@@ -763,7 +763,7 @@ function registerHabitatAutomations(
     appServerClient,
     desktopApiOptions,
     globalState,
-    () => getDesktopFeatureAvailability().localAutomationHabitatMigration,
+    () => getDesktopFeatureAvailability().localAutomationHabitatMigration === true,
     (url, init) => net.fetch(url, init),
     invalidate,
   );

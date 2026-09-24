@@ -1634,5 +1634,4 @@ export {
   type DesktopFetchOptions,
   type HostFetchHandler,
   type FetchMetrics,
-  isSameAuthIdentity,
 };

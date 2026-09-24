@@ -75,7 +75,7 @@ export class SkysightServiceManager {
   private cachedStatus: SkysightStatus & Record<string, unknown> = STOPPED_STATUS;
   private desiredState: string = `stopped`;
   private pendingOperation: Promise<unknown> = Promise.resolve();
-  private finishPendingPauseResume: ((status: SkysightStatus) => void) | null = null;
+  private finishPendingPauseResume: ((status: SkysightStatus & Record<string, unknown>) => void) | null = null;
   private pendingStatus: Promise<SkysightStatus & Record<string, unknown>> | null = null;
 
   constructor(dependencies: SkysightServiceManagerDependencies) {
