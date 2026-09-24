@@ -248,7 +248,14 @@ export interface AppServerConnection {
   registerInternalNotificationHandler(handler: (notification: any) => void): () => void;
   registerInternalAuthenticatedPrincipalChangeHandler(handler: () => void): () => void;
   registerInternalConnectionStateHandler(handler: (state: unknown) => void): () => void;
+  listThreadTurns(id: string, opts: unknown, fetchOpts: unknown): Promise<{ data: any[] }>;
 }
+
+/** cron 运行的目标目录（原 ks 的 v 局部）。 */
+export type AutomationTarget =
+  | { type: `legacy`; cwd: string }
+  | { type: `projectless` }
+  | { type: `project`; project: { projectId: string; roots: string[] } };
 
 /** git worker 请求函数（requestGitWorker）。 */
 export type GitWorkerRequest = (request: {
@@ -872,7 +879,7 @@ async function runAutomationTurn({
   repoRoot: string;
   runTrigger: string;
 }): Promise<void> {
-  let targets: Array<{ type: string; cwd?: string; projectId?: string; roots?: string[]; project?: unknown }>;
+  let targets: AutomationTarget[];
   if (automation.target == null)
     targets = automation.cwds.map((cwd) => ({ type: `legacy`, cwd }));
   else if (automation.target.type === `projectless`) targets = [{ type: `projectless` }];
@@ -969,11 +976,11 @@ async function runAutomationTurn({
 }
 
 /** 目标 → cwd 字符串（原 As，9,266-9,268）。 */
-function targetCwd(target: { type: string; cwd?: string; project?: { roots: string[] } }): string | null {
+function targetCwd(target: AutomationTarget): string | null {
   return target.type === `legacy`
-    ? target.cwd!
+    ? target.cwd
     : target.type === `project`
-      ? joinProjectRootsAsCwd(target.project!.roots)
+      ? joinProjectRootsAsCwd(target.project.roots)
       : null;
 }
 
@@ -1051,7 +1058,7 @@ async function runAutomationForTarget({
   appServerClient: AutomationSchedulerOptions["appServerClient"];
   worktreeLifecycle: AutomationSchedulerOptions["worktreeLifecycle"];
   configRequirements: any;
-  target: { type: string; cwd?: string; project?: { projectId: string; roots: string[] } };
+  target: AutomationTarget;
   automationModelSettings: { model: string; reasoningEffort: string };
   appToolNames: string[];
   hostedAutomationsAvailable: boolean;
@@ -1062,16 +1069,16 @@ async function runAutomationForTarget({
   let threadTitle = `Automation: ${automation.name}`;
   let baseInstructions = HEARTBEAT_BASE_INSTRUCTIONS.trim();
   let isProjectless = target.type === `projectless`;
-  let project = target.type === `project` ? target.project! : null;
+  let project = target.type === `project` ? target.project : null;
   let projectRoots = project?.roots ?? [];
   let targetCwdOrNull = targetCwd(target);
   let cwd = targetCwdOrNull ?? expandHomeDir(`~`);
-  let compatibilityCwds = target.type === `legacy` ? [target.cwd!] : projectRoots;
+  let compatibilityCwds = target.type === `legacy` ? [target.cwd] : projectRoots;
   let projectlessOutputDirectory: string | null = null;
   let projectlessWorkspaceBrowserRoot: string | null = null;
   if (isProjectless || targetCwdOrNull == null) {
     let paths = await createProjectlessThreadPathsViaAppServer({
-      appServerClient,
+      appServerClient: appServerClient as never,
       configuredWorkspaceRoot:
         (appServerClient as { hostConfig: { id: string } }).hostConfig.id === `local`
           ? settingsStore.getEffective(settingsKeys.projectlessWorkspaceRoot.key)
@@ -1160,7 +1167,7 @@ async function runAutomationForTarget({
       config: {
         ...threadConfig,
         ...(await resolveCodexAppMcpOverrides({
-          hostConfig,
+          hostConfig: hostConfig as { kind: string },
           appServerVersion: appServerConnection.appServerVersion,
         })),
         [configOverrideKeyForVersion(appServerConnection.appServerVersion)]: appToolNames,
@@ -1283,9 +1290,9 @@ async function runAutomationForTarget({
     try {
       let [codexHomeOrWorkspacesRoot, platformPath] = await Promise.all([
         (desktopFeatureAvailability as { workspaceDir?: boolean }).workspaceDir
-          ? (appServerClient as { workspacesRoot(): Promise<string> }).workspacesRoot()
-          : (appServerClient as { codexHome(): Promise<string> }).codexHome(),
-        appServerClient.platformPath(),
+          ? (appServerClient as unknown as { workspacesRoot(): Promise<string> }).workspacesRoot()
+          : (appServerClient as unknown as { codexHome(): Promise<string> }).codexHome(),
+        (appServerClient as unknown as { platformPath(): Promise<any> }).platformPath(),
       ]);
       let visualizationDir = platformPath.join(
         convertPathForExecutionHost(codexHomeOrWorkspacesRoot, shouldUseWslPaths((appServerClient as { hostConfig: unknown }).hostConfig)),
@@ -1293,7 +1300,7 @@ async function runAutomationForTarget({
         ...String(visualizationId).split(`/`),
         threadId,
       );
-      await (appServerClient as { createDirectory(path: string, opts: { recursive: boolean }): Promise<unknown> }).createDirectory(
+      await (appServerClient as unknown as { createDirectory(path: string, opts: { recursive: boolean }): Promise<unknown> }).createDirectory(
         visualizationDir,
         { recursive: true },
       );

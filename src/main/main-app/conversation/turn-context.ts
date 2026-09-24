@@ -43,6 +43,7 @@ import {
   Tl as expandTilde,
   Ol as toPosix,
 } from "@chunk/shared";
+import { basename as posixBasename } from "node:path/posix";
 import { uniqBy } from "../util/lodash-interop";
 import {
   FILES_MENTIONED_SECTION,
@@ -1104,10 +1105,10 @@ function formatCommentAttachment({ comment, promptNumber }: { comment: any; prom
   comment.localArtifactAnnotationMetadata != null &&
     (text += `Artifact annotation: ${formatArtifactAnnotationTarget(comment.localArtifactAnnotationMetadata)}\n`);
   comment.localBrowserScreenshot != null &&
-    (text += comment.localBrowserCommentMetadata?.kind === `element` ? `${savedMarkerScreenshotMessage(promptNumber)}\n` : `${annotatedScreenshotMessage(promptNumber)}\n`);
-  comment.localPdfScreenshot != null && (text += `${annotatedPdfScreenshotMessage(promptNumber)}\n`);
+    (text += comment.localBrowserCommentMetadata?.kind === `element` ? `${savedMarkerScreenshotMessage(promptNumber as any)}\n` : `${annotatedScreenshotMessage(promptNumber as any)}\n`);
+  comment.localPdfScreenshot != null && (text += `${annotatedPdfScreenshotMessage(promptNumber as any)}\n`);
   let attachedImageCount = comment.localBrowserAttachedImages?.length ?? 0;
-  if (attachedImageCount > 0 && (text += `${attachedImagesMessage(promptNumber, attachedImageCount)}\n`), comment.localBrowserDesignChange == null || comment.localBrowserDesignChange.group.comment != null) {
+  if (attachedImageCount > 0 && (text += `${attachedImagesMessage(promptNumber as any, attachedImageCount)}\n`), comment.localBrowserDesignChange == null || comment.localBrowserDesignChange.group.comment != null) {
     let designChange = comment.localBrowserDesignChange?.group;
     let commentText = designChange == null || extractAnnotationControlChanges(designChange).length === 0 ? content : (designChange.comment ?? ``);
     text += `Comment:\n${commentText}\n`;
@@ -1307,7 +1308,7 @@ export function createQueuedMessagePrepare(
       additionalContext =
         extractWritingBlockContext(
           conversationId,
-          mergedConversationTurns(currentConversation).map((turn: any) => ({
+          mergedConversationTurns(currentConversation, undefined).map((turn: any) => ({
             turnId: turn.turnId,
             messages: turn.items.flatMap((item: any) =>
               item.type === `agentMessage` && `text` in item && typeof item.text == `string` ? [item.text] : [],
@@ -1380,7 +1381,7 @@ export function createQueuedMessagePrepare(
  */
 export function createQueuedMessagesFacade(
   manager: any,
-  { runtime, settings, storage }: { runtime: any; settings: any; storage: any },
+  options: { runtime: any; settings: any; storage: any; filesystem?: any },
   resolveDefaultServiceTier: (model: string | null) => Promise<unknown>,
   isAlive: () => boolean,
   emitExecutionEvent: (event: any) => void,
@@ -1388,12 +1389,12 @@ export function createQueuedMessagesFacade(
   resumeConversation: (request: any, isExecutor?: boolean) => Promise<any>,
 ) {
   return {
-    ...runtime.queuedMessages,
-    prepare: createQueuedMessagePrepare(manager, { runtime, settings, storage }, resolveDefaultServiceTier, createId, resumeConversation),
+    ...options.runtime.queuedMessages,
+    prepare: createQueuedMessagePrepare(manager, options as any, resolveDefaultServiceTier, createId, resumeConversation),
     isClientReady: (conversationId: string) =>
       isAlive() &&
-      runtime.queuedMessages.automaticExecutionEnabled &&
-      runtime.queuedMessages.isHostForConversation(conversationId, manager.getHostId()),
+      options.runtime.queuedMessages.automaticExecutionEnabled &&
+      options.runtime.queuedMessages.isHostForConversation(conversationId, manager.getHostId()),
     errorReason: (error: unknown) => (error instanceof Error ? error.message : String(error)),
     onAttempt: (conversationId: string, message: any) => emitExecutionEvent({ type: `attempt`, conversationId, message }),
     onResult: (conversationId: string, message: any, result: any) =>
@@ -1404,8 +1405,8 @@ export function createQueuedMessagesFacade(
         manager.addAnyConversationMetaCallback(readinessChanged),
         manager.addStreamRoleStateCallback(changed),
         manager.addTurnCompletedListener(turnCompleted),
-        storage.subscribeQueuedFollowUps?.(changed),
-        settings.subscribeExecutionSettingsChanged?.(readinessChanged),
+        options.storage.subscribeQueuedFollowUps?.(changed),
+        options.settings.subscribeExecutionSettingsChanged?.(readinessChanged),
       ];
       return () => {
         for (let unsubscribe of unsubscribers) unsubscribe?.();

@@ -256,7 +256,7 @@ export function updateDesktopFeatureAvailability(
     patch.codexLocalAccess != null &&
     patch.workCloudAccess != null &&
     patch.workLocalAccess != null;
-  let next = {
+  let next: Record<string, unknown> = {
     ...currentAvailability,
     ...patch,
     deviceAttestation: deviceAttestationSupported(),

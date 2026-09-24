@@ -101,9 +101,10 @@ function dateDirectory({
 }
 
 /** 线程目录名（原 Ct，633-640）：directoryName 优先，否则从 prompt 取词干。 */
-function threadDirectoryName(input: { directoryName?: string } | string | null): string {
-  let explicit = typeof input == `object` && input ? input.directoryName : null;
-  let prompt = typeof input == `object` && input ? (input as { prompt?: string }).prompt : input;
+function threadDirectoryName(input: { directoryName?: string; prompt?: string } | string | null): string {
+  let explicit = typeof input == `object` && input != null ? input.directoryName : null;
+  let prompt =
+    typeof input == `object` && input != null ? input.prompt : (input as string | null);
   let words = (explicit ?? prompt)?.toLowerCase().match(/[a-z0-9]+/g);
   return words == null || words.length === 0
     ? `new-chat`
@@ -288,7 +289,12 @@ export async function createProjectlessThreadPathsViaAppServer({
 }: {
   appServerClient: {
     hostConfig: unknown;
-    platformPath(): Promise<{ join(...parts: string[]): string; isAbsolute(p: string): string }>;
+    platformPath(): Promise<{
+      join(...parts: string[]): string;
+      isAbsolute(p: string): boolean;
+      basename(p: string): string;
+      dirname(p: string): string;
+    }>;
   };
   configuredWorkspaceRoot: string | null;
   createSplitDirectories: boolean;

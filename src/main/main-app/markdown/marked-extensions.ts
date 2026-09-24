@@ -333,7 +333,7 @@ export function extractInboxItems(conversationId: string, text: string) {
   return directives.reduce((items: any[], directive: any, index: number) => {
     let attributes: Record<string, string> = {};
     for (let [key, value] of Object.entries(directive.attributes))
-      attributes[key] = value === true ? `true` : value;
+      attributes[key] = value === true ? `true` : (value as string);
     let explicitId = attributes.id?.trim() ?? null;
     let fallbackId = directives.length > 1 && explicitId == null ? `${conversationId}-${index + 1}` : conversationId;
     let id = explicitId?.length ? explicitId : fallbackId;

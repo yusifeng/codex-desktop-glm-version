@@ -362,7 +362,7 @@ export async function runConversationCreationWithFirstTurn(
       threadSource,
       threadStartKind,
       requiresThreadReferences = false,
-    } = params;
+    } = params as any;
     let personality = await manager.readDefaultPersonality(cwd);
     let saveThreadProjectAssignment = facade.runtimeSettings.saveThreadProjectAssignment;
     let onConversationCreated =
@@ -540,11 +540,11 @@ export async function runConversationCreationWithFirstTurn(
             ).turn.id,
           };
         } catch (error) {
-          return error instanceof DeliveryError && error.delivery.stage === `outcome-unknown`
+          return error instanceof DeliveryError && (error as any).delivery.stage === `outcome-unknown`
             ? {
                 status: `outcome-unknown`,
                 clientUserMessageId: turnClientUserMessageId,
-                requestId: error.delivery.requestId,
+                requestId: (error as any).delivery.requestId,
               }
             : {
                 status: error instanceof Error && `jsonRpcCode` in error ? `rejected` : `not-started`,
@@ -557,8 +557,8 @@ export async function runConversationCreationWithFirstTurn(
     .then(
       async (result: any) => (await notifySettled(result), result),
       async (error: unknown) => {
-        if (error instanceof DeliveryError && error.delivery.stage === `outcome-unknown`) {
-          let outcome = { status: `outcome-unknown`, requestId: error.delivery.requestId };
+        if (error instanceof DeliveryError && (error as any).delivery.stage === `outcome-unknown`) {
+          let outcome = { status: `outcome-unknown`, requestId: (error as any).delivery.requestId };
           await notifySettled(outcome);
           return outcome;
         }
@@ -607,7 +607,7 @@ export async function startContinuationTurn({
   let latestTurn =
     conversation == null
       ? null
-      : (findLast(mergedTurnsView(conversation, turnMergePolicy), (turn: any) => turn.turnId != null) ?? null);
+      : (findLast(mergedConversationTurns(conversation, turnMergePolicy), (turn: any) => turn.turnId != null) ?? null);
   if (
     conversation?.threadRuntimeStatus?.type === `active` ||
     (latestTurn?.status === `inProgress` && conversation?.threadRuntimeStatus?.type !== `idle`)

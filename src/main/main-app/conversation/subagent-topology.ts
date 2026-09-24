@@ -401,7 +401,7 @@ export class SubagentTopology {
     let conversation = this.params.threadStore.getConversation(conversationId);
     if (conversation == null) return [];
     let spawnedIds = new Set<string>();
-    for (let turn of mergedConversationTurns(conversation))
+    for (let turn of mergedConversationTurns(conversation, undefined))
       for (let item of turn.items)
         if (
           item.type === `subAgentActivity` &&

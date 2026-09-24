@@ -33,7 +33,7 @@ export interface RealtimeLaunch {
 
 /** renderer 侧 starter 的 RPC 句柄形态（with onRpcBroken + Symbol.dispose）。 */
 export interface StarterRpcHandle {
-  (): Promise<unknown> | unknown;
+  (request?: RealtimeStartRequest): Promise<unknown> | unknown;
   onRpcBroken(handler: () => void): unknown;
   [Symbol.dispose](): void;
 }

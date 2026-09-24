@@ -625,7 +625,8 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       observeTurnStart: (conversationId: string, turnId: string) => this.turnStartObservations.observeStart(conversationId, turnId),
       manager: this,
       notificationContext: this.notificationContext,
-      hasRuntimeSession: (conversationId: string) => this.runtime.hasSession?.(conversationId) ?? false,
+      // 原版 b = this.settings.restricted（threadRecognition 同源对象）。
+      hasRuntimeSession: (conversationId: string) => this.settings.restricted?.hasSession(conversationId) ?? false,
       readQueuedFollowUpHead: this.turnCoordinator.readHead,
       supportsGoalContinuation: this.runtime.hasDesktopRuntime,
       createId: this.history.createSearchIslandId,

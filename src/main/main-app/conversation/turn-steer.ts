@@ -326,7 +326,7 @@ async function waitForActiveTurnId({
   let activeTurn = conversation == null ? null : lastIncompleteTurn(conversation);
   if (activeTurn?.status !== `inProgress`) throw createInactiveError();
   return activeTurn.turnId == null
-    ? new Promise((resolve, reject) => {
+    ? new Promise<string>((resolve, reject) => {
         let timeout = schedule(() => {
           unregister();
           reject(Error(`Cannot steer conversation ${conversationId} without an active turn id`));

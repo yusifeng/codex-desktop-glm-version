@@ -428,7 +428,9 @@ export class AvatarOverlayWindowManager {
       this.quickChatKeyboardInteractionActive = true;
       let focused = BrowserWindow.getFocusedWindow();
       if (focused != null && focused !== this.window) this.previousQuickChatWindow = focused;
-      else this.previousQuickChatApplication ??= getFrontmostWindow();
+      else
+        this.previousQuickChatApplication ??=
+          getFrontmostWindow() as Promise<{ bundleIdentifier: string } | null>;
       return;
     }
     if (!this.quickChatKeyboardInteractionActive) return;
@@ -2973,7 +2975,11 @@ function run(argv) {
       window.setIgnoreMouseEvents(false);
       this.mousePassthroughMode = `disabled`;
     }
-    let applied = window.setInputShape(
+    let applied = (
+      window as unknown as {
+        setInputShape(rects: Array<{ height: number; width: number; x: number; y: number }>): boolean;
+      }
+    ).setInputShape(
       this.inputShape.map(({ height, left, top, width }) => ({
         height,
         width,

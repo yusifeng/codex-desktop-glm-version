@@ -941,8 +941,8 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
       let onDidNavigate = (_event: unknown, url: string) => {
         updateThread(url);
       };
-      let onDidNavigateInPage = (_event: unknown, url: string, _isMainFrame: unknown, _frame: unknown, didCommit: boolean) => {
-        if (didCommit) updateThread(url);
+      let onDidNavigateInPage = (_event: unknown, url: string, isMainFrame: boolean) => {
+        if (isMainThreadNavigation(isMainFrame)) updateThread(url);
       };
       let { webContents } = window;
       webContents.on(`did-navigate`, onDidNavigate);
@@ -1023,6 +1023,11 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
       }
     },
   };
+}
+
+/** did-navigate-in-page 的主帧导航判定（原文 `i = (e,n,r) => { r && t(n) }`）。 */
+function isMainThreadNavigation(isMainFrame: unknown): boolean {
+  return isMainFrame === true;
 }
 
 /** URL → 线程 id（原 uue + Nd，18,703-18,710 + 18,720-18,728）。 */

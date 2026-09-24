@@ -549,7 +549,7 @@ function clampTrayHeight({
   realtimeCaptionAboveMascotPx: number;
   petControlRowReserve: number;
   traySize: { width: number; height: number };
-}): Rect {
+}): { width: number; height: number } {
   let captionReserve = captionReservePx(mode, realtimeCaptionAboveMascotPx);
   let topExtra =
     placement.startsWith(`top`)

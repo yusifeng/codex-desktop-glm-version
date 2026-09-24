@@ -30,9 +30,11 @@ import { iv as normalizeTurn } from "../threads/projection";
 import { H_ as parseThreadSource } from "../threads/projection";
 // hh（28,627）= produce 冻结包装（本 build 中为恒等）——R3 vendor/immer。
 import { freezeIdentity } from "../vendor/immer";
-// T_（31,567）= 会话追加 turn——R3 turns/canonical-history（导出名以 R3 侧
-// 落地为准，暂按语义名引用，缺导出已记录）。
-import { appendConversationTurn } from "../turns/canonical-history";
+// T_（31,567）= 会话追加单 turn——R3 turns/canonical-history 尚未导出该
+// 符号（appendConversationTurn），落地后改为命名导出（缺导出已记录）。
+import * as canonicalHistoryModule from "../turns/canonical-history";
+const appendConversationTurn: (conversation: any, turn: any, createId: () => string) => any =
+  (canonicalHistoryModule as any).appendConversationTurn;
 // dg（30,006）= steeringUserMessage 条目构造——R3 turns/steering-merge 簇
 //（导出名以 R3 侧落地为准——暂按压缩名引用，缺导出已记录）。
 import { dg as buildSteeringUserMessage } from "../turns/steering-merge";
@@ -376,15 +378,15 @@ function buildGoalTurnParams(conversationId: string, goal: any, permissions: any
 function applyGoalTurnToState(manager: any, conversationId: string, goal: any, createSearchIslandId: () => string) {
   manager.updateConversationState(conversationId, (state: any) => {
     state.threadGoal = goal;
-    let lastTurn = lastTurn(state);
-    let firstInput = lastTurn?.params.input[0];
+    let currentTurn = lastTurn(state);
+    let firstInput = currentTurn?.params.input[0];
     if (
-      lastTurn != null &&
-      lastTurn.turnId == null &&
-      lastTurn.turnStartedAtMs === goal.updatedAt * 1e3 &&
-      lastTurn.status === `completed` &&
-      lastTurn.items.length === 0 &&
-      lastTurn.params.input.length === 1 &&
+      currentTurn != null &&
+      currentTurn.turnId == null &&
+      currentTurn.turnStartedAtMs === goal.updatedAt * 1e3 &&
+      currentTurn.status === `completed` &&
+      currentTurn.items.length === 0 &&
+      currentTurn.params.input.length === 1 &&
       firstInput?.type === `text` &&
       firstInput.text === goalCommandText(goal.objective)
     )
@@ -394,11 +396,11 @@ function applyGoalTurnToState(manager: any, conversationId: string, goal: any, c
       state,
       buildGoalTurnParams(conversationId, goal, {
         approvalPolicy:
-          state.latestThreadSettings?.approvalPolicy ?? lastTurn?.params.approvalPolicy ?? defaultPermissions.approvalPolicy,
+          state.latestThreadSettings?.approvalPolicy ?? currentTurn?.params.approvalPolicy ?? defaultPermissions.approvalPolicy,
         approvalsReviewer:
-          state.latestThreadSettings?.approvalsReviewer ?? lastTurn?.params.approvalsReviewer ?? defaultPermissions.approvalsReviewer,
+          state.latestThreadSettings?.approvalsReviewer ?? currentTurn?.params.approvalsReviewer ?? defaultPermissions.approvalsReviewer,
         sandboxPolicy:
-          state.latestThreadSettings?.sandboxPolicy ?? lastTurn?.params.sandboxPolicy ?? defaultPermissions.sandboxPolicy,
+          state.latestThreadSettings?.sandboxPolicy ?? currentTurn?.params.sandboxPolicy ?? defaultPermissions.sandboxPolicy,
       }),
       createSearchIslandId,
     );

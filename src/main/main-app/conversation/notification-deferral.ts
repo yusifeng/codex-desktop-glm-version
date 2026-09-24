@@ -207,7 +207,7 @@ export class UnreadTurnState {
   }
 
   /** 持久化读状态就绪：补齐延迟初始化的 hadUnreadTurn。 */
-  initializeSavedReadState(unreadThreadIds: Set<string> | string[]) {
+  initializeSavedReadState(unreadThreadIds: Set<string>) {
     for (let entry of this.turnState.values())
       entry.savedReadStatePending &&= ((entry.hadUnreadTurn = unreadThreadIds.has(entry.conversationId)), false);
   }
@@ -305,7 +305,7 @@ export class PrewarmedThreadManager {
       },
       (error: unknown) => {
         // 失败（非 outcome-unknown）时出池；outcome-unknown 保留等待落定。
-        (error instanceof DeliveryError && error.delivery.stage === `outcome-unknown`) ||
+        (error instanceof DeliveryError && (error as any).delivery.stage === `outcome-unknown`) ||
           (this.prewarmedThreadByCwd.get(cwd) === entry && this.prewarmedThreadByCwd.delete(cwd));
       },
     );

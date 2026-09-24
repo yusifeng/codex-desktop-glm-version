@@ -46,9 +46,11 @@ import {
   findDraftTurn,
   removeTurn,
 } from "../turns/canonical-history";
-// T_（31,567）= 会话追加 turn——R3 turns/canonical-history（导出名以 R3 侧
-// 落地为准，暂按语义名引用，缺导出已记录）。
-import { appendConversationTurn } from "../turns/canonical-history";
+// T_（31,567）= 会话追加单 turn——R3 turns/canonical-history 尚未导出该
+// 符号（appendConversationTurn），落地后改为命名导出（缺导出已记录）。
+import * as canonicalHistoryModule from "../turns/canonical-history";
+const appendConversationTurn: (conversation: any, turn: any, createId: () => string) => any =
+  (canonicalHistoryModule as any).appendConversationTurn;
 // R3 threads/operations（沙箱/根集合运算，原 Nx/Ox/kx/Ax/Px）。
 import {
   mergeUnique,
@@ -624,7 +626,7 @@ function prepareTurnDispatch(
       ? request.additionalContext
       : extractWritingBlockContext(
           conversationId,
-          mergedConversationTurns(conversation).map((turn: any) => ({
+          mergedConversationTurns(conversation, undefined).map((turn: any) => ({
             turnId: turn.turnId,
             messages: turn.items.flatMap((item: any) =>
               item.type === `agentMessage` && `text` in item && typeof item.text == `string` ? [item.text] : [],
@@ -792,20 +794,20 @@ function findTurnByClientUserMessageId(conversation: any, clientUserMessageId: s
 }
 
 /** 有未确认提交时抛错（防并发 turn/start）。 */
-function assertNoUnconfirmedSubmission(conversation: any) {
+export function assertNoUnconfirmedSubmission(conversation: any) {
   if (conversation?.unconfirmedTurnSubmissions?.[0] != null)
     throw Error(`An earlier turn submission is not yet confirmed`);
 }
 
 /** 记录未确认提交（按 requestId 去重）。 */
-function recordUnconfirmedSubmission(conversation: any, submission: any, clientUserMessageId: string) {
+export function recordUnconfirmedSubmission(conversation: any, submission: any, clientUserMessageId: string) {
   let submissions = (conversation.unconfirmedTurnSubmissions ??= []);
   submissions.some((entry: any) => entry.requestId === submission.requestId) ||
     submissions.push({ ...submission, clientUserMessageId });
 }
 
 /** 清除未确认提交（清空后删除键）。 */
-function clearUnconfirmedSubmission(conversation: any, requestId: string | null) {
+export function clearUnconfirmedSubmission(conversation: any, requestId: string | null) {
   requestId != null &&
     conversation.unconfirmedTurnSubmissions != null &&
     ((conversation.unconfirmedTurnSubmissions = conversation.unconfirmedTurnSubmissions.filter(
@@ -1029,8 +1031,10 @@ async function executeTurnStartCore(
   let isLatestTurnStart = () => manager.getConversation(conversationId)?.latestTurnStartMessageId === clientUserMessageId;
   let runtimeStatusBefore = manager.getConversation(conversationId)?.threadRuntimeStatus;
   let activeRuntimeStatus = { type: `active`, activeFlags: [] };
+  // 原版为单条逗号表达式语句（无 if）：projectless 工作区字段提升 + 最新
+  // model/effort/collab 写回 + 权限落位（pendingWorkspace 存在时跳过）。
   let applyPreparedState = (state: any) => {
-    if (
+    void (
       prepared.pendingWorkspace == null &&
       prepared.projectlessWorkspace &&
       ((state.workspaceKind = `projectless`),
@@ -1099,11 +1103,11 @@ async function executeTurnStartCore(
     await beforeSendRequest?.();
     assertNoUnconfirmedSubmission(manager.getConversation(conversationId));
     let current = manager.getConversation(conversationId);
-    let latestTurn = current == null ? null : latestTurn(current);
+    let currentTurn = current == null ? null : latestTurn(current);
     let isFirstTurnOfIdleThread =
       threadWasIdle &&
-      latestTurn?.turnId == null &&
-      latestTurn?.params.clientUserMessageId === clientUserMessageId &&
+      currentTurn?.turnId == null &&
+      currentTurn?.params.clientUserMessageId === clientUserMessageId &&
       (current?.threadRuntimeStatus === activeRuntimeStatus || current?.threadRuntimeStatus?.type !== `active`);
     if ((responseItems?.length ?? 0) > 0 && !isFirstTurnOfIdleThread)
       throw Error(`App context must wait until the current turn finishes`);

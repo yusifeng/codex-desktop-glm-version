@@ -293,7 +293,7 @@ export class ProjectlessConversations {
   }
 
   /** 读 projectless 会话 id 集合（失败返回 null）。 */
-  private async loadConversationIds() {
+  private async loadConversationIds(): Promise<Set<string> | null> {
     try {
       let value = await this.storage.readGlobalState(`projectless-thread-ids`);
       let ids = zArray(zString()).parse(value ?? []);
@@ -308,11 +308,13 @@ export class ProjectlessConversations {
   }
 
   /** 读路径提示表（失败返回 null）。 */
-  private async loadThreadPathHints(key: string) {
+  private async loadThreadPathHints(key: string): Promise<Map<string, string> | null> {
     try {
       let value = await this.storage.readGlobalState(key);
       let parsed = pathHintsSchema.safeParse(value).data ?? {};
-      return new Map(Object.entries(parsed).map(([id, path]) => [normalizeThreadId(id), path]));
+      return new Map<string, string>(
+        (Object.entries(parsed) as [string, string][]).map(([id, path]) => [normalizeThreadId(id), path]),
+      );
     } catch (error) {
       this.logger.warning(`Failed to load projectless thread path hints`, {
         safe: { key },

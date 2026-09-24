@@ -509,11 +509,12 @@ export interface TurnStartObservationHandle {
 export class TurnStartObservations {
   hostId: string;
   logger: any;
-  capture: (conversationId: string, registerObserver: (observer: any) => () => void) => void;
+  /** capture（events.captureTurnStart）以上下文对象 + 观察者注册器调用。 */
+  capture: (context: unknown, registerObserver: (observer: any) => () => void) => void;
   requests = new Map<string, TurnStartObservationEntry>();
   clearing = false;
 
-  constructor(hostId: string, logger: any, capture: any) {
+  constructor(hostId: string, logger: any, capture: (context: unknown, registerObserver: (observer: any) => () => void) => void) {
     this.hostId = hostId;
     this.logger = logger;
     this.capture = capture;

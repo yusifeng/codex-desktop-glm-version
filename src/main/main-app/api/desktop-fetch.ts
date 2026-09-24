@@ -1598,6 +1598,13 @@ function createBrowserAuthOperations(
   });
 }
 
+/** 认证身份匹配（原 main chunk `W`）：chatgpt 比 accountId+userId，其余比 authMode。 */
+export function isSameAuthIdentity(a: { kind: string; accountId?: string; userId?: string; authMode?: string }, b: { kind: string; accountId?: string; userId?: string; authMode?: string }): boolean {
+  return a.kind === "chatgpt"
+    ? b.kind === "chatgpt" && a.accountId === b.accountId && a.userId === b.userId
+    : b.kind === "execution-storage" && a.authMode === b.authMode;
+}
+
 export {
   requestProfileSchema,
   workspaceSettingsSchema,
@@ -1627,4 +1634,5 @@ export {
   type DesktopFetchOptions,
   type HostFetchHandler,
   type FetchMetrics,
+  isSameAuthIdentity,
 };

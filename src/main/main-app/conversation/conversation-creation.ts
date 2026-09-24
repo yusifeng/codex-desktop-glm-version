@@ -985,7 +985,7 @@ export class ConversationCreationExecutor {
       canonicalVoiceHistory: isCanonicalVoiceHistory(response.thread),
       serviceName: params.serviceName,
     };
-    this.params.canonicalTurnHistory && applyConversationTurns(freezeIdentity(conversationState), [], true);
+    this.params.canonicalTurnHistory && applyConversationTurns(freezeIdentity(conversationState), [], true, null);
     applyModelSettingsUpdate(freezeIdentity(conversationState), {
       ...buildModelSettingsUpdate(
         response,
