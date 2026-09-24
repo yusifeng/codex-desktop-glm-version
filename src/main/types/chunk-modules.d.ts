@@ -100,7 +100,10 @@ declare module "@chunk/shared" {
   export const Ca: any; // 内部符号: Lne
   export const Cc: any; // 内部符号: SC
   export const Cd: any; // 内部符号: Ute
-  export const Cf: () => NumberSchema;
+  // 注：zod builder 导出（Cf/Of 等）在 main-app 重写中被大量链式调用
+  // （.trim()/.int()/.refine()/.catchall() 等），d.ts 无法完整还原 zod 的 builder 面，
+  // 故放宽为 any；内部符号名见原粗扫/深析文档。
+  export const Cf: any; // 内部符号: hZ（zod number builder）
   export const Ci: any; // 内部符号: ZM
   export const Cl: any; // 内部符号: rx
   export const Cn: any; // 内部符号: OX
@@ -253,7 +256,7 @@ declare module "@chunk/shared" {
   export const Oa: any; // 内部符号: Ane
   export const Oc: any; // 内部符号: TC
   export const Od: any; // 内部符号: E_
-  export const Of: () => Schema;
+  export const Of: any; // 内部符号: kF（zod string builder，链式调用放宽为 any）
   export const Oi: any; // 内部符号: xM
   export const Ol: any; // 内部符号: ex
   export const On: any; // 内部符号: hX
@@ -431,7 +434,7 @@ declare module "@chunk/shared" {
   export const ba: any; // 内部符号: oj
   export const bc: any; // 内部符号: NC
   export const bd: any; // 内部符号: H_
-  export const bf: (value: unknown) => Schema;
+  export const bf: any; // 内部符号: Jx（zod literal builder，链式调用放宽为 any）
   export const bi: any; // 内部符号: dN
   export const bl: any; // 内部符号: Jb
   export const bn: any; // 内部符号: pX
@@ -509,7 +512,7 @@ declare module "@chunk/shared" {
   export const ha: any; // 内部符号: fj
   export const hc: any; // 内部符号: JC
   export const hd: any; // 内部符号: B_
-  export const hf: (schema: Schema) => ArraySchema;
+  export const hf: any; // 内部符号: cj（zod array builder，链式调用放宽为 any）
   export const hi: any; // 内部符号: wP
   export const hl: any; // 内部符号: sx
   export const hn: any; // 内部符号: xQ
@@ -696,7 +699,7 @@ declare module "@chunk/shared" {
   export const va: any; // 内部符号: Hne
   export const vc: any; // 内部符号: GC
   export const vd: any; // 内部符号: K_
-  export const vf: (discriminator: string, options: Schema[]) => Schema;
+  export const vf: any; // 内部符号: h9（zod discriminated-union builder，放宽为 any）
   export const vi: any; // 内部符号: HN
   export const vl: any; // 内部符号: Zb
   export const vn: any; // 内部符号: ZY
@@ -709,7 +712,7 @@ declare module "@chunk/shared" {
   export const wa: any; // 内部符号: Rne
   export const wc: any; // 内部符号: bC
   export const wd: any; // 内部符号: M_
-  export const wf: (shape: Record<string, Schema>) => Schema;
+  export const wf: any; // 内部符号: j3（zod object builder，链式调用放宽为 any）
   export const wi: any; // 内部符号: YM
   export const wl: any; // 内部符号: Qb
   export const wn: any; // 内部符号: TX
@@ -782,7 +785,63 @@ declare module "@chunk/main" {
 }
 
 declare module "@chunk/bootstrap" {
-  // bootstrap-C4dRql4x.js —— 主进程引导（Sentry 初始化、自动更新等）。
-  // 加载时执行引导逻辑，无有意义的导出。
-  export {};
+  // bootstrap-C4dRql4x.js —— 已重写 chunk（src/main/bootstrap/，见
+  // chunk-manifest.mjs 的 REWRITTEN）。兼容导出（单字母名，如 "in"/"R"/"bn"）
+  // 与语义导出均由真实源码提供，直接转发真实模块的导出面。
+  export * from "../../bootstrap/index";
+  // `export *` 不转发字符串命名的导出（TS 限制）：
+  // - 保留字导出："in" → BuildFlavor 模型（build-info/build-flavor.ts）。
+  // - 兼容单字母 global-state 键（main-app 消费方按原版字母导入后重命名）。
+  export { in as "in" } from "../../bootstrap/build-info/build-flavor";
+  export {
+    COMPLETED_LOCAL_DATA_MIGRATION_IDS_KEY as "B",
+    AVATAR_OVERLAY_OPEN_KEY as "F",
+    PERSISTED_ATOM_STATE_KEY as "J",
+    AVATAR_OVERLAY_BOUNDS_KEY as "P",
+    REMOTE_HOSTED_PIP_TASK_VISIBILITY_STATE_KEY as "Q",
+    BROWSER_DOWNLOAD_HISTORY_KEY as "W",
+    REMOTE_HOSTED_PIP_CONTENT_MAX_DISPLAY_SIZE_KEY as "Z",
+  } from "../../bootstrap/state/global-state";
+}
+declare module "@chunk/windows-file-copy" {
+  // windows-file-copy-B0DNtkPq.js —— 已重写 chunk（src/main/windows-file-copy/）。
+  /** 复制目录；源目录加密且目标盘不支持加密时回退为「解密后复制」。 */
+  export function copyDirectoryAllowDecryptedDestinationOnEncryptionFailure(input: {
+    copy: () => Promise<void>;
+    source: string;
+    destination: string;
+  }): Promise<void>;
+  /** 复制文件；同上的加密回退策略。 */
+  export function copyFileAllowDecryptedDestinationOnEncryptionFailure(input: {
+    copy: () => Promise<void>;
+    source: string;
+    destination: string;
+  }): Promise<void>;
+}
+declare module "@chunk/main-shared" {
+  // src-C9YLnbgY.js —— 主进程小工具 chunk（尚未逆向重写）。
+  // deep-equal（fast-equals CJS 模块；main-C 中 `G = e.a(n.Ld())` 后
+  // `(0, G.default)(a, b)` 的来源，即深度相等比较）。
+  const deepEqual: (a: unknown, b: unknown) => boolean;
+  export default deepEqual;
+  /** 与 util.isDeepStrictEqual 同源的深度严格相等（fast-equals re-export）。 */
+  export const isDeepStrictEqual: (a: unknown, b: unknown) => boolean;
+}
+
+declare module "@chunk/css-selector" {
+  // dist-wQAv1pJP.js —— 未重写（css-select 引擎 + 惰性 HTML DOM parser 模块）。
+  // t：rolldown 惰性 CJS 模块访问器——调用一次返回 parser 模块对象，其
+  // parse(html) 产出带 querySelectorAll / structuredText 的 DOM 树
+  // （main-C-Mhak1n.ts 26,445 `Bme = s.t()`，线程标题 markdown 纯文本化用）。
+  export const t: () => {
+    parse(
+      html: string,
+      options?: unknown,
+    ): {
+      querySelectorAll(selector: string): { remove(): void }[];
+      structuredText: string;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
 }
