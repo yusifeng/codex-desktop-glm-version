@@ -47,4 +47,5 @@ export const REWRITTEN = new Set([
   "sandbox-preload",
   "preload",
   "device-service",
+  "bootstrap",
 ]);

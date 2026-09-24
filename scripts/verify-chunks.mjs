@@ -29,14 +29,22 @@ function requiresOf(code) {
     set.add(m[1] ?? m[2]);
   // 重写后的 chunk 用 esbuild 打包，不再 require rolldown 打包运行时。
   for (const r of [...set]) if (/^\.\/rolldown-runtime-/.test(r)) set.delete(r);
+  // node: 前缀的规范化：node:module === module（同一内置模块）
+  const canon = (r) => r.replace(/^node:/, "");
+  for (const r of [...set]) {
+    const bare = canon(r);
+    if (bare !== r && set.has(bare)) set.delete(r);
+    else if (bare !== r) { set.delete(r); set.add(bare); }
+  }
   return set;
 }
 
 function exportsOfOriginal(code) {
   const names = new Set();
-  for (const m of code.matchAll(/exports\.([A-Za-z0-9_]+)\s*=/g)) names.add(m[1]);
+  // 接收者必须是 chunk 的 exports 本身（排除 vendored 模块内的 t.exports.X=）
+  for (const m of code.matchAll(/(?<![.\w$])exports\.([A-Za-z0-9_]+)\s*=/g)) names.add(m[1]);
   // 原始产物是压缩后的单行代码，逗号后没有空格。
-  for (const m of code.matchAll(/Object\.defineProperty\(exports,\s*"([A-Za-z0-9_]+)"/g))
+  for (const m of code.matchAll(/(?<![.\w$])Object\.defineProperty\(exports,\s*"([A-Za-z0-9_]+)"/g))
     names.add(m[1]);
   return names;
 }

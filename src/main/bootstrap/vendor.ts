@@ -18184,3 +18184,37 @@ var pO = {
     return JSON.parse(t.decode(e));
   },
 };
+
+// ---- 应用模块需要的导出（按各重写 agent 报告补齐，集成时继续追加）----
+export {
+  it, // "index.html"（app-protocol 路由常量，原 3327）
+  et, // mime-types 惰性模块（charset/contentType 等，原 3249）
+  W, // Sentry getClient() helper（原 10300，供 main chunk 使用）
+  sE, // lodash clamp interop（原 oE 的 e.a(oE())，placement-snapping 用）
+  tt, // mime-types 实例（charset/contentType/lookup 等）
+  tC, // TS using/Symbol.asyncDispose 降级 helper
+  QS, // @sentry/electron init
+  fb, // SentryIpcMode 枚举（Classic/Protocol/Both）
+  DS, // makeOfflineStoreTransport
+  Lp, // makePromiseTransport
+  mx, // SentryMinidump 集成
+  Ix, // ChildProcess 集成
+  wh, // Console 集成
+  xh, // RewriteFrames 集成
+  Rm, // addSentryBreadcrumb
+  Hf, // captureSentryException
+  Uf, // captureSentryMessage
+  Kf, // setSentryUser
+  Gf, // setSentryTag
+  J, // @opentelemetry/api default（tracer/meter/propagation 全局 API）
+  X, // SamplingDecision 枚举
+  Bi, // W3CPropagator
+  rg, // TraceIdRatioBasedSampler
+  ng, // ParentBasedSampler
+  xg, // NodeTracerProvider
+  fg, // BatchSpanProcessor
+  qh, // resourceFromAttributes
+  Ay, // AsyncLocalStorageContextManager
+  gi, // ExportResultCode
+  pO, // OTLP JSON 序列化（serializeRequest）
+};
