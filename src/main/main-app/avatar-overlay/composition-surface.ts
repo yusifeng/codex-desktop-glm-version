@@ -24,7 +24,7 @@
 
 import { promisify } from "node:util";
 import { execFile } from "node:child_process";
-import { app, BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, powerMonitor, screen } from "electron";
 import deepEqual from "@chunk/main-shared";
 import {
   F as AVATAR_OVERLAY_OPEN_KEY,
@@ -53,8 +53,10 @@ import {
 import { CursorTracker, computeAvatarOverlayLayout } from "./geometry";
 import type { AvatarOverlayLayout, OverlayLayoutMode, OverlayPlacement, Point, Rect } from "./geometry";
 import {
+  ANIMATION_FRAME_MS,
   AVATAR_OVERLAY_HOST_ID,
   AVATAR_OVERLAY_ROUTE,
+  BOUNCE_FACTOR,
   DEFAULT_MASCOT_SIZE,
   DEFAULT_PET_CONTROLS_APPEARANCE,
   DETACHED_DISPLAY_REMEMBER_MS,
@@ -63,23 +65,25 @@ import {
   FADE_START_OPACITY,
   HIDE_FADE_DURATION_MS,
   LEGACY_TRAY_SIZE,
+  MAX_FRAME_DELTA_MS,
   MOMENTUM_DECAY_FRAME_MS,
   MOMENTUM_FRAME_DECAY,
   MOMENTUM_MAX_DURATION_MS,
   MOMENTUM_MIN_SPEED,
-  BOUNCE_FACTOR,
-  MAX_FRAME_DELTA_MS,
   MOVED_WINDOW_PERSIST_DELAY_MS,
+  MOVEMENT_SPRING,
   NATIVE_DRAG_POLL_INTERVAL_MS,
   NATIVE_TRAY_SIZE,
+  PROXIMITY_POLL_INTERVAL_MS,
   QUICK_CHAT_MIN_SNAP_WIDTH_PX,
   SNAP_DISTANCE_THRESHOLD_PX,
-  SNAP_SPEED_THRESHOLD_PX,
   SNAP_SETTLE_MAX_DURATION_MS,
-  SNAP_SPRING_STIFFNESS,
+  SNAP_SPEED_THRESHOLD_PX,
   SNAP_SPRING_DAMPING,
-  ANIMATION_FRAME_MS,
-  PROXIMITY_POLL_INTERVAL_MS,
+  SNAP_SPRING_STIFFNESS,
+  quickChatRestingWidth,
+} from "./constants";
+import {
   computeDockAttraction,
   displayById,
   displayDrawBounds,
@@ -99,15 +103,30 @@ import {
   pointInBounds,
   positionFromPoint,
   preferredPlacementFor,
-  quickChatRestingWidth,
   relativeRect,
   rendererLayoutSubset,
   resolutionKeyForBounds,
   sameSize,
   storedPlacementForDisplay,
 } from "./geometry";
-export * from "./geometry";
-import { MOVEMENT_SPRING } from "./constants";
+
+// objc-js 为外部 CJS 包（打包依赖），无类型声明；以最小面声明。
+declare module "objc-js" {
+  const objc: {
+    fromPointer(handle: Buffer): { window(): OjcNSWindow };
+  };
+  interface OjcNSWindow {
+    respondsToSelector$(selector: string): boolean;
+    _setPreventsActivation$(value: boolean): unknown;
+    _setForceActiveControls$(value: boolean): unknown;
+    setNativeGlassForcesActiveAppearance$(value: boolean): unknown;
+    _sendForcedWindowChangedKeyState(): unknown;
+    isKeyWindow(): boolean;
+    resignKeyWindow(): unknown;
+    makeKeyAndOrderFront$(value: unknown): unknown;
+  }
+  export default objc;
+}
 
 // ---------------------------------------------------------------------------
 // 类型
@@ -188,11 +207,11 @@ export class AvatarOverlayWindowManager {
   private isRemoteHostedPIPEnabled: () => boolean;
   private logger = memoizedTaggedLogger(`avatar-overlay`);
   /** Electron 能力探测（构造期求值——必须在 app ready 后构造）。 */
-  private supportsInputShape = BrowserWindow.isInputShapeSupported();
+  private supportsInputShape = (BrowserWindow as unknown as { isInputShapeSupported?(): boolean }).isInputShapeSupported?.() ?? false;
 
   private window: BrowserWindow | null = null;
-  private nonactivatingPanelBridge: typeof import("objc-js") | null = null;
-  private nativeAppearanceBridge: typeof import("objc-js") | null = null;
+  private nonactivatingPanelBridge: unknown = null;
+  private nativeAppearanceBridge: { fromPointer(handle: Buffer): { window(): { respondsToSelector$(selector: string): boolean; _setForceActiveControls$(v: boolean): unknown; setNativeGlassForcesActiveAppearance$(v: boolean): unknown; _sendForcedWindowChangedKeyState(): unknown; isKeyWindow(): boolean; resignKeyWindow(): unknown; makeKeyAndOrderFront$(v: unknown): unknown } } } | null = null;
   private closingWindow: BrowserWindow | null = null;
   private openingWindowPromise: Promise<BrowserWindow | null> | null = null;
   private anchor: Rect = defaultAnchorForDisplay({ x: 0, y: 0, width: 0, height: 0 }, DEFAULT_MASCOT_SIZE);
@@ -290,7 +309,7 @@ export class AvatarOverlayWindowManager {
     setRemoteHostedPIPContentComputerUseCursorLocationHandler((location: ComputerUseCursorLocation) => {
       this.setComputerUseCursorLocation(location);
     });
-    this.remoteHostedPIPContentLayoutState = getRemoteHostedPIPContentLayoutState();
+    this.remoteHostedPIPContentLayoutState = getRemoteHostedPIPContentLayoutState() as RemoteHostedPIPContentLayoutState | null;
     setRemoteHostedPIPContentLayoutStateChangedHandler((state: RemoteHostedPIPContentLayoutState) => {
       this.setRemoteHostedPIPContentLayoutState(state);
     });
@@ -396,7 +415,7 @@ export class AvatarOverlayWindowManager {
       window.isDestroyed()
     )
       return false;
-    let frontmost = this.quickChatKeyboardInteractionActive
+    let frontmost: Promise<{ bundleIdentifier: string } | null> = this.quickChatKeyboardInteractionActive
       ? (this.previousQuickChatApplication ?? getFrontmostWindow())
       : getFrontmostWindow();
     this.previousQuickChatApplication = frontmost;
@@ -496,8 +515,6 @@ function run(argv) {
     ) {
       this.setQuickChatStashed(window.webContents.id, null);
       if (requestId == null) this.setKeyboardInteraction(window.webContents.id, true);
-      else if (this.pendingQuickChatFocus)
-        this.pendingQuickChatFocus.hasLayout = this.pendingQuickChatFocus.hasLayout;
       this.windowManager.sendMessageToWebContents(window.webContents, {
         type: `avatar-overlay-action`,
         action:
@@ -762,6 +779,7 @@ function run(argv) {
     if (this.isAppQuitting || this.realtimeController.isSessionReserved()) return;
     this.logger().debug(`Showing pet from global hotkey`, {
       safe: { isOpen: this.isOpen(), usesQuickChatBar: this.usesQuickChatBar },
+      sensitive: {},
     });
     if (!this.isOpen() || this.hiddenForApplicationHide || this.windowHideAnimation === `running`) {
       this.resetQuickChatKeyboardInteraction();
@@ -977,7 +995,9 @@ function run(argv) {
       return;
     this.applyPointerInteractivityPolicy();
     let panelWindow =
-      this.nonactivatingPanelBridge?.fromPointer(window.getNativeWindowHandle()).window() ?? null;
+      (this.nonactivatingPanelBridge as { fromPointer?(handle: Buffer): { window(): { isKeyWindow(): boolean; resignKeyWindow(): unknown; makeKeyAndOrderFront$(v: unknown): unknown } } } | null)
+        ?.fromPointer?.(window.getNativeWindowHandle())
+        .window() ?? null;
     if (!active) {
       if (panelWindow?.isKeyWindow()) panelWindow.resignKeyWindow();
       window.setFocusable(false);
@@ -1001,6 +1021,7 @@ function run(argv) {
     this.applyPointerInteractivityPolicy();
     this.logger().debug(`Pet keyboard focus requested`, {
       safe: { nonactivating: panelWindow != null, isKeyWindow: panelWindow?.isKeyWindow() },
+      sensitive: {},
     });
     this.windowManager.sendMessageToWebContents(window.webContents, {
       type: `avatar-overlay-keyboard-interaction-ready`,
@@ -1065,7 +1086,7 @@ function run(argv) {
       let mascot = this.getLayout(window).mascot;
       let handedOff = performWindowDrag(
         window,
-        nativeStart,
+        nativeStart as unknown as Record<string, unknown>,
         screen.getAllDisplays().map((display) => {
           let drawBounds = displayDrawBounds(display, this.layoutMode);
           let anchorAtOrigin = this.getLayoutForDisplay(display, { ...this.anchor, x: drawBounds.x, y: drawBounds.y }).anchor;
@@ -1088,6 +1109,7 @@ function run(argv) {
       this.nativeWindowDragActive = handedOff;
       this.logger().info(`Native pet window drag handoff`, {
         safe: { driver: `appkit-events`, started: handedOff },
+        sensitive: {},
       });
       if (handedOff) {
         this.nativeWindowDragCompletionTimer = setInterval(() => {
@@ -1117,12 +1139,12 @@ function run(argv) {
       return;
     let dragState = this.dragState;
     let wasNativeDrag = this.nativeWindowDragActive;
-    let nativeResult = wasNativeDrag ? finishWindowDrag(window) : null;
+    let nativeResult = (wasNativeDrag ? finishWindowDrag(window) : null) as { bounds?: Rect; altKey?: boolean } | null;
     let nativeBounds = nativeResult?.bounds;
     let shouldDock = wasNativeDrag ? nativeResult?.altKey === true : altKey;
     if (wasNativeDrag) {
       this.handleNativeWindowDragMove(window, nativeBounds);
-      this.logger().info(`Native pet window drag finished`, { safe: { reason } });
+      this.logger().info(`Native pet window drag finished`, { safe: { reason }, sensitive: {} });
     } else if (dragState.didHaveMovementIntent) {
       let cursor = screen.getCursorScreenPoint();
       let point = dragState.getCursorPointForSource({
@@ -1312,17 +1334,17 @@ function run(argv) {
             y: this.layout.anchor.y + this.quickChatDrawOffset.y,
           }
         : this.quickChatResizeDrawAnchor;
-    if (
-      (mode !== this.layoutMode ||
-        presentationSwitched ||
-        !sameSize(sizes.mascot, this.mascotSize) ||
-        (sizes.realtimeCaptionAboveMascotPx ?? 0) !== this.realtimeCaptionAboveMascotPx ||
-        (sizes.showsPetControls ?? false) !== this.showsPetControls ||
-        (trayChanged && (!this.isQuickChatPresentation || sizes.quickChat?.isActivityVisible === true))) &&
-      this.cancelMomentum();
+    let layoutInvalidating =
+      mode !== this.layoutMode ||
+      presentationSwitched ||
+      !sameSize(sizes.mascot, this.mascotSize) ||
+      (sizes.realtimeCaptionAboveMascotPx ?? 0) !== this.realtimeCaptionAboveMascotPx ||
+      (sizes.showsPetControls ?? false) !== this.showsPetControls ||
+      (trayChanged && (!this.isQuickChatPresentation || sizes.quickChat?.isActivityVisible === true));
+    if (layoutInvalidating) this.cancelMomentum();
     this.layoutMode = mode;
     this.isQuickChatPresentation = sizes.presentation === `quick-chat`;
-    this.quickChatControls = sizes.quickChat ?? null;
+    this.quickChatControls = sizes.quickChat;
     if (!this.isQuickChatPresentation) {
       this.quickChatPosition = null;
       this.quickChatStashedEdge = null;
@@ -1398,13 +1420,14 @@ function run(argv) {
       (edge === `left` && display.workArea.x > display.bounds.x) ||
       (edge === `right` && display.workArea.x + display.workArea.width < display.bounds.x + display.bounds.width)
     ) {
-      this.logger().info(`Quick Chat ignored stash against Dock`, { safe: { edge } });
+      this.logger().info(`Quick Chat ignored stash against Dock`, { safe: { edge }, sensitive: {} });
       return;
     }
     let nearestEdge = this.getLayoutForDisplay(display).quickChat?.nearestStashEdge;
     if (edge != null && nearestEdge != null && edge !== nearestEdge) {
       this.logger().info(`Quick Chat ignored opposite-edge stash`, {
         safe: { edge, nearestEdge },
+        sensitive: {},
       });
       return;
     }
@@ -1412,7 +1435,7 @@ function run(argv) {
     this.quickChatStashedEdge = edge;
     this.quickChatResizeDrawAnchor = null;
     if (edge != null) this.setKeyboardInteraction(webContentsId, false, true);
-    this.logger().info(`Quick Chat stash changed`, { safe: { edge } });
+    this.logger().info(`Quick Chat stash changed`, { safe: { edge }, sensitive: {} });
     this.snapQuickChatToPosition(display, position, window.isVisible(), true);
     this.applyLayout(window, display);
   }
@@ -1425,4 +1448,1611 @@ function run(argv) {
     this.petControlsProximityRects = proximityRects;
     this.applyPointerInteractivityPolicy();
   }
+
+  /** 宠物控件邻近追踪（原 updateCssPetControlsProximityTracking，16,775-16,818）。 */
+  updateCssPetControlsProximityTracking(): void {
+    let window = this.window;
+    if (
+      !this.shouldPresentWindow() ||
+      window == null ||
+      window.isDestroyed() ||
+      !window.isVisible() ||
+      this.hiddenForApplicationHide ||
+      (process.platform === `darwin` && app.isHidden()) ||
+      this.layoutMode !== `native` ||
+      !this.showsPetControls ||
+      this.isQuickChatPresentation
+    ) {
+      if (this.petControlsProximityTimer != null) {
+        clearInterval(this.petControlsProximityTimer);
+        this.petControlsProximityTimer = null;
+        this.logger().debug(`Stopped pet controls proximity tracking`);
+      }
+      this.setPetPointerProximity(false);
+      return;
+    }
+    if (this.petControlsProximityTimer == null) {
+      this.logger().debug(`Started pet controls proximity tracking`);
+      this.petControlsProximityTimer = setInterval(() => {
+        let currentWindow = this.window;
+        let mascot = this.layout?.mascot;
+        if (currentWindow == null || currentWindow.isDestroyed() || mascot == null) {
+          this.setPetPointerProximity(false);
+          return;
+        }
+        let contentBounds = currentWindow.getContentBounds();
+        let cursor = screen.getCursorScreenPoint();
+        let radius = this.pointerNearPet
+          ? this.petControlsAppearance.proximityExitDistance
+          : this.petControlsAppearance.proximityEnterDistance;
+        this.setPetPointerProximity(
+          [mascot, ...this.petControlsProximityRects].some((rect) => {
+            let dx = Math.max(contentBounds.x + rect.left - cursor.x, 0, cursor.x - contentBounds.x - rect.left - rect.width);
+            let dy = Math.max(contentBounds.y + rect.top - cursor.y, 0, cursor.y - contentBounds.y - rect.top - rect.height);
+            return dx ** 2 + dy ** 2 <= radius ** 2;
+          }),
+        );
+      }, PROXIMITY_POLL_INTERVAL_MS);
+      this.petControlsProximityTimer.unref?.();
+    }
+  }
+
+  /** 邻近状态变化（原 setPetPointerProximity）。 */
+  private setPetPointerProximity(near: boolean): void {
+    if (this.pointerNearPet === near) return;
+    this.pointerNearPet = near;
+    this.logger().debug(`Pet controls pointer proximity changed`, {
+      safe: { isNear: near, regionCount: this.petControlsProximityRects.length },
+      sensitive: {},
+    });
+    let window = this.window;
+    if (window != null && !window.isDestroyed()) {
+      this.windowManager.sendMessageToWebContents(window.webContents, {
+        type: `avatar-overlay-action`,
+        action: { type: `pet-pointer-proximity-changed`, isNear: near },
+      });
+    }
+  }
+
+  /** 发布 remote-hosted PIP 内容宿主（原 publishRemoteHostedPIPContentHost，16,833-16,879）。 */
+  publishRemoteHostedPIPContentHost(): void {
+    let window = this.window;
+    let mascot = this.layout?.mascot;
+    if (!this.isRemoteHostedPIPEnabled() || window == null || window.isDestroyed()) {
+      this.remoteHostedPIPContentHostAlignment = null;
+      if (this.remoteHostedPIPContentHostRegistered) {
+        this.remoteHostedPIPContentHostRegistered = false;
+        unregisterRemoteHostedPIPContentHost(AVATAR_OVERLAY_HOST_ID);
+      }
+      return;
+    }
+    if (mascot == null) return;
+    let hostRect = mascot;
+    let motionTarget = this.remoteHostedPIPContentHostMotionTarget;
+    if (motionTarget != null) {
+      let contentBounds = window.getContentBounds();
+      hostRect = {
+        left: motionTarget.x - contentBounds.x,
+        top: motionTarget.y - contentBounds.y,
+        width: motionTarget.width,
+        height: motionTarget.height,
+      };
+    }
+    let alignment: string;
+    switch (this.placement) {
+      case `top-start`:
+        alignment = this.isQuickChatPresentation ? `bottom-center` : `bottom-left`;
+        break;
+      case `top-end`:
+        alignment = this.isQuickChatPresentation ? `bottom-center` : `bottom-right`;
+        break;
+      case `bottom-start`:
+        alignment = this.isQuickChatPresentation ? `top-center` : `top-left`;
+        break;
+      case `bottom-end`:
+        alignment = this.isQuickChatPresentation ? `top-center` : `top-right`;
+        break;
+    }
+    let anchorY = hostRect.top + hostRect.height / 2;
+    if (this.isQuickChatPresentation)
+      anchorY = alignment === `top-center` ? hostRect.top + hostRect.height + 8 : hostRect.top - 8;
+    let alignmentChanged =
+      this.remoteHostedPIPContentHostAlignment != null &&
+      this.remoteHostedPIPContentHostAlignment !== alignment;
+    let registered = registerRemoteHostedPIPContentHost(AVATAR_OVERLAY_HOST_ID, window, {
+      anchorRect: { x: hostRect.left, y: hostRect.top, width: hostRect.width, height: hostRect.height },
+      anchors: [{ alignment, point: { x: hostRect.left + hostRect.width / 2, y: anchorY } }],
+      animated: alignmentChanged,
+      animationSpring: MOVEMENT_SPRING,
+      isCodexHomeAvailable: false,
+      interactionPassthroughRect: { x: mascot.left, y: mascot.top, width: mascot.width, height: mascot.height },
+      presentationScope: `all`,
+    });
+    if (registered) {
+      this.remoteHostedPIPContentHostAlignment = alignment;
+      this.remoteHostedPIPContentHostRegistered = true;
+    }
+  }
+
+  /** 确保窗口存在（原 ensureWindow，16,880-16,903）。 */
+  private async ensureWindow(sequence: number): Promise<BrowserWindow | null> {
+    if (this.isAppQuitting) return null;
+    let closing = this.closingWindow;
+    if (closing != null && !closing.isDestroyed()) {
+      await new Promise<void>((resolve) => {
+        closing.once(`closed`, resolve);
+      });
+      if (
+        this.isAppQuitting ||
+        (sequence !== this.windowVisibilitySequence && !this.realtimeController.isSessionReserved())
+      )
+        return null;
+    }
+    let current = this.window;
+    if (current != null && !current.isDestroyed()) return current;
+    if (this.openingWindowPromise == null) {
+      this.realtimeController.prepareForWindowCreation();
+      this.openingWindowPromise = this.createWindow().finally(() => {
+        this.openingWindowPromise = null;
+      });
+    }
+    return this.openingWindowPromise;
+  }
+
+  /** 刷新原生激活外观（原 refreshNativeActiveAppearance，16,904-16,922）。 */
+  private refreshNativeActiveAppearance(window: BrowserWindow): void {
+    let bridge = this.nativeAppearanceBridge;
+    if (bridge == null) return;
+    try {
+      let nativeWindow = bridge.fromPointer(window.getNativeWindowHandle()).window();
+      if (nativeWindow.respondsToSelector$(`_setForceActiveControls:`)) {
+        nativeWindow._setForceActiveControls$(true);
+        if (nativeWindow.respondsToSelector$(`setNativeGlassForcesActiveAppearance:`))
+          nativeWindow.setNativeGlassForcesActiveAppearance$(true);
+        if (nativeWindow.respondsToSelector$(`_sendForcedWindowChangedKeyState`))
+          nativeWindow._sendForcedWindowChangedKeyState();
+      } else {
+        this.logger().debug(`Mini's active appearance selector is unavailable`);
+      }
+    } catch (error) {
+      this.logger().debug(`Could not set Mini's active appearance`, {
+        safe: {},
+        sensitive: { error },
+      });
+    }
+  }
+
+  /** 创建窗口（原 createWindow，16,923-16,098 的完整装配）。 */
+  private async createWindow(): Promise<BrowserWindow | null> {
+    let objcJs =
+      process.platform === `darwin`
+        ? await import(`objc-js`).catch((error) => {
+            this.logger().debug(`Could not load Mini's active appearance bridge`, {
+              safe: {},
+              sensitive: { error },
+            });
+            return null;
+          })
+        : null;
+    if (this.isAppQuitting) return null;
+    let window = await this.windowManager.createWindow({
+      title: app.getName(),
+      width: 356,
+      height: 320,
+      appearance: `avatarOverlay`,
+      supportsWindowTiling: false,
+      focusable: false,
+      show: false,
+      initialRoute: AVATAR_OVERLAY_ROUTE,
+    });
+    this.nonactivatingPanelBridge = null;
+    if (objcJs != null) {
+      try {
+        let nativeWindow = objcJs.fromPointer(window.getNativeWindowHandle()).window();
+        if (nativeWindow.respondsToSelector$(`_setPreventsActivation:`)) {
+          nativeWindow._setPreventsActivation$(true);
+          this.nonactivatingPanelBridge = objcJs;
+        }
+      } catch (error) {
+        this.logger().debug(`Could not configure pet nonactivating focus`, {
+          safe: {},
+          sensitive: { error },
+        });
+      }
+    }
+    this.nativeAppearanceBridge = objcJs;
+    this.refreshNativeActiveAppearance(window);
+    let webContentsId = window.webContents.id;
+    this.window = window;
+    this.nativeWindowDragTargetRegistered = setWindowDragTarget(window);
+    this.lastSentRendererState = null;
+    this.rendererReady = this.windowManager.isWebContentsReady(webContentsId);
+    this.updateRendererBackgroundThrottling();
+    this.clearDetachedDisplayRestore();
+    this.displayBounds = null;
+    this.displayId = null;
+    this.dragState = null;
+    this.nativeWindowDragStart = null;
+    this.nativeWindowDragActive = false;
+    this.hasDeferredLayout = false;
+    this.layout = null;
+    this.layoutMode = `legacy`;
+    this.isQuickChatPresentation = false;
+    this.quickChatControls = undefined;
+    this.petControlsAppearance = DEFAULT_PET_CONTROLS_APPEARANCE;
+    this.showsPetControls = false;
+    this.initialPresentationState = `waiting-for-layout`;
+    this.hiddenForApplicationHide = false;
+    this.mascotSize = DEFAULT_MASCOT_SIZE;
+    this.isSuspended = false;
+    this.mousePassthroughMode = `disabled`;
+    this.inputShape = null;
+    this.petControlsProximityRects = [];
+    this.placement = `top-end`;
+    this.pointerInteractive = false;
+    this.applyPointerInteractivityPolicy();
+    this.resolutionKey = null;
+    this.realtimeCaptionAboveMascotPx = 0;
+    this.traySize = null;
+    if (process.platform === `darwin`) {
+      window.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true,
+      });
+    } else {
+      window.setVisibleOnAllWorkspaces(true);
+    }
+    window.setAlwaysOnTop(true, `floating`);
+    window.setMenuBarVisibility(false);
+    this.addDisplayChangeListeners();
+    this.addApplicationLifecycleListeners();
+    this.addPowerMonitorListeners();
+    window.once(`ready-to-show`, () => {
+      this.showWindowIfReady(window);
+    });
+    window.on(`close`, () => {
+      if (this.window === window) {
+        this.cancelMomentum();
+        this.clearMovedWindowPersist();
+        this.unregisterNativeWindowDragTarget(`closed`);
+        this.persistWindowBounds(window);
+      }
+    });
+    window.on(`move`, () => {
+      if (this.nativeWindowDragActive) {
+        this.handleNativeWindowDragMove(window);
+        return;
+      }
+      if (this.dragState == null) {
+        if (this.presentationMotionTarget != null || (this.isQuickChatPresentation && this.isSettingWindowBounds)) {
+          if (this.presentationMotionTarget == null)
+            this.logger().debug(`Ignored Quick Chat layout move`);
+          return;
+        }
+        this.publishRemoteHostedPIPContentHost();
+        if (this.layoutMode === `native`) this.rememberMovedWindow(window);
+      }
+    });
+    window.on(`will-move`, () => {
+      if (!this.momentumActive) {
+        this.cancelMomentum();
+        this.clearDetachedDisplayRestore();
+      }
+    });
+    window.on(`show`, () => {
+      if (this.window === window) {
+        this.nativeWindowDragTargetRegistered = setWindowDragTarget(window);
+        this.applyPointerInteractivityPolicy();
+        this.updateCssPetControlsProximityTracking();
+      }
+    });
+    window.on(`hide`, () => {
+      if (this.window === window) {
+        this.unregisterNativeWindowDragTarget(`hidden`);
+        this.applyPointerInteractivityPolicy();
+        this.updateCssPetControlsProximityTracking();
+      }
+      if (
+        process.platform === `darwin` &&
+        this.window === window &&
+        this.shouldPresentWindow() &&
+        !this.hiddenForApplicationHide &&
+        app.isHidden()
+      ) {
+        this.hiddenForApplicationHide = true;
+        return;
+      }
+      if (
+        this.window === window &&
+        (this.presentationVisibility ?? this.startupPresentationVisibility) === true
+      )
+        this.reconcileWindowVisibility();
+    });
+    window.on(`closed`, () => {
+      if (this.window !== window) return;
+      this.cancelPresentationFade(window, false);
+      this.clearDismissedWindowCleanup();
+      let hadPresentationVisibility =
+        this.presentationVisibility != null || this.startupPresentationVisibility != null;
+      let wasClosing = this.closingWindow === window;
+      this.cancelMomentum();
+      this.clearMovedWindowPersist();
+      this.unregisterNativeWindowDragTarget(`closed`);
+      this.window = null;
+      this.isQuickChatPresentation = false;
+      this.quickChatControls = undefined;
+      this.resetQuickChatKeyboardInteraction();
+      this.removeDisplayChangeListeners();
+      this.removeApplicationLifecycleListeners();
+      this.removePowerMonitorListeners();
+      this.displayBounds = null;
+      this.displayId = null;
+      this.dragState = null;
+      this.clearDetachedDisplayRestore();
+      this.hasDeferredLayout = false;
+      this.layout = null;
+      this.isSuspended = false;
+      if (!wasClosing) this.realtimeController.handleWindowClosed(webContentsId);
+      this.closingWindow = null;
+      this.rendererReady = false;
+      this.awaitingRealtimeVoicePresentation = false;
+      this.lastSentRendererState = null;
+      this.isDismissedWindowRetained = false;
+      if (!hadPresentationVisibility && !wasClosing) this.petOpenIntent = false;
+      this.hiddenForApplicationHide = false;
+      this.pointerInteractive = false;
+      this.mousePassthroughMode = `disabled`;
+      this.updateCssPetControlsProximityTracking();
+      this.publishRemoteHostedPIPContentHost();
+      this.broadcastOpenState();
+      if (!(wasClosing && (this.petOpenIntent || hadPresentationVisibility)))
+        this.reconcileWindowVisibility();
+    });
+    return window;
+  }
+
+  // -------------------------------------------------------------------------
+  // 位置与 display 切换
+  // -------------------------------------------------------------------------
+
+  /** 定位窗口（原 positionWindow，16,099-17,111）。 */
+  private positionWindow(window: BrowserWindow, origin: unknown): void {
+    if (window.isDestroyed()) return;
+    let stored = this.globalState.get(AVATAR_OVERLAY_BOUNDS_KEY);
+    let display = this.getInitialDisplay(window, origin, stored);
+    let placement = storedPlacementForDisplay(stored, display);
+    if (placement != null) {
+      this.restoreBoundsForDisplay(placement, display);
+      this.applyLayout(window, display);
+      if (stored?.byDisplayId == null || stored.byResolution == null)
+        this.persistWindowBounds(window, display);
+      return;
+    }
+    this.resetToDefaultAnchor(display);
+    this.applyLayout(window, display);
+  }
+
+  /** 初始 display（原 getInitialDisplay，17,112-17,127）。 */
+  private getInitialDisplay(window: BrowserWindow, origin: unknown, stored: any): Electron.Display {
+    let storedDisplayId = stored?.displayId;
+    if (storedDisplayId != null) {
+      let display = displayById(storedDisplayId);
+      if (display != null) return display;
+    }
+    let storedBounds = stored?.displayBounds;
+    if (storedBounds != null) {
+      let display = screen.getDisplayMatching(storedBounds);
+      if (boundsEqual(display.bounds, storedBounds)) return display;
+    }
+    let originWindow = origin == null ? null : BrowserWindow.fromWebContents(origin as Electron.WebContents);
+    return originWindow == null || originWindow.isDestroyed() || originWindow === window
+      ? screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+      : screen.getDisplayMatching(originWindow.getBounds());
+  }
+
+  /** 从持久化记录恢复（原 restoreBoundsForDisplay，17,128-17,142）。 */
+  private restoreBoundsForDisplay(placement: any, display: Electron.Display): void {
+    let anchor = anchorFromStoredPlacement(placement, display.bounds);
+    this.anchor = {
+      ...this.mascotSize,
+      x: anchor.x - this.presentationOffset.x,
+      y: anchor.y - this.presentationOffset.y,
+    };
+    this.placement = placement.placement ?? this.placement;
+    this.isFreelyPositioned = placement.isFreelyPositioned ?? false;
+    this.quickChatPosition = null;
+    if (this.isQuickChatPresentation && !this.isFreelyPositioned)
+      this.quickChatPosition = positionFromPoint(anchorCenter(this.anchor), display.workArea);
+    this.restoreQuickChatFromOccupiedEdge(display);
+  }
+
+  /** 重置到默认锚点（原 resetToDefaultAnchor，17,143-17,152）。 */
+  private resetToDefaultAnchor(display: Electron.Display): void {
+    this.isFreelyPositioned = false;
+    this.quickChatPosition = null;
+    let bounds = this.layoutMode === `native` ? display.workArea : display.bounds;
+    let anchor = defaultAnchorForDisplay(bounds, this.mascotSize);
+    this.anchor = {
+      ...anchor,
+      x: anchor.x - this.presentationOffset.x,
+      y: anchor.y - this.presentationOffset.y,
+    };
+    this.restoreQuickChatFromOccupiedEdge(display);
+  }
+
+  /** 被占边的恢复（原 restoreQuickChatFromOccupiedEdge，17,153-17,162）。 */
+  private restoreQuickChatFromOccupiedEdge(display: Electron.Display): void {
+    if (
+      (this.quickChatStashedEdge === `left` && display.workArea.x > display.bounds.x) ||
+      (this.quickChatStashedEdge === `right` &&
+        display.workArea.x + display.workArea.width < display.bounds.x + display.bounds.width)
+    ) {
+      this.logger().info(`Quick Chat restored from occupied display edge`, {
+        safe: { edge: this.quickChatStashedEdge },
+        sensitive: {},
+      });
+      this.quickChatStashedEdge = null;
+      this.quickChatResizeDrawAnchor = null;
+    }
+  }
+
+  /** 切换 display（原 switchToDisplay，17,163-17,177）。 */
+  private switchToDisplay(window: BrowserWindow, display: Electron.Display, animated = false): void {
+    let placement = storedPlacementForDisplay(this.globalState.get(AVATAR_OVERLAY_BOUNDS_KEY), display);
+    if (placement == null) this.resetToDefaultAnchor(display);
+    else this.restoreBoundsForDisplay(placement, display);
+    if (this.isQuickChatPresentation && !this.isFreelyPositioned) {
+      this.snapQuickChatToPosition(
+        display,
+        this.quickChatPosition ?? positionFromPoint(anchorCenter(this.anchor), display.workArea),
+        animated,
+      );
+      return;
+    }
+    this.applyLayout(window, display, animated);
+  }
+
+  /** 当前 display（原 getCurrentDisplay）。 */
+  private getCurrentDisplay(): Electron.Display {
+    if (this.displayId != null) {
+      let display = displayById(this.displayId);
+      if (display != null) return display;
+    }
+    return screen.getDisplayNearestPoint(anchorCenter(this.anchor));
+  }
+
+  // -------------------------------------------------------------------------
+  // 事件监听
+  // -------------------------------------------------------------------------
+
+  private addDisplayChangeListeners(): void {
+    screen.on(`display-added`, this.handleDisplayChanged);
+    screen.on(`display-removed`, this.handleDisplayChanged);
+    screen.on(`display-metrics-changed`, this.handleDisplayChanged);
+  }
+
+  private removeDisplayChangeListeners(): void {
+    screen.off(`display-added`, this.handleDisplayChanged);
+    screen.off(`display-removed`, this.handleDisplayChanged);
+    screen.off(`display-metrics-changed`, this.handleDisplayChanged);
+  }
+
+  private addPowerMonitorListeners(): void {
+    powerMonitor.on(`suspend`, this.handleSuspend);
+    powerMonitor.on(`resume`, this.handleResume);
+  }
+
+  private removePowerMonitorListeners(): void {
+    powerMonitor.off(`suspend`, this.handleSuspend);
+    powerMonitor.off(`resume`, this.handleResume);
+  }
+
+  private addApplicationLifecycleListeners(): void {
+    if (this.applicationLifecycleListenersRegistered) return;
+    this.applicationLifecycleListenersRegistered = true;
+    app.on(`did-resign-active`, this.handleApplicationDidResignActive);
+    app.on(`did-become-active`, this.handleApplicationDidBecomeActive);
+  }
+
+  private removeApplicationLifecycleListeners(): void {
+    if (!this.applicationLifecycleListenersRegistered) return;
+    this.applicationLifecycleListenersRegistered = false;
+    app.off(`did-resign-active`, this.handleApplicationDidResignActive);
+    app.off(`did-become-active`, this.handleApplicationDidBecomeActive);
+    this.clearApplicationHideCheck();
+  }
+
+  private clearApplicationHideCheck(): void {
+    if (this.applicationHideCheckTimer != null) {
+      clearTimeout(this.applicationHideCheckTimer);
+      this.applicationHideCheckTimer = null;
+    }
+  }
+
+  /** 失活 → 检查应用隐藏（原 handleApplicationDidResignActive）。 */
+  private handleApplicationDidResignActive = () => {
+    this.clearApplicationHideCheck();
+    this.applicationHideCheckTimer = setTimeout(() => {
+      this.applicationHideCheckTimer = null;
+      let window = this.window;
+      if (
+        app.isHidden() &&
+        !this.hiddenForApplicationHide &&
+        window != null &&
+        !window.isDestroyed() &&
+        this.shouldPresentWindow()
+      ) {
+        this.hiddenForApplicationHide = true;
+        this.updateCssPetControlsProximityTracking();
+      }
+    }, 0);
+  };
+
+  /** 激活 → 恢复隐藏窗口（原 handleApplicationDidBecomeActive）。 */
+  private handleApplicationDidBecomeActive = () => {
+    this.clearApplicationHideCheck();
+    if (!this.hiddenForApplicationHide) return;
+    this.hiddenForApplicationHide = false;
+    let window = this.window;
+    if (window != null && !window.isDestroyed() && this.shouldPresentWindow()) {
+      if (this.pendingQuickChatFocus != null) {
+        this.lastSentRendererState = null;
+        this.sendLayoutToRenderer(window);
+      }
+      this.presentWindow(window);
+    }
+  };
+
+  /** display 变更（原 handleDisplayChanged，17,244-17,279）。 */
+  private handleDisplayChanged = () => {
+    if (this.isSuspended) return;
+    if (this.dragState != null) {
+      this.dragState.updateDisplayBounds(
+        screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).bounds,
+      );
+      return;
+    }
+    this.cancelMomentum();
+    let window = this.window;
+    if (
+      window == null ||
+      window.isDestroyed() ||
+      (this.movedWindowPersistTimer != null &&
+        this.logger().info(`Discarding pending pet move for display change`),
+      this.clearMovedWindowPersist(),
+      (this.hasDeferredLayout = false),
+      this.restoreDetachedDisplay(window))
+    )
+      return;
+    this.rememberDetachedDisplay();
+    let display = this.getCurrentDisplay();
+    if (
+      resolutionKeyForBounds(display.bounds) !== this.resolutionKey ||
+      this.displayBounds == null ||
+      !boundsEqual(display.bounds, this.displayBounds)
+    ) {
+      this.switchToDisplay(window, display, true);
+      this.persistWindowBounds(window, display);
+      return;
+    }
+    this.restoreQuickChatFromOccupiedEdge(display);
+    this.reclampWindowToVisibleDisplay({ shouldPersist: true });
+    if (this.isQuickChatPresentation && this.quickChatPosition != null)
+      this.snapQuickChatToPosition(display, this.quickChatPosition, false);
+  };
+
+  /** 系统休眠（原 handleSuspend）。 */
+  private handleSuspend = () => {
+    let window = this.window;
+    if (window == null || window.isDestroyed() || this.displayBounds == null) return;
+    this.cancelMomentum();
+    this.isSuspended = true;
+    let display = this.getCurrentDisplay();
+    this.persistWindowBounds(window, display);
+  };
+
+  /** 系统恢复（原 handleResume，17,287-17,308）。 */
+  private handleResume = () => {
+    this.isSuspended = false;
+    let window = this.window;
+    if (
+      window == null ||
+      window.isDestroyed() ||
+      (this.clearMovedWindowPersist(),
+      (this.hasDeferredLayout = false),
+      this.restoreDetachedDisplay(window))
+    )
+      return;
+    let displayId = this.displayId;
+    if (displayId == null) return;
+    let display = displayById(displayId);
+    if (display == null) {
+      this.rememberDetachedDisplay();
+      let currentDisplay = this.getCurrentDisplay();
+      this.switchToDisplay(window, currentDisplay, true);
+      this.persistWindowBounds(window, currentDisplay);
+      return;
+    }
+    this.switchToDisplay(window, display, true);
+    this.persistWindowBounds(window, display);
+  };
+
+  /** 记忆脱离的 display（原 rememberDetachedDisplay）。 */
+  private rememberDetachedDisplay(): void {
+    let displayId = this.displayId;
+    let displayBounds = this.displayBounds;
+    if (
+      displayId != null &&
+      displayBounds != null &&
+      displayById(displayId) == null &&
+      this.detachedDisplay?.id !== displayId
+    ) {
+      this.detachedDisplay = { bounds: displayBounds, id: displayId };
+      if (this.detachedDisplayRestoreTimer != null)
+        clearTimeout(this.detachedDisplayRestoreTimer);
+      this.detachedDisplayRestoreTimer = setTimeout(() => {
+        this.detachedDisplay = null;
+        this.detachedDisplayRestoreTimer = null;
+      }, DETACHED_DISPLAY_REMEMBER_MS);
+    }
+  }
+
+  /** 恢复脱离的 display（原 restoreDetachedDisplay，17,322-17,336）。 */
+  private restoreDetachedDisplay(window: BrowserWindow): boolean {
+    let detached = this.detachedDisplay;
+    if (detached == null) return false;
+    let display = displayById(detached.id) ?? displayMatchingBounds(detached.bounds);
+    if (display == null) return false;
+    let placement = this.globalState.get(AVATAR_OVERLAY_BOUNDS_KEY)?.byDisplayId?.[String(detached.id)];
+    this.clearDetachedDisplayRestore();
+    if (placement == null) this.switchToDisplay(window, display, true);
+    else {
+      this.restoreBoundsForDisplay(placement, display);
+      this.applyLayout(window, display, true);
+    }
+    this.persistWindowBounds(window, display);
+    return true;
+  }
+
+  private clearDetachedDisplayRestore(): void {
+    if (this.detachedDisplayRestoreTimer != null) {
+      clearTimeout(this.detachedDisplayRestoreTimer);
+      this.detachedDisplayRestoreTimer = null;
+    }
+    this.detachedDisplay = null;
+  }
+
+  /** 夹回可见 display（原 reclampWindowToVisibleDisplay）。 */
+  private reclampWindowToVisibleDisplay({ shouldPersist }: { shouldPersist: boolean }): void {
+    let window = this.window;
+    if (window == null || window.isDestroyed()) return;
+    let display = this.getCurrentDisplay();
+    this.applyLayout(window, display);
+    if (shouldPersist) this.persistWindowBounds(window, display);
+  }
+
+  /** 拖动指针跟随（原 moveDragToPointer，17,348-17,366）。 */
+  private moveDragToPointer(window: BrowserWindow, point: Point): void {
+    let dragState = this.dragState;
+    if (dragState == null) return;
+    let targetBounds = boundsForDragTarget(point, dragState.displayBounds);
+    let display = screen.getDisplayMatching(targetBounds);
+    dragState.recordMove(display.bounds);
+    this.anchor = {
+      ...this.anchor,
+      x:
+        this.quickChatStashedEdge == null
+          ? point.x - dragState.pointerAnchorX
+          : display.workArea.x +
+            (this.quickChatStashedEdge === `left` ? 13 : display.workArea.width - 13) -
+            this.mascotSize.width / 2,
+      y: point.y - dragState.pointerAnchorY,
+    };
+    if (this.layoutMode === `native`) this.placement = preferredPlacementFor(this.anchor, display.workArea);
+    this.applyLayout(window, display);
+  }
+
+  /** 呈现定位到起点（原 positionPresentationAtOrigin）。 */
+  private positionPresentationAtOrigin(window: BrowserWindow, origin: unknown): void {
+    this.anchor = anchorForDockTarget(origin as { centerX: number; centerY: number }, this.mascotSize, this.presentationOffset);
+    this.applyLayout(window, screen.getDisplayNearestPoint(anchorCenter(this.anchor)));
+  }
+
+  /** Quick Chat 静置宽度（原 getQuickChatRestingWidth）。 */
+  private getQuickChatRestingWidth(): number {
+    let base = quickChatRestingWidth(this.quickChatControls?.hasNotifications ?? false);
+    return this.quickChatControls?.isActivityVisible
+      ? Math.max(base, this.traySize?.width ?? base)
+      : base;
+  }
+
+  /** Quick Chat 吸附（原 snapQuickChatToPosition，17,375-17,430）。 */
+  private snapQuickChatToPosition(
+    display: Electron.Display,
+    position: string,
+    animated: boolean,
+    fromStash = false,
+  ): Rect | null {
+    let window = this.window;
+    if (window == null || window.isDestroyed()) return null;
+    this.isFreelyPositioned = false;
+    this.quickChatPosition = position;
+    let restingWidth = this.getQuickChatRestingWidth();
+    let widthWithPip = Math.max(
+      restingWidth,
+      this.remoteHostedPIPContentLayoutState?.currentHostID === AVATAR_OVERLAY_HOST_ID
+        ? Math.max(0, this.remoteHostedPIPContentLayoutState.stackDisplayWidth)
+        : 0,
+    );
+    let snapTarget = placeQuickChatAtPosition(position, display, this.mascotSize, {
+      width: widthWithPip,
+      height: 40,
+    });
+    if (this.quickChatStashedEdge != null) {
+      snapTarget.x =
+        display.workArea.x +
+        (this.quickChatStashedEdge === `left` ? 13 : display.workArea.width - 13) -
+        this.mascotSize.width / 2;
+    }
+    this.logger().info(`Quick Chat snap target selected`, {
+      safe: {
+        position,
+        animated,
+        restingWidth,
+        hasVisibleActivity: this.quickChatControls?.isActivityVisible ?? false,
+      },
+      sensitive: {},
+    });
+    if (animated) {
+      if (fromStash && this.layout != null) {
+        let contentBounds = window.getContentBounds();
+        let centerX = snapTarget.x + snapTarget.width / 2;
+        let halfWidth = Math.max(QUICK_CHAT_MIN_SNAP_WIDTH_PX, restingWidth) / 2;
+        if (centerX - halfWidth >= contentBounds.x && centerX + halfWidth <= contentBounds.x + contentBounds.width) {
+          this.quickChatResizeDrawAnchor = {
+            ...this.layout.anchor,
+            x: this.layout.anchor.x + this.quickChatDrawOffset.x,
+            y: this.layout.anchor.y + this.quickChatDrawOffset.y,
+          };
+        }
+      }
+      this.animatePresentationTo(
+        snapTarget,
+        { x: 0, y: 0 },
+        () => {
+          if (this.quickChatStashedEdge == null) this.persistWindowBounds(window, display);
+        },
+        this.quickChatResizeDrawAnchor,
+        true,
+      );
+    } else {
+      this.anchor = snapTarget;
+      this.applyLayout(window, display);
+      this.quickChatResizeDrawAnchor = null;
+      if (this.quickChatStashedEdge == null) this.persistWindowBounds(window, display);
+    }
+    return snapTarget;
+  }
+
+  /** 吸附动画（原 animatePresentationTo，17,431-17,494）。 */
+  private animatePresentationTo(
+    target: Rect,
+    velocity: Point,
+    onSettled?: () => void,
+    resizeDrawAnchor: Rect | null = null,
+    pacedByDisplayFrequency = false,
+  ): void {
+    let window = this.window;
+    if (window == null || window.isDestroyed()) {
+      onSettled?.();
+      return;
+    }
+    this.cancelMomentum();
+    this.quickChatResizeDrawAnchor = resizeDrawAnchor;
+    this.presentationMotionTarget = target;
+    this.momentumActive = true;
+    let vx = velocity.x;
+    let vy = velocity.y;
+    let webContentsId = window.webContents.id;
+    let frameInterval = pacedByDisplayFrequency
+      ? 1000 / (screen.getDisplayNearestPoint(anchorCenter(target)).displayFrequency || 60)
+      : ANIMATION_FRAME_MS;
+    let startTime = Date.now();
+    let lastFrameTime = startTime;
+    let nextPacedFrameAt = startTime + frameInterval;
+    let step = () => {
+      let currentWindow = this.window;
+      if (currentWindow == null || currentWindow.isDestroyed() || currentWindow.webContents.id !== webContentsId) {
+        this.cancelMomentum();
+        return;
+      }
+      this.momentumTimer = null;
+      let now = Date.now();
+      let dt = Math.min(Math.max(0, now - lastFrameTime), MAX_FRAME_DELTA_MS) / 1000;
+      lastFrameTime = now;
+      let ax = SNAP_SPRING_STIFFNESS * (target.x - this.anchor.x) - SNAP_SPRING_DAMPING * vx;
+      let ay = SNAP_SPRING_STIFFNESS * (target.y - this.anchor.y) - SNAP_SPRING_DAMPING * vy;
+      vx += ax * dt;
+      vy += ay * dt;
+      let next = { ...this.anchor, x: this.anchor.x + vx * dt, y: this.anchor.y + vy * dt };
+      this.anchor = next;
+      this.applyLayout(currentWindow, screen.getDisplayNearestPoint(anchorCenter(this.anchor)));
+      if (pacedByDisplayFrequency) this.anchor = next;
+      if (
+        now - startTime >= (pacedByDisplayFrequency ? 1000 : SNAP_SETTLE_MAX_DURATION_MS) ||
+        (Math.hypot(target.x - this.anchor.x, target.y - this.anchor.y) <=
+          (pacedByDisplayFrequency ? 0.5 : SNAP_DISTANCE_THRESHOLD_PX) &&
+          Math.hypot(vx, vy) < (pacedByDisplayFrequency ? 10 : SNAP_SPEED_THRESHOLD_PX))
+      ) {
+        if (pacedByDisplayFrequency) {
+          this.logger().debug(`Mini snap motion settled`, {
+            safe: {
+              durationMs: now - startTime,
+              frameIntervalMs: frameInterval,
+              remainingDistancePx: Math.hypot(target.x - this.anchor.x, target.y - this.anchor.y),
+              nativeWindowX: currentWindow.getContentBounds().x,
+              rendererWindowX: this.layout?.windowBounds.x,
+            },
+            sensitive: {},
+          });
+        }
+        this.anchor = target;
+        if (this.remoteHostedPIPContentHostMotionTarget === target)
+          this.remoteHostedPIPContentHostMotionTarget = null;
+        this.applyLayout(currentWindow, screen.getDisplayNearestPoint(anchorCenter(target)));
+        this.momentumActive = false;
+        this.presentationMotionTarget = null;
+        this.quickChatResizeDrawAnchor = null;
+        onSettled?.();
+        return;
+      }
+      if (pacedByDisplayFrequency) {
+        nextPacedFrameAt += frameInterval;
+        if (nextPacedFrameAt <= now) nextPacedFrameAt = now + frameInterval;
+      }
+      this.momentumTimer = setTimeout(
+        step,
+        pacedByDisplayFrequency ? Math.max(0, nextPacedFrameAt - Date.now()) : frameInterval,
+      );
+    };
+    this.momentumTimer = setTimeout(step, frameInterval);
+  }
+
+  /** 恢复入坞锚点（原 restoreDockAnchor）。 */
+  private restoreDockAnchor(): void {
+    let restoreAnchor = this.dockRestoreAnchor;
+    if (restoreAnchor == null) return;
+    this.cancelMomentum();
+    this.dockRestoreAnchor = null;
+    this.anchor = restoreAnchor;
+    let window = this.window;
+    if (window != null && !window.isDestroyed())
+      this.applyLayout(window, screen.getDisplayNearestPoint(anchorCenter(restoreAnchor)));
+  }
+
+  /** 取消动量（原 cancelMomentum）。 */
+  private cancelMomentum(): void {
+    if (this.momentumTimer != null) {
+      clearTimeout(this.momentumTimer);
+      this.momentumTimer = null;
+    }
+    this.remoteHostedPIPContentHostMotionTarget = null;
+    this.presentationMotionTarget = null;
+    this.momentumActive = false;
+    this.quickChatResizeDrawAnchor = null;
+  }
+
+  /** 附件可见性（原 setPresentationAccessoriesVisible）。 */
+  private setPresentationAccessoriesVisible(visible: boolean): void {
+    this.arePresentationAccessoriesVisible = visible;
+    let window = this.window;
+    if (window != null && !window.isDestroyed()) this.sendLayoutToRenderer(window);
+  }
+
+  private clearMovedWindowPersist(): void {
+    if (this.movedWindowPersistTimer != null) {
+      clearTimeout(this.movedWindowPersistTimer);
+      this.movedWindowPersistTimer = null;
+    }
+  }
+
+  /** 原生拖动移动（原 handleNativeWindowDragMove，17,519-17,551）。 */
+  private handleNativeWindowDragMove(window: BrowserWindow, nativeBounds?: Rect): void {
+    let layout = this.layout;
+    if (window.isDestroyed() || layout == null) return;
+    let bounds = nativeBounds ?? window.getContentBounds();
+    this.anchor = { ...this.anchor, x: bounds.x + layout.mascot.left, y: bounds.y + layout.mascot.top };
+    let display = screen.getDisplayNearestPoint(anchorCenter(this.anchor));
+    this.dragState?.recordMove(display.bounds);
+    this.displayBounds = display.bounds;
+    this.displayId = display.id;
+    this.resolutionKey = resolutionKeyForBounds(display.bounds);
+    this.placement = preferredPlacementFor(this.anchor, display.workArea);
+    let computed = this.getLayoutForDisplay(display);
+    this.layout = {
+      ...computed,
+      anchor: this.anchor,
+      mascot: layout.mascot,
+      quickChat:
+        computed.quickChat == null
+          ? undefined
+          : { ...computed.quickChat, workArea: intersectBounds(bounds, display.workArea) },
+      tray:
+        computed.tray == null
+          ? null
+          : {
+              ...computed.tray,
+              left: computed.windowBounds.x + computed.tray.left - bounds.x,
+              top: computed.windowBounds.y + computed.tray.top - bounds.y,
+            },
+      viewport: { width: bounds.width, height: bounds.height },
+      visibleBounds: intersectBounds(bounds, displayDrawBounds(display, this.layoutMode)),
+      windowBounds: bounds,
+    };
+    this.placement = computed.placement;
+    this.publishRemoteHostedPIPContentHost();
+    this.sendLayoutToRenderer(window);
+  }
+
+  private clearNativeWindowDragCompletionTimer(): void {
+    if (this.nativeWindowDragCompletionTimer != null) {
+      clearInterval(this.nativeWindowDragCompletionTimer);
+      this.nativeWindowDragCompletionTimer = null;
+    }
+  }
+
+  /** 注销原生拖动（原 unregisterNativeWindowDragTarget，17,557-17,574）。 */
+  private unregisterNativeWindowDragTarget(reason: string): void {
+    try {
+      if (
+        this.nativeWindowDragActive &&
+        this.window != null &&
+        (!this.window.isDestroyed() ||
+          this.handleNativeWindowDragMove(this.window, (finishWindowDrag(this.window) as { bounds?: Rect } | null)?.bounds),
+        (this.suppressNextRendererThrow = true),
+        this.logger().info(`Native pet window drag finished`, { safe: { reason } }))
+      );
+    } finally {
+      setWindowDragTarget(null);
+      this.clearNativeWindowDragCompletionTimer();
+      this.dragState = null;
+      this.hasDeferredLayout = false;
+      this.nativeWindowDragTargetRegistered = false;
+      this.nativeWindowDragStart = null;
+      this.nativeWindowDragActive = false;
+    }
+  }
+
+  /** 记忆被移动的窗口（原 rememberMovedWindow，17,575-17,599）。 */
+  private rememberMovedWindow(window: BrowserWindow, nativeBounds?: Rect): void {
+    if (window.isDestroyed() || this.layout == null) return;
+    let bounds = nativeBounds ?? window.getContentBounds();
+    this.anchor = {
+      ...this.anchor,
+      x: bounds.x + this.layout.mascot.left,
+      y: bounds.y + this.layout.mascot.top,
+    };
+    let display = screen.getDisplayNearestPoint(anchorCenter(this.anchor));
+    this.displayBounds = display.bounds;
+    this.displayId = display.id;
+    this.resolutionKey = resolutionKeyForBounds(display.bounds);
+    if (this.isOverlayWindowPointerDragActive()) this.clearDetachedDisplayRestore();
+    this.clearMovedWindowPersist();
+    this.movedWindowPersistTimer = setTimeout(() => {
+      this.movedWindowPersistTimer = null;
+      if (this.isOverlayWindowPointerDragActive()) {
+        this.rememberMovedWindow(window);
+        return;
+      }
+      if (this.hasDeferredLayout) {
+        this.hasDeferredLayout = false;
+        this.applyLatestElementSizes(window);
+      }
+      this.applyPointerInteractivityPolicy();
+      this.reclampWindowToVisibleDisplay({ shouldPersist: true });
+    }, MOVED_WINDOW_PERSIST_DELAY_MS);
+  }
+
+  /** 指针拖动是否活跃（原 isOverlayWindowPointerDragActive）。 */
+  private isOverlayWindowPointerDragActive(): boolean {
+    let window = this.window;
+    if (window == null || window.isDestroyed() || !this.pointerInteractive || this.dragState == null)
+      return false;
+    return pointInBounds(screen.getCursorScreenPoint(), window.getContentBounds());
+  }
+
+  /** 尺寸变更后的锚点重定（原 applyLatestElementSizes）。 */
+  private applyLatestElementSizes(window: BrowserWindow): void {
+    if (!this.isQuickChatPresentation) {
+      this.anchor = {
+        ...this.anchor,
+        x: this.anchor.x + Math.round(this.anchor.width / 2) - Math.round(this.mascotSize.width / 2),
+        y: this.anchor.y + Math.round(this.anchor.height / 2) - Math.round(this.mascotSize.height / 2),
+      };
+    }
+    this.anchor = { ...this.anchor, ...this.mascotSize };
+    this.applyLayout(window, this.getCurrentDisplay());
+  }
+
+  /** 应用布局（原 applyLayout，17,622-17,649）。 */
+  private applyLayout(window: BrowserWindow, display: Electron.Display = this.getCurrentDisplay(), animated = false): void {
+    if (window.isDestroyed()) return;
+    if (this.nativeWindowDragActive || this.movedWindowPersistTimer != null) {
+      this.hasDeferredLayout = true;
+      this.handleNativeWindowDragMove(window);
+      return;
+    }
+    let layout = this.getLayoutForDisplay(display);
+    if (this.quickChatResizeDrawAnchor != null) {
+      this.quickChatDrawOffset = {
+        x: this.quickChatResizeDrawAnchor.x - layout.anchor.x,
+        y: this.quickChatResizeDrawAnchor.y - layout.anchor.y,
+      };
+    }
+    this.displayId = display.id;
+    this.resolutionKey = resolutionKeyForBounds(display.bounds);
+    this.displayBounds = display.bounds;
+    this.anchor = {
+      ...layout.anchor,
+      y: this.realtimeCaptionAboveMascotPx > 0 ? this.anchor.y : layout.anchor.y,
+    };
+    this.layout = layout;
+    this.placement = layout.placement;
+    this.setWindowBounds(window, layout.windowBounds, animated);
+    this.publishRemoteHostedPIPContentHost();
+    this.sendLayoutToRenderer(window);
+    if (this.computerUseCursorLocation != null && this.dragState == null)
+      this.sendComputerUseCursorLocationToRenderer(window);
+  }
+
+  /** 计算某 display 的布局（原 getLayoutForDisplay，17,650-17,714）。 */
+  private getLayoutForDisplay(display: Electron.Display, anchor: Rect = this.anchor): AvatarOverlayLayout {
+    let workingAnchor = anchor;
+    let stashOrMomentum =
+      this.isQuickChatPresentation && (this.quickChatStashedEdge != null || this.momentumActive);
+    let drawBounds = displayDrawBounds(display, this.layoutMode);
+    let pipState = this.remoteHostedPIPContentLayoutState;
+    let pipHostingOverlay = pipState?.currentHostID === AVATAR_OVERLAY_HOST_ID;
+    let pipStackHeight = pipHostingOverlay ? Math.max(0, pipState.stackDisplayHeight) : undefined;
+    let pipStackWidth = pipHostingOverlay ? Math.max(0, pipState.stackDisplayWidth) : undefined;
+    if (this.layoutMode === `native` && this.isQuickChatPresentation && !stashOrMomentum) {
+      let margin =
+        (Math.max(quickChatRestingWidth(this.quickChatControls?.hasNotifications ?? false), pipStackWidth ?? 0) -
+          this.mascotSize.width) /
+          2 +
+        16;
+      workingAnchor = {
+        ...workingAnchor,
+        x: Math.max(
+          drawBounds.x + margin,
+          Math.min(workingAnchor.x, drawBounds.x + drawBounds.width - this.mascotSize.width - margin),
+        ),
+      };
+    }
+    let allDisplays = screen.getAllDisplays();
+    let layout = computeAvatarOverlayLayout({
+      anchor: workingAnchor,
+      constrainNativeDrawWindowToDisplay:
+        process.platform === `win32` ||
+        (process.platform === `darwin` && this.isQuickChatPresentation && allDisplays.length > 1),
+      displayBounds: drawBounds,
+      dockedPIPStackDisplayHeight: pipStackHeight,
+      mode: this.layoutMode,
+      mascotSize: this.mascotSize,
+      nativeDrawAnchor: this.isQuickChatPresentation
+        ? (this.quickChatResizeDrawAnchor ?? {
+            ...workingAnchor,
+            x: Math.round(workingAnchor.x) + this.quickChatDrawOffset.x,
+            y: Math.round(workingAnchor.y) + this.quickChatDrawOffset.y,
+          })
+        : undefined,
+      nativeDrawMascotSize: this.isQuickChatPresentation ? undefined : { width: 80, height: 87 },
+      nativeDrawDisplayHeightPx: Math.max(
+        ...allDisplays.map((d) => displayDrawBounds(d, this.layoutMode).height),
+      ),
+      previousPlacement: this.placement,
+      realtimeCaptionAboveMascotPx: this.realtimeCaptionAboveMascotPx,
+      showsPetControls: this.showsPetControls,
+      petControlRowHeight: this.quickChatControls == null ? undefined : 40,
+      traySize: this.traySize ?? (this.layoutMode === `native` ? NATIVE_TRAY_SIZE : LEGACY_TRAY_SIZE),
+      viewportSize:
+        this.layoutMode === `native` && this.isQuickChatPresentation
+          ? { width: QUICK_CHAT_MIN_SNAP_WIDTH_PX + 56, height: NATIVE_VIEWPORT_SIZE.height }
+          : undefined,
+    });
+    if (this.isQuickChatPresentation) {
+      if (stashOrMomentum) {
+        layout.mascot.left += anchor.x - layout.anchor.x;
+        layout.anchor.x = anchor.x;
+      }
+      let offsetFromCenter =
+        workingAnchor.x + workingAnchor.width / 2 - (display.bounds.x + display.bounds.width / 2);
+      let nearestStashEdge: string | undefined;
+      if (offsetFromCenter < -0.5) nearestStashEdge = `left`;
+      else if (offsetFromCenter > 0.5) nearestStashEdge = `right`;
+      layout.quickChat = {
+        restingWidth: this.getQuickChatRestingWidth(),
+        hasOrbPicker: this.quickChatControls?.hasOrbPicker,
+        nearestStashEdge,
+        stashedEdge: this.quickChatStashedEdge ?? undefined,
+        workArea: intersectBounds(layout.windowBounds, display.workArea),
+      };
+    }
+    return layout;
+  }
+
+  /** remote PIP 布局状态更新（原 setRemoteHostedPIPContentLayoutState，17,715-17,756）。 */
+  setRemoteHostedPIPContentLayoutState(state: RemoteHostedPIPContentLayoutState): void {
+    if (deepEqual(this.remoteHostedPIPContentLayoutState, state)) return;
+    let wasHosting = this.remoteHostedPIPContentLayoutState?.currentHostID === AVATAR_OVERLAY_HOST_ID;
+    let previousStackWidth = wasHosting
+      ? Math.max(0, this.remoteHostedPIPContentLayoutState?.stackDisplayWidth ?? 0)
+      : undefined;
+    this.remoteHostedPIPContentLayoutState = state;
+    this.windowManager.sendMessageToAllWindows({
+      state,
+      type: `remote-hosted-pip-content-layout-state-changed`,
+    });
+    let nowHosting = state.currentHostID === AVATAR_OVERLAY_HOST_ID;
+    let nextStackHeight = nowHosting ? Math.max(0, state.stackDisplayHeight) : undefined;
+    let widthChanged =
+      previousStackWidth !== (nowHosting ? Math.max(0, state.stackDisplayWidth) : undefined);
+    if (previousStackWidth === nextStackHeight && !widthChanged) return;
+    let window = this.window;
+    if (window != null && !window.isDestroyed()) {
+      if (!wasHosting && nowHosting) {
+        this.windowManager.sendMessageToWebContents(window.webContents, {
+          type: `avatar-overlay-action`,
+          action: { type: `hide-activity-pills`, automatic: true },
+        });
+      }
+      if (this.isQuickChatPresentation && this.dragState == null && !this.isFreelyPositioned && widthChanged) {
+        let display = this.getCurrentDisplay();
+        let snapTarget = this.snapQuickChatToPosition(
+          display,
+          this.quickChatPosition ?? positionFromPoint(anchorCenter(this.anchor), display.workArea),
+          true,
+        );
+        if (nowHosting && snapTarget != null) {
+          this.remoteHostedPIPContentHostMotionTarget = snapTarget;
+          this.publishRemoteHostedPIPContentHost();
+        }
+      } else {
+        this.applyLayout(window);
+      }
+    }
+  }
+
+  /** 取布局（懒计算，原 getLayout）。 */
+  private getLayout(window: BrowserWindow): AvatarOverlayLayout {
+    if (this.layout == null) this.applyLayout(window);
+    if (this.layout == null) throw Error(`Expected avatar overlay layout`);
+    return this.layout;
+  }
+
+  /** 设置窗口 bounds（原 setWindowBounds）。 */
+  private setWindowBounds(window: BrowserWindow, bounds: Rect, animated: boolean): void {
+    if (!window.isDestroyed() && !boundsEqual(window.getContentBounds(), bounds)) {
+      this.isSettingWindowBounds = true;
+      try {
+        window.setContentBounds(bounds, animated);
+      } finally {
+        this.isSettingWindowBounds = false;
+      }
+    }
+  }
+
+  /** 发送布局到 renderer（原 sendLayoutToRenderer，17,772-17,808）。 */
+  private sendLayoutToRenderer(window: BrowserWindow): void {
+    if (window.isDestroyed() || this.layout == null || !this.rendererReady) return;
+    let layout = rendererLayoutSubset(this.layout);
+    let isGlobalRealtimeVoicePresentation = this.realtimeController.isGlobalHotkeySessionReserved();
+    let isVisible = this.shouldPresentWindow() || this.windowHideAnimation === `running`;
+    let quickChatFocusRequestId = this.pendingQuickChatFocus?.hasLayout
+      ? this.pendingQuickChatFocus.requestId
+      : undefined;
+    let unchanged =
+      this.lastSentRendererState != null &&
+      deepEqual(layout, (this.lastSentRendererState as { layout: unknown }).layout) &&
+      this.petOpenIntent === this.lastSentRendererState.petOpenIntent &&
+      this.arePresentationAccessoriesVisible ===
+        this.lastSentRendererState.arePresentationAccessoriesVisible &&
+      isVisible === this.lastSentRendererState.isVisible &&
+      isGlobalRealtimeVoicePresentation ===
+        this.lastSentRendererState.isGlobalRealtimeVoicePresentation &&
+      quickChatFocusRequestId === this.lastSentRendererState.quickChatFocusRequestId;
+    if (unchanged) return;
+    this.lastSentRendererState = {
+      isGlobalRealtimeVoicePresentation,
+      isVisible,
+      layout,
+      petOpenIntent: this.petOpenIntent,
+      arePresentationAccessoriesVisible: this.arePresentationAccessoriesVisible,
+      quickChatFocusRequestId,
+    };
+    this.windowManager.sendMessageToWebContents(
+      window.webContents,
+      {
+        type: `avatar-overlay-layout-changed`,
+        layoutRevision: ++this.layoutRevision,
+        quickChatFocusRequestId,
+        isGlobalRealtimeVoicePresentation,
+        isVisible,
+        layout,
+        petOpenIntent: this.petOpenIntent,
+        arePresentationAccessoriesVisible: this.arePresentationAccessoriesVisible,
+      },
+      { priority: `critical` },
+    );
+  }
+
+  /** 持久化窗口位置（原 persistWindowBounds，17,809-17,829）。 */
+  private persistWindowBounds(window: BrowserWindow, display: Electron.Display = this.getCurrentDisplay()): void {
+    if (window.isDestroyed()) return;
+    let displayBounds = display.bounds;
+    let placement = {
+      x: this.anchor.x + this.presentationOffset.x,
+      y: this.anchor.y + this.presentationOffset.y,
+      displayBounds,
+      displayId: display.id,
+      placement: this.placement,
+      isFreelyPositioned: this.isFreelyPositioned,
+    };
+    let stored = this.globalState.get(AVATAR_OVERLAY_BOUNDS_KEY);
+    let resolutionKey = resolutionKeyForBounds(displayBounds);
+    this.displayId = display.id;
+    this.resolutionKey = resolutionKey;
+    let next = {
+      ...placement,
+      byDisplayId: { ...stored?.byDisplayId, [String(display.id)]: placement },
+      byResolution: { ...stored?.byResolution, [resolutionKey]: placement },
+    };
+    if (!deepEqual(stored, next)) this.globalState.set(AVATAR_OVERLAY_BOUNDS_KEY, next);
+  }
+
+  /** 显示窗口（原 showWindow，17,830-17,851）。 */
+  private showWindow(window: BrowserWindow): void {
+    if (window.isDestroyed()) return;
+    let wasOpen = this.isOpen();
+    window.moveTop();
+    window.showInactive();
+    this.updateCssPetControlsProximityTracking();
+    if (this.presentationFadeInPending) {
+      this.presentationFadeInPending = false;
+      this.fadeInPresentation(window);
+    }
+    this.publishRemoteHostedPIPContentHost();
+    if (!wasOpen && this.isOpen()) {
+      this.realtimeController.handlePresented();
+      this.broadcastOpenState();
+    }
+    let pending = this.pendingPresentation;
+    if (pending != null) {
+      this.pendingPresentation = null;
+      if (pending.velocity == null) {
+        this.dockRestoreAnchor = pending.target;
+        this.animatePresentationTo(pending.target, dockingVelocity(this.anchor, pending.target), () => {
+          if (this.dockRestoreAnchor === pending.target) this.dockRestoreAnchor = null;
+        });
+      } else {
+        this.startMomentum(pending.velocity.x, pending.velocity.y, true);
+      }
+    }
+  }
+
+  /** 可见性对账（原 reconcileWindowVisibility，17,852-17,869）。 */
+  private reconcileWindowVisibility(): void {
+    if (this.isAppQuitting) return;
+    if (!this.shouldPresentWindow()) {
+      this.hideWindow();
+      return;
+    }
+    let window = this.window;
+    if (window != null && window !== this.closingWindow && !window.isDestroyed()) {
+      this.presentWindow(window);
+      return;
+    }
+    this.open(null, { persistPetIntent: false }).catch((error) => {
+      this.logger().warning(`Failed to show avatar overlay presentation`, {
+        safe: {},
+        sensitive: { error },
+      });
+    });
+  }
+
+  /** 隐藏窗口（原 hideWindow，17,870-17,907）。 */
+  private hideWindow(): void {
+    if (this.windowHideAnimation === `running`) return;
+    let animated = this.windowHideAnimation === `pending`;
+    let window = this.window;
+    this.windowVisibilitySequence += 1;
+    this.cancelQuickChatFocus();
+    this.cancelPresentationFade(window, false);
+    let hideNow = () => {
+      if (window !== this.window) {
+        this.windowHideAnimation = null;
+        this.updateCssPetControlsProximityTracking();
+        this.resetQuickChatKeyboardInteraction();
+        this.broadcastOpenState();
+        this.scheduleDismissedWindowCleanup();
+        return;
+      }
+      this.windowHideAnimation = null;
+      this.updateCssPetControlsProximityTracking();
+      if (window != null && !window.isDestroyed()) {
+        this.updateRendererBackgroundThrottling();
+        window.hide();
+        if (animated || !this.hiddenForApplicationHide) window.setOpacity(1);
+        if (this.isQuickChatPresentation) {
+          window.setFocusable(false);
+          this.refreshNativeActiveAppearance(window);
+        }
+        this.restoreDockAnchor();
+        this.sendLayoutToRenderer(window);
+      }
+      this.resetQuickChatKeyboardInteraction();
+      this.broadcastOpenState();
+      this.scheduleDismissedWindowCleanup();
+    };
+    if (
+      animated &&
+      !this.isAppQuitting &&
+      !this.hiddenForApplicationHide &&
+      window != null &&
+      !window.isDestroyed() &&
+      window.isVisible()
+    ) {
+      this.fadePresentation(window, window.getOpacity(), 0, hideNow, HIDE_FADE_DURATION_MS);
+      this.windowHideAnimation = `running`;
+      return;
+    }
+    hideNow();
+  }
+
+  /** 调度销毁保留窗口（原 scheduleDismissedWindowCleanup，17,908-17,929）。 */
+  private scheduleDismissedWindowCleanup(): void {
+    this.clearDismissedWindowCleanup();
+    let window = this.window;
+    if (
+      !this.isDismissedWindowRetained ||
+      this.isAppQuitting ||
+      this.shouldPresentWindow() ||
+      this.realtimeController.isSessionReserved() ||
+      window == null ||
+      window.isDestroyed() ||
+      window.isVisible()
+    )
+      return;
+    this.dismissedWindowCleanupTimer = setTimeout(() => {
+      this.dismissedWindowCleanupTimer = null;
+      let currentWindow = this.window;
+      if (
+        this.shouldPresentWindow() ||
+        this.realtimeController.isSessionReserved() ||
+        currentWindow == null ||
+        currentWindow.isDestroyed() ||
+        currentWindow.isVisible()
+      )
+        return;
+      this.destroyHiddenWindow();
+    }, DISMISSED_WINDOW_CLEANUP_DELAY_MS);
+    this.dismissedWindowCleanupTimer.unref?.();
+  }
+
+  private clearDismissedWindowCleanup(): void {
+    if (this.dismissedWindowCleanupTimer != null) {
+      clearTimeout(this.dismissedWindowCleanupTimer);
+      this.dismissedWindowCleanupTimer = null;
+    }
+  }
+
+  /** 销毁隐藏窗口（原 destroyHiddenWindow）。 */
+  private destroyHiddenWindow(): void {
+    this.clearDismissedWindowCleanup();
+    if (this.shouldPresentWindow()) return;
+    let window = this.window;
+    if (window != null && this.closingWindow !== window) {
+      this.isDismissedWindowRetained = false;
+      this.realtimeController.unregisterStarter(window.webContents.id);
+      this.closingWindow = window;
+      window.close();
+    }
+  }
+
+  /** 就绪则显示（原 showWindowIfReady）。 */
+  private showWindowIfReady(window: BrowserWindow): void {
+    if (
+      this.shouldPresentWindow() &&
+      !this.hiddenForApplicationHide &&
+      this.rendererReady &&
+      this.initialPresentationState === `ready` &&
+      this.pendingQuickChatFocus == null &&
+      !this.awaitingRealtimeVoicePresentation
+    ) {
+      this.showWindow(window);
+      this.applyPointerInteractivityPolicy();
+    }
+  }
+
+  /** 淡入（原 fadeInPresentation）。 */
+  private fadeInPresentation(window: BrowserWindow): void {
+    this.fadePresentation(window, FADE_START_OPACITY, 1);
+  }
+
+  /** 淡出/淡入动画（原 fadePresentation，17,956-17,974）。 */
+  private fadePresentation(
+    window: BrowserWindow,
+    fromOpacity: number,
+    toOpacity: number,
+    onDone?: () => void,
+    durationMs = FADE_DURATION_MS,
+  ): void {
+    this.cancelPresentationFade(window, false);
+    let startTime = Date.now();
+    let step = () => {
+      if (window.isDestroyed() || !window.isVisible()) {
+        this.presentationFadeTimer = null;
+        onDone?.();
+        return;
+      }
+      let progress = Math.min(1, (Date.now() - startTime) / durationMs);
+      let eased = 1 - (1 - progress) ** 3;
+      window.setOpacity(progress === 1 ? toOpacity : fromOpacity + (toOpacity - fromOpacity) * eased);
+      if (progress === 1) {
+        this.presentationFadeTimer = null;
+        onDone?.();
+        return;
+      }
+      this.presentationFadeTimer = setTimeout(
+        step,
+        Math.min(ANIMATION_FRAME_MS, durationMs - (Date.now() - startTime)),
+      );
+      this.presentationFadeTimer.unref?.();
+    };
+    step();
+  }
+
+  /** 取消淡出（原 cancelPresentationFade）。 */
+  private cancelPresentationFade(window: BrowserWindow = this.window, resetOpacity = true): void {
+    this.windowHideAnimation = null;
+    this.presentationFadeInPending = false;
+    if (this.presentationFadeTimer != null) {
+      clearTimeout(this.presentationFadeTimer);
+      this.presentationFadeTimer = null;
+    }
+    if (resetOpacity && window != null && !window.isDestroyed()) window.setOpacity(1);
+  }
+
+  /** 是否应呈现（原 shouldPresentWindow）。 */
+  private shouldPresentWindow(): boolean {
+    return (
+      (this.presentationVisibility ?? this.startupPresentationVisibility ?? this.petOpenIntent) ===
+      true
+    );
+  }
+
+  /** renderer 节流（原 updateRendererBackgroundThrottling）。 */
+  private updateRendererBackgroundThrottling(): void {
+    let window = this.window;
+    if (window == null || window.isDestroyed() || !this.rendererReady) return;
+    window.webContents.setBackgroundThrottling(
+      !this.shouldPresentWindow() && !this.realtimeController.isSessionReserved(),
+    );
+  }
+
+  /** 广播打开状态（原 broadcastOpenState）。 */
+  private broadcastOpenState(): void {
+    this.windowManager.sendMessageToAllRegisteredWindows({
+      type: `avatar-overlay-open-state-changed`,
+      isOpen: this.isOpen(),
+    });
+  }
+
+  /** 鼠标穿透策略（原 applyPointerInteractivityPolicy，18,002-18,025）。 */
+  private applyPointerInteractivityPolicy(): void {
+    let window = this.window;
+    if (window == null || window.isDestroyed()) {
+      this.mousePassthroughMode = `disabled`;
+      return;
+    }
+    let inputShapeApplied = this.applyInputShape(window);
+    if (!window.isVisible()) {
+      if (process.platform === `win32` && this.mousePassthroughMode === `disabled`) return;
+      if (this.mousePassthroughMode !== `without-forwarding`) {
+        window.setIgnoreMouseEvents(true, { forward: false });
+        this.mousePassthroughMode = `without-forwarding`;
+      }
+      return;
+    }
+    if (inputShapeApplied) return;
+    let nextMode = this.pointerInteractive ? `disabled` : `forwarding`;
+    if (this.mousePassthroughMode !== nextMode) {
+      this.mousePassthroughMode = nextMode;
+      if (nextMode === `forwarding`) {
+        window.setIgnoreMouseEvents(true, { forward: true });
+        return;
+      }
+      window.setIgnoreMouseEvents(false);
+      this.refreshCursorAtCurrentMousePosition(window);
+    }
+  }
+
+  /** 应用输入形状（原 applyInputShape，18,026-18,039）。 */
+  private applyInputShape(window: BrowserWindow): boolean {
+    if (!this.supportsInputShape || this.inputShape == null) return false;
+    if (this.mousePassthroughMode !== `disabled`) {
+      window.setIgnoreMouseEvents(false);
+      this.mousePassthroughMode = `disabled`;
+    }
+    let applied = window.setInputShape(
+      this.inputShape.map(({ height, left, top, width }) => ({
+        height,
+        width,
+        x: left,
+        y: top,
+      })),
+    );
+    if (applied) this.mousePassthroughMode = `disabled`;
+    return applied;
+  }
+
+  /** computer-use 光标位置（原 setComputerUseCursorLocation，18,040-18,055）。 */
+  private setComputerUseCursorLocation(location: ComputerUseCursorLocation): void {
+    this.computerUseCursorLocation = location;
+    this.computerUseCursorPoint = location.isActive ? { x: location.x, y: location.y } : null;
+    let window = this.window;
+    if (window == null || window.isDestroyed()) return;
+    this.sendComputerUseCursorLocationToRenderer(window);
+    if (this.dragState != null) return;
+    if (this.computerUseCursorPoint != null) {
+      this.sendCursorPointToAvatarOverlay(window, this.computerUseCursorPoint, true);
+      return;
+    }
+    if (!this.refreshCursorAtCurrentMousePosition(window))
+      window.webContents.sendInputEvent({ type: `mouseLeave`, x: -1, y: -1 });
+  }
+
+  /** 光标位置下发（原 sendComputerUseCursorLocationToRenderer）。 */
+  private sendComputerUseCursorLocationToRenderer(window: BrowserWindow): void {
+    if (window.isDestroyed() || !this.rendererReady) return;
+    let contentBounds = window.getContentBounds();
+    this.windowManager.sendMessageToWebContents(window.webContents, {
+      type: `avatar-overlay-computer-use-cursor-changed`,
+      point:
+        this.computerUseCursorPoint == null
+          ? null
+          : {
+              x: this.computerUseCursorPoint.x - contentBounds.x,
+              y: this.computerUseCursorPoint.y - contentBounds.y,
+            },
+    });
+  }
+
+  /** 刷新光标到当前位置（原 refreshCursorAtCurrentMousePosition）。 */
+  private refreshCursorAtCurrentMousePosition(window: BrowserWindow): boolean {
+    if (window.isDestroyed()) return false;
+    if (this.computerUseCursorPoint != null)
+      return this.sendCursorPointToAvatarOverlay(window, this.computerUseCursorPoint, true);
+    let cursor = screen.getCursorScreenPoint();
+    return this.sendCursorPointToAvatarOverlay(window, cursor, false);
+  }
+
+  /** 光标合成事件（原 sendCursorPointToAvatarOverlay）。 */
+  private sendCursorPointToAvatarOverlay(window: BrowserWindow, point: Point, force: boolean): boolean {
+    let contentBounds = window.getContentBounds();
+    let x = point.x - contentBounds.x;
+    let y = point.y - contentBounds.y;
+    if (!force && (x < 0 || y < 0 || x > contentBounds.width || y > contentBounds.height))
+      return false;
+    window.webContents.sendInputEvent({
+      type: `mouseMove`,
+      x,
+      y,
+      movementX: 0,
+      movementY: 0,
+    });
+    return true;
+  }
 }
+
+

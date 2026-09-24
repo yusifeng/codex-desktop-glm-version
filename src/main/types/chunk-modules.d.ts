@@ -845,3 +845,17 @@ declare module "@chunk/css-selector" {
     [key: string]: unknown;
   };
 }
+
+// main chunk 内嵌 vendored 库的临时声明（main 集成阶段会提取 main-vendor.ts）。
+declare module "@main-vendor/statsig" {
+  // @statsig/js-client（js-mono v3.33.4）入口的三符号（原 main chunk `Yw`）。
+  export class StatsigClient {
+    constructor(sdkKey: string, user: unknown, options?: unknown);
+    dataAdapter: { setData(data: string): void };
+    initializeSync(opts?: unknown): { success: boolean };
+    getContext(): { user: unknown; values: unknown };
+    shutdown(): void;
+  }
+  export function djb2Hash(value: string): string;
+  export function makeTypedGet(name: string, value: unknown): (key: string) => unknown;
+}

@@ -44,7 +44,7 @@ export interface SkysightStatus {
 }
 
 /** 停止态的初始缓存（原 `joe`，模块级常量）。 */
-const STOPPED_STATUS: SkysightStatus = {
+const STOPPED_STATUS: SkysightStatus & Record<string, unknown> = {
   state: `stopped`,
   eventStreamRootPath: null,
   currentSegmentEventsPath: null,
@@ -216,7 +216,7 @@ export class SkysightServiceManager {
     method: `skysightPause` | `skysightResume`,
     duration?: unknown,
   ): Promise<SkysightStatus & Record<string, unknown>> {
-    return new Promise((resolve, reject) => {
+    return new Promise<SkysightStatus & Record<string, unknown>>((resolve, reject) => {
       this.finishPendingPauseResume = resolve;
       const request =
         method === `skysightPause`

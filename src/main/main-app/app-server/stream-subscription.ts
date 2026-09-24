@@ -18,7 +18,8 @@ import { Uf as EventEmitter } from "@chunk/shared";
 /** 流通知连接面（app-server conversation stream 连接）。 */
 export interface ConversationStreamConnection {
   /** 复制出独立游标的订阅连接（不支持 dup 的连接走直通订阅）。 */
-  dup?(): ConversationStreamConnection & {
+  dup?(): {
+    (notification: ConversationStreamNotification): Promise<any> & Disposable;
     onRpcBroken(callback: () => void): void;
     [Symbol.dispose](): void;
   };
@@ -70,13 +71,13 @@ export class ConversationStreamSubscription extends EventEmitter {
     let needsReset = false;
     let consuming = false;
     let active = true;
-    let resetUsingDispose: (() => void) | null = null;
+    let resetUsingDispose: (Promise<any> & Disposable) | null = null;
     let unsubscribeSource: (() => void) | null = null;
     let subscription = new ConversationStreamSubscription(() => {
       active = false;
       queued.length = 0;
       unsubscribeSource?.();
-      resetUsingDispose?.();
+      resetUsingDispose?.[Symbol.dispose]();
       stream[Symbol.dispose]();
     });
     let consume = async (initial: ConversationStreamNotification | null) => {

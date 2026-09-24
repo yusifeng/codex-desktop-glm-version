@@ -102,7 +102,7 @@ function stringifyArrayOfTables(
   let out = ``;
   for (let i = 0; i < value.length; i++) {
     out += `${out && `\n` }[[${sectionPath}]]\n`;
-    out += stringifyTable(0, value[i], sectionPath, depth, numbersAsFloat);
+    out += stringifyTable(``, value[i], sectionPath, depth, numbersAsFloat);
   }
   return out;
 }

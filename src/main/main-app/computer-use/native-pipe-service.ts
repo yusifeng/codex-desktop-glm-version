@@ -1018,6 +1018,7 @@ export function createComputerUseNativePipeClient({
                 missingTransportModulePath: windowsHelperTransportModulePath == null,
                 platform: platformName,
               },
+              sensitive: {},
             });
             return;
           }
@@ -1025,6 +1026,7 @@ export function createComputerUseNativePipeClient({
             const result = await ensureNotifyConfig({ codexHome, windowsHelperPath });
             pipeClientLogger().info(`computer-use notify config ensure finished`, {
               safe: { platform: platformName, status: result.status },
+              sensitive: {},
             });
           } catch (error) {
             pipeClientLogger().warning(`computer-use notify config ensure failed`, {
@@ -1087,6 +1089,7 @@ export function createComputerUseNativePipeClient({
             return;
           pipeClientLogger().info(`computer-use native pipe helper paths changed`, {
             safe: { platform: platformName },
+            sensitive: {},
           });
           await disposeServer();
           await ensureStarted(paths);

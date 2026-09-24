@@ -19,7 +19,7 @@ import { freezeIdentity } from "../vendor/immer";
 import { findLast } from "../util/lodash-interop";
 import { mergeTurnLists, type AnyTurn } from "./item-merge";
 
-export type { AnyTurn, HistoryEntry };
+export type { AnyTurn };
 
 /** 历史边界（岛的一侧）。 */
 export interface HistoryBoundary {

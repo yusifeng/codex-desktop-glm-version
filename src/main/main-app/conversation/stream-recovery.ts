@@ -476,3 +476,226 @@ export class StreamRecovery {
     this.unconfirmedMissingConversationIds.delete(conversationId);
   }
 }
+
+// ---------------------------------------------------------------------------
+// TurnStartObservations（lSe，49,789-49,948）
+// ---------------------------------------------------------------------------
+
+/** turn start 观察条目：owner 现势性 + 观察者列表 + 生命周期标记。 */
+interface TurnStartObservationEntry {
+  conversationId: string;
+  isOwnerCurrent: (allowUnloaded: boolean) => boolean;
+  observations: { observer: any; active: boolean }[];
+  dispatched: boolean;
+  turnId: string | null;
+  accepted: boolean;
+  completion: any;
+  delivered: boolean;
+  allowUnloaded: boolean;
+}
+
+/** turn start 观察句柄（dispatched/accepted/cancel）。 */
+export interface TurnStartObservationHandle {
+  dispatched: () => void;
+  accepted: (turnId: string) => void;
+  cancel: () => void;
+}
+
+/**
+ * turn start 观测登记（原 lSe）：把「turn 派发 → 接受 → 完成」的回调面
+ * 挂到 capture 语义的 turnStartRequested 事件上。观察者失效（owner 变更、
+ * 未派发即收到完成、观察者自身报错）时自动退订；clearing 期间不登记新条目。
+ */
+export class TurnStartObservations {
+  hostId: string;
+  logger: any;
+  capture: (conversationId: string, registerObserver: (observer: any) => () => void) => void;
+  requests = new Map<string, TurnStartObservationEntry>();
+  clearing = false;
+
+  constructor(hostId: string, logger: any, capture: any) {
+    this.hostId = hostId;
+    this.logger = logger;
+    this.capture = capture;
+  }
+
+  /** 登记一次 turn start 观测（同会话旧条目先取消）。 */
+  begin(conversationId: string, isOwnerCurrent: (allowUnloaded: boolean) => boolean): TurnStartObservationHandle {
+    let existing = this.requests.get(conversationId);
+    let entry: TurnStartObservationEntry = {
+      conversationId,
+      isOwnerCurrent,
+      observations: [],
+      dispatched: false,
+      turnId: null,
+      accepted: false,
+      completion: null,
+      delivered: false,
+      allowUnloaded: false,
+    };
+    this.clearing || this.requests.set(conversationId, entry);
+    existing != null && this.cancel(existing);
+    this.isCurrent(entry) &&
+      this.capture(
+        { conversationId, hostId: this.hostId, isCurrent: () => this.isCurrent(entry) },
+        (observer: any) => {
+          let slot = { observer, active: true };
+          entry.observations.push(slot);
+          this.isCurrent(entry) || this.disposeObservation(entry, slot);
+          return () => this.disposeObservation(entry, slot);
+        },
+      );
+    entry.observations.length === 0 && this.cancel(entry);
+    return {
+      dispatched: () => {
+        this.isCurrent(entry) && (entry.dispatched = true);
+      },
+      accepted: (turnId: string) => {
+        if (this.matches(entry, turnId)) {
+          for (let slot of entry.observations)
+            if (this.observationIsCurrent(entry, slot)) {
+              try {
+                slot.observer.onAccepted(turnId) || this.disposeObservation(entry, slot);
+              } catch (error) {
+                this.warn(error);
+                this.disposeObservation(entry, slot);
+              }
+            }
+          entry.accepted = true;
+          this.deliver(entry);
+        }
+      },
+      cancel: () => this.cancel(entry),
+    };
+  }
+
+  /** turn start 请求事件到达时校验现势性（原 observeStart）。 */
+  observeStart(conversationId: string, turnId: string) {
+    let entry = this.requests.get(conversationId);
+    entry != null && this.matches(entry, turnId);
+  }
+
+  /** turn 完成事件：accepted 且 turnId 不同则投递（原 observeCompletion）。 */
+  observeCompletion(event: any) {
+    if (event.turnId == null) return;
+    let entry = this.requests.get(event.conversationId);
+    (entry?.accepted && entry.turnId !== event.turnId) ||
+      (entry != null &&
+        this.matches(entry, event.turnId) &&
+        !entry.delivered &&
+        ((entry.completion ??= event), this.deliver(entry)));
+  }
+
+  /** owner 角色变化时校验现势性（原 ownerChanged）。 */
+  ownerChanged(conversationId: string) {
+    let entry = this.requests.get(conversationId);
+    entry != null && this.isCurrent(entry);
+  }
+
+  /** 会话被动释放：已投递的允许 unloaded，否则退休（原 unload）。 */
+  unload(conversationId: string) {
+    let entry = this.requests.get(conversationId);
+    entry?.delivered ? (entry.allowUnloaded = true) : this.retire(conversationId);
+  }
+
+  /** 退休某会话的观测（原 retire）。 */
+  retire(conversationId: string) {
+    let entry = this.requests.get(conversationId);
+    entry != null && this.cancel(entry);
+  }
+
+  /** 全部清空（重入安全，原 clear）。 */
+  clear() {
+    if (this.clearing) return;
+    this.clearing = true;
+    let entries = Array.from(this.requests.values());
+    this.requests.clear();
+    try {
+      for (let entry of entries) this.cancel(entry);
+    } finally {
+      this.clearing = false;
+    }
+  }
+
+  /** turnId 匹配：未派发或 turnId 已换 → 取消并 false（原 matches）。 */
+  private matches(entry: TurnStartObservationEntry, turnId: string) {
+    return this.isCurrent(entry)
+      ? !entry.dispatched || (entry.turnId != null && entry.turnId !== turnId)
+        ? (this.cancel(entry), false)
+        : ((entry.turnId = turnId), true)
+      : false;
+  }
+
+  /** 条目是否仍是当前有效观测（owner 现势，原 isCurrent）。 */
+  private isCurrent(entry: TurnStartObservationEntry) {
+    return this.requests.get(entry.conversationId) === entry
+      ? entry.isOwnerCurrent(entry.allowUnloaded)
+        ? true
+        : (this.cancel(entry), false)
+      : false;
+  }
+
+  /** 观察者是否仍有效（自身 isCurrent + 条目现势，原 observationIsCurrent）。 */
+  private observationIsCurrent(entry: TurnStartObservationEntry, slot: { observer: any; active: boolean }) {
+    if (!slot.active || !this.isCurrent(entry)) return false;
+    try {
+      if (slot.observer.isCurrent()) return slot.active && this.isCurrent(entry);
+    } catch (error) {
+      this.warn(error);
+    }
+    return (this.disposeObservation(entry, slot), false);
+  }
+
+  /** 投递完成（accepted + completion + 现势；onCompleted 可返回清理 promise）。 */
+  private deliver(entry: TurnStartObservationEntry) {
+    let completion = entry.completion;
+    if (entry.accepted && !entry.delivered && completion != null && this.isCurrent(entry)) {
+      entry.completion = null;
+      entry.delivered = true;
+      for (let slot of entry.observations)
+        if (this.observationIsCurrent(entry, slot)) {
+          try {
+            let cleanup = slot.observer.onCompleted(completion);
+            cleanup == null
+              ? this.disposeObservation(entry, slot)
+              : cleanup.then(
+                  () => this.disposeObservation(entry, slot),
+                  (error: unknown) => {
+                    this.warn(error);
+                    this.disposeObservation(entry, slot);
+                  },
+                );
+          } catch (error) {
+            this.warn(error);
+            this.disposeObservation(entry, slot);
+          }
+        }
+    }
+  }
+
+  /** 取消条目（出表 + 观察者全部退订）。 */
+  private cancel(entry: TurnStartObservationEntry) {
+    this.requests.get(entry.conversationId) === entry && this.requests.delete(entry.conversationId);
+    entry.completion = null;
+    for (let slot of entry.observations) this.disposeObservation(entry, slot);
+  }
+
+  /** 退订单个观察者（全部退订后条目出表，原 disposeObservation）。 */
+  private disposeObservation(entry: TurnStartObservationEntry, slot: { observer: any; active: boolean }) {
+    if (slot.active) {
+      slot.active = false;
+      try {
+        slot.observer.dispose();
+      } catch (error) {
+        this.warn(error);
+      }
+      entry.observations.every((candidate) => !candidate.active) &&
+        this.requests.get(entry.conversationId) === entry &&
+        (this.requests.delete(entry.conversationId), (entry.completion = null));
+    }
+  }
+
+  private warn(error: unknown) {
+    this.logger.warning(`Turn start observer failed`, { safe: {}, sensitive: { error } });
+  }
+}

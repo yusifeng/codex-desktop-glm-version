@@ -145,7 +145,7 @@ export class ThreadItemIndex {
     changedItems: { entityKey: string; itemId: string }[] | null,
   ): void {
     // 1) timeline 位置表增量搬移（entries 数字下标的 add/replace patch）。
-    let previousTimeline = previous?.itemTimeline;
+    let previousTimeline = (previous as any)?.itemTimeline;
     let nextTimeline = (next as any).itemTimeline;
     let previousTimelinePositions =
       previousTimeline == null ? void 0 : this.timelinePositions.get(previousTimeline);

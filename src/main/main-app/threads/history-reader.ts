@@ -817,7 +817,7 @@ export class ConversationHistoryReader {
                 if (entity != null) entriesByTurnId.set(entity.turnId ?? original(entity) ?? entity, entry);
               }
               island.entries = load.mergedTurns.map((turn, index) => {
-                let existingEntry = entriesByTurnId.get(turn.turnId ?? turn);
+                let existingEntry = entriesByTurnId.get(turn.turnId ?? (turn as unknown as string));
                 let key =
                   existingEntry?.value ??
                   (turn.turnId == null ? `${island.id}:local:${index}` : `turn:${turn.turnId}`);

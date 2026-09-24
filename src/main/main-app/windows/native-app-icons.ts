@@ -1297,6 +1297,7 @@ export function createBrowserUsePipManager({
         if (!focused)
           browserUsePipLogger().warning(`Failed to focus Browser Use PiP content`, {
             safe: { backend: target.backend, tabID: target.tabID },
+            sensitive: {},
           });
       })
       .catch((error) => {
@@ -1398,6 +1399,7 @@ export function createBrowserUsePipManager({
         } else if (nativePresentationEnabled) {
           browserUsePipLogger().warning(`Failed to upsert Browser Use PiP content`, {
             safe: { backend: surface.backend, tabID: surface.screenshot.tabId },
+            sensitive: {},
           });
         }
       }
@@ -1463,6 +1465,7 @@ function parseBrowserUseSurfaceNotification(notification: {
           tabID: parsed.data[`codex/toolSurface`].screenshot?.tabId,
           threadID: notification.params.threadId,
         },
+        sensitive: {},
       }),
       {
         surface: parsed.data[`codex/toolSurface`],
@@ -1562,7 +1565,8 @@ function requestChromeTabPipe(
       socket.write(encodeTabFocusFrame(JSON.stringify({ id: requestId, jsonrpc: `2.0`, ...request })));
     });
     socket.on(`data`, (data) => {
-      buffered = Buffer.concat([buffered, data]);
+      const incoming = Buffer.isBuffer(data) ? data : Buffer.from(data);
+      buffered = Buffer.concat([buffered, incoming]);
       while (buffered.length >= TAB_FOCUS_PREFIX_BYTES) {
         const frameLength = readTabFocusFrameLength(buffered);
         if (frameLength > TAB_FOCUS_MAX_FRAME_BYTES) {

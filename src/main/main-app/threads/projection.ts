@@ -13,7 +13,7 @@ import {
   wf as zObject,
 } from "@chunk/shared";
 import { plainTextFromMarkdown } from "../markdown/plain-text";
-import { ae as parseCodexDelegation } from "../misc/delegation";
+import { parseCodexDelegation } from "../misc/delegation";
 import { takeLastRequestSection } from "../prompts/section-markers";
 
 /**
@@ -41,6 +41,7 @@ export function conversationFromThreadSummary(summary: {
   daybreakEnabled?: boolean;
   hasUnreadTurn?: boolean;
   threadRuntimeStatus?: any;
+  gitInfo?: any;
   workspaceKind?: string;
   cwd?: string | null;
   environments?: any;

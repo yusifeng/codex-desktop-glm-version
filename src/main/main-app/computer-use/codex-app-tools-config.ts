@@ -101,7 +101,7 @@ export async function syncCodexAppToolsMcpConfig({
     pluginName: found.plugin.name,
   });
   const useWslPaths = shouldUseWslPathsForHostConfig(connection.hostConfig);
-  const installPath = useWslPaths ? convertPathForWsl(pluginInstallPath, defaultWslDistro()) : pluginInstallPath;
+  const installPath = useWslPaths ? convertPathForWsl(pluginInstallPath) : pluginInstallPath;
   if (!useWslPaths) {
     if (process.platform !== `win32`)
       server.command = join(installPath, relative(server.cwd, server.command));

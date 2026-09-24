@@ -52,7 +52,7 @@ export type AutoApproveElicitationResult =
 export class AutoApprovedElicitationFlow extends EventEmitter {
   #active = true;
   #hostHandle: { cancel(): void; [Symbol.dispose](): void } | null = null;
-  #cancelled = promiseWithResolvers<AutoApproveElicitationResult>();
+  #cancelled = promiseWithResolvers();
   #result: Promise<AutoApproveElicitationResult>;
   #params: AutoApproveElicitationParams;
   #unsubscribeInvalidation: () => void;

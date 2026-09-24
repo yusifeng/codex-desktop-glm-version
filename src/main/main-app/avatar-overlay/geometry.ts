@@ -127,7 +127,7 @@ export class CursorTracker {
   private crossedDisplay = false;
   private hasMovementIntent = false;
   private hasMoved = false;
-  private displayBounds: Rect;
+  displayBounds: Rect;
 
   constructor(
     cursorSource: `native` | `renderer`,

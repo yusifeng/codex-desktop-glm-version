@@ -46,7 +46,6 @@ import {
   applyConversationTurns,
   conversationTurns,
   lastTurnWithTurnId,
-  reconcileResumeTurns,
   type AnyTurn,
 } from "../turns/canonical-history";
 import {
@@ -55,6 +54,7 @@ import {
   listDurableTurnsWithItems,
   listTimelineTurns,
   mergeResumeTurns,
+  reconcileResumeTurns,
   THREAD_HISTORY_REQUEST_TIMEOUT_MS,
 } from "../turns/history-requests";
 import { mergeTurnLists } from "../turns/item-merge";
@@ -1105,7 +1105,8 @@ export async function maybeResumeConversation({
     let cloudHistoryLoad =
       useTailHydration && isDurableHost && (independentHistory != null || useBoundedCloudHistoryNow)
         ? (cloudHistoryPrefetch ??
-          (independentHistory?.useCompactHistory, null) ??
+          // 原版此处有一段 `(_e?.useCompactHistory, null)` 的死逗号表达式
+          //（求值后恒为 null，属性读取无副作用），等价于直接落到 mergeResumeTurns。
           mergeResumeTurns(manager as any, {
             conversationId,
             cwd: resumeCwd,
@@ -1140,7 +1141,7 @@ export async function maybeResumeConversation({
         retryCleanup = cleanup;
       },
     });
-    let hydrateThreadGoal = () =>
+    let hydrateThreadGoal = (): Promise<{ ok: boolean; goal?: any }> =>
       manager
         .sendRequest(
           `thread/goal/get`,

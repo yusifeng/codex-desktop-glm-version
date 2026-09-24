@@ -75,8 +75,8 @@ export class ArchivedThreadPreviewRead extends EventEmitter {
     Promise.resolve().then(async () => {
       let limits = previewLimitsSchema.safeParse(rawLimits);
       try {
-        let result = limits.success
-          ? await this.#read(connection, limits.data, policy)
+        let result: ArchivedThreadPreviewResult = limits.success
+          ? await this.#read(connection, limits.data as any, policy)
           : { ...this.#key, status: `unavailable`, reason: `invalid_limits` };
         this.#resolveResult?.(result);
       } catch (error) {
