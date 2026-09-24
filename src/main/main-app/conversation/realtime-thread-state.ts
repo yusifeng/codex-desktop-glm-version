@@ -30,6 +30,7 @@ const normalizeTurn: (turn: any, status?: string) => any = (projectionModule as 
 // H_（33,031）= thread source 解析（subAgent/thread_spawn）——R3
 // threads/projection 的 subAgentMetadata。
 import { subAgentMetadata as parseThreadSource } from "../threads/projection";
+import * as projectionModule from "../threads/projection";
 // hh（28,627）= produce 冻结包装（本 build 中为恒等）——R3 vendor/immer。
 import { freezeIdentity } from "../vendor/immer";
 // T_（31,567）= 会话追加单 turn——R3 turns/canonical-history 尚未导出该

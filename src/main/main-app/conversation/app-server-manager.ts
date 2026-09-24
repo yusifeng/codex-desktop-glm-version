@@ -38,8 +38,8 @@ import { Ah as ConversationEventBus } from "../conversations/event-bus";
 import { kh as ConversationEvictionCoordinator } from "../conversations/eviction";
 import { Khe as AccountAuthService } from "../auth/account-auth";
 import { T_e as ThreadStore } from "../threads/thread-store";
-import { Kge as ConversationHistoryPagination } from "../turns/history-reader";
-import { Yge as AppServerManagerStreamState } from "../threads/stream-roles";
+import { ConversationHistoryReader as ConversationHistoryPagination } from "../threads/history-reader";
+import { AppServerManagerStreamState } from "../threads/stream-roles";
 import { Dve as InactiveThreadUnsubscriber } from "../threads/inactive-unsubscriber";
 import { Bve as ManualContextCompactionTracker } from "../threads/context-compaction";
 import { Rve as ItemNotificationHandler } from "../streams/item-notifications";
@@ -319,8 +319,13 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
         `AppServerRequestClient hostId ${transport.hostId} does not match AppServerManager hostId ${hostId}`,
       );
     this.logger = logger;
-    this.turnStartObservations = new TurnStartObservations(hostId, logger, (conversationId: string, isOwnerCurrent: any) =>
-      this.events.captureTurnStart(conversationId, isOwnerCurrent, logger),
+    // 原版：(e, t) => this.events.captureTurnStart(e, t, i)——capture 以
+    // （上下文对象, 观察者注册器）调用。
+    this.turnStartObservations = new TurnStartObservations(
+      hostId,
+      logger,
+      (context: unknown, registerObserver: (observer: any) => () => void) =>
+        this.events.captureTurnStart(context, registerObserver, logger),
     );
     this.cleanup.push(
       this.events.addStreamRoleStateCallback((state: any) => this.turnStartObservations.ownerChanged(state)),
