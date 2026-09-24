@@ -8,10 +8,11 @@
 //   16931-18907 @sentry/electron 7.5.0
 //   18917-18976 TS using/Symbol.asyncDispose 降级 helper
 //   21993-22015 lodash clamp
-//   22864-23027 OTLP JSON 序列化
+//   22851-23027 hex 解码（OTel spanId 用）+ OTLP JSON 序列化
 // 代码保持发布版原样（仅删去应用代码区段），符号名维持压缩名，
 // 供 bootstrap 的应用模块（src/main/bootstrap/**）按需 import。
-// 头部的 chunk require 已改写为 @chunk/* 形式（构建时映射回原路径）。
+// 注意：原文件中这些区段与被删的应用代码同处一条 var 语句，提取时已在
+// 区段起点补回 var 关键字 / 终点补分号（见 scripts/check-scope.mjs 校验）。
 // ============================================================
 // @ts-nocheck
 const e = require("@chunk/bundler-runtime"),
@@ -2937,7 +2938,7 @@ var Xe = e.r({ default: () => Ze }),
   ot = `/@fs`,
   st = `app://${nt}`,
   ct = `app://${rt}`;
-  Xt = e.t((e) => {
+var   Xt = e.t((e) => {
     (Object.defineProperty(e, "__esModule", { value: !0 }),
       (e._globalThis = void 0),
       (e._globalThis = typeof globalThis == `object` ? globalThis : global));
@@ -17983,7 +17984,7 @@ function tC() {
     },
   };
 }
-  aE = e.t((e, t) => {
+var   aE = e.t((e, t) => {
     function n(e, t, n) {
       return (
         e === e && (n !== void 0 && (e = e <= n ? e : n), t !== void 0 && (e = e >= t ? e : t)),
@@ -18005,7 +18006,20 @@ function tC() {
     }
     t.exports = a;
   }),
-  sE = e.a(oE()),
+  sE = e.a(oE());
+function HD(e) {
+  return e >= 48 && e <= 57 ? e - 48 : e >= 97 && e <= 102 ? e - 87 : e - 55;
+}
+function UD(e) {
+  let t = new Uint8Array(e.length / 2),
+    n = 0;
+  for (let r = 0; r < e.length; r += 2) {
+    let i = HD(e.charCodeAt(r)),
+      a = HD(e.charCodeAt(r + 1));
+    t[n++] = (i << 4) | a;
+  }
+  return t;
+}
 F();
 function WD(e) {
   let t = BigInt(1e9);
