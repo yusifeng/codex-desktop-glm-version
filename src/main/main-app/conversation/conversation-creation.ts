@@ -37,10 +37,11 @@ import { mergeUnique, expandSandboxWritableRoots, sandboxMissingRoots } from "..
 import { projectlessWorkspaceInstructions, readThreadCodexConfig } from "../workspace/config";
 // R3 threads/start-config（mx：service tier 解析；vx：特性覆盖日志）。
 import { resolveServiceTier, logFeatureOverrideResolved } from "../threads/start-config";
-// R3 threads/projection（Tv/wv/q_：thread 时间戳/标题截断/voice history 判定）。
-import { threadTimestamps, truncateThreadTitle, isCanonicalVoiceHistory } from "../threads/projection";
-// R3 threads/hydration（Dv：环境配置选择）。
-import { selectEnvironmentConfig } from "../threads/hydration";
+// R3 threads/projection（Tv/wv/Dv：thread 时间戳/标题截断/环境配置选择）。
+import { threadTimestamps, truncateText, environmentSelection } from "../threads/projection";
+// q_（33,143 canonicalVoiceHistory 判定）——R3 尚未导出，落地后对齐（缺导出已记录）。
+import * as projectionModule from "../threads/projection";
+const isCanonicalVoiceHistory: (thread: any) => unknown = (projectionModule as any).isCanonicalVoiceHistory;
 // R3 threads/patch-classification（zv/Bv/Vv：model/collab/权限状态更新）。
 import { applyModelSettingsUpdate, buildModelSettingsUpdate, permissionSettingsUpdate } from "../threads/patch-classification";
 // R3 tools/dynamic-app-tools（Dh：thread_references 可用性判定）。
@@ -951,7 +952,7 @@ export class ConversationCreationExecutor {
       createdAt,
       updatedAt,
       recencyAt: recencyAt ?? updatedAt,
-      title: params.initialTitle == null ? null : truncateThreadTitle(params.initialTitle, 60),
+      title: params.initialTitle == null ? null : (truncateText(params.initialTitle, 60) ?? undefined),
       mode,
       threadStartKind,
       modelProvider: response.thread.modelProvider,
@@ -973,7 +974,7 @@ export class ConversationCreationExecutor {
       latestTokenUsageInfo: null,
       currentPermissions,
       connectedEnvironmentIds: this.params.threadStore.getConversation(conversationId)?.connectedEnvironmentIds,
-      ...selectEnvironmentConfig(response.thread, { environments: acceptedThread.environments ?? undefined }, `live`),
+      ...environmentSelection(response.thread, { environments: acceptedThread.environments ?? undefined }, `live`),
       workspaceKind: acceptedThread.workspaceKind,
       workspaceBrowserRoot: acceptedThread.workspaceBrowserRoot,
       projectlessOutputDirectory: acceptedThread.projectlessOutputDirectory,

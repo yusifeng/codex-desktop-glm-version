@@ -57,7 +57,7 @@ import {
   Ag as findTurnById,
 } from "../turns/canonical-history";
 import { Cve as historyPolicyDefaults, Tve as recentHistoryLimit } from "../threads/history-policy";
-import { Dv as selectEnvironmentConfig } from "../threads/hydration";
+import { environmentSelection as selectEnvironmentConfig } from "../threads/projection";
 import { zv as applyThreadSettingsUpdate, D_e as collectConversationMetrics } from "../threads/patch-classification";
 import { Wye as maybeResumeConversation } from "../threads/maybe-resume";
 import { xye as buildResumeProduct, wye as buildDefaultTurnConfig } from "../threads/start-config";

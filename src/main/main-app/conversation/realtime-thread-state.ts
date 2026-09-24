@@ -24,10 +24,12 @@ import {
   Wu as versionSupportsFeature,
 } from "@chunk/shared";
 import { latestTurn, lastTurn } from "../turns/canonical-history";
-// iv（33,373）= turn 规范化（补 items/hookRuns 数组）——R3 threads/projection。
-import { iv as normalizeTurn } from "../threads/projection";
-// H_（33,031）= thread source 解析（subAgent/thread_spawn）——R3 threads/projection。
-import { H_ as parseThreadSource } from "../threads/projection";
+// iv（33,373）= turn 规范化（补 items/hookRuns 数组）——R3 尚未导出，
+// 落地后对齐（缺导出已记录）。
+const normalizeTurn: (turn: any, status?: string) => any = (projectionModule as any).normalizeTurn;
+// H_（33,031）= thread source 解析（subAgent/thread_spawn）——R3
+// threads/projection 的 subAgentMetadata。
+import { subAgentMetadata as parseThreadSource } from "../threads/projection";
 // hh（28,627）= produce 冻结包装（本 build 中为恒等）——R3 vendor/immer。
 import { freezeIdentity } from "../vendor/immer";
 // T_（31,567）= 会话追加单 turn——R3 turns/canonical-history 尚未导出该
