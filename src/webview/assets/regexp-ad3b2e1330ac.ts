@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./regexp-8a0959d878b9.js";
+t();
+export { e as default };

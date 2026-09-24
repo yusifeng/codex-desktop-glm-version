@@ -1,0 +1,193 @@
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "./automation-side-panel-tab-cb6c559690f8.js",
+      "./rolldown-runtime-2d059c5e81f4.js",
+      "./app-shared-7b9edc1bfb7f.js",
+      "./app-shared-fa570b9eb9dd.css",
+      "./app-initial-51da50e6c6e3.js",
+      "./app-initial-e8ceb32eb626.css",
+      "./appgen-access-50974c702eaf.js",
+      "./elicitation-events-bfb932b10fdd.js",
+      "./site-automation-setup-state-75f372a61373.js",
+      "./automation-dialog-e8ab58185edc.js",
+      "./app-primary-d66705000d76.js",
+      "./app-primary-484df789f2f5.css",
+      "./model-and-reasoning-effort-translations-46ce15c23aea.js",
+      "./cloud-automation-detail-panel-3063b9153870.js",
+      "./automation-frequency-section-cd6fb509ea17.js",
+      "./DatePicker-14d6de970c7c.js",
+      "./DatePicker-e5c9d75bac51.css",
+      "./editor-dialog-e8770e580913.js",
+      "./appgen-automations-state-1070007996b9.js",
+      "./automation-delete-confirmation-dialog-65dd08412175.js",
+      "./schedule-fields-30da10334404.js",
+      "./chatgpt_tasks-5e437f7d5423.js",
+      "./schedule-draft-ca74099ea5b9.js",
+      "./share-analytics-bd38c16d6a05.js",
+      "./summary-59ae4f3898ef.js",
+      "./timestamps-85bd12c0e1b2.js",
+      "./PlatformUIKitProvider-748f2efe0f2a.js",
+      "./use-navigation-blocker-7587499d4b25.js",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import {
+  H3 as t,
+  I3 as n,
+  Jm as r,
+  V3 as i,
+  lw as a,
+  qm as o,
+  wy as s,
+} from "./app-shared-7b9edc1bfb7f.js";
+import {
+  Fg as c,
+  Gvt as l,
+  Ig as u,
+  Ng as d,
+  Pg as f,
+  QCt as p,
+  Sun as m,
+  Vvt as h,
+  Wvt as g,
+  ZCt as _,
+  _un as v,
+  _vt as y,
+  gvt as b,
+  mun as x,
+  qvt as S,
+  stt as C,
+  ttt as w,
+  zg as T,
+} from "./app-initial-51da50e6c6e3.js";
+import { n as E, t as D } from "./elicitation-events-bfb932b10fdd.js";
+import { n as O, t as k } from "./site-automation-setup-state-75f372a61373.js";
+function A({
+  scope: e,
+  revealAndFocus: t = !0,
+  automationId: n,
+  insertPosition: r,
+  tabId: i,
+  target: a = `right`,
+  title: o,
+}) {
+  P({
+    scope: e,
+    revealAndFocus: t,
+    durableRoute: { kind: c, params: { automationId: n }, payloadVersion: 1 },
+    insertPosition: r,
+    request: { type: `automation`, automationId: n },
+    tabId: i ?? `automation:${n}`,
+    target: a,
+    title: o,
+  });
+}
+async function j(e, t, { revealAndFocus: n, insertPosition: r, tabId: i, target: a }) {
+  try {
+    let { items: o } = await e.query.getOrFetch(p),
+      s = o.find((e) => e.id === t),
+      c = s == null ? await e.query.getOrFetch(w, t) : null,
+      l = s?.name ?? c?.automation.title;
+    return (
+      l != null &&
+      (A({
+        scope: e,
+        revealAndFocus: n,
+        automationId: t,
+        insertPosition: r,
+        tabId: i,
+        target: a,
+        title: l,
+      }),
+      !0)
+    );
+  } catch {
+    return !1;
+  }
+}
+function M({ scope: e, seed: t, title: n }) {
+  P({ scope: e, request: { type: `suggestion`, seed: t }, tabId: T(t.directiveKey), title: n });
+}
+function N({ scope: e, ...t }) {
+  let n = `site-automation:${t.projectId}`,
+    r = JSON.stringify([e.get(x), e.get(v), t.projectId]);
+  (b(e, n) == null && e.get(O, r)?.status === `saved` && e.set(O, r, null),
+    P({ scope: e, request: { type: `site`, proposal: t }, tabId: n, title: t.title }));
+}
+function P({
+  scope: e,
+  revealAndFocus: t = !0,
+  durableRoute: n,
+  insertPosition: r,
+  request: i,
+  tabId: a,
+  target: o = `right`,
+  title: s,
+}) {
+  l(e, L, {
+    revealAndFocus: t,
+    defaultState: () => ({ draftInstanceId: crypto.randomUUID(), savedAutomationId: null }),
+    durableRoute: n,
+    icon: (0, F.jsx)(I, {}),
+    insertPosition: r,
+    props: { request: i },
+    id: a,
+    target: b(e, a) ?? o,
+    title: s,
+    tooltip: s,
+    onClose: (e, t) => {
+      let n = t === `right` ? S : h,
+        r = e.get(n.tabStateById$, a)?.value;
+      i.type === `suggestion` &&
+        i.seed.elicitation != null &&
+        typeof r == `object` &&
+        r &&
+        `savedAutomationId` in r &&
+        r.savedAutomationId == null &&
+        E(e, i.seed.elicitation, `dismiss`);
+    },
+  });
+}
+var F, I, L;
+function R() {
+  return (R = e(() => {
+    (D(),
+      g(),
+      m(),
+      a(),
+      o(),
+      d(),
+      y(),
+      _(),
+      u(),
+      C(),
+      k(),
+      (F = n()),
+      t(),
+      (I = r(
+        async () => {
+          let { AutomationSidePanelTabIcon: e } = await i(
+            async () => {
+              let { AutomationSidePanelTabIcon: e } = await import(
+                `./automation-side-panel-tab-cb6c559690f8.js`
+              );
+              return { AutomationSidePanelTabIcon: e };
+            },
+            __vite__mapDeps([
+              0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+              24, 25, 26, 27,
+            ]),
+            import.meta.url,
+          );
+          return e;
+        },
+        { fallback: (0, F.jsx)(s, { "aria-hidden": !1 }), propagateLoadError: !0 },
+      )),
+      (L = f({ open: A, restore: j })));
+  }))();
+}
+export { j as a, N as i, A as n, M as r, R as t };

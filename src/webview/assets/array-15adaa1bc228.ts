@@ -1,0 +1,11 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+function t(e) {
+  return typeof e == `object` && `length` in e ? e : Array.from(e);
+}
+function n() {
+  return (n = e(() => {
+    Array.prototype.slice;
+  }))();
+}
+export { n, t };

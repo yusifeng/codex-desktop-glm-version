@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./file-digit-BMkRnMB6-14a5fd50b89a.js";
+e();
+export { t as default };

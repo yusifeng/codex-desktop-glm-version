@@ -1,0 +1,30 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { HZt as t, wQt as n } from "./app-initial-51da50e6c6e3.js";
+async function r(
+  { revealAndFocus: e, descriptor: t, insertPosition: r, reason: i, scope: a },
+  o,
+  s,
+) {
+  if (a.value.routeKind !== `local-thread`) return !1;
+  let c = a.value.conversationId;
+  return (
+    (await s(a, {
+      revealAndFocus: e,
+      deferHydrationUntilActivation: i === `persistence` && !e && o != null,
+      hostId: a.get(n, c),
+      insertPosition: r,
+      openOverviewWhenSelectionUnavailable: !0,
+      parentConversationId: c,
+      selectedConversationId: o,
+      tabId: t.tabId,
+    })) === t.tabId
+  );
+}
+function i() {
+  return (i = e(() => {
+    t();
+  }))();
+}
+i();
+export { r as restoreSubagentsTabRoute };

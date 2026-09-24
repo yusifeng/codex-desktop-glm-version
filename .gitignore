@@ -1,0 +1,12 @@
+# Dev toolchain of this repo (restore/build). NOT the app's runtime deps.
+/node_modules/
+
+# The cloned macOS app shell used to launch the rebuilt app (setup via scripts/setup-shell.sh).
+/shell/
+
+# Generated from src/ by `npm run build` — never edit these directly.
+/app/.vite/build/
+/app/webview/**/*.js
+
+.DS_Store
+/.reference/

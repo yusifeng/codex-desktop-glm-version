@@ -1,0 +1,34 @@
+// @ts-nocheck
+import "./app-shared-7b9edc1bfb7f.js";
+import {
+  a as e,
+  c as t,
+  d as n,
+  f as r,
+  i,
+  l as a,
+  m as o,
+  n as s,
+  o as c,
+  p as l,
+  r as u,
+  s as d,
+  t as f,
+  u as p,
+} from "./runtime-4b6d284756d8.js";
+s();
+export {
+  f as canOpenTerminalPanelTab,
+  u as launchTerminal,
+  i as openCopiedTerminalTranscript,
+  e as openNewTerminalBottomTab,
+  c as openNewTerminalPanelTab,
+  d as openTerminalBottomPanelWhenReady,
+  t as terminalBottomPanelOpen$,
+  a as terminalLaunchPanel$,
+  p as terminalRightPanelOpen$,
+  n as terminalTabType,
+  r as toggleTerminalBottomPanel,
+  l as toggleTerminalPanel,
+  o as watchPendingTerminalBottomPanelOpen,
+};

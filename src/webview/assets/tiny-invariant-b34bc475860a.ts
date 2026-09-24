@@ -1,0 +1,12 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+function t(e, t) {
+  if (!e) throw Error(n);
+}
+var n;
+function r() {
+  return (r = e(() => {
+    n = `Invariant failed`;
+  }))();
+}
+export { t as n, r as t };

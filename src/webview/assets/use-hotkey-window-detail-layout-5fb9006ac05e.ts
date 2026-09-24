@@ -1,0 +1,33 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { $3 as t, e6 as n } from "./app-shared-7b9edc1bfb7f.js";
+function r(e) {
+  let t = (0, i.c)(4),
+    n = (0, a.useContext)(o),
+    r,
+    s;
+  (t[0] !== e || t[1] !== n
+    ? ((r = () => {
+        if (n != null)
+          return (
+            n(e),
+            () => {
+              n(null);
+            }
+          );
+      }),
+      (s = [e, n]),
+      (t[0] = e),
+      (t[1] = n),
+      (t[2] = r),
+      (t[3] = s))
+    : ((r = t[2]), (s = t[3])),
+    (0, a.useLayoutEffect)(r, s));
+}
+var i, a, o;
+function s() {
+  return (s = e(() => {
+    ((i = t()), (a = n()), (o = (0, a.createContext)(null)));
+  }))();
+}
+export { s as n, r, o as t };

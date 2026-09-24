@@ -1,0 +1,29 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      {
+        name: `Minimum supported values`,
+        initialValues: {
+          rootCenter: -2,
+          rootSeparation: 1,
+          leftRootMultiplicity: 1,
+          rightRootMultiplicity: 1,
+        },
+      },
+      {
+        name: `Maximum supported values`,
+        initialValues: {
+          rootCenter: 2,
+          rootSeparation: 4,
+          leftRootMultiplicity: 3,
+          rightRootMultiplicity: 3,
+        },
+      },
+    ];
+  }))();
+}
+n();
+export { t as default };

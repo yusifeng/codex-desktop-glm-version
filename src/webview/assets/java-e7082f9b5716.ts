@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./java-49a633209a8d.js";
+t();
+export { e as default };

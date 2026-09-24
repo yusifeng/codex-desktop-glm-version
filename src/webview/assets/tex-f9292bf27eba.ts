@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./tex-88a281e4c36a.js";
+t();
+export { e as default };

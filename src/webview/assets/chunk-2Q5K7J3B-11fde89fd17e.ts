@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./chunk-Y2CYZVJY-ec17b93e265e.js";
+var t = class {
+  constructor(e) {
+    ((this.init = e), (this.records = this.init()));
+  }
+  static {
+    e(this, `ImperativeState`);
+  }
+  reset() {
+    this.records = this.init();
+  }
+};
+export { t };

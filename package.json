@@ -1,0 +1,23 @@
+{
+  "name": "codex-desktop-glm-version",
+  "private": true,
+  "description": "Restored TypeScript sources of the Codex (ChatGPT) desktop app for macOS. Recovered from the shipped app.asar; see README.md for what could and could not be restored.",
+  "type": "module",
+  "scripts": {
+    "restore": "node --max-old-space-size=8192 scripts/restore-ts.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "verify": "node scripts/verify-chunks.mjs",
+    "pack": "./scripts/pack.sh",
+    "setup": "./scripts/setup-shell.sh",
+    "start": "npm run build && npm run pack && ./scripts/run.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "electron": "42.3.0",
+    "esbuild": "*",
+    "prettier": "^3",
+    "typescript": "^7.0.2"
+  }
+}

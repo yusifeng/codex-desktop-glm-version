@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./tsx-b05f45ec50d2.js";
+t();
+export { e as default };

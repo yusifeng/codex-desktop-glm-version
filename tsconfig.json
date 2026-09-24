@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "preserve",
+    "verbatimModuleSyntax": true,
+    "allowJs": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": ["src/**/*.ts"]
+}

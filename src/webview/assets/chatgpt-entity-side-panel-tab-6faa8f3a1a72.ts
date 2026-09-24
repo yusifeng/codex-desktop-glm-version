@@ -1,0 +1,49 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { $3 as t, I3 as n, h4 as r, m4 as i } from "./app-shared-7b9edc1bfb7f.js";
+import { DG as a, EG as o } from "./app-initial-51da50e6c6e3.js";
+import { et as s, nt as c, rt as l } from "./app-primary-d66705000d76.js";
+function u(e) {
+  let t = (0, d.c)(4),
+    { conversationId: n, params: r } = e,
+    a;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((a = !1), (t[0] = a)) : (a = t[0]);
+  let l;
+  return (
+    t[1] !== n || t[2] !== r
+      ? ((l = (0, f.jsxs)(c, {
+          header: null,
+          children: [
+            a,
+            r.memorySource == null
+              ? (0, f.jsx)(`div`, {
+                  className: `[container-type:inline-size] h-full flex-1 overflow-y-auto pt-(--thread-content-top-inset) [--thread-sticky-header-top:calc(var(--spacing)*8)] [container-name:thread-content] browser:[--thread-sticky-header-top:var(--thread-content-top-inset,0px)] electron:[scrollbar-gutter:stable_both-edges]`,
+                  children: (0, f.jsx)(`div`, {
+                    className: i(s, `relative flex min-h-full flex-col pb-8`),
+                    children: (0, f.jsx)(`div`, {
+                      className: `-mx-(--padding-toolbar) flex flex-1 flex-col px-6`,
+                      children: (0, f.jsx)(o, { conversationId: n, params: r }),
+                    }),
+                  }),
+                })
+              : (0, f.jsx)(`div`, {
+                  className: `min-h-0 flex-1 overflow-y-auto p-panel`,
+                  children: (0, f.jsx)(o, { conversationId: n, params: r, flushTop: !0 }),
+                }),
+          ],
+        })),
+        (t[1] = n),
+        (t[2] = r),
+        (t[3] = l))
+      : (l = t[3]),
+    l
+  );
+}
+var d, f;
+function p() {
+  return (p = e(() => {
+    ((d = t()), r(), l(), a(), (f = n()));
+  }))();
+}
+p();
+export { u as ChatGptEntitySidePanelTab };

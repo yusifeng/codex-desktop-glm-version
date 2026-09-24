@@ -1,0 +1,24 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = { variable: `n`, unit: `mol`, min: 0.1, max: 2, step: 0.05, defaultValue: 1.2 }),
+      (n = { variable: `V`, unit: `L`, min: 0.5, max: 2, step: 0.05, defaultValue: 0.8 }),
+      (r = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (i = (e, t, n, i) => (Number.isFinite(e) ? r(e ?? t, n, i) : t)),
+      (a = (e) => ({
+        moles: i(e.moles, t.defaultValue, t.min, t.max),
+        volumeLiters: i(e.volumeLiters, n.defaultValue, n.min, n.max),
+      })),
+      (o = (e) => {
+        let t = a(e);
+        return {
+          ...t,
+          molarity: t.moles / t.volumeLiters,
+          volumeMilliliters: t.volumeLiters * 1e3,
+        };
+      }));
+  }))();
+}
+export { a, s as i, n, o as r, t };

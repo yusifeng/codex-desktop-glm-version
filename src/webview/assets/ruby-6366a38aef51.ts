@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./ruby-13d4043d144f.js";
+t();
+export { e as default };

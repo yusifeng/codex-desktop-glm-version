@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./javascript-f4061ef937b2.js";
+t();
+export { e as default };

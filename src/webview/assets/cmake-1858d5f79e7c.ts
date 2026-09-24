@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./cmake-41f37fc34f77.js";
+e();
+export { t as default };

@@ -1,0 +1,15 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { n as t, t as n } from "./lucide-createLucideIcon-c0d201bc7c664b76.js";
+var r;
+function i() {
+  return (i = e(() => {
+    (t(),
+      (r = n(`ArrowUpFromLine`, [
+        [`path`, { d: `m18 9-6-6-6 6`, key: `kcunyi` }],
+        [`path`, { d: `M12 3v14`, key: `7cf3v8` }],
+        [`path`, { d: `M5 21h14`, key: `11awu3` }],
+      ])));
+  }))();
+}
+export { i as n, r as t };

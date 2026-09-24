@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./turtle-3789894e20e3.js";
+t();
+export { e as default };

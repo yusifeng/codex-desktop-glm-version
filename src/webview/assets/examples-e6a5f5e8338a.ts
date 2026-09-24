@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      { name: `Minimum supported values`, initialValues: { lower_bound: -20, upper_bound: 11 } },
+      { name: `Maximum supported values`, initialValues: { lower_bound: 10, upper_bound: 40 } },
+      { name: `Narrow support`, initialValues: { lower_bound: 10, upper_bound: 11 } },
+    ];
+  }))();
+}
+n();
+export { t as default };

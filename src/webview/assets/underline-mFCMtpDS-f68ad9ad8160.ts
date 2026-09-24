@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { n as t, t as n } from "./createLucideIcon-BrIFp4GW-30982a428a75.js";
+var r;
+function i() {
+  return (i = e(() => {
+    (t(),
+      (r = n(`Underline`, [
+        [`path`, { d: `M6 4v6a6 6 0 0 0 12 0V4`, key: `9kb039` }],
+        [`line`, { x1: `4`, x2: `20`, y1: `20`, y2: `20`, key: `nun2al` }],
+      ])));
+  }))();
+}
+export { i as n, r as t };

@@ -1,0 +1,48 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { I3 as t } from "./app-shared-7b9edc1bfb7f.js";
+var n, r, i;
+function a() {
+  return (a = e(() => {
+    ((n = t()),
+      (r = ({ oneX: e, twoX: t, threeX: n }) => {
+        let r = [`${e} 1x`];
+        return (
+          t && r.push(`${t} 2x`),
+          n && r.push(`${n} 3x`),
+          r.length > 1 ? r.join(`,`) : void 0
+        );
+      }),
+      (i = ({
+        sources: e,
+        alt: t,
+        presentationMode: i = `standard`,
+        width: a = 320,
+        height: o = 320,
+        objectFit: s = `contain`,
+      }) => {
+        "use forget";
+        let c = i === `thumbnail`;
+        return (0, n.jsx)(`div`, {
+          className: `flex h-full w-full items-center justify-center`,
+          "data-learning-block-responsive-image": !0,
+          children: (0, n.jsx)(`img`, {
+            src: e.oneX,
+            srcSet: r(e),
+            alt: t,
+            width: a,
+            height: o,
+            className: c ? `m-0 block h-full w-full` : `m-0 block max-h-full max-w-full`,
+            style: {
+              objectFit: s,
+              width: c ? `100%` : a,
+              height: c ? `100%` : o,
+              maxWidth: `100%`,
+              maxHeight: `100%`,
+            },
+          }),
+        });
+      }));
+  }))();
+}
+export { a as n, i as t };

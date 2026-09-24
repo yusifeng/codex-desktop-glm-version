@@ -1,0 +1,33 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      {
+        name: `Minimum supported values`,
+        initialValues: {
+          cubicCoefficient: -5,
+          quadraticCoefficient: -10,
+          linearCoefficient: -20,
+          constantTerm: -100,
+          intervalCenter: -8,
+          intervalWidth: 0.5,
+        },
+      },
+      {
+        name: `Maximum supported values`,
+        initialValues: {
+          cubicCoefficient: 5,
+          quadraticCoefficient: 10,
+          linearCoefficient: 20,
+          constantTerm: 100,
+          intervalCenter: 8,
+          intervalWidth: 16,
+        },
+      },
+    ];
+  }))();
+}
+n();
+export { t as default };

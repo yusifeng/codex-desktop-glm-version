@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./yaml-bd5a72a355a2.js";
+t();
+export { e as default };

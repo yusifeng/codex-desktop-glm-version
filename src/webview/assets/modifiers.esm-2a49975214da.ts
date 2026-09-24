@@ -1,0 +1,35 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { cCn as t } from "./app-initial-51da50e6c6e3.js";
+function n(e, t, n) {
+  let r = { ...e };
+  return (
+    t.top + e.y <= n.top
+      ? (r.y = n.top - t.top)
+      : t.bottom + e.y >= n.top + n.height && (r.y = n.top + n.height - t.bottom),
+    t.left + e.x <= n.left
+      ? (r.x = n.left - t.left)
+      : t.right + e.x >= n.left + n.width && (r.x = n.left + n.width - t.right),
+    r
+  );
+}
+var r, i, a;
+function o() {
+  return (o = e(() => {
+    (t(),
+      (r = (e) => {
+        let { transform: t } = e;
+        return { ...t, y: 0 };
+      }),
+      (i = (e) => {
+        let { draggingNodeRect: t, transform: r, scrollableAncestorRects: i } = e,
+          a = i[0];
+        return !t || !a ? r : n(r, t, a);
+      }),
+      (a = (e) => {
+        let { transform: t } = e;
+        return { ...t, x: 0 };
+      }));
+  }))();
+}
+export { a as i, i as n, r, o as t };

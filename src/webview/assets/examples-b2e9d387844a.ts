@@ -1,0 +1,19 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      {
+        name: `initial_pattern: non-crossover-interaction`,
+        initialValues: { initial_pattern: `non-crossover-interaction` },
+      },
+      {
+        name: `initial_pattern: crossover-interaction`,
+        initialValues: { initial_pattern: `crossover-interaction` },
+      },
+    ];
+  }))();
+}
+n();
+export { t as default };

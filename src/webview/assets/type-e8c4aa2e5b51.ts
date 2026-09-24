@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `STRONG_VS_WEAK_ACID`),
+      (n = `strong-vs-weak-acid-v2`),
+      (r = {
+        initial_concentration_molar: { kind: `number`, defaultValue: 0.15, min: 0.1, max: 0.25 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+export { i as n, a as t };

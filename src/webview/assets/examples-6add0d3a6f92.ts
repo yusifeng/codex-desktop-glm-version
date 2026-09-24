@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      { name: `initialOrder: reversed`, initialValues: { initialOrder: `reversed` } },
+      { name: `initialOrder: nearly_sorted`, initialValues: { initialOrder: `nearly_sorted` } },
+      { name: `initialOrder: few_swaps`, initialValues: { initialOrder: `few_swaps` } },
+    ];
+  }))();
+}
+n();
+export { t as default };

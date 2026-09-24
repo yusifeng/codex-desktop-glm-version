@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { n as t, t as n } from "./createLucideIcon-BrIFp4GW-30982a428a75.js";
+var r;
+function i() {
+  return (i = e(() => {
+    (t(),
+      (r = n(`ArrowUpRight`, [
+        [`path`, { d: `M7 7h10v10`, key: `1tivn9` }],
+        [`path`, { d: `M7 17 17 7`, key: `1vkiza` }],
+      ])));
+  }))();
+}
+export { i as n, r as t };

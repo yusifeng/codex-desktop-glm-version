@@ -1,0 +1,16 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      { name: `Minimum supported values`, initialValues: { netForceNewtons: 2, massKilograms: 1 } },
+      {
+        name: `Maximum supported values`,
+        initialValues: { netForceNewtons: 12, massKilograms: 4 },
+      },
+    ];
+  }))();
+}
+n();
+export { t as default };

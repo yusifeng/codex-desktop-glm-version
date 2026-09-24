@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { n as t, t as n } from "./createLucideIcon-BrIFp4GW-30982a428a75.js";
+var r;
+function i() {
+  return (i = e(() => {
+    (t(),
+      (r = n(`ChevronsRight`, [
+        [`path`, { d: `m6 17 5-5-5-5`, key: `xnjwq` }],
+        [`path`, { d: `m13 17 5-5-5-5`, key: `17xmmf` }],
+      ])));
+  }))();
+}
+export { r as n, i as t };

@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./python-fdf8b6adcc28.js";
+t();
+export { e as default };

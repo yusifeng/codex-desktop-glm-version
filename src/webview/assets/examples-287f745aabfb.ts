@@ -1,0 +1,31 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      {
+        name: `Minimum supported values`,
+        initialValues: { cartAInitialVelocityMps: -3, cartBInitialVelocityMps: -3 },
+      },
+      {
+        name: `Maximum supported values`,
+        initialValues: { cartAInitialVelocityMps: 3, cartBInitialVelocityMps: 3 },
+      },
+      {
+        name: `Co-directional catching-up collision`,
+        initialValues: { cartAInitialVelocityMps: 3, cartBInitialVelocityMps: 0.5 },
+      },
+      {
+        name: `Co-directional no collision`,
+        initialValues: { cartAInitialVelocityMps: 1, cartBInitialVelocityMps: 2 },
+      },
+      {
+        name: `collisionType: perfectlyInelastic`,
+        initialValues: { collisionType: `perfectlyInelastic` },
+      },
+    ];
+  }))();
+}
+n();
+export { t as default };

@@ -1,0 +1,16 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `LINEAR_COMBINATION`),
+      (n = `linear-combination-v1`),
+      (r = `\\vec{w}=a\\vec{u}+b\\vec{v}`),
+      (i = {
+        coefficientA: { kind: `number`, defaultValue: 1, min: -2, max: 2 },
+        coefficientB: { kind: `number`, defaultValue: 1, min: -2, max: 2 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+export { a as n, o as t };

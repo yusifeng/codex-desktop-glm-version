@@ -1,0 +1,16 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      { name: `compound: MgCl2`, initialValues: { compound: `MgCl2` } },
+      {
+        name: `lattice_convention: dissociation`,
+        initialValues: { lattice_convention: `dissociation` },
+      },
+    ];
+  }))();
+}
+n();
+export { t as default };

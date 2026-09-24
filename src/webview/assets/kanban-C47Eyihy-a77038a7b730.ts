@@ -1,0 +1,15 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { n as t, t as n } from "./createLucideIcon-BrIFp4GW-30982a428a75.js";
+var r;
+function i() {
+  return (i = e(() => {
+    (t(),
+      (r = n(`Kanban`, [
+        [`path`, { d: `M6 5v11`, key: `mdvv1e` }],
+        [`path`, { d: `M12 5v6`, key: `14ar3b` }],
+        [`path`, { d: `M18 5v14`, key: `7ji314` }],
+      ])));
+  }))();
+}
+export { r as n, i as t };

@@ -1,0 +1,16 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      { name: `example_family: position`, initialValues: { example_family: `position` } },
+      {
+        name: `example_family: functional-group`,
+        initialValues: { example_family: `functional-group` },
+      },
+    ];
+  }))();
+}
+n();
+export { t as default };

@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+var t;
+function n() {
+  return (n = e(() => {
+    t = [
+      { name: `inputA: false`, initialValues: { inputA: !1 } },
+      { name: `inputB: true`, initialValues: { inputB: !0 } },
+      { name: `operator: or`, initialValues: { operator: `or` } },
+    ];
+  }))();
+}
+n();
+export { t as default };

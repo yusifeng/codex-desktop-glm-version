@@ -1,0 +1,14 @@
+// @ts-nocheck
+import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
+import { i as t, n } from "./chatgpt_math_blocks-9905574f666f.js";
+var r;
+function i() {
+  return (i = e(() => {
+    (t(),
+      (r = (e, t) => (r, i, a) => {
+        let o = t(r, i, a);
+        o != null && e(o, n.CHATGPT_MATH_BLOCK_EDIT_TYPE_DRAG_POINT);
+      }));
+  }))();
+}
+export { i as n, r as t };

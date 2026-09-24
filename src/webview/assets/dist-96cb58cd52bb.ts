@@ -1,0 +1,4 @@
+// @ts-nocheck
+import { n as e, t } from "./dist-15e5c1229202.js";
+t();
+export { e as parser };
