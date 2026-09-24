@@ -46,4 +46,5 @@ export const REWRITTEN = new Set([
   "windows-file-copy",
   "sandbox-preload",
   "preload",
+  "device-service",
 ]);
