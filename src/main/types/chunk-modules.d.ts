@@ -788,20 +788,136 @@ declare module "@chunk/bootstrap" {
   // bootstrap-C4dRql4x.js —— 已重写 chunk（src/main/bootstrap/，见
   // chunk-manifest.mjs 的 REWRITTEN）。兼容导出（单字母名，如 "in"/"R"/"bn"）
   // 与语义导出均由真实源码提供，直接转发真实模块的导出面。
-  export * from "../../bootstrap/index";
-  // `export *` 不转发字符串命名的导出（TS 限制）：
-  // - 保留字导出："in" → BuildFlavor 模型（build-info/build-flavor.ts）。
-  // - 兼容单字母 global-state 键（main-app 消费方按原版字母导入后重命名）。
-  export { in as "in" } from "../../bootstrap/build-info/build-flavor";
-  export {
-    COMPLETED_LOCAL_DATA_MIGRATION_IDS_KEY as "B",
-    AVATAR_OVERLAY_OPEN_KEY as "F",
-    PERSISTED_ATOM_STATE_KEY as "J",
-    AVATAR_OVERLAY_BOUNDS_KEY as "P",
-    REMOTE_HOSTED_PIP_TASK_VISIBILITY_STATE_KEY as "Q",
-    BROWSER_DOWNLOAD_HISTORY_KEY as "W",
-    REMOTE_HOSTED_PIP_CONTENT_MAX_DISPLAY_SIZE_KEY as "Z",
-  } from "../../bootstrap/state/global-state";
+  // `export *` 不转发字符串命名的导出（TS 限制），128 个兼容导出逐个转发
+  //（语义名见 docs/bootstrap-export-table.txt 与 bootstrap/index.ts 的映射）。
+  export { "$" as "$" } from "../../bootstrap/index";
+  export { "$t" as "$t" } from "../../bootstrap/index";
+  export { "A" as "A" } from "../../bootstrap/index";
+  export { "At" as "At" } from "../../bootstrap/index";
+  export { "B" as "B" } from "../../bootstrap/index";
+  export { "Bt" as "Bt" } from "../../bootstrap/index";
+  export { "C" as "C" } from "../../bootstrap/index";
+  export { "Ct" as "Ct" } from "../../bootstrap/index";
+  export { "D" as "D" } from "../../bootstrap/index";
+  export { "Dt" as "Dt" } from "../../bootstrap/index";
+  export { "E" as "E" } from "../../bootstrap/index";
+  export { "Et" as "Et" } from "../../bootstrap/index";
+  export { "F" as "F" } from "../../bootstrap/index";
+  export { "Ft" as "Ft" } from "../../bootstrap/index";
+  export { "G" as "G" } from "../../bootstrap/index";
+  export { "Gt" as "Gt" } from "../../bootstrap/index";
+  export { "H" as "H" } from "../../bootstrap/index";
+  export { "Ht" as "Ht" } from "../../bootstrap/index";
+  export { "I" as "I" } from "../../bootstrap/index";
+  export { "It" as "It" } from "../../bootstrap/index";
+  export { "J" as "J" } from "../../bootstrap/index";
+  export { "Jt" as "Jt" } from "../../bootstrap/index";
+  export { "K" as "K" } from "../../bootstrap/index";
+  export { "Kt" as "Kt" } from "../../bootstrap/index";
+  export { "L" as "L" } from "../../bootstrap/index";
+  export { "Lt" as "Lt" } from "../../bootstrap/index";
+  export { "M" as "M" } from "../../bootstrap/index";
+  export { "Mt" as "Mt" } from "../../bootstrap/index";
+  export { "N" as "N" } from "../../bootstrap/index";
+  export { "Nt" as "Nt" } from "../../bootstrap/index";
+  export { "O" as "O" } from "../../bootstrap/index";
+  export { "Ot" as "Ot" } from "../../bootstrap/index";
+  export { "P" as "P" } from "../../bootstrap/index";
+  export { "Pt" as "Pt" } from "../../bootstrap/index";
+  export { "Q" as "Q" } from "../../bootstrap/index";
+  export { "Qt" as "Qt" } from "../../bootstrap/index";
+  export { "R" as "R" } from "../../bootstrap/index";
+  export { "Rt" as "Rt" } from "../../bootstrap/index";
+  export { "S" as "S" } from "../../bootstrap/index";
+  export { "St" as "St" } from "../../bootstrap/index";
+  export { "T" as "T" } from "../../bootstrap/index";
+  export { "Tt" as "Tt" } from "../../bootstrap/index";
+  export { "U" as "U" } from "../../bootstrap/index";
+  export { "Ut" as "Ut" } from "../../bootstrap/index";
+  export { "V" as "V" } from "../../bootstrap/index";
+  export { "Vt" as "Vt" } from "../../bootstrap/index";
+  export { "W" as "W" } from "../../bootstrap/index";
+  export { "Wt" as "Wt" } from "../../bootstrap/index";
+  export { "X" as "X" } from "../../bootstrap/index";
+  export { "Xt" as "Xt" } from "../../bootstrap/index";
+  export { "Y" as "Y" } from "../../bootstrap/index";
+  export { "Yt" as "Yt" } from "../../bootstrap/index";
+  export { "Z" as "Z" } from "../../bootstrap/index";
+  export { "Zt" as "Zt" } from "../../bootstrap/index";
+  export { "_" as "_" } from "../../bootstrap/index";
+  export { "_n" as "_n" } from "../../bootstrap/index";
+  export { "_t" as "_t" } from "../../bootstrap/index";
+  export { "a" as "a" } from "../../bootstrap/index";
+  export { "an" as "an" } from "../../bootstrap/index";
+  export { "at" as "at" } from "../../bootstrap/index";
+  export { "b" as "b" } from "../../bootstrap/index";
+  export { "bn" as "bn" } from "../../bootstrap/index";
+  export { "bt" as "bt" } from "../../bootstrap/index";
+  export { "c" as "c" } from "../../bootstrap/index";
+  export { "cn" as "cn" } from "../../bootstrap/index";
+  export { "ct" as "ct" } from "../../bootstrap/index";
+  export { "d" as "d" } from "../../bootstrap/index";
+  export { "dn" as "dn" } from "../../bootstrap/index";
+  export { "dt" as "dt" } from "../../bootstrap/index";
+  export { "en" as "en" } from "../../bootstrap/index";
+  export { "et" as "et" } from "../../bootstrap/index";
+  export { "f" as "f" } from "../../bootstrap/index";
+  export { "fn" as "fn" } from "../../bootstrap/index";
+  export { "ft" as "ft" } from "../../bootstrap/index";
+  export { "g" as "g" } from "../../bootstrap/index";
+  export { "gn" as "gn" } from "../../bootstrap/index";
+  export { "gt" as "gt" } from "../../bootstrap/index";
+  export { "h" as "h" } from "../../bootstrap/index";
+  export { "hn" as "hn" } from "../../bootstrap/index";
+  export { "ht" as "ht" } from "../../bootstrap/index";
+  export { "i" as "i" } from "../../bootstrap/index";
+  export { "in" as "in" } from "../../bootstrap/index";
+  export { "it" as "it" } from "../../bootstrap/index";
+  export { "j" as "j" } from "../../bootstrap/index";
+  export { "jt" as "jt" } from "../../bootstrap/index";
+  export { "k" as "k" } from "../../bootstrap/index";
+  export { "kt" as "kt" } from "../../bootstrap/index";
+  export { "l" as "l" } from "../../bootstrap/index";
+  export { "ln" as "ln" } from "../../bootstrap/index";
+  export { "lt" as "lt" } from "../../bootstrap/index";
+  export { "m" as "m" } from "../../bootstrap/index";
+  export { "mn" as "mn" } from "../../bootstrap/index";
+  export { "mt" as "mt" } from "../../bootstrap/index";
+  export { "n" as "n" } from "../../bootstrap/index";
+  export { "nn" as "nn" } from "../../bootstrap/index";
+  export { "nt" as "nt" } from "../../bootstrap/index";
+  export { "o" as "o" } from "../../bootstrap/index";
+  export { "on" as "on" } from "../../bootstrap/index";
+  export { "ot" as "ot" } from "../../bootstrap/index";
+  export { "p" as "p" } from "../../bootstrap/index";
+  export { "pn" as "pn" } from "../../bootstrap/index";
+  export { "pt" as "pt" } from "../../bootstrap/index";
+  export { "q" as "q" } from "../../bootstrap/index";
+  export { "qt" as "qt" } from "../../bootstrap/index";
+  export { "r" as "r" } from "../../bootstrap/index";
+  export { "rn" as "rn" } from "../../bootstrap/index";
+  export { "rt" as "rt" } from "../../bootstrap/index";
+  export { "s" as "s" } from "../../bootstrap/index";
+  export { "sn" as "sn" } from "../../bootstrap/index";
+  export { "st" as "st" } from "../../bootstrap/index";
+  export { "t" as "t" } from "../../bootstrap/index";
+  export { "tn" as "tn" } from "../../bootstrap/index";
+  export { "tt" as "tt" } from "../../bootstrap/index";
+  export { "u" as "u" } from "../../bootstrap/index";
+  export { "un" as "un" } from "../../bootstrap/index";
+  export { "ut" as "ut" } from "../../bootstrap/index";
+  export { "v" as "v" } from "../../bootstrap/index";
+  export { "vn" as "vn" } from "../../bootstrap/index";
+  export { "vt" as "vt" } from "../../bootstrap/index";
+  export { "w" as "w" } from "../../bootstrap/index";
+  export { "wt" as "wt" } from "../../bootstrap/index";
+  export { "x" as "x" } from "../../bootstrap/index";
+  export { "xt" as "xt" } from "../../bootstrap/index";
+  export { "y" as "y" } from "../../bootstrap/index";
+  export { "yn" as "yn" } from "../../bootstrap/index";
+  export { "yt" as "yt" } from "../../bootstrap/index";
+  export { "z" as "z" } from "../../bootstrap/index";
+  export { "zt" as "zt" } from "../../bootstrap/index";
 }
 declare module "@chunk/windows-file-copy" {
   // windows-file-copy-B0DNtkPq.js —— 已重写 chunk（src/main/windows-file-copy/）。
@@ -856,6 +972,13 @@ declare module "@main-vendor/statsig" {
     getContext(): { user: unknown; values: unknown };
     shutdown(): void;
   }
+  /** PublishedStatsig 持有的 client 形状（实际是上面的 StatsigClient）。 */
+  export type StatsigClientLike = {
+    dataAdapter: { setData(data: string): void };
+    initializeSync(opts?: unknown): { success: boolean };
+    getContext(): { user: unknown; values: unknown };
+    shutdown(): void;
+  };
   export function djb2Hash(value: string): string;
   export function makeTypedGet(name: string, value: unknown): (key: string) => unknown;
 }

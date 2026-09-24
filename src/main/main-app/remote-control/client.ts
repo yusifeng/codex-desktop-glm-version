@@ -1252,7 +1252,7 @@ class RemoteControlWebsocketTransport extends WebSocketConnectionBase {
         if (backendAuth == null) throw new Error("Sign in to ChatGPT to connect remote control environments.");
         const requestHeaders = { ...headers };
         const explicitToken = findHeader(requestHeaders, "authorization");
-        assertSameAuthIdentity(explicitToken?.replace(/^Bearer /i, ""), backendAuth);
+        assertSameAuthIdentity(explicitToken != null ? String(explicitToken).replace(/^Bearer /i, "") : "", backendAuth);
         applyAuthHeaders(requestHeaders, backendAuth.token, options.desktopApiOptions);
         const url = applyWorkspaceRouting(resolveBackendApiUrl(options.desktopApiOptions, "/codex/remote/control/client"), requestHeaders, backendAuth);
         return { url: websocketUrlOf(url), headers: requestHeaders, signal: backendAuth.signal };

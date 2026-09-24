@@ -342,7 +342,7 @@ class PublishedStatsig extends EventEmitterBase {
       };
     }
     if (client == null || publication?.payload == null) return null;
-    const { user } = (client as StatsigClientLike & { getContext(): { user: { userID?: string; customIDs?: Record<string, string>; custom?: Record<string, unknown> } } }).getContext();
+    const user = ((client as StatsigClientLike).getContext() as { user: { userID?: string; customIDs?: Record<string, string>; custom?: Record<string, unknown> } }).user;
     return {
       identity: {
         userId: user.userID ?? null,

@@ -906,3 +906,9 @@ export class SubscriptionRegistry {
     return this.subscribers.get(conversationId);
   }
 }
+
+// ---------------------------------------------------------------------------
+// 兼容导出（原版压缩名；R4 切换语义名后移除）
+// ---------------------------------------------------------------------------
+
+export { AppServerManagerStreamState as Yge };

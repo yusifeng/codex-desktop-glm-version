@@ -972,7 +972,7 @@ class DesktopFetchService {
       if (typeof body == "string") return body;
       if (body == null) return undefined;
       const copy = new Uint8Array(body.byteLength);
-      copy.set(body);
+      copy.set(body as Uint8Array);
       return copy.buffer;
     };
 
@@ -1008,7 +1008,7 @@ class DesktopFetchService {
         )
           throw new DOMException("Authenticated principal changed", "AbortError");
       }
-      const response = await guarded("host.network", async () => {
+      const response = (await guarded("host.network", async () => {
         let result: Response;
         if (onUploadProgress == null) {
           const init = {
@@ -1033,14 +1033,14 @@ class DesktopFetchService {
           })) as Response;
         }
         return (abortSignal.throwIfAborted(), result);
-      });
+      })) as Response;
       if (attachIntegrityState) this.options.integrityStateStore.storeResponseUpdate(response.headers, requestIntegrityState);
       return response;
     };
 
     // —— auth 获取（432 失败码）——
     const authStart = performance.now();
-    authState = await guarded("host.auth", () =>
+    authState = (await guarded("host.auth", () =>
       loadAuth({
         errorStatus: 432,
         failureMessage: useRestrictedAuth
@@ -1049,7 +1049,7 @@ class DesktopFetchService {
         refreshToken: false,
         state: authState,
       }),
-    );
+    )) as AuthState;
 
     // —— workspace 路由（432 失败码；workspace 模式下 body 经 TransformStream 挂 abort）——
     let workspaceAuth: { token: string; signal: AbortSignal } | null = null;
@@ -1112,7 +1112,7 @@ class DesktopFetchService {
       metrics.retriedAfter401 = true;
       await response.body?.cancel();
       const retryAuthStart = performance.now();
-      authState = await guarded("host.auth_refresh", () =>
+      authState = (await guarded("host.auth_refresh", () =>
         loadAuth({
           errorStatus: 401,
           failureMessage: useRestrictedAuth
@@ -1121,7 +1121,7 @@ class DesktopFetchService {
           refreshToken: true,
           state: authState,
         }),
-      );
+      )) as AuthState;
       timings.retryAuthMs = elapsedMs(retryAuthStart);
       metrics.hasToken = authState.token != null;
       metrics.tokenSource = authState.tokenSource;
@@ -1271,7 +1271,14 @@ class DesktopFetchService {
     });
   }
 
-  prepareFetchInit(request: { body?: string | ArrayBuffer | Uint8Array; headers?: Record<string, unknown> }) {
+  prepareFetchInit(request: {
+    body?: string | ArrayBuffer | Uint8Array;
+    headers?: Record<string, unknown>;
+    type?: string;
+    requestId?: string;
+    url?: string;
+    method?: string;
+  }) {
     const headers = { ...request.headers };
     const body = request.body;
     if (typeof body == "string" && !this.hasHeader(headers, "Content-Type")) {
@@ -1397,7 +1404,7 @@ class DesktopFetchService {
         view,
         path,
         request.body ? JSON.parse(request.body) : undefined,
-        isGitSource(request.headers?.["x-codex-git-source"]) ? request.headers[GIT_SOURCE_HEADER_KEY] : null,
+        isGitSource(request.headers?.["x-codex-git-source"]) ? (request.headers[GIT_SOURCE_HEADER_KEY] as string) : null,
         signal,
       );
       const message = {

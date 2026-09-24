@@ -43,7 +43,11 @@ import { Yge as AppServerManagerStreamState } from "../threads/stream-roles";
 import { Dve as InactiveThreadUnsubscriber } from "../threads/inactive-unsubscriber";
 import { Bve as ManualContextCompactionTracker } from "../threads/context-compaction";
 import { Rve as ItemNotificationHandler } from "../streams/item-notifications";
-import { sve as OpenFileWatchRegistry, ny as delegateRequestToFollowerOwner } from "../files/open-file-watches";
+import {
+  sve as OpenFileWatchRegistry,
+  ny as delegateRequestToFollowerOwner,
+  dve as handleThreadFollowerRequest,
+} from "../files/open-file-watches";
 import { $_e as FileAttachmentUploader, ive as ThreadGoalAttachmentDirectories } from "../attachments/upload";
 import { q_e as DisposableHandle, Lv as AppServerOperationHandle, Rv as LoginOperationHandle } from "../util/dispose-handle";
 import {
@@ -356,9 +360,9 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
               this,
               { runtime, settings, storage },
               (conversationId: string) => this.defaultTurnConfig.readServiceTier(conversationId),
-              this.history.createSearchIslandId,
               () => !this.disposed,
               (event: any) => this.events.emitQueuedMessageExecution(event),
+              this.history.createSearchIslandId,
               (request: any, isExecutor: boolean) =>
                 this.#resumeConversationAndReport(request, isExecutor ? `executor` : `view`),
             ),
@@ -373,19 +377,19 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     this.useTailHydration = useTailHydration;
     this.runtimeSettings = runtimeSettings;
     this.hostId = hostId;
-    this.threadStartedNotificationDeferral = new ThreadStartedNotificationDeferral(
-      this.logger,
-      (conversationId: string) => {
+    this.threadStartedNotificationDeferral = new ThreadStartedNotificationDeferral({
+      logger: this.logger,
+      getTurns: (conversationId: string) => {
         let conversation = this.getConversation(conversationId);
         return conversation == null ? null : mergedTurns(conversation, this.history.turnMergePolicy);
       },
-      ({ notification, automationCapability }: any, shouldIgnore: boolean) => {
-        this.onNotification(notification.method, notification.params, automationCapability, shouldIgnore);
+      replayNotification: (method: string, params: any, automationCapability: unknown, shouldIgnore: boolean) => {
+        this.onNotification(method, params, automationCapability, shouldIgnore);
       },
-      (request: any) => {
+      replayRequest: (request: any) => {
         this.onRequest(request);
       },
-    );
+    });
     this.canonicalTurnHistory =
       this.runtimeSettings.canonicalTurnHistory ?? settings.history.canonicalTurnHistory;
     this.suppressResumeHistoryDrain =
@@ -417,20 +421,23 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     let clearObservations = () => this.turnStartObservations.clear();
     this.lifecycle.addAuthStatusCallback(clearObservations);
     this.cleanup.push(() => this.lifecycle.removeAuthStatusCallback(clearObservations));
-    this.projectlessConversations = new ProjectlessConversations(
-      this.hostId,
+    this.projectlessConversations = new ProjectlessConversations({
+      hostId: this.hostId,
       storage,
       threadProjectAssignments,
-      (conversationId: string) => this.getConversation(conversationId),
-      this.logger,
-      (conversationId: string) => {
+      getConversation: (conversationId: string) => this.getConversation(conversationId),
+      logger: this.logger,
+      getWorkspaceKindOverride: (conversationId: string) => {
         let state = this.getThreadWorkspaceState(conversationId);
         if (state != null) return state.project == null ? `projectless` : `project`;
       },
-    );
-    this.threadWorkspaceStorage = new ThreadWorkspaceStorage(storage, threadProjectAssignments, (title: string | null) =>
-      filesystem.createProjectlessThreadWorkspace(title),
-    );
+    });
+    this.threadWorkspaceStorage = new ThreadWorkspaceStorage({
+      storage,
+      threadProjectAssignments,
+      createProjectlessWorkspace: (title: string | null) =>
+        filesystem.createProjectlessThreadWorkspace(title),
+    });
     this.openFileWatches = new OpenFileWatchRegistry({
       logger: this.logger,
       createId: () => attachmentHost.createId(),
@@ -624,7 +631,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       createId: this.history.createSearchIslandId,
     };
     this.cleanup.push(
-      subscribeReadStateChanges(
+      (subscribeReadStateChanges(
         this.readState,
         this.unread,
         () => this.threadStore.getSavedReadChanges(),
@@ -632,7 +639,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
           (this.ownReadChange?.threadId !== threadId || this.ownReadChange.hasUnreadTurn !== hasUnreadTurn) &&
             this.applySavedConversationReadState(threadId, hasUnreadTurn);
         },
-      ),
+      ) as () => void),
     );
     if (coordination != null) {
       this.streamState.attach();
@@ -864,7 +871,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     let promise = Promise.resolve()
       .then(() =>
         maybeResumeConversation({
-          manager: this,
+          manager: this as any,
           workspace: this.projectlessConversations,
           params: request,
           product,
@@ -995,7 +1002,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       clientUserMessageId: messageId,
       additionalContext,
       toolOutput,
-      onMessageAdded,
+      onMessageAdded: onMessageAdded as (() => unknown) | undefined,
       createId: this.history.createSearchIslandId,
       schedule: (callback: () => void, delayMs: number) => this.scheduler.schedule(callback, delayMs),
       ownerWindowError: OWNER_WINDOW_ERROR,
@@ -1559,7 +1566,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     return getCompleteConversationTurns(this, conversationId);
   }
 
-  waitForConversationRevision(conversationId: string, revision: number, timeoutMs: number, onTimeout: any) {
+  waitForConversationRevision(conversationId: string, revision: any, timeoutMs: any, onTimeout: any) {
     return this.streamState.waitForConversationRevision(conversationId, revision, timeoutMs, onTimeout);
   }
 
@@ -2283,7 +2290,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
   // 请求派发 / settings
   // -------------------------------------------------------------------------
 
-  async sendRequest(method: string, params: any, options: any) {
+  async sendRequest(method: string, params: any, options?: any) {
     this.assertActive();
     return this.requestClient.sendRequest(method, params, options);
   }
@@ -2308,8 +2315,12 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     return this.updateThreadSettings(conversationId, settings, undefined, condition);
   }
 
-  async updateThreadPermissions(conversationId: string, permissions: any, activeTurnId?: string) {
-    await this.updateThreadSettings(conversationId, permissions, activeTurnId ?? activeTurnId(this.getConversation(conversationId)));
+  async updateThreadPermissions(conversationId: string, permissions: any, currentActiveTurnId?: string) {
+    await this.updateThreadSettings(
+      conversationId,
+      permissions,
+      currentActiveTurnId ?? activeTurnId(this.getConversation(conversationId)),
+    );
   }
 
   /** settings 更新（原 updateThreadSettings）：follower 委托 → 条件判定 →

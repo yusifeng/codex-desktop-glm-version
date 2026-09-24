@@ -73,6 +73,7 @@ import {
   MOVED_WINDOW_PERSIST_DELAY_MS,
   MOVEMENT_SPRING,
   NATIVE_DRAG_POLL_INTERVAL_MS,
+  NATIVE_VIEWPORT_SIZE,
   NATIVE_TRAY_SIZE,
   PROXIMITY_POLL_INTERVAL_MS,
   QUICK_CHAT_MIN_SNAP_WIDTH_PX,
@@ -109,24 +110,6 @@ import {
   sameSize,
   storedPlacementForDisplay,
 } from "./geometry";
-
-// objc-js 为外部 CJS 包（打包依赖），无类型声明；以最小面声明。
-declare module "objc-js" {
-  const objc: {
-    fromPointer(handle: Buffer): { window(): OjcNSWindow };
-  };
-  interface OjcNSWindow {
-    respondsToSelector$(selector: string): boolean;
-    _setPreventsActivation$(value: boolean): unknown;
-    _setForceActiveControls$(value: boolean): unknown;
-    setNativeGlassForcesActiveAppearance$(value: boolean): unknown;
-    _sendForcedWindowChangedKeyState(): unknown;
-    isKeyWindow(): boolean;
-    resignKeyWindow(): unknown;
-    makeKeyAndOrderFront$(value: unknown): unknown;
-  }
-  export default objc;
-}
 
 // ---------------------------------------------------------------------------
 // 类型
@@ -220,7 +203,7 @@ export class AvatarOverlayWindowManager {
   private detachedDisplay: { bounds: Rect; id: number } | null = null;
   private detachedDisplayRestoreTimer: ReturnType<typeof setTimeout> | null = null;
   private dragState: CursorTracker | null = null;
-  private nativeWindowDragStart: Point | null = null;
+  private nativeWindowDragStart: { pointerScreenX: number; pointerScreenY: number } | null = null;
   private nativeWindowDragActive = false;
   private nativeWindowDragCompletionTimer: ReturnType<typeof setInterval> | null = null;
   private nativeWindowDragTargetRegistered = false;
@@ -416,8 +399,9 @@ export class AvatarOverlayWindowManager {
     )
       return false;
     let frontmost: Promise<{ bundleIdentifier: string } | null> = this.quickChatKeyboardInteractionActive
-      ? (this.previousQuickChatApplication ?? getFrontmostWindow())
-      : getFrontmostWindow();
+      ? (this.previousQuickChatApplication ??
+        (getFrontmostWindow() as Promise<{ bundleIdentifier: string } | null>))
+      : (getFrontmostWindow() as Promise<{ bundleIdentifier: string } | null>);
     this.previousQuickChatApplication = frontmost;
     frontmost.then((appInfo) => {
       if (
@@ -485,6 +469,7 @@ function run(argv) {
           );
           this.logger().debug(`Quick Chat previous application activation`, {
             safe: { activated: stdout.trim() === `true` },
+            sensitive: {},
           });
         })
         .catch((error) => {
@@ -2404,14 +2389,18 @@ function run(argv) {
   /** 注销原生拖动（原 unregisterNativeWindowDragTarget，17,557-17,574）。 */
   private unregisterNativeWindowDragTarget(reason: string): void {
     try {
-      if (
-        this.nativeWindowDragActive &&
-        this.window != null &&
-        (!this.window.isDestroyed() ||
-          this.handleNativeWindowDragMove(this.window, (finishWindowDrag(this.window) as { bounds?: Rect } | null)?.bounds),
-        (this.suppressNextRendererThrow = true),
-        this.logger().info(`Native pet window drag finished`, { safe: { reason } }))
-      );
+      if (this.nativeWindowDragActive && this.window != null) {
+        if (!this.window.isDestroyed())
+          this.handleNativeWindowDragMove(
+            this.window,
+            (finishWindowDrag(this.window) as { bounds?: Rect } | null)?.bounds,
+          );
+        this.suppressNextRendererThrow = true;
+        this.logger().info(`Native pet window drag finished`, {
+          safe: { reason },
+          sensitive: {},
+        });
+      }
     } finally {
       setWindowDragTarget(null);
       this.clearNativeWindowDragCompletionTimer();
@@ -2965,7 +2954,7 @@ function run(argv) {
       return;
     }
     if (inputShapeApplied) return;
-    let nextMode = this.pointerInteractive ? `disabled` : `forwarding`;
+    let nextMode: `disabled` | `forwarding` = this.pointerInteractive ? `disabled` : `forwarding`;
     if (this.mousePassthroughMode !== nextMode) {
       this.mousePassthroughMode = nextMode;
       if (nextMode === `forwarding`) {

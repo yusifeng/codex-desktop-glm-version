@@ -326,3 +326,9 @@ function buildSteeredMatch({
       (context.addedFiles?.filter(filterAddedFiles).length ?? 0),
   };
 }
+
+// ---------------------------------------------------------------------------
+// 兼容导出（原版压缩名；R4 切换语义名后移除）
+// ---------------------------------------------------------------------------
+
+export { findMatchingSteeringMessage as fg };

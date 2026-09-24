@@ -23,8 +23,9 @@ import {
   io as isUntrustedQueueContext,
   no as untrustedQueueContextError,
 } from "@chunk/shared";
-// using 作用域（a.en）——@chunk/main-shared。
-import { en as usingScope } from "@chunk/main-shared";
+// using 作用域（原 a.en() = bootstrap 的 tC——TS using/Symbol.asyncDispose
+// 降级 helper）。
+import { en as usingScope } from "@chunk/bootstrap";
 // Sm（27,880）= ConversationStreamSubscription——R3 app-server/stream-subscription。
 import { Sm as ConversationStreamSubscription } from "../app-server/stream-subscription";
 // Fg/kg：turn 视图——R3 turns/canonical-history。
@@ -80,7 +81,8 @@ export interface QueuedFollowUpsOptions {
   getMessageQueueMode: (submission: any) => Promise<string>;
   submissionHost: {
     needsResume: (conversationId: string) => boolean;
-    resume: (request: any, signal?: unknown) => Promise<any>;
+    /** 第二参 = allowStartAfterNoActiveTurn（true 走 executor resume）。 */
+    resume: (request: any, isExecutor?: boolean) => Promise<any>;
     getActiveTurnId: (conversationId: string) => string | null;
     hasPendingTurnStart: (conversationId: string) => boolean;
     hasFinalAnswer: (conversationId: string) => boolean;
@@ -487,7 +489,7 @@ export class QueuedFollowUpsCoordinator extends ConversationEventEmitterBase {
       throw Error(`Resume request does not match the submission thread`);
     let activeTurnIdFromResume: string | null = null;
     if (submissionHost.needsResume(conversationId)) {
-      let resumeResult = await submissionHost.resume(submission.resume, onMessageAdded);
+      let resumeResult = await submissionHost.resume(submission.resume, allowStartAfterNoActiveTurn);
       if (resumeResult.status === `not-ready`) throw new ResumeNotReadyError(resumeResult);
       activeTurnIdFromResume = resumeResult.activeTurnId;
     }
@@ -998,9 +1000,8 @@ export function createQueuedFollowUps(
   _createSearchIslandId: () => string,
 ) {
   return new QueuedFollowUpsCoordinator({
-    createMessageThreadId: (conversationId: string) => {
-      manager.getConversation(conversationId);
-    },
+    createMessageThreadId: (conversationId: string) =>
+      (manager.getConversation(conversationId), undefined as any),
     onQueueChanged,
     execution,
     getMessageQueueMode: async (submission: any) => (
@@ -1026,7 +1027,10 @@ export function createQueuedFollowUps(
       },
       hasFinalAnswer: (conversationId: string) => {
         let conversation = manager.getConversation(conversationId);
-        let lastItem = conversation == null ? undefined : lastIncompleteTurn({ turns: mergedConversationTurns(conversation) })?.items.at(-1);
+        let lastItem =
+          conversation == null
+            ? undefined
+            : lastIncompleteTurn({ id: conversationId, turns: mergedConversationTurns(conversation, undefined) } as any)?.items.at(-1);
         return (
           lastItem?.type === `agentMessage` &&
           `phase` in lastItem &&

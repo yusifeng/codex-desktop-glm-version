@@ -1385,7 +1385,7 @@ export function createQueuedMessagesFacade(
   isAlive: () => boolean,
   emitExecutionEvent: (event: any) => void,
   createId: () => string,
-  resumeConversation: (request: any) => Promise<any>,
+  resumeConversation: (request: any, isExecutor?: boolean) => Promise<any>,
 ) {
   return {
     ...runtime.queuedMessages,

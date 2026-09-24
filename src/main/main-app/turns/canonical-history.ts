@@ -1092,3 +1092,15 @@ export function updateTurnIfFound(
   let turn = findTurnByTurnId(conversation, turnId, host, options);
   return turn ? (mutate(turn), true) : false;
 }
+
+// ---------------------------------------------------------------------------
+// 兼容导出（原版压缩名；R4/R5 manager 等按旧名 import；切换语义名后移除）
+// ---------------------------------------------------------------------------
+
+export {
+  findTurnById as Ag,
+  lastIncompleteTurn as Fg,
+  completeHistoryEntities as Mg,
+  findTurnAgentMessageText as Oge,
+  mergedConversationTurns as kg,
+};

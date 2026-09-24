@@ -36,6 +36,7 @@ import {
   interactWithRemoteHostedPIPContentPresentation,
   refreshRemoteHostedPIPContentVisibility,
   setRemoteHostedPIPContentMaxDisplaySize,
+  setRemoteHostedPIPContentMaxDisplaySizeChangedHandler,
   hasRemoteHostedPIPContentAnyPresentation,
   getRemoteHostedPIPContentActiveTaskIDs,
   setRemoteHostedPIPContentPetWakeRequestHandler,
@@ -216,7 +217,7 @@ export function createPipNativeVideoMultiplexer({
     }
   };
   let stopThread = (threadId: string) => {
-    setRemoteHostedPIPContentNativeVideoEnabled(threadId, false);
+    setRemoteHostedPIPContentNativeVideoEnabled([threadId], false);
     for (let webContents of getWebContentsForThreadID(threadId)) {
       if (!webContents.isDestroyed())
         webContents.send(messageChannel, { stopped: true, threadID: threadId } as never);
@@ -234,7 +235,7 @@ export function createPipNativeVideoMultiplexer({
     },
     setReady: (threadId: string, ready: boolean) => {
       if (refCounts.has(threadId))
-        setRemoteHostedPIPContentNativeVideoReady(threadId, ready);
+        setRemoteHostedPIPContentNativeVideoReady([threadId], ready);
     },
     start: (threadId: string) => {
       if (!isMacOS || threadId.length === 0) return;
@@ -247,7 +248,7 @@ export function createPipNativeVideoMultiplexer({
       if (installed) {
         frameHandlerInstalled = true;
         refCounts.set(threadId, 1);
-        if (!setRemoteHostedPIPContentNativeVideoEnabled(threadId, true)) {
+        if (!setRemoteHostedPIPContentNativeVideoEnabled([threadId], true)) {
           refCounts.delete(threadId);
           if (refCounts.size === 0) {
             setRemoteHostedPIPContentVideoFrameHandler(null);
@@ -399,8 +400,10 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
     isMacOS,
     messageChannel: videoFrameChannel,
   });
-  /** windowId → hostLayout（原 f）。 */
-  let layoutByWindowId = new Map<number, PipHostLayout>();
+  /** windowId → hostLayout 描述（原 f 的值部分）。 */
+  let windowLayouts = new Map<number, PipHostLayout>();
+  /** windowId → hostId（原 f 的键值映射，用于 host 换绑检测）。 */
+  let layoutByWindowId = new Map<number, string>();
   /** 持有 hostLayout 的 windowId 集合（原 m）。 */
   let windowsWithLayout = new Set<number>();
   /** hostId → windowId（原 h）。 */
@@ -445,14 +448,18 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
   let suppressRestoreApplied = false;
   /** homeSurface 宽度（原 j）。 */
   let homeSurfaceWidth: number | null = null;
-  /** 最大显示尺寸（原 M）。 */
-  let maxDisplaySize: number = STATE_MESSAGE_COALESCE_MS; // 占位——原文初值 200 为 coalesce 常量，尺寸由偏好注入
+  /** 最大显示尺寸（原 M；初值即原文的 cue 常量 200，由偏好/宿主宽度刷新）。 */
+  let maxDisplaySize: number = STATE_MESSAGE_COALESCE_MS;
   let browserFrameRevision = 0;
   let knownActiveTaskIds = new Set<string>();
 
   /** 全部活动任务 id（原 B，18,330-18,332）。 */
   let allActiveTaskIds = () => {
-    let ids = new Set<string>(nativeHostStarted && !disposed ? getRemoteHostedPIPContentActiveTaskIDs() : []);
+    let ids = new Set<string>(
+      nativeHostStarted && !disposed
+        ? (getRemoteHostedPIPContentActiveTaskIDs() as string[])
+        : [],
+    );
     for (let set of activeTasksBySurface.values()) for (let id of set) ids.add(id);
     return ids;
   };
@@ -485,7 +492,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
   let notifyVisibilityChanged = (changed: string[]) => {
     if (changed.length !== 0) {
       publishTaskState();
-      if (nativeHostStarted) refreshRemoteHostedPIPContentVisibility();
+      if (nativeHostStarted) refreshRemoteHostedPIPContentVisibility(null);
     }
   };
   /** 活动集合的默认可见性补录（原 re）。 */
@@ -507,7 +514,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
     let ephemeralShow =
       nativeHostStarted &&
       !knownActiveTaskIds.has(conversationId) &&
-      getRemoteHostedPIPContentActiveTaskIDs().includes(conversationId);
+      (getRemoteHostedPIPContentActiveTaskIDs() as string[]).includes(conversationId);
     if (ephemeralShow && changed.length === 0) taskVisibilityStore.markEphemeralStateChanged();
     if (changed.length > 0 || ephemeralShow) {
       queueMicrotask(() => {
@@ -531,20 +538,15 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
   };
   /** 启动原生宿主（原 oe，18,379-18,397）。 */
   let startNativeHost = () => {
-    if (
-      !disposed &&
-      !nativeHostStarted &&
-      isMacOS &&
-      isEnabled() &&
-      ((installShouldShowHandler(),
-      (nativeHostStarted = startRemoteHostedPIPContentHost({
-        controlTooltips: controlTooltips(),
-        onServiceConnectionLost: () => {
-          serviceProcessIdentifier = null;
-        },
-      })),
-      nativeHostStarted)
-    ) {
+    if (disposed || nativeHostStarted || !isMacOS || !isEnabled()) return;
+    installShouldShowHandler();
+    nativeHostStarted = startRemoteHostedPIPContentHost({
+      controlTooltips: controlTooltips(),
+      onServiceConnectionLost: () => {
+        serviceProcessIdentifier = null;
+      },
+    });
+    if (nativeHostStarted) {
       if (serviceProcessIdentifier != null) connectRemoteHostedPIPContentHost(serviceProcessIdentifier);
       installWakeRequestHandler();
       installVisibilityRequestHandler();
@@ -587,13 +589,13 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
       setAlwaysHidePictureInPicture(true);
     }
     let { changedConversationIds } = taskVisibilityStore.setTaskVisibilities(
-      [...allActiveTaskIds(), ...getRemoteHostedPIPContentActiveTaskIDs(), ...extraIds],
+      [...allActiveTaskIds(), ...(getRemoteHostedPIPContentActiveTaskIDs() as string[]), ...extraIds],
       `hidden`,
     );
     if (!wasHidden) taskVisibilityStore.markGlobalHiddenChanged();
     if (!wasHidden || changedConversationIds.length > 0) {
       publishTaskState();
-      if (nativeHostStarted) refreshRemoteHostedPIPContentVisibility();
+      if (nativeHostStarted) refreshRemoteHostedPIPContentVisibility(null);
     }
     return taskState();
   };
@@ -631,7 +633,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
   };
   let installMaxDisplaySizeHandler = () => {
     if (!maxDisplaySizeHandlerInstalled && isMacOS) {
-      maxDisplaySizeHandlerInstalled = setMaxDisplaySizeChangedHandlerSafe((size: number) => {
+      maxDisplaySizeHandlerInstalled = setRemoteHostedPIPContentMaxDisplaySizeChangedHandler((size: number) => {
         maxDisplaySize = size;
         preferenceStore.set(PIP_CONTENT_MAX_DISPLAY_SIZE_KEY, size);
       });
@@ -657,6 +659,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
   };
   let forgetWindow = (windowId: number) => {
     unregisterWindowHost(windowId);
+    windowLayouts.delete(windowId);
     layoutByWindowId.delete(windowId);
     threadByWindowId.delete(windowId);
     windowsWithLayout.delete(windowId);
@@ -676,7 +679,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
         shouldShowTaskHandlerInstalled = false;
       }
       if (maxDisplaySizeHandlerInstalled) {
-        setMaxDisplaySizeChangedHandlerSafe(null);
+        setRemoteHostedPIPContentMaxDisplaySizeChangedHandler(null);
         maxDisplaySizeHandlerInstalled = false;
       }
       stopRemoteHostedPIPContentHost();
@@ -755,7 +758,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
     if (window == null) return;
     let threadId = threadByWindowId.get(window.id);
     if (threadId === undefined) return;
-    let layout = layoutByWindowId.get(window.id);
+    let layout = windowLayouts.get(window.id);
     let needsReapply =
       layout != null &&
       windowsWithLayout.has(window.id) &&
@@ -786,7 +789,8 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
   };
   /** hostLayout 登记（原 Ce，18,547-18,555）。 */
   let setHostLayoutForWindow = (window: BrowserWindow, layout: PipHostLayout) => {
-    layoutByWindowId.set(window.id, layout);
+    windowLayouts.set(window.id, layout);
+    layoutByWindowId.set(window.id, layout.hostId);
     let focused = isFocusedPipWindow(window);
     if (layout.anchorRect == null) {
       forgetWindow(window.id);
@@ -850,7 +854,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
         globalHiddenBaseline = hidden;
         taskVisibilityStore.markGlobalHiddenChanged();
         publishTaskState();
-        if (nativeHostStarted) refreshRemoteHostedPIPContentVisibility();
+        if (nativeHostStarted) refreshRemoteHostedPIPContentVisibility(null);
       }
     },
     hideAllActiveTasks: () => (disposed ? taskState() : hideAllActiveTasks()),
@@ -866,7 +870,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
     },
     interactWithPresentation: (hostId, point, interaction) => {
       if (!disposed && nativeHostStarted && focusedHostId === hostId)
-        interactWithRemoteHostedPIPContentPresentation(hostId, point as never, interaction as never);
+        interactWithRemoteHostedPIPContentPresentation([hostId], [0], interaction);
     },
     onContentHostStarted: (listener) =>
       disposed
@@ -884,7 +888,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
         stopNativeHost();
         startNativeHost();
         for (let window of BrowserWindow.getAllWindows()) {
-          let layout = layoutByWindowId.get(window.id);
+          let layout = windowLayouts.get(window.id);
           if (layout != null) setHostLayoutForWindow(window, layout);
         }
         syncFocusedThread();
@@ -918,7 +922,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
       if (wasHidden || changedConversationIds.length > 0) {
         publishTaskState();
         if (nativeHostStarted)
-          refreshRemoteHostedPIPContentVisibility(wasHidden ? undefined : [conversationId]);
+          refreshRemoteHostedPIPContentVisibility(wasHidden ? null : conversationId);
       }
       return taskState();
     },
@@ -959,7 +963,7 @@ export function createRemoteHostedPipManager(options: RemoteHostedPipManagerOpti
     },
     setPlacement: (hostId, placement) => {
       if (!disposed && nativeHostStarted && focusedHostId === hostId)
-        setRemoteHostedPIPContentPlacement(hostId, placement as never);
+        setRemoteHostedPIPContentPlacement([hostId], placement);
     },
     setNativeVideoReady: (threadId, ready) => {
       if (!disposed && nativeHostStarted) videoMultiplexer.setReady(threadId, ready);

@@ -63,10 +63,7 @@ function matchMathDelimiter(open: string | null, line: string): string | null {
 
 /** math 块 tokenizer（原 pwe）：首行开定界符，逐行找闭；缩进按首行剥除。 */
 function tokenizeMathBlock(source: string) {
-  let firstLine = source.split(
-`,
-1,
-)[0];
+  let firstLine = source.split("\n", 1)[0];
   let open = matchMathDelimiter(null, firstLine);
   if (open == null) return;
   let closeIndex = source.length;
