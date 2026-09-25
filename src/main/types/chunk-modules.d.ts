@@ -94,7 +94,7 @@ declare module "@chunk/shared" {
   export const Bo: any; // 内部符号: uD
   export const Br: any; // 内部符号: oB
   export const Bs: any; // 内部符号: Fw
-  export const Bt: any; // 内部符号: a6
+  export { agentInstructionsForThread as Bt } from "../../shared/agent-instructions";
   export const Bu: any; // 内部符号: fy
   export const C: any; // 内部符号: Pse
   export const Ca: any; // 内部符号: Lne
@@ -174,7 +174,7 @@ declare module "@chunk/shared" {
   export const Ho: any; // 内部符号: fD
   export const Hr: any; // 内部符号: LI
   export const Hs: any; // 内部符号: Rw
-  export const Ht: any; // 内部符号: b3
+  export { permissionsForInstructions as Ht } from "../../shared/agent-instructions";
   export const Hu: any; // 内部符号: my
   export const I: any; // 内部符号: ioe
   export const Ia: any; // 内部符号: GA
@@ -301,7 +301,7 @@ declare module "@chunk/shared" {
   export const Ro: any; // 内部符号: MD
   export const Rr: any; // 内部符号: TB
   export const Rs: any; // 内部符号: oT
-  export const Rt: any; // 内部符号: i6
+  export { agentInstructions as Rt } from "../../shared/agent-instructions";
   export const Ru: any; // 内部符号: dy
   export const S: any; // 内部符号: Fse
   export const Sa: any; // 内部符号: sj
@@ -353,7 +353,7 @@ declare module "@chunk/shared" {
   export const Vo: any; // 内部符号: gD
   export const Vr: any; // 内部符号: HB
   export const Vs: any; // 内部符号: Iw
-  export const Vt: any; // 内部符号: F3
+  export { collectScheduledTemplates as Vt } from "../../shared/agent-instructions";
   export const Vu: any; // 内部符号: hy
   export const W: any; // 内部符号: z5
   export const Wa: any; // 内部符号: PA
@@ -758,7 +758,7 @@ declare module "@chunk/shared" {
   export const zo: any; // 内部符号: ND
   export const zr: any; // 内部符号: qB
   export const zs: any; // 内部符号: sT
-  export const zt: any; // 内部符号: r6
+  export { withHeartbeatInstructions as zt } from "../../shared/agent-instructions";
   export const zu: any; // 内部符号: py
 }
 declare module "@chunk/electron-resources-path" {
