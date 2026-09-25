@@ -1944,3 +1944,18 @@ declare module "@rchunk/thread-usage-breakdown" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/theme-font-face-loader" {
+  export const r: unknown;
+  export const t: unknown;
+}
+
+declare module "@rchunk/modulepreload-polyfill" {
+  export const t: unknown;
+}
+
+declare module "@rchunk/theme-font-family" {
+  const _default: unknown;
+  export default _default;
+}
+
