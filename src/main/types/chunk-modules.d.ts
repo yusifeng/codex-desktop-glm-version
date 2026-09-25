@@ -468,7 +468,7 @@ declare module "@chunk/shared" {
   export { do_ as "do" };
   export const dr: any; // 内部符号: zU
   export const ds: any; // 内部符号: iE
-  export const dt: any; // 内部符号: hie
+  export { emailDomainProvider as dt } from "../../shared/telemetry";
   export const du: any; // 内部符号: nb
   export const ea: any; // 内部符号: yj
   export const ec: any; // 内部符号: Sw
@@ -493,7 +493,7 @@ declare module "@chunk/shared" {
   export const fo: any; // 内部符号: Ok
   export const fr: any; // 内部符号: AV
   export const fs: any; // 内部符号: tE
-  export const ft: any; // 内部符号: fie
+  export { TelemetryClient as ft } from "../../shared/telemetry";
   export const fu: any; // 内部符号: Qy
   export const g: any; // 内部符号: nce
   export const ga: any; // 内部符号: lj
@@ -586,7 +586,7 @@ declare module "@chunk/shared" {
   export const mo: any; // 内部符号: jk
   export const mr: any; // 内部符号: DV
   export const ms: any; // 内部符号: $T
-  export const mt: any; // 内部符号: P8
+  export { telemetryIntakeUrl as mt } from "../../shared/telemetry";
   export const mu: any; // 内部符号: ib
   export const n: any; // 内部符号: Yce
   export const na: any; // 内部符号: tre
@@ -625,7 +625,7 @@ declare module "@chunk/shared" {
   export const po: any; // 内部符号: Ak
   export const pr: any; // 内部符号: jV
   export const ps: any; // 内部符号: nE
-  export const pt: any; // 内部符号: N8
+  export { TelemetryHttpTransport as pt } from "../../shared/telemetry";
   export const pu: any; // 内部符号: $y
   export const q: any; // 内部符号: x5
   export const qa: any; // 内部符号: lA
