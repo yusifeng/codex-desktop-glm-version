@@ -132,7 +132,7 @@ declare module "@rchunk/above-composer-fixed-content-surface" {
 declare module "@rchunk/agent-activity-item" {
   export const n: unknown;
   export const r: (a: unknown, b: unknown) => boolean;
-  export const t: (item: unknown) => { grouping?: string } | null;
+  export const t: (item: unknown) => { grouping?: string; item?: unknown } | null;
 }
 
 declare module "@rchunk/appgen-access" {
@@ -276,6 +276,16 @@ declare module "@rchunk/patch-diff-stats" {
 }
 
 declare module "@rchunk/presentation" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/result-card" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/tool-activity-disclosure" {
   const _default: unknown;
   export default _default;
 }
