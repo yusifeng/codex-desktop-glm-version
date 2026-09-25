@@ -982,3 +982,12 @@ declare module "@main-vendor/statsig" {
   export function djb2Hash(value: string): string;
   export function makeTypedGet(name: string, value: unknown): (key: string) => unknown;
 }
+
+// main chunk 内嵌 vendored yaml（eemeli/yaml ~2.x）的临时声明（73,181-79,294 带）。
+// 集成阶段提取 main-vendor.ts 时替换；长期方案为 npm i yaml。
+declare module "@main-vendor/yaml" {
+  export function parse(input: string): unknown;
+  export function parseAllDocuments(input: string): unknown[];
+  export function parseDocument(input: string): unknown;
+  export function stringify(value: unknown): string;
+}
