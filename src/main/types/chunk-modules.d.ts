@@ -99,7 +99,7 @@ declare module "@chunk/shared" {
   export const C: any; // 内部符号: Pse
   export const Ca: any; // 内部符号: Lne
   export const Cc: any; // 内部符号: SC
-  export const Cd: any; // 内部符号: Ute
+  export { remoteModelSlugs as Cd } from "../../shared/automation-settings";
   // 注：zod builder 导出（Cf/Of 等）在 main-app 重写中被大量链式调用
   // （.trim()/.int()/.refine()/.catchall() 等），d.ts 无法完整还原 zod 的 builder 面，
   // 故放宽为 any；内部符号名见原粗扫/深析文档。
@@ -306,7 +306,7 @@ declare module "@chunk/shared" {
   export const S: any; // 内部符号: Fse
   export const Sa: any; // 内部符号: sj
   export const Sc: any; // 内部符号: DC
-  export const Sd: any; // 内部符号: P_
+  export { DEFAULT_MODELS as Sd } from "../../shared/automation-settings";
   export const Sf: any; // 内部符号: Lp
   export const Si: any; // 内部符号: eN
   export const Sl: any; // 内部符号: ix
@@ -319,7 +319,7 @@ declare module "@chunk/shared" {
   export const T: any; // 内部符号: Dse
   export const Ta: any; // 内部符号: nj
   export const Tc: any; // 内部符号: CC
-  export const Td: any; // 内部符号: Rte
+  export { AGENT_MODE_BY_HOST_ID_KEY as Td } from "../../shared/automation-settings";
   export const Tf: any; // 内部符号: lh
   export const Ti: any; // 内部符号: EM
   export const Tl: any; // 内部符号: Gb
@@ -407,7 +407,7 @@ declare module "@chunk/shared" {
   export const _: any; // 内部符号: v9
   export const _a: any; // 内部符号: Une
   export const _c: any; // 内部符号: KC
-  export const _d: any; // 内部符号: R_
+  export { reasoningEffortSchema as _d } from "../../shared/automation-settings";
   export const _f: any; // 内部符号: th
   export const _i: any; // 内部符号: UN
   export const _l: any; // 内部符号: qb
@@ -473,7 +473,7 @@ declare module "@chunk/shared" {
   export const ea: any; // 内部符号: yj
   export const ec: any; // 内部符号: Sw
   export const ed: any; // 内部符号: Nv
-  export const ef: any; // 内部符号: Lh
+  export { DEFAULT_OPEN_TARGET_PREFERENCE as ef } from "../../shared/automation-settings";
   export const ei: any; // 内部符号: cI
   export const el: any; // 内部符号: bx
   export const en: any; // 内部符号: G1
@@ -498,7 +498,7 @@ declare module "@chunk/shared" {
   export const g: any; // 内部符号: nce
   export const ga: any; // 内部符号: lj
   export const gc: any; // 内部符号: qC
-  export const gd: any; // 内部符号: L_
+  export { notificationPolicySchema as gd } from "../../shared/automation-settings";
   export const gf: any; // 内部符号: G
   export const gi: any; // 内部符号: CP
   export const gl: any; // 内部符号: tx
@@ -617,7 +617,7 @@ declare module "@chunk/shared" {
   export const p: any; // 内部符号: tce
   export const pa: any; // 内部符号: uj
   export const pc: any; // 内部符号: ZC
-  export const pd: any; // 内部符号: I_
+  export { NO_FUTURE_RUNS_ERROR as pd } from "../../shared/automation-settings";
   export const pf: any; // 内部符号: jp
   export const pi: any; // 内部符号: xP
   export const pl: any; // 内部符号: mx
@@ -711,7 +711,7 @@ declare module "@chunk/shared" {
   export const w: any; // 内部符号: Nse
   export const wa: any; // 内部符号: Rne
   export const wc: any; // 内部符号: bC
-  export const wd: any; // 内部符号: M_
+  export { EMPTY_AMBIENT_SUGGESTIONS as wd } from "../../shared/automation-settings";
   export const wf: any; // 内部符号: j3（zod object builder，链式调用放宽为 any）
   export const wi: any; // 内部符号: YM
   export const wl: any; // 内部符号: Qb
