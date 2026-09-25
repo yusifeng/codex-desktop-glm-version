@@ -123,3 +123,113 @@ declare module "react" {
     export const version: string;
   }
 }
+
+declare module "@rchunk/above-composer-fixed-content-surface" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/agent-activity-item" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/appgen-access" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/appgen-access-state-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/appgen-automations-state" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/artifact-feedback-button" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/artifact-originating-turn" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/conversation-blocks" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/diff-summary" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/generated-image-output-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/google-chrome" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/google-drive-resource-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-appgen-share-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-automation-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-in-button" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-in-google-drive-menu-item" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/skill-exploration-labels" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/turn-preview-body-items" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-app-connect-flow" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-target-apps" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/user-message" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/workspace-file-context-menu-trigger" {
+  const _default: unknown;
+  export default _default;
+}

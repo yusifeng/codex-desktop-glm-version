@@ -26,6 +26,7 @@ export const CHUNKS = {
   "scroll-to-match": "scroll-to-match-baaa6728db7d.js",
   "virtualized-turn-list": "virtualized-turn-list-a260a21e3c40.js",
   "conversation-markdown": "conversation-markdown-8421317d1640.js",
+  "local-conversation-turn": "local-conversation-turn-14bf296d5217.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -37,4 +38,5 @@ export const REWRITTEN = new Set([
   "scroll-to-match",
   "virtualized-turn-list",
   "conversation-markdown",
+  "local-conversation-turn",
 ]);
