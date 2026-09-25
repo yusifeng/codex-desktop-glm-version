@@ -233,3 +233,33 @@ declare module "@rchunk/workspace-file-context-menu-trigger" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/hooks" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/hooks-settings-copy" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/hooks-settings-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-implementation-request" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/timestamps" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/Icon" {
+  const _default: unknown;
+  export default _default;
+}

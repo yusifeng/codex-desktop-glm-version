@@ -59,6 +59,8 @@ import { default as useTargetApps } from "@rchunk/use-target-apps";
 import { default as userMessageChunk } from "@rchunk/user-message";
 import { default as workspaceFileContextMenuTrigger } from "@rchunk/workspace-file-context-menu-trigger";
 import { o as runtimeInit } from "@rchunk/rolldown-runtime";
+import { default as IconChunk } from "@rchunk/Icon";
+void IconChunk;
 
 void runtimeLazy; void resourceIconHelpers; void appgenHelpers; void agentActivityApi;
 void appSharedInit; void appgenAccessApi; void environmentSetupInit; void appPrimaryInit;

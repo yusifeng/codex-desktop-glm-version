@@ -21,6 +21,8 @@
 // 先占位扣减（用户内容优先），超限走 CenterTruncator / S（JSON 流式截断）。
 
 import { BI as comparePaths, RI as splitAgentItems, VI as normalizeSeparatorsImport, iW as processOutputs, wL as initializeRuntime, zI as isAbsolutePathLikeImport } from "@rchunk/app-shared";
+import { $en as appInitialLazy, bS as appInitialSurface, CS as appInitialComponent } from "@rchunk/app-initial";
+void appInitialLazy; void appInitialSurface; void appInitialComponent;
 import { n as splitItemsIntoRenderGroups, t as renderGroupsInit } from "@rchunk/split-items-into-render-groups";
 import { S as agentActivityInit, c as agentActivityCount, d as agentActivityList, f as renderableAgentItems, l as agentActivitySummary, r as includeGeneratedImages } from "@rchunk/agent-activity-units";
 void comparePaths; void splitAgentItems; void normalizeSeparatorsImport; void processOutputs; void initializeRuntime; void isAbsolutePathLikeImport;
@@ -153,7 +155,7 @@ function jsonStringifyWithLimit(value: unknown, limit: MarkdownLimit): { text: s
  * 超限后保留首尾各半（前缀 + truncationMarker + 后缀）；
  * toString 时代理对边界安全（前尾孤代理剥除）。
  */
-export class CenterTruncator {
+class CenterTruncator {
   private prefix = "";
   private suffix: string | null = null;
 
