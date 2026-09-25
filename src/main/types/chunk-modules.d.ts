@@ -187,7 +187,7 @@ declare module "@chunk/shared" {
   export const Io: any; // 内部符号: BD
   export const Ir: any; // 内部符号: wB
   export const Is: any; // 内部符号: yT
-  export const It: any; // 内部符号: S6
+  export { ChunkedMessageSender as It } from "../../shared/chunked-message";
   export const Iu: any; // 内部符号: xy
   export const J: any; // 内部符号: dae
   export const Ja: any; // 内部符号: uA
