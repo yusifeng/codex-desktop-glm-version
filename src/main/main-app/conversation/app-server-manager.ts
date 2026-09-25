@@ -386,7 +386,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       logger: this.logger,
       getTurns: (conversationId: string) => {
         let conversation = this.getConversation(conversationId);
-        return conversation == null ? null : mergedTurns(conversation, this.history.turnMergePolicy);
+        return conversation == null ? null : mergedTurns(conversation as never, this.history.turnMergePolicy);
       },
       replayNotification: (method: string, params: any, automationCapability: unknown, shouldIgnore: boolean) => {
         this.onNotification(method, params, automationCapability, shouldIgnore);
@@ -460,7 +460,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
         threadMode: this.runtime.threadMode(this.hostId),
         readThreadListOriginators: () => settings.history.readThreadListOriginators?.(),
         threadRecognition: this.threadRecognition,
-        workspace: this.projectlessConversations,
+        workspace: this.projectlessConversations as never,
         removeOpenFileWatches: (conversationId: string) => {
           this.openFileWatches.removeConversation(conversationId);
         },
@@ -484,7 +484,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       savedReadState: this.readState,
     });
     this.pagination = new ConversationHistoryPagination(
-      this,
+      this as never,
       this.history,
       this.runtime.readCompactHistory,
       this.tracing.beginHistoryPage,
@@ -579,7 +579,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       scheduler: this.scheduler,
       logger: this.logger,
       now,
-      threadStore: this.threadStore,
+      threadStore: this.threadStore as never,
     });
     this.conversationCacheEvictor = new ConversationEvictionCoordinator({
       clearPersistedUnreadState: (conversationId: string) => this.saveReadState(conversationId, false),
@@ -604,7 +604,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     this.notificationContext = {
       events: this.events,
       getLastAgentMessageForTurn: (conversationId: string, turnId: string) =>
-        findTurnAgentMessageText(this.conversations.get(conversationId), turnId, this.history.turnMergePolicy),
+        findTurnAgentMessageText(this.conversations.get(conversationId) as never, turnId, this.history.turnMergePolicy),
       handleThreadArchived: this.handleThreadArchived.bind(this),
       handleThreadDeletion: this.handleThreadDeletion.bind(this),
       handleThreadUnarchived: this.handleThreadUnarchived.bind(this),
@@ -720,7 +720,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
                               let turn =
                                 event.turnId == null
                                   ? null
-                                  : findTurnById(this.getConversation(event.conversationId), event.turnId, this.history.turnMergePolicy);
+                                  : findTurnById(this.getConversation(event.conversationId) as never, event.turnId, this.history.turnMergePolicy);
                               turn == null
                                 ? listener({ event, completedTurn: { status: `missing` } })
                                 : turn.itemsPagination?.hasLoadedOldest === false
@@ -768,7 +768,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     let conversation = this.getConversation(conversationId);
     this.resumeNotificationBuffer.release(
       conversationId,
-      conversation == null ? null : mergedTurns(conversation, this.history.turnMergePolicy),
+      conversation == null ? null : mergedTurns(conversation as never, this.history.turnMergePolicy),
       ({ notification, automationCapability }: any, shouldIgnore: boolean) => {
         this.onNotification(notification.method, notification.params, automationCapability, shouldIgnore);
       },
@@ -878,7 +878,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
       .then(() =>
         maybeResumeConversation({
           manager: this as any,
-          workspace: this.projectlessConversations,
+          workspace: this.projectlessConversations as never,
           params: request,
           product,
           historyPolicy: this.history,
@@ -1454,8 +1454,8 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     this.threadStore.observeCatalogThreads(options);
   }
 
-  getCachedThreadMetadata(conversationId: string) {
-    return this.threadStore.getCachedThreadMetadata(conversationId);
+  getCachedThreadMetadata(threadIds: string[]) {
+    return this.threadStore.getCachedThreadMetadata(threadIds);
   }
 
   async hydratePinnedThreads(threadIds: string[], options: any) {
@@ -2039,7 +2039,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
   }
 
   async discardConversationIfEmpty(conversationId: string) {
-    if (completeHistoryTurns(this.conversations.get(conversationId))?.length !== 0) return false;
+    if (completeHistoryTurns(this.conversations.get(conversationId) as never)?.length !== 0) return false;
     this.conversationCacheEvictor.evictConversation(conversationId, { reason: `empty-thread` });
     try {
       await this.sendRequest(`thread/unsubscribe`, { threadId: conversationId });
