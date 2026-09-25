@@ -163,7 +163,7 @@ function memoizePromise<Key, Args extends unknown[], T>(
 }
 
 /** thread_not_found 判定（原 `me` 的最小面，misc/thread-errors 落地后切换）。 */
-function isThreadNotFound(error: unknown): boolean {
+export function isThreadNotFound(error: unknown): boolean {
   return (
     error instanceof Error &&
     ((error as Error & { code?: string }).code === "thread_not_found" ||
