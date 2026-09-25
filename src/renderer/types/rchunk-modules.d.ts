@@ -11,6 +11,12 @@ declare module "@rchunk/rolldown-runtime" {
 }
 
 declare module "@rchunk/app-shared" {
+  // React 兼容导出（e6 = react 模块命名空间，含 createContext/use 等）。
+  export const e6: {
+    createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
+    use<T>(context: unknown): T;
+    [key: string]: unknown;
+  };
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
   // 导出面（数千个压缩名）待 renderer-app-shared-analysis.md 完成后语义化。
   // 目前以 any 占位，重写完成后本声明会移除（源码直接导出真类型）。

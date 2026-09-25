@@ -22,6 +22,7 @@ export const CHUNKS = {
   "index-entry": "index-e0f46c018fe4.js",
   "rpc": "rpc-971deaddf2c2.js",
   "thread-virtualizer": "thread-virtualizer-e1964ca5c039.js",
+  "thread-scroll-controller-context-value": "thread-scroll-controller-context-value-144c8345e935.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -29,4 +30,5 @@ export const CHUNKS = {
 export const REWRITTEN = new Set([
   "rpc",
   "thread-virtualizer",
+  "thread-scroll-controller-context-value",
 ]);
