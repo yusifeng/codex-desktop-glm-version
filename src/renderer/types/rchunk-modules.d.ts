@@ -2238,3 +2238,53 @@ declare module "@rchunk/keyboard-shortcuts-search-input" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/about-you-summary" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chatgpt-user-context" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chronicle-service-queries" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chronicle-settings" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/memory-manager-gate" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/saved-memories" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/settings-host-dropdown" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/settings-loading-row" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/personalization-state" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/virtual-try-on" {
+  const _default: unknown;
+  export default _default;
+}
