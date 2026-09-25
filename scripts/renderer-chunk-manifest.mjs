@@ -21,10 +21,12 @@ export const CHUNKS = {
   "app-main": "app-main-be230e7e4f5a.js",
   "index-entry": "index-e0f46c018fe4.js",
   "rpc": "rpc-971deaddf2c2.js",
+  "thread-virtualizer": "thread-virtualizer-e1964ca5c039.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
   "rpc",
+  "thread-virtualizer",
 ]);
