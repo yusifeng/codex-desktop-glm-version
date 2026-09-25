@@ -8,6 +8,8 @@
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs --check",
     "typecheck": "tsc --noEmit",
+    "build-renderer": "node scripts/build-renderer.mjs",
+    "verify-renderer": "node scripts/verify-renderer.mjs",
     "verify": "node scripts/verify-chunks.mjs",
     "pack": "./scripts/pack.sh",
     "setup": "./scripts/setup-shell.sh",
