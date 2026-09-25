@@ -1,0 +1,514 @@
+[
+ {
+  "line": 96418,
+  "method": "workspace-root-options"
+ },
+ {
+  "line": 96425,
+  "method": "electron-clone-workspace-repo"
+ },
+ {
+  "line": 96430,
+  "method": "worktree-create-managed"
+ },
+ {
+  "line": 96444,
+  "method": "worktree-delete"
+ },
+ {
+  "line": 96447,
+  "method": "worktree-set-owner-thread"
+ },
+ {
+  "line": 96450,
+  "method": "codex-home"
+ },
+ {
+  "line": 96451,
+  "method": "projectless-thread-cwd"
+ },
+ {
+  "line": 96458,
+  "method": "projectless-workspace-root"
+ },
+ {
+  "line": 96470,
+  "method": "home-directory"
+ },
+ {
+  "line": 96471,
+  "method": "auto-deny-some-permissions"
+ },
+ {
+  "line": 96482,
+  "method": "download-internal-plugins"
+ },
+ {
+  "line": 96498,
+  "method": "app-connect-oauth-callback-url"
+ },
+ {
+  "line": 96501,
+  "method": "fast-mode-rollout-metrics"
+ },
+ {
+  "line": 96503,
+  "method": "refresh-remote-connections"
+ },
+ {
+  "line": 96505,
+  "method": "discover-remote-ssh-connections"
+ },
+ {
+  "line": 96507,
+  "method": "refresh-remote-control-connections"
+ },
+ {
+  "line": 96509,
+  "method": "rename-remote-control-environment"
+ },
+ {
+  "line": 96511,
+  "method": "delete-remote-control-environment"
+ },
+ {
+  "line": 96513,
+  "method": "authorize-remote-control-connections"
+ },
+ {
+  "line": 96515,
+  "method": "set-remote-control-connections-enabled"
+ },
+ {
+  "line": 96523,
+  "method": "set-remote-wsl-connections-enabled"
+ },
+ {
+  "line": 96530,
+  "method": "set-local-remote-control-enabled"
+ },
+ {
+  "line": 96537,
+  "method": "save-codex-managed-remote-ssh-connections"
+ },
+ {
+  "line": 96539,
+  "method": "set-remote-connection-auto-connect"
+ },
+ {
+  "line": 96541,
+  "method": "install-remote-codex"
+ },
+ {
+  "line": 96543,
+  "method": "start-remote-chatgpt-login-port-forward"
+ },
+ {
+  "line": 96545,
+  "method": "stop-remote-chatgpt-login-port-forward"
+ },
+ {
+  "line": 96547,
+  "method": "app-server-connection-state"
+ },
+ {
+  "line": 96549,
+  "method": "remote-workspace-directory-entries"
+ },
+ {
+  "line": 96554,
+  "method": "workspace-directory-entries"
+ },
+ {
+  "line": 96578,
+  "method": "has-custom-cli-executable"
+ },
+ {
+  "line": 96582,
+  "method": "account-info"
+ },
+ {
+  "line": 96583,
+  "method": "email-domain-mail-provider"
+ },
+ {
+  "line": 96584,
+  "method": "third-party-notices"
+ },
+ {
+  "line": 96585,
+  "method": "locale-info"
+ },
+ {
+  "line": 96589,
+  "method": "os-info"
+ },
+ {
+  "line": 96598,
+  "method": "wsl-bash-availability"
+ },
+ {
+  "line": 96599,
+  "method": "browser-browsing-data-clear"
+ },
+ {
+  "line": 96602,
+  "method": "browser-use-origin-state-read"
+ },
+ {
+  "line": 96603,
+  "method": "browser-use-approval-mode-write"
+ },
+ {
+  "line": 96607,
+  "method": "browser-use-history-approval-mode-write"
+ },
+ {
+  "line": 96611,
+  "method": "browser-use-file-transfer-approval-mode-write"
+ },
+ {
+  "line": 96615,
+  "method": "browser-use-full-cdp-access-enabled-write"
+ },
+ {
+  "line": 96617,
+  "method": "node-repl-active-execs-kill"
+ },
+ {
+  "line": 96619,
+  "method": "is-packaged"
+ },
+ {
+  "line": 96620,
+  "method": "global-dictation-hotkey-state"
+ },
+ {
+  "line": 96621,
+  "method": "global-dictation-set-hotkey"
+ },
+ {
+  "line": 96632,
+  "method": "global-dictation-set-toggle-hotkey"
+ },
+ {
+  "line": 96643,
+  "method": "codex-command-keymap-state"
+ },
+ {
+  "line": 96660,
+  "method": "set-codex-command-keybinding"
+ },
+ {
+  "line": 96691,
+  "method": "reset-codex-command-keybindings"
+ },
+ {
+  "line": 96712,
+  "method": "feedback-desktop-log-archive"
+ },
+ {
+  "line": 96736,
+  "method": "delete-feedback-desktop-log-archive"
+ },
+ {
+  "line": 96737,
+  "method": "openai-api-key"
+ },
+ {
+  "line": 96738,
+  "method": "recommended-skills"
+ },
+ {
+  "line": 96747,
+  "method": "local-custom-agents"
+ },
+ {
+  "line": 96749,
+  "method": "install-recommended-skill"
+ },
+ {
+  "line": 96783,
+  "method": "remove-skill"
+ },
+ {
+  "line": 96796,
+  "method": "read-file"
+ },
+ {
+  "line": 96801,
+  "method": "read-file-metadata"
+ },
+ {
+  "line": 96802,
+  "method": "write-file"
+ },
+ {
+  "line": 96818,
+  "method": "ensure-directory"
+ },
+ {
+  "line": 96819,
+  "method": "read-file-binary"
+ },
+ {
+  "line": 96820,
+  "method": "upload-local-file-over-sftp"
+ },
+ {
+  "line": 96821,
+  "method": "compile-latex-artifact"
+ },
+ {
+  "line": 96830,
+  "method": "read-git-file-binary"
+ },
+ {
+  "line": 96844,
+  "method": "codex-agents-md"
+ },
+ {
+  "line": 96845,
+  "method": "codex-agents-md-save"
+ },
+ {
+  "line": 96847,
+  "method": "generate-commit-message"
+ },
+ {
+  "line": 96871,
+  "method": "generate-commit-pull-request-message"
+ },
+ {
+  "line": 96899,
+  "method": "generate-pull-request-message"
+ },
+ {
+  "line": 96916,
+  "method": "inbox-items"
+ },
+ {
+  "line": 96917,
+  "method": "list-automations"
+ },
+ {
+  "line": 96924,
+  "method": "ambient-suggestions"
+ },
+ {
+  "line": 96929,
+  "method": "ambient-suggestions-refresh"
+ },
+ {
+  "line": 96966,
+  "method": "ambient-suggestion-set-status"
+ },
+ {
+  "line": 96986,
+  "method": "developer-instructions"
+ },
+ {
+  "line": 97009,
+  "method": "automation-run-archive"
+ },
+ {
+  "line": 97033,
+  "method": "automation-run-delete"
+ },
+ {
+  "line": 97040,
+  "method": "delete-archived-thread"
+ },
+ {
+  "line": 97045,
+  "method": "delete-all-archived-threads"
+ },
+ {
+  "line": 97050,
+  "method": "list-pinned-threads"
+ },
+ {
+  "line": 97051,
+  "method": "set-thread-pinned"
+ },
+ {
+  "line": 97052,
+  "method": "set-pinned-threads-order"
+ },
+ {
+  "line": 97053,
+  "method": "automation-create"
+ },
+ {
+  "line": 97054,
+  "method": "automation-update"
+ },
+ {
+  "line": 97055,
+  "method": "automation-delete"
+ },
+ {
+  "line": 97056,
+  "method": "automation-run-now"
+ },
+ {
+  "line": 97085,
+  "method": "find-files"
+ },
+ {
+  "line": 97095,
+  "method": "paths-exist"
+ },
+ {
+  "line": 97103,
+  "method": "claude-code-import-status"
+ },
+ {
+  "line": 97105,
+  "method": "external-agent-imported-connectors"
+ },
+ {
+  "line": 97145,
+  "method": "local-environment-config"
+ },
+ {
+  "line": 97161,
+  "method": "local-environment-config-save"
+ },
+ {
+  "line": 97172,
+  "method": "is-copilot-api-available"
+ },
+ {
+  "line": 97173,
+  "method": "get-copilot-api-proxy-info"
+ },
+ {
+  "line": 97174,
+  "method": "get-global-state"
+ },
+ {
+  "line": 97175,
+  "method": "set-global-state"
+ },
+ {
+  "line": 97181,
+  "method": "queued-follow-up-send-lock-acquire"
+ },
+ {
+  "line": 97192,
+  "method": "queued-follow-up-send-lock-release"
+ },
+ {
+  "line": 97205,
+  "method": "get-configuration"
+ },
+ {
+  "line": 97206,
+  "method": "set-configuration"
+ },
+ {
+  "line": 97210,
+  "method": "get-setting"
+ },
+ {
+  "line": 97211,
+  "method": "get-settings"
+ },
+ {
+  "line": 97215,
+  "method": "set-setting"
+ },
+ {
+  "line": 97219,
+  "method": "settings-read"
+ },
+ {
+  "line": 97223,
+  "method": "settings-write"
+ },
+ {
+  "line": 97227,
+  "method": "apply-patch"
+ },
+ {
+  "line": 97238,
+  "method": "mcp-codex-config"
+ },
+ {
+  "line": 97239,
+  "method": "worktree-shell-environment-config"
+ },
+ {
+  "line": 97241,
+  "method": "pick-file"
+ },
+ {
+  "line": 97244,
+  "method": "pick-files"
+ },
+ {
+  "line": 97259,
+  "method": "save-file"
+ },
+ {
+  "line": 97277,
+  "method": "add-context-file"
+ },
+ {
+  "line": 97288,
+  "method": "git-origins"
+ },
+ {
+  "line": 97289,
+  "method": "git-push"
+ },
+ {
+  "line": 97299,
+  "method": "git-create-branch"
+ },
+ {
+  "line": 97309,
+  "method": "git-checkout-branch"
+ },
+ {
+  "line": 97319,
+  "method": "git-merge-base"
+ },
+ {
+  "line": 97335,
+  "method": "prepare-worktree-snapshot"
+ },
+ {
+  "line": 97348,
+  "method": "upload-worktree-snapshot"
+ },
+ {
+  "line": 97366,
+  "method": "set-vs-context"
+ },
+ {
+  "line": 97369,
+  "method": "native-desktop-apps"
+ },
+ {
+  "line": 97370,
+  "method": "native-desktop-app-by-bundle-id"
+ },
+ {
+  "line": 97373,
+  "method": "computer-use-frontmost-window"
+ },
+ {
+  "line": 97381,
+  "method": "computer-use-start-capture"
+ },
+ {
+  "line": 97427,
+  "method": "native-desktop-app-icon"
+ },
+ {
+  "line": 97428,
+  "method": "computer-use-native-desktop-app-icon"
+ }
+]
