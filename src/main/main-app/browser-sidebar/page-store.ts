@@ -34,6 +34,7 @@ import {
 } from "@chunk/shared";
 import { memoizedTaggedLogger } from "@chunk/logger";
 import { bn as browserTabIdOf, hn as intlFormatter } from "@chunk/bootstrap";
+import { matchesLoadError } from "./error-pages";
 
 const logger = memoizedTaggedLogger("browser-sidebar-page-store");
 const managerLogger = memoizedTaggedLogger("browser-sidebar-manager");
@@ -178,19 +179,13 @@ export function effectiveUrl(page: { pendingUrl: string; url: string }): string 
   return page.pendingUrl.length > 0 && page.pendingUrl !== page.url ? page.pendingUrl : page.url;
 }
 
-/** 错误页 hash 剥离（原 `IU`）。 */
-function errorPageCanonicalUrl(url: string): string | null {
-  const [withoutHash] = url.split("#", 1);
-  return withoutHash.length > 0 ? withoutHash : null;
-}
-
-/** 错误页匹配（原 `FU`）：pageUrl 全等或去 hash 后相等。 */
-function matchesLoadError(error: { pageUrl: string } | null, url: string): boolean {
-  if (error == null) return false;
-  if (url === error.pageUrl) return true;
-  const urlCanonical = errorPageCanonicalUrl(url);
-  const errorCanonical = errorPageCanonicalUrl(error.pageUrl);
-  return urlCanonical != null && errorCanonical != null && urlCanonical === errorCanonical;
+/** 查找 URL 对应的错误页（原 `$U`）：data: URL 按 hash 匹配。 */
+function findLoadError(page: Pick<BrowserTabViewLike, "errorPagesByUrl" | "loadError">, url: string): LoadErrorRecord | null {
+  if (matchesLoadError(page.loadError, url)) return page.loadError;
+  const exact = page.errorPagesByUrl.get(url);
+  if (exact != null || !url.startsWith("data:")) return exact ?? null;
+  for (const error of page.errorPagesByUrl.values()) if (matchesLoadError(error, url)) return error;
+  return null;
 }
 
 /** 数值钳制（原 `iW`）。 */
@@ -258,15 +253,6 @@ export interface ElectronWebContentsLike {
     getAllEntries(): Array<{ pageState?: string; title: string; url: string }>;
     getActiveIndex(): number;
   } | null;
-}
-
-/** 查找 URL 对应的错误页（原 `$U`）：data: URL 按 hash 匹配。 */
-function findLoadError(page: Pick<BrowserTabViewLike, "errorPagesByUrl" | "loadError">, url: string): LoadErrorRecord | null {
-  if (matchesLoadError(page.loadError, url)) return page.loadError;
-  const exact = page.errorPagesByUrl.get(url);
-  if (exact != null || !url.startsWith("data:")) return exact ?? null;
-  for (const error of page.errorPagesByUrl.values()) if (matchesLoadError(error, url)) return error;
-  return null;
 }
 
 /** 单条目导航（原 `oW`）。 */
