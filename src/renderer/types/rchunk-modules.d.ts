@@ -30,6 +30,9 @@ declare module "@rchunk/app-initial" {
   export const hnt: () => Promise<void>; // initializeAppHostServices
   export const mnt: () => void; // 懒初始化器（遥测/基础设施装配）
   export const pnt: unknown; // appServices：已解析的服务集合
+  // scroll-to-match 依赖：CUt=查找器装配器 xUt=matchId 元素查找器
+  export const CUt: unknown;
+  export const xUt: unknown;
   export const _any: any;
 }
 
