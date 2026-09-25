@@ -2123,3 +2123,53 @@ declare module "@rchunk/file-diff-alt" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/security-browser" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-client" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/linked-app-logo" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-shared" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-src" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-tabs" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/confirmation" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/history" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/order-yubikey-dialog" {
+  const _default: unknown;
+  export default _default;
+}
