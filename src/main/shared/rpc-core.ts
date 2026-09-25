@@ -59,7 +59,7 @@ export class AbortableFetchDispatcher {
       options: Record<string, unknown>,
       signal: AbortSignal,
       context: unknown,
-    ) => Promise<{ response?: Response } | Record<string, unknown>>,
+    ) => Promise<Record<string, unknown>>,
   ) {}
 
   async fetch(url: string, options: Record<string, unknown>, context: unknown): Promise<Record<string, unknown>> {
@@ -67,8 +67,8 @@ export class AbortableFetchDispatcher {
     this.controllers.set(url, controller);
     let onBodyComplete: () => void = () => this.controllers.delete(url);
     try {
-      const result = await this.fetchImpl(url, options, controller.signal, context);
-      if ("response" in result && result.response != null && result.response.body != null) {
+      const result = (await this.fetchImpl(url, options, controller.signal, context)) as { response?: Response } & Record<string, unknown>;
+      if (result.response != null && result.response.body != null) {
         const { readable, writable } = new TransformStream();
         void result.response.body.pipeTo(writable, { signal: controller.signal }).catch(() => {}).finally(onBodyComplete);
         return { response: new Response(readable, { status: result.response.status, statusText: result.response.statusText, headers: result.response.headers }) };
