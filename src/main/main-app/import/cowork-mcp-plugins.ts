@@ -66,7 +66,7 @@ import { stringifyToml } from "../misc/env-toml-stringifier";
 // ---------------------------------------------------------------------------
 
 /** 宿主路径映射（原 `oF`：callbacks.pathForCodexHost）。 */
-function hostPath(callbacks: ImportCallbacks, path: string): string {
+function hostPath(callbacks: { pathForCodexHost?(path: string): string }, path: string): string {
   return callbacks.pathForCodexHost?.(path) ?? path;
 }
 
@@ -572,7 +572,7 @@ async function writeMarketplaceManifest({ codexHome, plugins }: { codexHome: str
 }
 
 /** 市场注册（原 `nF`）：扫描 → 写 manifest → addMarketplace。 */
-async function registerPluginMarketplace({ callbacks, codexHome }: { callbacks: ImportCallbacks; codexHome: string }): Promise<void> {
+async function registerPluginMarketplace({ callbacks, codexHome }: { callbacks: Pick<ImportCallbacks, "addMarketplace" | "pathForCodexHost">; codexHome: string }): Promise<void> {
   const plugins = await listInstalledPlugins(codexHome);
   if (plugins.length === 0) return;
   const marketplaceRoot = await writeMarketplaceManifest({ codexHome, plugins });
@@ -599,12 +599,7 @@ export interface ImportCallbacks {
   recordProjectlessThread?(request: { outputDirectory: string; threadId: string; workspaceRoot: string }): Promise<void>;
   reportSessionImportError?(report: { error: unknown; session: PreparedRollout | TranscriptCandidate }): void;
   pathForCodexHost?(path: string): string;
-  createProjectlessThreadPaths?(candidate: {
-    projectRoot: string;
-    sourceId: string;
-    title: string | null;
-    workspaceKind: string;
-  }): Promise<{ cwd: string; outputDirectory: string; workspaceRoot: string }>;
+  createProjectlessThreadPaths?(candidate: { title: string | null }): Promise<{ cwd: string; outputDirectory: string; workspaceRoot: string }>;
 }
 
 export interface PreparedRollout {

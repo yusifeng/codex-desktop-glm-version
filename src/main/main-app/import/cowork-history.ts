@@ -515,7 +515,7 @@ async function writeCodexConfigToml(path: string, config: Record<string, unknown
 }
 
 /** space 配置路径映射（原 `UMe`）。 */
-function mapSpaceConfig<T>(space: { spaceConfigPath: string; sourceFolders: string[] }, mapPath: (path: string) => T): { spaceConfigPath: T; sourceFolders: T[] } {
+function mapSpaceConfig<S extends { spaceConfigPath: string; sourceFolders: string[] }>(space: S, mapPath: (path: string) => string): S {
   return {
     ...space,
     spaceConfigPath: mapPath(space.spaceConfigPath),

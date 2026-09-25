@@ -1367,8 +1367,10 @@ export interface PlanItem {
     commands: unknown[];
     hooks: unknown[];
     mcpServers: unknown[];
-    plugins: Array<{ name: string }>;
+    /** 内部计划为扁平 {name} 形态；detect 线上格式为 {marketplaceName, pluginNames}。 */
+    plugins: Array<{ name: string } | { marketplaceName: string; pluginNames: string[] }>;
     sessions: Array<{ cwd: string; path: string; title: string | null; workspaceKind?: string }>;
+    skills?: unknown[];
     subagents: unknown[];
   } | null;
   itemType: "CONFIG" | "PLUGINS" | "AGENTS_MD" | "SESSIONS";

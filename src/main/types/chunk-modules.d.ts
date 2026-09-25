@@ -23,7 +23,7 @@ declare module "@chunk/desktop-open-path-queue" {
 declare module "@chunk/logger" {
   export interface LogTags {
     safe: Record<string, unknown>;
-    sensitive: Record<string, unknown>;
+    sensitive?: Record<string, unknown>;
   }
   export type LogLevel = "trace" | "debug" | "info" | "warning" | "error";
   export interface Logger {

@@ -990,7 +990,7 @@ function selectionLimits(limits: ImportLimits | undefined) {
 }
 
 /** items 的项目 cwd 列表（原 `vI`/`TF`）。 */
-function itemCwds(items: MigrationItem[]): string[] {
+export function itemCwds(items: MigrationItem[]): string[] {
   return [
     ...new Set(
       items.flatMap((item) => [
@@ -1680,7 +1680,7 @@ function selectedPluginKeys(items: MigrationItem[]): Set<string> {
         const sourcePath = item.sourcePath;
         return sourcePath == null || sourcePath === ""
           ? []
-          : (item.details?.plugins ?? []).flatMap((plugin) => [`${sourcePath}${plugin.name}`]);
+          : (item.details?.plugins ?? []).flatMap((plugin) => [`${sourcePath}${(plugin as { name: string }).name}`]);
       }),
   );
 }
