@@ -63,14 +63,14 @@ function scrollToMatch({
   }
   return new Promise<void>((resolve) => {
     let rafId: number | null = null;
-    let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
+    let timeoutId: number | null = null;
     const cleanup = () => {
       if (rafId != null) {
         window.cancelAnimationFrame(rafId);
         rafId = null;
       }
       if (timeoutId != null) {
-        window.clearTimeout(timeoutId);
+        window.clearTimeout(timeoutId as unknown as ReturnType<typeof window.setTimeout>);
         timeoutId = null;
       }
       signal?.removeEventListener("abort", onAbort);
@@ -98,7 +98,7 @@ function scrollToMatch({
     signal?.addEventListener("abort", onAbort, { once: true });
     timeoutId = window.setTimeout(() => {
       settle();
-    }, timeoutMs);
+    }, timeoutMs) as unknown as number;
     rafId = window.requestAnimationFrame(poll);
   });
 }
