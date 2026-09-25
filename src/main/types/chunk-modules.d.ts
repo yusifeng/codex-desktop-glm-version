@@ -81,13 +81,13 @@ declare module "@chunk/shared" {
   export const Ao: any; // 内部符号: gO
   export const Ar: any; // 内部符号: LB
   export const As: any; // 内部符号: IT
-  export const At: any; // 内部符号: U6
+  export { acceleratorsForCommand as At } from "../../shared/command-registry";
   export const Au: any; // 内部符号: Ly
   export const B: any; // 内部符号: Yae
   export const Ba: any; // 内部符号: zA
   export const Bc: any; // 内部符号: XS
   export const Bd: any; // 内部符号: Zg
-  export const Bf: any; // 内部符号: mt
+  export { AbortableFetchDispatcher as Bf } from "../../shared/rpc-core";
   export const Bi: any; // 内部符号: Bj
   export const Bl: any; // 内部符号: Lb
   export const Bn: any; // 内部符号: fY
@@ -110,7 +110,7 @@ declare module "@chunk/shared" {
   export const Co: any; // 内部符号: Mk
   export const Cr: any; // 内部符号: cB
   export const Cs: any; // 内部符号: ET
-  export const Ct: any; // 内部符号: n8
+  export { readKeymapSync as Ct } from "../../shared/command-registry";
   export const Cu: any; // 内部符号: Xy
   export const D: any; // 内部符号: cse
   export const Da: any; // 内部符号: tj
@@ -123,7 +123,7 @@ declare module "@chunk/shared" {
   export const Do: any; // 内部符号: TO
   export const Dr: any; // 内部符号: mB
   export const Ds: any; // 内部符号: jT
-  export const Dt: any; // 内部符号: j6
+  export { WEBVIEW_THREAD_COMMANDS as Dt } from "../../shared/command-registry";
   export const Du: any; // 内部符号: Py
   export const E: any; // 内部符号: _se
   export const Ea: any; // 内部符号: ej
@@ -136,7 +136,7 @@ declare module "@chunk/shared" {
   export const Eo: any; // 内部符号: PO
   export const Er: any; // 内部符号: kB
   export const Es: any; // 内部符号: LT
-  export const Et: any; // 内部符号: M6
+  export { WEBVIEW_FOCUS_TAB_COMMANDS as Et } from "../../shared/command-registry";
   export const Eu: any; // 内部符号: Jy
   export const F: any; // 内部符号: T7
   export const Fa: any; // 内部符号: qA
@@ -149,7 +149,7 @@ declare module "@chunk/shared" {
   export const Fo: any; // 内部符号: HD
   export const Fr: any; // 内部符号: CB
   export const Fs: any; // 内部符号: bT
-  export const Ft: any; // 内部符号: E6
+  export { COMMAND_DEFINITIONS as Ft } from "../../shared/command-registry";
   export const Fu: any; // 内部符号: Oy
   export const G: any; // 内部符号: k5
   export const Ga: any; // 内部符号: kA
@@ -167,7 +167,7 @@ declare module "@chunk/shared" {
   export const Ha: any; // 内部符号: LA
   export const Hc: any; // 内部符号: yS
   export const Hd: any; // 内部符号: Ug
-  export const Hf: any; // 内部符号: lt
+  export { RpcStubLike as Hf } from "../../shared/rpc-core";
   export const Hi: any; // 内部符号: lre
   export const Hl: any; // 内部符号: Bb
   export const Hn: any; // 内部符号: dY
@@ -237,7 +237,7 @@ declare module "@chunk/shared" {
   export const Mo: any; // 内部符号: nO
   export const Mr: any; // 内部符号: pB
   export const Ms: any; // 内部符号: xT
-  export const Mt: any; // 内部符号: W6
+  export { menuTitleForCommand as Mt } from "../../shared/command-registry";
   export const Mu: any; // 内部符号: zy
   export const N: any; // 内部符号: Doe
   export const Na: any; // 内部符号: YA
@@ -250,7 +250,7 @@ declare module "@chunk/shared" {
   export const No: any; // 内部符号: JD
   export const Nr: any; // 内部符号: SB
   export const Ns: any; // 内部符号: CT
-  export const Nt: any; // 内部符号: I6
+  export { commandAvailableForAccess as Nt } from "../../shared/command-registry";
   export const Nu: any; // 内部符号: Cy
   export const O: any; // 内部符号: ise
   export const Oa: any; // 内部符号: Ane
@@ -263,7 +263,7 @@ declare module "@chunk/shared" {
   export const Oo: any; // 内部符号: wO
   export const Or: any; // 内部符号: uB
   export const Os: any; // 内部符号: FT
-  export const Ot: any; // 内部符号: N6
+  export { findCommandDefinition as Ot } from "../../shared/command-registry";
   export const Ou: any; // 内部符号: Yy
   export const P: any; // 内部符号: Ooe
   export const Pa: any; // 内部符号: JA
@@ -276,7 +276,7 @@ declare module "@chunk/shared" {
   export const Po: any; // 内部符号: GD
   export const Pr: any; // 内部符号: KB
   export const Ps: any; // 内部符号: ST
-  export const Pt: any; // 内部符号: z6
+  export { isMouseAccelerator as Pt } from "../../shared/command-registry";
   export const Pu: any; // 内部符号: ky
   export const Q: any; // 内部符号: l5
   export const Qa: any; // 内部符号: tA
@@ -314,7 +314,7 @@ declare module "@chunk/shared" {
   export const So: any; // 内部符号: kk
   export const Sr: any; // 内部符号: dB
   export const Ss: any; // 内部符号: AT
-  export const St: any; // 内部符号: t8
+  export { readKeymap as St } from "../../shared/command-registry";
   export const Su: any; // 内部符号: Uy
   export const T: any; // 内部符号: Dse
   export const Ta: any; // 内部符号: nj
@@ -327,13 +327,13 @@ declare module "@chunk/shared" {
   export const To: any; // 内部符号: WO
   export const Tr: any; // 内部符号: AB
   export const Ts: any; // 内部符号: PT
-  export const Tt: any; // 内部符号: s8
+  export { updateKeymapBinding as Tt } from "../../shared/command-registry";
   export const Tu: any; // 内部符号: Ry
   export const U: any; // 内部符号: B5
   export const Ua: any; // 内部符号: FA
   export const Uc: any; // 内部符号: hS
   export const Ud: any; // 内部符号: Hg
-  export const Uf: any; // 内部符号: dt
+  export { RpcTarget as Uf } from "../../shared/rpc-core";
   export const Ui: any; // 内部符号: Ij
   export const Ul: any; // 内部符号: _ne
   export const Un: any; // 内部符号: tY
@@ -346,7 +346,7 @@ declare module "@chunk/shared" {
   export const Va: any; // 内部符号: RA
   export const Vc: any; // 内部符号: uS
   export const Vd: any; // 内部符号: Xg
-  export const Vf: any; // 内部符号: ut
+  export { RpcConnectionLike as Vf } from "../../shared/rpc-core";
   export const Vi: any; // 内部符号: Rj
   export const Vl: any; // 内部符号: Eb
   export const Vn: any; // 内部符号: mY
@@ -359,7 +359,7 @@ declare module "@chunk/shared" {
   export const Wa: any; // 内部符号: PA
   export const Wc: any; // 内部符号: _S
   export const Wd: any; // 内部符号: Rg
-  export const Wf: any; // 内部符号: ft
+  export { connectRpc as Wf } from "../../shared/rpc-core";
   export const Wi: any; // 内部符号: Pj
   export const Wl: any; // 内部符号: Rb
   export const Wn: any; // 内部符号: XJ
@@ -441,7 +441,7 @@ declare module "@chunk/shared" {
   export const bo: any; // 内部符号: Vk
   export const br: any; // 内部符号: UB
   export const bs: any; // 内部符号: OT
-  export const bt: any; // 内部符号: a8
+  export { firstAcceleratorSync as bt } from "../../shared/command-registry";
   export const bu: any; // 内部符号: Wy
   export const c: any; // 内部符号: Ace
   export const ca: any; // 内部符号: Xne
@@ -547,7 +547,7 @@ declare module "@chunk/shared" {
   export const jo: any; // 内部符号: lO
   export const jr: any; // 内部符号: GB
   export const js: any; // 内部符号: gT
-  export const jt: any; // 内部符号: V6
+  export { defaultAcceleratorsForCommand as jt } from "../../shared/command-registry";
   export const ju: any; // 内部符号: Iy
   export const k: any; // 内部符号: Uoe
   export const ka: any; // 内部符号: $A
@@ -560,7 +560,7 @@ declare module "@chunk/shared" {
   export const ko: any; // 内部符号: xO
   export const kr: any; // 内部符号: jB
   export const ks: any; // 内部符号: MT
-  export const kt: any; // 内部符号: H6
+  export { firstAcceleratorForCommand as kt } from "../../shared/command-registry";
   export const ku: any; // 内部符号: By
   export const l: any; // 内部符号: T9
   export const la: any; // 内部符号: pj
@@ -719,7 +719,7 @@ declare module "@chunk/shared" {
   export const wo: any; // 内部符号: JO
   export const wr: any; // 内部符号: MB
   export const ws: any; // 内部符号: NT
-  export const wt: any; // 内部符号: c8
+  export { resetKeybindings as wt } from "../../shared/command-registry";
   export const wu: any; // 内部符号: jy
   export const x: any; // 内部符号: Ise
   export const xa: any; // 内部符号: Vne
@@ -732,7 +732,7 @@ declare module "@chunk/shared" {
   export const xo: any; // 内部符号: Fk
   export const xr: any; // 内部符号: RB
   export const xs: any; // 内部符号: kT
-  export const xt: any; // 内部符号: o8
+  export { acceleratorsForCommandSync as xt } from "../../shared/command-registry";
   export const xu: any; // 内部符号: Zy
   export const y: any; // 内部符号: s9
   export const ya: any; // 内部符号: cj
@@ -751,7 +751,7 @@ declare module "@chunk/shared" {
   export const za: any; // 内部符号: VA
   export const zc: any; // 内部符号: qS
   export const zd: any; // 内部符号: Qg
-  export const zf: any; // 内部符号: tn
+  export { ABORTED as zf } from "../../shared/rpc-core";
   export const zi: any; // 内部符号: pre
   export const zl: any; // 内部符号: Ib
   export const zn: any; // 内部符号: gY
