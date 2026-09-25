@@ -25,6 +25,7 @@ export const CHUNKS = {
   "thread-scroll-controller-context-value": "thread-scroll-controller-context-value-144c8345e935.js",
   "scroll-to-match": "scroll-to-match-baaa6728db7d.js",
   "virtualized-turn-list": "virtualized-turn-list-a260a21e3c40.js",
+  "conversation-markdown": "conversation-markdown-8421317d1640.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -35,4 +36,5 @@ export const REWRITTEN = new Set([
   "thread-scroll-controller-context-value",
   "scroll-to-match",
   "virtualized-turn-list",
+  "conversation-markdown",
 ]);

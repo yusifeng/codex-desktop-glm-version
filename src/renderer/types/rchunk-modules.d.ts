@@ -53,6 +53,7 @@ declare module "@rchunk/app-shared" {
   export const t$: unknown;
   export const x_: unknown; // useIconScaleContext（_3）
   export const y_: unknown;
+  export const zI: unknown;
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
   // 导出面（数千个压缩名）待 renderer-app-shared-analysis.md 完成后语义化。
   // 目前以 any 占位，重写完成后本声明会移除（源码直接导出真类型）。
@@ -82,6 +83,20 @@ declare module "@rchunk/app-main" {
 
 declare module "@rchunk/rpc" {
   export const _any: any;
+}
+
+declare module "@rchunk/split-items-into-render-groups" {
+  export const n: unknown;
+  export const t: unknown;
+}
+
+declare module "@rchunk/agent-activity-units" {
+  export const S: unknown;
+  export const c: unknown;
+  export const d: unknown;
+  export const f: unknown;
+  export const l: unknown;
+  export const r: unknown;
 }
 
 declare module "@rchunk/index-entry" {
