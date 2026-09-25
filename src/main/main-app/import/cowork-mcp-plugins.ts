@@ -18,7 +18,7 @@
 //     workspace-write
 //   - AGENTS.md 指令写入（HNe/_F）：已有导入标记时跳过
 import { readFile, writeFile, mkdir, readdir, rm, cp, stat } from "node:fs/promises";
-import { join, dirname, basename, relative, isAbsolute, win32, sep, resolve } from "node:path";
+import { join, dirname, basename, relative, isAbsolute, win32, sep, resolve, extname } from "node:path";
 import {
   wf as objectSchema,
   Of as stringSchema,
@@ -35,6 +35,7 @@ import {
   SEMVER_PATTERN,
   pluginManifestSchema,
   mcpServersFileSchema,
+  pluginListSchema,
   isPlainObject,
   nonEmptyString,
   errorMessage,
@@ -52,7 +53,13 @@ import {
   recordConnectorCandidates,
   normalizeName,
   pathsEqual,
+  filterExisting,
+  readCoworkSettings,
+  readMcpServerConfigs,
 } from "./cowork-history";
+import { scanProjectlessSpace } from "./cowork-discovery";
+import type { ProjectImportSelection, TranscriptCandidate } from "./cowork-transcripts";
+import { stringifyToml } from "../misc/env-toml-stringifier";
 
 // ---------------------------------------------------------------------------
 // 路径工具（原 `oF`/`sF`/`cF`/`gP`）
@@ -63,103 +70,10 @@ function hostPath(callbacks: ImportCallbacks, path: string): string {
   return callbacks.pathForCodexHost?.(path) ?? path;
 }
 
-/** 逐候选探测存在性（原 `sF`/`cF`）。 */
-async function filterExisting(paths: string[]): Promise<string[]> {
-  const exists = await Promise.all(paths.map((path) => pathExists(path)));
-  return paths.filter((_path, index) => exists[index]);
-}
-
 /** 候选目录的从属判定（原 `gP`：userDataDir 在 accountOrgDir 之下）。 */
 function isPathInsideDir(parent: string, child: string): boolean {
   const rel = relative(parent, child);
   return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
-}
-
-// ---------------------------------------------------------------------------
-// MCP 配置读取（原 `lF`/`SNe`/`uF`/`dF`/`fF`）
-// ---------------------------------------------------------------------------
-
-const mcpJsonValueSchema = recordSchema(stringSchema(), jsonSchema());
-
-/** cowork 设置合并（原 `lF`）：accountOrgDirs 倒序逐个合并。 */
-async function readCoworkSettings(accountOrgDirs: string[], warnings: string[]): Promise<Record<string, unknown>> {
-  const merged: Record<string, unknown> = {};
-  const existing = await filterExisting(
-    ["cowork_account_settings.json", "cowork_settings.json"].flatMap((filename) =>
-      [...accountOrgDirs].reverse().map((dir) => join(dir, filename)),
-    ),
-  );
-  const parsed = await Promise.all(existing.map(async (path) => ({ parsed: await readJsonFile(path, mcpJsonValueSchema as never), sourcePath: path })));
-  for (const { parsed: settings, sourcePath } of parsed) {
-    if (settings == null) {
-      warnings.push(`Could not read Cowork settings file: ${sourcePath}`);
-      continue;
-    }
-    Object.assign(merged, settings);
-  }
-  return merged;
-}
-
-/** MCP server 配置合并（原 `SNe`）：双源 + disabled 过滤 + 空名拒绝。 */
-async function readMcpServerConfigs(
-  project: { accountOrgDirs: string[]; userDataDirs: string[] },
-  warnings: string[],
-  settings: Record<string, unknown>,
-): Promise<Map<string, { config: Record<string, unknown>; sourcePath: string }>> {
-  const disabledNames = readDisabledServerNames(settings);
-  const servers = new Map<string, { config: Record<string, unknown>; sourcePath: string }>();
-  const seen = new Set<string>();
-  const configFiles = await readMcpConfigFiles(project);
-  for (const { parsed, sourcePath } of configFiles) {
-    if (parsed == null) {
-      warnings.push(`Could not read Cowork MCP config file: ${sourcePath}`);
-      continue;
-    }
-    const serverEntries = { ...(parsed.mcpServers as Record<string, unknown>), ...(parsed.mcp_servers as Record<string, unknown>) } as Record<string, Record<string, unknown>>;
-    for (const [name, config] of Object.entries(serverEntries)) {
-      const trimmed = name.trim();
-      if (trimmed === "") {
-        warnings.push(`Cowork MCP config ${sourcePath} had an empty server name`);
-        continue;
-      }
-      if (seen.has(trimmed)) continue;
-      seen.add(trimmed);
-      if (!isServerDisabled({ disabledServerNames: disabledNames, serverConfig: config, serverName: trimmed }))
-        servers.set(trimmed, { config, sourcePath });
-    }
-  }
-  return servers;
-}
-
-/** MCP 配置文件读取（原 `uF`）：org 目录的 mcp.json/mcp-servers.json + userData 的 claude_desktop_config。 */
-async function readMcpConfigFiles(project: { accountOrgDirs: string[]; userDataDirs: string[] }): Promise<Array<{ parsed: Record<string, unknown> | null; sourcePath: string }>> {
-  const paths = await filterExisting(
-    project.userDataDirs.flatMap((userDataDir) => {
-      const orgDir = project.accountOrgDirs.find((dir) => isPathInsideDir(dir, userDataDir));
-      return [
-        ...(orgDir == null ? [] : [join(orgDir, "mcp.json"), join(orgDir, "mcp-servers.json")]),
-        join(userDataDir, "claude_desktop_config.json"),
-      ];
-    }),
-  );
-  return Promise.all(paths.map(async (path) => ({ parsed: await readJsonFile(path, mcpServersFileSchema as never), sourcePath: path })));
-}
-
-/** disabled 名单（原 `dF`）。 */
-function readDisabledServerNames(settings: Record<string, unknown>): Set<string> {
-  const disabled = (settings.disabledMcpjsonServers ?? settings.disabledMcpServers) as unknown;
-  return Array.isArray(disabled)
-    ? new Set(
-        (disabled as unknown[])
-          .filter((name): name is string => typeof name == "string")
-          .map((name) => name.trim())
-          .filter((name) => name !== ""),
-      )
-    : new Set();
-}
-
-function isServerDisabled({ disabledServerNames, serverConfig, serverName }: { disabledServerNames: Set<string>; serverConfig: Record<string, unknown>; serverName: string }): boolean {
-  return disabledServerNames.has(serverName) || serverConfig.disabled === true || serverConfig.enabled === false;
 }
 
 // ---------------------------------------------------------------------------
@@ -683,8 +597,14 @@ export interface ImportCallbacks {
   addMarketplace(request: { source: string }): Promise<unknown>;
   setThreadName?(request: { name: string; threadId: string }): Promise<void>;
   recordProjectlessThread?(request: { outputDirectory: string; threadId: string; workspaceRoot: string }): Promise<void>;
-  reportSessionImportError?(report: { error: unknown; session: PreparedRollout }): void;
+  reportSessionImportError?(report: { error: unknown; session: PreparedRollout | TranscriptCandidate }): void;
   pathForCodexHost?(path: string): string;
+  createProjectlessThreadPaths?(candidate: {
+    projectRoot: string;
+    sourceId: string;
+    title: string | null;
+    workspaceKind: string;
+  }): Promise<{ cwd: string; outputDirectory: string; workspaceRoot: string }>;
 }
 
 export interface PreparedRollout {
@@ -864,6 +784,234 @@ async function importAccountSetup({ callbacks, codexHome, migration, pluginImpor
   } finally {
     releaseRolloutKeys(claimedKeys);
   }
+}
+
+// ---------------------------------------------------------------------------
+// 账号级 skills/agents 迁移（原 `aPe`/`oPe`/`sPe`/`cPe`/`SF`/`CF`/`lPe`）
+// ---------------------------------------------------------------------------
+
+/** 账号条目名清洗（原 `vF`）。 */
+function sanitizeAccountItemName(name: string): string {
+  return (
+    name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "cowork-item"
+  );
+}
+
+/** skill markdown 缺 frontmatter 时补写（原 `sPe`/`cPe`）。 */
+function ensureSkillFrontmatter({ content, name }: { content: string; name: string }): string {
+  const frontmatter = /^---\n([\s\S]*?)\n---\n?/.exec(content);
+  if (frontmatter != null && /\bname\s*:/.test(frontmatter[1]) && /\bdescription\s*:/.test(frontmatter[1])) return content;
+  return [
+    "---",
+    `name: ${JSON.stringify(name)}`,
+    `description: ${JSON.stringify(`Migrated Claude Cowork skill ${name}.`)}`,
+    "---",
+    "",
+    content.trim(),
+    "",
+  ].join("\n");
+}
+
+/** org 目录下 <key>/*.md 收集（原 `CF`）：文件名（win32 小写）去重。 */
+async function collectAccountMarkdown(accountOrgDirs: string[], key: string): Promise<string[]> {
+  const scanned = await Promise.all(
+    accountOrgDirs.map(async (orgDir) => ({
+      entries: await readdir(join(orgDir, key), { withFileTypes: true }).catch(() => []),
+      root: orgDir,
+    })),
+  );
+  const byName = new Map<string, string>();
+  for (const { entries, root } of scanned) {
+    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+      const nameKey = process.platform === "win32" ? entry.name.toLowerCase() : entry.name;
+      if (entry.isFile() && entry.name.endsWith(".md") && !byName.has(nameKey)) byName.set(nameKey, join(root, key, entry.name));
+    }
+  }
+  return [...byName.values()];
+}
+
+/** skills.json/agents.json 名称索引（原 `SF`）：name/id → 显示名，单条目时提供 fallback。 */
+async function readAccountNameIndex(accountOrgDirs: string[], count: number, key: string): Promise<Map<string, string>> {
+  const lists = await Promise.all(accountOrgDirs.map((orgDir) => readJsonFile(join(orgDir, `${key}.json`), pluginListSchema as never)));
+  const entries = lists.flatMap((list) =>
+    list == null ? [] : Array.isArray(list) ? list : (((list as Record<string, unknown>)[key] as unknown[] | undefined) ?? []),
+  );
+  const index = new Map<string, string>();
+  for (const entry of entries) {
+    if (!isPlainObject(entry)) continue;
+    const displayName = (entry.name as string | undefined) ?? (entry.id as string | undefined);
+    if (displayName == null) continue;
+    const pathValue = nonEmptyString(entry.path);
+    const nameKey = pathValue == null ? sanitizeAccountItemName(displayName) : basename(pathValue, extname(pathValue));
+    if (!index.has(nameKey)) index.set(nameKey, displayName);
+  }
+  if (entries.length === 1 && count === 1) {
+    const [only] = entries;
+    if (isPlainObject(only)) {
+      const displayName = (only.name as string | undefined) ?? (only.id as string | undefined);
+      if (displayName != null) index.set("fallback", displayName);
+    }
+  }
+  return index;
+}
+
+/** agent 显示名兜底（原 `lPe`）：分隔符切段首字母大写。 */
+function titleCaseAgentName(name: string): string {
+  const title = name
+    .split(/[-_]+/g)
+    .filter((part) => part !== "")
+    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
+  return title === "" ? "Cowork Agent" : title;
+}
+
+/** skills 迁移（原 `aPe`）：skills/*.md → codexHome/skills/<名>/SKILL.md + loose skill 目录拷贝。 */
+async function importAccountSkills({
+  codexHome,
+  copiedFiles,
+  projectImport,
+}: {
+  codexHome: string;
+  copiedFiles: string[];
+  projectImport: ProjectImportSelection;
+}): Promise<string[]> {
+  const { looseSkills } = await scanProjectlessSpace(projectImport.project);
+  const skillFiles = await collectAccountMarkdown(projectImport.project.accountOrgDirs, SKILLS_DIRNAME);
+  const nameIndex = await readAccountNameIndex(projectImport.project.accountOrgDirs, skillFiles.length, SKILLS_DIRNAME);
+  const targets = new Map<string, { skillName: string; sourcePath: string }>();
+  for (const sourcePath of skillFiles) {
+    const base = basename(sourcePath, extname(sourcePath));
+    const skillName = nameIndex.get(base) ?? nameIndex.get("fallback") ?? base;
+    const target = join(codexHome, SKILLS_DIRNAME, sanitizeAccountItemName(skillName), "SKILL.md");
+    if (!targets.has(target)) targets.set(target, { skillName, sourcePath });
+  }
+  const written = (
+    await Promise.all(
+      [...targets].map(async ([target, { skillName, sourcePath }]) => {
+        if (await isFile(target)) return null;
+        await writeTextFile(target, ensureSkillFrontmatter({ content: await readFile(sourcePath, "utf8"), name: skillName }));
+        copiedFiles.push(target);
+        return target;
+      }),
+    )
+  ).filter((path): path is string => path != null);
+  const copied = (
+    await Promise.all(
+      looseSkills.map(async (skill) => {
+        const target = join(codexHome, SKILLS_DIRNAME, sanitizeAccountItemName(basename(skill.skillRoot)));
+        const skillFile = join(target, "SKILL.md");
+        if (await isFile(skillFile)) return null;
+        await cp(skill.skillRoot, target, { recursive: true });
+        copiedFiles.push(skillFile);
+        return skillFile;
+      }),
+    )
+  ).filter((path): path is string => path != null);
+  return [...written, ...copied];
+}
+
+/** agents 迁移（原 `oPe`）：agents/*.md → codexHome/agents/<名>.toml。 */
+async function importAccountAgents({
+  codexHome,
+  copiedFiles,
+  projectImport,
+}: {
+  codexHome: string;
+  copiedFiles: string[];
+  projectImport: ProjectImportSelection;
+}): Promise<string[]> {
+  const agentFiles = await collectAccountMarkdown(projectImport.project.accountOrgDirs, "agents");
+  if (agentFiles.length === 0) return [];
+  const nameIndex = await readAccountNameIndex(projectImport.project.accountOrgDirs, agentFiles.length, "agents");
+  const targets = new Map<string, { agentName: string; sourcePath: string }>();
+  for (const sourcePath of agentFiles) {
+    const base = basename(sourcePath, extname(sourcePath));
+    const agentName = nameIndex.get(base) ?? nameIndex.get("fallback") ?? titleCaseAgentName(base);
+    const target = join(codexHome, "agents", `${sanitizeAccountItemName(agentName)}.toml`);
+    if (!targets.has(target)) targets.set(target, { agentName, sourcePath });
+  }
+  return (
+    await Promise.all(
+      [...targets].map(async ([target, { agentName, sourcePath }]) => {
+        if (await isFile(target)) return null;
+        const instructions = await readFile(sourcePath, "utf8");
+        await writeTextFile(
+          target,
+          stringifyToml({
+            name: agentName,
+            description: `Migrated Claude Cowork agent ${agentName}.`,
+            developer_instructions: instructions.trim(),
+          }),
+        );
+        copiedFiles.push(target);
+        return target;
+      }),
+    )
+  ).filter((path): path is string => path != null);
+}
+
+// ---------------------------------------------------------------------------
+// 项目导入准备（原 `uPe`/`dPe`）
+// ---------------------------------------------------------------------------
+
+/** 单项目的导入准备结果（原 `dPe` 返回值）。 */
+export interface ProjectImportPreparation {
+  agentsPath: string | null;
+  copiedFiles: string[];
+  importedMcpServerNames: string[];
+  liveConfigPaths: string[];
+  projectImport: ProjectImportSelection;
+  transcriptCandidates: TranscriptCandidate[];
+}
+
+/** 项目导入准备（原 `uPe`）：逐项目串行执行 MCP/skills/agents/AGENTS.md。 */
+export async function prepareProjectImports({
+  codexHome,
+  projects,
+}: {
+  codexHome: string;
+  projects: ProjectImportSelection[];
+}): Promise<{ projects: ProjectImportPreparation[] }> {
+  const prepared: ProjectImportPreparation[] = [];
+  for (const projectImport of projects) {
+    prepared.push(await prepareProjectImport({ codexHome, projectImport }));
+  }
+  return { projects: prepared };
+}
+
+async function prepareProjectImport({
+  codexHome,
+  projectImport,
+}: {
+  codexHome: string;
+  projectImport: ProjectImportSelection;
+}): Promise<ProjectImportPreparation> {
+  const copiedFiles: string[] = [];
+  const importedMcpServerNames: string[] = [];
+  const liveConfigPaths: string[] = [];
+  let agentsPath: string | null = null;
+  if (projectImport.accountSetupSelected) {
+    const mcp = await importMcpConfig({ codexHome, copiedFiles, projectImport });
+    importedMcpServerNames.push(...mcp.importedMcpServerNames);
+    liveConfigPaths.push(
+      ...mcp.liveConfigPaths,
+      ...(await importAccountSkills({ codexHome, copiedFiles, projectImport })),
+      ...(await importAccountAgents({ codexHome, copiedFiles, projectImport })),
+    );
+  }
+  if (projectImport.itemTypes.has("AGENTS_MD")) agentsPath = await appendImportedInstructions({ projectImport });
+  return {
+    agentsPath,
+    copiedFiles,
+    importedMcpServerNames,
+    liveConfigPaths,
+    projectImport,
+    transcriptCandidates: projectImport.itemTypes.has("SESSIONS") ? projectImport.transcriptCandidates : [],
+  };
 }
 
 export {

@@ -28,6 +28,7 @@ import {
   sessionSchema,
   sessionEntriesSchema,
   taskListSchema,
+  pluginManifestSchema,
   readJsonFile,
   readTextFile,
   walkFiles,
@@ -44,6 +45,7 @@ import {
   filterExisting,
   isServerDisabled,
   pathsEqual,
+  type BoundedReadResult,
 } from "./cowork-history";
 
 // ---------------------------------------------------------------------------
@@ -106,7 +108,7 @@ interface CoworkSpace {
   userSelectedFolders?: Array<string | { path: string }>;
 }
 
-interface SessionManifest {
+export interface SessionManifest {
   cliSessionIds: string[];
   cwd: string | null;
   detectedFiles: Array<{ fileName: string; hostPath: string; timestampMs: number | null }>;
@@ -122,11 +124,12 @@ interface SessionManifest {
 }
 
 export interface ConfigSurface {
-  kind: string;
+  kind: "agents" | "extensions" | "mcp" | "operon" | "plugins" | "settings" | "skills";
   path: string;
 }
 
 export interface PluginCandidate {
+  accountOrgDir: string;
   pluginName: string;
   pluginRoot: string;
   manifestPath: string;
@@ -138,7 +141,7 @@ interface LooseSkill {
   skillRoot: string;
 }
 
-interface ProjectlessScan {
+export interface ProjectlessScan {
   looseSkills: LooseSkill[];
   pluginBundles: PluginCandidate[];
 }
@@ -174,6 +177,7 @@ export interface ConfigSurfacesResult {
   projectlessSpaces: ProjectlessSpace[];
   projects: CoworkProject[];
   scheduledTasksByProjectRoot: Map<string, Array<{ id: string; name: string | null; sourcePath: string }>>;
+  sessionManifestsByProjectlessSpaceRoot: Map<string, SessionManifest[]>;
   sessionManifestsByProjectRoot: Map<string, SessionManifest[]>;
   skippedProjects: SkippedProject[];
   warnings: string[];
@@ -226,7 +230,7 @@ export interface DiscoveryBudget {
   };
 }
 
-function createDiscoveryBudget(): DiscoveryBudget {
+export function createDiscoveryBudget(): DiscoveryBudget {
   return {
     deadlineMs: Date.now() + SAFETY_LIMITS.durationMs,
     deferred: false,
@@ -241,7 +245,7 @@ function createDiscoveryBudget(): DiscoveryBudget {
 }
 
 /** 预算扣减（原 `zF`）：超时或额度耗尽置 deferred 并返回 false。 */
-function consumeBudget(budget: DiscoveryBudget, resource: keyof DiscoveryBudget["remaining"], cost = 0): boolean {
+export function consumeBudget(budget: DiscoveryBudget, resource: keyof DiscoveryBudget["remaining"], cost = 0): boolean {
   if (Date.now() >= budget.deadlineMs || budget.remaining[resource] <= cost) {
     budget.deferred = true;
     return false;
@@ -251,12 +255,12 @@ function consumeBudget(budget: DiscoveryBudget, resource: keyof DiscoveryBudget[
 }
 
 /** 预算化有界读取（原 `BF`）。 */
-async function readBoundedWithBudget(
+export async function readBoundedWithBudget(
   path: string,
   maxBytes: number,
   budget: DiscoveryBudget | undefined,
   resource: keyof DiscoveryBudget["remaining"],
-): Promise<{ bytesRead: number; status: "read"; text: string } | { bytesRead: number; status: "too-large" | "unreadable" }> {
+): Promise<BoundedReadResult> {
   if (budget == null) return readBoundedText(path, maxBytes);
   if (Date.now() >= budget.deadlineMs || budget.remaining[resource] <= 1) {
     budget.deferred = true;
@@ -499,7 +503,7 @@ function buildAccountProjectlessSpace({
 }
 
 /** projectless → project 形状（原 `jF`）。 */
-function projectlessAsProject(space: ProjectlessSpace): CoworkProject {
+export function projectlessAsProject(space: ProjectlessSpace): CoworkProject {
   return {
     accountOrgDir: space.accountOrgDir,
     accountOrgDirs: space.accountOrgDirs,
@@ -576,7 +580,7 @@ export async function discoverCoworkSpaces(options: DiscoveryOptions): Promise<D
       locationGroups.flat().map(async ({ accountOrgDir }) => {
         const parsed = await readJsonFile(join(accountOrgDir, "remote-session-spaces.json"), sessionEntriesSchema as never);
         return (
-          (parsed as { entries: Array<{ sessionId: string } | null> | undefined)?.entries
+          (parsed as { entries?: Array<{ sessionId: string } | null> } | null)?.entries
             .filter((entry) => entry != null)
             .map((entry) => entry.sessionId.replace(/^cse_/, "session_"))
             .filter((sessionId) => /^session_[A-Za-z0-9]+$/.test(sessionId)) ?? []
@@ -899,12 +903,12 @@ async function findActiveMcpConfigSurfaces({ disabledServerNames, project, warni
 async function collectConfigSurfacesForProject(project: CoworkProject, warnings: string[], settings?: Record<string, unknown>): Promise<ConfigSurface[]> {
   const disabledNames = readDisabledServerNames(settings ?? (warnings == null ? {} : await readCoworkSettings(project.accountOrgDirs, warnings)));
   const mcpSurfaces = await findActiveMcpConfigSurfaces({ disabledServerNames: disabledNames, project, warnings });
-  const standardSurfaces = (
+  const standardSurfaces: ConfigSurface[] = (
     await Promise.all(
       [
         ...CONFIG_SURFACE_FILES.map((surface) => ({ ...surface, roots: project.accountOrgDirs })),
         ...EXTENSION_SURFACES.map((surface) => ({ ...surface, roots: project.userDataDirs })),
-      ].map(async ({ kind, relativePath, roots }) => {
+      ].map(async ({ kind, relativePath, roots }): Promise<ConfigSurface | null> => {
         const [existing] = await filterExisting(roots.map((root) => join(root, relativePath)));
         return existing == null ? null : { kind, path: existing };
       }),
@@ -1009,6 +1013,9 @@ export async function collectConfigSurfaces(
     projectlessSpaces: discovery.projectlessSpaces,
     projects: discovery.projects,
     scheduledTasksByProjectRoot: new Map(projectScans.map((scan) => [scan.project.sourceRoot, scan.scheduledTasks])),
+    sessionManifestsByProjectlessSpaceRoot: new Map(
+      projectlessScans.map((scan) => [scan.projectlessSpace.projectlessImportRoot, scan.sessionManifests]),
+    ),
     sessionManifestsByProjectRoot: new Map(projectScans.map((scan) => [scan.project.sourceRoot, scan.sessionManifests])),
     skippedProjects: discovery.skippedProjects,
     warnings: [...discovery.warnings, ...projectScans.flatMap((scan) => scan.warnings), ...projectlessScans.flatMap((scan) => scan.warnings)],
@@ -1016,7 +1023,7 @@ export async function collectConfigSurfaces(
 }
 
 /** projectless 空间的 skills/plugins 扫描（原 `yF`，looseSkills/pluginBundles）。 */
-async function scanProjectlessSpace(project: CoworkProject): Promise<ProjectlessScan> {
+export async function scanProjectlessSpace(project: CoworkProject): Promise<ProjectlessScan> {
   // skills：org 目录下的 skills/<名> 目录
   const looseSkills: LooseSkill[] = [];
   for (const orgDir of project.accountOrgDirs) {
@@ -1026,7 +1033,8 @@ async function scanProjectlessSpace(project: CoworkProject): Promise<Projectless
       if (entry.isDirectory()) looseSkills.push({ skillRoot: join(skillsRoot, entry.name) });
     }
   }
-  // plugins：.local-plugins/.remote-plugins 的插件候选
+  // plugins：.local-plugins/.remote-plugins 的插件候选（原 `yF`：manifest
+  // name/version 优先，缺失时回退目录名 + 版本清洗）
   const pluginBundles: PluginCandidate[] = [];
   for (const orgDir of project.accountOrgDirs) {
     for (const pluginsDir of [join(orgDir, ".local-plugins"), join(orgDir, ".remote-plugins")]) {
@@ -1036,8 +1044,22 @@ async function scanProjectlessSpace(project: CoworkProject): Promise<Projectless
         const pluginRoot = join(pluginsDir, entry.name);
         const manifestPath = join(pluginRoot, "manifest.json");
         if (!(await isFile(manifestPath))) continue;
-        const skillPaths = await walkFiles(pluginRoot).then((paths) => paths.filter((path) => basename(path) === "SKILL.md"));
-        pluginBundles.push({ pluginName: entry.name, pluginRoot, manifestPath, skillPaths });
+        const manifest = await readJsonFile(manifestPath, pluginManifestSchema as never);
+        const manifestName = typeof (manifest as { name?: unknown })?.name === "string" ? (manifest as { name: string }).name.trim() : "";
+        const manifestVersion = typeof (manifest as { version?: unknown })?.version === "string" ? (manifest as { version: string }).version.trim() : "";
+        pluginBundles.push({
+          accountOrgDir: project.accountOrgDir,
+          pluginName:
+            manifestName === ""
+              ? entry.name.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "cowork-plugin"
+              : manifestName.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "cowork-plugin",
+          pluginRoot,
+          manifestPath,
+          skillPaths: await walkFiles(pluginRoot).then((paths) => paths.filter((path) => basename(path) === "SKILL.md")),
+          ...(manifestVersion === ""
+            ? {}
+            : { version: manifestVersion.replace(/[^A-Za-z0-9.+_-]+/g, "-").replace(/^[.+-]+|[.+-]+$/g, "") || "local" }),
+        });
       }
     }
   }
@@ -1226,6 +1248,21 @@ async function collectArtifactSources(session: { accountOrgDirs: string[]; docum
       }),
     )
   ).filter((source): source is ArtifactSource => source != null);
+}
+
+/** 会话导入文件源汇总（原 `RPe`）：输出文件 + artifacts。 */
+export async function collectImportFileSources(session: {
+  accountOrgDirs: string[];
+  detectedFiles: Array<{ fileName: string; hostPath: string }>;
+  documentsDir: string;
+  sessionStorageDirs: string[];
+  sourceId: string;
+}): Promise<ImportFileSource[]> {
+  const [outputs, artifacts] = await Promise.all([
+    collectOutputSources(session),
+    collectArtifactSources(session),
+  ]);
+  return [...outputs, ...artifacts];
 }
 
 /** 输出文件 + artifacts 拷贝（原 `YFe`/`UPe`/`WPe`）。 */
@@ -1454,7 +1491,7 @@ export function filterSkippedProjectsByWorkspaceRoots(
   skippedProjects: SkippedProject[],
   workspaceRoots: string[] | null,
 ): SkippedProject[] {
-  return workspaceRoots == null ? skippedProjects : skippedProjects.filter((project) => project.sourceFolders.some((folder) => workspaceRoots.some((root) => pathsEqual(root, folder)));
+  return workspaceRoots == null ? skippedProjects : skippedProjects.filter((project) => project.sourceFolders.some((folder) => workspaceRoots.some((root) => pathsEqual(root, folder))));
 }
 
 export { SAFETY_LIMITS, HISTORY_LIMIT_WARNING };

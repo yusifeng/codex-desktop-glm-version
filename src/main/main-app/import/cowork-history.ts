@@ -14,7 +14,7 @@
 //   - config.toml 读写（qP/JP）+ 基础判定（YP isPlainObject / XP nonEmpty /
 //     ZP 时间戳归一：秒→毫秒）
 import { readFile, writeFile, mkdir, readdir, stat, lstat, open } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { join, dirname, relative, isAbsolute } from "node:path";
 import {
   wf as objectSchema,
   Of as stringSchema,
@@ -66,7 +66,12 @@ function errorMessage(error: unknown): string {
 // ---------------------------------------------------------------------------
 
 /** 有界读取（原 `xP`）：超限即中止（read 一字节越界判定），64KiB 分块。 */
-async function readBoundedText(path: string, maxBytes: number): Promise<{ bytesRead: number; status: "read"; text: string } | { bytesRead: number; status: "too-large" | "unreadable" }> {
+type BoundedReadResult =
+  | { bytesRead: number; status: "read"; text: string }
+  | { bytesRead: number; status: "too-large" }
+  | { bytesRead: number; status: "unreadable" };
+
+async function readBoundedText(path: string, maxBytes: number): Promise<BoundedReadResult> {
   let bytesRead = 0;
   const handle = await open(path, "r").catch(() => null);
   if (handle == null) return { bytesRead, status: "unreadable" };
@@ -518,8 +523,106 @@ function mapSpaceConfig<T>(space: { spaceConfigPath: string; sourceFolders: stri
   };
 }
 
+// ---------------------------------------------------------------------------
+// MCP 配置读取（原 `lF`/`SNe`/`uF`/`dF`/`sF`/`cF`/`gP`）
+// ---------------------------------------------------------------------------
+
+/** 逐候选探测存在性（原 `sF`/`cF`）。 */
+async function filterExisting(paths: string[]): Promise<string[]> {
+  const exists = await Promise.all(paths.map((path) => pathExists(path)));
+  return paths.filter((_path, index) => exists[index]);
+}
+
+/** 从属判定（原 `gP`：child 在 parent 之下）。 */
+function isPathInsideDir(parent: string, child: string): boolean {
+  const rel = relative(parent, child);
+  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+}
+
+/** cowork 设置合并（原 `lF`）：accountOrgDirs 倒序逐个合并。 */
+async function readCoworkSettings(accountOrgDirs: string[], warnings: string[]): Promise<Record<string, unknown>> {
+  const merged: Record<string, unknown> = {};
+  const existing = await filterExisting(
+    ["cowork_account_settings.json", "cowork_settings.json"].flatMap((filename) =>
+      [...accountOrgDirs].reverse().map((dir) => join(dir, filename)),
+    ),
+  );
+  const parsed = await Promise.all(existing.map(async (path) => ({ parsed: await readJsonFile(path, tomlValueSchema as never), sourcePath: path })));
+  for (const { parsed: settings, sourcePath } of parsed) {
+    if (settings == null) {
+      warnings.push(`Could not read Cowork settings file: ${sourcePath}`);
+      continue;
+    }
+    Object.assign(merged, settings);
+  }
+  return merged;
+}
+
+/** MCP 配置文件读取（原 `uF`）：org 目录的 mcp.json/mcp-servers.json + userData 的 claude_desktop_config。 */
+async function readMcpConfigFiles(project: { accountOrgDirs: string[]; userDataDirs: string[] }): Promise<Array<{ parsed: Record<string, unknown> | null; sourcePath: string }>> {
+  const paths = await filterExisting(
+    project.userDataDirs.flatMap((userDataDir) => {
+      const orgDir = project.accountOrgDirs.find((dir) => isPathInsideDir(dir, userDataDir));
+      return [
+        ...(orgDir == null ? [] : [join(orgDir, "mcp.json"), join(orgDir, "mcp-servers.json")]),
+        join(userDataDir, "claude_desktop_config.json"),
+      ];
+    }),
+  );
+  return Promise.all(paths.map(async (path) => ({ parsed: await readJsonFile(path, mcpServersFileSchema as never), sourcePath: path })));
+}
+
+/** disabled 名单（原 `dF`）。 */
+function readDisabledServerNames(settings: Record<string, unknown>): Set<string> {
+  const disabled = (settings.disabledMcpjsonServers ?? settings.disabledMcpServers) as unknown;
+  return Array.isArray(disabled)
+    ? new Set(
+        (disabled as unknown[])
+          .filter((name): name is string => typeof name == "string")
+          .map((name) => name.trim())
+          .filter((name) => name !== ""),
+      )
+    : new Set();
+}
+
+function isServerDisabled({ disabledServerNames, serverConfig, serverName }: { disabledServerNames: Set<string>; serverConfig: Record<string, unknown>; serverName: string }): boolean {
+  return disabledServerNames.has(serverName) || serverConfig.disabled === true || serverConfig.enabled === false;
+}
+
+/** MCP server 配置合并（原 `SNe`）：双源 + disabled 过滤 + 空名拒绝。 */
+async function readMcpServerConfigs(
+  project: { accountOrgDirs: string[]; userDataDirs: string[] },
+  warnings: string[],
+  settings: Record<string, unknown>,
+): Promise<Map<string, { config: Record<string, unknown>; sourcePath: string }>> {
+  const disabledNames = readDisabledServerNames(settings);
+  const servers = new Map<string, { config: Record<string, unknown>; sourcePath: string }>();
+  const seen = new Set<string>();
+  const configFiles = await readMcpConfigFiles(project);
+  for (const { parsed, sourcePath } of configFiles) {
+    if (parsed == null) {
+      warnings.push(`Could not read Cowork MCP config file: ${sourcePath}`);
+      continue;
+    }
+    const serverEntries = { ...(parsed.mcpServers as Record<string, unknown>), ...(parsed.mcp_servers as Record<string, unknown>) } as Record<string, Record<string, unknown>>;
+    for (const [name, config] of Object.entries(serverEntries)) {
+      const trimmed = name.trim();
+      if (trimmed === "") {
+        warnings.push(`Cowork MCP config ${sourcePath} had an empty server name`);
+        continue;
+      }
+      if (seen.has(trimmed)) continue;
+      seen.add(trimmed);
+      if (!isServerDisabled({ disabledServerNames: disabledNames, serverConfig: config, serverName: trimmed }))
+        servers.set(trimmed, { config, sourcePath });
+    }
+  }
+  return servers;
+}
+
 export {
   readBoundedText,
+  type BoundedReadResult,
   readJsonFile,
   readTextFile,
   writeTextFile,
@@ -544,6 +647,12 @@ export {
   isPlainObject,
   errorMessage,
   pathsEqual,
+  filterExisting,
+  readCoworkSettings,
+  readMcpConfigFiles,
+  readDisabledServerNames,
+  isServerDisabled,
+  readMcpServerConfigs,
   spaceListSchema,
   sessionSchema,
   sessionEntriesSchema,
