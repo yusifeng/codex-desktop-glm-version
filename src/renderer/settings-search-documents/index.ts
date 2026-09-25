@@ -1,24 +1,32 @@
-// @ts-nocheck
-import { n as e } from "./rolldown-runtime-2d059c5e81f4.js";
-var t;
-function n() {
-  return (n = e(() => {
-    t = {
+// settings-search-documents —— 设置搜索索引（20 区块 / 4480 条消息）。
+//
+// 原版：app/webview/assets/_virtual_settings-search-documents-d81257e4909b.js
+//（559KB 纯数据：每个设置项的 defaultMessage/id/description 搜索文档）。
+// 由 scripts/generate-settings-search-documents.mjs 从原 chunk 提取生成，
+// 勿手改。
+
+export interface SettingsSearchDocument {
+  defaultMessage: string;
+  description?: string;
+  id: string;
+}
+
+export const settingsSearchDocuments: Record<string, SettingsSearchDocument[]> = {
       account: [
         { defaultMessage: `Degree is required`, id: `cme.profile.degreeError` },
         { defaultMessage: `Degree`, id: `cme.profile.degreeLabel` },
         { defaultMessage: `Enter your degree (e.g. MD)`, id: `cme.profile.degreePlaceholder` },
         {
           defaultMessage: `Used for CME credits and other clinician features. Confirm physician eligibility to claim CME credits.`,
-          id: `cme.profile.description`,
+          id: `cme.profile.description`
         },
         {
           defaultMessage: `Physician eligibility confirmation is required`,
-          id: `cme.profile.eligibilityError`,
+          id: `cme.profile.eligibilityError`
         },
         {
           defaultMessage: `I am a physician eligible for CME credits`,
-          id: `cme.profile.eligibilityLabel`,
+          id: `cme.profile.eligibilityLabel`
         },
         { defaultMessage: `Unable to load medical credentials`, id: `cme.profile.loadFailed` },
         { defaultMessage: `Loading medical credentials…`, id: `cme.profile.loading` },
@@ -29,14 +37,14 @@ function n() {
         { defaultMessage: `Medical license number`, id: `cme.profile.numberLabel` },
         {
           defaultMessage: `Enter your medical license number`,
-          id: `cme.profile.numberPlaceholder`,
+          id: `cme.profile.numberPlaceholder`
         },
         { defaultMessage: `Try again`, id: `cme.profile.retry` },
         { defaultMessage: `Save`, id: `cme.profile.save` },
         { defaultMessage: `Medical credentials saved`, id: `cme.profile.saved` },
         {
           defaultMessage: `Unable to save medical credentials. Please try again.`,
-          id: `cme.profile.saveFailed`,
+          id: `cme.profile.saveFailed`
         },
         { defaultMessage: `Medical license state must be 2 letters`, id: `cme.profile.stateError` },
         { defaultMessage: `Medical license state`, id: `cme.profile.stateLabel` },
@@ -53,7 +61,7 @@ function n() {
         { defaultMessage: `Status`, id: `settings.chatGpt.account.status` },
         {
           defaultMessage: `Could not update account settings`,
-          id: `settings.chatGpt.account.updateError`,
+          id: `settings.chatGpt.account.updateError`
         },
         { defaultMessage: `Username`, id: `settings.chatGpt.account.username` },
         { defaultMessage: `@{username}`, id: `settings.chatGpt.account.usernameValue` },
@@ -63,44 +71,44 @@ function n() {
         { defaultMessage: `Confirm`, id: `settings.chatGpt.birthday.confirm` },
         {
           defaultMessage: `This helps us personalize your experience and {under18, select, yes {provide age-appropriate settings} other {provide the right settings}}, in line with our <privacy>Privacy Policy</privacy>`,
-          id: `settings.chatGpt.birthday.description`,
+          id: `settings.chatGpt.birthday.description`
         },
         { defaultMessage: `Invalid birthdate`, id: `settings.chatGpt.birthday.invalid` },
         { defaultMessage: `Pending`, id: `settings.chatGpt.birthday.pending` },
         {
           defaultMessage: `Your age is verified and will update soon`,
-          id: `settings.chatGpt.birthday.pendingDescription`,
+          id: `settings.chatGpt.birthday.pendingDescription`
         },
         { defaultMessage: `MM / DD / YYYY`, id: `settings.chatGpt.birthday.placeholder` },
         {
           defaultMessage: `Age verification finished, but we couldn't refresh your settings. Please try refreshing again.`,
-          id: `settings.chatGpt.birthday.refreshError`,
+          id: `settings.chatGpt.birthday.refreshError`
         },
         { defaultMessage: `Retry loading`, id: `settings.chatGpt.birthday.retry` },
         { defaultMessage: `Retry refresh`, id: `settings.chatGpt.birthday.retryRefresh` },
         {
           defaultMessage: `You updated your date of birth`,
-          id: `settings.chatGpt.birthday.updated`,
+          id: `settings.chatGpt.birthday.updated`
         },
         {
           defaultMessage: `Could not update your date of birth`,
-          id: `settings.chatGpt.birthday.updateError`,
+          id: `settings.chatGpt.birthday.updateError`
         },
         {
           defaultMessage: `To help keep ChatGPT appropriate for everyone, some settings require age verification. <learnMore>Learn more</learnMore>`,
-          id: `settings.chatGpt.birthday.verificationDescription`,
+          id: `settings.chatGpt.birthday.verificationDescription`
         },
         {
           defaultMessage: `Could not start age verification. Please try again.`,
-          id: `settings.chatGpt.birthday.verificationError`,
+          id: `settings.chatGpt.birthday.verificationError`
         },
         { defaultMessage: `Age verified`, id: `settings.chatGpt.birthday.verified` },
         { defaultMessage: `Verify age`, id: `settings.chatGpt.birthday.verify` },
         {
           defaultMessage: `To make changes, we need to verify your age`,
-          id: `settings.chatGpt.birthday.verifyDescription`,
+          id: `settings.chatGpt.birthday.verifyDescription`
         },
-        { defaultMessage: `Verify your age`, id: `settings.chatGpt.birthday.verifyTitle` },
+        { defaultMessage: `Verify your age`, id: `settings.chatGpt.birthday.verifyTitle` }
       ],
       "ads-controls": [
         { defaultMessage: `Retry`, id: `common.retry` },
@@ -110,54 +118,54 @@ function n() {
         { defaultMessage: `Delete`, id: `settings.ads.deleteDataConfirm` },
         {
           defaultMessage: `Delete your ad history associated with you. This won’t delete or change your chats.`,
-          id: `settings.ads.deleteDataDescriptionHistory`,
+          id: `settings.ads.deleteDataDescriptionHistory`
         },
         {
           defaultMessage: `Clear all ads history and topics data. This won't affect your chats.`,
-          id: `settings.ads.deleteDataDescriptionTopics`,
+          id: `settings.ads.deleteDataDescriptionTopics`
         },
         { defaultMessage: `Delete ads data`, id: `settings.ads.deleteDataLabel` },
         {
           defaultMessage: `See the ads you’ve viewed or interacted with. You’re always in control — you can clear your history at any time.`,
-          id: `settings.ads.historyDescription`,
+          id: `settings.ads.historyDescription`
         },
         { defaultMessage: `No ad history`, id: `settings.ads.historyEmpty` },
         {
           defaultMessage: `Ads you view in ChatGPT will appear here`,
-          id: `settings.ads.historyEmptyDescription`,
+          id: `settings.ads.historyEmptyDescription`
         },
         { defaultMessage: `{brand} — {title}`, id: `settings.ads.historyItem` },
         { defaultMessage: `History`, id: `settings.ads.historyLink` },
         { defaultMessage: `Ads history`, id: `settings.ads.historyTitle` },
         {
           defaultMessage: `Couldn’t load ads controls. Please try again`,
-          id: `settings.ads.loadError`,
+          id: `settings.ads.loadError`
         },
         { defaultMessage: `Loading ads controls…`, id: `settings.ads.loading` },
         { defaultMessage: `Ads are off`, id: `settings.ads.off` },
         {
           defaultMessage: `You’re using ChatGPT ad-free with reduced usage. Expand your access by upgrading your plan or turning on ads.`,
-          id: `settings.ads.offDescription`,
+          id: `settings.ads.offDescription`
         },
         { defaultMessage: `Opened`, id: `settings.ads.opened` },
         { defaultMessage: `Ads personalization`, id: `settings.ads.personalizationTitle` },
         {
           defaultMessage: `Personalized ads currently aren’t available in your region. You’ll still see ads based on limited data like general location, context, and device type.`,
-          id: `settings.ads.personalizationUnavailableDescription`,
+          id: `settings.ads.personalizationUnavailableDescription`
         },
         { defaultMessage: `Personalize ads`, id: `settings.ads.personalize` },
         {
           defaultMessage: `Allow ChatGPT to use your past chats, activity, and preferences to select ads. Ads may still be based on your current chat.`,
-          id: `settings.ads.personalizeDescription`,
+          id: `settings.ads.personalizeDescription`
         },
         { defaultMessage: `Ads controls`, id: `settings.ads.settings.title` },
         {
           defaultMessage: `ChatGPT may use these topics to choose ads that are more relevant to you.`,
-          id: `settings.ads.topicsDescription`,
+          id: `settings.ads.topicsDescription`
         },
         {
           defaultMessage: `ChatGPT may use topics to make ads more relevant. Topics may be based on your activity or feedback on ads.`,
-          id: `settings.ads.topicsEmptyDescription`,
+          id: `settings.ads.topicsEmptyDescription`
         },
         { defaultMessage: `No topics yet`, id: `settings.ads.topicsEmptyTitle` },
         { defaultMessage: `Topics`, id: `settings.ads.topicsLinkLabel` },
@@ -166,15 +174,15 @@ function n() {
         { defaultMessage: `Turn on ads`, id: `settings.ads.turnOn` },
         {
           defaultMessage: `Couldn’t update ads controls. Please try again`,
-          id: `settings.ads.updateError`,
+          id: `settings.ads.updateError`
         },
-        { defaultMessage: `Viewed`, id: `settings.ads.viewed` },
+        { defaultMessage: `Viewed`, id: `settings.ads.viewed` }
       ],
       agent: [
         { defaultMessage: `Open config.toml`, id: `codex.profileDropdown.openConfigToml` },
         {
           defaultMessage: `Open config.toml in WSL environment`,
-          id: `codex.profileDropdown.openConfigToml.wsl`,
+          id: `codex.profileDropdown.openConfigToml.wsl`
         },
         { defaultMessage: `High`, id: `composer.mode.local.reasoning.high.label` },
         { defaultMessage: `Light`, id: `composer.mode.local.reasoning.low.label.v2` },
@@ -187,391 +195,391 @@ function n() {
         { defaultMessage: `Extra High`, id: `composer.mode.local.reasoning.xhigh.label` },
         {
           defaultMessage: `Setting up your workspace: {percent}%`,
-          id: `localConversation.primaryRuntimeInstallStatus.downloading`,
+          id: `localConversation.primaryRuntimeInstallStatus.downloading`
         },
         {
           defaultMessage: `Preparing your workspace`,
-          id: `localConversation.primaryRuntimeInstallStatus.extracting`,
+          id: `localConversation.primaryRuntimeInstallStatus.extracting`
         },
         {
           defaultMessage: `Finalizing your workspace`,
-          id: `localConversation.primaryRuntimeInstallStatus.finalizing`,
+          id: `localConversation.primaryRuntimeInstallStatus.finalizing`
         },
         {
           defaultMessage: `Blocked actions fail instead of requesting approval`,
-          id: `settings-search.literal.2ef41498cded`,
+          id: `settings-search.literal.2ef41498cded`
         },
         {
           defaultMessage: `Can edit files outside this workspace`,
-          id: `settings-search.literal.81e017ad38d9`,
+          id: `settings-search.literal.81e017ad38d9`
         },
         {
           defaultMessage: `Ask when escalation is requested`,
-          id: `settings-search.literal.bdfc1f29f9be`,
+          id: `settings-search.literal.bdfc1f29f9be`
         },
         {
           defaultMessage: `Can edit files, but only in this workspace`,
-          id: `settings-search.literal.df60e1b67d35`,
+          id: `settings-search.literal.df60e1b67d35`
         },
         {
           defaultMessage: `Can read files, but cannot edit them`,
-          id: `settings-search.literal.f15e86d07ac1`,
+          id: `settings-search.literal.f15e86d07ac1`
         },
         { defaultMessage: `Agent defaults`, id: `settings.agent.agentDefaults.sectionTitle` },
         {
           defaultMessage: `Choose when ChatGPT asks for approval`,
-          id: `settings.agent.configuration.approval.definition`,
+          id: `settings.agent.configuration.approval.definition`
         },
         { defaultMessage: `Approval policy`, id: `settings.agent.configuration.approval.label` },
         {
           defaultMessage: `Never ask for approval`,
-          id: `settings.agent.configuration.approval.option.never`,
+          id: `settings.agent.configuration.approval.option.never`
         },
         {
           defaultMessage: `On failure`,
-          id: `settings.agent.configuration.approval.option.onFailure`,
+          id: `settings.agent.configuration.approval.option.onFailure`
         },
         {
           defaultMessage: `On request`,
-          id: `settings.agent.configuration.approval.option.onRequest`,
+          id: `settings.agent.configuration.approval.option.onRequest`
         },
         {
           defaultMessage: `Untrusted`,
-          id: `settings.agent.configuration.approval.option.untrusted`,
+          id: `settings.agent.configuration.approval.option.untrusted`
         },
         {
           defaultMessage: `Approval policy is restricted by this installation.`,
-          id: `settings.agent.configuration.approval.restricted`,
+          id: `settings.agent.configuration.approval.restricted`
         },
         { defaultMessage: `config.toml`, id: `settings.agent.configuration.configToml` },
         {
           defaultMessage: `Edit your config to customize agent behavior`,
-          id: `settings.agent.configuration.configToml.description`,
+          id: `settings.agent.configuration.configToml.description`
         },
         { defaultMessage: `Docs`, id: `settings.agent.configuration.configToml.docs` },
         {
           defaultMessage: `Restart ChatGPT after editing to apply changes`,
-          id: `settings.agent.configuration.configToml.restartNote`,
+          id: `settings.agent.configuration.configToml.restartNote`
         },
         {
           defaultMessage: `This value is managed by admin policy.`,
-          id: `settings.agent.configuration.control.managed`,
+          id: `settings.agent.configuration.control.managed`
         },
         {
           defaultMessage: `This project uses an inline sandbox table. Edit config.toml directly to change network access`,
-          id: `settings.agent.configuration.inlineSandboxWriteError`,
+          id: `settings.agent.configuration.inlineSandboxWriteError`
         },
         { defaultMessage: `Model default`, id: `settings.agent.configuration.modelDefault` },
         {
           defaultMessage: `Choose how much detail ChatGPT includes in responses`,
-          id: `settings.agent.configuration.modelVerbosity.definition`,
+          id: `settings.agent.configuration.modelVerbosity.definition`
         },
         {
           defaultMessage: `Output detail`,
-          id: `settings.agent.configuration.modelVerbosity.label`,
+          id: `settings.agent.configuration.modelVerbosity.label`
         },
         { defaultMessage: `High`, id: `settings.agent.configuration.modelVerbosity.option.high` },
         {
           defaultMessage: `Include more detail in responses`,
-          id: `settings.agent.configuration.modelVerbosity.option.high.description`,
+          id: `settings.agent.configuration.modelVerbosity.option.high.description`
         },
         { defaultMessage: `Low`, id: `settings.agent.configuration.modelVerbosity.option.low` },
         {
           defaultMessage: `Keep responses concise`,
-          id: `settings.agent.configuration.modelVerbosity.option.low.description`,
+          id: `settings.agent.configuration.modelVerbosity.option.low.description`
         },
         {
           defaultMessage: `Medium`,
-          id: `settings.agent.configuration.modelVerbosity.option.medium`,
+          id: `settings.agent.configuration.modelVerbosity.option.medium`
         },
         {
           defaultMessage: `Balance detail and brevity`,
-          id: `settings.agent.configuration.modelVerbosity.option.medium.description`,
+          id: `settings.agent.configuration.modelVerbosity.option.medium.description`
         },
         {
           defaultMessage: `Allow network access`,
-          id: `settings.agent.configuration.network.ariaLabel`,
+          id: `settings.agent.configuration.network.ariaLabel`
         },
         {
           defaultMessage: `Allow network access when the sandbox is set to workspace write`,
-          id: `settings.agent.configuration.network.definition`,
+          id: `settings.agent.configuration.network.definition`
         },
         {
           defaultMessage: `Allow network access`,
-          id: `settings.agent.configuration.network.label`,
+          id: `settings.agent.configuration.network.label`
         },
         {
           defaultMessage: `File: {path}{location}`,
-          id: `settings.agent.configuration.notice.fileContext`,
+          id: `settings.agent.configuration.notice.fileContext`
         },
         {
           defaultMessage: ` (line {line}, column {column})`,
-          id: `settings.agent.configuration.notice.fileLocationSuffix`,
+          id: `settings.agent.configuration.notice.fileLocationSuffix`
         },
         { defaultMessage: `Open file`, id: `settings.agent.configuration.notice.openFile` },
         {
           defaultMessage: `Choose how ChatGPT summarizes its reasoning`,
-          id: `settings.agent.configuration.reasoningSummary.definition`,
+          id: `settings.agent.configuration.reasoningSummary.definition`
         },
         {
           defaultMessage: `Reasoning summary`,
-          id: `settings.agent.configuration.reasoningSummary.label`,
+          id: `settings.agent.configuration.reasoningSummary.label`
         },
         { defaultMessage: `Auto`, id: `settings.agent.configuration.reasoningSummary.option.auto` },
         {
           defaultMessage: `Let the model choose the summary detail`,
-          id: `settings.agent.configuration.reasoningSummary.option.auto.description`,
+          id: `settings.agent.configuration.reasoningSummary.option.auto.description`
         },
         {
           defaultMessage: `Concise`,
-          id: `settings.agent.configuration.reasoningSummary.option.concise`,
+          id: `settings.agent.configuration.reasoningSummary.option.concise`
         },
         {
           defaultMessage: `Show a brief reasoning summary`,
-          id: `settings.agent.configuration.reasoningSummary.option.concise.description`,
+          id: `settings.agent.configuration.reasoningSummary.option.concise.description`
         },
         {
           defaultMessage: `Detailed`,
-          id: `settings.agent.configuration.reasoningSummary.option.detailed`,
+          id: `settings.agent.configuration.reasoningSummary.option.detailed`
         },
         {
           defaultMessage: `Show a more detailed reasoning summary`,
-          id: `settings.agent.configuration.reasoningSummary.option.detailed.description`,
+          id: `settings.agent.configuration.reasoningSummary.option.detailed.description`
         },
         { defaultMessage: `None`, id: `settings.agent.configuration.reasoningSummary.option.none` },
         {
           defaultMessage: `Don't show reasoning summaries`,
-          id: `settings.agent.configuration.reasoningSummary.option.none.description`,
+          id: `settings.agent.configuration.reasoningSummary.option.none.description`
         },
         {
           defaultMessage: `Choose how much ChatGPT can do when running commands`,
-          id: `settings.agent.configuration.sandbox.definition`,
+          id: `settings.agent.configuration.sandbox.definition`
         },
         { defaultMessage: `Sandbox settings`, id: `settings.agent.configuration.sandbox.label` },
         {
           defaultMessage: `Full access`,
-          id: `settings.agent.configuration.sandbox.option.fullAccess`,
+          id: `settings.agent.configuration.sandbox.option.fullAccess`
         },
         { defaultMessage: `Read only`, id: `settings.agent.configuration.sandbox.option.readOnly` },
         {
           defaultMessage: `Workspace write`,
-          id: `settings.agent.configuration.sandbox.option.workspaceWrite`,
+          id: `settings.agent.configuration.sandbox.option.workspaceWrite`
         },
         {
           defaultMessage: `Sandbox mode is restricted by this installation.`,
-          id: `settings.agent.configuration.sandbox.restricted`,
+          id: `settings.agent.configuration.sandbox.restricted`
         },
         { defaultMessage: `Global config`, id: `settings.agent.configuration.scope.globalGroup` },
         { defaultMessage: `Loading…`, id: `settings.agent.configuration.scope.loading` },
         { defaultMessage: `Admin config`, id: `settings.agent.configuration.scope.managed` },
         {
           defaultMessage: `Managed by admin policy`,
-          id: `settings.agent.configuration.scope.managedDescription`,
+          id: `settings.agent.configuration.scope.managedDescription`
         },
         { defaultMessage: `Open config.toml`, id: `settings.agent.configuration.scope.open` },
         { defaultMessage: `{repoName}`, id: `settings.agent.configuration.scope.project` },
         { defaultMessage: `Project config`, id: `settings.agent.configuration.scope.projectGroup` },
         {
           defaultMessage: `This config source cannot be edited here.`,
-          id: `settings.agent.configuration.scope.readOnly`,
+          id: `settings.agent.configuration.scope.readOnly`
         },
         {
           defaultMessage: `Config scope unavailable.`,
-          id: `settings.agent.configuration.scope.unavailable`,
+          id: `settings.agent.configuration.scope.unavailable`
         },
         { defaultMessage: `User config`, id: `settings.agent.configuration.scope.user` },
         {
           defaultMessage: `Configure approval policy and sandbox settings <a>Learn more</a>`,
-          id: `settings.agent.configuration.subtitle.summary`,
+          id: `settings.agent.configuration.subtitle.summary`
         },
         {
           defaultMessage: `Configure permissions, web access, and agent responses for new chats <a>Learn more</a>`,
-          id: `settings.agent.configuration.subtitle.summary.electron`,
+          id: `settings.agent.configuration.subtitle.summary.electron`
         },
         {
           defaultMessage: `Choose how ChatGPT accesses the web`,
-          id: `settings.agent.configuration.webSearch.definition`,
+          id: `settings.agent.configuration.webSearch.definition`
         },
         { defaultMessage: `Web search`, id: `settings.agent.configuration.webSearch.label` },
         { defaultMessage: `Cached`, id: `settings.agent.configuration.webSearch.option.cached` },
         {
           defaultMessage: `Use OpenAI's maintained search index`,
-          id: `settings.agent.configuration.webSearch.option.cached.description`,
+          id: `settings.agent.configuration.webSearch.option.cached.description`
         },
         {
           defaultMessage: `Disabled`,
-          id: `settings.agent.configuration.webSearch.option.disabled`,
+          id: `settings.agent.configuration.webSearch.option.disabled`
         },
         {
           defaultMessage: `Don't allow web search`,
-          id: `settings.agent.configuration.webSearch.option.disabled.description`,
+          id: `settings.agent.configuration.webSearch.option.disabled.description`
         },
         { defaultMessage: `Indexed`, id: `settings.agent.configuration.webSearch.option.indexed` },
         {
           defaultMessage: `Allow indexed external web access`,
-          id: `settings.agent.configuration.webSearch.option.indexed.description`,
+          id: `settings.agent.configuration.webSearch.option.indexed.description`
         },
         { defaultMessage: `Live`, id: `settings.agent.configuration.webSearch.option.live` },
         {
           defaultMessage: `Allow unrestricted, current web access`,
-          id: `settings.agent.configuration.webSearch.option.live.description`,
+          id: `settings.agent.configuration.webSearch.option.live.description`
         },
         {
           defaultMessage: `Web search is restricted by this installation`,
-          id: `settings.agent.configuration.webSearch.restricted`,
+          id: `settings.agent.configuration.webSearch.restricted`
         },
         {
           defaultMessage: `Couldn't update this setting. Check config.toml for errors and try again`,
-          id: `settings.agent.configuration.writeError`,
+          id: `settings.agent.configuration.writeError`
         },
         {
           defaultMessage: `Custom config.toml settings`,
-          id: `settings.agent.customConfig.sectionTitle`,
+          id: `settings.agent.customConfig.sectionTitle`
         },
         {
           defaultMessage: `Current version:`,
-          id: `settings.agent.dependencies.bundleVersion.label`,
+          id: `settings.agent.dependencies.bundleVersion.label`
         },
         { defaultMessage: `Checking…`, id: `settings.agent.dependencies.bundleVersion.loading` },
         {
           defaultMessage: `Not installed`,
-          id: `settings.agent.dependencies.bundleVersion.notInstalled`,
+          id: `settings.agent.dependencies.bundleVersion.notInstalled`
         },
         {
           defaultMessage: `Run diagnostics or reinstall if tool calls fail`,
-          id: `settings.agent.dependencies.bundleVersion.problemDescription`,
+          id: `settings.agent.dependencies.bundleVersion.problemDescription`
         },
         { defaultMessage: `Cancel download`, id: `settings.agent.dependencies.cancel.button` },
         {
           defaultMessage: `Canceling Codex dependency download`,
-          id: `settings.agent.dependencies.cancel.canceled`,
+          id: `settings.agent.dependencies.cancel.canceled`
         },
         {
           defaultMessage: `Couldn’t cancel Codex dependency download`,
-          id: `settings.agent.dependencies.cancel.failed`,
+          id: `settings.agent.dependencies.cancel.failed`
         },
         {
           defaultMessage: `No Codex dependency download is running`,
-          id: `settings.agent.dependencies.cancel.noop`,
+          id: `settings.agent.dependencies.cancel.noop`
         },
         { defaultMessage: `Diagnose`, id: `settings.agent.dependencies.diagnose.button` },
         {
           defaultMessage: `Checks the current bundle and records diagnostic logs`,
-          id: `settings.agent.dependencies.diagnose.description`,
+          id: `settings.agent.dependencies.diagnose.description`
         },
         {
           defaultMessage: `Couldn’t diagnose Codex dependencies`,
-          id: `settings.agent.dependencies.diagnose.failed`,
+          id: `settings.agent.dependencies.diagnose.failed`
         },
         {
           defaultMessage: `Diagnose issues in Codex Workspace`,
-          id: `settings.agent.dependencies.diagnose.label`,
+          id: `settings.agent.dependencies.diagnose.label`
         },
         {
           defaultMessage: `Codex dependencies look healthy`,
-          id: `settings.agent.dependencies.diagnose.ok`,
+          id: `settings.agent.dependencies.diagnose.ok`
         },
         {
           defaultMessage: `Codex dependencies may need repair. Send /feedback if this keeps happening`,
-          id: `settings.agent.dependencies.diagnose.problem`,
+          id: `settings.agent.dependencies.diagnose.problem`
         },
         {
           defaultMessage: `Enable Codex dependencies`,
-          id: `settings.agent.dependencies.enabled.ariaLabel`,
+          id: `settings.agent.dependencies.enabled.ariaLabel`
         },
         {
           defaultMessage: `Allow ChatGPT to install and expose bundled Node.js and Python tools`,
-          id: `settings.agent.dependencies.enabled.description`,
+          id: `settings.agent.dependencies.enabled.description`
         },
         { defaultMessage: `Codex dependencies`, id: `settings.agent.dependencies.enabled.label` },
         { defaultMessage: `Reinstall`, id: `settings.agent.dependencies.reset.button` },
         {
           defaultMessage: `Codex dependency download canceled`,
-          id: `settings.agent.dependencies.reset.canceled`,
+          id: `settings.agent.dependencies.reset.canceled`
         },
         {
           defaultMessage: `Downloads a fresh bundle, installs it, and reloads tools`,
-          id: `settings.agent.dependencies.reset.description`,
+          id: `settings.agent.dependencies.reset.description`
         },
         {
           defaultMessage: `Couldn’t reinstall Codex dependencies`,
-          id: `settings.agent.dependencies.reset.failed`,
+          id: `settings.agent.dependencies.reset.failed`
         },
         {
           defaultMessage: `Codex dependencies were reinstalled`,
-          id: `settings.agent.dependencies.reset.installed`,
+          id: `settings.agent.dependencies.reset.installed`
         },
         {
           defaultMessage: `Reset and install Workspace`,
-          id: `settings.agent.dependencies.reset.label`,
+          id: `settings.agent.dependencies.reset.label`
         },
         {
           defaultMessage: `Workspace Dependencies`,
-          id: `settings.agent.dependencies.sectionTitle`,
+          id: `settings.agent.dependencies.sectionTitle`
         },
         {
           defaultMessage: `Show Ultra in the model picker slider`,
-          id: `settings.agent.modelFeatures.modelPickerSliderUltra.ariaLabel`,
+          id: `settings.agent.modelFeatures.modelPickerSliderUltra.ariaLabel`
         },
         {
           defaultMessage: `Show Ultra as the highest slider option`,
-          id: `settings.agent.modelFeatures.modelPickerSliderUltra.description`,
+          id: `settings.agent.modelFeatures.modelPickerSliderUltra.description`
         },
         {
           defaultMessage: `Ultra in model picker slider`,
-          id: `settings.agent.modelFeatures.modelPickerSliderUltra.label`,
+          id: `settings.agent.modelFeatures.modelPickerSliderUltra.label`
         },
         {
           defaultMessage: `Choose which reasoning effort levels appear in model controls. Availability varies by model`,
-          id: `settings.agent.modelFeatures.reasoningEfforts.description`,
+          id: `settings.agent.modelFeatures.reasoningEfforts.description`
         },
         {
           defaultMessage: `Available reasoning efforts`,
-          id: `settings.agent.modelFeatures.reasoningEfforts.label`,
+          id: `settings.agent.modelFeatures.reasoningEfforts.label`
         },
         {
           defaultMessage: `{count, plural, one {# selected} other {# selected}}`,
-          id: `settings.agent.modelFeatures.reasoningEfforts.selectedCount`,
+          id: `settings.agent.modelFeatures.reasoningEfforts.selectedCount`
         },
         { defaultMessage: `Model features`, id: `settings.agent.modelFeatures.title` },
         {
           defaultMessage: `Experimental features (Beta)`,
-          id: `settings.general.experimentalFeatures`,
+          id: `settings.general.experimentalFeatures`
         },
         {
           defaultMessage: `No beta experimental features available`,
-          id: `settings.general.experimentalFeatures.empty`,
+          id: `settings.general.experimentalFeatures.empty`
         },
         {
           defaultMessage: `Loading experimental features…`,
-          id: `settings.general.experimentalFeatures.loading`,
+          id: `settings.general.experimentalFeatures.loading`
         },
         {
           defaultMessage: `Allow Codex to ask questions outside Plan mode. Changes apply only to new threads`,
-          id: `settings.general.experimentalFeatures.requestUserInput.description`,
+          id: `settings.general.experimentalFeatures.requestUserInput.description`
         },
         {
           defaultMessage: `Request user input`,
-          id: `settings.general.experimentalFeatures.requestUserInput.label`,
+          id: `settings.general.experimentalFeatures.requestUserInput.label`
         },
         {
           defaultMessage: `Restart {appName} to apply experimental feature changes`,
-          id: `settings.general.experimentalFeatures.restartNote`,
+          id: `settings.general.experimentalFeatures.restartNote`
         },
         {
           defaultMessage: `Toggle {featureName}`,
-          id: `settings.general.experimentalFeatures.toggle`,
+          id: `settings.general.experimentalFeatures.toggle`
         },
         {
           defaultMessage: `Allow ChatGPT to use installed plugins`,
-          id: `settings.general.plugins.description`,
+          id: `settings.general.plugins.description`
         },
         { defaultMessage: `Plugins`, id: `settings.general.plugins.label` },
         {
           defaultMessage: `Restart {appName} to apply this change`,
-          id: `settings.general.plugins.restartNotice`,
+          id: `settings.general.plugins.restartNotice`
         },
-        { defaultMessage: `Toggle plugins`, id: `settings.general.plugins.toggle` },
+        { defaultMessage: `Toggle plugins`, id: `settings.general.plugins.toggle` }
       ],
       analytics: [
         { defaultMessage: `Chat`, id: `consumerAnalyticsPreview.chats.chat` },
@@ -580,93 +588,93 @@ function n() {
         { defaultMessage: `Retry`, id: `consumerAnalyticsPreview.chats.retry` },
         {
           defaultMessage: `{expanded, select, yes {Show less} other {Show more}}`,
-          id: `consumerAnalyticsPreview.chats.toggleRows`,
+          id: `consumerAnalyticsPreview.chats.toggleRows`
         },
         {
           defaultMessage: `Usage history date range`,
-          id: `consumerAnalyticsPreview.history.period`,
+          id: `consumerAnalyticsPreview.history.period`
         },
         {
           defaultMessage: `<{threshold}`,
-          id: `consumerAnalyticsPreview.limitHistory.belowPrecision`,
+          id: `consumerAnalyticsPreview.limitHistory.belowPrecision`
         },
         {
           defaultMessage: `Breakdown isn't available for this period`,
-          id: `consumerAnalyticsPreview.limitHistory.breakdownUnavailable`,
+          id: `consumerAnalyticsPreview.limitHistory.breakdownUnavailable`
         },
         {
           defaultMessage: `See what used each of your plan limits`,
-          id: `consumerAnalyticsPreview.limitHistory.description`,
+          id: `consumerAnalyticsPreview.limitHistory.description`
         },
         {
           defaultMessage: `No limit periods in this date range`,
-          id: `consumerAnalyticsPreview.limitHistory.empty`,
+          id: `consumerAnalyticsPreview.limitHistory.empty`
         },
         {
           defaultMessage: `Couldn't load limit history`,
-          id: `consumerAnalyticsPreview.limitHistory.error`,
+          id: `consumerAnalyticsPreview.limitHistory.error`
         },
         {
           defaultMessage: `{limit, select, fiveHour {5-hour limits} other {Weekly limits}}`,
-          id: `consumerAnalyticsPreview.limitHistory.limitHeading`,
+          id: `consumerAnalyticsPreview.limitHistory.limitHeading`
         },
         {
           defaultMessage: `Loading limit history…`,
-          id: `consumerAnalyticsPreview.limitHistory.loading`,
+          id: `consumerAnalyticsPreview.limitHistory.loading`
         },
         {
           defaultMessage: `No usage to show for this breakdown`,
-          id: `consumerAnalyticsPreview.limitHistory.noContributions`,
+          id: `consumerAnalyticsPreview.limitHistory.noContributions`
         },
         {
           defaultMessage: `{limit, select, fiveHour {5-hour period} other {Weekly period}} from {start} to {end} UTC{current, select, yes {, current at last update} other {}}`,
-          id: `consumerAnalyticsPreview.limitHistory.openPeriod`,
+          id: `consumerAnalyticsPreview.limitHistory.openPeriod`
         },
         {
           defaultMessage: `Some periods aren't available yet`,
-          id: `consumerAnalyticsPreview.limitHistory.partial`,
+          id: `consumerAnalyticsPreview.limitHistory.partial`
         },
         { defaultMessage: `Period`, id: `consumerAnalyticsPreview.limitHistory.period` },
         { defaultMessage: `Retry`, id: `consumerAnalyticsPreview.limitHistory.retry` },
         {
           defaultMessage: `Group plan usage history`,
-          id: `consumerAnalyticsPreview.limitHistory.sharedGroup`,
+          id: `consumerAnalyticsPreview.limitHistory.sharedGroup`
         },
         {
           defaultMessage: `{limit, select, fiveHour {5-hour limits} other {Weekly limits}}`,
-          id: `consumerAnalyticsPreview.limitHistory.tableName`,
+          id: `consumerAnalyticsPreview.limitHistory.tableName`
         },
         { defaultMessage: `Plan usage history`, id: `consumerAnalyticsPreview.limitHistory.title` },
         {
           defaultMessage: `{expanded, select, yes {Show less} other {Show more}}`,
-          id: `consumerAnalyticsPreview.limitHistory.toggleRows`,
+          id: `consumerAnalyticsPreview.limitHistory.toggleRows`
         },
         {
           defaultMessage: `Not available`,
-          id: `consumerAnalyticsPreview.limitHistory.totalUnavailable`,
+          id: `consumerAnalyticsPreview.limitHistory.totalUnavailable`
         },
         {
           defaultMessage: `Limit history isn't available yet`,
-          id: `consumerAnalyticsPreview.limitHistory.unavailable`,
+          id: `consumerAnalyticsPreview.limitHistory.unavailable`
         },
         { defaultMessage: `% of limit used`, id: `consumerAnalyticsPreview.limitHistory.used` },
         {
           defaultMessage: `{breakdown, select, feature {By feature} model {By model} surface {By surface} other {By turn start}}`,
-          id: `consumerUsage.breakdown.label`,
+          id: `consumerUsage.breakdown.label`
         },
         {
           defaultMessage: `All usage by how each turn started`,
-          id: `consumerUsage.chart.turnStartsDescription`,
+          id: `consumerUsage.chart.turnStartsDescription`
         },
         { defaultMessage: `No recent chats on this device`, id: `consumerUsage.chats.empty` },
         {
           defaultMessage: `{metric, select, five_hour_limit_percent {% of 5h limit} weekly_limit_percent {% of weekly limit} other {Credits used}}`,
-          id: `consumerUsage.chats.metric`,
+          id: `consumerUsage.chats.metric`
         },
         { defaultMessage: `Open chat`, id: `consumerUsage.chats.openInChat` },
         {
           defaultMessage: `Compare each chat’s plan and credit usage`,
-          id: `consumerUsage.chats.recentDescription`,
+          id: `consumerUsage.chats.recentDescription`
         },
         { defaultMessage: `Top chats`, id: `consumerUsage.chats.title` },
         { defaultMessage: `-`, id: `consumerUsage.chats.unavailable` },
@@ -674,11 +682,11 @@ function n() {
         { defaultMessage: `Group usage history`, id: `consumerUsage.history.breakdown` },
         {
           defaultMessage: `Compare total usage by day, including plan usage and credits.`,
-          id: `consumerUsage.history.chartLabel`,
+          id: `consumerUsage.history.chartLabel`
         },
         {
           defaultMessage: `See where your usage goes and how your activity changes over time`,
-          id: `consumerUsage.history.description`,
+          id: `consumerUsage.history.description`
         },
         { defaultMessage: `Total usage history`, id: `consumerUsage.history.title` },
         { defaultMessage: `Share of daily usage`, id: `consumerUsage.legend.dailyShare` },
@@ -686,22 +694,22 @@ function n() {
         { defaultMessage: `-`, id: `consumerUsage.legend.unavailableShare` },
         {
           defaultMessage: `Amounts and period boundaries are approximate`,
-          id: `consumerUsage.limitHistory.approximateAmounts`,
+          id: `consumerUsage.limitHistory.approximateAmounts`
         },
         { defaultMessage: `Usage as of {asOf}`, id: `consumerUsage.limitHistory.bucketDataAsOf` },
         {
           defaultMessage: `Calculations run daily. Usage for this period may be out of date.`,
-          id: `consumerUsage.limitHistory.dailyCalculationNotice`,
+          id: `consumerUsage.limitHistory.dailyCalculationNotice`
         },
         { defaultMessage: `About plan usage history`, id: `consumerUsage.limitHistory.details` },
         {
           defaultMessage: `Some usage is unavailable; this period may be incomplete`,
-          id: `consumerUsage.limitHistory.incompleteAccounting`,
+          id: `consumerUsage.limitHistory.incompleteAccounting`
         },
         { defaultMessage: `Usage may be out of date`, id: `consumerUsage.limitHistory.staleUsage` },
         {
           defaultMessage: `By turn start includes Tasks only; percentages use the full period limit`,
-          id: `consumerUsage.limitHistory.tasksOnly`,
+          id: `consumerUsage.limitHistory.tasksOnly`
         },
         {
           defaultMessage: `{key, select,
@@ -761,7 +769,7 @@ function n() {
         unknown {Unknown}
       other {{fallback}}
     }`,
-          id: `consumerUsage.series.sourceLabel`,
+          id: `consumerUsage.series.sourceLabel`
         },
         {
           defaultMessage: `{trigger, select,
@@ -823,268 +831,268 @@ function n() {
         unknown {Unknown}
         other {}
       }`,
-          id: `consumerUsage.series.turnTriggerLabel`,
+          id: `consumerUsage.series.turnTriggerLabel`
         },
         {
           defaultMessage: `{unit, select, turns {Turns} lines {Lines of code} other {Usage}}`,
-          id: `settings.usage.billing.activity.chartLabel`,
+          id: `settings.usage.billing.activity.chartLabel`
         },
         {
           defaultMessage: `No plugin calls or skills used during this period`,
-          id: `settings.usage.billing.activity.empty`,
+          id: `settings.usage.billing.activity.empty`
         },
         { defaultMessage: `Other`, id: `settings.usage.billing.activity.other` },
         {
           defaultMessage: `Tool activity time range`,
-          id: `settings.usage.billing.activity.periodLabel`,
+          id: `settings.usage.billing.activity.periodLabel`
         },
         {
           defaultMessage: `Plugin calls`,
-          id: `settings.usage.billing.activity.personalPluginCalls`,
+          id: `settings.usage.billing.activity.personalPluginCalls`
         },
         { defaultMessage: `Plugins called`, id: `settings.usage.billing.activity.plugins` },
         { defaultMessage: `Skills used`, id: `settings.usage.billing.activity.skills` },
         {
           defaultMessage: `See which plugins and skills were used over time`,
-          id: `settings.usage.billing.activity.subtitle`,
+          id: `settings.usage.billing.activity.subtitle`
         },
         {
           defaultMessage: `See which plugins and skills were used over time. Updated {date}`,
-          id: `settings.usage.billing.activity.subtitle.updated`,
+          id: `settings.usage.billing.activity.subtitle.updated`
         },
         { defaultMessage: `Tool activity`, id: `settings.usage.billing.activity.title` },
         { defaultMessage: `No usage recorded yet`, id: `settings.usage.billing.chart.empty` },
         { defaultMessage: `Could not load usage data`, id: `settings.usage.billing.chart.error` },
         {
           defaultMessage: `Double-click to isolate`,
-          id: `settings.usage.billing.chart.legend.isolate`,
+          id: `settings.usage.billing.chart.legend.isolate`
         },
         {
           defaultMessage: `Double-click to show all`,
-          id: `settings.usage.billing.chart.legend.showAll`,
+          id: `settings.usage.billing.chart.legend.showAll`
         },
         {
           defaultMessage: `{series} · {share} of total usage · {period} UTC`,
-          id: `settings.usage.billing.chart.legend.totalUsagePeriodSummary`,
+          id: `settings.usage.billing.chart.legend.totalUsagePeriodSummary`
         },
         { defaultMessage: `Loading usage data…`, id: `settings.usage.billing.chart.loading` },
         { defaultMessage: `Retry`, id: `settings.usage.billing.chart.retry` },
         {
           defaultMessage: `{value, number} calls`,
-          id: `settings.usage.billing.chart.tooltip.calls`,
+          id: `settings.usage.billing.chart.tooltip.calls`
         },
         {
           defaultMessage: `{value, plural, one {# credit} other {# credits}}`,
-          id: `settings.usage.billing.chart.tooltip.creditAmount`,
+          id: `settings.usage.billing.chart.tooltip.creditAmount`
         },
         {
           defaultMessage: `{value, number} credits`,
-          id: `settings.usage.billing.chart.tooltip.credits`,
+          id: `settings.usage.billing.chart.tooltip.credits`
         },
         {
           defaultMessage: `{value, number} credits`,
-          id: `settings.usage.billing.chart.tooltip.creditValue`,
+          id: `settings.usage.billing.chart.tooltip.creditValue`
         },
         {
           defaultMessage: `{value, number} lines`,
-          id: `settings.usage.billing.chart.tooltip.lines`,
+          id: `settings.usage.billing.chart.tooltip.lines`
         },
         {
           defaultMessage: `{value, plural, one {# message} other {# messages}}`,
-          id: `settings.usage.billing.chart.tooltip.messages`,
+          id: `settings.usage.billing.chart.tooltip.messages`
         },
         {
           defaultMessage: `{value, number} tokens`,
-          id: `settings.usage.billing.chart.tooltip.tokens`,
+          id: `settings.usage.billing.chart.tooltip.tokens`
         },
         {
           defaultMessage: `Share of total usage`,
-          id: `settings.usage.billing.chart.tooltip.totalUsageShare`,
+          id: `settings.usage.billing.chart.tooltip.totalUsageShare`
         },
         {
           defaultMessage: `{value, number} turns`,
-          id: `settings.usage.billing.chart.tooltip.turns`,
+          id: `settings.usage.billing.chart.tooltip.turns`
         },
         { defaultMessage: `{value, number} uses`, id: `settings.usage.billing.chart.tooltip.uses` },
         {
           defaultMessage: `{unit, select, issues {{value, plural, one {# issue} other {# issues}}} reviews {{value, plural, one {# review} other {# reviews}}} reactions {{value, plural, one {# reaction} other {# reactions}}} other {{value, number}}}`,
-          id: `settings.usage.billing.codeReview.tooltip.total`,
+          id: `settings.usage.billing.codeReview.tooltip.total`
         },
         { defaultMessage: `Credits used`, id: `settings.usage.billing.credits.chartLabel` },
         {
           defaultMessage: `Credits history time range`,
-          id: `settings.usage.billing.credits.consumer.history.periodLabel`,
+          id: `settings.usage.billing.credits.consumer.history.periodLabel`
         },
         {
           defaultMessage: `Credits history`,
-          id: `settings.usage.billing.credits.consumer.history.title`,
+          id: `settings.usage.billing.credits.consumer.history.title`
         },
         {
           defaultMessage: `No plan usage or credits consumed during this period`,
-          id: `settings.usage.billing.credits.empty`,
+          id: `settings.usage.billing.credits.empty`
         },
         {
           defaultMessage: `Group credit usage history`,
-          id: `settings.usage.billing.credits.history.breakdownLabel`,
+          id: `settings.usage.billing.credits.history.breakdownLabel`
         },
         { defaultMessage: `By model`, id: `settings.usage.billing.credits.history.byModel` },
         { defaultMessage: `By product`, id: `settings.usage.billing.credits.history.byProduct` },
         {
           defaultMessage: `By reasoning`,
-          id: `settings.usage.billing.credits.history.byReasoning`,
+          id: `settings.usage.billing.credits.history.byReasoning`
         },
         { defaultMessage: `By speed`, id: `settings.usage.billing.credits.history.bySpeed` },
         {
           defaultMessage: `Credit usage history time range`,
-          id: `settings.usage.billing.credits.history.periodLabel`,
+          id: `settings.usage.billing.credits.history.periodLabel`
         },
         {
           defaultMessage: `{effort, select, none {None} minimal {Minimal} low {Light} medium {Medium} high {High} xhigh {Extra High} max {Max} ultra {Ultra} unspecified {Unspecified} unknown {Unknown} other {Other}}`,
-          id: `settings.usage.billing.credits.history.reasoningSeries`,
+          id: `settings.usage.billing.credits.history.reasoningSeries`
         },
         {
           defaultMessage: `{speed, select, fast {Fast mode} ultrafast {Ultrafast} standard {Standard} unknown {Unknown} other {Other}}`,
-          id: `settings.usage.billing.credits.history.speedSeries`,
+          id: `settings.usage.billing.credits.history.speedSeries`
         },
         {
           defaultMessage: `Track credits usage over time`,
-          id: `settings.usage.billing.credits.history.subtitle`,
+          id: `settings.usage.billing.credits.history.subtitle`
         },
         {
           defaultMessage: `Track credits usage over time. Updated {date}`,
-          id: `settings.usage.billing.credits.history.subtitle.updated`,
+          id: `settings.usage.billing.credits.history.subtitle.updated`
         },
         {
           defaultMessage: `Credit usage history`,
-          id: `settings.usage.billing.credits.history.title`,
+          id: `settings.usage.billing.credits.history.title`
         },
         {
           defaultMessage: `Credits spent`,
-          id: `settings.usage.billing.credits.personalChartLabel`,
+          id: `settings.usage.billing.credits.personalChartLabel`
         },
         { defaultMessage: `Credits spent`, id: `settings.usage.billing.credits.personalTitle` },
         { defaultMessage: `Credits used`, id: `settings.usage.billing.credits.title` },
         {
           defaultMessage: `Credits usage history`,
-          id: `settings.usage.billing.credits.workspace.history.title`,
+          id: `settings.usage.billing.credits.workspace.history.title`
         },
         { defaultMessage: `Est. {value}`, id: `settings.usage.billing.estimatedSpend` },
         { defaultMessage: `Other`, id: `settings.usage.billing.history.other` },
         {
           defaultMessage: `{product, select, codex {Codex} work {Work} other {Other}}`,
-          id: `settings.usage.billing.history.productSeries`,
+          id: `settings.usage.billing.history.productSeries`
         },
         {
           defaultMessage: `No lines of code during this period`,
-          id: `settings.usage.billing.linesOfCode.empty`,
+          id: `settings.usage.billing.linesOfCode.empty`
         },
         { defaultMessage: `Lines of code`, id: `settings.usage.billing.linesOfCode.series` },
         { defaultMessage: `Lines of code`, id: `settings.usage.billing.linesOfCode.title` },
         {
           defaultMessage: `Group messages by model or surface`,
-          id: `settings.usage.billing.messages.breakdownLabel`,
+          id: `settings.usage.billing.messages.breakdownLabel`
         },
         { defaultMessage: `Messages`, id: `settings.usage.billing.messages.chartLabel` },
         {
           defaultMessage: `No messages during this period`,
-          id: `settings.usage.billing.messages.empty`,
+          id: `settings.usage.billing.messages.empty`
         },
         {
           defaultMessage: `Messages time range`,
-          id: `settings.usage.billing.messages.periodLabel`,
+          id: `settings.usage.billing.messages.periodLabel`
         },
         { defaultMessage: `Messages`, id: `settings.usage.billing.messages.sectionTitle` },
         {
           defaultMessage: `Track the number of messages sent over time`,
-          id: `settings.usage.billing.messages.subtitle`,
+          id: `settings.usage.billing.messages.subtitle`
         },
         { defaultMessage: `Messages`, id: `settings.usage.billing.messages.title` },
         { defaultMessage: `7d`, id: `settings.usage.billing.period.sevenDays` },
         { defaultMessage: `30d`, id: `settings.usage.billing.period.thirtyDays` },
         {
           defaultMessage: `Group personal usage by product or model`,
-          id: `settings.usage.billing.personalUsage.breakdownLabel`,
+          id: `settings.usage.billing.personalUsage.breakdownLabel`
         },
         { defaultMessage: `Plan usage`, id: `settings.usage.billing.personalUsage.chartLabel` },
         {
           defaultMessage: `Personal usage history time range`,
-          id: `settings.usage.billing.personalUsage.history.periodLabel`,
+          id: `settings.usage.billing.personalUsage.history.periodLabel`
         },
         {
           defaultMessage: `See how plan usage and credits were consumed in Work, Codex, and other agentic tasks. Conversations in Chat are not included.`,
-          id: `settings.usage.billing.personalUsage.history.subtitle`,
+          id: `settings.usage.billing.personalUsage.history.subtitle`
         },
         {
           defaultMessage: `Usage history`,
-          id: `settings.usage.billing.personalUsage.history.title`,
+          id: `settings.usage.billing.personalUsage.history.title`
         },
         { defaultMessage: `Plan usage`, id: `settings.usage.billing.personalUsage.title` },
         { defaultMessage: `Plugins called`, id: `settings.usage.billing.plugins.chartLabel` },
         { defaultMessage: `Plugin calls`, id: `settings.usage.billing.plugins.personalChartLabel` },
         {
           defaultMessage: `No turns or lines of code during this period`,
-          id: `settings.usage.billing.productActivity.empty`,
+          id: `settings.usage.billing.productActivity.empty`
         },
         {
           defaultMessage: `See how your activity varies across products and models`,
-          id: `settings.usage.billing.productActivity.subtitle`,
+          id: `settings.usage.billing.productActivity.subtitle`
         },
         { defaultMessage: `Product activity`, id: `settings.usage.billing.productActivity.title` },
         { defaultMessage: `Skills used`, id: `settings.usage.billing.skills.chartLabel` },
         { defaultMessage: `Spend in USD`, id: `settings.usage.billing.spend.chartLabel` },
         {
           defaultMessage: `No spend recorded during this period`,
-          id: `settings.usage.billing.spend.empty`,
+          id: `settings.usage.billing.spend.empty`
         },
         {
           defaultMessage: `Group spend history`,
-          id: `settings.usage.billing.spend.history.breakdownLabel`,
+          id: `settings.usage.billing.spend.history.breakdownLabel`
         },
         {
           defaultMessage: `Spend history time range`,
-          id: `settings.usage.billing.spend.history.periodLabel`,
+          id: `settings.usage.billing.spend.history.periodLabel`
         },
         {
           defaultMessage: `Track spend in USD over time`,
-          id: `settings.usage.billing.spend.history.subtitle`,
+          id: `settings.usage.billing.spend.history.subtitle`
         },
         {
           defaultMessage: `Track spend in USD over time. Updated {date}`,
-          id: `settings.usage.billing.spend.history.subtitle.updated`,
+          id: `settings.usage.billing.spend.history.subtitle.updated`
         },
         { defaultMessage: `Spend history`, id: `settings.usage.billing.spend.history.title` },
         { defaultMessage: `Spend`, id: `settings.usage.billing.spend.title` },
         {
           defaultMessage: `Tokens by model`,
-          id: `settings.usage.billing.tokens.business.history.title`,
+          id: `settings.usage.billing.tokens.business.history.title`
         },
         { defaultMessage: `Cached input`, id: `settings.usage.billing.tokens.cachedInput` },
         { defaultMessage: `Tokens used`, id: `settings.usage.billing.tokens.chartLabel` },
         {
           defaultMessage: `No tokens used during this period`,
-          id: `settings.usage.billing.tokens.empty`,
+          id: `settings.usage.billing.tokens.empty`
         },
         { defaultMessage: `All models`, id: `settings.usage.billing.tokens.history.allModels` },
         {
           defaultMessage: `Filter token usage history by model`,
-          id: `settings.usage.billing.tokens.history.modelFilterLabel`,
+          id: `settings.usage.billing.tokens.history.modelFilterLabel`
         },
         { defaultMessage: `Other`, id: `settings.usage.billing.tokens.history.otherModel` },
         {
           defaultMessage: `Token usage history time range`,
-          id: `settings.usage.billing.tokens.history.periodLabel`,
+          id: `settings.usage.billing.tokens.history.periodLabel`
         },
         {
           defaultMessage: `Track token usage over time`,
-          id: `settings.usage.billing.tokens.history.subtitle`,
+          id: `settings.usage.billing.tokens.history.subtitle`
         },
         {
           defaultMessage: `Track token usage over time. Updated {date}`,
-          id: `settings.usage.billing.tokens.history.subtitle.updated`,
+          id: `settings.usage.billing.tokens.history.subtitle.updated`
         },
         {
           defaultMessage: `Token usage history`,
-          id: `settings.usage.billing.tokens.history.title`,
+          id: `settings.usage.billing.tokens.history.title`
         },
         { defaultMessage: `Output`, id: `settings.usage.billing.tokens.output` },
         { defaultMessage: `Total tokens`, id: `settings.usage.billing.tokens.personalChartLabel` },
@@ -1093,39 +1101,39 @@ function n() {
         { defaultMessage: `Uncached input`, id: `settings.usage.billing.tokens.uncachedInput` },
         {
           defaultMessage: `{breakdown, select, model {By model} surface {By surface} other {By model}}`,
-          id: `settings.usage.billing.turns.breakdown`,
+          id: `settings.usage.billing.turns.breakdown`
         },
         {
           defaultMessage: `Group turns by model or surface`,
-          id: `settings.usage.billing.turns.breakdownLabel`,
+          id: `settings.usage.billing.turns.breakdownLabel`
         },
         { defaultMessage: `No turns during this period`, id: `settings.usage.billing.turns.empty` },
         {
           defaultMessage: `Turns and lines of code time range`,
-          id: `settings.usage.billing.turns.periodLabel`,
+          id: `settings.usage.billing.turns.periodLabel`
         },
         {
           defaultMessage: `{surface, select, desktop {Desktop} cli {CLI} vscode {Extension} web {Codex Cloud} workWeb {Work Web} mobile {Mobile} codeReview {Code review} other {Other}}`,
-          id: `settings.usage.billing.turns.surface`,
+          id: `settings.usage.billing.turns.surface`
         },
         { defaultMessage: `Turns`, id: `settings.usage.billing.turns.title` },
         {
           defaultMessage: `Usage data is approximate and may be delayed by up to 6 hours`,
-          id: `settings.usage.daily.subtitle`,
+          id: `settings.usage.daily.subtitle`
         },
         { defaultMessage: `Chat`, id: `settings.usage.topConsumingChats.chatColumn` },
         { defaultMessage: `Credits used`, id: `settings.usage.topConsumingChats.creditsColumn` },
         {
           defaultMessage: `No thread activity during this period`,
-          id: `settings.usage.topConsumingChats.empty`,
+          id: `settings.usage.topConsumingChats.empty`
         },
         {
           defaultMessage: `Could not load task usage`,
-          id: `settings.usage.topConsumingChats.error`,
+          id: `settings.usage.topConsumingChats.error`
         },
         {
           defaultMessage: `Est. $ spent`,
-          id: `settings.usage.topConsumingChats.estimatedSpendColumn`,
+          id: `settings.usage.topConsumingChats.estimatedSpendColumn`
         },
         { defaultMessage: `Loading task usage…`, id: `settings.usage.topConsumingChats.loading` },
         { defaultMessage: `Spent`, id: `settings.usage.topConsumingChats.nativeSpendColumn` },
@@ -1134,14 +1142,14 @@ function n() {
         { defaultMessage: `See more`, id: `settings.usage.topConsumingChats.seeMore` },
         {
           defaultMessage: `Work and Codex chats active in the last 30 days ranked by lifetime credits`,
-          id: `settings.usage.topConsumingChats.subtitle`,
+          id: `settings.usage.topConsumingChats.subtitle`
         },
         { defaultMessage: `Top chats`, id: `settings.usage.topConsumingChats.title` },
         { defaultMessage: `Untitled task`, id: `settings.usage.topConsumingChats.untitled` },
         {
           defaultMessage: `Work and Codex chats active in the last 30 days ranked by lifetime spend`,
-          id: `settings.usage.topConsumingChats.usdSubtitle`,
-        },
+          id: `settings.usage.topConsumingChats.usdSubtitle`
+        }
       ],
       appearance: [
         { defaultMessage: `Proof`, id: `settings-search.literal.0d3582f93492` },
@@ -1177,149 +1185,149 @@ function n() {
         { defaultMessage: `Custom`, id: `settings.appearance.chatGptAccent.custom` },
         {
           defaultMessage: `Dark custom accent color`,
-          id: `settings.appearance.chatGptAccent.darkCustom`,
+          id: `settings.appearance.chatGptAccent.darkCustom`
         },
         { defaultMessage: `Default`, id: `settings.appearance.chatGptAccent.default` },
         { defaultMessage: `Green`, id: `settings.appearance.chatGptAccent.green` },
         {
           defaultMessage: `Light custom accent color`,
-          id: `settings.appearance.chatGptAccent.lightCustom`,
+          id: `settings.appearance.chatGptAccent.lightCustom`
         },
         { defaultMessage: `Orange`, id: `settings.appearance.chatGptAccent.orange` },
         { defaultMessage: `Pink`, id: `settings.appearance.chatGptAccent.pink` },
         { defaultMessage: `Purple`, id: `settings.appearance.chatGptAccent.purple` },
         {
           defaultMessage: `Could not update accent color`,
-          id: `settings.appearance.chatGptAccent.updateError`,
+          id: `settings.appearance.chatGptAccent.updateError`
         },
         { defaultMessage: `White`, id: `settings.appearance.chatGptAccent.white` },
         { defaultMessage: `Yellow`, id: `settings.appearance.chatGptAccent.yellow` },
         { defaultMessage: `Same as UI font`, id: `settings.appearance.contentFont.sameAsUi` },
         {
           defaultMessage: `{variant} accent color`,
-          id: `settings.general.appearance.chromeTheme.accent`,
+          id: `settings.general.appearance.chromeTheme.accent`
         },
         { defaultMessage: `Accent`, id: `settings.general.appearance.chromeTheme.accent.short` },
         {
           defaultMessage: `{variant} code font`,
-          id: `settings.general.appearance.chromeTheme.codeFontFamily`,
+          id: `settings.general.appearance.chromeTheme.codeFontFamily`
         },
         {
           defaultMessage: `Code font`,
-          id: `settings.general.appearance.chromeTheme.codeFontFamily.short`,
+          id: `settings.general.appearance.chromeTheme.codeFontFamily.short`
         },
         {
           defaultMessage: `{variant} code font style`,
-          id: `settings.general.appearance.chromeTheme.codeFontStyle`,
+          id: `settings.general.appearance.chromeTheme.codeFontStyle`
         },
         {
           defaultMessage: `{variant} content font`,
-          id: `settings.general.appearance.chromeTheme.contentFontFamily`,
+          id: `settings.general.appearance.chromeTheme.contentFontFamily`
         },
         {
           defaultMessage: `Content font`,
-          id: `settings.general.appearance.chromeTheme.contentFontFamily.short`,
+          id: `settings.general.appearance.chromeTheme.contentFontFamily.short`
         },
         {
           defaultMessage: `{variant} content font style`,
-          id: `settings.general.appearance.chromeTheme.contentFontStyle`,
+          id: `settings.general.appearance.chromeTheme.contentFontStyle`
         },
         {
           defaultMessage: `{variant} contrast`,
-          id: `settings.general.appearance.chromeTheme.contrast`,
+          id: `settings.general.appearance.chromeTheme.contrast`
         },
         {
           defaultMessage: `Contrast`,
-          id: `settings.general.appearance.chromeTheme.contrast.short`,
+          id: `settings.general.appearance.chromeTheme.contrast.short`
         },
         {
           defaultMessage: `Use custom font value`,
-          id: `settings.general.appearance.chromeTheme.customFontValue`,
+          id: `settings.general.appearance.chromeTheme.customFontValue`
         },
         { defaultMessage: `Copy theme`, id: `settings.general.appearance.chromeTheme.export` },
         {
           defaultMessage: `Copy {variant} theme`,
-          id: `settings.general.appearance.chromeTheme.export.ariaLabel`,
+          id: `settings.general.appearance.chromeTheme.export.ariaLabel`
         },
         {
           defaultMessage: `{variant} theme copied`,
-          id: `settings.general.appearance.chromeTheme.export.success`,
+          id: `settings.general.appearance.chromeTheme.export.success`
         },
         { defaultMessage: `Import`, id: `settings.general.appearance.chromeTheme.import` },
         {
           defaultMessage: `Import {variant} theme`,
-          id: `settings.general.appearance.chromeTheme.import.ariaLabel`,
+          id: `settings.general.appearance.chromeTheme.import.ariaLabel`
         },
         {
           defaultMessage: `{variant} theme share string`,
-          id: `settings.general.appearance.chromeTheme.import.dialog.ariaLabel`,
+          id: `settings.general.appearance.chromeTheme.import.dialog.ariaLabel`
         },
         {
           defaultMessage: `Cancel`,
-          id: `settings.general.appearance.chromeTheme.import.dialog.cancel`,
+          id: `settings.general.appearance.chromeTheme.import.dialog.cancel`
         },
         {
           defaultMessage: `Import theme`,
-          id: `settings.general.appearance.chromeTheme.import.dialog.submit`,
+          id: `settings.general.appearance.chromeTheme.import.dialog.submit`
         },
         {
           defaultMessage: `Import theme`,
-          id: `settings.general.appearance.chromeTheme.import.dialog.title`,
+          id: `settings.general.appearance.chromeTheme.import.dialog.title`
         },
         {
           defaultMessage: `Couldn’t import {variant} theme`,
-          id: `settings.general.appearance.chromeTheme.import.error`,
+          id: `settings.general.appearance.chromeTheme.import.error`
         },
         {
           defaultMessage: `{variant} theme imported`,
-          id: `settings.general.appearance.chromeTheme.import.success`,
+          id: `settings.general.appearance.chromeTheme.import.success`
         },
         {
           defaultMessage: `{variant} ink color`,
-          id: `settings.general.appearance.chromeTheme.ink`,
+          id: `settings.general.appearance.chromeTheme.ink`
         },
         { defaultMessage: `Foreground`, id: `settings.general.appearance.chromeTheme.ink.short` },
         {
           defaultMessage: `Regular`,
-          id: `settings.general.appearance.chromeTheme.regularFontStyle`,
+          id: `settings.general.appearance.chromeTheme.regularFontStyle`
         },
         {
           defaultMessage: `{variant} background color`,
-          id: `settings.general.appearance.chromeTheme.surface`,
+          id: `settings.general.appearance.chromeTheme.surface`
         },
         {
           defaultMessage: `Background`,
-          id: `settings.general.appearance.chromeTheme.surface.short`,
+          id: `settings.general.appearance.chromeTheme.surface.short`
         },
         {
           defaultMessage: `System default`,
-          id: `settings.general.appearance.chromeTheme.systemFont`,
+          id: `settings.general.appearance.chromeTheme.systemFont`
         },
         {
           defaultMessage: `{variant} translucent sidebar`,
-          id: `settings.general.appearance.chromeTheme.translucentSidebar`,
+          id: `settings.general.appearance.chromeTheme.translucentSidebar`
         },
         {
           defaultMessage: `Translucent sidebar`,
-          id: `settings.general.appearance.chromeTheme.translucentSidebar.short`,
+          id: `settings.general.appearance.chromeTheme.translucentSidebar.short`
         },
         {
           defaultMessage: `{variant} UI font`,
-          id: `settings.general.appearance.chromeTheme.uiFontFamily`,
+          id: `settings.general.appearance.chromeTheme.uiFontFamily`
         },
         {
           defaultMessage: `UI font`,
-          id: `settings.general.appearance.chromeTheme.uiFontFamily.short`,
+          id: `settings.general.appearance.chromeTheme.uiFontFamily.short`
         },
         {
           defaultMessage: `{variant} UI font style`,
-          id: `settings.general.appearance.chromeTheme.uiFontStyle`,
+          id: `settings.general.appearance.chromeTheme.uiFontStyle`
         },
         { defaultMessage: `Code font size`, id: `settings.general.appearance.codeFontSize` },
         { defaultMessage: `Code font size`, id: `settings.general.appearance.codeFontSize.row` },
         {
           defaultMessage: `Adjust the base size used for code across chats and diffs`,
-          id: `settings.general.appearance.codeFontSize.row.description`,
+          id: `settings.general.appearance.codeFontSize.row.description`
         },
         { defaultMessage: `px`, id: `settings.general.appearance.codeFontSize.units` },
         { defaultMessage: `{variant} code theme`, id: `settings.general.appearance.codeTheme` },
@@ -1328,41 +1336,41 @@ function n() {
         { defaultMessage: `Color`, id: `settings.general.appearance.diffMarkerStyle.color` },
         {
           defaultMessage: `Color diff markers`,
-          id: `settings.general.appearance.diffMarkerStyle.color.ariaLabel`,
+          id: `settings.general.appearance.diffMarkerStyle.color.ariaLabel`
         },
         {
           defaultMessage: `Show changes using colors or +/− markers`,
-          id: `settings.general.appearance.diffMarkerStyle.description`,
+          id: `settings.general.appearance.diffMarkerStyle.description`
         },
         { defaultMessage: `Diff markers`, id: `settings.general.appearance.diffMarkerStyle.label` },
         { defaultMessage: `+/-`, id: `settings.general.appearance.diffMarkerStyle.symbols` },
         {
           defaultMessage: `Plus / minus diff markers`,
-          id: `settings.general.appearance.diffMarkerStyle.symbols.ariaLabel`,
+          id: `settings.general.appearance.diffMarkerStyle.symbols.ariaLabel`
         },
         {
           defaultMessage: `Use ChatGPT Dock icon`,
-          id: `settings.general.appearance.dockIcon.chatGPT.ariaLabel`,
+          id: `settings.general.appearance.dockIcon.chatGPT.ariaLabel`
         },
         {
           defaultMessage: `Use Codex Dock icon`,
-          id: `settings.general.appearance.dockIcon.codex.ariaLabel`,
+          id: `settings.general.appearance.dockIcon.codex.ariaLabel`
         },
         { defaultMessage: `Dock icon`, id: `settings.general.appearance.dockIcon.label` },
         {
           defaultMessage: `Choose the icon the app will use in the dock`,
-          id: `settings.general.appearance.dockIcon.row.description`,
+          id: `settings.general.appearance.dockIcon.row.description`
         },
         {
           defaultMessage: `Use native macOS font anti-aliasing`,
-          id: `settings.general.appearance.fontSmoothing.description`,
+          id: `settings.general.appearance.fontSmoothing.description`
         },
         { defaultMessage: `Font smoothing`, id: `settings.general.appearance.fontSmoothing.label` },
         { defaultMessage: `Preferences`, id: `settings.general.appearance.general.groupTitle` },
         { defaultMessage: `Light theme`, id: `settings.general.appearance.lightChromeTheme` },
         {
           defaultMessage: `Reduce animations or match your system`,
-          id: `settings.general.appearance.reducedMotion.description`,
+          id: `settings.general.appearance.reducedMotion.description`
         },
         { defaultMessage: `Reduce motion`, id: `settings.general.appearance.reducedMotion.label` },
         { defaultMessage: `Off`, id: `settings.general.appearance.reducedMotion.off` },
@@ -1371,12 +1379,12 @@ function n() {
         { defaultMessage: `Sans font size`, id: `settings.general.appearance.sansFontSize` },
         {
           defaultMessage: `Adjust the base size used for the ChatGPT UI`,
-          id: `settings.general.appearance.sansFontSize.chatGptDescription`,
+          id: `settings.general.appearance.sansFontSize.chatGptDescription`
         },
         { defaultMessage: `UI font size`, id: `settings.general.appearance.sansFontSize.row` },
         {
           defaultMessage: `Adjust the base size used for the {appName} UI`,
-          id: `settings.general.appearance.sansFontSize.row.description`,
+          id: `settings.general.appearance.sansFontSize.row.description`
         },
         { defaultMessage: `px`, id: `settings.general.appearance.sansFontSize.units` },
         { defaultMessage: `Theme`, id: `settings.general.appearance.theme` },
@@ -1386,33 +1394,33 @@ function n() {
         { defaultMessage: `System`, id: `settings.general.appearance.theme.system` },
         {
           defaultMessage: `Change the cursor to a pointer when hovering over interactive elements`,
-          id: `settings.general.appearance.usePointerCursors.description`,
+          id: `settings.general.appearance.usePointerCursors.description`
         },
         {
           defaultMessage: `Use pointer cursors`,
-          id: `settings.general.appearance.usePointerCursors.label`,
-        },
+          id: `settings.general.appearance.usePointerCursors.label`
+        }
       ],
       appshots: [
         {
           defaultMessage: `Press both ⌘ keys simultaneously`,
-          id: `settings.appshotHotkey.description.command`,
+          id: `settings.appshotHotkey.description.command`
         },
         {
           defaultMessage: `Press both ⌥ keys simultaneously`,
-          id: `settings.appshotHotkey.description.option`,
+          id: `settings.appshotHotkey.description.option`
         },
         {
           defaultMessage: `Press both ⇧ keys simultaneously`,
-          id: `settings.appshotHotkey.description.shift`,
+          id: `settings.appshotHotkey.description.shift`
         },
         {
           defaultMessage: `Press both Alt keys simultaneously`,
-          id: `settings.appshotHotkey.description.windowsAlt`,
+          id: `settings.appshotHotkey.description.windowsAlt`
         },
         {
           defaultMessage: `Press both Shift keys simultaneously`,
-          id: `settings.appshotHotkey.description.windowsShift`,
+          id: `settings.appshotHotkey.description.windowsShift`
         },
         { defaultMessage: `Hotkey`, id: `settings.appshotHotkey.label` },
         { defaultMessage: `None`, id: `settings.appshotHotkey.none` },
@@ -1422,194 +1430,194 @@ function n() {
         { defaultMessage: `Automatic`, id: `settings.appshots.destination.automatic` },
         {
           defaultMessage: `Uses the current chat if used recently, otherwise starts a new chat`,
-          id: `settings.appshots.destination.automatic.description`,
+          id: `settings.appshots.destination.automatic.description`
         },
         {
           defaultMessage: `Uses the current chat if used recently, otherwise starts a new chat. In pet Quick Chat, always starts a new chat`,
-          id: `settings.appshots.destination.automatic.description.mini`,
+          id: `settings.appshots.destination.automatic.description.mini`
         },
         {
           defaultMessage: `Choose where appshots go when you use the hotkey`,
-          id: `settings.appshots.destination.description`,
+          id: `settings.appshots.destination.description`
         },
         { defaultMessage: `Appshot destination`, id: `settings.appshots.destination.label` },
         { defaultMessage: `Current chat`, id: `settings.appshots.destination.lastChat` },
         {
           defaultMessage: `Always use the current chat`,
-          id: `settings.appshots.destination.lastChat.description`,
+          id: `settings.appshots.destination.lastChat.description`
         },
         { defaultMessage: `New chat`, id: `settings.appshots.destination.newChat` },
         {
           defaultMessage: `Always start a new chat`,
-          id: `settings.appshots.destination.newChat.description`,
+          id: `settings.appshots.destination.newChat.description`
         },
         {
           defaultMessage: `Appshots include visual and text content, including text scrolled offscreen`,
-          id: `settings.appshots.hero.description`,
+          id: `settings.appshots.hero.description`
         },
         {
           defaultMessage: `Take an appshot to show ChatGPT your frontmost window`,
-          id: `settings.appshots.hero.title`,
+          id: `settings.appshots.hero.title`
         },
         {
           defaultMessage: `Play appshot sound effect`,
-          id: `settings.appshots.soundEffect.ariaLabel`,
+          id: `settings.appshots.soundEffect.ariaLabel`
         },
-        { defaultMessage: `Play sound effect`, id: `settings.appshots.soundEffect.label` },
+        { defaultMessage: `Play sound effect`, id: `settings.appshots.soundEffect.label` }
       ],
       billing: [
         {
           defaultMessage: `You've got {discount}{discountType, select, percentage {%} other {}} off {plan, select, go {Go} plus {Plus} other {Pro}}. Your discounted plan renews on {hasDate, select, true {{date}} other {Not available}}.`,
-          id: `settings.consumerBilling.activeDiscount`,
+          id: `settings.consumerBilling.activeDiscount`
         },
         { defaultMessage: `Add new`, id: `settings.consumerBilling.addPaymentMethod` },
         {
           defaultMessage: `{offer, select, keep_saving {Keep saving} other {View offer}}`,
-          id: `settings.consumerBilling.annualOfferAction`,
+          id: `settings.consumerBilling.annualOfferAction`
         },
         {
           defaultMessage: `{offer, select, annual_offer {Save {amount}/year with annual billing} other {Annual billing saves you {amount}/year}}`,
-          id: `settings.consumerBilling.annualSavings`,
+          id: `settings.consumerBilling.annualSavings`
         },
         {
           defaultMessage: `This card can’t be removed because it’s selected for auto-reload`,
-          id: `settings.consumerBilling.autoReloadRemovalHelp`,
+          id: `settings.consumerBilling.autoReloadRemovalHelp`
         },
         {
           defaultMessage: `Use another payment method if your default payment method fails`,
-          id: `settings.consumerBilling.backupDescription`,
+          id: `settings.consumerBilling.backupDescription`
         },
         { defaultMessage: `Backup payment methods`, id: `settings.consumerBilling.backupMethods` },
         {
           defaultMessage: `Unable to update backup payment methods setting. Please try again.`,
-          id: `settings.consumerBilling.backupPaymentMethodsError`,
+          id: `settings.consumerBilling.backupPaymentMethodsError`
         },
         { defaultMessage: `Billing address`, id: `settings.consumerBilling.billingAddress` },
         { defaultMessage: `Billing email`, id: `settings.consumerBilling.billingEmail` },
         { defaultMessage: `Name`, id: `settings.consumerBilling.billingName` },
         {
           defaultMessage: `Billing schedule options`,
-          id: `settings.consumerBilling.cadenceActionsLabel`,
+          id: `settings.consumerBilling.cadenceActionsLabel`
         },
         {
           defaultMessage: `{period, select, yearly {Annual} other {Monthly}}`,
-          id: `settings.consumerBilling.cadenceBadge`,
+          id: `settings.consumerBilling.cadenceBadge`
         },
         { defaultMessage: `Cancel`, id: `settings.consumerBilling.cancelPlanButton` },
         {
           defaultMessage: `If you cancel, you'll keep full access to your plan features until the end of your billing period`,
-          id: `settings.consumerBilling.cancelPlanDescription`,
+          id: `settings.consumerBilling.cancelPlanDescription`
         },
         { defaultMessage: `Cancel plan`, id: `settings.consumerBilling.cancelPlanTitle` },
         { defaultMessage: `Default`, id: `settings.consumerBilling.defaultCard` },
         {
           defaultMessage: `You've got {discount}{discountType, select, percentage {%} other {}} off {plan, select, go {Go} plus {Plus} other {Pro}}. Your plan renews (at {price}/{period, select, yearly {year} other {month}}) on {hasDate, select, true {{date}} other {Not available}}.`,
-          id: `settings.consumerBilling.discountEndingAtRenewal`,
+          id: `settings.consumerBilling.discountEndingAtRenewal`
         },
         {
           defaultMessage: `Edit billing information`,
-          id: `settings.consumerBilling.editBillingInformation`,
+          id: `settings.consumerBilling.editBillingInformation`
         },
         { defaultMessage: `Edit`, id: `settings.consumerBilling.editCard` },
         { defaultMessage: `Edit`, id: `settings.consumerBilling.editInformation` },
         { defaultMessage: `Expired`, id: `settings.consumerBilling.expiredCard` },
         {
           defaultMessage: `Intelligence for everyday tasks`,
-          id: `settings.consumerBilling.freePlanSubtitle`,
+          id: `settings.consumerBilling.freePlanSubtitle`
         },
         {
           defaultMessage: `Your {discount}{discountType, select, percentage {%} other {}} off {plan, select, go {Go} plus {Plus} other {Pro}} discount will apply in {numPeriods, plural, one {the next billing period} other {# billing periods}}`,
-          id: `settings.consumerBilling.futureDiscount`,
+          id: `settings.consumerBilling.futureDiscount`
         },
         { defaultMessage: `Billing information`, id: `settings.consumerBilling.information` },
         {
           defaultMessage: `Unable to load billing information. Please try again.`,
-          id: `settings.consumerBilling.loadError`,
+          id: `settings.consumerBilling.loadError`
         },
         {
           defaultMessage: `Loading billing information`,
-          id: `settings.consumerBilling.loadingBillingInformation`,
+          id: `settings.consumerBilling.loadingBillingInformation`
         },
         {
           defaultMessage: `Loading payment methods`,
-          id: `settings.consumerBilling.loadingPaymentMethods`,
+          id: `settings.consumerBilling.loadingPaymentMethods`
         },
         {
           defaultMessage: `Unable to load payment methods. Please try again.`,
-          id: `settings.consumerBilling.loadPaymentMethodsError`,
+          id: `settings.consumerBilling.loadPaymentMethodsError`
         },
         { defaultMessage: `Manage auto-reload`, id: `settings.consumerBilling.manageAutoReload` },
         { defaultMessage: `Manage billing schedule`, id: `settings.consumerBilling.manageCadence` },
         {
           defaultMessage: `No payment methods available`,
-          id: `settings.consumerBilling.noPaymentMethods`,
+          id: `settings.consumerBilling.noPaymentMethods`
         },
         {
           defaultMessage: `Your paid plan will downgrade to ChatGPT free on {date}`,
-          id: `settings.consumerBilling.paidPlanScheduledCancellation`,
+          id: `settings.consumerBilling.paidPlanScheduledCancellation`
         },
         {
           defaultMessage: `Open payment method actions`,
-          id: `settings.consumerBilling.paymentActions`,
+          id: `settings.consumerBilling.paymentActions`
         },
         {
           defaultMessage: `This card is already saved`,
-          id: `settings.consumerBilling.paymentMethodAlreadySaved`,
+          id: `settings.consumerBilling.paymentMethodAlreadySaved`
         },
         { defaultMessage: `Payment methods`, id: `settings.consumerBilling.paymentMethods` },
         {
           defaultMessage: `{action, select, external_manage {Manage} renew {Renew {plan, select, go {Go} plus {Plus} other {Pro}} Plan} upgrade {{compare, select, true {Compare plans} other {Upgrade}}} change {{compare, select, true {Compare plans} other {Change plan}}} other {{compare, select, true {Compare plans} other {View plans}}}}`,
-          id: `settings.consumerBilling.planAction`,
+          id: `settings.consumerBilling.planAction`
         },
         {
           defaultMessage: `Your plan auto-renews on {hasDate, select, true {{date}} other {Not available}}`,
-          id: `settings.consumerBilling.planAutoRenewal`,
+          id: `settings.consumerBilling.planAutoRenewal`
         },
         {
           defaultMessage: `Your plan is canceled and won't renew. You'll continue to have access to ChatGPT {plan, select, go {Go} plus {Plus} prolite {{showProLevels, select, true {Pro 5x} other {Pro}}} pro {{showProLevels, select, true {Pro 20x} other {Pro}}} other {{plan}}} until {date}.`,
-          id: `settings.consumerBilling.planCanceledWithAccess`,
+          id: `settings.consumerBilling.planCanceledWithAccess`
         },
         {
           defaultMessage: `Your plan will expire on {date}`,
-          id: `settings.consumerBilling.planExpires`,
+          id: `settings.consumerBilling.planExpires`
         },
         {
           defaultMessage: `ChatGPT {plan, select, free {Free} go {Go} plus {Plus} prolite {{showProLevels, select, true {Pro 5x} other {Pro}}} pro {{showProLevels, select, true {Pro 20x} other {Pro}}} other {Pro}}`,
-          id: `settings.consumerBilling.planNameWithProLevels`,
+          id: `settings.consumerBilling.planNameWithProLevels`
         },
         {
           defaultMessage: `Your plan is paused. Access is limited to ChatGPT’s free version`,
-          id: `settings.consumerBilling.planPaused`,
+          id: `settings.consumerBilling.planPaused`
         },
         { defaultMessage: `Redeem gift card`, id: `settings.consumerBilling.redeem` },
         { defaultMessage: `Remove`, id: `settings.consumerBilling.removeCard` },
         {
           defaultMessage: `Unable to remove payment method. Please try again.`,
-          id: `settings.consumerBilling.removePaymentMethodError`,
+          id: `settings.consumerBilling.removePaymentMethodError`
         },
         { defaultMessage: `Retry`, id: `settings.consumerBilling.retry` },
         { defaultMessage: `Retry`, id: `settings.consumerBilling.retryRemovalProtection` },
         { defaultMessage: `Save`, id: `settings.consumerBilling.save` },
         {
           defaultMessage: `Unable to save billing information. Please try again.`,
-          id: `settings.consumerBilling.saveInformationError`,
+          id: `settings.consumerBilling.saveInformationError`
         },
         {
           defaultMessage: `Changes to {period, select, yearly {annual} other {monthly}} billing on {date}`,
-          id: `settings.consumerBilling.scheduledBillingCadence`,
+          id: `settings.consumerBilling.scheduledBillingCadence`
         },
         {
           defaultMessage: `Your plan changes to {plan, select, free {Free} go {Go} plus {Plus} prolite {{showProLevels, select, true {Pro 5x} other {Pro}}} pro {{showProLevels, select, true {Pro 20x} other {Pro}}} other {{plan}}} on {date}`,
-          id: `settings.consumerBilling.scheduledPlanChangeWithProLevels`,
+          id: `settings.consumerBilling.scheduledPlanChangeWithProLevels`
         },
         { defaultMessage: `Set as default`, id: `settings.consumerBilling.setDefault` },
         {
           defaultMessage: `Unable to set default payment method. Please try again.`,
-          id: `settings.consumerBilling.setDefaultPaymentMethodError`,
+          id: `settings.consumerBilling.setDefaultPaymentMethodError`
         },
         {
           defaultMessage: `Your free student plan continues until {date}`,
-          id: `settings.consumerBilling.studentPlanEnd`,
+          id: `settings.consumerBilling.studentPlanEnd`
         },
         { defaultMessage: `Tax ID`, id: `settings.consumerBilling.taxId` },
         { defaultMessage: `{type} · {value}`, id: `settings.consumerBilling.taxIdValue` },
@@ -1623,76 +1631,76 @@ function n() {
         { defaultMessage: `Void`, id: `settingsModal.invoiceStatusVoid` },
         {
           defaultMessage: `Open invoice from {createdDate, date, long}`,
-          id: `settingsModal.openInvoiceLinkAriaLabel`,
+          id: `settingsModal.openInvoiceLinkAriaLabel`
         },
         { defaultMessage: `Amount`, id: `settingsModal.transactionHistory.amountHeader` },
         { defaultMessage: `Date`, id: `settingsModal.transactionHistory.dateHeader` },
         {
           defaultMessage: `No transactions available`,
-          id: `settingsModal.transactionHistory.empty`,
+          id: `settingsModal.transactionHistory.empty`
         },
         {
           defaultMessage: `Unable to load transactions. Please try again.`,
-          id: `settingsModal.transactionHistory.loadError`,
+          id: `settingsModal.transactionHistory.loadError`
         },
         { defaultMessage: `Loading transactions`, id: `settingsModal.transactionHistory.loading` },
         { defaultMessage: `Next`, id: `settingsModal.transactionHistory.pagination.next` },
         { defaultMessage: `Previous`, id: `settingsModal.transactionHistory.pagination.previous` },
         {
           defaultMessage: `Seat change`,
-          id: `settingsModal.transactionHistory.product.additionalBusinessSeats`,
+          id: `settingsModal.transactionHistory.product.additionalBusinessSeats`
         },
         {
           defaultMessage: `Business plan`,
-          id: `settingsModal.transactionHistory.product.businessPlan`,
+          id: `settingsModal.transactionHistory.product.businessPlan`
         },
         { defaultMessage: `ChatGPT Go`, id: `settingsModal.transactionHistory.product.chatGptGo` },
         {
           defaultMessage: `ChatGPT Plus`,
-          id: `settingsModal.transactionHistory.product.chatGptPlus`,
+          id: `settingsModal.transactionHistory.product.chatGptPlus`
         },
         {
           defaultMessage: `ChatGPT Pro`,
-          id: `settingsModal.transactionHistory.product.chatGptPro`,
+          id: `settingsModal.transactionHistory.product.chatGptPro`
         },
         {
           defaultMessage: `ChatGPT Pro 20x`,
-          id: `settingsModal.transactionHistory.product.chatGptPro20x`,
+          id: `settingsModal.transactionHistory.product.chatGptPro20x`
         },
         {
           defaultMessage: `ChatGPT Pro 5x`,
-          id: `settingsModal.transactionHistory.product.chatGptPro5x`,
+          id: `settingsModal.transactionHistory.product.chatGptPro5x`
         },
         { defaultMessage: `Credits`, id: `settingsModal.transactionHistory.product.credits` },
         {
           defaultMessage: `Credits auto-reload`,
-          id: `settingsModal.transactionHistory.product.creditsAutoReload`,
+          id: `settingsModal.transactionHistory.product.creditsAutoReload`
         },
         { defaultMessage: `Gift card`, id: `settingsModal.transactionHistory.product.giftCard` },
         {
           defaultMessage: `Gifted credits`,
-          id: `settingsModal.transactionHistory.product.giftedCredits`,
+          id: `settingsModal.transactionHistory.product.giftedCredits`
         },
         { defaultMessage: `Invoice`, id: `settingsModal.transactionHistory.product.invoice` },
         {
           defaultMessage: `Premium {quantityDelta}`,
-          id: `settingsModal.transactionHistory.product.premiumSeatQuantityDelta`,
+          id: `settingsModal.transactionHistory.product.premiumSeatQuantityDelta`
         },
         {
           defaultMessage: `Standard {quantityDelta}`,
-          id: `settingsModal.transactionHistory.product.standardSeatQuantityDelta`,
+          id: `settingsModal.transactionHistory.product.standardSeatQuantityDelta`
         },
         {
           defaultMessage: `Adjustment`,
-          id: `settingsModal.transactionHistory.product.walletAdjustment`,
+          id: `settingsModal.transactionHistory.product.walletAdjustment`
         },
         {
           defaultMessage: `A change to your account balance, such as a refund, credit, or billing correction`,
-          id: `settingsModal.transactionHistory.product.walletAdjustment.tooltip`,
+          id: `settingsModal.transactionHistory.product.walletAdjustment.tooltip`
         },
         {
           defaultMessage: `More information about this adjustment`,
-          id: `settingsModal.transactionHistory.product.walletAdjustment.tooltipTrigger`,
+          id: `settingsModal.transactionHistory.product.walletAdjustment.tooltipTrigger`
         },
         { defaultMessage: `Credit`, id: `settingsModal.transactionHistory.status.credit` },
         { defaultMessage: `Debit`, id: `settingsModal.transactionHistory.status.debit` },
@@ -1702,294 +1710,294 @@ function n() {
         { defaultMessage: `View all`, id: `settingsModal.transactionHistory.viewAll` },
         {
           defaultMessage: `Your balance will be applied automatically to eligible payments, including ChatGPT subscriptions and credit purchases.`,
-          id: `settingsModal.walletBalance.description.v2`,
+          id: `settingsModal.walletBalance.description.v2`
         },
         { defaultMessage: `Loading balance…`, id: `settingsModal.walletBalance.loading` },
-        { defaultMessage: `Not available`, id: `settingsModal.walletBalance.unavailable` },
+        { defaultMessage: `Not available`, id: `settingsModal.walletBalance.unavailable` }
       ],
       "browser-use": [
         { defaultMessage: `Always ask`, id: `settings.browserUse.approval.alwaysAsk.label` },
         { defaultMessage: `Always allow`, id: `settings.browserUse.approval.neverAsk.label` },
         {
           defaultMessage: `Unable to save approval setting`,
-          id: `settings.browserUse.approval.saveError`,
+          id: `settings.browserUse.approval.saveError`
         },
         {
           defaultMessage: `Autofill and passwords`,
-          id: `settings.browserUse.autofillAndPasswords.title`,
+          id: `settings.browserUse.autofillAndPasswords.title`
         },
         {
           defaultMessage: `Always include`,
-          id: `settings.browserUse.browser.annotationScreenshots.always.label`,
+          id: `settings.browserUse.browser.annotationScreenshots.always.label`
         },
         {
           defaultMessage: `Screenshots help ChatGPT better understand and address comments, but increase plan usage`,
-          id: `settings.browserUse.browser.annotationScreenshots.description`,
+          id: `settings.browserUse.browser.annotationScreenshots.description`
         },
         {
           defaultMessage: `Annotation screenshots`,
-          id: `settings.browserUse.browser.annotationScreenshots.label`,
+          id: `settings.browserUse.browser.annotationScreenshots.label`
         },
         {
           defaultMessage: `Only on drag selection`,
-          id: `settings.browserUse.browser.annotationScreenshots.necessary.label`,
+          id: `settings.browserUse.browser.annotationScreenshots.necessary.label`
         },
         {
           defaultMessage: `Browsing data cleared`,
-          id: `settings.browserUse.browser.browsingDataCleared`,
+          id: `settings.browserUse.browser.browsingDataCleared`
         },
         {
           defaultMessage: `Cached images and files`,
-          id: `settings.browserUse.browser.cache.label`,
+          id: `settings.browserUse.browser.cache.label`
         },
         { defaultMessage: `Browser cache cleared`, id: `settings.browserUse.browser.cacheCleared` },
         {
           defaultMessage: `Clear all browsing data`,
-          id: `settings.browserUse.browser.clearBrowsingData`,
+          id: `settings.browserUse.browser.clearBrowsingData`
         },
         {
           defaultMessage: `Clear browsing history, site data, cache, and download history from the in-app browser`,
-          id: `settings.browserUse.browser.clearBrowsingData.description`,
+          id: `settings.browserUse.browser.clearBrowsingData.description`
         },
         {
           defaultMessage: `Browsing data`,
-          id: `settings.browserUse.browser.clearBrowsingData.label`,
+          id: `settings.browserUse.browser.clearBrowsingData.label`
         },
         {
           defaultMessage: `Unable to clear browsing data`,
-          id: `settings.browserUse.browser.clearBrowsingDataError`,
+          id: `settings.browserUse.browser.clearBrowsingDataError`
         },
         {
           defaultMessage: `Delete cached images and files`,
-          id: `settings.browserUse.browser.clearCache`,
+          id: `settings.browserUse.browser.clearCache`
         },
         {
           defaultMessage: `Unable to clear browser cache`,
-          id: `settings.browserUse.browser.clearCacheError`,
+          id: `settings.browserUse.browser.clearCacheError`
         },
         { defaultMessage: `Delete cookies`, id: `settings.browserUse.browser.clearCookies` },
         {
           defaultMessage: `Unable to clear browser cookies`,
-          id: `settings.browserUse.browser.clearCookiesError`,
+          id: `settings.browserUse.browser.clearCookiesError`
         },
         {
           defaultMessage: `Delete download history`,
-          id: `settings.browserUse.browser.clearDownloads`,
+          id: `settings.browserUse.browser.clearDownloads`
         },
         {
           defaultMessage: `Unable to clear browser download history`,
-          id: `settings.browserUse.browser.clearDownloadsError`,
+          id: `settings.browserUse.browser.clearDownloadsError`
         },
         {
           defaultMessage: `Delete browsing history`,
-          id: `settings.browserUse.browser.clearHistory`,
+          id: `settings.browserUse.browser.clearHistory`
         },
         {
           defaultMessage: `Unable to clear browser history`,
-          id: `settings.browserUse.browser.clearHistoryError`,
+          id: `settings.browserUse.browser.clearHistoryError`
         },
         { defaultMessage: `Delete site data`, id: `settings.browserUse.browser.clearSiteData` },
         {
           defaultMessage: `Unable to clear browser site data`,
-          id: `settings.browserUse.browser.clearSiteDataError`,
+          id: `settings.browserUse.browser.clearSiteDataError`
         },
         { defaultMessage: `Cookies`, id: `settings.browserUse.browser.cookies.label` },
         {
           defaultMessage: `Browser cookies cleared`,
-          id: `settings.browserUse.browser.cookiesCleared`,
+          id: `settings.browserUse.browser.cookiesCleared`
         },
         { defaultMessage: `Download history`, id: `settings.browserUse.browser.downloads.label` },
         {
           defaultMessage: `Browser download history cleared`,
-          id: `settings.browserUse.browser.downloadsCleared`,
+          id: `settings.browserUse.browser.downloadsCleared`
         },
         {
           defaultMessage: `Hide individual browsing data options`,
-          id: `settings.browserUse.browser.hideClearOptions`,
+          id: `settings.browserUse.browser.hideClearOptions`
         },
         { defaultMessage: `Browsing history`, id: `settings.browserUse.browser.history.label` },
         {
           defaultMessage: `Browser history cleared`,
-          id: `settings.browserUse.browser.historyCleared`,
+          id: `settings.browserUse.browser.historyCleared`
         },
         {
           defaultMessage: `Clear browsing data`,
-          id: `settings.browserUse.browser.openClearBrowsingData`,
+          id: `settings.browserUse.browser.openClearBrowsingData`
         },
         {
           defaultMessage: `Show individual browsing data options`,
-          id: `settings.browserUse.browser.showClearOptions`,
+          id: `settings.browserUse.browser.showClearOptions`
         },
         { defaultMessage: `Site data`, id: `settings.browserUse.browser.siteData.label` },
         {
           defaultMessage: `Browser site data cleared`,
-          id: `settings.browserUse.browser.siteDataCleared`,
+          id: `settings.browserUse.browser.siteDataCleared`
         },
         { defaultMessage: `Browser`, id: `settings.browserUse.browserSettings.breadcrumb.browser` },
         {
           defaultMessage: `Settings`,
-          id: `settings.browserUse.browserSettings.breadcrumb.settings`,
+          id: `settings.browserUse.browserSettings.breadcrumb.settings`
         },
         {
           defaultMessage: `Site settings`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings`
         },
         {
           defaultMessage: `Intrusive ads`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.ads`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.ads`
         },
         {
           defaultMessage: `Automatic downloads`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.automaticDownloads`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.automaticDownloads`
         },
         {
           defaultMessage: `Background sync`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.backgroundSync`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.backgroundSync`
         },
         {
           defaultMessage: `Camera`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.camera`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.camera`
         },
         {
           defaultMessage: `Clipboard`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.clipboard`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.clipboard`
         },
         {
           defaultMessage: `Third-party cookies`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.cookies`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.cookies`
         },
         {
           defaultMessage: `Embedded content`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.embeddedContent`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.embeddedContent`
         },
         {
           defaultMessage: `Protocol handlers`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.handlers`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.handlers`
         },
         {
           defaultMessage: `Images`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.images`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.images`
         },
         {
           defaultMessage: `JavaScript`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.javascript`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.javascript`
         },
         {
           defaultMessage: `Location`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.location`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.location`
         },
         {
           defaultMessage: `Microphone`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.microphone`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.microphone`
         },
         {
           defaultMessage: `Notifications`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.notifications`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.notifications`
         },
         {
           defaultMessage: `Pop-ups and redirects`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.popups`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.popups`
         },
         {
           defaultMessage: `Protected content IDs`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.protectedContent`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.protectedContent`
         },
         {
           defaultMessage: `Sound`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.sound`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.sound`
         },
         {
           defaultMessage: `USB devices`,
-          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.usbDevices`,
+          id: `settings.browserUse.browserSettings.breadcrumb.siteSettings.usbDevices`
         },
         { defaultMessage: `Manage`, id: `settings.browserUse.browserSettings.manage` },
         { defaultMessage: `Back`, id: `settings.browserUse.browserSettings.navigation.back` },
         { defaultMessage: `Forward`, id: `settings.browserUse.browserSettings.navigation.forward` },
         {
           defaultMessage: `Unable to update browsing history`,
-          id: `settings.browserUse.browsingHistory.actionError`,
+          id: `settings.browserUse.browsingHistory.actionError`
         },
         {
           defaultMessage: `Actions for {title}`,
-          id: `settings.browserUse.browsingHistory.actions`,
+          id: `settings.browserUse.browsingHistory.actions`
         },
         { defaultMessage: `All-time history`, id: `settings.browserUse.browsingHistory.allTime` },
         {
           defaultMessage: `Browsing history`,
-          id: `settings.browserUse.browsingHistory.breadcrumb.current`,
+          id: `settings.browserUse.browsingHistory.breadcrumb.current`
         },
         {
           defaultMessage: `Clear browsing data`,
-          id: `settings.browserUse.browsingHistory.clearBrowsingData`,
+          id: `settings.browserUse.browsingHistory.clearBrowsingData`
         },
         {
           defaultMessage: `No browsing history yet`,
-          id: `settings.browserUse.browsingHistory.empty`,
+          id: `settings.browserUse.browsingHistory.empty`
         },
         {
           defaultMessage: `Pages visited in the built-in browser will appear here`,
-          id: `settings.browserUse.browsingHistory.empty.description`,
+          id: `settings.browserUse.browsingHistory.empty.description`
         },
         {
           defaultMessage: `Unable to load browsing history`,
-          id: `settings.browserUse.browsingHistory.loadError`,
+          id: `settings.browserUse.browsingHistory.loadError`
         },
         {
           defaultMessage: `Loading browsing history`,
-          id: `settings.browserUse.browsingHistory.loading`,
+          id: `settings.browserUse.browsingHistory.loading`
         },
         {
           defaultMessage: `No matching pages`,
-          id: `settings.browserUse.browsingHistory.noResults`,
+          id: `settings.browserUse.browsingHistory.noResults`
         },
         {
           defaultMessage: `Try searching for a different page or address`,
-          id: `settings.browserUse.browsingHistory.noResults.description`,
+          id: `settings.browserUse.browsingHistory.noResults.description`
         },
         { defaultMessage: `Open page`, id: `settings.browserUse.browsingHistory.open` },
         { defaultMessage: `Open {title}`, id: `settings.browserUse.browsingHistory.openPage` },
         {
           defaultMessage: `Unable to load more browsing history`,
-          id: `settings.browserUse.browsingHistory.paginationError`,
+          id: `settings.browserUse.browsingHistory.paginationError`
         },
         {
           defaultMessage: `Unable to update browsing history: {error}`,
-          id: `settings.browserUse.browsingHistory.policyError`,
+          id: `settings.browserUse.browsingHistory.policyError`
         },
         { defaultMessage: `Remove from history`, id: `settings.browserUse.browsingHistory.remove` },
         {
           defaultMessage: `Remove selected`,
-          id: `settings.browserUse.browsingHistory.removeSelected`,
+          id: `settings.browserUse.browsingHistory.removeSelected`
         },
         { defaultMessage: `Try again`, id: `settings.browserUse.browsingHistory.retry` },
         {
           defaultMessage: `Search browsing history`,
-          id: `settings.browserUse.browsingHistory.search`,
+          id: `settings.browserUse.browsingHistory.search`
         },
         { defaultMessage: `Select {title}`, id: `settings.browserUse.browsingHistory.selectPage` },
         { defaultMessage: `Browsing history`, id: `settings.browserUse.browsingHistory.title` },
         {
           defaultMessage: `Unable to clear browsing data`,
-          id: `settings.browserUse.clearBrowsingData.error`,
+          id: `settings.browserUse.clearBrowsingData.error`
         },
         {
           defaultMessage: `Unable to load browser settings`,
-          id: `settings.browserUse.config.loadError`,
+          id: `settings.browserUse.config.loadError`
         },
         { defaultMessage: `Loading browser settings…`, id: `settings.browserUse.config.loading` },
         { defaultMessage: `Contact info`, id: `settings.browserUse.contactInfo.breadcrumb` },
         {
           defaultMessage: `Add, delete, and edit saved addresses, phone numbers, and email addresses`,
-          id: `settings.browserUse.contactInfo.description`,
+          id: `settings.browserUse.contactInfo.description`
         },
         { defaultMessage: `Contact info`, id: `settings.browserUse.contactInfo.label` },
         {
           defaultMessage: `Contact info settings`,
-          id: `settings.browserUse.contactInfo.webviewLabel`,
+          id: `settings.browserUse.contactInfo.webviewLabel`
         },
         {
           defaultMessage: `Let ChatGPT control the built-in browser`,
-          id: `settings.browserUse.control.description`,
+          id: `settings.browserUse.control.description`
         },
         { defaultMessage: `Developer mode`, id: `settings.browserUse.developerMode.title` },
         { defaultMessage: `Add`, id: `settings.browserUse.domains.add` },
@@ -1997,200 +2005,200 @@ function n() {
         { defaultMessage: `Add`, id: `settings.browserUse.domains.addDialogConfirm` },
         {
           defaultMessage: `Unable to complete the download action`,
-          id: `settings.browserUse.downloadHistory.actionError`,
+          id: `settings.browserUse.downloadHistory.actionError`
         },
         { defaultMessage: `All-time history`, id: `settings.browserUse.downloadHistory.allTime` },
         {
           defaultMessage: `Download history`,
-          id: `settings.browserUse.downloadHistory.breadcrumb.current`,
+          id: `settings.browserUse.downloadHistory.breadcrumb.current`
         },
         { defaultMessage: `Cancel download`, id: `settings.browserUse.downloadHistory.cancel` },
         { defaultMessage: `Clear all`, id: `settings.browserUse.downloadHistory.clearAll` },
         {
           defaultMessage: `Unable to clear download history`,
-          id: `settings.browserUse.downloadHistory.clearError`,
+          id: `settings.browserUse.downloadHistory.clearError`
         },
         { defaultMessage: `Deleted`, id: `settings.browserUse.downloadHistory.deleted` },
         { defaultMessage: `No downloads yet`, id: `settings.browserUse.downloadHistory.empty` },
         {
           defaultMessage: `Files downloaded from the built-in browser will appear here`,
-          id: `settings.browserUse.downloadHistory.empty.description`,
+          id: `settings.browserUse.downloadHistory.empty.description`
         },
         {
           defaultMessage: `Unable to load download history`,
-          id: `settings.browserUse.downloadHistory.loadError`,
+          id: `settings.browserUse.downloadHistory.loadError`
         },
         {
           defaultMessage: `Loading download history`,
-          id: `settings.browserUse.downloadHistory.loading`,
+          id: `settings.browserUse.downloadHistory.loading`
         },
         {
           defaultMessage: `No matching downloads`,
-          id: `settings.browserUse.downloadHistory.noResults`,
+          id: `settings.browserUse.downloadHistory.noResults`
         },
         {
           defaultMessage: `Try searching for a different filename or address`,
-          id: `settings.browserUse.downloadHistory.noResults.description`,
+          id: `settings.browserUse.downloadHistory.noResults.description`
         },
         { defaultMessage: `Open {filename}`, id: `settings.browserUse.downloadHistory.open` },
         {
           defaultMessage: `Unable to load more downloads`,
-          id: `settings.browserUse.downloadHistory.paginationError`,
+          id: `settings.browserUse.downloadHistory.paginationError`
         },
         { defaultMessage: `Pause download`, id: `settings.browserUse.downloadHistory.pause` },
         {
           defaultMessage: `Remove from download history`,
-          id: `settings.browserUse.downloadHistory.remove`,
+          id: `settings.browserUse.downloadHistory.remove`
         },
         { defaultMessage: `Resume download`, id: `settings.browserUse.downloadHistory.resume` },
         { defaultMessage: `Try again`, id: `settings.browserUse.downloadHistory.retry` },
         {
           defaultMessage: `Search download history`,
-          id: `settings.browserUse.downloadHistory.search`,
+          id: `settings.browserUse.downloadHistory.search`
         },
         { defaultMessage: `Download history`, id: `settings.browserUse.downloadHistory.title` },
         {
           defaultMessage: `View and manage files downloaded from the built-in browser`,
-          id: `settings.browserUse.downloads.history.description`,
+          id: `settings.browserUse.downloads.history.description`
         },
         { defaultMessage: `Download history`, id: `settings.browserUse.downloads.history.label` },
         { defaultMessage: `Manage`, id: `settings.browserUse.downloads.history.manage` },
         {
           defaultMessage: `Manage download history`,
-          id: `settings.browserUse.downloads.history.manageAriaLabel`,
+          id: `settings.browserUse.downloads.history.manageAriaLabel`
         },
         { defaultMessage: `Change`, id: `settings.browserUse.downloads.location.change` },
         {
           defaultMessage: `Unable to change the downloads folder`,
-          id: `settings.browserUse.downloads.location.changeError`,
+          id: `settings.browserUse.downloads.location.changeError`
         },
         { defaultMessage: `Location`, id: `settings.browserUse.downloads.location.label` },
         { defaultMessage: `Reset`, id: `settings.browserUse.downloads.location.reset` },
         {
           defaultMessage: `System Downloads folder`,
-          id: `settings.browserUse.downloads.location.system`,
+          id: `settings.browserUse.downloads.location.system`
         },
         {
           defaultMessage: `Show a save dialog for downloads you start in the built-in browser`,
-          id: `settings.browserUse.downloads.prompt.description`,
+          id: `settings.browserUse.downloads.prompt.description`
         },
         {
           defaultMessage: `Ask where to save downloads`,
-          id: `settings.browserUse.downloads.prompt.label`,
+          id: `settings.browserUse.downloads.prompt.label`
         },
         { defaultMessage: `Downloads`, id: `settings.browserUse.downloads.title` },
         { defaultMessage: `Extensions`, id: `settings.browserUse.extensions.breadcrumb` },
         {
           defaultMessage: `Install, remove, and configure browser extensions`,
-          id: `settings.browserUse.extensions.description`,
+          id: `settings.browserUse.extensions.description`
         },
         { defaultMessage: `Extension manager`, id: `settings.browserUse.extensions.label` },
         { defaultMessage: `Extensions`, id: `settings.browserUse.extensions.title` },
         {
           defaultMessage: `Extensions settings`,
-          id: `settings.browserUse.extensions.webviewLabel`,
+          id: `settings.browserUse.extensions.webviewLabel`
         },
         { defaultMessage: `Toggle full CDP access`, id: `settings.browserUse.fullCdp.ariaLabel` },
         {
           defaultMessage: `Your organization has disabled this setting.`,
-          id: `settings.browserUse.fullCdp.blockedByPolicy`,
+          id: `settings.browserUse.fullCdp.blockedByPolicy`
         },
         {
           defaultMessage: `Allow ChatGPT to use full Chrome DevTools Protocol (CDP) access in connected Browser Use sessions. Full CDP access lets ChatGPT inspect and control sensitive browser internals that may put your data at risk.`,
-          id: `settings.browserUse.fullCdp.description`,
+          id: `settings.browserUse.fullCdp.description`
         },
         { defaultMessage: `Elevated risk`, id: `settings.browserUse.fullCdp.elevatedRisk.label` },
         { defaultMessage: `Enable full CDP access`, id: `settings.browserUse.fullCdp.label` },
         { defaultMessage: `General`, id: `settings.browserUse.general.title` },
         {
           defaultMessage: `View and manage pages visited in the built-in browser`,
-          id: `settings.browserUse.history.description`,
+          id: `settings.browserUse.history.description`
         },
         { defaultMessage: `Browsing history`, id: `settings.browserUse.history.label` },
         {
           defaultMessage: `Ask before accessing history`,
-          id: `settings.browserUse.historyApproval.alwaysAsk.description`,
+          id: `settings.browserUse.historyApproval.alwaysAsk.description`
         },
         {
           defaultMessage: `Do not allow access to history`,
-          id: `settings.browserUse.historyApproval.disabled.description`,
+          id: `settings.browserUse.historyApproval.disabled.description`
         },
         { defaultMessage: `Disable`, id: `settings.browserUse.historyApproval.disabled.label` },
         { defaultMessage: `History`, id: `settings.browserUse.historyApproval.label` },
         {
           defaultMessage: `History access is disabled by your organization`,
-          id: `settings.browserUse.historyApproval.managedDescription`,
+          id: `settings.browserUse.historyApproval.managedDescription`
         },
         {
           defaultMessage: `Access history without asking`,
-          id: `settings.browserUse.historyApproval.neverAsk.description`,
+          id: `settings.browserUse.historyApproval.neverAsk.description`
         },
         {
           defaultMessage: `Unable to save history setting`,
-          id: `settings.browserUse.historyApproval.saveError`,
+          id: `settings.browserUse.historyApproval.saveError`
         },
         {
           defaultMessage: `Choose whether ChatGPT can access your built-in browser history`,
-          id: `settings.browserUse.iabHistoryApproval.description`,
+          id: `settings.browserUse.iabHistoryApproval.description`
         },
         { defaultMessage: `Install`, id: `settings.browserUse.install.button` },
         {
           defaultMessage: `In-app browser plugin unavailable`,
-          id: `settings.browserUse.install.empty`,
+          id: `settings.browserUse.install.empty`
         },
         {
           defaultMessage: `Where local development sites open by default`,
-          id: `settings.browserUse.localUrlOpenTarget.description`,
+          id: `settings.browserUse.localUrlOpenTarget.description`
         },
         {
           defaultMessage: `Default browser`,
-          id: `settings.browserUse.localUrlOpenTarget.externalBrowser.label`,
+          id: `settings.browserUse.localUrlOpenTarget.externalBrowser.label`
         },
         {
           defaultMessage: `ChatGPT`,
-          id: `settings.browserUse.localUrlOpenTarget.inAppBrowser.chatGptLabel`,
+          id: `settings.browserUse.localUrlOpenTarget.inAppBrowser.chatGptLabel`
         },
         {
           defaultMessage: `Codex`,
-          id: `settings.browserUse.localUrlOpenTarget.inAppBrowser.label`,
+          id: `settings.browserUse.localUrlOpenTarget.inAppBrowser.label`
         },
         {
           defaultMessage: `Local URL open destination`,
-          id: `settings.browserUse.localUrlOpenTarget.label`,
+          id: `settings.browserUse.localUrlOpenTarget.label`
         },
         {
           defaultMessage: `Managed by your enterprise admin`,
-          id: `settings.browserUse.managed.explanation`,
+          id: `settings.browserUse.managed.explanation`
         },
         {
           defaultMessage: `Password manager`,
-          id: `settings.browserUse.passwordManager.breadcrumb`,
+          id: `settings.browserUse.passwordManager.breadcrumb`
         },
         {
           defaultMessage: `Add, delete, and edit saved passwords`,
-          id: `settings.browserUse.passwordManager.description`,
+          id: `settings.browserUse.passwordManager.description`
         },
         { defaultMessage: `Password manager`, id: `settings.browserUse.passwordManager.label` },
         {
           defaultMessage: `Password manager settings`,
-          id: `settings.browserUse.passwordManager.webviewLabel`,
+          id: `settings.browserUse.passwordManager.webviewLabel`
         },
         { defaultMessage: `Permissions`, id: `settings.browserUse.permissions.title` },
         {
           defaultMessage: `Agent permissions`,
-          id: `settings.browserUse.policy.agentPermissions.title`,
+          id: `settings.browserUse.policy.agentPermissions.title`
         },
         {
           defaultMessage: `Browser permissions`,
-          id: `settings.browserUse.policy.browserPermissions.title`,
+          id: `settings.browserUse.policy.browserPermissions.title`
         },
         {
           defaultMessage: `Manage your Browser Use preferences and site access.`,
-          id: `settings.browserUse.policyAuthoring.subtitle`,
+          id: `settings.browserUse.policyAuthoring.subtitle`
         },
         {
           defaultMessage: `https://example.com`,
-          id: `settings.browserUse.policyDomains.addDialogPlaceholder`,
+          id: `settings.browserUse.policyDomains.addDialogPlaceholder`
         },
         { defaultMessage: `Cookies`, id: `settings.browserUse.profileImport.cookies` },
         { defaultMessage: `Extensions`, id: `settings.browserUse.profileImport.extensions` },
@@ -2198,150 +2206,150 @@ function n() {
         { defaultMessage: `Saved passwords`, id: `settings.browserUse.profileImport.passwords` },
         {
           defaultMessage: `Import from your browser`,
-          id: `settings.browserUse.profileImport.title`,
+          id: `settings.browserUse.profileImport.title`
         },
         {
           defaultMessage: `Include the path, query, and fragment in the address bar`,
-          id: `settings.browserUse.showFullUrl.description`,
+          id: `settings.browserUse.showFullUrl.description`
         },
         { defaultMessage: `Show full URL`, id: `settings.browserUse.showFullUrl.label` },
         {
           defaultMessage: `Browse`,
-          id: `settings.browserUse.sitePermissions.addDialog.behaviorLabel`,
+          id: `settings.browserUse.sitePermissions.addDialog.behaviorLabel`
         },
         {
           defaultMessage: `Enter a valid origin, such as https://example.com or https://*.example.com`,
-          id: `settings.browserUse.sitePermissions.addDialog.invalidOrigin`,
+          id: `settings.browserUse.sitePermissions.addDialog.invalidOrigin`
         },
         {
           defaultMessage: `These permissions match the defaults, so adding this site would not change anything`,
-          id: `settings.browserUse.sitePermissions.addDialog.matchesDefaults`,
+          id: `settings.browserUse.sitePermissions.addDialog.matchesDefaults`
         },
         {
           defaultMessage: `More options`,
-          id: `settings.browserUse.sitePermissions.addDialog.moreOptions`,
+          id: `settings.browserUse.sitePermissions.addDialog.moreOptions`
         },
         {
           defaultMessage: `Site`,
-          id: `settings.browserUse.sitePermissions.addDialog.siteAriaLabel`,
+          id: `settings.browserUse.sitePermissions.addDialog.siteAriaLabel`
         },
         { defaultMessage: `Site`, id: `settings.browserUse.sitePermissions.addDialog.siteLabel` },
         {
           defaultMessage: `Choose what access ChatGPT has on a site`,
-          id: `settings.browserUse.sitePermissions.addDialog.subtitle`,
+          id: `settings.browserUse.sitePermissions.addDialog.subtitle`
         },
         {
           defaultMessage: `Add site permission`,
-          id: `settings.browserUse.sitePermissions.addDialog.title`,
+          id: `settings.browserUse.sitePermissions.addDialog.title`
         },
         {
           defaultMessage: `Always allow`,
-          id: `settings.browserUse.sitePermissions.approvalValue.alwaysAllow`,
+          id: `settings.browserUse.sitePermissions.approvalValue.alwaysAllow`
         },
         {
           defaultMessage: `Requires approval`,
-          id: `settings.browserUse.sitePermissions.approvalValue.requiresApproval`,
+          id: `settings.browserUse.sitePermissions.approvalValue.requiresApproval`
         },
         { defaultMessage: `Debug / CDP`, id: `settings.browserUse.sitePermissions.cdpAccess` },
         {
           defaultMessage: `Remove custom permissions for {origin}`,
-          id: `settings.browserUse.sitePermissions.clearAriaLabel`,
+          id: `settings.browserUse.sitePermissions.clearAriaLabel`
         },
         {
           defaultMessage: `Only sites with custom permissions appear here`,
-          id: `settings.browserUse.sitePermissions.customPermissionsFooter`,
+          id: `settings.browserUse.sitePermissions.customPermissionsFooter`
         },
         { defaultMessage: `Allow`, id: `settings.browserUse.sitePermissions.defaultValue.allowed` },
         {
           defaultMessage: `Always allow`,
-          id: `settings.browserUse.sitePermissions.defaultValue.alwaysAllowed`,
+          id: `settings.browserUse.sitePermissions.defaultValue.alwaysAllowed`
         },
         {
           defaultMessage: `Requires approval`,
-          id: `settings.browserUse.sitePermissions.defaultValue.approvalRequired`,
+          id: `settings.browserUse.sitePermissions.defaultValue.approvalRequired`
         },
         { defaultMessage: `Block`, id: `settings.browserUse.sitePermissions.defaultValue.denied` },
         { defaultMessage: `Download`, id: `settings.browserUse.sitePermissions.downloads` },
         {
           defaultMessage: `Uses the default permission`,
-          id: `settings.browserUse.sitePermissions.inheritedDescription`,
+          id: `settings.browserUse.sitePermissions.inheritedDescription`
         },
         {
           defaultMessage: `Unable to load site permissions`,
-          id: `settings.browserUse.sitePermissions.loadError`,
+          id: `settings.browserUse.sitePermissions.loadError`
         },
         { defaultMessage: `Loading websites…`, id: `settings.browserUse.sitePermissions.loading` },
         {
           defaultMessage: `Managed by your organization`,
-          id: `settings.browserUse.sitePermissions.managedLegend`,
+          id: `settings.browserUse.sitePermissions.managedLegend`
         },
         {
           defaultMessage: `Browsing`,
-          id: `settings.browserUse.sitePermissions.matrix.browsingColumn`,
+          id: `settings.browserUse.sitePermissions.matrix.browsingColumn`
         },
         { defaultMessage: `Default`, id: `settings.browserUse.sitePermissions.matrix.defaultRow` },
         {
           defaultMessage: `Downloads`,
-          id: `settings.browserUse.sitePermissions.matrix.downloadsColumn`,
+          id: `settings.browserUse.sitePermissions.matrix.downloadsColumn`
         },
         { defaultMessage: `—`, id: `settings.browserUse.sitePermissions.matrix.unavailableValue` },
         {
           defaultMessage: `Uploads`,
-          id: `settings.browserUse.sitePermissions.matrix.uploadsColumn`,
+          id: `settings.browserUse.sitePermissions.matrix.uploadsColumn`
         },
         {
           defaultMessage: `Choose default permissions and add exceptions for specific sites`,
-          id: `settings.browserUse.sitePermissions.matrixSubtitle`,
+          id: `settings.browserUse.sitePermissions.matrixSubtitle`
         },
         {
           defaultMessage: `Blocked by your network configuration`,
-          id: `settings.browserUse.sitePermissions.networkBlocked`,
+          id: `settings.browserUse.sitePermissions.networkBlocked`
         },
         { defaultMessage: `Cancel`, id: `settings.browserUse.sitePermissions.removeDialog.cancel` },
         {
           defaultMessage: `Remove`,
-          id: `settings.browserUse.sitePermissions.removeDialog.confirm`,
+          id: `settings.browserUse.sitePermissions.removeDialog.confirm`
         },
         {
           defaultMessage: `This resets this site's custom permissions to their defaults`,
-          id: `settings.browserUse.sitePermissions.removeDialog.subtitle`,
+          id: `settings.browserUse.sitePermissions.removeDialog.subtitle`
         },
         {
           defaultMessage: `Remove custom permissions for {origin}?`,
-          id: `settings.browserUse.sitePermissions.removeDialog.title`,
+          id: `settings.browserUse.sitePermissions.removeDialog.title`
         },
         {
           defaultMessage: `Change the default from Always allow before requiring approval for individual sites`,
-          id: `settings.browserUse.sitePermissions.requiresApprovalUnavailable`,
+          id: `settings.browserUse.sitePermissions.requiresApprovalUnavailable`
         },
         {
           defaultMessage: `Unable to save site permissions`,
-          id: `settings.browserUse.sitePermissions.saveError`,
+          id: `settings.browserUse.sitePermissions.saveError`
         },
         { defaultMessage: `Upload`, id: `settings.browserUse.sitePermissions.uploads` },
         { defaultMessage: `Allow`, id: `settings.browserUse.sitePermissions.value.allowed` },
         { defaultMessage: `Block`, id: `settings.browserUse.sitePermissions.value.denied` },
         {
           defaultMessage: `Use default`,
-          id: `settings.browserUse.sitePermissions.value.useDefault`,
+          id: `settings.browserUse.sitePermissions.value.useDefault`
         },
         { defaultMessage: `Browse`, id: `settings.browserUse.sitePermissions.websiteAccess` },
         { defaultMessage: `Site settings`, id: `settings.browserUse.siteSettings.breadcrumb` },
         {
           defaultMessage: `Control camera and microphone permissions in the built-in browser`,
-          id: `settings.browserUse.siteSettings.description`,
+          id: `settings.browserUse.siteSettings.description`
         },
         { defaultMessage: `Site settings`, id: `settings.browserUse.siteSettings.label` },
         { defaultMessage: `Site settings`, id: `settings.browserUse.siteSettings.webviewLabel` },
         { defaultMessage: `Toggle WebMCP`, id: `settings.browserUse.webMcp.ariaLabel` },
         {
           defaultMessage: `Allow ChatGPT to discover and call site tools exposed by websites, including WebMCP`,
-          id: `settings.browserUse.webMcp.description`,
+          id: `settings.browserUse.webMcp.description`
         },
         { defaultMessage: `Enable site tools`, id: `settings.browserUse.webMcp.label` },
         {
           defaultMessage: `Site tools aren't available for this account`,
-          id: `settings.browserUse.webMcp.unavailableDescription`,
+          id: `settings.browserUse.webMcp.unavailableDescription`
         },
         { defaultMessage: `Add site`, id: `settings.chatGpt.cloudBrowser.addSite` },
         { defaultMessage: `Always allow`, id: `settings.chatGpt.cloudBrowser.alwaysAllow` },
@@ -2352,31 +2360,31 @@ function n() {
         { defaultMessage: `Cookies`, id: `settings.chatGpt.cloudBrowser.cookies` },
         {
           defaultMessage: `Back to cloud browser settings`,
-          id: `settings.chatGpt.cloudBrowser.cookies.back`,
+          id: `settings.chatGpt.cloudBrowser.cookies.back`
         },
         {
           defaultMessage: `Remove cookies saved by the cloud browser.`,
-          id: `settings.chatGpt.cloudBrowser.cookies.description`,
+          id: `settings.chatGpt.cloudBrowser.cookies.description`
         },
         {
           defaultMessage: `Manage cookies saved by the cloud browser.`,
-          id: `settings.chatGpt.cloudBrowser.cookies.rowDescription`,
+          id: `settings.chatGpt.cloudBrowser.cookies.rowDescription`
         },
         {
           defaultMessage: `{count, plural, one {# cookie} other {# cookies}}`,
-          id: `settings.chatGpt.cloudBrowser.cookiesCount`,
+          id: `settings.chatGpt.cloudBrowser.cookiesCount`
         },
         {
           defaultMessage: `Could not delete browser data`,
-          id: `settings.chatGpt.cloudBrowser.cookiesDeleteError`,
+          id: `settings.chatGpt.cloudBrowser.cookiesDeleteError`
         },
         {
           defaultMessage: `Default permissions`,
-          id: `settings.chatGpt.cloudBrowser.defaultPermissions`,
+          id: `settings.chatGpt.cloudBrowser.defaultPermissions`
         },
         {
           defaultMessage: `Choose whether ChatGPT asks before interacting with websites`,
-          id: `settings.chatGpt.cloudBrowser.defaultPermissions.description`,
+          id: `settings.chatGpt.cloudBrowser.defaultPermissions.description`
         },
         { defaultMessage: `Delete`, id: `settings.chatGpt.cloudBrowser.deleteCookies` },
         { defaultMessage: `Permissions`, id: `settings.chatGpt.cloudBrowser.permissions` },
@@ -2386,112 +2394,112 @@ function n() {
         { defaultMessage: `Site permissions`, id: `settings.chatGpt.cloudBrowser.sitePermissions` },
         {
           defaultMessage: `Add sites to override the default permission.`,
-          id: `settings.chatGpt.cloudBrowser.sitePermissions.description`,
+          id: `settings.chatGpt.cloudBrowser.sitePermissions.description`
         },
         { defaultMessage: `example.com`, id: `settings.chatGpt.cloudBrowser.sitePlaceholder` },
         { defaultMessage: `Sites`, id: `settings.chatGpt.cloudBrowser.sites` },
         {
           defaultMessage: `Could not update cloud browser settings`,
-          id: `settings.chatGpt.cloudBrowser.updateError`,
+          id: `settings.chatGpt.cloudBrowser.updateError`
         },
         { defaultMessage: `Permissions`, id: `settings.computerUse.chrome.permissions.title` },
         {
           defaultMessage: `Browser permissions`,
-          id: `settings.computerUse.chrome.policy.browserPermissions.title`,
+          id: `settings.computerUse.chrome.policy.browserPermissions.title`
         },
         {
           defaultMessage: `Where links open by default`,
-          id: `settings.general.openLinkInTargetPreference.description`,
+          id: `settings.general.openLinkInTargetPreference.description`
         },
         {
           defaultMessage: `Default browser`,
-          id: `settings.general.openLinkInTargetPreference.externalBrowser.label`,
+          id: `settings.general.openLinkInTargetPreference.externalBrowser.label`
         },
         {
           defaultMessage: `ChatGPT`,
-          id: `settings.general.openLinkInTargetPreference.inAppBrowser.chatGptLabel`,
+          id: `settings.general.openLinkInTargetPreference.inAppBrowser.chatGptLabel`
         },
         {
           defaultMessage: `Codex`,
-          id: `settings.general.openLinkInTargetPreference.inAppBrowser.label`,
+          id: `settings.general.openLinkInTargetPreference.inAppBrowser.label`
         },
         {
           defaultMessage: `Web URL and link open destination`,
-          id: `settings.general.openLinkInTargetPreference.label`,
-        },
+          id: `settings.general.openLinkInTargetPreference.label`
+        }
       ],
       chronicle: [
         { defaultMessage: `Computer history`, id: `settings.chronicle.enable` },
         {
           defaultMessage: `Augment memories with your computer activity so ChatGPT can help with anything you’re working on. <learnMore>Learn more</learnMore>`,
-          id: `settings.chronicle.enableDescriptionWithLearnMore`,
+          id: `settings.chronicle.enableDescriptionWithLearnMore`
         },
         { defaultMessage: `History`, id: `settings.chronicle.history.title` },
         {
           defaultMessage: `Ask about what you were working on, get help without explaining everything again, or discover opportunities to automate repeated tasks.`,
-          id: `settings.chronicle.off.benefits`,
+          id: `settings.chronicle.off.benefits`
         },
         {
           defaultMessage: `ChatGPT can summarize your activity across the apps and websites you use without ever recording your screen or audio.`,
-          id: `settings.chronicle.off.description`,
+          id: `settings.chronicle.off.description`
         },
         {
           defaultMessage: `When turned on, ChatGPT saves text summaries of your activity across allowed apps and websites, potentially including communications. Audio and private-mode web browsing are never included, and you can pause or clear your history and manage what’s included at any time. This feature increases token usage. <learnMore>Learn more</learnMore>`,
-          id: `settings.chronicle.off.privacyDisclaimerWithLearnMore`,
+          id: `settings.chronicle.off.privacyDisclaimerWithLearnMore`
         },
         { defaultMessage: `Let ChatGPT follow your work`, id: `settings.chronicle.off.title` },
         {
           defaultMessage: `Choose which apps and websites to exclude or include in computer history`,
-          id: `settings.chronicle.permissions.description`,
+          id: `settings.chronicle.permissions.description`
         },
         { defaultMessage: `Exclude these apps`, id: `settings.chronicle.permissions.excludeApps` },
         {
           defaultMessage: `Exclude these websites`,
-          id: `settings.chronicle.permissions.excludeWebsites`,
+          id: `settings.chronicle.permissions.excludeWebsites`
         },
         {
           defaultMessage: `Include only these apps`,
-          id: `settings.chronicle.permissions.includeApps`,
+          id: `settings.chronicle.permissions.includeApps`
         },
         {
           defaultMessage: `Include only these websites`,
-          id: `settings.chronicle.permissions.includeWebsites`,
+          id: `settings.chronicle.permissions.includeWebsites`
         },
         {
           defaultMessage: `Private-mode web browsing activity is never included in computer history. <learnMore>Learn more about privacy</learnMore>`,
-          id: `settings.chronicle.permissions.privateBrowsingWithLearnMore`,
+          id: `settings.chronicle.permissions.privateBrowsingWithLearnMore`
         },
         { defaultMessage: `Permissions`, id: `settings.chronicle.permissions.title` },
         {
           defaultMessage: `Show indicator in menu bar`,
-          id: `settings.chronicle.showIndicatorInMenuBar`,
+          id: `settings.chronicle.showIndicatorInMenuBar`
         },
         {
           defaultMessage: `Computer history indicator visibility could not be updated`,
-          id: `settings.chronicle.showIndicatorInMenuBarError`,
-        },
+          id: `settings.chronicle.showIndicatorInMenuBarError`
+        }
       ],
       "cloud-environments": [
         { defaultMessage: `Create environment`, id: `settings.cloudEnvironments.create.action` },
         {
           defaultMessage: `Unable to create cloud environment`,
-          id: `settings.cloudEnvironments.create.error`,
+          id: `settings.cloudEnvironments.create.error`
         },
         {
           defaultMessage: `Created cloud environment`,
-          id: `settings.cloudEnvironments.create.success`,
+          id: `settings.cloudEnvironments.create.success`
         },
         {
           defaultMessage: `Create cloud environment`,
-          id: `settings.cloudEnvironments.create.title`,
+          id: `settings.cloudEnvironments.create.title`
         },
         {
           defaultMessage: `Unable to delete cloud environment`,
-          id: `settings.cloudEnvironments.delete.error`,
+          id: `settings.cloudEnvironments.delete.error`
         },
         {
           defaultMessage: `Deleted cloud environment`,
-          id: `settings.cloudEnvironments.delete.success`,
+          id: `settings.cloudEnvironments.delete.success`
         },
         { defaultMessage: `Environment actions`, id: `settings.cloudEnvironments.details.actions` },
         { defaultMessage: `Configuration`, id: `settings.cloudEnvironments.details.configuration` },
@@ -2503,20 +2511,20 @@ function n() {
         { defaultMessage: `Edit`, id: `settings.cloudEnvironments.details.editAction` },
         {
           defaultMessage: `Environment variables`,
-          id: `settings.cloudEnvironments.details.environmentVariables`,
+          id: `settings.cloudEnvironments.details.environmentVariables`
         },
         {
           defaultMessage: `Unable to load this cloud environment`,
-          id: `settings.cloudEnvironments.details.error`,
+          id: `settings.cloudEnvironments.details.error`
         },
         {
           defaultMessage: `Loading environment…`,
-          id: `settings.cloudEnvironments.details.loading`,
+          id: `settings.cloudEnvironments.details.loading`
         },
         { defaultMessage: `Machine`, id: `settings.cloudEnvironments.details.machine` },
         {
           defaultMessage: `Maintenance script`,
-          id: `settings.cloudEnvironments.details.maintenance`,
+          id: `settings.cloudEnvironments.details.maintenance`
         },
         { defaultMessage: `Network access`, id: `settings.cloudEnvironments.details.network` },
         { defaultMessage: `Repository`, id: `settings.cloudEnvironments.details.repository` },
@@ -2534,66 +2542,66 @@ function n() {
         { defaultMessage: `Description`, id: `settings.cloudEnvironments.editor.description` },
         {
           defaultMessage: `Environment description`,
-          id: `settings.cloudEnvironments.editor.description.aria`,
+          id: `settings.cloudEnvironments.editor.description.aria`
         },
         {
           defaultMessage: `Environment variables`,
-          id: `settings.cloudEnvironments.editor.environmentVariables`,
+          id: `settings.cloudEnvironments.editor.environmentVariables`
         },
         { defaultMessage: `Machine`, id: `settings.cloudEnvironments.editor.machine` },
         {
           defaultMessage: `Unable to load machines`,
-          id: `settings.cloudEnvironments.editor.machine.error`,
+          id: `settings.cloudEnvironments.editor.machine.error`
         },
         {
           defaultMessage: `Machine is required`,
-          id: `settings.cloudEnvironments.editor.machine.required`,
+          id: `settings.cloudEnvironments.editor.machine.required`
         },
         { defaultMessage: `Retry`, id: `settings.cloudEnvironments.editor.machine.retry` },
         {
           defaultMessage: `Select a machine`,
-          id: `settings.cloudEnvironments.editor.machine.select`,
+          id: `settings.cloudEnvironments.editor.machine.select`
         },
         {
           defaultMessage: `Maintenance script`,
-          id: `settings.cloudEnvironments.editor.maintenance`,
+          id: `settings.cloudEnvironments.editor.maintenance`
         },
         {
           defaultMessage: `Maintenance script`,
-          id: `settings.cloudEnvironments.editor.maintenance.aria`,
+          id: `settings.cloudEnvironments.editor.maintenance.aria`
         },
         {
           defaultMessage: `Runs after branch checkout whenever ChatGPT reuses a cached container`,
-          id: `settings.cloudEnvironments.editor.maintenance.description`,
+          id: `settings.cloudEnvironments.editor.maintenance.description`
         },
         { defaultMessage: `Name`, id: `settings.cloudEnvironments.editor.name` },
         { defaultMessage: `Environment name`, id: `settings.cloudEnvironments.editor.name.aria` },
         {
           defaultMessage: `Name is required`,
-          id: `settings.cloudEnvironments.editor.name.required`,
+          id: `settings.cloudEnvironments.editor.name.required`
         },
         { defaultMessage: `Network access`, id: `settings.cloudEnvironments.editor.network` },
         {
           defaultMessage: `Allowed domains`,
-          id: `settings.cloudEnvironments.editor.network.allowedDomains`,
+          id: `settings.cloudEnvironments.editor.network.allowedDomains`
         },
         {
           defaultMessage: `Allowed domains`,
-          id: `settings.cloudEnvironments.editor.network.allowedDomains.aria`,
+          id: `settings.cloudEnvironments.editor.network.allowedDomains.aria`
         },
         { defaultMessage: `Network access`, id: `settings.cloudEnvironments.editor.network.aria` },
         {
           defaultMessage: `Blocked domains`,
-          id: `settings.cloudEnvironments.editor.network.blockedDomains`,
+          id: `settings.cloudEnvironments.editor.network.blockedDomains`
         },
         {
           defaultMessage: `Blocked domains`,
-          id: `settings.cloudEnvironments.editor.network.blockedDomains.aria`,
+          id: `settings.cloudEnvironments.editor.network.blockedDomains.aria`
         },
         { defaultMessage: `Access`, id: `settings.cloudEnvironments.editor.network.mode` },
         {
           defaultMessage: `Controls internet access after setup completes`,
-          id: `settings.cloudEnvironments.editor.network.mode.description`,
+          id: `settings.cloudEnvironments.editor.network.mode.description`
         },
         { defaultMessage: `Remove`, id: `settings.cloudEnvironments.editor.removeSecret` },
         { defaultMessage: `Remove`, id: `settings.cloudEnvironments.editor.removeVariable` },
@@ -2601,252 +2609,252 @@ function n() {
         { defaultMessage: `Repository`, id: `settings.cloudEnvironments.editor.repository.aria` },
         {
           defaultMessage: `Repository is required`,
-          id: `settings.cloudEnvironments.editor.repository.required`,
+          id: `settings.cloudEnvironments.editor.repository.required`
         },
         { defaultMessage: `Runtime`, id: `settings.cloudEnvironments.editor.runtime` },
         {
           defaultMessage: `Authentication translation`,
-          id: `settings.cloudEnvironments.editor.runtime.authtranslator`,
+          id: `settings.cloudEnvironments.editor.runtime.authtranslator`
         },
         {
           defaultMessage: `Authentication translation`,
-          id: `settings.cloudEnvironments.editor.runtime.authtranslator.aria`,
+          id: `settings.cloudEnvironments.editor.runtime.authtranslator.aria`
         },
         {
           defaultMessage: `Automatic setup`,
-          id: `settings.cloudEnvironments.editor.runtime.autoSetup`,
+          id: `settings.cloudEnvironments.editor.runtime.autoSetup`
         },
         {
           defaultMessage: `Automatic setup`,
-          id: `settings.cloudEnvironments.editor.runtime.autoSetup.aria`,
+          id: `settings.cloudEnvironments.editor.runtime.autoSetup.aria`
         },
         {
           defaultMessage: `Post-setup cache`,
-          id: `settings.cloudEnvironments.editor.runtime.cache`,
+          id: `settings.cloudEnvironments.editor.runtime.cache`
         },
         {
           defaultMessage: `Post-setup cache`,
-          id: `settings.cloudEnvironments.editor.runtime.cache.aria`,
+          id: `settings.cloudEnvironments.editor.runtime.cache.aria`
         },
         {
           defaultMessage: `Speeds up chat startup by saving the container after setup`,
-          id: `settings.cloudEnvironments.editor.runtime.cache.description`,
+          id: `settings.cloudEnvironments.editor.runtime.cache.description`
         },
         {
           defaultMessage: `Docker in Docker`,
-          id: `settings.cloudEnvironments.editor.runtime.dockerInDocker`,
+          id: `settings.cloudEnvironments.editor.runtime.dockerInDocker`
         },
         {
           defaultMessage: `Docker in Docker`,
-          id: `settings.cloudEnvironments.editor.runtime.dockerInDocker.aria`,
+          id: `settings.cloudEnvironments.editor.runtime.dockerInDocker.aria`
         },
         { defaultMessage: `Save changes`, id: `settings.cloudEnvironments.editor.save` },
         { defaultMessage: `Scripts`, id: `settings.cloudEnvironments.editor.scripts` },
         { defaultMessage: `Secret domain`, id: `settings.cloudEnvironments.editor.secret.domain` },
         {
           defaultMessage: `Optional domain`,
-          id: `settings.cloudEnvironments.editor.secret.domainPlaceholder`,
+          id: `settings.cloudEnvironments.editor.secret.domainPlaceholder`
         },
         {
           defaultMessage: `Leave unchanged to keep`,
-          id: `settings.cloudEnvironments.editor.secret.keepPlaceholder`,
+          id: `settings.cloudEnvironments.editor.secret.keepPlaceholder`
         },
         { defaultMessage: `Secret key`, id: `settings.cloudEnvironments.editor.secret.name` },
         { defaultMessage: `Secret value`, id: `settings.cloudEnvironments.editor.secret.value` },
         { defaultMessage: `Secrets`, id: `settings.cloudEnvironments.editor.secrets` },
         {
           defaultMessage: `Secret keys and values are required, and key and domain combinations must be unique. Renaming a global secret requires a new value`,
-          id: `settings.cloudEnvironments.editor.secrets.invalid`,
+          id: `settings.cloudEnvironments.editor.secrets.invalid`
         },
         { defaultMessage: `Setup script`, id: `settings.cloudEnvironments.editor.setup` },
         { defaultMessage: `Setup script`, id: `settings.cloudEnvironments.editor.setup.aria` },
         {
           defaultMessage: `Runs after the repository is cloned; with caching enabled, it runs only for new containers`,
-          id: `settings.cloudEnvironments.editor.setup.description`,
+          id: `settings.cloudEnvironments.editor.setup.description`
         },
         { defaultMessage: `Sharing`, id: `settings.cloudEnvironments.editor.sharing` },
         { defaultMessage: `Add editor`, id: `settings.cloudEnvironments.editor.sharing.addEditor` },
         {
           defaultMessage: `Editor email {number}`,
-          id: `settings.cloudEnvironments.editor.sharing.editor.aria`,
+          id: `settings.cloudEnvironments.editor.sharing.editor.aria`
         },
         {
           defaultMessage: `Additional editors`,
-          id: `settings.cloudEnvironments.editor.sharing.editors`,
+          id: `settings.cloudEnvironments.editor.sharing.editors`
         },
         { defaultMessage: `Remove`, id: `settings.cloudEnvironments.editor.sharing.removeEditor` },
         {
           defaultMessage: `Visibility`,
-          id: `settings.cloudEnvironments.editor.sharing.visibility`,
+          id: `settings.cloudEnvironments.editor.sharing.visibility`
         },
         {
           defaultMessage: `Environment visibility`,
-          id: `settings.cloudEnvironments.editor.sharing.visibility.aria`,
+          id: `settings.cloudEnvironments.editor.sharing.visibility.aria`
         },
         { defaultMessage: `Variable name`, id: `settings.cloudEnvironments.editor.variable.name` },
         {
           defaultMessage: `Variable value`,
-          id: `settings.cloudEnvironments.editor.variable.value`,
+          id: `settings.cloudEnvironments.editor.variable.value`
         },
         {
           defaultMessage: `Variables and secrets`,
-          id: `settings.cloudEnvironments.editor.variables`,
+          id: `settings.cloudEnvironments.editor.variables`
         },
         {
           defaultMessage: `Variable names and values are required, and names must be unique`,
-          id: `settings.cloudEnvironments.editor.variables.invalid`,
+          id: `settings.cloudEnvironments.editor.variables.invalid`
         },
         {
           defaultMessage: `Workspace directory`,
-          id: `settings.cloudEnvironments.editor.workspaceDirectory`,
+          id: `settings.cloudEnvironments.editor.workspaceDirectory`
         },
         {
           defaultMessage: `Workspace directory`,
-          id: `settings.cloudEnvironments.editor.workspaceDirectory.aria`,
+          id: `settings.cloudEnvironments.editor.workspaceDirectory.aria`
         },
         {
           defaultMessage: `Directory where the repository is cloned; change this only when setup requires an absolute path`,
-          id: `settings.cloudEnvironments.editor.workspaceDirectory.description`,
+          id: `settings.cloudEnvironments.editor.workspaceDirectory.description`
         },
         { defaultMessage: `Environment actions`, id: `settings.cloudEnvironments.list.actions` },
         { defaultMessage: `Edit environment`, id: `settings.cloudEnvironments.list.edit` },
         {
           defaultMessage: `No cloud environments yet`,
-          id: `settings.cloudEnvironments.list.empty`,
+          id: `settings.cloudEnvironments.list.empty`
         },
         {
           defaultMessage: `Unable to load cloud environments`,
-          id: `settings.cloudEnvironments.list.error`,
+          id: `settings.cloudEnvironments.list.error`
         },
         {
           defaultMessage: `Loading cloud environments…`,
-          id: `settings.cloudEnvironments.list.loading`,
+          id: `settings.cloudEnvironments.list.loading`
         },
         {
           defaultMessage: `No repository configured`,
-          id: `settings.cloudEnvironments.list.noRepository`,
+          id: `settings.cloudEnvironments.list.noRepository`
         },
         {
           defaultMessage: `No matching cloud environments`,
-          id: `settings.cloudEnvironments.list.noResults`,
+          id: `settings.cloudEnvironments.list.noResults`
         },
         { defaultMessage: `Open {environmentName}`, id: `settings.cloudEnvironments.list.open` },
         {
           defaultMessage: `Searching cloud environments…`,
-          id: `settings.cloudEnvironments.list.searching`,
+          id: `settings.cloudEnvironments.list.searching`
         },
         { defaultMessage: `Custom`, id: `settings.cloudEnvironments.network.custom` },
         { defaultMessage: `Off`, id: `settings.cloudEnvironments.network.off` },
         { defaultMessage: `On`, id: `settings.cloudEnvironments.network.on` },
         {
           defaultMessage: `Unable to load more cloud environments`,
-          id: `settings.cloudEnvironments.pagination.error`,
+          id: `settings.cloudEnvironments.pagination.error`
         },
         { defaultMessage: `Retry`, id: `settings.cloudEnvironments.pagination.retryButton` },
         {
           defaultMessage: `Unable to reset cloud environment cache`,
-          id: `settings.cloudEnvironments.resetCache.error`,
+          id: `settings.cloudEnvironments.resetCache.error`
         },
         {
           defaultMessage: `Reset cloud environment cache`,
-          id: `settings.cloudEnvironments.resetCache.success`,
+          id: `settings.cloudEnvironments.resetCache.success`
         },
         { defaultMessage: `Retry`, id: `settings.cloudEnvironments.retry` },
         {
           defaultMessage: `Search cloud environments`,
-          id: `settings.cloudEnvironments.search.label`,
+          id: `settings.cloudEnvironments.search.label`
         },
         {
           defaultMessage: `Search environments`,
-          id: `settings.cloudEnvironments.search.placeholder`,
+          id: `settings.cloudEnvironments.search.placeholder`
         },
         { defaultMessage: `Private`, id: `settings.cloudEnvironments.sharing.private` },
         { defaultMessage: `Public`, id: `settings.cloudEnvironments.sharing.public` },
         { defaultMessage: `Workspace`, id: `settings.cloudEnvironments.sharing.workspace` },
         {
           defaultMessage: `Unable to update cloud environment. Reload and try again`,
-          id: `settings.cloudEnvironments.update.error`,
+          id: `settings.cloudEnvironments.update.error`
         },
         {
           defaultMessage: `Updated cloud environment`,
-          id: `settings.cloudEnvironments.update.success`,
-        },
+          id: `settings.cloudEnvironments.update.success`
+        }
       ],
       "cloud-settings": [
         {
           defaultMessage: `Available placeholders`,
-          id: `settings.general.cloudPreferences.branchFormat.availableTags`,
+          id: `settings.general.cloudPreferences.branchFormat.availableTags`
         },
         {
           defaultMessage: `Branch format has unmatched brackets`,
-          id: `settings.general.cloudPreferences.branchFormat.error.bracketMismatch`,
+          id: `settings.general.cloudPreferences.branchFormat.error.bracketMismatch`
         },
         {
           defaultMessage: `Branch format contains invalid characters`,
-          id: `settings.general.cloudPreferences.branchFormat.error.invalidCharacters`,
+          id: `settings.general.cloudPreferences.branchFormat.error.invalidCharacters`
         },
         {
           defaultMessage: `Branch format contains an unavailable placeholder`,
-          id: `settings.general.cloudPreferences.branchFormat.error.invalidPattern`,
+          id: `settings.general.cloudPreferences.branchFormat.error.invalidPattern`
         },
         {
           defaultMessage: `Branch format cannot start with '/'`,
-          id: `settings.general.cloudPreferences.branchFormat.error.leadingSlash`,
+          id: `settings.general.cloudPreferences.branchFormat.error.leadingSlash`
         },
         {
           defaultMessage: `Branch format must contain at least one placeholder`,
-          id: `settings.general.cloudPreferences.branchFormat.error.missingPattern`,
+          id: `settings.general.cloudPreferences.branchFormat.error.missingPattern`
         },
         {
           defaultMessage: `Generated branch name exceeds the allowed length`,
-          id: `settings.general.cloudPreferences.branchFormat.error.tooLong`,
+          id: `settings.general.cloudPreferences.branchFormat.error.tooLong`
         },
         {
           defaultMessage: `Branch format pattern`,
-          id: `settings.general.cloudPreferences.branchFormat.input.ariaLabel`,
+          id: `settings.general.cloudPreferences.branchFormat.input.ariaLabel`
         },
         {
           defaultMessage: `codex/{pattern}`,
-          id: `settings.general.cloudPreferences.branchFormat.input.placeholder`,
+          id: `settings.general.cloudPreferences.branchFormat.input.placeholder`
         },
         {
           defaultMessage: `Example: {branchName}`,
-          id: `settings.general.cloudPreferences.branchFormat.preview`,
+          id: `settings.general.cloudPreferences.branchFormat.preview`
         },
         { defaultMessage: `Save`, id: `settings.general.cloudPreferences.branchFormat.save` },
         {
           defaultMessage: `Saved branch format`,
-          id: `settings.general.cloudPreferences.branchFormat.save.success`,
+          id: `settings.general.cloudPreferences.branchFormat.save.success`
         },
         {
           defaultMessage: `Branch format`,
-          id: `settings.general.cloudPreferences.branchFormat.title`,
+          id: `settings.general.cloudPreferences.branchFormat.title`
         },
         { defaultMessage: `Diff view`, id: `settings.general.cloudPreferences.diffView.ariaLabel` },
         {
           defaultMessage: `Choose how changes are shown in cloud chats`,
-          id: `settings.general.cloudPreferences.diffView.description`,
+          id: `settings.general.cloudPreferences.diffView.description`
         },
         { defaultMessage: `Diff view`, id: `settings.general.cloudPreferences.diffView.label` },
         {
           defaultMessage: `Saved diff view`,
-          id: `settings.general.cloudPreferences.diffView.save.success`,
+          id: `settings.general.cloudPreferences.diffView.save.success`
         },
         { defaultMessage: `Split`, id: `settings.general.cloudPreferences.diffView.split` },
         { defaultMessage: `Unified`, id: `settings.general.cloudPreferences.diffView.unified` },
         {
           defaultMessage: `Unable to load cloud preferences`,
-          id: `settings.general.cloudPreferences.loadError`,
+          id: `settings.general.cloudPreferences.loadError`
         },
         {
           defaultMessage: `Loading cloud preferences…`,
-          id: `settings.general.cloudPreferences.loading`,
+          id: `settings.general.cloudPreferences.loading`
         },
         { defaultMessage: `Retry`, id: `settings.general.cloudPreferences.retry` },
         {
           defaultMessage: `Unable to save cloud preference`,
-          id: `settings.general.cloudPreferences.save.error`,
-        },
+          id: `settings.general.cloudPreferences.save.error`
+        }
       ],
       "codex-micro": [
         { defaultMessage: `Approve request`, id: `codex.command.approval.approve` },
@@ -2862,15 +2870,15 @@ function n() {
         { defaultMessage: `Cycle host`, id: `codex.command.composer.cycleHost` },
         {
           defaultMessage: `Cycle reasoning effort`,
-          id: `codex.command.composer.cycleReasoningEffort`,
+          id: `codex.command.composer.cycleReasoningEffort`
         },
         {
           defaultMessage: `Decrease reasoning effort`,
-          id: `codex.command.composer.decreaseReasoningEffort`,
+          id: `codex.command.composer.decreaseReasoningEffort`
         },
         {
           defaultMessage: `Increase reasoning effort`,
-          id: `codex.command.composer.increaseReasoningEffort`,
+          id: `codex.command.composer.increaseReasoningEffort`
         },
         { defaultMessage: `Open model picker`, id: `codex.command.composer.openModelPicker` },
         { defaultMessage: `Open project picker`, id: `codex.command.composer.openProjectPicker` },
@@ -2881,17 +2889,17 @@ function n() {
         { defaultMessage: `Send message`, id: `codex.command.composer.submit` },
         {
           defaultMessage: `Send message in background`,
-          id: `codex.command.composer.submitInBackground`,
+          id: `codex.command.composer.submitInBackground`
         },
         { defaultMessage: `Toggle Fast mode`, id: `codex.command.composer.toggleFastMode` },
         { defaultMessage: `Toggle plan mode`, id: `codex.command.composer.togglePlanMode` },
         {
           defaultMessage: `Toggle Cloud/Local`,
-          id: `codex.command.composer.toggleWorkRunLocation`,
+          id: `codex.command.composer.toggleWorkRunLocation`
         },
         {
           defaultMessage: `Toggle Local/Worktree`,
-          id: `codex.command.composer.toggleWorktreeMode`,
+          id: `codex.command.composer.toggleWorktreeMode`
         },
         { defaultMessage: `Copy as Markdown`, id: `codex.command.copyConversationMarkdown` },
         { defaultMessage: `Copy Page link`, id: `codex.command.copyPageLink` },
@@ -2909,7 +2917,7 @@ function n() {
         { defaultMessage: `Go back in file navigation`, id: `codex.command.file.navigateBack` },
         {
           defaultMessage: `Go forward in file navigation`,
-          id: `codex.command.file.navigateForward`,
+          id: `codex.command.file.navigateForward`
         },
         { defaultMessage: `Find`, id: `codex.command.findInThread` },
         { defaultMessage: `Focus browser address bar`, id: `codex.command.focusBrowserAddressBar` },
@@ -2936,7 +2944,7 @@ function n() {
         { defaultMessage: `Hold-to-dictate hotkey`, id: `codex.command.globalDictationHold` },
         {
           defaultMessage: `Hands-free dictation hotkey`,
-          id: `codex.command.globalDictationToggle`,
+          id: `codex.command.globalDictationToggle`
         },
         { defaultMessage: `Go to line`, id: `codex.command.goToLine` },
         { defaultMessage: `Popout Window hotkey`, id: `codex.command.hotkeyWindow` },
@@ -2957,7 +2965,7 @@ function n() {
         { defaultMessage: `Next chat`, id: `codex.command.nextThread` },
         {
           defaultMessage: `Next chat needing attention`,
-          id: `codex.command.nextThreadNeedingAttention`,
+          id: `codex.command.nextThreadNeedingAttention`
         },
         { defaultMessage: `Open browser tab`, id: `codex.command.openBrowserTab` },
         { defaultMessage: `Open control window`, id: `codex.command.openControlWindow` },
@@ -2972,7 +2980,7 @@ function n() {
         { defaultMessage: `Numbered list`, id: `codex.command.page.formatNumberedList` },
         {
           defaultMessage: `Previous recently viewed chat`,
-          id: `codex.command.previousRecentThread`,
+          id: `codex.command.previousRecentThread`
         },
         { defaultMessage: `Previous tab`, id: `codex.command.previousTab` },
         { defaultMessage: `Previous chat`, id: `codex.command.previousThread` },
@@ -2981,11 +2989,11 @@ function n() {
         { defaultMessage: `End Voice Chat`, id: `codex.command.realtimeVoice.endCall` },
         {
           defaultMessage: `Toggle Voice Chat microphone`,
-          id: `codex.command.realtimeVoice.toggleMicrophoneMute`,
+          id: `codex.command.realtimeVoice.toggleMicrophoneMute`
         },
         {
           defaultMessage: `Toggle Voice Chat audio`,
-          id: `codex.command.realtimeVoice.toggleOutputMute`,
+          id: `codex.command.realtimeVoice.toggleOutputMute`
         },
         { defaultMessage: `Go to recent chat 1`, id: `codex.command.recentThread1` },
         { defaultMessage: `Go to recent chat 2`, id: `codex.command.recentThread2` },
@@ -3017,7 +3025,7 @@ function n() {
         { defaultMessage: `Toggle debug panel`, id: `codex.command.toggleDebugModal` },
         {
           defaultMessage: `Toggle maximize side panel`,
-          id: `codex.command.toggleMaximizeSidePanel`,
+          id: `codex.command.toggleMaximizeSidePanel`
         },
         { defaultMessage: `Show pet`, id: `codex.command.toggleMiniOverlay` },
         { defaultMessage: `Toggle pinned summary`, id: `codex.command.togglePinnedSummary` },
@@ -3030,438 +3038,438 @@ function n() {
         { defaultMessage: `Undo last action`, id: `codex.command.undoAppAction` },
         {
           defaultMessage: `Approve the active request`,
-          id: `codex.commandDescription.approval.approve`,
+          id: `codex.commandDescription.approval.approve`
         },
         {
           defaultMessage: `Decline the active request`,
-          id: `codex.commandDescription.approval.decline`,
+          id: `codex.commandDescription.approval.decline`
         },
         {
           defaultMessage: `Archive the current chat`,
-          id: `codex.commandDescription.archiveThread`,
+          id: `codex.commandDescription.archiveThread`
         },
         {
           defaultMessage: `Mark all chats and scheduled task updates as read`,
-          id: `codex.commandDescription.clearAllUnreads`,
+          id: `codex.commandDescription.clearAllUnreads`
         },
         {
           defaultMessage: `Close all tabs except the active tab`,
-          id: `codex.commandDescription.closeOtherTabs`,
+          id: `codex.commandDescription.closeOtherTabs`
         },
         { defaultMessage: `Close the active tab`, id: `codex.commandDescription.closeTab` },
         { defaultMessage: `Close the active window`, id: `codex.commandDescription.closeWindow` },
         {
           defaultMessage: `Open Codex Micro setup`,
-          id: `codex.commandDescription.codexMicroSettings`,
+          id: `codex.commandDescription.codexMicroSettings`
         },
         {
           defaultMessage: `Attach files and folders to the active composer`,
-          id: `codex.commandDescription.composer.addFiles`,
+          id: `codex.commandDescription.composer.addFiles`
         },
         {
           defaultMessage: `Add photos to the active composer`,
-          id: `codex.commandDescription.composer.addPhotos`,
+          id: `codex.commandDescription.composer.addPhotos`
         },
         {
           defaultMessage: `Capture an appshot for the active composer`,
-          id: `codex.commandDescription.composer.captureAppshot`,
+          id: `codex.commandDescription.composer.captureAppshot`
         },
         {
           defaultMessage: `Clear the current composer prompt`,
-          id: `codex.commandDescription.composer.clear`,
+          id: `codex.commandDescription.composer.clear`
         },
         {
           defaultMessage: `Cycle the new task between this computer and available remote machines`,
-          id: `codex.commandDescription.composer.cycleHost`,
+          id: `codex.commandDescription.composer.cycleHost`
         },
         {
           defaultMessage: `Cycle through composer reasoning effort options`,
-          id: `codex.commandDescription.composer.cycleReasoningEffort`,
+          id: `codex.commandDescription.composer.cycleReasoningEffort`
         },
         {
           defaultMessage: `Decrease the current composer reasoning effort`,
-          id: `codex.commandDescription.composer.decreaseReasoningEffort`,
+          id: `codex.commandDescription.composer.decreaseReasoningEffort`
         },
         {
           defaultMessage: `Increase the current composer reasoning effort`,
-          id: `codex.commandDescription.composer.increaseReasoningEffort`,
+          id: `codex.commandDescription.composer.increaseReasoningEffort`
         },
         {
           defaultMessage: `Open the composer model picker`,
-          id: `codex.commandDescription.composer.openModelPicker`,
+          id: `codex.commandDescription.composer.openModelPicker`
         },
         {
           defaultMessage: `Open the composer project picker`,
-          id: `codex.commandDescription.composer.openProjectPicker`,
+          id: `codex.commandDescription.composer.openProjectPicker`
         },
         {
           defaultMessage: `Submit the current composer prompt as a queued message`,
-          id: `codex.commandDescription.composer.queue`,
+          id: `codex.commandDescription.composer.queue`
         },
         {
           defaultMessage: `Start dictation in the current composer`,
-          id: `codex.commandDescription.composer.startDictation`,
+          id: `codex.commandDescription.composer.startDictation`
         },
         {
           defaultMessage: `Start or stop voice chat`,
-          id: `codex.commandDescription.composer.startVoiceMode`,
+          id: `codex.commandDescription.composer.startVoiceMode`
         },
         {
           defaultMessage: `Submit the current composer prompt as a steering message`,
-          id: `codex.commandDescription.composer.steer`,
+          id: `codex.commandDescription.composer.steer`
         },
         {
           defaultMessage: `Send the current composer message`,
-          id: `codex.commandDescription.composer.submit`,
+          id: `codex.commandDescription.composer.submit`
         },
         {
           defaultMessage: `Send the current composer message without opening its chat`,
-          id: `codex.commandDescription.composer.submitInBackground`,
+          id: `codex.commandDescription.composer.submitInBackground`
         },
         {
           defaultMessage: `Turn Fast mode on or off in the current composer`,
-          id: `codex.commandDescription.composer.toggleFastMode`,
+          id: `codex.commandDescription.composer.toggleFastMode`
         },
         {
           defaultMessage: `Turn plan mode on or off in the current composer`,
-          id: `codex.commandDescription.composer.togglePlanMode`,
+          id: `codex.commandDescription.composer.togglePlanMode`
         },
         {
           defaultMessage: `Switch ChatGPT Work between cloud and local execution`,
-          id: `codex.commandDescription.composer.toggleWorkRunLocation`,
+          id: `codex.commandDescription.composer.toggleWorkRunLocation`
         },
         {
           defaultMessage: `Switch the current composer between local and a new worktree`,
-          id: `codex.commandDescription.composer.toggleWorktreeMode`,
+          id: `codex.commandDescription.composer.toggleWorktreeMode`
         },
         {
           defaultMessage: `Copy the current chat as Markdown`,
-          id: `codex.commandDescription.copyConversationMarkdown`,
+          id: `codex.commandDescription.copyConversationMarkdown`
         },
         {
           defaultMessage: `Copy the current chat path`,
-          id: `codex.commandDescription.copyConversationPath`,
+          id: `codex.commandDescription.copyConversationPath`
         },
         {
           defaultMessage: `Copy a deeplink to the current chat`,
-          id: `codex.commandDescription.copyDeeplink`,
+          id: `codex.commandDescription.copyDeeplink`
         },
         {
           defaultMessage: `Copy the current Page's link to the clipboard`,
-          id: `codex.commandDescription.copyPageLink`,
+          id: `codex.commandDescription.copyPageLink`
         },
         {
           defaultMessage: `Copy the current chat working directory`,
-          id: `codex.commandDescription.copyWorkingDirectory`,
+          id: `codex.commandDescription.copyWorkingDirectory`
         },
         {
           defaultMessage: `Run the environment action in this shortcut slot`,
-          id: `codex.commandDescription.environmentActionSlot`,
+          id: `codex.commandDescription.environmentActionSlot`
         },
         {
           defaultMessage: `Send product feedback to the ChatGPT team`,
-          id: `codex.commandDescription.feedback`,
+          id: `codex.commandDescription.feedback`
         },
         {
           defaultMessage: `Open the definition of the selected file symbol`,
-          id: `codex.commandDescription.file.goToDefinition`,
+          id: `codex.commandDescription.file.goToDefinition`
         },
         {
           defaultMessage: `Return to the previous file location`,
-          id: `codex.commandDescription.file.navigateBack`,
+          id: `codex.commandDescription.file.navigateBack`
         },
         {
           defaultMessage: `Return to the next file location`,
-          id: `codex.commandDescription.file.navigateForward`,
+          id: `codex.commandDescription.file.navigateForward`
         },
         { defaultMessage: `Search the current chat`, id: `codex.commandDescription.findInThread` },
         {
           defaultMessage: `Focus the in-app browser address bar`,
-          id: `codex.commandDescription.focusBrowserAddressBar`,
+          id: `codex.commandDescription.focusBrowserAddressBar`
         },
         {
           defaultMessage: `Move keyboard focus to the main chat composer`,
-          id: `codex.commandDescription.focusMainChat`,
+          id: `codex.commandDescription.focusMainChat`
         },
         {
           defaultMessage: `Move keyboard focus to an open side chat composer`,
-          id: `codex.commandDescription.focusSideChat`,
+          id: `codex.commandDescription.focusSideChat`
         },
         {
           defaultMessage: `Focus the tab at this position in the task tab strip`,
-          id: `codex.commandDescription.focusTab`,
+          id: `codex.commandDescription.focusTab`
         },
         {
           defaultMessage: `Refresh the skill catalog for the current context`,
-          id: `codex.commandDescription.forceReloadSkills`,
+          id: `codex.commandDescription.forceReloadSkills`
         },
         { defaultMessage: `Fork the current chat`, id: `codex.commandDescription.forkThread` },
         {
           defaultMessage: `Open commit or push options`,
-          id: `codex.commandDescription.git.commit`,
+          id: `codex.commandDescription.git.commit`
         },
         {
           defaultMessage: `Open branch creation options`,
-          id: `codex.commandDescription.git.createBranch`,
+          id: `codex.commandDescription.git.createBranch`
         },
         {
           defaultMessage: `Open draft pull request creation options`,
-          id: `codex.commandDescription.git.createDraftPullRequest`,
+          id: `codex.commandDescription.git.createDraftPullRequest`
         },
         {
           defaultMessage: `Open pull request creation options`,
-          id: `codex.commandDescription.git.createPullRequest`,
+          id: `codex.commandDescription.git.createPullRequest`
         },
         {
           defaultMessage: `Open pull request merge options`,
-          id: `codex.commandDescription.git.mergePullRequest`,
+          id: `codex.commandDescription.git.mergePullRequest`
         },
         {
           defaultMessage: `Open the pull request linked to the current chat`,
-          id: `codex.commandDescription.git.openPullRequest`,
+          id: `codex.commandDescription.git.openPullRequest`
         },
         {
           defaultMessage: `Show or hide author and commit details for the active editor line`,
-          id: `codex.commandDescription.git.toggleBlame`,
+          id: `codex.commandDescription.git.toggleBlame`
         },
         {
           defaultMessage: `Hold to dictate where your cursor is, release to finish, or Esc to cancel`,
-          id: `codex.commandDescription.globalDictationHold`,
+          id: `codex.commandDescription.globalDictationHold`
         },
         {
           defaultMessage: `Double-tap to dictate hands-free, press once to finish, or Esc to cancel`,
-          id: `codex.commandDescription.globalDictationToggle`,
+          id: `codex.commandDescription.globalDictationToggle`
         },
         {
           defaultMessage: `Go to a line in the current file`,
-          id: `codex.commandDescription.goToLine`,
+          id: `codex.commandDescription.goToLine`
         },
         {
           defaultMessage: `Force reload the active browser page`,
-          id: `codex.commandDescription.hardReloadBrowserPage`,
+          id: `codex.commandDescription.hardReloadBrowserPage`
         },
         {
           defaultMessage: `Show or hide Popout Window from anywhere on desktop`,
-          id: `codex.commandDescription.hotkeyWindow`,
+          id: `codex.commandDescription.hotkeyWindow`
         },
         {
           defaultMessage: `Import from other AI apps`,
-          id: `codex.commandDescription.importExternalAgent`,
+          id: `codex.commandDescription.importExternalAgent`
         },
         {
           defaultMessage: `Customize keyboard shortcuts`,
-          id: `codex.commandDescription.keyboardShortcuts`,
+          id: `codex.commandDescription.keyboardShortcuts`
         },
         { defaultMessage: `Sign out of {appName}`, id: `codex.commandDescription.logOut` },
         {
           defaultMessage: `Create or manage scheduled tasks from the current page`,
-          id: `codex.commandDescription.manageTasks`,
+          id: `codex.commandDescription.manageTasks`
         },
         {
           defaultMessage: `Mark the current chat as unread`,
-          id: `codex.commandDescription.markThreadUnread`,
+          id: `codex.commandDescription.markThreadUnread`
         },
         { defaultMessage: `Configure MCP servers`, id: `codex.commandDescription.mcpSettings` },
         {
           defaultMessage: `Go back in navigation history`,
-          id: `codex.commandDescription.navigateBack`,
+          id: `codex.commandDescription.navigateBack`
         },
         {
           defaultMessage: `Go back in browser history`,
-          id: `codex.commandDescription.navigateBrowserBack`,
+          id: `codex.commandDescription.navigateBrowserBack`
         },
         {
           defaultMessage: `Go forward in browser history`,
-          id: `codex.commandDescription.navigateBrowserForward`,
+          id: `codex.commandDescription.navigateBrowserForward`
         },
         {
           defaultMessage: `Go forward in navigation history`,
-          id: `codex.commandDescription.navigateForward`,
+          id: `codex.commandDescription.navigateForward`
         },
         {
           defaultMessage: `Start a new chat outside of any project`,
-          id: `codex.commandDescription.newProjectlessTask`,
+          id: `codex.commandDescription.newProjectlessTask`
         },
         { defaultMessage: `Start a new chat`, id: `codex.commandDescription.newThread` },
         { defaultMessage: `Open a new window`, id: `codex.commandDescription.newWindow` },
         {
           defaultMessage: `Cycle to the next recently viewed chat`,
-          id: `codex.commandDescription.nextRecentThread`,
+          id: `codex.commandDescription.nextRecentThread`
         },
         { defaultMessage: `Switch to the next tab`, id: `codex.commandDescription.nextTab` },
         { defaultMessage: `Switch to the next chat`, id: `codex.commandDescription.nextThread` },
         {
           defaultMessage: `Switch to the next chat awaiting input or with unread activity`,
-          id: `codex.commandDescription.nextThreadNeedingAttention`,
+          id: `codex.commandDescription.nextThreadNeedingAttention`
         },
         { defaultMessage: `Open a new browser tab`, id: `codex.commandDescription.openBrowserTab` },
         { defaultMessage: `Open the command menu`, id: `codex.commandDescription.openCommandMenu` },
         {
           defaultMessage: `Open the voice chat control window`,
-          id: `codex.commandDescription.openControlWindow`,
+          id: `codex.commandDescription.openControlWindow`
         },
         {
           defaultMessage: `Add a local project to {appName}`,
-          id: `codex.commandDescription.openFolder`,
+          id: `codex.commandDescription.openFolder`
         },
         {
           defaultMessage: `Show the pet from anywhere`,
-          id: `codex.commandDescription.openPetOverlay`,
+          id: `codex.commandDescription.openPetOverlay`
         },
         { defaultMessage: `Open the review tab`, id: `codex.commandDescription.openReviewTab` },
         {
           defaultMessage: `Open the current chat in a side chat`,
-          id: `codex.commandDescription.openSideChat`,
+          id: `codex.commandDescription.openSideChat`
         },
         {
           defaultMessage: `Browse installed and recommended skills`,
-          id: `codex.commandDescription.openSkills`,
+          id: `codex.commandDescription.openSkills`
         },
         {
           defaultMessage: `Open the current chat in a new window`,
-          id: `codex.commandDescription.openThreadInNewWindow`,
+          id: `codex.commandDescription.openThreadInNewWindow`
         },
         {
           defaultMessage: `Format the selected Page text as a bulleted list`,
-          id: `codex.commandDescription.page.formatBulletedList`,
+          id: `codex.commandDescription.page.formatBulletedList`
         },
         {
           defaultMessage: `Toggle checklist formatting for the selected Page text`,
-          id: `codex.commandDescription.page.formatChecklist`,
+          id: `codex.commandDescription.page.formatChecklist`
         },
         {
           defaultMessage: `Format the selected Page text as a numbered list`,
-          id: `codex.commandDescription.page.formatNumberedList`,
+          id: `codex.commandDescription.page.formatNumberedList`
         },
         {
           defaultMessage: `Cycle to the previous recently viewed chat`,
-          id: `codex.commandDescription.previousRecentThread`,
+          id: `codex.commandDescription.previousRecentThread`
         },
         {
           defaultMessage: `Switch to the previous tab`,
-          id: `codex.commandDescription.previousTab`,
+          id: `codex.commandDescription.previousTab`
         },
         {
           defaultMessage: `Switch to the previous chat`,
-          id: `codex.commandDescription.previousThread`,
+          id: `codex.commandDescription.previousThread`
         },
         {
           defaultMessage: `Start a lightweight chat in the quick composer`,
-          id: `codex.commandDescription.quickChat`,
+          id: `codex.commandDescription.quickChat`
         },
         {
           defaultMessage: `Start a Voice Chat from anywhere on desktop`,
-          id: `codex.commandDescription.realtimeVoice`,
+          id: `codex.commandDescription.realtimeVoice`
         },
         {
           defaultMessage: `End the active Voice Chat`,
-          id: `codex.commandDescription.realtimeVoice.endCall`,
+          id: `codex.commandDescription.realtimeVoice.endCall`
         },
         {
           defaultMessage: `Mute or unmute your microphone during a Voice Chat`,
-          id: `codex.commandDescription.realtimeVoice.toggleMicrophoneMute`,
+          id: `codex.commandDescription.realtimeVoice.toggleMicrophoneMute`
         },
         {
           defaultMessage: `Mute or unmute Voice Chat audio`,
-          id: `codex.commandDescription.realtimeVoice.toggleOutputMute`,
+          id: `codex.commandDescription.realtimeVoice.toggleOutputMute`
         },
         {
           defaultMessage: `Open the recently updated chat in this shortcut slot`,
-          id: `codex.commandDescription.recentThreadSlot`,
+          id: `codex.commandDescription.recentThreadSlot`
         },
         {
           defaultMessage: `Redo the most recently undone app action`,
-          id: `codex.commandDescription.redoAppAction`,
+          id: `codex.commandDescription.redoAppAction`
         },
         {
           defaultMessage: `Reload the active browser page`,
-          id: `codex.commandDescription.reloadBrowserPage`,
+          id: `codex.commandDescription.reloadBrowserPage`
         },
         { defaultMessage: `Rename the current chat`, id: `codex.commandDescription.renameThread` },
         {
           defaultMessage: `Reopen the most recently closed tab`,
-          id: `codex.commandDescription.reopenClosedTab`,
+          id: `codex.commandDescription.reopenClosedTab`
         },
         {
           defaultMessage: `Search and switch to a chat`,
-          id: `codex.commandDescription.searchChats`,
+          id: `codex.commandDescription.searchChats`
         },
         { defaultMessage: `Search files`, id: `codex.commandDescription.searchFiles` },
         { defaultMessage: `Open {appName} settings`, id: `codex.commandDescription.settings` },
         {
           defaultMessage: `Show the shortcuts available right now`,
-          id: `codex.commandDescription.showKeyboardShortcuts`,
+          id: `codex.commandDescription.showKeyboardShortcuts`
         },
         {
           defaultMessage: `Toggle full and split view, creating a new tab if needed`,
-          id: `codex.commandDescription.showWorkspaceTabView`,
+          id: `codex.commandDescription.showWorkspaceTabView`
         },
         {
           defaultMessage: `Show or hide content tabs without changing the layout`,
-          id: `codex.commandDescription.stepWorkspaceLayout`,
+          id: `codex.commandDescription.stepWorkspaceLayout`
         },
         { defaultMessage: `Switch to Chat`, id: `codex.commandDescription.switchToChat` },
         { defaultMessage: `Switch to Codex`, id: `codex.commandDescription.switchToCodex` },
         { defaultMessage: `Switch to Work`, id: `codex.commandDescription.switchToWork` },
         {
           defaultMessage: `Start a chat that won't appear in history`,
-          id: `codex.commandDescription.temporaryChat`,
+          id: `codex.commandDescription.temporaryChat`
         },
         {
           defaultMessage: `Open the visible chat in this shortcut slot`,
-          id: `codex.commandDescription.threadSlot`,
+          id: `codex.commandDescription.threadSlot`
         },
         {
           defaultMessage: `Show or hide the bottom panel`,
-          id: `codex.commandDescription.toggleBottomPanel`,
+          id: `codex.commandDescription.toggleBottomPanel`
         },
         {
           defaultMessage: `Show or hide the internal debug panel`,
-          id: `codex.commandDescription.toggleDebugModal`,
+          id: `codex.commandDescription.toggleDebugModal`
         },
         {
           defaultMessage: `Toggle the file tree panel`,
-          id: `codex.commandDescription.toggleFileTreePanel`,
+          id: `codex.commandDescription.toggleFileTreePanel`
         },
         {
           defaultMessage: `Expand or restore the side panel`,
-          id: `codex.commandDescription.toggleMaximizeSidePanel`,
+          id: `codex.commandDescription.toggleMaximizeSidePanel`
         },
         {
           defaultMessage: `Show or hide the pinned summary`,
-          id: `codex.commandDescription.togglePinnedSummary`,
+          id: `codex.commandDescription.togglePinnedSummary`
         },
         {
           defaultMessage: `Turn the sidebar activity view on or off`,
-          id: `codex.commandDescription.togglePriorityFilter`,
+          id: `codex.commandDescription.togglePriorityFilter`
         },
         {
           defaultMessage: `Show or hide Review for the current chat`,
-          id: `codex.commandDescription.toggleReviewPanel`,
+          id: `codex.commandDescription.toggleReviewPanel`
         },
         {
           defaultMessage: `Show or hide Review for the current Git-backed chat`,
-          id: `codex.commandDescription.toggleReviewTab`,
+          id: `codex.commandDescription.toggleReviewTab`
         },
         {
           defaultMessage: `Show or hide the sidebar`,
-          id: `codex.commandDescription.toggleSidebar`,
+          id: `codex.commandDescription.toggleSidebar`
         },
         {
           defaultMessage: `Open the terminal panel`,
-          id: `codex.commandDescription.toggleTerminal`,
+          id: `codex.commandDescription.toggleTerminal`
         },
         {
           defaultMessage: `Pin or unpin the current chat`,
-          id: `codex.commandDescription.toggleThreadPin`,
+          id: `codex.commandDescription.toggleThreadPin`
         },
         {
           defaultMessage: `Start or stop trace recording`,
-          id: `codex.commandDescription.toggleTraceRecording`,
+          id: `codex.commandDescription.toggleTraceRecording`
         },
         {
           defaultMessage: `Undo the most recent app action`,
-          id: `codex.commandDescription.undoAppAction`,
+          id: `codex.commandDescription.undoAppAction`
         },
         { defaultMessage: `Archive chat`, id: `codex.commandMenuTitle.archiveThread` },
         { defaultMessage: `Close Tab`, id: `codex.commandMenuTitle.closeTab` },
@@ -3469,21 +3477,21 @@ function n() {
         { defaultMessage: `Dictation`, id: `codex.commandMenuTitle.composer.startDictation` },
         {
           defaultMessage: `Copy conversation path`,
-          id: `codex.commandMenuTitle.copyConversationPath`,
+          id: `codex.commandMenuTitle.copyConversationPath`
         },
         { defaultMessage: `Copy deeplink`, id: `codex.commandMenuTitle.copyDeeplink` },
         {
           defaultMessage: `Copy working directory`,
-          id: `codex.commandMenuTitle.copyWorkingDirectory`,
+          id: `codex.commandMenuTitle.copyWorkingDirectory`
         },
         { defaultMessage: `Find`, id: `codex.commandMenuTitle.findInThread` },
         {
           defaultMessage: `Focus Browser Address Bar`,
-          id: `codex.commandMenuTitle.focusBrowserAddressBar`,
+          id: `codex.commandMenuTitle.focusBrowserAddressBar`
         },
         {
           defaultMessage: `Force Reload Browser Page`,
-          id: `codex.commandMenuTitle.hardReloadBrowserPage`,
+          id: `codex.commandMenuTitle.hardReloadBrowserPage`
         },
         { defaultMessage: `Log Out`, id: `codex.commandMenuTitle.logOut` },
         { defaultMessage: `Back`, id: `codex.commandMenuTitle.navigateBack` },
@@ -3498,7 +3506,7 @@ function n() {
         { defaultMessage: `Open Folder…`, id: `codex.commandMenuTitle.openFolder` },
         {
           defaultMessage: `Open in New Window`,
-          id: `codex.commandMenuTitle.openThreadInNewWindow`,
+          id: `codex.commandMenuTitle.openThreadInNewWindow`
         },
         { defaultMessage: `Previous Chat`, id: `codex.commandMenuTitle.previousThread` },
         { defaultMessage: `Reload Browser Page`, id: `codex.commandMenuTitle.reloadBrowserPage` },
@@ -3508,7 +3516,7 @@ function n() {
         { defaultMessage: `Settings…`, id: `codex.commandMenuTitle.settings` },
         {
           defaultMessage: `Keyboard Shortcuts`,
-          id: `codex.commandMenuTitle.showKeyboardShortcuts`,
+          id: `codex.commandMenuTitle.showKeyboardShortcuts`
         },
         { defaultMessage: `Go to Chat 1`, id: `codex.commandMenuTitle.thread1` },
         { defaultMessage: `Go to Chat 2`, id: `codex.commandMenuTitle.thread2` },
@@ -3523,7 +3531,7 @@ function n() {
         { defaultMessage: `Toggle File Tree`, id: `codex.commandMenuTitle.toggleFileTreePanel` },
         {
           defaultMessage: `Toggle Pinned Summary`,
-          id: `codex.commandMenuTitle.togglePinnedSummary`,
+          id: `codex.commandMenuTitle.togglePinnedSummary`
         },
         { defaultMessage: `Toggle Review Panel`, id: `codex.commandMenuTitle.toggleReviewPanel` },
         { defaultMessage: `Toggle Sidebar`, id: `codex.commandMenuTitle.toggleSidebar` },
@@ -3531,7 +3539,7 @@ function n() {
         { defaultMessage: `Pin/unpin chat`, id: `codex.commandMenuTitle.toggleThreadPin` },
         {
           defaultMessage: `Start Trace Recording`,
-          id: `codex.commandMenuTitle.toggleTraceRecording`,
+          id: `codex.commandMenuTitle.toggleTraceRecording`
         },
         { defaultMessage: `Creator Micro`, id: `codexMicro.deviceName.creatorMicro` },
         { defaultMessage: `None`, id: `settings.codexMicro.actionPicker.none` },
@@ -3539,35 +3547,35 @@ function n() {
         { defaultMessage: `Custom assignments`, id: `settings.codexMicro.agentKeys.customChats` },
         {
           defaultMessage: `Choose a chat, shortcut, keycap, or skill for each key`,
-          id: `settings.codexMicro.agentKeys.customChatsDescription`,
+          id: `settings.codexMicro.agentKeys.customChatsDescription`
         },
         {
           defaultMessage: `Choose what the six agent keys follow or trigger`,
-          id: `settings.codexMicro.agentKeys.description`,
+          id: `settings.codexMicro.agentKeys.description`
         },
         { defaultMessage: `Agent keys`, id: `settings.codexMicro.agentKeys.label` },
         { defaultMessage: `Pinned chats`, id: `settings.codexMicro.agentKeys.pinnedChats` },
         {
           defaultMessage: `First six chats in Pinned`,
-          id: `settings.codexMicro.agentKeys.pinnedChatsDescription`,
+          id: `settings.codexMicro.agentKeys.pinnedChatsDescription`
         },
         { defaultMessage: `Priority chats`, id: `settings.codexMicro.agentKeys.priorityChats` },
         {
           defaultMessage: `Waiting, unread, and active chats first`,
-          id: `settings.codexMicro.agentKeys.priorityChatsDescription`,
+          id: `settings.codexMicro.agentKeys.priorityChatsDescription`
         },
         { defaultMessage: `Most recent chats`, id: `settings.codexMicro.agentKeys.recentChats` },
         {
           defaultMessage: `First six recently updated chats, pinned or unpinned`,
-          id: `settings.codexMicro.agentKeys.recentChatsDescription`,
+          id: `settings.codexMicro.agentKeys.recentChatsDescription`
         },
         {
           defaultMessage: `Open the assigned task and focus the Codex window with a single tap instead of a double tap`,
-          id: `settings.codexMicro.agentKeys.singleTap.description`,
+          id: `settings.codexMicro.agentKeys.singleTap.description`
         },
         {
           defaultMessage: `Focus Codex with a single tap`,
-          id: `settings.codexMicro.agentKeys.singleTap.label`,
+          id: `settings.codexMicro.agentKeys.singleTap.label`
         },
         { defaultMessage: `Clear assignment`, id: `settings.codexMicro.analog.clearAssignment` },
         { defaultMessage: `App`, id: `settings.codexMicro.analog.commands.app` },
@@ -3579,85 +3587,85 @@ function n() {
         { defaultMessage: `Workspace`, id: `settings.codexMicro.analog.commands.workspace` },
         {
           defaultMessage: `Current assignment`,
-          id: `settings.codexMicro.analog.currentAssignment`,
+          id: `settings.codexMicro.analog.currentAssignment`
         },
         {
           defaultMessage: `No matching actions or skills`,
-          id: `settings.codexMicro.analog.noResults`,
+          id: `settings.codexMicro.analog.noResults`
         },
         {
           defaultMessage: `Search actions and skills`,
-          id: `settings.codexMicro.analog.search.placeholder`,
+          id: `settings.codexMicro.analog.search.placeholder`
         },
         { defaultMessage: `Skills`, id: `settings.codexMicro.analog.skills` },
         { defaultMessage: `Battery`, id: `settings.codexMicro.battery` },
         { defaultMessage: `Connected`, id: `settings.codexMicro.connection.connected` },
         {
           defaultMessage: `Connection failed`,
-          id: `settings.codexMicro.connection.connectionFailed`,
+          id: `settings.codexMicro.connection.connectionFailed`
         },
         {
           defaultMessage: `Codex found your {deviceName} but couldn't connect. Codex is reconnecting automatically. If the problem continues, reconnect it and check whether a keyboard remapper or security tool is blocking access.`,
-          id: `settings.codexMicro.connection.connectionFailedDescriptionByDevice`,
+          id: `settings.codexMicro.connection.connectionFailedDescriptionByDevice`
         },
         {
           defaultMessage: `Connected with limited functionality`,
-          id: `settings.codexMicro.connection.controlUnavailable`,
+          id: `settings.codexMicro.connection.controlUnavailable`
         },
         {
           defaultMessage: `{deviceName} input remains available, but lighting and battery updates are temporarily unavailable`,
-          id: `settings.codexMicro.connection.controlUnavailableDescriptionByDevice`,
+          id: `settings.codexMicro.connection.controlUnavailableDescriptionByDevice`
         },
         { defaultMessage: `Detected`, id: `settings.codexMicro.connection.detected` },
         {
           defaultMessage: `Discovery failed`,
-          id: `settings.codexMicro.connection.discoveryFailed`,
+          id: `settings.codexMicro.connection.discoveryFailed`
         },
         {
           defaultMessage: `Codex couldn't check for your {deviceName}. Codex will try again automatically. If the problem continues, reconnect the device or restart Codex.`,
-          id: `settings.codexMicro.connection.discoveryFailedDescriptionByDevice`,
+          id: `settings.codexMicro.connection.discoveryFailedDescriptionByDevice`
         },
         { defaultMessage: `Connection`, id: `settings.codexMicro.connection.label` },
         { defaultMessage: `Not detected`, id: `settings.codexMicro.connection.notDetected` },
         { defaultMessage: `Connection problem`, id: `settings.codexMicro.connection.problem` },
         {
           defaultMessage: `Codex couldn't communicate with your {deviceName}. Codex is reconnecting automatically. If the problem continues, reconnect it and try again.`,
-          id: `settings.codexMicro.connection.problemDescriptionByDevice`,
+          id: `settings.codexMicro.connection.problemDescriptionByDevice`
         },
         { defaultMessage: `Remove`, id: `settings.codexMicro.connection.remove` },
         {
           defaultMessage: `Connection interrupted`,
-          id: `settings.codexMicro.connection.transportUnavailable`,
+          id: `settings.codexMicro.connection.transportUnavailable`
         },
         {
           defaultMessage: `Codex lost communication with your {deviceName} and is reconnecting automatically. If your computer still shows the device and the problem continues, a keyboard remapper or security tool may be blocking access. Check that tool's device rules, reconnect {deviceName}, or contact IT if it is managed.`,
-          id: `settings.codexMicro.connection.transportUnavailableDescriptionByDevice`,
+          id: `settings.codexMicro.connection.transportUnavailableDescriptionByDevice`
         },
         {
           defaultMessage: `Add text to the active prompt without sending it`,
-          id: `settings.codexMicro.editor.action.insertText.description`,
+          id: `settings.codexMicro.editor.action.insertText.description`
         },
         { defaultMessage: `Assigned action`, id: `settings.codexMicro.editor.action.label` },
         { defaultMessage: `Cancel`, id: `settings.codexMicro.editor.cancel` },
         {
           defaultMessage: `Stored in your local Codex settings`,
-          id: `settings.codexMicro.editor.composerText.description`,
+          id: `settings.codexMicro.editor.composerText.description`
         },
         { defaultMessage: `Text to insert`, id: `settings.codexMicro.editor.composerText.label` },
         { defaultMessage: `Enter text`, id: `settings.codexMicro.editor.composerText.placeholder` },
         { defaultMessage: `Choose`, id: `settings.codexMicro.editor.customShortcut.choose` },
         {
           defaultMessage: `Keycap default: {action}`,
-          id: `settings.codexMicro.editor.customShortcut.defaultAction`,
+          id: `settings.codexMicro.editor.customShortcut.defaultAction`
         },
         { defaultMessage: `Unassigned`, id: `settings.codexMicro.editor.customShortcut.none` },
         {
           defaultMessage: `Unassigned`,
-          id: `settings.codexMicro.editor.customShortcut.unassigned`,
+          id: `settings.codexMicro.editor.customShortcut.unassigned`
         },
         {
           defaultMessage: `Use keycap default`,
-          id: `settings.codexMicro.editor.customShortcut.useDefault`,
+          id: `settings.codexMicro.editor.customShortcut.useDefault`
         },
         { defaultMessage: `No matching keycaps`, id: `settings.codexMicro.editor.noKeycaps` },
         { defaultMessage: `Save`, id: `settings.codexMicro.editor.save` },
@@ -3665,76 +3673,76 @@ function n() {
         { defaultMessage: `Search keycaps`, id: `settings.codexMicro.editor.searchPlaceholder` },
         {
           defaultMessage: `Choose what appears on {slotId}`,
-          id: `settings.codexMicro.editor.subtitle`,
+          id: `settings.codexMicro.editor.subtitle`
         },
         { defaultMessage: `Edit keycap`, id: `settings.codexMicro.editor.title` },
         {
           defaultMessage: `{input, select, left {Assign left turn} right {Assign right turn} click {Assign click} longPress {Assign long press} other {Assign knob gesture}}`,
-          id: `settings.codexMicro.encoder.assign`,
+          id: `settings.codexMicro.encoder.assign`
         },
         {
           defaultMessage: `Choose what each knob gesture triggers`,
-          id: `settings.codexMicro.encoder.description`,
+          id: `settings.codexMicro.encoder.description`
         },
         { defaultMessage: `Done`, id: `settings.codexMicro.encoder.done` },
         {
           defaultMessage: `{input, select, left {Turn left} right {Turn right} click {Click} longPress {Press and hold} other {Knob gesture}}`,
-          id: `settings.codexMicro.encoder.gesture`,
+          id: `settings.codexMicro.encoder.gesture`
         },
         {
           defaultMessage: `Knob gesture mappings`,
-          id: `settings.codexMicro.encoder.inputGroup.label`,
+          id: `settings.codexMicro.encoder.inputGroup.label`
         },
         {
           defaultMessage: `{input, select, left {Turn left} right {Turn right} click {Click} longPress {Press and hold} other {Knob gesture}}: {action}`,
-          id: `settings.codexMicro.encoder.mapping`,
+          id: `settings.codexMicro.encoder.mapping`
         },
         { defaultMessage: `None`, id: `settings.codexMicro.encoder.none` },
         {
           defaultMessage: `Search knob actions and skills`,
-          id: `settings.codexMicro.encoder.search.label`,
+          id: `settings.codexMicro.encoder.search.label`
         },
         { defaultMessage: `Knob`, id: `settings.codexMicro.encoder.title` },
         { defaultMessage: `Not granted`, id: `settings.codexMicro.inputMonitoring.denied` },
         {
           defaultMessage: `Required for {deviceName} key presses on macOS`,
-          id: `settings.codexMicro.inputMonitoring.descriptionByDevice`,
+          id: `settings.codexMicro.inputMonitoring.descriptionByDevice`
         },
         { defaultMessage: `Granted`, id: `settings.codexMicro.inputMonitoring.granted` },
         { defaultMessage: `Input Monitoring`, id: `settings.codexMicro.inputMonitoring.label` },
         {
           defaultMessage: `Open System Settings`,
-          id: `settings.codexMicro.inputMonitoring.openSettings`,
+          id: `settings.codexMicro.inputMonitoring.openSettings`
         },
         { defaultMessage: `Unavailable`, id: `settings.codexMicro.inputMonitoring.unavailable` },
         {
           defaultMessage: `Configure {deviceName} knob actions`,
-          id: `settings.codexMicro.keyboardLayout.knob.configureByDevice`,
+          id: `settings.codexMicro.keyboardLayout.knob.configureByDevice`
         },
         {
           defaultMessage: `{deviceName} knob`,
-          id: `settings.codexMicro.keyboardLayout.knobByDevice`,
+          id: `settings.codexMicro.keyboardLayout.knobByDevice`
         },
         { defaultMessage: `Click`, id: `settings.codexMicro.keyboardLayout.knobTooltip.click` },
         {
           defaultMessage: `Press and hold`,
-          id: `settings.codexMicro.keyboardLayout.knobTooltip.pressAndHold`,
+          id: `settings.codexMicro.keyboardLayout.knobTooltip.pressAndHold`
         },
         {
           defaultMessage: `Open {deviceName} settings`,
-          id: `settings.codexMicro.keyboardLayout.knobTooltip.pressAndHoldActionByDevice`,
+          id: `settings.codexMicro.keyboardLayout.knobTooltip.pressAndHoldActionByDevice`
         },
         {
           defaultMessage: `Knob controls`,
-          id: `settings.codexMicro.keyboardLayout.knobTooltip.title`,
+          id: `settings.codexMicro.keyboardLayout.knobTooltip.title`
         },
         {
           defaultMessage: `Turn left`,
-          id: `settings.codexMicro.keyboardLayout.knobTooltip.turnLeft`,
+          id: `settings.codexMicro.keyboardLayout.knobTooltip.turnLeft`
         },
         {
           defaultMessage: `Turn right`,
-          id: `settings.codexMicro.keyboardLayout.knobTooltip.turnRight`,
+          id: `settings.codexMicro.keyboardLayout.knobTooltip.turnRight`
         },
         { defaultMessage: `Reset layout`, id: `settings.codexMicro.keyboardLayout.reset` },
         { defaultMessage: `Layout`, id: `settings.codexMicro.keyboardLayout.title` },
@@ -3743,7 +3751,7 @@ function n() {
         { defaultMessage: `Open plugins`, id: `settings.codexMicro.keycaps.apps` },
         {
           defaultMessage: `Attach files and folders`,
-          id: `settings.codexMicro.keycaps.attachFiles`,
+          id: `settings.codexMicro.keycaps.attachFiles`
         },
         { defaultMessage: `Open Scheduled`, id: `settings.codexMicro.keycaps.automations` },
         { defaultMessage: `Create branch`, id: `settings.codexMicro.keycaps.branch` },
@@ -3751,35 +3759,35 @@ function n() {
         { defaultMessage: `Send message`, id: `settings.codexMicro.keycaps.codex` },
         {
           defaultMessage: `Available when a composer is active`,
-          id: `settings.codexMicro.keycaps.composerText.description`,
+          id: `settings.codexMicro.keycaps.composerText.description`
         },
         { defaultMessage: `Assign any shortcut`, id: `settings.codexMicro.keycaps.custom` },
         {
           defaultMessage: `Choose a shortcut to assign`,
-          id: `settings.codexMicro.keycaps.custom.description`,
+          id: `settings.codexMicro.keycaps.custom.description`
         },
         { defaultMessage: `Insert text`, id: `settings.codexMicro.keycaps.customComposerText` },
         {
           defaultMessage: `Adds custom text to the active prompt without sending it`,
-          id: `settings.codexMicro.keycaps.customComposerText.description`,
+          id: `settings.codexMicro.keycaps.customComposerText.description`
         },
         {
           defaultMessage: `Decrease reasoning effort`,
-          id: `settings.codexMicro.keycaps.decreaseReasoningEffort`,
+          id: `settings.codexMicro.keycaps.decreaseReasoningEffort`
         },
         { defaultMessage: `Archive chat`, id: `settings.codexMicro.keycaps.delete` },
         { defaultMessage: `Copy chat as Markdown`, id: `settings.codexMicro.keycaps.download` },
         { defaultMessage: `Create draft PR`, id: `settings.codexMicro.keycaps.draftPullRequest` },
         {
           defaultMessage: `Opens in your preferred browser`,
-          id: `settings.codexMicro.keycaps.externalUrl.description`,
+          id: `settings.codexMicro.keycaps.externalUrl.description`
         },
         { defaultMessage: `Toggle Fast mode`, id: `settings.codexMicro.keycaps.fast` },
         { defaultMessage: `Open folder`, id: `settings.codexMicro.keycaps.folder` },
         { defaultMessage: `Commit or push`, id: `settings.codexMicro.keycaps.git` },
         {
           defaultMessage: `Increase reasoning effort`,
-          id: `settings.codexMicro.keycaps.increaseReasoningEffort`,
+          id: `settings.codexMicro.keycaps.increaseReasoningEffort`
         },
         { defaultMessage: `Merge PR`, id: `settings.codexMicro.keycaps.mergePullRequest` },
         { defaultMessage: `Open browser tab`, id: `settings.codexMicro.keycaps.navigation` },
@@ -3798,74 +3806,74 @@ function n() {
         { defaultMessage: `Write :yolo: in the composer`, id: `settings.codexMicro.keycaps.yolo` },
         {
           defaultMessage: `Composer navigation`,
-          id: `settings.codexMicro.knob.composerNavigation`,
+          id: `settings.codexMicro.knob.composerNavigation`
         },
         {
           defaultMessage: `Open or select the highlighted control`,
-          id: `settings.codexMicro.knob.composerNavigationClick`,
+          id: `settings.codexMicro.knob.composerNavigationClick`
         },
         {
           defaultMessage: `Move through composer controls and options`,
-          id: `settings.codexMicro.knob.composerNavigationDescription`,
+          id: `settings.codexMicro.knob.composerNavigationDescription`
         },
         {
           defaultMessage: `Move to the next control or option`,
-          id: `settings.codexMicro.knob.composerNavigationTurnLeft`,
+          id: `settings.codexMicro.knob.composerNavigationTurnLeft`
         },
         {
           defaultMessage: `Move to the previous control or option`,
-          id: `settings.codexMicro.knob.composerNavigationTurnRight`,
+          id: `settings.codexMicro.knob.composerNavigationTurnRight`
         },
         {
           defaultMessage: `Conversation scrolling`,
-          id: `settings.codexMicro.knob.conversationScroll`,
+          id: `settings.codexMicro.knob.conversationScroll`
         },
         {
           defaultMessage: `Jump to the latest message`,
-          id: `settings.codexMicro.knob.conversationScrollClick`,
+          id: `settings.codexMicro.knob.conversationScrollClick`
         },
         {
           defaultMessage: `Scroll through the active conversation`,
-          id: `settings.codexMicro.knob.conversationScrollDescription`,
+          id: `settings.codexMicro.knob.conversationScrollDescription`
         },
         {
           defaultMessage: `Scroll down the conversation`,
-          id: `settings.codexMicro.knob.conversationScrollTurnLeft`,
+          id: `settings.codexMicro.knob.conversationScrollTurnLeft`
         },
         {
           defaultMessage: `Scroll up the conversation`,
-          id: `settings.codexMicro.knob.conversationScrollTurnRight`,
+          id: `settings.codexMicro.knob.conversationScrollTurnRight`
         },
         { defaultMessage: `Custom assignments`, id: `settings.codexMicro.knob.custom` },
         {
           defaultMessage: `Choose an action for each turn, click, and long press`,
-          id: `settings.codexMicro.knob.customDescription`,
+          id: `settings.codexMicro.knob.customDescription`
         },
         {
           defaultMessage: `Choose what turning the knob controls`,
-          id: `settings.codexMicro.knob.description`,
+          id: `settings.codexMicro.knob.description`
         },
         { defaultMessage: `Knob`, id: `settings.codexMicro.knob.label` },
         { defaultMessage: `Reasoning only`, id: `settings.codexMicro.knob.reasoning` },
         {
           defaultMessage: `Open the slider or advanced options`,
-          id: `settings.codexMicro.knob.reasoningClick`,
+          id: `settings.codexMicro.knob.reasoningClick`
         },
         {
           defaultMessage: `Open and adjust reasoning effort`,
-          id: `settings.codexMicro.knob.reasoningDescription`,
+          id: `settings.codexMicro.knob.reasoningDescription`
         },
         {
           defaultMessage: `Increase reasoning effort`,
-          id: `settings.codexMicro.knob.reasoningTurnLeft`,
+          id: `settings.codexMicro.knob.reasoningTurnLeft`
         },
         {
           defaultMessage: `Decrease reasoning effort`,
-          id: `settings.codexMicro.knob.reasoningTurnRight`,
+          id: `settings.codexMicro.knob.reasoningTurnRight`
         },
         {
           defaultMessage: `Turns lighting off after inactivity and back on when you use {deviceName} or an agent key changes color or state`,
-          id: `settings.codexMicro.lightingAutoOff.descriptionByDevice`,
+          id: `settings.codexMicro.lightingAutoOff.descriptionByDevice`
         },
         { defaultMessage: `Auto-dim`, id: `settings.codexMicro.lightingAutoOff.label` },
         { defaultMessage: `Off`, id: `settings.codexMicro.lightingAutoOff.off` },
@@ -3877,57 +3885,57 @@ function n() {
         { defaultMessage: `3 minutes`, id: `settings.codexMicro.lightingAutoOff.threeMinutes` },
         {
           defaultMessage: `Adjusts the brightness of all {deviceName} lighting`,
-          id: `settings.codexMicro.lightingBrightness.descriptionByDevice`,
+          id: `settings.codexMicro.lightingBrightness.descriptionByDevice`
         },
         { defaultMessage: `Brightness`, id: `settings.codexMicro.lightingBrightness.label` },
         {
           defaultMessage: `Choose how the microphone key works`,
-          id: `settings.codexMicro.microphoneKey.description`,
+          id: `settings.codexMicro.microphoneKey.description`
         },
         { defaultMessage: `Microphone key`, id: `settings.codexMicro.microphoneKey.label` },
         { defaultMessage: `Push to talk`, id: `settings.codexMicro.microphoneKey.pushToTalk` },
         {
           defaultMessage: `Hold to dictate or double-tap to keep recording`,
-          id: `settings.codexMicro.microphoneKey.pushToTalkDescription`,
+          id: `settings.codexMicro.microphoneKey.pushToTalkDescription`
         },
         {
           defaultMessage: `Map the two switches beneath the wide key separately`,
-          id: `settings.codexMicro.microphoneKey.split.description`,
+          id: `settings.codexMicro.microphoneKey.split.description`
         },
         {
           defaultMessage: `Use separate microphone keys`,
-          id: `settings.codexMicro.microphoneKey.split.label`,
+          id: `settings.codexMicro.microphoneKey.split.label`
         },
         {
           defaultMessage: `Start a Voice Chat`,
-          id: `settings.codexMicro.microphoneKey.startVoiceChat`,
+          id: `settings.codexMicro.microphoneKey.startVoiceChat`
         },
         { defaultMessage: `Voice Chat`, id: `settings.codexMicro.microphoneKey.voiceChat` },
         {
           defaultMessage: `Tap to start a Voice Chat or toggle your microphone, then hold to end`,
-          id: `settings.codexMicro.microphoneKey.voiceChatDescription`,
+          id: `settings.codexMicro.microphoneKey.voiceChatDescription`
         },
-        { defaultMessage: `Options`, id: `settings.codexMicro.options` },
+        { defaultMessage: `Options`, id: `settings.codexMicro.options` }
       ],
       "computer-use": [
         { defaultMessage: `Browser extension installed`, id: `plugins.browserExtension.installed` },
         {
           defaultMessage: `Use the browser extension for additional control`,
-          id: `plugins.browserExtension.loading`,
+          id: `plugins.browserExtension.loading`
         },
         {
           defaultMessage: `Browser extension not installed`,
-          id: `plugins.browserExtension.notInstalled`,
+          id: `plugins.browserExtension.notInstalled`
         },
         { defaultMessage: `Always ask`, id: `settings.browserUse.approval.alwaysAsk.label` },
         { defaultMessage: `Always allow`, id: `settings.browserUse.approval.neverAsk.label` },
         {
           defaultMessage: `Unable to save approval setting`,
-          id: `settings.browserUse.approval.saveError`,
+          id: `settings.browserUse.approval.saveError`
         },
         {
           defaultMessage: `Unable to load browser settings`,
-          id: `settings.browserUse.config.loadError`,
+          id: `settings.browserUse.config.loadError`
         },
         { defaultMessage: `Loading browser settings…`, id: `settings.browserUse.config.loading` },
         { defaultMessage: `Developer mode`, id: `settings.browserUse.developerMode.title` },
@@ -3937,273 +3945,273 @@ function n() {
         { defaultMessage: `Toggle full CDP access`, id: `settings.browserUse.fullCdp.ariaLabel` },
         {
           defaultMessage: `Your organization has disabled this setting.`,
-          id: `settings.browserUse.fullCdp.blockedByPolicy`,
+          id: `settings.browserUse.fullCdp.blockedByPolicy`
         },
         {
           defaultMessage: `Allow ChatGPT to use full Chrome DevTools Protocol (CDP) access in connected Browser Use sessions. Full CDP access lets ChatGPT inspect and control sensitive browser internals that may put your data at risk.`,
-          id: `settings.browserUse.fullCdp.description`,
+          id: `settings.browserUse.fullCdp.description`
         },
         { defaultMessage: `Elevated risk`, id: `settings.browserUse.fullCdp.elevatedRisk.label` },
         { defaultMessage: `Enable full CDP access`, id: `settings.browserUse.fullCdp.label` },
         {
           defaultMessage: `Ask before accessing history`,
-          id: `settings.browserUse.historyApproval.alwaysAsk.description`,
+          id: `settings.browserUse.historyApproval.alwaysAsk.description`
         },
         {
           defaultMessage: `Choose if ChatGPT asks for approval before accessing your browser's history`,
-          id: `settings.browserUse.historyApproval.description`,
+          id: `settings.browserUse.historyApproval.description`
         },
         {
           defaultMessage: `Do not allow access to history`,
-          id: `settings.browserUse.historyApproval.disabled.description`,
+          id: `settings.browserUse.historyApproval.disabled.description`
         },
         { defaultMessage: `Disable`, id: `settings.browserUse.historyApproval.disabled.label` },
         { defaultMessage: `History`, id: `settings.browserUse.historyApproval.label` },
         {
           defaultMessage: `History access is disabled by your organization`,
-          id: `settings.browserUse.historyApproval.managedDescription`,
+          id: `settings.browserUse.historyApproval.managedDescription`
         },
         {
           defaultMessage: `Access history without asking`,
-          id: `settings.browserUse.historyApproval.neverAsk.description`,
+          id: `settings.browserUse.historyApproval.neverAsk.description`
         },
         {
           defaultMessage: `Unable to save history setting`,
-          id: `settings.browserUse.historyApproval.saveError`,
+          id: `settings.browserUse.historyApproval.saveError`
         },
         {
           defaultMessage: `Managed by your enterprise admin`,
-          id: `settings.browserUse.managed.explanation`,
+          id: `settings.browserUse.managed.explanation`
         },
         { defaultMessage: `Permissions`, id: `settings.browserUse.permissions.title` },
         {
           defaultMessage: `Agent permissions`,
-          id: `settings.browserUse.policy.agentPermissions.title`,
+          id: `settings.browserUse.policy.agentPermissions.title`
         },
         {
           defaultMessage: `Browser permissions`,
-          id: `settings.browserUse.policy.browserPermissions.title`,
+          id: `settings.browserUse.policy.browserPermissions.title`
         },
         {
           defaultMessage: `https://example.com`,
-          id: `settings.browserUse.policyDomains.addDialogPlaceholder`,
+          id: `settings.browserUse.policyDomains.addDialogPlaceholder`
         },
         {
           defaultMessage: `Browse`,
-          id: `settings.browserUse.sitePermissions.addDialog.behaviorLabel`,
+          id: `settings.browserUse.sitePermissions.addDialog.behaviorLabel`
         },
         {
           defaultMessage: `Enter a valid origin, such as https://example.com or https://*.example.com`,
-          id: `settings.browserUse.sitePermissions.addDialog.invalidOrigin`,
+          id: `settings.browserUse.sitePermissions.addDialog.invalidOrigin`
         },
         {
           defaultMessage: `These permissions match the defaults, so adding this site would not change anything`,
-          id: `settings.browserUse.sitePermissions.addDialog.matchesDefaults`,
+          id: `settings.browserUse.sitePermissions.addDialog.matchesDefaults`
         },
         {
           defaultMessage: `More options`,
-          id: `settings.browserUse.sitePermissions.addDialog.moreOptions`,
+          id: `settings.browserUse.sitePermissions.addDialog.moreOptions`
         },
         {
           defaultMessage: `Site`,
-          id: `settings.browserUse.sitePermissions.addDialog.siteAriaLabel`,
+          id: `settings.browserUse.sitePermissions.addDialog.siteAriaLabel`
         },
         { defaultMessage: `Site`, id: `settings.browserUse.sitePermissions.addDialog.siteLabel` },
         {
           defaultMessage: `Choose what access ChatGPT has on a site`,
-          id: `settings.browserUse.sitePermissions.addDialog.subtitle`,
+          id: `settings.browserUse.sitePermissions.addDialog.subtitle`
         },
         {
           defaultMessage: `Add site permission`,
-          id: `settings.browserUse.sitePermissions.addDialog.title`,
+          id: `settings.browserUse.sitePermissions.addDialog.title`
         },
         {
           defaultMessage: `Always allow`,
-          id: `settings.browserUse.sitePermissions.approvalValue.alwaysAllow`,
+          id: `settings.browserUse.sitePermissions.approvalValue.alwaysAllow`
         },
         {
           defaultMessage: `Requires approval`,
-          id: `settings.browserUse.sitePermissions.approvalValue.requiresApproval`,
+          id: `settings.browserUse.sitePermissions.approvalValue.requiresApproval`
         },
         { defaultMessage: `Debug / CDP`, id: `settings.browserUse.sitePermissions.cdpAccess` },
         {
           defaultMessage: `Remove custom permissions for {origin}`,
-          id: `settings.browserUse.sitePermissions.clearAriaLabel`,
+          id: `settings.browserUse.sitePermissions.clearAriaLabel`
         },
         {
           defaultMessage: `Only sites with custom permissions appear here`,
-          id: `settings.browserUse.sitePermissions.customPermissionsFooter`,
+          id: `settings.browserUse.sitePermissions.customPermissionsFooter`
         },
         { defaultMessage: `Allow`, id: `settings.browserUse.sitePermissions.defaultValue.allowed` },
         {
           defaultMessage: `Always allow`,
-          id: `settings.browserUse.sitePermissions.defaultValue.alwaysAllowed`,
+          id: `settings.browserUse.sitePermissions.defaultValue.alwaysAllowed`
         },
         {
           defaultMessage: `Requires approval`,
-          id: `settings.browserUse.sitePermissions.defaultValue.approvalRequired`,
+          id: `settings.browserUse.sitePermissions.defaultValue.approvalRequired`
         },
         { defaultMessage: `Block`, id: `settings.browserUse.sitePermissions.defaultValue.denied` },
         { defaultMessage: `Download`, id: `settings.browserUse.sitePermissions.downloads` },
         {
           defaultMessage: `Uses the default permission`,
-          id: `settings.browserUse.sitePermissions.inheritedDescription`,
+          id: `settings.browserUse.sitePermissions.inheritedDescription`
         },
         {
           defaultMessage: `Unable to load site permissions`,
-          id: `settings.browserUse.sitePermissions.loadError`,
+          id: `settings.browserUse.sitePermissions.loadError`
         },
         { defaultMessage: `Loading websites…`, id: `settings.browserUse.sitePermissions.loading` },
         {
           defaultMessage: `Managed by your organization`,
-          id: `settings.browserUse.sitePermissions.managedLegend`,
+          id: `settings.browserUse.sitePermissions.managedLegend`
         },
         {
           defaultMessage: `Browsing`,
-          id: `settings.browserUse.sitePermissions.matrix.browsingColumn`,
+          id: `settings.browserUse.sitePermissions.matrix.browsingColumn`
         },
         { defaultMessage: `Default`, id: `settings.browserUse.sitePermissions.matrix.defaultRow` },
         {
           defaultMessage: `Downloads`,
-          id: `settings.browserUse.sitePermissions.matrix.downloadsColumn`,
+          id: `settings.browserUse.sitePermissions.matrix.downloadsColumn`
         },
         { defaultMessage: `—`, id: `settings.browserUse.sitePermissions.matrix.unavailableValue` },
         {
           defaultMessage: `Uploads`,
-          id: `settings.browserUse.sitePermissions.matrix.uploadsColumn`,
+          id: `settings.browserUse.sitePermissions.matrix.uploadsColumn`
         },
         {
           defaultMessage: `Choose default permissions and add exceptions for specific sites`,
-          id: `settings.browserUse.sitePermissions.matrixSubtitle`,
+          id: `settings.browserUse.sitePermissions.matrixSubtitle`
         },
         {
           defaultMessage: `Blocked by your network configuration`,
-          id: `settings.browserUse.sitePermissions.networkBlocked`,
+          id: `settings.browserUse.sitePermissions.networkBlocked`
         },
         { defaultMessage: `Cancel`, id: `settings.browserUse.sitePermissions.removeDialog.cancel` },
         {
           defaultMessage: `Remove`,
-          id: `settings.browserUse.sitePermissions.removeDialog.confirm`,
+          id: `settings.browserUse.sitePermissions.removeDialog.confirm`
         },
         {
           defaultMessage: `This resets this site's custom permissions to their defaults`,
-          id: `settings.browserUse.sitePermissions.removeDialog.subtitle`,
+          id: `settings.browserUse.sitePermissions.removeDialog.subtitle`
         },
         {
           defaultMessage: `Remove custom permissions for {origin}?`,
-          id: `settings.browserUse.sitePermissions.removeDialog.title`,
+          id: `settings.browserUse.sitePermissions.removeDialog.title`
         },
         {
           defaultMessage: `Change the default from Always allow before requiring approval for individual sites`,
-          id: `settings.browserUse.sitePermissions.requiresApprovalUnavailable`,
+          id: `settings.browserUse.sitePermissions.requiresApprovalUnavailable`
         },
         {
           defaultMessage: `Unable to save site permissions`,
-          id: `settings.browserUse.sitePermissions.saveError`,
+          id: `settings.browserUse.sitePermissions.saveError`
         },
         { defaultMessage: `Upload`, id: `settings.browserUse.sitePermissions.uploads` },
         { defaultMessage: `Allow`, id: `settings.browserUse.sitePermissions.value.allowed` },
         { defaultMessage: `Block`, id: `settings.browserUse.sitePermissions.value.denied` },
         {
           defaultMessage: `Use default`,
-          id: `settings.browserUse.sitePermissions.value.useDefault`,
+          id: `settings.browserUse.sitePermissions.value.useDefault`
         },
         { defaultMessage: `Browse`, id: `settings.browserUse.sitePermissions.websiteAccess` },
         { defaultMessage: `Toggle WebMCP`, id: `settings.browserUse.webMcp.ariaLabel` },
         {
           defaultMessage: `Allow ChatGPT to discover and call site tools exposed by websites, including WebMCP`,
-          id: `settings.browserUse.webMcp.description`,
+          id: `settings.browserUse.webMcp.description`
         },
         { defaultMessage: `Enable site tools`, id: `settings.browserUse.webMcp.label` },
         {
           defaultMessage: `Site tools aren't available for this account`,
-          id: `settings.browserUse.webMcp.unavailableDescription`,
+          id: `settings.browserUse.webMcp.unavailableDescription`
         },
         { defaultMessage: `None yet`, id: `settings.computerUse.allowedApps.emptyTitle` },
         {
           defaultMessage: `Unable to load allowed apps.`,
-          id: `settings.computerUse.allowedApps.loadError`,
+          id: `settings.computerUse.allowedApps.loadError`
         },
         { defaultMessage: `Loading allowed apps…`, id: `settings.computerUse.allowedApps.loading` },
         {
           defaultMessage: `Remove {displayName}`,
-          id: `settings.computerUse.allowedApps.removeAriaLabel`,
+          id: `settings.computerUse.allowedApps.removeAriaLabel`
         },
         { defaultMessage: `Cancel`, id: `settings.computerUse.allowedApps.removeDialogCancel` },
         { defaultMessage: `Remove`, id: `settings.computerUse.allowedApps.removeDialogConfirm` },
         {
           defaultMessage: `ChatGPT will ask to use “{displayName}” in the next computer use session.`,
-          id: `settings.computerUse.allowedApps.removeDialogSubtitle`,
+          id: `settings.computerUse.allowedApps.removeDialogSubtitle`
         },
         {
           defaultMessage: `Remove “{displayName}” from always allowed apps?`,
-          id: `settings.computerUse.allowedApps.removeDialogTitle`,
+          id: `settings.computerUse.allowedApps.removeDialogTitle`
         },
         { defaultMessage: `Allowed app removed`, id: `settings.computerUse.allowedApps.saved` },
         {
           defaultMessage: `Unable to save allowed apps`,
-          id: `settings.computerUse.allowedApps.saveError`,
+          id: `settings.computerUse.allowedApps.saveError`
         },
         { defaultMessage: `Always-allowed apps`, id: `settings.computerUse.allowedApps.title` },
         {
           defaultMessage: `Let ChatGPT control apps on your computer`,
-          id: `settings.computerUse.anyApp.description`,
+          id: `settings.computerUse.anyApp.description`
         },
         { defaultMessage: `Any App`, id: `settings.computerUse.anyApp.title` },
         {
           defaultMessage: `Enable Locked use`,
-          id: `settings.computerUse.backgroundAuth.ariaLabel`,
+          id: `settings.computerUse.backgroundAuth.ariaLabel`
         },
         {
           defaultMessage: `Let ChatGPT use your Mac when it's locked. <a>Learn more</a>`,
-          id: `settings.computerUse.backgroundAuth.description`,
+          id: `settings.computerUse.backgroundAuth.description`
         },
         {
           defaultMessage: `Locked use disabled`,
-          id: `settings.computerUse.backgroundAuth.disabled`,
+          id: `settings.computerUse.backgroundAuth.disabled`
         },
         { defaultMessage: `Locked use enabled`, id: `settings.computerUse.backgroundAuth.enabled` },
         { defaultMessage: `Locked use`, id: `settings.computerUse.backgroundAuth.label` },
         {
           defaultMessage: `Unable to update Locked use`,
-          id: `settings.computerUse.backgroundAuth.saveError`,
+          id: `settings.computerUse.backgroundAuth.saveError`
         },
         { defaultMessage: `Computer use`, id: `settings.computerUse.breadcrumb.computerUse` },
         {
           defaultMessage: `Use a browser extension for added control`,
-          id: `settings.computerUse.browser.description`,
+          id: `settings.computerUse.browser.description`
         },
         {
           defaultMessage: `Hide @{browserName} in the composer`,
-          id: `settings.computerUse.browser.disableTooltip`,
+          id: `settings.computerUse.browser.disableTooltip`
         },
         {
           defaultMessage: `Show @{browserName} in the composer`,
-          id: `settings.computerUse.browser.enableTooltip`,
+          id: `settings.computerUse.browser.enableTooltip`
         },
         { defaultMessage: `Install`, id: `settings.computerUse.browser.installExtension` },
         {
           defaultMessage: `Install the {pluginName} plugin to enable browser control`,
-          id: `settings.computerUse.browser.installPluginDescription`,
+          id: `settings.computerUse.browser.installPluginDescription`
         },
         { defaultMessage: `Loading browser settings…`, id: `settings.computerUse.browser.loading` },
         { defaultMessage: `Manage`, id: `settings.computerUse.browser.manage` },
         {
           defaultMessage: `Unable to open browser extension settings`,
-          id: `settings.computerUse.browser.openExtensionSettingsError`,
+          id: `settings.computerUse.browser.openExtensionSettingsError`
         },
         {
           defaultMessage: `Unable to open browser extension page`,
-          id: `settings.computerUse.browser.openExtensionStoreError`,
+          id: `settings.computerUse.browser.openExtensionStoreError`
         },
         {
           defaultMessage: `Reinstall extension`,
-          id: `settings.computerUse.browser.reinstallExtension`,
+          id: `settings.computerUse.browser.reinstallExtension`
         },
         { defaultMessage: `Remove extension`, id: `settings.computerUse.browser.removeExtension` },
         {
           defaultMessage: `Toggle the @{browserName} browser reference`,
-          id: `settings.computerUse.browser.toggleAria`,
+          id: `settings.computerUse.browser.toggleAria`
         },
         { defaultMessage: `Installed`, id: `settings.computerUse.chrome.installed` },
         { defaultMessage: `Not installed`, id: `settings.computerUse.chrome.notInstalled` },
@@ -4211,502 +4219,502 @@ function n() {
         { defaultMessage: `Google Chrome`, id: `settings.computerUse.chrome.pluginTitle` },
         {
           defaultMessage: `Browser permissions`,
-          id: `settings.computerUse.chrome.policy.browserPermissions.title`,
+          id: `settings.computerUse.chrome.policy.browserPermissions.title`
         },
         { defaultMessage: `Microsoft Edge`, id: `settings.computerUse.edge.pluginTitle` },
         { defaultMessage: `Install`, id: `settings.computerUse.install.button` },
         {
           defaultMessage: `Computer Use plugins unavailable`,
-          id: `settings.computerUse.install.empty`,
+          id: `settings.computerUse.install.empty`
         },
         { defaultMessage: `Control`, id: `settings.computerUse.install.title` },
         { defaultMessage: `Manage`, id: `settings.computerUse.manage` },
         { defaultMessage: `None yet`, id: `settings.computerUse.messages.allowedChats.empty` },
         {
           defaultMessage: `Unable to load allowed chats`,
-          id: `settings.computerUse.messages.allowedChats.loadError`,
+          id: `settings.computerUse.messages.allowedChats.loadError`
         },
         {
           defaultMessage: `Loading allowed chats…`,
-          id: `settings.computerUse.messages.allowedChats.loading`,
+          id: `settings.computerUse.messages.allowedChats.loading`
         },
         {
           defaultMessage: `Remove {displayName}`,
-          id: `settings.computerUse.messages.allowedChats.removeAriaLabel`,
+          id: `settings.computerUse.messages.allowedChats.removeAriaLabel`
         },
         {
           defaultMessage: `Unable to remove send permission`,
-          id: `settings.computerUse.messages.allowedChats.removeError`,
+          id: `settings.computerUse.messages.allowedChats.removeError`
         },
         {
           defaultMessage: `Per-chat approvals`,
-          id: `settings.computerUse.messages.allowedChats.savedApprovals`,
+          id: `settings.computerUse.messages.allowedChats.savedApprovals`
         },
         {
           defaultMessage: `Let ChatGPT read and send messages`,
-          id: `settings.computerUse.messages.description`,
+          id: `settings.computerUse.messages.description`
         },
         {
           defaultMessage: `Loading Messages settings…`,
-          id: `settings.computerUse.messages.loading`,
+          id: `settings.computerUse.messages.loading`
         },
         { defaultMessage: `Messages`, id: `settings.computerUse.messages.pluginTitle` },
         { defaultMessage: `Add`, id: `settings.computerUse.messages.readAccess.add` },
         {
           defaultMessage: `Allow all chats`,
-          id: `settings.computerUse.messages.readAccess.allowAll`,
+          id: `settings.computerUse.messages.readAccess.allowAll`
         },
         {
           defaultMessage: `Saved choices, including Never allow, don't apply`,
-          id: `settings.computerUse.messages.readAccess.allowAllDescription`,
+          id: `settings.computerUse.messages.readAccess.allowAllDescription`
         },
         {
           defaultMessage: `Allow by default`,
-          id: `settings.computerUse.messages.readAccess.allowUnconfigured`,
+          id: `settings.computerUse.messages.readAccess.allowUnconfigured`
         },
         {
           defaultMessage: `Allow reading chats without a saved choice`,
-          id: `settings.computerUse.messages.readAccess.allowUnconfiguredDescription`,
+          id: `settings.computerUse.messages.readAccess.allowUnconfiguredDescription`
         },
         {
           defaultMessage: `Always allow`,
-          id: `settings.computerUse.messages.readAccess.alwaysAllow`,
+          id: `settings.computerUse.messages.readAccess.alwaysAllow`
         },
         {
           defaultMessage: `Never allow`,
-          id: `settings.computerUse.messages.readAccess.alwaysDeny`,
+          id: `settings.computerUse.messages.readAccess.alwaysDeny`
         },
         { defaultMessage: `Always ask`, id: `settings.computerUse.messages.readAccess.ask` },
         {
           defaultMessage: `Ask by default`,
-          id: `settings.computerUse.messages.readAccess.askPerChat`,
+          id: `settings.computerUse.messages.readAccess.askPerChat`
         },
         {
           defaultMessage: `Ask before reading chats without a saved choice`,
-          id: `settings.computerUse.messages.readAccess.askPerChatDescription`,
+          id: `settings.computerUse.messages.readAccess.askPerChatDescription`
         },
         { defaultMessage: `None yet`, id: `settings.computerUse.messages.readAccess.empty` },
         {
           defaultMessage: `Unable to load read permissions`,
-          id: `settings.computerUse.messages.readAccess.loadError`,
+          id: `settings.computerUse.messages.readAccess.loadError`
         },
         {
           defaultMessage: `Loading read permissions…`,
-          id: `settings.computerUse.messages.readAccess.loading`,
+          id: `settings.computerUse.messages.readAccess.loading`
         },
         {
           defaultMessage: `ChatGPT asks before reading chats without a saved choice to answer your requests`,
-          id: `settings.computerUse.messages.readAccess.policyAskPerChatDescription`,
+          id: `settings.computerUse.messages.readAccess.policyAskPerChatDescription`
         },
         {
           defaultMessage: `ChatGPT can read chats without a saved choice to answer your requests`,
-          id: `settings.computerUse.messages.readAccess.policyDescription`,
+          id: `settings.computerUse.messages.readAccess.policyDescription`
         },
         {
           defaultMessage: `Reading behavior`,
-          id: `settings.computerUse.messages.readAccess.policyLabel`,
+          id: `settings.computerUse.messages.readAccess.policyLabel`
         },
         {
           defaultMessage: `ChatGPT can read all chats to answer your requests`,
-          id: `settings.computerUse.messages.readAccess.policyOverridden`,
+          id: `settings.computerUse.messages.readAccess.policyOverridden`
         },
         {
           defaultMessage: `Remove read permission for {displayName}`,
-          id: `settings.computerUse.messages.readAccess.removeAriaLabel`,
+          id: `settings.computerUse.messages.readAccess.removeAriaLabel`
         },
         {
           defaultMessage: `Unable to remove read permission`,
-          id: `settings.computerUse.messages.readAccess.removeError`,
+          id: `settings.computerUse.messages.readAccess.removeError`
         },
         {
           defaultMessage: `Per-chat permissions`,
-          id: `settings.computerUse.messages.readAccess.savedPermissions`,
+          id: `settings.computerUse.messages.readAccess.savedPermissions`
         },
         {
           defaultMessage: `Unable to update read permission`,
-          id: `settings.computerUse.messages.readAccess.saveError`,
+          id: `settings.computerUse.messages.readAccess.saveError`
         },
         { defaultMessage: `Read access`, id: `settings.computerUse.messages.readAccess.title` },
         {
           defaultMessage: `Always allow sending to all chats`,
-          id: `settings.computerUse.messages.sendAccess.allowAll`,
+          id: `settings.computerUse.messages.sendAccess.allowAll`
         },
         {
           defaultMessage: `When on, ChatGPT can send to any chat without asking you to approve the message or its recipients`,
-          id: `settings.computerUse.messages.sendAccess.allowAllDescription`,
+          id: `settings.computerUse.messages.sendAccess.allowAllDescription`
         },
         {
           defaultMessage: `Unable to update send permission`,
-          id: `settings.computerUse.messages.sendAccess.saveError`,
+          id: `settings.computerUse.messages.sendAccess.saveError`
         },
         { defaultMessage: `Send access`, id: `settings.computerUse.messages.sendAccess.title` },
         {
           defaultMessage: `Toggle Microsoft Excel live control`,
-          id: `settings.computerUse.microsoftExcel.appToggleAria`,
+          id: `settings.computerUse.microsoftExcel.appToggleAria`
         },
         {
           defaultMessage: `Let ChatGPT use Microsoft Excel add-in for additional control`,
-          id: `settings.computerUse.microsoftExcel.description`,
+          id: `settings.computerUse.microsoftExcel.description`
         },
         {
           defaultMessage: `Disable Microsoft Excel live control`,
-          id: `settings.computerUse.microsoftExcel.disableToggleTooltip`,
+          id: `settings.computerUse.microsoftExcel.disableToggleTooltip`
         },
         {
           defaultMessage: `Enable Microsoft Excel live control`,
-          id: `settings.computerUse.microsoftExcel.enableToggleTooltip`,
+          id: `settings.computerUse.microsoftExcel.enableToggleTooltip`
         },
         {
           defaultMessage: `Microsoft Excel`,
-          id: `settings.computerUse.microsoftExcel.pluginTitle`,
+          id: `settings.computerUse.microsoftExcel.pluginTitle`
         },
         {
           defaultMessage: `Toggle Microsoft PowerPoint live control`,
-          id: `settings.computerUse.microsoftPowerPoint.appToggleAria`,
+          id: `settings.computerUse.microsoftPowerPoint.appToggleAria`
         },
         {
           defaultMessage: `Let ChatGPT use Microsoft PowerPoint add-in for additional control`,
-          id: `settings.computerUse.microsoftPowerPoint.description`,
+          id: `settings.computerUse.microsoftPowerPoint.description`
         },
         {
           defaultMessage: `Disable Microsoft PowerPoint live control`,
-          id: `settings.computerUse.microsoftPowerPoint.disableToggleTooltip`,
+          id: `settings.computerUse.microsoftPowerPoint.disableToggleTooltip`
         },
         {
           defaultMessage: `Enable Microsoft PowerPoint live control`,
-          id: `settings.computerUse.microsoftPowerPoint.enableToggleTooltip`,
+          id: `settings.computerUse.microsoftPowerPoint.enableToggleTooltip`
         },
         {
           defaultMessage: `Microsoft PowerPoint`,
-          id: `settings.computerUse.microsoftPowerPoint.pluginTitle`,
+          id: `settings.computerUse.microsoftPowerPoint.pluginTitle`
         },
         {
           defaultMessage: `Toggle Microsoft Word live control`,
-          id: `settings.computerUse.microsoftWord.appToggleAria`,
+          id: `settings.computerUse.microsoftWord.appToggleAria`
         },
         {
           defaultMessage: `Let ChatGPT use Microsoft Word add-in for additional control`,
-          id: `settings.computerUse.microsoftWord.description`,
+          id: `settings.computerUse.microsoftWord.description`
         },
         {
           defaultMessage: `Disable Microsoft Word live control`,
-          id: `settings.computerUse.microsoftWord.disableToggleTooltip`,
+          id: `settings.computerUse.microsoftWord.disableToggleTooltip`
         },
         {
           defaultMessage: `Enable Microsoft Word live control`,
-          id: `settings.computerUse.microsoftWord.enableToggleTooltip`,
+          id: `settings.computerUse.microsoftWord.enableToggleTooltip`
         },
         { defaultMessage: `Microsoft Word`, id: `settings.computerUse.microsoftWord.pluginTitle` },
         {
           defaultMessage: `Set up extensions for more browsers`,
-          id: `settings.computerUse.moreBrowsers.description`,
+          id: `settings.computerUse.moreBrowsers.description`
         },
         { defaultMessage: `More browsers`, id: `settings.computerUse.moreBrowsers.title` },
         {
           defaultMessage: `Safari extension support is coming soon`,
-          id: `settings.computerUse.safari.description`,
+          id: `settings.computerUse.safari.description`
         },
         { defaultMessage: `Safari`, id: `settings.computerUse.safari.pluginTitle` },
         {
           defaultMessage: `Play sounds for foreground and background clicks`,
-          id: `settings.computerUse.sounds.foregroundAndBackgroundClicks`,
+          id: `settings.computerUse.sounds.foregroundAndBackgroundClicks`
         },
         {
           defaultMessage: `Play sounds for foreground clicks`,
-          id: `settings.computerUse.sounds.foregroundClicks`,
+          id: `settings.computerUse.sounds.foregroundClicks`
         },
         { defaultMessage: `Don’t play sounds`, id: `settings.computerUse.sounds.off` },
         {
           defaultMessage: `Manage how ChatGPT uses other applications on your computer`,
-          id: `settings.computerUse.subtitle`,
-        },
+          id: `settings.computerUse.subtitle`
+        }
       ],
       connections: [
         {
           defaultMessage: `Something went wrong connecting to the Codex CLI. Try restarting`,
-          id: `appServer.error.genericRestartRequired`,
+          id: `appServer.error.genericRestartRequired`
         },
         { defaultMessage: `You are currently logged out.`, id: `appServer.error.loginRequired` },
         {
           defaultMessage: `Codex CLI is not installed on this remote machine`,
-          id: `appServer.error.remoteCodexNotFound`,
+          id: `appServer.error.remoteCodexNotFound`
         },
         {
           defaultMessage: `Restart now to update to {installedVersion}. Currently running {currentVersion}`,
-          id: `appServer.error.restartAvailable`,
+          id: `appServer.error.restartAvailable`
         },
         {
           defaultMessage: `Codex CLI on this environment is out of date. Update to {minVersion} or newer. Current version: {currentVersion}`,
-          id: `appServer.error.unsupportedVersion`,
+          id: `appServer.error.unsupportedVersion`
         },
         { defaultMessage: `Color`, id: `codex.remoteConnectionEditor.color` },
         {
           defaultMessage: `Color changes for {host} everywhere it appears`,
-          id: `codex.remoteConnectionEditor.subtitle`,
+          id: `codex.remoteConnectionEditor.subtitle`
         },
         { defaultMessage: `Edit connection`, id: `codex.remoteConnectionEditor.title` },
         { defaultMessage: `Connection colors`, id: `codex.remoteHostColorPicker.colors` },
         {
           defaultMessage: `Change connection color`,
-          id: `codex.remoteHostColorPicker.pickerAriaLabel`,
+          id: `codex.remoteHostColorPicker.pickerAriaLabel`
         },
         { defaultMessage: `Connection color`, id: `codex.remoteHostColorPicker.title` },
         {
           defaultMessage: `This lets authorized devices, such as your phone, connect to ChatGPT and control this computer remotely`,
-          id: `codexMobile.setupDialog.allowHost.description`,
+          id: `codexMobile.setupDialog.allowHost.description`
         },
         {
           defaultMessage: `Couldn’t enable remote control. Try again`,
-          id: `codexMobile.setupDialog.allowHost.error`,
+          id: `codexMobile.setupDialog.allowHost.error`
         },
         {
           defaultMessage: `Allow devices to control this computer?`,
-          id: `codexMobile.setupDialog.allowHost.heading`,
+          id: `codexMobile.setupDialog.allowHost.heading`
         },
         { defaultMessage: `Allow`, id: `codexMobile.setupDialog.allowHost.primary` },
         {
           defaultMessage: `Allow devices to control this computer?`,
-          id: `codexMobile.setupDialog.allowHost.title`,
+          id: `codexMobile.setupDialog.allowHost.title`
         },
         {
           defaultMessage: `Let ChatGPT navigate websites and fill out forms`,
-          id: `codexMobile.setupDialog.connected.chromeExtension.description`,
+          id: `codexMobile.setupDialog.connected.chromeExtension.description`
         },
         {
           defaultMessage: `Set up Chrome extension`,
-          id: `codexMobile.setupDialog.connected.chromeExtension.title`,
+          id: `codexMobile.setupDialog.connected.chromeExtension.title`
         },
         {
           defaultMessage: `Set up Chrome extension`,
-          id: `codexMobile.setupDialog.connected.chromeExtension.toggle`,
+          id: `codexMobile.setupDialog.connected.chromeExtension.toggle`
         },
         {
           defaultMessage: `Let ChatGPT control apps on your Mac`,
-          id: `codexMobile.setupDialog.connected.computerUse.description`,
+          id: `codexMobile.setupDialog.connected.computerUse.description`
         },
         {
           defaultMessage: `Let ChatGPT control apps on your PC`,
-          id: `codexMobile.setupDialog.connected.computerUse.description.windows`,
+          id: `codexMobile.setupDialog.connected.computerUse.description.windows`
         },
         {
           defaultMessage: `Enable computer use`,
-          id: `codexMobile.setupDialog.connected.computerUse.title`,
+          id: `codexMobile.setupDialog.connected.computerUse.title`
         },
         {
           defaultMessage: `Enable computer use`,
-          id: `codexMobile.setupDialog.connected.computerUse.toggle`,
+          id: `codexMobile.setupDialog.connected.computerUse.toggle`
         },
         {
           defaultMessage: `Make the most out of your new connection. You can change these later in Settings.`,
-          id: `codexMobile.setupDialog.connected.description`,
+          id: `codexMobile.setupDialog.connected.description`
         },
         { defaultMessage: `Done`, id: `codexMobile.setupDialog.connected.finish` },
         { defaultMessage: `You’re connected`, id: `codexMobile.setupDialog.connected.heading` },
         {
           defaultMessage: `Prevent sleep when this computer is plugged in and remote access is enabled`,
-          id: `codexMobile.setupDialog.connected.keepAwake.description`,
+          id: `codexMobile.setupDialog.connected.keepAwake.description`
         },
         {
           defaultMessage: `Keep this Mac awake`,
-          id: `codexMobile.setupDialog.connected.keepAwake.title`,
+          id: `codexMobile.setupDialog.connected.keepAwake.title`
         },
         {
           defaultMessage: `Keep this PC awake`,
-          id: `codexMobile.setupDialog.connected.keepAwake.title.windows`,
+          id: `codexMobile.setupDialog.connected.keepAwake.title.windows`
         },
         {
           defaultMessage: `Keep this Mac awake`,
-          id: `codexMobile.setupDialog.connected.keepAwake.toggle`,
+          id: `codexMobile.setupDialog.connected.keepAwake.toggle`
         },
         {
           defaultMessage: `Keep this PC awake`,
-          id: `codexMobile.setupDialog.connected.keepAwake.toggle.windows`,
+          id: `codexMobile.setupDialog.connected.keepAwake.toggle.windows`
         },
         {
           defaultMessage: `Control Mac apps from your phone. <a>Learn more</a>`,
-          id: `codexMobile.setupDialog.connected.lockedComputerUse.description`,
+          id: `codexMobile.setupDialog.connected.lockedComputerUse.description`
         },
         {
           defaultMessage: `Use your Mac apps while locked`,
-          id: `codexMobile.setupDialog.connected.lockedComputerUse.title`,
+          id: `codexMobile.setupDialog.connected.lockedComputerUse.title`
         },
         {
           defaultMessage: `Use your Mac apps while locked`,
-          id: `codexMobile.setupDialog.connected.lockedComputerUse.toggle`,
+          id: `codexMobile.setupDialog.connected.lockedComputerUse.toggle`
         },
         { defaultMessage: `You’re connected`, id: `codexMobile.setupDialog.connected.title` },
         {
           defaultMessage: `Continue chats from the ChatGPT desktop app on your phone or another device`,
-          id: `codexMobile.setupDialog.initial.description`,
+          id: `codexMobile.setupDialog.initial.description`
         },
         {
           defaultMessage: `Just send a message to start a task on your desktop`,
-          id: `codexMobile.setupDialog.initial.feature.actions.description`,
+          id: `codexMobile.setupDialog.initial.feature.actions.description`
         },
         {
           defaultMessage: `Start something new`,
-          id: `codexMobile.setupDialog.initial.feature.actions.title`,
+          id: `codexMobile.setupDialog.initial.feature.actions.title`
         },
         {
           defaultMessage: `Get notified when ChatGPT finishes a task or needs your attention`,
-          id: `codexMobile.setupDialog.initial.feature.notifications.description`,
+          id: `codexMobile.setupDialog.initial.feature.notifications.description`
         },
         {
           defaultMessage: `Stay in the loop`,
-          id: `codexMobile.setupDialog.initial.feature.notifications.title`,
+          id: `codexMobile.setupDialog.initial.feature.notifications.title`
         },
         {
           defaultMessage: `Continue any chat or project from the ChatGPT desktop app`,
-          id: `codexMobile.setupDialog.initial.feature.threads.description`,
+          id: `codexMobile.setupDialog.initial.feature.threads.description`
         },
         {
           defaultMessage: `Pick up where you left off`,
-          id: `codexMobile.setupDialog.initial.feature.threads.title`,
+          id: `codexMobile.setupDialog.initial.feature.threads.title`
         },
         {
           defaultMessage: `Connect your phone to this Mac`,
-          id: `codexMobile.setupDialog.initial.heading`,
+          id: `codexMobile.setupDialog.initial.heading`
         },
         {
           defaultMessage: `Connect a device to this Mac`,
-          id: `codexMobile.setupDialog.initial.heading.desktop`,
+          id: `codexMobile.setupDialog.initial.heading.desktop`
         },
         {
           defaultMessage: `Connect a device to this PC`,
-          id: `codexMobile.setupDialog.initial.heading.windows`,
+          id: `codexMobile.setupDialog.initial.heading.windows`
         },
         { defaultMessage: `Get started`, id: `codexMobile.setupDialog.initial.primary` },
         { defaultMessage: `Later`, id: `codexMobile.setupDialog.initial.skip` },
         {
           defaultMessage: `Couldn’t check security requirements. Try again`,
-          id: `codexMobile.setupDialog.initial.startSetupError`,
+          id: `codexMobile.setupDialog.initial.startSetupError`
         },
         {
           defaultMessage: `Connect a device to this Mac`,
-          id: `codexMobile.setupDialog.initial.title.desktop`,
+          id: `codexMobile.setupDialog.initial.title.desktop`
         },
         {
           defaultMessage: `Connect a device to this PC`,
-          id: `codexMobile.setupDialog.initial.title.windows`,
+          id: `codexMobile.setupDialog.initial.title.windows`
         },
         {
           defaultMessage: `To enable this feature, you’ll need to turn on Multi-Factor Authentication for your ChatGPT account`,
-          id: `codexMobile.setupDialog.mfaRequired.description`,
+          id: `codexMobile.setupDialog.mfaRequired.description`
         },
         {
           defaultMessage: `Turn on Multi-Factor Authentication`,
-          id: `codexMobile.setupDialog.mfaRequired.heading`,
+          id: `codexMobile.setupDialog.mfaRequired.heading`
         },
         {
           defaultMessage: `Continue on chatgpt.com`,
-          id: `codexMobile.setupDialog.mfaRequired.primary`,
+          id: `codexMobile.setupDialog.mfaRequired.primary`
         },
         {
           defaultMessage: `Turn on Multi-Factor Authentication`,
-          id: `codexMobile.setupDialog.mfaRequired.title`,
+          id: `codexMobile.setupDialog.mfaRequired.title`
         },
         {
           defaultMessage: `Click <strong>Set up</strong> in the <strong>Control other devices</strong> tab`,
-          id: `codexMobile.setupDialog.waiting.computer.step.allow`,
+          id: `codexMobile.setupDialog.waiting.computer.step.allow`
         },
         {
           defaultMessage: `Open the <strong>ChatGPT desktop app</strong> on the computer you want to authorize`,
-          id: `codexMobile.setupDialog.waiting.computer.step.openDesktopApp`,
+          id: `codexMobile.setupDialog.waiting.computer.step.openDesktopApp`
         },
         {
           defaultMessage: `Go to <strong>Connections</strong> tab in settings`,
-          id: `codexMobile.setupDialog.waiting.computer.step.settingsConnections`,
+          id: `codexMobile.setupDialog.waiting.computer.step.settingsConnections`
         },
         { defaultMessage: `Device type`, id: `codexMobile.setupDialog.waiting.deviceType` },
         { defaultMessage: `Computer`, id: `codexMobile.setupDialog.waiting.deviceType.computer` },
         { defaultMessage: `Phone`, id: `codexMobile.setupDialog.waiting.deviceType.phone` },
         {
           defaultMessage: `Approve on your device to control this Mac remotely`,
-          id: `codexMobile.setupDialog.waiting.heading.mac`,
+          id: `codexMobile.setupDialog.waiting.heading.mac`
         },
         {
           defaultMessage: `Approve on your device to control this computer remotely`,
-          id: `codexMobile.setupDialog.waiting.heading.pc`,
+          id: `codexMobile.setupDialog.waiting.heading.pc`
         },
         { defaultMessage: `Approve on your device`, id: `codexMobile.setupDialog.waiting.title` },
         {
           defaultMessage: `Manage connections`,
-          id: `codexMobile.setupPage.connected.manageConnections`,
+          id: `codexMobile.setupPage.connected.manageConnections`
         },
         {
           defaultMessage: `Connect your phone to this PC`,
-          id: `codexMobile.setupPage.initial.heading.windows`,
+          id: `codexMobile.setupPage.initial.heading.windows`
         },
         {
           defaultMessage: `ChatGPT can access your desktop—including files, apps, and your browser—to complete tasks you send from your phone. This can introduce security risks. Only connect devices that you own and trust.`,
-          id: `codexMobile.setupPage.initial.securityNotice`,
+          id: `codexMobile.setupPage.initial.securityNotice`
         },
         {
           defaultMessage: `Scan QR code to set up a new phone or manage existing connections`,
-          id: `codexMobile.setupPage.ready.description`,
+          id: `codexMobile.setupPage.ready.description`
         },
         {
           defaultMessage: `Phone type`,
-          id: `codexMobile.setupPage.ready.phoneDeepLink.deviceType`,
+          id: `codexMobile.setupPage.ready.phoneDeepLink.deviceType`
         },
         { defaultMessage: `Remote`, id: `codexMobile.setupPage.ready.remoteHeading` },
         { defaultMessage: `Set up Remote`, id: `codexMobile.setupPage.remoteTitle` },
         {
           defaultMessage: `Click <strong>Add</strong> in the <strong>Settings > Connections > Control other devices</strong> tab on your other computer and enter this code`,
-          id: `codexMobile.setupPage.waiting.computerPairingCode.caption`,
+          id: `codexMobile.setupPage.waiting.computerPairingCode.caption`
         },
         {
           defaultMessage: `Close fullscreen QR code`,
-          id: `codexMobile.setupPage.waiting.pairing.closeFullscreenQrCode`,
+          id: `codexMobile.setupPage.waiting.pairing.closeFullscreenQrCode`
         },
         { defaultMessage: `Copy pairing code`, id: `codexMobile.setupPage.waiting.pairing.copy` },
         {
           defaultMessage: `Pairing QR code`,
-          id: `codexMobile.setupPage.waiting.pairing.fullscreenQrCodeTitle`,
+          id: `codexMobile.setupPage.waiting.pairing.fullscreenQrCodeTitle`
         },
         {
           defaultMessage: `Loading pairing code`,
-          id: `codexMobile.setupPage.waiting.pairing.loading`,
+          id: `codexMobile.setupPage.waiting.pairing.loading`
         },
         {
           defaultMessage: `Refresh pairing code`,
-          id: `codexMobile.setupPage.waiting.pairing.refresh`,
+          id: `codexMobile.setupPage.waiting.pairing.refresh`
         },
         {
           defaultMessage: `Show QR code fullscreen`,
-          id: `codexMobile.setupPage.waiting.pairing.showQrCodeFullscreen`,
+          id: `codexMobile.setupPage.waiting.pairing.showQrCodeFullscreen`
         },
         {
           defaultMessage: `Pairing code unavailable`,
-          id: `codexMobile.setupPage.waiting.pairing.unavailable`,
+          id: `codexMobile.setupPage.waiting.pairing.unavailable`
         },
         {
           defaultMessage: `Pairing code unavailable: {error}`,
-          id: `codexMobile.setupPage.waiting.pairing.unavailableWithError`,
+          id: `codexMobile.setupPage.waiting.pairing.unavailableWithError`
         },
         {
           defaultMessage: `Animate QR code`,
-          id: `codexMobile.setupPage.waiting.phoneDeepLink.animateQrCode`,
+          id: `codexMobile.setupPage.waiting.phoneDeepLink.animateQrCode`
         },
         {
           defaultMessage: `Scan to continue setup in ChatGPT`,
-          id: `codexMobile.setupPage.waiting.phoneDeepLink.caption`,
+          id: `codexMobile.setupPage.waiting.phoneDeepLink.caption`
         },
         {
           defaultMessage: `Android`,
-          id: `codexMobile.setupPage.waiting.phoneDeepLink.deviceType.android`,
+          id: `codexMobile.setupPage.waiting.phoneDeepLink.deviceType.android`
         },
         {
           defaultMessage: `iPhone`,
-          id: `codexMobile.setupPage.waiting.phoneDeepLink.deviceType.ios`,
+          id: `codexMobile.setupPage.waiting.phoneDeepLink.deviceType.ios`
         },
         {
           defaultMessage: `QR code to continue setup in ChatGPT`,
-          id: `codexMobile.setupPage.waiting.phoneDeepLink.qrCode`,
+          id: `codexMobile.setupPage.waiting.phoneDeepLink.qrCode`
         },
         {
           defaultMessage: `Please upgrade to the latest version of the ChatGPT app to pair`,
-          id: `codexMobile.setupPage.waiting.upgradeMessage`,
+          id: `codexMobile.setupPage.waiting.upgradeMessage`
         },
         { defaultMessage: `Continue`, id: `electron.onboarding.login.apikey.continue` },
         { defaultMessage: `OpenAI API key`, id: `electron.onboarding.login.apikey.label` },
@@ -4715,224 +4723,224 @@ function n() {
         { defaultMessage: `Cancel sign-in`, id: `electron.onboarding.login.chatgpt.cancel` },
         {
           defaultMessage: `Continue with ChatGPT`,
-          id: `electron.onboarding.login.chatgpt.continue`,
+          id: `electron.onboarding.login.chatgpt.continue`
         },
         {
           defaultMessage: `Manage browser remote control environments`,
-          id: `remoteConnections.page.browserSubheading`,
+          id: `remoteConnections.page.browserSubheading`
         },
         {
           defaultMessage: `You don’t have access to browser remote control in this workspace`,
-          id: `settings.remoteConnections.accessOtherDevices.accessRequired`,
+          id: `settings.remoteConnections.accessOtherDevices.accessRequired`
         },
         {
           defaultMessage: `Devices you can control from this Mac`,
-          id: `settings.remoteConnections.accessOtherDevices.devices.title`,
+          id: `settings.remoteConnections.accessOtherDevices.devices.title`
         },
         {
           defaultMessage: `Devices you can control from this PC`,
-          id: `settings.remoteConnections.accessOtherDevices.devices.title.windows`,
+          id: `settings.remoteConnections.accessOtherDevices.devices.title.windows`
         },
         {
           defaultMessage: `No devices added yet`,
-          id: `settings.remoteConnections.accessOtherDevices.empty`,
+          id: `settings.remoteConnections.accessOtherDevices.empty`
         },
         {
           defaultMessage: `Devices you can control from this Mac`,
-          id: `settings.remoteConnections.accessOtherDevices.header.title`,
+          id: `settings.remoteConnections.accessOtherDevices.header.title`
         },
         {
           defaultMessage: `Devices you can control from this PC`,
-          id: `settings.remoteConnections.accessOtherDevices.header.title.windows`,
+          id: `settings.remoteConnections.accessOtherDevices.header.title.windows`
         },
         {
           defaultMessage: `Loading devices…`,
-          id: `settings.remoteConnections.accessOtherDevices.loading`,
+          id: `settings.remoteConnections.accessOtherDevices.loading`
         },
         {
           defaultMessage: `Set up`,
-          id: `settings.remoteConnections.accessOtherDevices.setup.action`,
+          id: `settings.remoteConnections.accessOtherDevices.setup.action`
         },
         {
           defaultMessage: `Access and control other devices from this computer`,
-          id: `settings.remoteConnections.accessOtherDevices.setup.description`,
+          id: `settings.remoteConnections.accessOtherDevices.setup.description`
         },
         {
           defaultMessage: `Browser remote control isn’t available right now`,
-          id: `settings.remoteConnections.accessOtherDevices.unavailable`,
+          id: `settings.remoteConnections.accessOtherDevices.unavailable`
         },
         {
           defaultMessage: `Sign in to ChatGPT, then refresh to add a device`,
-          id: `settings.remoteConnections.add.disabled.authRequired`,
+          id: `settings.remoteConnections.add.disabled.authRequired`
         },
         {
           defaultMessage: `Refresh connections before adding a device`,
-          id: `settings.remoteConnections.add.disabled.refreshRequired`,
+          id: `settings.remoteConnections.add.disabled.refreshRequired`
         },
         {
           defaultMessage: `Wait for the current connection update to finish`,
-          id: `settings.remoteConnections.add.disabled.updating`,
+          id: `settings.remoteConnections.add.disabled.updating`
         },
         { defaultMessage: `Add`, id: `settings.remoteConnections.add.short` },
         {
           defaultMessage: `Add remote project for {connectionName}`,
-          id: `settings.remoteConnections.addRemoteProject`,
+          id: `settings.remoteConnections.addRemoteProject`
         },
         {
           defaultMessage: `Add a remote project`,
-          id: `settings.remoteConnections.addRemoteProject.tooltip`,
+          id: `settings.remoteConnections.addRemoteProject.tooltip`
         },
         { defaultMessage: `Back`, id: `settings.remoteConnections.auth.back` },
         { defaultMessage: `Close`, id: `settings.remoteConnections.auth.close` },
         { defaultMessage: `Close`, id: `settings.remoteConnections.auth.closeIcon` },
         {
           defaultMessage: `Authenticate the Codex CLI on this remote machine to continue`,
-          id: `settings.remoteConnections.auth.description`,
+          id: `settings.remoteConnections.auth.description`
         },
         {
           defaultMessage: `Sign-in failed: {message}`,
-          id: `settings.remoteConnections.auth.error`,
+          id: `settings.remoteConnections.auth.error`
         },
         { defaultMessage: `Login required`, id: `settings.remoteConnections.auth.title` },
         {
           defaultMessage: `Authorize on chatgpt.com`,
-          id: `settings.remoteConnections.authorizationDialog.authorize`,
+          id: `settings.remoteConnections.authorizationDialog.authorize`
         },
         {
           defaultMessage: `Authorize this Mac to control other devices signed in to your ChatGPT account`,
-          id: `settings.remoteConnections.authorizationDialog.description`,
+          id: `settings.remoteConnections.authorizationDialog.description`
         },
         {
           defaultMessage: `Authorize this PC to control other devices signed in to your ChatGPT account`,
-          id: `settings.remoteConnections.authorizationDialog.description.windows`,
+          id: `settings.remoteConnections.authorizationDialog.description.windows`
         },
         {
           defaultMessage: `Control other devices from this Mac`,
-          id: `settings.remoteConnections.authorizationDialog.heading`,
+          id: `settings.remoteConnections.authorizationDialog.heading`
         },
         {
           defaultMessage: `Control other devices from this PC`,
-          id: `settings.remoteConnections.authorizationDialog.heading.windows`,
+          id: `settings.remoteConnections.authorizationDialog.heading.windows`
         },
         {
           defaultMessage: `Control other devices from this Mac`,
-          id: `settings.remoteConnections.authorizationDialog.title`,
+          id: `settings.remoteConnections.authorizationDialog.title`
         },
         {
           defaultMessage: `Control other devices from this PC`,
-          id: `settings.remoteConnections.authorizationDialog.title.windows`,
+          id: `settings.remoteConnections.authorizationDialog.title.windows`
         },
         {
           defaultMessage: `Failed to update connection`,
-          id: `settings.remoteConnections.connectToggle.error`,
+          id: `settings.remoteConnections.connectToggle.error`
         },
         { defaultMessage: `Delete`, id: `settings.remoteConnections.deleteConnection` },
         { defaultMessage: `Alias`, id: `settings.remoteConnections.details.alias` },
         {
           defaultMessage: `Allow connections`,
-          id: `settings.remoteConnections.details.allowConnections`,
+          id: `settings.remoteConnections.details.allowConnections`
         },
         {
           defaultMessage: `Allow`,
-          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.allow`,
+          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.allow`
         },
         {
           defaultMessage: `iPhone Pro and Samsung Galaxy devices connected to ChatGPT on a computer`,
-          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.artworkAlt`,
+          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.artworkAlt`
         },
         {
           defaultMessage: `This will allow authorized devices like your phone to discover and control ChatGPT on this connection`,
-          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.description`,
+          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.description`
         },
         {
           defaultMessage: `Allow devices to control this connection?`,
-          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.title`,
+          id: `settings.remoteConnections.details.allowSignedInDevicesDialog.title`
         },
         {
           defaultMessage: `Available from signed-in devices`,
-          id: `settings.remoteConnections.details.availableFromSignedInDevices`,
+          id: `settings.remoteConnections.details.availableFromSignedInDevices`
         },
         {
           defaultMessage: `Connect`,
-          id: `settings.remoteConnections.details.availableFromSignedInDevicesConnect`,
+          id: `settings.remoteConnections.details.availableFromSignedInDevicesConnect`
         },
         {
           defaultMessage: `Allow ChatGPT apps signed into your account to use this device`,
-          id: `settings.remoteConnections.details.availableFromSignedInDevicesDescription`,
+          id: `settings.remoteConnections.details.availableFromSignedInDevicesDescription`
         },
         {
           defaultMessage: `Couldn’t update signed-in device availability`,
-          id: `settings.remoteConnections.details.availableFromSignedInDevicesUpdateError`,
+          id: `settings.remoteConnections.details.availableFromSignedInDevicesUpdateError`
         },
         {
           defaultMessage: `Control from phone or other device`,
-          id: `settings.remoteConnections.details.controlFromPhoneOrOtherDevice`,
+          id: `settings.remoteConnections.details.controlFromPhoneOrOtherDevice`
         },
         {
           defaultMessage: `Copied to clipboard`,
-          id: `settings.remoteConnections.details.copySuccess`,
+          id: `settings.remoteConnections.details.copySuccess`
         },
         { defaultMessage: `Host`, id: `settings.remoteConnections.details.host` },
         { defaultMessage: `Identity`, id: `settings.remoteConnections.details.identity` },
         { defaultMessage: `Port`, id: `settings.remoteConnections.details.port` },
         {
           defaultMessage: `Approve on your device to use this connection remotely`,
-          id: `settings.remoteConnections.details.sshRemoteControlPairing.heading`,
+          id: `settings.remoteConnections.details.sshRemoteControlPairing.heading`
         },
         { defaultMessage: `Version`, id: `settings.remoteConnections.details.version` },
         { defaultMessage: `Distro`, id: `settings.remoteConnections.details.wslDistro` },
         { defaultMessage: `Details`, id: `settings.remoteConnections.detailsMenu` },
         {
           defaultMessage: `No device connections found. Add a new connection to get started`,
-          id: `settings.remoteConnections.deviceConnections.empty`,
+          id: `settings.remoteConnections.deviceConnections.empty`
         },
         {
           defaultMessage: `Please update ChatGPT on the remote device to the latest version`,
-          id: `settings.remoteConnections.deviceConnections.remoteCodexUpdateRequiredSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.remoteCodexUpdateRequiredSubtitle`
         },
         {
           defaultMessage: `Requires authorization · Offline`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceAuthorizationRequiredOfflineSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceAuthorizationRequiredOfflineSubtitle`
         },
         {
           defaultMessage: `Requires authorization`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceAuthorizationRequiredSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceAuthorizationRequiredSubtitle`
         },
         {
           defaultMessage: `Confirming connection`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceConfirmingConnectionSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceConfirmingConnectionSubtitle`
         },
         {
           defaultMessage: `Connecting`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceConnectingSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceConnectingSubtitle`
         },
         {
           defaultMessage: `Connection failed`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceConnectionFailedSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceConnectionFailedSubtitle`
         },
         {
           defaultMessage: `Disconnected`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceDisconnectedSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceDisconnectedSubtitle`
         },
         {
           defaultMessage: `Initializing secure connection`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceInitializingSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceInitializingSubtitle`
         },
         {
           defaultMessage: `Offline`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceOfflineSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceOfflineSubtitle`
         },
         {
           defaultMessage: `Connected`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceOnlineSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceOnlineSubtitle`
         },
         {
           defaultMessage: `Signed in device`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceSubtitle`
         },
         {
           defaultMessage: `Waiting for device`,
-          id: `settings.remoteConnections.deviceConnections.signedInDeviceWaitingForDeviceSubtitle`,
+          id: `settings.remoteConnections.deviceConnections.signedInDeviceWaitingForDeviceSubtitle`
         },
         { defaultMessage: `SSH`, id: `settings.remoteConnections.deviceConnections.sshSubtitle` },
         { defaultMessage: `WSL`, id: `settings.remoteConnections.deviceConnections.wslSubtitle` },
@@ -4940,7 +4948,7 @@ function n() {
         { defaultMessage: `Save`, id: `settings.remoteConnections.dialog.apply` },
         {
           defaultMessage: `SSH authentication method`,
-          id: `settings.remoteConnections.dialog.authMode.ariaLabel`,
+          id: `settings.remoteConnections.dialog.authMode.ariaLabel`
         },
         { defaultMessage: `Identity`, id: `settings.remoteConnections.dialog.authMode.identity` },
         { defaultMessage: `No Auth`, id: `settings.remoteConnections.dialog.authMode.none` },
@@ -4950,425 +4958,425 @@ function n() {
         { defaultMessage: `Alias`, id: `settings.remoteConnections.dialog.field.alias` },
         {
           defaultMessage: `Display name`,
-          id: `settings.remoteConnections.dialog.field.displayName`,
+          id: `settings.remoteConnections.dialog.field.displayName`
         },
         {
           defaultMessage: `A connection with this display name already exists`,
-          id: `settings.remoteConnections.dialog.field.displayName.duplicateError`,
+          id: `settings.remoteConnections.dialog.field.displayName.duplicateError`
         },
         {
           defaultMessage: `Display name is required`,
-          id: `settings.remoteConnections.dialog.field.displayName.error`,
+          id: `settings.remoteConnections.dialog.field.displayName.error`
         },
         {
           defaultMessage: `Identity file path`,
-          id: `settings.remoteConnections.dialog.field.identity`,
+          id: `settings.remoteConnections.dialog.field.identity`
         },
         {
           defaultMessage: `Identity file path is required`,
-          id: `settings.remoteConnections.dialog.field.identity.error`,
+          id: `settings.remoteConnections.dialog.field.identity.error`
         },
         { defaultMessage: `(optional)`, id: `settings.remoteConnections.dialog.field.optional` },
         { defaultMessage: `Hostname`, id: `settings.remoteConnections.dialog.field.sshHost` },
         {
           defaultMessage: `Hostname is required`,
-          id: `settings.remoteConnections.dialog.field.sshHost.error`,
+          id: `settings.remoteConnections.dialog.field.sshHost.error`
         },
         {
           defaultMessage: `host.com or user@host.com`,
-          id: `settings.remoteConnections.dialog.field.sshHost.placeholder`,
+          id: `settings.remoteConnections.dialog.field.sshHost.placeholder`
         },
         { defaultMessage: `SSH port`, id: `settings.remoteConnections.dialog.field.sshPort` },
         {
           defaultMessage: `SSH port must be an integer`,
-          id: `settings.remoteConnections.dialog.field.sshPort.intError`,
+          id: `settings.remoteConnections.dialog.field.sshPort.intError`
         },
         {
           defaultMessage: `SSH port must be between 1 and 65535`,
-          id: `settings.remoteConnections.dialog.field.sshPort.rangeError`,
+          id: `settings.remoteConnections.dialog.field.sshPort.rangeError`
         },
         {
           defaultMessage: `Add manually`,
-          id: `settings.remoteConnections.discoveryDialog.addManually`,
+          id: `settings.remoteConnections.discoveryDialog.addManually`
         },
         {
           defaultMessage: `No SSH connections found`,
-          id: `settings.remoteConnections.discoveryDialog.empty`,
+          id: `settings.remoteConnections.discoveryDialog.empty`
         },
         { defaultMessage: `Refresh`, id: `settings.remoteConnections.discoveryDialog.refresh` },
         { defaultMessage: `Add`, id: `settings.remoteConnections.discoveryDialog.save` },
         {
           defaultMessage: `Add SSH Connection`,
-          id: `settings.remoteConnections.discoveryDialog.title`,
+          id: `settings.remoteConnections.discoveryDialog.title`
         },
         {
           defaultMessage: `Select {connectionName}`,
-          id: `settings.remoteConnections.discoveryDialog.toggleSelection`,
+          id: `settings.remoteConnections.discoveryDialog.toggleSelection`
         },
         { defaultMessage: `Edit connection`, id: `settings.remoteConnections.editConnection` },
         {
           defaultMessage: `SSH connection failed`,
-          id: `settings.remoteConnections.genericSshError`,
+          id: `settings.remoteConnections.genericSshError`
         },
         {
           defaultMessage: `Error details`,
-          id: `settings.remoteConnections.genericSshError.details`,
+          id: `settings.remoteConnections.genericSshError.details`
         },
         {
           defaultMessage: `WSL connection failed`,
-          id: `settings.remoteConnections.genericWslError`,
+          id: `settings.remoteConnections.genericWslError`
         },
         {
           defaultMessage: `Error details`,
-          id: `settings.remoteConnections.genericWslError.details`,
+          id: `settings.remoteConnections.genericWslError.details`
         },
         {
           defaultMessage: `Failed to install Codex CLI`,
-          id: `settings.remoteConnections.installCodex.error`,
+          id: `settings.remoteConnections.installCodex.error`
         },
         {
           defaultMessage: `Prevent sleep when computer is plugged in and remote access is enabled`,
-          id: `settings.remoteConnections.localHost.keepLive.description`,
+          id: `settings.remoteConnections.localHost.keepLive.description`
         },
         {
           defaultMessage: `Keep this Mac awake`,
-          id: `settings.remoteConnections.localHost.keepLive.label`,
+          id: `settings.remoteConnections.localHost.keepLive.label`
         },
         {
           defaultMessage: `Keep this PC awake`,
-          id: `settings.remoteConnections.localHost.keepLive.label.windows`,
+          id: `settings.remoteConnections.localHost.keepLive.label.windows`
         },
         {
           defaultMessage: `Other settings`,
-          id: `settings.remoteConnections.localHost.otherSettings.title`,
+          id: `settings.remoteConnections.localHost.otherSettings.title`
         },
         {
           defaultMessage: `Authorized devices on your ChatGPT account can discover and control this device`,
-          id: `settings.remoteConnections.localHost.remoteControl.description`,
+          id: `settings.remoteConnections.localHost.remoteControl.description`
         },
         {
           defaultMessage: `Allow this device to be discovered and controlled`,
-          id: `settings.remoteConnections.localHost.remoteControl.label`,
+          id: `settings.remoteConnections.localHost.remoteControl.label`
         },
         {
           defaultMessage: `Allow connections`,
-          id: `settings.remoteConnections.localHost.remoteControl.label.oneToOnePairing`,
+          id: `settings.remoteConnections.localHost.remoteControl.label.oneToOnePairing`
         },
         {
           defaultMessage: `Couldn’t update remote control availability`,
-          id: `settings.remoteConnections.localHost.remoteControlUpdateError`,
+          id: `settings.remoteConnections.localHost.remoteControlUpdateError`
         },
         { defaultMessage: `Logout`, id: `settings.remoteConnections.logout` },
         {
           defaultMessage: `Failed to log out of connection`,
-          id: `settings.remoteConnections.logout.error`,
+          id: `settings.remoteConnections.logout.error`
         },
         {
           defaultMessage: `Manage devices for {connectionName}`,
-          id: `settings.remoteConnections.manageRemoteControlDevices`,
+          id: `settings.remoteConnections.manageRemoteControlDevices`
         },
         {
           defaultMessage: `Failed to add device`,
-          id: `settings.remoteConnections.manualPairingDialog.error`,
+          id: `settings.remoteConnections.manualPairingDialog.error`
         },
         { defaultMessage: `Refresh`, id: `settings.remoteConnections.refresh` },
         {
           defaultMessage: `Failed to refresh remote connections`,
-          id: `settings.remoteConnections.refresh.error`,
+          id: `settings.remoteConnections.refresh.error`
         },
         {
           defaultMessage: `Refreshed remote connections`,
-          id: `settings.remoteConnections.refresh.success`,
+          id: `settings.remoteConnections.refresh.success`
         },
         {
           defaultMessage: `Couldn’t start device pairing`,
-          id: `settings.remoteConnections.remoteControlAddDeviceError`,
+          id: `settings.remoteConnections.remoteControlAddDeviceError`
         },
         {
           defaultMessage: `Authorized device`,
-          id: `settings.remoteConnections.remoteControlClients.authorized`,
+          id: `settings.remoteConnections.remoteControlClients.authorized`
         },
         {
           defaultMessage: `Devices that can control this Mac`,
-          id: `settings.remoteConnections.remoteControlClients.devices.title`,
+          id: `settings.remoteConnections.remoteControlClients.devices.title`
         },
         {
           defaultMessage: `Devices that can control this connection`,
-          id: `settings.remoteConnections.remoteControlClients.devices.title.ssh`,
+          id: `settings.remoteConnections.remoteControlClients.devices.title.ssh`
         },
         {
           defaultMessage: `Devices that can control this PC`,
-          id: `settings.remoteConnections.remoteControlClients.devices.title.windows`,
+          id: `settings.remoteConnections.remoteControlClients.devices.title.windows`
         },
         {
           defaultMessage: `Add device to control this Mac remotely`,
-          id: `settings.remoteConnections.remoteControlClients.empty`,
+          id: `settings.remoteConnections.remoteControlClients.empty`
         },
         {
           defaultMessage: `Add a device to control this connection remotely`,
-          id: `settings.remoteConnections.remoteControlClients.empty.ssh`,
+          id: `settings.remoteConnections.remoteControlClients.empty.ssh`
         },
         {
           defaultMessage: `Add device to control this PC remotely`,
-          id: `settings.remoteConnections.remoteControlClients.empty.windows`,
+          id: `settings.remoteConnections.remoteControlClients.empty.windows`
         },
         {
           defaultMessage: `Last connected {date}`,
-          id: `settings.remoteConnections.remoteControlClients.lastSeen`,
+          id: `settings.remoteConnections.remoteControlClients.lastSeen`
         },
         {
           defaultMessage: `Sign in to ChatGPT again, then retry`,
-          id: `settings.remoteConnections.remoteControlClients.loadError.authRequired`,
+          id: `settings.remoteConnections.remoteControlClients.loadError.authRequired`
         },
         {
           defaultMessage: `Retry to load devices that can control this computer`,
-          id: `settings.remoteConnections.remoteControlClients.loadError.generic`,
+          id: `settings.remoteConnections.remoteControlClients.loadError.generic`
         },
         {
           defaultMessage: `Retry`,
-          id: `settings.remoteConnections.remoteControlClients.loadError.retry`,
+          id: `settings.remoteConnections.remoteControlClients.loadError.retry`
         },
         {
           defaultMessage: `Couldn’t load device list`,
-          id: `settings.remoteConnections.remoteControlClients.loadError.title`,
+          id: `settings.remoteConnections.remoteControlClients.loadError.title`
         },
         {
           defaultMessage: `Loading device list`,
-          id: `settings.remoteConnections.remoteControlClients.loading`,
+          id: `settings.remoteConnections.remoteControlClients.loading`
         },
         {
           defaultMessage: `Revoke access`,
-          id: `settings.remoteConnections.remoteControlClients.revoke`,
+          id: `settings.remoteConnections.remoteControlClients.revoke`
         },
         {
           defaultMessage: `Failed to revoke device access`,
-          id: `settings.remoteConnections.remoteControlClients.revoke.error`,
+          id: `settings.remoteConnections.remoteControlClients.revoke.error`
         },
         {
           defaultMessage: `Revoked device access`,
-          id: `settings.remoteConnections.remoteControlClients.revoke.success`,
+          id: `settings.remoteConnections.remoteControlClients.revoke.success`
         },
         {
           defaultMessage: `Set up`,
-          id: `settings.remoteConnections.remoteControlClients.setup.action`,
+          id: `settings.remoteConnections.remoteControlClients.setup.action`
         },
         {
           defaultMessage: `Control this Mac from your phone or other device`,
-          id: `settings.remoteConnections.remoteControlClients.setup.description`,
+          id: `settings.remoteConnections.remoteControlClients.setup.description`
         },
         {
           defaultMessage: `Control this PC from your phone or other device`,
-          id: `settings.remoteConnections.remoteControlClients.setup.description.windows`,
+          id: `settings.remoteConnections.remoteControlClients.setup.description.windows`
         },
         {
           defaultMessage: `No signed-in devices available`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.empty`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.empty`
         },
         {
           defaultMessage: `Last used {date}`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.lastUsed`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.lastUsed`
         },
         {
           defaultMessage: `Don’t see your device here?`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.missingDevice`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.missingDevice`
         },
         {
           defaultMessage: `Offline`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.offline`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.offline`
         },
         {
           defaultMessage: `Online`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.online`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.online`
         },
         {
           defaultMessage: `Refresh`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.refresh`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.refresh`
         },
         {
           defaultMessage: `Add`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.save`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.save`
         },
         {
           defaultMessage: `Add device`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.title`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.title`
         },
         {
           defaultMessage: `Select {connectionName}`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.toggleSelection`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.toggleSelection`
         },
         {
           defaultMessage: `Click “{setupLabel}” to make your device discoverable`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.clickSetup`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.clickSetup`
         },
         {
           defaultMessage: `Or turn on {settingLabel} if the device is already set up`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.enableHost`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.enableHost`
         },
         {
           defaultMessage: `Go to the ChatGPT app on your device`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.openApp`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.openApp`
         },
         {
           defaultMessage: `Open Connections tab`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.openConnections`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.openConnections`
         },
         {
           defaultMessage: `Allow this Mac to be discovered and controlled`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.settingLabel`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.settingLabel`
         },
         {
           defaultMessage: `Allow this PC to be discovered and controlled`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.settingLabel.windows`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.settingLabel.windows`
         },
         {
           defaultMessage: `Set up`,
-          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.setupLabel`,
+          id: `settings.remoteConnections.remoteControlDiscoveryDialog.tooltip.setupLabel`
         },
         {
           defaultMessage: `Remote project folder must be an absolute path`,
-          id: `settings.remoteConnections.remoteProjectPath.invalid`,
+          id: `settings.remoteConnections.remoteProjectPath.invalid`
         },
         {
           defaultMessage: `Restart connection`,
-          id: `settings.remoteConnections.restartConnection`,
+          id: `settings.remoteConnections.restartConnection`
         },
         {
           defaultMessage: `Update details`,
-          id: `settings.remoteConnections.restartNotice.details`,
+          id: `settings.remoteConnections.restartNotice.details`
         },
         {
           defaultMessage: `<restart>Restart</restart> to update your CLI version`,
-          id: `settings.remoteConnections.restartNotice.message`,
+          id: `settings.remoteConnections.restartNotice.message`
         },
         {
           defaultMessage: `Update available: {installedVersion}. Currently running {currentVersion}`,
-          id: `settings.remoteConnections.restartNotice.tooltip`,
+          id: `settings.remoteConnections.restartNotice.tooltip`
         },
         {
           defaultMessage: `Failed to save remote connections`,
-          id: `settings.remoteConnections.save.error`,
+          id: `settings.remoteConnections.save.error`
         },
         {
           defaultMessage: `Saved remote connections`,
-          id: `settings.remoteConnections.save.success`,
+          id: `settings.remoteConnections.save.success`
         },
         { defaultMessage: `Settings`, id: `settings.remoteConnections.settingsMenu` },
         {
           defaultMessage: `Connect to a remote device through SSH connection`,
-          id: `settings.remoteConnections.ssh.empty`,
+          id: `settings.remoteConnections.ssh.empty`
         },
         {
           defaultMessage: `SSH connections from this Mac`,
-          id: `settings.remoteConnections.ssh.header.title`,
+          id: `settings.remoteConnections.ssh.header.title`
         },
         {
           defaultMessage: `SSH connections from this PC`,
-          id: `settings.remoteConnections.ssh.header.title.windows`,
+          id: `settings.remoteConnections.ssh.header.title.windows`
         },
         {
           defaultMessage: `Loading SSH connections…`,
-          id: `settings.remoteConnections.ssh.loading`,
+          id: `settings.remoteConnections.ssh.loading`
         },
         {
           defaultMessage: `{connectionName} actions`,
-          id: `settings.remoteConnections.table.actions.ariaLabel`,
+          id: `settings.remoteConnections.table.actions.ariaLabel`
         },
         {
           defaultMessage: `Connect {connectionName}`,
-          id: `settings.remoteConnections.table.autoConnect.ariaLabel`,
+          id: `settings.remoteConnections.table.autoConnect.ariaLabel`
         },
         {
           defaultMessage: `Connect {connectionName} remotely`,
-          id: `settings.remoteConnections.table.sshRemoteControlPairing.ariaLabel`,
+          id: `settings.remoteConnections.table.sshRemoteControlPairing.ariaLabel`
         },
         {
           defaultMessage: `Control from your phone or other device`,
-          id: `settings.remoteConnections.table.sshRemoteControlPairing.tooltip`,
+          id: `settings.remoteConnections.table.sshRemoteControlPairing.tooltip`
         },
         {
           defaultMessage: `Control other devices`,
-          id: `settings.remoteConnections.tabs.accessOtherDevices`,
+          id: `settings.remoteConnections.tabs.accessOtherDevices`
         },
         { defaultMessage: `Connections view`, id: `settings.remoteConnections.tabs.ariaLabel` },
         {
           defaultMessage: `Control this Mac`,
-          id: `settings.remoteConnections.tabs.controlThisMac`,
+          id: `settings.remoteConnections.tabs.controlThisMac`
         },
         {
           defaultMessage: `Control this PC`,
-          id: `settings.remoteConnections.tabs.controlThisMac.windows`,
+          id: `settings.remoteConnections.tabs.controlThisMac.windows`
         },
         { defaultMessage: `SSH`, id: `settings.remoteConnections.tabs.ssh` },
         { defaultMessage: `WSL`, id: `settings.remoteConnections.tabs.wsl` },
         {
           defaultMessage: `Update your CLI version`,
-          id: `settings.remoteConnections.updateRequiredInline`,
+          id: `settings.remoteConnections.updateRequiredInline`
         },
         {
           defaultMessage: `Update details`,
-          id: `settings.remoteConnections.updateRequiredInline.details`,
+          id: `settings.remoteConnections.updateRequiredInline.details`
         },
         {
           defaultMessage: `Minimum required: {minRequiredVersion}. Currently installed: {currentVersion}`,
-          id: `settings.remoteConnections.updateRequiredInline.tooltip`,
+          id: `settings.remoteConnections.updateRequiredInline.tooltip`
         },
         {
           defaultMessage: `Open your WSL distro and update the Codex CLI to {minRequiredVersion} or newer. Currently installed: {currentVersion}`,
-          id: `settings.remoteConnections.updateRequiredInline.wslTooltip`,
+          id: `settings.remoteConnections.updateRequiredInline.wslTooltip`
         },
         { defaultMessage: `WSL connections`, id: `settings.remoteConnections.wsl.header.title` },
         {
           defaultMessage: `Loading WSL connections…`,
-          id: `settings.remoteConnections.wsl.loading`,
+          id: `settings.remoteConnections.wsl.loading`
         },
         {
           defaultMessage: `Remote control authorized`,
-          id: `settings.remoteControlConnections.authorize.success`,
+          id: `settings.remoteControlConnections.authorize.success`
         },
         {
           defaultMessage: `Sign in to ChatGPT, then refresh to load remote control environments`,
-          id: `settings.remoteControlConnections.authRequired`,
+          id: `settings.remoteControlConnections.authRequired`
         },
         { defaultMessage: `busy`, id: `settings.remoteControlConnections.availability.busy` },
         {
           defaultMessage: `Connecting`,
-          id: `settings.remoteControlConnections.availability.connecting`,
+          id: `settings.remoteControlConnections.availability.connecting`
         },
         {
           defaultMessage: `Connection failed`,
-          id: `settings.remoteControlConnections.availability.connectionFailed`,
+          id: `settings.remoteControlConnections.availability.connectionFailed`
         },
         { defaultMessage: `offline`, id: `settings.remoteControlConnections.availability.offline` },
         { defaultMessage: `online`, id: `settings.remoteControlConnections.availability.online` },
         {
           defaultMessage: `Please update ChatGPT on the remote device to the latest version`,
-          id: `settings.remoteControlConnections.availability.remoteCodexUpdateRequired`,
+          id: `settings.remoteControlConnections.availability.remoteCodexUpdateRequired`
         },
         {
           defaultMessage: `This device is offline. Refresh to check again`,
-          id: `settings.remoteControlConnections.connect.offlineTooltip`,
+          id: `settings.remoteControlConnections.connect.offlineTooltip`
         },
         {
           defaultMessage: `Failed to delete remote control environment`,
-          id: `settings.remoteControlConnections.delete.error`,
+          id: `settings.remoteControlConnections.delete.error`
         },
         {
           defaultMessage: `Only offline environments can be deleted`,
-          id: `settings.remoteControlConnections.delete.offlineOnly`,
+          id: `settings.remoteControlConnections.delete.offlineOnly`
         },
         {
           defaultMessage: `Deleted remote control environment`,
-          id: `settings.remoteControlConnections.delete.success`,
+          id: `settings.remoteControlConnections.delete.success`
         },
         { defaultMessage: `Cancel`, id: `settings.remoteControlConnections.deleteDialog.cancel` },
         { defaultMessage: `Delete`, id: `settings.remoteControlConnections.deleteDialog.confirm` },
         {
           defaultMessage: `This removes the environment and its remote control tasks from ChatGPT. This cannot be undone.`,
-          id: `settings.remoteControlConnections.deleteDialog.subtitle`,
+          id: `settings.remoteControlConnections.deleteDialog.subtitle`
         },
         {
           defaultMessage: `Delete {connectionName}?`,
-          id: `settings.remoteControlConnections.deleteDialog.title`,
+          id: `settings.remoteControlConnections.deleteDialog.title`
         },
         { defaultMessage: `Host`, id: `settings.remoteControlConnections.details.host` },
         { defaultMessage: `Last seen`, id: `settings.remoteControlConnections.details.lastSeen` },
@@ -5378,167 +5386,167 @@ function n() {
         { defaultMessage: `Cancel`, id: `settings.remoteControlConnections.rename.cancel` },
         {
           defaultMessage: `Failed to rename remote control environment`,
-          id: `settings.remoteControlConnections.rename.error`,
+          id: `settings.remoteControlConnections.rename.error`
         },
         {
           defaultMessage: `Display name`,
-          id: `settings.remoteControlConnections.rename.inputLabel`,
+          id: `settings.remoteControlConnections.rename.inputLabel`
         },
         { defaultMessage: `Save`, id: `settings.remoteControlConnections.rename.save` },
         {
           defaultMessage: `Renamed remote control environment`,
-          id: `settings.remoteControlConnections.rename.success`,
+          id: `settings.remoteControlConnections.rename.success`
         },
         {
           defaultMessage: `Connect {connectionName}`,
-          id: `settings.remoteControlConnections.table.connect.ariaLabel`,
+          id: `settings.remoteControlConnections.table.connect.ariaLabel`
         },
         {
           defaultMessage: `Version details`,
-          id: `settings.remoteControlConnections.updateRequired.versionDetails`,
+          id: `settings.remoteControlConnections.updateRequired.versionDetails`
         },
         {
           defaultMessage: `Current app-server version: {currentVersion}. Minimum required app-server version: {minRequiredVersion}`,
-          id: `settings.remoteControlConnections.updateRequired.versionTooltip`,
+          id: `settings.remoteControlConnections.updateRequired.versionTooltip`
         },
         { defaultMessage: `Reconnecting…`, id: `sidebarElectron.connectionStatus.reconnecting` },
         { defaultMessage: `Connected`, id: `threadPage.remoteConnectionStatusBadge.connected` },
         { defaultMessage: `Connecting`, id: `threadPage.remoteConnectionStatusBadge.connecting` },
         {
           defaultMessage: `Disconnected`,
-          id: `threadPage.remoteConnectionStatusBadge.disconnected`,
+          id: `threadPage.remoteConnectionStatusBadge.disconnected`
         },
         { defaultMessage: `Error`, id: `threadPage.remoteConnectionStatusBadge.error` },
         {
           defaultMessage: `See Settings to connect`,
-          id: `threadPage.remoteConnectionStatusBadge.goToSettings`,
+          id: `threadPage.remoteConnectionStatusBadge.goToSettings`
         },
         {
           defaultMessage: `Install Codex CLI`,
-          id: `threadPage.remoteConnectionStatusBadge.installCodex`,
+          id: `threadPage.remoteConnectionStatusBadge.installCodex`
         },
         {
           defaultMessage: `Installing…`,
-          id: `threadPage.remoteConnectionStatusBadge.installingCodex`,
+          id: `threadPage.remoteConnectionStatusBadge.installingCodex`
         },
         { defaultMessage: `Sign in to Codex`, id: `threadPage.remoteConnectionStatusBadge.login` },
         { defaultMessage: `Reconnect`, id: `threadPage.remoteConnectionStatusBadge.reconnect` },
         {
           defaultMessage: `Codex CLI not installed`,
-          id: `threadPage.remoteConnectionStatusBadge.remoteCodexNotFound`,
+          id: `threadPage.remoteConnectionStatusBadge.remoteCodexNotFound`
         },
         { defaultMessage: `Restarting`, id: `threadPage.remoteConnectionStatusBadge.restarting` },
         { defaultMessage: `Restart now`, id: `threadPage.remoteConnectionStatusBadge.restartNow` },
         {
           defaultMessage: `Restarting will stop the running Codex CLI process and any ongoing tasks on this remote host`,
-          id: `threadPage.remoteConnectionStatusBadge.restartNowTooltip`,
+          id: `threadPage.remoteConnectionStatusBadge.restartNowTooltip`
         },
         {
           defaultMessage: `Restart required`,
-          id: `threadPage.remoteConnectionStatusBadge.restartRequired`,
+          id: `threadPage.remoteConnectionStatusBadge.restartRequired`
         },
         { defaultMessage: `Login required`, id: `threadPage.remoteConnectionStatusBadge.unauthed` },
         {
           defaultMessage: `Update Codex CLI`,
-          id: `threadPage.remoteConnectionStatusBadge.updateCodex`,
+          id: `threadPage.remoteConnectionStatusBadge.updateCodex`
         },
         {
           defaultMessage: `Update required`,
-          id: `threadPage.remoteConnectionStatusBadge.updateRequired`,
+          id: `threadPage.remoteConnectionStatusBadge.updateRequired`
         },
         {
           defaultMessage: `Codex CLI in WSL is out of date. Open your WSL distro and update the Codex CLI to {minRequiredVersion} or newer. Current version: {currentVersion}`,
-          id: `threadPage.remoteConnectionStatusBadge.updateWslCodexMessage`,
+          id: `threadPage.remoteConnectionStatusBadge.updateWslCodexMessage`
         },
-        { defaultMessage: `Updating…`, id: `threadPage.remoteConnectionStatusBadge.updatingCodex` },
+        { defaultMessage: `Updating…`, id: `threadPage.remoteConnectionStatusBadge.updatingCodex` }
       ],
       "consumer-view": [
         {
           defaultMessage: `<{threshold}`,
-          id: `consumerAnalyticsPreview.limitHistory.belowPrecision`,
+          id: `consumerAnalyticsPreview.limitHistory.belowPrecision`
         },
         {
           defaultMessage: `Breakdown isn't available for this period`,
-          id: `consumerAnalyticsPreview.limitHistory.breakdownUnavailable`,
+          id: `consumerAnalyticsPreview.limitHistory.breakdownUnavailable`
         },
         {
           defaultMessage: `See what used each of your plan limits`,
-          id: `consumerAnalyticsPreview.limitHistory.description`,
+          id: `consumerAnalyticsPreview.limitHistory.description`
         },
         {
           defaultMessage: `No limit periods in this date range`,
-          id: `consumerAnalyticsPreview.limitHistory.empty`,
+          id: `consumerAnalyticsPreview.limitHistory.empty`
         },
         {
           defaultMessage: `Couldn't load limit history`,
-          id: `consumerAnalyticsPreview.limitHistory.error`,
+          id: `consumerAnalyticsPreview.limitHistory.error`
         },
         {
           defaultMessage: `{limit, select, fiveHour {5-hour limits} other {Weekly limits}}`,
-          id: `consumerAnalyticsPreview.limitHistory.limitHeading`,
+          id: `consumerAnalyticsPreview.limitHistory.limitHeading`
         },
         {
           defaultMessage: `Loading limit history…`,
-          id: `consumerAnalyticsPreview.limitHistory.loading`,
+          id: `consumerAnalyticsPreview.limitHistory.loading`
         },
         {
           defaultMessage: `No usage to show for this breakdown`,
-          id: `consumerAnalyticsPreview.limitHistory.noContributions`,
+          id: `consumerAnalyticsPreview.limitHistory.noContributions`
         },
         {
           defaultMessage: `{limit, select, fiveHour {5-hour period} other {Weekly period}} from {start} to {end} UTC{current, select, yes {, current at last update} other {}}`,
-          id: `consumerAnalyticsPreview.limitHistory.openPeriod`,
+          id: `consumerAnalyticsPreview.limitHistory.openPeriod`
         },
         {
           defaultMessage: `Some periods aren't available yet`,
-          id: `consumerAnalyticsPreview.limitHistory.partial`,
+          id: `consumerAnalyticsPreview.limitHistory.partial`
         },
         { defaultMessage: `Period`, id: `consumerAnalyticsPreview.limitHistory.period` },
         { defaultMessage: `Retry`, id: `consumerAnalyticsPreview.limitHistory.retry` },
         {
           defaultMessage: `Group plan usage history`,
-          id: `consumerAnalyticsPreview.limitHistory.sharedGroup`,
+          id: `consumerAnalyticsPreview.limitHistory.sharedGroup`
         },
         {
           defaultMessage: `{limit, select, fiveHour {5-hour limits} other {Weekly limits}}`,
-          id: `consumerAnalyticsPreview.limitHistory.tableName`,
+          id: `consumerAnalyticsPreview.limitHistory.tableName`
         },
         { defaultMessage: `Plan usage history`, id: `consumerAnalyticsPreview.limitHistory.title` },
         {
           defaultMessage: `{expanded, select, yes {Show less} other {Show more}}`,
-          id: `consumerAnalyticsPreview.limitHistory.toggleRows`,
+          id: `consumerAnalyticsPreview.limitHistory.toggleRows`
         },
         {
           defaultMessage: `Not available`,
-          id: `consumerAnalyticsPreview.limitHistory.totalUnavailable`,
+          id: `consumerAnalyticsPreview.limitHistory.totalUnavailable`
         },
         {
           defaultMessage: `Limit history isn't available yet`,
-          id: `consumerAnalyticsPreview.limitHistory.unavailable`,
+          id: `consumerAnalyticsPreview.limitHistory.unavailable`
         },
         { defaultMessage: `% of limit used`, id: `consumerAnalyticsPreview.limitHistory.used` },
         {
           defaultMessage: `{breakdown, select, feature {By feature} model {By model} surface {By surface} other {By turn start}}`,
-          id: `consumerUsage.breakdown.label`,
+          id: `consumerUsage.breakdown.label`
         },
         {
           defaultMessage: `Amounts and period boundaries are approximate`,
-          id: `consumerUsage.limitHistory.approximateAmounts`,
+          id: `consumerUsage.limitHistory.approximateAmounts`
         },
         { defaultMessage: `Usage as of {asOf}`, id: `consumerUsage.limitHistory.bucketDataAsOf` },
         {
           defaultMessage: `Calculations run daily. Usage for this period may be out of date.`,
-          id: `consumerUsage.limitHistory.dailyCalculationNotice`,
+          id: `consumerUsage.limitHistory.dailyCalculationNotice`
         },
         { defaultMessage: `About plan usage history`, id: `consumerUsage.limitHistory.details` },
         {
           defaultMessage: `Some usage is unavailable; this period may be incomplete`,
-          id: `consumerUsage.limitHistory.incompleteAccounting`,
+          id: `consumerUsage.limitHistory.incompleteAccounting`
         },
         { defaultMessage: `Usage may be out of date`, id: `consumerUsage.limitHistory.staleUsage` },
         {
           defaultMessage: `By turn start includes Tasks only; percentages use the full period limit`,
-          id: `consumerUsage.limitHistory.tasksOnly`,
+          id: `consumerUsage.limitHistory.tasksOnly`
         },
         {
           defaultMessage: `{key, select,
@@ -5598,7 +5606,7 @@ function n() {
         unknown {Unknown}
       other {{fallback}}
     }`,
-          id: `consumerUsage.series.sourceLabel`,
+          id: `consumerUsage.series.sourceLabel`
         },
         {
           defaultMessage: `{trigger, select,
@@ -5660,25 +5668,25 @@ function n() {
         unknown {Unknown}
         other {}
       }`,
-          id: `consumerUsage.series.turnTriggerLabel`,
+          id: `consumerUsage.series.turnTriggerLabel`
         },
         {
           defaultMessage: `Restricted view used solely for OpenAI internal testing. Shows your real usage in this workspace.`,
-          id: `settings.usage.enterprise.consumerOverride.subtitle`,
+          id: `settings.usage.enterprise.consumerOverride.subtitle`
         },
         { defaultMessage: `Chat`, id: `settings.usage.topConsumingChats.chatColumn` },
         { defaultMessage: `Credits used`, id: `settings.usage.topConsumingChats.creditsColumn` },
         {
           defaultMessage: `No thread activity during this period`,
-          id: `settings.usage.topConsumingChats.empty`,
+          id: `settings.usage.topConsumingChats.empty`
         },
         {
           defaultMessage: `Could not load task usage`,
-          id: `settings.usage.topConsumingChats.error`,
+          id: `settings.usage.topConsumingChats.error`
         },
         {
           defaultMessage: `Est. $ spent`,
-          id: `settings.usage.topConsumingChats.estimatedSpendColumn`,
+          id: `settings.usage.topConsumingChats.estimatedSpendColumn`
         },
         { defaultMessage: `Loading task usage…`, id: `settings.usage.topConsumingChats.loading` },
         { defaultMessage: `Spent`, id: `settings.usage.topConsumingChats.nativeSpendColumn` },
@@ -5687,14 +5695,14 @@ function n() {
         { defaultMessage: `See more`, id: `settings.usage.topConsumingChats.seeMore` },
         {
           defaultMessage: `Work and Codex chats active in the last 30 days ranked by lifetime credits`,
-          id: `settings.usage.topConsumingChats.subtitle`,
+          id: `settings.usage.topConsumingChats.subtitle`
         },
         { defaultMessage: `Top chats`, id: `settings.usage.topConsumingChats.title` },
         { defaultMessage: `Untitled task`, id: `settings.usage.topConsumingChats.untitled` },
         {
           defaultMessage: `Work and Codex chats active in the last 30 days ranked by lifetime spend`,
-          id: `settings.usage.topConsumingChats.usdSubtitle`,
-        },
+          id: `settings.usage.topConsumingChats.usdSubtitle`
+        }
       ],
       "data-controls": [
         { defaultMessage: `Cancel`, id: `common.cancel` },
@@ -5704,11 +5712,11 @@ function n() {
         { defaultMessage: `Archive all chats`, id: `settings.chatGpt.dataControls.archiveAll` },
         {
           defaultMessage: `You can manage archived chats from Data controls.`,
-          id: `settings.chatGpt.dataControls.archiveConfirmDescription`,
+          id: `settings.chatGpt.dataControls.archiveConfirmDescription`
         },
         {
           defaultMessage: `Archive all chats?`,
-          id: `settings.chatGpt.dataControls.archiveConfirmTitle`,
+          id: `settings.chatGpt.dataControls.archiveConfirmTitle`
         },
         { defaultMessage: `Archived chats`, id: `settings.chatGpt.dataControls.archivedChats` },
         { defaultMessage: `Back`, id: `settings.chatGpt.dataControls.back` },
@@ -5716,60 +5724,60 @@ function n() {
         { defaultMessage: `Delete all chats`, id: `settings.chatGpt.dataControls.deleteAll` },
         {
           defaultMessage: `This action cannot be undone.`,
-          id: `settings.chatGpt.dataControls.deleteConfirmDescription`,
+          id: `settings.chatGpt.dataControls.deleteConfirmDescription`
         },
         {
           defaultMessage: `Delete all chats?`,
-          id: `settings.chatGpt.dataControls.deleteConfirmTitle`,
+          id: `settings.chatGpt.dataControls.deleteConfirmTitle`
         },
         {
           defaultMessage: `Export ChatGPT account data`,
-          id: `settings.chatGpt.dataControls.export.ariaLabel`,
+          id: `settings.chatGpt.dataControls.export.ariaLabel`
         },
         { defaultMessage: `Export`, id: `settings.chatGpt.dataControls.export.button` },
         { defaultMessage: `Export data`, id: `settings.chatGpt.dataControls.export.label` },
         { defaultMessage: `Location`, id: `settings.chatGpt.dataControls.location` },
         {
           defaultMessage: `Allow precise location`,
-          id: `settings.chatGpt.dataControls.location.ariaLabel`,
+          id: `settings.chatGpt.dataControls.location.ariaLabel`
         },
         { defaultMessage: `Manage`, id: `settings.chatGpt.dataControls.manage` },
         {
           defaultMessage: `Manage shared links`,
-          id: `settings.chatGpt.dataControls.manageSharedLinks`,
+          id: `settings.chatGpt.dataControls.manageSharedLinks`
         },
         {
           defaultMessage: `Work network access`,
-          id: `settings.chatGpt.dataControls.networkAccess`,
+          id: `settings.chatGpt.dataControls.networkAccess`
         },
         {
           defaultMessage: `Allow Work network access`,
-          id: `settings.chatGpt.dataControls.networkAccess.ariaLabel`,
+          id: `settings.chatGpt.dataControls.networkAccess.ariaLabel`
         },
         { defaultMessage: `Shared links`, id: `settings.chatGpt.dataControls.sharedLinks` },
         {
           defaultMessage: `Improve the model for everyone`,
-          id: `settings.chatGpt.dataControls.training`,
+          id: `settings.chatGpt.dataControls.training`
         },
         {
           defaultMessage: `Allow chats to improve the model`,
-          id: `settings.chatGpt.dataControls.training.ariaLabel`,
+          id: `settings.chatGpt.dataControls.training.ariaLabel`
         },
         {
           defaultMessage: `Control whether your chats are used for model training`,
-          id: `settings.chatGpt.dataControls.training.description`,
+          id: `settings.chatGpt.dataControls.training.description`
         },
         {
           defaultMessage: `Couldn’t load model improvement settings`,
-          id: `settings.chatGpt.dataControls.training.loadError`,
+          id: `settings.chatGpt.dataControls.training.loadError`
         },
         {
           defaultMessage: `Could not update data controls`,
-          id: `settings.chatGpt.dataControls.updateError`,
+          id: `settings.chatGpt.dataControls.updateError`
         },
         {
           defaultMessage: `Open marketing privacy settings`,
-          id: `settings.chatGpt.marketingPrivacy.open.ariaLabel`,
+          id: `settings.chatGpt.marketingPrivacy.open.ariaLabel`
         },
         { defaultMessage: `Marketing privacy`, id: `settings.chatGpt.marketingPrivacy.title` },
         { defaultMessage: `Actions`, id: `settings.chatGpt.sharedLinks.actions` },
@@ -5779,29 +5787,29 @@ function n() {
         { defaultMessage: `Delete all`, id: `settings.chatGpt.sharedLinks.deleteAllConfirm` },
         {
           defaultMessage: `People with these links will no longer be able to view the shared content. Your original content will not be deleted.`,
-          id: `settings.chatGpt.sharedLinks.deleteAllConfirmDescription`,
+          id: `settings.chatGpt.sharedLinks.deleteAllConfirmDescription`
         },
         {
           defaultMessage: `Delete all shared links?`,
-          id: `settings.chatGpt.sharedLinks.deleteAllConfirmTitle`,
+          id: `settings.chatGpt.sharedLinks.deleteAllConfirmTitle`
         },
         {
           defaultMessage: `Could not delete shared links`,
-          id: `settings.chatGpt.sharedLinks.deleteAllError`,
+          id: `settings.chatGpt.sharedLinks.deleteAllError`
         },
         {
           defaultMessage: `Could not delete shared link`,
-          id: `settings.chatGpt.sharedLinks.deleteError`,
+          id: `settings.chatGpt.sharedLinks.deleteError`
         },
         {
           defaultMessage: `Anyone with a shared link can view the shared image, message, chat, or scheduled task. Deleting a shared link stops others from viewing that shared content. It does not delete your original content. <link>Learn more</link>`,
-          id: `settings.chatGpt.sharedLinks.description`,
+          id: `settings.chatGpt.sharedLinks.description`
         },
         { defaultMessage: `You have no shared links`, id: `settings.chatGpt.sharedLinks.empty` },
         { defaultMessage: `Shared link`, id: `settings.chatGpt.sharedLinks.fallbackName` },
         {
           defaultMessage: `Could not load shared links`,
-          id: `settings.chatGpt.sharedLinks.loadError`,
+          id: `settings.chatGpt.sharedLinks.loadError`
         },
         { defaultMessage: `Loading shared links…`, id: `settings.chatGpt.sharedLinks.loading` },
         { defaultMessage: `Name`, id: `settings.chatGpt.sharedLinks.name` },
@@ -5815,449 +5823,449 @@ function n() {
         { defaultMessage: `{date}, {time}`, id: `settings.dataControls.archivedChats.dateTime` },
         {
           defaultMessage: `{date}, {time} • {environment}`,
-          id: `settings.dataControls.archivedChats.dateTimeWithEnvironment`,
+          id: `settings.dataControls.archivedChats.dateTimeWithEnvironment`
         },
         {
           defaultMessage: `{date}, {time} • {repo}`,
-          id: `settings.dataControls.archivedChats.dateTimeWithRepo`,
+          id: `settings.dataControls.archivedChats.dateTimeWithRepo`
         },
         { defaultMessage: `Delete`, id: `settings.dataControls.archivedChats.delete` },
         { defaultMessage: `Delete all`, id: `settings.dataControls.archivedChats.deleteAll` },
         {
           defaultMessage: `Failed to delete archived chats`,
-          id: `settings.dataControls.archivedChats.deleteAllError`,
+          id: `settings.dataControls.archivedChats.deleteAllError`
         },
         {
           defaultMessage: `Deleted {count, plural, one {# archived chat} other {# archived chats}}`,
-          id: `settings.dataControls.archivedChats.deleteAllSuccess`,
+          id: `settings.dataControls.archivedChats.deleteAllSuccess`
         },
         {
           defaultMessage: `Delete archived chat`,
-          id: `settings.dataControls.archivedChats.deleteAriaLabel`,
+          id: `settings.dataControls.archivedChats.deleteAriaLabel`
         },
         {
           defaultMessage: `Failed to delete archived chat`,
-          id: `settings.dataControls.archivedChats.deleteError`,
+          id: `settings.dataControls.archivedChats.deleteError`
         },
         {
           defaultMessage: `Delete all in project`,
-          id: `settings.dataControls.archivedChats.deleteProjectChats`,
+          id: `settings.dataControls.archivedChats.deleteProjectChats`
         },
         {
           defaultMessage: `Deleted archived chat`,
-          id: `settings.dataControls.archivedChats.deleteSuccessPlain`,
+          id: `settings.dataControls.archivedChats.deleteSuccessPlain`
         },
         {
           defaultMessage: `This host doesn’t support deleting chats. Update the Codex CLI on the host and try again.`,
-          id: `settings.dataControls.archivedChats.deleteUnsupported`,
+          id: `settings.dataControls.archivedChats.deleteUnsupported`
         },
         {
           defaultMessage: `Delete archived chat {title}`,
-          id: `settings.dataControls.archivedChats.deleteWithTitle`,
+          id: `settings.dataControls.archivedChats.deleteWithTitle`
         },
         {
           defaultMessage: `Deleting archived chat`,
-          id: `settings.dataControls.archivedChats.deleting`,
+          id: `settings.dataControls.archivedChats.deleting`
         },
         {
           defaultMessage: `Deleting archived chats`,
-          id: `settings.dataControls.archivedChats.deletingAll`,
+          id: `settings.dataControls.archivedChats.deletingAll`
         },
         { defaultMessage: `No archived chats`, id: `settings.dataControls.archivedChats.empty` },
         {
           defaultMessage: `Could not load archived chats`,
-          id: `settings.dataControls.archivedChats.error`,
+          id: `settings.dataControls.archivedChats.error`
         },
         { defaultMessage: `All chats`, id: `settings.dataControls.archivedChats.filter.all` },
         {
           defaultMessage: `Filter archived chats`,
-          id: `settings.dataControls.archivedChats.filter.ariaLabel`,
+          id: `settings.dataControls.archivedChats.filter.ariaLabel`
         },
         { defaultMessage: `Cloud`, id: `settings.dataControls.archivedChats.filter.cloud` },
         { defaultMessage: `Local`, id: `settings.dataControls.archivedChats.filter.local` },
         {
           defaultMessage: `Sort by`,
-          id: `settings.dataControls.archivedChats.filter.section.sort`,
+          id: `settings.dataControls.archivedChats.filter.section.sort`
         },
         { defaultMessage: `Type`, id: `settings.dataControls.archivedChats.filter.section.type` },
         {
           defaultMessage: `Group archived chats`,
-          id: `settings.dataControls.archivedChats.group.ariaLabel`,
+          id: `settings.dataControls.archivedChats.group.ariaLabel`
         },
         { defaultMessage: `None`, id: `settings.dataControls.archivedChats.group.none` },
         { defaultMessage: `Project`, id: `settings.dataControls.archivedChats.group.project` },
         {
           defaultMessage: `{count, plural, one {# chat} other {# chats}}`,
-          id: `settings.dataControls.archivedChats.groupCount`,
+          id: `settings.dataControls.archivedChats.groupCount`
         },
         {
           defaultMessage: `Loading archived chats…`,
-          id: `settings.dataControls.archivedChats.loading`,
+          id: `settings.dataControls.archivedChats.loading`
         },
         {
           defaultMessage: `No matching archived chats`,
-          id: `settings.dataControls.archivedChats.noMatches`,
+          id: `settings.dataControls.archivedChats.noMatches`
         },
         { defaultMessage: `No project`, id: `settings.dataControls.archivedChats.noProject` },
         {
           defaultMessage: `Unarchived chat, but failed to open it`,
-          id: `settings.dataControls.archivedChats.openError`,
+          id: `settings.dataControls.archivedChats.openError`
         },
         {
           defaultMessage: `Project actions`,
-          id: `settings.dataControls.archivedChats.projectActions`,
+          id: `settings.dataControls.archivedChats.projectActions`
         },
         {
           defaultMessage: `All projects`,
-          id: `settings.dataControls.archivedChats.projectFilter.allProjects`,
+          id: `settings.dataControls.archivedChats.projectFilter.allProjects`
         },
         {
           defaultMessage: `Filter archived chats by project`,
-          id: `settings.dataControls.archivedChats.projectFilter.ariaLabel`,
+          id: `settings.dataControls.archivedChats.projectFilter.ariaLabel`
         },
         {
           defaultMessage: `Scheduled tasks`,
-          id: `settings.dataControls.archivedChats.projectFilter.automations`,
+          id: `settings.dataControls.archivedChats.projectFilter.automations`
         },
         { defaultMessage: `Chats`, id: `settings.dataControls.archivedChats.projectFilter.chats` },
         {
           defaultMessage: `Search archived chats`,
-          id: `settings.dataControls.archivedChats.search.placeholder`,
+          id: `settings.dataControls.archivedChats.search.placeholder`
         },
         {
           defaultMessage: `Alphabetical`,
-          id: `settings.dataControls.archivedChats.sort.alphabetical`,
+          id: `settings.dataControls.archivedChats.sort.alphabetical`
         },
         { defaultMessage: `Created`, id: `settings.dataControls.archivedChats.sort.created` },
         { defaultMessage: `Updated`, id: `settings.dataControls.archivedChats.sort.updated` },
         { defaultMessage: `Unarchive`, id: `settings.dataControls.archivedChats.unarchive` },
         {
           defaultMessage: `Failed to unarchive chat`,
-          id: `settings.dataControls.archivedChats.unarchiveError`,
+          id: `settings.dataControls.archivedChats.unarchiveError`
         },
         {
           defaultMessage: `Unarchived chat`,
-          id: `settings.dataControls.archivedChats.unarchiveSuccessPlain`,
+          id: `settings.dataControls.archivedChats.unarchiveSuccessPlain`
         },
         {
           defaultMessage: `Unarchiving chat`,
-          id: `settings.dataControls.archivedChats.unarchiving`,
+          id: `settings.dataControls.archivedChats.unarchiving`
         },
         { defaultMessage: `Untitled chat`, id: `settings.dataControls.archivedChats.untitled` },
-        { defaultMessage: `View`, id: `settings.dataControls.archivedChats.viewNow` },
+        { defaultMessage: `View`, id: `settings.dataControls.archivedChats.viewNow` }
       ],
       debug: [
         { defaultMessage: `Enable Chrome debug pages`, id: `settings.debug.chromePages.label` },
         {
           defaultMessage: `Allow Browser Use to open trusted chrome:// diagnostics such as version and histograms. chrome-untrusted:// stays blocked.`,
-          id: `settings.debug.chromePages.subtitle`,
+          id: `settings.debug.chromePages.subtitle`
         },
         { defaultMessage: `Chrome debug pages`, id: `settings.debug.chromePages.title` },
         { defaultMessage: `Toggle Chrome debug pages`, id: `settings.debug.chromePages.toggle` },
         { defaultMessage: `GPU Tearing Debug`, id: `settings.general.gpuTearingDebug` },
         {
           defaultMessage: `Forces backdrop filters off across the web UI to reduce layered blur composition`,
-          id: `settings.general.gpuTearingDebug.disableBackdropBlur.description`,
+          id: `settings.general.gpuTearingDebug.disableBackdropBlur.description`
         },
         {
           defaultMessage: `Disable backdrop blur`,
-          id: `settings.general.gpuTearingDebug.disableBackdropBlur.label`,
+          id: `settings.general.gpuTearingDebug.disableBackdropBlur.label`
         },
         {
           defaultMessage: `Turns off CSS animations and transitions to isolate compositor animation work`,
-          id: `settings.general.gpuTearingDebug.disableCssMotion.description`,
+          id: `settings.general.gpuTearingDebug.disableCssMotion.description`
         },
         {
           defaultMessage: `Disable CSS motion`,
-          id: `settings.general.gpuTearingDebug.disableCssMotion.label`,
+          id: `settings.general.gpuTearingDebug.disableCssMotion.label`
         },
         {
           defaultMessage: `Removes scroll-edge fade masks entirely to isolate mask compositing as a tearing trigger`,
-          id: `settings.general.gpuTearingDebug.disableScrollFadeMask.description`,
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMask.description`
         },
         {
           defaultMessage: `Disable scroll fade mask`,
-          id: `settings.general.gpuTearingDebug.disableScrollFadeMask.label`,
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMask.label`
         },
         {
           defaultMessage: `Keeps static fade masks but removes the scroll-linked animation timeline`,
-          id: `settings.general.gpuTearingDebug.disableScrollFadeMaskAnimation.description`,
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMaskAnimation.description`
         },
         {
           defaultMessage: `Disable scroll fade animation`,
-          id: `settings.general.gpuTearingDebug.disableScrollFadeMaskAnimation.label`,
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMaskAnimation.label`
         },
         {
           defaultMessage: `Uses standard round corners instead of CSS superellipses to isolate squircle rendering cost`,
-          id: `settings.general.gpuTearingDebug.disableSquircles.description`,
+          id: `settings.general.gpuTearingDebug.disableSquircles.description`
         },
         {
           defaultMessage: `Disable squircles`,
-          id: `settings.general.gpuTearingDebug.disableSquircles.label`,
+          id: `settings.general.gpuTearingDebug.disableSquircles.label`
         },
         {
           defaultMessage: `Paints the renderer root and body with opaque backgrounds to isolate transparent-window composition`,
-          id: `settings.general.gpuTearingDebug.forceOpaqueRendererBackground.description`,
+          id: `settings.general.gpuTearingDebug.forceOpaqueRendererBackground.description`
         },
         {
           defaultMessage: `Force opaque web background`,
-          id: `settings.general.gpuTearingDebug.forceOpaqueRendererBackground.label`,
+          id: `settings.general.gpuTearingDebug.forceOpaqueRendererBackground.label`
         },
         {
           defaultMessage: `Temporary compositor isolation toggles. Changes apply immediately and are only active while the debug gate is enabled.`,
-          id: `settings.general.gpuTearingDebug.subtitle`,
+          id: `settings.general.gpuTearingDebug.subtitle`
         },
-        { defaultMessage: `Toggle {settingName}`, id: `settings.general.gpuTearingDebug.toggle` },
+        { defaultMessage: `Toggle {settingName}`, id: `settings.general.gpuTearingDebug.toggle` }
       ],
       environments: [
-        { defaultMessage: `Opens in your browser during Alpha`, id: `settings.section.external` },
+        { defaultMessage: `Opens in your browser during Alpha`, id: `settings.section.external` }
       ],
       "general-settings": [
         { defaultMessage: `Open config.toml`, id: `codex.profileDropdown.openConfigToml` },
         {
           defaultMessage: `Open config.toml in WSL environment`,
-          id: `codex.profileDropdown.openConfigToml.wsl`,
+          id: `codex.profileDropdown.openConfigToml.wsl`
         },
         { defaultMessage: `Cancel`, id: `common.cancel` },
         { defaultMessage: `Close`, id: `common.close` },
         {
           defaultMessage: `Couldn’t update model settings. Check your config.toml.{br}{br}{message}`,
-          id: `composer.modelSettings.errorConfigValidation`,
+          id: `composer.modelSettings.errorConfigValidation`
         },
         {
           defaultMessage: `Couldn’t update model settings`,
-          id: `composer.modelSettings.errorGeneric`,
+          id: `composer.modelSettings.errorGeneric`
         },
         { defaultMessage: `Continue`, id: `electron.onboarding.welcomeV2.continue` },
         {
           defaultMessage: `Do it in background`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.continueInBackground`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.continueInBackground`
         },
         {
           defaultMessage: `Chat sessions ({count})`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.chats`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.chats`
         },
         {
           defaultMessage: `Recent chats`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.chatsDescription`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.chatsDescription`
         },
         {
           defaultMessage: `Cursor rules will be imported as AGENTS.md`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.cursorInstructionsTooltip`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.cursorInstructionsTooltip`
         },
         {
           defaultMessage: `Cursor settings will be imported as config.toml`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.cursorSettingsTooltip`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.cursorSettingsTooltip`
         },
         {
           defaultMessage: `CLAUDE.md will be imported as AGENTS.md`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.instructionsTooltip`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.instructionsTooltip`
         },
         {
           defaultMessage: `Plugins ({count})`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.pluginsWithCount`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.pluginsWithCount`
         },
         {
           defaultMessage: `Projects ({count})`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.projects`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.projects`
         },
         {
           defaultMessage: `Work inside your existing projects`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.projectsDescription`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.projectsDescription`
         },
         {
           defaultMessage: `settings.json will be imported as config.toml`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.settingsTooltip`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.settingsTooltip`
         },
         {
           defaultMessage: `Skills ({count})`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.skillsWithCount`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.customize.skillsWithCount`
         },
         {
           defaultMessage: `Couldn't finish the import. Try again, or skip for now.`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.error`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.error`
         },
         {
           defaultMessage: `Import`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.importButton`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.importButton`
         },
         {
           defaultMessage: `Imported`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.importedStatus`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.importedStatus`
         },
         {
           defaultMessage: `Importing`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.importingButton`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.importingButton`
         },
         {
           defaultMessage: `Importing`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.importingStatus`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.importingStatus`
         },
         {
           defaultMessage: `What will be imported for {item}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.itemInfo`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.itemInfo`
         },
         {
           defaultMessage: `Import options`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.items.list`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.items.list`
         },
         {
           defaultMessage: `Choose what to bring over. Your existing setup won’t be affected.`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.items.subtitle`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.items.subtitle`
         },
         {
           defaultMessage: `Select items to import`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.items.title`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.items.title`
         },
         {
           defaultMessage: `Use your existing project folders`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.projects.description`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.projects.description`
         },
         {
           defaultMessage: `What will be imported for Projects`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.projects.info`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.projects.info`
         },
         {
           defaultMessage: `Projects ({count})`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.projects.title`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.projects.title`
         },
         {
           defaultMessage: `Apps found`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.appsFound`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.appsFound`
         },
         {
           defaultMessage: `Import from other AI apps`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.dialogTitle`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.dialogTitle`
         },
         {
           defaultMessage: `Apps found`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.list`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.list`
         },
         {
           defaultMessage: `Your existing app setup won’t be affected`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.setupPreserved`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.setupPreserved`
         },
         {
           defaultMessage: `Bring over your setup, projects, and recent chats`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.subtitle`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.subtitle`
         },
         {
           defaultMessage: `Import work from other AI apps`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.title`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.title`
         },
         {
           defaultMessage: `Import {provider}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.toggle`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.providers.toggle`
         },
         {
           defaultMessage: `Recent chats`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.description`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.description`
         },
         {
           defaultMessage: `What will be imported for Chat sessions`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.info`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.info`
         },
         {
           defaultMessage: `Chat sessions ({count})`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.title`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.title`
         },
         {
           defaultMessage: `{count, plural, one {# recent chat from {providers} will be imported} other {# recent chats from {providers} will be imported}}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.tooltip`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.recentChats.tooltip`
         },
         {
           defaultMessage: `Settings, instructions, plugins, skills`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.description`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.description`
         },
         {
           defaultMessage: `Tools & setup details`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.details`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.details`
         },
         {
           defaultMessage: `Hide Tools & setup details`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.hideDetails`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.hideDetails`
         },
         {
           defaultMessage: `Show Tools & setup details`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.showDetails`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.showDetails`
         },
         {
           defaultMessage: `Tools & setup`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.title`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.toolsAndSetup.title`
         },
         {
           defaultMessage: `{count, plural, one {# agent} other {# agents}}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.agentCount`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.agentCount`
         },
         {
           defaultMessage: `agents`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.agents`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.agents`
         },
         {
           defaultMessage: `{count, plural, one {# command} other {# commands}}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.commandCount`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.commandCount`
         },
         {
           defaultMessage: `commands`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.commands`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.commands`
         },
         {
           defaultMessage: `Cursor rules`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.cursorRules`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.cursorRules`
         },
         {
           defaultMessage: `Cursor settings`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.cursorSettings`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.cursorSettings`
         },
         {
           defaultMessage: `{count, plural, one {# hook} other {# hooks}}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.hookCount`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.hookCount`
         },
         {
           defaultMessage: `hooks`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.hooks`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.hooks`
         },
         {
           defaultMessage: `{items}, and {remainingCount, plural, one {# more} other {# more}}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.itemListWithRemaining`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.itemListWithRemaining`
         },
         {
           defaultMessage: `{count, plural, one {# MCP server} other {# MCP servers}}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.mcpServerCount`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.mcpServerCount`
         },
         {
           defaultMessage: `MCP servers`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.mcpServers`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.mcpServers`
         },
         {
           defaultMessage: `memory`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.memory`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.memory`
         },
         {
           defaultMessage: `{count, plural, one {# plugin} other {# plugins}}`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.pluginCount`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.pluginCount`
         },
         {
           defaultMessage: `plugins`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.plugins`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.plugins`
         },
         {
           defaultMessage: `skills`,
-          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.skills`,
+          id: `electron.onboarding.welcomeV2.externalAgentImport.tooltip.skills`
         },
         { defaultMessage: `Skip`, id: `electron.onboarding.welcomeV2.skip` },
         { defaultMessage: `View imported`, id: `externalAgentImport.review.viewImported` },
         {
           defaultMessage: `Show alerts when notification permissions are required`,
-          id: `notifications.permissions.description`,
+          id: `notifications.permissions.description`
         },
         {
           defaultMessage: `Enable permission notifications`,
-          id: `notifications.permissions.label`,
+          id: `notifications.permissions.label`
         },
         {
           defaultMessage: `Show alerts when input is needed to continue`,
-          id: `notifications.questions.description`,
+          id: `notifications.questions.description`
         },
         { defaultMessage: `Enable question notifications`, id: `notifications.questions.label` },
         { defaultMessage: `Basso`, id: `notifications.sound.basso` },
@@ -6267,12 +6275,12 @@ function n() {
         { defaultMessage: `Default`, id: `notifications.sound.default` },
         {
           defaultMessage: `Sound for task completion, permission requests, and questions`,
-          id: `notifications.sound.description`,
+          id: `notifications.sound.description`
         },
         { defaultMessage: `Glass`, id: `notifications.sound.glass` },
         {
           defaultMessage: `Couldn't import this sound. Choose an AIFF, WAV, or CAF file under 30 seconds and 10 MB`,
-          id: `notifications.sound.importError`,
+          id: `notifications.sound.importError`
         },
         { defaultMessage: `Notification sound`, id: `notifications.sound.label` },
         { defaultMessage: `None`, id: `notifications.sound.none` },
@@ -6280,18 +6288,18 @@ function n() {
         { defaultMessage: `Pop`, id: `notifications.sound.pop` },
         {
           defaultMessage: `Sound saved, but the preview couldn't play`,
-          id: `notifications.sound.previewError`,
+          id: `notifications.sound.previewError`
         },
         { defaultMessage: `Purr`, id: `notifications.sound.purr` },
         {
           defaultMessage: `Couldn't change the notification sound. Try again`,
-          id: `notifications.sound.saveError`,
+          id: `notifications.sound.saveError`
         },
         { defaultMessage: `Tink`, id: `notifications.sound.tink` },
         { defaultMessage: `Always`, id: `notifications.turnMode.always` },
         {
           defaultMessage: `Set when ChatGPT alerts you that it's finished`,
-          id: `notifications.turnMode.description`,
+          id: `notifications.turnMode.description`
         },
         { defaultMessage: `Turn completion notifications`, id: `notifications.turnMode.label` },
         { defaultMessage: `Never`, id: `notifications.turnMode.off` },
@@ -6303,239 +6311,239 @@ function n() {
         { defaultMessage: `Standard`, id: `serviceTier.standard.label` },
         {
           defaultMessage: `The fastest available responses for latency-sensitive work`,
-          id: `serviceTier.ultrafast.description`,
+          id: `serviceTier.ultrafast.description`
         },
         { defaultMessage: `Ultrafast`, id: `serviceTier.ultrafast.label` },
         { defaultMessage: `Suggested prompts`, id: `settings.agent.ambientSuggestions.groupTitle` },
         {
           defaultMessage: `Suggest what to do next by searching project files and connected apps`,
-          id: `settings.agent.ambientSuggestions.rowLabel`,
+          id: `settings.agent.ambientSuggestions.rowLabel`
         },
         {
           defaultMessage: `Enable ambient suggestions`,
-          id: `settings.agent.ambientSuggestions.toggleLabel`,
+          id: `settings.agent.ambientSuggestions.toggleLabel`
         },
         {
           defaultMessage: `By default, ChatGPT can read and edit files in its workspace. It can ask for additional access when needed`,
-          id: `settings.agent.permissionsMode.default.description`,
+          id: `settings.agent.permissionsMode.default.description`
         },
         {
           defaultMessage: `Default permissions`,
-          id: `settings.agent.permissionsMode.default.title`,
+          id: `settings.agent.permissionsMode.default.title`
         },
         {
           defaultMessage: `Default permissions are always shown`,
-          id: `settings.agent.permissionsMode.default.toggle`,
+          id: `settings.agent.permissionsMode.default.toggle`
         },
         {
           defaultMessage: `Turning this on adds Full Access to the permissions menu. It does not turn Full Access on. <a>Learn more</a>`,
-          id: `settings.agent.permissionsMode.fullAccess.confirm.availabilityDescription`,
+          id: `settings.agent.permissionsMode.fullAccess.confirm.availabilityDescription`
         },
         {
           defaultMessage: `When selected, ChatGPT can access the internet and read and edit files without asking for approval — including potentially destructive commands`,
-          id: `settings.agent.permissionsMode.fullAccess.confirm.body`,
+          id: `settings.agent.permissionsMode.fullAccess.confirm.body`
         },
         {
           defaultMessage: `Cancel`,
-          id: `settings.agent.permissionsMode.fullAccess.confirm.cancel`,
+          id: `settings.agent.permissionsMode.fullAccess.confirm.cancel`
         },
         {
           defaultMessage: `Confirm`,
-          id: `settings.agent.permissionsMode.fullAccess.confirm.confirm`,
+          id: `settings.agent.permissionsMode.fullAccess.confirm.confirm`
         },
         {
           defaultMessage: `Make Full Access available?`,
-          id: `settings.agent.permissionsMode.fullAccess.confirm.title`,
+          id: `settings.agent.permissionsMode.fullAccess.confirm.title`
         },
         {
           defaultMessage: `When ChatGPT runs with full access, it can edit any file on your computer and run commands with network, without your approval. This significantly increases the risk of data loss, leaks, or unexpected behavior. <a>Learn more</a> about elevated risks.`,
-          id: `settings.agent.permissionsMode.fullAccess.description`,
+          id: `settings.agent.permissionsMode.fullAccess.description`
         },
         { defaultMessage: `Full access`, id: `settings.agent.permissionsMode.fullAccess.title` },
         {
           defaultMessage: `Show Full access in the composer`,
-          id: `settings.agent.permissionsMode.fullAccess.toggle`,
+          id: `settings.agent.permissionsMode.fullAccess.toggle`
         },
         { defaultMessage: `Permissions`, id: `settings.agent.permissionsMode.groupTitle` },
         {
           defaultMessage: `Choose how quickly ChatGPT runs across chats, subagents, and compaction`,
-          id: `settings.agent.speed.description`,
+          id: `settings.agent.speed.description`
         },
         {
           defaultMessage: `faster speed, increased usage`,
-          id: `settings.agent.speed.fast.description`,
+          id: `settings.agent.speed.fast.description`
         },
         { defaultMessage: `Speed`, id: `settings.agent.speed.label` },
         {
           defaultMessage: `Choose where the agent runs on Windows`,
-          id: `settings.agentEnvironment.description`,
+          id: `settings.agentEnvironment.description`
         },
         { defaultMessage: `Agent environment`, id: `settings.agentEnvironment.label` },
         {
           defaultMessage: `The legacy WSL agent environment is deprecated. <connectionsLink>Open WSL connections</connectionsLink> to continue`,
-          id: `settings.agentEnvironment.legacyWsl.deprecation.connectionNotReady`,
+          id: `settings.agentEnvironment.legacyWsl.deprecation.connectionNotReady`
         },
         {
           defaultMessage: `The legacy WSL agent environment is deprecated. Use a project from your WSL connection instead, or <addProject>add a new one</addProject>`,
-          id: `settings.agentEnvironment.legacyWsl.deprecation.withConnection`,
+          id: `settings.agentEnvironment.legacyWsl.deprecation.withConnection`
         },
         {
           defaultMessage: `The legacy WSL agent environment is deprecated. Install WSL and the Codex CLI inside your WSL distribution, then restart ChatGPT to use remote WSL connections`,
-          id: `settings.agentEnvironment.legacyWsl.deprecation.withoutConnection`,
+          id: `settings.agentEnvironment.legacyWsl.deprecation.withoutConnection`
         },
         {
           defaultMessage: `Restart {appName} to apply this change. The agent is still running in {currentEnvironment}.`,
-          id: `settings.agentEnvironment.restartNotice`,
+          id: `settings.agentEnvironment.restartNotice`
         },
         { defaultMessage: `Windows native`, id: `settings.agentEnvironment.windowsNative` },
         {
           defaultMessage: `Run the agent directly in Windows`,
-          id: `settings.agentEnvironment.windowsNative.description`,
+          id: `settings.agentEnvironment.windowsNative.description`
         },
         { defaultMessage: `Windows Subsystem for Linux`, id: `settings.agentEnvironment.wsl` },
         {
           defaultMessage: `Run the agent inside WSL`,
-          id: `settings.agentEnvironment.wsl.description`,
+          id: `settings.agentEnvironment.wsl.description`
         },
         {
           defaultMessage: `Codex CLI can't run in {distributionName} because /usr/bin/bash is missing`,
-          id: `settings.agentEnvironment.wslBashError`,
+          id: `settings.agentEnvironment.wslBashError`
         },
         {
           defaultMessage: `this WSL distribution`,
-          id: `settings.agentEnvironment.wslBashError.unknownDistribution`,
+          id: `settings.agentEnvironment.wslBashError.unknownDistribution`
         },
         { defaultMessage: `Enable Dictation`, id: `settings.chatGpt.dictation` },
         { defaultMessage: `Enable Dictation`, id: `settings.chatGpt.dictation.ariaLabel` },
         {
           defaultMessage: `Use dictation in the chat composer.`,
-          id: `settings.chatGpt.dictation.description`,
+          id: `settings.chatGpt.dictation.description`
         },
         { defaultMessage: `Higher intelligence`, id: `settings.chatGpt.higherIntelligence` },
         {
           defaultMessage: `Enable higher intelligence`,
-          id: `settings.chatGpt.higherIntelligence.ariaLabel`,
+          id: `settings.chatGpt.higherIntelligence.ariaLabel`
         },
         {
           defaultMessage: `ChatGPT can automatically use a higher intelligence setting when you ask a complex question.`,
-          id: `settings.chatGpt.higherIntelligence.description`,
+          id: `settings.chatGpt.higherIntelligence.description`
         },
         { defaultMessage: `Enable Ultra effort`, id: `settings.chatGpt.ultraEffort` },
         { defaultMessage: `Enable Ultra effort`, id: `settings.chatGpt.ultraEffort.ariaLabel` },
         {
           defaultMessage: `Ultra uses multiple agents in parallel for your most ambitious tasks. This will consume your usage limit significantly faster.`,
-          id: `settings.chatGpt.ultraEffort.description`,
+          id: `settings.chatGpt.ultraEffort.description`
         },
         { defaultMessage: `Could not update this setting`, id: `settings.chatGpt.updateError` },
         {
           defaultMessage: `Show the bottom panel control in the app header`,
-          id: `settings.general.bottomPanel.description`,
+          id: `settings.general.bottomPanel.description`
         },
         { defaultMessage: `Bottom panel`, id: `settings.general.bottomPanel.label` },
         { defaultMessage: `Composer`, id: `settings.general.composer.groupTitle` },
         {
           defaultMessage: `Keep code, Markdown, and links as literal text while writing messages`,
-          id: `settings.general.composer.plainTextMode.description`,
+          id: `settings.general.composer.plainTextMode.description`
         },
         {
           defaultMessage: `Plain text composer`,
-          id: `settings.general.composer.plainTextMode.label`,
+          id: `settings.general.composer.plainTextMode.label`
         },
         {
           defaultMessage: `Show context window usage in the composer`,
-          id: `settings.general.contextUsageIndicator.ariaLabel`,
+          id: `settings.general.contextUsageIndicator.ariaLabel`
         },
         {
           defaultMessage: `Show context window usage`,
-          id: `settings.general.contextUsageIndicator.label`,
+          id: `settings.general.contextUsageIndicator.label`
         },
         {
           defaultMessage: `For approved security work, enable Daybreak in the model menu for more permissive cyber capabilities`,
-          id: `settings.general.daybreakAccess.blue.howToUse`,
+          id: `settings.general.daybreakAccess.blue.howToUse`
         },
         { defaultMessage: `Daybreak Blue`, id: `settings.general.daybreakAccess.blue.label` },
         {
           defaultMessage: `Expanded cyber capabilities for approved security work`,
-          id: `settings.general.daybreakAccess.blue.summary`,
+          id: `settings.general.daybreakAccess.blue.summary`
         },
         { defaultMessage: `Daybreak Access`, id: `settings.general.daybreakAccess.groupTitle` },
         {
           defaultMessage: `How to use Daybreak`,
-          id: `settings.general.daybreakAccess.howToUse.label`,
+          id: `settings.general.daybreakAccess.howToUse.label`
         },
         {
           defaultMessage: `For approved security work, enable Daybreak in the model menu for more permissive cyber capabilities on general-purpose models, as well as access to specialized cyber models`,
-          id: `settings.general.daybreakAccess.red.howToUse`,
+          id: `settings.general.daybreakAccess.red.howToUse`
         },
         { defaultMessage: `Daybreak Red`, id: `settings.general.daybreakAccess.red.label` },
         {
           defaultMessage: `Expanded cyber capabilities and specialized models for approved security work`,
-          id: `settings.general.daybreakAccess.red.summary`,
+          id: `settings.general.daybreakAccess.red.summary`
         },
         { defaultMessage: `Bottom`, id: `settings.general.defaultTerminalLocation.bottom` },
         {
           defaultMessage: `Choose where the terminal shortcut and environment actions open terminal tabs`,
-          id: `settings.general.defaultTerminalLocation.description`,
+          id: `settings.general.defaultTerminalLocation.description`
         },
         {
           defaultMessage: `Default terminal location`,
-          id: `settings.general.defaultTerminalLocation.label`,
+          id: `settings.general.defaultTerminalLocation.label`
         },
         { defaultMessage: `Right`, id: `settings.general.defaultTerminalLocation.right` },
         {
           defaultMessage: `Enable desktop app beta features`,
-          id: `settings.general.desktopAppBeta.ariaLabel`,
+          id: `settings.general.desktopAppBeta.ariaLabel`
         },
         {
           defaultMessage: `Try new desktop features and receive early app updates`,
-          id: `settings.general.desktopAppBeta.description`,
+          id: `settings.general.desktopAppBeta.description`
         },
         {
           defaultMessage: `Desktop app beta features`,
-          id: `settings.general.desktopAppBeta.label`,
+          id: `settings.general.desktopAppBeta.label`
         },
         {
           defaultMessage: `Controlled by your administrator`,
-          id: `settings.general.desktopAppBeta.managedTooltip`,
+          id: `settings.general.desktopAppBeta.managedTooltip`
         },
         { defaultMessage: `Show educational tips`, id: `settings.general.educationalTips.label` },
         {
           defaultMessage: `{modifierSymbol} + Enter always`,
-          id: `settings.general.enterBehavior.cmdAlways`,
+          id: `settings.general.enterBehavior.cmdAlways`
         },
         {
           defaultMessage: `{modifierSymbol} + Enter for multiline prompts`,
-          id: `settings.general.enterBehavior.cmdIfMultiline`,
+          id: `settings.general.enterBehavior.cmdIfMultiline`
         },
         {
           defaultMessage: `Choose when Enter sends a prompt or inserts a new line`,
-          id: `settings.general.enterBehavior.description.v2`,
+          id: `settings.general.enterBehavior.description.v2`
         },
         { defaultMessage: `Enter`, id: `settings.general.enterBehavior.enter` },
         { defaultMessage: `Send shortcut`, id: `settings.general.enterBehavior.rowLabel` },
         {
           defaultMessage: `Popout Window hotkey capture`,
-          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.captureAriaLabel`,
+          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.captureAriaLabel`
         },
         {
           defaultMessage: `Set a global shortcut for Popout Window. Leave unset to keep it off.`,
-          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.description`,
+          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.description`
         },
         {
           defaultMessage: `Failed to update Popout Window hotkey.`,
-          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.errorGeneric`,
+          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.errorGeneric`
         },
         {
           defaultMessage: `Popout Window hotkey`,
-          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.label`,
+          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.label`
         },
         {
           defaultMessage: `Off`,
-          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.off`,
+          id: `settings.general.experimentalFeatures.hotkeyWindowHotkey.off`
         },
         {
           defaultMessage: `Queue follow-ups while {appName} runs or steer the current run. Press {invertFollowUpShortcutLabel} to do the opposite for one message`,
-          id: `settings.general.followUpQueueMode.description`,
+          id: `settings.general.followUpQueueMode.description`
         },
         { defaultMessage: `Steer`, id: `settings.general.followUpQueueMode.interrupt` },
         { defaultMessage: `Follow-up behavior`, id: `settings.general.followUpQueueMode.label` },
@@ -6543,85 +6551,85 @@ function n() {
         { defaultMessage: `General`, id: `settings.general.groupTitle` },
         {
           defaultMessage: `Imported agent setup`,
-          id: `settings.general.importExternalAgent.importedRowLabel`,
+          id: `settings.general.importExternalAgent.importedRowLabel`
         },
         {
           defaultMessage: `Import work from other AI apps`,
-          id: `settings.general.importExternalAgent.rowLabel`,
+          id: `settings.general.importExternalAgent.rowLabel`
         },
         {
           defaultMessage: `Your organization has turned off in-app updates`,
-          id: `settings.general.inAppUpdates.description.managed`,
+          id: `settings.general.inAppUpdates.description.managed`
         },
         { defaultMessage: `In-app updates`, id: `settings.general.inAppUpdates.label` },
         { defaultMessage: `Managed`, id: `settings.general.inAppUpdates.status.managed` },
         {
           defaultMessage: `Show {appName} in the menu bar`,
-          id: `settings.general.macMenuBar.ariaLabel`,
+          id: `settings.general.macMenuBar.ariaLabel`
         },
         {
           defaultMessage: `Keep {appName} in the macOS menu bar when the main window is closed`,
-          id: `settings.general.macMenuBar.description`,
+          id: `settings.general.macMenuBar.description`
         },
         { defaultMessage: `Show in menu bar`, id: `settings.general.macMenuBar.label` },
         { defaultMessage: `Notifications`, id: `settings.general.notifications` },
         {
           defaultMessage: `Allow ChatGPT to use installed plugins`,
-          id: `settings.general.plugins.description`,
+          id: `settings.general.plugins.description`
         },
         { defaultMessage: `Plugins`, id: `settings.general.plugins.label` },
         {
           defaultMessage: `Restart {appName} to apply this change`,
-          id: `settings.general.plugins.restartNotice`,
+          id: `settings.general.plugins.restartNotice`
         },
         { defaultMessage: `Toggle plugins`, id: `settings.general.plugins.toggle` },
         { defaultMessage: `Popout Window`, id: `settings.general.popoutWindow` },
         {
           defaultMessage: `Default Popout Window to standalone chat`,
-          id: `settings.general.popoutWindow.projectlessDefault.ariaLabel`,
+          id: `settings.general.popoutWindow.projectlessDefault.ariaLabel`
         },
         {
           defaultMessage: `Start new chats outside of any project`,
-          id: `settings.general.popoutWindow.projectlessDefault.description`,
+          id: `settings.general.popoutWindow.projectlessDefault.description`
         },
         {
           defaultMessage: `Default to standalone chat`,
-          id: `settings.general.popoutWindow.projectlessDefault.label`,
+          id: `settings.general.popoutWindow.projectlessDefault.label`
         },
         {
           defaultMessage: `Keep your computer awake while {appName} is running a task`,
-          id: `settings.general.power.preventSleepWhileRunning.description`,
+          id: `settings.general.power.preventSleepWhileRunning.description`
         },
         {
           defaultMessage: `Prevent sleep while running`,
-          id: `settings.general.power.preventSleepWhileRunning.label`,
+          id: `settings.general.power.preventSleepWhileRunning.label`
         },
         { defaultMessage: `Change`, id: `settings.general.projectlessChatFolder.change` },
         {
           defaultMessage: `Unable to change the projectless task folder`,
-          id: `settings.general.projectlessChatFolder.changeError`,
+          id: `settings.general.projectlessChatFolder.changeError`
         },
         {
           defaultMessage: `The location where tasks started outside of projects store their data by default.`,
-          id: `settings.general.projectlessChatFolder.description`,
+          id: `settings.general.projectlessChatFolder.description`
         },
         {
           defaultMessage: `Projectless task folder`,
-          id: `settings.general.projectlessChatFolder.label`,
+          id: `settings.general.projectlessChatFolder.label`
         },
         { defaultMessage: `Loading folder…`, id: `settings.general.projectlessChatFolder.loading` },
         { defaultMessage: `Reset`, id: `settings.general.projectlessChatFolder.reset` },
         {
           defaultMessage: `Unable to reset the projectless task folder`,
-          id: `settings.general.projectlessChatFolder.resetError`,
+          id: `settings.general.projectlessChatFolder.resetError`
         },
         {
           defaultMessage: `Where files and folders open by default`,
-          id: `settings.ide.defaultOpenTarget.description`,
+          id: `settings.ide.defaultOpenTarget.description`
         },
         {
           defaultMessage: `Default file open destination`,
-          id: `settings.ide.defaultOpenTarget.label`,
+          id: `settings.ide.defaultOpenTarget.label`
         },
         { defaultMessage: `No targets found`, id: `settings.ide.defaultOpenTarget.placeholder` },
         { defaultMessage: `Auto detect`, id: `settings.ide.language.auto` },
@@ -6631,55 +6639,55 @@ function n() {
         { defaultMessage: `Search languages`, id: `settings.ide.language.search` },
         {
           defaultMessage: `Choose which shell opens in the integrated terminal.`,
-          id: `settings.openIn.integratedTerminalShell.description`,
+          id: `settings.openIn.integratedTerminalShell.description`
         },
         {
           defaultMessage: `Integrated terminal shell`,
-          id: `settings.openIn.integratedTerminalShell.label`,
+          id: `settings.openIn.integratedTerminalShell.label`
         },
         {
           defaultMessage: `No shells available`,
-          id: `settings.openIn.integratedTerminalShell.unavailable`,
+          id: `settings.openIn.integratedTerminalShell.unavailable`
         },
         {
           defaultMessage: `Third-party notices for bundled dependencies`,
-          id: `settings.openSourceLicenses.rowDescription`,
+          id: `settings.openSourceLicenses.rowDescription`
         },
         { defaultMessage: `Open source licenses`, id: `settings.openSourceLicenses.rowLabel` },
         { defaultMessage: `View`, id: `settings.openSourceLicenses.view` },
         {
           defaultMessage: `Animate conversation rails with system audio. Audio is processed on your device, never saved or uploaded.`,
-          id: `settings.toys.audioVisualizer.description`,
+          id: `settings.toys.audioVisualizer.description`
         },
         { defaultMessage: `Audio visualizer`, id: `settings.toys.audioVisualizer.label` },
         { defaultMessage: `Open Settings`, id: `settings.toys.audioVisualizer.openPermissions` },
         {
           defaultMessage: `Allow system audio recording in System Settings to use the visualizer`,
-          id: `settings.toys.audioVisualizer.permissionDenied`,
+          id: `settings.toys.audioVisualizer.permissionDenied`
         },
         {
           defaultMessage: `Unable to save audio visualizer setting`,
-          id: `settings.toys.audioVisualizer.saveError`,
+          id: `settings.toys.audioVisualizer.saveError`
         },
         {
           defaultMessage: `Couldn’t start the visualizer`,
-          id: `settings.toys.audioVisualizer.startError`,
+          id: `settings.toys.audioVisualizer.startError`
         },
         {
           defaultMessage: `Let Codex fire confetti in the app when you ask!`,
-          id: `settings.toys.confetti.description`,
+          id: `settings.toys.confetti.description`
         },
         { defaultMessage: `Confetti cannon`, id: `settings.toys.confetti.label` },
         {
           defaultMessage: `Unable to save confetti setting`,
-          id: `settings.toys.confetti.saveError`,
+          id: `settings.toys.confetti.saveError`
         },
-        { defaultMessage: `Toys`, id: `settings.toys.groupTitle` },
+        { defaultMessage: `Toys`, id: `settings.toys.groupTitle` }
       ],
       "git-settings": [
         {
           defaultMessage: `Start /review in the current chat when possible or launch a separate review chat`,
-          id: `settings.general.reviewDelivery.description`,
+          id: `settings.general.reviewDelivery.description`
         },
         { defaultMessage: `Detached`, id: `settings.general.reviewDelivery.detached` },
         { defaultMessage: `Inline`, id: `settings.general.reviewDelivery.inline` },
@@ -6687,173 +6695,173 @@ function n() {
         { defaultMessage: `Branch prefix`, id: `settings.git.branchPrefix.ariaLabel` },
         {
           defaultMessage: `Prefix used when ChatGPT creates new branches`,
-          id: `settings.git.branchPrefix.description`,
+          id: `settings.git.branchPrefix.description`
         },
         { defaultMessage: `Branch prefix`, id: `settings.git.branchPrefix.label` },
         { defaultMessage: `codex/`, id: `settings.git.branchPrefix.placeholder` },
         {
           defaultMessage: `Failed to save branch prefix`,
-          id: `settings.git.branchPrefix.save.error`,
+          id: `settings.git.branchPrefix.save.error`
         },
         { defaultMessage: `Saved branch prefix`, id: `settings.git.branchPrefix.save.success` },
         { defaultMessage: `Commit instructions`, id: `settings.git.commitInstructions.ariaLabel` },
         {
           defaultMessage: `Added to commit message generation prompts`,
-          id: `settings.git.commitInstructions.description`,
+          id: `settings.git.commitInstructions.description`
         },
         { defaultMessage: `Commit instructions`, id: `settings.git.commitInstructions.label` },
         {
           defaultMessage: `Add commit message guidance…`,
-          id: `settings.git.commitInstructions.placeholder`,
+          id: `settings.git.commitInstructions.placeholder`
         },
         {
           defaultMessage: `Create draft pull requests`,
-          id: `settings.git.createDraftPullRequest.ariaLabel`,
+          id: `settings.git.createDraftPullRequest.ariaLabel`
         },
         {
           defaultMessage: `Use draft pull requests by default when creating PRs from ChatGPT`,
-          id: `settings.git.createDraftPullRequest.description`,
+          id: `settings.git.createDraftPullRequest.description`
         },
         {
           defaultMessage: `Create draft pull requests`,
-          id: `settings.git.createDraftPullRequest.label`,
+          id: `settings.git.createDraftPullRequest.label`
         },
         {
           defaultMessage: `Create draft pull requests disabled`,
-          id: `settings.git.createDraftPullRequest.save.disabled`,
+          id: `settings.git.createDraftPullRequest.save.disabled`
         },
         {
           defaultMessage: `Create draft pull requests enabled`,
-          id: `settings.git.createDraftPullRequest.save.enabled`,
+          id: `settings.git.createDraftPullRequest.save.enabled`
         },
         {
           defaultMessage: `Failed to save draft pull request setting`,
-          id: `settings.git.createDraftPullRequest.save.error`,
+          id: `settings.git.createDraftPullRequest.save.error`
         },
         { defaultMessage: `Always force push`, id: `settings.git.forcePush.ariaLabel` },
         {
           defaultMessage: `Use --force-with-lease when pushing from ChatGPT`,
-          id: `settings.git.forcePush.description`,
+          id: `settings.git.forcePush.description`
         },
         { defaultMessage: `Always force push`, id: `settings.git.forcePush.label` },
         {
           defaultMessage: `Always force push disabled`,
-          id: `settings.git.forcePush.save.disabled`,
+          id: `settings.git.forcePush.save.disabled`
         },
         { defaultMessage: `Always force push enabled`, id: `settings.git.forcePush.save.enabled` },
         {
           defaultMessage: `Failed to save force push setting`,
-          id: `settings.git.forcePush.save.error`,
+          id: `settings.git.forcePush.save.error`
         },
         {
           defaultMessage: `Pull request instructions`,
-          id: `settings.git.prInstructions.ariaLabel`,
+          id: `settings.git.prInstructions.ariaLabel`
         },
         {
           defaultMessage: `Added to PR title/description generation prompts`,
-          id: `settings.git.prInstructions.description`,
+          id: `settings.git.prInstructions.description`
         },
         { defaultMessage: `Pull request instructions`, id: `settings.git.prInstructions.label` },
         {
           defaultMessage: `Add pull request guidance…`,
-          id: `settings.git.prInstructions.placeholder`,
+          id: `settings.git.prInstructions.placeholder`
         },
         {
           defaultMessage: `Pull request merge method`,
-          id: `settings.git.pullRequestMergeMethod.ariaLabel`,
+          id: `settings.git.pullRequestMergeMethod.ariaLabel`
         },
         {
           defaultMessage: `Choose how ChatGPT merges pull requests`,
-          id: `settings.git.pullRequestMergeMethod.description`,
+          id: `settings.git.pullRequestMergeMethod.description`
         },
         {
           defaultMessage: `Pull request merge method`,
-          id: `settings.git.pullRequestMergeMethod.label`,
+          id: `settings.git.pullRequestMergeMethod.label`
         },
         { defaultMessage: `Merge`, id: `settings.git.pullRequestMergeMethod.merge` },
         {
           defaultMessage: `Failed to save pull request merge method`,
-          id: `settings.git.pullRequestMergeMethod.save.error`,
+          id: `settings.git.pullRequestMergeMethod.save.error`
         },
         {
           defaultMessage: `Saved pull request merge method`,
-          id: `settings.git.pullRequestMergeMethod.save.success`,
+          id: `settings.git.pullRequestMergeMethod.save.success`
         },
         { defaultMessage: `Squash`, id: `settings.git.pullRequestMergeMethod.squash` },
         {
           defaultMessage: `Auto-merge when ready`,
-          id: `settings.git.pullRequestWatch.autoMerge.ariaLabel`,
+          id: `settings.git.pullRequestWatch.autoMerge.ariaLabel`
         },
         {
           defaultMessage: `Continue watching until the pull request is merged`,
-          id: `settings.git.pullRequestWatch.autoMerge.description`,
+          id: `settings.git.pullRequestWatch.autoMerge.description`
         },
         {
           defaultMessage: `Automatic PR merging disabled`,
-          id: `settings.git.pullRequestWatch.autoMerge.disabled`,
+          id: `settings.git.pullRequestWatch.autoMerge.disabled`
         },
         {
           defaultMessage: `Automatic PR merging enabled`,
-          id: `settings.git.pullRequestWatch.autoMerge.enabled`,
+          id: `settings.git.pullRequestWatch.autoMerge.enabled`
         },
         {
           defaultMessage: `Failed to save automatic PR merging`,
-          id: `settings.git.pullRequestWatch.autoMerge.error`,
+          id: `settings.git.pullRequestWatch.autoMerge.error`
         },
         {
           defaultMessage: `Auto-merge when ready`,
-          id: `settings.git.pullRequestWatch.autoMerge.label`,
+          id: `settings.git.pullRequestWatch.autoMerge.label`
         },
         {
           defaultMessage: `Pull request watch instructions`,
-          id: `settings.git.pullRequestWatch.instructions.ariaLabel`,
+          id: `settings.git.pullRequestWatch.instructions.ariaLabel`
         },
         {
           defaultMessage: `For example: Comment /merge after checks pass and approve unrelated Chromatic changes…`,
-          id: `settings.git.pullRequestWatch.instructions.placeholder`,
+          id: `settings.git.pullRequestWatch.instructions.placeholder`
         },
         {
           defaultMessage: `Watch and fix pull requests`,
-          id: `settings.git.pullRequestWatch.title`,
+          id: `settings.git.pullRequestWatch.title`
         },
         {
           defaultMessage: `Failed to update active pull request watchers`,
-          id: `settings.git.pullRequestWatch.updateActive.error`,
+          id: `settings.git.pullRequestWatch.updateActive.error`
         },
         { defaultMessage: `Disable Git-Based Review`, id: `settings.git.reviewMode.ariaLabel` },
         {
           defaultMessage: `Only show "Last Turn" in the Review panel and disable Unstaged/Staged/Branch to avoid git operations`,
-          id: `settings.git.reviewMode.description`,
+          id: `settings.git.reviewMode.description`
         },
-        { defaultMessage: `Disable Git-Based Review`, id: `settings.git.reviewMode.label` },
+        { defaultMessage: `Disable Git-Based Review`, id: `settings.git.reviewMode.label` }
       ],
       "hooks-settings": [
         {
           defaultMessage: `Configured hooks will appear here`,
-          id: `settings.hooks.emptyHooks.description`,
+          id: `settings.hooks.emptyHooks.description`
         },
         { defaultMessage: `No hooks found`, id: `settings.hooks.emptyHooks.label` },
         { defaultMessage: `Agent`, id: `settings.hooks.event.agentHandler` },
         {
           defaultMessage: `Hook changed since last trusted`,
-          id: `settings.hooks.event.changedReviewReason`,
+          id: `settings.hooks.event.changedReviewReason`
         },
         { defaultMessage: `Command`, id: `settings.hooks.event.command` },
         { defaultMessage: `Command`, id: `settings.hooks.event.commandHandler` },
         {
           defaultMessage: `Disabled until hook is trusted`,
-          id: `settings.hooks.event.disabledUntilTrustedTooltip`,
+          id: `settings.hooks.event.disabledUntilTrustedTooltip`
         },
         { defaultMessage: `Hook {index}`, id: `settings.hooks.event.fallbackHookTitle` },
         { defaultMessage: `Handler`, id: `settings.hooks.event.handler` },
         { defaultMessage: `Interrupt`, id: `settings.hooks.event.interrupt` },
         {
           defaultMessage: `When a turn is interrupted`,
-          id: `settings.hooks.event.interrupt.description`,
+          id: `settings.hooks.event.interrupt.description`
         },
         {
           defaultMessage: `Managed hooks are always on`,
-          id: `settings.hooks.event.managedTooltip`,
+          id: `settings.hooks.event.managedTooltip`
         },
         { defaultMessage: `Matcher`, id: `settings.hooks.event.matcher` },
         { defaultMessage: `MCP tool`, id: `settings.hooks.event.mcpToolHandler` },
@@ -6861,54 +6869,54 @@ function n() {
         { defaultMessage: `PermissionRequest`, id: `settings.hooks.event.permissionRequest` },
         {
           defaultMessage: `When permission is requested`,
-          id: `settings.hooks.event.permissionRequest.description`,
+          id: `settings.hooks.event.permissionRequest.description`
         },
         { defaultMessage: `PostCompact`, id: `settings.hooks.event.postCompact` },
         {
           defaultMessage: `After ChatGPT compacts the conversation`,
-          id: `settings.hooks.event.postCompact.description`,
+          id: `settings.hooks.event.postCompact.description`
         },
         { defaultMessage: `PostToolUse`, id: `settings.hooks.event.postToolUse` },
         {
           defaultMessage: `After a tool executes`,
-          id: `settings.hooks.event.postToolUse.description`,
+          id: `settings.hooks.event.postToolUse.description`
         },
         { defaultMessage: `PreCompact`, id: `settings.hooks.event.preCompact` },
         {
           defaultMessage: `Before ChatGPT compacts the conversation`,
-          id: `settings.hooks.event.preCompact.description`,
+          id: `settings.hooks.event.preCompact.description`
         },
         { defaultMessage: `PreToolUse`, id: `settings.hooks.event.preToolUse` },
         {
           defaultMessage: `Before a tool executes`,
-          id: `settings.hooks.event.preToolUse.description`,
+          id: `settings.hooks.event.preToolUse.description`
         },
         { defaultMessage: `Prompt`, id: `settings.hooks.event.promptHandler` },
         { defaultMessage: `SessionEnd`, id: `settings.hooks.event.sessionEnd` },
         {
           defaultMessage: `When a session ends`,
-          id: `settings.hooks.event.sessionEnd.description`,
+          id: `settings.hooks.event.sessionEnd.description`
         },
         { defaultMessage: `SessionStart`, id: `settings.hooks.event.sessionStart` },
         {
           defaultMessage: `When a new session starts`,
-          id: `settings.hooks.event.sessionStart.description`,
+          id: `settings.hooks.event.sessionStart.description`
         },
         { defaultMessage: `Status message`, id: `settings.hooks.event.statusMessage` },
         { defaultMessage: `Stop`, id: `settings.hooks.event.stop` },
         {
           defaultMessage: `Right before ChatGPT ends its turn`,
-          id: `settings.hooks.event.stop.description`,
+          id: `settings.hooks.event.stop.description`
         },
         { defaultMessage: `SubagentStart`, id: `settings.hooks.event.subagentStart` },
         {
           defaultMessage: `When a subagent starts`,
-          id: `settings.hooks.event.subagentStart.description`,
+          id: `settings.hooks.event.subagentStart.description`
         },
         { defaultMessage: `SubagentStop`, id: `settings.hooks.event.subagentStop` },
         {
           defaultMessage: `When a subagent stops`,
-          id: `settings.hooks.event.subagentStop.description`,
+          id: `settings.hooks.event.subagentStop.description`
         },
         { defaultMessage: `Timeout`, id: `settings.hooks.event.timeout` },
         { defaultMessage: `Trust`, id: `settings.hooks.event.trust` },
@@ -6916,12 +6924,12 @@ function n() {
         { defaultMessage: `UserPromptSubmit`, id: `settings.hooks.event.userPromptSubmit` },
         {
           defaultMessage: `When the user submits a prompt`,
-          id: `settings.hooks.event.userPromptSubmit.description`,
+          id: `settings.hooks.event.userPromptSubmit.description`
         },
         { defaultMessage: `{path}: {message}`, id: `settings.hooks.issues.error` },
         {
           defaultMessage: `{count, plural, one {# issue loading hooks for this source} other {# issues loading hooks for this source}}`,
-          id: `settings.hooks.issues.summary`,
+          id: `settings.hooks.issues.summary`
         },
         { defaultMessage: `Could not load hooks`, id: `settings.hooks.loadError.label` },
         { defaultMessage: `Loading hooks…`, id: `settings.hooks.loading.label` },
@@ -6929,13 +6937,13 @@ function n() {
         { defaultMessage: `Refreshed hooks`, id: `settings.hooks.refresh.success` },
         {
           defaultMessage: `Hooks can run outside of the sandbox so we ask you to review any recently installed or modified hooks`,
-          id: `settings.hooks.review.summary`,
+          id: `settings.hooks.review.summary`
         },
         { defaultMessage: `Admin config`, id: `settings.hooks.source.adminConfig` },
         { defaultMessage: `From Config`, id: `settings.hooks.source.globalConfig` },
         {
           defaultMessage: `{count, plural, one {# hook} other {# hooks}}`,
-          id: `settings.hooks.source.hookCount`,
+          id: `settings.hooks.source.hookCount`
         },
         { defaultMessage: `Other sources`, id: `settings.hooks.source.otherSources` },
         { defaultMessage: `Plugin`, id: `settings.hooks.source.plugin` },
@@ -6949,20 +6957,20 @@ function n() {
         { defaultMessage: `User config`, id: `settings.hooks.source.userConfig` },
         {
           defaultMessage: `Manage lifecycle hooks from config and enabled plugins. <a>Learn more</a>`,
-          id: `settings.hooks.subtitle`,
+          id: `settings.hooks.subtitle`
         },
         {
           defaultMessage: `{issueCount}{separator}{needsReview}`,
-          id: `settings.hooks.summary.attentionCounts`,
+          id: `settings.hooks.summary.attentionCounts`
         },
         {
           defaultMessage: `{issueCount, plural, one {# issue} other {# issues}}`,
-          id: `settings.hooks.summary.issueCounts`,
+          id: `settings.hooks.summary.issueCounts`
         },
         {
           defaultMessage: `{needsReview, plural, one {# needs review} other {# need review}}`,
-          id: `settings.hooks.summary.reviewCounts`,
-        },
+          id: `settings.hooks.summary.reviewCounts`
+        }
       ],
       "keyboard-shortcuts": [
         { defaultMessage: `Approve request`, id: `codex.command.approval.approve` },
@@ -6977,15 +6985,15 @@ function n() {
         { defaultMessage: `Cycle host`, id: `codex.command.composer.cycleHost` },
         {
           defaultMessage: `Cycle reasoning effort`,
-          id: `codex.command.composer.cycleReasoningEffort`,
+          id: `codex.command.composer.cycleReasoningEffort`
         },
         {
           defaultMessage: `Decrease reasoning effort`,
-          id: `codex.command.composer.decreaseReasoningEffort`,
+          id: `codex.command.composer.decreaseReasoningEffort`
         },
         {
           defaultMessage: `Increase reasoning effort`,
-          id: `codex.command.composer.increaseReasoningEffort`,
+          id: `codex.command.composer.increaseReasoningEffort`
         },
         { defaultMessage: `Open model picker`, id: `codex.command.composer.openModelPicker` },
         { defaultMessage: `Open project picker`, id: `codex.command.composer.openProjectPicker` },
@@ -6996,17 +7004,17 @@ function n() {
         { defaultMessage: `Send message`, id: `codex.command.composer.submit` },
         {
           defaultMessage: `Send message in background`,
-          id: `codex.command.composer.submitInBackground`,
+          id: `codex.command.composer.submitInBackground`
         },
         { defaultMessage: `Toggle Fast mode`, id: `codex.command.composer.toggleFastMode` },
         { defaultMessage: `Toggle plan mode`, id: `codex.command.composer.togglePlanMode` },
         {
           defaultMessage: `Toggle Cloud/Local`,
-          id: `codex.command.composer.toggleWorkRunLocation`,
+          id: `codex.command.composer.toggleWorkRunLocation`
         },
         {
           defaultMessage: `Toggle Local/Worktree`,
-          id: `codex.command.composer.toggleWorktreeMode`,
+          id: `codex.command.composer.toggleWorktreeMode`
         },
         { defaultMessage: `Copy as Markdown`, id: `codex.command.copyConversationMarkdown` },
         { defaultMessage: `Copy Page link`, id: `codex.command.copyPageLink` },
@@ -7024,7 +7032,7 @@ function n() {
         { defaultMessage: `Go back in file navigation`, id: `codex.command.file.navigateBack` },
         {
           defaultMessage: `Go forward in file navigation`,
-          id: `codex.command.file.navigateForward`,
+          id: `codex.command.file.navigateForward`
         },
         { defaultMessage: `Find`, id: `codex.command.findInThread` },
         { defaultMessage: `Focus browser address bar`, id: `codex.command.focusBrowserAddressBar` },
@@ -7051,7 +7059,7 @@ function n() {
         { defaultMessage: `Hold-to-dictate hotkey`, id: `codex.command.globalDictationHold` },
         {
           defaultMessage: `Hands-free dictation hotkey`,
-          id: `codex.command.globalDictationToggle`,
+          id: `codex.command.globalDictationToggle`
         },
         { defaultMessage: `Go to line`, id: `codex.command.goToLine` },
         { defaultMessage: `Popout Window hotkey`, id: `codex.command.hotkeyWindow` },
@@ -7072,7 +7080,7 @@ function n() {
         { defaultMessage: `Next chat`, id: `codex.command.nextThread` },
         {
           defaultMessage: `Next chat needing attention`,
-          id: `codex.command.nextThreadNeedingAttention`,
+          id: `codex.command.nextThreadNeedingAttention`
         },
         { defaultMessage: `Open browser tab`, id: `codex.command.openBrowserTab` },
         { defaultMessage: `Open control window`, id: `codex.command.openControlWindow` },
@@ -7087,7 +7095,7 @@ function n() {
         { defaultMessage: `Numbered list`, id: `codex.command.page.formatNumberedList` },
         {
           defaultMessage: `Previous recently viewed chat`,
-          id: `codex.command.previousRecentThread`,
+          id: `codex.command.previousRecentThread`
         },
         { defaultMessage: `Previous tab`, id: `codex.command.previousTab` },
         { defaultMessage: `Previous chat`, id: `codex.command.previousThread` },
@@ -7096,11 +7104,11 @@ function n() {
         { defaultMessage: `End Voice Chat`, id: `codex.command.realtimeVoice.endCall` },
         {
           defaultMessage: `Toggle Voice Chat microphone`,
-          id: `codex.command.realtimeVoice.toggleMicrophoneMute`,
+          id: `codex.command.realtimeVoice.toggleMicrophoneMute`
         },
         {
           defaultMessage: `Toggle Voice Chat audio`,
-          id: `codex.command.realtimeVoice.toggleOutputMute`,
+          id: `codex.command.realtimeVoice.toggleOutputMute`
         },
         { defaultMessage: `Go to recent chat 1`, id: `codex.command.recentThread1` },
         { defaultMessage: `Go to recent chat 2`, id: `codex.command.recentThread2` },
@@ -7132,7 +7140,7 @@ function n() {
         { defaultMessage: `Toggle debug panel`, id: `codex.command.toggleDebugModal` },
         {
           defaultMessage: `Toggle maximize side panel`,
-          id: `codex.command.toggleMaximizeSidePanel`,
+          id: `codex.command.toggleMaximizeSidePanel`
         },
         { defaultMessage: `Show pet`, id: `codex.command.toggleMiniOverlay` },
         { defaultMessage: `Toggle pinned summary`, id: `codex.command.togglePinnedSummary` },
@@ -7145,434 +7153,434 @@ function n() {
         { defaultMessage: `Undo last action`, id: `codex.command.undoAppAction` },
         {
           defaultMessage: `Approve the active request`,
-          id: `codex.commandDescription.approval.approve`,
+          id: `codex.commandDescription.approval.approve`
         },
         {
           defaultMessage: `Decline the active request`,
-          id: `codex.commandDescription.approval.decline`,
+          id: `codex.commandDescription.approval.decline`
         },
         {
           defaultMessage: `Archive the current chat`,
-          id: `codex.commandDescription.archiveThread`,
+          id: `codex.commandDescription.archiveThread`
         },
         {
           defaultMessage: `Mark all chats and scheduled task updates as read`,
-          id: `codex.commandDescription.clearAllUnreads`,
+          id: `codex.commandDescription.clearAllUnreads`
         },
         {
           defaultMessage: `Close all tabs except the active tab`,
-          id: `codex.commandDescription.closeOtherTabs`,
+          id: `codex.commandDescription.closeOtherTabs`
         },
         { defaultMessage: `Close the active tab`, id: `codex.commandDescription.closeTab` },
         { defaultMessage: `Close the active window`, id: `codex.commandDescription.closeWindow` },
         {
           defaultMessage: `Open Codex Micro setup`,
-          id: `codex.commandDescription.codexMicroSettings`,
+          id: `codex.commandDescription.codexMicroSettings`
         },
         {
           defaultMessage: `Attach files and folders to the active composer`,
-          id: `codex.commandDescription.composer.addFiles`,
+          id: `codex.commandDescription.composer.addFiles`
         },
         {
           defaultMessage: `Add photos to the active composer`,
-          id: `codex.commandDescription.composer.addPhotos`,
+          id: `codex.commandDescription.composer.addPhotos`
         },
         {
           defaultMessage: `Clear the current composer prompt`,
-          id: `codex.commandDescription.composer.clear`,
+          id: `codex.commandDescription.composer.clear`
         },
         {
           defaultMessage: `Cycle the new task between this computer and available remote machines`,
-          id: `codex.commandDescription.composer.cycleHost`,
+          id: `codex.commandDescription.composer.cycleHost`
         },
         {
           defaultMessage: `Cycle through composer reasoning effort options`,
-          id: `codex.commandDescription.composer.cycleReasoningEffort`,
+          id: `codex.commandDescription.composer.cycleReasoningEffort`
         },
         {
           defaultMessage: `Decrease the current composer reasoning effort`,
-          id: `codex.commandDescription.composer.decreaseReasoningEffort`,
+          id: `codex.commandDescription.composer.decreaseReasoningEffort`
         },
         {
           defaultMessage: `Increase the current composer reasoning effort`,
-          id: `codex.commandDescription.composer.increaseReasoningEffort`,
+          id: `codex.commandDescription.composer.increaseReasoningEffort`
         },
         {
           defaultMessage: `Open the composer model picker`,
-          id: `codex.commandDescription.composer.openModelPicker`,
+          id: `codex.commandDescription.composer.openModelPicker`
         },
         {
           defaultMessage: `Open the composer project picker`,
-          id: `codex.commandDescription.composer.openProjectPicker`,
+          id: `codex.commandDescription.composer.openProjectPicker`
         },
         {
           defaultMessage: `Submit the current composer prompt as a queued message`,
-          id: `codex.commandDescription.composer.queue`,
+          id: `codex.commandDescription.composer.queue`
         },
         {
           defaultMessage: `Start dictation in the current composer`,
-          id: `codex.commandDescription.composer.startDictation`,
+          id: `codex.commandDescription.composer.startDictation`
         },
         {
           defaultMessage: `Start or stop voice chat`,
-          id: `codex.commandDescription.composer.startVoiceMode`,
+          id: `codex.commandDescription.composer.startVoiceMode`
         },
         {
           defaultMessage: `Submit the current composer prompt as a steering message`,
-          id: `codex.commandDescription.composer.steer`,
+          id: `codex.commandDescription.composer.steer`
         },
         {
           defaultMessage: `Send the current composer message`,
-          id: `codex.commandDescription.composer.submit`,
+          id: `codex.commandDescription.composer.submit`
         },
         {
           defaultMessage: `Send the current composer message without opening its chat`,
-          id: `codex.commandDescription.composer.submitInBackground`,
+          id: `codex.commandDescription.composer.submitInBackground`
         },
         {
           defaultMessage: `Turn Fast mode on or off in the current composer`,
-          id: `codex.commandDescription.composer.toggleFastMode`,
+          id: `codex.commandDescription.composer.toggleFastMode`
         },
         {
           defaultMessage: `Turn plan mode on or off in the current composer`,
-          id: `codex.commandDescription.composer.togglePlanMode`,
+          id: `codex.commandDescription.composer.togglePlanMode`
         },
         {
           defaultMessage: `Switch ChatGPT Work between cloud and local execution`,
-          id: `codex.commandDescription.composer.toggleWorkRunLocation`,
+          id: `codex.commandDescription.composer.toggleWorkRunLocation`
         },
         {
           defaultMessage: `Switch the current composer between local and a new worktree`,
-          id: `codex.commandDescription.composer.toggleWorktreeMode`,
+          id: `codex.commandDescription.composer.toggleWorktreeMode`
         },
         {
           defaultMessage: `Copy the current chat as Markdown`,
-          id: `codex.commandDescription.copyConversationMarkdown`,
+          id: `codex.commandDescription.copyConversationMarkdown`
         },
         {
           defaultMessage: `Copy the current chat path`,
-          id: `codex.commandDescription.copyConversationPath`,
+          id: `codex.commandDescription.copyConversationPath`
         },
         {
           defaultMessage: `Copy a deeplink to the current chat`,
-          id: `codex.commandDescription.copyDeeplink`,
+          id: `codex.commandDescription.copyDeeplink`
         },
         {
           defaultMessage: `Copy the current Page's link to the clipboard`,
-          id: `codex.commandDescription.copyPageLink`,
+          id: `codex.commandDescription.copyPageLink`
         },
         {
           defaultMessage: `Copy the current chat working directory`,
-          id: `codex.commandDescription.copyWorkingDirectory`,
+          id: `codex.commandDescription.copyWorkingDirectory`
         },
         {
           defaultMessage: `Run the environment action in this shortcut slot`,
-          id: `codex.commandDescription.environmentActionSlot`,
+          id: `codex.commandDescription.environmentActionSlot`
         },
         {
           defaultMessage: `Send product feedback to the ChatGPT team`,
-          id: `codex.commandDescription.feedback`,
+          id: `codex.commandDescription.feedback`
         },
         {
           defaultMessage: `Open the definition of the selected file symbol`,
-          id: `codex.commandDescription.file.goToDefinition`,
+          id: `codex.commandDescription.file.goToDefinition`
         },
         {
           defaultMessage: `Return to the previous file location`,
-          id: `codex.commandDescription.file.navigateBack`,
+          id: `codex.commandDescription.file.navigateBack`
         },
         {
           defaultMessage: `Return to the next file location`,
-          id: `codex.commandDescription.file.navigateForward`,
+          id: `codex.commandDescription.file.navigateForward`
         },
         { defaultMessage: `Search the current chat`, id: `codex.commandDescription.findInThread` },
         {
           defaultMessage: `Focus the in-app browser address bar`,
-          id: `codex.commandDescription.focusBrowserAddressBar`,
+          id: `codex.commandDescription.focusBrowserAddressBar`
         },
         {
           defaultMessage: `Move keyboard focus to the main chat composer`,
-          id: `codex.commandDescription.focusMainChat`,
+          id: `codex.commandDescription.focusMainChat`
         },
         {
           defaultMessage: `Move keyboard focus to an open side chat composer`,
-          id: `codex.commandDescription.focusSideChat`,
+          id: `codex.commandDescription.focusSideChat`
         },
         {
           defaultMessage: `Focus the tab at this position in the task tab strip`,
-          id: `codex.commandDescription.focusTab`,
+          id: `codex.commandDescription.focusTab`
         },
         {
           defaultMessage: `Refresh the skill catalog for the current context`,
-          id: `codex.commandDescription.forceReloadSkills`,
+          id: `codex.commandDescription.forceReloadSkills`
         },
         { defaultMessage: `Fork the current chat`, id: `codex.commandDescription.forkThread` },
         {
           defaultMessage: `Open commit or push options`,
-          id: `codex.commandDescription.git.commit`,
+          id: `codex.commandDescription.git.commit`
         },
         {
           defaultMessage: `Open branch creation options`,
-          id: `codex.commandDescription.git.createBranch`,
+          id: `codex.commandDescription.git.createBranch`
         },
         {
           defaultMessage: `Open draft pull request creation options`,
-          id: `codex.commandDescription.git.createDraftPullRequest`,
+          id: `codex.commandDescription.git.createDraftPullRequest`
         },
         {
           defaultMessage: `Open pull request creation options`,
-          id: `codex.commandDescription.git.createPullRequest`,
+          id: `codex.commandDescription.git.createPullRequest`
         },
         {
           defaultMessage: `Open pull request merge options`,
-          id: `codex.commandDescription.git.mergePullRequest`,
+          id: `codex.commandDescription.git.mergePullRequest`
         },
         {
           defaultMessage: `Open the pull request linked to the current chat`,
-          id: `codex.commandDescription.git.openPullRequest`,
+          id: `codex.commandDescription.git.openPullRequest`
         },
         {
           defaultMessage: `Show or hide author and commit details for the active editor line`,
-          id: `codex.commandDescription.git.toggleBlame`,
+          id: `codex.commandDescription.git.toggleBlame`
         },
         {
           defaultMessage: `Hold to dictate where your cursor is, release to finish, or Esc to cancel`,
-          id: `codex.commandDescription.globalDictationHold`,
+          id: `codex.commandDescription.globalDictationHold`
         },
         {
           defaultMessage: `Double-tap to dictate hands-free, press once to finish, or Esc to cancel`,
-          id: `codex.commandDescription.globalDictationToggle`,
+          id: `codex.commandDescription.globalDictationToggle`
         },
         {
           defaultMessage: `Go to a line in the current file`,
-          id: `codex.commandDescription.goToLine`,
+          id: `codex.commandDescription.goToLine`
         },
         {
           defaultMessage: `Force reload the active browser page`,
-          id: `codex.commandDescription.hardReloadBrowserPage`,
+          id: `codex.commandDescription.hardReloadBrowserPage`
         },
         {
           defaultMessage: `Show or hide Popout Window from anywhere on desktop`,
-          id: `codex.commandDescription.hotkeyWindow`,
+          id: `codex.commandDescription.hotkeyWindow`
         },
         {
           defaultMessage: `Import from other AI apps`,
-          id: `codex.commandDescription.importExternalAgent`,
+          id: `codex.commandDescription.importExternalAgent`
         },
         {
           defaultMessage: `Customize keyboard shortcuts`,
-          id: `codex.commandDescription.keyboardShortcuts`,
+          id: `codex.commandDescription.keyboardShortcuts`
         },
         { defaultMessage: `Sign out of {appName}`, id: `codex.commandDescription.logOut` },
         {
           defaultMessage: `Create or manage scheduled tasks from the current page`,
-          id: `codex.commandDescription.manageTasks`,
+          id: `codex.commandDescription.manageTasks`
         },
         {
           defaultMessage: `Mark the current chat as unread`,
-          id: `codex.commandDescription.markThreadUnread`,
+          id: `codex.commandDescription.markThreadUnread`
         },
         { defaultMessage: `Configure MCP servers`, id: `codex.commandDescription.mcpSettings` },
         {
           defaultMessage: `Go back in navigation history`,
-          id: `codex.commandDescription.navigateBack`,
+          id: `codex.commandDescription.navigateBack`
         },
         {
           defaultMessage: `Go back in browser history`,
-          id: `codex.commandDescription.navigateBrowserBack`,
+          id: `codex.commandDescription.navigateBrowserBack`
         },
         {
           defaultMessage: `Go forward in browser history`,
-          id: `codex.commandDescription.navigateBrowserForward`,
+          id: `codex.commandDescription.navigateBrowserForward`
         },
         {
           defaultMessage: `Go forward in navigation history`,
-          id: `codex.commandDescription.navigateForward`,
+          id: `codex.commandDescription.navigateForward`
         },
         {
           defaultMessage: `Start a new chat outside of any project`,
-          id: `codex.commandDescription.newProjectlessTask`,
+          id: `codex.commandDescription.newProjectlessTask`
         },
         { defaultMessage: `Start a new chat`, id: `codex.commandDescription.newThread` },
         { defaultMessage: `Open a new window`, id: `codex.commandDescription.newWindow` },
         {
           defaultMessage: `Cycle to the next recently viewed chat`,
-          id: `codex.commandDescription.nextRecentThread`,
+          id: `codex.commandDescription.nextRecentThread`
         },
         { defaultMessage: `Switch to the next tab`, id: `codex.commandDescription.nextTab` },
         { defaultMessage: `Switch to the next chat`, id: `codex.commandDescription.nextThread` },
         {
           defaultMessage: `Switch to the next chat awaiting input or with unread activity`,
-          id: `codex.commandDescription.nextThreadNeedingAttention`,
+          id: `codex.commandDescription.nextThreadNeedingAttention`
         },
         { defaultMessage: `Open a new browser tab`, id: `codex.commandDescription.openBrowserTab` },
         { defaultMessage: `Open the command menu`, id: `codex.commandDescription.openCommandMenu` },
         {
           defaultMessage: `Open the voice chat control window`,
-          id: `codex.commandDescription.openControlWindow`,
+          id: `codex.commandDescription.openControlWindow`
         },
         {
           defaultMessage: `Add a local project to {appName}`,
-          id: `codex.commandDescription.openFolder`,
+          id: `codex.commandDescription.openFolder`
         },
         {
           defaultMessage: `Show the pet from anywhere`,
-          id: `codex.commandDescription.openPetOverlay`,
+          id: `codex.commandDescription.openPetOverlay`
         },
         { defaultMessage: `Open the review tab`, id: `codex.commandDescription.openReviewTab` },
         {
           defaultMessage: `Open the current chat in a side chat`,
-          id: `codex.commandDescription.openSideChat`,
+          id: `codex.commandDescription.openSideChat`
         },
         {
           defaultMessage: `Browse installed and recommended skills`,
-          id: `codex.commandDescription.openSkills`,
+          id: `codex.commandDescription.openSkills`
         },
         {
           defaultMessage: `Open the current chat in a new window`,
-          id: `codex.commandDescription.openThreadInNewWindow`,
+          id: `codex.commandDescription.openThreadInNewWindow`
         },
         {
           defaultMessage: `Format the selected Page text as a bulleted list`,
-          id: `codex.commandDescription.page.formatBulletedList`,
+          id: `codex.commandDescription.page.formatBulletedList`
         },
         {
           defaultMessage: `Toggle checklist formatting for the selected Page text`,
-          id: `codex.commandDescription.page.formatChecklist`,
+          id: `codex.commandDescription.page.formatChecklist`
         },
         {
           defaultMessage: `Format the selected Page text as a numbered list`,
-          id: `codex.commandDescription.page.formatNumberedList`,
+          id: `codex.commandDescription.page.formatNumberedList`
         },
         {
           defaultMessage: `Cycle to the previous recently viewed chat`,
-          id: `codex.commandDescription.previousRecentThread`,
+          id: `codex.commandDescription.previousRecentThread`
         },
         {
           defaultMessage: `Switch to the previous tab`,
-          id: `codex.commandDescription.previousTab`,
+          id: `codex.commandDescription.previousTab`
         },
         {
           defaultMessage: `Switch to the previous chat`,
-          id: `codex.commandDescription.previousThread`,
+          id: `codex.commandDescription.previousThread`
         },
         {
           defaultMessage: `Start a lightweight chat in the quick composer`,
-          id: `codex.commandDescription.quickChat`,
+          id: `codex.commandDescription.quickChat`
         },
         {
           defaultMessage: `Start a Voice Chat from anywhere on desktop`,
-          id: `codex.commandDescription.realtimeVoice`,
+          id: `codex.commandDescription.realtimeVoice`
         },
         {
           defaultMessage: `End the active Voice Chat`,
-          id: `codex.commandDescription.realtimeVoice.endCall`,
+          id: `codex.commandDescription.realtimeVoice.endCall`
         },
         {
           defaultMessage: `Mute or unmute your microphone during a Voice Chat`,
-          id: `codex.commandDescription.realtimeVoice.toggleMicrophoneMute`,
+          id: `codex.commandDescription.realtimeVoice.toggleMicrophoneMute`
         },
         {
           defaultMessage: `Mute or unmute Voice Chat audio`,
-          id: `codex.commandDescription.realtimeVoice.toggleOutputMute`,
+          id: `codex.commandDescription.realtimeVoice.toggleOutputMute`
         },
         {
           defaultMessage: `Open the recently updated chat in this shortcut slot`,
-          id: `codex.commandDescription.recentThreadSlot`,
+          id: `codex.commandDescription.recentThreadSlot`
         },
         {
           defaultMessage: `Redo the most recently undone app action`,
-          id: `codex.commandDescription.redoAppAction`,
+          id: `codex.commandDescription.redoAppAction`
         },
         {
           defaultMessage: `Reload the active browser page`,
-          id: `codex.commandDescription.reloadBrowserPage`,
+          id: `codex.commandDescription.reloadBrowserPage`
         },
         { defaultMessage: `Rename the current chat`, id: `codex.commandDescription.renameThread` },
         {
           defaultMessage: `Reopen the most recently closed tab`,
-          id: `codex.commandDescription.reopenClosedTab`,
+          id: `codex.commandDescription.reopenClosedTab`
         },
         {
           defaultMessage: `Search and switch to a chat`,
-          id: `codex.commandDescription.searchChats`,
+          id: `codex.commandDescription.searchChats`
         },
         { defaultMessage: `Search files`, id: `codex.commandDescription.searchFiles` },
         { defaultMessage: `Open {appName} settings`, id: `codex.commandDescription.settings` },
         {
           defaultMessage: `Show the shortcuts available right now`,
-          id: `codex.commandDescription.showKeyboardShortcuts`,
+          id: `codex.commandDescription.showKeyboardShortcuts`
         },
         {
           defaultMessage: `Toggle full and split view, creating a new tab if needed`,
-          id: `codex.commandDescription.showWorkspaceTabView`,
+          id: `codex.commandDescription.showWorkspaceTabView`
         },
         {
           defaultMessage: `Show or hide content tabs without changing the layout`,
-          id: `codex.commandDescription.stepWorkspaceLayout`,
+          id: `codex.commandDescription.stepWorkspaceLayout`
         },
         { defaultMessage: `Switch to Chat`, id: `codex.commandDescription.switchToChat` },
         { defaultMessage: `Switch to Codex`, id: `codex.commandDescription.switchToCodex` },
         { defaultMessage: `Switch to Work`, id: `codex.commandDescription.switchToWork` },
         {
           defaultMessage: `Start a chat that won't appear in history`,
-          id: `codex.commandDescription.temporaryChat`,
+          id: `codex.commandDescription.temporaryChat`
         },
         {
           defaultMessage: `Open the visible chat in this shortcut slot`,
-          id: `codex.commandDescription.threadSlot`,
+          id: `codex.commandDescription.threadSlot`
         },
         {
           defaultMessage: `Show or hide the bottom panel`,
-          id: `codex.commandDescription.toggleBottomPanel`,
+          id: `codex.commandDescription.toggleBottomPanel`
         },
         {
           defaultMessage: `Show or hide the internal debug panel`,
-          id: `codex.commandDescription.toggleDebugModal`,
+          id: `codex.commandDescription.toggleDebugModal`
         },
         {
           defaultMessage: `Toggle the file tree panel`,
-          id: `codex.commandDescription.toggleFileTreePanel`,
+          id: `codex.commandDescription.toggleFileTreePanel`
         },
         {
           defaultMessage: `Expand or restore the side panel`,
-          id: `codex.commandDescription.toggleMaximizeSidePanel`,
+          id: `codex.commandDescription.toggleMaximizeSidePanel`
         },
         {
           defaultMessage: `Show or hide the pinned summary`,
-          id: `codex.commandDescription.togglePinnedSummary`,
+          id: `codex.commandDescription.togglePinnedSummary`
         },
         {
           defaultMessage: `Turn the sidebar activity view on or off`,
-          id: `codex.commandDescription.togglePriorityFilter`,
+          id: `codex.commandDescription.togglePriorityFilter`
         },
         {
           defaultMessage: `Show or hide Review for the current chat`,
-          id: `codex.commandDescription.toggleReviewPanel`,
+          id: `codex.commandDescription.toggleReviewPanel`
         },
         {
           defaultMessage: `Show or hide Review for the current Git-backed chat`,
-          id: `codex.commandDescription.toggleReviewTab`,
+          id: `codex.commandDescription.toggleReviewTab`
         },
         {
           defaultMessage: `Show or hide the sidebar`,
-          id: `codex.commandDescription.toggleSidebar`,
+          id: `codex.commandDescription.toggleSidebar`
         },
         {
           defaultMessage: `Open the terminal panel`,
-          id: `codex.commandDescription.toggleTerminal`,
+          id: `codex.commandDescription.toggleTerminal`
         },
         {
           defaultMessage: `Pin or unpin the current chat`,
-          id: `codex.commandDescription.toggleThreadPin`,
+          id: `codex.commandDescription.toggleThreadPin`
         },
         {
           defaultMessage: `Start or stop trace recording`,
-          id: `codex.commandDescription.toggleTraceRecording`,
+          id: `codex.commandDescription.toggleTraceRecording`
         },
         {
           defaultMessage: `Undo the most recent app action`,
-          id: `codex.commandDescription.undoAppAction`,
+          id: `codex.commandDescription.undoAppAction`
         },
         { defaultMessage: `Archive chat`, id: `codex.commandMenuTitle.archiveThread` },
         { defaultMessage: `Close Tab`, id: `codex.commandMenuTitle.closeTab` },
@@ -7580,21 +7588,21 @@ function n() {
         { defaultMessage: `Dictation`, id: `codex.commandMenuTitle.composer.startDictation` },
         {
           defaultMessage: `Copy conversation path`,
-          id: `codex.commandMenuTitle.copyConversationPath`,
+          id: `codex.commandMenuTitle.copyConversationPath`
         },
         { defaultMessage: `Copy deeplink`, id: `codex.commandMenuTitle.copyDeeplink` },
         {
           defaultMessage: `Copy working directory`,
-          id: `codex.commandMenuTitle.copyWorkingDirectory`,
+          id: `codex.commandMenuTitle.copyWorkingDirectory`
         },
         { defaultMessage: `Find`, id: `codex.commandMenuTitle.findInThread` },
         {
           defaultMessage: `Focus Browser Address Bar`,
-          id: `codex.commandMenuTitle.focusBrowserAddressBar`,
+          id: `codex.commandMenuTitle.focusBrowserAddressBar`
         },
         {
           defaultMessage: `Force Reload Browser Page`,
-          id: `codex.commandMenuTitle.hardReloadBrowserPage`,
+          id: `codex.commandMenuTitle.hardReloadBrowserPage`
         },
         { defaultMessage: `Log Out`, id: `codex.commandMenuTitle.logOut` },
         { defaultMessage: `Back`, id: `codex.commandMenuTitle.navigateBack` },
@@ -7609,7 +7617,7 @@ function n() {
         { defaultMessage: `Open Folder…`, id: `codex.commandMenuTitle.openFolder` },
         {
           defaultMessage: `Open in New Window`,
-          id: `codex.commandMenuTitle.openThreadInNewWindow`,
+          id: `codex.commandMenuTitle.openThreadInNewWindow`
         },
         { defaultMessage: `Previous Chat`, id: `codex.commandMenuTitle.previousThread` },
         { defaultMessage: `Reload Browser Page`, id: `codex.commandMenuTitle.reloadBrowserPage` },
@@ -7619,7 +7627,7 @@ function n() {
         { defaultMessage: `Settings…`, id: `codex.commandMenuTitle.settings` },
         {
           defaultMessage: `Keyboard Shortcuts`,
-          id: `codex.commandMenuTitle.showKeyboardShortcuts`,
+          id: `codex.commandMenuTitle.showKeyboardShortcuts`
         },
         { defaultMessage: `Go to Chat 1`, id: `codex.commandMenuTitle.thread1` },
         { defaultMessage: `Go to Chat 2`, id: `codex.commandMenuTitle.thread2` },
@@ -7634,7 +7642,7 @@ function n() {
         { defaultMessage: `Toggle File Tree`, id: `codex.commandMenuTitle.toggleFileTreePanel` },
         {
           defaultMessage: `Toggle Pinned Summary`,
-          id: `codex.commandMenuTitle.togglePinnedSummary`,
+          id: `codex.commandMenuTitle.togglePinnedSummary`
         },
         { defaultMessage: `Toggle Review Panel`, id: `codex.commandMenuTitle.toggleReviewPanel` },
         { defaultMessage: `Toggle Sidebar`, id: `codex.commandMenuTitle.toggleSidebar` },
@@ -7642,7 +7650,7 @@ function n() {
         { defaultMessage: `Pin/unpin chat`, id: `codex.commandMenuTitle.toggleThreadPin` },
         {
           defaultMessage: `Start Trace Recording`,
-          id: `codex.commandMenuTitle.toggleTraceRecording`,
+          id: `codex.commandMenuTitle.toggleTraceRecording`
         },
         { defaultMessage: `No active shortcuts`, id: `keyboardShortcutsDialog.empty` },
         { defaultMessage: `Loading shortcuts…`, id: `keyboardShortcutsDialog.loading` },
@@ -7658,69 +7666,69 @@ function n() {
         { defaultMessage: `Keyboard shortcuts`, id: `keyboardShortcutsDialog.title` },
         {
           defaultMessage: `Shortcut capture for {commandTitle}`,
-          id: `settings.keyboardShortcuts.captureAriaLabel`,
+          id: `settings.keyboardShortcuts.captureAriaLabel`
         },
         {
           defaultMessage: `{platform, select, macOS {⌥+Click} other {Alt+Click}}`,
-          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.alt`,
+          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.alt`
         },
         {
           defaultMessage: `Hold the assigned keys while clicking a web link to open it in your default system browser`,
-          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.description`,
+          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.description`
         },
         {
           defaultMessage: `{platform, select, macOS {⌘+Click} other {Ctrl+Click}}`,
-          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.primary`,
+          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.primary`
         },
         {
           defaultMessage: `{platform, select, macOS {⇧⌘+Click} other {Ctrl+Shift+Click}}`,
-          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.primaryShift`,
+          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.primaryShift`
         },
         {
           defaultMessage: `Open web link in default browser`,
-          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.title`,
+          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.title`
         },
         {
           defaultMessage: `Unassigned`,
-          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.unassigned`,
+          id: `settings.keyboardShortcuts.externalBrowserLinkShortcut.unassigned`
         },
         {
           defaultMessage: `{command, select, find {Find} findNext {Find Next} other {Find Previous}}`,
-          id: `settings.keyboardShortcuts.fixedFindCommand`,
+          id: `settings.keyboardShortcuts.fixedFindCommand`
         },
         {
           defaultMessage: `Keystroke search capture`,
-          id: `settings.keyboardShortcuts.keystrokeSearch.ariaLabel`,
+          id: `settings.keyboardShortcuts.keystrokeSearch.ariaLabel`
         },
         {
           defaultMessage: `Press shortcut to search`,
-          id: `settings.keyboardShortcuts.keystrokeSearch.placeholder`,
+          id: `settings.keyboardShortcuts.keystrokeSearch.placeholder`
         },
         { defaultMessage: `Loading shortcuts…`, id: `settings.keyboardShortcuts.loading` },
         { defaultMessage: `No matching shortcuts`, id: `settings.keyboardShortcuts.noMatches` },
         {
           defaultMessage: `Use {primary}1–9 to switch chats and {secondary}1–9 to switch tabs`,
-          id: `settings.keyboardShortcuts.numberTarget.chatsPrimary`,
+          id: `settings.keyboardShortcuts.numberTarget.chatsPrimary`
         },
         {
           defaultMessage: `Some number shortcuts are already assigned to other actions`,
-          id: `settings.keyboardShortcuts.numberTarget.conflict`,
+          id: `settings.keyboardShortcuts.numberTarget.conflict`
         },
         {
           defaultMessage: `Could not save shortcut preference`,
-          id: `settings.keyboardShortcuts.numberTarget.error`,
+          id: `settings.keyboardShortcuts.numberTarget.error`
         },
         {
           defaultMessage: `{primary}1-9 for Chats`,
-          id: `settings.keyboardShortcuts.numberTarget.sidebarWithShortcut`,
+          id: `settings.keyboardShortcuts.numberTarget.sidebarWithShortcut`
         },
         {
           defaultMessage: `Use {primary}1–9 to switch tabs and {secondary}1–9 to switch chats`,
-          id: `settings.keyboardShortcuts.numberTarget.tabsPrimary`,
+          id: `settings.keyboardShortcuts.numberTarget.tabsPrimary`
         },
         {
           defaultMessage: `{primary}1-9 for Tabs`,
-          id: `settings.keyboardShortcuts.numberTarget.tabsWithShortcut`,
+          id: `settings.keyboardShortcuts.numberTarget.tabsWithShortcut`
         },
         { defaultMessage: `Number shortcuts`, id: `settings.keyboardShortcuts.numberTarget.title` },
         { defaultMessage: `Reset all to defaults`, id: `settings.keyboardShortcuts.resetAll` },
@@ -7728,33 +7736,33 @@ function n() {
         { defaultMessage: `Reset all`, id: `settings.keyboardShortcuts.resetAllConfirm.confirm` },
         {
           defaultMessage: `This will discard all custom shortcuts and restore the defaults`,
-          id: `settings.keyboardShortcuts.resetAllConfirm.description`,
+          id: `settings.keyboardShortcuts.resetAllConfirm.description`
         },
         {
           defaultMessage: `Reset all keyboard shortcuts?`,
-          id: `settings.keyboardShortcuts.resetAllConfirm.title`,
+          id: `settings.keyboardShortcuts.resetAllConfirm.title`
         },
         {
           defaultMessage: `Failed to reset keyboard shortcuts`,
-          id: `settings.keyboardShortcuts.resetAllError`,
+          id: `settings.keyboardShortcuts.resetAllError`
         },
         {
           defaultMessage: `Search keyboard shortcuts`,
-          id: `settings.keyboardShortcuts.search.ariaLabel`,
+          id: `settings.keyboardShortcuts.search.ariaLabel`
         },
         { defaultMessage: `Search shortcuts`, id: `settings.keyboardShortcuts.search.placeholder` },
         {
           defaultMessage: `Search by keystrokes`,
-          id: `settings.keyboardShortcuts.searchByKeystrokes.ariaLabel`,
+          id: `settings.keyboardShortcuts.searchByKeystrokes.ariaLabel`
         },
         {
           defaultMessage: `Search by keystrokes`,
-          id: `settings.keyboardShortcuts.searchByKeystrokes.tooltip`,
+          id: `settings.keyboardShortcuts.searchByKeystrokes.tooltip`
         },
         {
           defaultMessage: `Failed to update shortcut`,
-          id: `settings.keyboardShortcuts.updateError`,
-        },
+          id: `settings.keyboardShortcuts.updateError`
+        }
       ],
       "local-environments": [
         { defaultMessage: `Environment`, id: `cloudEnvironments.columns.environment` },
@@ -7762,7 +7770,7 @@ function n() {
         { defaultMessage: `Delete environment`, id: `cloudEnvironments.delete.action` },
         {
           defaultMessage: `+{count, plural, one {# more repo} other {# more repos}}`,
-          id: `cloudEnvironments.repositories.moreRepos`,
+          id: `cloudEnvironments.repositories.moreRepos`
         },
         { defaultMessage: `Shared by you`, id: `cloudEnvironments.sharing.byYou` },
         { defaultMessage: `Private`, id: `cloudEnvironments.sharing.private` },
@@ -7776,7 +7784,7 @@ function n() {
         { defaultMessage: `Manage`, id: `environmentSetup.variables.manage` },
         {
           defaultMessage: `Manage environment variables`,
-          id: `environmentSetup.variables.manageLabel`,
+          id: `environmentSetup.variables.manageLabel`
         },
         { defaultMessage: `Add`, id: `personalVault.addEntry` },
         { defaultMessage: `All environment configurations`, id: `personalVault.allTargets` },
@@ -7784,7 +7792,7 @@ function n() {
         { defaultMessage: `Delete`, id: `personalVault.delete` },
         {
           defaultMessage: `Save your own environment variables and network secrets for cloud environments in this workspace. Values stay hidden after saving. All entries are optional.`,
-          id: `personalVault.description`,
+          id: `personalVault.description`
         },
         { defaultMessage: `Edit`, id: `personalVault.edit` },
         { defaultMessage: `No entries yet`, id: `personalVault.emptyEntries` },
@@ -7793,11 +7801,11 @@ function n() {
         { defaultMessage: `Variables`, id: `personalVault.filterVariables` },
         {
           defaultMessage: `Recreate this legacy secret to choose its key and environments`,
-          id: `personalVault.legacy`,
+          id: `personalVault.legacy`
         },
         {
           defaultMessage: `Couldn’t load all personal vault entries`,
-          id: `personalVault.loadError`,
+          id: `personalVault.loadError`
         },
         { defaultMessage: `Loading personal vault…`, id: `personalVault.loading` },
         { defaultMessage: `Load more`, id: `personalVault.loadMoreEntries` },
@@ -7811,7 +7819,7 @@ function n() {
         { defaultMessage: `Cancel`, id: `projectSetup.createLocalProject.cancel` },
         {
           defaultMessage: `Remove local project`,
-          id: `projectSetup.editLocalProject.remove.button.label`,
+          id: `projectSetup.editLocalProject.remove.button.label`
         },
         { defaultMessage: `Failed to save project`, id: `projectSetup.editLocalProject.saveError` },
         { defaultMessage: `Save`, id: `projectSetup.editLocalProject.submit` },
@@ -7819,60 +7827,60 @@ function n() {
         { defaultMessage: `No saved environments`, id: `restricted.cloudV2.savedConfigs.empty` },
         {
           defaultMessage: `Couldn’t load saved environments`,
-          id: `restricted.cloudV2.savedConfigs.error`,
+          id: `restricted.cloudV2.savedConfigs.error`
         },
         {
           defaultMessage: `Loading saved environments…`,
-          id: `restricted.cloudV2.savedConfigs.loading`,
+          id: `restricted.cloudV2.savedConfigs.loading`
         },
         { defaultMessage: `Loading more…`, id: `restricted.cloudV2.savedConfigs.loadingMore` },
         {
           defaultMessage: `Load more saved environments`,
-          id: `restricted.cloudV2.savedConfigs.loadMore`,
+          id: `restricted.cloudV2.savedConfigs.loadMore`
         },
         { defaultMessage: `Retry`, id: `restricted.cloudV2.savedConfigs.retry` },
         {
           defaultMessage: `Sign in to load saved environments`,
-          id: `restricted.cloudV2.savedConfigs.signIn`,
+          id: `restricted.cloudV2.savedConfigs.signIn`
         },
         { defaultMessage: `Name`, id: `restricted.environmentSetup.configuration.name` },
         {
           defaultMessage: `Edit environment name`,
-          id: `restricted.environmentSetup.configuration.name.edit`,
+          id: `restricted.environmentSetup.configuration.name.edit`
         },
         {
           defaultMessage: `Environment configuration`,
-          id: `restricted.environmentSetup.sidePanel.form`,
+          id: `restricted.environmentSetup.sidePanel.form`
         },
         {
           defaultMessage: `Couldn’t load environment`,
-          id: `restricted.environmentSetup.sidePanel.loadError`,
+          id: `restricted.environmentSetup.sidePanel.loadError`
         },
         {
           defaultMessage: `Loading environment…`,
-          id: `restricted.environmentSetup.sidePanel.loading`,
+          id: `restricted.environmentSetup.sidePanel.loading`
         },
         { defaultMessage: `Retry`, id: `restricted.environmentSetup.sidePanel.retry` },
         { defaultMessage: `Saving…`, id: `restricted.environmentSetup.sidePanel.saving` },
         { defaultMessage: `Edit {name}`, id: `restricted.environmentSetup.variables.edit` },
         {
           defaultMessage: `No environment variables added`,
-          id: `restricted.environmentSetup.variables.empty`,
+          id: `restricted.environmentSetup.variables.empty`
         },
         { defaultMessage: `Missing`, id: `restricted.environmentSetup.variables.missing` },
         {
           defaultMessage: `User-provided`,
-          id: `restricted.environmentSetup.variables.source.userProvided`,
+          id: `restricted.environmentSetup.variables.source.userProvided`
         },
         {
           defaultMessage: `Environment variables`,
-          id: `restricted.environmentSetup.variables.title`,
+          id: `restricted.environmentSetup.variables.title`
         },
         { defaultMessage: `Unavailable`, id: `restricted.environmentSetup.variables.unavailable` },
         { defaultMessage: `Add action`, id: `settings.localEnvironments.actions.add` },
         {
           defaultMessage: `Add an action to run commands from the local toolbar`,
-          id: `settings.localEnvironments.actions.empty`,
+          id: `settings.localEnvironments.actions.empty`
         },
         { defaultMessage: `Debug`, id: `settings.localEnvironments.actions.icon.debug` },
         { defaultMessage: `Run`, id: `settings.localEnvironments.actions.icon.run` },
@@ -7883,225 +7891,225 @@ function n() {
         { defaultMessage: `Platforms`, id: `settings.localEnvironments.actions.item.platforms` },
         {
           defaultMessage: `All platforms`,
-          id: `settings.localEnvironments.actions.item.platforms.all`,
+          id: `settings.localEnvironments.actions.item.platforms.all`
         },
         { defaultMessage: `Linux`, id: `settings.localEnvironments.actions.item.platforms.linux` },
         { defaultMessage: `macOS`, id: `settings.localEnvironments.actions.item.platforms.macos` },
         {
           defaultMessage: `Windows`,
-          id: `settings.localEnvironments.actions.item.platforms.windows`,
+          id: `settings.localEnvironments.actions.item.platforms.windows`
         },
         { defaultMessage: `Actions`, id: `settings.localEnvironments.actions.title` },
         {
           defaultMessage: `Actions for {environmentName}`,
-          id: `settings.localEnvironments.catalog.actions.label`,
+          id: `settings.localEnvironments.catalog.actions.label`
         },
         {
           defaultMessage: `Continue setup`,
-          id: `settings.localEnvironments.catalog.continueSetup`,
+          id: `settings.localEnvironments.catalog.continueSetup`
         },
         { defaultMessage: `Create`, id: `settings.localEnvironments.catalog.create` },
         { defaultMessage: `Cancel`, id: `settings.localEnvironments.catalog.editor.cancel` },
         {
           defaultMessage: `No matching environments`,
-          id: `settings.localEnvironments.catalog.empty`,
+          id: `settings.localEnvironments.catalog.empty`
         },
         {
           defaultMessage: `Unknown repository`,
-          id: `settings.localEnvironments.catalog.repository.unknown`,
+          id: `settings.localEnvironments.catalog.repository.unknown`
         },
         {
           defaultMessage: `Search environments`,
-          id: `settings.localEnvironments.catalog.search.label`,
+          id: `settings.localEnvironments.catalog.search.label`
         },
         { defaultMessage: `Search`, id: `settings.localEnvironments.catalog.search.placeholder` },
         { defaultMessage: `Cloud`, id: `settings.localEnvironments.catalog.tabs.cloud` },
         {
           defaultMessage: `Environment location`,
-          id: `settings.localEnvironments.catalog.tabs.label`,
+          id: `settings.localEnvironments.catalog.tabs.label`
         },
         { defaultMessage: `Local`, id: `settings.localEnvironments.catalog.tabs.local` },
         {
           defaultMessage: `Runs at the project root on worktree creation`,
-          id: `settings.localEnvironments.editor.setup.description`,
+          id: `settings.localEnvironments.editor.setup.description`
         },
         {
           defaultMessage: `For example: npm install`,
-          id: `settings.localEnvironments.editor.simpleSetup.placeholder`,
+          id: `settings.localEnvironments.editor.simpleSetup.placeholder`
         },
         {
           defaultMessage: `Hide full command for {actionName}`,
-          id: `settings.localEnvironments.environment.action.hideCommand`,
+          id: `settings.localEnvironments.environment.action.hideCommand`
         },
         {
           defaultMessage: `Show full command for {actionName}`,
-          id: `settings.localEnvironments.environment.action.showCommand`,
+          id: `settings.localEnvironments.environment.action.showCommand`
         },
         {
           defaultMessage: `These actions can run any command and will be displayed in the header`,
-          id: `settings.localEnvironments.environment.actions.description`,
+          id: `settings.localEnvironments.environment.actions.description`
         },
         { defaultMessage: `Actions`, id: `settings.localEnvironments.environment.actionsLabel` },
         {
           defaultMessage: `Runs at the project root before worktree cleanup`,
-          id: `settings.localEnvironments.environment.cleanup.description`,
+          id: `settings.localEnvironments.environment.cleanup.description`
         },
         {
           defaultMessage: `Cleanup script`,
-          id: `settings.localEnvironments.environment.cleanup.input`,
+          id: `settings.localEnvironments.environment.cleanup.input`
         },
         {
           defaultMessage: `Cleanup script platform`,
-          id: `settings.localEnvironments.environment.cleanup.platformSelector`,
+          id: `settings.localEnvironments.environment.cleanup.platformSelector`
         },
         {
           defaultMessage: `Cleanup script`,
-          id: `settings.localEnvironments.environment.cleanup.title`,
+          id: `settings.localEnvironments.environment.cleanup.title`
         },
         {
           defaultMessage: `Create local environment`,
-          id: `settings.localEnvironments.environment.create`,
+          id: `settings.localEnvironments.environment.create`
         },
         { defaultMessage: `local`, id: `settings.localEnvironments.environment.defaultName` },
         { defaultMessage: `Edit`, id: `settings.localEnvironments.environment.editAction` },
         {
           defaultMessage: `No local environment is configured for this project yet`,
-          id: `settings.localEnvironments.environment.empty`,
+          id: `settings.localEnvironments.environment.empty`
         },
         { defaultMessage: `Name`, id: `settings.localEnvironments.environment.name` },
         {
           defaultMessage: `No script configured for this platform`,
-          id: `settings.localEnvironments.environment.platformScript.empty`,
+          id: `settings.localEnvironments.environment.platformScript.empty`
         },
         {
           defaultMessage: `No platform override. Using the default script`,
-          id: `settings.localEnvironments.environment.platformUsesDefault`,
+          id: `settings.localEnvironments.environment.platformUsesDefault`
         },
         { defaultMessage: `Default`, id: `settings.localEnvironments.environment.script.default` },
         {
           defaultMessage: `No script configured`,
-          id: `settings.localEnvironments.environment.script.empty`,
+          id: `settings.localEnvironments.environment.script.empty`
         },
         { defaultMessage: `Setup script`, id: `settings.localEnvironments.environment.setup` },
         {
           defaultMessage: `This script runs on worktree creation`,
-          id: `settings.localEnvironments.environment.setup.description`,
+          id: `settings.localEnvironments.environment.setup.description`
         },
         {
           defaultMessage: `Variables`,
-          id: `settings.localEnvironments.environment.setup.envVars.button`,
+          id: `settings.localEnvironments.environment.setup.envVars.button`
         },
         {
           defaultMessage: `Source workspace path`,
-          id: `settings.localEnvironments.environment.setup.envVars.sourcePath.description`,
+          id: `settings.localEnvironments.environment.setup.envVars.sourcePath.description`
         },
         {
           defaultMessage: `Setup script environment variables`,
-          id: `settings.localEnvironments.environment.setup.envVars.title`,
+          id: `settings.localEnvironments.environment.setup.envVars.title`
         },
         {
           defaultMessage: `New worktree path`,
-          id: `settings.localEnvironments.environment.setup.envVars.worktreePath.description`,
+          id: `settings.localEnvironments.environment.setup.envVars.worktreePath.description`
         },
         {
           defaultMessage: `Setup script platform`,
-          id: `settings.localEnvironments.environment.setup.platformSelector`,
+          id: `settings.localEnvironments.environment.setup.platformSelector`
         },
         { defaultMessage: `Add project`, id: `settings.localEnvironments.workspace.add` },
         {
           defaultMessage: `Add environment to {projectName}`,
-          id: `settings.localEnvironments.workspaceSelect.addLabel`,
+          id: `settings.localEnvironments.workspaceSelect.addLabel`
         },
         {
           defaultMessage: `Local environments tell ChatGPT how to set up worktrees for a project. {learnMore}`,
-          id: `settings.localEnvironments.workspaceSelect.description`,
+          id: `settings.localEnvironments.workspaceSelect.description`
         },
         {
           defaultMessage: `No projects yet. Add one to configure local environments.`,
-          id: `settings.localEnvironments.workspaceSelect.empty`,
+          id: `settings.localEnvironments.workspaceSelect.empty`
         },
         {
           defaultMessage: `Could not load projects`,
-          id: `settings.localEnvironments.workspaceSelect.error`,
+          id: `settings.localEnvironments.workspaceSelect.error`
         },
         {
           defaultMessage: `Environment needs attention`,
-          id: `settings.localEnvironments.workspaceSelect.errorLabel`,
+          id: `settings.localEnvironments.workspaceSelect.errorLabel`
         },
         {
           defaultMessage: `Inherited environments ({count})`,
-          id: `settings.localEnvironments.workspaceSelect.inherited`,
+          id: `settings.localEnvironments.workspaceSelect.inherited`
         },
         {
           defaultMessage: `Hide inherited environments`,
-          id: `settings.localEnvironments.workspaceSelect.inherited.hide`,
+          id: `settings.localEnvironments.workspaceSelect.inherited.hide`
         },
         {
           defaultMessage: `Show inherited environments`,
-          id: `settings.localEnvironments.workspaceSelect.inherited.show`,
+          id: `settings.localEnvironments.workspaceSelect.inherited.show`
         },
         {
           defaultMessage: `From {sourceFolderName} · {fileName}`,
-          id: `settings.localEnvironments.workspaceSelect.inheritedSource`,
+          id: `settings.localEnvironments.workspaceSelect.inheritedSource`
         },
         {
           defaultMessage: `Learn more.`,
-          id: `settings.localEnvironments.workspaceSelect.learnMore`,
+          id: `settings.localEnvironments.workspaceSelect.learnMore`
         },
         {
           defaultMessage: `Available projects`,
-          id: `settings.localEnvironments.workspaceSelect.listLabel`,
+          id: `settings.localEnvironments.workspaceSelect.listLabel`
         },
         {
           defaultMessage: `Loading projects…`,
-          id: `settings.localEnvironments.workspaceSelect.loading`,
+          id: `settings.localEnvironments.workspaceSelect.loading`
         },
         {
           defaultMessage: `Loading environment`,
-          id: `settings.localEnvironments.workspaceSelect.loadingLabel`,
+          id: `settings.localEnvironments.workspaceSelect.loadingLabel`
         },
         {
           defaultMessage: `Open {projectName}`,
-          id: `settings.localEnvironments.workspaceSelect.openProject`,
+          id: `settings.localEnvironments.workspaceSelect.openProject`
         },
         {
           defaultMessage: `Select a project`,
-          id: `settings.localEnvironments.workspaceSelect.title`,
+          id: `settings.localEnvironments.workspaceSelect.title`
         },
         {
           defaultMessage: `View {environmentName}`,
-          id: `settings.localEnvironments.workspaceSelect.viewAction`,
+          id: `settings.localEnvironments.workspaceSelect.viewAction`
         },
         {
           defaultMessage: `View {environmentName} from {sourceFolderName}`,
-          id: `settings.localEnvironments.workspaceSelect.viewInheritedAction`,
+          id: `settings.localEnvironments.workspaceSelect.viewInheritedAction`
         },
         { defaultMessage: `Cancel`, id: `sidebarElectron.removeProject.cancel` },
         {
           defaultMessage: `Remove project`,
-          id: `sidebarElectron.removeProject.dialog.confirm.local`,
+          id: `sidebarElectron.removeProject.dialog.confirm.local`
         },
         {
           defaultMessage: `Remove project`,
-          id: `sidebarElectron.removeProject.dialog.confirm.remote`,
+          id: `sidebarElectron.removeProject.dialog.confirm.remote`
         },
         {
           defaultMessage: `This only removes the project from the app. Files on your computer and existing chats won't be deleted.`,
-          id: `sidebarElectron.removeProject.dialog.description.local`,
+          id: `sidebarElectron.removeProject.dialog.description.local`
         },
         {
           defaultMessage: `This only removes the project from the app. Its files and existing chats won't be deleted.`,
-          id: `sidebarElectron.removeProject.dialog.description.remote`,
+          id: `sidebarElectron.removeProject.dialog.description.remote`
         },
         {
           defaultMessage: `Remove {projectLabel}?`,
-          id: `sidebarElectron.removeProject.dialog.title`,
+          id: `sidebarElectron.removeProject.dialog.title`
         },
         {
           defaultMessage: `Failed to remove {projectLabel}`,
-          id: `sidebarElectron.removeProject.error`,
+          id: `sidebarElectron.removeProject.error`
         },
-        { defaultMessage: `Removing…`, id: `sidebarElectron.removeProject.removing` },
+        { defaultMessage: `Removing…`, id: `sidebarElectron.removeProject.removing` }
       ],
       "mcp-settings": [
         { defaultMessage: `Key`, id: `settings.editRow.headerPlaceholder` },
@@ -8113,7 +8121,7 @@ function n() {
         { defaultMessage: `MCP app data cleared`, id: `settings.mcp.apps.clearData.success` },
         {
           defaultMessage: `Clear site data and cache from all MCP apps`,
-          id: `settings.mcp.apps.data.description`,
+          id: `settings.mcp.apps.data.description`
         },
         { defaultMessage: `App data`, id: `settings.mcp.apps.data.label` },
         { defaultMessage: `MCP Apps`, id: `settings.mcp.apps.title` },
@@ -8128,7 +8136,7 @@ function n() {
         { defaultMessage: `Docs`, id: `settings.mcp.detail.docs.link` },
         {
           defaultMessage: `Environment variable passthrough`,
-          id: `settings.mcp.detail.envVarPassthrough`,
+          id: `settings.mcp.detail.envVarPassthrough`
         },
         { defaultMessage: `Environment variables`, id: `settings.mcp.detail.envVars` },
         { defaultMessage: `Add variable`, id: `settings.mcp.detail.http.addEnvHeader` },
@@ -8136,7 +8144,7 @@ function n() {
         { defaultMessage: `Bearer token env var`, id: `settings.mcp.detail.http.bearerToken` },
         {
           defaultMessage: `Headers from environment variables`,
-          id: `settings.mcp.detail.http.envHeaders`,
+          id: `settings.mcp.detail.http.envHeaders`
         },
         { defaultMessage: `Headers`, id: `settings.mcp.detail.http.headers` },
         { defaultMessage: `URL`, id: `settings.mcp.detail.http.url` },
@@ -8145,7 +8153,7 @@ function n() {
         { defaultMessage: `Could not save MCP server`, id: `settings.mcp.detail.saveError` },
         {
           defaultMessage: `If you would like to switch MCP server type, please uninstall first.`,
-          id: `settings.mcp.detail.switchTransportNotice`,
+          id: `settings.mcp.detail.switchTransportNotice`
         },
         { defaultMessage: `Update {name} MCP`, id: `settings.mcp.detail.titleExisting` },
         { defaultMessage: `Connect to a custom MCP`, id: `settings.mcp.detail.titleNew` },
@@ -8156,14 +8164,14 @@ function n() {
         { defaultMessage: `Uninstall`, id: `settings.mcp.detail.uninstall` },
         {
           defaultMessage: `Could not uninstall MCP server`,
-          id: `settings.mcp.detail.uninstallError`,
+          id: `settings.mcp.detail.uninstallError`
         },
         { defaultMessage: `No MCP servers connected`, id: `settings.mcp.empty` },
         { defaultMessage: `From plugins`, id: `settings.mcp.fromPlugins` },
         { defaultMessage: `Servers`, id: `settings.mcp.myServers` },
         {
           defaultMessage: `MCP server settings are unavailable`,
-          id: `settings.mcp.noWritableConfig`,
+          id: `settings.mcp.noWritableConfig`
         },
         { defaultMessage: `Restart`, id: `settings.mcp.restartApp` },
         { defaultMessage: `Restart extension`, id: `settings.mcp.restartExtension` },
@@ -8172,29 +8180,29 @@ function n() {
         { defaultMessage: `Auto`, id: `settings.mcp.server.clientRegistration.autoShort` },
         {
           defaultMessage: `Client ID metadata document (CIMD)`,
-          id: `settings.mcp.server.clientRegistration.cimd`,
+          id: `settings.mcp.server.clientRegistration.cimd`
         },
         { defaultMessage: `CIMD`, id: `settings.mcp.server.clientRegistration.cimdShort` },
         {
           defaultMessage: `Dynamic client registration (DCR)`,
-          id: `settings.mcp.server.clientRegistration.dcr`,
+          id: `settings.mcp.server.clientRegistration.dcr`
         },
         { defaultMessage: `DCR`, id: `settings.mcp.server.clientRegistration.dcrShort` },
         {
           defaultMessage: `OAuth client registration: {strategy, select, auto {Automatic} cimd {CIMD} dcr {DCR} other {Automatic}}`,
-          id: `settings.mcp.server.clientRegistration.label`,
+          id: `settings.mcp.server.clientRegistration.label`
         },
         { defaultMessage: `Enable`, id: `settings.mcp.server.enable` },
         { defaultMessage: `Authenticate`, id: `settings.mcp.server.login` },
         { defaultMessage: `Settings`, id: `settings.mcp.server.settings` },
         {
           defaultMessage: `Connect external tools and data sources`,
-          id: `settings.section.mcp-settings.subtitle`,
+          id: `settings.section.mcp-settings.subtitle`
         },
-        { defaultMessage: `No MCP servers found`, id: `skills.appsPage.empty.mcps` },
+        { defaultMessage: `No MCP servers found`, id: `skills.appsPage.empty.mcps` }
       ],
       notifications: [
-        { defaultMessage: `ChatGPT`, id: `settings.notifications.chatGptGroupTitle` },
+        { defaultMessage: `ChatGPT`, id: `settings.notifications.chatGptGroupTitle` }
       ],
       "parental-controls": [
         { defaultMessage: `Cancel`, id: `amphora.members.cancelButton` },
@@ -8202,45 +8210,45 @@ function n() {
         { defaultMessage: `Invitation sent`, id: `amphora.members.status.invitationSent` },
         {
           defaultMessage: `Your parent or guardian can adjust these settings to help guide how you use ChatGPT and Sora.`,
-          id: `amphora.memberSettings.childInformationalBanner`,
+          id: `amphora.memberSettings.childInformationalBanner`
         },
         {
           defaultMessage: `You can link one parent at a time`,
-          id: `amphora.relationship.helpCenterParagraph2`,
+          id: `amphora.relationship.helpCenterParagraph2`
         },
         { defaultMessage: `Safety notifications`, id: `amphora.settings.safetyNotifications` },
         {
           defaultMessage: `Manage notifications`,
-          id: `amphora.settings.safetyNotificationsButton`,
+          id: `amphora.settings.safetyNotificationsButton`
         },
         {
           defaultMessage: `We care about your teen's safety. If we detect certain serious safety concerns, we will notify you—though no system is perfect. You can choose how you'd like to be contacted.`,
-          id: `amphora.settings.safetyNotificationsDescription`,
+          id: `amphora.settings.safetyNotificationsDescription`
         },
         {
           defaultMessage: `Ends the next day`,
-          id: `chatgpt.parental_controls.quiet_hours.block.overnight.help_text`,
+          id: `chatgpt.parental_controls.quiet_hours.block.overnight.help_text`
         },
         { defaultMessage: `Saving…`, id: `chatgpt.parental_controls.quiet_hours.button.saving` },
         {
           defaultMessage: `Couldn't update this schedule. Try again.`,
-          id: `chatgpt.parental_controls.quiet_hours.error.save`,
+          id: `chatgpt.parental_controls.quiet_hours.error.save`
         },
         {
           defaultMessage: `Managed by your parent`,
-          id: `chatgpt.parental_controls.quiet_hours.status.managed_by_parent`,
+          id: `chatgpt.parental_controls.quiet_hours.status.managed_by_parent`
         },
         {
           defaultMessage: `Unsupported schedule`,
-          id: `chatgpt.parental_controls.quiet_hours.status.unsupported`,
+          id: `chatgpt.parental_controls.quiet_hours.status.unsupported`
         },
         {
           defaultMessage: `This schedule can't be edited here. Your existing settings have been preserved.`,
-          id: `chatgpt.parental_controls.quiet_hours.unsupported.help_text`,
+          id: `chatgpt.parental_controls.quiet_hours.unsupported.help_text`
         },
         {
           defaultMessage: `Schedule block {number}`,
-          id: `chatgpt.recurring_schedule.block.accessibility.label`,
+          id: `chatgpt.recurring_schedule.block.accessibility.label`
         },
         { defaultMessage: `Add a new block`, id: `chatgpt.recurring_schedule.block.button.add` },
         { defaultMessage: `Delete block`, id: `chatgpt.recurring_schedule.block.button.delete` },
@@ -8253,16 +8261,16 @@ function n() {
         { defaultMessage: `Done`, id: `settings.chatGpt.parentalControls.done` },
         {
           defaultMessage: `{role, select, parent {Parent} teen {Teen} child {Child} other {Family member}}`,
-          id: `settings.chatGpt.parentalControls.familyRole`,
+          id: `settings.chatGpt.parentalControls.familyRole`
         },
         {
           defaultMessage: `This family member is no longer available`,
-          id: `settings.chatGpt.parentalControls.memberUnavailable`,
+          id: `settings.chatGpt.parentalControls.memberUnavailable`
         },
         { defaultMessage: `Not scheduled`, id: `settings.chatGpt.parentalControls.notScheduled` },
         {
           defaultMessage: `Parental controls are available in your personal ChatGPT account`,
-          id: `settings.chatGpt.parentalControls.personalAccountRequired`,
+          id: `settings.chatGpt.parentalControls.personalAccountRequired`
         },
         { defaultMessage: `Save`, id: `settings.chatGpt.parentalControls.save` },
         { defaultMessage: `Add child`, id: `settingsModal.addChildCTA` },
@@ -8271,276 +8279,276 @@ function n() {
         { defaultMessage: `Family members`, id: `settingsModal.amphoraMembersTitle` },
         {
           defaultMessage: `Parents and teens can link accounts, giving parents tools to adjust certain features, set limits, and add safeguards that work for their family. <link>Learn more</link>`,
-          id: `settingsModal.inviteAmphoraMembersParagraph3`,
+          id: `settingsModal.inviteAmphoraMembersParagraph3`
         },
         { defaultMessage: `Invite`, id: `settingsModal.inviteButton` },
         {
           defaultMessage: `You have a pending family invite`,
-          id: `settingsModal.pendingAmphoraInvite`,
-        },
+          id: `settingsModal.pendingAmphoraInvite`
+        }
       ],
       personalization: [
         {
           defaultMessage: `Choose a clear, full-body photo of yourself. ChatGPT will use it when you virtually try on clothing and accessories`,
-          id: `chatgpt.settings.personalization.virtual_try_on.full_body_photo.modal.description`,
+          id: `chatgpt.settings.personalization.virtual_try_on.full_body_photo.modal.description`
         },
         {
           defaultMessage: `Used to show how clothing and accessories look on you`,
-          id: `chatgpt.settings.personalization.virtual_try_on.full_body_photo.row.description`,
+          id: `chatgpt.settings.personalization.virtual_try_on.full_body_photo.row.description`
         },
         {
           defaultMessage: `Full-body reference photo`,
-          id: `chatgpt.settings.personalization.virtual_try_on.full_body_photo.row.label`,
+          id: `chatgpt.settings.personalization.virtual_try_on.full_body_photo.row.label`
         },
         {
           defaultMessage: `Reference photos`,
-          id: `chatgpt.settings.personalization.virtual_try_on.reference_photos.section.title`,
+          id: `chatgpt.settings.personalization.virtual_try_on.reference_photos.section.title`
         },
         { defaultMessage: `About you`, id: `settings.chatGpt.personalization.aboutYou` },
         {
           defaultMessage: `Additional ChatGPT settings`,
-          id: `settings.chatGpt.personalization.additionalSettings`,
+          id: `settings.chatGpt.personalization.additionalSettings`
         },
         { defaultMessage: `Code`, id: `settings.chatGpt.personalization.advanced.code` },
         {
           defaultMessage: `Let ChatGPT execute code using Code Interpreter`,
-          id: `settings.chatGpt.personalization.advanced.code.description`,
+          id: `settings.chatGpt.personalization.advanced.code.description`
         },
         {
           defaultMessage: `Connector search`,
-          id: `settings.chatGpt.personalization.advanced.connectors`,
+          id: `settings.chatGpt.personalization.advanced.connectors`
         },
         {
           defaultMessage: `Connector search`,
-          id: `settings.chatGpt.personalization.advanced.connectors.ariaLabel`,
+          id: `settings.chatGpt.personalization.advanced.connectors.ariaLabel`
         },
         {
           defaultMessage: `Let ChatGPT automatically search connected sources for answers`,
-          id: `settings.chatGpt.personalization.advanced.connectors.description`,
+          id: `settings.chatGpt.personalization.advanced.connectors.description`
         },
         {
           defaultMessage: `Library search`,
-          id: `settings.chatGpt.personalization.advanced.library`,
+          id: `settings.chatGpt.personalization.advanced.library`
         },
         {
           defaultMessage: `Library search`,
-          id: `settings.chatGpt.personalization.advanced.library.ariaLabel`,
+          id: `settings.chatGpt.personalization.advanced.library.ariaLabel`
         },
         {
           defaultMessage: `Allow ChatGPT to automatically search Library files for answers`,
-          id: `settings.chatGpt.personalization.advanced.library.description`,
+          id: `settings.chatGpt.personalization.advanced.library.description`
         },
         { defaultMessage: `ChatGPT Voice`, id: `settings.chatGpt.personalization.advanced.voice` },
         {
           defaultMessage: `ChatGPT Voice`,
-          id: `settings.chatGpt.personalization.advanced.voice.aria`,
+          id: `settings.chatGpt.personalization.advanced.voice.aria`
         },
         {
           defaultMessage: `Enable Voice in ChatGPT`,
-          id: `settings.chatGpt.personalization.advanced.voice.description`,
+          id: `settings.chatGpt.personalization.advanced.voice.description`
         },
         { defaultMessage: `Web search`, id: `settings.chatGpt.personalization.advanced.web` },
         {
           defaultMessage: `Let ChatGPT automatically search the web for answers`,
-          id: `settings.chatGpt.personalization.advanced.web.description`,
+          id: `settings.chatGpt.personalization.advanced.web.description`
         },
         { defaultMessage: `Base style and tone`, id: `settings.chatGpt.personalization.baseStyle` },
         {
           defaultMessage: `Set the style and tone of how ChatGPT responds to you. This doesn’t impact ChatGPT’s capabilities.`,
-          id: `settings.chatGpt.personalization.baseStyle.description`,
+          id: `settings.chatGpt.personalization.baseStyle.description`
         },
         { defaultMessage: `Cancel`, id: `settings.chatGpt.personalization.cancel` },
         {
           defaultMessage: `ChatGPT characteristics`,
-          id: `settings.chatGpt.personalization.characteristics`,
+          id: `settings.chatGpt.personalization.characteristics`
         },
         {
           defaultMessage: `ChatGPT instructions`,
-          id: `settings.chatGpt.personalization.customInstructions`,
+          id: `settings.chatGpt.personalization.customInstructions`
         },
         {
           defaultMessage: `Additional behavior, style, and tone preferences`,
-          id: `settings.chatGpt.personalization.customInstructions.placeholder`,
+          id: `settings.chatGpt.personalization.customInstructions.placeholder`
         },
         { defaultMessage: `Default`, id: `settings.chatGpt.personalization.defaultStyle` },
         { defaultMessage: `Fast answers`, id: `settings.chatGpt.personalization.fastAnswers` },
         {
           defaultMessage: `Enable fast answers`,
-          id: `settings.chatGpt.personalization.fastAnswers.ariaLabel`,
+          id: `settings.chatGpt.personalization.fastAnswers.ariaLabel`
         },
         {
           defaultMessage: `ChatGPT can sometimes use its general knowledge to give fast, in-depth answers. These aren’t personalized and don’t use your memory.`,
-          id: `settings.chatGpt.personalization.fastAnswers.description`,
+          id: `settings.chatGpt.personalization.fastAnswers.description`
         },
         {
           defaultMessage: `Give ChatGPT extra instructions and context for all chats. <learn>Learn more</learn>`,
-          id: `settings.chatGpt.personalization.instructions.description`,
+          id: `settings.chatGpt.personalization.instructions.description`
         },
         {
           defaultMessage: `Keep this field under {limit, number} characters`,
-          id: `settings.chatGpt.personalization.lengthError`,
+          id: `settings.chatGpt.personalization.lengthError`
         },
         {
           defaultMessage: `Couldn’t load personalization. Retry`,
-          id: `settings.chatGpt.personalization.load.retry`,
+          id: `settings.chatGpt.personalization.load.retry`
         },
         { defaultMessage: `Upgrade`, id: `settings.chatGpt.personalization.memories.upgrade` },
         {
           defaultMessage: `Couldn’t verify memory availability for this account`,
-          id: `settings.chatGpt.personalization.memory.accountUnavailable.description`,
+          id: `settings.chatGpt.personalization.memory.accountUnavailable.description`
         },
         {
           defaultMessage: `{full, select, true {New memories can’t be saved, so responses may feel less personalized.} other {Responses may feel less personalized soon.}} For more memory, <upgrade>upgrade to Plus</upgrade>`,
-          id: `settings.chatGpt.personalization.memory.capacityUpgrade`,
+          id: `settings.chatGpt.personalization.memory.capacityUpgrade`
         },
         {
           defaultMessage: `Configure how ChatGPT manages memory. <learn>Learn more</learn>`,
-          id: `settings.chatGpt.personalization.memory.description`,
+          id: `settings.chatGpt.personalization.memory.description`
         },
         { defaultMessage: `ChatGPT memory`, id: `settings.chatGpt.personalization.memory.desktop` },
         { defaultMessage: `Enable memory`, id: `settings.chatGpt.personalization.memory.enabled` },
         {
           defaultMessage: `Enable ChatGPT memory`,
-          id: `settings.chatGpt.personalization.memory.enabled.ariaLabel`,
+          id: `settings.chatGpt.personalization.memory.enabled.ariaLabel`
         },
         {
           defaultMessage: `Let ChatGPT personalize your experience based on your chats, files, and connected apps. <learn>Learn more</learn>`,
-          id: `settings.chatGpt.personalization.memory.enabled.description.learnMore`,
+          id: `settings.chatGpt.personalization.memory.enabled.description.learnMore`
         },
         {
           defaultMessage: `Reference chat history`,
-          id: `settings.chatGpt.personalization.memory.history.enabled`,
+          id: `settings.chatGpt.personalization.memory.history.enabled`
         },
         {
           defaultMessage: `Let ChatGPT reference all previous conversations when responding`,
-          id: `settings.chatGpt.personalization.memory.history.enabled.all.description`,
+          id: `settings.chatGpt.personalization.memory.history.enabled.all.description`
         },
         {
           defaultMessage: `Reference chat history`,
-          id: `settings.chatGpt.personalization.memory.history.enabled.ariaLabel`,
+          id: `settings.chatGpt.personalization.memory.history.enabled.ariaLabel`
         },
         {
           defaultMessage: `Let ChatGPT reference recent conversations when responding`,
-          id: `settings.chatGpt.personalization.memory.history.enabled.recent.description`,
+          id: `settings.chatGpt.personalization.memory.history.enabled.recent.description`
         },
         { defaultMessage: `Manage`, id: `settings.chatGpt.personalization.memory.manage` },
         {
           defaultMessage: `Reference saved memories`,
-          id: `settings.chatGpt.personalization.memory.saved.enabled`,
+          id: `settings.chatGpt.personalization.memory.saved.enabled`
         },
         {
           defaultMessage: `Reference saved memories`,
-          id: `settings.chatGpt.personalization.memory.saved.enabled.ariaLabel`,
+          id: `settings.chatGpt.personalization.memory.saved.enabled.ariaLabel`
         },
         {
           defaultMessage: `Let ChatGPT save and use memories when responding`,
-          id: `settings.chatGpt.personalization.memory.saved.enabled.description`,
+          id: `settings.chatGpt.personalization.memory.saved.enabled.description`
         },
         {
           defaultMessage: `Saved memories`,
-          id: `settings.chatGpt.personalization.memory.saved.manage`,
+          id: `settings.chatGpt.personalization.memory.saved.manage`
         },
         {
           defaultMessage: `View and manage details ChatGPT remembers about you`,
-          id: `settings.chatGpt.personalization.memory.saved.manage.description`,
+          id: `settings.chatGpt.personalization.memory.saved.manage.description`
         },
         {
           defaultMessage: `Manage saved memories`,
-          id: `settings.chatGpt.personalization.memory.saved.manageButton`,
+          id: `settings.chatGpt.personalization.memory.saved.manageButton`
         },
         {
           defaultMessage: `ChatGPT may use Memory to personalize queries to search providers, such as Bing. <learn>Learn more</learn>`,
-          id: `settings.chatGpt.personalization.memory.search.explanation`,
+          id: `settings.chatGpt.personalization.memory.search.explanation`
         },
         { defaultMessage: `Memory summary`, id: `settings.chatGpt.personalization.memory.summary` },
         {
           defaultMessage: `View an overview of what ChatGPT has learned about you. Use <customInstructions>custom instructions</customInstructions> for information you’d like it to always keep in mind. You can still manage your old <memories>saved memories</memories>.`,
-          id: `settings.chatGpt.personalization.memory.summary.description.instructionsAndMemories`,
+          id: `settings.chatGpt.personalization.memory.summary.description.instructionsAndMemories`
         },
         {
           defaultMessage: `Memory controls unavailable`,
-          id: `settings.chatGpt.personalization.memory.unavailable`,
+          id: `settings.chatGpt.personalization.memory.unavailable`
         },
         {
           defaultMessage: `Couldn’t load your memory settings. Try again`,
-          id: `settings.chatGpt.personalization.memory.unavailable.description`,
+          id: `settings.chatGpt.personalization.memory.unavailable.description`
         },
         {
           defaultMessage: `Retry`,
-          id: `settings.chatGpt.personalization.memory.unavailable.retry`,
+          id: `settings.chatGpt.personalization.memory.unavailable.retry`
         },
         {
           defaultMessage: `Memory is disabled for this workspace`,
-          id: `settings.chatGpt.personalization.memory.workspaceDisabled`,
+          id: `settings.chatGpt.personalization.memory.workspaceDisabled`
         },
         {
           defaultMessage: `These instructions may violate our content policies. Please revise them and try again`,
-          id: `settings.chatGpt.personalization.moderationError`,
+          id: `settings.chatGpt.personalization.moderationError`
         },
         {
           defaultMessage: `More about you`,
-          id: `settings.chatGpt.personalization.moreAboutYou.label`,
+          id: `settings.chatGpt.personalization.moreAboutYou.label`
         },
         {
           defaultMessage: `Interests, values, or preferences to keep in mind`,
-          id: `settings.chatGpt.personalization.moreAboutYou.placeholder`,
+          id: `settings.chatGpt.personalization.moreAboutYou.placeholder`
         },
         { defaultMessage: `Nickname`, id: `settings.chatGpt.personalization.nickname` },
         {
           defaultMessage: `What should ChatGPT call you?`,
-          id: `settings.chatGpt.personalization.nickname.placeholder`,
+          id: `settings.chatGpt.personalization.nickname.placeholder`
         },
         { defaultMessage: `Occupation`, id: `settings.chatGpt.personalization.occupation` },
         {
           defaultMessage: `What do you do?`,
-          id: `settings.chatGpt.personalization.occupation.placeholder`,
+          id: `settings.chatGpt.personalization.occupation.placeholder`
         },
         {
           defaultMessage: `Couldn’t update this preference. Please try again`,
-          id: `settings.chatGpt.personalization.preference.error`,
+          id: `settings.chatGpt.personalization.preference.error`
         },
         {
           defaultMessage: `Reference record history`,
-          id: `settings.chatGpt.personalization.recordMode.reference`,
+          id: `settings.chatGpt.personalization.recordMode.reference`
         },
         {
           defaultMessage: `Reference record history`,
-          id: `settings.chatGpt.personalization.recordMode.reference.ariaLabel`,
+          id: `settings.chatGpt.personalization.recordMode.reference.ariaLabel`
         },
         {
           defaultMessage: `Let ChatGPT reference all previous recording transcripts and notes when responding. <learn>Learn more</learn>`,
-          id: `settings.chatGpt.personalization.recordMode.reference.description`,
+          id: `settings.chatGpt.personalization.recordMode.reference.description`
         },
         { defaultMessage: `Clear role`, id: `settings.chatGpt.personalization.role.clear` },
         { defaultMessage: `Role`, id: `settings.chatGpt.personalization.role.label` },
         {
           defaultMessage: `Couldn't load your role`,
-          id: `settings.chatGpt.personalization.role.load_error`,
+          id: `settings.chatGpt.personalization.role.load_error`
         },
         { defaultMessage: `Loading…`, id: `settings.chatGpt.personalization.role.loading` },
         { defaultMessage: `Select role`, id: `settings.chatGpt.personalization.role.placeholder` },
         { defaultMessage: `Try again`, id: `settings.chatGpt.personalization.role.retry` },
         {
           defaultMessage: `Couldn't save your role. Please try again`,
-          id: `settings.chatGpt.personalization.role.save_error`,
+          id: `settings.chatGpt.personalization.role.save_error`
         },
         { defaultMessage: `Save`, id: `settings.chatGpt.personalization.save` },
         { defaultMessage: `Personalization updated`, id: `settings.chatGpt.personalization.saved` },
         {
           defaultMessage: `Could not update personalization`,
-          id: `settings.chatGpt.personalization.saveError`,
+          id: `settings.chatGpt.personalization.saveError`
         },
         {
           defaultMessage: `Suggested prompts`,
-          id: `settings.chatGpt.personalization.suggestedPrompts`,
+          id: `settings.chatGpt.personalization.suggestedPrompts`
         },
         {
           defaultMessage: `Enable suggested prompts`,
-          id: `settings.chatGpt.personalization.suggestedPrompts.ariaLabel`,
+          id: `settings.chatGpt.personalization.suggestedPrompts.ariaLabel`
         },
         {
           defaultMessage: `ChatGPT can generate suggestions based on searching connected plugins`,
-          id: `settings.chatGpt.personalization.suggestedPrompts.description`,
+          id: `settings.chatGpt.personalization.suggestedPrompts.description`
         },
         { defaultMessage: `Add`, id: `settings.chatGpt.referencePhotos.add` },
         { defaultMessage: `Cancel`, id: `settings.chatGpt.referencePhotos.cancel` },
@@ -8548,60 +8556,60 @@ function n() {
         { defaultMessage: `Reference photo`, id: `settings.chatGpt.referencePhotos.face` },
         {
           defaultMessage: `This is the photo that ChatGPT refers to when you create an image of yourself`,
-          id: `settings.chatGpt.referencePhotos.face.description`,
+          id: `settings.chatGpt.referencePhotos.face.description`
         },
         {
           defaultMessage: `Choose a clear, front-facing photo of yourself. We'll use it to create images of you when you ask for them`,
-          id: `settings.chatGpt.referencePhotos.face.guidance`,
+          id: `settings.chatGpt.referencePhotos.face.guidance`
         },
         {
           defaultMessage: `Your reference photo`,
-          id: `settings.chatGpt.referencePhotos.face.title`,
+          id: `settings.chatGpt.referencePhotos.face.title`
         },
         {
           defaultMessage: `Couldn't load your reference photos`,
-          id: `settings.chatGpt.referencePhotos.loadError`,
+          id: `settings.chatGpt.referencePhotos.loadError`
         },
         { defaultMessage: `Your reference photo`, id: `settings.chatGpt.referencePhotos.preview` },
         { defaultMessage: `Remove photo`, id: `settings.chatGpt.referencePhotos.remove` },
         {
           defaultMessage: `ChatGPT won't use this photo to create images of you unless you add a new one`,
-          id: `settings.chatGpt.referencePhotos.removeDescription`,
+          id: `settings.chatGpt.referencePhotos.removeDescription`
         },
         {
           defaultMessage: `Couldn't remove your reference photo. Please try again`,
-          id: `settings.chatGpt.referencePhotos.removeError`,
+          id: `settings.chatGpt.referencePhotos.removeError`
         },
         {
           defaultMessage: `Remove reference photo?`,
-          id: `settings.chatGpt.referencePhotos.removeTitle`,
+          id: `settings.chatGpt.referencePhotos.removeTitle`
         },
         { defaultMessage: `Retry`, id: `settings.chatGpt.referencePhotos.retry` },
         { defaultMessage: `Retry preview`, id: `settings.chatGpt.referencePhotos.retryPreview` },
         {
           defaultMessage: `Couldn't upload your reference photo. Please try again`,
-          id: `settings.chatGpt.referencePhotos.uploadError`,
+          id: `settings.chatGpt.referencePhotos.uploadError`
         },
         { defaultMessage: `Could not update this setting`, id: `settings.chatGpt.updateError` },
         {
           defaultMessage: `Allow memories from tool-assisted chats`,
-          id: `settings.memory.allowMemoryGenerationFromToolAssistedTasksAriaLabel.host`,
+          id: `settings.memory.allowMemoryGenerationFromToolAssistedTasksAriaLabel.host`
         },
         {
           defaultMessage: `Generate memories from chats that used MCP tools or web search`,
-          id: `settings.memory.allowMemoryGenerationFromToolAssistedTasksDescription`,
+          id: `settings.memory.allowMemoryGenerationFromToolAssistedTasksDescription`
         },
         {
           defaultMessage: `Allow memories from tool-assisted chats`,
-          id: `settings.memory.allowMemoryGenerationFromToolAssistedTasksLabel.host`,
+          id: `settings.memory.allowMemoryGenerationFromToolAssistedTasksLabel.host`
         },
         {
           defaultMessage: `Enable Codex memories`,
-          id: `settings.memory.enableMemoriesAriaLabel.host`,
+          id: `settings.memory.enableMemoriesAriaLabel.host`
         },
         {
           defaultMessage: `Create memories from chats on {hostName} and use them to personalize future chats on {hostName}`,
-          id: `settings.memory.enableMemoriesDescription.host`,
+          id: `settings.memory.enableMemoriesDescription.host`
         },
         { defaultMessage: `Enable Codex memories`, id: `settings.memory.enableMemoriesLabel.host` },
         { defaultMessage: `Unable to load Codex memory settings`, id: `settings.memory.loadError` },
@@ -8609,198 +8617,198 @@ function n() {
         { defaultMessage: `Delete`, id: `settings.memory.resetDialogConfirm` },
         {
           defaultMessage: `This deletes all Codex memories for {hostName}`,
-          id: `settings.memory.resetDialogSubtitle.host`,
+          id: `settings.memory.resetDialogSubtitle.host`
         },
         {
           defaultMessage: `Delete all Codex memories?`,
-          id: `settings.memory.resetDialogTitle.host`,
+          id: `settings.memory.resetDialogTitle.host`
         },
         {
           defaultMessage: `Unable to delete Codex memories`,
-          id: `settings.memory.resetError.host`,
+          id: `settings.memory.resetError.host`
         },
         { defaultMessage: `Delete`, id: `settings.memory.resetMemoriesButton` },
         {
           defaultMessage: `Delete all Codex memories for {hostName}`,
-          id: `settings.memory.resetMemoriesDescription.host`,
+          id: `settings.memory.resetMemoriesDescription.host`
         },
         { defaultMessage: `Delete Codex memories`, id: `settings.memory.resetMemoriesLabel.host` },
         { defaultMessage: `Codex memories deleted`, id: `settings.memory.resetSuccess.host` },
         { defaultMessage: `Retry`, id: `settings.memory.retry` },
         {
           defaultMessage: `Codex memory isn't available on this computer`,
-          id: `settings.memory.unavailable`,
+          id: `settings.memory.unavailable`
         },
         { defaultMessage: `Cancel`, id: `settings.personalization.aboutYou.cancel` },
         {
           defaultMessage: `Turn on customization in ChatGPT to edit About you`,
-          id: `settings.personalization.aboutYou.disabled`,
+          id: `settings.personalization.aboutYou.disabled`
         },
         {
           defaultMessage: `Unable to load About you`,
-          id: `settings.personalization.aboutYou.loadError`,
+          id: `settings.personalization.aboutYou.loadError`
         },
         { defaultMessage: `Loading About you…`, id: `settings.personalization.aboutYou.loading` },
         {
           defaultMessage: `This content may violate our usage policies. Please try different wording.`,
-          id: `settings.personalization.aboutYou.moderated`,
+          id: `settings.personalization.aboutYou.moderated`
         },
         { defaultMessage: `More about you`, id: `settings.personalization.aboutYou.more` },
         {
           defaultMessage: `Interests, values, or preferences to keep in mind`,
-          id: `settings.personalization.aboutYou.morePlaceholder`,
+          id: `settings.personalization.aboutYou.morePlaceholder`
         },
         { defaultMessage: `Nickname`, id: `settings.personalization.aboutYou.nickname` },
         {
           defaultMessage: `What should ChatGPT call you?`,
-          id: `settings.personalization.aboutYou.nicknamePlaceholder`,
+          id: `settings.personalization.aboutYou.nicknamePlaceholder`
         },
         { defaultMessage: `Occupation`, id: `settings.personalization.aboutYou.occupation` },
         {
           defaultMessage: `What do you do?`,
-          id: `settings.personalization.aboutYou.occupationPlaceholder`,
+          id: `settings.personalization.aboutYou.occupationPlaceholder`
         },
         { defaultMessage: `Retry`, id: `settings.personalization.aboutYou.retry` },
         { defaultMessage: `Save`, id: `settings.personalization.aboutYou.save` },
         { defaultMessage: `About you updated`, id: `settings.personalization.aboutYou.saved` },
         {
           defaultMessage: `Unable to save About you`,
-          id: `settings.personalization.aboutYou.saveError`,
+          id: `settings.personalization.aboutYou.saveError`
         },
         { defaultMessage: `Save About you`, id: `settings.personalization.aboutYou.saveLabel` },
         { defaultMessage: `About you`, id: `settings.personalization.aboutYou.title` },
         {
           defaultMessage: `Please use {limit, number} characters or fewer`,
-          id: `settings.personalization.aboutYou.tooLong`,
+          id: `settings.personalization.aboutYou.tooLong`
         },
         {
           defaultMessage: `Give Codex extra instructions and context for all chats. Repository instructions may also apply. <a>Learn more</a>`,
-          id: `settings.personalization.agents.description`,
+          id: `settings.personalization.agents.description`
         },
         {
           defaultMessage: `Unable to load Codex instructions`,
-          id: `settings.personalization.agents.loadError.host`,
+          id: `settings.personalization.agents.loadError.host`
         },
         {
           defaultMessage: `Loading Codex instructions…`,
-          id: `settings.personalization.agents.loading.host`,
+          id: `settings.personalization.agents.loading.host`
         },
         {
           defaultMessage: `These instructions are overridden by AGENTS.override.md`,
-          id: `settings.personalization.agents.overrideNotice`,
+          id: `settings.personalization.agents.overrideNotice`
         },
         {
           defaultMessage: `Add your custom instructions…`,
-          id: `settings.personalization.agents.placeholder`,
+          id: `settings.personalization.agents.placeholder`
         },
         { defaultMessage: `Retry`, id: `settings.personalization.agents.retry` },
         { defaultMessage: `Save`, id: `settings.personalization.agents.save` },
         {
           defaultMessage: `Unable to save Codex instructions`,
-          id: `settings.personalization.agents.save.error.host`,
+          id: `settings.personalization.agents.save.error.host`
         },
         {
           defaultMessage: `Codex instructions saved`,
-          id: `settings.personalization.agents.save.success.host`,
+          id: `settings.personalization.agents.save.success.host`
         },
         { defaultMessage: `Codex instructions`, id: `settings.personalization.agents.title` },
         {
           defaultMessage: `Loading personalization settings…`,
-          id: `settings.personalization.loading`,
+          id: `settings.personalization.loading`
         },
         {
           defaultMessage: `Configure how Codex manages memory for {hostName}. <a>Learn more</a>`,
-          id: `settings.personalization.memory.subtitle.host`,
+          id: `settings.personalization.memory.subtitle.host`
         },
-        { defaultMessage: `Codex memory`, id: `settings.personalization.memory.title` },
+        { defaultMessage: `Codex memory`, id: `settings.personalization.memory.title` }
       ],
       pets: [
         {
           defaultMessage: `Hot path energy for fast iteration.`,
-          id: `settings-search.literal.0011b59d82f1`,
+          id: `settings-search.literal.0011b59d82f1`
         },
         {
           defaultMessage: `A calm companion for focused workspace days`,
-          id: `settings-search.literal.0de39fb68eaa`,
+          id: `settings-search.literal.0de39fb68eaa`
         },
         { defaultMessage: `Dewey`, id: `settings-search.literal.262d23cfd9bd` },
         {
           defaultMessage: `Small green shoots for new ideas.`,
-          id: `settings-search.literal.2e9784e6560e`,
+          id: `settings-search.literal.2e9784e6560e`
         },
         {
           defaultMessage: `A sharp-eyed owl for polished work in a blink.`,
-          id: `settings-search.literal.409d5de7813c`,
+          id: `settings-search.literal.409d5de7813c`
         },
         {
           defaultMessage: `A tiny blue-screen gremlin.`,
-          id: `settings-search.literal.6284d9777be4`,
+          id: `settings-search.literal.6284d9777be4`
         },
         { defaultMessage: `Null Signal`, id: `settings-search.literal.6cce6d2f6fc8` },
         {
           defaultMessage: `A balanced stack for deep work.`,
-          id: `settings-search.literal.84c5bdb6b311`,
+          id: `settings-search.literal.84c5bdb6b311`
         },
         { defaultMessage: `Stacky`, id: `settings-search.literal.85b7fd8c2347` },
         { defaultMessage: `Hoots`, id: `settings-search.literal.94eb9e33455b` },
         {
           defaultMessage: `The original Codex companion.`,
-          id: `settings-search.literal.ae63c80df06c`,
+          id: `settings-search.literal.ae63c80df06c`
         },
         { defaultMessage: `Seedy`, id: `settings-search.literal.b6758680d796` },
         { defaultMessage: `Codex`, id: `settings-search.literal.c1175be8f66c` },
         { defaultMessage: `BSOD`, id: `settings-search.literal.cd619a260fbd` },
         {
           defaultMessage: `A steady rock when the diff gets large.`,
-          id: `settings-search.literal.d2ff69ba8f83`,
+          id: `settings-search.literal.d2ff69ba8f83`
         },
         { defaultMessage: `Fireball`, id: `settings-search.literal.d340fee1bb37` },
         { defaultMessage: `Rocky`, id: `settings-search.literal.dde1cf768def` },
         {
           defaultMessage: `Quiet signal from the void.`,
-          id: `settings-search.literal.e24ceab1420b`,
+          id: `settings-search.literal.e24ceab1420b`
         },
         {
           defaultMessage: `Couldn’t complete this action. Please try again`,
-          id: `settings.chatGpt.personalization.pet.actionFailed`,
+          id: `settings.chatGpt.personalization.pet.actionFailed`
         },
         {
           defaultMessage: `Actions for {petName}`,
-          id: `settings.chatGpt.personalization.pet.actions`,
+          id: `settings.chatGpt.personalization.pet.actions`
         },
         { defaultMessage: `Copy share link`, id: `settings.chatGpt.personalization.pet.copy` },
         {
           defaultMessage: `Create a pet with ChatGPT`,
-          id: `settings.chatGpt.personalization.pet.create`,
+          id: `settings.chatGpt.personalization.pet.create`
         },
         {
           defaultMessage: `Describe what you want, and ChatGPT will make it for you`,
-          id: `settings.chatGpt.personalization.pet.create.description`,
+          id: `settings.chatGpt.personalization.pet.create.description`
         },
         { defaultMessage: `Delete`, id: `settings.chatGpt.personalization.pet.delete` },
         {
           defaultMessage: `Download sprite sheet`,
-          id: `settings.chatGpt.personalization.pet.download`,
+          id: `settings.chatGpt.personalization.pet.download`
         },
         {
           defaultMessage: `Edit in ChatGPT`,
-          id: `settings.chatGpt.personalization.pet.edit.chatgpt`,
+          id: `settings.chatGpt.personalization.pet.edit.chatgpt`
         },
         {
           defaultMessage: `Edit manually`,
-          id: `settings.chatGpt.personalization.pet.edit.manually`,
+          id: `settings.chatGpt.personalization.pet.edit.manually`
         },
         {
           defaultMessage: `Help me modify my pet {petName}.`,
-          id: `settings.chatGpt.personalization.pet.edit.prompt`,
+          id: `settings.chatGpt.personalization.pet.edit.prompt`
         },
         {
           defaultMessage: `Couldn’t load your custom pets`,
-          id: `settings.chatGpt.personalization.pet.loadError`,
+          id: `settings.chatGpt.personalization.pet.loadError`
         },
         {
           defaultMessage: `Loading custom pets…`,
-          id: `settings.chatGpt.personalization.pet.loading`,
+          id: `settings.chatGpt.personalization.pet.loading`
         },
         { defaultMessage: `Do not show pet`, id: `settings.chatGpt.personalization.pet.none` },
         { defaultMessage: `Pet options`, id: `settings.chatGpt.personalization.pet.options` },
@@ -8808,31 +8816,31 @@ function n() {
         { defaultMessage: `Retry`, id: `settings.chatGpt.personalization.pet.retry` },
         {
           defaultMessage: `A steady rock for when the inbox gets out of control`,
-          id: `settings.chatGpt.personalization.pet.rocky.description`,
+          id: `settings.chatGpt.personalization.pet.rocky.description`
         },
         {
           defaultMessage: `Couldn’t select your pet. Please try again`,
-          id: `settings.chatGpt.personalization.pet.selection.error`,
+          id: `settings.chatGpt.personalization.pet.selection.error`
         },
         { defaultMessage: `Share`, id: `settings.chatGpt.personalization.pet.share` },
         {
           defaultMessage: `This pet’s artwork is unavailable`,
-          id: `settings.chatGpt.personalization.pet.unavailable`,
+          id: `settings.chatGpt.personalization.pet.unavailable`
         },
         { defaultMessage: `Unshare`, id: `settings.chatGpt.personalization.pet.unshare` },
         { defaultMessage: `Upload pet`, id: `settings.chatGpt.personalization.pet.upload` },
         {
           defaultMessage: `Pets give you quick access to ChatGPT`,
-          id: `settings.mini.descriptionWithoutShortcut`,
+          id: `settings.mini.descriptionWithoutShortcut`
         },
         {
           defaultMessage: `Pets give you quick access to ChatGPT. Show and focus your pet by pressing {shortcut}`,
-          id: `settings.mini.descriptionWithShortcut`,
+          id: `settings.mini.descriptionWithShortcut`
         },
         { defaultMessage: `Hide pet`, id: `settings.mini.hide` },
         {
           defaultMessage: `The lightweight codex companion`,
-          id: `settings.mini.pets.barOnly.description`,
+          id: `settings.mini.pets.barOnly.description`
         },
         { defaultMessage: `Mini`, id: `settings.mini.pets.barOnly.title` },
         { defaultMessage: `Create pet`, id: `settings.mini.pets.create.accessibleLabel` },
@@ -8856,7 +8864,7 @@ function n() {
         { defaultMessage: `Loading custom pets…`, id: `settings.pets.loadingCustom` },
         {
           defaultMessage: `Pets manage threads and surface what needs attention`,
-          id: `settings.pets.pickPet.description`,
+          id: `settings.pets.pickPet.description`
         },
         { defaultMessage: `Pick a pet`, id: `settings.pets.pickPet.title` },
         { defaultMessage: `Customize`, id: `settings.pets.preview.customize` },
@@ -8864,7 +8872,7 @@ function n() {
         { defaultMessage: `Refresh`, id: `settings.pets.refresh` },
         { defaultMessage: `Pet size`, id: `settings.pets.size` },
         { defaultMessage: `Adjust the size of your pet`, id: `settings.pets.size.description` },
-        { defaultMessage: `Reset`, id: `settings.pets.size.reset` },
+        { defaultMessage: `Reset`, id: `settings.pets.size.reset` }
       ],
       "plugins-settings": [
         { defaultMessage: `Close`, id: `common.close` },
@@ -8875,7 +8883,7 @@ function n() {
         { defaultMessage: `Disabled by admin`, id: `plugins.card.disabledByAdmin` },
         {
           defaultMessage: `Access is turned off by your admin`,
-          id: `plugins.card.disabledInstallTooltip`,
+          id: `plugins.card.disabledInstallTooltip`
         },
         { defaultMessage: `Plugin disabled`, id: `plugins.card.disabledStatus` },
         { defaultMessage: `Disable`, id: `plugins.card.disableMenuItem` },
@@ -8894,16 +8902,16 @@ function n() {
         { defaultMessage: `Try now`, id: `plugins.card.tryItNowMenuItem` },
         {
           defaultMessage: `Unavailable in this context`,
-          id: `plugins.card.unavailableInCurrentContext`,
+          id: `plugins.card.unavailableInCurrentContext`
         },
         { defaultMessage: `Uninstall`, id: `plugins.card.uninstallMenuItem` },
         {
           defaultMessage: `You do not have permission to add plugins. Contact your admin to enable Plugin Creator or plugin uploads`,
-          id: `plugins.create.addDisabledByAdmin`,
+          id: `plugins.create.addDisabledByAdmin`
         },
         {
           defaultMessage: `You do not have permission to create a plugin via conversation. Contact your admin to enable Plugin Creator`,
-          id: `plugins.create.creatorDisabledByAdmin`,
+          id: `plugins.create.creatorDisabledByAdmin`
         },
         { defaultMessage: `Create MCP App`, id: `plugins.create.mcpApp` },
         { defaultMessage: `Upload plugin archive`, id: `plugins.create.uploadArchiveAction` },
@@ -8911,63 +8919,63 @@ function n() {
         { defaultMessage: `Actions for {accountName}`, id: `plugins.detail.accounts.actions` },
         {
           defaultMessage: `{appName} account`,
-          id: `plugins.detail.accounts.appAccountIdentityFallback`,
+          id: `plugins.detail.accounts.appAccountIdentityFallback`
         },
         { defaultMessage: `Cancel`, id: `plugins.detail.accounts.cancel` },
         { defaultMessage: `Connect another account`, id: `plugins.detail.accounts.connectAnother` },
         { defaultMessage: `Disconnect`, id: `plugins.detail.accounts.disconnect` },
         {
           defaultMessage: `Couldn't disconnect account`,
-          id: `plugins.detail.accounts.disconnectError`,
+          id: `plugins.detail.accounts.disconnectError`
         },
         { defaultMessage: `Account disconnected`, id: `plugins.detail.accounts.disconnectSuccess` },
         {
           defaultMessage: `{userName}'s account`,
-          id: `plugins.detail.accounts.holderAccountIdentityFallback`,
+          id: `plugins.detail.accounts.holderAccountIdentityFallback`
         },
         { defaultMessage: `Loading connected accounts…`, id: `plugins.detail.accounts.loading` },
         {
           defaultMessage: `Couldn't load connected accounts`,
-          id: `plugins.detail.accounts.loadingError`,
+          id: `plugins.detail.accounts.loadingError`
         },
         { defaultMessage: `Nickname`, id: `plugins.detail.accounts.nickname` },
         { defaultMessage: `Add a nickname`, id: `plugins.detail.accounts.nicknamePlaceholder` },
         {
           defaultMessage: `Enter an account nickname`,
-          id: `plugins.detail.accounts.nicknameRequired`,
+          id: `plugins.detail.accounts.nicknameRequired`
         },
         {
           defaultMessage: `Nickname must be 64 characters or fewer`,
-          id: `plugins.detail.accounts.nicknameTooLong`,
+          id: `plugins.detail.accounts.nicknameTooLong`
         },
         {
           defaultMessage: `{connectorName} (no account linked)`,
-          id: `plugins.detail.accounts.noAccountIdentity`,
+          id: `plugins.detail.accounts.noAccountIdentity`
         },
         {
           defaultMessage: `{userName}'s {appName} account`,
-          id: `plugins.detail.accounts.personalizedAccountIdentityFallback`,
+          id: `plugins.detail.accounts.personalizedAccountIdentityFallback`
         },
         { defaultMessage: `Reconnect`, id: `plugins.detail.accounts.reconnect` },
         {
           defaultMessage: `Reconnect {accountName}`,
-          id: `plugins.detail.accounts.reconnectAccount`,
+          id: `plugins.detail.accounts.reconnectAccount`
         },
         {
           defaultMessage: `Reconnect your existing account first`,
-          id: `plugins.detail.accounts.reconnectFirst`,
+          id: `plugins.detail.accounts.reconnectFirst`
         },
         {
           defaultMessage: `To add another account, first reconnect {accountName}`,
-          id: `plugins.detail.accounts.reconnectFirstDescription`,
+          id: `plugins.detail.accounts.reconnectFirstDescription`
         },
         {
           defaultMessage: `Authentication update required`,
-          id: `plugins.detail.accounts.reconnectRequired`,
+          id: `plugins.detail.accounts.reconnectRequired`
         },
         {
           defaultMessage: `Account updated, but couldn't refresh accounts`,
-          id: `plugins.detail.accounts.refreshError`,
+          id: `plugins.detail.accounts.refreshError`
         },
         { defaultMessage: `Rename account`, id: `plugins.detail.accounts.rename` },
         { defaultMessage: `Try again`, id: `plugins.detail.accounts.retry` },
@@ -8986,48 +8994,48 @@ function n() {
         { defaultMessage: `Couldn't disconnect app`, id: `plugins.detail.appDisconnectError` },
         {
           defaultMessage: `App disconnected, but couldn't refresh apps`,
-          id: `plugins.detail.appDisconnectRefreshError`,
+          id: `plugins.detail.appDisconnectRefreshError`
         },
         { defaultMessage: `Manage`, id: `plugins.detail.breadcrumb.manage` },
         { defaultMessage: `Plugins`, id: `plugins.detail.breadcrumb.root` },
         { defaultMessage: `Couldn't copy share link`, id: `plugins.detail.copyShareLinkError` },
         {
           defaultMessage: `The Plugin Creator plugin is disabled by your workspace admin`,
-          id: `plugins.detail.editDisabledByAdmin`,
+          id: `plugins.detail.editDisabledByAdmin`
         },
         {
           defaultMessage: `Couldn’t set up Plugin Creator. Try again`,
-          id: `plugins.detail.editSetupFailed`,
+          id: `plugins.detail.editSetupFailed`
         },
         {
           defaultMessage: `{pluginCreator} Edit {plugin} to`,
-          id: `plugins.detail.editWithCreatorPrompt`,
+          id: `plugins.detail.editWithCreatorPrompt`
         },
         { defaultMessage: `Failed to load plugin`, id: `plugins.detail.errorTitle` },
         { defaultMessage: `Manage in settings`, id: `plugins.detail.hooks.settings` },
         {
           defaultMessage: `Plugins from imported marketplaces can't be shared`,
-          id: `plugins.detail.importedExternalMarketplaceShareTooltip`,
+          id: `plugins.detail.importedExternalMarketplaceShareTooltip`
         },
         {
           defaultMessage: `This app isn’t enabled for your workspace. Contact your admin to enable it`,
-          id: `plugins.detail.includes.appAdminDisabledExplanation`,
+          id: `plugins.detail.includes.appAdminDisabledExplanation`
         },
         { defaultMessage: `Other`, id: `plugins.detail.includes.apps.otherCategory` },
         { defaultMessage: `Apps`, id: `plugins.detail.includes.apps.title` },
         { defaultMessage: `App setup`, id: `plugins.detail.includes.appSetup.title` },
         {
           defaultMessage: `This app isn’t available`,
-          id: `plugins.detail.includes.appUnavailableExplanation`,
+          id: `plugins.detail.includes.appUnavailableExplanation`
         },
         { defaultMessage: `Disabled by admin`, id: `plugins.detail.includes.disabledByAdminBadge` },
         {
           defaultMessage: `Run deterministic scripts during the task lifecycle`,
-          id: `plugins.detail.includes.hooks.description`,
+          id: `plugins.detail.includes.hooks.description`
         },
         {
           defaultMessage: `{count, plural, one {# hook needs review before it can run} other {# hooks need review before they can run}}`,
-          id: `plugins.detail.includes.hooks.needsReview`,
+          id: `plugins.detail.includes.hooks.needsReview`
         },
         { defaultMessage: `Review`, id: `plugins.detail.includes.hooks.review` },
         { defaultMessage: `Hooks`, id: `plugins.detail.includes.hooks.title` },
@@ -9036,11 +9044,11 @@ function n() {
         { defaultMessage: `MCP servers`, id: `plugins.detail.includes.mcpServers.title` },
         {
           defaultMessage: `This app can’t be used while the plugin is disabled`,
-          id: `plugins.detail.includes.pluginDisabledExplanation`,
+          id: `plugins.detail.includes.pluginDisabledExplanation`
         },
         {
           defaultMessage: `{hasNames, select, true {See {itemNames}{remainingCount, plural, =0 {} other {, and # more}}} other {Show {count, number} more}}`,
-          id: `plugins.detail.includes.showMore`,
+          id: `plugins.detail.includes.showMore`
         },
         { defaultMessage: `Skills`, id: `plugins.detail.includes.skills.title` },
         { defaultMessage: `Information`, id: `plugins.detail.information` },
@@ -9054,15 +9062,15 @@ function n() {
         { defaultMessage: `Website`, id: `plugins.detail.information.website` },
         {
           defaultMessage: `Note on Google apps: This plugin may contain one or more Google apps, as listed above. Any data synced from these apps may be used to provide you with relevant and personalized information. We do not train generalized models on this data or derivations of it, except those submitted in feedback or included in ChatGPT’s response. You can delete your conversations, which will also delete any app data used in those conversations. <learnMoreLink>Learn more</learnMoreLink>`,
-          id: `plugins.detail.legalNotice.googleApps`,
+          id: `plugins.detail.legalNotice.googleApps`
         },
         {
           defaultMessage: `This plugin may contain one or more apps, as listed above. When connected to an app, ChatGPT may share relevant chats and memories with the app to help provide context for your requests. An app’s use of this data is subject to their terms and privacy policy, which can be found on the app’s page. If you have <memoryLink>Memory</memoryLink> enabled, data from the app may be used to proactively provide helpful information or suggestions. ChatGPT always respects your training data preferences, including for data from connected apps. Use of apps may come with <elevatedRiskLink>elevated risk</elevatedRiskLink>. You can manage your preferences or disconnect from apps anytime in your settings. <learnMoreLink>Learn more</learnMoreLink>`,
-          id: `plugins.detail.legalNotice.multipleApps`,
+          id: `plugins.detail.legalNotice.multipleApps`
         },
         {
           defaultMessage: `When connected to {pluginName}, ChatGPT may share relevant chats and memories with this app to help provide context for your requests. {pluginName}’s use of this data is subject to their <termsLink>terms</termsLink> and <privacyPolicyLink>privacy policy</privacyPolicyLink>. If you have <memoryLink>Memory</memoryLink> enabled, data from the app may be used to proactively provide helpful information or suggestions. ChatGPT always respects your training data preferences, including for data from connected apps. Use of apps may come with <elevatedRiskLink>elevated risk</elevatedRiskLink>. You can manage your preferences or disconnect from apps anytime in your settings. <learnMoreLink>Learn more</learnMoreLink>`,
-          id: `plugins.detail.legalNotice.singleApp`,
+          id: `plugins.detail.legalNotice.singleApp`
         },
         { defaultMessage: `Couldn't load plugin sharing`, id: `plugins.detail.loadSharingError` },
         { defaultMessage: `Disable MCP server`, id: `plugins.detail.mcp.disable` },
@@ -9073,11 +9081,11 @@ function n() {
         { defaultMessage: `Plugin not found`, id: `plugins.detail.missing` },
         {
           defaultMessage: `This plugin could not be loaded from its marketplace entry.`,
-          id: `plugins.detail.missingDescription`,
+          id: `plugins.detail.missingDescription`
         },
         {
           defaultMessage: `This plugin is not available in your current plugin marketplaces`,
-          id: `plugins.detail.missingFromCurrentMarketplaces`,
+          id: `plugins.detail.missingFromCurrentMarketplaces`
         },
         { defaultMessage: `Plugin`, id: `plugins.detail.pageTitleFallback` },
         { defaultMessage: `Scheduled`, id: `plugins.detail.scheduledTasks` },
@@ -9088,49 +9096,49 @@ function n() {
         { defaultMessage: `Share`, id: `plugins.detail.share` },
         {
           defaultMessage: `Only plugins you created can be shared`,
-          id: `plugins.detail.shareCreatedPluginsOnlyTooltip`,
+          id: `plugins.detail.shareCreatedPluginsOnlyTooltip`
         },
         { defaultMessage: `Only those invited`, id: `plugins.detail.shareInvitedTooltip` },
         {
           defaultMessage: `Sharing can only be edited when you have a local copy`,
-          id: `plugins.detail.shareLocalCopyRequiredTooltip`,
+          id: `plugins.detail.shareLocalCopyRequiredTooltip`
         },
         { defaultMessage: `Not shared`, id: `plugins.detail.shareNotSharedTooltip` },
         { defaultMessage: `Shared`, id: `plugins.detail.shareSharedTooltip` },
         {
           defaultMessage: `Anyone at workspace with the link`,
-          id: `plugins.detail.shareWorkspaceTooltip`,
+          id: `plugins.detail.shareWorkspaceTooltip`
         },
         {
           defaultMessage: `This skill can’t be viewed because the plugin is disabled by your workspace admin`,
-          id: `plugins.detail.skills.disabledByAdmin`,
+          id: `plugins.detail.skills.disabledByAdmin`
         },
         {
           defaultMessage: `This skill can’t be viewed because the plugin is unavailable`,
-          id: `plugins.detail.skills.pluginUnavailable`,
+          id: `plugins.detail.skills.pluginUnavailable`
         },
         { defaultMessage: `Workspace admin setup`, id: `plugins.detail.template.adminSetup` },
         { defaultMessage: `Open configured app`, id: `plugins.detail.template.openConfiguredApp` },
         { defaultMessage: `Unavailable`, id: `plugins.detail.template.unavailable` },
         {
           defaultMessage: `Couldn't update shared version`,
-          id: `plugins.detail.updateSharedVersionError`,
+          id: `plugins.detail.updateSharedVersionError`
         },
         {
           defaultMessage: `Shared version updated`,
-          id: `plugins.detail.updateSharedVersionSuccess`,
+          id: `plugins.detail.updateSharedVersionSuccess`
         },
         {
           defaultMessage: `Couldn't update plugin sharing`,
-          id: `plugins.detail.updateSharingError`,
+          id: `plugins.detail.updateSharingError`
         },
         {
           defaultMessage: `Not available on your plan`,
-          id: `plugins.disabledReason.planNotEligible`,
+          id: `plugins.disabledReason.planNotEligible`
         },
         {
           defaultMessage: `Required app unavailable`,
-          id: `plugins.disabledReason.requiredAppUnavailable`,
+          id: `plugins.disabledReason.requiredAppUnavailable`
         },
         { defaultMessage: `Unavailable`, id: `plugins.disabledReason.unknown` },
         { defaultMessage: `App unavailable`, id: `plugins.install.connectorUnavailable` },
@@ -9140,15 +9148,15 @@ function n() {
         { defaultMessage: `Couldn't load plugin sharing`, id: `plugins.manage.loadSharingError` },
         {
           defaultMessage: `Couldn't update shared version`,
-          id: `plugins.manage.updateSharedVersionError`,
+          id: `plugins.manage.updateSharedVersionError`
         },
         {
           defaultMessage: `Shared version updated`,
-          id: `plugins.manage.updateSharedVersionSuccess`,
+          id: `plugins.manage.updateSharedVersionSuccess`
         },
         {
           defaultMessage: `Couldn't update plugin sharing`,
-          id: `plugins.manage.updateSharingError`,
+          id: `plugins.manage.updateSharingError`
         },
         { defaultMessage: `Failed to load plugins`, id: `plugins.page.loadError.title` },
         { defaultMessage: `Loading plugins…`, id: `plugins.page.loading` },
@@ -9156,11 +9164,11 @@ function n() {
         { defaultMessage: `Add MCP server`, id: `settings.mcp.addServerFromPluginsMenu` },
         {
           defaultMessage: `Browse directory`,
-          id: `settings.section.plugins-settings.browseDirectory`,
+          id: `settings.section.plugins-settings.browseDirectory`
         },
         {
           defaultMessage: `Manage plugins, skills, and MCPs`,
-          id: `settings.section.plugins-settings.subtitle`,
+          id: `settings.section.plugins-settings.subtitle`
         },
         { defaultMessage: `Page actions`, id: `skills.appsPage.actionsMenu` },
         { defaultMessage: `Add`, id: `skills.appsPage.add` },
@@ -9168,7 +9176,7 @@ function n() {
         { defaultMessage: `Cancel`, id: `skills.appsPage.addMarketplace.cancel` },
         {
           defaultMessage: `Failed to add marketplace`,
-          id: `skills.appsPage.addMarketplace.failed`,
+          id: `skills.appsPage.addMarketplace.failed`
         },
         { defaultMessage: `Add plugin marketplace`, id: `skills.appsPage.addMarketplace.header` },
         { defaultMessage: `Git ref`, id: `skills.appsPage.addMarketplace.refLabel` },
@@ -9176,21 +9184,21 @@ function n() {
         { defaultMessage: `Source`, id: `skills.appsPage.addMarketplace.sourceLabel` },
         {
           defaultMessage: `openai/plugins or git@github.com:org/repo.git`,
-          id: `skills.appsPage.addMarketplace.sourcePlaceholder`,
+          id: `skills.appsPage.addMarketplace.sourcePlaceholder`
         },
         {
           defaultMessage: `Enter a marketplace source`,
-          id: `skills.appsPage.addMarketplace.sourceRequired`,
+          id: `skills.appsPage.addMarketplace.sourceRequired`
         },
         { defaultMessage: `Sparse paths`, id: `skills.appsPage.addMarketplace.sparsePathsLabel` },
         {
           defaultMessage: `plugins/codex`,
-          id: `skills.appsPage.addMarketplace.sparsePathsPlaceholder`,
+          id: `skills.appsPage.addMarketplace.sparsePathsPlaceholder`
         },
         { defaultMessage: `Add marketplace`, id: `skills.appsPage.addMarketplace.submit` },
         {
           defaultMessage: `Add from a GitHub repo, Git URL, or local folder. <link>Learn more</link>`,
-          id: `skills.appsPage.addMarketplace.subtitle`,
+          id: `skills.appsPage.addMarketplace.subtitle`
         },
         { defaultMessage: `Add plugin marketplace`, id: `skills.appsPage.addMarketplace.title` },
         { defaultMessage: `Add account`, id: `skills.appsPage.apps.addAccount` },
@@ -9206,48 +9214,48 @@ function n() {
         { defaultMessage: `Enable app`, id: `skills.appsPage.apps.enableToggleTooltip` },
         {
           defaultMessage: `Loading project settings…`,
-          id: `skills.appsPage.apps.loadingProjectSettings`,
+          id: `skills.appsPage.apps.loadingProjectSettings`
         },
         { defaultMessage: `No description`, id: `skills.appsPage.apps.noDescription` },
         { defaultMessage: `Reconnect`, id: `skills.appsPage.apps.reconnect` },
         {
           defaultMessage: `Retry loading connection options`,
-          id: `skills.appsPage.apps.retryConnectionOptions`,
+          id: `skills.appsPage.apps.retryConnectionOptions`
         },
         {
           defaultMessage: `This app is disabled`,
-          id: `skills.appsPage.apps.unattributedDisablement`,
+          id: `skills.appsPage.apps.unattributedDisablement`
         },
         { defaultMessage: `Manage`, id: `skills.appsPage.breadcrumb.manage` },
         { defaultMessage: `Plugins`, id: `skills.appsPage.breadcrumb.root` },
         { defaultMessage: `Filter sections`, id: `skills.appsPage.browseDropdown.ariaLabel` },
         {
           defaultMessage: `Extend Codex with task-specific skills`,
-          id: `skills.appsPage.browseIntro.codexSkillsSubtitle`,
+          id: `skills.appsPage.browseIntro.codexSkillsSubtitle`
         },
         {
           defaultMessage: `Work with Codex across your favorite tools`,
-          id: `skills.appsPage.browseIntro.codexSubtitle`,
+          id: `skills.appsPage.browseIntro.codexSubtitle`
         },
         {
           defaultMessage: `Extend ChatGPT with task-specific skills`,
-          id: `skills.appsPage.browseIntro.skillsSubtitle`,
+          id: `skills.appsPage.browseIntro.skillsSubtitle`
         },
         { defaultMessage: `Skills`, id: `skills.appsPage.browseIntro.skillsTitle` },
         {
           defaultMessage: `Work with ChatGPT across your favorite tools`,
-          id: `skills.appsPage.browseIntro.subtitle`,
+          id: `skills.appsPage.browseIntro.subtitle`
         },
         { defaultMessage: `Plugins`, id: `skills.appsPage.browseIntro.title` },
         { defaultMessage: `Plugins`, id: `skills.appsPage.browseTabs.plugins` },
         {
           defaultMessage: `Skills, new suggestions`,
-          id: `skills.appsPage.browseTabs.skillsWithNewSuggestions`,
+          id: `skills.appsPage.browseTabs.skillsWithNewSuggestions`
         },
         { defaultMessage: `Browse plugins or skills`, id: `skills.appsPage.browseToggle` },
         {
           defaultMessage: `{count, plural, one {# more connected plugin} other {# more connected plugins}}`,
-          id: `skills.appsPage.connectedPlugins.overflowAriaLabel`,
+          id: `skills.appsPage.connectedPlugins.overflowAriaLabel`
         },
         { defaultMessage: `{count} more`, id: `skills.appsPage.connectedPlugins.overflowLabel` },
         { defaultMessage: `Create plugin`, id: `skills.appsPage.createPlugin` },
@@ -9278,78 +9286,78 @@ function n() {
         { defaultMessage: `Retry`, id: `skills.appsPage.marketplace.loadError.retry` },
         {
           defaultMessage: `Unable to load marketplaces`,
-          id: `skills.appsPage.marketplace.loadError.title`,
+          id: `skills.appsPage.marketplace.loadError.title`
         },
         { defaultMessage: `Loading marketplaces…`, id: `skills.appsPage.marketplace.loading` },
         {
           defaultMessage: `{count, plural, one {# more marketplace could not be loaded} other {# more marketplaces could not be loaded}}`,
-          id: `skills.appsPage.marketplace.partialLoadError.more`,
+          id: `skills.appsPage.marketplace.partialLoadError.more`
         },
         { defaultMessage: `Retry`, id: `skills.appsPage.marketplace.partialLoadError.retry` },
         {
           defaultMessage: `Some marketplaces could not be loaded`,
-          id: `skills.appsPage.marketplace.partialLoadError.title`,
+          id: `skills.appsPage.marketplace.partialLoadError.title`
         },
         {
           defaultMessage: `{count, plural, one {# plugin} other {# plugins}}`,
-          id: `skills.appsPage.marketplace.pluginCount`,
+          id: `skills.appsPage.marketplace.pluginCount`
         },
         { defaultMessage: `Remove marketplace`, id: `skills.appsPage.marketplace.remove` },
         {
           defaultMessage: `Remove marketplace`,
-          id: `skills.appsPage.marketplace.remove.ariaLabel`,
+          id: `skills.appsPage.marketplace.remove.ariaLabel`
         },
         {
           defaultMessage: `Built-in marketplaces cannot be removed`,
-          id: `skills.appsPage.marketplace.remove.builtInDisabled`,
+          id: `skills.appsPage.marketplace.remove.builtInDisabled`
         },
         {
           defaultMessage: `Only configured marketplaces can be removed`,
-          id: `skills.appsPage.marketplace.remove.configuredDisabled`,
+          id: `skills.appsPage.marketplace.remove.configuredDisabled`
         },
         { defaultMessage: `Cancel`, id: `skills.appsPage.marketplace.removeDialog.cancel` },
         { defaultMessage: `Remove`, id: `skills.appsPage.marketplace.removeDialog.confirm` },
         {
           defaultMessage: `This removes the marketplace from your configuration. Its plugins won't appear unless you add it again.`,
-          id: `skills.appsPage.marketplace.removeDialog.description`,
+          id: `skills.appsPage.marketplace.removeDialog.description`
         },
         {
           defaultMessage: `Remove "{marketplaceName}"?`,
-          id: `skills.appsPage.marketplace.removeDialog.title`,
+          id: `skills.appsPage.marketplace.removeDialog.title`
         },
         { defaultMessage: `Upgrade marketplace`, id: `skills.appsPage.marketplace.upgrade` },
         {
           defaultMessage: `Upgrade marketplace`,
-          id: `skills.appsPage.marketplace.upgrade.ariaLabel`,
+          id: `skills.appsPage.marketplace.upgrade.ariaLabel`
         },
         {
           defaultMessage: `Built-in marketplaces update automatically`,
-          id: `skills.appsPage.marketplace.upgrade.builtInDisabled`,
+          id: `skills.appsPage.marketplace.upgrade.builtInDisabled`
         },
         { defaultMessage: `Upgrade`, id: `skills.appsPage.marketplace.upgrade.button` },
         {
           defaultMessage: `Only Git marketplaces can be upgraded`,
-          id: `skills.appsPage.marketplace.upgrade.localDisabled`,
+          id: `skills.appsPage.marketplace.upgrade.localDisabled`
         },
         { defaultMessage: `Upgrade`, id: `skills.appsPage.marketplace.upgradeAll` },
         {
           defaultMessage: `Upgrade all marketplaces`,
-          id: `skills.appsPage.marketplace.upgradeAll.tooltip`,
+          id: `skills.appsPage.marketplace.upgradeAll.tooltip`
         },
         {
           defaultMessage: `Choose another host to browse and manage plugins`,
-          id: `skills.appsPage.pluginsUnsupportedHost.description`,
+          id: `skills.appsPage.pluginsUnsupportedHost.description`
         },
         {
           defaultMessage: `Plugins are not available for this host`,
-          id: `skills.appsPage.pluginsUnsupportedHost.title`,
+          id: `skills.appsPage.pluginsUnsupportedHost.title`
         },
         { defaultMessage: `Record a skill`, id: `skills.appsPage.recordSkill` },
         { defaultMessage: `Search apps`, id: `skills.appsPage.search.apps` },
         { defaultMessage: `Search apps`, id: `skills.appsPage.search.apps.label` },
         {
           defaultMessage: `Clear category filter`,
-          id: `skills.appsPage.search.clearCategoryFilter`,
+          id: `skills.appsPage.search.clearCategoryFilter`
         },
         { defaultMessage: `Search marketplaces`, id: `skills.appsPage.search.marketplace` },
         { defaultMessage: `Search marketplaces`, id: `skills.appsPage.search.marketplace.label` },
@@ -9361,7 +9369,7 @@ function n() {
         { defaultMessage: `Search skills`, id: `skills.appsPage.search.skills.label` },
         {
           defaultMessage: `in {directoryName}`,
-          id: `skills.appsPage.search.workspaceDirectorySubheading`,
+          id: `skills.appsPage.search.workspaceDirectorySubheading`
         },
         { defaultMessage: `Installed`, id: `skills.appsPage.section.connected` },
         { defaultMessage: `Created by you`, id: `skills.appsPage.section.createdByYou` },
@@ -9373,60 +9381,60 @@ function n() {
         { defaultMessage: `Recommended`, id: `skills.appsPage.section.recommendedSkills` },
         {
           defaultMessage: `See {pluginNames}{remainingCount, plural, =0 {} one {, and # more} other {, and # more}}`,
-          id: `skills.appsPage.section.seeAllDescription`,
+          id: `skills.appsPage.section.seeAllDescription`
         },
         { defaultMessage: `Shared with you`, id: `skills.appsPage.section.sharedWithYou` },
         { defaultMessage: `All`, id: `skills.appsPage.sectionFilter.all` },
         { defaultMessage: `Skills`, id: `skills.appsPage.skillsFilter.all` },
         {
           defaultMessage: `Connect external tools and services with Apps`,
-          id: `skills.appsPage.subheading.apps`,
+          id: `skills.appsPage.subheading.apps`
         },
         {
           defaultMessage: `Manage available plugin marketplaces`,
-          id: `skills.appsPage.subheading.marketplace`,
+          id: `skills.appsPage.subheading.marketplace`
         },
         {
           defaultMessage: `Manage MCP server connections and availability.`,
-          id: `skills.appsPage.subheading.mcps`,
+          id: `skills.appsPage.subheading.mcps`
         },
         {
           defaultMessage: `Customize ChatGPT with plugins`,
-          id: `skills.appsPage.subheading.plugins`,
+          id: `skills.appsPage.subheading.plugins`
         },
         {
           defaultMessage: `Add reusable workflows with Skills`,
-          id: `skills.appsPage.subheading.skills`,
+          id: `skills.appsPage.subheading.skills`
         },
         { defaultMessage: `Disable app`, id: `skills.appsPage.toolsDialog.disableApp` },
         { defaultMessage: `Disabled`, id: `skills.appsPage.toolsDialog.disabledBadge` },
         {
           defaultMessage: `No tools available for this app.`,
-          id: `skills.appsPage.toolsDialog.empty`,
+          id: `skills.appsPage.toolsDialog.empty`
         },
         { defaultMessage: `Enable app`, id: `skills.appsPage.toolsDialog.enableApp` },
         {
           defaultMessage: `Unable to load tools for this app.`,
-          id: `skills.appsPage.toolsDialog.error`,
+          id: `skills.appsPage.toolsDialog.error`
         },
         { defaultMessage: `Loading tools…`, id: `skills.appsPage.toolsDialog.loading` },
         {
           defaultMessage: `Loading project settings…`,
-          id: `skills.appsPage.toolsDialog.loadingProjectSettings`,
+          id: `skills.appsPage.toolsDialog.loadingProjectSettings`
         },
         { defaultMessage: `Tools for this app`, id: `skills.appsPage.toolsDialog.subtitle` },
         {
           defaultMessage: `The {appName} app contains {totalActions} actions ({actionTypes})`,
-          id: `skills.appsPage.toolsDialog.summary`,
+          id: `skills.appsPage.toolsDialog.summary`
         },
         { defaultMessage: `Try now`, id: `skills.appsPage.toolsDialog.tryInChat` },
         {
           defaultMessage: `Enable and connect this app to try it now`,
-          id: `skills.appsPage.toolsDialog.tryInChatDisabled`,
+          id: `skills.appsPage.toolsDialog.tryInChatDisabled`
         },
         {
           defaultMessage: `This app is disabled`,
-          id: `skills.appsPage.toolsDialog.unattributedDisablement`,
+          id: `skills.appsPage.toolsDialog.unattributedDisablement`
         },
         { defaultMessage: `Skill actions`, id: `skills.card.actionsMenu` },
         { defaultMessage: `Copied SKILL.md`, id: `skills.card.copiedSkillMarkdown` },
@@ -9463,7 +9471,7 @@ function n() {
         { defaultMessage: `Repo`, id: `skills.scope.repo` },
         { defaultMessage: `System`, id: `skills.scope.system` },
         { defaultMessage: `Team`, id: `skills.scope.team` },
-        { defaultMessage: `User`, id: `skills.scope.user` },
+        { defaultMessage: `User`, id: `skills.scope.user` }
       ],
       profile: [
         { defaultMessage: `Invite`, id: `codex.profile.invite` },
@@ -9482,49 +9490,49 @@ function n() {
         { defaultMessage: `Fast Mode`, id: `profile.activity.features.fastMode` },
         {
           defaultMessage: `How often you use /fast mode`,
-          id: `profile.activity.features.fastModeTooltip`,
+          id: `profile.activity.features.fastModeTooltip`
         },
         {
           defaultMessage: `Most used reasoning`,
-          id: `profile.activity.features.mostUsedReasoning`,
+          id: `profile.activity.features.mostUsedReasoning`
         },
         { defaultMessage: `None`, id: `profile.activity.features.none` },
         { defaultMessage: `Not used`, id: `profile.activity.features.notUsed` },
         {
           defaultMessage: `Your most used reasoning effort`,
-          id: `profile.activity.features.reasoningEffortTooltip`,
+          id: `profile.activity.features.reasoningEffortTooltip`
         },
         { defaultMessage: `Skills explored`, id: `profile.activity.features.skillsExplored` },
         {
           defaultMessage: `The number of unique skills you've used`,
-          id: `profile.activity.features.skillsExploredTooltip`,
+          id: `profile.activity.features.skillsExploredTooltip`
         },
         { defaultMessage: `Total skills used`, id: `profile.activity.features.totalSkillsUsed` },
         {
           defaultMessage: `Total times Codex used a skill`,
-          id: `profile.activity.features.totalSkillsUsedTooltip`,
+          id: `profile.activity.features.totalSkillsUsedTooltip`
         },
         { defaultMessage: `Total chats`, id: `profile.activity.features.totalThreads` },
         {
           defaultMessage: `Total unique conversations with Codex`,
-          id: `profile.activity.features.totalThreadsTooltip`,
+          id: `profile.activity.features.totalThreadsTooltip`
         },
         { defaultMessage: `Activity insights`, id: `profile.activity.insights.title` },
         { defaultMessage: `Browse`, id: `profile.activity.plugins.browse` },
         { defaultMessage: `No plugins used yet ·`, id: `profile.activity.plugins.empty` },
         {
           defaultMessage: `{runs, plural, one {# run} other {# runs}}`,
-          id: `profile.activity.plugins.runs`,
+          id: `profile.activity.plugins.runs`
         },
         { defaultMessage: `Most used plugins`, id: `profile.activity.plugins.title` },
         {
           defaultMessage: `Plugin activity unavailable`,
-          id: `profile.activity.plugins.unavailable`,
+          id: `profile.activity.plugins.unavailable`
         },
         { defaultMessage: `Activity insights unavailable`, id: `profile.activity.unavailable` },
         {
           defaultMessage: `{count, number}/{limit, number} characters`,
-          id: `profile.bioCharacterCount`,
+          id: `profile.bioCharacterCount`
         },
         { defaultMessage: `Bio`, id: `profile.bioInputLabel` },
         { defaultMessage: `Unable to update display name`, id: `profile.displayNameUpdateError` },
@@ -9555,18 +9563,18 @@ function n() {
         { defaultMessage: `Cancel`, id: `profile.editProfileCancel` },
         {
           defaultMessage: `Update your profile picture, display name, and username`,
-          id: `profile.editProfileDescription`,
+          id: `profile.editProfileDescription`
         },
         {
           defaultMessage: `Update your profile picture and display name`,
-          id: `profile.editProfileDescriptionWithoutUsername`,
+          id: `profile.editProfileDescriptionWithoutUsername`
         },
         { defaultMessage: `Edit profile`, id: `profile.editProfileLabel` },
         { defaultMessage: `Save`, id: `profile.editProfileSave` },
         { defaultMessage: `Edit profile`, id: `profile.editProfileTitle` },
         {
           defaultMessage: `We’re having trouble loading your profile. Please try again later.`,
-          id: `profile.fetchError`,
+          id: `profile.fetchError`
         },
         { defaultMessage: `[Employee only] Error: {details}`, id: `profile.fetchErrorDetail` },
         { defaultMessage: `Profile`, id: `profile.header` },
@@ -9574,12 +9582,12 @@ function n() {
         { defaultMessage: `Display name`, id: `profile.nameInputLabel` },
         {
           defaultMessage: `{displayName} (@{username}) | ChatGPT`,
-          id: `profile.page.documentTitle`,
+          id: `profile.page.documentTitle`
         },
         { defaultMessage: `Cancel`, id: `profile.photoCrop.cancel` },
         {
           defaultMessage: `Drag the image to reposition it, and adjust zoom with the slider`,
-          id: `profile.photoCrop.description`,
+          id: `profile.photoCrop.description`
         },
         { defaultMessage: `Unable to process the profile picture`, id: `profile.photoCrop.error` },
         { defaultMessage: `Save`, id: `profile.photoCrop.save` },
@@ -9599,11 +9607,11 @@ function n() {
         { defaultMessage: `Copy image`, id: `profile.shareCard.preview.copyImage` },
         {
           defaultMessage: `Preview your profile share card before sharing or saving it`,
-          id: `profile.shareCard.preview.description`,
+          id: `profile.shareCard.preview.description`
         },
         {
           defaultMessage: `Dismiss share instructions`,
-          id: `profile.shareCard.preview.dismissShareInstructions`,
+          id: `profile.shareCard.preview.dismissShareInstructions`
         },
         { defaultMessage: `Share your activity`, id: `profile.shareCard.preview.heading` },
         { defaultMessage: `Hide pet`, id: `profile.shareCard.preview.hidePetLabel` },
@@ -9612,18 +9620,18 @@ function n() {
         { defaultMessage: `Creating image…`, id: `profile.shareCard.preview.loading` },
         {
           defaultMessage: `Creating profile share card`,
-          id: `profile.shareCard.preview.loadingLabel`,
+          id: `profile.shareCard.preview.loadingLabel`
         },
         { defaultMessage: `Next custom pet`, id: `profile.shareCard.preview.nextPet` },
         {
           defaultMessage: `Open {platformName} composer`,
-          id: `profile.shareCard.preview.openSocialComposer`,
+          id: `profile.shareCard.preview.openSocialComposer`
         },
         { defaultMessage: `Paste image into the post`, id: `profile.shareCard.preview.pasteImage` },
         { defaultMessage: `Hidden`, id: `profile.shareCard.preview.petHidden` },
         {
           defaultMessage: `{petPosition} / {petCount}`,
-          id: `profile.shareCard.preview.petPosition`,
+          id: `profile.shareCard.preview.petPosition`
         },
         { defaultMessage: `Custom pet`, id: `profile.shareCard.preview.petSwitcher` },
         { defaultMessage: `Previous custom pet`, id: `profile.shareCard.preview.previousPet` },
@@ -9636,7 +9644,7 @@ function n() {
         { defaultMessage: `Show pet`, id: `profile.shareCard.preview.showPetLabel` },
         {
           defaultMessage: `Share to {platformName}`,
-          id: `profile.shareCard.preview.socialInstructionsTitle`,
+          id: `profile.shareCard.preview.socialInstructionsTitle`
         },
         { defaultMessage: `Share profile card`, id: `profile.shareCard.preview.title` },
         { defaultMessage: `X`, id: `profile.shareCard.preview.x` },
@@ -9650,7 +9658,7 @@ function n() {
         { defaultMessage: `Current streak`, id: `profile.stats.currentStreak` },
         {
           defaultMessage: `{days, plural, one {# day} other {# days}}`,
-          id: `profile.stats.dayStreakValue`,
+          id: `profile.stats.dayStreakValue`
         },
         { defaultMessage: `Lifetime tokens`, id: `profile.stats.lifetimeTokens` },
         { defaultMessage: `Longest streak`, id: `profile.stats.longestStreak` },
@@ -9665,7 +9673,7 @@ function n() {
         { defaultMessage: `Unable to update profile`, id: `profile.updateError` },
         {
           defaultMessage: `Use 3-20 lowercase letters, numbers, periods, underscores, or hyphens`,
-          id: `profile.usernameHelper`,
+          id: `profile.usernameHelper`
         },
         { defaultMessage: `Username`, id: `profile.usernameInputLabel` },
         { defaultMessage: `@`, id: `profile.usernamePrefix` },
@@ -9674,15 +9682,15 @@ function n() {
         { defaultMessage: `Enter a username`, id: `profile.usernameValidation.empty` },
         {
           defaultMessage: `Use only lowercase letters, numbers, periods, underscores, or hyphens`,
-          id: `profile.usernameValidation.invalidCharacters`,
+          id: `profile.usernameValidation.invalidCharacters`
         },
         {
           defaultMessage: `Username must be 20 characters or fewer`,
-          id: `profile.usernameValidation.tooLong`,
+          id: `profile.usernameValidation.tooLong`
         },
         {
           defaultMessage: `Username must be at least 3 characters long`,
-          id: `profile.usernameValidation.tooShort`,
+          id: `profile.usernameValidation.tooShort`
         },
         { defaultMessage: `@{username}`, id: `profile.usernameValue` },
         { defaultMessage: `{percent, number, percent} of runs`, id: `profile.v2.fastMode.value` },
@@ -9691,49 +9699,49 @@ function n() {
         { defaultMessage: `This profile couldn’t be loaded`, id: `profile.viewFetchError` },
         {
           defaultMessage: `Hot path energy for fast iteration.`,
-          id: `settings-search.literal.0011b59d82f1`,
+          id: `settings-search.literal.0011b59d82f1`
         },
         {
           defaultMessage: `A calm companion for focused workspace days`,
-          id: `settings-search.literal.0de39fb68eaa`,
+          id: `settings-search.literal.0de39fb68eaa`
         },
         { defaultMessage: `Dewey`, id: `settings-search.literal.262d23cfd9bd` },
         {
           defaultMessage: `Small green shoots for new ideas.`,
-          id: `settings-search.literal.2e9784e6560e`,
+          id: `settings-search.literal.2e9784e6560e`
         },
         {
           defaultMessage: `A sharp-eyed owl for polished work in a blink.`,
-          id: `settings-search.literal.409d5de7813c`,
+          id: `settings-search.literal.409d5de7813c`
         },
         {
           defaultMessage: `A tiny blue-screen gremlin.`,
-          id: `settings-search.literal.6284d9777be4`,
+          id: `settings-search.literal.6284d9777be4`
         },
         { defaultMessage: `Null Signal`, id: `settings-search.literal.6cce6d2f6fc8` },
         {
           defaultMessage: `A balanced stack for deep work.`,
-          id: `settings-search.literal.84c5bdb6b311`,
+          id: `settings-search.literal.84c5bdb6b311`
         },
         { defaultMessage: `Stacky`, id: `settings-search.literal.85b7fd8c2347` },
         { defaultMessage: `Hoots`, id: `settings-search.literal.94eb9e33455b` },
         {
           defaultMessage: `The original Codex companion.`,
-          id: `settings-search.literal.ae63c80df06c`,
+          id: `settings-search.literal.ae63c80df06c`
         },
         { defaultMessage: `Seedy`, id: `settings-search.literal.b6758680d796` },
         { defaultMessage: `Codex`, id: `settings-search.literal.c1175be8f66c` },
         { defaultMessage: `BSOD`, id: `settings-search.literal.cd619a260fbd` },
         {
           defaultMessage: `A steady rock when the diff gets large.`,
-          id: `settings-search.literal.d2ff69ba8f83`,
+          id: `settings-search.literal.d2ff69ba8f83`
         },
         { defaultMessage: `Fireball`, id: `settings-search.literal.d340fee1bb37` },
         { defaultMessage: `Rocky`, id: `settings-search.literal.dde1cf768def` },
         {
           defaultMessage: `Quiet signal from the void.`,
-          id: `settings-search.literal.e24ceab1420b`,
-        },
+          id: `settings-search.literal.e24ceab1420b`
+        }
       ],
       safety: [
         { defaultMessage: `Cancel`, id: `common.cancel` },
@@ -9742,88 +9750,88 @@ function n() {
         { defaultMessage: `Back`, id: `settings.chatGpt.quietHours.back` },
         {
           defaultMessage: `Leave at least five minutes outside quiet hours each day`,
-          id: `settings.chatGpt.quietHours.breakRequired`,
+          id: `settings.chatGpt.quietHours.breakRequired`
         },
         {
           defaultMessage: `You can’t change this schedule right now. Close the editor to review the current setting.`,
-          id: `settings.chatGpt.quietHours.denied`,
+          id: `settings.chatGpt.quietHours.denied`
         },
         {
           defaultMessage: `Select at least one day per block and different start and end times`,
-          id: `settings.chatGpt.quietHours.invalidSchedule`,
+          id: `settings.chatGpt.quietHours.invalidSchedule`
         },
         {
           defaultMessage: `This setting is managed by your parent`,
-          id: `settings.chatGpt.quietHours.managedByParent`,
+          id: `settings.chatGpt.quietHours.managedByParent`
         },
         {
           defaultMessage: `Couldn’t confirm the updated schedule. Try again.`,
-          id: `settings.chatGpt.quietHours.saveError`,
+          id: `settings.chatGpt.quietHours.saveError`
         },
         {
           defaultMessage: `Schedule hours when ChatGPT can’t be used`,
-          id: `settings.chatGpt.quietHours.scheduleDescription`,
+          id: `settings.chatGpt.quietHours.scheduleDescription`
         },
         {
           defaultMessage: `This schedule can’t be edited here. Your existing settings have been preserved.`,
-          id: `settings.chatGpt.quietHours.unsupported`,
+          id: `settings.chatGpt.quietHours.unsupported`
         },
         { defaultMessage: `Back`, id: `settings.chatGpt.timeManagement.back` },
         {
           defaultMessage: `Time management isn’t available for this account`,
-          id: `settings.chatGpt.timeManagement.ineligible`,
+          id: `settings.chatGpt.timeManagement.ineligible`
         },
         {
           defaultMessage: `Managed by your parent`,
-          id: `settings.chatGpt.timeManagement.managedByParent`,
+          id: `settings.chatGpt.timeManagement.managedByParent`
         },
         {
           defaultMessage: `Schedule hours when ChatGPT can’t be used`,
-          id: `settings.chatGpt.timeManagement.quietHours.description`,
+          id: `settings.chatGpt.timeManagement.quietHours.description`
         },
         { defaultMessage: `Quiet hours`, id: `settings.chatGpt.timeManagement.quietHours.title` },
         {
           defaultMessage: `Couldn’t load schedule settings`,
-          id: `settings.chatGpt.timeManagement.schedule.loadError`,
+          id: `settings.chatGpt.timeManagement.schedule.loadError`
         },
         {
           defaultMessage: `Loading schedule settings…`,
-          id: `settings.chatGpt.timeManagement.schedule.loading`,
+          id: `settings.chatGpt.timeManagement.schedule.loading`
         },
         {
           defaultMessage: `{enabled, select, true {Scheduled} other {Not scheduled}}`,
-          id: `settings.chatGpt.timeManagement.scheduleStatus`,
+          id: `settings.chatGpt.timeManagement.scheduleStatus`
         },
         {
           defaultMessage: `This schedule can’t be edited here. Your existing settings have been preserved.`,
-          id: `settings.chatGpt.timeManagement.scheduleUnsupported`,
+          id: `settings.chatGpt.timeManagement.scheduleUnsupported`
         },
         {
           defaultMessage: `Have ChatGPT ask questions and give hints before answering questions. <link>Learn more</link>`,
-          id: `settings.chatGpt.timeManagement.studyHours.studyModeDescription`,
+          id: `settings.chatGpt.timeManagement.studyHours.studyModeDescription`
         },
         { defaultMessage: `Study hours`, id: `settings.chatGpt.timeManagement.studyHours.title` },
         {
           defaultMessage: `Managed by your parent`,
-          id: `settings.chatGpt.timeManagement.studyManagedByParent`,
+          id: `settings.chatGpt.timeManagement.studyManagedByParent`
         },
         {
           defaultMessage: `{enabled, select, true {Scheduled} other {Not scheduled}}`,
-          id: `settings.chatGpt.timeManagement.studyScheduleStatus`,
+          id: `settings.chatGpt.timeManagement.studyScheduleStatus`
         },
         {
           defaultMessage: `Unsupported schedule`,
-          id: `settings.chatGpt.timeManagement.studyUnsupportedStatus`,
+          id: `settings.chatGpt.timeManagement.studyUnsupportedStatus`
         },
         {
           defaultMessage: `Unsupported schedule`,
-          id: `settings.chatGpt.timeManagement.unsupportedStatus`,
+          id: `settings.chatGpt.timeManagement.unsupportedStatus`
         },
         { defaultMessage: `Add a new block`, id: `settings.recurringSchedule.add` },
         { defaultMessage: `Schedule block {number}`, id: `settings.recurringSchedule.block` },
         {
           defaultMessage: `Use no more than twelve blocks`,
-          id: `settings.recurringSchedule.blockLimit`,
+          id: `settings.recurringSchedule.blockLimit`
         },
         { defaultMessage: `Days`, id: `settings.recurringSchedule.days` },
         { defaultMessage: `Done`, id: `settings.recurringSchedule.days.done` },
@@ -9833,110 +9841,110 @@ function n() {
         { defaultMessage: `End time`, id: `settings.recurringSchedule.end` },
         {
           defaultMessage: `Ends the following day. Selected days are the days it starts.`,
-          id: `settings.recurringSchedule.overnight`,
+          id: `settings.recurringSchedule.overnight`
         },
         { defaultMessage: `Delete block`, id: `settings.recurringSchedule.remove` },
-        { defaultMessage: `Start time`, id: `settings.recurringSchedule.start` },
+        { defaultMessage: `Start time`, id: `settings.recurringSchedule.start` }
       ],
       security: [
         {
           defaultMessage: `Review login activity and changes to your security settings.`,
-          id: `chatgpt.settings.security.history.description`,
+          id: `chatgpt.settings.security.history.description`
         },
         { defaultMessage: `Security history`, id: `chatgpt.settings.security.history.title` },
         {
           defaultMessage: `Couldn’t complete this action. Please try again`,
-          id: `settings.chatGpt.security.actionFailed`,
+          id: `settings.chatGpt.security.actionFailed`
         },
         { defaultMessage: `Active sessions`, id: `settings.chatGpt.security.activeSessions` },
         {
           defaultMessage: `Use stronger sign-in protections and additional safeguards to help prevent unauthorized access to your account`,
-          id: `settings.chatGpt.security.advancedProtection.description`,
+          id: `settings.chatGpt.security.advancedProtection.description`
         },
         {
           defaultMessage: `Advanced account security helps keep your account safe by requiring stronger sign-in methods like passkeys or hardware security keys`,
-          id: `settings.chatGpt.security.advancedProtection.detailDescription`,
+          id: `settings.chatGpt.security.advancedProtection.detailDescription`
         },
         {
           defaultMessage: `Disable`,
-          id: `settings.chatGpt.security.advancedProtection.disable.button`,
+          id: `settings.chatGpt.security.advancedProtection.disable.button`
         },
         {
           defaultMessage: `Disabling advanced account security will restore standard sign-in and account recovery methods, remove recovery keys, and stop requiring your passkeys or security keys at sign-in`,
-          id: `settings.chatGpt.security.advancedProtection.disable.confirmation.description`,
+          id: `settings.chatGpt.security.advancedProtection.disable.confirmation.description`
         },
         {
           defaultMessage: `Disable advanced account security?`,
-          id: `settings.chatGpt.security.advancedProtection.disable.confirmation.title`,
+          id: `settings.chatGpt.security.advancedProtection.disable.confirmation.title`
         },
         {
           defaultMessage: `This removes additional protections. Once disabled, you'll use standard sign-in and account recovery methods.`,
-          id: `settings.chatGpt.security.advancedProtection.disable.description`,
+          id: `settings.chatGpt.security.advancedProtection.disable.description`
         },
         {
           defaultMessage: `Disable advanced account security`,
-          id: `settings.chatGpt.security.advancedProtection.disable.title`,
+          id: `settings.chatGpt.security.advancedProtection.disable.title`
         },
         {
           defaultMessage: `Advanced account security is enabled`,
-          id: `settings.chatGpt.security.advancedProtection.enabled`,
+          id: `settings.chatGpt.security.advancedProtection.enabled`
         },
         {
           defaultMessage: `Enabled`,
-          id: `settings.chatGpt.security.advancedProtection.enabledBadge`,
+          id: `settings.chatGpt.security.advancedProtection.enabledBadge`
         },
         { defaultMessage: `Enroll`, id: `settings.chatGpt.security.advancedProtection.enroll` },
         {
           defaultMessage: `Disable email account recovery`,
-          id: `settings.chatGpt.security.advancedProtection.included.disableEmailRecovery`,
+          id: `settings.chatGpt.security.advancedProtection.included.disableEmailRecovery`
         },
         {
           defaultMessage: `Disable email and SMS sign-in codes`,
-          id: `settings.chatGpt.security.advancedProtection.included.disableEmailSmsCodes`,
+          id: `settings.chatGpt.security.advancedProtection.included.disableEmailSmsCodes`
         },
         {
           defaultMessage: `Disable model training`,
-          id: `settings.chatGpt.security.advancedProtection.included.disableModelTraining`,
+          id: `settings.chatGpt.security.advancedProtection.included.disableModelTraining`
         },
         {
           defaultMessage: `Disable password sign-in`,
-          id: `settings.chatGpt.security.advancedProtection.included.disablePasswordSignIn`,
+          id: `settings.chatGpt.security.advancedProtection.included.disablePasswordSignIn`
         },
         {
           defaultMessage: `Enable email alerts for login attempts`,
-          id: `settings.chatGpt.security.advancedProtection.included.enableEmailLoginAlerts`,
+          id: `settings.chatGpt.security.advancedProtection.included.enableEmailLoginAlerts`
         },
         {
           defaultMessage: `Enable shorter active sessions`,
-          id: `settings.chatGpt.security.advancedProtection.included.enableShorterSessions`,
+          id: `settings.chatGpt.security.advancedProtection.included.enableShorterSessions`
         },
         {
           defaultMessage: `The following protections are included with advanced account security:`,
-          id: `settings.chatGpt.security.advancedProtection.includedDescription`,
+          id: `settings.chatGpt.security.advancedProtection.includedDescription`
         },
         {
           defaultMessage: `Manage`,
-          id: `settings.chatGpt.security.advancedProtection.manageNative`,
+          id: `settings.chatGpt.security.advancedProtection.manageNative`
         },
         {
           defaultMessage: `Advanced account security isn’t enabled`,
-          id: `settings.chatGpt.security.advancedProtection.notEnrolled`,
+          id: `settings.chatGpt.security.advancedProtection.notEnrolled`
         },
         {
           defaultMessage: `Recovery keys help you regain access to your account if you lose your sign-in methods. Keep them stored somewhere safe. If you lose your recovery keys or think someone else has them, you can replace them here. Replacing them will invalidate the old keys.`,
-          id: `settings.chatGpt.security.advancedProtection.recoveryKeys.description`,
+          id: `settings.chatGpt.security.advancedProtection.recoveryKeys.description`
         },
         {
           defaultMessage: `Replace recovery keys`,
-          id: `settings.chatGpt.security.advancedProtection.recoveryKeys.replace`,
+          id: `settings.chatGpt.security.advancedProtection.recoveryKeys.replace`
         },
         {
           defaultMessage: `Recovery keys`,
-          id: `settings.chatGpt.security.advancedProtection.recoveryKeys.title`,
+          id: `settings.chatGpt.security.advancedProtection.recoveryKeys.title`
         },
         {
           defaultMessage: `Advanced account security`,
-          id: `settings.chatGpt.security.advancedProtection.title`,
+          id: `settings.chatGpt.security.advancedProtection.title`
         },
         { defaultMessage: `Advanced security`, id: `settings.chatGpt.security.advancedSecurity` },
         { defaultMessage: `Authenticator app`, id: `settings.chatGpt.security.authenticator` },
@@ -9944,173 +9952,173 @@ function n() {
         { defaultMessage: `Cancel`, id: `settings.chatGpt.security.cancel` },
         {
           defaultMessage: `Check your eligibility to use our most capable models for cybersecurity work`,
-          id: `settings.chatGpt.security.cyber.description`,
+          id: `settings.chatGpt.security.cyber.description`
         },
         { defaultMessage: `Trusted Access for Cyber`, id: `settings.chatGpt.security.cyber.title` },
         { defaultMessage: `Developer mode`, id: `settings.chatGpt.security.developerMode` },
         {
           defaultMessage: `Your admin has not enabled developer mode`,
-          id: `settings.chatGpt.security.developerMode.adminDisabled`,
+          id: `settings.chatGpt.security.developerMode.adminDisabled`
         },
         {
           defaultMessage: `Turn on developer mode`,
-          id: `settings.chatGpt.security.developerMode.confirm`,
+          id: `settings.chatGpt.security.developerMode.confirm`
         },
         {
           defaultMessage: `Developer mode allows unverified connectors. Turning on developer mode will turn off lockdown mode.`,
-          id: `settings.chatGpt.security.developerMode.confirmDescription`,
+          id: `settings.chatGpt.security.developerMode.confirmDescription`
         },
         {
           defaultMessage: `Turn on developer mode?`,
-          id: `settings.chatGpt.security.developerMode.confirmTitle`,
+          id: `settings.chatGpt.security.developerMode.confirmTitle`
         },
         {
           defaultMessage: `Allows you to add unverified connectors that could modify or erase data permanently. Use at your own risk. <link>Learn more</link>`,
-          id: `settings.chatGpt.security.developerMode.description`,
+          id: `settings.chatGpt.security.developerMode.description`
         },
         {
           defaultMessage: `Use device code sign-in for headless or remote environments where the normal browser flow isn’t available. Exercise caution in enabling, as device codes can be phished. Never share a device code.`,
-          id: `settings.chatGpt.security.deviceCode.description`,
+          id: `settings.chatGpt.security.deviceCode.description`
         },
         {
           defaultMessage: `Enable device code authorization for Codex`,
-          id: `settings.chatGpt.security.deviceCode.label`,
+          id: `settings.chatGpt.security.deviceCode.label`
         },
         { defaultMessage: `Elevated risk`, id: `settings.chatGpt.security.elevatedRisk` },
         {
           defaultMessage: `When enabled, dev mode apps without a declared CSP get the same restricted default CSP they would in production instead of unrestricted network access. <link>Learn more</link>`,
-          id: `settings.chatGpt.security.enforceCsp.description`,
+          id: `settings.chatGpt.security.enforceCsp.description`
         },
         {
           defaultMessage: `Enforce CSP in developer mode`,
-          id: `settings.chatGpt.security.enforceCsp.title`,
+          id: `settings.chatGpt.security.enforceCsp.title`
         },
         {
           defaultMessage: `All <count>{total, number}</count>`,
-          id: `settings.chatGpt.security.linkedApps.allWithCount`,
+          id: `settings.chatGpt.security.linkedApps.allWithCount`
         },
         {
           defaultMessage: `Get personalized ChatGPT responses and Plus benefits when using Siri and Writing Tools`,
-          id: `settings.chatGpt.security.linkedApps.appleDescription`,
+          id: `settings.chatGpt.security.linkedApps.appleDescription`
         },
         {
           defaultMessage: `Apps and sites`,
-          id: `settings.chatGpt.security.linkedApps.appsAndSites`,
+          id: `settings.chatGpt.security.linkedApps.appsAndSites`
         },
         {
           defaultMessage: `Allow Codex CLI to use models from the API`,
-          id: `settings.chatGpt.security.linkedApps.codexDescription`,
+          id: `settings.chatGpt.security.linkedApps.codexDescription`
         },
         {
           defaultMessage: `Connected on {timestamp, date, long}`,
-          id: `settings.chatGpt.security.linkedApps.connectedOn`,
+          id: `settings.chatGpt.security.linkedApps.connectedOn`
         },
         {
           defaultMessage: `{name} will no longer have access through your ChatGPT account`,
-          id: `settings.chatGpt.security.linkedApps.connection.description`,
+          id: `settings.chatGpt.security.linkedApps.connection.description`
         },
         {
           defaultMessage: `Disconnect`,
-          id: `settings.chatGpt.security.linkedApps.connection.disconnect`,
+          id: `settings.chatGpt.security.linkedApps.connection.disconnect`
         },
         {
           defaultMessage: `Disconnect {name}`,
-          id: `settings.chatGpt.security.linkedApps.connection.disconnectLabel`,
+          id: `settings.chatGpt.security.linkedApps.connection.disconnectLabel`
         },
         {
           defaultMessage: `Manage login connection`,
-          id: `settings.chatGpt.security.linkedApps.connection.title`,
+          id: `settings.chatGpt.security.linkedApps.connection.title`
         },
         {
           defaultMessage: `Review other apps and sites you’ve logged into with ChatGPT, and manage what they can access`,
-          id: `settings.chatGpt.security.linkedApps.description`,
+          id: `settings.chatGpt.security.linkedApps.description`
         },
         { defaultMessage: `Details`, id: `settings.chatGpt.security.linkedApps.details` },
         { defaultMessage: `Disconnect`, id: `settings.chatGpt.security.linkedApps.disconnect` },
         {
           defaultMessage: `Disconnect {name}?`,
-          id: `settings.chatGpt.security.linkedApps.disconnectTitle`,
+          id: `settings.chatGpt.security.linkedApps.disconnectTitle`
         },
         {
           defaultMessage: `You haven’t used ChatGPT to sign into any websites or apps yet. Once you do, they’ll show up here.`,
-          id: `settings.chatGpt.security.linkedApps.empty`,
+          id: `settings.chatGpt.security.linkedApps.empty`
         },
         {
           defaultMessage: `ChatGPT in KakaoTalk`,
-          id: `settings.chatGpt.security.linkedApps.kakaoDescription`,
+          id: `settings.chatGpt.security.linkedApps.kakaoDescription`
         },
         {
           defaultMessage: `Linked on {timestamp, date, medium} at {timestamp, time, short}`,
-          id: `settings.chatGpt.security.linkedApps.linkedAt`,
+          id: `settings.chatGpt.security.linkedApps.linkedAt`
         },
         {
           defaultMessage: `No apps or sites found`,
-          id: `settings.chatGpt.security.linkedApps.noMatches`,
+          id: `settings.chatGpt.security.linkedApps.noMatches`
         },
         {
           defaultMessage: `No permissions granted`,
-          id: `settings.chatGpt.security.linkedApps.noPermissions`,
+          id: `settings.chatGpt.security.linkedApps.noPermissions`
         },
         { defaultMessage: `Permissions`, id: `settings.chatGpt.security.linkedApps.permissions` },
         {
           defaultMessage: `Manage usage`,
-          id: `settings.chatGpt.security.linkedApps.plan.manageUsage`,
+          id: `settings.chatGpt.security.linkedApps.plan.manageUsage`
         },
         {
           defaultMessage: `Remove the Sign in with ChatGPT connection with this app/site`,
-          id: `settings.chatGpt.security.linkedApps.removeSignInConnectionDescription`,
+          id: `settings.chatGpt.security.linkedApps.removeSignInConnectionDescription`
         },
         {
           defaultMessage: `Search apps and sites`,
-          id: `settings.chatGpt.security.linkedApps.search`,
+          id: `settings.chatGpt.security.linkedApps.search`
         },
         { defaultMessage: `Search`, id: `settings.chatGpt.security.linkedApps.searchPlaceholder` },
         {
           defaultMessage: `Shared with {name}`,
-          id: `settings.chatGpt.security.linkedApps.sharedWith`,
+          id: `settings.chatGpt.security.linkedApps.sharedWith`
         },
         {
           defaultMessage: `Signed in with ChatGPT`,
-          id: `settings.chatGpt.security.linkedApps.signedIn`,
+          id: `settings.chatGpt.security.linkedApps.signedIn`
         },
         {
           defaultMessage: `Sites <count>{total, number}</count>`,
-          id: `settings.chatGpt.security.linkedApps.sitesWithCount`,
+          id: `settings.chatGpt.security.linkedApps.sitesWithCount`
         },
         {
           defaultMessage: `Connected apps and sites`,
-          id: `settings.chatGpt.security.linkedApps.tabs`,
+          id: `settings.chatGpt.security.linkedApps.tabs`
         },
         {
           defaultMessage: `Apps <count>{total, number}</count>`,
-          id: `settings.chatGpt.security.linkedApps.thirdPartyWithCount`,
+          id: `settings.chatGpt.security.linkedApps.thirdPartyWithCount`
         },
         {
           defaultMessage: `ChatGPT in Viber`,
-          id: `settings.chatGpt.security.linkedApps.viberDescription`,
+          id: `settings.chatGpt.security.linkedApps.viberDescription`
         },
         { defaultMessage: `Website`, id: `settings.chatGpt.security.linkedApps.website` },
         {
           defaultMessage: `Couldn’t load security settings. Please try again`,
-          id: `settings.chatGpt.security.loadError`,
+          id: `settings.chatGpt.security.loadError`
         },
         { defaultMessage: `Loading security settings…`, id: `settings.chatGpt.security.loading` },
         {
           defaultMessage: `Login connections`,
-          id: `settings.chatGpt.security.loginConnections.title`,
+          id: `settings.chatGpt.security.loginConnections.title`
         },
         {
           defaultMessage: `Passkeys and security keys`,
-          id: `settings.chatGpt.security.loginMethods.passkeys.title`,
+          id: `settings.chatGpt.security.loginMethods.passkeys.title`
         },
         { defaultMessage: `How you log in`, id: `settings.chatGpt.security.loginMethods.title` },
         {
           defaultMessage: `Add another method to prevent lockouts`,
-          id: `settings.chatGpt.security.mfa.addAnother`,
+          id: `settings.chatGpt.security.mfa.addAnother`
         },
         {
           defaultMessage: `Use one-time codes from an authenticator app`,
-          id: `settings.chatGpt.security.mfa.authenticatorDescription`,
+          id: `settings.chatGpt.security.mfa.authenticatorDescription`
         },
         { defaultMessage: `6-digit code`, id: `settings.chatGpt.security.mfa.code` },
         { defaultMessage: `Copy code`, id: `settings.chatGpt.security.mfa.copyCode` },
@@ -10121,126 +10129,126 @@ function n() {
         { defaultMessage: `Push notifications`, id: `settings.chatGpt.security.mfa.push` },
         {
           defaultMessage: `Approve log-ins with a push sent to your trusted device`,
-          id: `settings.chatGpt.security.mfa.pushDescription`,
+          id: `settings.chatGpt.security.mfa.pushDescription`
         },
         {
           defaultMessage: `Enable push notifications`,
-          id: `settings.chatGpt.security.mfa.pushTitle`,
+          id: `settings.chatGpt.security.mfa.pushTitle`
         },
         {
           defaultMessage: `QR code for authenticator app setup`,
-          id: `settings.chatGpt.security.mfa.qrLabel`,
+          id: `settings.chatGpt.security.mfa.qrLabel`
         },
         { defaultMessage: `Remove`, id: `settings.chatGpt.security.mfa.remove` },
         {
           defaultMessage: `You won’t be able to use this method to sign in to your account anymore`,
-          id: `settings.chatGpt.security.mfa.removeDescription`,
+          id: `settings.chatGpt.security.mfa.removeDescription`
         },
         {
           defaultMessage: `Remove authentication method?`,
-          id: `settings.chatGpt.security.mfa.removeTitle`,
+          id: `settings.chatGpt.security.mfa.removeTitle`
         },
         { defaultMessage: `Resend code`, id: `settings.chatGpt.security.mfa.resend` },
         {
           defaultMessage: `We resent a code to your phone`,
-          id: `settings.chatGpt.security.mfa.resent`,
+          id: `settings.chatGpt.security.mfa.resent`
         },
         {
           defaultMessage: `Scan the QR code using your authenticator app, then enter the 6-digit code from the app`,
-          id: `settings.chatGpt.security.mfa.scanInstructions`,
+          id: `settings.chatGpt.security.mfa.scanInstructions`
         },
         { defaultMessage: `Send code`, id: `settings.chatGpt.security.mfa.sendCode` },
         { defaultMessage: `Show QR code`, id: `settings.chatGpt.security.mfa.showQr` },
         {
           defaultMessage: `Can’t scan? Enter the code manually`,
-          id: `settings.chatGpt.security.mfa.showSecret`,
+          id: `settings.chatGpt.security.mfa.showSecret`
         },
         { defaultMessage: `Text message`, id: `settings.chatGpt.security.mfa.sms` },
         { defaultMessage: `Enter the code`, id: `settings.chatGpt.security.mfa.smsCodeTitle` },
         {
           defaultMessage: `Get 6-digit verification codes by SMS or WhatsApp based on your country code`,
-          id: `settings.chatGpt.security.mfa.smsDescription`,
+          id: `settings.chatGpt.security.mfa.smsDescription`
         },
         {
           defaultMessage: `Enter the 6-digit code we just sent to {phoneNumber}`,
-          id: `settings.chatGpt.security.mfa.smsSent`,
+          id: `settings.chatGpt.security.mfa.smsSent`
         },
         { defaultMessage: `Add your phone number`, id: `settings.chatGpt.security.mfa.smsTitle` },
         {
           defaultMessage: `Multi-factor authentication (MFA)`,
-          id: `settings.chatGpt.security.mfa.title`,
+          id: `settings.chatGpt.security.mfa.title`
         },
         {
           defaultMessage: `Connect your authenticator app`,
-          id: `settings.chatGpt.security.mfa.totpTitle`,
+          id: `settings.chatGpt.security.mfa.totpTitle`
         },
         {
           defaultMessage: `Text message verification isn’t available for this country code`,
-          id: `settings.chatGpt.security.mfa.unsupportedRegion`,
+          id: `settings.chatGpt.security.mfa.unsupportedRegion`
         },
         { defaultMessage: `Verify`, id: `settings.chatGpt.security.mfa.verify` },
         {
           defaultMessage: `Couldn’t complete setup. Check your details and try again`,
-          id: `settings.chatGpt.security.mfa.verifyError`,
+          id: `settings.chatGpt.security.mfa.verifyError`
         },
         { defaultMessage: `Actions for {name}`, id: `settings.chatGpt.security.passkeys.actions` },
         { defaultMessage: `Add`, id: `settings.chatGpt.security.passkeys.add` },
         { defaultMessage: `Add`, id: `settings.chatGpt.security.passkeys.addAction` },
         {
           defaultMessage: `Add a passkey or security key`,
-          id: `settings.chatGpt.security.passkeys.addButton`,
+          id: `settings.chatGpt.security.passkeys.addButton`
         },
         {
           defaultMessage: `Added: {timestamp, date, long}`,
-          id: `settings.chatGpt.security.passkeys.added`,
+          id: `settings.chatGpt.security.passkeys.added`
         },
         { defaultMessage: `Delete`, id: `settings.chatGpt.security.passkeys.delete` },
         {
           defaultMessage: `Use a phishing-resistant alternative to passwords`,
-          id: `settings.chatGpt.security.passkeys.description`,
+          id: `settings.chatGpt.security.passkeys.description`
         },
         { defaultMessage: `Passkey`, id: `settings.chatGpt.security.passkeys.fallback` },
         {
           defaultMessage: `Hardware security keys offer the strongest protection`,
-          id: `settings.chatGpt.security.passkeys.hardwareDescription`,
+          id: `settings.chatGpt.security.passkeys.hardwareDescription`
         },
         {
           defaultMessage: `See all the active security keys and passkeys`,
-          id: `settings.chatGpt.security.passkeys.listDescription`,
+          id: `settings.chatGpt.security.passkeys.listDescription`
         },
         {
           defaultMessage: `Passkeys & security keys`,
-          id: `settings.chatGpt.security.passkeys.listTitle`,
+          id: `settings.chatGpt.security.passkeys.listTitle`
         },
         { defaultMessage: `Name`, id: `settings.chatGpt.security.passkeys.name` },
         { defaultMessage: `Order a YubiKey`, id: `settings.chatGpt.security.passkeys.order` },
         { defaultMessage: `Rename`, id: `settings.chatGpt.security.passkeys.rename` },
         {
           defaultMessage: `Failed to save passkey name`,
-          id: `settings.chatGpt.security.passkeys.renameError`,
+          id: `settings.chatGpt.security.passkeys.renameError`
         },
         {
           defaultMessage: `Rename security key`,
-          id: `settings.chatGpt.security.passkeys.renameTitle`,
+          id: `settings.chatGpt.security.passkeys.renameTitle`
         },
         { defaultMessage: `Save`, id: `settings.chatGpt.security.passkeys.save` },
         {
           defaultMessage: `Your browser doesn’t support passkeys`,
-          id: `settings.chatGpt.security.passkeys.unsupported`,
+          id: `settings.chatGpt.security.passkeys.unsupported`
         },
         {
           defaultMessage: `Get a YubiKey bundle`,
-          id: `settings.chatGpt.security.passkeys.yubikey`,
+          id: `settings.chatGpt.security.passkeys.yubikey`
         },
         { defaultMessage: `Add`, id: `settings.chatGpt.security.password.add` },
         {
           defaultMessage: `Password sign-in is disabled while Advanced account security is enabled`,
-          id: `settings.chatGpt.security.password.advancedProtectionDescription`,
+          id: `settings.chatGpt.security.password.advancedProtectionDescription`
         },
         { defaultMessage: `Change`, id: `settings.chatGpt.security.password.change` },
         {
           defaultMessage: `Manage the password you use to log in`,
-          id: `settings.chatGpt.security.password.description`,
+          id: `settings.chatGpt.security.password.description`
         },
         { defaultMessage: `Disabled`, id: `settings.chatGpt.security.password.disabled` },
         { defaultMessage: `Password`, id: `settings.chatGpt.security.password.title` },
@@ -10248,111 +10256,111 @@ function n() {
         { defaultMessage: `Sessions`, id: `settings.chatGpt.security.sessions` },
         {
           defaultMessage: `Log out of all devices`,
-          id: `settings.chatGpt.security.sessions.allConfirm`,
+          id: `settings.chatGpt.security.sessions.allConfirm`
         },
         {
           defaultMessage: `This will log you out of your account on all devices, including this one. You’ll need to log in again on any device you want to use.`,
-          id: `settings.chatGpt.security.sessions.allDescription`,
+          id: `settings.chatGpt.security.sessions.allDescription`
         },
         {
           defaultMessage: `Log out of all devices?`,
-          id: `settings.chatGpt.security.sessions.allTitle`,
+          id: `settings.chatGpt.security.sessions.allTitle`
         },
         { defaultMessage: `Current session`, id: `settings.chatGpt.security.sessions.current` },
         {
           defaultMessage: `View all devices that have accessed your account. You can review active sessions, remove trusted devices, or use Log out all to end all sessions.`,
-          id: `settings.chatGpt.security.sessions.description`,
+          id: `settings.chatGpt.security.sessions.description`
         },
         {
           defaultMessage: `Review devices with active sessions. Trusted devices can receive security notifications, such as sign-in approvals.`,
-          id: `settings.chatGpt.security.sessions.devicesDescription`,
+          id: `settings.chatGpt.security.sessions.devicesDescription`
         },
         { defaultMessage: `No active sessions`, id: `settings.chatGpt.security.sessions.empty` },
         { defaultMessage: `Got it`, id: `settings.chatGpt.security.sessions.gotIt` },
         { defaultMessage: `Info`, id: `settings.chatGpt.security.sessions.info` },
         {
           defaultMessage: `{timestamp, date, medium} at {timestamp, time, short}`,
-          id: `settings.chatGpt.security.sessions.loginTime`,
+          id: `settings.chatGpt.security.sessions.loginTime`
         },
         { defaultMessage: `Log out`, id: `settings.chatGpt.security.sessions.logOut` },
         { defaultMessage: `Log out all`, id: `settings.chatGpt.security.sessions.logOutAll` },
         {
           defaultMessage: `Log out of all active sessions across all devices, including this session. This may take up to 30 minutes.`,
-          id: `settings.chatGpt.security.sessions.logOutAllDescription`,
+          id: `settings.chatGpt.security.sessions.logOutAllDescription`
         },
         {
           defaultMessage: `Log out of all sessions`,
-          id: `settings.chatGpt.security.sessions.logOutAllLabel`,
+          id: `settings.chatGpt.security.sessions.logOutAllLabel`
         },
         {
           defaultMessage: `This will immediately log out from your account. You’ll need to log in again to access your account on that device.`,
-          id: `settings.chatGpt.security.sessions.logoutDescription`,
+          id: `settings.chatGpt.security.sessions.logoutDescription`
         },
         { defaultMessage: `Log out?`, id: `settings.chatGpt.security.sessions.logoutTitle` },
         { defaultMessage: `Trusted device`, id: `settings.chatGpt.security.sessions.trusted` },
         {
           defaultMessage: `This will log out the device and remove it from your trusted devices. The device will no longer receive push notifications or be used to unlock your account.`,
-          id: `settings.chatGpt.security.sessions.trustedDescription`,
+          id: `settings.chatGpt.security.sessions.trustedDescription`
         },
         {
           defaultMessage: `Log out and remove trusted device?`,
-          id: `settings.chatGpt.security.sessions.trustedTitle`,
+          id: `settings.chatGpt.security.sessions.trustedTitle`
         },
         {
           defaultMessage: `Session status unavailable`,
-          id: `settings.chatGpt.security.sessions.unavailable`,
+          id: `settings.chatGpt.security.sessions.unavailable`
         },
         {
           defaultMessage: `To remove this device, go back and select “Log out all”`,
-          id: `settings.chatGpt.security.sessions.unavailableDescription`,
+          id: `settings.chatGpt.security.sessions.unavailableDescription`
         },
         {
           defaultMessage: `Can’t log out`,
-          id: `settings.chatGpt.security.sessions.unavailableTitle`,
+          id: `settings.chatGpt.security.sessions.unavailableTitle`
         },
         {
           defaultMessage: `Unknown device`,
-          id: `settings.chatGpt.security.sessions.unknownDevice`,
+          id: `settings.chatGpt.security.sessions.unknownDevice`
         },
         {
           defaultMessage: `Could not update security settings`,
-          id: `settings.chatGpt.security.updateError`,
+          id: `settings.chatGpt.security.updateError`
         },
         { defaultMessage: `Lockdown mode`, id: `settingsModal.lockdownMode` },
         {
           defaultMessage: `Helps protect sensitive data from prompt-injection attacks by limiting features that can connect to the web or external services. <link>Learn more</link>`,
-          id: `settingsModal.lockdownModeDescription`,
-        },
+          id: `settingsModal.lockdownModeDescription`
+        }
       ],
       storage: [
         { defaultMessage: `Couldn't load storage usage`, id: `settings.chatGpt.storage.error` },
         { defaultMessage: `Files`, id: `settings.chatGpt.storage.files` },
         {
           defaultMessage: `{size} • {count, plural, one {# file} other {# files}}`,
-          id: `settings.chatGpt.storage.filesDetail`,
+          id: `settings.chatGpt.storage.filesDetail`
         },
         { defaultMessage: `Images`, id: `settings.chatGpt.storage.images` },
         {
           defaultMessage: `{size} • {count, plural, one {# image} other {# images}}`,
-          id: `settings.chatGpt.storage.imagesDetail`,
+          id: `settings.chatGpt.storage.imagesDetail`
         },
         {
           defaultMessage: `Manage your library to free up storage`,
-          id: `settings.chatGpt.storage.manageDescription`,
+          id: `settings.chatGpt.storage.manageDescription`
         },
         { defaultMessage: `Manage storage`, id: `settings.chatGpt.storage.manageStorage` },
         {
           defaultMessage: `Delete files to free up storage space`,
-          id: `settings.chatGpt.storage.manageStorageToast`,
+          id: `settings.chatGpt.storage.manageStorageToast`
         },
         { defaultMessage: `Retry`, id: `settings.chatGpt.storage.retry` },
-        { defaultMessage: `{used} of {allowed} used`, id: `settings.chatGpt.storage.usageSummary` },
+        { defaultMessage: `{used} of {allowed} used`, id: `settings.chatGpt.storage.usageSummary` }
       ],
       "trusted-contact": [
         { defaultMessage: `Phone number`, id: `phoneNumberInput.phoneNumberLabel` },
         {
           defaultMessage: `Couldn't load trusted contact. Please try again.`,
-          id: `settings.chatGpt.trustedContact.loadError`,
+          id: `settings.chatGpt.trustedContact.loadError`
         },
         { defaultMessage: `Retry`, id: `settings.chatGpt.trustedContact.retry` },
         { defaultMessage: `Active`, id: `settingsModal.trustedContacts.activeStatus` },
@@ -10360,219 +10368,219 @@ function n() {
         { defaultMessage: `Add contact`, id: `settingsModal.trustedContacts.addTrustedContact` },
         {
           defaultMessage: `Cancel invitation`,
-          id: `settingsModal.trustedContacts.cancelInvitation`,
+          id: `settingsModal.trustedContacts.cancelInvitation`
         },
         {
           defaultMessage: `I confirm this person and I are 18 or older. If this person agrees to be my trusted contact, I understand and agree that OpenAI may notify them in the future if I discuss suicide with ChatGPT in a way that indicates a serious safety concern, and I agree to my data being used for this purpose. I understand this system can make mistakes and that this feature is not an emergency service or a substitute for professional care.`,
-          id: `settingsModal.trustedContacts.consentTextAdultPermissionRequired.v3`,
+          id: `settingsModal.trustedContacts.consentTextAdultPermissionRequired.v3`
         },
         {
           defaultMessage: `I confirm this person and I are 19 or older. If this person agrees to be my trusted contact, I understand and agree that OpenAI may notify them in the future if I discuss suicide with ChatGPT in a way that indicates a serious safety concern, and I agree to my data being used for this purpose. I understand this system can make mistakes and that this feature is not an emergency service or a substitute for professional care.`,
-          id: `settingsModal.trustedContacts.consentTextAdultPermissionRequiredKorea.v1`,
+          id: `settingsModal.trustedContacts.consentTextAdultPermissionRequiredKorea.v1`
         },
         { defaultMessage: `Close`, id: `settingsModal.trustedContacts.infoModal.closeButton` },
         {
           defaultMessage: `Add a contact`,
-          id: `settingsModal.trustedContacts.infoModal.continueButton.v2`,
+          id: `settingsModal.trustedContacts.infoModal.continueButton.v2`
         },
         {
           defaultMessage: `When things feel heavy, it can be hard to reach out for help. Having a <bold>trusted contact</bold> can make it easier to get support from someone who knows you well.`,
-          id: `settingsModal.trustedContacts.infoModal.introBodyPrimary.v2`,
+          id: `settingsModal.trustedContacts.infoModal.introBodyPrimary.v2`
         },
         {
           defaultMessage: `In the future, if you discuss suicide with ChatGPT in a way that indicates a serious safety concern, we may automatically notify your trusted contact so they can check in with you.`,
-          id: `settingsModal.trustedContacts.infoModal.introBodySecondary.v2`,
+          id: `settingsModal.trustedContacts.infoModal.introBodySecondary.v2`
         },
         {
           defaultMessage: `Learn more`,
-          id: `settingsModal.trustedContacts.infoModal.learnMoreLinkLabel`,
+          id: `settingsModal.trustedContacts.infoModal.learnMoreLinkLabel`
         },
         {
           defaultMessage: `Adding a trusted contact`,
-          id: `settingsModal.trustedContacts.infoModal.title.v2`,
+          id: `settingsModal.trustedContacts.infoModal.title.v2`
         },
         {
           defaultMessage: `You’ll invite someone to be your trusted contact. They can choose whether to participate.`,
-          id: `settingsModal.trustedContacts.infoModal.whatToExpectBulletOne.v2`,
+          id: `settingsModal.trustedContacts.infoModal.whatToExpectBulletOne.v2`
         },
         {
           defaultMessage: `Your trusted contact’s role is to check in, listen, and help you find additional support if needed. They aren’t expected to handle emergencies or be your only source of support.`,
-          id: `settingsModal.trustedContacts.infoModal.whatToExpectBulletThree.v2`,
+          id: `settingsModal.trustedContacts.infoModal.whatToExpectBulletThree.v2`
         },
         {
           defaultMessage: `In the future, if it seems you may need support, we’ll let them know. We’ll only share the general reason — that suicide came up in a potentially concerning way — and encourage them to check in with you. We won’t share your chat details or transcripts.`,
-          id: `settingsModal.trustedContacts.infoModal.whatToExpectBulletTwo.v2`,
+          id: `settingsModal.trustedContacts.infoModal.whatToExpectBulletTwo.v2`
         },
         {
           defaultMessage: `What to expect`,
-          id: `settingsModal.trustedContacts.infoModal.whatToExpectHeading`,
+          id: `settingsModal.trustedContacts.infoModal.whatToExpectHeading`
         },
         {
           defaultMessage: `You can invite a friend, family member, or another trusted adult (18+) to be your trusted contact.`,
-          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletOne.v2`,
+          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletOne.v2`
         },
         {
           defaultMessage: `You can invite a friend, family member, or another trusted adult (19+) to be your trusted contact.`,
-          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletOneKorea.v1`,
+          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletOneKorea.v1`
         },
         {
           defaultMessage: `You can change or remove your trusted contact anytime from your ChatGPT settings.`,
-          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletThree.v2`,
+          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletThree.v2`
         },
         {
           defaultMessage: `Choose someone who you feel comfortable being honest with and trust to respond with care.`,
-          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletTwo.v2`,
+          id: `settingsModal.trustedContacts.infoModal.whoToInviteBulletTwo.v2`
         },
         {
           defaultMessage: `Who to invite`,
-          id: `settingsModal.trustedContacts.infoModal.whoToInviteHeading`,
+          id: `settingsModal.trustedContacts.infoModal.whoToInviteHeading`
         },
         {
           defaultMessage: `Please enter a valid email address.`,
-          id: `settingsModal.trustedContacts.invalidEmailError`,
+          id: `settingsModal.trustedContacts.invalidEmailError`
         },
         {
           defaultMessage: `Invitation resent.`,
-          id: `settingsModal.trustedContacts.invitationResentSuccess`,
+          id: `settingsModal.trustedContacts.invitationResentSuccess`
         },
         {
           defaultMessage: `Choose a friend, family member, or another trusted adult who is readily available to offer support. We’ll invite them to be your trusted contact, and they can choose whether to participate. <learnMoreLink>Learn more</learnMoreLink>`,
-          id: `settingsModal.trustedContacts.inviteModalDescription.v2`,
+          id: `settingsModal.trustedContacts.inviteModalDescription.v2`
         },
         {
           defaultMessage: `Invite a trusted contact`,
-          id: `settingsModal.trustedContacts.inviteModalTitle`,
+          id: `settingsModal.trustedContacts.inviteModalTitle`
         },
         {
           defaultMessage: `Your trusted contact`,
-          id: `settingsModal.trustedContacts.inviteSuccessModal.contactReferenceFallback`,
+          id: `settingsModal.trustedContacts.inviteSuccessModal.contactReferenceFallback`
         },
         {
           defaultMessage: `{contactName} ({contactMethod})`,
-          id: `settingsModal.trustedContacts.inviteSuccessModal.contactReferenceWithMethod`,
+          id: `settingsModal.trustedContacts.inviteSuccessModal.contactReferenceWithMethod`
         },
         {
           defaultMessage: `You can update or remove your trusted contact anytime from your <settingsLink>settings</settingsLink>.`,
-          id: `settingsModal.trustedContacts.inviteSuccessModal.description`,
+          id: `settingsModal.trustedContacts.inviteSuccessModal.description`
         },
         {
           defaultMessage: `Hi there, {paragraphBreak}I’ve been thinking about ways to make sure I have support when I’m going through a tough time. Sometimes it’s hard for me to reach out in those moments. {paragraphBreak}There’s a feature in ChatGPT where I can add a trusted contact — someone who would get a heads-up if I might need support. I thought of you, and wanted to check how you’d feel about that.{paragraphBreak}You may have seen an invitation from ChatGPT about this already, but I wanted to reach out directly, too. If you’re open to it, maybe we could find a time to talk?`,
-          id: `settingsModal.trustedContacts.inviteSuccessModal.personalNoteEmailBody`,
+          id: `settingsModal.trustedContacts.inviteSuccessModal.personalNoteEmailBody`
         },
         {
           defaultMessage: `Could we find time to chat?`,
-          id: `settingsModal.trustedContacts.inviteSuccessModal.personalNoteEmailSubject`,
+          id: `settingsModal.trustedContacts.inviteSuccessModal.personalNoteEmailSubject`
         },
         {
           defaultMessage: `Send a personal note`,
-          id: `settingsModal.trustedContacts.inviteSuccessModal.sendPersonalNote`,
+          id: `settingsModal.trustedContacts.inviteSuccessModal.sendPersonalNote`
         },
         {
           defaultMessage: `Invitation sent`,
-          id: `settingsModal.trustedContacts.inviteSuccessModal.title`,
+          id: `settingsModal.trustedContacts.inviteSuccessModal.title`
         },
         {
           defaultMessage: `Loading trusted contact...`,
-          id: `settingsModal.trustedContacts.loading`,
+          id: `settingsModal.trustedContacts.loading`
         },
         { defaultMessage: `Email`, id: `settingsModal.trustedContacts.modalEmailLabel` },
         {
           defaultMessage: `contact@example.com`,
-          id: `settingsModal.trustedContacts.modalEmailPlaceholder`,
+          id: `settingsModal.trustedContacts.modalEmailPlaceholder`
         },
         { defaultMessage: `Name`, id: `settingsModal.trustedContacts.modalNameLabel` },
         {
           defaultMessage: `Enter your trusted contact's full name`,
-          id: `settingsModal.trustedContacts.modalNamePlaceholder`,
+          id: `settingsModal.trustedContacts.modalNamePlaceholder`
         },
         { defaultMessage: `Phone`, id: `settingsModal.trustedContacts.modalPhoneLabel` },
         { defaultMessage: `Pending`, id: `settingsModal.trustedContacts.pendingStatus` },
         {
           defaultMessage: `Go back`,
-          id: `settingsModal.trustedContacts.removeConfirmation.cancelButton`,
+          id: `settingsModal.trustedContacts.removeConfirmation.cancelButton`
         },
         {
           defaultMessage: `Remove contact`,
-          id: `settingsModal.trustedContacts.removeConfirmation.confirmButton`,
+          id: `settingsModal.trustedContacts.removeConfirmation.confirmButton`
         },
         {
           defaultMessage: `You’re about to remove {name} as your trusted contact.`,
-          id: `settingsModal.trustedContacts.removeConfirmation.description`,
+          id: `settingsModal.trustedContacts.removeConfirmation.description`
         },
         {
           defaultMessage: `Are you sure?`,
-          id: `settingsModal.trustedContacts.removeConfirmation.title`,
+          id: `settingsModal.trustedContacts.removeConfirmation.title`
         },
         {
           defaultMessage: `Unable to remove trusted contact. Please try again.`,
-          id: `settingsModal.trustedContacts.removedError`,
+          id: `settingsModal.trustedContacts.removedError`
         },
         {
           defaultMessage: `Trusted contact removed`,
-          id: `settingsModal.trustedContacts.removedSuccess`,
+          id: `settingsModal.trustedContacts.removedSuccess`
         },
         {
           defaultMessage: `Remove contact`,
-          id: `settingsModal.trustedContacts.removeTrustedContact`,
+          id: `settingsModal.trustedContacts.removeTrustedContact`
         },
         {
           defaultMessage: `Resend invitation`,
-          id: `settingsModal.trustedContacts.resendInvitation`,
+          id: `settingsModal.trustedContacts.resendInvitation`
         },
         {
           defaultMessage: `Unable to save trusted contact. Please try again.`,
-          id: `settingsModal.trustedContacts.savedError`,
+          id: `settingsModal.trustedContacts.savedError`
         },
         {
           defaultMessage: `Having a trusted contact can make it easier to get support from someone who knows you well.`,
-          id: `settingsModal.trustedContacts.sectionDescriptionPrimary.v2`,
+          id: `settingsModal.trustedContacts.sectionDescriptionPrimary.v2`
         },
         {
           defaultMessage: `In the future, if you discuss suicide with ChatGPT in a way that indicates a serious safety concern, we may automatically notify your trusted contact so they can check in with you. They must be 18+ to participate. <learnMoreLink>Learn more</learnMoreLink>`,
-          id: `settingsModal.trustedContacts.sectionDescriptionSecondary.v2`,
+          id: `settingsModal.trustedContacts.sectionDescriptionSecondary.v2`
         },
         {
           defaultMessage: `In the future, if you discuss suicide with ChatGPT in a way that indicates a serious safety concern, we may automatically notify your trusted contact so they can check in with you. You and they must be 19+ to participate. <learnMoreLink>Learn more</learnMoreLink>`,
-          id: `settingsModal.trustedContacts.sectionDescriptionSecondaryKorea.v1`,
+          id: `settingsModal.trustedContacts.sectionDescriptionSecondaryKorea.v1`
         },
         {
           defaultMessage: `Trusted contact`,
-          id: `settingsModal.trustedContacts.trustedContactFallbackName`,
+          id: `settingsModal.trustedContacts.trustedContactFallbackName`
         },
         {
           defaultMessage: `Add someone else`,
-          id: `settingsModal.trustedContacts.unavailableModal.addSomeoneElse`,
+          id: `settingsModal.trustedContacts.unavailableModal.addSomeoneElse`
         },
         {
           defaultMessage: `This person`,
-          id: `settingsModal.trustedContacts.unavailableModal.contactReferenceFallback`,
+          id: `settingsModal.trustedContacts.unavailableModal.contactReferenceFallback`
         },
         {
           defaultMessage: `{contactName} ({contactMethod})`,
-          id: `settingsModal.trustedContacts.unavailableModal.contactReferenceWithMethod`,
+          id: `settingsModal.trustedContacts.unavailableModal.contactReferenceWithMethod`
         },
         {
           defaultMessage: `This can happen for different reasons — for example, they may not be eligible. <helpCenterLink>Learn more</helpCenterLink>`,
-          id: `settingsModal.trustedContacts.unavailableModal.description.v2`,
+          id: `settingsModal.trustedContacts.unavailableModal.description.v2`
         },
         {
           defaultMessage: `Couldn’t add trusted contact`,
-          id: `settingsModal.trustedContacts.unavailableModal.title`,
-        },
+          id: `settingsModal.trustedContacts.unavailableModal.title`
+        }
       ],
       usage: [
         {
           defaultMessage: `Couldn’t reset usage. Please try again`,
-          id: `codex.rateLimitResetModal.error`,
+          id: `codex.rateLimitResetModal.error`
         },
         { defaultMessage: `Retry`, id: `common.retry` },
         {
           defaultMessage: `{years, plural, one {annual limit} other {{years} year limit}}`,
-          id: `composer.mode.rateLimit.annualDynamicSentence`,
+          id: `composer.mode.rateLimit.annualDynamicSentence`
         },
         {
           defaultMessage: `{years, plural, one {Annual} other {{years} Years}}`,
-          id: `composer.mode.rateLimit.annualDynamicTitle`,
+          id: `composer.mode.rateLimit.annualDynamicTitle`
         },
         { defaultMessage: `{days}d`, id: `composer.mode.rateLimit.day` },
         { defaultMessage: `Usage remaining`, id: `composer.mode.rateLimit.heading` },
@@ -10580,137 +10588,137 @@ function n() {
         { defaultMessage: `{minutes}m`, id: `composer.mode.rateLimit.minute` },
         {
           defaultMessage: `{months, plural, one {monthly limit} other {{months} month limit}}`,
-          id: `composer.mode.rateLimit.monthlyDynamicSentence`,
+          id: `composer.mode.rateLimit.monthlyDynamicSentence`
         },
         {
           defaultMessage: `{months, plural, one {Monthly} other {{months} Months}}`,
-          id: `composer.mode.rateLimit.monthlyDynamicTitle`,
+          id: `composer.mode.rateLimit.monthlyDynamicTitle`
         },
         {
           defaultMessage: `{weeks, plural, one {weekly limit} other {{weeks} week limit}}`,
-          id: `composer.mode.rateLimit.weeklyDynamicSentence`,
+          id: `composer.mode.rateLimit.weeklyDynamicSentence`
         },
         {
           defaultMessage: `{weeks, plural, one {Weekly} other {{weeks} Weeks}}`,
-          id: `composer.mode.rateLimit.weeklyDynamicTitle`,
+          id: `composer.mode.rateLimit.weeklyDynamicTitle`
         },
         { defaultMessage: `Upgrade your plan`, id: `pricing.comparison.title` },
         { defaultMessage: `Cancel`, id: `settings.usage.autoTopUp.cancel` },
         {
           defaultMessage: `OpenAI will charge your payment method automatically when you reach your minimum balance.`,
-          id: `settings.usage.autoTopUp.dialog.description`,
+          id: `settings.usage.autoTopUp.dialog.description`
         },
         { defaultMessage: `Auto-reload credits`, id: `settings.usage.autoTopUp.dialog.title` },
         { defaultMessage: `Turn off`, id: `settings.usage.autoTopUp.disable` },
         {
           defaultMessage: `Failed to disable auto reload`,
-          id: `settings.usage.autoTopUp.disable.error`,
+          id: `settings.usage.autoTopUp.disable.error`
         },
         { defaultMessage: `Disabled auto reload`, id: `settings.usage.autoTopUp.disable.success` },
         { defaultMessage: `Turn on`, id: `settings.usage.autoTopUp.enable` },
         {
           defaultMessage: `Failed to enable auto reload`,
-          id: `settings.usage.autoTopUp.enable.error`,
+          id: `settings.usage.autoTopUp.enable.error`
         },
         { defaultMessage: `Enabled auto reload`, id: `settings.usage.autoTopUp.enable.success` },
         {
           defaultMessage: `The initial top-up for an estimated {amount} failed. <actionLine><managePayment>Update your payment method</managePayment> or <purchaseCredit>purchase credit directly</purchaseCredit>.</actionLine>`,
-          id: `settings.usage.autoTopUp.immediateTopUpFailure.amount`,
+          id: `settings.usage.autoTopUp.immediateTopUpFailure.amount`
         },
         {
           defaultMessage: `The initial top-up failed. <actionLine><managePayment>Update your payment method</managePayment> or <purchaseCredit>purchase credit directly</purchaseCredit>.</actionLine>`,
-          id: `settings.usage.autoTopUp.immediateTopUpFailure.generic`,
+          id: `settings.usage.autoTopUp.immediateTopUpFailure.generic`
         },
         {
           defaultMessage: `Enabling auto reload will trigger a one-time purchase of {creditCount, number} credit to reach your target balance. Estimated cost: <strong>{amount}</strong>.`,
-          id: `settings.usage.autoTopUp.immediateTopUpNotice.enable`,
+          id: `settings.usage.autoTopUp.immediateTopUpNotice.enable`
         },
         {
           defaultMessage: `Updating your settings will trigger a one-time purchase of {creditCount, number} credit with an estimated cost of <strong>{amount}</strong>.`,
-          id: `settings.usage.autoTopUp.immediateTopUpNotice.update`,
+          id: `settings.usage.autoTopUp.immediateTopUpNotice.update`
         },
         {
           defaultMessage: `Unable to open payment settings right now. Please try again.`,
-          id: `settings.usage.autoTopUp.managePayment.error`,
+          id: `settings.usage.autoTopUp.managePayment.error`
         },
         { defaultMessage: `Save`, id: `settings.usage.autoTopUp.save` },
         {
           defaultMessage: `Failed to save auto reload settings`,
-          id: `settings.usage.autoTopUp.save.error`,
+          id: `settings.usage.autoTopUp.save.error`
         },
         {
           defaultMessage: `Auto-reload target balance`,
-          id: `settings.usage.autoTopUp.target.ariaLabel`,
+          id: `settings.usage.autoTopUp.target.ariaLabel`
         },
         {
           defaultMessage: `Minimum {creditCount, number} credit will be purchased, equivalent to <strong>{amount}</strong>`,
-          id: `settings.usage.autoTopUp.target.equivalent`,
+          id: `settings.usage.autoTopUp.target.equivalent`
         },
         {
           defaultMessage: `Loading price`,
-          id: `settings.usage.autoTopUp.target.equivalent.loading`,
+          id: `settings.usage.autoTopUp.target.equivalent.loading`
         },
         {
           defaultMessage: `Target balance must be at most {maximumCredits, number} credits`,
-          id: `settings.usage.autoTopUp.target.error.maximum`,
+          id: `settings.usage.autoTopUp.target.error.maximum`
         },
         {
           defaultMessage: `Set the target balance to at least 125 credits above the minimum balance.`,
-          id: `settings.usage.autoTopUp.target.error.minimumDifference`,
+          id: `settings.usage.autoTopUp.target.error.minimumDifference`
         },
         {
           defaultMessage: `Enter a target balance.`,
-          id: `settings.usage.autoTopUp.target.error.missing`,
+          id: `settings.usage.autoTopUp.target.error.missing`
         },
         {
           defaultMessage: `Target balance must be a whole number.`,
-          id: `settings.usage.autoTopUp.target.error.wholeNumber`,
+          id: `settings.usage.autoTopUp.target.error.wholeNumber`
         },
         {
           defaultMessage: `Auto reload brings your credit balance back up to this amount.`,
-          id: `settings.usage.autoTopUp.target.helper`,
+          id: `settings.usage.autoTopUp.target.helper`
         },
         { defaultMessage: `Target balance`, id: `settings.usage.autoTopUp.target.label` },
         {
           defaultMessage: `Auto-reload minimum balance`,
-          id: `settings.usage.autoTopUp.threshold.ariaLabel`,
+          id: `settings.usage.autoTopUp.threshold.ariaLabel`
         },
         {
           defaultMessage: `Set the minimum balance to at least 125 credits.`,
-          id: `settings.usage.autoTopUp.threshold.error.minimum`,
+          id: `settings.usage.autoTopUp.threshold.error.minimum`
         },
         {
           defaultMessage: `Enter a minimum balance (at least 125 credits).`,
-          id: `settings.usage.autoTopUp.threshold.error.missing`,
+          id: `settings.usage.autoTopUp.threshold.error.missing`
         },
         {
           defaultMessage: `Minimum balance must be a whole number.`,
-          id: `settings.usage.autoTopUp.threshold.error.wholeNumber`,
+          id: `settings.usage.autoTopUp.threshold.error.wholeNumber`
         },
         {
           defaultMessage: `Auto reload triggers when your credit balance goes below this amount.`,
-          id: `settings.usage.autoTopUp.threshold.helper`,
+          id: `settings.usage.autoTopUp.threshold.helper`
         },
         { defaultMessage: `Minimum balance`, id: `settings.usage.autoTopUp.threshold.label` },
         {
           defaultMessage: `Failed to update auto reload`,
-          id: `settings.usage.autoTopUp.update.error`,
+          id: `settings.usage.autoTopUp.update.error`
         },
         {
           defaultMessage: `Updated auto reload settings`,
-          id: `settings.usage.autoTopUp.update.success`,
+          id: `settings.usage.autoTopUp.update.success`
         },
         {
           defaultMessage: `No banked reset activity in the past 30 days`,
-          id: `settings.usage.bankedResetHistory.empty`,
+          id: `settings.usage.bankedResetHistory.empty`
         },
         {
           defaultMessage: `Couldn’t load banked reset history`,
-          id: `settings.usage.bankedResetHistory.error`,
+          id: `settings.usage.bankedResetHistory.error`
         },
         {
           defaultMessage: `Loading banked reset history…`,
-          id: `settings.usage.bankedResetHistory.loading`,
+          id: `settings.usage.bankedResetHistory.loading`
         },
         { defaultMessage: `Show more`, id: `settings.usage.bankedResetHistory.more` },
         { defaultMessage: `Past 30 days`, id: `settings.usage.bankedResetHistory.period` },
@@ -10718,314 +10726,314 @@ function n() {
         { defaultMessage: `Reset used`, id: `settings.usage.bankedResetHistory.redeemed` },
         {
           defaultMessage: `Your subscription is managed through your Apple account. You'll need to <cancel>cancel via iOS</cancel>`,
-          id: `settings.usage.cancelPlan.appleDescription`,
+          id: `settings.usage.cancelPlan.appleDescription`
         },
         {
           defaultMessage: `Your subscription is managed through your Google Play account. You'll need to <cancel>cancel via Android</cancel>`,
-          id: `settings.usage.cancelPlan.googlePlayDescription`,
+          id: `settings.usage.cancelPlan.googlePlayDescription`
         },
         { defaultMessage: `Add more`, id: `settings.usage.credit.balance.addBusinessCredits` },
         { defaultMessage: `Add more`, id: `settings.usage.credit.balance.addMore` },
         { defaultMessage: `Automatic reload`, id: `settings.usage.credit.balance.automaticReload` },
         {
           defaultMessage: `Toggle automatic reload`,
-          id: `settings.usage.credit.balance.automaticReload.ariaLabel`,
+          id: `settings.usage.credit.balance.automaticReload.ariaLabel`
         },
         { defaultMessage: `Automatic reload`, id: `settings.usage.credit.balance.autoReloadLabel` },
         { defaultMessage: `Current balance`, id: `settings.usage.credit.balance.current` },
         {
           defaultMessage: `Buy credits or turn on automatic reload to continue using Work and Codex when you reach usage limits. <link>Learn more</link>`,
-          id: `settings.usage.credit.balance.description`,
+          id: `settings.usage.credit.balance.description`
         },
         {
           defaultMessage: `Up to {discountPercent, number}% off`,
-          id: `settings.usage.credit.balance.discountOffer`,
+          id: `settings.usage.credit.balance.discountOffer`
         },
         { defaultMessage: `Gift credits`, id: `settings.usage.credit.balance.giftCredits` },
         {
           defaultMessage: `Buy credits for someone else`,
-          id: `settings.usage.credit.balance.giftCredits.description`,
+          id: `settings.usage.credit.balance.giftCredits.description`
         },
         { defaultMessage: `Loading credits`, id: `settings.usage.credit.balance.loading` },
         {
           defaultMessage: `Manage auto-reload`,
-          id: `settings.usage.credit.balance.manageAutoReload`,
+          id: `settings.usage.credit.balance.manageAutoReload`
         },
         {
           defaultMessage: `Buy credits to continue using Work and Codex when you reach usage limits`,
-          id: `settings.usage.credit.balance.purchase.description`,
+          id: `settings.usage.credit.balance.purchase.description`
         },
         {
           defaultMessage: `Your remaining credits`,
-          id: `settings.usage.credit.balance.readOnly.description`,
+          id: `settings.usage.credit.balance.readOnly.description`
         },
         {
           defaultMessage: `Set up auto-reload`,
-          id: `settings.usage.credit.balance.setupAutoReload`,
+          id: `settings.usage.credit.balance.setupAutoReload`
         },
         { defaultMessage: `Credits`, id: `settings.usage.credit.balance.title` },
         {
           defaultMessage: `Shared workspace credits let you keep using Work beyond included usage`,
-          id: `settings.usage.credit.balance.workspace.description`,
+          id: `settings.usage.credit.balance.workspace.description`
         },
         {
           defaultMessage: `{credits, plural, one {# credit remaining} other {# credits remaining}}`,
-          id: `settings.usage.credit.remaining.count`,
+          id: `settings.usage.credit.remaining.count`
         },
         {
           defaultMessage: `Credit remaining unavailable`,
-          id: `settings.usage.credit.remaining.unavailable`,
+          id: `settings.usage.credit.remaining.unavailable`
         },
         { defaultMessage: `Unlimited credit`, id: `settings.usage.credit.remaining.unlimited` },
         {
           defaultMessage: `No credit usage recorded yet`,
-          id: `settings.usage.creditHistory.empty`,
+          id: `settings.usage.creditHistory.empty`
         },
         {
           defaultMessage: `Could not load credit usage history`,
-          id: `settings.usage.creditHistory.error`,
+          id: `settings.usage.creditHistory.error`
         },
         { defaultMessage: `Next`, id: `settings.usage.creditHistory.next` },
         { defaultMessage: `Previous`, id: `settings.usage.creditHistory.previous` },
         {
           defaultMessage: `{from}-{to} of {total} usage events`,
-          id: `settings.usage.creditHistory.range`,
+          id: `settings.usage.creditHistory.range`
         },
         { defaultMessage: `Credit usage history`, id: `settings.usage.creditHistory.title` },
         {
           defaultMessage: `Credits power Codex. Valid for 12 months. <link>View rate card</link>`,
-          id: `settings.usage.creditReload.addCredits.description`,
+          id: `settings.usage.creditReload.addCredits.description`
         },
         {
           defaultMessage: `Credits power Codex. Valid for 12 months. View rate card`,
-          id: `settings.usage.creditReload.addCredits.screenReaderDescription`,
+          id: `settings.usage.creditReload.addCredits.screenReaderDescription`
         },
         { defaultMessage: `Add credits`, id: `settings.usage.creditReload.addCredits.title` },
         {
           defaultMessage: `{creditQuantity, number} credits`,
-          id: `settings.usage.creditReload.amount.credits`,
+          id: `settings.usage.creditReload.amount.credits`
         },
         {
           defaultMessage: `{discountPercent, number}% off`,
-          id: `settings.usage.creditReload.amount.discount`,
+          id: `settings.usage.creditReload.amount.discount`
         },
         { defaultMessage: `Other`, id: `settings.usage.creditReload.amount.other` },
         {
           defaultMessage: `Custom reload amount`,
-          id: `settings.usage.creditReload.amount.other.ariaLabel`,
+          id: `settings.usage.creditReload.amount.other.ariaLabel`
         },
         { defaultMessage: `—`, id: `settings.usage.creditReload.amount.pending` },
         { defaultMessage: `Back`, id: `settings.usage.creditReload.autoReload.back` },
         { defaultMessage: `Auto-reload`, id: `settings.usage.creditReload.autoReload.checkbox` },
         {
           defaultMessage: `Automatically add credits when your balance runs low`,
-          id: `settings.usage.creditReload.autoReload.checkboxDescription`,
+          id: `settings.usage.creditReload.autoReload.checkboxDescription`
         },
         {
           defaultMessage: `When my balance hits {thresholdAmount}, top up to {targetAmount}, up to {monthlyLimitAmount} per month`,
-          id: `settings.usage.creditReload.autoReload.description`,
+          id: `settings.usage.creditReload.autoReload.description`
         },
         {
           defaultMessage: `When my balance hits {thresholdAmount}, top up to {targetAmount}, with no monthly maximum`,
-          id: `settings.usage.creditReload.autoReload.description.noLimit`,
+          id: `settings.usage.creditReload.autoReload.description.noLimit`
         },
         {
           defaultMessage: `If your balance falls below the minimum, Codex will automatically reload your credits`,
-          id: `settings.usage.creditReload.autoReload.description.pending`,
+          id: `settings.usage.creditReload.autoReload.description.pending`
         },
         {
           defaultMessage: `Failed to disable auto-reload`,
-          id: `settings.usage.creditReload.autoReload.disable.error`,
+          id: `settings.usage.creditReload.autoReload.disable.error`
         },
         {
           defaultMessage: `Disabled auto-reload`,
-          id: `settings.usage.creditReload.autoReload.disable.success`,
+          id: `settings.usage.creditReload.autoReload.disable.success`
         },
         {
           defaultMessage: `Enable auto-reload`,
-          id: `settings.usage.creditReload.autoReload.enable`,
+          id: `settings.usage.creditReload.autoReload.enable`
         },
         {
           defaultMessage: `Failed to enable auto-reload`,
-          id: `settings.usage.creditReload.autoReload.enable.error`,
+          id: `settings.usage.creditReload.autoReload.enable.error`
         },
         {
           defaultMessage: `Enabled auto-reload`,
-          id: `settings.usage.creditReload.autoReload.enable.success`,
+          id: `settings.usage.creditReload.autoReload.enable.success`
         },
         {
           defaultMessage: `Manage auto-reload`,
-          id: `settings.usage.creditReload.autoReload.manage.title`,
+          id: `settings.usage.creditReload.autoReload.manage.title`
         },
         {
           defaultMessage: `Automatically add credits when your balance runs low`,
-          id: `settings.usage.creditReload.autoReload.modalDescription`,
+          id: `settings.usage.creditReload.autoReload.modalDescription`
         },
         {
           defaultMessage: `Automatically purchase credits when you’re running low`,
-          id: `settings.usage.creditReload.autoReload.offer.description.v2`,
+          id: `settings.usage.creditReload.autoReload.offer.description.v2`
         },
         { defaultMessage: `Auto-reload`, id: `settings.usage.creditReload.autoReload.offer.title` },
         { defaultMessage: `Save`, id: `settings.usage.creditReload.autoReload.save` },
         {
           defaultMessage: `Set up auto-reload`,
-          id: `settings.usage.creditReload.autoReload.setup.title`,
+          id: `settings.usage.creditReload.autoReload.setup.title`
         },
         { defaultMessage: `Turn off`, id: `settings.usage.creditReload.autoReload.turnOff` },
         {
           defaultMessage: `Turn auto-reload off`,
-          id: `settings.usage.creditReload.autoReload.turnOffDiscounted`,
+          id: `settings.usage.creditReload.autoReload.turnOffDiscounted`
         },
         {
           defaultMessage: `Turn on auto-reload`,
-          id: `settings.usage.creditReload.autoReload.turnOn`,
+          id: `settings.usage.creditReload.autoReload.turnOn`
         },
         {
           defaultMessage: `Failed to update auto-reload`,
-          id: `settings.usage.creditReload.autoReload.update.error`,
+          id: `settings.usage.creditReload.autoReload.update.error`
         },
         {
           defaultMessage: `Updated auto-reload settings`,
-          id: `settings.usage.creditReload.autoReload.update.success`,
+          id: `settings.usage.creditReload.autoReload.update.success`
         },
         { defaultMessage: `Close`, id: `settings.usage.creditReload.close` },
         {
           defaultMessage: `Continue to checkout`,
-          id: `settings.usage.creditReload.continueToCheckout`,
+          id: `settings.usage.creditReload.continueToCheckout`
         },
         {
           defaultMessage: `Current balance: {balance}`,
-          id: `settings.usage.creditReload.currentBalance`,
+          id: `settings.usage.creditReload.currentBalance`
         },
         {
           defaultMessage: `Current balance unavailable`,
-          id: `settings.usage.creditReload.currentBalance.unavailable`,
+          id: `settings.usage.creditReload.currentBalance.unavailable`
         },
         {
           defaultMessage: `Enter credits in increments of {quantityStep, number}`,
-          id: `settings.usage.creditReload.error.increment`,
+          id: `settings.usage.creditReload.error.increment`
         },
         {
           defaultMessage: `Enter an amount that converts to a whole number of credits`,
-          id: `settings.usage.creditReload.error.invalidCurrencyAmount`,
+          id: `settings.usage.creditReload.error.invalidCurrencyAmount`
         },
         {
           defaultMessage: `Enter no more than {maximumQuantity, number} credits`,
-          id: `settings.usage.creditReload.error.maximum`,
+          id: `settings.usage.creditReload.error.maximum`
         },
         {
           defaultMessage: `Target balance must be at most {maximumAmount}.`,
-          id: `settings.usage.creditReload.error.maximumCurrency`,
+          id: `settings.usage.creditReload.error.maximumCurrency`
         },
         {
           defaultMessage: `Enter at least {minimumQuantity, number} credits`,
-          id: `settings.usage.creditReload.error.minimum`,
+          id: `settings.usage.creditReload.error.minimum`
         },
         {
           defaultMessage: `Set the minimum balance to at least {minimumAmount}.`,
-          id: `settings.usage.creditReload.error.minimumCurrency`,
+          id: `settings.usage.creditReload.error.minimumCurrency`
         },
         { defaultMessage: `Enter an amount`, id: `settings.usage.creditReload.error.missing` },
         {
           defaultMessage: `Enter a minimum balance (at least {minimumAmount}).`,
-          id: `settings.usage.creditReload.error.missingMinimumCurrency`,
+          id: `settings.usage.creditReload.error.missingMinimumCurrency`
         },
         {
           defaultMessage: `Set the monthly limit high enough to cover one reload`,
-          id: `settings.usage.creditReload.error.monthlyLimit`,
+          id: `settings.usage.creditReload.error.monthlyLimit`
         },
         {
           defaultMessage: `Set the target balance at least {minimumQuantity, number} credits above the minimum balance`,
-          id: `settings.usage.creditReload.error.targetBalance`,
+          id: `settings.usage.creditReload.error.targetBalance`
         },
         {
           defaultMessage: `Enter a whole number of credits`,
-          id: `settings.usage.creditReload.error.wholeNumber`,
+          id: `settings.usage.creditReload.error.wholeNumber`
         },
         {
           defaultMessage: `The initial reload for an estimated {amount} failed. <managePayment>Update your payment method</managePayment>`,
-          id: `settings.usage.creditReload.immediateTopUpFailure.amount`,
+          id: `settings.usage.creditReload.immediateTopUpFailure.amount`
         },
         {
           defaultMessage: `The initial reload failed. <managePayment>Update your payment method</managePayment>`,
-          id: `settings.usage.creditReload.immediateTopUpFailure.generic`,
+          id: `settings.usage.creditReload.immediateTopUpFailure.generic`
         },
         { defaultMessage: `Cancel`, id: `settings.usage.creditReload.load.cancel` },
         {
           defaultMessage: `Could not load credit settings`,
-          id: `settings.usage.creditReload.load.error`,
+          id: `settings.usage.creditReload.load.error`
         },
         {
           defaultMessage: `Loading credit settings…`,
-          id: `settings.usage.creditReload.load.loading`,
+          id: `settings.usage.creditReload.load.loading`
         },
         { defaultMessage: `Retry`, id: `settings.usage.creditReload.load.retry` },
         {
           defaultMessage: `Unable to open payment settings right now. Please try again`,
-          id: `settings.usage.creditReload.managePayment.error`,
+          id: `settings.usage.creditReload.managePayment.error`
         },
         { defaultMessage: `Minimum balance`, id: `settings.usage.creditReload.minimumBalance` },
         {
           defaultMessage: `Minimum balance`,
-          id: `settings.usage.creditReload.minimumBalance.ariaLabel`,
+          id: `settings.usage.creditReload.minimumBalance.ariaLabel`
         },
         {
           defaultMessage: `Minimum balance`,
-          id: `settings.usage.creditReload.minimumBalance.discounted.ariaLabel.v2`,
+          id: `settings.usage.creditReload.minimumBalance.discounted.ariaLabel.v2`
         },
         {
           defaultMessage: `Automatically purchase credits when my balance drops below this amount`,
-          id: `settings.usage.creditReload.minimumBalance.discounted.tooltip`,
+          id: `settings.usage.creditReload.minimumBalance.discounted.tooltip`
         },
         {
           defaultMessage: `About minimum balance`,
-          id: `settings.usage.creditReload.minimumBalance.discounted.tooltip.ariaLabel`,
+          id: `settings.usage.creditReload.minimumBalance.discounted.tooltip.ariaLabel`
         },
         {
           defaultMessage: `Minimum balance`,
-          id: `settings.usage.creditReload.minimumBalance.discounted.v2`,
+          id: `settings.usage.creditReload.minimumBalance.discounted.v2`
         },
         {
           defaultMessage: `Purchase credits so you can continue using Codex if your usage runs out. <link>View rate card</link>`,
-          id: `settings.usage.creditReload.oneTimePurchase.description`,
+          id: `settings.usage.creditReload.oneTimePurchase.description`
         },
         {
           defaultMessage: `Purchase credits so you can continue using Codex if your usage runs out. View rate card`,
-          id: `settings.usage.creditReload.oneTimePurchase.screenReaderDescription`,
+          id: `settings.usage.creditReload.oneTimePurchase.screenReaderDescription`
         },
         {
           defaultMessage: `One time credit purchase`,
-          id: `settings.usage.creditReload.oneTimePurchase.title`,
+          id: `settings.usage.creditReload.oneTimePurchase.title`
         },
         { defaultMessage: `Maximum monthly spend`, id: `settings.usage.creditReload.spendLimit` },
         {
           defaultMessage: `Monthly reload spend limit`,
-          id: `settings.usage.creditReload.spendLimit.ariaLabel`,
+          id: `settings.usage.creditReload.spendLimit.ariaLabel`
         },
         {
           defaultMessage: `Maximum monthly spend (optional)`,
-          id: `settings.usage.creditReload.spendLimit.discounted.ariaLabel`,
+          id: `settings.usage.creditReload.spendLimit.discounted.ariaLabel`
         },
         {
           defaultMessage: `Maximum monthly spend must cover the minimum balance plus the reload amount`,
-          id: `settings.usage.creditReload.spendLimit.discounted.error`,
+          id: `settings.usage.creditReload.spendLimit.discounted.error`
         },
         { defaultMessage: `(Optional)`, id: `settings.usage.creditReload.spendLimit.optional` },
         {
           defaultMessage: `(optional)`,
-          id: `settings.usage.creditReload.spendLimit.optional.discounted`,
+          id: `settings.usage.creditReload.spendLimit.optional.discounted`
         },
         { defaultMessage: `No limit`, id: `settings.usage.creditReload.spendLimit.placeholder` },
         { defaultMessage: `View rate card`, id: `settings.usage.creditReload.viewRateCard` },
         {
           defaultMessage: `{value, number} {value, plural, one {credit} other {credits}}`,
-          id: `settings.usage.credits.value`,
+          id: `settings.usage.credits.value`
         },
         { defaultMessage: `No daily usage recorded yet`, id: `settings.usage.daily.empty` },
         { defaultMessage: `Could not load daily usage`, id: `settings.usage.daily.error` },
         {
           defaultMessage: `Usage data is approximate and may be delayed by up to 6 hours`,
-          id: `settings.usage.daily.subtitle`,
+          id: `settings.usage.daily.subtitle`
         },
         { defaultMessage: `Daily usage`, id: `settings.usage.daily.title` },
         { defaultMessage: `Loading usage history…`, id: `settings.usage.history.loading` },
@@ -11033,15 +11041,15 @@ function n() {
         { defaultMessage: `Buy an instant reset`, id: `settings.usage.limits.buyReset.button` },
         {
           defaultMessage: `Reset your usage limits now`,
-          id: `settings.usage.limits.buyReset.label`,
+          id: `settings.usage.limits.buyReset.label`
         },
         {
           defaultMessage: `This is not a banked reset. Buying an instant reset will reset your limits immediately.`,
-          id: `settings.usage.limits.buyReset.tooltip`,
+          id: `settings.usage.limits.buyReset.tooltip`
         },
         {
           defaultMessage: `How buying a reset works`,
-          id: `settings.usage.limits.buyReset.tooltipLabel`,
+          id: `settings.usage.limits.buyReset.tooltipLabel`
         },
         { defaultMessage: `Request more usage`, id: `settings.usage.limits.customRequestIncrease` },
         { defaultMessage: `Daily usage limit`, id: `settings.usage.limits.day.label` },
@@ -11050,49 +11058,49 @@ function n() {
         { defaultMessage: `Monthly limit`, id: `settings.usage.limits.monthly.billingLabel` },
         {
           defaultMessage: `Monthly credits used`,
-          id: `settings.usage.limits.monthly.billingProgressAriaLabel`,
+          id: `settings.usage.limits.monthly.billingProgressAriaLabel`
         },
         {
           defaultMessage: `{used} of {limit} credits used · Est. {usedCost} of {limitCost} used`,
-          id: `settings.usage.limits.monthly.creditsAndEstimatedSpendUsed`,
+          id: `settings.usage.limits.monthly.creditsAndEstimatedSpendUsed`
         },
         {
           defaultMessage: `{used} of {limit} credits used`,
-          id: `settings.usage.limits.monthly.creditsUsed`,
+          id: `settings.usage.limits.monthly.creditsUsed`
         },
         {
           defaultMessage: `Your usage this month`,
-          id: `settings.usage.limits.monthly.currentUsage`,
+          id: `settings.usage.limits.monthly.currentUsage`
         },
         {
           defaultMessage: `{credits, plural, one {# credit} other {# credits}}`,
-          id: `settings.usage.limits.monthly.currentUsageCredits`,
+          id: `settings.usage.limits.monthly.currentUsageCredits`
         },
         {
           defaultMessage: `{credits, plural, one {# credit} other {# credits}} · Est. {cost}`,
-          id: `settings.usage.limits.monthly.currentUsageCreditsAndEstimatedSpend`,
+          id: `settings.usage.limits.monthly.currentUsageCreditsAndEstimatedSpend`
         },
         { defaultMessage: `Monthly usage limit`, id: `settings.usage.limits.monthly.label` },
         {
           defaultMessage: `Your admin hasn’t set a usage limit`,
-          id: `settings.usage.limits.monthly.none`,
+          id: `settings.usage.limits.monthly.none`
         },
         {
           defaultMessage: `{remaining}% remaining`,
-          id: `settings.usage.limits.monthly.progress.remaining`,
+          id: `settings.usage.limits.monthly.progress.remaining`
         },
         {
           defaultMessage: `Monthly usage remaining`,
-          id: `settings.usage.limits.monthly.progress.remainingAriaLabel`,
+          id: `settings.usage.limits.monthly.progress.remainingAriaLabel`
         },
         {
           defaultMessage: `Monthly spend used`,
-          id: `settings.usage.limits.monthly.usdProgressAriaLabel`,
+          id: `settings.usage.limits.monthly.usdProgressAriaLabel`
         },
         { defaultMessage: `{used} of {limit} used`, id: `settings.usage.limits.monthly.usdUsed` },
         {
           defaultMessage: `Shared across Codex, Work, Workspace Agents, and ChatGPT for Excel. Chat conversations are not included.`,
-          id: `settings.usage.limits.plan.subtitle`,
+          id: `settings.usage.limits.plan.subtitle`
         },
         { defaultMessage: `Plan limits`, id: `settings.usage.limits.plan.title` },
         { defaultMessage: `Usage remaining`, id: `settings.usage.limits.progress.ariaLabel` },
@@ -11102,32 +11110,32 @@ function n() {
         { defaultMessage: `Justification`, id: `settings.usage.limits.requestJustificationLabel` },
         {
           defaultMessage: `Tell your admin why you need more usage`,
-          id: `settings.usage.limits.requestJustificationPlaceholder`,
+          id: `settings.usage.limits.requestJustificationPlaceholder`
         },
         {
           defaultMessage: `Enter a justification to submit your request`,
-          id: `settings.usage.limits.requestMissingJustification`,
+          id: `settings.usage.limits.requestMissingJustification`
         },
         {
           defaultMessage: `Your request is pending admin review.`,
-          id: `settings.usage.limits.requestPending`,
+          id: `settings.usage.limits.requestPending`
         },
         { defaultMessage: `Submit request`, id: `settings.usage.limits.requestSave` },
         { defaultMessage: `Request submitted`, id: `settings.usage.limits.requestSaved` },
         {
           defaultMessage: `Could not save your request. Please try again`,
-          id: `settings.usage.limits.requestSaveError`,
+          id: `settings.usage.limits.requestSaveError`
         },
         { defaultMessage: `Update request`, id: `settings.usage.limits.requestUpdate` },
         { defaultMessage: `Request updated`, id: `settings.usage.limits.requestUpdated` },
         {
           defaultMessage: `GPT-5.3-Codex-Spark usage limits`,
-          id: `settings.usage.limits.spark.title`,
+          id: `settings.usage.limits.spark.title`
         },
         { defaultMessage: `General usage limits`, id: `settings.usage.limits.title` },
         {
           defaultMessage: `Update pending request`,
-          id: `settings.usage.limits.updatePendingRequest`,
+          id: `settings.usage.limits.updatePendingRequest`
         },
         { defaultMessage: `Weekly usage limit`, id: `settings.usage.limits.week.label` },
         { defaultMessage: `Resets {time}`, id: `settings.usage.limits.window.resetAt` },
@@ -11139,32 +11147,32 @@ function n() {
         { defaultMessage: `5-hour limit`, id: `settings.usage.personalLimits.fiveHour` },
         {
           defaultMessage: `Resets in {days}d {hours}h`,
-          id: `settings.usage.personalLimits.resetsInDaysHours`,
+          id: `settings.usage.personalLimits.resetsInDaysHours`
         },
         {
           defaultMessage: `Resets in {hours}h {minutes}m`,
-          id: `settings.usage.personalLimits.resetsInHoursMinutes`,
+          id: `settings.usage.personalLimits.resetsInHoursMinutes`
         },
         {
           defaultMessage: `Resets in {minutes}m`,
-          id: `settings.usage.personalLimits.resetsInMinutes`,
+          id: `settings.usage.personalLimits.resetsInMinutes`
         },
         { defaultMessage: `Resets now`, id: `settings.usage.personalLimits.resetsNow` },
         {
           defaultMessage: `Shared across Codex, Work, Workspace Agents, and ChatGPT for Excel. Chat conversations are not included.`,
-          id: `settings.usage.personalLimits.sharedDescription`,
+          id: `settings.usage.personalLimits.sharedDescription`
         },
         { defaultMessage: `Plan limits`, id: `settings.usage.personalLimits.title` },
         {
           defaultMessage: `Shared across Codex, Work, Workspace Agents, and ChatGPT for Excel. Chat conversations are not included. To increase usage, <upgrade>upgrade your plan</upgrade>`,
-          id: `settings.usage.personalLimits.upgradeDescription`,
+          id: `settings.usage.personalLimits.upgradeDescription`
         },
         { defaultMessage: `Weekly limit`, id: `settings.usage.personalLimits.weekly` },
         { defaultMessage: `ChatGPT Free`, id: `settings.usage.plan.free` },
         { defaultMessage: `ChatGPT Go`, id: `settings.usage.plan.go` },
         {
           defaultMessage: `Your subscription is managed through ChatGPT. Go to <cancel>Settings > Billing on Web</cancel> to manage or cancel your plan`,
-          id: `settings.usage.plan.manageOnWebDescription`,
+          id: `settings.usage.plan.manageOnWebDescription`
         },
         { defaultMessage: `{price} / month`, id: `settings.usage.plan.monthlyPrice` },
         { defaultMessage: `ChatGPT Plus`, id: `settings.usage.plan.plus` },
@@ -11173,12 +11181,12 @@ function n() {
         { defaultMessage: `View plans`, id: `settings.usage.plan.view` },
         {
           defaultMessage: `Successfully upgraded plan`,
-          id: `settings.usage.pricingPlanPage.subscriptionUpdate.upgradeSucceeded`,
+          id: `settings.usage.pricingPlanPage.subscriptionUpdate.upgradeSucceeded`
         },
         { defaultMessage: `Confirm`, id: `settings.usage.resets.confirmReset` },
         {
           defaultMessage: `Use a reset to restore your 5-hour limit, weekly limit, or both`,
-          id: `settings.usage.resets.description`,
+          id: `settings.usage.resets.description`
         },
         { defaultMessage: `No resets available`, id: `settings.usage.resets.empty` },
         { defaultMessage: `Expires {date}`, id: `settings.usage.resets.expiresOnDate` },
@@ -11186,14 +11194,14 @@ function n() {
         { defaultMessage: `Usage reset`, id: `settings.usage.resets.fallbackTitle` },
         {
           defaultMessage: `Couldn’t load usage limit resets`,
-          id: `settings.usage.resets.loadError`,
+          id: `settings.usage.resets.loadError`
         },
         { defaultMessage: `Loading usage limit resets…`, id: `settings.usage.resets.loading` },
         { defaultMessage: `Retry`, id: `settings.usage.resets.retry` },
         { defaultMessage: `Usage limits reset`, id: `settings.usage.resets.success` },
         {
           defaultMessage: `Available <count>{availableCount}</count>`,
-          id: `settings.usage.resets.tabs.available.label`,
+          id: `settings.usage.resets.tabs.available.label`
         },
         { defaultMessage: `History`, id: `settings.usage.resets.tabs.history` },
         { defaultMessage: `Usage limit resets`, id: `settings.usage.resets.tabs.label` },
@@ -11201,78 +11209,78 @@ function n() {
         { defaultMessage: `Use reset`, id: `settings.usage.resets.useReset` },
         {
           defaultMessage: `No apps are sharing your subscription`,
-          id: `settings.usage.subscriptionSharing.apps.empty`,
+          id: `settings.usage.subscriptionSharing.apps.empty`
         },
         { defaultMessage: `Limit`, id: `settings.usage.subscriptionSharing.apps.limit` },
         {
           defaultMessage: `Weekly limit for {app}: {limit, number, percent} of available tokens`,
-          id: `settings.usage.subscriptionSharing.apps.limitLabel`,
+          id: `settings.usage.subscriptionSharing.apps.limitLabel`
         },
         {
           defaultMessage: `Weekly app limit reached`,
-          id: `settings.usage.subscriptionSharing.apps.limitReached`,
+          id: `settings.usage.subscriptionSharing.apps.limitReached`
         },
         {
           defaultMessage: `{limit, number, percent} of available tokens`,
-          id: `settings.usage.subscriptionSharing.apps.limitValue`,
+          id: `settings.usage.subscriptionSharing.apps.limitValue`
         },
         {
           defaultMessage: `Couldn't load app limits`,
-          id: `settings.usage.subscriptionSharing.apps.loadError`,
+          id: `settings.usage.subscriptionSharing.apps.loadError`
         },
         {
           defaultMessage: `Loading app limits…`,
-          id: `settings.usage.subscriptionSharing.apps.loading`,
+          id: `settings.usage.subscriptionSharing.apps.loading`
         },
         {
           defaultMessage: `Weekly usage remaining for {app}`,
-          id: `settings.usage.subscriptionSharing.apps.remainingLabel`,
+          id: `settings.usage.subscriptionSharing.apps.remainingLabel`
         },
         { defaultMessage: `Retry`, id: `settings.usage.subscriptionSharing.apps.retry` },
         { defaultMessage: `Save`, id: `settings.usage.subscriptionSharing.apps.save` },
         {
           defaultMessage: `Services sharing tokens`,
-          id: `settings.usage.subscriptionSharing.apps.title`,
+          id: `settings.usage.subscriptionSharing.apps.title`
         },
         {
           defaultMessage: `Usage unavailable`,
-          id: `settings.usage.subscriptionSharing.apps.usageUnavailable`,
+          id: `settings.usage.subscriptionSharing.apps.usageUnavailable`
         },
         {
           defaultMessage: `Uses credits`,
-          id: `settings.usage.subscriptionSharing.apps.usesCredits`,
+          id: `settings.usage.subscriptionSharing.apps.usesCredits`
         },
         {
           defaultMessage: `Tokens available to share`,
-          id: `settings.usage.subscriptionSharing.availableTokens`,
+          id: `settings.usage.subscriptionSharing.availableTokens`
         },
         {
           defaultMessage: `Allow credits to be used for Subscription Sharing`,
-          id: `settings.usage.subscriptionSharing.credits.ariaLabel`,
+          id: `settings.usage.subscriptionSharing.credits.ariaLabel`
         },
         {
           defaultMessage: `Allow Subscription Sharing services to use your credits when needed`,
-          id: `settings.usage.subscriptionSharing.credits.description`,
+          id: `settings.usage.subscriptionSharing.credits.description`
         },
         {
           defaultMessage: `Couldn’t load credit preference`,
-          id: `settings.usage.subscriptionSharing.credits.loadError`,
+          id: `settings.usage.subscriptionSharing.credits.loadError`
         },
         {
           defaultMessage: `Loading credit preference…`,
-          id: `settings.usage.subscriptionSharing.credits.loading`,
+          id: `settings.usage.subscriptionSharing.credits.loading`
         },
         {
           defaultMessage: `Use credits for Subscription Sharing`,
-          id: `settings.usage.subscriptionSharing.credits.title`,
+          id: `settings.usage.subscriptionSharing.credits.title`
         },
         {
           defaultMessage: `Couldn’t update credit preference`,
-          id: `settings.usage.subscriptionSharing.credits.updateError`,
+          id: `settings.usage.subscriptionSharing.credits.updateError`
         },
         {
           defaultMessage: `You can share your subscription tokens to access partner services.`,
-          id: `settings.usage.subscriptionSharing.description`,
+          id: `settings.usage.subscriptionSharing.description`
         },
         { defaultMessage: `Subscription sharing`, id: `settings.usage.subscriptionSharing.title` },
         { defaultMessage: `Access tokens`, id: `settings.usage.surface.agentIdentity` },
@@ -11293,39 +11301,39 @@ function n() {
         { defaultMessage: `Desktop (Work)`, id: `settings.usage.surface.workDesktop` },
         { defaultMessage: `Mobile`, id: `settings.usage.surface.workMobile` },
         { defaultMessage: `Web`, id: `settings.usage.surface.workWeb` },
-        { defaultMessage: `Usage sections`, id: `settings.usage.tabsLabel` },
+        { defaultMessage: `Usage sections`, id: `settings.usage.tabsLabel` }
       ],
       "usage-code-review": [
         {
           defaultMessage: `{chart, select, issues {Issues found by Codex code review during the selected time period} reviews {Pull requests reviewed by Codex during the selected time period} priorities {Issues found by Codex code review grouped by priority during the selected time period} reactions {Reactions to Codex code review comments during the selected time period} sentiment {Share of code review reactions grouped by reaction type during the selected time period} other {Code review activity during the selected time period}}`,
-          id: `settings.usage.billing.codeReview.chart.info`,
+          id: `settings.usage.billing.codeReview.chart.info`
         },
         {
           defaultMessage: `{chart, select, issues {More information about issues found} reviews {More information about PRs reviewed} priorities {More information about issues by priority} reactions {More information about reactions} sentiment {More information about reaction sentiment} other {More information about code review}}`,
-          id: `settings.usage.billing.codeReview.chart.infoLabel`,
+          id: `settings.usage.billing.codeReview.chart.infoLabel`
         },
         {
           defaultMessage: `{chart, select, issues {Issues found} reviews {PRs reviewed} priorities {Issues by priority} reactions {Reactions} sentiment {Reaction sentiment} other {Code review}}`,
-          id: `settings.usage.billing.codeReview.chart.title`,
+          id: `settings.usage.billing.codeReview.chart.title`
         },
         {
           defaultMessage: `{chart, select, issues {Issues found} reviews {PRs reviewed} priorities {Issues by priority} reactions {Reactions} sentiment {Reaction sentiment} other {Code review}}`,
-          id: `settings.usage.billing.codeReview.chartLabel`,
+          id: `settings.usage.billing.codeReview.chartLabel`
         },
         {
           defaultMessage: `Code review time range`,
-          id: `settings.usage.billing.codeReview.periodLabel`,
+          id: `settings.usage.billing.codeReview.periodLabel`
         },
         { defaultMessage: `Other`, id: `settings.usage.billing.codeReview.priorityOther` },
         {
           defaultMessage: `{percentage} positive`,
-          id: `settings.usage.billing.codeReview.sentiment.summary`,
+          id: `settings.usage.billing.codeReview.sentiment.summary`
         },
         {
           defaultMessage: `{series, select, issues {Issues found} reviews {PRs reviewed} p0 {P0} p1 {P1} p2 {P2} plus1 {👍 reactions} minus1 {👎 reactions} other {Other reactions}}`,
-          id: `settings.usage.billing.codeReview.series`,
+          id: `settings.usage.billing.codeReview.series`
         },
-        { defaultMessage: `Code review`, id: `settings.usage.billing.codeReview.title` },
+        { defaultMessage: `Code review`, id: `settings.usage.billing.codeReview.title` }
       ],
       voice: [
         { defaultMessage: `Cove`, id: `settings-search.literal.0d115bff8b2b` },
@@ -11339,7 +11347,7 @@ function n() {
         { defaultMessage: `Juniper`, id: `settings-search.literal.fde14f6749a9` },
         {
           defaultMessage: `Choose the voice used for voice chat and read aloud`,
-          id: `settings.chatGpt.voice.description`,
+          id: `settings.chatGpt.voice.description`
         },
         { defaultMessage: `Intelligence`, id: `settings.chatGpt.voice.intelligence` },
         { defaultMessage: `High`, id: `settings.chatGpt.voice.intelligence.high` },
@@ -11352,222 +11360,222 @@ function n() {
         { defaultMessage: `Live`, id: `settings.chatGpt.voice.model.wingman` },
         {
           defaultMessage: `Could not update voice settings`,
-          id: `settings.chatGpt.voice.updateError`,
+          id: `settings.chatGpt.voice.updateError`
         },
         { defaultMessage: `Voice`, id: `settings.chatGpt.voice.voice` },
         { defaultMessage: `Dictation`, id: `settings.general.dictation` },
         { defaultMessage: `Add entry`, id: `settings.general.dictationDictionary.addEntry` },
         {
           defaultMessage: `Words or phrases dictation should recognize`,
-          id: `settings.general.dictationDictionary.description`,
+          id: `settings.general.dictationDictionary.description`
         },
         {
           defaultMessage: `Dictionary entry {index}`,
-          id: `settings.general.dictationDictionary.entryLabel`,
+          id: `settings.general.dictationDictionary.entryLabel`
         },
         {
           defaultMessage: `Dictation dictionary`,
-          id: `settings.general.dictationDictionary.label`,
+          id: `settings.general.dictationDictionary.label`
         },
         {
           defaultMessage: `Remove dictionary entry {index}`,
-          id: `settings.general.dictationDictionary.removeEntry`,
+          id: `settings.general.dictationDictionary.removeEntry`
         },
         {
           defaultMessage: `Recording actions`,
-          id: `settings.general.globalDictationHistory.actions`,
+          id: `settings.general.globalDictationHistory.actions`
         },
         {
           defaultMessage: `{status, select, recording {Recording in progress} cancelled {Recording cancelled} interrupted {Recording interrupted} other {Recording saved}}`,
-          id: `settings.general.globalDictationHistory.audioOnly`,
+          id: `settings.general.globalDictationHistory.audioOnly`
         },
         { defaultMessage: `Copy dictation`, id: `settings.general.globalDictationHistory.copy` },
         {
           defaultMessage: `Delete recording`,
-          id: `settings.general.globalDictationHistory.delete`,
+          id: `settings.general.globalDictationHistory.delete`
         },
         {
           defaultMessage: `Download recording`,
-          id: `settings.general.globalDictationHistory.download`,
+          id: `settings.general.globalDictationHistory.download`
         },
         {
           defaultMessage: `Recent recordings`,
-          id: `settings.general.globalDictationHistory.emptyTitle`,
+          id: `settings.general.globalDictationHistory.emptyTitle`
         },
         {
           defaultMessage: `Your last {count} recordings are saved on this device`,
-          id: `settings.general.globalDictationHistory.recoveryDescription`,
+          id: `settings.general.globalDictationHistory.recoveryDescription`
         },
         { defaultMessage: `Retry`, id: `settings.general.globalDictationHistory.retry` },
         {
           defaultMessage: `Retry transcription`,
-          id: `settings.general.globalDictationHistory.retryTranscription`,
+          id: `settings.general.globalDictationHistory.retryTranscription`
         },
         {
           defaultMessage: `Hold-to-dictate hotkey capture`,
-          id: `settings.general.globalDictationHotkey.captureAriaLabel`,
+          id: `settings.general.globalDictationHotkey.captureAriaLabel`
         },
         {
           defaultMessage: `Hold to dictate where your cursor is, release to finish, or Esc to cancel`,
-          id: `settings.general.globalDictationHotkey.description`,
+          id: `settings.general.globalDictationHotkey.description`
         },
         {
           defaultMessage: `Failed to update hold-to-dictate hotkey`,
-          id: `settings.general.globalDictationHotkey.errorGeneric`,
+          id: `settings.general.globalDictationHotkey.errorGeneric`
         },
         {
           defaultMessage: `Hold-to-dictate hotkey`,
-          id: `settings.general.globalDictationHotkey.label`,
+          id: `settings.general.globalDictationHotkey.label`
         },
         { defaultMessage: `Off`, id: `settings.general.globalDictationHotkey.off` },
         {
           defaultMessage: `Hands-free dictation hotkey capture`,
-          id: `settings.general.globalDictationToggleHotkey.captureAriaLabel`,
+          id: `settings.general.globalDictationToggleHotkey.captureAriaLabel`
         },
         {
           defaultMessage: `Double-tap to dictate hands-free, press once to finish, or Esc to cancel. You can use the same shortcut as hold to dictate`,
-          id: `settings.general.globalDictationToggleHotkey.description`,
+          id: `settings.general.globalDictationToggleHotkey.description`
         },
         {
           defaultMessage: `Failed to update toggle dictation hotkey`,
-          id: `settings.general.globalDictationToggleHotkey.errorGeneric`,
+          id: `settings.general.globalDictationToggleHotkey.errorGeneric`
         },
         {
           defaultMessage: `Hands-free dictation hotkey`,
-          id: `settings.general.globalDictationToggleHotkey.label`,
+          id: `settings.general.globalDictationToggleHotkey.label`
         },
         {
           defaultMessage: `Used for voice chat and dictation`,
-          id: `settings.general.microphoneInput.description`,
+          id: `settings.general.microphoneInput.description`
         },
         { defaultMessage: `No microphones found`, id: `settings.general.microphoneInput.empty` },
         {
           defaultMessage: `Microphone {index}`,
-          id: `settings.general.microphoneInput.fallbackDeviceLabel`,
+          id: `settings.general.microphoneInput.fallbackDeviceLabel`
         },
         { defaultMessage: `Microphone`, id: `settings.general.microphoneInput.label` },
         {
           defaultMessage: `Unable to load microphones`,
-          id: `settings.general.microphoneInput.loadError`,
+          id: `settings.general.microphoneInput.loadError`
         },
         { defaultMessage: `Loading microphones`, id: `settings.general.microphoneInput.loading` },
         { defaultMessage: `Selected microphone`, id: `settings.general.microphoneInput.selected` },
         { defaultMessage: `System default`, id: `settings.general.microphoneInput.systemDefault` },
         {
           defaultMessage: `Unavailable microphone`,
-          id: `settings.general.microphoneInput.unavailable`,
+          id: `settings.general.microphoneInput.unavailable`
         },
         {
           defaultMessage: `Microphone selection is not available on this device`,
-          id: `settings.general.microphoneInput.unsupported`,
+          id: `settings.general.microphoneInput.unsupported`
         },
         { defaultMessage: `Voice chat`, id: `settings.general.realtimeVoice` },
         {
           defaultMessage: `Unable to verify voice chat access`,
-          id: `settings.general.realtimeVoice.accessError`,
+          id: `settings.general.realtimeVoice.accessError`
         },
         {
           defaultMessage: `Checking voice chat access…`,
-          id: `settings.general.realtimeVoice.accessLoading`,
+          id: `settings.general.realtimeVoice.accessLoading`
         },
         {
           defaultMessage: `Unable to load voice settings`,
-          id: `settings.general.realtimeVoice.loadError`,
+          id: `settings.general.realtimeVoice.loadError`
         },
         { defaultMessage: `Loading…`, id: `settings.general.realtimeVoice.loading` },
         { defaultMessage: `Retry`, id: `settings.general.realtimeVoice.retry` },
         {
           defaultMessage: `Your account or workspace does not have access to voice chat`,
-          id: `settings.general.realtimeVoice.unavailable.description`,
+          id: `settings.general.realtimeVoice.unavailable.description`
         },
         {
           defaultMessage: `Voice chat unavailable`,
-          id: `settings.general.realtimeVoice.unavailable.label`,
+          id: `settings.general.realtimeVoice.unavailable.label`
         },
         {
           defaultMessage: `Easygoing and versatile`,
-          id: `settings.general.realtimeVoice.voice.arbor.description`,
+          id: `settings.general.realtimeVoice.voice.arbor.description`
         },
         {
           defaultMessage: `Animated and earnest`,
-          id: `settings.general.realtimeVoice.voice.breeze.description`,
+          id: `settings.general.realtimeVoice.voice.breeze.description`
         },
         {
           defaultMessage: `Composed and direct`,
-          id: `settings.general.realtimeVoice.voice.cove.description`,
+          id: `settings.general.realtimeVoice.voice.cove.description`
         },
         {
           defaultMessage: `Choose the voice Codex uses for new voice chats`,
-          id: `settings.general.realtimeVoice.voice.description`,
+          id: `settings.general.realtimeVoice.voice.description`
         },
         {
           defaultMessage: `Confident and optimistic`,
-          id: `settings.general.realtimeVoice.voice.ember.description`,
+          id: `settings.general.realtimeVoice.voice.ember.description`
         },
         {
           defaultMessage: `Open and upbeat`,
-          id: `settings.general.realtimeVoice.voice.juniper.description`,
+          id: `settings.general.realtimeVoice.voice.juniper.description`
         },
         { defaultMessage: `Voice`, id: `settings.general.realtimeVoice.voice.label` },
         {
           defaultMessage: `Cheerful and candid`,
-          id: `settings.general.realtimeVoice.voice.maple.description`,
+          id: `settings.general.realtimeVoice.voice.maple.description`
         },
         {
           defaultMessage: `Savvy and relaxed`,
-          id: `settings.general.realtimeVoice.voice.sol.description`,
+          id: `settings.general.realtimeVoice.voice.sol.description`
         },
         {
           defaultMessage: `Calm and affirming`,
-          id: `settings.general.realtimeVoice.voice.spruce.description`,
+          id: `settings.general.realtimeVoice.voice.spruce.description`
         },
         {
           defaultMessage: `Bright and inquisitive`,
-          id: `settings.general.realtimeVoice.voice.vale.description`,
+          id: `settings.general.realtimeVoice.voice.vale.description`
         },
         {
           defaultMessage: `Voice chat hotkey capture`,
-          id: `settings.general.realtimeVoiceHotkey.captureAriaLabel`,
+          id: `settings.general.realtimeVoiceHotkey.captureAriaLabel`
         },
         {
           defaultMessage: `Start voice chat from anywhere on desktop`,
-          id: `settings.general.realtimeVoiceHotkey.description`,
+          id: `settings.general.realtimeVoiceHotkey.description`
         },
         {
           defaultMessage: `Failed to update voice chat hotkey`,
-          id: `settings.general.realtimeVoiceHotkey.errorGeneric`,
+          id: `settings.general.realtimeVoiceHotkey.errorGeneric`
         },
         { defaultMessage: `Voice chat hotkey`, id: `settings.general.realtimeVoiceHotkey.label` },
         { defaultMessage: `Off`, id: `settings.general.realtimeVoiceHotkey.off` },
         {
           defaultMessage: `Enable screen context for voice chat`,
-          id: `settings.general.realtimeVoiceScreenContext.ariaLabel`,
+          id: `settings.general.realtimeVoiceScreenContext.ariaLabel`
         },
         {
           defaultMessage: `Let Codex inspect the foreground app when you refer to what's on screen. macOS asks for access the first time Codex needs it`,
-          id: `settings.general.realtimeVoiceScreenContext.description`,
+          id: `settings.general.realtimeVoiceScreenContext.description`
         },
         {
           defaultMessage: `Screen context`,
-          id: `settings.general.realtimeVoiceScreenContext.label`,
+          id: `settings.general.realtimeVoiceScreenContext.label`
         },
         { defaultMessage: `Show all recordings`, id: `settings.voice.allRecordings` },
         {
           defaultMessage: `Dictation is not available on this device`,
-          id: `settings.voice.dictation.unsupported`,
+          id: `settings.voice.dictation.unsupported`
         },
         {
           defaultMessage: `Play sounds when dictation starts and stops`,
-          id: `settings.voice.dictationSounds.description`,
+          id: `settings.voice.dictationSounds.description`
         },
         { defaultMessage: `Dictation sounds`, id: `settings.voice.dictationSounds.label` },
         {
           defaultMessage: `Toggle dictation sounds`,
-          id: `settings.voice.dictationSounds.toggleLabel`,
+          id: `settings.voice.dictationSounds.toggleLabel`
         },
         {
           defaultMessage: `Words or phrases dictation should recognize`,
-          id: `settings.voice.dictionary.description`,
+          id: `settings.voice.dictionary.description`
         },
         { defaultMessage: `Manage`, id: `settings.voice.dictionary.manage` },
         { defaultMessage: `Download audio`, id: `settings.voice.downloadRecovered` },
@@ -11576,144 +11584,140 @@ function n() {
         { defaultMessage: `Retry`, id: `settings.voice.language.retry` },
         {
           defaultMessage: `Could not update voice language`,
-          id: `settings.voice.language.updateError`,
+          id: `settings.voice.language.updateError`
         },
         {
           defaultMessage: `Voice dictionary`,
-          id: `speechSettings.content.customDictionary.page.title`,
-        },
+          id: `speechSettings.content.customDictionary.page.title`
+        }
       ],
       worktrees: [
         { defaultMessage: `Worktree root`, id: `settings.git.worktreeRoot.ariaLabel` },
         {
           defaultMessage: `Directory where ChatGPT creates managed worktrees. Leave blank to use the default location`,
-          id: `settings.git.worktreeRoot.description`,
+          id: `settings.git.worktreeRoot.description`
         },
         { defaultMessage: `Worktree root`, id: `settings.git.worktreeRoot.label` },
         {
           defaultMessage: `Failed to save worktree root`,
-          id: `settings.git.worktreeRoot.save.error`,
+          id: `settings.git.worktreeRoot.save.error`
         },
         { defaultMessage: `Saved worktree root`, id: `settings.git.worktreeRoot.save.success` },
         {
           defaultMessage: `Automatically delete old worktrees`,
-          id: `settings.worktrees.autoCleanup.ariaLabel`,
+          id: `settings.worktrees.autoCleanup.ariaLabel`
         },
         {
           defaultMessage: `We highly recommend keeping automatic deletion on so old worktrees do not build up and use unnecessary disk space. If you prefer to manage old worktrees yourself, you can turn this off and ChatGPT will stop deleting them automatically.`,
-          id: `settings.worktrees.autoCleanup.confirm.body`,
+          id: `settings.worktrees.autoCleanup.confirm.body`
         },
         {
           defaultMessage: `Keep automatic deletion`,
-          id: `settings.worktrees.autoCleanup.confirm.cancel`,
+          id: `settings.worktrees.autoCleanup.confirm.cancel`
         },
         {
           defaultMessage: `Disable automatic deletion`,
-          id: `settings.worktrees.autoCleanup.confirm.confirm`,
+          id: `settings.worktrees.autoCleanup.confirm.confirm`
         },
         {
           defaultMessage: `Disable automatic worktree deletion?`,
-          id: `settings.worktrees.autoCleanup.confirm.title`,
+          id: `settings.worktrees.autoCleanup.confirm.title`
         },
         {
           defaultMessage: `Recommended for most users. Turn this off only if you want to manage old worktrees and disk usage yourself.`,
-          id: `settings.worktrees.autoCleanup.description`,
+          id: `settings.worktrees.autoCleanup.description`
         },
         {
           defaultMessage: `Automatically delete old worktrees`,
-          id: `settings.worktrees.autoCleanup.label`,
+          id: `settings.worktrees.autoCleanup.label`
         },
         {
           defaultMessage: `Automatic deletion disabled`,
-          id: `settings.worktrees.autoCleanup.save.disabled`,
+          id: `settings.worktrees.autoCleanup.save.disabled`
         },
         {
           defaultMessage: `Automatic deletion enabled`,
-          id: `settings.worktrees.autoCleanup.save.enabled`,
+          id: `settings.worktrees.autoCleanup.save.enabled`
         },
         {
           defaultMessage: `Failed to save automatic deletion setting`,
-          id: `settings.worktrees.autoCleanup.save.error`,
+          id: `settings.worktrees.autoCleanup.save.error`
         },
         { defaultMessage: `Untitled conversation`, id: `settings.worktrees.conversation.untitled` },
         {
           defaultMessage: `Worktrees created by ChatGPT will appear here`,
-          id: `settings.worktrees.empty.body`,
+          id: `settings.worktrees.empty.body`
         },
         { defaultMessage: `No worktrees yet`, id: `settings.worktrees.empty.title` },
         {
           defaultMessage: `Something went wrong while loading worktrees.`,
-          id: `settings.worktrees.error.body`,
+          id: `settings.worktrees.error.body`
         },
         { defaultMessage: `Unable to load worktrees`, id: `settings.worktrees.error.title` },
         { defaultMessage: `Auto-delete limit`, id: `settings.worktrees.keepCount.ariaLabel` },
         {
           defaultMessage: `Number of managed worktrees to keep before older ones are pruned automatically. ChatGPT snapshots worktrees before deleting, so pruned worktrees should always be restorable.`,
-          id: `settings.worktrees.keepCount.description`,
+          id: `settings.worktrees.keepCount.description`
         },
         {
           defaultMessage: `Automatic deletion is disabled. ChatGPT will not prune old worktrees automatically. Re-enable it to use this saved limit again.`,
-          id: `settings.worktrees.keepCount.description.disabled`,
+          id: `settings.worktrees.keepCount.description.disabled`
         },
         { defaultMessage: `Auto-delete limit`, id: `settings.worktrees.keepCount.label` },
         {
           defaultMessage: `Failed to save auto-delete limit`,
-          id: `settings.worktrees.keepCount.save.error`,
+          id: `settings.worktrees.keepCount.save.error`
         },
         {
           defaultMessage: `Saved auto-delete limit`,
-          id: `settings.worktrees.keepCount.save.success`,
+          id: `settings.worktrees.keepCount.save.success`
         },
         { defaultMessage: `Fetching worktree details…`, id: `settings.worktrees.loading.body` },
         { defaultMessage: `Refresh`, id: `settings.worktrees.refresh` },
         {
           defaultMessage: `Loading repository metadata…`,
-          id: `settings.worktrees.repository.loading`,
+          id: `settings.worktrees.repository.loading`
         },
         { defaultMessage: `Unknown repository`, id: `settings.worktrees.repository.unknown` },
         { defaultMessage: `Conversations`, id: `settings.worktrees.row.conversations` },
         {
           defaultMessage: `No conversations linked to this worktree.`,
-          id: `settings.worktrees.row.conversations.empty`,
+          id: `settings.worktrees.row.conversations.empty`
         },
         {
           defaultMessage: `Loading conversations…`,
-          id: `settings.worktrees.row.conversations.loading`,
+          id: `settings.worktrees.row.conversations.loading`
         },
         { defaultMessage: `Delete`, id: `settings.worktrees.row.delete` },
         { defaultMessage: `New chat in this worktree`, id: `settings.worktrees.row.newChat` },
         {
           defaultMessage: `Starts a fresh chat using the same files and branch`,
-          id: `settings.worktrees.row.newChatDescription`,
+          id: `settings.worktrees.row.newChatDescription`
         },
         { defaultMessage: `Worktree`, id: `settings.worktrees.row.title` },
         {
           defaultMessage: `Always fetch upstream before creating worktrees`,
-          id: `settings.worktrees.upstreamRefresh.ariaLabel`,
+          id: `settings.worktrees.upstreamRefresh.ariaLabel`
         },
         {
           defaultMessage: `Codex normally picks up branch updates during regular Git activity. This also fetches before each new worktree.`,
-          id: `settings.worktrees.upstreamRefresh.description`,
+          id: `settings.worktrees.upstreamRefresh.description`
         },
         {
           defaultMessage: `Always fetch upstream before creating worktrees`,
-          id: `settings.worktrees.upstreamRefresh.label`,
+          id: `settings.worktrees.upstreamRefresh.label`
         },
         {
           defaultMessage: `Upstream refresh disabled`,
-          id: `settings.worktrees.upstreamRefresh.save.disabled`,
+          id: `settings.worktrees.upstreamRefresh.save.disabled`
         },
         {
           defaultMessage: `Upstream refresh enabled`,
-          id: `settings.worktrees.upstreamRefresh.save.enabled`,
+          id: `settings.worktrees.upstreamRefresh.save.enabled`
         },
         {
           defaultMessage: `Failed to save upstream refresh setting`,
-          id: `settings.worktrees.upstreamRefresh.save.error`,
-        },
-      ],
+          id: `settings.worktrees.upstreamRefresh.save.error`
+        }
+      ]
     };
-  }))();
-}
-n();
-export { t as settingsSearchDocuments };
