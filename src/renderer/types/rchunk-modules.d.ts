@@ -2203,3 +2203,38 @@ declare module "@rchunk/remote-connection-editor-draft" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/codex-micro-analog-action-title" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-micro-commands" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-micro-keyboard-surface" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-micro-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-micro-slot-signals" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/command-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/keyboard-shortcuts-search-input" {
+  const _default: unknown;
+  export default _default;
+}
