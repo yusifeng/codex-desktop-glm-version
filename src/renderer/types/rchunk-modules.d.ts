@@ -263,3 +263,18 @@ declare module "@rchunk/Icon" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/assert-never" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/patch-diff-stats" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/presentation" {
+  const _default: unknown;
+  export default _default;
+}
