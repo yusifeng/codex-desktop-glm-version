@@ -1959,3 +1959,167 @@ declare module "@rchunk/theme-font-family" {
   export default _default;
 }
 
+declare module "@rchunk/chatgpt-accent-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/dock-icon-setting-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/import-settings-gate" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/middle-truncated-text" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/notifications-settings" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/permissions-mode-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugins-settings-row" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/settings-route-state" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chatgpt-accent-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/dock-icon-setting-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/import-settings-gate" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/middle-truncated-text" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/notifications-settings" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/permissions-mode-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugins-settings-row" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/settings-route-state" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chatgpt-accent-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/dock-icon-setting-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/import-settings-gate" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/middle-truncated-text" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/notifications-settings" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/permissions-mode-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugins-settings-row" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/settings-route-state" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chatgpt-accent-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/dock-icon-setting-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/import-settings-gate" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/middle-truncated-text" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/notifications-settings" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/permissions-mode-visibility" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugins-settings-row" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/settings-route-state" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/file-diff-alt" {
+  const _default: unknown;
+  export default _default;
+}
