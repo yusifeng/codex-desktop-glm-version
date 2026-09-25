@@ -2173,3 +2173,33 @@ declare module "@rchunk/order-yubikey-dialog" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/chatgpt-desktop-auth-url" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-mobile-setup-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-mobile-setup-flow" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/onboarding-login-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/remote-connection-editor-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/remote-connection-editor-draft" {
+  const _default: unknown;
+  export default _default;
+}
