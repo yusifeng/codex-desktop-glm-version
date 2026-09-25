@@ -63,7 +63,7 @@ declare module "@chunk/shared" {
   export const $c: any; // 内部符号: Px
   export const $d: any; // 内部符号: qh
   export const $i: any; // 内部符号: $ne
-  export const $l: any; // 内部符号: ine
+  export { NODE_REPL_TRUSTED_SERVICES_ENV_KEY as $l } from "../../shared/app-constants";
   export const $n: any; // 内部符号: YK
   export const $o: any; // 内部符号: wE
   export const $r: any; // 内部符号: sI
@@ -105,7 +105,7 @@ declare module "@chunk/shared" {
   // 故放宽为 any；内部符号名见原粗扫/深析文档。
   export const Cf: any; // 内部符号: hZ（zod number builder）
   export const Ci: any; // 内部符号: ZM
-  export const Cl: any; // 内部符号: rx
+  export { joinPath as Cl } from "../../shared/app-constants";
   export const Cn: any; // 内部符号: OX
   export const Co: any; // 内部符号: Mk
   export const Cr: any; // 内部符号: cB
@@ -156,7 +156,7 @@ declare module "@chunk/shared" {
   export const Gc: any; // 内部符号: bS
   export const Gd: any; // 内部符号: Pg
   export const Gi: any; // 内部符号: cre
-  export const Gl: any; // 内部符号: _b
+  export { CODEX_CLI_PATH_ENV_KEY as Gl } from "../../shared/app-constants";
   export const Gn: any; // 内部符号: ZJ
   export const Go: any; // 内部符号: aD
   export const Gr: any; // 内部符号: NI
@@ -169,7 +169,7 @@ declare module "@chunk/shared" {
   export const Hd: any; // 内部符号: Ug
   export { RpcStubLike as Hf } from "../../shared/rpc-core";
   export const Hi: any; // 内部符号: lre
-  export const Hl: any; // 内部符号: Bb
+  export { buildAutoInstallOptOutKey as Hl } from "../../shared/app-constants";
   export const Hn: any; // 内部符号: dY
   export const Ho: any; // 内部符号: fD
   export const Hr: any; // 内部符号: LI
@@ -206,7 +206,7 @@ declare module "@chunk/shared" {
   export const Kc: any; // 内部符号: cS
   export const Kd: any; // 内部符号: Mg
   export const Ki: any; // 内部符号: Nj
-  export const Kl: any; // 内部符号: Sb
+  export { COMPUTER_USE_MCP_SERVER_NAME as Kl } from "../../shared/app-constants";
   export const Kn: any; // 内部符号: xJ
   export const Ko: any; // 内部符号: cD
   export const Kr: any; // 内部符号: MI
@@ -258,7 +258,7 @@ declare module "@chunk/shared" {
   export { readOnlyPermissions as Od } from "../../shared/sandbox-permissions";
   export const Of: any; // 内部符号: kF（zod string builder，链式调用放宽为 any）
   export const Oi: any; // 内部符号: xM
-  export const Ol: any; // 内部符号: ex
+  export { stripDrivePrefix as Ol } from "../../shared/app-constants";
   export const On: any; // 内部符号: hX
   export const Oo: any; // 内部符号: wO
   export const Or: any; // 内部符号: uB
@@ -309,7 +309,7 @@ declare module "@chunk/shared" {
   export { DEFAULT_MODELS as Sd } from "../../shared/automation-settings";
   export const Sf: any; // 内部符号: Lp
   export const Si: any; // 内部符号: eN
-  export const Sl: any; // 内部符号: ix
+  export { joinHostPath as Sl } from "../../shared/app-constants";
   export const Sn: any; // 内部符号: wX
   export const So: any; // 内部符号: kk
   export const Sr: any; // 内部符号: dB
@@ -322,7 +322,7 @@ declare module "@chunk/shared" {
   export { AGENT_MODE_BY_HOST_ID_KEY as Td } from "../../shared/automation-settings";
   export const Tf: any; // 内部符号: lh
   export const Ti: any; // 内部符号: EM
-  export const Tl: any; // 内部符号: Gb
+  export { toForwardSlashes as Tl } from "../../shared/app-constants";
   export const Tn: any; // 内部符号: kX
   export const To: any; // 内部符号: WO
   export const Tr: any; // 内部符号: AB
@@ -335,7 +335,7 @@ declare module "@chunk/shared" {
   export const Ud: any; // 内部符号: Hg
   export { RpcTarget as Uf } from "../../shared/rpc-core";
   export const Ui: any; // 内部符号: Ij
-  export const Ul: any; // 内部符号: _ne
+  export { marketplaceNameForFlavor as Ul } from "../../shared/app-constants";
   export const Un: any; // 内部符号: tY
   export const Uo: any; // 内部符号: sD
   export const Ur: any; // 内部符号: RI
@@ -348,7 +348,7 @@ declare module "@chunk/shared" {
   export const Vd: any; // 内部符号: Xg
   export { RpcConnectionLike as Vf } from "../../shared/rpc-core";
   export const Vi: any; // 内部符号: Rj
-  export const Vl: any; // 内部符号: Eb
+  export { DEFAULT_MARKETPLACE_NAME as Vl } from "../../shared/app-constants";
   export const Vn: any; // 内部符号: mY
   export const Vo: any; // 内部符号: gD
   export const Vr: any; // 内部符号: HB
@@ -361,7 +361,7 @@ declare module "@chunk/shared" {
   export const Wd: any; // 内部符号: Rg
   export { connectRpc as Wf } from "../../shared/rpc-core";
   export const Wi: any; // 内部符号: Pj
-  export const Wl: any; // 内部符号: Rb
+  export { isBundledMarketplaceName as Wl } from "../../shared/app-constants";
   export const Wn: any; // 内部符号: XJ
   export const Wo: any; // 内部符号: oD
   export const Wr: any; // 内部符号: II
@@ -410,7 +410,7 @@ declare module "@chunk/shared" {
   export { reasoningEffortSchema as _d } from "../../shared/automation-settings";
   export const _f: any; // 内部符号: th
   export const _i: any; // 内部符号: UN
-  export const _l: any; // 内部符号: qb
+  export { stripWindowsExtendedPrefix as _l } from "../../shared/app-constants";
   export const _n: any; // 内部符号: _Q
   export const _o: any; // 内部符号: Hk
   export const _r: any; // 内部符号: WB
@@ -429,20 +429,20 @@ declare module "@chunk/shared" {
   export const ar: any; // 内部符号: uK
   export const as: any; // 内部符号: RE
   export const at: any; // 内部符号: Sie
-  export const au: any; // 内部符号: tne
+  export { getAtomStateDefault as au } from "../../shared/app-constants";
   export const b: any; // 内部符号: Lse
   export const ba: any; // 内部符号: oj
   export const bc: any; // 内部符号: NC
   export const bd: any; // 内部符号: H_
   export const bf: any; // 内部符号: Jx（zod literal builder，链式调用放宽为 any）
   export const bi: any; // 内部符号: dN
-  export const bl: any; // 内部符号: Jb
+  export { isWindowsPath as bl } from "../../shared/app-constants";
   export const bn: any; // 内部符号: pX
   export const bo: any; // 内部符号: Vk
   export const br: any; // 内部符号: UB
   export const bs: any; // 内部符号: OT
   export { firstAcceleratorSync as bt } from "../../shared/command-registry";
-  export const bu: any; // 内部符号: Wy
+  export { POPUP_WINDOW_SIZE as bu } from "../../shared/app-constants";
   export const c: any; // 内部符号: Ace
   export const ca: any; // 内部符号: Xne
   export const cc: any; // 内部符号: hw
@@ -455,7 +455,7 @@ declare module "@chunk/shared" {
   export const cr: any; // 内部符号: EW
   export const cs: any; // 内部符号: PE
   export { COMMIT_PULL_REQUEST_GENERATION_BUNDLE as ct } from "../../shared/structured-generation";
-  export const cu: any; // 内部符号: fb
+  export { BuildFlavor as cu } from "../../shared/app-constants";
   export const d: any; // 内部符号: lce
   export const da: any; // 内部符号: dj
   export const dc: any; // 内部符号: tw
@@ -494,14 +494,14 @@ declare module "@chunk/shared" {
   export const fr: any; // 内部符号: AV
   export const fs: any; // 内部符号: tE
   export { TelemetryClient as ft } from "../../shared/telemetry";
-  export const fu: any; // 内部符号: Qy
+  export { INBOX_ITEM_CHANGE as fu } from "../../shared/app-constants";
   export const g: any; // 内部符号: nce
   export const ga: any; // 内部符号: lj
   export const gc: any; // 内部符号: qC
   export { notificationPolicySchema as gd } from "../../shared/automation-settings";
   export const gf: any; // 内部符号: G
   export const gi: any; // 内部符号: CP
-  export const gl: any; // 内部符号: tx
+  export { isSamePath as gl } from "../../shared/app-constants";
   export const gn: any; // 内部符号: vQ
   export const go: any; // 内部符号: Dk
   export const gr: any; // 内部符号: yV
@@ -535,7 +535,7 @@ declare module "@chunk/shared" {
   export const ir: any; // 内部符号: dK
   export const is: any; // 内部符号: IE
   export const it: any; // 内部符号: bie
-  export const iu: any; // 内部符号: gb
+  export { STATE_KEYS as iu } from "../../shared/app-constants";
   export const j: any; // 内部符号: Aoe
   export const ja: any; // 内部符号: ZA
   export const jc: any; // 内部符号: mC
@@ -613,7 +613,7 @@ declare module "@chunk/shared" {
   export const or: any; // 内部符号: HW
   export const os: any; // 内部符号: jE
   export const ot: any; // 内部符号: H8
-  export const ou: any; // 内部符号: pb
+  export { BROWSER_PLUGIN_NAME as ou } from "../../shared/app-constants";
   export const p: any; // 内部符号: tce
   export const pa: any; // 内部符号: uj
   export const pc: any; // 内部符号: ZC
@@ -681,7 +681,7 @@ declare module "@chunk/shared" {
   export const tr: any; // 内部符号: jK
   export const ts: any; // 内部符号: zE
   export { searchFileNames as tt } from "../../shared/file-search";
-  export const tu: any; // 内部符号: ane
+  export { isComputerUseServerName as tu } from "../../shared/app-constants";
   export const u: any; // 内部符号: dce
   export const ua: any; // 内部符号: Wne
   export const uc: any; // 内部符号: iw
@@ -694,14 +694,14 @@ declare module "@chunk/shared" {
   export const ur: any; // 内部符号: cW
   export const us: any; // 内部符号: _E
   export { runStructuredGeneration as ut } from "../../shared/structured-generation";
-  export const uu: any; // 内部符号: lb
+  export { COWORK_MARKETPLACE_NAME as uu } from "../../shared/app-constants";
   export const v: any; // 内部符号: Qse
   export const va: any; // 内部符号: Hne
   export const vc: any; // 内部符号: GC
   export const vd: any; // 内部符号: K_
   export const vf: any; // 内部符号: h9（zod discriminated-union builder，放宽为 any）
   export const vi: any; // 内部符号: HN
-  export const vl: any; // 内部符号: Zb
+  export { isPosixAbsolutePath as vl } from "../../shared/app-constants";
   export const vn: any; // 内部符号: ZY
   export const vo: any; // 内部符号: Rk
   export const vr: any; // 内部符号: xB
@@ -714,7 +714,7 @@ declare module "@chunk/shared" {
   export { EMPTY_AMBIENT_SUGGESTIONS as wd } from "../../shared/automation-settings";
   export const wf: any; // 内部符号: j3（zod object builder，链式调用放宽为 any）
   export const wi: any; // 内部符号: YM
-  export const wl: any; // 内部符号: Qb
+  export { normalizeUncPath as wl } from "../../shared/app-constants";
   export const wn: any; // 内部符号: TX
   export const wo: any; // 内部符号: JO
   export const wr: any; // 内部符号: MB
@@ -727,7 +727,7 @@ declare module "@chunk/shared" {
   export const xd: any; // 内部符号: U_
   export const xf: any; // 内部符号: Kp
   export const xi: any; // 内部符号: sN
-  export const xl: any; // 内部符号: Yb
+  export { isUncPath as xl } from "../../shared/app-constants";
   export const xn: any; // 内部符号: CX
   export const xo: any; // 内部符号: Fk
   export const xr: any; // 内部符号: RB
@@ -740,7 +740,7 @@ declare module "@chunk/shared" {
   export const yd: any; // 内部符号: Y_
   export const yf: any; // 内部符号: ch
   export const yi: any; // 内部符号: CN
-  export const yl: any; // 内部符号: Xb
+  export { isNotNetworkUncPath as yl } from "../../shared/app-constants";
   export const yn: any; // 内部符号: XY
   export const yo: any; // 内部符号: Bk
   export const yr: any; // 内部符号: VB
