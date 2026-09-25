@@ -415,7 +415,7 @@ declare module "@chunk/shared" {
   export const _o: any; // 内部符号: Hk
   export const _r: any; // 内部符号: WB
   export const _s: any; // 内部符号: wT
-  export const _t: any; // 内部符号: Gre
+  export { listCustomAvatars as _t } from "../../shared/pet-spritesheet";
   export const _u: any; // 内部符号: Gy
   export const a: any; // 内部符号: Wce
   export const aa: any; // 内部符号: wj
@@ -454,7 +454,7 @@ declare module "@chunk/shared" {
   export const co: any; // 内部符号: nk
   export const cr: any; // 内部符号: EW
   export const cs: any; // 内部符号: PE
-  export const ct: any; // 内部符号: Tie
+  export { COMMIT_PULL_REQUEST_GENERATION_BUNDLE as ct } from "../../shared/structured-generation";
   export const cu: any; // 内部符号: fb
   export const d: any; // 内部符号: lce
   export const da: any; // 内部符号: dj
@@ -506,7 +506,7 @@ declare module "@chunk/shared" {
   export const go: any; // 内部符号: Dk
   export const gr: any; // 内部符号: yV
   export const gs: any; // 内部符号: ZT
-  export const gt: any; // 内部符号: Kre
+  export { readCustomAvatar as gt } from "../../shared/pet-spritesheet";
   export const gu: any; // 内部符号: My
   export const h: any; // 内部符号: b9
   export const ha: any; // 内部符号: fj
@@ -573,7 +573,7 @@ declare module "@chunk/shared" {
   export const lo: any; // 内部符号: Tk
   export const lr: any; // 内部符号: TW
   export const ls: any; // 内部符号: hE
-  export const lt: any; // 内部符号: X8
+  export { PULL_REQUEST_GENERATION_BUNDLE as lt } from "../../shared/structured-generation";
   export const lu: any; // 内部符号: tb
   export const m: any; // 内部符号: y9
   export const ma: any; // 内部符号: Kne
@@ -666,7 +666,7 @@ declare module "@chunk/shared" {
   export const so: any; // 内部符号: ak
   export const sr: any; // 内部符号: FW
   export const ss: any; // 内部符号: NE
-  export const st: any; // 内部符号: wie
+  export { COMMIT_MESSAGE_GENERATION_BUNDLE as st } from "../../shared/structured-generation";
   export const su: any; // 内部符号: $te
   export const t: any; // 内部符号: Zce
   export const ta: any; // 内部符号: ere

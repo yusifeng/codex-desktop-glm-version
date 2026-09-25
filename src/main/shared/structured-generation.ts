@@ -759,6 +759,26 @@ const PULL_REQUEST_GENERATION_BUNDLE = {
   extractParsedResult: (parsed: { title: string; body: string }) => parsed,
 } as const;
 
+/** commit 消息生成配置捆绑（原 `wie`）。 */
+const COMMIT_MESSAGE_GENERATION_BUNDLE = {
+  tokenUsageTelemetryFeature: "commit_message",
+  promptCharLimit: EPHEMERAL_GENERATION_PROMPT_LIMIT,
+  buildGenerationPrompt: commitMessagePrompt,
+  outputSchema: promptClone(commitResponseSchema),
+  responseSchema: commitResponseSchema,
+  extractParsedResult: (parsed: { message: string }) => parsed.message,
+} as const;
+
+/** commit + PR 合并生成配置捆绑（原 `Tie`）。 */
+const COMMIT_PULL_REQUEST_GENERATION_BUNDLE = {
+  tokenUsageTelemetryFeature: "commit_pull_request_message",
+  promptCharLimit: COMMIT_PR_PROMPT_LIMIT,
+  buildGenerationPrompt: commitPullRequestPrompt,
+  outputSchema: promptClone(commitPrResponseSchema),
+  responseSchema: commitPrResponseSchema,
+  extractParsedResult: (parsed: { message: string; title: string; body: string }) => parsed,
+} as const;
+
 /**
  * PR 消息生成器（原 `Aie`，导出 `rt`）。
  * RPC 暴露的 generate → 可 dispose 句柄；providerModelFallback 按版本门控。
@@ -857,4 +877,7 @@ export {
   runStructuredGeneration as ut,
   TextGenerator as nt,
   PullRequestMessageGenerator as rt,
+  COMMIT_PULL_REQUEST_GENERATION_BUNDLE as ct,
+  PULL_REQUEST_GENERATION_BUNDLE as lt,
+  COMMIT_MESSAGE_GENERATION_BUNDLE as st,
 };

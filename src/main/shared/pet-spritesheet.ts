@@ -196,10 +196,146 @@ export async function installCustomPet({
 }
 
 // ---------------------------------------------------------------------------
-// 兼容导出（pet-spritesheet 分区 2 个压缩名）
+// 自定义头像/宠物注册表（原 `Gre`/`Kre`/`T8`/`E8`/`D8`/`Wre`）
+// ---------------------------------------------------------------------------
+
+import { z } from "zod";
+
+/** manifest schema（原 `Wre`）。 */
+const avatarManifestSchema = z.object({
+  id: z.string().trim().min(1).optional(),
+  displayName: z.string().trim().min(1).optional(),
+  description: z.string().nullish().transform((value) => value?.trim() || null),
+  spriteVersionNumber: z.union([z.literal(1), z.literal(2)]).default(1),
+  spritesheetPath: z.string().trim().min(1).default("spritesheet.webp"),
+});
+
+/** 已加载的自定义头像。 */
+export interface CustomAvatar {
+  directoryPath: string;
+  id: string;
+  displayName: string;
+  description: string | null;
+  spriteVersionNumber: number;
+  spritesheetDataUrl: string;
+}
+
+/** 头像/宠物读取文件系统面（Gre/Kre 依赖的最小接口）。 */
+export interface AvatarRegistryFilesystem extends PetInstallFilesystem {
+  readFile(path: string): Promise<unknown>;
+  resolve(from: string, to: string): string;
+  relative(from: string, to: string): string;
+  sep: string;
+  isAbsolute(path: string): boolean;
+}
+
+/** 越界路径判定（原 `D8`：resolve 后必须仍在 root 内）。 */
+function containedPath(fs: AvatarRegistryFilesystem, root: string, candidate: string): string | null {
+  const resolved = fs.resolve(root, candidate);
+  const rel = fs.relative(root, resolved);
+  if (rel === "" || rel === ".." || rel.startsWith(`..${fs.sep}`) || fs.isAbsolute(rel)) return null;
+  return resolved;
+}
+
+/** 单个 manifest 加载（原 `E8`）。 */
+async function readAvatarManifest(fs: AvatarRegistryFilesystem, root: string, directoryName: string, manifestFilename: string): Promise<CustomAvatar | null> {
+  const directory = containedPath(fs, root, directoryName);
+  if (directory == null) return null;
+  const manifestPath = fs.join(directory, manifestFilename);
+  try {
+    const parsed = avatarManifestSchema.safeParse(JSON.parse(String(await fs.readFile(manifestPath))));
+    if (!parsed.success) return null;
+    const spritesheetPath = containedPath(fs, directory, parsed.data.spritesheetPath);
+    if (spritesheetPath == null) return null;
+    const bytes = Buffer.from(String(await fs.readFile(spritesheetPath)), "base64");
+    const validated = validatePetSpritesheet(bytes, parsed.data.spriteVersionNumber);
+    if (validated == null) return null;
+    return {
+      directoryPath: directory,
+      id: `custom:${directoryName}`,
+      displayName: parsed.data.displayName ?? parsed.data.id ?? directoryName,
+      description: parsed.data.description,
+      spriteVersionNumber: parsed.data.spriteVersionNumber,
+      spritesheetDataUrl: validated.spritesheetDataUrl,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** 目录扫描（原 `T8`：子目录/符号链接各读 manifest）。 */
+async function readAvatarDirectory(fs: AvatarRegistryFilesystem, root: string, manifestFilename: string): Promise<CustomAvatar[]> {
+  const entries = (await fs.readDirectory(root)) as { name: string; isDirectory?(): boolean; isSymbolicLink?(): boolean }[];
+  return (
+    await Promise.all(
+      entries
+        .filter((entry) => (entry.isDirectory?.() ?? false) || (entry.isSymbolicLink?.() ?? false))
+        .map((entry) => readAvatarManifest(fs, root, entry.name, manifestFilename)),
+    )
+  ).filter((avatar): avatar is CustomAvatar => avatar != null);
+}
+
+/**
+ * 列出自定义头像与宠物（原 `Gre`，导出 `_t`）。
+ * pets 目录（pet.json）覆盖 avatars 目录（avatar.json）的同名 id；
+ * 结果按 displayName 排序；pets 目录创建失败返回空表。
+ */
+export async function listCustomAvatars({
+  appServerClient,
+  preferWsl = false,
+}: {
+  appServerClient: AvatarRegistryFilesystem;
+  preferWsl?: boolean;
+}): Promise<{ avatarDirectory: string; avatars: CustomAvatar[] }> {
+  const codexHome = process.env.CODEX_HOME ?? `${require("node:os").homedir()}/.codex`;
+  const petsDirectory = appServerClient.join(codexHome, "pets");
+  const avatarsDirectory = appServerClient.join(codexHome, "avatars");
+  try {
+    await appServerClient.createDirectory(petsDirectory, { recursive: true });
+  } catch {
+    return { avatarDirectory: petsDirectory, avatars: [] };
+  }
+  const [avatars, pets] = await Promise.all([
+    readAvatarDirectory(appServerClient, avatarsDirectory, "avatar.json").catch(() => [] as CustomAvatar[]),
+    readAvatarDirectory(appServerClient, petsDirectory, "pet.json"),
+  ]);
+  const byId = new Map(avatars.map((avatar) => [avatar.id, avatar]));
+  for (const pet of pets) byId.set(pet.id, pet);
+  return {
+    avatarDirectory: petsDirectory,
+    avatars: [...byId.values()].sort((a, b) => a.displayName.localeCompare(b.displayName)),
+  };
+}
+
+/**
+ * 读取单个自定义头像（原 `Kre`，导出 `gt`）。
+ * `custom:<slug>` 形式；pets 优先、avatars 兜底。
+ */
+export async function readCustomAvatar({
+  appServerClient,
+  avatarId,
+  preferWsl = false,
+}: {
+  appServerClient: AvatarRegistryFilesystem;
+  avatarId: string;
+  preferWsl?: boolean;
+}): Promise<CustomAvatar | null> {
+  const slug = avatarId.startsWith("custom:") ? avatarId.slice(7) : "";
+  if (!slug) return null;
+  const codexHome = process.env.CODEX_HOME ?? `${require("node:os").homedir()}/.codex`;
+  return (
+    (await readAvatarManifest(appServerClient, appServerClient.join(codexHome, "pets"), slug, "pet.json")) ??
+    readAvatarManifest(appServerClient, appServerClient.join(codexHome, "avatars"), slug, "avatar.json")
+  );
+}
+
+// ---------------------------------------------------------------------------
+// 兼容导出（pet-spritesheet 分区 4 个压缩名）
 // ---------------------------------------------------------------------------
 
 export {
   validatePetSpritesheet as vt,
   installCustomPet as ht,
+  listCustomAvatars as _t,
+  readCustomAvatar as gt,
 };
