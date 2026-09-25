@@ -74,6 +74,7 @@ export class ProjectlessDirectoryChooser {
 
   async chooseDirectory(): Promise<string | null> {
     const result = await this.dialog.showOpenDialog({
+      createDirectory: true,
       properties: ["openDirectory", "createDirectory"],
       title: "Choose Projectless Task Folder",
     });
