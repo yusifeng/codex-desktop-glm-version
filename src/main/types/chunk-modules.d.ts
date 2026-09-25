@@ -224,7 +224,7 @@ declare module "@chunk/shared" {
   export const Lo: any; // 内部符号: RD
   export const Lr: any; // 内部符号: fB
   export const Ls: any; // 内部符号: iT
-  export const Lt: any; // 内部符号: u6
+  export { resolveRealpaths as Lt } from "../../shared/realpath";
   export const Lu: any; // 内部符号: Sy
   export const M: any; // 内部符号: C7
   export const Ma: any; // 内部符号: XA
@@ -366,7 +366,7 @@ declare module "@chunk/shared" {
   export const Wo: any; // 内部符号: oD
   export const Wr: any; // 内部符号: II
   export const Ws: any; // 内部符号: Pw
-  export const Wt: any; // 内部符号: e3
+  export { toWebSocketUrl as Wt } from "../../shared/ws-url";
   export const Wu: any; // 内部符号: ny
   export const X: any; // 内部符号: n5
   export const Xa: any; // 内部符号: oA
