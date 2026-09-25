@@ -519,7 +519,7 @@ declare module "@chunk/shared" {
   export const ho: any; // 内部符号: Ck
   export const hr: any; // 内部符号: vV
   export const hs: any; // 内部符号: QT
-  export const ht: any; // 内部符号: qre
+  export { installCustomPet as ht } from "../../shared/pet-spritesheet";
   export const hu: any; // 内部符号: cb
   export const i: any; // 内部符号: Kce
   export const ia: any; // 内部符号: nre
@@ -680,7 +680,7 @@ declare module "@chunk/shared" {
   export const to: any; // 内部符号: $k
   export const tr: any; // 内部符号: jK
   export const ts: any; // 内部符号: zE
-  export const tt: any; // 内部符号: Pie
+  export { searchFileNames as tt } from "../../shared/file-search";
   export const tu: any; // 内部符号: ane
   export const u: any; // 内部符号: dce
   export const ua: any; // 内部符号: Wne
@@ -706,7 +706,7 @@ declare module "@chunk/shared" {
   export const vo: any; // 内部符号: Rk
   export const vr: any; // 内部符号: xB
   export const vs: any; // 内部符号: TT
-  export const vt: any; // 内部符号: w8
+  export { validatePetSpritesheet as vt } from "../../shared/pet-spritesheet";
   export const vu: any; // 内部符号: Vy
   export const w: any; // 内部符号: Nse
   export const wa: any; // 内部符号: Rne
