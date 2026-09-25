@@ -1,0 +1,623 @@
+[
+ {
+  "group": "git",
+  "prop": "branchPrefix",
+  "fn": "OV",
+  "key": "git-branch-prefix",
+  "description": "Prefix for branches Codex creates",
+  "default": "`codex/`",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "alwaysForcePush",
+  "fn": "OV",
+  "key": "git-always-force-push",
+  "description": "Whether Codex always force-pushes branches",
+  "default": "false",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "createPullRequestAsDraft",
+  "fn": "OV",
+  "key": "git-create-pull-request-as-draft",
+  "description": "Whether Codex creates pull requests as drafts",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "pullRequestMergeMethod",
+  "fn": "OV",
+  "key": "git-pull-request-merge-method",
+  "description": "Preferred pull request merge method",
+  "default": "`merge`",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "reviewMode",
+  "fn": "OV",
+  "key": "git-review-mode",
+  "description": "Whether Git Review uses all sources or only recorded Last Turn changes",
+  "default": "`full`",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "showSidebarPrIcons",
+  "fn": "OV",
+  "key": "git-show-sidebar-pr-icons",
+  "description": "Whether sidebar pull request icons are shown",
+  "default": "void 0",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "worktreeRoot",
+  "fn": "OV",
+  "key": "git-worktree-root",
+  "description": "Directory where Codex creates managed git worktrees",
+  "default": "``",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "commitInstructions",
+  "fn": "OV",
+  "key": "git-commit-instructions",
+  "description": "Custom git commit instructions",
+  "default": "``",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "pullRequestInstructions",
+  "fn": "OV",
+  "key": "git-pr-instructions",
+  "description": "Custom pull request instructions",
+  "default": "``",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "pullRequestWatchAutoMerge",
+  "fn": "OV",
+  "key": "git-pr-watch-auto-merge",
+  "description": "Whether watched pull requests are merged when ready",
+  "default": "false",
+  "agentAccess": ""
+ },
+ {
+  "group": "git",
+  "prop": "pullRequestWatchInstructions",
+  "fn": "OV",
+  "key": "git-pr-watch-instructions",
+  "description": "Custom instructions for watching and fixing pull requests",
+  "default": "``",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "enabled",
+  "fn": "OV",
+  "key": "ambient-suggestions-enabled",
+  "description": "Whether home-page ambient suggestions are enabled",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "theme",
+  "fn": "DV",
+  "key": "appearanceTheme",
+  "description": "Preferred app appearance mode",
+  "default": "`system`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "lightChromeTheme",
+  "fn": "DV",
+  "key": "appearanceLightChromeTheme",
+  "description": "Chrome theme used in light mode",
+  "default": "void 0",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "darkChromeTheme",
+  "fn": "DV",
+  "key": "appearanceDarkChromeTheme",
+  "description": "Chrome theme used in dark mode",
+  "default": "void 0",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "lightCodeThemeId",
+  "fn": "DV",
+  "key": "appearanceLightCodeThemeId",
+  "description": "Code theme used in light mode",
+  "default": "gV.CODEX",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "darkCodeThemeId",
+  "fn": "DV",
+  "key": "appearanceDarkCodeThemeId",
+  "description": "Code theme used in dark mode",
+  "default": "gV.CODEX",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "diffMarkerStyle",
+  "fn": "DV",
+  "key": "appearanceDiffMarkerStyle",
+  "description": "Diff marker style used in code review surfaces",
+  "default": "`color`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "sansFontSize",
+  "fn": "DV",
+  "key": "sansFontSize",
+  "description": "Base UI font size",
+  "default": "14",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "codeFontSize",
+  "fn": "DV",
+  "key": "codeFontSize",
+  "description": "Code font size",
+  "default": "12",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "useFontSmoothing",
+  "fn": "DV",
+  "key": "useFontSmoothing",
+  "description": "Whether font smoothing is enabled",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "usePointerCursors",
+  "fn": "DV",
+  "key": "usePointerCursors",
+  "description": "Whether interactive controls use pointer cursors",
+  "default": "false",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "dockIconPreference",
+  "fn": "OV",
+  "key": "?",
+  "description": "Preferred macOS Dock icon",
+  "default": "`app-default`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "reducedMotionPreference",
+  "fn": "OV",
+  "key": "reduced-motion-preference",
+  "description": "Whether Codex reduces interface motion",
+  "default": "`system`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "destination",
+  "fn": "DV",
+  "key": "appshotDestination",
+  "description": "Where global shortcut appshots are attached",
+  "default": "`automatic`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "soundEnabled",
+  "fn": "DV",
+  "key": "appshotSoundEnabled",
+  "description": "Whether appshots play a sound effect",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "annotationMarkersVisible",
+  "fn": "kV",
+  "key": "browser-annotation-markers-visible",
+  "description": "Whether saved annotations show markers on browser pages",
+  "default": "true",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "extensionsToolbarVisible",
+  "fn": "kV",
+  "key": "browser-extensions-toolbar-visible",
+  "description": "Whether the extensions puzzle button is pinned to the browser toolbar",
+  "default": "true",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "showFullUrl",
+  "fn": "kV",
+  "key": "browser-show-full-url",
+  "description": "Whether the in-app browser address bar shows the full URL",
+  "default": "false",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "annotationScreenshotsMode",
+  "fn": "OV",
+  "key": "browser-annotation-screenshots-mode",
+  "description": "When browser annotation screenshots are included",
+  "default": "_z",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "disabledSiteAnnotationHostnames",
+  "fn": "kV",
+  "key": "browser-disabled-site-annotation-hostnames",
+  "description": "Hostnames where custom site annotation features are disabled",
+  "default": "[]",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "siteAnnotationPermissionAnsweredHostnames",
+  "fn": "kV",
+  "key": "browser-site-annotation-permission-answered-hostnames",
+  "description": "Hostnames whose site annotation permission prompt the user answered",
+  "default": "[]",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "debugChromePagesEnabled",
+  "fn": "OV",
+  "key": "?",
+  "description": "Whether Browser Use may open trusted chrome:// diagnostic pages",
+  "default": "false",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "downloadDirectory",
+  "fn": "OV",
+  "key": "?",
+  "description": "Folder where files downloaded by the in-app browser are saved",
+  "default": "null",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "promptForDownloadLocation",
+  "fn": "OV",
+  "key": "?",
+  "description": "Whether manual browser downloads ask where to save each file",
+  "default": "false",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "agentSource",
+  "fn": "OV",
+  "key": "codex-micro-agent-source",
+  "description": "Task source for Codex Micro agent keys",
+  "default": "PMe",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "singleTapAgentKeys",
+  "fn": "kV",
+  "key": "codex-micro-single-tap-agent-keys",
+  "description": "Whether Codex Micro agent keys open assigned conversations with a single tap",
+  "default": "false",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "layout",
+  "fn": "OV",
+  "key": "codex-micro-layout",
+  "description": "Configured action-key layout for Codex Micro",
+  "default": "jL",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "lightingBrightness",
+  "fn": "kV",
+  "key": "codex-micro-lighting-brightness",
+  "description": "Brightness of Codex Micro lighting",
+  "default": "100",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "lightingAutoOff",
+  "fn": "kV",
+  "key": "codex-micro-lighting-auto-off",
+  "description": "When Codex Micro lighting turns off after inactivity",
+  "default": "`3-minutes`",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "alwaysHidePictureInPicture",
+  "fn": "DV",
+  "key": "computerUseAlwaysHidePictureInPicture",
+  "description": "Whether Computer Use picture in picture is always hidden",
+  "default": "false",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "primaryNumberShortcutTarget",
+  "fn": "kV",
+  "key": "primary-number-shortcut-target",
+  "description": "Whether primary-modifier number shortcuts select sidebar tasks or tabs",
+  "default": "`tabs`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "appBetaPreferencesByAccountId",
+  "fn": "OV",
+  "key": "?",
+  "description": "Desktop app beta feature preferences by account",
+  "default": "{}",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "macMenuBarEnabled",
+  "fn": "OV",
+  "key": "mac-menu-bar-enabled",
+  "description": "Whether the macOS menu bar is shown",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "chronicleMenuBarIndicatorEnabled",
+  "fn": "kV",
+  "key": "chronicle-menu-bar-indicator-enabled",
+  "description": "Whether the macOS menu bar shows the Computer History recording indicator",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "openInTargetPreferences",
+  "fn": "OV",
+  "key": "open-in-target-preferences",
+  "description": "Preferred targets for opening paths",
+  "default": "{}",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "openLinkInTargetPreference",
+  "fn": "DV",
+  "key": "open-link-in-target-preference",
+  "description": "Preferred target for opening links",
+  "default": "PL",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "externalBrowserLinkShortcut",
+  "fn": "DV",
+  "key": "external-browser-link-shortcut",
+  "description": "Modifier-click shortcut for opening web links in the default browser",
+  "default": "`unassigned`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "openLocalUrlInTargetPreference",
+  "fn": "DV",
+  "key": "open-local-url-in-target-preference",
+  "description": "Preferred target for opening local URLs",
+  "default": "PL",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "customFileHandlers",
+  "fn": "DV",
+  "key": "custom_file_handlers",
+  "description": "Custom file handlers for opening files from Codex App",
+  "default": "{}",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "syncEnabled",
+  "fn": "kV",
+  "key": "external-agent-import-sync-enabled",
+  "description": "Whether imported content is automatically kept in sync",
+  "default": "false",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "syncItemTypes",
+  "fn": "kV",
+  "key": "external-agent-import-sync-item-types",
+  "description": "Automatically sync all categories, including categories found later, or only selected categories; unset preferences retain the original import selections",
+  "default": "null",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "dictationSoundsEnabled",
+  "fn": "DV",
+  "key": "dictationSoundsEnabled",
+  "description": "Whether sounds play when dictation starts and stops",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "dictationDictionary",
+  "fn": "DV",
+  "key": "dictationDictionary",
+  "description": "Custom dictation dictionary entries",
+  "default": "[]",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "microphoneInputDeviceId",
+  "fn": "DV",
+  "key": "microphoneInputDeviceId",
+  "description": "Preferred microphone input device for voice and dictation",
+  "default": "null",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "followUpQueueMode",
+  "fn": "DV",
+  "key": "followUpQueueMode",
+  "description": "How follow-up prompts behave while a turn is running",
+  "default": "`steer`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "composerEnterBehavior",
+  "fn": "DV",
+  "key": "composerEnterBehavior",
+  "description": "How Enter behaves in the composer",
+  "default": "`enter`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "composerPlainTextMode",
+  "fn": "DV",
+  "key": "composerPlainTextMode",
+  "description": "Whether the message composer keeps code, Markdown, and links as literal text",
+  "default": "false",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "showContextWindowUsage",
+  "fn": "kV",
+  "key": "show-context-window-usage",
+  "description": "Whether context window usage is shown in the composer",
+  "default": "false",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "showEducationalTips",
+  "fn": "kV",
+  "key": "show-educational-tips",
+  "description": "Whether educational tips are shown above the composer",
+  "default": "true",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "reviewDelivery",
+  "fn": "DV",
+  "key": "reviewDelivery",
+  "description": "How code review results are delivered",
+  "default": "`inline`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "localeOverride",
+  "fn": "DV",
+  "key": "localeOverride",
+  "description": "Explicit locale override",
+  "default": "null",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "projectlessWorkspaceRoot",
+  "fn": "DV",
+  "key": "projectlessWorkspaceRoot",
+  "description": "The location where tasks started outside of projects store their data by default.",
+  "default": "null",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "preventSleepWhileRunning",
+  "fn": "DV",
+  "key": "preventSleepWhileRunning",
+  "description": "Whether the machine stays awake while Codex is running",
+  "default": "false",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "keepRemoteControlAwakeWhilePluggedIn",
+  "fn": "DV",
+  "key": "keepRemoteControlAwakeWhilePluggedIn",
+  "description": "Whether remote control keeps this computer awake while plugged in",
+  "default": "false",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "integratedTerminalShell",
+  "fn": "DV",
+  "key": "integratedTerminalShell",
+  "description": "Preferred integrated terminal shell",
+  "default": "void 0",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "defaultTerminalLocation",
+  "fn": "DV",
+  "key": "defaultTerminalLocation",
+  "description": "Where terminal actions open terminal tabs by default",
+  "default": "`bottom`",
+  "agentAccess": ""
+ },
+ {
+  "group": "desktop",
+  "prop": "runCodexInWsl",
+  "fn": "DV",
+  "key": "runCodexInWindowsSubsystemForLinux",
+  "description": "Whether Codex runs inside WSL on Windows",
+  "default": "false",
+  "agentAccess": "hidden"
+ },
+ {
+  "group": "desktop",
+  "prop": "hotkeyWindowProjectlessDefaultEnabled",
+  "fn": "OV",
+  "key": "hotkey-window-projectless-default-enabled",
+  "description": "Whether new popout-window tasks default to projectless mode",
+  "default": "false",
+  "agentAccess": ""
+ }
+]
