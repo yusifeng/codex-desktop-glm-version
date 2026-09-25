@@ -196,7 +196,9 @@ const clientThreadIdForFamily = {
   resolve(conversationId: string | null, lookup: (key: unknown, id: string | null) => unknown): string | null {
     if (conversationId != null && lookup(null, conversationId) != null) return conversationId;
     const source = lookup(null, conversationId) as { launchMode?: string; clientThreadId?: string } | null;
-    return source == null ? source : source.launchMode === "create-stable-worktree" ? null : (source.clientThreadId ?? null);
+    if (source == null) return null;
+    if (source.launchMode === "create-stable-worktree") return null;
+    return source.clientThreadId ?? null;
   },
 };
 
