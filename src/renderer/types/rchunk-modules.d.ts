@@ -289,3 +289,1338 @@ declare module "@rchunk/tool-activity-disclosure" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/artifact-file-preview-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/automation-delete-confirmation-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/bookmarked-thread-user-message-navigation" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/command-execution-command" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/conversation-source" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/creation-target-query" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/environment-labels" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/git-action-new-branch-field" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-artifacts-signals" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-external-resource-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-git-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-plan-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-side-chat" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-summary-panel-image-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-thread-turn-entries" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-webmcp-tools-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-editor" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-workflow-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/lock" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-picker-chevron-down-sm" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-terminal-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-sources-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-code-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pending-onboarding" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugin-picker-menu-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/publish-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-detail-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-fix-workflow" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-status-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-handoff-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-launch-surface" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-motion" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-stage-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/remote-hosted-pip-anchor-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/result-values" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/runtime" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-keys" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/setup-artwork" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-handoff-modal" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-pin-shortcut-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-scroll-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/timestamp-separator" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/triangle-warning" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-git-config-value" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-local-conversation-sources" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-realtime-voice-native-overlay-transition-enabled" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-resume-conversation-if-needed" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/worktree-setup-auto-fix" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/file-diff" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-writing-block-directive-renderer" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/active-tool-activity-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/book-open" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/computer-use-native-app-metadata" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/diff-preview-tooltip" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/elicitation-events" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/exec-shell-container" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/hooks-settings-route" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-app-analytics" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-activity-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-approval-message" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-item-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/partition" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-summary-item-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/undo" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/artifact-file-preview-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/automation-delete-confirmation-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/bookmarked-thread-user-message-navigation" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/command-execution-command" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/conversation-source" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/creation-target-query" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/environment-labels" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/git-action-new-branch-field" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-artifacts-signals" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-external-resource-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-git-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-plan-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-side-chat" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-summary-panel-image-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-thread-turn-entries" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-webmcp-tools-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-editor" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-workflow-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/lock" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-picker-chevron-down-sm" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-terminal-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-sources-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-code-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pending-onboarding" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugin-picker-menu-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/publish-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-detail-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-fix-workflow" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-status-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-handoff-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-launch-surface" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-motion" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-stage-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/remote-hosted-pip-anchor-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/result-values" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/runtime" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-keys" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/setup-artwork" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-handoff-modal" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-pin-shortcut-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-scroll-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/timestamp-separator" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/triangle-warning" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-git-config-value" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-local-conversation-sources" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-realtime-voice-native-overlay-transition-enabled" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-resume-conversation-if-needed" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/worktree-setup-auto-fix" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/file-diff" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-writing-block-directive-renderer" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/active-tool-activity-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/book-open" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/computer-use-native-app-metadata" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/diff-preview-tooltip" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/elicitation-events" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/exec-shell-container" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/hooks-settings-route" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-app-analytics" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-activity-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-approval-message" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-item-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/partition" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-summary-item-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/undo" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/artifact-file-preview-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/automation-delete-confirmation-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/bookmarked-thread-user-message-navigation" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/command-execution-command" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/conversation-source" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/creation-target-query" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/environment-labels" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/git-action-new-branch-field" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-artifacts-signals" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-external-resource-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-git-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-plan-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-side-chat" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-summary-panel-image-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-thread-turn-entries" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-webmcp-tools-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-editor" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-workflow-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/lock" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-picker-chevron-down-sm" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-terminal-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-sources-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-code-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pending-onboarding" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugin-picker-menu-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/publish-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-detail-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-fix-workflow" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-status-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-handoff-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-launch-surface" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-motion" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-stage-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/remote-hosted-pip-anchor-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/result-values" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/runtime" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-keys" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/setup-artwork" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-handoff-modal" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-pin-shortcut-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-scroll-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/timestamp-separator" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/triangle-warning" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-git-config-value" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-local-conversation-sources" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-realtime-voice-native-overlay-transition-enabled" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-resume-conversation-if-needed" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/worktree-setup-auto-fix" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/file-diff" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-writing-block-directive-renderer" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/active-tool-activity-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/book-open" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/computer-use-native-app-metadata" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/diff-preview-tooltip" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/elicitation-events" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/exec-shell-container" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/hooks-settings-route" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-app-analytics" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-activity-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-approval-message" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/mcp-tool-item-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/partition" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-summary-item-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/undo" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/artifact-file-preview-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/automation-delete-confirmation-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/bookmarked-thread-user-message-navigation" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/command-execution-command" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/conversation-source" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/creation-target-query" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/environment-labels" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/git-action-new-branch-field" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-artifacts-signals" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-external-resource-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-git-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-plan-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-side-chat" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-summary-panel-image-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-thread-turn-entries" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-webmcp-tools-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-editor" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-environment-workflow-messages" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/lock" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-picker-chevron-down-sm" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-terminal-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-sources-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-code-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pending-onboarding" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plan-side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/plugin-picker-menu-content" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/publish-actions" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-detail-model" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-fix-workflow" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-status-label" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-handoff-target" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-launch-surface" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-motion" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/realtime-voice-stage-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/remote-hosted-pip-anchor-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/result-values" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/runtime" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/security-keys" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/setup-artwork" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/side-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-handoff-modal" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-pin-shortcut-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-scroll-layout" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/timestamp-separator" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/triangle-warning" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-git-config-value" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-local-conversation-sources" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-realtime-voice-native-overlay-transition-enabled" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-resume-conversation-if-needed" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/worktree-setup-auto-fix" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/file-diff" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-writing-block-directive-renderer" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/gitlab-merge-request-form-dialog" {
+  const _default: unknown;
+  export default _default;
+}
