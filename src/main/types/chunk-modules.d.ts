@@ -73,7 +73,7 @@ declare module "@chunk/shared" {
   export const A: any; // 内部符号: koe
   export const Aa: any; // 内部符号: One
   export const Ac: any; // 内部符号: _C
-  export const Ad: any; // 内部符号: A_
+  export { normalizeApprovalsReviewer as Ad } from "../../shared/sandbox-permissions";
   export const Af: any; // 内部符号: nm
   export const Ai: any; // 内部符号: _re
   export const Al: any; // 内部符号: Ob
@@ -115,7 +115,7 @@ declare module "@chunk/shared" {
   export const D: any; // 内部符号: cse
   export const Da: any; // 内部符号: tj
   export const Dc: any; // 内部符号: wC
-  export const Dd: any; // 内部符号: k_
+  export { permissionsForProfile as Dd } from "../../shared/sandbox-permissions";
   export const Df: any; // 内部符号: Gp
   export const Di: any; // 内部符号: Z
   export const Dl: any; // 内部符号: Kb
@@ -141,7 +141,7 @@ declare module "@chunk/shared" {
   export const F: any; // 内部符号: T7
   export const Fa: any; // 内部符号: qA
   export const Fc: any; // 内部符号: JS
-  export const Fd: any; // 内部符号: S_
+  export { permissionSetAllowed as Fd } from "../../shared/sandbox-permissions";
   export const Ff: any; // 内部符号: Zd
   export const Fi: any; // 内部符号: cM
   export const Fl: any; // 内部符号: jb
@@ -179,7 +179,7 @@ declare module "@chunk/shared" {
   export const I: any; // 内部符号: ioe
   export const Ia: any; // 内部符号: GA
   export const Ic: any; // 内部符号: YS
-  export const Id: any; // 内部符号: x_
+  export { availablePermissionProfileKinds as Id } from "../../shared/sandbox-permissions";
   export const If: any; // 内部符号: Gd
   export const Ii: any; // 内部符号: hre
   export const Il: any; // 内部符号: Pb
@@ -216,7 +216,7 @@ declare module "@chunk/shared" {
   export const L: any; // 内部符号: toe
   export const La: any; // 内部符号: WA
   export const Lc: any; // 内部符号: GS
-  export const Ld: any; // 内部符号: s_
+  export { deepEquals as Ld } from "../../shared/sandbox-permissions";
   export const Lf: any; // 内部符号: Ud
   export const Li: any; // 内部符号: fre
   export const Ll: any; // 内部符号: gne
@@ -229,7 +229,7 @@ declare module "@chunk/shared" {
   export const M: any; // 内部符号: C7
   export const Ma: any; // 内部符号: XA
   export const Mc: any; // 内部符号: tC
-  export const Md: any; // 内部符号: __
+  export { sandboxModeOfPolicy as Md } from "../../shared/sandbox-permissions";
   export const Mf: any; // 内部符号: Fp
   export const Mi: any; // 内部符号: oM
   export const Ml: any; // 内部符号: Ab
@@ -242,7 +242,7 @@ declare module "@chunk/shared" {
   export const N: any; // 内部符号: Doe
   export const Na: any; // 内部符号: YA
   export const Nc: any; // 内部符号: eC
-  export const Nd: any; // 内部符号: y_
+  export { permissionParamsOf as Nd } from "../../shared/sandbox-permissions";
   export const Nf: any; // 内部符号: Of
   export const Ni: any; // 内部符号: sM
   export const Nl: any; // 内部符号: Fb
@@ -255,7 +255,7 @@ declare module "@chunk/shared" {
   export const O: any; // 内部符号: ise
   export const Oa: any; // 内部符号: Ane
   export const Oc: any; // 内部符号: TC
-  export const Od: any; // 内部符号: E_
+  export { readOnlyPermissions as Od } from "../../shared/sandbox-permissions";
   export const Of: any; // 内部符号: kF（zod string builder，链式调用放宽为 any）
   export const Oi: any; // 内部符号: xM
   export const Ol: any; // 内部符号: ex
@@ -268,7 +268,7 @@ declare module "@chunk/shared" {
   export const P: any; // 内部符号: Ooe
   export const Pa: any; // 内部符号: JA
   export const Pc: any; // 内部符号: BS
-  export const Pd: any; // 内部符号: m_
+  export { isAutomaticApprovalsReviewer as Pd } from "../../shared/sandbox-permissions";
   export const Pf: any; // 内部符号: Cf
   export const Pi: any; // 内部符号: mre
   export const Pl: any; // 内部符号: Nb
@@ -539,7 +539,7 @@ declare module "@chunk/shared" {
   export const j: any; // 内部符号: Aoe
   export const ja: any; // 内部符号: ZA
   export const jc: any; // 内部符号: mC
-  export const jd: any; // 内部符号: b_
+  export { runtimeWorkspaceRootsOf as jd } from "../../shared/sandbox-permissions";
   export const jf: any; // 内部符号: Jp
   export const ji: any; // 内部符号: bM
   export const jl: any; // 内部符号: kb
@@ -552,7 +552,7 @@ declare module "@chunk/shared" {
   export const k: any; // 内部符号: Uoe
   export const ka: any; // 内部符号: $A
   export const kc: any; // 内部符号: vC
-  export const kd: any; // 内部符号: T_
+  export { workspaceWritePermissions as kd } from "../../shared/sandbox-permissions";
   export const kf: any; // 内部符号: Km
   export const ki: any; // 内部符号: SM
   export const kl: any; // 内部符号: Db
