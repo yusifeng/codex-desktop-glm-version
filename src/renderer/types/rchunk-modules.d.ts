@@ -53,6 +53,8 @@ declare module "@rchunk/app-shared" {
   export const t$: unknown;
   export const x_: unknown; // useIconScaleContext（_3）
   export const y_: unknown;
+  export const FX: unknown;
+  export const G4: unknown;
   export const zI: unknown;
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
   // 导出面（数千个压缩名）待 renderer-app-shared-analysis.md 完成后语义化。
@@ -2285,6 +2287,26 @@ declare module "@rchunk/personalization-state" {
 }
 
 declare module "@rchunk/virtual-try-on" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/browser-use-origin-state-queries" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/diff-comment-card" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/pull-request-readonly-comment" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/review-row" {
   const _default: unknown;
   export default _default;
 }
