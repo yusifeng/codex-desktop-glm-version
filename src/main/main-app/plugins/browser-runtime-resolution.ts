@@ -514,7 +514,7 @@ function resolveChannelInstallUrl({
 // ===========================================================================
 
 /** Chromium 浏览器是否已安装（原 `Une`）。 */
-async function isChromiumBrowserInstalled({
+export async function isChromiumBrowserInstalled({
   browserFamily,
   platform = process.platform,
 }: {
@@ -534,7 +534,7 @@ async function isChromiumBrowserInstalled({
  * 「缺扩展安装提示」信息（原 `Wne`）：默认浏览器为受支持 Chromium 且
  * 尚未安装目标扩展时返回 {browserFamily, displayName, installUrl}。
  */
-function getMissingChromeExtensionInstallInfo(options: {
+export function getMissingChromeExtensionInstallInfo(options: {
   buildFlavor?: string;
   chromeConfigHome?: string;
   compatibleExtensionIds?: string[];
@@ -624,7 +624,7 @@ export function isChromiumExtensionInstalled({
 }
 
 /** 第一个已安装的扩展 id（原 `ga`）。 */
-function findInstalledExtensionId({
+export function findInstalledExtensionId({
   extensionIds,
   ...rest
 }: {
@@ -644,7 +644,7 @@ function findInstalledExtensionId({
 }
 
 /** 打开浏览器扩展设置页（原 `Gne`）。 */
-async function openBrowserExtensionSettings({
+export async function openBrowserExtensionSettings({
   browserFamily = `chrome`,
   extensionId,
   platform = process.platform,
@@ -666,7 +666,7 @@ async function openBrowserExtensionSettings({
 }
 
 /** 在 Chromium 浏览器中打开 URL（原 `Kne`）。 */
-async function openChromiumUrl({
+export async function openChromiumUrl({
   browserFamily,
   platform = process.platform,
   runCommand = runCommandFn,
