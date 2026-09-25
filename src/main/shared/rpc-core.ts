@@ -18,8 +18,8 @@
 // 这是 shared 692 导出的地基族（Uf/Hf/Vf/Wf/Bf/zf 六个别名被
 // 145+ 个 main-app 模块 import）。
 
-/** RPC 目标基类（原 `D`：dist chunk 的 RpcTarget 或空类）。 */
-export declare class RpcTarget {
+/** RPC 目标基类（原 `D`：dist chunk 的 RpcTarget，无则空类回退）。 */
+export class RpcTarget {
   [key: string]: unknown;
 }
 

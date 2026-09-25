@@ -599,7 +599,7 @@ declare module "@chunk/shared" {
   export const no: any; // 内部符号: Yk
   export const nr: any; // 内部符号: bK
   export const ns: any; // 内部符号: BE
-  export const nt: any; // 内部符号: Mie
+  export { TextGenerator as nt } from "../../shared/structured-generation";
   export const nu: any; // 内部符号: Tb
   export const o: any; // 内部符号: Lce
   export const oa: any; // 内部符号: hj
@@ -653,7 +653,7 @@ declare module "@chunk/shared" {
   export const ro: any; // 内部符号: Jk
   export const rr: any; // 内部符号: vK
   export const rs: any; // 内部符号: FE
-  export const rt: any; // 内部符号: Aie
+  export { PullRequestMessageGenerator as rt } from "../../shared/structured-generation";
   export const ru: any; // 内部符号: mb
   export const s: any; // 内部符号: jce
   export const sa: any; // 内部符号: gj
@@ -693,7 +693,7 @@ declare module "@chunk/shared" {
   export const uo: any; // 内部符号: Ek
   export const ur: any; // 内部符号: cW
   export const us: any; // 内部符号: _E
-  export const ut: any; // 内部符号: R8
+  export { runStructuredGeneration as ut } from "../../shared/structured-generation";
   export const uu: any; // 内部符号: lb
   export const v: any; // 内部符号: Qse
   export const va: any; // 内部符号: Hne
