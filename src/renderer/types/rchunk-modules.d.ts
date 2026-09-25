@@ -17,6 +17,42 @@ declare module "@rchunk/app-shared" {
     use<T>(context: unknown): T;
     [key: string]: unknown;
   };
+  // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
+  export const $3: unknown; // rolldown lazy 辅助
+  export const BX: unknown;
+  export const C_: unknown;
+  export const FQ: unknown;
+  export const FX: unknown;
+  export const HX: unknown; // Maitai query 订阅 store 工厂（oMe）
+  export const I3: unknown; // jsx runtime
+  export const IQ: unknown;
+  export const JQ: unknown;
+  export const K2: unknown;
+  export const LX: unknown;
+  export const P3: unknown;
+  export const QI: unknown;
+  export const S_: unknown; // IconAsset（h3）
+  export const Xi: unknown;
+  export const Y2: unknown; // FormattedMessage
+  export const Yi: unknown;
+  export const ZI: unknown;
+  export const __: unknown;
+  export const b_: unknown; // React use（ait）
+  export const fk: unknown;
+  export const g_: unknown;
+  export const h4: unknown;
+  export const i$: unknown;
+  export const lk: unknown;
+  export const m4: unknown; // intl message（J）
+  export const n$: unknown;
+  export const pZ: unknown; // createDerivedFamily（kI）
+  export const qQ: unknown;
+  export const qm: unknown;
+  export const r$: unknown;
+  export const rZ: unknown; // createSignalFamily（Sje）
+  export const t$: unknown;
+  export const x_: unknown; // useIconScaleContext（_3）
+  export const y_: unknown;
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
   // 导出面（数千个压缩名）待 renderer-app-shared-analysis.md 完成后语义化。
   // 目前以 any 占位，重写完成后本声明会移除（源码直接导出真类型）。
