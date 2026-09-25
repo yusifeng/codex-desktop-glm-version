@@ -1624,3 +1624,323 @@ declare module "@rchunk/gitlab-merge-request-form-dialog" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/chat-tab-metadata-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/content-quick-chat-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/delete-archived-chats-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/document-title" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/latest-turn-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-stream-role-product-event" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-and-reasoning-effort-translations" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-agent" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-subagents-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/right-panel-composer-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-app-shell-chrome" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-emoji" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-overflow-menu" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-panel-toggle-button" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-usage-breakdown" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chat-tab-metadata-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/content-quick-chat-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/delete-archived-chats-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/document-title" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/latest-turn-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-stream-role-product-event" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-and-reasoning-effort-translations" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-agent" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-subagents-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/right-panel-composer-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-app-shell-chrome" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-emoji" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-overflow-menu" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-panel-toggle-button" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-usage-breakdown" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chat-tab-metadata-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/content-quick-chat-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/delete-archived-chats-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/document-title" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/latest-turn-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-stream-role-product-event" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-and-reasoning-effort-translations" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-agent" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-subagents-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/right-panel-composer-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-app-shell-chrome" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-emoji" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-overflow-menu" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-panel-toggle-button" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-usage-breakdown" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/chat-tab-metadata-bridge" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/content-quick-chat-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/delete-archived-chats-dialog" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/document-title" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/latest-turn-preview" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/local-conversation-stream-role-product-event" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/model-and-reasoning-effort-translations" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-background-agent" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-local-conversation-subagents-panel" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/open-thread-pull-request-side-panel-tab" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/right-panel-composer-overlay" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-app-shell-chrome" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-emoji" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-overflow-menu" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-panel-toggle-button" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/thread-usage-breakdown" {
+  const _default: unknown;
+  export default _default;
+}
