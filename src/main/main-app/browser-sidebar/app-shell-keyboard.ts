@@ -111,6 +111,11 @@ export function matchesAccelerator(event: InputEvent, accelerator: string): bool
     : matchesDomAccelerator(toDomKeyboardEvent(event), accelerator);
 }
 
+/** DOM 事件命中 accelerator（原 `sU`，供外部以 DOM 事件形态复用）。 */
+export function matchesDomAcceleratorEvent(event: ReturnType<typeof toDomKeyboardEvent>, accelerator: string): boolean {
+  return matchesDomAccelerator(event, accelerator);
+}
+
 function matchesDomAccelerator(event: { altKey: boolean; code: string; ctrlKey: boolean; key: string; metaKey: boolean; repeat: boolean; shiftKey: boolean }, accelerator: string): boolean {
   const parsed = parseAccelerator(accelerator);
   return (
@@ -241,11 +246,13 @@ export interface AppShellFocusState {
   bottomPanelBrowserConversationId?: string | null;
   bottomPanelBrowserTabId?: string | null;
   bottomPanelCanCloseActiveTab?: boolean;
+  canAcceptAppshotShortcut?: boolean;
   canRedoAppAction?: boolean;
   canUndoAppAction?: boolean;
   focusArea: "bottom-panel" | "main" | "right-panel" | "hidden-browser-use" | null;
   focusedEditable?: string | null;
   imagePreviewOpen?: boolean;
+  isNewChatRoute?: boolean;
   rightPanelBrowserCanZoom?: boolean;
   rightPanelBrowserConversationId?: string | null;
   rightPanelBrowserTabId?: string | null;
@@ -339,8 +346,8 @@ function closeTabAction(state: AppShellFocusState | null, conversationId?: strin
   }
 }
 
-/** 单事件 → 动作（原 `uU`）。 */
-function actionForEvent(
+/** 单事件 → 动作（原 `uU`，供 browser-shortcuts 复用）。 */
+export function actionForEvent(
   event: InputEvent,
   {
     allowDebugMenu,
