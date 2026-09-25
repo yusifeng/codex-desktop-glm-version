@@ -1,0 +1,3410 @@
+{
+ "arrow-up-md-light-20": {
+  "file": "ui/icons/arrow-up-md-light-20.ts",
+  "var": "NT",
+  "init": "PT",
+  "export": "icon_arrow_up_md_light_20"
+ },
+ "at-sign-light-16": {
+  "file": "ui/icons/at-sign-light-16.ts",
+  "var": "FT",
+  "init": "IT",
+  "export": "icon_at_sign_light_16"
+ },
+ "chat-bubble-rounded-rectangle-text-light-20": {
+  "file": "ui/icons/chat-bubble-rounded-rectangle-text-light-20.ts",
+  "var": "qhe",
+  "init": "Jhe",
+  "export": "icon_chat_bubble_rounded_rectangle_text_light_20"
+ },
+ "checkmark-md-light-16": {
+  "file": "ui/icons/checkmark-md-light-16.ts",
+  "var": "LT",
+  "init": "RT",
+  "export": "icon_checkmark_md_light_16"
+ },
+ "ellipsis-horizontal-light-16": {
+  "file": "ui/icons/ellipsis-horizontal-light-16.ts",
+  "var": "zT",
+  "init": "BT",
+  "export": "icon_ellipsis_horizontal_light_16"
+ },
+ "emoji-face-badge-plus-light-16": {
+  "file": "ui/icons/emoji-face-badge-plus-light-16.ts",
+  "var": "VT",
+  "init": "HT",
+  "export": "icon_emoji_face_badge_plus_light_16"
+ },
+ "filter-light-16": {
+  "file": "ui/icons/filter-light-16.ts",
+  "var": "UT",
+  "init": "WT",
+  "export": "icon_filter_light_16"
+ },
+ "filter-light-20": {
+  "file": "ui/icons/filter-light-20.ts",
+  "var": "GT",
+  "init": "KT",
+  "export": "icon_filter_light_20"
+ },
+ "trash-light-16": {
+  "file": "ui/icons/trash-light-16.ts",
+  "var": "qT",
+  "init": "JT",
+  "export": "icon_trash_light_16"
+ },
+ "xmark-lg-light-16": {
+  "file": "ui/icons/xmark-lg-light-16.ts",
+  "var": "YT",
+  "init": "XT",
+  "export": "icon_xmark_lg_light_16"
+ },
+ "arrow-curved-right-large-typographic-light-16": {
+  "file": "ui/icons/arrow-curved-right-large-typographic-light-16.ts",
+  "var": "aQe",
+  "init": "oQe",
+  "export": "icon_arrow_curved_right_large_typographic_light_16"
+ },
+ "arrow-curved-right-large-typographic-light-20": {
+  "file": "ui/icons/arrow-curved-right-large-typographic-light-20.ts",
+  "var": "sQe",
+  "init": "cQe",
+  "export": "icon_arrow_curved_right_large_typographic_light_20"
+ },
+ "arrow-down-arrow-up-light-20": {
+  "file": "ui/icons/arrow-down-arrow-up-light-20.ts",
+  "var": "lQe",
+  "init": "uQe",
+  "export": "icon_arrow_down_arrow_up_light_20"
+ },
+ "arrow-down-left-arrow-up-right-sm-light-20": {
+  "file": "ui/icons/arrow-down-left-arrow-up-right-sm-light-20.ts",
+  "var": "dQe",
+  "init": "fQe",
+  "export": "icon_arrow_down_left_arrow_up_right_sm_light_20"
+ },
+ "arrow-down-lg-light-16": {
+  "file": "ui/icons/arrow-down-lg-light-16.ts",
+  "var": "pQe",
+  "init": "mQe",
+  "export": "icon_arrow_down_lg_light_16"
+ },
+ "arrow-left-arrow-right-light-16": {
+  "file": "ui/icons/arrow-left-arrow-right-light-16.ts",
+  "var": "hQe",
+  "init": "gQe",
+  "export": "icon_arrow_left_arrow_right_light_16"
+ },
+ "arrow-left-lg-light-20": {
+  "file": "ui/icons/arrow-left-lg-light-20.ts",
+  "var": "_Qe",
+  "init": "vQe",
+  "export": "icon_arrow_left_lg_light_20"
+ },
+ "arrow-right-up-trending-light-16": {
+  "file": "ui/icons/arrow-right-up-trending-light-16.ts",
+  "var": "yQe",
+  "init": "bQe",
+  "export": "icon_arrow_right_up_trending_light_16"
+ },
+ "arrow-up-circle-light-20": {
+  "file": "ui/icons/arrow-up-circle-light-20.ts",
+  "var": "xQe",
+  "init": "SQe",
+  "export": "icon_arrow_up_circle_light_20"
+ },
+ "arrow-up-line-horizontal-light-20": {
+  "file": "ui/icons/arrow-up-line-horizontal-light-20.ts",
+  "var": "CQe",
+  "init": "wQe",
+  "export": "icon_arrow_up_line_horizontal_light_20"
+ },
+ "arrow-up-md-light-16": {
+  "file": "ui/icons/arrow-up-md-light-16.ts",
+  "var": "TQe",
+  "init": "EQe",
+  "export": "icon_arrow_up_md_light_16"
+ },
+ "arrow-up-open-base-light-20": {
+  "file": "ui/icons/arrow-up-open-base-light-20.ts",
+  "var": "DQe",
+  "init": "OQe",
+  "export": "icon_arrow_up_open_base_light_20"
+ },
+ "arrow-up-right-arrow-down-left-md-light-16": {
+  "file": "ui/icons/arrow-up-right-arrow-down-left-md-light-16.ts",
+  "var": "kQe",
+  "init": "AQe",
+  "export": "icon_arrow_up_right_arrow_down_left_md_light_16"
+ },
+ "arrow-up-right-arrow-down-left-sm-light-20": {
+  "file": "ui/icons/arrow-up-right-arrow-down-left-sm-light-20.ts",
+  "var": "jQe",
+  "init": "MQe",
+  "export": "icon_arrow_up_right_arrow_down_left_sm_light_20"
+ },
+ "arrow-up-right-md-light-12": {
+  "file": "ui/icons/arrow-up-right-md-light-12.ts",
+  "var": "NQe",
+  "init": "PQe",
+  "export": "icon_arrow_up_right_md_light_12"
+ },
+ "arrow-uturn-right-light-16": {
+  "file": "ui/icons/arrow-uturn-right-light-16.ts",
+  "var": "FQe",
+  "init": "IQe",
+  "export": "icon_arrow_uturn_right_light_16"
+ },
+ "arrow-uturn-right-light-20": {
+  "file": "ui/icons/arrow-uturn-right-light-20.ts",
+  "var": "LQe",
+  "init": "RQe",
+  "export": "icon_arrow_uturn_right_light_20"
+ },
+ "arrows-clockwise-rotate-lg-light-20": {
+  "file": "ui/icons/arrows-clockwise-rotate-lg-light-20.ts",
+  "var": "zQe",
+  "init": "BQe",
+  "export": "icon_arrows_clockwise_rotate_lg_light_20"
+ },
+ "atom-light-20": {
+  "file": "ui/icons/atom-light-20.ts",
+  "var": "VQe",
+  "init": "HQe",
+  "export": "icon_atom_light_20"
+ },
+ "balance-scale-light-16": {
+  "file": "ui/icons/balance-scale-light-16.ts",
+  "var": "UQe",
+  "init": "WQe",
+  "export": "icon_balance_scale_light_16"
+ },
+ "balance-scale-light-20": {
+  "file": "ui/icons/balance-scale-light-20.ts",
+  "var": "GQe",
+  "init": "KQe",
+  "export": "icon_balance_scale_light_20"
+ },
+ "bar-chart-light-20": {
+  "file": "ui/icons/bar-chart-light-20.ts",
+  "var": "qQe",
+  "init": "JQe",
+  "export": "icon_bar_chart_light_20"
+ },
+ "bell-badge-light-16": {
+  "file": "ui/icons/bell-badge-light-16.ts",
+  "var": "YQe",
+  "init": "XQe",
+  "export": "icon_bell_badge_light_16"
+ },
+ "bell-badge-light-20": {
+  "file": "ui/icons/bell-badge-light-20.ts",
+  "var": "ZQe",
+  "init": "QQe",
+  "export": "icon_bell_badge_light_20"
+ },
+ "bell-light-16": {
+  "file": "ui/icons/bell-light-16.ts",
+  "var": "e1",
+  "init": "t1",
+  "export": "icon_bell_light_16"
+ },
+ "bell-light-20": {
+  "file": "ui/icons/bell-light-20.ts",
+  "var": "n1",
+  "init": "r1",
+  "export": "icon_bell_light_20"
+ },
+ "book-open-light-16": {
+  "file": "ui/icons/book-open-light-16.ts",
+  "var": "i1",
+  "init": "a1",
+  "export": "icon_book_open_light_16"
+ },
+ "book-open-light-20": {
+  "file": "ui/icons/book-open-light-20.ts",
+  "var": "o1",
+  "init": "s1",
+  "export": "icon_book_open_light_20"
+ },
+ "books-light-16": {
+  "file": "ui/icons/books-light-16.ts",
+  "var": "c1",
+  "init": "l1",
+  "export": "icon_books_light_16"
+ },
+ "books-light-20": {
+  "file": "ui/icons/books-light-20.ts",
+  "var": "u1",
+  "init": "d1",
+  "export": "icon_books_light_20"
+ },
+ "braces-light-20": {
+  "file": "ui/icons/braces-light-20.ts",
+  "var": "f1",
+  "init": "p1",
+  "export": "icon_braces_light_20"
+ },
+ "brain-light-16": {
+  "file": "ui/icons/brain-light-16.ts",
+  "var": "m1",
+  "init": "h1",
+  "export": "icon_brain_light_16"
+ },
+ "brain-light-20": {
+  "file": "ui/icons/brain-light-20.ts",
+  "var": "g1",
+  "init": "_1",
+  "export": "icon_brain_light_20"
+ },
+ "branch-light-16": {
+  "file": "ui/icons/branch-light-16.ts",
+  "var": "v1",
+  "init": "y1",
+  "export": "icon_branch_light_16"
+ },
+ "branch-light-20": {
+  "file": "ui/icons/branch-light-20.ts",
+  "var": "b1",
+  "init": "x1",
+  "export": "icon_branch_light_20"
+ },
+ "building-light-16": {
+  "file": "ui/icons/building-light-16.ts",
+  "var": "S1",
+  "init": "C1",
+  "export": "icon_building_light_16"
+ },
+ "chat-bubble-light-16": {
+  "file": "ui/icons/chat-bubble-light-16.ts",
+  "var": "w1",
+  "init": "T1",
+  "export": "icon_chat_bubble_light_16"
+ },
+ "chat-bubble-on-chat-bubble-light-16": {
+  "file": "ui/icons/chat-bubble-on-chat-bubble-light-16.ts",
+  "var": "E1",
+  "init": "D1",
+  "export": "icon_chat_bubble_on_chat_bubble_light_16"
+ },
+ "chat-bubble-on-chat-bubble-light-20": {
+  "file": "ui/icons/chat-bubble-on-chat-bubble-light-20.ts",
+  "var": "O1",
+  "init": "k1",
+  "export": "icon_chat_bubble_on_chat_bubble_light_20"
+ },
+ "checkmark-lg-light-16": {
+  "file": "ui/icons/checkmark-lg-light-16.ts",
+  "var": "A1",
+  "init": "j1",
+  "export": "icon_checkmark_lg_light_16"
+ },
+ "checkmark-lg-light-20": {
+  "file": "ui/icons/checkmark-lg-light-20.ts",
+  "var": "M1",
+  "init": "N1",
+  "export": "icon_checkmark_lg_light_20"
+ },
+ "chevron-down-md-light-12": {
+  "file": "ui/icons/chevron-down-md-light-12.ts",
+  "var": "P1",
+  "init": "F1",
+  "export": "icon_chevron_down_md_light_12"
+ },
+ "chevron-down-md-light-16": {
+  "file": "ui/icons/chevron-down-md-light-16.ts",
+  "var": "I1",
+  "init": "L1",
+  "export": "icon_chevron_down_md_light_16"
+ },
+ "chevron-right-md-light-16": {
+  "file": "ui/icons/chevron-right-md-light-16.ts",
+  "var": "R1",
+  "init": "z1",
+  "export": "icon_chevron_right_md_light_16"
+ },
+ "clipboard-light-16": {
+  "file": "ui/icons/clipboard-light-16.ts",
+  "var": "B1",
+  "init": "V1",
+  "export": "icon_clipboard_light_16"
+ },
+ "cloud-light-16": {
+  "file": "ui/icons/cloud-light-16.ts",
+  "var": "H1",
+  "init": "U1",
+  "export": "icon_cloud_light_16"
+ },
+ "cloud-plugin-light-16": {
+  "file": "ui/icons/cloud-plugin-light-16.ts",
+  "var": "t1e",
+  "init": "n1e",
+  "export": "icon_cloud_plugin_light_16"
+ },
+ "cloud-plugin-light-20": {
+  "file": "ui/icons/cloud-plugin-light-20.ts",
+  "var": "r1e",
+  "init": "i1e",
+  "export": "icon_cloud_plugin_light_20"
+ },
+ "code-light-16": {
+  "file": "ui/icons/code-light-16.ts",
+  "var": "W1",
+  "init": "G1",
+  "export": "icon_code_light_16"
+ },
+ "code-light-20": {
+  "file": "ui/icons/code-light-20.ts",
+  "var": "a1e",
+  "init": "o1e",
+  "export": "icon_code_light_20"
+ },
+ "compare-light-28": {
+  "file": "ui/icons/compare-light-28.ts",
+  "var": "s1e",
+  "init": "c1e",
+  "export": "icon_compare_light_28"
+ },
+ "credit-card-light-20": {
+  "file": "ui/icons/credit-card-light-20.ts",
+  "var": "l1e",
+  "init": "u1e",
+  "export": "icon_credit_card_light_20"
+ },
+ "credits-light-16": {
+  "file": "ui/icons/credits-light-16.ts",
+  "var": "d1e",
+  "init": "f1e",
+  "export": "icon_credits_light_16"
+ },
+ "credits-light-24": {
+  "file": "ui/icons/credits-light-24.ts",
+  "var": "p1e",
+  "init": "m1e",
+  "export": "icon_credits_light_24"
+ },
+ "cube-light-16": {
+  "file": "ui/icons/cube-light-16.ts",
+  "var": "K1",
+  "init": "q1",
+  "export": "icon_cube_light_16"
+ },
+ "cube-light-20": {
+  "file": "ui/icons/cube-light-20.ts",
+  "var": "h1e",
+  "init": "g1e",
+  "export": "icon_cube_light_20"
+ },
+ "cube-light-32": {
+  "file": "ui/icons/cube-light-32.ts",
+  "var": "_1e",
+  "init": "v1e",
+  "export": "icon_cube_light_32"
+ },
+ "cursor-frame-light-16": {
+  "file": "ui/icons/cursor-frame-light-16.ts",
+  "var": "J1",
+  "init": "Y1",
+  "export": "icon_cursor_frame_light_16"
+ },
+ "cursor-frame-light-20": {
+  "file": "ui/icons/cursor-frame-light-20.ts",
+  "var": "X1",
+  "init": "Z1",
+  "export": "icon_cursor_frame_light_20"
+ },
+ "desktop-light-16": {
+  "file": "ui/icons/desktop-light-16.ts",
+  "var": "y1e",
+  "init": "b1e",
+  "export": "icon_desktop_light_16"
+ },
+ "document-badge-plus-light-16": {
+  "file": "ui/icons/document-badge-plus-light-16.ts",
+  "var": "x1e",
+  "init": "S1e",
+  "export": "icon_document_badge_plus_light_16"
+ },
+ "document-light-16": {
+  "file": "ui/icons/document-light-16.ts",
+  "var": "e0",
+  "init": "t0",
+  "export": "icon_document_light_16"
+ },
+ "document-light-20": {
+  "file": "ui/icons/document-light-20.ts",
+  "var": "n0",
+  "init": "r0",
+  "export": "icon_document_light_20"
+ },
+ "document-light-28": {
+  "file": "ui/icons/document-light-28.ts",
+  "var": "C1e",
+  "init": "w1e",
+  "export": "icon_document_light_28"
+ },
+ "document-pdf-light-20": {
+  "file": "ui/icons/document-pdf-light-20.ts",
+  "var": "T1e",
+  "init": "E1e",
+  "export": "icon_document_pdf_light_20"
+ },
+ "drag-light-16": {
+  "file": "ui/icons/drag-light-16.ts",
+  "var": "D1e",
+  "init": "O1e",
+  "export": "icon_drag_light_16"
+ },
+ "dumbbell-light-16": {
+  "file": "ui/icons/dumbbell-light-16.ts",
+  "var": "k1e",
+  "init": "A1e",
+  "export": "icon_dumbbell_light_16"
+ },
+ "dumbbell-light-20": {
+  "file": "ui/icons/dumbbell-light-20.ts",
+  "var": "j1e",
+  "init": "M1e",
+  "export": "icon_dumbbell_light_20"
+ },
+ "dumbbell-slash-regular-20": {
+  "file": "ui/icons/dumbbell-slash-regular-20.ts",
+  "var": "N1e",
+  "init": "P1e",
+  "export": "icon_dumbbell_slash_regular_20"
+ },
+ "ellipsis-horizontal-light-20": {
+  "file": "ui/icons/ellipsis-horizontal-light-20.ts",
+  "var": "F1e",
+  "init": "I1e",
+  "export": "icon_ellipsis_horizontal_light_20"
+ },
+ "envelope-light-20": {
+  "file": "ui/icons/envelope-light-20.ts",
+  "var": "L1e",
+  "init": "R1e",
+  "export": "icon_envelope_light_20"
+ },
+ "eraser-badge-light-16": {
+  "file": "ui/icons/eraser-badge-light-16.ts",
+  "var": "z1e",
+  "init": "B1e",
+  "export": "icon_eraser_badge_light_16"
+ },
+ "eraser-light-16": {
+  "file": "ui/icons/eraser-light-16.ts",
+  "var": "i0",
+  "init": "a0",
+  "export": "icon_eraser_light_16"
+ },
+ "eraser-light-20": {
+  "file": "ui/icons/eraser-light-20.ts",
+  "var": "V1e",
+  "init": "H1e",
+  "export": "icon_eraser_light_20"
+ },
+ "exclamation-mark-triangle-light-16": {
+  "file": "ui/icons/exclamation-mark-triangle-light-16.ts",
+  "var": "U1e",
+  "init": "W1e",
+  "export": "icon_exclamation_mark_triangle_light_16"
+ },
+ "eye-light-16": {
+  "file": "ui/icons/eye-light-16.ts",
+  "var": "o0",
+  "init": "s0",
+  "export": "icon_eye_light_16"
+ },
+ "eye-light-20": {
+  "file": "ui/icons/eye-light-20.ts",
+  "var": "G1e",
+  "init": "K1e",
+  "export": "icon_eye_light_20"
+ },
+ "eye-slash-light-20": {
+  "file": "ui/icons/eye-slash-light-20.ts",
+  "var": "c0",
+  "init": "l0",
+  "export": "icon_eye_slash_light_20"
+ },
+ "finance-light-20": {
+  "file": "ui/icons/finance-light-20.ts",
+  "var": "q1e",
+  "init": "J1e",
+  "export": "icon_finance_light_20"
+ },
+ "flag-light-16": {
+  "file": "ui/icons/flag-light-16.ts",
+  "var": "u0",
+  "init": "d0",
+  "export": "icon_flag_light_16"
+ },
+ "flag-light-20": {
+  "file": "ui/icons/flag-light-20.ts",
+  "var": "f0",
+  "init": "p0",
+  "export": "icon_flag_light_20"
+ },
+ "flask-light-16": {
+  "file": "ui/icons/flask-light-16.ts",
+  "var": "Y1e",
+  "init": "X1e",
+  "export": "icon_flask_light_16"
+ },
+ "flask-light-20": {
+  "file": "ui/icons/flask-light-20.ts",
+  "var": "Z1e",
+  "init": "Q1e",
+  "export": "icon_flask_light_20"
+ },
+ "folder-badge-arrow-right-light-16": {
+  "file": "ui/icons/folder-badge-arrow-right-light-16.ts",
+  "var": "m0",
+  "init": "h0",
+  "export": "icon_folder_badge_arrow_right_light_16"
+ },
+ "folder-badge-branch-light-16": {
+  "file": "ui/icons/folder-badge-branch-light-16.ts",
+  "var": "g0",
+  "init": "_0",
+  "export": "icon_folder_badge_branch_light_16"
+ },
+ "folder-badge-checkmark-light-20": {
+  "file": "ui/icons/folder-badge-checkmark-light-20.ts",
+  "var": "t0e",
+  "init": "n0e",
+  "export": "icon_folder_badge_checkmark_light_20"
+ },
+ "folder-badge-plus-light-16": {
+  "file": "ui/icons/folder-badge-plus-light-16.ts",
+  "var": "v0",
+  "init": "y0",
+  "export": "icon_folder_badge_plus_light_16"
+ },
+ "folder-badge-xmark-light-16": {
+  "file": "ui/icons/folder-badge-xmark-light-16.ts",
+  "var": "r0e",
+  "init": "i0e",
+  "export": "icon_folder_badge_xmark_light_16"
+ },
+ "folder-light-16": {
+  "file": "ui/icons/folder-light-16.ts",
+  "var": "b0",
+  "init": "x0",
+  "export": "icon_folder_light_16"
+ },
+ "folder-light-20": {
+  "file": "ui/icons/folder-light-20.ts",
+  "var": "S0",
+  "init": "C0",
+  "export": "icon_folder_light_20"
+ },
+ "folder-light-32": {
+  "file": "ui/icons/folder-light-32.ts",
+  "var": "a0e",
+  "init": "o0e",
+  "export": "icon_folder_light_32"
+ },
+ "folder-on-folder-light-16": {
+  "file": "ui/icons/folder-on-folder-light-16.ts",
+  "var": "w0",
+  "init": "T0",
+  "export": "icon_folder_on_folder_light_16"
+ },
+ "folder-open-light-16": {
+  "file": "ui/icons/folder-open-light-16.ts",
+  "var": "E0",
+  "init": "D0",
+  "export": "icon_folder_open_light_16"
+ },
+ "folder-person-2-light-20": {
+  "file": "ui/icons/folder-person-2-light-20.ts",
+  "var": "s0e",
+  "init": "c0e",
+  "export": "icon_folder_person_2_light_20"
+ },
+ "follow-up-light-16": {
+  "file": "ui/icons/follow-up-light-16.ts",
+  "var": "l0e",
+  "init": "u0e",
+  "export": "icon_follow_up_light_16"
+ },
+ "gear-light-16": {
+  "file": "ui/icons/gear-light-16.ts",
+  "var": "O0",
+  "init": "k0",
+  "export": "icon_gear_light_16"
+ },
+ "gear-light-20": {
+  "file": "ui/icons/gear-light-20.ts",
+  "var": "A0",
+  "init": "j0",
+  "export": "icon_gear_light_20"
+ },
+ "gift-regular-16": {
+  "file": "ui/icons/gift-regular-16.ts",
+  "var": "d0e",
+  "init": "f0e",
+  "export": "icon_gift_regular_16"
+ },
+ "github-regular-24": {
+  "file": "ui/icons/github-regular-24.ts",
+  "var": "p0e",
+  "init": "m0e",
+  "export": "icon_github_regular_24"
+ },
+ "globe-light-12": {
+  "file": "ui/icons/globe-light-12.ts",
+  "var": "h0e",
+  "init": "g0e",
+  "export": "icon_globe_light_12"
+ },
+ "globe-light-16": {
+  "file": "ui/icons/globe-light-16.ts",
+  "var": "M0",
+  "init": "N0",
+  "export": "icon_globe_light_16"
+ },
+ "globe-light-20": {
+  "file": "ui/icons/globe-light-20.ts",
+  "var": "P0",
+  "init": "F0",
+  "export": "icon_globe_light_20"
+ },
+ "globe-light-32": {
+  "file": "ui/icons/globe-light-32.ts",
+  "var": "_0e",
+  "init": "v0e",
+  "export": "icon_globe_light_32"
+ },
+ "globe-slash-light-16": {
+  "file": "ui/icons/globe-slash-light-16.ts",
+  "var": "y0e",
+  "init": "b0e",
+  "export": "icon_globe_slash_light_16"
+ },
+ "graduation-cap-light-16": {
+  "file": "ui/icons/graduation-cap-light-16.ts",
+  "var": "x0e",
+  "init": "S0e",
+  "export": "icon_graduation_cap_light_16"
+ },
+ "graduation-cap-light-20": {
+  "file": "ui/icons/graduation-cap-light-20.ts",
+  "var": "C0e",
+  "init": "w0e",
+  "export": "icon_graduation_cap_light_20"
+ },
+ "hand-light-16": {
+  "file": "ui/icons/hand-light-16.ts",
+  "var": "I0",
+  "init": "L0",
+  "export": "icon_hand_light_16"
+ },
+ "hand-light-20": {
+  "file": "ui/icons/hand-light-20.ts",
+  "var": "R0",
+  "init": "z0",
+  "export": "icon_hand_light_20"
+ },
+ "health-light-20": {
+  "file": "ui/icons/health-light-20.ts",
+  "var": "T0e",
+  "init": "E0e",
+  "export": "icon_health_light_20"
+ },
+ "heart-light-16": {
+  "file": "ui/icons/heart-light-16.ts",
+  "var": "B0",
+  "init": "V0",
+  "export": "icon_heart_light_16"
+ },
+ "heart-light-20": {
+  "file": "ui/icons/heart-light-20.ts",
+  "var": "D0e",
+  "init": "O0e",
+  "export": "icon_heart_light_20"
+ },
+ "info-circle-light-16": {
+  "file": "ui/icons/info-circle-light-16.ts",
+  "var": "H0",
+  "init": "U0",
+  "export": "icon_info_circle_light_16"
+ },
+ "info-circle-light-20": {
+  "file": "ui/icons/info-circle-light-20.ts",
+  "var": "k0e",
+  "init": "A0e",
+  "export": "icon_info_circle_light_20"
+ },
+ "kettlebell-light-16": {
+  "file": "ui/icons/kettlebell-light-16.ts",
+  "var": "j0e",
+  "init": "M0e",
+  "export": "icon_kettlebell_light_16"
+ },
+ "kettlebell-light-20": {
+  "file": "ui/icons/kettlebell-light-20.ts",
+  "var": "N0e",
+  "init": "P0e",
+  "export": "icon_kettlebell_light_20"
+ },
+ "keyboard-light-20": {
+  "file": "ui/icons/keyboard-light-20.ts",
+  "var": "W0",
+  "init": "G0",
+  "export": "icon_keyboard_light_20"
+ },
+ "keys-light-16": {
+  "file": "ui/icons/keys-light-16.ts",
+  "var": "K0",
+  "init": "q0",
+  "export": "icon_keys_light_16"
+ },
+ "ladybug-light-16": {
+  "file": "ui/icons/ladybug-light-16.ts",
+  "var": "F0e",
+  "init": "I0e",
+  "export": "icon_ladybug_light_16"
+ },
+ "ladybug-light-20": {
+  "file": "ui/icons/ladybug-light-20.ts",
+  "var": "L0e",
+  "init": "R0e",
+  "export": "icon_ladybug_light_20"
+ },
+ "laptop-connector-light-16": {
+  "file": "ui/icons/laptop-connector-light-16.ts",
+  "var": "z0e",
+  "init": "B0e",
+  "export": "icon_laptop_connector_light_16"
+ },
+ "laptop-light-16": {
+  "file": "ui/icons/laptop-light-16.ts",
+  "var": "J0",
+  "init": "Y0",
+  "export": "icon_laptop_light_16"
+ },
+ "laptop-light-20": {
+  "file": "ui/icons/laptop-light-20.ts",
+  "var": "X0",
+  "init": "Z0",
+  "export": "icon_laptop_light_20"
+ },
+ "lightbulb-light-20": {
+  "file": "ui/icons/lightbulb-light-20.ts",
+  "var": "V0e",
+  "init": "H0e",
+  "export": "icon_lightbulb_light_20"
+ },
+ "lightbulb-rays-light-20": {
+  "file": "ui/icons/lightbulb-rays-light-20.ts",
+  "var": "U0e",
+  "init": "W0e",
+  "export": "icon_lightbulb_rays_light_20"
+ },
+ "link-light-16": {
+  "file": "ui/icons/link-light-16.ts",
+  "var": "e2",
+  "init": "t2",
+  "export": "icon_link_light_16"
+ },
+ "link-light-20": {
+  "file": "ui/icons/link-light-20.ts",
+  "var": "G0e",
+  "init": "K0e",
+  "export": "icon_link_light_20"
+ },
+ "list-bullet-light-20": {
+  "file": "ui/icons/list-bullet-light-20.ts",
+  "var": "q0e",
+  "init": "J0e",
+  "export": "icon_list_bullet_light_20"
+ },
+ "lock-light-12": {
+  "file": "ui/icons/lock-light-12.ts",
+  "var": "Y0e",
+  "init": "X0e",
+  "export": "icon_lock_light_12"
+ },
+ "lock-light-16": {
+  "file": "ui/icons/lock-light-16.ts",
+  "var": "n2",
+  "init": "r2",
+  "export": "icon_lock_light_16"
+ },
+ "lock-light-20": {
+  "file": "ui/icons/lock-light-20.ts",
+  "var": "Z0e",
+  "init": "Q0e",
+  "export": "icon_lock_light_20"
+ },
+ "lotus-light-16": {
+  "file": "ui/icons/lotus-light-16.ts",
+  "var": "t2e",
+  "init": "n2e",
+  "export": "icon_lotus_light_16"
+ },
+ "lotus-light-20": {
+  "file": "ui/icons/lotus-light-20.ts",
+  "var": "r2e",
+  "init": "i2e",
+  "export": "icon_lotus_light_20"
+ },
+ "magnifying-glass-lg-light-16": {
+  "file": "ui/icons/magnifying-glass-lg-light-16.ts",
+  "var": "a2e",
+  "init": "o2e",
+  "export": "icon_magnifying_glass_lg_light_16"
+ },
+ "magnifying-glass-lg-light-20": {
+  "file": "ui/icons/magnifying-glass-lg-light-20.ts",
+  "var": "s2e",
+  "init": "c2e",
+  "export": "icon_magnifying_glass_lg_light_20"
+ },
+ "microphone-light-20": {
+  "file": "ui/icons/microphone-light-20.ts",
+  "var": "i2",
+  "init": "a2",
+  "export": "icon_microphone_light_20"
+ },
+ "minus-md-light-16": {
+  "file": "ui/icons/minus-md-light-16.ts",
+  "var": "l2e",
+  "init": "u2e",
+  "export": "icon_minus_md_light_16"
+ },
+ "minus-square-light-16": {
+  "file": "ui/icons/minus-square-light-16.ts",
+  "var": "d2e",
+  "init": "f2e",
+  "export": "icon_minus_square_light_16"
+ },
+ "ms-excel-light-20": {
+  "file": "ui/icons/ms-excel-light-20.ts",
+  "var": "p2e",
+  "init": "m2e",
+  "export": "icon_ms_excel_light_20"
+ },
+ "ms-powerpoint-light-20": {
+  "file": "ui/icons/ms-powerpoint-light-20.ts",
+  "var": "h2e",
+  "init": "g2e",
+  "export": "icon_ms_powerpoint_light_20"
+ },
+ "ms-sharepoint-regular-12": {
+  "file": "ui/icons/ms-sharepoint-regular-12.ts",
+  "var": "_2e",
+  "init": "v2e",
+  "export": "icon_ms_sharepoint_regular_12"
+ },
+ "ms-sharepoint-regular-16": {
+  "file": "ui/icons/ms-sharepoint-regular-16.ts",
+  "var": "y2e",
+  "init": "b2e",
+  "export": "icon_ms_sharepoint_regular_16"
+ },
+ "ms-sharepoint-regular-20": {
+  "file": "ui/icons/ms-sharepoint-regular-20.ts",
+  "var": "x2e",
+  "init": "S2e",
+  "export": "icon_ms_sharepoint_regular_20"
+ },
+ "ms-word-light-20": {
+  "file": "ui/icons/ms-word-light-20.ts",
+  "var": "C2e",
+  "init": "w2e",
+  "export": "icon_ms_word_light_20"
+ },
+ "music-note-light-16": {
+  "file": "ui/icons/music-note-light-16.ts",
+  "var": "o2",
+  "init": "s2",
+  "export": "icon_music_note_light_16"
+ },
+ "music-note-light-20": {
+  "file": "ui/icons/music-note-light-20.ts",
+  "var": "c2",
+  "init": "l2",
+  "export": "icon_music_note_light_20"
+ },
+ "notebook-light-20": {
+  "file": "ui/icons/notebook-light-20.ts",
+  "var": "T2e",
+  "init": "E2e",
+  "export": "icon_notebook_light_20"
+ },
+ "notion-light-20": {
+  "file": "ui/icons/notion-light-20.ts",
+  "var": "D2e",
+  "init": "O2e",
+  "export": "icon_notion_light_20"
+ },
+ "open-base-arrow-forward-light-16": {
+  "file": "ui/icons/open-base-arrow-forward-light-16.ts",
+  "var": "u2",
+  "init": "d2",
+  "export": "icon_open_base_arrow_forward_light_16"
+ },
+ "open-link-bold-16": {
+  "file": "ui/icons/open-link-bold-16.ts",
+  "var": "k2e",
+  "init": "A2e",
+  "export": "icon_open_link_bold_16"
+ },
+ "open-link-light-16": {
+  "file": "ui/icons/open-link-light-16.ts",
+  "var": "f2",
+  "init": "p2",
+  "export": "icon_open_link_light_16"
+ },
+ "paint-palette-light-16": {
+  "file": "ui/icons/paint-palette-light-16.ts",
+  "var": "j2e",
+  "init": "M2e",
+  "export": "icon_paint_palette_light_16"
+ },
+ "paint-palette-light-20": {
+  "file": "ui/icons/paint-palette-light-20.ts",
+  "var": "N2e",
+  "init": "P2e",
+  "export": "icon_paint_palette_light_20"
+ },
+ "paintbrush-light-20": {
+  "file": "ui/icons/paintbrush-light-20.ts",
+  "var": "F2e",
+  "init": "I2e",
+  "export": "icon_paintbrush_light_20"
+ },
+ "paperclip-light-16": {
+  "file": "ui/icons/paperclip-light-16.ts",
+  "var": "m2",
+  "init": "h2",
+  "export": "icon_paperclip_light_16"
+ },
+ "paperclip-light-20": {
+  "file": "ui/icons/paperclip-light-20.ts",
+  "var": "L2e",
+  "init": "R2e",
+  "export": "icon_paperclip_light_20"
+ },
+ "pause-circle-light-16": {
+  "file": "ui/icons/pause-circle-light-16.ts",
+  "var": "z2e",
+  "init": "B2e",
+  "export": "icon_pause_circle_light_16"
+ },
+ "paw-light-20": {
+  "file": "ui/icons/paw-light-20.ts",
+  "var": "V2e",
+  "init": "H2e",
+  "export": "icon_paw_light_20"
+ },
+ "pdf-document-light-20": {
+  "file": "ui/icons/pdf-document-light-20.ts",
+  "var": "U2e",
+  "init": "W2e",
+  "export": "icon_pdf_document_light_20"
+ },
+ "pen-tip-light-16": {
+  "file": "ui/icons/pen-tip-light-16.ts",
+  "var": "G2e",
+  "init": "K2e",
+  "export": "icon_pen_tip_light_16"
+ },
+ "pen-tip-light-20": {
+  "file": "ui/icons/pen-tip-light-20.ts",
+  "var": "q2e",
+  "init": "J2e",
+  "export": "icon_pen_tip_light_20"
+ },
+ "pencil-light-16": {
+  "file": "ui/icons/pencil-light-16.ts",
+  "var": "g2",
+  "init": "_2",
+  "export": "icon_pencil_light_16"
+ },
+ "pencil-light-20": {
+  "file": "ui/icons/pencil-light-20.ts",
+  "var": "v2",
+  "init": "y2",
+  "export": "icon_pencil_light_20"
+ },
+ "pencil-sparkle-light-20": {
+  "file": "ui/icons/pencil-sparkle-light-20.ts",
+  "var": "Y2e",
+  "init": "X2e",
+  "export": "icon_pencil_sparkle_light_20"
+ },
+ "person-2-light-16": {
+  "file": "ui/icons/person-2-light-16.ts",
+  "var": "Z2e",
+  "init": "Q2e",
+  "export": "icon_person_2_light_16"
+ },
+ "person-badge-lock-light-16": {
+  "file": "ui/icons/person-badge-lock-light-16.ts",
+  "var": "b2",
+  "init": "x2",
+  "export": "icon_person_badge_lock_light_16"
+ },
+ "person-circle-light-16": {
+  "file": "ui/icons/person-circle-light-16.ts",
+  "var": "S2",
+  "init": "C2",
+  "export": "icon_person_circle_light_16"
+ },
+ "person-group-light-16": {
+  "file": "ui/icons/person-group-light-16.ts",
+  "var": "w2",
+  "init": "T2",
+  "export": "icon_person_group_light_16"
+ },
+ "person-light-20": {
+  "file": "ui/icons/person-light-20.ts",
+  "var": "t4e",
+  "init": "n4e",
+  "export": "icon_person_light_20"
+ },
+ "person-light-32": {
+  "file": "ui/icons/person-light-32.ts",
+  "var": "r4e",
+  "init": "i4e",
+  "export": "icon_person_light_32"
+ },
+ "phone-light-20": {
+  "file": "ui/icons/phone-light-20.ts",
+  "var": "a4e",
+  "init": "o4e",
+  "export": "icon_phone_light_20"
+ },
+ "photo-light-16": {
+  "file": "ui/icons/photo-light-16.ts",
+  "var": "E2",
+  "init": "D2",
+  "export": "icon_photo_light_16"
+ },
+ "photo-light-20": {
+  "file": "ui/icons/photo-light-20.ts",
+  "var": "O2",
+  "init": "k2",
+  "export": "icon_photo_light_20"
+ },
+ "photo-on-square-light-16": {
+  "file": "ui/icons/photo-on-square-light-16.ts",
+  "var": "A2",
+  "init": "j2",
+  "export": "icon_photo_on_square_light_16"
+ },
+ "pin-fill-light-16": {
+  "file": "ui/icons/pin-fill-light-16.ts",
+  "var": "M2",
+  "init": "N2",
+  "export": "icon_pin_fill_light_16"
+ },
+ "pin-light-16": {
+  "file": "ui/icons/pin-light-16.ts",
+  "var": "P2",
+  "init": "F2",
+  "export": "icon_pin_light_16"
+ },
+ "pin-light-20": {
+  "file": "ui/icons/pin-light-20.ts",
+  "var": "s4e",
+  "init": "c4e",
+  "export": "icon_pin_light_20"
+ },
+ "pin-location-light-20": {
+  "file": "ui/icons/pin-location-light-20.ts",
+  "var": "l4e",
+  "init": "u4e",
+  "export": "icon_pin_location_light_20"
+ },
+ "pin-slash-light-16": {
+  "file": "ui/icons/pin-slash-light-16.ts",
+  "var": "d4e",
+  "init": "f4e",
+  "export": "icon_pin_slash_light_16"
+ },
+ "pin-slash-light-20": {
+  "file": "ui/icons/pin-slash-light-20.ts",
+  "var": "p4e",
+  "init": "m4e",
+  "export": "icon_pin_slash_light_20"
+ },
+ "play-circle-light-16": {
+  "file": "ui/icons/play-circle-light-16.ts",
+  "var": "h4e",
+  "init": "g4e",
+  "export": "icon_play_circle_light_16"
+ },
+ "play-light-20": {
+  "file": "ui/icons/play-light-20.ts",
+  "var": "_4e",
+  "init": "v4e",
+  "export": "icon_play_light_20"
+ },
+ "plugin-light-16": {
+  "file": "ui/icons/plugin-light-16.ts",
+  "var": "I2",
+  "init": "L2",
+  "export": "icon_plugin_light_16"
+ },
+ "plugin-light-20": {
+  "file": "ui/icons/plugin-light-20.ts",
+  "var": "R2",
+  "init": "z2",
+  "export": "icon_plugin_light_20"
+ },
+ "plugin-light-28": {
+  "file": "ui/icons/plugin-light-28.ts",
+  "var": "y4e",
+  "init": "b4e",
+  "export": "icon_plugin_light_28"
+ },
+ "plus-chat-bubble-light-16": {
+  "file": "ui/icons/plus-chat-bubble-light-16.ts",
+  "var": "x4e",
+  "init": "S4e",
+  "export": "icon_plus_chat_bubble_light_16"
+ },
+ "plus-chat-bubble-light-20": {
+  "file": "ui/icons/plus-chat-bubble-light-20.ts",
+  "var": "C4e",
+  "init": "w4e",
+  "export": "icon_plus_chat_bubble_light_20"
+ },
+ "plus-chat-bubble-right-light-16": {
+  "file": "ui/icons/plus-chat-bubble-right-light-16.ts",
+  "var": "B2",
+  "init": "V2",
+  "export": "icon_plus_chat_bubble_right_light_16"
+ },
+ "plus-lg-light-16": {
+  "file": "ui/icons/plus-lg-light-16.ts",
+  "var": "T4e",
+  "init": "E4e",
+  "export": "icon_plus_lg_light_16"
+ },
+ "plus-lg-light-20": {
+  "file": "ui/icons/plus-lg-light-20.ts",
+  "var": "D4e",
+  "init": "O4e",
+  "export": "icon_plus_lg_light_20"
+ },
+ "plus-lg-regular-16": {
+  "file": "ui/icons/plus-lg-regular-16.ts",
+  "var": "H2",
+  "init": "U2",
+  "export": "icon_plus_lg_regular_16"
+ },
+ "plus-lg-regular-20": {
+  "file": "ui/icons/plus-lg-regular-20.ts",
+  "var": "k4e",
+  "init": "A4e",
+  "export": "icon_plus_lg_regular_20"
+ },
+ "plus-minus-square-light-16": {
+  "file": "ui/icons/plus-minus-square-light-16.ts",
+  "var": "j4e",
+  "init": "M4e",
+  "export": "icon_plus_minus_square_light_16"
+ },
+ "popcorn-light-16": {
+  "file": "ui/icons/popcorn-light-16.ts",
+  "var": "N4e",
+  "init": "P4e",
+  "export": "icon_popcorn_light_16"
+ },
+ "popcorn-light-20": {
+  "file": "ui/icons/popcorn-light-20.ts",
+  "var": "F4e",
+  "init": "I4e",
+  "export": "icon_popcorn_light_20"
+ },
+ "pull-request-merged-light-16": {
+  "file": "ui/icons/pull-request-merged-light-16.ts",
+  "var": "L4e",
+  "init": "R4e",
+  "export": "icon_pull_request_merged_light_16"
+ },
+ "pull-request-open-light-16": {
+  "file": "ui/icons/pull-request-open-light-16.ts",
+  "var": "z4e",
+  "init": "B4e",
+  "export": "icon_pull_request_open_light_16"
+ },
+ "pull-request-open-light-20": {
+  "file": "ui/icons/pull-request-open-light-20.ts",
+  "var": "V4e",
+  "init": "H4e",
+  "export": "icon_pull_request_open_light_20"
+ },
+ "pulse-light-20": {
+  "file": "ui/icons/pulse-light-20.ts",
+  "var": "U4e",
+  "init": "W4e",
+  "export": "icon_pulse_light_20"
+ },
+ "puzzle-piece-light-20": {
+  "file": "ui/icons/puzzle-piece-light-20.ts",
+  "var": "G4e",
+  "init": "K4e",
+  "export": "icon_puzzle_piece_light_20"
+ },
+ "questionmark-circle-light-20": {
+  "file": "ui/icons/questionmark-circle-light-20.ts",
+  "var": "q4e",
+  "init": "J4e",
+  "export": "icon_questionmark_circle_light_20"
+ },
+ "reddit-regular-20": {
+  "file": "ui/icons/reddit-regular-20.ts",
+  "var": "Y4e",
+  "init": "X4e",
+  "export": "icon_reddit_regular_20"
+ },
+ "remove-background-light-16": {
+  "file": "ui/icons/remove-background-light-16.ts",
+  "var": "Z4e",
+  "init": "Q4e",
+  "export": "icon_remove_background_light_16"
+ },
+ "robot-light-16": {
+  "file": "ui/icons/robot-light-16.ts",
+  "var": "W2",
+  "init": "G2",
+  "export": "icon_robot_light_16"
+ },
+ "robot-light-20": {
+  "file": "ui/icons/robot-light-20.ts",
+  "var": "K2",
+  "init": "q2",
+  "export": "icon_robot_light_20"
+ },
+ "shapes-light-20": {
+  "file": "ui/icons/shapes-light-20.ts",
+  "var": "t3e",
+  "init": "n3e",
+  "export": "icon_shapes_light_20"
+ },
+ "shield-exclamationmark-light-16": {
+  "file": "ui/icons/shield-exclamationmark-light-16.ts",
+  "var": "r3e",
+  "init": "i3e",
+  "export": "icon_shield_exclamationmark_light_16"
+ },
+ "shield-light-16": {
+  "file": "ui/icons/shield-light-16.ts",
+  "var": "J2",
+  "init": "Y2",
+  "export": "icon_shield_light_16"
+ },
+ "shield-light-20": {
+  "file": "ui/icons/shield-light-20.ts",
+  "var": "X2",
+  "init": "Z2",
+  "export": "icon_shield_light_20"
+ },
+ "sidebar-hidden-light-20": {
+  "file": "ui/icons/sidebar-hidden-light-20.ts",
+  "var": "a3e",
+  "init": "o3e",
+  "export": "icon_sidebar_hidden_light_20"
+ },
+ "sidebar-light-16": {
+  "file": "ui/icons/sidebar-light-16.ts",
+  "var": "e4",
+  "init": "t4",
+  "export": "icon_sidebar_light_16"
+ },
+ "sidebar-light-20": {
+  "file": "ui/icons/sidebar-light-20.ts",
+  "var": "s3e",
+  "init": "c3e",
+  "export": "icon_sidebar_light_20"
+ },
+ "sites-light-16": {
+  "file": "ui/icons/sites-light-16.ts",
+  "var": "n4",
+  "init": "r4",
+  "export": "icon_sites_light_16"
+ },
+ "sites-light-20": {
+  "file": "ui/icons/sites-light-20.ts",
+  "var": "i4",
+  "init": "a4",
+  "export": "icon_sites_light_20"
+ },
+ "sliders-light-20": {
+  "file": "ui/icons/sliders-light-20.ts",
+  "var": "l3e",
+  "init": "u3e",
+  "export": "icon_sliders_light_20"
+ },
+ "slides-light-16": {
+  "file": "ui/icons/slides-light-16.ts",
+  "var": "d3e",
+  "init": "f3e",
+  "export": "icon_slides_light_16"
+ },
+ "slides-light-20": {
+  "file": "ui/icons/slides-light-20.ts",
+  "var": "p3e",
+  "init": "m3e",
+  "export": "icon_slides_light_20"
+ },
+ "smartphone-light-16": {
+  "file": "ui/icons/smartphone-light-16.ts",
+  "var": "h3e",
+  "init": "g3e",
+  "export": "icon_smartphone_light_16"
+ },
+ "sparkle-fill-light-12": {
+  "file": "ui/icons/sparkle-fill-light-12.ts",
+  "var": "_3e",
+  "init": "v3e",
+  "export": "icon_sparkle_fill_light_12"
+ },
+ "sparkle-fill-light-16": {
+  "file": "ui/icons/sparkle-fill-light-16.ts",
+  "var": "y3e",
+  "init": "b3e",
+  "export": "icon_sparkle_fill_light_16"
+ },
+ "sparkles-light-16": {
+  "file": "ui/icons/sparkles-light-16.ts",
+  "var": "x3e",
+  "init": "S3e",
+  "export": "icon_sparkles_light_16"
+ },
+ "sparkles-light-20": {
+  "file": "ui/icons/sparkles-light-20.ts",
+  "var": "C3e",
+  "init": "w3e",
+  "export": "icon_sparkles_light_20"
+ },
+ "speaker-sound-wave-2-light-16": {
+  "file": "ui/icons/speaker-sound-wave-2-light-16.ts",
+  "var": "T3e",
+  "init": "E3e",
+  "export": "icon_speaker_sound_wave_2_light_16"
+ },
+ "speaker-sound-wave-2-slash-light-16": {
+  "file": "ui/icons/speaker-sound-wave-2-slash-light-16.ts",
+  "var": "D3e",
+  "init": "O3e",
+  "export": "icon_speaker_sound_wave_2_slash_light_16"
+ },
+ "spinner-quarter-graded-light-12": {
+  "file": "ui/icons/spinner-quarter-graded-light-12.ts",
+  "var": "k3e",
+  "init": "A3e",
+  "export": "icon_spinner_quarter_graded_light_12"
+ },
+ "spinner-rays-graded-regular-20": {
+  "file": "ui/icons/spinner-rays-graded-regular-20.ts",
+  "var": "j3e",
+  "init": "M3e",
+  "export": "icon_spinner_rays_graded_regular_20"
+ },
+ "square-and-pencil-light-16": {
+  "file": "ui/icons/square-and-pencil-light-16.ts",
+  "var": "o4",
+  "init": "s4",
+  "export": "icon_square_and_pencil_light_16"
+ },
+ "square-and-pencil-light-20": {
+  "file": "ui/icons/square-and-pencil-light-20.ts",
+  "var": "N3e",
+  "init": "P3e",
+  "export": "icon_square_and_pencil_light_20"
+ },
+ "square-checkmark-fill-light-16": {
+  "file": "ui/icons/square-checkmark-fill-light-16.ts",
+  "var": "F3e",
+  "init": "I3e",
+  "export": "icon_square_checkmark_fill_light_16"
+ },
+ "square-grid-2x2-light-16": {
+  "file": "ui/icons/square-grid-2x2-light-16.ts",
+  "var": "c4",
+  "init": "l4",
+  "export": "icon_square_grid_2x2_light_16"
+ },
+ "square-grid-2x2-light-20": {
+  "file": "ui/icons/square-grid-2x2-light-20.ts",
+  "var": "L3e",
+  "init": "R3e",
+  "export": "icon_square_grid_2x2_light_20"
+ },
+ "square-light-16": {
+  "file": "ui/icons/square-light-16.ts",
+  "var": "z3e",
+  "init": "B3e",
+  "export": "icon_square_light_16"
+ },
+ "square-on-square-light-16": {
+  "file": "ui/icons/square-on-square-light-16.ts",
+  "var": "u4",
+  "init": "d4",
+  "export": "icon_square_on_square_light_16"
+ },
+ "square-on-square-light-20": {
+  "file": "ui/icons/square-on-square-light-20.ts",
+  "var": "V3e",
+  "init": "H3e",
+  "export": "icon_square_on_square_light_20"
+ },
+ "star-fill-light-12": {
+  "file": "ui/icons/star-fill-light-12.ts",
+  "var": "U3e",
+  "init": "W3e",
+  "export": "icon_star_fill_light_12"
+ },
+ "star-fill-light-16": {
+  "file": "ui/icons/star-fill-light-16.ts",
+  "var": "f4",
+  "init": "p4",
+  "export": "icon_star_fill_light_16"
+ },
+ "star-of-life-light-16": {
+  "file": "ui/icons/star-of-life-light-16.ts",
+  "var": "G3e",
+  "init": "K3e",
+  "export": "icon_star_of_life_light_16"
+ },
+ "star-of-life-light-20": {
+  "file": "ui/icons/star-of-life-light-20.ts",
+  "var": "q3e",
+  "init": "J3e",
+  "export": "icon_star_of_life_light_20"
+ },
+ "stethoscope-light-16": {
+  "file": "ui/icons/stethoscope-light-16.ts",
+  "var": "Y3e",
+  "init": "X3e",
+  "export": "icon_stethoscope_light_16"
+ },
+ "stethoscope-light-20": {
+  "file": "ui/icons/stethoscope-light-20.ts",
+  "var": "Z3e",
+  "init": "Q3e",
+  "export": "icon_stethoscope_light_20"
+ },
+ "suitcase-light-16": {
+  "file": "ui/icons/suitcase-light-16.ts",
+  "var": "t6e",
+  "init": "n6e",
+  "export": "icon_suitcase_light_16"
+ },
+ "suitcase-light-20": {
+  "file": "ui/icons/suitcase-light-20.ts",
+  "var": "r6e",
+  "init": "i6e",
+  "export": "icon_suitcase_light_20"
+ },
+ "table-light-16": {
+  "file": "ui/icons/table-light-16.ts",
+  "var": "a6e",
+  "init": "o6e",
+  "export": "icon_table_light_16"
+ },
+ "table-light-20": {
+  "file": "ui/icons/table-light-20.ts",
+  "var": "s6e",
+  "init": "c6e",
+  "export": "icon_table_light_20"
+ },
+ "tag-light-16": {
+  "file": "ui/icons/tag-light-16.ts",
+  "var": "l6e",
+  "init": "u6e",
+  "export": "icon_tag_light_16"
+ },
+ "terminal-light-16": {
+  "file": "ui/icons/terminal-light-16.ts",
+  "var": "m4",
+  "init": "h4",
+  "export": "icon_terminal_light_16"
+ },
+ "terminal-light-20": {
+  "file": "ui/icons/terminal-light-20.ts",
+  "var": "g4",
+  "init": "_4",
+  "export": "icon_terminal_light_20"
+ },
+ "terminal-shield-light-20": {
+  "file": "ui/icons/terminal-shield-light-20.ts",
+  "var": "v4",
+  "init": "y4",
+  "export": "icon_terminal_shield_light_20"
+ },
+ "text-bold-sm-light-20": {
+  "file": "ui/icons/text-bold-sm-light-20.ts",
+  "var": "d6e",
+  "init": "f6e",
+  "export": "icon_text_bold_sm_light_20"
+ },
+ "text-bubble-light-16": {
+  "file": "ui/icons/text-bubble-light-16.ts",
+  "var": "p6e",
+  "init": "m6e",
+  "export": "icon_text_bubble_light_16"
+ },
+ "text-bubble-light-20": {
+  "file": "ui/icons/text-bubble-light-20.ts",
+  "var": "h6e",
+  "init": "g6e",
+  "export": "icon_text_bubble_light_20"
+ },
+ "text-document-light-16": {
+  "file": "ui/icons/text-document-light-16.ts",
+  "var": "_6e",
+  "init": "v6e",
+  "export": "icon_text_document_light_16"
+ },
+ "text-document-light-20": {
+  "file": "ui/icons/text-document-light-20.ts",
+  "var": "y6e",
+  "init": "b6e",
+  "export": "icon_text_document_light_20"
+ },
+ "text-format-light-16": {
+  "file": "ui/icons/text-format-light-16.ts",
+  "var": "x6e",
+  "init": "S6e",
+  "export": "icon_text_format_light_16"
+ },
+ "text-format-light-20": {
+  "file": "ui/icons/text-format-light-20.ts",
+  "var": "C6e",
+  "init": "w6e",
+  "export": "icon_text_format_light_20"
+ },
+ "text-italic-sm-light-20": {
+  "file": "ui/icons/text-italic-sm-light-20.ts",
+  "var": "T6e",
+  "init": "E6e",
+  "export": "icon_text_italic_sm_light_20"
+ },
+ "text-overflow-light-16": {
+  "file": "ui/icons/text-overflow-light-16.ts",
+  "var": "D6e",
+  "init": "O6e",
+  "export": "icon_text_overflow_light_16"
+ },
+ "text-page-light-20": {
+  "file": "ui/icons/text-page-light-20.ts",
+  "var": "k6e",
+  "init": "A6e",
+  "export": "icon_text_page_light_20"
+ },
+ "text-wrap-light-16": {
+  "file": "ui/icons/text-wrap-light-16.ts",
+  "var": "b4",
+  "init": "x4",
+  "export": "icon_text_wrap_light_16"
+ },
+ "thumb-down-fill-light-20": {
+  "file": "ui/icons/thumb-down-fill-light-20.ts",
+  "var": "j6e",
+  "init": "M6e",
+  "export": "icon_thumb_down_fill_light_20"
+ },
+ "thumb-down-light-16": {
+  "file": "ui/icons/thumb-down-light-16.ts",
+  "var": "N6e",
+  "init": "P6e",
+  "export": "icon_thumb_down_light_16"
+ },
+ "thumb-down-light-20": {
+  "file": "ui/icons/thumb-down-light-20.ts",
+  "var": "F6e",
+  "init": "I6e",
+  "export": "icon_thumb_down_light_20"
+ },
+ "thumb-up-fill-light-16": {
+  "file": "ui/icons/thumb-up-fill-light-16.ts",
+  "var": "L6e",
+  "init": "R6e",
+  "export": "icon_thumb_up_fill_light_16"
+ },
+ "thumb-up-fill-light-20": {
+  "file": "ui/icons/thumb-up-fill-light-20.ts",
+  "var": "z6e",
+  "init": "B6e",
+  "export": "icon_thumb_up_fill_light_20"
+ },
+ "thumb-up-light-16": {
+  "file": "ui/icons/thumb-up-light-16.ts",
+  "var": "V6e",
+  "init": "H6e",
+  "export": "icon_thumb_up_light_16"
+ },
+ "thumb-up-light-20": {
+  "file": "ui/icons/thumb-up-light-20.ts",
+  "var": "U6e",
+  "init": "W6e",
+  "export": "icon_thumb_up_light_20"
+ },
+ "thumb-up-thumb-down-light-16": {
+  "file": "ui/icons/thumb-up-thumb-down-light-16.ts",
+  "var": "G6e",
+  "init": "K6e",
+  "export": "icon_thumb_up_thumb_down_light_16"
+ },
+ "thumb-up-thumb-down-light-20": {
+  "file": "ui/icons/thumb-up-thumb-down-light-20.ts",
+  "var": "S4",
+  "init": "C4",
+  "export": "icon_thumb_up_thumb_down_light_20"
+ },
+ "trash-light-20": {
+  "file": "ui/icons/trash-light-20.ts",
+  "var": "q6e",
+  "init": "J6e",
+  "export": "icon_trash_light_20"
+ },
+ "voice-regular-16": {
+  "file": "ui/icons/voice-regular-16.ts",
+  "var": "Y6e",
+  "init": "X6e",
+  "export": "icon_voice_regular_16"
+ },
+ "voice-regular-20": {
+  "file": "ui/icons/voice-regular-20.ts",
+  "var": "Z6e",
+  "init": "Q6e",
+  "export": "icon_voice_regular_20"
+ },
+ "wrench-light-16": {
+  "file": "ui/icons/wrench-light-16.ts",
+  "var": "w4",
+  "init": "T4",
+  "export": "icon_wrench_light_16"
+ },
+ "x-regular-20": {
+  "file": "ui/icons/x-regular-20.ts",
+  "var": "t8e",
+  "init": "n8e",
+  "export": "icon_x_regular_20"
+ },
+ "xmark-circle-fill-regular-16": {
+  "file": "ui/icons/xmark-circle-fill-regular-16.ts",
+  "var": "r8e",
+  "init": "i8e",
+  "export": "icon_xmark_circle_fill_regular_16"
+ },
+ "xmark-lg-light-20": {
+  "file": "ui/icons/xmark-lg-light-20.ts",
+  "var": "a8e",
+  "init": "o8e",
+  "export": "icon_xmark_lg_light_20"
+ },
+ "xmark-md-light-16": {
+  "file": "ui/icons/xmark-md-light-16.ts",
+  "var": "E4",
+  "init": "D4",
+  "export": "icon_xmark_md_light_16"
+ },
+ "xmark-md-light-20": {
+  "file": "ui/icons/xmark-md-light-20.ts",
+  "var": "s8e",
+  "init": "c8e",
+  "export": "icon_xmark_md_light_20"
+ },
+ "document-light-24": {
+  "file": "ui/icons/document-light-24.ts",
+  "var": "tit",
+  "init": "nit",
+  "export": "icon_document_light_24"
+ },
+ "document-zip-light-16": {
+  "file": "ui/icons/document-zip-light-16.ts",
+  "var": "Vit",
+  "init": "Hit",
+  "export": "icon_document_zip_light_16"
+ },
+ "film-strip-light-16": {
+  "file": "ui/icons/film-strip-light-16.ts",
+  "var": "Uit",
+  "init": "Wit",
+  "export": "icon_film_strip_light_16"
+ },
+ "ms-excel-light-16": {
+  "file": "ui/icons/ms-excel-light-16.ts",
+  "var": "Git",
+  "init": "Kit",
+  "export": "icon_ms_excel_light_16"
+ },
+ "ms-powerpoint-light-16": {
+  "file": "ui/icons/ms-powerpoint-light-16.ts",
+  "var": "qit",
+  "init": "Jit",
+  "export": "icon_ms_powerpoint_light_16"
+ },
+ "ms-word-light-16": {
+  "file": "ui/icons/ms-word-light-16.ts",
+  "var": "Yit",
+  "init": "Xit",
+  "export": "icon_ms_word_light_16"
+ },
+ "page-text-light-16": {
+  "file": "ui/icons/page-text-light-16.ts",
+  "var": "Zit",
+  "init": "Qit",
+  "export": "icon_page_text_light_16"
+ },
+ "spreadsheet-light-16": {
+  "file": "ui/icons/spreadsheet-light-16.ts",
+  "var": "tat",
+  "init": "nat",
+  "export": "icon_spreadsheet_light_16"
+ },
+ "wavelength-light-16": {
+  "file": "ui/icons/wavelength-light-16.ts",
+  "var": "rat",
+  "init": "iat",
+  "export": "icon_wavelength_light_16"
+ },
+ "xmark-md-light-12": {
+  "file": "ui/icons/xmark-md-light-12.ts",
+  "var": "aot",
+  "init": "oot",
+  "export": "icon_xmark_md_light_12"
+ },
+ "xmark-lg-regular-20": {
+  "file": "ui/icons/xmark-lg-regular-20.ts",
+  "var": "vot",
+  "init": "yot",
+  "export": "icon_xmark_lg_regular_20"
+ },
+ "magnifying-glass-md-light-16": {
+  "file": "ui/icons/magnifying-glass-md-light-16.ts",
+  "var": "_5",
+  "init": "v5",
+  "export": "icon_magnifying_glass_md_light_16"
+ },
+ "microphone-fill-light-12": {
+  "file": "ui/icons/microphone-fill-light-12.ts",
+  "var": "slt",
+  "init": "clt",
+  "export": "icon_microphone_fill_light_12"
+ },
+ "record-light-16": {
+  "file": "ui/icons/record-light-16.ts",
+  "var": "llt",
+  "init": "ult",
+  "export": "icon_record_light_16"
+ },
+ "video-fill-light-12": {
+  "file": "ui/icons/video-fill-light-12.ts",
+  "var": "dlt",
+  "init": "flt",
+  "export": "icon_video_fill_light_12"
+ },
+ "circle-checkmark-light-16": {
+  "file": "ui/icons/circle-checkmark-light-16.ts",
+  "var": "jlt",
+  "init": "Mlt",
+  "export": "icon_circle_checkmark_light_16"
+ },
+ "circle-exclamation-mark-light-16": {
+  "file": "ui/icons/circle-exclamation-mark-light-16.ts",
+  "var": "w5",
+  "init": "Nlt",
+  "export": "icon_circle_exclamation_mark_light_16"
+ },
+ "circle-info-light-16": {
+  "file": "ui/icons/circle-info-light-16.ts",
+  "var": "Plt",
+  "init": "Flt",
+  "export": "icon_circle_info_light_16"
+ },
+ "photo-on-tilted-square-light-16": {
+  "file": "ui/icons/photo-on-tilted-square-light-16.ts",
+  "var": "ept",
+  "init": "tpt",
+  "export": "icon_photo_on_tilted_square_light_16"
+ },
+ "square-plus-minus-light-24": {
+  "file": "ui/icons/square-plus-minus-light-24.ts",
+  "var": "npt",
+  "init": "rpt",
+  "export": "icon_square_plus_minus_light_24"
+ },
+ "terminal-shield-light-16": {
+  "file": "ui/icons/terminal-shield-light-16.ts",
+  "var": "opt",
+  "init": "spt",
+  "export": "icon_terminal_shield_light_16"
+ },
+ "photo-light-28": {
+  "file": "ui/icons/photo-light-28.ts",
+  "var": "qpt",
+  "init": "Jpt",
+  "export": "icon_photo_light_28"
+ },
+ "chevron-right-lg-light-16": {
+  "file": "ui/icons/chevron-right-lg-light-16.ts",
+  "var": "Ypt",
+  "init": "Xpt",
+  "export": "icon_chevron_right_lg_light_16"
+ },
+ "chevron-right-md-light-20": {
+  "file": "ui/icons/chevron-right-md-light-20.ts",
+  "var": "Zpt",
+  "init": "Qpt",
+  "export": "icon_chevron_right_md_light_20"
+ },
+ "arrow-down-left-arrow-up-right-sm-light-16": {
+  "file": "ui/icons/arrow-down-left-arrow-up-right-sm-light-16.ts",
+  "var": "smt",
+  "init": "cmt",
+  "export": "icon_arrow_down_left_arrow_up_right_sm_light_16"
+ },
+ "pause-sm-fill-light-16": {
+  "file": "ui/icons/pause-sm-fill-light-16.ts",
+  "var": "lmt",
+  "init": "umt",
+  "export": "icon_pause_sm_fill_light_16"
+ },
+ "play-light-16": {
+  "file": "ui/icons/play-light-16.ts",
+  "var": "dmt",
+  "init": "fmt",
+  "export": "icon_play_light_16"
+ },
+ "square-fill-light-20": {
+  "file": "ui/icons/square-fill-light-20.ts",
+  "var": "pmt",
+  "init": "mmt",
+  "export": "icon_square_fill_light_20"
+ },
+ "square-light-20": {
+  "file": "ui/icons/square-light-20.ts",
+  "var": "hmt",
+  "init": "gmt",
+  "export": "icon_square_light_20"
+ },
+ "arrow-down-lg-bold-16": {
+  "file": "ui/icons/arrow-down-lg-bold-16.ts",
+  "var": "Pgt",
+  "init": "Fgt",
+  "export": "icon_arrow_down_lg_bold_16"
+ },
+ "arrow-left-lg-bold-16": {
+  "file": "ui/icons/arrow-left-lg-bold-16.ts",
+  "var": "Igt",
+  "init": "Lgt",
+  "export": "icon_arrow_left_lg_bold_16"
+ },
+ "arrow-right-lg-bold-16": {
+  "file": "ui/icons/arrow-right-lg-bold-16.ts",
+  "var": "Rgt",
+  "init": "zgt",
+  "export": "icon_arrow_right_lg_bold_16"
+ },
+ "chat-bubble-bold-16": {
+  "file": "ui/icons/chat-bubble-bold-16.ts",
+  "var": "Bgt",
+  "init": "Vgt",
+  "export": "icon_chat_bubble_bold_16"
+ },
+ "pin-bold-16": {
+  "file": "ui/icons/pin-bold-16.ts",
+  "var": "Hgt",
+  "init": "Ugt",
+  "export": "icon_pin_bold_16"
+ },
+ "gift-light-20": {
+  "file": "ui/icons/gift-light-20.ts",
+  "var": "Wgt",
+  "init": "Ggt",
+  "export": "icon_gift_light_20"
+ },
+ "open-link-light-12": {
+  "file": "ui/icons/open-link-light-12.ts",
+  "var": "Kgt",
+  "init": "qgt",
+  "export": "icon_open_link_light_12"
+ },
+ "pencil-sparkle-light-16": {
+  "file": "ui/icons/pencil-sparkle-light-16.ts",
+  "var": "t_t",
+  "init": "n_t",
+  "export": "icon_pencil_sparkle_light_16"
+ },
+ "lightbulb-rays-light-16": {
+  "file": "ui/icons/lightbulb-rays-light-16.ts",
+  "var": "r_t",
+  "init": "i_t",
+  "export": "icon_lightbulb_rays_light_16"
+ },
+ "summary-light-16": {
+  "file": "ui/icons/summary-light-16.ts",
+  "var": "a_t",
+  "init": "o_t",
+  "export": "icon_summary_light_16"
+ },
+ "checkmark-lg-light-12": {
+  "file": "ui/icons/checkmark-lg-light-12.ts",
+  "var": "I_t",
+  "init": "L_t",
+  "export": "icon_checkmark_lg_light_12"
+ },
+ "building-light-12": {
+  "file": "ui/icons/building-light-12.ts",
+  "var": "Z_t",
+  "init": "Q_t",
+  "export": "icon_building_light_12"
+ },
+ "star-fill-regular-12": {
+  "file": "ui/icons/star-fill-regular-12.ts",
+  "var": "tvt",
+  "init": "nvt",
+  "export": "icon_star_fill_regular_12"
+ },
+ "clock-light-24": {
+  "file": "ui/icons/clock-light-24.ts",
+  "var": "rvt",
+  "init": "ivt",
+  "export": "icon_clock_light_24"
+ },
+ "pin-location-light-24": {
+  "file": "ui/icons/pin-location-light-24.ts",
+  "var": "avt",
+  "init": "ovt",
+  "export": "icon_pin_location_light_24"
+ },
+ "chevron-left-md-light-20": {
+  "file": "ui/icons/chevron-left-md-light-20.ts",
+  "var": "svt",
+  "init": "cvt",
+  "export": "icon_chevron_left_md_light_20"
+ },
+ "bookmark-fill-light-20": {
+  "file": "ui/icons/bookmark-fill-light-20.ts",
+  "var": "lvt",
+  "init": "uvt",
+  "export": "icon_bookmark_fill_light_20"
+ },
+ "bookmark-light-20": {
+  "file": "ui/icons/bookmark-light-20.ts",
+  "var": "dvt",
+  "init": "fvt",
+  "export": "icon_bookmark_light_20"
+ },
+ "plus-sm-light-16": {
+  "file": "ui/icons/plus-sm-light-16.ts",
+  "var": "pvt",
+  "init": "mvt",
+  "export": "icon_plus_sm_light_16"
+ },
+ "flashcards-landscape-light-24": {
+  "file": "ui/icons/flashcards-landscape-light-24.ts",
+  "var": "hvt",
+  "init": "gvt",
+  "export": "icon_flashcards_landscape_light_24"
+ },
+ "translate-light-20": {
+  "file": "ui/icons/translate-light-20.ts",
+  "var": "_vt",
+  "init": "vvt",
+  "export": "icon_translate_light_20"
+ },
+ "paintbrush-stroke-light-16": {
+  "file": "ui/icons/paintbrush-stroke-light-16.ts",
+  "var": "Svt",
+  "init": "Cvt",
+  "export": "icon_paintbrush_stroke_light_16"
+ },
+ "arrow-down-line-horizontal-light-16": {
+  "file": "ui/icons/arrow-down-line-horizontal-light-16.ts",
+  "var": "wvt",
+  "init": "Tvt",
+  "export": "icon_arrow_down_line_horizontal_light_16"
+ },
+ "chat-bubble-on-photo-light-20": {
+  "file": "ui/icons/chat-bubble-on-photo-light-20.ts",
+  "var": "Evt",
+  "init": "Dvt",
+  "export": "icon_chat_bubble_on_photo_light_20"
+ },
+ "photo-on-square-light-20": {
+  "file": "ui/icons/photo-on-square-light-20.ts",
+  "var": "Ovt",
+  "init": "kvt",
+  "export": "icon_photo_on_square_light_20"
+ },
+ "photo-light-24": {
+  "file": "ui/icons/photo-light-24.ts",
+  "var": "Avt",
+  "init": "jvt",
+  "export": "icon_photo_light_24"
+ },
+ "photo-light-32": {
+  "file": "ui/icons/photo-light-32.ts",
+  "var": "Mvt",
+  "init": "Nvt",
+  "export": "icon_photo_light_32"
+ },
+ "circle-info-light-28": {
+  "file": "ui/icons/circle-info-light-28.ts",
+  "var": "Pvt",
+  "init": "Fvt",
+  "export": "icon_circle_info_light_28"
+ },
+ "person-badge-heart-light-28": {
+  "file": "ui/icons/person-badge-heart-light-28.ts",
+  "var": "Ivt",
+  "init": "Lvt",
+  "export": "icon_person_badge_heart_light_28"
+ },
+ "diamond-sparkle-light-20": {
+  "file": "ui/icons/diamond-sparkle-light-20.ts",
+  "var": "Rvt",
+  "init": "zvt",
+  "export": "icon_diamond_sparkle_light_20"
+ },
+ "circle-questionmark-light-16": {
+  "file": "ui/icons/circle-questionmark-light-16.ts",
+  "var": "Bvt",
+  "init": "Vvt",
+  "export": "icon_circle_questionmark_light_16"
+ },
+ "plugin-light-24": {
+  "file": "ui/icons/plugin-light-24.ts",
+  "var": "Hvt",
+  "init": "Uvt",
+  "export": "icon_plugin_light_24"
+ },
+ "arrow-up-arrow-down-light-20": {
+  "file": "ui/icons/arrow-up-arrow-down-light-20.ts",
+  "var": "Wvt",
+  "init": "Gvt",
+  "export": "icon_arrow_up_arrow_down_light_20"
+ },
+ "arrow-up-arrow-down-light-24": {
+  "file": "ui/icons/arrow-up-arrow-down-light-24.ts",
+  "var": "Kvt",
+  "init": "qvt",
+  "export": "icon_arrow_up_arrow_down_light_24"
+ },
+ "checkmark-lg-light-24": {
+  "file": "ui/icons/checkmark-lg-light-24.ts",
+  "var": "Jvt",
+  "init": "Yvt",
+  "export": "icon_checkmark_lg_light_24"
+ },
+ "circle-exclamation-mark-light-24": {
+  "file": "ui/icons/circle-exclamation-mark-light-24.ts",
+  "var": "Xvt",
+  "init": "Zvt",
+  "export": "icon_circle_exclamation_mark_light_24"
+ },
+ "circle-light-16": {
+  "file": "ui/icons/circle-light-16.ts",
+  "var": "eyt",
+  "init": "tyt",
+  "export": "icon_circle_light_16"
+ },
+ "circle-xmark-light-16": {
+  "file": "ui/icons/circle-xmark-light-16.ts",
+  "var": "nyt",
+  "init": "ryt",
+  "export": "icon_circle_xmark_light_16"
+ },
+ "triangle-exclamation-mark-light-16": {
+  "file": "ui/icons/triangle-exclamation-mark-light-16.ts",
+  "var": "iyt",
+  "init": "ayt",
+  "export": "icon_triangle_exclamation_mark_light_16"
+ },
+ "gift-light-24": {
+  "file": "ui/icons/gift-light-24.ts",
+  "var": "oyt",
+  "init": "syt",
+  "export": "icon_gift_light_24"
+ },
+ "gauge-light-16": {
+  "file": "ui/icons/gauge-light-16.ts",
+  "var": "Dyt",
+  "init": "Oyt",
+  "export": "icon_gauge_light_16"
+ },
+ "list-circle-light-16": {
+  "file": "ui/icons/list-circle-light-16.ts",
+  "var": "kyt",
+  "init": "Ayt",
+  "export": "icon_list_circle_light_16"
+ },
+ "circle-grid-2x2-light-16": {
+  "file": "ui/icons/circle-grid-2x2-light-16.ts",
+  "var": "jyt",
+  "init": "Myt",
+  "export": "icon_circle_grid_2x2_light_16"
+ },
+ "circle-person-light-16": {
+  "file": "ui/icons/circle-person-light-16.ts",
+  "var": "Nyt",
+  "init": "Pyt",
+  "export": "icon_circle_person_light_16"
+ },
+ "paper-plane-light-16": {
+  "file": "ui/icons/paper-plane-light-16.ts",
+  "var": "Fyt",
+  "init": "Iyt",
+  "export": "icon_paper_plane_light_16"
+ },
+ "exclamation-mark-triangle-light-20": {
+  "file": "ui/icons/exclamation-mark-triangle-light-20.ts",
+  "var": "Lyt",
+  "init": "Ryt",
+  "export": "icon_exclamation_mark_triangle_light_20"
+ },
+ "diamond-sparkle-fill-regular-12": {
+  "file": "ui/icons/diamond-sparkle-fill-regular-12.ts",
+  "var": "zyt",
+  "init": "Byt",
+  "export": "icon_diamond_sparkle_fill_regular_12"
+ },
+ "diamond-sparkle-fill-regular-16": {
+  "file": "ui/icons/diamond-sparkle-fill-regular-16.ts",
+  "var": "Vyt",
+  "init": "Hyt",
+  "export": "icon_diamond_sparkle_fill_regular_16"
+ },
+ "pet-egg-light-16": {
+  "file": "ui/icons/pet-egg-light-16.ts",
+  "var": "Uyt",
+  "init": "Wyt",
+  "export": "icon_pet_egg_light_16"
+ },
+ "plus-md-light-16": {
+  "file": "ui/icons/plus-md-light-16.ts",
+  "var": "Gyt",
+  "init": "Kyt",
+  "export": "icon_plus_md_light_16"
+ },
+ "chrome-logo-light-16": {
+  "file": "ui/icons/chrome-logo-light-16.ts",
+  "var": "tbt",
+  "init": "nbt",
+  "export": "icon_chrome_logo_light_16"
+ },
+ "help-light-16": {
+  "file": "ui/icons/help-light-16.ts",
+  "var": "rbt",
+  "init": "ibt",
+  "export": "icon_help_light_16"
+ },
+ "lock-and-shield-light-16": {
+  "file": "ui/icons/lock-and-shield-light-16.ts",
+  "var": "abt",
+  "init": "obt",
+  "export": "icon_lock_and_shield_light_16"
+ },
+ "square-bolt-light-16": {
+  "file": "ui/icons/square-bolt-light-16.ts",
+  "var": "sbt",
+  "init": "cbt",
+  "export": "icon_square_bolt_light_16"
+ },
+ "shield-checkmark-light-16": {
+  "file": "ui/icons/shield-checkmark-light-16.ts",
+  "var": "lbt",
+  "init": "ubt",
+  "export": "icon_shield_checkmark_light_16"
+ },
+ "gift-light-16": {
+  "file": "ui/icons/gift-light-16.ts",
+  "var": "dbt",
+  "init": "fbt",
+  "export": "icon_gift_light_16"
+ },
+ "circle-xmark-light-20": {
+  "file": "ui/icons/circle-xmark-light-20.ts",
+  "var": "pbt",
+  "init": "mbt",
+  "export": "icon_circle_xmark_light_20"
+ },
+ "minus-sm-light-16": {
+  "file": "ui/icons/minus-sm-light-16.ts",
+  "var": "hbt",
+  "init": "gbt",
+  "export": "icon_minus_sm_light_16"
+ },
+ "folder-on-folder-light-20": {
+  "file": "ui/icons/folder-on-folder-light-20.ts",
+  "var": "Tbt",
+  "init": "Ebt",
+  "export": "icon_folder_on_folder_light_20"
+ },
+ "hook-light-20": {
+  "file": "ui/icons/hook-light-20.ts",
+  "var": "Dbt",
+  "init": "Obt",
+  "export": "icon_hook_light_20"
+ },
+ "skills-light-20": {
+  "file": "ui/icons/skills-light-20.ts",
+  "var": "kbt",
+  "init": "Abt",
+  "export": "icon_skills_light_20"
+ },
+ "pin-window-light-16": {
+  "file": "ui/icons/pin-window-light-16.ts",
+  "var": "jbt",
+  "init": "Mbt",
+  "export": "icon_pin_window_light_16"
+ },
+ "play-sm-fill-light-16": {
+  "file": "ui/icons/play-sm-fill-light-16.ts",
+  "var": "Nbt",
+  "init": "Pbt",
+  "export": "icon_play_sm_fill_light_16"
+ },
+ "arrow-up-lg-light-16": {
+  "file": "ui/icons/arrow-up-lg-light-16.ts",
+  "var": "q9",
+  "init": "Fbt",
+  "export": "icon_arrow_up_lg_light_16"
+ },
+ "stop-fill-light-20": {
+  "file": "ui/icons/stop-fill-light-20.ts",
+  "var": "Ibt",
+  "init": "Lbt",
+  "export": "icon_stop_fill_light_20"
+ },
+ "arrow-up-right-md-light-20": {
+  "file": "ui/icons/arrow-up-right-md-light-20.ts",
+  "var": "Rbt",
+  "init": "zbt",
+  "export": "icon_arrow_up_right_md_light_20"
+ },
+ "toolbox-light-16": {
+  "file": "ui/icons/toolbox-light-16.ts",
+  "var": "Bbt",
+  "init": "Vbt",
+  "export": "icon_toolbox_light_16"
+ },
+ "toolbox-light-20": {
+  "file": "ui/icons/toolbox-light-20.ts",
+  "var": "Hbt",
+  "init": "Ubt",
+  "export": "icon_toolbox_light_20"
+ },
+ "braces-light-16": {
+  "file": "ui/icons/braces-light-16.ts",
+  "var": "Wbt",
+  "init": "Gbt",
+  "export": "icon_braces_light_16"
+ },
+ "arrow-rotate-counterclockwise-clock-light-16": {
+  "file": "ui/icons/arrow-rotate-counterclockwise-clock-light-16.ts",
+  "var": "Kbt",
+  "init": "qbt",
+  "export": "icon_arrow_rotate_counterclockwise_clock_light_16"
+ },
+ "arrow-rotate-counterclockwise-clock-light-20": {
+  "file": "ui/icons/arrow-rotate-counterclockwise-clock-light-20.ts",
+  "var": "Jbt",
+  "init": "Ybt",
+  "export": "icon_arrow_rotate_counterclockwise_clock_light_20"
+ },
+ "across-arrow-right-light-16": {
+  "file": "ui/icons/across-arrow-right-light-16.ts",
+  "var": "Xbt",
+  "init": "Zbt",
+  "export": "icon_across_arrow_right_light_16"
+ },
+ "codex-light-16": {
+  "file": "ui/icons/codex-light-16.ts",
+  "var": "ext",
+  "init": "txt",
+  "export": "icon_codex_light_16"
+ },
+ "arrow-rotate-counterclockwise-light-12": {
+  "file": "ui/icons/arrow-rotate-counterclockwise-light-12.ts",
+  "var": "Sxt",
+  "init": "Cxt",
+  "export": "icon_arrow_rotate_counterclockwise_light_12"
+ },
+ "info-circle-light-12": {
+  "file": "ui/icons/info-circle-light-12.ts",
+  "var": "wxt",
+  "init": "Txt",
+  "export": "icon_info_circle_light_12"
+ },
+ "code-light-12": {
+  "file": "ui/icons/code-light-12.ts",
+  "var": "Ext",
+  "init": "Dxt",
+  "export": "icon_code_light_12"
+ },
+ "chevron-up-chevron-down-sm-light-20": {
+  "file": "ui/icons/chevron-up-chevron-down-sm-light-20.ts",
+  "var": "Oxt",
+  "init": "kxt",
+  "export": "icon_chevron_up_chevron_down_sm_light_20"
+ },
+ "circle-pause-light-16": {
+  "file": "ui/icons/circle-pause-light-16.ts",
+  "var": "Axt",
+  "init": "jxt",
+  "export": "icon_circle_pause_light_16"
+ },
+ "circle-play-light-16": {
+  "file": "ui/icons/circle-play-light-16.ts",
+  "var": "Mxt",
+  "init": "Nxt",
+  "export": "icon_circle_play_light_16"
+ },
+ "circle-exclamation-mark-light-20": {
+  "file": "ui/icons/circle-exclamation-mark-light-20.ts",
+  "var": "Rxt",
+  "init": "zxt",
+  "export": "icon_circle_exclamation_mark_light_20"
+ },
+ "pause-circle-light-20": {
+  "file": "ui/icons/pause-circle-light-20.ts",
+  "var": "Bxt",
+  "init": "Vxt",
+  "export": "icon_pause_circle_light_20"
+ },
+ "play-circle-light-20": {
+  "file": "ui/icons/play-circle-light-20.ts",
+  "var": "Hxt",
+  "init": "Uxt",
+  "export": "icon_play_circle_light_20"
+ },
+ "microphone-light-16": {
+  "file": "ui/icons/microphone-light-16.ts",
+  "var": "Wxt",
+  "init": "Gxt",
+  "export": "icon_microphone_light_16"
+ },
+ "microphone-slash-light-16": {
+  "file": "ui/icons/microphone-slash-light-16.ts",
+  "var": "Yxt",
+  "init": "Xxt",
+  "export": "icon_microphone_slash_light_16"
+ },
+ "speaker-slash-fill-light-16": {
+  "file": "ui/icons/speaker-slash-fill-light-16.ts",
+  "var": "Zxt",
+  "init": "Qxt",
+  "export": "icon_speaker_slash_fill_light_16"
+ },
+ "appshot-window-light-16": {
+  "file": "ui/icons/appshot-window-light-16.ts",
+  "var": "tSt",
+  "init": "nSt",
+  "export": "icon_appshot_window_light_16"
+ },
+ "ms-onedrive-regular-12": {
+  "file": "ui/icons/ms-onedrive-regular-12.ts",
+  "var": "rSt",
+  "init": "iSt",
+  "export": "icon_ms_onedrive_regular_12"
+ },
+ "ms-onedrive-regular-16": {
+  "file": "ui/icons/ms-onedrive-regular-16.ts",
+  "var": "aSt",
+  "init": "oSt",
+  "export": "icon_ms_onedrive_regular_16"
+ },
+ "ms-onedrive-regular-20": {
+  "file": "ui/icons/ms-onedrive-regular-20.ts",
+  "var": "sSt",
+  "init": "cSt",
+  "export": "icon_ms_onedrive_regular_20"
+ },
+ "ms-onedrive-regular-24": {
+  "file": "ui/icons/ms-onedrive-regular-24.ts",
+  "var": "lSt",
+  "init": "uSt",
+  "export": "icon_ms_onedrive_regular_24"
+ },
+ "deep-research-light-16": {
+  "file": "ui/icons/deep-research-light-16.ts",
+  "var": "dSt",
+  "init": "fSt",
+  "export": "icon_deep_research_light_16"
+ },
+ "deep-research-light-20": {
+  "file": "ui/icons/deep-research-light-20.ts",
+  "var": "pSt",
+  "init": "mSt",
+  "export": "icon_deep_research_light_20"
+ },
+ "sparkle-fill-light-20": {
+  "file": "ui/icons/sparkle-fill-light-20.ts",
+  "var": "hSt",
+  "init": "gSt",
+  "export": "icon_sparkle_fill_light_20"
+ },
+ "circle-xmark-fill-light-16": {
+  "file": "ui/icons/circle-xmark-fill-light-16.ts",
+  "var": "_St",
+  "init": "vSt",
+  "export": "icon_circle_xmark_fill_light_16"
+ },
+ "arrow-up-lg-light-12": {
+  "file": "ui/icons/arrow-up-lg-light-12.ts",
+  "var": "ySt",
+  "init": "bSt",
+  "export": "icon_arrow_up_lg_light_12"
+ },
+ "circle-checkmark-fill-light-24": {
+  "file": "ui/icons/circle-checkmark-fill-light-24.ts",
+  "var": "xSt",
+  "init": "SSt",
+  "export": "icon_circle_checkmark_fill_light_24"
+ },
+ "circle-light-24": {
+  "file": "ui/icons/circle-light-24.ts",
+  "var": "CSt",
+  "init": "wSt",
+  "export": "icon_circle_light_24"
+ },
+ "funnel-light-20": {
+  "file": "ui/icons/funnel-light-20.ts",
+  "var": "TSt",
+  "init": "ESt",
+  "export": "icon_funnel_light_20"
+ },
+ "pause-circle-fill-light-24": {
+  "file": "ui/icons/pause-circle-fill-light-24.ts",
+  "var": "DSt",
+  "init": "OSt",
+  "export": "icon_pause_circle_fill_light_24"
+ },
+ "pause-circle-light-24": {
+  "file": "ui/icons/pause-circle-light-24.ts",
+  "var": "kSt",
+  "init": "ASt",
+  "export": "icon_pause_circle_light_24"
+ },
+ "play-circle-light-24": {
+  "file": "ui/icons/play-circle-light-24.ts",
+  "var": "jSt",
+  "init": "MSt",
+  "export": "icon_play_circle_light_24"
+ },
+ "plus-circle-light-24": {
+  "file": "ui/icons/plus-circle-light-24.ts",
+  "var": "NSt",
+  "init": "PSt",
+  "export": "icon_plus_circle_light_24"
+ },
+ "stop-fill-light-16": {
+  "file": "ui/icons/stop-fill-light-16.ts",
+  "var": "FSt",
+  "init": "ISt",
+  "export": "icon_stop_fill_light_16"
+ },
+ "arrow-curvedpath-left-lg-light-20": {
+  "file": "ui/icons/arrow-curvedpath-left-lg-light-20.ts",
+  "var": "LSt",
+  "init": "RSt",
+  "export": "icon_arrow_curvedpath_left_lg_light_20"
+ },
+ "checkmark-circle-fill-regular-16": {
+  "file": "ui/icons/checkmark-circle-fill-regular-16.ts",
+  "var": "zSt",
+  "init": "BSt",
+  "export": "icon_checkmark_circle_fill_regular_16"
+ },
+ "checkmark-md-light-24": {
+  "file": "ui/icons/checkmark-md-light-24.ts",
+  "var": "VSt",
+  "init": "HSt",
+  "export": "icon_checkmark_md_light_24"
+ },
+ "clock-light-28": {
+  "file": "ui/icons/clock-light-28.ts",
+  "var": "USt",
+  "init": "WSt",
+  "export": "icon_clock_light_28"
+ },
+ "exclamation-mark-circle-light-28": {
+  "file": "ui/icons/exclamation-mark-circle-light-28.ts",
+  "var": "GSt",
+  "init": "KSt",
+  "export": "icon_exclamation_mark_circle_light_28"
+ },
+ "exclamationmark-circle-fill-light-16": {
+  "file": "ui/icons/exclamationmark-circle-fill-light-16.ts",
+  "var": "qSt",
+  "init": "JSt",
+  "export": "icon_exclamationmark_circle_fill_light_16"
+ },
+ "questionmark-circle-light-28": {
+  "file": "ui/icons/questionmark-circle-light-28.ts",
+  "var": "YSt",
+  "init": "XSt",
+  "export": "icon_questionmark_circle_light_28"
+ },
+ "stop-sm-fill-regular-28": {
+  "file": "ui/icons/stop-sm-fill-regular-28.ts",
+  "var": "ZSt",
+  "init": "QSt",
+  "export": "icon_stop_sm_fill_regular_28"
+ },
+ "arrow-pointer-light-16": {
+  "file": "ui/icons/arrow-pointer-light-16.ts",
+  "var": "tCt",
+  "init": "nCt",
+  "export": "icon_arrow_pointer_light_16"
+ },
+ "eye-slash-light-16": {
+  "file": "ui/icons/eye-slash-light-16.ts",
+  "var": "rCt",
+  "init": "iCt",
+  "export": "icon_eye_slash_light_16"
+ },
+ "clipboard-light-20": {
+  "file": "ui/icons/clipboard-light-20.ts",
+  "var": "aCt",
+  "init": "oCt",
+  "export": "icon_clipboard_light_20"
+ },
+ "keyboard-light-16": {
+  "file": "ui/icons/keyboard-light-16.ts",
+  "var": "sCt",
+  "init": "cCt",
+  "export": "icon_keyboard_light_16"
+ },
+ "location-arrow-light-16": {
+  "file": "ui/icons/location-arrow-light-16.ts",
+  "var": "lCt",
+  "init": "uCt",
+  "export": "icon_location_arrow_light_16"
+ },
+ "location-arrow-light-20": {
+  "file": "ui/icons/location-arrow-light-20.ts",
+  "var": "dCt",
+  "init": "fCt",
+  "export": "icon_location_arrow_light_20"
+ },
+ "video-light-16": {
+  "file": "ui/icons/video-light-16.ts",
+  "var": "pCt",
+  "init": "mCt",
+  "export": "icon_video_light_16"
+ },
+ "video-light-20": {
+  "file": "ui/icons/video-light-20.ts",
+  "var": "hCt",
+  "init": "gCt",
+  "export": "icon_video_light_20"
+ },
+ "smartphone-and-arrow-rotate-counterclockwise-light-16": {
+  "file": "ui/icons/smartphone-and-arrow-rotate-counterclockwise-light-16.ts",
+  "var": "kCt",
+  "init": "ACt",
+  "export": "icon_smartphone_and_arrow_rotate_counterclockwise_light_16"
+ },
+ "sliders-light-16": {
+  "file": "ui/icons/sliders-light-16.ts",
+  "var": "jCt",
+  "init": "MCt",
+  "export": "icon_sliders_light_16"
+ },
+ "cursor-light-12": {
+  "file": "ui/icons/cursor-light-12.ts",
+  "var": "NCt",
+  "init": "PCt",
+  "export": "icon_cursor_light_12"
+ },
+ "chevron-right-lg-light-12": {
+  "file": "ui/icons/chevron-right-lg-light-12.ts",
+  "var": "FCt",
+  "init": "ICt",
+  "export": "icon_chevron_right_lg_light_12"
+ },
+ "book-open-light-12": {
+  "file": "ui/icons/book-open-light-12.ts",
+  "var": "LCt",
+  "init": "RCt",
+  "export": "icon_book_open_light_12"
+ },
+ "pencil-light-12": {
+  "file": "ui/icons/pencil-light-12.ts",
+  "var": "zCt",
+  "init": "BCt",
+  "export": "icon_pencil_light_12"
+ },
+ "node-to-node-path-light-16": {
+  "file": "ui/icons/node-to-node-path-light-16.ts",
+  "var": "VCt",
+  "init": "HCt",
+  "export": "icon_node_to_node_path_light_16"
+ },
+ "target-light-16": {
+  "file": "ui/icons/target-light-16.ts",
+  "var": "UCt",
+  "init": "WCt",
+  "export": "icon_target_light_16"
+ },
+ "chat-bubble-questionmark-light-16": {
+  "file": "ui/icons/chat-bubble-questionmark-light-16.ts",
+  "var": "GCt",
+  "init": "KCt",
+  "export": "icon_chat_bubble_questionmark_light_16"
+ },
+ "cursor-interactive-light-16": {
+  "file": "ui/icons/cursor-interactive-light-16.ts",
+  "var": "qCt",
+  "init": "JCt",
+  "export": "icon_cursor_interactive_light_16"
+ },
+ "dock-light-16": {
+  "file": "ui/icons/dock-light-16.ts",
+  "var": "YCt",
+  "init": "XCt",
+  "export": "icon_dock_light_16"
+ },
+ "plus-square-stack-fanned-light-16": {
+  "file": "ui/icons/plus-square-stack-fanned-light-16.ts",
+  "var": "ZCt",
+  "init": "QCt",
+  "export": "icon_plus_square_stack_fanned_light_16"
+ },
+ "chevron-down-left-chevron-up-right-sm-light-16": {
+  "file": "ui/icons/chevron-down-left-chevron-up-right-sm-light-16.ts",
+  "var": "twt",
+  "init": "nwt",
+  "export": "icon_chevron_down_left_chevron_up_right_sm_light_16"
+ },
+ "chevron-up-right-chevron-down-left-sm-light-16": {
+  "file": "ui/icons/chevron-up-right-chevron-down-left-sm-light-16.ts",
+  "var": "rwt",
+  "init": "iwt",
+  "export": "icon_chevron_up_right_chevron_down_left_sm_light_16"
+ },
+ "branch-light-24": {
+  "file": "ui/icons/branch-light-24.ts",
+  "var": "awt",
+  "init": "owt",
+  "export": "icon_branch_light_24"
+ },
+ "star-light-12": {
+  "file": "ui/icons/star-light-12.ts",
+  "var": "swt",
+  "init": "cwt",
+  "export": "icon_star_light_12"
+ },
+ "ellipsis-horizontal-light-12": {
+  "file": "ui/icons/ellipsis-horizontal-light-12.ts",
+  "var": "lwt",
+  "init": "uwt",
+  "export": "icon_ellipsis_horizontal_light_12"
+ },
+ "gauge-light-12": {
+  "file": "ui/icons/gauge-light-12.ts",
+  "var": "dwt",
+  "init": "fwt",
+  "export": "icon_gauge_light_12"
+ },
+ "chevron-down-chevron-up-sm-light-16": {
+  "file": "ui/icons/chevron-down-chevron-up-sm-light-16.ts",
+  "var": "pwt",
+  "init": "mwt",
+  "export": "icon_chevron_down_chevron_up_sm_light_16"
+ },
+ "chevron-up-chevron-down-sm-light-16": {
+  "file": "ui/icons/chevron-up-chevron-down-sm-light-16.ts",
+  "var": "hwt",
+  "init": "gwt",
+  "export": "icon_chevron_up_chevron_down_sm_light_16"
+ },
+ "minus-sm-light-20": {
+  "file": "ui/icons/minus-sm-light-20.ts",
+  "var": "_wt",
+  "init": "vwt",
+  "export": "icon_minus_sm_light_20"
+ },
+ "emoji-face-light-16": {
+  "file": "ui/icons/emoji-face-light-16.ts",
+  "var": "ywt",
+  "init": "bwt",
+  "export": "icon_emoji_face_light_16"
+ },
+ "plus-md-light-12": {
+  "file": "ui/icons/plus-md-light-12.ts",
+  "var": "xwt",
+  "init": "Swt",
+  "export": "icon_plus_md_light_12"
+ },
+ "arrow-up-right-lg-light-20": {
+  "file": "ui/icons/arrow-up-right-lg-light-20.ts",
+  "var": "Cwt",
+  "init": "wwt",
+  "export": "icon_arrow_up_right_lg_light_20"
+ },
+ "text-select-light-16": {
+  "file": "ui/icons/text-select-light-16.ts",
+  "var": "Twt",
+  "init": "Ewt",
+  "export": "icon_text_select_light_16"
+ },
+ "wifi-light-16": {
+  "file": "ui/icons/wifi-light-16.ts",
+  "var": "Dwt",
+  "init": "Owt",
+  "export": "icon_wifi_light_16"
+ },
+ "circle-grid-2x2-connect-light-16": {
+  "file": "ui/icons/circle-grid-2x2-connect-light-16.ts",
+  "var": "kwt",
+  "init": "Awt",
+  "export": "icon_circle_grid_2x2_connect_light_16"
+ },
+ "web-browser-cursor-light-16": {
+  "file": "ui/icons/web-browser-cursor-light-16.ts",
+  "var": "jwt",
+  "init": "Mwt",
+  "export": "icon_web_browser_cursor_light_16"
+ },
+ "hook-light-16": {
+  "file": "ui/icons/hook-light-16.ts",
+  "var": "Nwt",
+  "init": "Pwt",
+  "export": "icon_hook_light_16"
+ },
+ "circle-grid-2x2-connect-light-24": {
+  "file": "ui/icons/circle-grid-2x2-connect-light-24.ts",
+  "var": "Fwt",
+  "init": "Iwt",
+  "export": "icon_circle_grid_2x2_connect_light_24"
+ },
+ "skills-light-16": {
+  "file": "ui/icons/skills-light-16.ts",
+  "var": "Lwt",
+  "init": "Rwt",
+  "export": "icon_skills_light_16"
+ },
+ "book-badge-heart-light-16": {
+  "file": "ui/icons/book-badge-heart-light-16.ts",
+  "var": "zwt",
+  "init": "Bwt",
+  "export": "icon_book_badge_heart_light_16"
+ },
+ "heart-badge-shield-light-16": {
+  "file": "ui/icons/heart-badge-shield-light-16.ts",
+  "var": "Vwt",
+  "init": "Hwt",
+  "export": "icon_heart_badge_shield_light_16"
+ },
+ "code-light-24": {
+  "file": "ui/icons/code-light-24.ts",
+  "var": "Uwt",
+  "init": "Wwt",
+  "export": "icon_code_light_24"
+ },
+ "frame-cursor-light-24": {
+  "file": "ui/icons/frame-cursor-light-24.ts",
+  "var": "Gwt",
+  "init": "Kwt",
+  "export": "icon_frame_cursor_light_24"
+ },
+ "resize-window-light-16": {
+  "file": "ui/icons/resize-window-light-16.ts",
+  "var": "qwt",
+  "init": "Jwt",
+  "export": "icon_resize_window_light_16"
+ },
+ "person-frame-light-20": {
+  "file": "ui/icons/person-frame-light-20.ts",
+  "var": "Ywt",
+  "init": "Xwt",
+  "export": "icon_person_frame_light_20"
+ },
+ "bookmark-fill-light-16": {
+  "file": "ui/icons/bookmark-fill-light-16.ts",
+  "var": "Zwt",
+  "init": "Qwt",
+  "export": "icon_bookmark_fill_light_16"
+ },
+ "gift-regular-20": {
+  "file": "ui/icons/gift-regular-20.ts",
+  "var": "tTt",
+  "init": "nTt",
+  "export": "icon_gift_regular_20"
+ },
+ "sparkle-fill-regular-20": {
+  "file": "ui/icons/sparkle-fill-regular-20.ts",
+  "var": "rTt",
+  "init": "iTt",
+  "export": "icon_sparkle_fill_regular_20"
+ },
+ "plus-md-light-28": {
+  "file": "ui/icons/plus-md-light-28.ts",
+  "var": "aTt",
+  "init": "oTt",
+  "export": "icon_plus_md_light_28"
+ },
+ "chat-bubble-checkmark-dashed-light-20": {
+  "file": "ui/icons/chat-bubble-checkmark-dashed-light-20.ts",
+  "var": "sTt",
+  "init": "cTt",
+  "export": "icon_chat_bubble_checkmark_dashed_light_20"
+ },
+ "chat-bubble-checkmark-dashed-light-32": {
+  "file": "ui/icons/chat-bubble-checkmark-dashed-light-32.ts",
+  "var": "lTt",
+  "init": "uTt",
+  "export": "icon_chat_bubble_checkmark_dashed_light_32"
+ },
+ "chat-bubble-dashed-light-20": {
+  "file": "ui/icons/chat-bubble-dashed-light-20.ts",
+  "var": "dTt",
+  "init": "fTt",
+  "export": "icon_chat_bubble_dashed_light_20"
+ },
+ "chevron-down-left-chevron-up-right-sm-light-20": {
+  "file": "ui/icons/chevron-down-left-chevron-up-right-sm-light-20.ts",
+  "var": "pTt",
+  "init": "mTt",
+  "export": "icon_chevron_down_left_chevron_up_right_sm_light_20"
+ },
+ "chevron-up-right-chevron-down-left-lg-light-20": {
+  "file": "ui/icons/chevron-up-right-chevron-down-left-lg-light-20.ts",
+  "var": "hTt",
+  "init": "gTt",
+  "export": "icon_chevron_up_right_chevron_down_left_lg_light_20"
+ },
+ "personalization-light-20": {
+  "file": "ui/icons/personalization-light-20.ts",
+  "var": "_Tt",
+  "init": "vTt",
+  "export": "icon_personalization_light_20"
+ },
+ "multiply-lg-light-20": {
+  "file": "ui/icons/multiply-lg-light-20.ts",
+  "var": "yTt",
+  "init": "bTt",
+  "export": "icon_multiply_lg_light_20"
+ },
+ "pencil-text-light-20": {
+  "file": "ui/icons/pencil-text-light-20.ts",
+  "var": "xTt",
+  "init": "STt",
+  "export": "icon_pencil_text_light_20"
+ },
+ "personalization-light-16": {
+  "file": "ui/icons/personalization-light-16.ts",
+  "var": "CTt",
+  "init": "wTt",
+  "export": "icon_personalization_light_16"
+ },
+ "chevron-down-lg-light-16": {
+  "file": "ui/icons/chevron-down-lg-light-16.ts",
+  "var": "TTt",
+  "init": "ETt",
+  "export": "icon_chevron_down_lg_light_16"
+ },
+ "chevron-down-sm-light-20": {
+  "file": "ui/icons/chevron-down-sm-light-20.ts",
+  "var": "DTt",
+  "init": "OTt",
+  "export": "icon_chevron_down_sm_light_20"
+ },
+ "plus-md-light-20": {
+  "file": "ui/icons/plus-md-light-20.ts",
+  "var": "kTt",
+  "init": "ATt",
+  "export": "icon_plus_md_light_20"
+ },
+ "terms-light-16": {
+  "file": "ui/icons/terms-light-16.ts",
+  "var": "jTt",
+  "init": "MTt",
+  "export": "icon_terms_light_16"
+ },
+ "terms-light-20": {
+  "file": "ui/icons/terms-light-20.ts",
+  "var": "NTt",
+  "init": "PTt",
+  "export": "icon_terms_light_20"
+ },
+ "open-link-light-20": {
+  "file": "ui/icons/open-link-light-20.ts",
+  "var": "FTt",
+  "init": "ITt",
+  "export": "icon_open_link_light_20"
+ },
+ "person-light-16": {
+  "file": "ui/icons/person-light-16.ts",
+  "var": "LTt",
+  "init": "RTt",
+  "export": "icon_person_light_16"
+ },
+ "text-frame-light-20": {
+  "file": "ui/icons/text-frame-light-20.ts",
+  "var": "zTt",
+  "init": "BTt",
+  "export": "icon_text_frame_light_20"
+ },
+ "folder-person-2-light-32": {
+  "file": "ui/icons/folder-person-2-light-32.ts",
+  "var": "VTt",
+  "init": "HTt",
+  "export": "icon_folder_person_2_light_32"
+ },
+ "chat-bubble-rounded-rectangle-text-light-16": {
+  "file": "ui/icons/chat-bubble-rounded-rectangle-text-light-16.ts",
+  "var": "UTt",
+  "init": "WTt",
+  "export": "icon_chat_bubble_rounded_rectangle_text_light_16"
+ },
+ "pop-in-window-egg-light-16": {
+  "file": "ui/icons/pop-in-window-egg-light-16.ts",
+  "var": "GTt",
+  "init": "KTt",
+  "export": "icon_pop_in_window_egg_light_16"
+ },
+ "sparkle-fill-light-24": {
+  "file": "ui/icons/sparkle-fill-light-24.ts",
+  "var": "qTt",
+  "init": "JTt",
+  "export": "icon_sparkle_fill_light_24"
+ },
+ "arrow-right-lg-light-20": {
+  "file": "ui/icons/arrow-right-lg-light-20.ts",
+  "var": "YTt",
+  "init": "XTt",
+  "export": "icon_arrow_right_lg_light_20"
+ },
+ "plus-lg-light-24": {
+  "file": "ui/icons/plus-lg-light-24.ts",
+  "var": "ZTt",
+  "init": "QTt",
+  "export": "icon_plus_lg_light_24"
+ },
+ "chevron-left-lg-light-24": {
+  "file": "ui/icons/chevron-left-lg-light-24.ts",
+  "var": "tEt",
+  "init": "nEt",
+  "export": "icon_chevron_left_lg_light_24"
+ },
+ "chevron-right-lg-light-24": {
+  "file": "ui/icons/chevron-right-lg-light-24.ts",
+  "var": "rEt",
+  "init": "iEt",
+  "export": "icon_chevron_right_lg_light_24"
+ },
+ "chrome-logo-light-20": {
+  "file": "ui/icons/chrome-logo-light-20.ts",
+  "var": "aEt",
+  "init": "oEt",
+  "export": "icon_chrome_logo_light_20"
+ },
+ "cursor-interactive-light-20": {
+  "file": "ui/icons/cursor-interactive-light-20.ts",
+  "var": "sEt",
+  "init": "cEt",
+  "export": "icon_cursor_interactive_light_20"
+ },
+ "desktop-badge-lock-light-20": {
+  "file": "ui/icons/desktop-badge-lock-light-20.ts",
+  "var": "lEt",
+  "init": "uEt",
+  "export": "icon_desktop_badge_lock_light_20"
+ },
+ "moon-sun-light-20": {
+  "file": "ui/icons/moon-sun-light-20.ts",
+  "var": "dEt",
+  "init": "fEt",
+  "export": "icon_moon_sun_light_20"
+ },
+ "sun-light-20": {
+  "file": "ui/icons/sun-light-20.ts",
+  "var": "pEt",
+  "init": "mEt",
+  "export": "icon_sun_light_20"
+ },
+ "smartphone-light-20": {
+  "file": "ui/icons/smartphone-light-20.ts",
+  "var": "hEt",
+  "init": "gEt",
+  "export": "icon_smartphone_light_20"
+ },
+ "tasks-light-24": {
+  "file": "ui/icons/tasks-light-24.ts",
+  "var": "_Et",
+  "init": "vEt",
+  "export": "icon_tasks_light_24"
+ },
+ "square-plus-minus-light-16": {
+  "file": "ui/icons/square-plus-minus-light-16.ts",
+  "var": "yEt",
+  "init": "bEt",
+  "export": "icon_square_plus_minus_light_16"
+ },
+ "analytics-light-16": {
+  "file": "ui/icons/analytics-light-16.ts",
+  "var": "xEt",
+  "init": "SEt",
+  "export": "icon_analytics_light_16"
+ },
+ "analytics-light-20": {
+  "file": "ui/icons/analytics-light-20.ts",
+  "var": "CEt",
+  "init": "wEt",
+  "export": "icon_analytics_light_20"
+ },
+ "appshot-window-light-20": {
+  "file": "ui/icons/appshot-window-light-20.ts",
+  "var": "TEt",
+  "init": "EEt",
+  "export": "icon_appshot_window_light_20"
+ },
+ "arrow-branch-light-20": {
+  "file": "ui/icons/arrow-branch-light-20.ts",
+  "var": "DEt",
+  "init": "OEt",
+  "export": "icon_arrow_branch_light_20"
+ },
+ "circle-person-light-20": {
+  "file": "ui/icons/circle-person-light-20.ts",
+  "var": "kEt",
+  "init": "AEt",
+  "export": "icon_circle_person_light_20"
+ },
+ "cloud-light-20": {
+  "file": "ui/icons/cloud-light-20.ts",
+  "var": "jEt",
+  "init": "MEt",
+  "export": "icon_cloud_light_20"
+ },
+ "dock-light-20": {
+  "file": "ui/icons/dock-light-20.ts",
+  "var": "NEt",
+  "init": "PEt",
+  "export": "icon_dock_light_20"
+ },
+ "gauge-light-20": {
+  "file": "ui/icons/gauge-light-20.ts",
+  "var": "FEt",
+  "init": "IEt",
+  "export": "icon_gauge_light_20"
+ },
+ "keys-light-20": {
+  "file": "ui/icons/keys-light-20.ts",
+  "var": "LEt",
+  "init": "REt",
+  "export": "icon_keys_light_20"
+ },
+ "person-group-light-20": {
+  "file": "ui/icons/person-group-light-20.ts",
+  "var": "zEt",
+  "init": "BEt",
+  "export": "icon_person_group_light_20"
+ },
+ "pet-egg-light-20": {
+  "file": "ui/icons/pet-egg-light-20.ts",
+  "var": "VEt",
+  "init": "HEt",
+  "export": "icon_pet_egg_light_20"
+ },
+ "sun-light-16": {
+  "file": "ui/icons/sun-light-16.ts",
+  "var": "UEt",
+  "init": "WEt",
+  "export": "icon_sun_light_16"
+ },
+ "web-browser-light-16": {
+  "file": "ui/icons/web-browser-light-16.ts",
+  "var": "GEt",
+  "init": "KEt",
+  "export": "icon_web_browser_light_16"
+ },
+ "notebook-light-16": {
+  "file": "ui/icons/notebook-light-16.ts",
+  "var": "qEt",
+  "init": "JEt",
+  "export": "icon_notebook_light_16"
+ },
+ "google-light-20": {
+  "file": "ui/icons/google-light-20.ts",
+  "var": "YEt",
+  "init": "XEt",
+  "export": "icon_google_light_20"
+ },
+ "microsoft-light-20": {
+  "file": "ui/icons/microsoft-light-20.ts",
+  "var": "ZEt",
+  "init": "QEt",
+  "export": "icon_microsoft_light_20"
+ },
+ "clock-light-12": {
+  "file": "ui/icons/clock-light-12.ts",
+  "var": "tDt",
+  "init": "nDt",
+  "export": "icon_clock_light_12"
+ },
+ "chevron-down-md-regular-12": {
+  "file": "ui/icons/chevron-down-md-regular-12.ts",
+  "var": "rDt",
+  "init": "iDt",
+  "export": "icon_chevron_down_md_regular_12"
+ },
+ "chevron-right-md-regular-12": {
+  "file": "ui/icons/chevron-right-md-regular-12.ts",
+  "var": "aDt",
+  "init": "oDt",
+  "export": "icon_chevron_right_md_regular_12"
+ },
+ "chevron-right-md-regular-16": {
+  "file": "ui/icons/chevron-right-md-regular-16.ts",
+  "var": "sDt",
+  "init": "cDt",
+  "export": "icon_chevron_right_md_regular_16"
+ },
+ "sites-light-32": {
+  "file": "ui/icons/sites-light-32.ts",
+  "var": "lDt",
+  "init": "uDt",
+  "export": "icon_sites_light_32"
+ },
+ "circle-info-light-12": {
+  "file": "ui/icons/circle-info-light-12.ts",
+  "var": "dDt",
+  "init": "fDt",
+  "export": "icon_circle_info_light_12"
+ },
+ "plus-sm-light-28": {
+  "file": "ui/icons/plus-sm-light-28.ts",
+  "var": "pDt",
+  "init": "mDt",
+  "export": "icon_plus_sm_light_28"
+ },
+ "chat-bubble-plus-light-16": {
+  "file": "ui/icons/chat-bubble-plus-light-16.ts",
+  "var": "hDt",
+  "init": "gDt",
+  "export": "icon_chat_bubble_plus_light_16"
+ },
+ "minus-md-regular-16": {
+  "file": "ui/icons/minus-md-regular-16.ts",
+  "var": "_Dt",
+  "init": "vDt",
+  "export": "icon_minus_md_regular_16"
+ },
+ "arrow-up-open-base-light-32": {
+  "file": "ui/icons/arrow-up-open-base-light-32.ts",
+  "var": "yDt",
+  "init": "bDt",
+  "export": "icon_arrow_up_open_base_light_32"
+ },
+ "magnifying-glass-lg-light-32": {
+  "file": "ui/icons/magnifying-glass-lg-light-32.ts",
+  "var": "xDt",
+  "init": "SDt",
+  "export": "icon_magnifying_glass_lg_light_32"
+ },
+ "folder-badge-arrow-right-light-20": {
+  "file": "ui/icons/folder-badge-arrow-right-light-20.ts",
+  "var": "CDt",
+  "init": "wDt",
+  "export": "icon_folder_badge_arrow_right_light_20"
+ },
+ "trash-open-arrow-up-light-20": {
+  "file": "ui/icons/trash-open-arrow-up-light-20.ts",
+  "var": "TDt",
+  "init": "EDt",
+  "export": "icon_trash_open_arrow_up_light_20"
+ },
+ "trash-xmark-light-20": {
+  "file": "ui/icons/trash-xmark-light-20.ts",
+  "var": "DDt",
+  "init": "ODt",
+  "export": "icon_trash_xmark_light_20"
+ },
+ "bookmark-fill-light-12": {
+  "file": "ui/icons/bookmark-fill-light-12.ts",
+  "var": "kDt",
+  "init": "ADt",
+  "export": "icon_bookmark_fill_light_12"
+ },
+ "person-2-fill-light-12": {
+  "file": "ui/icons/person-2-fill-light-12.ts",
+  "var": "jDt",
+  "init": "MDt",
+  "export": "icon_person_2_fill_light_12"
+ },
+ "person-2-light-20": {
+  "file": "ui/icons/person-2-light-20.ts",
+  "var": "NDt",
+  "init": "PDt",
+  "export": "icon_person_2_light_20"
+ },
+ "minus-circle-light-20": {
+  "file": "ui/icons/minus-circle-light-20.ts",
+  "var": "FDt",
+  "init": "IDt",
+  "export": "icon_minus_circle_light_20"
+ },
+ "book-open-moon-star-light-20": {
+  "file": "ui/icons/book-open-moon-star-light-20.ts",
+  "var": "LDt",
+  "init": "RDt",
+  "export": "icon_book_open_moon_star_light_20"
+ },
+ "calculator-light-20": {
+  "file": "ui/icons/calculator-light-20.ts",
+  "var": "zDt",
+  "init": "BDt",
+  "export": "icon_calculator_light_20"
+ },
+ "emoji-face-sticker-light-20": {
+  "file": "ui/icons/emoji-face-sticker-light-20.ts",
+  "var": "VDt",
+  "init": "HDt",
+  "export": "icon_emoji_face_sticker_light_20"
+ },
+ "magic-wand-light-20": {
+  "file": "ui/icons/magic-wand-light-20.ts",
+  "var": "UDt",
+  "init": "WDt",
+  "export": "icon_magic_wand_light_20"
+ },
+ "pencil-and-chat-bubble-light-20": {
+  "file": "ui/icons/pencil-and-chat-bubble-light-20.ts",
+  "var": "GDt",
+  "init": "KDt",
+  "export": "icon_pencil_and_chat_bubble_light_20"
+ },
+ "play-square-on-tilted-photo-light-20": {
+  "file": "ui/icons/play-square-on-tilted-photo-light-20.ts",
+  "var": "qDt",
+  "init": "JDt",
+  "export": "icon_play_square_on_tilted_photo_light_20"
+ },
+ "circle-checkmark-fill-light-16": {
+  "file": "ui/icons/circle-checkmark-fill-light-16.ts",
+  "var": "YDt",
+  "init": "XDt",
+  "export": "icon_circle_checkmark_fill_light_16"
+ },
+ "building-light-24": {
+  "file": "ui/icons/building-light-24.ts",
+  "var": "ZDt",
+  "init": "QDt",
+  "export": "icon_building_light_24"
+ },
+ "document-badge-magnifyingglass-light-16": {
+  "file": "ui/icons/document-badge-magnifyingglass-light-16.ts",
+  "var": "tOt",
+  "init": "nOt",
+  "export": "icon_document_badge_magnifyingglass_light_16"
+ },
+ "folder-badge-arrow-right-light-28": {
+  "file": "ui/icons/folder-badge-arrow-right-light-28.ts",
+  "var": "rOt",
+  "init": "iOt",
+  "export": "icon_folder_badge_arrow_right_light_28"
+ },
+ "chevron-down-md-light-24": {
+  "file": "ui/icons/chevron-down-md-light-24.ts",
+  "var": "aOt",
+  "init": "oOt",
+  "export": "icon_chevron_down_md_light_24"
+ },
+ "arrow-left-md-light-16": {
+  "file": "ui/icons/arrow-left-md-light-16.ts",
+  "var": "sOt",
+  "init": "cOt",
+  "export": "icon_arrow_left_md_light_16"
+ },
+ "arrow-up-md-light-24": {
+  "file": "ui/icons/arrow-up-md-light-24.ts",
+  "var": "lOt",
+  "init": "uOt",
+  "export": "icon_arrow_up_md_light_24"
+ },
+ "ellipsis-horizontal-regular-24": {
+  "file": "ui/icons/ellipsis-horizontal-regular-24.ts",
+  "var": "dOt",
+  "init": "fOt",
+  "export": "icon_ellipsis_horizontal_regular_24"
+ },
+ "passkey-light-16": {
+  "file": "ui/icons/passkey-light-16.ts",
+  "var": "pOt",
+  "init": "mOt",
+  "export": "icon_passkey_light_16"
+ },
+ "security-key-light-16": {
+  "file": "ui/icons/security-key-light-16.ts",
+  "var": "hOt",
+  "init": "gOt",
+  "export": "icon_security_key_light_16"
+ },
+ "arrow-forward-open-base-light-16": {
+  "file": "ui/icons/arrow-forward-open-base-light-16.ts",
+  "var": "_Ot",
+  "init": "vOt",
+  "export": "icon_arrow_forward_open_base_light_16"
+ },
+ "open-base-arrow-right-light-16": {
+  "file": "ui/icons/open-base-arrow-right-light-16.ts",
+  "var": "yOt",
+  "init": "bOt",
+  "export": "icon_open_base_arrow_right_light_16"
+ },
+ "shield-lock-light-16": {
+  "file": "ui/icons/shield-lock-light-16.ts",
+  "var": "xOt",
+  "init": "SOt",
+  "export": "icon_shield_lock_light_16"
+ },
+ "person-badge-heart-light-32": {
+  "file": "ui/icons/person-badge-heart-light-32.ts",
+  "var": "COt",
+  "init": "wOt",
+  "export": "icon_person_badge_heart_light_32"
+ },
+ "sidebar-light-28": {
+  "file": "ui/icons/sidebar-light-28.ts",
+  "var": "TOt",
+  "init": "EOt",
+  "export": "icon_sidebar_light_28"
+ },
+ "car-light-16": {
+  "file": "ui/icons/car-light-16.ts",
+  "var": "DOt",
+  "init": "OOt",
+  "export": "icon_car_light_16"
+ },
+ "emoji-face-smile-mouth-light-16": {
+  "file": "ui/icons/emoji-face-smile-mouth-light-16.ts",
+  "var": "kOt",
+  "init": "AOt",
+  "export": "icon_emoji_face_smile_mouth_light_16"
+ },
+ "paw-light-16": {
+  "file": "ui/icons/paw-light-16.ts",
+  "var": "jOt",
+  "init": "MOt",
+  "export": "icon_paw_light_16"
+ },
+ "soccerball-light-16": {
+  "file": "ui/icons/soccerball-light-16.ts",
+  "var": "NOt",
+  "init": "POt",
+  "export": "icon_soccerball_light_16"
+ },
+ "wine-and-cloche-light-16": {
+  "file": "ui/icons/wine-and-cloche-light-16.ts",
+  "var": "FOt",
+  "init": "IOt",
+  "export": "icon_wine_and_cloche_light_16"
+ }
+}
