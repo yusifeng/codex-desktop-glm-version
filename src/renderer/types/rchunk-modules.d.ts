@@ -130,8 +130,9 @@ declare module "@rchunk/above-composer-fixed-content-surface" {
 }
 
 declare module "@rchunk/agent-activity-item" {
-  const _default: unknown;
-  export default _default;
+  export const n: unknown;
+  export const r: (a: unknown, b: unknown) => boolean;
+  export const t: (item: unknown) => { grouping?: string } | null;
 }
 
 declare module "@rchunk/appgen-access" {
