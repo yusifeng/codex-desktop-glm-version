@@ -252,7 +252,7 @@ async function readImportHistory(codexHome: string): Promise<CoworkImportHistory
 /** 账本统计（原 `MMe`）：不存在返回 0；损坏抛错。 */
 async function importHistoryStats(codexHome: string): Promise<{ importedSessionCount: number; latestImportedAtMs: number | null }> {
   const historyPath = join(codexHome, IMPORT_HISTORY_FILENAME);
-  const history = await readJsonFile(historyPath, importHistorySchema as never);
+  const history = (await readJsonFile(historyPath, importHistorySchema as never)) as CoworkImportHistory | null;
   if (history == null) {
     try {
       await lstat(historyPath);
@@ -293,7 +293,7 @@ async function recordImportedTranscripts({ codexHome, importedAtMs = Date.now(),
 async function recordAccountSetupItems({ codexHome, importedAtMs = Date.now(), items }: { codexHome: string; importedAtMs?: number; items: Array<{ accountOrgDir: string; itemType: "CONFIG" | "PLUGINS" }> }): Promise<void> {
   if (items.length === 0) return;
   const history = await readImportHistory(codexHome);
-  const records = items.map((item) => ({ accountOrgDir: item.accountOrgDir, importedAtMs, itemType: item.itemType }));
+  const records = items.map((item): AccountSetupRecord => ({ accountOrgDir: item.accountOrgDir, importedAtMs, itemType: item.itemType }));
   await writeImportHistory(codexHome, { ...history, accountSetupItems: mergeByPredicate(history.accountSetupItems, records, isDuplicateAccountSetupItem) });
 }
 
@@ -301,7 +301,7 @@ async function recordAccountSetupItems({ codexHome, importedAtMs = Date.now(), i
 async function recordImportedProjects({ codexHome, importedAtMs = Date.now(), projects }: { codexHome: string; importedAtMs?: number; projects: Array<{ sourceRoot: string; spaceId: string }> }): Promise<void> {
   if (projects.length === 0) return;
   const history = await readImportHistory(codexHome);
-  const records = projects.map((project) => ({ importedAtMs, sourceRoot: project.sourceRoot, spaceId: project.spaceId }));
+  const records = projects.map((project): ProjectRecord => ({ importedAtMs, sourceRoot: project.sourceRoot, spaceId: project.spaceId }));
   await writeImportHistory(codexHome, { ...history, projects: mergeByPredicate(history.projects, records, isDuplicateProject) });
 }
 
@@ -316,12 +316,12 @@ async function recordConnectorCandidates({ candidates, codexHome }: { candidates
 }
 
 /** 项目是否已导入（原 `LMe`）。 */
-function hasImportedProject(history: CoworkImportHistory, project: { sourceRoot: string; spaceId: string }): boolean {
+function hasImportedProject(history: CoworkImportHistory, project: ProjectRecord): boolean {
   return history.projects.some((record) => isDuplicateProject(record, project));
 }
 
 /** 配置/插件是否已导入（原 `MP`）。 */
-function hasImportedAccountSetupItem(history: CoworkImportHistory, item: { accountOrgDir: string; itemType: string }): boolean {
+function hasImportedAccountSetupItem(history: CoworkImportHistory, item: AccountSetupRecord): boolean {
   return history.accountSetupItems.some((record) => isDuplicateAccountSetupItem(record, item));
 }
 
@@ -335,11 +335,11 @@ function mergeByPredicate<T>(existing: T[], next: T[], isDuplicate: (a: T, b: T)
   return [...existing.filter((record) => !next.some((candidate) => isDuplicate(record, candidate))), ...next];
 }
 
-function isDuplicateAccountSetupItem(a: { accountOrgDir: string; itemType: string }, b: { accountOrgDir: string; itemType: string }): boolean {
+function isDuplicateAccountSetupItem(a: AccountSetupRecord, b: AccountSetupRecord): boolean {
   return a.itemType === b.itemType && pathsEqual(a.accountOrgDir, b.accountOrgDir);
 }
 
-function isDuplicateProject(a: { sourceRoot: string; spaceId: string }, b: { sourceRoot: string; spaceId: string }): boolean {
+function isDuplicateProject(a: ProjectRecord, b: ProjectRecord): boolean {
   return a.spaceId === b.spaceId && pathsEqual(a.sourceRoot, b.sourceRoot);
 }
 
@@ -551,7 +551,6 @@ export {
   mcpServersFileSchema,
   pluginListSchema,
   pluginManifestSchema,
-  type CoworkImportHistory,
   type ImportRecord,
   type ProjectRecord,
   type AccountSetupRecord,
