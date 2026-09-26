@@ -941,14 +941,22 @@ check(
   "persists reset-banner dismissal per account",
 );
 
-globalThis.__homeOnboardingTest.microAnimation = { analytics: [], state: [] };
+globalThis.__homeOnboardingTest.microAnimation = {
+  analytics: [],
+  elapsed: null,
+  state: [],
+};
 const microAnimation = await loadModule("codex-micro-onboarding-animation", {
   "app-shared": `
     export const ZI = Symbol("scope");
     export const FX = () => {};
     export const QI = () => {};
-    export const pZ = () => Symbol("elapsed");
-    export const sZ = (_scope, _read) => Symbol("computed");
+    export const pZ = () => ({
+      read: () => globalThis.__homeOnboardingTest.microAnimation.elapsed,
+    });
+    export const sZ = (_scope, derive) => ({
+      read: () => derive({ get: signal => signal.read() }),
+    });
   `,
   "app-initial": `
     export const cs = "device-lifecycle";
@@ -998,6 +1006,12 @@ check(
   progressedFrame.agentSlots[0].status === "awaiting-approval" &&
     progressedFrame.agentSlots.length === 6,
   "advances each Codex Micro agent through its staggered cycle",
+);
+globalThis.__homeOnboardingTest.microAnimation.elapsed = 4_000;
+check(
+  microAnimation.t.read().agentSlots[0].status === "awaiting-approval" &&
+    microAnimation.n.read().length === 6,
+  "derives the animation frame and agent slots from elapsed signal state",
 );
 microAnimation.s(
   "scope",
@@ -1448,5 +1462,5 @@ check(
   "forwards API-key edits and disables empty submission",
 );
 
-assert.equal(assertions, 95);
+assert.equal(assertions, 96);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);

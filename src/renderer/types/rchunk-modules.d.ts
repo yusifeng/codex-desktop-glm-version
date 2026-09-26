@@ -5912,14 +5912,55 @@ declare module "@rchunk/codex-micro-layout" {
 }
 
 declare module "@rchunk/codex-micro-onboarding-animation" {
-  export const a: (...args: any[]) => (() => void) | undefined;
-  export const c: (...args: any[]) => void;
+  export type CodexMicroAgentStatus =
+    | "awaiting-approval"
+    | "awaiting-response"
+    | "error"
+    | "idle"
+    | "unread"
+    | "working";
+  export interface CodexMicroAnimationAgentSlot {
+    id: number;
+    selected: false;
+    status: CodexMicroAgentStatus;
+    threadKey: null;
+    title: null;
+  }
+  export interface CodexMicroOnboardingAnimationFrame {
+    actionKeycapIds: string[];
+    agentSlots: CodexMicroAnimationAgentSlot[];
+  }
+  export const a: (
+    scope: { set(signal: unknown, value: unknown): void },
+    reducedMotion: boolean,
+  ) => () => void;
+  export const c: (
+    scope: unknown,
+    input: {
+      flowId: string;
+      inputMonitoringPermissionState: string;
+      screen: string;
+      step: string;
+    },
+  ) => void;
   export const i: () => void;
-  export const n: unknown;
+  export const n: import("@rchunk/app-shared").ScopedDerivedSignal<
+    unknown,
+    CodexMicroAnimationAgentSlot[] | null
+  >;
   export const o: () => void;
-  export const r: (elapsedMs: number) => any;
-  export const s: (...args: any[]) => void;
-  export const t: unknown;
+  export const r: (elapsedMs: number) => CodexMicroOnboardingAnimationFrame;
+  export const s: (
+    scope: unknown,
+    device: { status: string },
+    transition: string | null,
+    transport: string | null,
+    previouslyDetected: boolean,
+  ) => void;
+  export const t: import("@rchunk/app-shared").ScopedDerivedSignal<
+    unknown,
+    CodexMicroOnboardingAnimationFrame | null
+  >;
 }
 
 declare module "@rchunk/codex-micro-slot-signals" {

@@ -7,7 +7,13 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 void runtimeChunk;
 
 const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  FX: initializeSignalRuntime,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+  pZ: createScopedSignal,
+  sZ: createDerivedSignal,
+} = appSharedChunk;
 
 const TICK_INTERVAL_MS = 100;
 const CYCLE_DURATION_MS = 12_000;
@@ -37,9 +43,40 @@ const ACTION_KEYCAP_CYCLES = [
   ["CODEX", "APPR", "SETUP"],
 ] as const;
 
-let elapsedAnimationTimeState: any = Symbol("codex-micro-onboarding-elapsed");
-let animationFrameSignal: any = Symbol("codex-micro-onboarding-frame");
-let agentSlotsSignal: any = Symbol("codex-micro-onboarding-agent-slots");
+type AgentStatus = (typeof AGENT_STATUS_CYCLES)[number][number];
+type ActionKeycapId = (typeof ACTION_KEYCAP_CYCLES)[number][number];
+
+interface AnimationAgentSlot {
+  id: number;
+  selected: false;
+  status: AgentStatus;
+  threadKey: null;
+  title: null;
+}
+
+interface CodexMicroOnboardingAnimationFrame {
+  actionKeycapIds: ActionKeycapId[];
+  agentSlots: AnimationAgentSlot[];
+}
+
+type ScopedSignal<Value> = import("@rchunk/app-shared").ScopedSignal<
+  unknown,
+  Value
+>;
+type DerivedSignal<Value> = import("@rchunk/app-shared").ScopedDerivedSignal<
+  unknown,
+  Value
+>;
+
+let elapsedAnimationTimeState = Symbol(
+  "codex-micro-onboarding-elapsed",
+) as unknown as ScopedSignal<number | null>;
+let animationFrameSignal = Symbol(
+  "codex-micro-onboarding-frame",
+) as unknown as DerivedSignal<CodexMicroOnboardingAnimationFrame | null>;
+let agentSlotsSignal = Symbol(
+  "codex-micro-onboarding-agent-slots",
+) as unknown as DerivedSignal<AnimationAgentSlot[] | null>;
 let initialized = false;
 
 function mapDeviceLifecycleStatus(status: string): unknown {
@@ -193,7 +230,9 @@ function cycleValue<T>(
   return values[phaseIndex((elapsedMs + offsetMs) % CYCLE_DURATION_MS)];
 }
 
-function buildCodexMicroOnboardingAnimationFrame(elapsedMs: number) {
+function buildCodexMicroOnboardingAnimationFrame(
+  elapsedMs: number,
+): CodexMicroOnboardingAnimationFrame {
   const reducedMotion = elapsedMs === -1;
   const normalizedElapsed = reducedMotion ? 0 : elapsedMs;
   return {
@@ -242,21 +281,21 @@ function startCodexMicroOnboardingAnimation(
 function initializeCodexMicroOnboardingAnimation(): void {
   if (initialized) return;
   initialized = true;
-  appShared.FX?.();
-  appShared.QI?.();
+  initializeSignalRuntime?.();
+  initializeSharedRuntime?.();
   elapsedAnimationTimeState =
-    appShared.pZ?.(appShared.ZI, null) ?? elapsedAnimationTimeState;
+    createScopedSignal(applicationScope, null);
   animationFrameSignal =
-    appShared.sZ?.(appShared.ZI, ({ get }: any) => {
+    createDerivedSignal(applicationScope, ({ get }) => {
       const elapsed = get(elapsedAnimationTimeState);
       return elapsed == null
         ? null
         : buildCodexMicroOnboardingAnimationFrame(elapsed);
-    }) ?? animationFrameSignal;
+    });
   agentSlotsSignal =
-    appShared.sZ?.(appShared.ZI, ({ get }: any) => {
+    createDerivedSignal(applicationScope, ({ get }) => {
       return get(animationFrameSignal)?.agentSlots ?? null;
-    }) ?? agentSlotsSignal;
+    });
 }
 
 initializeCodexMicroOnboardingAnimation();
