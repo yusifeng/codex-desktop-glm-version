@@ -6,13 +6,81 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as retirementChunk from "@rchunk/gpt-plugin-retirement";
 import * as migratedAccessChunk from "@rchunk/migrated-plugin-access";
+import type {
+  JsxRuntime,
+  IntlShape,
+} from "@rchunk/app-shared";
+import type { Experiment } from "@rchunk/app-initial";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const retirement = retirementChunk as Record<string, any>;
-const migratedAccess = migratedAccessChunk as Record<string, any>;
-let jsx: any;
+
+interface NoticeState {
+  canUsePlugins: boolean;
+  deadline: string;
+  intl: IntlShape;
+  retirementExperiment: Experiment;
+}
+
+export interface MigrationNoticeProps {
+  onDismiss?: () => void;
+  onMigrate?: () => void;
+  surface: string;
+}
+
+export interface WorkspacePluginsBlockedNoticeProps {
+  deadline?: number;
+  onKeepUsingGpt?: () => void;
+  surface: "directory" | "gpt" | "migrated";
+}
+
+export interface RetirementNoticeProps {
+  actionPlacement?: "inline" | "below";
+  currentGpt?: boolean;
+  onExplore?: (event: unknown) => void;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  BX: useSignalFamilyValue,
+  C_: initializeIconAsset,
+  FX: initializeSignalRuntime,
+  I3: getJsxRuntime,
+  K2: initializeReactRuntime,
+  S_: IconAsset,
+  Tl: pluginMigrationIcon,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+  c_: initializeTooltip,
+  lw: initializeMigrationIcons,
+  n4: useIntl,
+  o_: Tooltip,
+  sw: CloseIcon,
+  wl: initializeCloseIcon,
+} = appSharedChunk;
+const {
+  Dft: initializeOpenExternalLink,
+  Dln: workspacePermissionsQuery,
+  M6t: initializeSessionAccount,
+  N6t: useSessionAccount,
+  Oft: openExternalLink,
+  Oln: initializeNavigation,
+  afn: getExperiment,
+  ifn: initializeMigrationExperiments,
+  n7: AnnouncementBanner,
+  ofn: isGateEnabled,
+  r7: initializeAccountPlan,
+  rht: initializeAccountQuery,
+  uht: useAccountQuery,
+} = appInitialChunk;
+const {
+  n: getHelpCenterUrl,
+  r: initializePluginRetirement,
+  t: parseRetirementDate,
+} = retirementChunk;
+const { i: canAccountUseMigratedPlugins } = migratedAccessChunk;
+
+let jsx: JsxRuntime;
 
 function message(
   id: string,
@@ -20,43 +88,42 @@ function message(
   description: string,
   values?: Record<string, unknown>,
 ): unknown {
-  return jsx.jsx(appShared.Y2, { id, defaultMessage, description, values });
+  return jsx.jsx(FormattedMessage, { id, defaultMessage, description, values });
 }
 
-function useNoticeState(): any {
-  const intl = appShared.n4?.();
-  const migrationExperiment = appInitial.afn?.("2562735250");
-  const retirementExperiment = appInitial.afn?.("2513446768");
-  const migrationEnabled =
-    migrationExperiment?.get?.("enabled", false) ?? false;
-  const { accountId } = appInitial.N6t?.() ?? {};
-  const account = appInitial.uht?.(undefined, { preview: false })?.data;
-  const workspaceGate = appInitial.ofn?.("1355972088") ?? false;
+function useNoticeState(): NoticeState {
+  const intl = useIntl();
+  const migrationExperiment = getExperiment("2562735250");
+  const retirementExperiment = getExperiment("2513446768");
+  const migrationEnabled = migrationExperiment.get("enabled", false);
+  const { accountId } = useSessionAccount();
+  const account = useAccountQuery(undefined, { preview: false }).data;
+  const workspaceGate = isGateEnabled("1355972088");
   const queryEnabled =
     accountId != null &&
     account?.id === accountId &&
     account?.structure === "workspace" &&
     workspaceGate;
-  const permissions = appShared.BX?.(appInitial.Dln, accountId ?? "", {
+  const permissions = useSignalFamilyValue(workspacePermissionsQuery, accountId ?? "", {
     enabled: queryEnabled,
-  })?.data?.permissions;
+  }).data?.permissions;
   return {
     intl,
     retirementExperiment,
     deadline: intl.formatDate(
-      retirement.t?.(retirementExperiment.get("retirement_date", "")),
+      parseRetirementDate(retirementExperiment.get("retirement_date", "")),
       { month: "long", day: "numeric", timeZone: "UTC" },
     ),
     canUsePlugins:
       migrationEnabled &&
       account?.id === accountId &&
-      migratedAccess.i?.(account, workspaceGate, permissions),
+      canAccountUseMigratedPlugins(account, workspaceGate, permissions),
   };
 }
 
 function icon(): unknown {
-  return jsx.jsx(appShared.S_, {
-    asset: appShared.Tl,
+  return jsx.jsx(IconAsset, {
+    asset: pluginMigrationIcon,
     className: "text-secondary",
   });
 }
@@ -65,11 +132,7 @@ function MigrationNotice({
   surface,
   onMigrate,
   onDismiss,
-}: {
-  surface: string;
-  onMigrate?: () => void;
-  onDismiss?: () => void;
-}): unknown {
+}: MigrationNoticeProps): unknown {
   const { intl, deadline, canUsePlugins } = useNoticeState();
   const title = message(
     "chatgptConversations.gpts.notices.migrateTitle",
@@ -86,7 +149,7 @@ function MigrationNotice({
   const customCtas =
     onMigrate == null
       ? undefined
-      : jsx.jsx(appShared.o_, {
+      : jsx.jsx(Tooltip, {
           tooltipContent: canUsePlugins
             ? undefined
             : message(
@@ -94,7 +157,7 @@ function MigrationNotice({
                 "Your workspace must allow you to use plugins to migrate this GPT",
                 "Tooltip on a disabled GPT migration button for workspace users without permission to use plugins, or while that permission is loading",
               ),
-          children: jsx.jsx(appShared.Yh, {
+          children: jsx.jsx(Button, {
             color: "primary",
             size: "dialog",
             disabled: !canUsePlugins,
@@ -116,7 +179,7 @@ function MigrationNotice({
   const trailingAction =
     onDismiss == null
       ? undefined
-      : jsx.jsx(appShared.Yh, {
+      : jsx.jsx(Button, {
           "aria-label": intl.formatMessage({
             id: "chatgptConversations.gpts.notices.dismiss",
             defaultMessage: "Dismiss migration notice",
@@ -127,9 +190,9 @@ function MigrationNotice({
           size: "icon",
           uniform: true,
           onClick: onDismiss,
-          children: jsx.jsx(appShared.sw, {}),
+          children: jsx.jsx(CloseIcon, {}),
         });
-  return jsx.jsx(appInitial.n7, {
+  return jsx.jsx(AnnouncementBanner, {
     variant: "announcement",
     icon: icon(),
     stackOnNarrow: true,
@@ -145,15 +208,11 @@ function WorkspacePluginsBlockedNotice({
   surface,
   onKeepUsingGpt,
   deadline: deadlineValue,
-}: {
-  surface: "directory" | "migrated" | "gpt";
-  onKeepUsingGpt?: () => void;
-  deadline?: number;
-}): unknown {
-  const intl = appShared.n4?.();
-  const experiment = appInitial.afn?.("2513446768");
+}: WorkspacePluginsBlockedNoticeProps): unknown {
+  const intl = useIntl();
+  const experiment = getExperiment("2513446768");
   const deadline = intl.formatDate(
-    deadlineValue ?? retirement.t?.(experiment.get("retirement_date", "")),
+    deadlineValue ?? parseRetirementDate(experiment.get("retirement_date", "")),
     { month: "long", day: "numeric", timeZone: "UTC" },
   );
   const copy =
@@ -181,7 +240,7 @@ function WorkspacePluginsBlockedNotice({
   const customCtas =
     onKeepUsingGpt == null
       ? undefined
-      : jsx.jsx(appShared.Yh, {
+      : jsx.jsx(Button, {
           type: "button",
           color: "primary",
           size: "dialog",
@@ -192,7 +251,7 @@ function WorkspacePluginsBlockedNotice({
             "Only action in the migrated GPT chat notice when its creator cannot use plugins. Reveals the existing composer with its draft preserved for this visit.",
           ),
         });
-  return jsx.jsx(appInitial.n7, {
+  return jsx.jsx(AnnouncementBanner, {
     variant: "announcement",
     icon: icon(),
     stackOnNarrow: true,
@@ -207,20 +266,16 @@ function RetirementNotice({
   actionPlacement = "inline",
   currentGpt = false,
   onExplore,
-}: {
-  actionPlacement?: "inline" | "below";
-  currentGpt?: boolean;
-  onExplore?: (event: unknown) => void;
-}): unknown {
+}: RetirementNoticeProps): unknown {
   const { intl, retirementExperiment, deadline, canUsePlugins } =
     useNoticeState();
   const action = canUsePlugins
     ? onExplore
     : (event: unknown) =>
-        appInitial.Oft?.({
+        openExternalLink({
           disposition: "new-tab",
           event,
-          href: retirement.n?.(
+          href: getHelpCenterUrl(
             intl.locale,
             retirementExperiment.get("learn_more_url", ""),
           ),
@@ -228,7 +283,7 @@ function RetirementNotice({
           openTarget:
             actionPlacement === "below" ? "external-browser" : undefined,
         });
-  const button = jsx.jsx(appShared.Yh, {
+  const button = jsx.jsx(Button, {
     className: actionPlacement === "below" ? "w-full" : undefined,
     color: "primary",
     size: actionPlacement === "below" ? "detailAction" : "dialog",
@@ -263,7 +318,7 @@ function RetirementNotice({
           "Retirement notice in the GPT directory.",
           { deadline },
         );
-  const announcement = jsx.jsx(appInitial.n7, {
+  const announcement = jsx.jsx(AnnouncementBanner, {
     variant: actionPlacement === "below" ? "announcementInset" : "announcement",
     icon: icon(),
     stackOnNarrow: true,
@@ -288,22 +343,22 @@ function RetirementNotice({
 let initialized = false;
 function initializeGptPluginMigrationNotices(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.wl?.();
-  appShared.FX?.();
-  appShared.K2?.();
-  appInitial.Oln?.();
-  appInitial.M6t?.();
-  appInitial.rht?.();
-  appInitial.r7?.();
-  appShared.Zh?.();
-  appInitial.Dft?.();
-  appShared.C_?.();
-  appShared.lw?.();
-  appShared.c_?.();
-  appInitial.ifn?.();
-  retirement.r?.();
-  jsx = appShared.I3?.();
+  initializeRuntimeLazy();
+  initializeCloseIcon();
+  initializeSignalRuntime();
+  initializeReactRuntime();
+  initializeNavigation();
+  initializeSessionAccount();
+  initializeAccountQuery();
+  initializeAccountPlan();
+  initializeButton();
+  initializeOpenExternalLink();
+  initializeIconAsset();
+  initializeMigrationIcons();
+  initializeTooltip();
+  initializeMigrationExperiments();
+  initializePluginRetirement();
+  jsx = getJsxRuntime();
   initialized = true;
 }
 

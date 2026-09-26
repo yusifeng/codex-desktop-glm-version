@@ -1034,6 +1034,9 @@ declare module "@rchunk/app-shared" {
   export const Ls: () => void;
   /** Open plugin 图标资源。 */
   export const Is: IconAssetPreset;
+  export const wl: () => void;
+  export const Tl: IconAssetPreset;
+  export const sw: (props: Record<string, unknown>) => unknown;
   export const FQ: unknown;
   /** initializeMaitaiRuntime（app-shared/runtime/atom-signal.ts）。 */
   export const FX: () => void;
@@ -2852,9 +2855,11 @@ declare module "@rchunk/app-initial" {
   export const uP: (timestamp: number | null) => Date;
   export const jTt: string;
   export const Oft: (input: {
+    disposition?: "new-tab";
     event: unknown;
     href: string;
     initiator: "open_in_browser_bridge";
+    openTarget?: "external-browser";
   }) => void;
   export const n7: (props: Record<string, unknown>) => unknown;
   export const Dft: () => void;
@@ -4112,20 +4117,25 @@ declare module "@rchunk/migrated-plugin-access" {
 }
 
 declare module "@rchunk/gpt-plugin-migration-notices" {
-  export const i: () => void;
-  export const n: (props: {
+  export interface MigrationNoticeProps {
     onDismiss?: () => void;
     onMigrate?: () => void;
     surface: string;
-  }) => unknown;
-  export const r: (props: {
+  }
+  export interface RetirementNoticeProps {
+    actionPlacement?: "inline" | "below";
     currentGpt?: boolean;
-    onExplore?: (event?: unknown) => void;
-  }) => unknown;
-  export const t: (props: {
+    onExplore?: (event: unknown) => void;
+  }
+  export interface WorkspacePluginsBlockedNoticeProps {
+    deadline?: number;
     onKeepUsingGpt?: () => void;
     surface: "directory" | "gpt" | "migrated";
-  }) => unknown;
+  }
+  export const i: () => void;
+  export const n: (props: MigrationNoticeProps) => unknown;
+  export const r: (props: RetirementNoticeProps) => unknown;
+  export const t: (props: WorkspacePluginsBlockedNoticeProps) => unknown;
 }
 
 declare module "@rchunk/migrated-plugin-notice" {
@@ -4147,7 +4157,7 @@ declare module "@rchunk/migrated-plugin-notice" {
 declare module "@rchunk/gpt-plugin-retirement" {
   export const n: (user: unknown, urlTemplate: string) => string;
   export const r: () => void;
-  export const t: (value: unknown) => unknown;
+  export const t: (value: string) => number;
 }
 
 declare module "@rchunk/computer-history-suggestion-prompt" {
