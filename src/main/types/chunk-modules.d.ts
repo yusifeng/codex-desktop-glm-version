@@ -76,7 +76,7 @@ declare module "@chunk/shared" {
   export { normalizeApprovalsReviewer as Ad } from "../../shared/sandbox-permissions";
   export const Af: any; // 内部符号: nm
   export const Ai: any; // 内部符号: _re
-  export const Al: any; // 内部符号: Ob
+  export { CHROME_DEV_PLUGIN_NAME as Al } from "../../shared/app-constants";
   export const An: any; // 内部符号: jX
   export const Ao: any; // 内部符号: gO
   export const Ar: any; // 内部符号: LB
@@ -89,7 +89,7 @@ declare module "@chunk/shared" {
   export const Bd: any; // 内部符号: Zg
   export { AbortableFetchDispatcher as Bf } from "../../shared/rpc-core";
   export const Bi: any; // 内部符号: Bj
-  export const Bl: any; // 内部符号: Lb
+  export { VISUALIZE_PLUGIN_NAME as Bl } from "../../shared/app-constants";
   export const Bn: any; // 内部符号: fY
   export const Bo: any; // 内部符号: uD
   export const Br: any; // 内部符号: oB
@@ -114,11 +114,11 @@ declare module "@chunk/shared" {
   export const Cu: any; // 内部符号: Xy
   export const D: any; // 内部符号: cse
   export const Da: any; // 内部符号: tj
-  export const Dc: any; // 内部符号: wC
+  export { configOverrideKeyForVersion as Dc } from "../../shared/app-config";
   export { permissionsForProfile as Dd } from "../../shared/sandbox-permissions";
   export const Df: any; // 内部符号: Gp
   export const Di: any; // 内部符号: Z
-  export const Dl: any; // 内部符号: Kb
+  export { toPosixPath as Dl } from "../../shared/app-constants";
   export const Dn: any; // 内部符号: oX
   export const Do: any; // 内部符号: TO
   export const Dr: any; // 内部符号: mB
@@ -131,7 +131,7 @@ declare module "@chunk/shared" {
   export const Ed: any; // 内部符号: j_
   export const Ef: any; // 内部符号: im
   export const Ei: any; // 内部符号: DM
-  export const El: any; // 内部符号: $b
+  export { stripDriveLetterSlash as El } from "../../shared/app-constants";
   export const En: any; // 内部符号: DX
   export const Eo: any; // 内部符号: PO
   export const Er: any; // 内部符号: kB
@@ -144,7 +144,7 @@ declare module "@chunk/shared" {
   export { permissionSetAllowed as Fd } from "../../shared/sandbox-permissions";
   export const Ff: any; // 内部符号: Zd
   export const Fi: any; // 内部符号: cM
-  export const Fl: any; // 内部符号: jb
+  export { COMPUTER_USE_PLUGIN_NAME as Fl } from "../../shared/app-constants";
   export const Fn: any; // 内部符号: xY
   export const Fo: any; // 内部符号: HD
   export const Fr: any; // 内部符号: CB
@@ -194,7 +194,7 @@ declare module "@chunk/shared" {
   export const Jc: any; // 内部符号: oS
   export const Jd: any; // 内部符号: kg
   export const Ji: any; // 内部符号: ore
-  export const Jl: any; // 内部符号: yb
+  export { NODE_REPL_COMMAND_ENV_KEY as Jl } from "../../shared/app-constants";
   export const Jn: any; // 内部符号: eJ
   export const Jo: any; // 内部符号: tD
   export const Jr: any; // 内部符号: hI
@@ -219,7 +219,7 @@ declare module "@chunk/shared" {
   export { deepEquals as Ld } from "../../shared/sandbox-permissions";
   export const Lf: any; // 内部符号: Ud
   export const Li: any; // 内部符号: fre
-  export const Ll: any; // 内部符号: gne
+  export { BUNDLED_PLUGIN_DESCRIPTORS as Ll } from "../../shared/app-constants";
   export const Ln: any; // 内部符号: vY
   export const Lo: any; // 内部符号: RD
   export const Lr: any; // 内部符号: fB
@@ -232,7 +232,7 @@ declare module "@chunk/shared" {
   export { sandboxModeOfPolicy as Md } from "../../shared/sandbox-permissions";
   export const Mf: any; // 内部符号: Fp
   export const Mi: any; // 内部符号: oM
-  export const Ml: any; // 内部符号: Ab
+  export { CHROME_PLUGIN_NAME as Ml } from "../../shared/app-constants";
   export const Mn: any; // 内部符号: yY
   export const Mo: any; // 内部符号: nO
   export const Mr: any; // 内部符号: pB
@@ -245,7 +245,7 @@ declare module "@chunk/shared" {
   export { permissionParamsOf as Nd } from "../../shared/sandbox-permissions";
   export const Nf: any; // 内部符号: Of
   export const Ni: any; // 内部符号: sM
-  export const Nl: any; // 内部符号: Fb
+  export { CODEX_APP_TOOLS_PLUGIN_NAME as Nl } from "../../shared/app-constants";
   export const Nn: any; // 内部符号: bY
   export const No: any; // 内部符号: JD
   export const Nr: any; // 内部符号: SB
@@ -271,7 +271,7 @@ declare module "@chunk/shared" {
   export { isAutomaticApprovalsReviewer as Pd } from "../../shared/sandbox-permissions";
   export const Pf: any; // 内部符号: Cf
   export const Pi: any; // 内部符号: mre
-  export const Pl: any; // 内部符号: Nb
+  export { COMPUTER_HISTORY_PLUGIN_NAME as Pl } from "../../shared/app-constants";
   export const Pn: any; // 内部符号: SY
   export const Po: any; // 内部符号: GD
   export const Pr: any; // 内部符号: KB
@@ -296,7 +296,7 @@ declare module "@chunk/shared" {
   export const Rd: any; // 内部符号: i_
   export const Rf: any; // 内部符号: Id
   export const Ri: any; // 内部符号: aM
-  export const Rl: any; // 内部符号: Mb
+  export { UNIFIED_COMPUTER_USE_PLUGIN_NAME as Rl } from "../../shared/app-constants";
   export const Rn: any; // 内部符号: _Y
   export const Ro: any; // 内部符号: MD
   export const Rr: any; // 内部符号: TB
@@ -373,7 +373,7 @@ declare module "@chunk/shared" {
   export const Xc: any; // 内部符号: nS
   export const Xd: any; // 内部符号: Dg
   export const Xi: any; // 内部符号: Oj
-  export const Xl: any; // 内部符号: xb
+  export { NODE_REPL_MCP_SERVER_NAME as Xl } from "../../shared/app-constants";
   export const Xn: any; // 内部符号: $q
   export const Xo: any; // 内部符号: XE
   export const Xr: any; // 内部符号: gI
@@ -385,7 +385,7 @@ declare module "@chunk/shared" {
   export const Yc: any; // 内部符号: eS
   export const Yd: any; // 内部符号: Og
   export const Yi: any; // 内部符号: Aj
-  export const Yl: any; // 内部符号: bb
+  export { NODE_REPL_REQUEST_META_ENV_KEY as Yl } from "../../shared/app-constants";
   export const Yn: any; // 内部符号: Qq
   export const Yo: any; // 内部符号: $E
   export const Yr: any; // 内部符号: _I
@@ -459,7 +459,7 @@ declare module "@chunk/shared" {
   export const d: any; // 内部符号: lce
   export const da: any; // 内部符号: dj
   export const dc: any; // 内部符号: tw
-  export const dd: any; // 内部符号: $_
+  export { parseAutomationUpdateOutput as dd } from "../../shared/automation-settings";
   export const df: any; // 内部符号: J
   export const di: any; // 内部符号: IP
   export const dl: any; // 内部符号: Ax
@@ -542,7 +542,7 @@ declare module "@chunk/shared" {
   export { runtimeWorkspaceRootsOf as jd } from "../../shared/sandbox-permissions";
   export const jf: any; // 内部符号: Jp
   export const ji: any; // 内部符号: bM
-  export const jl: any; // 内部符号: kb
+  export { CHROME_INTERNAL_PLUGIN_NAME as jl } from "../../shared/app-constants";
   export const jn: any; // 内部符号: gX
   export const jo: any; // 内部符号: lO
   export const jr: any; // 内部符号: GB
@@ -632,7 +632,7 @@ declare module "@chunk/shared" {
   export const qc: any; // 内部符号: sS
   export const qd: any; // 内部符号: jg
   export const qi: any; // 内部符号: Mj
-  export const ql: any; // 内部符号: vb
+  export { NODE_REPL_MODULE_DIR_ENV_KEY as ql } from "../../shared/app-constants";
   /** 按名字解析 PATH 上的可执行文件（带缓存），找不到返回 undefined。 */
   export const qn: {
     resolve(executable: string, opts?: { cwd?: string; env?: Record<string, string | undefined> }): string | undefined;
@@ -667,7 +667,7 @@ declare module "@chunk/shared" {
   export const sr: any; // 内部符号: FW
   export const ss: any; // 内部符号: NE
   export { COMMIT_MESSAGE_GENERATION_BUNDLE as st } from "../../shared/structured-generation";
-  export const su: any; // 内部符号: $te
+  export { BROWSER_USE_PLUGIN_NAME as su } from "../../shared/app-constants";
   export const t: any; // 内部符号: Zce
   export const ta: any; // 内部符号: ere
   export { composeFeatureOverrides as tc } from "../../shared/app-config";
@@ -753,7 +753,7 @@ declare module "@chunk/shared" {
   export const zd: any; // 内部符号: Qg
   export { ABORTED as zf } from "../../shared/rpc-core";
   export const zi: any; // 内部符号: pre
-  export const zl: any; // 内部符号: Ib
+  export { USER_WRITING_PLUGIN_NAME as zl } from "../../shared/app-constants";
   export const zn: any; // 内部符号: gY
   export const zo: any; // 内部符号: ND
   export const zr: any; // 内部符号: qB

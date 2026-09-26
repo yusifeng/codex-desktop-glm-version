@@ -218,6 +218,33 @@ export const COWORK_MARKETPLACE_NAME = "claude-cowork";
 /** browser 插件名（原 `pb`，导出 `ou`）。 */
 export const BROWSER_PLUGIN_NAME = "browser";
 
+/** chrome 插件名（原 `Ab`，导出 `Ml`）。 */
+export const CHROME_PLUGIN_NAME = "chrome";
+
+/** chrome-dev 插件名（原 `Ob`，导出 `Al`）。 */
+export const CHROME_DEV_PLUGIN_NAME = "chrome-dev";
+
+/** chrome-internal 插件名（原 `kb`，导出 `jl`）。 */
+export const CHROME_INTERNAL_PLUGIN_NAME = "chrome-internal";
+
+/** computer-use 插件名（原 `jb`，导出 `Fl`）。 */
+export const COMPUTER_USE_PLUGIN_NAME = "computer-use";
+
+/** unified-computer-use 插件名（原 `Mb`，导出 `Rl`）。 */
+export const UNIFIED_COMPUTER_USE_PLUGIN_NAME = "unified-computer-use";
+
+/** computer-history 插件名（原 `Nb`，导出 `Pl`）。 */
+export const COMPUTER_HISTORY_PLUGIN_NAME = "computer-history";
+
+/** codex-app-tools 插件名（原 `Fb`，导出 `Nl`）。 */
+export const CODEX_APP_TOOLS_PLUGIN_NAME = "codex-app-tools";
+
+/** user-writing 插件名（原 `Ib`，导出 `zl`）。 */
+export const USER_WRITING_PLUGIN_NAME = "user-writing";
+
+/** visualize 插件名（原 `Lb`，导出 `Bl`）。 */
+export const VISUALIZE_PLUGIN_NAME = "visualize";
+
 /** browser-use 插件名（原 `$te`，导出 `su`）。 */
 export const BROWSER_USE_PLUGIN_NAME = "browser-use";
 
@@ -287,6 +314,18 @@ export function buildAutoInstallOptOutKey(pluginName: string): string | undefine
 
 /** CODEX_CLI_PATH env key（原 `_b`，导出 `Gl`）。 */
 export const CODEX_CLI_PATH_ENV_KEY = "CODEX_CLI_PATH";
+
+/** NODE_REPL_NODE_MODULE_DIRS env key（原 `vb`，导出 `ql`）。 */
+export const NODE_REPL_MODULE_DIR_ENV_KEY = "NODE_REPL_NODE_MODULE_DIRS";
+
+/** NODE_REPL_NODE_PATH env key（原 `yb`，导出 `Jl`）。 */
+export const NODE_REPL_COMMAND_ENV_KEY = "NODE_REPL_NODE_PATH";
+
+/** NODE_REPL_REQUEST_META env key（原 `bb`，导出 `Yl`）。 */
+export const NODE_REPL_REQUEST_META_ENV_KEY = "NODE_REPL_REQUEST_META";
+
+/** node_repl MCP server 名（原 `xb`，导出 `Xl`）。 */
+export const NODE_REPL_MCP_SERVER_NAME = "node_repl";
 
 /** NODE_REPL_TRUSTED_SERVICES env key（原 `ine`，导出 `$l`）。 */
 export const NODE_REPL_TRUSTED_SERVICES_ENV_KEY = "NODE_REPL_TRUSTED_SERVICES";
@@ -394,6 +433,13 @@ export function isSamePath(a: string, b: string): boolean {
   return mappingA != null && mappingB != null && (mappingA.explicit || mappingB.explicit) && mappingA.comparablePath === mappingB.comparablePath;
 }
 
+/** 剥 \\?\ / \\.\ 设备前缀（原 `Kb`，导出 `Dl`）。 */
+export function toPosixPath(path: string): string {
+  return path.startsWith("\\\\?\\") || path.startsWith("\\\\.\\")
+    ? path.slice(4).replace(/^UNC\\/i, "\\\\")
+    : path;
+}
+
 /** posix join（原 `rx`，导出 `Cl`）。 */
 export function joinPath(base: string | null, child: string | null): string {
   return base ? (child ? `${base.replace(/\/+$/, "")}/${child.replace(/^\/+/, "")}` : base) : (child ?? "");
@@ -423,12 +469,26 @@ export {
   COWORK_MARKETPLACE_NAME as uu,
   BROWSER_PLUGIN_NAME as ou,
   BROWSER_USE_PLUGIN_NAME as su,
+  CHROME_PLUGIN_NAME as Ml,
+  CHROME_DEV_PLUGIN_NAME as Al,
+  CHROME_INTERNAL_PLUGIN_NAME as jl,
+  COMPUTER_USE_PLUGIN_NAME as Fl,
+  UNIFIED_COMPUTER_USE_PLUGIN_NAME as Rl,
+  COMPUTER_HISTORY_PLUGIN_NAME as Pl,
+  CODEX_APP_TOOLS_PLUGIN_NAME as Nl,
+  USER_WRITING_PLUGIN_NAME as zl,
+  VISUALIZE_PLUGIN_NAME as Bl,
+  BUNDLED_PLUGIN_DESCRIPTORS as Ll,
   COMPUTER_USE_MCP_SERVER_NAME as Kl,
   DEFAULT_MARKETPLACE_NAME as Vl,
   marketplaceNameForFlavor as Ul,
   isBundledMarketplaceName as Wl,
   buildAutoInstallOptOutKey as Hl,
   CODEX_CLI_PATH_ENV_KEY as Gl,
+  NODE_REPL_MODULE_DIR_ENV_KEY as ql,
+  NODE_REPL_COMMAND_ENV_KEY as Jl,
+  NODE_REPL_REQUEST_META_ENV_KEY as Yl,
+  NODE_REPL_MCP_SERVER_NAME as Xl,
   NODE_REPL_TRUSTED_SERVICES_ENV_KEY as $l,
   isComputerUseServerName as tu,
   toForwardSlashes as Tl,
@@ -439,6 +499,7 @@ export {
   normalizeUncPath as wl,
   stripDriveLetterSlash as El,
   stripWindowsExtendedPrefix as _l,
+  toPosixPath as Dl,
   stripDrivePrefix as Ol,
   isSamePath as gl,
   joinPath as Cl,

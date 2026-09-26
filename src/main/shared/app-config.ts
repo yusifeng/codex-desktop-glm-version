@@ -33,7 +33,7 @@
 import { z } from "zod";
 
 import { BROWSER_CONTEXT_KINDS } from "./browser-context";
-import { compareSemver, isValidSemver } from "./app-server-version";
+import { appServerSupportsFeature, compareSemver, isValidSemver } from "./app-server-version";
 
 // ---------------------------------------------------------------------------
 // 应用品牌（原 `ev`/`tv`/`rv`）
@@ -390,6 +390,17 @@ export function configKeyPath(key: string): string {
   return key.startsWith(FEATURES_PREFIX) ? key : `${FEATURES_PREFIX}${key}`;
 }
 
+/** 插件 MCP 配置覆盖键（原 `SC`：pluginMcpConfigOverrides 门控开启时）。 */
+const PLUGIN_MCP_CONFIG_OVERRIDE_KEY = "plugins.codex-app-tools@openai-bundled.mcp_servers.codex_app.enabled_tools";
+
+/** 内建 MCP 配置覆盖键（原 `CC`）。 */
+const BUILTIN_MCP_CONFIG_OVERRIDE_KEY = "mcp_servers.codex_app.enabled_tools";
+
+/** config 覆盖键（原 `wC`，导出 `Dc`）。 */
+export function configOverrideKeyForVersion(appServerVersion: string | null): string {
+  return appServerSupportsFeature(appServerVersion, "pluginMcpConfigOverrides") ? PLUGIN_MCP_CONFIG_OVERRIDE_KEY : BUILTIN_MCP_CONFIG_OVERRIDE_KEY;
+}
+
 /** 深合并（lodash mergeWith 语义的受限实现）。 */
 function deepMergeWith(target: Record<string, unknown>, ...sources: Record<string, unknown>[]): Record<string, unknown> {
   for (const source of sources) {
@@ -428,4 +439,5 @@ export {
   composeDefaultEnableFeatures as rc,
   composeFeatureOverrides as tc,
   configKeyPath as oc,
+  configOverrideKeyForVersion as Dc,
 };
