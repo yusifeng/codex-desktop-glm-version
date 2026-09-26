@@ -321,7 +321,7 @@ declare module "@rchunk/browser-profile-import-analytics" {
 }
 
 declare module "@rchunk/browser-profile-import-dialog" {
-  export const BrowserProfileImportDialogModal: unknown;
+  export const BrowserProfileImportDialogModal: (...args: any[]) => any;
 }
 
 declare module "@rchunk/browser-profile-import-query" {

@@ -874,6 +874,7 @@ export const REWRITTEN = new Set([
   "browser-profile-import-availability",
   "browser-profile-import-analytics",
   "browser-profile-import-query",
+  "browser-profile-import-dialog",
   "home-starter-prompts",
   "home-announcement-state",
   "codex-micro-onboarding-animation",
