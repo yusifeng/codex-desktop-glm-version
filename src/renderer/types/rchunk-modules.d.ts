@@ -320,6 +320,22 @@ declare module "@rchunk/app-shared" {
   export const Ad: (props: CheckboxProps) => unknown;
   /** initializeCheckbox（内部 Imt）。 */
   export const jd: () => void;
+  export type LazyComponent<Props extends Record<string, unknown>> = (
+    props: Props,
+  ) => unknown;
+  export interface LazyComponentOptions<Props extends Record<string, unknown>> {
+    errorFallback?: unknown | LazyComponent<Props>;
+    fallback?: unknown;
+    propagateLoadError?: boolean;
+    suspendToParent?: boolean;
+  }
+  /** createLazyComponent（app-shared/ui/lazy-component.ts，内部 cct）。 */
+  export const Jm: <Props extends Record<string, unknown>>(
+    load: () => Promise<LazyComponent<Props>>,
+    options?: LazyComponentOptions<Props>,
+  ) => LazyComponent<Props>;
+  /** initializeLazyComponent（内部 sct）。 */
+  export const Xm: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
