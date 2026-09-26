@@ -6,35 +6,163 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-let React: any;
-let jsx: any;
+
+type SlugStatusState =
+  | "available"
+  | "checking"
+  | "error"
+  | "invalid-format"
+  | "requirements"
+  | "unavailable"
+  | null;
+
+interface ReactRuntime {
+  useState<Value>(
+    initialValue: Value,
+  ): [Value, (value: Value | ((current: Value) => Value)) => void];
+}
+
+interface JsxRuntime {
+  jsx(component: unknown, props: Record<string, unknown>): unknown;
+  jsxs(component: unknown, props: Record<string, unknown>): unknown;
+}
+
+interface SlugAvailability extends Record<string, unknown> {
+  available: boolean;
+  slug: string;
+}
+
+interface AppgenChangeSlugDialogProps {
+  currentSlug: string;
+  hostedDomainSuffix?: string | null;
+  onClose(): void;
+  projectId: string;
+}
+
+interface SlugInputProps {
+  describedBy: string;
+  disabled: boolean;
+  hasValidationError: boolean;
+  hostedDomainSuffix?: string | null;
+  label: string;
+  onChange(value: string): void;
+  value: string;
+}
+
+interface SlugStatusProps {
+  onRetry(): void;
+  state: SlugStatusState;
+}
+
+interface FormSubmitEvent {
+  preventDefault(): void;
+}
+
+interface TextInputChangeEvent {
+  target: { value: string };
+}
+
+interface PlainIntl {
+  formatMessage(
+    descriptor: import("@rchunk/app-shared").MessageDescriptor,
+  ): string;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  I3: jsxRuntimeFactory,
+  e6: reactRuntimeFactory,
+  lk: initializeSlugDialogAssets,
+} = appSharedChunk as unknown as {
+  $3(): void;
+  I3(): JsxRuntime;
+  e6(): ReactRuntime;
+  lk(): void;
+};
+const {
+  Ah: DialogHeader,
+  BX: useScopedMutation,
+  FX: initializeMaitaiRuntime,
+  G2: defineMessages,
+  Ih: Dialog,
+  K2: initializeMessageRuntime,
+  Lh: DialogDescription,
+  LX: useScope,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  QI: initializeAppScope,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: appScopeRoot,
+  Zh: initializeButton,
+  _L: useQuery,
+  gL: initializeUseQuery,
+  h4: initializeIntlHook,
+  jh: DialogSection,
+  kh: DialogFooter,
+  m4: classNames,
+  n4: useIntl,
+  pk: toastManagerSignal,
+  zh: initializeDialog,
+} = appSharedChunk;
+const {
+  Cht: useDebouncedValue,
+  Sht: initializeDebouncedValue,
+  Xin: appgenSlugAvailabilityQueryKey,
+  _an: initializeAppgenQueries,
+  ean: changeSlugMutation,
+  pan: checkSlugAvailability,
+} = appInitialChunk as unknown as {
+  Cht(value: string, delay: number): string;
+  Sht(): void;
+  Xin: readonly unknown[];
+  _an(): void;
+  ean: import("@rchunk/app-shared").ScopedMutationFamily<
+    unknown,
+    string,
+    unknown,
+    Error,
+    string,
+    unknown
+  >;
+  pan(projectId: string, slug: string): Promise<SlugAvailability>;
+};
+
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 let SLUG_PATTERN: RegExp;
 let DOMAIN_DESCRIPTION_ID: string;
 let STATUS_DESCRIPTION_ID: string;
-let STATUS_MESSAGES: Record<string, any>;
+let STATUS_MESSAGES: Record<
+  Exclude<SlugStatusState, null>,
+  import("@rchunk/app-shared").MessageDescriptor
+>;
 
 function AppgenChangeSlugDialog({
   currentSlug,
   hostedDomainSuffix,
   onClose,
   projectId,
-}: any) {
-  const scope = appShared.LX(appShared.ZI);
-  const intl = appShared.n4();
-  const mutation = appShared.BX(appInitial.ean, projectId);
+}: AppgenChangeSlugDialogProps): unknown {
+  const scope = useScope(appScopeRoot);
+  const intl = useIntl() as PlainIntl;
+  const mutation = useScopedMutation(changeSlugMutation, projectId);
   const [inputValue, setInputValue] = React.useState(currentSlug);
   const normalizedSlug = inputValue.trim().toLowerCase();
-  const debouncedSlug = appInitial.Cht(normalizedSlug, 400);
+  const debouncedSlug = useDebouncedValue(normalizedSlug, 400);
   const unchanged = normalizedSlug === currentSlug;
   const invalidFormat =
     normalizedSlug.length > 0 && !SLUG_PATTERN.test(normalizedSlug);
   const validChangedSlug = !unchanged && SLUG_PATTERN.test(normalizedSlug);
-  const queryKey = [...appInitial.Xin, projectId, debouncedSlug];
-  const queryFn = () => appInitial.pan(projectId, debouncedSlug);
+  const queryKey = [
+    ...appgenSlugAvailabilityQueryKey,
+    projectId,
+    debouncedSlug,
+  ];
+  const queryFn = () => checkSlugAvailability(projectId, debouncedSlug);
   const queryEnabled = validChangedSlug && debouncedSlug === normalizedSlug;
-  const availabilityQuery = appShared._L({
+  const availabilityQuery = useQuery<SlugAvailability>({
     queryKey,
     queryFn,
     enabled: queryEnabled,
@@ -54,8 +182,8 @@ function AppgenChangeSlugDialog({
   const unavailable = currentResult?.available === false;
   const hasValidationError = invalidFormat || unavailable;
 
-  let status = "requirements";
-  if (unchanged) status = null as any;
+  let status: SlugStatusState = "requirements";
+  if (unchanged) status = null;
   else if (invalidFormat) status = "invalid-format";
   else if (validChangedSlug && (debouncedSlug !== normalizedSlug || isFetching))
     status = "checking";
@@ -72,13 +200,13 @@ function AppgenChangeSlugDialog({
   const onOpenChange = (open: boolean) => {
     if (!open && !mutation.isPending) onClose();
   };
-  const onSubmit = (event: any) => {
+  const onSubmit = (event: FormSubmitEvent) => {
     event.preventDefault();
     if (available && !mutation.isPending) {
       mutation.mutateAsync(normalizedSlug).then(
         () => onClose(),
         () => {
-          scope.get(appShared.pk).danger(
+          scope.get(toastManagerSignal).danger(
             intl.formatMessage({
               id: "appgenSettings.general.url.changeDialog.submitError",
               defaultMessage: "Unable to change site URL",
@@ -92,17 +220,17 @@ function AppgenChangeSlugDialog({
     }
   };
 
-  const title = jsx.jsx(appShared.Rh, {
-    children: jsx.jsx(appShared.Y2, {
+  const title = jsx.jsx(DialogTitle, {
+    children: jsx.jsx(FormattedMessage, {
       id: "appgenSettings.general.url.changeDialog.title",
       defaultMessage: "Change URL",
       description: "Title of the dialog for changing a Site's hosted URL",
     }),
   });
-  const header = jsx.jsx(appShared.Ah, {
+  const header = jsx.jsx(DialogHeader, {
     title,
-    subtitle: jsx.jsx(appShared.Lh, {
-      children: jsx.jsx(appShared.Y2, {
+    subtitle: jsx.jsx(DialogDescription, {
+      children: jsx.jsx(FormattedMessage, {
         id: "appgenSettings.general.url.changeDialog.description",
         defaultMessage: "Enter a new web address for your site",
         description:
@@ -128,43 +256,43 @@ function AppgenChangeSlugDialog({
     state: status,
     onRetry: () => void refetch(),
   });
-  const content = jsx.jsxs(appShared.jh, {
+  const content = jsx.jsxs(DialogSection, {
     className: "gap-2",
     children: [field, statusMessage],
   });
-  const cancel = jsx.jsx(appShared.Yh, {
+  const cancel = jsx.jsx(Button, {
     color: "ghostSecondary",
     disabled: mutation.isPending,
     onClick: onClose,
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "appgenSettings.general.url.changeDialog.cancel",
       defaultMessage: "Cancel",
       description:
         "Button that closes the Site URL change dialog without saving",
     }),
   });
-  const submit = jsx.jsx(appShared.Yh, {
+  const submit = jsx.jsx(Button, {
     disabled: !available,
     loading: mutation.isPending,
     type: "submit",
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "appgenSettings.general.url.changeDialog.submit",
       defaultMessage: "Change URL",
       description: "Button that submits a new hosted URL name for a Site",
     }),
   });
-  const footer = jsx.jsxs(appShared.kh, {
+  const footer = jsx.jsxs(DialogFooter, {
     className: "mt-10",
     children: [cancel, submit],
   });
-  const form = jsx.jsxs(appShared.Oh, {
+  const form = jsx.jsxs(DialogBody, {
     as: "form",
     className: "gap-0 px-4 pt-3.5 pb-4",
     onSubmit,
     children: [header, content, footer],
   });
 
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: true,
     size: "compact",
     shouldIgnoreClickOutside: mutation.isPending,
@@ -174,7 +302,7 @@ function AppgenChangeSlugDialog({
   });
 }
 
-function isPresent(value: unknown): boolean {
+function isPresent<Value>(value: Value | null | undefined): value is Value {
   return value != null;
 }
 
@@ -186,8 +314,8 @@ function SlugInput({
   label,
   onChange,
   value,
-}: any) {
-  const className = appShared.m4(
+}: SlugInputProps): unknown {
+  const className = classNames(
     "flex h-9 w-full min-w-0 items-center overflow-hidden rounded-md border border-primary-outline bg-primary-soft text-sm text-default",
     !hasValidationError && "focus-within:border-chart-blue",
     hasValidationError && "border-text-danger ring-2 ring-text-danger/20",
@@ -207,7 +335,7 @@ function SlugInput({
     spellCheck: false,
     type: "text",
     value,
-    onChange: (event: any) => onChange(event.target.value),
+    onChange: (event: TextInputChangeEvent) => onChange(event.target.value),
   });
   const suffix =
     hostedDomainSuffix == null
@@ -221,7 +349,7 @@ function SlugInput({
   return jsx.jsxs("div", { className, children: [input, suffix] });
 }
 
-function SlugStatus({ onRetry, state }: any) {
+function SlugStatus({ onRetry, state }: SlugStatusProps): unknown {
   if (state == null) return null;
   const isError =
     state === "error" || state === "invalid-format" || state === "unavailable";
@@ -233,11 +361,11 @@ function SlugStatus({ onRetry, state }: any) {
         : "text-secondary";
   const retry =
     state === "error"
-      ? jsx.jsx(appShared.Yh, {
+      ? jsx.jsx(Button, {
           color: "ghost",
           size: "compact",
           onClick: onRetry,
-          children: jsx.jsx(appShared.Y2, {
+          children: jsx.jsx(FormattedMessage, {
             id: "appgenSettings.general.url.changeDialog.retry",
             defaultMessage: "Retry",
             description:
@@ -249,29 +377,29 @@ function SlugStatus({ onRetry, state }: any) {
     id: STATUS_DESCRIPTION_ID,
     className: `flex min-h-6 items-center gap-1 text-xs ${colorClass}`,
     role: isError ? "alert" : "status",
-    children: [jsx.jsx(appShared.Y2, { ...STATUS_MESSAGES[state] }), retry],
+    children: [jsx.jsx(FormattedMessage, { ...STATUS_MESSAGES[state] }), retry],
   });
 }
 
 function initializeAppgenChangeSlugDialog(): void {
-  appShared.$3();
-  appShared.gL();
-  appShared.h4();
-  appShared.FX();
-  React = appShared.e6();
-  appShared.K2();
-  appShared.Zh();
-  appShared.zh();
-  appShared.Ph();
-  appShared.lk();
-  appShared.QI();
-  appInitial.Sht();
-  appInitial._an();
-  jsx = appShared.I3();
+  initializeRuntimeLazy();
+  initializeUseQuery();
+  initializeIntlHook();
+  initializeMaitaiRuntime();
+  React = reactRuntimeFactory();
+  initializeMessageRuntime();
+  initializeButton();
+  initializeDialog();
+  initializeDialogLayout();
+  initializeSlugDialogAssets();
+  initializeAppScope();
+  initializeDebouncedValue();
+  initializeAppgenQueries();
+  jsx = jsxRuntimeFactory();
   SLUG_PATTERN = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u;
   DOMAIN_DESCRIPTION_ID = "appgen-site-slug-domain";
   STATUS_DESCRIPTION_ID = "appgen-site-slug-status";
-  STATUS_MESSAGES = appShared.G2({
+  STATUS_MESSAGES = defineMessages({
     available: {
       id: "appgenSettings.general.url.changeDialog.available",
       defaultMessage: "URL is available",
