@@ -851,6 +851,7 @@ export const REWRITTEN = new Set([
   "chatgpt-onboarding-dialog",
   "onboarding-login-content",
   "codex-app-home-beacon-announcement-core",
+  "realtime-voice-home-announcement",
   "codex-micro-onboarding-host",
   "home-artifact-template-card",
   "home-artifact-templates",

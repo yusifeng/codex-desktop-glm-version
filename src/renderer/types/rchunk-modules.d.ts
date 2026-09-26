@@ -593,6 +593,10 @@ declare module "@rchunk/wallet-onboarding-announcement-modal" {
   export const WalletOnboardingAnnouncementModal: unknown;
 }
 
+declare module "@rchunk/realtime-voice-home-announcement" {
+  export const RealtimeVoiceHomeAnnouncementContent: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
