@@ -68,6 +68,24 @@ declare module "@rchunk/app-shared" {
   export const Yh: (props: ButtonProps) => unknown;
   /** initializeButton（app-shared/ui/button.ts，内部 c8）。 */
   export const Zh: () => void;
+  export interface MoreButtonClickEvent {
+    stopPropagation(): void;
+  }
+  export interface MoreButtonProps
+    extends Omit<
+      ButtonProps,
+      "children" | "color" | "onClick" | "size" | "uniform"
+    > {
+    label: string;
+    onClick?: (event: MoreButtonClickEvent) => void;
+    size?: ButtonSize;
+    iconClassName?: string;
+    uniform?: boolean;
+  }
+  /** MoreButton（app-shared/ui/more-button.ts，内部 q_t）。 */
+  export const gu: (props: MoreButtonProps) => unknown;
+  /** initializeMoreButton（内部 X_t）。 */
+  export const _u: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
