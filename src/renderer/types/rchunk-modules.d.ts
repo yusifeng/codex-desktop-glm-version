@@ -177,6 +177,11 @@ declare module "@rchunk/composer-browser-skills-state" {
   export const t: () => void;
 }
 
+declare module "@rchunk/home-task-suggestions-core" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
