@@ -186,6 +186,8 @@ declare module "@rchunk/browser-address-suggestion-overlay" { export const Brows
 declare module "@rchunk/home-beacon" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
+declare module "@rchunk/codex-micro-mini-games" { export const _any: any; }
+declare module "@rchunk/codex-micro-mini-game-composer" { export const CodexMicroMiniGameComposer: unknown; }
 
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
   export const a: () => void;
