@@ -725,6 +725,25 @@ declare module "@rchunk/app-shared" {
   };
   /** appgenInteractionActions（app-shared/runtime/appgen-interaction-action.ts，内部 bq）。 */
   export const Bk: AppgenInteractionActions;
+  export type AppgenInteractionPage =
+    | "CODEX_APPGEN_INTERACTION_PAGE_UNSPECIFIED"
+    | "CODEX_APPGEN_INTERACTION_PAGE_ANALYTICS"
+    | "CODEX_APPGEN_INTERACTION_PAGE_SETTINGS"
+    | "CODEX_APPGEN_INTERACTION_PAGE_DATABASE"
+    | "UNRECOGNIZED";
+  export interface AppgenInteractionPages {
+    readonly CODEX_APPGEN_INTERACTION_PAGE_UNSPECIFIED:
+      "CODEX_APPGEN_INTERACTION_PAGE_UNSPECIFIED";
+    readonly CODEX_APPGEN_INTERACTION_PAGE_ANALYTICS:
+      "CODEX_APPGEN_INTERACTION_PAGE_ANALYTICS";
+    readonly CODEX_APPGEN_INTERACTION_PAGE_SETTINGS:
+      "CODEX_APPGEN_INTERACTION_PAGE_SETTINGS";
+    readonly CODEX_APPGEN_INTERACTION_PAGE_DATABASE:
+      "CODEX_APPGEN_INTERACTION_PAGE_DATABASE";
+    readonly UNRECOGNIZED: "UNRECOGNIZED";
+  }
+  /** appgenInteractionPages（app-shared/runtime/appgen-interaction-page.ts，内部 Cq）。 */
+  export const Vk: AppgenInteractionPages;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
   export const FQ: unknown;
