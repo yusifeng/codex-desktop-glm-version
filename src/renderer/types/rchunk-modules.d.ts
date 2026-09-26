@@ -324,6 +324,30 @@ declare module "@rchunk/browser-profile-import-dialog" {
   export const BrowserProfileImportDialogModal: unknown;
 }
 
+declare module "@rchunk/browser-profile-import-query" {
+  export const a: (...args: any[]) => any;
+  export const c: Record<string, any>;
+  export const d: () => void;
+  export const i: () => void;
+  export const l: () => void;
+  export const n: (...args: any[]) => any;
+  export const o: (...args: any[]) => any;
+  export const r: (...args: any[]) => any;
+  export const s: () => void;
+  export const t: (...args: any[]) => any;
+  export const u: (...args: any[]) => any;
+}
+
+declare module "@rchunk/browser-profile-import-cookies-icon" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/browser-profile-import-history-icon" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }

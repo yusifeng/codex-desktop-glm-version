@@ -352,7 +352,7 @@ function recordAttemptFinished(
     ...outcomes,
   });
 
-  const safe = {
+  const safe: Record<string, unknown> = {
     entryPoint: entryPointValue(entryPoint),
     source: sourceValue(request.source),
     cookiesRequested: request.importCookies !== false,
