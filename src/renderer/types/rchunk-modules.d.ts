@@ -495,6 +495,34 @@ declare module "@rchunk/app-shared" {
   }) => AutomationModelSelection;
   /** initializeAutomationModels（内部 nR）。 */
   export const RY: () => void;
+  export interface HeartbeatPrompt {
+    automationId: string | null;
+    currentTimeIso: string;
+    instructions: string;
+  }
+  export interface AutomationInputItem extends Record<string, unknown> {
+    type: string;
+    text?: string;
+  }
+  export interface AutomationToolOutput extends Record<string, unknown> {
+    namespace?: string;
+    name?: string;
+    output?: unknown;
+  }
+  /** parseHeartbeatPrompt（app-shared/runtime/automation-heartbeat.ts，内部 rR）。 */
+  export const kY: (source: string) => HeartbeatPrompt | null;
+  /** parseHeartbeatInput（内部 RNe）。 */
+  export const AY: (
+    input: readonly AutomationInputItem[] | null | undefined,
+  ) => HeartbeatPrompt | null;
+  /** initializeHeartbeatInputParser（内部 zNe）。 */
+  export const OY: () => void;
+  /** extractAutomationUpdateOutput（内部 BNe）。 */
+  export const EY: (
+    toolOutput: AutomationToolOutput | null | undefined,
+  ) => string | null;
+  /** initializeAutomationUpdateOutputParser（内部 aR）。 */
+  export const DY: () => void;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
     readonly query: {
