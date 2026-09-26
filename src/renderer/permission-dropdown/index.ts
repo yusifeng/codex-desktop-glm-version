@@ -5,10 +5,40 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeReactRuntime,
+  I3: getJsxRuntime,
+  If: initializeMenu,
+  cy: ChevronIcon,
+  iy: CheckIcon,
+  jf: Menu,
+  kf: DropdownMenu,
+  lw: initializePermissionIcons,
+} = appSharedChunk;
+const jsx = getJsxRuntime();
 
-function PermissionDropdown({
+type PermissionValue = string | number;
+
+interface PermissionOption<Value extends PermissionValue> {
+  ariaLabel?: string;
+  description?: string | null;
+  disabled?: boolean;
+  tooltipText?: unknown;
+  value: Value;
+}
+
+interface PermissionDropdownProps<Value extends PermissionValue> {
+  disabled?: boolean;
+  onChange?: (value: Value) => void;
+  onRemoveAccess?: () => void;
+  options: readonly PermissionOption<Value>[];
+  removeLabel?: unknown;
+  renderLabel: (value: Value) => unknown;
+  value: Value;
+  variant?: "default" | "inline";
+}
+
+function PermissionDropdown<Value extends PermissionValue>({
   options,
   disabled = false,
   renderLabel,
@@ -17,16 +47,7 @@ function PermissionDropdown({
   value,
   onChange,
   onRemoveAccess,
-}: {
-  options: any[];
-  disabled?: boolean;
-  renderLabel: (value: any) => any;
-  removeLabel?: any;
-  variant?: "default" | "inline";
-  value: any;
-  onChange?: (value: any) => void;
-  onRemoveAccess?: () => void;
-}) {
+}: PermissionDropdownProps<Value>): unknown {
   const triggerClassName =
     variant === "inline"
       ? "flex shrink-0 cursor-interaction items-center gap-1 text-base text-default"
@@ -37,17 +58,17 @@ function PermissionDropdown({
     className: triggerClassName,
     children: [
       renderLabel(value),
-      jsx.jsx(appShared.cy, { className: "text-codex-description" }),
+      jsx.jsx(ChevronIcon, { className: "text-codex-description" }),
     ],
   });
   const optionItems = options.map((option) =>
     jsx.jsx(
-      appShared.jf.Item,
+      Menu.Item,
       {
         "aria-description": option.description,
         "aria-label": option.ariaLabel,
         disabled: disabled || option.disabled,
-        RightIcon: option.value === value ? appShared.iy : undefined,
+        RightIcon: option.value === value ? CheckIcon : undefined,
         SubText:
           option.description == null
             ? undefined
@@ -65,8 +86,8 @@ function PermissionDropdown({
       ? null
       : jsx.jsxs(jsx.Fragment, {
           children: [
-            jsx.jsx(appShared.jf.Separator, {}),
-            jsx.jsx(appShared.jf.Item, {
+            jsx.jsx(Menu.Separator, {}),
+            jsx.jsx(Menu.Item, {
               disabled,
               onSelect: onRemoveAccess,
               children: jsx.jsx("span", {
@@ -77,7 +98,7 @@ function PermissionDropdown({
           ],
         });
 
-  return jsx.jsxs(appShared.kf, {
+  return jsx.jsxs(DropdownMenu, {
     align: "end",
     contentWidth: "xs",
     disabled,
@@ -87,9 +108,9 @@ function PermissionDropdown({
 }
 
 function initializePermissionDropdown(): void {
-  appShared.$3?.();
-  appShared.If?.();
-  appShared.lw?.();
+  initializeReactRuntime();
+  initializeMenu();
+  initializePermissionIcons();
 }
 
 export { initializePermissionDropdown as n, PermissionDropdown as t };

@@ -1093,6 +1093,12 @@ declare module "@rchunk/app-shared" {
   export const AS: (props: IconAssetProps) => unknown;
   /** browser-profile-import 图标依赖初始化器。 */
   export const lw: () => void;
+  export interface SimpleIconProps extends Record<string, unknown> {
+    className?: string;
+  }
+  /** Permission dropdown 的 chevron 与选中图标。 */
+  export const cy: (props: SimpleIconProps) => unknown;
+  export const iy: (props: SimpleIconProps) => unknown;
   /** Report 图标组件（内部 F9e）。 */
   export const mb: (props: Record<string, unknown>) => unknown;
   /** query runtime 初始化器。 */
@@ -3586,8 +3592,28 @@ declare module "@rchunk/dialog-action" {
 }
 
 declare module "@rchunk/permission-dropdown" {
+  export type PermissionValue = string | number;
+  export interface PermissionOption<Value extends PermissionValue> {
+    ariaLabel?: string;
+    description?: string | null;
+    disabled?: boolean;
+    tooltipText?: unknown;
+    value: Value;
+  }
+  export interface PermissionDropdownProps<Value extends PermissionValue> {
+    disabled?: boolean;
+    onChange?: (value: Value) => void;
+    onRemoveAccess?: () => void;
+    options: readonly PermissionOption<Value>[];
+    removeLabel?: unknown;
+    renderLabel: (value: Value) => unknown;
+    value: Value;
+    variant?: "default" | "inline";
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: <Value extends PermissionValue>(
+    props: PermissionDropdownProps<Value>,
+  ) => unknown;
 }
 
 declare module "@rchunk/appgen-site-card" {
