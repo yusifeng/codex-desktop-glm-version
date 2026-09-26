@@ -42,7 +42,9 @@ declare module "@rchunk/app-shared" {
   export const g_: unknown;
   export const h4: unknown;
   export const i$: unknown;
+  export const iW: (path: string) => string;
   export const lk: unknown;
+  export const wL: () => void;
   export const m4: unknown; // intl message（J）
   export const mZ: any;
   export const n$: unknown;
@@ -74,6 +76,13 @@ declare module "@rchunk/app-initial" {
   export const Rht: any;
   export const kht: any;
   export const zPt: any;
+  export const $ln: (key: string) => readonly unknown[];
+  export const Qln: (event: string, payload: unknown) => Promise<unknown>;
+  export const aun: () => void;
+  export const nun: () => void;
+  export const oun: (queryClient: unknown, key: unknown) => Promise<unknown>;
+  export const q3t: unknown;
+  export const s6t: () => void;
   // scroll-to-match 依赖：CUt=查找器装配器 xUt=matchId 元素查找器
   export const CUt: unknown;
   export const xUt: unknown;
@@ -141,7 +150,7 @@ declare module "@rchunk/home-suggestion-surface" {
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
   export const a: () => void;
   export const i: unknown;
-  export const n: unknown;
+  export const n: (hostId: string) => readonly string[];
   export const o: unknown;
   export const r: unknown;
   export const t: unknown;
@@ -231,6 +240,11 @@ declare module "@rchunk/composer-overlay" {
 declare module "@rchunk/above-composer-fixed-content-surface" {
   export const n: () => void;
   export const t: unknown;
+}
+
+declare module "@rchunk/first-app-connect-ambient-suggestions" {
+  export const n: unknown;
+  export const t: () => void;
 }
 
 declare module "@rchunk/rpc" {
