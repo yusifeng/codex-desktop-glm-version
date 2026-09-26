@@ -336,6 +336,24 @@ declare module "@rchunk/app-shared" {
   ) => LazyComponent<Props>;
   /** initializeLazyComponent（内部 sct）。 */
   export const Xm: () => void;
+  export interface QueryOptionsShape {
+    queryKey: readonly unknown[];
+  }
+  export interface InfiniteQueryOptionsShape extends QueryOptionsShape {
+    initialPageParam: unknown;
+  }
+  /** queryOptions（app-shared/runtime/query-options.ts，内部 eJe）。 */
+  export const pL: <Options extends QueryOptionsShape>(options: Options) => Options;
+  /** initializeQueryOptions（内部 tJe）。 */
+  export const fL: () => void;
+  /** infiniteQueryOptions（内部 nJe）。 */
+  export const uL: <Options extends InfiniteQueryOptionsShape>(options: Options) => Options;
+  /** initializeInfiniteQueryOptions（内部 rJe）。 */
+  export const dL: () => void;
+  /** mutationOptions（内部 fJe）。 */
+  export const nL: <Options extends Record<string, unknown>>(options: Options) => Options;
+  /** initializeMutationOptions（内部 pJe）。 */
+  export const tL: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
