@@ -85,7 +85,7 @@ declare module "@chunk/shared" {
   export const Au: any; // 内部符号: Ly
   export const B: any; // 内部符号: Yae
   export const Ba: any; // 内部符号: zA
-  export const Bc: any; // 内部符号: XS
+  export { isKnownBrowserFamily as Bc } from "../../shared/browser-tab-mentions";
   export const Bd: any; // 内部符号: Zg
   export { AbortableFetchDispatcher as Bf } from "../../shared/rpc-core";
   export const Bi: any; // 内部符号: Bj
@@ -140,7 +140,7 @@ declare module "@chunk/shared" {
   export const Eu: any; // 内部符号: Jy
   export const F: any; // 内部符号: T7
   export const Fa: any; // 内部符号: qA
-  export const Fc: any; // 内部符号: JS
+  export { buildChromiumExtensionManagementUrl as Fc } from "../../shared/browser-tab-mentions";
   export { permissionSetAllowed as Fd } from "../../shared/sandbox-permissions";
   export const Ff: any; // 内部符号: Zd
   export const Fi: any; // 内部符号: cM
@@ -153,7 +153,7 @@ declare module "@chunk/shared" {
   export { parseElementName as Fu } from "../../shared/browser-context";
   export const G: any; // 内部符号: k5
   export const Ga: any; // 内部符号: kA
-  export const Gc: any; // 内部符号: bS
+  export { deserializeBrowserTabMention as Gc } from "../../shared/browser-tab-mentions";
   export const Gd: any; // 内部符号: Pg
   export const Gi: any; // 内部符号: cre
   export { CODEX_CLI_PATH_ENV_KEY as Gl } from "../../shared/app-constants";
@@ -165,7 +165,7 @@ declare module "@chunk/shared" {
   export { supportsRecencySortKey as Gu } from "../../shared/app-server-version";
   export const H: any; // 内部符号: q5
   export const Ha: any; // 内部符号: LA
-  export const Hc: any; // 内部符号: yS
+  export { mentionsWithinBudget as Hc } from "../../shared/browser-tab-mentions";
   export const Hd: any; // 内部符号: Ug
   export { RpcStubLike as Hf } from "../../shared/rpc-core";
   export const Hi: any; // 内部符号: lre
@@ -178,7 +178,7 @@ declare module "@chunk/shared" {
   export { normalizeWindowsStoreBuildVersion as Hu } from "../../shared/app-server-version";
   export const I: any; // 内部符号: ioe
   export const Ia: any; // 内部符号: GA
-  export const Ic: any; // 内部符号: YS
+  export { browserFamilyForProgId as Ic } from "../../shared/browser-tab-mentions";
   export { availablePermissionProfileKinds as Id } from "../../shared/sandbox-permissions";
   export const If: any; // 内部符号: Gd
   export const Ii: any; // 内部符号: hre
@@ -203,7 +203,7 @@ declare module "@chunk/shared" {
   export { parseVersionOutput as Ju } from "../../shared/app-server-version";
   export const K: any; // 内部符号: pae
   export const Ka: any; // 内部符号: SA
-  export const Kc: any; // 内部符号: cS
+  export { hasValidUnicode as Kc } from "../../shared/browser-tab-mentions";
   export const Kd: any; // 内部符号: Mg
   export const Ki: any; // 内部符号: Nj
   export { COMPUTER_USE_MCP_SERVER_NAME as Kl } from "../../shared/app-constants";
@@ -215,7 +215,7 @@ declare module "@chunk/shared" {
   export { supportsPaginatedHistory as Ku } from "../../shared/app-server-version";
   export const L: any; // 内部符号: toe
   export const La: any; // 内部符号: WA
-  export const Lc: any; // 内部符号: GS
+  export { findDistribution as Lc } from "../../shared/browser-tab-mentions";
   export { deepEquals as Ld } from "../../shared/sandbox-permissions";
   export const Lf: any; // 内部符号: Ud
   export const Li: any; // 内部符号: fre
@@ -228,7 +228,7 @@ declare module "@chunk/shared" {
   export { parseBrowserContextKind as Lu } from "../../shared/browser-context";
   export const M: any; // 内部符号: C7
   export const Ma: any; // 内部符号: XA
-  export const Mc: any; // 内部符号: tC
+  export { candidateLimitForQuery as Mc } from "../../shared/browser-tab-mentions";
   export { sandboxModeOfPolicy as Md } from "../../shared/sandbox-permissions";
   export const Mf: any; // 内部符号: Fp
   export const Mi: any; // 内部符号: oM
@@ -241,7 +241,7 @@ declare module "@chunk/shared" {
   export const Mu: any; // 内部符号: zy
   export const N: any; // 内部符号: Doe
   export const Na: any; // 内部符号: YA
-  export const Nc: any; // 内部符号: eC
+  export { dedupeTabCandidates as Nc } from "../../shared/browser-tab-mentions";
   export { permissionParamsOf as Nd } from "../../shared/sandbox-permissions";
   export const Nf: any; // 内部符号: Of
   export const Ni: any; // 内部符号: sM
@@ -267,7 +267,7 @@ declare module "@chunk/shared" {
   export const Ou: any; // 内部符号: Yy
   export const P: any; // 内部符号: Ooe
   export const Pa: any; // 内部符号: JA
-  export const Pc: any; // 内部符号: BS
+  export { BROWSER_FAMILY_CONFIGS as Pc } from "../../shared/browser-tab-mentions";
   export { isAutomaticApprovalsReviewer as Pd } from "../../shared/sandbox-permissions";
   export const Pf: any; // 内部符号: Cf
   export const Pi: any; // 内部符号: mre
@@ -292,7 +292,7 @@ declare module "@chunk/shared" {
   export { isValidSemver as Qu } from "../../shared/app-server-version";
   export const R: any; // 内部符号: noe
   export const Ra: any; // 内部符号: HA
-  export const Rc: any; // 内部符号: US
+  export { chromeExtensionIdsForChannel as Rc } from "../../shared/browser-tab-mentions";
   export const Rd: any; // 内部符号: i_
   export const Rf: any; // 内部符号: Id
   export const Ri: any; // 内部符号: aM
@@ -344,7 +344,7 @@ declare module "@chunk/shared" {
   export { parseSemanticVersion as Uu } from "../../shared/app-server-version";
   export const V: any; // 内部符号: Jae
   export const Va: any; // 内部符号: RA
-  export const Vc: any; // 内部符号: uS
+  export { BROWSER_PLUGIN_DESCRIPTORS as Vc } from "../../shared/browser-tab-mentions";
   export const Vd: any; // 内部符号: Xg
   export { RpcConnectionLike as Vf } from "../../shared/rpc-core";
   export const Vi: any; // 内部符号: Rj
@@ -357,7 +357,7 @@ declare module "@chunk/shared" {
   export { buildMsixPackageIdentity as Vu } from "../../shared/app-server-version";
   export const W: any; // 内部符号: z5
   export const Wa: any; // 内部符号: PA
-  export const Wc: any; // 内部符号: _S
+  export { tabDedupeKey as Wc } from "../../shared/browser-tab-mentions";
   export const Wd: any; // 内部符号: Rg
   export { connectRpc as Wf } from "../../shared/rpc-core";
   export const Wi: any; // 内部符号: Pj
@@ -749,7 +749,7 @@ declare module "@chunk/shared" {
   export const yu: any; // 内部符号: Hy
   export const z: any; // 内部符号: i7
   export const za: any; // 内部符号: VA
-  export const zc: any; // 内部符号: qS
+  export { getBrowserFamilyStoreUrls as zc } from "../../shared/browser-tab-mentions";
   export const zd: any; // 内部符号: Qg
   export { ABORTED as zf } from "../../shared/rpc-core";
   export const zi: any; // 内部符号: pre
