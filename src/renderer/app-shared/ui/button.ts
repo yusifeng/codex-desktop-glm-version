@@ -583,3 +583,6 @@ export function Button(props: ButtonProps): unknown {
 export function LinkButton(props: Omit<ButtonProps, "as">): unknown {
   return renderButton({ ...props, as: "a" });
 }
+
+/** 原 `c8` / 压缩导出 `Zh`。 */
+export function initializeButton(): void {}

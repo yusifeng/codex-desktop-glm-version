@@ -58,3 +58,6 @@ export function classNames(...values: ClassValue[]): string {
   }
   return result;
 }
+
+/** 原 `Eh` / 压缩导出 `h4`。 */
+export function initializeClassNames(): void {}

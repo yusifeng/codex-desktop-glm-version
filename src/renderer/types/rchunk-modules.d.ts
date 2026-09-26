@@ -66,6 +66,8 @@ declare module "@rchunk/app-shared" {
   export const Qh: (props: LoadingSpinnerProps) => unknown;
   export const Xh: (props: Omit<ButtonProps, "as">) => unknown;
   export const Yh: (props: ButtonProps) => unknown;
+  /** initializeButton（app-shared/ui/button.ts，内部 c8）。 */
+  export const Zh: () => void;
   export interface DialogLayoutProps extends Record<string, unknown> {
     children?: unknown;
     className?: string;
@@ -253,7 +255,8 @@ declare module "@rchunk/app-shared" {
     ): ReadableSignal<T>;
   };
   export const Bk: Record<string, string>; // bq：Appgen interaction action 枚举
-  export const C_: unknown;
+  /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
+  export const C_: () => void;
   export const FQ: unknown;
   /** initializeMaitaiRuntime（app-shared/runtime/atom-signal.ts）。 */
   export const FX: () => void;
@@ -1097,7 +1100,8 @@ declare module "@rchunk/app-shared" {
   export const ek: () => void;
   export const fk: unknown;
   export const g_: unknown;
-  export const h4: unknown;
+  /** initializeClassNames（app-shared/ui/class-names.ts，内部 Eh）。 */
+  export const h4: () => void;
   export const i$: unknown;
   export const iW: (path: string) => string;
   export const lk: unknown;

@@ -185,4 +185,9 @@ assert.throws(
 );
 assertions += 1;
 
+check(
+  icons.initializeIconAsset() === undefined,
+  "keeps icon initialization idempotent",
+);
+
 console.log(`${assertions} app-shared IconAsset assertions passed`);

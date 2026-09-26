@@ -231,6 +231,9 @@ export function IconAsset(props: IconAssetProps): unknown {
   });
 }
 
+/** 原 `g3` / 压缩导出 `C_`。 */
+export function initializeIconAsset(): void {}
+
 /** 能力校验（原 `Rhe`）。 */
 function requireCapability(preset: IconPreset, capability: string): void {
   if (!preset.capabilities.includes(capability))

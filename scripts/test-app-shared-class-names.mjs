@@ -14,9 +14,10 @@ const result = await esbuild.build({
   write: false,
   logLevel: "silent",
 });
-const { classNames } = await import(
+const classNamesModule = await import(
   `data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`
 );
+const { classNames } = classNamesModule;
 
 const cases = [
   { values: [], expected: "", label: "empty input" },
@@ -64,5 +65,10 @@ assert.equal(
   "own inherited",
   "preserves the original enumerable for-in behavior",
 );
+assert.equal(
+  classNamesModule.initializeClassNames(),
+  undefined,
+  "keeps class-name initialization idempotent",
+);
 
-console.log(`${cases.length + 1} app-shared classNames assertions passed`);
+console.log(`${cases.length + 2} app-shared classNames assertions passed`);

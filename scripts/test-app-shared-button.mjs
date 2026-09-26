@@ -182,5 +182,9 @@ check(
   raysIcon.props.dangerouslySetInnerHTML.__html.includes("fill-opacity"),
   "preserves the multicolor rays artwork",
 );
+check(
+  buttons.initializeButton() === undefined,
+  "keeps button initialization idempotent",
+);
 
 console.log(`${assertions} app-shared button assertions passed`);
