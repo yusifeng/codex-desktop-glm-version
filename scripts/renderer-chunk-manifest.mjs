@@ -897,6 +897,7 @@ export const REWRITTEN = new Set([
   "migrated-plugin-access",
   "gpt-plugin-retirement",
   "migrated-plugin-notice",
+  "gpt-plugin-migration-notices",
   "home-beacon",
   "home-beacon-finance",
   "composer-utility-bar",
