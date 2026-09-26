@@ -261,6 +261,11 @@ declare module "@rchunk/first-app-connect-ambient-suggestions" {
   export const t: () => void;
 }
 
+declare module "@rchunk/home-suggestion-staggered-item" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
