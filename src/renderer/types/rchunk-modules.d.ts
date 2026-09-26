@@ -731,6 +731,11 @@ declare module "@rchunk/migrated-plugin-notice" {
   export const t: unknown;
 }
 
+declare module "@rchunk/gpt-plugin-retirement" {
+  export const r: () => void;
+  export const t: (value: unknown) => unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
