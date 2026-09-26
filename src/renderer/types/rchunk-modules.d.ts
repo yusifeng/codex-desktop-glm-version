@@ -137,6 +137,24 @@ declare module "@rchunk/app-shared" {
   export { useIsMounted as if };
   /** initializeMountedState（内部 Tpt）。 */
   export const rf: () => void;
+  export interface SandboxPartitionOptions {
+    persist?: boolean;
+  }
+  export interface SandboxOriginOptions {
+    requireSkybridge?: boolean;
+  }
+  /** createSandboxPartition（app-shared/runtime/sandbox-url.ts，内部 xVe）。 */
+  export const KH: (
+    sandboxId: string,
+    options?: SandboxPartitionOptions,
+  ) => string;
+  /** getTrustedSandboxOrigin（内部 CVe）。 */
+  export const qH: (
+    value: string | URL,
+    options?: SandboxOriginOptions,
+  ) => string | null;
+  /** initializeSandboxUrls（内部 XV）。 */
+  export const YH: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
