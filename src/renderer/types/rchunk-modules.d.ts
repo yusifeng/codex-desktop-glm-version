@@ -204,6 +204,22 @@ declare module "@rchunk/sidebar-onboarding-checklist-task-config" {
   export const _any: any;
 }
 
+declare module "@rchunk/dialog-launcher-core" {
+  export const n: (...args: any[]) => any;
+  export const t: () => void;
+}
+
+declare module "@rchunk/realtime-voice-launch-surface" {
+  export const n: () => void;
+  export const t: unknown;
+  export const _any: any;
+}
+
+declare module "@rchunk/codex-app-home-beacon-announcement-core" {
+  export const r: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;
