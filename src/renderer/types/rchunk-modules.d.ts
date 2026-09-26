@@ -231,6 +231,11 @@ declare module "@rchunk/lock" {
   export const _any: any;
 }
 
+declare module "@rchunk/pepper-onboarding-modal" {
+  export const PepperOnboardingModal: unknown;
+  export const _any: any;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;

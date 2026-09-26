@@ -289,5 +289,41 @@ check(
   "uses the Work learn-more URL",
 );
 
-assert.equal(assertions, 20);
+globalThis.__homeOnboardingTest.activeAccountId = "account-1";
+globalThis.__homeOnboardingTest.dismissedModals = [];
+const beaconModal = await loadModule("beacon-modal", {
+  "app-initial": `
+    export const U6t = Symbol("active-account");
+    export const zzt = (_scope, modal) => globalThis.__homeOnboardingTest.dismissedModals.push(modal);
+  `,
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const LX = () => ({ id: "scope" });
+    export const HX = () => globalThis.__homeOnboardingTest.activeAccountId;
+    export const e6 = globalThis.__homeOnboardingTest.react;
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const Jm = () => "LazyPepperModal";
+  `,
+  "pepper-onboarding-modal":
+    "export const PepperOnboardingModal = 'PepperModal';",
+});
+const matchingModal = beaconModal.PepperOnboardingBeaconModal({
+  accountId: "account-1",
+  onClose() {},
+});
+check(
+  matchingModal.type === "LazyPepperModal" &&
+    matchingModal.props.accountId === "account-1",
+  "renders the lazy Pepper modal for the active account",
+);
+globalThis.__homeOnboardingTest.activeAccountId = "account-2";
+check(
+  beaconModal.PepperOnboardingBeaconModal({
+    accountId: "account-1",
+    onClose() {},
+  }) === null && globalThis.__homeOnboardingTest.dismissedModals.length === 1,
+  "dismisses stale-account Pepper modals",
+);
+
+assert.equal(assertions, 22);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
