@@ -357,6 +357,10 @@ declare module "@rchunk/create-project-dialog-core" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/create-project-dialog-entry" {
+  export const CreateProjectDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
