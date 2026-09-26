@@ -441,6 +441,10 @@ declare module "@rchunk/source-file-delete-dialog" {
   export const ChatGptProjectFileDeleteDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/codex-thread-report-dialog-entry" {
+  export const CodexThreadReportDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
