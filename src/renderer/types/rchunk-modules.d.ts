@@ -118,6 +118,7 @@ declare module "@rchunk/app-shared" {
   export type SignalFamily<Param, T> =
     | CallableSignalFamily<Param, T>
     | ScopedDerivedFamily<unknown, Param, T>
+    | ScopedExternalSignalFamily<unknown, Param, T>
     | ScopedMutationFamily<unknown, Param, unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, Param, unknown, unknown>
     | ScopedInfiniteQueryFamily<unknown, Param, unknown, unknown, unknown>
@@ -217,6 +218,10 @@ declare module "@rchunk/app-shared" {
       parameter: Param,
     ): Value;
     get<Param, Value>(
+      family: ScopedExternalSignalFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
+    get<Param, Value>(
       family: ScopedSignalFamily<unknown, Param, Value>,
       parameter: Param,
     ): Value;
@@ -273,6 +278,12 @@ declare module "@rchunk/app-shared" {
     TScope,
     TValue
   >;
+  export interface ScopedExternalSignalFamily<TScope, Param, TValue> {
+    autoDisposeMs: number;
+    debugLabel?: string;
+    kind: "readable-family";
+    scope: MaitaiScope<TScope>;
+  }
   export interface ScopedQueryFunctionContext {
     client: ScopedQueryClient;
     meta?: unknown;
@@ -524,6 +535,10 @@ declare module "@rchunk/app-shared" {
       parameter: Param,
     ): Value;
     get<Param, Value>(
+      family: ScopedExternalSignalFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
+    get<Param, Value>(
       family: ScopedSignalFamily<unknown, Param, Value>,
       parameter: Param,
     ): Value;
@@ -648,6 +663,21 @@ declare module "@rchunk/app-shared" {
     ) => ScopedExternalSignalCleanup | PromiseLike<ScopedExternalSignalCleanup>,
     options?: ScopedDerivedSignalOptions<TValue>,
   ) => ScopedExternalSignal<TScope, TValue>;
+  /** createExternalSignalFamily（app-shared/runtime/atom-signal.ts，内部 xje）。 */
+  export const iZ: <TScope, Param, TValue>(
+    scope: MaitaiScope<TScope>,
+    initialValue:
+      | TValue
+      | ((
+          parameter: Param,
+          context: DerivedScopedSignalContext<TScope>,
+        ) => TValue),
+    subscribe: (
+      parameter: Param,
+      context: ScopedExternalSignalContext<TScope, TValue>,
+    ) => ScopedExternalSignalCleanup | PromiseLike<ScopedExternalSignalCleanup>,
+    options?: ScopedDerivedFamilyOptions<Param, TValue>,
+  ) => ScopedExternalSignalFamily<TScope, Param, TValue>;
   /** createDerivedSignal（app-shared/runtime/atom-signal.ts，内部 PI）。 */
   export const sZ: <TScope, TValue>(
     scope: MaitaiScope<TScope>,
