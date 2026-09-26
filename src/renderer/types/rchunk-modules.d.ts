@@ -92,6 +92,69 @@ declare module "@rchunk/app-shared" {
   export const Lf: (props: SwitchProps) => unknown;
   /** initializeSwitch（内部 Zdt）。 */
   export const Rf: () => void;
+  export type SettingsRowVariant =
+    | "default" | "featured" | "recommendation" | "stacked" | "nested";
+  export type SettingsRowSize = "default" | "compact";
+  export interface SettingsControlAriaProps {
+    "aria-labelledby"?: string;
+    "aria-describedby"?: string;
+  }
+  export type SettingsControl =
+    | ((props: SettingsControlAriaProps) => unknown)
+    | string
+    | number
+    | bigint
+    | boolean
+    | symbol
+    | object
+    | null;
+  export interface SettingsRowProps {
+    label?: unknown;
+    labelSizing?: "grow" | "fixed";
+    description?: unknown;
+    control?: SettingsControl;
+    icon?: unknown;
+    className?: string;
+    id?: string;
+    size?: SettingsRowSize;
+    variant?: SettingsRowVariant;
+    verticalAlignment?: "center" | "start";
+  }
+  export interface SettingsDescriptionProps {
+    children?: unknown;
+  }
+  export interface SettingsFieldRowProps {
+    children?: unknown;
+    compactLabelInset?: boolean;
+    label?: unknown;
+    valueAlignment?: "start" | "end";
+    variant?: "default" | "compact";
+  }
+  export interface SettingsActionRowProps {
+    actions?: unknown;
+    ariaLabel?: string;
+    className?: string;
+    description?: unknown;
+    disabled?: boolean;
+    edgeRounding?: "row" | "none";
+    icon?: unknown;
+    label?: unknown;
+    onClick?: (event: unknown) => void;
+    onFocus?: (event: unknown) => void;
+    onPointerEnter?: (event: unknown) => void;
+    trailing?: unknown;
+    variant?: "default" | "recommendation" | "nested";
+  }
+  /** initializeSettingsRows（app-shared/ui/settings-row.ts，内部 myt）。 */
+  export const al: () => void;
+  /** SettingsDescription（内部 lyt）。 */
+  export const il: (props: SettingsDescriptionProps) => unknown;
+  /** SettingsFieldRow（内部 dyt）。 */
+  export const nl: (props: SettingsFieldRowProps) => unknown;
+  /** SettingsRow（内部 cyt）。 */
+  export const rl: (props: SettingsRowProps) => unknown;
+  /** SettingsActionRow（内部 uyt）。 */
+  export const tl: (props: SettingsActionRowProps) => unknown;
   export interface DialogLayoutProps extends Record<string, unknown> {
     children?: unknown;
     className?: string;
