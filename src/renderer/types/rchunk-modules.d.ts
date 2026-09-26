@@ -115,6 +115,26 @@ declare module "@rchunk/connector-logo-stack" {
   export const _any: any;
 }
 
+declare module "@rchunk/onboarding-mail-provider" {
+  export const _any: any;
+}
+
+declare module "@rchunk/ambient-suggestion-apps" {
+  export const _any: any;
+}
+
+declare module "@rchunk/new-chat-suggestion-source-debug-state" {
+  export const _any: any;
+}
+
+declare module "@rchunk/home-suggestion-surface" {
+  export const _any: any;
+}
+
+declare module "@rchunk/new-chat-page-suggestions-eligibility" {
+  export const _any: any;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
