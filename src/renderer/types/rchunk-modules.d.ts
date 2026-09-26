@@ -414,6 +414,134 @@ declare module "@rchunk/portable-thumbnail-font-face-sources" {
   export const getPopcornCarlitoFontFaceSourcesFromDocument: () => unknown[];
 }
 
+declare module "@rchunk/thumbnail-worker-font-faces" {
+  export const installPopcornFontFaces: (fonts: readonly unknown[]) => Promise<void>;
+}
+
+declare module "@rchunk/thumbnail-worker-shape-presets" {
+  export const installPresetShapeDefinitions: () => void;
+}
+
+declare module "@rchunk/thumbnail-worker-presentation-model" {
+  export interface PresentationSlide {
+    frame: { height: number; width: number };
+  }
+  export interface PresentationDocument {
+    slides: { items: PresentationSlide[] };
+  }
+  export const Presentation: {
+    load(value: unknown): PresentationDocument;
+  };
+  export const Workbook: {
+    fromCSV(text: string, options?: { separator: string }): Promise<unknown> | unknown;
+    load(value: unknown): unknown;
+  };
+  export const drawSlideToCtx: (
+    slide: PresentationSlide,
+    presentation: PresentationDocument,
+    context: OffscreenCanvasRenderingContext2D,
+    resources: readonly unknown[],
+  ) => Promise<void> | void;
+}
+
+declare module "@rchunk/thumbnail-worker-workbook-renderer" {
+  export const renderWorkbook: (
+    workbook: unknown,
+    options: {
+      center: "A1";
+      headers: false;
+      height: number;
+      scale: 1;
+      sheetIndex: 0;
+      width: number;
+    },
+  ) => Promise<Blob> | Blob;
+}
+
+declare module "@rchunk/thumbnail-worker-walnut-reader" {
+  export interface WalnutReaderExports {
+    DocxReader: { ExtractDocxProto(bytes: Uint8Array, includeUnknown: false): Uint8Array };
+    PptxReader: { ExtractSlidesProto(bytes: Uint8Array, includeUnknown: false): Uint8Array };
+    XlsxReader: { ExtractXlsxProto(bytes: Uint8Array, includeUnknown: false): Uint8Array };
+  }
+  export const getPopcornWalnutReaderExports: (
+    resourceBaseUrl: URL,
+  ) => Promise<WalnutReaderExports>;
+}
+
+declare module "@rchunk/thumbnail-worker-presentation-proto" {
+  export const Presentation: { decode(bytes: Uint8Array): unknown };
+}
+
+declare module "@rchunk/thumbnail-worker-document-proto" {
+  export const Document: { decode(bytes: Uint8Array): unknown };
+}
+
+declare module "@rchunk/thumbnail-worker-document-model" {
+  export interface ThumbnailDocumentModel {
+    pagePaintContext: {
+      chartsById: unknown;
+      pageBackgroundFill: unknown;
+      themeMap: unknown;
+    };
+  }
+  export const DocumentModel: {
+    load(value: unknown): ThumbnailDocumentModel;
+  };
+}
+
+declare module "@rchunk/thumbnail-worker-document-renderer" {
+  import type { ThumbnailDocumentModel } from "@rchunk/thumbnail-worker-document-model";
+  export interface ThumbnailDocumentPage {
+    heightPx: number;
+    widthPx: number;
+  }
+  export const layoutDocumentPages: (
+    document: ThumbnailDocumentModel,
+    context: OffscreenCanvasRenderingContext2D,
+  ) => ThumbnailDocumentPage[];
+  export const preloadDocumentImageBitmaps: (
+    document: ThumbnailDocumentModel,
+    pages: readonly ThumbnailDocumentPage[],
+  ) => Promise<ReadonlyMap<unknown, ImageBitmap>>;
+  export const paintRenderedDocumentPage: (
+    context: OffscreenCanvasRenderingContext2D,
+    page: ThumbnailDocumentPage,
+    themeMap: unknown,
+    chartsById: unknown,
+    pageBackgroundFill: unknown,
+    images: ReadonlyMap<unknown, ImageBitmap>,
+    selection: undefined,
+    options: { drawPageOutline: false },
+  ) => void;
+}
+
+declare module "@rchunk/thumbnail-worker-spreadsheet-proto" {
+  export const Workbook: { decode(bytes: Uint8Array): unknown };
+}
+
+declare module "@rchunk/thumbnail-worker-pdf-runtime" {
+  export const GlobalWorkerOptions: { workerPort?: Worker };
+  export const getDocument: (options: {
+    CanvasFactory: new () => unknown;
+    data: Uint8Array;
+    disableFontFace: true;
+    isEvalSupported: false;
+  }) => {
+    destroy(): Promise<void>;
+    promise: Promise<{
+      getPage(pageNumber: 1): Promise<{
+        getViewport(options: { scale: number }): { height: number; width: number };
+        render(options: {
+          canvas: null;
+          canvasContext: OffscreenCanvasRenderingContext2D;
+          viewport: { height: number; width: number };
+        }): { promise: Promise<void> };
+      }>;
+    }>;
+  };
+}
+
 declare module "@rchunk/app-initial" {
   // 15MB 聚合块：应用启动逻辑 + Shiki 语法 grammars + math/learning blocks。
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
