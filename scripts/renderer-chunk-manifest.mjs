@@ -727,6 +727,7 @@ export const REWRITTEN = new Set([
   "right-panel-composer-overlay-alignment",
   "composer-overlay",
   "above-composer-fixed-content-surface",
+  "new-chat-page-suggestions-eligibility",
   "rpc",
   "thread-virtualizer",
   "thread-scroll-controller-context-value",

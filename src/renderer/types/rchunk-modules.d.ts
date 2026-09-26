@@ -139,7 +139,12 @@ declare module "@rchunk/home-suggestion-surface" {
 }
 
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
-  export const _any: any;
+  export const a: () => void;
+  export const i: unknown;
+  export const n: unknown;
+  export const o: unknown;
+  export const r: unknown;
+  export const t: unknown;
 }
 
 declare module "@rchunk/option-carousel" {
