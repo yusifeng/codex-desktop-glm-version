@@ -5,7 +5,15 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void runtimeChunk;
-const appInitial = appInitialChunk as Record<string, any>;
+
+export interface LocalizedUser {
+  locale?: string | null;
+}
+
+const {
+  iN: getUserLocaleSettings,
+  sN: initializeUserLocaleSettings,
+} = appInitialChunk;
 const DEFAULT_RETIREMENT_TIMESTAMP = Date.UTC(2026, 11, 11);
 
 function parseRetirementDate(value: string): number {
@@ -17,8 +25,11 @@ function parseRetirementDate(value: string): number {
     : DEFAULT_RETIREMENT_TIMESTAMP;
 }
 
-function getGptHelpCenterUrl(user: unknown, urlTemplate: string): string {
-  const locale = (appInitial.iN?.(user)?.locale ?? "en-US").toLowerCase();
+function getGptHelpCenterUrl(
+  user: LocalizedUser | string | null | undefined,
+  urlTemplate: string,
+): string {
+  const locale = (getUserLocaleSettings(user)?.locale ?? "en-US").toLowerCase();
   const language = locale === "en-us" ? "en" : locale;
   const fallback = `https://help.openai.com/${language}/collections/8475420-gpts`;
   try {
@@ -32,7 +43,7 @@ function getGptHelpCenterUrl(user: unknown, urlTemplate: string): string {
 let initialized = false;
 function initializeGptPluginRetirement(): void {
   if (initialized) return;
-  appInitial.sN?.();
+  initializeUserLocaleSettings();
   initialized = true;
 }
 

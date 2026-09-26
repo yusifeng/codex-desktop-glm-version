@@ -2867,6 +2867,10 @@ declare module "@rchunk/app-initial" {
   export const r7: () => void;
   export const sP: () => void;
   export const Rln: () => void;
+  export const iN: (
+    user: { locale?: string | null } | string | null | undefined,
+  ) => { locale?: string | null } | null | undefined;
+  export const sN: () => void;
   /** initializeThreadState（pending-onboarding 依赖的线程索引初始化器）。 */
   export const Ftn: () => void;
   /** 当前用户 ID signal。 */
@@ -4155,7 +4159,13 @@ declare module "@rchunk/migrated-plugin-notice" {
 }
 
 declare module "@rchunk/gpt-plugin-retirement" {
-  export const n: (user: unknown, urlTemplate: string) => string;
+  export interface LocalizedUser {
+    locale?: string | null;
+  }
+  export const n: (
+    user: LocalizedUser | string | null | undefined,
+    urlTemplate: string,
+  ) => string;
   export const r: () => void;
   export const t: (value: string) => number;
 }
