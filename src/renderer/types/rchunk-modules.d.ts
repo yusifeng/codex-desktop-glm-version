@@ -83,12 +83,42 @@ declare module "@rchunk/app-shared" {
   }; // alt：分离窗口的 browser 内容渲染器
   export const BI: (path: string) => string; // wJe：路径规范化后转小写
   export const BK: (path: string) => boolean; // Rz：是否为绝对路径
-  export const BX: any;
+  export interface QueryReadOptions {
+    enabled?: boolean;
+  }
+  export interface SubscribableSignal<T> {
+    get(): T;
+    subscribe(listener: () => void): () => void;
+  }
+  export interface BoundAtomSignal<T> {
+    atom: unknown;
+    store: {
+      get(atom: unknown): T;
+      sub(atom: unknown, listener: () => void): () => void;
+    };
+  }
+  export type ReadableSignal<T> =
+    | BoundAtomSignal<T>
+    | SubscribableSignal<T>
+    | T;
+  export interface SignalFamily<Param, T> {
+    (parameter: Param): ReadableSignal<T>;
+  }
+  /** useSignalFamilyValue（app-shared/runtime/atom-signal.ts）。 */
+  export const BX: <Param, T>(
+    family: SignalFamily<Param, T>,
+    parameter: Param,
+    options?: QueryReadOptions,
+  ) => T;
   export const Bk: Record<string, string>; // bq：Appgen interaction action 枚举
   export const C_: unknown;
   export const FQ: unknown;
   export const FX: any;
-  export const HX: unknown; // Maitai query 订阅 store 工厂（oMe）
+  /** useSignalValue（app-shared/runtime/atom-signal.ts）。 */
+  export const HX: <T>(
+    signal: ReadableSignal<T>,
+    options?: QueryReadOptions,
+  ) => T;
   export const I3: unknown; // jsx runtime
   export const IQ: unknown;
   export const JQ: unknown;

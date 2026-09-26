@@ -356,9 +356,7 @@ class MaitaiStore implements AtomStore {
       for (const dependent of this.requireNodeState(current).t) {
         const dependentState = this.requireAtomState(dependent);
         if (!("v" in dependentState)) continue;
-        const stale = [...dependentState.d.entries()].some(
-          ([dependency, version]) => this.requireAtomState(dependency).n !== version,
-        );
+        const stale = [...dependentState.d.entries()].some(([dependency, version]) => this.requireAtomState(dependency).n !== version);
         if (stale) {
           this.setValueInternal(dependent, this.evaluate(dependent, dependentState));
           this.changedAtoms.add(dependent);
@@ -395,13 +393,19 @@ export interface Scope<T = unknown> {
 /** autoDispose 归一（原 `YN`）：true→0ms / false→∞ / 数值→毫秒。 */
 export function normalizeAutoDispose(autoDispose: boolean | number = false): number {
   if (typeof autoDispose === "boolean") return autoDispose ? 0 : Infinity;
-  if (!Number.isFinite(autoDispose) || autoDispose < 0)
-    throw new RangeError("autoDispose must be a boolean or a finite, nonnegative delay in milliseconds");
+  if (!Number.isFinite(autoDispose) || autoDispose < 0) throw new RangeError("autoDispose must be a boolean or a finite, nonnegative delay in milliseconds");
   return autoDispose;
 }
 
 /** scope 构造（原 `nke`）。 */
-export function createScope<T>(brand: T, options?: { key?: (memberKey: string) => string; parent?: Scope; retain?: { autoDispose: boolean | number } }): Scope<T> {
+export function createScope<T>(
+  brand: T,
+  options?: {
+    key?: (memberKey: string) => string;
+    parent?: Scope;
+    retain?: { autoDispose: boolean | number };
+  },
+): Scope<T> {
   return {
     __scopeBrand: brand,
     getKey: options?.key,
@@ -420,14 +424,17 @@ export interface AtomFamily<Param, T> {
   kind: "readable-family" | "signal-family";
   (param: Param): Atom<T>;
   read(scopeGet: unknown, param: Param, ...rest: unknown[]): T;
-  [RESOLVE_FAMILY_MEMBER_INTERNAL](param: Param): { disposal: { atom: Atom<boolean> } | null; value: Atom<T> };
+  [RESOLVE_FAMILY_MEMBER_INTERNAL](param: Param): {
+    disposal: { atom: Atom<boolean> } | null;
+    value: Atom<T>;
+  };
   [EVICT_FAMILY_MEMBER_INTERNAL]?(param: Param): void;
   [FAMILY_DISPOSAL_INTERNAL]?(param: Param): void;
   [DISPOSE_FAMILY_VALUE_INTERNAL]?(param: Param, value: T): void;
 }
 
 function isFamily(value: unknown): value is AtomFamily<unknown, unknown> {
-  return typeof value == "object" && !!value && "kind" in value && (value.kind === "readable-family" || value.kind === "signal-family");
+  return (typeof value === "object" || typeof value === "function") && !!value && "kind" in value && (value.kind === "readable-family" || value.kind === "signal-family");
 }
 
 /**
@@ -437,13 +444,19 @@ function isFamily(value: unknown): value is AtomFamily<unknown, unknown> {
 export function createFamily<Param, T>(memberFactory: (param: Param) => Atom<T>, kind: "readable-family" | "signal-family" = "readable-family"): AtomFamily<Param, T> {
   const members = new Map<Param, { disposal: { atom: Atom<boolean> } | null; value: Atom<T> }>();
   const family = ((param: Param) => {
-    const member = members.get(param) ?? { disposal: null, value: memberFactory(param) };
+    const member = members.get(param) ?? {
+      disposal: null,
+      value: memberFactory(param),
+    };
     if (!members.has(param)) members.set(param, member);
     return member.value;
   }) as AtomFamily<Param, T>;
   family.kind = kind;
   family[RESOLVE_FAMILY_MEMBER_INTERNAL] = (param: Param) => {
-    const member = members.get(param) ?? { disposal: null, value: memberFactory(param) };
+    const member = members.get(param) ?? {
+      disposal: null,
+      value: memberFactory(param),
+    };
     if (!members.has(param)) members.set(param, member);
     return member;
   };
@@ -542,13 +555,17 @@ export function isAtomFamily(value: unknown): value is AtomFamily<unknown, unkno
 }
 
 /** 可写读取器判定（原 `MAe`）。 */
-export function isWritableReader(value: unknown): value is { atom: WritableAtom<unknown>; set: (...values: unknown[]) => void; store: AtomStore } {
+export function isWritableReader(value: unknown): value is {
+  atom: WritableAtom<unknown>;
+  set: (...values: unknown[]) => void;
+  store: AtomStore;
+} {
   return isAtomStoreReader(value) && "set" in value;
 }
 
 /** signal-family 判定（原 `NAe`）。 */
 export function isSignalFamily(value: unknown): boolean {
-  return typeof value == "object" && !!value && "kind" in value && (value as { kind: string }).kind === "signal-family";
+  return (typeof value === "object" || typeof value === "function") && !!value && "kind" in value && (value as { kind: string }).kind === "signal-family";
 }
 
 // ---------------------------------------------------------------------------
@@ -557,7 +574,7 @@ export function isSignalFamily(value: unknown): boolean {
 
 /** React 面（结构化子集）。 */
 interface ReactLike {
-  useSyncExternalStore<T>(subscribe: (onChange: () => void) => () => void, getSnapshot: () => T): T;
+  useSyncExternalStore<T>(subscribe: (onChange: () => void) => () => void, getSnapshot: () => T, getServerSnapshot?: () => T): T;
   useCallback<T extends (...args: never[]) => unknown>(fn: T, deps?: unknown[]): T;
 }
 
@@ -579,10 +596,7 @@ export function setDefaultAtomStore(store: AtomStore): void {
 export function useAtom<T>(target: Atom<T>, store?: AtomStore): [T, (value: T | ((current: T) => T)) => void] {
   const React = reactOf();
   const effectiveStore = store ?? defaultStore ?? createStore();
-  const subscribe = React.useCallback(
-    (onChange: () => void) => effectiveStore.sub(target, onChange) as unknown as () => void,
-    [effectiveStore, target],
-  );
+  const subscribe = React.useCallback((onChange: () => void) => effectiveStore.sub(target, onChange) as unknown as () => void, [effectiveStore, target]);
   const value = React.useSyncExternalStore(subscribe, () => effectiveStore.get(target));
   const setValue = React.useCallback(
     (next: T | ((current: T) => T)) => {
@@ -595,4 +609,82 @@ export function useAtom<T>(target: Atom<T>, store?: AtomStore): [T, (value: T | 
     [effectiveStore, target],
   );
   return [value, setValue];
+}
+
+// ---------------------------------------------------------------------------
+// React 只读绑定（原 `oMe` / `dMe`，压缩导出 `HX` / `BX`）
+// ---------------------------------------------------------------------------
+
+export interface QueryReadOptions {
+  enabled?: boolean;
+}
+
+/** 可直接订阅的外部 signal；对应原 `LF` 分支。 */
+export interface SubscribableSignal<T> {
+  get(): T;
+  subscribe(listener: () => void): () => void;
+}
+
+/** 已绑定 atom/store 的只读 signal。 */
+export interface BoundAtomSignal<T> {
+  atom: Atom<T>;
+  store: AtomStore;
+}
+
+/** `HX` 可读取的公共形态。普通值用于原实现的常量快照分支。 */
+export type ReadableSignal<T> = Atom<T> | BoundAtomSignal<T> | SubscribableSignal<T> | T;
+
+/** `BX` 的参数化 signal family。 */
+export interface SignalFamily<Param, T> {
+  (parameter: Param): ReadableSignal<T>;
+}
+
+function isSubscribableSignal<T>(value: ReadableSignal<T>): value is SubscribableSignal<T> {
+  return typeof value === "object" && value != null && "get" in value && typeof value.get === "function" && "subscribe" in value && typeof value.subscribe === "function";
+}
+
+function isBoundAtomSignal<T>(value: ReadableSignal<T>): value is BoundAtomSignal<T> {
+  return isAtomStoreReader(value);
+}
+
+function isAtomDefinition<T>(value: ReadableSignal<T>): value is Atom<T> {
+  return typeof value === "object" && value != null && "read" in value && typeof value.read === "function" && "toString" in value && typeof value.toString === "function";
+}
+
+const subscribeNever = () => () => {};
+
+/**
+ * 原 `oMe` / 压缩导出 `HX`：
+ * - query options 先经 `withQueryReadOptions` 派生；
+ * - 外部 reader 使用其 get/subscribe；
+ * - bound atom 与普通 atom 使用 Maitai store；
+ * - 常量仍走 useSyncExternalStore，保持 hook 调用序列稳定。
+ */
+export function useSignalValue<T>(signal: ReadableSignal<T>, options?: QueryReadOptions): T {
+  const React = reactOf();
+  const resolved = withQueryReadOptions(signal, options) as ReadableSignal<T>;
+  if (isSubscribableSignal(resolved)) {
+    return React.useSyncExternalStore(
+      (onChange) => resolved.subscribe(onChange),
+      () => resolved.get(),
+      () => resolved.get(),
+    );
+  }
+  if (isBoundAtomSignal(resolved)) {
+    return React.useSyncExternalStore(
+      (onChange) => resolved.store.sub(resolved.atom, onChange),
+      () => resolved.store.get(resolved.atom),
+      () => resolved.store.get(resolved.atom),
+    );
+  }
+  if (isAtomDefinition(resolved)) {
+    return useAtom(resolved)[0];
+  }
+  const getSnapshot = () => resolved as T;
+  return React.useSyncExternalStore(subscribeNever, getSnapshot, getSnapshot);
+}
+
+/** 原 `dMe` / 压缩导出 `BX`：解析 family 成员后复用 `useSignalValue`。 */
+export function useSignalFamilyValue<Param, T>(family: SignalFamily<Param, T>, parameter: Param, options?: QueryReadOptions): T {
+  return useSignalValue(family(parameter), options);
 }
