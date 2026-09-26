@@ -1894,6 +1894,9 @@ declare module "@rchunk/app-shared" {
   export const fO: IconAssetPreset;
   export const gO: IconAssetPreset;
   export const bE: IconAssetPreset;
+  /** Site access state 的 public 图标及初始化器。 */
+  export const A_: (props: SimpleIconProps) => unknown;
+  export const j_: () => void;
   /** dismiss icon asset（worktree onboarding banner）。 */
   export const ig: IconAssetPreset;
   /** Worktree onboarding analytics event descriptor。 */
@@ -3322,7 +3325,7 @@ declare module "@rchunk/access-splash" {
 
 declare module "@rchunk/lock" {
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
   export const _any: any;
 }
 
@@ -3635,7 +3638,7 @@ declare module "@rchunk/appgen-site-card" {
 
 declare module "@rchunk/building" {
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/create-remote-project-modal" {
@@ -4666,12 +4669,25 @@ declare module "@rchunk/appgen-access" {
 }
 
 declare module "@rchunk/appgen-access-state-messages" {
-  export const a: (...args: any[]) => any;
+  export interface AccessStateIconProps extends Record<string, unknown> {
+    accessPolicy?: import("@rchunk/appgen-access").AppgenAccessPolicy | null;
+    accessState?: import("@rchunk/appgen-access").AppgenAccessSummary;
+  }
+  export type AccessStateMessage =
+    | import("@rchunk/app-shared").MessageDescriptor
+    | undefined;
+  export const a: (props: AccessStateIconProps) => unknown;
   export const i: () => void;
-  export const n: (...args: any[]) => any;
+  export const n: (
+    state: import("@rchunk/appgen-access").AppgenAccessSummary,
+  ) => AccessStateMessage;
   export const o: () => void;
-  export const r: (...args: any[]) => any;
-  export const t: (...args: any[]) => any;
+  export const r: (
+    state: import("@rchunk/appgen-access").AppgenAccessSummary,
+  ) => AccessStateMessage;
+  export const t: (
+    state: import("@rchunk/appgen-access").AppgenAccessSummary,
+  ) => AccessStateMessage;
 }
 
 declare module "@rchunk/appgen-automations-state" {

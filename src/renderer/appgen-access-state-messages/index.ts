@@ -6,22 +6,63 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as lockChunk from "@rchunk/lock";
 import * as appgenAccessChunk from "@rchunk/appgen-access";
 import * as buildingChunk from "@rchunk/building";
+import type {
+  AppgenAccessPolicy,
+  AppgenAccessSummary,
+} from "@rchunk/appgen-access";
+import type { JsxRuntime, MessageDescriptor } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const lock = lockChunk as Record<string, any>;
-const appgenAccess = appgenAccessChunk as Record<string, any>;
-const building = buildingChunk as Record<string, any>;
-let jsx: any;
-let PeopleIcon: (props: any) => any;
-let fullMessages: Record<string, any>;
-let shortMessages: Record<string, any>;
-let siteMessages: Record<string, any>;
+const {
+  $3: initializeReactRuntime,
+  A_: PublicIcon,
+  G2: defineMessages,
+  I3: getJsxRuntime,
+  K2: initializeInternationalization,
+  e6: initializeReact,
+  j_: initializePublicIcon,
+} = appSharedChunk;
+const {
+  n: initializeLockIcon,
+  t: LockIcon,
+} = lockChunk;
+const {
+  c: isEmptyRestrictedAccess,
+  r: summarizeAccessPolicy,
+  s: initializeAppgenAccess,
+} = appgenAccessChunk;
+const {
+  n: initializeBuildingIcon,
+  t: BuildingIcon,
+} = buildingChunk;
+
+type AccessStateKey =
+  | "groups"
+  | "owner_only"
+  | "people"
+  | "people_and_groups"
+  | "public"
+  | "workspace_all";
+
+interface AccessStateIconProps extends Record<string, unknown> {
+  accessPolicy?: AppgenAccessPolicy | null;
+  accessState?: AppgenAccessSummary;
+}
+
+interface SvgIconProps extends Record<string, unknown> {
+  className?: string;
+}
+
+let jsx: JsxRuntime;
+let PeopleIcon: (props: SvgIconProps) => unknown;
+let fullMessages: Record<AccessStateKey, MessageDescriptor>;
+let shortMessages: Record<AccessStateKey, MessageDescriptor>;
+let siteMessages: Record<AccessStateKey, MessageDescriptor>;
 
 function initializePeopleIcon(): void {
-  appShared.e6?.();
-  jsx = appShared.I3();
-  PeopleIcon = (props: any) =>
+  initializeReact();
+  jsx = getJsxRuntime();
+  PeopleIcon = (props: SvgIconProps) =>
     jsx.jsx("svg", {
       width: 16,
       height: 13,
@@ -36,22 +77,24 @@ function initializePeopleIcon(): void {
     });
 }
 
-function AccessStateIcon(props: any) {
+function AccessStateIcon(props: AccessStateIconProps): unknown {
   const { accessPolicy, accessState, ...iconProps } = props;
-  const state = accessState ?? appgenAccess.r(accessPolicy);
+  const state = accessState ?? summarizeAccessPolicy(accessPolicy);
   switch (state.accessMode) {
     case "admins_only":
     case "custom":
-      return jsx.jsx(appgenAccess.c(state) ? lock.t : PeopleIcon, iconProps);
+      return jsx.jsx(isEmptyRestrictedAccess(state) ? LockIcon : PeopleIcon, iconProps);
     case "workspace_all":
-      return jsx.jsx(building.t, iconProps);
+      return jsx.jsx(BuildingIcon, iconProps);
     case "public":
-      return jsx.jsx(appShared.A_, iconProps);
+      return jsx.jsx(PublicIcon, iconProps);
   }
 }
 
-function accessStateKey(state: any) {
-  if (appgenAccess.c(state)) return "owner_only";
+function accessStateKey(
+  state: AppgenAccessSummary,
+): AccessStateKey | undefined {
+  if (isEmptyRestrictedAccess(state)) return "owner_only";
   const { accessMode, groupCount, userCount } = state;
   switch (accessMode) {
     case "admins_only":
@@ -69,32 +112,41 @@ function accessStateKey(state: any) {
   }
 }
 
-function fullAccessMessage(state: any) {
-  return fullMessages[accessStateKey(state)];
+function fullAccessMessage(
+  state: AppgenAccessSummary,
+): MessageDescriptor | undefined {
+  const key = accessStateKey(state);
+  return key == null ? undefined : fullMessages[key];
 }
 
-function shortAccessMessage(state: any) {
-  return shortMessages[accessStateKey(state)];
+function shortAccessMessage(
+  state: AppgenAccessSummary,
+): MessageDescriptor | undefined {
+  const key = accessStateKey(state);
+  return key == null ? undefined : shortMessages[key];
 }
 
-function siteAccessMessage(state: any) {
-  return siteMessages[accessStateKey(state)];
+function siteAccessMessage(
+  state: AppgenAccessSummary,
+): MessageDescriptor | undefined {
+  const key = accessStateKey(state);
+  return key == null ? undefined : siteMessages[key];
 }
 
 function initializeAccessStateIcon(): void {
-  appShared.$3?.();
-  building.n?.();
-  appShared.j_?.();
-  lock.n?.();
+  initializeReactRuntime();
+  initializeBuildingIcon();
+  initializePublicIcon();
+  initializeLockIcon();
   initializePeopleIcon();
-  appgenAccess.s?.();
-  jsx = appShared.I3();
+  initializeAppgenAccess();
+  jsx = getJsxRuntime();
 }
 
 function initializeAccessStateMessages(): void {
-  appShared.K2?.();
-  appgenAccess.s?.();
-  fullMessages = appShared.G2({
+  initializeInternationalization();
+  initializeAppgenAccess();
+  fullMessages = defineMessages({
     groups: {
       id: "appgenAccess.state.visibleToGroups",
       defaultMessage:
@@ -128,7 +180,7 @@ function initializeAccessStateMessages(): void {
       description: "Label for a site shared with anyone in the workspace",
     },
   });
-  shortMessages = appShared.G2({
+  shortMessages = defineMessages({
     groups: {
       id: "appgenAccess.shortState.groups",
       defaultMessage: "{groupCount, plural, one {# group} other {# groups}}",
@@ -163,7 +215,7 @@ function initializeAccessStateMessages(): void {
         "Concise label for a site shared with anyone in the workspace",
     },
   });
-  siteMessages = appShared.G2({
+  siteMessages = defineMessages({
     groups: {
       id: "appgenAccess.siteState.visibleToGroups",
       defaultMessage:
