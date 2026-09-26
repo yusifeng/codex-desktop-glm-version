@@ -1018,5 +1018,96 @@ check(
   "clears Codex Micro animation state on teardown",
 );
 
-assert.equal(assertions, 71);
+globalThis.__homeOnboardingTest.chatgptOnboarding = {
+  continued: 0,
+  legalEvents: [],
+  shown: 0,
+};
+const chatgptOnboarding = await loadModule("chatgpt-onboarding-dialog", {
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const Ih = "Dialog";
+    export const Rh = "Heading";
+    export const Lh = "Text";
+    export const Yh = "Button";
+    export const ty = "Logo";
+    export const Y2 = "FormattedMessage";
+    export const LX = () => ({ get: () => ({ logProductEvent: (_event, payload) => globalThis.__homeOnboardingTest.chatgptOnboarding.legalEvents.push(payload) }) });
+  `,
+  "app-initial": `
+    export const HNt = { FullscreenOnboarding: "fullscreen-onboarding" };
+    export const Jot = "ExternalLink";
+    export const Cpn = Symbol("analytics");
+    export const Ds = "legal-link-clicked";
+    export const Es = {
+      CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_TERMS: "terms",
+      CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_PRIVACY: "privacy",
+      CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_KOREA_ADDENDUM: "korea-addendum"
+    };
+  `,
+  "app-primary": "export const kh = 'Claim';",
+});
+const onboardingDialog = chatgptOnboarding.ChatGptOnboardingDialog({
+  country: "KR",
+  onContinue: () => {
+    globalThis.__homeOnboardingTest.chatgptOnboarding.continued += 1;
+  },
+  onShown: () => {
+    globalThis.__homeOnboardingTest.chatgptOnboarding.shown += 1;
+  },
+});
+check(
+  onboardingDialog.type === "Claim" &&
+    onboardingDialog.props.claim === "fullscreen-onboarding",
+  "claims the fullscreen onboarding surface",
+);
+const onboardingDialogSurface = onboardingDialog.props.children;
+check(
+  onboardingDialogSurface.type === "Dialog" &&
+    onboardingDialogSurface.props.open &&
+    !onboardingDialogSurface.props.showDialogClose,
+  "renders a non-dismissible viewport-sized onboarding dialog",
+);
+onboardingDialogSurface.props.contentProps.onOpenAutoFocus();
+check(
+  globalThis.__homeOnboardingTest.chatgptOnboarding.shown === 1,
+  "reports when the onboarding dialog is shown",
+);
+let escapePrevented = false;
+onboardingDialogSurface.props.contentProps.onEscapeKeyDown({
+  preventDefault: () => {
+    escapePrevented = true;
+  },
+});
+check(escapePrevented, "prevents Escape from closing onboarding");
+const onboardingForm = onboardingDialogSurface.props.children.props.children;
+let submitPrevented = false;
+onboardingForm.props.onSubmit({
+  preventDefault: () => {
+    submitPrevented = true;
+  },
+});
+check(
+  submitPrevented &&
+    globalThis.__homeOnboardingTest.chatgptOnboarding.continued === 1,
+  "continues onboarding through form submission",
+);
+const onboardingActions = onboardingForm.props.children[1];
+const koreanLegalMessage = onboardingActions.props.children[2].props.children;
+check(
+  koreanLegalMessage.props.id === "thread.agreeToTermsNoAuthKorea-may-06" &&
+    typeof koreanLegalMessage.props.values.koreaAddendumLink === "function",
+  "shows the Korea-specific legal addendum",
+);
+const termsLink = koreanLegalMessage.props.values.termsLink("Terms");
+termsLink.props.onClick();
+check(
+  termsLink.props.href === "https://openai.com/terms" &&
+    globalThis.__homeOnboardingTest.chatgptOnboarding.legalEvents[0].link ===
+      "terms",
+  "opens and records onboarding policy links",
+);
+
+assert.equal(assertions, 78);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
