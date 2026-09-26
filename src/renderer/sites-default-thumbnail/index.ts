@@ -7,16 +7,93 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as disabledTooltipChunk from "@rchunk/appgen-disabled-tooltip";
 import * as cardLayoutChunk from "@rchunk/appgen-card-layout";
 import * as shareDialogChunk from "@rchunk/open-appgen-share-dialog";
+import type {
+  AppgenInteractionAction,
+  JsxRuntime,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const disabledTooltip = disabledTooltipChunk as Record<string, any>;
-const cardLayout = cardLayoutChunk as Record<string, any>;
-const shareDialog = shareDialogChunk as Record<string, any>;
-let jsx: any;
-let WindowsSiteThumbnail: any;
-let MacSiteThumbnail: any;
+const {
+  $3: initializeReactRuntime,
+  AT: initializeMountedState,
+  Bk: appgenInteractionActions,
+  Bs: publishIcon,
+  C_: initializeCardActions,
+  DF: sitesSharingSources,
+  FX: initializeMaitaiRuntime,
+  Hk: appgenInteractionSources,
+  I3: getJsxRuntime,
+  If: initializeMenu,
+  K2: initializeInternationalization,
+  LX: useScope,
+  QI: initializeImageRuntime,
+  S_: IconAsset,
+  Vs: initializeMenuIcons,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: AppScope,
+  Zh: initializeButton,
+  _O: initializeSiteActionIcons,
+  _u: initializeMoreButton,
+  bE: settingsIcon,
+  c_: initializeTooltip,
+  e6: initializeReact,
+  fI: initializeIntlRuntime,
+  fO: shareIcon,
+  gO: analyticsIcon,
+  gu: MoreButton,
+  jf: Menu,
+  jT: editIcon,
+  kf: DropdownMenu,
+  lk: initializeIconAssets,
+  n4: useIntl,
+  o_: Tooltip,
+  pO: initializeDropdownMenu,
+  xE: initializeNavigationTooltip,
+} = appSharedChunk;
+const {
+  Nan: initializeAppgenAnalytics,
+  Pan: recordAppgenInteraction,
+  cnn: appgenSettingsPath,
+  ifn: initializeAppgenRuntime,
+  inn: appgenAnalyticsPath,
+  lnn: initializeAppgenRoutes,
+  ofn: isFeatureGateEnabled,
+  o_n: useNavigate,
+} = appInitialChunk;
+const {
+  n: initializeDisabledTooltip,
+  t: AppgenDisabledTooltip,
+} = disabledTooltipChunk;
+const {
+  a: initializeCardLayout,
+  i: AppgenCardActionsLayout,
+} = cardLayoutChunk;
+const {
+  n: openAppgenShareDialog,
+  t: initializeOpenShareDialog,
+} = shareDialogChunk;
+let jsx: JsxRuntime;
+
+interface SiteCardActionsProps {
+  canManage?: boolean;
+  disabled?: boolean;
+  disabledBy?: string | null;
+  onEdit(mode: "edit" | "publish"): void;
+  projectId: string;
+  projectTitle: string;
+  surface: "library" | "sites";
+  unpublished?: boolean;
+  viewMode: "grid" | "list";
+}
+
+interface SiteThumbnailProps extends Record<string, unknown> {
+  "aria-hidden"?: boolean;
+  className?: string;
+}
+
+let WindowsSiteThumbnail: (props: SiteThumbnailProps) => unknown;
+let MacSiteThumbnail: (props: SiteThumbnailProps) => unknown;
 
 function SiteCardActions({
   canManage = true,
@@ -28,38 +105,40 @@ function SiteCardActions({
   surface,
   unpublished = false,
   viewMode,
-}: any) {
-  const scope = appShared.LX(appShared.ZI);
-  const intl = appShared.n4();
-  const navigate = appInitial.o_n();
-  const analyticsEnabled = appInitial.ofn("262557526");
+}: SiteCardActionsProps): unknown {
+  const scope = useScope(AppScope);
+  const intl = useIntl();
+  const navigate = useNavigate();
+  const analyticsEnabled = isFeatureGateEnabled("262557526");
   const compactSitesList = surface === "sites" && viewMode === "list";
-  const track = (action: any) => {
-    appInitial.Pan(scope, {
+  const track = (action: AppgenInteractionAction) => {
+    recordAppgenInteraction(scope, {
       action,
       projectId,
       source:
         surface === "sites"
-          ? appShared.Hk.CODEX_APPGEN_INTERACTION_SOURCE_SITES
-          : appShared.Hk.CODEX_APPGEN_INTERACTION_SOURCE_LIBRARY,
+          ? appgenInteractionSources.CODEX_APPGEN_INTERACTION_SOURCE_SITES
+          : appgenInteractionSources.CODEX_APPGEN_INTERACTION_SOURCE_LIBRARY,
     });
   };
   const edit = () => {
-    track(appShared.Bk.CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED);
+    track(
+      appgenInteractionActions.CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED,
+    );
     onEdit("edit");
   };
   const publish = () => onEdit("publish");
   const share = () => {
-    shareDialog.n(scope, projectId, {
+    openAppgenShareDialog(scope, projectId, {
       source:
         surface === "library"
-          ? appShared.DF.CODEX_SITES_SHARING_SOURCE_LIBRARY
-          : appShared.DF.CODEX_SITES_SHARING_SOURCE_SITES,
+          ? sitesSharingSources.CODEX_SITES_SHARING_SOURCE_LIBRARY
+          : sitesSharingSources.CODEX_SITES_SHARING_SOURCE_SITES,
     });
   };
   const openSettings = () => {
-    track(appShared.Bk.CODEX_APPGEN_INTERACTION_ACTION_SETTINGS_OPENED);
-    navigate(appInitial.cnn(projectId));
+    track(appgenInteractionActions.CODEX_APPGEN_INTERACTION_ACTION_SETTINGS_OPENED);
+    navigate(appgenSettingsPath(projectId));
   };
   const moreLabel = intl.formatMessage(
     {
@@ -70,7 +149,7 @@ function SiteCardActions({
     { siteTitle: projectTitle },
   );
   const disabledReason = disabled
-    ? jsx.jsx(disabledTooltip.t, { disabledBy })
+    ? jsx.jsx(AppgenDisabledTooltip, { disabledBy })
     : null;
   const ownerRequired = intl.formatMessage({
     id: "appgenPage.publish.ownerRequired",
@@ -79,7 +158,7 @@ function SiteCardActions({
   });
   const nonOwnerPublish =
     unpublished && !canManage
-      ? jsx.jsx(appShared.o_, {
+      ? jsx.jsx(Tooltip, {
           tooltipContent: ownerRequired,
           children: jsx.jsx("span", {
             "aria-disabled": "true",
@@ -91,7 +170,7 @@ function SiteCardActions({
             className: "inline-flex [@container_(max-width:520px)]:hidden",
             role: "button",
             tabIndex: 0,
-            children: jsx.jsxs(appShared.Yh, {
+            children: jsx.jsxs(Button, {
               "aria-hidden": "true",
               "aria-label": intl.formatMessage({
                 id: "appgenPage.publish.label",
@@ -104,9 +183,9 @@ function SiteCardActions({
               disabled: true,
               size: "toolbar",
               children: [
-                jsx.jsx(appShared.S_, {
+                jsx.jsx(IconAsset, {
                   className: "hidden [@container_(max-width:720px)]:block",
-                  asset: appShared.Bs,
+                  asset: publishIcon,
                   "aria-hidden": true,
                 }),
                 jsx.jsx("span", {
@@ -123,7 +202,7 @@ function SiteCardActions({
         })
       : null;
 
-  const editAction = jsx.jsx(appShared.o_, {
+  const editAction = jsx.jsx(Tooltip, {
     interactive: disabled && disabledBy === "openai",
     tooltipContent:
       disabledReason ??
@@ -132,7 +211,7 @@ function SiteCardActions({
         "Edit",
         "Tooltip for starting a new conversation to edit a site",
       ),
-    children: jsx.jsx(appShared.Yh, {
+    children: jsx.jsx(Button, {
       className: compactSitesList
         ? "[@container_(max-width:520px)]:hidden"
         : undefined,
@@ -150,8 +229,8 @@ function SiteCardActions({
       size: viewMode === "grid" ? "toolbar" : "composer",
       uniform: true,
       onClick: edit,
-      children: jsx.jsx(appShared.S_, {
-        asset: appShared.jT,
+      children: jsx.jsx(IconAsset, {
+        asset: editIcon,
         "aria-hidden": true,
       }),
     }),
@@ -163,24 +242,24 @@ function SiteCardActions({
     ? undefined
     : "hidden [@container_(max-width:520px)]:inline-flex";
   const menu = disabled
-    ? jsx.jsx(appShared.gu, {
+    ? jsx.jsx(MoreButton, {
         className: menuClassName,
         disabled: true,
         label: moreLabel,
       })
-    : jsx.jsxs(appShared.kf, {
+    : jsx.jsxs(DropdownMenu, {
         align: "end",
         contentWidth: "menu",
-        triggerButton: jsx.jsx(appShared.gu, {
+        triggerButton: jsx.jsx(MoreButton, {
           className: menuClassName,
           label: moreLabel,
         }),
         children: [
           unpublished
-            ? jsx.jsx(appShared.jf.Item, {
+            ? jsx.jsx(Menu.Item, {
                 disabled: !canManage,
                 focusableWhenDisabled: !canManage,
-                leftIconAsset: appShared.Bs,
+                leftIconAsset: publishIcon,
                 onSelect: canManage ? publish : undefined,
                 tooltipText: canManage ? undefined : ownerRequired,
                 children: message(
@@ -191,8 +270,8 @@ function SiteCardActions({
               })
             : null,
           canManage && (unpublished || compactSitesList)
-            ? jsx.jsx(appShared.jf.Item, {
-                leftIconAsset: appShared.fO,
+            ? jsx.jsx(Menu.Item, {
+                leftIconAsset: shareIcon,
                 onSelect: share,
                 children: message(
                   "appgenPage.share.label",
@@ -201,8 +280,8 @@ function SiteCardActions({
                 ),
               })
             : null,
-          jsx.jsx(appShared.jf.Item, {
-            leftIconAsset: appShared.jT,
+          jsx.jsx(Menu.Item, {
+            leftIconAsset: editIcon,
             onSelect: edit,
             children: message(
               "appgenPage.edit.label",
@@ -211,14 +290,14 @@ function SiteCardActions({
             ),
           }),
           canManage && analyticsEnabled
-            ? jsx.jsx(appShared.jf.Item, {
-                leftIconAsset: appShared.gO,
+            ? jsx.jsx(Menu.Item, {
+                leftIconAsset: analyticsIcon,
                 onSelect: () => {
                   track(
-                    appShared.Bk
+                    appgenInteractionActions
                       .CODEX_APPGEN_INTERACTION_ACTION_ANALYTICS_OPENED,
                   );
-                  navigate(appInitial.inn(projectId));
+                  navigate(appgenAnalyticsPath(projectId));
                 },
                 children: message(
                   "appgenPage.analytics.label",
@@ -228,8 +307,8 @@ function SiteCardActions({
               })
             : null,
           canManage
-            ? jsx.jsx(appShared.jf.Item, {
-                leftIconAsset: appShared.bE,
+            ? jsx.jsx(Menu.Item, {
+                leftIconAsset: settingsIcon,
                 onSelect: openSettings,
                 children: message(
                   "appgenPage.settings.label",
@@ -247,10 +326,10 @@ function SiteCardActions({
     });
     return viewMode === "grid"
       ? actions
-      : jsx.jsx(cardLayout.i, { children: actions });
+      : jsx.jsx(AppgenCardActionsLayout, { children: actions });
   }
 
-  const settingsAction = jsx.jsx(appShared.o_, {
+  const settingsAction = jsx.jsx(Tooltip, {
     interactive: disabled && disabledBy === "openai",
     tooltipContent:
       disabledReason ??
@@ -259,7 +338,7 @@ function SiteCardActions({
         "Settings",
         "Tooltip for opening site settings from the sites list",
       ),
-    children: jsx.jsx(appShared.Yh, {
+    children: jsx.jsx(Button, {
       className: compactSitesList
         ? "[@container_(max-width:520px)]:hidden"
         : undefined,
@@ -277,8 +356,8 @@ function SiteCardActions({
       size: viewMode === "grid" ? "toolbar" : "composer",
       uniform: true,
       onClick: openSettings,
-      children: jsx.jsx(appShared.S_, {
-        asset: appShared.bE,
+      children: jsx.jsx(IconAsset, {
+        asset: settingsIcon,
         "aria-hidden": true,
       }),
     }),
@@ -319,10 +398,10 @@ function SiteCardActions({
         },
         { siteTitle: projectTitle },
       );
-  const primaryAction = jsx.jsx(appShared.o_, {
+  const primaryAction = jsx.jsx(Tooltip, {
     interactive: disabled && disabledBy === "openai",
     tooltipContent: primaryTooltip,
-    children: jsx.jsxs(appShared.Yh, {
+    children: jsx.jsxs(Button, {
       className: viewMode === "list" ? responsivePrimaryClass : undefined,
       "aria-label": primaryLabel,
       color: unpublished ? "primary" : secondaryColor,
@@ -337,7 +416,7 @@ function SiteCardActions({
               "Publish",
               "Button label for publishing an unpublished Site",
             )
-          : jsx.jsx(appShared.S_, { asset: appShared.fO, "aria-hidden": true }),
+          : jsx.jsx(IconAsset, { asset: shareIcon, "aria-hidden": true }),
         !unpublished && viewMode === "list"
           ? jsx.jsx("span", {
               className: "[@container_(max-width:520px)]:hidden",
@@ -368,40 +447,40 @@ function SiteCardActions({
   });
   return viewMode === "grid"
     ? actions
-    : jsx.jsx(cardLayout.i, { children: actions });
+    : jsx.jsx(AppgenCardActionsLayout, { children: actions });
 
   function message(id: string, defaultMessage: string, description: string) {
-    return jsx.jsx(appShared.Y2, { id, defaultMessage, description });
+    return jsx.jsx(FormattedMessage, { id, defaultMessage, description });
   }
 }
 
 function initializeSiteCardActions(): void {
-  appShared.$3();
-  appShared.fI();
-  appShared._O();
-  appShared.Vs();
-  appShared.pO();
-  appShared.xE();
-  appShared.AT();
-  appShared.FX();
-  appShared.K2();
-  appShared.lk();
-  appShared.Zh();
-  appShared.If();
-  appShared.C_();
-  appShared._u();
-  appShared.c_();
-  cardLayout.a();
-  appShared.QI();
-  appInitial.ifn();
-  appInitial.Nan();
-  disabledTooltip.n();
-  appInitial.lnn();
-  shareDialog.t();
-  jsx = appShared.I3();
+  initializeReactRuntime();
+  initializeIntlRuntime();
+  initializeSiteActionIcons();
+  initializeMenuIcons();
+  initializeDropdownMenu();
+  initializeNavigationTooltip();
+  initializeMountedState();
+  initializeMaitaiRuntime();
+  initializeInternationalization();
+  initializeIconAssets();
+  initializeButton();
+  initializeMenu();
+  initializeCardActions();
+  initializeMoreButton();
+  initializeTooltip();
+  initializeCardLayout();
+  initializeImageRuntime();
+  initializeAppgenRuntime();
+  initializeAppgenAnalytics();
+  initializeDisabledTooltip();
+  initializeAppgenRoutes();
+  initializeOpenShareDialog();
+  jsx = getJsxRuntime();
 }
 
-function siteLogoShapes(runtime: any) {
+function siteLogoShapes(runtime: JsxRuntime): unknown[] {
   return [
     runtime.jsx("path", {
       d: "M46.6667 30.8485C46.6667 31.8526 45.8526 32.6667 44.8485 32.6667H41.8182C40.814 32.6667 40 31.8526 40 30.8485V26H44.8485C45.8526 26 46.6667 26.814 46.6667 27.8182V30.8485Z",
@@ -425,9 +504,9 @@ function siteLogoShapes(runtime: any) {
 }
 
 function initializeWindowsSiteThumbnail(): void {
-  appShared.e6();
-  const svg = appShared.I3();
-  WindowsSiteThumbnail = (props: any) =>
+  initializeReact();
+  const svg = getJsxRuntime();
+  WindowsSiteThumbnail = (props: SiteThumbnailProps) =>
     svg.jsxs("svg", {
       width: 80,
       height: 50,
@@ -468,9 +547,9 @@ function initializeWindowsSiteThumbnail(): void {
 }
 
 function initializeMacSiteThumbnail(): void {
-  appShared.e6();
-  const svg = appShared.I3();
-  MacSiteThumbnail = (props: any) =>
+  initializeReact();
+  const svg = getJsxRuntime();
+  MacSiteThumbnail = (props: SiteThumbnailProps) =>
     svg.jsxs("svg", {
       width: 80,
       height: 50,

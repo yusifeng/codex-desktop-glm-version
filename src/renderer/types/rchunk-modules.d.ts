@@ -1849,6 +1849,11 @@ declare module "@rchunk/app-shared" {
   /** replaceEqualDeep（app-shared/runtime/query-structural-utils.ts）。 */
   export const PZ: <T>(previous: unknown, next: T) => T;
   export const QI: () => void;
+  /** Sites 卡片操作区图标与菜单依赖。 */
+  export const _O: () => void;
+  export const Vs: () => void;
+  export const pO: () => void;
+  export const xE: () => void;
   export interface IconAssetPreset {
     body: string;
     capabilities: readonly string[];
@@ -1867,6 +1872,11 @@ declare module "@rchunk/app-shared" {
   export const S_: (props: IconAssetProps) => unknown;
   /** edit icon asset（Site detail toolbar）。 */
   export const jT: IconAssetPreset;
+  /** Sites 卡片操作区图标 assets。 */
+  export const Bs: IconAssetPreset;
+  export const fO: IconAssetPreset;
+  export const gO: IconAssetPreset;
+  export const bE: IconAssetPreset;
   /** dismiss icon asset（worktree onboarding banner）。 */
   export const ig: IconAssetPreset;
   /** Worktree onboarding analytics event descriptor。 */
@@ -1953,7 +1963,7 @@ declare module "@rchunk/app-shared" {
   export const h4: () => void;
   export const i$: unknown;
   export const iW: (path: string) => string;
-  export const lk: unknown;
+  export const lk: () => void;
   export const wL: () => void;
   export const oq: string;
   export type TooltipSide = "top" | "right" | "bottom" | "left";
@@ -2784,6 +2794,18 @@ declare module "@rchunk/app-initial" {
   export const ofn: (gateId: string) => boolean;
   export const i_n: () => { pathname: string };
   export const o_n: () => (path: string) => void;
+  export const Pan: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    event: {
+      action: import("@rchunk/app-shared").AppgenInteractionAction;
+      projectId: string;
+      source: import("@rchunk/app-shared").AppgenInteractionSource;
+    },
+  ) => void;
+  export const cnn: (projectId: string) => string;
+  export const inn: (projectId: string) => string;
+  export const Nan: () => void;
+  export const lnn: () => void;
   export const uht: (
     accountId?: string,
     options?: { preview?: boolean },
@@ -3511,7 +3533,13 @@ declare module "@rchunk/appgen-share-dialog" {
 }
 
 declare module "@rchunk/open-appgen-share-dialog" {
-  export const n: (...args: any[]) => void;
+  export const n: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    projectId: string,
+    options: {
+      source: import("@rchunk/app-shared").SitesSharingSource;
+    },
+  ) => void;
   export const t: () => void;
 }
 
@@ -4651,11 +4679,23 @@ declare module "@rchunk/appgen-card-layout" {
 }
 
 declare module "@rchunk/sites-default-thumbnail" {
+  export interface SiteCardActionsProps {
+    canManage?: boolean;
+    disabled?: boolean;
+    disabledBy?: string | null;
+    onEdit(mode: "edit" | "publish"): void;
+    projectId: string;
+    projectTitle: string;
+    surface: "library" | "sites";
+    unpublished?: boolean;
+    viewMode: "grid" | "list";
+  }
   export interface DefaultSiteThumbnailAssetProps
     extends Record<string, unknown> {
     "aria-hidden"?: boolean;
     className?: string;
   }
+  export const a: (props: SiteCardActionsProps) => unknown;
   export const i: () => void;
   export const n: () => void;
   export const o: () => void;
