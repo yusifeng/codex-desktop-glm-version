@@ -649,6 +649,11 @@ declare module "@rchunk/codex-home-announcements-current" {
   export const t: unknown;
 }
 
+declare module "@rchunk/codex-home-announcements-current-entry" {
+  export const CodexHomeAnnouncements: unknown;
+  export const HomeComposerAnnouncements: unknown;
+}
+
 declare module "@rchunk/home-announcement-state" {
   export const r: unknown;
   export const t: () => void;
