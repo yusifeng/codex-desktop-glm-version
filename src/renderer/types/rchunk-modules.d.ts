@@ -2738,6 +2738,15 @@ declare module "@rchunk/app-initial" {
   export const Qgn: () => void;
   export const rht: () => void;
   export const Vzt: () => void;
+  /** initializePepperOnboarding（Pepper Beacon modal 状态依赖）。 */
+  export const Sqt: () => void;
+  /** Pepper onboarding 使用的当前账户 ID signal。 */
+  export const U6t: import("@rchunk/app-shared").ReadableSignal<string | null>;
+  /** 从当前 scope 关闭指定 dialog component。 */
+  export const zzt: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    component: (props: Record<string, unknown>) => unknown,
+  ) => void;
   export const ifn: () => void;
   export const mN: () => void;
   export const l1: () => void;
@@ -3015,8 +3024,21 @@ declare module "@rchunk/lock" {
 }
 
 declare module "@rchunk/pepper-onboarding-modal" {
-  export const PepperOnboardingModal: unknown;
+  export const PepperOnboardingModal: (
+    props: import("@rchunk/beacon-modal").PepperOnboardingBeaconModalProps,
+  ) => unknown;
   export const _any: any;
+}
+
+declare module "@rchunk/beacon-modal" {
+  export interface PepperOnboardingBeaconModalProps
+    extends Record<string, unknown> {
+    accountId: string;
+    onClose(): void;
+  }
+  export const PepperOnboardingBeaconModal: (
+    props: PepperOnboardingBeaconModalProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/chatgpt-cme" {

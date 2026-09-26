@@ -293,16 +293,24 @@ globalThis.__homeOnboardingTest.activeAccountId = "account-1";
 globalThis.__homeOnboardingTest.dismissedModals = [];
 const beaconModal = await loadModule("beacon-modal", {
   "app-initial": `
+    export const Sqt = () => {};
     export const U6t = Symbol("active-account");
+    export const Vzt = () => {};
     export const zzt = (_scope, modal) => globalThis.__homeOnboardingTest.dismissedModals.push(modal);
   `,
   "app-shared": `
+    export const $3 = () => {};
+    export const FX = () => {};
+    export const H3 = () => {};
+    export const QI = () => {};
     export const ZI = Symbol("scope");
     export const LX = () => ({ id: "scope" });
     export const HX = () => globalThis.__homeOnboardingTest.activeAccountId;
-    export const e6 = globalThis.__homeOnboardingTest.react;
-    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const e6 = () => globalThis.__homeOnboardingTest.react;
+    export const I3 = () => globalThis.__homeOnboardingTest.jsx;
     export const Jm = () => "LazyPepperModal";
+    export const V3 = async (loader) => loader();
+    export const qm = () => {};
   `,
   "pepper-onboarding-modal":
     "export const PepperOnboardingModal = 'PepperModal';",
