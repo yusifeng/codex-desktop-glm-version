@@ -393,6 +393,11 @@ declare module "@rchunk/permission-dropdown" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-site-card" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
