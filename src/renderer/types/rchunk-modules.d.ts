@@ -712,6 +712,7 @@ declare module "@rchunk/gpt-plugin-migration-dialog" {
 }
 
 declare module "@rchunk/migrated-plugin-access" {
+  export const a: () => void;
   export const i: (...args: any[]) => any;
   export const n: unknown;
   export const o: (...args: any[]) => any;
