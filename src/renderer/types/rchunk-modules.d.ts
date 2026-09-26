@@ -800,6 +800,9 @@ declare module "@rchunk/app-shared" {
   export type ReadableSignal<T> =
     | BoundAtomSignal<T>
     | SubscribableSignal<T>
+    | ScopedSignal<unknown, T>
+    | ScopedDerivedSignal<unknown, T>
+    | ScopedExternalSignal<unknown, T>
     | T;
   export interface CallableSignalFamily<Param, T> {
     (parameter: Param): ReadableSignal<T>;
@@ -2748,13 +2751,25 @@ declare module "@rchunk/app-info" {
 }
 
 declare module "@rchunk/use-codex-worktrees" {
-  export const n: (...args: any[]) => any;
+  export interface CodexWorktreesQueryResult {
+    data?: { worktrees?: unknown[] };
+    isError?: boolean;
+    isLoading?: boolean;
+  }
+  export const n: (
+    host: unknown,
+    surface: "home_page",
+    options: { enabled: boolean },
+  ) => CodexWorktreesQueryResult;
   export const t: () => void;
-  export const _any: any;
 }
 
 declare module "@rchunk/worktree-onboarding-state" {
-  export const n: (...args: any[]) => any;
+  export const n: (options: {
+    enabled: boolean;
+    entryPoint: string;
+    isLocalModeRemote?: boolean;
+  }) => { isEligible: boolean };
   export const r: unknown;
   export const t: () => void;
 }
@@ -3170,7 +3185,6 @@ declare module "@rchunk/home-suggestion-list" {
 
 declare module "@rchunk/home-composer-announcement-candidates" { export const HomeComposerAnnouncementCandidates: unknown; }
 declare module "@rchunk/codex-home-announcements" { export const _any: any; }
-declare module "@rchunk/worktree-onboarding-state" { export const _any: any; }
 declare module "@rchunk/announcement-entry-points" { export const _any: any; }
 declare module "@rchunk/realtime-voice-home-announcement" { export const _any: any; }
 declare module "@rchunk/worktree-onboarding-banner-controller" { export const _any: any; }

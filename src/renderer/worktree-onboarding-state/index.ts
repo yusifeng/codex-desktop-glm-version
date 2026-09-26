@@ -8,16 +8,50 @@ import * as worktreesChunk from "@rchunk/use-codex-worktrees";
 void runtimeChunk;
 
 const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const worktrees = worktreesChunk as Record<string, any>;
+const {
+  BX: useSignalFamilyValue,
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+  e6: reactRuntime,
+  sZ: createDerivedSignal,
+} = appSharedChunk;
+const {
+  n: useCodexWorktrees,
+  t: initializeCodexWorktrees,
+} = worktreesChunk;
 
-let worktreeOnboardingStateSignal: unknown = Symbol(
+type WorktreeOnboardingState = "dismissed" | "eligible" | "succeeded";
+type RunMode = "local" | "remote" | string;
+
+interface WorkspaceState {
+  cwd: string;
+  hostId: string;
+  isCodexWorktree?: boolean;
+  kind: string;
+}
+
+interface ReactRuntime {
+  useEffect(effect: () => void, dependencies: readonly unknown[]): void;
+}
+
+type ReadableSignal<Value> = import("@rchunk/app-shared").ReadableSignal<Value>;
+
+function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
+  return (typeof runtimeOrFactory === "function"
+    ? runtimeOrFactory()
+    : runtimeOrFactory) as Runtime;
+}
+
+let worktreeOnboardingStateSignal = Symbol(
   "worktree-onboarding-state-v1",
-);
-let promptSuggestsWorktreesSignal: unknown = Symbol(
+) as unknown as ReadableSignal<WorktreeOnboardingState>;
+let promptSuggestsWorktreesSignal = Symbol(
   "prompt-suggests-worktrees",
-);
-let React: any;
+) as unknown as ReadableSignal<boolean>;
+let React: ReactRuntime;
 let initialized = false;
 
 function promptSuggestsWorktrees(prompt: string): boolean {
@@ -36,21 +70,26 @@ function useWorktreeOnboardingState({
   isLocalModeRemote?: boolean;
 }): { isEligible: boolean } {
   initializeWorktreeOnboardingState();
-  const scope = appShared.LX(appShared.ZI);
-  const workspace = appShared.HX(appInitial.mdt);
-  const state = appShared.HX(worktreeOnboardingStateSignal);
+  const scope = useSignalScope(applicationScope);
+  const workspace = useSignalValue<WorkspaceState>(appInitial.mdt);
+  const state = useSignalValue<WorktreeOnboardingState>(
+    worktreeOnboardingStateSignal,
+  );
   const host = appInitial.Vfn?.(workspace.hostId);
   const projectKey = appInitial.kst?.({
     cwd: workspace.cwd,
     hostId: workspace.hostId,
   });
-  const runMode = appShared.BX?.(appInitial.Q4, projectKey);
-  const promptEligible = appShared.HX(promptSuggestsWorktreesSignal);
+  const runMode = useSignalFamilyValue?.(
+    appInitial.Q4,
+    projectKey,
+  ) as unknown as RunMode;
+  const promptEligible = useSignalValue<boolean>(promptSuggestsWorktreesSignal);
   const featureEnabled = appInitial.ofn?.("2634243883") === true;
   const bannerEnabled = appInitial.ofn?.("505458") === true;
   const shouldQuery =
     enabled && state === "eligible" && featureEnabled && promptEligible;
-  const query = worktrees.n(host, "home_page", { enabled: shouldQuery });
+  const query = useCodexWorktrees(host, "home_page", { enabled: shouldQuery });
   const hasWorktrees = (query.data?.worktrees?.length ?? 0) > 0;
   React.useEffect(() => {
     if (
@@ -78,10 +117,10 @@ function useWorktreeOnboardingState({
 function initializeWorktreeOnboardingState(): void {
   if (initialized) return;
   initialized = true;
-  appShared.FX?.();
-  worktrees.t?.();
+  initializeSignalRuntime?.();
+  initializeCodexWorktrees?.();
   appInitial.pdt?.();
-  appShared.QI?.();
+  initializeSharedRuntime?.();
   appInitial.Rht?.();
   appInitial.Bfn?.();
   appInitial.ifn?.();
@@ -92,10 +131,10 @@ function initializeWorktreeOnboardingState(): void {
     appInitial.dun?.("worktree-onboarding-state-v1", "eligible") ??
     worktreeOnboardingStateSignal;
   promptSuggestsWorktreesSignal =
-    appShared.sZ?.(appInitial.kht, ({ get }: any) =>
+    createDerivedSignal(appInitial.kht, ({ get }) =>
       promptSuggestsWorktrees(get(appInitial.t3)),
-    ) ?? promptSuggestsWorktreesSignal;
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
+    );
+  React = resolveRuntime<ReactRuntime>(reactRuntime);
 }
 
 export {

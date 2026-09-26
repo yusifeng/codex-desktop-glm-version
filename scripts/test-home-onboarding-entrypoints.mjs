@@ -564,6 +564,7 @@ check(
 );
 
 globalThis.__homeOnboardingTest.worktree = {
+  prompt: "Use a separate worktree for this task",
   query: { data: { worktrees: [] } },
   sets: [],
   workspace: {
@@ -593,9 +594,12 @@ const worktreeState = await loadModule("worktree-onboarding-state", {
     });
     export const HX = signal => signal.description === "workspace"
       ? globalThis.__homeOnboardingTest.worktree.workspace
-      : signal.description === "prompt-suggests-worktrees" ? true : signal.initial;
+      : signal.read ? signal.read() : signal.initial;
     export const BX = () => "local";
-    export const sZ = () => Symbol("prompt-suggests-worktrees");
+    export const sZ = (_scope, derive) => ({
+      description: "prompt-suggests-worktrees",
+      read: () => derive({ get: () => globalThis.__homeOnboardingTest.worktree.prompt }),
+    });
   `,
   "use-codex-worktrees": `
     export const n = () => globalThis.__homeOnboardingTest.worktree.query;
@@ -617,6 +621,12 @@ check(
 check(
   globalThis.__homeOnboardingTest.worktree.sets.at(-1)[1] === "succeeded",
   "marks onboarding succeeded after detecting a worktree",
+);
+globalThis.__homeOnboardingTest.worktree.query = { data: { worktrees: [] } };
+globalThis.__homeOnboardingTest.worktree.prompt = "Fix the typo";
+check(
+  worktreeState.n({ enabled: true, entryPoint: "codex" }).isEligible === false,
+  "requires a prompt that suggests isolated or parallel work",
 );
 
 globalThis.__homeOnboardingTest.worktreeActions = [];
@@ -1417,5 +1427,5 @@ check(
   "forwards API-key edits and disables empty submission",
 );
 
-assert.equal(assertions, 93);
+assert.equal(assertions, 94);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
