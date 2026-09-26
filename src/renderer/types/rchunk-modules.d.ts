@@ -462,6 +462,10 @@ declare module "@rchunk/chatgpt-image-upload-reminder-dialog-core" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/chatgpt-image-upload-reminder-dialog-entry" {
+  export const ChatGptImageUploadReminderDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
