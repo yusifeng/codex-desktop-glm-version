@@ -147,6 +147,10 @@ declare module "@rchunk/chatgpt-image-home" {
   export const _any: any;
 }
 
+declare module "@rchunk/image-suggestions-core" {
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
