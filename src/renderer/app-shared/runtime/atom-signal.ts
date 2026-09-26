@@ -230,7 +230,7 @@ class MaitaiStore implements AtomStore {
       this.nodeStates.set(target, node);
       // 有 init 的 atom 且无任何依赖 → 挂 onMount
       for (const dependency of state.d.keys()) this.requireNodeState(dependency).t.add(target);
-      if (isWritable(target) && hasInit(target)) {
+      if (target.onMount != null) {
         this.mountEffects.add(() => {
           const onMount = target.onMount;
           if (onMount == null) return;
@@ -435,6 +435,7 @@ export const AppScope = createScope<Record<string, unknown>>("AppScope");
 
 /** scope 实例节点；同一 scope 定义可以在不同父实例下拥有多份节点。 */
 export interface ScopeState<T = unknown> {
+  familyBindings: Map<ScopedDerivedFamily<unknown, unknown, unknown>, Map<unknown, Atom<unknown>>>;
   parent?: ScopeState<unknown>;
   queryClient?: unknown;
   retainedScopeEntries: Map<Scope<unknown>, Map<unknown, ScopeState<unknown>>>;
@@ -457,6 +458,7 @@ export interface ScopeApi<T = unknown> {
   readonly scope: Scope<T>;
   readonly value: T;
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+  get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
   set<Value>(signal: ScopedSignal<unknown, Value>, value: Value | ((current: Value) => Value)): void;
 }
 
@@ -472,6 +474,32 @@ export interface ScopedSignalOptions<TScope, TValue> {
     setSelf: (value: TValue | ((current: TValue) => TValue)) => void,
     scope: ScopeApi<TScope>,
   ) => void | (() => void);
+}
+
+export interface ScopedDerivedFamilyOptions<Param, TValue> {
+  autoDispose?: boolean | number;
+  excludeFieldsFromKey?: readonly string[];
+  isEqual?: (previous: TValue, next: TValue) => boolean;
+  key?: (parameter: Param) => unknown;
+  owner?: (parameter: Param) => unknown;
+}
+
+export interface DerivedScopedSignalContext<T = unknown> {
+  readonly queryClient: unknown;
+  readonly scope: ScopeApi<T>;
+  get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+  get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
+  get<Value = unknown>(reader: unknown, ...parameters: unknown[]): Value;
+}
+
+/** 原 `Sje` 返回的 scope 键控派生 family。 */
+export interface ScopedDerivedFamily<TScope, Param, TValue> {
+  autoDisposeMs: number;
+  debugLabel?: string;
+  kind: "readable-family";
+  scope: Scope<TScope>;
+  evict(state: ScopeState<unknown>, parameter: Param): boolean;
+  resolve(state: ScopeState<unknown>, parameter: Param): Atom<TValue>;
 }
 
 /** 原 `kI` 返回的 scope 键控 signal binding。 */
@@ -497,16 +525,18 @@ const scopeStateByApi = new WeakMap<ScopeApi<unknown>, ScopeState<unknown>>();
 function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
   const cached = scopeApiByState.get(state);
   if (cached != null) return cached as ScopeApi<T>;
-  const api: ScopeApi<T> = {
+  const api = {
     get queryClient() {
       if (state.queryClient == null) throw new Error("Missing query client");
       return state.queryClient;
     },
     scope: state.scope,
     value: state.value,
-    get<Value>(signal: ScopedSignal<unknown, Value>): Value {
-      const owner = findScopeState(state, signal.scope);
-      return owner.store.get(signal.resolve(state));
+    get(binding: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>, parameter?: unknown): unknown {
+      const owner = findScopeState(state, binding.scope);
+      return isScopedDerivedFamily(binding)
+        ? owner.store.get(binding.resolve(state, parameter))
+        : owner.store.get(binding.resolve(state));
     },
     set<Value>(
       signal: ScopedSignal<unknown, Value>,
@@ -515,7 +545,7 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
       const owner = findScopeState(state, signal.scope);
       owner.store.set(signal.resolve(state), value);
     },
-  };
+  } as ScopeApi<T>;
   scopeApiByState.set(state, api as ScopeApi<unknown>);
   scopeStateByApi.set(api as ScopeApi<unknown>, state as ScopeState<unknown>);
   return api;
@@ -536,6 +566,7 @@ export function createScopeState<T>(
     throw new Error(`Missing parent scope instance: ${scope.parent.__scopeBrand}`);
   }
   const state: ScopeState<T> = {
+    familyBindings: new Map(),
     parent: options.parent,
     queryClient: options.queryClient ?? options.parent?.queryClient,
     retainedScopeEntries: new Map(),
@@ -579,6 +610,149 @@ export function getRetainedScopeState<T>(
   const parentState = findScopeState(activeState, scope.parent);
   const retained = parentState.retainedScopeEntries.get(scope)?.get(key);
   return retained == null ? null : createScopeApi(retained as ScopeState<T>);
+}
+
+function canonicalFamilyKey(value: unknown, excludedFields?: ReadonlySet<string>): unknown {
+  if (Array.isArray(value)) return value.map((entry) => canonicalFamilyKey(entry));
+  if (typeof value !== "object" || value == null) return value;
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype != null) return value;
+  const source = value as Record<string, unknown>;
+  const normalized: Record<string, unknown> = {};
+  for (const key of Object.keys(source).sort()) {
+    if (!excludedFields?.has(key)) normalized[key] = canonicalFamilyKey(source[key]);
+  }
+  return normalized;
+}
+
+function isPlainFamilyKey(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== "object" || value == null) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype == null;
+}
+
+function scopedFamilyKey<Param>(
+  parameter: Param,
+  options?: ScopedDerivedFamilyOptions<Param, unknown>,
+): unknown {
+  if (options?.key != null) return options.key(parameter);
+  if (!Array.isArray(parameter) && !isPlainFamilyKey(parameter)) {
+    return parameter;
+  }
+  const excluded = options?.excludeFieldsFromKey == null
+    ? undefined
+    : new Set(options.excludeFieldsFromKey);
+  return JSON.stringify(canonicalFamilyKey(parameter, excluded));
+}
+
+function isScopedDerivedFamily(
+  value: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>,
+): value is ScopedDerivedFamily<unknown, unknown, unknown> {
+  return "kind" in value && value.kind === "readable-family";
+}
+
+function createDerivedContext<T>(
+  state: ScopeState<T>,
+  getAtom: AtomGet,
+): DerivedScopedSignalContext<T> {
+  const scopeApi = createScopeApi(state);
+  return {
+    get queryClient() {
+      return scopeApi.queryClient;
+    },
+    scope: scopeApi,
+    get<Value>(reader: unknown, ...parameters: unknown[]): Value {
+      if (typeof reader === "object" && reader != null && "scope" in reader) {
+        const binding = reader as ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>;
+        const owner = findScopeState(state, binding.scope);
+        const target = isScopedDerivedFamily(binding)
+          ? binding.resolve(state, parameters[0])
+          : binding.resolve(state);
+        if (owner.store !== state.store) return owner.store.get(target) as Value;
+        return getAtom(target) as Value;
+      }
+      if (isAtomStoreReader(reader)) {
+        return reader.store.get(reader.atom as Atom<Value>);
+      }
+      if (typeof reader === "object" && reader != null && "read" in reader) {
+        return getAtom(reader as Atom<Value>);
+      }
+      throw new TypeError("Unsupported derived signal reader");
+    },
+  };
+}
+
+/**
+ * 创建 scope 键控派生 family（原 `Sje` / 压缩导出 `rZ`）。成员按稳定参数
+ * key 缓存在目标 scope 实例上，默认 autoDispose 为 60 秒。
+ */
+export function createDerivedFamily<TScope, Param, TValue>(
+  scope: Scope<TScope>,
+  derive: (parameter: Param, context: DerivedScopedSignalContext<TScope>) => TValue,
+  options?: ScopedDerivedFamilyOptions<Param, TValue>,
+): ScopedDerivedFamily<TScope, Param, TValue> {
+  const autoDisposeMs = normalizeAutoDispose(options?.autoDispose ?? 60_000);
+  const keyOptions = options as ScopedDerivedFamilyOptions<Param, unknown> | undefined;
+  const family: ScopedDerivedFamily<TScope, Param, TValue> = {
+    autoDisposeMs,
+    kind: "readable-family",
+    scope,
+    evict(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const members = owner.familyBindings.get(
+        family as ScopedDerivedFamily<unknown, unknown, unknown>,
+      );
+      if (members == null) return false;
+      const removed = members.delete(scopedFamilyKey(parameter, keyOptions));
+      if (members.size === 0) {
+        owner.familyBindings.delete(
+          family as ScopedDerivedFamily<unknown, unknown, unknown>,
+        );
+      }
+      return removed;
+    },
+    resolve(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const familyKey = family as ScopedDerivedFamily<unknown, unknown, unknown>;
+      let members = owner.familyBindings.get(familyKey);
+      if (members == null) {
+        members = new Map();
+        owner.familyBindings.set(familyKey, members);
+      }
+      const parameterKey = scopedFamilyKey(parameter, keyOptions);
+      const cached = members.get(parameterKey);
+      if (cached != null) return cached as Atom<TValue>;
+      const derivedAtom = atom((get) => derive(parameter, createDerivedContext(owner, get)));
+      derivedAtom.isEqual = options?.isEqual;
+      let disposalTimer: ReturnType<typeof setTimeout> | undefined;
+      derivedAtom.onMount = () => {
+        if (disposalTimer != null) {
+          clearTimeout(disposalTimer);
+          disposalTimer = undefined;
+        }
+        return () => {
+          if (autoDisposeMs === Infinity) return;
+          disposalTimer = setTimeout(() => {
+            disposalTimer = undefined;
+            family.evict(activeState, parameter);
+          }, autoDisposeMs);
+        };
+      };
+      members.set(parameterKey, derivedAtom as Atom<unknown>);
+      return derivedAtom;
+    },
+  };
+  return family;
+}
+
+/** 解析派生 family 成员为 hook 可消费的 atom/store 对。 */
+export function resolveScopedDerivedFamily<TScope, Param, TValue>(
+  family: ScopedDerivedFamily<TScope, Param, TValue>,
+  parameter: Param,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<TValue> {
+  const owner = findScopeState(state, family.scope);
+  return { atom: family.resolve(state, parameter), store: owner.store };
 }
 
 /**

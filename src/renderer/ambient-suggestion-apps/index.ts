@@ -6,7 +6,9 @@ import {
   FX as initializeStore,
   QI as initializeQueryBridge,
   ZI as storeFamily,
-  rZ as deriveStoreFamily,
+  rZ as createDerivedFamily,
+  type DerivedScopedSignalContext,
+  type ScopedDerivedFamily,
 } from "@rchunk/app-shared";
 import {
   $4t as initializeApps,
@@ -67,7 +69,15 @@ function hasAppWithoutIcon(apps: Iterable<AmbientSuggestionApp>): boolean {
   return false;
 }
 
-let appIndexFamily: any;
+interface AppsQueryResult {
+  data?: AmbientSuggestionApp[];
+}
+
+let appIndexFamily: ScopedDerivedFamily<
+  Record<string, unknown>,
+  string,
+  Map<string, AmbientSuggestionApp> | undefined
+>;
 
 function initializeAmbientSuggestionApps(): void {
   if (appIndexFamily != null) return;
@@ -78,10 +88,13 @@ function initializeAmbientSuggestionApps(): void {
   initializeHostApps();
   initializeQueryBridge();
   initializeAppIcons();
-  appIndexFamily = deriveStoreFamily(storeFamily, (hostId: string, context: { get(value: any, key: string): any }) => {
-    const apps = context.get(appsQueryFamily, hostId).data as AmbientSuggestionApp[] | undefined;
-    return apps == null ? undefined : createAmbientSuggestionAppIndex(apps);
-  });
+  appIndexFamily = createDerivedFamily(
+    storeFamily,
+    (hostId: string, context: DerivedScopedSignalContext<Record<string, unknown>>) => {
+      const apps = context.get<AppsQueryResult>(appsQueryFamily, hostId).data;
+      return apps == null ? undefined : createAmbientSuggestionAppIndex(apps);
+    },
+  );
 }
 
 function useAmbientSuggestionApps(input: {

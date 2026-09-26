@@ -104,9 +104,12 @@ declare module "@rchunk/app-shared" {
     | BoundAtomSignal<T>
     | SubscribableSignal<T>
     | T;
-  export interface SignalFamily<Param, T> {
+  export interface CallableSignalFamily<Param, T> {
     (parameter: Param): ReadableSignal<T>;
   }
+  export type SignalFamily<Param, T> =
+    | CallableSignalFamily<Param, T>
+    | ScopedDerivedFamily<unknown, Param, T>;
   /** useSignalFamilyValue（app-shared/runtime/atom-signal.ts）。 */
   export const BX: <Param, T>(
     family: SignalFamily<Param, T>,
@@ -183,6 +186,29 @@ declare module "@rchunk/app-shared" {
     debugLabel?: string;
     scope: MaitaiScope<TScope>;
   }
+  export interface ScopedDerivedFamilyOptions<Param, TValue> {
+    autoDispose?: boolean | number;
+    excludeFieldsFromKey?: readonly string[];
+    isEqual?: (previous: TValue, next: TValue) => boolean;
+    key?: (parameter: Param) => unknown;
+    owner?: (parameter: Param) => unknown;
+  }
+  export interface DerivedScopedSignalContext<T = unknown> {
+    readonly queryClient: unknown;
+    readonly scope: MaitaiScopeApi<T>;
+    get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+    get<Param, Value>(
+      family: ScopedDerivedFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
+    get<Value = unknown>(reader: unknown, ...parameters: unknown[]): Value;
+  }
+  export interface ScopedDerivedFamily<TScope, Param, TValue> {
+    autoDisposeMs: number;
+    debugLabel?: string;
+    kind: "readable-family";
+    scope: MaitaiScope<TScope>;
+  }
   export const LX: unknown;
   export const P3: unknown;
   /** replaceEqualDeep（app-shared/runtime/query-structural-utils.ts）。 */
@@ -219,7 +245,15 @@ declare module "@rchunk/app-shared" {
   export const lk: unknown;
   export const wL: () => void;
   export const oq: string;
-  export const rZ: any;
+  /** createDerivedFamily（app-shared/runtime/atom-signal.ts，内部 Sje）。 */
+  export const rZ: <TScope, Param, TValue>(
+    scope: MaitaiScope<TScope>,
+    derive: (
+      parameter: Param,
+      context: DerivedScopedSignalContext<TScope>,
+    ) => TValue,
+    options?: ScopedDerivedFamilyOptions<Param, TValue>,
+  ) => ScopedDerivedFamily<TScope, Param, TValue>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =
