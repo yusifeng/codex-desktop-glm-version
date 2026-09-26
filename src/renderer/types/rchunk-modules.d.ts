@@ -577,6 +577,18 @@ declare module "@rchunk/queries" {
   export const t: unknown;
 }
 
+declare module "@rchunk/stripe-payment-confirmation" {
+  export const a: (error: unknown) => string;
+  export const i: string;
+  export const n: (paymentIntent: unknown) => string | null;
+  export const o: () => void;
+  export const r: () => void;
+  export const t: (input: {
+    confirmPaymentIntent: () => Promise<unknown>;
+    shouldRetry: () => boolean;
+  }) => Promise<any>;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
