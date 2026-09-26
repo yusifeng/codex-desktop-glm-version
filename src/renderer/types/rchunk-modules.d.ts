@@ -111,13 +111,21 @@ declare module "@rchunk/app-shared" {
   export type SignalFamily<Param, T> =
     | CallableSignalFamily<Param, T>
     | ScopedDerivedFamily<unknown, Param, T>
+    | ScopedQueryFamily<unknown, Param, unknown, unknown>
     | ScopedSignalFamily<unknown, Param, T>;
   /** useSignalFamilyValue（app-shared/runtime/atom-signal.ts）。 */
-  export const BX: <Param, T>(
-    family: SignalFamily<Param, T>,
-    parameter: Param,
-    options?: QueryReadOptions,
-  ) => T;
+  export const BX: {
+    <Param, Data, QueryError>(
+      family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+      parameter: Param,
+      options?: QueryReadOptions,
+    ): ScopedQueryResult<Data, QueryError>;
+    <Param, T>(
+      family: SignalFamily<Param, T>,
+      parameter: Param,
+      options?: QueryReadOptions,
+    ): T;
+  };
   export const Bk: Record<string, string>; // bq：Appgen interaction action 枚举
   export const C_: unknown;
   export const FQ: unknown;
@@ -167,6 +175,10 @@ declare module "@rchunk/app-shared" {
       signal: ScopedQuerySignal<unknown, Data, QueryError>,
     ): ScopedQueryResult<Data, QueryError>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
+    get<Param, Data, QueryError>(
+      family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+      parameter: Param,
+    ): ScopedQueryResult<Data, QueryError>;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
@@ -228,7 +240,9 @@ declare module "@rchunk/app-shared" {
     meta?: unknown;
     queryFn?: (context: ScopedQueryFunctionContext) => Promise<TData> | TData;
     queryKey: readonly unknown[];
+    refetchInterval?: number | false;
     refetchOnMount?: boolean | "always";
+    refetchOnWindowFocus?: boolean | "always";
     retry?: boolean | number | ((failureCount: number, error: TError) => boolean);
     staleTime?: number;
     throwOnError?: boolean | ((error: TError) => boolean);
@@ -284,6 +298,10 @@ declare module "@rchunk/app-shared" {
     key?: (parameter: Param) => unknown;
     owner?: (parameter: Param) => unknown;
   }
+  export type ScopedQueryFamilyOptions<Param> = Omit<
+    ScopedDerivedFamilyOptions<Param, unknown>,
+    "isEqual"
+  >;
   export interface ScopedSignalFamilyOptions<Param> {
     autoDispose?: boolean | number;
     excludeFieldsFromKey?: readonly string[];
@@ -310,6 +328,10 @@ declare module "@rchunk/app-shared" {
       signal: ScopedQuerySignal<unknown, Data, QueryError>,
     ): ScopedQueryResult<Data, QueryError>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
+    get<Param, Data, QueryError>(
+      family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+      parameter: Param,
+    ): ScopedQueryResult<Data, QueryError>;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
@@ -324,6 +346,17 @@ declare module "@rchunk/app-shared" {
     autoDisposeMs: number;
     debugLabel?: string;
     kind: "readable-family";
+    scope: MaitaiScope<TScope>;
+  }
+  export interface ScopedQueryFamily<TScope, Param, TData, TError = Error> {
+    autoDisposeMs: number;
+    debugLabel?: string;
+    getOptions(
+      parameter: Param,
+      context: DerivedScopedSignalContext<TScope>,
+    ): ScopedQueryOptions<TData, TError>;
+    kind: "readable-family";
+    queryKind: "query";
     scope: MaitaiScope<TScope>;
   }
   export interface ScopedSignalFamily<TScope, Param, TValue> {
@@ -391,6 +424,15 @@ declare module "@rchunk/app-shared" {
       context: DerivedScopedSignalContext<TScope>,
     ) => ScopedQueryOptions<TData, TError>,
   ) => ScopedQuerySignal<TScope, TData, TError>;
+  /** createQueryFamily（app-shared/runtime/atom-signal.ts，内部 Vje）。 */
+  export const QX: <TScope, Param, TData, TError = Error>(
+    scope: MaitaiScope<TScope>,
+    getOptions: (
+      parameter: Param,
+      context: DerivedScopedSignalContext<TScope>,
+    ) => ScopedQueryOptions<TData, TError>,
+    options?: ScopedQueryFamilyOptions<Param>,
+  ) => ScopedQueryFamily<TScope, Param, TData, TError>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =

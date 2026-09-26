@@ -439,6 +439,7 @@ export interface ScopeState<T = unknown> {
   familyBindings: Map<ScopedDerivedFamily<unknown, unknown, unknown>, Map<unknown, Atom<unknown>>>;
   parent?: ScopeState<unknown>;
   queryClient?: unknown;
+  queryFamilyBindings: Map<ScopedQueryFamily<unknown, unknown, unknown, unknown>, Map<unknown, Atom<unknown>>>;
   retainedScopeEntries: Map<Scope<unknown>, Map<unknown, ScopeState<unknown>>>;
   scope: Scope<T>;
   signalFamilyBindings: Map<ScopedSignalFamily<unknown, unknown, unknown>, Map<unknown, WritableAtom<unknown, unknown>>>;
@@ -467,6 +468,10 @@ export interface ScopeApi<T = unknown> {
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
   get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
   get<Data, QueryError>(signal: ScopedQuerySignal<unknown, Data, QueryError>): ScopedQueryResult<Data, QueryError>;
+  get<Param, Data, QueryError>(
+    family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+    parameter: Param,
+  ): ScopedQueryResult<Data, QueryError>;
   get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
   get<Param, Value>(family: ScopedSignalFamily<unknown, Param, Value>, parameter: Param): Value;
   getOwnValue<Value>(scope: Scope<Value>): Value;
@@ -511,7 +516,9 @@ export interface ScopedQueryOptions<TData, TError = Error> {
   meta?: unknown;
   queryFn?: (context: ScopedQueryFunctionContext) => Promise<TData> | TData;
   queryKey: readonly unknown[];
+  refetchInterval?: number | false;
   refetchOnMount?: boolean | "always";
+  refetchOnWindowFocus?: boolean | "always";
   retry?: boolean | number | ((failureCount: number, error: TError) => boolean);
   staleTime?: number;
   throwOnError?: boolean | ((error: TError) => boolean);
@@ -562,6 +569,11 @@ export interface ScopedDerivedFamilyOptions<Param, TValue> {
   owner?: (parameter: Param) => unknown;
 }
 
+export type ScopedQueryFamilyOptions<Param> = Omit<
+  ScopedDerivedFamilyOptions<Param, unknown>,
+  "isEqual"
+>;
+
 export interface ScopedSignalFamilyOptions<Param> {
   autoDispose?: boolean | number;
   excludeFieldsFromKey?: readonly string[];
@@ -588,6 +600,10 @@ export interface DerivedScopedSignalContext<T = unknown> {
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
   get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
   get<Data, QueryError>(signal: ScopedQuerySignal<unknown, Data, QueryError>): ScopedQueryResult<Data, QueryError>;
+  get<Param, Data, QueryError>(
+    family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+    parameter: Param,
+  ): ScopedQueryResult<Data, QueryError>;
   get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
   get<Param, Value>(family: ScopedSignalFamily<unknown, Param, Value>, parameter: Param): Value;
   get<Value = unknown>(reader: unknown, ...parameters: unknown[]): Value;
@@ -610,6 +626,22 @@ export interface ScopedQuerySignal<TScope, TData, TError = Error> {
   scope: Scope<TScope>;
   resolve(state: ScopeState<unknown>): Atom<ScopedQueryResult<TData, TError>>;
   [WITH_QUERY_READ_OPTIONS](options: QueryReadOptions): ScopedQuerySignal<TScope, TData, TError>;
+}
+
+/** 原 `Vje` 返回的 scope 键控 query family。 */
+export interface ScopedQueryFamily<TScope, Param, TData, TError = Error> {
+  autoDisposeMs: number;
+  debugLabel?: string;
+  getOptions(
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ): ScopedQueryOptions<TData, TError>;
+  kind: "readable-family";
+  queryKind: "query";
+  scope: Scope<TScope>;
+  evict(state: ScopeState<unknown>, parameter: Param): boolean;
+  resolve(state: ScopeState<unknown>, parameter: Param): Atom<ScopedQueryResult<TData, TError>>;
+  [WITH_QUERY_READ_OPTIONS](options: QueryReadOptions): ScopedQueryFamily<TScope, Param, TData, TError>;
 }
 
 /** 原 `Sje` 返回的 scope 键控派生 family。 */
@@ -679,6 +711,7 @@ function resolveScopeBinding(
     | ScopedSignal<unknown, unknown>
     | ScopedDerivedSignal<unknown, unknown>
     | ScopedQuerySignal<unknown, unknown, unknown>
+    | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
   parameter?: unknown,
@@ -719,6 +752,7 @@ function watchScope<T>(
           | ScopedSignal<unknown, unknown>
           | ScopedDerivedSignal<unknown, unknown>
           | ScopedQuerySignal<unknown, unknown, unknown>
+          | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>,
         parameter?: unknown,
@@ -770,6 +804,7 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
         | ScopedSignal<unknown, unknown>
         | ScopedDerivedSignal<unknown, unknown>
         | ScopedQuerySignal<unknown, unknown, unknown>
+        | ScopedQueryFamily<unknown, unknown, unknown, unknown>
         | ScopedDerivedFamily<unknown, unknown, unknown>
         | ScopedSignalFamily<unknown, unknown, unknown>,
       parameter?: unknown,
@@ -833,6 +868,7 @@ export function createScopeState<T>(
     familyBindings: new Map(),
     parent: options.parent,
     queryClient: options.queryClient ?? options.parent?.queryClient,
+    queryFamilyBindings: new Map(),
     retainedScopeEntries: new Map(),
     scope,
     signalFamilyBindings: new Map(),
@@ -920,10 +956,12 @@ function isScopedFamily(
     | ScopedSignal<unknown, unknown>
     | ScopedDerivedSignal<unknown, unknown>
     | ScopedQuerySignal<unknown, unknown, unknown>
+    | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
 ): value is
   | ScopedDerivedFamily<unknown, unknown, unknown>
+  | ScopedQueryFamily<unknown, unknown, unknown, unknown>
   | ScopedSignalFamily<unknown, unknown, unknown> {
   return "kind" in value && (value.kind === "readable-family" || value.kind === "signal-family");
 }
@@ -950,6 +988,7 @@ function createDerivedContext<T>(
           | ScopedSignal<unknown, unknown>
           | ScopedDerivedSignal<unknown, unknown>
           | ScopedQuerySignal<unknown, unknown, unknown>
+          | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>;
         const owner = findScopeState(state, binding.scope);
@@ -1252,6 +1291,121 @@ export function resolveScopedQuerySignal<TScope, TData, TError>(
 ): BoundAtomSignal<ScopedQueryResult<TData, TError>> {
   const owner = findScopeState(state, signal.scope);
   return { atom: signal.resolve(state), store: owner.store };
+}
+
+function createQueryFamilyInternal<TScope, Param, TData, TError>(
+  scope: Scope<TScope>,
+  getOptions: (
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedQueryOptions<TData, TError>,
+  options?: ScopedQueryFamilyOptions<Param>,
+  forcedEnabled?: boolean,
+): ScopedQueryFamily<TScope, Param, TData, TError> {
+  const autoDisposeMs = normalizeAutoDispose(options?.autoDispose ?? true);
+  const memberSignals = new WeakMap<
+    ScopeState<unknown>,
+    Map<unknown, ScopedQuerySignal<TScope, TData, TError>>
+  >();
+  let disabledFamily: ScopedQueryFamily<TScope, Param, TData, TError> | undefined;
+  const family: ScopedQueryFamily<TScope, Param, TData, TError> = {
+    autoDisposeMs,
+    getOptions,
+    kind: "readable-family",
+    queryKind: "query",
+    scope,
+    [WITH_QUERY_READ_OPTIONS](readOptions) {
+      if (readOptions.enabled !== false || forcedEnabled === false) return family;
+      disabledFamily ??= createQueryFamilyInternal(scope, getOptions, options, false);
+      disabledFamily.debugLabel = family.debugLabel;
+      return disabledFamily;
+    },
+    evict(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const familyKey = family as ScopedQueryFamily<unknown, unknown, unknown, unknown>;
+      const parameterKey = scopedFamilyKey(parameter, options);
+      const members = owner.queryFamilyBindings.get(familyKey);
+      const signal = memberSignals.get(owner)?.get(parameterKey);
+      if (signal != null) {
+        owner.cachedBindings.delete(
+          signal as unknown as ScopedDerivedSignal<unknown, unknown>,
+        );
+        memberSignals.get(owner)?.delete(parameterKey);
+      }
+      if (members == null) return false;
+      const removed = members.delete(parameterKey);
+      if (members.size === 0) owner.queryFamilyBindings.delete(familyKey);
+      return removed;
+    },
+    resolve(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const familyKey = family as ScopedQueryFamily<unknown, unknown, unknown, unknown>;
+      let members = owner.queryFamilyBindings.get(familyKey);
+      if (members == null) {
+        members = new Map();
+        owner.queryFamilyBindings.set(familyKey, members);
+      }
+      const parameterKey = scopedFamilyKey(parameter, options);
+      const cached = members.get(parameterKey);
+      if (cached != null) return cached as Atom<ScopedQueryResult<TData, TError>>;
+
+      const signal = createQuerySignalInternal(
+        scope,
+        (context) => getOptions(parameter, context),
+        forcedEnabled,
+      );
+      signal.debugLabel = family.debugLabel;
+      let signals = memberSignals.get(owner);
+      if (signals == null) {
+        signals = new Map();
+        memberSignals.set(owner, signals);
+      }
+      signals.set(parameterKey, signal);
+      const queryAtom = signal.resolve(activeState);
+      const mountQuery = queryAtom.onMount;
+      let disposalTimer: ReturnType<typeof setTimeout> | undefined;
+      queryAtom.onMount = (setSelf) => {
+        if (disposalTimer != null) {
+          clearTimeout(disposalTimer);
+          disposalTimer = undefined;
+        }
+        const unmountQuery = mountQuery?.(setSelf);
+        return () => {
+          if (typeof unmountQuery === "function") unmountQuery();
+          if (autoDisposeMs === Infinity) return;
+          disposalTimer = setTimeout(() => {
+            disposalTimer = undefined;
+            family.evict(activeState, parameter);
+          }, autoDisposeMs);
+        };
+      };
+      members.set(parameterKey, queryAtom as Atom<unknown>);
+      return queryAtom;
+    },
+  };
+  return family;
+}
+
+/** 创建 scope 键控 query family（原 `Vje` / 压缩导出 `QX`）。 */
+export function createQueryFamily<TScope, Param, TData, TError = Error>(
+  scope: Scope<TScope>,
+  getOptions: (
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedQueryOptions<TData, TError>,
+  options?: ScopedQueryFamilyOptions<Param>,
+): ScopedQueryFamily<TScope, Param, TData, TError> {
+  return createQueryFamilyInternal(scope, getOptions, options);
+}
+
+/** 解析 query family 成员为 hook 可消费的 atom/store 对。 */
+export function resolveScopedQueryFamily<TScope, Param, TData, TError>(
+  family: ScopedQueryFamily<TScope, Param, TData, TError>,
+  parameter: Param,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<ScopedQueryResult<TData, TError>> {
+  const owner = findScopeState(state, family.scope);
+  return { atom: family.resolve(state, parameter), store: owner.store };
 }
 
 /**
@@ -1720,9 +1874,31 @@ export interface BoundAtomSignal<T> {
 /** `HX` 可读取的公共形态。普通值用于原实现的常量快照分支。 */
 export type ReadableSignal<T> = Atom<T> | BoundAtomSignal<T> | SubscribableSignal<T> | T;
 
-/** `BX` 的参数化 signal family。 */
-export interface SignalFamily<Param, T> {
+/** `BX` 的普通 callable signal family。 */
+export interface CallableSignalFamily<Param, T> {
   (parameter: Param): ReadableSignal<T>;
+}
+
+/** `BX` 可读取的参数化 family 形态。 */
+export type SignalFamily<Param, T> =
+  | CallableSignalFamily<Param, T>
+  | ScopedDerivedFamily<unknown, Param, T>
+  | ScopedQueryFamily<unknown, Param, unknown, unknown>
+  | ScopedSignalFamily<unknown, Param, T>;
+
+function isScopedFamilyBinding<Param, T>(
+  value: SignalFamily<Param, T>,
+): value is
+  | ScopedDerivedFamily<unknown, Param, T>
+  | ScopedQueryFamily<unknown, Param, unknown, unknown>
+  | ScopedSignalFamily<unknown, Param, T> {
+  return (
+    typeof value === "object" &&
+    value != null &&
+    "scope" in value &&
+    "resolve" in value &&
+    "kind" in value
+  );
 }
 
 function isSubscribableSignal<T>(value: ReadableSignal<T>): value is SubscribableSignal<T> {
@@ -1772,5 +1948,20 @@ export function useSignalValue<T>(signal: ReadableSignal<T>, options?: QueryRead
 
 /** 原 `dMe` / 压缩导出 `BX`：解析 family 成员后复用 `useSignalValue`。 */
 export function useSignalFamilyValue<Param, T>(family: SignalFamily<Param, T>, parameter: Param, options?: QueryReadOptions): T {
-  return useSignalValue(family(parameter), options);
+  const configuredFamily = withQueryReadOptions(family, options) as SignalFamily<Param, T>;
+  if (isScopedFamilyBinding(configuredFamily)) {
+    const activeState = reactOf().useContext(getScopeReactContext(configuredFamily.scope));
+    if (activeState == null) {
+      throw new Error(`Missing scope instance: ${configuredFamily.scope.__scopeBrand}`);
+    }
+    const owner = findScopeState(activeState, configuredFamily.scope);
+    const scopedFamily = configuredFamily as {
+      resolve(state: ScopeState<unknown>, member: Param): Atom<T>;
+    };
+    return useSignalValue({
+      atom: scopedFamily.resolve(activeState, parameter),
+      store: owner.store,
+    });
+  }
+  return useSignalValue(configuredFamily(parameter), options);
 }
