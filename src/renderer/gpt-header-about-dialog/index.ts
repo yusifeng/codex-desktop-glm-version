@@ -5,13 +5,47 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as gptAboutDialogChunk from "@rchunk/gpt-about-dialog-core";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const gptAboutDialog = gptAboutDialogChunk as Record<string, any>;
 
-const jsx = appShared.I3();
+interface GptGizmo {
+  id: string;
+  short_url?: string | null;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  BX: useSignalFamilyValue,
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  I3: getJsxRuntime,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+} = appSharedChunk;
+const {
+  Dln: workspacePermissionsQuery,
+  F7: clearSelectedResource,
+  Het: initializeComposerMode,
+  Jet: setComposerMode,
+  Oln: initializeNavigation,
+  P7: initializeSelectedResource,
+  Qgn: initializeGptResources,
+  Sun: initializeGptPermissions,
+  mun: activeAccountIdSignal,
+  o_n: useNavigate,
+  rht: initializeAccountQuery,
+  uht: useAccountQuery,
+  xtn: initializeGptRoutes,
+  ytn: gptRoute,
+} = appInitialChunk;
+const {
+  n: initializeGptAboutDialog,
+  t: GptAboutDialog,
+} = gptAboutDialogChunk;
+
+const jsx: JsxRuntime = getJsxRuntime();
 
 function GptHeaderAboutDialog({
   accountId,
@@ -19,55 +53,53 @@ function GptHeaderAboutDialog({
   onClose,
 }: {
   accountId?: string;
-  resource: any;
+  resource: GptGizmo;
   onClose: () => void;
-}) {
-  const scope = appShared.LX(appShared.ZI);
-  const navigate = appInitial.o_n();
-  const activeAccountId = appShared.HX(appInitial.mun);
-  const { data: account } = appInitial.uht(undefined, { preview: false });
+}): unknown {
+  const scope = useSignalScope(applicationScope);
+  const navigate = useNavigate();
+  const activeAccountId = useSignalValue(activeAccountIdSignal);
+  const { data: account } = useAccountQuery(undefined, { preview: false });
   const isWorkspaceOwner =
     account?.id === accountId &&
     account?.structure === "workspace" &&
     account.account_user_role === "account-owner";
   const canLoadPolicy = activeAccountId === accountId && isWorkspaceOwner;
-  const { data: workspacePolicy } = appShared.BX(
-    appInitial.Dln,
+  const { data: workspacePolicy } = useSignalFamilyValue(
+    workspacePermissionsQuery,
     accountId ?? "",
     { enabled: canLoadPolicy },
   );
 
   if (activeAccountId !== accountId) return null;
-  return jsx.jsx(gptAboutDialog.t, {
+  return jsx.jsx(GptAboutDialog, {
     accountId,
     gizmo: resource,
     isOwnerAndWorkspaceAllowsSpecific:
       isWorkspaceOwner &&
       workspacePolicy?.allow_third_party_gpts === "allow_specific",
     onClose,
-    onStartChat: (selected: any) => {
+    onStartChat: (selected: { gizmo: GptGizmo }) => {
       onClose();
-      appInitial.F7(scope, null);
-      appInitial.Jet(scope, "chat");
-      navigate(
-        appInitial.ytn(selected.gizmo.short_url?.trim() || selected.gizmo.id),
-      );
+      clearSelectedResource(scope, null);
+      setComposerMode(scope, "chat");
+      navigate(gptRoute(selected.gizmo.short_url?.trim() || selected.gizmo.id));
     },
   });
 }
 
 function initializeGptHeaderAboutDialog(): void {
-  appShared.$3?.();
-  appShared.FX?.();
-  appInitial.Qgn?.();
-  appInitial.Sun?.();
-  appInitial.Oln?.();
-  appInitial.rht?.();
-  appInitial.Het?.();
-  appInitial.P7?.();
-  appShared.QI?.();
-  gptAboutDialog.n?.();
-  appInitial.xtn?.();
+  initializeRuntimeLazy();
+  initializeSignalRuntime();
+  initializeGptResources();
+  initializeGptPermissions();
+  initializeNavigation();
+  initializeAccountQuery();
+  initializeComposerMode();
+  initializeSelectedResource();
+  initializeSharedRuntime();
+  initializeGptAboutDialog();
+  initializeGptRoutes();
 }
 
 initializeGptHeaderAboutDialog();

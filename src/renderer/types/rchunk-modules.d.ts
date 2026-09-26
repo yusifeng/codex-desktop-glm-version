@@ -2650,6 +2650,7 @@ declare module "@rchunk/app-initial" {
     structure: "personal" | "workspace" | string;
   }
   export interface WorkspacePermissions {
+    allow_third_party_gpts?: string;
     permissions?: string[];
   }
   export interface Experiment {
@@ -2735,6 +2736,20 @@ declare module "@rchunk/app-initial" {
     props: Props,
   ) => void;
   export const u1: (pluginId: string, navigate: (path: string) => void) => void;
+  export const mun: import("@rchunk/app-shared").ReadableSignal<string | null>;
+  export const F7: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    resource: unknown,
+  ) => void;
+  export const Jet: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    mode: "chat" | string,
+  ) => void;
+  export const ytn: (gizmoIdOrSlug: string) => string;
+  export const Sun: () => void;
+  export const Het: () => void;
+  export const P7: () => void;
+  export const xtn: () => void;
   export const X4t: (app: unknown) => unknown;
   export const oDt: () => void;
   export const sDt: (input: { hostId: string }) => boolean;
@@ -3162,11 +3177,23 @@ declare module "@rchunk/chatgpt-skill-source-dialog" {
 
 declare module "@rchunk/gpt-about-dialog-core" {
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: {
+    accountId?: string;
+    gizmo: { id: string; short_url?: string | null };
+    isOwnerAndWorkspaceAllowsSpecific: boolean;
+    onClose(): void;
+    onStartChat(selected: {
+      gizmo: { id: string; short_url?: string | null };
+    }): void;
+  }) => unknown;
 }
 
 declare module "@rchunk/gpt-header-about-dialog" {
-  export const GptHeaderAboutDialog: (...args: any[]) => any;
+  export const GptHeaderAboutDialog: (props: {
+    accountId?: string;
+    onClose(): void;
+    resource: { id: string; short_url?: string | null };
+  }) => unknown;
 }
 
 declare module "@rchunk/python-analysis-details" {
