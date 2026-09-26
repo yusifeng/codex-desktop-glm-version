@@ -127,7 +127,7 @@ declare module "@chunk/shared" {
   export const Du: any; // 内部符号: Py
   export const E: any; // 内部符号: _se
   export const Ea: any; // 内部符号: ej
-  export const Ec: any; // 内部符号: EC
+  export { dynamicAppToolResultSchema as Ec } from "../../shared/app-config";
   export const Ed: any; // 内部符号: j_
   export const Ef: any; // 内部符号: im
   export const Ei: any; // 内部符号: DM
@@ -188,7 +188,7 @@ declare module "@chunk/shared" {
   export const Ir: any; // 内部符号: wB
   export const Is: any; // 内部符号: yT
   export { ChunkedMessageSender as It } from "../../shared/chunked-message";
-  export const Iu: any; // 内部符号: xy
+  export { BROWSER_CONTEXT_KINDS as Iu } from "../../shared/app-config";
   export const J: any; // 内部符号: dae
   export const Ja: any; // 内部符号: uA
   export const Jc: any; // 内部符号: oS
@@ -419,7 +419,7 @@ declare module "@chunk/shared" {
   export const _u: any; // 内部符号: Gy
   export const a: any; // 内部符号: Wce
   export const aa: any; // 内部符号: wj
-  export const ac: any; // 内部符号: Tw
+  export { jsonSchema as ac } from "../../shared/app-config";
   export const ad: any; // 内部符号: hv
   export const af: any; // 内部符号: Hp
   export const ai: any; // 内部符号: JF
@@ -481,7 +481,7 @@ declare module "@chunk/shared" {
   export const er: any; // 内部符号: JK
   export const es: any; // 内部符号: LE
   export const et: any; // 内部符号: Zie
-  export const eu: any; // 内部符号: one
+  export { buildNodeReplMcpConfig as eu } from "../../shared/app-config";
   export const f: any; // 内部符号: sce
   export const fa: any; // 内部符号: Gne
   export const fc: any; // 内部符号: $C
@@ -524,7 +524,7 @@ declare module "@chunk/shared" {
   export const i: any; // 内部符号: Kce
   export const ia: any; // 内部符号: nre
   export const ic: any; // 内部符号: Aw
-  export const id: any; // 内部符号: yv
+  export { last as id } from "../../shared/app-config";
   declare const if_: any; // 内部符号: ph（保留字导出）
   export { if_ as "if" };
   export const ii: any; // 内部符号: eI
@@ -600,11 +600,11 @@ declare module "@chunk/shared" {
   export const nr: any; // 内部符号: bK
   export const ns: any; // 内部符号: BE
   export { TextGenerator as nt } from "../../shared/structured-generation";
-  export const nu: any; // 内部符号: Tb
+  export { isNodeReplSandboxPlatform as nu } from "../../shared/app-config";
   export const o: any; // 内部符号: Lce
   export const oa: any; // 内部符号: hj
-  export const oc: any; // 内部符号: Ow
-  export const od: any; // 内部符号: mv
+  export { configKeyPath as oc } from "../../shared/app-config";
+  export { unescapeHtml as od } from "../../shared/app-config";
   export const of: any; // 内部符号: Tm
   export const oi: any; // 内部符号: GF
   export const ol: any; // 内部符号: Cx
@@ -644,7 +644,7 @@ declare module "@chunk/shared" {
   export { APP_SERVER_UNSUPPORTED_PREFIX as qu } from "../../shared/app-server-version";
   export const r: any; // 内部符号: Gce
   export const ra: any; // 内部符号: Ej
-  export const rc: any; // 内部符号: Ew
+  export { composeDefaultEnableFeatures as rc } from "../../shared/app-config";
   export const rd: any; // 内部符号: bv
   export const rf: any; // 内部符号: mh
   export const ri: any; // 内部符号: nI
@@ -670,8 +670,8 @@ declare module "@chunk/shared" {
   export const su: any; // 内部符号: $te
   export const t: any; // 内部符号: Zce
   export const ta: any; // 内部符号: ere
-  export const tc: any; // 内部符号: Dw
-  export const td: any; // 内部符号: Av
+  export { composeFeatureOverrides as tc } from "../../shared/app-config";
+  export { InMemoryInterceptor as td } from "../../shared/app-config";
   /** 线程状态 → RGB 颜色码（内部符号 Cte，switch 返回各状态颜色常量）。 */
   export { colorForThreadStatus as tf } from "../../shared/browser-context";
   export const ti: any; // 内部符号: tI
@@ -685,7 +685,7 @@ declare module "@chunk/shared" {
   export const u: any; // 内部符号: dce
   export const ua: any; // 内部符号: Wne
   export const uc: any; // 内部符号: iw
-  export const ud: any; // 内部符号: rv
+  export { parseAppBrand as ud } from "../../shared/app-config";
   export const uf: any; // 内部符号: rm
   export const ui: any; // 内部符号: LP
   export const ul: any; // 内部符号: jx
