@@ -107,6 +107,14 @@ declare module "@rchunk/worktree-environment-dropdown" {
   export const _any: any;
 }
 
+declare module "@rchunk/color-icon" {
+  export const _any: any;
+}
+
+declare module "@rchunk/connector-logo-stack" {
+  export const _any: any;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
