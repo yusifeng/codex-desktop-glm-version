@@ -202,6 +202,17 @@ declare module "@rchunk/sketch-composer-host-core" {
   export const t: unknown;
 }
 
+declare module "@rchunk/drawing-size-slider" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/sketch" {
+  export const l: unknown;
+  export const o: () => void;
+  export const t: () => void;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
