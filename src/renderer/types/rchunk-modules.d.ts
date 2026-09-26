@@ -2874,6 +2874,125 @@ declare module "@rchunk/app-initial" {
   export const Xl: () => void;
   export const xlt: () => void;
   export const qx: () => void;
+  /** Appgen/Sites query 子系统。 */
+  export type AppgenQueryKey = readonly unknown[];
+  export interface AppgenProject extends Record<string, unknown> {
+    id: string;
+    screenshot_url?: string | null;
+    slug?: string;
+    title?: string;
+  }
+  export interface AppgenDatabaseTableRows extends Record<string, unknown> {
+    offset: number;
+    rows: readonly Record<string, unknown>[];
+  }
+  export interface AppgenAccessUpdate extends Record<string, unknown> {
+    access_mode?: unknown;
+    allowed_tenant_group_ids?: readonly string[] | null;
+    allowed_user_emails?: readonly string[] | null;
+    allowed_workspace_group_ids?: readonly string[] | null;
+    editor_changes?: Record<string, unknown> | null;
+    optimistic_user?: Record<string, unknown> | null;
+    viewer_changes?: Record<string, unknown> | null;
+  }
+  export interface AppgenQueryClient {
+    invalidateQueries(options: {
+      exact?: boolean;
+      queryKey: readonly unknown[];
+      refetchType?: string;
+    }): Promise<unknown>;
+  }
+  export type AppgenQueryFamily<Param = string, Data = Record<string, unknown>> =
+    import("@rchunk/app-shared").ScopedQueryFamily<
+      Record<string, unknown>,
+      Param,
+      Data
+    >;
+  export type AppgenMutationFamily<Variables = unknown, Data = unknown> =
+    import("@rchunk/app-shared").ScopedMutationFamily<
+      Record<string, unknown>,
+      string,
+      Data,
+      Error,
+      Variables,
+      unknown
+    >;
+  export const Bin: AppgenQueryKey;
+  export const Vin: AppgenQueryKey;
+  export const Hin: AppgenQueryKey;
+  export const Uin: AppgenQueryKey;
+  export const Win: AppgenQueryKey;
+  export const Gin: AppgenQueryKey;
+  export const Kin: AppgenQueryKey;
+  export const qin: AppgenQueryKey;
+  export const Jin: AppgenQueryKey;
+  export const Yin: AppgenQueryKey;
+  export const Xin: AppgenQueryKey;
+  export const Zin: AppgenQueryKey;
+  export const Qin: AppgenQueryFamily<string | null>;
+  export const $in: AppgenMutationFamily<{ hostname: string }>;
+  export const ean: AppgenMutationFamily<string>;
+  export const tan: AppgenQueryFamily;
+  export const nan: AppgenMutationFamily<void, { project_id: string; was_deleted: boolean }>;
+  export const ran: AppgenQueryFamily;
+  export const ian: import("zod").ZodType<
+    | {
+        chatgpt_conversation_id?: string | null;
+        codex_thread_id?: string | null;
+      }
+    | null
+    | undefined
+  >;
+  export const aan: AppgenQueryFamily<string, AppgenProject>;
+  export const oan: AppgenMutationFamily<string>;
+  export const san: AppgenMutationFamily<string>;
+  export const can: import("@rchunk/app-shared").ScopedQuerySignal<
+    Record<string, unknown>,
+    { customDomains: boolean; database: boolean; slugChange: boolean }
+  >;
+  export const lan: AppgenMutationFamily<AppgenAccessUpdate>;
+  export const uan: AppgenMutationFamily<Record<string, unknown>>;
+  export const dan: AppgenMutationFamily<Record<string, unknown>, AppgenProject>;
+  export const fan: <Result>(
+    toolName: string,
+    args: Record<string, unknown>,
+    schema: import("zod").ZodType<Result>,
+    options?: {
+      expectedErrorTypes?: readonly string[];
+      resultMetaKey?: string;
+    },
+  ) => Promise<Result>;
+  export const pan: (
+    projectId: string,
+    slug: string,
+  ) => Promise<{ available: boolean; slug: string; status: string }>;
+  export const man: (projectId: string, update: AppgenAccessUpdate) => boolean;
+  export const han: (projectId: string) => Promise<AppgenProject>;
+  export const gan: (page: AppgenDatabaseTableRows) => number;
+  export const van: (
+    client: AppgenQueryClient,
+    projectIds: readonly string[],
+  ) => Promise<void>;
+  export const yan: (update: AppgenAccessUpdate | null | undefined) => boolean;
+  export const ban: (
+    projectId: string,
+    bindingName?: string | null,
+  ) => import("@rchunk/app-shared").UseQueryResult<Record<string, unknown>>;
+  export const xan: (projectId: string) => (bindingName: string | null) => Promise<void>;
+  export const San: (params: {
+    bindingName?: string | null;
+    offset: number;
+    projectId: string;
+    tableName?: string | null;
+  }) => import("@rchunk/app-shared").UseQueryResult<AppgenDatabaseTableRows>;
+  export const Can: (options?: {
+    enabled?: boolean;
+    includeEditable?: boolean;
+  }) => unknown;
+  export const wan: (
+    screenshotUrl?: string | null,
+  ) => import("@rchunk/app-shared").UseQueryResult<string>;
+  export const _an: () => void;
   export const ql: (props: Record<string, unknown>) => unknown;
   export const Hln: (planType: unknown) => boolean;
   export const uP: (timestamp: number | null) => Date;
@@ -4449,44 +4568,44 @@ declare module "@rchunk/chart-stores" {
 }
 
 declare module "@rchunk/appgen-query" {
-  export const APPGEN_ACCESS_GROUPS_QUERY_KEY: any;
-  export const APPGEN_CUSTOM_DOMAINS_QUERY_KEY: any;
-  export const APPGEN_DATABASE_OVERVIEW_QUERY_KEY: any;
-  export const APPGEN_DATABASE_TABLE_ROWS_QUERY_KEY: any;
-  export const APPGEN_EDITABLE_PROJECTS_QUERY_KEY: any;
-  export const APPGEN_ENVIRONMENT_QUERY_KEY: any;
-  export const APPGEN_PENDING_SLUG_CHANGE_QUERY_KEY: any;
-  export const APPGEN_PROJECTS_QUERY_KEY: any;
-  export const APPGEN_PROJECT_QUERY_KEY: any;
-  export const APPGEN_SCREENSHOT_QUERY_KEY: any;
-  export const APPGEN_SLUG_AVAILABILITY_QUERY_KEY: any;
-  export const APPGEN_TOOL_AVAILABILITY_QUERY_KEY: any;
-  export const appgenAccessGroupsQuery$: any;
-  export const appgenAddCustomDomainMutation$: any;
-  export const appgenChangeSlugMutation$: any;
-  export const appgenCustomDomainsQuery$: any;
-  export const appgenDeleteProjectMutation$: any;
-  export const appgenEnvironmentQuery$: any;
-  export const appgenLatestEditContextSchema: any;
-  export const appgenProjectQuery$: any;
-  export const appgenRefreshCustomDomainMutation$: any;
-  export const appgenRemoveCustomDomainMutation$: any;
-  export const appgenToolAvailabilityQuery$: any;
-  export const appgenUpdateAccessMutation$: any;
-  export const appgenUpdateEnvironmentMutation$: any;
-  export const appgenUpdateProjectTitleMutation$: any;
-  export const callSitesTool: any;
-  export const checkAppgenSlugAvailability: any;
-  export const discardQueuedAppgenAccessUpdate: any;
-  export const fetchAppgenProject: any;
-  export const getNextAppgenDatabaseTableRowsOffset: any;
-  export const invalidateAppgenProjectQueries: any;
-  export const isIncrementalAppgenUserAccessUpdate: any;
-  export const useAppgenDatabaseOverview: any;
-  export const useAppgenDatabaseRefresh: any;
-  export const useAppgenDatabaseTableRows: any;
-  export const useAppgenProjects: any;
-  export const useAppgenScreenshotSrc: any;
+  export const APPGEN_ACCESS_GROUPS_QUERY_KEY: typeof import("@rchunk/app-initial").Bin;
+  export const APPGEN_CUSTOM_DOMAINS_QUERY_KEY: typeof import("@rchunk/app-initial").Vin;
+  export const APPGEN_DATABASE_OVERVIEW_QUERY_KEY: typeof import("@rchunk/app-initial").Hin;
+  export const APPGEN_DATABASE_TABLE_ROWS_QUERY_KEY: typeof import("@rchunk/app-initial").Uin;
+  export const APPGEN_EDITABLE_PROJECTS_QUERY_KEY: typeof import("@rchunk/app-initial").Win;
+  export const APPGEN_ENVIRONMENT_QUERY_KEY: typeof import("@rchunk/app-initial").Gin;
+  export const APPGEN_PENDING_SLUG_CHANGE_QUERY_KEY: typeof import("@rchunk/app-initial").Kin;
+  export const APPGEN_PROJECTS_QUERY_KEY: typeof import("@rchunk/app-initial").qin;
+  export const APPGEN_PROJECT_QUERY_KEY: typeof import("@rchunk/app-initial").Jin;
+  export const APPGEN_SCREENSHOT_QUERY_KEY: typeof import("@rchunk/app-initial").Yin;
+  export const APPGEN_SLUG_AVAILABILITY_QUERY_KEY: typeof import("@rchunk/app-initial").Xin;
+  export const APPGEN_TOOL_AVAILABILITY_QUERY_KEY: typeof import("@rchunk/app-initial").Zin;
+  export const appgenAccessGroupsQuery$: typeof import("@rchunk/app-initial").Qin;
+  export const appgenAddCustomDomainMutation$: typeof import("@rchunk/app-initial").$in;
+  export const appgenChangeSlugMutation$: typeof import("@rchunk/app-initial").ean;
+  export const appgenCustomDomainsQuery$: typeof import("@rchunk/app-initial").tan;
+  export const appgenDeleteProjectMutation$: typeof import("@rchunk/app-initial").nan;
+  export const appgenEnvironmentQuery$: typeof import("@rchunk/app-initial").ran;
+  export const appgenLatestEditContextSchema: typeof import("@rchunk/app-initial").ian;
+  export const appgenProjectQuery$: typeof import("@rchunk/app-initial").aan;
+  export const appgenRefreshCustomDomainMutation$: typeof import("@rchunk/app-initial").oan;
+  export const appgenRemoveCustomDomainMutation$: typeof import("@rchunk/app-initial").san;
+  export const appgenToolAvailabilityQuery$: typeof import("@rchunk/app-initial").can;
+  export const appgenUpdateAccessMutation$: typeof import("@rchunk/app-initial").lan;
+  export const appgenUpdateEnvironmentMutation$: typeof import("@rchunk/app-initial").uan;
+  export const appgenUpdateProjectTitleMutation$: typeof import("@rchunk/app-initial").dan;
+  export const callSitesTool: typeof import("@rchunk/app-initial").fan;
+  export const checkAppgenSlugAvailability: typeof import("@rchunk/app-initial").pan;
+  export const discardQueuedAppgenAccessUpdate: typeof import("@rchunk/app-initial").man;
+  export const fetchAppgenProject: typeof import("@rchunk/app-initial").han;
+  export const getNextAppgenDatabaseTableRowsOffset: typeof import("@rchunk/app-initial").gan;
+  export const invalidateAppgenProjectQueries: typeof import("@rchunk/app-initial").van;
+  export const isIncrementalAppgenUserAccessUpdate: typeof import("@rchunk/app-initial").yan;
+  export const useAppgenDatabaseOverview: typeof import("@rchunk/app-initial").ban;
+  export const useAppgenDatabaseRefresh: typeof import("@rchunk/app-initial").xan;
+  export const useAppgenDatabaseTableRows: typeof import("@rchunk/app-initial").San;
+  export const useAppgenProjects: typeof import("@rchunk/app-initial").Can;
+  export const useAppgenScreenshotSrc: typeof import("@rchunk/app-initial").wan;
 }
 
 declare module "@rchunk/appgen-disabled-tooltip" {

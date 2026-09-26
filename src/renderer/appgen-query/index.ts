@@ -5,11 +5,8 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void appSharedChunk;
-const appInitial = appInitialChunk as Record<string, any>;
-
-appInitial._an();
-
 const {
+  _an: initializeAppgenQueries,
   Bin: APPGEN_ACCESS_GROUPS_QUERY_KEY,
   Vin: APPGEN_CUSTOM_DOMAINS_QUERY_KEY,
   Hin: APPGEN_DATABASE_OVERVIEW_QUERY_KEY,
@@ -48,7 +45,9 @@ const {
   San: useAppgenDatabaseTableRows,
   Can: useAppgenProjects,
   wan: useAppgenScreenshotSrc,
-} = appInitial;
+} = appInitialChunk;
+
+initializeAppgenQueries();
 
 export {
   APPGEN_ACCESS_GROUPS_QUERY_KEY,
