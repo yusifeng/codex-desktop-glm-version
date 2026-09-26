@@ -10,26 +10,186 @@ import * as breadcrumbChunk from "@rchunk/toolbar-breadcrumb";
 import * as appgenAccessChunk from "@rchunk/appgen-access";
 import * as disabledTooltipChunk from "@rchunk/appgen-disabled-tooltip";
 import * as startConversationChunk from "@rchunk/start-appgen-conversation";
+import type {
+  IntlShape,
+  JsxRuntime,
+  MaitaiScopeApi,
+  ReadableSignal,
+  ScopedQueryFamily,
+  ScopedQueryResult,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const tabs = tabsChunk as Record<string, any>;
-const breadcrumb = breadcrumbChunk as Record<string, any>;
-const appgenAccess = appgenAccessChunk as Record<string, any>;
-const disabledTooltip = disabledTooltipChunk as Record<string, any>;
-const startConversation = startConversationChunk as Record<string, any>;
 
-let React: any;
-let jsx: any;
-let SiteContext: any;
+type SiteDetailTab = "analytics" | "automations" | "database" | "settings";
+
+interface AppgenSite {
+  current_user_role?: string;
+  current_live_url?: string | null;
+  disabled_by?: string | null;
+  id: string;
+  latest_edit_context?: unknown;
+  screenshot_url?: string | null;
+  slug: string;
+  status?: string;
+  title: string;
+}
+
+interface AppgenSiteDetailLayoutProps {
+  children(site: AppgenSite): unknown;
+  prefetchTab?(tab: SiteDetailTab): Promise<unknown>;
+  projectId: string;
+  selectedTab: SiteDetailTab;
+}
+
+interface ReactContext<T> {
+  Provider: unknown;
+  value?: T;
+}
+
+interface ReactRuntime {
+  createContext<T>(value: T): ReactContext<T>;
+  useContext<T>(context: ReactContext<T>): T;
+  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
+  useEffectEvent<Callback extends (...args: never[]) => unknown>(callback: Callback): Callback;
+  useRef<T>(value: T): { current: T };
+}
+
+interface AppInitialBindings {
+  Aet(): void;
+  B9: unknown;
+  Nan(): void;
+  Pan(
+    scope: MaitaiScopeApi<Record<string, unknown>>,
+    event: {
+      action: string;
+      page?: string;
+      projectId: string;
+      source: string;
+    },
+  ): void;
+  Qgn(): void;
+  V9(): void;
+  Ygn: unknown;
+  _an(): void;
+  a3t(): void;
+  aan: ScopedQueryFamily<Record<string, unknown>, string, AppgenSite>;
+  ann(projectId: string): string;
+  can: ReadableSignal<ScopedQueryResult<{ database?: boolean }>>;
+  cnn(projectId: string): string;
+  d2(): void;
+  enn: string;
+  h2(): (options: Record<string, unknown>) => void;
+  h7(): void;
+  i3t: unknown;
+  ifn(): void;
+  inn(projectId: string): string;
+  ket: unknown;
+  lnn(): void;
+  m7: unknown;
+  o_n(): (destination: string) => void;
+  ofn(flagId: string): boolean;
+  onn(projectId: string): string;
+  pfn(): void;
+  sfn(flagId: string): boolean;
+  vfn: ReadableSignal<boolean>;
+  wan(url: string | null): { data?: string | null };
+}
+
+interface AppPrimaryBindings {
+  Sf(): void;
+  xf(url: string | null | undefined): string | null;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  $h: initializeResourceButton,
+  AT: initializeMountedState,
+  Bk: interactionActions,
+  BX: useSignalFamilyValue,
+  C_: initializeIconAsset,
+  FX: initializeSignalRuntime,
+  Hk: interactionSources,
+  HX: useSignalValue,
+  I3: getJsxRuntime,
+  K2: initializeSharedComponents,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  Qh: LoadingSpinner,
+  S_: IconAsset,
+  Vk: interactionPages,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: applicationScope,
+  Zh: initializeButton,
+  c_: initializeTooltip,
+  e6: reactRuntimeExport,
+  if: useIsMounted,
+  jT: editIconAsset,
+  n4: useIntl,
+  o_: Tooltip,
+  rf: initializeIntl,
+} = appSharedChunk;
+const {
+  Aet: initializeAppgenHeader,
+  B9: Header,
+  Nan: initializeScreenshotQuery,
+  Pan: trackAppgenInteraction,
+  Qgn: initializeGptResources,
+  V9: initializeNavigationComponents,
+  Ygn: Navigate,
+  _an: initializeAppgenRouting,
+  a3t: initializeAppgenFeatureFlags,
+  aan: appgenSiteQuery,
+  ann: appgenAutomationsRoute,
+  can: databaseAvailabilityQuery,
+  cnn: appgenSettingsRoute,
+  d2: initializeSiteComponents,
+  enn: sitesDefaultRoute,
+  h2: useStartConversationFromHome,
+  h7: initializeHeaderLayout,
+  i3t: SiteIcon,
+  ifn: initializeExperiments,
+  inn: appgenAnalyticsRoute,
+  ket: ErrorStateView,
+  lnn: initializeAppgenConversation,
+  m7: HeaderBoundary,
+  o_n: useNavigate,
+  ofn: useFeatureGate,
+  onn: appgenDatabaseRoute,
+  pfn: initializeMigrationExperiment,
+  sfn: useFeatureGateLoading,
+  vfn: automationsAvailabilityLoadingSignal,
+  wan: useScreenshot,
+} = appInitialChunk as unknown as AppInitialBindings;
+const {
+  Sf: initializeAppgenFormatting,
+  xf: formatSiteHost,
+} = appPrimaryChunk as unknown as AppPrimaryBindings;
+const { n: initializeTabs, t: Tabs } = tabsChunk;
+const { n: initializeBreadcrumb, t: ToolbarBreadcrumb } = breadcrumbChunk;
+const {
+  s: initializeAppgenAccess,
+  t: canManageAppgenSite,
+} = appgenAccessChunk;
+const {
+  n: initializeDisabledTooltip,
+  t: AppgenDisabledTooltip,
+} = disabledTooltipChunk;
+const {
+  n: startAppgenConversation,
+  t: initializeStartAppgenConversation,
+} = startConversationChunk;
+
+let React: ReactRuntime;
+let jsx: JsxRuntime;
+let SiteContext: ReactContext<AppgenSite | null>;
 let ANALYTICS_PANEL_ID: string;
 let DATABASE_PANEL_ID: string;
 let AUTOMATIONS_PANEL_ID: string;
 let SETTINGS_PANEL_ID: string;
 
-function AppgenSiteDetailLayout(props: any) {
+function AppgenSiteDetailLayout(props: AppgenSiteDetailLayoutProps): unknown {
   const existingSite = React.useContext(SiteContext);
   if (existingSite != null) {
     return jsx.jsx(jsx.Fragment, { children: props.children(existingSite) });
@@ -42,26 +202,28 @@ function AppgenSiteDetailLayoutRoot({
   prefetchTab,
   projectId,
   selectedTab,
-}: any) {
-  const scope = appShared.LX(appShared.ZI);
-  const navigate = appInitial.o_n();
-  const intl = appShared.n4();
-  const isMounted = appShared.if();
+}: AppgenSiteDetailLayoutProps): unknown {
+  const scope = useSignalScope(applicationScope);
+  const navigate = useNavigate();
+  const intl = useIntl();
+  const isMounted = useIsMounted();
   const navigationSequence = React.useRef(0);
-  const startConversationFromHome = appInitial.h2();
-  const automationsEnabled = appInitial.ofn("282477705");
-  const automationsFlagLoading = appInitial.sfn("282477705");
-  const automationsAvailabilityLoading = appShared.HX(appInitial.vfn);
-  const analyticsEnabled = appInitial.ofn("262557526");
-  const databaseEnabled = appInitial.ofn("1912312436");
+  const startConversationFromHome = useStartConversationFromHome();
+  const automationsEnabled = useFeatureGate("282477705");
+  const automationsFlagLoading = useFeatureGateLoading("282477705");
+  const automationsAvailabilityLoading = useSignalValue(
+    automationsAvailabilityLoadingSignal,
+  );
+  const analyticsEnabled = useFeatureGate("262557526");
+  const databaseEnabled = useFeatureGate("1912312436");
   const { data: databaseAvailability, isError: databaseAvailabilityError } =
-    appShared.HX(appInitial.can, { enabled: databaseEnabled });
+    useSignalValue(databaseAvailabilityQuery, { enabled: databaseEnabled });
   const {
     data: site,
     isError: siteError,
     isLoading: siteLoading,
-  } = appShared.BX(appInitial.aan, projectId);
-  const canManageSite = appgenAccess.t(site);
+  } = useSignalFamilyValue(appgenSiteQuery, projectId);
+  const canManageSite = canManageAppgenSite(site);
 
   const trackPageView = React.useEffectEvent(() => {
     let page;
@@ -69,19 +231,19 @@ function AppgenSiteDetailLayoutRoot({
       case "automations":
         return;
       case "analytics":
-        page = appShared.Vk.CODEX_APPGEN_INTERACTION_PAGE_ANALYTICS;
+        page = interactionPages.CODEX_APPGEN_INTERACTION_PAGE_ANALYTICS;
         break;
       case "database":
-        page = appShared.Vk.CODEX_APPGEN_INTERACTION_PAGE_DATABASE;
+        page = interactionPages.CODEX_APPGEN_INTERACTION_PAGE_DATABASE;
         break;
       case "settings":
-        page = appShared.Vk.CODEX_APPGEN_INTERACTION_PAGE_SETTINGS;
+        page = interactionPages.CODEX_APPGEN_INTERACTION_PAGE_SETTINGS;
     }
-    appInitial.Pan(scope, {
-      action: appShared.Bk.CODEX_APPGEN_INTERACTION_ACTION_PAGE_VIEWED,
+    trackAppgenInteraction(scope, {
+      action: interactionActions.CODEX_APPGEN_INTERACTION_ACTION_PAGE_VIEWED,
       page,
       projectId,
-      source: appShared.Hk.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
+      source: interactionSources.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
     });
   });
   const pageViewKey =
@@ -101,32 +263,32 @@ function AppgenSiteDetailLayoutRoot({
     if (pageViewKey != null) trackPageView();
   }, [pageViewKey]);
 
-  const { data: screenshotSrc } = appInitial.wan(site?.screenshot_url ?? null);
+  const { data: screenshotSrc } = useScreenshot(site?.screenshot_url ?? null);
   const liveUrl = site?.status === "suspended" ? null : site?.current_live_url;
 
   if (site != null && selectedTab === "settings" && !canManageSite) {
-    return jsx.jsx(appInitial.Ygn, { replace: true, to: appInitial.enn });
+    return jsx.jsx(Navigate, { replace: true, to: sitesDefaultRoute });
   }
   if (
     selectedTab === "automations" &&
     (automationsAvailabilityLoading || automationsFlagLoading)
   ) {
-    return jsx.jsx(appShared.Qh, {});
+    return jsx.jsx(LoadingSpinner, {});
   }
   if (
     selectedTab === "automations" &&
     (!automationsEnabled || (site != null && !canManageSite))
   ) {
-    return jsx.jsx(appInitial.Ygn, {
+    return jsx.jsx(Navigate, {
       replace: true,
-      to: appInitial.cnn(projectId),
+      to: appgenSettingsRoute(projectId),
     });
   }
 
   const tabItems = [
     {
       key: "settings",
-      name: jsx.jsx(appShared.Y2, {
+      name: jsx.jsx(FormattedMessage, {
         id: "appgenSiteDetail.navigation.settings",
         defaultMessage: "Settings",
         description: "Tab label for Site settings",
@@ -137,7 +299,7 @@ function AppgenSiteDetailLayoutRoot({
   if (analyticsEnabled || selectedTab === "analytics") {
     tabItems.push({
       key: "analytics",
-      name: jsx.jsx(appShared.Y2, {
+      name: jsx.jsx(FormattedMessage, {
         id: "appgenSiteDetail.navigation.analytics",
         defaultMessage: "Analytics",
         description: "Tab label for Site analytics",
@@ -151,7 +313,7 @@ function AppgenSiteDetailLayoutRoot({
   ) {
     tabItems.push({
       key: "database",
-      name: jsx.jsx(appShared.Y2, {
+      name: jsx.jsx(FormattedMessage, {
         id: "appgenSiteDetail.navigation.database",
         defaultMessage: "Database",
         description: "Tab label for the Site database viewer",
@@ -162,7 +324,7 @@ function AppgenSiteDetailLayoutRoot({
   if (automationsEnabled && canManageSite) {
     tabItems.push({
       key: "automations",
-      name: jsx.jsx(appShared.Y2, {
+      name: jsx.jsx(FormattedMessage, {
         id: "appgenSiteDetail.navigation.automations",
         defaultMessage: "Automations",
         description: "Tab label for a Site's cloud scheduled tasks",
@@ -177,20 +339,21 @@ function AppgenSiteDetailLayoutRoot({
     site == null
       ? undefined
       : () => {
-          appInitial.Pan(scope, {
+          trackAppgenInteraction(scope, {
             action:
-              appShared.Bk
+              interactionActions
                 .CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED,
             projectId: site.id,
-            source: appShared.Hk.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
+            source:
+              interactionSources.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
           });
-          startConversation.n(scope, startConversationFromHome, {
+          startAppgenConversation(scope, startConversationFromHome, {
             type: "edit",
             liveUrl,
             projectId: site.id,
             projectTitle: site.title,
             latestEditContext: site.latest_edit_context,
-          });
+          }, {});
         };
   const header = jsx.jsx(SiteDetailHeader, { site, onBack, onEdit });
 
@@ -207,20 +370,20 @@ function AppgenSiteDetailLayoutRoot({
       description:
         "Accessible label for navigation between Site settings, analytics, and database",
     });
-    const selectTab = (tab: string) => {
-      let destination;
+    const selectTab = (tab: SiteDetailTab) => {
+      let destination: string;
       switch (tab) {
         case "automations":
-          destination = appInitial.ann(projectId);
+          destination = appgenAutomationsRoute(projectId);
           break;
         case "settings":
-          destination = appInitial.cnn(projectId);
+          destination = appgenSettingsRoute(projectId);
           break;
         case "analytics":
-          destination = appInitial.inn(projectId);
+          destination = appgenAnalyticsRoute(projectId);
           break;
         case "database":
-          destination = appInitial.onn(projectId);
+          destination = appgenDatabaseRoute(projectId);
       }
       const sequence = (navigationSequence.current += 1);
       (prefetchTab?.(tab) ?? Promise.resolve()).catch(ignoreError).then(() => {
@@ -230,7 +393,7 @@ function AppgenSiteDetailLayoutRoot({
     };
     const tabNavigation = jsx.jsx("div", {
       className: "border-b border-subtle pb-6",
-      children: jsx.jsx(tabs.t, {
+      children: jsx.jsx(Tabs, {
         ariaLabel,
         selectedKey: selectedTab,
         tabs: tabItems,
@@ -258,7 +421,7 @@ function AppgenSiteDetailLayoutRoot({
     children: [
       null,
       jsx.jsx(jsx.Fragment, {
-        children: jsx.jsx(appInitial.m7, { children: header }),
+        children: jsx.jsx(HeaderBoundary, { children: header }),
       }),
       jsx.jsx("div", {
         className:
@@ -272,11 +435,14 @@ function AppgenSiteDetailLayoutRoot({
   });
 }
 
-function getSelectedPanel(selectedTab: string, intl: any) {
-  const descriptors: Record<string, { id: string; label: string }> = {
+function getSelectedPanel(
+  selectedTab: SiteDetailTab,
+  intl: IntlShape,
+): { id: string; label: string } {
+  const descriptors: Record<SiteDetailTab, { id: string; label: string }> = {
     automations: {
       id: AUTOMATIONS_PANEL_ID,
-      label: intl.formatMessage({
+      label: formatMessageText(intl, {
         id: "appgenSiteDetail.navigation.automations",
         defaultMessage: "Automations",
         description: "Tab label for a Site's cloud scheduled tasks",
@@ -284,7 +450,7 @@ function getSelectedPanel(selectedTab: string, intl: any) {
     },
     settings: {
       id: SETTINGS_PANEL_ID,
-      label: intl.formatMessage({
+      label: formatMessageText(intl, {
         id: "appgenSiteDetail.navigation.settings",
         defaultMessage: "Settings",
         description: "Tab label for Site settings",
@@ -292,7 +458,7 @@ function getSelectedPanel(selectedTab: string, intl: any) {
     },
     analytics: {
       id: ANALYTICS_PANEL_ID,
-      label: intl.formatMessage({
+      label: formatMessageText(intl, {
         id: "appgenSiteDetail.navigation.analytics",
         defaultMessage: "Analytics",
         description: "Tab label for Site analytics",
@@ -300,7 +466,7 @@ function getSelectedPanel(selectedTab: string, intl: any) {
     },
     database: {
       id: DATABASE_PANEL_ID,
-      label: intl.formatMessage({
+      label: formatMessageText(intl, {
         id: "appgenSiteDetail.navigation.database",
         defaultMessage: "Database",
         description: "Tab label for the Site database viewer",
@@ -310,13 +476,29 @@ function getSelectedPanel(selectedTab: string, intl: any) {
   return descriptors[selectedTab];
 }
 
+function formatMessageText(
+  intl: IntlShape,
+  descriptor: Parameters<IntlShape["formatMessage"]>[0],
+): string {
+  const value = intl.formatMessage(descriptor);
+  return typeof value === "string" ? value : descriptor.defaultMessage ?? "";
+}
+
 function ignoreError() {}
 
-function SiteDetailHeader({ onBack, onEdit, site }: any) {
+function SiteDetailHeader({
+  onBack,
+  onEdit,
+  site,
+}: {
+  onBack(): void;
+  onEdit?: () => void;
+  site?: AppgenSite;
+}): unknown {
   const ancestors = [
     {
       id: "sites",
-      label: jsx.jsx(appShared.Y2, {
+      label: jsx.jsx(FormattedMessage, {
         id: "appgenSiteDetail.header.sites",
         defaultMessage: "Sites",
         description: "Breadcrumb link from Site details back to Sites",
@@ -324,7 +506,7 @@ function SiteDetailHeader({ onBack, onEdit, site }: any) {
       onClick: onBack,
     },
   ];
-  const breadcrumbs = jsx.jsx(breadcrumb.t, {
+  const breadcrumbs = jsx.jsx(ToolbarBreadcrumb, {
     ancestors,
     current: site?.title,
   });
@@ -332,10 +514,16 @@ function SiteDetailHeader({ onBack, onEdit, site }: any) {
     site == null || onEdit == null
       ? null
       : jsx.jsx(EditSiteButton, { site, onEdit });
-  return jsx.jsxs(appInitial.B9, { children: [breadcrumbs, editAction] });
+  return jsx.jsxs(Header, { children: [breadcrumbs, editAction] });
 }
 
-function SiteSummary({ screenshotSrc, site }: any) {
+function SiteSummary({
+  screenshotSrc,
+  site,
+}: {
+  screenshotSrc?: string | null;
+  site: AppgenSite;
+}): unknown {
   const titleAndUrl = jsx.jsxs("div", {
     className: "flex min-w-0 flex-col gap-0.5",
     children: [
@@ -345,13 +533,13 @@ function SiteSummary({ screenshotSrc, site }: any) {
       }),
       jsx.jsx("div", {
         className: "truncate text-xs text-tertiary",
-        children: appPrimary.xf(site.current_live_url) ?? site.slug,
+        children: formatSiteHost(site.current_live_url) ?? site.slug,
       }),
     ],
   });
   const thumbnail =
     screenshotSrc == null
-      ? jsx.jsx(appInitial.i3t, { "aria-hidden": true, className: "icon-md" })
+      ? jsx.jsx(SiteIcon, { "aria-hidden": true, className: "icon-md" })
       : jsx.jsx("img", {
           alt: "",
           className: "size-full object-cover",
@@ -375,16 +563,22 @@ function SiteSummary({ screenshotSrc, site }: any) {
   });
 }
 
-function EditSiteButton({ onEdit, site }: any) {
+function EditSiteButton({
+  onEdit,
+  site,
+}: {
+  onEdit(): void;
+  site: AppgenSite;
+}): unknown {
   const suspended = site.status === "suspended";
-  const button = jsx.jsxs(appShared.Yh, {
+  const button = jsx.jsxs(Button, {
     color: "outline",
     disabled: suspended,
     size: "toolbar",
     onClick: onEdit,
     children: [
-      jsx.jsx(appShared.S_, { asset: appShared.jT }),
-      jsx.jsx(appShared.Y2, {
+      jsx.jsx(IconAsset, { asset: editIconAsset }),
+      jsx.jsx(FormattedMessage, {
         id: "appgenSiteDetail.edit",
         defaultMessage: "Edit",
         description: "Button label for editing a Site from its details page",
@@ -392,9 +586,9 @@ function EditSiteButton({ onEdit, site }: any) {
     ],
   });
   return suspended
-    ? jsx.jsx(appShared.o_, {
+    ? jsx.jsx(Tooltip, {
         interactive: site.disabled_by === "openai",
-        tooltipContent: jsx.jsx(disabledTooltip.t, {
+        tooltipContent: jsx.jsx(AppgenDisabledTooltip, {
           disabledBy: site.disabled_by,
         }),
         children: button,
@@ -405,14 +599,14 @@ function EditSiteButton({ onEdit, site }: any) {
 function LoadingState() {
   return jsx.jsx("div", {
     className: "flex min-h-96 flex-1 items-center justify-center",
-    children: jsx.jsx(appShared.Qh, {}),
+    children: jsx.jsx(LoadingSpinner, {}),
   });
 }
 
 function ErrorState() {
-  return jsx.jsx(appInitial.ket, {
+  return jsx.jsx(ErrorStateView, {
     className: "min-h-96 flex-1",
-    title: jsx.jsx(appShared.Y2, {
+    title: jsx.jsx(FormattedMessage, {
       id: "appgenSiteDetail.error.title",
       defaultMessage: "Unable to load site",
       description: "Error state shown when Site details cannot load",
@@ -421,40 +615,44 @@ function ErrorState() {
 }
 
 function initializeAppgenSiteDetailLayout(): void {
-  appShared.$3();
-  appShared.AT();
-  appShared.FX();
-  React = appShared.e6();
-  appShared.K2();
-  appInitial.Qgn();
-  appInitial.h7();
-  appInitial.V9();
-  appShared.Zh();
-  appShared.C_();
-  appInitial.Aet();
-  appShared.$h();
-  tabs.n();
-  breadcrumb.n();
-  appShared.c_();
-  appInitial.d2();
-  appInitial.a3t();
-  appShared.QI();
-  appInitial.ifn();
-  appInitial.pfn();
-  appShared.rf();
-  appgenAccess.s();
-  appInitial.Nan();
-  disabledTooltip.n();
-  appInitial._an();
-  appInitial.lnn();
-  appPrimary.Sf();
-  startConversation.t();
-  jsx = appShared.I3();
+  initializeRuntimeLazy();
+  initializeMountedState();
+  initializeSignalRuntime();
+  React = resolveRuntime<ReactRuntime>(reactRuntimeExport);
+  initializeSharedComponents();
+  initializeGptResources();
+  initializeHeaderLayout();
+  initializeNavigationComponents();
+  initializeButton();
+  initializeIconAsset();
+  initializeAppgenHeader();
+  initializeResourceButton();
+  initializeTabs();
+  initializeBreadcrumb();
+  initializeTooltip();
+  initializeSiteComponents();
+  initializeAppgenFeatureFlags();
+  initializeSharedRuntime();
+  initializeExperiments();
+  initializeMigrationExperiment();
+  initializeIntl();
+  initializeAppgenAccess();
+  initializeScreenshotQuery();
+  initializeDisabledTooltip();
+  initializeAppgenRouting();
+  initializeAppgenConversation();
+  initializeAppgenFormatting();
+  initializeStartAppgenConversation();
+  jsx = getJsxRuntime();
   ANALYTICS_PANEL_ID = "appgen-site-detail-analytics";
   DATABASE_PANEL_ID = "appgen-site-detail-database";
   AUTOMATIONS_PANEL_ID = "appgen-site-detail-automations";
   SETTINGS_PANEL_ID = "appgen-site-detail-settings";
   SiteContext = React.createContext(null);
+}
+
+function resolveRuntime<T>(value: unknown): T {
+  return (typeof value === "function" ? value() : value) as T;
 }
 
 export { initializeAppgenSiteDetailLayout as n, AppgenSiteDetailLayout as t };

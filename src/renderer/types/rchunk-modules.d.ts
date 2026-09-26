@@ -777,6 +777,8 @@ declare module "@rchunk/app-shared" {
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   /** initializeJsxRuntimeLazy（rolldown lazy 辅助）。 */
   export const $3: () => void;
+  /** initializeMountedState（mounted callback hook 依赖）。 */
+  export const AT: () => void;
   export const $h: () => void; // i8：资源按钮依赖初始化器
   export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
@@ -1820,6 +1822,8 @@ declare module "@rchunk/app-shared" {
   }
   /** IconAsset（app-shared/ui/icons/icon-preset.ts）。 */
   export const S_: (props: IconAssetProps) => unknown;
+  /** edit icon asset（Site detail toolbar）。 */
+  export const jT: IconAssetPreset;
   /** check icon asset（Wallet enrollment 成功态）。 */
   export const vD: IconAssetPreset;
   export interface MessageDescriptor {
@@ -3968,7 +3972,10 @@ declare module "@rchunk/appgen-access" {
   export const o: (...args: any[]) => any;
   export const r: (...args: any[]) => any;
   export const s: () => void;
-  export const t: (...args: any[]) => boolean;
+  /** isOwner（Site access policy 的 current user 是否为 owner）。 */
+  export const t: (site: {
+    current_user_role?: string;
+  } | null | undefined) => boolean;
 }
 
 declare module "@rchunk/appgen-access-state-messages" {
@@ -4043,7 +4050,7 @@ declare module "@rchunk/appgen-query" {
 
 declare module "@rchunk/appgen-disabled-tooltip" {
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: { disabledBy?: string | null }) => unknown;
 }
 
 declare module "@rchunk/appgen-card-layout" {
@@ -4065,18 +4072,50 @@ declare module "@rchunk/appgen-project-row" {
 }
 
 declare module "@rchunk/start-appgen-conversation" {
-  export const n: (...args: any[]) => void;
+  export const n: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    startConversation: (options: Record<string, unknown>) => void,
+    request: {
+      latestEditContext?: unknown;
+      liveUrl?: string | null;
+      projectId: string;
+      projectTitle: string;
+      type: "edit";
+    },
+    options?: Record<string, unknown>,
+  ) => void;
   export const t: () => void;
 }
 
 declare module "@rchunk/appgen-site-detail-layout" {
+  export interface AppgenSiteDetailSite {
+    current_user_role?: string;
+    current_live_url?: string | null;
+    disabled_by?: string | null;
+    id: string;
+    latest_edit_context?: unknown;
+    screenshot_url?: string | null;
+    slug: string;
+    status?: string;
+    title: string;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: {
+    children(site: AppgenSiteDetailSite): unknown;
+    prefetchTab?(
+      tab: "analytics" | "automations" | "database" | "settings",
+    ): Promise<unknown>;
+    projectId: string;
+    selectedTab: "analytics" | "automations" | "database" | "settings";
+  }) => unknown;
 }
 
 declare module "@rchunk/toolbar-breadcrumb" {
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: {
+    ancestors: Array<{ id: string; label: unknown; onClick(): void }>;
+    current?: string;
+  }) => unknown;
 }
 
 declare module "@rchunk/appgen-site-detail-route" {
@@ -6118,7 +6157,13 @@ declare module "@rchunk/security-src" {
 
 declare module "@rchunk/security-tabs" {
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: {
+    ariaLabel: string;
+    onSelect(key: string): void;
+    selectedKey: string;
+    tabs: Array<{ key: string; name: unknown; panelId: string }>;
+    variant?: string;
+  }) => unknown;
 }
 
 declare module "@rchunk/confirmation" {
