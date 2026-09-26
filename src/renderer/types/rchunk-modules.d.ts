@@ -1138,11 +1138,6 @@ declare module "@rchunk/google-drive-resource-icon" {
   export default _default;
 }
 
-declare module "@rchunk/open-appgen-share-dialog" {
-  const _default: unknown;
-  export default _default;
-}
-
 declare module "@rchunk/open-automation-side-panel-tab" {
   const _default: unknown;
   export default _default;
