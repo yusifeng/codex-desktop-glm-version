@@ -79,6 +79,11 @@ globalThis.__artifactTemplatesTest = {
   inserted: [],
   mentions: [],
   metadata: new Map(),
+  metadataQueryFactory: null,
+  fileMetadata: new Map([
+    ["/created", { createdAtMs: 12, mtimeMs: 20 }],
+    ["/modified", { createdAtMs: 0, mtimeMs: 21 }],
+  ]),
   mutationInput: null,
   skills: [],
   useEvents: [],
@@ -121,6 +126,7 @@ globalThis.__artifactTemplatesTest = {
 
 const artifactTemplates = await loadModule({
   "app-shared": `
+    export const Ct = () => {};
     export const I3 = globalThis.__artifactTemplatesTest.jsx;
     export const e6 = globalThis.__artifactTemplatesTest.react;
     export const HX = signal => typeof signal === "function" ? signal() : signal;
@@ -128,7 +134,10 @@ const artifactTemplates = await loadModule({
     export const n4 = () => ({ formatMessage: (descriptor, values = {}) => descriptor.defaultMessage.replace(/\\{([^}]+)\\}/g, (_, key) => values[key] ?? "{" + key + "}") });
     export const m4 = (...values) => values.filter(Boolean).join(" ");
     export const BX = () => ({ data: new Map() });
-    export const QX = (_scope, factory) => factory;
+    export const QX = (_scope, factory) => {
+      globalThis.__artifactTemplatesTest.metadataQueryFactory = factory;
+      return factory;
+    };
     export const ZI = Symbol("scope");
     export const pk = Symbol("toast");
     export const S_ = "Icon";
@@ -138,6 +147,9 @@ const artifactTemplates = await loadModule({
     export const dw = "close";
   `,
   "app-initial": `
+    export const O5t = () => {};
+    export const P5t = () => {};
+    export const w5t = () => {};
     export const kht = Symbol("picker-scope");
     export const Syt = "context";
     export const Dyt = "host-1";
@@ -159,7 +171,11 @@ const artifactTemplates = await loadModule({
     export const HZ = () => globalThis.__artifactTemplatesTest.composer;
     export const Lz = () => ({ minimum: 0, maximum: 100 });
     export const Rz = (_element, direction) => direction < 0 ? 0 : 100;
-    export const Qln = async () => ({ createdAtMs: 1 });
+    export const Qln = async (_event, payload) => {
+      const metadata = globalThis.__artifactTemplatesTest.fileMetadata.get(payload.params.path);
+      if (metadata == null) throw new Error("missing metadata");
+      return metadata;
+    };
     export const _ = "Surface";
     export const YX = "Panel";
     export const XX = "Body";
@@ -187,6 +203,31 @@ const artifactTemplates = await loadModule({
     export const t = "TemplateCard";
   `,
 });
+
+const metadataOptions = globalThis.__artifactTemplatesTest.metadataQueryFactory(
+  {
+    hostId: "host-1",
+    paths: ["/created", "/modified", "/missing"],
+    skillsRefreshNonce: 4,
+  },
+);
+check(
+  metadataOptions.enabled === true &&
+    metadataOptions.queryKey.join("|") ===
+      "artifact-template-skill-creation-times|host-1|4|/created|/modified|/missing",
+  "keys and enables the metadata query from host, nonce, and paths",
+);
+const creationTimes = await metadataOptions.queryFn({
+  signal: new AbortController().signal,
+});
+check(
+  creationTimes.get("/created") === 12 && creationTimes.get("/modified") === 21,
+  "prefers creation time and falls back to modification time",
+);
+check(
+  creationTimes.get("/missing") === null,
+  "keeps unreadable template metadata as a null timestamp",
+);
 
 const reusableSkill = {
   enabled: true,
@@ -296,5 +337,5 @@ check(
   "does not render while the picker state is inactive",
 );
 
-assert.equal(assertions, 10);
+assert.equal(assertions, 13);
 console.log(`${assertions} Home artifact templates assertions passed`);

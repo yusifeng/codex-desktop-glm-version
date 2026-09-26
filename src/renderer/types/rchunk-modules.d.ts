@@ -66,10 +66,17 @@ declare module "@rchunk/app-shared" {
   export const Qh: (props: LoadingSpinnerProps) => unknown;
   export const Xh: (props: Omit<ButtonProps, "as">) => unknown;
   export const Yh: (props: ButtonProps) => unknown;
+  export interface ReactRef<T> {
+    current: T;
+  }
   // React 兼容导出（e6 = react 模块命名空间，含 createContext/use 等）。
   export const e6: {
+    Fragment: unknown;
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
     use<T>(context: unknown): T;
+    useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
+    useRef<T>(initialValue: T): ReactRef<T>;
+    useState<T>(initialValue: T): [T, (value: T | ((current: T) => T)) => void];
     [key: string]: unknown;
   };
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
@@ -387,6 +394,33 @@ declare module "@rchunk/app-shared" {
   }
   /** IconAsset（app-shared/ui/icons/icon-preset.ts）。 */
   export const S_: (props: IconAssetProps) => unknown;
+  export interface IntlShape {
+    formatMessage(
+      descriptor: { defaultMessage: string; description?: string; id: string },
+      values?: Record<string, unknown>,
+    ): string;
+  }
+  export interface ToastManager {
+    danger(
+      message: string,
+      options?: { errorAnalytics?: { toastId: string } },
+    ): void;
+    success(message: string): void;
+  }
+  export interface TextSelectionLike {
+    readonly $from?: { nodeBefore?: { isText?: boolean; text?: string } };
+    readonly from: number;
+  }
+  export const Ct: () => void;
+  export const dw: IconAssetPreset;
+  export const n4: () => IntlShape;
+  export const pk: ScopedSignal<unknown, ToastManager>;
+  export const rQ: {
+    atEnd(document: unknown): TextSelectionLike;
+    create(document: unknown, position: number): TextSelectionLike;
+  };
+  export const wt: IconAssetPreset;
+  export const Yd: IconAssetPreset;
   export const Xi: unknown;
   export const Y2: unknown; // FormattedMessage
   export const Yi: unknown;
@@ -471,7 +505,19 @@ declare module "@rchunk/app-shared" {
       | ((context: ScopedSignalInitializerContext<TScope>) => TValue),
     options?: ScopedSignalOptions<TScope, TValue>,
   ) => ScopedSignal<TScope, TValue>;
-  export const qQ: unknown;
+  export interface AnimationPlaybackControls {
+    stop(): void;
+  }
+  export const qQ: (
+    from: number,
+    to: number,
+    options: {
+      duration: number;
+      ease: readonly [number, number, number, number];
+      onComplete(): void;
+      onUpdate(value: number): void;
+    },
+  ) => AnimationPlaybackControls;
   export const qm: unknown;
   export const r$: unknown;
   export const t$: unknown;

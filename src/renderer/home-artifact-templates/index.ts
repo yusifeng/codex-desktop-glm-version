@@ -10,14 +10,313 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as staggeredItemChunk from "@rchunk/home-suggestion-staggered-item";
 import * as templateCardChunk from "@rchunk/home-artifact-template-card";
+import type {
+  AnimationPlaybackControls,
+  IntlShape,
+  MaitaiScope,
+  MaitaiScopeApi,
+  ReadableSignal,
+  ScopedQueryFamily,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const staggeredItem = staggeredItemChunk as Record<string, any>;
-const templateCard = templateCardChunk as Record<string, any>;
+type StateSetter<T> = (value: T | ((current: T) => T)) => void;
+type Component = string | ((props: Record<string, unknown>) => unknown);
+
+interface ReactRuntime {
+  Fragment: unknown;
+  useEffect(
+    effect: () => void | (() => void),
+    dependencies?: readonly unknown[],
+  ): void;
+  useRef<T>(initialValue: T): { current: T };
+  useState<T>(initialValue: T): [T, StateSetter<T>];
+}
+
+interface JsxRuntime {
+  Fragment: unknown;
+  jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
+  jsxs(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
+}
+
+interface ArtifactSkill {
+  enabled?: boolean;
+  name: string;
+  path: string;
+  title?: string;
+}
+
+interface GalleryMetadata {
+  galleryKind: TemplateKind | string;
+  sourceUrl?: string | null;
+}
+
+interface ArtifactTemplateMetadataParams {
+  hostId: string;
+  paths: string[];
+  skillsRefreshNonce: number;
+}
+
+interface FileMetadata {
+  createdAtMs?: number;
+  mtimeMs?: number;
+}
+
+interface EditorTransaction {
+  readonly doc: unknown;
+  insertText(text: string, from: number, to: number): EditorTransaction;
+  setSelection(selection: unknown): EditorTransaction;
+}
+
+interface EditorState {
+  readonly doc: unknown;
+  readonly selection: { readonly from: number };
+  readonly tr: EditorTransaction;
+}
+
+interface ComposerController {
+  appendPromptText?(text: string | undefined): void;
+  focus?(): void;
+  insertSkillMentionAtSelection?(skill: ArtifactSkill): void;
+  insertTextAtSelection?(text: string): void;
+  view?: {
+    dispatch(transaction: EditorTransaction): void;
+    state: EditorState;
+  };
+}
+
+interface SkillQueryResult {
+  forceReload(): Promise<unknown>;
+  isLoading: boolean;
+  skills: ArtifactSkill[];
+}
+
+interface GalleryQueryResult {
+  data: Map<string, GalleryMetadata> | undefined;
+  isLoading: boolean;
+}
+
+interface RemoveSkillInput {
+  hostId: string;
+  skillPath: string;
+}
+
+interface RemoveSkillMutation {
+  isPending: boolean;
+  mutate(input: RemoveSkillInput): void;
+}
+
+interface ComposerSelector {
+  <T>(
+    composer: ComposerController | undefined,
+    selector: (composer: ComposerController) => T,
+  ): T | undefined;
+  <T>(
+    composer: ComposerController | undefined,
+    selector: (composer: ComposerController) => T,
+    fallback: T,
+  ): T;
+}
+
+interface AppInitialBindings {
+  Body: Component;
+  Header: Component;
+  Panel: Component;
+  Surface: Component;
+  buildEditPrompt(templateCreator: ArtifactSkill, skill: ArtifactSkill): string;
+  canDeleteTemplate(skill: ArtifactSkill, hostCapability: boolean): boolean;
+  composerContextSignal: ReadableSignal<unknown>;
+  dismissReasons?: {
+    CODEX_ARTIFACT_TEMPLATE_CAROUSEL_DISMISS_REASON_CLOSE_BUTTON?: unknown;
+  };
+  filterSkills(
+    skills: ArtifactSkill[],
+    kind: TemplateKind,
+    metadata: Map<string, GalleryMetadata>,
+  ): ArtifactSkill[];
+  getGallery(
+    skills: ArtifactSkill[],
+    hostId: string,
+    refreshNonce: number,
+  ): GalleryQueryResult;
+  getScrollBounds(element: HTMLElement): { minimum: number; maximum: number };
+  getSkillDisplayName(skill: ArtifactSkill): string;
+  getTemplateKind(kind: string): TemplateKind | string;
+  hostIdSignal: ReadableSignal<string>;
+  initializeArtifactTemplates(): void;
+  initializeGallery(): void;
+  initializeTemplateCard(): void;
+  invalidateQueries(): (queryKey: readonly unknown[]) => Promise<unknown>;
+  mergeMetadata(
+    skills: ArtifactSkill[],
+    creationTimes: Map<string, number | null> | undefined,
+    deletablePaths: Set<string>,
+  ): ArtifactSkill[];
+  nextScrollPosition(element: HTMLElement, direction: number): number;
+  pickerScope: MaitaiScope<Record<string, unknown>>;
+  readFileMetadata(event: string, payload: unknown): Promise<FileMetadata>;
+  selectComposer: ComposerSelector;
+  settingsSignal: ReadableSignal<boolean>;
+  skillsQueryKey: readonly unknown[];
+  useComposer(): ComposerController | undefined;
+  useHostCapability(hostId: string): boolean;
+  useRemoveSkillMutation(
+    name: string,
+    options: {
+      onError(): void;
+      onSuccess(result: { success: boolean }): Promise<void> | void;
+    },
+  ): RemoveSkillMutation;
+  useSkills(
+    context: unknown,
+    hostId: string,
+    options: { enabled: boolean },
+  ): SkillQueryResult;
+  useStoredNumber(key: string): [number, StateSetter<number>];
+}
+
+interface AppPrimaryBindings {
+  closePicker(scope: MaitaiScopeApi<unknown> | undefined): void;
+  dismissPicker(
+    scope: MaitaiScopeApi<unknown> | undefined,
+    reason: unknown,
+  ): void;
+  isComposerBlocked(state: EditorState | undefined): boolean;
+  journeySignal: unknown;
+  recordAttachment(
+    scope: MaitaiScopeApi<unknown> | undefined,
+    event: { attachmentPath: string; journey: unknown; templateId: string },
+  ): void;
+  recordCreate(scope: MaitaiScopeApi<unknown> | undefined, url: string): void;
+  recordOpen(
+    scope: MaitaiScopeApi<unknown> | undefined,
+    kind: TemplateKind,
+  ): void;
+  recordUse(
+    scope: MaitaiScopeApi<unknown> | undefined,
+    skill: ArtifactSkill,
+  ): void;
+  selectedKind(document: unknown, format: unknown): TemplateKind | null;
+  templateFormatSignal: ReadableSignal<unknown>;
+  templatesEnabledSignal: ReadableSignal<boolean>;
+}
+
+const {
+  BX: useSignalFamilyValue,
+  Ct: initializeSharedRuntime,
+  HX: useSignalValue,
+  I3: jsxRuntimeExport,
+  LX: useScope,
+  QX: createQueryFamily,
+  S_: IconAsset,
+  Yd: arrowRightIcon,
+  Yh: Button,
+  ZI: appScope,
+  dw: closeIcon,
+  e6: reactRuntimeExport,
+  m4: classNames,
+  n4: useIntl,
+  pk: toastSignal,
+  qQ: animateNumber,
+  rQ: TextSelection,
+  wt: plusIcon,
+} = appSharedChunk;
+
+const {
+  C5t: filterSkills,
+  D5t: getTemplateKind,
+  Dyt: hostIdSignal,
+  E5t: mergeMetadata,
+  G1: getGallery,
+  Gfn: useStoredNumber,
+  HZ: useComposer,
+  Lz: getScrollBounds,
+  M5t: getSkillDisplayName,
+  O5t: initializeArtifactTemplates,
+  P5t: initializeGallery,
+  Qln: readFileMetadata,
+  Rz: nextScrollPosition,
+  Syt: composerContextSignal,
+  T5t: canDeleteTemplate,
+  UZ: selectComposer,
+  Ukt: settingsSignal,
+  XX: Body,
+  YX: Panel,
+  Z6t: useHostCapability,
+  ZX: Header,
+  _: Surface,
+  b5t: buildEditPrompt,
+  iun: useRemoveSkillMutation,
+  kht: pickerScope,
+  lEt: useSkills,
+  qs: dismissReasons,
+  sEt: skillsQueryKey,
+  sun: invalidateQueries,
+  w5t: initializeTemplateCard,
+} = appInitialChunk as unknown as {
+  C5t: AppInitialBindings["filterSkills"];
+  D5t: AppInitialBindings["getTemplateKind"];
+  Dyt: AppInitialBindings["hostIdSignal"];
+  E5t: AppInitialBindings["mergeMetadata"];
+  G1: AppInitialBindings["getGallery"];
+  Gfn: AppInitialBindings["useStoredNumber"];
+  HZ: AppInitialBindings["useComposer"];
+  Lz: AppInitialBindings["getScrollBounds"];
+  M5t: AppInitialBindings["getSkillDisplayName"];
+  O5t: AppInitialBindings["initializeArtifactTemplates"];
+  P5t: AppInitialBindings["initializeGallery"];
+  Qln: AppInitialBindings["readFileMetadata"];
+  Rz: AppInitialBindings["nextScrollPosition"];
+  Syt: AppInitialBindings["composerContextSignal"];
+  T5t: AppInitialBindings["canDeleteTemplate"];
+  UZ: AppInitialBindings["selectComposer"];
+  Ukt: AppInitialBindings["settingsSignal"];
+  XX: AppInitialBindings["Body"];
+  YX: AppInitialBindings["Panel"];
+  Z6t: AppInitialBindings["useHostCapability"];
+  ZX: AppInitialBindings["Header"];
+  _: AppInitialBindings["Surface"];
+  b5t: AppInitialBindings["buildEditPrompt"];
+  iun: AppInitialBindings["useRemoveSkillMutation"];
+  kht: AppInitialBindings["pickerScope"];
+  lEt: AppInitialBindings["useSkills"];
+  qs: AppInitialBindings["dismissReasons"];
+  sEt: AppInitialBindings["skillsQueryKey"];
+  sun: AppInitialBindings["invalidateQueries"];
+  w5t: AppInitialBindings["initializeTemplateCard"];
+};
+
+const {
+  Ci: dismissPicker,
+  Ei: recordUse,
+  Si: recordAttachment,
+  Ti: recordCreate,
+  bi: journeySignal,
+  gg: templateFormatSignal,
+  hg: templatesEnabledSignal,
+  po: isComposerBlocked,
+  vg: selectedKindFromDocument,
+  vi: closePicker,
+  wi: recordOpen,
+} = appPrimaryChunk as unknown as {
+  Ci: AppPrimaryBindings["dismissPicker"];
+  Ei: AppPrimaryBindings["recordUse"];
+  Si: AppPrimaryBindings["recordAttachment"];
+  Ti: AppPrimaryBindings["recordCreate"];
+  bi: AppPrimaryBindings["journeySignal"];
+  gg: AppPrimaryBindings["templateFormatSignal"];
+  hg: AppPrimaryBindings["templatesEnabledSignal"];
+  po: AppPrimaryBindings["isComposerBlocked"];
+  vg: AppPrimaryBindings["selectedKind"];
+  vi: AppPrimaryBindings["closePicker"];
+  wi: AppPrimaryBindings["recordOpen"];
+};
+
+const { n: initializeStaggeredItem, t: StaggeredItem } =
+  staggeredItemChunk as unknown as { n: () => void; t: Component };
+const { n: initializeTemplateCardChunk, t: TemplateCard } =
+  templateCardChunk as unknown as { n: () => void; t: Component };
 
 type TemplateKind =
   | "document"
@@ -223,10 +522,14 @@ const BUILT_IN_TEMPLATES: readonly BuiltInTemplate[] = [
   ),
 ];
 
-let React: any;
-let jsx: any;
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 let initialized = false;
-let artifactTemplateMetadataQuery: any;
+let artifactTemplateMetadataQuery: ScopedQueryFamily<
+  Record<string, unknown>,
+  ArtifactTemplateMetadataParams,
+  Map<string, number | null>
+>;
 
 function builtIn(
   id: string,
@@ -251,9 +554,9 @@ function builtIn(
 }
 
 function format(
-  intl: any,
+  intl: IntlShape | undefined,
   descriptor: MessageDescriptor,
-  values: Record<string, any> = {},
+  values: Record<string, unknown> = {},
 ): string {
   if (intl?.formatMessage != null)
     return intl.formatMessage(descriptor, values);
@@ -262,51 +565,55 @@ function format(
   );
 }
 
-function useSignal(signal: any): any {
-  return typeof appShared.HX === "function" ? appShared.HX(signal) : signal;
+function useSignal<T>(signal: ReadableSignal<T>): T {
+  return useSignalValue(signal);
 }
 
-function createArtifactTemplateMetadataQuery(): any {
-  if (typeof appShared.QX !== "function") return null;
-  return appShared.QX(
-    appShared.ZI,
-    ({ hostId, paths, skillsRefreshNonce }: Record<string, any>) => ({
-      queryKey: [
-        "artifact-template-skill-creation-times",
-        hostId,
-        skillsRefreshNonce,
-        ...paths,
-      ],
-      queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        const entries = await Promise.all(
-          paths.map(async (path: string) => {
-            try {
-              const metadata = await appInitial.Qln("read-file-metadata", {
-                params: { hostId, path },
-                signal,
-              });
-              const createdAt = metadata?.createdAtMs;
-              return [
-                path,
-                createdAt != null && createdAt > 0
-                  ? createdAt
-                  : (metadata?.mtimeMs ?? null),
-              ];
-            } catch (error) {
-              if (signal.aborted) throw error;
-              return [path, null];
-            }
-          }),
-        );
-        return new Map(entries);
-      },
-      enabled: paths.length > 0,
-      staleTime: 0,
-    }),
-  );
+function createArtifactTemplateMetadataQuery(): ScopedQueryFamily<
+  Record<string, unknown>,
+  ArtifactTemplateMetadataParams,
+  Map<string, number | null>
+> {
+  return createQueryFamily<
+    Record<string, unknown>,
+    ArtifactTemplateMetadataParams,
+    Map<string, number | null>
+  >(appScope, ({ hostId, paths, skillsRefreshNonce }) => ({
+    queryKey: [
+      "artifact-template-skill-creation-times",
+      hostId,
+      skillsRefreshNonce,
+      ...paths,
+    ],
+    queryFn: async ({ signal }: { signal: AbortSignal }) => {
+      const entries = await Promise.all(
+        paths.map(async (path: string) => {
+          try {
+            const metadata = await readFileMetadata("read-file-metadata", {
+              params: { hostId, path },
+              signal,
+            });
+            const createdAt = metadata?.createdAtMs;
+            return [
+              path,
+              createdAt != null && createdAt > 0
+                ? createdAt
+                : (metadata?.mtimeMs ?? null),
+            ] as const;
+          } catch (error) {
+            if (signal.aborted) throw error;
+            return [path, null] as const;
+          }
+        }),
+      );
+      return new Map(entries);
+    },
+    enabled: paths.length > 0,
+    staleTime: 0,
+  }));
 }
 
-function isTemplateCreator(skill: any): boolean {
+function isTemplateCreator(skill: ArtifactSkill): boolean {
   return Boolean(
     skill?.enabled &&
     (skill.name === "template-creator" ||
@@ -314,29 +621,28 @@ function isTemplateCreator(skill: any): boolean {
   );
 }
 
-function skillPath(skill: any): string {
+function skillPath(skill: ArtifactSkill): string {
   return skill.path;
 }
 
 function showDangerToast(
-  scope: any,
-  intl: any,
+  scope: MaitaiScopeApi<unknown> | undefined,
+  intl: IntlShape | undefined,
   descriptor: MessageDescriptor,
 ): void {
-  scope?.get?.(appShared.pk)?.danger?.(format(intl, descriptor), {
+  scope?.get(toastSignal).danger(format(intl, descriptor), {
     errorAnalytics: { toastId: descriptor.id },
   });
 }
 
 function useRemoveTemplate(forceReload: () => Promise<unknown>): {
   isPending: boolean;
-  mutate(input: any): void;
+  mutate(input: RemoveSkillInput): void;
 } {
-  const scope = appShared.LX?.(appShared.ZI);
-  const intl = appShared.n4?.();
-  const invalidate = appInitial.sun?.() ?? (async () => {});
-  const nonceState = appInitial.Gfn?.("skills_refresh_nonce") ?? [0, () => {}];
-  const setNonce = nonceState[1] ?? (() => {});
+  const scope = useScope(appScope);
+  const intl = useIntl();
+  const invalidate = invalidateQueries();
+  const [, setNonce] = useStoredNumber("skills_refresh_nonce");
   const onError = () =>
     showDangerToast(scope, intl, {
       id: "home.artifactTemplates.deleteFailed",
@@ -348,9 +654,9 @@ function useRemoveTemplate(forceReload: () => Promise<unknown>): {
     if (!success) return onError();
     try {
       await forceReload();
-      await invalidate(appInitial.sEt);
-      setNonce((value: number | undefined) => (value ?? 0) + 1);
-      scope?.get?.(appShared.pk)?.success?.(
+      await invalidate(skillsQueryKey);
+      setNonce((value) => value + 1);
+      scope.get(toastSignal).success(
         format(intl, {
           id: "home.artifactTemplates.deleteSuccess",
           defaultMessage: "Template deleted",
@@ -367,20 +673,20 @@ function useRemoveTemplate(forceReload: () => Promise<unknown>): {
       });
     }
   };
-  return (
-    appInitial.iun?.("remove-skill", { onSuccess, onError }) ?? {
-      isPending: false,
-      mutate: () => {},
-    }
-  );
+  return useRemoveSkillMutation("remove-skill", { onSuccess, onError });
+}
+
+interface TemplateCreatorCardProps {
+  isDocumentTemplates: boolean;
+  label: string;
+  onClick(): void;
 }
 
 function TemplateCreatorCard({
   isDocumentTemplates,
   label,
   onClick,
-}: Record<string, any>): unknown {
-  const Icon = appShared.S_ ?? "span";
+}: TemplateCreatorCardProps): unknown {
   return jsx.jsxs("button", {
     type: "button",
     className:
@@ -388,14 +694,14 @@ function TemplateCreatorCard({
     onClick,
     children: [
       jsx.jsx("div", {
-        className: appShared.m4?.(
+        className: classNames(
           "relative flex items-center justify-center overflow-hidden rounded-xl border border-default bg-surface-secondary/85 shadow-sm ring-4 ring-transparent group-hover:border-strong group-hover:bg-text/5 group-focus-visible:ring-ring",
           isDocumentTemplates ? "aspect-[4/5]" : "aspect-video",
         ),
-        children: jsx.jsx(Icon, {
+        children: jsx.jsx(IconAsset, {
           className: "text-text-tertiary/60 group-hover:text-codex-icon",
           "aria-hidden": true,
-          asset: appShared.wt,
+          asset: plusIcon,
         }),
       }),
       jsx.jsx("div", {
@@ -407,23 +713,29 @@ function TemplateCreatorCard({
   });
 }
 
+interface BuiltInTemplateGalleryProps {
+  createTemplateCard: unknown;
+  kind: TemplateKind | string;
+  onAttachTemplate(
+    template: BuiltInTemplate,
+  ): Promise<{ path: string } | null | undefined>;
+}
+
 function BuiltInTemplateGallery({
   createTemplateCard,
   kind,
   onAttachTemplate,
-}: Record<string, any>): unknown {
-  const scope = appShared.LX?.(appShared.ZI);
-  const composer = appInitial.HZ?.();
-  const intl = appShared.n4?.();
-  const [attachingId, setAttachingId] = React.useState(null);
+}: BuiltInTemplateGalleryProps): unknown {
+  const scope = useScope(appScope);
+  const composer = useComposer();
+  const intl = useIntl();
+  const [attachingId, setAttachingId] = React.useState<string | null>(null);
   const portrait = kind === "document" || kind === "google-docs";
   const all = BUILT_IN_TEMPLATES.filter((template) => template.kind === kind);
   const templates = all.slice(
     0,
     !portrait && createTemplateCard != null ? 2 : undefined,
   );
-  const StaggeredItem = staggeredItem.t ?? React.Fragment;
-  const Icon = appShared.S_ ?? "span";
 
   const attach = async (template: BuiltInTemplate) => {
     setAttachingId(template.id);
@@ -442,7 +754,7 @@ function BuiltInTemplateGallery({
   };
 
   return jsx.jsxs("div", {
-    className: appShared.m4?.(
+    className: classNames(
       "hide-scrollbar grid snap-x snap-mandatory grid-flow-col gap-4 overflow-x-auto scroll-pe-4 scroll-ps-3 pe-4 ps-3 py-1 sm:snap-none sm:grid-flow-row sm:auto-cols-auto sm:overflow-visible",
       portrait
         ? "auto-cols-[min(14rem,80vw)] sm:grid-cols-4"
@@ -472,7 +784,7 @@ function BuiltInTemplateGallery({
               onClick: () => void attach(template),
               children: [
                 jsx.jsxs("div", {
-                  className: appShared.m4?.(
+                  className: classNames(
                     "relative overflow-hidden rounded-xl border border-default bg-surface shadow-sm ring-4 ring-transparent group-hover:border-strong group-focus-visible:ring-ring",
                     portrait ? "aspect-[4/5]" : "aspect-video",
                   ),
@@ -480,7 +792,7 @@ function BuiltInTemplateGallery({
                     jsx.jsx("img", {
                       src: template.previewUrl,
                       alt: "",
-                      className: appShared.m4?.(
+                      className: classNames(
                         "h-full w-full object-top",
                         portrait ? "object-contain" : "object-cover",
                         attachingId === template.id &&
@@ -492,9 +804,9 @@ function BuiltInTemplateGallery({
                       "aria-hidden": true,
                       className:
                         "pointer-events-none absolute inset-0 flex items-center justify-center bg-text/0 text-text-primary-solid/0 group-hover:bg-text/25 group-hover:text-primary-solid group-focus-visible:bg-text/25 group-focus-visible:text-primary-solid",
-                      children: jsx.jsx(Icon, {
+                      children: jsx.jsx(IconAsset, {
                         "aria-hidden": true,
-                        asset: appShared.wt,
+                        asset: plusIcon,
                       }),
                     }),
                   ],
@@ -523,14 +835,14 @@ function BuiltInTemplateGallery({
 }
 
 function insertTemplateMention(
-  composer: any,
-  scope: any,
-  intl: any,
-  skill: any,
+  composer: ComposerController | undefined,
+  scope: MaitaiScopeApi<unknown> | undefined,
+  intl: IntlShape | undefined,
+  skill: ArtifactSkill,
 ): void {
   const editor = composer?.view;
-  if (editor?.state != null && appShared.rQ?.atEnd != null) {
-    const end = appShared.rQ.atEnd(editor.state.doc);
+  if (editor?.state != null) {
+    const end = TextSelection.atEnd(editor.state.doc);
     const before = end.$from?.nodeBefore;
     editor.dispatch(editor.state.tr.setSelection(end));
     if (before != null && (!before.isText || !/\s$/.test(before.text ?? ""))) {
@@ -558,9 +870,9 @@ function insertTemplateMention(
       .slice(placeholder + TEMPLATE_NAME_PLACEHOLDER.length)
       .replaceAll(
         TEMPLATE_NAME_PLACEHOLDER,
-        appInitial.M5t?.(skill) ?? skill.title ?? skill.name,
+        getSkillDisplayName(skill) ?? skill.title ?? skill.name,
       );
-    if (editor?.state != null && appShared.rQ?.create != null) {
+    if (editor?.state != null) {
       const { state, dispatch } = editor;
       const from = state.selection.from - 1;
       const transaction = state.tr.insertText(
@@ -569,14 +881,14 @@ function insertTemplateMention(
         state.selection.from,
       );
       transaction.setSelection(
-        appShared.rQ.create(transaction.doc, from + suffix.length),
+        TextSelection.create(transaction.doc, from + suffix.length),
       );
       dispatch(transaction);
     } else {
       composer?.insertTextAtSelection?.(suffix);
     }
   }
-  appPrimary.Ei?.(scope, skill);
+  recordUse(scope, skill);
 }
 
 function ArtifactTemplatePicker({
@@ -585,76 +897,58 @@ function ArtifactTemplatePicker({
   placement = "top",
 }: ArtifactTemplatePickerProps): unknown {
   initializeHomeArtifactTemplates();
-  const scope = appShared.LX?.(appInitial.kht);
-  const composer = appInitial.HZ?.();
-  const scrollRef = React.useRef(null);
-  const resizeObserverRef = React.useRef(null);
+  const scope = useScope(pickerScope);
+  const composer = useComposer();
+  const scrollRef = React.useRef<HTMLElement | null>(null);
+  const resizeObserverRef = React.useRef<ResizeObserver | null>(null);
   const scrollKeyRef = React.useRef("");
-  const scrollAnimationRef = React.useRef(null);
+  const scrollAnimationRef = React.useRef<AnimationPlaybackControls | null>(
+    null,
+  );
   const [canScrollBackward, setCanScrollBackward] = React.useState(false);
   const [canScrollForward, setCanScrollForward] = React.useState(false);
-  const context = useSignal(appInitial.Syt);
-  const hostId = useSignal(appInitial.Dyt);
-  const hostCapability = appInitial.Z6t?.(hostId);
-  const setting = useSignal(appInitial.Ukt);
-  const refreshNonceState = appInitial.Gfn?.("skills_refresh_nonce") ?? [0];
-  const skillsRefreshNonce = refreshNonceState[0];
-  const templatesEnabled = useSignal(appPrimary.hg);
-  const templateFormat = useSignal(appPrimary.gg);
-  const intl = appShared.n4?.();
+  const context = useSignal(composerContextSignal);
+  const hostId = useSignal(hostIdSignal);
+  const hostCapability = useHostCapability(hostId);
+  const setting = useSignal(settingsSignal);
+  const [skillsRefreshNonce] = useStoredNumber("skills_refresh_nonce");
+  const templatesEnabled = useSignal(templatesEnabledSignal);
+  const templateFormat = useSignal(templateFormatSignal);
+  const intl = useIntl();
   const composerState =
-    appInitial.UZ?.(composer, (value: any) =>
-      appPrimary.po?.(value.view.state),
-    ) ?? false;
-  const selectedKind =
-    appInitial.UZ?.(
-      composer,
-      (value: any) => appPrimary.vg?.(value.view.state.doc, templateFormat),
-      "document",
-    ) ?? null;
+    selectComposer(composer, (value) => isComposerBlocked(value.view?.state)) ??
+    false;
+  const selectedKind = selectComposer(
+    composer,
+    (value) => selectedKindFromDocument(value.view?.state.doc, templateFormat),
+    "document",
+  );
   const activeKind: TemplateKind | null =
     templatesEnabled && !composerState ? selectedKind : null;
   const queryOptions = { enabled: activeKind != null && !hostCapability };
-  const skillResult = appInitial.lEt?.(
-    context ?? undefined,
-    hostId,
-    queryOptions,
-  ) ?? {
-    forceReload: async () => {},
-    isLoading: false,
-    skills: [],
-  };
+  const skillResult = useSkills(context ?? undefined, hostId, queryOptions);
   const { forceReload, isLoading: skillsLoading, skills = [] } = skillResult;
   const { isPending: deletePending, mutate: removeSkill } =
     useRemoveTemplate(forceReload);
   const relevantSkills = activeKind == null ? [] : skills;
-  const galleryResult = appInitial.G1?.(
-    relevantSkills,
-    hostId,
-    skillsRefreshNonce,
-  ) ?? {
-    data: new Map(),
-    isLoading: false,
-  };
+  const galleryResult = getGallery(relevantSkills, hostId, skillsRefreshNonce);
   const galleryMetadata = galleryResult.data;
   const galleryLoading = galleryResult.isLoading === true;
-  const filterSkills = appInitial.C5t ?? ((value: any[]) => value);
   const reusableSkills =
     activeKind == null || galleryMetadata == null
       ? []
       : filterSkills(skills, activeKind, galleryMetadata);
-  const canDelete = (skill: any) =>
-    appInitial.T5t?.(skill, appInitial.Z6t?.(hostId)) ?? true;
+  const canDelete = (skill: ArtifactSkill) =>
+    canDeleteTemplate(skill, useHostCapability(hostId));
   const deletablePaths = new Set(
     reusableSkills.filter(canDelete).map(skillPath),
   );
   const metadataPaths = [...deletablePaths];
-  const creationTimes = appShared.BX?.(artifactTemplateMetadataQuery, {
+  const creationTimes = useSignalFamilyValue(artifactTemplateMetadataQuery, {
     hostId,
     paths: metadataPaths,
     skillsRefreshNonce,
-  })?.data;
-  const mergeMetadata = appInitial.E5t ?? ((value: any[]) => value);
+  }).data;
   const visibleSkills = mergeMetadata(
     reusableSkills,
     creationTimes,
@@ -663,20 +957,16 @@ function ArtifactTemplatePicker({
   const templateCreator = skills.find(isTemplateCreator);
   const canCreate = templateCreator != null && canUseTemplateAttachments;
   const galleryKind =
-    activeKind === "google-drive"
-      ? null
-      : (appInitial.D5t?.(activeKind) ?? activeKind);
+    activeKind === "google-drive" ? null : getTemplateKind(activeKind);
   const isDocumentTemplates =
     activeKind === "document" || activeKind === "google-docs";
   const cardWidth = isDocumentTemplates
     ? "basis-[min(14rem,80vw)] sm:basis-[calc((100%_+_2rem)/5)]"
     : "basis-[min(18rem,85vw)] sm:basis-1/3";
   const isGoogleDriveGallery = activeKind === "google-drive";
-  const StaggeredItem = staggeredItem.t ?? React.Fragment;
-  const TemplateCard = templateCard.t ?? "div";
 
   React.useEffect(() => {
-    if (activeKind != null) appPrimary.wi?.(scope, activeKind);
+    if (activeKind != null) recordOpen(scope, activeKind);
   }, [scope, activeKind]);
 
   const hadTemplates = React.useRef(false);
@@ -686,7 +976,7 @@ function ArtifactTemplatePicker({
     } else if (!composerState) {
       if (visibleSkills.length > 0) hadTemplates.current = true;
       else if (!skillsLoading && !galleryLoading && hadTemplates.current)
-        appPrimary.vi?.(scope);
+        closePicker(scope);
     }
   }, [
     skillsLoading,
@@ -699,11 +989,8 @@ function ArtifactTemplatePicker({
 
   if (activeKind == null) return null;
 
-  const updateScrollState = (element: any) => {
-    const bounds = appInitial.Lz?.(element) ?? {
-      minimum: 0,
-      maximum: Math.max(0, element.scrollWidth - element.clientWidth),
-    };
+  const updateScrollState = (element: HTMLElement) => {
+    const bounds = getScrollBounds(element);
     setCanScrollBackward(element.scrollLeft > bounds.minimum + 1);
     setCanScrollForward(element.scrollLeft < bounds.maximum - 1);
   };
@@ -711,7 +998,7 @@ function ArtifactTemplatePicker({
     ...visibleSkills.map(skillPath),
     ...(canCreate ? ["create-template"] : []),
   ].join("\n");
-  const bindScrollContainer = (element: any) => {
+  const bindScrollContainer = (element: HTMLElement | null) => {
     resizeObserverRef.current?.disconnect?.();
     scrollRef.current = element;
     if (element == null || galleryKey === "") return;
@@ -719,7 +1006,7 @@ function ArtifactTemplatePicker({
       scrollKeyRef.current = galleryKey;
       scrollAnimationRef.current?.stop?.();
       element.style.removeProperty("scroll-snap-type");
-      const bounds = appInitial.Lz?.(element) ?? { minimum: 0 };
+      const bounds = getScrollBounds(element);
       element.scrollTo({ left: bounds.minimum });
     }
     updateScrollState(element);
@@ -730,19 +1017,17 @@ function ArtifactTemplatePicker({
     resizeObserverRef.current = observer;
   };
   const scroll = (direction: number) => {
-    const element: any = scrollRef.current;
+    const element = scrollRef.current;
     if (element == null) return;
     scrollAnimationRef.current?.stop?.();
-    const left =
-      appInitial.Rz?.(element, direction) ??
-      element.scrollLeft + direction * element.clientWidth;
+    const left = nextScrollPosition(element, direction);
     if (setting) {
       element.scrollTo({ left });
       element.style.removeProperty("scroll-snap-type");
       updateScrollState(element);
     } else {
       element.style.scrollSnapType = "none";
-      scrollAnimationRef.current = appShared.qQ?.(element.scrollLeft, left, {
+      scrollAnimationRef.current = animateNumber(element.scrollLeft, left, {
         duration: 0.2,
         ease: [0.165, 0.84, 0.44, 1],
         onUpdate: (value: number) => element.scrollTo({ left: value }),
@@ -753,10 +1038,10 @@ function ArtifactTemplatePicker({
       });
     }
   };
-  const useTemplate = (skill: any) =>
+  const useTemplate = (skill: ArtifactSkill) =>
     insertTemplateMention(composer, scope, intl, skill);
   const createTemplate = () => {
-    appPrimary.Ti?.(scope, TEMPLATE_CREATOR_URL);
+    recordCreate(scope, TEMPLATE_CREATOR_URL);
     composer?.appendPromptText?.(
       format(intl, CREATE_PROMPTS[activeKind], {
         templateCreator: TEMPLATE_CREATOR_MENTION,
@@ -786,13 +1071,13 @@ function ArtifactTemplatePicker({
           createTemplateCard: createCard,
           kind: galleryKind,
           onAttachTemplate: async (template: BuiltInTemplate) => {
-            const journey = scope?.get?.(appPrimary.bi);
+            const journey = scope.get(journeySignal);
             const attachment = await onAddFileAssetAttachment({
               assetUrl: template.assetUrl,
               label: template.filename,
             });
             if (attachment == null) return null;
-            appPrimary.Si?.(scope, {
+            recordAttachment(scope, {
               attachmentPath: attachment.path,
               journey,
               templateId: template.id,
@@ -809,15 +1094,16 @@ function ArtifactTemplatePicker({
             "hide-scrollbar flex snap-x snap-mandatory scroll-px-3 gap-3 overflow-x-auto px-3 py-1",
           role: "group",
           "aria-label": "Templates",
-          onScroll: (event: any) => updateScrollState(event.currentTarget),
+          onScroll: (event: { currentTarget: HTMLElement }) =>
+            updateScrollState(event.currentTarget),
           children: [
-            visibleSkills.map((skill: any, index: number) => {
+            visibleSkills.map((skill: ArtifactSkill, index: number) => {
               const metadata = galleryMetadata?.get?.(skill.path);
               if (metadata == null) return null;
               return jsx.jsx(
                 StaggeredItem,
                 {
-                  className: appShared.m4?.(
+                  className: classNames(
                     "-m-1 min-w-0 shrink-0 snap-start p-1",
                     isGoogleDriveGallery ? "w-fit" : cardWidth,
                   ),
@@ -834,14 +1120,12 @@ function ArtifactTemplatePicker({
                         ? undefined
                         : () =>
                             composer?.appendPromptText?.(
-                              appInitial.b5t?.(templateCreator, skill),
+                              buildEditPrompt(templateCreator, skill),
                             ),
                     onUse: () => useTemplate(skill),
                     skill,
                     sourceUrl: metadata.sourceUrl,
-                    templateKind:
-                      appInitial.D5t?.(metadata.galleryKind) ??
-                      metadata.galleryKind,
+                    templateKind: getTemplateKind(metadata.galleryKind),
                     isGoogleDriveGallery,
                   }),
                 },
@@ -851,7 +1135,7 @@ function ArtifactTemplatePicker({
             createCard == null
               ? null
               : jsx.jsx(StaggeredItem, {
-                  className: appShared.m4?.(
+                  className: classNames(
                     "-m-1 min-w-0 shrink-0 snap-start p-1",
                     cardWidth,
                   ),
@@ -863,12 +1147,6 @@ function ArtifactTemplatePicker({
         })
       : null;
 
-  const Button = appShared.Yh ?? "button";
-  const Header = appInitial.ZX ?? "header";
-  const Body = appInitial.XX ?? "div";
-  const Panel = appInitial.YX ?? "section";
-  const Surface = appInitial._ ?? "div";
-  const Icon = appShared.S_ ?? "span";
   const scrollButtons =
     visibleSkills.length === 0
       ? null
@@ -881,10 +1159,10 @@ function ArtifactTemplatePicker({
               onClick: () => scroll(-1),
               size: "toolbar",
               uniform: true,
-              children: jsx.jsx(Icon, {
+              children: jsx.jsx(IconAsset, {
                 className: "rotate-180",
                 "aria-hidden": true,
-                asset: appShared.Yd,
+                asset: arrowRightIcon,
               }),
             }),
             jsx.jsx(Button, {
@@ -894,20 +1172,19 @@ function ArtifactTemplatePicker({
               onClick: () => scroll(1),
               size: "toolbar",
               uniform: true,
-              children: jsx.jsx(Icon, {
+              children: jsx.jsx(IconAsset, {
                 "aria-hidden": true,
-                asset: appShared.Yd,
+                asset: arrowRightIcon,
               }),
             }),
           ],
         });
   const close = () => {
-    appPrimary.Ci?.(
+    dismissPicker(
       scope,
-      appInitial.qs
-        ?.CODEX_ARTIFACT_TEMPLATE_CAROUSEL_DISMISS_REASON_CLOSE_BUTTON,
+      dismissReasons?.CODEX_ARTIFACT_TEMPLATE_CAROUSEL_DISMISS_REASON_CLOSE_BUTTON,
     );
-    appPrimary.vi?.(scope);
+    closePicker(scope);
   };
 
   return jsx.jsx(Surface, {
@@ -936,9 +1213,9 @@ function ArtifactTemplatePicker({
                   onClick: close,
                   size: "toolbar",
                   uniform: true,
-                  children: jsx.jsx(Icon, {
+                  children: jsx.jsx(IconAsset, {
                     "aria-hidden": true,
-                    asset: appShared.dw,
+                    asset: closeIcon,
                   }),
                 }),
               ],
@@ -954,15 +1231,19 @@ function ArtifactTemplatePicker({
 function initializeHomeArtifactTemplates(): void {
   if (initialized) return;
   initialized = true;
-  appShared.Ct?.();
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
-  staggeredItem.n?.();
-  templateCard.n?.();
-  appInitial.O5t?.();
-  appInitial.P5t?.();
-  appInitial.w5t?.();
+  initializeSharedRuntime();
+  React = resolveRuntimeExport<ReactRuntime>(reactRuntimeExport);
+  jsx = resolveRuntimeExport<JsxRuntime>(jsxRuntimeExport);
+  initializeStaggeredItem();
+  initializeTemplateCardChunk();
+  initializeArtifactTemplates();
+  initializeGallery();
+  initializeTemplateCard();
   artifactTemplateMetadataQuery = createArtifactTemplateMetadataQuery();
+}
+
+function resolveRuntimeExport<T>(value: unknown): T {
+  return (typeof value === "function" ? value() : value) as T;
 }
 
 initializeHomeArtifactTemplates();
