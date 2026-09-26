@@ -1004,6 +1004,17 @@ declare module "@rchunk/app-shared" {
   }
   /** sitesSharingSources（app-shared/runtime/sites-sharing-source.ts，内部 Eq）。 */
   export const DF: SitesSharingSources;
+  export type SitesSharingAction =
+    | "CODEX_SITES_SHARING_ACTION_OPENED"
+    | "UNRECOGNIZED";
+  export interface SitesSharingActions {
+    readonly CODEX_SITES_SHARING_ACTION_OPENED:
+      "CODEX_SITES_SHARING_ACTION_OPENED";
+    readonly UNRECOGNIZED: "UNRECOGNIZED";
+  }
+  /** Sites 分享弹窗打开事件及 action 枚举。 */
+  export const EF: AnalyticsEventDescriptor<string>;
+  export const TF: SitesSharingActions;
   export interface AnalyticsEventDescriptor<Type extends string> {
     readonly $type: Type;
   }
@@ -3529,16 +3540,22 @@ declare module "@rchunk/appgen-settings-dialog" {
 }
 
 declare module "@rchunk/appgen-share-dialog" {
-  export const AppgenShareDialog: (...args: any[]) => any;
+  export interface AppgenShareDialogProps extends Record<string, unknown> {
+    projectId: string;
+    source: import("@rchunk/app-shared").SitesSharingSource;
+  }
+  export const AppgenShareDialog: (props: AppgenShareDialogProps) => unknown;
 }
 
 declare module "@rchunk/open-appgen-share-dialog" {
+  export interface OpenAppgenShareDialogOptions
+    extends Record<string, unknown> {
+    source: import("@rchunk/app-shared").SitesSharingSource;
+  }
   export const n: (
     scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
     projectId: string,
-    options: {
-      source: import("@rchunk/app-shared").SitesSharingSource;
-    },
+    options: OpenAppgenShareDialogOptions,
   ) => void;
   export const t: () => void;
 }

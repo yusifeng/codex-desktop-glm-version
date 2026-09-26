@@ -4,10 +4,25 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type {
+  MaitaiScopeApi,
+  SitesSharingSource,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  EF: sitesSharingEvent,
+  H3: initializeModulePreload,
+  TF: sitesSharingActions,
+  V3: preloadModule,
+  fI: initializeIntlRuntime,
+} = appSharedChunk;
+const {
+  Uzt: openLazyDialog,
+  Vzt: initializeDialogLauncher,
+  xpn: emitAnalyticsEvent,
+  ypn: initializeAnalyticsEmitter,
+} = appInitialChunk;
 
 const shareDialogDependencies = [
   "./appgen-share-dialog-5fd465534630.js",
@@ -24,30 +39,38 @@ const shareDialogDependencies = [
   "./permission-dropdown-faa59c51006d.js",
 ];
 
-function openAppgenShareDialog(scope: any, projectId: string, options: any) {
+interface OpenAppgenShareDialogOptions extends Record<string, unknown> {
+  source: SitesSharingSource;
+}
+
+function openAppgenShareDialog(
+  scope: MaitaiScopeApi<Record<string, unknown>>,
+  projectId: string,
+  options: OpenAppgenShareDialogOptions,
+): void {
   const loadDialog = async () => {
     const { AppgenShareDialog } = await import("@rchunk/appgen-share-dialog");
     return { AppgenShareDialog };
   };
-  appShared
-    .V3(loadDialog, shareDialogDependencies, import.meta.url)
-    .then(({ AppgenShareDialog }: any) => {
+  preloadModule(loadDialog, shareDialogDependencies, import.meta.url).then(
+    ({ AppgenShareDialog }) => {
       try {
-        appInitial.xpn(scope, appShared.EF, {
-          action: appShared.TF.CODEX_SITES_SHARING_ACTION_OPENED,
+        emitAnalyticsEvent(scope, sitesSharingEvent, {
+          action: sitesSharingActions.CODEX_SITES_SHARING_ACTION_OPENED,
           projectId,
           source: options.source,
         });
       } catch {}
-      appInitial.Uzt(scope, AppgenShareDialog, { projectId, ...options });
-    });
+      openLazyDialog(scope, AppgenShareDialog, { projectId, ...options });
+    },
+  );
 }
 
 function initializeOpenAppgenShareDialog(): void {
-  appShared.fI?.();
-  appInitial.Vzt?.();
-  appInitial.ypn?.();
-  appShared.H3?.();
+  initializeIntlRuntime();
+  initializeDialogLauncher();
+  initializeAnalyticsEmitter();
+  initializeModulePreload();
 }
 
 export { openAppgenShareDialog as n, initializeOpenAppgenShareDialog as t };
