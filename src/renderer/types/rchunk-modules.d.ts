@@ -1882,6 +1882,10 @@ declare module "@rchunk/app-shared" {
   export interface IntlShape {
     locale?: string;
     textComponent?: unknown;
+    formatDate(
+      value: string | number | Date,
+      options?: Intl.DateTimeFormatOptions,
+    ): string;
     formatMessage(
       descriptor: MessageDescriptor,
       values?: MessageValues,
@@ -2685,6 +2689,7 @@ declare module "@rchunk/app-initial" {
     account_user_id?: string | null;
     account_user_role?: string | null;
     id: string;
+    plan_type?: string | null;
     structure: "personal" | "workspace" | string;
   }
   export interface WorkspacePermissions {
@@ -2776,7 +2781,7 @@ declare module "@rchunk/app-initial" {
   export const uht: (
     accountId?: string,
     options?: { preview?: boolean },
-  ) => { data: Account | undefined };
+  ) => { data: Account | undefined; isLoading: boolean };
   export const Uzt: <Props extends Record<string, unknown>>(
     scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
     component: import("@rchunk/app-shared").LazyComponent<Props>,
@@ -2843,6 +2848,20 @@ declare module "@rchunk/app-initial" {
   export const xlt: () => void;
   export const qx: () => void;
   export const ql: (props: Record<string, unknown>) => unknown;
+  export const Hln: (planType: unknown) => boolean;
+  export const uP: (timestamp: number | null) => Date;
+  export const jTt: string;
+  export const Oft: (input: {
+    event: unknown;
+    href: string;
+    initiator: "open_in_browser_bridge";
+  }) => void;
+  export const n7: (props: Record<string, unknown>) => unknown;
+  export const Dft: () => void;
+  export const eEt: () => void;
+  export const r7: () => void;
+  export const sP: () => void;
+  export const Rln: () => void;
   /** initializeThreadState（pending-onboarding 依赖的线程索引初始化器）。 */
   export const Ftn: () => void;
   /** 当前用户 ID signal。 */
@@ -3922,14 +3941,34 @@ declare module "@rchunk/codex-home-announcements-entry" {
 }
 
 declare module "@rchunk/workspace-renewal-payment" {
-  export const n: () => any;
-  export const t: unknown;
+  export interface WorkspaceRenewalPaymentCandidate {
+    content: unknown;
+    gracePeriodEnd: string | null;
+    id: "workspace-renewal-payment";
+    isEligible: boolean;
+    isLoading: boolean;
+  }
+  export const n: () => WorkspaceRenewalPaymentCandidate;
+  export const t: () => void;
 }
 
 declare module "@rchunk/workspace-renewal-state" {
+  export interface WorkspaceRenewalSubscription extends Record<string, unknown> {
+    became_delinquent_timestamp?: string | null;
+    grace_period_end_timestamp?: string | null;
+    is_delinquent?: boolean;
+    will_renew?: boolean;
+  }
   export const n: () => void;
-  export const r: unknown;
-  export const t: (subscription: unknown, now: Date) => string | null;
+  export const r: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string | null,
+    WorkspaceRenewalSubscription
+  >;
+  export const t: (
+    subscription: WorkspaceRenewalSubscription | null | undefined,
+    now: Date,
+  ) => string | null;
 }
 
 declare module "@rchunk/home-announcement-state" {
