@@ -398,6 +398,11 @@ declare module "@rchunk/appgen-site-card" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/building" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
@@ -1115,8 +1120,12 @@ declare module "@rchunk/appgen-access" {
 }
 
 declare module "@rchunk/appgen-access-state-messages" {
-  const _default: unknown;
-  export default _default;
+  export const a: (...args: any[]) => any;
+  export const i: () => void;
+  export const n: (...args: any[]) => any;
+  export const o: () => void;
+  export const r: (...args: any[]) => any;
+  export const t: (...args: any[]) => any;
 }
 
 declare module "@rchunk/appgen-automations-state" {
