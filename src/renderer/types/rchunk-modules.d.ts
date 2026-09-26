@@ -68,6 +68,30 @@ declare module "@rchunk/app-shared" {
   export const Yh: (props: ButtonProps) => unknown;
   /** initializeButton（app-shared/ui/button.ts，内部 c8）。 */
   export const Zh: () => void;
+  export type SwitchSize = "default" | "sm";
+  export type SwitchTone = "accent" | "neutral";
+  export interface SwitchEvent {
+    defaultPrevented?: boolean;
+    preventDefault?(): void;
+    stopPropagation?(): void;
+  }
+  export interface SwitchProps extends Record<string, unknown> {
+    checked: boolean;
+    onChange(checked: boolean): void;
+    disabled?: boolean;
+    className?: string;
+    id?: string;
+    ariaLabel?: string;
+    size?: SwitchSize;
+    tone?: SwitchTone;
+    trackClassName?: string;
+    thumbClassName?: string;
+    onClick?: (event: SwitchEvent) => void;
+  }
+  /** Switch（app-shared/ui/switch.ts，内部 Kdt）。 */
+  export const Lf: (props: SwitchProps) => unknown;
+  /** initializeSwitch（内部 Zdt）。 */
+  export const Rf: () => void;
   export interface DialogLayoutProps extends Record<string, unknown> {
     children?: unknown;
     className?: string;
