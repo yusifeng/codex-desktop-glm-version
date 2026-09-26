@@ -163,6 +163,9 @@ declare module "@rchunk/app-shared" {
     readonly value: T;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
+    get<Data, QueryError>(
+      signal: ScopedQuerySignal<unknown, Data, QueryError>,
+    ): ScopedQueryResult<Data, QueryError>;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
@@ -212,6 +215,63 @@ declare module "@rchunk/app-shared" {
     debugLabel?: string;
     scope: MaitaiScope<TScope>;
   }
+  export interface ScopedQueryFunctionContext {
+    client: ScopedQueryClient;
+    meta?: unknown;
+    queryKey: readonly unknown[];
+    signal: AbortSignal;
+  }
+  export interface ScopedQueryOptions<TData, TError = Error> {
+    enabled?: boolean | ((query: unknown) => boolean);
+    initialData?: TData | (() => TData);
+    meta?: unknown;
+    queryFn?: (context: ScopedQueryFunctionContext) => Promise<TData> | TData;
+    queryKey: readonly unknown[];
+    refetchOnMount?: boolean | "always";
+    staleTime?: number;
+    throwOnError?: boolean | ((error: TError) => boolean);
+  }
+  export interface ScopedQueryState<TData, TError> {
+    data?: TData;
+    dataUpdatedAt?: number;
+    error?: TError | null;
+    fetchStatus?: "fetching" | "idle" | "paused";
+    isInvalidated?: boolean;
+    status?: "error" | "pending" | "success";
+  }
+  export interface ScopedQueryCache {
+    subscribe?(listener: (event: unknown) => void): () => void;
+  }
+  export interface ScopedQueryClient {
+    fetchQuery?<TData>(options: ScopedQueryOptions<TData, unknown>): Promise<TData>;
+    getQueryCache?(): ScopedQueryCache;
+    getQueryData?<TData>(queryKey: readonly unknown[]): TData | undefined;
+    getQueryState?<TData, TError>(
+      queryKey: readonly unknown[],
+    ): ScopedQueryState<TData, TError> | undefined;
+    setQueryData?<TData>(queryKey: readonly unknown[], data: TData): void;
+  }
+  export interface ScopedQueryResult<TData, TError = Error> {
+    data: TData | undefined;
+    error: TError | null;
+    fetchStatus: "fetching" | "idle" | "paused";
+    isEnabled: boolean;
+    isError: boolean;
+    isFetching: boolean;
+    isLoading: boolean;
+    isPending: boolean;
+    isRefetching: boolean;
+    isStale: boolean;
+    isSuccess: boolean;
+    refetch(): Promise<ScopedQueryResult<TData, TError>>;
+    status: "error" | "pending" | "success";
+  }
+  export interface ScopedQuerySignal<TScope, TData, TError = Error> {
+    cache: "cached";
+    debugLabel?: string;
+    queryKind: "query";
+    scope: MaitaiScope<TScope>;
+  }
   export interface ScopedDerivedFamilyOptions<Param, TValue> {
     autoDispose?: boolean | number;
     excludeFieldsFromKey?: readonly string[];
@@ -242,6 +302,9 @@ declare module "@rchunk/app-shared" {
     readonly scope: MaitaiScopeApi<T>;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
+    get<Data, QueryError>(
+      signal: ScopedQuerySignal<unknown, Data, QueryError>,
+    ): ScopedQueryResult<Data, QueryError>;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
@@ -316,6 +379,13 @@ declare module "@rchunk/app-shared" {
     derive: (context: DerivedScopedSignalContext<TScope>) => TValue,
     options?: ScopedDerivedSignalOptions<TValue>,
   ) => ScopedDerivedSignal<TScope, TValue>;
+  /** createQuerySignal（app-shared/runtime/atom-signal.ts，内部 Bje）。 */
+  export const eZ: <TScope, TData, TError = Error>(
+    scope: MaitaiScope<TScope>,
+    getOptions: (
+      context: DerivedScopedSignalContext<TScope>,
+    ) => ScopedQueryOptions<TData, TError>,
+  ) => ScopedQuerySignal<TScope, TData, TError>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =

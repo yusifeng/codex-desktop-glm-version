@@ -466,6 +466,7 @@ export interface ScopeApi<T = unknown> {
   readonly value: T;
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
   get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
+  get<Data, QueryError>(signal: ScopedQuerySignal<unknown, Data, QueryError>): ScopedQueryResult<Data, QueryError>;
   get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
   get<Param, Value>(family: ScopedSignalFamily<unknown, Param, Value>, parameter: Param): Value;
   getOwnValue<Value>(scope: Scope<Value>): Value;
@@ -495,6 +496,61 @@ export interface ScopedSignalOptions<TScope, TValue> {
 
 export interface ScopedDerivedSignalOptions<TValue> {
   isEqual?: (previous: TValue, next: TValue) => boolean;
+}
+
+export interface ScopedQueryFunctionContext {
+  client: ScopedQueryClient;
+  meta?: unknown;
+  queryKey: readonly unknown[];
+  signal: AbortSignal;
+}
+
+export interface ScopedQueryOptions<TData, TError = Error> {
+  enabled?: boolean | ((query: unknown) => boolean);
+  initialData?: TData | (() => TData);
+  meta?: unknown;
+  queryFn?: (context: ScopedQueryFunctionContext) => Promise<TData> | TData;
+  queryKey: readonly unknown[];
+  refetchOnMount?: boolean | "always";
+  staleTime?: number;
+  throwOnError?: boolean | ((error: TError) => boolean);
+}
+
+export interface ScopedQueryState<TData, TError> {
+  data?: TData;
+  dataUpdatedAt?: number;
+  error?: TError | null;
+  fetchStatus?: "fetching" | "idle" | "paused";
+  isInvalidated?: boolean;
+  status?: "error" | "pending" | "success";
+}
+
+export interface ScopedQueryCache {
+  subscribe?(listener: (event: unknown) => void): () => void;
+}
+
+export interface ScopedQueryClient {
+  fetchQuery?<TData>(options: ScopedQueryOptions<TData, unknown>): Promise<TData>;
+  getQueryCache?(): ScopedQueryCache;
+  getQueryData?<TData>(queryKey: readonly unknown[]): TData | undefined;
+  getQueryState?<TData, TError>(queryKey: readonly unknown[]): ScopedQueryState<TData, TError> | undefined;
+  setQueryData?<TData>(queryKey: readonly unknown[], data: TData): void;
+}
+
+export interface ScopedQueryResult<TData, TError = Error> {
+  data: TData | undefined;
+  error: TError | null;
+  fetchStatus: "fetching" | "idle" | "paused";
+  isEnabled: boolean;
+  isError: boolean;
+  isFetching: boolean;
+  isLoading: boolean;
+  isPending: boolean;
+  isRefetching: boolean;
+  isStale: boolean;
+  isSuccess: boolean;
+  refetch(): Promise<ScopedQueryResult<TData, TError>>;
+  status: "error" | "pending" | "success";
 }
 
 export interface ScopedDerivedFamilyOptions<Param, TValue> {
@@ -530,6 +586,7 @@ export interface DerivedScopedSignalContext<T = unknown> {
   readonly scope: ScopeApi<T>;
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
   get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
+  get<Data, QueryError>(signal: ScopedQuerySignal<unknown, Data, QueryError>): ScopedQueryResult<Data, QueryError>;
   get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
   get<Param, Value>(family: ScopedSignalFamily<unknown, Param, Value>, parameter: Param): Value;
   get<Value = unknown>(reader: unknown, ...parameters: unknown[]): Value;
@@ -541,6 +598,17 @@ export interface ScopedDerivedSignal<TScope, TValue> {
   debugLabel?: string;
   scope: Scope<TScope>;
   resolve(state: ScopeState<unknown>): Atom<TValue>;
+}
+
+/** 原 `Bje` 返回的 scope 键控 query signal。 */
+export interface ScopedQuerySignal<TScope, TData, TError = Error> {
+  cache: "cached";
+  debugLabel?: string;
+  getOptions(context: DerivedScopedSignalContext<TScope>): ScopedQueryOptions<TData, TError>;
+  queryKind: "query";
+  scope: Scope<TScope>;
+  resolve(state: ScopeState<unknown>): Atom<ScopedQueryResult<TData, TError>>;
+  [WITH_QUERY_READ_OPTIONS](options: QueryReadOptions): ScopedQuerySignal<TScope, TData, TError>;
 }
 
 /** 原 `Sje` 返回的 scope 键控派生 family。 */
@@ -609,6 +677,7 @@ function resolveScopeBinding(
   binding:
     | ScopedSignal<unknown, unknown>
     | ScopedDerivedSignal<unknown, unknown>
+    | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
   parameter?: unknown,
@@ -648,6 +717,7 @@ function watchScope<T>(
         binding:
           | ScopedSignal<unknown, unknown>
           | ScopedDerivedSignal<unknown, unknown>
+          | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>,
         parameter?: unknown,
@@ -698,6 +768,7 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
       binding:
         | ScopedSignal<unknown, unknown>
         | ScopedDerivedSignal<unknown, unknown>
+        | ScopedQuerySignal<unknown, unknown, unknown>
         | ScopedDerivedFamily<unknown, unknown, unknown>
         | ScopedSignalFamily<unknown, unknown, unknown>,
       parameter?: unknown,
@@ -847,6 +918,7 @@ function isScopedFamily(
   value:
     | ScopedSignal<unknown, unknown>
     | ScopedDerivedSignal<unknown, unknown>
+    | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
 ): value is
@@ -876,6 +948,7 @@ function createDerivedContext<T>(
         const binding = reader as
           | ScopedSignal<unknown, unknown>
           | ScopedDerivedSignal<unknown, unknown>
+          | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>;
         const owner = findScopeState(state, binding.scope);
@@ -928,6 +1001,254 @@ export function resolveScopedDerivedSignal<TScope, TValue>(
   signal: ScopedDerivedSignal<TScope, TValue>,
   state: ScopeState<unknown>,
 ): BoundAtomSignal<TValue> {
+  const owner = findScopeState(state, signal.scope);
+  return { atom: signal.resolve(state), store: owner.store };
+}
+
+interface LocalQueryState<TData, TError> {
+  data?: TData;
+  error: TError | null;
+  fetchStatus: "fetching" | "idle" | "paused";
+  queryHash: string;
+  status: "error" | "pending" | "success";
+  updatedAt: number;
+}
+
+function scopedQueryHash(queryKey: readonly unknown[]): string {
+  return JSON.stringify(canonicalFamilyKey(queryKey));
+}
+
+function queryResultEqual<TData, TError>(
+  previous: ScopedQueryResult<TData, TError>,
+  next: ScopedQueryResult<TData, TError>,
+): boolean {
+  return (
+    Object.is(previous.data, next.data) &&
+    Object.is(previous.error, next.error) &&
+    previous.fetchStatus === next.fetchStatus &&
+    previous.isEnabled === next.isEnabled &&
+    previous.isStale === next.isStale &&
+    previous.status === next.status
+  );
+}
+
+function createQuerySignalInternal<TScope, TData, TError>(
+  scope: Scope<TScope>,
+  getOptions: (context: DerivedScopedSignalContext<TScope>) => ScopedQueryOptions<TData, TError>,
+  forcedEnabled?: boolean,
+): ScopedQuerySignal<TScope, TData, TError> {
+  let disabledSignal: ScopedQuerySignal<TScope, TData, TError> | undefined;
+  const binding: ScopedQuerySignal<TScope, TData, TError> = {
+    cache: "cached",
+    getOptions,
+    queryKind: "query",
+    scope,
+    [WITH_QUERY_READ_OPTIONS](options) {
+      if (options.enabled !== false || forcedEnabled === false) return binding;
+      disabledSignal ??= createQuerySignalInternal(scope, getOptions, false);
+      disabledSignal.debugLabel = binding.debugLabel;
+      return disabledSignal;
+    },
+    resolve(activeState) {
+      const owner = findScopeState(activeState, scope);
+      const cacheKey = binding as unknown as ScopedDerivedSignal<unknown, unknown>;
+      const cached = owner.cachedBindings.get(cacheKey);
+      if (cached != null) return cached as Atom<ScopedQueryResult<TData, TError>>;
+
+      const client = owner.queryClient as ScopedQueryClient | undefined;
+      if (client == null) throw new Error("querySignal requires a QueryClient on Scope");
+      const refreshAtom = atom(0);
+      const initialOptions = getOptions(
+        createDerivedContext(owner, (target) => owner.store.get(target)),
+      );
+      const initialData = typeof initialOptions.initialData === "function"
+        ? (initialOptions.initialData as () => TData)()
+        : initialOptions.initialData;
+      const initialQueryHash = scopedQueryHash(initialOptions.queryKey);
+      const localStateAtom = atom<LocalQueryState<TData, TError>>({
+        data: initialData,
+        error: null,
+        fetchStatus: "idle",
+        queryHash: initialQueryHash,
+        status: initialData === undefined ? "pending" : "success",
+        updatedAt: initialData === undefined ? 0 : Date.now(),
+      });
+      let latestOptions = initialOptions;
+      let latestResult: ScopedQueryResult<TData, TError>;
+      let activeController: AbortController | undefined;
+      let activeFetch: Promise<ScopedQueryResult<TData, TError>> | undefined;
+      let activeQueryHash: string | undefined;
+      let mounted = false;
+      let observedEnabled = false;
+      let observedQueryHash = initialQueryHash;
+      let scheduledFetch = false;
+
+      const refresh = () => {
+        owner.store.set(refreshAtom, (current: number) => current + 1);
+      };
+      const execute = (): Promise<ScopedQueryResult<TData, TError>> => {
+        const options = latestOptions;
+        const queryHash = scopedQueryHash(options.queryKey);
+        if (activeFetch != null && activeQueryHash === queryHash) return activeFetch;
+        if (options.queryFn == null && client.fetchQuery == null) {
+          return Promise.resolve(latestResult);
+        }
+        activeController?.abort();
+        activeController = new AbortController();
+        activeQueryHash = queryHash;
+        owner.store.set(localStateAtom, (current) => ({
+          data: current.queryHash === queryHash ? current.data : undefined,
+          error: null,
+          fetchStatus: "fetching",
+          queryHash,
+          status: current.queryHash === queryHash && current.data !== undefined ? current.status : "pending",
+          updatedAt: current.queryHash === queryHash ? current.updatedAt : 0,
+        }));
+        const request = client.fetchQuery != null
+          ? client.fetchQuery<TData>(options as ScopedQueryOptions<TData, unknown>)
+          : Promise.resolve(options.queryFn?.({
+              client,
+              meta: options.meta,
+              queryKey: options.queryKey,
+              signal: activeController.signal,
+            }) as TData | Promise<TData>);
+        const fetch = request.then(
+          (data) => {
+            client.setQueryData?.(options.queryKey, data);
+            owner.store.set(localStateAtom, {
+              data,
+              error: null,
+              fetchStatus: "idle",
+              queryHash,
+              status: "success",
+              updatedAt: Date.now(),
+            });
+            refresh();
+            return owner.store.get(queryAtom);
+          },
+          (error: TError) => {
+            owner.store.set(localStateAtom, (current) => ({
+              ...current,
+              error,
+              fetchStatus: "idle",
+              queryHash,
+              status: "error",
+            }));
+            refresh();
+            throw error;
+          },
+        ).finally(() => {
+          if (activeFetch === fetch) {
+            activeFetch = undefined;
+            activeController = undefined;
+            activeQueryHash = undefined;
+          }
+        });
+        activeFetch = fetch;
+        return fetch;
+      };
+
+      const refetch = () => execute();
+      const queryAtom = atom((get) => {
+        get(refreshAtom);
+        const context = createDerivedContext(owner, get);
+        const options = getOptions(context);
+        latestOptions = options;
+        const queryHash = scopedQueryHash(options.queryKey);
+        const queryState = client.getQueryState?.<TData, TError>(options.queryKey);
+        const storedLocalState = get(localStateAtom);
+        const localState = storedLocalState.queryHash === queryHash
+          ? storedLocalState
+          : {
+              data: undefined,
+              error: null,
+              fetchStatus: "idle" as const,
+              queryHash,
+              status: "pending" as const,
+              updatedAt: 0,
+            };
+        const cachedData = client.getQueryData?.<TData>(options.queryKey);
+        const data = cachedData ?? queryState?.data ?? localState.data;
+        const error = queryState?.error ?? localState.error ?? null;
+        const fetchStatus = queryState?.fetchStatus ?? localState.fetchStatus;
+        const status = queryState?.status ?? (data === undefined ? localState.status : "success");
+        const enabledByOptions = typeof options.enabled === "function"
+          ? options.enabled(queryState)
+          : options.enabled ?? true;
+        const isEnabled = forcedEnabled !== false && enabledByOptions;
+        const updatedAt = queryState?.dataUpdatedAt ?? localState.updatedAt;
+        const staleTime = options.staleTime ?? 0;
+        const isStale = queryState?.isInvalidated === true ||
+          data === undefined ||
+          staleTime !== Infinity && Date.now() - updatedAt >= staleTime;
+        const result: ScopedQueryResult<TData, TError> = {
+          data,
+          error,
+          fetchStatus,
+          isEnabled,
+          isError: status === "error",
+          isFetching: fetchStatus === "fetching",
+          isLoading: status === "pending" && fetchStatus === "fetching",
+          isPending: status === "pending",
+          isRefetching: status !== "pending" && fetchStatus === "fetching",
+          isStale: isEnabled ? isStale : false,
+          isSuccess: status === "success",
+          refetch,
+          status,
+        };
+        latestResult = result;
+        const queryChanged = observedQueryHash !== queryHash;
+        const becameEnabled = !observedEnabled && isEnabled;
+        observedQueryHash = queryHash;
+        observedEnabled = isEnabled;
+        if (mounted && isEnabled && (queryChanged || becameEnabled) && (data === undefined || isStale)) {
+          if (!scheduledFetch) {
+            scheduledFetch = true;
+            queueMicrotask(() => {
+              scheduledFetch = false;
+              void execute().catch(() => {});
+            });
+          }
+        }
+        return result;
+      });
+      queryAtom.isEqual = queryResultEqual;
+      queryAtom.onMount = () => {
+        mounted = true;
+        const unsubscribe = client.getQueryCache?.().subscribe?.(refresh);
+        const result = owner.store.get(queryAtom);
+        if (
+          result.isEnabled &&
+          (result.data === undefined || initialOptions.refetchOnMount === true || initialOptions.refetchOnMount === "always")
+        ) {
+          void execute().catch(() => {});
+        }
+        return () => {
+          mounted = false;
+          activeController?.abort();
+          unsubscribe?.();
+        };
+      };
+      owner.cachedBindings.set(cacheKey, queryAtom as Atom<unknown>);
+      return queryAtom;
+    },
+  };
+  return binding;
+}
+
+/** 创建 scope 键控 query signal（原 `Bje` / 压缩导出 `eZ`）。 */
+export function createQuerySignal<TScope, TData, TError = Error>(
+  scope: Scope<TScope>,
+  getOptions: (context: DerivedScopedSignalContext<TScope>) => ScopedQueryOptions<TData, TError>,
+): ScopedQuerySignal<TScope, TData, TError> {
+  return createQuerySignalInternal(scope, getOptions);
+}
+
+/** 解析 query signal 为 hook 可消费的 atom/store 对。 */
+export function resolveScopedQuerySignal<TScope, TData, TError>(
+  signal: ScopedQuerySignal<TScope, TData, TError>,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<ScopedQueryResult<TData, TError>> {
   const owner = findScopeState(state, signal.scope);
   return { atom: signal.resolve(state), store: owner.store };
 }
