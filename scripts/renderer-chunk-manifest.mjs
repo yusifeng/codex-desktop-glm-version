@@ -738,6 +738,7 @@ export const REWRITTEN = new Set([
   "home-suggestion-staggered-item",
   "computer-history-suggestion-prompt",
   "computer-history-suggestions",
+  "new-chat-suggestion-source-debug-state",
   "rpc",
   "thread-virtualizer",
   "thread-scroll-controller-context-value",

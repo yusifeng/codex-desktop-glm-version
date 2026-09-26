@@ -158,7 +158,19 @@ declare module "@rchunk/ambient-suggestion-apps" {
 }
 
 declare module "@rchunk/new-chat-suggestion-source-debug-state" {
-  export const _any: any;
+  export const a: unknown;
+  export const c: () => void;
+  export const d: unknown;
+  export const f: unknown;
+  export const i: unknown;
+  export const l: unknown;
+  export const n: unknown;
+  export const o: unknown;
+  export const p: unknown;
+  export const r: unknown;
+  export const s: unknown;
+  export const t: () => void;
+  export const u: unknown;
 }
 
 declare module "@rchunk/home-suggestion-surface" {
