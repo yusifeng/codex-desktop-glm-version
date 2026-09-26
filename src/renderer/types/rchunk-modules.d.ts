@@ -155,6 +155,30 @@ declare module "@rchunk/app-shared" {
   export const rl: (props: SettingsRowProps) => unknown;
   /** SettingsActionRow（内部 uyt）。 */
   export const tl: (props: SettingsActionRowProps) => unknown;
+  export type SettingsGroupOverflow = "hidden" | "visible";
+  export type SettingsGroupVariant =
+    | "default"
+    | "metered"
+    | "secondary"
+    | "form"
+    | "recommendation";
+  export type SettingsGroupDecoration = "daybreak";
+  export interface SettingsGroupProps {
+    children?: unknown;
+    className?: string;
+    contentOverflow?: SettingsGroupOverflow;
+    dividers?: boolean;
+    variant?: SettingsGroupVariant;
+    decoration?: SettingsGroupDecoration;
+  }
+  /** settingsDividerClassName（app-shared/ui/settings-group.ts，内部 hyt）。 */
+  export const $c: string;
+  /** initializeSettingsDividers（内部 gyt）。 */
+  export const el: () => void;
+  /** SettingsGroup（内部 byt）。 */
+  export const Zc: (props: SettingsGroupProps) => unknown;
+  /** initializeSettingsGroup（内部 Cyt）。 */
+  export const Qc: () => void;
   export interface DialogLayoutProps extends Record<string, unknown> {
     children?: unknown;
     className?: string;
