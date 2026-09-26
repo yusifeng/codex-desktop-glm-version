@@ -145,8 +145,10 @@ runtime.worker、editor-doc 的 presentation/workbook 编辑器（巨型 vendore
    `"语义名": "发布文件名"`，`REWRITTEN` 加语义名。
 2. **定位导出**：用 `docs/renderer-app-shared-export-map.json` /
    `docs/renderer-app-initial-export-map.json`（导出名 → 内部符号 + 行号）
-   找到该 chunk 的全部导出与依赖；纯数据 chunk 用生成器脚本提取
-   （参照 `scripts/generate-icons.mjs` 的平衡括号提取法）。
+   找到该 chunk 的全部导出与依赖；`docs/renderer-chunk-manifest.json`
+   是全量 11,201 chunk 的原始 import 邻接表（edges），重写前先查它拿到
+   该 chunk 的精确依赖集合（verify 比对的正是这个集合）；纯数据 chunk
+   用生成器脚本提取（参照 `scripts/generate-icons.mjs` 的平衡括号提取法）。
 3. **语义重写**：读原版（`src/webview/assets/<发布文件名>.js` 或
    `.reference/app-original/`），按真实结构命名（组件/类型/hook 的真实语义），
    写入 `src/renderer/<语义名>/`。
