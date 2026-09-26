@@ -777,6 +777,8 @@ declare module "@rchunk/app-shared" {
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   /** initializeJsxRuntimeLazy（rolldown lazy 辅助）。 */
   export const $3: () => void;
+  /** initializeIntlRuntime（localized banner/message 基础设施）。 */
+  export const fI: () => void;
   /** initializeMountedState（mounted callback hook 依赖）。 */
   export const AT: () => void;
   export const $h: () => void; // i8：资源按钮依赖初始化器
@@ -1832,6 +1834,10 @@ declare module "@rchunk/app-shared" {
   export const S_: (props: IconAssetProps) => unknown;
   /** edit icon asset（Site detail toolbar）。 */
   export const jT: IconAssetPreset;
+  /** dismiss icon asset（worktree onboarding banner）。 */
+  export const ig: IconAssetPreset;
+  /** Worktree onboarding analytics event descriptor。 */
+  export const MA: unknown;
   /** check icon asset（Wallet enrollment 成功态）。 */
   export const vD: IconAssetPreset;
   /** Automation fallback icon（未设置 emoji 的 schedule row）。 */
@@ -3021,7 +3027,10 @@ declare module "@rchunk/worktree-onboarding-state" {
     entryPoint: string;
     isLocalModeRemote?: boolean;
   }) => { isEligible: boolean };
-  export const r: unknown;
+  export const r: import("@rchunk/app-shared").ScopedSignal<
+    unknown,
+    "dismissed" | "eligible" | "succeeded"
+  >;
   export const t: () => void;
 }
 
@@ -3480,7 +3489,9 @@ declare module "@rchunk/home-composer-announcement-candidates" { export const Ho
 declare module "@rchunk/codex-home-announcements" { export const _any: any; }
 declare module "@rchunk/announcement-entry-points" { export const _any: any; }
 declare module "@rchunk/realtime-voice-home-announcement" { export const _any: any; }
-declare module "@rchunk/worktree-onboarding-banner-controller" { export const _any: any; }
+declare module "@rchunk/worktree-onboarding-banner-controller" {
+  export const WorktreeOnboardingBannerController: () => unknown;
+}
 
 declare module "@rchunk/thread-scroll-controller-context-value" {
   export const n: () => void;

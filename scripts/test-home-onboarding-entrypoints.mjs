@@ -663,6 +663,9 @@ const worktreeBanner = await loadModule(
       export const j3 = () => globalThis.__homeOnboardingTest.worktreeActions.push("select");
       export const xvt = () => globalThis.__homeOnboardingTest.worktreeActions.push("close");
       export const Oft = value => globalThis.__homeOnboardingTest.worktreeActions.push(value.href);
+      export const Dft = () => {}; export const Evt = () => {}; export const Rht = () => {};
+      export const eEt = () => {}; export const jst = () => {}; export const pdt = () => {};
+      export const x3 = () => {}; export const ypn = () => {};
     `,
     "app-primary": `
       export const Sm = "Banner";
@@ -671,6 +674,7 @@ const worktreeBanner = await loadModule(
     "app-shared": `
       export const I3 = globalThis.__homeOnboardingTest.jsx;
       export const MA = "analytics-event";
+      export const fI = () => {}; export const FX = () => {}; export const ig = "dismiss-icon";
       export const LX = () => ({ set: (_signal, value) => globalThis.__homeOnboardingTest.worktreeActions.push(value) });
       export const HX = () => ({ cwd: "/repo", hostId: "local" });
       export const n4 = () => ({ formatMessage: value => value.defaultMessage });

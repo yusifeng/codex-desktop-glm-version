@@ -5,23 +5,116 @@ import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as stateChunk from "@rchunk/worktree-onboarding-state";
+import type {
+  JsxRuntime,
+  MaitaiScope,
+  MaitaiScopeApi,
+  ReadableSignal,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const state = stateChunk as Record<string, any>;
+interface WorkspaceState {
+  cwd: string;
+  hostId: string;
+}
 
-let jsx: any;
+interface WorktreeProjectKey {
+  cwd: string;
+  hostId: string;
+}
+
+interface AppInitialBindings {
+  Dft(): void;
+  Evt(): void;
+  Oft(input: { event: unknown; href: string; initiator: string }): void;
+  QTt: string;
+  Rht(): void;
+  eEt(): void;
+  j3(
+    scope: MaitaiScopeApi<unknown>,
+    project: WorktreeProjectKey,
+    mode: "worktree",
+  ): void;
+  jst(): void;
+  kht: MaitaiScope<unknown>;
+  kst(input: WorktreeProjectKey): WorktreeProjectKey;
+  mdt: ReadableSignal<WorkspaceState>;
+  pdt(): void;
+  x3(): void;
+  xpn(
+    scope: MaitaiScopeApi<unknown>,
+    event: unknown,
+    details: { mode: "worktree" },
+  ): void;
+  xvt(): void;
+  ypn(): void;
+}
+
+interface AppPrimaryBindings {
+  Cm(): void;
+  Sm: ((props: WorktreeOnboardingBannerViewProps) => unknown) | null;
+}
+
+interface WorktreeOnboardingBannerViewProps {
+  description: string;
+  dismissAction: { ariaLabel: string; icon: unknown; onClick(): void };
+  primaryAction: { label: string; onClick(): void };
+  secondaryAction: { label: string; onClick(event: unknown): void };
+  title: string;
+}
+
+interface WorktreeOnboardingBannerProps {
+  onDismiss(): void;
+  onLearnMore(event: unknown): void;
+  onNewWorktree(): void;
+}
+
+const {
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  I3: jsxRuntimeExport,
+  LX: useSignalScope,
+  MA: worktreeAnalyticsEvent,
+  fI: initializeIntlRuntime,
+  ig: dismissIcon,
+  n4: useIntl,
+} = appSharedChunk;
+const {
+  Dft: initializeWorktreeSelection,
+  Evt: initializeWindowActions,
+  Oft: openExternalLink,
+  QTt: worktreeDocumentationUrl,
+  Rht: initializeWorkspaceState,
+  eEt: initializeBannerRuntime,
+  j3: selectWorktreeProject,
+  jst: initializeProjectKeys,
+  kht: routeScope,
+  kst: createWorktreeProjectKey,
+  mdt: workspaceSignal,
+  pdt: initializeWorkspaceSignals,
+  x3: initializeWorktreeMode,
+  xpn: trackWorktreeAction,
+  xvt: closeWorktreePicker,
+  ypn: initializeWorktreeAnalytics,
+} = appInitialChunk as unknown as AppInitialBindings;
+const {
+  Cm: initializeBanner,
+  Sm: Banner,
+} = appPrimaryChunk as unknown as AppPrimaryBindings;
+const {
+  r: worktreeOnboardingStateSignal,
+  t: initializeWorktreeOnboardingState,
+} = stateChunk;
+
+let jsx: JsxRuntime;
 
 function WorktreeOnboardingBanner({
   onDismiss,
   onLearnMore,
   onNewWorktree,
-}: any): unknown {
-  const intl = appShared.n4?.();
-  const Banner = appPrimary.Sm;
+}: WorktreeOnboardingBannerProps): unknown {
+  const intl = useIntl();
   const text = (defaultMessage: string) => defaultMessage;
   const props = {
     title: text("Start another task without disturbing your work"),
@@ -29,11 +122,14 @@ function WorktreeOnboardingBanner({
     primaryAction: { label: text("New worktree"), onClick: onNewWorktree },
     secondaryAction: { label: text("Learn more"), onClick: onLearnMore },
     dismissAction: {
-      ariaLabel:
-        intl?.formatMessage?.({
+      ariaLabel: (() => {
+        const value = intl.formatMessage({
+          id: "worktreeOnboarding.dismiss",
           defaultMessage: "Dismiss worktree suggestion",
-        }) ?? "Dismiss worktree suggestion",
-      icon: appShared.ig,
+        });
+        return typeof value === "string" ? value : "Dismiss worktree suggestion";
+      })(),
+      icon: dismissIcon,
       onClick: onDismiss,
     },
   };
@@ -44,22 +140,25 @@ function WorktreeOnboardingBanner({
 
 function WorktreeOnboardingBannerController(): unknown {
   initializeWorktreeOnboardingBanner();
-  const scope = appShared.LX(appInitial.kht);
-  const workspace = appShared.HX(appInitial.mdt);
-  const onDismiss = () => scope.set(state.r, "dismissed");
+  const scope = useSignalScope(routeScope);
+  const workspace = useSignalValue(workspaceSignal);
+  const onDismiss = () => scope.set(worktreeOnboardingStateSignal, "dismissed");
   const onNewWorktree = () => {
-    appInitial.xpn?.(scope, appShared.MA, { mode: "worktree" });
-    appInitial.j3?.(
+    trackWorktreeAction(scope, worktreeAnalyticsEvent, { mode: "worktree" });
+    selectWorktreeProject(
       scope,
-      appInitial.kst?.({ cwd: workspace.cwd, hostId: workspace.hostId }),
+      createWorktreeProjectKey({
+        cwd: workspace.cwd,
+        hostId: workspace.hostId,
+      }),
       "worktree",
     );
-    appInitial.xvt?.();
+    closeWorktreePicker();
   };
   const onLearnMore = (event: unknown) =>
-    appInitial.Oft?.({
+    openExternalLink({
       event,
-      href: appInitial.QTt,
+      href: worktreeDocumentationUrl,
       initiator: "open_in_browser_bridge",
     });
   return jsx.jsx(WorktreeOnboardingBanner, {
@@ -71,19 +170,23 @@ function WorktreeOnboardingBannerController(): unknown {
 
 function initializeWorktreeOnboardingBanner(): void {
   if (jsx != null) return;
-  appShared.fI?.();
-  appShared.FX?.();
-  appInitial.eEt?.();
-  appInitial.Dft?.();
-  appInitial.ypn?.();
-  appInitial.pdt?.();
-  appInitial.Rht?.();
-  appInitial.jst?.();
-  appInitial.x3?.();
-  appInitial.Evt?.();
-  state.t?.();
-  appPrimary.Cm?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeIntlRuntime();
+  initializeSignalRuntime();
+  initializeBannerRuntime();
+  initializeWorktreeSelection();
+  initializeWorktreeAnalytics();
+  initializeWorkspaceSignals();
+  initializeWorkspaceState();
+  initializeProjectKeys();
+  initializeWorktreeMode();
+  initializeWindowActions();
+  initializeWorktreeOnboardingState();
+  initializeBanner();
+  jsx = resolveRuntime<JsxRuntime>(jsxRuntimeExport);
+}
+
+function resolveRuntime<T>(value: unknown): T {
+  return (typeof value === "function" ? value() : value) as T;
 }
 
 initializeWorktreeOnboardingBanner();
