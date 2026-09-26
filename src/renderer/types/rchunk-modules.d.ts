@@ -219,8 +219,7 @@ declare module "@rchunk/app-shared" {
   export const I3: unknown; // jsx runtime
   export const IQ: unknown;
   export const JQ: unknown;
-  export const K2: unknown;
-  export const W2: (descriptor: unknown) => unknown;
+  export const K2: () => void;
   export interface ScopeRetainOptions {
     autoDispose?: boolean | number;
     max?: number;
@@ -982,11 +981,35 @@ declare module "@rchunk/app-shared" {
   }
   /** IconAsset（app-shared/ui/icons/icon-preset.ts）。 */
   export const S_: (props: IconAssetProps) => unknown;
+  export interface MessageDescriptor {
+    id: string;
+    defaultMessage?: string;
+    description?: string | Record<string, unknown>;
+  }
+  export type MessagePrimitive = boolean | Date | null | number | string | undefined;
+  export type MessageValue =
+    | MessagePrimitive
+    | ((chunks: readonly unknown[]) => unknown);
+  export type MessageValues = Record<string, MessageValue>;
   export interface IntlShape {
+    locale?: string;
+    textComponent?: unknown;
     formatMessage(
-      descriptor: { defaultMessage: string; description?: string; id: string },
+      descriptor: MessageDescriptor,
+      values?: MessageValues,
+      options?: { ignoreTag?: boolean },
+    ): string | readonly unknown[];
+    formatMessage(
+      descriptor: MessageDescriptor,
       values?: Record<string, unknown>,
+      options?: { ignoreTag?: boolean },
     ): string;
+  }
+  export interface FormattedMessageProps extends MessageDescriptor {
+    values?: MessageValues;
+    children?: (chunks: readonly unknown[]) => unknown;
+    tagName?: unknown;
+    ignoreTag?: boolean;
   }
   export interface ToastManager {
     danger(
@@ -1010,7 +1033,16 @@ declare module "@rchunk/app-shared" {
   export const wt: IconAssetPreset;
   export const Yd: IconAssetPreset;
   export const Xi: unknown;
-  export const Y2: unknown; // FormattedMessage
+  /** FormattedMessage（app-shared/ui/intl.ts，内部 Gg）。 */
+  export const Y2: (props: FormattedMessageProps) => unknown;
+  /** defineMessages（内部 oae）。 */
+  export const G2: <const Messages extends Record<string, MessageDescriptor>>(
+    messages: Messages,
+  ) => Messages;
+  /** defineMessage（内部 sae）。 */
+  export const W2: <const Descriptor extends MessageDescriptor>(
+    descriptor: Descriptor,
+  ) => Descriptor;
   export const Yi: unknown;
   /** AppScope（app-shared/runtime/atom-signal.ts，内部 YW）。 */
   export const ZI: MaitaiScope<Record<string, unknown>>;
