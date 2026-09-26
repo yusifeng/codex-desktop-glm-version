@@ -236,6 +236,11 @@ declare module "@rchunk/pepper-onboarding-modal" {
   export const _any: any;
 }
 
+declare module "@rchunk/chatgpt-cme" {
+  export const n: unknown;
+  export const r: () => void;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;

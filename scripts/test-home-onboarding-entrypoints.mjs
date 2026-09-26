@@ -325,5 +325,56 @@ check(
   "dismisses stale-account Pepper modals",
 );
 
-assert.equal(assertions, 22);
+globalThis.__homeOnboardingTest.cme = {
+  mobile: false,
+  selected: [],
+};
+const cmeEntry = await loadModule("home-entry-point", {
+  "app-initial": `
+    export const kht = Symbol("scope");
+    export const v2 = Symbol("mode");
+    export const HZ = () => ({ hasText: () => false, view: { state: {} }, focus: () => globalThis.__homeOnboardingTest.cme.selected.push("focus") });
+    export const UZ = () => true;
+    export const uht = () => ({ data: { id: "account-1", plan_type: "team" } });
+    export const i_n = () => ({ search: "" });
+    export const N9 = () => globalThis.__homeOnboardingTest.cme.mobile;
+    export const Vln = () => true;
+    export const yln = () => false;
+    export const b2 = () => globalThis.__homeOnboardingTest.cme.selected.push("cme");
+    export const xpn = () => globalThis.__homeOnboardingTest.cme.selected.push("analytics");
+  `,
+  "app-shared": `
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const Yh = "Button";
+    export const Y2 = "Message";
+    export const Vb = "CmeIcon";
+    export const wu = { getState: () => ({ active: false }) };
+    export const LX = () => ({
+      get: () => true,
+      queryClient: { getQueryData: () => ({ account_ordering: ["account-1"] }) }
+    });
+    export const HX = () => true;
+    export const sZ = () => Symbol("eligibility");
+  `,
+  "chatgpt-cme": `
+    export const n = "cme-tool";
+    export const r = () => {};
+  `,
+});
+const cmeTree = cmeEntry.CmeHomeEntryPoint();
+check(cmeTree.type === "div", "renders the eligible CME entry point");
+check(
+  cmeTree.props.children.props.children[1].props.defaultMessage.includes("CME"),
+  "renders the CME call to action",
+);
+cmeTree.props.children.props.onClick();
+check(
+  globalThis.__homeOnboardingTest.cme.selected.join(",") ===
+    "cme,focus,analytics",
+  "selects CME, focuses the editor, and records the action",
+);
+globalThis.__homeOnboardingTest.cme.mobile = true;
+check(cmeEntry.CmeHomeEntryPoint() === null, "hides CME on narrow viewports");
+
+assert.equal(assertions, 26);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
