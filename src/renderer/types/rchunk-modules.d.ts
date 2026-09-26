@@ -1129,8 +1129,9 @@ declare module "@rchunk/appgen-access-state-messages" {
 }
 
 declare module "@rchunk/appgen-automations-state" {
-  const _default: unknown;
-  export default _default;
+  export const n: (...args: any[]) => any;
+  export const r: () => void;
+  export const t: (...args: any[]) => any;
 }
 
 declare module "@rchunk/artifact-feedback-button" {

@@ -941,6 +941,7 @@ export const REWRITTEN = new Set([
   "appgen-access",
   "appgen-site-card",
   "appgen-access-state-messages",
+  "appgen-automations-state",
   "home-starter-prompts",
   "home-announcement-state",
   "codex-micro-onboarding-animation",
