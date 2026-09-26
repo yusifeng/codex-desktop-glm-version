@@ -161,12 +161,19 @@ declare module "@rchunk/app-shared" {
     readonly scope: MaitaiScope<T>;
     readonly value: T;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+    get<Param, Value>(
+      family: ScopedDerivedFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
     get<Value = unknown>(signal: unknown, ...parameters: unknown[]): Value;
+    getOwnValue<Value>(scope: MaitaiScope<Value>): Value;
     set<Value>(
       signal: ScopedSignal<unknown, Value>,
       value: Value | ((current: Value) => Value),
     ): void;
     set(signal: unknown, value: unknown, ...parameters: unknown[]): void;
+    watch(effect: (scope: MaitaiScopeApi<T>) => void | (() => void)): () => void;
+    when(predicate: (scope: MaitaiScopeApi<T>) => boolean): Promise<void>;
     [key: string]: unknown;
   }
   export interface ScopedSignalInitializerContext<T = unknown> {
@@ -209,7 +216,8 @@ declare module "@rchunk/app-shared" {
     kind: "readable-family";
     scope: MaitaiScope<TScope>;
   }
-  export const LX: unknown;
+  /** useScope（app-shared/runtime/atom-signal.ts，内部 mMe）。 */
+  export const LX: <T>(scope: MaitaiScope<T>) => MaitaiScopeApi<T>;
   export const P3: unknown;
   /** replaceEqualDeep（app-shared/runtime/query-structural-utils.ts）。 */
   export const PZ: <T>(previous: unknown, next: T) => T;

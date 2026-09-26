@@ -453,13 +453,21 @@ export interface CreateScopeStateOptions {
 }
 
 /** scoped signal 初始化器和 onMount 能看到的 scope 门面。 */
+export interface ScopeQueryApi {
+  getOrFetch<Result>(query: unknown, ...parameters: unknown[]): Promise<Result>;
+}
+
 export interface ScopeApi<T = unknown> {
   readonly queryClient: unknown;
+  readonly query: ScopeQueryApi;
   readonly scope: Scope<T>;
   readonly value: T;
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
   get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
+  getOwnValue<Value>(scope: Scope<Value>): Value;
   set<Value>(signal: ScopedSignal<unknown, Value>, value: Value | ((current: Value) => Value)): void;
+  watch(effect: (scope: ScopeApi<T>) => void | (() => void)): () => void;
+  when(predicate: (scope: ScopeApi<T>) => boolean): Promise<void>;
 }
 
 export interface ScopedSignalInitializerContext<T = unknown> {
@@ -522,6 +530,98 @@ function findScopeState<T>(state: ScopeState<unknown>, scope: Scope<T>): ScopeSt
 const scopeApiByState = new WeakMap<ScopeState<unknown>, ScopeApi<unknown>>();
 const scopeStateByApi = new WeakMap<ScopeApi<unknown>, ScopeState<unknown>>();
 
+function getScopeQueryApi(state: ScopeState<unknown>): ScopeQueryApi {
+  return {
+    async getOrFetch<Result>(query: unknown, ...parameters: unknown[]): Promise<Result> {
+      const client = state.queryClient as {
+        fetchQuery?: (options: unknown) => Promise<Result>;
+        getOrFetch?: (query: unknown, ...parameters: unknown[]) => Promise<Result>;
+      } | undefined;
+      if (client?.getOrFetch != null) return client.getOrFetch(query, ...parameters);
+      if (client?.fetchQuery != null) return client.fetchQuery(query);
+      if (typeof query === "function") {
+        return await (query as (...values: unknown[]) => Result | Promise<Result>)(...parameters);
+      }
+      if (typeof query === "object" && query != null && "queryFn" in query) {
+        const queryFn = (query as { queryFn?: (...values: unknown[]) => Result | Promise<Result> }).queryFn;
+        if (queryFn != null) return await queryFn(...parameters);
+      }
+      throw new Error("Missing query client");
+    },
+  };
+}
+
+function resolveScopeBinding(
+  state: ScopeState<unknown>,
+  binding: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>,
+  parameter?: unknown,
+): BoundAtomSignal<unknown> {
+  const owner = findScopeState(state, binding.scope);
+  const target = isScopedDerivedFamily(binding)
+    ? binding.resolve(state, parameter)
+    : binding.resolve(state);
+  return { atom: target, store: owner.store };
+}
+
+function watchScope<T>(
+  state: ScopeState<T>,
+  effect: (scope: ScopeApi<T>) => void | (() => void),
+): () => void {
+  let stopped = false;
+  let cleanup: void | (() => void);
+  let unsubscribers: Array<() => void> = [];
+  let running = false;
+  let rerunRequested = false;
+
+  const run = () => {
+    if (stopped) return;
+    if (running) {
+      rerunRequested = true;
+      return;
+    }
+    running = true;
+    if (typeof cleanup === "function") cleanup();
+    for (const unsubscribe of unsubscribers) unsubscribe();
+    unsubscribers = [];
+    const dependencies = new Map<AtomStore, Set<Atom<unknown>>>();
+    const base = createScopeApi(state);
+    const tracked = {
+      ...base,
+      get(
+        binding: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>,
+        parameter?: unknown,
+      ): unknown {
+        const resolved = resolveScopeBinding(state, binding, parameter);
+        let atoms = dependencies.get(resolved.store);
+        if (atoms == null) {
+          atoms = new Set();
+          dependencies.set(resolved.store, atoms);
+        }
+        atoms.add(resolved.atom);
+        return resolved.store.get(resolved.atom);
+      },
+    } as ScopeApi<T>;
+    cleanup = effect(tracked);
+    for (const [store, atoms] of dependencies) {
+      for (const target of atoms) unsubscribers.push(store.sub(target, run));
+    }
+    running = false;
+    if (rerunRequested) {
+      rerunRequested = false;
+      run();
+    }
+  };
+
+  run();
+  return () => {
+    if (stopped) return;
+    stopped = true;
+    if (typeof cleanup === "function") cleanup();
+    for (const unsubscribe of unsubscribers) unsubscribe();
+    unsubscribers = [];
+  };
+}
+
 function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
   const cached = scopeApiByState.get(state);
   if (cached != null) return cached as ScopeApi<T>;
@@ -530,13 +630,15 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
       if (state.queryClient == null) throw new Error("Missing query client");
       return state.queryClient;
     },
+    query: getScopeQueryApi(state),
     scope: state.scope,
     value: state.value,
     get(binding: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>, parameter?: unknown): unknown {
-      const owner = findScopeState(state, binding.scope);
-      return isScopedDerivedFamily(binding)
-        ? owner.store.get(binding.resolve(state, parameter))
-        : owner.store.get(binding.resolve(state));
+      const resolved = resolveScopeBinding(state, binding, parameter);
+      return resolved.store.get(resolved.atom);
+    },
+    getOwnValue<Value>(scope: Scope<Value>): Value {
+      return findScopeState(state, scope).value;
     },
     set<Value>(
       signal: ScopedSignal<unknown, Value>,
@@ -544,6 +646,22 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
     ): void {
       const owner = findScopeState(state, signal.scope);
       owner.store.set(signal.resolve(state), value);
+    },
+    watch(effect: (scope: ScopeApi<T>) => void | (() => void)): () => void {
+      return watchScope(state, effect);
+    },
+    when(predicate: (scope: ScopeApi<T>) => boolean): Promise<void> {
+      return new Promise((resolve) => {
+        let unsubscribe: (() => void) | undefined;
+        let resolvedBeforeSubscription = false;
+        unsubscribe = watchScope(state, (scopeApi) => {
+          if (!predicate(scopeApi)) return;
+          resolve();
+          if (unsubscribe == null) resolvedBeforeSubscription = true;
+          else unsubscribe();
+        });
+        if (resolvedBeforeSubscription) unsubscribe();
+      });
     },
   } as ScopeApi<T>;
   scopeApiByState.set(state, api as ScopeApi<unknown>);
@@ -970,12 +1088,40 @@ export function isSignalFamily(value: unknown): boolean {
 
 /** React 面（结构化子集）。 */
 interface ReactLike {
+  createContext<T>(defaultValue: T): ReactContextLike<T>;
+  useContext<T>(context: ReactContextLike<T>): T;
   useSyncExternalStore<T>(subscribe: (onChange: () => void) => () => void, getSnapshot: () => T, getServerSnapshot?: () => T): T;
   useCallback<T extends (...args: never[]) => unknown>(fn: T, deps?: unknown[]): T;
 }
 
+export interface ReactContextLike<T> {
+  Consumer: unknown;
+  Provider: unknown;
+}
+
 function reactOf(): ReactLike {
   return (globalThis as { __RENDERER_REACT__?: ReactLike }).__RENDERER_REACT__ ?? (require("react") as unknown as ReactLike);
+}
+
+const reactScopeContexts = new WeakMap<Scope<unknown>, ReactContextLike<ScopeState<unknown> | null>>();
+
+/** 返回 scope 对应的 React context，供 scope provider 装配实例链。 */
+export function getScopeReactContext<T>(
+  scope: Scope<T>,
+): ReactContextLike<ScopeState<unknown> | null> {
+  let context = reactScopeContexts.get(scope);
+  if (context == null) {
+    context = reactOf().createContext<ScopeState<unknown> | null>(null);
+    reactScopeContexts.set(scope, context);
+  }
+  return context;
+}
+
+/** React scope hook（原 `mMe` / 压缩导出 `LX`）。 */
+export function useScope<T>(scope: Scope<T>): ScopeApi<T> {
+  const activeState = reactOf().useContext(getScopeReactContext(scope));
+  if (activeState == null) throw new Error(`Missing scope instance: ${scope.__scopeBrand}`);
+  return createScopeApi(findScopeState(activeState, scope));
 }
 
 /**
