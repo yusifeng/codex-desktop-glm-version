@@ -563,5 +563,113 @@ check(
   "preserves the official Home icon path",
 );
 
-assert.equal(assertions, 40);
+globalThis.__homeOnboardingTest.worktree = {
+  query: { data: { worktrees: [] } },
+  sets: [],
+  workspace: {
+    cwd: "/repo",
+    hostId: "local",
+    isCodexWorktree: false,
+    kind: "git",
+  },
+};
+const worktreeState = await loadModule("worktree-onboarding-state", {
+  "app-initial": `
+    export const mdt = Symbol("workspace");
+    export const kht = Symbol("scope");
+    export const t3 = Symbol("prompt");
+    export const Q4 = Symbol("mode-family");
+    export const Vfn = hostId => ({ hostId });
+    export const kst = value => value;
+    export const ofn = () => true;
+    export const dun = (key, initial) => ({ key, initial });
+  `,
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const e6 = globalThis.__homeOnboardingTest.react;
+    export const LX = () => ({
+      get: signal => signal.initial,
+      set: (signal, value) => globalThis.__homeOnboardingTest.worktree.sets.push([signal, value])
+    });
+    export const HX = signal => signal.description === "workspace"
+      ? globalThis.__homeOnboardingTest.worktree.workspace
+      : signal.description === "prompt-suggests-worktrees" ? true : signal.initial;
+    export const BX = () => "local";
+    export const sZ = () => Symbol("prompt-suggests-worktrees");
+  `,
+  "use-codex-worktrees": `
+    export const n = () => globalThis.__homeOnboardingTest.worktree.query;
+    export const t = () => {};
+  `,
+});
+worktreeState.t();
+check(
+  worktreeState.n({ enabled: true, entryPoint: "codex" }).isEligible === true,
+  "enables the worktree suggestion for an eligible Git workspace",
+);
+globalThis.__homeOnboardingTest.worktree.query = {
+  data: { worktrees: [{ id: "existing" }] },
+};
+check(
+  worktreeState.n({ enabled: true, entryPoint: "codex" }).isEligible === false,
+  "hides the suggestion when worktrees already exist",
+);
+check(
+  globalThis.__homeOnboardingTest.worktree.sets.at(-1)[1] === "succeeded",
+  "marks onboarding succeeded after detecting a worktree",
+);
+
+globalThis.__homeOnboardingTest.worktreeActions = [];
+const worktreeBanner = await loadModule(
+  "worktree-onboarding-banner-controller",
+  {
+    "app-initial": `
+      export const kht = Symbol("scope");
+      export const mdt = Symbol("workspace");
+      export const QTt = "https://example.com/worktrees";
+      export const kst = value => value;
+      export const xpn = () => globalThis.__homeOnboardingTest.worktreeActions.push("analytics");
+      export const j3 = () => globalThis.__homeOnboardingTest.worktreeActions.push("select");
+      export const xvt = () => globalThis.__homeOnboardingTest.worktreeActions.push("close");
+      export const Oft = value => globalThis.__homeOnboardingTest.worktreeActions.push(value.href);
+    `,
+    "app-primary": `
+      export const Sm = "Banner";
+      export const Cm = () => {};
+    `,
+    "app-shared": `
+      export const I3 = globalThis.__homeOnboardingTest.jsx;
+      export const MA = "analytics-event";
+      export const LX = () => ({ set: (_signal, value) => globalThis.__homeOnboardingTest.worktreeActions.push(value) });
+      export const HX = () => ({ cwd: "/repo", hostId: "local" });
+      export const n4 = () => ({ formatMessage: value => value.defaultMessage });
+    `,
+    "worktree-onboarding-state": `
+      export const r = Symbol("state");
+      export const t = () => {};
+    `,
+  },
+);
+const controllerNode = worktreeBanner.WorktreeOnboardingBannerController();
+const bannerNode = controllerNode.type(controllerNode.props);
+check(bannerNode.type === "Banner", "renders the worktree onboarding banner");
+bannerNode.props.dismissAction.onClick();
+check(
+  globalThis.__homeOnboardingTest.worktreeActions.at(-1) === "dismissed",
+  "persists worktree banner dismissal",
+);
+bannerNode.props.secondaryAction.onClick("event");
+check(
+  globalThis.__homeOnboardingTest.worktreeActions.at(-1) ===
+    "https://example.com/worktrees",
+  "opens worktree documentation",
+);
+bannerNode.props.primaryAction.onClick();
+check(
+  globalThis.__homeOnboardingTest.worktreeActions.slice(-3).join(",") ===
+    "analytics,select,close",
+  "selects the worktree mode and closes the picker",
+);
+
+assert.equal(assertions, 47);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);

@@ -269,6 +269,18 @@ declare module "@rchunk/app-info" {
   export const t: (app: any) => any;
 }
 
+declare module "@rchunk/use-codex-worktrees" {
+  export const n: (...args: any[]) => any;
+  export const t: () => void;
+  export const _any: any;
+}
+
+declare module "@rchunk/worktree-onboarding-state" {
+  export const n: (...args: any[]) => any;
+  export const r: unknown;
+  export const t: () => void;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;
