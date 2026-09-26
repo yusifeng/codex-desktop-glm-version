@@ -714,6 +714,7 @@ export const REWRITTEN = new Set([
   "home-composer-mode-toggle-entry",
   "home-composer-mode-toggle-core",
   "browser-composer-disclaimer-entry",
+  "browser-composer-disclaimer-core",
   "rpc",
   "thread-virtualizer",
   "thread-scroll-controller-context-value",
