@@ -1448,7 +1448,55 @@ declare module "@rchunk/app-shared" {
   export const RI: () => void; // nG：路径 dirname 依赖初始化器
   export const V3: unknown; // detachedWindow preload 依赖表
   export const VI: (path: string) => string; // QW：路径分隔符规范化
-  export const W3: () => void; // detachedWindow 所需 app-shared 初始化器
+  export interface RendererHostMessage extends Record<string, unknown> {
+    type: string;
+  }
+  export type RendererHostMessageReply = (
+    type: string,
+    payload: Record<string, unknown>,
+  ) => void;
+  export type RendererHostMessageHandler<
+    Message extends RendererHostMessage = RendererHostMessage,
+  > = (message: Message, reply: RendererHostMessageReply) => void;
+  export interface RendererMessageApi {
+    postMessage(message: RendererHostMessage): void;
+    getState<T = unknown>(): T | undefined;
+    setState<T>(state: T): void;
+  }
+  export interface RendererHostMessageBridge {
+    dispatchMessage(type: string, payload: Record<string, unknown>): void;
+    dispatchHostMessage(message: RendererHostMessage): void;
+    hasHandledBufferedMessage(message: object): boolean;
+    startTestWindowMessageListener(): never;
+    stopWindowMessageListener(): void;
+    reset(): void;
+    subscribe<Message extends RendererHostMessage>(
+      type: string,
+      handler: RendererHostMessageHandler<Message>,
+    ): () => void;
+  }
+  /** renderer 消息桥单例（app-shared/runtime/message-bridge.ts，内部 re）。 */
+  export const G3: RendererHostMessageBridge;
+  /** useElectronMessageHandler（内部 ee）。 */
+  export const K3: <Message extends RendererHostMessage>(
+    type: string,
+    handler: RendererHostMessageHandler<Message>,
+    dependencies?: readonly unknown[],
+  ) => void;
+  /** VscodeHostMessageBridge 构造器（内部 R）。 */
+  export const U3: {
+    new (): RendererHostMessageBridge;
+    getInstance(): RendererHostMessageBridge;
+    instance: RendererHostMessageBridge | null;
+  };
+  /** renderer 消息 API（内部 E）。 */
+  export const X3: RendererMessageApi;
+  /** initializeRendererMessageApi（内部 D）。 */
+  export const Y3: () => void;
+  /** parseWindowMessageCached（内部 O）。 */
+  export const q3: (event: MessageEvent) => RendererHostMessage | null;
+  /** initializeHostMessageBridge（内部 z）。 */
+  export const W3: () => void;
   export const l3: (left: unknown, right: unknown) => boolean; // Yt：lodash isEqual
   export const zI: unknown;
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
