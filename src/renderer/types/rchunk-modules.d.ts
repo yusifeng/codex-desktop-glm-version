@@ -429,6 +429,10 @@ declare module "@rchunk/settings-unsaved-changes-dialog" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/chatgpt-saved-memory-source-delete-dialog" {
+  export const ChatGptSavedMemorySourceDeleteDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
