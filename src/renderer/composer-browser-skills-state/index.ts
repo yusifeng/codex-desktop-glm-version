@@ -7,7 +7,13 @@
 //   r = submitWithBrowserSkills（原 `y`）
 //   t = initializeComposerBrowserSkillsState（原 `x`）
 
-import { FX as initializeSharedSignals, mZ as getScopedState, pZ as createSignalFamily } from "@rchunk/app-shared";
+import {
+  FX as initializeSharedSignals,
+  mZ as getScopedState,
+  pZ as createScopedSignal,
+  type MaitaiScopeApi,
+  type ScopedSignal,
+} from "@rchunk/app-shared";
 import {
   BPt as initializeComposerState,
   Iht as resolveComposerStateKey,
@@ -47,7 +53,7 @@ interface BrowserSkillRecord {
   [key: string]: unknown;
 }
 
-let browserSkillResolutionFailedFamily: any;
+let browserSkillResolutionFailedSignal: ScopedSignal<unknown, boolean>;
 
 /**
  * 原 `y`：提交前把 prompt 中的 browser skill mentions 收敛为当前账号可用的
@@ -55,14 +61,14 @@ let browserSkillResolutionFailedFamily: any;
  * 提交并设置失败状态；查询完成后再次核对身份，避免切换账号竞态。
  */
 async function submitWithBrowserSkills(
-  rootScope: any,
+  rootScope: MaitaiScopeApi<unknown>,
   composerStateKey: unknown,
   surface: unknown,
   input: unknown,
   submit: SubmitCallback,
 ): Promise<boolean> {
   const scope = getScopedState(rootScope, composerStateRoot, resolveComposerStateKey(composerStateKey));
-  scope?.set(browserSkillResolutionFailedFamily, false);
+  scope?.set(browserSkillResolutionFailedSignal, false);
   const mentions = extractBrowserSkillMentions(input) as BrowserSkillMention[];
 
   if (mentions.length === 0) return (await submit()) !== false;
@@ -87,7 +93,7 @@ async function submitWithBrowserSkills(
   try {
     installedSkills = await scope.query.getOrFetch(installedBrowserSkillsQuery, "installed");
   } catch {
-    scope.set(browserSkillResolutionFailedFamily, true);
+    scope.set(browserSkillResolutionFailedSignal, true);
     return false;
   }
 
@@ -118,19 +124,19 @@ async function submitWithBrowserSkills(
 
 /** 原 `x`：装配依赖并创建按 composer scope 隔离的失败标记。 */
 function initializeComposerBrowserSkillsState(): void {
-  if (browserSkillResolutionFailedFamily != null) return;
+  if (browserSkillResolutionFailedSignal != null) return;
   initializeSharedSignals();
   initializeComposerState();
   initializeAppState();
   initializeSystemSkillId();
   initializeBrowserSkillsState();
-  browserSkillResolutionFailedFamily = createSignalFamily(composerStateRoot, false);
+  browserSkillResolutionFailedSignal = createScopedSignal(composerStateRoot, false);
 }
 
 initializeComposerBrowserSkillsState();
 
 export {
-  browserSkillResolutionFailedFamily as n,
+  browserSkillResolutionFailedSignal as n,
   submitWithBrowserSkills as r,
   initializeComposerBrowserSkillsState as t,
 };

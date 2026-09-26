@@ -149,6 +149,34 @@ declare module "@rchunk/app-shared" {
     brand: string,
     options?: CreateScopeOptions<T>,
   ) => MaitaiScope<T>;
+  export interface MaitaiScopeApi<T = unknown> {
+    readonly queryClient: unknown;
+    readonly scope: MaitaiScope<T>;
+    readonly value: T;
+    get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+    set<Value>(
+      signal: ScopedSignal<unknown, Value>,
+      value: Value | ((current: Value) => Value),
+    ): void;
+    [key: string]: unknown;
+  }
+  export interface ScopedSignalInitializerContext<T = unknown> {
+    readonly queryClient: unknown;
+    readonly scope: MaitaiScopeApi<T>;
+  }
+  export interface ScopedSignalOptions<TScope, TValue> {
+    getServerSnapshot?: () => TValue;
+    isEqual?: (previous: TValue, next: TValue) => boolean;
+    onMount?: (
+      setSelf: (value: TValue | ((current: TValue) => TValue)) => void,
+      scope: MaitaiScopeApi<TScope>,
+    ) => void | (() => void);
+  }
+  export interface ScopedSignal<TScope, TValue> {
+    cache: "signal";
+    debugLabel?: string;
+    scope: MaitaiScope<TScope>;
+  }
   export const LX: unknown;
   export const P3: unknown;
   /** replaceEqualDeep（app-shared/runtime/query-structural-utils.ts）。 */
@@ -201,7 +229,14 @@ declare module "@rchunk/app-shared" {
   export const m4: (...values: ClassValue[]) => string;
   export const mZ: any;
   export const n$: unknown;
-  export const pZ: any; // createDerivedFamily（kI）
+  /** createScopedSignal（app-shared/runtime/atom-signal.ts，内部 kI）。 */
+  export const pZ: <TScope, TValue>(
+    scope: MaitaiScope<TScope>,
+    initialValue:
+      | TValue
+      | ((context: ScopedSignalInitializerContext<TScope>) => TValue),
+    options?: ScopedSignalOptions<TScope, TValue>,
+  ) => ScopedSignal<TScope, TValue>;
   export const qQ: unknown;
   export const qm: unknown;
   export const r$: unknown;

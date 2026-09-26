@@ -58,7 +58,11 @@ export interface Atom<T> {
   read(get: AtomGet): T;
   /** 调试名（`atom<N>`）。 */
   toString(): string;
-  onMount?(schedule: (callback: (get: AtomGet) => void) => void): void;
+  /** 自定义相等判断；返回 true 时保持现有值与版本。 */
+  isEqual?(previous: T, next: T): boolean;
+  /** 服务端渲染快照。 */
+  getServerSnapshot?(): T;
+  onMount?(setSelf: (value: T | ((current: T) => T)) => void): void | (() => void);
   INTERNAL_onInit?(store: AtomStore): void;
   [key: symbol]: unknown;
 }
@@ -202,6 +206,7 @@ class MaitaiStore implements AtomStore {
     return () => {
       node.l.delete(listener as (value?: unknown) => void);
       this.tryUnmount(target);
+      this.flush();
     };
   }
 
@@ -229,22 +234,10 @@ class MaitaiStore implements AtomStore {
         this.mountEffects.add(() => {
           const onMount = target.onMount;
           if (onMount == null) return;
-          let active = true;
-          const wrapped = (get: AtomGet) => {
-            if (!active) return;
-            onMount((callback) => {
-              try {
-                callback(get);
-              } finally {
-                this.flush();
-              }
-            });
-          };
-          const simpleGet: AtomGet = (dependency) => this.get(dependency);
-          wrapped(simpleGet);
-          node!.u = () => {
-            active = false;
-          };
+          const cleanup = onMount((value) => {
+            this.set(target as WritableAtom<unknown, unknown>, value);
+          });
+          if (typeof cleanup === "function") node!.u = cleanup;
         });
       }
     }
@@ -272,6 +265,8 @@ class MaitaiStore implements AtomStore {
 
   private ensureMounted(target: Atom<unknown>): void {
     this.requireNodeState(target);
+    const state = this.requireAtomState(target);
+    if (!("v" in state)) this.setValueInternal(target, this.evaluate(target, state));
     this.flush();
   }
 
@@ -300,6 +295,7 @@ class MaitaiStore implements AtomStore {
     const state = this.requireAtomState(target);
     const hadValue = "v" in state;
     const previous = state.v;
+    if (hadValue && target.isEqual?.(previous, value)) return;
     state.v = value;
     delete state.e;
     if (!hadValue || !Object.is(previous, state.v)) state.n += 1;
@@ -332,15 +328,17 @@ class MaitaiStore implements AtomStore {
       }
     };
     do {
-      for (const effect of this.mountEffects) run(effect);
+      const mountEffects = [...this.mountEffects];
       this.mountEffects.clear();
+      for (const effect of mountEffects) run(effect);
       const listeners = new Set<(value?: unknown) => void>();
       for (const changed of this.changedAtoms) {
         for (const listener of this.requireNodeState(changed).l) listeners.add(listener);
       }
       this.changedAtoms.clear();
-      for (const effect of this.unmountEffects) run(effect);
+      const unmountEffects = [...this.unmountEffects];
       this.unmountEffects.clear();
+      for (const effect of unmountEffects) run(effect);
       for (const listener of listeners) run(listener as () => void);
     } while (this.changedAtoms.size || this.mountEffects.size || this.unmountEffects.size);
     if (errors.length) throw new AggregateError(errors);
@@ -430,6 +428,159 @@ export function initializeMaitaiRuntime(): void {}
 
 /** 应用级根 scope（原 `YW` / 压缩导出 `ZI`）。 */
 export const AppScope = createScope<Record<string, unknown>>("AppScope");
+
+/** scope 实例节点；同一 scope 定义可以在不同父实例下拥有多份节点。 */
+export interface ScopeState<T = unknown> {
+  parent?: ScopeState<unknown>;
+  queryClient?: unknown;
+  scope: Scope<T>;
+  signalBindings: Map<ScopedSignal<unknown, unknown>, Atom<unknown>>;
+  store: AtomStore;
+  value: T;
+}
+
+export interface CreateScopeStateOptions {
+  parent?: ScopeState<unknown>;
+  queryClient?: unknown;
+  store?: AtomStore;
+}
+
+/** scoped signal 初始化器和 onMount 能看到的 scope 门面。 */
+export interface ScopeApi<T = unknown> {
+  readonly queryClient: unknown;
+  readonly scope: Scope<T>;
+  readonly value: T;
+  get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+  set<Value>(signal: ScopedSignal<unknown, Value>, value: Value | ((current: Value) => Value)): void;
+}
+
+export interface ScopedSignalInitializerContext<T = unknown> {
+  readonly queryClient: unknown;
+  readonly scope: ScopeApi<T>;
+}
+
+export interface ScopedSignalOptions<TScope, TValue> {
+  getServerSnapshot?: () => TValue;
+  isEqual?: (previous: TValue, next: TValue) => boolean;
+  onMount?: (
+    setSelf: (value: TValue | ((current: TValue) => TValue)) => void,
+    scope: ScopeApi<TScope>,
+  ) => void | (() => void);
+}
+
+/** 原 `kI` 返回的 scope 键控 signal binding。 */
+export interface ScopedSignal<TScope, TValue> {
+  cache: "signal";
+  debugLabel?: string;
+  scope: Scope<TScope>;
+  resolve(state: ScopeState<unknown>): WritableAtom<TValue, unknown>;
+}
+
+function findScopeState<T>(state: ScopeState<unknown>, scope: Scope<T>): ScopeState<T> {
+  let current: ScopeState<unknown> | undefined = state;
+  while (current != null) {
+    if (current.scope === scope) return current as ScopeState<T>;
+    current = current.parent;
+  }
+  throw new Error(`Missing scope instance: ${scope.__scopeBrand}`);
+}
+
+function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
+  return {
+    get queryClient() {
+      if (state.queryClient == null) throw new Error("Missing query client");
+      return state.queryClient;
+    },
+    scope: state.scope,
+    value: state.value,
+    get<Value>(signal: ScopedSignal<unknown, Value>): Value {
+      const owner = findScopeState(state, signal.scope);
+      return owner.store.get(signal.resolve(state));
+    },
+    set<Value>(
+      signal: ScopedSignal<unknown, Value>,
+      value: Value | ((current: Value) => Value),
+    ): void {
+      const owner = findScopeState(state, signal.scope);
+      owner.store.set(signal.resolve(state), value);
+    },
+  };
+}
+
+/** 创建一个 scope 实例，供语义源码和独立测试装配 scope 链。 */
+export function createScopeState<T>(
+  scope: Scope<T>,
+  value: T,
+  options: CreateScopeStateOptions = {},
+): ScopeState<T> {
+  if (scope.parent != null && options.parent?.scope !== scope.parent) {
+    throw new Error(`Missing parent scope instance: ${scope.parent.__scopeBrand}`);
+  }
+  return {
+    parent: options.parent,
+    queryClient: options.queryClient ?? options.parent?.queryClient,
+    scope,
+    signalBindings: new Map(),
+    store: options.store ?? options.parent?.store ?? createStore(),
+    value,
+  };
+}
+
+/**
+ * 创建 scope 键控 signal（原 `kI` / 压缩导出 `pZ`）。每个目标 scope
+ * 实例只创建并缓存一个 atom；初始化器、onMount 和 query client 都绑定到
+ * 该实例，而不是绑定到 scope 定义本身。
+ */
+export function createScopedSignal<TScope, TValue>(
+  scope: Scope<TScope>,
+  initialValue:
+    | TValue
+    | ((context: ScopedSignalInitializerContext<TScope>) => TValue),
+  options?: ScopedSignalOptions<TScope, TValue>,
+): ScopedSignal<TScope, TValue> {
+  const binding: ScopedSignal<TScope, TValue> = {
+    cache: "signal",
+    scope,
+    resolve(activeState) {
+      const owner = findScopeState(activeState, scope);
+      const cached = owner.signalBindings.get(binding as ScopedSignal<unknown, unknown>);
+      if (cached != null) return cached as WritableAtom<TValue, unknown>;
+
+      const scopeApi = createScopeApi(owner);
+      const context: ScopedSignalInitializerContext<TScope> = {
+        get queryClient() {
+          return scopeApi.queryClient;
+        },
+        scope: scopeApi,
+      };
+      const initial =
+        typeof initialValue === "function"
+          ? (initialValue as (context: ScopedSignalInitializerContext<TScope>) => TValue)(context)
+          : initialValue;
+      const scopedAtom = atom(initial);
+      scopedAtom.isEqual = options?.isEqual;
+      scopedAtom.getServerSnapshot = options?.getServerSnapshot;
+      if (options?.onMount != null) {
+        scopedAtom.onMount = (setSelf) => options.onMount?.(setSelf, scopeApi);
+      }
+      owner.signalBindings.set(
+        binding as ScopedSignal<unknown, unknown>,
+        scopedAtom as Atom<unknown>,
+      );
+      return scopedAtom;
+    },
+  };
+  return binding;
+}
+
+/** 解析为现有 signal hook 可直接消费的 atom/store 对。 */
+export function resolveScopedSignal<TScope, TValue>(
+  signal: ScopedSignal<TScope, TValue>,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<TValue> {
+  const owner = findScopeState(state, signal.scope);
+  return { atom: signal.resolve(state), store: owner.store };
+}
 
 // ---------------------------------------------------------------------------
 // family（原 `MI`/`PI`）
