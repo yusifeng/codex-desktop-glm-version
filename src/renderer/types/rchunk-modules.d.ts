@@ -86,6 +86,30 @@ declare module "@rchunk/app-shared" {
   export const gu: (props: MoreButtonProps) => unknown;
   /** initializeMoreButton（内部 X_t）。 */
   export const _u: () => void;
+  export type AlertLevel = "info" | "success" | "warning" | "danger";
+  export type AlertVariant = "default" | "successNeutral" | "dangerSolid";
+  export interface AlertIconProps {
+    className?: string;
+  }
+  export interface AlertProps {
+    actions?: unknown;
+    actionsInline?: boolean;
+    announce?: boolean;
+    className?: string;
+    level?: AlertLevel;
+    fullWidth?: boolean;
+    children?: unknown;
+    icon?: (props: AlertIconProps) => unknown;
+    leading?: unknown;
+    onRemove?: (event: unknown) => void;
+    richColors?: boolean;
+    testId?: string;
+    variant?: AlertVariant;
+  }
+  /** Alert（app-shared/ui/alert.ts，内部 Ilt）。 */
+  export const om: (props: AlertProps) => unknown;
+  /** initializeAlert（内部 Rlt）。 */
+  export const sm: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
