@@ -119,6 +119,7 @@ declare module "@rchunk/app-shared" {
     | CallableSignalFamily<Param, T>
     | ScopedDerivedFamily<unknown, Param, T>
     | ScopedQueryFamily<unknown, Param, unknown, unknown>
+    | ScopedInfiniteQueryFamily<unknown, Param, unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, Param, T>;
   /** useSignalFamilyValue（app-shared/runtime/atom-signal.ts）。 */
   export const BX: {
@@ -127,6 +128,11 @@ declare module "@rchunk/app-shared" {
       parameter: Param,
       options?: QueryReadOptions,
     ): ScopedQueryResult<Data, QueryError>;
+    <Param, Page, PageParam, QueryError>(
+      family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
+      parameter: Param,
+      options?: QueryReadOptions,
+    ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
     <Param, T>(
       family: SignalFamily<Param, T>,
       parameter: Param,
@@ -183,6 +189,10 @@ declare module "@rchunk/app-shared" {
     ): ScopedQueryResult<Data, QueryError>;
     get<Page, PageParam, QueryError>(
       signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
+    ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+    get<Param, Page, PageParam, QueryError>(
+      family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
+      parameter: Param,
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Data, QueryError>(
@@ -421,6 +431,17 @@ declare module "@rchunk/app-shared" {
     queryKind: "query";
     scope: MaitaiScope<TScope>;
   }
+  export interface ScopedInfiniteQueryFamily<TScope, Param, TPage, TPageParam, TError = Error> {
+    autoDisposeMs: number;
+    debugLabel?: string;
+    getOptions(
+      parameter: Param,
+      context: DerivedScopedSignalContext<TScope>,
+    ): ScopedInfiniteQueryOptions<TPage, TPageParam, TError>;
+    kind: "readable-family";
+    queryKind: "infinite";
+    scope: MaitaiScope<TScope>;
+  }
   export interface ScopedSignalFamily<TScope, Param, TValue> {
     autoDisposeMs: number;
     debugLabel?: string;
@@ -530,6 +551,15 @@ declare module "@rchunk/app-shared" {
       context: DerivedScopedSignalContext<TScope>,
     ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
   ) => ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError>;
+  /** createInfiniteQueryFamily（app-shared/runtime/atom-signal.ts，内部 Hje）。 */
+  export const XX: <TScope, Param, TPage, TPageParam, TError = Error>(
+    scope: MaitaiScope<TScope>,
+    getOptions: (
+      parameter: Param,
+      context: DerivedScopedSignalContext<TScope>,
+    ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
+    options?: ScopedQueryFamilyOptions<Param>,
+  ) => ScopedInfiniteQueryFamily<TScope, Param, TPage, TPageParam, TError>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =

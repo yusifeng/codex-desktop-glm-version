@@ -439,7 +439,11 @@ export interface ScopeState<T = unknown> {
   familyBindings: Map<ScopedDerivedFamily<unknown, unknown, unknown>, Map<unknown, Atom<unknown>>>;
   parent?: ScopeState<unknown>;
   queryClient?: unknown;
-  queryFamilyBindings: Map<ScopedQueryFamily<unknown, unknown, unknown, unknown>, Map<unknown, Atom<unknown>>>;
+  queryFamilyBindings: Map<
+    | ScopedQueryFamily<unknown, unknown, unknown, unknown>
+    | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>,
+    Map<unknown, Atom<unknown>>
+  >;
   retainedScopeEntries: Map<Scope<unknown>, Map<unknown, ScopeState<unknown>>>;
   scope: Scope<T>;
   signalFamilyBindings: Map<ScopedSignalFamily<unknown, unknown, unknown>, Map<unknown, WritableAtom<unknown, unknown>>>;
@@ -470,6 +474,10 @@ export interface ScopeApi<T = unknown> {
   get<Data, QueryError>(signal: ScopedQuerySignal<unknown, Data, QueryError>): ScopedQueryResult<Data, QueryError>;
   get<Page, PageParam, QueryError>(
     signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
+  ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+  get<Param, Page, PageParam, QueryError>(
+    family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
+    parameter: Param,
   ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
@@ -660,6 +668,10 @@ export interface DerivedScopedSignalContext<T = unknown> {
   get<Page, PageParam, QueryError>(
     signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
   ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+  get<Param, Page, PageParam, QueryError>(
+    family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
+    parameter: Param,
+  ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
     parameter: Param,
@@ -724,6 +736,33 @@ export interface ScopedQueryFamily<TScope, Param, TData, TError = Error> {
   evict(state: ScopeState<unknown>, parameter: Param): boolean;
   resolve(state: ScopeState<unknown>, parameter: Param): Atom<ScopedQueryResult<TData, TError>>;
   [WITH_QUERY_READ_OPTIONS](options: QueryReadOptions): ScopedQueryFamily<TScope, Param, TData, TError>;
+}
+
+/** 原 `Hje` 返回的 scope 键控 infinite-query family。 */
+export interface ScopedInfiniteQueryFamily<
+  TScope,
+  Param,
+  TPage,
+  TPageParam,
+  TError = Error,
+> {
+  autoDisposeMs: number;
+  debugLabel?: string;
+  getOptions(
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ): ScopedInfiniteQueryOptions<TPage, TPageParam, TError>;
+  kind: "readable-family";
+  queryKind: "infinite";
+  scope: Scope<TScope>;
+  evict(state: ScopeState<unknown>, parameter: Param): boolean;
+  resolve(
+    state: ScopeState<unknown>,
+    parameter: Param,
+  ): Atom<ScopedInfiniteQueryResult<TPage, TPageParam, TError>>;
+  [WITH_QUERY_READ_OPTIONS](
+    options: QueryReadOptions,
+  ): ScopedInfiniteQueryFamily<TScope, Param, TPage, TPageParam, TError>;
 }
 
 /** 原 `Sje` 返回的 scope 键控派生 family。 */
@@ -795,6 +834,7 @@ function resolveScopeBinding(
     | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
+    | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
   parameter?: unknown,
@@ -837,6 +877,7 @@ function watchScope<T>(
           | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
+          | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>,
         parameter?: unknown,
@@ -890,6 +931,7 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
         | ScopedQuerySignal<unknown, unknown, unknown>
         | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
         | ScopedQueryFamily<unknown, unknown, unknown, unknown>
+        | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
         | ScopedDerivedFamily<unknown, unknown, unknown>
         | ScopedSignalFamily<unknown, unknown, unknown>,
       parameter?: unknown,
@@ -1043,11 +1085,13 @@ function isScopedFamily(
     | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
+    | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
 ): value is
   | ScopedDerivedFamily<unknown, unknown, unknown>
   | ScopedQueryFamily<unknown, unknown, unknown, unknown>
+  | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
   | ScopedSignalFamily<unknown, unknown, unknown> {
   return "kind" in value && (value.kind === "readable-family" || value.kind === "signal-family");
 }
@@ -1076,6 +1120,7 @@ function createDerivedContext<T>(
           | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
+          | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>;
         const owner = findScopeState(state, binding.scope);
@@ -1872,6 +1917,177 @@ export function resolveScopedQueryFamily<TScope, Param, TData, TError>(
   return { atom: family.resolve(state, parameter), store: owner.store };
 }
 
+function createInfiniteQueryFamilyInternal<
+  TScope,
+  Param,
+  TPage,
+  TPageParam,
+  TError,
+>(
+  scope: Scope<TScope>,
+  getOptions: (
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
+  options?: ScopedQueryFamilyOptions<Param>,
+  forcedEnabled?: boolean,
+): ScopedInfiniteQueryFamily<TScope, Param, TPage, TPageParam, TError> {
+  type Family = ScopedInfiniteQueryFamily<
+    TScope,
+    Param,
+    TPage,
+    TPageParam,
+    TError
+  >;
+  type Signal = ScopedInfiniteQuerySignal<
+    TScope,
+    TPage,
+    TPageParam,
+    TError
+  >;
+  type Result = ScopedInfiniteQueryResult<TPage, TPageParam, TError>;
+
+  const autoDisposeMs = normalizeAutoDispose(options?.autoDispose ?? true);
+  const memberSignals = new WeakMap<
+    ScopeState<unknown>,
+    Map<unknown, Signal>
+  >();
+  let disabledFamily: Family | undefined;
+  const family: Family = {
+    autoDisposeMs,
+    getOptions,
+    kind: "readable-family",
+    queryKind: "infinite",
+    scope,
+    [WITH_QUERY_READ_OPTIONS](readOptions) {
+      if (readOptions.enabled !== false || forcedEnabled === false) return family;
+      disabledFamily ??= createInfiniteQueryFamilyInternal(
+        scope,
+        getOptions,
+        options,
+        false,
+      );
+      disabledFamily.debugLabel = family.debugLabel;
+      return disabledFamily;
+    },
+    evict(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const familyKey = family as ScopedInfiniteQueryFamily<
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown
+      >;
+      const parameterKey = scopedFamilyKey(parameter, options);
+      const members = owner.queryFamilyBindings.get(familyKey);
+      const signal = memberSignals.get(owner)?.get(parameterKey);
+      if (signal != null) {
+        owner.cachedBindings.delete(
+          signal as unknown as ScopedDerivedSignal<unknown, unknown>,
+        );
+        memberSignals.get(owner)?.delete(parameterKey);
+      }
+      if (members == null) return false;
+      const removed = members.delete(parameterKey);
+      if (members.size === 0) owner.queryFamilyBindings.delete(familyKey);
+      return removed;
+    },
+    resolve(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const familyKey = family as ScopedInfiniteQueryFamily<
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown
+      >;
+      let members = owner.queryFamilyBindings.get(familyKey);
+      if (members == null) {
+        members = new Map();
+        owner.queryFamilyBindings.set(familyKey, members);
+      }
+      const parameterKey = scopedFamilyKey(parameter, options);
+      const cached = members.get(parameterKey);
+      if (cached != null) return cached as Atom<Result>;
+
+      const signal = createInfiniteQuerySignalInternal(
+        scope,
+        (context) => getOptions(parameter, context),
+        forcedEnabled,
+      );
+      signal.debugLabel = family.debugLabel;
+      let signals = memberSignals.get(owner);
+      if (signals == null) {
+        signals = new Map();
+        memberSignals.set(owner, signals);
+      }
+      signals.set(parameterKey, signal);
+      const queryAtom = signal.resolve(activeState);
+      const mountQuery = queryAtom.onMount;
+      let disposalTimer: ReturnType<typeof setTimeout> | undefined;
+      queryAtom.onMount = (setSelf) => {
+        if (disposalTimer != null) {
+          clearTimeout(disposalTimer);
+          disposalTimer = undefined;
+        }
+        const unmountQuery = mountQuery?.(setSelf);
+        return () => {
+          if (typeof unmountQuery === "function") unmountQuery();
+          if (autoDisposeMs === Infinity) return;
+          disposalTimer = setTimeout(() => {
+            disposalTimer = undefined;
+            family.evict(activeState, parameter);
+          }, autoDisposeMs);
+        };
+      };
+      members.set(parameterKey, queryAtom as Atom<unknown>);
+      return queryAtom;
+    },
+  };
+  return family;
+}
+
+/** 创建 scope 键控 infinite-query family（原 `Hje` / 压缩导出 `XX`）。 */
+export function createInfiniteQueryFamily<
+  TScope,
+  Param,
+  TPage,
+  TPageParam,
+  TError = Error,
+>(
+  scope: Scope<TScope>,
+  getOptions: (
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
+  options?: ScopedQueryFamilyOptions<Param>,
+): ScopedInfiniteQueryFamily<TScope, Param, TPage, TPageParam, TError> {
+  return createInfiniteQueryFamilyInternal(scope, getOptions, options);
+}
+
+/** 解析 infinite-query family 成员为 hook 可消费的 atom/store 对。 */
+export function resolveScopedInfiniteQueryFamily<
+  TScope,
+  Param,
+  TPage,
+  TPageParam,
+  TError,
+>(
+  family: ScopedInfiniteQueryFamily<
+    TScope,
+    Param,
+    TPage,
+    TPageParam,
+    TError
+  >,
+  parameter: Param,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<ScopedInfiniteQueryResult<TPage, TPageParam, TError>> {
+  const owner = findScopeState(state, family.scope);
+  return { atom: family.resolve(state, parameter), store: owner.store };
+}
+
 /**
  * 创建 scope 键控派生 family（原 `Sje` / 压缩导出 `rZ`）。成员按稳定参数
  * key 缓存在目标 scope 实例上，默认 autoDispose 为 60 秒。
@@ -2348,6 +2564,7 @@ export type SignalFamily<Param, T> =
   | CallableSignalFamily<Param, T>
   | ScopedDerivedFamily<unknown, Param, T>
   | ScopedQueryFamily<unknown, Param, unknown, unknown>
+  | ScopedInfiniteQueryFamily<unknown, Param, unknown, unknown, unknown>
   | ScopedSignalFamily<unknown, Param, T>;
 
 function isScopedFamilyBinding<Param, T>(
@@ -2355,6 +2572,7 @@ function isScopedFamilyBinding<Param, T>(
 ): value is
   | ScopedDerivedFamily<unknown, Param, T>
   | ScopedQueryFamily<unknown, Param, unknown, unknown>
+  | ScopedInfiniteQueryFamily<unknown, Param, unknown, unknown, unknown>
   | ScopedSignalFamily<unknown, Param, T> {
   return (
     typeof value === "object" &&
