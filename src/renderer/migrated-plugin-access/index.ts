@@ -4,21 +4,100 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type {
+  DerivedScopedSignalContext,
+  ScopedQueryFamily,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
 
-type MigrationEligibility = {
-  resource: any;
-  account: any;
+interface GptPermissions {
+  can_preview_business_agent_tools?: boolean | null;
+  can_read?: boolean;
+  can_view_config?: boolean;
+  can_write?: boolean;
+}
+
+interface GptResource {
+  gizmo: {
+    author: { user_id: string };
+    current_user_permission?: GptPermissions | null;
+    gizmo_type: string;
+    live_version?: number | null;
+    migrated_plugin_id?: string | null;
+    share_recipient?: string | null;
+    workspace_id?: string | null;
+  };
+}
+
+interface Account {
+  account_user_id?: string | null;
+  account_user_role?: string | null;
+  id: string;
+  structure: "personal" | "workspace" | string;
+}
+
+interface MigrationEligibility {
+  resource: GptResource;
+  account: Account | null;
   accountId: string | null;
   userId: string | null;
   enabled: boolean;
   allowMigrated?: boolean;
-};
+}
 
-function isLiveGptResource({ gizmo }: any): boolean {
+interface PluginBatchResponse {
+  results: Array<{
+    plugin: {
+      id: string;
+      installation_policy: string;
+      status: string;
+    };
+  }>;
+}
+
+interface AppInitialBindings {
+  G3t(product: string): Record<string, string>;
+  G6t(): void;
+  K3t(): void;
+  K6t: unknown;
+  Sun(): void;
+  _un: unknown;
+  f4t(signal: AbortSignal): AbortSignal;
+  p4t(): void;
+  pdn(): void;
+  udn: {
+    safePost<Result>(
+      path: string,
+      options: {
+        additionalHeaders: Record<string, string>;
+        requestBody: { plugin_ids: string[] };
+        signal: AbortSignal;
+      },
+    ): Promise<Result>;
+  };
+}
+
+const {
+  G3t: getProductHeaders,
+  G6t: initializeGptResources,
+  K3t: initializeAccountState,
+  K6t: accountIdSignal,
+  Sun: initializeGptPermissions,
+  _un: userIdSignal,
+  f4t: normalizeAbortSignal,
+  p4t: initializePluginState,
+  pdn: initializeWorkspaceSubscriptions,
+  udn: appApiClient,
+} = appInitialChunk as unknown as AppInitialBindings;
+const {
+  FX: initializeMaitaiRuntime,
+  QI: initializeQueryBridge,
+  QX: createQueryFamily,
+  ZI: AppScope,
+} = appSharedChunk;
+
+function isLiveGptResource({ gizmo }: GptResource): boolean {
   return (
     gizmo.gizmo_type === "gpt" &&
     gizmo.current_user_permission?.can_preview_business_agent_tools == null &&
@@ -62,7 +141,7 @@ function canMigrateGpt({
 }
 
 function accountCanUseWorkspacePlugins(
-  account: any,
+  account: Account | null | undefined,
   workspaceGate: boolean,
   permissions?: string[],
 ): boolean {
@@ -79,8 +158,8 @@ function shouldShowWorkspacePluginRetirement({
   accountId,
   permissions,
 }: {
-  resource: any;
-  account: any;
+  resource: GptResource;
+  account: Account | null;
   accountId: string | null;
   permissions?: string[];
 }): boolean {
@@ -95,22 +174,33 @@ function shouldShowWorkspacePluginRetirement({
   );
 }
 
-let pluginAccessQuery: any;
+let pluginAccessQuery: ScopedQueryFamily<
+  Record<string, unknown>,
+  string,
+  boolean
+>;
 let initialized = false;
 function initializeMigratedPluginAccess(): void {
   if (initialized) return;
-  appShared.FX?.();
-  appInitial.G6t?.();
-  appInitial.Sun?.();
-  appInitial.K3t?.();
-  appInitial.p4t?.();
-  appShared.QI?.();
-  appInitial.pdn?.();
-  pluginAccessQuery = appShared.QX?.(
-    appShared.ZI,
-    (pluginId: string, { get }: { get: (atom: unknown) => unknown }) => {
-      const accountId = get(appInitial.K6t);
-      const userId = get(appInitial._un);
+  initializeMaitaiRuntime();
+  initializeGptResources();
+  initializeGptPermissions();
+  initializeAccountState();
+  initializePluginState();
+  initializeQueryBridge();
+  initializeWorkspaceSubscriptions();
+  pluginAccessQuery = createQueryFamily<
+    Record<string, unknown>,
+    string,
+    boolean
+  >(
+    AppScope,
+    (
+      pluginId: string,
+      { get }: DerivedScopedSignalContext<Record<string, unknown>>,
+    ) => {
+      const accountId = get<string | null>(accountIdSignal);
+      const userId = get<string | null>(userIdSignal);
       return {
         enabled: accountId != null && userId != null,
         queryKey: [
@@ -121,16 +211,16 @@ function initializeMigratedPluginAccess(): void {
           userId,
         ],
         queryFn: async ({ signal }: { signal: AbortSignal }) => {
-          const { results } = await appInitial.udn.safePost(
+          const { results } = await appApiClient.safePost<PluginBatchResponse>(
             "/ps/plugins/batch",
             {
               requestBody: { plugin_ids: [pluginId] },
-              additionalHeaders: appInitial.G3t("chatgpt"),
-              signal: appInitial.f4t(signal),
+              additionalHeaders: getProductHeaders("chatgpt"),
+              signal: normalizeAbortSignal(signal),
             },
           );
           return results.some(
-            ({ plugin }: any) =>
+            ({ plugin }) =>
               plugin.id === pluginId &&
               plugin.status === "ENABLED" &&
               plugin.installation_policy !== "NOT_AVAILABLE",
