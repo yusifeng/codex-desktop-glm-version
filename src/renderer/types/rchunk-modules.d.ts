@@ -415,6 +415,10 @@ declare module "@rchunk/gpt-report-menu-item" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/file-already-exists-dialog" {
+  export const ProjectFileAlreadyExistsDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
