@@ -1419,6 +1419,14 @@ declare module "@rchunk/app-shared" {
       family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
       parameter: Param,
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+    get<Param, Data, QueryError>(
+      family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+      parameter: Param,
+    ): ScopedQueryResult<Data, QueryError>;
+    get<Param, Value>(
+      family: ScopedDerivedFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
     get<Param, Value>(
       family: ScopedSignalFamily<unknown, Param, Value>,
       parameter: Param,
@@ -6219,8 +6227,32 @@ declare module "@rchunk/codex-mobile-setup-flow" {
 }
 
 declare module "@rchunk/onboarding-login-content" {
-  const _default: unknown;
-  export default _default;
+  export type LoginMethodState =
+    | { status: "loading" | "error" | "unsupported" }
+    | { status: "ready"; api: boolean; chatgpt: boolean };
+  export const a: () => void;
+  export const i: () => void;
+  export const n: () => void;
+  export const o: import("@rchunk/app-shared").ScopedDerivedFamily<
+    Record<string, unknown>,
+    string,
+    LoginMethodState
+  >;
+  export const r: (props: { hostId: string }) => unknown;
+  export const t: (props: {
+    allowApiKey: boolean;
+    allowChatGpt: boolean;
+    apiKeySecondaryActionLabel: unknown;
+    apiKeyValue: string;
+    isApiKeyEntryVisible: boolean;
+    isApiKeySignInPending: boolean;
+    isChatGptSignInPending: boolean;
+    onApiKeySecondaryAction(): void;
+    onApiKeySubmit(): void;
+    onApiKeyValueChange(value: string): void;
+    onChatGptSignIn(): void;
+    onShowApiKeyEntry(): void;
+  }) => unknown;
 }
 
 declare module "@rchunk/remote-connection-editor-dialog" {

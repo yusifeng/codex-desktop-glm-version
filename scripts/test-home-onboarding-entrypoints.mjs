@@ -1417,6 +1417,21 @@ check(
   "honors managed allowed login methods",
 );
 globalThis.__homeOnboardingTest.loginMethods.requirements = {
+  data: { requirements: 42 },
+  isPending: false,
+  isError: false,
+};
+const malformedLoginState = onboardingLogin.o.resolver("local-host", {
+  get: (signal) =>
+    signal.description === "requirements"
+      ? globalThis.__homeOnboardingTest.loginMethods.requirements
+      : globalThis.__homeOnboardingTest.loginMethods.config,
+});
+check(
+  malformedLoginState.status === "error",
+  "rejects malformed managed login requirements without throwing",
+);
+globalThis.__homeOnboardingTest.loginMethods.requirements = {
   data: { requirements: null },
   isPending: false,
   isError: false,
@@ -1478,5 +1493,5 @@ check(
   "forwards API-key edits and disables empty submission",
 );
 
-assert.equal(assertions, 97);
+assert.equal(assertions, 98);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);

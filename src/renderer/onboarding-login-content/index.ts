@@ -3,18 +3,94 @@
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type {
+  DerivedScopedSignalContext,
+  JsxRuntime,
+  ScopedDerivedFamily,
+  ScopedQueryFamily,
+  ScopedQueryResult,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
 
 type LoginMethodState =
   | { status: "loading" | "error" | "unsupported" }
   | { status: "ready"; api: boolean; chatgpt: boolean };
 
-let jsx: any;
-let loginMethodsSignal: any = Symbol("onboarding-login-methods");
+interface HostRequirementsResponse {
+  requirements?: unknown;
+}
+
+interface LocalConfigResponse {
+  config: { forced_login_method?: "api" | "chatgpt" | null };
+  configReadSucceeded: boolean;
+}
+
+interface LoginMethodReader {
+  get(
+    signal: ScopedQueryFamily<
+      Record<string, unknown>,
+      { hostId: string },
+      HostRequirementsResponse
+    >,
+    parameter: { hostId: string },
+  ): ScopedQueryResult<HostRequirementsResponse>;
+  get(
+    signal: ScopedQueryFamily<
+      Record<string, unknown>,
+      string,
+      LocalConfigResponse
+    >,
+    parameter: string,
+  ): ScopedQueryResult<LocalConfigResponse>;
+}
+
+interface AppInitialBindings {
+  $sn(): void;
+  Jat: unknown;
+  Xat(): void;
+  Ysn: ScopedQueryFamily<
+    Record<string, unknown>,
+    { hostId: string },
+    HostRequirementsResponse
+  >;
+  lcn: ScopedQueryFamily<
+    Record<string, unknown>,
+    string,
+    LocalConfigResponse
+  >;
+}
+
+const {
+  BX: useSignalFamilyValue,
+  FX: initializeSignalRuntime,
+  I3: jsxRuntimeExport,
+  K2: initializeSharedComponents,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  Qh: LoadingSpinner,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: applicationScope,
+  Zh: initializeButton,
+  g4: initializeDialogComponents,
+  n4: useIntl,
+  rZ: createDerivedFamily,
+} = appSharedChunk;
+const {
+  $sn: initializeHostRequirements,
+  Jat: Input,
+  Xat: initializeInput,
+  Ysn: hostRequirementsQuery,
+  lcn: localConfigQuery,
+} = appInitialChunk as unknown as AppInitialBindings;
+
+let jsx: JsxRuntime;
+let loginMethodsSignal: ScopedDerivedFamily<
+  Record<string, unknown>,
+  string,
+  LoginMethodState
+>;
 let stateInitialized = false;
 let contentInitialized = false;
 
@@ -22,7 +98,8 @@ function isAllowedLoginMethods(value: unknown): value is {
   allowedLoginMethods?: Array<"api" | "chatgpt"> | null;
 } {
   if (value == null || typeof value !== "object") return false;
-  const methods = (value as any).allowedLoginMethods;
+  const methods = (value as { allowedLoginMethods?: unknown })
+    .allowedLoginMethods;
   return (
     methods == null ||
     (Array.isArray(methods) &&
@@ -32,9 +109,9 @@ function isAllowedLoginMethods(value: unknown): value is {
 
 function resolveLoginMethods(
   hostId: string,
-  get: (signal: unknown, key: unknown) => any,
+  get: LoginMethodReader["get"],
 ): LoginMethodState {
-  const requirementsQuery = get(appInitial.Ysn, { hostId });
+  const requirementsQuery = get(hostRequirementsQuery, { hostId });
   if (requirementsQuery.isPending) return { status: "loading" };
   if (
     requirementsQuery.isError ||
@@ -44,7 +121,7 @@ function resolveLoginMethods(
   }
   const requirements = requirementsQuery.data.requirements;
   if (requirements == null) {
-    const configQuery = get(appInitial.lcn, hostId);
+    const configQuery = get(localConfigQuery, hostId);
     if (configQuery.isPending) return { status: "loading" };
     if (configQuery.isError || !configQuery.data?.configReadSucceeded) {
       return { status: "error" };
@@ -56,6 +133,7 @@ function resolveLoginMethods(
       chatgpt: forcedMethod == null || forcedMethod === "chatgpt",
     };
   }
+  if (typeof requirements !== "object") return { status: "error" };
   if (!("allowedLoginMethods" in requirements)) {
     return { status: "unsupported" };
   }
@@ -71,23 +149,23 @@ function resolveLoginMethods(
 function initializeLoginMethodState(): void {
   if (stateInitialized) return;
   stateInitialized = true;
-  appShared.FX?.();
-  appShared.g4?.();
-  appInitial.$sn?.();
-  appShared.QI?.();
-  loginMethodsSignal =
-    appShared.rZ?.(appShared.ZI, (hostId: string, { get }: any) =>
-      resolveLoginMethods(hostId, get),
-    ) ?? loginMethodsSignal;
+  initializeSignalRuntime();
+  initializeDialogComponents();
+  initializeHostRequirements();
+  initializeSharedRuntime();
+  loginMethodsSignal = createDerivedFamily(
+    applicationScope,
+    (
+      hostId: string,
+      { get }: DerivedScopedSignalContext<Record<string, unknown>>,
+    ) => resolveLoginMethods(hostId, get as LoginMethodReader["get"]),
+  );
 }
 
 function LoginMethodsUnavailable({ hostId }: { hostId: string }): unknown {
   initializeLoginMethodsUnavailable();
-  const scope = appShared.LX?.(appShared.ZI);
-  const state = appShared.BX?.(loginMethodsSignal, hostId) as LoginMethodState;
-  const FormattedMessage = appShared.Y2;
-  const Button = appShared.Yh ?? "button";
-  const Spinner = appShared.Qh ?? "span";
+  const scope = useSignalScope(applicationScope);
+  const state = useSignalFamilyValue(loginMethodsSignal, hostId);
   if (state.status === "loading") {
     return jsx.jsx("div", {
       className:
@@ -95,7 +173,7 @@ function LoginMethodsUnavailable({ hostId }: { hostId: string }): unknown {
       children: jsx.jsxs("div", {
         role: "status",
         children: [
-          jsx.jsx(Spinner, { className: "h-4 w-4 text-default" }),
+          jsx.jsx(LoadingSpinner, { className: "h-4 w-4 text-default" }),
           jsx.jsx(FormattedMessage, {
             id: "electron.loginMethods.loading",
             defaultMessage: "Loading sign-in requirements…",
@@ -140,8 +218,8 @@ function LoginMethodsUnavailable({ hostId }: { hostId: string }): unknown {
       jsx.jsx(Button, {
         color: "secondary",
         onClick: () => {
-          scope.get(appInitial.Ysn, { hostId }).refetch();
-          scope.get(appInitial.lcn, hostId).refetch();
+          scope.get(hostRequirementsQuery, { hostId }).refetch();
+          scope.get(localConfigQuery, hostId).refetch();
         },
         children: jsx.jsx(FormattedMessage, {
           id: "electron.loginMethods.retry",
@@ -173,17 +251,14 @@ function LoginActions(props: {
   apiKeySecondaryActionLabel: unknown;
 }): unknown {
   initializeLoginActions();
-  const intl = appShared.n4?.();
-  const FormattedMessage = appShared.Y2;
-  const Button = appShared.Yh ?? "button";
-  const Input = appInitial.Jat ?? "input";
+  const intl = useIntl();
   if (props.allowApiKey && props.isApiKeyEntryVisible) {
     const placeholder =
-      intl?.formatMessage?.({
+      intl.formatMessage({
         id: "electron.onboarding.login.apikey.placeholder",
         defaultMessage: "sk-…",
         description: "Placeholder for API key input on desktop onboarding",
-      }) ?? "sk-…";
+      });
     return jsx.jsxs("div", {
       className: "flex w-full flex-col gap-3",
       children: [
@@ -274,15 +349,19 @@ function LoginActions(props: {
 
 function initializeLoginActions(): void {
   initializeLoginContent();
-  appInitial.Xat?.();
+  initializeInput();
 }
 
 function initializeLoginContent(): void {
   if (contentInitialized) return;
   contentInitialized = true;
-  appShared.K2?.();
-  appShared.Zh?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeSharedComponents();
+  initializeButton();
+  jsx = resolveRuntime<JsxRuntime>(jsxRuntimeExport);
+}
+
+function resolveRuntime<T>(value: unknown): T {
+  return (typeof value === "function" ? value() : value) as T;
 }
 
 initializeLoginMethodState();
