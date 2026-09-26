@@ -1204,5 +1204,107 @@ check(
   "suppresses lower-priority promos while a Beacon selection is active",
 );
 
-assert.equal(assertions, 84);
+globalThis.__homeOnboardingTest.financeBeacon = {
+  analytics: [],
+  conversations: [],
+  started: [],
+};
+const financeBeacon = await loadModule("home-beacon-finance", {
+  "app-shared": `
+    export const pk = Symbol("toaster");
+    export const FX = () => {};
+    export const K2 = () => {};
+    export const QI = () => {};
+  `,
+  "app-initial": `
+    export const mpn = Symbol("intl");
+    export const mun = Symbol("account-id");
+    export const _fn = Symbol("finance-disabled");
+    export const hfn = Symbol("finance-enabled");
+    export const mfn = Symbol("requires-links");
+    export const HW = Symbol("capabilities-query");
+    export const WW = Symbol("connector-service");
+    export const jzt = "finance-app";
+    export const Mzt = "finance-system-hint";
+    export const fW = "finance-analytics";
+    export const n4t = async () => [{
+      canonicalAppId: "finance-app-id",
+      plugin: { enabled: true, availability: "AVAILABLE" }
+    }];
+    export const q6t = () => "connector_693864f100e4819093e6ed9b651239f1";
+    export const NOt = input => input;
+    export const yNt = () => true;
+    export const xpn = (_scope, _event, payload) => globalThis.__homeOnboardingTest.financeBeacon.analytics.push(payload);
+  `,
+  "app-primary": "export {};",
+  "app-connect-modal":
+    "export const n = () => {}; export const t = 'AppConnectModal';",
+  "plaid-link": "export const n = () => {}; export const r = async () => true;",
+  "conversation-start": `
+    export const t = () => {};
+    export const n = async (_scope, input) => {
+      globalThis.__homeOnboardingTest.financeBeacon.conversations.push(input);
+      return { id: "conversation-1" };
+    };
+  `,
+});
+const financeIntl = {
+  formatMessage: (descriptor) => descriptor.defaultMessage,
+};
+const financeConnector = {
+  getConnectorLink: async () => ({ link: { auth_status: "ACTIVE" } }),
+};
+const financeScope = {
+  query: {
+    getOrFetch: async (query) =>
+      query.description === "capabilities-query" ? { finances: true } : {},
+  },
+  get(signal) {
+    if (signal.description === "intl") return financeIntl;
+    if (signal.description === "account-id") return "account-1";
+    if (signal.description === "finance-disabled") return false;
+    if (signal.description === "finance-enabled") return true;
+    if (signal.description === "requires-links") return false;
+    if (signal.description === "connector-service") return financeConnector;
+    if (signal.description === "toaster") return { danger: () => {} };
+  },
+};
+const financeAbort = new AbortController();
+const financeConnected =
+  await financeBeacon.connectPersonalFinanceFromHomeBeacon(financeScope, {
+    accountId: "account-1",
+    beacon: { beacon_id: "finance-beacon" },
+    onConversationStarted: (conversation) =>
+      globalThis.__homeOnboardingTest.financeBeacon.started.push(conversation),
+    signal: financeAbort.signal,
+    suppressAnalytics: false,
+  });
+check(financeConnected, "completes the Finance Home Beacon connection flow");
+check(
+  globalThis.__homeOnboardingTest.financeBeacon.conversations[0].prompt ===
+    "What can I do with my newly connected accounts once they finish syncing?" &&
+    globalThis.__homeOnboardingTest.financeBeacon.conversations[0]
+      .forceOnboarding,
+  "starts the Finance onboarding conversation with metadata",
+);
+check(
+  globalThis.__homeOnboardingTest.financeBeacon.started[0].id ===
+    "conversation-1" &&
+    globalThis.__homeOnboardingTest.financeBeacon.analytics[0].entrypoint ===
+      "homepage_banner",
+  "reports the connected conversation and successful Beacon analytics",
+);
+const cancelledFinanceAbort = new AbortController();
+cancelledFinanceAbort.abort();
+check(
+  !(await financeBeacon.connectPersonalFinanceFromHomeBeacon(financeScope, {
+    accountId: "account-1",
+    beacon: { beacon_id: "finance-beacon" },
+    onConversationStarted: () => {},
+    signal: cancelledFinanceAbort.signal,
+  })),
+  "stops Finance onboarding after cancellation",
+);
+
+assert.equal(assertions, 88);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);

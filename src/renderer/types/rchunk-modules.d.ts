@@ -345,6 +345,16 @@ declare module "@rchunk/home-beacon" {
   export const r: (...args: any[]) => any;
   export const t: () => void;
 }
+
+declare module "@rchunk/conversation-start" {
+  export const n: (...args: any[]) => Promise<any>;
+  export const t: () => void;
+}
+
+declare module "@rchunk/plaid-link" {
+  export const n: () => void;
+  export const r: (...args: any[]) => Promise<boolean>;
+}
 declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
 declare module "@rchunk/codex-micro-mini-games" { export const _any: any; }
