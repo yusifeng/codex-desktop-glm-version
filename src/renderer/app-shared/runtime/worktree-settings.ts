@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { gitSettings } from "./git-settings";
+
 export type WorktreeUpstreamRefreshMode = "never" | "best-effort";
 
 export interface GlobalStateSetting<T> {
@@ -22,8 +24,6 @@ export interface ResolvedWorktreeSettings {
   autoCleanupEnabled: boolean;
   keepCount: number;
 }
-
-const gitWorktreeRootKey = "git-worktree-root";
 
 function globalStateSetting<T>(
   definition: Omit<GlobalStateSetting<T>, "hostStorage">,
@@ -66,7 +66,9 @@ export function initializeWorktreeSettings(): void {}
 export function resolveWorktreeSettings(
   values?: Readonly<Record<string, unknown>> | null,
 ): ResolvedWorktreeSettings {
-  const worktreesRoot = z.string().safeParse(values?.[gitWorktreeRootKey]);
+  const worktreesRoot = gitSettings.worktreeRoot.schema.safeParse(
+    values?.[gitSettings.worktreeRoot.key],
+  );
   const autoCleanupEnabled = worktreeSettings.autoCleanupEnabled.schema.safeParse(
     values?.[worktreeSettings.autoCleanupEnabled.key],
   );
@@ -74,7 +76,9 @@ export function resolveWorktreeSettings(
     values?.[worktreeSettings.keepCount.key],
   );
   return {
-    worktreesRoot: worktreesRoot.success ? worktreesRoot.data : "",
+    worktreesRoot: worktreesRoot.success
+      ? worktreesRoot.data
+      : gitSettings.worktreeRoot.default,
     autoCleanupEnabled: autoCleanupEnabled.success
       ? autoCleanupEnabled.data
       : worktreeSettings.autoCleanupEnabled.default,

@@ -259,6 +259,34 @@ declare module "@rchunk/app-shared" {
   ) => ResolvedWorktreeSettings;
   /** initializeGitAndWorktreeSettings（内部 PV）。 */
   export const CU: () => void;
+  export type PullRequestMergeMethod = "merge" | "squash";
+  export type GitReviewMode = "full" | "last-turn-only";
+  export type GitSettingAgentAccess = "read-write" | "read-only";
+  export interface GitGlobalStateSetting<TDefault, TStored = TDefault> {
+    agentAccess: GitSettingAgentAccess;
+    default: TDefault;
+    description: string;
+    hostStorage: { kind: "global-state"; key: string };
+    key: string;
+    schema: import("zod").ZodType<TStored>;
+  }
+  export interface GitSettings {
+    branchPrefix: GitGlobalStateSetting<string>;
+    alwaysForcePush: GitGlobalStateSetting<boolean>;
+    createPullRequestAsDraft: GitGlobalStateSetting<boolean>;
+    pullRequestMergeMethod: GitGlobalStateSetting<PullRequestMergeMethod>;
+    reviewMode: GitGlobalStateSetting<GitReviewMode>;
+    showSidebarPrIcons: GitGlobalStateSetting<boolean | undefined, boolean>;
+    worktreeRoot: GitGlobalStateSetting<string>;
+    commitInstructions: GitGlobalStateSetting<string>;
+    pullRequestInstructions: GitGlobalStateSetting<string>;
+    pullRequestWatchAutoMerge: GitGlobalStateSetting<boolean>;
+    pullRequestWatchInstructions: GitGlobalStateSetting<string>;
+  }
+  /** gitSettings（app-shared/runtime/git-settings.ts，内部 AV）。 */
+  export const EU: GitSettings;
+  /** initializeGitSettings（内部 jV）。 */
+  export const DU: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
