@@ -523,12 +523,45 @@ const errorTree = connectById.n({
   onOpenChange() {},
 });
 const errorDialog = errorTree.type(errorTree.props);
-const errorActions = errorDialog.props.children.props.children[2].props.children;
+const errorActions =
+  errorDialog.props.children.props.children[2].props.children;
 errorActions[1].props.onClick();
 check(
   globalThis.__homeOnboardingTest.connect.at(-1)[0] === "refetch",
   "retries failed connector queries",
 );
 
-assert.equal(assertions, 36);
+const appInfo = await loadModule("app-info", {});
+const normalizedInfo = appInfo.t({
+  id: "calendar",
+  name: "Calendar",
+  iconUrl: "calendar.png",
+});
+check(
+  normalizedInfo.logoUrl === "calendar.png" &&
+    normalizedInfo.isEnabled === true,
+  "normalizes app icons and enabled state",
+);
+check(
+  Array.isArray(normalizedInfo.pluginDisplayNames) &&
+    normalizedInfo.pluginDisplayNames.length === 0,
+  "defaults missing plugin display names",
+);
+
+const homeFill = await loadModule("home-fill-icon", {
+  "app-shared": "export const I3 = globalThis.__homeOnboardingTest.jsx;",
+});
+const homeIcon = homeFill.default({ className: "icon-sm" });
+check(
+  homeIcon.type === "svg" &&
+    homeIcon.props.viewBox === "0 0 20 20" &&
+    homeIcon.props.className === "icon-sm",
+  "renders the Home icon SVG contract",
+);
+check(
+  homeIcon.props.children.props.d.startsWith("M9.2393 2.48"),
+  "preserves the official Home icon path",
+);
+
+assert.equal(assertions, 40);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
