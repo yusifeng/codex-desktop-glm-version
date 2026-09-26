@@ -243,6 +243,10 @@ declare module "@rchunk/followup-suggestions" {
   export const SketchHomeSuggestions: unknown;
 }
 
+declare module "@rchunk/sketch-composer-state" {
+  export const createSketchComposerState: unknown;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
@@ -280,6 +284,7 @@ declare module "@rchunk/drawing-size-slider" {
 
 declare module "@rchunk/sketch" {
   export const l: unknown;
+  export const n: (options: unknown) => any;
   export const o: () => void;
   export const t: () => void;
 }
