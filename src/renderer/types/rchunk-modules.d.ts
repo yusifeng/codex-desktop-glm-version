@@ -1211,6 +1211,11 @@ declare module "@rchunk/appgen-publication-terms-route" {
   export const AppgenPublicationTermsRoute: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-browser-site-core" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
