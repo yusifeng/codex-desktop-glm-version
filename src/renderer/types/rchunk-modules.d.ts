@@ -1135,6 +1135,10 @@ declare module "@rchunk/appgen-automations-state" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-automations-page" {
+  export const AppgenAutomationsPage: (...args: any[]) => any;
+}
+
 declare module "@rchunk/appgen-query" {
   export const APPGEN_ACCESS_GROUPS_QUERY_KEY: any;
   export const APPGEN_CUSTOM_DOMAINS_QUERY_KEY: any;
@@ -1271,8 +1275,11 @@ declare module "@rchunk/google-drive-resource-icon" {
 }
 
 declare module "@rchunk/open-automation-side-panel-tab" {
-  const _default: unknown;
-  export default _default;
+  export const a: (...args: any[]) => any;
+  export const i: (...args: any[]) => any;
+  export const n: (...args: any[]) => any;
+  export const r: (...args: any[]) => any;
+  export const t: () => void;
 }
 
 declare module "@rchunk/open-in-button" {
