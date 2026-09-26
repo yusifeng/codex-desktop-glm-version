@@ -1051,6 +1051,8 @@ declare module "@rchunk/app-shared" {
   export const AS: (props: IconAssetProps) => unknown;
   /** browser-profile-import 图标依赖初始化器。 */
   export const lw: () => void;
+  /** Report 图标组件（内部 F9e）。 */
+  export const mb: (props: Record<string, unknown>) => unknown;
   /** query runtime 初始化器。 */
   export const Z3: () => void;
   /** renderer logger。 */
@@ -2369,7 +2371,12 @@ declare module "@rchunk/app-shared" {
   export const Gs: unknown; // jbt：pin-window-light-16 IconAsset
   export const H3: () => void; // detachedWindow 入口的 preload helper
   export const RI: () => void; // nG：路径 dirname 依赖初始化器
-  export const V3: unknown; // detachedWindow preload 依赖表
+  /** Vite preload helper：预取依赖后执行动态 import。 */
+  export const V3: <Loaded>(
+    load: () => Promise<Loaded>,
+    dependencies: readonly string[],
+    importerUrl: string,
+  ) => Promise<Loaded>;
   export const VI: (path: string) => string; // QW：路径分隔符规范化
   export interface RendererHostMessage extends Record<string, unknown> {
     type: string;
@@ -3241,7 +3248,12 @@ declare module "@rchunk/report-dialog-core" {
 }
 
 declare module "@rchunk/gpt-report-dialog" {
-  export const GptReportDialog: (...args: any[]) => any;
+  export interface GptReportDialogProps extends Record<string, unknown> {
+    accountId: string;
+    resource: import("@rchunk/gpt-report-menu-item").GptResource;
+    onClose?: () => void;
+  }
+  export const GptReportDialog: (props: GptReportDialogProps) => unknown;
 }
 
 declare module "@rchunk/codex-thread-report-dialog" {
@@ -3254,8 +3266,19 @@ declare module "@rchunk/chatgpt-project-report-dialog" {
 }
 
 declare module "@rchunk/gpt-report-menu-item" {
+  export interface GptResource extends Record<string, unknown> {
+    gizmo: {
+      id: string;
+      share_recipient?: string | null;
+      tags?: readonly string[];
+    };
+  }
+  export interface GptReportMenuItemProps {
+    resource: GptResource;
+    onSelect?: () => void;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: GptReportMenuItemProps) => unknown;
 }
 
 declare module "@rchunk/file-already-exists-dialog" {

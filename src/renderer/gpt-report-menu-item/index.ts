@@ -4,11 +4,60 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type {
+  JsxRuntime,
+  LazyComponent,
+  MaitaiScopeApi,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const jsx = appShared.I3();
+
+export interface GptResource extends Record<string, unknown> {
+  gizmo: {
+    id: string;
+    share_recipient?: string | null;
+    tags?: readonly string[];
+  };
+}
+
+export interface GptReportDialogProps extends Record<string, unknown> {
+  accountId: string;
+  resource: GptResource;
+  onClose?: () => void;
+}
+
+export interface GptReportMenuItemProps {
+  resource: GptResource;
+  onSelect?: () => void;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  FX: initializeSignalRuntime,
+  H3: initializePreloadHelper,
+  HX: useSignalValue,
+  I3: getJsxRuntime,
+  If: initializeMenu,
+  Jm: createLazyComponent,
+  K2: initializeReactRuntime,
+  LX: useSignalScope,
+  QI: initializeAppScope,
+  V3: preloadModule,
+  Y2: FormattedMessage,
+  ZI: appScope,
+  jf: Menu,
+  lw: initializeReportIcon,
+  mb: ReportIcon,
+  qm: initializeQueryRuntime,
+} = appSharedChunk;
+const {
+  Sun: initializeAccountState,
+  Uzt: openDialog,
+  Vzt: initializeDialogHost,
+  mun: currentAccountIdSignal,
+} = appInitialChunk;
+
+const jsx: JsxRuntime = getJsxRuntime();
 
 const reportDialogDependencies = [
   "./gpt-report-dialog-8f475e8bdb75.js",
@@ -20,26 +69,26 @@ const reportDialogDependencies = [
   "./report-dialog-75a130d615ed.js",
 ];
 
-const LazyGptReportDialog = appShared.Jm(async () => {
+const LazyGptReportDialog: LazyComponent<GptReportDialogProps> =
+  createLazyComponent<GptReportDialogProps>(async () => {
   const loadDialog = async () => {
     const { GptReportDialog } = await import("@rchunk/gpt-report-dialog");
     return { GptReportDialog };
   };
-  const loaded = appShared.V3
-    ? await appShared.V3(loadDialog, reportDialogDependencies, import.meta.url)
-    : await loadDialog();
+  const loaded = await preloadModule(
+    loadDialog,
+    reportDialogDependencies,
+    import.meta.url,
+  );
   return loaded.GptReportDialog;
 });
 
 function GptReportMenuItem({
   resource,
   onSelect,
-}: {
-  resource: any;
-  onSelect?: () => void;
-}) {
-  const scope = appShared.LX(appShared.ZI);
-  const accountId = appShared.HX(appInitial.mun);
+}: GptReportMenuItemProps): unknown {
+  const scope: MaitaiScopeApi<Record<string, unknown>> = useSignalScope(appScope);
+  const accountId = useSignalValue(currentAccountIdSignal);
   const shareRecipient = resource.gizmo.share_recipient;
   if (
     accountId == null ||
@@ -51,14 +100,14 @@ function GptReportMenuItem({
 
   const openReportDialog = () => {
     onSelect?.();
-    appInitial.Uzt(scope, LazyGptReportDialog, { accountId, resource });
+    openDialog(scope, LazyGptReportDialog, { accountId, resource });
   };
 
-  return jsx.jsxs(appShared.jf.Item, {
+  return jsx.jsxs(Menu.Item, {
     onSelect: openReportDialog,
     children: [
-      jsx.jsx(appShared.jf.ItemIcon, { children: jsx.jsx(appShared.mb, {}) }),
-      jsx.jsx(appShared.Y2, {
+      jsx.jsx(Menu.ItemIcon, { children: jsx.jsx(ReportIcon, {}) }),
+      jsx.jsx(FormattedMessage, {
         id: "chatgptConversations.gpts.report.action",
         defaultMessage: "Report GPT",
         description: "Menu action to report a publicly shared third-party GPT",
@@ -68,16 +117,16 @@ function GptReportMenuItem({
 }
 
 function initializeGptReportMenuItem(): void {
-  appShared.$3?.();
-  appShared.FX?.();
-  appShared.K2?.();
-  appInitial.Sun?.();
-  appShared.If?.();
-  appShared.lw?.();
-  appShared.qm?.();
-  appInitial.Vzt?.();
-  appShared.QI?.();
-  appShared.H3?.();
+  initializeRuntimeLazy();
+  initializeSignalRuntime();
+  initializeReactRuntime();
+  initializeAccountState();
+  initializeMenu();
+  initializeReportIcon();
+  initializeQueryRuntime();
+  initializeDialogHost();
+  initializeAppScope();
+  initializePreloadHelper();
 }
 
 initializeGptReportMenuItem();
