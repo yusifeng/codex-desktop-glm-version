@@ -10,76 +10,143 @@ import * as migratedAccessChunk from "@rchunk/migrated-plugin-access";
 import * as noticesChunk from "@rchunk/gpt-plugin-migration-notices";
 import * as migratedPluginChunk from "@rchunk/migrated-plugin-notice";
 import * as migrationDialogChunk from "@rchunk/gpt-plugin-migration-dialog";
+import type { LazyComponent } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const chatChoice = chatChoiceChunk as Record<string, any>;
-const migratedAccess = migratedAccessChunk as Record<string, any>;
-const notices = noticesChunk as Record<string, any>;
-const migratedPlugin = migratedPluginChunk as Record<string, any>;
-const migrationDialog = migrationDialogChunk as Record<string, any>;
 
-let jsx: any;
-let MigrationDialog: any;
-let initialized = false;
-function initializeGptPluginMigrationBannerContent(): void {
-  if (initialized) return;
-  appShared.$3?.();
-  appShared.FX?.();
-  appInitial.Qgn?.();
-  appInitial.Oln?.();
-  appInitial.M6t?.();
-  appInitial.rht?.();
-  appShared.qm?.();
-  appInitial.Vzt?.();
-  appShared.QI?.();
-  appInitial.ifn?.();
-  appInitial.mN?.();
-  appInitial.l1?.();
-  chatChoice.n?.();
-  appPrimary.Lp?.();
-  migratedAccess.t?.();
-  migratedPlugin.r?.();
-  notices.i?.();
-  jsx = appShared.I3?.();
-  MigrationDialog =
-    appShared.Jm?.(async () => ({
-      default: migrationDialog.GptPluginMigrationDialog,
-    })) ?? migrationDialog.GptPluginMigrationDialog;
-  initialized = true;
+interface GptResource {
+  gizmo: {
+    current_user_permission?: {
+      can_preview_business_agent_tools?: boolean | null;
+    } | null;
+    display: { name: string };
+    gizmo_type: string;
+    live_version?: number | null;
+    migrated_plugin_id?: string | null;
+  };
 }
 
-type MigrationChoiceProps = {
+interface MigrationDialogProps extends Record<string, unknown> {
+  resource: GptResource;
+}
+
+interface MigrationChoiceProps {
   gizmoId: string;
   pluginId: string;
   gptName: string;
-};
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  BX: useSignalFamilyValue,
+  FX: initializeSignalRuntime,
+  I3: getJsxRuntime,
+  Jm: createLazyComponent,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+  qm: initializeQueryRuntime,
+} = appSharedChunk;
+const {
+  Dln: workspacePermissionsQuery,
+  M6t: initializeAuthentication,
+  N6t: useAuthentication,
+  Oln: initializeNavigation,
+  Qgn: initializeGptResources,
+  Uzt: openDialog,
+  Vzt: initializeDialogHost,
+  afn: useExperiment,
+  fN: gptResourceQuery,
+  i_n: useLocation,
+  ifn: initializeExperiments,
+  l1: initializePluginNavigation,
+  mN: initializeAccounts,
+  o_n: useNavigate,
+  ofn: useFeatureGate,
+  rht: initializeAccountQuery,
+  u1: openPlugin,
+  uht: useAccountQuery,
+} = appInitialChunk;
+const {
+  Ip: migrationDismissedSignal,
+  Lp: initializeMigrationVisitState,
+  Mp: keepUsingGptForVisit,
+  Np: dismissMigrationForVisit,
+  Pp: migrationVisitedSignal,
+} = appPrimaryChunk;
+const { n: initializeChatChoiceView, t: ChatChoiceView } = chatChoiceChunk;
+const {
+  i: accountCanUseWorkspacePlugins,
+  n: pluginAccessQuery,
+  o: shouldShowWorkspacePluginRetirement,
+  r: canMigrateGpt,
+  t: initializeMigratedPluginAccess,
+} = migratedAccessChunk;
+const {
+  i: initializeMigrationNotices,
+  n: MigrationNotice,
+  r: ExplorePluginsNotice,
+  t: WorkspacePluginsBlockedNotice,
+} = noticesChunk;
+const {
+  r: initializeMigratedPluginNotice,
+  t: MigratedPluginNotice,
+} = migratedPluginChunk;
+const MigrationDialogComponent =
+  migrationDialogChunk.GptPluginMigrationDialog as LazyComponent<MigrationDialogProps>;
+
+let jsx: ReturnType<typeof getJsxRuntime>;
+let MigrationDialog: LazyComponent<MigrationDialogProps>;
+let initialized = false;
+function initializeGptPluginMigrationBannerContent(): void {
+  if (initialized) return;
+  initializeRuntimeLazy();
+  initializeSignalRuntime();
+  initializeGptResources();
+  initializeNavigation();
+  initializeAuthentication();
+  initializeAccountQuery();
+  initializeQueryRuntime();
+  initializeDialogHost();
+  initializeSharedRuntime();
+  initializeExperiments();
+  initializeAccounts();
+  initializePluginNavigation();
+  initializeChatChoiceView();
+  initializeMigrationVisitState();
+  initializeMigratedPluginAccess();
+  initializeMigratedPluginNotice();
+  initializeMigrationNotices();
+  jsx = getJsxRuntime();
+  MigrationDialog = createLazyComponent<MigrationDialogProps>(
+    async () => MigrationDialogComponent,
+  );
+  initialized = true;
+}
 
 function MigratedPluginChoice({
   gizmoId,
   pluginId,
   gptName,
 }: MigrationChoiceProps): unknown {
-  const scope = appShared.LX?.(appShared.ZI);
-  const location = appInitial.i_n?.() ?? { pathname: "/" };
-  const navigate = appInitial.o_n?.() ?? (() => {});
-  const accessQuery = appShared.BX?.(migratedAccess.n, pluginId) ?? {};
-  let accessState = "denied";
+  const scope = useSignalScope(applicationScope);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const accessQuery = useSignalFamilyValue(pluginAccessQuery, pluginId);
+  let accessState: "allowed" | "denied" | "error" | "pending" = "denied";
   if (accessQuery.isPending || accessQuery.isFetching) accessState = "pending";
   else if (accessQuery.isError) accessState = "error";
   else if (accessQuery.data === true) accessState = "allowed";
 
-  const onRetry = () => void accessQuery.refetch?.();
+  const onRetry = () => void accessQuery.refetch();
   const onUsePlugin = () => {
     if (accessState === "pending") return;
-    if (accessState === "allowed") appInitial.u1?.(pluginId, navigate);
+    if (accessState === "allowed") openPlugin(pluginId, navigate);
     else navigate("/plugins");
   };
   const onKeepUsingGpt = () =>
-    appPrimary.Mp?.(scope, { gizmoId, visitKey: location.pathname });
-  return jsx.jsx(chatChoice.t, {
+    keepUsingGptForVisit(scope, { gizmoId, visitKey: location.pathname });
+  return jsx.jsx(ChatChoiceView, {
     gptName,
     accessState,
     onRetry,
@@ -94,39 +161,40 @@ function GptPluginMigrationBannerContent({
   gizmoId: string;
 }): unknown {
   initializeGptPluginMigrationBannerContent();
-  const scope = appShared.LX?.(appShared.ZI);
-  const navigate = appInitial.o_n?.() ?? (() => {});
-  const location = appInitial.i_n?.() ?? { pathname: "/" };
-  const auth = appInitial.N6t?.() ?? {};
-  const accountId = auth.accountId;
-  const userId = auth.userId;
-  const account = appInitial.uht?.(undefined, { preview: false })?.data;
-  const resource = appShared.BX?.(appInitial.fN, gizmoId)?.data;
-  const workspaceExperiment =
-    appInitial.afn?.("2562735250")?.get?.("enabled", false) ?? false;
-  const workspaceGate = appInitial.ofn?.("1355972088") ?? false;
+  const scope = useSignalScope(applicationScope);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { accountId, userId } = useAuthentication();
+  const account = useAccountQuery(undefined, { preview: false }).data;
+  const resource = useSignalFamilyValue(gptResourceQuery, gizmoId).data;
+  const workspaceExperiment = useExperiment("2562735250").get(
+    "enabled",
+    false,
+  );
+  const workspaceGate = useFeatureGate("1355972088");
   const isWorkspaceEligible =
     workspaceExperiment &&
     accountId != null &&
     account?.id === accountId &&
-    account?.structure === "workspace" &&
+    account.structure === "workspace" &&
     workspaceGate;
-  const permissionsQuery =
-    appShared.BX?.(appInitial.Dln, accountId ?? "", {
-      enabled: isWorkspaceEligible,
-    }) ?? {};
+  const permissionsQuery = useSignalFamilyValue(
+    workspacePermissionsQuery,
+    accountId ?? "",
+    { enabled: isWorkspaceEligible },
+  );
   const visit = { gizmoId, visitKey: location.pathname };
-  const dismissed = appShared.BX?.(appPrimary.Ip, visit);
-  const hasVisitedMigration = appShared.BX?.(appPrimary.Pp, visit);
+  const dismissed = useSignalFamilyValue(migrationDismissedSignal, visit);
+  const hasVisitedMigration = useSignalFamilyValue(migrationVisitedSignal, visit);
 
-  if (resource?.gizmo?.gizmo_type !== "gpt") return null;
+  if (resource?.gizmo.gizmo_type !== "gpt") return null;
   const gizmo = resource.gizmo;
   const pluginId = gizmo.migrated_plugin_id;
 
   if (
     isWorkspaceEligible &&
     !permissionsQuery.isError &&
-    migratedAccess.o?.({
+    shouldShowWorkspacePluginRetirement({
       resource,
       account,
       accountId,
@@ -135,11 +203,11 @@ function GptPluginMigrationBannerContent({
   ) {
     const onKeepUsingGpt =
       pluginId && hasVisitedMigration
-        ? () => appPrimary.Mp?.(scope, visit)
+        ? () => keepUsingGptForVisit(scope, visit)
         : undefined;
     return jsx.jsx("div", {
       className: "mx-auto mb-3 w-full max-w-[var(--thread-content-max-width)]",
-      children: jsx.jsx(notices.t, {
+      children: jsx.jsx(WorkspacePluginsBlockedNotice, {
         surface: pluginId ? "migrated" : "gpt",
         onKeepUsingGpt,
       }),
@@ -153,7 +221,7 @@ function GptPluginMigrationBannerContent({
           pluginId,
           gptName: gizmo.display.name,
         })
-      : jsx.jsx(migratedPlugin.t, {
+      : jsx.jsx(MigratedPluginNotice, {
           pluginId,
           gptName: gizmo.display.name,
         });
@@ -171,12 +239,12 @@ function GptPluginMigrationBannerContent({
 
   const canMigrate =
     workspaceExperiment &&
-    migratedAccess.i?.(
+    accountCanUseWorkspacePlugins(
       account,
       workspaceGate,
       permissionsQuery.data?.permissions,
     ) &&
-    migratedAccess.r?.({
+    canMigrateGpt({
       resource,
       account,
       accountId,
@@ -186,13 +254,12 @@ function GptPluginMigrationBannerContent({
   return jsx.jsx("div", {
     className: "mx-auto mb-3 w-full max-w-[var(--thread-content-max-width)]",
     children: canMigrate
-      ? jsx.jsx(notices.n, {
+      ? jsx.jsx(MigrationNotice, {
           surface: "chat",
-          onDismiss: () => appPrimary.Np?.(scope, visit),
-          onMigrate: () =>
-            appInitial.Uzt?.(scope, MigrationDialog, { resource }),
+          onDismiss: () => dismissMigrationForVisit(scope, visit),
+          onMigrate: () => openDialog(scope, MigrationDialog, { resource }),
         })
-      : jsx.jsx(notices.r, {
+      : jsx.jsx(ExplorePluginsNotice, {
           currentGpt: true,
           onExplore: () => void navigate("/plugins"),
         }),

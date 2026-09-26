@@ -69,7 +69,10 @@ const result = await esbuild.build({
                     if (source === "permissions") return { data: { permissions: ["manage"] }, isPending: false, isError: false };
                     return undefined;
                   };
-                  export const Jm = () => "LazyMigrationDialog";
+                  export const Jm = loader => {
+                    globalThis.__migrationContentTest.lazyLoader = loader;
+                    return "LazyMigrationDialog";
+                  };
                   export const $3 = () => {}; export const FX = () => {}; export const QI = () => {};
                   export const qm = () => {}; export const H3 = () => {};
                 `,
@@ -124,6 +127,11 @@ function check(value, message) {
   assert.ok(value, message);
   assertions += 1;
 }
+
+check(
+  (await state.lazyLoader()) === "MigrationDialog",
+  "loads the migration dialog component through the shared lazy wrapper",
+);
 
 let node = migration.GptPluginMigrationBannerContent({ gizmoId: "gizmo-1" });
 check(
@@ -211,7 +219,7 @@ check(
   "ignores non-GPT resources",
 );
 
-assert.equal(assertions, 15);
+assert.equal(assertions, 16);
 console.log(
   `${assertions} GPT plugin migration banner-content assertions passed`,
 );

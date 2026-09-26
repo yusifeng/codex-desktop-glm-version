@@ -1006,7 +1006,12 @@ declare module "@rchunk/app-shared" {
     signal: ReadableSignal<T>,
     options?: QueryReadOptions,
   ) => T;
-  export const I3: unknown; // jsx runtime
+  export interface JsxRuntime {
+    jsx(component: unknown, props: unknown, key?: string): unknown;
+    jsxs(component: unknown, props: unknown, key?: string): unknown;
+  }
+  /** getJsxRuntime（返回 React JSX runtime）。 */
+  export const I3: () => JsxRuntime;
   /** releaseSignalFamilyMember（释放指定 family parameter 的 retained state）。 */
   export const _Z: <Param>(
     scope: MaitaiScopeApi<unknown>,
@@ -2314,7 +2319,8 @@ declare module "@rchunk/app-shared" {
       onUpdate(value: number): void;
     },
   ) => AnimationPlaybackControls;
-  export const qm: unknown;
+  /** initializeQueryRuntime（查询客户端与 React bridge 的基础装配）。 */
+  export const qm: () => void;
   export const r$: unknown;
   export const t$: unknown;
   export const x_: unknown; // useIconScaleContext（_3）
@@ -2582,7 +2588,70 @@ declare module "@rchunk/app-initial" {
   export const HEt: () => void;
   export const M6t: () => void;
   export const MEt: any;
-  export const N6t: () => { isLoading: boolean; userId?: string | null };
+  export interface GptResource {
+    gizmo: {
+      author?: { user_id: string };
+      current_user_permission?: {
+        can_preview_business_agent_tools?: boolean | null;
+        can_read?: boolean;
+        can_view_config?: boolean;
+        can_write?: boolean;
+      } | null;
+      display: { name: string };
+      gizmo_type: string;
+      live_version?: number | null;
+      migrated_plugin_id?: string | null;
+      share_recipient?: string | null;
+      workspace_id?: string | null;
+    };
+  }
+  export interface Account {
+    account_user_id?: string | null;
+    account_user_role?: string | null;
+    id: string;
+    structure: "personal" | "workspace" | string;
+  }
+  export interface WorkspacePermissions {
+    permissions?: string[];
+  }
+  export interface Experiment {
+    get<T>(key: string, fallback: T): T;
+  }
+  export const Dln: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string,
+    WorkspacePermissions
+  >;
+  export const fN: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string,
+    GptResource
+  >;
+  export const N6t: () => {
+    accountId?: string | null;
+    isLoading?: boolean;
+    userId?: string | null;
+  };
+  export const Qgn: () => void;
+  export const rht: () => void;
+  export const Vzt: () => void;
+  export const ifn: () => void;
+  export const mN: () => void;
+  export const l1: () => void;
+  export const afn: (experimentId: string) => Experiment;
+  export const ofn: (gateId: string) => boolean;
+  export const i_n: () => { pathname: string };
+  export const o_n: () => (path: string) => void;
+  export const uht: (
+    accountId?: string,
+    options?: { preview?: boolean },
+  ) => { data: Account | undefined };
+  export const Uzt: <Props extends Record<string, unknown>>(
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    component: import("@rchunk/app-shared").LazyComponent<Props>,
+    props: Props,
+  ) => void;
+  export const u1: (pluginId: string, navigate: (path: string) => void) => void;
   export const X4t: (app: unknown) => unknown;
   export const oDt: () => void;
   export const sDt: (input: { hostId: string }) => boolean;
@@ -2599,6 +2668,29 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-primary" {
+  export interface GptMigrationVisitKey {
+    gizmoId: string;
+    visitKey: string;
+  }
+  export const Ip: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    GptMigrationVisitKey,
+    boolean
+  >;
+  export const Pp: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    GptMigrationVisitKey,
+    boolean
+  >;
+  export const Lp: () => void;
+  export const Mp: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    visit: GptMigrationVisitKey,
+  ) => void;
+  export const Np: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    visit: GptMigrationVisitKey,
+  ) => void;
   export const Bf: () => void;
   export const Rf: (input: { defaultPrompt: string; pluginDisplayName: string; pluginId: string }) => unknown;
   export const d: () => void; // O9：项目选择器依赖初始化器
@@ -3495,16 +3587,26 @@ declare module "@rchunk/banner" {
 }
 
 declare module "@rchunk/gpt-plugin-migration-banner-content" {
-  export const GptPluginMigrationBannerContent: unknown;
+  export const GptPluginMigrationBannerContent: (props: {
+    gizmoId: string;
+  }) => unknown;
 }
 
 declare module "@rchunk/chat-choice-view" {
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: {
+    accessState: "allowed" | "denied" | "error" | "pending";
+    gptName: string;
+    onKeepUsingGpt?: () => void;
+    onRetry?: () => void;
+    onUsePlugin: () => void;
+  }) => unknown;
 }
 
 declare module "@rchunk/gpt-plugin-migration-dialog" {
-  export const GptPluginMigrationDialog: unknown;
+  export const GptPluginMigrationDialog: import("@rchunk/app-shared").LazyComponent<{
+    resource: import("@rchunk/app-initial").GptResource;
+  } & Record<string, unknown>>;
 }
 
 declare module "@rchunk/gpt-plugin-migration-failure" {
@@ -3531,24 +3633,59 @@ declare module "@rchunk/delete-archived-chats-dialog" {
 
 declare module "@rchunk/migrated-plugin-access" {
   export const a: () => void;
-  export const i: (...args: any[]) => any;
-  export const n: unknown;
-  export const o: (...args: any[]) => any;
-  export const r: (...args: any[]) => any;
+  export const i: (
+    account: import("@rchunk/app-initial").Account | null | undefined,
+    workspaceGate: boolean,
+    permissions?: string[],
+  ) => boolean;
+  export const n: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string,
+    boolean
+  >;
+  export const o: (input: {
+    resource: import("@rchunk/app-initial").GptResource;
+    account: import("@rchunk/app-initial").Account | null;
+    accountId: string | null;
+    permissions?: string[];
+  }) => boolean;
+  export const r: (input: {
+    resource: import("@rchunk/app-initial").GptResource;
+    account: import("@rchunk/app-initial").Account | null;
+    accountId: string | null;
+    userId: string | null;
+    enabled: boolean;
+    allowMigrated?: boolean;
+  }) => boolean;
   export const t: () => void;
 }
 
 declare module "@rchunk/gpt-plugin-migration-notices" {
   export const i: () => void;
-  export const n: unknown;
-  export const r: unknown;
-  export const t: unknown;
+  export const n: (props: {
+    onDismiss?: () => void;
+    onMigrate?: () => void;
+    surface: string;
+  }) => unknown;
+  export const r: (props: {
+    currentGpt?: boolean;
+    onExplore?: (event?: unknown) => void;
+  }) => unknown;
+  export const t: (props: {
+    onKeepUsingGpt?: () => void;
+    surface: "directory" | "gpt" | "migrated";
+  }) => unknown;
 }
 
 declare module "@rchunk/migrated-plugin-notice" {
   export const n: unknown;
   export const r: () => void;
-  export const t: unknown;
+  export const t: (props: {
+    gptName?: string;
+    onClose?: () => void;
+    pluginId: string;
+    presentation?: "notice" | "row";
+  }) => unknown;
 }
 
 declare module "@rchunk/gpt-plugin-retirement" {
