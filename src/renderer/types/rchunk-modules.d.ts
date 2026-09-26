@@ -77,7 +77,7 @@ declare module "@rchunk/app-shared" {
   export const $h: () => void; // i8：资源按钮依赖初始化器
   export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
-  export const $O: { ONE_MINUTE: number };
+  export const $O: { ONE_MINUTE: number; THIRTY_SECONDS: number };
   export type QueryKey = readonly unknown[];
   /** hashQueryKey（app-shared/runtime/query-structural-utils.ts）。 */
   export const AZ: (queryKey: QueryKey) => string;
@@ -394,6 +394,7 @@ declare module "@rchunk/app-shared" {
   export const ZI: MaitaiScope<Record<string, unknown>>;
   export const __: unknown;
   export const b_: unknown; // React use（ait）
+  export const ek: () => void;
   export const fk: unknown;
   export const g_: unknown;
   export const h4: unknown;

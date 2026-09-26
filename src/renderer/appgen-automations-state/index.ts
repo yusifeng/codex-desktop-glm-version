@@ -4,68 +4,145 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type {
+  DerivedScopedSignalContext,
+  MaitaiScope,
+  ScopedQueryFamily,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-let automationBacklinksQuery: any;
-let siteAutomationAttachmentsQuery: any;
+
+interface SiteAutomationAttachment extends Record<string, unknown> {
+  id?: string;
+}
+
+interface AutomationBacklinksResponse extends Record<string, unknown> {
+  sites: unknown[];
+}
+
+type ChunkItems = <T>(items: T[], size: number) => T[][];
+
+interface AppInitialBindings {
+  I1t(): { default: ChunkItems } | ChunkItems;
+  cJt(): void;
+  ett: unknown;
+  mfn: unknown;
+  pfn(): void;
+  rJt: {
+    safeGet<Result>(
+      path: string,
+      options: {
+        parameters: {
+          path?: { automation_id: string };
+          query?: { project_ids: string[] };
+        };
+        signal: AbortSignal;
+      },
+    ): Promise<Result>;
+  };
+  stt(): void;
+}
+
+const {
+  I1t: loadChunkUtility,
+  cJt: initializeWebsiteQueries,
+  ett: accountIdSignal,
+  mfn: featureFlagFamily,
+  pfn: initializeAccountSignals,
+  rJt: appApiClient,
+  stt: initializeAutomations,
+} = appInitialChunk as unknown as AppInitialBindings;
+const {
+  $O: queryStaleTimes,
+  FX: initializeMaitaiRuntime,
+  QI: initializeQueryBridge,
+  QX: createQueryFamily,
+  ZI: AppScope,
+  ek: initializeQueryRuntime,
+} = appSharedChunk;
+
+type AppScopeValue = Record<string, unknown>;
+type QueryContext = DerivedScopedSignalContext<AppScopeValue>;
+
+let automationBacklinksQuery: ScopedQueryFamily<
+  AppScopeValue,
+  string,
+  AutomationBacklinksResponse
+>;
+let siteAutomationAttachmentsQuery: ScopedQueryFamily<
+  AppScopeValue,
+  string[],
+  SiteAutomationAttachment[]
+>;
 
 function initializeAppgenAutomationsState(): void {
-  const chunkModule = appInitial.I1t();
-  const chunk = chunkModule?.default ?? chunkModule;
-  appShared.FX?.();
-  appInitial.stt?.();
-  appInitial.cJt?.();
-  appShared.QI?.();
-  appInitial.pfn?.();
-  appShared.ek?.();
+  const chunkModule = loadChunkUtility();
+  const chunk = typeof chunkModule === "function" ? chunkModule : chunkModule.default;
+  initializeMaitaiRuntime();
+  initializeAutomations();
+  initializeWebsiteQueries();
+  initializeQueryBridge();
+  initializeAccountSignals();
+  initializeQueryRuntime();
 
-  siteAutomationAttachmentsQuery = appShared.QX(
-    appShared.ZI,
-    (projectIds: string[], { get }: any) => {
-      const accountId = get(appInitial.ett);
+  siteAutomationAttachmentsQuery = createQueryFamily<
+    AppScopeValue,
+    string[],
+    SiteAutomationAttachment[]
+  >(
+    AppScope as MaitaiScope<AppScopeValue>,
+    (projectIds: string[], { get }: QueryContext) => {
+      const accountId = get<string | null>(accountIdSignal);
       return {
         enabled:
           accountId != null &&
           projectIds.length > 0 &&
-          get(appInitial.mfn, "282477705"),
+          get<boolean>(featureFlagFamily, "282477705"),
         queryKey: ["site-automation-attachments", accountId, projectIds],
-        queryFn: async ({ signal }: any) =>
+        queryFn: async ({ signal }) =>
           (
             await Promise.all(
               chunk(projectIds, 100).map((batch: string[]) =>
-                appInitial.rJt.safeGet("/websites/automation-attachments", {
-                  parameters: { query: { project_ids: batch } },
-                  signal,
-                }),
+                appApiClient.safeGet<SiteAutomationAttachment[]>(
+                  "/websites/automation-attachments",
+                  {
+                    parameters: { query: { project_ids: batch } },
+                    signal,
+                  },
+                ),
               ),
             )
           ).flat(),
-        staleTime: appShared.$O.THIRTY_SECONDS,
+        staleTime: queryStaleTimes.THIRTY_SECONDS,
         refetchOnMount: "always",
-        refetchInterval: appShared.$O.ONE_MINUTE,
+        refetchInterval: queryStaleTimes.ONE_MINUTE,
         retry: false,
       };
     },
   );
 
-  automationBacklinksQuery = appShared.QX(
-    appShared.ZI,
-    (automationId: string, { get }: any) => {
-      const accountId = get(appInitial.ett);
+  automationBacklinksQuery = createQueryFamily<
+    AppScopeValue,
+    string,
+    AutomationBacklinksResponse
+  >(
+    AppScope as MaitaiScope<AppScopeValue>,
+    (automationId: string, { get }: QueryContext) => {
+      const accountId = get<string | null>(accountIdSignal);
       return {
-        enabled: accountId != null && get(appInitial.mfn, "282477705"),
+        enabled:
+          accountId != null &&
+          get<boolean>(featureFlagFamily, "282477705"),
         queryKey: ["site-automation-backlinks", accountId, automationId],
-        queryFn: ({ signal }: any) =>
-          appInitial.rJt.safeGet(
+        queryFn: ({ signal }) =>
+          appApiClient.safeGet<AutomationBacklinksResponse>(
             "/websites/automations/{automation_id}/sites",
             {
               parameters: { path: { automation_id: automationId } },
               signal,
             },
           ),
-        staleTime: appShared.$O.THIRTY_SECONDS,
+        staleTime: queryStaleTimes.THIRTY_SECONDS,
         retry: false,
       };
     },
