@@ -733,6 +733,7 @@ declare module "@rchunk/migrated-plugin-notice" {
 }
 
 declare module "@rchunk/gpt-plugin-retirement" {
+  export const n: (user: unknown, urlTemplate: string) => string;
   export const r: () => void;
   export const t: (value: unknown) => unknown;
 }
