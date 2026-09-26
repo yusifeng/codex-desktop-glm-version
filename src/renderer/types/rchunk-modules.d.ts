@@ -361,6 +361,10 @@ declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
 
+declare module "@rchunk/location-permission-denied-dialog" {
+  export const ChatGptLocationPermissionDeniedDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
