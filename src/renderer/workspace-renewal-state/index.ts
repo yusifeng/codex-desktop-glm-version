@@ -4,17 +4,50 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type { ScopedQueryFamily } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
+
+export interface WorkspaceRenewalSubscription extends Record<string, unknown> {
+  became_delinquent_timestamp?: string | null;
+  grace_period_end_timestamp?: string | null;
+  is_delinquent?: boolean;
+  will_renew?: boolean;
+}
+
+interface AppInitialBindings {
+  pdn(): void;
+  udn: {
+    safeGet<Result>(
+      path: string,
+      options: {
+        parameters: { query: { account_id?: string } };
+      },
+    ): Promise<Result>;
+  };
+}
+
+const { pdn: initializeWorkspaceSubscriptions, udn: appApiClient } =
+  appInitialChunk as unknown as AppInitialBindings;
+const {
+  $O: queryStaleTimes,
+  FX: initializeMaitaiRuntime,
+  QI: initializeQueryBridge,
+  QX: createQueryFamily,
+  ZI: AppScope,
+  ek: initializeQueryRuntime,
+} = appSharedChunk;
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1_000;
 let initialized = false;
-let workspaceRenewalSubscriptionQuery: unknown;
+let workspaceRenewalSubscriptionQuery: ScopedQueryFamily<
+  Record<string, unknown>,
+  string | null,
+  WorkspaceRenewalSubscription
+>;
 
 function activeGracePeriodEnd(
-  subscription: Record<string, any> | null | undefined,
+  subscription: WorkspaceRenewalSubscription | null | undefined,
   now: Date,
 ): string | null {
   if (
@@ -34,20 +67,22 @@ function activeGracePeriodEnd(
 
 function initializeWorkspaceRenewalState(): void {
   if (initialized) return;
-  appShared.FX?.();
-  appShared.QI?.();
-  appShared.ek?.();
-  appInitial.pdn?.();
-  const createQuery = appShared.QX;
-  const client = appInitial.udn;
-  const oneMinute = appShared.$O?.ONE_MINUTE ?? 60_000;
-  workspaceRenewalSubscriptionQuery = createQuery?.(
-    appShared.ZI,
+  initializeMaitaiRuntime();
+  initializeQueryBridge();
+  initializeQueryRuntime();
+  initializeWorkspaceSubscriptions();
+  const oneMinute = queryStaleTimes.ONE_MINUTE;
+  workspaceRenewalSubscriptionQuery = createQueryFamily<
+    Record<string, unknown>,
+    string | null,
+    WorkspaceRenewalSubscription
+  >(
+    AppScope,
     (accountId: string | null) => ({
       enabled: accountId != null,
       queryKey: ["workspace-renewal-subscription", accountId],
       queryFn: () =>
-        client.safeGet("/subscriptions", {
+        appApiClient.safeGet<WorkspaceRenewalSubscription>("/subscriptions", {
           parameters: { query: { account_id: accountId ?? undefined } },
         }),
       refetchInterval: oneMinute,
