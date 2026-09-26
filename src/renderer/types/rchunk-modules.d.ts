@@ -410,6 +410,11 @@ declare module "@rchunk/chatgpt-project-report-dialog" {
   export const ChatGptProjectReportDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/gpt-report-menu-item" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
