@@ -964,6 +964,7 @@ export const REWRITTEN = new Set([
   "appgen-disabled-tooltip",
   "appgen-project-row",
   "appgen-card-layout",
+  "sites-default-thumbnail",
   "start-appgen-conversation",
   "appgen-site-detail-route",
   "appgen-site-detail-layout",
