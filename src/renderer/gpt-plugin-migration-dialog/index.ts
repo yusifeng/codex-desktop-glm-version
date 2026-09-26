@@ -17,13 +17,85 @@ const managementUrl = managementUrlChunk as Record<string, any>;
 const migratedNotice = migratedNoticeChunk as Record<string, any>;
 const migrationFailure = failureChunk as Record<string, any>;
 
-let jsx: any;
+const {
+  $3: initializeRuntimeLazy,
+  BX: useSignalFamilyValue,
+  D: initializeDynamicConfiguration,
+  FX: initializeSignalRuntime,
+  I: initializeDialogRuntime,
+  I3: jsxRuntime,
+  Ih: Dialog,
+  K2: initializeSharedComponents,
+  LX: useSignalScope,
+  Lh: DialogDescription,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  QI: initializeSharedRuntime,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: applicationScope,
+  Zh: initializeButton,
+  e6: reactRuntime,
+  zh: DialogFooter,
+} = appShared;
+const {
+  _L: useQuery,
+  gL: initializeUseQuery,
+  pL: defineQueryOptions,
+} = appSharedChunk;
+
+interface JsxRuntime {
+  jsx(component: unknown, props: unknown, key?: string): unknown;
+  jsxs(component: unknown, props: unknown, key?: string): unknown;
+}
+
+let jsx: JsxRuntime;
+interface MigrationIssue extends Record<string, unknown> {
+  code?: string;
+  resource?: { type?: string };
+}
+
+interface MigratedConnector extends Record<string, unknown> {
+  id: string;
+  status?: string;
+}
+
+interface MigrationApps {
+  disabledByAdmin: MigratedConnector[];
+  unavailable: string[];
+}
+
+interface MigrationTool extends Record<string, unknown> {
+  settings?: { action_ids?: unknown };
+  type: string;
+}
+
+interface MigrationGizmo extends Record<string, unknown> {
+  current_user_permission?: { can_write?: boolean };
+  display: { name: string };
+  gizmo_config_id?: string | null;
+  id: string;
+  migrated_plugin_id?: string | null;
+}
+
+interface MigrationResource extends Record<string, unknown> {
+  files?: unknown[];
+  gizmo: MigrationGizmo;
+  tools: MigrationTool[];
+}
+
+interface MigrationPreview {
+  apps: MigrationApps | null;
+  resource: MigrationResource;
+}
+
 type AppCheck =
   | { status: "loading" }
   | { status: "error"; httpStatus?: number }
   | {
       status: "ready";
-      apps: null | { unavailable: string[]; disabledByAdmin: any[] };
+      apps: MigrationApps | null;
     };
 type MigrationError = {
   kind: "request" | "preview" | "validation" | "file_copy" | "unavailable";
@@ -31,9 +103,51 @@ type MigrationError = {
   errorCode?: string;
   backendMessage?: string;
   backendSuggestion?: string;
-  issues?: any[];
-  failedFiles?: any[];
+  issues?: MigrationIssue[];
+  failedFiles?: unknown[];
 };
+
+interface MigrationDialogViewProps {
+  appCheck?: AppCheck;
+  canMigrate: boolean;
+  editingDisabled: boolean;
+  failedFiles: unknown[];
+  failure?: MigrationError;
+  hasCustomActions: boolean;
+  isMigrating: boolean;
+  modal?: boolean;
+  onCheckApps?(): void;
+  onClose(): void;
+  onEdit?(event: unknown): void;
+  onMigrate(): void;
+  pluginAction?: unknown;
+  pluginId?: string | null;
+  portalContainer?: unknown;
+  resource: MigrationResource;
+  canPublishPlugin?: boolean;
+  canSharePlugin?: boolean;
+  sharingChecked?: boolean;
+  sharingCheckFailed?: boolean;
+}
+
+interface GptPluginMigrationDialogProps {
+  modal?: boolean;
+  onClose(): void;
+  onMigrated?(pluginId: string): void;
+  onMigratingChange?(isMigrating: boolean): void;
+  portalContainer?: unknown;
+  resource: MigrationResource;
+}
+
+interface FormSubmitEvent {
+  preventDefault(): void;
+}
+
+function objectRecord(value: unknown): Record<string, unknown> | undefined {
+  return value != null && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
 
 function message(
   id: string,
@@ -41,43 +155,68 @@ function message(
   description: string,
   values?: Record<string, unknown>,
 ): unknown {
-  return jsx.jsx(appShared.Y2, { id, defaultMessage, description, values });
+  return jsx.jsx(FormattedMessage, { id, defaultMessage, description, values });
 }
 
-function parseMigrationError(error: any): MigrationError {
-  const status = error?.status;
-  let detail: any;
+function parseMigrationError(error: unknown): MigrationError {
+  const errorRecord = objectRecord(error);
+  const status =
+    typeof errorRecord?.status === "number" ? errorRecord.status : undefined;
+  let detail: unknown;
   try {
-    const payload = JSON.parse(error?.message ?? "");
-    detail = payload?.detail ?? payload;
+    const payload: unknown = JSON.parse(
+      typeof errorRecord?.message === "string" ? errorRecord.message : "",
+    );
+    detail = objectRecord(payload)?.detail ?? payload;
   } catch {
     detail = undefined;
   }
-  if (detail?.code === "gpt_plugin_file_copy_failed")
+  const detailRecord = objectRecord(detail);
+  const code =
+    typeof detailRecord?.code === "string" ? detailRecord.code : undefined;
+  const issues = Array.isArray(detailRecord?.issues)
+    ? (detailRecord.issues.filter(objectRecord) as MigrationIssue[])
+    : [];
+  const failedFiles = Array.isArray(detailRecord?.failed_files)
+    ? detailRecord.failed_files
+    : [];
+  if (code === "gpt_plugin_file_copy_failed")
     return {
       kind: "file_copy",
-      issues: detail.issues ?? [],
-      failedFiles: detail.failed_files ?? [],
+      issues,
+      failedFiles,
     };
-  if (detail?.code === "gpt_plugin_incompatible")
+  if (code === "gpt_plugin_incompatible")
     return {
       kind: "validation",
-      issues: detail.issues ?? [],
-      failedFiles: detail.failed_files ?? [],
+      issues,
+      failedFiles,
     };
   const errorCode =
-    typeof detail === "string" ? detail : (detail?.code ?? detail?.error_code);
+    typeof detail === "string"
+      ? detail
+      : typeof detailRecord?.error_code === "string"
+        ? detailRecord.error_code
+        : code;
   return {
     kind: "request",
     status,
     errorCode,
-    backendMessage: typeof detail === "object" ? detail?.message : undefined,
+    backendMessage:
+      typeof detailRecord?.message === "string"
+        ? detailRecord.message
+        : undefined,
     backendSuggestion:
-      typeof detail === "object" ? detail?.suggestion : undefined,
+      typeof detailRecord?.suggestion === "string"
+        ? detailRecord.suggestion
+        : undefined,
   };
 }
 
-function failureCopy(error: MigrationError, editingDisabled: boolean): any {
+function failureCopy(
+  error: MigrationError,
+  editingDisabled: boolean,
+): { description: unknown; title: unknown } {
   let title = "Migration failed";
   let description = "We couldn’t finish migration. Try again to continue.";
   if (error.kind === "preview") {
@@ -148,8 +287,8 @@ function failureCopy(error: MigrationError, editingDisabled: boolean): any {
   };
 }
 
-function connectorIds(resource: any): string[] {
-  const ids: string[] = resource.tools.flatMap((tool: any) => {
+function connectorIds(resource: MigrationResource): string[] {
+  const ids: string[] = resource.tools.flatMap((tool) => {
     if (tool.type !== "connector") return [];
     const values = tool.settings?.action_ids;
     return Array.isArray(values)
@@ -166,10 +305,10 @@ function connectorIds(resource: any): string[] {
 }
 
 async function checkRequiredApps(
-  resource: any,
+  resource: MigrationResource,
   accountId: string,
   signal: AbortSignal,
-): Promise<{ unavailable: string[]; disabledByAdmin: any[] }> {
+): Promise<MigrationApps> {
   const ids = connectorIds(resource);
   if (ids.length === 0) return { unavailable: [], disabledByAdmin: [] };
   const response = await appInitial.rJt.safePost("/aip/connectors/batch", {
@@ -185,7 +324,7 @@ async function checkRequiredApps(
   });
   const connectors = response.connectors ?? [];
   const normalized = new Map(
-    connectors.map((connector: any) => [
+    connectors.map((connector: MigratedConnector) => [
       appInitial.q6t?.(connector.id) ?? connector.id,
       connector,
     ]),
@@ -195,7 +334,7 @@ async function checkRequiredApps(
       (id) => !normalized.has(appInitial.q6t?.(id) ?? id),
     ),
     disabledByAdmin: connectors.filter(
-      (connector: any) => connector.status === "DISABLED_BY_ADMIN",
+      (connector: MigratedConnector) => connector.status === "DISABLED_BY_ADMIN",
     ),
   };
 }
@@ -209,10 +348,20 @@ function ReadinessChecklist({
   canSharePlugin,
   canPublishPlugin,
   editingDisabled,
-}: any): unknown {
+}: Pick<
+  MigrationDialogViewProps,
+  | "appCheck"
+  | "canPublishPlugin"
+  | "canSharePlugin"
+  | "editingDisabled"
+  | "failure"
+  | "hasCustomActions"
+  | "sharingChecked"
+  | "sharingCheckFailed"
+>): unknown {
   const issues = failure?.issues ?? [];
   const oversized = issues.filter(
-    (issue: any) =>
+    (issue) =>
       issue.code === "knowledge_file_too_large" &&
       issue.resource?.type === "knowledge_file",
   );
@@ -281,7 +430,7 @@ function ReadinessChecklist({
   });
 }
 
-function MigrationDialogView(props: any): unknown {
+function MigrationDialogView(props: MigrationDialogViewProps): unknown {
   const {
     resource,
     appCheck,
@@ -344,7 +493,7 @@ function MigrationDialogView(props: any): unknown {
       (appCheck?.status === "ready" && appCheck.apps == null));
   let primaryAction: unknown;
   if (checkFailed)
-    primaryAction = jsx.jsx(appShared.Yh, {
+    primaryAction = jsx.jsx(Button, {
       className: "w-full",
       color: "primary",
       size: "promotionalAction",
@@ -359,7 +508,7 @@ function MigrationDialogView(props: any): unknown {
     });
   else if (pluginId != null) primaryAction = pluginAction;
   else if (blockingApps && onEdit != null && !editingDisabled)
-    primaryAction = jsx.jsx(appShared.Yh, {
+    primaryAction = jsx.jsx(Button, {
       className: "w-full",
       color: "primary",
       size: "promotionalAction",
@@ -372,7 +521,7 @@ function MigrationDialogView(props: any): unknown {
       ),
     });
   else
-    primaryAction = jsx.jsx(appShared.Yh, {
+    primaryAction = jsx.jsx(Button, {
       className: "w-full",
       color: "primary",
       size: "promotionalAction",
@@ -392,12 +541,12 @@ function MigrationDialogView(props: any): unknown {
       jsx.jsxs("div", {
         className: "flex flex-col gap-4",
         children: [
-          jsx.jsx(appShared.Rh, {
+          jsx.jsx(DialogTitle, {
             className:
               "text-center text-heading-lg leading-7 font-semibold wrap-anywhere select-none",
             children: title,
           }),
-          jsx.jsx(appShared.Lh, {
+          jsx.jsx(DialogDescription, {
             className:
               "text-center text-sm leading-5 text-secondary select-none",
             "aria-live": "polite",
@@ -423,12 +572,12 @@ function MigrationDialogView(props: any): unknown {
             migrationSucceeded: pluginId != null,
           })
         : null,
-      jsx.jsxs(appShared.zh, {
+      jsx.jsxs(DialogFooter, {
         className: "flex-col text-center",
         expandSingleButton: false,
         children: [
           primaryAction,
-          jsx.jsx(appShared.Yh, {
+          jsx.jsx(Button, {
             color: "ghostSecondary",
             size: "promotionalLink",
             disabled: isMigrating,
@@ -440,18 +589,18 @@ function MigrationDialogView(props: any): unknown {
       }),
     ],
   });
-  const form = jsx.jsx(appShared.Oh, {
+  const form = jsx.jsx(DialogBody, {
     as: "form",
     size: "viewport",
     variant: "chatgpt",
-    onSubmit: (event: any) => {
+    onSubmit: (event: FormSubmitEvent) => {
       event.preventDefault();
       if (!isMigrating && canMigrate && !blockingApps && pluginId == null)
         onMigrate();
     },
     children: body,
   });
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: true,
     modal: props.modal,
     portalContainer: props.portalContainer,
@@ -474,24 +623,23 @@ function GptPluginMigrationDialog({
   onMigrated,
   modal,
   portalContainer,
-}: any): unknown {
+}: GptPluginMigrationDialogProps): unknown {
   initializeGptPluginMigrationDialog();
-  const React = appShared.e6?.();
-  const scope = appShared.LX?.(appShared.ZI);
+  const React =
+    typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
+  const scope = useSignalScope?.(applicationScope);
   const navigate = appInitial.o_n?.() ?? (() => {});
-  const gates = appInitial.lfn?.();
   const { accountId, userId } = appInitial.N6t?.() ?? {};
   const account = appInitial.uht?.(undefined, { preview: false })?.data;
   const eligibilityGate = appInitial.ofn?.("2160578039") ?? false;
   const migrationEnabled =
-    appShared.BX?.(appInitial.m0t, "2562735250")?.get?.("enabled", false) ??
+    useSignalFamilyValue?.(appInitial.m0t, "2562735250")?.get?.("enabled", false) ??
     false;
   const editingDisabled =
-    appShared
-      .BX?.(appInitial.m0t, "2513446768")
+    useSignalFamilyValue?.(appInitial.m0t, "2513446768")
       ?.get?.("disable_gpt_updates", false) === true;
   const workspaceGate = appInitial.ofn?.("1355972088") ?? false;
-  const workspacePermissions = appShared.BX?.(appInitial.Dln, accountId ?? "", {
+  const workspacePermissions = useSignalFamilyValue?.(appInitial.Dln, accountId ?? "", {
     enabled:
       accountId != null &&
       account?.id === accountId &&
@@ -503,7 +651,7 @@ function GptPluginMigrationDialog({
   const [allowMigrated, setAllowMigrated] = React.useState(false);
   const [isMigrating, setMigrating] = React.useState(false);
   const [failure, setFailure] = React.useState(undefined);
-  const [failedFiles, setFailedFiles] = React.useState([]);
+  const [failedFiles, setFailedFiles] = React.useState([] as unknown[]);
   const inFlight = React.useRef(false);
   const canMigrate =
     migrationEnabled &&
@@ -516,7 +664,7 @@ function GptPluginMigrationDialog({
       allowMigrated,
     }) &&
     migratedAccess.i?.(account, workspaceGate, workspacePermissions);
-  const previewQuery = appShared.pL?.({
+  const previewQuery = defineQueryOptions({
     queryKey: [
       "chatgpt-gizmos",
       "migration-preview",
@@ -525,7 +673,11 @@ function GptPluginMigrationDialog({
       resource.gizmo.id,
       resource.gizmo.gizmo_config_id,
     ],
-    queryFn: async ({ signal }: { signal: AbortSignal }) => {
+    queryFn: async ({
+      signal,
+    }: {
+      signal: AbortSignal;
+    }): Promise<MigrationPreview> => {
       if (accountId == null) throw Error("GPT migration requires an account");
       const latest = await appInitial.rJt.safeGet(
         "/gizmos/{gizmo_id_or_short_url}",
@@ -554,7 +706,7 @@ function GptPluginMigrationDialog({
     staleTime: 0,
     refetchOnWindowFocus: false,
   });
-  const preview = appShared._L?.(previewQuery) ?? {};
+  const preview = useQuery<MigrationPreview>(previewQuery);
   const appCheck: AppCheck = preview.isFetching
     ? { status: "loading" }
     : preview.isError
@@ -567,7 +719,7 @@ function GptPluginMigrationDialog({
         : { status: "ready", apps: preview.data.apps };
   const latestResource = preview.data?.resource ?? resource;
   const hasCustomActions = latestResource.tools?.some(
-    (tool: any) => tool.type === "plugins_prototype",
+    (tool) => tool.type === "plugins_prototype",
   );
   const blockedByApps =
     appCheck.status === "ready" && (appCheck.apps?.unavailable.length ?? 0) > 0;
@@ -678,22 +830,22 @@ function GptPluginMigrationDialog({
 let initialized = false;
 function initializeGptPluginMigrationDialog(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.gL?.();
-  appShared.FX?.();
-  appShared.K2?.();
+  initializeRuntimeLazy?.();
+  initializeUseQuery();
+  initializeSignalRuntime?.();
+  initializeSharedComponents?.();
   appInitial.Qgn?.();
-  appShared.D?.();
+  initializeDynamicConfiguration?.();
   appInitial.Sun?.();
   appInitial.Oln?.();
   appInitial.M6t?.();
   appInitial.rht?.();
-  appShared.Zh?.();
-  appShared.I?.();
-  appShared.Ph?.();
+  initializeButton?.();
+  initializeDialogRuntime?.();
+  initializeDialogLayout?.();
   appInitial.Dft?.();
   appInitial.l1?.();
-  appShared.QI?.();
+  initializeSharedRuntime?.();
   appInitial.ifn?.();
   appInitial.p0t?.();
   appInitial.cJt?.();
@@ -701,7 +853,7 @@ function initializeGptPluginMigrationDialog(): void {
   migrationFailure.n?.();
   managementUrl.n?.();
   migratedNotice.r?.();
-  jsx = appShared.I3?.();
+  jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
   initialized = true;
 }
 

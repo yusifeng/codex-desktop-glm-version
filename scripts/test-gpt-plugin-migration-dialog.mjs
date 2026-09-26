@@ -11,6 +11,7 @@ const state = (globalThis.__migrationDialogTest = {
   closed: 0,
   migrated: null,
   migrating: [],
+  usedQuery: null,
   latest: {
     gizmo: {
       id: "gizmo-1",
@@ -89,7 +90,10 @@ const result = await esbuild.build({
                   });
                   export const BX = (source, key) => source === "dynamic" ? ({ get: field => field === "enabled" ? true : false }) : source === "permissions" ? ({ data: { permissions: [] } }) : undefined;
                   export const pL = value => { globalThis.__migrationDialogTest.query = value; return value; };
-                  export const _L = () => globalThis.__migrationDialogTest.queryResult;
+                  export const _L = options => {
+                    globalThis.__migrationDialogTest.usedQuery = options;
+                    return globalThis.__migrationDialogTest.queryResult;
+                  };
                   export const Y2 = "FormattedMessage"; export const Yh = "Button";
                   export const Rh = "DialogTitle"; export const Lh = "DialogDescription";
                   export const Oh = "DialogContent"; export const Ih = "Dialog"; export const zh = "DialogFooter";
@@ -156,6 +160,12 @@ check(
   node.props.resource === state.latest && node.props.pluginId == null,
   "uses the latest published GPT preview",
 );
+check(
+  state.usedQuery === state.query &&
+    state.usedQuery.queryKey[1] === "migration-preview" &&
+    state.usedQuery.enabled === true,
+  "consumes the typed migration preview options with the query hook",
+);
 let dialog = node.type(node.props);
 check(
   dialog.type === "Dialog" && dialog.props.showDialogClose,
@@ -218,5 +228,5 @@ check(
   "uses the external GPT editor URL when editing is available",
 );
 
-assert.equal(assertions, 16);
+assert.equal(assertions, 17);
 console.log(`${assertions} GPT plugin migration dialog assertions passed`);
