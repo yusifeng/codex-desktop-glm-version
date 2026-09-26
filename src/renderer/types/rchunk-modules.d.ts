@@ -1239,6 +1239,10 @@ declare module "@rchunk/appgen-settings-page-entry" {
   export const AppgenSettingsPage: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-change-slug-dialog" {
+  export const AppgenChangeSlugDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/appgen-access-entry" {
   export const canManageAppgenProject: (...args: any[]) => boolean;
   export const getAppgenAccessModeOptions: (...args: any[]) => any[];
