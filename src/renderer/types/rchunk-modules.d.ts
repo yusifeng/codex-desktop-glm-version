@@ -2743,6 +2743,26 @@ declare module "@rchunk/app-initial" {
   export const ist: () => void;
   /** ExternalLinkConfirmationDialog（内部 yEi）。 */
   export const rst: (props: ExternalLinkConfirmationDialogProps) => unknown;
+  export interface McpAppFollowUpConfirmation {
+    canConfirm?: boolean;
+    context?: Record<string, unknown>;
+    description?: unknown;
+    footerLeadingContent?: unknown;
+    imageUrls?: string[];
+    onCancel(): void;
+    onConfirm(prompt: string): void;
+    prompt: string;
+    title?: unknown;
+  }
+  export interface McpAppFollowUpConfirmationDialogProps {
+    confirmation?: McpAppFollowUpConfirmation | null;
+  }
+  /** initializeMcpAppFollowUpConfirmationDialog（内部 vHa）。 */
+  export const AX: () => void;
+  /** McpAppFollowUpConfirmationDialog（内部 lHa）。 */
+  export const kX: (
+    props: McpAppFollowUpConfirmationDialogProps,
+  ) => unknown;
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices
@@ -3870,7 +3890,9 @@ declare module "@rchunk/external-link-confirmation-dialog" {
 }
 
 declare module "@rchunk/mcp-app-follow-up-confirmation-dialog" {
-  export const McpAppFollowUpConfirmationDialog: (...args: any[]) => any;
+  export const McpAppFollowUpConfirmationDialog: (
+    props: import("@rchunk/app-initial").McpAppFollowUpConfirmationDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/chatgpt-image-upload-reminder-dialog-core" {

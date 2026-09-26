@@ -5,10 +5,11 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void appSharedChunk;
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  AX: initializeMcpAppFollowUpConfirmationDialog,
+  kX: McpAppFollowUpConfirmationDialog,
+} = appInitialChunk;
 
-appInitial.AX();
-
-const McpAppFollowUpConfirmationDialog = appInitial.kX;
+initializeMcpAppFollowUpConfirmationDialog();
 
 export { McpAppFollowUpConfirmationDialog };
