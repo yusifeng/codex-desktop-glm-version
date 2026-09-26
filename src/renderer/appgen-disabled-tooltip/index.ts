@@ -4,17 +4,27 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-let React: any;
-let jsx: any;
+const {
+  $3: initializeReactRuntime,
+  I3: getJsxRuntime,
+  K2: initializeInternationalization,
+  Y2: FormattedMessage,
+  e6: getReactRuntime,
+} = appSharedChunk;
+const {
+  Jot: ExternalLink,
+  Xot: initializeExternalLink,
+} = appInitialChunk;
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 const SITES_TERMS_URL = "https://openai.com/policies/chatgpt-sites-terms/";
 
-function LearnMoreLink(children: any) {
+function LearnMoreLink(children: unknown): unknown {
   return jsx.jsx(
-    appInitial.Jot,
+    ExternalLink,
     {
       className: "text-info underline decoration-current underline-offset-2",
       href: SITES_TERMS_URL,
@@ -27,7 +37,7 @@ function LearnMoreLink(children: any) {
 
 function AppgenDisabledTooltip({ disabledBy }: { disabledBy?: string | null }) {
   if (disabledBy === "openai") {
-    return jsx.jsx(appShared.Y2, {
+    return jsx.jsx(FormattedMessage, {
       id: "appgenPage.disabledByOpenAI.tooltip",
       defaultMessage:
         "Your site may violate OpenAI policies. <learnMore>Learn more</learnMore>",
@@ -37,14 +47,14 @@ function AppgenDisabledTooltip({ disabledBy }: { disabledBy?: string | null }) {
     });
   }
   if (disabledBy !== "workspace_admin") {
-    return jsx.jsx(appShared.Y2, {
+    return jsx.jsx(FormattedMessage, {
       id: "appgenPage.disabledUnknown.tooltip",
       defaultMessage: "Disabled",
       description:
         "Tooltip for a disabled site whose disabling actor is unavailable",
     });
   }
-  return jsx.jsx(appShared.Y2, {
+  return jsx.jsx(FormattedMessage, {
     id: "appgenPage.disabled.tooltip",
     defaultMessage: "Disabled by an admin",
     description:
@@ -53,11 +63,11 @@ function AppgenDisabledTooltip({ disabledBy }: { disabledBy?: string | null }) {
 }
 
 function initializeAppgenDisabledTooltip(): void {
-  appShared.$3?.();
-  React = appShared.e6();
-  appShared.K2?.();
-  appInitial.Xot?.();
-  jsx = appShared.I3();
+  initializeReactRuntime();
+  React = getReactRuntime();
+  initializeInternationalization();
+  initializeExternalLink();
+  jsx = getJsxRuntime();
 }
 
 export { initializeAppgenDisabledTooltip as n, AppgenDisabledTooltip as t };

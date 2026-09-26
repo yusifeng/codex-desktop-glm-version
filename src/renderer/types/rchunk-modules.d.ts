@@ -773,6 +773,9 @@ declare module "@rchunk/app-shared" {
     current: T;
   }
   export interface ReactRuntime {
+    Children: {
+      toArray(children: unknown): unknown[];
+    };
     Fragment: unknown;
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
     use<T>(context: unknown): T;
@@ -2993,6 +2996,15 @@ declare module "@rchunk/app-initial" {
     screenshotUrl?: string | null,
   ) => import("@rchunk/app-shared").UseQueryResult<string>;
   export const _an: () => void;
+  export interface ExternalLinkProps extends Record<string, unknown> {
+    children?: unknown;
+    className?: string;
+    href: string;
+    initiator: string;
+  }
+  /** 带桌面端外链路由与分析上下文的链接组件。 */
+  export const Jot: (props: ExternalLinkProps) => unknown;
+  export const Xot: () => void;
   export const ql: (props: Record<string, unknown>) => unknown;
   export const Hln: (planType: unknown) => boolean;
   export const uP: (timestamp: number | null) => Date;
