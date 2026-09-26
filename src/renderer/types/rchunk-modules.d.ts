@@ -379,6 +379,32 @@ declare module "@rchunk/app-shared" {
   }
   /** appgenInteractionSources（app-shared/runtime/appgen-interaction-source.ts，内部 wq）。 */
   export const Hk: AppgenInteractionSources;
+  export type AppgenInteractionAction =
+    | "CODEX_APPGEN_INTERACTION_ACTION_UNSPECIFIED"
+    | "CODEX_APPGEN_INTERACTION_ACTION_CREATE_SITE_CLICKED"
+    | "CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED"
+    | "CODEX_APPGEN_INTERACTION_ACTION_ANALYTICS_OPENED"
+    | "CODEX_APPGEN_INTERACTION_ACTION_SETTINGS_OPENED"
+    | "CODEX_APPGEN_INTERACTION_ACTION_PAGE_VIEWED"
+    | "CODEX_APPGEN_INTERACTION_ACTION_MENTION_SUGGESTIONS_LOADED"
+    | "UNRECOGNIZED";
+  export interface AppgenInteractionActions {
+    readonly CODEX_APPGEN_INTERACTION_ACTION_UNSPECIFIED:
+      "CODEX_APPGEN_INTERACTION_ACTION_UNSPECIFIED";
+    readonly CODEX_APPGEN_INTERACTION_ACTION_CREATE_SITE_CLICKED:
+      "CODEX_APPGEN_INTERACTION_ACTION_CREATE_SITE_CLICKED";
+    readonly CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED:
+      "CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED";
+    readonly CODEX_APPGEN_INTERACTION_ACTION_ANALYTICS_OPENED:
+      "CODEX_APPGEN_INTERACTION_ACTION_ANALYTICS_OPENED";
+    readonly CODEX_APPGEN_INTERACTION_ACTION_SETTINGS_OPENED:
+      "CODEX_APPGEN_INTERACTION_ACTION_SETTINGS_OPENED";
+    readonly CODEX_APPGEN_INTERACTION_ACTION_PAGE_VIEWED:
+      "CODEX_APPGEN_INTERACTION_ACTION_PAGE_VIEWED";
+    readonly CODEX_APPGEN_INTERACTION_ACTION_MENTION_SUGGESTIONS_LOADED:
+      "CODEX_APPGEN_INTERACTION_ACTION_MENTION_SUGGESTIONS_LOADED";
+    readonly UNRECOGNIZED: "UNRECOGNIZED";
+  }
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
@@ -697,7 +723,8 @@ declare module "@rchunk/app-shared" {
       parameter: Param,
     ): ReadableSignal<T>;
   };
-  export const Bk: Record<string, string>; // bq：Appgen interaction action 枚举
+  /** appgenInteractionActions（app-shared/runtime/appgen-interaction-action.ts，内部 bq）。 */
+  export const Bk: AppgenInteractionActions;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
   export const FQ: unknown;
