@@ -1213,6 +1213,11 @@ declare module "@rchunk/appgen-site-detail-layout" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/toolbar-breadcrumb" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/appgen-site-detail-route" {
   export const AppgenSiteDetailRoute: (...args: any[]) => any;
 }
@@ -3247,8 +3252,8 @@ declare module "@rchunk/security-src" {
 }
 
 declare module "@rchunk/security-tabs" {
-  const _default: unknown;
-  export default _default;
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
 }
 
 declare module "@rchunk/confirmation" {
