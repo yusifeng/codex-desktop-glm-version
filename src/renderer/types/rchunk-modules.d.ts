@@ -19,6 +19,7 @@ declare module "@rchunk/app-shared" {
   };
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   export const $3: unknown; // rolldown lazy 辅助
+  export const $K: string;
   export const BX: any;
   export const C_: unknown;
   export const FQ: unknown;
@@ -28,6 +29,7 @@ declare module "@rchunk/app-shared" {
   export const IQ: unknown;
   export const JQ: unknown;
   export const K2: unknown;
+  export const W2: (descriptor: unknown) => unknown;
   export const LX: unknown;
   export const P3: unknown;
   export const QI: () => void;
@@ -45,6 +47,7 @@ declare module "@rchunk/app-shared" {
   export const iW: (path: string) => string;
   export const lk: unknown;
   export const wL: () => void;
+  export const oq: string;
   export const rZ: any;
   export const m4: unknown; // intl message（J）
   export const mZ: any;
@@ -53,7 +56,6 @@ declare module "@rchunk/app-shared" {
   export const qQ: unknown;
   export const qm: unknown;
   export const r$: unknown;
-  export const rZ: unknown; // createSignalFamily（Sje）
   export const t$: unknown;
   export const x_: unknown; // useIconScaleContext（_3）
   export const y_: unknown;
@@ -100,6 +102,8 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-primary" {
+  export const Bf: () => void;
+  export const Rf: (input: { defaultPrompt: string; pluginDisplayName: string; pluginId: string }) => unknown;
   export const n: () => void;
   export const t: unknown;
   export const _any: any;
@@ -263,6 +267,12 @@ declare module "@rchunk/first-app-connect-ambient-suggestions" {
 
 declare module "@rchunk/home-suggestion-staggered-item" {
   export const n: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/computer-history-suggestion-prompt" {
+  export const n: unknown;
+  export const r: () => void;
   export const t: unknown;
 }
 
