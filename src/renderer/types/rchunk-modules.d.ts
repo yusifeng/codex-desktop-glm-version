@@ -597,6 +597,21 @@ declare module "@rchunk/realtime-voice-home-announcement" {
   export const RealtimeVoiceHomeAnnouncementContent: unknown;
 }
 
+declare module "@rchunk/subscription-onboarding-content" {
+  export const a: (account: unknown) => void;
+  export const d: unknown;
+  export const g: string[];
+  export const h: string[];
+  export const l: unknown;
+  export const n: (account: unknown) => boolean;
+  export const o: (account: unknown) => boolean;
+  export const p: unknown;
+  export const r: (account: unknown) => boolean;
+  export const s: unknown;
+  export const t: () => void;
+  export const v: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
