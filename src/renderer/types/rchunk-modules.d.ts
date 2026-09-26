@@ -437,6 +437,10 @@ declare module "@rchunk/my-gpt-delete-dialog" {
   export const MyGptDeleteDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/source-file-delete-dialog" {
+  export const ChatGptProjectFileDeleteDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
