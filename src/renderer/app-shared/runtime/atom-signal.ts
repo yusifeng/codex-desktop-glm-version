@@ -435,6 +435,7 @@ export const AppScope = createScope<Record<string, unknown>>("AppScope");
 
 /** scope 实例节点；同一 scope 定义可以在不同父实例下拥有多份节点。 */
 export interface ScopeState<T = unknown> {
+  cachedBindings: Map<ScopedDerivedSignal<unknown, unknown>, Atom<unknown>>;
   familyBindings: Map<ScopedDerivedFamily<unknown, unknown, unknown>, Map<unknown, Atom<unknown>>>;
   parent?: ScopeState<unknown>;
   queryClient?: unknown;
@@ -463,6 +464,7 @@ export interface ScopeApi<T = unknown> {
   readonly scope: Scope<T>;
   readonly value: T;
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+  get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
   get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
   getOwnValue<Value>(scope: Scope<Value>): Value;
   set<Value>(signal: ScopedSignal<unknown, Value>, value: Value | ((current: Value) => Value)): void;
@@ -484,6 +486,10 @@ export interface ScopedSignalOptions<TScope, TValue> {
   ) => void | (() => void);
 }
 
+export interface ScopedDerivedSignalOptions<TValue> {
+  isEqual?: (previous: TValue, next: TValue) => boolean;
+}
+
 export interface ScopedDerivedFamilyOptions<Param, TValue> {
   autoDispose?: boolean | number;
   excludeFieldsFromKey?: readonly string[];
@@ -496,8 +502,17 @@ export interface DerivedScopedSignalContext<T = unknown> {
   readonly queryClient: unknown;
   readonly scope: ScopeApi<T>;
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+  get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
   get<Param, Value>(family: ScopedDerivedFamily<unknown, Param, Value>, parameter: Param): Value;
   get<Value = unknown>(reader: unknown, ...parameters: unknown[]): Value;
+}
+
+/** 原 `PI` 返回的 scope 键控只读派生 signal。 */
+export interface ScopedDerivedSignal<TScope, TValue> {
+  cache: "cached";
+  debugLabel?: string;
+  scope: Scope<TScope>;
+  resolve(state: ScopeState<unknown>): Atom<TValue>;
 }
 
 /** 原 `Sje` 返回的 scope 键控派生 family。 */
@@ -553,7 +568,10 @@ function getScopeQueryApi(state: ScopeState<unknown>): ScopeQueryApi {
 
 function resolveScopeBinding(
   state: ScopeState<unknown>,
-  binding: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>,
+  binding:
+    | ScopedSignal<unknown, unknown>
+    | ScopedDerivedSignal<unknown, unknown>
+    | ScopedDerivedFamily<unknown, unknown, unknown>,
   parameter?: unknown,
 ): BoundAtomSignal<unknown> {
   const owner = findScopeState(state, binding.scope);
@@ -588,7 +606,10 @@ function watchScope<T>(
     const tracked = {
       ...base,
       get(
-        binding: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>,
+        binding:
+          | ScopedSignal<unknown, unknown>
+          | ScopedDerivedSignal<unknown, unknown>
+          | ScopedDerivedFamily<unknown, unknown, unknown>,
         parameter?: unknown,
       ): unknown {
         const resolved = resolveScopeBinding(state, binding, parameter);
@@ -633,7 +654,13 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
     query: getScopeQueryApi(state),
     scope: state.scope,
     value: state.value,
-    get(binding: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>, parameter?: unknown): unknown {
+    get(
+      binding:
+        | ScopedSignal<unknown, unknown>
+        | ScopedDerivedSignal<unknown, unknown>
+        | ScopedDerivedFamily<unknown, unknown, unknown>,
+      parameter?: unknown,
+    ): unknown {
       const resolved = resolveScopeBinding(state, binding, parameter);
       return resolved.store.get(resolved.atom);
     },
@@ -684,6 +711,7 @@ export function createScopeState<T>(
     throw new Error(`Missing parent scope instance: ${scope.parent.__scopeBrand}`);
   }
   const state: ScopeState<T> = {
+    cachedBindings: new Map(),
     familyBindings: new Map(),
     parent: options.parent,
     queryClient: options.queryClient ?? options.parent?.queryClient,
@@ -764,7 +792,10 @@ function scopedFamilyKey<Param>(
 }
 
 function isScopedDerivedFamily(
-  value: ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>,
+  value:
+    | ScopedSignal<unknown, unknown>
+    | ScopedDerivedSignal<unknown, unknown>
+    | ScopedDerivedFamily<unknown, unknown, unknown>,
 ): value is ScopedDerivedFamily<unknown, unknown, unknown> {
   return "kind" in value && value.kind === "readable-family";
 }
@@ -781,7 +812,10 @@ function createDerivedContext<T>(
     scope: scopeApi,
     get<Value>(reader: unknown, ...parameters: unknown[]): Value {
       if (typeof reader === "object" && reader != null && "scope" in reader) {
-        const binding = reader as ScopedSignal<unknown, unknown> | ScopedDerivedFamily<unknown, unknown, unknown>;
+        const binding = reader as
+          | ScopedSignal<unknown, unknown>
+          | ScopedDerivedSignal<unknown, unknown>
+          | ScopedDerivedFamily<unknown, unknown, unknown>;
         const owner = findScopeState(state, binding.scope);
         const target = isScopedDerivedFamily(binding)
           ? binding.resolve(state, parameters[0])
@@ -798,6 +832,42 @@ function createDerivedContext<T>(
       throw new TypeError("Unsupported derived signal reader");
     },
   };
+}
+
+/** 创建 scope 键控只读派生 signal（原 `PI` / 压缩导出 `sZ`）。 */
+export function createDerivedSignal<TScope, TValue>(
+  scope: Scope<TScope>,
+  derive: (context: DerivedScopedSignalContext<TScope>) => TValue,
+  options?: ScopedDerivedSignalOptions<TValue>,
+): ScopedDerivedSignal<TScope, TValue> {
+  const binding: ScopedDerivedSignal<TScope, TValue> = {
+    cache: "cached",
+    scope,
+    resolve(activeState) {
+      const owner = findScopeState(activeState, scope);
+      const cached = owner.cachedBindings.get(
+        binding as ScopedDerivedSignal<unknown, unknown>,
+      );
+      if (cached != null) return cached as Atom<TValue>;
+      const derivedAtom = atom((get) => derive(createDerivedContext(owner, get)));
+      derivedAtom.isEqual = options?.isEqual;
+      owner.cachedBindings.set(
+        binding as ScopedDerivedSignal<unknown, unknown>,
+        derivedAtom as Atom<unknown>,
+      );
+      return derivedAtom;
+    },
+  };
+  return binding;
+}
+
+/** 解析只读派生 signal 为 hook 可消费的 atom/store 对。 */
+export function resolveScopedDerivedSignal<TScope, TValue>(
+  signal: ScopedDerivedSignal<TScope, TValue>,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<TValue> {
+  const owner = findScopeState(state, signal.scope);
+  return { atom: signal.resolve(state), store: owner.store };
 }
 
 /**

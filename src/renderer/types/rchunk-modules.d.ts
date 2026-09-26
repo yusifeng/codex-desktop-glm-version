@@ -161,6 +161,7 @@ declare module "@rchunk/app-shared" {
     readonly scope: MaitaiScope<T>;
     readonly value: T;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+    get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
@@ -193,6 +194,14 @@ declare module "@rchunk/app-shared" {
     debugLabel?: string;
     scope: MaitaiScope<TScope>;
   }
+  export interface ScopedDerivedSignalOptions<TValue> {
+    isEqual?: (previous: TValue, next: TValue) => boolean;
+  }
+  export interface ScopedDerivedSignal<TScope, TValue> {
+    cache: "cached";
+    debugLabel?: string;
+    scope: MaitaiScope<TScope>;
+  }
   export interface ScopedDerivedFamilyOptions<Param, TValue> {
     autoDispose?: boolean | number;
     excludeFieldsFromKey?: readonly string[];
@@ -204,6 +213,7 @@ declare module "@rchunk/app-shared" {
     readonly queryClient: unknown;
     readonly scope: MaitaiScopeApi<T>;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+    get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
@@ -262,6 +272,12 @@ declare module "@rchunk/app-shared" {
     ) => TValue,
     options?: ScopedDerivedFamilyOptions<Param, TValue>,
   ) => ScopedDerivedFamily<TScope, Param, TValue>;
+  /** createDerivedSignal（app-shared/runtime/atom-signal.ts，内部 PI）。 */
+  export const sZ: <TScope, TValue>(
+    scope: MaitaiScope<TScope>,
+    derive: (context: DerivedScopedSignalContext<TScope>) => TValue,
+    options?: ScopedDerivedSignalOptions<TValue>,
+  ) => ScopedDerivedSignal<TScope, TValue>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =
@@ -347,6 +363,12 @@ declare module "@rchunk/app-initial" {
   export const X4t: (app: unknown) => unknown;
   export const oDt: () => void;
   export const sDt: (input: { hostId: string }) => boolean;
+  export const $sn: () => void;
+  export const Oln: () => void;
+  export const fgn: () => void;
+  export const dgn: string;
+  export const Sln: unknown;
+  export const Ysn: unknown;
   // scroll-to-match 依赖：CUt=查找器装配器 xUt=matchId 元素查找器
   export const CUt: unknown;
   export const xUt: unknown;
