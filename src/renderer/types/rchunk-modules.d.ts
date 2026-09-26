@@ -427,6 +427,19 @@ declare module "@rchunk/app-shared" {
   ) => boolean | undefined;
   /** initializePermissionProfiles（内部 UL）。 */
   export const sX: () => void;
+  export interface SuggestionModelSelection {
+    selectedModel?: string | null;
+    selectedModelDisplayName?: string | null;
+  }
+  export type SuggestionTarget = "science";
+  /** getSuggestionTarget（app-shared/runtime/suggestion-targeting.ts，内部 dNe）。 */
+  export const JY: (
+    selection: SuggestionModelSelection,
+  ) => SuggestionTarget | null;
+  /** isScienceSuggestionModel（内部 fNe）。 */
+  export const XY: (selection: SuggestionModelSelection) => boolean;
+  /** initializeSuggestionTargeting（内部 KL）。 */
+  export const YY: () => void;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
     readonly query: {
