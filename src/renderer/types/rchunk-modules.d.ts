@@ -698,6 +698,15 @@ declare module "@rchunk/banner" {
   export const t: unknown;
 }
 
+declare module "@rchunk/gpt-plugin-migration-banner-content" {
+  export const GptPluginMigrationBannerContent: unknown;
+}
+
+declare module "@rchunk/chat-choice-view" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
