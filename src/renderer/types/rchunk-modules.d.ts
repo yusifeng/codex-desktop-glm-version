@@ -181,6 +181,8 @@ declare module "@rchunk/home-suggestion-surface" {
 declare module "@rchunk/composer-banners" { export const ComposerBanners: unknown; }
 declare module "@rchunk/usage" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/task-announcement-candidates" { export const TaskAnnouncementCandidates: unknown; }
+declare module "@rchunk/popup" { export const i: unknown; export const n: () => void; export const r: unknown; export const t: unknown; }
+declare module "@rchunk/browser-address-suggestion-overlay" { export const BrowserAddressSuggestionOverlay: unknown; }
 
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
   export const a: () => void;
