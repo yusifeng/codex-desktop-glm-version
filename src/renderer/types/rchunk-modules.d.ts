@@ -1134,6 +1134,47 @@ declare module "@rchunk/appgen-automations-state" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-query" {
+  export const APPGEN_ACCESS_GROUPS_QUERY_KEY: any;
+  export const APPGEN_CUSTOM_DOMAINS_QUERY_KEY: any;
+  export const APPGEN_DATABASE_OVERVIEW_QUERY_KEY: any;
+  export const APPGEN_DATABASE_TABLE_ROWS_QUERY_KEY: any;
+  export const APPGEN_EDITABLE_PROJECTS_QUERY_KEY: any;
+  export const APPGEN_ENVIRONMENT_QUERY_KEY: any;
+  export const APPGEN_PENDING_SLUG_CHANGE_QUERY_KEY: any;
+  export const APPGEN_PROJECTS_QUERY_KEY: any;
+  export const APPGEN_PROJECT_QUERY_KEY: any;
+  export const APPGEN_SCREENSHOT_QUERY_KEY: any;
+  export const APPGEN_SLUG_AVAILABILITY_QUERY_KEY: any;
+  export const APPGEN_TOOL_AVAILABILITY_QUERY_KEY: any;
+  export const appgenAccessGroupsQuery$: any;
+  export const appgenAddCustomDomainMutation$: any;
+  export const appgenChangeSlugMutation$: any;
+  export const appgenCustomDomainsQuery$: any;
+  export const appgenDeleteProjectMutation$: any;
+  export const appgenEnvironmentQuery$: any;
+  export const appgenLatestEditContextSchema: any;
+  export const appgenProjectQuery$: any;
+  export const appgenRefreshCustomDomainMutation$: any;
+  export const appgenRemoveCustomDomainMutation$: any;
+  export const appgenToolAvailabilityQuery$: any;
+  export const appgenUpdateAccessMutation$: any;
+  export const appgenUpdateEnvironmentMutation$: any;
+  export const appgenUpdateProjectTitleMutation$: any;
+  export const callSitesTool: any;
+  export const checkAppgenSlugAvailability: any;
+  export const discardQueuedAppgenAccessUpdate: any;
+  export const fetchAppgenProject: any;
+  export const getNextAppgenDatabaseTableRowsOffset: any;
+  export const invalidateAppgenProjectQueries: any;
+  export const isIncrementalAppgenUserAccessUpdate: any;
+  export const useAppgenDatabaseOverview: any;
+  export const useAppgenDatabaseRefresh: any;
+  export const useAppgenDatabaseTableRows: any;
+  export const useAppgenProjects: any;
+  export const useAppgenScreenshotSrc: any;
+}
+
 declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
