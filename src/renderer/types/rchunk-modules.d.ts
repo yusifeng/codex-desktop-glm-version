@@ -81,6 +81,8 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-primary" {
+  export const n: () => void;
+  export const t: unknown;
   export const _any: any;
 }
 
