@@ -70,6 +70,42 @@ declare module "@rchunk/app-shared" {
     children?: unknown;
     className?: string;
   }
+  export type DialogSize =
+    | "default" | "large" | "narrow" | "feature" | "catalogDetail"
+    | "beacon" | "compact" | "wide" | "share" | "feedback"
+    | "xwide" | "xwideTall" | "xxwide" | "xxxwideTall"
+    | "editor" | "square" | "sheet";
+  export type DialogVariant =
+    | "default" | "chatgpt" | "beacon" | "beaconModal"
+    | "promotional" | "catalog" | "centeredText";
+  export interface DialogProps extends Record<string, unknown> {
+    children?: unknown;
+    open?: boolean;
+    defaultOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    modal?: boolean;
+    triggerContent?: unknown;
+    triggerAsChild?: boolean;
+    triggerRef?: unknown;
+    contentClassName?: string;
+    contentOverflow?: "hidden" | "visible";
+    contentPosition?: "centered" | "inline";
+    contentProps?: Record<string, unknown>;
+    dialogCloseClassName?: string;
+    closeButtonSize?: "default" | "large";
+    dialogCloseLabel?: string;
+    headerActions?: unknown;
+    overlayClassName?: string;
+    portalContainer?: unknown;
+    radius?: "default" | "compact";
+    showDialogClose?: boolean;
+    shouldIgnoreClickOutside?: boolean;
+    shouldStopPointerDownPropagation?: boolean;
+    unstyledContent?: boolean;
+    viewportSized?: boolean;
+    variant?: DialogVariant;
+    size?: DialogSize;
+  }
   export interface DialogHeaderProps extends DialogLayoutProps {
     icon?: unknown;
     iconClassName?: string;
@@ -95,6 +131,16 @@ declare module "@rchunk/app-shared" {
   }
   /** DialogHeader（app-shared/ui/dialog-layout.ts，内部 Xot）。 */
   export const Ah: (props: DialogHeaderProps) => unknown;
+  /** Dialog（内部 Vot）。 */
+  export const Ih: (props: DialogProps) => unknown;
+  /** DialogTitle（内部 Hot）。 */
+  export const Rh: (
+    props: DialogLayoutProps & { variant?: DialogVariant },
+  ) => unknown;
+  /** DialogDescription（内部 Uot）。 */
+  export const Lh: (props: DialogLayoutProps) => unknown;
+  /** initializeDialog（内部 Jot）。 */
+  export const zh: () => void;
   /** DialogBody（内部 Zot）。 */
   export const Oh: (props: DialogBodyProps) => unknown;
   /** DialogFooter（内部 Qot）。 */

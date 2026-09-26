@@ -50,6 +50,16 @@ globalThis.__RENDERER_REACT__ = {
     return { ...element, props: { ...element.props, ...props } };
   },
 };
+globalThis.__RENDERER_DIALOG_PRIMITIVES__ = {
+  Root: "Root",
+  Trigger: "Trigger",
+  Portal: "Portal",
+  Overlay: "Overlay",
+  Content: "Content",
+  Close: "Close",
+  Title: "Title",
+  Description: "Description",
+};
 
 const dialog = await import(
   `data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`
@@ -64,6 +74,100 @@ function check(value, message) {
   assert.ok(value, message);
   assertions += 1;
 }
+
+const dialogTitle = dialog.DialogTitle({
+  children: "Title",
+  variant: "promotional",
+  className: "title-extra",
+});
+equal(dialogTitle.type, "Title", "renders the title primitive");
+check(
+  dialogTitle.props.className.includes("dialog-promotional-title"),
+  "styles promotional titles",
+);
+equal(dialogTitle.props.children, "Title", "forwards title children");
+const dialogDescription = dialog.DialogDescription({ children: "Description" });
+equal(
+  dialogDescription.type,
+  "Description",
+  "renders the description primitive",
+);
+
+let prevented = 0;
+let stopped = 0;
+let outsideHandled = 0;
+const dialogRoot = dialog.Dialog({
+  open: true,
+  onOpenChange: () => {},
+  triggerContent: "Open",
+  children: "Body",
+  headerActions: "Actions",
+  size: "wide",
+  radius: "compact",
+  contentOverflow: "visible",
+  shouldIgnoreClickOutside: true,
+  contentProps: {
+    "data-test": "content",
+    onPointerDownOutside: () => {
+      outsideHandled += 1;
+    },
+  },
+});
+equal(dialogRoot.type, "Root", "renders the dialog root primitive");
+equal(dialogRoot.props.open, true, "forwards root state");
+const [trigger, portal] = dialogRoot.props.children;
+equal(trigger.type, "Trigger", "renders a trigger when provided");
+equal(trigger.props.asChild, true, "defaults trigger composition");
+equal(portal.type, "Portal", "renders the dialog portal");
+const [overlay, content] = portal.props.children;
+equal(overlay.type, "Overlay", "renders the dialog overlay");
+equal(content.type, "Content", "renders the dialog content");
+equal(content.props["data-test"], "content", "forwards content props");
+check(content.props.className.includes("w-[600px]"), "applies dialog width");
+check(
+  content.props.className.includes("rounded-2xl"),
+  "applies compact radius",
+);
+check(
+  content.props.className.includes("overflow-visible"),
+  "supports visible overflow",
+);
+const [dialogChildren, actions, close] = content.props.children;
+equal(dialogChildren, "Body", "renders dialog children");
+equal(actions, "Actions", "renders header actions");
+equal(close.type, "Close", "renders the close primitive");
+equal(close.props["aria-label"], "Close dialog", "labels the close button");
+content.props.onPointerDownOutside({
+  preventDefault: () => {
+    prevented += 1;
+  },
+});
+content.props.onPointerDown({
+  stopPropagation: () => {
+    stopped += 1;
+  },
+});
+equal(prevented, 1, "prevents ignored outside interactions");
+equal(outsideHandled, 1, "calls the outside interaction handler");
+equal(stopped, 1, "stops pointer propagation by default");
+
+const inlineDialog = dialog.Dialog({
+  children: "Inline",
+  contentPosition: "inline",
+  size: "square",
+  showDialogClose: false,
+  unstyledContent: true,
+});
+const inlineContent = inlineDialog.props.children[1].props.children[1];
+check(
+  !inlineContent.props.className.includes("fixed"),
+  "keeps inline content in flow",
+);
+check(
+  inlineContent.props.className.includes("aspect-square"),
+  "applies square sizing",
+);
+equal(inlineContent.props.children[2], null, "can hide the close button");
 
 const body = dialog.DialogBody({ children: "content" });
 equal(body.type, "div", "renders a div body by default");

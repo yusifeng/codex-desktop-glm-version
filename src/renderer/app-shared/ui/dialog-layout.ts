@@ -19,6 +19,28 @@ interface ReactLike {
   isValidElement(value: unknown): value is ElementLike;
 }
 
+interface DialogPrimitives {
+  Root: unknown;
+  Trigger: unknown;
+  Portal: unknown;
+  Overlay: unknown;
+  Content: unknown;
+  Close: unknown;
+  Title: unknown;
+  Description: unknown;
+}
+
+const FALLBACK_DIALOG_PRIMITIVES: DialogPrimitives = {
+  Root: "dialog-root",
+  Trigger: "dialog-trigger",
+  Portal: "dialog-portal",
+  Overlay: "dialog-overlay",
+  Content: "dialog-content",
+  Close: "dialog-close",
+  Title: "dialog-title",
+  Description: "dialog-description",
+};
+
 function jsxRuntimeOf(): JsxRuntimeLike {
   return (
     (globalThis as { __RENDERER_JSX_RUNTIME__?: JsxRuntimeLike })
@@ -31,6 +53,16 @@ function reactOf(): ReactLike {
   return (
     (globalThis as { __RENDERER_REACT__?: ReactLike }).__RENDERER_REACT__ ??
     (require("react") as ReactLike)
+  );
+}
+
+function dialogPrimitivesOf(): DialogPrimitives {
+  return (
+    (
+      globalThis as {
+        __RENDERER_DIALOG_PRIMITIVES__?: DialogPrimitives;
+      }
+    ).__RENDERER_DIALOG_PRIMITIVES__ ?? FALLBACK_DIALOG_PRIMITIVES
   );
 }
 
@@ -52,6 +84,244 @@ function debugLabel(name: string): unknown {
 }
 
 const DEBUG_CONTAINER_CLASS = "relative rounded-lg border border-chart-blue/40";
+
+export type DialogSize =
+  | "default"
+  | "large"
+  | "narrow"
+  | "feature"
+  | "catalogDetail"
+  | "beacon"
+  | "compact"
+  | "wide"
+  | "share"
+  | "feedback"
+  | "xwide"
+  | "xwideTall"
+  | "xxwide"
+  | "xxxwideTall"
+  | "editor"
+  | "square"
+  | "sheet";
+export type DialogVariant =
+  | "default"
+  | "chatgpt"
+  | "beacon"
+  | "beaconModal"
+  | "promotional"
+  | "catalog"
+  | "centeredText";
+
+export interface DialogProps extends Record<string, unknown> {
+  children?: unknown;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  modal?: boolean;
+  triggerContent?: unknown;
+  triggerAsChild?: boolean;
+  triggerRef?: unknown;
+  contentClassName?: string;
+  contentOverflow?: "hidden" | "visible";
+  contentPosition?: "centered" | "inline";
+  contentProps?: Record<string, unknown>;
+  dialogCloseClassName?: string;
+  closeButtonSize?: "default" | "large";
+  dialogCloseLabel?: string;
+  headerActions?: unknown;
+  overlayClassName?: string;
+  portalContainer?: unknown;
+  radius?: "default" | "compact";
+  showDialogClose?: boolean;
+  shouldIgnoreClickOutside?: boolean;
+  shouldStopPointerDownPropagation?: boolean;
+  unstyledContent?: boolean;
+  viewportSized?: boolean;
+  variant?: DialogVariant;
+  size?: DialogSize;
+}
+
+function dialogWidthClass(size: DialogSize): string {
+  switch (size) {
+    case "large":
+      return "w-lg";
+    case "narrow":
+      return "w-[380px]";
+    case "feature":
+      return "w-[400px]";
+    case "catalogDetail":
+      return "w-143.5";
+    case "beacon":
+      return "w-120";
+    case "compact":
+      return "w-[420px]";
+    case "wide":
+      return "w-[600px]";
+    case "share":
+      return "w-[640px]";
+    case "feedback":
+      return "w-xl";
+    case "xwide":
+      return "w-[680px]";
+    case "xwideTall":
+      return "h-[min(92vh,800px)] max-h-[min(92vh,800px)] w-[680px]";
+    case "xxwide":
+      return "w-[800px]";
+    case "xxxwideTall":
+      return "h-[min(85vh,740px)] max-h-[min(85vh,740px)] w-[960px]";
+    case "editor":
+      return "w-[600px] h-[720px] max-w-full max-h-full";
+    case "square":
+      return "aspect-square";
+    case "sheet":
+      return "rounded-b-none";
+    default:
+      return "w-[520px]";
+  }
+}
+
+/** 原 `Hot` / 压缩导出 `Rh`。 */
+export function DialogTitle({
+  variant = "default",
+  className,
+  ...props
+}: DialogLayoutProps & { variant?: DialogVariant }): unknown {
+  return jsxRuntimeOf().jsx(dialogPrimitivesOf().Title, {
+    className: classNames(
+      className,
+      variant === "promotional" ? "dialog-promotional-title" : undefined,
+    ),
+    ...props,
+  });
+}
+
+/** 原 `Uot` / 压缩导出 `Lh`。 */
+export function DialogDescription(props: DialogLayoutProps): unknown {
+  return jsxRuntimeOf().jsx(dialogPrimitivesOf().Description, { ...props });
+}
+
+/** 原 `Vot` / 压缩导出 `Ih`。 */
+export function Dialog(props: DialogProps): unknown {
+  const {
+    children,
+    triggerContent,
+    triggerAsChild = true,
+    triggerRef,
+    contentClassName,
+    contentOverflow = "hidden",
+    contentPosition = "centered",
+    contentProps = {},
+    dialogCloseClassName,
+    closeButtonSize = "default",
+    dialogCloseLabel = "Close dialog",
+    headerActions,
+    overlayClassName,
+    portalContainer,
+    radius = "default",
+    showDialogClose = true,
+    shouldIgnoreClickOutside = false,
+    shouldStopPointerDownPropagation = true,
+    unstyledContent = false,
+    viewportSized = false,
+    variant = "default",
+    size = "default",
+    ...rootProps
+  } = props;
+  const primitives = dialogPrimitivesOf();
+  const trigger = triggerContent
+    ? jsxRuntimeOf().jsx(primitives.Trigger, {
+        asChild: triggerAsChild,
+        ref: triggerRef,
+        children: triggerContent,
+      })
+    : null;
+  const isCatalog = variant === "catalog" || variant === "centeredText";
+  const isBeacon = variant === "beacon" || variant === "beaconModal";
+  const content = jsxRuntimeOf().jsxs(primitives.Content, {
+    ...contentProps,
+    className: classNames(
+      "codex-dialog z-50",
+      variant !== "centeredText" && "outline-none",
+      size === "sheet" && "bottom-0 left-0",
+      contentPosition === "centered" &&
+        size !== "sheet" &&
+        "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+      contentPosition !== "inline" &&
+        (portalContainer == null ? "fixed" : "absolute"),
+      !unstyledContent &&
+        variant === "default" &&
+        "bg-surface-elevated-secondary/90 text-default ring-border ring-[0.5px] shadow-lg backdrop-blur-xl",
+      !unstyledContent &&
+        (variant === "chatgpt" || isBeacon) &&
+        "bg-surface dark:bg-surface-tertiary text-default shadow-lg",
+      !unstyledContent &&
+        variant === "promotional" &&
+        "bg-surface-elevated-secondary text-default shadow-lg ring-[0.5px] ring-border",
+      !unstyledContent &&
+        isCatalog &&
+        "bg-surface-elevated-secondary text-default",
+      !unstyledContent &&
+        !isCatalog &&
+        (radius === "compact" || variant === "chatgpt" || isBeacon
+          ? "rounded-2xl"
+          : "rounded-3xl"),
+      size !== "sheet" && size !== "square" && "max-w-[92vw]",
+      contentOverflow === "visible" ? "overflow-visible" : "overflow-hidden",
+      isBeacon && "max-h-[92dvh] overflow-y-auto",
+      dialogWidthClass(size),
+      viewportSized && "max-h-[92dvh]",
+      contentClassName,
+    ),
+    onPointerDownOutside: (event: { preventDefault?(): void }) => {
+      if (shouldIgnoreClickOutside) event.preventDefault?.();
+      const handler = contentProps.onPointerDownOutside;
+      if (typeof handler === "function") handler(event);
+    },
+    onPointerDown: (event: { stopPropagation?(): void }) => {
+      if (shouldStopPointerDownPropagation) event.stopPropagation?.();
+      const handler = contentProps.onPointerDown;
+      if (typeof handler === "function") handler(event);
+    },
+    children: [
+      children,
+      headerActions,
+      showDialogClose
+        ? jsxRuntimeOf().jsx(primitives.Close, {
+            className: classNames(
+              "no-drag cursor-interaction leading-none hover:bg-primary-ghost-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              closeButtonSize === "large" ? "size-9" : "rounded p-1",
+              dialogCloseClassName,
+            ),
+            "aria-label": dialogCloseLabel,
+            children: "×",
+          })
+        : null,
+    ],
+  });
+  const portal = jsxRuntimeOf().jsxs(primitives.Portal, {
+    container: portalContainer ?? undefined,
+    children: [
+      jsxRuntimeOf().jsx(primitives.Overlay, {
+        className: classNames(
+          "codex-dialog-overlay fixed inset-0 z-50",
+          (variant === "beacon" || variant === "promotional") &&
+            "bg-text/5 backdrop-blur-sm",
+          (variant === "default" || variant === "chatgpt") &&
+            "extension:bg-surface-tertiary/80 electron:bg-[#00000022]",
+          overlayClassName,
+        ),
+      }),
+      content,
+    ],
+  });
+  return jsxRuntimeOf().jsxs(primitives.Root, {
+    ...rootProps,
+    children: [trigger, portal],
+  });
+}
+
+/** 原 `Jot` / 压缩导出 `zh`。 */
+export function initializeDialog(): void {}
 
 export interface DialogLayoutProps extends Record<string, unknown> {
   children?: unknown;
