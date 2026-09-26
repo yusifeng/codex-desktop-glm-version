@@ -1309,6 +1309,50 @@ declare module "@rchunk/app-shared" {
   export const jf: MenuComponents;
   /** initializeMenu（内部 jft）。 */
   export const If: () => void;
+  export type DropdownContentWidth =
+    | "icon" | "xs" | "sm" | "menuNarrow" | "menu" | "menuFixed"
+    | "menuBounded" | "menuWide" | "sidebar" | "workspace" | "panel"
+    | "panelWide" | "panelExtraWide";
+  export type DropdownContentMaxHeight =
+    | "compact" | "list" | "tall" | "composerPlugins";
+  export interface DropdownEvent {
+    defaultPrevented?: boolean;
+    preventDefault?(): void;
+    stopPropagation?(): void;
+  }
+  export interface DropdownMenuProps extends Record<string, unknown> {
+    triggerButton: MenuElement;
+    disabled?: boolean;
+    children?: unknown;
+    modal?: boolean;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    dir?: "ltr" | "rtl";
+    side?: "top" | "right" | "bottom" | "left";
+    align?: "start" | "center" | "end";
+    sideOffset?: number;
+    alignOffset?: number;
+    contentRef?: unknown;
+    onContentFocus?: (event: DropdownEvent) => void;
+    onContentKeyDownCapture?: (event: DropdownEvent) => void;
+    onContentPointerDownCapture?: (event: DropdownEvent) => void;
+    onContentPointerEnter?: (event: DropdownEvent) => void;
+    onContentPointerLeave?: (event: DropdownEvent) => void;
+    onOpenAutoFocus?: (event: DropdownEvent) => void;
+    onCloseAutoFocus?: (event: DropdownEvent) => void;
+    onEscapeKeyDown?: (event: DropdownEvent) => void;
+    contentClassName?: string;
+    contentVariant?: "default" | "attached" | "picker";
+    contentStyle?: Record<string, unknown>;
+    size?: "default" | "large" | "descriptive" | "select";
+    surface?: "menu" | "panel" | "glass" | "chatgpt" | "bare";
+    contentWidth?: DropdownContentWidth;
+    matchTriggerWidth?: boolean;
+    contentMaxHeight?: DropdownContentMaxHeight;
+    portalContainer?: unknown;
+  }
+  /** DropdownMenu（app-shared/ui/dropdown-menu.ts，内部 xft）。 */
+  export const kf: (props: DropdownMenuProps) => unknown;
   export type ContextMenuItemType =
     | "item" | "checkbox" | "radio" | "label" | "separator";
   export interface ContextMenuMessage {
