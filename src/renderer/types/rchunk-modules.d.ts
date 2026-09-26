@@ -188,6 +188,8 @@ declare module "@rchunk/catalog" { export const n: () => void; export const t: u
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
 declare module "@rchunk/codex-micro-mini-games" { export const _any: any; }
 declare module "@rchunk/codex-micro-mini-game-composer" { export const CodexMicroMiniGameComposer: unknown; }
+declare module "@rchunk/wheel-swipe-gesture" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/right-panel-composer-overlay" { export const n: () => void; export const t: unknown; }
 
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
   export const a: () => void;
