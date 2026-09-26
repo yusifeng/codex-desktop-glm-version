@@ -69,7 +69,7 @@ declare module "@chunk/shared" {
   export const $r: any; // 内部符号: sI
   export const $s: any; // 内部符号: $w
   export const $t: any; // 内部符号: _2
-  export const $u: any; // 内部符号: Pv
+  export { threadIdOf as $u } from "../../shared/browser-context";
   export const A: any; // 内部符号: koe
   export const Aa: any; // 内部符号: One
   export const Ac: any; // 内部符号: _C
@@ -150,7 +150,7 @@ declare module "@chunk/shared" {
   export const Fr: any; // 内部符号: CB
   export const Fs: any; // 内部符号: bT
   export { COMMAND_DEFINITIONS as Ft } from "../../shared/command-registry";
-  export const Fu: any; // 内部符号: Oy
+  export { parseElementName as Fu } from "../../shared/browser-context";
   export const G: any; // 内部符号: k5
   export const Ga: any; // 内部符号: kA
   export const Gc: any; // 内部符号: bS
@@ -225,7 +225,7 @@ declare module "@chunk/shared" {
   export const Lr: any; // 内部符号: fB
   export const Ls: any; // 内部符号: iT
   export { resolveRealpaths as Lt } from "../../shared/realpath";
-  export const Lu: any; // 内部符号: Sy
+  export { parseBrowserContextKind as Lu } from "../../shared/browser-context";
   export const M: any; // 内部符号: C7
   export const Ma: any; // 内部符号: XA
   export const Mc: any; // 内部符号: tC
@@ -277,7 +277,7 @@ declare module "@chunk/shared" {
   export const Pr: any; // 内部符号: KB
   export const Ps: any; // 内部符号: ST
   export { isMouseAccelerator as Pt } from "../../shared/command-registry";
-  export const Pu: any; // 内部符号: ky
+  export { parseElementMetadata as Pu } from "../../shared/browser-context";
   export const Q: any; // 内部符号: l5
   export const Qa: any; // 内部符号: tA
   export const Qc: any; // 内部符号: Hx
@@ -507,7 +507,7 @@ declare module "@chunk/shared" {
   export const gr: any; // 内部符号: yV
   export const gs: any; // 内部符号: ZT
   export { readCustomAvatar as gt } from "../../shared/pet-spritesheet";
-  export const gu: any; // 内部符号: My
+  export { ANNOTATION_FLOWS as gu } from "../../shared/browser-context";
   export const h: any; // 内部符号: b9
   export const ha: any; // 内部符号: fj
   export const hc: any; // 内部符号: JC
@@ -520,7 +520,7 @@ declare module "@chunk/shared" {
   export const hr: any; // 内部符号: vV
   export const hs: any; // 内部符号: QT
   export { installCustomPet as ht } from "../../shared/pet-spritesheet";
-  export const hu: any; // 内部符号: cb
+  export { isValidThreadId as hu } from "../../shared/browser-context";
   export const i: any; // 内部符号: Kce
   export const ia: any; // 内部符号: nre
   export const ic: any; // 内部符号: Aw
@@ -587,7 +587,7 @@ declare module "@chunk/shared" {
   export const mr: any; // 内部符号: DV
   export const ms: any; // 内部符号: $T
   export { telemetryIntakeUrl as mt } from "../../shared/telemetry";
-  export const mu: any; // 内部符号: ib
+  export { broadcastVersionOf as mu } from "../../shared/browser-context";
   export const n: any; // 内部符号: Yce
   export const na: any; // 内部符号: tre
   export const nc: any; // 内部符号: jw
@@ -673,7 +673,7 @@ declare module "@chunk/shared" {
   export const tc: any; // 内部符号: Dw
   export const td: any; // 内部符号: Av
   /** 线程状态 → RGB 颜色码（内部符号 Cte，switch 返回各状态颜色常量）。 */
-  export const tf: (status: string) => number;
+  export { colorForThreadStatus as tf } from "../../shared/browser-context";
   export const ti: any; // 内部符号: tI
   export const tl: any; // 内部符号: xx
   export const tn: any; // 内部符号: W1
