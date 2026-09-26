@@ -127,7 +127,22 @@ declare module "@rchunk/app-shared" {
   export const LX: unknown;
   export const P3: unknown;
   export const QI: () => void;
-  export const S_: unknown; // IconAsset（h3）
+  export interface IconAssetPreset {
+    body: string;
+    capabilities: readonly string[];
+    canvas: { height: number; viewBox: string; width: number };
+    name: string;
+    optical?: Record<string, unknown>;
+    paint: Record<string, unknown>;
+  }
+  export interface IconAssetProps extends Record<string, unknown> {
+    alignment?: "composite" | "foreground";
+    asset: IconAssetPreset;
+    idPrefix?: string;
+    label?: string;
+  }
+  /** IconAsset（app-shared/ui/icons/icon-preset.ts）。 */
+  export const S_: (props: IconAssetProps) => unknown;
   export const Xi: unknown;
   export const Y2: unknown; // FormattedMessage
   export const Yi: unknown;

@@ -34,8 +34,13 @@ export interface MonochromePaint {
 
 /** 多色绘制（分层）。 */
 export interface MulticolorLayer {
-  body?: string;
   bounds?: IconRect;
+  color: string;
+  foundationToken?: string;
+  role: "accent" | "brand" | "fixed" | "foreground";
+  token?: string;
+  wideGamut?: string;
+  wideGamutToken?: string;
   [key: string]: unknown;
 }
 
@@ -192,50 +197,248 @@ export function createIconPreset(definition: {
 /** React 面（结构化子集）。 */
 interface ReactLike {
   createElement(type: unknown, props: Record<string, unknown>, ...children: unknown[]): unknown;
-  useContext<T>(context: { _currentValue?: T }): T;
+  useId(): string;
 }
 
 function reactOf(): ReactLike {
   return (globalThis as { __RENDERER_REACT__?: ReactLike }).__RENDERER_REACT__ ?? (require("react") as unknown as ReactLike);
 }
 
-/** 尺寸上下文（原 `y3` = createContext(1)，缩放系数）。 */
-const scaleContext = { _currentValue: 1 };
-
 /** 对齐方式。 */
-export type IconAlignment = "leading" | "secondary" | string;
+export type IconAlignment = "composite" | "foreground";
+
+export interface IconAssetProps extends Record<string, unknown> {
+  alignment?: IconAlignment;
+  asset: IconPreset;
+  idPrefix?: string;
+  label?: string;
+}
 
 /**
  * IconAsset 组件（原 `h3`）：
  * props { asset, alignment?, idPrefix?, label?, ...svgProps }。
  * 校验 asset 能力（Rhe：icon 能力必须存在）；按对齐方式换算光学尺寸。
  */
-export function IconAsset(props: {
-  alignment?: IconAlignment;
-  asset: IconPreset;
-  idPrefix?: string;
-  label?: string;
-  [key: string]: unknown;
-}): unknown {
+export function IconAsset(props: IconAssetProps): unknown {
   const { alignment, asset, idPrefix, label, ...svgProps } = props;
   requireCapability(asset, "icon");
-  const scale = reactOf().useContext(scaleContext) || 1;
-  return renderIconSvg({ preset: asset, icon: scaledIcon(asset, alignment, scale), svgProps, idPrefix, label });
+  return renderIconSvg({
+    preset: asset,
+    icon: resolveIconBody(asset, alignment),
+    svgProps,
+    idPrefix,
+    label,
+  });
 }
 
 /** 能力校验（原 `Rhe`）。 */
 function requireCapability(preset: IconPreset, capability: string): void {
-  if (!preset.capabilities.includes(capability)) throw TypeError(`Icon asset ${preset.name} does not declare capability '${capability}'`);
+  if (!preset.capabilities.includes(capability))
+    throw TypeError(`${preset.name} does not support the ${capability} capability`);
 }
 
-/** 对齐换算（原 `v8e` 语义：secondary 取 16px 光学档，其余按画布）。 */
-function scaledIcon(preset: IconPreset, alignment: IconAlignment | undefined, scale: number): { width: number; height: number; viewBox: string } {
-  const canvas = preset.canvas;
-  if (alignment === "secondary") {
-    // secondary 场景（紧凑来源图标）：按 16 档渲染
-    return { width: 16, height: 16, viewBox: canvas.viewBox };
+interface ResolvedIconBody {
+  body: string;
+  style: Record<string, string>;
+  supportsWideGamut: boolean;
+}
+
+function paintToken(layer: MulticolorLayer): string | undefined {
+  if (layer.token != null || layer.foundationToken != null)
+    return layer.token ?? layer.foundationToken;
+  if (
+    (layer.role === "brand" || layer.role === "fixed") &&
+    layer.wideGamut != null &&
+    /^#[\da-f]{6}$/iu.test(layer.color)
+  ) {
+    return `authored-${layer.color.slice(1).toLowerCase()}`;
   }
-  return { width: canvas.width * scale, height: canvas.height * scale, viewBox: canvas.viewBox };
+  return undefined;
+}
+
+function multicolorStyle(preset: IconPreset): Record<string, string> {
+  if (preset.paint.kind === "monochrome") return {};
+  const style: Record<string, string> = {};
+  for (const layer of preset.paint.layers) {
+    const token = paintToken(layer);
+    if (token == null) continue;
+    const normalizedToken = token.replace(/^--/u, "");
+    const fallback =
+      layer.foundationToken == null
+        ? layer.color
+        : `var(--${layer.foundationToken.replace(/^--/u, "")}, ${layer.color})`;
+    const gamutFallback =
+      (layer.role !== "brand" && layer.role !== "fixed") ||
+      (layer.wideGamut == null && layer.wideGamutToken == null)
+        ? fallback
+        : `var(--icon-p3-${normalizedToken}, ${fallback})`;
+    style[`--icon-${normalizedToken}`] =
+      layer.token == null
+        ? gamutFallback
+        : `var(--${normalizedToken}, ${gamutFallback})`;
+  }
+  return style;
+}
+
+function multicolorBody(preset: IconPreset): string {
+  if (preset.paint.kind === "monochrome") return preset.body;
+  let body = preset.body;
+  const semanticColors = new Set(
+    preset.paint.layers
+      .filter((layer) => layer.role === "foreground" || layer.role === "accent")
+      .map((layer) => layer.color.toLowerCase()),
+  );
+  const wideGamutRules: string[] = [];
+  for (const layer of preset.paint.layers) {
+    const token = paintToken(layer);
+    if (token == null) continue;
+    const normalizedToken = token.replace(/^--/u, "");
+    const attribute =
+      layer.role === "brand" || layer.role === "fixed"
+        ? semanticColors.has(layer.color.toLowerCase())
+          ? "stop-color"
+          : "fill|stroke|stop-color"
+        : "fill|stroke";
+    const escapedColor = layer.color.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+    body = body.replaceAll(
+      RegExp(`\\b(${attribute})=(["'])${escapedColor}\\2`, "giu"),
+      `$1="var(--icon-${normalizedToken}, ${layer.color})"`,
+    );
+    if (
+      (layer.role === "brand" || layer.role === "fixed") &&
+      layer.wideGamut != null
+    ) {
+      wideGamutRules.push(
+        `--icon-p3-${normalizedToken}:` +
+          (layer.wideGamutToken == null
+            ? layer.wideGamut
+            : `var(--${layer.wideGamutToken.replace(/^--/u, "")},${layer.wideGamut})`),
+      );
+    }
+  }
+  if (wideGamutRules.length === 0) return body;
+  return (
+    `<style>@supports (color:color(display-p3 1 1 1)){@media (color-gamut:p3){svg[data-icon-p3="${preset.name}"]{` +
+    wideGamutRules.join(";") +
+    "}}}</style>" +
+    body
+  );
+}
+
+function canvasOverflows(preset: IconPreset): boolean {
+  const frame = preset.canvas.frame;
+  const bounds = preset.canvas.visualBounds;
+  return (
+    frame != null &&
+    bounds != null &&
+    (bounds.x < frame.x ||
+      bounds.y < frame.y ||
+      bounds.x + bounds.width > frame.x + frame.width ||
+      bounds.y + bounds.height > frame.y + frame.height)
+  );
+}
+
+/** 原 `v8e`/`y8e`：颜色变量替换 + 光学锚点平移。 */
+function resolveIconBody(
+  preset: IconPreset,
+  alignment?: IconAlignment,
+): ResolvedIconBody {
+  let body = multicolorBody(preset);
+  let overflows = canvasOverflows(preset);
+  if (alignment != null) {
+    const frame = preset.canvas.frame ?? {
+      x: 0,
+      y: 0,
+      width: preset.canvas.width,
+      height: preset.canvas.height,
+    };
+    const frameCenter = {
+      x: frame.x + frame.width / 2,
+      y: frame.y + frame.height / 2,
+    };
+    const anchor =
+      alignment === "composite"
+        ? (preset.optical?.anchors?.ink ?? preset.optical?.center ?? frameCenter)
+        : (preset.optical?.anchors?.foreground ??
+          preset.optical?.anchors?.ink ??
+          preset.optical?.center ??
+          frameCenter);
+    const offsetX = Number((frameCenter.x - anchor.x).toFixed(6));
+    const offsetY = Number((frameCenter.y - anchor.y).toFixed(6));
+    if (offsetX !== 0 || offsetY !== 0) {
+      body = `<g transform="translate(${offsetX} ${offsetY})">${body}</g>`;
+      const bounds = preset.canvas.visualBounds;
+      overflows =
+        overflows ||
+        bounds == null ||
+        bounds.x + offsetX < frame.x ||
+        bounds.y + offsetY < frame.y ||
+        bounds.x + offsetX + bounds.width > frame.x + frame.width ||
+        bounds.y + offsetY + bounds.height > frame.y + frame.height;
+    }
+  }
+  return {
+    body,
+    style: {
+      ...multicolorStyle(preset),
+      ...(overflows ? { overflow: "visible" } : {}),
+    },
+    supportsWideGamut:
+      preset.paint.kind === "multicolor" &&
+      preset.paint.layers.some(
+        (layer) =>
+          (layer.role === "brand" || layer.role === "fixed") &&
+          layer.wideGamut != null,
+      ),
+  };
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^$(){}|[\]\\]/g, "\\$&");
+}
+
+function validateIdPrefix(value: string): void {
+  if (!/^[A-Za-z_:][A-Za-z0-9_.:-]*$/.test(value))
+    throw TypeError("icon idPrefix must be a non-empty SVG identifier prefix");
+}
+
+/** 原 `OT`：为 SVG body 内的本地 id、url(#id) 与 href="#id" 加前缀。 */
+function prefixSvgIds(body: string, prefix?: string): string {
+  const ids = new Set(
+    [...body.matchAll(/(?:^|[\s<])id\s*=\s*(["'])([^"']+)\1/g)]
+      .map((match) => match[2])
+      .filter((id): id is string => id != null),
+  );
+  if (prefix == null) {
+    if (ids.size > 0)
+      throw TypeError("icon idPrefix is required when the SVG body contains local IDs");
+    return body;
+  }
+  validateIdPrefix(prefix);
+  let rewritten = body;
+  for (const id of ids) {
+    const nextId = `${prefix}-${id}`;
+    const escapedId = escapeRegExp(id);
+    rewritten = rewritten
+      .replace(
+        RegExp(`((?:^|[\\s<])id\\s*=\\s*)(["'])${escapedId}\\2`, "g"),
+        (_match, lead: string, quote: string) => `${lead}${quote}${nextId}${quote}`,
+      )
+      .replace(
+        RegExp(`(url\\(\\s*)(["']?)#${escapedId}\\2(\\s*\\))`, "g"),
+        (_match, lead: string, quote: string, tail: string) =>
+          `${lead}${quote}#${nextId}${quote}${tail}`,
+      )
+      .replace(
+        RegExp(
+          `((?:^|[\\s<])(?:xlink:)?href\\s*=\\s*)(["'])#${escapedId}\\2`,
+          "g",
+        ),
+        (_match, lead: string, quote: string) =>
+          `${lead}${quote}#${nextId}${quote}`,
+      );
+  }
+  return rewritten;
 }
 
 /** SVG 渲染（原 `f8e`）。 */
@@ -247,33 +450,43 @@ function renderIconSvg({
   label,
 }: {
   preset: IconPreset;
-  icon: { width: number; height: number; viewBox: string };
+  icon: ResolvedIconBody;
   svgProps: Record<string, unknown>;
   idPrefix?: string;
   label?: string;
 }): unknown {
   const React = reactOf();
-  const body = preset.paint.kind === "multicolor" ? preset.paint.layers.map((layer) => layer.body).join(" ") : preset.body;
-  const titleId = idPrefix != null ? `${idPrefix}-${preset.name}-title` : undefined;
-  return React.createElement(
-    "svg",
-    {
-      "aria-hidden": label == null ? true : undefined,
-      "aria-labelledby": label != null && titleId != null ? titleId : undefined,
-      fill: "currentColor",
-      height: icon.height,
-      role: label != null ? "img" : undefined,
-      viewBox: icon.viewBox,
-      width: icon.width,
-      ...svgProps,
-      dangerouslySetInnerHTML: {
-        __html:
-          (label != null && titleId != null ? `<title id="${titleId}">${escapeHtml(label)}</title>` : "") + body,
-      },
-    },
-  );
-}
-
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char] as string);
+  const {
+    "aria-hidden": ariaHiddenProp,
+    "aria-label": ariaLabelProp,
+    "aria-labelledby": ariaLabelledBy,
+    className,
+    focusable,
+    role: roleProp,
+    style,
+    ...rest
+  } = svgProps;
+  const generatedId = React.useId();
+  const ariaLabel = ariaLabelProp ?? (label == null || label === "" ? undefined : label);
+  const hasAccessibleLabel =
+    (ariaLabel != null && ariaLabel !== "") ||
+    (ariaLabelledBy != null && ariaLabelledBy !== "");
+  const ariaHidden = ariaHiddenProp ?? (!hasAccessibleLabel || undefined);
+  const bodyPrefix = idPrefix ?? `${preset.name}-${generatedId}`;
+  return React.createElement("svg", {
+    ...rest,
+    "aria-hidden": ariaHidden,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    className,
+    "data-icon-p3": icon.supportsWideGamut ? preset.name : undefined,
+    focusable,
+    height: preset.canvas.height,
+    role: roleProp ?? (hasAccessibleLabel ? "img" : undefined),
+    style: { ...icon.style, ...(style as Record<string, unknown> | undefined) },
+    viewBox: preset.canvas.viewBox,
+    width: preset.canvas.width,
+    xmlns: "http://www.w3.org/2000/svg",
+    dangerouslySetInnerHTML: { __html: prefixSvgIds(icon.body, bodyPrefix) },
+  });
 }
