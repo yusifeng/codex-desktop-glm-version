@@ -1285,6 +1285,72 @@ declare module "@rchunk/app-shared" {
   export const jf: MenuComponents;
   /** initializeMenu（内部 jft）。 */
   export const If: () => void;
+  export type ContextMenuItemType =
+    | "item" | "checkbox" | "radio" | "label" | "separator";
+  export interface ContextMenuMessage {
+    id: string;
+    defaultMessage?: string;
+  }
+  export interface ContextMenuItem {
+    id: string;
+    type?: ContextMenuItemType;
+    message?: ContextMenuMessage;
+    messageValues?: Record<string, unknown>;
+    tooltipMessage?: ContextMenuMessage;
+    tooltipMessageValues?: Record<string, unknown>;
+    checked?: boolean;
+    closeOnSelect?: boolean;
+    icon?: unknown;
+    accelerator?: string;
+    enabled?: boolean;
+    href?: string;
+    onClick?: (event: ContextMenuEvent) => void;
+    onSelect?: () => void;
+    selectAfterClose?: boolean;
+    tone?: "default" | "danger";
+    submenu?: ContextMenuItem[];
+  }
+  export interface PreparedContextMenuItem extends ContextMenuItem {
+    nativeLabel: string;
+    nativeTooltip?: string;
+    submenu?: PreparedContextMenuItem[];
+  }
+  export interface ContextMenuEvent {
+    altKey?: boolean;
+    ctrlKey?: boolean;
+    defaultPrevented?: boolean;
+    key?: string;
+    metaKey?: boolean;
+    shiftKey?: boolean;
+    target?: unknown;
+    currentTarget?: unknown;
+    preventDefault(): void;
+    stopPropagation(): void;
+  }
+  export interface ContextMenuCloseEvent {
+    defaultPrevented: boolean;
+    preventDefault(): void;
+  }
+  export interface ContextMenuProps extends Record<string, unknown> {
+    items?: ContextMenuItem[];
+    getItems?: () => ContextMenuItem[] | Promise<ContextMenuItem[]>;
+    children: MenuElement;
+    trigger?: "click" | "contextmenu";
+    disableNative?: boolean;
+    align?: "start" | "center" | "end";
+    contentWidth?: "menu" | "trigger" | number | string;
+    onOpenChange?: (open: boolean) => void;
+    open?: boolean;
+    onCloseAutoFocus?: (event: ContextMenuCloseEvent) => void;
+    renderItem?: (item: PreparedContextMenuItem) => unknown;
+    shortcuts?: Record<string, string>;
+    awaitBeforeOpen?: boolean;
+    onBeforeOpen?: () => void | Promise<void>;
+  }
+  /** ContextMenu（app-shared/ui/context-menu.ts，内部 Ift）。 */
+  export const Df: (props: ContextMenuProps) => unknown;
+  /** initializeContextMenu（内部 Kft）。 */
+  export const Of: () => void;
   /** createDerivedFamily（app-shared/runtime/atom-signal.ts，内部 Sje）。 */
   export const rZ: <TScope, Param, TValue>(
     scope: MaitaiScope<TScope>,
