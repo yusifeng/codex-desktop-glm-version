@@ -109,7 +109,8 @@ declare module "@rchunk/app-shared" {
   }
   export type SignalFamily<Param, T> =
     | CallableSignalFamily<Param, T>
-    | ScopedDerivedFamily<unknown, Param, T>;
+    | ScopedDerivedFamily<unknown, Param, T>
+    | ScopedSignalFamily<unknown, Param, T>;
   /** useSignalFamilyValue（app-shared/runtime/atom-signal.ts）。 */
   export const BX: <Param, T>(
     family: SignalFamily<Param, T>,
@@ -166,10 +167,19 @@ declare module "@rchunk/app-shared" {
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
     ): Value;
+    get<Param, Value>(
+      family: ScopedSignalFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
     get<Value = unknown>(signal: unknown, ...parameters: unknown[]): Value;
     getOwnValue<Value>(scope: MaitaiScope<Value>): Value;
     set<Value>(
       signal: ScopedSignal<unknown, Value>,
+      value: Value | ((current: Value) => Value),
+    ): void;
+    set<Param, Value>(
+      family: ScopedSignalFamily<unknown, Param, Value>,
+      parameter: Param,
       value: Value | ((current: Value) => Value),
     ): void;
     set(signal: unknown, value: unknown, ...parameters: unknown[]): void;
@@ -209,6 +219,24 @@ declare module "@rchunk/app-shared" {
     key?: (parameter: Param) => unknown;
     owner?: (parameter: Param) => unknown;
   }
+  export interface ScopedSignalFamilyOptions<Param> {
+    autoDispose?: boolean | number;
+    excludeFieldsFromKey?: readonly string[];
+    key?: (parameter: Param) => unknown;
+    owner?: (parameter: Param) => unknown;
+  }
+  export interface ScopedSignalFamilyScopeApi<TScope, Param>
+    extends MaitaiScopeApi<TScope> {
+    readonly key: Param;
+  }
+  export interface ScopedSignalFamilyValueOptions<TScope, Param, TValue> {
+    getServerSnapshot?: (parameter: Param) => TValue;
+    isEqual?: (previous: TValue, next: TValue) => boolean;
+    onMount?: (
+      setSelf: (value: TValue | ((current: TValue) => TValue)) => void,
+      scope: ScopedSignalFamilyScopeApi<TScope, Param>,
+    ) => void | (() => void);
+  }
   export interface DerivedScopedSignalContext<T = unknown> {
     readonly queryClient: unknown;
     readonly scope: MaitaiScopeApi<T>;
@@ -218,12 +246,22 @@ declare module "@rchunk/app-shared" {
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
     ): Value;
+    get<Param, Value>(
+      family: ScopedSignalFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
     get<Value = unknown>(reader: unknown, ...parameters: unknown[]): Value;
   }
   export interface ScopedDerivedFamily<TScope, Param, TValue> {
     autoDisposeMs: number;
     debugLabel?: string;
     kind: "readable-family";
+    scope: MaitaiScope<TScope>;
+  }
+  export interface ScopedSignalFamily<TScope, Param, TValue> {
+    autoDisposeMs: number;
+    debugLabel?: string;
+    kind: "signal-family";
     scope: MaitaiScope<TScope>;
   }
   /** useScope（app-shared/runtime/atom-signal.ts，内部 mMe）。 */
@@ -298,6 +336,15 @@ declare module "@rchunk/app-shared" {
     key: unknown,
   ) => MaitaiScopeApi<T> | null;
   export const n$: unknown;
+  /** createSignalFamily（app-shared/runtime/atom-signal.ts，内部 bje）。 */
+  export const oZ: <TScope, Param, TValue>(
+    scope: MaitaiScope<TScope>,
+    initialValue:
+      | TValue
+      | ((parameter: Param, context: DerivedScopedSignalContext<TScope>) => TValue),
+    signalOptions?: ScopedSignalFamilyValueOptions<TScope, Param, TValue>,
+    familyOptions?: ScopedSignalFamilyOptions<Param>,
+  ) => ScopedSignalFamily<TScope, Param, TValue>;
   /** createScopedSignal（app-shared/runtime/atom-signal.ts，内部 kI）。 */
   export const pZ: <TScope, TValue>(
     scope: MaitaiScope<TScope>,
