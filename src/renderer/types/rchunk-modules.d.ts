@@ -300,6 +300,133 @@ declare module "@rchunk/app-shared" {
   ) => boolean;
   /** initializeCodexMicroConfig（内部 ML）。 */
   export const DX: () => void;
+  export type ApprovalPolicy = string | Record<string, unknown>;
+  export type ApprovalsReviewer = "user" | "auto_review" | "guardian_subagent";
+  export type SandboxMode = "danger-full-access" | "read-only" | "workspace-write";
+  export type PermissionPreset =
+    | "read-only"
+    | "auto"
+    | "granular"
+    | "guardian-approvals"
+    | "full-access"
+    | "custom";
+  export type BuiltInPermissionPreset = Exclude<PermissionPreset, "custom">;
+  export interface ActivePermissionProfile {
+    id: string;
+    extends: string | null;
+  }
+  export interface ReadOnlySandboxPolicy {
+    type: "readOnly";
+    networkAccess: boolean;
+  }
+  export interface WorkspaceWriteSandboxPolicy {
+    type: "workspaceWrite";
+    writableRoots: string[];
+    excludeSlashTmp: boolean;
+    excludeTmpdirEnvVar: boolean;
+    networkAccess: boolean;
+  }
+  export interface DangerFullAccessSandboxPolicy {
+    type: "dangerFullAccess";
+  }
+  export interface ExternalSandboxPolicy {
+    type: "externalSandbox";
+  }
+  export type SandboxPolicy =
+    | ReadOnlySandboxPolicy
+    | WorkspaceWriteSandboxPolicy
+    | DangerFullAccessSandboxPolicy
+    | ExternalSandboxPolicy;
+  export interface RuntimePermissionState {
+    activePermissionProfile: ActivePermissionProfile | null;
+    runtimeWorkspaceRoots?: string[];
+    sandboxPolicy: SandboxPolicy;
+    approvalPolicy: ApprovalPolicy;
+    approvalsReviewer?: ApprovalsReviewer;
+  }
+  export interface SandboxWorkspaceWriteConfig {
+    writable_roots?: readonly string[];
+    exclude_slash_tmp?: boolean;
+    exclude_tmpdir_env_var?: boolean;
+    network_access?: boolean;
+  }
+  export interface PermissionCliConfig extends Record<string, unknown> {
+    sandbox_mode?: SandboxMode | null;
+    sandbox_workspace_write?: SandboxWorkspaceWriteConfig;
+    approval_policy?: ApprovalPolicy | null;
+    approvals_reviewer?: ApprovalsReviewer | null;
+    features?: Record<string, unknown> | null;
+  }
+  export interface PermissionRequirements {
+    allowedPermissionProfiles?: Record<string, boolean> | null;
+    allowedSandboxModes?: readonly SandboxMode[] | null;
+    allowedApprovalPolicies?: readonly ApprovalPolicy[] | null;
+    allowedApprovalsReviewers?: readonly ApprovalsReviewer[] | null;
+  }
+  /** detectPermissionPreset（app-shared/runtime/permission-profiles.ts，内部 LMe）。 */
+  export const nX: (state: RuntimePermissionState) => PermissionPreset | null;
+  /** getBooleanFeatureFlag（内部 RMe）。 */
+  export const dX: (
+    config: PermissionCliConfig | null | undefined,
+    feature: string,
+  ) => boolean | undefined;
+  /** getPermissionRuntimeSelector（内部 VMe）。 */
+  export const oX: (
+    state: RuntimePermissionState,
+  ) => { sandboxPolicy: SandboxPolicy } | { permissions: string };
+  /** getRuntimeWorkspaceRoots（内部 HMe）。 */
+  export const aX: (state: RuntimePermissionState) => string[];
+  /** getAvailablePermissionPresets（内部 KMe）。 */
+  export const mX: (
+    requirements: PermissionRequirements | null | undefined,
+    config: PermissionCliConfig | null | undefined,
+  ) => PermissionPreset[];
+  /** selectPreferredPermissionPreset（内部 qMe）。 */
+  export const hX: (presets: readonly PermissionPreset[]) => PermissionPreset;
+  /** listAllowedPermissionPresets（内部 YMe）。 */
+  export const pX: (
+    requirements: PermissionRequirements | null | undefined,
+  ) => BuiltInPermissionPreset[];
+  /** isPermissionPresetAllowed（内部 XMe）。 */
+  export const cX: (
+    preset: BuiltInPermissionPreset,
+    requirements: PermissionRequirements | null | undefined,
+  ) => boolean;
+  /** createWorkspaceWritePermissionState（内部 LL）。 */
+  export const tX: (
+    workspaceRoots: string[],
+    config?: SandboxWorkspaceWriteConfig,
+    approvalPolicy?: ApprovalPolicy | null,
+    approvalsReviewer?: ApprovalsReviewer,
+    activePermissionProfile?: ActivePermissionProfile | null,
+  ) => RuntimePermissionState;
+  /** createReadOnlyPermissionState（内部 RL）。 */
+  export const eX: (
+    approvalPolicy?: ApprovalPolicy | null,
+    approvalsReviewer?: ApprovalsReviewer,
+    activePermissionProfile?: ActivePermissionProfile | null,
+  ) => RuntimePermissionState;
+  /** createPermissionStateForPreset（内部 zL）。 */
+  export const $Y: (
+    preset: PermissionPreset,
+    workspaceRoots: string[],
+    config?: PermissionCliConfig | null,
+  ) => RuntimePermissionState;
+  /** resolveApprovalsReviewer（内部 $Me）。 */
+  export const rX: (
+    config: PermissionCliConfig | null | undefined,
+  ) => ApprovalsReviewer;
+  /** inferPermissionPresetFromConfig（内部 tNe）。 */
+  export const iX: (
+    config: PermissionCliConfig | null | undefined,
+    defaultPreset?: PermissionPreset,
+  ) => PermissionPreset | null;
+  /** isGuardianApprovalEnabled（内部 BL）。 */
+  export const fX: (
+    config: PermissionCliConfig | null | undefined,
+  ) => boolean | undefined;
+  /** initializePermissionProfiles（内部 UL）。 */
+  export const sX: () => void;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
     readonly query: {
