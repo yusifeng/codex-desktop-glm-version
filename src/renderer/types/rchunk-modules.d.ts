@@ -183,6 +183,9 @@ declare module "@rchunk/usage" { export const n: () => void; export const t: unk
 declare module "@rchunk/task-announcement-candidates" { export const TaskAnnouncementCandidates: unknown; }
 declare module "@rchunk/popup" { export const i: unknown; export const n: () => void; export const r: unknown; export const t: unknown; }
 declare module "@rchunk/browser-address-suggestion-overlay" { export const BrowserAddressSuggestionOverlay: unknown; }
+declare module "@rchunk/home-beacon" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
 
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
   export const a: () => void;
