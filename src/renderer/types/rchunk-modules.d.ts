@@ -757,8 +757,7 @@ declare module "@rchunk/app-shared" {
   export interface ReactRef<T> {
     current: T;
   }
-  // React 兼容导出（e6 = react 模块命名空间，含 createContext/use 等）。
-  export const e6: {
+  export interface ReactRuntime {
     Fragment: unknown;
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
     use<T>(context: unknown): T;
@@ -772,8 +771,15 @@ declare module "@rchunk/app-shared" {
     useMemo<T>(factory: () => T, dependencies: readonly unknown[]): T;
     useRef<T>(initialValue: T): ReactRef<T>;
     useState<T>(initialValue: T): [T, (value: T | ((current: T) => T)) => void];
+    useSyncExternalStore<Snapshot>(
+      subscribe: (listener: () => void) => () => void,
+      getSnapshot: () => Snapshot,
+      getServerSnapshot?: () => Snapshot,
+    ): Snapshot;
     [key: string]: unknown;
-  };
+  }
+  // React 兼容导出（e6 为可延迟初始化、也可直接访问的 React 模块命名空间）。
+  export const e6: (() => ReactRuntime) & ReactRuntime;
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   /** initializeJsxRuntimeLazy（rolldown lazy 辅助）。 */
   export const $3: () => void;
@@ -2758,6 +2764,13 @@ declare module "@rchunk/app-initial" {
   export const cJt: () => void;
   /** 账户隔离的应用 API client。 */
   export const rJt: ApiClient;
+  /** initializeImmutableState（Immer producer 依赖初始化器）。 */
+  export const Zhn: () => void;
+  /** produceImmutable（基于 recipe 生成不可变状态副本）。 */
+  export const Qhn: <Value>(
+    value: Value,
+    recipe: (draft: Value) => void,
+  ) => Value;
   /** initializeThreadState（pending-onboarding 依赖的线程索引初始化器）。 */
   export const Ftn: () => void;
   /** 当前用户 ID signal。 */
@@ -4133,9 +4146,37 @@ declare module "@rchunk/appgen-database-page" {
 }
 
 declare module "@rchunk/chart-stores" {
+  export type ChartPartition = Record<string, unknown>;
+  export type ChartStateUpdate<State> = State | ((current: State) => State);
+  export interface ChartExternalStore<State> {
+    <Selection = State>(selector?: (value: State) => Selection): Selection;
+    getInitialState(): State;
+    getState(): State;
+    setState(update: ChartStateUpdate<State>, replace?: boolean): void;
+    subscribe(listener: (next: State, previous: State) => void): () => void;
+  }
+  export interface ChartStores {
+    useNameToIdStore: ChartExternalStore<ChartPartition>;
+    useWidgetStateStore: ChartExternalStore<ChartPartition>;
+  }
+  export interface ChartRuntimeContext {
+    activeBreakpoints: readonly unknown[];
+    errorMode: "throw";
+    flags: Record<string, unknown>;
+    getActiveBreakpointValue<Value>(value: { default: Value }): Value;
+    streaming: false;
+    theme: unknown;
+    useNameToIdStore: ChartExternalStore<ChartPartition>;
+    useWidgetStateStore: ChartExternalStore<ChartPartition>;
+    [key: string]: unknown;
+  }
   export const n: () => void;
-  export const r: (...args: any[]) => any;
-  export const t: (...args: any[]) => any;
+  export const r: () => ChartStores;
+  export const t: (
+    theme: unknown,
+    stores: ChartStores,
+    flags?: Record<string, unknown>,
+  ) => ChartRuntimeContext;
 }
 
 declare module "@rchunk/appgen-query" {

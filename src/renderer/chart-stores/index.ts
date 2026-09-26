@@ -4,15 +4,77 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type {
+  MaitaiScopeApi,
+  ReactRuntime,
+  ScopedSignal,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-let React: any;
-let chartStateAtom: any;
 
-function useChartStores() {
-  const scope = appShared.LX(appShared.ZI);
+type ChartPartition = Record<string, unknown>;
+
+interface ChartState {
+  nameToId: ChartPartition;
+  widgetState: ChartPartition;
+}
+
+type ChartStateUpdate<State> = State | ((current: State) => State);
+
+export interface ChartExternalStore<State> {
+  <Selection = State>(selector?: (value: State) => Selection): Selection;
+  getInitialState(): State;
+  getState(): State;
+  setState(update: ChartStateUpdate<State>, replace?: boolean): void;
+  subscribe(listener: (next: State, previous: State) => void): () => void;
+}
+
+export interface ChartStores {
+  useNameToIdStore: ChartExternalStore<ChartPartition>;
+  useWidgetStateStore: ChartExternalStore<ChartPartition>;
+}
+
+export interface ChartRuntimeContext {
+  activeBreakpoints: readonly unknown[];
+  errorMode: "throw";
+  evaluate(): undefined;
+  flags: Record<string, unknown>;
+  getActiveBreakpointValue<Value>(value: { default: Value }): Value;
+  isPrimarilyTouchDevice: false;
+  mapboxAccessToken: null;
+  onAction(): Promise<undefined>;
+  onError(): undefined;
+  onSoftFailure(): undefined;
+  onStateMutation(): undefined;
+  preferNativeControls: false;
+  setRootWidgetElement(): undefined;
+  showRenderFailureDebugInfo: false;
+  streaming: false;
+  theme: unknown;
+  useNameToIdStore: ChartExternalStore<ChartPartition>;
+  usePointerDown: false;
+  useWidgetStateStore: ChartExternalStore<ChartPartition>;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  FX: initializeSignalRuntime,
+  LX: useSignalScope,
+  QI: initializeAppScope,
+  ZI: appScope,
+  e6: getReactRuntime,
+  pZ: createScopedSignal,
+} = appSharedChunk;
+const {
+  Qhn: produceImmutable,
+  Zhn: initializeImmutableState,
+} = appInitialChunk;
+
+let React: ReactRuntime;
+let chartStateAtom: ScopedSignal<Record<string, unknown>, ChartState>;
+
+function useChartStores(): ChartStores {
+  const scope = useSignalScope(appScope);
   return {
     useNameToIdStore: createChartExternalStore(scope, "nameToId"),
     useWidgetStateStore: createChartExternalStore(scope, "widgetState"),
@@ -20,16 +82,16 @@ function useChartStores() {
 }
 
 function createChartRuntimeContext(
-  theme: any,
-  { useNameToIdStore, useWidgetStateStore }: any,
-  flags: Record<string, any> = {},
-) {
+  theme: unknown,
+  { useNameToIdStore, useWidgetStateStore }: ChartStores,
+  flags: Record<string, unknown> = {},
+): ChartRuntimeContext {
   return {
     activeBreakpoints: [],
     errorMode: "throw",
     evaluate: () => undefined,
     flags,
-    getActiveBreakpointValue: (value: any) => value.default,
+    getActiveBreakpointValue: <Value>(value: { default: Value }) => value.default,
     isPrimarilyTouchDevice: false,
     mapboxAccessToken: null,
     onAction: async () => undefined,
@@ -47,15 +109,18 @@ function createChartRuntimeContext(
   };
 }
 
-function createChartExternalStore(scope: any, key: "nameToId" | "widgetState") {
+function createChartExternalStore<Key extends keyof ChartState>(
+  scope: MaitaiScopeApi<Record<string, unknown>>,
+  key: Key,
+): ChartExternalStore<ChartState[Key]> {
   const getState = () => scope.get(chartStateAtom)[key];
-  const initialState = { nameToId: {}, widgetState: {} }[key];
-  function setState(update: any, replace = false) {
-    scope.set(chartStateAtom, (current: any) => {
+  const initialState: ChartState[Key] = { nameToId: {}, widgetState: {} }[key];
+  function setState(update: ChartStateUpdate<ChartState[Key]>, replace = false) {
+    scope.set(chartStateAtom, (current) => {
       const previous = current[key];
       const next = typeof update === "function" ? update(previous) : update;
       if (Object.is(next, previous)) return current;
-      return appInitial.Qhn(current, (draft: any) => {
+      return produceImmutable(current, (draft) => {
         const target = draft[key];
         if (replace) {
           for (const entry of Object.keys(target)) delete target[entry];
@@ -65,9 +130,11 @@ function createChartExternalStore(scope: any, key: "nameToId" | "widgetState") {
     });
   }
   const getInitialState = () => initialState;
-  function subscribe(listener: (next: any, previous: any) => void) {
+  function subscribe(
+    listener: (next: ChartState[Key], previous: ChartState[Key]) => void,
+  ) {
     let previous = getState();
-    return scope.watch((snapshot: any) => {
+    return scope.watch((snapshot) => {
       const next = snapshot.get(chartStateAtom)[key];
       if (Object.is(next, previous)) return;
       const old = previous;
@@ -75,7 +142,13 @@ function createChartExternalStore(scope: any, key: "nameToId" | "widgetState") {
       listener(next, old);
     });
   }
-  function useStore(selector?: (value: any) => any) {
+  function useStore(): ChartState[Key];
+  function useStore<Selection>(
+    selector: (value: ChartState[Key]) => Selection,
+  ): Selection;
+  function useStore<Selection>(
+    selector?: (value: ChartState[Key]) => Selection,
+  ): Selection | ChartState[Key] {
     const getSnapshot = () =>
       selector == null ? getState() : selector(getState());
     const getServerSnapshot = () =>
@@ -95,12 +168,12 @@ function createChartExternalStore(scope: any, key: "nameToId" | "widgetState") {
 }
 
 function initializeChartStores(): void {
-  appShared.$3();
-  appInitial.Zhn();
-  appShared.FX();
-  React = appShared.e6();
-  appShared.QI();
-  chartStateAtom = appShared.pZ(appShared.ZI, () => ({
+  initializeRuntimeLazy();
+  initializeImmutableState();
+  initializeSignalRuntime();
+  React = getReactRuntime();
+  initializeAppScope();
+  chartStateAtom = createScopedSignal(appScope, () => ({
     nameToId: {},
     widgetState: {},
   }));
