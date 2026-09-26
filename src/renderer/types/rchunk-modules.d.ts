@@ -728,6 +728,11 @@ declare module "@rchunk/automation-delete-confirmation-dialog" {
   export const t: unknown;
 }
 
+declare module "@rchunk/delete-archived-chats-dialog" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/migrated-plugin-access" {
   export const a: () => void;
   export const i: (...args: any[]) => any;

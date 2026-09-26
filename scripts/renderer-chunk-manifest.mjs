@@ -904,6 +904,7 @@ export const REWRITTEN = new Set([
   "gpt-management-url",
   "gpt-plugin-migration-dialog",
   "automation-delete-confirmation-dialog",
+  "delete-archived-chats-dialog",
   "home-beacon",
   "home-beacon-finance",
   "composer-utility-bar",
