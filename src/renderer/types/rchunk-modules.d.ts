@@ -4631,15 +4631,23 @@ declare module "@rchunk/appgen-disabled-tooltip" {
 }
 
 declare module "@rchunk/appgen-card-layout" {
-  export interface AppgenCardThumbnailLayoutProps
-    extends Record<string, unknown> {
-    aspectRatio?: string;
+  export interface AppgenCardElementProps extends Record<string, unknown> {
     children?: unknown;
     className?: string;
+  }
+  export interface AppgenCardThumbnailLayoutProps
+    extends AppgenCardElementProps {
+    aspectRatio?: string;
+    viewMode: "grid" | "list";
+  }
+  export interface AppgenCardTitleProps extends AppgenCardElementProps {
     viewMode: "grid" | "list";
   }
   export const a: () => void;
+  export const i: (props: AppgenCardElementProps) => unknown;
   export const n: (props: AppgenCardThumbnailLayoutProps) => unknown;
+  export const r: (props: AppgenCardTitleProps) => unknown;
+  export const t: (props: AppgenCardElementProps) => unknown;
 }
 
 declare module "@rchunk/sites-default-thumbnail" {

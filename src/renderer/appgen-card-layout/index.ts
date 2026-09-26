@@ -3,12 +3,35 @@
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-let jsx: any;
+const {
+  $3: initializeReactRuntime,
+  C_: initializeCardActions,
+  I3: getJsxRuntime,
+  Zh: initializeButton,
+  c_: initializeCardTypography,
+  h4: initializeImageComponent,
+  m4: classNames,
+} = appSharedChunk;
+let jsx: JsxRuntime;
 
-function AppgenCardThumbnail(props: any) {
+interface AppgenCardElementProps extends Record<string, unknown> {
+  children?: unknown;
+  className?: string;
+}
+
+interface AppgenCardThumbnailProps extends AppgenCardElementProps {
+  aspectRatio?: "landscape" | "square" | string;
+  viewMode: "grid" | "list";
+}
+
+interface AppgenCardTitleProps extends AppgenCardElementProps {
+  viewMode: "grid" | "list";
+}
+
+function AppgenCardThumbnail(props: AppgenCardThumbnailProps): unknown {
   const {
     children,
     className,
@@ -21,7 +44,7 @@ function AppgenCardThumbnail(props: any) {
     viewMode === "grid" &&
     (aspectRatio === "landscape" ? "aspect-230/150" : "aspect-square");
   return jsx.jsx("div", {
-    className: appShared.m4(
+    className: classNames(
       "relative shrink-0 overflow-hidden",
       sizeClass,
       aspectClass,
@@ -32,12 +55,12 @@ function AppgenCardThumbnail(props: any) {
   });
 }
 
-function AppgenCardTitle(props: any) {
+function AppgenCardTitle(props: AppgenCardTitleProps): unknown {
   const { className, viewMode, ...rest } = props;
   const typography =
     viewMode === "list" ? "text-sm leading-5" : "text-xs leading-[18px]";
   return jsx.jsx("div", {
-    className: appShared.m4(
+    className: classNames(
       "truncate font-medium text-default",
       typography,
       className,
@@ -46,18 +69,18 @@ function AppgenCardTitle(props: any) {
   });
 }
 
-function AppgenCardDescription(props: any) {
+function AppgenCardDescription(props: AppgenCardElementProps): unknown {
   const { className, ...rest } = props;
   return jsx.jsx("div", {
-    className: appShared.m4("text-xs leading-[18px] text-secondary", className),
+    className: classNames("text-xs leading-[18px] text-secondary", className),
     ...rest,
   });
 }
 
-function AppgenCardActions(props: any) {
+function AppgenCardActions(props: AppgenCardElementProps): unknown {
   const { className, ...rest } = props;
   return jsx.jsx("div", {
-    className: appShared.m4(
+    className: classNames(
       "pointer-events-auto relative z-10 flex items-center gap-2 ps-4 [@container_(max-width:420px)]:gap-1 [@container_(max-width:420px)]:ps-2",
       className,
     ),
@@ -66,12 +89,12 @@ function AppgenCardActions(props: any) {
 }
 
 function initializeAppgenCardLayout(): void {
-  appShared.$3();
-  appShared.h4();
-  appShared.Zh();
-  appShared.C_();
-  appShared.c_();
-  jsx = appShared.I3();
+  initializeReactRuntime();
+  initializeImageComponent();
+  initializeButton();
+  initializeCardActions();
+  initializeCardTypography();
+  jsx = getJsxRuntime();
 }
 
 export {
