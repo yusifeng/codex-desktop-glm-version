@@ -1170,6 +1170,121 @@ declare module "@rchunk/app-shared" {
   export const o_: (props: TooltipProps) => unknown;
   /** initializeTooltip（内部 U3）。 */
   export const c_: () => void;
+  export interface MenuEvent {
+    defaultPrevented?: boolean;
+    key?: string;
+    metaKey?: boolean;
+    ctrlKey?: boolean;
+    preventDefault(): void;
+    stopPropagation(): void;
+    currentTarget?: { select?(): void };
+  }
+  export interface MenuBaseProps extends Record<string, unknown> {
+    children?: unknown;
+    className?: string;
+    disabled?: boolean;
+  }
+  export interface MenuContentProps extends MenuBaseProps {
+    align?: "start" | "center" | "end";
+    sideOffset?: number;
+    size?: "default" | "large" | "descriptive" | "select";
+    surface?: "menu" | "panel" | "glass" | "chatgpt" | "bare";
+    variant?: "default" | "attached" | "picker";
+    style?: Record<string, unknown>;
+  }
+  export interface MenuItemProps extends MenuBaseProps {
+    asChild?: boolean;
+    href?: string;
+    onClick?: (event: MenuEvent) => void;
+    onSelect?: (event: MenuEvent) => void;
+    isActive?: boolean;
+    focusableWhenDisabled?: boolean;
+    leftIcon?: unknown;
+    rightIcon?: unknown;
+    keyboardShortcut?: unknown;
+    rightText?: unknown;
+    SubText?: unknown;
+    tone?: "default" | "danger";
+    variant?: "default" | "hint" | "label" | "display" | "detail" | "unstyled";
+    allowWrap?: boolean;
+    subTextAllowWrap?: boolean;
+    textOverflow?: "ellipsis" | "fade";
+    tooltipText?: unknown;
+    tooltipDisabled?: boolean;
+    tooltipSide?: TooltipSide;
+    tooltipAlign?: TooltipAlign;
+    tooltipOpenWhen?: TooltipOpenWhen;
+  }
+  export interface MenuCheckboxItemProps extends MenuBaseProps {
+    checked?: boolean;
+    closeOnSelect?: boolean;
+    href?: string;
+    indicator?: "checkmark" | "switch";
+    leftIcon?: unknown;
+    onSelect?: (event: MenuEvent) => void;
+    SubText?: unknown;
+  }
+  export interface MenuRadioItemProps extends MenuBaseProps {
+    value?: string;
+    href?: string;
+    icon?: unknown;
+    SubText?: unknown;
+    variant?: "default" | "icon" | "swatch" | "chatgpt";
+  }
+  export interface MenuInputProps extends Record<string, unknown> {
+    className?: string;
+    onKeyDown?: (event: MenuEvent) => void;
+  }
+  export interface MenuSearchInputProps extends MenuInputProps {
+    inputClassName?: string;
+    sticky?: boolean;
+    trailingContent?: unknown;
+    variant?: "default" | "inset";
+  }
+  export interface MenuElement {
+    type: unknown;
+    props: Record<string, unknown>;
+  }
+  export interface MenuComponents {
+    Trigger: (props: MenuBaseProps) => unknown;
+    Content: (props: MenuContentProps) => unknown;
+    Item: (props: MenuItemProps) => unknown;
+    ItemSlot: (props: MenuBaseProps) => unknown;
+    CheckboxItem: (props: MenuCheckboxItemProps) => unknown;
+    RadioGroup: (props: MenuBaseProps) => unknown;
+    RadioItem: (props: MenuRadioItemProps) => unknown;
+    ItemIcon: (
+      props: MenuBaseProps & { size?: "xs" | "sm" | "base" | "md" },
+    ) => unknown;
+    Input: (props: MenuInputProps) => unknown;
+    SearchInput: (props: MenuSearchInputProps) => unknown;
+    Separator: (
+      props: MenuBaseProps & { variant?: "default" | "chatgpt" },
+    ) => unknown;
+    SectionLabel: (props: MenuBaseProps) => unknown;
+    Message: (
+      props: MenuBaseProps & {
+        tone?: "muted" | "error";
+        compact?: boolean;
+        centered?: boolean;
+        variant?: "default" | "chatgpt";
+      },
+    ) => unknown;
+    Title: (props: MenuBaseProps) => unknown;
+    SubmenuItem: (props: {
+      trigger: MenuElement;
+      children?: unknown;
+      isDefaultOpen?: boolean;
+      onOpenChange?: (open: boolean) => void;
+    }) => unknown;
+    FlyoutSubmenuItem: (props: MenuItemProps) => unknown;
+    Group: (props: MenuBaseProps) => unknown;
+    Section: (props: MenuBaseProps) => unknown;
+  }
+  /** Menu（app-shared/ui/menu.ts，内部 O7）。 */
+  export const jf: MenuComponents;
+  /** initializeMenu（内部 jft）。 */
+  export const If: () => void;
   /** createDerivedFamily（app-shared/runtime/atom-signal.ts，内部 Sje）。 */
   export const rZ: <TScope, Param, TValue>(
     scope: MaitaiScope<TScope>,
