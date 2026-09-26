@@ -1143,6 +1143,12 @@ declare module "@rchunk/appgen-database-page" {
   export const AppgenDatabasePage: (...args: any[]) => any;
 }
 
+declare module "@rchunk/chart-stores" {
+  export const n: () => void;
+  export const r: (...args: any[]) => any;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/appgen-query" {
   export const APPGEN_ACCESS_GROUPS_QUERY_KEY: any;
   export const APPGEN_CUSTOM_DOMAINS_QUERY_KEY: any;
