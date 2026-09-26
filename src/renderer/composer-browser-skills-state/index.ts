@@ -91,7 +91,10 @@ async function submitWithBrowserSkills(
 
   let installedSkills: BrowserSkillRecord[];
   try {
-    installedSkills = await scope.query.getOrFetch(installedBrowserSkillsQuery, "installed");
+    installedSkills = await scope.query.getOrFetch<BrowserSkillRecord[]>(
+      installedBrowserSkillsQuery,
+      "installed",
+    );
   } catch {
     scope.set(browserSkillResolutionFailedSignal, true);
     return false;

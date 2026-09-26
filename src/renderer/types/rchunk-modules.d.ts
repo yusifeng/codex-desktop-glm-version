@@ -151,13 +151,19 @@ declare module "@rchunk/app-shared" {
   ) => MaitaiScope<T>;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
+    readonly query: {
+      getOrFetch<Result>(query: unknown, ...parameters: unknown[]): Promise<Result>;
+      [key: string]: unknown;
+    };
     readonly scope: MaitaiScope<T>;
     readonly value: T;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
+    get<Value = unknown>(signal: unknown, ...parameters: unknown[]): Value;
     set<Value>(
       signal: ScopedSignal<unknown, Value>,
       value: Value | ((current: Value) => Value),
     ): void;
+    set(signal: unknown, value: unknown, ...parameters: unknown[]): void;
     [key: string]: unknown;
   }
   export interface ScopedSignalInitializerContext<T = unknown> {
@@ -227,7 +233,12 @@ declare module "@rchunk/app-shared" {
     | undefined;
   /** classNames（app-shared/ui/class-names.ts，内部 J）。 */
   export const m4: (...values: ClassValue[]) => string;
-  export const mZ: any;
+  /** getRetainedScopeState（app-shared/runtime/atom-signal.ts，内部 dje）。 */
+  export const mZ: <T>(
+    activeScope: MaitaiScopeApi<unknown>,
+    scope: MaitaiScope<T>,
+    key: unknown,
+  ) => MaitaiScopeApi<T> | null;
   export const n$: unknown;
   /** createScopedSignal（app-shared/runtime/atom-signal.ts，内部 kI）。 */
   export const pZ: <TScope, TValue>(

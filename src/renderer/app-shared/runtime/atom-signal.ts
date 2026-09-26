@@ -411,6 +411,10 @@ export function createScope<T>(
   },
 ): Scope<T> {
   normalizeAutoDispose(options?.retain?.autoDispose);
+  const retainMax = options?.retain?.max;
+  if (retainMax != null && (!Number.isInteger(retainMax) || retainMax < 0)) {
+    throw new RangeError("retain.max must be a nonnegative integer");
+  }
   return {
     __scopeBrand: brand,
     getKey: options?.key,
@@ -433,6 +437,7 @@ export const AppScope = createScope<Record<string, unknown>>("AppScope");
 export interface ScopeState<T = unknown> {
   parent?: ScopeState<unknown>;
   queryClient?: unknown;
+  retainedScopeEntries: Map<Scope<unknown>, Map<unknown, ScopeState<unknown>>>;
   scope: Scope<T>;
   signalBindings: Map<ScopedSignal<unknown, unknown>, Atom<unknown>>;
   store: AtomStore;
@@ -442,6 +447,7 @@ export interface ScopeState<T = unknown> {
 export interface CreateScopeStateOptions {
   parent?: ScopeState<unknown>;
   queryClient?: unknown;
+  retainKey?: unknown;
   store?: AtomStore;
 }
 
@@ -485,8 +491,13 @@ function findScopeState<T>(state: ScopeState<unknown>, scope: Scope<T>): ScopeSt
   throw new Error(`Missing scope instance: ${scope.__scopeBrand}`);
 }
 
+const scopeApiByState = new WeakMap<ScopeState<unknown>, ScopeApi<unknown>>();
+const scopeStateByApi = new WeakMap<ScopeApi<unknown>, ScopeState<unknown>>();
+
 function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
-  return {
+  const cached = scopeApiByState.get(state);
+  if (cached != null) return cached as ScopeApi<T>;
+  const api: ScopeApi<T> = {
     get queryClient() {
       if (state.queryClient == null) throw new Error("Missing query client");
       return state.queryClient;
@@ -505,6 +516,14 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
       owner.store.set(signal.resolve(state), value);
     },
   };
+  scopeApiByState.set(state, api as ScopeApi<unknown>);
+  scopeStateByApi.set(api as ScopeApi<unknown>, state as ScopeState<unknown>);
+  return api;
+}
+
+/** 把 scope 实例节点包装为可读写门面。 */
+export function getScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
+  return createScopeApi(state);
 }
 
 /** 创建一个 scope 实例，供语义源码和独立测试装配 scope 链。 */
@@ -516,14 +535,50 @@ export function createScopeState<T>(
   if (scope.parent != null && options.parent?.scope !== scope.parent) {
     throw new Error(`Missing parent scope instance: ${scope.parent.__scopeBrand}`);
   }
-  return {
+  const state: ScopeState<T> = {
     parent: options.parent,
     queryClient: options.queryClient ?? options.parent?.queryClient,
+    retainedScopeEntries: new Map(),
     scope,
     signalBindings: new Map(),
     store: options.store ?? options.parent?.store ?? createStore(),
     value,
   };
+  if (scope.parent != null && scope.retain != null && options.parent != null) {
+    let entries = options.parent.retainedScopeEntries.get(scope);
+    if (entries == null) {
+      entries = new Map();
+      options.parent.retainedScopeEntries.set(scope, entries);
+    }
+    const key = options.retainKey ?? scope.getKey?.(value) ?? value;
+    entries.delete(key);
+    entries.set(key, state as ScopeState<unknown>);
+    const max = scope.retain.max;
+    if (max != null) {
+      while (entries.size > max) {
+        const oldestKey = entries.keys().next().value;
+        entries.delete(oldestKey);
+      }
+    }
+  }
+  return state;
+}
+
+/**
+ * 查找已由父 scope 保留的子 scope（原 `dje` / 压缩导出 `mZ`）。根 scope
+ * 没有父节点，未命中时返回 null；命中后返回绑定到该子实例的 scope API。
+ */
+export function getRetainedScopeState<T>(
+  activeScope: ScopeApi<unknown>,
+  scope: Scope<T>,
+  key: unknown,
+): ScopeApi<T> | null {
+  if (scope.parent == null) return null;
+  const activeState = scopeStateByApi.get(activeScope);
+  if (activeState == null) throw new Error("Missing scope state");
+  const parentState = findScopeState(activeState, scope.parent);
+  const retained = parentState.retainedScopeEntries.get(scope)?.get(key);
+  return retained == null ? null : createScopeApi(retained as ScopeState<T>);
 }
 
 /**
