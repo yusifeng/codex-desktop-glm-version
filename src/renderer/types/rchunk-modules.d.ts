@@ -241,6 +241,34 @@ declare module "@rchunk/chatgpt-cme" {
   export const r: () => void;
 }
 
+declare module "@rchunk/pca-connector-action" {
+  export const n: unknown;
+  export const r: (...args: any[]) => Promise<unknown>;
+  export const t: () => void;
+}
+
+declare module "@rchunk/app-connect-modal-by-id" {
+  export const n: unknown;
+  export const r: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/use-app-connect-flow" {
+  export const n: (...args: any[]) => any;
+  export const t: () => void;
+}
+
+declare module "@rchunk/app-connect-modal" {
+  export const n: () => void;
+  export const t: unknown;
+  export const _any: any;
+}
+
+declare module "@rchunk/app-info" {
+  export const n: () => void;
+  export const t: (app: any) => any;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;

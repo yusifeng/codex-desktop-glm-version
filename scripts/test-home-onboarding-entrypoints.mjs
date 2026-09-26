@@ -376,5 +376,97 @@ check(
 globalThis.__homeOnboardingTest.cme.mobile = true;
 check(cmeEntry.CmeHomeEntryPoint() === null, "hides CME on narrow viewports");
 
-assert.equal(assertions, 26);
+globalThis.__homeOnboardingTest.connect = [];
+const beaconConnect = await loadModule("codex-app-home-beacon-connect-modal", {
+  "app-connect-modal-by-id": `
+    export const n = "ConnectById";
+    export const r = () => {};
+  `,
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const LX = () => ({ id: "scope" });
+    export const e6 = { useState: value => [value, next => globalThis.__homeOnboardingTest.connect.push(["loading", next])] };
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+  `,
+  "pca-connector-action": `
+    export const r = async (_scope, target) => globalThis.__homeOnboardingTest.connect.push(["resume", target]);
+    export const t = () => {};
+  `,
+  "use-app-connect-flow": `
+    export const n = () => ({ handleAppConnectOAuthStarted: event => globalThis.__homeOnboardingTest.connect.push(["oauth", event]) });
+    export const t = () => {};
+  `,
+});
+const connectTree = beaconConnect.CodexAppHomeBeaconConnectModal({
+  connectorId: "gmail",
+  onOpenChange() {},
+  pcaResumeTarget: "resume-1",
+});
+check(
+  connectTree.type === "ConnectById" &&
+    connectTree.props.waitForConnectedHandler === true &&
+    connectTree.props.allowBrowserFallback === false,
+  "configures resumed Beacon connections",
+);
+await connectTree.props.onConnected();
+check(
+  globalThis.__homeOnboardingTest.connect.some(
+    ([kind, value]) => kind === "resume" && value === "resume-1",
+  ),
+  "resumes PCA after connection",
+);
+connectTree.props.onOAuthStarted({ connectorId: "gmail" });
+check(
+  globalThis.__homeOnboardingTest.connect.at(-1)[1].resumeTarget === "resume-1",
+  "forwards the PCA resume target into OAuth",
+);
+
+const pastedConnect = await loadModule("pasted-link-connect-modal", {
+  "app-connect-modal": `
+    export const n = () => {};
+    export const t = "ConnectModal";
+  `,
+  "app-info": `
+    export const n = () => {};
+    export const t = app => ({ ...app, normalized: true });
+  `,
+  "app-shared": "export const I3 = globalThis.__homeOnboardingTest.jsx;",
+  "use-app-connect-flow": `
+    export const n = () => ({
+      handleAppConnected: id => globalThis.__homeOnboardingTest.connect.push(["connected", id]),
+      handleAppConnectOAuthStarted: event => globalThis.__homeOnboardingTest.connect.push(["pasted-oauth", event])
+    });
+    export const t = () => {};
+  `,
+});
+let pastedConnected = false;
+const pastedTree = pastedConnect.LibraryPastedLinkConnectModal({
+  app: { id: "drive", name: "Drive" },
+  area: "library",
+  onConnected() {
+    pastedConnected = true;
+  },
+  onOpenChange() {},
+  reauthLinkId: "link-1",
+});
+check(
+  pastedTree.type === "ConnectModal" &&
+    pastedTree.props.app.normalized === true &&
+    pastedTree.props.connectorAuth.authReason === "reauth_required",
+  "normalizes apps and configures reauthentication",
+);
+pastedTree.props.onConnected();
+check(
+  pastedConnected &&
+    globalThis.__homeOnboardingTest.connect.at(-1)[1] === "drive",
+  "records successful pasted-link connections",
+);
+pastedTree.props.onOAuthStarted({ connectorId: "drive" });
+check(
+  globalThis.__homeOnboardingTest.connect.at(-1)[1]
+    .pastedLinkProductExperience === "library",
+  "forwards pasted-link product context into OAuth",
+);
+
+assert.equal(assertions, 32);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
