@@ -77,6 +77,9 @@ declare module "@rchunk/app-shared" {
   export const $h: () => void; // i8：资源按钮依赖初始化器
   export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
+  export type QueryKey = readonly unknown[];
+  /** hashQueryKey（app-shared/runtime/query-structural-utils.ts）。 */
+  export const AZ: (queryKey: QueryKey) => string;
   export const Am: {
     kind: "browser";
     loadDetachedRenderer(): Promise<unknown>;
@@ -126,6 +129,8 @@ declare module "@rchunk/app-shared" {
   export const W2: (descriptor: unknown) => unknown;
   export const LX: unknown;
   export const P3: unknown;
+  /** replaceEqualDeep（app-shared/runtime/query-structural-utils.ts）。 */
+  export const PZ: <T>(previous: unknown, next: T) => T;
   export const QI: () => void;
   export interface IconAssetPreset {
     body: string;
