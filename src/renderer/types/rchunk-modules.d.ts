@@ -365,6 +365,15 @@ declare module "@rchunk/location-permission-denied-dialog" {
   export const ChatGptLocationPermissionDeniedDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/plugin-skill-preview" {
+  export const r: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/chatgpt-skill-source-dialog" {
+  export const ChatGptSkillSourceDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
