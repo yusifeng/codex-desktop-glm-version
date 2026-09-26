@@ -295,6 +295,17 @@ declare module "@rchunk/browser-profile-import-dialog" {
   export const BrowserProfileImportDialogModal: unknown;
 }
 
+declare module "@rchunk/shuffle" {
+  export const t: <T>(items: T[]) => T[];
+}
+
+declare module "@rchunk/departments" {
+  export const a: (...args: any[]) => any;
+  export const i: unknown;
+  export const n: () => void;
+  export const t: Record<string, string[]>;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;

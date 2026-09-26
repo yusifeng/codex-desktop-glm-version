@@ -723,5 +723,83 @@ check(
   "does not reopen an active import dialog",
 );
 
-assert.equal(assertions, 52);
+globalThis.__homeOnboardingTest.clinical = {
+  focused: false,
+  prompt: "",
+  data: {
+    accountId: "account-1",
+    userId: "user-1",
+    prompts: [
+      {
+        id: "decision",
+        kind: "clinical_decision_support",
+        prompt: "Review this differential",
+      },
+      {
+        id: "guidelines",
+        kind: "latest_guidelines",
+        prompt: "Find the latest guideline",
+      },
+    ],
+  },
+};
+const starterPrompts = await loadModule("home-starter-prompts", {
+  "app-initial": `
+    export const kht = Symbol("scope");
+    export const v2 = Symbol("conversation");
+    export const A2 = Symbol("inert");
+    export const Xet = Symbol("capability");
+    export const Qet = Symbol("identity");
+    export const HZ = () => ({
+      hasText: () => false,
+      setPromptText: text => { globalThis.__homeOnboardingTest.clinical.prompt = text; },
+      focus: () => { globalThis.__homeOnboardingTest.clinical.focused = true; }
+    });
+    export const i_n = () => ({ search: "" });
+    export const yln = () => false;
+    export const UZ = () => true;
+    export const oNt = () => false;
+  `,
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const e6 = { useId: () => "starter-heading" };
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const LX = () => ({ get: signal => signal.description === "identity"
+      ? { accountId: "account-1", userId: "user-1" }
+      : { isCapable: true } });
+    export const HX = signal => signal.description === "inert" ? false : "conversation-1";
+    export const BX = signal => signal.description === "capability"
+      ? { isCapable: true }
+      : globalThis.__homeOnboardingTest.clinical.data;
+    export const eZ = () => Symbol("query");
+    export const rZ = () => Symbol("family");
+  `,
+  departments: `
+    export const n = () => {};
+    export const t = {};
+  `,
+  shuffle: "export const t = items => items;",
+});
+const starterTree = starterPrompts.ClinicalStarterPrompts();
+check(starterTree.type === "div", "renders eligible clinical starter prompts");
+const cardsNode = starterTree.props.children;
+const cardsTree = cardsNode.type(cardsNode.props);
+check(
+  cardsTree.props.children[1].props.children.length === 2,
+  "renders each clinical prompt card",
+);
+const firstStarter = cardsTree.props.children[1].props.children[0];
+check(
+  firstStarter.props["aria-label"] === "Review this differential",
+  "labels clinical prompt cards",
+);
+firstStarter.props.onClick();
+check(
+  globalThis.__homeOnboardingTest.clinical.prompt ===
+    "Review this differential" &&
+    globalThis.__homeOnboardingTest.clinical.focused,
+  "writes the selected prompt and focuses the editor",
+);
+
+assert.equal(assertions, 56);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
