@@ -672,6 +672,12 @@ declare module "@rchunk/workspace-renewal-payment" {
   export const t: unknown;
 }
 
+declare module "@rchunk/workspace-renewal-state" {
+  export const n: () => void;
+  export const r: unknown;
+  export const t: (subscription: unknown, now: Date) => string | null;
+}
+
 declare module "@rchunk/home-announcement-state" {
   export const r: unknown;
   export const t: () => void;
