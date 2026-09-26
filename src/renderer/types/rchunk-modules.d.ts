@@ -216,8 +216,31 @@ declare module "@rchunk/realtime-voice-launch-surface" {
 }
 
 declare module "@rchunk/codex-app-home-beacon-announcement-core" {
+  export const n: (...args: any[]) => unknown;
   export const r: () => void;
-  export const t: unknown;
+  export const t: (...args: any[]) => unknown;
+}
+
+declare module "@rchunk/pca-connector-eligibility" {
+  export const a: any;
+  export const c: any;
+  export const d: any;
+  export const i: (...args: any[]) => any;
+  export const l: any;
+  export const n: any;
+  export const o: any;
+  export const r: any;
+  export const s: any;
+  export const t: any;
+  export const u: any;
+}
+
+declare module "@rchunk/country-codes" {
+  export const _any: any;
+}
+
+declare module "@rchunk/google-logo" {
+  export const _any: any;
 }
 
 declare module "@rchunk/access-splash" {
@@ -344,6 +367,10 @@ declare module "@rchunk/home-beacon" {
   export const n: (...args: any[]) => boolean;
   export const r: (...args: any[]) => any;
   export const t: () => void;
+}
+
+declare module "@rchunk/home-beacon-finance" {
+  export const connectPersonalFinanceFromHomeBeacon: (...args: any[]) => Promise<boolean>;
 }
 
 declare module "@rchunk/conversation-start" {
