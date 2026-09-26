@@ -457,6 +457,11 @@ declare module "@rchunk/mcp-app-follow-up-confirmation-dialog" {
   export const McpAppFollowUpConfirmationDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/chatgpt-image-upload-reminder-dialog-core" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
