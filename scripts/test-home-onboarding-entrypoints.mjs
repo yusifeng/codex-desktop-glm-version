@@ -801,5 +801,110 @@ check(
   "writes the selected prompt and focuses the editor",
 );
 
-assert.equal(assertions, 56);
+globalThis.__homeOnboardingTest.homeAnnouncements = {
+  modal: [],
+  prefill: null,
+  state: [],
+};
+const homeAnnouncementState = await loadModule("home-announcement-state", {
+  "app-initial": `
+    export const ont = Symbol("host-features");
+    export const f0t = Symbol("usage");
+    export const ugn = "local-host";
+    export const vP = "RateLimitResetModal";
+    export const Kot = "MultiAgentIcon";
+    export const n6 = "ResetIcon";
+    export const dun = (key, _fallback) => Symbol(key);
+    export const kI = () => ({ id: "host" });
+    export const jyt = () => ({ hostId: "local-host" });
+    export const nN = () => true;
+    export const ngn = (_key, fallback) => fallback;
+    export const Gfn = () => [null, value => { globalThis.__homeOnboardingTest.homeAnnouncements.prefill = value; }];
+    export const cnt = () => ({ mutateAsync: () => Promise.resolve() });
+    export const N6t = () => ({ accountId: "account-1", isLoading: false });
+    export const uht = () => ({ data: { id: "account-1" }, isLoading: false });
+    export const i5 = () => ({ remainingPercent: 5 });
+    export const $M = () => ({ config: { remainingThresholdPercent: 10 } });
+    export const lfn = () => ({});
+    export const Uzt = (_scope, component, props) => globalThis.__homeOnboardingTest.homeAnnouncements.modal.push({ component, props });
+    export const xpn = () => {};
+  `,
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const AM = "exposed";
+    export const OM = "try-now";
+    export const kM = "dismissed";
+    export const ig = "DismissIcon";
+    export const Y2 = "FormattedMessage";
+    export const e6 = {
+      useState: value => [value, () => {}],
+      useRef: value => ({ current: value }),
+      useEffect: effect => effect()
+    };
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const LX = () => ({ set: (signal, value) => globalThis.__homeOnboardingTest.homeAnnouncements.state.push({ signal, value }) });
+    export const HX = signal => {
+      if (signal.description === "usage") return {
+        data: { rate_limit_reset_credits: { available_count: 2 } },
+        isLoading: false
+      };
+      return signal.description === "rate-limit-reset-home-announcement-dismissal-by-account-id" ? {} : false;
+    };
+    export const BX = () => ({ data: [], isLoading: false });
+    export const n4 = () => ({ formatMessage: descriptor => descriptor.defaultMessage });
+  `,
+  "app-primary": "export const Sm = 'Banner';",
+});
+const multiAgentEligibility = homeAnnouncementState.u();
+check(
+  multiAgentEligibility.isEligible && !multiAgentEligibility.isLoading,
+  "offers the multi-agent announcement before feature activation",
+);
+const multiAgentBanner = homeAnnouncementState.s({});
+check(
+  multiAgentBanner.type === "Banner" &&
+    multiAgentBanner.props.primaryAction.label.props.defaultMessage ===
+      "Try now",
+  "renders the multi-agent banner actions",
+);
+multiAgentBanner.props.primaryAction.onClick();
+await Promise.resolve();
+await Promise.resolve();
+check(
+  globalThis.__homeOnboardingTest.homeAnnouncements.prefill.text ===
+    "Spawn a subagent to explore this repo.",
+  "prefills the composer after enabling multi-agent mode",
+);
+multiAgentBanner.props.dismissAction.onClick();
+check(
+  globalThis.__homeOnboardingTest.homeAnnouncements.state.some(
+    (entry) => entry.value === true,
+  ),
+  "persists multi-agent banner dismissal",
+);
+const resetEligibility = homeAnnouncementState.n();
+check(
+  resetEligibility.isEligible && resetEligibility.availableCount === 2,
+  "offers reset credits near the rate limit threshold",
+);
+const resetBannerWrapper = homeAnnouncementState.r({
+  availableCount: resetEligibility.availableCount,
+  onDismiss: resetEligibility.dismiss,
+});
+const resetBanner = resetBannerWrapper.type(resetBannerWrapper.props);
+resetBanner.props.primaryAction.onClick();
+check(
+  globalThis.__homeOnboardingTest.homeAnnouncements.modal[0].component ===
+    "RateLimitResetModal",
+  "opens the rate limit reset modal",
+);
+resetBanner.props.dismissAction.onClick();
+const resetDismissal =
+  globalThis.__homeOnboardingTest.homeAnnouncements.state.at(-1);
+check(
+  typeof resetDismissal.value === "function",
+  "persists reset-banner dismissal per account",
+);
+
+assert.equal(assertions, 63);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
