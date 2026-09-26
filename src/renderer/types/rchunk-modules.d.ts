@@ -2651,6 +2651,12 @@ declare module "@rchunk/app-initial" {
     string,
     GptResource
   >;
+  export const mfn: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    string,
+    boolean
+  >;
+  export const pfn: () => void;
   export const N6t: () => {
     accountId?: string | null;
     isLoading?: boolean;
@@ -3690,13 +3696,13 @@ declare module "@rchunk/announcement-modal-source-bridge" {
 
 declare module "@rchunk/banner" {
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: { gizmoId: string }) => unknown;
 }
 
 declare module "@rchunk/gpt-plugin-migration-banner-content" {
-  export const GptPluginMigrationBannerContent: (props: {
-    gizmoId: string;
-  }) => unknown;
+  export const GptPluginMigrationBannerContent:
+    | ((props: { gizmoId: string }) => unknown)
+    | null;
 }
 
 declare module "@rchunk/chat-choice-view" {

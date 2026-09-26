@@ -9,25 +9,45 @@ import * as chatChoiceChunk from "@rchunk/chat-choice-view";
 import * as bannerContentChunk from "@rchunk/gpt-plugin-migration-banner-content";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const chatChoice = chatChoiceChunk as Record<string, any>;
-const bannerContent = bannerContentChunk as Record<string, any>;
+const {
+  $3: initializeRuntimeLazy,
+  BX: useSignalFamilyValue,
+  FX: initializeSignalRuntime,
+  I3: getJsxRuntime,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+} = appSharedChunk;
+const {
+  Qgn: initializeGptResources,
+  fN: gptResourceQuery,
+  i_n: useLocation,
+  mN: initializeAccounts,
+  mfn: migrationExperimentSignal,
+  o_n: useNavigate,
+  pfn: initializeMigrationExperiment,
+} = appInitialChunk;
+const {
+  Lp: initializeMigrationVisitState,
+  Mp: keepUsingGptForVisit,
+  Pp: migrationVisitedSignal,
+} = appPrimaryChunk;
+const { n: initializeChatChoiceView, t: ChatChoiceView } = chatChoiceChunk;
+const { GptPluginMigrationBannerContent } = bannerContentChunk;
 
-let jsx: any;
+let jsx: ReturnType<typeof getJsxRuntime>;
 let initialized = false;
 function initializeGptPluginMigrationBanner(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.FX?.();
-  appShared.QI?.();
-  appInitial.Qgn?.();
-  appInitial.pfn?.();
-  appInitial.mN?.();
-  chatChoice.n?.();
-  appPrimary.Lp?.();
-  jsx = appShared.I3?.();
+  initializeRuntimeLazy();
+  initializeSignalRuntime();
+  initializeSharedRuntime();
+  initializeGptResources();
+  initializeMigrationExperiment();
+  initializeAccounts();
+  initializeChatChoiceView();
+  initializeMigrationVisitState();
+  jsx = getJsxRuntime();
   initialized = true;
 }
 
@@ -36,31 +56,32 @@ function MigrationBannerErrorFallback({
 }: {
   gizmoId: string;
 }): unknown {
-  const scope = appShared.LX?.(appShared.ZI);
-  const location = appInitial.i_n?.() ?? { pathname: "/" };
-  const navigate = appInitial.o_n?.() ?? (() => {});
-  const query = appShared.BX?.(appInitial.fN, gizmoId) ?? {};
+  const scope = useSignalScope(applicationScope);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const query = useSignalFamilyValue(gptResourceQuery, gizmoId);
   const visitKey = { gizmoId, visitKey: location.pathname };
-  const shouldShow = appShared.BX?.(appPrimary.Pp, visitKey);
-  const ChoiceView = chatChoice.t;
+  const shouldShow = useSignalFamilyValue(migrationVisitedSignal, visitKey);
   return shouldShow && query.data?.gizmo?.migrated_plugin_id
-    ? jsx.jsx(ChoiceView, {
+    ? jsx.jsx(ChatChoiceView, {
         gptName: query.data.gizmo.display.name,
         accessState: "error",
         onUsePlugin: () => void navigate("/plugins"),
-        onKeepUsingGpt: () => appPrimary.Mp?.(scope, visitKey),
+        onKeepUsingGpt: () => keepUsingGptForVisit(scope, visitKey),
       })
     : null;
 }
 
 function GptPluginMigrationBanner({ gizmoId }: { gizmoId: string }): unknown {
   initializeGptPluginMigrationBanner();
-  const enabled = appShared.BX?.(appInitial.mfn, "2160578039");
+  const enabled = useSignalFamilyValue(
+    migrationExperimentSignal,
+    "2160578039",
+  );
   if (!enabled) return null;
-  const Content = bannerContent.GptPluginMigrationBannerContent;
-  if (Content == null)
+  if (GptPluginMigrationBannerContent == null)
     return jsx.jsx(MigrationBannerErrorFallback, { gizmoId });
-  return jsx.jsx(Content, { gizmoId }, gizmoId);
+  return jsx.jsx(GptPluginMigrationBannerContent, { gizmoId }, gizmoId);
 }
 
 initializeGptPluginMigrationBanner();
