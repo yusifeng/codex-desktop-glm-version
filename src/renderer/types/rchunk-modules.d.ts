@@ -3551,7 +3551,7 @@ declare module "@rchunk/library-file-picker-dialog" {
 }
 
 declare module "@rchunk/appgen-settings-page" {
-  export const n: (...args: any[]) => any;
+  export const n: () => unknown;
   export const r: () => void;
   export const t: (...args: any[]) => any;
 }
@@ -4928,7 +4928,7 @@ declare module "@rchunk/appgen-browser-site-entry" {
 }
 
 declare module "@rchunk/appgen-settings-page-entry" {
-  export const AppgenSettingsPage: (...args: any[]) => any;
+  export const AppgenSettingsPage: typeof import("@rchunk/appgen-settings-page").n;
 }
 
 declare module "@rchunk/appgen-change-slug-dialog" {

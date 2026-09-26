@@ -5,10 +5,11 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as settingsPageChunk from "@rchunk/appgen-settings-page";
 
 void appSharedChunk;
-const settingsPage = settingsPageChunk as Record<string, any>;
+const {
+  n: AppgenSettingsPage,
+  r: initializeAppgenSettingsPage,
+} = settingsPageChunk;
 
-settingsPage.r();
-
-const AppgenSettingsPage = settingsPage.n;
+initializeAppgenSettingsPage();
 
 export { AppgenSettingsPage };
