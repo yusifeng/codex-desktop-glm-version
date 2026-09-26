@@ -213,6 +213,12 @@ declare module "@rchunk/sketch" {
   export const t: () => void;
 }
 
+declare module "@rchunk/right-panel-composer-overlay-alignment" {
+  export const n: unknown;
+  export const r: unknown;
+  export const t: () => void;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
