@@ -440,6 +440,61 @@ declare module "@rchunk/app-shared" {
   export const XY: (selection: SuggestionModelSelection) => boolean;
   /** initializeSuggestionTargeting（内部 KL）。 */
   export const YY: () => void;
+  export type ReasoningEffort =
+    | "none" | "minimal" | "low" | "medium"
+    | "high" | "xhigh" | "max" | "ultra";
+  export interface ReasoningEffortOption extends Record<string, unknown> {
+    reasoningEffort: ReasoningEffort;
+  }
+  export interface AutomationModel extends Record<string, unknown> {
+    model: string;
+    isDefault?: boolean;
+    defaultReasoningEffort?: ReasoningEffort | null;
+    supportedReasoningEfforts?: readonly ReasoningEffortOption[];
+  }
+  export interface AutomationModelPreference {
+    model?: string | null;
+    reasoningEffort?: ReasoningEffort | null;
+  }
+  export interface AutomationDefinition extends AutomationModelPreference {
+    kind?: string;
+  }
+  export interface AutomationModelSelection {
+    model: string;
+    reasoningEffort: ReasoningEffort | null;
+  }
+  export interface RemoteModelConfiguration {
+    automationModel: string;
+    ephemeralGenerationModel: string;
+    ambientSuggestionsModel: string;
+    ambientSuggestionsSafetyModel: string;
+  }
+  /** parseRemoteModelConfiguration（app-shared/runtime/automation-models.ts，内部 CNe）。 */
+  export const UY: (value: unknown) => RemoteModelConfiguration;
+  /** initializeRemoteModelConfiguration（内部 ZL）。 */
+  export const HY: () => void;
+  /** isHeartbeatAutomation（内部 TNe）。 */
+  export const zY: (automation: AutomationDefinition) => boolean;
+  /** normalizeAutomationExecutionEnvironment（内部 ENe）。 */
+  export const BY: (environment: unknown) => "worktree" | "local";
+  /** findAutomationModel（内部 QL）。 */
+  export const FY: (
+    models: readonly AutomationModel[],
+    model: string | null | undefined,
+  ) => AutomationModel | null;
+  /** resolveSupportedReasoningEffort（内部 $L）。 */
+  export const LY: (options: {
+    model: AutomationModel | null | undefined;
+    reasoningEffort: ReasoningEffort | null | undefined;
+  }) => ReasoningEffort | null;
+  /** resolveAutomationModelSelection（内部 ONe）。 */
+  export const IY: (options: {
+    automation: AutomationModelPreference;
+    models: readonly AutomationModel[];
+    defaultModel?: string | null;
+  }) => AutomationModelSelection;
+  /** initializeAutomationModels（内部 nR）。 */
+  export const RY: () => void;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
     readonly query: {
