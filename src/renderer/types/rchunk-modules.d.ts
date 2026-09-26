@@ -230,6 +230,35 @@ declare module "@rchunk/app-shared" {
   export const hU: (value: string) => boolean;
   /** initializeLibraryFileId（内部 ZBe）。 */
   export const mU: () => void;
+  export type WorktreeUpstreamRefreshMode = "never" | "best-effort";
+  export interface GlobalStateSetting<T> {
+    agentAccess: "hidden" | "read-write";
+    default: T;
+    description: string;
+    hostStorage: { kind: "global-state"; key: string };
+    key: string;
+    schema: import("zod").ZodType<T>;
+  }
+  export interface WorktreeSettings {
+    upstreamRefreshMode: GlobalStateSetting<WorktreeUpstreamRefreshMode>;
+    autoCleanupEnabled: GlobalStateSetting<boolean>;
+    keepCount: GlobalStateSetting<number>;
+  }
+  export interface ResolvedWorktreeSettings {
+    worktreesRoot: string;
+    autoCleanupEnabled: boolean;
+    keepCount: number;
+  }
+  /** worktreeSettings（app-shared/runtime/worktree-settings.ts，内部 MV）。 */
+  export const TU: WorktreeSettings;
+  /** initializeWorktreeSettings（内部 NV）。 */
+  export const wU: () => void;
+  /** resolveWorktreeSettings（内部 WBe）。 */
+  export const SU: (
+    values?: Readonly<Record<string, unknown>> | null,
+  ) => ResolvedWorktreeSettings;
+  /** initializeGitAndWorktreeSettings（内部 PV）。 */
+  export const CU: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
