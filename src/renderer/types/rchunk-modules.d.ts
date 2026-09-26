@@ -374,6 +374,46 @@ declare module "@rchunk/app-shared" {
   export const _any: any;
 }
 
+declare module "@rchunk/portable-attachment-thumbnail" {
+  export type PortableAttachmentImportKind =
+    | "csv"
+    | "docx"
+    | "ipynb"
+    | "pdf"
+    | "pptx"
+    | "tex"
+    | "tsv"
+    | "xlsx";
+  export interface PortableAttachmentThumbnailRequest {
+    importKind: PortableAttachmentImportKind | null;
+    readBytes(signal: AbortSignal): Promise<Uint8Array>;
+    signal: AbortSignal;
+    size?: number;
+  }
+  export interface PortableAttachmentThumbnailResult {
+    byteLength?: number;
+    dataUrl: string | null;
+    reason?: "overloaded" | "timeout" | "unsupported";
+  }
+  export const renderPortableAttachmentThumbnail: (
+    request: PortableAttachmentThumbnailRequest,
+  ) => Promise<PortableAttachmentThumbnailResult>;
+}
+
+declare module "@rchunk/portable-thumbnail-pdf-runtime" {
+  export const getPdfjs: () => Promise<{
+    GlobalWorkerOptions: { workerSrc?: string };
+  }>;
+}
+
+declare module "@rchunk/portable-thumbnail-fonts" {
+  export const ensurePopcornSpreadsheetFontsLoaded: () => Promise<void>;
+}
+
+declare module "@rchunk/portable-thumbnail-font-face-sources" {
+  export const getPopcornCarlitoFontFaceSourcesFromDocument: () => unknown[];
+}
+
 declare module "@rchunk/app-initial" {
   // 15MB 聚合块：应用启动逻辑 + Shiki 语法 grammars + math/learning blocks。
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
