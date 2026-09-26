@@ -256,11 +256,23 @@ declare module "@rchunk/app-shared" {
   export interface ScopedDerivedSignalOptions<TValue> {
     isEqual?: (previous: TValue, next: TValue) => boolean;
   }
+  export type ScopedExternalSignalCleanup =
+    | (() => void)
+    | { [Symbol.dispose](): void }
+    | void;
+  export interface ScopedExternalSignalContext<TScope, TValue>
+    extends DerivedScopedSignalContext<TScope> {
+    set(value: TValue | ((current: TValue) => TValue)): void;
+  }
   export interface ScopedDerivedSignal<TScope, TValue> {
     cache: "cached";
     debugLabel?: string;
     scope: MaitaiScope<TScope>;
   }
+  export type ScopedExternalSignal<TScope, TValue> = ScopedDerivedSignal<
+    TScope,
+    TValue
+  >;
   export interface ScopedQueryFunctionContext {
     client: ScopedQueryClient;
     meta?: unknown;
@@ -625,6 +637,17 @@ declare module "@rchunk/app-shared" {
     ) => TValue,
     options?: ScopedDerivedFamilyOptions<Param, TValue>,
   ) => ScopedDerivedFamily<TScope, Param, TValue>;
+  /** createExternalSignal（app-shared/runtime/atom-signal.ts，内部 vje）。 */
+  export const dZ: <TScope, TValue>(
+    scope: MaitaiScope<TScope>,
+    initialValue:
+      | TValue
+      | ((context: DerivedScopedSignalContext<TScope>) => TValue),
+    subscribe: (
+      context: ScopedExternalSignalContext<TScope, TValue>,
+    ) => ScopedExternalSignalCleanup | PromiseLike<ScopedExternalSignalCleanup>,
+    options?: ScopedDerivedSignalOptions<TValue>,
+  ) => ScopedExternalSignal<TScope, TValue>;
   /** createDerivedSignal（app-shared/runtime/atom-signal.ts，内部 PI）。 */
   export const sZ: <TScope, TValue>(
     scope: MaitaiScope<TScope>,

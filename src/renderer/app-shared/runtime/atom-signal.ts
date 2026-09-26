@@ -525,6 +525,16 @@ export interface ScopedDerivedSignalOptions<TValue> {
   isEqual?: (previous: TValue, next: TValue) => boolean;
 }
 
+export type ScopedExternalSignalCleanup =
+  | (() => void)
+  | { [Symbol.dispose](): void }
+  | void;
+
+export interface ScopedExternalSignalContext<TScope, TValue>
+  extends DerivedScopedSignalContext<TScope> {
+  set(value: TValue | ((current: TValue) => TValue)): void;
+}
+
 export interface ScopedQueryFunctionContext {
   client: ScopedQueryClient;
   meta?: unknown;
@@ -769,6 +779,12 @@ export interface ScopedDerivedSignal<TScope, TValue> {
   scope: Scope<TScope>;
   resolve(state: ScopeState<unknown>): Atom<TValue>;
 }
+
+/** 原 `vje` 返回的 scope 键控外部订阅 signal。 */
+export type ScopedExternalSignal<TScope, TValue> = ScopedDerivedSignal<
+  TScope,
+  TValue
+>;
 
 /** 原 `Bje` 返回的 scope 键控 query signal。 */
 export interface ScopedQuerySignal<TScope, TData, TError = Error> {
@@ -1275,6 +1291,136 @@ function createDerivedContext<T>(
       throw new TypeError("Unsupported derived signal reader");
     },
   };
+}
+
+function disposeExternalSignalCleanup(
+  cleanup: ScopedExternalSignalCleanup,
+): void {
+  if (typeof cleanup === "function") {
+    cleanup();
+    return;
+  }
+  cleanup?.[Symbol.dispose]();
+}
+
+function reportExternalSignalError(error: unknown): void {
+  if (
+    typeof globalThis.dispatchEvent === "function" &&
+    typeof globalThis.ErrorEvent === "function"
+  ) {
+    globalThis.dispatchEvent(
+      new ErrorEvent("error", { cancelable: true, error }),
+    );
+    return;
+  }
+  queueMicrotask(() => {
+    throw error;
+  });
+}
+
+function createExternalSignalContext<TScope, TValue>(
+  scopeApi: ScopeApi<TScope>,
+  setValue: (value: TValue | ((current: TValue) => TValue)) => void,
+): ScopedExternalSignalContext<TScope, TValue> {
+  return {
+    get queryClient() {
+      return scopeApi.queryClient;
+    },
+    scope: scopeApi,
+    get<Value>(reader: unknown, ...parameters: unknown[]): Value {
+      const read = scopeApi.get as unknown as (
+        reader: unknown,
+        ...parameters: unknown[]
+      ) => Value;
+      return read(reader, ...parameters);
+    },
+    set: setValue,
+  };
+}
+
+/** 创建 scope 键控外部订阅 signal（原 `vje` / 压缩导出 `dZ`）。 */
+export function createExternalSignal<TScope, TValue>(
+  scope: Scope<TScope>,
+  initialValue:
+    | TValue
+    | ((context: DerivedScopedSignalContext<TScope>) => TValue),
+  subscribe: (
+    context: ScopedExternalSignalContext<TScope, TValue>,
+  ) =>
+    | ScopedExternalSignalCleanup
+    | PromiseLike<ScopedExternalSignalCleanup>,
+  options?: ScopedDerivedSignalOptions<TValue>,
+): ScopedExternalSignal<TScope, TValue> {
+  const binding: ScopedExternalSignal<TScope, TValue> = {
+    cache: "cached",
+    scope,
+    resolve(activeState) {
+      const owner = findScopeState(activeState, scope);
+      const cacheKey = binding as ScopedDerivedSignal<unknown, unknown>;
+      const cached = owner.cachedBindings.get(cacheKey);
+      if (cached != null) return cached as Atom<TValue>;
+
+      const initialContext = createDerivedContext(
+        owner,
+        (target) => owner.store.get(target),
+      );
+      const resolveInitial = (
+        context: DerivedScopedSignalContext<TScope>,
+      ): TValue => typeof initialValue === "function"
+        ? (initialValue as (
+            context: DerivedScopedSignalContext<TScope>,
+          ) => TValue)(context)
+        : initialValue;
+      const externalAtom = atom(resolveInitial(initialContext));
+      externalAtom.isEqual = options?.isEqual;
+      externalAtom.onMount = (setSelf) => watchScope(owner, (scopeApi) => {
+        let active = true;
+        let cleanup: ScopedExternalSignalCleanup;
+        const context = createExternalSignalContext<TScope, TValue>(scopeApi, (value) => {
+          if (active) setSelf(value);
+        });
+        setSelf(resolveInitial(context));
+        const subscription = subscribe(context);
+        if (
+          typeof subscription === "object" &&
+          subscription != null &&
+          "then" in subscription
+        ) {
+          if (Symbol.dispose in subscription) {
+            cleanup = subscription as unknown as { [Symbol.dispose](): void };
+          }
+          Promise.resolve(subscription).then(
+            (resolved) => {
+              if (active) cleanup = resolved;
+              else disposeExternalSignalCleanup(resolved);
+            },
+            (error: unknown) => {
+              if (active) reportExternalSignalError(error);
+            },
+          );
+        } else {
+          cleanup = subscription as ScopedExternalSignalCleanup;
+        }
+        return () => {
+          if (!active) return;
+          active = false;
+          disposeExternalSignalCleanup(cleanup);
+        };
+      });
+      owner.cachedBindings.set(cacheKey, externalAtom as Atom<unknown>);
+      return externalAtom;
+    },
+  };
+  return binding;
+}
+
+/** 解析外部订阅 signal 为 hook 可消费的 atom/store 对。 */
+export function resolveScopedExternalSignal<TScope, TValue>(
+  signal: ScopedExternalSignal<TScope, TValue>,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<TValue> {
+  const owner = findScopeState(state, signal.scope);
+  return { atom: signal.resolve(state), store: owner.store };
 }
 
 /** 创建 scope 键控只读派生 signal（原 `PI` / 压缩导出 `sZ`）。 */
