@@ -196,6 +196,12 @@ declare module "@rchunk/browser-composer-disclaimer-core" {
   export const t: unknown;
 }
 
+declare module "@rchunk/sketch-composer-host-core" {
+  export const n: unknown;
+  export const r: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
