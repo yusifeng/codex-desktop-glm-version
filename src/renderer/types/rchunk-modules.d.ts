@@ -306,6 +306,13 @@ declare module "@rchunk/suggestion-card" {
   export const t: unknown;
 }
 
+declare module "@rchunk/composer-announcement-slot" {
+  export const i: () => void;
+  export const n: () => void;
+  export const r: unknown;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
