@@ -143,6 +143,42 @@ declare module "@rchunk/app-shared" {
   export interface SandboxOriginOptions {
     requireSkybridge?: boolean;
   }
+  export interface SandboxEntryUrlOptions {
+    locale: string;
+    scheme?: "https" | "codex-sandbox";
+    subdomain: string;
+  }
+  export interface SandboxInitializationOptions {
+    initId: string;
+    sandboxId: string;
+    sourceUrl: string;
+  }
+  export type ResourceActivity = "read" | "created" | "updated";
+  export interface SandboxResourceActivity {
+    id: string;
+    url: string;
+    title?: string;
+    mimeType?: string;
+    activities: ResourceActivity[];
+  }
+  export type SandboxResourceActivitiesResult =
+    | { status: "absent" }
+    | { status: "invalid" }
+    | { status: "valid"; resources: SandboxResourceActivity[] };
+  /** getSandboxResourceUri（app-shared/runtime/sandbox-url.ts，内部 pVe）。 */
+  export const QH: (metadata: unknown) => string | null;
+  /** areSandboxMethodsAllowed（内部 _Ve）。 */
+  export const JH: (methods: readonly unknown[]) => boolean;
+  /** createSandboxEntryUrl（内部 SVe）。 */
+  export const WH: (options: SandboxEntryUrlOptions) => string;
+  /** attachSandboxInitialization（内部 wVe）。 */
+  export const UH: (options: SandboxInitializationOptions) => string;
+  /** getSandboxInitId（内部 TVe）。 */
+  export const GH: (value?: string | null) => string | null;
+  /** parseSandboxResourceActivities（内部 MVe）。 */
+  export const RH: (
+    metadata: unknown,
+  ) => SandboxResourceActivitiesResult;
   /** createSandboxPartition（app-shared/runtime/sandbox-url.ts，内部 xVe）。 */
   export const KH: (
     sandboxId: string,
