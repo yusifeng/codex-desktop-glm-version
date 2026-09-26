@@ -186,6 +186,11 @@ declare module "@rchunk/home-starter-prompts" {
   export const _any: any;
 }
 
+declare module "@rchunk/home-composer-mode-toggle-core" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
