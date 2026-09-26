@@ -10,8 +10,11 @@ const state = (globalThis.__appSharedSignalHooksTest = {
   notifications: 0,
   unsubscriptions: [],
 });
+let activeScopeState = null;
 globalThis.__RENDERER_REACT__ = {
+  createContext: (defaultValue) => ({ Consumer: {}, Provider: {}, defaultValue }),
   useCallback: (callback) => callback,
+  useContext: (context) => activeScopeState ?? context.defaultValue,
   useSyncExternalStore: (subscribe, getSnapshot) => {
     state.subscriptions += 1;
     state.unsubscriptions.push(
@@ -97,8 +100,33 @@ value = signals.useSignalFamilyValue(nativeFamily, "codex");
 check(value === 5, "consumes native Maitai families");
 check(signals.isSignalFamily(nativeFamily), "retains signal-family metadata");
 
+const scope = signals.createScope("HookFamilyScope");
+activeScopeState = signals.createScopeState(
+  scope,
+  { offset: 2 },
+  { queryClient: {} },
+);
+const scopedFamily = signals.createDerivedFamily(
+  scope,
+  (factor, { scope: activeScope }) => factor + activeScope.value.offset,
+);
+const scopedMember = signals.useSignalFamilyMember(scopedFamily, 3);
+check(scopedMember.store === activeScopeState.store, "binds scoped family members to their store");
+check(scopedMember.store.get(scopedMember.atom) === 5, "returns the selected scoped member signal");
 check(
-  state.subscriptions === 7,
+  signals.useSignalFamilyMember(scopedFamily, 3).atom === scopedMember.atom,
+  "reuses the cached scoped family member",
+);
+check(signals.useSignalFamilyValue(scopedFamily, 4) === 6, "keeps BX value reads on the member helper");
+activeScopeState = null;
+assert.throws(
+  () => signals.useSignalFamilyMember(scopedFamily, 3),
+  /Missing scope instance: HookFamilyScope/,
+);
+assertions += 1;
+
+check(
+  state.subscriptions === 8,
   "uses a stable external-store subscription for every hook call",
 );
 for (const unsubscribe of state.unsubscriptions) unsubscribe();

@@ -3494,6 +3494,43 @@ export function useSignalValue<T>(signal: ReadableSignal<T>, options?: QueryRead
 }
 
 /** 原 `dMe` / 压缩导出 `BX`：解析 family 成员后复用 `useSignalValue`。 */
+export function useSignalFamilyMember<Param, Data, QueryError>(
+  family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+  parameter: Param,
+): BoundAtomSignal<ScopedQueryResult<Data, QueryError>>;
+export function useSignalFamilyMember<Param, Page, PageParam, QueryError>(
+  family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
+  parameter: Param,
+): BoundAtomSignal<ScopedInfiniteQueryResult<Page, PageParam, QueryError>>;
+export function useSignalFamilyMember<Param, Data, MutationError, Variables, Context>(
+  family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+  parameter: Param,
+): BoundAtomSignal<ScopedMutationResult<Data, MutationError, Variables, Context>>;
+export function useSignalFamilyMember<Param, T>(
+  family: SignalFamily<Param, T>,
+  parameter: Param,
+): ReadableSignal<T>;
+export function useSignalFamilyMember<Param, T>(
+  family: SignalFamily<Param, T>,
+  parameter: Param,
+): ReadableSignal<T> {
+  if (isScopedFamilyBinding(family)) {
+    const activeState = reactOf().useContext(getScopeReactContext(family.scope));
+    if (activeState == null) {
+      throw new Error(`Missing scope instance: ${family.scope.__scopeBrand}`);
+    }
+    const owner = findScopeState(activeState, family.scope);
+    const scopedFamily = family as {
+      resolve(state: ScopeState<unknown>, member: Param): Atom<T>;
+    };
+    return {
+      atom: scopedFamily.resolve(activeState, parameter),
+      store: owner.store,
+    };
+  }
+  return family(parameter);
+}
+
 export function useSignalFamilyValue<Param, Data, MutationError, Variables, Context>(
   family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
   parameter: Param,
@@ -3501,19 +3538,8 @@ export function useSignalFamilyValue<Param, Data, MutationError, Variables, Cont
 ): ScopedMutationResult<Data, MutationError, Variables, Context>;
 export function useSignalFamilyValue<Param, T>(family: SignalFamily<Param, T>, parameter: Param, options?: QueryReadOptions): T {
   const configuredFamily = withQueryReadOptions(family, options) as SignalFamily<Param, T>;
-  if (isScopedFamilyBinding(configuredFamily)) {
-    const activeState = reactOf().useContext(getScopeReactContext(configuredFamily.scope));
-    if (activeState == null) {
-      throw new Error(`Missing scope instance: ${configuredFamily.scope.__scopeBrand}`);
-    }
-    const owner = findScopeState(activeState, configuredFamily.scope);
-    const scopedFamily = configuredFamily as {
-      resolve(state: ScopeState<unknown>, member: Param): Atom<T>;
-    };
-    return useSignalValue({
-      atom: scopedFamily.resolve(activeState, parameter),
-      store: owner.store,
-    });
-  }
-  return useSignalValue(configuredFamily(parameter), options);
+  return useSignalValue(
+    useSignalFamilyMember(configuredFamily, parameter),
+    options,
+  );
 }

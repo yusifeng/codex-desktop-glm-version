@@ -146,6 +146,25 @@ declare module "@rchunk/app-shared" {
       options?: QueryReadOptions,
     ): T;
   };
+  /** useSignalFamilyMember（app-shared/runtime/atom-signal.ts，内部 uMe）。 */
+  export const zX: {
+    <Param, Data, QueryError>(
+      family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
+      parameter: Param,
+    ): BoundAtomSignal<ScopedQueryResult<Data, QueryError>>;
+    <Param, Page, PageParam, QueryError>(
+      family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
+      parameter: Param,
+    ): BoundAtomSignal<ScopedInfiniteQueryResult<Page, PageParam, QueryError>>;
+    <Param, Data, MutationError, Variables, Context>(
+      family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+      parameter: Param,
+    ): BoundAtomSignal<ScopedMutationResult<Data, MutationError, Variables, Context>>;
+    <Param, T>(
+      family: SignalFamily<Param, T>,
+      parameter: Param,
+    ): ReadableSignal<T>;
+  };
   export const Bk: Record<string, string>; // bq：Appgen interaction action 枚举
   export const C_: unknown;
   export const FQ: unknown;
