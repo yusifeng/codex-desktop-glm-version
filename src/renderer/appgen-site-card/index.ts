@@ -7,24 +7,46 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeReactRuntime,
+  C_: initializeCardActions,
+  I3: getJsxRuntime,
+  K2: initializeInternationalization,
+  S_: IconAsset,
+  Xh: LinkButton,
+  Y2: FormattedMessage,
+  Zh: initializeButton,
+  bE: settingsIcon,
+  c_: initializeTooltip,
+  n4: useIntl,
+  o_: Tooltip,
+  xE: initializeNavigationTooltip,
+} = appSharedChunk;
+const {
+  a3t: initializeSiteIcon,
+  i3t: SiteIcon,
+} = appInitialChunk;
+const {
+  Sf: initializeSiteUrlFormatter,
+  xf: formatSiteLiveUrl,
+} = appPrimaryChunk;
+const jsx = getJsxRuntime();
+
+interface AppgenSiteCardProps {
+  liveUrl?: string | null;
+  onOpenSettings?: () => void;
+  settingsHref?: string | null;
+  title: string;
+}
 
 function AppgenSiteCard({
   liveUrl,
   title,
   onOpenSettings,
   settingsHref,
-}: {
-  liveUrl?: string | null;
-  title: string;
-  onOpenSettings?: () => void;
-  settingsHref?: string | null;
-}) {
-  const intl = appShared.n4();
-  const formattedLiveUrl = appPrimary.xf(liveUrl);
+}: AppgenSiteCardProps): unknown {
+  const intl = useIntl();
+  const formattedLiveUrl = formatSiteLiveUrl(liveUrl);
   const settingsLabel = intl.formatMessage({
     id: "appgenShareDialog.site.settings.label",
     defaultMessage: "Open site settings",
@@ -33,7 +55,7 @@ function AppgenSiteCard({
   });
   const siteIcon = jsx.jsx("span", {
     className: "flex size-10 shrink-0 items-center justify-center",
-    children: jsx.jsx(appInitial.i3t, { className: "icon-md" }),
+    children: jsx.jsx(SiteIcon, { className: "icon-md" }),
   });
   const titleNode = jsx.jsx("div", {
     className: "truncate text-sm font-medium text-default",
@@ -41,7 +63,7 @@ function AppgenSiteCard({
   });
   const urlLabel =
     formattedLiveUrl ??
-    jsx.jsx(appShared.Y2, {
+    jsx.jsx(FormattedMessage, {
       id: "appgenShareDialog.site.notPublished",
       defaultMessage: "Not published yet",
       description: "Label in a Site card for a site without a published URL",
@@ -59,9 +81,9 @@ function AppgenSiteCard({
   const settingsAction =
     settingsHref == null
       ? null
-      : jsx.jsx(appShared.o_, {
+      : jsx.jsx(Tooltip, {
           tooltipContent: settingsLabel,
-          children: jsx.jsx(appShared.Xh, {
+          children: jsx.jsx(LinkButton, {
             "aria-label": settingsLabel,
             color: "ghost",
             size: "toolbar",
@@ -70,7 +92,7 @@ function AppgenSiteCard({
             target: undefined,
             rel: "noopener noreferrer",
             onClick: onOpenSettings,
-            children: jsx.jsx(appShared.S_, { asset: appShared.bE }),
+            children: jsx.jsx(IconAsset, { asset: settingsIcon }),
           }),
         });
 
@@ -81,14 +103,14 @@ function AppgenSiteCard({
 }
 
 function initializeAppgenSiteCard(): void {
-  appShared.$3?.();
-  appShared.xE?.();
-  appShared.K2?.();
-  appShared.Zh?.();
-  appShared.C_?.();
-  appShared.c_?.();
-  appInitial.a3t?.();
-  appPrimary.Sf?.();
+  initializeReactRuntime();
+  initializeNavigationTooltip();
+  initializeInternationalization();
+  initializeButton();
+  initializeCardActions();
+  initializeTooltip();
+  initializeSiteIcon();
+  initializeSiteUrlFormatter();
 }
 
 export { initializeAppgenSiteCard as n, AppgenSiteCard as t };

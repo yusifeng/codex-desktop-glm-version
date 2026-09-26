@@ -2817,6 +2817,8 @@ declare module "@rchunk/app-initial" {
   export const inn: (projectId: string) => string;
   export const Nan: () => void;
   export const lnn: () => void;
+  export const i3t: (props: { className?: string }) => unknown;
+  export const a3t: () => void;
   export const uht: (
     accountId?: string,
     options?: { preview?: boolean },
@@ -3128,6 +3130,9 @@ declare module "@rchunk/app-primary" {
     visit: GptMigrationVisitKey,
   ) => void;
   export const Bf: () => void;
+  /** Site live URL 的主机名展示格式化器。 */
+  export const xf: (liveUrl?: string | null) => string | null;
+  export const Sf: () => void;
   export const Rf: (input: { defaultPrompt: string; pluginDisplayName: string; pluginId: string }) => unknown;
   export const d: () => void; // O9：项目选择器依赖初始化器
   export const n: () => void;
@@ -3586,8 +3591,14 @@ declare module "@rchunk/permission-dropdown" {
 }
 
 declare module "@rchunk/appgen-site-card" {
+  export interface AppgenSiteCardProps {
+    liveUrl?: string | null;
+    onOpenSettings?: () => void;
+    settingsHref?: string | null;
+    title: string;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: AppgenSiteCardProps) => unknown;
 }
 
 declare module "@rchunk/building" {
