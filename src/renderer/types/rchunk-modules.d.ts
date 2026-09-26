@@ -788,6 +788,22 @@ declare module "@rchunk/app-shared" {
   export const fg: () => boolean | null;
   /** initializeThemeSubscription（内部 U6）。 */
   export const dg: () => void;
+  /** BROWSER_FORM_FILL_PATH（app-shared/runtime/request-protocol.ts，内部 Fze）。 */
+  export const gW: "/flora/browser/form-fill";
+  /** CODEX_SURFACE_HEADER（内部 Ize）。 */
+  export const _W: "X-Codex-Surface";
+  /** ATTACH_AUTH_HEADER（内部 Lze）。 */
+  export const fW: "X-OpenAI-Attach-Auth";
+  /** ATTACH_DESKTOP_SURFACE_HEADER（内部 Rze）。 */
+  export const pW: "X-OpenAI-Attach-Desktop-Surface";
+  /** ATTACH_DEVICE_CHECK_TOKEN_HEADER（内部 zze）。 */
+  export const mW: "X-OpenAI-Attach-DeviceCheck-Token";
+  /** ATTACH_INTEGRITY_STATE_HEADER（内部 Bze）。 */
+  export const hW: "X-OpenAI-Attach-Integrity-State";
+  /** EXPECTED_ACCOUNT_ID_HEADER（内部 Vze）。 */
+  export const vW: "X-OpenAI-Expected-Account-Id";
+  /** initializeRequestProtocol（内部 iV）。 */
+  export const CW: () => void;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
   export const FQ: unknown;
