@@ -223,6 +223,11 @@ declare module "@rchunk/composer-overlay" {
   export const HomeComposerOverlay: unknown;
 }
 
+declare module "@rchunk/above-composer-fixed-content-surface" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
