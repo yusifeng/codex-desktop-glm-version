@@ -1306,5 +1306,112 @@ check(
   "stops Finance onboarding after cancellation",
 );
 
-assert.equal(assertions, 88);
+globalThis.__homeOnboardingTest.loginMethods = {
+  requirements: {
+    data: { requirements: { allowedLoginMethods: ["chatgpt"] } },
+    isPending: false,
+    isError: false,
+  },
+  config: {
+    data: { configReadSucceeded: true, config: {} },
+    isPending: false,
+    isError: false,
+  },
+  apiKey: "",
+};
+const onboardingLogin = await loadModule("onboarding-login-content", {
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const FX = () => {};
+    export const QI = () => {};
+    export const K2 = () => {};
+    export const Zh = () => {};
+    export const g4 = () => {};
+    export const rZ = (_scope, resolver) => ({ resolver });
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const Y2 = "FormattedMessage";
+    export const Yh = "Button";
+    export const n4 = () => ({ formatMessage: descriptor => descriptor.defaultMessage });
+  `,
+  "app-initial": `
+    export const Ysn = Symbol("requirements");
+    export const lcn = Symbol("config");
+    export const Jat = "Input";
+    export const $sn = () => {};
+    export const Xat = () => {};
+  `,
+});
+const loginState = onboardingLogin.o.resolver("local-host", {
+  get: (signal) =>
+    signal.description === "requirements"
+      ? globalThis.__homeOnboardingTest.loginMethods.requirements
+      : globalThis.__homeOnboardingTest.loginMethods.config,
+});
+check(
+  loginState.status === "ready" && !loginState.api && loginState.chatgpt,
+  "honors managed allowed login methods",
+);
+globalThis.__homeOnboardingTest.loginMethods.requirements = {
+  data: { requirements: null },
+  isPending: false,
+  isError: false,
+};
+globalThis.__homeOnboardingTest.loginMethods.config.data.config.forced_login_method =
+  "api";
+const legacyLoginState = onboardingLogin.o.resolver("local-host", {
+  get: (signal) =>
+    signal.description === "requirements"
+      ? globalThis.__homeOnboardingTest.loginMethods.requirements
+      : globalThis.__homeOnboardingTest.loginMethods.config,
+});
+check(
+  legacyLoginState.status === "ready" &&
+    legacyLoginState.api &&
+    !legacyLoginState.chatgpt,
+  "falls back to the legacy forced login method",
+);
+const loginActionsBase = {
+  allowApiKey: true,
+  allowChatGpt: true,
+  apiKeyValue: "",
+  isApiKeyEntryVisible: false,
+  isApiKeySignInPending: false,
+  isChatGptSignInPending: false,
+  onApiKeySecondaryAction: () => {},
+  onApiKeySubmit: () => {},
+  onApiKeyValueChange: (value) => {
+    globalThis.__homeOnboardingTest.loginMethods.apiKey = value;
+  },
+  onChatGptSignIn: () => {},
+  onShowApiKeyEntry: () => {},
+  apiKeySecondaryActionLabel: "Back",
+};
+const loginChoices = onboardingLogin.t(loginActionsBase);
+check(
+  loginChoices.props.children.filter(Boolean).length === 2,
+  "shows both ChatGPT and API-key login choices",
+);
+const pendingLoginChoices = onboardingLogin.t({
+  ...loginActionsBase,
+  isChatGptSignInPending: true,
+});
+check(
+  pendingLoginChoices.props.children[0].props.children.props.defaultMessage ===
+    "Cancel sign-in" && pendingLoginChoices.props.children[1] == null,
+  "hides API-key entry while ChatGPT sign-in can be cancelled",
+);
+const apiKeyEntry = onboardingLogin.t({
+  ...loginActionsBase,
+  isApiKeyEntryVisible: true,
+});
+const apiKeyInput = apiKeyEntry.props.children[0].props.children[1];
+apiKeyInput.props.onChange({ target: { value: "sk-test" } });
+const apiKeyContinue = apiKeyEntry.props.children[1].props.children[1];
+check(
+  globalThis.__homeOnboardingTest.loginMethods.apiKey === "sk-test" &&
+    apiKeyContinue.props.disabled,
+  "forwards API-key edits and disables empty submission",
+);
+
+assert.equal(assertions, 93);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
