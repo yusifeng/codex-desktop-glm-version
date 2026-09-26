@@ -366,6 +366,7 @@ declare module "@rchunk/library-file-picker-dialog" {
 }
 
 declare module "@rchunk/appgen-settings-page" {
+  export const n: (...args: any[]) => any;
   export const r: () => void;
   export const t: (...args: any[]) => any;
 }
@@ -1218,6 +1219,10 @@ declare module "@rchunk/appgen-browser-site-core" {
 
 declare module "@rchunk/appgen-browser-site-entry" {
   export const getAppgenBrowserSiteForUrl: (...args: any[]) => any;
+}
+
+declare module "@rchunk/appgen-settings-page-entry" {
+  export const AppgenSettingsPage: (...args: any[]) => any;
 }
 
 declare module "@rchunk/artifact-feedback-button" {
