@@ -906,5 +906,117 @@ check(
   "persists reset-banner dismissal per account",
 );
 
-assert.equal(assertions, 63);
+globalThis.__homeOnboardingTest.microAnimation = { analytics: [], state: [] };
+const microAnimation = await loadModule("codex-micro-onboarding-animation", {
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const FX = () => {};
+    export const QI = () => {};
+    export const pZ = () => Symbol("elapsed");
+    export const sZ = (_scope, _read) => Symbol("computed");
+  `,
+  "app-initial": `
+    export const cs = "device-lifecycle";
+    export const ds = "onboarding-lifecycle";
+    export const ls = {
+      CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_FIRST_DETECTED: "first-detected",
+      CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTED: "connected",
+      CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTION_FAILED: "connection-failed",
+      CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTION_LOST: "connection-lost",
+      CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_RECONNECTED: "reconnected"
+    };
+    export const ss = {
+      CODEX_MICRO_CONNECTION_TRANSPORT_BLUETOOTH: "bluetooth",
+      CODEX_MICRO_CONNECTION_TRANSPORT_USB: "usb",
+      CODEX_MICRO_CONNECTION_TRANSPORT_UNSPECIFIED: "unspecified"
+    };
+    export const fs = {
+      CODEX_MICRO_ONBOARDING_LIFECYCLE_STEP_TYPE_FLOW_COMPLETED: "flow-completed",
+      CODEX_MICRO_ONBOARDING_LIFECYCLE_STEP_TYPE_SCREEN_SHOWN: "screen-shown"
+    };
+    export const ps = {
+      CODEX_MICRO_ONBOARDING_SCREEN_WELCOME: "welcome",
+      CODEX_MICRO_ONBOARDING_SCREEN_AGENT_KEYS: "agent-keys",
+      CODEX_MICRO_ONBOARDING_SCREEN_COMMAND_KEYS: "command-keys"
+    };
+    export const us = {
+      CODEX_MICRO_INPUT_MONITORING_PERMISSION_STATE_GRANTED: "granted",
+      CODEX_MICRO_INPUT_MONITORING_PERMISSION_STATE_DENIED: "denied",
+      CODEX_MICRO_INPUT_MONITORING_PERMISSION_STATE_UNAVAILABLE: "unavailable",
+      CODEX_MICRO_INPUT_MONITORING_PERMISSION_STATE_NOT_APPLICABLE: "not-applicable"
+    };
+    export const xpn = (_scope, event, payload) => globalThis.__homeOnboardingTest.microAnimation.analytics.push({ event, payload });
+  `,
+});
+const stillFrame = microAnimation.r(-1);
+check(
+  stillFrame.agentSlots.map((slot) => slot.status).join(",") ===
+    "working,unread,awaiting-approval,idle,working,awaiting-response",
+  "freezes Codex Micro agents at their initial reduced-motion frame",
+);
+check(
+  stillFrame.actionKeycapIds.join(",") === "FAST,APPR,REJ,SPLIT,MIC,CODEX",
+  "freezes Codex Micro keycaps at their initial reduced-motion frame",
+);
+const progressedFrame = microAnimation.r(4_000);
+check(
+  progressedFrame.agentSlots[0].status === "awaiting-approval" &&
+    progressedFrame.agentSlots.length === 6,
+  "advances each Codex Micro agent through its staggered cycle",
+);
+microAnimation.s(
+  "scope",
+  { status: "connected" },
+  "connected",
+  "bluetooth",
+  false,
+);
+check(
+  globalThis.__homeOnboardingTest.microAnimation.analytics.length === 2,
+  "records first detection and connection as separate lifecycle steps",
+);
+check(
+  globalThis.__homeOnboardingTest.microAnimation.analytics[0].payload
+    .connectionTransport === "bluetooth" &&
+    globalThis.__homeOnboardingTest.microAnimation.analytics[1].payload
+      .stepType === "connected",
+  "maps Codex Micro device lifecycle telemetry enums",
+);
+microAnimation.c("scope", {
+  flowId: "flow-1",
+  inputMonitoringPermissionState: "granted",
+  screen: "welcome",
+  step: "screen-shown",
+});
+const onboardingEvent =
+  globalThis.__homeOnboardingTest.microAnimation.analytics.at(-1);
+check(
+  onboardingEvent.payload.flowId === "flow-1" &&
+    onboardingEvent.payload.inputMonitoringPermissionState === "granted" &&
+    onboardingEvent.payload.screen === "welcome" &&
+    onboardingEvent.payload.stepType === "screen-shown",
+  "maps Codex Micro onboarding lifecycle telemetry",
+);
+const stopMicroAnimation = microAnimation.a(
+  {
+    set(signal, value) {
+      globalThis.__homeOnboardingTest.microAnimation.state.push({
+        signal,
+        value,
+      });
+    },
+  },
+  true,
+);
+check(
+  globalThis.__homeOnboardingTest.microAnimation.state[0].value === -1,
+  "uses the static animation sentinel for reduced motion",
+);
+stopMicroAnimation();
+check(
+  globalThis.__homeOnboardingTest.microAnimation.state.at(-1).value === null,
+  "clears Codex Micro animation state on teardown",
+);
+
+assert.equal(assertions, 71);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
