@@ -72,7 +72,7 @@ declare module "@chunk/shared" {
   export { threadIdOf as $u } from "../../shared/browser-context";
   export const A: any; // 内部符号: koe
   export const Aa: any; // 内部符号: One
-  export const Ac: any; // 内部符号: _C
+  export { createDeferred as Ac } from "../../shared/http-headers";
   export { normalizeApprovalsReviewer as Ad } from "../../shared/sandbox-permissions";
   export const Af: any; // 内部符号: nm
   export const Ai: any; // 内部符号: _re
@@ -93,7 +93,7 @@ declare module "@chunk/shared" {
   export const Bn: any; // 内部符号: fY
   export const Bo: any; // 内部符号: uD
   export const Br: any; // 内部符号: oB
-  export const Bs: any; // 内部符号: Fw
+  export { HEADER_ATTACH_AUTH as Bs } from "../../shared/http-headers";
   export { agentInstructionsForThread as Bt } from "../../shared/agent-instructions";
   export { normalizeAppVersion as Bu } from "../../shared/app-server-version";
   export const C: any; // 内部符号: Pse
@@ -160,7 +160,7 @@ declare module "@chunk/shared" {
   export const Gn: any; // 内部符号: ZJ
   export const Go: any; // 内部符号: aD
   export const Gr: any; // 内部符号: NI
-  export const Gs: any; // 内部符号: Vw
+  export { shouldAttachAuthHeaders as Gs } from "../../shared/http-headers";
   export const Gt: any; // 内部符号: Y2
   export { supportsRecencySortKey as Gu } from "../../shared/app-server-version";
   export const H: any; // 内部符号: q5
@@ -173,7 +173,7 @@ declare module "@chunk/shared" {
   export const Hn: any; // 内部符号: dY
   export const Ho: any; // 内部符号: fD
   export const Hr: any; // 内部符号: LI
-  export const Hs: any; // 内部符号: Rw
+  export { HEADER_INTEGRITY_STATE as Hs } from "../../shared/http-headers";
   export { permissionsForInstructions as Ht } from "../../shared/agent-instructions";
   export { normalizeWindowsStoreBuildVersion as Hu } from "../../shared/app-server-version";
   export const I: any; // 内部符号: ioe
@@ -198,7 +198,7 @@ declare module "@chunk/shared" {
   export const Jn: any; // 内部符号: eJ
   export const Jo: any; // 内部符号: tD
   export const Jr: any; // 内部符号: hI
-  export const Js: any; // 内部符号: Ww
+  export { wantsIntegrityState as Js } from "../../shared/http-headers";
   export const Jt: any; // 内部符号: h2
   export { parseVersionOutput as Ju } from "../../shared/app-server-version";
   export const K: any; // 内部符号: pae
@@ -210,7 +210,7 @@ declare module "@chunk/shared" {
   export const Kn: any; // 内部符号: xJ
   export const Ko: any; // 内部符号: cD
   export const Kr: any; // 内部符号: MI
-  export const Ks: any; // 内部符号: Hw
+  export { wantsDesktopSurface as Ks } from "../../shared/http-headers";
   export const Kt: any; // 内部符号: U2
   export { supportsPaginatedHistory as Ku } from "../../shared/app-server-version";
   export const L: any; // 内部符号: toe
@@ -287,7 +287,7 @@ declare module "@chunk/shared" {
   export const Qn: any; // 内部符号: XK
   export const Qo: any; // 内部符号: CE
   export const Qr: any; // 内部符号: ZF
-  export const Qs: any; // 内部符号: Bw
+  export { joinBackendApiPath as Qs } from "../../shared/http-headers";
   export const Qt: any; // 内部符号: g2
   export { isValidSemver as Qu } from "../../shared/app-server-version";
   export const R: any; // 内部符号: noe
@@ -352,7 +352,7 @@ declare module "@chunk/shared" {
   export const Vn: any; // 内部符号: mY
   export const Vo: any; // 内部符号: gD
   export const Vr: any; // 内部符号: HB
-  export const Vs: any; // 内部符号: Iw
+  export { HEADER_DESKTOP_SURFACE as Vs } from "../../shared/http-headers";
   export { collectScheduledTemplates as Vt } from "../../shared/agent-instructions";
   export { buildMsixPackageIdentity as Vu } from "../../shared/app-server-version";
   export const W: any; // 内部符号: z5
@@ -365,7 +365,7 @@ declare module "@chunk/shared" {
   export const Wn: any; // 内部符号: XJ
   export const Wo: any; // 内部符号: oD
   export const Wr: any; // 内部符号: II
-  export const Ws: any; // 内部符号: Pw
+  export { HEADER_SURFACE as Ws } from "../../shared/http-headers";
   export { toWebSocketUrl as Wt } from "../../shared/ws-url";
   export { appServerSupportsFeature as Wu } from "../../shared/app-server-version";
   export const X: any; // 内部符号: n5
@@ -377,7 +377,7 @@ declare module "@chunk/shared" {
   export const Xn: any; // 内部符号: $q
   export const Xo: any; // 内部符号: XE
   export const Xr: any; // 内部符号: gI
-  export const Xs: any; // 内部符号: Xw
+  export { errorKindOf as Xs } from "../../shared/http-headers";
   export const Xt: any; // 内部符号: v2
   export const Xu: any; // 内部符号: Bv
   export const Y: any; // 内部符号: fae
@@ -389,7 +389,7 @@ declare module "@chunk/shared" {
   export const Yn: any; // 内部符号: Qq
   export const Yo: any; // 内部符号: $E
   export const Yr: any; // 内部符号: _I
-  export const Ys: any; // 内部符号: Gw
+  export { expectedAccountIdOf as Ys } from "../../shared/http-headers";
   export const Yt: any; // 内部符号: W2
   export { isSupportedAppServerVersion as Yu } from "../../shared/app-server-version";
   export const Z: any; // 内部符号: eae
@@ -401,7 +401,7 @@ declare module "@chunk/shared" {
   export const Zn: any; // 内部符号: Uq
   export const Zo: any; // 内部符号: KE
   export const Zr: any; // 内部符号: aI
-  export const Zs: any; // 内部符号: qw
+  export { hasHeader as Zs } from "../../shared/http-headers";
   export const Zt: any; // 内部符号: m2
   export { compareSemver as Zu } from "../../shared/app-server-version";
   export const _: any; // 内部符号: v9
@@ -551,7 +551,7 @@ declare module "@chunk/shared" {
   export const ju: any; // 内部符号: Iy
   export const k: any; // 内部符号: Uoe
   export const ka: any; // 内部符号: $A
-  export const kc: any; // 内部符号: vC
+  export { raceWithAbortSignal as kc } from "../../shared/http-headers";
   export { workspaceWritePermissions as kd } from "../../shared/sandbox-permissions";
   export const kf: any; // 内部符号: Km
   export const ki: any; // 内部符号: SM
@@ -639,7 +639,7 @@ declare module "@chunk/shared" {
   };
   export const qo: any; // 内部符号: iD
   export const qr: any; // 内部符号: AI
-  export const qs: any; // 内部符号: Uw
+  export { wantsDeviceCheckToken as qs } from "../../shared/http-headers";
   export const qt: any; // 内部符号: A2
   export { APP_SERVER_UNSUPPORTED_PREFIX as qu } from "../../shared/app-server-version";
   export const r: any; // 内部符号: Gce
