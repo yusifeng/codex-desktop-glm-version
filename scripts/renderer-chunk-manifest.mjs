@@ -963,6 +963,7 @@ export const REWRITTEN = new Set([
   "appgen-query",
   "appgen-disabled-tooltip",
   "appgen-project-row",
+  "appgen-card-layout",
   "start-appgen-conversation",
   "appgen-site-detail-route",
   "appgen-site-detail-layout",
