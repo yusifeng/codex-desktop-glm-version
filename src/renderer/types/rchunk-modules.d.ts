@@ -392,6 +392,15 @@ declare module "@rchunk/python-analysis-dialog" {
   export const PythonAnalysisDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/report-dialog-core" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/gpt-report-dialog" {
+  export const GptReportDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
