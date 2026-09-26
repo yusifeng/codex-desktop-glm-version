@@ -3365,9 +3365,29 @@ declare module "@rchunk/workspace-renewal-state" {
 }
 
 declare module "@rchunk/home-announcement-state" {
-  export const r: unknown;
+  export interface AnnouncementEligibility {
+    isEligible: boolean;
+    isLoading: boolean;
+  }
+  export interface RateLimitResetEligibility extends AnnouncementEligibility {
+    availableCount: number;
+    dismiss(): void;
+  }
+  export const a: () => void;
+  export const c: () => void;
+  export const d: () => void;
+  export const f: () => void;
+  export const i: () => void;
+  export const l: () => void;
+  export const n: () => RateLimitResetEligibility;
+  export const o: () => void;
+  export const r: (props: {
+    availableCount: number;
+    onDismiss(): void;
+  }) => unknown;
+  export const s: (props: { onTryNow?: () => void }) => unknown;
   export const t: () => void;
-  export const u: () => any;
+  export const u: () => AnnouncementEligibility;
 }
 
 declare module "@rchunk/home-announcement-slot" {
