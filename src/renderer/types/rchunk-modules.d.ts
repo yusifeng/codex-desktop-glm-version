@@ -1216,6 +1216,10 @@ declare module "@rchunk/appgen-browser-site-core" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-browser-site-entry" {
+  export const getAppgenBrowserSiteForUrl: (...args: any[]) => any;
+}
+
 declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
