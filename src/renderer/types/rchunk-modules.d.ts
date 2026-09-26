@@ -348,6 +348,10 @@ declare module "@rchunk/browser-profile-import-history-icon" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/generated-image-context-menu" {
+  export const getGeneratedImageContextMenuItems: (...args: any[]) => any[];
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }

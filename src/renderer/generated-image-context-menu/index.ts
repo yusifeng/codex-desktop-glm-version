@@ -1,0 +1,12 @@
+// generated-image-context-menu —— 生成图片右键菜单的稳定语义入口。
+// 原版：app/webview/assets/generated-image-context-menu-83c7ac872ac6.js。
+
+import * as appInitialChunk from "@rchunk/app-initial";
+
+const appInitial = appInitialChunk as Record<string, any>;
+
+appInitial.QB();
+
+const getGeneratedImageContextMenuItems = appInitial.ZB;
+
+export { getGeneratedImageContextMenuItems };
