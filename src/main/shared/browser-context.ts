@@ -218,6 +218,46 @@ export function colorForThreadStatus(status: string): number {
 }
 
 // ---------------------------------------------------------------------------
+// 线程可视化（原 `rre`/`Mj`/`ire`/`are`/`sre`/`ore`）
+// ---------------------------------------------------------------------------
+
+/** UUIDv7 线程 id 形态（原 `rre`）。 */
+const UUID_V7_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * 线程 id → 可视化日期（原 `Mj`，导出 `qi`）。
+ * UUIDv7 前段 hex（8+4 位）解析为毫秒时间戳 → YYYY/MM/DD；非 v7 → null。
+ */
+export function visualizationDateOf(threadId: string): string | null {
+  if (!UUID_V7_PATTERN.test(threadId)) return null;
+  const date = new Date(Number.parseInt(`${threadId.slice(0, 8)}${threadId.slice(9, 13)}`, 16));
+  return [
+    date.getUTCFullYear(),
+    String(date.getUTCMonth() + 1).padStart(2, "0"),
+    String(date.getUTCDate()).padStart(2, "0"),
+  ].join("/");
+}
+
+/** 可视化产物路径形态（原 `ire`：.codex/visualizations/YYYY/MM/DD/…html）。 */
+const VISUALIZATION_PATH_PATTERN =
+  /(?:^|[\\/])(?:\.codex|(?:\.codex-workspaces|OpenAI[\\/]Codex[\\/]workspaces)(?:[\\/]instances[\\/][0-9a-f-]+)?)[\\/]visualizations[\\/]\d{4}[\\/]\d{2}[\\/]\d{2}[\\/]([a-zA-Z0-9_-]+)[\\/][a-z0-9]+(?:-[a-z0-9]+)*\.html$/;
+
+/** 路径是否可视化产物（原 `are`）。 */
+function isVisualizationPath(path: string): boolean {
+  return VISUALIZATION_PATH_PATTERN.test(path);
+}
+
+/** 文件变更的生效路径（原 `sre`：update 取 move_path ?? path）。 */
+function effectiveChangePath(change: { kind: { type: string; move_path?: string | null }; path: string }): string {
+  return change.kind.type === "update" ? (change.kind.move_path ?? change.path) : change.path;
+}
+
+/** 变更是否触及可视化产物（原 `ore`，导出 `Ji`——消费名 isDeleteFileChange）。 */
+export function changeTouchesVisualizationArtifact(change: { kind: { type: string; move_path?: string | null }; path: string }): boolean {
+  return isVisualizationPath(effectiveChangePath(change));
+}
+
+// ---------------------------------------------------------------------------
 // 兼容导出（browser-context 分区 8 个压缩名）
 // ---------------------------------------------------------------------------
 
@@ -230,4 +270,6 @@ export {
   parseElementName as Fu,
   parseElementMetadata as Pu,
   colorForThreadStatus as tf,
+  visualizationDateOf as qi,
+  changeTouchesVisualizationArtifact as Ji,
 };

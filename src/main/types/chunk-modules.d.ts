@@ -75,7 +75,7 @@ declare module "@chunk/shared" {
   export { createDeferred as Ac } from "../../shared/http-headers";
   export { normalizeApprovalsReviewer as Ad } from "../../shared/sandbox-permissions";
   export const Af: any; // 内部符号: nm
-  export const Ai: any; // 内部符号: _re
+  export { buildWslEnvDirective as Ai } from "../../shared/wsl-paths";
   export { CHROME_DEV_PLUGIN_NAME as Al } from "../../shared/app-constants";
   export const An: any; // 内部符号: jX
   export const Ao: any; // 内部符号: gO
@@ -88,7 +88,7 @@ declare module "@chunk/shared" {
   export { isKnownBrowserFamily as Bc } from "../../shared/browser-tab-mentions";
   export const Bd: any; // 内部符号: Zg
   export { AbortableFetchDispatcher as Bf } from "../../shared/rpc-core";
-  export const Bi: any; // 内部符号: Bj
+  export { sanitizedProcessEnv as Bi } from "../../shared/wsl-paths";
   export { VISUALIZE_PLUGIN_NAME as Bl } from "../../shared/app-constants";
   export const Bn: any; // 内部符号: fY
   export const Bo: any; // 内部符号: uD
@@ -109,7 +109,7 @@ declare module "@chunk/shared" {
   export const Cn: any; // 内部符号: OX
   export const Co: any; // 内部符号: Mk
   export const Cr: any; // 内部符号: cB
-  export const Cs: any; // 内部符号: ET
+  export { isDurableHost as Cs } from "../../shared/host-config";
   export { readKeymapSync as Ct } from "../../shared/command-registry";
   export const Cu: any; // 内部符号: Xy
   export const D: any; // 内部符号: cse
@@ -117,7 +117,7 @@ declare module "@chunk/shared" {
   export { configOverrideKeyForVersion as Dc } from "../../shared/app-config";
   export { permissionsForProfile as Dd } from "../../shared/sandbox-permissions";
   export const Df: any; // 内部符号: Gp
-  export const Di: any; // 内部符号: Z
+  export { appServerFileSystem as Di } from "../../shared/wsl-paths";
   export { toPosixPath as Dl } from "../../shared/app-constants";
   export const Dn: any; // 内部符号: oX
   export const Do: any; // 内部符号: TO
@@ -135,7 +135,7 @@ declare module "@chunk/shared" {
   export const En: any; // 内部符号: DX
   export const Eo: any; // 内部符号: PO
   export const Er: any; // 内部符号: kB
-  export const Es: any; // 内部符号: LT
+  export { isRemoteHostConfig as Es } from "../../shared/host-config";
   export { WEBVIEW_FOCUS_TAB_COMMANDS as Et } from "../../shared/command-registry";
   export const Eu: any; // 内部符号: Jy
   export const F: any; // 内部符号: T7
@@ -143,7 +143,7 @@ declare module "@chunk/shared" {
   export { buildChromiumExtensionManagementUrl as Fc } from "../../shared/browser-tab-mentions";
   export { permissionSetAllowed as Fd } from "../../shared/sandbox-permissions";
   export const Ff: any; // 内部符号: Zd
-  export const Fi: any; // 内部符号: cM
+  export { getInteractivePathFromWslBash as Fi } from "../../shared/wsl-paths";
   export { COMPUTER_USE_PLUGIN_NAME as Fl } from "../../shared/app-constants";
   export const Fn: any; // 内部符号: xY
   export const Fo: any; // 内部符号: HD
@@ -168,7 +168,7 @@ declare module "@chunk/shared" {
   export { mentionsWithinBudget as Hc } from "../../shared/browser-tab-mentions";
   export const Hd: any; // 内部符号: Ug
   export { RpcStubLike as Hf } from "../../shared/rpc-core";
-  export const Hi: any; // 内部符号: lre
+  export { isWslUncPath as Hi } from "../../shared/wsl-paths";
   export { buildAutoInstallOptOutKey as Hl } from "../../shared/app-constants";
   export const Hn: any; // 内部符号: dY
   export const Ho: any; // 内部符号: fD
@@ -186,14 +186,14 @@ declare module "@chunk/shared" {
   export const In: any; // 内部符号: CY
   export const Io: any; // 内部符号: BD
   export const Ir: any; // 内部符号: wB
-  export const Is: any; // 内部符号: yT
+  export { isGitSource as Is } from "../../shared/host-config";
   export { ChunkedMessageSender as It } from "../../shared/chunked-message";
   export { BROWSER_CONTEXT_KINDS as Iu } from "../../shared/app-config";
   export const J: any; // 内部符号: dae
   export const Ja: any; // 内部符号: uA
   export const Jc: any; // 内部符号: oS
   export const Jd: any; // 内部符号: kg
-  export const Ji: any; // 内部符号: ore
+  export { changeTouchesVisualizationArtifact as Ji } from "../../shared/browser-context";
   export { NODE_REPL_COMMAND_ENV_KEY as Jl } from "../../shared/app-constants";
   export const Jn: any; // 内部符号: eJ
   export const Jo: any; // 内部符号: tD
@@ -218,7 +218,7 @@ declare module "@chunk/shared" {
   export { findDistribution as Lc } from "../../shared/browser-tab-mentions";
   export { deepEquals as Ld } from "../../shared/sandbox-permissions";
   export const Lf: any; // 内部符号: Ud
-  export const Li: any; // 内部符号: fre
+  export { setShouldSpawnInsideWsl as Li } from "../../shared/wsl-paths";
   export { BUNDLED_PLUGIN_DESCRIPTORS as Ll } from "../../shared/app-constants";
   export const Ln: any; // 内部符号: vY
   export const Lo: any; // 内部符号: RD
@@ -231,7 +231,7 @@ declare module "@chunk/shared" {
   export { candidateLimitForQuery as Mc } from "../../shared/browser-tab-mentions";
   export { sandboxModeOfPolicy as Md } from "../../shared/sandbox-permissions";
   export const Mf: any; // 内部符号: Fp
-  export const Mi: any; // 内部符号: oM
+  export { wslDistroName as Mi } from "../../shared/wsl-paths";
   export { CHROME_PLUGIN_NAME as Ml } from "../../shared/app-constants";
   export const Mn: any; // 内部符号: yY
   export const Mo: any; // 内部符号: nO
@@ -244,12 +244,12 @@ declare module "@chunk/shared" {
   export { dedupeTabCandidates as Nc } from "../../shared/browser-tab-mentions";
   export { permissionParamsOf as Nd } from "../../shared/sandbox-permissions";
   export const Nf: any; // 内部符号: Of
-  export const Ni: any; // 内部符号: sM
+  export { resolveWslDistro as Ni } from "../../shared/wsl-paths";
   export { CODEX_APP_TOOLS_PLUGIN_NAME as Nl } from "../../shared/app-constants";
   export const Nn: any; // 内部符号: bY
   export const No: any; // 内部符号: JD
   export const Nr: any; // 内部符号: SB
-  export const Ns: any; // 内部符号: CT
+  export { normalizeProjectPath as Ns } from "../../shared/host-config";
   export { commandAvailableForAccess as Nt } from "../../shared/command-registry";
   export const Nu: any; // 内部符号: Cy
   export const O: any; // 内部符号: ise
@@ -257,12 +257,12 @@ declare module "@chunk/shared" {
   export const Oc: any; // 内部符号: TC
   export { readOnlyPermissions as Od } from "../../shared/sandbox-permissions";
   export const Of: any; // 内部符号: kF（zod string builder，链式调用放宽为 any）
-  export const Oi: any; // 内部符号: xM
+  export { resolveCodexHome as Oi } from "../../shared/wsl-paths";
   export { stripDrivePrefix as Ol } from "../../shared/app-constants";
   export const On: any; // 内部符号: hX
   export const Oo: any; // 内部符号: wO
   export const Or: any; // 内部符号: uB
-  export const Os: any; // 内部符号: FT
+  export { isSshHostConfig as Os } from "../../shared/host-config";
   export { findCommandDefinition as Ot } from "../../shared/command-registry";
   export const Ou: any; // 内部符号: Yy
   export const P: any; // 内部符号: Ooe
@@ -295,7 +295,7 @@ declare module "@chunk/shared" {
   export { chromeExtensionIdsForChannel as Rc } from "../../shared/browser-tab-mentions";
   export const Rd: any; // 内部符号: i_
   export const Rf: any; // 内部符号: Id
-  export const Ri: any; // 内部符号: aM
+  export { shouldSpawnInsideWsl as Ri } from "../../shared/wsl-paths";
   export { UNIFIED_COMPUTER_USE_PLUGIN_NAME as Rl } from "../../shared/app-constants";
   export const Rn: any; // 内部符号: _Y
   export const Ro: any; // 内部符号: MD
@@ -334,7 +334,7 @@ declare module "@chunk/shared" {
   export const Uc: any; // 内部符号: hS
   export const Ud: any; // 内部符号: Hg
   export { RpcTarget as Uf } from "../../shared/rpc-core";
-  export const Ui: any; // 内部符号: Ij
+  export { isWslPath as Ui } from "../../shared/wsl-paths";
   export { marketplaceNameForFlavor as Ul } from "../../shared/app-constants";
   export const Un: any; // 内部符号: tY
   export const Uo: any; // 内部符号: sD
@@ -347,7 +347,7 @@ declare module "@chunk/shared" {
   export { BROWSER_PLUGIN_DESCRIPTORS as Vc } from "../../shared/browser-tab-mentions";
   export const Vd: any; // 内部符号: Xg
   export { RpcConnectionLike as Vf } from "../../shared/rpc-core";
-  export const Vi: any; // 内部符号: Rj
+  export { windowsToWslPath as Vi } from "../../shared/wsl-paths";
   export { DEFAULT_MARKETPLACE_NAME as Vl } from "../../shared/app-constants";
   export const Vn: any; // 内部符号: mY
   export const Vo: any; // 内部符号: gD
@@ -414,7 +414,7 @@ declare module "@chunk/shared" {
   export const _n: any; // 内部符号: _Q
   export const _o: any; // 内部符号: Hk
   export const _r: any; // 内部符号: WB
-  export const _s: any; // 内部符号: wT
+  export { DURABLE_HOST_ID as _s } from "../../shared/host-config";
   export { listCustomAvatars as _t } from "../../shared/pet-spritesheet";
   export const _u: any; // 内部符号: Gy
   export const a: any; // 内部符号: Wce
@@ -440,7 +440,7 @@ declare module "@chunk/shared" {
   export const bn: any; // 内部符号: pX
   export const bo: any; // 内部符号: Vk
   export const br: any; // 内部符号: UB
-  export const bs: any; // 内部符号: OT
+  export { hostIdOfEnvId as bs } from "../../shared/host-config";
   export { firstAcceleratorSync as bt } from "../../shared/command-registry";
   export { POPUP_WINDOW_SIZE as bu } from "../../shared/app-constants";
   export const c: any; // 内部符号: Ace
@@ -541,12 +541,12 @@ declare module "@chunk/shared" {
   export const jc: any; // 内部符号: mC
   export { runtimeWorkspaceRootsOf as jd } from "../../shared/sandbox-permissions";
   export const jf: any; // 内部符号: Jp
-  export const ji: any; // 内部符号: bM
+  export { wslToWindowsPath as ji } from "../../shared/wsl-paths";
   export { CHROME_INTERNAL_PLUGIN_NAME as jl } from "../../shared/app-constants";
   export const jn: any; // 内部符号: gX
   export const jo: any; // 内部符号: lO
   export const jr: any; // 内部符号: GB
-  export const js: any; // 内部符号: gT
+  export { GIT_SOURCE_HEADER_KEY as js } from "../../shared/host-config";
   export { defaultAcceleratorsForCommand as jt } from "../../shared/command-registry";
   export const ju: any; // 内部符号: Iy
   export const k: any; // 内部符号: Uoe
@@ -554,7 +554,7 @@ declare module "@chunk/shared" {
   export { raceWithAbortSignal as kc } from "../../shared/http-headers";
   export { workspaceWritePermissions as kd } from "../../shared/sandbox-permissions";
   export const kf: any; // 内部符号: Km
-  export const ki: any; // 内部符号: SM
+  export { resolveExecutionCodexHome as ki } from "../../shared/wsl-paths";
   export const kl: any; // 内部符号: Db
   export const kn: any; // 内部符号: EX
   export const ko: any; // 内部符号: xO
@@ -631,7 +631,7 @@ declare module "@chunk/shared" {
   export const qa: any; // 内部符号: lA
   export const qc: any; // 内部符号: sS
   export const qd: any; // 内部符号: jg
-  export const qi: any; // 内部符号: Mj
+  export { visualizationDateOf as qi } from "../../shared/browser-context";
   export { NODE_REPL_MODULE_DIR_ENV_KEY as ql } from "../../shared/app-constants";
   /** 按名字解析 PATH 上的可执行文件（带缓存），找不到返回 undefined。 */
   export const qn: {
@@ -752,7 +752,7 @@ declare module "@chunk/shared" {
   export { getBrowserFamilyStoreUrls as zc } from "../../shared/browser-tab-mentions";
   export const zd: any; // 内部符号: Qg
   export { ABORTED as zf } from "../../shared/rpc-core";
-  export const zi: any; // 内部符号: pre
+  export { shouldUseWslPaths as zi } from "../../shared/wsl-paths";
   export { USER_WRITING_PLUGIN_NAME as zl } from "../../shared/app-constants";
   export const zn: any; // 内部符号: gY
   export const zo: any; // 内部符号: ND
