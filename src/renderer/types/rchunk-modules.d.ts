@@ -1203,6 +1203,11 @@ declare module "@rchunk/appgen-project-row" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/start-appgen-conversation" {
+  export const n: (...args: any[]) => void;
+  export const t: () => void;
+}
+
 declare module "@rchunk/appgen-site-detail-layout" {
   export const n: () => void;
   export const t: (...args: any[]) => any;
