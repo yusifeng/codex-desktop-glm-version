@@ -570,6 +570,13 @@ declare module "@rchunk/home-artifact-template-card" {
   export const t: unknown;
 }
 
+declare module "@rchunk/queries" {
+  export const i: () => void;
+  export const n: (accountId: string) => unknown;
+  export const r: unknown;
+  export const t: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
