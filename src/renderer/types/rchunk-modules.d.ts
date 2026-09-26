@@ -365,6 +365,15 @@ declare module "@rchunk/library-file-picker-dialog" {
   export const LibraryFilePickerDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-settings-page" {
+  export const r: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/appgen-settings-dialog" {
+  export const AppgenSettingsDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
