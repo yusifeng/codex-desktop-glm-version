@@ -1826,6 +1826,8 @@ declare module "@rchunk/app-shared" {
   export const jT: IconAssetPreset;
   /** check icon asset（Wallet enrollment 成功态）。 */
   export const vD: IconAssetPreset;
+  /** Automation fallback icon（未设置 emoji 的 schedule row）。 */
+  export const wy: (props: Record<string, unknown>) => unknown;
   export interface MessageDescriptor {
     id: string;
     defaultMessage?: string;
@@ -3988,13 +3990,28 @@ declare module "@rchunk/appgen-access-state-messages" {
 }
 
 declare module "@rchunk/appgen-automations-state" {
-  export const n: (...args: any[]) => any;
+  export interface SiteAutomationAttachment extends Record<string, unknown> {
+    automation_ids?: string[];
+    id?: string;
+  }
+  export interface AutomationBacklinksResponse extends Record<string, unknown> {
+    sites: unknown[];
+  }
+  export const n: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string,
+    AutomationBacklinksResponse
+  >;
   export const r: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string[],
+    SiteAutomationAttachment[]
+  >;
 }
 
 declare module "@rchunk/appgen-automations-page" {
-  export const AppgenAutomationsPage: (...args: any[]) => any;
+  export const AppgenAutomationsPage: () => unknown;
 }
 
 declare module "@rchunk/appgen-database-page" {
@@ -4190,7 +4207,12 @@ declare module "@rchunk/google-drive-resource-icon" {
 
 declare module "@rchunk/open-automation-side-panel-tab" {
   export const a: (...args: any[]) => any;
-  export const i: (...args: any[]) => any;
+  export const i: (request: {
+    projectId: string;
+    prompt: string;
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>;
+    title: string;
+  }) => void;
   export const n: (...args: any[]) => any;
   export const r: (...args: any[]) => any;
   export const t: () => void;
