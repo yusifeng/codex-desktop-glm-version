@@ -663,6 +663,10 @@ declare module "@rchunk/codex-home-announcements" {
   export const t: unknown;
 }
 
+declare module "@rchunk/codex-home-announcements-entry" {
+  export const HomeComposerAnnouncements: unknown;
+}
+
 declare module "@rchunk/workspace-renewal-payment" {
   export const n: () => any;
   export const t: unknown;
