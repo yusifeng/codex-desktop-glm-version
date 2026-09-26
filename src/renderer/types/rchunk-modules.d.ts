@@ -1139,6 +1139,10 @@ declare module "@rchunk/appgen-automations-page" {
   export const AppgenAutomationsPage: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-database-page" {
+  export const AppgenDatabasePage: (...args: any[]) => any;
+}
+
 declare module "@rchunk/appgen-query" {
   export const APPGEN_ACCESS_GROUPS_QUERY_KEY: any;
   export const APPGEN_CUSTOM_DOMAINS_QUERY_KEY: any;
