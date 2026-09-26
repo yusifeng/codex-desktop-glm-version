@@ -612,6 +612,10 @@ declare module "@rchunk/subscription-onboarding-content" {
   export const v: unknown;
 }
 
+declare module "@rchunk/subscription-onboarding" {
+  export const SubscriptionOnboarding: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
