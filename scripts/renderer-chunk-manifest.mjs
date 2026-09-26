@@ -730,6 +730,7 @@ export const REWRITTEN = new Set([
   "above-composer-fixed-content-surface",
   "new-chat-page-suggestions-eligibility",
   "first-app-connect-ambient-suggestions",
+  "ambient-suggestion-apps",
   "rpc",
   "thread-virtualizer",
   "thread-scroll-controller-context-value",

@@ -19,7 +19,7 @@ declare module "@rchunk/app-shared" {
   };
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   export const $3: unknown; // rolldown lazy 辅助
-  export const BX: unknown;
+  export const BX: any;
   export const C_: unknown;
   export const FQ: unknown;
   export const FX: any;
@@ -30,12 +30,12 @@ declare module "@rchunk/app-shared" {
   export const K2: unknown;
   export const LX: unknown;
   export const P3: unknown;
-  export const QI: unknown;
+  export const QI: () => void;
   export const S_: unknown; // IconAsset（h3）
   export const Xi: unknown;
   export const Y2: unknown; // FormattedMessage
   export const Yi: unknown;
-  export const ZI: unknown;
+  export const ZI: any;
   export const __: unknown;
   export const b_: unknown; // React use（ait）
   export const fk: unknown;
@@ -45,6 +45,7 @@ declare module "@rchunk/app-shared" {
   export const iW: (path: string) => string;
   export const lk: unknown;
   export const wL: () => void;
+  export const rZ: any;
   export const m4: unknown; // intl message（J）
   export const mZ: any;
   export const n$: unknown;
@@ -83,6 +84,15 @@ declare module "@rchunk/app-initial" {
   export const oun: (queryClient: unknown, key: unknown) => Promise<unknown>;
   export const q3t: unknown;
   export const s6t: () => void;
+  export const $4t: () => void;
+  export const Bfn: () => void;
+  export const HEt: () => void;
+  export const M6t: () => void;
+  export const MEt: any;
+  export const N6t: () => { isLoading: boolean; userId?: string | null };
+  export const X4t: (app: unknown) => unknown;
+  export const oDt: () => void;
+  export const sDt: (input: { hostId: string }) => boolean;
   // scroll-to-match 依赖：CUt=查找器装配器 xUt=matchId 元素查找器
   export const CUt: unknown;
   export const xUt: unknown;
@@ -136,7 +146,11 @@ declare module "@rchunk/onboarding-mail-provider" {
 }
 
 declare module "@rchunk/ambient-suggestion-apps" {
-  export const _any: any;
+  export const a: unknown;
+  export const i: unknown;
+  export const n: unknown;
+  export const r: () => void;
+  export const t: unknown;
 }
 
 declare module "@rchunk/new-chat-suggestion-source-debug-state" {
