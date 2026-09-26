@@ -3,51 +3,76 @@
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type {
+  DerivedScopedSignalContext,
+  ScopedDerivedFamily,
+  ScopedSignal,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  Ftn: initializeThreadState,
+  Ltn: threadByIdFamily,
+  Sun: initializeAccountState,
+  _un: currentUserIdSignal,
+  mun: currentAccountIdSignal,
+} = appInitialChunk;
+const {
+  FX: initializeSignalRuntime,
+  QI: initializeAppScope,
+  ZI: appScope,
+  pZ: createScopedSignal,
+  rZ: createDerivedFamily,
+} = appSharedChunk;
 
 export interface PendingOnboarding {
-  accountId: unknown;
-  userId: unknown;
+  accountId: string | null;
+  userId: string | null;
   [key: string]: unknown;
 }
 
-let pendingOnboardingByThreadSignal: unknown = new Map();
-let pendingOnboardingForThreadFamily: unknown = Symbol(
-  "pending-onboarding-for-thread",
-);
+type AppScopeState = Record<string, unknown>;
+type PendingOnboardingMap = Map<string, PendingOnboarding>;
+
+let pendingOnboardingByThreadSignal: ScopedSignal<
+  AppScopeState,
+  PendingOnboardingMap
+>;
+let pendingOnboardingForThreadFamily: ScopedDerivedFamily<
+  AppScopeState,
+  string | null,
+  PendingOnboarding | null
+>;
 let initialized = false;
 
 function initializePendingOnboarding(): void {
   if (initialized) return;
   initialized = true;
-  appShared.FX?.();
-  appInitial.Sun?.();
-  appShared.QI?.();
-  appInitial.Ftn?.();
-  pendingOnboardingByThreadSignal =
-    appShared.pZ?.(appShared.ZI, new Map<string, PendingOnboarding>()) ??
-    pendingOnboardingByThreadSignal;
-  pendingOnboardingForThreadFamily =
-    appShared.rZ?.(
-      appShared.ZI,
-      (
-        threadId: string | null,
-        { get }: { get(signal: unknown, key?: unknown): any },
-      ) => {
-        if (threadId == null) return null;
-        const pending = get(pendingOnboardingByThreadSignal).get(threadId);
-        return pending != null &&
-          pending.accountId === get(appInitial.mun) &&
-          pending.userId === get(appInitial._un) &&
-          get(appInitial.Ltn, threadId) != null
-          ? pending
-          : null;
-      },
-    ) ?? pendingOnboardingForThreadFamily;
+  initializeSignalRuntime();
+  initializeAccountState();
+  initializeAppScope();
+  initializeThreadState();
+  pendingOnboardingByThreadSignal = createScopedSignal(
+    appScope,
+    new Map<string, PendingOnboarding>(),
+  );
+  pendingOnboardingForThreadFamily = createDerivedFamily(
+    appScope,
+    (
+      threadId: string | null,
+      { get }: DerivedScopedSignalContext<AppScopeState>,
+    ) => {
+      if (threadId == null) return null;
+      const pending = get(pendingOnboardingByThreadSignal).get(threadId);
+      return pending != null &&
+        pending.accountId === get<string | null>(currentAccountIdSignal) &&
+        pending.userId === get<string | null>(currentUserIdSignal) &&
+        get<unknown>(threadByIdFamily, threadId) != null
+        ? pending
+        : null;
+    },
+  );
 }
 
 export {

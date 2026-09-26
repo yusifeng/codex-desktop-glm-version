@@ -125,11 +125,15 @@ check(
 
 const pending = await loadModule("pending-onboarding", {
   "app-initial": `
+    export const Ftn = () => {};
     export const mun = Symbol("account");
     export const _un = Symbol("user");
     export const Ltn = Symbol("thread");
+    export const Sun = () => {};
   `,
   "app-shared": `
+    export const FX = () => {};
+    export const QI = () => {};
     export const ZI = Symbol("scope");
     export const pZ = (_scope, initial) => ({ initial });
     export const rZ = (_scope, resolver) => ({ resolver });

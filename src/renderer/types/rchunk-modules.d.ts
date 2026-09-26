@@ -2743,6 +2743,15 @@ declare module "@rchunk/app-initial" {
   ) => void;
   export const u1: (pluginId: string, navigate: (path: string) => void) => void;
   export const mun: import("@rchunk/app-shared").ReadableSignal<string | null>;
+  /** initializeThreadState（pending-onboarding 依赖的线程索引初始化器）。 */
+  export const Ftn: () => void;
+  /** 当前用户 ID signal。 */
+  export const _un: import("@rchunk/app-shared").ReadableSignal<string | null>;
+  /** 按 thread ID 读取线程记录的 signal family。 */
+  export const Ltn: import("@rchunk/app-shared").SignalFamily<
+    string,
+    unknown | null
+  >;
   export const F7: (
     scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
     resource: unknown,
@@ -2855,8 +2864,20 @@ declare module "@rchunk/onboarding-entrypoint" {
 }
 
 declare module "@rchunk/pending-onboarding" {
-  export const n: unknown;
-  export const r: unknown;
+  export interface PendingOnboarding {
+    accountId: string | null;
+    userId: string | null;
+    [key: string]: unknown;
+  }
+  export const n: import("@rchunk/app-shared").ScopedDerivedFamily<
+    Record<string, unknown>,
+    string | null,
+    PendingOnboarding | null
+  >;
+  export const r: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    Map<string, PendingOnboarding>
+  >;
   export const t: () => void;
 }
 
