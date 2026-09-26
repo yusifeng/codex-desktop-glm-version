@@ -374,6 +374,15 @@ declare module "@rchunk/chatgpt-skill-source-dialog" {
   export const ChatGptSkillSourceDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/gpt-about-dialog-core" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/gpt-header-about-dialog" {
+  export const GptHeaderAboutDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
