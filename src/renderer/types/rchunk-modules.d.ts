@@ -220,6 +220,17 @@ declare module "@rchunk/codex-app-home-beacon-announcement-core" {
   export const t: unknown;
 }
 
+declare module "@rchunk/access-splash" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/lock" {
+  export const n: () => void;
+  export const t: unknown;
+  export const _any: any;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;

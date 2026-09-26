@@ -48,7 +48,11 @@ globalThis.__homeOnboardingTest = {
   artifactCalls: [],
   initializers: [],
   jsx: {
+    Fragment: "fragment",
     jsx(type, props) {
+      return { type, props };
+    },
+    jsxs(type, props) {
       return { type, props };
     },
   },
@@ -195,5 +199,95 @@ check(
   "initializes and re-exports beacon content",
 );
 
-assert.equal(assertions, 12);
+globalThis.__homeOnboardingTest.openedLinks = [];
+const access = await loadModule("access-splash", {
+  "app-initial": `
+    export const i7 = "ExternalLink";
+    export const Oft = value => globalThis.__homeOnboardingTest.openedLinks.push(value);
+  `,
+  "app-shared": "export const I3 = globalThis.__homeOnboardingTest.jsx;",
+  lock: `
+    export const n = () => globalThis.__homeOnboardingTest.initializers.push("lock");
+    export const t = "Lock";
+  `,
+});
+access.n();
+const accessTree = access.t({
+  accessMessage: "No access",
+  description: "Description",
+  learnMoreLabel: "Learn more",
+  learnMoreUrl: "https://example.com/learn",
+  title: "Title",
+});
+const accessNodes = (function walk(node) {
+  if (node == null || typeof node !== "object") return [];
+  const children = node.props?.children;
+  return [
+    node,
+    ...(Array.isArray(children) ? children.flatMap(walk) : walk(children)),
+  ];
+})(accessTree);
+check(accessTree.type === "main", "renders access splash as the main region");
+const learnMore = accessNodes.find((node) => node.type === "a");
+check(
+  learnMore.props.href === "https://example.com/learn",
+  "renders the learn-more destination",
+);
+learnMore.props.onClick("event");
+check(
+  globalThis.__homeOnboardingTest.openedLinks[0].initiator ===
+    "open_in_browser_bridge",
+  "routes learn-more clicks through the browser bridge",
+);
+check(
+  accessNodes.some((node) => node.type === "Lock"),
+  "renders the access lock icon",
+);
+
+const localSplash = await loadModule("codex-local-access-splash", {
+  "access-splash": `
+    export const n = () => globalThis.__homeOnboardingTest.initializers.push("access-local");
+    export const t = "AccessSplash";
+  `,
+  "app-shared": `
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const Y2 = "Message";
+  `,
+});
+const localTree = localSplash.CodexLocalAccessSplash();
+check(
+  localTree.type === "AccessSplash",
+  "composes the shared Codex access splash",
+);
+check(
+  localTree.props.learnMoreUrl === "https://chatgpt.com/codex/",
+  "uses the Codex learn-more URL",
+);
+
+const workSplash = await loadModule("work-mode-access-splash", {
+  "access-splash": `
+    export const n = () => globalThis.__homeOnboardingTest.initializers.push("access-work");
+    export const t = "AccessSplash";
+  `,
+  "app-primary": `
+    export const Cg = "ModeToggleContext";
+    export const wg = () => {};
+  `,
+  "app-shared": `
+    export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const Y2 = "Message";
+  `,
+});
+const workTree = workSplash.WorkModeAccessSplash({ modeToggle: "toggle" });
+check(
+  workTree.props.children[0].type === "ModeToggleContext",
+  "wraps the Work mode toggle in context",
+);
+check(
+  workTree.props.children[1].props.learnMoreUrl ===
+    "https://openai.com/chatgpt-work/",
+  "uses the Work learn-more URL",
+);
+
+assert.equal(assertions, 20);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
