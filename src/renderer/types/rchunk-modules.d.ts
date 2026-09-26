@@ -179,6 +179,27 @@ declare module "@rchunk/app-shared" {
   export const Zc: (props: SettingsGroupProps) => unknown;
   /** initializeSettingsGroup（内部 Cyt）。 */
   export const Qc: () => void;
+  export interface StylePropertyMap {
+    getPropertyValue(name: string): string;
+    removeProperty(name: string): string;
+    setProperty(name: string, value: string): void;
+  }
+  export interface StylePropertyTarget {
+    style: StylePropertyMap;
+  }
+  export type StylePropertyValues = Record<
+    string,
+    string | null | undefined
+  >;
+  /** syncStyleProperties（app-shared/ui/dom-style.ts，内部 wyt）。 */
+  export const Yc: (
+    element: StylePropertyTarget,
+    properties: StylePropertyValues,
+  ) => void;
+  /** initializeStylePropertySync（内部 Tyt）。 */
+  export const Xc: () => void;
+  /** initializeStylePropertyRuntime（内部 Eyt）。 */
+  export const Jc: () => void;
   export interface DialogLayoutProps extends Record<string, unknown> {
     children?: unknown;
     className?: string;
