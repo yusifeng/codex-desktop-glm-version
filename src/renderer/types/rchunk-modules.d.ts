@@ -211,6 +211,25 @@ declare module "@rchunk/app-shared" {
   export const NH: MinimumIntervalGateConstructor;
   /** initializeMinimumIntervalGate（内部 QV）。 */
   export const PH: () => void;
+  export interface PathValue {
+    path: string;
+  }
+  export interface PreviewablePathValue extends PathValue {
+    fsPath?: string;
+    startLine?: number | null;
+  }
+  /** isDirectoryPath（app-shared/runtime/file-predicates.ts，内部 GBe）。 */
+  export const bU: (value: PathValue) => boolean;
+  /** isRichFilePath（内部 KBe）。 */
+  export const xU: (value: PreviewablePathValue) => boolean;
+  /** isMissingFileError（内部 JBe）。 */
+  export const _U: (value: unknown) => boolean;
+  /** initializeMissingFileError（内部 IV）。 */
+  export const gU: () => void;
+  /** isLibraryFileId（内部 XBe）。 */
+  export const hU: (value: string) => boolean;
+  /** initializeLibraryFileId（内部 ZBe）。 */
+  export const mU: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
