@@ -219,6 +219,10 @@ declare module "@rchunk/right-panel-composer-overlay-alignment" {
   export const t: () => void;
 }
 
+declare module "@rchunk/composer-overlay" {
+  export const HomeComposerOverlay: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
