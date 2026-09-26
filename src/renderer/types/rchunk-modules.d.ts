@@ -804,6 +804,37 @@ declare module "@rchunk/app-shared" {
   export const vW: "X-OpenAI-Expected-Account-Id";
   /** initializeRequestProtocol（内部 iV）。 */
   export const CW: () => void;
+  export type SitesSharingSource =
+    | "CODEX_SITES_SHARING_SOURCE_UNSPECIFIED"
+    | "CODEX_SITES_SHARING_SOURCE_LIBRARY"
+    | "CODEX_SITES_SHARING_SOURCE_LIBRARY_ACCESS_BADGE"
+    | "CODEX_SITES_SHARING_SOURCE_SITES"
+    | "CODEX_SITES_SHARING_SOURCE_SITES_ACCESS_BADGE"
+    | "CODEX_SITES_SHARING_SOURCE_SETTINGS"
+    | "CODEX_SITES_SHARING_SOURCE_CONVERSATION_RESOURCE"
+    | "CODEX_SITES_SHARING_SOURCE_IN_APP_BROWSER"
+    | "UNRECOGNIZED";
+  export interface SitesSharingSources {
+    readonly CODEX_SITES_SHARING_SOURCE_UNSPECIFIED:
+      "CODEX_SITES_SHARING_SOURCE_UNSPECIFIED";
+    readonly CODEX_SITES_SHARING_SOURCE_LIBRARY:
+      "CODEX_SITES_SHARING_SOURCE_LIBRARY";
+    readonly CODEX_SITES_SHARING_SOURCE_LIBRARY_ACCESS_BADGE:
+      "CODEX_SITES_SHARING_SOURCE_LIBRARY_ACCESS_BADGE";
+    readonly CODEX_SITES_SHARING_SOURCE_SITES:
+      "CODEX_SITES_SHARING_SOURCE_SITES";
+    readonly CODEX_SITES_SHARING_SOURCE_SITES_ACCESS_BADGE:
+      "CODEX_SITES_SHARING_SOURCE_SITES_ACCESS_BADGE";
+    readonly CODEX_SITES_SHARING_SOURCE_SETTINGS:
+      "CODEX_SITES_SHARING_SOURCE_SETTINGS";
+    readonly CODEX_SITES_SHARING_SOURCE_CONVERSATION_RESOURCE:
+      "CODEX_SITES_SHARING_SOURCE_CONVERSATION_RESOURCE";
+    readonly CODEX_SITES_SHARING_SOURCE_IN_APP_BROWSER:
+      "CODEX_SITES_SHARING_SOURCE_IN_APP_BROWSER";
+    readonly UNRECOGNIZED: "UNRECOGNIZED";
+  }
+  /** sitesSharingSources（app-shared/runtime/sites-sharing-source.ts，内部 Eq）。 */
+  export const DF: SitesSharingSources;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
   export const FQ: unknown;
