@@ -965,6 +965,7 @@ export const REWRITTEN = new Set([
   "appgen-site-detail-route",
   "appgen-site-detail-layout",
   "toolbar-breadcrumb",
+  "security-tabs",
   "appgen-publication-terms-route",
   "appgen-browser-site-core",
   "appgen-browser-site-entry",
