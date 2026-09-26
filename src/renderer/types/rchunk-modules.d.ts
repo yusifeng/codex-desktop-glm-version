@@ -589,6 +589,10 @@ declare module "@rchunk/stripe-payment-confirmation" {
   }) => Promise<any>;
 }
 
+declare module "@rchunk/wallet-onboarding-announcement-modal" {
+  export const WalletOnboardingAnnouncementModal: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
