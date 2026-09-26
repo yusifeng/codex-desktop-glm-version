@@ -4,38 +4,101 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type {
+  JsxRuntime,
+  ScopedSignalFamily,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-let jsx: any;
-let migrationFailureState: any;
+
+export interface MigrationFailedFile extends Record<string, unknown> {
+  file_id?: string;
+  message?: string;
+  type: "knowledge_file" | "profile_picture" | string;
+}
+
+export interface MigrationIssue extends Record<string, unknown> {
+  message?: string;
+  resource: { id?: string; name?: string; type: string };
+}
+
+export interface MigrationUploadedFile extends Record<string, unknown> {
+  file_id?: string;
+  file_response_type?: string;
+  name?: string;
+}
+
+export interface MigrationFailureValue {
+  failedFiles: MigrationFailedFile[];
+}
+
+export interface MigrationFailureDetailsProps {
+  failedFiles: MigrationFailedFile[];
+  files?: MigrationUploadedFile[];
+  issues?: MigrationIssue[];
+  migrationSucceeded: boolean;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  FX: initializeSignalRuntime,
+  I3: getJsxRuntime,
+  K2: initializeReactRuntime,
+  QI: initializeAppScope,
+  Y2: FormattedMessage,
+  ZI: appScope,
+  oZ: createSignalFamily,
+  om: Alert,
+  sm: initializeAlert,
+} = appSharedChunk;
+const {
+  afn: getExperiment,
+  ifn: initializeMigrationExperiments,
+  n7: AnnouncementBanner,
+  r7: initializeAccountPlan,
+} = appInitialChunk;
+
+let jsx: JsxRuntime;
+let migrationFailureState: ScopedSignalFamily<
+  Record<string, unknown>,
+  string,
+  MigrationFailureValue | null
+>;
 
 function initializeMigrationFailureState(): void {
-  appShared.FX?.();
-  appShared.QI?.();
-  migrationFailureState ??= appShared.oZ?.(appShared.ZI, () => null);
+  if (migrationFailureState != null) return;
+  initializeSignalRuntime();
+  initializeAppScope();
+  migrationFailureState = createSignalFamily(appScope, () => null);
 }
 
-function isKnowledgeFile(file: any): boolean {
+function isKnowledgeFile(file: MigrationFailedFile): boolean {
   return file.type === "knowledge_file";
 }
-function isProfilePicture(file: any): boolean {
+function isProfilePicture(file: MigrationFailedFile): boolean {
   return file.type === "profile_picture";
 }
 
-function FailedKnowledgeFile({ file, files, issues }: any): unknown {
+function FailedKnowledgeFile({
+  file,
+  files,
+  issues,
+}: {
+  file: MigrationFailedFile;
+  files?: MigrationUploadedFile[];
+  issues?: MigrationIssue[];
+}): unknown {
   const matchingIssues = issues?.filter(
-    (issue: any) =>
+    (issue) =>
       issue.resource.type === "knowledge_file" &&
       file.file_id != null &&
       issue.resource.id === file.file_id,
   );
   const uploadedFile = files?.find(
-    (candidate: any) => candidate.file_id === file.file_id,
+    (candidate) => candidate.file_id === file.file_id,
   );
   const filename =
-    matchingIssues?.find((issue: any) => issue.resource.name)?.resource.name ||
+    matchingIssues?.find((issue) => issue.resource.name)?.resource.name ||
     (uploadedFile?.file_response_type === "full_file_response"
       ? uploadedFile.name
       : undefined) ||
@@ -44,7 +107,7 @@ function FailedKnowledgeFile({ file, files, issues }: any): unknown {
   return jsx.jsx("li", {
     className: "wrap-anywhere text-default select-text",
     children: filename
-      ? jsx.jsx(appShared.Y2, {
+      ? jsx.jsx(FormattedMessage, {
           id: "chatgptConversations.gpts.migration.referenceFileCopyErrorWithFilename",
           defaultMessage: "<strong>{filename}</strong> — {message}",
           description:
@@ -55,7 +118,7 @@ function FailedKnowledgeFile({ file, files, issues }: any): unknown {
             strong: (children: unknown) => jsx.jsx("strong", { children }),
           },
         })
-      : jsx.jsx(appShared.Y2, {
+      : jsx.jsx(FormattedMessage, {
           id: "chatgptConversations.gpts.migration.unnamedReferenceFileCopyErrorWithLabel",
           defaultMessage: "<strong>Reference file</strong> — {message}",
           description:
@@ -73,23 +136,22 @@ function MigrationFailureDetails({
   files,
   issues,
   migrationSucceeded,
-}: any): unknown {
+}: MigrationFailureDetailsProps): unknown {
   const updatesDisabled =
-    appInitial.afn?.("2513446768")?.get?.("disable_gpt_updates", false) ??
-    false;
+    getExperiment("2513446768").get("disable_gpt_updates", false);
   const knowledgeFiles = failedFiles.filter(isKnowledgeFile);
   const profilePictures = failedFiles.filter(isProfilePicture);
   const profileWarning =
     profilePictures.length === 0
       ? null
-      : jsx.jsx(appInitial.n7, {
+      : jsx.jsx(AnnouncementBanner, {
           type: "warning",
           variant: "callout",
           layout: "vertical",
           role: "alert",
           content: jsx.jsx("p", {
             className: "select-none",
-            children: jsx.jsx(appShared.Y2, {
+            children: jsx.jsx(FormattedMessage, {
               id: migrationSucceeded
                 ? "chatgptConversations.gpts.migration.profileCopyFailedAfterSuccess"
                 : "chatgptConversations.gpts.migration.profileCopyFailedBeforeSuccess",
@@ -102,20 +164,20 @@ function MigrationFailureDetails({
         });
   let description: unknown;
   if (migrationSucceeded)
-    description = jsx.jsx(appShared.Y2, {
+    description = jsx.jsx(FormattedMessage, {
       id: "chatgptConversations.gpts.migration.referenceCopyWarningAfterSuccess",
       defaultMessage:
         "Your plugin was created without these files. Open your plugin and choose Edit plugin to add them.",
       description: "Reference files omitted after successful migration",
     });
   else if (updatesDisabled)
-    description = jsx.jsx(appShared.Y2, {
+    description = jsx.jsx(FormattedMessage, {
       id: "chatgptConversations.gpts.migration.referenceCopyFailedReadonlyDescription",
       defaultMessage: "Your plugin wasn’t created. Try again later.",
       description: "Readonly GPT migration copy failure",
     });
   else
-    description = jsx.jsx(appShared.Y2, {
+    description = jsx.jsx(FormattedMessage, {
       id: "chatgptConversations.gpts.migration.referenceCopyFailedDescription",
       defaultMessage:
         "Your plugin wasn’t created. Try again, or fix these files and republish the GPT.",
@@ -124,14 +186,14 @@ function MigrationFailureDetails({
   const fileFailures =
     knowledgeFiles.length === 0
       ? null
-      : jsx.jsx(appShared.om, {
+      : jsx.jsx(Alert, {
           level: "danger",
           children: jsx.jsxs("div", {
             className: "flex flex-col gap-1 text-sm",
             children: [
               jsx.jsx("h3", {
                 className: "font-semibold text-default select-none",
-                children: jsx.jsx(appShared.Y2, {
+                children: jsx.jsx(FormattedMessage, {
                   id: "chatgptConversations.gpts.migration.referenceCopyFailed",
                   defaultMessage:
                     "{count, plural, one {A reference file couldn’t be synced} other {Reference files couldn’t be synced}}",
@@ -145,7 +207,7 @@ function MigrationFailureDetails({
               }),
               jsx.jsx("ul", {
                 className: "flex list-disc flex-col gap-1 ps-5",
-                children: knowledgeFiles.map((file: any, index: number) =>
+                children: knowledgeFiles.map((file, index) =>
                   jsx.jsx(FailedKnowledgeFile, { file, files, issues }, index),
                 ),
               }),
@@ -161,11 +223,12 @@ function MigrationFailureDetails({
 let initialized = false;
 function initializeMigrationFailure(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.sm?.();
-  appInitial.ifn?.();
-  jsx = appShared.I3?.();
+  initializeRuntimeLazy();
+  initializeReactRuntime();
+  initializeAlert();
+  initializeMigrationExperiments();
+  initializeAccountPlan();
+  jsx = getJsxRuntime();
   initialized = true;
 }
 

@@ -4035,10 +4035,36 @@ declare module "@rchunk/gpt-plugin-migration-dialog" {
 }
 
 declare module "@rchunk/gpt-plugin-migration-failure" {
-  export const i: unknown;
+  export interface MigrationFailedFile extends Record<string, unknown> {
+    file_id?: string;
+    message?: string;
+    type: "knowledge_file" | "profile_picture" | string;
+  }
+  export interface MigrationIssue extends Record<string, unknown> {
+    message?: string;
+    resource: { id?: string; name?: string; type: string };
+  }
+  export interface MigrationUploadedFile extends Record<string, unknown> {
+    file_id?: string;
+    file_response_type?: string;
+    name?: string;
+  }
+  export interface MigrationFailureValue {
+    failedFiles: MigrationFailedFile[];
+  }
+  export const i: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    string,
+    MigrationFailureValue | null
+  >;
   export const n: () => void;
   export const r: () => void;
-  export const t: unknown;
+  export const t: (props: {
+    failedFiles: MigrationFailedFile[];
+    files?: MigrationUploadedFile[];
+    issues?: MigrationIssue[];
+    migrationSucceeded: boolean;
+  }) => unknown;
 }
 
 declare module "@rchunk/gpt-management-url" {
