@@ -9,10 +9,51 @@ void runtimeChunk;
 
 const appInitial = appInitialChunk as Record<string, any>;
 const appPrimary = appPrimaryChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  BX: useSignalFamilyValue,
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+  _Z: releaseSignalFamilyMember,
+  e6: reactRuntime,
+} = appSharedChunk;
 
-let React: any;
-let debugBeacon: any;
+interface ReactRuntime {
+  useContext<Value>(context: unknown): Value;
+  useEffect(
+    effect: () => void | (() => void),
+    dependencies: readonly unknown[],
+  ): void;
+  useRef<Value>(initialValue: Value): { current: Value };
+}
+
+interface HomeBeaconRecord extends Record<string, unknown> {
+  beacon_id: string;
+}
+
+type BeaconSelection =
+  | { status: "idle" | "pending" }
+  | { beacon: HomeBeaconRecord; status: "selected" };
+
+interface HomeBeaconResult {
+  accountId: string | null;
+  beacon: HomeBeaconRecord | null;
+  containerBeacon: HomeBeaconRecord | null;
+  isEligible: boolean;
+  isLoading: boolean;
+  shouldSuppressVanillaPromos: boolean;
+}
+
+function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
+  return (typeof runtimeOrFactory === "function"
+    ? runtimeOrFactory()
+    : runtimeOrFactory) as Runtime;
+}
+
+let React: ReactRuntime;
+let debugBeacon: HomeBeaconRecord;
 let initialized = false;
 
 interface BeaconMessageIdentity {
@@ -72,21 +113,25 @@ function recordBeaconViewOnce(
 function useHomeBeacon(
   product = "codex",
   options: { shouldSuppressFocusedModal?: boolean } = {},
-) {
+): HomeBeaconResult {
   initializeHomeBeacon();
   const shouldSuppressFocusedModal =
     options.shouldSuppressFocusedModal ?? appPrimary.Fh;
   const navigation = appInitial.i_n?.() ?? { key: "", pathname: "/" };
-  const scope = appShared.LX?.(appShared.ZI);
+  const scope = useSignalScope(applicationScope);
   const identity = appInitial.N6t?.() ?? {};
   const accountQuery = appInitial.uht?.() ?? {};
   const session = appInitial.lfn?.();
-  const localeState = appShared.HX?.(appInitial.mpn) ?? { locale: "en" };
-  const debug = appShared.HX?.(appInitial.nPt) === true;
-  const activeClaims = appShared.HX?.(appInitial.YNt);
-  const focusedModalSuppressed = appShared.HX?.(appInitial.GNt) === true;
-  const pageContextSuppressionEnabled = appShared.HX?.(appInitial.ZNt) === true;
-  const pageContext = React.useContext(appPrimary.Th);
+  const localeState = useSignalValue<{ locale: string }>(appInitial.mpn) ?? {
+    locale: "en",
+  };
+  const debug = useSignalValue<boolean>(appInitial.nPt) === true;
+  const activeClaims = useSignalValue<unknown>(appInitial.YNt);
+  const focusedModalSuppressed =
+    useSignalValue<boolean>(appInitial.GNt) === true;
+  const pageContextSuppressionEnabled =
+    useSignalValue<boolean>(appInitial.ZNt) === true;
+  const pageContext = React.useContext<unknown>(appPrimary.Th);
   const telemetryAccountId =
     session?.getContext?.().user?.customIDs?.account_id ?? null;
   const accountId =
@@ -110,7 +155,7 @@ function useHomeBeacon(
           pathname: navigation.pathname,
           product,
         });
-  const selection = appShared.BX?.(appPrimary.jh, {
+  const selection = (useSignalFamilyValue?.(appPrimary.jh, {
     accountId,
     locale: localeState.locale,
     pathname: navigation.pathname,
@@ -118,7 +163,7 @@ function useHomeBeacon(
     shouldFetch: canFetch,
     shouldSuppressFocusedModal,
     visitKey: visitKey ?? "",
-  }) ?? { status: "idle" };
+  }) ?? { status: "idle" }) as BeaconSelection;
 
   const cleanupKey = JSON.stringify([
     accountId,
@@ -141,7 +186,7 @@ function useHomeBeacon(
           state.cleanupGeneration === generation ||
           state.activeKey !== cleanupKey
         ) {
-          appShared._Z?.(scope, appPrimary.Nh, {
+          releaseSignalFamilyMember?.(scope, appPrimary.Nh, {
             accountId,
             locale: localeState.locale,
             pathname: navigation.pathname,
@@ -226,8 +271,8 @@ function useHomeBeacon(
 function initializeHomeBeacon(): void {
   if (initialized) return;
   initialized = true;
-  appShared.FX?.();
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
+  initializeSignalRuntime?.();
+  React = resolveRuntime<ReactRuntime>(reactRuntime);
   appInitial.Qgn?.();
   appInitial.M6t?.();
   appInitial.DNt?.();
@@ -240,7 +285,7 @@ function initializeHomeBeacon(): void {
   appPrimary.Dh?.();
   appInitial.ppn?.();
   appInitial.JNt?.();
-  appShared.QI?.();
+  initializeSharedRuntime?.();
   appInitial.ifn?.();
   debugBeacon = {
     type: "beacon_ui_response",

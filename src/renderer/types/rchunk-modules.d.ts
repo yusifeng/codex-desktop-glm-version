@@ -1007,6 +1007,12 @@ declare module "@rchunk/app-shared" {
     options?: QueryReadOptions,
   ) => T;
   export const I3: unknown; // jsx runtime
+  /** releaseSignalFamilyMember（释放指定 family parameter 的 retained state）。 */
+  export const _Z: <Param>(
+    scope: MaitaiScopeApi<unknown>,
+    family: SignalFamily<Param, unknown>,
+    parameter: Param,
+  ) => void;
   export const IQ: unknown;
   export const JQ: unknown;
   export const K2: () => void;
@@ -3093,8 +3099,38 @@ declare module "@rchunk/task-announcement-candidates" { export const TaskAnnounc
 declare module "@rchunk/popup" { export const i: unknown; export const n: () => void; export const r: unknown; export const t: unknown; }
 declare module "@rchunk/browser-address-suggestion-overlay" { export const BrowserAddressSuggestionOverlay: unknown; }
 declare module "@rchunk/home-beacon" {
-  export const n: (...args: any[]) => boolean;
-  export const r: (...args: any[]) => any;
+  export interface BeaconMessageIdentity {
+    conversationId: string;
+    messageId: string;
+    suppressLifecycle?: boolean;
+  }
+  export interface HomeBeaconRecord extends Record<string, unknown> {
+    beacon_id: string;
+  }
+  export interface HomeBeaconResult {
+    accountId: string | null;
+    beacon: HomeBeaconRecord | null;
+    containerBeacon: HomeBeaconRecord | null;
+    isEligible: boolean;
+    isLoading: boolean;
+    shouldSuppressVanillaPromos: boolean;
+  }
+  export const n: (
+    scope: {
+      get(signal: unknown): Set<string>;
+      set(
+        signal: unknown,
+        update: (current: Set<string>) => Set<string>,
+      ): void;
+    },
+    accountId: string,
+    beacon: HomeBeaconRecord,
+    message: BeaconMessageIdentity | null,
+  ) => boolean;
+  export const r: (
+    product?: string,
+    options?: { shouldSuppressFocusedModal?: boolean },
+  ) => HomeBeaconResult;
   export const t: () => void;
 }
 

@@ -1158,7 +1158,11 @@ check(
   "opens and records onboarding policy links",
 );
 
-globalThis.__homeOnboardingTest.homeBeacon = { events: [] };
+globalThis.__homeOnboardingTest.homeBeacon = {
+  cleanups: [],
+  events: [],
+  releases: [],
+};
 const homeBeacon = await loadModule("home-beacon", {
   "app-shared": `
     export const ZI = Symbol("scope");
@@ -1167,7 +1171,10 @@ const homeBeacon = await loadModule("home-beacon", {
     export const e6 = {
       useContext: () => null,
       useRef: value => ({ current: value }),
-      useEffect: effect => { effect(); }
+      useEffect: effect => {
+        const cleanup = effect();
+        if (cleanup) globalThis.__homeOnboardingTest.homeBeacon.cleanups.push(cleanup);
+      }
     };
     export const LX = () => ({ id: "scope" });
     export const HX = signal => signal.description === "locale" ? { locale: "en-US" } : false;
@@ -1175,7 +1182,9 @@ const homeBeacon = await loadModule("home-beacon", {
       status: "selected",
       beacon: { beacon_id: "beacon-1", kind: "banner" }
     });
-    export const _Z = () => {};
+    export const _Z = (_scope, _family, parameter) => {
+      globalThis.__homeOnboardingTest.homeBeacon.releases.push(parameter);
+    };
   `,
   "app-initial": `
     export const mpn = Symbol("locale");
@@ -1251,6 +1260,13 @@ check(
 check(
   selectedHomeBeacon.shouldSuppressVanillaPromos,
   "suppresses lower-priority promos while a Beacon selection is active",
+);
+globalThis.__homeOnboardingTest.homeBeacon.cleanups.at(-1)();
+await new Promise((resolve) => queueMicrotask(resolve));
+check(
+  globalThis.__homeOnboardingTest.homeBeacon.releases[0].accountId ===
+    "account-1",
+  "releases the retained Beacon family member during hook cleanup",
 );
 
 globalThis.__homeOnboardingTest.financeBeacon = {
@@ -1462,5 +1478,5 @@ check(
   "forwards API-key edits and disables empty submission",
 );
 
-assert.equal(assertions, 96);
+assert.equal(assertions, 97);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
