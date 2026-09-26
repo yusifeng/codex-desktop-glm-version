@@ -710,6 +710,7 @@ export const REWRITTEN = new Set([
   "home-task-suggestions-entry",
   "home-task-suggestions-core",
   "home-composer-mode-toggle-entry",
+  "home-composer-mode-toggle-core",
   "rpc",
   "thread-virtualizer",
   "thread-scroll-controller-context-value",
