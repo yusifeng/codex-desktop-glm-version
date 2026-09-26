@@ -1198,6 +1198,15 @@ declare module "@rchunk/appgen-project-row" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-site-detail-layout" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/appgen-site-detail-route" {
+  export const AppgenSiteDetailRoute: (...args: any[]) => any;
+}
+
 declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
