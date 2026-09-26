@@ -374,6 +374,15 @@ declare module "@rchunk/appgen-settings-dialog" {
   export const AppgenSettingsDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-share-dialog" {
+  export const AppgenShareDialog: (...args: any[]) => any;
+}
+
+declare module "@rchunk/open-appgen-share-dialog" {
+  export const n: (...args: any[]) => void;
+  export const t: () => void;
+}
+
 declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
