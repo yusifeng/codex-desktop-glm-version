@@ -6,56 +6,89 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as chatChoiceChunk from "@rchunk/chat-choice-view";
 import * as migratedAccessChunk from "@rchunk/migrated-plugin-access";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const chatChoice = chatChoiceChunk as Record<string, any>;
-const migratedAccess = migratedAccessChunk as Record<string, any>;
 
-let jsx: any;
+export type MigratedPluginPresentation = "notice" | "row";
+
+export interface MigratedPluginNoticeProps {
+  gptName?: string;
+  onClose?: () => void;
+  pluginId: string;
+  presentation?: MigratedPluginPresentation;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  BX: useSignalFamilyValue,
+  C_: initializeIconAsset,
+  FX: initializeSignalRuntime,
+  I3: getJsxRuntime,
+  Is: openPluginIcon,
+  K2: initializeReactRuntime,
+  Ls: initializeOpenPluginIcon,
+  S_: IconAsset,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+} = appSharedChunk;
+const {
+  Qgn: initializeGptResources,
+  l1: initializePluginNavigation,
+  o_n: useNavigate,
+  u1: openPlugin,
+} = appInitialChunk;
+const {
+  n: initializeChatChoiceView,
+  t: ChatChoiceView,
+} = chatChoiceChunk;
+const {
+  n: migratedPluginAccessQuery,
+  t: initializeMigratedPluginAccess,
+} = migratedAccessChunk;
+
+let jsx: JsxRuntime;
 let initialized = false;
 function initializeMigratedPluginNotice(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.Ls?.();
-  appShared.FX?.();
-  appShared.K2?.();
-  appInitial.Qgn?.();
-  appShared.Zh?.();
-  appShared.C_?.();
-  appInitial.l1?.();
-  chatChoice.n?.();
-  migratedAccess.t?.();
-  jsx = appShared.I3?.();
+  initializeRuntimeLazy();
+  initializeOpenPluginIcon();
+  initializeSignalRuntime();
+  initializeReactRuntime();
+  initializeGptResources();
+  initializeButton();
+  initializeIconAsset();
+  initializePluginNavigation();
+  initializeChatChoiceView();
+  initializeMigratedPluginAccess();
+  jsx = getJsxRuntime();
   initialized = true;
 }
-
-type Presentation = "notice" | "row";
 
 function OpenPluginButton({
   onOpen,
   presentation = "notice",
 }: {
   onOpen: () => void;
-  presentation?: Presentation;
+  presentation?: MigratedPluginPresentation;
 }): unknown {
   const isRow = presentation === "row";
-  return jsx.jsxs(appShared.Yh, {
+  return jsx.jsxs(Button, {
     className: "w-full",
     color: isRow ? "outlineGhost" : "primary",
     size: isRow ? "entityRowAction" : "beaconAction",
     type: "button",
     onClick: onOpen,
     children: [
-      jsx.jsx(appShared.Y2, {
+      jsx.jsx(FormattedMessage, {
         id: "chatgptConversations.gpts.migration.openPlugin",
         defaultMessage: "Open plugin",
         description:
           "Button in a migrated GPT notice or migration success dialog that opens the destination plugin's detail page; it does not install or run the plugin",
       }),
-      jsx.jsx(appShared.S_, {
-        asset: appShared.Is,
+      jsx.jsx(IconAsset, {
+        asset: openPluginIcon,
         className: "shrink-0",
       }),
     ],
@@ -72,13 +105,13 @@ function MigratedPluginAccessPresentation({
 }: {
   accessState: string;
   gptName?: string;
-  presentation?: Presentation;
+  presentation?: MigratedPluginPresentation;
   onOpen: () => void;
   onRetry: () => void;
   onExplore: () => void;
 }): unknown {
   if (gptName != null)
-    return jsx.jsx(chatChoice.t, {
+    return jsx.jsx(ChatChoiceView, {
       accessState,
       gptName,
       onRetry,
@@ -96,17 +129,17 @@ function AccessCheckedMigratedPlugin({
   gptName: string;
   onClose?: () => void;
 }): unknown {
-  const navigate = appInitial.o_n?.() ?? (() => {});
-  const query = appShared.BX?.(migratedAccess.n, pluginId) ?? {};
-  let accessState = "denied";
+  const navigate = useNavigate();
+  const query = useSignalFamilyValue(migratedPluginAccessQuery, pluginId);
+  let accessState: "allowed" | "denied" | "error" | "pending" = "denied";
   if (query.isPending || query.isFetching) accessState = "pending";
   else if (query.isError) accessState = "error";
   else if (query.data === true) accessState = "allowed";
   const onOpen = () => {
     onClose?.();
-    appInitial.u1?.(pluginId, navigate);
+    openPlugin(pluginId, navigate);
   };
-  const onRetry = () => void query.refetch?.();
+  const onRetry = () => void query.refetch();
   const onExplore = () => {
     onClose?.();
     navigate("/plugins");
@@ -125,14 +158,9 @@ function MigratedPluginNotice({
   onClose,
   gptName,
   presentation = "notice",
-}: {
-  pluginId: string;
-  onClose?: () => void;
-  gptName?: string;
-  presentation?: Presentation;
-}): unknown {
+}: MigratedPluginNoticeProps): unknown {
   initializeMigratedPluginNotice();
-  const navigate = appInitial.o_n?.() ?? (() => {});
+  const navigate = useNavigate();
   if (gptName != null)
     return jsx.jsx(AccessCheckedMigratedPlugin, {
       pluginId,
@@ -141,7 +169,7 @@ function MigratedPluginNotice({
     });
   const onOpen = () => {
     onClose?.();
-    appInitial.u1?.(pluginId, navigate);
+    openPlugin(pluginId, navigate);
   };
   return jsx.jsx(OpenPluginButton, { presentation, onOpen });
 }

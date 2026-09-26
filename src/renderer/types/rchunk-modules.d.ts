@@ -1015,6 +1015,10 @@ declare module "@rchunk/app-shared" {
   >;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
+  /** initializeOpenPluginIcon（迁移插件入口图标初始化器）。 */
+  export const Ls: () => void;
+  /** Open plugin 图标资源。 */
+  export const Is: IconAssetPreset;
   export const FQ: unknown;
   /** initializeMaitaiRuntime（app-shared/runtime/atom-signal.ts）。 */
   export const FX: () => void;
@@ -3977,14 +3981,19 @@ declare module "@rchunk/gpt-plugin-migration-notices" {
 }
 
 declare module "@rchunk/migrated-plugin-notice" {
-  export const n: unknown;
-  export const r: () => void;
-  export const t: (props: {
+  export type MigratedPluginPresentation = "notice" | "row";
+  export interface MigratedPluginNoticeProps {
     gptName?: string;
     onClose?: () => void;
     pluginId: string;
-    presentation?: "notice" | "row";
+    presentation?: MigratedPluginPresentation;
+  }
+  export const n: (props: {
+    onOpen(): void;
+    presentation?: MigratedPluginPresentation;
   }) => unknown;
+  export const r: () => void;
+  export const t: (props: MigratedPluginNoticeProps) => unknown;
 }
 
 declare module "@rchunk/gpt-plugin-retirement" {
