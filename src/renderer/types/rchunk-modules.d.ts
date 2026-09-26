@@ -352,6 +352,15 @@ declare module "@rchunk/generated-image-context-menu" {
   export const getGeneratedImageContextMenuItems: (...args: any[]) => any[];
 }
 
+declare module "@rchunk/create-project-dialog-core" {
+  export const r: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/create-remote-project-modal" {
+  export const CreateRemoteProjectModal: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
