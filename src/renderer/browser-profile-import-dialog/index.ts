@@ -66,6 +66,24 @@ type AttemptContext = {
   windowsChromeAdminApprovalNoticeAcknowledged: boolean;
 };
 
+interface BrowserProfileImportService {
+  importBrowserProfile(request: ImportRequest): Promise<ImportResult>;
+}
+
+interface ImportMutationVariables {
+  context: AttemptContext;
+  previousResult?: ImportResult;
+  request: ImportRequest;
+  startedAt: number;
+}
+
+const {
+  _L: useQuery,
+  gL: initializeUseQuery,
+  iL: useMutation,
+  rL: initializeUseMutation,
+} = appSharedChunk;
+
 const jsx = appShared.I3();
 const React = appShared.e6();
 const revealInitialDelayMs = 750;
@@ -1200,7 +1218,7 @@ function BrowserProfileImportDialogModal({
   entryPoint: string;
   flowId: string;
   onClose: () => void;
-  service: any;
+  service: BrowserProfileImportService;
 }) {
   const scope = appShared.LX(appShared.ZI);
   const [selectedProfileKey, setSelectedProfileKey] = React.useState("");
@@ -1221,26 +1239,23 @@ function BrowserProfileImportDialogModal({
   const adminNoticeRequired = React.useRef(false);
   const activeAttempt = React.useRef(null);
 
-  const profilesQuery = appShared._L(query.t(service, true));
-  const mutation = appShared.iL({
-    mutationFn: ({ request }: { request: ImportRequest }) =>
+  const profilesQuery = useQuery<Profile[]>(
+    query.t(service, true) as import("@rchunk/app-shared").UseQueryOptions<
+      Profile[]
+    >,
+  );
+  const mutation = useMutation<
+    ImportResult,
+    unknown,
+    ImportMutationVariables
+  >({
+    mutationFn: ({ request }) =>
       service.importBrowserProfile(request),
-    onError: (
-      _error: unknown,
-      variables: { context: AttemptContext; request: ImportRequest },
-    ) => {
+    onError: (_error, variables) => {
       exitState.current = "after-request-error";
       analytics.n(scope, entryPoint, variables.request, variables.context);
     },
-    onSuccess: async (
-      nextResult: ImportResult,
-      variables: {
-        context: AttemptContext;
-        previousResult?: ImportResult;
-        request: ImportRequest;
-        startedAt: number;
-      },
-    ) => {
+    onSuccess: async (nextResult, variables) => {
       exitState.current = "after-result";
       const result =
         variables.previousResult == null
@@ -1554,8 +1569,6 @@ function BrowserProfileImportDialogModal({
 function initializeBrowserProfileImportDialog(): void {
   const appSharedInitializers = [
     "$3",
-    "rL",
-    "gL",
     "FX",
     "zh",
     "QI",
@@ -1576,6 +1589,8 @@ function initializeBrowserProfileImportDialog(): void {
     "Qc",
   ];
   for (const name of appSharedInitializers) appShared[name]?.();
+  initializeUseMutation();
+  initializeUseQuery();
   appInitial.pfn?.();
   appInitial.xlt?.();
   appInitial.Xl?.();
