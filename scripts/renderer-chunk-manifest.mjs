@@ -936,6 +936,7 @@ export const REWRITTEN = new Set([
   "open-appgen-share-dialog",
   "dialog-action",
   "permission-dropdown",
+  "appgen-access",
   "home-starter-prompts",
   "home-announcement-state",
   "codex-micro-onboarding-animation",

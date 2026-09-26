@@ -1099,8 +1099,14 @@ declare module "@rchunk/agent-activity-item" {
 }
 
 declare module "@rchunk/appgen-access" {
-  const _default: unknown;
-  export default _default;
+  export const a: (...args: any[]) => any;
+  export const c: (...args: any[]) => boolean;
+  export const i: (...args: any[]) => any;
+  export const n: (...args: any[]) => any[];
+  export const o: (...args: any[]) => any;
+  export const r: (...args: any[]) => any;
+  export const s: () => void;
+  export const t: (...args: any[]) => boolean;
 }
 
 declare module "@rchunk/appgen-access-state-messages" {
