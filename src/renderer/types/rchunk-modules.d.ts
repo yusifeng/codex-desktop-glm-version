@@ -264,6 +264,12 @@ declare module "@rchunk/composer-provider" {
   export const t: unknown;
 }
 
+declare module "@rchunk/thread-scroll-controller-context-value" {
+  export const n: () => void;
+  export const r: () => unknown;
+  export const t: unknown;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
