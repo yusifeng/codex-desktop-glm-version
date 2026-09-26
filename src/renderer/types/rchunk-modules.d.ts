@@ -116,7 +116,8 @@ declare module "@rchunk/app-shared" {
   export const Bk: Record<string, string>; // bq：Appgen interaction action 枚举
   export const C_: unknown;
   export const FQ: unknown;
-  export const FX: any;
+  /** initializeMaitaiRuntime（app-shared/runtime/atom-signal.ts）。 */
+  export const FX: () => void;
   /** useSignalValue（app-shared/runtime/atom-signal.ts）。 */
   export const HX: <T>(
     signal: ReadableSignal<T>,
@@ -127,6 +128,27 @@ declare module "@rchunk/app-shared" {
   export const JQ: unknown;
   export const K2: unknown;
   export const W2: (descriptor: unknown) => unknown;
+  export interface ScopeRetainOptions {
+    autoDispose?: boolean | number;
+    max?: number;
+  }
+  export interface MaitaiScope<T = unknown> {
+    __scopeBrand: string;
+    getKey?: (value: T) => string;
+    id: symbol;
+    parent?: MaitaiScope<unknown>;
+    retain?: ScopeRetainOptions;
+  }
+  export interface CreateScopeOptions<T> {
+    key?: (value: T) => string;
+    parent?: MaitaiScope<unknown>;
+    retain?: ScopeRetainOptions;
+  }
+  /** createScope（app-shared/runtime/atom-signal.ts，内部 nke）。 */
+  export const UZ: <T = unknown>(
+    brand: string,
+    options?: CreateScopeOptions<T>,
+  ) => MaitaiScope<T>;
   export const LX: unknown;
   export const P3: unknown;
   /** replaceEqualDeep（app-shared/runtime/query-structural-utils.ts）。 */
@@ -151,7 +173,8 @@ declare module "@rchunk/app-shared" {
   export const Xi: unknown;
   export const Y2: unknown; // FormattedMessage
   export const Yi: unknown;
-  export const ZI: any;
+  /** AppScope（app-shared/runtime/atom-signal.ts，内部 YW）。 */
+  export const ZI: MaitaiScope<Record<string, unknown>>;
   export const __: unknown;
   export const b_: unknown; // React use（ait）
   export const fk: unknown;

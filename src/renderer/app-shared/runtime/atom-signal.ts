@@ -381,13 +381,19 @@ export function createStore(): AtomStore {
 // scope（原 `nke` + `tke` autoDispose 调度）
 // ---------------------------------------------------------------------------
 
+/** scope 的保留策略。 */
+export interface ScopeRetainOptions {
+  autoDispose?: boolean | number;
+  max?: number;
+}
+
 /** scope 定义。 */
 export interface Scope<T = unknown> {
-  __scopeBrand: T;
-  getKey?: (memberKey: string) => string;
+  __scopeBrand: string;
+  getKey?: (value: T) => string;
   id: symbol;
-  parent: Scope | null;
-  retain?: { autoDispose: number };
+  parent?: Scope<unknown>;
+  retain?: ScopeRetainOptions;
 }
 
 /** autoDispose 归一（原 `YN`）：true→0ms / false→∞ / 数值→毫秒。 */
@@ -399,21 +405,31 @@ export function normalizeAutoDispose(autoDispose: boolean | number = false): num
 
 /** scope 构造（原 `nke`）。 */
 export function createScope<T>(
-  brand: T,
+  brand: string,
   options?: {
-    key?: (memberKey: string) => string;
-    parent?: Scope;
-    retain?: { autoDispose: boolean | number };
+    key?: (value: T) => string;
+    parent?: Scope<unknown>;
+    retain?: ScopeRetainOptions;
   },
 ): Scope<T> {
+  normalizeAutoDispose(options?.retain?.autoDispose);
   return {
     __scopeBrand: brand,
     getKey: options?.key,
     id: Symbol(),
-    parent: options?.parent ?? null,
-    retain: options?.retain ? { autoDispose: normalizeAutoDispose(options.retain.autoDispose) } : undefined,
-  } as Scope<T>;
+    parent: options?.parent,
+    retain: options?.retain,
+  };
 }
+
+/**
+ * 初始化已被语义源码展开的 Maitai runtime（原 `gL` / 压缩导出 `FX`）。
+ * 原函数只触发 lazy initializer；语义模块为 eager 初始化，因此重复调用为空操作。
+ */
+export function initializeMaitaiRuntime(): void {}
+
+/** 应用级根 scope（原 `YW` / 压缩导出 `ZI`）。 */
+export const AppScope = createScope<Record<string, unknown>>("AppScope");
 
 // ---------------------------------------------------------------------------
 // family（原 `MI`/`PI`）
