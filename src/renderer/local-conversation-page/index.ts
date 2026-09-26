@@ -21,7 +21,7 @@
 import { d as appPrimaryInit } from "@rchunk/app-primary";
 import { default as runtimeChunk } from "@rchunk/runtime";
 import { default as openThreadPullRequestSidePanelTab } from "@rchunk/open-thread-pull-request-side-panel-tab";
-import { default as rightPanelComposerOverlay } from "@rchunk/right-panel-composer-overlay";
+import * as rightPanelComposerOverlay from "@rchunk/right-panel-composer-overlay";
 import { default as threadPanelToggleButton } from "@rchunk/thread-panel-toggle-button";
 import { default as localConversationSideChat } from "@rchunk/local-conversation-side-chat";
 import { default as threadEmoji } from "@rchunk/thread-emoji";
@@ -29,14 +29,14 @@ import { default as threadAppShellChrome } from "@rchunk/thread-app-shell-chrome
 import { default as pullRequestFixWorkflow } from "@rchunk/pull-request-fix-workflow";
 import { default as threadOverflowMenu } from "@rchunk/thread-overflow-menu";
 import { default as threadUsageBreakdown } from "@rchunk/thread-usage-breakdown";
-import { default as localConversationTurn } from "@rchunk/local-conversation-turn";
-import { default as turnPreviewBodyItems } from "@rchunk/turn-preview-body-items";
+import * as localConversationTurn from "@rchunk/local-conversation-turn";
+import * as turnPreviewBodyItems from "@rchunk/turn-preview-body-items";
 import { default as openLocalConversationSubagentsPanel } from "@rchunk/open-local-conversation-subagents-panel";
 void appPrimaryInit, runtimeChunk, openThreadPullRequestSidePanelTab, rightPanelComposerOverlay, threadPanelToggleButton, localConversationSideChat, threadEmoji, threadAppShellChrome, pullRequestFixWorkflow, threadOverflowMenu, threadUsageBreakdown, localConversationTurn, turnPreviewBodyItems, openLocalConversationSubagentsPanel;
 
 import { $3 as appSharedLazy } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
-import { default as localConversationThread } from "@rchunk/local-conversation-thread";
+import * as localConversationThread from "@rchunk/local-conversation-thread";
 import { default as latestTurnPreview } from "@rchunk/latest-turn-preview";
 import { default as documentTitle } from "@rchunk/document-title";
 import { default as chatTabMetadataBridge } from "@rchunk/chat-tab-metadata-bridge";
@@ -45,9 +45,9 @@ import { default as contentQuickChatOverlay } from "@rchunk/content-quick-chat-o
 import { default as modelAndReasoningEffortTranslations } from "@rchunk/model-and-reasoning-effort-translations";
 import { default as openLocalConversationBackgroundAgent } from "@rchunk/open-local-conversation-background-agent";
 import { default as streamRoleProductEvent } from "@rchunk/local-conversation-stream-role-product-event";
-import { default as agentActivityUnits } from "@rchunk/agent-activity-units";
-import { default as splitItems } from "@rchunk/split-items-into-render-groups";
-import { default as virtualizedTurnList } from "@rchunk/virtualized-turn-list";
+import * as agentActivityUnits from "@rchunk/agent-activity-units";
+import * as splitItems from "@rchunk/split-items-into-render-groups";
+import * as virtualizedTurnList from "@rchunk/virtualized-turn-list";
 import { default as scrollLayout } from "@rchunk/thread-scroll-layout";
 
 void appSharedLazy; void appInitialInit; void localConversationThread;

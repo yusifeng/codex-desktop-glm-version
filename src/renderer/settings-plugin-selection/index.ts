@@ -19,7 +19,7 @@
 import { $3 as runtimeLazy, FX as originStateApi, G4 as settingsHelpers } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
-import { default as assertNever } from "@rchunk/assert-never";
+import * as assertNever from "@rchunk/assert-never";
 import { default as browserUseOriginStateQueries } from "@rchunk/browser-use-origin-state-queries";
 import { default as settingsLoadingRow } from "@rchunk/settings-loading-row";
 

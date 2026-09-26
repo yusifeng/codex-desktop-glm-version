@@ -49,7 +49,7 @@ import { n as scrollToMatchInit } from "@rchunk/scroll-to-match";
 import { default as skillExplorationLabels } from "@rchunk/skill-exploration-labels";
 import { default as toolActivityDisclosure } from "@rchunk/tool-activity-disclosure";
 import { default as undo } from "@rchunk/undo";
-import { default as roleHeadingInit2 } from "@rchunk/user-message";
+import * as roleHeadingInit2 from "@rchunk/user-message";
 import { default as workspaceFileContextMenuTrigger } from "@rchunk/workspace-file-context-menu-trigger";
 import { default as writingBlockDirectiveRenderer } from "@rchunk/codex-writing-block-directive-renderer";
 import { default as fileDiff } from "@rchunk/file-diff";

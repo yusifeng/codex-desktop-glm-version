@@ -8,6 +8,7 @@
 
 declare module "@rchunk/rolldown-runtime" {
   export const n: unknown; // 共享运行时的 lazy 辅助（__vite__mapDeps 场景）
+  export const o: () => void; // 通用懒初始化包装器
 }
 
 declare module "@rchunk/app-shared" {
@@ -438,7 +439,75 @@ declare module "@rchunk/agent-activity-units" {
   export const d: unknown;
   export const f: unknown;
   export const l: unknown;
+  export const n: () => void;
   export const r: unknown;
+}
+
+declare module "@rchunk/thread-virtualizer" {
+  export const a: (...args: any[]) => any;
+  export const i: (...args: any[]) => any;
+  export const n: (...args: any[]) => any;
+  export const o: () => void;
+  export const r: (...args: any[]) => any;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/scroll-to-match" {
+  export const n: unknown;
+  export const r: unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/local-conversation-turn" {
+  export const a: unknown;
+  export const c: () => void;
+  export const i: () => void;
+  export const n: () => void;
+  export const o: () => void;
+  export const r: unknown;
+  export const s: unknown;
+  export const t: unknown;
+}
+
+declare module "@rchunk/local-conversation-thread" {
+  export const _: () => void;
+  export const a: unknown;
+  export const c: () => void;
+  export const d: () => void;
+  export const f: unknown;
+  export const g: unknown;
+  export const h: () => void;
+  export const i: unknown;
+  export const l: unknown;
+  export const m: unknown;
+  export const n: unknown;
+  export const o: unknown;
+  export const p: () => void;
+  export const r: unknown;
+  export const s: () => void;
+  export const t: unknown;
+  export const u: unknown;
+}
+
+declare module "@rchunk/virtualized-turn-list" {
+  export const a: unknown;
+  export const c: () => void;
+  export const d: unknown;
+  export const f: () => void;
+  export const i: unknown;
+  export const l: unknown;
+  export const m: () => void;
+  export const n: () => void;
+  export const o: unknown;
+  export const p: unknown;
+  export const r: () => void;
+  export const s: () => void;
+  export const t: unknown;
+  export const u: unknown;
+}
+
+declare module "@rchunk/detached-entry" {
+  export const initializeDetachedWindow: () => Promise<{ [Symbol.dispose](): void }>;
 }
 
 declare module "@rchunk/index-entry" {

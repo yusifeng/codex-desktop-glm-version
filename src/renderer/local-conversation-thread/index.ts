@@ -44,11 +44,11 @@ void openAutomationSidePanelTab2, googleDriveResourceIcon, scrollToMatchInit2, u
 import { $3 as appSharedLazy } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
 import { d as appPrimaryInit } from "@rchunk/app-primary";
-import { default as virtualizedTurnList } from "@rchunk/virtualized-turn-list";
-import { default as localConversationTurn } from "@rchunk/local-conversation-turn";
-import { default as conversationBlocks } from "@rchunk/conversation-blocks";
-import { default as splitItems } from "@rchunk/split-items-into-render-groups";
-import { default as userMessage } from "@rchunk/user-message";
+import * as virtualizedTurnList from "@rchunk/virtualized-turn-list";
+import * as localConversationTurn from "@rchunk/local-conversation-turn";
+import * as conversationBlocks from "@rchunk/conversation-blocks";
+import * as splitItems from "@rchunk/split-items-into-render-groups";
+import * as userMessage from "@rchunk/user-message";
 import { default as scrollLayout } from "@rchunk/thread-scroll-layout";
 import { default as timestampSeparator } from "@rchunk/timestamp-separator";
 import { default as threadHandoffModal } from "@rchunk/thread-handoff-modal";

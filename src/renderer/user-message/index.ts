@@ -35,7 +35,7 @@ import { default as hooksChunk } from "@rchunk/hooks";
 import { default as hooksSettingsCopy } from "@rchunk/hooks-settings-copy";
 import { default as hooksSettingsModel } from "@rchunk/hooks-settings-model";
 import { default as planImplementationRequest } from "@rchunk/plan-implementation-request";
-import { default as timestampsChunk } from "@rchunk/timestamps";
+import * as timestampsChunk from "@rchunk/timestamps";
 
 void runtimeLazy; void appInitialInit; void appPrimaryInit;
 void hooksChunk; void hooksSettingsCopy; void hooksSettingsModel;

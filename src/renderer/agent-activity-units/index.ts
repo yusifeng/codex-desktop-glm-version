@@ -30,8 +30,8 @@ import {
   $3 as runtimeLazy,
 } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
-import { default as agentActivityItem } from "@rchunk/agent-activity-item";
-import { default as assertNever } from "@rchunk/assert-never";
+import * as agentActivityItem from "@rchunk/agent-activity-item";
+import * as assertNever from "@rchunk/assert-never";
 import { default as patchDiffStats } from "@rchunk/patch-diff-stats";
 import { default as presentationChunk } from "@rchunk/presentation";
 import { default as skillExplorationLabels } from "@rchunk/skill-exploration-labels";
