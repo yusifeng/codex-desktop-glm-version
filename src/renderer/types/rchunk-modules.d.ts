@@ -3018,6 +3018,11 @@ declare module "@rchunk/app-initial" {
   }) => void;
   export const n7: (props: Record<string, unknown>) => unknown;
   export const Dft: () => void;
+  export const E6t: () => { platform: string };
+  export const a7: () => void;
+  export const RS: () => void;
+  export const T6t: () => void;
+  export const yZ: () => void;
   export const eEt: () => void;
   export const r7: () => void;
   export const sP: () => void;
@@ -4626,21 +4631,38 @@ declare module "@rchunk/appgen-disabled-tooltip" {
 }
 
 declare module "@rchunk/appgen-card-layout" {
+  export interface AppgenCardThumbnailLayoutProps
+    extends Record<string, unknown> {
+    aspectRatio?: string;
+    children?: unknown;
+    className?: string;
+    viewMode: "grid" | "list";
+  }
   export const a: () => void;
-  export const n: (...args: any[]) => any;
+  export const n: (props: AppgenCardThumbnailLayoutProps) => unknown;
 }
 
 declare module "@rchunk/sites-default-thumbnail" {
+  export interface DefaultSiteThumbnailAssetProps
+    extends Record<string, unknown> {
+    "aria-hidden"?: boolean;
+    className?: string;
+  }
   export const i: () => void;
   export const n: () => void;
   export const o: () => void;
-  export const r: (...args: any[]) => any;
-  export const t: (...args: any[]) => any;
+  export const r: (props: DefaultSiteThumbnailAssetProps) => unknown;
+  export const t: (props: DefaultSiteThumbnailAssetProps) => unknown;
 }
 
 declare module "@rchunk/appgen-project-row" {
+  export interface AppgenProjectThumbnailProps {
+    aspectRatio?: string;
+    screenshotUrl?: string | null;
+    viewMode: "grid" | "list";
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: AppgenProjectThumbnailProps) => unknown;
 }
 
 declare module "@rchunk/start-appgen-conversation" {

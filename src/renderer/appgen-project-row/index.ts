@@ -9,17 +9,52 @@ import * as accessStateMessagesChunk from "@rchunk/appgen-access-state-messages"
 import * as cardLayoutChunk from "@rchunk/appgen-card-layout";
 import * as openShareDialogChunk from "@rchunk/open-appgen-share-dialog";
 import * as defaultThumbnailChunk from "@rchunk/sites-default-thumbnail";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appgenAccess = appgenAccessChunk as Record<string, any>;
-const accessStateMessages = accessStateMessagesChunk as Record<string, any>;
-const cardLayout = cardLayoutChunk as Record<string, any>;
-const openShareDialog = openShareDialogChunk as Record<string, any>;
-const defaultThumbnail = defaultThumbnailChunk as Record<string, any>;
-let jsx: any;
+const {
+  $3: initializeReactRuntime,
+  FX: initializeMaitaiRuntime,
+  I3: getJsxRuntime,
+  QI: initializeImageRuntime,
+  h4: initializeImageComponent,
+  m4: classNames,
+} = appSharedChunk;
+const {
+  Dft: initializeLinkNavigation,
+  E6t: getDesktopPlatform,
+  RS: initializeProjectAccess,
+  T6t: initializeSiteMetadata,
+  _an: initializeAppgenQueries,
+  a7: initializeSiteRoutes,
+  wan: useAppgenScreenshotSrc,
+  yZ: initializeImageLoading,
+} = appInitialChunk;
+const { s: initializeAppgenAccess } = appgenAccessChunk;
+const {
+  i: initializeAccessStateIcons,
+  o: initializeAccessStateMessages,
+} = accessStateMessagesChunk;
+const {
+  a: initializeCardLayout,
+  n: AppgenCardThumbnailLayout,
+} = cardLayoutChunk;
+const { t: initializeOpenShareDialog } = openShareDialogChunk;
+const {
+  i: initializeMacThumbnail,
+  n: initializeWindowsThumbnail,
+  o: initializeDefaultThumbnailRuntime,
+  r: WindowsDefaultThumbnail,
+  t: MacDefaultThumbnail,
+} = defaultThumbnailChunk;
+let jsx: JsxRuntime;
 let styles: Record<string, string>;
+
+interface AppgenProjectThumbnailProps {
+  aspectRatio?: string;
+  screenshotUrl?: string | null;
+  viewMode: "list" | "grid";
+}
 
 function initializeStyles(): void {
   styles = {
@@ -36,19 +71,19 @@ function DefaultSiteThumbnail({
   aspectRatio?: string;
   viewMode: "list" | "grid";
 }) {
-  const { platform } = appInitial.E6t();
+  const { platform } = getDesktopPlatform();
   const ThumbnailAsset =
-    platform === "windows" ? defaultThumbnail.r : defaultThumbnail.t;
+    platform === "windows" ? WindowsDefaultThumbnail : MacDefaultThumbnail;
   const assetClassName =
     viewMode === "list" ? styles.listAsset : styles.gridAsset;
   const sizeClassName = viewMode === "list" ? "size-full" : "h-auto w-[72%]";
-  return jsx.jsx(cardLayout.n, {
+  return jsx.jsx(AppgenCardThumbnailLayout, {
     className: "flex items-center justify-center",
     aspectRatio,
     viewMode,
     children: jsx.jsx(ThumbnailAsset, {
       "aria-hidden": true,
-      className: appShared.m4(assetClassName, sizeClassName),
+      className: classNames(assetClassName, sizeClassName),
     }),
   });
 }
@@ -57,22 +92,18 @@ function AppgenProjectThumbnail({
   aspectRatio,
   screenshotUrl,
   viewMode,
-}: {
-  aspectRatio?: string;
-  screenshotUrl?: string | null;
-  viewMode: "list" | "grid";
-}) {
-  const { data: screenshotSrc } = appInitial.wan(screenshotUrl);
+}: AppgenProjectThumbnailProps) {
+  const { data: screenshotSrc } = useAppgenScreenshotSrc(screenshotUrl);
   if (screenshotSrc == null) {
     return jsx.jsx(DefaultSiteThumbnail, { aspectRatio, viewMode });
   }
-  return jsx.jsx(cardLayout.n, {
+  return jsx.jsx(AppgenCardThumbnailLayout, {
     className: "flex items-center justify-center",
     aspectRatio,
     viewMode,
     children: jsx.jsx("img", {
       alt: "",
-      className: appShared.m4(
+      className: classNames(
         viewMode === "list" ? styles.listAsset : styles.gridAsset,
         viewMode === "grid"
           ? "max-h-[72%] max-w-[72%]"
@@ -86,26 +117,26 @@ function AppgenProjectThumbnail({
 }
 
 function initializeAppgenProjectRow(): void {
-  appShared.$3?.();
-  appShared.h4?.();
-  appShared.FX?.();
-  appInitial.Dft?.();
-  appInitial.a7?.();
-  appInitial.RS?.();
-  appInitial.T6t?.();
-  appInitial.yZ?.();
-  cardLayout.a?.();
-  appShared.QI?.();
-  appgenAccess.s?.();
-  accessStateMessages.o?.();
-  accessStateMessages.i?.();
-  defaultThumbnail.o?.();
-  appInitial._an?.();
-  openShareDialog.t?.();
-  defaultThumbnail.i?.();
-  defaultThumbnail.n?.();
+  initializeReactRuntime();
+  initializeImageComponent();
+  initializeMaitaiRuntime();
+  initializeLinkNavigation();
+  initializeSiteRoutes();
+  initializeProjectAccess();
+  initializeSiteMetadata();
+  initializeImageLoading();
+  initializeCardLayout();
+  initializeImageRuntime();
+  initializeAppgenAccess();
+  initializeAccessStateMessages();
+  initializeAccessStateIcons();
+  initializeDefaultThumbnailRuntime();
+  initializeAppgenQueries();
+  initializeOpenShareDialog();
+  initializeMacThumbnail();
+  initializeWindowsThumbnail();
   initializeStyles();
-  jsx = appShared.I3();
+  jsx = getJsxRuntime();
 }
 
 export { initializeAppgenProjectRow as n, AppgenProjectThumbnail as t };
