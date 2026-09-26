@@ -110,6 +110,28 @@ declare module "@rchunk/app-shared" {
   export const om: (props: AlertProps) => unknown;
   /** initializeAlert（内部 Rlt）。 */
   export const sm: () => void;
+  export interface ToastAction {
+    label: unknown;
+    loading?: boolean;
+    onClick(): void;
+  }
+  export interface ToastProps {
+    description?: unknown;
+    leading?: unknown;
+    level: AlertLevel;
+    onClose?: (event: unknown) => void;
+    primaryAction?: ToastAction;
+    secondaryAction?: ToastAction;
+    testId?: string;
+    title?: unknown;
+    variant?: AlertVariant;
+  }
+  /** initializeToastStyles（app-shared/ui/toast.ts，内部 Ult）。 */
+  export const im: () => void;
+  /** Toast（内部 Wlt）。 */
+  export const nm: (props: ToastProps) => unknown;
+  /** initializeToast（内部 qlt）。 */
+  export const rm: () => void;
   /** useIsMounted（app-shared/runtime/mounted-state.ts，内部 Spt）。 */
   const useIsMounted: () => () => boolean;
   export { useIsMounted as if };
