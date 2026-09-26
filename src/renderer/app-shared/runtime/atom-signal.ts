@@ -468,6 +468,9 @@ export interface ScopeApi<T = unknown> {
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
   get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
   get<Data, QueryError>(signal: ScopedQuerySignal<unknown, Data, QueryError>): ScopedQueryResult<Data, QueryError>;
+  get<Page, PageParam, QueryError>(
+    signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
+  ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
     parameter: Param,
@@ -510,6 +513,17 @@ export interface ScopedQueryFunctionContext {
   signal: AbortSignal;
 }
 
+export interface ScopedInfiniteQueryFunctionContext<TPageParam>
+  extends ScopedQueryFunctionContext {
+  direction: "backward" | "forward";
+  pageParam: TPageParam;
+}
+
+export interface InfiniteQueryData<TPage, TPageParam = unknown> {
+  pageParams: TPageParam[];
+  pages: TPage[];
+}
+
 export interface ScopedQueryOptions<TData, TError = Error> {
   enabled?: boolean | ((query: unknown) => boolean);
   initialData?: TData | (() => TData);
@@ -522,6 +536,36 @@ export interface ScopedQueryOptions<TData, TError = Error> {
   retry?: boolean | number | ((failureCount: number, error: TError) => boolean);
   staleTime?: number;
   throwOnError?: boolean | ((error: TError) => boolean);
+}
+
+export interface ScopedInfiniteQueryOptions<
+  TPage,
+  TPageParam,
+  TError = Error,
+> extends Omit<
+    ScopedQueryOptions<InfiniteQueryData<TPage, TPageParam>, TError>,
+    "initialData" | "queryFn"
+  > {
+  getNextPageParam?(
+    lastPage: TPage,
+    allPages: TPage[],
+    lastPageParam: TPageParam,
+    allPageParams: TPageParam[],
+  ): TPageParam | null | undefined;
+  getPreviousPageParam?(
+    firstPage: TPage,
+    allPages: TPage[],
+    firstPageParam: TPageParam,
+    allPageParams: TPageParam[],
+  ): TPageParam | null | undefined;
+  initialData?:
+    | InfiniteQueryData<TPage, TPageParam>
+    | (() => InfiniteQueryData<TPage, TPageParam>);
+  initialPageParam: TPageParam;
+  maxPages?: number;
+  queryFn?(
+    context: ScopedInfiniteQueryFunctionContext<TPageParam>,
+  ): Promise<TPage> | TPage;
 }
 
 export interface ScopedQueryState<TData, TError> {
@@ -559,6 +603,19 @@ export interface ScopedQueryResult<TData, TError = Error> {
   isSuccess: boolean;
   refetch(): Promise<ScopedQueryResult<TData, TError>>;
   status: "error" | "pending" | "success";
+}
+
+export interface ScopedInfiniteQueryResult<
+  TPage,
+  TPageParam,
+  TError = Error,
+> extends ScopedQueryResult<InfiniteQueryData<TPage, TPageParam>, TError> {
+  fetchNextPage(): Promise<ScopedInfiniteQueryResult<TPage, TPageParam, TError>>;
+  fetchPreviousPage(): Promise<ScopedInfiniteQueryResult<TPage, TPageParam, TError>>;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  isFetchingNextPage: boolean;
+  isFetchingPreviousPage: boolean;
 }
 
 export interface ScopedDerivedFamilyOptions<Param, TValue> {
@@ -600,6 +657,9 @@ export interface DerivedScopedSignalContext<T = unknown> {
   get<Value>(signal: ScopedSignal<unknown, Value>): Value;
   get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
   get<Data, QueryError>(signal: ScopedQuerySignal<unknown, Data, QueryError>): ScopedQueryResult<Data, QueryError>;
+  get<Page, PageParam, QueryError>(
+    signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
+  ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
     parameter: Param,
@@ -626,6 +686,28 @@ export interface ScopedQuerySignal<TScope, TData, TError = Error> {
   scope: Scope<TScope>;
   resolve(state: ScopeState<unknown>): Atom<ScopedQueryResult<TData, TError>>;
   [WITH_QUERY_READ_OPTIONS](options: QueryReadOptions): ScopedQuerySignal<TScope, TData, TError>;
+}
+
+/** 原 `zje` 返回的 scope 键控 infinite-query signal。 */
+export interface ScopedInfiniteQuerySignal<
+  TScope,
+  TPage,
+  TPageParam,
+  TError = Error,
+> {
+  cache: "cached";
+  debugLabel?: string;
+  getOptions(
+    context: DerivedScopedSignalContext<TScope>,
+  ): ScopedInfiniteQueryOptions<TPage, TPageParam, TError>;
+  queryKind: "infinite";
+  scope: Scope<TScope>;
+  resolve(
+    state: ScopeState<unknown>,
+  ): Atom<ScopedInfiniteQueryResult<TPage, TPageParam, TError>>;
+  [WITH_QUERY_READ_OPTIONS](
+    options: QueryReadOptions,
+  ): ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError>;
 }
 
 /** 原 `Vje` 返回的 scope 键控 query family。 */
@@ -711,6 +793,7 @@ function resolveScopeBinding(
     | ScopedSignal<unknown, unknown>
     | ScopedDerivedSignal<unknown, unknown>
     | ScopedQuerySignal<unknown, unknown, unknown>
+    | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
@@ -752,6 +835,7 @@ function watchScope<T>(
           | ScopedSignal<unknown, unknown>
           | ScopedDerivedSignal<unknown, unknown>
           | ScopedQuerySignal<unknown, unknown, unknown>
+          | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>,
@@ -804,6 +888,7 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
         | ScopedSignal<unknown, unknown>
         | ScopedDerivedSignal<unknown, unknown>
         | ScopedQuerySignal<unknown, unknown, unknown>
+        | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
         | ScopedQueryFamily<unknown, unknown, unknown, unknown>
         | ScopedDerivedFamily<unknown, unknown, unknown>
         | ScopedSignalFamily<unknown, unknown, unknown>,
@@ -956,6 +1041,7 @@ function isScopedFamily(
     | ScopedSignal<unknown, unknown>
     | ScopedDerivedSignal<unknown, unknown>
     | ScopedQuerySignal<unknown, unknown, unknown>
+    | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
@@ -988,6 +1074,7 @@ function createDerivedContext<T>(
           | ScopedSignal<unknown, unknown>
           | ScopedDerivedSignal<unknown, unknown>
           | ScopedQuerySignal<unknown, unknown, unknown>
+          | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
           | ScopedSignalFamily<unknown, unknown, unknown>;
@@ -1289,6 +1376,383 @@ export function resolveScopedQuerySignal<TScope, TData, TError>(
   signal: ScopedQuerySignal<TScope, TData, TError>,
   state: ScopeState<unknown>,
 ): BoundAtomSignal<ScopedQueryResult<TData, TError>> {
+  const owner = findScopeState(state, signal.scope);
+  return { atom: signal.resolve(state), store: owner.store };
+}
+
+function infiniteQueryResultEqual<TPage, TPageParam, TError>(
+  previous: ScopedInfiniteQueryResult<TPage, TPageParam, TError>,
+  next: ScopedInfiniteQueryResult<TPage, TPageParam, TError>,
+): boolean {
+  return (
+    queryResultEqual(previous, next) &&
+    previous.hasNextPage === next.hasNextPage &&
+    previous.hasPreviousPage === next.hasPreviousPage &&
+    previous.isFetchingNextPage === next.isFetchingNextPage &&
+    previous.isFetchingPreviousPage === next.isFetchingPreviousPage
+  );
+}
+
+function getInfinitePageParam<TPage, TPageParam, TError>(
+  options: ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
+  data: InfiniteQueryData<TPage, TPageParam>,
+  direction: "backward" | "forward",
+): TPageParam | null | undefined {
+  if (data.pages.length === 0) return options.initialPageParam;
+  if (direction === "forward") {
+    return options.getNextPageParam?.(
+      data.pages[data.pages.length - 1],
+      data.pages,
+      data.pageParams[data.pageParams.length - 1],
+      data.pageParams,
+    );
+  }
+  return options.getPreviousPageParam?.(
+    data.pages[0],
+    data.pages,
+    data.pageParams[0],
+    data.pageParams,
+  );
+}
+
+function trimInfiniteData<TPage, TPageParam>(
+  data: InfiniteQueryData<TPage, TPageParam>,
+  direction: "backward" | "forward",
+  maxPages?: number,
+): InfiniteQueryData<TPage, TPageParam> {
+  if (maxPages == null || maxPages <= 0 || data.pages.length <= maxPages) {
+    return data;
+  }
+  return direction === "forward"
+    ? {
+        pageParams: data.pageParams.slice(-maxPages),
+        pages: data.pages.slice(-maxPages),
+      }
+    : {
+        pageParams: data.pageParams.slice(0, maxPages),
+        pages: data.pages.slice(0, maxPages),
+      };
+}
+
+function createInfiniteQuerySignalInternal<TScope, TPage, TPageParam, TError>(
+  scope: Scope<TScope>,
+  getOptions: (
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
+  forcedEnabled?: boolean,
+): ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError> {
+  type Data = InfiniteQueryData<TPage, TPageParam>;
+  type Result = ScopedInfiniteQueryResult<TPage, TPageParam, TError>;
+
+  let disabledSignal:
+    | ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError>
+    | undefined;
+  const binding: ScopedInfiniteQuerySignal<
+    TScope,
+    TPage,
+    TPageParam,
+    TError
+  > = {
+    cache: "cached",
+    getOptions,
+    queryKind: "infinite",
+    scope,
+    [WITH_QUERY_READ_OPTIONS](options) {
+      if (options.enabled !== false || forcedEnabled === false) return binding;
+      disabledSignal ??= createInfiniteQuerySignalInternal(
+        scope,
+        getOptions,
+        false,
+      );
+      disabledSignal.debugLabel = binding.debugLabel;
+      return disabledSignal;
+    },
+    resolve(activeState) {
+      const owner = findScopeState(activeState, scope);
+      const cacheKey = binding as unknown as ScopedDerivedSignal<
+        unknown,
+        unknown
+      >;
+      const cached = owner.cachedBindings.get(cacheKey);
+      if (cached != null) return cached as Atom<Result>;
+
+      const client = owner.queryClient as ScopedQueryClient | undefined;
+      if (client == null) {
+        throw new Error(
+          "infiniteQuerySignal requires a QueryClient on Scope",
+        );
+      }
+      const refreshAtom = atom(0);
+      const initialOptions = getOptions(
+        createDerivedContext(owner, (target) => owner.store.get(target)),
+      );
+      const initialData =
+        typeof initialOptions.initialData === "function"
+          ? initialOptions.initialData()
+          : initialOptions.initialData;
+      const initialQueryHash = scopedQueryHash(initialOptions.queryKey);
+      const localStateAtom = atom<LocalQueryState<Data, TError>>({
+        data: initialData,
+        error: null,
+        fetchStatus: "idle",
+        queryHash: initialQueryHash,
+        status: initialData === undefined ? "pending" : "success",
+        updatedAt: initialData === undefined ? 0 : Date.now(),
+      });
+      let latestOptions = initialOptions;
+      let latestResult: Result;
+      let activeController: AbortController | undefined;
+      let activeDirection: "backward" | "forward" | "refetch" | undefined;
+      let activeFetch: Promise<Result> | undefined;
+      let mounted = false;
+      let observedEnabled = false;
+      let observedQueryHash = initialQueryHash;
+      let scheduledFetch = false;
+
+      const refresh = () => {
+        owner.store.set(refreshAtom, (current: number) => current + 1);
+      };
+      const execute = (
+        direction: "backward" | "forward" | "refetch",
+      ): Promise<Result> => {
+        if (activeFetch != null) return activeFetch;
+        const options = latestOptions;
+        const queryHash = scopedQueryHash(options.queryKey);
+        const stored = owner.store.get(localStateAtom);
+        const cachedData = client.getQueryData?.<Data>(options.queryKey);
+        const currentData =
+          cachedData ?? (stored.queryHash === queryHash ? stored.data : undefined);
+        const pageDirection = direction === "backward" ? "backward" : "forward";
+        const pageParam =
+          direction === "refetch"
+            ? options.initialPageParam
+            : currentData == null
+              ? options.initialPageParam
+              : getInfinitePageParam(options, currentData, pageDirection);
+        if (pageParam == null || options.queryFn == null) {
+          return Promise.resolve(latestResult);
+        }
+
+        activeController?.abort();
+        activeController = new AbortController();
+        activeDirection = direction;
+        owner.store.set(localStateAtom, (current) => ({
+          data: current.queryHash === queryHash ? current.data : undefined,
+          error: null,
+          fetchStatus: "fetching",
+          queryHash,
+          status:
+            current.queryHash === queryHash && current.data !== undefined
+              ? current.status
+              : "pending",
+          updatedAt: current.queryHash === queryHash ? current.updatedAt : 0,
+        }));
+        const request = Promise.resolve(
+          options.queryFn({
+            client,
+            direction: pageDirection,
+            meta: options.meta,
+            pageParam,
+            queryKey: options.queryKey,
+            signal: activeController.signal,
+          }),
+        );
+        const fetch = request
+          .then(
+            (page) => {
+              const previous = direction === "refetch" ? undefined : currentData;
+              const nextData = trimInfiniteData(
+                pageDirection === "backward"
+                  ? {
+                      pageParams: [pageParam, ...(previous?.pageParams ?? [])],
+                      pages: [page, ...(previous?.pages ?? [])],
+                    }
+                  : {
+                      pageParams: [...(previous?.pageParams ?? []), pageParam],
+                      pages: [...(previous?.pages ?? []), page],
+                    },
+                pageDirection,
+                options.maxPages,
+              );
+              client.setQueryData?.(options.queryKey, nextData);
+              owner.store.set(localStateAtom, {
+                data: nextData,
+                error: null,
+                fetchStatus: "idle",
+                queryHash,
+                status: "success",
+                updatedAt: Date.now(),
+              });
+              activeDirection = undefined;
+              refresh();
+              return owner.store.get(queryAtom);
+            },
+            (error: TError) => {
+              owner.store.set(localStateAtom, (current) => ({
+                ...current,
+                error,
+                fetchStatus: "idle",
+                queryHash,
+                status: "error",
+              }));
+              activeDirection = undefined;
+              refresh();
+              throw error;
+            },
+          )
+          .finally(() => {
+            if (activeFetch === fetch) {
+              activeFetch = undefined;
+              activeController = undefined;
+              activeDirection = undefined;
+            }
+          });
+        activeFetch = fetch;
+        return fetch;
+      };
+
+      const refetch = () => execute("refetch");
+      const fetchNextPage = () => execute("forward");
+      const fetchPreviousPage = () => execute("backward");
+      const queryAtom = atom((get) => {
+        get(refreshAtom);
+        const context = createDerivedContext(owner, get);
+        const options = getOptions(context);
+        latestOptions = options;
+        const queryHash = scopedQueryHash(options.queryKey);
+        const queryState = client.getQueryState?.<Data, TError>(
+          options.queryKey,
+        );
+        const storedLocalState = get(localStateAtom);
+        const localState =
+          storedLocalState.queryHash === queryHash
+            ? storedLocalState
+            : {
+                data: undefined,
+                error: null,
+                fetchStatus: "idle" as const,
+                queryHash,
+                status: "pending" as const,
+                updatedAt: 0,
+              };
+        const cachedData = client.getQueryData?.<Data>(options.queryKey);
+        const data = cachedData ?? queryState?.data ?? localState.data;
+        const error = queryState?.error ?? localState.error ?? null;
+        const fetchStatus = queryState?.fetchStatus ?? localState.fetchStatus;
+        const status =
+          queryState?.status ??
+          (data === undefined ? localState.status : "success");
+        const enabledByOptions =
+          typeof options.enabled === "function"
+            ? options.enabled(queryState)
+            : (options.enabled ?? true);
+        const isEnabled = forcedEnabled !== false && enabledByOptions;
+        const updatedAt = queryState?.dataUpdatedAt ?? localState.updatedAt;
+        const staleTime = options.staleTime ?? 0;
+        const isStale =
+          queryState?.isInvalidated === true ||
+          data === undefined ||
+          (staleTime !== Infinity && Date.now() - updatedAt >= staleTime);
+        const nextPageParam =
+          data == null
+            ? undefined
+            : getInfinitePageParam(options, data, "forward");
+        const previousPageParam =
+          data == null
+            ? undefined
+            : getInfinitePageParam(options, data, "backward");
+        const result: Result = {
+          data,
+          error,
+          fetchNextPage,
+          fetchPreviousPage,
+          fetchStatus,
+          hasNextPage: nextPageParam != null,
+          hasPreviousPage: previousPageParam != null,
+          isEnabled,
+          isError: status === "error",
+          isFetching: fetchStatus === "fetching",
+          isFetchingNextPage: activeDirection === "forward",
+          isFetchingPreviousPage: activeDirection === "backward",
+          isLoading: status === "pending" && fetchStatus === "fetching",
+          isPending: status === "pending",
+          isRefetching: status !== "pending" && fetchStatus === "fetching",
+          isStale: isEnabled ? isStale : false,
+          isSuccess: status === "success",
+          refetch,
+          status,
+        };
+        latestResult = result;
+        const queryChanged = observedQueryHash !== queryHash;
+        const becameEnabled = !observedEnabled && isEnabled;
+        observedQueryHash = queryHash;
+        observedEnabled = isEnabled;
+        if (
+          mounted &&
+          isEnabled &&
+          (queryChanged || becameEnabled) &&
+          (data === undefined || isStale) &&
+          !scheduledFetch
+        ) {
+          scheduledFetch = true;
+          queueMicrotask(() => {
+            scheduledFetch = false;
+            void execute("refetch").catch(() => {});
+          });
+        }
+        return result;
+      });
+      queryAtom.isEqual = infiniteQueryResultEqual;
+      queryAtom.onMount = () => {
+        mounted = true;
+        const unsubscribe = client.getQueryCache?.().subscribe?.(refresh);
+        const result = owner.store.get(queryAtom);
+        if (
+          result.isEnabled &&
+          (result.data === undefined ||
+            initialOptions.refetchOnMount === true ||
+            initialOptions.refetchOnMount === "always")
+        ) {
+          void execute("refetch").catch(() => {});
+        }
+        return () => {
+          mounted = false;
+          activeController?.abort();
+          unsubscribe?.();
+        };
+      };
+      owner.cachedBindings.set(cacheKey, queryAtom as Atom<unknown>);
+      return queryAtom;
+    },
+  };
+  return binding;
+}
+
+/** 创建 scope 键控 infinite-query signal（原 `zje` / 压缩导出 `tZ`）。 */
+export function createInfiniteQuerySignal<
+  TScope,
+  TPage,
+  TPageParam,
+  TError = Error,
+>(
+  scope: Scope<TScope>,
+  getOptions: (
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
+): ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError> {
+  return createInfiniteQuerySignalInternal(scope, getOptions);
+}
+
+/** 解析 infinite-query signal 为 hook 可消费的 atom/store 对。 */
+export function resolveScopedInfiniteQuerySignal<
+  TScope,
+  TPage,
+  TPageParam,
+  TError,
+>(
+  signal: ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError>,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<ScopedInfiniteQueryResult<TPage, TPageParam, TError>> {
   const owner = findScopeState(state, signal.scope);
   return { atom: signal.resolve(state), store: owner.store };
 }

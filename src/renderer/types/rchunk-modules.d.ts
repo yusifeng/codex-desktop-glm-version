@@ -181,6 +181,9 @@ declare module "@rchunk/app-shared" {
     get<Data, QueryError>(
       signal: ScopedQuerySignal<unknown, Data, QueryError>,
     ): ScopedQueryResult<Data, QueryError>;
+    get<Page, PageParam, QueryError>(
+      signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
+    ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Data, QueryError>(
       family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
@@ -241,6 +244,15 @@ declare module "@rchunk/app-shared" {
     queryKey: readonly unknown[];
     signal: AbortSignal;
   }
+  export interface ScopedInfiniteQueryFunctionContext<TPageParam>
+    extends ScopedQueryFunctionContext {
+    direction: "backward" | "forward";
+    pageParam: TPageParam;
+  }
+  export interface InfiniteQueryData<TPage, TPageParam = unknown> {
+    pageParams: TPageParam[];
+    pages: TPage[];
+  }
   export interface ScopedQueryOptions<TData, TError = Error> {
     enabled?: boolean | ((query: unknown) => boolean);
     initialData?: TData | (() => TData);
@@ -253,6 +265,28 @@ declare module "@rchunk/app-shared" {
     retry?: boolean | number | ((failureCount: number, error: TError) => boolean);
     staleTime?: number;
     throwOnError?: boolean | ((error: TError) => boolean);
+  }
+  export interface ScopedInfiniteQueryOptions<TPage, TPageParam, TError = Error>
+    extends Omit<
+      ScopedQueryOptions<InfiniteQueryData<TPage, TPageParam>, TError>,
+      "initialData" | "queryFn"
+    > {
+    getNextPageParam?(
+      lastPage: TPage,
+      allPages: TPage[],
+      lastPageParam: TPageParam,
+      allPageParams: TPageParam[],
+    ): TPageParam | null | undefined;
+    getPreviousPageParam?(
+      firstPage: TPage,
+      allPages: TPage[],
+      firstPageParam: TPageParam,
+      allPageParams: TPageParam[],
+    ): TPageParam | null | undefined;
+    initialData?: InfiniteQueryData<TPage, TPageParam> | (() => InfiniteQueryData<TPage, TPageParam>);
+    initialPageParam: TPageParam;
+    maxPages?: number;
+    queryFn?(context: ScopedInfiniteQueryFunctionContext<TPageParam>): Promise<TPage> | TPage;
   }
   export interface ScopedQueryState<TData, TError> {
     data?: TData;
@@ -289,6 +323,15 @@ declare module "@rchunk/app-shared" {
     refetch(): Promise<ScopedQueryResult<TData, TError>>;
     status: "error" | "pending" | "success";
   }
+  export interface ScopedInfiniteQueryResult<TPage, TPageParam, TError = Error>
+    extends ScopedQueryResult<InfiniteQueryData<TPage, TPageParam>, TError> {
+    fetchNextPage(): Promise<ScopedInfiniteQueryResult<TPage, TPageParam, TError>>;
+    fetchPreviousPage(): Promise<ScopedInfiniteQueryResult<TPage, TPageParam, TError>>;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    isFetchingNextPage: boolean;
+    isFetchingPreviousPage: boolean;
+  }
   export interface ScopedQuerySignal<TScope, TData, TError = Error> {
     cache: "cached";
     debugLabel?: string;
@@ -296,6 +339,15 @@ declare module "@rchunk/app-shared" {
       context: DerivedScopedSignalContext<TScope>,
     ): ScopedQueryOptions<TData, TError>;
     queryKind: "query";
+    scope: MaitaiScope<TScope>;
+  }
+  export interface ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError = Error> {
+    cache: "cached";
+    debugLabel?: string;
+    getOptions(
+      context: DerivedScopedSignalContext<TScope>,
+    ): ScopedInfiniteQueryOptions<TPage, TPageParam, TError>;
+    queryKind: "infinite";
     scope: MaitaiScope<TScope>;
   }
   export interface ScopedDerivedFamilyOptions<Param, TValue> {
@@ -334,6 +386,9 @@ declare module "@rchunk/app-shared" {
     get<Data, QueryError>(
       signal: ScopedQuerySignal<unknown, Data, QueryError>,
     ): ScopedQueryResult<Data, QueryError>;
+    get<Page, PageParam, QueryError>(
+      signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
+    ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Data, QueryError>(
       family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
@@ -468,6 +523,13 @@ declare module "@rchunk/app-shared" {
     ) => ScopedQueryOptions<TData, TError>,
     options?: ScopedQueryFamilyOptions<Param>,
   ) => ScopedQueryFamily<TScope, Param, TData, TError>;
+  /** createInfiniteQuerySignal（app-shared/runtime/atom-signal.ts，内部 zje）。 */
+  export const tZ: <TScope, TPage, TPageParam, TError = Error>(
+    scope: MaitaiScope<TScope>,
+    getOptions: (
+      context: DerivedScopedSignalContext<TScope>,
+    ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
+  ) => ScopedInfiniteQuerySignal<TScope, TPage, TPageParam, TError>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =
