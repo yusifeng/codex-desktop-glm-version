@@ -118,6 +118,7 @@ declare module "@rchunk/app-shared" {
   export type SignalFamily<Param, T> =
     | CallableSignalFamily<Param, T>
     | ScopedDerivedFamily<unknown, Param, T>
+    | ScopedMutationFamily<unknown, Param, unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, Param, unknown, unknown>
     | ScopedInfiniteQueryFamily<unknown, Param, unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, Param, T>;
@@ -133,6 +134,11 @@ declare module "@rchunk/app-shared" {
       parameter: Param,
       options?: QueryReadOptions,
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+    <Param, Data, MutationError, Variables, Context>(
+      family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+      parameter: Param,
+      options?: QueryReadOptions,
+    ): ScopedMutationResult<Data, MutationError, Variables, Context>;
     <Param, T>(
       family: SignalFamily<Param, T>,
       parameter: Param,
@@ -196,6 +202,10 @@ declare module "@rchunk/app-shared" {
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
     get<Data, MutationError, Variables, Context>(
       signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+    ): ScopedMutationResult<Data, MutationError, Variables, Context>;
+    get<Param, Data, MutationError, Variables, Context>(
+      family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+      parameter: Param,
     ): ScopedMutationResult<Data, MutationError, Variables, Context>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Data, QueryError>(
@@ -428,6 +438,23 @@ declare module "@rchunk/app-shared" {
     ): ScopedMutationOptions<TData, TError, TVariables, TContext>;
     scope: MaitaiScope<TScope>;
   }
+  export interface ScopedMutationFamily<
+    TScope,
+    Param,
+    TData,
+    TError,
+    TVariables,
+    TContext,
+  > {
+    autoDisposeMs: number;
+    debugLabel?: string;
+    getOptions(
+      parameter: Param,
+      context: DerivedScopedSignalContext<TScope>,
+    ): ScopedMutationOptions<TData, TError, TVariables, TContext>;
+    kind: "readable-family";
+    scope: MaitaiScope<TScope>;
+  }
   export interface ScopedDerivedFamilyOptions<Param, TValue> {
     autoDispose?: boolean | number;
     excludeFieldsFromKey?: readonly string[];
@@ -439,6 +466,7 @@ declare module "@rchunk/app-shared" {
     ScopedDerivedFamilyOptions<Param, unknown>,
     "isEqual"
   >;
+  export type ScopedMutationFamilyOptions<Param> = ScopedQueryFamilyOptions<Param>;
   export interface ScopedSignalFamilyOptions<Param> {
     autoDispose?: boolean | number;
     excludeFieldsFromKey?: readonly string[];
@@ -469,6 +497,10 @@ declare module "@rchunk/app-shared" {
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
     get<Data, MutationError, Variables, Context>(
       signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+    ): ScopedMutationResult<Data, MutationError, Variables, Context>;
+    get<Param, Data, MutationError, Variables, Context>(
+      family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+      parameter: Param,
     ): ScopedMutationResult<Data, MutationError, Variables, Context>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Data, QueryError>(
@@ -644,6 +676,22 @@ declare module "@rchunk/app-shared" {
       context: DerivedScopedSignalContext<TScope>,
     ) => ScopedMutationOptions<TData, TError, TVariables, TContext>,
   ) => ScopedMutationSignal<TScope, TData, TError, TVariables, TContext>;
+  /** createMutationFamily（app-shared/runtime/atom-signal.ts，内部 Uje）。 */
+  export const JX: <
+    TScope,
+    Param,
+    TData,
+    TError = Error,
+    TVariables = void,
+    TContext = unknown,
+  >(
+    scope: MaitaiScope<TScope>,
+    getOptions: (
+      parameter: Param,
+      context: DerivedScopedSignalContext<TScope>,
+    ) => ScopedMutationOptions<TData, TError, TVariables, TContext>,
+    options?: ScopedMutationFamilyOptions<Param>,
+  ) => ScopedMutationFamily<TScope, Param, TData, TError, TVariables, TContext>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =

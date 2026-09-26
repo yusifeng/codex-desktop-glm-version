@@ -439,6 +439,10 @@ export interface ScopeState<T = unknown> {
   familyBindings: Map<ScopedDerivedFamily<unknown, unknown, unknown>, Map<unknown, Atom<unknown>>>;
   parent?: ScopeState<unknown>;
   queryClient?: unknown;
+  mutationFamilyBindings: Map<
+    ScopedMutationFamily<unknown, unknown, unknown, unknown, unknown, unknown>,
+    Map<unknown, Atom<unknown>>
+  >;
   queryFamilyBindings: Map<
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>,
@@ -481,6 +485,10 @@ export interface ScopeApi<T = unknown> {
   ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
   get<Data, MutationError, Variables, Context>(
     signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+  ): ScopedMutationResult<Data, MutationError, Variables, Context>;
+  get<Param, Data, MutationError, Variables, Context>(
+    family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+    parameter: Param,
   ): ScopedMutationResult<Data, MutationError, Variables, Context>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
@@ -703,6 +711,8 @@ export type ScopedQueryFamilyOptions<Param> = Omit<
   "isEqual"
 >;
 
+export type ScopedMutationFamilyOptions<Param> = ScopedQueryFamilyOptions<Param>;
+
 export interface ScopedSignalFamilyOptions<Param> {
   autoDispose?: boolean | number;
   excludeFieldsFromKey?: readonly string[];
@@ -738,6 +748,10 @@ export interface DerivedScopedSignalContext<T = unknown> {
   ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
   get<Data, MutationError, Variables, Context>(
     signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+  ): ScopedMutationResult<Data, MutationError, Variables, Context>;
+  get<Param, Data, MutationError, Variables, Context>(
+    family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+    parameter: Param,
   ): ScopedMutationResult<Data, MutationError, Variables, Context>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
@@ -851,6 +865,30 @@ export interface ScopedMutationSignal<
   ): Atom<ScopedMutationResult<TData, TError, TVariables, TContext>>;
 }
 
+/** 原 `Uje` 返回的 scope 键控 mutation family。 */
+export interface ScopedMutationFamily<
+  TScope,
+  Param,
+  TData,
+  TError,
+  TVariables,
+  TContext,
+> {
+  autoDisposeMs: number;
+  debugLabel?: string;
+  getOptions(
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ): ScopedMutationOptions<TData, TError, TVariables, TContext>;
+  kind: "readable-family";
+  scope: Scope<TScope>;
+  evict(state: ScopeState<unknown>, parameter: Param): boolean;
+  resolve(
+    state: ScopeState<unknown>,
+    parameter: Param,
+  ): Atom<ScopedMutationResult<TData, TError, TVariables, TContext>>;
+}
+
 /** 原 `Sje` 返回的 scope 键控派生 family。 */
 export interface ScopedDerivedFamily<TScope, Param, TValue> {
   autoDisposeMs: number;
@@ -920,6 +958,7 @@ function resolveScopeBinding(
     | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
     | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
+    | ScopedMutationFamily<unknown, unknown, unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -964,6 +1003,7 @@ function watchScope<T>(
           | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
           | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
+          | ScopedMutationFamily<unknown, unknown, unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -1019,6 +1059,7 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
         | ScopedQuerySignal<unknown, unknown, unknown>
         | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
         | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
+        | ScopedMutationFamily<unknown, unknown, unknown, unknown, unknown, unknown>
         | ScopedQueryFamily<unknown, unknown, unknown, unknown>
         | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
         | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -1082,6 +1123,7 @@ export function createScopeState<T>(
   const state: ScopeState<T> = {
     cachedBindings: new Map(),
     familyBindings: new Map(),
+    mutationFamilyBindings: new Map(),
     parent: options.parent,
     queryClient: options.queryClient ?? options.parent?.queryClient,
     queryFamilyBindings: new Map(),
@@ -1174,12 +1216,14 @@ function isScopedFamily(
     | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
     | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
+    | ScopedMutationFamily<unknown, unknown, unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
     | ScopedSignalFamily<unknown, unknown, unknown>,
 ): value is
   | ScopedDerivedFamily<unknown, unknown, unknown>
+  | ScopedMutationFamily<unknown, unknown, unknown, unknown, unknown, unknown>
   | ScopedQueryFamily<unknown, unknown, unknown, unknown>
   | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
   | ScopedSignalFamily<unknown, unknown, unknown> {
@@ -1210,6 +1254,7 @@ function createDerivedContext<T>(
           | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
           | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
+          | ScopedMutationFamily<unknown, unknown, unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -2179,8 +2224,7 @@ export function resolveScopedInfiniteQueryFamily<
   return { atom: family.resolve(state, parameter), store: owner.store };
 }
 
-/** 创建 scope 键控 mutation signal（原 `Wje` / 压缩导出 `YX`）。 */
-export function createMutationSignal<
+function createMutationSignalInternal<
   TScope,
   TData,
   TError = Error,
@@ -2191,6 +2235,9 @@ export function createMutationSignal<
   getOptions: (
     context: DerivedScopedSignalContext<TScope>,
   ) => ScopedMutationOptions<TData, TError, TVariables, TContext>,
+  resolveCurrent?: (
+    owner: ScopeState<unknown>,
+  ) => Atom<ScopedMutationResult<TData, TError, TVariables, TContext>> | undefined,
 ): ScopedMutationSignal<TScope, TData, TError, TVariables, TContext> {
   type Result = ScopedMutationResult<TData, TError, TVariables, TContext>;
   type State = Pick<Result, "data" | "error" | "status" | "variables">;
@@ -2224,9 +2271,10 @@ export function createMutationSignal<
         variables: undefined,
       });
       let mutationId = 0;
-      const resultAtom = atom((get) => {
+      let resultAtom: Atom<Result>;
+      resultAtom = atom((get) => {
         const state = get(stateAtom);
-        const mutateAsync = async (
+        const executeMutation = async (
           variables: TVariables,
           callbacks?: ScopedMutationCallbacks<
             TData,
@@ -2295,6 +2343,21 @@ export function createMutationSignal<
           callbacks?.onSettled?.(data, null, variables, context, mutation);
           return data;
         };
+        const mutateAsync = (
+          variables: TVariables,
+          callbacks?: ScopedMutationCallbacks<
+            TData,
+            TError,
+            TVariables,
+            TContext
+          >,
+        ): Promise<TData> => {
+          const current = resolveCurrent?.(owner);
+          if (current != null && current !== resultAtom) {
+            return owner.store.get(current).mutateAsync(variables, callbacks);
+          }
+          return executeMutation(variables, callbacks);
+        };
         return {
           ...state,
           isError: state.status === "error",
@@ -2314,6 +2377,22 @@ export function createMutationSignal<
   return binding;
 }
 
+/** 创建 scope 键控 mutation signal（原 `Wje` / 压缩导出 `YX`）。 */
+export function createMutationSignal<
+  TScope,
+  TData,
+  TError = Error,
+  TVariables = void,
+  TContext = unknown,
+>(
+  scope: Scope<TScope>,
+  getOptions: (
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedMutationOptions<TData, TError, TVariables, TContext>,
+): ScopedMutationSignal<TScope, TData, TError, TVariables, TContext> {
+  return createMutationSignalInternal(scope, getOptions);
+}
+
 /** 解析 mutation signal 为 hook 可消费的 atom/store 对。 */
 export function resolveScopedMutationSignal<
   TScope,
@@ -2327,6 +2406,162 @@ export function resolveScopedMutationSignal<
 ): BoundAtomSignal<ScopedMutationResult<TData, TError, TVariables, TContext>> {
   const owner = findScopeState(state, signal.scope);
   return { atom: signal.resolve(state), store: owner.store };
+}
+
+/** 创建 scope 键控 mutation family（原 `Uje` / 压缩导出 `JX`）。 */
+export function createMutationFamily<
+  TScope,
+  Param,
+  TData,
+  TError = Error,
+  TVariables = void,
+  TContext = unknown,
+>(
+  scope: Scope<TScope>,
+  getOptions: (
+    parameter: Param,
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedMutationOptions<TData, TError, TVariables, TContext>,
+  options?: ScopedMutationFamilyOptions<Param>,
+): ScopedMutationFamily<
+  TScope,
+  Param,
+  TData,
+  TError,
+  TVariables,
+  TContext
+> {
+  type Family = ScopedMutationFamily<
+    TScope,
+    Param,
+    TData,
+    TError,
+    TVariables,
+    TContext
+  >;
+  type Signal = ScopedMutationSignal<
+    TScope,
+    TData,
+    TError,
+    TVariables,
+    TContext
+  >;
+  type Result = ScopedMutationResult<TData, TError, TVariables, TContext>;
+
+  const autoDisposeMs = normalizeAutoDispose(options?.autoDispose);
+  const memberSignals = new WeakMap<
+    ScopeState<unknown>,
+    Map<unknown, Signal>
+  >();
+  const family: Family = {
+    autoDisposeMs,
+    getOptions,
+    kind: "readable-family",
+    scope,
+    evict(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const familyKey = family as ScopedMutationFamily<
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown
+      >;
+      const parameterKey = scopedFamilyKey(parameter, options);
+      const members = owner.mutationFamilyBindings.get(familyKey);
+      const signal = memberSignals.get(owner)?.get(parameterKey);
+      if (signal != null) {
+        owner.cachedBindings.delete(
+          signal as unknown as ScopedDerivedSignal<unknown, unknown>,
+        );
+        memberSignals.get(owner)?.delete(parameterKey);
+      }
+      if (members == null) return false;
+      const removed = members.delete(parameterKey);
+      if (members.size === 0) owner.mutationFamilyBindings.delete(familyKey);
+      return removed;
+    },
+    resolve(activeState, parameter) {
+      const owner = findScopeState(activeState, scope);
+      const familyKey = family as ScopedMutationFamily<
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown
+      >;
+      let members = owner.mutationFamilyBindings.get(familyKey);
+      if (members == null) {
+        members = new Map();
+        owner.mutationFamilyBindings.set(familyKey, members);
+      }
+      const parameterKey = scopedFamilyKey(parameter, options);
+      const cached = members.get(parameterKey);
+      if (cached != null) return cached as Atom<Result>;
+
+      const signal = createMutationSignalInternal(
+        scope,
+        (context) => getOptions(parameter, context),
+        (currentOwner) => currentOwner.mutationFamilyBindings
+          .get(familyKey)
+          ?.get(parameterKey) as Atom<Result> | undefined,
+      );
+      signal.debugLabel = family.debugLabel;
+      let signals = memberSignals.get(owner);
+      if (signals == null) {
+        signals = new Map();
+        memberSignals.set(owner, signals);
+      }
+      signals.set(parameterKey, signal);
+      const mutationAtom = signal.resolve(activeState);
+      const mountMutation = mutationAtom.onMount;
+      let disposalTimer: ReturnType<typeof setTimeout> | undefined;
+      mutationAtom.onMount = (setSelf) => {
+        if (disposalTimer != null) {
+          clearTimeout(disposalTimer);
+          disposalTimer = undefined;
+        }
+        const unmountMutation = mountMutation?.(setSelf);
+        return () => {
+          if (typeof unmountMutation === "function") unmountMutation();
+          if (autoDisposeMs === Infinity) return;
+          disposalTimer = setTimeout(() => {
+            disposalTimer = undefined;
+            family.evict(activeState, parameter);
+          }, autoDisposeMs);
+        };
+      };
+      members.set(parameterKey, mutationAtom as Atom<unknown>);
+      return mutationAtom;
+    },
+  };
+  return family;
+}
+
+/** 解析 mutation family 成员为 hook 可消费的 atom/store 对。 */
+export function resolveScopedMutationFamily<
+  TScope,
+  Param,
+  TData,
+  TError,
+  TVariables,
+  TContext,
+>(
+  family: ScopedMutationFamily<
+    TScope,
+    Param,
+    TData,
+    TError,
+    TVariables,
+    TContext
+  >,
+  parameter: Param,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<ScopedMutationResult<TData, TError, TVariables, TContext>> {
+  const owner = findScopeState(state, family.scope);
+  return { atom: family.resolve(state, parameter), store: owner.store };
 }
 
 /**
@@ -2804,6 +3039,7 @@ export interface CallableSignalFamily<Param, T> {
 export type SignalFamily<Param, T> =
   | CallableSignalFamily<Param, T>
   | ScopedDerivedFamily<unknown, Param, T>
+  | ScopedMutationFamily<unknown, Param, unknown, unknown, unknown, unknown>
   | ScopedQueryFamily<unknown, Param, unknown, unknown>
   | ScopedInfiniteQueryFamily<unknown, Param, unknown, unknown, unknown>
   | ScopedSignalFamily<unknown, Param, T>;
@@ -2812,6 +3048,7 @@ function isScopedFamilyBinding<Param, T>(
   value: SignalFamily<Param, T>,
 ): value is
   | ScopedDerivedFamily<unknown, Param, T>
+  | ScopedMutationFamily<unknown, Param, unknown, unknown, unknown, unknown>
   | ScopedQueryFamily<unknown, Param, unknown, unknown>
   | ScopedInfiniteQueryFamily<unknown, Param, unknown, unknown, unknown>
   | ScopedSignalFamily<unknown, Param, T> {
@@ -2870,6 +3107,11 @@ export function useSignalValue<T>(signal: ReadableSignal<T>, options?: QueryRead
 }
 
 /** 原 `dMe` / 压缩导出 `BX`：解析 family 成员后复用 `useSignalValue`。 */
+export function useSignalFamilyValue<Param, Data, MutationError, Variables, Context>(
+  family: ScopedMutationFamily<unknown, Param, Data, MutationError, Variables, Context>,
+  parameter: Param,
+  options?: QueryReadOptions,
+): ScopedMutationResult<Data, MutationError, Variables, Context>;
 export function useSignalFamilyValue<Param, T>(family: SignalFamily<Param, T>, parameter: Param, options?: QueryReadOptions): T {
   const configuredFamily = withQueryReadOptions(family, options) as SignalFamily<Param, T>;
   if (isScopedFamilyBinding(configuredFamily)) {
