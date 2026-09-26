@@ -172,6 +172,11 @@ declare module "@rchunk/connector-logo-stack" {
 }
 
 declare module "@rchunk/onboarding-mail-provider" {
+  export const a: (...args: any[]) => any;
+  export const n: (...args: any[]) => any;
+  export const o: (...args: any[]) => any;
+  export const r: (...args: any[]) => any;
+  export const t: (...args: any[]) => any;
   export const _any: any;
 }
 
