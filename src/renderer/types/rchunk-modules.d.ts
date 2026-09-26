@@ -301,6 +301,11 @@ declare module "@rchunk/computer-history-suggestions" {
   export const t: unknown;
 }
 
+declare module "@rchunk/suggestion-card" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
