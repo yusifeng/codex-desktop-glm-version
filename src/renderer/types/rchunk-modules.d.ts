@@ -66,6 +66,47 @@ declare module "@rchunk/app-shared" {
   export const Qh: (props: LoadingSpinnerProps) => unknown;
   export const Xh: (props: Omit<ButtonProps, "as">) => unknown;
   export const Yh: (props: ButtonProps) => unknown;
+  export interface DialogLayoutProps extends Record<string, unknown> {
+    children?: unknown;
+    className?: string;
+  }
+  export interface DialogHeaderProps extends DialogLayoutProps {
+    icon?: unknown;
+    iconClassName?: string;
+    iconBackgroundClassName?: string;
+    title?: unknown;
+    titleSize?: "dialog" | "lg" | "base" | "sm";
+    titleClassName?: string;
+    subtitle?: unknown;
+    subtitleSize?: "base" | "sm";
+    subtitleTone?: "secondary" | "tertiary";
+    subtitleClassName?: string;
+  }
+  export interface DialogBodyProps extends DialogLayoutProps {
+    as?: "div" | "form";
+    size?: "viewport" | "full" | "tall";
+    variant?: "default" | string;
+  }
+  export interface DialogFooterProps extends DialogLayoutProps {
+    expandSingleButton?: boolean;
+  }
+  export interface DialogSectionProps extends DialogLayoutProps {
+    spacing?: "default" | "large";
+  }
+  /** DialogHeader（app-shared/ui/dialog-layout.ts，内部 Xot）。 */
+  export const Ah: (props: DialogHeaderProps) => unknown;
+  /** DialogBody（内部 Zot）。 */
+  export const Oh: (props: DialogBodyProps) => unknown;
+  /** DialogFooter（内部 Qot）。 */
+  export const kh: (props: DialogFooterProps) => unknown;
+  /** DialogSection（内部 est）。 */
+  export const jh: (props: DialogSectionProps) => unknown;
+  /** DialogFormRow（内部 tst）。 */
+  export const Nh: (props: DialogLayoutProps) => unknown;
+  /** DialogFieldStack（内部 nst）。 */
+  export const Mh: (props: DialogLayoutProps) => unknown;
+  /** initializeDialogLayout（内部 ost）。 */
+  export const Ph: () => void;
   export interface ReactRef<T> {
     current: T;
   }
