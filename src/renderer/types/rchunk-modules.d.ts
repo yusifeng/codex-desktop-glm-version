@@ -2723,6 +2723,26 @@ declare module "@rchunk/app-initial" {
     scope: unknown,
     options: GeneratedImageContextMenuOptions,
   ) => GeneratedImageContextMenuItem[];
+  export interface ExternalLinkConfirmationDialogProps {
+    clickModifiers?: unknown;
+    disposition?: unknown;
+    href: string;
+    hostId?: string;
+    initiator?: unknown;
+    onClose(): void;
+    onDownload?: () => void;
+    onOpen?: () => boolean | void;
+    openTarget?: unknown;
+    openTargetIntent?: unknown;
+    originHostId?: string;
+    presentationIntent?: unknown;
+    source?: string;
+    useExternalBrowser?: boolean;
+  }
+  /** initializeExternalLinkConfirmationDialog（内部 xEi）。 */
+  export const ist: () => void;
+  /** ExternalLinkConfirmationDialog（内部 yEi）。 */
+  export const rst: (props: ExternalLinkConfirmationDialogProps) => unknown;
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices
@@ -3844,7 +3864,9 @@ declare module "@rchunk/trusted-contact-no-thanks-dialog" {
 }
 
 declare module "@rchunk/external-link-confirmation-dialog" {
-  export const ExternalLinkConfirmationDialog: (...args: any[]) => any;
+  export const ExternalLinkConfirmationDialog: (
+    props: import("@rchunk/app-initial").ExternalLinkConfirmationDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/mcp-app-follow-up-confirmation-dialog" {
