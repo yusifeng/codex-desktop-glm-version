@@ -754,6 +754,21 @@ declare module "@rchunk/app-shared" {
   export const Mh: (props: DialogLayoutProps) => unknown;
   /** initializeDialogLayout（内部 ost）。 */
   export const Ph: () => void;
+  /** Dialog actions 的标准 footer class。 */
+  export const Dh: string;
+  /** Error / minus / success 状态图标。 */
+  export const Lo: (props: Record<string, unknown>) => unknown;
+  export const Ud: (props: Record<string, unknown>) => unknown;
+  export const wc: (props: Record<string, unknown>) => unknown;
+  export const Qc: () => void;
+  export const Wd: () => void;
+  export const Ro: () => void;
+  /** Motion 与 check-control 初始化器。 */
+  export const Tc: () => void;
+  export const a$: () => void;
+  export const xD: () => void;
+  /** Menu 当前选中项的 check icon asset。 */
+  export const bD: IconAssetPreset;
   export interface ReactRef<T> {
     current: T;
   }
@@ -2806,6 +2821,28 @@ declare module "@rchunk/app-initial" {
   export const ujt: () => void;
   export const pp: () => void;
   export const lx: () => void;
+  /** Browser profile import 的完成状态 signals。 */
+  export const Gx: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    boolean
+  >;
+  export const Jx: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    number
+  >;
+  export const Kx: (result: unknown) => boolean;
+  export const Ux: (result: { status?: string } | null | undefined) => boolean;
+  export const Wx: (
+    result:
+      | { status?: string; imported?: number }
+      | null
+      | undefined,
+  ) => boolean;
+  export const Slt: () => boolean;
+  export const Xl: () => void;
+  export const xlt: () => void;
+  export const qx: () => void;
+  export const ql: (props: Record<string, unknown>) => unknown;
   /** initializeThreadState（pending-onboarding 依赖的线程索引初始化器）。 */
   export const Ftn: () => void;
   /** 当前用户 ID signal。 */
@@ -2844,6 +2881,8 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-primary" {
+  export const Jp: (props: Record<string, unknown>) => unknown;
+  export const Yp: () => void;
   export interface GptMigrationVisitKey {
     gizmoId: string;
     visitKey: string;
@@ -3137,18 +3176,62 @@ declare module "@rchunk/browser-profile-import-availability" {
 }
 
 declare module "@rchunk/browser-profile-import-analytics" {
-  export const a: (...args: any[]) => void;
-  export const c: (...args: any[]) => void;
-  export const i: (...args: any[]) => void;
-  export const n: (...args: any[]) => void;
-  export const o: (...args: any[]) => void;
-  export const r: (...args: any[]) => void;
-  export const s: (...args: any[]) => void;
+  export type BrowserProfileImportEntryPoint = string;
+  export interface BrowserProfileImportAttemptContext {
+    attemptIndex: number;
+    flowId: string;
+    windowsChromeAdminApprovalNoticeAcknowledged: boolean;
+    windowsChromeAdminApprovalNoticeRequired: boolean;
+  }
+  export interface BrowserProfileImportRequest {
+    importCookies?: boolean;
+    importExtensions?: boolean;
+    importPasswords?: boolean;
+    source: "atlas" | "chrome";
+  }
+  export const a: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    entryPoint: BrowserProfileImportEntryPoint,
+    flowId: string,
+  ) => void;
+  export const c: typeof a;
+  export const i: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    entryPoint: BrowserProfileImportEntryPoint,
+    details: Record<string, unknown>,
+  ) => void;
+  export const n: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    entryPoint: BrowserProfileImportEntryPoint,
+    request: BrowserProfileImportRequest,
+    context: BrowserProfileImportAttemptContext,
+    result?: unknown,
+  ) => void;
+  export const o: typeof a;
+  export const r: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    entryPoint: BrowserProfileImportEntryPoint,
+    request: BrowserProfileImportRequest,
+    context: BrowserProfileImportAttemptContext,
+  ) => void;
+  export const s: typeof a;
   export const t: () => void;
 }
 
 declare module "@rchunk/browser-profile-import-dialog" {
-  export const BrowserProfileImportDialogModal: (...args: any[]) => any;
+  export interface BrowserProfileImportService
+    extends import("@rchunk/browser-profile-import-query").BrowserProfileImportService {
+    importBrowserProfile(request: Record<string, unknown>): Promise<unknown>;
+  }
+  export interface BrowserProfileImportDialogProps {
+    entryPoint: string;
+    flowId: string;
+    onClose(): void;
+    service: BrowserProfileImportService;
+  }
+  export const BrowserProfileImportDialogModal: (
+    props: BrowserProfileImportDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/browser-profile-import-query" {

@@ -7,13 +7,13 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as analyticsChunk from "@rchunk/browser-profile-import-analytics";
 import * as queryChunk from "@rchunk/browser-profile-import-query";
+import type {
+  JsxRuntime,
+  MessageDescriptor,
+  ReactRuntime,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const analytics = analyticsChunk as Record<string, any>;
-const query = queryChunk as Record<string, any>;
 
 type Source = "atlas" | "chrome";
 type ImportKind = "passwords" | "cookies" | "history" | "extensions";
@@ -41,9 +41,11 @@ type ImportRequest = {
 
 type DataResult = {
   status?: string;
+  discovered?: number;
   imported?: number;
   failed?: number;
   error?: unknown;
+  skippedExisting?: number;
   skippedInvalid?: number;
   failures?: Array<{ id?: string; name?: string; reason?: string }>;
   profile?: DataResult;
@@ -67,7 +69,9 @@ type AttemptContext = {
 };
 
 interface BrowserProfileImportService {
+  getImportSignals(): Promise<Record<string, unknown>>;
   importBrowserProfile(request: ImportRequest): Promise<ImportResult>;
+  listImportableBrowserProfiles(): Promise<Profile[]>;
 }
 
 interface ImportMutationVariables {
@@ -77,6 +81,59 @@ interface ImportMutationVariables {
   startedAt: number;
 }
 
+interface ResultState {
+  result: ImportResult;
+  revealedRowCount: number;
+}
+
+interface ExtensionConfirmationState {
+  profile: Profile;
+  request: ImportRequest;
+}
+
+interface ImportResultsProps {
+  activeImportRequest?: ImportRequest;
+  cookieAccessFailureMessage?: unknown;
+  importCookies: boolean;
+  importExtensions: boolean;
+  importHistory: boolean;
+  importPasswords: boolean;
+  isImporting: boolean;
+  revealedImportResultRowCount?: number;
+  showCloseBrowserGuidance: boolean;
+  result: ImportResult | null;
+  onDone(): void;
+  onRetry?: () => void;
+}
+
+interface ImportSelectionProps extends ImportResultsProps {
+  confirmExtensionImport: boolean;
+  elevatedChromeConsent: boolean;
+  extensionsAvailable: boolean;
+  isLoadingProfiles: boolean;
+  profilePickerOpen?: boolean;
+  profiles?: Profile[];
+  profilesHaveError: boolean;
+  requiresElevatedChromeConsent: boolean;
+  selectedProfile: Profile | null;
+  onCancel(): void;
+  onElevatedChromeConsentChange(checked: boolean): void;
+  onImport(): void;
+  onImportCookiesChange(checked: boolean): void;
+  onImportExtensionsChange(checked: boolean): void;
+  onImportHistoryChange(checked: boolean): void;
+  onImportPasswordsChange(checked: boolean): void;
+  onProfilePickerOpenChange?: (open: boolean) => void;
+  onSelectProfile(profile: Profile): void;
+}
+
+export interface BrowserProfileImportDialogProps {
+  entryPoint: string;
+  flowId: string;
+  onClose(): void;
+  service: BrowserProfileImportService;
+}
+
 const {
   _L: useQuery,
   gL: initializeUseQuery,
@@ -84,12 +141,99 @@ const {
   rL: initializeUseMutation,
 } = appSharedChunk;
 
-const jsx = appShared.I3();
-const React = appShared.e6();
+const {
+  $3: initializeRuntimeLazy,
+  $h: initializeSettingsRow,
+  Ad: Checkbox,
+  Ah: DialogHeader,
+  BX: useSignalFamilyValue,
+  Dh: dialogActionsClassName,
+  FX: initializeSignalRuntime,
+  G2: defineMessages,
+  I3: getJsxRuntime,
+  If: initializeMenu,
+  Ih: Dialog,
+  K2: initializeReactRuntime,
+  LX: useSignalScope,
+  Lf: CheckControl,
+  Lh: DialogDescription,
+  Lo: ErrorIcon,
+  Oh: DialogContent,
+  Ph: initializeDialogLayout,
+  QI: initializeAppScope,
+  Qc: initializeErrorIcon,
+  Qh: LoadingSpinner,
+  Rf: initializeSettingsList,
+  Rh: DialogTitle,
+  Ro: initializeSuccessIcon,
+  Tc: initializeMotion,
+  Ud: MinusIcon,
+  Wd: initializeMinusIcon,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: appScope,
+  Zc: SettingsList,
+  Zh: initializeButton,
+  a$: initializeMotionRuntime,
+  al: initializeSelectTrigger,
+  bD: selectedItemIcon,
+  e6: getReactRuntime,
+  h4: initializeClassNames,
+  jd: initializeCheckbox,
+  jf: Menu,
+  jh: DialogSection,
+  kf: MenuTrigger,
+  kh: DialogActions,
+  m4: classNames,
+  o$: MotionSpan,
+  rl: SettingsRow,
+  wc: SuccessIcon,
+  xD: initializeCheckControl,
+  zh: initializeDialog,
+} = appSharedChunk;
+const {
+  Gx: browserImportSucceededSignal,
+  Jx: browserImportCompletedAtSignal,
+  Kx: isImportSuccessful,
+  Slt: useReducedMotion,
+  Ux: isImportFailure,
+  Wx: isImportDataSuccessful,
+  Xl: initializeBrowserImportSettings,
+  mfn: browserExtensionsFeatureFamily,
+  pfn: initializeBrowserExtensionFeature,
+  ql: SelectTrigger,
+  qx: initializeBrowserImportRuntime,
+  xlt: initializeBrowserImportState,
+} = appInitialChunk;
+const {
+  Jp: WarningIcon,
+  Yp: initializeWarningIcon,
+} = appPrimaryChunk;
+const {
+  c: recordAdminNoticeShown,
+  i: recordDialogClosed,
+  n: recordAttemptFinished,
+  r: recordAttemptStarted,
+  s: recordAdminNoticeAcknowledged,
+  t: initializeBrowserImportAnalytics,
+} = analyticsChunk;
+const {
+  a: SourceIcon,
+  c: importMessages,
+  d: initializeImportDataIcons,
+  i: initializeImportQueries,
+  l: initializeImportMessages,
+  s: initializeSourceIcons,
+  t: createProfilesQueryOptions,
+  u: ImportDataIcon,
+} = queryChunk;
+
+const jsx: JsxRuntime = getJsxRuntime();
+const React: ReactRuntime = getReactRuntime();
 const revealInitialDelayMs = 750;
 const revealRowDelayMs = 500;
 
-const dialogMessages = appShared.G2({
+const dialogMessages = defineMessages({
   cancel: {
     id: "settings.browserUse.profileImport.cancel",
     defaultMessage: "Cancel",
@@ -146,7 +290,7 @@ const dialogMessages = appShared.G2({
 });
 
 function Message(props: Record<string, unknown>) {
-  return jsx.jsx(appShared.Y2, props);
+  return jsx.jsx(FormattedMessage, props);
 }
 
 function profileKey(profile: Profile): string {
@@ -204,7 +348,7 @@ function mergeImportResults(
 }
 
 function shouldRetry(...results: (DataResult | undefined)[]): boolean {
-  return !results.some(appInitial.Wx) || results.some(appInitial.Ux);
+  return !results.some(isImportDataSuccessful) || results.some(isImportFailure);
 }
 
 function hasCleanStatus(result?: DataResult): boolean {
@@ -220,7 +364,7 @@ function hasCleanStatus(result?: DataResult): boolean {
 }
 
 function ImportedDataIcon({ kind }: { kind: ImportKind }) {
-  return jsx.jsx(query.u, { className: "size-5 text-secondary", kind });
+  return jsx.jsx(ImportDataIcon, { className: "size-5 text-secondary", kind });
 }
 
 const extensionFailureMessages: Record<string, [string, string]> = {
@@ -350,14 +494,14 @@ function ExtensionFailureMessage({ result }: { result?: DataResult }) {
 }
 
 function ProfileLabel({ profile }: { profile: Profile }) {
-  const iconClass = appShared.m4(
+  const iconClass = classNames(
     "size-4 shrink-0",
     profile.source === "atlas" && "rounded-[22%]",
   );
   return jsx.jsxs("span", {
     className: "flex min-w-0 flex-1 items-center gap-1.5",
     children: [
-      jsx.jsx(query.a, { className: iconClass, source: profile.source }),
+      jsx.jsx(SourceIcon, { className: iconClass, source: profile.source }),
       jsx.jsx("span", {
         className: "min-w-0 truncate text-default",
         children: profile.appName,
@@ -391,7 +535,7 @@ function ProfilePicker({
   const triggerContent = isLoading
     ? jsx.jsxs(React.Fragment, {
         children: [
-          jsx.jsx(appShared.Qh, { className: "icon-2xs" }),
+          jsx.jsx(LoadingSpinner, { className: "icon-2xs" }),
           jsx.jsx(Message, {
             id: "settings.browserUse.profileImport.loadingProfiles",
             defaultMessage: "Loading profiles…",
@@ -404,12 +548,12 @@ function ProfilePicker({
           defaultMessage: "No profiles found",
         })
       : jsx.jsx(ProfileLabel, { profile: selectedProfile });
-  const trigger = jsx.jsx(appInitial.ql, {
+  const trigger = jsx.jsx(SelectTrigger, {
     "aria-disabled": oneProfile || undefined,
     "aria-label": selectedProfile
       ? profileAccessibleName(selectedProfile)
       : undefined,
-    className: appShared.m4(
+    className: classNames(
       "min-w-0 flex-1",
       oneProfile && "pointer-events-none",
     ),
@@ -430,18 +574,18 @@ function ProfilePicker({
       }),
       oneProfile
         ? trigger
-        : jsx.jsx(appShared.kf, {
+        : jsx.jsx(MenuTrigger, {
             align: "end",
             contentWidth: "menuWide",
             disabled,
             open,
             triggerButton: trigger,
             onOpenChange,
-            children: jsx.jsx(appShared.jf.Section, {
+            children: jsx.jsx(Menu.Section, {
               className: "max-h-[250px] overflow-y-auto",
               children: profiles?.map((profile) =>
                 jsx.jsx(
-                  appShared.jf.Item,
+                  Menu.Item,
                   {
                     "aria-label": profileAccessibleName(profile),
                     rightIconAsset:
@@ -449,7 +593,7 @@ function ProfilePicker({
                       (selectedProfile == null
                         ? null
                         : profileKey(selectedProfile))
-                        ? appShared.bD
+                        ? selectedItemIcon
                         : undefined,
                     onSelect: () => onSelectProfile(profile),
                     children: jsx.jsx(ProfileLabel, { profile }),
@@ -474,14 +618,14 @@ function DataSelectionRow({
   kind: ImportKind;
   onChange: (checked: boolean) => void;
 }) {
-  return jsx.jsx(appShared.rl, {
+  return jsx.jsx(SettingsRow, {
     icon: jsx.jsx(ImportedDataIcon, { kind }),
     label: jsx.jsx("span", {
       className: "select-none",
-      children: jsx.jsx(Message, { ...query.c[kind] }),
+      children: jsx.jsx(Message, { ...importMessages[kind] }),
     }),
     control: (props: Record<string, unknown>) =>
-      jsx.jsx(appShared.Lf, { ...props, checked, disabled, onChange }),
+      jsx.jsx(CheckControl, { ...props, checked, disabled, onChange }),
   });
 }
 
@@ -516,7 +660,7 @@ function ElevatedChromeConsent({
       jsx.jsxs("label", {
         className: "relative flex cursor-interaction items-start gap-2",
         children: [
-          jsx.jsx(appShared.Ad, {
+          jsx.jsx(Checkbox, {
             checked,
             disabled,
             onCheckedChange: onChange,
@@ -553,29 +697,29 @@ function ExtensionsConfirmation({
       "Codex can’t verify extensions or saved permissions from this {appName} profile “{profileName}”. If imported, these extensions may run code or access data in Codex. Continue only if you trust the profile.",
     values: { appName: profile.appName, profileName: profile.profileName },
   });
-  return jsx.jsxs(appShared.Oh, {
+  return jsx.jsxs(DialogContent, {
     as: "form",
     onSubmit: (event: { preventDefault: () => void }) => {
       event.preventDefault();
       onImport();
     },
     children: [
-      jsx.jsx(appShared.Rh, { className: "sr-only", children: title }),
-      jsx.jsx(appShared.Lh, { className: "sr-only", children: description }),
-      jsx.jsx(appShared.jh, {
-        children: jsx.jsx(appShared.Ah, { title, subtitle: description }),
+      jsx.jsx(DialogTitle, { className: "sr-only", children: title }),
+      jsx.jsx(DialogDescription, { className: "sr-only", children: description }),
+      jsx.jsx(DialogSection, {
+        children: jsx.jsx(DialogHeader, { title, subtitle: description }),
       }),
-      jsx.jsx(appShared.jh, {
-        children: jsx.jsxs(appShared.kh, {
+      jsx.jsx(DialogSection, {
+        children: jsx.jsxs(DialogActions, {
           children: [
-            jsx.jsx(appShared.Yh, {
+            jsx.jsx(Button, {
               autoFocus: true,
               color: "secondary",
               onClick: onCancel,
               type: "button",
               children: jsx.jsx(Message, { ...dialogMessages.cancel }),
             }),
-            jsx.jsx(appShared.Yh, {
+            jsx.jsx(Button, {
               type: "submit",
               children: jsx.jsx(Message, {
                 id: "settings.browserUse.profileImport.extensionsConfirmationAction",
@@ -619,7 +763,7 @@ function cookieFailureMessage(
 
 function passwordFailureMessage(results: (DataResult | undefined)[]) {
   const partiallyFailed =
-    results.some(appInitial.Ux) && results.some(appInitial.Wx);
+    results.some(isImportFailure) && results.some(isImportDataSuccessful);
   const accessFailed = results.some(
     (result) => result?.status === "failed_to_copy",
   );
@@ -655,7 +799,7 @@ function AnimatedStatusIcon({
   children: unknown;
   rotate: boolean;
 }) {
-  const reducedMotion = appInitial.Slt();
+  const reducedMotion = useReducedMotion();
   const keyframes = rotate
     ? [
         "scale(0.9) rotate(-14deg)",
@@ -665,7 +809,7 @@ function AnimatedStatusIcon({
         "scale(1) rotate(0deg)",
       ]
     : ["scale(0.9)", "scale(1.16)", "scale(0.94)", "scale(1.04)", "scale(1)"];
-  return jsx.jsx(appShared.o$, {
+  return jsx.jsx(MotionSpan, {
     className: "inline-flex",
     animate: {
       opacity: 1,
@@ -710,12 +854,12 @@ function ResultRow({
   const labelId = `browser-profile-import-${kind}-result-label`;
   const descriptionId = `browser-profile-import-${kind}-result-description`;
   let statusIcon = succeeded
-    ? jsx.jsx(appShared.wc, { className: "size-5 text-chart-green" })
-    : jsx.jsx(appShared.Ud, { className: "size-5 text-tertiary" });
+    ? jsx.jsx(SuccessIcon, { className: "size-5 text-chart-green" })
+    : jsx.jsx(MinusIcon, { className: "size-5 text-tertiary" });
   if (failureMessage != null) {
     statusIcon = warning
-      ? jsx.jsx(appPrimary.Jp, { className: "size-5 text-warning" })
-      : jsx.jsx(appShared.Lo, { className: "size-5 text-danger" });
+      ? jsx.jsx(WarningIcon, { className: "size-5 text-warning" })
+      : jsx.jsx(ErrorIcon, { className: "size-5 text-danger" });
   }
   let control: unknown = jsx.jsx(AnimatedStatusIcon, {
     animationDelay,
@@ -727,7 +871,7 @@ function ResultRow({
       className: "inline-flex size-5 items-center justify-center",
       "aria-labelledby": labelId,
       role: "status",
-      children: jsx.jsx(appShared.Qh, { className: "size-5" }),
+      children: jsx.jsx(LoadingSpinner, { className: "size-5" }),
     });
   } else if (!succeeded && failureMessage == null) {
     control = jsx.jsx("span", {
@@ -757,12 +901,12 @@ function ResultRow({
         : undefined;
   return jsx.jsxs("div", {
     children: [
-      jsx.jsx(appShared.rl, {
+      jsx.jsx(SettingsRow, {
         control,
         icon: jsx.jsx(ImportedDataIcon, { kind }),
         label: jsx.jsx("span", {
           id: labelId,
-          children: jsx.jsx(Message, { ...query.c[kind] }),
+          children: jsx.jsx(Message, { ...importMessages[kind] }),
         }),
       }),
       detail == null
@@ -789,7 +933,7 @@ function ImportResults({
   result,
   onDone,
   onRetry,
-}: Record<string, any>) {
+}: ImportResultsProps) {
   const revealing = isImporting || revealedImportResultRowCount != null;
   const visible = {
     passwords: revealing ? importPasswords : result?.passwords != null,
@@ -805,22 +949,22 @@ function ImportResults({
   const passwordFailed =
     visible.passwords &&
     result != null &&
-    (result.passwords == null || passwordResults.some(appInitial.Ux));
+    (result.passwords == null || passwordResults.some(isImportFailure));
   const cookieFailed =
     visible.cookies &&
     result != null &&
-    (result.cookies == null || appInitial.Ux(result.cookies));
+    (result.cookies == null || isImportFailure(result.cookies));
   const historyFailed =
     visible.history &&
     result != null &&
-    (result.history == null || appInitial.Ux(result.history));
+    (result.history == null || isImportFailure(result.history));
   const extensionFailed =
     visible.extensions &&
     result != null &&
-    (result.extensions == null || appInitial.Ux(result.extensions));
+    (result.extensions == null || isImportFailure(result.extensions));
   const extensionSkipped =
     visible.extensions && (result?.extensions?.skippedInvalid ?? 0) > 0;
-  const complete = result != null && appInitial.Kx(result);
+  const complete = result != null && isImportSuccessful(result);
   const anyFailure =
     passwordFailed || cookieFailed || historyFailed || extensionFailed;
   const allFailed = (anyFailure || extensionSkipped) && !complete;
@@ -836,7 +980,7 @@ function ImportResults({
     ["success", "partial-success"].includes(result?.cookies?.status);
   const passwordWarning =
     passwordFailed &&
-    passwordResults.some(appInitial.Wx) &&
+    passwordResults.some(isImportDataSuccessful) &&
     (passwordResults.some((item) => (item?.imported ?? 0) > 0) ||
       passwordResults.some(
         (item) => item?.status === "partial-success" && item.imported == null,
@@ -855,7 +999,7 @@ function ImportResults({
         isImporting &&
         visible.passwords &&
         (activeImportRequest?.importPasswords ?? importPasswords),
-      succeeded: passwordResults.some(appInitial.Wx),
+      succeeded: passwordResults.some(isImportDataSuccessful),
       warning: passwordWarning,
       failureMessage: passwordFailed
         ? passwordFailureMessage(passwordResults)
@@ -868,7 +1012,7 @@ function ImportResults({
         isImporting &&
         visible.cookies &&
         (activeImportRequest?.importCookies ?? importCookies),
-      succeeded: appInitial.Wx(result?.cookies),
+      succeeded: isImportDataSuccessful(result?.cookies),
       warning: cookieWarning,
       failureMessage:
         result != null && cookieFailed
@@ -887,7 +1031,7 @@ function ImportResults({
         isImporting &&
         visible.history &&
         (activeImportRequest?.importHistory ?? importHistory),
-      succeeded: appInitial.Wx(result?.history),
+      succeeded: isImportDataSuccessful(result?.history),
       warning: historyWarning,
       failureMessage: historyFailed
         ? jsx.jsx(Message, {
@@ -903,8 +1047,8 @@ function ImportResults({
         isImporting &&
         visible.extensions &&
         (activeImportRequest?.importExtensions ?? importExtensions),
-      succeeded: appInitial.Wx(result?.extensions),
-      warning: appInitial.Wx(result?.extensions),
+      succeeded: isImportDataSuccessful(result?.extensions),
+      warning: isImportDataSuccessful(result?.extensions),
       failureMessage:
         extensionFailed || extensionSkipped
           ? jsx.jsx(ExtensionFailureMessage, { result: result?.extensions })
@@ -919,7 +1063,7 @@ function ImportResults({
     importingRows[Math.min(revealIndex, importingRows.length - 1)]?.kind ??
     "passwords";
   const titleMessage = isImporting
-    ? query.c.title
+    ? importMessages.title
     : allFailed
       ? dialogMessages.failed
       : dialogMessages.complete;
@@ -948,17 +1092,17 @@ function ImportResults({
             defaultMessage: "No browser data was available to import",
           };
 
-  return jsx.jsxs(appShared.Oh, {
+  return jsx.jsxs(DialogContent, {
     children: [
-      jsx.jsx(appShared.jh, {
-        children: jsx.jsx(appShared.Ah, {
+      jsx.jsx(DialogSection, {
+        children: jsx.jsx(DialogHeader, {
           title: jsx.jsx(Message, { ...titleMessage }),
           subtitle: jsx.jsx(Message, { ...subtitle }),
         }),
       }),
-      jsx.jsx(appShared.jh, {
+      jsx.jsx(DialogSection, {
         className: "max-h-80 overflow-y-auto",
-        children: jsx.jsx(appShared.Zc, {
+        children: jsx.jsx(SettingsList, {
           className: "shrink-0",
           children: rows.map((row, index) => {
             const waiting =
@@ -979,13 +1123,13 @@ function ImportResults({
           }),
         }),
       }),
-      jsx.jsx(appShared.jh, {
-        children: jsx.jsxs(appShared.kh, {
-          className: appShared.Dh,
+      jsx.jsx(DialogSection, {
+        children: jsx.jsxs(DialogActions, {
+          className: dialogActionsClassName,
           expandSingleButton: false,
           children: [
             isImporting
-              ? jsx.jsx(appShared.Yh, {
+              ? jsx.jsx(Button, {
                   color: "secondary",
                   disabled: true,
                   onClick: onDone,
@@ -994,14 +1138,14 @@ function ImportResults({
                 })
               : undefined,
             !isImporting && anyFailure && onRetry != null
-              ? jsx.jsx(appShared.Yh, {
+              ? jsx.jsx(Button, {
                   color: "secondary",
                   onClick: onRetry,
                   type: "button",
                   children: jsx.jsx(Message, { ...dialogMessages.retry }),
                 })
               : undefined,
-            jsx.jsx(appShared.Yh, {
+            jsx.jsx(Button, {
               color: "primary",
               disabled: isImporting,
               loading: isImporting,
@@ -1018,7 +1162,7 @@ function ImportResults({
   });
 }
 
-function ImportSelection(props: Record<string, any>) {
+function ImportSelection(props: ImportSelectionProps) {
   const {
     activeImportRequest,
     cookieAccessFailureMessage,
@@ -1075,17 +1219,17 @@ function ImportSelection(props: Record<string, any>) {
       !historySelected &&
       !extensionsSelected) ||
     (requiresElevatedChromeConsent && !elevatedChromeConsent);
-  return jsx.jsxs(appShared.Oh, {
+  return jsx.jsxs(DialogContent, {
     as: "form",
     onSubmit: (event: { preventDefault: () => void }) => {
       event.preventDefault();
       props.onImport();
     },
     children: [
-      jsx.jsx(appShared.jh, {
-        children: jsx.jsx(appShared.Ah, {
-          title: jsx.jsx(Message, { ...query.c.title }),
-          subtitle: jsx.jsx(appShared.Lh, {
+      jsx.jsx(DialogSection, {
+        children: jsx.jsx(DialogHeader, {
+          title: jsx.jsx(Message, { ...importMessages.title }),
+          subtitle: jsx.jsx(DialogDescription, {
             asChild: true,
             children: jsx.jsx("div", {
               children: jsx.jsx(Message, {
@@ -1097,7 +1241,7 @@ function ImportSelection(props: Record<string, any>) {
           }),
         }),
       }),
-      jsx.jsxs(appShared.jh, {
+      jsx.jsxs(DialogSection, {
         className: "gap-3",
         children: [
           jsx.jsx(ProfilePicker, {
@@ -1132,7 +1276,7 @@ function ImportSelection(props: Record<string, any>) {
             : undefined,
           selectedProfile == null
             ? undefined
-            : jsx.jsxs(appShared.Zc, {
+            : jsx.jsxs(SettingsList, {
                 children: [
                   jsx.jsx(DataSelectionRow, {
                     checked: passwordsSelected,
@@ -1184,18 +1328,18 @@ function ImportSelection(props: Record<string, any>) {
             : undefined,
         ],
       }),
-      jsx.jsx(appShared.jh, {
-        children: jsx.jsxs(appShared.kh, {
-          className: appShared.Dh,
+      jsx.jsx(DialogSection, {
+        children: jsx.jsxs(DialogActions, {
+          className: dialogActionsClassName,
           children: [
-            jsx.jsx(appShared.Yh, {
+            jsx.jsx(Button, {
               color: "secondary",
               disabled: isImporting,
               onClick: props.onCancel,
               type: "button",
               children: jsx.jsx(Message, { ...dialogMessages.cancel }),
             }),
-            jsx.jsx(appShared.Yh, {
+            jsx.jsx(Button, {
               color: "primary",
               disabled: submitDisabled,
               loading: isImporting,
@@ -1214,35 +1358,33 @@ function BrowserProfileImportDialogModal({
   flowId,
   onClose,
   service,
-}: {
-  entryPoint: string;
-  flowId: string;
-  onClose: () => void;
-  service: BrowserProfileImportService;
-}) {
-  const scope = appShared.LX(appShared.ZI);
+}: BrowserProfileImportDialogProps) {
+  const scope = useSignalScope(appScope);
   const [selectedProfileKey, setSelectedProfileKey] = React.useState("");
   const [importCookies, setImportCookies] = React.useState(true);
   const [importPasswords, setImportPasswords] = React.useState(true);
   const [importHistory, setImportHistory] = React.useState(true);
   const [importExtensions, setImportExtensions] = React.useState(false);
   const [extensionConfirmation, setExtensionConfirmation] =
-    React.useState(null);
-  const extensionsFeatureEnabled = appShared.BX(appInitial.mfn, "2982604767");
-  const [resultState, setResultState] = React.useState(undefined);
+    React.useState<ExtensionConfirmationState | null>(null);
+  const extensionsFeatureEnabled = useSignalFamilyValue(
+    browserExtensionsFeatureFamily,
+    "2982604767",
+  );
+  const [resultState, setResultState] = React.useState<ResultState | undefined>(
+    undefined,
+  );
   const [elevatedConsentProfileKey, setElevatedConsentProfileKey] =
-    React.useState(null);
+    React.useState<string | null>(null);
   const exitState = React.useRef("before-attempt");
   const closeRecorded = React.useRef(false);
   const dismissalReason = React.useRef("close-button");
   const adminNoticeAcknowledged = React.useRef(false);
   const adminNoticeRequired = React.useRef(false);
-  const activeAttempt = React.useRef(null);
+  const activeAttempt = React.useRef<ImportMutationVariables | null>(null);
 
   const profilesQuery = useQuery<Profile[]>(
-    query.t(service, true) as import("@rchunk/app-shared").UseQueryOptions<
-      Profile[]
-    >,
+    createProfilesQueryOptions(service, true),
   );
   const mutation = useMutation<
     ImportResult,
@@ -1253,7 +1395,7 @@ function BrowserProfileImportDialogModal({
       service.importBrowserProfile(request),
     onError: (_error, variables) => {
       exitState.current = "after-request-error";
-      analytics.n(scope, entryPoint, variables.request, variables.context);
+      recordAttemptFinished(scope, entryPoint, variables.request, variables.context);
     },
     onSuccess: async (nextResult, variables) => {
       exitState.current = "after-result";
@@ -1261,10 +1403,11 @@ function BrowserProfileImportDialogModal({
         variables.previousResult == null
           ? nextResult
           : mergeImportResults(variables.previousResult, nextResult);
-      const successful = appInitial.Kx(result);
-      if (successful) scope.set(appInitial.Gx, true);
-      if (appInitial.Kx(nextResult)) scope.set(appInitial.Jx, Date.now());
-      analytics.n(
+      const successful = isImportSuccessful(result);
+      if (successful) scope.set(browserImportSucceededSignal, true);
+      if (isImportSuccessful(nextResult))
+        scope.set(browserImportCompletedAtSignal, Date.now());
+      recordAttemptFinished(
         scope,
         entryPoint,
         variables.request,
@@ -1376,7 +1519,7 @@ function BrowserProfileImportDialogModal({
   const recordClose = (reason: string) => {
     if (closeRecorded.current) return;
     closeRecorded.current = true;
-    analytics.i(scope, entryPoint, {
+    recordDialogClosed(scope, entryPoint, {
       flowId,
       attemptIndex: activeAttempt.current?.context.attemptIndex,
       source:
@@ -1402,7 +1545,7 @@ function BrowserProfileImportDialogModal({
       !adminNoticeRequired.current
     ) {
       adminNoticeRequired.current = true;
-      analytics.c(scope, entryPoint, flowId);
+      recordAdminNoticeShown(scope, entryPoint, flowId);
     }
   }, [selectedKey, entryPoint, flowId, requiresElevatedChromeConsent, scope]);
 
@@ -1416,7 +1559,10 @@ function BrowserProfileImportDialogModal({
     priorContext?: AttemptContext,
     previousResult?: ImportResult,
   ) => {
-    if (request.importExtensions && !scope.get(appInitial.mfn, "2982604767"))
+    if (
+      request.importExtensions &&
+      !scope.get(browserExtensionsFeatureFamily, "2982604767")
+    )
       return;
     const context: AttemptContext = {
       flowId,
@@ -1440,7 +1586,7 @@ function BrowserProfileImportDialogModal({
         : { result: previousResult, revealedRowCount: 0 },
     );
     mutation.reset();
-    analytics.r(scope, entryPoint, request, context);
+    recordAttemptStarted(scope, entryPoint, request, context);
     mutation.mutate(activeAttempt.current);
   };
 
@@ -1528,7 +1674,7 @@ function BrowserProfileImportDialogModal({
     onElevatedChromeConsentChange: (checked: boolean) => {
       if (checked && !adminNoticeAcknowledged.current) {
         adminNoticeAcknowledged.current = true;
-        analytics.s(scope, entryPoint, flowId);
+        recordAdminNoticeAcknowledged(scope, entryPoint, flowId);
       }
       setElevatedConsentProfileKey(checked ? selectedKey : null);
     },
@@ -1547,7 +1693,7 @@ function BrowserProfileImportDialogModal({
     },
   });
 
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     contentProps: {
       onEscapeKeyDown: () => {
         dismissalReason.current = "escape-key";
@@ -1567,40 +1713,37 @@ function BrowserProfileImportDialogModal({
 }
 
 function initializeBrowserProfileImportDialog(): void {
-  const appSharedInitializers = [
-    "$3",
-    "FX",
-    "zh",
-    "QI",
-    "xD",
-    "h4",
-    "a$",
-    "K2",
-    "Zh",
-    "jd",
-    "Ph",
-    "If",
-    "$h",
-    "Rf",
-    "Tc",
-    "Wd",
-    "Ro",
-    "al",
-    "Qc",
-  ];
-  for (const name of appSharedInitializers) appShared[name]?.();
+  initializeRuntimeLazy();
+  initializeSignalRuntime();
+  initializeDialog();
+  initializeAppScope();
+  initializeCheckControl();
+  initializeClassNames();
+  initializeMotionRuntime();
+  initializeReactRuntime();
+  initializeButton();
+  initializeCheckbox();
+  initializeDialogLayout();
+  initializeMenu();
+  initializeSettingsRow();
+  initializeSettingsList();
+  initializeMotion();
+  initializeMinusIcon();
+  initializeSuccessIcon();
+  initializeSelectTrigger();
+  initializeErrorIcon();
   initializeUseMutation();
   initializeUseQuery();
-  appInitial.pfn?.();
-  appInitial.xlt?.();
-  appInitial.Xl?.();
-  appInitial.qx?.();
-  appPrimary.Yp?.();
-  analytics.t?.();
-  query.d?.();
-  query.l?.();
-  query.s?.();
-  query.i?.();
+  initializeBrowserExtensionFeature();
+  initializeBrowserImportState();
+  initializeBrowserImportSettings();
+  initializeBrowserImportRuntime();
+  initializeWarningIcon();
+  initializeBrowserImportAnalytics();
+  initializeImportDataIcons();
+  initializeImportMessages();
+  initializeSourceIcons();
+  initializeImportQueries();
 }
 
 initializeBrowserProfileImportDialog();
