@@ -479,6 +479,9 @@ export interface ScopeApi<T = unknown> {
     family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
     parameter: Param,
   ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+  get<Data, MutationError, Variables, Context>(
+    signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+  ): ScopedMutationResult<Data, MutationError, Variables, Context>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
     parameter: Param,
@@ -626,6 +629,67 @@ export interface ScopedInfiniteQueryResult<
   isFetchingPreviousPage: boolean;
 }
 
+export interface ScopedMutationContext {
+  client: unknown;
+  meta?: unknown;
+  mutationKey?: readonly unknown[];
+}
+
+export interface ScopedMutationCallbacks<TData, TError, TVariables, TContext> {
+  onError?(
+    error: TError,
+    variables: TVariables,
+    context: TContext | undefined,
+    mutation: ScopedMutationContext,
+  ): Promise<unknown> | unknown;
+  onSettled?(
+    data: TData | undefined,
+    error: TError | null,
+    variables: TVariables,
+    context: TContext | undefined,
+    mutation: ScopedMutationContext,
+  ): Promise<unknown> | unknown;
+  onSuccess?(
+    data: TData,
+    variables: TVariables,
+    context: TContext | undefined,
+    mutation: ScopedMutationContext,
+  ): Promise<unknown> | unknown;
+}
+
+export interface ScopedMutationOptions<TData, TError, TVariables, TContext>
+  extends ScopedMutationCallbacks<TData, TError, TVariables, TContext> {
+  meta?: unknown;
+  mutationFn?(
+    variables: TVariables,
+    context: ScopedMutationContext,
+  ): Promise<TData> | TData;
+  mutationKey?: readonly unknown[];
+  onMutate?(
+    variables: TVariables,
+    context: ScopedMutationContext,
+  ): Promise<TContext> | TContext;
+}
+
+export interface ScopedMutationResult<TData, TError, TVariables, TContext> {
+  data: TData | undefined;
+  error: TError | null;
+  isError: boolean;
+  isIdle: boolean;
+  isPending: boolean;
+  isSuccess: boolean;
+  mutate(
+    variables: TVariables,
+    callbacks?: ScopedMutationCallbacks<TData, TError, TVariables, TContext>,
+  ): void;
+  mutateAsync(
+    variables: TVariables,
+    callbacks?: ScopedMutationCallbacks<TData, TError, TVariables, TContext>,
+  ): Promise<TData>;
+  status: "error" | "idle" | "pending" | "success";
+  variables: TVariables | undefined;
+}
+
 export interface ScopedDerivedFamilyOptions<Param, TValue> {
   autoDispose?: boolean | number;
   excludeFieldsFromKey?: readonly string[];
@@ -672,6 +736,9 @@ export interface DerivedScopedSignalContext<T = unknown> {
     family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
     parameter: Param,
   ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+  get<Data, MutationError, Variables, Context>(
+    signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+  ): ScopedMutationResult<Data, MutationError, Variables, Context>;
   get<Param, Data, QueryError>(
     family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
     parameter: Param,
@@ -765,6 +832,25 @@ export interface ScopedInfiniteQueryFamily<
   ): ScopedInfiniteQueryFamily<TScope, Param, TPage, TPageParam, TError>;
 }
 
+/** 原 `Gje` / `Wje` 返回的 scope 键控 mutation signal。 */
+export interface ScopedMutationSignal<
+  TScope,
+  TData,
+  TError,
+  TVariables,
+  TContext,
+> {
+  cache: "cached";
+  debugLabel?: string;
+  getOptions(
+    context: DerivedScopedSignalContext<TScope>,
+  ): ScopedMutationOptions<TData, TError, TVariables, TContext>;
+  scope: Scope<TScope>;
+  resolve(
+    state: ScopeState<unknown>,
+  ): Atom<ScopedMutationResult<TData, TError, TVariables, TContext>>;
+}
+
 /** 原 `Sje` 返回的 scope 键控派生 family。 */
 export interface ScopedDerivedFamily<TScope, Param, TValue> {
   autoDisposeMs: number;
@@ -833,6 +919,7 @@ function resolveScopeBinding(
     | ScopedDerivedSignal<unknown, unknown>
     | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
+    | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -876,6 +963,7 @@ function watchScope<T>(
           | ScopedDerivedSignal<unknown, unknown>
           | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
+          | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -930,6 +1018,7 @@ function createScopeApi<T>(state: ScopeState<T>): ScopeApi<T> {
         | ScopedDerivedSignal<unknown, unknown>
         | ScopedQuerySignal<unknown, unknown, unknown>
         | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
+        | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
         | ScopedQueryFamily<unknown, unknown, unknown, unknown>
         | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
         | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -1084,6 +1173,7 @@ function isScopedFamily(
     | ScopedDerivedSignal<unknown, unknown>
     | ScopedQuerySignal<unknown, unknown, unknown>
     | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
+    | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
     | ScopedQueryFamily<unknown, unknown, unknown, unknown>
     | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
     | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -1119,6 +1209,7 @@ function createDerivedContext<T>(
           | ScopedDerivedSignal<unknown, unknown>
           | ScopedQuerySignal<unknown, unknown, unknown>
           | ScopedInfiniteQuerySignal<unknown, unknown, unknown, unknown>
+          | ScopedMutationSignal<unknown, unknown, unknown, unknown, unknown>
           | ScopedQueryFamily<unknown, unknown, unknown, unknown>
           | ScopedInfiniteQueryFamily<unknown, unknown, unknown, unknown, unknown>
           | ScopedDerivedFamily<unknown, unknown, unknown>
@@ -2086,6 +2177,156 @@ export function resolveScopedInfiniteQueryFamily<
 ): BoundAtomSignal<ScopedInfiniteQueryResult<TPage, TPageParam, TError>> {
   const owner = findScopeState(state, family.scope);
   return { atom: family.resolve(state, parameter), store: owner.store };
+}
+
+/** 创建 scope 键控 mutation signal（原 `Wje` / 压缩导出 `YX`）。 */
+export function createMutationSignal<
+  TScope,
+  TData,
+  TError = Error,
+  TVariables = void,
+  TContext = unknown,
+>(
+  scope: Scope<TScope>,
+  getOptions: (
+    context: DerivedScopedSignalContext<TScope>,
+  ) => ScopedMutationOptions<TData, TError, TVariables, TContext>,
+): ScopedMutationSignal<TScope, TData, TError, TVariables, TContext> {
+  type Result = ScopedMutationResult<TData, TError, TVariables, TContext>;
+  type State = Pick<Result, "data" | "error" | "status" | "variables">;
+
+  const binding: ScopedMutationSignal<
+    TScope,
+    TData,
+    TError,
+    TVariables,
+    TContext
+  > = {
+    cache: "cached",
+    getOptions,
+    scope,
+    resolve(activeState) {
+      const owner = findScopeState(activeState, scope);
+      const cacheKey = binding as unknown as ScopedDerivedSignal<
+        unknown,
+        unknown
+      >;
+      const cached = owner.cachedBindings.get(cacheKey);
+      if (cached != null) return cached as Atom<Result>;
+      if (owner.queryClient == null) {
+        throw new Error("mutationSignal requires a QueryClient on Scope");
+      }
+
+      const stateAtom = atom<State>({
+        data: undefined,
+        error: null,
+        status: "idle",
+        variables: undefined,
+      });
+      let mutationId = 0;
+      const resultAtom = atom((get) => {
+        const state = get(stateAtom);
+        const mutateAsync = async (
+          variables: TVariables,
+          callbacks?: ScopedMutationCallbacks<
+            TData,
+            TError,
+            TVariables,
+            TContext
+          >,
+        ): Promise<TData> => {
+          const options = getOptions(createDerivedContext(owner, get));
+          const mutation: ScopedMutationContext = {
+            client: owner.queryClient,
+            meta: options.meta,
+            mutationKey: options.mutationKey,
+          };
+          const currentMutationId = ++mutationId;
+          owner.store.set(stateAtom, {
+            data: undefined,
+            error: null,
+            status: "pending",
+            variables,
+          });
+          let context: TContext | undefined;
+          let data: TData;
+          try {
+            context = await options.onMutate?.(variables, mutation);
+            data = (await options.mutationFn?.(variables, mutation)) as TData;
+          } catch (caught) {
+            const error = caught as TError;
+            if (currentMutationId === mutationId) {
+              owner.store.set(stateAtom, {
+                data: undefined,
+                error,
+                status: "error",
+                variables,
+              });
+            }
+            await options.onError?.(error, variables, context, mutation);
+            await options.onSettled?.(
+              undefined,
+              error,
+              variables,
+              context,
+              mutation,
+            );
+            callbacks?.onError?.(error, variables, context, mutation);
+            callbacks?.onSettled?.(
+              undefined,
+              error,
+              variables,
+              context,
+              mutation,
+            );
+            throw caught;
+          }
+          if (currentMutationId === mutationId) {
+            owner.store.set(stateAtom, {
+              data,
+              error: null,
+              status: "success",
+              variables,
+            });
+          }
+          await options.onSuccess?.(data, variables, context, mutation);
+          await options.onSettled?.(data, null, variables, context, mutation);
+          callbacks?.onSuccess?.(data, variables, context, mutation);
+          callbacks?.onSettled?.(data, null, variables, context, mutation);
+          return data;
+        };
+        return {
+          ...state,
+          isError: state.status === "error",
+          isIdle: state.status === "idle",
+          isPending: state.status === "pending",
+          isSuccess: state.status === "success",
+          mutate(variables, callbacks) {
+            void mutateAsync(variables, callbacks).catch(() => {});
+          },
+          mutateAsync,
+        };
+      });
+      owner.cachedBindings.set(cacheKey, resultAtom as Atom<unknown>);
+      return resultAtom;
+    },
+  };
+  return binding;
+}
+
+/** 解析 mutation signal 为 hook 可消费的 atom/store 对。 */
+export function resolveScopedMutationSignal<
+  TScope,
+  TData,
+  TError,
+  TVariables,
+  TContext,
+>(
+  signal: ScopedMutationSignal<TScope, TData, TError, TVariables, TContext>,
+  state: ScopeState<unknown>,
+): BoundAtomSignal<ScopedMutationResult<TData, TError, TVariables, TContext>> {
+  const owner = findScopeState(state, signal.scope);
+  return { atom: signal.resolve(state), store: owner.store };
 }
 
 /**

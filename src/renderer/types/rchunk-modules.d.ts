@@ -194,6 +194,9 @@ declare module "@rchunk/app-shared" {
       family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
       parameter: Param,
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+    get<Data, MutationError, Variables, Context>(
+      signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+    ): ScopedMutationResult<Data, MutationError, Variables, Context>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Data, QueryError>(
       family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
@@ -342,6 +345,63 @@ declare module "@rchunk/app-shared" {
     isFetchingNextPage: boolean;
     isFetchingPreviousPage: boolean;
   }
+  export interface ScopedMutationContext {
+    client: unknown;
+    meta?: unknown;
+    mutationKey?: readonly unknown[];
+  }
+  export interface ScopedMutationCallbacks<TData, TError, TVariables, TContext> {
+    onError?(
+      error: TError,
+      variables: TVariables,
+      context: TContext | undefined,
+      mutation: ScopedMutationContext,
+    ): Promise<unknown> | unknown;
+    onSettled?(
+      data: TData | undefined,
+      error: TError | null,
+      variables: TVariables,
+      context: TContext | undefined,
+      mutation: ScopedMutationContext,
+    ): Promise<unknown> | unknown;
+    onSuccess?(
+      data: TData,
+      variables: TVariables,
+      context: TContext | undefined,
+      mutation: ScopedMutationContext,
+    ): Promise<unknown> | unknown;
+  }
+  export interface ScopedMutationOptions<TData, TError, TVariables, TContext>
+    extends ScopedMutationCallbacks<TData, TError, TVariables, TContext> {
+    meta?: unknown;
+    mutationFn?(
+      variables: TVariables,
+      context: ScopedMutationContext,
+    ): Promise<TData> | TData;
+    mutationKey?: readonly unknown[];
+    onMutate?(
+      variables: TVariables,
+      context: ScopedMutationContext,
+    ): Promise<TContext> | TContext;
+  }
+  export interface ScopedMutationResult<TData, TError, TVariables, TContext> {
+    data: TData | undefined;
+    error: TError | null;
+    isError: boolean;
+    isIdle: boolean;
+    isPending: boolean;
+    isSuccess: boolean;
+    mutate(
+      variables: TVariables,
+      callbacks?: ScopedMutationCallbacks<TData, TError, TVariables, TContext>,
+    ): void;
+    mutateAsync(
+      variables: TVariables,
+      callbacks?: ScopedMutationCallbacks<TData, TError, TVariables, TContext>,
+    ): Promise<TData>;
+    status: "error" | "idle" | "pending" | "success";
+    variables: TVariables | undefined;
+  }
   export interface ScopedQuerySignal<TScope, TData, TError = Error> {
     cache: "cached";
     debugLabel?: string;
@@ -358,6 +418,14 @@ declare module "@rchunk/app-shared" {
       context: DerivedScopedSignalContext<TScope>,
     ): ScopedInfiniteQueryOptions<TPage, TPageParam, TError>;
     queryKind: "infinite";
+    scope: MaitaiScope<TScope>;
+  }
+  export interface ScopedMutationSignal<TScope, TData, TError, TVariables, TContext> {
+    cache: "cached";
+    debugLabel?: string;
+    getOptions(
+      context: DerivedScopedSignalContext<TScope>,
+    ): ScopedMutationOptions<TData, TError, TVariables, TContext>;
     scope: MaitaiScope<TScope>;
   }
   export interface ScopedDerivedFamilyOptions<Param, TValue> {
@@ -399,6 +467,9 @@ declare module "@rchunk/app-shared" {
     get<Page, PageParam, QueryError>(
       signal: ScopedInfiniteQuerySignal<unknown, Page, PageParam, QueryError>,
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+    get<Data, MutationError, Variables, Context>(
+      signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
+    ): ScopedMutationResult<Data, MutationError, Variables, Context>;
     get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Data, QueryError>(
       family: ScopedQueryFamily<unknown, Param, Data, QueryError>,
@@ -560,6 +631,19 @@ declare module "@rchunk/app-shared" {
     ) => ScopedInfiniteQueryOptions<TPage, TPageParam, TError>,
     options?: ScopedQueryFamilyOptions<Param>,
   ) => ScopedInfiniteQueryFamily<TScope, Param, TPage, TPageParam, TError>;
+  /** createMutationSignal（app-shared/runtime/atom-signal.ts，内部 Wje）。 */
+  export const YX: <
+    TScope,
+    TData,
+    TError = Error,
+    TVariables = void,
+    TContext = unknown,
+  >(
+    scope: MaitaiScope<TScope>,
+    getOptions: (
+      context: DerivedScopedSignalContext<TScope>,
+    ) => ScopedMutationOptions<TData, TError, TVariables, TContext>,
+  ) => ScopedMutationSignal<TScope, TData, TError, TVariables, TContext>;
   export type ClassDictionary = Record<string, unknown>;
   export interface ClassArray extends Array<ClassValue> {}
   export type ClassValue =
