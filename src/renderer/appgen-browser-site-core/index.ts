@@ -5,16 +5,31 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 
 void runtimeChunk;
-const appPrimary = appPrimaryChunk as Record<string, any>;
+const {
+  Sf: initializeSiteUrlMatcher,
+  yf: isSiteUrlMatch,
+} = appPrimaryChunk;
 
-function matchingSpecificity(currentUrl: string, siteUrl: string) {
-  return appPrimary.yf(currentUrl, siteUrl)
+export interface BrowserSiteEntry extends Record<string, unknown> {
+  alternateUrls?: Array<string | null | undefined> | null;
+  type: string;
+  url?: string | null;
+}
+
+function matchingSpecificity(
+  currentUrl: string,
+  siteUrl: string,
+): number | null {
+  return isSiteUrlMatch(currentUrl, siteUrl)
     ? new URL(siteUrl).pathname.replace(/\/+$/u, "").length
     : null;
 }
 
-function getAppgenBrowserSiteForUrl(sites: any[], currentUrl: string) {
-  let bestMatch: { site: any; specificity: number } | null = null;
+function getAppgenBrowserSiteForUrl<Site extends BrowserSiteEntry>(
+  sites: readonly Site[],
+  currentUrl: string,
+): Site | null {
+  let bestMatch: { site: Site; specificity: number } | null = null;
   for (const site of sites) {
     if (site.type !== "appgen-app") continue;
     for (const siteUrl of [site.url, ...(site.alternateUrls ?? [])]) {
@@ -29,7 +44,7 @@ function getAppgenBrowserSiteForUrl(sites: any[], currentUrl: string) {
 }
 
 function initializeAppgenBrowserSite(): void {
-  appPrimary.Sf?.();
+  initializeSiteUrlMatcher();
 }
 
 export { initializeAppgenBrowserSite as n, getAppgenBrowserSiteForUrl as t };

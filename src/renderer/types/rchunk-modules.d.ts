@@ -3147,6 +3147,7 @@ declare module "@rchunk/app-primary" {
   export const Bf: () => void;
   /** Site live URL 的主机名展示格式化器。 */
   export const xf: (liveUrl?: string | null) => string | null;
+  export const yf: (currentUrl: string, candidateUrl: string) => boolean;
   export const Sf: () => void;
   export const Rf: (input: { defaultPrompt: string; pluginDisplayName: string; pluginId: string }) => unknown;
   export const d: () => void; // O9：项目选择器依赖初始化器
@@ -4910,8 +4911,16 @@ declare module "@rchunk/appgen-publication-terms-route" {
 }
 
 declare module "@rchunk/appgen-browser-site-core" {
+  export interface BrowserSiteEntry extends Record<string, unknown> {
+    alternateUrls?: Array<string | null | undefined> | null;
+    type: string;
+    url?: string | null;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: <Site extends BrowserSiteEntry>(
+    sites: readonly Site[],
+    currentUrl: string,
+  ) => Site | null;
 }
 
 declare module "@rchunk/appgen-browser-site-entry" {
