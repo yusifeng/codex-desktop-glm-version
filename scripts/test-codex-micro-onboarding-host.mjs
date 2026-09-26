@@ -53,6 +53,7 @@ globalThis.__microHostTest = {
   eligible: true,
   inputSettings: 0,
   navigation: [],
+  permissionQueryOptions: null,
   stateWrites: [],
   telemetry: [],
   jsx: {
@@ -98,7 +99,10 @@ const microHost = await loadModule({
       if (signal.description === "joystick") return { x: 0, y: 0 };
       return null;
     };
-    export const _L = () => ({ data: "granted", isPending: false });
+    export const _L = options => {
+      globalThis.__microHostTest.permissionQueryOptions = options;
+      return { data: "granted", isPending: false };
+    };
   `,
   "app-initial": `
     export const c$t = Symbol("app-info");
@@ -170,6 +174,19 @@ check(
     host.props.model === "codex-micro",
   "passes app, permission and hardware model context into the flow",
 );
+check(
+  globalThis.__microHostTest.permissionQueryOptions.enabled === true &&
+    globalThis.__microHostTest.permissionQueryOptions.queryKey.description ===
+      "permission-query" &&
+    globalThis.__microHostTest.permissionQueryOptions.refetchInterval === 5000 &&
+    globalThis.__microHostTest.permissionQueryOptions.staleTime === 5000,
+  "configures the typed permission query with the expected key and cadence",
+);
+check(
+  (await globalThis.__microHostTest.permissionQueryOptions.queryFn()) ===
+    "granted",
+  "queries the Codex Micro bridge for the typed permission status",
+);
 
 host.props.onOpenInputMonitoringSettings();
 check(
@@ -221,5 +238,5 @@ check(
   "suppresses onboarding when the device is no longer eligible",
 );
 
-assert.equal(assertions, 9);
+assert.equal(assertions, 11);
 console.log(`${assertions} Codex Micro onboarding host assertions passed`);

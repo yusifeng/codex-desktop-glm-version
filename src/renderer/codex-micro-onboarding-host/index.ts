@@ -17,7 +17,61 @@ const keyboardSurface = keyboardSurfaceChunk as Record<string, any>;
 const layout = layoutChunk as Record<string, any>;
 const onboardingAnimation = onboardingAnimationChunk as Record<string, any>;
 
+const {
+  $O: queryTiming,
+  C_: initializeIconAssets,
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  I3: jsxRuntime,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: applicationScope,
+  e6: reactRuntime,
+  g_: initializeSharedIcons,
+} = appShared;
+const { _L: useQuery } = appSharedChunk;
+
 type OnboardingStep = "welcome" | "agent-keys" | "command-keys";
+type InputMonitoringPermissionStatus = "denied" | "granted" | "unavailable";
+type InputMonitoringAnalyticsState =
+  | InputMonitoringPermissionStatus
+  | "not-applicable";
+type OnboardingLifecycleStep =
+  | "flow-completed"
+  | "flow-dismissed"
+  | "input-monitoring-permission-granted"
+  | "input-monitoring-settings-opened"
+  | "screen-continued"
+  | "screen-shown"
+  | "settings-opened";
+
+interface CodexMicroBridge {
+  getInputMonitoringPermissionStatus(): Promise<InputMonitoringPermissionStatus>;
+  openInputMonitoringSettings(): Promise<void> | void;
+  ownsPrimaryWindow(): Promise<boolean>;
+}
+
+interface CodexMicroTourProps {
+  appIconMedium: string | null;
+  appName: string;
+  inputMonitoringPermissionStatus: InputMonitoringPermissionStatus;
+  model: string;
+  onComplete(): void;
+  onCompleteAndOpenSettings(): void;
+  onLifecycleStep(
+    step: OnboardingLifecycleStep,
+    screen: OnboardingStep,
+  ): void;
+  onOpenInputMonitoringSettings(): void;
+}
+
+interface OnboardingLifecycleProps
+  extends Omit<CodexMicroTourProps, "onLifecycleStep"> {
+  codexMicro: CodexMicroBridge;
+  inputMonitoringAnalyticsState: InputMonitoringAnalyticsState;
+}
 
 const INPUT_SETUP_URL = "https://worklouder.cc/micro-setup";
 const STATIC_FRAME = onboardingAnimation.r?.(0) ?? {
@@ -44,7 +98,7 @@ function message(
   description: string,
   values?: Record<string, unknown>,
 ): unknown {
-  return jsx.jsx(appShared.Y2, { id, defaultMessage, description, values });
+  return jsx.jsx(FormattedMessage, { id, defaultMessage, description, values });
 }
 
 function openWorkLouderInput(event: any): void {
@@ -65,7 +119,7 @@ function PermissionHelp({
   appName: string;
   permissionSettingsName: string;
 }): unknown {
-  const Button = appShared.Yh ?? "button";
+  const PermissionButton = Button ?? "button";
   return jsx.jsxs("div", {
     className:
       "flex items-center gap-3 rounded-lg border border-default bg-primary-soft-alpha p-2.5 text-start",
@@ -91,7 +145,7 @@ function PermissionHelp({
             "Instructions for dragging the app from Finder into a macOS permission settings page when it is missing",
             { appName, permissionSettingsName },
           ),
-          jsx.jsx(Button, {
+          jsx.jsx(PermissionButton, {
             color: "secondary",
             onClick: () =>
               appInitial.pnt?.systemPermissions
@@ -112,8 +166,8 @@ function PermissionHelp({
 
 function AnimatedKeyboard(): unknown {
   const shouldReduceMotion = appInitial.Slt?.() === true;
-  const joystick = appShared.HX?.(appInitial.tw);
-  const frame = appShared.HX?.(onboardingAnimation.t) ?? STATIC_FRAME;
+  const joystick = useSignalValue?.(appInitial.tw);
+  const frame = useSignalValue?.(onboardingAnimation.t) ?? STATIC_FRAME;
   const Keyboard = keyboardSurface.i ?? "div";
   const AgentKey = keyboardSurface.o ?? "div";
   const ActionKey = keyboardSurface.l ?? "div";
@@ -161,13 +215,13 @@ function StepBody({
 }: {
   appIconMedium: string | null;
   appName: string;
-  inputMonitoringPermissionStatus: string;
+  inputMonitoringPermissionStatus: InputMonitoringPermissionStatus;
   model: string;
   onOpenInputMonitoringSettings(): void;
   step: OnboardingStep;
 }): unknown {
   const creator = model === "creator-micro-v2";
-  const Button = appShared.Yh ?? "button";
+  const PermissionButton = Button ?? "button";
   if (step === "welcome") {
     const permission =
       inputMonitoringPermissionStatus === "denied"
@@ -196,7 +250,7 @@ function StepBody({
                 appName,
                 permissionSettingsName: "Input Monitoring",
               }),
-              jsx.jsx(Button, {
+              jsx.jsx(PermissionButton, {
                 className: "justify-center self-center",
                 color: "secondary",
                 onClick: onOpenInputMonitoringSettings,
@@ -309,7 +363,7 @@ function CodexMicroTour({
   onCompleteAndOpenSettings,
   onLifecycleStep,
   onOpenInputMonitoringSettings,
-}: Record<string, any>): unknown {
+}: CodexMicroTourProps): unknown {
   const [step, setStep] = React.useState("welcome") as [
     OnboardingStep,
     (step: OnboardingStep) => void,
@@ -379,14 +433,14 @@ function CodexMicroTour({
   });
 }
 
-function OnboardingLifecycle(props: Record<string, any>): unknown {
-  const scope = appShared.LX?.(appShared.ZI);
+function OnboardingLifecycle(props: OnboardingLifecycleProps): unknown {
+  const scope = useSignalScope?.(applicationScope);
   const [flowId] = React.useState(() => crypto.randomUUID());
   const initialPermission = React.useRef(props.inputMonitoringAnalyticsState);
   const shown = React.useRef(new Set<string>());
   const queue = React.useRef(Promise.resolve());
   const record = (
-    step: string,
+    step: OnboardingLifecycleStep,
     screen: OnboardingStep,
     permission = props.inputMonitoringAnalyticsState,
   ) => {
@@ -440,17 +494,19 @@ function CodexMicroOnboardingHost({
   dismissAnnouncement(): void;
 }): unknown {
   initializeCodexMicroOnboardingHost();
-  const codexMicro = appInitial.pnt?.codexMicro;
+  const codexMicro = appInitial.pnt?.codexMicro as
+    | CodexMicroBridge
+    | undefined;
   if (codexMicro == null) return null;
-  const scope = appShared.LX?.(appShared.ZI);
+  const scope = useSignalScope?.(applicationScope);
   const reducedMotion = appInitial.Slt?.() === true;
   const navigate = appInitial.o_n?.();
-  const appInfo = appShared.HX?.(appInitial.c$t)?.data;
-  const deviceStatus = appShared.HX?.(appInitial.$C)?.status;
-  const model = appShared.HX?.(appInitial.ew) ?? "codex-micro";
-  const hasEverBeenDetected = appShared.HX?.(appInitial.fw) === true;
-  const onboardingState = appShared.HX?.(appPrimary.xc);
-  const announcementEnabled = appShared.HX?.(appInitial.nw) === true;
+  const appInfo = useSignalValue?.(appInitial.c$t)?.data;
+  const deviceStatus = useSignalValue?.(appInitial.$C)?.status;
+  const model = useSignalValue?.(appInitial.ew) ?? "codex-micro";
+  const hasEverBeenDetected = useSignalValue?.(appInitial.fw) === true;
+  const onboardingState = useSignalValue?.(appPrimary.xc);
+  const announcementEnabled = useSignalValue?.(appInitial.nw) === true;
   const platform = appInitial.E6t?.().platform;
   const eligible =
     (appPrimary.Tc?.({
@@ -460,18 +516,15 @@ function CodexMicroOnboardingHost({
     }) ??
       (hasEverBeenDetected && onboardingState !== "complete")) &&
     announcementEnabled;
-  const permissionQuery = appShared._L?.({
+  const permissionQuery = useQuery<InputMonitoringPermissionStatus>({
     enabled: eligible && platform === "macOS",
     queryFn: () => codexMicro.getInputMonitoringPermissionStatus(),
     queryKey: keyboardSurface.d,
     refetchInterval: keyboardSurface.f,
     refetchIntervalInBackground: true,
     refetchOnMount: "always",
-    staleTime: appShared.$O?.FIVE_SECONDS,
-  }) ?? {
-    data: platform === "macOS" ? undefined : "unavailable",
-    isPending: false,
-  };
+    staleTime: queryTiming?.FIVE_SECONDS,
+  });
   const ready =
     eligible && (platform !== "macOS" || !permissionQuery.isPending);
   React.useEffect(() => {
@@ -509,18 +562,18 @@ function CodexMicroOnboardingHost({
 function initializeCodexMicroOnboardingHost(): void {
   if (initialized) return;
   initialized = true;
-  appShared.FX?.();
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeSignalRuntime?.();
+  React = typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
+  jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
   appInitial.Qgn?.();
   appInitial.aw?.();
   appInitial.T6t?.();
   appInitial.xlt?.();
   appInitial.l$t?.();
   appInitial.mnt?.();
-  appShared.QI?.();
-  appShared.C_?.();
-  appShared.g_?.();
+  initializeSharedRuntime?.();
+  initializeIconAssets?.();
+  initializeSharedIcons?.();
   onboardingAnimation.o?.();
   appInitial.mw?.();
   keyboardSurface.p?.();
