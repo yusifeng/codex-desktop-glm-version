@@ -230,6 +230,10 @@ declare module "@rchunk/use-chatgpt-composer-controller" {
   export const t: () => void;
 }
 
+declare module "@rchunk/primary-composer-at-mention-list" {
+  export const PrimaryComposerAtMentionList: unknown;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
