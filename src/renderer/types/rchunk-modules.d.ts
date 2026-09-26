@@ -565,6 +565,11 @@ declare module "@rchunk/home-suggestion-staggered-item" {
   export const t: unknown;
 }
 
+declare module "@rchunk/home-artifact-template-card" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
