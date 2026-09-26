@@ -191,6 +191,26 @@ declare module "@rchunk/app-shared" {
   ) => string | null;
   /** initializeSandboxUrls（内部 XV）。 */
   export const YH: () => void;
+  /** initializeErrorValueToString（app-shared/runtime/error-rate-limit.ts，内部 zVe）。 */
+  export const FH: () => void;
+  /** errorValueToString（内部 RVe）。 */
+  export const IH: (value: unknown) => string | undefined;
+  export interface MinimumIntervalGateOptions {
+    minIntervalMs: number;
+  }
+  export interface MinimumIntervalGate {
+    readonly minIntervalMs: number;
+    canPass(now?: number): boolean;
+    mark(now?: number): void;
+    tryPass(now?: number): boolean;
+  }
+  export interface MinimumIntervalGateConstructor {
+    new (options: MinimumIntervalGateOptions): MinimumIntervalGate;
+  }
+  /** MinimumIntervalGate（内部 BVe）。 */
+  export const NH: MinimumIntervalGateConstructor;
+  /** initializeMinimumIntervalGate（内部 QV）。 */
+  export const PH: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
