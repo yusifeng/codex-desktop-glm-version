@@ -4,10 +4,28 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type { MaitaiScopeApi } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
+const { Q3: logger, Z3: initializeQueryRuntime } = appSharedChunk;
+const {
+  Bs: entryPointEnums,
+  Fs: cookieItemResultEnums,
+  Gs: sourceEnums,
+  Hs: lifecycleStepEnums,
+  Is: cookieStatusEnums,
+  Ks: initializeAnalyticsEnums,
+  Ls: dataOutcomeEnums,
+  Rs: exitStateEnums,
+  Us: passwordStatusEnums,
+  Ux: isImportFailure,
+  Vs: browserProfileImportEvent,
+  Ws: requestOutcomeEnums,
+  qx: initializeBrowserImportRuntime,
+  xpn: emitAnalyticsEvent,
+  ypn: initializeAnalyticsEmitter,
+  zs: dismissalReasonEnums,
+} = appInitialChunk;
 
 type ImportSource = "atlas" | "chrome";
 type EntryPoint =
@@ -81,32 +99,38 @@ const EXIT_STATES: Record<string, string> = {
 let nuxStepTypes: Record<string, unknown>;
 let initialized = false;
 
-function enumValue(group: string, name: string): unknown {
-  return appInitial[group]?.[name];
+function enumValue(
+  enumTable: Readonly<Record<string, unknown>>,
+  name: string,
+): unknown {
+  return enumTable[name];
 }
 
 function entryPointValue(entryPoint: EntryPoint): unknown {
-  return enumValue("Bs", ENTRY_POINTS[entryPoint]);
+  return enumValue(entryPointEnums, ENTRY_POINTS[entryPoint]);
 }
 
 function sourceValue(source: ImportSource): unknown {
-  return enumValue("Gs", SOURCES[source]);
+  return enumValue(sourceEnums, SOURCES[source]);
 }
 
 function dismissalReasonValue(reason: string): unknown {
-  return enumValue("zs", DISMISSAL_REASONS[reason]);
+  return enumValue(dismissalReasonEnums, DISMISSAL_REASONS[reason]);
 }
 
 function exitStateValue(exitState: string): unknown {
-  return enumValue("Rs", EXIT_STATES[exitState]);
+  return enumValue(exitStateEnums, EXIT_STATES[exitState]);
 }
 
-function emit(scope: unknown, fields: Record<string, unknown>): void {
-  appInitial.xpn(scope, appInitial.Vs, fields);
+function emit(
+  scope: MaitaiScopeApi<unknown>,
+  fields: Record<string, unknown>,
+): void {
+  emitAnalyticsEvent(scope, browserProfileImportEvent, fields);
 }
 
 function recordNuxLifecycleStep(
-  scope: unknown,
+  scope: MaitaiScopeApi<unknown>,
   entryPoint: EntryPoint,
   flowId: string,
   stepName: "shown" | "dismissed" | "continue-clicked",
@@ -124,13 +148,13 @@ function recordNuxLifecycleStep(
 }
 
 function recordDialogOpened(
-  scope: unknown,
+  scope: MaitaiScopeApi<unknown>,
   entryPoint: EntryPoint,
   flowId: string,
 ): void {
   emit(scope, {
     stepType: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_DIALOG_OPENED",
     ),
     entryPoint: entryPointValue(entryPoint),
@@ -139,13 +163,13 @@ function recordDialogOpened(
 }
 
 function recordWindowsChromeAdminNoticeShown(
-  scope: unknown,
+  scope: MaitaiScopeApi<unknown>,
   entryPoint: EntryPoint,
   flowId: string,
 ): void {
   emit(scope, {
     stepType: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_WINDOWS_CHROME_ADMIN_APPROVAL_NOTICE_SHOWN",
     ),
     entryPoint: entryPointValue(entryPoint),
@@ -157,13 +181,13 @@ function recordWindowsChromeAdminNoticeShown(
 }
 
 function recordWindowsChromeAdminNoticeAcknowledged(
-  scope: unknown,
+  scope: MaitaiScopeApi<unknown>,
   entryPoint: EntryPoint,
   flowId: string,
 ): void {
   emit(scope, {
     stepType: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_WINDOWS_CHROME_ADMIN_APPROVAL_NOTICE_ACKNOWLEDGED",
     ),
     entryPoint: entryPointValue(entryPoint),
@@ -195,14 +219,14 @@ function attemptFields(
 }
 
 function recordAttemptStarted(
-  scope: unknown,
+  scope: MaitaiScopeApi<unknown>,
   entryPoint: EntryPoint,
   request: ImportRequest,
   attempt: AttemptContext,
 ): void {
   emit(scope, {
     stepType: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_ATTEMPT_STARTED",
     ),
     ...attemptFields(entryPoint, request, attempt),
@@ -219,7 +243,7 @@ function cookieStatusValue(status?: string): unknown {
       failed_to_read: "FAILED_TO_READ",
     }[status ?? "missing"] ?? "UNKNOWN";
   return enumValue(
-    "Is",
+    cookieStatusEnums,
     `CODEX_BROWSER_PROFILE_IMPORT_COOKIE_STATUS_${suffix}`,
   );
 }
@@ -237,7 +261,7 @@ function passwordStatusValue(status?: string): unknown {
       failed_to_read_target_store: "FAILED_TO_READ_TARGET_STORE",
     }[status ?? "missing"] ?? "UNKNOWN";
   return enumValue(
-    "Us",
+    passwordStatusEnums,
     `CODEX_BROWSER_PROFILE_IMPORT_PASSWORD_STATUS_${suffix}`,
   );
 }
@@ -253,7 +277,7 @@ function cookieItemResultValue(data?: ImportData): unknown {
       ? "FAILED_ONLY"
       : "NO_IMPORTED_OR_FAILED_ITEMS";
   return enumValue(
-    "Fs",
+    cookieItemResultEnums,
     `CODEX_BROWSER_PROFILE_IMPORT_COOKIE_ITEM_RESULT_${suffix}`,
   );
 }
@@ -271,13 +295,16 @@ function dataOutcomeValue(
   ...children: (ImportData | undefined)[]
 ): unknown {
   const outcome = (suffix: string) =>
-    enumValue("Ls", `CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_${suffix}`);
+    enumValue(
+      dataOutcomeEnums,
+      `CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_${suffix}`,
+    );
   if (data == null) return outcome("FAILED");
 
   const results = [data, ...children].filter(
     (value): value is ImportData => value != null,
   );
-  const hasFailure = results.some((value) => appInitial.Ux(value));
+  const hasFailure = results.some((value) => isImportFailure(value));
   const hasSuccess = results.some(hasSuccessfulData);
   if (hasFailure) return outcome(hasSuccess ? "PARTIAL_SUCCESS" : "FAILED");
 
@@ -300,7 +327,7 @@ function resultFields(
 ): Record<string, unknown> {
   const fields: Record<string, unknown> = {
     requestOutcome: enumValue(
-      "Ws",
+      requestOutcomeEnums,
       result == null
         ? "CODEX_BROWSER_PROFILE_IMPORT_REQUEST_OUTCOME_FAILED_WITHOUT_RESULT"
         : "CODEX_BROWSER_PROFILE_IMPORT_REQUEST_OUTCOME_RETURNED_RESULT",
@@ -336,7 +363,7 @@ function resultFields(
 }
 
 function recordAttemptFinished(
-  scope: unknown,
+  scope: MaitaiScopeApi<unknown>,
   entryPoint: EntryPoint,
   request: ImportRequest,
   attempt: AttemptContext,
@@ -345,7 +372,7 @@ function recordAttemptFinished(
   const outcomes = resultFields(request, result);
   emit(scope, {
     stepType: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_ATTEMPT_FINISHED",
     ),
     ...attemptFields(entryPoint, request, attempt),
@@ -371,25 +398,28 @@ function recordAttemptFinished(
   ].some(
     (value) =>
       value ===
-        enumValue("Ls", "CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED") ||
+        enumValue(
+          dataOutcomeEnums,
+          "CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_FAILED",
+        ) ||
       value ===
         enumValue(
-          "Ls",
+          dataOutcomeEnums,
           "CODEX_BROWSER_PROFILE_IMPORT_DATA_OUTCOME_PARTIAL_SUCCESS",
         ),
   );
   if (result == null) {
-    appShared.Q3.error(
+    logger.error(
       "Browser profile import request failed without a result",
       { safe },
     );
   } else if (failed) {
-    appShared.Q3.warning("Browser profile import returned failures", { safe });
+    logger.warning("Browser profile import returned failures", { safe });
   }
 }
 
 function recordDialogClosed(
-  scope: unknown,
+  scope: MaitaiScopeApi<unknown>,
   entryPoint: EntryPoint,
   state: AttemptContext & {
     source?: ImportSource;
@@ -399,7 +429,7 @@ function recordDialogClosed(
 ): void {
   emit(scope, {
     stepType: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_DIALOG_CLOSED",
     ),
     entryPoint: entryPointValue(entryPoint),
@@ -418,21 +448,21 @@ function recordDialogClosed(
 
 function initializeBrowserProfileImportAnalytics(): void {
   if (initialized) return;
-  appInitial.Ks?.();
-  appInitial.ypn?.();
-  appShared.Z3?.();
-  appInitial.qx?.();
+  initializeAnalyticsEnums();
+  initializeAnalyticsEmitter();
+  initializeQueryRuntime();
+  initializeBrowserImportRuntime();
   nuxStepTypes = {
     shown: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_SHOWN",
     ),
     dismissed: enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_DISMISSED",
     ),
     "continue-clicked": enumValue(
-      "Hs",
+      lifecycleStepEnums,
       "CODEX_BROWSER_PROFILE_IMPORT_LIFECYCLE_STEP_TYPE_NUX_CONTINUE_CLICKED",
     ),
   };

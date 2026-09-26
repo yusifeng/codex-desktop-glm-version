@@ -2839,6 +2839,30 @@ declare module "@rchunk/app-initial" {
     number
   >;
   export const Kx: (result: unknown) => boolean;
+  /** Browser profile import 分析协议使用的枚举值注册表。 */
+  export type BrowserProfileImportAnalyticsEnumTable = Readonly<
+    Record<string, unknown>
+  >;
+  export const Bs: BrowserProfileImportAnalyticsEnumTable;
+  export const Fs: BrowserProfileImportAnalyticsEnumTable;
+  export const Gs: BrowserProfileImportAnalyticsEnumTable;
+  export const Hs: BrowserProfileImportAnalyticsEnumTable;
+  export const Is: BrowserProfileImportAnalyticsEnumTable;
+  export const Ls: BrowserProfileImportAnalyticsEnumTable;
+  export const Rs: BrowserProfileImportAnalyticsEnumTable;
+  export const Us: BrowserProfileImportAnalyticsEnumTable;
+  export const Ws: BrowserProfileImportAnalyticsEnumTable;
+  export const zs: BrowserProfileImportAnalyticsEnumTable;
+  /** Browser profile import 分析事件描述符。 */
+  export const Vs: unknown;
+  /** 将结构化字段发送到 Maitai 分析管道。 */
+  export const xpn: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    event: unknown,
+    fields: Record<string, unknown>,
+  ) => void;
+  export const Ks: () => void;
+  export const ypn: () => void;
   export const Ux: (result: { status?: string } | null | undefined) => boolean;
   export const Wx: (
     result:
