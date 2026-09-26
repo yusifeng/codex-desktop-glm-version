@@ -158,7 +158,19 @@ declare module "@rchunk/app-shared" {
   export const wL: () => void;
   export const oq: string;
   export const rZ: any;
-  export const m4: unknown; // intl message（J）
+  export type ClassDictionary = Record<string, unknown>;
+  export interface ClassArray extends Array<ClassValue> {}
+  export type ClassValue =
+    | ClassArray
+    | ClassDictionary
+    | bigint
+    | boolean
+    | null
+    | number
+    | string
+    | undefined;
+  /** classNames（app-shared/ui/class-names.ts，内部 J）。 */
+  export const m4: (...values: ClassValue[]) => string;
   export const mZ: any;
   export const n$: unknown;
   export const pZ: any; // createDerivedFamily（kI）
