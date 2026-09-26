@@ -19,8 +19,17 @@ declare module "@rchunk/app-shared" {
   };
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   export const $3: unknown; // rolldown lazy 辅助
+  export const $h: () => void; // i8：资源按钮依赖初始化器
+  export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
+  export const Am: {
+    kind: "browser";
+    loadDetachedRenderer(): Promise<unknown>;
+  }; // alt：分离窗口的 browser 内容渲染器
+  export const BI: (path: string) => string; // wJe：路径规范化后转小写
+  export const BK: (path: string) => boolean; // Rz：是否为绝对路径
   export const BX: any;
+  export const Bk: Record<string, string>; // bq：Appgen interaction action 枚举
   export const C_: unknown;
   export const FQ: unknown;
   export const FX: any;
@@ -60,6 +69,13 @@ declare module "@rchunk/app-shared" {
   export const x_: unknown; // useIconScaleContext（_3）
   export const y_: unknown;
   export const G4: unknown;
+  export const Gs: unknown; // jbt：pin-window-light-16 IconAsset
+  export const H3: () => void; // detachedWindow 入口的 preload helper
+  export const RI: () => void; // nG：路径 dirname 依赖初始化器
+  export const V3: unknown; // detachedWindow preload 依赖表
+  export const VI: (path: string) => string; // QW：路径分隔符规范化
+  export const W3: () => void; // detachedWindow 所需 app-shared 初始化器
+  export const l3: (left: unknown, right: unknown) => boolean; // Yt：lodash isEqual
   export const zI: unknown;
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
   // 导出面（数千个压缩名）待 renderer-app-shared-analysis.md 完成后语义化。
@@ -74,6 +90,14 @@ declare module "@rchunk/app-initial" {
   export const hnt: () => Promise<void>; // initializeAppHostServices
   export const mnt: () => void; // 懒初始化器（遥测/基础设施装配）
   export const pnt: unknown; // appServices：已解析的服务集合
+  export const $en: unknown; // zb：RouteScope atom
+  export const bS: Record<string, unknown>; // Bms：侧面板 UI 组件注册表
+  export const C: unknown; // XXc：PermissionsModeDropdown 懒加载组件
+  export const CS: unknown; // ems：侧面板 List 组件
+  export const P0t: <T>(items: readonly T[] | null | undefined, iteratee?: ((item: T) => unknown) | string) => T[]; // zDn：lodash uniqBy
+  export const fhn: (left: { connector_id?: unknown; link_id?: unknown; auth_reason?: unknown; connection_consent?: unknown; requested_scopes?: unknown[] }, right: { connector_id?: unknown; link_id?: unknown; auth_reason?: unknown; connection_consent?: unknown; requested_scopes?: unknown[] }) => boolean; // mmt：connector approval 等价判定
+  export const gmn: <T>(items: readonly T[] | null | undefined, iteratee: ((item: T) => PropertyKey) | string) => Record<PropertyKey, T[]>; // wm：lodash groupBy
+  export const wfn: () => void; // BMt：URL 解析辅助初始化器
   export const BPt: any;
   export const Iht: any;
   export const Rht: any;
@@ -104,6 +128,7 @@ declare module "@rchunk/app-initial" {
 declare module "@rchunk/app-primary" {
   export const Bf: () => void;
   export const Rf: (input: { defaultPrompt: string; pluginDisplayName: string; pluginId: string }) => unknown;
+  export const d: () => void; // O9：项目选择器依赖初始化器
   export const n: () => void;
   export const t: unknown;
   export const _any: any;
