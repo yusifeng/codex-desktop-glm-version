@@ -12,6 +12,60 @@ declare module "@rchunk/rolldown-runtime" {
 }
 
 declare module "@rchunk/app-shared" {
+  // app-shared/ui/button.ts（内部 n8/a8/pot；压缩导出 Qh/Yh/Xh）。
+  export type ButtonColor =
+    | "accent" | "accentInverse" | "accentSubtle" | "activity"
+    | "activityStop" | "activitySuccess" | "cardAction"
+    | "composerPrimary" | "composerSurface" | "conversationFollowup"
+    | "danger" | "dangerSolid" | "ghost" | "ghostAccent"
+    | "ghostActive" | "ghostMuted" | "ghostOutline" | "ghostSecondary"
+    | "ghostTertiary" | "ghostUserMessage" | "headerUpgrade"
+    | "mediaOverlay" | "mediaSolid" | "mediaSubtle" | "outline"
+    | "outlineActive" | "outlineCard" | "outlineGhost"
+    | "outlineGhostMuted" | "outlineSurface" | "primary" | "secondary"
+    | "segmentedInsetSelected" | "segmentedSelected" | "selectTrigger"
+    | "shareDestination" | "successSolid" | "tinted" | "upgrade";
+  export type ButtonSize =
+    | "actionSm" | "activityOption" | "auth" | "beaconAction"
+    | "beaconCarousel" | "cardAction" | "compact" | "composer"
+    | "composerAuxiliary" | "composerPermissions" | "composerPill"
+    | "composerSm" | "composerSmLabel" | "composerWithBadge"
+    | "conversationFollowup" | "default" | "detailAction" | "dialog"
+    | "dialogAction" | "dialogGhost" | "dragHandle" | "entityHeader"
+    | "entityRowAction" | "formatToolbar" | "formatToolbarIcon"
+    | "giftCard" | "headerUpsell" | "icon" | "iconCircle"
+    | "iconCircleSm" | "iconLarge" | "iconMd" | "iconSm"
+    | "imageToolbar" | "inline" | "inputControl" | "inputIcon"
+    | "inputSegment" | "inputSelect" | "large" | "medium" | "menuRow"
+    | "paginationDot" | "panelAction" | "promotionalAction"
+    | "promotionalLink" | "settingsSelect" | "shareDestination"
+    | "surveyOption" | "tabStripAction" | "toolbar";
+  export interface ButtonProps extends Record<string, unknown> {
+    as?: "a" | "button";
+    allowShrink?: boolean;
+    children?: unknown;
+    className?: string;
+    color?: ButtonColor;
+    contentLayout?: "balanced" | "default";
+    disabled?: boolean;
+    focusRing?: "default" | "inset" | "none";
+    href?: string;
+    loading?: boolean;
+    radius?: "default" | "extraLarge" | "full" | "large" | "small";
+    size?: ButtonSize;
+    spinnerVariant?: "default" | "rays";
+    type?: "button" | "reset" | "submit";
+    uniform?: boolean;
+  }
+  export interface LoadingSpinnerProps extends Record<string, unknown> {
+    animationDurationMs?: number;
+    className?: string;
+    containerClassName?: string;
+    variant?: "default" | "rays";
+  }
+  export const Qh: (props: LoadingSpinnerProps) => unknown;
+  export const Xh: (props: Omit<ButtonProps, "as">) => unknown;
+  export const Yh: (props: ButtonProps) => unknown;
   // React 兼容导出（e6 = react 模块命名空间，含 createContext/use 等）。
   export const e6: {
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
