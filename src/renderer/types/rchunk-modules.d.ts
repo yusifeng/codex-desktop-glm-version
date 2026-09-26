@@ -225,6 +225,11 @@ declare module "@rchunk/browser-skills-composer" {
   export const BrowserSkillsComposer: unknown;
 }
 
+declare module "@rchunk/use-chatgpt-composer-controller" {
+  export const n: unknown;
+  export const t: () => void;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
