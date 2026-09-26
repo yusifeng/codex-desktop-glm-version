@@ -512,6 +512,7 @@ export interface ScopedQueryOptions<TData, TError = Error> {
   queryFn?: (context: ScopedQueryFunctionContext) => Promise<TData> | TData;
   queryKey: readonly unknown[];
   refetchOnMount?: boolean | "always";
+  retry?: boolean | number | ((failureCount: number, error: TError) => boolean);
   staleTime?: number;
   throwOnError?: boolean | ((error: TError) => boolean);
 }

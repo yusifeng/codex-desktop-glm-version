@@ -759,11 +759,15 @@ const starterPrompts = await loadModule("home-starter-prompts", {
     export const yln = () => false;
     export const UZ = () => true;
     export const oNt = () => false;
+    export const rJt = { safePost: async () => ({ examples: [] }) };
   `,
   "app-shared": `
+    export const $O = { ONE_MINUTE: 60_000 };
     export const ZI = Symbol("scope");
     export const e6 = { useId: () => "starter-heading" };
     export const I3 = globalThis.__homeOnboardingTest.jsx;
+    export const FX = () => {};
+    export const QI = () => {};
     export const LX = () => ({ get: signal => signal.description === "identity"
       ? { accountId: "account-1", userId: "user-1" }
       : { isCapable: true } });

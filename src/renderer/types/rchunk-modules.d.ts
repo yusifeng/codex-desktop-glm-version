@@ -77,6 +77,7 @@ declare module "@rchunk/app-shared" {
   export const $h: () => void; // i8：资源按钮依赖初始化器
   export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
+  export const $O: { ONE_MINUTE: number };
   export type QueryKey = readonly unknown[];
   /** hashQueryKey（app-shared/runtime/query-structural-utils.ts）。 */
   export const AZ: (queryKey: QueryKey) => string;
@@ -162,10 +163,10 @@ declare module "@rchunk/app-shared" {
     readonly scope: MaitaiScope<T>;
     readonly value: T;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
-    get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Data, QueryError>(
       signal: ScopedQuerySignal<unknown, Data, QueryError>,
     ): ScopedQueryResult<Data, QueryError>;
+    get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
@@ -228,6 +229,7 @@ declare module "@rchunk/app-shared" {
     queryFn?: (context: ScopedQueryFunctionContext) => Promise<TData> | TData;
     queryKey: readonly unknown[];
     refetchOnMount?: boolean | "always";
+    retry?: boolean | number | ((failureCount: number, error: TError) => boolean);
     staleTime?: number;
     throwOnError?: boolean | ((error: TError) => boolean);
   }
@@ -269,6 +271,9 @@ declare module "@rchunk/app-shared" {
   export interface ScopedQuerySignal<TScope, TData, TError = Error> {
     cache: "cached";
     debugLabel?: string;
+    getOptions(
+      context: DerivedScopedSignalContext<TScope>,
+    ): ScopedQueryOptions<TData, TError>;
     queryKind: "query";
     scope: MaitaiScope<TScope>;
   }
@@ -301,10 +306,10 @@ declare module "@rchunk/app-shared" {
     readonly queryClient: unknown;
     readonly scope: MaitaiScopeApi<T>;
     get<Value>(signal: ScopedSignal<unknown, Value>): Value;
-    get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Data, QueryError>(
       signal: ScopedQuerySignal<unknown, Data, QueryError>,
     ): ScopedQueryResult<Data, QueryError>;
+    get<Value>(signal: ScopedDerivedSignal<unknown, Value>): Value;
     get<Param, Value>(
       family: ScopedDerivedFamily<unknown, Param, Value>,
       parameter: Param,
