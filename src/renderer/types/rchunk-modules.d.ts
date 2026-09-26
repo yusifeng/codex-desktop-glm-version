@@ -354,6 +354,31 @@ declare module "@rchunk/app-shared" {
   export const nL: <Options extends Record<string, unknown>>(options: Options) => Options;
   /** initializeMutationOptions（内部 pJe）。 */
   export const tL: () => void;
+  export type AppgenInteractionSource =
+    | "CODEX_APPGEN_INTERACTION_SOURCE_UNSPECIFIED"
+    | "CODEX_APPGEN_INTERACTION_SOURCE_SITES"
+    | "CODEX_APPGEN_INTERACTION_SOURCE_LIBRARY"
+    | "CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS"
+    | "CODEX_APPGEN_INTERACTION_SOURCE_AT_MENTION"
+    | "CODEX_APPGEN_INTERACTION_SOURCE_RESPONSE_CARD"
+    | "UNRECOGNIZED";
+  export interface AppgenInteractionSources {
+    readonly CODEX_APPGEN_INTERACTION_SOURCE_UNSPECIFIED:
+      "CODEX_APPGEN_INTERACTION_SOURCE_UNSPECIFIED";
+    readonly CODEX_APPGEN_INTERACTION_SOURCE_SITES:
+      "CODEX_APPGEN_INTERACTION_SOURCE_SITES";
+    readonly CODEX_APPGEN_INTERACTION_SOURCE_LIBRARY:
+      "CODEX_APPGEN_INTERACTION_SOURCE_LIBRARY";
+    readonly CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS:
+      "CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS";
+    readonly CODEX_APPGEN_INTERACTION_SOURCE_AT_MENTION:
+      "CODEX_APPGEN_INTERACTION_SOURCE_AT_MENTION";
+    readonly CODEX_APPGEN_INTERACTION_SOURCE_RESPONSE_CARD:
+      "CODEX_APPGEN_INTERACTION_SOURCE_RESPONSE_CARD";
+    readonly UNRECOGNIZED: "UNRECOGNIZED";
+  }
+  /** appgenInteractionSources（app-shared/runtime/appgen-interaction-source.ts，内部 wq）。 */
+  export const Hk: AppgenInteractionSources;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
