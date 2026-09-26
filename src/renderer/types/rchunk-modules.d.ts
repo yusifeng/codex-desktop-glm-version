@@ -178,6 +178,10 @@ declare module "@rchunk/home-suggestion-surface" {
   export const t: unknown;
 }
 
+declare module "@rchunk/composer-banners" { export const ComposerBanners: unknown; }
+declare module "@rchunk/usage" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/task-announcement-candidates" { export const TaskAnnouncementCandidates: unknown; }
+
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
   export const a: () => void;
   export const i: unknown;
