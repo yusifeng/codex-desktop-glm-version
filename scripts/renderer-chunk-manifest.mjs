@@ -868,6 +868,8 @@ export const REWRITTEN = new Set([
   "worktree-onboarding-state",
   "worktree-onboarding-banner-controller",
   "dialog-launcher-core",
+  "browser-profile-import-availability",
+  "browser-profile-import-analytics",
   "home-starter-prompts",
   "home-announcement-state",
   "codex-micro-onboarding-animation",

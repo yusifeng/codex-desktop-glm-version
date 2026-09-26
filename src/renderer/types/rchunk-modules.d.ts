@@ -311,6 +311,12 @@ declare module "@rchunk/browser-profile-import-availability" {
 
 declare module "@rchunk/browser-profile-import-analytics" {
   export const a: (...args: any[]) => void;
+  export const c: (...args: any[]) => void;
+  export const i: (...args: any[]) => void;
+  export const n: (...args: any[]) => void;
+  export const o: (...args: any[]) => void;
+  export const r: (...args: any[]) => void;
+  export const s: (...args: any[]) => void;
   export const t: () => void;
 }
 
