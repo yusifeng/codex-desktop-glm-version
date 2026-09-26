@@ -2780,6 +2780,28 @@ declare module "@rchunk/app-initial" {
     value: Value,
     recipe: (draft: Value) => void,
   ) => Value;
+  export interface ProjectSourceFile extends Record<string, unknown> {
+    file_id?: string;
+    id?: string;
+    processingState?: unknown;
+  }
+  export interface ChatGptProject extends Record<string, unknown> {
+    files: ProjectSourceFile[];
+    gizmo: {
+      current_user_permission?: { can_write?: boolean };
+    };
+  }
+  export const cjt: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string,
+    ChatGptProject
+  >;
+  export const ux: () => unknown;
+  export const eUt: (canWrite: boolean | undefined, context: unknown) => boolean;
+  export const dp: (file: ProjectSourceFile) => unknown | null;
+  export const ujt: () => void;
+  export const pp: () => void;
+  export const lx: () => void;
   /** initializeThreadState（pending-onboarding 依赖的线程索引初始化器）。 */
   export const Ftn: () => void;
   /** 当前用户 ID signal。 */
@@ -3363,7 +3385,16 @@ declare module "@rchunk/my-gpt-delete-dialog" {
 }
 
 declare module "@rchunk/source-file-delete-dialog" {
-  export const ChatGptProjectFileDeleteDialog: (...args: any[]) => any;
+  export interface ChatGptProjectFileDeleteDialogProps {
+    fileId: string;
+    onClose(): void;
+    onDelete(): void;
+    projectId: string;
+    title: string;
+  }
+  export const ChatGptProjectFileDeleteDialog: (
+    props: ChatGptProjectFileDeleteDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/codex-thread-report-dialog-entry" {

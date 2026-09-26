@@ -4,13 +4,50 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const jsx = appShared.I3();
 
-function Bold(children: any) {
+export interface ChatGptProjectFileDeleteDialogProps {
+  fileId: string;
+  onClose(): void;
+  onDelete(): void;
+  projectId: string;
+  title: string;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  Ah: DialogHeader,
+  BX: useSignalFamilyValue,
+  FX: initializeSignalRuntime,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeReactRuntime,
+  Lh: DialogDescription,
+  Oh: DialogContent,
+  Ph: initializeDialogLayout,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+  jh: DialogSection,
+  kh: DialogActions,
+  zh: initializeDialog,
+} = appSharedChunk;
+const {
+  cjt: projectByIdQuery,
+  dp: getProjectFileProcessingState,
+  eUt: canDeleteProjectFile,
+  lx: initializeProjectFileState,
+  pp: initializeProjectPermissions,
+  ujt: initializeProjectQuery,
+  ux: getProjectFileDeletionContext,
+} = appInitialChunk;
+
+const jsx: JsxRuntime = getJsxRuntime();
+
+function Bold(children: unknown): unknown {
   return jsx.jsx("strong", { children });
 }
 
@@ -20,23 +57,18 @@ function ChatGptProjectFileDeleteDialog({
   onDelete,
   projectId,
   title,
-}: {
-  fileId: string;
-  onClose: () => void;
-  onDelete: () => void;
-  projectId: string;
-  title: string;
-}) {
-  const { data: project } = appShared.BX(appInitial.cjt, projectId);
-  const deletionContext = appInitial.ux();
+}: ChatGptProjectFileDeleteDialogProps): unknown {
+  const { data: project } = useSignalFamilyValue(projectByIdQuery, projectId);
+  const deletionContext = getProjectFileDeletionContext();
   const canDelete =
-    appInitial.eUt(
+    canDeleteProjectFile(
       project?.gizmo.current_user_permission?.can_write,
       deletionContext,
     ) &&
     project?.files.some(
-      (file: any) =>
-        (file.file_id || file.id) === fileId && appInitial.dp(file) == null,
+      (file) =>
+        (file.file_id || file.id) === fileId &&
+        getProjectFileProcessingState(file) == null,
     ) === true;
 
   const handleOpenChange = (open: boolean) => {
@@ -49,8 +81,8 @@ function ChatGptProjectFileDeleteDialog({
       onDelete();
     }
   };
-  const dialogTitle = jsx.jsx(appShared.Rh, {
-    children: jsx.jsx(appShared.Y2, {
+  const dialogTitle = jsx.jsx(DialogTitle, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptProjectHome.sources.deleteFile.title",
       defaultMessage: 'Delete "{title}" from project?',
       description:
@@ -58,8 +90,8 @@ function ChatGptProjectFileDeleteDialog({
       values: { title },
     }),
   });
-  const description = jsx.jsx(appShared.Lh, {
-    children: jsx.jsx(appShared.Y2, {
+  const description = jsx.jsx(DialogDescription, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptProjectHome.sources.deleteFile.description",
       defaultMessage:
         "<bold>This removes this file from the project for everyone.</bold> It can be added again later.",
@@ -68,47 +100,47 @@ function ChatGptProjectFileDeleteDialog({
       values: { bold: Bold },
     }),
   });
-  const heading = jsx.jsx(appShared.jh, {
-    children: jsx.jsx(appShared.Ah, {
+  const heading = jsx.jsx(DialogSection, {
+    children: jsx.jsx(DialogHeader, {
       title: dialogTitle,
       subtitle: description,
     }),
   });
-  const cancelButton = jsx.jsx(appShared.Yh, {
+  const cancelButton = jsx.jsx(Button, {
     color: "outline",
     type: "button",
     onClick: onClose,
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptProjectHome.sources.deleteFile.cancel",
       defaultMessage: "Cancel",
       description:
         "Cancel button in the confirmation for deleting an uploaded file from a shared ChatGPT project",
     }),
   });
-  const deleteButton = jsx.jsx(appShared.Yh, {
+  const deleteButton = jsx.jsx(Button, {
     color: "danger",
     disabled: !canDelete,
     type: "submit",
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptProjectHome.sources.deleteFile.confirm",
       defaultMessage: "Delete",
       description:
         "Button confirming deletion of an uploaded file from a shared ChatGPT project's sources",
     }),
   });
-  const footer = jsx.jsx(appShared.jh, {
-    children: jsx.jsxs(appShared.kh, {
+  const footer = jsx.jsx(DialogSection, {
+    children: jsx.jsxs(DialogActions, {
       children: [cancelButton, deleteButton],
     }),
   });
-  const form = jsx.jsxs(appShared.Oh, {
+  const form = jsx.jsxs(DialogContent, {
     className: "select-none",
     as: "form",
     onSubmit: handleSubmit,
     children: [heading, footer],
   });
 
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: true,
     onOpenChange: handleOpenChange,
     size: "compact",
@@ -117,15 +149,15 @@ function ChatGptProjectFileDeleteDialog({
 }
 
 function initializeChatGptProjectFileDeleteDialog(): void {
-  appShared.$3?.();
-  appShared.FX?.();
-  appShared.K2?.();
-  appShared.Zh?.();
-  appShared.zh?.();
-  appShared.Ph?.();
-  appInitial.ujt?.();
-  appInitial.pp?.();
-  appInitial.lx?.();
+  initializeRuntimeLazy();
+  initializeSignalRuntime();
+  initializeReactRuntime();
+  initializeButton();
+  initializeDialog();
+  initializeDialogLayout();
+  initializeProjectQuery();
+  initializeProjectPermissions();
+  initializeProjectFileState();
 }
 
 initializeChatGptProjectFileDeleteDialog();
