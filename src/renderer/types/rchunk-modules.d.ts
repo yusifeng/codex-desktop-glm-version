@@ -287,6 +287,21 @@ declare module "@rchunk/app-shared" {
   export const EU: GitSettings;
   /** initializeGitSettings（内部 jV）。 */
   export const DU: () => void;
+  export interface AmbientSuggestionSetting<T> {
+    agentAccess: "read-write";
+    default: T;
+    description: string;
+    hostStorage: { kind: "global-state"; key: string };
+    key: string;
+    schema: import("zod").ZodType<T>;
+  }
+  export interface AmbientSuggestionSettings {
+    enabled: AmbientSuggestionSetting<boolean>;
+  }
+  /** ambientSuggestionSettings（app-shared/runtime/ambient-suggestion-settings.ts，内部 _U）。 */
+  export const Tz: AmbientSuggestionSettings;
+  /** initializeAmbientSuggestionSettings（内部 vU）。 */
+  export const Ez: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
