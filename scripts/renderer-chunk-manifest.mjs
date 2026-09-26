@@ -883,6 +883,7 @@ export const REWRITTEN = new Set([
   "codex-home-announcements",
   "codex-home-announcements-entry",
   "workspace-renewal-state",
+  "workspace-renewal-payment",
   "home-beacon",
   "home-beacon-finance",
   "composer-utility-bar",
