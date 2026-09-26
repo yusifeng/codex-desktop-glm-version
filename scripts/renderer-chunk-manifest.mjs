@@ -903,6 +903,7 @@ export const REWRITTEN = new Set([
   "gpt-plugin-migration-failure",
   "gpt-management-url",
   "gpt-plugin-migration-dialog",
+  "automation-delete-confirmation-dialog",
   "home-beacon",
   "home-beacon-finance",
   "composer-utility-bar",

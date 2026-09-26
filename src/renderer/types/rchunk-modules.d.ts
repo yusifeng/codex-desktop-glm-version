@@ -723,6 +723,11 @@ declare module "@rchunk/gpt-management-url" {
   export const t: (path: string) => string;
 }
 
+declare module "@rchunk/automation-delete-confirmation-dialog" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/migrated-plugin-access" {
   export const a: () => void;
   export const i: (...args: any[]) => any;
