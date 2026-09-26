@@ -2667,7 +2667,26 @@ declare module "@rchunk/use-imported-setup-opportunity" {
 }
 
 declare module "@rchunk/sidebar-onboarding-checklist-task-config" {
-  export const _any: any;
+  export interface OnboardingTaskDefinition extends Record<string, unknown> {
+    instructions?: string;
+    is_auto_submit_enabled?: boolean;
+    messages: {
+      label: import("@rchunk/app-shared").MessageDescriptor;
+      prompt: import("@rchunk/app-shared").MessageDescriptor;
+    };
+    origin: "checked_in" | "remote";
+    pluginSlots?: Record<string, string>;
+  }
+  /** initializeRemoteTaskConfig。 */
+  export const a: () => void;
+  /** useRemoteTaskDefinitions。 */
+  export const c: (options?: {
+    disableExposureLog?: boolean;
+  }) => Record<string, OnboardingTaskDefinition>;
+  /** initializeCandidateTaskConstants。 */
+  export const m: () => void;
+  /** initializePermissionPromptState。 */
+  export const v: () => void;
 }
 
 declare module "@rchunk/dialog-launcher-core" {

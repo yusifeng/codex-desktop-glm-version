@@ -143,6 +143,14 @@ check(
 taskConfig.q(store);
 check(taskConfig.W(store).phase === "role", "workflow resets");
 
+taskConfig.v();
+check(
+  taskConfig.w.initial === false &&
+    taskConfig.T.initial === false &&
+    taskConfig.S.initial === "not-determined",
+  "creates typed permission prompt signals with their default states",
+);
+
 check(taskConfig.I.safeParse("remote-task").success, "task IDs accept text");
 check(!taskConfig.L.safeParse("remote-task").success, "local IDs are closed");
 check(taskConfig._("gmail", null), "unknown plans remain eligible");
@@ -204,7 +212,7 @@ check(
   "remote plugin IDs parse independently",
 );
 
-assert.equal(assertionCount, 22);
+assert.equal(assertionCount, 23);
 console.log(
   `${assertionCount} sidebar onboarding task-config assertions passed`,
 );

@@ -12,8 +12,18 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 void runtimeChunk;
 
 const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
 const mailProvider = mailProviderChunk as Record<string, any>;
+
+const {
+  FX: initializeSignalRuntime,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+  cX: isPermissionPresetAllowed,
+  oZ: createSignalFamily,
+  pZ: createScopedSignal,
+  rZ: createDerivedFamily,
+  sZ: createDerivedSignal,
+} = appSharedChunk;
 
 type PermissionStatus = "not-requested" | "pending" | "allowed" | "denied";
 type WorkflowPhase =
@@ -31,8 +41,11 @@ export interface ConversationalOnboardingWorkflow {
   selectedTask: string | null;
 }
 
-export interface SignalStore {
+export interface SignalReader {
   get<T>(signal: unknown, key?: unknown): T;
+}
+
+export interface SignalStore extends SignalReader {
   set<T>(signal: unknown, value: T | ((previous: T) => T)): void;
   queryClient?: { setQueriesData(filter: unknown, value: unknown): void };
   when?(predicate: (reader: SignalStore) => boolean): Promise<void>;
@@ -41,6 +54,15 @@ export interface SignalStore {
 export interface CapabilityStatus {
   id: string;
   status: "checking" | "enabled" | "unavailable" | string;
+}
+
+interface CompletionQueryValue {
+  data?: { completion?: unknown; status?: string };
+}
+
+interface ConversationTurn {
+  items: unknown[];
+  status?: string;
 }
 
 export interface TaskMessage {
@@ -215,11 +237,6 @@ const inFlightStarts = new Map<
 const inFlightTurns = new Map<string, Promise<void>>();
 const startGeneration = new Map<string, number>();
 
-function maybeInitialize(chunk: Record<string, any>, name: string): unknown {
-  const value = chunk[name];
-  return typeof value === "function" ? value() : value;
-}
-
 function createSchema<T>(parse: (value: unknown) => T | null) {
   return {
     safeParse(
@@ -265,15 +282,15 @@ const taskIconSchema = createSchema<{ iconAppId?: string; label: string }>(
 function initializeWorkflowState(): void {
   if (workflowStateInitialized) return;
   workflowStateInitialized = true;
-  maybeInitialize(appShared, "FX");
-  maybeInitialize(appShared, "QI");
+  initializeSignalRuntime?.();
+  initializeSharedRuntime?.();
   if (typeof appInitial.dun === "function") {
     workflowSignal = appInitial.dun(WORKFLOW_STORAGE_KEY, DEFAULT_WORKFLOW);
   }
-  if (typeof appShared.sZ === "function") {
-    completedImportSignal = appShared.sZ(
-      appShared.ZI,
-      ({ get }: SignalStore) =>
+  if (typeof createDerivedSignal === "function") {
+    completedImportSignal = createDerivedSignal(
+      applicationScope,
+      ({ get }: SignalReader) =>
         get<ConversationalOnboardingWorkflow | null>(workflowSignal)
           ?.completedImport,
     );
@@ -492,11 +509,11 @@ function clearStoredConversation(conversation: StoredConversation): boolean {
 function initializeConversationStateFamily(): void {
   if (conversationStateFamilyInitialized) return;
   conversationStateFamilyInitialized = true;
-  maybeInitialize(appShared, "FX");
-  maybeInitialize(appShared, "QI");
-  if (typeof appShared.oZ === "function") {
-    conversationStateFamily = appShared.oZ(
-      appShared.ZI,
+  initializeSignalRuntime?.();
+  initializeSharedRuntime?.();
+  if (typeof createSignalFamily === "function") {
+    conversationStateFamily = createSignalFamily(
+      applicationScope,
       () => null,
       undefined,
       {
@@ -565,7 +582,10 @@ async function createOnboardingConversation(
         "{locale}",
         appInitial.hdn?.() ?? "en",
       ),
-    agentMode: appShared.cX?.("granular", options.permissionsRequirements)
+    agentMode: isPermissionPresetAllowed?.(
+      "granular",
+      options.permissionsRequirements,
+    )
       ? "granular"
       : options.agentMode,
     permissionProfileId: options.permissionProfileId,
@@ -623,42 +643,55 @@ function initializeConversationRuntime(): void {
   initializeWorkflowState();
   initializeConversationStateFamily();
   completionConversationIdSignal =
-    appShared.pZ?.(appShared.ZI, null) ?? completionConversationIdSignal;
+    createScopedSignal?.(applicationScope, null) ??
+    completionConversationIdSignal;
   completionQueryFamily =
-    appShared.rZ?.(appShared.ZI, (conversationId: string, { get }: any) => ({
-      enabled: appInitial.pnt?.conversationalOnboarding != null,
-      queryKey: ["conversational-onboarding-completion", conversationId],
-      queryFn: async () =>
-        (await appInitial.pnt?.conversationalOnboarding?.getTaskCompletionState(
-          { hostId: "local", conversationId },
-        )) ?? { status: "unavailable" },
-      staleTime: 0,
-    })) ?? completionQueryFamily;
+    createDerivedFamily?.(
+      applicationScope,
+      (conversationId: string, { get }: SignalReader) => ({
+        enabled: appInitial.pnt?.conversationalOnboarding != null,
+        queryKey: ["conversational-onboarding-completion", conversationId],
+        queryFn: async () =>
+          (await appInitial.pnt?.conversationalOnboarding?.getTaskCompletionState(
+            { hostId: "local", conversationId },
+          )) ?? { status: "unavailable" },
+        staleTime: 0,
+      }),
+    ) ?? completionQueryFamily;
   completionResultFamily =
-    appShared.rZ?.(
-      appShared.ZI,
-      (conversationId: string | null, { get }: any) => {
+    createDerivedFamily?.(
+      applicationScope,
+      (conversationId: string | null, { get }: SignalReader) => {
         if (conversationId == null) return null;
         const service = appInitial.pnt?.conversationalOnboarding;
         if (service != null) {
-          const state = get(completionQueryFamily, conversationId).data;
+          const state = get<CompletionQueryValue>(
+            completionQueryFamily,
+            conversationId,
+          ).data;
           if (state?.status === "completed") return state.completion;
           if (state?.status !== "absent") return null;
         }
-        const turns = get(appInitial.n$t, conversationId);
+        const turns = get<ConversationTurn[] | null>(
+          appInitial.n$t,
+          conversationId,
+        );
         return extractCompletionFromTurns(
-          get(completionConversationIdSignal) === conversationId
+          get<string | null>(completionConversationIdSignal) === conversationId
             ? turns?.slice(-1)
             : turns,
         );
       },
     ) ?? completionResultFamily;
   completionFailedFamily =
-    appShared.rZ?.(
-      appShared.ZI,
-      (conversationId: string | null, { get }: any) => {
+    createDerivedFamily?.(
+      applicationScope,
+      (conversationId: string | null, { get }: SignalReader) => {
         if (conversationId == null) return false;
-        const lastTurn = get(appInitial.n$t, conversationId)?.at(-1);
+        const lastTurn = get<ConversationTurn[] | null>(
+          appInitial.n$t,
+          conversationId,
+        )?.at(-1);
         return (
           lastTurn != null &&
           lastTurn.status !== "inProgress" &&
@@ -905,12 +938,14 @@ async function archiveOnboardingConversations(
 function initializePermissionDelayState(): void {
   if (permissionDelayStateInitialized) return;
   permissionDelayStateInitialized = true;
-  maybeInitialize(appShared, "FX");
-  maybeInitialize(appShared, "QI");
+  initializeSignalRuntime?.();
+  initializeSharedRuntime?.();
   permissionPromptDisabledSignal =
-    appShared.pZ?.(appShared.ZI, false) ?? permissionPromptDisabledSignal;
+    createScopedSignal?.(applicationScope, false) ??
+    permissionPromptDisabledSignal;
   permissionPromptDelayedSignal =
-    appShared.pZ?.(appShared.ZI, false) ?? permissionPromptDelayedSignal;
+    createScopedSignal?.(applicationScope, false) ??
+    permissionPromptDelayedSignal;
 }
 
 function initializePermissionPromptState(): void {
@@ -918,7 +953,7 @@ function initializePermissionPromptState(): void {
   permissionPromptStateInitialized = true;
   initializePermissionDelayState();
   permissionPromptVisibleSignal =
-    appShared.pZ?.(appShared.ZI, "not-determined") ??
+    createScopedSignal?.(applicationScope, "not-determined") ??
     permissionPromptVisibleSignal;
 }
 
