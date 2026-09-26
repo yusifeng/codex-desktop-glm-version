@@ -6,17 +6,28 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as cookiesIconChunk from "@rchunk/browser-profile-import-cookies-icon";
 import * as historyIconChunk from "@rchunk/browser-profile-import-history-icon";
 import * as chromeIconChunk from "@rchunk/google-chrome";
+import type { JsxRuntime, MessageDescriptor } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const cookiesIcon = cookiesIconChunk as Record<string, any>;
-const historyIcon = historyIconChunk as Record<string, any>;
-const chromeIcon = chromeIconChunk as Record<string, any>;
+
+const {
+  n: initializeCookiesIcon,
+  t: CookiesIcon,
+} = cookiesIconChunk;
+const {
+  n: initializeHistoryIcon,
+  t: HistoryIcon,
+} = historyIconChunk;
+const {
+  n: initializeChromeIcon,
+  t: ChromeIcon,
+} = chromeIconChunk;
 
 const {
   $3: initializeJsxRuntimeLazy,
   AS: ExtensionsIcon,
   G2: defineMessages,
-  I3: jsxRuntime,
+  I3: getJsxRuntime,
   K2: initializeIntl,
   Q3: logger,
   Z3: initializeQueryRuntime,
@@ -47,20 +58,9 @@ interface BrowserProfileImportService {
   listImportableBrowserProfiles(): Promise<ImportableBrowserProfile[]>;
 }
 
-interface JsxRuntime {
-  jsx(component: unknown, props: unknown): unknown;
-  jsxs(component: unknown, props: unknown): unknown;
-}
-
-function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
-  return (typeof runtimeOrFactory === "function"
-    ? runtimeOrFactory()
-    : runtimeOrFactory) as Runtime;
-}
-
 let jsx: JsxRuntime;
 let PasswordsIcon: (props: Record<string, unknown>) => unknown;
-let messages: Record<string, unknown>;
+let messages: Record<string, MessageDescriptor>;
 let atlasIconUrl: string;
 let queryStaleTime: number;
 
@@ -71,7 +71,7 @@ let queriesInitialized = false;
 
 function initializePasswordsIcon(): void {
   if (PasswordsIcon != null) return;
-  jsx = resolveRuntime<JsxRuntime>(jsxRuntime);
+  jsx = getJsxRuntime();
   PasswordsIcon = (props) =>
     jsx.jsxs("svg", {
       width: 20,
@@ -109,9 +109,9 @@ function ImportDataIcon({
 }): unknown {
   switch (kind) {
     case "cookies":
-      return jsx.jsx(cookiesIcon.t, { className });
+      return jsx.jsx(CookiesIcon, { className });
     case "history":
-      return jsx.jsx(historyIcon.t, { className });
+      return jsx.jsx(HistoryIcon, { className });
     case "passwords":
       return jsx.jsx(PasswordsIcon, { className });
     case "extensions":
@@ -126,10 +126,10 @@ function initializeImportDataIcons(): void {
   if (dataIconsInitialized) return;
   initializeJsxRuntimeLazy();
   initializeImportIcons();
-  cookiesIcon.n?.();
-  historyIcon.n?.();
+  initializeCookiesIcon();
+  initializeHistoryIcon();
   initializePasswordsIcon();
-  jsx = resolveRuntime<JsxRuntime>(jsxRuntime);
+  jsx = getJsxRuntime();
   dataIconsInitialized = true;
 }
 
@@ -183,7 +183,7 @@ function SourceIcon({
         src: atlasIconUrl,
       });
     case "chrome":
-      return jsx.jsx(chromeIcon.t, { "aria-hidden": true, className });
+      return jsx.jsx(ChromeIcon, { "aria-hidden": true, className });
   }
 }
 
@@ -219,8 +219,8 @@ function initializeSourceIcons(): void {
   if (sourceIconsInitialized) return;
   initializeJsxRuntimeLazy();
   atlasIconUrl = new URL("atlas-app-5b67bfaeebb3.png", import.meta.url).href;
-  chromeIcon.n?.();
-  jsx = resolveRuntime<JsxRuntime>(jsxRuntime);
+  initializeChromeIcon();
+  jsx = getJsxRuntime();
   sourceIconsInitialized = true;
 }
 

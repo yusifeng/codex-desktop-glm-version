@@ -3311,12 +3311,12 @@ declare module "@rchunk/browser-profile-import-query" {
 
 declare module "@rchunk/browser-profile-import-cookies-icon" {
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: { className?: string }) => unknown;
 }
 
 declare module "@rchunk/browser-profile-import-history-icon" {
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: { className?: string }) => unknown;
 }
 
 declare module "@rchunk/generated-image-context-menu" {
@@ -4581,6 +4581,8 @@ declare module "@rchunk/generated-image-output-visibility" {
 }
 
 declare module "@rchunk/google-chrome" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
   const _default: unknown;
   export default _default;
 }
