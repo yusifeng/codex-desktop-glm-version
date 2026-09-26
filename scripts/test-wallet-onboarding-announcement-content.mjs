@@ -170,8 +170,12 @@ const content = await bundle(
   "src/renderer/wallet-onboarding-announcement-content/index.ts",
   {
     "app-shared": `
-      export const I3 = globalThis.__walletContentTest.jsx;
+      export const I3 = () => globalThis.__walletContentTest.jsx;
       export const e6 = globalThis.__walletContentTest.react;
+      export const $3 = () => {}; export const C_ = () => {}; export const FX = () => {};
+      export const K2 = () => {}; export const QI = () => {}; export const YH = () => {};
+      export const Z3 = () => {}; export const g4 = () => {}; export const jZ = () => {};
+      export const wL = () => {};
       export const BX = query => query === "identity-query" ? { data: globalThis.__walletContentTest.identity } : { data: { sourceUrl: "https://wallet.example/widget" } };
       export const LX = () => globalThis.__walletContentTest.scope;
       export const ZI = "scope";
@@ -191,6 +195,10 @@ const content = await bundle(
       export const o$ = { div: "MotionDiv", span: "MotionSpan" };
     `,
     "app-initial": `
+      export const $H = () => {}; export const Jdt = () => {}; export const KU = () => {};
+      export const Llt = () => {}; export const Pnt = () => {}; export const kk = () => {};
+      export const lXt = () => {}; export const pXt = () => {}; export const xlt = () => {};
+      export const zdt = () => {};
       export const Ok = ({ view }) => ({ view });
       export const Rlt = "identity-query";
       export const eU = "source-query";

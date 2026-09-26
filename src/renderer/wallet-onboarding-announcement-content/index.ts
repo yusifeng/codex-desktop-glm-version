@@ -6,19 +6,214 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as walletModalChunk from "@rchunk/wallet-onboarding-announcement-modal";
 import { buildWalletEnrollmentHtml } from "./wallet-enrollment-html";
+import type {
+  IntlShape,
+  JsxRuntime,
+  MaitaiScopeApi,
+  ReadableSignal,
+  ScopedQueryFamily,
+  ScopedSignalFamily,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const walletModal = walletModalChunk as Record<string, any>;
-
 interface EnrollmentView {
   hostId: string;
-  server: any;
-  serverTools: any[];
+  server: unknown;
+  serverTools: WalletTool[];
   tool: { name: string };
 }
+
+interface WalletTool {
+  name: string;
+}
+
+interface ResourceIdentity {
+  context: unknown;
+  identity:
+    | { kind: "connector"; connectorId: string }
+    | { kind: string; connectorId?: string };
+}
+
+interface WalletToolResult {
+  isError?: boolean;
+  structuredContent?: unknown;
+}
+
+interface WalletRegistration {
+  id: string;
+  optionIds: Set<string>;
+}
+
+interface WalletBootstrapState {
+  attempt: number;
+  metadata: Record<string, unknown> | null;
+  retry: number;
+  status: "error" | "loading" | "ready";
+}
+
+interface WalletWebview extends HTMLElement {
+  destroy?(): void;
+}
+
+interface WalletBridge {
+  notifyMcpAppsHostContext(input: { hostContext: unknown }): Promise<unknown>;
+  runWidgetCode(input: Record<string, unknown>): AsyncIterable<unknown>;
+  setTheme(input: { theme: string }): Promise<unknown>;
+  setWidgetData(input: Record<string, unknown>): Promise<unknown>;
+}
+
+interface ReactRuntime {
+  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
+  useEffectEvent?<Callback extends (...args: never[]) => unknown>(callback: Callback): Callback;
+  useId(): string;
+  useLayoutEffect(
+    effect: () => void | (() => void),
+    dependencies: readonly unknown[],
+  ): void;
+  useRef<T>(value: T): { current: T };
+  useState<T>(
+    value: T,
+  ): [T, (value: T | ((previous: T) => T)) => void];
+}
+
+interface WalletEnrollmentResourceProps {
+  active: boolean;
+  enrollmentAttempt: number;
+  enrollmentView: EnrollmentView;
+  onComplete(): void;
+  onPreparationError(): void;
+  onPrepared(): void;
+  preparing: boolean;
+  targetElement: HTMLElement | null;
+}
+
+interface WalletEnrollmentSandboxProps extends WalletEnrollmentResourceProps {
+  resourceIdentity: ResourceIdentity;
+}
+
+interface WalletEnrollmentDialogProps {
+  completed: boolean;
+  dismissAnnouncement(): void;
+  onBack(): void;
+  onRetry(): void;
+  preparationFailed?: boolean;
+  setSandboxTarget(element: HTMLElement | null): void;
+}
+
+interface WalletSourceQueryParameter {
+  identity: ResourceIdentity["identity"];
+  locale?: string;
+  widgetDomain: null;
+}
+
+interface AppInitialBindings {
+  $H(): void;
+  Blt: ScopedSignalFamily<
+    Record<string, unknown>,
+    ResourceIdentity,
+    string
+  >;
+  Fnt: { safeParse(value: unknown): { success: boolean } };
+  Jdt(): void;
+  KU(): void;
+  Llt(): void;
+  Nnt(input: Record<string, unknown>): Promise<WalletBridge>;
+  Ok(input: { view: EnrollmentView }): unknown;
+  Pnt(): void;
+  QH(sourceUrl: string): string | null;
+  Rdt(
+    scope: MaitaiScopeApi<Record<string, unknown>>,
+    hostId: string,
+    server: unknown,
+    toolName: string,
+    input: Record<string, unknown>,
+  ): Promise<WalletToolResult>;
+  Rlt: ScopedQueryFamily<Record<string, unknown>, unknown, ResourceIdentity["identity"]>;
+  Slt(): boolean;
+  Ydt(input: {
+    connectorId: string | null;
+    server: unknown;
+    toolName: string;
+    tools: WalletTool[];
+  }): WalletTool;
+  cXt(input: { toolResult: WalletToolResult }): unknown;
+  eU: ScopedQueryFamily<
+    Record<string, unknown>,
+    WalletSourceQueryParameter,
+    { sourceUrl: string }
+  >;
+  kk(): void;
+  lXt(): void;
+  mXt(server: unknown): boolean;
+  pXt(): void;
+  qU: ReadableSignal<Record<string, string>>;
+  sXt(input: {
+    isCodexAppsServer: boolean;
+    toolResult: WalletToolResult;
+  }): WalletToolResult;
+  xlt(): void;
+  zdt(): void;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  AZ: serializeQueryKey,
+  Ah: Result,
+  BX: useSignalFamilyValue,
+  C_: initializeIconAsset,
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeSharedComponents,
+  KH: createSandboxPartition,
+  LX: useSignalScope,
+  Q3: logger,
+  QI: initializeSharedRuntime,
+  Rh: Heading,
+  S_: Icon,
+  Y2: FormattedMessage,
+  YH: initializeSandboxUrls,
+  Yh: Button,
+  Z3: initializeQueryRuntime,
+  ZI: applicationScope,
+  e6: reactRuntime,
+  g4: initializeDialogComponents,
+  jZ: initializeMotionRuntime,
+  n4: useIntl,
+  o$: Motion,
+  qH: getTrustedSandboxOrigin,
+  vD: checkIconAsset,
+  wL: initializeMotionPreferences,
+} = appSharedChunk;
+const {
+  $H: initializeMcpHostApi,
+  Blt: currentResourceSignal,
+  Fnt: widgetRunningStatusSchema,
+  Jdt: initializeToolResultMetadata,
+  KU: initializeResourceSourceQuery,
+  Llt: initializeResourceIdentity,
+  Nnt: createWalletBridge,
+  Ok: createResourceContext,
+  Pnt: initializeToolInvocation,
+  QH: createSandboxId,
+  Rdt: invokeTool,
+  Rlt: resourceIdentityQuery,
+  Slt: useReducedMotion,
+  Ydt: selectWalletTool,
+  cXt: extractStructuredContent,
+  eU: resourceSourceQuery,
+  kk: initializeWidgetHost,
+  lXt: initializeServerClassification,
+  mXt: isCodexAppsServer,
+  pXt: initializeResourceQueries,
+  qU: styleVariablesSignal,
+  sXt: normalizeToolResult,
+  xlt: initializeWalletRuntime,
+  zdt: initializeWidgetBridge,
+} = appInitialChunk as unknown as AppInitialBindings;
+const { WalletOnboardingAnnouncementModal: WalletModal } = walletModalChunk;
 
 interface WalletOnboardingAnnouncementProps {
   dismissAnnouncement(): void;
@@ -177,8 +372,8 @@ const MESSAGES: Record<
   ),
 };
 
-let React: any;
-let jsx: any;
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 let initialized = false;
 
 function message(name: string, defaultMessage: string, description: string) {
@@ -189,11 +384,11 @@ function message(name: string, defaultMessage: string, description: string) {
   };
 }
 
-function isObject(value: unknown): value is Record<string, any> {
+function isObject(value: unknown): value is Record<string, unknown> {
   return value != null && typeof value === "object";
 }
 
-function parseBootstrapMetadata(value: unknown): Record<string, any> | null {
+function parseBootstrapMetadata(value: unknown): Record<string, unknown> | null {
   if (!isObject(value) || !isObject(value.vgs_collect_bootstrap)) return null;
   const bootstrap = value.vgs_collect_bootstrap;
   return typeof bootstrap.access_token === "string" &&
@@ -221,7 +416,7 @@ function parseRegistration(
     return null;
   if (!Array.isArray(value.verification_options)) return null;
   const optionIds = value.verification_options
-    .map((option: any) => option?.option_id)
+    .map((option: unknown) => (isObject(option) ? option.option_id : undefined))
     .filter(
       (optionId: unknown): optionId is string => typeof optionId === "string",
     );
@@ -237,11 +432,16 @@ function validFinalization(value: unknown): boolean {
   );
 }
 
-function localizedMessages(intl: any): Record<string, string> {
+function localizedMessages(intl: IntlShape): Record<string, string> {
   return Object.fromEntries(
     Object.entries(MESSAGES).map(([key, descriptor]) => [
       key,
-      intl?.formatMessage?.(descriptor) ?? descriptor.defaultMessage,
+      (() => {
+        const formatted = intl.formatMessage(descriptor);
+        return typeof formatted === "string"
+          ? formatted
+          : descriptor.defaultMessage;
+      })(),
     ]),
   );
 }
@@ -268,9 +468,6 @@ function WalletOnboardingFlow({
   const [sandboxTarget, setSandboxTarget] = React.useState(
     null as HTMLElement | null,
   );
-  const WalletModal =
-    walletModal.WalletOnboardingAnnouncementModal ??
-    "WalletOnboardingAnnouncementModal";
   const foreground =
     screen === "introduction"
       ? jsx.jsx(WalletModal, {
@@ -320,18 +517,18 @@ function WalletOnboardingFlow({
   return jsx.jsxs(jsx.Fragment, { children: [foreground, enrollment] });
 }
 
-function WalletEnrollmentResource(props: Record<string, any>): unknown {
-  const context = appInitial.Ok?.({ view: props.enrollmentView });
-  const identity = appShared.BX?.(appInitial.Rlt, context)?.data;
+function WalletEnrollmentResource(props: WalletEnrollmentResourceProps): unknown {
+  const context = createResourceContext({ view: props.enrollmentView });
+  const identity = useSignalFamilyValue(resourceIdentityQuery, context).data;
   if (identity == null) return null;
   return jsx.jsx(
     WalletEnrollmentSandbox,
     { ...props, resourceIdentity: { context, identity } },
-    appShared.AZ?.([identity]),
+    serializeQueryKey([identity]),
   );
 }
 
-function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
+function WalletEnrollmentSandbox(props: WalletEnrollmentSandboxProps): unknown {
   const {
     active,
     enrollmentAttempt,
@@ -343,58 +540,58 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
     targetElement,
     resourceIdentity,
   } = props;
-  const scope = appShared.LX?.(appShared.ZI);
-  const intl = appShared.n4?.() ?? { locale: "en-US" };
-  const styleVariables =
-    (typeof appShared.HX === "function" ? appShared.HX(appInitial.qU) : {}) ??
-    {};
+  const scope = useSignalScope(applicationScope);
+  const intl = useIntl();
+  const styleVariables = useSignalValue(styleVariablesSignal) ?? {};
   const reactId = React.useId();
   const activeRef = React.useRef(active);
   const completedWhileHidden = React.useRef(false);
-  const registrationRef = React.useRef(null as any);
+  const registrationRef = React.useRef<WalletRegistration | null>(null);
   const hiddenTargetRef = React.useRef(null as HTMLElement | null);
-  const bootstrapCache = React.useRef(new Map<string, Promise<any>>());
+  const bootstrapCache = React.useRef(
+    new Map<string, Promise<WalletToolResult>>(),
+  );
   const [bootstrapRetry, setBootstrapRetry] = React.useState(0);
-  const [bootstrap, setBootstrap] = React.useState(null as any);
-  const [bridge, setBridge] = React.useState(null as any);
-  const [webview, setWebview] = React.useState(null as any);
+  const [bootstrap, setBootstrap] =
+    React.useState<WalletBootstrapState | null>(null);
+  const [bridge, setBridge] = React.useState<WalletBridge | null>(null);
+  const [webview, setWebview] = React.useState<WalletWebview | null>(null);
   const [sandboxReady, setSandboxReady] = React.useState(false);
   const connectorId =
     resourceIdentity.identity.kind === "connector"
       ? resourceIdentity.identity.connectorId
       : null;
-  const sourceQuery = appShared.BX?.(appInitial.eU, {
+  const sourceQuery = useSignalFamilyValue(resourceSourceQuery, {
     identity: resourceIdentity.identity,
     locale: intl.locale,
     widgetDomain: null,
   });
-  const sourceUrl = sourceQuery?.data?.sourceUrl;
-  const sandboxId = sourceUrl == null ? null : appInitial.QH?.(sourceUrl);
+  const sourceUrl = sourceQuery.data?.sourceUrl;
+  const sandboxId = sourceUrl == null ? null : createSandboxId(sourceUrl);
   const widgetId = `wallet-onboarding-${reactId}`;
 
   const assertCurrentAccount = () => {
-    if (scope?.get?.(appInitial.Blt, resourceIdentity) !== "current") {
+    if (scope.get(currentResourceSignal, resourceIdentity) !== "current") {
       throw new Error("Wallet enrollment account changed");
     }
   };
   const invokeWalletTool = async (
     suffix: string,
-    input: Record<string, any>,
+    input: Record<string, unknown>,
   ) => {
     const matcher = new RegExp(`(?:^|[._])(?:wallet_)?${suffix}$`);
-    const tool = enrollmentView.serverTools.find((candidate: any) =>
+    const tool = enrollmentView.serverTools.find((candidate) =>
       matcher.test(candidate.name),
     );
     if (tool == null)
       throw new Error("Wallet registration tool is unavailable");
-    const selected =
-      appInitial.Ydt?.({
-        connectorId,
-        server: enrollmentView.server,
-        toolName: tool.name,
-        tools: enrollmentView.serverTools,
-      }) ?? tool;
-    const result = await appInitial.Rdt(
+    const selected = selectWalletTool({
+      connectorId,
+      server: enrollmentView.server,
+      toolName: tool.name,
+      tools: enrollmentView.serverTools,
+    });
+    const result = await invokeTool(
       scope,
       enrollmentView.hostId,
       enrollmentView.server,
@@ -402,26 +599,26 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
       input,
     );
     assertCurrentAccount();
-    return (
-      appInitial.sXt?.({
-        isCodexAppsServer: appInitial.mXt?.(enrollmentView.server),
-        toolResult: result,
-      }) ?? result
-    );
+    return normalizeToolResult({
+      isCodexAppsServer: isCodexAppsServer(enrollmentView.server),
+      toolResult: result,
+    });
   };
-  const callTool = async (name: string, input: Record<string, any>) => {
+  const callTool = async (name: string, input: Record<string, unknown>) => {
     assertCurrentAccount();
     if (name === TOOLS.stage) {
       if (
         !isObject(input) ||
+        typeof input.stage !== "string" ||
         !["fields_ready", "save", "sdk_load", "submit"].includes(input.stage) ||
+        typeof input.result !== "string" ||
         !["failure", "success"].includes(input.result) ||
         typeof input.duration_ms !== "number" ||
         input.duration_ms < 0
       ) {
         throw new Error("Invalid Wallet onboarding stage event");
       }
-      appShared.Q3?.info?.("wallet_onboarding_sandbox.stage", { safe: input });
+      logger.info("wallet_onboarding_sandbox.stage", { safe: input });
       if (preparing && input.stage === "fields_ready") {
         input.result === "success" ? onPrepared() : onPreparationError();
       }
@@ -436,7 +633,7 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
       setBootstrapRetry((value: number) => value + 1);
       return {};
     }
-    if (!Object.values(TOOLS).includes(name as any)) {
+    if (!(Object.values(TOOLS) as readonly string[]).includes(name)) {
       throw new Error("Wallet onboarding sandbox cannot call this tool");
     }
     if (
@@ -515,14 +712,14 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
 
   React.useLayoutEffect(() => {
     if (sandboxId == null) return;
-    const element = document.createElement("webview") as any;
+    const element = document.createElement("webview") as unknown as WalletWebview;
     element.className = "h-full w-full overflow-hidden border-0";
-    element.setAttribute("partition", appShared.KH?.(sandboxId));
+    element.setAttribute("partition", createSandboxPartition(sandboxId));
     setWebview(element);
     return () => {
       element.remove();
       element.destroy?.();
-      setWebview((current: any) => (current === element ? null : current));
+      setWebview((current) => (current === element ? null : current));
     };
   }, [sandboxId]);
 
@@ -537,9 +734,9 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
 
   React.useLayoutEffect(() => {
     if (webview == null || sandboxId == null || sourceUrl == null) return;
-    const origin = appShared.qH?.(sourceUrl, { requireSkybridge: true });
+    const origin = getTrustedSandboxOrigin(sourceUrl, { requireSkybridge: true });
     if (origin == null) {
-      appShared.Q3?.warning?.("wallet_onboarding_sandbox.invalid_origin", {
+      logger.warning("wallet_onboarding_sandbox.invalid_origin", {
         safe: {},
       });
       preparationError();
@@ -556,36 +753,35 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
       theme,
     });
     const hostContext = createHostContext(intl.locale, styleVariables, theme);
-    appInitial
-      .Nnt({
-        hostApiHandlers: {
-          callMcp: () =>
-            Promise.reject(
-              new Error("Wallet onboarding sandbox cannot make MCP requests"),
-            ),
-          callTool: effectCallTool,
-          notifyBackgroundColor() {},
-          notifyEnvironmentError: preparationError,
-          notifyIntrinsicHeight() {},
-          notifyIntrinsicWidth() {},
-          notifyNavigation() {},
-          notifySecurityPolicyViolation: preparationError,
-          openExternal() {},
-          requestDisplayMode: () => ({ mode: "inline" }),
-          sendFollowUpMessage: () =>
-            Promise.reject(
-              new Error("Wallet onboarding sandbox cannot send follow-ups"),
-            ),
-          sendInstrument() {},
-          updateWidgetState() {},
-        },
-        origin,
-        sandboxId,
-        signal: abort.signal,
-        sourceUrl,
-        webview,
-      })
-      .then(async (nextBridge: any) => {
+    createWalletBridge({
+      hostApiHandlers: {
+        callMcp: () =>
+          Promise.reject(
+            new Error("Wallet onboarding sandbox cannot make MCP requests"),
+          ),
+        callTool: effectCallTool,
+        notifyBackgroundColor() {},
+        notifyEnvironmentError: preparationError,
+        notifyIntrinsicHeight() {},
+        notifyIntrinsicWidth() {},
+        notifyNavigation() {},
+        notifySecurityPolicyViolation: preparationError,
+        openExternal() {},
+        requestDisplayMode: () => ({ mode: "inline" }),
+        sendFollowUpMessage: () =>
+          Promise.reject(
+            new Error("Wallet onboarding sandbox cannot send follow-ups"),
+          ),
+        sendInstrument() {},
+        updateWidgetState() {},
+      },
+      origin,
+      sandboxId,
+      signal: abort.signal,
+      sourceUrl,
+      webview,
+    })
+      .then(async (nextBridge) => {
         if (abort.signal.aborted) return;
         setBridge(nextBridge);
         const statuses = nextBridge.runWidgetCode({
@@ -619,7 +815,7 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
         });
         timeout = setTimeout(() => {
           if (!abort.signal.aborted) {
-            appShared.Q3?.warning?.("wallet_onboarding_sandbox.init_failed", {
+            logger.warning("wallet_onboarding_sandbox.init_failed", {
               safe: { errorName: "TimeoutError" },
             });
             preparationError();
@@ -632,7 +828,7 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
           () => {
             clearTimeout(timeout);
             setSandboxReady(true);
-            appShared.Q3?.info?.("wallet_onboarding_sandbox.initialized", {
+            logger.info("wallet_onboarding_sandbox.initialized", {
               safe: {
                 durationMs: Math.max(
                   0,
@@ -644,7 +840,7 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
         );
         if (status === "ended" && !abort.signal.aborted) {
           clearTimeout(timeout);
-          appShared.Q3?.warning?.("wallet_onboarding_sandbox.init_failed", {
+          logger.warning("wallet_onboarding_sandbox.init_failed", {
             safe: { errorName: "MissingRunningStatus" },
           });
           preparationError();
@@ -652,7 +848,7 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
       })
       .catch((error: unknown) => {
         if (!abort.signal.aborted) {
-          appShared.Q3?.warning?.("wallet_onboarding_sandbox.init_failed", {
+          logger.warning("wallet_onboarding_sandbox.init_failed", {
             safe: {
               errorName: error instanceof Error ? error.name : "UnknownError",
             },
@@ -687,25 +883,23 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
     let request = bootstrapCache.current.get(cacheKey);
     if (request == null) {
       const startedAt = performance.now();
-      request = appInitial
-        .Rdt(
-          scope,
-          enrollmentView.hostId,
-          enrollmentView.server,
-          enrollmentView.tool.name,
-          {},
-        )
-        .then((result: any) => {
-          appShared.Q3?.info?.("wallet_onboarding_sandbox.bootstrap", {
-            safe: {
-              durationMs: Math.max(
-                0,
-                Math.round(performance.now() - startedAt),
-              ),
-            },
-          });
-          return result;
+      request = invokeTool(
+        scope,
+        enrollmentView.hostId,
+        enrollmentView.server,
+        enrollmentView.tool.name,
+        {},
+      ).then((result) => {
+        logger.info("wallet_onboarding_sandbox.bootstrap", {
+          safe: {
+            durationMs: Math.max(
+              0,
+              Math.round(performance.now() - startedAt),
+            ),
+          },
         });
+        return result;
+      });
       bootstrapCache.current.set(cacheKey, request);
     }
     let stopped = false;
@@ -722,15 +916,15 @@ function WalletEnrollmentSandbox(props: Record<string, any>): unknown {
       }
     }, SANDBOX_TIMEOUT_MS);
     request
-      .then((result: any) => {
+      .then((result) => {
         if (stopped) return;
         const normalized =
-          appInitial.sXt?.({
-            isCodexAppsServer: appInitial.mXt?.(enrollmentView.server),
+          normalizeToolResult({
+            isCodexAppsServer: isCodexAppsServer(enrollmentView.server),
             toolResult: result,
-          }) ?? result;
+          });
         const metadata =
-          appInitial.cXt?.({ toolResult: normalized }) ??
+          extractStructuredContent({ toolResult: normalized }) ??
           normalized.structuredContent;
         const valid = parseBootstrapMetadata(metadata);
         setBootstrap({
@@ -843,7 +1037,7 @@ async function waitForRunningStatus(
 ): Promise<"aborted" | "running" | "ended"> {
   for await (const status of statuses) {
     if (signal.aborted) return "aborted";
-    const parsed = appInitial.Fnt?.safeParse?.(status);
+    const parsed = widgetRunningStatusSchema.safeParse(status);
     if (parsed?.success || (isObject(status) && status.status === "running")) {
       onRunning();
       return "running";
@@ -859,15 +1053,8 @@ function WalletEnrollmentDialog({
   onRetry,
   preparationFailed = false,
   setSandboxTarget,
-}: Record<string, any>): unknown {
-  const reducedMotion = appInitial.Slt?.() ?? false;
-  const Dialog = appShared.Ih ?? "Dialog";
-  const Button = appShared.Yh ?? "button";
-  const FormattedMessage = appShared.Y2 ?? "span";
-  const Heading = appShared.Rh ?? "h2";
-  const Result = appShared.Ah ?? "div";
-  const Icon = appShared.S_ ?? "span";
-  const Motion = appShared.o$ ?? { div: "div", span: "span" };
+}: WalletEnrollmentDialogProps): unknown {
+  const reducedMotion = useReducedMotion();
   let content: unknown;
   if (completed) {
     content = jsx.jsx(Motion.div, {
@@ -885,7 +1072,10 @@ function WalletEnrollmentDialog({
           transition: reducedMotion
             ? { duration: 0 }
             : { damping: 18, delay: 0.12, stiffness: 320, type: "spring" },
-          children: jsx.jsx(Icon, { "aria-hidden": true, asset: appShared.vD }),
+          children: jsx.jsx(Icon, {
+            "aria-hidden": true,
+            asset: checkIconAsset,
+          }),
         }),
         iconBackgroundClassName: "bg-chart-green/20",
         iconClassName: "mx-auto text-chart-green",
@@ -1004,28 +1194,28 @@ function WalletEnrollmentDialog({
 function initializeWalletOnboardingAnnouncementContent(): void {
   if (initialized) return;
   initialized = true;
-  appShared.$3?.();
-  appShared.jZ?.();
-  appShared.FX?.();
-  appShared.wL?.();
-  appShared.YH?.();
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
-  appShared.K2?.();
-  appShared.g4?.();
-  appInitial.Llt?.();
-  appInitial.pXt?.();
-  appInitial.KU?.();
-  appInitial.Pnt?.();
-  appInitial.lXt?.();
-  appInitial.$H?.();
-  appInitial.Jdt?.();
-  appInitial.zdt?.();
-  appInitial.kk?.();
-  appShared.QI?.();
-  appShared.Z3?.();
-  appShared.C_?.();
-  appInitial.xlt?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeRuntimeLazy();
+  initializeMotionRuntime();
+  initializeSignalRuntime();
+  initializeMotionPreferences();
+  initializeSandboxUrls();
+  React = reactRuntime;
+  initializeSharedComponents();
+  initializeDialogComponents();
+  initializeResourceIdentity();
+  initializeResourceQueries();
+  initializeResourceSourceQuery();
+  initializeToolInvocation();
+  initializeServerClassification();
+  initializeMcpHostApi();
+  initializeToolResultMetadata();
+  initializeWidgetBridge();
+  initializeWidgetHost();
+  initializeSharedRuntime();
+  initializeQueryRuntime();
+  initializeIconAsset();
+  initializeWalletRuntime();
+  jsx = getJsxRuntime();
 }
 
 initializeWalletOnboardingAnnouncementContent();

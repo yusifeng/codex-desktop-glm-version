@@ -763,6 +763,12 @@ declare module "@rchunk/app-shared" {
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
     use<T>(context: unknown): T;
     useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
+    useEffectEvent?<Callback extends (...args: never[]) => unknown>(callback: Callback): Callback;
+    useId(): string;
+    useLayoutEffect(
+      effect: () => void | (() => void),
+      dependencies?: readonly unknown[],
+    ): void;
     useMemo<T>(factory: () => T, dependencies: readonly unknown[]): T;
     useRef<T>(initialValue: T): ReactRef<T>;
     useState<T>(initialValue: T): [T, (value: T | ((current: T) => T)) => void];
@@ -1008,8 +1014,9 @@ declare module "@rchunk/app-shared" {
     options?: QueryReadOptions,
   ) => T;
   export interface JsxRuntime {
-    jsx(component: unknown, props: unknown, key?: string): unknown;
-    jsxs(component: unknown, props: unknown, key?: string): unknown;
+    Fragment: unknown;
+    jsx(component: unknown, props: unknown, key?: string | number): unknown;
+    jsxs(component: unknown, props: unknown, key?: string | number): unknown;
   }
   /** getJsxRuntime（返回 React JSX runtime）。 */
   export const I3: () => JsxRuntime;
@@ -1022,6 +1029,12 @@ declare module "@rchunk/app-shared" {
   export const IQ: unknown;
   export const JQ: unknown;
   export const K2: () => void;
+  /** initializeDialogComponents（Wallet enrollment 对话框依赖）。 */
+  export const g4: () => void;
+  /** initializeMotionRuntime（Wallet enrollment 动画依赖）。 */
+  export const jZ: () => void;
+  /** motion components（Wallet enrollment 过渡容器）。 */
+  export const o$: { div: unknown; span: unknown };
   /** initializeComposerEditorState（CME Home 入口依赖）。 */
   export const Eu: () => void;
   /** CME 图标组件。 */
@@ -1404,6 +1417,10 @@ declare module "@rchunk/app-shared" {
       family: ScopedInfiniteQueryFamily<unknown, Param, Page, PageParam, QueryError>,
       parameter: Param,
     ): ScopedInfiniteQueryResult<Page, PageParam, QueryError>;
+    get<Param, Value>(
+      family: ScopedSignalFamily<unknown, Param, Value>,
+      parameter: Param,
+    ): Value;
     get<Data, MutationError, Variables, Context>(
       signal: ScopedMutationSignal<unknown, Data, MutationError, Variables, Context>,
     ): ScopedMutationResult<Data, MutationError, Variables, Context>;
@@ -1803,6 +1820,8 @@ declare module "@rchunk/app-shared" {
   }
   /** IconAsset（app-shared/ui/icons/icon-preset.ts）。 */
   export const S_: (props: IconAssetProps) => unknown;
+  /** check icon asset（Wallet enrollment 成功态）。 */
+  export const vD: IconAssetPreset;
   export interface MessageDescriptor {
     id: string;
     defaultMessage?: string;
@@ -3538,7 +3557,27 @@ declare module "@rchunk/stripe-payment-confirmation" {
 }
 
 declare module "@rchunk/wallet-onboarding-announcement-modal" {
-  export const WalletOnboardingAnnouncementModal: unknown;
+  export const WalletOnboardingAnnouncementModal: (props: {
+    animationMode?: "animate" | "fanned" | "tucked";
+    animationSpeed?: "normal" | "slow";
+    dismissAnnouncement(): void;
+    footer?: unknown;
+    isSettingUpWallet?: boolean;
+    onSetUpWallet(): void;
+  }) => unknown;
+}
+
+declare module "@rchunk/wallet-onboarding-announcement-content" {
+  export interface WalletEnrollmentView {
+    hostId: string;
+    server: unknown;
+    serverTools: Array<{ name: string }>;
+    tool: { name: string };
+  }
+  export const WalletOnboardingAnnouncement: (props: {
+    dismissAnnouncement(): void;
+    enrollmentView: WalletEnrollmentView;
+  }) => unknown;
 }
 
 declare module "@rchunk/realtime-voice-home-announcement" {
