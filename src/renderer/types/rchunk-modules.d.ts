@@ -340,7 +340,11 @@ declare module "@rchunk/usage" { export const n: () => void; export const t: unk
 declare module "@rchunk/task-announcement-candidates" { export const TaskAnnouncementCandidates: unknown; }
 declare module "@rchunk/popup" { export const i: unknown; export const n: () => void; export const r: unknown; export const t: unknown; }
 declare module "@rchunk/browser-address-suggestion-overlay" { export const BrowserAddressSuggestionOverlay: unknown; }
-declare module "@rchunk/home-beacon" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/home-beacon" {
+  export const n: (...args: any[]) => boolean;
+  export const r: (...args: any[]) => any;
+  export const t: () => void;
+}
 declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
 declare module "@rchunk/codex-micro-mini-games" { export const _any: any; }

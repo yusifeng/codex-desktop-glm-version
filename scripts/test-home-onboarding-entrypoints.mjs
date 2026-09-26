@@ -1109,5 +1109,100 @@ check(
   "opens and records onboarding policy links",
 );
 
-assert.equal(assertions, 78);
+globalThis.__homeOnboardingTest.homeBeacon = { events: [] };
+const homeBeacon = await loadModule("home-beacon", {
+  "app-shared": `
+    export const ZI = Symbol("scope");
+    export const FX = () => {};
+    export const QI = () => {};
+    export const e6 = {
+      useContext: () => null,
+      useRef: value => ({ current: value }),
+      useEffect: effect => { effect(); }
+    };
+    export const LX = () => ({ id: "scope" });
+    export const HX = signal => signal.description === "locale" ? { locale: "en-US" } : false;
+    export const BX = () => ({
+      status: "selected",
+      beacon: { beacon_id: "beacon-1", kind: "banner" }
+    });
+    export const _Z = () => {};
+  `,
+  "app-initial": `
+    export const mpn = Symbol("locale");
+    export const nPt = Symbol("debug");
+    export const YNt = Symbol("claims");
+    export const GNt = Symbol("focused-modal");
+    export const ZNt = Symbol("page-context-suppression");
+    export const WNt = { NonLegalBanners: "non-legal-banners" };
+    export const ePt = "debug-beacon";
+    export const i_n = () => ({ key: "navigation-1", pathname: "/" });
+    export const N6t = () => ({
+      accountId: "account-1",
+      authMethod: "chatgpt",
+      isLoading: false,
+      userId: "user-1"
+    });
+    export const uht = () => ({ data: null });
+    export const lfn = () => ({ getContext: () => ({ user: null }) });
+    export const $Nt = () => false;
+    export const KNt = () => new Set();
+    export const CNt = () => false;
+    export const SNt = beacon => beacon.kind === "banner";
+    export const bNt = () => false;
+    export const ONt = payload => globalThis.__homeOnboardingTest.homeBeacon.events.push(payload);
+  `,
+  "app-primary": `
+    export const Fh = false;
+    export const Ih = input => input.navigationKey + ":" + input.product;
+    export const jh = Symbol("beacon-query");
+    export const Th = Symbol("page-context");
+    export const Nh = Symbol("cleanup");
+    export const wh = Symbol("viewed");
+    export const Eh = () => ({ isPending: false, isUnavailable: false });
+  `,
+});
+let viewedBeaconKeys = new Set();
+const beaconLifecycleScope = {
+  get: () => viewedBeaconKeys,
+  set: (_signal, update) => {
+    viewedBeaconKeys = update(viewedBeaconKeys);
+  },
+};
+const lifecycleBeacon = { beacon_id: "beacon-1" };
+check(
+  homeBeacon.n(beaconLifecycleScope, "account-1", lifecycleBeacon, null),
+  "records the first session-level Beacon view",
+);
+check(
+  !homeBeacon.n(beaconLifecycleScope, "account-1", lifecycleBeacon, null) &&
+    globalThis.__homeOnboardingTest.homeBeacon.events.length === 1,
+  "deduplicates repeated session-level Beacon views",
+);
+check(
+  viewedBeaconKeys.has("account-1:session:beacon-1"),
+  "uses the account, session and Beacon id as the exposure key",
+);
+check(
+  !homeBeacon.n(beaconLifecycleScope, "account-1", lifecycleBeacon, {
+    conversationId: "conversation-1",
+    messageId: "message-1",
+    suppressLifecycle: true,
+  }),
+  "honors message-level Beacon lifecycle suppression",
+);
+const selectedHomeBeacon = homeBeacon.r();
+check(
+  selectedHomeBeacon.accountId === "account-1" &&
+    selectedHomeBeacon.beacon.beacon_id === "beacon-1" &&
+    selectedHomeBeacon.isEligible &&
+    !selectedHomeBeacon.isLoading,
+  "selects an eligible ChatGPT Home Beacon",
+);
+check(
+  selectedHomeBeacon.shouldSuppressVanillaPromos,
+  "suppresses lower-priority promos while a Beacon selection is active",
+);
+
+assert.equal(assertions, 84);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);

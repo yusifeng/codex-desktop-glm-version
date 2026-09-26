@@ -831,6 +831,7 @@ export const REWRITTEN = new Set([
   "home-announcement-state",
   "codex-micro-onboarding-animation",
   "chatgpt-onboarding-dialog",
+  "home-beacon",
   "composer-utility-bar",
   "work-onboarding-suggestions",
   "home-ambient-suggestions-content",
