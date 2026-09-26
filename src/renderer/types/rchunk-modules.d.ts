@@ -180,6 +180,17 @@ declare module "@rchunk/onboarding-mail-provider" {
   export const _any: any;
 }
 
+declare module "@rchunk/onboarding-entrypoint" {
+  export const n: unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/pending-onboarding" {
+  export const n: unknown;
+  export const r: unknown;
+  export const t: () => void;
+}
+
 declare module "@rchunk/external-agent-config-import-flow" {
   export const openExternalAgentImport: (...args: any[]) => Promise<unknown>;
   export const _any: any;
