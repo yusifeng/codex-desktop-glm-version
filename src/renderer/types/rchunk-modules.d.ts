@@ -744,6 +744,46 @@ declare module "@rchunk/app-shared" {
   }
   /** appgenInteractionPages（app-shared/runtime/appgen-interaction-page.ts，内部 Cq）。 */
   export const Vk: AppgenInteractionPages;
+  export type KnownServiceTierKind = "fast" | "ultrafast";
+  export interface ModelServiceTier extends Record<string, unknown> {
+    id: string;
+    name: string;
+  }
+  export interface ServiceTierModel extends Record<string, unknown> {
+    defaultServiceTier?: string | null;
+    serviceTiers?: readonly ModelServiceTier[] | null;
+  }
+  /** PRIORITY_SERVICE_TIER（app-shared/runtime/service-tiers.ts，内部 tKe）。 */
+  export const Dz: "priority";
+  /** FAST_SERVICE_TIER（内部 nKe）。 */
+  export const Oz: "fast";
+  /** classifyServiceTier（内部 YGe）。 */
+  export const Az: (
+    id: string,
+    name?: string | null,
+  ) => KnownServiceTierKind | null;
+  /** findFastServiceTier（内部 ZGe）。 */
+  export const kz: (
+    model: ServiceTierModel | null | undefined,
+  ) => ModelServiceTier | null;
+  /** supportsServiceTier（内部 QGe）。 */
+  export const Pz: (
+    model: ServiceTierModel | null | undefined,
+    tier: string | null | undefined,
+  ) => boolean;
+  /** resolveServiceTierId（内部 $Ge）。 */
+  export const jz: (
+    model: ServiceTierModel | null | undefined,
+    tier: string | null | undefined,
+  ) => string | null;
+  /** resolveSelectedServiceTier（内部 eKe）。 */
+  export const Mz: (
+    model: ServiceTierModel | null | undefined,
+    selectedTier: string | null | undefined,
+    enabled?: boolean,
+  ) => string | null;
+  /** initializeServiceTiers（内部 gU）。 */
+  export const Nz: () => void;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
   export const FQ: unknown;
