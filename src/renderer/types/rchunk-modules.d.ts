@@ -216,6 +216,31 @@ declare module "@rchunk/app-shared" {
   export const UX: <T>(props: ScopeProviderProps<T>) => unknown;
   /** initializeScopeProviderRuntime（内部 rL）。 */
   export const KX: () => void;
+  /** Codex Web 入口（内部 _Me）。 */
+  export const NX: "https://chatgpt.com/codex";
+  export interface ParsedCodexDeepLink {
+    destination: string;
+    url: URL;
+  }
+  /** parseCodexDeepLink（app-shared/runtime/codex-links.ts，内部 vMe）。 */
+  export const jX: (input: string | URL) => ParsedCodexDeepLink | null;
+  export interface CodexDelegationPayload {
+    input: string;
+    sourceThreadId: string;
+  }
+  export interface CodexToolOutput {
+    name: string;
+    namespace: string;
+    output: unknown;
+  }
+  /** parseCodexDelegation（app-shared/runtime/codex-links.ts，内部 xMe）。 */
+  export const AX: (output: string) => CodexDelegationPayload | null;
+  /** extractCodexDelegationToolOutput（内部 bMe）。 */
+  export const OX: (toolOutput: CodexToolOutput) => string | null;
+  /** initializeCodexWebUrl（内部 _L）。 */
+  export const PX: () => void;
+  /** initializeCodexDelegationParser（内部 yMe）。 */
+  export const MX: () => void;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
     readonly query: {
