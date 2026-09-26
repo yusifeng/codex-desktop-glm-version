@@ -835,6 +835,33 @@ declare module "@rchunk/app-shared" {
   }
   /** sitesSharingSources（app-shared/runtime/sites-sharing-source.ts，内部 Eq）。 */
   export const DF: SitesSharingSources;
+  export interface AnalyticsEventDescriptor<Type extends string> {
+    readonly $type: Type;
+  }
+  /** FAST_MODE_ANNOUNCEMENT_CTA_CLICKED（app-shared/runtime/fast-mode-analytics-events.ts，内部 RX）。 */
+  export const mj: AnalyticsEventDescriptor<
+    "protobuf_analytics_events.v1.CodexFastModeAnnouncementCtaClicked"
+  >;
+  /** FAST_MODE_ANNOUNCEMENT_DISMISSED（内部 zX）。 */
+  export const hj: AnalyticsEventDescriptor<
+    "protobuf_analytics_events.v1.CodexFastModeAnnouncementDismissed"
+  >;
+  /** FAST_MODE_ANNOUNCEMENT_VIEWED（内部 BX）。 */
+  export const gj: AnalyticsEventDescriptor<
+    "protobuf_analytics_events.v1.CodexFastModeAnnouncementViewed"
+  >;
+  /** FAST_MODE_BANNER_CTA_CLICKED（内部 VX）。 */
+  export const _j: AnalyticsEventDescriptor<
+    "protobuf_analytics_events.v1.CodexFastModeBannerCtaClicked"
+  >;
+  /** FAST_MODE_BANNER_DISMISSED（内部 HX）。 */
+  export const vj: AnalyticsEventDescriptor<
+    "protobuf_analytics_events.v1.CodexFastModeBannerDismissed"
+  >;
+  /** FAST_MODE_BANNER_VIEWED（内部 UX）。 */
+  export const yj: AnalyticsEventDescriptor<
+    "protobuf_analytics_events.v1.CodexFastModeBannerViewed"
+  >;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
   export const FQ: unknown;
