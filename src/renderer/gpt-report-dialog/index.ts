@@ -5,15 +5,53 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as reportDialogChunk from "@rchunk/report-dialog-core";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const reportDialog = reportDialogChunk as Record<string, any>;
-const jsx = appShared.I3();
 
-function loadGptReportReasons() {
-  return appInitial.rJt.safeGet("/report_flow/reasons/{entity_type}", {
+interface GptReportResource extends Record<string, unknown> {
+  gizmo: {
+    display: { name: string };
+    id: string;
+  };
+}
+
+interface ReportReason {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface SubmitReportInput {
+  details: string;
+  reason: ReportReason;
+}
+
+const {
+  $3: initializeRuntimeLazy,
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  I3: getJsxRuntime,
+  K2: initializeReactRuntime,
+  LX: useSignalScope,
+  QI: initializeAppScope,
+  Y2: FormattedMessage,
+  ZI: appScope,
+} = appSharedChunk;
+const {
+  Sun: initializeAccountState,
+  cJt: initializeApiClient,
+  mun: currentAccountIdSignal,
+  rJt: apiClient,
+} = appInitialChunk;
+const {
+  n: initializeReportDialog,
+  t: ReportDialog,
+} = reportDialogChunk;
+
+const jsx: JsxRuntime = getJsxRuntime();
+
+function loadGptReportReasons(): Promise<ReportReason[]> {
+  return apiClient.safeGet<ReportReason[]>("/report_flow/reasons/{entity_type}", {
     parameters: { path: { entity_type: "gizmo" } },
   });
 }
@@ -21,28 +59,28 @@ function loadGptReportReasons() {
 function GptReportDialog({
   accountId,
   resource,
-  onClose,
+  onClose = () => {},
 }: {
   accountId: string;
-  resource: any;
-  onClose: () => void;
-}) {
-  const scope = appShared.LX(appShared.ZI);
-  const activeAccountId = appShared.HX(appInitial.mun);
+  resource: GptReportResource;
+  onClose?: () => void;
+}): unknown {
+  const scope = useSignalScope(appScope);
+  const activeAccountId = useSignalValue(currentAccountIdSignal);
   if (activeAccountId !== accountId) return null;
 
   return jsx.jsx(
-    reportDialog.t,
+    ReportDialog,
     {
       onClose,
       queryKey: ["gpt-report-reasons", accountId],
       loadReasons: loadGptReportReasons,
-      submitReport: async ({ reason, details }: any) => {
-        if (scope.get(appInitial.mun) !== accountId) {
+      submitReport: async ({ reason, details }: SubmitReportInput) => {
+        if (scope.get(currentAccountIdSignal) !== accountId) {
           onClose();
           return;
         }
-        await appInitial.rJt.safePost("/report_flow/report", {
+        await apiClient.safePost("/report_flow/report", {
           requestBody: {
             entity_id: resource.gizmo.id,
             entity_type: "gizmo",
@@ -52,7 +90,7 @@ function GptReportDialog({
           },
         });
       },
-      title: jsx.jsx(appShared.Y2, {
+      title: jsx.jsx(FormattedMessage, {
         id: "chatgptConversations.gpts.report.title",
         defaultMessage: "Report {gptName}",
         description: "Title of the reporting dialog for a GPT",
@@ -64,13 +102,13 @@ function GptReportDialog({
 }
 
 function initializeGptReportDialog(): void {
-  appShared.$3?.();
-  appShared.FX?.();
-  appShared.K2?.();
-  appInitial.Sun?.();
-  reportDialog.n?.();
-  appShared.QI?.();
-  appInitial.cJt?.();
+  initializeRuntimeLazy();
+  initializeSignalRuntime();
+  initializeReactRuntime();
+  initializeAccountState();
+  initializeReportDialog();
+  initializeAppScope();
+  initializeApiClient();
 }
 
 initializeGptReportDialog();

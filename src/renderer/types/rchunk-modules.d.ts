@@ -2750,6 +2750,14 @@ declare module "@rchunk/app-initial" {
   ) => void;
   export const u1: (pluginId: string, navigate: (path: string) => void) => void;
   export const mun: import("@rchunk/app-shared").ReadableSignal<string | null>;
+  export interface ApiClient {
+    safeGet<Response>(path: string, options?: unknown): Promise<Response>;
+    safePost<Response = unknown>(path: string, options?: unknown): Promise<Response>;
+  }
+  /** initializeApiClient（内部 API transport 初始化器）。 */
+  export const cJt: () => void;
+  /** 账户隔离的应用 API client。 */
+  export const rJt: ApiClient;
   /** initializeThreadState（pending-onboarding 依赖的线程索引初始化器）。 */
   export const Ftn: () => void;
   /** 当前用户 ID signal。 */
@@ -3243,14 +3251,30 @@ declare module "@rchunk/python-analysis-dialog" {
 }
 
 declare module "@rchunk/report-dialog-core" {
+  export interface ReportReason {
+    id: string;
+    [key: string]: unknown;
+  }
+  export interface ReportDialogProps extends Record<string, unknown> {
+    loadReasons: () => Promise<ReportReason[]>;
+    onClose: () => void;
+    queryKey: readonly unknown[];
+    submitReport: (input: {
+      details: string;
+      reason: ReportReason;
+    }) => Promise<void>;
+    title: unknown;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: ReportDialogProps) => unknown;
 }
 
 declare module "@rchunk/gpt-report-dialog" {
   export interface GptReportDialogProps extends Record<string, unknown> {
     accountId: string;
-    resource: import("@rchunk/gpt-report-menu-item").GptResource;
+    resource: import("@rchunk/gpt-report-menu-item").GptResource & {
+      gizmo: { display: { name: string }; id: string };
+    };
     onClose?: () => void;
   }
   export const GptReportDialog: (props: GptReportDialogProps) => unknown;
