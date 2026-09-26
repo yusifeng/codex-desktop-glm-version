@@ -3234,9 +3234,12 @@ export function isSignalFamily(value: unknown): boolean {
 /** React 面（结构化子集）。 */
 interface ReactLike {
   createContext<T>(defaultValue: T): ReactContextLike<T>;
+  createElement(type: unknown, props: Record<string, unknown> | null, ...children: unknown[]): unknown;
   useContext<T>(context: ReactContextLike<T>): T;
   useSyncExternalStore<T>(subscribe: (onChange: () => void) => () => void, getSnapshot: () => T, getServerSnapshot?: () => T): T;
   useCallback<T extends (...args: never[]) => unknown>(fn: T, deps?: unknown[]): T;
+  useLayoutEffect(effect: () => void | (() => void), deps?: unknown[]): void;
+  useRef<T>(initialValue: T): { current: T };
 }
 
 export interface ReactContextLike<T> {
@@ -3249,6 +3252,12 @@ function reactOf(): ReactLike {
 }
 
 const reactScopeContexts = new WeakMap<Scope<unknown>, ReactContextLike<ScopeState<unknown> | null>>();
+let queryClientReactContext: ReactContextLike<unknown | undefined> | undefined;
+
+function getQueryClientReactContext(): ReactContextLike<unknown | undefined> {
+  queryClientReactContext ??= reactOf().createContext<unknown | undefined>(undefined);
+  return queryClientReactContext;
+}
 
 /** 返回 scope 对应的 React context，供 scope provider 装配实例链。 */
 export function getScopeReactContext<T>(
@@ -3261,6 +3270,91 @@ export function getScopeReactContext<T>(
   }
   return context;
 }
+
+export interface QueryClientProviderProps {
+  children?: unknown;
+  queryClient?: unknown;
+}
+
+/** 向根 scope 注入 QueryClient（原 `Xje` / 压缩导出 `GX`）。 */
+export function QueryClientProvider({
+  children,
+  queryClient,
+}: QueryClientProviderProps): unknown {
+  const React = reactOf();
+  return React.createElement(
+    getQueryClientReactContext().Provider,
+    { value: queryClient },
+    children,
+  );
+}
+
+export interface ScopeProviderProps<T> {
+  children?: unknown;
+  scope: Scope<T>;
+  value?: T;
+}
+
+interface ScopeProviderState<T> {
+  key: unknown;
+  parent: ScopeState<unknown> | null;
+  state: ScopeState<T>;
+}
+
+const EMPTY_SCOPE_VALUE: Record<string, never> = Object.freeze({});
+
+/** 装配 React scope 实例链（原 `$je` / 压缩导出 `UX`）。 */
+export function ScopeProvider<T>({
+  children,
+  scope,
+  value,
+}: ScopeProviderProps<T>): unknown {
+  const React = reactOf();
+  const parent = scope.parent == null
+    ? null
+    : React.useContext(getScopeReactContext(scope.parent));
+  if (scope.parent != null && parent == null) {
+    throw new Error("Missing parent scope");
+  }
+  const queryClient = React.useContext(getQueryClientReactContext());
+  const providedValue = (value ?? EMPTY_SCOPE_VALUE) as T;
+  const key = scope.getKey?.(providedValue) ?? JSON.stringify(providedValue);
+  const holder = React.useRef<ScopeProviderState<T> | null>(null);
+  const retained = scope.retain != null && parent != null
+    ? parent.retainedScopeEntries.get(scope)?.get(key) as ScopeState<T> | undefined
+    : undefined;
+  if (
+    holder.current == null ||
+    holder.current.parent !== parent ||
+    !Object.is(holder.current.key, key) ||
+    (retained != null && holder.current.state !== retained)
+  ) {
+    const state = retained ?? createScopeState(scope, providedValue, {
+      parent: parent ?? undefined,
+      queryClient,
+      retainKey: key,
+    });
+    holder.current = { key, parent, state };
+  }
+  const activeState = holder.current.state;
+  const effectiveQueryClient = parent?.queryClient ?? queryClient;
+  if (
+    !Object.is(activeState.value, providedValue) ||
+    activeState.queryClient !== effectiveQueryClient
+  ) {
+    activeState.cachedBindings = new Map();
+    activeState.value = providedValue;
+    activeState.queryClient = effectiveQueryClient;
+  }
+  return React.createElement(
+    getScopeReactContext(scope).Provider,
+    { value: activeState },
+    children,
+  );
+}
+
+/** Provider lazy initializer（原 `rL` / 压缩导出 `KX`）。 */
+export function initializeScopeProviderRuntime(): void {}
 
 /** React scope hook（原 `mMe` / 压缩导出 `LX`）。 */
 export function useScope<T>(scope: Scope<T>): ScopeApi<T> {

@@ -182,6 +182,21 @@ declare module "@rchunk/app-shared" {
     brand: string,
     options?: CreateScopeOptions<T>,
   ) => MaitaiScope<T>;
+  export interface QueryClientProviderProps {
+    children?: unknown;
+    queryClient?: unknown;
+  }
+  export interface ScopeProviderProps<T> {
+    children?: unknown;
+    scope: MaitaiScope<T>;
+    value?: T;
+  }
+  /** QueryClientProvider（app-shared/runtime/atom-signal.ts，内部 Xje）。 */
+  export const GX: (props: QueryClientProviderProps) => unknown;
+  /** ScopeProvider（app-shared/runtime/atom-signal.ts，内部 $je）。 */
+  export const UX: <T>(props: ScopeProviderProps<T>) => unknown;
+  /** initializeScopeProviderRuntime（内部 rL）。 */
+  export const KX: () => void;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
     readonly query: {
