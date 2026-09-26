@@ -577,6 +577,27 @@ declare module "@rchunk/queries" {
   export const t: unknown;
 }
 
+declare module "@rchunk/pricing-promotions" {
+  export const f: () => void;
+  export const m: () => void;
+  export const n: string;
+}
+
+declare module "@rchunk/plan-names" {
+  export const n: (input: unknown) => string | null;
+  export const r: () => void;
+}
+
+declare module "@rchunk/pricing" {
+  export const n: (input: unknown) => any;
+}
+
+declare module "@rchunk/offer-notice" {
+  export const i: () => void;
+  export const n: unknown;
+  export const r: unknown;
+}
+
 declare module "@rchunk/stripe-payment-confirmation" {
   export const a: (error: unknown) => string;
   export const i: string;
@@ -614,6 +635,11 @@ declare module "@rchunk/subscription-onboarding-content" {
 
 declare module "@rchunk/subscription-onboarding" {
   export const SubscriptionOnboarding: unknown;
+}
+
+declare module "@rchunk/subscription-update-dialog" {
+  export const n: () => void;
+  export const t: unknown;
 }
 
 declare module "@rchunk/computer-history-suggestion-prompt" {
