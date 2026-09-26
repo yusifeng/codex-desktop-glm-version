@@ -1225,6 +1225,16 @@ declare module "@rchunk/appgen-settings-page-entry" {
   export const AppgenSettingsPage: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-access-entry" {
+  export const canManageAppgenProject: (...args: any[]) => boolean;
+  export const getAppgenAccessModeOptions: (...args: any[]) => any[];
+  export const getAppgenAccessState: (...args: any[]) => any;
+  export const getAppgenAccessUpdate: (...args: any[]) => any;
+  export const getAppgenAccessUpdateWithoutGroup: (...args: any[]) => any;
+  export const getAppgenAccessUpdateWithoutUser: (...args: any[]) => any;
+  export const isAppgenAccessOwnerOnly: (...args: any[]) => boolean;
+}
+
 declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
