@@ -642,6 +642,33 @@ declare module "@rchunk/subscription-update-dialog" {
   export const t: unknown;
 }
 
+declare module "@rchunk/codex-home-announcements-current" {
+  export const i: () => void;
+  export const n: unknown;
+  export const r: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/home-announcement-state" {
+  export const r: unknown;
+  export const t: () => void;
+  export const u: () => any;
+}
+
+declare module "@rchunk/home-announcement-slot" {
+  export const n: () => void;
+}
+
+declare module "@rchunk/announcement-modal-source-bridge" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/banner" {
+  export const n: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
