@@ -135,6 +135,18 @@ declare module "@rchunk/new-chat-page-suggestions-eligibility" {
   export const _any: any;
 }
 
+declare module "@rchunk/option-carousel" {
+  export const _any: any;
+}
+
+declare module "@rchunk/recent-uploads" {
+  export const _any: any;
+}
+
+declare module "@rchunk/chatgpt-image-home" {
+  export const _any: any;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
