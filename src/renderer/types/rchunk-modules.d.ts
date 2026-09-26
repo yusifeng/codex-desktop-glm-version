@@ -4924,7 +4924,7 @@ declare module "@rchunk/appgen-browser-site-core" {
 }
 
 declare module "@rchunk/appgen-browser-site-entry" {
-  export const getAppgenBrowserSiteForUrl: (...args: any[]) => any;
+  export const getAppgenBrowserSiteForUrl: typeof import("@rchunk/appgen-browser-site-core").t;
 }
 
 declare module "@rchunk/appgen-settings-page-entry" {

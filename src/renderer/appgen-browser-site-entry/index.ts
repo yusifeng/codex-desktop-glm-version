@@ -3,10 +3,11 @@
 
 import * as browserSiteChunk from "@rchunk/appgen-browser-site-core";
 
-const browserSite = browserSiteChunk as Record<string, any>;
+const {
+  n: initializeAppgenBrowserSite,
+  t: getAppgenBrowserSiteForUrl,
+} = browserSiteChunk;
 
-browserSite.n();
-
-const getAppgenBrowserSiteForUrl = browserSite.t;
+initializeAppgenBrowserSite();
 
 export { getAppgenBrowserSiteForUrl };
