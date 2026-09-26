@@ -174,7 +174,8 @@ declare module "@rchunk/new-chat-suggestion-source-debug-state" {
 }
 
 declare module "@rchunk/home-suggestion-surface" {
-  export const _any: any;
+  export const n: () => void;
+  export const t: unknown;
 }
 
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
