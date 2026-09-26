@@ -3330,14 +3330,23 @@ declare module "@rchunk/subscription-update-dialog" {
 
 declare module "@rchunk/codex-home-announcements-current" {
   export const i: () => void;
-  export const n: unknown;
+  export const n: (props: {
+    entryPoint: string;
+    hasSeparateCodexAnnouncements?: boolean;
+    homeComposerMode: "chat" | "work" | string;
+    isLocalModeRemote?: boolean;
+    selectedCustomGptId?: string | null;
+  }) => unknown;
   export const r: () => void;
-  export const t: unknown;
+  export const t: (props: {
+    homeRunLocationRemoteProject?: unknown;
+    includeGitCheckoutWarning?: boolean;
+  }) => unknown;
 }
 
 declare module "@rchunk/codex-home-announcements-current-entry" {
-  export const CodexHomeAnnouncements: unknown;
-  export const HomeComposerAnnouncements: unknown;
+  export const CodexHomeAnnouncements: import("@rchunk/codex-home-announcements-current")["t"];
+  export const HomeComposerAnnouncements: import("@rchunk/codex-home-announcements-current")["n"];
 }
 
 declare module "@rchunk/codex-home-announcements" {

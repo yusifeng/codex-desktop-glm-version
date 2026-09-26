@@ -24,11 +24,56 @@ const appShared = appSharedChunk as Record<string, any>;
 const appInitial = appInitialChunk as Record<string, any>;
 const appPrimary = appPrimaryChunk as Record<string, any>;
 const beacon = beaconChunk as Record<string, any>;
-const state = announcementStateChunk as Record<string, any>;
 const entryPoints = entryPointsChunk as Record<string, any>;
 const announcementSlot = announcementSlotChunk as Record<string, any>;
 const realtimeVoice = realtimeVoiceChunk as Record<string, any>;
 const worktreeController = worktreeControllerChunk as Record<string, any>;
+
+const {
+  $3: initializeJsxRuntimeLazy,
+  I3: jsxRuntime,
+  K2: initializeIntl,
+  LX: useSignalScope,
+  T: fastModeBannerDismissedEvent,
+  Y2: FormattedMessage,
+  ZI: applicationScope,
+  _j: fastModeBannerActionEvent,
+  e6: reactRuntime,
+  h4: initializeClassNames,
+  ig: DismissIcon,
+  kz: parseServiceTier,
+  m4: classNames,
+  n4: useIntl,
+} = appShared;
+const {
+  r: RateLimitResetHomeAnnouncement,
+  t: initializeRateLimitResetAnnouncementState,
+  u: useMultiAgentAnnouncementEligibility,
+} = announcementStateChunk;
+
+interface ReactRuntime {
+  useState<Value>(initialValue: Value): [
+    Value,
+    (value: Value | ((current: Value) => Value)) => void,
+  ];
+}
+
+interface JsxRuntime {
+  jsx(component: unknown, props: unknown, key?: string): unknown;
+  jsxs(component: unknown, props: unknown, key?: string): unknown;
+}
+
+interface IntlShape {
+  formatMessage(descriptor: {
+    defaultMessage: string;
+    description?: string;
+    id: string;
+  }): string;
+}
+
+type SetState<Value> = (
+  value: Value | ((current: Value) => Value),
+) => void;
 
 interface AnnouncementEntry {
   content: unknown;
@@ -37,20 +82,66 @@ interface AnnouncementEntry {
   pageContextClaim?: unknown;
 }
 
-let React: any;
-let jsx: any;
+interface FastModeCandidate extends AnnouncementEntry {
+  content: unknown;
+  fastModeModel: unknown;
+  intl: IntlShape;
+  isSubmitting: boolean;
+  setHasSeenFastModeHomeBanner(seen: boolean): void;
+  setIsSubmitting: SetState<boolean>;
+  setServiceTier(tier: string, source: "home_banner"): Promise<unknown> | unknown;
+}
+
+interface BeaconCandidate {
+  accountId?: string | null;
+  beacon?: unknown;
+  isEligible: boolean;
+  isLoading: boolean;
+  shouldSuppressVanillaPromos?: boolean;
+}
+
+interface HomeAnnouncementCandidatesProps {
+  beaconProduct?: "chatgpt" | "work_tab";
+  entryPoint: string;
+  isLocalModeRemote: boolean;
+  shouldHideOnboardingPromos: boolean;
+}
+
+interface HomeComposerAnnouncementsProps {
+  entryPoint: string;
+  hasSeparateCodexAnnouncements?: boolean;
+  homeComposerMode: "chat" | "work" | string;
+  isLocalModeRemote?: boolean;
+  selectedCustomGptId?: string | null;
+}
+
+interface CodexHomeAnnouncementEntriesProps {
+  homeRunLocationRemoteProject?: unknown;
+  includeGitCheckoutWarning?: boolean;
+  shouldHideOnboardingPromos: boolean;
+}
+
+interface CodexHomeAnnouncementsProps {
+  homeRunLocationRemoteProject?: unknown;
+  includeGitCheckoutWarning?: boolean;
+}
+
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 let initialized = false;
 function initializeCodexHomeAnnouncements(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.h4?.();
+  initializeJsxRuntimeLazy?.();
+  initializeIntl?.();
+  initializeClassNames?.();
   announcementSlot.n?.();
-  state.t?.();
+  initializeRateLimitResetAnnouncementState();
   entryPoints.t?.();
   beacon.r?.();
-  React = appShared.e6?.();
-  jsx = appShared.I3?.();
+  React = (typeof reactRuntime === "function"
+    ? reactRuntime()
+    : reactRuntime) as ReactRuntime;
+  jsx = (typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime) as JsxRuntime;
   initialized = true;
 }
 
@@ -87,17 +178,16 @@ function FastModeBanner({
   setHasSeenFastModeHomeBanner,
   setIsSubmitting,
   setServiceTier,
-}: Record<string, any>): unknown {
+}: FastModeCandidate): unknown {
   const Shell = appPrimary.Sm ?? "div";
-  const FormattedMessage = appShared.Y2;
-  const scope = appShared.LX?.(appShared.ZI);
+  const scope = useSignalScope?.(applicationScope);
   const enable = () => {
     if (fastModeModel == null) return;
     setIsSubmitting(true);
-    appInitial.xpn?.(scope, appShared._j, {});
+    appInitial.xpn?.(scope, fastModeBannerActionEvent, {});
     Promise.resolve(
       setServiceTier(
-        appShared.kz?.(fastModeModel)?.id ?? "priority",
+        parseServiceTier?.(fastModeModel)?.id ?? "priority",
         "home_banner",
       ),
     ).finally(() => {
@@ -106,7 +196,7 @@ function FastModeBanner({
     });
   };
   const dismiss = () => {
-    appInitial.xpn?.(scope, appShared.T, {});
+    appInitial.xpn?.(scope, fastModeBannerDismissedEvent, {});
     setHasSeenFastModeHomeBanner(true);
   };
   return jsx.jsx(Shell, {
@@ -135,15 +225,15 @@ function FastModeBanner({
         description:
           "Accessible label for dismissing the Fast mode home banner",
       }),
-      icon: appShared.ig,
+      icon: DismissIcon,
       onClick: dismiss,
       disabled: isSubmitting,
     },
   });
 }
 
-function useFastModeCandidate(): Record<string, any> {
-  const intl = appShared.n4?.();
+function useFastModeCandidate(): FastModeCandidate {
+  const intl = useIntl?.() as IntlShape;
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const override = appInitial.D0t?.() ?? {};
   if (override.fastModeCandidate != null)
@@ -166,7 +256,7 @@ function useFastModeCandidate(): Record<string, any> {
   };
 }
 
-function useBeaconCandidate(product?: string): Record<string, any> {
+function useBeaconCandidate(product?: string): BeaconCandidate {
   const candidate = appPrimary.Ch?.(product, {
     shouldSuppressFocusedModal: () => false,
   });
@@ -180,7 +270,13 @@ function useBeaconCandidate(product?: string): Record<string, any> {
     }
   );
 }
-function BeaconContent({ candidate, product }: Record<string, any>): unknown {
+function BeaconContent({
+  candidate,
+  product,
+}: {
+  candidate: BeaconCandidate;
+  product?: string;
+}): unknown {
   const Component = beacon.t;
   if (
     candidate.accountId == null ||
@@ -210,7 +306,7 @@ function HomeAnnouncementCandidates({
   entryPoint,
   isLocalModeRemote,
   shouldHideOnboardingPromos,
-}: Record<string, any>): unknown {
+}: HomeAnnouncementCandidatesProps): unknown {
   const candidateOverride = appInitial.D0t?.()?.homeAnnouncementCandidates;
   if (candidateOverride != null)
     return jsx.jsx(AnnouncementEntries, {
@@ -262,7 +358,7 @@ function HomeAnnouncementCandidates({
       !isLocalModeRemote &&
       beaconProduct !== "chatgpt" &&
       recap.isLoading,
-    content: jsx.jsx(state.r ?? "div", {
+    content: jsx.jsx(RateLimitResetHomeAnnouncement ?? "div", {
       availableCount: recap.availableCount,
       onDismiss: recap.dismiss,
     }),
@@ -296,7 +392,7 @@ function HomeComposerAnnouncements({
   homeComposerMode,
   isLocalModeRemote = false,
   selectedCustomGptId,
-}: Record<string, any>): unknown {
+}: HomeComposerAnnouncementsProps): unknown {
   void hasSeparateCodexAnnouncements;
   const source = appInitial.i_n?.()?.pathname ?? "/";
   const hidePromos = appInitial.sbt?.({
@@ -314,7 +410,7 @@ function HomeComposerAnnouncements({
       ? null
       : jsx.jsx(bannerChunk.t, { gizmoId: selectedCustomGptId });
   return jsx.jsxs("div", {
-    className: appShared.m4?.(
+    className: classNames?.(
       "empty:hidden",
       entryPoint === "codex" &&
         "electron:mx-[var(--home-composer-inline-inset)]",
@@ -335,7 +431,7 @@ function CodexHomeAnnouncementEntries({
   homeRunLocationRemoteProject,
   includeGitCheckoutWarning,
   shouldHideOnboardingPromos,
-}: Record<string, any>): unknown {
+}: CodexHomeAnnouncementEntriesProps): unknown {
   void homeRunLocationRemoteProject;
   void includeGitCheckoutWarning;
   const fastMode = useFastModeCandidate();
@@ -355,7 +451,7 @@ function CodexHomeAnnouncementEntries({
       isLoading: !shouldHideOnboardingPromos && beaconCandidate.isLoading,
       content: beaconContent,
     },
-    state.u?.() ?? { isEligible: false, isLoading: false, content: null },
+    useMultiAgentAnnouncementEligibility(),
     {
       isEligible: !shouldHideOnboardingPromos && fastMode.isEligible,
       isLoading: !shouldHideOnboardingPromos && fastMode.isLoading,
@@ -371,7 +467,7 @@ function CodexHomeAnnouncementEntries({
 function CodexHomeAnnouncements({
   homeRunLocationRemoteProject = null,
   includeGitCheckoutWarning = true,
-}: Record<string, any>): unknown {
+}: CodexHomeAnnouncementsProps): unknown {
   const pathname = appInitial.i_n?.()?.pathname ?? "/";
   const hidePromos = appInitial.sbt?.({
     hideFirstNewThreadOnboardingPromos: false,

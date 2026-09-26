@@ -164,6 +164,14 @@ check(
     fastBanner.props.primaryAction.label.props.defaultMessage === "Enable now",
   "renders the Fast mode action in the shared shell",
 );
+fastBanner.props.primaryAction.onClick();
+await new Promise((resolve) => setImmediate(resolve));
+check(
+  globalThis.__homeAnnouncementsTest.serviceTier.join(":") ===
+    "fast-model:home_banner" &&
+    globalThis.__homeAnnouncementsTest.seen === true,
+  "enables the selected Fast mode tier and persists banner completion",
+);
 
-assert.equal(assertions, 11);
+assert.equal(assertions, 12);
 console.log(`${assertions} current Codex Home announcement assertions passed`);
