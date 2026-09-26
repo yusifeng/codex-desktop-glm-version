@@ -3,10 +3,11 @@
 
 import * as appInitialChunk from "@rchunk/app-initial";
 
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  QB: initializeGeneratedImageContextMenu,
+  ZB: getGeneratedImageContextMenuItems,
+} = appInitialChunk;
 
-appInitial.QB();
-
-const getGeneratedImageContextMenuItems = appInitial.ZB;
+initializeGeneratedImageContextMenu();
 
 export { getGeneratedImageContextMenuItems };
