@@ -707,6 +707,30 @@ declare module "@rchunk/chat-choice-view" {
   export const t: unknown;
 }
 
+declare module "@rchunk/gpt-plugin-migration-dialog" {
+  export const GptPluginMigrationDialog: unknown;
+}
+
+declare module "@rchunk/migrated-plugin-access" {
+  export const i: (...args: any[]) => any;
+  export const n: unknown;
+  export const o: (...args: any[]) => any;
+  export const r: (...args: any[]) => any;
+  export const t: () => void;
+}
+
+declare module "@rchunk/gpt-plugin-migration-notices" {
+  export const i: () => void;
+  export const n: unknown;
+  export const r: unknown;
+  export const t: unknown;
+}
+
+declare module "@rchunk/migrated-plugin-notice" {
+  export const r: () => void;
+  export const t: unknown;
+}
+
 declare module "@rchunk/computer-history-suggestion-prompt" {
   export const n: unknown;
   export const r: () => void;
