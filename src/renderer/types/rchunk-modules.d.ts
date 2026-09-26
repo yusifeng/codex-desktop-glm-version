@@ -1180,6 +1180,24 @@ declare module "@rchunk/appgen-disabled-tooltip" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/appgen-card-layout" {
+  export const a: () => void;
+  export const n: (...args: any[]) => any;
+}
+
+declare module "@rchunk/sites-default-thumbnail" {
+  export const i: () => void;
+  export const n: () => void;
+  export const o: () => void;
+  export const r: (...args: any[]) => any;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/appgen-project-row" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
