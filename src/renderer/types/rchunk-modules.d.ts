@@ -2798,13 +2798,35 @@ declare module "@rchunk/codex-micro-commands" {
 }
 
 declare module "@rchunk/codex-micro-keyboard-surface" {
-  const _default: unknown;
-  export default _default;
+  export const a: any;
+  export const c: any;
+  export const d: any;
+  export const f: any;
+  export const i: any;
+  export const l: any;
+  export const n: any;
+  export const o: any;
+  export const p: any;
+  export const r: any;
+  export const s: any;
+  export const t: any;
+  export const u: any;
 }
 
 declare module "@rchunk/codex-micro-layout" {
-  const _default: unknown;
-  export default _default;
+  export const o: any;
+  export const r: (...args: any[]) => any;
+}
+
+declare module "@rchunk/codex-micro-onboarding-animation" {
+  export const a: (...args: any[]) => (() => void) | undefined;
+  export const c: (...args: any[]) => void;
+  export const i: () => void;
+  export const n: unknown;
+  export const o: () => void;
+  export const r: (elapsedMs: number) => any;
+  export const s: (...args: any[]) => void;
+  export const t: unknown;
 }
 
 declare module "@rchunk/codex-micro-slot-signals" {
