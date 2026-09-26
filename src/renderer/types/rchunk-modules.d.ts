@@ -276,6 +276,19 @@ declare module "@rchunk/computer-history-suggestion-prompt" {
   export const t: unknown;
 }
 
+declare module "@rchunk/computer-history-query" {
+  export const a: () => void;
+  export const r: unknown;
+}
+
+declare module "@rchunk/computer-history-suggestions" {
+  export const a: () => void;
+  export const i: unknown;
+  export const n: unknown;
+  export const r: unknown;
+  export const t: unknown;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
