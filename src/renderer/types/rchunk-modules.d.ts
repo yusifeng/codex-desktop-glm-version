@@ -22,7 +22,7 @@ declare module "@rchunk/app-shared" {
   export const BX: unknown;
   export const C_: unknown;
   export const FQ: unknown;
-  export const FX: unknown;
+  export const FX: any;
   export const HX: unknown; // Maitai query 订阅 store 工厂（oMe）
   export const I3: unknown; // jsx runtime
   export const IQ: unknown;
@@ -44,8 +44,9 @@ declare module "@rchunk/app-shared" {
   export const i$: unknown;
   export const lk: unknown;
   export const m4: unknown; // intl message（J）
+  export const mZ: any;
   export const n$: unknown;
-  export const pZ: unknown; // createDerivedFamily（kI）
+  export const pZ: any; // createDerivedFamily（kI）
   export const qQ: unknown;
   export const qm: unknown;
   export const r$: unknown;
@@ -53,7 +54,6 @@ declare module "@rchunk/app-shared" {
   export const t$: unknown;
   export const x_: unknown; // useIconScaleContext（_3）
   export const y_: unknown;
-  export const FX: unknown;
   export const G4: unknown;
   export const zI: unknown;
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
@@ -69,6 +69,11 @@ declare module "@rchunk/app-initial" {
   export const hnt: () => Promise<void>; // initializeAppHostServices
   export const mnt: () => void; // 懒初始化器（遥测/基础设施装配）
   export const pnt: unknown; // appServices：已解析的服务集合
+  export const BPt: any;
+  export const Iht: any;
+  export const Rht: any;
+  export const kht: any;
+  export const zPt: any;
   // scroll-to-match 依赖：CUt=查找器装配器 xUt=matchId 元素查找器
   export const CUt: unknown;
   export const xUt: unknown;
@@ -149,6 +154,20 @@ declare module "@rchunk/chatgpt-image-home" {
 
 declare module "@rchunk/image-suggestions-core" {
   export const t: unknown;
+}
+
+declare module "@rchunk/browser-skills-state" {
+  export const a: any;
+  export const b: any;
+  export const c: any;
+  export const d: any;
+  export const f: any;
+  export const g: any;
+  export const n: any;
+  export const s: any;
+  export const u: any;
+  export const v: any;
+  export const y: any;
 }
 
 declare module "@rchunk/rpc" {
