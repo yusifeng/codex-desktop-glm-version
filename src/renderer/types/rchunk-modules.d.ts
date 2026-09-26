@@ -424,6 +424,11 @@ declare module "@rchunk/pending-edits-dialog" {
   export const t: (...args: any[]) => any;
 }
 
+declare module "@rchunk/settings-unsaved-changes-dialog" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
