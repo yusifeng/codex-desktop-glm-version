@@ -234,6 +234,15 @@ declare module "@rchunk/primary-composer-at-mention-list" {
   export const PrimaryComposerAtMentionList: unknown;
 }
 
+declare module "@rchunk/values" {
+  export const n: unknown;
+  export const t: unknown;
+}
+
+declare module "@rchunk/followup-suggestions" {
+  export const SketchHomeSuggestions: unknown;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
