@@ -1010,6 +1010,14 @@ declare module "@rchunk/app-shared" {
   export const IQ: unknown;
   export const JQ: unknown;
   export const K2: () => void;
+  /** initializeComposerEditorState（CME Home 入口依赖）。 */
+  export const Eu: () => void;
+  /** CME 图标组件。 */
+  export const Vb: (props: IconAssetProps) => unknown;
+  /** Composer mention/plugin state reader。 */
+  export const wu: {
+    getState(editorState: unknown): { active?: boolean } | undefined;
+  };
   /** Extensions 图标组件。 */
   export const AS: (props: IconAssetProps) => unknown;
   /** browser-profile-import 图标依赖初始化器。 */
@@ -2720,6 +2728,10 @@ declare module "@rchunk/pepper-onboarding-modal" {
 declare module "@rchunk/chatgpt-cme" {
   export const n: unknown;
   export const r: () => void;
+}
+
+declare module "@rchunk/home-entry-point" {
+  export const CmeHomeEntryPoint: () => unknown;
 }
 
 declare module "@rchunk/pca-connector-action" {

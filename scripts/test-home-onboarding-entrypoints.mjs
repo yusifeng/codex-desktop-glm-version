@@ -326,13 +326,19 @@ check(
 );
 
 globalThis.__homeOnboardingTest.cme = {
+  capable: true,
+  hints: [{ system_hint: "cme" }],
   mobile: false,
+  modes: [],
   selected: [],
 };
 const cmeEntry = await loadModule("home-entry-point", {
   "app-initial": `
     export const kht = Symbol("scope");
     export const v2 = Symbol("mode");
+    export const Xet = Symbol("capability");
+    export const NIt = Symbol("selected-modes");
+    export const YBt = Symbol("hints");
     export const HZ = () => ({ hasText: () => false, view: { state: {} }, focus: () => globalThis.__homeOnboardingTest.cme.selected.push("focus") });
     export const UZ = () => true;
     export const uht = () => ({ data: { id: "account-1", plan_type: "team" } });
@@ -353,8 +359,17 @@ const cmeEntry = await loadModule("home-entry-point", {
       get: () => true,
       queryClient: { getQueryData: () => ({ account_ordering: ["account-1"] }) }
     });
-    export const HX = () => true;
-    export const sZ = () => Symbol("eligibility");
+    export const HX = signal => signal.read ? signal.read() : true;
+    export const sZ = (_scope, derive) => ({
+      read: () => derive({
+        get(signal) {
+          if (signal.description === "capability") return { isCapable: globalThis.__homeOnboardingTest.cme.capable };
+          if (signal.description === "selected-modes") return globalThis.__homeOnboardingTest.cme.modes;
+          if (signal.description === "hints") return { data: globalThis.__homeOnboardingTest.cme.hints };
+          return "default";
+        },
+      }),
+    });
   `,
   "chatgpt-cme": `
     export const n = "cme-tool";
@@ -373,6 +388,12 @@ check(
     "cme,focus,analytics",
   "selects CME, focuses the editor, and records the action",
 );
+globalThis.__homeOnboardingTest.cme.hints = [];
+check(
+  cmeEntry.CmeHomeEntryPoint() === null,
+  "hides CME when the account no longer advertises the CME system hint",
+);
+globalThis.__homeOnboardingTest.cme.hints = [{ system_hint: "cme" }];
 globalThis.__homeOnboardingTest.cme.mobile = true;
 check(cmeEntry.CmeHomeEntryPoint() === null, "hides CME on narrow viewports");
 
@@ -1427,5 +1448,5 @@ check(
   "forwards API-key edits and disables empty submission",
 );
 
-assert.equal(assertions, 94);
+assert.equal(assertions, 95);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);

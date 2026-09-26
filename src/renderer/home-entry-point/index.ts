@@ -11,29 +11,68 @@ const appInitial = appInitialChunk as Record<string, any>;
 const appShared = appSharedChunk as Record<string, any>;
 const cme = cmeChunk as Record<string, any>;
 
+const {
+  Eu: initializeComposerEditorState,
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  I3: jsxRuntime,
+  K2: initializeIntl,
+  LX: useSignalScope,
+  Vb: CmeIcon,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+  lw: initializeImportIcons,
+  wu: composerMentionState,
+} = appShared;
+const { sZ: createDerivedSignal } = appSharedChunk;
+
 interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
+  jsx(type: unknown, props: unknown): unknown;
+  jsxs(type: unknown, props: unknown): unknown;
+}
+
+interface ComposerEditor {
+  focus?(): void;
+  hasText(): boolean;
+  view: { state: unknown };
+}
+
+interface AccountCheckResult {
+  account_ordering?: string[];
+}
+
+type EligibilitySignal = import("@rchunk/app-shared").ScopedDerivedSignal<
+  unknown,
+  boolean
+>;
+
+function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
+  return (typeof runtimeOrFactory === "function"
+    ? runtimeOrFactory()
+    : runtimeOrFactory) as Runtime;
 }
 
 let jsx: JsxRuntime | null = null;
-let cmeEligibilitySignal: unknown = Symbol("cme-home-entry-point");
+let cmeEligibilitySignal = Symbol(
+  "cme-home-entry-point",
+) as unknown as EligibilitySignal;
 let initialized = false;
 
-function editorIsEmpty(editor: any): boolean {
+function editorIsEmpty(editor: ComposerEditor): boolean {
   return (
     !editor.hasText() &&
-    appShared.wu?.getState(editor.view.state)?.active !== true
+    composerMentionState?.getState(editor.view.state)?.active !== true
   );
 }
 
 function CmeHomeEntryPoint(): unknown {
   initializeCmeHomeEntryPoint();
-  const scope = appShared.LX(appInitial.kht);
-  const editor = appInitial.HZ?.();
+  const scope = useSignalScope(appInitial.kht);
+  const editor = appInitial.HZ?.() as ComposerEditor | undefined;
   const editorReady = appInitial.UZ?.(editor, editorIsEmpty) ?? true;
   const account = appInitial.uht?.() ?? {};
-  const eligible = appShared.HX?.(cmeEligibilitySignal) === true;
+  const eligible = useSignalValue(cmeEligibilitySignal) === true;
   const location = appInitial.i_n?.() ?? { search: "" };
   if (
     appInitial.N9?.("(width < 48rem)") ||
@@ -48,7 +87,7 @@ function CmeHomeEntryPoint(): unknown {
     const accountCheck = scope.queryClient?.getQueryData?.([
       "accounts",
       "check",
-    ]);
+    ]) as AccountCheckResult | undefined;
     if (
       scope.get(cmeEligibilitySignal) &&
       accountCheck?.account_ordering?.[0] === account.data?.id
@@ -59,19 +98,17 @@ function CmeHomeEntryPoint(): unknown {
     }
   };
   const renderer = jsx as JsxRuntime;
-  const Button = appShared.Yh ?? "button";
-  const Message = appShared.Y2;
-  const Icon = appShared.Vb;
+  const ButtonComponent = Button ?? "button";
   return renderer.jsx("div", {
     className: "mt-11 flex justify-center max-md:hidden",
-    children: renderer.jsxs(Button, {
+    children: renderer.jsxs(ButtonComponent, {
       color: "outlineGhost",
       radius: "full",
       size: "large",
       onClick,
       children: [
-        Icon == null ? null : renderer.jsx(Icon, {}),
-        renderer.jsx(Message, {
+        CmeIcon == null ? null : renderer.jsx(CmeIcon, {}),
+        renderer.jsx(FormattedMessage, {
           id: "chatgpt.composer.connector_pill.cme.button.label",
           defaultMessage: "Try Continuing Medical Education (CME)",
           description:
@@ -86,8 +123,8 @@ function initializeCmeHomeEntryPoint(): void {
   if (initialized) return;
   initialized = true;
   cme.r?.();
-  appShared.FX?.();
-  appShared.K2?.();
+  initializeSignalRuntime?.();
+  initializeIntl?.();
   appInitial.Qgn?.();
   appInitial.ket?.();
   appInitial.RIt?.();
@@ -95,25 +132,27 @@ function initializeCmeHomeEntryPoint(): void {
   appInitial.y2?.();
   appInitial.vln?.();
   appInitial.rht?.();
-  appShared.Eu?.();
+  initializeComposerEditorState?.();
   appInitial.VZ?.();
-  appShared.Zh?.();
-  appShared.lw?.();
+  initializeButton?.();
+  initializeImportIcons?.();
   appInitial.M9?.();
   appInitial.ypn?.();
   appInitial.Rht?.();
   appInitial.Rln?.();
-  jsx ??= typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  jsx ??= resolveRuntime<JsxRuntime>(jsxRuntime);
   cmeEligibilitySignal =
-    appShared.sZ?.(
+    createDerivedSignal(
       appInitial.kht,
-      ({ get }: { get(signal: unknown, key?: unknown): any }) =>
-        get(appInitial.Xet, { name: "chatgpt.cme" }).isCapable &&
-        get(appInitial.NIt, get(appInitial.v2)).length === 0 &&
-        get(appInitial.YBt).data?.some(
+      ({ get }) =>
+        get<{ isCapable?: boolean }>(appInitial.Xet, {
+          name: "chatgpt.cme",
+        }).isCapable === true &&
+        get<unknown[]>(appInitial.NIt, get(appInitial.v2)).length === 0 &&
+        get<{ data?: Array<{ system_hint?: string }> }>(appInitial.YBt).data?.some(
           (entry: { system_hint?: string }) => entry.system_hint === "cme",
         ) === true,
-    ) ?? cmeEligibilitySignal;
+    );
 }
 
 initializeCmeHomeEntryPoint();
