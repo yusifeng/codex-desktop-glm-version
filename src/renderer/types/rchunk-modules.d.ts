@@ -449,6 +449,10 @@ declare module "@rchunk/trusted-contact-no-thanks-dialog" {
   export const TrustedContactNoThanksDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/external-link-confirmation-dialog" {
+  export const ExternalLinkConfirmationDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
