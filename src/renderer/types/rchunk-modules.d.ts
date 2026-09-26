@@ -216,6 +216,15 @@ declare module "@rchunk/browser-skills-state" {
   export const y: any;
 }
 
+declare module "@rchunk/skill-icon-source" {
+  export const n: () => void;
+  export const r: unknown;
+}
+
+declare module "@rchunk/browser-skills-composer" {
+  export const BrowserSkillsComposer: unknown;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
