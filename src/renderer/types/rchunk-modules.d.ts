@@ -3209,7 +3209,10 @@ declare module "@rchunk/home-artifact-template-card" {
 
 declare module "@rchunk/queries" {
   export const i: () => void;
-  export const n: (accountId: string) => unknown;
+  /** subscriptionAccountQueryOptions（账户与订阅权益查询）。 */
+  export const n: <QueryData = unknown>(
+    accountId: string,
+  ) => import("@rchunk/app-shared").UseQueryOptions<QueryData>;
   export const r: unknown;
   export const t: unknown;
 }

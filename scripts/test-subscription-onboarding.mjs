@@ -18,6 +18,7 @@ globalThis.__subscriptionHostTest = {
     hash: "#plus_onboarding",
     state: null,
   },
+  queryOptions: null,
   query: {
     data: {
       account: {
@@ -68,7 +69,10 @@ const result = await esbuild.build({
                 "app-shared": `
                   export const I3 = () => globalThis.__subscriptionHostTest.jsx;
                   export const e6 = () => globalThis.__subscriptionHostTest.react;
-                  export const _L = () => globalThis.__subscriptionHostTest.query;
+                  export const _L = options => {
+                    globalThis.__subscriptionHostTest.queryOptions = options;
+                    return globalThis.__subscriptionHostTest.query;
+                  };
                   export const n4 = () => ({ formatMessage: descriptor => descriptor.defaultMessage });
                   export const Ih = "Dialog";
                   export const $3 = () => {}; export const K2 = () => {};
@@ -132,6 +136,13 @@ const props = {
 
 const plusHost = host.SubscriptionOnboarding(props);
 check(typeof plusHost.type === "function", "selects the plan onboarding host");
+check(
+  globalThis.__subscriptionHostTest.queryOptions.queryKey.join(":") ===
+    "account:account-1" &&
+    globalThis.__subscriptionHostTest.queryOptions.enabled === true &&
+    globalThis.__subscriptionHostTest.queryOptions.staleTime === 0,
+  "configures the typed account query for the active account",
+);
 const plusCandidates = plusHost.type(plusHost.props);
 check(
   plusCandidates.length === 1,
@@ -187,5 +198,5 @@ check(
   "routes an eligible student campaign to the student host",
 );
 
-assert.equal(assertions, 8);
+assert.equal(assertions, 9);
 console.log(`${assertions} subscription onboarding host assertions passed`);

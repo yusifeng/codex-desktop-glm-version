@@ -10,8 +10,117 @@ import * as contentChunk from "@rchunk/subscription-onboarding-content";
 void runtimeChunk;
 const appShared = appSharedChunk as Record<string, any>;
 const appInitial = appInitialChunk as Record<string, any>;
-const queries = queriesChunk as Record<string, any>;
 const content = contentChunk as Record<string, any>;
+
+const {
+  $3: initializeRuntimeLazy,
+  I3: jsxRuntime,
+  Ih: Dialog,
+  K2: initializeSharedComponents,
+  e6: reactRuntime,
+  n4: useIntl,
+} = appShared;
+const { _L: useQuery } = appSharedChunk;
+const {
+  i: initializeSubscriptionQueries,
+  n: subscriptionAccountQueryOptions,
+} = queriesChunk;
+
+interface LocationState {
+  hash: string;
+  pathname: string;
+  search: string;
+  state: unknown;
+}
+
+interface SubscriptionDiscount extends Record<string, unknown> {
+  promo_campaign_id?: string;
+}
+
+interface SubscriptionAccount extends Record<string, unknown> {
+  account_id: string;
+  plan_type?: string;
+  structure?: string;
+}
+
+interface SubscriptionAccountResult extends Record<string, unknown> {
+  account?: SubscriptionAccount | null;
+  can_access_with_session?: boolean;
+  entitlement?: {
+    discount?: SubscriptionDiscount | null;
+    has_active_subscription?: boolean;
+  } | null;
+}
+
+interface StudentAccount {
+  accountUserId: string;
+  discount?: SubscriptionDiscount | null;
+  id: string;
+  isPaidPlus: boolean;
+}
+
+interface OnboardingAction {
+  action?: string;
+  pageId: string;
+  [key: string]: unknown;
+}
+
+interface HomeCandidate {
+  content: unknown;
+  id: "subscription-onboarding";
+  isEligible: boolean;
+  isLoading: boolean;
+  trackVisibility: boolean;
+}
+
+type RenderCandidates = (candidates: HomeCandidate[]) => unknown;
+
+interface SubscriptionOnboardingProps {
+  canCreateImage?: boolean;
+  canPresent: boolean;
+  canStartConversation: boolean;
+  homeCandidates?: (renderCandidates: RenderCandidates) => unknown;
+  onAction?(event: OnboardingAction): void;
+  onClosed?(): void;
+  onCreateImage?(): void;
+  onInteraction?(event: OnboardingAction): void;
+  onOpenFileDialog?(): void;
+  onPresented?(): void;
+  onSelectIntelligence?(level: "pro" | "standard"): void;
+  onStartConversation?(
+    initialStage: string,
+    onComplete: () => void,
+  ): Promise<unknown> | unknown;
+  onStartSite?(): void;
+  onStartVoice?(): void;
+  renderCandidates: RenderCandidates;
+}
+
+interface SubscriptionOnboardingFrameProps {
+  children: unknown;
+  closeButtonClassName?: string;
+  descriptionId?: string;
+  onCloseComplete?(): void;
+  onOpenChange(open: boolean): void;
+  open: boolean;
+  titleId?: string;
+}
+
+interface ConversationalOnboardingProps {
+  canStart: boolean;
+  initialStage: string;
+  onStart: NonNullable<SubscriptionOnboardingProps["onStartConversation"]>;
+}
+
+interface StudentOnboardingHostProps extends SubscriptionOnboardingProps {
+  account: StudentAccount;
+  automatic: boolean;
+}
+
+interface PlanOnboardingProps extends SubscriptionOnboardingProps {
+  hasPaidSubscription: boolean;
+  plan: "plus" | "pro";
+}
 
 const MAC_ARM_URL =
   "https://persistent.oaistatic.com/codex-app-prod/ChatGPT.dmg";
@@ -25,12 +134,12 @@ let jsx: any;
 let initialized = false;
 function initializeSubscriptionOnboarding(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  queries.i?.();
+  initializeRuntimeLazy?.();
+  initializeSharedComponents?.();
+  initializeSubscriptionQueries?.();
   content.t?.();
-  React = appShared.e6?.();
-  jsx = appShared.I3?.();
+  React = typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
+  jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
   initialized = true;
 }
 
@@ -89,10 +198,10 @@ function SubscriptionOnboardingFrame({
   onOpenChange,
   open,
   titleId,
-}: Record<string, any>): unknown {
-  const Dialog = appShared.Ih ?? "div";
-  const intl = appShared.n4?.();
-  return jsx.jsx(Dialog, {
+}: SubscriptionOnboardingFrameProps): unknown {
+  const DialogComponent = Dialog ?? "div";
+  const intl = useIntl?.();
+  return jsx.jsx(DialogComponent, {
     open,
     onOpenChange,
     onCloseComplete,
@@ -130,22 +239,22 @@ function SubscriptionOnboardingFrame({
 }
 
 function addCandidate(
-  props: Record<string, any>,
-  candidate: Record<string, any>,
+  props: SubscriptionOnboardingProps,
+  candidate: HomeCandidate,
 ): unknown {
-  const append = (existing: unknown[]) =>
+  const append = (existing: HomeCandidate[]) =>
     props.renderCandidates([...existing, candidate]);
   return props.homeCandidates == null
     ? append([])
     : props.homeCandidates(append);
 }
-function renderEmpty(props: Record<string, any>): unknown {
+function renderEmpty(props: SubscriptionOnboardingProps): unknown {
   return props.homeCandidates == null
     ? props.renderCandidates([])
     : props.homeCandidates(props.renderCandidates);
 }
 
-function useLocation(): Record<string, any> {
+function useLocation(): LocationState {
   return (
     appInitial.i_n?.() ?? {
       pathname: window.location?.pathname ?? "/",
@@ -155,14 +264,19 @@ function useLocation(): Record<string, any> {
     }
   );
 }
-function useNavigate(): (destination: any, options?: any) => void {
+function useNavigate(): (
+  destination: string | Pick<LocationState, "hash" | "pathname" | "search">,
+  options?: { replace?: boolean; state?: unknown },
+) => void {
   return appInitial.o_n?.() ?? (() => {});
 }
-function experiment(id: string): any {
+function experiment(id: string): {
+  get<Value>(key: string, fallback: Value): Value;
+} {
   const context = appInitial.lfn?.();
   return (
     appInitial.rfn?.(context, id) ?? {
-      get: (_key: string, fallback: any) => fallback,
+      get: <Value>(_key: string, fallback: Value) => fallback,
     }
   );
 }
@@ -171,7 +285,7 @@ function ConversationalOnboarding({
   canStart,
   initialStage,
   onStart,
-}: Record<string, any>): null {
+}: ConversationalOnboardingProps): null {
   const started = React.useRef(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -190,23 +304,23 @@ function ConversationalOnboarding({
   return null;
 }
 
-function StudentOnboardingHost(props: Record<string, any>): unknown {
+function StudentOnboardingHost(props: StudentOnboardingHostProps): unknown {
   const [open, setOpen] = React.useState(true);
   const pendingAction = React.useRef(null as string | null);
   const location = useLocation();
   const navigate = useNavigate();
   const automatic = props.automatic || content.r(props.account);
-  const showModern = experiment("2272277762").get("enabled", false);
+  const showModern = experiment("2272277762").get<boolean>("enabled", false);
   const common = {
     Frame: SubscriptionOnboardingFrame,
     direction: "ltr",
     isScreenAtLeastSm: true,
     open,
     onOpenChange: setOpen,
-    onAction: (event: Record<string, any>) => {
+    onAction: (event: OnboardingAction) => {
       pendingAction.current = event.pageId;
     },
-    onInteraction: (event: Record<string, any>) => {
+    onInteraction: (event: OnboardingAction) => {
       if (event.action === "step_viewed") {
         content.a(props.account);
         props.onPresented?.();
@@ -247,21 +361,29 @@ function StudentOnboardingHost(props: Record<string, any>): unknown {
       });
 }
 
-function PlanOnboarding(props: Record<string, any>): unknown {
+function PlanOnboarding(props: PlanOnboardingProps): unknown {
   const [open, setOpen] = React.useState(true);
   const pendingAction = React.useRef(null as string | null);
   const navigate = useNavigate();
-  const plan = props.plan as "plus" | "pro";
+  const plan = props.plan;
   const proEnabled =
-    experiment("1895559448").get("onboarding_variant", "off") === "carousel_v1";
+    experiment("1895559448").get<"carousel_v1" | "off">(
+      "onboarding_variant",
+      "off",
+    ) === "carousel_v1";
   const plusConfig = experiment("3081805378");
-  const plusVariant = plusConfig.get("carousel_onboarding_variant", "off");
+  const plusVariant = plusConfig.get<
+    | "carousel_v1"
+    | "conversational_personalized"
+    | "conversational_static"
+    | "off"
+  >("carousel_onboarding_variant", "off");
   const conversational =
     plan === "plus" &&
     props.hasPaidSubscription &&
     (plusVariant === "conversational_static" ||
       plusVariant === "conversational_personalized") &&
-    plusConfig.get("enabled", false);
+    plusConfig.get<boolean>("enabled", false);
   const eligible = plan === "pro" ? proEnabled : plusVariant !== "off";
   const common = {
     Frame: SubscriptionOnboardingFrame,
@@ -269,7 +391,7 @@ function PlanOnboarding(props: Record<string, any>): unknown {
     isScreenAtLeastSm: true,
     open,
     onOpenChange: setOpen,
-    onAction: (event: Record<string, any>) => {
+    onAction: (event: OnboardingAction) => {
       pendingAction.current = event.pageId;
       props.onAction?.(event);
     },
@@ -288,7 +410,7 @@ function PlanOnboarding(props: Record<string, any>): unknown {
   const contentNode = conversational
     ? jsx.jsx(ConversationalOnboarding, {
         canStart: props.canStartConversation,
-        initialStage: plusConfig.get("web_initial_stage", "welcome"),
+        initialStage: plusConfig.get<string>("web_initial_stage", "welcome"),
         onStart: props.onStartConversation,
       })
     : plan === "plus"
@@ -311,16 +433,16 @@ function PlanOnboarding(props: Record<string, any>): unknown {
   });
 }
 
-function SubscriptionOnboarding(props: Record<string, any>): unknown {
+function SubscriptionOnboarding(props: SubscriptionOnboardingProps): unknown {
   initializeSubscriptionOnboarding();
   const auth = appInitial.N6t?.() ?? {};
   const accountId = auth.accountId ?? "";
   const queryOptions = {
-    ...(queries.n?.(accountId) ?? {}),
+    ...subscriptionAccountQueryOptions<SubscriptionAccountResult>(accountId),
     staleTime: 0,
     enabled: auth.accountId != null,
   };
-  const query = appShared._L?.(queryOptions) ?? {};
+  const query = useQuery<SubscriptionAccountResult>(queryOptions);
   const result = query.data;
   const account = result?.account;
   const location = useLocation();
