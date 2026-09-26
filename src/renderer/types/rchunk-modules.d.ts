@@ -654,6 +654,20 @@ declare module "@rchunk/codex-home-announcements-current-entry" {
   export const HomeComposerAnnouncements: unknown;
 }
 
+declare module "@rchunk/codex-home-announcements" {
+  export const a: () => void;
+  export const i: unknown;
+  export const n: unknown;
+  export const o: () => void;
+  export const r: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/workspace-renewal-payment" {
+  export const n: () => any;
+  export const t: unknown;
+}
+
 declare module "@rchunk/home-announcement-state" {
   export const r: unknown;
   export const t: () => void;
