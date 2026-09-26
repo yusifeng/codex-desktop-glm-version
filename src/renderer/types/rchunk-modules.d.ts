@@ -241,6 +241,65 @@ declare module "@rchunk/app-shared" {
   export const PX: () => void;
   /** initializeCodexDelegationParser（内部 yMe）。 */
   export const MX: () => void;
+  export type CodexMicroIdleTimeout =
+    | "off"
+    | "30-seconds"
+    | "1-minute"
+    | "3-minutes"
+    | "10-minutes"
+    | "30-minutes"
+    | "1-hour";
+  export type CodexMicroStatus =
+    | "awaiting-approval"
+    | "awaiting-response"
+    | "error"
+    | "idle"
+    | "off"
+    | "unread"
+    | "working";
+  export interface CodexMicroConfig {
+    analogStick: Record<string, unknown>;
+    encoder: Record<string, unknown>;
+    encoderMode: "composer-navigation" | "reasoning" | "conversation-scroll" | "custom";
+    separateMicrophoneKeys: boolean;
+    slots: Record<string, unknown>;
+    version: 1;
+    voiceButtonMode: "push-to-talk" | "realtime";
+  }
+  export interface AutoReviewConfig {
+    autoReview?: { requiredOnModels?: readonly string[] };
+  }
+  /** Codex Micro idle timeout schema（内部 vL）。 */
+  export const CX: import("zod").ZodType<CodexMicroIdleTimeout>;
+  /** Codex Micro config schema（内部 AL）。 */
+  export const SX: import("zod").ZodType<CodexMicroConfig>;
+  /** Codex Micro task sort schema（内部 TL）。 */
+  export const bX: import("zod").ZodType<"pinned" | "recent" | "priority" | "custom">;
+  /** Codex Micro agent key ids（内部 NMe）。 */
+  export const vX: readonly ["AG00", "AG01", "AG02", "AG03", "AG04", "AG05"];
+  /** Codex Micro voice button mode schema（内部 wL）。 */
+  export const wX: import("zod").ZodType<"push-to-talk" | "realtime">;
+  /** Codex Micro encoder mode schema（内部 CL）。 */
+  export const xX: import("zod").ZodType<
+    "composer-navigation" | "reasoning" | "conversation-scroll" | "custom"
+  >;
+  /** Default Codex Micro config（内部 jL）。 */
+  export const yX: CodexMicroConfig;
+  /** Composer submit modes（内部 NL）。 */
+  export const gX: readonly ["enter", "cmdIfMultiline", "cmdAlways"];
+  /** getCodexMicroIdleTimeoutMs（内部 TMe）。 */
+  export const TX: (timeout: CodexMicroIdleTimeout) => number | null;
+  /** getCodexMicroStatusColor（内部 EMe）。 */
+  export const EX: (status: CodexMicroStatus) => number;
+  /** isAutomatedReviewSource（内部 IL）。 */
+  export const lX: (source: unknown) => boolean;
+  /** isAutoReviewRequiredForModel（内部 FMe）。 */
+  export const uX: (
+    config: AutoReviewConfig | null | undefined,
+    model: string | null | undefined,
+  ) => boolean;
+  /** initializeCodexMicroConfig（内部 ML）。 */
+  export const DX: () => void;
   export interface MaitaiScopeApi<T = unknown> {
     readonly queryClient: unknown;
     readonly query: {
