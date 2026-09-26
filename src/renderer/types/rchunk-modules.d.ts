@@ -273,6 +273,13 @@ declare module "@rchunk/home-suggestion-list" {
   export const t: unknown;
 }
 
+declare module "@rchunk/home-composer-announcement-candidates" { export const HomeComposerAnnouncementCandidates: unknown; }
+declare module "@rchunk/codex-home-announcements" { export const _any: any; }
+declare module "@rchunk/worktree-onboarding-state" { export const _any: any; }
+declare module "@rchunk/announcement-entry-points" { export const _any: any; }
+declare module "@rchunk/realtime-voice-home-announcement" { export const _any: any; }
+declare module "@rchunk/worktree-onboarding-banner-controller" { export const _any: any; }
+
 declare module "@rchunk/thread-scroll-controller-context-value" {
   export const n: () => void;
   export const r: () => unknown;
