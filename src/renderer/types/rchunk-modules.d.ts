@@ -281,6 +281,20 @@ declare module "@rchunk/worktree-onboarding-state" {
   export const t: () => void;
 }
 
+declare module "@rchunk/browser-profile-import-availability" {
+  export const n: unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/browser-profile-import-analytics" {
+  export const a: (...args: any[]) => void;
+  export const t: () => void;
+}
+
+declare module "@rchunk/browser-profile-import-dialog" {
+  export const BrowserProfileImportDialogModal: unknown;
+}
+
 declare module "@rchunk/ambient-suggestion-apps" {
   export const a: unknown;
   export const i: unknown;

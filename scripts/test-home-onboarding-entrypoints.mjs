@@ -671,5 +671,57 @@ check(
   "selects the worktree mode and closes the picker",
 );
 
-assert.equal(assertions, 47);
+globalThis.__homeOnboardingTest.profileImport = {
+  analytics: [],
+  open: false,
+  shown: [],
+};
+const dialogCore = await loadModule("dialog-launcher-core", {
+  "app-initial": `
+    export const Hzt = () => globalThis.__homeOnboardingTest.profileImport.open;
+    export const Uzt = (_scope, component, props) => globalThis.__homeOnboardingTest.profileImport.shown.push({ component, props });
+  `,
+  "app-shared": `
+    export const e6 = { lazy: () => "LazyProfileImportDialog" };
+  `,
+  "browser-profile-import-analytics": `
+    export const a = (_scope, entryPoint, flowId) => globalThis.__homeOnboardingTest.profileImport.analytics.push({ entryPoint, flowId });
+    export const t = () => {};
+  `,
+  "browser-profile-import-availability": `
+    export const n = Symbol("availability");
+    export const t = () => {};
+  `,
+  "browser-profile-import-dialog":
+    "export const BrowserProfileImportDialogModal = 'ProfileImportDialog';",
+});
+const availableScope = { get: () => true };
+check(
+  dialogCore.n(availableScope, null, "settings") === false,
+  "rejects profile import without a service",
+);
+check(
+  dialogCore.n({ get: () => false }, {}, "settings") === false,
+  "honors profile import availability",
+);
+check(
+  dialogCore.n(availableScope, { id: "service" }, "settings", "flow-1") ===
+    true,
+  "opens an available profile import flow",
+);
+check(
+  globalThis.__homeOnboardingTest.profileImport.analytics[0].flowId ===
+    "flow-1" &&
+    globalThis.__homeOnboardingTest.profileImport.shown[0].props.entryPoint ===
+      "settings",
+  "records and forwards the import flow identity",
+);
+globalThis.__homeOnboardingTest.profileImport.open = true;
+dialogCore.n(availableScope, { id: "service" }, "settings", "flow-2");
+check(
+  globalThis.__homeOnboardingTest.profileImport.shown.length === 1,
+  "does not reopen an active import dialog",
+);
+
+assert.equal(assertions, 52);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
