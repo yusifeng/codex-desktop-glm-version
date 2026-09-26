@@ -247,6 +247,10 @@ declare module "@rchunk/sketch-composer-state" {
   export const createSketchComposerState: unknown;
 }
 
+declare module "@rchunk/composer-project-picker-content" {
+  export const ComposerProjectPickerContent: unknown;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
