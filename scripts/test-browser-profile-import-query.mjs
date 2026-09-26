@@ -147,7 +147,13 @@ check(
   "initializes queries once",
 );
 const service = {
-  listImportableBrowserProfiles: async () => ["profile-1"],
+  listImportableBrowserProfiles: async () => [
+    {
+      appName: "Chrome",
+      profilePath: "/profiles/Default",
+      source: "chrome",
+    },
+  ],
   getImportSignals: async () => ({ hasCookies: true }),
 };
 const profiles = query.t(service, true);
@@ -161,7 +167,7 @@ check(
   "sets stable query policy",
 );
 check(
-  (await profiles.queryFn())[0] === "profile-1",
+  (await profiles.queryFn())[0].profilePath === "/profiles/Default",
   "lists profiles through the service",
 );
 

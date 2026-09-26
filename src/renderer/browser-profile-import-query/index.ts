@@ -8,12 +8,57 @@ import * as historyIconChunk from "@rchunk/browser-profile-import-history-icon";
 import * as chromeIconChunk from "@rchunk/google-chrome";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
 const cookiesIcon = cookiesIconChunk as Record<string, any>;
 const historyIcon = historyIconChunk as Record<string, any>;
 const chromeIcon = chromeIconChunk as Record<string, any>;
 
-let jsx: Record<string, any>;
+const {
+  $3: initializeJsxRuntimeLazy,
+  AS: ExtensionsIcon,
+  G2: defineMessages,
+  I3: jsxRuntime,
+  K2: initializeIntl,
+  Q3: logger,
+  Z3: initializeQueryRuntime,
+  lw: initializeImportIcons,
+  pL: defineQueryOptions,
+} = appSharedChunk;
+
+type BrowserProfileSource = "atlas" | "chrome";
+type BrowserProfileImportKind =
+  | "cookies"
+  | "extensions"
+  | "history"
+  | "passwords";
+
+interface ImportableBrowserProfile extends Record<string, unknown> {
+  appName: string;
+  hasExtensions?: boolean;
+  profileDirectoryName?: string;
+  profileName?: string;
+  profilePath: string;
+  source: BrowserProfileSource;
+}
+
+interface BrowserProfileImportSignals extends Record<string, unknown> {}
+
+interface BrowserProfileImportService {
+  getImportSignals(): Promise<BrowserProfileImportSignals>;
+  listImportableBrowserProfiles(): Promise<ImportableBrowserProfile[]>;
+}
+
+interface JsxRuntime {
+  jsx(component: unknown, props: unknown): unknown;
+  jsxs(component: unknown, props: unknown): unknown;
+}
+
+function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
+  return (typeof runtimeOrFactory === "function"
+    ? runtimeOrFactory()
+    : runtimeOrFactory) as Runtime;
+}
+
+let jsx: JsxRuntime;
 let PasswordsIcon: (props: Record<string, unknown>) => unknown;
 let messages: Record<string, unknown>;
 let atlasIconUrl: string;
@@ -26,7 +71,7 @@ let queriesInitialized = false;
 
 function initializePasswordsIcon(): void {
   if (PasswordsIcon != null) return;
-  jsx = appShared.I3();
+  jsx = resolveRuntime<JsxRuntime>(jsxRuntime);
   PasswordsIcon = (props) =>
     jsx.jsxs("svg", {
       width: 20,
@@ -60,7 +105,7 @@ function ImportDataIcon({
   kind,
 }: {
   className?: string;
-  kind: "cookies" | "history" | "passwords" | "extensions";
+  kind: BrowserProfileImportKind;
 }): unknown {
   switch (kind) {
     case "cookies":
@@ -72,26 +117,26 @@ function ImportDataIcon({
     case "extensions":
       return jsx.jsx("span", {
         className,
-        children: jsx.jsx(appShared.AS, {}),
+        children: jsx.jsx(ExtensionsIcon, {}),
       });
   }
 }
 
 function initializeImportDataIcons(): void {
   if (dataIconsInitialized) return;
-  appShared.$3?.();
-  appShared.lw?.();
+  initializeJsxRuntimeLazy();
+  initializeImportIcons();
   cookiesIcon.n?.();
   historyIcon.n?.();
   initializePasswordsIcon();
-  jsx = appShared.I3();
+  jsx = resolveRuntime<JsxRuntime>(jsxRuntime);
   dataIconsInitialized = true;
 }
 
 function initializeBrowserProfileImportMessages(): void {
   if (messagesInitialized) return;
-  appShared.K2?.();
-  messages = appShared.G2({
+  initializeIntl();
+  messages = defineMessages({
     cookies: {
       id: "settings.browserUse.profileImport.cookies",
       defaultMessage: "Cookies",
@@ -127,7 +172,7 @@ function SourceIcon({
   source,
 }: {
   className?: string;
-  source: "atlas" | "chrome";
+  source: BrowserProfileSource;
 }): unknown {
   switch (source) {
     case "atlas":
@@ -145,7 +190,7 @@ function SourceIcon({
 function ProfileSourcesIcon({
   sources,
 }: {
-  sources: Array<"atlas" | "chrome">;
+  sources: BrowserProfileSource[];
 }): unknown {
   if (sources.length === 1) {
     return jsx.jsx(SourceIcon, {
@@ -172,19 +217,24 @@ function ProfileSourcesIcon({
 
 function initializeSourceIcons(): void {
   if (sourceIconsInitialized) return;
-  appShared.$3?.();
+  initializeJsxRuntimeLazy();
   atlasIconUrl = new URL("atlas-app-5b67bfaeebb3.png", import.meta.url).href;
   chromeIcon.n?.();
-  jsx = appShared.I3();
+  jsx = resolveRuntime<JsxRuntime>(jsxRuntime);
   sourceIconsInitialized = true;
 }
 
-function uniqueProfileSources(profiles: Array<{ source: "atlas" | "chrome" }>) {
+function uniqueProfileSources(
+  profiles: Array<{ source: BrowserProfileSource }>,
+): BrowserProfileSource[] {
   return Array.from(new Set(profiles.map((profile) => profile.source)));
 }
 
-function importableProfilesQuery(service: any, enabled: boolean): unknown {
-  return appShared.pL({
+function importableProfilesQuery(
+  service: BrowserProfileImportService | null | undefined,
+  enabled: boolean,
+): import("@rchunk/app-shared").UseQueryOptions<ImportableBrowserProfile[]> {
+  return defineQueryOptions({
     enabled,
     queryKey: ["browser-profile-import-profiles"],
     queryFn: async () => {
@@ -192,7 +242,7 @@ function importableProfilesQuery(service: any, enabled: boolean): unknown {
       try {
         return await service.listImportableBrowserProfiles();
       } catch (error) {
-        appShared.Q3.error("Failed to list importable browser profiles", {
+        logger.error("Failed to list importable browser profiles", {
           safe: {},
         });
         throw error;
@@ -203,8 +253,11 @@ function importableProfilesQuery(service: any, enabled: boolean): unknown {
   });
 }
 
-function importSignalsQuery(service: any, enabled: boolean): unknown {
-  return appShared.pL({
+function importSignalsQuery(
+  service: BrowserProfileImportService | null | undefined,
+  enabled: boolean,
+): import("@rchunk/app-shared").UseQueryOptions<BrowserProfileImportSignals> {
+  return defineQueryOptions({
     enabled,
     queryKey: ["browser-profile-import-signals"],
     queryFn: async () => {
@@ -218,7 +271,7 @@ function importSignalsQuery(service: any, enabled: boolean): unknown {
 
 function initializeBrowserProfileImportQueries(): void {
   if (queriesInitialized) return;
-  appShared.Z3?.();
+  initializeQueryRuntime();
   queryStaleTime = 30_000;
   queriesInitialized = true;
 }

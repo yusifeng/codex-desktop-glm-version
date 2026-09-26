@@ -768,7 +768,8 @@ declare module "@rchunk/app-shared" {
     [key: string]: unknown;
   };
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
-  export const $3: unknown; // rolldown lazy 辅助
+  /** initializeJsxRuntimeLazy（rolldown lazy 辅助）。 */
+  export const $3: () => void;
   export const $h: () => void; // i8：资源按钮依赖初始化器
   export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
@@ -1006,6 +1007,18 @@ declare module "@rchunk/app-shared" {
   export const IQ: unknown;
   export const JQ: unknown;
   export const K2: () => void;
+  /** Extensions 图标组件。 */
+  export const AS: (props: IconAssetProps) => unknown;
+  /** browser-profile-import 图标依赖初始化器。 */
+  export const lw: () => void;
+  /** query runtime 初始化器。 */
+  export const Z3: () => void;
+  /** renderer logger。 */
+  export const Q3: {
+    error(message: string, details?: Record<string, unknown>): void;
+    info(message: string, details?: Record<string, unknown>): void;
+    warning(message: string, details?: Record<string, unknown>): void;
+  };
   export interface ScopeRetainOptions {
     autoDispose?: boolean | number;
     max?: number;
@@ -2767,17 +2780,50 @@ declare module "@rchunk/browser-profile-import-dialog" {
 }
 
 declare module "@rchunk/browser-profile-import-query" {
-  export const a: (...args: any[]) => any;
-  export const c: Record<string, any>;
+  export type BrowserProfileSource = "atlas" | "chrome";
+  export type BrowserProfileImportKind =
+    | "cookies"
+    | "extensions"
+    | "history"
+    | "passwords";
+  export interface ImportableBrowserProfile extends Record<string, unknown> {
+    appName: string;
+    hasExtensions?: boolean;
+    profileDirectoryName?: string;
+    profileName?: string;
+    profilePath: string;
+    source: BrowserProfileSource;
+  }
+  export interface BrowserProfileImportSignals extends Record<string, unknown> {}
+  export interface BrowserProfileImportService {
+    getImportSignals(): Promise<BrowserProfileImportSignals>;
+    listImportableBrowserProfiles(): Promise<ImportableBrowserProfile[]>;
+  }
+  export const a: (props: {
+    className?: string;
+    source: BrowserProfileSource;
+  }) => unknown;
+  export const c: Record<string, import("@rchunk/app-shared").MessageDescriptor>;
   export const d: () => void;
   export const i: () => void;
   export const l: () => void;
-  export const n: (...args: any[]) => any;
-  export const o: (...args: any[]) => any;
-  export const r: (...args: any[]) => any;
+  export const n: (
+    service: BrowserProfileImportService | null | undefined,
+    enabled: boolean,
+  ) => import("@rchunk/app-shared").UseQueryOptions<BrowserProfileImportSignals>;
+  export const o: (props: { sources: BrowserProfileSource[] }) => unknown;
+  export const r: (
+    profiles: Array<{ source: BrowserProfileSource }>,
+  ) => BrowserProfileSource[];
   export const s: () => void;
-  export const t: (...args: any[]) => any;
-  export const u: (...args: any[]) => any;
+  export const t: (
+    service: BrowserProfileImportService | null | undefined,
+    enabled: boolean,
+  ) => import("@rchunk/app-shared").UseQueryOptions<ImportableBrowserProfile[]>;
+  export const u: (props: {
+    className?: string;
+    kind: BrowserProfileImportKind;
+  }) => unknown;
 }
 
 declare module "@rchunk/browser-profile-import-cookies-icon" {
