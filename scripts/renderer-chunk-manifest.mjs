@@ -20,6 +20,13 @@ export const CHUNKS = {
   "app-primary": "app-primary-d66705000d76.js",
   "app-main": "app-main-be230e7e4f5a.js",
   "index-entry": "index-e0f46c018fe4.js",
+  "composer-utility-bar": "composer-utility-bar-a9b94a95b731.js",
+  "use-git-submodule-paths": "use-git-submodule-paths-b4885fafb7e7.js",
+  "git-branch-switcher": "git-branch-switcher-96861524e333.js",
+  "dock": "dock-127e7a9fd453.js",
+  "create-dialog": "create-dialog-ae36d087f814.js",
+  "use-create-git-repository": "use-create-git-repository-ee97465882be.js",
+  "worktree-environment-dropdown": "worktree-environment-dropdown-2377eaeb71ed.js",
   "rpc": "rpc-971deaddf2c2.js",
   "thread-virtualizer": "thread-virtualizer-e1964ca5c039.js",
   "thread-scroll-controller-context-value": "thread-scroll-controller-context-value-144c8345e935.js",
@@ -669,6 +676,7 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "composer-utility-bar",
   "rpc",
   "thread-virtualizer",
   "thread-scroll-controller-context-value",

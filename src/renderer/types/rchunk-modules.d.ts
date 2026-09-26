@@ -83,6 +83,30 @@ declare module "@rchunk/app-main" {
   export const _any: any;
 }
 
+declare module "@rchunk/use-git-submodule-paths" {
+  export const _any: any;
+}
+
+declare module "@rchunk/git-branch-switcher" {
+  export const _any: any;
+}
+
+declare module "@rchunk/dock" {
+  export const _any: any;
+}
+
+declare module "@rchunk/create-dialog" {
+  export const _any: any;
+}
+
+declare module "@rchunk/use-create-git-repository" {
+  export const _any: any;
+}
+
+declare module "@rchunk/worktree-environment-dropdown" {
+  export const _any: any;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
