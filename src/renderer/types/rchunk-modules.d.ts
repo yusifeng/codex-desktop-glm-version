@@ -302,6 +302,24 @@ declare module "@rchunk/app-shared" {
   export const Tz: AmbientSuggestionSettings;
   /** initializeAmbientSuggestionSettings（内部 vU）。 */
   export const Ez: () => void;
+  export type CheckboxState = boolean | "indeterminate";
+  export type CheckboxVariant = "default" | "secondary" | "overlay" | "checklist";
+  export interface CheckboxClickEvent {
+    defaultPrevented?: boolean;
+  }
+  export interface CheckboxProps extends Record<string, unknown> {
+    checked?: CheckboxState;
+    className?: string;
+    defaultChecked?: CheckboxState;
+    disabled?: boolean;
+    onCheckedChange?: (checked: boolean) => void;
+    onClick?: (event: CheckboxClickEvent) => void;
+    variant?: CheckboxVariant;
+  }
+  /** Checkbox（app-shared/ui/checkbox.ts，内部 Nmt）。 */
+  export const Ad: (props: CheckboxProps) => unknown;
+  /** initializeCheckbox（内部 Imt）。 */
+  export const jd: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
