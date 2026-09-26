@@ -2670,6 +2670,14 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 
 declare module "@rchunk/app-initial" {
   // 15MB 聚合块：应用启动逻辑 + Shiki 语法 grammars + math/learning blocks。
+  export type SetupCodexStep = "role" | "task" | "complete";
+  export interface SetupCodexStepArguments {
+    step: SetupCodexStep;
+  }
+  /** setupCodexStepArgumentsSchema（内部 id）。 */
+  export const C_n: import("zod").ZodType<SetupCodexStepArguments>;
+  /** initializeOnboardingInteractiveTools（内部 ad）。 */
+  export const b_n: () => void;
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices

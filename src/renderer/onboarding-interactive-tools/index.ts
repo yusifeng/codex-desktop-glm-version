@@ -2,8 +2,12 @@
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
-const appInitial = appInitialChunk as Record<string, any>;
-void runtimeChunk;
-appInitial.b_n?.();
+const {
+  C_n: setupCodexStepArgumentsSchema,
+  b_n: initializeOnboardingInteractiveTools,
+} = appInitialChunk;
 
-export const setupCodexStepArgumentsSchema = appInitial.C_n;
+void runtimeChunk;
+initializeOnboardingInteractiveTools();
+
+export { setupCodexStepArgumentsSchema };
