@@ -110,6 +110,11 @@ declare module "@rchunk/app-shared" {
   export const om: (props: AlertProps) => unknown;
   /** initializeAlert（内部 Rlt）。 */
   export const sm: () => void;
+  /** useIsMounted（app-shared/runtime/mounted-state.ts，内部 Spt）。 */
+  const useIsMounted: () => () => boolean;
+  export { useIsMounted as if };
+  /** initializeMountedState（内部 Tpt）。 */
+  export const rf: () => void;
   export type SwitchSize = "default" | "sm";
   export type SwitchTone = "accent" | "neutral";
   export interface SwitchEvent {
