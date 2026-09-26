@@ -763,6 +763,7 @@ declare module "@rchunk/app-shared" {
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
     use<T>(context: unknown): T;
     useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
+    useMemo<T>(factory: () => T, dependencies: readonly unknown[]): T;
     useRef<T>(initialValue: T): ReactRef<T>;
     useState<T>(initialValue: T): [T, (value: T | ((current: T) => T)) => void];
     [key: string]: unknown;
@@ -2562,7 +2563,11 @@ declare module "@rchunk/app-initial" {
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices
   export const mnt: () => void; // 懒初始化器（遥测/基础设施装配）
-  export const pnt: unknown; // appServices：已解析的服务集合
+  export const pnt: {
+    systemPermissions: {
+      openNotificationSettings(): Promise<void>;
+    };
+  }; // appServices：已解析的服务集合
   export const $en: unknown; // zb：RouteScope atom
   export const bS: Record<string, unknown>; // Bms：侧面板 UI 组件注册表
   export const C: unknown; // XXc：PermissionsModeDropdown 懒加载组件
@@ -2630,8 +2635,47 @@ declare module "@rchunk/app-initial" {
   export const N6t: () => {
     accountId?: string | null;
     isLoading?: boolean;
+    planAtLogin?: unknown;
     userId?: string | null;
   };
+  export interface SidebarChecklistItemState extends Record<string, unknown> {
+    action?: string;
+    completed?: boolean;
+    id: string;
+    isAutoSubmitEnabled?: boolean;
+    label?: string;
+    message?: string | import("@rchunk/app-shared").MessageDescriptor;
+    pluginMentions?: Array<{ pluginId: string }>;
+    prompt?: string;
+    snapshot?: { iconAppId?: string; label?: string; type?: string };
+    threadId?: string;
+  }
+  export interface SidebarChecklistAccountState {
+    collapsed?: boolean;
+    dismissed?: boolean;
+    expired?: boolean;
+    items?: SidebarChecklistItemState[];
+  }
+  export const xwt: import("@rchunk/app-shared").ReadableSignal<unknown | null>;
+  export const bwt: import("@rchunk/app-shared").ReadableSignal<unknown | null>;
+  export const uwt: (
+    accountCollection: unknown,
+    accountId: string,
+    debugOverride: unknown,
+  ) => SidebarChecklistAccountState | null;
+  export const ke: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    accountId: string,
+  ) => void;
+  export const vwt: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    accountId: string,
+    collapsed: boolean,
+  ) => void;
+  export const cwt: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    accountId: string,
+  ) => void;
   export const Qgn: () => void;
   export const rht: () => void;
   export const Vzt: () => void;
@@ -2736,7 +2780,8 @@ declare module "@rchunk/connector-logo-stack" {
 }
 
 declare module "@rchunk/onboarding-mail-provider" {
-  export const a: (...args: any[]) => any;
+  export type MailProvider = "google" | "microsoft" | "other";
+  export const a: (provider: MailProvider, plan: unknown) => MailProvider;
   export const n: (...args: any[]) => any;
   export const o: (...args: any[]) => any;
   export const r: (...args: any[]) => any;
@@ -2761,7 +2806,30 @@ declare module "@rchunk/external-agent-config-import-flow" {
 }
 
 declare module "@rchunk/use-imported-setup-opportunity" {
+  export const ft: (
+    item: { label?: string },
+    intl: import("@rchunk/app-shared").IntlShape,
+  ) => string | undefined;
+  export const pt: <Item extends { id: string }>(input: {
+    items: Item[];
+    locale: string;
+    mailProvider: unknown;
+    plan: unknown;
+    representativeRole: string | null;
+    taskDefinitions: Record<
+      string,
+      import("@rchunk/sidebar-onboarding-checklist-task-config").OnboardingTaskDefinition
+    >;
+  }) => Item[];
   export const _any: any;
+}
+
+declare module "@rchunk/sidebar-onboarding-checklist" {
+  export const SidebarOnboardingChecklist: (props: {
+    accountId?: string | null;
+    className?: string;
+    isVisible?: boolean;
+  } & Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/sidebar-onboarding-checklist-task-config" {

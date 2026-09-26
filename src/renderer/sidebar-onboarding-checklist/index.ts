@@ -11,15 +11,16 @@ import * as mailProviderChunk from "@rchunk/onboarding-mail-provider";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as taskConfigChunk from "@rchunk/sidebar-onboarding-checklist-task-config";
 import * as importedSetupChunk from "@rchunk/use-imported-setup-opportunity";
+import type {
+  IntlShape,
+  JsxRuntime,
+  MessageDescriptor,
+  ReadableSignal,
+} from "@rchunk/app-shared";
+import type { MailProvider } from "@rchunk/onboarding-mail-provider";
 
 void appPrimaryChunk;
 void runtimeChunk;
-
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const mailProvider = mailProviderChunk as Record<string, any>;
-const taskConfig = taskConfigChunk as Record<string, any>;
-const importedSetup = importedSetupChunk as Record<string, any>;
 
 interface ReactRuntime {
   useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
@@ -28,11 +29,39 @@ interface ReactRuntime {
   useState<T>(value: T): [T, (value: T | ((previous: T) => T)) => void];
 }
 
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-}
+const {
+  FX: initializeSignalRuntime,
+  HX: useSignalValue,
+  I3: getJsxRuntime,
+  LX: useSignalScope,
+  QI: initializeSharedRuntime,
+  ZI: applicationScope,
+  e6: reactRuntime,
+  n4: useIntl,
+} = appSharedChunk;
+const {
+  Bfn: initializeSidebarOnboardingState,
+  M6t: initializeAuthentication,
+  N6t: useAuthentication,
+  bwt: onboardingDebugOverrideSignal,
+  cwt: dismissOnboardingChecklist,
+  ke: recordOnboardingChecklistView,
+  pnt: appServices,
+  uwt: selectOnboardingAccountState,
+  vwt: setOnboardingChecklistCollapsed,
+  xwt: onboardingAccountCollectionSignal,
+} = appInitialChunk;
+const { a: resolveMailProvider } = mailProviderChunk;
+const {
+  a: initializeRemoteTaskConfig,
+  c: useRemoteTaskDefinitions,
+  m: initializeCandidateTaskConstants,
+  v: initializePermissionPromptState,
+} = taskConfigChunk;
+const {
+  ft: resolveImportedSetupLabel,
+  pt: projectImportedSetupItems,
+} = importedSetupChunk;
 
 export interface SidebarChecklistItem {
   action?:
@@ -45,7 +74,7 @@ export interface SidebarChecklistItem {
   id: string;
   isAutoSubmitEnabled?: boolean;
   label?: string;
-  message?: string | { defaultMessage?: string; id?: string };
+  message?: string | MessageDescriptor;
   pluginMentions?: Array<{ pluginId: string }>;
   prompt?: string;
   snapshot?: { iconAppId?: string; label?: string; type?: string };
@@ -63,47 +92,43 @@ export interface SidebarOnboardingChecklistProps {
   className?: string;
   isVisible?: boolean;
   items?: SidebarChecklistItem[];
-  mailProvider?: unknown;
+  mailProvider?: MailProvider;
   onItemAction?(item: SidebarChecklistItem): void | Promise<void>;
   onStartPrompt?(item: SidebarChecklistItem): void | Promise<void>;
 }
 
-let React: ReactRuntime | null = null;
-let jsx: JsxRuntime | null = null;
-
-function callInitializer(chunk: Record<string, any>, name: string): unknown {
-  const value = chunk[name];
-  return typeof value === "function" ? value() : value;
-}
+const React: ReactRuntime = reactRuntime;
+let jsx: JsxRuntime;
 
 function initializeSidebarOnboardingChecklist(): void {
-  callInitializer(appShared, "FX");
-  callInitializer(appShared, "QI");
-  callInitializer(appInitial, "Bfn");
-  callInitializer(appInitial, "M6t");
-  taskConfig.a?.();
-  taskConfig.m?.();
-  taskConfig.v?.();
-  React ??= callInitializer(appShared, "e6") as ReactRuntime;
-  jsx ??= callInitializer(appShared, "I3") as JsxRuntime;
+  initializeSignalRuntime();
+  initializeSharedRuntime();
+  initializeSidebarOnboardingState();
+  initializeAuthentication();
+  initializeRemoteTaskConfig();
+  initializeCandidateTaskConstants();
+  initializePermissionPromptState();
+  jsx ??= getJsxRuntime();
 }
 
-function useSignal<T>(signal: unknown, fallback: T): T {
-  if (typeof appShared.HX !== "function" || signal == null) return fallback;
-  return (appShared.HX(signal) as T | null | undefined) ?? fallback;
+function useSignal<T>(signal: ReadableSignal<T>, fallback: T): T {
+  return useSignalValue(signal) ?? fallback;
 }
 
 function cx(...values: Array<string | false | null | undefined>): string {
   return values.filter(Boolean).join(" ");
 }
 
-function messageText(intl: any, message: unknown, fallback: string): string {
+function messageText(intl: IntlShape, message: unknown, fallback: string): string {
   if (typeof message === "string") return message;
   if (message != null && typeof message === "object") {
     const descriptor = message as Record<string, unknown>;
-    if (typeof intl?.formatMessage === "function") {
+    if (typeof descriptor.id === "string") {
       try {
-        return intl.formatMessage(descriptor);
+        const formatted = intl.formatMessage(
+          descriptor as unknown as MessageDescriptor,
+        );
+        if (typeof formatted === "string") return formatted;
       } catch {
         // A malformed remote descriptor should not make the checklist disappear.
       }
@@ -114,8 +139,8 @@ function messageText(intl: any, message: unknown, fallback: string): string {
   return fallback;
 }
 
-function itemLabel(item: SidebarChecklistItem, intl: any): string {
-  const importedLabel = importedSetup.ft?.(item, intl);
+function itemLabel(item: SidebarChecklistItem, intl: IntlShape): string {
+  const importedLabel = resolveImportedSetupLabel(item, intl);
   if (typeof importedLabel === "string") return importedLabel;
   if (item.snapshot?.label != null) return item.snapshot.label;
   if (item.label != null) return item.label;
@@ -124,12 +149,12 @@ function itemLabel(item: SidebarChecklistItem, intl: any): string {
 
 function normalizeItems(
   storedItems: SidebarChecklistItem[],
-  intl: any,
+  intl: IntlShape,
   provider: unknown,
   plan: unknown,
 ): SidebarChecklistItem[] {
-  const definitions = taskConfig.c?.({ disableExposureLog: true }) ?? {};
-  const configured = importedSetup.pt?.({
+  const definitions = useRemoteTaskDefinitions({ disableExposureLog: true });
+  const configured = projectImportedSetupItems({
     items: storedItems,
     locale: intl?.locale ?? "en",
     mailProvider: provider,
@@ -137,9 +162,7 @@ function normalizeItems(
     representativeRole: null,
     taskDefinitions: definitions,
   });
-  const candidates: SidebarChecklistItem[] = Array.isArray(configured)
-    ? configured
-    : storedItems;
+  const candidates: SidebarChecklistItem[] = configured;
   const storedById = new Map(storedItems.map((item) => [item.id, item]));
   return candidates
     .map((item) => ({ ...item, ...storedById.get(item.id) }))
@@ -160,7 +183,7 @@ async function runChecklistAction(
         ?.click();
       return;
     case "enable_notifications":
-      await appInitial.pnt?.systemPermissions?.openNotificationSettings?.();
+      await appServices.systemPermissions.openNotificationSettings();
       return;
     case "import_claude": {
       const { openExternalAgentImport } =
@@ -185,7 +208,7 @@ function ChecklistIcon({
   completed: boolean;
   loading: boolean;
 }): unknown {
-  const renderer = jsx as JsxRuntime;
+  const renderer = jsx;
   return renderer.jsx("span", {
     "aria-hidden": true,
     className: cx(
@@ -205,11 +228,11 @@ function ChecklistRow({
   onRun,
 }: {
   item: SidebarChecklistItem;
-  intl: any;
+  intl: IntlShape;
   onRun(item: SidebarChecklistItem): Promise<void>;
 }): unknown {
-  const react = React as ReactRuntime;
-  const renderer = jsx as JsxRuntime;
+  const react = React;
+  const renderer = jsx;
   const [loading, setLoading] = react.useState(false);
   const completed = item.completed === true;
   const label = itemLabel(item, intl);
@@ -256,35 +279,27 @@ function SidebarOnboardingChecklist(
   props: SidebarOnboardingChecklistProps,
 ): unknown {
   initializeSidebarOnboardingChecklist();
-  const react = React as ReactRuntime;
-  const renderer = jsx as JsxRuntime;
-  const intl =
-    typeof appShared.n4 === "function"
-      ? appShared.n4()
-      : {
-          locale: "en",
-          formatMessage: ({ defaultMessage }: any) => defaultMessage,
-        };
-  const account = appInitial.N6t?.() ?? {};
+  const react = React;
+  const renderer = jsx;
+  const intl = useIntl();
+  const scope = useSignalScope(applicationScope);
+  const account = useAuthentication();
   const accountId =
     props.accountId ?? account.accountId ?? account.userId ?? null;
-  const accountCollection = useSignal(appInitial.xwt, null);
-  const debugOverride = useSignal(appInitial.bwt, null);
+  const accountCollection = useSignal(onboardingAccountCollectionSignal, null);
+  const debugOverride = useSignal(onboardingDebugOverrideSignal, null);
   const runtimeState =
     props.accountState ??
     (accountId == null
       ? null
-      : (appInitial.uwt?.(accountCollection, accountId, debugOverride) ??
-        null));
+      : selectOnboardingAccountState(accountCollection, accountId, debugOverride));
   const [collapsedOverride, setCollapsedOverride] = react.useState<
     boolean | null
   >(null);
   const [hidden, setHidden] = react.useState(false);
-  const headerRef = react.useRef<any>(null);
+  const headerRef = react.useRef<HTMLElement | null>(null);
   const provider =
-    mailProvider.a?.(props.mailProvider ?? "other", account.planAtLogin) ??
-    props.mailProvider ??
-    "other";
+    resolveMailProvider(props.mailProvider ?? "other", account.planAtLogin);
   const storedItems = props.items ?? runtimeState?.items ?? [];
   const items = react.useMemo(
     () => normalizeItems(storedItems, intl, provider, account.planAtLogin),
@@ -297,9 +312,8 @@ function SidebarOnboardingChecklist(
     totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
   react.useEffect(() => {
-    if (accountId != null && typeof appInitial.ke === "function") {
-      appInitial.ke(appShared.LX?.(appShared.ZI), accountId);
-    }
+    if (accountId != null)
+      recordOnboardingChecklistView(scope, accountId);
   }, [accountId]);
 
   if (
@@ -334,12 +348,12 @@ function SidebarOnboardingChecklist(
     const next = !collapsed;
     setCollapsedOverride(next);
     if (accountId != null)
-      appInitial.vwt?.(appShared.LX?.(appShared.ZI), accountId, next);
+      setOnboardingChecklistCollapsed(scope, accountId, next);
   };
   const dismiss = () => {
     setHidden(true);
     if (accountId != null)
-      appInitial.cwt?.(appShared.LX?.(appShared.ZI), accountId);
+      dismissOnboardingChecklist(scope, accountId);
   };
 
   return renderer.jsx("section", {

@@ -29,19 +29,33 @@ const jsxRuntime = {
     return typeof type === "function" ? type(props) : { type, props, key };
   },
 };
-globalThis.__sidebarChecklistTest = { jsxRuntime, reactRuntime };
+globalThis.__sidebarChecklistTest = {
+  collapsed: [],
+  dismissed: [],
+  jsxRuntime,
+  reactRuntime,
+  views: [],
+};
 
 const mockModules = {
   "app-initial": `
     export const N6t = () => ({ accountId: "account-1", planAtLogin: "pro" });
     export const pnt = { systemPermissions: { openNotificationSettings: async () => {} } };
+    export const Bfn = () => {}; export const M6t = () => {};
+    export const xwt = "account-collection"; export const bwt = "debug-override";
+    export const uwt = () => null;
+    export const ke = (scope, accountId) => globalThis.__sidebarChecklistTest.views.push({ scope, accountId });
+    export const vwt = (scope, accountId, collapsed) => globalThis.__sidebarChecklistTest.collapsed.push({ scope, accountId, collapsed });
+    export const cwt = (scope, accountId) => globalThis.__sidebarChecklistTest.dismissed.push({ scope, accountId });
   `,
   "app-primary": "export {};",
   "app-shared": `
     export const e6 = globalThis.__sidebarChecklistTest.reactRuntime;
-    export const I3 = globalThis.__sidebarChecklistTest.jsxRuntime;
+    export const I3 = () => globalThis.__sidebarChecklistTest.jsxRuntime;
     export const n4 = () => ({ locale: "en", formatMessage: descriptor => descriptor.defaultMessage });
     export const ZI = Symbol("scope");
+    export const LX = () => "scope"; export const HX = () => null;
+    export const FX = () => {}; export const QI = () => {};
   `,
   "external-agent-config-import-flow":
     "export const openExternalAgentImport = async () => {};",
@@ -152,6 +166,22 @@ check(
   nodes.some((node) => node.props?.["aria-label"] === "Hide setup"),
   "offers a hide control when expanded",
 );
+check(
+  globalThis.__sidebarChecklistTest.views[0]?.accountId === "account-1",
+  "records the checklist view for the active account",
+);
+nodes
+  .find((node) => node.props?.["aria-label"] === "Collapse checklist")
+  .props.onClick();
+check(
+  globalThis.__sidebarChecklistTest.collapsed[0]?.collapsed === true,
+  "persists the collapsed state through the scoped onboarding store",
+);
+nodes.find((node) => node.props?.["aria-label"] === "Hide setup").props.onClick();
+check(
+  globalThis.__sidebarChecklistTest.dismissed[0]?.accountId === "account-1",
+  "dismisses the checklist through the scoped onboarding store",
+);
 
 const collapsedTree = SidebarOnboardingChecklist({
   accountState: { collapsed: true },
@@ -179,5 +209,5 @@ check(
   "hides invisible and completed checklists",
 );
 
-assert.equal(assertions, 12);
+assert.equal(assertions, 15);
 console.log(`${assertions} sidebar onboarding checklist assertions passed`);
