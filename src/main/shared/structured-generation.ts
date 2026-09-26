@@ -26,93 +26,12 @@
 import { z } from "zod";
 
 import { RpcTarget } from "./rpc-core";
+import { appServerSupportsFeature, compareSemver, parseSemver } from "./app-server-version";
 import { memoizedTaggedLogger } from "@chunk/logger";
 
-// ---------------------------------------------------------------------------
-// semver（原 `Fv`/`zv`/`Rv`/`Iv`）
-// ---------------------------------------------------------------------------
-
-const SEMVER_PATTERN =
-  /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
-
-interface ParsedSemver {
-  major: number;
-  minor: number;
-  patch: number;
-  prerelease: (number | string)[];
-}
-
-/** semver 解析（原 `zv`）。 */
-export function parseSemver(version: string): ParsedSemver | null {
-  const match = SEMVER_PATTERN.exec(version);
-  if (match?.groups == null) return null;
-  return {
-    major: Number(match.groups.major),
-    minor: Number(match.groups.minor),
-    patch: Number(match.groups.patch),
-    prerelease:
-      match.groups.prerelease?.split(".").map((part) => (/^(0|[1-9]\d*)$/.test(part) ? Number(part) : part)) ?? [],
-  };
-}
-
-/** 主版本比较（原 `Rv`）。 */
-function compareSemverMain(a: ParsedSemver, b: ParsedSemver): number {
-  return a.major === b.major
-    ? a.minor === b.minor
-      ? a.patch === b.patch
-        ? 0
-        : a.patch - b.patch
-      : a.minor - b.minor
-    : a.major - b.major;
-}
-
-/** semver 比较（原 `Iv`；任一侧不可解析返回 0）。 */
-export function compareSemver(a: string, b: string): number {
-  const parsedA = parseSemver(a);
-  const parsedB = parseSemver(b);
-  if (parsedA == null || parsedB == null) return 0;
-  const main = compareSemverMain(parsedA, parsedB);
-  if (main !== 0) return main;
-  const preA = parsedA.prerelease;
-  const preB = parsedB.prerelease;
-  if (preA.length === 0 && preB.length === 0) return 0;
-  if (preA.length === 0) return 1;
-  if (preB.length === 0) return -1;
-  const length = Math.max(preA.length, preB.length);
-  for (let index = 0; index < length; index += 1) {
-    const partA = preA[index];
-    const partB = preB[index];
-    if (partA == null) return -1;
-    if (partB == null) return 1;
-    if (partA !== partB) {
-      if (typeof partA === "number" && typeof partB === "number") return partA - partB;
-      if (typeof partA === "number") return -1;
-      if (typeof partB === "number") return 1;
-      return partA.localeCompare(partB as string);
-    }
-  }
-  return 0;
-}
-
-// ---------------------------------------------------------------------------
-// app-server 版本门控（原 `ny` + ty 表的相关门）
-// ---------------------------------------------------------------------------
-
-/** 门控版本表（原 `ty`，全表在 app-server gates 分区；此处收编本模块用到的门）。 */
-const APP_SERVER_FEATURE_GATES: Record<string, string> = {
-  providerModelFallback: "0.143.0-alpha.26",
-};
-
-/** 开发版哨兵（原 `ey`：无版本 = 开发构建，全门开）。 */
-const APP_SERVER_DEV_VERSION = "0.0.0-dev";
-
-/** 版本门控判定（原 `ny`）。 */
-export function appServerSupportsFeature(appServerVersion: string | null, feature: string): boolean {
-  if (appServerVersion === APP_SERVER_DEV_VERSION) return true;
-  const gate = APP_SERVER_FEATURE_GATES[feature];
-  if (gate == null || appServerVersion == null || parseSemver(appServerVersion) == null) return false;
-  return compareSemver(appServerVersion, gate) >= 0;
-}
+// semver 与 app-server 特性门控（原 `Fv`/`zv`/`Rv`/`Iv`/`ny`+`ty`）的
+// 实现在 app-server-version.ts——本模块转发导出以保持既有消费面。
+export { appServerSupportsFeature, compareSemver, parseSemver };
 
 // ---------------------------------------------------------------------------
 // token 用量遥测（原 `wN`/`SN`/`CN`/`xN`）

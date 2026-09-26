@@ -95,7 +95,7 @@ declare module "@chunk/shared" {
   export const Br: any; // 内部符号: oB
   export const Bs: any; // 内部符号: Fw
   export { agentInstructionsForThread as Bt } from "../../shared/agent-instructions";
-  export const Bu: any; // 内部符号: fy
+  export { normalizeAppVersion as Bu } from "../../shared/app-server-version";
   export const C: any; // 内部符号: Pse
   export const Ca: any; // 内部符号: Lne
   export const Cc: any; // 内部符号: SC
@@ -162,7 +162,7 @@ declare module "@chunk/shared" {
   export const Gr: any; // 内部符号: NI
   export const Gs: any; // 内部符号: Vw
   export const Gt: any; // 内部符号: Y2
-  export const Gu: any; // 内部符号: iy
+  export { supportsRecencySortKey as Gu } from "../../shared/app-server-version";
   export const H: any; // 内部符号: q5
   export const Ha: any; // 内部符号: LA
   export const Hc: any; // 内部符号: yS
@@ -175,7 +175,7 @@ declare module "@chunk/shared" {
   export const Hr: any; // 内部符号: LI
   export const Hs: any; // 内部符号: Rw
   export { permissionsForInstructions as Ht } from "../../shared/agent-instructions";
-  export const Hu: any; // 内部符号: my
+  export { normalizeWindowsStoreBuildVersion as Hu } from "../../shared/app-server-version";
   export const I: any; // 内部符号: ioe
   export const Ia: any; // 内部符号: GA
   export const Ic: any; // 内部符号: YS
@@ -200,7 +200,7 @@ declare module "@chunk/shared" {
   export const Jr: any; // 内部符号: hI
   export const Js: any; // 内部符号: Ww
   export const Jt: any; // 内部符号: h2
-  export const Ju: any; // 内部符号: qv
+  export { parseVersionOutput as Ju } from "../../shared/app-server-version";
   export const K: any; // 内部符号: pae
   export const Ka: any; // 内部符号: SA
   export const Kc: any; // 内部符号: cS
@@ -212,7 +212,7 @@ declare module "@chunk/shared" {
   export const Kr: any; // 内部符号: MI
   export const Ks: any; // 内部符号: Hw
   export const Kt: any; // 内部符号: U2
-  export const Ku: any; // 内部符号: ry
+  export { supportsPaginatedHistory as Ku } from "../../shared/app-server-version";
   export const L: any; // 内部符号: toe
   export const La: any; // 内部符号: WA
   export const Lc: any; // 内部符号: GS
@@ -289,7 +289,7 @@ declare module "@chunk/shared" {
   export const Qr: any; // 内部符号: ZF
   export const Qs: any; // 内部符号: Bw
   export const Qt: any; // 内部符号: g2
-  export const Qu: any; // 内部符号: Lv
+  export { isValidSemver as Qu } from "../../shared/app-server-version";
   export const R: any; // 内部符号: noe
   export const Ra: any; // 内部符号: HA
   export const Rc: any; // 内部符号: US
@@ -302,7 +302,7 @@ declare module "@chunk/shared" {
   export const Rr: any; // 内部符号: TB
   export const Rs: any; // 内部符号: oT
   export { agentInstructions as Rt } from "../../shared/agent-instructions";
-  export const Ru: any; // 内部符号: dy
+  export { formatSemanticVersion as Ru } from "../../shared/app-server-version";
   export const S: any; // 内部符号: Fse
   export const Sa: any; // 内部符号: sj
   export const Sc: any; // 内部符号: DC
@@ -341,7 +341,7 @@ declare module "@chunk/shared" {
   export const Ur: any; // 内部符号: RI
   export const Us: any; // 内部符号: Nw
   export const Ut: any; // 内部符号: U4
-  export const Uu: any; // 内部符号: uy
+  export { parseSemanticVersion as Uu } from "../../shared/app-server-version";
   export const V: any; // 内部符号: Jae
   export const Va: any; // 内部符号: RA
   export const Vc: any; // 内部符号: uS
@@ -354,7 +354,7 @@ declare module "@chunk/shared" {
   export const Vr: any; // 内部符号: HB
   export const Vs: any; // 内部符号: Iw
   export { collectScheduledTemplates as Vt } from "../../shared/agent-instructions";
-  export const Vu: any; // 内部符号: hy
+  export { buildMsixPackageIdentity as Vu } from "../../shared/app-server-version";
   export const W: any; // 内部符号: z5
   export const Wa: any; // 内部符号: PA
   export const Wc: any; // 内部符号: _S
@@ -367,7 +367,7 @@ declare module "@chunk/shared" {
   export const Wr: any; // 内部符号: II
   export const Ws: any; // 内部符号: Pw
   export { toWebSocketUrl as Wt } from "../../shared/ws-url";
-  export const Wu: any; // 内部符号: ny
+  export { appServerSupportsFeature as Wu } from "../../shared/app-server-version";
   export const X: any; // 内部符号: n5
   export const Xa: any; // 内部符号: oA
   export const Xc: any; // 内部符号: nS
@@ -391,7 +391,7 @@ declare module "@chunk/shared" {
   export const Yr: any; // 内部符号: _I
   export const Ys: any; // 内部符号: Gw
   export const Yt: any; // 内部符号: W2
-  export const Yu: any; // 内部符号: Qv
+  export { isSupportedAppServerVersion as Yu } from "../../shared/app-server-version";
   export const Z: any; // 内部符号: eae
   export const Za: any; // 内部符号: rA
   export const Zc: any; // 内部符号: tS
@@ -403,7 +403,7 @@ declare module "@chunk/shared" {
   export const Zr: any; // 内部符号: aI
   export const Zs: any; // 内部符号: qw
   export const Zt: any; // 内部符号: m2
-  export const Zu: any; // 内部符号: Iv
+  export { compareSemver as Zu } from "../../shared/app-server-version";
   export const _: any; // 内部符号: v9
   export const _a: any; // 内部符号: Une
   export const _c: any; // 内部符号: KC
@@ -433,7 +433,7 @@ declare module "@chunk/shared" {
   export const b: any; // 内部符号: Lse
   export const ba: any; // 内部符号: oj
   export const bc: any; // 内部符号: NC
-  export const bd: any; // 内部符号: H_
+  export { isCronAutomation as bd } from "../../shared/automation-settings";
   export const bf: any; // 内部符号: Jx（zod literal builder，链式调用放宽为 any）
   export const bi: any; // 内部符号: dN
   export { isWindowsPath as bl } from "../../shared/app-constants";
@@ -472,7 +472,7 @@ declare module "@chunk/shared" {
   export const du: any; // 内部符号: nb
   export const ea: any; // 内部符号: yj
   export const ec: any; // 内部符号: Sw
-  export const ed: any; // 内部符号: Nv
+  export { identity as ed } from "../../shared/app-server-version";
   export { DEFAULT_OPEN_TARGET_PREFERENCE as ef } from "../../shared/automation-settings";
   export const ei: any; // 内部符号: cI
   export const el: any; // 内部符号: bx
@@ -485,7 +485,7 @@ declare module "@chunk/shared" {
   export const f: any; // 内部符号: sce
   export const fa: any; // 内部符号: Gne
   export const fc: any; // 内部符号: $C
-  export const fd: any; // 内部符号: Z_
+  export { parseHeartbeatFromBlocks as fd } from "../../shared/automation-settings";
   export const ff: any; // 内部符号: oh
   export const fi: any; // 内部符号: SP
   export const fl: any; // 内部符号: cx
@@ -578,7 +578,7 @@ declare module "@chunk/shared" {
   export const m: any; // 内部符号: y9
   export const ma: any; // 内部符号: Kne
   export const mc: any; // 内部符号: XC
-  export const md: any; // 内部符号: Wte
+  export { AUTOMATION_MISSING_ERROR as md } from "../../shared/automation-settings";
   export const mf: any; // 内部符号: kp
   export const mi: any; // 内部符号: EP
   export const ml: any; // 内部符号: px
@@ -641,7 +641,7 @@ declare module "@chunk/shared" {
   export const qr: any; // 内部符号: AI
   export const qs: any; // 内部符号: Uw
   export const qt: any; // 内部符号: A2
-  export const qu: any; // 内部符号: Vv
+  export { APP_SERVER_UNSUPPORTED_PREFIX as qu } from "../../shared/app-server-version";
   export const r: any; // 内部符号: Gce
   export const ra: any; // 内部符号: Ej
   export const rc: any; // 内部符号: Ew
@@ -698,7 +698,7 @@ declare module "@chunk/shared" {
   export const v: any; // 内部符号: Qse
   export const va: any; // 内部符号: Hne
   export const vc: any; // 内部符号: GC
-  export const vd: any; // 内部符号: K_
+  export { findModel as vd } from "../../shared/automation-settings";
   export const vf: any; // 内部符号: h9（zod discriminated-union builder，放宽为 any）
   export const vi: any; // 内部符号: HN
   export { isPosixAbsolutePath as vl } from "../../shared/app-constants";
@@ -724,7 +724,7 @@ declare module "@chunk/shared" {
   export const x: any; // 内部符号: Ise
   export const xa: any; // 内部符号: Vne
   export const xc: any; // 内部符号: FC
-  export const xd: any; // 内部符号: U_
+  export { isHeartbeatAutomation as xd } from "../../shared/automation-settings";
   export const xf: any; // 内部符号: Kp
   export const xi: any; // 内部符号: sN
   export { isUncPath as xl } from "../../shared/app-constants";
@@ -737,7 +737,7 @@ declare module "@chunk/shared" {
   export const y: any; // 内部符号: s9
   export const ya: any; // 内部符号: cj
   export const yc: any; // 内部符号: MC
-  export const yd: any; // 内部符号: Y_
+  export { effectiveModelForAutomation as yd } from "../../shared/automation-settings";
   export const yf: any; // 内部符号: ch
   export const yi: any; // 内部符号: CN
   export { isNotNetworkUncPath as yl } from "../../shared/app-constants";
@@ -759,7 +759,7 @@ declare module "@chunk/shared" {
   export const zr: any; // 内部符号: qB
   export const zs: any; // 内部符号: sT
   export { withHeartbeatInstructions as zt } from "../../shared/agent-instructions";
-  export const zu: any; // 内部符号: py
+  export { parseAppVersionAsDate as zu } from "../../shared/app-server-version";
 }
 declare module "@chunk/electron-resources-path" {
   // electron-resources-path-BDLw2lp0.js —— 已重写 chunk（src/main/electron-resources-path/）。
