@@ -383,6 +383,15 @@ declare module "@rchunk/gpt-header-about-dialog" {
   export const GptHeaderAboutDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/python-analysis-details" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
+declare module "@rchunk/python-analysis-dialog" {
+  export const PythonAnalysisDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/shuffle" {
   export const t: <T>(items: T[]) => T[];
 }
