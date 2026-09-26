@@ -361,6 +361,10 @@ declare module "@rchunk/create-project-dialog-entry" {
   export const CreateProjectDialog: (...args: any[]) => any;
 }
 
+declare module "@rchunk/library-file-picker-dialog" {
+  export const LibraryFilePickerDialog: (...args: any[]) => any;
+}
+
 declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
