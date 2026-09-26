@@ -3380,8 +3380,23 @@ declare module "@rchunk/open-appgen-share-dialog" {
 }
 
 declare module "@rchunk/dialog-action" {
+  export interface DialogPrimaryAction {
+    label?: unknown;
+    onClick: () => void;
+    type?: "button" | "reset" | "submit";
+  }
+  export interface DialogActionProps {
+    actions: Record<"invite" | "share", DialogPrimaryAction>;
+    cancelAction?: { disabled?: boolean; onClick: () => void };
+    disabled?: boolean;
+    hasPendingAccessChange: boolean;
+    hasPendingInvitees: boolean;
+    idleActions?: unknown;
+    isSaving?: boolean;
+    size?: import("@rchunk/app-shared").ButtonSize;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: DialogActionProps) => unknown;
 }
 
 declare module "@rchunk/permission-dropdown" {

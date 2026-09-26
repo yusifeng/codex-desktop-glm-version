@@ -3,10 +3,42 @@
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
+import type { ButtonSize } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeReactRuntime,
+  I3: getJsxRuntime,
+  K2: initializeInternationalization,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+} = appSharedChunk;
+const jsx = getJsxRuntime();
+
+type DialogActionKind = "invite" | "share";
+
+interface DialogPrimaryAction {
+  label?: unknown;
+  onClick: () => void;
+  type?: "button" | "reset" | "submit";
+}
+
+interface DialogCancelAction {
+  disabled?: boolean;
+  onClick: () => void;
+}
+
+interface DialogActionProps {
+  actions: Record<DialogActionKind, DialogPrimaryAction>;
+  cancelAction?: DialogCancelAction;
+  disabled?: boolean;
+  hasPendingAccessChange: boolean;
+  hasPendingInvitees: boolean;
+  idleActions?: unknown;
+  isSaving?: boolean;
+  size?: ButtonSize;
+}
 
 function pendingAction({
   hasPendingAccessChange,
@@ -19,17 +51,17 @@ function pendingAction({
   return hasPendingAccessChange && !hasPendingInvitees ? "share" : "invite";
 }
 
-function DefaultActionLabel({ action }: { action: "invite" | "share" }) {
+function DefaultActionLabel({ action }: { action: DialogActionKind }) {
   switch (action) {
     case "invite":
-      return jsx.jsx(appShared.Y2, {
+      return jsx.jsx(FormattedMessage, {
         id: "shareDialog.primaryAction.invite",
         defaultMessage: "Invite",
         description:
           "Button label for inviting selected people or groups in a share dialog",
       });
     case "share":
-      return jsx.jsx(appShared.Y2, {
+      return jsx.jsx(FormattedMessage, {
         id: "shareDialog.primaryAction.save",
         defaultMessage: "Save",
         description: "Button label for saving a share dialog access change",
@@ -46,16 +78,7 @@ function DialogAction({
   idleActions,
   isSaving,
   size = "medium",
-}: {
-  actions: Record<string, any>;
-  cancelAction?: { disabled?: boolean; onClick: () => void };
-  disabled?: boolean;
-  hasPendingAccessChange: boolean;
-  hasPendingInvitees: boolean;
-  idleActions?: any;
-  isSaving?: boolean;
-  size?: string;
-}) {
+}: DialogActionProps) {
   const action = pendingAction({
     hasPendingAccessChange,
     hasPendingInvitees,
@@ -65,12 +88,12 @@ function DialogAction({
   const cancelButton =
     cancelAction == null
       ? null
-      : jsx.jsx(appShared.Yh, {
+      : jsx.jsx(Button, {
           color: "secondary",
           disabled: (cancelAction.disabled ?? disabled) || isSaving,
           size,
           onClick: cancelAction.onClick,
-          children: jsx.jsx(appShared.Y2, {
+          children: jsx.jsx(FormattedMessage, {
             id: "shareDialog.primaryAction.cancel",
             defaultMessage: "Cancel",
             description:
@@ -79,14 +102,14 @@ function DialogAction({
         });
   const actionConfig = actions[action];
   const label = isSaving
-    ? jsx.jsx(appShared.Y2, {
+    ? jsx.jsx(FormattedMessage, {
         id: "shareDialog.primaryAction.saving",
         defaultMessage: "Saving",
         description:
           "Button label while a share dialog saves permissions or invites",
       })
     : (actionConfig.label ?? jsx.jsx(DefaultActionLabel, { action }));
-  const primaryButton = jsx.jsx(appShared.Yh, {
+  const primaryButton = jsx.jsx(Button, {
     "aria-busy": isSaving,
     color: "primary",
     disabled,
@@ -105,9 +128,9 @@ function DialogAction({
 }
 
 function initializeDialogAction(): void {
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.Zh?.();
+  initializeReactRuntime();
+  initializeInternationalization();
+  initializeButton();
 }
 
 export { initializeDialogAction as n, DialogAction as t };
