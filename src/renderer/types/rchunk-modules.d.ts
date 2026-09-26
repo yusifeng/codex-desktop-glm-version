@@ -1107,6 +1107,69 @@ declare module "@rchunk/app-shared" {
   export const lk: unknown;
   export const wL: () => void;
   export const oq: string;
+  export type TooltipSide = "top" | "right" | "bottom" | "left";
+  export type TooltipAlign = "start" | "center" | "end";
+  export type TooltipVariant =
+    | "tooltip" | "rich" | "coachmark" | "unstyled"
+    | "floating-navigation-rail";
+  export type TooltipColor = "default" | "surface" | "inverse";
+  export type TooltipOpenWhen =
+    | "always" | "trigger-overflows" | "visibility-target-hidden";
+  export interface TooltipEvent {
+    currentTarget?: unknown;
+    defaultPrevented?: boolean;
+    key?: string;
+    pointerType?: string;
+    preventDefault?(): void;
+    stopPropagation?(): void;
+  }
+  export interface TooltipProps extends Record<string, unknown> {
+    children?: unknown;
+    tooltipContent?: unknown;
+    shortcut?: string;
+    disabled?: boolean;
+    delayOpen?: boolean;
+    delayDuration?: number;
+    getDelayDuration?: (event: TooltipEvent, duration: number) => number;
+    open?: boolean;
+    defaultOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    triggerPopupOpen?: boolean;
+    disableHoverOpen?: boolean;
+    closeOnTriggerClick?: boolean;
+    closeOnTriggerBlur?: boolean;
+    closeOnPointerLeave?: boolean;
+    closeOnWindowBlur?: boolean;
+    triggerAsChild?: boolean;
+    cloneCustomTrigger?: boolean;
+    triggerRef?: unknown;
+    triggerElement?: unknown;
+    positioningElement?: unknown;
+    forceMount?: boolean;
+    selectable?: boolean;
+    interactive?: boolean;
+    keyboardNavigation?: boolean;
+    scaleAvailableSizeWithZoom?: boolean;
+    disablePadding?: boolean;
+    color?: TooltipColor;
+    variant?: TooltipVariant;
+    side?: TooltipSide;
+    sideOffset?: number;
+    align?: TooltipAlign;
+    alignOffset?: number;
+    flipAlignment?: boolean;
+    tooltipClassName?: string;
+    tooltipBodyClassName?: string;
+    tooltipId?: string;
+    tooltipMaxWidth?: string | number;
+    openWhen?: TooltipOpenWhen;
+    portalContainer?: unknown;
+    className?: string;
+  }
+  /** Tooltip（app-shared/ui/tooltip.ts，内部 M3）。 */
+  export const o_: (props: TooltipProps) => unknown;
+  /** initializeTooltip（内部 U3）。 */
+  export const c_: () => void;
   /** createDerivedFamily（app-shared/runtime/atom-signal.ts，内部 Sje）。 */
   export const rZ: <TScope, Param, TValue>(
     scope: MaitaiScope<TScope>,
