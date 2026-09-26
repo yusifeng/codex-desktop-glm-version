@@ -5,17 +5,18 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appgenAccessChunk from "@rchunk/appgen-access";
 
 void appInitialChunk;
-const appgenAccess = appgenAccessChunk as Record<string, any>;
+const {
+  a: getAppgenAccessUpdateWithoutGroup,
+  c: isAppgenAccessOwnerOnly,
+  i: getAppgenAccessUpdate,
+  n: getAppgenAccessModeOptions,
+  o: getAppgenAccessUpdateWithoutUser,
+  r: getAppgenAccessState,
+  s: initializeAppgenAccess,
+  t: canManageAppgenProject,
+} = appgenAccessChunk;
 
-appgenAccess.s();
-
-const canManageAppgenProject = appgenAccess.t;
-const getAppgenAccessModeOptions = appgenAccess.n;
-const getAppgenAccessState = appgenAccess.r;
-const getAppgenAccessUpdate = appgenAccess.i;
-const getAppgenAccessUpdateWithoutGroup = appgenAccess.a;
-const getAppgenAccessUpdateWithoutUser = appgenAccess.o;
-const isAppgenAccessOwnerOnly = appgenAccess.c;
+initializeAppgenAccess();
 
 export {
   canManageAppgenProject,

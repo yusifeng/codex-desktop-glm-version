@@ -4581,12 +4581,77 @@ declare module "@rchunk/agent-activity-item" {
 }
 
 declare module "@rchunk/appgen-access" {
-  export const a: (...args: any[]) => any;
-  export const c: (...args: any[]) => boolean;
-  export const i: (...args: any[]) => any;
-  export const n: (...args: any[]) => any[];
-  export const o: (...args: any[]) => any;
-  export const r: (...args: any[]) => any;
+  export interface AppgenAccessGroup extends Record<string, unknown> {
+    id: string;
+    source?: "tenant" | "workspace" | string;
+  }
+  export interface AppgenAccessUser extends Record<string, unknown> {
+    account_user_id: string;
+    email?: string | null;
+  }
+  export interface AppgenAccessPolicy extends Record<string, unknown> {
+    access_mode: string;
+    allowed_account_user_ids: string[];
+    allowed_editors?: AppgenAccessUser[];
+    allowed_groups?: AppgenAccessGroup[];
+    allowed_tenant_group_ids: string[];
+    allowed_users?: AppgenAccessUser[];
+    allowed_workspace_group_ids: string[];
+    current_user_role?: string;
+    external_visitor_count?: number;
+  }
+  export interface AppgenEditableAccessPolicy extends AppgenAccessPolicy {
+    allowed_groups: AppgenAccessGroup[];
+    allowed_users: AppgenAccessUser[];
+  }
+  export interface AppgenAccessSummary {
+    accessMode: string;
+    groupCount: number;
+    userCount: number;
+  }
+  export interface AppgenAccessModeOption {
+    disabled: boolean;
+    value: string;
+  }
+  export interface AppgenAccessUpdate extends Record<string, unknown> {
+    allowed_tenant_group_ids?: string[];
+    allowed_user_emails?: string[];
+    allowed_workspace_group_ids?: string[];
+    editor_changes?: {
+      add_editor_account_user_ids?: string[];
+      remove_editor_account_user_ids?: string[];
+    };
+  }
+  export interface BuildAppgenAccessUpdateInput {
+    accessGroups: AppgenAccessGroup[];
+    allowedUserEmails: Array<string | null | undefined>;
+    canManageInvitees: boolean;
+    editorAccountUserIds?: string[];
+    existingGroups: AppgenAccessGroup[];
+    knownAccessGroups: AppgenAccessGroup[];
+    removedEditorAccountUserIds?: string[];
+    selectedGroups: AppgenAccessGroup[];
+  }
+  export const a: (input: {
+    accessGroups: AppgenAccessGroup[];
+    accessPolicy: AppgenEditableAccessPolicy;
+    group: AppgenAccessGroup;
+    knownAccessGroups: AppgenAccessGroup[];
+  }) => AppgenAccessUpdate;
+  export const c: (summary: AppgenAccessSummary) => boolean;
+  export const i: (input: BuildAppgenAccessUpdateInput) => AppgenAccessUpdate;
+  export const n: (input: {
+    availableAccessModes?: string[] | null;
+    currentAccessMode: string;
+    isWorkspaceAccount: boolean;
+  }) => AppgenAccessModeOption[];
+  export const o: (
+    accessPolicy: AppgenEditableAccessPolicy,
+    accountUserId: string,
+  ) => AppgenAccessUpdate;
+  export const r: (
+    accessPolicy: AppgenAccessPolicy | null | undefined,
+  ) => AppgenAccessSummary;
   export const s: () => void;
   /** isOwner（Site access policy 的 current user 是否为 owner）。 */
   export const t: (site: {
@@ -4840,13 +4905,13 @@ declare module "@rchunk/appgen-change-slug-dialog" {
 }
 
 declare module "@rchunk/appgen-access-entry" {
-  export const canManageAppgenProject: (...args: any[]) => boolean;
-  export const getAppgenAccessModeOptions: (...args: any[]) => any[];
-  export const getAppgenAccessState: (...args: any[]) => any;
-  export const getAppgenAccessUpdate: (...args: any[]) => any;
-  export const getAppgenAccessUpdateWithoutGroup: (...args: any[]) => any;
-  export const getAppgenAccessUpdateWithoutUser: (...args: any[]) => any;
-  export const isAppgenAccessOwnerOnly: (...args: any[]) => boolean;
+  export const canManageAppgenProject: typeof import("@rchunk/appgen-access").t;
+  export const getAppgenAccessModeOptions: typeof import("@rchunk/appgen-access").n;
+  export const getAppgenAccessState: typeof import("@rchunk/appgen-access").r;
+  export const getAppgenAccessUpdate: typeof import("@rchunk/appgen-access").i;
+  export const getAppgenAccessUpdateWithoutGroup: typeof import("@rchunk/appgen-access").a;
+  export const getAppgenAccessUpdateWithoutUser: typeof import("@rchunk/appgen-access").o;
+  export const isAppgenAccessOwnerOnly: typeof import("@rchunk/appgen-access").c;
 }
 
 declare module "@rchunk/artifact-feedback-button" {
