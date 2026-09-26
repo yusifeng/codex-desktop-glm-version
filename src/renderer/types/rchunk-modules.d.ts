@@ -354,6 +354,136 @@ declare module "@rchunk/app-shared" {
   export const nL: <Options extends Record<string, unknown>>(options: Options) => Options;
   /** initializeMutationOptions（内部 pJe）。 */
   export const tL: () => void;
+  export interface QueryFunctionContext<
+    QueryKey extends readonly unknown[] = readonly unknown[],
+  > {
+    queryKey: QueryKey;
+    signal: AbortSignal;
+    meta?: Record<string, unknown>;
+  }
+  export interface UseQueryOptions<
+    QueryFnData,
+    QueryError = Error,
+    Data = QueryFnData,
+    QueryKey extends readonly unknown[] = readonly unknown[],
+  > extends Record<string, unknown> {
+    queryKey: QueryKey;
+    queryFn?: (
+      context: QueryFunctionContext<QueryKey>,
+    ) => Promise<QueryFnData> | QueryFnData;
+    enabled?: boolean | ((query: unknown) => boolean);
+    select?: (data: QueryFnData) => Data;
+    throwOnError?: boolean | ((error: QueryError, query: unknown) => boolean);
+  }
+  export interface UseQueryResult<Data, QueryError = Error> {
+    data: Data | undefined;
+    error: QueryError | null;
+    isError: boolean;
+    isFetching: boolean;
+    isLoading: boolean;
+    isPending: boolean;
+    isSuccess: boolean;
+    refetch(): Promise<UseQueryResult<Data, QueryError>>;
+    status: "error" | "pending" | "success";
+  }
+  export interface MutationFunctionContext {
+    client: unknown;
+    meta?: Record<string, unknown>;
+    mutationKey?: readonly unknown[];
+  }
+  export interface MutationCallbacks<Data, MutationError, Variables, Context> {
+    onError?(
+      error: MutationError,
+      variables: Variables,
+      context: Context | undefined,
+      mutation: MutationFunctionContext,
+    ): Promise<unknown> | unknown;
+    onSettled?(
+      data: Data | undefined,
+      error: MutationError | null,
+      variables: Variables,
+      context: Context | undefined,
+      mutation: MutationFunctionContext,
+    ): Promise<unknown> | unknown;
+    onSuccess?(
+      data: Data,
+      variables: Variables,
+      context: Context | undefined,
+      mutation: MutationFunctionContext,
+    ): Promise<unknown> | unknown;
+  }
+  export interface UseMutationOptions<
+    Data,
+    MutationError = Error,
+    Variables = void,
+    Context = unknown,
+  > extends MutationCallbacks<Data, MutationError, Variables, Context>,
+      Record<string, unknown> {
+    mutationFn?: (
+      variables: Variables,
+      context: MutationFunctionContext,
+    ) => Promise<Data> | Data;
+    mutationKey?: readonly unknown[];
+    onMutate?(
+      variables: Variables,
+      context: MutationFunctionContext,
+    ): Promise<Context> | Context;
+  }
+  export type MutationArguments<Variables, Callbacks> = Variables extends void
+    ? [variables?: Variables, callbacks?: Callbacks]
+    : [variables: Variables, callbacks?: Callbacks];
+  export interface UseMutationResult<
+    Data,
+    MutationError = Error,
+    Variables = void,
+    Context = unknown,
+  > {
+    data: Data | undefined;
+    error: MutationError | null;
+    isError: boolean;
+    isIdle: boolean;
+    isPending: boolean;
+    isSuccess: boolean;
+    mutate(
+      ...arguments_: MutationArguments<
+        Variables,
+        MutationCallbacks<Data, MutationError, Variables, Context>
+      >
+    ): void;
+    mutateAsync(
+      ...arguments_: MutationArguments<
+        Variables,
+        MutationCallbacks<Data, MutationError, Variables, Context>
+      >
+    ): Promise<Data>;
+    reset(): void;
+    status: "error" | "idle" | "pending" | "success";
+    variables: Variables | undefined;
+  }
+  /** useQuery（app-shared 内嵌 QueryObserver，内部 Xqe）。 */
+  export const _L: <
+    QueryFnData,
+    QueryError = Error,
+    Data = QueryFnData,
+    QueryKey extends readonly unknown[] = readonly unknown[],
+  >(
+    options: UseQueryOptions<QueryFnData, QueryError, Data, QueryKey>,
+    queryClient?: unknown,
+  ) => UseQueryResult<Data, QueryError>;
+  /** initializeUseQuery（内部 Zqe）。 */
+  export const gL: () => void;
+  /** useMutation（app-shared 内嵌 MutationObserver，内部 uJe）。 */
+  export const iL: <
+    Data,
+    MutationError = Error,
+    Variables = void,
+    Context = unknown,
+  >(
+    options: UseMutationOptions<Data, MutationError, Variables, Context>,
+    queryClient?: unknown,
+  ) => UseMutationResult<Data, MutationError, Variables, Context>;
+  /** initializeUseMutation（内部 dJe）。 */
+  export const rL: () => void;
   export type AppgenInteractionSource =
     | "CODEX_APPGEN_INTERACTION_SOURCE_UNSPECIFIED"
     | "CODEX_APPGEN_INTERACTION_SOURCE_SITES"
