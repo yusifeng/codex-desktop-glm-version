@@ -170,6 +170,11 @@ declare module "@rchunk/browser-skills-state" {
   export const y: any;
 }
 
+declare module "@rchunk/composer-browser-skills-state" {
+  export const r: any;
+  export const t: () => void;
+}
+
 declare module "@rchunk/rpc" {
   export const _any: any;
 }
