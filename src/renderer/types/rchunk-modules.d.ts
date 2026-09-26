@@ -383,6 +383,11 @@ declare module "@rchunk/open-appgen-share-dialog" {
   export const t: () => void;
 }
 
+declare module "@rchunk/dialog-action" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/create-remote-project-modal" {
   export const CreateRemoteProjectModal: (...args: any[]) => any;
 }
