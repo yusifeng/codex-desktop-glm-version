@@ -1175,6 +1175,11 @@ declare module "@rchunk/appgen-query" {
   export const useAppgenScreenshotSrc: any;
 }
 
+declare module "@rchunk/appgen-disabled-tooltip" {
+  export const n: () => void;
+  export const t: (...args: any[]) => any;
+}
+
 declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
