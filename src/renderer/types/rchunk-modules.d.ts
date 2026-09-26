@@ -711,6 +711,18 @@ declare module "@rchunk/gpt-plugin-migration-dialog" {
   export const GptPluginMigrationDialog: unknown;
 }
 
+declare module "@rchunk/gpt-plugin-migration-failure" {
+  export const i: unknown;
+  export const n: () => void;
+  export const r: () => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/gpt-management-url" {
+  export const n: () => void;
+  export const t: (path: string) => string;
+}
+
 declare module "@rchunk/migrated-plugin-access" {
   export const a: () => void;
   export const i: (...args: any[]) => any;
