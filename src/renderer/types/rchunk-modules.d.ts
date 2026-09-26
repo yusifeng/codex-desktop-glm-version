@@ -784,6 +784,10 @@ declare module "@rchunk/app-shared" {
   ) => string | null;
   /** initializeServiceTiers（内部 gU）。 */
   export const Nz: () => void;
+  /** useIsDarkTheme（app-shared/runtime/theme.ts，内部 H6）。 */
+  export const fg: () => boolean | null;
+  /** initializeThemeSubscription（内部 U6）。 */
+  export const dg: () => void;
   /** initializeIconAsset（app-shared/ui/icons/icon-preset.ts，内部 g3）。 */
   export const C_: () => void;
   export const FQ: unknown;
