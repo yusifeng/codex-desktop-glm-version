@@ -728,6 +728,7 @@ declare module "@rchunk/gpt-plugin-migration-notices" {
 }
 
 declare module "@rchunk/migrated-plugin-notice" {
+  export const n: unknown;
   export const r: () => void;
   export const t: unknown;
 }
