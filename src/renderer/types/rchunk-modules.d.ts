@@ -2825,6 +2825,12 @@ declare module "@rchunk/app-initial" {
   export const lnn: () => void;
   export const i3t: (props: { className?: string }) => unknown;
   export const a3t: () => void;
+  export type UniqueValuesFunction = <Value>(
+    values: readonly Value[],
+  ) => Value[];
+  export const z2t: () =>
+    | UniqueValuesFunction
+    | { default: UniqueValuesFunction };
   export const uht: (
     accountId?: string,
     options?: { preview?: boolean },

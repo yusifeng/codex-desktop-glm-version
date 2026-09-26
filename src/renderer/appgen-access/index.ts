@@ -5,10 +5,82 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void runtimeChunk;
-const appInitial = appInitialChunk as Record<string, any>;
-let uniqueValues: (values: any[]) => any[];
+const { z2t: loadUniqueValues } = appInitialChunk;
 
-function isOwner(accessPolicy: any): boolean {
+type UniqueValues = <Value>(values: readonly Value[]) => Value[];
+
+export interface AppgenAccessGroup extends Record<string, unknown> {
+  id: string;
+  source?: "tenant" | "workspace" | string;
+}
+
+export interface AppgenAccessUser extends Record<string, unknown> {
+  account_user_id: string;
+  email?: string | null;
+}
+
+export interface AppgenAccessPolicy extends Record<string, unknown> {
+  access_mode: string;
+  allowed_account_user_ids: string[];
+  allowed_editors?: AppgenAccessUser[];
+  allowed_groups?: AppgenAccessGroup[];
+  allowed_tenant_group_ids: string[];
+  allowed_users?: AppgenAccessUser[];
+  allowed_workspace_group_ids: string[];
+  current_user_role?: string;
+  external_visitor_count?: number;
+}
+
+export interface AppgenEditableAccessPolicy extends AppgenAccessPolicy {
+  allowed_groups: AppgenAccessGroup[];
+  allowed_users: AppgenAccessUser[];
+}
+
+export interface AppgenAccessSummary {
+  accessMode: string;
+  groupCount: number;
+  userCount: number;
+}
+
+export interface AppgenAccessModeOption {
+  disabled: boolean;
+  value: string;
+}
+
+export interface AppgenAccessUpdate extends Record<string, unknown> {
+  allowed_tenant_group_ids?: string[];
+  allowed_user_emails?: string[];
+  allowed_workspace_group_ids?: string[];
+  editor_changes?: {
+    add_editor_account_user_ids?: string[];
+    remove_editor_account_user_ids?: string[];
+  };
+}
+
+export interface BuildAppgenAccessUpdateInput {
+  accessGroups: AppgenAccessGroup[];
+  allowedUserEmails: Array<string | null | undefined>;
+  canManageInvitees: boolean;
+  editorAccountUserIds?: string[];
+  existingGroups: AppgenAccessGroup[];
+  knownAccessGroups: AppgenAccessGroup[];
+  removedEditorAccountUserIds?: string[];
+  selectedGroups: AppgenAccessGroup[];
+}
+
+interface BuildGroupChangesInput {
+  accessGroups: AppgenAccessGroup[];
+  existingGroups: AppgenAccessGroup[];
+  knownAccessGroups: AppgenAccessGroup[];
+  removedGroups: AppgenAccessGroup[];
+  selectedGroups: AppgenAccessGroup[];
+}
+
+let uniqueValues: UniqueValues;
+
+function isOwner(
+  accessPolicy: { current_user_role?: string } | null | undefined,
+): boolean {
   return accessPolicy?.current_user_role === "owner";
 }
 
@@ -20,7 +92,7 @@ function buildAccessModeOptions({
   availableAccessModes?: string[] | null;
   currentAccessMode: string;
   isWorkspaceAccount: boolean;
-}) {
+}): AppgenAccessModeOption[] {
   const modes =
     availableAccessModes ??
     (isWorkspaceAccount ? ["workspace_all", "custom"] : []);
@@ -36,7 +108,7 @@ function compactUnique(values: Array<string | null | undefined>): string[] {
   );
 }
 
-function uniqueGroupIds(groups: any[]): string[] {
+function uniqueGroupIds(groups: AppgenAccessGroup[]): string[] {
   return Array.from(new Set(groups.map((group) => group.id)));
 }
 
@@ -46,13 +118,7 @@ function buildGroupChanges({
   existingGroups,
   removedGroups,
   selectedGroups,
-}: {
-  accessGroups: any[];
-  knownAccessGroups: any[];
-  existingGroups: any[];
-  removedGroups: any[];
-  selectedGroups: any[];
-}) {
+}: BuildGroupChangesInput): AppgenAccessUpdate {
   const groupsById = new Map(
     [...knownAccessGroups, ...accessGroups].map((group) => [group.id, group]),
   );
@@ -99,7 +165,7 @@ function buildAccessUpdate({
   knownAccessGroups,
   removedEditorAccountUserIds = [],
   selectedGroups,
-}: any) {
+}: BuildAppgenAccessUpdateInput): AppgenAccessUpdate {
   return {
     ...(canManageInvitees && {
       allowed_user_emails: compactUnique(allowedUserEmails),
@@ -127,7 +193,9 @@ function buildAccessUpdate({
   };
 }
 
-function summarizeAccessPolicy(accessPolicy: any) {
+function summarizeAccessPolicy(
+  accessPolicy: AppgenAccessPolicy | null | undefined,
+): AppgenAccessSummary {
   if (accessPolicy == null) {
     return { accessMode: "admins_only", groupCount: 0, userCount: 0 };
   }
@@ -147,7 +215,11 @@ function summarizeAccessPolicy(accessPolicy: any) {
   };
 }
 
-function isEmptyRestrictedAccess({ accessMode, groupCount, userCount }: any) {
+function isEmptyRestrictedAccess({
+  accessMode,
+  groupCount,
+  userCount,
+}: AppgenAccessSummary): boolean {
   return (
     (accessMode === "admins_only" || accessMode === "custom") &&
     groupCount === 0 &&
@@ -155,12 +227,15 @@ function isEmptyRestrictedAccess({ accessMode, groupCount, userCount }: any) {
   );
 }
 
-function buildRemoveUserRequest(accessPolicy: any, accountUserId: string) {
+function buildRemoveUserRequest(
+  accessPolicy: AppgenEditableAccessPolicy,
+  accountUserId: string,
+): AppgenAccessUpdate {
   return {
     allowed_user_emails: compactUnique(
       accessPolicy.allowed_users
-        .filter((user: any) => user.account_user_id !== accountUserId)
-        .map((user: any) => user.email),
+        .filter((user) => user.account_user_id !== accountUserId)
+        .map((user) => user.email),
     ),
   };
 }
@@ -170,16 +245,21 @@ function buildRemoveGroupRequest({
   accessPolicy,
   group,
   knownAccessGroups,
-}: any) {
+}: {
+  accessGroups: AppgenAccessGroup[];
+  accessPolicy: AppgenEditableAccessPolicy;
+  group: AppgenAccessGroup;
+  knownAccessGroups: AppgenAccessGroup[];
+}): AppgenAccessUpdate {
   return {
     allowed_user_emails: compactUnique(
-      accessPolicy.allowed_users.map((user: any) => user.email),
+      accessPolicy.allowed_users.map((user) => user.email),
     ),
     ...buildGroupChanges({
       accessGroups,
       knownAccessGroups,
       existingGroups: accessPolicy.allowed_groups.filter(
-        (candidate: any) => candidate.id !== group.id,
+        (candidate) => candidate.id !== group.id,
       ),
       removedGroups: [group],
       selectedGroups: [],
@@ -188,8 +268,8 @@ function buildRemoveGroupRequest({
 }
 
 function initializeAppgenAccess(): void {
-  const loaded = appInitial.z2t();
-  uniqueValues = loaded?.default ?? loaded;
+  const loaded = loadUniqueValues();
+  uniqueValues = typeof loaded === "function" ? loaded : loaded.default;
 }
 
 export {
