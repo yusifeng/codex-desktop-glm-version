@@ -255,6 +255,15 @@ declare module "@rchunk/composer-work-home-plugins-control" {
   export const ComposerWorkHomePluginsControl: unknown;
 }
 
+declare module "@rchunk/composer-provider" {
+  export const a: unknown;
+  export const i: () => void;
+  export const n: () => void;
+  export const o: () => void;
+  export const r: unknown;
+  export const t: unknown;
+}
+
 declare module "@rchunk/composer-browser-skills-state" {
   export const r: any;
   export const t: () => void;
