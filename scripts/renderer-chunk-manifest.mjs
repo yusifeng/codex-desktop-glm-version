@@ -810,6 +810,7 @@ export const REWRITTEN = new Set([
   "home-entry-point",
   "codex-app-home-beacon-connect-modal",
   "pasted-link-connect-modal",
+  "app-connect-modal-by-id",
   "composer-utility-bar",
   "work-onboarding-suggestions",
   "home-ambient-suggestions-content",

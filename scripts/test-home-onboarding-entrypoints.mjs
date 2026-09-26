@@ -468,5 +468,67 @@ check(
   "forwards pasted-link product context into OAuth",
 );
 
-assert.equal(assertions, 32);
+globalThis.__homeOnboardingTest.connectorQuery = {
+  data: [
+    {
+      id: "gmail",
+      name: "Gmail",
+      description: "Mail",
+      iconUrl: "light.png",
+      iconUrlDark: "dark.png",
+      pluginDisplayNames: ["Gmail"],
+    },
+  ],
+  isFetching: false,
+  isPending: false,
+  refetch() {
+    globalThis.__homeOnboardingTest.connect.push(["refetch"]);
+  },
+};
+const connectById = await loadModule("app-connect-modal-by-id", {
+  "app-connect-modal": `
+    export const n = () => {};
+    export const t = "ConnectModal";
+  `,
+  "app-initial":
+    "export const V$ = () => globalThis.__homeOnboardingTest.connectorQuery;",
+  "app-shared": "export const I3 = globalThis.__homeOnboardingTest.jsx;",
+});
+const byIdTree = connectById.n({
+  connectorId: "gmail",
+  hostId: "local",
+  onOpenChange() {},
+});
+check(byIdTree.type === "ConnectModal", "opens the resolved connector modal");
+check(
+  byIdTree.props.app.logoUrl === "light.png" &&
+    byIdTree.props.app.isAccessible === false,
+  "normalizes connector query results",
+);
+globalThis.__homeOnboardingTest.connectorQuery.data = [];
+globalThis.__homeOnboardingTest.connectorQuery.isPending = true;
+const loadingTree = connectById.n({
+  connectorId: "missing",
+  onOpenChange() {},
+});
+const loadingDialog = loadingTree.type(loadingTree.props);
+check(
+  loadingDialog.props["aria-busy"] === true &&
+    loadingDialog.props.role === "dialog",
+  "renders an accessible loading dialog",
+);
+globalThis.__homeOnboardingTest.connectorQuery.isPending = false;
+const errorTree = connectById.n({
+  connectorId: "missing",
+  onOpenChange() {},
+});
+const errorDialog = errorTree.type(errorTree.props);
+const errorActions = errorDialog.props.children.props.children[2].props.children;
+errorActions[1].props.onClick();
+check(
+  globalThis.__homeOnboardingTest.connect.at(-1)[0] === "refetch",
+  "retries failed connector queries",
+);
+
+assert.equal(assertions, 36);
 console.log(`${assertions} home onboarding entrypoint assertions passed`);
