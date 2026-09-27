@@ -11883,6 +11883,12 @@ declare module "@rchunk/remote-connection-editor-draft" {
 }
 
 declare module "@rchunk/codex-micro-analog-action-title" {
+  export const n: () => void;
+  export const t: (
+    action: Record<string, unknown>,
+    skills: readonly Record<string, unknown>[],
+    intl: import("@rchunk/app-shared").IntlShape,
+  ) => string;
   const _default: unknown;
   export default _default;
 }
@@ -11933,6 +11939,43 @@ declare module "@rchunk/codex-micro-keyboard-surface" {
     joystick: { angle: number; distance: number };
   }) => unknown;
   export const u: () => void;
+}
+
+declare module "@rchunk/codex-micro-joystick-feedback" {
+  export type Direction = "up" | "right" | "down" | "left";
+  export interface JoystickEvent { angle: number; distance: number }
+  export interface Feedback {
+    action: Record<string, unknown> | null;
+    direction: Direction;
+    event: JoystickEvent;
+    gameActivationProgress?: number;
+    status: "game-gesture" | "tracking" | "triggered" | "unassigned" | "unavailable";
+    visible: boolean;
+  }
+  export const a: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    update: {
+      activeDirection: Direction | null;
+      enabled: boolean;
+      event: JoystickEvent;
+      executionStatus?: Feedback["status"] | null;
+      mapping: Partial<Record<Direction, Record<string, unknown> | null>>;
+      previousActiveDirection: Direction | null;
+    },
+  ) => Feedback;
+  export const i: (scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>) => void;
+  export const n: (scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>) => void;
+  export const o: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    event: JoystickEvent,
+    progress: number,
+  ) => void;
+  export const r: () => void;
+  export const t: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, Feedback>;
+}
+
+declare module "@rchunk/codex-micro-joystick-hud" {
+  export const CodexMicroJoystickHud: () => unknown;
 }
 
 declare module "@rchunk/play-outline" {

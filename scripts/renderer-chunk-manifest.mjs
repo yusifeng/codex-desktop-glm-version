@@ -1115,6 +1115,8 @@ export const CHUNKS = {
   "persona-runtime": "persona-dcd82a18594e.js",
   "chatgpt-tasks-runtime": "chatgpt_tasks-5e437f7d5423.js",
   "play-outline": "play-outline-dd4b549787d6.js",
+  "codex-micro-joystick-feedback": "codex-micro-joystick-feedback-6271b17ee457.js",
+  "codex-micro-joystick-hud": "codex-micro-joystick-hud-6d7a529fb1ed.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -1138,6 +1140,8 @@ export const REWRITTEN = new Set([
   "codex-micro-keyboard-surface",
   "codex-micro-layout",
   "codex-micro-slot-signals",
+  "codex-micro-joystick-feedback",
+  "codex-micro-joystick-hud",
   "open-sources-side-panel-tab",
   "verify-descendant",
   "editable-plan-tab",
