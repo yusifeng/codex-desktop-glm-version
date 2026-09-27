@@ -7,10 +7,11 @@ import * as createProjectDialogChunk from "@rchunk/create-project-dialog-core";
 
 void appSharedChunk;
 void appInitialChunk;
-const createProjectDialog = createProjectDialogChunk as Record<string, any>;
+const {
+  r: initializeCreateProjectDialog,
+  t: CreateProjectDialog,
+} = createProjectDialogChunk;
 
-createProjectDialog.r();
-
-const CreateProjectDialog = createProjectDialog.t;
+initializeCreateProjectDialog();
 
 export { CreateProjectDialog };

@@ -3989,12 +3989,18 @@ declare module "@rchunk/generated-image-context-menu" {
 }
 
 declare module "@rchunk/create-project-dialog-core" {
+  export interface CreateProjectDialogProps {
+    initialRequest?: Record<string, unknown> | null;
+    onClose(): void;
+  }
   export const r: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: CreateProjectDialogProps) => unknown;
 }
 
 declare module "@rchunk/create-project-dialog-entry" {
-  export const CreateProjectDialog: (...args: any[]) => any;
+  export const CreateProjectDialog: (
+    props: import("@rchunk/create-project-dialog-core").CreateProjectDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/library-file-picker-dialog" {
