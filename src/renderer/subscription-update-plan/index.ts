@@ -6,47 +6,53 @@ import * as appInitialChunk from "@rchunk/app-initial";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  Pdn: subscriptionPlans,
+  Rln: initializeSubscriptionPlans,
+} = appInitialChunk;
+
+type SubscriptionPlan =
+  (typeof subscriptionPlans)[keyof typeof subscriptionPlans];
 
 type SubscriptionPlanSlug =
   "chatgptgoplan" | "chatgptplusplan" | "chatgptprolite" | "chatgptpro";
 
 function subscriptionPlanToSlug(
-  plan: unknown,
+  plan: SubscriptionPlan,
 ): SubscriptionPlanSlug | undefined {
-  const plans = appInitial.Pdn;
   switch (plan) {
-    case plans?.GO:
+    case subscriptionPlans.GO:
       return "chatgptgoplan";
-    case plans?.PLUS:
+    case subscriptionPlans.PLUS:
       return "chatgptplusplan";
-    case plans?.PROLITE:
+    case subscriptionPlans.PROLITE:
       return "chatgptprolite";
-    case plans?.PRO:
+    case subscriptionPlans.PRO:
       return "chatgptpro";
     default:
       return undefined;
   }
 }
 
-function subscriptionPlanFromSlug(slug: string): unknown {
-  const plans = appInitial.Pdn;
+function subscriptionPlanFromSlug(
+  slug: string,
+): SubscriptionPlan | undefined {
   switch (slug) {
     case "chatgptgoplan":
-      return plans?.GO;
+      return subscriptionPlans.GO;
     case "chatgptplusplan":
-      return plans?.PLUS;
+      return subscriptionPlans.PLUS;
     case "chatgptprolite":
-      return plans?.PROLITE;
+      return subscriptionPlans.PROLITE;
     case "chatgptpro":
-      return plans?.PRO;
+      return subscriptionPlans.PRO;
     default:
       return undefined;
   }
 }
 
 function initializeSubscriptionUpdatePlan(): void {
-  appInitial.Rln?.();
+  initializeSubscriptionPlans();
 }
 
 initializeSubscriptionUpdatePlan();

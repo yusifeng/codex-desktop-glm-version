@@ -3397,6 +3397,14 @@ declare module "@rchunk/app-initial" {
   export const eEt: () => void;
   export const r7: () => void;
   export const sP: () => void;
+  export type SubscriptionPlan = "go" | "plus" | "prolite" | "pro";
+  /** 订阅产品类型到内部 plan 值的稳定映射。 */
+  export const Pdn: {
+    readonly GO: "go";
+    readonly PLUS: "plus";
+    readonly PROLITE: "prolite";
+    readonly PRO: "pro";
+  };
   export const Rln: () => void;
   export const iN: (
     user: { locale?: string | null } | string | null | undefined,
@@ -3437,6 +3445,24 @@ declare module "@rchunk/app-initial" {
   export const CUt: unknown;
   export const xUt: unknown;
   export const _any: any;
+}
+
+declare module "@rchunk/subscription-update-plan" {
+  export type SubscriptionPlanSlug =
+    | "chatgptgoplan"
+    | "chatgptplusplan"
+    | "chatgptprolite"
+    | "chatgptpro";
+  /** 将订阅更新 API 的 plan slug 转回前端套餐值。 */
+  export const n: (
+    slug: string,
+  ) => import("@rchunk/app-initial").SubscriptionPlan | undefined;
+  /** 初始化订阅更新套餐依赖。 */
+  export const r: () => void;
+  /** 将前端套餐值转换为订阅更新 API 的 plan slug。 */
+  export const t: (
+    plan: import("@rchunk/app-initial").SubscriptionPlan,
+  ) => SubscriptionPlanSlug | undefined;
 }
 
 declare module "@rchunk/app-primary" {
