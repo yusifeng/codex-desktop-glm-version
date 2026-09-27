@@ -6492,7 +6492,20 @@ declare module "@rchunk/thread-shell-runtime" {
   export const t: (scope: TerminalScope) => boolean;
   export const u: (scope: TerminalScope) => boolean;
 }
-declare module "@rchunk/artifact-viewer";
+declare module "@rchunk/artifact-viewer" {
+  export interface ConversationItem { completed?: boolean; id?: string; messageId?: string; status?: string; type: string; [key: string]: unknown }
+  export interface ConversationTurn { artifacts?: Record<string, unknown>; items: ConversationItem[]; messageIds?: readonly string[]; status?: string; [key: string]: unknown }
+  export interface RenderedTurn { id: string; timestampTurns?: readonly unknown[] | null; turn: ConversationTurn; [key: string]: unknown }
+  export interface TurnRendererProps { conversationId: string; isMostRecentTurn?: boolean; turn: ConversationTurn; turnId: string; [key: string]: unknown }
+  export const _: () => void; export const a: { current: TurnRendererProps | null }; export const c: () => void; export const d: () => void;
+  export const f: (scope: { openPanel?(panel: { id: string; props: Record<string, unknown>; title: string }): void }, input: { conversationId: string; selectedThreadId?: string | null }) => void;
+  export const g: (input: Record<string, unknown> & { conversationId: string; renderedTurns: readonly RenderedTurn[] }) => Array<RenderedTurn & Record<string, unknown>>;
+  export const h: (input: Record<string, unknown>) => { renderedConversation: unknown; renderedTurns: RenderedTurn[]; showPendingLoadingMessage: boolean };
+  export const i: () => void; export const l: () => void; export const m: () => void; export const n: () => void; export const o: () => void; export const p: { readonly key: "chatgpt-conversation-effects" };
+  export const r: (props: TurnRendererProps) => unknown; export const s: (props: { conversationId: string; images?: readonly { height?: number; id?: string; src?: string | null; title?: string; width?: number }[] }) => unknown;
+  export const t: (props: Record<string, unknown> & { comparison: { treatment?: string; variants: readonly unknown[] }; conversationId: string }) => unknown;
+  export const u: (scope: unknown, image?: { height?: number; src?: string | null; width?: number } | null) => Promise<{ height?: number; name: string; src: string; width?: number }>;
+}
 declare module "@rchunk/thread-scroll-layout" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/thread-app-shell-chrome" { export const n: () => void; export const t: (props: Record<string, unknown> & { threadType: "local" | "new" | "remote" }) => unknown; }
 declare module "@rchunk/thread-user-message-navigation-rail-app" { export const AppThreadUserMessageNavigationRail: (props: { items: Array<{ bookmarked?: boolean; id: string; preview?: unknown; title?: string; [key: string]: unknown }>; onBookmarkChange?(item: Record<string, unknown>, bookmarked: boolean): void; onPreviewItem?(item: Record<string, unknown>): void; onRevealItem?(item: Record<string, unknown>): void }) => unknown; }
@@ -10368,7 +10381,7 @@ declare module "@rchunk/pull-request-status-label" {
 }
 
 declare module "@rchunk/profile-view" { export interface ProfileStat { key: "currentStreakDays" | "longestStreakDays" | "longestTaskDurationMs" | "peakTokens" | "totalTextTokens" | string; label?: string; value: number } export interface ProfileViewProps { Layout?: (props: { children?: unknown }) => unknown; activities?: readonly { id: string; label: string; timestamp?: string }[]; avatarId?: string | null; error?: Error | null; isProfileV2Enabled?: boolean; onAvatarChanged?(avatarId: string): void; onUsernameChanged?(username: string): void; stats?: readonly ProfileStat[]; today?: Date | string; username?: string } export const n: () => void; export const t: (props: ProfileViewProps) => unknown; }
-declare module "@rchunk/profile-site-details";
+declare module "@rchunk/profile-site-details" { export interface ShowcaseSite { open_url?: string | null; thumbnail_url?: string | null; title: string } export interface ShowcaseSiteDetailsProps { creatorName?: string | null; onClose(): void; onCloseAutoFocus?(event: unknown): void; onCopyLink?(url: string): Promise<boolean> | boolean; onOpenSite?(url: string): void; site: ShowcaseSite } export const ShowcaseSiteDetails: (props: ShowcaseSiteDetailsProps) => unknown }
 declare module "@rchunk/workspace-agent-detail-query" {
   export interface WorkspaceAgentQueryContext { accountId?: string | null; enabled?: boolean }
   export const a: { getOptions(input: { agentId: string; fileId?: string | null; fileName?: string; mimeType?: string | null; sizeBytes?: number | null; updatedAt?: string | null }, context?: WorkspaceAgentQueryContext): Record<string, unknown> };
@@ -14506,7 +14519,10 @@ declare module "@rchunk/pdf-preview-panel" {
   export const PdfPreviewPanel: (props: PdfPreviewPanelProps) => unknown;
 }
 declare module "@rchunk/library-json-preview" { export interface LibraryJsonPreviewProps { content: string; fileName: string } export const LibraryJsonPreview: (props: LibraryJsonPreviewProps) => unknown }
-declare module "@rchunk/annotation-comment-editor-card";
+declare module "@rchunk/annotation-comment-editor-card" { export type AnnotationSubmitMode = "saved" | "direct"; export interface AnnotationEditorSession { body?: string; originalBody?: string | null; sessionId: string; surfaceMode: "composer" | "edit" | "preview" } export interface AnnotationCommentEditorCardProps { allowDirectSubmit?: boolean; allowDirectSubmitOnEdit?: boolean; allowEmptySubmit?: boolean; allowImageAttachments?: boolean; autoFocus?: boolean; defaultCreateSubmitMode?: AnnotationSubmitMode; defaultDesignEditorOpen?: boolean; inputAriaLabel?: string; isVisible?: boolean; onAttachmentPreviewOpenChange?(open: boolean): void; onBodyChange?(body: string): void; onCancel?(): void; onDelete?(): void; onDirectSubmit?(body: string): Promise<void> | void; onMounted?(): void; onSubmit?(body: string, mode: AnnotationSubmitMode): Promise<void> | void; onTweaksEditorOpenChange?(open: boolean): void; placeholder?: string; session: AnnotationEditorSession; showAdjustEntry?: boolean } export const n: () => void; export const t: (props: AnnotationCommentEditorCardProps) => unknown }
+declare module "@rchunk/design-editor-state";
+declare module "@rchunk/workbook-from-csv"; declare module "@rchunk/resume-chatgpt-completion"; declare module "@rchunk/respond"; declare module "@rchunk/turn-bibliography"; declare module "@rchunk/summary"; declare module "@rchunk/content"; declare module "@rchunk/payload"; declare module "@rchunk/image-validation-session"; declare module "@rchunk/chatgpt-generated-image-favorite"; declare module "@rchunk/request-panel";
+declare module "@rchunk/library-writing-block"; declare module "@rchunk/chatgpt-subagents-panel"; declare module "@rchunk/registered-chatgpt-subagents-thumbnail"; declare module "@rchunk/image-gen-loading-games"; declare module "@rchunk/chatgpt-conversation-inline-beacon"; declare module "@rchunk/work-mode-pet-content";
 declare module "@rchunk/popcorn-review-bar-overlay";
 declare module "@rchunk/docx-preview-runtime";
 declare module "@rchunk/codemirror-json-runtime";
