@@ -5235,7 +5235,7 @@ declare module "@rchunk/platform-ui-kit-provider";
 declare module "@rchunk/navigation-blocker";
 declare module "@rchunk/automation-share-dialog";
 declare module "@rchunk/date-picker-runtime";
-declare module "@rchunk/binary-preview-source";
+declare module "@rchunk/binary-preview-source" { export interface BinaryPreviewSource { contentsBase64?: string | null; cwd?: string | null; environmentId?: string; hostId?: string; isError?: boolean; isLoading?: boolean; kind: "git" | "worktree"; mimeType?: string | null; path?: string; ref?: string } export const a: () => void; export const i: (props: { children?: unknown }) => unknown; export const n: (source?: BinaryPreviewSource | null) => { dataUrl: string | null; isError: boolean; isLoading: boolean }; export const o: (props: { after?: unknown; before?: unknown; className?: string; showAfterOnly?: boolean }) => unknown; export const r: (props: { className?: string }) => unknown; export const s: () => void; export const t: () => void }
 declare module "@rchunk/surface";
 declare module "@rchunk/pdf-preview-diff";
 declare module "@rchunk/conversation-diff-comments";
@@ -8101,7 +8101,7 @@ declare module "@rchunk/sketch-composer-host-core" {
 
 declare module "@rchunk/drawing-size-slider" {
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: { "aria-label": string; className?: string; disabled?: boolean; forceExpanded?: boolean; max: number; min: number; name?: string; onInteractionEnd?(): void; onInteractionStart?(): void; onValueChange(value: number): void; preserveTextFocus?: boolean; title?: string; value: number }) => unknown;
 }
 
 declare module "@rchunk/sketch" {
@@ -14228,15 +14228,15 @@ declare module "@rchunk/command-menu-search-results" {
   export const t: () => void;
 }
 declare module "@rchunk/popcorn-icons";
-declare module "@rchunk/popcorn-manual-edit-header-controls";
+declare module "@rchunk/popcorn-manual-edit-header-controls" { export const a: () => void; export const i: (props: { title: unknown; trailingContent?: unknown }) => unknown; export const n: (props: { ariaLabel: string; children?: unknown; trailingContent?: unknown }) => unknown; export const o: (props: Record<string, unknown> & { as?: string; children?: unknown; className?: string }) => unknown; export const r: () => unknown; export const s: () => void; export const t: (props: { activeLabel?: string; children?: unknown; disabled?: boolean; expanded?: boolean; label: string; onClick?(): void; pressed?: boolean; showActiveBackground?: boolean; size?: "compact" | "default"; testId?: string }) => unknown }
 declare module "@rchunk/artifact-annotation-batch-controls";
-declare module "@rchunk/artifact-annotation-comment";
+declare module "@rchunk/artifact-annotation-comment" { export interface ArtifactAnnotationComment extends Record<string, unknown> { localArtifactAnnotationContext?: { annotationId?: string; artifactKind: "document" | "presentation" | "site" | "spreadsheet"; label?: string; path: string }; localArtifactAnnotationMetadata?: { target?: Record<string, unknown> & { type: string } }; position: { line: number }; text?: string } export const a: (input: { currentComments: ArtifactAnnotationComment[]; path: string; previousComments: ArtifactAnnotationComment[] }) => string[]; export const i: (comments: ArtifactAnnotationComment[]) => Array<Record<string, unknown>>; export const n: (comments: ArtifactAnnotationComment[], path: string) => ArtifactAnnotationComment[]; export const o: () => void; export const r: (comments: ArtifactAnnotationComment[]) => number; export const s: (comments: ArtifactAnnotationComment[], path: string) => ArtifactAnnotationComment[]; export const t: (input: Record<string, unknown>) => ArtifactAnnotationComment | undefined }
 declare module "@rchunk/artifact-preview-status" { export const n: (status: string) => unknown; export const t: () => void }
 declare module "@rchunk/artifact-preview-zoom" { export const a: (x1: number, y1: number, x2: number, y2: number) => number; export const i: (zoomPercent: number, wheelDelta: number) => number; export const n: (value: number) => number; export const o: () => void; export const r: (input: { initialDistance: number; initialZoomPercent: number; nextDistance: number }) => number; export const t: readonly number[] }
 declare module "@rchunk/artifact-tab-content-electron";
 declare module "@rchunk/app-connect-availability" { export interface AppConnectAvailabilityInput { appId: string; availableAppIds?: Iterable<string>; companionConnectorIds: string[]; connectors?: Array<{ id: string; [key: string]: unknown }>; getLink?(id: string): Promise<unknown>; primaryLink?: unknown } export const i: (input: AppConnectAvailabilityInput) => Promise<Array<{ id: string; [key: string]: unknown }>>; export const n: typeof i; export const r: () => void; export const t: () => void }
 declare module "@rchunk/cloud-file-preview";
-declare module "@rchunk/editor-header";
+declare module "@rchunk/editor-header" { export interface EditorHeaderControls { annotationControl?: unknown; commentsControl?: unknown; editingControls?: unknown; navigationControl?: unknown; supplementalActions?: unknown; zoomControl?: unknown } export const n: (props: { onOpenChange(open: boolean): void; open: boolean }) => unknown; export const r: () => void; export const t: (props: { actions?: unknown; annotationControlPlacement?: "editing" | "review"; commentsControl?: unknown; contentFade?: boolean; controls: EditorHeaderControls; downloadControl?: unknown; downloadPending?: boolean; onClose?(): void; onDownload?(): void; onShare?(): void; tabId?: string; title?: unknown }) => unknown }
 declare module "@rchunk/editor-header-controls" { export interface EditorHeaderControls { annotationControl: unknown; commentsControl: unknown; editingControls: unknown; navigationControl: unknown; supplementalActions: unknown; zoomControl: unknown } export const n: () => void; export const t: EditorHeaderControls }
 declare module "@rchunk/artifact-entry";
 declare module "@rchunk/file-preview" { export const ChatGptSearchFilePreview: (props: { accountId: string; authenticatedAccountId: string; authenticatedUserId?: string; item: { cloudFile: { name: string }; [key: string]: unknown }; onClose(): void; renderPreview?(item: { cloudFile: { name: string }; [key: string]: unknown }): unknown; sessionReady?: boolean; userId: string }) => unknown }
@@ -14256,8 +14256,8 @@ declare module "@rchunk/loading-controls" { export const n: () => void; export c
 declare module "@rchunk/open-image-preview";
 declare module "@rchunk/open-in-library-item" { export const n: () => void; export const t: (props: { disabled?: boolean; libraryFileId: string; onOpen?(path: string): void }) => unknown }
 declare module "@rchunk/artifact-presentation";
-declare module "@rchunk/presentation-annotation-coachmark";
-declare module "@rchunk/presentation-annotation-cursor-coachmark";
+declare module "@rchunk/presentation-annotation-coachmark" { export const n: () => void; export const t: (props: { children?: unknown; onDismiss(): void; open: boolean }) => unknown }
+declare module "@rchunk/presentation-annotation-cursor-coachmark" { export const i: () => void; export const n: () => void; export const r: Readonly<Record<"document" | "pdf" | "presentation" | "spreadsheet", { defaultMessage: string; id: string }>>; export const t: (props: { children?: unknown; contentSelector?: string; message: { defaultMessage?: string; id?: string }; onDismiss(): void; open: boolean }) => unknown }
 declare module "@rchunk/preview-layout" { export const n: () => void; export const t: (props: { assetName: string; bottomContent?: unknown; children?: unknown; contentOwnsHeader?: boolean; endContent?: unknown; headerVariant?: "default" | "document"; onClose(): void; titleEndContent?: unknown }) => unknown }
 declare module "@rchunk/render-file-children" { export interface FileLineAnnotation { id?: string | number; line?: number; [key: string]: unknown } export const n: <FileValue>(props: { file: FileValue; getAnnotationSlotName?(annotation: FileLineAnnotation): string; getHoveredLine?(): number | null; lineAnnotations?: FileLineAnnotation[]; renderAnnotation?(annotation: FileLineAnnotation): unknown; renderCustomHeader?(file: FileValue): unknown; renderGutterUtility?(getHoveredLine?: () => number | null): unknown; renderHeaderFilenameSuffix?(file: FileValue): unknown; renderHeaderMetadata?(file: FileValue): unknown; renderHeaderPrefix?(file: FileValue): unknown }) => unknown; export const t: () => void }
 declare module "@rchunk/spreadsheet-editor";

@@ -2223,4 +2223,11 @@ export const REWRITTEN = new Set([
   "radio-group",
   "animated-segmented-toggle",
   "project-share-model",
+  "presentation-annotation-coachmark",
+  "artifact-annotation-comment",
+  "popcorn-manual-edit-header-controls",
+  "binary-preview-source",
+  "editor-header",
+  "presentation-annotation-cursor-coachmark",
+  "drawing-size-slider",
 ]);
