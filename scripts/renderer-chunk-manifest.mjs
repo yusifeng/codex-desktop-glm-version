@@ -1884,6 +1884,8 @@ export const REWRITTEN = new Set([
   "browser-mfa-session",
   "outbound-identity-connection-dialog",
   "plugin-share-dialogs-runtime",
+  "pull-request-comment",
+  "review-file-tree-pane",
   "portable-attachment-thumbnail",
   "portable-attachment-thumbnail-worker",
   "work-onboarding-suggestions",

@@ -4947,6 +4947,10 @@ declare module "@rchunk/confirm-subscription-upgrade" {
 }
 
 declare module "@rchunk/app-primary" {
+  /** Pull-request comment markdown renderer and initializer. */
+  export const af: () => void;
+  const PullRequestMarkdownRenderer: (props: Record<string, unknown>) => unknown;
+  export { PullRequestMarkdownRenderer as if };
   /** 初始化模型与 reasoning-effort 翻译表。 */
   export const cc: () => void;
   /** reasoning-effort 到本地化消息描述的映射。 */
@@ -13422,12 +13426,55 @@ declare module "@rchunk/pull-request-code-review-core" {
   export const t: (props: Record<string, unknown>) => unknown;
 }
 
-declare module "@rchunk/pull-request-comment" { const _default: unknown; export default _default; }
+declare module "@rchunk/pull-request-comment" {
+  export const S: (...arguments_: unknown[]) => void;
+  export const _: unknown;
+  export const a: () => void;
+  export const b: (...arguments_: unknown[]) => void;
+  export const c: unknown;
+  export const d: () => void;
+  export const f: () => void;
+  export const g: unknown;
+  export const h: unknown;
+  export const i: (props: Record<string, unknown>) => unknown;
+  export const l: () => void;
+  export const m: unknown;
+  export const n: () => void;
+  export const o: (props: Record<string, unknown>) => unknown;
+  export const p: unknown;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const s: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+  export const u: (props: Record<string, unknown>) => unknown;
+  export const v: (...arguments_: unknown[]) => void;
+  export const x: (...arguments_: unknown[]) => void;
+  export const y: (...arguments_: unknown[]) => void;
+}
 declare module "@rchunk/arrow-curved-right" { const _default: unknown; export default _default; }
-declare module "@rchunk/review-file-tree-pane" { const _default: unknown; export default _default; }
+declare module "@rchunk/review-file-tree-pane" {
+  export const a: () => void;
+  export const c: () => void;
+  export const d: (event: { composedPath(): EventTarget[] }) => string | null;
+  export const f: () => void;
+  export const i: (source: string | null | undefined, options?: { basePath?: string | null }) => ((path: string) => "set" | "unset" | "unspecified" | null) | null;
+  export const l: (props: Record<string, unknown>) => unknown;
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const o: (input: { cwd?: string | null; gitCommonDir?: string | null; gitRoot?: string | null; hostId: string; paths: string[] }) => { hasLinguistGeneratedAttributes: boolean; hasUnhandledAttributesFiles: boolean; isReady: boolean; paths: Set<string> };
+  export const r: () => void;
+  export const s: (props: Record<string, unknown>) => unknown;
+  export const t: () => unknown;
+  export const u: () => void;
+}
 declare module "@rchunk/text-shorter" { const _default: unknown; export default _default; }
 declare module "@rchunk/code-diff" { const _default: unknown; export default _default; }
-declare module "@rchunk/review-preferences-model" { const _default: unknown; export default _default; }
+declare module "@rchunk/review-preferences-model" {
+  export const a: () => void;
+  export const c: unknown;
+  export const d: unknown;
+  export const l: unknown;
+  export const o: unknown;
+  export const u: unknown;
+}
 declare module "@rchunk/review-diff-virtualizer-metrics" { const _default: unknown; export default _default; }
 declare module "@rchunk/pull-request-error-description" { const _default: unknown; export default _default; }
 
