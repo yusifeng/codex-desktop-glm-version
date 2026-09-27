@@ -50,6 +50,26 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 
 ## 三、当前状态（截至交接时）
 
+### 2026-09-28 收口状态（优先以本节为准）
+
+交接后的 renderer 主线已经完成本轮收口：
+
+- `REWRITTEN`：959 个语义 chunk；`verify-renderer` 为 959/959。
+- `PRESERVED_ASSETS`：50 个经审计的 vendor/generated/data/worker 资产，继续
+  使用 transform-only 轨道，不伪造业务源码。
+- `INCREMENTAL_HUBS`：8 个聚合边界。`app-shared/app-initial/app-primary` 按
+  实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
+  由消费审计锁定，禁止无声明的压缩导出扩张。
+- `node scripts/audit-renderer-tail.mjs`：0 个未分类语义尾项。
+- `node scripts/audit-app-shared-consumption.mjs`：324 个实际消费导出均有语义
+  声明，0 missing、0 any、0 direct namespace use。
+- main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
+
+因此，下面“27 个 chunk / composer 与 app-shared 待推进”等内容是初始交接快照，
+仅保留作历史背景，不再是当前待办。新的 renderer 工作只有在增加真实消费者时，
+才应从增量 hub 拆出对应语义 API；不要为了提高重写计数复制未消费的聚合导出。
+完整分类与审计依据见 `docs/renderer-tail-audit.md`。
+
 ### 已完成
 
 **Bootstrap + Main（主进程）：** 169 个 .ts 文件。bootstrap chunk 全量重写；
@@ -226,9 +246,10 @@ node scripts/verify-renderer.mjs && node scripts/verify-chunks.mjs && \
 npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"
 ```
 
-三个数字 27/27、11/11、139 = 接手状态健康。然后按第三节 P0 顺序，
-从 composer 簇挑第一个 chunk（建议 `composer-utility-bar`，中型、
-被 conversation 页直接消费），走第四节闭环。
+当前健康数字应为 959/959、11/11、73；另运行
+`node scripts/audit-renderer-tail.mjs` 应报告 0 个 semantic tail modules pending，
+`node scripts/audit-app-shared-consumption.mjs` 应报告 324 个消费导出全部安全。
+下方 2026-09-27 流程更新继续有效。
 
 ### 2026-09-27 增量流程更新
 
