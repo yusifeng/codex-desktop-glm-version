@@ -50,25 +50,32 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 
 ## 三、当前状态（截至交接时）
 
-### 2026-09-28 收口状态（优先以本节为准）
+### 2026-09-28 当前状态（优先以本节为准）
 
-交接后的 renderer 主线已经完成本轮收口：
+交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
+但尚未完成全量 app-code：
 
-- `REWRITTEN`：959 个语义 chunk；`verify-renderer` 为 959/959。
+- `REWRITTEN`：971 个语义 chunk；`verify-renderer` 为 971/971。
 - `PRESERVED_ASSETS`：50 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：8 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
   由消费审计锁定，禁止无声明的压缩导出扩张。
-- `node scripts/audit-renderer-tail.mjs`：0 个未分类语义尾项。
+- `node scripts/audit-renderer-tail.mjs` 的 0 pending **只表示当前 `CHUNKS` 登记集
+  内部无悬空项**，不能当成全量 renderer 完成证明。
+- 全量 `docs/renderer-app-chunks.json` 有 2250 个 app-code 文件；必须运行
+  `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
+  968/2250 tracked、1282 pending；composer 47/47、sidebar 12/12 已覆盖，
+  settings 47/70。
 - `node scripts/audit-app-shared-consumption.mjs`：324 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
 
-因此，下面“27 个 chunk / composer 与 app-shared 待推进”等内容是初始交接快照，
-仅保留作历史背景，不再是当前待办。新的 renderer 工作只有在增加真实消费者时，
-才应从增量 hub 拆出对应语义 API；不要为了提高重写计数复制未消费的聚合导出。
-完整分类与审计依据见 `docs/renderer-tail-audit.md`。
+因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
+但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、
+pages-routes、terminal、browser 等真实缺口继续；增量 hub 只在出现真实消费者时拆出
+语义 API，不为未消费导出制造占位源码。完整依据见
+`docs/renderer-tail-audit.md`。
 
 ### 已完成
 
@@ -246,9 +253,9 @@ node scripts/verify-renderer.mjs && node scripts/verify-chunks.mjs && \
 npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"
 ```
 
-当前健康数字应为 959/959、11/11、73；另运行
-`node scripts/audit-renderer-tail.mjs` 应报告 0 个 semantic tail modules pending，
-`node scripts/audit-app-shared-consumption.mjs` 应报告 324 个消费导出全部安全。
+健康检查应同时运行 `verify-renderer`、`verify-chunks`、TypeScript 基线、
+`audit-renderer-tail.mjs`、`audit-renderer-app-coverage.mjs` 和
+`audit-app-shared-consumption.mjs`。前者的 0 pending 不得替代全量覆盖审计。
 下方 2026-09-27 流程更新继续有效。
 
 ### 2026-09-27 增量流程更新

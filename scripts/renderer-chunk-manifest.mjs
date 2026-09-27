@@ -15,6 +15,19 @@
 // value = 发布版 chunk 文件名。
 
 export const CHUNKS = {
+  "plugins-settings-entry": "plugins-settings-a6cc8c327ff7.js",
+  "notifications-settings-entry": "notifications-settings-ebea0dc9da14.js",
+  "general-settings-entry": "general-settings-4d0f64b22132.js",
+  "skills-settings": "skills-settings-2a3de63b855b.js",
+  "appearance-settings": "appearance-settings-b7026bff7ec6.js",
+  "settings-external-section": "settings-external-section-572589552e67.js",
+  "mcp-settings": "mcp-settings-46098748ccb7.js",
+  "time-management-settings": "time-management-settings-9bdd323c658a.js",
+  "consumer-view-settings": "settings-c9978bb73980.js",
+  "usage-analytics-settings": "analytics-settings-45239c8f89d3.js",
+  "profile-settings-entry": "profile-settings-3687227a4513.js",
+  "plugins-settings-core": "plugins-settings-a104e9fe3d0b.js",
+  "billing-analytics": "billing-analytics-9a493b3c8aaf.js",
   "chatgpt-file-upload": "chatgpt-file-upload-81c175d920b7.js",
   "use-avatar-options": "use-avatar-options-88289755a2ab.js",
   "profile-site-details": "site-details-bf62c13b615c.js",
@@ -1500,6 +1513,18 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "plugins-settings-entry",
+  "notifications-settings-entry",
+  "general-settings-entry",
+  "skills-settings",
+  "appearance-settings",
+  "settings-external-section",
+  "mcp-settings",
+  "time-management-settings",
+  "consumer-view-settings",
+  "usage-analytics-settings",
+  "profile-settings-entry",
+  "plugins-settings-core",
   "sketch",
   "portable-thumbnail-font-runtime",
   "portable-thumbnail-font-face-source-runtime",
@@ -2530,4 +2555,5 @@ export const INCREMENTAL_HUBS = new Map([
   ["popcorn-electron-surface-style", "typed-consumer-surface"],
   ["use-imported-setup-opportunity", "typed-consumer-surface"],
   ["checkout-session", "typed-consumer-surface"],
+  ["billing-analytics", "typed-consumer-surface"],
 ]);

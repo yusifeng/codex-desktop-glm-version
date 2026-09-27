@@ -56,4 +56,13 @@ assert.equal(typeof checkoutSession.chunk, "string");
 assert.equal(checkoutSession.exportCount, 60);
 assert.ok(checkoutSession.imports.length > 0 && checkoutSession.imports.every((item) => item.clause == null));
 
-console.log("22 renderer incremental hub assertions passed");
+const billingAnalytics = inspectHub("billing-analytics");
+assert.equal(billingAnalytics.strategy, "typed-consumer-surface");
+assert.equal(typeof billingAnalytics.chunk, "string");
+assert.equal(billingAnalytics.exportCount, 2);
+assert.equal(billingAnalytics.imports.length, 2);
+assert.ok(billingAnalytics.imports.every((item) => item.clause?.includes("initializeBillingAnalytics") && item.clause.includes("BillingAnalytics")));
+const billingDeclaration = declarationSource.slice(declarationSource.indexOf('declare module "@rchunk/billing-analytics"'), declarationSource.indexOf('declare module "@rchunk/plugins-settings-core"'));
+assert.doesNotMatch(billingDeclaration, /\bany\b/);
+
+console.log("28 renderer incremental hub assertions passed");

@@ -6118,6 +6118,33 @@ declare module "@rchunk/checkout-error" {
 }
 declare module "@rchunk/account-action-integrity";
 declare module "@rchunk/checkout-session";
+declare module "@rchunk/billing-analytics" {
+  export interface BillingAnalyticsProps extends Record<string, unknown> {
+    canViewCreditSettings?: boolean;
+    isPolling?: boolean;
+    isUsdWorkspace?: boolean;
+    reduceMotion?: boolean;
+    scope?: "business" | "consumer" | "workspace";
+    workspaceTaskUsage?: boolean;
+  }
+  export const n: () => void;
+  export const t: (props: BillingAnalyticsProps) => unknown;
+}
+declare module "@rchunk/plugins-settings-core" {
+  export interface PluginsSettingsProps extends Record<string, unknown> {
+    manageOnly?: boolean;
+  }
+  export const n: () => void;
+  export const t: (props?: PluginsSettingsProps) => unknown;
+}
+declare module "@rchunk/general-settings" {
+  export const a: (props?: Record<string, unknown>) => unknown;
+  export const i: (props?: Record<string, unknown>) => unknown;
+  export const n: (props?: Record<string, unknown>) => unknown;
+  export const o: () => void;
+  export const r: (props?: Record<string, unknown>) => unknown;
+  export const t: (props?: Record<string, unknown>) => unknown;
+}
 declare module "@rchunk/checkout-confirm-latency" {
   export const a: (email: string | null | undefined, fallback?: string) => { checkoutEmail: string; hasCheckoutEmail: boolean; defaultEmail: string };
   export const c: () => void;

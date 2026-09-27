@@ -35,3 +35,8 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 `projectImportedSetupItems`，声明也固定为具体函数签名；审计禁止扩大该表面。
 `checkout-session` 的 60 个导出当前没有命名消费者，仅作为 checkout 簇的副作用
 依赖边保留。二者都由同一 hub 测试锁定，避免为未使用的压缩导出制造占位源码。
+
+注意：`audit-renderer-tail.mjs` 只审计已经登记进 `CHUNKS` 的集合，不能证明
+`docs/renderer-app-chunks.json` 中的 2250 个 app-code 文件已经全部处理。全量覆盖
+必须以 `node scripts/audit-renderer-app-coverage.mjs` 为准；它会报告当前 manifest
+覆盖数以及 composer/sidebar/settings/pages-routes 等优先簇的真实剩余数量。
