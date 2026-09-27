@@ -3361,6 +3361,21 @@ declare module "@rchunk/app-initial" {
     accountId: string,
   ) => void;
   export const Qgn: () => void;
+  /** new-thread-panel-page 依赖的面板状态、Composer 与空状态组件。 */
+  export const Dht: () => void;
+  export const Du: () => void;
+  export const Oht: import("@rchunk/app-shared").ReadableSignal<unknown>;
+  export const cln: () => void;
+  export const Aet: () => void;
+  export interface EmptyStateProps extends Record<string, unknown> {
+    actions?: unknown;
+    className?: string;
+    description?: unknown;
+    illustration?: unknown;
+    illustrationSize?: "icon" | string;
+    title: unknown;
+  }
+  export const ket: (props: EmptyStateProps) => unknown;
   export const rht: () => void;
   export const p0t: () => void;
   export const Vzt: () => void;
@@ -4101,6 +4116,14 @@ declare module "@rchunk/confirm-subscription-upgrade" {
 }
 
 declare module "@rchunk/app-primary" {
+  /** new-thread-panel-page 初始化面与实验配置。 */
+  export const P: () => void;
+  export const ds: unknown;
+  export const dt: () => void;
+  export const ko: () => void;
+  export const r: () => void;
+  export const rt: () => void;
+  export const us: string;
   export const gc: () => void;
   export const hc: (...arguments_: unknown[]) => unknown;
   export interface BeaconSelectionParameter {
@@ -7259,6 +7282,15 @@ declare module "@rchunk/thread-pin-shortcut-bridge" {
 declare module "@rchunk/thread-scroll-layout" {
   const _default: unknown;
   export default _default;
+}
+
+declare module "@rchunk/use-element-in-view" {
+  export interface ElementInViewOptions {
+    container: Element | null;
+    target: Element | null;
+  }
+  export const n: (options: ElementInViewOptions) => boolean;
+  export const t: () => void;
 }
 
 declare module "@rchunk/timestamp-separator" {

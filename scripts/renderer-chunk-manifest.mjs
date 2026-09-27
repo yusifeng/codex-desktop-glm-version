@@ -20,6 +20,11 @@ export const CHUNKS = {
   "app-primary": "app-primary-d66705000d76.js",
   "app-main": "app-main-be230e7e4f5a.js",
   "index-entry": "index-e0f46c018fe4.js",
+  "new-thread-panel-page": "new-thread-panel-page-7891f59b2b15.js",
+  "unrestored-thread-tab-route": "unrestored-thread-tab-route-a2c0a461cb92.js",
+  "page-layout": "page-layout-ca2711c2c3fe.js",
+  "use-searchable-page-title-visibility": "use-searchable-page-title-visibility-16a23679012a.js",
+  "use-element-in-view": "use-element-in-view-4e918ffaac4a.js",
   "chatgpt-personalization-route": "chatgpt-personalization-route-36526df91ee9.js",
   "thread-tab-route-checkpoint": "thread-tab-route-checkpoint-5cbbb4add2f7.js",
   "remote-connections-page": "remote-connections-page-ff8f0f4620c8.js",
@@ -942,6 +947,10 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "new-thread-panel-page",
+  "unrestored-thread-tab-route",
+  "page-layout",
+  "use-searchable-page-title-visibility",
   "chatgpt-work-home-page-entry",
   "checkout-page-entry",
   "loading-page",
