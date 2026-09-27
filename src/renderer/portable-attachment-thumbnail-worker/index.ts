@@ -4,6 +4,8 @@
 // 支持 PDF、PPTX、DOCX、XLSX、CSV 与 TSV；所有格式最终都在
 // OffscreenCanvas 上渲染并返回 PNG Blob。
 
+import type { FontFaceSource } from "@rchunk/thumbnail-worker-font-faces";
+
 export type ThumbnailImportKind =
   | "csv"
   | "docx"
@@ -16,7 +18,7 @@ export type ThumbnailImportKind =
 
 export interface AttachmentThumbnailWorkerRequest {
   bytes: Uint8Array;
-  fonts: readonly unknown[];
+  fonts: readonly FontFaceSource[];
   importKind: ThumbnailImportKind;
   pdfWorkerSrc?: string;
   resourceBaseUrl: string;

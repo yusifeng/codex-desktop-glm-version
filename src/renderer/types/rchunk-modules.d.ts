@@ -2695,7 +2695,10 @@ declare module "@rchunk/portable-thumbnail-font-face-sources" {
 }
 
 declare module "@rchunk/thumbnail-worker-font-faces" {
-  export const installPopcornFontFaces: (fonts: readonly unknown[]) => Promise<void>;
+  export interface FontFaceSource { family: string; format: string; src: string; style: string; unicodeRange?: string; weight: string; }
+  export const getPopcornCarlitoFontFaceSourcesFromDocument: () => FontFaceSource[];
+  export const getPopcornFontDebugState: () => Record<string, unknown>;
+  export const installPopcornFontFaces: (fonts: readonly FontFaceSource[]) => Promise<void>;
 }
 
 declare module "@rchunk/thumbnail-worker-shape-presets" {
@@ -9662,13 +9665,16 @@ declare module "@rchunk/quick-chat-window" {
 }
 
 declare module "@rchunk/portable-thumbnail-font-face-source-runtime" {
-  export const i: (fonts: readonly unknown[]) => Promise<void>;
-  export const n: () => unknown;
+  export interface FontFaceSource { family: string; format: string; src: string; style: string; unicodeRange?: string; weight: string; }
+  export const i: (fonts: readonly FontFaceSource[]) => Promise<void>;
+  export const n: () => Record<string, unknown>;
   export const r: () => void;
-  export const t: () => unknown[];
+  export const t: () => FontFaceSource[];
 }
 
 declare module "@rchunk/portable-thumbnail-font-runtime" {
+  export const a: () => void;
+  export const i: () => void;
   export const n: () => Promise<void>;
   export const r: () => void;
   export const t: () => boolean;
@@ -9676,9 +9682,20 @@ declare module "@rchunk/portable-thumbnail-font-runtime" {
 
 declare module "@rchunk/portable-thumbnail-pdf-document" {
   export const n: () => void;
-  export const t: () => Promise<{
-    GlobalWorkerOptions: { workerSrc?: string };
-  }>;
+  export const r: (props: { fileDataUrl: string }) => { loadedFileDataUrl: string | null; loadState: "error" | "loading" | "ready"; loadStateFileDataUrl: string; numPages: number; pageViewportSize: { height: number; width: number } | null; pdfDocument: unknown | null };
+  export const t: () => Promise<{ GlobalWorkerOptions: { workerSrc: string }; getDocument(options: { data: Uint8Array }): unknown }>;
+}
+
+declare module "@rchunk/portable-thumbnail-font-metrics" {
+  export const c: () => void;
+  export const i: () => void;
+}
+declare module "@rchunk/thumbnail-worker-font-metrics" {
+  export const s: () => void;
+}
+declare module "@rchunk/portable-pdfjs-runtime" {
+  export const GlobalWorkerOptions: { workerSrc: string };
+  export const getDocument: (options: { data: Uint8Array }) => unknown;
 }
 
 declare module "@rchunk/diff-worker-algorithm-parser" {

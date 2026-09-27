@@ -1094,6 +1094,9 @@ export const CHUNKS = {
   "registered-pull-request-thumbnail": "registered-56d9602398a1.js",
   "thread-user-message-navigation-rail-app": "thread-user-message-navigation-rail-app-36b00895660c.js",
   "portable-thumbnail-font-face-source-runtime": "font-face-utils-da022ce7d181.js",
+  "portable-thumbnail-font-metrics": "font-metrics-fcb74d2f1fcc.js",
+  "thumbnail-worker-font-metrics": "font-metrics-a133f7544b54.js",
+  "portable-pdfjs-runtime": "pdf-ceb204fe5c6b.js",
   "portable-thumbnail-font-runtime": "ensure-fonts-loaded-49577b273704.js",
   "portable-thumbnail-pdf-document": "document-b62c2a70534b.js",
   "diff-worker-algorithm-parser": "dist-340268e76fe9.js",
@@ -1116,6 +1119,10 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "portable-thumbnail-font-runtime",
+  "portable-thumbnail-font-face-source-runtime",
+  "portable-thumbnail-pdf-document",
+  "thumbnail-worker-font-faces",
   "browser-skills-state",
   "skill-icon-source",
   "ansi-block",
