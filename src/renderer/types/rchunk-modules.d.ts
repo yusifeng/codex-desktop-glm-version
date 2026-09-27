@@ -5046,7 +5046,14 @@ declare module "@rchunk/use-home-directory" {
   export const t: () => void;
 }
 declare module "@rchunk/voice-personalization-dialog-entry";
-declare module "@rchunk/connector-post-connect-dialog";
+declare module "@rchunk/connector-post-connect-dialog" {
+  export const ConnectorPostConnectDialog: (props: {
+    connectorName?: string;
+    onClose?(): void;
+    onContinue?(): void;
+    open?: boolean;
+  }) => unknown;
+}
 
 declare module "@rchunk/thread-handoff-modal" {
   export const n: () => void;
@@ -6378,7 +6385,8 @@ declare module "@rchunk/plugin-skill-preview" {
     skillName: string;
     title: unknown;
   }
-  export const r: () => void;
+  export const n: () => void;
+  export const r: (contents?: string | null) => unknown;
   export const t: (props: PluginSkillPreviewProps) => unknown;
 }
 
@@ -7566,6 +7574,43 @@ declare module "@rchunk/mcp-extension-quick-action-dialog-core" {
   }
   export const n: () => void;
   export const t: (props: McpExtensionQuickActionDialogProps) => unknown;
+}
+
+declare module "@rchunk/ecosystem-widget-queries" {
+  export const n: () => void;
+  export const t: (input: Record<string, unknown>) => Record<string, unknown>;
+}
+declare module "@rchunk/connect-plugins-submenu-item" {
+  export const n: () => void;
+  export const t: (props: {
+    connectedCount?: number;
+    disabled?: boolean;
+    onConnect(): void;
+  }) => unknown;
+}
+declare module "@rchunk/use-search-plugins" {
+  export interface SearchablePlugin { id: string; name: string; description?: string; }
+  export const n: () => void;
+  export const t: (plugins: readonly SearchablePlugin[], query: string) => SearchablePlugin[];
+}
+declare module "@rchunk/plugin-skill-queries" {
+  export const a: (pluginId: string, skillName: string) => Record<string, unknown>;
+  export const i: () => void;
+  export const n: (connector: Record<string, unknown>) => string | null;
+  export const r: (pluginId: string) => Record<string, unknown>;
+  export const t: (pluginId: string, skillName: string) => Record<string, unknown>;
+}
+declare module "@rchunk/canonical-plugin-query" {
+  export const n: () => void;
+  export const t: (appId: string, accountId: string | null) => Record<string, unknown>;
+}
+declare module "@rchunk/plugin-picker-menu-content" {
+  export const a: (plugins: readonly Record<string, unknown>[]) => string[];
+  export const i: () => void;
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const o: (plugins: readonly Record<string, unknown>[], id: string) => Record<string, unknown>[];
+  export const r: (plugins: readonly Record<string, unknown>[]) => string[];
+  export const t: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/gpt-plugin-migration-failure" {
