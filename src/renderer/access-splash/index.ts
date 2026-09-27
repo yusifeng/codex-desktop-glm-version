@@ -7,16 +7,27 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const lock = lockChunk as Record<string, any>;
+const {
+  Dft: initializeExternalLinkBridge,
+  Oft: openExternalLink,
+  a7: initializeExternalLinkIcon,
+  i7: ExternalLinkIcon,
+} = appInitialChunk;
+const {
+  $3: initializeJsxRuntimeLazy,
+  I3: getJsxRuntime,
+} = appSharedChunk;
+const { n: initializeLockIcon, t: LockIcon } = lockChunk;
 
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
+interface AccessSplashProps {
+  accessMessage: unknown;
+  description: unknown;
+  learnMoreLabel: unknown;
+  learnMoreUrl: string;
+  title: unknown;
 }
 
-let jsx: JsxRuntime | null = null;
+let jsx: import("@rchunk/app-shared").JsxRuntime | null = null;
 
 function AccessSplash({
   accessMessage,
@@ -24,19 +35,11 @@ function AccessSplash({
   learnMoreLabel,
   learnMoreUrl,
   title,
-}: {
-  accessMessage: unknown;
-  description: unknown;
-  learnMoreLabel: unknown;
-  learnMoreUrl: string;
-  title: unknown;
-}): unknown {
+}: AccessSplashProps): unknown {
   initializeAccessSplash();
-  const renderer = jsx as JsxRuntime;
-  const LockIcon = lock.t;
-  const ExternalLinkIcon = appInitial.i7;
+  const renderer = jsx as import("@rchunk/app-shared").JsxRuntime;
   const onLearnMore = (event: unknown) => {
-    appInitial.Oft?.({
+    openExternalLink?.({
       event,
       href: learnMoreUrl,
       initiator: "open_in_browser_bridge",
@@ -96,10 +99,12 @@ function AccessSplash({
 }
 
 function initializeAccessSplash(): void {
-  appInitial.Dft?.();
-  appInitial.a7?.();
-  lock.n?.();
-  jsx ??= typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeJsxRuntimeLazy?.();
+  initializeExternalLinkBridge?.();
+  initializeExternalLinkIcon?.();
+  initializeLockIcon?.();
+  jsx ??=
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
 }
 
 export { initializeAccessSplash as n, AccessSplash as t };

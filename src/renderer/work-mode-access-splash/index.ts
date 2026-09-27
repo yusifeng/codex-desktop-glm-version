@@ -10,27 +10,33 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  Cg: WorkModeToggleContext,
+  wg: initializeWorkModeToggleContext,
+} = appPrimaryChunk;
+const {
+  $3: initializeJsxRuntimeLazy,
+  I3: getJsxRuntime,
+  K2: initializeFormattedMessage,
+  Y2: FormattedMessage,
+} = appSharedChunk;
 
-function WorkModeAccessSplash({
-  modeToggle,
-}: {
+interface WorkModeAccessSplashProps {
   modeToggle?: unknown;
-}): unknown {
+}
+
+function WorkModeAccessSplash({ modeToggle }: WorkModeAccessSplashProps): unknown {
   initializeWorkModeAccessSplash();
   const jsx =
-    typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
-  const Message = appShared.Y2;
-  const Context = appPrimary.Cg;
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
   const message = (id: string, defaultMessage: string, description: string) =>
-    jsx.jsx(Message, { id, defaultMessage, description });
+    jsx.jsx(FormattedMessage, { id, defaultMessage, description });
   const toggle =
     modeToggle == null
       ? null
-      : Context == null
+      : WorkModeToggleContext == null
         ? modeToggle
-        : jsx.jsx(Context, { children: modeToggle });
+        : jsx.jsx(WorkModeToggleContext, { children: modeToggle });
   return jsx.jsxs(jsx.Fragment, {
     children: [
       toggle,
@@ -62,8 +68,9 @@ function WorkModeAccessSplash({
 }
 
 function initializeWorkModeAccessSplash(): void {
-  appShared.K2?.();
-  appPrimary.wg?.();
+  initializeJsxRuntimeLazy?.();
+  initializeFormattedMessage?.();
+  initializeWorkModeToggleContext?.();
   initializeAccessSplash();
 }
 

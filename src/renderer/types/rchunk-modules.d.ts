@@ -3550,6 +3550,7 @@ declare module "@rchunk/app-initial" {
   export const Dft: () => void;
   export const E6t: () => { platform: string };
   export const a7: () => void;
+  export const i7: (props: Record<string, unknown>) => unknown;
   export const RS: () => void;
   export const T6t: () => void;
   export const yZ: () => void;
@@ -3762,6 +3763,8 @@ declare module "@rchunk/app-primary" {
     title?: unknown;
   }
   export const Sm: (props: BannerProps) => unknown;
+  export const Cg: (props: { children?: unknown }) => unknown;
+  export const wg: () => void;
   export type AnnouncementStatus = "eligible" | "ineligible" | "loading";
   export const $p: (state: {
     isEligible: boolean;
@@ -4038,14 +4041,30 @@ declare module "@rchunk/google-logo" {
 }
 
 declare module "@rchunk/access-splash" {
+  export interface AccessSplashProps {
+    accessMessage: unknown;
+    description: unknown;
+    learnMoreLabel: unknown;
+    learnMoreUrl: string;
+    title: unknown;
+  }
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: AccessSplashProps) => unknown;
 }
 
 declare module "@rchunk/lock" {
   export const n: () => void;
   export const t: (props: Record<string, unknown>) => unknown;
-  export const _any: any;
+}
+
+declare module "@rchunk/codex-local-access-splash" {
+  export const CodexLocalAccessSplash: () => unknown;
+}
+
+declare module "@rchunk/work-mode-access-splash" {
+  export const WorkModeAccessSplash: (props: {
+    modeToggle?: unknown;
+  }) => unknown;
 }
 
 declare module "@rchunk/pepper-onboarding-modal" {
