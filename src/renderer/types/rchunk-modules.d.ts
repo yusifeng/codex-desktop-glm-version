@@ -2697,6 +2697,10 @@ declare module "@rchunk/app-initial" {
   export const V$: (
     options: ConnectorAppsQueryOptions,
   ) => ConnectorAppsQueryResult;
+  export const Lb: {
+    delete: import("@rchunk/app-shared").MessageDescriptor;
+  };
+  export const Rb: () => void;
   export interface ProductAnalytics {
     logProductEvent(
       event: unknown,
@@ -4740,8 +4744,18 @@ declare module "@rchunk/automation-delete-confirmation-dialog" {
 }
 
 declare module "@rchunk/delete-archived-chats-dialog" {
+  export type DeleteArchivedChatsState =
+    | { kind: "all"; threads: readonly unknown[] }
+    | { kind: "project"; threads: readonly unknown[] }
+    | { kind: "single"; threads: readonly unknown[] };
+  export interface DeleteArchivedChatsDialogProps {
+    isDeleting?: boolean;
+    onConfirm(): void;
+    onOpenChange(open: boolean): void;
+    state: DeleteArchivedChatsState | null;
+  }
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: DeleteArchivedChatsDialogProps) => unknown;
 }
 
 declare module "@rchunk/migrated-plugin-access" {

@@ -4,43 +4,66 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-let jsx: any;
+const {
+  $3: initializeJsxRuntime,
+  Ah: DialogHeader,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeIntlRuntime,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+  jh: DialogSection,
+  kh: DialogFooter,
+  zh: initializeDialog,
+} = appSharedChunk;
+const { Lb: commonMessages, Rb: initializeCommonMessages } = appInitialChunk;
+let jsxRuntime: JsxRuntime | null = null;
 let initialized = false;
 
 function initializeDeleteArchivedChatsDialog(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.Zh?.();
-  appShared.zh?.();
-  appShared.Ph?.();
-  appInitial.Rb?.();
-  jsx = appShared.I3?.();
+  initializeJsxRuntime();
+  initializeIntlRuntime();
+  initializeButton();
+  initializeDialog();
+  initializeDialogLayout();
+  initializeCommonMessages();
+  jsxRuntime = getJsxRuntime();
   initialized = true;
 }
 
 type DeleteState =
-  | { kind: "all"; threads: unknown[] }
-  | { kind: "project"; threads: unknown[] }
-  | { kind: "single"; threads: unknown[] };
+  | { kind: "all"; threads: readonly unknown[] }
+  | { kind: "project"; threads: readonly unknown[] }
+  | { kind: "single"; threads: readonly unknown[] };
+
+interface DeleteArchivedChatsDialogProps {
+  state: DeleteState | null;
+  onConfirm(): void;
+  onOpenChange(open: boolean): void;
+  isDeleting?: boolean;
+}
+
+interface FormSubmitEvent {
+  preventDefault(): void;
+}
 
 function DeleteArchivedChatsDialog({
   state,
   onConfirm,
   onOpenChange,
   isDeleting = false,
-}: {
-  state: DeleteState | null;
-  onConfirm: () => void;
-  onOpenChange: (open: boolean) => void;
-  isDeleting?: boolean;
-}): unknown {
+}: DeleteArchivedChatsDialogProps): unknown {
   initializeDeleteArchivedChatsDialog();
   if (state == null) return null;
+  const jsx = getInitializedJsxRuntime();
   const titleCopy =
     state.kind === "all"
       ? {
@@ -84,47 +107,47 @@ function DeleteArchivedChatsDialog({
             description:
               "Body copy in the delete archived chat confirmation dialog",
           };
-  const header = jsx.jsx(appShared.jh, {
-    children: jsx.jsx(appShared.Ah, {
-      title: jsx.jsx(appShared.Rh, {
-        children: jsx.jsx(appShared.Y2, titleCopy),
+  const header = jsx.jsx(DialogSection, {
+    children: jsx.jsx(DialogHeader, {
+      title: jsx.jsx(DialogTitle, {
+        children: jsx.jsx(FormattedMessage, titleCopy),
       }),
     }),
   });
-  const body = jsx.jsx(appShared.jh, {
+  const body = jsx.jsx(DialogSection, {
     className: "text-codex-description",
     children: jsx.jsx("p", {
-      children: jsx.jsx(appShared.Y2, bodyCopy),
+      children: jsx.jsx(FormattedMessage, bodyCopy),
     }),
   });
-  const cancel = jsx.jsx(appShared.Yh, {
+  const cancel = jsx.jsx(Button, {
     color: "ghost",
     disabled: isDeleting,
     onClick: () => onOpenChange(false),
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "settings.dataControls.archivedChats.deleteConfirm.cancel",
       defaultMessage: "Cancel",
       description: "Cancel button label for deleting archived chats",
     }),
   });
-  const confirm = jsx.jsx(appShared.Yh, {
+  const confirm = jsx.jsx(Button, {
     color: "danger",
     loading: isDeleting,
     type: "submit",
-    children: jsx.jsx(appShared.Y2, { ...appInitial.Lb.delete }),
+    children: jsx.jsx(FormattedMessage, { ...commonMessages.delete }),
   });
-  const footer = jsx.jsx(appShared.jh, {
-    children: jsx.jsxs(appShared.kh, { children: [cancel, confirm] }),
+  const footer = jsx.jsx(DialogSection, {
+    children: jsx.jsxs(DialogFooter, { children: [cancel, confirm] }),
   });
-  const form = jsx.jsxs(appShared.Oh, {
+  const form = jsx.jsxs(DialogBody, {
     as: "form",
-    onSubmit: (event: any) => {
+    onSubmit: (event: FormSubmitEvent) => {
       event.preventDefault();
       if (!isDeleting) onConfirm();
     },
     children: [header, body, footer],
   });
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: true,
     showDialogClose: false,
     onOpenChange: (open: boolean) => {
@@ -132,6 +155,14 @@ function DeleteArchivedChatsDialog({
     },
     children: form,
   });
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializeDeleteArchivedChatsDialog();
+  if (jsxRuntime == null) {
+    throw new Error("Delete archived chats JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 initializeDeleteArchivedChatsDialog();
