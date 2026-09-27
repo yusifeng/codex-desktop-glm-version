@@ -3118,6 +3118,35 @@ declare module "@rchunk/app-initial" {
   export const $en: import("@rchunk/app-shared").MaitaiScope<
     Record<string, unknown>
   >; // zb：RouteScope atom
+  export interface WorkspaceFileContextMenuOptions
+    extends Record<string, unknown> {
+    artifactNavigationTarget?: unknown;
+    attachmentPreviewOrigin?: unknown;
+    column?: number;
+    cwd?: string;
+    endLine?: number;
+    hostId?: string;
+    isAttachmentPreview?: boolean;
+    line?: number;
+    onOpenTargetSelected?(target: string | null, bundleId?: string): void;
+    openInSidePanel?: boolean;
+    openMode?: "workspace" | string;
+    path: string;
+  }
+  export const Jut: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    options: WorkspaceFileContextMenuOptions,
+  ) => Promise<import("@rchunk/app-shared").ContextMenuItem[]>;
+  export const Yut: () => void;
+  export const Gut: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    options: WorkspaceFileContextMenuOptions,
+  ) => Promise<import("@rchunk/app-shared").ContextMenuItem[]>;
+  export const qut: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    options: WorkspaceFileContextMenuOptions,
+  ) => void;
+  export const Kut: () => void;
   export interface ArtifactTemplateSkill extends Record<string, unknown> {
     description?: unknown;
     name?: string;
@@ -6824,8 +6853,17 @@ declare module "@rchunk/user-message" {
 }
 
 declare module "@rchunk/workspace-file-context-menu-trigger" {
+  export const n: () => void;
+  export const t: (props: {
+    children: import("@rchunk/app-shared").MenuElement;
+  } & import("@rchunk/app-initial").WorkspaceFileContextMenuOptions) => unknown;
   const _default: unknown;
   export default _default;
+}
+
+declare module "@rchunk/workspace-file-tab-context-menu" {
+  export const getWorkspaceFileTabContextMenuItems: typeof import("@rchunk/app-initial").Gut;
+  export const prefetchWorkspaceFileTabContextMenuItems: typeof import("@rchunk/app-initial").qut;
 }
 
 declare module "@rchunk/hooks" {
