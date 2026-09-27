@@ -12,6 +12,33 @@ declare module "@rchunk/rolldown-runtime" {
 }
 
 declare module "@rchunk/app-shared" {
+  export interface SafeParseSuccess<T> {
+    success: true;
+    data: T;
+  }
+  export interface SafeParseFailure {
+    success: false;
+  }
+  export interface SafeParseSchema<T> {
+    safeParse(value: unknown): SafeParseSuccess<T> | SafeParseFailure;
+  }
+  export interface OptionalSchema<T> extends SafeParseSchema<T | undefined> {
+    optional(): OptionalSchema<T>;
+  }
+  export interface StringSchema extends SafeParseSchema<string> {
+    min(length: number): StringSchema;
+    nullable(): OptionalSchema<string | null>;
+    optional(): OptionalSchema<string>;
+  }
+  export interface ObjectSchema<T extends Record<string, unknown>>
+    extends SafeParseSchema<T> {
+    loose(): ObjectSchema<T>;
+  }
+  export const H4: <T extends Record<string, unknown>>(
+    shape: Record<string, SafeParseSchema<unknown>>,
+  ) => ObjectSchema<T>;
+  export const R4: <T>(value: T) => OptionalSchema<T>;
+  export const q4: () => StringSchema;
   // app-shared/ui/button.ts（内部 n8/a8/pot；压缩导出 Qh/Yh/Xh）。
   export type ButtonColor =
     | "accent" | "accentInverse" | "accentSubtle" | "activity"
@@ -4067,6 +4094,8 @@ declare module "@rchunk/confirm-subscription-upgrade" {
 }
 
 declare module "@rchunk/app-primary" {
+  export const gc: () => void;
+  export const hc: (...arguments_: unknown[]) => unknown;
   export interface BeaconSelectionParameter {
     accountId: string | null;
     locale: string;
@@ -6933,6 +6962,7 @@ declare module "@rchunk/hooks-settings-copy" {
 }
 
 declare module "@rchunk/hooks-settings-model" {
+  export const p: () => void;
   const _default: unknown;
   export default _default;
 }
