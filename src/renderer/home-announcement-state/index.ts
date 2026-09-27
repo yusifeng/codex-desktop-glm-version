@@ -4,12 +4,14 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type {
+  JsxRuntime,
+  MaitaiScopeApi,
+  ReactRuntime,
+  ReadableSignal,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
-
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
 
 const {
   AM: multiAgentBannerExposedEvent,
@@ -24,7 +26,30 @@ const {
   ig: DismissIcon,
   kM: multiAgentBannerDismissedEvent,
   n4: useIntl,
-} = appShared;
+} = appSharedChunk;
+const {
+  $M: getRateLimitAnnouncementConfig,
+  Gfn: useComposerPrefill,
+  Kot: MultiAgentIcon,
+  N6t: useAccountIdentity,
+  Uzt: openManagedDialog,
+  cnt: useFeatureMutation,
+  dun: createPersistedSignal,
+  f0t: usageQuerySignal,
+  i5: getUsageLimitStatus,
+  jyt: getHostInfo,
+  kI: useCurrentHost,
+  lfn: getRateLimitExperiment,
+  n6: RateLimitResetIcon,
+  nN: useMultiAgentFeatureEnabled,
+  ngn: getPersistedFallback,
+  ont: hostFeaturesQueryFamily,
+  ugn: localHostId,
+  uht: useAccountQuery,
+  vP: RateLimitResetDialog,
+  xpn: logProductEvent,
+} = appInitialChunk;
+const { Sm: Banner } = appPrimaryChunk;
 
 const MULTI_AGENT_FEATURE = "multi_agent";
 const MULTI_AGENT_DISMISSED_KEY = "has-seen-multi-agent-composer-banner";
@@ -32,50 +57,16 @@ const RATE_LIMIT_DISMISSAL_KEY =
   "rate-limit-reset-home-announcement-dismissal-by-account-id";
 const RATE_LIMIT_DISMISSAL_TTL_MS = 86_400_000;
 
-interface ReactRuntime {
-  useEffect(effect: () => void, dependencies: readonly unknown[]): void;
-  useRef<Value>(initialValue: Value): { current: Value };
-  useState<Value>(initialValue: Value): [
-    Value,
-    (value: Value | ((current: Value) => Value)) => void,
-  ];
-}
-
-interface JsxRuntime {
-  jsx(component: unknown, props: unknown): unknown;
-}
-
-interface AnnouncementScope {
-  set?(signal: unknown, value: unknown): void;
-}
-
-interface MultiAgentFeature {
-  enabled?: boolean;
-  name?: string;
-}
-
-interface MultiAgentFeatureQuery {
-  data?: MultiAgentFeature[];
-  isLoading?: boolean;
-}
-
-interface UsageQuery {
-  data?: {
-    rate_limit_reset_credits?: { available_count?: number };
-  } | null;
-  isLoading?: boolean;
-}
-
 interface RateLimitDismissal {
   dismissedAtMs: number;
 }
 
 type RateLimitDismissals = Record<string, RateLimitDismissal>;
 
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let multiAgentDismissedState: unknown = Symbol(MULTI_AGENT_DISMISSED_KEY);
-let rateLimitDismissalState: unknown = Symbol(RATE_LIMIT_DISMISSAL_KEY);
+let React: ReactRuntime | null = null;
+let jsx: JsxRuntime | null = null;
+let multiAgentDismissedState: ReadableSignal<boolean> | null = null;
+let rateLimitDismissalState: ReadableSignal<RateLimitDismissals> | null = null;
 let initialized = false;
 
 interface AnnouncementEligibility {
@@ -88,18 +79,35 @@ interface RateLimitResetEligibility extends AnnouncementEligibility {
   dismiss(): void;
 }
 
+interface MultiAgentHomeAnnouncementProps {
+  onTryNow?: () => void;
+}
+
+interface RateLimitResetHomeAnnouncementProps {
+  availableCount: number;
+  onDismiss(): void;
+}
+
+interface RateLimitResetBannerProps {
+  onDismiss(): void;
+  onSeeResets(): void;
+}
+
 function initializeRuntime(): void {
   if (initialized) return;
   initialized = true;
   React = (typeof reactRuntime === "function"
     ? reactRuntime()
-    : reactRuntime) as ReactRuntime;
-  jsx = (typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime) as JsxRuntime;
-  multiAgentDismissedState =
-    appInitial.dun?.(MULTI_AGENT_DISMISSED_KEY, false) ??
-    multiAgentDismissedState;
-  rateLimitDismissalState =
-    appInitial.dun?.(RATE_LIMIT_DISMISSAL_KEY, {}) ?? rateLimitDismissalState;
+    : reactRuntime);
+  jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
+  multiAgentDismissedState = createPersistedSignal(
+    MULTI_AGENT_DISMISSED_KEY,
+    false,
+  );
+  rateLimitDismissalState = createPersistedSignal(
+    RATE_LIMIT_DISMISSAL_KEY,
+    {},
+  );
 }
 
 function initializeAnnouncementClassification(): void {
@@ -134,25 +142,47 @@ function initializeRateLimitResetAnnouncementState(): void {
   initializeRuntime();
 }
 
-function resolveScope(): AnnouncementScope {
-  return (
-    useSignalScope?.(applicationScope) ?? useSignalScope?.(appInitial.kht) ?? {}
-  );
+function resolveScope(): MaitaiScopeApi<Record<string, unknown>> {
+  return useSignalScope(applicationScope);
+}
+
+function getMultiAgentDismissedSignal(): ReadableSignal<boolean> {
+  initializeRuntime();
+  if (multiAgentDismissedState == null) {
+    throw new Error("Multi-agent dismissal signal failed to initialize");
+  }
+  return multiAgentDismissedState;
+}
+
+function getRateLimitDismissalSignal(): ReadableSignal<RateLimitDismissals> {
+  initializeRuntime();
+  if (rateLimitDismissalState == null) {
+    throw new Error("Rate-limit dismissal signal failed to initialize");
+  }
+  return rateLimitDismissalState;
+}
+
+function getAnnouncementRuntime(): {
+  React: ReactRuntime;
+  jsx: JsxRuntime;
+} {
+  initializeRuntime();
+  if (React == null || jsx == null) {
+    throw new Error("Home announcement runtime failed to initialize");
+  }
+  return { React, jsx };
 }
 
 function useMultiAgentAnnouncementEligibility(): AnnouncementEligibility {
   initializeMultiAgentAnnouncementState();
-  const currentHost = appInitial.kI?.();
-  const hostId = appInitial.jyt?.(currentHost)?.hostId;
-  const featureEnabled = appInitial.nN?.() === true;
+  const currentHost = useCurrentHost();
+  const hostId = getHostInfo(currentHost).hostId;
+  const featureEnabled = useMultiAgentFeatureEnabled();
   const seen =
-    (useSignalValue?.(multiAgentDismissedState) as boolean | undefined) ??
-    appInitial.ngn?.(MULTI_AGENT_DISMISSED_KEY, false) ??
+    useSignalValue(getMultiAgentDismissedSignal()) ??
+    getPersistedFallback(MULTI_AGENT_DISMISSED_KEY, false) ??
     false;
-  const query =
-    (useSignalFamilyValue?.(appInitial.ont, hostId) as
-      | MultiAgentFeatureQuery
-      | undefined) ?? {};
+  const query = useSignalFamilyValue(hostFeaturesQueryFamily, hostId);
   const hasEnabledMultiAgent =
     query.data?.some?.(
       (feature) =>
@@ -170,34 +200,29 @@ function message(
   defaultMessage: string,
   description: string,
 ): unknown {
-  return FormattedMessage == null
-    ? defaultMessage
-    : jsx.jsx(FormattedMessage, { id, defaultMessage, description });
+  const { jsx } = getAnnouncementRuntime();
+  return jsx.jsx(FormattedMessage, { id, defaultMessage, description });
 }
 
 function analytics(
-  scope: AnnouncementScope,
+  scope: MaitaiScopeApi<Record<string, unknown>>,
   event: unknown,
-  payload: object,
+  payload: Record<string, unknown>,
 ): void {
-  appInitial.xpn?.(scope, event, payload);
+  logProductEvent(scope, event, payload);
 }
 
 function MultiAgentHomeAnnouncement({
   onTryNow,
-}: {
-  onTryNow?: () => void;
-}): unknown {
+}: MultiAgentHomeAnnouncementProps): unknown {
   initializeMultiAgentAnnouncementContent();
+  const { React, jsx } = getAnnouncementRuntime();
   const scope = resolveScope();
-  const intl = useIntl?.();
-  const [, setComposerPrefill] = appInitial.Gfn?.("composer_prefill") ?? [
-    null,
-    null,
-  ];
+  const intl = useIntl();
+  const [, setComposerPrefill] = useComposerPrefill("composer_prefill");
   const seen =
-    (useSignalValue?.(multiAgentDismissedState) as boolean | undefined) ??
-    appInitial.ngn?.(MULTI_AGENT_DISMISSED_KEY, false) ??
+    useSignalValue(getMultiAgentDismissedSignal()) ??
+    getPersistedFallback(MULTI_AGENT_DISMISSED_KEY, false) ??
     false;
   const [submitting, setSubmitting] = React.useState(false);
   const exposed = React.useRef(false);
@@ -213,33 +238,34 @@ function MultiAgentHomeAnnouncement({
 
   const tryNow = () => {
     setSubmitting(true);
+    const formattedPrompt = intl.formatMessage({
+      id: "composer.multiAgentBanner.tryNow.prompt",
+      defaultMessage: "Spawn a subagent to explore this repo.",
+      description:
+        "Prompt inserted when the user clicks Try now on the multi-agent composer banner",
+    });
     const prompt =
-      intl?.formatMessage?.({
-        id: "composer.multiAgentBanner.tryNow.prompt",
-        defaultMessage: "Spawn a subagent to explore this repo.",
-        description:
-          "Prompt inserted when the user clicks Try now on the multi-agent composer banner",
-      }) ?? "Spawn a subagent to explore this repo.";
+      typeof formattedPrompt === "string"
+        ? formattedPrompt
+        : "Spawn a subagent to explore this repo.";
     analytics(scope, multiAgentBannerActionEvent, { action: "try_now" });
-    const mutation = appInitial.cnt?.({ hostId: appInitial.ugn });
-    const request = mutation?.mutateAsync?.({
+    const mutation = useFeatureMutation({ hostId: localHostId });
+    const request = mutation.mutateAsync({
       featureName: MULTI_AGENT_FEATURE,
       enabled: true,
     });
     Promise.resolve(request).finally(() => {
       if (onTryNow != null) onTryNow();
-      else setComposerPrefill?.({ text: prompt });
-      scope?.set?.(multiAgentDismissedState, true);
+      else setComposerPrefill({ text: prompt });
+      scope.set(getMultiAgentDismissedSignal(), true);
       setSubmitting(false);
     });
   };
   const dismiss = () => {
     analytics(scope, multiAgentBannerDismissedEvent, {});
-    scope?.set?.(multiAgentDismissedState, true);
+    scope.set(getMultiAgentDismissedSignal(), true);
   };
 
-  const Banner = appPrimary.Sm ?? "div";
-  const MultiAgentIcon = appInitial.Kot ?? "span";
   return jsx.jsx(Banner, {
     title: message(
       "codex.multiAgentComposerBanner.title",
@@ -263,7 +289,7 @@ function MultiAgentHomeAnnouncement({
     },
     dismissAction: {
       ariaLabel:
-        intl?.formatMessage?.({
+        intl.formatMessage({
           id: "codex.multiAgentComposerBanner.dismissLabel",
           defaultMessage: "Dismiss subagent banner",
           description:
@@ -279,14 +305,12 @@ function MultiAgentHomeAnnouncement({
 function RateLimitResetHomeAnnouncement({
   availableCount,
   onDismiss,
-}: {
-  availableCount: number;
-  onDismiss(): void;
-}): unknown {
+}: RateLimitResetHomeAnnouncementProps): unknown {
   initializeRateLimitResetAnnouncementContent();
+  const { jsx } = getAnnouncementRuntime();
   const scope = resolveScope();
   const openResets = () => {
-    appInitial.Uzt?.(scope, appInitial.vP, {
+    openManagedDialog(scope, RateLimitResetDialog, {
       initialAvailableCount: availableCount,
       isRateLimitReached: false,
       onResetComplete() {},
@@ -298,13 +322,9 @@ function RateLimitResetHomeAnnouncement({
 function RateLimitResetBanner({
   onDismiss,
   onSeeResets,
-}: {
-  onDismiss(): void;
-  onSeeResets(): void;
-}): unknown {
-  const intl = useIntl?.();
-  const Banner = appPrimary.Sm ?? "div";
-  const ResetIcon = appInitial.n6 ?? "span";
+}: RateLimitResetBannerProps): unknown {
+  const { jsx } = getAnnouncementRuntime();
+  const intl = useIntl();
   return jsx.jsx(Banner, {
     title: message(
       "codex.rateLimitResetHomeBanner.title",
@@ -316,7 +336,7 @@ function RateLimitResetBanner({
       "You were granted a rate limit reset that will expire in 30 days.",
       "Description shown in the home banner when a Codex rate limit reset credit is available",
     ),
-    leadingVisual: jsx.jsx(ResetIcon, { className: "size-8" }),
+    leadingVisual: jsx.jsx(RateLimitResetIcon, { className: "size-8" }),
     primaryAction: {
       label: message(
         "codex.rateLimitResetHomeBanner.seeResets",
@@ -327,7 +347,7 @@ function RateLimitResetBanner({
     },
     dismissAction: {
       ariaLabel:
-        intl?.formatMessage?.({
+        intl.formatMessage({
           id: "codex.rateLimitResetHomeBanner.dismiss",
           defaultMessage: "Dismiss rate limit reset banner",
           description:
@@ -342,29 +362,26 @@ function RateLimitResetBanner({
 function useRateLimitResetAnnouncement(): RateLimitResetEligibility {
   initializeRateLimitResetAnnouncementState();
   const scope = resolveScope();
-  const identity = appInitial.N6t?.() ?? {};
+  const identity = useAccountIdentity();
   const accountId = identity.accountId ?? null;
-  const accountQuery = appInitial.uht?.() ?? {};
-  const usageQuery =
-    (useSignalValue?.(appInitial.f0t) as UsageQuery | undefined) ?? {};
+  const accountQuery = useAccountQuery();
+  const usageQuery = useSignalValue(usageQuerySignal);
   const availableCount =
     usageQuery.data?.rate_limit_reset_credits?.available_count ?? 0;
-  const usage = appInitial.i5?.(usageQuery.data ?? null) ?? null;
+  const usage = getUsageLimitStatus(usageQuery.data ?? null);
   const dismissalByAccount =
-    (useSignalValue?.(rateLimitDismissalState) as
-      | RateLimitDismissals
-      | undefined) ?? {};
+    useSignalValue(getRateLimitDismissalSignal()) ?? {};
   const dismissal = accountId == null ? null : dismissalByAccount[accountId];
   const threshold =
-    appInitial.$M?.(appInitial.lfn?.(), {
+    getRateLimitAnnouncementConfig(getRateLimitExperiment(), {
       currentAccount: accountQuery.data,
       disableExposureLog: true,
-    })?.config?.remainingThresholdPercent ?? 10;
+    }).config.remainingThresholdPercent;
   const dismiss = () => {
     if (accountId == null) return;
-    scope?.set?.(
-      rateLimitDismissalState,
-      (current: Record<string, unknown>) => ({
+    scope.set(
+      getRateLimitDismissalSignal(),
+      (current: RateLimitDismissals) => ({
         ...current,
         [accountId]: { dismissedAtMs: Date.now() },
       }),

@@ -804,6 +804,10 @@ declare module "@rchunk/app-shared" {
   // virtualized-turn-list 消费的压缩导出面（语义见该模块头注释）：
   /** initializeJsxRuntimeLazy（rolldown lazy 辅助）。 */
   export const $3: () => void;
+  /** Multi-agent Home banner analytics events. */
+  export const AM: unknown;
+  export const OM: unknown;
+  export const kM: unknown;
   /** initializeIntlRuntime（localized banner/message 基础设施）。 */
   export const fI: () => void;
   /** initializeMountedState（mounted callback hook 依赖）。 */
@@ -2697,6 +2701,66 @@ declare module "@rchunk/app-initial" {
   export const V$: (
     options: ConnectorAppsQueryOptions,
   ) => ConnectorAppsQueryResult;
+  export interface MultiAgentFeature {
+    enabled?: boolean;
+    name?: string;
+  }
+  export interface UsageQueryData {
+    rate_limit_reset_credits?: { available_count?: number };
+  }
+  export interface UsageQueryResult {
+    data?: UsageQueryData | null;
+    isLoading?: boolean;
+  }
+  export interface RateLimitResetDialogProps extends Record<string, unknown> {
+    initialAvailableCount: number;
+    isRateLimitReached: boolean;
+    onResetComplete(): void;
+  }
+  export const dun: <Value>(
+    key: string,
+    initialValue: Value,
+  ) => import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    Value
+  >;
+  export const ngn: <Value>(key: string, fallback: Value) => Value;
+  export const kI: () => unknown;
+  export const jyt: (host: unknown) => { hostId: string };
+  export const nN: () => boolean;
+  export const ont: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    string,
+    MultiAgentFeature[]
+  >;
+  export const Gfn: (
+    key: "composer_prefill",
+  ) => [
+    unknown,
+    (value: { text: string }) => void,
+  ];
+  export const cnt: (options: { hostId: string }) => {
+    mutateAsync(input: {
+      enabled: boolean;
+      featureName: string;
+    }): Promise<unknown>;
+  };
+  export const ugn: string;
+  export const f0t: import("@rchunk/app-shared").ReadableSignal<UsageQueryResult>;
+  export const i5: (
+    data: UsageQueryData | null,
+  ) => { remainingPercent: number } | null;
+  export const lfn: () => unknown;
+  export const $M: (
+    experiment: unknown,
+    options: {
+      currentAccount: Account | undefined;
+      disableExposureLog: boolean;
+    },
+  ) => { config: { remainingThresholdPercent: number } };
+  export const vP: ManagedDialogComponent<RateLimitResetDialogProps>;
+  export const Kot: (props: { className?: string }) => unknown;
+  export const n6: (props: { className?: string }) => unknown;
   export const Lb: {
     delete: import("@rchunk/app-shared").MessageDescriptor;
   };
@@ -3349,6 +3413,21 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-primary" {
+  export interface BannerAction {
+    ariaLabel?: string;
+    disabled?: boolean;
+    icon?: unknown;
+    label?: unknown;
+    onClick(): void;
+  }
+  export interface BannerProps extends Record<string, unknown> {
+    description?: unknown;
+    dismissAction?: BannerAction;
+    leadingVisual?: unknown;
+    primaryAction?: BannerAction;
+    title?: unknown;
+  }
+  export const Sm: (props: BannerProps) => unknown;
   export interface SurfaceClaimProps extends Record<string, unknown> {
     children: unknown;
     claim: unknown;
@@ -4727,6 +4806,13 @@ declare module "@rchunk/home-announcement-state" {
     availableCount: number;
     dismiss(): void;
   }
+  export interface MultiAgentHomeAnnouncementProps {
+    onTryNow?: () => void;
+  }
+  export interface RateLimitResetHomeAnnouncementProps {
+    availableCount: number;
+    onDismiss(): void;
+  }
   export const a: () => void;
   export const c: () => void;
   export const d: () => void;
@@ -4735,11 +4821,8 @@ declare module "@rchunk/home-announcement-state" {
   export const l: () => void;
   export const n: () => RateLimitResetEligibility;
   export const o: () => void;
-  export const r: (props: {
-    availableCount: number;
-    onDismiss(): void;
-  }) => unknown;
-  export const s: (props: { onTryNow?: () => void }) => unknown;
+  export const r: (props: RateLimitResetHomeAnnouncementProps) => unknown;
+  export const s: (props: MultiAgentHomeAnnouncementProps) => unknown;
   export const t: () => void;
   export const u: () => AnnouncementEligibility;
 }
