@@ -229,3 +229,21 @@ npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"
 三个数字 27/27、11/11、139 = 接手状态健康。然后按第三节 P0 顺序，
 从 composer 簇挑第一个 chunk（建议 `composer-utility-bar`，中型、
 被 conversation 页直接消费），走第四节闭环。
+
+### 2026-09-27 增量流程更新
+
+当前推进已改为“语义簇一 commit、簇末统一门禁”。不要再手工依次运行
+build/verify/tsc/diff 以及手工核对断言总数；统一使用：
+
+```bash
+npm run verify-renderer-cluster -- \
+  --test scripts/test-<cluster>.mjs \
+  --module <module-a>:<assertions> \
+  --module <module-b>:<assertions>
+```
+
+该命令会自动执行定向测试、核对测试源码实际断言数、构建 renderer、运行
+renderer/main 结构验证、检查 TypeScript 基线、`git diff --check`、新增 any
+以及直接 namespace chunk 消费，并输出可直接复制进 commit message 的模块
+验证清单。当前 TypeScript 基线为 **73**；可用
+`--tsc-baseline <count>` 显式覆盖。
