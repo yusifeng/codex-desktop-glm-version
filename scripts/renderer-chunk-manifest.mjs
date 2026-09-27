@@ -15,6 +15,7 @@
 // value = 发布版 chunk 文件名。
 
 export const CHUNKS = {
+  "codex-pet-assets": "codex-pet-assets-5f01c10f2955.js",
   "animated-icon-svg": "animated-icon-svg-6d0bf1a76c25.js",
   "hello-icon": "hello-8562d3c63d3b.js",
   "loader-icon": "loader-7d97c70543c1.js",
@@ -2317,4 +2318,6 @@ export const REWRITTEN = new Set([
   "animated-icon",
   "catalog",
   "codex-mobile-setup-flow",
+  "avatar-mascot-button",
+  "voice-configuration-manager",
 ]);
