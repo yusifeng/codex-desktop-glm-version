@@ -15,6 +15,10 @@
 // value = 发布版 chunk 文件名。
 
 export const CHUNKS = {
+  "billing-icons": "icons-2e00db17c09a.js",
+  "prop-types-runtime": "prop-types-1ebacf647ac7.js",
+  "stripe-payment-element-options": "stripe-payment-element-options-437b431243e5.js",
+  "tax-types": "tax-types-ea09745eb0a2.js",
   "multiplayer-document-runtime": "document-8b336e44c2be.js",
   "writing-block-surface": "writing-block-surface-8e4ea0426261.js",
   "vite-browser-external": "__vite-browser-external-1a803c367e3b.js",
@@ -2300,4 +2304,8 @@ export const REWRITTEN = new Set([
   "mcp-tool-approval-message",
   "mcp-tool-item-content",
   "plan-summary-item-content",
+  "usage",
+  "pricing-plan-comparison",
+  "billing-form-options",
+  "checkout-page-core",
 ]);

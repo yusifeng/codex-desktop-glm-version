@@ -1,0 +1,12 @@
+import "@rchunk/rolldown-runtime";
+import "@rchunk/app-shared";
+import "@rchunk/prop-types-runtime";
+import "@rchunk/stripe-payment-element-options";
+
+interface ExperimentReader { getLayer(id: string): { get<Value>(key: string, fallback: Value): Value }; getDynamicConfig(id: string): { get<Value>(key: string, fallback: Value): Value } }
+interface BillingContext { checkoutSessionId?: string; email?: string; isNewStripeCustomer?: boolean; minimalBillingAddress?: Record<string, unknown>; useMinimalBillingAddress?: boolean }
+interface PaymentElementOptions { checkoutSessionId?: string; defaultValues?: { billingDetails: { email: string } }; isGooglePayEnabled: boolean; isNewStripeCustomer?: boolean; minimalBillingAddress?: Record<string, unknown>; paymentElementLayoutMode: string; paymentMethodOrder?: string[]; shouldHidePaymentElementName: boolean; useMinimalBillingAddress?: boolean }
+const stripeReactRuntime = { Elements: "Elements", PaymentElement: "PaymentElement", ExpressCheckoutElement: "ExpressCheckoutElement", AddressElement: "AddressElement" } as const;
+function getBillingFormOptions(experiments: ExperimentReader, context?: BillingContext): PaymentElementOptions { const layeredOrder = experiments.getLayer("1461259566").get<unknown>("payment_method_order", null); const configuredOrder = experiments.getDynamicConfig("247832287").get<unknown>("payment_method_order", null); const paymentMethodOrder = [layeredOrder, configuredOrder].find(value => Array.isArray(value) && value.some(item => typeof item === "string")) as unknown[] | undefined; return { ...(context?.email ? { defaultValues: { billingDetails: { email: context.email } } } : {}), checkoutSessionId: context?.checkoutSessionId, isNewStripeCustomer: context?.isNewStripeCustomer, useMinimalBillingAddress: context?.useMinimalBillingAddress, minimalBillingAddress: context?.minimalBillingAddress, paymentMethodOrder: paymentMethodOrder?.filter((item): item is string => typeof item === "string"), paymentElementLayoutMode: experiments.getLayer("2160290604").get("pe_layout_mode", "tabs"), shouldHidePaymentElementName: experiments.getLayer("4224149292").get("hide_payment_element_name", false), isGooglePayEnabled: context?.isNewStripeCustomer === true && experiments.getLayer("2160290604").get("is_google_pay_pe_enabled", false) }; }
+function initializeBillingFormOptions(): void {}
+export { initializeBillingFormOptions as n, stripeReactRuntime as r, getBillingFormOptions as t };

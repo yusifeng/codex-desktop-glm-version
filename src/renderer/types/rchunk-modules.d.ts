@@ -5298,7 +5298,7 @@ declare module "@rchunk/format-amount" {
   export const t: (intl: AmountFormatter, amount: number, currencyCode: string) => string;
 }
 declare module "@rchunk/chatgpt-subscription-events";
-declare module "@rchunk/pricing-plan-comparison";
+declare module "@rchunk/pricing-plan-comparison" { export type PricingPlan = "free" | "go" | "plus" | "prolite" | "pro" | "self_serve_business" | "self_serve_business_usage_based" | string; export const i: () => void; export const n: () => void; export const r: (currentPlan: PricingPlan, targetPlan: PricingPlan, interval?: "month" | "year") => string | null; export const t: (props: { currentPlan: PricingPlan; offers?: Record<string, { price?: string }>; plans?: PricingPlan[]; billingInterval?: "month" | "year"; onSelectPlan?(plan: PricingPlan, checkoutUrl: string | null): void }) => unknown; }
 declare module "@rchunk/voice-configuration-manager";
 declare module "@rchunk/chatgpt-voices-query" { export interface VoiceResponse { voices: Array<{ description?: string | null; name?: string | null; preview_url?: string; voice: string }>; [key: string]: unknown } export const n: { getOptions(input: { spoken_language?: string | null; voice_mode?: string }, context?: { accountId?: string | null; defaultLanguage?: string }): { queryKey: readonly unknown[]; queryFn(): Promise<VoiceResponse>; select(response: VoiceResponse): VoiceResponse & { voices: Array<{ description: string; name: string; orbTreatment: string; previewUrl?: string; slug: string }> }; staleTime: 0; refetchOnMount: "always"; retryOnMount: true } }; export const r: () => void; export const t: readonly ["chatgpt-settings-voices"] }
 declare module "@rchunk/library-item-actions" { export interface LibraryActionNode { downloadUrl?: string; file_id?: string | null; id: string; kind: "directory" | "file"; mime_type?: string | null; name: string; parent_directory_id?: string | null; requestHeaders?: Record<string, string> } export interface LibraryActionSelection { canDelete?: boolean; canDownload?: boolean; canMove?: boolean; canRename?: boolean; canRestore?: boolean; node: LibraryActionNode } export type LibraryItemAction = { type: "delete"; permanently?: boolean } | { type: "download"; analyticsContext?: unknown } | { type: "move"; directoryId: string | null } | { type: "rename"; name: string } | { type: "restore" }; export interface LibraryItemActionScope { api: { delete(path: string, input?: Record<string, unknown>): Promise<{ success?: boolean }>; patch(path: string, input?: Record<string, unknown>): Promise<unknown>; post(path: string, input?: Record<string, unknown>): Promise<unknown> }; download?(node: LibraryActionNode): Promise<void> | void; invalidate?(action: LibraryItemAction): Promise<void> | void; notifyError?(message: string): void } export const i: (scope: LibraryItemActionScope, item: LibraryActionSelection, action: LibraryItemAction, skipInvalidation?: boolean) => Promise<boolean>; export const n: Map<string, boolean>; export const r: (scope: LibraryItemActionScope, items: LibraryActionSelection[], action: LibraryItemAction) => Promise<string[]>; export const t: () => void }
@@ -5324,7 +5324,7 @@ declare module "@rchunk/add-payment-method" {
   export const n: () => void;
   export const t: (props: AddPaymentMethodProps) => unknown;
 }
-declare module "@rchunk/billing-form-options";
+declare module "@rchunk/billing-form-options" { export interface BillingExperimentReader { getLayer(id: string): { get<Value>(key: string, fallback: Value): Value }; getDynamicConfig(id: string): { get<Value>(key: string, fallback: Value): Value } } export const n: () => void; export const r: { readonly AddressElement: "AddressElement"; readonly Elements: "Elements"; readonly ExpressCheckoutElement: "ExpressCheckoutElement"; readonly PaymentElement: "PaymentElement" }; export const t: (experiments: BillingExperimentReader, context?: { checkoutSessionId?: string; email?: string; isNewStripeCustomer?: boolean; minimalBillingAddress?: Record<string, unknown>; useMinimalBillingAddress?: boolean }) => { checkoutSessionId?: string; defaultValues?: { billingDetails: { email: string } }; isGooglePayEnabled: boolean; isNewStripeCustomer?: boolean; minimalBillingAddress?: Record<string, unknown>; paymentElementLayoutMode: string; paymentMethodOrder?: string[]; shouldHidePaymentElementName: boolean; useMinimalBillingAddress?: boolean }; }
 declare module "@rchunk/delinquent-upgrade-preparation" {
   export interface DelinquentUpgradePreparationInput extends Record<string, unknown> { accountId: string; hasPromotion?: boolean; initialPlan: string; pricingInfo?: unknown; updatedPlan: string; userId: string }
   export const n: () => void;
@@ -6097,9 +6097,15 @@ declare module "@rchunk/checkout-confirm-latency" {
 }
 
 declare module "@rchunk/checkout-page-core" {
+  export const n: (props: { returnPath?: string; url: string; onOpenExternal?(url: string): void }) => unknown;
   export const r: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const t: (props: { accountId?: string | null; checkoutSessionId?: string | null; error?: string | null; loading?: boolean; processorEntity?: string | null; returnPath?: string; search?: string; userId?: string | null; hostedCheckoutUrl?: string | null; onOpenExternal?(url: string): void; onRetry?(): void }) => unknown;
 }
+
+declare module "@rchunk/billing-icons";
+declare module "@rchunk/prop-types-runtime";
+declare module "@rchunk/stripe-payment-element-options";
+declare module "@rchunk/tax-types";
 
 declare module "@rchunk/credit-purchase-page-core" {
   export const n: () => void;
@@ -7741,7 +7747,7 @@ declare module "@rchunk/home-suggestion-surface" {
 }
 
 declare module "@rchunk/composer-banners" { export const ComposerBanners: unknown; }
-declare module "@rchunk/usage" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/usage" { export const n: (props: { canShowUsageBanners?: boolean; imageGenerationLimit?: boolean; modelName?: string; resetAt?: string | number | Date | null; showModelLimit?: boolean; showWorkspaceUsageLimit?: boolean; showUpsell?: boolean; onDismissImageGenerationLimit?(): void }) => unknown; export const t: () => void; }
 declare module "@rchunk/task-announcement-candidates" {
   export interface TaskAnnouncementCandidatesProps {
     conversationId?: string | null;
