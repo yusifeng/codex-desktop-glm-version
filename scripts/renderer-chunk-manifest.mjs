@@ -2397,4 +2397,6 @@ export const REWRITTEN = new Set([
   "popcorn-presentation-panel",
   "popcorn-workbook-panel",
   "popcorn-document-panel",
+  "writing-block-copy-button",
+  "chatgpt-writing-block-ai-tools",
 ]);
