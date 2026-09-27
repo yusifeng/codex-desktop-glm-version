@@ -2454,4 +2454,5 @@ export const REWRITTEN = new Set([
   "design-editor-state",
   "workbook-review-utils",
   "popcorn-chart-hover-tooltip",
+  "draw-presence-label",
 ]);
