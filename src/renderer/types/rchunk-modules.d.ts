@@ -4933,14 +4933,48 @@ declare module "@rchunk/remote-connection-editor-draft" {
   export const r: () => void;
 }
 
-declare module "@rchunk/billing-queries";
-declare module "@rchunk/billing-query-error";
-declare module "@rchunk/stripe-client";
-declare module "@rchunk/billing-state";
-declare module "@rchunk/billing-pricing";
-declare module "@rchunk/subscription-queries";
-declare module "@rchunk/billing-events";
-declare module "@rchunk/card-tile";
+declare module "@rchunk/billing-queries" {
+  export const i: (context: { queryClient: { invalidateQueries(input: { queryKey: unknown[] }): Promise<unknown> | unknown } }, accountId: string) => Promise<void>;
+  export const n: () => void;
+  export const r: (accountId: string) => Record<string, unknown>;
+  export const t: (accountId: string) => Record<string, unknown>;
+}
+declare module "@rchunk/billing-query-error" {
+  export const n: () => void;
+  export const t: (props: { onRetry(): void }) => unknown;
+}
+declare module "@rchunk/stripe-client" {
+  export const n: () => void;
+  export const r: (accountId: string) => Record<string, unknown>;
+  export const t: (dark: boolean) => Record<string, unknown>;
+}
+declare module "@rchunk/billing-state" {
+  export const i: (method: { id: string; type?: string; card?: { exp_month?: number; exp_year?: number } }, now?: Date) => boolean;
+  export const n: (state: { entitlement: { has_active_subscription?: boolean }; last_active_subscription?: { purchase_origin_platform?: string } }) => "app_store" | "google_play_store" | "partner_managed" | null;
+  export const r: () => void;
+  export const t: (input: { paymentMethod: { id: string }; defaultPaymentMethodId?: string; autoReloadPaymentMethodId?: string; autoReloadResolved: boolean }) => boolean;
+}
+declare module "@rchunk/billing-pricing" {
+  export const n: () => void;
+  export const t: (input: { country?: string; currency?: string; isPricingEnabled(gate: string): boolean; signal?: AbortSignal }) => Promise<Record<string, unknown>>;
+}
+declare module "@rchunk/subscription-queries" {
+  export const a: (accountId: string, scope: Record<string, unknown> | undefined, isPricingEnabled: (gate: string) => boolean) => Record<string, unknown>;
+  export const i: () => void;
+  export const n: (...arguments_: unknown[]) => { amount: number; currency?: string; period: string } | undefined;
+  export const o: (accountId: string) => Record<string, unknown>;
+  export const r: (scope?: Record<string, unknown>) => string | null;
+  export const t: { safeParse(value: unknown): { success: boolean; data: unknown } };
+}
+declare module "@rchunk/billing-events" {
+  export const n: (store: Record<string, unknown>, error: Error) => void;
+  export const r: (store: Record<string, unknown>, event: { name: string; metadata?: Record<string, unknown> }) => void;
+  export const t: () => void;
+}
+declare module "@rchunk/card-tile" {
+  export const n: () => void;
+  export const t: (props: { actions?: unknown; badges?: unknown[]; className?: string; description?: unknown; disabled?: boolean; icon?: unknown; isHighlighted?: boolean; onClick?(): void; presentation?: "card" | "catalog" | "featured" | "ranked" | "related" | "row"; title: unknown; tooltip?: unknown }) => unknown;
+}
 declare module "@rchunk/plugin-settings-url";
 declare module "@rchunk/cloud-environment-queries";
 
@@ -5390,6 +5424,7 @@ declare module "@rchunk/mcp-view-surface" {
 declare module "@rchunk/diff-preview-content";
 declare module "@rchunk/ansi-block";
 declare module "@rchunk/shell-label";
+declare module "@rchunk/stripe-pure";
 
 declare module "@rchunk/detail-page" {
   export const n: (props: { children?: unknown }) => unknown;

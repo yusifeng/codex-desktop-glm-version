@@ -1,0 +1,8 @@
+import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+interface CardTileProps { actions?: unknown; badges?: unknown[]; className?: string; description?: unknown; disabled?: boolean; icon?: unknown; isHighlighted?: boolean; onClick?(): void; presentation?: "card" | "catalog" | "featured" | "ranked" | "related" | "row"; title: unknown; tooltip?: unknown }
+const jsx = getJsxRuntime();
+function CardTile({ actions, badges = [], className, description, disabled = false, icon, isHighlighted = false, onClick, presentation = "card", title, tooltip }: CardTileProps): unknown { const activate = (event: { currentTarget?: unknown; key?: string; preventDefault?(): void; target?: unknown }) => { if (!disabled && onClick && event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault?.(); onClick(); } }; return jsx.jsxs("div", { className, role: onClick || disabled ? "button" : undefined, tabIndex: onClick || disabled ? 0 : -1, "aria-disabled": disabled || undefined, "data-highlighted": isHighlighted || undefined, "data-presentation": presentation, "data-tooltip": tooltip, onClick: disabled ? undefined : onClick, onKeyDown: activate, children: [icon ? jsx.jsx("span", { children: icon }) : null, jsx.jsxs("div", { children: [jsx.jsxs("div", { children: [jsx.jsx("strong", { children: title }), badges.length ? jsx.jsx("span", { children: badges }) : null, actions] }), description ? jsx.jsx("p", { children: description }) : null] })] }); }
+function initializeCardTile(): void {}
+export { initializeCardTile as n, CardTile as t };

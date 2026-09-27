@@ -1,0 +1,8 @@
+import "@rchunk/rolldown-runtime";
+interface SubscriptionState { entitlement: { has_active_subscription?: boolean }; last_active_subscription?: { purchase_origin_platform?: string } }
+interface PaymentMethod { id: string; type?: string; card?: { exp_month?: number; exp_year?: number } }
+function subscriptionManagementSource(state: SubscriptionState): "app_store" | "google_play_store" | "partner_managed" | null { if (!state.entitlement.has_active_subscription) return null; switch (state.last_active_subscription?.purchase_origin_platform) { case "chatgpt_mobile_ios": case "sora_mobile_ios": return "app_store"; case "chatgpt_mobile_android": return "google_play_store"; case "partner_managed": return "partner_managed"; default: return null; } }
+function isExpiredPaymentMethod(method: PaymentMethod, now = new Date()): boolean { const card = method.card; return method.type === "card" && card?.exp_month != null && card.exp_year != null && (card.exp_year < now.getFullYear() || (card.exp_year === now.getFullYear() && card.exp_month < now.getMonth() + 1)); }
+function canDeletePaymentMethod({ paymentMethod, defaultPaymentMethodId, autoReloadPaymentMethodId, autoReloadResolved }: { paymentMethod: PaymentMethod; defaultPaymentMethodId?: string; autoReloadPaymentMethodId?: string; autoReloadResolved: boolean }): boolean { return autoReloadResolved && paymentMethod.id !== defaultPaymentMethodId && paymentMethod.id !== autoReloadPaymentMethodId; }
+function initializeBillingState(): void {}
+export { isExpiredPaymentMethod as i, subscriptionManagementSource as n, initializeBillingState as r, canDeletePaymentMethod as t };
