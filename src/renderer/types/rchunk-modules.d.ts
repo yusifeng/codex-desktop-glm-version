@@ -3712,6 +3712,8 @@ declare module "@rchunk/app-initial" {
       | undefined,
   ) => boolean;
   export const Slt: () => boolean;
+  export const Let: (props: Record<string, unknown>) => unknown;
+  export const Ret: () => void;
   export const Xl: () => void;
   export const xlt: () => void;
   export const qx: () => void;
@@ -4258,6 +4260,9 @@ declare module "@rchunk/app-primary" {
   export const d: () => void; // O9：项目选择器依赖初始化器
   export const n: () => void;
   export const t: unknown;
+  export const fc: (props: Record<string, unknown>) => unknown;
+  export const mc: () => void;
+  export const pc: (props: Record<string, unknown>) => unknown;
   export const _any: any;
 }
 
@@ -4508,6 +4513,57 @@ declare module "@rchunk/beacon-modal" {
   export const PepperOnboardingBeaconModal: (
     props: PepperOnboardingBeaconModalProps,
   ) => unknown;
+}
+
+declare module "@rchunk/chatgpt-work-home-page-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/checkout-page-core" {
+  export const r: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/credit-purchase-page-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/skills-page-core" {
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/browser-login-handoff-page-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/local-conversation-page" {
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/chatgpt-conversation-page-core" {
+  export const c: () => void;
+  export const i: (props: Record<string, unknown>) => unknown;
+  export const s: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/plugin-detail-page-core" {
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/mcp-extension-view-page-core" {
+  export const i: () => void;
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/chatgpt-cme" {
