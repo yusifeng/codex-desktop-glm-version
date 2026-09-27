@@ -7,12 +7,25 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as pluginSkillPreviewChunk from "@rchunk/plugin-skill-preview";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const pluginSkillPreview = pluginSkillPreviewChunk as Record<string, any>;
+const {
+  $3: initializeJsxRuntime,
+  I3: getJsxRuntime,
+  Jm: createLazyComponent,
+  lw: initializeBrowserProfileImportIcons,
+  qm: initializeQueryRuntime,
+  rC: PluginSkillIcon,
+} = appSharedChunk;
+const {
+  _E: loadSkillDetails,
+  gE: initializeSkillDetails,
+} = appInitialChunk;
+const {
+  r: initializePluginSkillPreview,
+  t: PluginSkillPreview,
+} = pluginSkillPreviewChunk;
 
-const jsx = appShared.I3();
-const SkillDetailsDialog = appShared.Jm(appInitial._E);
+const jsx = getJsxRuntime();
+const SkillDetailsDialog = createLazyComponent(loadSkillDetails);
 
 type SkillSource = {
   label: string;
@@ -21,21 +34,23 @@ type SkillSource = {
   skillId?: string;
 };
 
+interface ChatGptSkillSourceDialogProps {
+  onClose(): void;
+  shouldBlockExternalEgress: boolean;
+  source: SkillSource;
+}
+
 function ChatGptSkillSourceDialog({
   source,
   shouldBlockExternalEgress,
   onClose,
-}: {
-  source: SkillSource;
-  shouldBlockExternalEgress: boolean;
-  onClose: () => void;
-}) {
+}: ChatGptSkillSourceDialogProps): unknown {
   if (source.pluginId != null) {
-    return jsx.jsx(pluginSkillPreview.t, {
+    return jsx.jsx(PluginSkillPreview, {
       skillName: source.label,
       title: source.label,
       description: source.pluginName,
-      icon: jsx.jsx(appShared.rC, {}),
+      icon: jsx.jsx(PluginSkillIcon, {}),
       pluginId: source.pluginId,
       shouldBlockExternalEgress,
       onClose,
@@ -47,11 +62,11 @@ function ChatGptSkillSourceDialog({
 }
 
 function initializeChatGptSkillSourceDialog(): void {
-  appShared.$3?.();
-  appInitial.gE?.();
-  appShared.lw?.();
-  appShared.qm?.();
-  pluginSkillPreview.r?.();
+  initializeJsxRuntime();
+  initializeSkillDetails();
+  initializeBrowserProfileImportIcons();
+  initializeQueryRuntime();
+  initializePluginSkillPreview();
 }
 
 initializeChatGptSkillSourceDialog();

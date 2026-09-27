@@ -1096,6 +1096,8 @@ declare module "@rchunk/app-shared" {
   export const AS: (props: IconAssetProps) => unknown;
   /** browser-profile-import 图标依赖初始化器。 */
   export const lw: () => void;
+  /** 插件技能来源图标组件。 */
+  export const rC: (props: Record<string, unknown>) => unknown;
   export interface SimpleIconProps extends Record<string, unknown> {
     className?: string;
   }
@@ -2784,6 +2786,16 @@ declare module "@rchunk/app-initial" {
   export const dl: (props: PublicationTermsNoticeProps) => unknown;
   /** initializePublicationTermsNotice（内部 csc）。 */
   export const fl: () => void;
+  export interface SkillDetailsDialogProps extends Record<string, unknown> {
+    onClose(): void;
+    skillId: string;
+  }
+  /** loadSkillDetails（内部 n9o）。 */
+  export const _E: () => Promise<
+    (props: SkillDetailsDialogProps) => unknown
+  >;
+  /** initializeSkillDetails（内部 a9o）。 */
+  export const gE: () => void;
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices
@@ -3787,12 +3799,37 @@ declare module "@rchunk/location-permission-denied-dialog" {
 }
 
 declare module "@rchunk/plugin-skill-preview" {
+  export interface PluginSkillPreviewProps extends Record<string, unknown> {
+    description?: unknown;
+    footer?: unknown;
+    headerActions?: unknown;
+    icon?: unknown;
+    onClose(): void;
+    onCloseAutoFocus?: unknown;
+    pluginId: string;
+    shouldBlockExternalEgress: boolean;
+    skillName: string;
+    title: unknown;
+  }
   export const r: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: PluginSkillPreviewProps) => unknown;
 }
 
 declare module "@rchunk/chatgpt-skill-source-dialog" {
-  export const ChatGptSkillSourceDialog: (...args: any[]) => any;
+  export interface ChatGptSkillSource {
+    label: string;
+    pluginId?: string;
+    pluginName?: string;
+    skillId?: string;
+  }
+  export interface ChatGptSkillSourceDialogProps {
+    onClose(): void;
+    shouldBlockExternalEgress: boolean;
+    source: ChatGptSkillSource;
+  }
+  export const ChatGptSkillSourceDialog: (
+    props: ChatGptSkillSourceDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/gpt-about-dialog-core" {
