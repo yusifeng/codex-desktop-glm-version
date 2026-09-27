@@ -10,6 +10,7 @@ import {
 import {
   n as formatCommandMessage,
   r as initializeCommandMessages,
+  type CommandMessageIntl,
 } from "@rchunk/command-messages";
 
 type AnalogAction =
@@ -25,7 +26,7 @@ interface SkillMetadata {
 function getAnalogActionTitle(
   action: AnalogAction,
   skills: SkillMetadata[],
-  intl: unknown,
+  intl: CommandMessageIntl,
 ): string {
   if (action.type === "command") {
     const command = getCodexMicroCommand(action.commandId);

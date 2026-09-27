@@ -7756,7 +7756,18 @@ declare module "@rchunk/task-announcement-candidates" {
     props?: TaskAnnouncementCandidatesProps,
   ) => unknown;
 }
-declare module "@rchunk/popup" { export const i: unknown; export const n: () => void; export const r: unknown; export const t: unknown; }
+declare module "@rchunk/popup" {
+  export interface AddressSuggestionPreview { selectionEnd: number; selectionStart: number; value: string }
+  export interface AddressSuggestion { ariaLabel?: string; canBeDefault?: boolean; content?: unknown; deleteAction?: { label: string; run(): boolean }; id: string; isEmphasized?: boolean; isExistingDestination?: boolean; preview?: { inline?: AddressSuggestionPreview | null; selected?: AddressSuggestionPreview | null }; renderKey?: string; textMatch?: "exact" | "prefix" | "substring" }
+  export interface AddressSuggestionResult { isRetained?: boolean; suggestions: AddressSuggestion[] }
+  export interface AddressSuggestionQuery extends AddressSuggestionPreview { preventInlineAutocomplete?: boolean }
+  export interface AddressSuggestionSource { getSuggestions(value: string): AddressSuggestionResult | null; id: string; start?(query: AddressSuggestionQuery, changed: () => void): void; stop?(reason: string, resetComposition: boolean): void; subscribe?(changed: () => void): (() => void) | void }
+  export interface AddressSuggestionSnapshot { displayedSelectedIndex: number; isKeyboardSelection: boolean; isSelectedSuggestionMissing: boolean; preview: AddressSuggestionPreview | null; query: string | null; selectedIndex: number; selectedSuggestion: AddressSuggestion | null; suggestions: AddressSuggestion[] }
+  export class r { subscribe(listener: () => void, sources?: AddressSuggestionSource[]): () => void; getSnapshot(sources?: AddressSuggestionSource[]): AddressSuggestionSnapshot; start(query: AddressSuggestionQuery, sources: AddressSuggestionSource[]): void; stop(reason: string, resetComposition: boolean): void; moveSelection(offset: number, sources?: AddressSuggestionSource[]): void; deleteSuggestion(suggestion: AddressSuggestion, sources?: AddressSuggestionSource[]): boolean; hasKeyboardSelection(): boolean; setComposing(value: boolean): void; setPreventInlineAutocompleteOnNextChange(value: boolean): void; shouldPreventInlineAutocompleteOnNextChange(): boolean; consumePreventInlineAutocompleteOnNextChange(): boolean; isAutocompleteSelection(value: string, selectionStart: number, selectionEnd: number, sources?: AddressSuggestionSource[]): boolean }
+  export const i: () => void;
+  export const n: () => void;
+  export const t: (props: { label: string; listboxId: string; suggestions: AddressSuggestion[]; selectedIndex: number; onDelete?(suggestion: AddressSuggestion): void; onDeleteBlur?(target: EventTarget | null): void; onSelect(suggestion: AddressSuggestion): void }) => unknown;
+}
 declare module "@rchunk/browser-address-suggestion-overlay" { export const BrowserAddressSuggestionOverlay: unknown; }
 declare module "@rchunk/home-beacon" {
   export interface BeaconMessageIdentity {
@@ -13599,8 +13610,11 @@ declare module "@rchunk/codex-micro-slot-signals" {
 }
 
 declare module "@rchunk/command-messages" {
-  export const n: (command: Record<string, unknown>, intl: unknown) => string;
+  export interface CommandMessageIntl { formatMessage(descriptor: { defaultMessage: string; description: string; id: string }, values?: Record<string, unknown>): string }
+  export interface CommandMessage extends Record<string, unknown> { descriptionIntlId?: string; electron?: { menuTitleIntlId: string }; id?: string; titleIntlId?: string }
+  export const n: (command: CommandMessage, intl: CommandMessageIntl, petEnabled?: boolean) => string;
   export const r: () => void;
+  export const t: (command: CommandMessage, intl: CommandMessageIntl, override?: { description?: string; title?: string }, petEnabled?: boolean) => { description: string; title: string };
 }
 
 declare module "@rchunk/keyboard-shortcuts-search-input" {
@@ -14096,7 +14110,7 @@ declare module "@rchunk/app-initial" {
 
 declare module "@rchunk/conversation-thumbnail-ui" {
   export const n: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const t: (props: { draft?: string; requestExcerpt?: string | null; responseExcerpt?: string | null; statusState: { type: "error" | "idle" | "loading"; unread?: boolean; unreadCount?: number }; title: string; waitingFor?: "waitingOnApproval" | "waitingOnUserInput" | null }) => unknown;
 }
 
 declare module "@rchunk/cloud-automation-detail-panel" {
@@ -14135,7 +14149,7 @@ declare module "@rchunk/thread-panel-secondary-state" {
   export const a: "178837158"; export const c: { value: number | null }; export const d: (input: BrowserProfileDiscoveryInput) => { cooldownEndsAtMs: number | null; presentation: "banner" | "modal" | null; shouldDiscoverProfiles: boolean }; export const f: { value: boolean }; export const h: (rules: BrowserProfileTargetRules, candidate: string) => boolean; export const i: "target_specific_urls"; export const l: (scope: { set<Value>(state: { value: Value }, value: Value): void }) => void; export const m: () => void; export const n: "1161538056"; export const o: (scope: { set<Value>(state: { value: Value }, value: Value): void }) => void; export const p: { value: boolean }; export const r: "show_modal"; export const s: { value: number | null }; export const t: 86400000; export const u: (scope: { set<Value>(state: { value: Value }, value: Value): void }) => void;
 }
 declare module "@rchunk/browser-session-queries";
-declare module "@rchunk/tab-address-input" { export const n: () => void; export const t: (props: Record<string, unknown> & { onCommitAddress(address: string): void; sources: Array<Record<string, unknown>> }) => unknown }
+declare module "@rchunk/tab-address-input" { import type { AddressSuggestionSource } from "@rchunk/popup"; export interface TabAddressInputProps { addressValue: string; allowEmptySuggestions?: boolean; className?: string; currentAddress?: string; id: string; isAddressEditing?: boolean; isVisible?: boolean; placeholder?: string; sources: AddressSuggestionSource[]; submittedAddressStillPending?: boolean; onAddressValueChange(value: string): void; onCancelAddressEditing?(): void; onCommitAddress(address: string): void; onEnsureAddressEditing?(): void; onFind?(): void; onFinishAddressEditing?(): void; onStartAddressEditing?(): void; onStopAddressEditing?(): void } export const n: () => void; export const t: (props: TabAddressInputProps) => unknown }
 declare module "@rchunk/tab-input" {
   export interface TabInputContext { conversationId?: string | null; id: string; navigate(address: string, preserveEditing?: boolean): void; panelTarget?: string; stopEditing?(): void; value?: string }
   export interface TabInputProps extends Record<string, unknown> { addressValue?: string; conversationId?: string | null; id: string; onNavigate(address: string, preserveEditing?: boolean): void; onStopAddressEditing?(): void; panelTarget?: string; providers?: Array<(scope: unknown, context: TabInputContext) => Record<string, unknown>>; scope?: unknown; sources?: Array<Record<string, unknown>> }
@@ -14146,7 +14160,7 @@ declare module "@rchunk/view-control-labels" {
   export interface ViewControlLabelState { evaluate(context: ViewControlLabelContext): string }
   export const n: ViewControlLabelState; export const r: ViewControlLabelState; export const t: () => void;
 }
-declare module "@rchunk/thread-tab-entity";
+declare module "@rchunk/thread-tab-entity" { export const RegisteredChatGptEntityThumbnail: (props: { conversationId: string; draft?: string; requestExcerpt?: string | null; responseExcerpt?: string | null; statusState?: { type: "error" | "idle" | "loading"; unread?: boolean; unreadCount?: number }; title: string; waitingFor?: "waitingOnApproval" | "waitingOnUserInput" | null }) => unknown }
 
 declare module "@rchunk/app-initial" {
   /** initializeSearchInput（通用 SearchInput 组件依赖）。 */

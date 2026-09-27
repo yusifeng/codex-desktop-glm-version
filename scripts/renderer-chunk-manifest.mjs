@@ -2291,4 +2291,9 @@ export const REWRITTEN = new Set([
   "multiplayer-writing-block",
   "library-cloud-file-preview",
   "open-image-preview",
+  "command-messages",
+  "popup",
+  "tab-address-input",
+  "conversation-thumbnail-ui",
+  "thread-tab-entity",
 ]);
