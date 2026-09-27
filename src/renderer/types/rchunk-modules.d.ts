@@ -5719,7 +5719,8 @@ declare module "@rchunk/worktree-environment-dropdown" {
 }
 
 declare module "@rchunk/color-icon" {
-  export const _any: any;
+  export const n: () => void;
+  export const t: (props: { className?: string; name: string; title?: string }) => unknown;
 }
 
 declare module "@rchunk/connector-logo-stack" {
@@ -5962,7 +5963,8 @@ declare module "@rchunk/country-codes" {
 }
 
 declare module "@rchunk/google-logo" {
-  export const _any: any;
+  export const n: () => void;
+  export const t: (props?: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/access-splash" {
@@ -13691,13 +13693,30 @@ declare module "@rchunk/saved-memory-history" { export interface SavedMemoryVers
 declare module "@rchunk/animated-icon" {
   export const n: () => void;
   export const t: (props: {
-    animationJson: unknown;
+    animation: "automation" | "hello" | "loader" | "memory" | "sidebar-finances" | "sidebar-images" | "sidebar-library" | "sidebar-more" | "sidebar-new-chat" | "sidebar-plugins" | "sidebar-projects" | "sidebar-search" | "sidebar-tasks";
+    animated?: boolean;
+    className?: string;
     color?: string;
+    fallbackIcon?: unknown;
     loop?: boolean;
     onComplete?(): void;
     onReady?(): void;
   }) => unknown;
 }
+
+declare module "@rchunk/animated-icon-svg";
+declare module "@rchunk/hello-icon";
+declare module "@rchunk/loader-icon";
+declare module "@rchunk/memory-footnote-icon";
+declare module "@rchunk/sidebar-finances-icon";
+declare module "@rchunk/sidebar-images-icon";
+declare module "@rchunk/sidebar-library-icon";
+declare module "@rchunk/sidebar-more-icon";
+declare module "@rchunk/sidebar-new-chat-icon";
+declare module "@rchunk/sidebar-plugins-icon";
+declare module "@rchunk/sidebar-projects-icon";
+declare module "@rchunk/sidebar-search-icon";
+declare module "@rchunk/sidebar-tasks-icon";
 
 declare module "@rchunk/about-you-summary" {
   interface AboutYouOptions {

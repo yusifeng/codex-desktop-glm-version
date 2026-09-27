@@ -210,7 +210,7 @@ function AboutYouSummaryView(props: AboutYouProps): unknown {
 
   return jsx.jsxs("section", { "aria-label": "About you", children: [
     jsx.jsxs("header", { children: [jsx.jsx("h2", { children: "About you" }), jsx.jsx("button", { type: "button", onClick: props.onClose, children: "Close" })] }),
-    loading ? jsx.jsxs("p", { role: "status", children: [jsx.jsx(AnimatedIcon, { animationJson: {}, loop: true }), " Updating what ChatGPT knows about you…"] }) : null,
+    loading ? jsx.jsxs("p", { role: "status", children: [jsx.jsx(AnimatedIcon, { animation: "loader", loop: true }), " Updating what ChatGPT knows about you…"] }) : null,
     error ? jsx.jsx("p", { role: "alert", children: error }) : null,
     summary?.sections.map(section => jsx.jsxs("article", { "data-memory-section-id": section.id, children: [jsx.jsx("h3", { children: section.title }), jsx.jsx("p", { children: section.description })] }, section.id)),
     jsx.jsxs("footer", { children: [

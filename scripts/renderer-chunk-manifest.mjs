@@ -15,6 +15,10 @@
 // value = 发布版 chunk 文件名。
 
 export const CHUNKS = {
+  "animated-icon-svg": "animated-icon-svg-6d0bf1a76c25.js",
+  "hello-icon": "hello-8562d3c63d3b.js",
+  "loader-icon": "loader-7d97c70543c1.js",
+  "memory-footnote-icon": "memory-footnote-icon-8d0afd55c126.js",
   "billing-icons": "icons-2e00db17c09a.js",
   "prop-types-runtime": "prop-types-1ebacf647ac7.js",
   "stripe-payment-element-options": "stripe-payment-element-options-437b431243e5.js",
@@ -2308,4 +2312,7 @@ export const REWRITTEN = new Set([
   "pricing-plan-comparison",
   "billing-form-options",
   "checkout-page-core",
+  "google-logo",
+  "color-icon",
+  "animated-icon",
 ]);
