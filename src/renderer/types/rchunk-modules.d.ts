@@ -5780,7 +5780,7 @@ declare module "@rchunk/plugin-detail-page-core" {
 declare module "@rchunk/app-connect-link-navigation"; declare module "@rchunk/plugin-connector-setup";
 declare module "@rchunk/use-plugin-scheduled-tasks"; declare module "@rchunk/apps-availability";
 declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-card"; declare module "@rchunk/api";
-declare module "@rchunk/share-menu-item"; declare module "@rchunk/recommended-skill-statsig-overrides";
+declare module "@rchunk/share-menu-item";
 declare module "@rchunk/find-plugin-mcp-extension-view"; declare module "@rchunk/control-group"; declare module "@rchunk/filter";
 declare module "@rchunk/plugin-connected-account-links"; declare module "@rchunk/plugin-disabled-reason";
 declare module "@rchunk/plugin-connected-account-links" {
@@ -5798,7 +5798,21 @@ declare module "@rchunk/find-plugin-mcp-extension-view" { export const n: () => 
 declare module "@rchunk/use-plugin-scheduled-tasks" { export const n: (input: { hostId: string; capable?: boolean; enabled?: boolean; tasks?: unknown[] }) => unknown[] | undefined; export const t: () => void; }
 declare module "@rchunk/prepare-plugin-creator" { export const n: (scope: { get<T>(signal: unknown): T }, signal: AbortSignal, options?: { hostId?: string }) => Promise<{ pluginId: string; setupStarted: boolean } | null>; export const t: () => void; }
 declare module "@rchunk/plugin-connector-setup" { export const n: () => void; export const r: (input: Record<string, unknown>) => Promise<void>; export const t: (input: Record<string, unknown>) => void; }
-declare module "@rchunk/requested-plugin-connection" { const _default: unknown; export default _default; }
+declare module "@rchunk/requested-plugin-connection" {
+  export const n: (input: { appConnectOptions?: Record<string, unknown>; requestedConnectorId?: string | null; requiresAppSetup?: boolean; fetchConnector?(connectorId: string): Promise<{ description?: string | null; name: string; status?: string }>; fetchLink?(connectorId: string): Promise<{ auth_status?: string | null } | null> }) => Promise<{ kind: "ready" | "unavailable" } | { app: { category: null; description: string | null; id: string; installUrl: null; name: string }; kind: "needsAuth" }>;
+  export const t: () => void;
+}
+declare module "@rchunk/recommended-skill-statsig-overrides" { export const n: () => void; export const r: (value?: unknown) => Record<string, string>; export const t: (overrides: Record<string, string>, skillId: string) => string | undefined; }
+declare module "@rchunk/profile-plugin-details" { export const ProfilePluginDetails: (props: { invocation: { plugin_id?: string | null; plugin_name: string }; onClose(): void; onCloseAutoFocus?(): void; plugin?: { id?: string; name: string; [key: string]: unknown } | null; searchResults?: Array<Record<string, unknown>>; searchError?: Error | null; searchLoading?: boolean }) => unknown; }
+declare module "@rchunk/plugin-showcase-skill-details" { export const PluginShowcaseSkillDetails: (props: { item: { description?: string; pin: { artifact_id: string }; title?: string }; onClose(): void; onInstall?(skill: Record<string, unknown>): Promise<void> | void; skill?: Record<string, unknown> | null; skillsAccess?: boolean }) => unknown; }
+declare module "@rchunk/skill-data" {
+  export const getSkillName: (skill: { id: string; name?: string }) => string; export const getSkillSafetyStatus: (skill: Record<string, unknown>, config?: { blockUnsafe?: boolean }) => "blocked" | "needs-review" | null;
+  export const setSkillInstalled: (scope: unknown, skill: Record<string, unknown>, installed: boolean) => Promise<Record<string, unknown>>;
+  export const skillDetail$: { key: string }; export const skillFile$: { key: string }; export const skillSafetyConfig$: { key: string }; export const skillsAccess$: { key: string }; export const skillsCollection$: { key: string };
+}
+declare module "@rchunk/use-plugin-installation" { export const installPlugin: (plugin: { id: string; name?: string; [key: string]: unknown }, installer?: (plugin: { id: string; name?: string; [key: string]: unknown }) => Promise<unknown>) => Promise<unknown>; }
+declare module "@rchunk/browser-skill-files";
+declare module "@rchunk/showcase-items";
 
 declare module "@rchunk/mcp-extension-view-page-core" {
   export const i: () => void;
