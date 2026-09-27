@@ -5035,7 +5035,16 @@ declare module "@rchunk/create-dialog" {
 
 declare module "@rchunk/pepper-persona";
 declare module "@rchunk/computer-use-app-approvals-query";
-declare module "@rchunk/use-home-directory";
+declare module "@rchunk/use-home-directory" {
+  export interface HomeDirectoryQueryResult {
+    data?: { homeDirectory?: string };
+    error?: unknown;
+    isLoading?: boolean;
+  }
+  export const n: (hostId?: string | null) => string | undefined;
+  export const r: (hostId?: string | null) => HomeDirectoryQueryResult;
+  export const t: () => void;
+}
 declare module "@rchunk/voice-personalization-dialog-entry";
 declare module "@rchunk/connector-post-connect-dialog";
 
@@ -6676,7 +6685,20 @@ declare module "@rchunk/home-suggestion-surface" {
 
 declare module "@rchunk/composer-banners" { export const ComposerBanners: unknown; }
 declare module "@rchunk/usage" { export const n: () => void; export const t: unknown; }
-declare module "@rchunk/task-announcement-candidates" { export const TaskAnnouncementCandidates: unknown; }
+declare module "@rchunk/task-announcement-candidates" {
+  export interface TaskAnnouncementCandidatesProps {
+    conversationId?: string | null;
+    currentModel?: string | null;
+    replacementModel?: string | null;
+    suppressed?: boolean;
+    turnId?: string | null;
+    onDismiss?(): void;
+    onSwitchModel?(model: string): Promise<unknown> | unknown;
+  }
+  export const TaskAnnouncementCandidates: (
+    props?: TaskAnnouncementCandidatesProps,
+  ) => unknown;
+}
 declare module "@rchunk/popup" { export const i: unknown; export const n: () => void; export const r: unknown; export const t: unknown; }
 declare module "@rchunk/browser-address-suggestion-overlay" { export const BrowserAddressSuggestionOverlay: unknown; }
 declare module "@rchunk/home-beacon" {
@@ -6777,7 +6799,19 @@ declare module "@rchunk/new-chat-page-suggestions-eligibility" {
 }
 
 declare module "@rchunk/option-carousel" {
-  export const _any: any;
+  export interface OptionCarouselProps {
+    ariaInvalid?: boolean;
+    ariaLabel?: string;
+    backLabel: string;
+    children?: unknown;
+    forwardLabel: string;
+    header?: unknown;
+    layout?: "form" | "gallery";
+    role?: string;
+    shouldUseReducedMotion?: boolean;
+  }
+  export const n: () => void;
+  export const t: (props: OptionCarouselProps) => unknown;
 }
 
 declare module "@rchunk/recent-uploads" {
@@ -6877,16 +6911,61 @@ declare module "@rchunk/home-composer-announcement-candidates" {
   ) => unknown;
 }
 declare module "@rchunk/announcement-entry-points" {
-  export const i: (options: {
-    enabled: boolean;
-  }) => import("@rchunk/app-initial").HomeAnnouncementCandidate;
-  export const o: (options: {
-    enabled: boolean;
-  }) => import("@rchunk/app-initial").HomeAnnouncementCandidate;
-  export const s: (options: {
-    enabled: boolean;
-  }) => import("@rchunk/app-initial").HomeAnnouncementCandidate;
-  export const t: () => void;
+  export interface CandidateState {
+    dismiss(): void;
+    isEligible: boolean;
+    isLoading: boolean;
+  }
+  export const _: () => void;
+  export const a: () => void;
+  export const c: () => void;
+  export const d: () => void;
+  export const f: (options?: { enabled?: boolean }) => CandidateState & {
+    markShown(): void;
+    replay(): void;
+  };
+  export const g: (
+    intervals: readonly { endMs: number; startMs: number }[],
+    nowMs?: number,
+  ) => boolean;
+  export const h: (
+    histories: readonly {
+      completedAtMs: number | string;
+      successes: readonly unknown[];
+    }[],
+    status: { latestImportedAtMs?: number | null },
+  ) => number | null;
+  export const i: (options?: { enabled?: boolean }) => CandidateState & {
+    openGiftCredits(): void;
+  };
+  export const l: () => void;
+  export const m: () => void;
+  export const n: () => void;
+  export const o: (options?: { enabled?: boolean }) => CandidateState & {
+    markShown(): void;
+    openImport(): void;
+    providerId: null;
+  };
+  export const p: (props: Record<string, unknown>) => unknown;
+  export const r: () => void;
+  export const s: (props: Record<string, unknown>) => unknown;
+  export const t: (props?: Record<string, unknown>) => unknown;
+  export const u: (scope: unknown) => Promise<void>;
+  export const v: (props: Record<string, unknown>) => unknown;
+  export const y: () => void;
+}
+
+declare module "@rchunk/task-announcement-state";
+declare module "@rchunk/entry-point-availability";
+declare module "@rchunk/computer-history-plugin-icon" {
+  export const n: () => void;
+  export const t: string;
+}
+declare module "@rchunk/run-external-agent-import-command" {
+  export const runExternalAgentImportCommand: (
+    scope: unknown,
+    source: "home_beacon",
+  ) => Promise<unknown>;
 }
 declare module "@rchunk/worktree-onboarding-banner-controller" {
   export const WorktreeOnboardingBannerController: () => unknown;
