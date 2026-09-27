@@ -9817,6 +9817,41 @@ declare module "@rchunk/use-resume-conversation-if-needed" {
 }
 
 declare module "@rchunk/worktree-setup-auto-fix" {
+  export interface PendingWorktree {
+    attempt: number;
+    errorMessage?: string | null;
+    hostId: string;
+    id: string;
+    launchMode: "fork-conversation" | "start-conversation";
+    localEnvironmentConfigPath?: string | null;
+    phase: "queued" | "creating" | "setting-up" | "worktree-ready" | "failed";
+    setupOutputText: string;
+    sourceCollaborationMode?: unknown;
+    sourceWorkspaceRoot: string;
+    sourceWorkspaceRoots: string[];
+    startConversationParamsInput: Record<string, unknown> & { workspaceRoots: string[] };
+    startingState: Record<string, unknown> & { type: string; remoteRef?: string | null };
+    worktreeGitRoot?: string | null;
+    worktreeOutputText: string;
+    worktreeWorkspaceRoot?: string | null;
+  }
+  export const i: () => void;
+  export const n: () => void;
+  export const r: (props: {
+    children?: unknown;
+    isConversationStartFailed?: boolean;
+    isConversationStarting?: boolean;
+    onContinueWithoutUpdating?: () => void;
+    pendingWorktree: PendingWorktree;
+    upstreamRefreshMode?: "best-effort" | "never" | "required";
+  }) => unknown;
+  export const t: (input: {
+    createPendingWorktree(options: Record<string, unknown>): unknown;
+    intl: import("@rchunk/app-shared").IntlShape;
+    pendingWorktree: PendingWorktree;
+    scope: unknown;
+    serviceTier: unknown;
+  }) => Promise<unknown>;
   const _default: unknown;
   export default _default;
 }

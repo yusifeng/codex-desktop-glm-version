@@ -1144,6 +1144,7 @@ export const REWRITTEN = new Set([
   "codex-micro-joystick-feedback",
   "codex-micro-joystick-hud",
   "codex-micro-bridge",
+  "worktree-setup-auto-fix",
   "open-sources-side-panel-tab",
   "verify-descendant",
   "editable-plan-tab",
