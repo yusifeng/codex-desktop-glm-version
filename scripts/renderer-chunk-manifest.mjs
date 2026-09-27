@@ -2519,9 +2519,13 @@ export const PRESERVED_ASSETS = new Map([
 ]);
 
 // 聚合 chunk 采用“按已消费导出增量语义化”，不要求复制整个发布版 bundle。
-// audit-app-shared-consumption.mjs 负责验证 app-shared 的实际消费面。
+// app-shared 有命名消费面审计；Popcorn/Artifact 聚合 hub 当前仅允许副作用导入，
+// 一旦出现命名消费，test-renderer-incremental-hubs.mjs 会要求先拆出语义源码。
 export const INCREMENTAL_HUBS = new Map([
   ["app-shared", "typed-consumer-surface"],
   ["app-initial", "typed-consumer-surface"],
   ["app-primary", "typed-consumer-surface"],
+  ["artifact-source-bootstrap", "typed-consumer-surface"],
+  ["text-underline-icon", "typed-consumer-surface"],
+  ["popcorn-electron-surface-style", "typed-consumer-surface"],
 ]);
