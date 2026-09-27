@@ -3478,7 +3478,10 @@ declare module "@rchunk/app-initial" {
   export const kht: any;
   export const zPt: any;
   export const $ln: (key: string, parameters?: unknown) => readonly unknown[];
-  export const Qln: (event: string, payload?: unknown) => Promise<unknown>;
+  export const Qln: <Result = unknown>(
+    event: string,
+    payload?: unknown,
+  ) => Promise<Result>;
   export const aun: () => void;
   export const nun: () => void;
   export const oun: (queryClient: unknown, key: unknown) => Promise<unknown>;
@@ -4467,7 +4470,7 @@ declare module "@rchunk/app-initial" {
     request(input: {
       method: string;
       params: Record<string, unknown>;
-      signal: AbortSignal;
+      signal?: AbortSignal;
     }): Promise<unknown>;
   };
   /** Pull request revision/checks 基础依赖。 */
@@ -9026,6 +9029,18 @@ declare module "@rchunk/app-shared" {
   /** Editable plan icon dependencies。 */
   export const Nu: () => void;
   export const Pu: IconAssetPreset;
+  /** Text file storage helpers。 */
+  export const jU: unknown;
+  export const lW: number;
+  export const uW: (bytes: Uint8Array) => Promise<string>;
+  /** React Query client hooks。 */
+  export const CL: () => {
+    invalidateQueries(options: { queryKey: readonly unknown[] }): Promise<unknown>;
+  };
+  export const SL: () => void;
+  /** Read-only code block used by Python analysis details。 */
+  export const $d: (props: Record<string, unknown>) => unknown;
+  export const ef: () => void;
 }
 
 declare module "@rchunk/app-initial" {
@@ -9112,6 +9127,14 @@ declare module "@rchunk/app-initial" {
   export const DKt: { sentinelToken: string; timing: string };
   /** Codex Micro visibility predicate。 */
   export const Ovt: (element: HTMLElement) => boolean;
+  /** Text file storage encoding and routing dependencies。 */
+  export const Fon: (value: string) => string;
+  export const Non: (value: string) => Uint8Array;
+  export const Oyt: () => void;
+  export const kyt: unknown;
+  /** Project color palette definitions。 */
+  export const TM: () => void;
+  export const xM: Record<string, { swatchClassName: string }>;
 }
 
 declare module "@rchunk/app-primary" {
