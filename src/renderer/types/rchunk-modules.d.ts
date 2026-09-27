@@ -14639,11 +14639,30 @@ declare module "@rchunk/registered-chatgpt-subagents-thumbnail" { export const R
 declare module "@rchunk/image-gen-loading-games" { export const ImageGenLoadingGames: (props: { aspectRatio?: number; game: "brick-breaker" | "snake"; imageCount?: number; isGif?: boolean; messageId: string; onGameEngaged?(sessionId: string): void; onGameOpened?(sessionId: string): void; startedAtMs?: number }) => unknown }
 declare module "@rchunk/chatgpt-conversation-inline-beacon" { export interface InlineBeaconAction { id: string; label: string; onAction?(): void } export interface InlineBeacon { action_items?: readonly InlineBeaconAction[]; beacon_id: string; ui_info?: { design?: "card" | "inline"; primary_info_text?: string | null } } export const ChatGptConversationInlineBeacon: (props: { beacon?: InlineBeacon | null; conversationId: string; messageIds: readonly string[]; sourceMessageId?: string | null }) => unknown }
 declare module "@rchunk/work-mode-pet-content" { export const WorkModePetContent: (props: { accessoryId?: string | null; alt?: string; builtInAssets?: Readonly<Record<string, string>>; customPets?: readonly { id: string; spritesheetUrl: string; expiresAt?: string | null }[]; enabled?: boolean }) => unknown }
-declare module "@rchunk/subagent-panel"; declare module "@rchunk/subagent-row"; declare module "@rchunk/share-conversation-action";
+declare module "@rchunk/subagent-panel" {
+  export interface SubagentPanelItem { avatarSeed: string; id: string; label: string; preview?: string | null; previewLineCount?: 1 | 2; trailing?: unknown }
+  export interface SubagentPanelSection { className?: string; emptyState?: unknown; id: string; items: SubagentPanelItem[]; title: string; titleTrailing?: unknown; visibleItemLimit?: number }
+  export const n: (props: { onSelect(id: string): void; sections: SubagentPanelSection[] }) => unknown;
+  export const r: () => void;
+  export const t: (props: { backAriaLabel: string; label: string; onBack(): void; seed: string; trailing?: unknown }) => unknown;
+}
+declare module "@rchunk/subagent-row" { export const n: () => void; export const t: (props: { avatarSeed: string; name: string; status: string }) => unknown }
+declare module "@rchunk/share-conversation-action" {
+  export interface ConversationAction { action_v2: { action_enum: string; conversation_id?: string; current_node_id?: string; items?: ConversationAction[]; model_slug?: string; title?: string; update_model_picker?: boolean } }
+  export interface ActionScope { get(key: unknown, parameter: unknown): unknown }
+  export type ActionOverride = (action: ConversationAction) => boolean | Promise<boolean>;
+  export const a: () => void;
+  export const i: (actions: ConversationAction[]) => boolean;
+  export const n: (input: { canShare: boolean; conversationId?: string | null; onShare?(scope: ActionScope, conversationId: string, title: string | undefined, currentNodeId: string): boolean | Promise<boolean>; scope: ActionScope }) => ActionOverride | undefined;
+  export const o: (input: { allowedModelSlug?: string | null; conversationId: string; isTemporaryChat?: boolean; scope: ActionScope; services?: Record<string, unknown> }) => ActionOverride;
+  export const r: (input: { action: ConversationAction; getActionOverride?(action: ConversationAction): unknown; shareConversationEligible?: boolean | null; shareConversationOverride?: ActionOverride }) => unknown;
+  export const s: () => void;
+  export const t: unknown;
+}
 declare module "@rchunk/popcorn-review-bar-overlay";
 declare module "@rchunk/docx-preview-runtime";
 declare module "@rchunk/codemirror-json-runtime";
-declare module "@rchunk/chatgpt-code-block-highlighting";
+declare module "@rchunk/chatgpt-code-block-highlighting" { export const a: () => void; export const i: Readonly<{ Comment: string; InlineCodePane: string; ViewerContent: string }>; export const n: unknown[]; export const r: () => void; export const t: unknown }
 declare module "@rchunk/multiplayer-note" { export const MultiplayerNote: (props: { content?: string | null; error?: string | null; isLoading?: boolean; name?: string; onClose(): void }) => unknown; }
 declare module "@rchunk/multiplayer-writing-block" { export const MultiplayerWritingBlock: (props: { content?: string | null; name?: string; onOpen?(): void }) => unknown; }
 declare module "@rchunk/file-preview" { export const ChatGptSearchFilePreview: (props: { accountId: string; authenticatedAccountId: string; authenticatedUserId?: string; item: { cloudFile: { name: string }; [key: string]: unknown }; onClose(): void; renderPreview?(item: { cloudFile: { name: string }; [key: string]: unknown }): unknown; sessionReady?: boolean; userId: string }) => unknown }

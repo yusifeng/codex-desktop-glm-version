@@ -2446,4 +2446,8 @@ export const REWRITTEN = new Set([
   "spreadsheet-utils",
   "spreadsheet-address-utils",
   "freeze-panes",
+  "subagent-panel",
+  "subagent-row",
+  "share-conversation-action",
+  "chatgpt-code-block-highlighting",
 ]);
