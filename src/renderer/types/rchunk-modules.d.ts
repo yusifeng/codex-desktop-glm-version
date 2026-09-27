@@ -4202,10 +4202,106 @@ declare module "@rchunk/app-initial" {
   export const dgn: string;
   export const Sln: unknown;
   export const Ysn: unknown;
+  /** git-review 基础层：unified patch 解析与初始化。 */
+  export const XO: (patch: string) => Array<{
+    additions: number;
+    deletions: number;
+    firstAdditionLine?: number | null;
+    firstDeletionLine?: number | null;
+  }>;
+  export const YO: () => void;
+  /** virtualized file diff 控制器。 */
+  export class hvn {
+    top?: number | null;
+    getLinePosition(
+      line: number,
+      side: string,
+    ): { height: number; top: number } | null | undefined;
+    setSelectedLines(
+      selection: unknown,
+      options: { notify: boolean },
+    ): void;
+  }
+  export const L_n: () => void;
+  export const PSn: string;
+  /** git live-query hook。 */
+  export const Kan: () => void;
+  export const Yan: (
+    host: unknown,
+    roots: ReadonlyArray<{ root: string }>,
+    queryName: string,
+    getParameters: (root: { root: string }) => Record<string, unknown>,
+    operationSource: string,
+    options: Record<string, unknown>,
+  ) => unknown;
+  /** PR query key 与 query 对象。 */
+  export const By: (...arguments_: unknown[]) => unknown;
+  export const Hy: () => void;
+  export const Vy: (...arguments_: unknown[]) => unknown;
+  export const Cy: unknown;
+  export const Sy: unknown;
+  export const _y: (...arguments_: unknown[]) => unknown;
+  export const by: unknown;
+  export const gy: unknown;
+  export const vy: (...arguments_: unknown[]) => unknown;
+  export const xy: unknown;
+  export const yy: () => void;
+  /** Git origins query。 */
+  export const CSt: () => void;
+  export const SSt: unknown;
+  /** Review file source tab 与 workspace tab 同步。 */
+  export const $st: unknown;
+  export const Qst: (...arguments_: unknown[]) => unknown;
+  export const Xst: (...arguments_: unknown[]) => unknown;
+  export const Zst: () => void;
+  export const ect: (...arguments_: unknown[]) => unknown;
+  export const cut: () => void;
+  export const lut: (...arguments_: unknown[]) => unknown;
+  export const sut: (...arguments_: unknown[]) => unknown;
   // scroll-to-match 依赖：CUt=查找器装配器 xUt=matchId 元素查找器
   export const CUt: unknown;
   export const xUt: unknown;
   export const _any: any;
+}
+
+declare module "@rchunk/pull-request-code-review-navigation-core" {
+  export const n: () => void;
+  export const r: (...arguments_: unknown[]) => unknown;
+  export const t: (...arguments_: unknown[]) => unknown;
+}
+
+declare module "@rchunk/pull-request-revision-queries-core" {
+  export const a: unknown;
+  export const i: unknown;
+  export const n: () => void;
+  export const r: unknown;
+  export const t: (...arguments_: unknown[]) => unknown;
+}
+
+declare module "@rchunk/diff-summary" {
+  export interface FileDiffSummary {
+    additions: number;
+    deletions: number;
+  }
+  export const n: () => void;
+  export const t: (files: readonly FileDiffSummary[]) => {
+    fileCount: number;
+    hasChanges: boolean;
+    linesAdded: number;
+    linesDeleted: number;
+  };
+}
+
+declare module "@rchunk/pull-request-detail-model" {
+  export const a: (...arguments_: unknown[]) => unknown;
+  export const c: () => void;
+  export const i: (...arguments_: unknown[]) => unknown;
+  export const l: unknown;
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const o: (...arguments_: unknown[]) => unknown;
+  export const r: (...arguments_: unknown[]) => unknown;
+  export const s: () => void;
+  export const t: (...arguments_: unknown[]) => unknown;
 }
 
 declare module "@rchunk/subscription-update-plan" {

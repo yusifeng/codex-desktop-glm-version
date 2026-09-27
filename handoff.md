@@ -232,8 +232,10 @@ npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"
 
 ### 2026-09-27 增量流程更新
 
-当前推进已改为“语义簇一 commit、簇末统一门禁”。不要再手工依次运行
-build/verify/tsc/diff 以及手工核对断言总数；统一使用：
+当前推进已改为“业务批次一 commit、批次末统一门禁”。提交边界应覆盖一个
+完整用户流程或一组共享依赖/测试夹具的模块，通常约 **10–25 个模块**；不要
+因为单个文件名簇完成就中断上下文。批次内部只跑受影响模块的快速定向测试，
+不反复运行 build/verify/tsc。批次收口时再统一使用：
 
 ```bash
 npm run verify-renderer-cluster -- \
@@ -242,8 +244,13 @@ npm run verify-renderer-cluster -- \
   --module <module-b>:<assertions>
 ```
 
-该命令会自动执行定向测试、核对测试源码实际断言数、构建 renderer、运行
+`--test` 与 `--module` 均可重复，允许一个业务批次汇集多个原有小簇。该命令
+会自动执行定向测试、核对测试源码实际断言数、构建 renderer、运行
 renderer/main 结构验证、检查 TypeScript 基线、`git diff --check`、新增 any
 以及直接 namespace chunk 消费，并输出可直接复制进 commit message 的模块
 验证清单。当前 TypeScript 基线为 **73**；可用
 `--tsc-baseline <count>` 显式覆盖。
+
+完整门禁在当前机器约 16 秒；主要成本是人工收口与上下文切换。因此不要为了
+追求更大的数字把无关功能硬塞进同一提交，但只要模块属于同一用户流程、共享
+同一套 mock/类型声明，优先合并到同一业务批次后再验证、提交。
