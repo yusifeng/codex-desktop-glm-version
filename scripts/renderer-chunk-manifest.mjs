@@ -2450,4 +2450,6 @@ export const REWRITTEN = new Set([
   "subagent-row",
   "share-conversation-action",
   "chatgpt-code-block-highlighting",
+  "tax-types",
+  "design-editor-state",
 ]);

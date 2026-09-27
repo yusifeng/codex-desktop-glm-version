@@ -6145,7 +6145,17 @@ declare module "@rchunk/checkout-page-core" {
 declare module "@rchunk/billing-icons";
 declare module "@rchunk/prop-types-runtime" { export interface Validator { (...arguments_: unknown[]): void; isRequired: Validator } export interface PropTypesRuntime { PropTypes: PropTypesRuntime; any: Validator; array: Validator; arrayOf(): Validator; bool: Validator; checkPropTypes(): void; number: Validator; object: Validator; oneOf(): Validator; resetWarningCache(): void; string: Validator; [key: string]: unknown } export const t: () => PropTypesRuntime }
 declare module "@rchunk/stripe-payment-element-options" { export interface PaymentElementOptions { billingDetails?: Record<string, unknown>; defaultValues?: Record<string, unknown>; fields?: Record<string, unknown>; wallets?: Record<string, unknown>; [key: string]: unknown } export interface PaymentElementOverrides { checkoutSessionId?: string; isGooglePayEnabled?: boolean; isNewStripeCustomer?: boolean; minimalBillingAddress?: Record<string, unknown>; paymentElementLayoutMode?: "accordion" | "auto" | "tabs"; paymentMethodOrder?: string[]; shouldHidePaymentElementName?: boolean; useMinimalBillingAddress?: boolean } export const n: () => void; export const r: (id: unknown) => id is string; export const t: (options?: PaymentElementOptions, overrides?: PaymentElementOverrides) => Record<string, unknown> }
-declare module "@rchunk/tax-types";
+declare module "@rchunk/tax-types" {
+  export interface TaxType { country: string; description: string; placeholder?: string; region: string; stripe_type: string; supported: boolean; type: string }
+  export interface TaxIdentifier { country?: string; country_specific_type?: string; type: string; value: string }
+  export interface ControlledTextValue { onChange(value: string): void; value: string }
+  export interface TaxTypeEditorProps { available: TaxType[]; businessName?: ControlledTextValue | null; disabled?: boolean; enabled: boolean; onChange(value: TaxIdentifier): void; onEnabledChange(enabled: boolean): void; selected?: TaxType | null; showErrors?: boolean; taxId?: TaxIdentifier | null }
+  export const a: () => void;
+  export const i: (props: TaxTypeEditorProps) => unknown;
+  export const n: (country: string, value: unknown) => TaxType[];
+  export const r: () => void;
+  export const t: (available: TaxType[], current: Partial<TaxIdentifier> | null | undefined, country: string) => TaxType | undefined;
+}
 
 declare module "@rchunk/credit-purchase-page-core" {
   export const n: () => void;
@@ -14621,7 +14631,25 @@ declare module "@rchunk/pdf-preview-panel" {
 }
 declare module "@rchunk/library-json-preview" { export interface LibraryJsonPreviewProps { content: string; fileName: string } export const LibraryJsonPreview: (props: LibraryJsonPreviewProps) => unknown }
 declare module "@rchunk/annotation-comment-editor-card" { export type AnnotationSubmitMode = "saved" | "direct"; export interface AnnotationEditorSession { body?: string; originalBody?: string | null; sessionId: string; surfaceMode: "composer" | "edit" | "preview" } export interface AnnotationCommentEditorCardProps { allowDirectSubmit?: boolean; allowDirectSubmitOnEdit?: boolean; allowEmptySubmit?: boolean; allowImageAttachments?: boolean; autoFocus?: boolean; defaultCreateSubmitMode?: AnnotationSubmitMode; defaultDesignEditorOpen?: boolean; inputAriaLabel?: string; isVisible?: boolean; onAttachmentPreviewOpenChange?(open: boolean): void; onBodyChange?(body: string): void; onCancel?(): void; onDelete?(): void; onDirectSubmit?(body: string): Promise<void> | void; onMounted?(): void; onSubmit?(body: string, mode: AnnotationSubmitMode): Promise<void> | void; onTweaksEditorOpenChange?(open: boolean): void; placeholder?: string; session: AnnotationEditorSession; showAdjustEntry?: boolean } export const n: () => void; export const t: (props: AnnotationCommentEditorCardProps) => unknown }
-declare module "@rchunk/design-editor-state";
+declare module "@rchunk/design-editor-state" {
+  export type AnnotationControlValue = boolean | number | string;
+  export interface AnnotationControlBase { callback: string; currentValue?: AnnotationControlValue | null; defaultValue?: AnnotationControlValue | null; label: string; reference?: string | null }
+  export interface SelectAnnotationControl extends AnnotationControlBase { options: Array<{ label: string; value: string }>; type: "select" }
+  export interface ToggleAnnotationControl extends AnnotationControlBase { type: "toggle" }
+  export interface ColorAnnotationControl extends AnnotationControlBase { type: "color" }
+  export interface NumberAnnotationControl extends AnnotationControlBase { max: number; min: number; step?: number; type: "number" | "range" }
+  export type AnnotationControl = SelectAnnotationControl | ToggleAnnotationControl | ColorAnnotationControl | NumberAnnotationControl;
+  export interface AnnotationControlChange { callback: string; previousValue?: AnnotationControlValue | null; value: AnnotationControlValue }
+  export interface DesignEditorState { annotationControlChanges?: AnnotationControlChange[]; annotationControls: { controls: AnnotationControl[] } }
+  export const a: Readonly<{ colorInput: string; numericInput: string }>;
+  export const c: () => void;
+  export const i: () => void;
+  export const n: (state: DesignEditorState, callback: string, value?: AnnotationControlValue | null) => DesignEditorState;
+  export const o: () => void;
+  export const r: (props: { dropdownPortalContainer?: unknown; editorState: DesignEditorState; isEditable: boolean; onReset(callback: string): void; onValueChange(callback: string, value: AnnotationControlValue): void }) => unknown;
+  export const s: (props: { children?: unknown }) => unknown;
+  export const t: () => void;
+}
 declare module "@rchunk/workbook-from-csv" { export interface CsvWorkbookOptions { anchor?: string; separator?: string; sheetName?: string } export interface CsvWorkbookResult { rangeRef?: string; rect?: { c1: number; c2: number; r1: number; r2: number }; sheetName: string; values: string[][] } export const n: (source: string, options?: CsvWorkbookOptions) => CsvWorkbookResult; export const r: (name?: string | null) => string; export const t: () => void }
 declare module "@rchunk/respond" { export interface ToolApprovalAction { target_message_id: string; type: string; [key: string]: unknown } export interface RespondOptions { action: ToolApprovalAction; conversationId: string; elicitationResponse?: unknown; isApiToolElicitation?: boolean; isTemporaryChat?: boolean; model?: string; recipient?: string } export const n: (scope: { submit(input: Record<string, unknown>): Promise<unknown> | unknown }, options: RespondOptions) => Promise<void>; export const t: () => void }
 declare module "@rchunk/turn-bibliography" { export interface BibliographyReference { id?: string; title?: string; url?: string; [key: string]: unknown } export const n: () => void; export const t: (props: { references: readonly BibliographyReference[]; shouldBlockExternalEgress?: boolean }) => unknown }
