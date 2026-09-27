@@ -9107,6 +9107,11 @@ declare module "@rchunk/app-initial" {
   export const zg: (directiveKey: string) => string;
   export const hEt: () => void;
   export const mEt: (commandId: string) => boolean;
+  /** Sentinel account-action integrity constants。 */
+  export const AKt: () => void;
+  export const DKt: { sentinelToken: string; timing: string };
+  /** Codex Micro visibility predicate。 */
+  export const Ovt: (element: HTMLElement) => boolean;
 }
 
 declare module "@rchunk/app-primary" {
@@ -9165,6 +9170,26 @@ declare module "@rchunk/automation-side-panel-tab-core" {
   export const AutomationSidePanelTabIcon: (
     props: Record<string, unknown>,
   ) => unknown;
+}
+
+declare module "@rchunk/persona-runtime" {
+  const persona: {
+    Client: new (options: {
+      inquiryId: string;
+      onCancel(): void;
+      onComplete(): void;
+      onError(): void;
+      onLoad(): void;
+    }) => { destroy(): void; open(): void };
+  };
+  export default persona;
+}
+
+declare module "@rchunk/chatgpt-tasks-runtime" {
+  export const i: Record<string, unknown>;
+  export const n: unknown;
+  export const r: Record<string, unknown>;
+  export const s: () => void;
 }
 
 // Conversation workflow, source panels, and local-workspace foundations.

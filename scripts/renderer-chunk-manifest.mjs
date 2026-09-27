@@ -1108,6 +1108,8 @@ export const CHUNKS = {
   "environment-setup-tab-panel": "tab-panel-f36ccc73e17f.js",
   "automation-side-panel-tab-core": "automation-side-panel-tab-cb6c559690f8.js",
   "site-automation-setup-state": "site-automation-setup-state-75f372a61373.js",
+  "persona-runtime": "persona-dcd82a18594e.js",
+  "chatgpt-tasks-runtime": "chatgpt_tasks-5e437f7d5423.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -1118,6 +1120,10 @@ export const REWRITTEN = new Set([
   "open-sources-side-panel-tab",
   "verify-descendant",
   "editable-plan-tab",
+  "pepper-persona",
+  "account-action-integrity",
+  "codex-micro-mini-games",
+  "share-analytics",
   "chat-tab-metadata-bridge",
   "open-local-conversation-subagents-panel",
   "open-local-conversation-sources-side-panel-tab",
