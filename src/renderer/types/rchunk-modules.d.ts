@@ -5230,6 +5230,7 @@ declare module "@rchunk/automation-frequency-section";
 declare module "@rchunk/platform-ui-kit-provider";
 declare module "@rchunk/navigation-blocker";
 declare module "@rchunk/automation-share-dialog";
+declare module "@rchunk/date-picker-runtime";
 declare module "@rchunk/binary-preview-source";
 declare module "@rchunk/surface";
 declare module "@rchunk/pdf-preview-diff";
