@@ -9422,6 +9422,43 @@ declare module "@rchunk/pull-request-status-label" {
   export default _default;
 }
 
+declare module "@rchunk/profile-view" { const profileView: unknown; export default profileView; }
+declare module "@rchunk/workspace-agent-detail-query" { const workspaceAgentDetailQuery: unknown; export default workspaceAgentDetailQuery; }
+
+declare module "@rchunk/profile-page" {
+  export interface ProfilePageProps { today?: Date | string; username?: string; editPaneOpen?: boolean; header?: unknown; children?: unknown; onUsernameChanged?(username: string): void; }
+  export const ProfilePage: (props: ProfilePageProps) => unknown;
+}
+declare module "@rchunk/browser-plugin-share-page" {
+  export const BrowserPluginSharePage: (props: { shareKey?: string; resolvedPluginId?: string; isLoading?: boolean; error?: string; search?: string }) => unknown;
+}
+declare module "@rchunk/codex-mobile-page" {
+  export const CodexMobilePage: (props: { isMfaSetupRequiredError?: boolean; isMfaSetupRequiredFetching?: boolean; mfaSetupRequired?: boolean; remoteControlStatus?: "connected" | "disconnected" | "pending"; setupStepDebugOverride?: string; onManageConnections?(): void; onClose?(): void }) => unknown;
+}
+declare module "@rchunk/plan-summary-page" {
+  export const PlanSummaryPage: (props: { state?: { planContent?: string; conversationId?: string; hostId?: string } | null }) => unknown;
+}
+declare module "@rchunk/gpt-chat-page" {
+  export const GptChatPage: (props: { gpt?: { id: string; name?: string; description?: string; short_url?: string | null } | null; isLoading?: boolean; errorStatus?: number; pathname?: string; search?: string; hash?: string; onRetry?(): void }) => unknown;
+}
+declare module "@rchunk/open-source-licenses-page" {
+  export const OpenSourceLicensesPage: (props: { noticesText?: string | null; isLoading?: boolean; state?: { licensesBackPath?: unknown } | null; onBack?(path: string): void }) => unknown;
+}
+declare module "@rchunk/plugin-mcp-app-deep-link-page" {
+  export interface McpExtensionView { entrypoint?: string; pluginId?: string; plugin_id?: string; serverName?: string; toolName?: string; tool_name?: string; url?: string; }
+  export const PluginMcpAppDeepLinkPage: (props: { entrypoint?: string; pluginId?: string; toolName?: string; views?: readonly McpExtensionView[]; isLoading?: boolean; activationState?: "active" | "inactive" | "unavailable" }) => unknown;
+}
+declare module "@rchunk/asb-conversation-page" {
+  export const AsbConversationPage: (props: { conversationId?: string; hostId?: string; title?: string; archived?: boolean; readOnly?: boolean; children?: unknown; onRename?(title: string): void; onArchive?(): void }) => unknown;
+}
+declare module "@rchunk/hotkey-window-thread-page" {
+  export const HotkeyWindowThreadPage: (props: { conversationId?: string; title?: string; projectLabel?: string; mainWindowPath?: string; children?: unknown; onBack?(): void }) => unknown;
+}
+declare module "@rchunk/workspace-agent-detail-page" {
+  export interface WorkspaceAgentDetailData { agent: { id: string; name?: string; description?: string }; latest_published_version?: { id?: string; version?: number; [key: string]: unknown } | null; }
+  export const WorkspaceAgentDetailPage: (props: { agentId?: string; useLegacyRoute?: boolean; data?: WorkspaceAgentDetailData | null; isLoading?: boolean; errorStatus?: number; onRetry?(): void; onOpenLegacy?(): void }) => unknown;
+}
+
 declare module "@rchunk/app-shared" {
   /** invokeDesktopBridgePromise（桌面桥 Promise 规范化）。 */
   export const UI: <Result>(request: Promise<Result>, signal?: AbortSignal) => Promise<Result>;
