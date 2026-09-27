@@ -4050,12 +4050,25 @@ declare module "@rchunk/gpt-header-about-dialog" {
 }
 
 declare module "@rchunk/python-analysis-details" {
+  export interface PythonAnalysisItem extends Record<string, unknown> {
+    id: string;
+  }
+  export interface PythonAnalysisDetailsProps {
+    item: PythonAnalysisItem;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: PythonAnalysisDetailsProps) => unknown;
 }
 
 declare module "@rchunk/python-analysis-dialog" {
-  export const PythonAnalysisDialog: (...args: any[]) => any;
+  export interface PythonAnalysisDialogProps {
+    items: import("@rchunk/python-analysis-details").PythonAnalysisItem[];
+    onClose(): void;
+    onCloseAutoFocus?: (event: unknown) => void;
+  }
+  export const PythonAnalysisDialog: (
+    props: PythonAnalysisDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/report-dialog-core" {

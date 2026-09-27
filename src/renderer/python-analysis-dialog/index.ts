@@ -4,29 +4,48 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as analysisDetailsChunk from "@rchunk/python-analysis-details";
+import type { PythonAnalysisItem } from "@rchunk/python-analysis-details";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const analysisDetails = analysisDetailsChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeJsxRuntime,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeIntlRuntime,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  zh: initializeDialog,
+} = appSharedChunk;
+const {
+  n: initializePythonAnalysisDetails,
+  t: PythonAnalysisDetails,
+} = analysisDetailsChunk;
+
+let jsxRuntime: JsxRuntime | null = null;
+
+interface PythonAnalysisDialogProps {
+  items: PythonAnalysisItem[];
+  onClose(): void;
+  onCloseAutoFocus?: (event: unknown) => void;
+}
 
 function PythonAnalysisDialog({
   items,
   onClose,
   onCloseAutoFocus,
-}: {
-  items: Array<{ id: string; [key: string]: unknown }>;
-  onClose: () => void;
-  onCloseAutoFocus?: (event: unknown) => void;
-}) {
-  const content = jsx.jsxs(appShared.Oh, {
+}: PythonAnalysisDialogProps): unknown {
+  const jsx = getInitializedJsxRuntime();
+  const content = jsx.jsxs(DialogBody, {
     className:
       "max-h-[calc(100dvh/var(--codex-window-zoom)-2rem)] min-h-0 overflow-hidden",
     variant: "chatgpt",
     children: [
-      jsx.jsx(appShared.Rh, {
+      jsx.jsx(DialogTitle, {
         className: "shrink-0 p-4 pe-14 text-lg font-normal select-none",
-        children: jsx.jsx(appShared.Y2, {
+        children: jsx.jsx(FormattedMessage, {
           id: "chatgpt.pythonExecution.analysisTitle",
           defaultMessage: "Analysis",
           description:
@@ -38,13 +57,13 @@ function PythonAnalysisDialog({
         children: jsx.jsx("div", {
           className: "flex min-w-0 flex-col gap-4",
           children: items.map((item) =>
-            jsx.jsx(analysisDetails.t, { item }, item.id),
+            jsx.jsx(PythonAnalysisDetails, { item }, item.id),
           ),
         }),
       }),
     ],
   });
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: true,
     contentProps: {
       "aria-describedby": undefined,
@@ -60,11 +79,21 @@ function PythonAnalysisDialog({
 }
 
 function initializePythonAnalysisDialog(): void {
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.zh?.();
-  appShared.Ph?.();
-  analysisDetails.n?.();
+  if (jsxRuntime != null) return;
+  initializeJsxRuntime();
+  initializeIntlRuntime();
+  initializeDialog();
+  initializeDialogLayout();
+  initializePythonAnalysisDetails();
+  jsxRuntime = getJsxRuntime();
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializePythonAnalysisDialog();
+  if (jsxRuntime == null) {
+    throw new Error("Python analysis dialog JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 initializePythonAnalysisDialog();
