@@ -1520,6 +1520,12 @@ declare module "@rchunk/app-shared" {
     readonly queryClient: unknown;
     readonly query: {
       getOrFetch<Result>(query: unknown, ...parameters: unknown[]): Promise<Result>;
+      snapshot<Data, QueryError>(
+        query: ScopedQuerySignal<unknown, Data, QueryError>,
+      ): {
+        cancel(): Promise<void>;
+        setData(data: Data): void;
+      };
       [key: string]: unknown;
     };
     readonly scope: MaitaiScope<T>;
@@ -3859,6 +3865,7 @@ declare module "@rchunk/app-initial" {
   export const Man: () => void;
   export interface ApiClient {
     safeGet<Response>(path: string, options?: unknown): Promise<Response>;
+    safePatch<Response>(path: string, options?: unknown): Promise<Response>;
     safePost<Response = unknown>(path: string, options?: unknown): Promise<Response>;
   }
   /** initializeApiClient（内部 API transport 初始化器）。 */
@@ -4612,6 +4619,12 @@ declare module "@rchunk/app-primary" {
     actionId: string;
     beaconId: string;
   }) => string;
+  /** Announcement modal 候选来源注册表。 */
+  export const Qp: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    Map<string, { candidate: unknown; source: string }>
+  >;
+  export const em: () => void;
   export const Sc: () => void;
   export const Tc: (input: {
     deviceStatus?: string;
@@ -5210,6 +5223,208 @@ declare module "@rchunk/pull-request-fix-automation" {
     automations: readonly Record<string, unknown>[] | null | undefined,
     pullRequestUrl: string | null | undefined,
   ) => unknown;
+}
+
+declare module "@rchunk/app-shared" {
+  export interface ArraySchema<Value> extends SafeParseSchema<Value[]> {
+    transform<Output>(transformer: (values: Value[]) => Output): SafeParseSchema<Output>;
+  }
+  export const E4: <Value>(schema: SafeParseSchema<Value>) => ArraySchema<Value>;
+  export const Z4: () => StringSchema;
+  export const tU: () => string;
+  export const bS: (props: Record<string, unknown>) => unknown;
+  export const qv: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/app-initial" {
+  export const Bzt: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const Kzt: <Props extends Record<string, unknown>>(
+    component: ManagedDialogComponent<Props>,
+  ) => boolean;
+  export const Rzt: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+  ) => void;
+  export const Wzt: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    blocking: boolean,
+  ) => void;
+  export const qzt: <Props extends Record<string, unknown>>(
+    component: ManagedDialogComponent<Props>,
+  ) => Props | null;
+  export const xun: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const RVt: import("@rchunk/app-shared").SignalFamily<
+    string,
+    Record<string, unknown> | null
+  >;
+  export const uHt: () => void;
+  export const fnn: () => void;
+  export const mnn: (
+    turn: Record<string, unknown>,
+    requests: unknown,
+    options: {
+      includeTurnDiff: boolean;
+      isBackgroundSubagentsEnabled: boolean;
+      preserveServerUserMessages?: boolean;
+      projectionBudget: {
+        fits(value: unknown): boolean;
+        select<Value>(
+          values: readonly Value[],
+          predicate?: (value: Value) => boolean,
+          limit?: number,
+        ): Value[];
+      };
+    },
+  ) => Record<string, unknown>;
+  export const d2: () => void;
+  export const h2: () => (input: { prefillPrompt: string }) => void;
+  export const Ir: () => void;
+  export const Lr: () => {
+    isAppConnectPending(
+      connectorId: string,
+      resumeTarget: unknown,
+      hostId?: string,
+    ): boolean;
+    markAppConnectOAuthPending(
+      event: Record<string, unknown>,
+    ): unknown;
+  };
+  export const cW: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    requestId: string,
+    result: Record<string, unknown>,
+  ) => void;
+  export const lW: () => void;
+  export const uW: import("@rchunk/app-shared").ReadableSignal<unknown>;
+  export const Gdt: () => void;
+  export const LR: (props: {
+    icon: unknown;
+    monochrome?: boolean;
+  }) => unknown;
+  export const Mk: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    fields: { view: unknown },
+  ) => void;
+  export const RR: () => void;
+  export const Wdt: (action: Record<string, unknown>) => unknown;
+  export const kk: () => void;
+  export interface WorkspaceAccount {
+    isDeactivated?: boolean;
+    isPersonalWorkspace?: boolean;
+    plan_type?: unknown;
+    [key: string]: unknown;
+  }
+  export interface WorkspaceAccountsResponse {
+    accounts?: WorkspaceAccount[];
+    [key: string]: unknown;
+  }
+  export const Ox: (
+    response: WorkspaceAccountsResponse | null | undefined,
+  ) => WorkspaceAccount[];
+  export const iht: () => {
+    data?: WorkspaceAccountsResponse | null;
+  };
+  export const mC: import("@rchunk/app-shared").SignalFamily<
+    { accountId: string | null; userId: string | null },
+    { data?: unknown }
+  >;
+}
+
+declare module "@rchunk/conversation-markdown" {
+  export class a {
+    truncated: boolean;
+    constructor(limit: { maxChars: number; truncationMarker: string });
+    append(value: string): void;
+    toString(): string;
+  }
+  export const i: (input: {
+    cwd: string | null;
+    markdownLimit: { maxChars: number; truncationMarker: string };
+    projectlessOutputDirectory: string | null;
+    turn: Record<string, unknown>;
+  }) => string | null;
+  export const o: () => void;
+  export const r: (
+    title: string | null,
+    limit: { maxChars: number; truncationMarker: string },
+  ) => string;
+  export const t: () => void;
+}
+
+declare module "@rchunk/workspace-discovery" {
+  export const c: (value: unknown) => boolean;
+  export const i: () => void;
+  export const l: () => void;
+  export const n: () => void;
+  export const r: unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/view-frame" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/modal-controller-state" {
+  export const closeAllModals: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+  ) => void;
+  export const closeModal: typeof import("@rchunk/app-initial").zzt;
+  export const hasAnyModalOpen$: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const isModalOpen: typeof import("@rchunk/app-initial").Hzt;
+  export const openModal: typeof import("@rchunk/app-initial").Uzt;
+  export const setModalBlocking: typeof import("@rchunk/app-initial").Wzt;
+  export const useHasAnyModalOpen: () => boolean;
+  export const useIsModalOpen: typeof import("@rchunk/app-initial").Kzt;
+  export const useModalState: typeof import("@rchunk/app-initial").qzt;
+}
+
+declare module "@rchunk/announcement-modal-source-bridge" {
+  export const n: () => void;
+  export const t: (props: { candidate: unknown; source: string }) => unknown;
+}
+
+declare module "@rchunk/chatgpt-user-context" {
+  export const n: () => void;
+  export const t: import("@rchunk/app-shared").ScopedQuerySignal<
+    Record<string, unknown>,
+    Record<string, unknown>
+  >;
+}
+
+declare module "@rchunk/request-context" {
+  export const n: () => void;
+  export const r: import("@rchunk/app-shared").ScopedDerivedFamily<
+    Record<string, unknown>,
+    {
+      context: { conversationId: string; messageId: string };
+      product: { cite?: boolean };
+    },
+    { isSourceCatalog: boolean; rewrittenQueries?: string[] }
+  >;
+  export const t: (
+    scope: { get(signal: unknown, parameter: string): unknown },
+    position: { conversationId: string; messageId: string },
+    product: { cite?: boolean },
+  ) => { isSourceCatalog: boolean; rewrittenQueries?: string[] };
+}
+
+declare module "@rchunk/promo-funnel-context" {
+  export interface PromoFunnelCheckoutContext {
+    accountId?: string;
+    location: string;
+    organizationId?: string;
+    promoCampaignId?: string;
+    promoCode?: string;
+    referralCode?: string;
+  }
+  export const n: () => void;
+  export const r: (context: PromoFunnelCheckoutContext) => void;
+  export const t: () => PromoFunnelCheckoutContext | null;
+}
+
+declare module "@rchunk/mcp-quick-action-dialog" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/worktree-onboarding-state" {
