@@ -2439,4 +2439,11 @@ export const REWRITTEN = new Set([
   "image-gen-loading-games",
   "chatgpt-conversation-inline-beacon",
   "work-mode-pet-content",
+  "drawing-frame-geometry",
+  "floating-ui-modifiers",
+  "presentation-review-utils",
+  "tableau10-palette",
+  "spreadsheet-utils",
+  "spreadsheet-address-utils",
+  "freeze-panes",
 ]);

@@ -14502,7 +14502,108 @@ declare module "@rchunk/artifact-spreadsheet-model-runtime";
 declare module "@rchunk/popcorn-presentation-panel" { export interface PresentationSlide { id: string; title?: string; thumbnailUrl?: string } export interface PopcornPresentationController { getSelectedSlideIndex(): number; selectSlide(index: number): void; setZoom(zoom: number): void } export interface PopcornElectronPresentationPanelProps { annotationsEnabled?: boolean; className?: string; footerContent?: unknown; headerCenterContent?: unknown; headerRightContent?: unknown; headerTitleContent?: unknown; initialSelectedSlideIdx?: number; initialSourceBytes?: Uint8Array; initialSourceFormat?: string; initialZoom?: number; isEditing?: boolean; onControllerReady?(controller: PopcornPresentationController): void; onImportError?(error: Error): void; onImportReady?(): void; onInteractionAttempt?(): void; onPresentationEdit?(): void; renderHeader?(parts: Record<string, unknown>): unknown; renderLayout?(parts: Record<string, unknown>): unknown; slides?: readonly PresentationSlide[]; theme?: string; title?: string } export const PopcornElectronPresentationPanel: (props: PopcornElectronPresentationPanelProps) => unknown }
 declare module "@rchunk/popcorn-workbook-panel" { export interface WorkbookSheet { cells?: readonly (readonly unknown[])[]; id: string; name: string } export interface PopcornWorkbookController { getActiveSheetName(): string | undefined; setActiveSheetName(name: string): void; setSelectedAddress(address: string): void; setZoom(zoom: number): void } export interface PopcornElectronWorkbookPanelProps { className?: string; headerCenterContent?: unknown; headerRightContent?: unknown; headerTitleContent?: unknown; initialSelectedAddress?: string; initialSourceBytes?: Uint8Array; initialSourceFormat?: string; initialZoom?: number; isEditing?: boolean; onControllerReady?(controller: PopcornWorkbookController): void; onImportError?(error: Error): void; onImportReady?(): void; onInteractionAttempt?(): void; renderHeader?(parts: Record<string, unknown>): unknown; renderLayout?(parts: Record<string, unknown>): unknown; sheets?: readonly WorkbookSheet[]; theme?: string; title?: string; toolbarHidden?: boolean } export const PopcornElectronWorkbookPanel: (props: PopcornElectronWorkbookPanelProps) => unknown }
 declare module "@rchunk/popcorn-document-panel" { export interface DocumentPage { content?: string; id: string; title?: string } export interface PopcornElectronDocumentPanelProps { annotationsEnabled?: boolean; artifactSearchEnabled?: boolean; className?: string; documentProtoVersion?: number; enablePageNavigation?: boolean; headerRightContent?: unknown; headerTitleContent?: unknown; initialPageIndex?: number; initialSourceBytes?: Uint8Array; initialSourceFormat?: string; initialZoom?: number; isEditing?: boolean; navigationTarget?: { pageNumber: number; requestId: string }; onImportError?(error: Error): void; onImportReady?(): void; pages?: readonly DocumentPage[]; renderHeader?(parts: Record<string, unknown>): unknown; renderHeaderZoomControl?(zoom: number): unknown; renderLayout?(parts: Record<string, unknown>): unknown; theme?: string; title?: string; zoomToFitLabel?: string } export const PopcornElectronDocumentPanel: (props: PopcornElectronDocumentPanelProps) => unknown }
-declare module "@rchunk/artifact-workbook-runtime"; declare module "@rchunk/artifact-source-bootstrap"; declare module "@rchunk/text-underline-icon"; declare module "@rchunk/drawing-frame-geometry"; declare module "@rchunk/floating-ui-modifiers"; declare module "@rchunk/popcorn-electron-surface-style"; declare module "@rchunk/draw-presence-label"; declare module "@rchunk/presentation-review-utils"; declare module "@rchunk/d3-ordinal-runtime"; declare module "@rchunk/tableau10-palette"; declare module "@rchunk/spreadsheet-utils"; declare module "@rchunk/spreadsheet-address-utils"; declare module "@rchunk/popcorn-chart-hover-tooltip"; declare module "@rchunk/freeze-panes"; declare module "@rchunk/workbook-review-utils"; declare module "@rchunk/artifact-document-core";
+declare module "@rchunk/artifact-workbook-runtime"; declare module "@rchunk/artifact-source-bootstrap"; declare module "@rchunk/text-underline-icon"; declare module "@rchunk/popcorn-electron-surface-style"; declare module "@rchunk/draw-presence-label"; declare module "@rchunk/d3-ordinal-runtime"; declare module "@rchunk/popcorn-chart-hover-tooltip"; declare module "@rchunk/workbook-review-utils"; declare module "@rchunk/artifact-document-core";
+declare module "@rchunk/drawing-frame-geometry" {
+  export interface Point { x: number; y: number }
+  export interface CameraTransform extends Point { k: number }
+  export interface Frame { height: number; left: number; rotation?: number | null; top: number; width: number }
+  export type FrameCorner = "ne" | "nw" | "se" | "sw";
+  export const C: (camera: CameraTransform, screenX: number, screenY: number, nextZoom: number, minimum: number, maximum: number) => CameraTransform;
+  export const S: (camera: CameraTransform, x: number, y: number) => Point;
+  export const _: (camera: CameraTransform, content: { height: number; width: number }, viewport: { height: number; width: number }) => CameraTransform;
+  export const a: (frame: Frame, zoom: number) => Point;
+  export const b: () => void;
+  export const c: (frame: Frame, point: Point) => boolean;
+  export const d: (zoom: number) => { halfVisibleSize: number; hitRadius: number; rotationBand: number; rotationHandleDistance: number; visibleSize: number };
+  export const f: (corner?: FrameCorner | null) => string | null;
+  export const g: (camera: CameraTransform) => { left: number; top: number };
+  export const h: (camera: CameraTransform) => { left: number; top: number };
+  export const i: (frames: readonly Frame[]) => Omit<Frame, "rotation"> | null;
+  export const l: (frame: Frame, point: Point, zoom: number) => FrameCorner | null;
+  export const m: () => void;
+  export const n: (frame: Frame) => Point;
+  export const o: () => void;
+  export const p: () => string;
+  export const r: (frame: Frame) => Record<FrameCorner, Point>;
+  export const s: (rotation?: number | null) => number;
+  export const t: (bounds: Omit<Frame, "rotation">, frame: Frame) => boolean;
+  export const u: (frame: Frame, point: Point, zoom: number) => boolean;
+  export const v: (value: number, minimum: number, maximum: number) => number;
+  export const x: (camera: CameraTransform, x: number, y: number) => Point;
+  export const y: (points: Map<number, Point>) => { centerX: number; centerY: number; distance: number } | null;
+}
+declare module "@rchunk/floating-ui-modifiers" {
+  export interface DragTransform { x: number; y: number; [key: string]: unknown }
+  export interface DragModifierInput { draggingNodeRect?: { bottom: number; left: number; right: number; top: number } | null; scrollableAncestorRects?: readonly { height: number; left: number; top: number; width: number }[]; transform: DragTransform }
+  export const i: (input: DragModifierInput) => DragTransform;
+  export const n: (input: DragModifierInput) => DragTransform;
+  export const r: (input: DragModifierInput) => DragTransform;
+  export const t: () => void;
+}
+declare module "@rchunk/presentation-review-utils" {
+  export interface Point { x: number; y: number }
+  export interface Frame { height: number; left: number; rotation?: number | null; top: number; width: number }
+  export interface ContainedElement { elementId: string; frame: Frame }
+  export interface SlideElementTarget extends Record<string, unknown> { frame: Frame; id: string }
+  export interface InspectorSlideElement extends Record<string, unknown> { id: string; kind?: string | null; name?: string | null }
+  export interface PresentationSnapshot { inspector: { slideElements: InspectorSlideElement[] }; primarySelectedElementId?: string | null; selectedElementIds: string[]; selectedSlideElementTargets: SlideElementTarget[]; selectedSlideIdx: number; slideIds: string[]; slideLabels: string[] }
+  export interface PresentationRegionTarget { anchorPoint: Point; containedElements: ContainedElement[]; frame: Frame; slideId: string; slideIndex: number; slideLabel: string; type: "presentation-region" }
+  export interface PresentationElementSelectionTarget { anchorPoint?: Point; elementIds: string[]; frame: Frame; primaryElementId: string | null; primaryElementKind?: string | null; primaryElementName?: string | null; primaryElementOffset?: Point | null; primaryElementOrdinal?: number | null; slideId: string; slideIndex: number; slideLabel: string; type: "presentation-element-selection" }
+  export interface PresentationDrawingRegionTarget { containedElements: ContainedElement[]; frame: Frame; slideId: string; slideIndex: number; slideLabel: string; type: "presentation-drawing-region"; viewportBounds: Omit<Frame, "rotation"> }
+  export type PresentationReviewTarget = PresentationRegionTarget | PresentationElementSelectionTarget;
+  export const a: (target: PresentationDrawingRegionTarget) => string;
+  export const c: (target: PresentationReviewTarget) => string;
+  export const i: (input: { anchorPoint: Point; containedElements?: ContainedElement[]; frame: Frame; snapshot: PresentationSnapshot }) => PresentationRegionTarget | null;
+  export const l: (input: Pick<PresentationSnapshot, "selectedElementIds" | "selectedSlideElementTargets">) => Omit<Frame, "rotation"> | null;
+  export const n: (input: { containedElements?: ContainedElement[]; frame: Frame; snapshot: PresentationSnapshot; viewportBounds: Omit<Frame, "rotation"> }) => PresentationDrawingRegionTarget | null;
+  export const o: (target: PresentationReviewTarget, viewport?: { left: number; scale: number; top: number } | null) => Frame;
+  export const r: (input: { anchorPoint?: Point | null; elementIds?: string[]; frame?: Frame | null; primaryElementId?: string | null; snapshot: PresentationSnapshot }) => PresentationElementSelectionTarget | null;
+  export const s: (target: { frame: Frame }, viewport?: { left: number; scale: number; top: number } | null) => Frame;
+  export const t: (hit: { kind: "slide"; slideId: string; slideIndex: number; slideLabel: string } | { elementId: string; elementName?: string | null; frame?: Frame | null; kind: string; slideId: string; slideIndex: number; slideLabel: string }, point: Point) => PresentationReviewTarget;
+  export const u: () => void;
+}
+declare module "@rchunk/tableau10-palette" { export const i: () => void; export const n: () => void; export const r: (value: string) => string[]; export const t: string[] }
+declare module "@rchunk/spreadsheet-utils" {
+  export const a: (index: number) => string;
+  export const c: (points?: number | null) => number;
+  export const d: (fontSize: number) => { padLr: number; padTb: number };
+  export const f: (reference: string) => number;
+  export const i: (reference: string) => number;
+  export const l: (pixels: number, characterWidth?: number | null) => number;
+  export const n: (value: string) => string;
+  export const o: (index?: number | null) => string | undefined;
+  export const r: (width?: number | null, characterWidth?: number | null) => number;
+  export const s: () => void;
+  export const t: 8.43;
+  export const u: (pixels?: number | null) => number;
+}
+declare module "@rchunk/spreadsheet-address-utils" {
+  export interface CellBounds { endCol: number; endRow: number; startCol: number; startRow: number }
+  export interface ParsedCellRange { bounds: CellBounds; ref: string }
+  export const a: (reference: string) => string | null;
+  export const c: (value: string) => { ref: string; sheetName?: string };
+  export const i: (row: number, column: number) => string;
+  export const n: (bounds: CellBounds) => string;
+  export const o: (reference: string) => ParsedCellRange | null;
+  export const r: () => void;
+  export const s: (left: CellBounds, right: CellBounds) => boolean;
+  export const t: (bounds: CellBounds) => { cols: number; rows: number };
+}
+declare module "@rchunk/freeze-panes" {
+  export interface CameraTransform { k: number; x: number; y: number }
+  export interface FreezePanes { columnCount: number; rowCount: number }
+  export interface GridDimensions { columnWidths: number[]; freezePanes: FreezePanes; rowHeights: number[] }
+  export const a: (input: GridDimensions & { camera: CameraTransform; height: number; width: number; worldX: number; worldY: number }) => Array<{ height: number; width: number; x: number; y: number }>;
+  export const c: (input: GridDimensions & { camera: CameraTransform; screenX: number; screenY: number }) => { x: number; y: number };
+  export const i: () => void;
+  export const l: (input: GridDimensions & { camera: CameraTransform; worldX: number; worldY: number }) => { x: number; y: number };
+  export const n: (input: GridDimensions & { bottomScrollReservePx?: number; camera: CameraTransform; maxZoom: number; minZoom: number; viewportHeight: number; viewportWidth: number }) => CameraTransform;
+  export const o: (input: GridDimensions & { camera: CameraTransform; height: number; width: number; worldX: number; worldY: number }) => Array<{ height: number; width: number; x: number; y: number }>;
+  export const r: (grid: GridDimensions) => { freezeLineX: number; freezeLineY: number; frozenBodyHeight: number; frozenBodyWidth: number };
+  export const s: (offsets: readonly number[], value: number) => number;
+  export const t: (values: readonly number[]) => number[];
+  export const u: (input: GridDimensions & { camera: CameraTransform; worldX: number; worldY: number }) => { x: number; y: number };
+}
 declare module "@rchunk/docx-preview-panel" {
   export interface DocumentPreviewPage { alt?: string; id?: string | number; src?: string; text?: string }
   export interface DocxPreviewPanelProps { currentPage?: number; error?: string | null; fileName?: string; isLoading?: boolean; libraryFileId?: string; onClose?(): void; onDownload?(): void; onOpenInLibrary?(libraryFileId: string): void; onPageChange?(page: number): void; onRetry?(): void; onZoomChange?(zoom: number): void; pages?: readonly DocumentPreviewPage[]; title?: string; zoom?: number }
