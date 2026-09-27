@@ -5270,6 +5270,12 @@ declare module "@rchunk/library-trash-analytics";
 declare module "@rchunk/source-dashed-border";
 declare module "@rchunk/analytics-runtime";
 declare module "@rchunk/chatgpt-projects-runtime";
+declare module "@rchunk/cadence-events";
+declare module "@rchunk/add-payment-method";
+declare module "@rchunk/delinquent-upgrade-preparation";
+declare module "@rchunk/payment-method-display";
+declare module "@rchunk/edit-payment-method";
+declare module "@rchunk/subscription-recovery-events";
 
 declare module "@rchunk/dictionary-dialog" {
   export interface DictionaryWord { id: string; text: string; }
@@ -5287,6 +5293,10 @@ declare module "@rchunk/scheduled-task-share-dialog" { export const ScheduledTas
 declare module "@rchunk/image-prompt-share-dialog" { export const ImagePromptShareDialog: (props: Record<string, unknown> & { accountId: string; onClose(): void; shareSessionId: string; sourceContent: { prompt: string; title: string }; userId: string }) => unknown; }
 declare module "@rchunk/chatgpt-project-settings-modal" { export const ChatGptProjectSettingsModal: (props: Record<string, unknown> & { accountId: string; onClose(): void; project: Record<string, unknown> }) => unknown; }
 declare module "@rchunk/profile-showcase-editor" { export const ProfileShowcaseEditor: (props: Record<string, unknown> & { accountId: string; onClose(): void; savedItems: Array<Record<string, unknown>>; userId: string }) => unknown; }
+declare module "@rchunk/billing-cadence-dialog" { export const BillingCadenceDialog: (props: Record<string, unknown> & { accountId: string; entryPoint: string; onClose(): void; state: Record<string, unknown> }) => unknown; }
+declare module "@rchunk/subscription-recovery-dialog" { export const RecoveryDialog: (props: Record<string, unknown> & { accountId: string; onClose(): void; onComplete(): void; planName: string }) => unknown; }
+declare module "@rchunk/subscription-cancellation-dialog" { export const CancellationDialog: (props: Record<string, unknown> & { account: Record<string, unknown>; accountId: string; onClose(): void }) => unknown; }
+declare module "@rchunk/credit-reload-dialog-host" { export const CreditReloadDialogHost: (props: Record<string, unknown> & { onClose(): void; source: string; variant: string }) => unknown; }
 declare module "@rchunk/review-file-source-breadcrumb" {
   export const a: () => void; export const c: () => void; export const d: (line: number, lineCount: number) => number; export const i: () => void; export const l: (contents: string) => number; export const n: () => void; export const o: (element: HTMLElement, line: number, character: number) => boolean; export const r: (props: Record<string, unknown>) => unknown; export const s: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; export const u: (value: string, lineCount?: number) => number | null;
 }

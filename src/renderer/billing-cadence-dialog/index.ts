@@ -1,0 +1,20 @@
+import "@rchunk/rolldown-runtime";
+import "@rchunk/app-initial";
+import "@rchunk/app-primary";
+import "@rchunk/billing-queries";
+import "@rchunk/cadence-events";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+type BillingCadence = "monthly" | "yearly";
+interface Price { amount: number; tax?: "inclusive" | "exclusive" }
+interface BillingCadenceState { annualPrice: Price; billingCurrency: string; effectiveNextCadence: BillingCadence; monthlyPrice: Price; renewalDate: Date | string; requiresReactivation?: boolean }
+interface BillingCadenceDialogProps { accountId: string; entryPoint: "annual_offer" | "manage_billing_schedule"; error?: string | null; isLoading?: boolean; onClose(): void; onRetry?(): void; onUpdate?(cadence: BillingCadence): Promise<void> | void; previewDate?: Date | string; state: BillingCadenceState }
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function money(amount: number, currency: string): string { return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount); }
+function BillingCadenceDialog({ entryPoint, error, isLoading = false, onClose, onRetry, onUpdate, previewDate, state }: BillingCadenceDialogProps): unknown {
+  const manage = entryPoint === "manage_billing_schedule"; let selected: BillingCadence = manage ? state.effectiveNextCadence : "yearly", pending = false;
+  const date = new Date(previewDate ?? state.renewalDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  const summary = () => { const price = selected === "yearly" ? state.annualPrice.amount * 12 : state.monthlyPrice.amount; if (selected === state.effectiveNextCadence) return state.requiresReactivation ? `Your plan will be canceled on ${date}` : `Your ${selected === "yearly" ? "annual" : "monthly"} plan will renew on ${date} for ${money(price, state.billingCurrency)}/${selected === "yearly" ? "year" : "month"}`; return `Your plan will switch to ${selected === "yearly" ? "annual" : "monthly"} on ${date} for ${money(price, state.billingCurrency)}/${selected === "yearly" ? "year" : "month"}`; };
+  return jsx().jsxs("dialog", { open: true, children: [jsx().jsx("h2", { children: manage ? "Manage billing schedule" : "Confirm billing change" }), manage ? jsx().jsx("p", { children: `Review or update your billing schedule. Any change will take effect at your next renewal on ${date}.` }) : null, isLoading ? jsx().jsx("p", { role: "status", children: "Checking your billing details…" }) : error != null ? jsx().jsxs("div", { role: "alert", children: [error, jsx().jsx("button", { type: "button", onClick: onRetry, children: "Retry" })] }) : jsx().jsxs("form", { onSubmit: (event: { preventDefault(): void }) => { event.preventDefault(); if (pending) return; if (selected === state.effectiveNextCadence && !state.requiresReactivation) { onClose(); return; } pending = true; Promise.resolve(onUpdate?.(selected)).then(onClose).finally(() => { pending = false; }); }, children: [manage ? jsx().jsxs("fieldset", { children: [jsx().jsx("legend", { children: "Billing frequency" }), ...(["monthly", "yearly"] as const).map(cadence => jsx().jsx("label", { children: [jsx().jsx("input", { type: "radio", name: "cadence", defaultChecked: selected === cadence, onChange: () => { selected = cadence; } }), cadence === "yearly" ? "Annual" : "Monthly"] }, cadence))] }) : null, jsx().jsx("p", { children: summary() }), state.requiresReactivation ? jsx().jsx("p", { children: `Confirming this change will reactivate your subscription. Your plan will renew on ${date}.` }) : null, jsx().jsxs("footer", { children: [jsx().jsx("button", { type: "button", disabled: pending, onClick: onClose, children: "Cancel" }), jsx().jsx("button", { type: "submit", disabled: pending, children: selected === state.effectiveNextCadence && !state.requiresReactivation ? "Done" : "Confirm" })] })] })] });
+}
+export { BillingCadenceDialog, type BillingCadenceDialogProps, type BillingCadenceState };
