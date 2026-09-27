@@ -5189,8 +5189,44 @@ declare module "@rchunk/app-primary" {
 declare module "@rchunk/form-runtime";
 declare module "@rchunk/color-palette";
 declare module "@rchunk/automation-dialog";
-declare module "@rchunk/schedule-fields";
-declare module "@rchunk/schedule-draft";
+declare module "@rchunk/schedule-draft" {
+  export type ScheduleMode = "custom" | "daily" | "hourly" | "monthly" | "weekdays" | "weekly";
+  export type Weekday = "FR" | "MO" | "SA" | "SU" | "TH" | "TU" | "WE";
+  export interface ScheduleConfig { customRrule: string; intervalHours: number; intervalMinutes: number | null; mode: ScheduleMode; monthDay: number; oneTimeDate?: string; oneTimeSeconds?: number; time: string; untilDate?: string; untilTime?: string; weekdays: Weekday[] }
+  export interface AutomationRecord { default_timezone?: string; id: string; is_enabled: boolean; next_run_times: string[]; prompt: string; schedule: string; schedule_components: { by_day?: string | null; by_hour?: number | null; by_minute?: number | null; by_month_day?: number | null; frequency: string; start_time?: string | null }; schedule_time_of_day?: "morning" | "afternoon" | "evening" | "night" | null; target_time_utc?: string | null; thread_mode?: string | null; timing_mode?: string | number; title: string }
+  export interface AutomationDraft { id: string; kind: "cron"; name: string; prompt: string; rawRrule: string | null; scheduleConfig: ScheduleConfig; scheduleDirty: boolean; status: "ACTIVE" | "PAUSED"; threadMode?: string | null }
+  export interface AutomationUpdateRequest { default_timezone?: string; is_enabled: boolean; prompt: string; schedule: string; thread_mode?: string | null; timing_mode?: string | number; title: string }
+  export const a: (time: string) => "morning" | "afternoon" | "evening" | "night";
+  export const c: () => void;
+  export const i: (automation: AutomationRecord, draft: AutomationDraft, now: Date) => "end-past" | "past" | "too-far" | null;
+  export const l: (automation: AutomationRecord, config: ScheduleConfig, mode: ScheduleMode) => ScheduleConfig;
+  export const n: (automation: AutomationRecord) => AutomationDraft;
+  export const o: (automation: AutomationRecord) => Date | null;
+  export const r: (automation: AutomationRecord, draft: AutomationDraft) => AutomationUpdateRequest;
+  export const s: (automation: AutomationRecord, draft: AutomationDraft) => boolean;
+  export const t: Readonly<{ morning: "09:00"; afternoon: "14:00"; evening: "18:00"; night: "22:00" }>;
+}
+declare module "@rchunk/schedule-fields" {
+  import type { AutomationDraft, AutomationRecord } from "@rchunk/schedule-draft";
+  export interface AutomationItem { automation: AutomationRecord & { canManage?: boolean; conversation_id?: string | null; conversation_origin?: string | null; source_conversation_id?: string | null; initial_conversation_id?: string | null; status?: string }; teamId?: string | null }
+  export interface AutomationSuggestion { suggested_automation_type?: string; system_hint?: string | null; user_message: string }
+  export interface AutomationModel { slug: string; thinkingEffort?: string | null; versionId?: string }
+  export interface AutomationOperationScope { accountId?: string | null; getDefaultModel?(origin?: string): AutomationModel; logEvent?(event: Record<string, unknown>): void; markConversationRead?(conversationId: string): Promise<void> | void; navigate?(location: { pathname: string; search?: string }, options?: { state?: unknown }): void; runAutomation?(input: { automationId: string; conversationId: string; model: AutomationModel; prompt: string; signal: AbortSignal }): Promise<{ conversationId?: string; serverConversationId?: string } | null>; startSuggestion?(input: { conversationId: string; forceUseSearch?: boolean; model: AutomationModel; prompt: string; signal: AbortSignal; suggestedAutomationType?: string; systemHints: string[] }): Promise<{ conversationId?: string; serverConversationId?: string } | null>; subscribeAccount?(listener: (accountId: string | null | undefined) => void): () => void; updateAutomation?(automationId: string, request: import("@rchunk/schedule-draft").AutomationUpdateRequest, signal: AbortSignal): Promise<AutomationRecord> }
+  export const a: (scope: AutomationOperationScope, item: AutomationItem, navigate?: AutomationOperationScope["navigate"], options?: { source?: "editor" | "scheduled_page"; state?: unknown }) => void;
+  export const c: (scope: AutomationOperationScope, input: { conversationId: string; conversationOrigin?: string; suggestion: AutomationSuggestion; signal: AbortSignal }) => Promise<string>;
+  export const d: (scope: AutomationOperationScope, item: AutomationItem) => Promise<void>;
+  export const f: (policy: { preferredModel?: AutomationModel; versionOptions?: Array<{ id?: string; model?: AutomationModel }> } | null | undefined, origin?: string) => AutomationModel | undefined;
+  export const g: (scope: AutomationOperationScope, input: { item: AutomationItem; destination: "conversation" | "editor"; source: "editor" | "scheduled_page" }) => void;
+  export const h: (scope: AutomationOperationScope) => void;
+  export const i: () => void; export const l: (item: AutomationItem) => string | null; export const m: () => void; export const n: () => void;
+  export const o: (scope: AutomationOperationScope, input: { automation: AutomationItem["automation"]; conversationId: string; conversationOrigin?: string; signal: AbortSignal }) => Promise<string>;
+  export const p: () => void;
+  export const r: (scope: AutomationOperationScope, signal: AbortSignal) => { signal: AbortSignal; dispose(): void };
+  export const s: (scope: AutomationOperationScope, input: { automation: AutomationRecord & { canManage?: boolean; status?: string }; draft: AutomationDraft; signal: AbortSignal }) => Promise<AutomationRecord>;
+  export const t: (props: { automation: AutomationRecord; draft: AutomationDraft; onChange(draft: AutomationDraft): void; sharedPreview?: boolean }) => unknown;
+  export const u: () => void;
+}
+declare module "@rchunk/automation-frequency-section";
 declare module "@rchunk/share-analytics";
 declare module "@rchunk/create-pull-request-modal-content";
 
