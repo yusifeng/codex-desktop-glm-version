@@ -5980,10 +5980,42 @@ declare module "@rchunk/local-conversation-page" {
 }
 
 declare module "@rchunk/chatgpt-conversation-page-core" {
+  export interface ChatGptProject { id: string; name: string; icon?: unknown; shared?: boolean }
+  export interface ConversationTurn { id: string; role: "assistant" | "system" | "user"; text?: string; pending?: boolean; [key: string]: unknown }
+  export interface ConversationHeaderProps { breadcrumbHeader?: unknown; isCloudTask?: boolean; isTemporaryChat?: boolean; project?: ChatGptProject | null; startActions?: unknown; title?: string | null; workTitle?: string | null }
+  export interface HeaderToolbarProps { allowsThreadContentOverlap?: boolean; project?: ChatGptProject | null; startActions?: unknown; workTitle?: string | null }
+  export interface ConversationLayoutProps { children?: unknown; conversationId: string; header?: unknown; isArchivedPreview?: boolean; rightPanel?: unknown; title?: string | null }
+  export interface ConversationContentProps { archivedPreviewFooter?: unknown; composer?: unknown; conversationId: string; emptyState?: unknown; error?: string | null; header?: unknown; isArchivedPreview?: boolean; isCloudTask?: boolean; isLoading?: boolean; isReadOnly?: boolean; isRestricted?: boolean; isStreaming?: boolean; isTemporaryChat?: boolean; onAddFiles?(files: readonly File[]): void; onRetry?(): void; project?: ChatGptProject | null; rightPanel?: unknown; sharedConversationId?: string | null; title?: string | null; turns?: readonly ConversationTurn[] }
+  export interface ChatGptConversationPageProps extends Omit<ConversationContentProps, "conversationId"> { conversationId?: string | null; redirectTo?: string }
+  export interface ChatGptSharedConversationPageProps extends Omit<ConversationContentProps, "conversationId" | "sharedConversationId"> { conversationId?: string | null; onReport?(conversationId: string): void; sharedConversationId?: string | null }
+  export interface ShareConversationButtonProps { conversationId: string; isReady?: boolean; isRestricted?: boolean; isStreaming?: boolean; onShare?(conversationId: string): void }
+  export const a: (props: ConversationLayoutProps) => unknown;
   export const c: () => void;
-  export const i: (props: Record<string, unknown>) => unknown;
-  export const s: (props: Record<string, unknown>) => unknown;
+  export const d: (props?: { conversationId?: string; onReport?(conversationId: string): void }) => unknown;
+  export const f: () => void;
+  export const i: (props?: ChatGptConversationPageProps) => unknown;
+  export const l: (props?: { authMethod?: string; chatGptAccessStatus?: string; children?: unknown; isWorkOnlyChatDisabled?: boolean }) => unknown;
+  export const m: () => void;
+  export const n: (props: ConversationHeaderProps) => unknown;
+  export const o: (props: ShareConversationButtonProps) => unknown;
+  export const p: (props: HeaderToolbarProps) => unknown;
+  export const r: (props: { children?: unknown }) => unknown;
+  export const s: (props?: ChatGptSharedConversationPageProps) => unknown;
+  export const t: (props: ConversationContentProps) => unknown;
+  export const u: () => void;
 }
+
+declare module "@rchunk/conversation-screen";
+declare module "@rchunk/conversation-summary";
+declare module "@rchunk/archived-conversation-preview-footer";
+declare module "@rchunk/chatgpt-sources-message";
+declare module "@rchunk/chatgpt-gizmo-header";
+declare module "@rchunk/chatgpt-temporary-chat-ui";
+declare module "@rchunk/cloud-browser-preview";
+declare module "@rchunk/chatgpt-sources-side-panel-tab";
+declare module "@rchunk/open-audio-summary-dialog";
+declare module "@rchunk/open-conversation-files";
+declare module "@rchunk/chatgpt-entity-side-panel-tab";
 
 declare module "@rchunk/plugin-detail-page-core" {
   export const _: <T>(value: T) => T; export const a: () => void; export const b: (plugin: { id?: string; name: string }) => string;
