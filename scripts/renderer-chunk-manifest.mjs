@@ -1027,11 +1027,17 @@ export const CHUNKS = {
   "open-automation-side-panel-tab": "open-automation-side-panel-tab-e60c04bac713.js",
   "hooks": "hooks-28b6d6fc88f5.js",
   "Icon": "Icon-994cd6bb9e69.js",
+  "chatgpt-saved-memory-state": "chatgpt-saved-memory-state-fc941ce42fb3.js",
+  "animated-icon": "animated-icon-ac1b587a8839.js",
+  "saved-memory-history": "saved-memory-history-1b9a65254851.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "saved-memories",
+  "about-you-summary",
+  "notifications-settings",
   "computer-history-query",
   "chronicle-service-queries",
   "recent-uploads",

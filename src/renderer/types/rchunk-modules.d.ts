@@ -9987,6 +9987,18 @@ declare module "@rchunk/notifications-settings" {
   export default _default;
 }
 
+declare module "@rchunk/app-primary" {
+  /** updateAccountSetting: updates one account-scoped ChatGPT setting. */
+  export const Gp: (
+    scope: unknown,
+    accountId: string,
+    setting: string,
+    value: unknown,
+  ) => Promise<unknown>;
+  /** initializeAccountSettings: prepares account-setting mutations. */
+  export const Wp: () => void;
+}
+
 declare module "@rchunk/permissions-mode-visibility" {
   const _default: unknown;
   export default _default;
@@ -10707,6 +10719,60 @@ declare module "@rchunk/memory-manager-gate" {
 declare module "@rchunk/saved-memories" {
   const _default: unknown;
   export default _default;
+}
+
+declare module "@rchunk/chatgpt-saved-memory-state" {
+  export const i: () => void;
+  export const n: unknown;
+  export const r: (scope: unknown, input: Record<string, unknown>) => Promise<void>;
+  export const t: unknown;
+}
+
+declare module "@rchunk/saved-memory-history";
+
+declare module "@rchunk/animated-icon" {
+  export const n: () => void;
+  export const t: (props: {
+    animationJson: unknown;
+    color?: string;
+    loop?: boolean;
+    onComplete?(): void;
+    onReady?(): void;
+  }) => unknown;
+}
+
+declare module "@rchunk/about-you-summary" {
+  interface AboutYouOptions {
+    accountId: string;
+    contextualHint?: string;
+    signal?: AbortSignal;
+    source?: string;
+    [key: string]: unknown;
+  }
+  export const a: (options: AboutYouOptions, endpoint?: string) => Promise<Record<string, unknown>>;
+  export const i: () => void;
+  export const n: (props: AboutYouOptions & { forceRefresh?: boolean; onClose(): void }) => unknown;
+  export const o: (payload: Record<string, unknown>, options: AboutYouOptions) => Promise<Record<string, unknown>>;
+  export const r: (accountId: string | null, options?: AboutYouOptions) => Promise<Record<string, unknown>>;
+  export const t: (props: AboutYouOptions & { forceRefresh?: boolean; onClose(): void; onDeleteAndTurnOffMemory?(): Promise<void> }) => unknown;
+}
+
+declare module "@rchunk/notifications-settings" {
+  interface NotificationSettings {
+    permissionsEnabled: boolean;
+    questionsEnabled: boolean;
+    sound?: string;
+    turnMode: "off" | "unfocused" | "always";
+  }
+  interface NotificationSettingsProps {
+    loading?: boolean;
+    onChange?(settings: NotificationSettings): void;
+    settings?: Partial<NotificationSettings>;
+    soundOptions?: readonly string[];
+  }
+  export const n: (props?: NotificationSettingsProps & { available?: boolean }) => unknown;
+  export const r: () => void;
+  export const t: (props: NotificationSettingsProps) => unknown;
 }
 
 declare module "@rchunk/settings-host-dropdown" {
