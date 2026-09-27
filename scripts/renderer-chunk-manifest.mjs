@@ -2425,4 +2425,8 @@ export const REWRITTEN = new Set([
   "summary",
   "payload",
   "image-validation-session",
+  "resume-chatgpt-completion",
+  "content",
+  "chatgpt-generated-image-favorite",
+  "request-panel",
 ]);
