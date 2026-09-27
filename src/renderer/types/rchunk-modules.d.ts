@@ -3394,6 +3394,10 @@ declare module "@rchunk/app-initial" {
   export const hnt: () => Promise<void>; // initializeAppHostServices
   export const mnt: () => void; // 懒初始化器（遥测/基础设施装配）
   export const pnt: {
+    customAvatars: {
+      installPet?: (request: Record<string, unknown>) => Promise<{ id: string }>;
+      previewPetInstall?: (request: Record<string, unknown>) => Promise<Record<string, unknown> & { spriteVersionNumber: number }>;
+    };
     hotkeyWindowHotkeys?: {
       open(options: { path: string }): void;
     };
@@ -5259,7 +5263,18 @@ declare module "@rchunk/upgrade-plan-dialog" { export const UpgradePlanDialog: (
 declare module "@rchunk/voice-personalization-dialog" { export const VoicePersonalizationDialog: (props: Record<string, unknown> & { accountId: string; onBack(): void; onClose(): void; onComplete(): void }) => unknown; }
 declare module "@rchunk/slides-outline-template-picker" { export const SlidesOutlineTemplatePicker: (props: Record<string, unknown> & { onOpenChange(open: boolean): void; onSelect(template: unknown): void; open: boolean }) => unknown; }
 declare module "@rchunk/avatar-mascot-button";
-declare module "@rchunk/pet-install-state";
+declare module "@rchunk/pet-install-state" {
+  export interface PetPreview { spriteVersionNumber: number; [key: string]: unknown }
+  export interface PetRequest extends Record<string, unknown> { description?: string; imageUrl: string; name: string; spriteVersionNumber?: number }
+  export type PetInstallState = null | (PetRequest & { installedAvatarId?: string; preview?: PetPreview; status: "installError" | "installed" | "installing" | "loading" | "previewError" | "ready" });
+  export interface PetStateKey { value: PetInstallState }
+  export interface PetStateScope { get<Value>(key: PetStateKey): Value; set(key: PetStateKey, value: PetInstallState): void }
+  export const a: (scope: PetStateScope, request: PetRequest, preview?: (request: PetRequest) => Promise<PetPreview>) => Promise<void>;
+  export const i: PetStateKey;
+  export const n: () => void;
+  export const r: (scope: PetStateScope, refresh: () => Promise<unknown>, install?: (request: PetRequest) => Promise<{ id: string }>) => Promise<void>;
+  export const t: (scope: PetStateScope) => void;
+}
 declare module "@rchunk/subscription-plan-status" {
   export type SubscriptionPlan = "free" | "go" | "plus" | "pro" | "prolite" | string;
   export interface SubscriptionPlanStatusAccount { account: { plan_type: SubscriptionPlan }; entitlement: { cancels_at?: string | null; expires_at?: string | null; is_delinquent?: boolean; renews_at?: string | null; scheduled_plan_change?: { changes_at?: string | null; plan_type: SubscriptionPlan } | null }; last_active_subscription: { will_renew: boolean } }
@@ -5323,11 +5338,34 @@ declare module "@rchunk/subscription-recovery-events" {
   export const r: (scope: SubscriptionRecoveryEventScope, action: "shown" | "dismissed" | "cta_clicked", payload?: Record<string, unknown>) => void;
   export const t: (scope: SubscriptionRecoveryEventScope, action: "shown" | "dismissed" | "pay_now_clicked" | "requires_action" | "payment_failed" | "payment_error" | "payment_succeeded", payload?: Record<string, unknown>) => void;
 }
-declare module "@rchunk/project-share-model";
+declare module "@rchunk/project-share-model" {
+  export interface ProjectShareCapabilities extends Record<string, boolean | undefined> { can_read?: boolean; can_share?: boolean; can_view_config?: boolean; can_write?: boolean }
+  export type ProjectShareSubject = { capabilities: ProjectShareCapabilities; type: 1; user_email?: string; user_id: string; user_name?: string } | { capabilities: ProjectShareCapabilities; group_id: string; group_name?: string; type: 2 } | { capabilities: ProjectShareCapabilities; type: 3 | 4 } | { capabilities: ProjectShareCapabilities; type: 10; user_email: string };
+  export const a: () => void;
+  export const c: (subject: ProjectShareSubject) => string;
+  export const i: (project: { gizmo: { id: string; short_url?: string } }) => string;
+  export const l: (subject: ProjectShareSubject, accountId?: string) => Record<string, unknown>;
+  export const n: (subjects: readonly ProjectShareSubject[]) => "link" | "private" | "workspace_link";
+  export const o: (previous: readonly ProjectShareSubject[], next: readonly ProjectShareSubject[]) => boolean;
+  export const r: (project: Record<string, unknown> | null | undefined, account: Record<string, unknown> | null | undefined, policy?: Record<string, unknown> | null) => { canInvite: boolean; canListWorkspaceMembers: boolean; canManage: boolean; canOpen: boolean; canShareWorkspaceLink: boolean };
+  export const s: (subject: ProjectShareSubject) => string | undefined;
+  export const t: Readonly<Record<"chat" | "edit", ProjectShareCapabilities>>;
+}
 declare module "@rchunk/builder-analytics";
 declare module "@rchunk/read-error" { export const n: () => void; export const t: (props: { children?: unknown; loading?: boolean; onRetry?(): void }) => unknown }
-declare module "@rchunk/animated-segmented-toggle";
-declare module "@rchunk/radio-group";
+declare module "@rchunk/animated-segmented-toggle" {
+  export interface AnimatedSegmentedToggleProps { animateSelection?: boolean; ariaLabel: string; className?: string; onSelect(id: string): void; options: Array<{ ariaLabel?: string; id: string; label: unknown }>; selectedId: string; size?: "compact" | "default" }
+  export const n: () => void;
+  export const t: (props: AnimatedSegmentedToggleProps) => unknown;
+}
+declare module "@rchunk/radio-group" {
+  export interface RadioGroupProps extends Record<string, unknown> { __isWidget?: boolean; children?: unknown; className?: string; direction?: "column" | "row"; disabled?: boolean; onChange?(value: string): void; value?: string }
+  export interface RadioItemProps extends Record<string, unknown> { block?: boolean; children?: unknown; className?: string; disabled?: boolean; id?: string; required?: boolean; value: string }
+  export interface RadioGroupComponent { (props: RadioGroupProps): unknown; Item(props: RadioItemProps): unknown }
+  export const n: RadioGroupComponent;
+  export const r: () => void;
+  export const t: () => void;
+}
 declare module "@rchunk/cme-state";
 declare module "@rchunk/format-bytes" { export const n: () => void; export const t: (bytes: number, intl: { formatNumber(value: number, options: Intl.NumberFormatOptions): string }) => string }
 
@@ -6421,7 +6459,11 @@ declare module "@rchunk/browser-skill-files" {
     signal?: AbortSignal,
   ) => Promise<ArrayBuffer>;
 }
-declare module "@rchunk/showcase-items";
+declare module "@rchunk/showcase-items" {
+  export type ShowcaseItem = { kind: "site"; site: { description?: string | null; thumbnail_url?: string | null; title: string } } | { kind: "pin"; pin: { description?: string | null; icon?: string | null; title: string } };
+  export const n: () => void;
+  export const t: (item: ShowcaseItem) => { description: string | null; icon: unknown; title: string };
+}
 
 declare module "@rchunk/mcp-extension-view-page-core" {
   export const i: () => void;
@@ -14035,12 +14077,25 @@ declare module "@rchunk/local-conversation-thread-entry" {
   ) => unknown;
 }
 
-declare module "@rchunk/avatar-overlay-debug-state";
+declare module "@rchunk/avatar-overlay-debug-state" { export const n: () => void; export const t: { value: boolean } }
 declare module "@rchunk/comment-mode-coachmark-state" { export const i: () => void; export const n: () => void; export const r: { value: boolean }; export const t: string }
-declare module "@rchunk/thread-panel-secondary-state";
+declare module "@rchunk/thread-panel-secondary-state" {
+  export interface BrowserProfileTargetRules { domains?: string[]; urls?: string[] }
+  export interface BrowserProfileDiscoveryInput { bannerAlreadyVisible?: boolean; bannerDismissedAtMs?: number | null; experimentAvailable?: boolean; experimentEnabled?: boolean; hasImported?: boolean; hasLoadedBrowserPage?: boolean; hasSeenBanner?: boolean; hasSeenModal?: boolean; isModalExperimentAssignment?: boolean; isPanelSettled?: boolean; isVisible?: boolean; modalDismissedAtMs?: number | null; nowMs: number; profiles?: readonly unknown[] | null; profilesQuerySucceeded?: boolean; serviceAvailable?: boolean }
+  export const a: "178837158"; export const c: { value: number | null }; export const d: (input: BrowserProfileDiscoveryInput) => { cooldownEndsAtMs: number | null; presentation: "banner" | "modal" | null; shouldDiscoverProfiles: boolean }; export const f: { value: boolean }; export const h: (rules: BrowserProfileTargetRules, candidate: string) => boolean; export const i: "target_specific_urls"; export const l: (scope: { set<Value>(state: { value: Value }, value: Value): void }) => void; export const m: () => void; export const n: "1161538056"; export const o: (scope: { set<Value>(state: { value: Value }, value: Value): void }) => void; export const p: { value: boolean }; export const r: "show_modal"; export const s: { value: number | null }; export const t: 86400000; export const u: (scope: { set<Value>(state: { value: Value }, value: Value): void }) => void;
+}
 declare module "@rchunk/browser-session-queries";
-declare module "@rchunk/tab-input";
-declare module "@rchunk/view-control-labels";
+declare module "@rchunk/tab-address-input" { export const n: () => void; export const t: (props: Record<string, unknown> & { onCommitAddress(address: string): void; sources: Array<Record<string, unknown>> }) => unknown }
+declare module "@rchunk/tab-input" {
+  export interface TabInputContext { conversationId?: string | null; id: string; navigate(address: string, preserveEditing?: boolean): void; panelTarget?: string; stopEditing?(): void; value?: string }
+  export interface TabInputProps extends Record<string, unknown> { addressValue?: string; conversationId?: string | null; id: string; onNavigate(address: string, preserveEditing?: boolean): void; onStopAddressEditing?(): void; panelTarget?: string; providers?: Array<(scope: unknown, context: TabInputContext) => Record<string, unknown>>; scope?: unknown; sources?: Array<Record<string, unknown>> }
+  export const n: () => void; export const t: (props: TabInputProps) => unknown;
+}
+declare module "@rchunk/view-control-labels" {
+  export interface ViewControlLabelContext { intl: { formatMessage(descriptor: { defaultMessage: string; description: string; id: string }): string }; tabIds: readonly string[]; view: "chat" | "full" | "split" | string }
+  export interface ViewControlLabelState { evaluate(context: ViewControlLabelContext): string }
+  export const n: ViewControlLabelState; export const r: ViewControlLabelState; export const t: () => void;
+}
 declare module "@rchunk/thread-tab-entity";
 
 declare module "@rchunk/app-initial" {
