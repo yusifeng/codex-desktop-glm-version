@@ -2456,4 +2456,5 @@ export const REWRITTEN = new Set([
   "popcorn-chart-hover-tooltip",
   "draw-presence-label",
   "library-writing-block-core",
+  "writing-block-floating-slash-menu",
 ]);
