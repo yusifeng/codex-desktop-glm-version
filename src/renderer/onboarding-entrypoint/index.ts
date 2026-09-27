@@ -2,26 +2,32 @@
 
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type { ScopedSignal } from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  dun: createPersistedSignal,
+  uun: initializeLocalHost,
+} = appInitialChunk;
 
-let onboardingLoginEntrypointSignal: unknown = Symbol(
-  "electron:onboarding-login-entrypoint",
-);
+type OnboardingLoginEntrypoint = string | undefined;
+
+let onboardingLoginEntrypointSignal: ScopedSignal<
+  Record<string, unknown>,
+  OnboardingLoginEntrypoint
+>;
 let initialized = false;
 
 function initializeOnboardingEntrypoint(): void {
   if (initialized) return;
   initialized = true;
-  appInitial.uun?.();
-  if (typeof appInitial.dun === "function") {
-    onboardingLoginEntrypointSignal = appInitial.dun(
+  initializeLocalHost();
+  onboardingLoginEntrypointSignal =
+    createPersistedSignal<OnboardingLoginEntrypoint>(
       "electron:onboarding-login-entrypoint",
       undefined,
     );
-  }
 }
 
 export {

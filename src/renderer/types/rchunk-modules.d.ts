@@ -3566,7 +3566,11 @@ declare module "@rchunk/onboarding-mail-provider" {
 }
 
 declare module "@rchunk/onboarding-entrypoint" {
-  export const n: unknown;
+  export type OnboardingLoginEntrypoint = string | undefined;
+  export const n: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    OnboardingLoginEntrypoint
+  >;
   export const t: () => void;
 }
 
