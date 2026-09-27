@@ -4674,6 +4674,26 @@ declare module "@rchunk/conversation-move-menu-items" {
   export const t: (props: Record<string, unknown> & { conversation: ConversationSummary; onMove(projectId: string | null): Promise<void> | void }) => unknown;
 }
 
+declare module "@rchunk/work-mode-upsell-modal" {
+  export const WorkModeUpsellModal: (props: { accountKind?: "business" | "personal"; isLoading?: boolean; onClose(): void; onUpgrade(event: unknown, plan: "business" | "personal"): void }) => unknown;
+}
+declare module "@rchunk/quiet-hours-active-dialog" {
+  export const QuietHoursActiveDialog: (props: { accountId: string; userId: string; timeZone: string; nextAllowedAt?: Date | null; eligible?: boolean; onClose(): void }) => unknown;
+}
+declare module "@rchunk/model-picker-upsell-modal" {
+  export interface ModelPickerUpsellModel { displayName: string; model: string; defaultReasoningEffort?: string; }
+  export interface ModelPickerUpsellStatus { model_picker_upsell?: { title?: string; message?: string; ctas?: Array<{ id: string; label: string }> } | null; }
+  export const ModelPickerUpsellModal: (props: { model: ModelPickerUpsellModel; rateLimitStatus: ModelPickerUpsellStatus; onClose(): void; onRestorePickerFocus?(): void; onSelectCta?(id: string): void }) => unknown;
+}
+declare module "@rchunk/first-limit-dialog" {
+  export type FirstLimitPresentation = { variant: "thinking" | "instant"; resetDay: "today" | "later"; resetTime: Date } | { variant: "plan_intro" | "limit_reached" };
+  export const FirstLimitDialog: (props: { presentation: FirstLimitPresentation; onClose(): void; onUpgradeAfterClose?(presentation: FirstLimitPresentation): void }) => unknown;
+}
+declare module "@rchunk/remote-connection-editor-modal" {
+  export interface RemoteConnectionDraft { displayName: string; host: string; hostId: string; port?: number; user?: string; }
+  export const RemoteConnectionEditorModal: (props: { connection?: RemoteConnectionDraft | null; hostId: string; isLoading?: boolean; isSaving?: boolean; onClose(): void; onSave?(connection: RemoteConnectionDraft): Promise<void> | void }) => unknown;
+}
+
 declare module "@rchunk/pull-request-code-review-navigation-core" {
   export const C: (...arguments_: unknown[]) => void;
   export const S: (...arguments_: unknown[]) => void;
