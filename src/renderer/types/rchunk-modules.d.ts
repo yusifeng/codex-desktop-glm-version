@@ -4641,6 +4641,39 @@ declare module "@rchunk/changelog-modal" {
   export const ChangelogModal: (props: { onClose(): void; post: ChangelogPost }) => unknown;
 }
 
+declare module "@rchunk/chatgpt-sites";
+declare module "@rchunk/duplicate-agent";
+declare module "@rchunk/use-visible-settings-sections";
+
+declare module "@rchunk/create-output-menu" {
+  export type ArtifactKind = "document" | "presentation" | "spreadsheet" | "site";
+  export interface CreateOutputActions { availableArtifactKinds: readonly ArtifactKind[]; createArtifact(kind: ArtifactKind): boolean | void; isLoadingApps?: boolean; appsError?: unknown; retryApps?(): void; }
+  export const ChatGptCreateOutputMenu: (props: { composerActions: CreateOutputActions; defaultOpen?: boolean }) => unknown;
+}
+
+declare module "@rchunk/add-source-menu" {
+  export interface AddSourceActions { canOpenFileDialog: boolean; canOpenLibraryPicker: boolean; openFileDialog(): boolean | void; openLibraryPicker(): boolean | void; openPluginDirectory?(): void; }
+  export const ChatGptAddSourceMenu: (props: { composerActions: AddSourceActions; conversationId: string; defaultOpen?: boolean; shouldBlockExternalEgress?: boolean }) => unknown;
+}
+
+declare module "@rchunk/settings-command-menu-section-items" {
+  export interface VisibleSettingsSection { disabled?: boolean; externalUrl?: string; label: string; slug: string; }
+  export const VisibleSettingsCommandMenuSectionItems: (props: { close(): void; isSelectedHostLocal: boolean; selectedHostId: string; sections?: readonly VisibleSettingsSection[]; onNavigate?(path: string): void; onOpenExternal?(url: string): void }) => unknown;
+}
+
+declare module "@rchunk/agent-menu" {
+  export interface WorkspaceAgentSummary { icon?: string | null; id: string; name: string; }
+  export const n: () => void;
+  export const t: (props: Record<string, unknown> & { agent: WorkspaceAgentSummary; isPublished: boolean }) => unknown;
+}
+
+declare module "@rchunk/conversation-move-menu-items" {
+  export interface ConversationSummary { conversation_origin?: string; id: string; memory_scope?: string | null; }
+  export interface ProjectSummary { id: string; name: string; ownerId?: string; projectOnly?: boolean; }
+  export const n: () => void;
+  export const t: (props: Record<string, unknown> & { conversation: ConversationSummary; onMove(projectId: string | null): Promise<void> | void }) => unknown;
+}
+
 declare module "@rchunk/pull-request-code-review-navigation-core" {
   export const C: (...arguments_: unknown[]) => void;
   export const S: (...arguments_: unknown[]) => void;
