@@ -843,6 +843,7 @@ declare module "@rchunk/app-shared" {
       props: Record<string, unknown>,
     ): unknown;
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
+    useContext<T>(context: unknown): T;
     lazy<Props extends Record<string, unknown>>(
       loader: () => Promise<{ default: (props: Props) => unknown }>,
     ): (props: Props) => unknown;
@@ -2109,6 +2110,8 @@ declare module "@rchunk/app-shared" {
   export const iW: (path: string) => string;
   export const lk: () => void;
   export const wL: () => void;
+  /** shell executable 到用户可见标签的映射。 */
+  export const RR: Record<string, string>;
   /** 读取指定宿主能力开关。 */
   export const VJ: (capabilities: unknown, capability: string) => boolean;
   export const oq: string;
@@ -3479,6 +3482,13 @@ declare module "@rchunk/app-initial" {
   export const nun: () => void;
   export const oun: (queryClient: unknown, key: unknown) => Promise<unknown>;
   export const q3t: unknown;
+  export const $3t: () => string;
+  export const $i: (...arguments_: unknown[]) => unknown;
+  export const Qi: () => void;
+  export const Ji: () => void;
+  export const Yi: (...arguments_: unknown[]) => unknown;
+  export const fH: (...arguments_: unknown[]) => Promise<unknown>;
+  export const uH: () => void;
   export const s6t: () => void;
   export const $4t: () => void;
   export const Bfn: () => void;
@@ -5052,7 +5062,16 @@ declare module "@rchunk/card-tile" {
   export const n: () => void;
   export const t: (props: { actions?: unknown; badges?: unknown[]; className?: string; description?: unknown; disabled?: boolean; icon?: unknown; isHighlighted?: boolean; onClick?(): void; presentation?: "card" | "catalog" | "featured" | "ranked" | "related" | "row"; title: unknown; tooltip?: unknown }) => unknown;
 }
-declare module "@rchunk/plugin-settings-url";
+declare module "@rchunk/plugin-settings-url" {
+  export const i: () => void;
+  export const n: (input: {
+    appId: string;
+    installUrl?: string | null;
+    remotePluginId?: string | null;
+  }) => string;
+  export const r: (pluginId: string, version?: number) => string;
+  export const t: () => void;
+}
 declare module "@rchunk/cloud-environment-queries";
 
 declare module "@rchunk/create-pull-request-modal-content" {
@@ -5102,7 +5121,11 @@ declare module "@rchunk/use-home-directory" {
   export const r: (hostId?: string | null) => HomeDirectoryQueryResult;
   export const t: () => void;
 }
-declare module "@rchunk/voice-personalization-dialog-entry";
+declare module "@rchunk/voice-personalization-dialog-entry" {
+  export const loadVoicePersonalizationDialog: (
+    ...arguments_: unknown[]
+  ) => Promise<unknown>;
+}
 declare module "@rchunk/connector-post-connect-dialog" {
   export const ConnectorPostConnectDialog: (props: {
     connectorName?: string;
@@ -5159,7 +5182,8 @@ declare module "@rchunk/git-branch-switcher" {
 }
 
 declare module "@rchunk/dock" {
-  export const _any: any;
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/create-dialog" {
@@ -5231,8 +5255,9 @@ declare module "@rchunk/pending-onboarding" {
 }
 
 declare module "@rchunk/external-agent-config-import-flow" {
-  export const openExternalAgentImport: (...args: any[]) => Promise<unknown>;
-  export const _any: any;
+  export const openExternalAgentImport: (
+    ...arguments_: unknown[]
+  ) => Promise<unknown>;
 }
 
 declare module "@rchunk/use-imported-setup-opportunity" {
@@ -5653,7 +5678,10 @@ declare module "@rchunk/diff-preview-content" {
   export const DiffPreviewContent: (props: { diff: { metadata?: unknown }; displayPath?: string; linesAdded?: number; linesRemoved?: number; onOpen?(event?: unknown): void }) => unknown;
 }
 declare module "@rchunk/ansi-block";
-declare module "@rchunk/shell-label";
+declare module "@rchunk/shell-label" {
+  export const n: () => void;
+  export const t: (command: string) => string | null;
+}
 declare module "@rchunk/stripe-pure" {
   export interface StripeInstance {
     _registerWrapper?(metadata: {
@@ -5724,8 +5752,13 @@ declare module "@rchunk/skills-page-grid" {
 }
 
 declare module "@rchunk/chatgpt-cme" {
-  export const n: unknown;
+  export const n: {
+    readonly $type: "protobuf_analytics_events.v1.ChatgptCmeHomeEntryClicked";
+  };
   export const r: () => void;
+  export const t: {
+    readonly $type: "protobuf_analytics_events.v1.ChatgptCmeClaimSubmitted";
+  };
 }
 
 declare module "@rchunk/home-entry-point" {
@@ -9375,6 +9408,13 @@ declare module "@rchunk/diff-worker-utils-parser" {
   export const t: () => void;
 }
 
+declare module "@rchunk/katex-runtime" {
+  export const c: () => void;
+  export const l: {
+    renderToString(source: string, options?: Record<string, unknown>): string;
+  };
+}
+
 declare module "@rchunk/content-quick-chat-overlay" {
   export const i: () => void;
   export const n: () => void;
@@ -10880,7 +10920,7 @@ declare module "@rchunk/theme-font-face-loader" {
 }
 
 declare module "@rchunk/modulepreload-polyfill" {
-  export const t: unknown;
+  export const t: () => void;
 }
 
 declare module "@rchunk/theme-font-family" {
