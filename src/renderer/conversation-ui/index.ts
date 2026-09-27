@@ -1,0 +1,12 @@
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+
+export interface ConversationStarterState { context?: { interactionId?: string; showConversationStarters?: boolean; starters?: Array<{ id?: string; prompt: string; title?: string }> }; error?: string; status: "error" | "loading" | "ready" }
+let jsx: JsxRuntime;
+function ConversationStarterBoundary({ fallback, state }: { conversationId?: string; fallback?: unknown; state?: ConversationStarterState | null }): unknown { if (state == null || (state.status === "ready" && !state.context?.showConversationStarters)) return fallback ?? null; return renderStarterState(state); }
+function ConversationContextBanner({ className, state }: { className?: string; conversationId?: string; state?: ConversationStarterState | null }): unknown { if (state?.status !== "ready") return null; return ensureJsx().jsx("div", { className, "data-interaction-id": state.context?.interactionId, children: "Conversation context" }); }
+function ConversationEmptyState({ fallback, onStarterPromptSelect, state }: { conversationId?: string; fallback?: unknown; onStarterPromptSelect?(prompt: string): void; state?: ConversationStarterState | null }): unknown { if (state == null) return fallback ?? null; if (state.status !== "ready") return renderStarterState(state); if (!state.context?.showConversationStarters) return ensureJsx().jsxs(ensureJsx().Fragment, { children: [ensureJsx().jsx(ConversationContextBanner, { state }), fallback] }); return renderStarterState(state, onStarterPromptSelect); }
+function renderStarterState(state: ConversationStarterState, onSelect?: (prompt: string) => void): unknown { const runtime = ensureJsx(); if (state.status === "loading") return runtime.jsx("div", { "aria-busy": true, children: "Loading suggestions…" }); if (state.status === "error") return runtime.jsx("div", { role: "alert", children: state.error ?? "Suggestions unavailable" }); return runtime.jsx("div", { className: "conversation-starters", children: (state.context?.starters ?? []).map((starter) => runtime.jsx("button", { type: "button", onClick: () => onSelect?.(starter.prompt), children: starter.title ?? starter.prompt }, starter.id ?? starter.prompt)) }); }
+const initialize = (): void => { jsx = getJsxRuntime(); };
+function ensureJsx(): JsxRuntime { if (jsx == null) jsx = getJsxRuntime(); return jsx; }
+export { initialize as i, ConversationStarterBoundary as n, ConversationEmptyState as r, ConversationContextBanner as t };

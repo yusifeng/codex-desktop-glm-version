@@ -5799,6 +5799,14 @@ declare module "@rchunk/registered-conversation-thumbnail";
 declare module "@rchunk/plugin-share-dialogs-runtime";
 declare module "@rchunk/loading-page";
 declare module "@rchunk/plugin-share-dialog-entry";
+declare module "@rchunk/thread-shell-runtime";
+declare module "@rchunk/artifact-viewer";
+declare module "@rchunk/thread-scroll-layout" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/thread-app-shell-chrome" { export const n: () => void; export const t: (props: Record<string, unknown> & { threadType: "local" | "new" | "remote" }) => unknown; }
+declare module "@rchunk/thread-user-message-navigation-rail-app" { export const AppThreadUserMessageNavigationRail: (props: { items: Array<{ bookmarked?: boolean; id: string; preview?: unknown; title?: string; [key: string]: unknown }>; onBookmarkChange?(item: Record<string, unknown>, bookmarked: boolean): void; onPreviewItem?(item: Record<string, unknown>): void; onRevealItem?(item: Record<string, unknown>): void }) => unknown; }
+declare module "@rchunk/thread-usage-breakdown" { export const n: (props: { usage: Record<string, unknown>; title?: unknown; showCostUsd?: boolean }) => unknown; export const r: () => void; export const t: (input: { dimension: "model" | "reasoning_effort" | "speed"; value?: string | null }) => string; }
+declare module "@rchunk/chatgpt-conversation-transcript" { export const n: () => void; export const t: (props: Record<string, unknown> & { conversationId: string }) => unknown; }
+declare module "@rchunk/conversation-ui" { export const i: () => void; export const n: (props: Record<string, unknown>) => unknown; export const r: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/find-plugin-mcp-extension-view"; declare module "@rchunk/control-group"; declare module "@rchunk/filter";
 declare module "@rchunk/plugin-connected-account-links"; declare module "@rchunk/plugin-disabled-reason";
 declare module "@rchunk/plugin-connected-account-links" {
