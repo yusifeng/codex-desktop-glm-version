@@ -5697,12 +5697,34 @@ declare module "@rchunk/plugin-detail-view" {
   export const s: (props: { cardActions?: unknown; cardDescription?: unknown; cardIcon?: unknown; cardTitle: unknown; modalBody?: unknown; modalDescription?: unknown; modalFooter?: unknown; modalHeaderActions?: unknown; modalTitle?: unknown; onOpenPreview?(): void }) => unknown;
   export const t: (input: { state: "loading" } | { errorMessage?: string; state: "error" } | { description?: string; state: "missing" } | ({ plugin: DetailPlugin; presentation?: "dialog" | "page"; state: "ready" } & Record<string, unknown>)) => unknown;
 }
-declare module "@rchunk/hosted-plugin-creation-actions";
-declare module "@rchunk/plugin-setup";
-declare module "@rchunk/profile-lock";
-declare module "@rchunk/browser-extension-setup-messages";
-declare module "@rchunk/category-plugins-query";
-declare module "@rchunk/hosted-plugin-create-dialog";
+declare module "@rchunk/hosted-plugin-creation-actions" {
+  export interface HostedCreateAction { canCreateMcpApp?: boolean; canUploadArchive?: boolean; onCreate?(mode: "archive" | "mcp"): void }
+  export interface CreationMenuProps { canCreatePlugin?: boolean; canCreateSkill?: boolean; currentBrowseTab?: "plugins" | "skills"; hostedCreateAction?: HostedCreateAction; isCreatingPlugin?: boolean; isPluginCreatorDisabledByAdmin?: boolean; mode?: "browse" | "manage"; onAddMarketplace?(): void; onAddMcpServer?(): void; onCreatePlugin?(): void; onCreateSkill?(): void }
+  export const a: (props: CreationMenuProps) => unknown; export const i: () => void; export const n: () => void;
+  export const o: (props: CreationMenuProps & { breadcrumb?: unknown; hostSelector?: unknown; onExitManageMode?(): void }) => unknown;
+  export const r: (props: { canCreatePlugin?: boolean; children(input: { canCreatePlugin: boolean; isCreatingPlugin: boolean; isPluginCreatorDisabledByAdmin: boolean; onCreatePlugin?(): void }): unknown; onCreatePlugin?(): void }) => unknown;
+  export const s: () => void; export const t: (props: { children(input: { canCreatePlugin: boolean; canCreateSkill: boolean; isPluginCreatorDisabledByAdmin: boolean; onCreatePlugin?(): void; onCreateSkill?(): void }): unknown; enabled?: boolean; onCreatePlugin?(): void; onCreateSkill?(): void }) => unknown;
+}
+declare module "@rchunk/plugin-setup" {
+  export interface SetupApp { id: string; isAccessible?: boolean; [key: string]: unknown }
+  export interface SetupPlugin { canonicalAppId?: string | null; marketplaceName?: string; plugin: { id: string; installed?: boolean; name?: string; [key: string]: unknown }; [key: string]: unknown }
+  export interface SetupResult { appsRequiringConnection: SetupApp[]; importedPlugins: Array<{ app: SetupApp; plugin: SetupPlugin }> }
+  export const a: (app: SetupApp, plugin: SetupPlugin) => boolean; export const i: () => void; export const n: { key: string }; export const r: () => void;
+  export const t: (input: { inputsResult: Record<string, unknown>; pluginDirectory: { errorMessage?: string | null; isLoading: boolean; plugins: SetupPlugin[]; refetch(): void } }) => unknown;
+}
+declare module "@rchunk/profile-lock" { export const n: () => void; export const t: (props?: { className?: string; title?: string }) => unknown; }
+declare module "@rchunk/browser-extension-setup-messages" {
+  export interface BrowserExtensionMessage { defaultMessage: string; description: string; id: string }
+  export const n: (browserFamily: string) => BrowserExtensionMessage; export const r: () => void; export const t: (browserFamily: string) => BrowserExtensionMessage;
+}
+declare module "@rchunk/category-plugins-query" {
+  export interface CategoryPlugin { id: string; remotePluginId?: string; [key: string]: unknown }
+  export const n: () => void; export const t: (input: { categorySlug: string; hostId: string; searchQuery?: string; visibility?: { hiddenPluginIds?: Set<string> } }) => Record<string, unknown>;
+}
+declare module "@rchunk/hosted-plugin-create-dialog" {
+  export const HostedPluginCreateDialog: (props: { canCreateMcpApp: boolean; canUploadArchive: boolean; initialMode?: "archive" | "mcp"; isPending?: boolean; onAppCreated?(app: Record<string, unknown>): void; onArchiveCreated?(plugin: Record<string, unknown>): void; onClose(): void }) => unknown;
+}
+declare module "@rchunk/mcp-oauth-runtime";
 declare module "@rchunk/plugins-page" { export const i: () => void; export const n: () => void; export const r: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; }
 
 declare module "@rchunk/skills-page-core" {

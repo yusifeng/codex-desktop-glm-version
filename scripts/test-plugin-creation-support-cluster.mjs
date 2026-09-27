@@ -1,0 +1,126 @@
+import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as esbuild from "esbuild";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
+globalThis.__jsx = jsx;
+async function load(name) {
+  const result = await esbuild.build({ entryPoints: [path.join(ROOT, `src/renderer/${name}/index.ts`)], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mocks", setup(build) {
+    build.onResolve({ filter: /^@rchunk\// }, ({ path: modulePath }) => ({ path: modulePath.slice(8), namespace: "mock" }));
+    build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: modulePath }) => modulePath === "app-shared" ? { loader: "js", contents: "export const I3=()=>globalThis.__jsx;" } : { loader: "js", contents: "export {};" });
+  } }] });
+  return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${name}`);
+}
+
+const lock = await load("profile-lock");
+lock.n();
+const lockIcon = lock.t({ className: "icon-sm", title: "Private" });
+assert.equal(lockIcon.type, "svg");
+assert.equal(lockIcon.props.className, "icon-sm");
+assert.equal(lockIcon.props.role, "img");
+assert.equal(lockIcon.props["aria-label"], "Private");
+assert.equal(lockIcon.props.children.props.children.length, 2);
+assert.equal(lock.t().props.role, undefined);
+
+const messages = await load("browser-extension-setup-messages");
+messages.r();
+assert.equal(messages.n("chrome").defaultMessage, "ChatGPT for Chrome");
+assert.equal(messages.t("chrome").defaultMessage, "Install this extension in Chrome to connect ChatGPT to your browser");
+assert.equal(messages.n("edge").defaultMessage, "ChatGPT for Edge");
+assert.equal(messages.t("edge").defaultMessage, "Install this extension in Edge to connect ChatGPT to your browser");
+assert.equal(messages.n("unknown").defaultMessage, "ChatGPT browser extension");
+assert.equal(messages.t("unknown").defaultMessage, "Install this extension to connect ChatGPT to your browser");
+
+const setup = await load("plugin-setup");
+setup.r();
+const calendarApp = { id: "Google-Calendar" };
+const calendarPlugin = { marketplaceName: "openai", canonicalAppId: "google_calendar", plugin: { id: "calendar-plugin", name: "Calendar" } };
+assert.equal(setup.a(calendarApp, calendarPlugin), true);
+assert.equal(setup.a({ id: "drive" }, calendarPlugin), false);
+assert.equal(setup.a(calendarApp, { ...calendarPlugin, marketplaceName: undefined }), false);
+assert.equal(setup.n.key, "plugin-setup-state");
+const readyInput = { status: "ready", data: { kind: "plugin-directory", candidates: [{ id: "Calendar" }, { id: "Slack" }], directoryApps: [], runtimeApps: [{ id: "Slack", isAccessible: true }] } };
+const merged = setup.t({ inputsResult: readyInput, pluginDirectory: { errorMessage: null, isLoading: false, plugins: [calendarPlugin], refetch() {} } });
+assert.equal(merged.status, "ready");
+assert.equal(merged.data.importedPlugins.length, 1);
+assert.equal(merged.data.importedPlugins[0].plugin.plugin.id, "calendar-plugin");
+assert.deepEqual(merged.data.appsRequiringConnection, []);
+assert.equal(setup.t({ inputsResult: readyInput, pluginDirectory: { isLoading: true, plugins: [], refetch() {} } }).status, "loading");
+const retry = () => {};
+const failed = setup.t({ inputsResult: readyInput, pluginDirectory: { errorMessage: "offline", isLoading: false, plugins: [], refetch: retry } });
+assert.equal(failed.status, "error");
+assert.equal(failed.retry, retry);
+const complete = { status: "ready", data: { kind: "complete", setup: { appsRequiringConnection: [calendarApp], importedPlugins: [] } } };
+assert.deepEqual(setup.t({ inputsResult: complete, pluginDirectory: { isLoading: false, plugins: [], refetch() {} } }).data, complete.data.setup);
+const loadingInput = { status: "loading" };
+assert.equal(setup.t({ inputsResult: loadingInput, pluginDirectory: { isLoading: false, plugins: [], refetch() {} } }), loadingInput);
+
+const category = await load("category-plugins-query");
+category.n();
+const categoryQuery = category.t({ categorySlug: "productivity", hostId: "local", searchQuery: " calendar ", visibility: { hiddenPluginIds: new Set(["hidden"]) } });
+assert.deepEqual(categoryQuery.queryKey, ["plugins", "category", "local", "productivity", "search", "calendar"]);
+assert.equal(categoryQuery.enabled, true);
+assert.equal(categoryQuery.retry, false);
+assert.equal(categoryQuery.getNextPageParam({ pagination: { next_page_token: "next" }, plugins: [] }), "next");
+assert.equal(categoryQuery.getNextPageParam({ pagination: {}, plugins: [] }), undefined);
+const selected = categoryQuery.select({ pages: [{ pagination: {}, plugins: [{ id: "one", remotePluginId: "shared" }, { id: "hidden" }] }, { pagination: {}, plugins: [{ id: "two", remotePluginId: "shared" }, { id: "three" }] }] });
+assert.deepEqual(selected.map((plugin) => plugin.id), ["two", "three"]);
+assert.deepEqual(category.t({ categorySlug: "all", hostId: "remote" }).queryKey, ["plugins", "category", "remote", "all"]);
+
+const actions = await load("hosted-plugin-creation-actions");
+actions.n();
+let createdMode = null;
+const menu = actions.a({ canCreatePlugin: true, canCreateSkill: false, onCreatePlugin() {}, hostedCreateAction: { canCreateMcpApp: true, canUploadArchive: true, onCreate: (mode) => { createdMode = mode; } }, onAddMarketplace() {} });
+assert.equal(menu.props.role, "menu");
+assert.equal(menu.props.children.length, 5);
+assert.equal(menu.props.children[0].props.children, "Create plugin");
+assert.equal(menu.props.children[0].props.disabled, false);
+assert.equal(menu.props.children[1].props.disabled, true);
+assert.equal(menu.props.children[2].props.children, "Upload plugin archive");
+menu.props.children[2].props.onClick();
+assert.equal(createdMode, "archive");
+menu.props.children[3].props.onClick();
+assert.equal(createdMode, "mcp");
+const toolbar = actions.o({ mode: "manage", canCreatePlugin: true });
+assert.equal(toolbar.type, "header");
+assert.equal(toolbar.props.children[0].props.children, "Manage");
+assert.equal(toolbar.props.children[2].type.name, "CreationMenu");
+const creatorBoundary = actions.r({ canCreatePlugin: true, children: (state) => state });
+assert.equal(creatorBoundary.canCreatePlugin, true);
+assert.equal(creatorBoundary.isCreatingPlugin, false);
+assert.equal(creatorBoundary.isPluginCreatorDisabledByAdmin, false);
+const workspaceBoundary = actions.t({ enabled: false, children: (state) => state, onCreateSkill() {} });
+assert.equal(workspaceBoundary.canCreatePlugin, false);
+assert.equal(workspaceBoundary.canCreateSkill, false);
+assert.equal(workspaceBoundary.onCreateSkill, undefined);
+
+const dialogModule = await load("hosted-plugin-create-dialog");
+let closed = 0;
+let archiveCreated = 0;
+const archiveDialog = dialogModule.HostedPluginCreateDialog({ canCreateMcpApp: true, canUploadArchive: true, initialMode: "archive", onClose: () => { closed++; }, onArchiveCreated: () => { archiveCreated++; } });
+assert.equal(archiveDialog.type, "dialog");
+assert.equal(archiveDialog.props.open, true);
+const archiveForm = archiveDialog.props.children;
+assert.equal(archiveForm.props["data-mode"], "archive");
+assert.equal(archiveForm.props.children[0].props.children, "Upload plugin archive");
+assert.equal(archiveForm.props.children[2].props["data-next-mode"], "mcp");
+assert.equal(archiveForm.props.children[4].props.children, "Add plugin");
+archiveForm.props.onSubmit({ preventDefault() {} });
+assert.equal(archiveCreated, 1);
+archiveForm.props.children[3].props.onClick();
+assert.equal(closed, 1);
+let appCreated = 0;
+const mcpDialog = dialogModule.HostedPluginCreateDialog({ canCreateMcpApp: true, canUploadArchive: false, onClose() {}, onAppCreated: () => { appCreated++; } });
+assert.equal(mcpDialog.props.children.props["data-mode"], "mcp");
+assert.equal(mcpDialog.props.children.props.children[0].props.children, "Create MCP App");
+assert.equal(mcpDialog.props.children.props.children[2], null);
+assert.equal(mcpDialog.props.children.props.children[4].props.children, "Create");
+mcpDialog.props.children.props.onSubmit({ preventDefault() {} });
+assert.equal(appCreated, 1);
+const disabledDialog = dialogModule.HostedPluginCreateDialog({ canCreateMcpApp: false, canUploadArchive: false, onClose() {} });
+assert.equal(disabledDialog.props.children.props.children[4].props.disabled, true);
+
+console.log("plugin creation support cluster complete");
