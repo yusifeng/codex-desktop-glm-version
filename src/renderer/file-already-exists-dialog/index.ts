@@ -4,22 +4,37 @@
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeJsxRuntime,
+  I3: getJsxRuntime,
+  K2: initializeIntlRuntime,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+} = appSharedChunk;
+const {
+  Kat: CompactFormDialog,
+  qat: initializeCompactFormDialog,
+} = appInitialChunk;
+
+let jsxRuntime: JsxRuntime | null = null;
+
+interface ProjectFileAlreadyExistsDialogProps {
+  fileName: string;
+  onClose(): void;
+  onConfirm(): void;
+}
 
 function ProjectFileAlreadyExistsDialog({
   fileName,
   onClose,
   onConfirm,
-}: {
-  fileName: string;
-  onClose: () => void;
-  onConfirm: () => void;
-}) {
-  const title = jsx.jsx(appShared.Y2, {
+}: ProjectFileAlreadyExistsDialogProps): unknown {
+  const jsx = getInitializedJsxRuntime();
+  const title = jsx.jsx(FormattedMessage, {
     id: "chatgptProjectUpload.duplicate.title",
     defaultMessage: "File already exists",
     description:
@@ -27,7 +42,7 @@ function ProjectFileAlreadyExistsDialog({
   });
   const subtitle = jsx.jsx("span", {
     className: "wrap-anywhere",
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptProjectUpload.duplicate.description",
       defaultMessage: "A file with the name {fileName} already exists",
       description:
@@ -39,23 +54,23 @@ function ProjectFileAlreadyExistsDialog({
     onConfirm();
     onClose();
   };
-  const skipButton = jsx.jsx(appShared.Yh, {
+  const skipButton = jsx.jsx(Button, {
     color: "secondary",
     size: "dialogAction",
     type: "button",
     onClick: onClose,
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptProjectUpload.duplicate.skip",
       defaultMessage: "Skip",
       description:
         "Skips only the current conflicting file in a project upload batch and continues with the other selected files",
     }),
   });
-  const uploadButton = jsx.jsx(appShared.Yh, {
+  const uploadButton = jsx.jsx(Button, {
     color: "primary",
     size: "dialogAction",
     type: "submit",
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptProjectUpload.duplicate.upload",
       defaultMessage: "Upload anyway",
       description:
@@ -63,7 +78,7 @@ function ProjectFileAlreadyExistsDialog({
     }),
   });
 
-  return jsx.jsx(appInitial.Kat, {
+  return jsx.jsx(CompactFormDialog, {
     size: "compact",
     title,
     subtitle,
@@ -75,10 +90,20 @@ function ProjectFileAlreadyExistsDialog({
 }
 
 function initializeProjectFileAlreadyExistsDialog(): void {
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.Zh?.();
-  appInitial.qat?.();
+  if (jsxRuntime != null) return;
+  initializeJsxRuntime();
+  initializeIntlRuntime();
+  initializeButton();
+  initializeCompactFormDialog();
+  jsxRuntime = getJsxRuntime();
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializeProjectFileAlreadyExistsDialog();
+  if (jsxRuntime == null) {
+    throw new Error("Duplicate file dialog JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 initializeProjectFileAlreadyExistsDialog();

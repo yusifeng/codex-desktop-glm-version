@@ -2701,6 +2701,17 @@ declare module "@rchunk/app-initial" {
     delete: import("@rchunk/app-shared").MessageDescriptor;
   };
   export const Rb: () => void;
+  export interface CompactFormDialogProps extends Record<string, unknown> {
+    children?: unknown;
+    footer?: unknown;
+    onClose(): void;
+    onSubmit(): void;
+    size: "compact" | string;
+    subtitle?: unknown;
+    title: unknown;
+  }
+  export const Kat: (props: CompactFormDialogProps) => unknown;
+  export const qat: () => void;
   export interface ProductAnalytics {
     logProductEvent(
       event: unknown,
@@ -4103,7 +4114,14 @@ declare module "@rchunk/gpt-report-menu-item" {
 }
 
 declare module "@rchunk/file-already-exists-dialog" {
-  export const ProjectFileAlreadyExistsDialog: (...args: any[]) => any;
+  export interface ProjectFileAlreadyExistsDialogProps {
+    fileName: string;
+    onClose(): void;
+    onConfirm(): void;
+  }
+  export const ProjectFileAlreadyExistsDialog: (
+    props: ProjectFileAlreadyExistsDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/pending-edits-dialog" {
