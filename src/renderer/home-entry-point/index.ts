@@ -7,11 +7,8 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const cme = cmeChunk as Record<string, any>;
-
 const {
+  $3: initializeJsxRuntimeLazy,
   Eu: initializeComposerEditorState,
   FX: initializeSignalRuntime,
   HX: useSignalValue,
@@ -24,8 +21,40 @@ const {
   Zh: initializeButton,
   lw: initializeImportIcons,
   wu: composerMentionState,
-} = appShared;
-const { sZ: createDerivedSignal } = appSharedChunk;
+  sZ: createDerivedSignal,
+} = appSharedChunk;
+const {
+  $Bt: initializeAccountHints,
+  HZ: useComposerEditor,
+  M9: initializeMediaQuery,
+  N9: matchesMediaQuery,
+  NIt: selectedComposerModesSignal,
+  Qgn: initializeAccountQueries,
+  RIt: initializeComposerReadiness,
+  Rht: initializeWorkspaceState,
+  Rln: initializeAccountPlanHelpers,
+  UZ: useEditorPredicate,
+  VZ: initializeComposerEditorBridge,
+  Vln: isEligibleCmePlan,
+  Xet: accountCapabilitySignal,
+  YBt: accountSystemHintsSignal,
+  Zet: initializeComposerState,
+  b2: setComposerModes,
+  i_n: useRouterLocation,
+  kht: applicationScope,
+  rht: initializeAccountState,
+  uht: useCurrentAccount,
+  v2: composerModesSignal,
+  vln: initializePlanEligibility,
+  xpn: logAnalyticsEvent,
+  y2: initializeComposerModeState,
+  yln: hasUnsupportedHomeSearch,
+  ypn: initializeAnalytics,
+} = appInitialChunk;
+const {
+  n: cmeAnalyticsEvent,
+  r: initializeCme,
+} = cmeChunk;
 
 interface JsxRuntime {
   jsx(type: unknown, props: unknown): unknown;
@@ -68,33 +97,39 @@ function editorIsEmpty(editor: ComposerEditor): boolean {
 
 function CmeHomeEntryPoint(): unknown {
   initializeCmeHomeEntryPoint();
-  const scope = useSignalScope(appInitial.kht);
-  const editor = appInitial.HZ?.() as ComposerEditor | undefined;
-  const editorReady = appInitial.UZ?.(editor, editorIsEmpty) ?? true;
-  const account = appInitial.uht?.() ?? {};
+  const scope = useSignalScope(applicationScope);
+  const editor = useComposerEditor?.() as ComposerEditor | undefined;
+  const editorReady = useEditorPredicate?.(editor, editorIsEmpty) ?? true;
+  const account = useCurrentAccount?.() ?? {
+    data: undefined,
+    isLoading: false,
+  };
   const eligible = useSignalValue(cmeEligibilitySignal) === true;
-  const location = appInitial.i_n?.() ?? { search: "" };
+  const location = useRouterLocation?.() ?? { search: "" };
   if (
-    appInitial.N9?.("(width < 48rem)") ||
-    !appInitial.Vln?.(account.data?.plan_type) ||
+    matchesMediaQuery?.("(width < 48rem)") ||
+    !isEligibleCmePlan?.(account.data?.plan_type) ||
     !eligible ||
     !editorReady ||
-    appInitial.yln?.(location.search)
+    hasUnsupportedHomeSearch?.(location.search)
   ) {
     return null;
   }
   const onClick = () => {
-    const accountCheck = scope.queryClient?.getQueryData?.([
+    const queryClient = scope.queryClient as {
+      getQueryData?<Data>(queryKey: readonly unknown[]): Data | undefined;
+    };
+    const accountCheck = queryClient.getQueryData?.<AccountCheckResult>([
       "accounts",
       "check",
-    ]) as AccountCheckResult | undefined;
+    ]);
     if (
       scope.get(cmeEligibilitySignal) &&
       accountCheck?.account_ordering?.[0] === account.data?.id
     ) {
-      appInitial.b2?.(scope, scope.get(appInitial.v2), ["cme"]);
+      setComposerModes?.(scope, scope.get(composerModesSignal), ["cme"]);
       editor?.focus?.();
-      appInitial.xpn?.(scope, cme.n, {});
+      logAnalyticsEvent?.(scope, cmeAnalyticsEvent, {});
     }
   };
   const renderer = jsx as JsxRuntime;
@@ -122,34 +157,35 @@ function CmeHomeEntryPoint(): unknown {
 function initializeCmeHomeEntryPoint(): void {
   if (initialized) return;
   initialized = true;
-  cme.r?.();
+  initializeJsxRuntimeLazy?.();
+  initializeCme?.();
   initializeSignalRuntime?.();
   initializeIntl?.();
-  appInitial.Qgn?.();
-  appInitial.ket?.();
-  appInitial.RIt?.();
-  appInitial.$Bt?.();
-  appInitial.y2?.();
-  appInitial.vln?.();
-  appInitial.rht?.();
+  initializeAccountQueries?.();
+  initializeComposerState?.();
+  initializeComposerReadiness?.();
+  initializeAccountHints?.();
+  initializeComposerModeState?.();
+  initializePlanEligibility?.();
+  initializeAccountState?.();
   initializeComposerEditorState?.();
-  appInitial.VZ?.();
+  initializeComposerEditorBridge?.();
   initializeButton?.();
   initializeImportIcons?.();
-  appInitial.M9?.();
-  appInitial.ypn?.();
-  appInitial.Rht?.();
-  appInitial.Rln?.();
+  initializeMediaQuery?.();
+  initializeAnalytics?.();
+  initializeWorkspaceState?.();
+  initializeAccountPlanHelpers?.();
   jsx ??= resolveRuntime<JsxRuntime>(jsxRuntime);
   cmeEligibilitySignal =
     createDerivedSignal(
-      appInitial.kht,
+      applicationScope,
       ({ get }) =>
-        get<{ isCapable?: boolean }>(appInitial.Xet, {
+        get<{ isCapable?: boolean }>(accountCapabilitySignal, {
           name: "chatgpt.cme",
         }).isCapable === true &&
-        get<unknown[]>(appInitial.NIt, get(appInitial.v2)).length === 0 &&
-        get<{ data?: Array<{ system_hint?: string }> }>(appInitial.YBt).data?.some(
+        get<unknown[]>(selectedComposerModesSignal, get(composerModesSignal)).length === 0 &&
+        get<{ data?: Array<{ system_hint?: string }> }>(accountSystemHintsSignal).data?.some(
           (entry: { system_hint?: string }) => entry.system_hint === "cme",
         ) === true,
     );

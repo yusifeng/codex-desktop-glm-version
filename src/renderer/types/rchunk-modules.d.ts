@@ -821,7 +821,11 @@ declare module "@rchunk/app-shared" {
   export const $h: () => void; // i8：资源按钮依赖初始化器
   export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
-  export const $O: { ONE_MINUTE: number; THIRTY_SECONDS: number };
+  export const $O: {
+    FIVE_MINUTES: number;
+    ONE_MINUTE: number;
+    THIRTY_SECONDS: number;
+  };
   export type QueryKey = readonly unknown[];
   /** hashQueryKey（app-shared/runtime/query-structural-utils.ts）。 */
   export const AZ: (queryKey: QueryKey) => string;
@@ -2790,6 +2794,59 @@ declare module "@rchunk/app-initial" {
   export const kht: import("@rchunk/app-shared").MaitaiScope<
     Record<string, unknown>
   >;
+  export interface ComposerEditorLike {
+    focus?(): void;
+    hasText(): boolean;
+    view: { state: unknown };
+  }
+  export const $Bt: () => void;
+  export const HZ: () => ComposerEditorLike;
+  export const M9: () => void;
+  export const N9: (query: string) => boolean;
+  export const NIt: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    unknown,
+    unknown[]
+  >;
+  export const RIt: () => void;
+  export const UZ: <Value>(
+    value: Value | undefined,
+    predicate: (value: Value) => boolean,
+  ) => boolean;
+  export const VZ: () => void;
+  export const Vln: (planType: unknown) => boolean;
+  export const Xet: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    { name: string },
+    { isCapable?: boolean }
+  >;
+  export const YBt: import("@rchunk/app-shared").ReadableSignal<{
+    data?: Array<{ system_hint?: string }>;
+  }>;
+  export const Zet: () => void;
+  export const b2: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    currentModes: unknown,
+    nextModes: string[],
+  ) => void;
+  export const v2: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    unknown
+  >;
+  export const vln: () => void;
+  export const y2: () => void;
+  export const yln: (search: string) => boolean;
+  export const Wln: (plan: unknown) => boolean;
+  export const eun: (
+    scope: import("@rchunk/app-shared").MaitaiScope<Record<string, unknown>>,
+    queryName: string,
+    getOptions: (domain: string | null) => {
+      enabled: boolean;
+      params?: { domain: string };
+      retry: number;
+      staleTime: number;
+    },
+  ) => unknown;
   export const t3: import("@rchunk/app-shared").ReadableSignal<string>;
   export const pdt: () => void;
   export const Rht: () => void;
@@ -3894,11 +3951,16 @@ declare module "@rchunk/connector-logo-stack" {
 declare module "@rchunk/onboarding-mail-provider" {
   export type MailProvider = "google" | "microsoft" | "other";
   export const a: (provider: MailProvider, plan: unknown) => MailProvider;
-  export const n: (...args: any[]) => any;
-  export const o: (...args: any[]) => any;
-  export const r: (...args: any[]) => any;
-  export const t: (...args: any[]) => any;
-  export const _any: any;
+  export const i: (pluginId: string, provider: MailProvider) => string;
+  export const n: (email: string | null | undefined) => string | null;
+  export const o: () => void;
+  export const r: (input: {
+    debugOverride?: MailProvider | null;
+    detectedProvider?: MailProvider | null;
+    emailDomain?: string | null;
+    isError?: boolean;
+  }) => MailProvider | null;
+  export const t: unknown;
 }
 
 declare module "@rchunk/onboarding-entrypoint" {

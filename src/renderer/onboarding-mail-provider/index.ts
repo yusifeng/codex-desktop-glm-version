@@ -6,8 +6,18 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  Rln: initializeAccountPlanHelpers,
+  Wln: isMicrosoftMailPlan,
+  eun: createMailProviderQueryFamily,
+  nun: initializeMailProviderQuery,
+} = appInitialChunk;
+const {
+  $O: queryStaleTimes,
+  QI: initializeQueryRuntime,
+  ZI: applicationScope,
+  ek: initializeQueryOptions,
+} = appSharedChunk;
 
 export type MailProvider = "google" | "microsoft" | "other";
 
@@ -46,7 +56,7 @@ function resolveDetectedProvider({
 
 function providerForPlan(provider: MailProvider, plan: unknown): MailProvider {
   if (provider !== "other") return provider;
-  return appInitial.Wln?.(plan) ? "microsoft" : "google";
+  return isMicrosoftMailPlan?.(plan) ? "microsoft" : "google";
 }
 
 function pluginIdForProvider(pluginId: string, provider: MailProvider): string {
@@ -58,25 +68,25 @@ function pluginIdForProvider(pluginId: string, provider: MailProvider): string {
 function initializeOnboardingMailProvider(): void {
   if (initialized) return;
   initialized = true;
-  appShared.QI?.();
-  appShared.ek?.();
-  appInitial.Rln?.();
-  appInitial.nun?.();
+  initializeQueryRuntime?.();
+  initializeQueryOptions?.();
+  initializeAccountPlanHelpers?.();
+  initializeMailProviderQuery?.();
   pluginIdMap = {
     gmail: "outlook-email",
     "google-calendar": "outlook-calendar",
     "google-drive": "sharepoint",
     slack: "teams",
   };
-  if (typeof appInitial.eun === "function") {
-    mailProviderQueryFamily = appInitial.eun(
-      appShared.ZI,
+  if (typeof createMailProviderQueryFamily === "function") {
+    mailProviderQueryFamily = createMailProviderQueryFamily(
+      applicationScope,
       "email-domain-mail-provider",
       (domain: string | null) => ({
         enabled: domain != null,
         params: domain == null ? undefined : { domain },
         retry: 2,
-        staleTime: appShared.$O?.FIVE_MINUTES,
+        staleTime: queryStaleTimes.FIVE_MINUTES,
       }),
     );
   }
