@@ -1181,6 +1181,8 @@ declare module "@rchunk/app-shared" {
   }
   /** getJsxRuntime（返回 React JSX runtime）。 */
   export const I3: () => JsxRuntime;
+  /** ReactDOM client runtime used by the renderer entry point. */
+  export const N3: () => { createRoot(element: HTMLElement): { render(node: unknown): void } };
   /** releaseSignalFamilyMember（释放指定 family parameter 的 retained state）。 */
   export const _Z: <Param>(
     scope: MaitaiScopeApi<unknown>,
@@ -3008,6 +3010,11 @@ declare module "@rchunk/app-initial" {
     Record<string, unknown>,
     Value
   >;
+  export const Dt: () => Promise<unknown>;
+  export const Et: () => void;
+  export const FG: unknown;
+  export const IG: unknown;
+  export const PG: () => void;
   export const ngn: <Value = unknown>(key: string, fallback?: Value) => Value;
   /** initializePreferenceRuntime（偏好信号运行时初始化器）。 */
   export const rgn: () => void;
@@ -5650,9 +5657,7 @@ declare module "@rchunk/app-connect-modal" {
   export const u: () => void;
 }
 
-declare module "@rchunk/app-main" {
-  export const _any: any;
-}
+declare module "@rchunk/app-main" {}
 
 declare module "@rchunk/use-git-submodule-paths" {
   export const _any: any;
@@ -9112,9 +9117,7 @@ declare module "@rchunk/detached-entry" {
   export const initializeDetachedWindow: () => Promise<{ [Symbol.dispose](): void }>;
 }
 
-declare module "@rchunk/index-entry" {
-  export const _any: any;
-}
+declare module "@rchunk/index-entry" {}
 
 // npm 依赖（react 等）：发布包内无 node_modules，实际符号由共享 chunk 提供。
 // 重写模块应经 @rchunk/app-shared 引用；此处仅为 tsc 提供最小 React 类型面，
@@ -11123,8 +11126,13 @@ declare module "@rchunk/thumbnail-worker-font-metrics" {
   export const s: () => void;
 }
 declare module "@rchunk/portable-pdfjs-runtime" {
+  export const AbortException: unknown; export const AnnotationEditorLayer: unknown; export const AnnotationEditorParamsType: unknown; export const AnnotationEditorType: unknown; export const AnnotationEditorUIManager: unknown; export const AnnotationLayer: unknown; export const AnnotationMode: unknown; export const AnnotationType: unknown; export const CSSConstants: unknown; export const ColorPicker: unknown; export const DOMSVGFactory: unknown; export const DrawLayer: unknown; export const FeatureTest: unknown; export const ImageKind: unknown; export const InvalidPDFException: unknown; export const MathClamp: unknown; export const OPS: unknown; export const OutputScale: unknown; export const PDFDataRangeTransport: unknown; export const PDFDateString: unknown; export const PDFWorker: unknown; export const PasswordResponses: unknown; export const PermissionFlag: unknown; export const PixelsPerInch: unknown; export const RenderingCancelledException: unknown; export const ResponseException: unknown; export const SignatureExtractor: unknown; export const SupportedImageMimeTypes: unknown; export const TextLayer: unknown; export const TouchManager: unknown; export const Util: unknown; export const VerbosityLevel: unknown; export const XfaLayer: unknown; export const applyOpacity: unknown; export const build: unknown; export const createValidAbsoluteUrl: unknown; export const fetchData: unknown; export const findContrastColor: unknown; export const getFilenameFromUrl: unknown; export const getPdfFilenameFromUrl: unknown; export const getRGB: unknown; export const getUuid: unknown; export const getXfaPageViewport: unknown; export const isDataScheme: unknown; export const isPdfFile: unknown; export const isValidExplicitDest: unknown; export const noContextMenu: unknown; export const normalizeUnicode: unknown; export const renderRichText: unknown; export const setLayerDimensions: unknown; export const shadow: unknown; export const stopEvent: unknown; export const updateUrlHash: unknown; export const version: unknown;
   export const GlobalWorkerOptions: { workerSrc: string };
   export const getDocument: (options: { data: Uint8Array }) => unknown;
+}
+
+declare module "@rchunk/pdfjs-core" {
+  export const AbortException: unknown; export const AnnotationEditorLayer: unknown; export const AnnotationEditorParamsType: unknown; export const AnnotationEditorType: unknown; export const AnnotationEditorUIManager: unknown; export const AnnotationLayer: unknown; export const AnnotationMode: unknown; export const AnnotationType: unknown; export const CSSConstants: unknown; export const ColorPicker: unknown; export const DOMSVGFactory: unknown; export const DrawLayer: unknown; export const FeatureTest: unknown; export const GlobalWorkerOptions: { workerSrc: string }; export const ImageKind: unknown; export const InvalidPDFException: unknown; export const MathClamp: unknown; export const OPS: unknown; export const OutputScale: unknown; export const PDFDataRangeTransport: unknown; export const PDFDateString: unknown; export const PDFWorker: unknown; export const PasswordResponses: unknown; export const PermissionFlag: unknown; export const PixelsPerInch: unknown; export const RenderingCancelledException: unknown; export const ResponseException: unknown; export const SignatureExtractor: unknown; export const SupportedImageMimeTypes: unknown; export const TextLayer: unknown; export const TouchManager: unknown; export const Util: unknown; export const VerbosityLevel: unknown; export const XfaLayer: unknown; export const applyOpacity: unknown; export const build: unknown; export const createValidAbsoluteUrl: unknown; export const fetchData: unknown; export const findContrastColor: unknown; export const getDocument: (options: { data: Uint8Array }) => unknown; export const getFilenameFromUrl: unknown; export const getPdfFilenameFromUrl: unknown; export const getRGB: unknown; export const getUuid: unknown; export const getXfaPageViewport: unknown; export const isDataScheme: unknown; export const isPdfFile: unknown; export const isValidExplicitDest: unknown; export const noContextMenu: unknown; export const normalizeUnicode: unknown; export const renderRichText: unknown; export const setLayerDimensions: unknown; export const shadow: unknown; export const stopEvent: unknown; export const updateUrlHash: unknown; export const version: unknown;
 }
 
 declare module "@rchunk/diff-worker-algorithm-parser" {
@@ -14249,10 +14257,12 @@ declare module "@rchunk/artifact-preview-status" { export const n: (status: stri
 declare module "@rchunk/artifact-preview-zoom" { export const a: (x1: number, y1: number, x2: number, y2: number) => number; export const i: (zoomPercent: number, wheelDelta: number) => number; export const n: (value: number) => number; export const o: () => void; export const r: (input: { initialDistance: number; initialZoomPercent: number; nextDistance: number }) => number; export const t: readonly number[] }
 declare module "@rchunk/artifact-tab-content-electron";
 declare module "@rchunk/app-connect-availability" { export interface AppConnectAvailabilityInput { appId: string; availableAppIds?: Iterable<string>; companionConnectorIds: string[]; connectors?: Array<{ id: string; [key: string]: unknown }>; getLink?(id: string): Promise<unknown>; primaryLink?: unknown } export const i: (input: AppConnectAvailabilityInput) => Promise<Array<{ id: string; [key: string]: unknown }>>; export const n: typeof i; export const r: () => void; export const t: () => void }
-declare module "@rchunk/cloud-file-preview";
+declare module "@rchunk/cloud-file-preview" { export const t: () => void }
 declare module "@rchunk/editor-header" { export interface EditorHeaderControls { annotationControl?: unknown; commentsControl?: unknown; editingControls?: unknown; navigationControl?: unknown; supplementalActions?: unknown; zoomControl?: unknown } export const n: (props: { onOpenChange(open: boolean): void; open: boolean }) => unknown; export const r: () => void; export const t: (props: { actions?: unknown; annotationControlPlacement?: "editing" | "review"; commentsControl?: unknown; contentFade?: boolean; controls: EditorHeaderControls; downloadControl?: unknown; downloadPending?: boolean; onClose?(): void; onDownload?(): void; onShare?(): void; tabId?: string; title?: unknown }) => unknown }
 declare module "@rchunk/editor-header-controls" { export interface EditorHeaderControls { annotationControl: unknown; commentsControl: unknown; editingControls: unknown; navigationControl: unknown; supplementalActions: unknown; zoomControl: unknown } export const n: () => void; export const t: EditorHeaderControls }
-declare module "@rchunk/artifact-entry";
+declare module "@rchunk/artifact-entry" { export const n: () => Promise<unknown>; export const r: () => Promise<unknown>; export const t: () => void }
+declare module "@rchunk/multiplayer-note" { export const MultiplayerNote: unknown }
+declare module "@rchunk/multiplayer-writing-block" { export const MultiplayerWritingBlock: unknown }
 declare module "@rchunk/file-preview" { export const ChatGptSearchFilePreview: (props: { accountId: string; authenticatedAccountId: string; authenticatedUserId?: string; item: { cloudFile: { name: string }; [key: string]: unknown }; onClose(): void; renderPreview?(item: { cloudFile: { name: string }; [key: string]: unknown }): unknown; sessionReady?: boolean; userId: string }) => unknown }
 declare module "@rchunk/header-content-fade" { export const i: () => void; export const n: () => void; export const r: (props: { libraryFileId?: string; onNavigate?(): void; parentDirectoryId?: string }) => null; export const t: (kind: string) => "artifact" | "surface" | undefined }
 declare module "@rchunk/artifact-layout" { export const n: () => void; export const t: (props: { content: unknown; header: unknown; headerPlacement?: string; renderLayout?(parts: { content: unknown; header: unknown; headerPlacement?: string }): unknown }) => unknown }
@@ -14260,9 +14270,9 @@ declare module "@rchunk/lazy-version-history" { export const n: (props: { childr
 declare module "@rchunk/library-cloud-file-preview";
 declare module "@rchunk/library-file-display-title" { export const n: () => void; export const t: (name: string, kind: string | null | undefined, intl: { formatMessage(descriptor: { defaultMessage: string; id: string }, values?: Record<string, string>): string }) => string }
 declare module "@rchunk/library-file-download" { export interface DownloadableLibraryFile { downloadUrl?: string; file_name: string; requestHeaders?: Record<string, string> } export const a: () => void; export const i: (file: DownloadableLibraryFile, signal?: AbortSignal) => Promise<string>; export const n: (file: DownloadableLibraryFile, signal?: AbortSignal) => Promise<Response>; export const r: (file: DownloadableLibraryFile, signal?: AbortSignal) => Promise<Uint8Array>; export const t: (file: DownloadableLibraryFile) => Promise<void> }
-declare module "@rchunk/reset-image-library-state";
-declare module "@rchunk/saved-entities-data";
-declare module "@rchunk/file-preview-version-history";
+declare module "@rchunk/reset-image-library-state" { export const n: (queryClient: { resetQueries(options: { predicate(query: { queryKey: readonly unknown[] }): boolean; queryKey: readonly unknown[] }): Promise<unknown> | unknown }, fileIds?: readonly string[] | null) => Promise<unknown> | unknown; export const t: () => void }
+declare module "@rchunk/saved-entities-data" { export const savedEntitiesApi$: unknown; export const savedEntityStatus$: unknown }
+declare module "@rchunk/file-preview-version-history" { export const ChatGptFilePreviewVersionHistory: typeof import("@rchunk/version-history").t; export const LibraryFilePreviewVersionHistory: typeof import("@rchunk/version-history").n }
 declare module "@rchunk/library-file-preview-kind" { export interface PreviewableLibraryFile { file_name: string; library_file_category?: string | null; mime_type?: string | null } export const i: () => void; export const n: (file: PreviewableLibraryFile) => string | null; export const r: (file: PreviewableLibraryFile) => "artifact" | "html" | "image" | "markdown" | "pdf" | "text" | "unsupported"; export const t: (input: { fileId: string; mimeType?: string | null; sourceUrl?: string | null }) => string | null }
 declare module "@rchunk/library-file-preview-loading" { export const n: () => void; export const t: () => unknown }
 declare module "@rchunk/library-multiplayer-access" { export interface LibraryAccessState { accountFeatures?: readonly string[]; access: "allowed" | "denied" | "loading"; featureGateEnabled?: boolean; isInternal?: boolean; isLoadingAccount?: boolean; sharedContentGateEnabled?: boolean } export const n: { evaluate(state: LibraryAccessState): boolean }; export const r: { evaluate(state: LibraryAccessState): boolean }; export const t: () => void }
