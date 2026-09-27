@@ -3432,7 +3432,7 @@ declare module "@rchunk/app-initial" {
     disposition?: "current-tab" | "new-tab";
     href: string;
     initiator: "open_in_browser_bridge";
-    openTarget: "external-browser" | "in-app-browser";
+    openTarget?: "external-browser" | "in-app-browser";
     originHostId?: string;
   }) => void;
   export interface TemplateViewerProps extends Record<string, unknown> {
@@ -3551,6 +3551,7 @@ declare module "@rchunk/app-initial" {
   export const N6t: () => {
     accountId?: string | null;
     authMethod?: string | null;
+    hasChatGptToken?: boolean;
     isLoading?: boolean;
     planAtLogin?: unknown;
     userId?: string | null;
@@ -4032,6 +4033,7 @@ declare module "@rchunk/app-initial" {
   export const ppn: () => void;
   export const Man: () => void;
   export interface ApiClient {
+    safeDelete<Response = unknown>(path: string, options?: unknown): Promise<Response>;
     safeGet<Response>(path: string, options?: unknown): Promise<Response>;
     safePatch<Response>(path: string, options?: unknown): Promise<Response>;
     safePost<Response = unknown>(path: string, options?: unknown): Promise<Response>;
@@ -9003,6 +9005,48 @@ declare module "@rchunk/pull-request-fix-workflow" {
 declare module "@rchunk/pull-request-status-label" {
   const _default: unknown;
   export default _default;
+}
+
+declare module "@rchunk/app-shared" {
+  /** invokeDesktopBridgePromise（桌面桥 Promise 规范化）。 */
+  export const UI: <Result>(request: Promise<Result>, signal?: AbortSignal) => Promise<Result>;
+}
+
+declare module "@rchunk/app-initial" {
+  /** account check 查询 key。 */
+  export const cdn: (accountId: string) => readonly unknown[];
+  export const ldn: () => void;
+  /** 当前 active conversation session 及其初始化器。 */
+  export const A1t: () => void;
+  export const M1t: import("@rchunk/app-shared").ReadableSignal<{
+    locator: { conversationId: string; hostId: string };
+    phase: string;
+    sessionId: string;
+  }>;
+  /** Saved-memory API and citation feedback state。 */
+  export const $K: import("@rchunk/app-shared").SignalFamily<
+    { accountId: string; citationUuid: string; conversationId: string; messageId?: string | null },
+    { feedback?: unknown } | null
+  >;
+  export const Ozt: () => void;
+  export const Tzt: (error: unknown) => string | null | undefined;
+  export const eq: () => void;
+  export const udn: ApiClient;
+  export const ydn: () => void;
+  /** Cloud environment connector constants。 */
+  export const Jr: string;
+  export const Kr: string;
+  export const Yr: () => void;
+  /** Computer-use capability dependencies。 */
+  export const $fn: () => void;
+  export const Qfn: (get: unknown, key: string) => unknown;
+  export const Su: (input: {
+    remoteControlConnectionsState: unknown;
+    slingshotEnabled: boolean;
+  }) => boolean;
+  export const xu: () => void;
+  /** Feature configuration hook。 */
+  export const ufn: (featureId: string) => Experiment;
 }
 
 // Conversation workflow, source panels, and local-workspace foundations.
