@@ -1877,6 +1877,8 @@ export const REWRITTEN = new Set([
   "home-beacon",
   "home-beacon-finance",
   "composer-utility-bar",
+  "use-target-apps",
+  "browser-skill-files",
   "portable-attachment-thumbnail",
   "portable-attachment-thumbnail-worker",
   "work-onboarding-suggestions",

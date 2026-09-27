@@ -25,6 +25,8 @@ declare module "@rchunk/app-shared" {
   export const oY: (error: unknown) => boolean;
   export const OK: (url: string) => string;
   export const PK: (value: string) => boolean;
+  /** isWorkspacePath（目标应用发现前的本地路径判定）。 */
+  export const NK: (value: string) => boolean;
   /** getPathBasename（来源面板的本地文件标签）。 */
   export const II: (path: string) => string;
   /** getMcpAppId（从 MCP 调用 id 提取稳定 app id）。 */
@@ -3130,6 +3132,13 @@ declare module "@rchunk/app-initial" {
       payload: { link: OnboardingLegalLink },
     ): void;
     flush(timeoutMs: number): Promise<void>;
+    submitCodexAnalyticsEvent?(event: {
+      action: string;
+      eventKind: string;
+      metadata: Record<string, unknown>;
+      threadId: string;
+      turnId: string;
+    }): void;
   }
   export type OnboardingLegalLink =
     | "terms"
@@ -3391,6 +3400,10 @@ declare module "@rchunk/app-initial" {
     systemPermissions: {
       openNotificationSettings(): Promise<void>;
       showPermissionSettingsAppInFinder?(): Promise<void>;
+    };
+    openIn: {
+      detectTarget(options: { target: string }): Promise<{ available: boolean }>;
+      loadTargetIcon(options: { target: string }): Promise<{ icon: unknown }>;
     };
   }; // appServices：已解析的服务集合
   export const $en: import("@rchunk/app-shared").MaitaiScope<
@@ -5985,7 +5998,28 @@ declare module "@rchunk/skill-data" {
   export const skillDetail$: { key: string }; export const skillFile$: { key: string }; export const skillSafetyConfig$: { key: string }; export const skillsAccess$: { key: string }; export const skillsCollection$: { key: string };
 }
 declare module "@rchunk/use-plugin-installation" { export const installPlugin: (plugin: { id: string; name?: string; [key: string]: unknown }, installer?: (plugin: { id: string; name?: string; [key: string]: unknown }) => Promise<unknown>) => Promise<unknown>; }
-declare module "@rchunk/browser-skill-files";
+declare module "@rchunk/browser-skill-files" {
+  export interface BrowserSkillFileRange { length: number; start: number; }
+  export interface BrowserSkillWithFiles extends Record<string, unknown> {
+    check_sum_hash?: string | null;
+    files: Record<string, BrowserSkillFileRange | undefined>;
+    id: string;
+    permissions?: { can_read?: boolean };
+    sediment_id?: string | null;
+  }
+  export const n: () => void;
+  export const r: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    { path: string; skill: BrowserSkillWithFiles },
+    string
+  >;
+  export const t: (
+    accountId: string,
+    skill: BrowserSkillWithFiles,
+    path: string,
+    signal?: AbortSignal,
+  ) => Promise<ArrayBuffer>;
+}
 declare module "@rchunk/showcase-items";
 
 declare module "@rchunk/mcp-extension-view-page-core" {
@@ -7407,7 +7441,7 @@ declare module "@rchunk/browser-skills-state" {
     enabled?: boolean;
     id: string;
     name?: string;
-    permissions?: { can_write?: boolean };
+    permissions?: { can_read?: boolean; can_write?: boolean };
     safety_check_status?: string | null;
     safety_scan?: { risk_score?: number | null } | null;
     surfaces?: string[] | null;
@@ -9285,8 +9319,47 @@ declare module "@rchunk/use-app-connect-flow" {
 }
 
 declare module "@rchunk/use-target-apps" {
-  const _default: unknown;
-  export default _default;
+  export interface TargetApp extends Record<string, unknown> {
+    appPath?: string | null;
+    available?: boolean;
+    default?: boolean;
+    id: string;
+    kind?: string;
+    resolvedIcon?: unknown;
+    target: string;
+  }
+  export interface OpenTargetOptions extends Record<string, unknown> {
+    appPath?: string;
+    column?: number;
+    line?: number;
+    openMode?: string;
+    path?: string;
+    persistPreferred?: boolean;
+  }
+  export interface UseTargetAppsOptions extends Record<string, unknown> {
+    cwd?: string;
+    deferEnrichment?: boolean;
+    hostId?: string;
+    openPath?: string;
+    turnId?: string;
+  }
+  export const n: () => void;
+  export const r: (options: UseTargetAppsOptions) => {
+    availableTargets: string[];
+    canLoadTargets: boolean;
+    hasLoadedTargets: boolean;
+    isLoadingTargets: boolean;
+    mode: unknown;
+    open(target: string, options: OpenTargetOptions): void;
+    preferredTarget: string | null;
+    targets: TargetApp[];
+  };
+  export const t: (props: {
+    cwd?: string;
+    delayMs?: number;
+    hostId?: string;
+    openPath?: string;
+  }) => null;
 }
 
 declare module "@rchunk/user-message" {
@@ -9932,6 +10005,40 @@ declare module "@rchunk/app-initial" {
   export const eq: () => void;
   export const udn: ApiClient;
   export const ydn: () => void;
+  /** Desktop fetch bridge used by legacy browser-skill downloads. */
+  export const _dn: {
+    getInstance(): {
+      fetch(input: string, init?: RequestInit): Promise<{
+        arrayBuffer(): Promise<ArrayBuffer>;
+      }>;
+    };
+  };
+  /** Target-app query, loader and open mutation contracts. */
+  export const _ft: () => void;
+  export const hft: unknown;
+  export const mft: () => void;
+  export const vft: {
+    getOptions(parameters: Record<string, unknown>): {
+      queryKey: readonly unknown[];
+      [key: string]: unknown;
+    };
+  };
+  export const yft: (
+    parameters: Record<string, unknown>,
+    signal?: AbortSignal,
+  ) => Promise<{
+    availableTargets?: string[];
+    mode?: unknown;
+    preferredTarget?: string | null;
+    targets: Array<{
+      appPath?: string | null;
+      available?: boolean;
+      id: string;
+      kind?: string;
+      target: string;
+      [key: string]: unknown;
+    }>;
+  }>;
   /** Cloud environment connector constants。 */
   export const Jr: string;
   export const Kr: string;
