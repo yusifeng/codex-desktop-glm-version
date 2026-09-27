@@ -39,4 +39,21 @@ assert.equal(typeof surfaceStyle.chunk, "string");
 assert.equal(surfaceStyle.exportCount, 65);
 assert.ok(surfaceStyle.imports.length > 0 && surfaceStyle.imports.every((item) => item.clause == null));
 
-console.log("12 renderer incremental hub assertions passed");
+const importedSetup = inspectHub("use-imported-setup-opportunity");
+assert.equal(importedSetup.strategy, "typed-consumer-surface");
+assert.equal(typeof importedSetup.chunk, "string");
+assert.equal(importedSetup.exportCount, 74);
+assert.ok(importedSetup.imports.some((item) => item.clause?.includes("* as importedSetupChunk")));
+const checklistSource = fs.readFileSync(path.join(RENDERER, "sidebar-onboarding-checklist/index.ts"), "utf8");
+assert.match(checklistSource, /ft:\s*resolveImportedSetupLabel[\s\S]*pt:\s*projectImportedSetupItems/);
+const declarationSource = fs.readFileSync(path.join(RENDERER, "types/rchunk-modules.d.ts"), "utf8");
+const importedSetupDeclaration = declarationSource.slice(declarationSource.indexOf('declare module "@rchunk/use-imported-setup-opportunity"'), declarationSource.indexOf('declare module "@rchunk/sidebar-onboarding-checklist"'));
+assert.doesNotMatch(importedSetupDeclaration, /\bany\b/);
+
+const checkoutSession = inspectHub("checkout-session");
+assert.equal(checkoutSession.strategy, "typed-consumer-surface");
+assert.equal(typeof checkoutSession.chunk, "string");
+assert.equal(checkoutSession.exportCount, 60);
+assert.ok(checkoutSession.imports.length > 0 && checkoutSession.imports.every((item) => item.clause == null));
+
+console.log("22 renderer incremental hub assertions passed");

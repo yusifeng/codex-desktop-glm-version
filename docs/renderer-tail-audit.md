@@ -29,3 +29,9 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 边界，而不是 181 个值得复制的业务 API。`scripts/test-renderer-incremental-hubs.mjs`
 固定原资产、导出数量和消费方式；若未来出现命名导入，该测试会立即失败，届时应
 只把实际消费的能力拆成语义源码并补充精确声明。
+
+`use-imported-setup-opportunity` 同样是 74 导出的构建聚合边界，但当前仅消费
+`ft/pt`。消费侧已经分别命名为 `resolveImportedSetupLabel` 与
+`projectImportedSetupItems`，声明也固定为具体函数签名；审计禁止扩大该表面。
+`checkout-session` 的 60 个导出当前没有命名消费者，仅作为 checkout 簇的副作用
+依赖边保留。二者都由同一 hub 测试锁定，避免为未使用的压缩导出制造占位源码。

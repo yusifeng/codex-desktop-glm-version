@@ -5835,7 +5835,6 @@ declare module "@rchunk/use-imported-setup-opportunity" {
       import("@rchunk/sidebar-onboarding-checklist-task-config").OnboardingTaskDefinition
     >;
   }) => Item[];
-  export const _any: any;
 }
 
 declare module "@rchunk/sidebar-onboarding-checklist" {

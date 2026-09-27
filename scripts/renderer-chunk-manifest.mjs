@@ -2528,4 +2528,6 @@ export const INCREMENTAL_HUBS = new Map([
   ["artifact-source-bootstrap", "typed-consumer-surface"],
   ["text-underline-icon", "typed-consumer-surface"],
   ["popcorn-electron-surface-style", "typed-consumer-surface"],
+  ["use-imported-setup-opportunity", "typed-consumer-surface"],
+  ["checkout-session", "typed-consumer-surface"],
 ]);
