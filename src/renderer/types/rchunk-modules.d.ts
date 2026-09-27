@@ -5268,6 +5268,8 @@ declare module "@rchunk/chatgpt-voices-query";
 declare module "@rchunk/library-item-actions";
 declare module "@rchunk/library-trash-analytics";
 declare module "@rchunk/source-dashed-border";
+declare module "@rchunk/analytics-runtime";
+declare module "@rchunk/chatgpt-projects-runtime";
 
 declare module "@rchunk/dictionary-dialog" {
   export interface DictionaryWord { id: string; text: string; }
@@ -5280,6 +5282,11 @@ declare module "@rchunk/library-item-dialogs" {
 declare module "@rchunk/library-move-dialog" { export const MoveLibraryItemsDialog: (props: Record<string, unknown> & { accountId: string; entries: Array<Record<string, unknown>>; onClose(): void; onMoved(ids: string[]): void; userId: string }) => unknown; }
 declare module "@rchunk/chatgpt-project-create-dialog" { export const ChatGptProjectCreateDialog: (props: Record<string, unknown> & { onClose(): void }) => unknown; }
 declare module "@rchunk/chatgpt-project-add-sources-dialog" { export const ChatGptProjectAddSourcesDialog: (props: Record<string, unknown> & { onClose(): void; onFilesSelected(files: File[]): void; projectId: string }) => unknown; }
+declare module "@rchunk/profile-share-dialog-content" { export const ProfileShareDialogContent: (props: Record<string, unknown> & { accountId: string; onClose(): void; userId: string }) => unknown; }
+declare module "@rchunk/scheduled-task-share-dialog" { export const ScheduledTaskShareDialog: (props: Record<string, unknown> & { automation: { id: string; prompt: string }; onClose(): void }) => unknown; }
+declare module "@rchunk/image-prompt-share-dialog" { export const ImagePromptShareDialog: (props: Record<string, unknown> & { accountId: string; onClose(): void; shareSessionId: string; sourceContent: { prompt: string; title: string }; userId: string }) => unknown; }
+declare module "@rchunk/chatgpt-project-settings-modal" { export const ChatGptProjectSettingsModal: (props: Record<string, unknown> & { accountId: string; onClose(): void; project: Record<string, unknown> }) => unknown; }
+declare module "@rchunk/profile-showcase-editor" { export const ProfileShowcaseEditor: (props: Record<string, unknown> & { accountId: string; onClose(): void; savedItems: Array<Record<string, unknown>>; userId: string }) => unknown; }
 declare module "@rchunk/review-file-source-breadcrumb" {
   export const a: () => void; export const c: () => void; export const d: (line: number, lineCount: number) => number; export const i: () => void; export const l: (contents: string) => number; export const n: () => void; export const o: (element: HTMLElement, line: number, character: number) => boolean; export const r: (props: Record<string, unknown>) => unknown; export const s: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; export const u: (value: string, lineCount?: number) => number | null;
 }

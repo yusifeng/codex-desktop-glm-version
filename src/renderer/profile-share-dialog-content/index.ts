@@ -1,0 +1,15 @@
+import "@rchunk/rolldown-runtime";
+import "@rchunk/app-initial";
+import "@rchunk/reddit-logo";
+import "@rchunk/twitter-logo";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+type ProfileVisibility = "private" | "public" | "workspace";
+interface ProfileShareDialogContentProps { accountId: string; error?: string | null; imageUrl?: string | null; isLoading?: boolean; isWorkspace?: boolean; onClose(): void; onCopy?(url: string): void; onRetry?(): void; onShare?(target: "reddit" | "twitter", url: string): void; onVisibilityChange?(visibility: ProfileVisibility): Promise<void> | void; userId: string; username?: string | null; visibility?: ProfileVisibility }
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function ProfileShareDialogContent({ error, imageUrl, isLoading = false, isWorkspace = false, onClose, onCopy, onRetry, onShare, onVisibilityChange, username, visibility = "private" }: ProfileShareDialogContentProps): unknown {
+  let current = visibility, pending = false;
+  const url = username != null && username.trim().length > 0 && (isWorkspace || current === "public") ? `https://chatgpt.com/u/${encodeURIComponent(username.trim())}` : null;
+  return jsx().jsxs("dialog", { open: true, children: [jsx().jsxs("header", { children: [jsx().jsx("h2", { children: "Share your profile" }), jsx().jsx("button", { type: "button", "aria-label": "Close", onClick: onClose, children: "Close" })] }), isLoading ? jsx().jsx("p", { role: "status", children: "Loading sharing settings" }) : error != null ? jsx().jsxs("div", { role: "alert", children: ["Couldn’t load sharing settings", jsx().jsx("button", { type: "button", onClick: onRetry, children: "Try again" })] }) : jsx().jsxs("section", { children: [imageUrl == null ? null : jsx().jsx("img", { src: imageUrl, alt: "Profile thumbnail" }), isWorkspace ? jsx().jsx("p", { children: "Your workspace profile is only visible to members of this workspace" }) : jsx().jsxs("label", { children: ["Who can see your profile", jsx().jsx("select", { defaultValue: current, disabled: pending, onChange: (event: { currentTarget: { value: string } }) => { const next = event.currentTarget.value === "public" ? "public" : "private"; pending = true; Promise.resolve(onVisibilityChange?.(next)).then(() => { current = next; }).finally(() => { pending = false; }); }, children: [jsx().jsx("option", { value: "private", children: "Only me" }), jsx().jsx("option", { value: "public", children: "Everyone" })] })] }), url == null ? jsx().jsx("p", { children: "Make your profile public to share it" }) : jsx().jsxs("div", { children: [jsx().jsx("input", { readOnly: true, value: url, "aria-label": "Profile link" }), jsx().jsx("button", { type: "button", onClick: () => onCopy?.(url), children: "Copy link" }), jsx().jsx("button", { type: "button", onClick: () => onShare?.("twitter", url), children: "Share on X" }), jsx().jsx("button", { type: "button", onClick: () => onShare?.("reddit", url), children: "Share on Reddit" })] })] })] });
+}
+export { ProfileShareDialogContent, type ProfileShareDialogContentProps };
