@@ -4,11 +4,16 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as worktreesChunk from "@rchunk/use-codex-worktrees";
+import type {
+  ReactRuntime,
+  ScopedDerivedSignal,
+  ScopedSignal,
+} from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
 const {
+  $3: initializeJsxRuntime,
   BX: useSignalFamilyValue,
   FX: initializeSignalRuntime,
   HX: useSignalValue,
@@ -19,40 +24,45 @@ const {
   sZ: createDerivedSignal,
 } = appSharedChunk;
 const {
+  Bfn: initializeHostFeatures,
+  Q4: runModeByProjectFamily,
+  Rht: initializeRunMode,
+  Vfn: getHostById,
+  dun: createPersistedSignal,
+  ifn: initializeExperiments,
+  jst: initializePromptState,
+  kht: onboardingScope,
+  kst: createProjectKey,
+  mdt: workspaceStateSignal,
+  ofn: isFeatureGateEnabled,
+  pdt: initializeWorkspaceState,
+  t3: promptSignal,
+  uun: initializeLocalHost,
+  x3: initializeProjectKey,
+} = appInitialChunk;
+const {
   n: useCodexWorktrees,
   t: initializeCodexWorktrees,
 } = worktreesChunk;
 
 type WorktreeOnboardingState = "dismissed" | "eligible" | "succeeded";
-type RunMode = "local" | "remote" | string;
 
-interface WorkspaceState {
-  cwd: string;
-  hostId: string;
-  isCodexWorktree?: boolean;
-  kind: string;
-}
-
-interface ReactRuntime {
-  useEffect(effect: () => void, dependencies: readonly unknown[]): void;
-}
-
-type ReadableSignal<Value> = import("@rchunk/app-shared").ReadableSignal<Value>;
-
-function resolveRuntime<Runtime>(runtimeOrFactory: unknown): Runtime {
-  return (typeof runtimeOrFactory === "function"
-    ? runtimeOrFactory()
-    : runtimeOrFactory) as Runtime;
-}
-
-let worktreeOnboardingStateSignal = Symbol(
-  "worktree-onboarding-state-v1",
-) as unknown as ReadableSignal<WorktreeOnboardingState>;
-let promptSuggestsWorktreesSignal = Symbol(
-  "prompt-suggests-worktrees",
-) as unknown as ReadableSignal<boolean>;
-let React: ReactRuntime;
+let worktreeOnboardingStateSignal: ScopedSignal<
+  Record<string, unknown>,
+  WorktreeOnboardingState
+>;
+let promptSuggestsWorktreesSignal: ScopedDerivedSignal<
+  Record<string, unknown>,
+  boolean
+>;
+let React: ReactRuntime | null = null;
 let initialized = false;
+
+interface UseWorktreeOnboardingStateOptions {
+  enabled: boolean;
+  entryPoint: string;
+  isLocalModeRemote?: boolean;
+}
 
 function promptSuggestsWorktrees(prompt: string): boolean {
   return /\b(?:worktrees?|parallel|another task|separate task|isolat(?:e|ed|ion)|keep my changes|without disturbing)\b/i.test(
@@ -64,29 +74,23 @@ function useWorktreeOnboardingState({
   enabled,
   entryPoint,
   isLocalModeRemote = false,
-}: {
-  enabled: boolean;
-  entryPoint: string;
-  isLocalModeRemote?: boolean;
-}): { isEligible: boolean } {
+}: UseWorktreeOnboardingStateOptions): { isEligible: boolean } {
   initializeWorktreeOnboardingState();
+  if (React == null) {
+    throw new Error("Worktree onboarding React runtime failed to initialize");
+  }
   const scope = useSignalScope(applicationScope);
-  const workspace = useSignalValue<WorkspaceState>(appInitial.mdt);
-  const state = useSignalValue<WorktreeOnboardingState>(
-    worktreeOnboardingStateSignal,
-  );
-  const host = appInitial.Vfn?.(workspace.hostId);
-  const projectKey = appInitial.kst?.({
+  const workspace = useSignalValue(workspaceStateSignal);
+  const state = useSignalValue(worktreeOnboardingStateSignal);
+  const host = getHostById(workspace.hostId);
+  const projectKey = createProjectKey({
     cwd: workspace.cwd,
     hostId: workspace.hostId,
   });
-  const runMode = useSignalFamilyValue?.(
-    appInitial.Q4,
-    projectKey,
-  ) as unknown as RunMode;
-  const promptEligible = useSignalValue<boolean>(promptSuggestsWorktreesSignal);
-  const featureEnabled = appInitial.ofn?.("2634243883") === true;
-  const bannerEnabled = appInitial.ofn?.("505458") === true;
+  const runMode = useSignalFamilyValue(runModeByProjectFamily, projectKey);
+  const promptEligible = useSignalValue(promptSuggestsWorktreesSignal);
+  const featureEnabled = isFeatureGateEnabled("2634243883");
+  const bannerEnabled = isFeatureGateEnabled("505458");
   const shouldQuery =
     enabled && state === "eligible" && featureEnabled && promptEligible;
   const query = useCodexWorktrees(host, "home_page", { enabled: shouldQuery });
@@ -117,24 +121,27 @@ function useWorktreeOnboardingState({
 function initializeWorktreeOnboardingState(): void {
   if (initialized) return;
   initialized = true;
+  initializeJsxRuntime?.();
   initializeSignalRuntime?.();
+  React =
+    typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
   initializeCodexWorktrees?.();
-  appInitial.pdt?.();
+  initializeWorkspaceState?.();
   initializeSharedRuntime?.();
-  appInitial.Rht?.();
-  appInitial.Bfn?.();
-  appInitial.ifn?.();
-  appInitial.uun?.();
-  appInitial.jst?.();
-  appInitial.x3?.();
-  worktreeOnboardingStateSignal =
-    appInitial.dun?.("worktree-onboarding-state-v1", "eligible") ??
-    worktreeOnboardingStateSignal;
-  promptSuggestsWorktreesSignal =
-    createDerivedSignal(appInitial.kht, ({ get }) =>
-      promptSuggestsWorktrees(get(appInitial.t3)),
-    );
-  React = resolveRuntime<ReactRuntime>(reactRuntime);
+  initializeRunMode?.();
+  initializeHostFeatures?.();
+  initializeExperiments?.();
+  initializeLocalHost?.();
+  initializePromptState?.();
+  initializeProjectKey?.();
+  worktreeOnboardingStateSignal = createPersistedSignal<WorktreeOnboardingState>(
+    "worktree-onboarding-state-v1",
+    "eligible",
+  );
+  promptSuggestsWorktreesSignal = createDerivedSignal(
+    onboardingScope,
+    ({ get }) => promptSuggestsWorktrees(get(promptSignal)),
+  );
 }
 
 export {

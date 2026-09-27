@@ -2761,6 +2761,33 @@ declare module "@rchunk/app-initial" {
   export const vP: ManagedDialogComponent<RateLimitResetDialogProps>;
   export const Kot: (props: { className?: string }) => unknown;
   export const n6: (props: { className?: string }) => unknown;
+  export interface WorkspaceState {
+    cwd: string;
+    hostId: string;
+    isCodexWorktree?: boolean;
+    kind: string;
+  }
+  export interface ProjectKey {
+    cwd: string;
+    hostId: string;
+  }
+  export type ProjectRunMode = "local" | "remote" | string;
+  export const mdt: import("@rchunk/app-shared").ReadableSignal<WorkspaceState>;
+  export const Vfn: (hostId: string) => unknown;
+  export const kst: (project: ProjectKey) => ProjectKey;
+  export const Q4: import("@rchunk/app-shared").SignalFamily<
+    ProjectKey,
+    ProjectRunMode
+  >;
+  export const kht: import("@rchunk/app-shared").MaitaiScope<
+    Record<string, unknown>
+  >;
+  export const t3: import("@rchunk/app-shared").ReadableSignal<string>;
+  export const pdt: () => void;
+  export const Rht: () => void;
+  export const uun: () => void;
+  export const jst: () => void;
+  export const x3: () => void;
   export const Lb: {
     delete: import("@rchunk/app-shared").MessageDescriptor;
   };
@@ -3818,13 +3845,16 @@ declare module "@rchunk/use-codex-worktrees" {
 }
 
 declare module "@rchunk/worktree-onboarding-state" {
-  export const n: (options: {
+  export interface UseWorktreeOnboardingStateOptions {
     enabled: boolean;
     entryPoint: string;
     isLocalModeRemote?: boolean;
-  }) => { isEligible: boolean };
+  }
+  export const n: (
+    options: UseWorktreeOnboardingStateOptions,
+  ) => { isEligible: boolean };
   export const r: import("@rchunk/app-shared").ScopedSignal<
-    unknown,
+    Record<string, unknown>,
     "dismissed" | "eligible" | "succeeded"
   >;
   export const t: () => void;
