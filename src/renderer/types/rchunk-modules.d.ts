@@ -5236,13 +5236,13 @@ declare module "@rchunk/surface";
 declare module "@rchunk/pdf-preview-diff";
 declare module "@rchunk/conversation-diff-comments";
 declare module "@rchunk/artifact-preview-header";
-declare module "@rchunk/compact-empty-state";
-declare module "@rchunk/file-viewer-frame";
+declare module "@rchunk/compact-empty-state" { export const n: () => void; export const t: (props: { actions?: unknown; className?: string; contentClassName?: string; description?: unknown; icon: unknown; title: unknown }) => unknown }
+declare module "@rchunk/file-viewer-frame" { export const n: () => void; export const t: (props: { className?: string; filePath: string; fileViewer: { hostId?: string; [key: string]: unknown }; lifetime?: unknown; mcpAppId: string; recipient?: unknown }) => unknown }
 declare module "@rchunk/text-file-editor-tab-content";
 declare module "@rchunk/gate";
 declare module "@rchunk/File";
 declare module "@rchunk/file-blank";
-declare module "@rchunk/detail-section-state";
+declare module "@rchunk/detail-section-state" { export const n: () => void; export const t: (props: Record<string, unknown> & { children?: unknown; className?: string; tone?: "danger" | "secondary" }) => unknown }
 declare module "@rchunk/pull-request-revision-queries";
 declare module "@rchunk/commit";
 declare module "@rchunk/open-pull-request-fix-automation-panel";
@@ -5278,7 +5278,7 @@ declare module "@rchunk/voice-configuration-manager";
 declare module "@rchunk/chatgpt-voices-query";
 declare module "@rchunk/library-item-actions";
 declare module "@rchunk/library-trash-analytics";
-declare module "@rchunk/source-dashed-border";
+declare module "@rchunk/source-dashed-border" { export const n: () => void; export const t: (props: { isDragActive?: boolean }) => unknown }
 declare module "@rchunk/analytics-runtime";
 declare module "@rchunk/chatgpt-projects-runtime";
 declare module "@rchunk/cadence-events" {
@@ -14034,7 +14034,7 @@ declare module "@rchunk/local-conversation-thread-entry" {
 }
 
 declare module "@rchunk/avatar-overlay-debug-state";
-declare module "@rchunk/comment-mode-coachmark-state";
+declare module "@rchunk/comment-mode-coachmark-state" { export const i: () => void; export const n: () => void; export const r: { value: boolean }; export const t: string }
 declare module "@rchunk/thread-panel-secondary-state";
 declare module "@rchunk/browser-session-queries";
 declare module "@rchunk/tab-input";
@@ -14174,17 +14174,17 @@ declare module "@rchunk/popcorn-icons";
 declare module "@rchunk/popcorn-manual-edit-header-controls";
 declare module "@rchunk/artifact-annotation-batch-controls";
 declare module "@rchunk/artifact-annotation-comment";
-declare module "@rchunk/artifact-preview-status";
-declare module "@rchunk/artifact-preview-zoom";
+declare module "@rchunk/artifact-preview-status" { export const n: (status: string) => unknown; export const t: () => void }
+declare module "@rchunk/artifact-preview-zoom" { export const a: (x1: number, y1: number, x2: number, y2: number) => number; export const i: (zoomPercent: number, wheelDelta: number) => number; export const n: (value: number) => number; export const o: () => void; export const r: (input: { initialDistance: number; initialZoomPercent: number; nextDistance: number }) => number; export const t: readonly number[] }
 declare module "@rchunk/artifact-tab-content-electron";
 declare module "@rchunk/app-connect-availability";
 declare module "@rchunk/cloud-file-preview";
 declare module "@rchunk/editor-header";
-declare module "@rchunk/editor-header-controls";
+declare module "@rchunk/editor-header-controls" { export interface EditorHeaderControls { annotationControl: unknown; commentsControl: unknown; editingControls: unknown; navigationControl: unknown; supplementalActions: unknown; zoomControl: unknown } export const n: () => void; export const t: EditorHeaderControls }
 declare module "@rchunk/artifact-entry";
 declare module "@rchunk/file-preview";
-declare module "@rchunk/header-content-fade";
-declare module "@rchunk/artifact-layout";
+declare module "@rchunk/header-content-fade" { export const i: () => void; export const n: () => void; export const r: (props: { libraryFileId?: string; onNavigate?(): void; parentDirectoryId?: string }) => null; export const t: (kind: string) => "artifact" | "surface" | undefined }
+declare module "@rchunk/artifact-layout" { export const n: () => void; export const t: (props: { content: unknown; header: unknown; headerPlacement?: string; renderLayout?(parts: { content: unknown; header: unknown; headerPlacement?: string }): unknown }) => unknown }
 declare module "@rchunk/lazy-version-history";
 declare module "@rchunk/library-cloud-file-preview";
 declare module "@rchunk/library-file-display-title" { export const n: () => void; export const t: (name: string, kind: string | null | undefined, intl: { formatMessage(descriptor: { defaultMessage: string; id: string }, values?: Record<string, string>): string }) => string }
@@ -14192,7 +14192,7 @@ declare module "@rchunk/library-file-download" { export interface DownloadableLi
 declare module "@rchunk/library-file-preview-kind" { export interface PreviewableLibraryFile { file_name: string; library_file_category?: string | null; mime_type?: string | null } export const i: () => void; export const n: (file: PreviewableLibraryFile) => string | null; export const r: (file: PreviewableLibraryFile) => "artifact" | "html" | "image" | "markdown" | "pdf" | "text" | "unsupported"; export const t: (input: { fileId: string; mimeType?: string | null; sourceUrl?: string | null }) => string | null }
 declare module "@rchunk/library-file-preview-loading" { export const n: () => void; export const t: () => unknown }
 declare module "@rchunk/library-multiplayer-access";
-declare module "@rchunk/loading-controls";
+declare module "@rchunk/loading-controls" { export const n: () => void; export const t: (props: { paginated: boolean }) => import("@rchunk/editor-header-controls").EditorHeaderControls }
 declare module "@rchunk/open-image-preview";
 declare module "@rchunk/open-in-library-item" { export const n: () => void; export const t: (props: { disabled?: boolean; libraryFileId: string; onOpen?(path: string): void }) => unknown }
 declare module "@rchunk/artifact-presentation";
