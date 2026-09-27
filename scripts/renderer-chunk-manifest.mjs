@@ -30,6 +30,10 @@ export const CHUNKS = {
   "writing-block-app-capabilities": "writing-block-app-capabilities-5e7496463ca9.js",
   "writing-block-content-update": "writing-block-content-update-b8f40b9e389d.js",
   "writing-block-directive-renderer": "writing-block-directive-renderer-220e969c84ce.js",
+  "writing-block-floating-slash-menu": "writing-block-floating-slash-menu-c158ecd6de8f.js",
+  "writing-block-copy-button": "writing-block-copy-button-6e4a1f32e5f4.js",
+  "chatgpt-writing-block-ai-tools": "chatgpt-writing-block-ai-tools-a6655b25e19c.js",
+  "slides-outline-template-picker": "template-picker-6dd6e54238ed.js",
   "terminal-workspace-warning-state": "terminal-workspace-warning-state-888b5e947714.js",
   "codex-pet-assets": "codex-pet-assets-5f01c10f2955.js",
   "animated-icon-svg": "animated-icon-svg-6d0bf1a76c25.js",
@@ -2372,4 +2376,6 @@ export const REWRITTEN = new Set([
   "vite-browser-external",
   "portable-thumbnail-font-metrics",
   "thumbnail-worker-font-metrics",
+  "editable-writing-block",
+  "writing-block-app-capabilities",
 ]);
