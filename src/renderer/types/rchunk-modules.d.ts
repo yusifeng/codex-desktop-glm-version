@@ -14512,7 +14512,44 @@ declare module "@rchunk/artifact-spreadsheet-model-runtime";
 declare module "@rchunk/popcorn-presentation-panel" { export interface PresentationSlide { id: string; title?: string; thumbnailUrl?: string } export interface PopcornPresentationController { getSelectedSlideIndex(): number; selectSlide(index: number): void; setZoom(zoom: number): void } export interface PopcornElectronPresentationPanelProps { annotationsEnabled?: boolean; className?: string; footerContent?: unknown; headerCenterContent?: unknown; headerRightContent?: unknown; headerTitleContent?: unknown; initialSelectedSlideIdx?: number; initialSourceBytes?: Uint8Array; initialSourceFormat?: string; initialZoom?: number; isEditing?: boolean; onControllerReady?(controller: PopcornPresentationController): void; onImportError?(error: Error): void; onImportReady?(): void; onInteractionAttempt?(): void; onPresentationEdit?(): void; renderHeader?(parts: Record<string, unknown>): unknown; renderLayout?(parts: Record<string, unknown>): unknown; slides?: readonly PresentationSlide[]; theme?: string; title?: string } export const PopcornElectronPresentationPanel: (props: PopcornElectronPresentationPanelProps) => unknown }
 declare module "@rchunk/popcorn-workbook-panel" { export interface WorkbookSheet { cells?: readonly (readonly unknown[])[]; id: string; name: string } export interface PopcornWorkbookController { getActiveSheetName(): string | undefined; setActiveSheetName(name: string): void; setSelectedAddress(address: string): void; setZoom(zoom: number): void } export interface PopcornElectronWorkbookPanelProps { className?: string; headerCenterContent?: unknown; headerRightContent?: unknown; headerTitleContent?: unknown; initialSelectedAddress?: string; initialSourceBytes?: Uint8Array; initialSourceFormat?: string; initialZoom?: number; isEditing?: boolean; onControllerReady?(controller: PopcornWorkbookController): void; onImportError?(error: Error): void; onImportReady?(): void; onInteractionAttempt?(): void; renderHeader?(parts: Record<string, unknown>): unknown; renderLayout?(parts: Record<string, unknown>): unknown; sheets?: readonly WorkbookSheet[]; theme?: string; title?: string; toolbarHidden?: boolean } export const PopcornElectronWorkbookPanel: (props: PopcornElectronWorkbookPanelProps) => unknown }
 declare module "@rchunk/popcorn-document-panel" { export interface DocumentPage { content?: string; id: string; title?: string } export interface PopcornElectronDocumentPanelProps { annotationsEnabled?: boolean; artifactSearchEnabled?: boolean; className?: string; documentProtoVersion?: number; enablePageNavigation?: boolean; headerRightContent?: unknown; headerTitleContent?: unknown; initialPageIndex?: number; initialSourceBytes?: Uint8Array; initialSourceFormat?: string; initialZoom?: number; isEditing?: boolean; navigationTarget?: { pageNumber: number; requestId: string }; onImportError?(error: Error): void; onImportReady?(): void; pages?: readonly DocumentPage[]; renderHeader?(parts: Record<string, unknown>): unknown; renderHeaderZoomControl?(zoom: number): unknown; renderLayout?(parts: Record<string, unknown>): unknown; theme?: string; title?: string; zoomToFitLabel?: string } export const PopcornElectronDocumentPanel: (props: PopcornElectronDocumentPanelProps) => unknown }
-declare module "@rchunk/artifact-workbook-runtime"; declare module "@rchunk/artifact-source-bootstrap"; declare module "@rchunk/text-underline-icon"; declare module "@rchunk/popcorn-electron-surface-style"; declare module "@rchunk/draw-presence-label"; declare module "@rchunk/d3-ordinal-runtime"; declare module "@rchunk/popcorn-chart-hover-tooltip"; declare module "@rchunk/workbook-review-utils"; declare module "@rchunk/artifact-document-core";
+declare module "@rchunk/artifact-workbook-runtime"; declare module "@rchunk/artifact-source-bootstrap"; declare module "@rchunk/text-underline-icon"; declare module "@rchunk/popcorn-electron-surface-style"; declare module "@rchunk/draw-presence-label"; declare module "@rchunk/d3-ordinal-runtime"; declare module "@rchunk/popcorn-chart-hover-tooltip"; declare module "@rchunk/artifact-document-core";
+declare module "@rchunk/workbook-review-utils" {
+  export interface Point { x: number; y: number }
+  export interface CameraTransform { k: number; x: number; y: number }
+  export interface FreezePanes { columnCount: number; rowCount: number }
+  export interface CellPoint { col: number; row: number }
+  export interface CellRect { c1: number; c2: number; r1: number; r2: number }
+  export interface Bounds { height: number; left: number; top: number; width: number }
+  export interface WorkbookGrid { camera: CameraTransform; columnWidths: number[]; freezePanes: FreezePanes; rowHeights: number[] }
+  export interface WorkbookRangeTarget { anchorPoint?: Point; cols: number; rangeAddress: string; rect: CellRect; rows: number; sheetName: string; type: "workbook-range" }
+  export interface WorkbookFloatingElementTarget { anchorPoint?: Point; elementId: string; elementKind: string; elementOffset?: Point; logicalBounds: { height: number; width: number; x: number; y: number }; rotation?: number; sheetName: string; type: "workbook-floating-element" }
+  export interface WorkbookDrawingRegionTarget { coveredCells: CellRect | null; logicalBounds: Bounds; rangeAddress: string | null; sheetName: string; type: "workbook-drawing-region"; viewportBounds: Bounds }
+  export type WorkbookReviewTarget = WorkbookRangeTarget | WorkbookFloatingElementTarget;
+  export const C: (first: CellPoint, second: CellPoint) => CellRect;
+  export const S: () => void;
+  export const _: (values: readonly (readonly unknown[])[]) => string;
+  export const a: (input: { color: string; rect: CellRect }) => CellRect & { borderRadiusPx: number; borderWidthPx: number; color: string; dashed: boolean; fillAlpha: number; visibleWhenCellSelectionSuppressed: boolean };
+  export const b: (html: string, plainText?: string) => ReturnType<typeof x>;
+  export const c: (target: WorkbookDrawingRegionTarget) => string;
+  export const d: (input: WorkbookGrid & { accentStroke: string; overlayCanvas?: HTMLCanvasElement | null; selectionRect: CellRect; syncViewportCanvases(): void; viewportMetrics: { dpr: number; height: number; width: number } }) => void;
+  export const f: () => void;
+  export const g: () => void;
+  export const h: (input: { accentStroke: string; coordinateScale?: number; ctx: CanvasRenderingContext2D; rect: { height: number; width: number; x: number; y: number } }) => void;
+  export const i: (input: { anchorPoint?: Point | null; selectedFloatingElement: { id: string; kind: string; logicalBounds: { height: number; width: number; x: number; y: number }; rotation?: number }; sheetName: string }) => WorkbookFloatingElementTarget;
+  export const l: (input: WorkbookGrid & { sheet?: { mergedCells?: Array<{ endAddress: string; startAddress: string }> }; target: WorkbookReviewTarget }) => Bounds | null;
+  export const m: (input: { endAddress: string; endCol: number; endRow: number; sheetName: string; startAddress: string; startCol: number; startRow: number }) => WorkbookRangeTarget;
+  export const n: (input: { anchorPoint?: Point | null; selectionSummary: { cols: number; rangeAddress: string; rect?: CellRect | null; rows: number }; sheetName: string }) => WorkbookRangeTarget | null;
+  export const o: (bounds: readonly Bounds[]) => Bounds | null;
+  export const p: () => void;
+  export const r: (input: { coveredCells?: CellRect | null; logicalBounds: Bounds; rangeAddress?: string | null; sheetName: string; viewportBounds: Bounds }) => WorkbookDrawingRegionTarget;
+  export const s: (input: { colOffsets: number[]; columnWidths: number[]; logicalBounds: Bounds; rowHeights: number[]; rowOffsets: number[] }) => { coveredCells: CellRect | null; rangeAddress: string | null };
+  export const t: (input: { floatingAnchorPoint?: Point | null; rangeAnchorPoint?: Point | null; selectedFloatingElement?: { id: string; kind: string; logicalBounds: { height: number; width: number; x: number; y: number }; rotation?: number } | null; selectionSummary: { cols: number; rangeAddress: string; rect?: CellRect | null; rows: number }; snapshot: { activeSheetName: string } }) => WorkbookReviewTarget | null;
+  export const u: (input: WorkbookGrid & { sheet?: { mergedCells?: Array<{ endAddress: string; startAddress: string }> }; target: WorkbookReviewTarget }) => Bounds | null;
+  export const v: () => void;
+  export const w: (input: WorkbookGrid & { screenX: number; screenY: number; selectionRect: CellRect }) => boolean;
+  export const x: (text: string) => { formulas: Array<Array<string | null>>; html: string; kind: "copy"; plainText: string; source: { range: CellRect; sheetName: string }; values: Array<Array<string | number | boolean>> };
+  export const y: (address: string) => CellPoint;
+}
 declare module "@rchunk/drawing-frame-geometry" {
   export interface Point { x: number; y: number }
   export interface CameraTransform extends Point { k: number }

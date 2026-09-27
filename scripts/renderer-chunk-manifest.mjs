@@ -2452,4 +2452,5 @@ export const REWRITTEN = new Set([
   "chatgpt-code-block-highlighting",
   "tax-types",
   "design-editor-state",
+  "workbook-review-utils",
 ]);
