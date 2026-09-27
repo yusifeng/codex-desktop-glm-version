@@ -5317,12 +5317,76 @@ declare module "@rchunk/chatgpt-work-home-page-core" {
   }) => unknown;
 }
 
-declare module "@rchunk/checkout-policy";
-declare module "@rchunk/checkout-dialog-fields";
-declare module "@rchunk/checkout-error";
+declare module "@rchunk/checkout-policy" {
+  export const A: (input: string | URLSearchParams, output: URLSearchParams) => URLSearchParams;
+  export const C: (kind: string, checkout: Record<string, unknown>, override?: boolean) => boolean;
+  export const D: (input: { isStandaloneCredit: boolean; intentType?: string; paymentMethodType?: string | null }) => boolean;
+  export const E: (checkout: Record<string, unknown>, context: Record<string, unknown>) => string | undefined;
+  export const O: (input: string | URLSearchParams) => string | null;
+  export const S: () => void;
+  export const T: (checkout: Record<string, unknown>, context?: { fromiOSWebview?: boolean }) => boolean;
+  export const _: (input: Record<string, unknown>) => Record<string, unknown>;
+  export const a: (sessionId: string, selection: Record<string, unknown>, amounts?: Record<string, unknown> | null) => Record<string, unknown>;
+  export const b: (input: { audience: string; checkoutFrom?: string | null; setupFailed?: boolean; source?: string | null }) => "desktop_handoff" | "workspace_billing" | "personal_usage";
+  export const c: (input: Record<string, unknown>) => { monthlyAmount: number; yearlyAmount: number } | null;
+  export const d: (plan?: string) => string;
+  export const f: (checkout: Record<string, unknown>) => string;
+  export const g: (checkout: Record<string, unknown>, query: string | URLSearchParams) => Record<string, unknown>;
+  export const h: (total: Record<string, unknown>) => number | null;
+  export const i: (id: string, intentType?: string) => boolean;
+  export const j: (url: string, input: string | URLSearchParams) => string;
+  export const k: () => void;
+  export const l: (checkout: Record<string, unknown>, query: string | URLSearchParams, allowedPath?: string) => string | null;
+  export const m: (currency: string) => number | undefined;
+  export const n: { Standard: "standard"; CodexTeam: "codex_team"; StandaloneCredit: "standalone_credit"; RateLimitReset: "codex_rate_limit_reset" };
+  export const o: (...arguments_: unknown[]) => Record<string, unknown> | null;
+  export const p: (status?: string | null) => string;
+  export const r: string;
+  export const s: (input: Record<string, unknown>) => boolean;
+  export const t: string;
+  export const u: (error: unknown) => string | undefined;
+  export const v: (source: string) => "workspace" | "personal" | "unknown";
+  export const w: (input: Record<string, unknown>) => boolean;
+  export const x: (checkout: Record<string, unknown>) => boolean;
+  export const y: (checkout: Record<string, unknown>) => { invoiceTotalMinorUnits: number; amountDueMinorUnits: number; currency: string };
+}
+declare module "@rchunk/checkout-dialog-fields" {
+  export const a: (props: Record<string, unknown>) => unknown;
+  export const c: (input: Record<string, unknown>) => string | null;
+  export const i: (props: Record<string, unknown>) => unknown;
+  export const l: () => void;
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const o: () => void;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const s: (input: Record<string, unknown>) => string | null;
+  export const t: (props: { discountPercent: number }) => unknown;
+}
+declare module "@rchunk/checkout-error" {
+  export const a: (props: { kind: "billing" | "payment"; loading?: boolean; error?: Error | null; onRetry(): void }) => unknown;
+  export const i: () => void;
+  export const n: (code: string) => string | undefined;
+  export const o: () => void;
+  export const r: (error: unknown) => string;
+  export class t extends Error { status?: number; errorCode?: string; constructor(message: string, options?: { status?: number; errorCode?: string }); }
+}
 declare module "@rchunk/account-action-integrity";
 declare module "@rchunk/checkout-session";
-declare module "@rchunk/checkout-confirm-latency";
+declare module "@rchunk/checkout-confirm-latency" {
+  export const a: (email: string | null | undefined, fallback?: string) => { checkoutEmail: string; hasCheckoutEmail: boolean; defaultEmail: string };
+  export const c: () => void;
+  export const d: (path: string) => void;
+  export const f: (previousId: string, checkoutSessionId: string) => void;
+  export const i: RegExp;
+  export const l: (checkoutSessionId: string, quantity: number | null) => void;
+  export const m: () => void;
+  export const n: (input: Record<string, unknown>) => { durationMs: number; checkoutSessionId?: string } | undefined;
+  export const o: () => void;
+  export const p: (props: Record<string, unknown>) => unknown;
+  export const r: () => void;
+  export const s: (checkoutSessionId: string, params: URLSearchParams, audience: string, setupFailed: boolean) => string;
+  export const t: (checkout: Record<string, unknown>, confirm: () => Promise<{ type: string }>) => Promise<{ type: string }>;
+  export const u: (checkoutSessionId: string, params: URLSearchParams) => void;
+}
 
 declare module "@rchunk/checkout-page-core" {
   export const r: () => void;

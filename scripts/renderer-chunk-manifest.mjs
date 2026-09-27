@@ -1073,6 +1073,10 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "checkout-policy",
+  "checkout-dialog-fields",
+  "checkout-error",
+  "checkout-confirm-latency",
   "billing-queries",
   "billing-query-error",
   "stripe-client",
