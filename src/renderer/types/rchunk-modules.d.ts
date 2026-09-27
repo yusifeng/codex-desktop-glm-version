@@ -4111,6 +4111,7 @@ declare module "@rchunk/app-initial" {
   export const ppn: () => void;
   export const Man: () => void;
   export interface ApiClient {
+    getResponse(path: string, options?: unknown): Promise<Response>;
     safeDelete<Response = unknown>(path: string, options?: unknown): Promise<Response>;
     safeGet<Response>(path: string, options?: unknown): Promise<Response>;
     safePatch<Response>(path: string, options?: unknown): Promise<Response>;
@@ -5290,7 +5291,7 @@ declare module "@rchunk/format-amount" {
 declare module "@rchunk/chatgpt-subscription-events";
 declare module "@rchunk/pricing-plan-comparison";
 declare module "@rchunk/voice-configuration-manager";
-declare module "@rchunk/chatgpt-voices-query";
+declare module "@rchunk/chatgpt-voices-query" { export interface VoiceResponse { voices: Array<{ description?: string | null; name?: string | null; preview_url?: string; voice: string }>; [key: string]: unknown } export const n: { getOptions(input: { spoken_language?: string | null; voice_mode?: string }, context?: { accountId?: string | null; defaultLanguage?: string }): { queryKey: readonly unknown[]; queryFn(): Promise<VoiceResponse>; select(response: VoiceResponse): VoiceResponse & { voices: Array<{ description: string; name: string; orbTreatment: string; previewUrl?: string; slug: string }> }; staleTime: 0; refetchOnMount: "always"; retryOnMount: true } }; export const r: () => void; export const t: readonly ["chatgpt-settings-voices"] }
 declare module "@rchunk/library-item-actions" { export interface LibraryActionNode { downloadUrl?: string; file_id?: string | null; id: string; kind: "directory" | "file"; mime_type?: string | null; name: string; parent_directory_id?: string | null; requestHeaders?: Record<string, string> } export interface LibraryActionSelection { canDelete?: boolean; canDownload?: boolean; canMove?: boolean; canRename?: boolean; canRestore?: boolean; node: LibraryActionNode } export type LibraryItemAction = { type: "delete"; permanently?: boolean } | { type: "download"; analyticsContext?: unknown } | { type: "move"; directoryId: string | null } | { type: "rename"; name: string } | { type: "restore" }; export interface LibraryItemActionScope { api: { delete(path: string, input?: Record<string, unknown>): Promise<{ success?: boolean }>; patch(path: string, input?: Record<string, unknown>): Promise<unknown>; post(path: string, input?: Record<string, unknown>): Promise<unknown> }; download?(node: LibraryActionNode): Promise<void> | void; invalidate?(action: LibraryItemAction): Promise<void> | void; notifyError?(message: string): void } export const i: (scope: LibraryItemActionScope, item: LibraryActionSelection, action: LibraryItemAction, skipInvalidation?: boolean) => Promise<boolean>; export const n: Map<string, boolean>; export const r: (scope: LibraryItemActionScope, items: LibraryActionSelection[], action: LibraryItemAction) => Promise<string[]>; export const t: () => void }
 declare module "@rchunk/library-trash-analytics" { export interface LibraryTrashAnalyticsScope { get?(key: unknown): unknown; log?(event: Record<string, unknown>): void } export const a: { value: string }; export const i: (scope: LibraryTrashAnalyticsScope, items: Array<{ node: { id: string } }>) => void; export const n: (scope: LibraryTrashAnalyticsScope, sessionId: string, interactionType: string, error: unknown) => void; export const r: (scope: LibraryTrashAnalyticsScope, items: Array<{ node: { id: string } }>) => void; export const t: () => void }
 declare module "@rchunk/source-dashed-border" { export const n: () => void; export const t: (props: { isDragActive?: boolean }) => unknown }
@@ -5366,7 +5367,7 @@ declare module "@rchunk/radio-group" {
   export const r: () => void;
   export const t: () => void;
 }
-declare module "@rchunk/cme-state";
+declare module "@rchunk/cme-state" { export interface CmeIdentity { accountId: string; userId: string } export interface CmeScope { currentIdentity?(): CmeIdentity | null; invalidate?(key: string, identity: CmeIdentity): Promise<unknown> | unknown; setData?(key: string, identity: CmeIdentity, data: unknown): void; download?(blob: Blob, filename: string): void } export const a: (scope: CmeScope, identity: CmeIdentity, calendarYear: number) => Promise<void>; export const c: (scope: CmeScope, identity: CmeIdentity, request: Record<string, unknown>) => Promise<unknown>; export const i: { evaluate(identity?: CmeIdentity | null): CmeIdentity | null }; export const l: (scope: CmeScope, identity: CmeIdentity, request: Record<string, unknown>) => Promise<unknown>; export const n: { getOptions(identity: CmeIdentity, current?: CmeIdentity | null): Record<string, unknown> }; export const o: () => void; export const r: { getOptions(identity: CmeIdentity, current?: CmeIdentity | null): Record<string, unknown> }; export const s: (scope: CmeScope, identity: CmeIdentity, conversationId: string) => Promise<void>; export const t: { getOptions(identity: CmeIdentity, current?: CmeIdentity | null): Record<string, unknown> } }
 declare module "@rchunk/format-bytes" { export const n: () => void; export const t: (bytes: number, intl: { formatNumber(value: number, options: Intl.NumberFormatOptions): string }) => string }
 
 declare module "@rchunk/dictionary-dialog" {
@@ -6611,18 +6612,10 @@ declare module "@rchunk/home-entry-point" {
 
 declare module "@rchunk/pca-connector-action" {
   export const n: () => void;
-  export const r: (
-    scope: import("@rchunk/app-shared").MaitaiScopeApi<
-      Record<string, unknown>
-    >,
-    resumeTarget: unknown,
-  ) => Promise<unknown>;
-  export const t: (
-    scope: import("@rchunk/app-shared").MaitaiScopeApi<
-      Record<string, unknown>
-    >,
-    options: Record<string, unknown>,
-  ) => unknown;
+  export interface PcaResumeTarget { capturedLeafId: string; capturedModel?: string; capturedPromptId: string; connectorId: string; includeConnectorSystemHintAfterLink?: boolean; kind: "chatgpt-pca-beacon"; serverConversationId: string; triggerTurnAfterLink?: boolean }
+  export interface PcaActionScope { activeLinks?(connectorId: string): Promise<boolean>; conversation?(conversationId: string): Promise<{ currentLeafId: string; mapping: Record<string, { message?: Record<string, unknown> | null; parent?: string | null }> } | null>; get?<Value>(reader: unknown, ...parameters: unknown[]): Value; getConversationId?(conversationId: string): string | null; getLeafId?(conversationId: string): string | null; getMapping?(conversationId: string): Record<string, { message?: Record<string, unknown> | null; parent?: string | null }> | null; log?(event: string, payload: Record<string, unknown>): void; submitTurn?(input: Record<string, unknown>): Promise<unknown> }
+  export const r: (scope: PcaActionScope, resumeTarget: unknown) => Promise<unknown>;
+  export const t: (scope: PcaActionScope, options: { connectorId: string; conversationId: string; includeConnectorSystemHint?: boolean; triggerTurnAfterLink?: boolean }) => PcaResumeTarget | null;
 }
 
 declare module "@rchunk/codex-app-home-beacon-connect-modal" {
@@ -7680,9 +7673,15 @@ declare module "@rchunk/shuffle" {
 }
 
 declare module "@rchunk/departments" {
-  export const a: (...args: any[]) => any;
-  export const i: unknown;
+  export interface DepartmentIdentity { accountId: string; userId: string }
+  export interface DepartmentOnboarding extends Record<string, unknown> { departments: string[]; role: string }
+  export interface DepartmentScope { currentIdentity?(): DepartmentIdentity | null; invalidate?(queryKey: readonly unknown[]): Promise<unknown> | unknown; setOnboardingData?(identity: DepartmentIdentity, data: DepartmentOnboarding): void }
+  export const a: "oai/apps/hasSeenOnboarding";
+  export const i: { getOptions(identity: DepartmentIdentity): Record<string, unknown> };
   export const n: () => void;
+  export const o: (scope: DepartmentScope, identity: DepartmentIdentity, signal?: AbortSignal) => Promise<void>;
+  export const r: (scope: DepartmentScope, identity: DepartmentIdentity, signal?: AbortSignal) => Promise<void>;
+  export const s: (scope: DepartmentScope, identity: DepartmentIdentity, onboarding: DepartmentOnboarding, systemMessage?: Record<string, unknown> | null, signal?: AbortSignal) => Promise<void>;
   export const t: Record<string, string[]>;
 }
 

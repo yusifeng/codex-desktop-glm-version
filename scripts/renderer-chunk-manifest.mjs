@@ -2230,4 +2230,8 @@ export const REWRITTEN = new Set([
   "editor-header",
   "presentation-annotation-cursor-coachmark",
   "drawing-size-slider",
+  "chatgpt-voices-query",
+  "departments",
+  "cme-state",
+  "pca-connector-action",
 ]);
