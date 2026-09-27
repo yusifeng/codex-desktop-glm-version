@@ -11895,24 +11895,90 @@ declare module "@rchunk/codex-micro-commands" {
 }
 
 declare module "@rchunk/codex-micro-keyboard-surface" {
-  export const a: unknown;
-  export const c: unknown;
-  export const d: readonly unknown[];
+  export interface KeycapDefinition {
+    icon: string;
+    id: string;
+  }
+  export interface AgentSlotPreview {
+    selected?: boolean;
+    status?: import("@rchunk/app-shared").CodexMicroStatus;
+    threadKey?: string | null;
+    title?: string | null;
+  }
+  export const a: () => void;
+  export const c: (props: { children?: unknown; className?: string }) => unknown;
+  export const d: readonly string[];
   export const f: number;
-  export const i: (props: Record<string, unknown>) => unknown;
-  export const l: (props: Record<string, unknown>) => unknown;
-  export const n: unknown;
-  export const o: (props: Record<string, unknown>) => unknown;
+  export const i: (props: { children?: unknown; className?: string }) => unknown;
+  export const l: (props: { className?: string; keycap: KeycapDefinition }) => unknown;
+  export const n: (props: {
+    ariaLabel?: string;
+    isPressed?: boolean;
+    pulse?: "clockwise" | "counterclockwise" | null;
+  }) => unknown;
+  export const o: (props: {
+    assignmentTitle?: string | null;
+    isPressed?: boolean;
+    keycap?: KeycapDefinition | null;
+    onClick?: () => void;
+    position: number;
+    showTooltip?: boolean;
+    slot?: AgentSlotPreview | null;
+  }) => unknown;
   export const p: () => void;
-  export const r: unknown;
-  export const s: unknown;
-  export const t: (props: Record<string, unknown>) => unknown;
-  export const u: unknown;
+  export const r: () => unknown;
+  export const s: () => void;
+  export const t: (props: {
+    className?: string;
+    joystick: { angle: number; distance: number };
+  }) => unknown;
+  export const u: () => void;
+}
+
+declare module "@rchunk/play-outline" {
+  export const i: () => void;
+  export const n: () => void;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const t: () => void;
 }
 
 declare module "@rchunk/codex-micro-layout" {
+  export type KeycapAction =
+    | { type: "command"; command: string }
+    | { type: "composer-text"; label: string; text: string }
+    | { type: "custom-shortcut" }
+    | { type: "external-url"; label: string; url: string }
+    | { type: "named"; label: string };
+  export interface KeycapDefinition {
+    action: KeycapAction;
+    icon: string;
+    id: string;
+    size: "single" | "double";
+  }
+  export interface SlotConfig extends Record<string, unknown> {
+    action?:
+      | { type: "command"; commandId: string }
+      | { type: "composer-text"; label: string; text: string }
+      | { type: "skill"; skillName: string; skillPath?: string };
+    commandId?: string;
+    keycapId: string;
+  }
+  export const a: (slot: SlotConfig) => Record<string, unknown> | null;
+  export const c: <T extends import("@rchunk/app-shared").CodexMicroConfig>(config: T, key: string, value: unknown) => T;
+  export const d: (keycap: KeycapDefinition) => string[];
+  export const f: () => void;
+  export const i: (value: unknown) => import("@rchunk/app-shared").CodexMicroConfig;
+  export const l: (
+    config: import("@rchunk/app-shared").CodexMicroConfig,
+    slotId: string,
+    assignment: SlotConfig,
+  ) => import("@rchunk/app-shared").CodexMicroConfig;
+  export const n: (slotId: string) => KeycapDefinition[];
   export const o: () => void;
-  export const r: (keycapId: string) => unknown;
+  export const r: (keycapId: string) => KeycapDefinition;
+  export const s: <T extends import("@rchunk/app-shared").CodexMicroConfig>(config: T, key: string, value: unknown) => T;
+  export const t: (value: string) => string | null;
+  export const u: KeycapDefinition[];
 }
 
 declare module "@rchunk/codex-micro-onboarding-animation" {
@@ -11974,6 +12040,39 @@ declare module "@rchunk/codex-micro-onboarding-host" {
 }
 
 declare module "@rchunk/codex-micro-slot-signals" {
+  export type AgentKeyId = "AG00" | "AG01" | "AG02" | "AG03" | "AG04" | "AG05";
+  export interface ThreadAssignment { hostId: string; threadKey: string; title?: string | null }
+  export type AgentAssignment = ThreadAssignment | { commandId: string; type: "command" }
+    | { keycapId: string; skillName: string; type: "skill" } | null;
+  export type AgentAssignments = Record<AgentKeyId, AgentAssignment>;
+  export interface AgentSlot {
+    id: number;
+    selected: boolean;
+    status: import("@rchunk/app-shared").CodexMicroStatus;
+    threadKey: string | null;
+    title: string | null;
+  }
+  export const a: () => void;
+  export const c: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    agentKeyId: AgentKeyId,
+    assignment: AgentAssignment,
+  ) => void;
+  export const d: (index: number) => AgentKeyId | null;
+  export const f: () => void;
+  export const i: (state: Record<string, unknown>) => string;
+  export const l: (...arguments_: unknown[]) => boolean;
+  export const n: import("@rchunk/app-shared").ScopedDerivedSignal<Record<string, unknown>, AgentSlot[]>;
+  export const o: AgentAssignments;
+  export const p: (...arguments_: unknown[]) => void;
+  export const r: () => void;
+  export const s: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    agentKeyId: AgentKeyId,
+    clientThreadId: string,
+  ) => boolean;
+  export const t: import("@rchunk/app-shared").ScopedDerivedSignal<Record<string, unknown>, Record<string, unknown>>;
+  export const u: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, AgentAssignments>;
   const _default: unknown;
   export default _default;
 }

@@ -1114,6 +1114,7 @@ export const CHUNKS = {
   "site-automation-setup-state": "site-automation-setup-state-75f372a61373.js",
   "persona-runtime": "persona-dcd82a18594e.js",
   "chatgpt-tasks-runtime": "chatgpt_tasks-5e437f7d5423.js",
+  "play-outline": "play-outline-dd4b549787d6.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -1134,6 +1135,9 @@ export const REWRITTEN = new Set([
   "python-analysis-details",
   "codex-micro-commands",
   "codex-micro-analog-action-title",
+  "codex-micro-keyboard-surface",
+  "codex-micro-layout",
+  "codex-micro-slot-signals",
   "open-sources-side-panel-tab",
   "verify-descendant",
   "editable-plan-tab",
