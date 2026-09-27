@@ -2455,4 +2455,5 @@ export const REWRITTEN = new Set([
   "workbook-review-utils",
   "popcorn-chart-hover-tooltip",
   "draw-presence-label",
+  "library-writing-block-core",
 ]);
