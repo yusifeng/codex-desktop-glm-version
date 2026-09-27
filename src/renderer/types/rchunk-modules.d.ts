@@ -820,6 +820,12 @@ declare module "@rchunk/app-shared" {
   /** Motion 与 check-control 初始化器。 */
   export const Tc: () => void;
   export const a$: () => void;
+  /** AnimatePresence 与 motion 初始化面。 */
+  export const d$: (props: Record<string, unknown>) => unknown;
+  export const f$: () => void;
+  export const YQ: () => void;
+  /** prefers-reduced-motion hook。 */
+  export const XQ: () => boolean | null;
   export const xD: () => void;
   /** Menu 当前选中项的 check icon asset。 */
   export const bD: IconAssetPreset;
@@ -2043,6 +2049,12 @@ declare module "@rchunk/app-shared" {
       value: number,
       options: Intl.NumberFormatOptions,
     ): Intl.NumberFormatPart[];
+    formatRelativeTime(
+      value: number,
+      unit: Intl.RelativeTimeFormatUnit,
+      options?: Intl.RelativeTimeFormatOptions,
+    ): string;
+    formatTime(value: string | number | Date, options?: Intl.DateTimeFormatOptions): string;
   }
   export interface FormattedMessageProps extends MessageDescriptor {
     values?: MessageValues;
@@ -6769,7 +6781,9 @@ declare module "@rchunk/chatgpt-image-upload-reminder-dialog-entry" {
 }
 
 declare module "@rchunk/shuffle" {
-  export const t: <T>(items: T[]) => T[];
+  export const t: <T>(
+    items: ArrayLike<T> | Record<string, T> | null | undefined,
+  ) => T[];
 }
 
 declare module "@rchunk/departments" {
@@ -6911,7 +6925,14 @@ declare module "@rchunk/catalog" { export const n: () => void; export const t: u
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
 declare module "@rchunk/codex-micro-mini-games" { export const _any: any; }
 declare module "@rchunk/codex-micro-mini-game-composer" { export const CodexMicroMiniGameComposer: unknown; }
-declare module "@rchunk/wheel-swipe-gesture" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/wheel-swipe-gesture" {
+  export const n: () => void;
+  export class t {
+    activeSwipe: Record<string, unknown> | null;
+    begin(event: { deltaY: number; timeStamp: number }, idleMs: number): void;
+    isContinuation(event: { deltaY: number; timeStamp: number }): boolean;
+  }
+}
 declare module "@rchunk/right-panel-composer-overlay" { export const n: () => void; export const t: unknown; }
 
 declare module "@rchunk/new-chat-page-suggestions-eligibility" {
@@ -6984,8 +7005,10 @@ declare module "@rchunk/primary-composer-at-mention-list" {
 }
 
 declare module "@rchunk/values" {
-  export const n: unknown;
-  export const t: unknown;
+  export const n: <T>(array: T[], size?: number) => T[];
+  export const t: <T>(
+    value: Record<string, T> | null | undefined,
+  ) => T[];
 }
 
 declare module "@rchunk/followup-suggestions" {
@@ -8679,6 +8702,8 @@ declare module "@rchunk/workspace-file-tab-context-menu" {
 }
 
 declare module "@rchunk/hooks" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -8769,6 +8794,12 @@ declare module "@rchunk/bookmarked-thread-user-message-navigation" {
 }
 
 declare module "@rchunk/command-execution-command" {
+  export interface CommandExecution {
+    command: string;
+    commandActions: Array<{ command?: string | null } | null>;
+  }
+  export const n: () => void;
+  export const t: (execution: CommandExecution) => string;
   const _default: unknown;
   export default _default;
 }
@@ -9317,6 +9348,14 @@ declare module "@rchunk/use-element-in-view" {
 }
 
 declare module "@rchunk/timestamp-separator" {
+  export const i: () => void;
+  export const n: () => void;
+  export const r: (props: {
+    children?: unknown;
+    className?: string;
+    isVisible: boolean;
+  }) => unknown;
+  export const t: (props: { nowMs?: number; sentAtMs: number }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -10765,8 +10804,11 @@ declare module "@rchunk/thread-usage-breakdown" {
 }
 
 declare module "@rchunk/theme-font-face-loader" {
-  export const r: unknown;
-  export const t: unknown;
+  export const n: (
+    fontFace: import("@rchunk/theme-font-family").ThemeFontFace,
+  ) => Promise<boolean>;
+  export const r: (selections: readonly Record<string, unknown>[]) => Promise<void>;
+  export const t: () => void;
 }
 
 declare module "@rchunk/modulepreload-polyfill" {
@@ -10774,6 +10816,24 @@ declare module "@rchunk/modulepreload-polyfill" {
 }
 
 declare module "@rchunk/theme-font-family" {
+  export interface ThemeFontFace {
+    family: string;
+    fullName: string;
+    postscriptName: string;
+  }
+  export const a: (fontFace: ThemeFontFace) => string;
+  export const i: (fontFamily: string) => string;
+  export const n: (fontFamily: string) => string;
+  export const o: (
+    fontFamily: string | null | undefined,
+    fontFace: ThemeFontFace | null | undefined,
+  ) => string | null | undefined;
+  export const r: (fontFamily?: string | null) => string | undefined;
+  export const s: () => void;
+  export const t: (
+    fontFamily: string | null | undefined,
+    fontFace: ThemeFontFace,
+  ) => boolean;
   const _default: unknown;
   export default _default;
 }

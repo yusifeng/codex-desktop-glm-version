@@ -1,0 +1,53 @@
+import * as appSharedChunk from "@rchunk/app-shared";
+import "@rchunk/rolldown-runtime";
+import type { JsxRuntime } from "@rchunk/app-shared";
+
+const { I3: getJsxRuntime, e6: getReactRuntime } = appSharedChunk;
+let jsx: JsxRuntime;
+
+function LockIcon(props: Record<string, unknown>): unknown {
+  initializeLockIcon();
+  return jsx.jsxs("svg", {
+    width: 18,
+    height: 18,
+    viewBox: "0 0 18 18",
+    fill: "none",
+    xmlns: "http://www.w3.org/2000/svg",
+    ...props,
+    children: [
+      jsx.jsx("rect", {
+        x: 3.19995,
+        y: 6.20001,
+        width: 11.6,
+        height: 8.8,
+        rx: 2.25,
+        stroke: "currentColor",
+        strokeWidth: 1.33,
+      }),
+      jsx.jsx("path", {
+        d: "M5.30005 6.29999V5.99999C5.30005 3.95653 6.9566 2.29999 9.00005 2.29999C11.0435 2.29999 12.7 3.95653 12.7 5.99999V6.29999",
+        stroke: "currentColor",
+        strokeWidth: 1.33,
+        strokeLinejoin: "round",
+      }),
+      jsx.jsx("path", {
+        d: "M8.5 10.5H9.5",
+        stroke: "currentColor",
+        strokeWidth: 1.33,
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+      }),
+    ],
+  });
+}
+
+let initialized = false;
+function initializeLockIcon(): void {
+  if (initialized) return;
+  getReactRuntime();
+  jsx = getJsxRuntime();
+  initialized = true;
+}
+
+initializeLockIcon();
+export { initializeLockIcon as n, LockIcon as t };
