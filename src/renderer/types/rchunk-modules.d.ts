@@ -2038,6 +2038,11 @@ declare module "@rchunk/app-shared" {
       values?: Record<string, unknown>,
       options?: { ignoreTag?: boolean },
     ): string;
+    formatNumber(value: number, options: Intl.NumberFormatOptions): string;
+    formatNumberToParts(
+      value: number,
+      options: Intl.NumberFormatOptions,
+    ): Intl.NumberFormatPart[];
   }
   export interface FormattedMessageProps extends MessageDescriptor {
     values?: MessageValues;
@@ -4293,7 +4298,18 @@ declare module "@rchunk/app-initial" {
   export const kF: () => void;
   export const wdn: () => void;
   export const CT: () => void;
-  export const TT: () => void;
+  /** defineMessages（订阅与定价消息描述）。 */
+  export const TT: {
+    (): void;
+    <
+      const Messages extends Record<
+        string,
+        import("@rchunk/app-shared").MessageDescriptor
+      >,
+    >(
+      messages: Messages,
+    ): Messages;
+  };
   export const wT: () => void;
   export interface CurrencyAmountInput {
     amount: number;
@@ -4671,6 +4687,13 @@ declare module "@rchunk/confirm-subscription-upgrade" {
 }
 
 declare module "@rchunk/app-primary" {
+  /** 初始化模型与 reasoning-effort 翻译表。 */
+  export const cc: () => void;
+  /** reasoning-effort 到本地化消息描述的映射。 */
+  export const lc: Record<
+    string,
+    import("@rchunk/app-shared").MessageDescriptor
+  >;
   export const gf: () => void;
   export const hf: (text: string) => Array<Record<string, unknown>>;
   /** new-thread-panel-page 初始化面与实验配置。 */
@@ -5590,7 +5613,25 @@ declare module "@rchunk/diff-preview-content" {
 }
 declare module "@rchunk/ansi-block";
 declare module "@rchunk/shell-label";
-declare module "@rchunk/stripe-pure";
+declare module "@rchunk/stripe-pure" {
+  export interface StripeInstance {
+    _registerWrapper?(metadata: {
+      name: string;
+      startTime: number;
+      version: string;
+    }): void;
+  }
+  export interface LoadStripe {
+    (
+      publishableKey: string,
+      ...arguments_: unknown[]
+    ): Promise<StripeInstance | null>;
+    setLoadParameters(parameters: { advancedFraudSignals: boolean }): void;
+  }
+  export const n: () => void;
+  export const r: LoadStripe;
+  export const t: () => void;
+}
 declare module "@rchunk/shiki-highlight-provider";
 declare module "@rchunk/codex-diff-css";
 declare module "@rchunk/diff-worker-runtime";
@@ -7176,27 +7217,39 @@ declare module "@rchunk/pricing-promotions" {
 
 declare module "@rchunk/plan-names" {
   export interface PlanNameInput {
-    initialPlanType: string;
+    initialPlanType?: string;
     planType: string;
-    updatedPlanType: string;
+    updatedPlanType?: string;
   }
   export const n: (input: PlanNameInput) => string | null;
   export const r: () => void;
+  export const t: Record<
+    "free" | "go" | "plus" | "pro" | "team",
+    import("@rchunk/app-shared").MessageDescriptor
+  >;
 }
 
 declare module "@rchunk/pricing" {
   export interface FormattedPrice {
-    currencyCodeLabel?: string | null;
-    formatted?: string | null;
-    parts?: Intl.NumberFormatPart[];
+    currencyCodeLabel: string | null;
+    formatted: string;
+    parts: Intl.NumberFormatPart[];
   }
   export interface FormatPriceInput {
-    amount: number;
+    amount?: number | null;
     currencyCode: string;
-    intl: import("@rchunk/app-shared").IntlShape;
-    minorUnitExponent: number;
+    intl: {
+      formatNumber(value: number, options: Intl.NumberFormatOptions): string;
+      formatNumberToParts(
+        value: number,
+        options: Intl.NumberFormatOptions,
+      ): Intl.NumberFormatPart[];
+    };
+    minorUnitExponent?: number;
   }
-  export const n: (input: FormatPriceInput) => FormattedPrice;
+  export const n: (input: FormatPriceInput) => FormattedPrice | null;
+  export const r: () => void;
+  export const t: (input: FormatPriceInput) => string | null;
 }
 
 declare module "@rchunk/offer-notice" {
@@ -7206,13 +7259,25 @@ declare module "@rchunk/offer-notice" {
 }
 
 declare module "@rchunk/stripe-payment-confirmation" {
+  export type StripeFailureReason =
+    | "authentication_failed"
+    | "expired_card"
+    | "incorrect_cvc"
+    | "incorrect_number"
+    | "insufficient_funds"
+    | "invalid_cvc"
+    | "missing_payment_method"
+    | "other"
+    | "payment_method_declined"
+    | "payment_method_unavailable";
   export interface StripeError {
-    code?: string;
+    code?: string | null;
+    decline_code?: string | null;
     message?: string;
     reason?: string;
   }
   export interface StripePaymentIntent {
-    id?: string;
+    last_payment_error?: StripeError | null;
     status: string;
   }
   export interface StripeConfirmationResult {
@@ -7223,9 +7288,11 @@ declare module "@rchunk/stripe-payment-confirmation" {
     error?: StripeError;
     setupIntent?: { id: string; status: string };
   }
-  export const a: (error: StripeError) => string;
-  export const i: string;
-  export const n: (paymentIntent: StripePaymentIntent) => string | null;
+  export const a: (error: StripeError) => StripeFailureReason;
+  export const i: "lock_timeout";
+  export const n: (
+    paymentIntent: StripePaymentIntent,
+  ) => StripeFailureReason | null;
   export const o: () => void;
   export const r: () => void;
   export const t: (input: {
@@ -10301,6 +10368,11 @@ declare module "@rchunk/local-conversation-stream-role-product-event" {
 }
 
 declare module "@rchunk/model-and-reasoning-effort-translations" {
+  export interface ReasoningEffortTranslationProps {
+    effort: string;
+  }
+  export const n: () => void;
+  export const t: (props: ReasoningEffortTranslationProps) => unknown;
   const _default: unknown;
   export default _default;
 }
