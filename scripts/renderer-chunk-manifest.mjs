@@ -1064,11 +1064,24 @@ export const CHUNKS = {
   "plugin-detail-view": "plugin-detail-view-514feb8d1f55.js",
   "plugins-page": "plugins-page-fe136f0c8463.js",
   "mcp-view-surface": "surface-a350805dc637.js",
+  "diff-preview-content": "diff-preview-content-ac76996ab559.js",
+  "ansi-block": "ansi-block-5043e88b0254.js",
+  "shell-label": "shell-label-8c52b5db8bde.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "result-values",
+  "partition",
+  "undo",
+  "book-open",
+  "diff-preview-tooltip",
+  "exec-shell-container",
+  "computer-use-native-app-metadata",
+  "open-in-button",
+  "skill-exploration-labels",
+  "plan-implementation-request",
   "mcp-view-surface",
   "view-frame",
   "active-tool-activity-label",

@@ -5387,6 +5387,10 @@ declare module "@rchunk/mcp-view-surface" {
   export const t: (props: { isLoading?: boolean; loadingContent?: unknown; partition?: string; showBackButton?: boolean; src: string; webviewRef?(element: unknown): void }) => unknown;
 }
 
+declare module "@rchunk/diff-preview-content";
+declare module "@rchunk/ansi-block";
+declare module "@rchunk/shell-label";
+
 declare module "@rchunk/detail-page" {
   export const n: (props: { children?: unknown }) => unknown;
   export const r: () => void;
@@ -8089,6 +8093,18 @@ declare module "@rchunk/open-automation-side-panel-tab" {
 }
 
 declare module "@rchunk/open-in-button" {
+  export const n: () => void;
+  export const t: (props: {
+    analyticsClickSource?: string;
+    artifactRef?: string;
+    hostId?: string;
+    kind?: string;
+    onDownload?(): void;
+    onOpen?(): void;
+    threadId?: string;
+    title?: string;
+    variant?: "menu" | "title";
+  }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -8099,6 +8115,16 @@ declare module "@rchunk/open-in-google-drive-menu-item" {
 }
 
 declare module "@rchunk/skill-exploration-labels" {
+  export const a: (command: string) => "create" | "update" | null;
+  export const c: (summary: Record<string, unknown> | null | undefined) => boolean;
+  export const i: (input: { kind: "create" | "update"; isFinished: boolean; isLeadingSegment: boolean; intl?: unknown }) => string;
+  export const l: (status?: string) => boolean;
+  export const n: () => void;
+  export const o: (content?: Array<{ type?: string; text?: string }>) => "explicit" | "soft" | "none";
+  export const r: (input: { summary: Record<string, unknown> }) => boolean;
+  export const s: () => void;
+  export const t: (input: { summary: Record<string, unknown> }) => Record<string, unknown> | null;
+  export const u: { activeCreating: string; activeUpdating: string };
   const _default: unknown;
   export default _default;
 }
@@ -8154,6 +8180,9 @@ declare module "@rchunk/hooks-settings-model" {
 }
 
 declare module "@rchunk/plan-implementation-request" {
+  export const n: () => void;
+  export const r: (input: string) => boolean;
+  export const t: string;
   const _default: unknown;
   export default _default;
 }
@@ -8630,6 +8659,13 @@ declare module "@rchunk/remote-hosted-pip-anchor-bridge" {
 }
 
 declare module "@rchunk/result-values" {
+  export const a: () => void;
+  export const i: (props: { script?: string }) => unknown;
+  export const n: (props: { detail?: boolean; workspaceName?: string }) => unknown;
+  export const o: { queryKey: string[] };
+  export const r: (props: { configuration?: unknown; requirement: { connection_id: string; display_name?: string } }) => unknown;
+  export const s: () => void;
+  export const t: (props: { policy: { type: "disabled" | "unrestricted" } | { type: "restricted"; egress_rules: Array<{ host: string }>; presets?: string[] } }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -8792,16 +8828,22 @@ declare module "@rchunk/active-tool-activity-label" {
 }
 
 declare module "@rchunk/book-open" {
+  export const n: () => void;
+  export const t: (props?: Record<string, unknown>) => unknown;
   const _default: unknown;
   export default _default;
 }
 
 declare module "@rchunk/computer-use-native-app-metadata" {
+  export const n: (reference: ({ kind: "appId"; appId: string; metadata?: Record<string, unknown> } | { kind: "displayName"; displayName: string; metadata?: Record<string, unknown> } | null)) => Record<string, unknown> | null;
+  export const t: () => void;
   const _default: unknown;
   export default _default;
 }
 
 declare module "@rchunk/diff-preview-tooltip" {
+  export const n: () => void;
+  export const t: (props: { children?: unknown; diff: { metadata?: unknown }; disabled?: boolean; displayPath?: string; linesAdded?: number; linesRemoved?: number; onOpen?(): void }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -8815,6 +8857,11 @@ declare module "@rchunk/elicitation-events" {
 }
 
 declare module "@rchunk/exec-shell-container" {
+  export const n: () => void;
+  export const r: (props?: Record<string, unknown>) => unknown;
+  export const t: ((props: { command: string; cwd?: string; footer?: unknown; isInProgress?: boolean; output: string; surface?: "default" | "plain" }) => unknown) & {
+    Footer(props: { exitCode?: number; isInProgress?: boolean; isSuccess?: boolean; wasInterrupted?: boolean }): unknown;
+  };
   const _default: unknown;
   export default _default;
 }
@@ -8849,6 +8896,7 @@ declare module "@rchunk/mcp-tool-item-content" {
 }
 
 declare module "@rchunk/partition" {
+  export const t: <Value>(values: Value[], predicate: (value: Value, index: number) => boolean) => [Value[], Value[]];
   const _default: unknown;
   export default _default;
 }
@@ -8859,6 +8907,8 @@ declare module "@rchunk/plan-summary-item-content" {
 }
 
 declare module "@rchunk/undo" {
+  export const n: () => void;
+  export const t: (props?: Record<string, unknown>) => unknown;
   const _default: unknown;
   export default _default;
 }
