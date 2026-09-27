@@ -3400,6 +3400,9 @@ declare module "@rchunk/app-initial" {
     | string
     | Pick<RouterLocationState, "hash" | "pathname" | "search">;
   export const i_n: () => RouterLocationState;
+  export const d_n: () => [URLSearchParams, (next: URLSearchParams) => void];
+  export const Fx: (target?: string | null, fallback?: string) => string;
+  export const Ix: () => void;
   export const o_n: () => (
     destination: RouterDestination,
     options?: { replace?: boolean; state?: unknown },
@@ -3411,11 +3414,15 @@ declare module "@rchunk/app-initial" {
     pattern: string,
     pathname: string,
   ) => Record<string, string> | null;
-  export const l_n: () => { projectId?: string | null };
+  export const l_n: () => {
+    postId?: string | null;
+    projectId?: string | null;
+  };
   export const Xgn: (props: Record<string, unknown>) => unknown;
   export const Ygn: (props: {
     replace?: boolean;
-    to: string;
+    state?: unknown;
+    to: RouterDestination;
   }) => unknown;
   export const WT: PrefetchableRoute;
   export const KT: PrefetchableRoute;
@@ -4592,6 +4599,18 @@ declare module "@rchunk/mcp-extension-view-page-core" {
   export const i: () => void;
   export const n: (props: Record<string, unknown>) => unknown;
   export const r: (props: Record<string, unknown>) => unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/detail-page" {
+  export const n: (props: { children?: unknown }) => unknown;
+  export const r: () => void;
+  export const t: string;
+}
+
+declare module "@rchunk/skills-page-grid" {
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: () => void;
   export const t: (props: Record<string, unknown>) => unknown;
 }
 
