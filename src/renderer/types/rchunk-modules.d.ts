@@ -5726,6 +5726,22 @@ declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-car
 declare module "@rchunk/share-menu-item"; declare module "@rchunk/recommended-skill-statsig-overrides";
 declare module "@rchunk/find-plugin-mcp-extension-view"; declare module "@rchunk/control-group"; declare module "@rchunk/filter";
 declare module "@rchunk/plugin-connected-account-links"; declare module "@rchunk/plugin-disabled-reason";
+declare module "@rchunk/plugin-connected-account-links" {
+  export const i: () => void; export const n: () => void;
+  export const r: (props: { ariaLabel: string; icon?: unknown }) => unknown;
+  export const t: (links: Array<{ connector_id: string; id: string; visibility?: string }>, connectorId: string) => Array<{ connector_id: string; id: string; visibility?: string }>;
+}
+declare module "@rchunk/plugin-disabled-reason" {
+  export const a: (props: { credits: number; showRequirements?: boolean }) => unknown;
+  export const i: () => void; export const n: () => void; export const o: () => void;
+  export const r: (input: { disabledReason?: string | null; fallback: string; intl: import("@rchunk/app-shared").IntlShape }) => string;
+  export const t: (props: { children?: unknown; disabledReason?: string | null }) => unknown;
+}
+declare module "@rchunk/find-plugin-mcp-extension-view" { export const n: () => void; export const t: (plugin: { summary: { id: string }; apps: Array<{ id: string }>; mcpServers: Array<{ name?: string; server?: string }> } | null, views: Array<{ appId?: string; pluginId?: string; server?: string }>) => unknown; }
+declare module "@rchunk/use-plugin-scheduled-tasks" { export const n: (input: { hostId: string; capable?: boolean; enabled?: boolean; tasks?: unknown[] }) => unknown[] | undefined; export const t: () => void; }
+declare module "@rchunk/prepare-plugin-creator" { export const n: (scope: { get<T>(signal: unknown): T }, signal: AbortSignal, options?: { hostId?: string }) => Promise<{ pluginId: string; setupStarted: boolean } | null>; export const t: () => void; }
+declare module "@rchunk/plugin-connector-setup" { export const n: () => void; export const r: (input: Record<string, unknown>) => Promise<void>; export const t: (input: Record<string, unknown>) => void; }
+declare module "@rchunk/requested-plugin-connection" { const _default: unknown; export default _default; }
 
 declare module "@rchunk/mcp-extension-view-page-core" {
   export const i: () => void;

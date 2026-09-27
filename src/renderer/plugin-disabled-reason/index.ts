@@ -1,0 +1,7 @@
+import { I3 as getJsxRuntime,type JsxRuntime,type IntlShape } from "@rchunk/app-shared";import "@rchunk/app-initial";
+type Reason="plan_not_eligible"|"required_app_unavailable"|"unknown"|"disabled_by_admin"|null|undefined;let jsx:JsxRuntime;const messages={plan_not_eligible:{id:"plugins.disabledReason.planNotEligible",defaultMessage:"Not available on your plan"},required_app_unavailable:{id:"plugins.disabledReason.requiredAppUnavailable",defaultMessage:"Required app unavailable"},unknown:{id:"plugins.disabledReason.unknown",defaultMessage:"Unavailable"}};
+function descriptor(reason:Reason){if(reason==null||reason==="disabled_by_admin")return null;return messages[reason]}
+function label(input:{disabledReason:Reason;fallback:string;intl:IntlShape}):string{const message=descriptor(input.disabledReason);return message==null?input.fallback:String(input.intl.formatMessage(message))}
+function DisabledReason(props:{children?:unknown;disabledReason:Reason}):unknown{const message=descriptor(props.disabledReason);return message==null?props.children:ensure().jsx("span",{children:message.defaultMessage})}
+function RewardBadge(props:{credits:number;showRequirements?:boolean}):unknown{return ensure().jsx("span",{className:"reward-badge",children:props.showRequirements?`Get ${props.credits} credits for installing and using`:`${props.credits} credits`})}
+const initialize=():void=>{jsx=getJsxRuntime()};function ensure(){if(jsx==null)initialize();return jsx}export{RewardBadge as a,initialize as i,initialize as n,initialize as o,label as r,DisabledReason as t};
