@@ -2751,6 +2751,7 @@ declare module "@rchunk/app-initial" {
     data: UsageQueryData | null,
   ) => { remainingPercent: number } | null;
   export const lfn: () => unknown;
+  export const rfn: (context: unknown, experimentId: string) => Experiment;
   export const $M: (
     experiment: unknown,
     options: {
@@ -3058,6 +3059,8 @@ declare module "@rchunk/app-initial" {
     planAtLogin?: unknown;
     userId?: string | null;
   };
+  /** 是否由全局状态抑制订阅 onboarding。 */
+  export const Gzt: () => boolean;
   export interface SidebarChecklistItemState extends Record<string, unknown> {
     action?: string;
     completed?: boolean;
@@ -3124,8 +3127,20 @@ declare module "@rchunk/app-initial" {
   export const l1: () => void;
   export const afn: (experimentId: string) => Experiment;
   export const ofn: (gateId: string) => boolean;
-  export const i_n: () => { pathname: string };
-  export const o_n: () => (path: string) => void;
+  export interface RouterLocationState {
+    hash: string;
+    pathname: string;
+    search: string;
+    state: unknown;
+  }
+  export type RouterDestination =
+    | string
+    | Pick<RouterLocationState, "hash" | "pathname" | "search">;
+  export const i_n: () => RouterLocationState;
+  export const o_n: () => (
+    destination: RouterDestination,
+    options?: { replace?: boolean; state?: unknown },
+  ) => void;
   export const Pan: (
     scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
     event: {
@@ -4999,7 +5014,42 @@ declare module "@rchunk/subscription-onboarding-content" {
 }
 
 declare module "@rchunk/subscription-onboarding" {
-  export const SubscriptionOnboarding: unknown;
+  export interface OnboardingAction extends Record<string, unknown> {
+    action?: string;
+    pageId: string;
+  }
+  export interface HomeCandidate {
+    content: unknown;
+    id: "subscription-onboarding";
+    isEligible: boolean;
+    isLoading: boolean;
+    trackVisibility: boolean;
+  }
+  export type RenderCandidates = (candidates: HomeCandidate[]) => unknown;
+  export interface SubscriptionOnboardingProps
+    extends Record<string, unknown> {
+    canCreateImage?: boolean;
+    canPresent: boolean;
+    canStartConversation: boolean;
+    homeCandidates?: (renderCandidates: RenderCandidates) => unknown;
+    onAction?(event: OnboardingAction): void;
+    onClosed?(): void;
+    onCreateImage?(): void;
+    onInteraction?(event: OnboardingAction): void;
+    onOpenFileDialog?(): void;
+    onPresented?(): void;
+    onSelectIntelligence?(level: "pro" | "standard"): void;
+    onStartConversation?(
+      initialStage: string,
+      onComplete: () => void,
+    ): Promise<unknown> | unknown;
+    onStartSite?(): void;
+    onStartVoice?(): void;
+    renderCandidates: RenderCandidates;
+  }
+  export const SubscriptionOnboarding: (
+    props: SubscriptionOnboardingProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/subscription-update-dialog" {

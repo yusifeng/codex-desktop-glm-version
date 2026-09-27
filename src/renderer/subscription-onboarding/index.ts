@@ -8,23 +8,41 @@ import * as queriesChunk from "@rchunk/queries";
 import * as contentChunk from "@rchunk/subscription-onboarding-content";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const content = contentChunk as Record<string, any>;
-
 const {
   $3: initializeRuntimeLazy,
-  I3: jsxRuntime,
+  I3: getJsxRuntime,
   Ih: Dialog,
   K2: initializeSharedComponents,
-  e6: reactRuntime,
+  e6: getReactRuntime,
   n4: useIntl,
-} = appShared;
+} = appSharedChunk;
 const { _L: useQuery } = appSharedChunk;
 const {
-  i: initializeSubscriptionQueries,
-  n: subscriptionAccountQueryOptions,
-} = queriesChunk;
+  Gzt: isSubscriptionOnboardingSuppressed,
+  N6t: useAuthenticatedAccount,
+  i_n: useRouterLocation,
+  lfn: useExperimentContext,
+  o_n: useRouterNavigate,
+  rfn: getExperiment,
+} = appInitialChunk;
+const { i: initializeSubscriptionQueries, n: subscriptionAccountQueryOptions } =
+  queriesChunk;
+const {
+  a: markStudentOnboardingShown,
+  d: CheckoutThemeFrame,
+  g: proMobileFeatureIds,
+  h: proDesktopFeatureIds,
+  l: Student2026Tour,
+  n: shouldShowStudentOnboarding,
+  p: ProTour,
+  r: consumePendingStudentOnboarding,
+  s: StudentTour,
+  t: initializeSubscriptionOnboardingContent,
+  v: PlusTour,
+} = contentChunk;
+
+type JsxRuntime = import("@rchunk/app-shared").JsxRuntime;
+type ReactRuntime = import("@rchunk/app-shared").ReactRuntime;
 
 interface LocationState {
   hash: string;
@@ -129,17 +147,17 @@ const MAC_X64_URL =
 const WINDOWS_URL =
   "https://get.microsoft.com/installer/download/9PLM9XGG6VKS?cid=website_cta_psi";
 
-let React: any;
-let jsx: any;
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 let initialized = false;
 function initializeSubscriptionOnboarding(): void {
   if (initialized) return;
-  initializeRuntimeLazy?.();
-  initializeSharedComponents?.();
-  initializeSubscriptionQueries?.();
-  content.t?.();
-  React = typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
-  jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
+  initializeRuntimeLazy();
+  initializeSharedComponents();
+  initializeSubscriptionQueries();
+  initializeSubscriptionOnboardingContent();
+  React = getReactRuntime();
+  jsx = getJsxRuntime();
   initialized = true;
 }
 
@@ -199,9 +217,8 @@ function SubscriptionOnboardingFrame({
   open,
   titleId,
 }: SubscriptionOnboardingFrameProps): unknown {
-  const DialogComponent = Dialog ?? "div";
-  const intl = useIntl?.();
-  return jsx.jsx(DialogComponent, {
+  const intl = useIntl();
+  return jsx.jsx(Dialog, {
     open,
     onOpenChange,
     onCloseComplete,
@@ -214,7 +231,7 @@ function SubscriptionOnboardingFrame({
       "aria-labelledby": titleId,
       "aria-describedby": descriptionId,
     },
-    children: jsx.jsxs(content.d, {
+    children: jsx.jsxs(CheckoutThemeFrame, {
       className: "max-h-[calc(100dvh-16px)] overflow-y-auto",
       children: [
         jsx.jsx("button", {
@@ -223,7 +240,7 @@ function SubscriptionOnboardingFrame({
             closeButtonClassName ??
             "absolute end-1.5 top-1.5 z-10 flex size-8 items-center justify-center rounded-full",
           "aria-label":
-            intl?.formatMessage?.({
+            intl.formatMessage({
               id: "codex.dialog.closeButton",
               defaultMessage: "Close dialog",
               description:
@@ -256,7 +273,7 @@ function renderEmpty(props: SubscriptionOnboardingProps): unknown {
 
 function useLocation(): LocationState {
   return (
-    appInitial.i_n?.() ?? {
+    useRouterLocation() ?? {
       pathname: window.location?.pathname ?? "/",
       search: window.location?.search ?? "",
       hash: window.location?.hash ?? "",
@@ -268,17 +285,13 @@ function useNavigate(): (
   destination: string | Pick<LocationState, "hash" | "pathname" | "search">,
   options?: { replace?: boolean; state?: unknown },
 ) => void {
-  return appInitial.o_n?.() ?? (() => {});
+  return useRouterNavigate();
 }
 function experiment(id: string): {
   get<Value>(key: string, fallback: Value): Value;
 } {
-  const context = appInitial.lfn?.();
-  return (
-    appInitial.rfn?.(context, id) ?? {
-      get: <Value>(_key: string, fallback: Value) => fallback,
-    }
-  );
+  const context = useExperimentContext();
+  return getExperiment(context, id);
 }
 
 function ConversationalOnboarding({
@@ -309,7 +322,8 @@ function StudentOnboardingHost(props: StudentOnboardingHostProps): unknown {
   const pendingAction = React.useRef(null as string | null);
   const location = useLocation();
   const navigate = useNavigate();
-  const automatic = props.automatic || content.r(props.account);
+  const automatic =
+    props.automatic || consumePendingStudentOnboarding(props.account);
   const showModern = experiment("2272277762").get<boolean>("enabled", false);
   const common = {
     Frame: SubscriptionOnboardingFrame,
@@ -322,7 +336,7 @@ function StudentOnboardingHost(props: StudentOnboardingHostProps): unknown {
     },
     onInteraction: (event: OnboardingAction) => {
       if (event.action === "step_viewed") {
-        content.a(props.account);
+        markStudentOnboardingShown(props.account);
         props.onPresented?.();
       }
       props.onInteraction?.(event);
@@ -345,14 +359,14 @@ function StudentOnboardingHost(props: StudentOnboardingHostProps): unknown {
   };
   if (!automatic) return null;
   return showModern
-    ? jsx.jsx(content.l, {
+    ? jsx.jsx(Student2026Tour, {
         ...common,
         showPluginsAction: true,
         showWorkAction: props.canStartConversation,
         showSitesAction: props.onStartSite != null,
         showVoiceAction: props.onStartVoice != null,
       })
-    : jsx.jsx(content.s, {
+    : jsx.jsx(StudentTour, {
         ...common,
         showWorkAction: props.canStartConversation,
         showFilesAction: props.onOpenFileDialog != null,
@@ -414,13 +428,13 @@ function PlanOnboarding(props: PlanOnboardingProps): unknown {
         onStart: props.onStartConversation,
       })
     : plan === "plus"
-      ? jsx.jsx(content.v, common)
-      : jsx.jsx(content.p, {
+      ? jsx.jsx(PlusTour, common)
+      : jsx.jsx(ProTour, {
           ...common,
           featurePageIds:
             platformFromUserAgent(navigator.userAgent) == null
-              ? content.g
-              : content.h,
+              ? proMobileFeatureIds
+              : proDesktopFeatureIds,
           canStartVoice: props.onStartVoice != null,
           canStartWork: props.canStartConversation,
         });
@@ -435,7 +449,7 @@ function PlanOnboarding(props: PlanOnboardingProps): unknown {
 
 function SubscriptionOnboarding(props: SubscriptionOnboardingProps): unknown {
   initializeSubscriptionOnboarding();
-  const auth = appInitial.N6t?.() ?? {};
+  const auth = useAuthenticatedAccount();
   const accountId = auth.accountId ?? "";
   const queryOptions = {
     ...subscriptionAccountQueryOptions<SubscriptionAccountResult>(accountId),
@@ -457,7 +471,7 @@ function SubscriptionOnboarding(props: SubscriptionOnboardingProps): unknown {
   };
   const automaticStudent =
     (location.search === "" || location.search === "?refresh_account=true") &&
-    content.n(isStudentAccount);
+    shouldShowStudentOnboarding(isStudentAccount);
   const campaignStudent =
     (location.search === "?refresh_account=true&campaign=students_2026" ||
       location.search === "?campaign=students_2026") &&
@@ -479,7 +493,7 @@ function SubscriptionOnboarding(props: SubscriptionOnboardingProps): unknown {
     account?.account_id === auth.accountId &&
     account?.structure === "personal" &&
     props.canPresent &&
-    !appInitial.Gzt?.();
+    !isSubscriptionOnboardingSuppressed();
 
   if (!ready || (!student && !(routeEligible && validPlan)))
     return renderEmpty(props);
