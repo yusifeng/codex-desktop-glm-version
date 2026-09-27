@@ -1160,6 +1160,8 @@ declare module "@rchunk/app-shared" {
   /** Permission dropdown 的 chevron 与选中图标。 */
   export const cy: (props: SimpleIconProps) => unknown;
   export const iy: (props: SimpleIconProps) => unknown;
+  /** 下拉菜单使用的向下箭头。 */
+  export const sy: (props: SimpleIconProps) => unknown;
   /** Report 图标组件（内部 F9e）。 */
   export const mb: (props: Record<string, unknown>) => unknown;
   /** query runtime 初始化器。 */
@@ -3306,7 +3308,7 @@ declare module "@rchunk/app-initial" {
   export const Rht: any;
   export const kht: any;
   export const zPt: any;
-  export const $ln: (key: string) => readonly unknown[];
+  export const $ln: (key: string, parameters?: unknown) => readonly unknown[];
   export const Qln: (event: string, payload: unknown) => Promise<unknown>;
   export const aun: () => void;
   export const nun: () => void;
@@ -4202,6 +4204,29 @@ declare module "@rchunk/app-initial" {
   export const dgn: string;
   export const Sln: unknown;
   export const Ysn: unknown;
+  /** Pull request revision/checks 基础依赖。 */
+  export const $v: (props: Record<string, unknown>) => unknown;
+  export const Hg: () => void;
+  export const Vg: (props: Record<string, unknown>) => unknown;
+  export const ey: () => void;
+  export const Gy: unknown;
+  export const Xy: (
+    method: string,
+    parameters: unknown,
+    options: { signal: AbortSignal; source: string },
+  ) => Promise<unknown>;
+  export const Yy: () => void;
+  export const gy: unknown;
+  export const i5t: () => void;
+  export const nrn: () => void;
+  export const qy: () => void;
+  export const t5t: (account: unknown) => unknown;
+  export const dat: () => void;
+  export const uat: (props: {
+    className?: string;
+    linesAdded: number;
+    linesRemoved: number;
+  }) => unknown;
   /** git-review 基础层：unified patch 解析与初始化。 */
   export const XO: (patch: string) => Array<{
     additions: number;
@@ -4302,6 +4327,50 @@ declare module "@rchunk/pull-request-detail-model" {
   export const r: (...arguments_: unknown[]) => unknown;
   export const s: () => void;
   export const t: (...arguments_: unknown[]) => unknown;
+}
+
+declare module "@rchunk/full-content-metadata" {
+  export interface DiffContentBlock {
+    additionLineIndex: number;
+    additions: number;
+    deletionLineIndex: number;
+    deletions: number;
+    lines: number;
+    type: string;
+    [key: string]: unknown;
+  }
+  export interface DiffHunk {
+    additionCount: number;
+    additionStart: number;
+    deletionCount: number;
+    deletionStart: number;
+    hunkContent: DiffContentBlock[];
+    splitLineCount: number;
+    unifiedLineCount: number;
+    [key: string]: unknown;
+  }
+  export interface PartialDiffMetadata {
+    additionLines: string[];
+    cacheKey?: string | null;
+    deletionLines: string[];
+    hunks: DiffHunk[];
+    name: string;
+    newObjectId?: string | null;
+    prevObjectId?: string | null;
+    [key: string]: unknown;
+  }
+  export const n: () => { lines: never[]; type: "success" };
+  export const r: () => void;
+  export const t: (
+    metadata: PartialDiffMetadata,
+    deletionLines: string[],
+    additionLines: string[],
+    options?: { ignoreWhitespace?: boolean },
+  ) => (PartialDiffMetadata & {
+    isPartial: false;
+    splitLineCount: number;
+    unifiedLineCount: number;
+  }) | null;
 }
 
 declare module "@rchunk/subscription-update-plan" {
