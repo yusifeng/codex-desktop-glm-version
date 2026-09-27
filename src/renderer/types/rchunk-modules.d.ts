@@ -4566,6 +4566,61 @@ declare module "@rchunk/app-initial" {
   export const _any: any;
 }
 
+declare module "@rchunk/app-shared" {
+  export const $I: (options: unknown) => unknown;
+}
+
+declare module "@rchunk/app-initial" {
+  export const Gv: () => { selectedHostId: string };
+}
+
+declare module "@rchunk/cloud-environment-queries" {
+  export interface CloudEnvironment {
+    id?: string;
+    slug?: string;
+    label: string;
+    description?: string;
+    repos: string[];
+    permissions?: { can_delete?: boolean; can_write?: boolean };
+    machine_id?: string;
+    setup?: string | string[];
+    maintenance_setup?: string | string[];
+    env_vars?: Record<string, string>;
+    [key: string]: unknown;
+  }
+  export interface EnvironmentForm {
+    label: string;
+    description: string;
+    machineId: string;
+    setupCommands: string;
+    maintenanceSetupCommands: string;
+    repositoryId: string;
+    [key: string]: unknown;
+  }
+  export const i: (query: string) => unknown;
+  export const t: import("@rchunk/app-shared").ScopedSignalFamily<unknown, string, unknown>;
+  export const l: import("@rchunk/app-shared").ScopedSignal<unknown, unknown>;
+  export const p: import("@rchunk/app-shared").ScopedSignal<unknown, unknown>;
+  export const u: import("@rchunk/app-shared").ScopedSignal<unknown, unknown>;
+  export const f: import("@rchunk/app-shared").ScopedSignal<unknown, unknown>;
+  export const x: (environment?: CloudEnvironment | null, fallbackConnectorId?: string | null) => EnvironmentForm;
+  export const w: (form: EnvironmentForm) => Record<string, string>;
+  export const v: (form: EnvironmentForm, canChangeMachine: boolean, currentMachineId: string) => boolean;
+  export const y: (form: EnvironmentForm) => Record<string, unknown>;
+}
+
+declare module "@rchunk/cloud-environments-settings-page" {
+  export const CloudEnvironmentsSettingsPage: () => unknown;
+}
+
+declare module "@rchunk/local-environments-settings-page" {
+  export const LocalEnvironmentsSettings: () => unknown;
+}
+
+declare module "@rchunk/personal-vault-settings" {
+  export const PersonalVaultSettings: (props: { onBack(): void }) => unknown;
+}
+
 declare module "@rchunk/pull-request-code-review-navigation-core" {
   export const C: (...arguments_: unknown[]) => void;
   export const S: (...arguments_: unknown[]) => void;
