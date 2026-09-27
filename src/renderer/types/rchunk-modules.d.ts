@@ -9459,6 +9459,43 @@ declare module "@rchunk/workspace-agent-detail-page" {
   export const WorkspaceAgentDetailPage: (props: { agentId?: string; useLegacyRoute?: boolean; data?: WorkspaceAgentDetailData | null; isLoading?: boolean; errorStatus?: number; onRetry?(): void; onOpenLegacy?(): void }) => unknown;
 }
 
+declare module "@rchunk/datadog-rum-browser" { const rum: unknown; export default rum; }
+declare module "@rchunk/browser-mfa-session" { const session: unknown; export default session; }
+declare module "@rchunk/mobile-age-verification-page" {
+  export type MobileAgeVerificationStatus = "loading" | "active" | "success" | "cancelled" | "error";
+  export const MobileAgeVerificationPage: (props: { inquiryId?: string; status?: MobileAgeVerificationStatus; errorCode?: string; errorStatus?: string; onStart?(): void; onResult?(url: string): void }) => unknown;
+}
+declare module "@rchunk/browser-mobile-handoff-page" {
+  export type MobileHandoffStatus = "loading" | "account_changed" | "unavailable" | "ready";
+  export const BrowserMobileHandoffPage: (props: { status?: MobileHandoffStatus; redirectTo?: string; onContinue?(url: string): void }) => unknown;
+}
+declare module "@rchunk/browser-mfa-enroll-page" {
+  export type MfaEnrollStatus = "loading" | "ready" | "reauthenticate" | "email_required" | "error";
+  export const BrowserMfaEnrollPage: (props: { status?: MfaEnrollStatus; token?: string; factor?: "passkey" | "totp"; appName?: string; redirectPath?: string; onReauthenticate?(): void; onRetry?(): void }) => unknown;
+}
+declare module "@rchunk/browser-mfa-disable-page" {
+  export type MfaDisableStatus = "loading" | "ready" | "reauthenticate" | "disabled" | "no_default" | "error";
+  export const BrowserMfaDisablePage: (props: { status?: MfaDisableStatus; onDisable?(): void; onReauthenticate?(): void; onRetry?(): void; onReturn?(): void }) => unknown;
+}
+declare module "@rchunk/browser-logout-page" {
+  export type BrowserLogoutStatus = "confirm" | "pending" | "error" | "complete";
+  export const BrowserLogoutPage: (props: { email?: string; status?: BrowserLogoutStatus; logoutAllDevices?: boolean; onConfirm?(): void; onCancel?(): void }) => unknown;
+}
+declare module "@rchunk/verify-guardian-page" {
+  export type GuardianVerificationPhase = "loading" | "refreshing" | "active" | "pending" | "canceled" | "error" | "refresh-error" | "redirect";
+  export const VerifyGuardianPage: (props: { accountId?: string; userId?: string; phase?: GuardianVerificationPhase; onRetry?(): void; onReturn?(): void }) => unknown;
+}
+declare module "@rchunk/verify-age-page" {
+  export type AgeVerificationPhase = "loading" | "refreshing" | "active" | "pending" | "canceled" | "error" | "refresh-error" | "redirect";
+  export const VerifyAgePage: (props: { accountId?: string; userId?: string; phase?: AgeVerificationPhase; onRetry?(): void; onReturn?(): void }) => unknown;
+}
+declare module "@rchunk/icloud-hosted-page" {
+  export type ICloudHostedStatus = "loading" | "ready" | "unavailable" | "finished";
+  export interface ICloudHostedPageProps { status?: ICloudHostedStatus; service?: "mail" | "calendar"; userId?: string; accountId?: string; children?: unknown; onReturn?(result: "connected" | "cancelled" | "unavailable"): void; }
+  export const ICloudHostedPage: (props: ICloudHostedPageProps) => unknown;
+  export const ICloudHostedCompletionPage: (props: Pick<ICloudHostedPageProps, "onReturn">) => unknown;
+}
+
 declare module "@rchunk/app-shared" {
   /** invokeDesktopBridgePromise（桌面桥 Promise 规范化）。 */
   export const UI: <Result>(request: Promise<Result>, signal?: AbortSignal) => Promise<Result>;
