@@ -5279,7 +5279,8 @@ declare module "@rchunk/conversation-diff-comments" { export interface Conversat
 declare module "@rchunk/artifact-preview-header" { export const n: () => void; export const r: (action: (() => Promise<void> | void) | undefined) => Promise<{ ok: boolean; error?: string }>; export const t: (props: { canDownload?: boolean; downloading?: boolean; openTargets?: Array<{ id: string; label: string }>; title?: string; onDownload?(): Promise<void> | void; onOpen?(targetId: string): void; onReveal?(): void }) => unknown; }
 declare module "@rchunk/compact-empty-state" { export const n: () => void; export const t: (props: { actions?: unknown; className?: string; contentClassName?: string; description?: unknown; icon: unknown; title: unknown }) => unknown }
 declare module "@rchunk/file-viewer-frame" { export const n: () => void; export const t: (props: { className?: string; filePath: string; fileViewer: { hostId?: string; [key: string]: unknown }; lifetime?: unknown; mcpAppId: string; recipient?: unknown }) => unknown }
-declare module "@rchunk/text-file-editor-tab-content";
+declare module "@rchunk/text-file-editor-tab-content" { export interface TextFileEditorProps { content?: string; editor: { kind: "pierre" | "code" | string }; filePath: string; isActive?: boolean; language?: string; onDraftChange?(content: string): void; onSaveChange?(saved: boolean): void; onUnsavedChangesChange?(unsaved: boolean): void; readOnly?: boolean; tabId: string } export const i: () => void; export const n: () => void; export const r: (environmentId: string, cwd: string) => string; export const t: (props: TextFileEditorProps) => unknown; }
+declare module "@rchunk/codemirror-state-runtime"; declare module "@rchunk/codemirror-view-runtime"; declare module "@rchunk/codemirror-commands-runtime"; declare module "@rchunk/codemirror-language-runtime"; declare module "@rchunk/text-editor-merge-runtime"; declare module "@rchunk/read-saved-plan-content";
 declare module "@rchunk/gate";
 declare module "@rchunk/File";
 declare module "@rchunk/file-blank";
@@ -9687,7 +9688,7 @@ declare module "@rchunk/environment-configuration-fields" {
   export const r: (props: { disabled?: boolean; domains: string[]; onChange(domains: string[]): void; issues?: EnvironmentIssue[] }) => unknown;
   export const t: (props: Record<string, unknown> & { draft: EnvironmentDraft; onDraftChange(change: Partial<EnvironmentDraft>): void; secrets: EnvironmentSecret[]; setSecrets(secrets: EnvironmentSecret[]): void }) => unknown;
 }
-declare module "@rchunk/diff-file-view" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/diff-file-view" { export interface DiffFile { name?: string; path?: string; contents?: string; additions?: number; deletions?: number } export interface DiffFileViewProps { className?: string; edit?: boolean; file: DiffFile; lineAnnotations?: readonly { line: number; label?: string }[]; onEditChange?(contents: string): void; onEditComplete?(contents: string): "accept" | "reject" | void; selectedLines?: readonly number[]; style?: Record<string, unknown> } export const n: () => void; export const t: (props: DiffFileViewProps) => unknown; }
 declare module "@rchunk/outbound-identity-connection-dialog" {
   export interface OutboundIdentityConnection extends Record<string, unknown> {
     connection_id: string;
@@ -10155,6 +10156,11 @@ declare module "@rchunk/use-git-recent-branches" {
 }
 
 declare module "@rchunk/layout" {
+  export interface TextLayoutOptions { tabSize?: number; whiteSpace?: "normal" | "pre" | "pre-wrap" }
+  export interface TextLayout { font: string; options: TextLayoutOptions; text: string }
+  export const n: (layout: TextLayout, maxWidth: number, lineHeight: number) => { height: number; lineCount: number };
+  export const r: (text: string, font: string, options?: TextLayoutOptions) => TextLayout;
+  export const t: () => void;
   const _default: unknown;
   export default _default;
 }
@@ -11392,9 +11398,13 @@ declare module "@rchunk/file-diff" {
 }
 
 declare module "@rchunk/codex-writing-block-directive-renderer" {
+  export interface WritingBlockDirective { content?: string; id?: string; metadata?: { recipients?: string[]; subject?: string }; title?: string; variant?: "document" | "email" | string }
+  export interface CodexWritingBlockDirectiveRendererProps { directive: WritingBlockDirective; editable?: boolean; onBlur?(): void; onContentChange?(content: string): void; onRecipientChange?(recipients: string[]): void; onSubjectChange?(subject: string): void; render?(content: string): unknown }
+  export const CodexWritingBlockDirectiveRenderer: (props: CodexWritingBlockDirectiveRendererProps) => unknown;
   const _default: unknown;
   export default _default;
 }
+declare module "@rchunk/editable-writing-block"; declare module "@rchunk/writing-block-app-capabilities"; declare module "@rchunk/writing-block-content-update"; declare module "@rchunk/writing-block-directive-renderer";
 
 declare module "@rchunk/active-tool-activity-label" {
   export const n: () => void;
