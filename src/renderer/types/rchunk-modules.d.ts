@@ -5230,6 +5230,18 @@ declare module "@rchunk/automation-frequency-section";
 declare module "@rchunk/platform-ui-kit-provider";
 declare module "@rchunk/navigation-blocker";
 declare module "@rchunk/automation-share-dialog";
+declare module "@rchunk/binary-preview-source";
+declare module "@rchunk/surface";
+declare module "@rchunk/pdf-preview-diff";
+declare module "@rchunk/diff-source" {
+  export interface DiffHunk { hunkId: string; lineEnd: number; lineMapping?: "contiguous" | string; lineSpans?: Array<{ end: number; lineEnd: number; lineStart: number; side?: "left" | "right" | "unified"; start: number }>; lineStart: number; text: string }
+  export interface DiffFile { hunks: DiffHunk[]; path: string }
+  export const i: (props: { path: string; skipFindHighlight?: boolean }) => (element: Element | null) => void; export const n: () => void; export const r: () => void;
+  export const t: (input: { contextId: string; getFiles(): DiffFile[]; preserveScrollBeforeResultClear?: boolean; scrollAdapter: Record<string, unknown> }) => Record<string, unknown>;
+}
+declare module "@rchunk/code-diff-context-menu" {
+  export const a: (input: Record<string, unknown>) => Record<string, unknown>; export const c: (...arguments_: unknown[]) => Promise<void>; export const d: (props: Record<string, unknown>) => unknown; export const f: () => void; export const i: (...arguments_: unknown[]) => Promise<unknown>; export const l: (props: Record<string, unknown>) => unknown; export const m: () => void; export const n: () => void; export const o: () => void; export const p: (props: Record<string, unknown>) => unknown; export const r: Readonly<{ key: "preferred-open-target" }>; export const s: (...arguments_: unknown[]) => Promise<void>; export const t: (props: Record<string, unknown>) => unknown; export const u: () => void;
+}
 declare module "@rchunk/automation-editor-dialog" {
   import type { AutomationDraft, AutomationRecord } from "@rchunk/schedule-draft";
   import type { AutomationItem } from "@rchunk/schedule-fields";
