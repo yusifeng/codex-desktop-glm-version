@@ -9519,6 +9519,21 @@ declare module "@rchunk/submit-artifact-feedback" {
   import type { FeedbackAppInfo, FeedbackTransport } from "@rchunk/submit-feedback";
   export const submitArtifactFeedback: (scope: unknown, context: { appInfo?: FeedbackAppInfo; artifactType: string; classification: string; description: string; fileFormat: string; fileSizeBytes?: number; hostId?: string; path?: string; planType?: string; threadId?: string; metadata?: { authoringTurnCount?: number; modelConfigurations?: readonly string[]; connectorIds?: readonly string[]; connectorNames?: readonly string[]; pluginIds?: readonly string[]; skillIds?: readonly string[]; platform?: string; skillPluginConnectorUsageCollected?: boolean; generatedSourcePaths?: readonly string[] }; transport: FeedbackTransport }, answers: { attachArtifact: boolean; includeLogs: boolean; influences: readonly string[]; rating: string; timeSaved?: string | null }) => Promise<{ feedbackId: string }>;
 }
+declare module "@rchunk/thumb-mixed" { const thumbMixed: unknown; export default thumbMixed; }
+declare module "@rchunk/artifact-feedback-dialog" {
+  export type ArtifactFeedbackRating = "better" | "same" | "worse";
+  export type ArtifactFeedbackInfluence = "content" | "visual_quality" | "time_saved" | "other";
+  export type ArtifactFeedbackTimeSaved = "under_15_minutes" | "15_to_under_60_minutes" | "1_to_under_4_hours" | "4_to_under_8_hours" | "8_hours_or_more";
+  export interface FeedbackArtifact { artifactType: string; fileFormat: string; label: string; path?: string | null; allowArtifactAttachment?: boolean; }
+  export interface ArtifactFeedbackValue { attachArtifact: boolean; details: string; includeLogs: boolean; influences: ArtifactFeedbackInfluence[]; rating: ArtifactFeedbackRating; timeSaved: ArtifactFeedbackTimeSaved | null; }
+  export interface ArtifactFeedbackDialogProps { artifacts: readonly FeedbackArtifact[]; onClose(): void; onSubmit(value: ArtifactFeedbackValue, artifact?: FeedbackArtifact): boolean | Promise<boolean>; showArtifactSelector?: boolean; }
+  export const ArtifactFeedbackDialog: (props: ArtifactFeedbackDialogProps) => unknown;
+}
+declare module "@rchunk/artifact-feedback-button" {
+  import type { ArtifactFeedbackDialogProps, ArtifactFeedbackValue, FeedbackArtifact } from "@rchunk/artifact-feedback-dialog";
+  export const n: () => void;
+  export const t: (props: { artifacts: readonly FeedbackArtifact[]; fileSizeBytes?: number; hostId?: string; showArtifactSelector?: boolean; variant?: "icon" | "text" | "manualEditHeader"; onOpenFeedback?(input: { artifacts: readonly FeedbackArtifact[]; showArtifactSelector: boolean; Dialog: (props: ArtifactFeedbackDialogProps) => unknown; submit(value: ArtifactFeedbackValue, artifact?: FeedbackArtifact): Promise<boolean> }): void; onSubmit?(value: ArtifactFeedbackValue, artifact: FeedbackArtifact): Promise<boolean> | boolean; onError?(error: unknown): void }) => unknown;
+}
 declare module "@rchunk/subscription-platform-dialog" {
   export type SubscriptionManagementSource = "app_store" | "google_play_store" | "partner_managed";
   export const SubscriptionPlatformDialog: (props: { account: { account: { plan_type?: string | null } }; managementSource: SubscriptionManagementSource; showProLevels?: boolean; onClose(): void; onOpenStore?(url: string): void }) => unknown;
