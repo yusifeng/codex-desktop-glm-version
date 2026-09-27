@@ -1,10 +1,11 @@
 // app-info —— Connector API app 转 UI app model。
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type { AppInfo, ConnectorApp } from "@rchunk/app-info";
 
 void runtimeChunk;
 
-function toAppInfo(app: Record<string, any>): Record<string, any> {
+function toAppInfo(app: ConnectorApp): AppInfo {
   return {
     id: app.id,
     name: app.name,
