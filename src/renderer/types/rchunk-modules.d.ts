@@ -4694,6 +4694,17 @@ declare module "@rchunk/remote-connection-editor-modal" {
   export const RemoteConnectionEditorModal: (props: { connection?: RemoteConnectionDraft | null; hostId: string; isLoading?: boolean; isSaving?: boolean; onClose(): void; onSave?(connection: RemoteConnectionDraft): Promise<void> | void }) => unknown;
 }
 
+declare module "@rchunk/epic-launch-contracts";
+declare module "@rchunk/shield-check";
+declare module "@rchunk/app-initial" { export const B6t: unknown; }
+declare module "@rchunk/epic-launch-page" { export const EpicLaunchPage: () => unknown; }
+declare module "@rchunk/browser-auth-error-page" { export const BrowserAuthErrorPage: () => unknown; }
+declare module "@rchunk/demo-tools-setup-page" { export const DemoToolsSetupPage: () => unknown; }
+declare module "@rchunk/app-connect-oauth-callback-page" {
+  export interface AppConnectCallbackResult { appId?: string; error?: string; success: boolean; }
+  export const AppConnectOAuthCallbackPage: (props?: { completeCallback?(parameters: URLSearchParams): Promise<AppConnectCallbackResult> }) => unknown;
+}
+
 declare module "@rchunk/pull-request-code-review-navigation-core" {
   export const C: (...arguments_: unknown[]) => void;
   export const S: (...arguments_: unknown[]) => void;
