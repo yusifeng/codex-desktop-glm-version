@@ -2361,4 +2361,9 @@ export const REWRITTEN = new Set([
   "notebook-preview-panel",
   "pdf-preview-panel",
   "library-json-preview",
+  "read-saved-plan-content",
+  "writing-block-content-update",
+  "writing-block-directive-renderer",
+  "chatgpt-file-upload",
+  "terminal-workspace-warning-state",
 ]);

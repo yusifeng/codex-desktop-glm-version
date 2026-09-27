@@ -5280,7 +5280,8 @@ declare module "@rchunk/artifact-preview-header" { export const n: () => void; e
 declare module "@rchunk/compact-empty-state" { export const n: () => void; export const t: (props: { actions?: unknown; className?: string; contentClassName?: string; description?: unknown; icon: unknown; title: unknown }) => unknown }
 declare module "@rchunk/file-viewer-frame" { export const n: () => void; export const t: (props: { className?: string; filePath: string; fileViewer: { hostId?: string; [key: string]: unknown }; lifetime?: unknown; mcpAppId: string; recipient?: unknown }) => unknown }
 declare module "@rchunk/text-file-editor-tab-content" { export interface TextFileEditorProps { content?: string; editor: { kind: "pierre" | "code" | string }; filePath: string; isActive?: boolean; language?: string; onDraftChange?(content: string): void; onSaveChange?(saved: boolean): void; onUnsavedChangesChange?(unsaved: boolean): void; readOnly?: boolean; tabId: string } export const i: () => void; export const n: () => void; export const r: (environmentId: string, cwd: string) => string; export const t: (props: TextFileEditorProps) => unknown; }
-declare module "@rchunk/codemirror-state-runtime"; declare module "@rchunk/codemirror-view-runtime"; declare module "@rchunk/codemirror-commands-runtime"; declare module "@rchunk/codemirror-language-runtime"; declare module "@rchunk/text-editor-merge-runtime"; declare module "@rchunk/read-saved-plan-content";
+declare module "@rchunk/codemirror-state-runtime"; declare module "@rchunk/codemirror-view-runtime"; declare module "@rchunk/codemirror-commands-runtime"; declare module "@rchunk/codemirror-language-runtime"; declare module "@rchunk/text-editor-merge-runtime";
+declare module "@rchunk/read-saved-plan-content" { export interface ReadSavedPlanContentInput { hostId: string; path: string; save?: (() => boolean | Promise<boolean>) | null } export const n: (input: ReadSavedPlanContentInput) => Promise<string>; export const t: () => void }
 declare module "@rchunk/gate";
 declare module "@rchunk/File";
 declare module "@rchunk/file-blank";
@@ -6423,7 +6424,16 @@ declare module "@rchunk/api" {
   export const s: (pluginId: string, accountId: string, file: PluginArchiveFile) => Promise<void>;
   export const t: (pluginId: string, accountId: string, signal?: AbortSignal) => Promise<boolean>;
 }
-declare module "@rchunk/chatgpt-file-upload";
+declare module "@rchunk/chatgpt-file-upload" {
+  export const ChatGptFileUploadIncompleteError: new (...arguments_: unknown[]) => Error;
+  export const MAX_CHATGPT_UPLOAD_SIZE_BYTES: number;
+  export const MAX_CONCURRENT_CHATGPT_FILE_UPLOADS: number;
+  export const createChatGptFile: (...arguments_: unknown[]) => unknown;
+  export const processChatGptFileUploadStream: (...arguments_: unknown[]) => unknown;
+  export const uploadChatGptConversationFile: (...arguments_: unknown[]) => unknown;
+  export const uploadChatGptFileBytes: (...arguments_: unknown[]) => unknown;
+  export const uploadChatGptProjectFiles: (...arguments_: unknown[]) => unknown;
+}
 declare module "@rchunk/share-menu-item" {
   export interface SharePlugin { can_publish_to_workspace?: boolean; can_share_to_workspace?: boolean; canonical_app_id?: string | null; creator_account_user_id?: string | null; discoverability?: string | null; installPolicy?: string; installed?: boolean; is_deletable_workspace_plugin?: boolean; scope?: "GLOBAL" | "USER" | "WORKSPACE"; source?: { type?: string }; workspace_id?: string | null; [key: string]: unknown }
   export interface ShareAccount { account_user_id?: string; account_user_role?: string; id: string; structure: "personal" | "workspace" }
@@ -6461,7 +6471,7 @@ declare module "@rchunk/plugin-share-dialogs-runtime" {
 }
 declare module "@rchunk/loading-page";
 declare module "@rchunk/plugin-share-dialog-entry";
-declare module "@rchunk/terminal-workspace-warning-state";
+declare module "@rchunk/terminal-workspace-warning-state" { export interface WorkspaceTarget { hostId?: string | null; workspaceRoot?: string | null } export interface TerminalWarningInput { binding?: WorkspaceTarget | null; currentTarget: WorkspaceTarget; currentWorkspaceRoots: readonly string[]; dismissedTarget?: WorkspaceTarget | null } export interface TerminalWarningState { dismissedTarget: WorkspaceTarget | null; dismiss(target: WorkspaceTarget): void; reset(): void } export const n: (input: TerminalWarningInput) => boolean; export const r: TerminalWarningState; export const t: () => void }
 declare module "@rchunk/thread-shell-runtime" {
   export type TerminalPanel = "bottom" | "right";
   export interface ThreadTerminalContext { conversationId: string; conversationTitle?: string; cwd?: string | null; hostId?: string }
@@ -11404,7 +11414,22 @@ declare module "@rchunk/codex-writing-block-directive-renderer" {
   const _default: unknown;
   export default _default;
 }
-declare module "@rchunk/editable-writing-block"; declare module "@rchunk/writing-block-app-capabilities"; declare module "@rchunk/writing-block-content-update"; declare module "@rchunk/writing-block-directive-renderer";
+declare module "@rchunk/editable-writing-block" { export const t: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/writing-block-app-capabilities";
+declare module "@rchunk/writing-block-content-update" { export interface ToneSection { content: string; id: string; tone: string; [key: string]: unknown } export interface ToneSectionControllerInput { isPersistenceReady: boolean; isStreaming: boolean; metadata?: { active_option_id?: unknown } | null; onPersistSelection?(id: string): void; storedActiveToneSectionId?: string | null; toneSections?: readonly ToneSection[] | null } export interface ToneSectionController { activeToneSectionId?: string; displayedToneSections: readonly ToneSection[]; selectToneSection(id: string): void } export interface ContentUpdateInput { nextContent: string; toneSectionId?: string | null; toneSections?: readonly ToneSection[] | null } export const a: () => void; export const i: () => void; export const n: <T extends Record<string, unknown>>(metadata: T, toneSections: readonly ToneSection[] | null | undefined) => T & { tone_sections?: Array<{ content: string; id: string; label: string }> }; export const o: (input: ToneSectionControllerInput) => ToneSectionController; export const r: (sections: readonly ToneSection[] | null | undefined, id: string | null | undefined) => { id?: string; index?: number; isOriginal: boolean }; export const t: (input: ContentUpdateInput) => { activeToneSectionId?: string; content: string; toneSections?: readonly ToneSection[] | null } }
+declare module "@rchunk/writing-block-directive-renderer" { export interface ContentReference { id?: string; replacement?: string; text?: string } export interface ToneSection { content: string; id: string; tone: string; [key: string]: unknown } export interface ParsedWritingBlock { bodyContent: string; content: string; emailMetadata: { bcc?: string; cc?: string; recipient?: string; subject?: string }; id?: string; metadata?: Record<string, unknown>; title?: string; toneSections?: ToneSection[]; variant?: string } export interface WritingBlockDirectiveProps { attributes?: Record<string, unknown>; contentReferences?: readonly ContentReference[]; isStreaming?: boolean; rawText?: string | null; renderExtension?(block: ParsedWritingBlock): unknown; renderPersisted?(block: ParsedWritingBlock): unknown; testId?: string } export const a: <T extends { content: string; edited?: boolean; locallyEdited?: boolean; metadata?: Record<string, unknown> }>(block: T, context: { contentReferences?: readonly ContentReference[]; isStreaming?: boolean }) => T; export const c: (input: { content: string; metadata?: Record<string, unknown>; preserveEmptySections?: boolean }) => ToneSection[] | undefined; export const i: (metadata: Record<string, unknown> | undefined, context: { contentReferences?: readonly ContentReference[]; isStreaming?: boolean }) => Record<string, unknown> | undefined; export const l: () => void; export const n: () => void; export const o: () => void; export const r: (content: string, context: { contentReferences?: readonly ContentReference[]; isStreaming?: boolean }) => string; export const s: (value: unknown) => Record<string, unknown> | undefined; export const t: (props: WritingBlockDirectiveProps) => unknown }
+
+declare module "@rchunk/app-initial" {
+  export const GRt: (...arguments_: unknown[]) => unknown;
+  export const HRt: new (...arguments_: unknown[]) => Error;
+  export const JRt: (...arguments_: unknown[]) => unknown;
+  export const KRt: () => void;
+  export const URt: number;
+  export const WRt: number;
+  export const XRt: (...arguments_: unknown[]) => unknown;
+  export const YRt: (...arguments_: unknown[]) => unknown;
+  export const qRt: (...arguments_: unknown[]) => unknown;
+}
 
 declare module "@rchunk/active-tool-activity-label" {
   export const n: () => void;

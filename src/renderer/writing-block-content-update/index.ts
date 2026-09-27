@@ -1,0 +1,16 @@
+import "@rchunk/rolldown-runtime";
+import "@rchunk/app-shared";
+import "@rchunk/app-initial";
+
+export interface ToneSection { content: string; id: string; tone: string; [key: string]: unknown }
+export interface ToneSectionSelection { index: number; section: ToneSection; shouldPersist: boolean; token: symbol }
+export interface ToneSectionControllerInput { isPersistenceReady: boolean; isStreaming: boolean; metadata?: { active_option_id?: unknown } | null; onPersistSelection?(id: string): void; storedActiveToneSectionId?: string | null; toneSections?: readonly ToneSection[] | null }
+export interface ToneSectionController { activeToneSectionId?: string; displayedToneSections: readonly ToneSection[]; selectToneSection(id: string): void }
+export interface ContentUpdateInput { nextContent: string; toneSectionId?: string | null; toneSections?: readonly ToneSection[] | null }
+function getToneSectionSelection(toneSections: readonly ToneSection[] | null | undefined, id: string | null | undefined): { id?: string; index?: number; isOriginal: boolean } { const index = toneSections?.findIndex(section => section.id === id) ?? -1; const section = toneSections?.[index]; return index > 0 && section ? { id: section.id, index, isOriginal: false } : { isOriginal: true }; }
+function attachToneSections<T extends Record<string, unknown>>(metadata: T, toneSections: readonly ToneSection[] | null | undefined): T & { tone_sections?: Array<{ content: string; id: string; label: string }> } { return toneSections == null ? metadata : { ...metadata, tone_sections: toneSections.map(section => ({ content: section.content, id: section.id, label: section.tone })) }; }
+function applyContentUpdate({ nextContent, toneSectionId, toneSections }: ContentUpdateInput): { activeToneSectionId?: string; content: string; toneSections?: readonly ToneSection[] | null } { if (!toneSections?.length || !toneSectionId || !toneSections.some(section => section.id === toneSectionId)) return { activeToneSectionId: undefined, content: nextContent, toneSections }; const updated = toneSections.map(section => section.id === toneSectionId ? { ...section, content: nextContent } : section); return { activeToneSectionId: toneSectionId, content: updated[0]?.content ?? nextContent, toneSections: updated }; }
+function createToneSectionController(input: ToneSectionControllerInput): ToneSectionController { const sections = [...(input.toneSections ?? [])]; let activeToneSectionId = typeof input.metadata?.active_option_id === "string" ? input.metadata.active_option_id : input.storedActiveToneSectionId ?? sections[0]?.id; if (!sections.some(section => section.id === activeToneSectionId)) activeToneSectionId = sections[0]?.id; return { activeToneSectionId, displayedToneSections: sections.slice(0, 3), selectToneSection(id) { if (!sections.some(section => section.id === id) || id === activeToneSectionId) return; activeToneSectionId = id; this.activeToneSectionId = id; if (input.isPersistenceReady && !input.isStreaming) input.onPersistSelection?.(id); } }; }
+function initializeWritingBlockContentUpdate(): void {}
+function initializeWritingBlockMetadata(): void {}
+export { initializeWritingBlockContentUpdate as a, initializeWritingBlockMetadata as i, attachToneSections as n, createToneSectionController as o, getToneSectionSelection as r, applyContentUpdate as t };
