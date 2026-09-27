@@ -7,17 +7,61 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
+const { wL: initializeAppSharedRuntime } = appSharedChunk;
+const {
+  Dft: initializeAppgenState,
+  GWt: initializeSiteMentions,
+  HWt: createSiteMention,
+  Man: initializeAppgenNavigation,
+  Sun: initializeSubscriptionState,
+  _pn: navigateToAppgenConversation,
+  _un: currentUserIdSignal,
+  gpn: initializeAppgenConversation,
+  jan: sitesPluginId,
+  lnn: initializeAppgenQueries,
+  mpn: intlSignal,
+  mun: currentAccountIdSignal,
+  ppn: initializeAppgenPrompts,
+  snn: getSiteConversationRoute,
+} = appInitialChunk;
+const {
+  Bf: initializeArtifactTypes,
+  Bh: artifactTypes,
+  Hh: initializePluginPrompts,
+  Rf: createPluginPrompt,
+} = appPrimaryChunk;
+
+type StartAppgenRequest =
+  | {
+      assetType: "document" | "spreadsheet" | "presentation" | "pdf" | "image";
+      cloudLibraryEnabled?: boolean;
+      type: "create-asset";
+    }
+  | { type: "create" }
+  | {
+      latestEditContext?: unknown;
+      liveUrl?: string | null;
+      projectId: string;
+      projectTitle: string;
+      type: "edit";
+    }
+  | { projectId: string; projectTitle: string; type: "publish" };
+
+interface ConversationLaunchOptions extends Record<string, unknown> {
+  activeProject?: unknown;
+  libraryFileCreation?: boolean;
+  prefillPrompt?: string;
+  startInSidebar?: boolean;
+}
 
 function startAppgenConversation(
-  scope: any,
-  startConversation: (options: any) => void,
-  request: any,
-  options: Record<string, any>,
+  scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+  startConversation: (options: ConversationLaunchOptions) => void,
+  request: StartAppgenRequest,
+  options: Record<string, unknown>,
 ): void {
-  const intl = scope.get(appInitial.mpn);
+  const intl =
+    scope.get<import("@rchunk/app-initial").AppgenConversationIntl>(intlSignal);
   let prefillPrompt: string | undefined;
 
   switch (request.type) {
@@ -30,8 +74,8 @@ function startAppgenConversation(
           const artifact =
             request.assetType === "pdf"
               ? { label: "PDF", pluginId: "pdf@openai-primary-runtime" }
-              : appPrimary.Bh[request.assetType].artifact;
-          prefillPrompt = appPrimary.Rf({
+              : artifactTypes[request.assetType].artifact;
+          prefillPrompt = createPluginPrompt({
             defaultPrompt: null,
             pluginDisplayName: artifact.label,
             pluginId: artifact.pluginId,
@@ -49,39 +93,43 @@ function startAppgenConversation(
       break;
 
     case "create":
-      prefillPrompt = appPrimary.Rf({
+      prefillPrompt = createPluginPrompt({
         defaultPrompt: intl.formatMessage({
           id: "appgenConversation.createPrompt",
           defaultMessage: "Create a website that …",
           description: "Prompt for starting a new site from the Sites page",
         }),
         pluginDisplayName: "Sites",
-        pluginId: appInitial.jan,
+        pluginId: sitesPluginId,
       });
       break;
 
     case "edit":
-      appInitial._pn(scope, appInitial.snn(request.projectId), {
-        state: {
-          ...options,
-          siteEditLiveUrl: request.liveUrl,
-          siteEditContext: {
-            accountId: scope.get(appInitial.mun),
-            userId: scope.get(appInitial._un),
-            projectId: request.projectId,
-            projectTitle: request.projectTitle,
-            latestEditContext: request.latestEditContext,
+      navigateToAppgenConversation(
+        scope,
+        getSiteConversationRoute(request.projectId),
+        {
+          state: {
+            ...options,
+            siteEditLiveUrl: request.liveUrl,
+            siteEditContext: {
+              accountId: scope.get<string | null>(currentAccountIdSignal),
+              userId: scope.get<string | null>(currentUserIdSignal),
+              projectId: request.projectId,
+              projectTitle: request.projectTitle,
+              latestEditContext: request.latestEditContext,
+            },
           },
         },
-      });
+      );
       return;
 
     case "publish": {
-      const siteMention = appInitial.HWt({
+      const siteMention = createSiteMention({
         projectId: request.projectId,
         title: request.projectTitle,
       });
-      prefillPrompt = `${appPrimary.Rf({
+      prefillPrompt = `${createPluginPrompt({
         defaultPrompt: intl.formatMessage(
           {
             id: "appgenConversation.publishPrompt",
@@ -92,7 +140,7 @@ function startAppgenConversation(
           { siteMention },
         ),
         pluginDisplayName: "Sites",
-        pluginId: appInitial.jan,
+        pluginId: sitesPluginId,
       })} `;
       break;
     }
@@ -113,16 +161,16 @@ function startAppgenConversation(
 }
 
 function initializeStartAppgenConversation(): void {
-  appShared.wL();
-  appPrimary.Hh();
-  appInitial.gpn();
-  appInitial.Sun();
-  appInitial.GWt();
-  appInitial.Dft();
-  appInitial.ppn();
-  appPrimary.Bf();
-  appInitial.Man();
-  appInitial.lnn();
+  initializeAppSharedRuntime();
+  initializePluginPrompts();
+  initializeAppgenConversation();
+  initializeSubscriptionState();
+  initializeSiteMentions();
+  initializeAppgenState();
+  initializeAppgenPrompts();
+  initializeArtifactTypes();
+  initializeAppgenNavigation();
+  initializeAppgenQueries();
 }
 
 export { startAppgenConversation as n, initializeStartAppgenConversation as t };

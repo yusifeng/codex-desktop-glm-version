@@ -3202,6 +3202,25 @@ declare module "@rchunk/app-initial" {
   ) => void;
   export const u1: (pluginId: string, navigate: (path: string) => void) => void;
   export const mun: import("@rchunk/app-shared").ReadableSignal<string | null>;
+  export interface AppgenConversationIntl {
+    formatMessage(
+      descriptor: import("@rchunk/app-shared").MessageDescriptor,
+      values?: Record<string, unknown>,
+    ): string;
+  }
+  export const mpn: import("@rchunk/app-shared").ReadableSignal<AppgenConversationIntl>;
+  export const jan: string;
+  export const snn: (projectId: string) => string;
+  export const HWt: (input: { projectId: string; title: string }) => string;
+  export const _pn: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    route: string,
+    options: { state: Record<string, unknown> },
+  ) => void;
+  export const gpn: () => void;
+  export const GWt: () => void;
+  export const ppn: () => void;
+  export const Man: () => void;
   export interface ApiClient {
     safeGet<Response>(path: string, options?: unknown): Promise<Response>;
     safePost<Response = unknown>(path: string, options?: unknown): Promise<Response>;
@@ -3702,11 +3721,23 @@ declare module "@rchunk/app-primary" {
     visit: GptMigrationVisitKey,
   ) => void;
   export const Bf: () => void;
+  export const Hh: () => void;
+  export interface ArtifactTypeDefinition {
+    artifact: { label: string; pluginId: string };
+  }
+  export const Bh: Record<
+    "document" | "spreadsheet" | "presentation",
+    ArtifactTypeDefinition
+  >;
   /** Site live URL 的主机名展示格式化器。 */
   export const xf: (liveUrl?: string | null) => string | null;
   export const yf: (currentUrl: string, candidateUrl: string) => boolean;
   export const Sf: () => void;
-  export const Rf: (input: { defaultPrompt: string; pluginDisplayName: string; pluginId: string }) => unknown;
+  export const Rf: (input: {
+    defaultPrompt: string | null;
+    pluginDisplayName: string;
+    pluginId: string;
+  }) => string;
   export const d: () => void; // O9：项目选择器依赖初始化器
   export const n: () => void;
   export const t: unknown;
@@ -5895,16 +5926,36 @@ declare module "@rchunk/appgen-project-row" {
 }
 
 declare module "@rchunk/start-appgen-conversation" {
+  export type StartAppgenRequest =
+    | {
+        assetType:
+          | "document"
+          | "spreadsheet"
+          | "presentation"
+          | "pdf"
+          | "image";
+        cloudLibraryEnabled?: boolean;
+        type: "create-asset";
+      }
+    | { type: "create" }
+    | {
+        latestEditContext?: unknown;
+        liveUrl?: string | null;
+        projectId: string;
+        projectTitle: string;
+        type: "edit";
+      }
+    | { projectId: string; projectTitle: string; type: "publish" };
+  export interface ConversationLaunchOptions extends Record<string, unknown> {
+    activeProject?: unknown;
+    libraryFileCreation?: boolean;
+    prefillPrompt?: string;
+    startInSidebar?: boolean;
+  }
   export const n: (
     scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
-    startConversation: (options: Record<string, unknown>) => void,
-    request: {
-      latestEditContext?: unknown;
-      liveUrl?: string | null;
-      projectId: string;
-      projectTitle: string;
-      type: "edit";
-    },
+    startConversation: (options: ConversationLaunchOptions) => void,
+    request: StartAppgenRequest,
     options?: Record<string, unknown>,
   ) => void;
   export const t: () => void;
