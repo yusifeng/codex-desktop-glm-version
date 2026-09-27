@@ -4690,7 +4690,10 @@ declare module "@rchunk/local-environments-settings-page" {
 }
 
 declare module "@rchunk/personal-vault-settings" {
-  export const PersonalVaultSettings: (props: { onBack(): void }) => unknown;
+  export type VaultNamespace = "not_sensitive" | "sensitive";
+  export interface PersonalVaultEntry { envVar?: string | null; id: string; name: string; namespace: VaultNamespace; targets?: string[] }
+  export interface PersonalVaultSettingsProps { entries?: readonly PersonalVaultEntry[]; error?: string | null; isLoading?: boolean; onAdd?(namespace: VaultNamespace): void; onBack(): void; onDelete?(entry: PersonalVaultEntry): void; onEdit?(entry: PersonalVaultEntry): void }
+  export const PersonalVaultSettings: (props: PersonalVaultSettingsProps) => unknown;
 }
 
 declare module "@rchunk/artifact-preview-page-navigation" {
@@ -4715,7 +4718,18 @@ declare module "@rchunk/changelog-modal" {
 
 declare module "@rchunk/chatgpt-sites";
 declare module "@rchunk/duplicate-agent" { export interface AgentManagementService { canDelete?(agentId: string): boolean; canDuplicate?(agentId: string): boolean; clone?(agentId: string, name: string): Promise<{ id: string }>; delete?(agentId: string): Promise<void>; invalidate?(keys: readonly unknown[]): void; navigateToAgent?(agentId: string): void; notify?(tone: "danger" | "success", message: string): void } export const a: (props: { agentId: string; onClose(): void; onDeleted?(): void; service?: AgentManagementService }) => unknown; export const i: () => void; export const n: (props: { onSelect(): void }) => unknown; export const o: () => void; export const r: (props: { agentId: string; onSelect(): void; service?: AgentManagementService }) => unknown; export const t: (props: { agentId: string; agentName: string; onClose(): void; service?: AgentManagementService }) => unknown }
-declare module "@rchunk/use-visible-settings-sections";
+declare module "@rchunk/use-visible-settings-sections" {
+  export type SettingsSurface = "chatGpt" | "codex" | "codexLocal" | "codexOrWorkLocal" | "chatGptOrCodex";
+  export interface SettingsSection { disabled?: boolean; externalUrl?: string; label: string; slug: string; surface?: SettingsSurface }
+  export interface VisibleSettingsOptions { buildFlavor?: "chatgpt" | "codex" | "work"; isLocalHost?: boolean; labels?: Partial<Record<string, string>>; sections?: readonly SettingsSection[] }
+  export const a: string;
+  export const i: () => void;
+  export const n: (options?: VisibleSettingsOptions) => SettingsSection[];
+  export const o: Readonly<Record<"account" | "securitySettings", { href: string; label: string }>>;
+  export const r: (slug: string, platform?: string) => { commandAsset: string; component: string; navigation: { ariaHidden: boolean } };
+  export const s: () => void;
+  export const t: () => void;
+}
 
 declare module "@rchunk/create-output-menu" {
   export type ArtifactKind = "document" | "presentation" | "spreadsheet" | "site";
@@ -7328,11 +7342,9 @@ declare module "@rchunk/library-file-picker-dialog" {
 }
 
 declare module "@rchunk/appgen-settings-page" {
-  export interface AppgenSettingsPageProps extends Record<string, unknown> {
-    onDeleted(): void;
-    projectId: string;
-  }
-  export const n: () => unknown;
+  export interface AppgenEnvironmentDraft { buildCommand?: string; outputDirectory?: string; rootDirectory?: string }
+  export interface AppgenSettingsPageProps { environment?: AppgenEnvironmentDraft | null; error?: string | null; initialEnvironmentDraft?: AppgenEnvironmentDraft; initialTitle?: string; isLoading?: boolean; onDeleted(): void; onSave?(input: { environment: AppgenEnvironmentDraft; title: string }): Promise<void> | void; projectId: string; siteUrl?: string | null }
+  export const n: (props: AppgenSettingsPageProps) => unknown;
   export const r: () => void;
   export const t: (props: AppgenSettingsPageProps) => unknown;
 }

@@ -2323,4 +2323,7 @@ export const REWRITTEN = new Set([
   "voice-configuration-manager",
   "surface",
   "thread-shell-runtime",
+  "use-visible-settings-sections",
+  "personal-vault-settings",
+  "appgen-settings-page",
 ]);
