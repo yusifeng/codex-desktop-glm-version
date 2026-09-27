@@ -1102,6 +1102,10 @@ export const CHUNKS = {
   "diff-worker-utils-parser": "dist-9a2f61daa4d5.js",
   "katex-runtime": "katex-b62b0c0d6a07.js",
   "verify-descendant": "verify-descendant-7045b49cb284.js",
+  "open-sources-side-panel-tab": "open-sources-side-panel-tab-67bcb2ae2bb1.js",
+  "local-conversation-sources-side-panel-tab-core": "local-conversation-sources-side-panel-tab-bf34acdaf32e.js",
+  "registered-sources": "registered-sources-1291c9a6cab3.js",
+  "environment-setup-tab-panel": "tab-panel-f36ccc73e17f.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -1109,6 +1113,8 @@ export const CHUNKS = {
 export const REWRITTEN = new Set([
   "chat-tab-metadata-bridge",
   "open-local-conversation-subagents-panel",
+  "open-local-conversation-sources-side-panel-tab",
+  "side-panel",
   "queries",
   "task-announcement-state",
   "entry-point-availability",

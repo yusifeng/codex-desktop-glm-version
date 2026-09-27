@@ -11,6 +11,10 @@ function resetState() {
     definitions: [],
     effects: [],
     opens: [],
+    registered: [],
+    lazy: [],
+    sourceOpens: [],
+    derived: [],
     sets: [],
     verifyResult: true,
     warnings: [],
@@ -42,11 +46,15 @@ async function bundle(directory) {
           if (value === "app-shared") return { contents: `
             const state=globalThis.__chatPanelTest;
             const noop=()=>{};
-            export const $3=noop,FX=noop,K2=noop,lw=noop,Z3=noop;
+            export const $3=noop,FX=noop,K2=noop,lw=noop,Z3=noop,H3=noop,qm=noop,wL=noop;
             export const I3=()=>state.jsx; export const Y2=Symbol("FormattedMessage"); export const V_=Symbol("UnarchiveIcon");
-            export const e6={useLayoutEffect(effect){state.effects.push(effect);const cleanup=effect();if(cleanup)state.cleanup=cleanup}};
+            export const e6={useLayoutEffect(effect){state.effects.push(effect);const cleanup=effect();if(cleanup)state.cleanup=cleanup},createElement:(type,props)=>({type,props})};
             export const LX=()=>({set(signal,value){state.sets.push({signal,value})}});
             export const Q3={warning(message,details){state.warnings.push({message,details})}};
+            export const Jm=(loader,options)=>{const component=(props)=>({lazy:true,props});component.loader=loader;component.options=options;state.lazy.push(component);return component};
+            export const Hy=Symbol("EnvironmentIcon"); export const rJ=(id)=>id.startsWith("client:");
+            export const oZ=(_scope,factory)=>({factory}); export const pZ=(_scope,value)=>({value});
+            export const sZ=(_scope,factory)=>(state.derived.push(factory),{factory});
           `, loader: "js" };
           if (value === "app-initial") return { contents: `
             const state=globalThis.__chatPanelTest; const noop=()=>{};
@@ -55,15 +63,27 @@ async function bundle(directory) {
             export const GZt={},PQt={},kZt={},lQt={},vZt={},wZt={},zZt={},mpn={};
             export const Wgn=noop,HZt=noop,Wvt=noop,cg=noop,ig=noop,ppn=noop;
             export const og="subagents"; export const sg=(id)=>"subagents:"+id;
-            export const qvt={tabById$:Symbol("tabs")};
+            export const qvt={tabById$:Symbol("tabs"),activeTab$:Symbol("active")};
             export const ag=(definition)=>(state.definitions.push(definition),definition);
             export const Gvt=(scope,definition,options)=>{state.opens.push(options);scope.tabs.set(options.id,{props:options.props,renderPanel:"panel"});return options.id};
             export const Ugn=()=>({hydrateBackgroundThreads:async(ids,options)=>{state.hydrated={ids,options}}});
+            export const FDt=noop,Qen=noop,Ebt=noop,Ftn=noop,_vt=noop;
+            export const Zen={SOURCES:"sources"};
+            export const IDt=(kind,component,options)=>{const definition={kind,component,...options};state.registered.push(definition);return definition};
+            export const Otn={},Utn={},vbt={},wtn={};
+            export const vvt=()=>state.revealResult??true;
           `, loader: "js" };
           if (value === "verify-descendant") return { contents: `
             export const t=()=>{};
             export const n=()=>globalThis.__chatPanelTest.verifyResult;
           `, loader: "js" };
+          if (value === "open-sources-side-panel-tab") return { contents: `
+            export const t=()=>{};
+            export const n=(...args)=>globalThis.__chatPanelTest.sourceOpens.push(args);
+          `, loader: "js" };
+          if (value === "local-conversation-sources-side-panel-tab-core") return { contents: "export const LocalConversationSourcesSidePanelTab=()=>null;", loader: "js" };
+          if (value === "registered-sources") return { contents: "export const RegisteredLocalSourcesThumbnail=()=>null;", loader: "js" };
+          if (value === "environment-setup-tab-panel") return { contents: "export const EnvironmentSetupTabPanel=()=>null;", loader: "js" };
           return { contents: "export {};", loader: "js" };
         });
       },
@@ -149,4 +169,47 @@ assert.equal(deferred, "subagents:parent");
 assert.equal(state.opens.at(-1).props.isLoading, true);
 assert.equal(typeof state.opens.at(-1).onActivate, "function");
 
-console.log("26 chat metadata and side-panel bridge assertions passed");
+state = resetState();
+const sources = await bundle("open-local-conversation-sources-side-panel-tab");
+sources.t();
+assert.equal(state.lazy.length, 2);
+assert.equal(state.registered.length, 1);
+assert.equal(state.registered[0].kind, "sources");
+assert.equal(state.registered[0].isAvailable({ value: { routeKind: "local-thread" } }), true);
+assert.equal(state.registered[0].isAvailable({ value: { routeKind: "chatgpt-thread" } }), false);
+assert.equal(state.registered[0].getId(), "sources");
+const thumbnail = state.registered[0].renderThumbnail(
+  { conversationId: "c1", hostId: "h1" }, { title: "Sources" },
+);
+assert.equal(thumbnail.props.title, "Sources");
+sources.n({ value: {} }, "c1", "h1", { revealAndFocus: false });
+assert.deepEqual(state.sourceOpens[0].slice(2), ["c1", "h1", { revealAndFocus: false }]);
+
+state = resetState();
+const environmentPanel = await bundle("side-panel");
+environmentPanel.n();
+assert.equal(state.registered.length, 1);
+assert.equal(state.registered[0].kind, "environment-setup");
+const environmentTabs = new Map();
+const environmentScope = {
+  value: { routeKind: "local-thread", conversationId: "c1" },
+  tabs: environmentTabs,
+  get(signal, parameter) {
+    if (typeof signal === "symbol") return environmentTabs.get(parameter) ?? null;
+    if (parameter === undefined) {
+      if (signal?.value !== undefined) return signal.value;
+      return { formatMessage: ({ defaultMessage }) => defaultMessage };
+    }
+    return parameter;
+  },
+  set(signal, parameter, value) { state.sets.push({ signal, parameter, value }); },
+};
+assert.equal(environmentPanel.i(environmentScope, "other"), false);
+assert.equal(environmentPanel.i(environmentScope, "c1", "env-1"), true);
+assert.equal(state.opens.at(-1).id, "environment-setup:c1");
+assert.equal(state.opens.at(-1).title, "Environment");
+assert.equal(state.sets.at(-1).value, "env-1");
+environmentPanel.t(environmentScope, "c1");
+assert.equal(state.sets.at(-1).parameter, true);
+
+console.log("42 chat metadata and side-panel bridge assertions passed");

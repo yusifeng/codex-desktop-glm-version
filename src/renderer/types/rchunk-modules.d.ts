@@ -9016,6 +9016,9 @@ declare module "@rchunk/app-shared" {
   export const UI: <Result>(request: Promise<Result>, signal?: AbortSignal) => Promise<Result>;
   /** Archived conversation unarchive icon。 */
   export const V_: (props: Record<string, unknown>) => unknown;
+  /** 是否为 client conversation id。 */
+  export const rJ: (conversationId: string) => boolean;
+  export const Hy: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/app-initial" {
@@ -9066,6 +9069,19 @@ declare module "@rchunk/app-initial" {
   export const qvt: { tabById$: unknown; activeTab$?: unknown };
   export const sg: (parentConversationId: string) => string;
   export const wZt: unknown;
+  /** Side-panel definition registry and environment setup state。 */
+  export const FDt: () => void;
+  export const IDt: (
+    kind: string,
+    component: unknown,
+    options: Record<string, unknown>,
+  ) => unknown;
+  export const Ebt: () => void;
+  export const Otn: unknown;
+  export const Utn: unknown;
+  export const vbt: unknown;
+  export const vvt: (scope: unknown, placement: string) => boolean;
+  export const wtn: import("@rchunk/app-shared").MaitaiScope<unknown>;
 }
 
 declare module "@rchunk/verify-descendant" {
@@ -9079,6 +9095,35 @@ declare module "@rchunk/verify-descendant" {
     },
   ) => boolean | Promise<boolean>;
   export const t: () => void;
+}
+
+declare module "@rchunk/open-sources-side-panel-tab" {
+  export const n: (
+    scope: unknown,
+    definition: unknown,
+    conversationId: string,
+    hostId: string,
+    options?: Record<string, unknown>,
+  ) => void;
+  export const t: () => void;
+}
+
+declare module "@rchunk/local-conversation-sources-side-panel-tab-core" {
+  export const LocalConversationSourcesSidePanelTab: (
+    props: Record<string, unknown>,
+  ) => unknown;
+}
+
+declare module "@rchunk/registered-sources" {
+  export const RegisteredLocalSourcesThumbnail: (
+    props: Record<string, unknown>,
+  ) => unknown;
+}
+
+declare module "@rchunk/environment-setup-tab-panel" {
+  export const EnvironmentSetupTabPanel: (
+    props: Record<string, unknown>,
+  ) => unknown;
 }
 
 // Conversation workflow, source panels, and local-workspace foundations.
