@@ -5,41 +5,56 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  $3: initializeJsxRuntime,
+  Ah: DialogHeader,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeFormattedMessage,
+  Lh: DialogDescription,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  jh: DialogSection,
+  zh: initializeDialog,
+} = appSharedChunk;
 
-const jsx = appShared.I3();
+const jsx = getJsxRuntime();
+
+interface LocationPermissionDeniedDialogProps {
+  onClose(): void;
+}
 
 function ChatGptLocationPermissionDeniedDialog({
   onClose,
-}: {
-  onClose: () => void;
-}) {
-  const title = jsx.jsx(appShared.Rh, {
-    children: jsx.jsx(appShared.Y2, {
+}: LocationPermissionDeniedDialogProps): unknown {
+  const title = jsx.jsx(DialogTitle, {
+    children: jsx.jsx(FormattedMessage, {
       id: "chatgptConversations.preciseLocation.permissionDenied.title",
       defaultMessage: "Turn on location access",
       description:
-        "Title of a dialog shown after precise location permission was blocked",
+        "Title of a dialog shown after ChatGPT cannot get precise location because browser permission was already blocked. It asks the user to enable this site's Location permission in their browser. Keep this headline concise.",
     }),
   });
-  const content = jsx.jsx(appShared.Oh, {
-    children: jsx.jsx(appShared.jh, {
-      children: jsx.jsx(appShared.Ah, {
+  const content = jsx.jsx(DialogBody, {
+    children: jsx.jsx(DialogSection, {
+      children: jsx.jsx(DialogHeader, {
         className: "select-none",
         title,
-        subtitle: jsx.jsx(appShared.Lh, {
-          children: jsx.jsx(appShared.Y2, {
+        subtitle: jsx.jsx(DialogDescription, {
+          children: jsx.jsx(FormattedMessage, {
             id: "chatgptConversations.preciseLocation.permissionDenied.description",
             defaultMessage:
               "Open your browser's site settings from the icon beside the address bar, set Location to Allow, then refresh the page",
             description:
-              "Instructions for enabling the site's Location permission and refreshing",
+              "Instructions in a ChatGPT dialog shown when browser location permission was already blocked. Explain how to enable this site's Location permission using the browser's site-controls icon, then reload ChatGPT. This is plain text with no interactive link or placeholders.",
           }),
         }),
       }),
     }),
   });
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: true,
     size: "compact",
     onOpenChange: (open: boolean) => {
@@ -50,10 +65,10 @@ function ChatGptLocationPermissionDeniedDialog({
 }
 
 function initializeLocationPermissionDeniedDialog(): void {
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.zh?.();
-  appShared.Ph?.();
+  initializeJsxRuntime();
+  initializeFormattedMessage();
+  initializeDialog();
+  initializeDialogLayout();
 }
 
 initializeLocationPermissionDeniedDialog();

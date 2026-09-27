@@ -3816,7 +3816,12 @@ declare module "@rchunk/create-remote-project-modal" {
 }
 
 declare module "@rchunk/location-permission-denied-dialog" {
-  export const ChatGptLocationPermissionDeniedDialog: (...args: any[]) => any;
+  export interface LocationPermissionDeniedDialogProps {
+    onClose(): void;
+  }
+  export const ChatGptLocationPermissionDeniedDialog: (
+    props: LocationPermissionDeniedDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/plugin-skill-preview" {
