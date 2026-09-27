@@ -1,0 +1,22 @@
+import "@rchunk/rolldown-runtime";
+import "@rchunk/app-initial";
+import "@rchunk/app-primary";
+import "@rchunk/app-shared";
+import "@rchunk/command-messages";
+import "@rchunk/settings-command-menu-section-items";
+import "@rchunk/thread-emoji";
+import "@rchunk/command-menu-search-results";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+interface CommandItem { description?: string; group?: string; id: string; label: string; keywords?: string[]; onSelect?(): void; requiredAccess?: "codexLocal" | "workLocal" }
+interface ChatResult { id: string; title: string }
+interface CommandMenuDialogProps { chatResults?: ChatResult[]; close(): void; commands?: CommandItem[]; error?: string | null; inputRef?: { current?: unknown }; isLoading?: boolean; onCreateChat?(): void; onRetry?(): void; onSelectChat?(chat: ChatResult): void; rootChatSearchIntent?: boolean; search: string; searchEventLogger?: Record<string, unknown>; setSearch(value: string): void }
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function CommandMenuDialog({ chatResults = [], close, commands = [], error, isLoading = false, onCreateChat, onRetry, onSelectChat, rootChatSearchIntent = false, search, setSearch }: CommandMenuDialogProps): unknown {
+  let query = search, selectedIndex = 0;
+  const filteredCommands = () => commands.filter(command => `${command.label} ${command.description ?? ""} ${(command.keywords ?? []).join(" ")}`.toLowerCase().includes(query.trim().toLowerCase()));
+  const filteredChats = () => chatResults.filter(chat => chat.title.toLowerCase().includes(query.trim().toLowerCase()));
+  const choose = () => { const items = [...filteredCommands(), ...filteredChats()]; const item = items[selectedIndex]; if (item == null) return; if ("label" in item) item.onSelect?.(); else onSelectChat?.(item); close(); };
+  return jsx().jsxs("dialog", { open: true, children: [jsx().jsxs("header", { children: [jsx().jsx("h2", { children: rootChatSearchIntent ? "Search chats" : "Command menu" }), jsx().jsx("button", { type: "button", "aria-label": "Close command menu", onClick: close, children: "Close" })] }), jsx().jsx("input", { role: "combobox", "aria-label": "Search commands and past chats", value: search, placeholder: rootChatSearchIntent ? "Search chats" : "Search chats or run a command", onChange: (event: { currentTarget: { value: string } }) => { query = event.currentTarget.value; selectedIndex = 0; setSearch(query); }, onKeyDown: (event: { key: string; preventDefault(): void }) => { const count = filteredCommands().length + filteredChats().length; if (event.key === "ArrowDown") { event.preventDefault(); selectedIndex = count === 0 ? 0 : (selectedIndex + 1) % count; } else if (event.key === "ArrowUp") { event.preventDefault(); selectedIndex = count === 0 ? 0 : (selectedIndex - 1 + count) % count; } else if (event.key === "Enter") { event.preventDefault(); choose(); } else if (event.key === "Escape") close(); } }), error != null ? jsx().jsxs("div", { role: "alert", children: ["Couldn't search ChatGPT chats", jsx().jsx("button", { type: "button", onClick: onRetry, children: "Retry" })] }) : isLoading ? jsx().jsx("p", { role: "status", children: "Loading chats…" }) : filteredCommands().length === 0 && filteredChats().length === 0 ? jsx().jsxs("section", { children: [jsx().jsx("p", { children: "No matches" }), chatResults.length === 0 ? jsx().jsx("button", { type: "button", onClick: onCreateChat, children: "Create chat" }) : null] }) : jsx().jsxs("div", { children: [filteredCommands().length === 0 ? null : jsx().jsxs("section", { children: [jsx().jsx("h3", { children: "Quick actions" }), jsx().jsx("ul", { children: filteredCommands().map((command, index) => jsx().jsx("li", { children: jsx().jsxs("button", { type: "button", "data-selected": index === selectedIndex, onClick: () => { command.onSelect?.(); close(); }, children: [command.label, command.description == null ? null : jsx().jsx("span", { children: command.description })] }) }, command.id)) })] }), filteredChats().length === 0 ? null : jsx().jsxs("section", { children: [jsx().jsx("h3", { children: "Chats" }), jsx().jsx("ul", { children: filteredChats().map((chat, index) => jsx().jsx("li", { children: jsx().jsx("button", { type: "button", "data-selected": filteredCommands().length + index === selectedIndex, onClick: () => { onSelectChat?.(chat); close(); }, children: chat.title }) }, chat.id)) })] })] })] });
+}
+export { CommandMenuDialog, type CommandMenuDialogProps };

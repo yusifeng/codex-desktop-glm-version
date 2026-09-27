@@ -14075,3 +14075,61 @@ declare module "@rchunk/shield-check" { export const n: () => void; export const
 declare module "@rchunk/text-shorter" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/thumb-mixed" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/twitter-logo" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+
+declare module "@rchunk/command-menu-availability";
+declare module "@rchunk/command-menu-client";
+declare module "@rchunk/command-menu-holdout";
+declare module "@rchunk/command-menu-queries";
+declare module "@rchunk/command-menu-search-results";
+declare module "@rchunk/popcorn-icons";
+declare module "@rchunk/popcorn-manual-edit-header-controls";
+declare module "@rchunk/artifact-annotation-batch-controls";
+declare module "@rchunk/artifact-annotation-comment";
+declare module "@rchunk/artifact-preview-status";
+declare module "@rchunk/artifact-preview-zoom";
+declare module "@rchunk/artifact-tab-content-electron";
+declare module "@rchunk/app-connect-availability";
+declare module "@rchunk/cloud-file-preview";
+declare module "@rchunk/editor-header";
+declare module "@rchunk/editor-header-controls";
+declare module "@rchunk/artifact-entry";
+declare module "@rchunk/file-preview";
+declare module "@rchunk/header-content-fade";
+declare module "@rchunk/artifact-layout";
+declare module "@rchunk/lazy-version-history";
+declare module "@rchunk/library-cloud-file-preview";
+declare module "@rchunk/library-file-display-title";
+declare module "@rchunk/library-file-download";
+declare module "@rchunk/library-file-preview-kind";
+declare module "@rchunk/library-file-preview-loading";
+declare module "@rchunk/library-multiplayer-access";
+declare module "@rchunk/loading-controls";
+declare module "@rchunk/open-image-preview";
+declare module "@rchunk/open-in-library-item";
+declare module "@rchunk/artifact-presentation";
+declare module "@rchunk/presentation-annotation-coachmark";
+declare module "@rchunk/presentation-annotation-cursor-coachmark";
+declare module "@rchunk/preview-layout";
+declare module "@rchunk/render-file-children";
+declare module "@rchunk/spreadsheet-editor";
+declare module "@rchunk/version-history";
+
+declare module "@rchunk/command-menu-dialog" {
+  export interface CommandMenuDialogProps extends Record<string, unknown> {
+    close(): void;
+    search: string;
+    setSearch(value: string): void;
+  }
+  export const CommandMenuDialog: (props: CommandMenuDialogProps) => unknown;
+}
+
+declare module "@rchunk/chatgpt-search-dialog" {
+  export type SearchFilter = "all" | "chats" | "documents" | "images" | "projects";
+  export interface ChatGptSearchDialogProps extends Record<string, unknown> {
+    close(): void;
+    search: string;
+    searchFilter: SearchFilter;
+    setSearch(value: string, filter?: SearchFilter): void;
+  }
+  export const ChatGptSearchDialog: (props: ChatGptSearchDialogProps) => unknown;
+}
