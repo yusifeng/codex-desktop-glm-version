@@ -9871,6 +9871,25 @@ declare module "@rchunk/app-shared" {
   export const Hy: (props: Record<string, unknown>) => unknown;
   /** Codex Micro command registry。 */
   export const Ep: () => void;
+  export interface RegisteredCommand extends Record<string, unknown> {
+    commandMenuGroupKey?: string | null;
+    id: string;
+    kind: string;
+    requiredAccess?: "codexLocal" | "codexOrWorkLocal";
+  }
+  /** command menu 分组排序。 */
+  export const Dp: string[];
+  /** realtime voice command 判定。 */
+  export const Gp: (commandId: string) => boolean;
+  /** getCommand（按 id 查询 Codex command registry）。 */
+  export const Np: (commandId: string) => RegisteredCommand | null;
+  /** unified tab strip command ids。 */
+  export const kp: string[];
+  /** command requiredAccess 校验。 */
+  export const zp: (
+    command: RegisteredCommand,
+    access: { codexLocal: boolean; workLocal: boolean },
+  ) => boolean;
   export const Xp: Array<Record<string, unknown> & { id: string; kind: string }>;
   export const qp: (command: Record<string, unknown>, platform: string) => boolean;
   /** Editable plan icon dependencies。 */
@@ -13227,4 +13246,81 @@ declare module "@rchunk/offer-queries" {
   export const n: (input: { accountId: string; code: string; kind: string; signal: AbortSignal }) => Promise<Promotion>;
   export const r: () => void;
   export const t: (input: PromotionSelectionInput) => { lockedProPlanName: string | null; proPromotionPending: boolean; proSelectionBlocked: boolean };
+}
+
+declare module "@rchunk/app-initial" {
+  /** initializeSearchInput（通用 SearchInput 组件依赖）。 */
+  export const mT: () => void;
+  /** SearchInput（键盘快捷键检索输入框）。 */
+  export const pT: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/keyboard-shortcuts-gate" {
+  export const n: () => void;
+  export const t: string | undefined;
+}
+
+declare module "@rchunk/app-connect-link-navigation" {
+  export const n: (url: string) => boolean;
+  export const t: () => void;
+}
+
+declare module "@rchunk/epic-launch-contracts" {
+  export const n: string | undefined;
+  export const r: () => void;
+  export const t: string | undefined;
+}
+
+declare module "@rchunk/codex-analytics-attribution" {
+  export const n: import("@rchunk/app-shared").ScopedDerivedSignal<
+    Record<string, unknown>,
+    { threadId: string; turnId: string } | null
+  > | undefined;
+  export const t: () => void;
+}
+
+declare module "@rchunk/control-group" {
+  export interface ControlGroupProps { children?: unknown; className?: string; }
+  export const n: () => void;
+  export const t: (props: ControlGroupProps) => unknown;
+}
+
+declare module "@rchunk/outbound-identity-error" {
+  export interface OutboundIdentityErrorProps { error: { error?: string; status?: number }; }
+  export const n: () => void;
+  export const t: (props: OutboundIdentityErrorProps) => unknown;
+}
+
+declare module "@rchunk/keyboard-shortcut-command-order" {
+  export interface CommandAccess { codexLocal: boolean; workLocal: boolean; }
+  export interface CommandVisibilityOptions extends Record<string, unknown> {
+    browserEnabled?: boolean;
+    commandAccess: CommandAccess;
+    platform?: string;
+  }
+  export interface ShortcutCommand extends Record<string, unknown> {
+    commandMenuGroupKey?: string | null;
+    id: string;
+    kind: string;
+    requiredAccess?: "codexLocal" | "codexOrWorkLocal";
+  }
+  export const a: (command: ShortcutCommand, options: Omit<CommandVisibilityOptions, "browserEnabled" | "platform">) => boolean;
+  export const i: (commandId: string, options: CommandVisibilityOptions) => boolean;
+  export const n: () => void;
+  export const r: () => void;
+  export const t: (left: ShortcutCommand, right: ShortcutCommand) => number;
+}
+
+declare module "@rchunk/keyboard-shortcuts-search-input" {
+  export interface KeyboardShortcutsSearchInputProps extends Record<string, unknown> {
+    ariaLabel?: string;
+    autoFocus?: boolean;
+    isSearchingByKeystrokes?: boolean;
+    onValueChange(value: string): void;
+    placeholder?: string;
+    trailingContent?: unknown;
+    value: string;
+  }
+  export const n: () => void;
+  export const t: (props: KeyboardShortcutsSearchInputProps) => unknown;
 }
