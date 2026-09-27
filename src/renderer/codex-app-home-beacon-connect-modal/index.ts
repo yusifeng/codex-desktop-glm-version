@@ -5,43 +5,58 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as pcaActionChunk from "@rchunk/pca-connector-action";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as useConnectFlowChunk from "@rchunk/use-app-connect-flow";
+import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appConnectById = appConnectByIdChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const pcaAction = pcaActionChunk as Record<string, any>;
-const useConnectFlow = useConnectFlowChunk as Record<string, any>;
+const { n: AppConnectModalById, r: initializeAppConnectModalById } =
+  appConnectByIdChunk;
+const {
+  $3: initializeJsxRuntime,
+  FX: initializeMaitaiRuntime,
+  I3: getJsxRuntime,
+  LX: useScope,
+  QI: initializeAppScopeRuntime,
+  ZI: AppScope,
+  e6: getReactRuntime,
+} = appSharedChunk;
+const {
+  n: initializePcaConnectorAction,
+  r: resumePcaAfterConnection,
+} = pcaActionChunk;
+const { n: useAppConnectFlow, t: initializeAppConnectFlow } =
+  useConnectFlowChunk;
 
-let React: any;
-let jsx: any;
+let reactRuntime: ReactRuntime | null = null;
+let jsxRuntime: JsxRuntime | null = null;
+
+interface CodexAppHomeBeaconConnectModalProps {
+  connectorId: string;
+  onOpenChange(open: boolean): void;
+  pcaResumeTarget?: unknown;
+}
 
 function CodexAppHomeBeaconConnectModal({
   connectorId,
   onOpenChange,
   pcaResumeTarget,
-}: {
-  connectorId: string;
-  onOpenChange(open: boolean): void;
-  pcaResumeTarget?: unknown;
-}): unknown {
-  initializeConnectModal();
-  const scope = appShared.LX(appShared.ZI);
+}: CodexAppHomeBeaconConnectModalProps): unknown {
+  const { React, jsx } = getInitializedConnectModalRuntime();
+  const scope = useScope(AppScope);
   const [isCompletingConnection, setCompletingConnection] =
     React.useState(false);
-  const { handleAppConnectOAuthStarted } = useConnectFlow.n();
+  const { handleAppConnectOAuthStarted } = useAppConnectFlow();
   const onConnected =
     pcaResumeTarget == null
       ? undefined
       : async () => {
           setCompletingConnection(true);
-          await pcaAction
-            .r(scope, pcaResumeTarget)
+          await resumePcaAfterConnection(scope, pcaResumeTarget)
             .finally(() => setCompletingConnection(false));
         };
   const onOAuthStarted = (event: Record<string, unknown>) =>
     handleAppConnectOAuthStarted({ ...event, resumeTarget: pcaResumeTarget });
-  return jsx.jsx(appConnectById.n, {
+  return jsx.jsx(AppConnectModalById, {
     allowBrowserFallback: pcaResumeTarget == null,
     connectorId,
     isCompletingConnection,
@@ -53,14 +68,28 @@ function CodexAppHomeBeaconConnectModal({
 }
 
 function initializeConnectModal(): void {
-  if (jsx != null) return;
-  appShared.FX?.();
-  appConnectById.r?.();
-  useConnectFlow.t?.();
-  pcaAction.t?.();
-  appShared.QI?.();
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  if (jsxRuntime != null && reactRuntime != null) return;
+  initializeJsxRuntime?.();
+  initializeMaitaiRuntime?.();
+  reactRuntime =
+    typeof getReactRuntime === "function" ? getReactRuntime() : getReactRuntime;
+  initializeAppConnectModalById();
+  initializeAppConnectFlow();
+  initializePcaConnectorAction?.();
+  initializeAppScopeRuntime?.();
+  jsxRuntime =
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
+}
+
+function getInitializedConnectModalRuntime(): {
+  React: ReactRuntime;
+  jsx: JsxRuntime;
+} {
+  initializeConnectModal();
+  if (reactRuntime == null || jsxRuntime == null) {
+    throw new Error("Beacon connect modal runtime failed to initialize");
+  }
+  return { React: reactRuntime, jsx: jsxRuntime };
 }
 
 initializeConnectModal();

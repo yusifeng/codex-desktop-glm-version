@@ -3544,9 +3544,30 @@ declare module "@rchunk/home-entry-point" {
 }
 
 declare module "@rchunk/pca-connector-action" {
-  export const n: unknown;
-  export const r: (...args: any[]) => Promise<unknown>;
-  export const t: () => void;
+  export const n: () => void;
+  export const r: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<
+      Record<string, unknown>
+    >,
+    resumeTarget: unknown,
+  ) => Promise<unknown>;
+  export const t: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<
+      Record<string, unknown>
+    >,
+    options: Record<string, unknown>,
+  ) => unknown;
+}
+
+declare module "@rchunk/codex-app-home-beacon-connect-modal" {
+  export interface CodexAppHomeBeaconConnectModalProps {
+    connectorId: string;
+    onOpenChange(open: boolean): void;
+    pcaResumeTarget?: unknown;
+  }
+  export const CodexAppHomeBeaconConnectModal: (
+    props: CodexAppHomeBeaconConnectModalProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/app-connect-modal-by-id" {
