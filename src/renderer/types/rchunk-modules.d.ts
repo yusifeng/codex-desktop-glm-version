@@ -832,7 +832,7 @@ declare module "@rchunk/app-shared" {
     ): void;
     useMemo<T>(factory: () => T, dependencies: readonly unknown[]): T;
     useRef<T>(initialValue: T): ReactRef<T>;
-    useState<T>(initialValue: T): [T, (value: T | ((current: T) => T)) => void];
+    useState<T>(initialValue: T | (() => T)): [T, (value: T | ((current: T) => T)) => void];
     useSyncExternalStore<Snapshot>(
       subscribe: (listener: () => void) => () => void,
       getSnapshot: () => Snapshot,
@@ -2060,6 +2060,8 @@ declare module "@rchunk/app-shared" {
   export const iW: (path: string) => string;
   export const lk: () => void;
   export const wL: () => void;
+  /** 读取指定宿主能力开关。 */
+  export const VJ: (capabilities: unknown, capability: string) => boolean;
   export const oq: string;
   export type TooltipSide = "top" | "right" | "bottom" | "left";
   export type TooltipAlign = "start" | "center" | "end";
@@ -2943,6 +2945,7 @@ declare module "@rchunk/app-initial" {
       event: unknown,
       payload: { link: OnboardingLegalLink },
     ): void;
+    flush(timeoutMs: number): Promise<void>;
   }
   export type OnboardingLegalLink =
     | "terms"
@@ -2953,6 +2956,26 @@ declare module "@rchunk/app-initial" {
     Record<string, unknown>,
     ProductAnalytics
   >;
+  export const an: {
+    readonly ACCESS_FLOW_ENTRY_ACTION_TYPE_PAGE_LOADED: string;
+  };
+  export const on: {
+    readonly ACCESS_FLOW_ENTRY_POINT_AUTH_LOGIN_PAGE: string;
+  };
+  export const sn: {
+    readonly ACCESS_FLOW_ENTRY_TRIGGER_AUTOMATIC: string;
+  };
+  const accessFlowEntryEvent: unknown;
+  export { accessFlowEntryEvent as in };
+  export const mn: () => void;
+  export const cc: () => void;
+  export const sc: {
+    count(
+      namespace: string,
+      metric: string,
+      fields: Record<string, string>,
+    ): void;
+  };
   export const Ds: unknown;
   export const Es: {
     CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_TERMS: "terms";
@@ -3156,6 +3179,23 @@ declare module "@rchunk/app-initial" {
     quickChatWindow?: {
       addToComposer(content: unknown): Promise<void>;
       rendererReady(conversationId: string | null): void;
+    };
+    appInfo: {
+      get(): Promise<{ chatGptDesktopAuthOrigin?: string | null }>;
+    };
+    chatGptBrowserSession?: {
+      cancelProbe(probeId: string): void;
+      getLookupEligibility(): Promise<BrowserSessionEligibility>;
+      probe(
+        probeId: string,
+        desktopSessionUrl: string,
+        securityLevel: string,
+        onDebugEvent?: (event: {
+          details?: Record<string, unknown>;
+          source: "renderer";
+          stage: string;
+        }) => void,
+      ): Promise<BrowserSessionProfile | null>;
     };
     codexMicro?: {
       getInputMonitoringPermissionStatus(): Promise<
@@ -3388,6 +3428,54 @@ declare module "@rchunk/app-initial" {
     accountId: string,
   ) => void;
   export const Qgn: () => void;
+  /** 桌面认证 URL、会话启动和浏览器 session 探测依赖。 */
+  export interface DesktopLoginSession {
+    cancel(): Promise<void>;
+    getStartResult(): Promise<Record<string, unknown>>;
+    waitForCompletion(): Promise<unknown>;
+    [Symbol.dispose](): void;
+  }
+  export interface DesktopLoginStartResult extends Record<string, unknown> {
+    completion: Promise<unknown>;
+  }
+  export interface BrowserSessionEligibility extends Record<string, unknown> {
+    arm64: boolean;
+    browserHasVisibleWindow: boolean;
+    browserIsRunning: boolean;
+    deviceCheck: boolean;
+    eligible: boolean;
+    macOS: boolean;
+  }
+  export interface BrowserSessionProfile extends Record<string, unknown> {
+    id?: string;
+  }
+  export const Bgn: () => void;
+  export const Eon: () => void;
+  export const Lfn: () => void;
+  export const Wgn: () => void;
+  export const Ifn: import("@rchunk/app-shared").ScopedSignalFamily<
+    unknown,
+    string,
+    unknown
+  >;
+  export const Ton: () => Error;
+  export const Ugn: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    hostId: string,
+  ) => {
+    createChatGptLoginSession(options: {
+      appBrand?: "chatgpt";
+      useHostedLoginSuccessPage: boolean;
+      useStreamlinedLogin?: boolean;
+    }): DesktopLoginSession;
+  };
+  export const Vgn: () => {
+    StableID: { get(key: unknown): string };
+  };
+  export const zgn: unknown;
+  export const _s: () => void;
+  export const gs: unknown;
+  export const hs: unknown;
   /** 浏览器认证 handoff 与 Magic Link 的 URL、Cookie 和会话依赖。 */
   export interface CookieStore {
     getCookie(name: string): string | undefined;
@@ -3489,7 +3577,11 @@ declare module "@rchunk/app-initial" {
     | Pick<RouterLocationState, "hash" | "pathname" | "search">;
   export const i_n: () => RouterLocationState;
   export const d_n: () => [URLSearchParams, (next: URLSearchParams) => void];
-  export const Fx: (target?: string | null, fallback?: string) => string;
+  export const Fx: (
+    target?: string | null,
+    fallback?: string | null,
+    context?: string,
+  ) => string;
   export const Ix: () => void;
   export const o_n: () => (
     destination: RouterDestination,
@@ -3607,14 +3699,18 @@ declare module "@rchunk/app-initial" {
   export interface CodexMicroAppInfo {
     appIconMedium?: string | null;
     appName?: string;
+    version?: string;
   }
   export const $C: import("@rchunk/app-shared").ReadableSignal<{
     status?: string;
   }>;
   export const aw: () => void;
-  export const c$t: import("@rchunk/app-shared").ReadableSignal<{
-    data?: CodexMicroAppInfo;
-  }>;
+  export const c$t:
+    & import("@rchunk/app-shared").ReadableSignal<{ data?: CodexMicroAppInfo }>
+    & import("@rchunk/app-shared").ScopedSignal<
+      Record<string, unknown>,
+      { data?: CodexMicroAppInfo }
+    >;
   export const ew: import("@rchunk/app-shared").ReadableSignal<string>;
   export const fw: import("@rchunk/app-shared").ScopedSignal<
     Record<string, unknown>,
@@ -9142,8 +9238,13 @@ declare module "@rchunk/order-yubikey-dialog" {
 }
 
 declare module "@rchunk/chatgpt-desktop-auth-url" {
-  const _default: unknown;
-  export default _default;
+  export const a: (options: Record<string, unknown>) => Promise<unknown>;
+  export const i: () => void;
+  export const n: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+  ) => string | undefined;
+  export const r: () => void;
+  export const t: (options: Record<string, unknown>) => string;
 }
 
 declare module "@rchunk/codex-mobile-setup-dialog" {
