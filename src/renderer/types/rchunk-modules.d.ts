@@ -2521,7 +2521,10 @@ declare module "@rchunk/app-shared" {
   export const G4: unknown;
   export const Gs: unknown; // jbt：pin-window-light-16 IconAsset
   export const H3: () => void; // detachedWindow 入口的 preload helper
-  export const RI: () => void; // nG：路径 dirname 依赖初始化器
+  export const RI: {
+    (): void;
+    (...segments: string[]): string;
+  }; // nG：路径工具惰性初始化器与初始化后的 join 实现
   /** Vite preload helper：预取依赖后执行动态 import。 */
   export const V3: <Loaded>(
     load: () => Promise<Loaded>,
@@ -4650,7 +4653,7 @@ declare module "@rchunk/app-primary" {
     title?: unknown;
   }
   export const Sm: (props: BannerProps) => unknown;
-  export const Cg: (props: { children?: unknown }) => unknown;
+  export const Cg: (...arguments_: unknown[]) => unknown;
   export const wg: () => void;
   export type AnnouncementStatus = "eligible" | "ineligible" | "loading";
   export const $p: (state: {
@@ -5501,9 +5504,9 @@ declare module "@rchunk/local-conversation-webmcp-tools-model" {
 
 declare module "@rchunk/local-conversation-sources-signals" {
   export const i: import("@rchunk/app-shared").SignalFamily<string, unknown>;
-  export const n: import("@rchunk/app-shared").SignalFamily<string, unknown>;
+  export const n: () => void;
   export const r: import("@rchunk/app-shared").SignalFamily<string, unknown>;
-  export const t: () => void;
+  export const t: import("@rchunk/app-shared").SignalFamily<string, unknown>;
 }
 
 declare module "@rchunk/open-thread-pull-request-side-panel-tab" {
@@ -7998,6 +8001,220 @@ declare module "@rchunk/pull-request-fix-workflow" {
 declare module "@rchunk/pull-request-status-label" {
   const _default: unknown;
   export default _default;
+}
+
+// Conversation workflow, source panels, and local-workspace foundations.
+declare module "@rchunk/app-shared" {
+  export const HI: (path: string) => string;
+  export const IK: (left: string, right: string) => boolean;
+  export const NU: (alias: string) => string;
+  export const WK: (...segments: string[]) => string;
+  export const YF: unknown;
+  export const _H: (
+    value: string,
+  ) => { host: string; owner: string; repo: string } | null;
+  export const hq: (server: unknown) => boolean;
+  export const lZ: (
+    scope: unknown,
+    factory: (...arguments_: unknown[]) => unknown,
+    options?: unknown,
+    familyOptions?: Record<string, unknown>,
+  ) => unknown;
+  export const zU: (hostId: string) => boolean;
+}
+
+declare module "@rchunk/app-primary" {
+  export const Bl: (props: Record<string, unknown>) => unknown;
+  export const Ur: (
+    scope: unknown,
+    conversationId: string,
+    hostId: string,
+  ) => boolean | Promise<boolean>;
+  export const Vl: () => void;
+  export const Wr: () => void;
+  export const mn: () => void;
+  export const pn: unknown;
+}
+
+declare module "@rchunk/app-initial" {
+  export const $b: unknown;
+  export const $4t: () => void;
+  export const Ag: unknown;
+  export const AXt: () => void;
+  export const Af: (
+    scope: unknown,
+    hostId: string,
+    capability: unknown,
+    projectName: string,
+  ) => Promise<unknown>;
+  export const Bst: () => void;
+  export const C3: (scope: unknown) => void;
+  export const Cg: (...arguments_: unknown[]) => unknown;
+  export const Chn: (thread: unknown) => string | null;
+  export const Dg: () => void;
+  export const Dhn: (history: unknown) => { entries: unknown[] } | null;
+  export const Dlt: (props: Record<string, unknown>) => unknown;
+  export const Dpn: () => void;
+  export const Eg: (conversationId: string, terminalId: string) => string;
+  export const F_t: unknown;
+  export const Ff: () => void;
+  export const Fin: (conversation: unknown) => Array<Record<string, unknown>>;
+  export const GEt: (input: Record<string, unknown>) => { data?: unknown[] };
+  export const If: (scope: unknown, capability: unknown) => Promise<void>;
+  export const Iin: () => void;
+  export const J9t: (path: string) => string;
+  export const L9t: (mimeType?: string | null) => unknown;
+  export const MQt: unknown;
+  export const MXt: () => void;
+  export const Mg: () => void;
+  export const NXt: unknown;
+  export const Nzt: unknown;
+  export const OZt: unknown;
+  export const O_t: () => void;
+  export const Og: () => void;
+  export const Olt: () => void;
+  export const PXt: () => void;
+  export const PQt: unknown;
+  export const Pf: (data: unknown, action: string) => unknown;
+  export const Pnn: (agentPath: unknown) => string | null;
+  export const Qb: () => void;
+  export const ROt: (
+    scope: unknown,
+    options: Record<string, unknown>,
+  ) => Promise<unknown>;
+  export const RQt: unknown;
+  export const Sg: unknown;
+  export const TQt: unknown;
+  export const Tct: (scope: unknown) => void;
+  export const Tfn: (left: unknown[], right: unknown[]) => boolean;
+  export const Tg: unknown;
+  export const Thn: (source: unknown) => Record<string, unknown> | null;
+  export const UBt: unknown;
+  export const Vst: unknown;
+  export const X4: unknown;
+  export const YVt: unknown;
+  export const Zen: { PLAN: string; SOURCES?: string };
+  export const _Qt: unknown;
+  export const _Z: () => void;
+  export const al: (...arguments_: unknown[]) => unknown;
+  export const arn: () => void;
+  export const bg: (definition: Record<string, unknown>) => unknown;
+  export const cl: () => void;
+  export const cm: () => void;
+  export const d9t: (turn: unknown) => string | null | undefined;
+  export const dHt: (status: unknown) => boolean;
+  export const ecn: unknown;
+  export const f9t: () => void;
+  export const fon: (
+    options: Record<string, unknown> | null | undefined,
+    defaultStaleTime: number | null,
+  ) => Record<string, unknown>;
+  export const gZ: (props: Record<string, unknown>) => unknown;
+  export const gon: () => void;
+  export const h_t: import("@rchunk/app-shared").SignalFamily<string, string | null>;
+  export const ict: () => void;
+  export const il: (...arguments_: unknown[]) => unknown;
+  export const irn: (turn: unknown) => {
+    editedFilePaths: string[];
+    outputFilePaths: string[];
+  };
+  export const jOt: (scope: unknown, conversationId: string) => void;
+  export const jQt: unknown;
+  export const jXt: (options: Record<string, unknown>) => {
+    fromTarget$: unknown;
+  };
+  export const jcn: unknown;
+  export const jg: (conversationId: string) => string;
+  export const jin: (conversation: unknown) => unknown;
+  export const kXt: unknown;
+  export const kf: () => void;
+  export const kg: (definition: Record<string, unknown>) => unknown;
+  export const lQt: unknown;
+  export const m_t: () => void;
+  export const n$t: unknown;
+  export const n0: () => void;
+  export const ncn: unknown;
+  export const oct: unknown;
+  export const ojt: () => void;
+  export const ol: unknown;
+  export const rQt: unknown;
+  export const rl: (...arguments_: unknown[]) => unknown;
+  export const sQt: unknown;
+  export const sjt: (title: string) => string;
+  export const sl: unknown;
+  export const sm: unknown;
+  export const t$t: unknown;
+  export const t0: (props: Record<string, unknown>) => unknown;
+  export const u9t: (turn: unknown) => string | null | undefined;
+  export const uct: unknown;
+  export const vZt: unknown;
+  export const vat: number;
+  export const w$t: (items: unknown[]) => unknown[];
+  export const wVt: unknown;
+  export const wct: () => void;
+  export const wg: (definition: Record<string, unknown>) => unknown;
+  export const xat: (options: { fallbackFontSizePx: number }) => unknown;
+  export const xct: (scope: unknown, appId: string) => void;
+  export const xg: unknown;
+  export const yZt: unknown;
+  export const yat: () => void;
+  export const yg: () => void;
+  export const z9t: (url: string) => unknown;
+}
+
+declare module "@rchunk/webmcp-tool-calls" {
+  export const n: () => void;
+  export const t: (metadata: unknown) => unknown[];
+}
+
+declare module "@rchunk/google-drive-resource-icon" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/local-conversation-external-resources" {
+  export const a: (source: Record<string, unknown>) => boolean;
+  export const n: (...arguments_: unknown[]) => Array<Record<string, unknown>>;
+  export const r: () => void;
+}
+
+declare module "@rchunk/local-conversation-summary-panel-sources-model" {
+  export const a: () => void;
+  export const i: (...arguments_: unknown[]) => {
+    externalSources: Array<Record<string, unknown>>;
+    webSearchSource: unknown;
+  };
+  export const n: (...arguments_: unknown[]) => unknown[];
+  export const r: (...arguments_: unknown[]) => unknown;
+  export const t: (...arguments_: unknown[]) => unknown[];
+}
+
+declare module "@rchunk/text-file-storage" {
+  export const n: () => void;
+  export const r: (input: {
+    filePath: string;
+    hostId: string;
+  }) => Promise<{ content: string }>;
+}
+
+declare module "@rchunk/editable-plan-tab" {
+  export const i: unknown;
+  export const n: (...arguments_: unknown[]) => boolean;
+  export const o: () => void;
+  export const r: unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/layout" {
+  export const n: (...arguments_: unknown[]) => { lineCount: number };
+  export const r: (...arguments_: unknown[]) => unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/open-target" {
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const r: () => void;
+  export const t: (...arguments_: unknown[]) => unknown;
 }
 
 declare module "@rchunk/realtime-voice-handoff-target" {
