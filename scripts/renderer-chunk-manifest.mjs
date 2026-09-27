@@ -1030,6 +1030,10 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "chatgpt-accent-messages",
+  "security-messages",
+  "local-conversation-external-resources",
+  "local-conversation-summary-panel-sources-model",
   "thread-pin-shortcut-bridge",
   "thread-emoji",
   "local-conversation-plan-model",

@@ -12,6 +12,10 @@ declare module "@rchunk/rolldown-runtime" {
 }
 
 declare module "@rchunk/app-shared" {
+  /** getPathBasename（来源面板的本地文件标签）。 */
+  export const II: (path: string) => string;
+  /** getMcpAppId（从 MCP 调用 id 提取稳定 app id）。 */
+  export const eU: (callId: string) => string;
   export interface SafeParseSuccess<T> {
     success: true;
     data: T;
@@ -2770,6 +2774,30 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const Brn: (serverName: string) => string;
+  export const Drn: () => void;
+  export const Ern: (input: Record<string, unknown>) => Record<string, unknown> | null;
+  export const F9t: (content: unknown) => Record<string, unknown> | null;
+  export const I9t: () => void;
+  export const M9t: (toolName: string) => string;
+  export const M_n: (tree: unknown, visitor: (...arguments_: unknown[]) => void) => void;
+  export const N9t: () => void;
+  export const P9t: (call: Record<string, unknown>) => boolean;
+  export const P_n: () => void;
+  export const Vrn: () => void;
+  export const ZGt: (input: { url: string }) => Record<string, unknown> | null;
+  export const _hn: (content: unknown) => unknown[];
+  export const dmn: (input: { attachments: unknown[]; input: unknown[] }) => Array<Record<string, unknown>>;
+  export const fmn: () => void;
+  export const hmn: () => void;
+  export const j9t: (toolName: string) => string;
+  export const mmn: (attachment: Record<string, unknown>) => string;
+  export const non: (markdown: string) => unknown;
+  export const pnn: (turn: Record<string, unknown>, call: Record<string, unknown>) => Record<string, unknown>;
+  export const ton: () => void;
+  export const vhn: () => void;
+  export const wrn: () => void;
+  export const yrn: string;
   // 15MB 聚合块：应用启动逻辑 + Shiki 语法 grammars + math/learning blocks。
   export type ConnectorCatalogApp =
     import("@rchunk/app-info").ConnectorApp & {
@@ -8173,9 +8201,29 @@ declare module "@rchunk/google-drive-resource-icon" {
 }
 
 declare module "@rchunk/local-conversation-external-resources" {
-  export const a: (source: Record<string, unknown>) => boolean;
-  export const n: (...arguments_: unknown[]) => Array<Record<string, unknown>>;
+  export type ExternalResourceActivity = "provided" | "read" | "created" | "updated";
+  export interface ExternalResourceProvider {
+    id: string;
+    logoUrl: string | null;
+    logoUrlDark: string | null;
+    name: string;
+    pluginDisplayNames: string[];
+  }
+  export interface ExternalResource extends Record<string, unknown> {
+    activities: ExternalResourceActivity[];
+    isSource: boolean;
+    key: string;
+    mimeType: string | null;
+    openInitiator: "markdown_link_click" | "mcp_app_resource";
+    provider: ExternalResourceProvider | null;
+    title: string;
+    url: string;
+  }
+  export const a: (source: ExternalResource) => boolean;
+  export const i: (source: ExternalResource) => boolean;
+  export const n: (...arguments_: unknown[]) => ExternalResource[];
   export const r: () => void;
+  export const t: (url: string) => string | null;
 }
 
 declare module "@rchunk/local-conversation-summary-panel-sources-model" {
@@ -8433,11 +8481,15 @@ declare module "@rchunk/hooks-settings-route" {
 }
 
 declare module "@rchunk/mcp-app-analytics" {
+  export const n: () => void;
+  export const t: (app: Record<string, unknown> | null | undefined) => string | undefined;
   const _default: unknown;
   export default _default;
 }
 
 declare module "@rchunk/mcp-tool-activity-label" {
+  export const i: () => void;
+  export const t: (input: Record<string, unknown>) => string;
   const _default: unknown;
   export default _default;
 }
