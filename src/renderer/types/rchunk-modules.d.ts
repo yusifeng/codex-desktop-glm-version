@@ -5519,10 +5519,36 @@ declare module "@rchunk/diff-worker-algorithm";
 declare module "@rchunk/diff-worker-model";
 declare module "@rchunk/diff-worker-renderer";
 declare module "@rchunk/diff-worker-utils";
-declare module "@rchunk/pull-request-actions";
-declare module "@rchunk/pull-request-revision-tab";
-declare module "@rchunk/registered-pull-request-thumbnail";
+declare module "@rchunk/pull-request-actions" {
+  export const _: (input: { currentComments: Array<Record<string, unknown>>; nextComments: Array<Record<string, unknown>> }) => Array<Record<string, unknown>>;
+  export const a: symbol;
+  export const c: symbol;
+  export const d: symbol;
+  export class f extends Error { reason: string; constructor(reason: string, cause?: unknown); }
+  export const g: (input: { comments: Array<Record<string, unknown>>; filePaths: string[]; workspaceRoot?: string }) => Map<string, number>;
+  export const h: (revision: string, comment: Record<string, unknown>) => { commentKey: string; revision: string };
+  export const i: symbol;
+  export const l: symbol;
+  export const m: () => void;
+  export const n: symbol;
+  export const o: symbol;
+  export const p: (input: Record<string, unknown>) => Promise<string>;
+  export const r: symbol;
+  export const s: symbol;
+  export const t: () => void;
+  export const u: symbol;
+  export const v: () => void;
+}
+declare module "@rchunk/pull-request-revision-tab" {
+  export const PullRequestRevisionTab: (props: { request?: unknown; title?: string; unavailableReason?: string }) => unknown;
+}
+declare module "@rchunk/registered-pull-request-thumbnail" {
+  export const RegisteredPullRequestThumbnail: (props: { props?: { request?: Record<string, unknown>; status?: string; checks?: unknown[] }; title?: string }) => unknown;
+}
 declare module "@rchunk/virtualized-file-diff-line-position";
+declare module "@rchunk/thread-user-message-navigation-rail-app";
+declare module "@rchunk/revision-review-unavailable-message";
+declare module "@rchunk/pull-request-checks-summary";
 
 declare module "@rchunk/detail-page" {
   export const n: (props: { children?: unknown }) => unknown;
@@ -8368,6 +8394,8 @@ declare module "@rchunk/tool-activity-disclosure" {
 }
 
 declare module "@rchunk/artifact-file-preview-icon" {
+  export const n: () => void;
+  export const t: (props: { getImagePreviewSrc?(path: string): string | null | undefined; iconClassName?: string; imageClassName?: string; path: string }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -8378,6 +8406,8 @@ declare module "@rchunk/automation-delete-confirmation-dialog" {
 }
 
 declare module "@rchunk/bookmarked-thread-user-message-navigation" {
+  export const n: () => void;
+  export const t: (props: { bookmarkKey?: string; enabled?: boolean; getItems(): Array<{ id: string; label?: string; bookmarked?: boolean; [key: string]: unknown }>; onBookmarkChange?(item: Record<string, unknown>): void; onPreviewItem?(item: Record<string, unknown>): void; onRevealItem?(item: Record<string, unknown>): void }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -11209,6 +11239,13 @@ declare module "@rchunk/diff-comment-card" {
 }
 
 declare module "@rchunk/pull-request-readonly-comment" {
+  export const a: () => void;
+  export const i: (props: { children?: unknown }) => unknown;
+  export const n: (props: { comment: Record<string, unknown>; filePath?: string; line?: number; side?: string }) => unknown;
+  export const o: (login: string | null | undefined, size: number, hostname?: string) => string | null;
+  export const r: () => void;
+  export const s: () => void;
+  export const t: (props: { authorAvatarUrl?: string; authorLogin?: string; body?: string; createdAt?: string; url?: string }) => unknown;
   const _default: unknown;
   export default _default;
 }

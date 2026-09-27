@@ -1078,11 +1078,18 @@ export const CHUNKS = {
   "pull-request-actions": "pull-request-actions-5ac6dcc71dec.js",
   "pull-request-revision-tab": "pull-request-revision-tab-5ef1fcd9eb3f.js",
   "registered-pull-request-thumbnail": "registered-56d9602398a1.js",
+  "thread-user-message-navigation-rail-app": "thread-user-message-navigation-rail-app-36b00895660c.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "pull-request-actions",
+  "pull-request-revision-tab",
+  "registered-pull-request-thumbnail",
+  "pull-request-readonly-comment",
+  "bookmarked-thread-user-message-navigation",
+  "artifact-file-preview-icon",
   "diff-core",
   "review-row",
   "file-diff-alt",
