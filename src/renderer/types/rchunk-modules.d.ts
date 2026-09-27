@@ -5646,9 +5646,29 @@ declare module "@rchunk/credit-purchase-page-core" {
 
 declare module "@rchunk/plugin-request-empty-state";
 declare module "@rchunk/plugins-store-page";
-declare module "@rchunk/plugins-page-section";
+declare module "@rchunk/plugins-page-section" {
+  export interface Skill { id: string; name: string; description?: string; shortDescription?: string; path?: string; scope?: string; [key: string]: unknown }
+  export interface InstalledSkill { skill: Skill; [key: string]: unknown }
+  export interface Plugin { isBuiltIn?: boolean; marketplaceDisplayName?: string; marketplaceName?: string; marketplacePath?: string; name: string; origin?: string | null; path?: string; scope?: string; [key: string]: unknown }
+  export interface App { description?: string | null; displayName?: string; id?: string; isAccessible?: boolean; name: string; shortDescription?: string | null; type?: string; [key: string]: unknown }
+  export const A: () => void; export const C: (input: { installedSkills: InstalledSkill[]; recommendedSkills: Skill[] }) => InstalledSkill[];
+  export const D: (skills: InstalledSkill[]) => InstalledSkill[]; export const E: (input: { installedRecommendedSkillIds: Set<string>; installedSkillMatchKeys: Set<string>; skills: Skill[] }) => Skill[];
+  export const F: (props: Record<string, unknown> & { id: string }) => unknown; export const I: () => void; export const M: undefined;
+  export const N: () => void; export const O: () => void; export const P: (props: Record<string, unknown> & { sections: Array<{ id: string; title: unknown }> }) => unknown;
+  export const S: (input: { skills: Skill[]; query: string }) => Skill[]; export const T: (input: { recommendedSkills?: Skill[] | null; skills: InstalledSkill[] }) => InstalledSkill[];
+  export const _: (input: { pluginResultKeys: string[]; skillResultKeys: string[]; tab: string }) => string[] | undefined;
+  export const a: () => void; export const b: (input: { skills: InstalledSkill[]; query: string }) => InstalledSkill[]; export const c: (config: unknown) => Set<string>;
+  export const d: () => void; export const f: (plugin: Plugin, names: Set<string>) => boolean; export const g: (input: { currentTab: string; isCurrentTabLoading: boolean; isManagePage: boolean; isPluginsEnabled: boolean; tabCounts: Record<string, number> }) => string;
+  export const h: (apps: App[]) => { installedApps: App[]; discoverApps: App[] }; export const i: (props: { hostId: string; plugin: Plugin; size?: string }) => unknown;
+  export const j: () => void; export const k: () => void; export const l: (input: { installedSkills: InstalledSkill[]; skill: Skill }) => Skill | null;
+  export const m: (input: { installedSkillMatchKeys: Set<string>; skill: Skill }) => boolean; export const n: (props: Record<string, unknown>) => unknown;
+  export const o: (skills: InstalledSkill[]) => Set<string>; export const p: (plugin: Plugin, names: Set<string>) => boolean; export const r: () => void;
+  export const s: (config: unknown) => Set<string>; export const t: (props: Record<string, unknown>) => unknown; export const u: (plugin: Plugin) => string;
+  export const v: (input: { query: string; suggestions?: App[] | null }) => App[]; export const w: (apps: App[]) => App[];
+  export const x: (input: { configuredMarketplaceNames: Set<string>; marketplaces: Plugin[]; query: string }) => Plugin[]; export const y: (input: { apps: App[]; query: string }) => App[];
+}
 declare module "@rchunk/plugin-detail-view";
-declare module "@rchunk/plugins-page";
+declare module "@rchunk/plugins-page" { export const i: () => void; export const n: () => void; export const r: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; }
 
 declare module "@rchunk/skills-page-core" {
   interface Skill {
@@ -5688,10 +5708,24 @@ declare module "@rchunk/chatgpt-conversation-page-core" {
 }
 
 declare module "@rchunk/plugin-detail-page-core" {
+  export const _: <T>(value: T) => T; export const a: () => void; export const b: (plugin: { id?: string; name: string }) => string;
+  export const c: <T>(value: T) => T; export const d: (plugin: { id?: string; installed?: boolean }) => boolean; export const f: <T>(value: T) => T;
+  export const g: (plugin: { id?: string; name: string }) => string; export const h: <T>(value: T) => T; export const i: () => void;
+  export const l: (plugin: { id?: string; name: string }) => string; export const m: <T>(value: T) => T;
   export const n: (props: Record<string, unknown>) => unknown;
+  export const o: (props: Record<string, unknown>) => unknown; export const p: <T>(value: T) => T;
   export const r: () => void;
+  export const s: <T>(value: T) => T;
   export const t: (props: Record<string, unknown>) => unknown;
+  export const u: <T>(value: T) => T; export const v: <T>(value: T) => T; export const x: <T>(value: T) => T; export const y: <T>(value: T) => T;
 }
+
+declare module "@rchunk/app-connect-link-navigation"; declare module "@rchunk/plugin-connector-setup";
+declare module "@rchunk/use-plugin-scheduled-tasks"; declare module "@rchunk/apps-availability";
+declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-card"; declare module "@rchunk/api";
+declare module "@rchunk/share-menu-item"; declare module "@rchunk/recommended-skill-statsig-overrides";
+declare module "@rchunk/find-plugin-mcp-extension-view"; declare module "@rchunk/control-group"; declare module "@rchunk/filter";
+declare module "@rchunk/plugin-connected-account-links"; declare module "@rchunk/plugin-disabled-reason";
 
 declare module "@rchunk/mcp-extension-view-page-core" {
   export const i: () => void;
