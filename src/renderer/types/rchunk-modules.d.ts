@@ -4125,8 +4125,13 @@ declare module "@rchunk/file-already-exists-dialog" {
 }
 
 declare module "@rchunk/pending-edits-dialog" {
+  export interface PendingEditsDialogProps {
+    onCancel(): void;
+    onConfirm(): void;
+    open: boolean;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: PendingEditsDialogProps) => unknown;
 }
 
 declare module "@rchunk/settings-unsaved-changes-dialog" {
