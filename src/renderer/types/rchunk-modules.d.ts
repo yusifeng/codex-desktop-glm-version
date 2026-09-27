@@ -8898,9 +8898,26 @@ declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
 }
-declare module "@rchunk/secret-scope" { const secretScope: unknown; export default secretScope; }
-declare module "@rchunk/validation-message" { const validationMessage: unknown; export default validationMessage; }
-declare module "@rchunk/allowed-domains-input" { const allowedDomainsInput: unknown; export default allowedDomainsInput; }
+declare module "@rchunk/secret-scope" {
+  export type SecretScope = "environment" | "user_provided";
+  export interface SecretValueInputProps { id: string; value: string; ariaLabel: string; invalid?: boolean; describedBy?: string; hasSavedValue?: boolean; saved?: boolean; optional?: boolean; personal?: boolean; scopeControl?: unknown; onFocus?(): void; onBlur?(): void; onChange(value: string): void; }
+  export const a: (props: SecretValueInputProps) => unknown; export const c: () => void; export const i: () => void; export const n: () => void; export const o: () => void;
+  export const r: (props: SecretValueInputProps & { configuration?: { configId?: string }; namespace: "sensitive" | "not_sensitive"; name: string; savedStatus?: "saved" | "ambiguous" | "unavailable"; onRetry?(): void }) => unknown;
+  export const s: (props: SecretValueInputProps) => unknown;
+  export const t: (props: { name: string; source: SecretScope; disabled?: boolean; attached?: boolean; onChange(scope: SecretScope): void }) => unknown;
+}
+declare module "@rchunk/validation-message" {
+  export type EnvironmentValidationError = "missing-key" | "invalid-key" | "reserved-key" | "duplicate" | "missing-value" | "invalid-value";
+  export const n: (props: { error: EnvironmentValidationError }) => unknown; export const r: () => void; export const t: (props: { name: string }) => unknown;
+}
+declare module "@rchunk/allowed-domains-input" {
+  export interface EnvironmentSaveIssue { code: string; field?: string; message?: string; valuesSaved?: boolean; }
+  export const a: () => void;
+  export const i: (props: { issues: readonly EnvironmentSaveIssue[] }) => unknown;
+  export const n: () => void;
+  export const r: (props: { issue: EnvironmentSaveIssue }) => unknown;
+  export const t: (props: { disabled?: boolean; domains: readonly string[]; value: string; onChange(domains: string[]): void; onInputChange(value: string): void; showErrors?: boolean; purpose?: "network" | "secret"; readOnly?: boolean; otherDomainCount?: number }) => unknown;
+}
 declare module "@rchunk/environment-entry-input" {
   export type EnvironmentParseFailure = { ok: false; reason: "duplicate" | "limit" | "malformed"; line: number };
   export type EnvironmentParseResult = { ok: true; entries: Map<string, string> } | EnvironmentParseFailure;
