@@ -5,10 +5,90 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-let jsx: any;
-let TOOLBAR_STYLE: any;
-let TAB_STYLES: Record<string, any>;
+const {
+  $3: initializeJsxRuntimeLazy,
+  I3: getJsxRuntime,
+  Yh: InsetButton,
+  Zh: initializeButton,
+  ag: initializeDismissIcon,
+  h4: initializeClassNames,
+  ig: DismissIcon,
+  m4: classNames,
+} = appSharedChunk;
+
+type TabVariant =
+  | "browse"
+  | "filter"
+  | "inset"
+  | "page"
+  | "pill"
+  | "profile"
+  | "segmented"
+  | "toolbar"
+  | "underline";
+
+interface TabItem {
+  closeLabel?: string;
+  icon?: unknown;
+  key: string;
+  name: unknown;
+  onClose?(): void;
+  panelId?: string;
+}
+
+interface TabsProps {
+  activationMode?: "automatic" | "manual";
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  className?: string;
+  fill?: boolean;
+  onSelect(key: string): void;
+  scrollable?: boolean;
+  selectedKey: string;
+  tabListRef?: unknown;
+  tabs: TabItem[];
+  variant?: TabVariant;
+}
+
+interface TabStyle {
+  closeButtonClassName?: string;
+  itemClassName?: string;
+  listClassName: string;
+  segmentedEdges?: boolean;
+  selectedClassName?: string;
+  selectionIndicator?: "underline" | null;
+  tabButtonClassName?: string;
+  unselectedClassName?: string;
+}
+
+interface TabElement {
+  focus(): void;
+  scrollIntoView(options: { block: "nearest"; inline: "nearest" }): void;
+}
+
+interface TabsKeyboardEvent {
+  altKey?: boolean;
+  ctrlKey?: boolean;
+  currentTarget: {
+    querySelectorAll(selector: string): ArrayLike<TabElement>;
+  } & Element;
+  key: string;
+  metaKey?: boolean;
+  preventDefault(): void;
+  shiftKey?: boolean;
+  stopPropagation(): void;
+  target: unknown;
+}
+
+interface TabsWheelEvent {
+  currentTarget: { scrollLeft: number };
+  deltaX: number;
+  deltaY: number;
+}
+
+let jsx: import("@rchunk/app-shared").JsxRuntime;
+let TOOLBAR_STYLE: TabStyle;
+let TAB_STYLES: Record<TabVariant, TabStyle>;
 
 function Tabs({
   tabs,
@@ -22,17 +102,17 @@ function Tabs({
   ariaLabel,
   ariaLabelledBy,
   activationMode = "automatic",
-}: any) {
+}: TabsProps): unknown {
   const style = TAB_STYLES[variant];
-  const TabButton = variant === "inset" ? appShared.Yh : "button";
-  const listClassName = appShared.m4(
+  const TabButton = variant === "inset" ? InsetButton : "button";
+  const listClassName = classNames(
     style.listClassName,
     fill && "w-full",
     scrollable && "hide-scrollbar overflow-x-auto overflow-y-hidden",
     className,
   );
   const onWheel = scrollable ? translateWheelToHorizontalScroll : undefined;
-  const onKeyDown = (event: any) => {
+  const onKeyDown = (event: TabsKeyboardEvent) => {
     if (
       event.altKey ||
       event.ctrlKey ||
@@ -44,7 +124,7 @@ function Tabs({
     }
     const tabElements = Array.from(
       event.currentTarget.querySelectorAll('[role="tab"]'),
-    ) as any[];
+    ) as TabElement[];
     const currentIndex = tabElements.findIndex((tab) => tab === event.target);
     if (currentIndex < 0 || tabElements.length === 0) return;
     event.preventDefault();
@@ -71,7 +151,7 @@ function Tabs({
       onSelect(nextTab.key);
   };
 
-  const tabNodes = tabs.map((tab: any, index: number) => {
+  const tabNodes = tabs.map((tab, index: number) => {
     const selected = tab.key === selectedKey;
     const first = index === 0;
     const last = index === tabs.length - 1;
@@ -84,7 +164,7 @@ function Tabs({
     return jsx.jsxs(
       "div",
       {
-        className: appShared.m4(
+        className: classNames(
           "relative flex min-w-0 items-center",
           style.itemClassName,
           fill && "flex-1",
@@ -93,7 +173,7 @@ function Tabs({
         children: [
           jsx.jsxs(TabButton, {
             id: tab.panelId == null ? undefined : `${tab.panelId}-tab`,
-            className: appShared.m4(
+            className: classNames(
               fill && "min-w-0 flex-1 justify-center",
               variant !== "inset" && [
                 "cursor-interaction items-center text-sm select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
@@ -138,12 +218,12 @@ function Tabs({
             : jsx.jsx("button", {
                 type: "button",
                 "aria-label": tab.closeLabel,
-                className: appShared.m4(
+                className: classNames(
                   "cursor-interaction text-tertiary hover:text-default",
                   style.closeButtonClassName,
                 ),
                 onClick: tab.onClose,
-                children: jsx.jsx(appShared.ig, { className: "icon-2xs" }),
+                children: jsx.jsx(DismissIcon, { className: "icon-2xs" }),
               }),
           style.segmentedEdges && !last
             ? jsx.jsx("div", {
@@ -169,17 +249,17 @@ function Tabs({
   });
 }
 
-function translateWheelToHorizontalScroll(event: any) {
+function translateWheelToHorizontalScroll(event: TabsWheelEvent): void {
   const delta = event.deltaX || event.deltaY;
   if (delta !== 0) event.currentTarget.scrollLeft += delta;
 }
 
 function initializeTabs(): void {
-  appShared.$3();
-  appShared.h4();
-  appShared.ag();
-  appShared.Zh();
-  jsx = appShared.I3();
+  initializeJsxRuntimeLazy();
+  initializeClassNames();
+  initializeDismissIcon();
+  initializeButton();
+  jsx = getJsxRuntime();
   TOOLBAR_STYLE = {
     closeButtonClassName: "flex h-7 w-5 items-center justify-center",
     itemClassName: "shrink-0",

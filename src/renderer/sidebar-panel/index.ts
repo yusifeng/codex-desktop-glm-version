@@ -13,17 +13,42 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-
-interface ReactRuntime {
-  useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
-  useRef<T>(value: T): { current: T };
-}
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-}
+const {
+  BQ: initializeDictationRecorder,
+  J: initializeDictationErrors,
+  RQ: mergeDictationTranscript,
+  Rrt: initializeDisclosure,
+  Urt: Disclosure,
+  X: initializeDictationTranscription,
+  Y: isDictationEnabled,
+  Z: useDictation,
+  _t: DictationButton,
+  vt: DictationRecordingOverlay,
+  yt: initializeDictation,
+} = appInitialChunk;
+const {
+  FX: initializeSignalRuntime,
+  Fs: InsertIcon16,
+  I3: getJsxRuntime,
+  Ix: FormatIcon16,
+  K2: initializeIntl,
+  LX: useSignalScope,
+  Lx: FormatIcon20,
+  Ms: initializeInsertIcons,
+  Ns: InsertIcon20,
+  Ps: initializeImageIcons,
+  QI: initializeQueryRuntime,
+  ZI: applicationScope,
+  e6: reactRuntime,
+  lg: AnimatedIcon,
+  lk: initializeToastUi,
+  lw: initializeImportIcons,
+  n4: useIntl,
+  nS: ImageIcon16,
+  pk: toastManagerSignal,
+  rS: ImageIcon20,
+  ug: initializeFormatIcons,
+} = appSharedChunk;
 
 export interface SidebarPanelDictationRenderState {
   dictationButton: unknown;
@@ -41,26 +66,23 @@ export interface SidebarPanelDictationProps {
   value: string;
 }
 
-let React: ReactRuntime | null = null;
-let jsx: JsxRuntime | null = null;
-
-function callInitializer(chunk: Record<string, any>, name: string): unknown {
-  const initializer = chunk[name];
-  return typeof initializer === "function" ? initializer() : initializer;
-}
+let React: import("@rchunk/app-shared").ReactRuntime | null = null;
+let jsx: import("@rchunk/app-shared").JsxRuntime | null = null;
 
 /** 装配 React、scope、toast 与 dictation 运行时（原 `R`）。 */
 function initializeSidebarPanelDictation(): void {
-  callInitializer(appShared, "FX");
-  callInitializer(appShared, "K2");
-  callInitializer(appInitial, "yt");
-  callInitializer(appInitial, "BQ");
-  callInitializer(appInitial, "X");
-  callInitializer(appInitial, "J");
-  callInitializer(appShared, "lk");
-  callInitializer(appShared, "QI");
-  React ??= callInitializer(appShared, "e6") as ReactRuntime;
-  jsx ??= callInitializer(appShared, "I3") as JsxRuntime;
+  initializeSignalRuntime?.();
+  initializeIntl?.();
+  initializeDictation?.();
+  initializeDictationRecorder?.();
+  initializeDictationTranscription?.();
+  initializeDictationErrors?.();
+  initializeToastUi?.();
+  initializeQueryRuntime?.();
+  React ??=
+    typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
+  jsx ??=
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
 }
 
 /**
@@ -71,16 +93,17 @@ function initializeSidebarPanelDictation(): void {
  */
 function SidebarPanelDictationController(props: SidebarPanelDictationProps): unknown {
   initializeSidebarPanelDictation();
-  const react = React as ReactRuntime;
-  const renderer = jsx as JsxRuntime;
-  const scope = appShared.LX(appShared.ZI);
-  const intl = appShared.n4();
+  const react = React as import("@rchunk/app-shared").ReactRuntime;
+  const renderer = jsx as import("@rchunk/app-shared").JsxRuntime;
+  const scope = useSignalScope(applicationScope);
+  const intl = useIntl();
   const valueRef = react.useRef(props.value);
   react.useEffect(() => {
     valueRef.current = props.value;
   }, [props.value]);
 
-  const mergeTranscript = (transcript: string) => appInitial.RQ(valueRef.current, transcript);
+  const mergeTranscript = (transcript: string) =>
+    mergeDictationTranscript(valueRef.current, transcript);
   const onTranscriptInsert = (transcript: string) => {
     const next = mergeTranscript(transcript);
     valueRef.current = next;
@@ -97,13 +120,13 @@ function SidebarPanelDictationController(props: SidebarPanelDictationProps): unk
   };
 
   const showError = (id: string, defaultMessage: string, description: string) => {
-    scope.get(appShared.pk).danger(
-      intl.formatMessage({ id, defaultMessage, description }),
+    scope.get(toastManagerSignal).danger(
+      String(intl.formatMessage({ id, defaultMessage, description })),
       { errorAnalytics: { toastId: id } },
     );
   };
-  const enabled = appInitial.Y() === true;
-  const dictation = appInitial.Z({
+  const enabled = isDictationEnabled() === true;
+  const dictation = useDictation({
     enabled,
     getSurroundingText: () => valueRef.current,
     onTranscriptInsert,
@@ -139,7 +162,7 @@ function SidebarPanelDictationController(props: SidebarPanelDictationProps): unk
 
   const dictationButton =
     dictation.hostCapability == null || enabled
-      ? renderer.jsx(appInitial._t, {
+      ? renderer.jsx(DictationButton, {
           isVisible: true,
           isStarting: dictation.isDictationStarting,
           isTranscribing: dictation.isTranscribing,
@@ -157,7 +180,7 @@ function SidebarPanelDictationController(props: SidebarPanelDictationProps): unk
       ? renderer.jsx("div", {
           className:
             "absolute inset-0 z-20 flex flex-col justify-center bg-surface-elevated-secondary",
-          children: renderer.jsx(appInitial.vt, {
+          children: renderer.jsx(DictationRecordingOverlay, {
             transcriptionAction: dictation.transcriptionAction,
             waveformCanvasRef: dictation.waveformCanvasRef,
             stopDictation: dictation.stopDictation,
@@ -179,21 +202,21 @@ function SidebarPanelDictationController(props: SidebarPanelDictationProps): unk
 let sidebarPanelAttachmentIcons: Record<string, unknown> = {};
 
 function initializeSidebarPanelAttachmentIcons(): void {
-  callInitializer(appShared, "Ps");
-  callInitializer(appShared, "Ms");
-  callInitializer(appShared, "lw");
-  callInitializer(appShared, "ug");
-  const renderer = (jsx ??= callInitializer(appShared, "I3") as JsxRuntime);
-  const IconAsset = appShared.lg;
+  initializeImageIcons?.();
+  initializeInsertIcons?.();
+  initializeImportIcons?.();
+  initializeFormatIcons?.();
+  const renderer = (jsx ??=
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime);
   sidebarPanelAttachmentIcons = {
-    image: renderer.jsx(IconAsset, {
-      icon: { 16: appShared.nS, 20: appShared.rS },
+    image: renderer.jsx(AnimatedIcon, {
+      icon: { 16: ImageIcon16, 20: ImageIcon20 },
     }),
-    insert: renderer.jsx(IconAsset, {
-      icon: { assets: { 16: appShared.Fs, 20: appShared.Ns } },
+    insert: renderer.jsx(AnimatedIcon, {
+      icon: { assets: { 16: InsertIcon16, 20: InsertIcon20 } },
     }),
-    format: renderer.jsx(IconAsset, {
-      icon: { 16: appShared.Ix, 20: appShared.Lx },
+    format: renderer.jsx(AnimatedIcon, {
+      icon: { 16: FormatIcon16, 20: FormatIcon20 },
     }),
   };
 }
@@ -201,7 +224,7 @@ function initializeSidebarPanelAttachmentIcons(): void {
 /** Framer Motion 高度自动展开容器（原 `H`）。 */
 function renderSidebarPanelDisclosure(children: unknown, open: boolean): unknown {
   initializeSidebarPanelDisclosure();
-  return (jsx as JsxRuntime).jsx(appInitial.Urt, {
+  return (jsx as import("@rchunk/app-shared").JsxRuntime).jsx(Disclosure, {
     className: "pointer-events-auto",
     height: "content",
     open,
@@ -210,8 +233,9 @@ function renderSidebarPanelDisclosure(children: unknown, open: boolean): unknown
 }
 
 function initializeSidebarPanelDisclosure(): void {
-  callInitializer(appInitial, "Rrt");
-  jsx ??= callInitializer(appShared, "I3") as JsxRuntime;
+  initializeDisclosure?.();
+  jsx ??=
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
 }
 
 export {

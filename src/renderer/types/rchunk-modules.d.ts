@@ -1923,6 +1923,17 @@ declare module "@rchunk/app-shared" {
   export const ig: IconAssetPreset;
   /** close icon asset（Home Beacon banner）。 */
   export const cw: IconAssetPreset;
+  /** Sidebar panel attachment animation assets and initializers. */
+  export const Fs: unknown;
+  export const Ix: unknown;
+  export const Lx: unknown;
+  export const Ms: () => void;
+  export const Ns: unknown;
+  export const Ps: () => void;
+  export const lg: (props: Record<string, unknown>) => unknown;
+  export const nS: unknown;
+  export const rS: unknown;
+  export const ug: () => void;
   export const ag: () => void;
   /** Worktree onboarding analytics event descriptor。 */
   export const MA: unknown;
@@ -3514,6 +3525,38 @@ declare module "@rchunk/app-initial" {
   export const v2t: unknown;
   export const yNt: (beacon: unknown) => boolean;
   export const zW: unknown;
+  export interface SidebarDictationOptions {
+    enabled: boolean;
+    getSurroundingText(): string;
+    onStartError(): void;
+    onTranscriptInsert(transcript: string): void;
+    onTranscriptSend(transcript: string): void;
+    onTranscribeError(): void;
+    onUnsupported(): void;
+  }
+  export interface SidebarDictationState {
+    canRetryDictation: boolean;
+    hostCapability?: unknown;
+    isDictating: boolean;
+    isDictationStarting: boolean;
+    isTranscribing: boolean;
+    retryDictation(): void;
+    startDictation(): void;
+    stopDictation(): void;
+    transcriptionAction?: unknown;
+    waveformCanvasRef?: unknown;
+  }
+  export const BQ: () => void;
+  export const J: () => void;
+  export const RQ: (current: string, transcript: string) => string;
+  export const Rrt: () => void;
+  export const Urt: (props: Record<string, unknown>) => unknown;
+  export const X: () => void;
+  export const Y: () => boolean;
+  export const Z: (options: SidebarDictationOptions) => SidebarDictationState;
+  export const _t: (props: Record<string, unknown>) => unknown;
+  export const vt: (props: Record<string, unknown>) => unknown;
+  export const yt: () => void;
   export const ANt: () => void;
   export const Ae: () => (destination: unknown) => void;
   export const FNt: (
@@ -8657,14 +8700,61 @@ declare module "@rchunk/security-src" {
 }
 
 declare module "@rchunk/security-tabs" {
-  export const n: () => void;
-  export const t: (props: {
-    ariaLabel: string;
+  export interface SecurityTabItem {
+    closeLabel?: string;
+    icon?: unknown;
+    key: string;
+    name: unknown;
+    onClose?(): void;
+    panelId?: string;
+  }
+  export interface SecurityTabsProps {
+    activationMode?: "automatic" | "manual";
+    ariaLabel?: string;
+    ariaLabelledBy?: string;
+    className?: string;
+    fill?: boolean;
     onSelect(key: string): void;
+    scrollable?: boolean;
     selectedKey: string;
-    tabs: Array<{ key: string; name: unknown; panelId: string }>;
-    variant?: string;
-  }) => unknown;
+    tabListRef?: unknown;
+    tabs: SecurityTabItem[];
+    variant?:
+      | "browse"
+      | "filter"
+      | "inset"
+      | "page"
+      | "pill"
+      | "profile"
+      | "segmented"
+      | "toolbar"
+      | "underline";
+  }
+  export const n: () => void;
+  export const t: (props: SecurityTabsProps) => unknown;
+}
+
+declare module "@rchunk/sidebar-panel" {
+  export interface SidebarPanelDictationRenderState {
+    dictationButton: unknown;
+    isBusy: boolean;
+    isDictating: boolean;
+    recordingOverlay: unknown;
+  }
+  export interface SidebarPanelDictationProps {
+    children(state: SidebarPanelDictationRenderState): unknown;
+    onBusyChange?(busy: boolean): void;
+    onChange(value: string): void;
+    onSubmit(value: string): void;
+    tooltipPortalContainer?: Element | null;
+    value: string;
+  }
+  export const a: (props: SidebarPanelDictationProps) => unknown;
+  export const i: Record<string, unknown>;
+  export const n: (children: unknown, open: boolean) => unknown;
+  export const o: () => void;
+  export const r: () => void;
+  export const t: () => void;
 }
 
 declare module "@rchunk/confirmation" {
