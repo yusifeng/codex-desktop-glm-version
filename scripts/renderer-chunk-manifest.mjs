@@ -328,6 +328,8 @@ export const CHUNKS = {
   "bookmarked-thread-user-message-navigation": "bookmarked-thread-user-message-navigation-f166b870b632.js",
   "command-execution-command": "command-execution-command-615dea847916.js",
   "conversation-source": "conversation-source-a25a6a9a1e11.js",
+  "highlight-selectors": "highlight-selectors-452c942ff7fd.js",
+  "katex-renderer": "katex-fb2359bfd034.js",
   "creation-target-query": "creation-target-query-96337f5ffd91.js",
   "environment-labels": "environment-labels-c762ad05cdf9.js",
   "git-action-new-branch-field": "git-action-new-branch-field-a2e24da5e504.js",
@@ -1030,6 +1032,9 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "local-conversation-thread-turn-entries",
+  "local-conversation-artifacts-signals",
+  "conversation-source",
   "chatgpt-accent-messages",
   "security-messages",
   "local-conversation-external-resources",

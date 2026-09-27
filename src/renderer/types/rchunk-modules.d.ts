@@ -12,6 +12,8 @@ declare module "@rchunk/rolldown-runtime" {
 }
 
 declare module "@rchunk/app-shared" {
+  export const OK: (url: string) => string;
+  export const PK: (value: string) => boolean;
   /** getPathBasename（来源面板的本地文件标签）。 */
   export const II: (path: string) => string;
   /** getMcpAppId（从 MCP 调用 id 提取稳定 app id）。 */
@@ -2774,6 +2776,48 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const A_: (entry: Record<string, unknown>) => boolean;
+  export const A9t: (input: Record<string, unknown>) => boolean;
+  export const D9t: (input: Record<string, unknown>) => boolean;
+  export const E9t: () => void;
+  export const Fut: () => void;
+  export const Grn: (text: unknown, preserve: boolean) => { content: string; removed: boolean };
+  export const H9t: (resourcePath: string) => boolean;
+  export const Hnn: () => void;
+  export const Knn: () => void;
+  export const Krn: () => void;
+  export const Put: (input: Record<string, unknown>) => Array<Record<string, unknown>>;
+  export const T9t: (input: Record<string, unknown>) => Array<Record<string, unknown>>;
+  export const V9t: () => void;
+  export const bQt: unknown;
+  export const ein: () => void;
+  export const i$t: unknown;
+  export const k9t: () => void;
+  export const k_: () => void;
+  export const nWt: () => void;
+  export const tin: (turn: Record<string, unknown>) => boolean;
+  export const w9t: (artifacts: unknown) => unknown[];
+  export const yhn: (input: Record<string, unknown>) => { artifactScanContent: unknown };
+  export const AUt: () => void;
+  export const CUt: () => void;
+  export const DUt: (mutations: MutationRecord[]) => boolean;
+  export const EUt: (input: Record<string, unknown>) => void;
+  export const OUt: (text: string, start: number, end: number) => unknown;
+  export const PUt: (input: Record<string, unknown>, signal?: AbortSignal) => Promise<Record<string, unknown> | null>;
+  export const SUt: (text: string, query: string, limit: number) => { offsets: Array<{ end: number; start: number }>; totalMatches: number };
+  export const TUt: (element: Element, selected: boolean) => void;
+  export const _D: () => void;
+  export const _Ut: (turnKey: string, unitId: string) => string;
+  export const gUt: (location: Record<string, unknown>) => string;
+  export const gmn: () => void;
+  export const hUt: (container: ParentNode, options: { includeShadowRoots: boolean }) => void;
+  export const iD: unknown;
+  export const jUt: (text: string, range: { end: number; start: number }) => { end: number; start: number };
+  export const kUt: (text: string, query: string, limit: number) => { offsets: Array<{ end: number; start: number }>; totalMatches: number };
+  export const tD: unknown;
+  export const wUt: unknown;
+  export const xUt: (input: { container: ParentNode; includeShadowRoots?: boolean; matchId: string }) => Element | null;
+  export const yUt: () => HTMLElement;
   export const Brn: (serverName: string) => string;
   export const Drn: () => void;
   export const Ern: (input: Record<string, unknown>) => Record<string, unknown> | null;
@@ -4550,6 +4594,8 @@ declare module "@rchunk/confirm-subscription-upgrade" {
 }
 
 declare module "@rchunk/app-primary" {
+  export const gf: () => void;
+  export const hf: (text: string) => Array<Record<string, unknown>>;
   /** new-thread-panel-page 初始化面与实验配置。 */
   export const P: () => void;
   export const ds: unknown;
@@ -7209,8 +7255,8 @@ declare module "@rchunk/rpc" {
 }
 
 declare module "@rchunk/split-items-into-render-groups" {
-  export const n: unknown;
-  export const t: unknown;
+  export const n: (items: unknown[], status: unknown, mode: string) => Record<string, unknown>;
+  export const t: () => void;
 }
 
 declare module "@rchunk/agent-activity-units" {
@@ -7233,9 +7279,20 @@ declare module "@rchunk/thread-virtualizer" {
 }
 
 declare module "@rchunk/scroll-to-match" {
-  export const n: unknown;
-  export const r: unknown;
+  export const n: (input: { container: ParentNode; includeShadowRoots?: boolean; matchId: string; signal?: AbortSignal }) => Promise<void>;
+  export const r: () => Promise<void>;
   export const t: () => void;
+}
+
+declare module "@rchunk/highlight-selectors" {
+  export const n: (matches: unknown[]) => Map<string, unknown[]>;
+  export const r: () => void;
+  export const t: (matches: unknown[]) => Map<string, unknown[]>;
+}
+
+declare module "@rchunk/katex-renderer" {
+  const katex: { renderToString(source: string, options?: Record<string, unknown>): string };
+  export default katex;
 }
 
 declare module "@rchunk/local-conversation-turn" {
@@ -7732,6 +7789,11 @@ declare module "@rchunk/diff-summary" {
 }
 
 declare module "@rchunk/generated-image-output-visibility" {
+  export const a: (items: unknown[]) => boolean;
+  export const i: (paths: unknown[]) => boolean;
+  export const n: (input: Record<string, unknown>) => { images?: unknown[] } | null;
+  export const r: () => void;
+  export const t: (...arguments_: unknown[]) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -7832,6 +7894,11 @@ declare module "@rchunk/plan-implementation-request" {
 }
 
 declare module "@rchunk/timestamps" {
+  export const a: () => void;
+  export const i: (turnTimestamps: unknown[]) => Array<number | null>;
+  export const n: (...arguments_: unknown[]) => string;
+  export const r: (...arguments_: unknown[]) => Record<string, unknown>;
+  export const t: (...arguments_: unknown[]) => number;
   const _default: unknown;
   export default _default;
 }
@@ -8033,7 +8100,7 @@ declare module "@rchunk/pull-request-status-label" {
 
 // Conversation workflow, source panels, and local-workspace foundations.
 declare module "@rchunk/app-shared" {
-  export const HI: (path: string) => string;
+  export const HI: (...segments: string[]) => string;
   export const IK: (left: string, right: string) => boolean;
   export const NU: (alias: string) => string;
   export const WK: (...segments: string[]) => string;
