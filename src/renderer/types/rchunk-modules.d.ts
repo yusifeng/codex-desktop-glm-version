@@ -5244,7 +5244,15 @@ declare module "@rchunk/navigation-blocker";
 declare module "@rchunk/automation-share-dialog";
 declare module "@rchunk/date-picker-runtime";
 declare module "@rchunk/binary-preview-source" { export interface BinaryPreviewSource { contentsBase64?: string | null; cwd?: string | null; environmentId?: string; hostId?: string; isError?: boolean; isLoading?: boolean; kind: "git" | "worktree"; mimeType?: string | null; path?: string; ref?: string } export const a: () => void; export const i: (props: { children?: unknown }) => unknown; export const n: (source?: BinaryPreviewSource | null) => { dataUrl: string | null; isError: boolean; isLoading: boolean }; export const o: (props: { after?: unknown; before?: unknown; className?: string; showAfterOnly?: boolean }) => unknown; export const r: (props: { className?: string }) => unknown; export const s: () => void; export const t: () => void }
-declare module "@rchunk/surface";
+declare module "@rchunk/surface" {
+  export interface MetadataEntry { key: string; value: string | string[] }
+  export interface SurfaceProps { background?: "normal" | "subtle"; children?: unknown; className?: string; overflow?: "auto" | "clip" }
+  export interface MarkdownSurfaceProps { conversationId?: string | null; cwd?: string | null; enableMetadataPreview?: boolean; hideCodeBlocks?: boolean; hostId?: string; isStreaming?: boolean; markdown: string }
+  export const i: () => void;
+  export const n: (props: SurfaceProps) => unknown;
+  export const r: (props: MarkdownSurfaceProps) => unknown;
+  export const t: (props: { entries: MetadataEntry[] }) => unknown;
+}
 declare module "@rchunk/pdf-preview-diff" { export const PdfPreviewDiff: (props: { currentPage?: number; error?: string | null; isLoading?: boolean; leftLabel?: string; rightLabel?: string; totalPages?: number; onNextPage?(): void; onPreviousPage?(): void }) => unknown; }
 declare module "@rchunk/tiny-invariant" { const invariant: (condition: unknown, message?: string) => asserts condition; export default invariant; }
 declare module "@rchunk/conversation-diff-comments" { export interface ConversationDiffComment { id?: string; path?: string | null; text?: string; [key: string]: unknown } export interface ConversationDiffCommentService { getComments?(conversationId: string): ConversationDiffComment[]; getModelComments?(conversationId: string): ConversationDiffComment[]; setComments?(conversationId: string, comments: ConversationDiffComment[]): void } export const n: (conversationId: string, service?: ConversationDiffCommentService) => { comments: ConversationDiffComment[]; modelComments: ConversationDiffComment[]; setComments(next: ConversationDiffComment[]): void }; export const t: () => void; }
@@ -6417,7 +6425,27 @@ declare module "@rchunk/plugin-share-dialogs-runtime" {
 }
 declare module "@rchunk/loading-page";
 declare module "@rchunk/plugin-share-dialog-entry";
-declare module "@rchunk/thread-shell-runtime";
+declare module "@rchunk/terminal-workspace-warning-state";
+declare module "@rchunk/thread-shell-runtime" {
+  export type TerminalPanel = "bottom" | "right";
+  export interface ThreadTerminalContext { conversationId: string; conversationTitle?: string; cwd?: string | null; hostId?: string }
+  export interface TerminalSession { context: ThreadTerminalContext; id: string; panel: TerminalPanel; snapshot?: unknown }
+  export interface TerminalScope { activePanel?: TerminalPanel; context?: ThreadTerminalContext | null; defaultTerminalLocation?: TerminalPanel; sessions: TerminalSession[]; terminalHidden?: boolean }
+  export const a: (scope: TerminalScope) => void;
+  export const c: (scope: TerminalScope) => boolean;
+  export const d: { getId(session: TerminalSession): string; getTitle(session: TerminalSession): string; open(scope: TerminalScope, sessionId?: string, panel?: TerminalPanel, options?: { snapshot?: unknown }): string | null; preloadExisting(scope: TerminalScope, sessionId: string, snapshot: unknown): Promise<boolean> };
+  export const f: (scope: TerminalScope) => void;
+  export const i: (scope: TerminalScope, input: { panel: TerminalPanel; sessionId: string; snapshot: unknown }) => void;
+  export const l: (scope: TerminalScope) => TerminalPanel;
+  export const m: (scope: TerminalScope) => () => void;
+  export const n: () => void;
+  export const o: (scope: TerminalScope, panel: TerminalPanel, replaceTabId?: string) => void;
+  export const p: (scope: TerminalScope, panel?: TerminalPanel) => void;
+  export const r: (scope: TerminalScope, sessionId?: string, panel?: TerminalPanel, options?: { snapshot?: unknown }) => string | null;
+  export const s: (scope: TerminalScope) => void;
+  export const t: (scope: TerminalScope) => boolean;
+  export const u: (scope: TerminalScope) => boolean;
+}
 declare module "@rchunk/artifact-viewer";
 declare module "@rchunk/thread-scroll-layout" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/thread-app-shell-chrome" { export const n: () => void; export const t: (props: Record<string, unknown> & { threadType: "local" | "new" | "remote" }) => unknown; }

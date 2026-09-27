@@ -1,0 +1,14 @@
+import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+interface SurfaceProps { background?: "normal" | "subtle"; children?: unknown; className?: string; overflow?: "auto" | "clip" }
+interface MetadataEntry { key: string; value: string | string[] }
+interface MarkdownSurfaceProps { conversationId?: string | null; cwd?: string | null; enableMetadataPreview?: boolean; hideCodeBlocks?: boolean; hostId?: string; isStreaming?: boolean; markdown: string }
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function parseFrontmatter(markdown: string): { body: string; entries: MetadataEntry[] } | null { if (!markdown.startsWith("---\n")) return null; const end = markdown.indexOf("\n---\n", 4); if (end < 0) return null; const entries = markdown.slice(4, end).split("\n").flatMap(line => { const separator = line.indexOf(":"); if (separator < 0) return []; const key = line.slice(0, separator).trim(), raw = line.slice(separator + 1).trim(); const value = raw.startsWith("[") && raw.endsWith("]") ? raw.slice(1, -1).split(",").map(item => item.trim()).filter(Boolean) : raw; return key ? [{ key, value }] : []; }); return { body: markdown.slice(end + 5), entries }; }
+function Surface({ background = "subtle", children, className = "", overflow = "clip" }: SurfaceProps): unknown { return jsx().jsx("div", { className: `relative rounded-lg ${background === "normal" ? "bg-surface" : "bg-text/5"} ${overflow === "auto" ? "overflow-auto" : "overflow-clip"} ${className}`.trim(), children }); }
+function MetadataPreview({ entries }: { entries: MetadataEntry[] }): unknown { return jsx().jsxs("div", { "data-metadata-preview": true, children: [jsx().jsx("div", { children: "Metadata" }), jsx().jsx("dl", { children: entries.slice(0, 8).map((entry, index) => jsx().jsxs("div", { children: [jsx().jsx("dt", { children: entry.key }), jsx().jsx("dd", { children: Array.isArray(entry.value) ? entry.value.map((value, valueIndex) => jsx().jsx("span", { children: value || '""' }, `${value}-${valueIndex}`)) : entry.value || '""' })] }, `${entry.key}-${index}`)) })] }); }
+function MarkdownSurface({ enableMetadataPreview = false, markdown, ...context }: MarkdownSurfaceProps): unknown { const parsed = enableMetadataPreview ? parseFrontmatter(markdown) : null; return jsx().jsxs("div", { "data-conversation-id": context.conversationId, "data-host-id": context.hostId, children: [parsed != null && parsed.entries.length > 0 ? jsx().jsx(MetadataPreview, { entries: parsed.entries }) : null, jsx().jsx("div", { "data-markdown": true, "data-streaming": context.isStreaming ?? false, children: parsed?.body ?? markdown })] }); }
+function initializeSurface(): void { void jsx(); }
+export { initializeSurface as i, Surface as n, MarkdownSurface as r, MetadataPreview as t };
