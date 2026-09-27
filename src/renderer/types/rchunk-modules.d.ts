@@ -2802,6 +2802,12 @@ declare module "@rchunk/app-initial" {
     signal: AbortSignal,
   ) => Promise<Blob & { name: string }>;
   export const yRt: () => void;
+  export const BGt: (blob: Blob) => Blob | Promise<Blob>;
+  export const Dan: (blob: Blob) => Promise<string>;
+  export const KGt: (
+    fileId: string,
+    options: { downloadIntent: boolean },
+  ) => Promise<Blob>;
   /** 恢复会话相关信号与宿主服务适配器。 */
   export const B8t: (
     scope: unknown,
@@ -10433,6 +10439,81 @@ declare module "@rchunk/hooks-settings-model" {
   export const s: (...arguments_: unknown[]) => string[];
   export const t: "__unknown__";
   export const u: (...arguments_: unknown[]) => Record<string, unknown> | null;
+}
+
+declare module "@rchunk/computer-history-query" {
+  export const a: () => void;
+  export const i: unknown;
+  export const n: unknown;
+  export const r: unknown;
+  export const t: string[];
+}
+
+declare module "@rchunk/chronicle-service-queries" {
+  export const C: () => Record<string, unknown>;
+  export const S: () => void;
+  export const _: (...arguments_: unknown[]) => Record<string, unknown>;
+  export const a: () => void;
+  export const b: (options: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  export const c: unknown;
+  export const d: unknown;
+  export const f: () => void;
+  export const g: () => Record<string, unknown>;
+  export const h: () => void;
+  export const i: unknown;
+  export const l: unknown;
+  export const m: (settings: Record<string, unknown>) => Record<string, unknown>;
+  export const n: unknown;
+  export const o: unknown;
+  export const p: (settings: Record<string, unknown>, bundleIdentifier: string) => boolean;
+  export const r: unknown;
+  export const s: unknown;
+  export const t: unknown;
+  export const u: unknown;
+  export const v: () => void;
+  export const x: (...arguments_: unknown[]) => Promise<void>;
+  export const y: (...arguments_: unknown[]) => void;
+}
+
+declare module "@rchunk/recent-uploads" {
+  export const n: () => void;
+  export const r: unknown;
+  export const t: (record: { file_id: string }) => Promise<Record<string, unknown>>;
+}
+
+declare module "@rchunk/chatgpt-image-home" {
+  export const a: Record<string, string>;
+  export const i: { $type: string };
+  export const n: { $type: string };
+  export const o: () => void;
+  export const r: { $type: string };
+  export const t: Record<string, string>;
+}
+
+declare module "@rchunk/virtual-try-on" {
+  export const C: () => void;
+  export const S: Record<string, string>;
+  export const _: { $type: string };
+  export const a: { $type: string };
+  export const b: Record<string, string>;
+  export const c: { $type: string };
+  export const d: { $type: string };
+  export const f: Record<string, string>;
+  export const g: Record<string, string>;
+  export const h: { $type: string };
+  export const i: Record<string, string>;
+  export const l: Record<string, string>;
+  export const m: Record<string, string>;
+  export const n: { $type: string };
+  export const o: Record<string, string>;
+  export const p: { $type: string };
+  export const r: Record<string, string>;
+  export const s: { $type: string };
+  export const t: { $type: string };
+  export const u: { $type: string };
+  export const v: Record<string, string>;
+  export const x: { $type: string };
+  export const y: { $type: string };
 }
 
 declare module "@rchunk/chatgpt-desktop-auth-url" {
