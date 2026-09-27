@@ -5260,8 +5260,18 @@ declare module "@rchunk/voice-personalization-dialog" { export const VoicePerson
 declare module "@rchunk/slides-outline-template-picker" { export const SlidesOutlineTemplatePicker: (props: Record<string, unknown> & { onOpenChange(open: boolean): void; onSelect(template: unknown): void; open: boolean }) => unknown; }
 declare module "@rchunk/avatar-mascot-button";
 declare module "@rchunk/pet-install-state";
-declare module "@rchunk/subscription-plan-status";
-declare module "@rchunk/format-amount";
+declare module "@rchunk/subscription-plan-status" {
+  export type SubscriptionPlan = "free" | "go" | "plus" | "pro" | "prolite" | string;
+  export interface SubscriptionPlanStatusAccount { account: { plan_type: SubscriptionPlan }; entitlement: { cancels_at?: string | null; expires_at?: string | null; is_delinquent?: boolean; renews_at?: string | null; scheduled_plan_change?: { changes_at?: string | null; plan_type: SubscriptionPlan } | null }; last_active_subscription: { will_renew: boolean } }
+  export const n: (props: { account: SubscriptionPlanStatusAccount; renewalPrice?: unknown; scheduledCadence?: string | null; showProLevels?: boolean }) => unknown;
+  export const r: () => void;
+  export const t: (input: { plan: SubscriptionPlan; showProLevels?: boolean }) => string;
+}
+declare module "@rchunk/format-amount" {
+  export interface AmountFormatter { formatNumber(value: number, options: Intl.NumberFormatOptions): string }
+  export const n: () => void;
+  export const t: (intl: AmountFormatter, amount: number, currencyCode: string) => string;
+}
 declare module "@rchunk/chatgpt-subscription-events";
 declare module "@rchunk/pricing-plan-comparison";
 declare module "@rchunk/voice-configuration-manager";
@@ -5271,12 +5281,37 @@ declare module "@rchunk/library-trash-analytics";
 declare module "@rchunk/source-dashed-border";
 declare module "@rchunk/analytics-runtime";
 declare module "@rchunk/chatgpt-projects-runtime";
-declare module "@rchunk/cadence-events";
+declare module "@rchunk/cadence-events" {
+  export type BillingCadence = "monthly" | "yearly";
+  export interface BillingCadenceState { annualPrice: { amount: number; tax?: number }; annualSavingsAmount: number; annualSavingsPercentage: number; billingCurrency: string; currentCadence: BillingCadence; displayPricingSource: string; effectiveNextCadence: BillingCadence; isAcquisitionCandidate: boolean; isRetentionCandidate: boolean; monthlyPrice: { amount: number; tax?: number }; renewalDate: Date; requiresReactivation: boolean; scheduledCadence: BillingCadence | null }
+  export const a: (state: BillingCadenceState, target: BillingCadence) => string;
+  export const c: (invoice?: { amount_due?: { amount?: number }; renewal_date?: string | null } | null) => boolean;
+  export const i: (account: Record<string, unknown>, subscription: Record<string, unknown> | null, pricing: Record<string, unknown> | null, now?: number) => BillingCadenceState | null;
+  export const n: (scope: { log?(event: Record<string, unknown>): void }, event: Record<string, unknown>) => void;
+  export const o: () => void;
+  export const r: (error: unknown, target: BillingCadence) => string;
+  export const s: (account: Record<string, unknown>) => boolean;
+  export const t: () => void;
+}
 declare module "@rchunk/add-payment-method";
-declare module "@rchunk/delinquent-upgrade-preparation";
-declare module "@rchunk/payment-method-display";
+declare module "@rchunk/delinquent-upgrade-preparation" {
+  export interface DelinquentUpgradePreparationInput extends Record<string, unknown> { accountId: string; hasPromotion?: boolean; initialPlan: string; pricingInfo?: unknown; updatedPlan: string; userId: string }
+  export const n: () => void;
+  export const r: (input: DelinquentUpgradePreparationInput) => Promise<Record<string, unknown> | null>;
+  export const t: (error: unknown) => string | undefined;
+}
+declare module "@rchunk/payment-method-display" {
+  export interface DisplayPaymentMethod extends Record<string, unknown> { card?: { brand?: string; last4?: string }; cashapp?: { cashtag?: string }; custom?: { payment_method_type?: string; provider?: string }; ideal?: { bank?: string }; kr_card?: { brand?: string; last4?: string }; link?: { email?: string }; paypal?: { payer_email?: string }; sepa_debit?: { last4?: string }; type: string; upi?: { vpa?: string } }
+  export const n: () => void;
+  export const t: (method: DisplayPaymentMethod) => { description: unknown; label: unknown };
+}
 declare module "@rchunk/edit-payment-method";
-declare module "@rchunk/subscription-recovery-events";
+declare module "@rchunk/subscription-recovery-events" {
+  export interface SubscriptionRecoveryEventScope { logProductEvent?(descriptor: string, payload: Record<string, unknown>): void }
+  export const n: () => void;
+  export const r: (scope: SubscriptionRecoveryEventScope, action: "shown" | "dismissed" | "cta_clicked", payload?: Record<string, unknown>) => void;
+  export const t: (scope: SubscriptionRecoveryEventScope, action: "shown" | "dismissed" | "pay_now_clicked" | "requires_action" | "payment_failed" | "payment_error" | "payment_succeeded", payload?: Record<string, unknown>) => void;
+}
 declare module "@rchunk/project-share-model";
 declare module "@rchunk/builder-analytics";
 declare module "@rchunk/read-error";
@@ -10249,7 +10284,6 @@ declare module "@rchunk/icloud-hosted-page" {
   export const ICloudHostedCompletionPage: (props: Pick<ICloudHostedPageProps, "onReturn">) => unknown;
 }
 
-declare module "@rchunk/subscription-plan-status" { const subscriptionPlanStatus: unknown; export default subscriptionPlanStatus; }
 declare module "@rchunk/feedback-legal-notice" { export const n: () => void; export const t: () => unknown; }
 declare module "@rchunk/feedback-form-dialog" {
   export interface FeedbackOption { id: string; label: string | { defaultMessage?: string; [key: string]: unknown }; }
