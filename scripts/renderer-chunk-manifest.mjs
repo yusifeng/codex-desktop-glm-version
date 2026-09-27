@@ -1047,11 +1047,21 @@ export const CHUNKS = {
   "card-tile": "card-tile-58cfccd9fb3f.js",
   "plugin-settings-url": "plugin-settings-url-cb4b412ead63.js",
   "cloud-environment-queries": "cloud-environment-queries-fe64a79d8109.js",
+  "pepper-persona": "persona-a3bb93441dce.js",
+  "computer-use-app-approvals-query": "computer-use-app-approvals-query-32a42c762e96.js",
+  "use-home-directory": "use-home-directory-590afb3c7fc1.js",
+  "voice-personalization-dialog-entry": "entry-9b0cd9d2d508.js",
+  "connector-post-connect-dialog": "dialog-4073966912d7.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "pepper-onboarding-modal",
+  "appgen-share-dialog",
+  "thread-handoff-modal",
+  "app-connect-modal",
+  "codex-mobile-setup-dialog",
   "create-pull-request-modal-content",
   "automation-dialog",
   "plan-downgrade-dialog-core",

@@ -4979,6 +4979,46 @@ declare module "@rchunk/create-dialog" {
   export const t: (props: Record<string, unknown>) => unknown;
 }
 
+declare module "@rchunk/pepper-persona";
+declare module "@rchunk/computer-use-app-approvals-query";
+declare module "@rchunk/use-home-directory";
+declare module "@rchunk/voice-personalization-dialog-entry";
+declare module "@rchunk/connector-post-connect-dialog";
+
+declare module "@rchunk/thread-handoff-modal" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/codex-mobile-setup-dialog" {
+  export const a: () => void;
+  export const c: { key: string; defaultValue: string };
+  export const i: (props: Record<string, unknown>) => unknown;
+  export const l: () => void;
+  export const n: () => void;
+  export const o: (step: string) => string;
+  export const r: (step: string) => string;
+  export const s: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/app-connect-modal" {
+  export const a: (input: Record<string, unknown[]>) => string[];
+  export const c: (input: { connectorId: string; disableExposureLog?: boolean; statsigClient?: unknown }) => boolean;
+  export const d: (input: Record<string, unknown[]>) => string[];
+  export const f: (input: { connectorId: string }) => string[];
+  export const h: () => void;
+  export const i: (value: unknown) => string;
+  export const l: (app: { description?: string; id: string; name: string }) => string;
+  export const m: (connectorId: string, connectorIds: string[]) => string | null;
+  export const n: () => void;
+  export const o: (connectorId: string) => string[];
+  export const p: (connectorId: string, links: string[]) => string[];
+  export const r: () => void;
+  export const s: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+  export const u: () => void;
+}
+
 declare module "@rchunk/app-main" {
   export const _any: any;
 }
