@@ -850,6 +850,11 @@ declare module "@rchunk/app-shared" {
     use<T>(context: unknown): T;
     useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
     useEffectEvent?<Callback extends (...args: never[]) => unknown>(callback: Callback): Callback;
+    useInsertionEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
+    useCallback<Callback extends (...arguments_: never[]) => unknown>(
+      callback: Callback,
+      dependencies: readonly unknown[],
+    ): Callback;
     useId(): string;
     useLayoutEffect(
       effect: () => void | (() => void),
@@ -5686,7 +5691,10 @@ declare module "@rchunk/diff-preview-content" {
   export const DiffHighlightPreloader: (props: { fileDiff: unknown }) => unknown;
   export const DiffPreviewContent: (props: { diff: { metadata?: unknown }; displayPath?: string; linesAdded?: number; linesRemoved?: number; onOpen?(event?: unknown): void }) => unknown;
 }
-declare module "@rchunk/ansi-block";
+declare module "@rchunk/ansi-block" {
+  export const n: () => void;
+  export const t: (props: { children?: string | null; className?: string }) => unknown;
+}
 declare module "@rchunk/shell-label" {
   export const n: () => void;
   export const t: (command: string) => string | null;
@@ -5710,8 +5718,28 @@ declare module "@rchunk/stripe-pure" {
   export const r: LoadStripe;
   export const t: () => void;
 }
-declare module "@rchunk/shiki-highlight-provider";
-declare module "@rchunk/codex-diff-css";
+declare module "@rchunk/shiki-highlight-provider" {
+  export const ShikiHighlightProvider: (props: { children?: unknown }) => unknown;
+}
+declare module "@rchunk/codex-diff-css" {
+  export const _: <Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result) => (...arguments_: Arguments) => Result;
+  export const a: () => void;
+  export const c: (children: unknown, shadowHtml?: string | null) => unknown;
+  export const d: () => void;
+  export const f: () => null;
+  export const g: () => void;
+  export const h: () => ((element: HTMLElement, options: unknown, state: unknown) => unknown) | undefined;
+  export const i: unknown;
+  export const l: Readonly<Record<string, string | number>>;
+  export const m: () => void;
+  export const n: (options: { alignCommentGutter?: boolean; includeDiffHeader?: boolean; includeSimpleLineSeparators?: boolean; rootSelector: string; surface: string; useReviewLineInfoSeparators?: boolean }) => string;
+  export const o: () => unknown;
+  export const p: (props: { children?: unknown; createEditor(element: HTMLElement, options: unknown, state: unknown): unknown }) => unknown;
+  export const r: () => void;
+  export const s: () => void;
+  export const t: (usePrimarySurface: boolean, kind: string) => string;
+  export const u: Readonly<Record<string, string>>;
+}
 declare module "@rchunk/diff-worker-runtime" { export const parser: unknown; }
 declare module "@rchunk/diff-worker-algorithm" { export const parser: unknown; }
 declare module "@rchunk/diff-worker-model" { export const parser: unknown; }
@@ -9041,6 +9069,8 @@ declare module "@rchunk/app-shared" {
   /** Read-only code block used by Python analysis details。 */
   export const $d: (props: Record<string, unknown>) => unknown;
   export const ef: () => void;
+  /** Code highlighting theme configuration. */
+  export const Cz: { darkCodeThemeId: string; lightCodeThemeId: string };
 }
 
 declare module "@rchunk/app-initial" {
@@ -9135,6 +9165,15 @@ declare module "@rchunk/app-initial" {
   /** Project color palette definitions。 */
   export const TM: () => void;
   export const xM: Record<string, { swatchClassName: string }>;
+  /** Shiki provider theme and diff preferences. */
+  export const CW: (theme: unknown) => "dark" | "light";
+  export const GO: unknown;
+  export const Kcn: (settingId: string) => unknown;
+  export const SW: () => unknown;
+  export const VO: () => void;
+  export const r_t: (theme: unknown, colorScheme: "dark" | "light") => { name: string };
+  export const wk: () => void;
+  export const xW: () => void;
 }
 
 declare module "@rchunk/app-primary" {
@@ -12040,11 +12079,11 @@ declare module "@rchunk/file-diff-presentation-core" {
 }
 
 declare module "@rchunk/register-pierre-themes" {
-  export const a: unknown;
+  export const a: () => { setRenderOptions(options: { lineDiffType: string; theme: string }): unknown } | null;
   export const i: () => void;
   export const n: unknown;
-  export const r: unknown;
-  export const t: unknown;
+  export const r: (props: { children?: unknown; highlighterOptions: Record<string, unknown>; poolOptions: Record<string, unknown> }) => unknown;
+  export const t: () => void;
 }
 
 declare module "@rchunk/open-pull-request-fix-automation-panel-core" {

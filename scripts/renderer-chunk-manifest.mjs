@@ -1115,6 +1115,9 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "ansi-block",
+  "shiki-highlight-provider",
+  "codex-diff-css",
   "text-file-storage",
   "use-create-git-repository",
   "color-palette",
