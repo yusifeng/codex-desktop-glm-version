@@ -5923,14 +5923,14 @@ declare module "@rchunk/codex-app-home-beacon-announcement-core" {
 
 declare module "@rchunk/pca-connector-eligibility" {
   export interface PcaActionSupport {
-    diagnostic?: unknown;
-    status: "supported" | "unsupported" | string;
+    diagnostic?: { actionEnum: string; actionId: string; reason: string };
+    status: "pending" | "supported" | "unavailable" | "unsupported";
   }
   export interface PcaActionSupportInput extends Record<string, unknown> {
-    actionItems: readonly unknown[];
-    context: Record<string, unknown>;
+    actionItems: readonly Array<{ action_v2: { action_enum?: string; connector_id?: string; items?: unknown[]; [key: string]: unknown }; description?: string | null; id: string; label?: string | null; type?: string }>;
+    context: Record<string, unknown> & { getHandlerStatus?(action: unknown): "missing" | "pending" | "supported" | "unavailable"; supportedActionEnums?: readonly string[] };
     referencedActionIds?: string[];
-    variant: "banner" | "carousel" | "modal" | "takeover";
+    variant: "banner" | "carousel" | "inline" | "modal" | "takeover";
   }
   export const a: () => void;
   export const c: (props: Record<string, unknown>) => unknown;
@@ -5943,10 +5943,10 @@ declare module "@rchunk/pca-connector-eligibility" {
     onOpenChange(open: boolean): void;
     pcaResumeTarget?: unknown;
   }) => unknown;
-  export const r: unknown;
+  export const r: { getOptions(connectorIds: readonly string[], context: { fetchConnector(id: string): Promise<{ authType?: string; status?: string }> }): { enabled: boolean; queryKey: readonly unknown[]; queryFn(): Promise<Set<string>>; retry: false; staleTime: number } };
   export const s: () => void;
-  export const t: unknown;
-  export const u: unknown;
+  export const t: (actions: PcaActionSupportInput["actionItems"]) => string[];
+  export const u: (options: { isAccountPending?: boolean; isWorkspaceMemoryLoading?: boolean; onMemoryUpdateError?(): void; onMemoryUpdateSuccess?(message: string): void; trustedAccountId?: string | null; userId?: string | null }) => (action: PcaActionSupportInput["actionItems"][number]) => "pending" | "supported" | "unavailable" | undefined;
 }
 
 declare module "@rchunk/country-codes" {
@@ -6356,7 +6356,8 @@ declare module "@rchunk/plugin-detail-page-core" {
 }
 
 declare module "@rchunk/app-connect-link-navigation"; declare module "@rchunk/plugin-connector-setup";
-declare module "@rchunk/use-plugin-scheduled-tasks"; declare module "@rchunk/apps-availability";
+declare module "@rchunk/use-plugin-scheduled-tasks";
+declare module "@rchunk/apps-availability" { export interface AvailableApp { id: string; isEnabled: boolean; name?: string } export interface AppsAvailabilityOptions { apps?: AvailableApp[]; hostId?: string; invalidate?(queryKey: readonly unknown[]): Promise<unknown> | unknown; notify?(tone: "danger" | "success", message: string): void; readApps?(): AvailableApp[] | undefined; writeConfig?(input: { edits: Array<{ keyPath: string; mergeStrategy: "upsert"; value: boolean }>; hostId: string }): Promise<{ status?: string }>; writeOptimistic?(apps: AvailableApp[]): void } export const n: (options?: AppsAvailabilityOptions) => { isUpdating: boolean; setAppEnabled(update: { appId: string; appName?: string; enabled: boolean }): Promise<void>; updatingAppId: string | null }; export const t: () => void }
 declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-card";
 declare module "@rchunk/api" {
   export const a: (file: File) => string | null;
@@ -6648,14 +6649,28 @@ declare module "@rchunk/app-connect-modal-by-id" {
 
 declare module "@rchunk/use-app-connect-flow" {
   export interface AppConnectFlowOptions {
+    connect?(app: { id: string; isAccessible?: boolean; name?: string }, options?: Record<string, unknown>): Promise<{ kind?: string; redirectUrl?: string } | null>;
+    getPending?(appId: string, hostId: string, target?: Record<string, unknown>): { appConnectOptions?: Record<string, unknown>; hostId?: string; oauthState?: string; resumeTarget: Record<string, unknown> & { kind: string } } | null;
     hostId?: string;
     marketplaceAnalytics?: unknown;
-    onConnectStarted?(appId: string): void;
-    onExternalConnectStarted?(appId: string): void;
+    onConnectStarted?(app: { id: string; isAccessible?: boolean; name?: string }): void;
+    onExternalConnectStarted?(app: { id: string; isAccessible?: boolean; name?: string }): void;
+    openExternal?(url: string): void;
+    savePending?(pending: Record<string, unknown>): string | null | void;
+    clearPending?(input: { hostId: string; oauthState?: string }): void;
   }
   export interface AppConnectFlow {
+    connectingApp: { id: string; isAccessible?: boolean; name?: string } | null;
+    connectingOptions?: Record<string, unknown>;
+    clearConnectingApp(): void;
+    clearPendingAppConnect(input: Record<string, unknown>): void;
     handleAppConnected(appId: string): void;
-    handleAppConnectOAuthStarted(event: Record<string, unknown>): void;
+    handleAppConnectOAuthStarted(event: Record<string, unknown>): string | null | void;
+    handleConnectApp(app: { id: string; isAccessible?: boolean; name?: string }, options?: Record<string, unknown>): Promise<void>;
+    handleExternalConnectStarted(app: { id: string; isAccessible?: boolean; name?: string }, target?: Record<string, unknown>): void;
+    handleOpenAppUrl(url?: string | null): void;
+    isAppConnectPending(appId: string, target?: Record<string, unknown>): boolean;
+    isAppReauthPending(appId: string): boolean;
   }
   export const n: (options?: AppConnectFlowOptions) => AppConnectFlow;
   export const t: () => void;

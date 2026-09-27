@@ -2234,4 +2234,7 @@ export const REWRITTEN = new Set([
   "departments",
   "cme-state",
   "pca-connector-action",
+  "apps-availability",
+  "pca-connector-eligibility",
+  "use-app-connect-flow",
 ]);
