@@ -1069,6 +1069,13 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "mcp-view-surface",
+  "view-frame",
+  "active-tool-activity-label",
+  "tool-activity-disclosure",
+  "elicitation-events",
+  "mcp-app-analytics",
+  "result-card",
   "chatgpt-work-home-page-core",
   "credit-purchase-page-core",
   "skills-page-core",

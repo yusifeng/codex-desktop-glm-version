@@ -5382,7 +5382,10 @@ declare module "@rchunk/mcp-extension-view-page-core" {
   }) => unknown;
 }
 
-declare module "@rchunk/mcp-view-surface";
+declare module "@rchunk/mcp-view-surface" {
+  export const n: () => void;
+  export const t: (props: { isLoading?: boolean; loadingContent?: unknown; partition?: string; showBackButton?: boolean; src: string; webviewRef?(element: unknown): void }) => unknown;
+}
 
 declare module "@rchunk/detail-page" {
   export const n: (props: { children?: unknown }) => unknown;
@@ -5700,7 +5703,7 @@ declare module "@rchunk/workspace-discovery" {
 
 declare module "@rchunk/view-frame" {
   export const n: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const t: (props: { className?: string; deepLink?: string; lifetime?: "app" | "component"; mcpAppId?: string; onClose?(): void; sessionId?: string; view?: { id?: string; title?: string; url?: string; [key: string]: unknown } }) => unknown;
 }
 
 declare module "@rchunk/modal-controller-state" {
@@ -8186,11 +8189,18 @@ declare module "@rchunk/presentation" {
 }
 
 declare module "@rchunk/result-card" {
+  export const n: (props: { details: Record<string, unknown>; notice?: unknown; onOpenRepository?(): void; title?: string }) => unknown;
+  export const r: () => void;
+  export const t: typeof n;
   const _default: unknown;
   export default _default;
 }
 
 declare module "@rchunk/tool-activity-disclosure" {
+  export const i: () => { elementHeightPx: number; elementRef(element: { scrollHeight?: number } | null): void };
+  export const n: () => void;
+  export const r: () => void;
+  export const t: (props: { children?: unknown; defaultExpanded?: boolean; icon?: unknown; indentContent?: boolean; onExpand?(): void; status?: "complete" | "error" | "running"; summary: unknown }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -8775,6 +8785,8 @@ declare module "@rchunk/codex-writing-block-directive-renderer" {
 }
 
 declare module "@rchunk/active-tool-activity-label" {
+  export const n: () => void;
+  export const t: (activity: Record<string, unknown>) => { activityKey?: string; icon: string; message: string; values?: Record<string, string> };
   const _default: unknown;
   export default _default;
 }
@@ -8795,6 +8807,9 @@ declare module "@rchunk/diff-preview-tooltip" {
 }
 
 declare module "@rchunk/elicitation-events" {
+  export const n: (store: { emit?(event: Record<string, unknown>): void }, event: Record<string, unknown>, action: string) => void;
+  export const r: (...arguments_: unknown[]) => (() => void) | undefined;
+  export const t: () => void;
   const _default: unknown;
   export default _default;
 }
