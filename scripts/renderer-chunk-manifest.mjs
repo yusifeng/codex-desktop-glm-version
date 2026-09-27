@@ -1245,6 +1245,11 @@ export const CHUNKS = {
   "codex-micro-joystick-feedback": "codex-micro-joystick-feedback-6271b17ee457.js",
   "codex-micro-joystick-hud": "codex-micro-joystick-hud-6d7a529fb1ed.js",
   "codex-micro-bridge": "codex-micro-bridge-6b74dba6b0b6.js",
+  "permission-request-model": "permission-request-model-5651a96c7a72.js",
+  "voice-preferences": "preferences-c824e7299e20.js",
+  "chatgpt-subagent-final-response-query": "chatgpt-subagent-final-response-query-44807e048855.js",
+  "library-file-metadata": "library-file-metadata-f2ac93fc2be7.js",
+  "offer-queries": "offer-queries-415b3d007f03.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -1406,6 +1411,11 @@ export const REWRITTEN = new Set([
   "browser-auth-error-page",
   "demo-tools-setup-page",
   "app-connect-oauth-callback-page",
+  "permission-request-model",
+  "voice-preferences",
+  "chatgpt-subagent-final-response-query",
+  "library-file-metadata",
+  "offer-queries",
   "pull-request-actions",
   "pull-request-revision-tab",
   "registered-pull-request-thumbnail",

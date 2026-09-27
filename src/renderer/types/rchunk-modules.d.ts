@@ -2971,11 +2971,16 @@ declare module "@rchunk/app-initial" {
   export const dun: <Value>(
     key: string,
     initialValue: Value,
+    options?: {
+      coerceStoredValue?(value: unknown): Value;
+    },
   ) => import("@rchunk/app-shared").ScopedSignal<
     Record<string, unknown>,
     Value
   >;
-  export const ngn: <Value>(key: string, fallback: Value) => Value;
+  export const ngn: <Value = unknown>(key: string, fallback?: Value) => Value;
+  /** initializePreferenceRuntime（偏好信号运行时初始化器）。 */
+  export const rgn: () => void;
   export const kI: () => unknown;
   export const jyt: (host: unknown) => { hostId: string };
   export const nN: () => boolean;
@@ -3097,6 +3102,10 @@ declare module "@rchunk/app-initial" {
   export const pdt: () => void;
   export const Rht: () => void;
   export const uun: () => void;
+  /** initializeOffers（套餐优惠状态初始化器）。 */
+  export const aI: () => void;
+  /** promotionPlanName（从促销 metadata 提取锁定套餐）。 */
+  export const eI: (metadata: unknown) => string | null;
   export const jst: () => void;
   export const x3: () => void;
   export const Lb: {
@@ -13148,4 +13157,74 @@ declare module "@rchunk/pull-request-status-label" {
   export const t: (props: {
     status: "closed" | "draft" | "merged" | "open";
   }) => unknown;
+}
+
+declare module "@rchunk/permission-request-model" {
+  export type PermissionPath =
+    | { type: "path"; path: string }
+    | { type: "glob_pattern"; pattern: string }
+    | { type: "special"; value: { kind: "root" | "minimal" | "tmpdir" | "slash_tmp" } | { kind: "project_roots"; subpath?: string | null } | { kind: "unknown"; path: string; subpath?: string | null } };
+  export interface PermissionRequest {
+    network?: unknown;
+    fileSystem?: { entries?: Array<{ access: "read" | "write"; path: PermissionPath }> } | null;
+  }
+  export type PermissionGroup =
+    | { kind: "network" }
+    | { kind: "fileSystem"; access: "read" | "write" | "readWrite"; paths: string[] };
+  export const n: () => void;
+  export const t: (request: PermissionRequest) => PermissionGroup[];
+}
+
+declare module "@rchunk/voice-preferences" {
+  type VoiceScope = Record<string, unknown>;
+  type VoicePreference<Value> = import("@rchunk/app-shared").ScopedSignal<VoiceScope, Value>;
+  export const a: () => number | undefined;
+  export const c: VoicePreference<string> | undefined;
+  export const i: (value: unknown) => number;
+  export const n: VoicePreference<boolean> | undefined;
+  export const o: () => void;
+  export const r: () => "none" | "asr" | "volume" | undefined;
+  export const s: VoicePreference<null> | undefined;
+  export const t: VoicePreference<number> | undefined;
+}
+
+declare module "@rchunk/chatgpt-subagent-final-response-query" {
+  export interface SubagentFinalResponseInput {
+    activationId: string | null;
+    conversationId: string | null;
+    isTurnLive: boolean;
+    threadId: string | null;
+  }
+  export const n: () => void;
+  export const t: import("@rchunk/app-shared").ScopedQueryFamily<
+    Record<string, unknown>,
+    SubagentFinalResponseInput,
+    string | null
+  > | undefined;
+}
+
+declare module "@rchunk/library-file-metadata" {
+  export interface LibraryFileMetadata extends Record<string, unknown> { id: string; }
+  export interface AbortSignalLike { throwIfAborted(): void; }
+  export const n: () => void;
+  export const t: (fileId: string, accountId: string, signal: AbortSignalLike) => Promise<LibraryFileMetadata>;
+}
+
+declare module "@rchunk/offer-queries" {
+  export interface Promotion extends Record<string, unknown> {
+    is_eligible?: boolean;
+    metadata?: unknown;
+  }
+  export interface PromotionSelectionInput {
+    accountId?: string | null;
+    promoCode?: string | null;
+    planName: string;
+    promotion?: Promotion | null;
+    isLoading: boolean;
+    error?: unknown;
+  }
+  export const i: (input: { accountId?: string | null; promoCode?: string | null; planName: string }) => unknown;
+  export const n: (input: { accountId: string; code: string; kind: string; signal: AbortSignal }) => Promise<Promotion>;
+  export const r: () => void;
+  export const t: (input: PromotionSelectionInput) => { lockedProPlanName: string | null; proPromotionPending: boolean; proSelectionBlocked: boolean };
 }
