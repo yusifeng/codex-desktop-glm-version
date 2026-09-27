@@ -474,6 +474,10 @@ declare module "@rchunk/app-shared" {
   ) => UseQueryResult<Data, QueryError>;
   /** initializeUseQuery（内部 Zqe）。 */
   export const gL: () => void;
+  /** initializeDynamicConfiguration（feature experiment 配置依赖）。 */
+  export const D: () => void;
+  /** initializeDialogRuntime（对话框基础依赖）。 */
+  export const I: () => void;
   /** useMutation（app-shared 内嵌 MutationObserver，内部 uJe）。 */
   export const iL: <
     Data,
@@ -3222,6 +3226,12 @@ declare module "@rchunk/app-initial" {
   export interface Experiment {
     get<T>(key: string, fallback: T): T;
   }
+  /** 动态实验配置 signal family。 */
+  export const m0t: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    string,
+    Experiment
+  >;
   export const Dln: import("@rchunk/app-shared").ScopedQueryFamily<
     Record<string, unknown>,
     string,
@@ -3296,6 +3306,7 @@ declare module "@rchunk/app-initial" {
   ) => void;
   export const Qgn: () => void;
   export const rht: () => void;
+  export const p0t: () => void;
   export const Vzt: () => void;
   export interface DialogScope {
     get<Value>(signal: unknown): Value;
@@ -3459,6 +3470,10 @@ declare module "@rchunk/app-initial" {
   >;
   export const l$t: () => void;
   export const l2: (props: Record<string, unknown>) => unknown;
+  /** AnnouncementModal 及 Wallet 标记组件依赖。 */
+  export const u2: () => void;
+  export const s3t: () => void;
+  export const o3t: (props: { className?: string }) => unknown;
   export const mw: () => void;
   export const nw: import("@rchunk/app-shared").ReadableSignal<boolean>;
   export const tw: import("@rchunk/app-shared").ReadableSignal<unknown>;

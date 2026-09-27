@@ -7,8 +7,23 @@ import * as appInitialChunk from "@rchunk/app-initial";
 
 void runtimeChunk;
 
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  $3: initializeRuntimeLazy,
+  h4: initializeClassNames,
+  e6: reactRuntime,
+  K2: initializeSharedComponents,
+  I3: jsxRuntime,
+  Y2: FormattedMessage,
+  m4: classNames,
+} = appSharedChunk;
+const {
+  u2: initializeAnnouncementModal,
+  xlt: initializeReducedMotion,
+  s3t: initializeWalletMark,
+  Slt: useReducedMotion,
+  l2: AnnouncementModal,
+  o3t: WalletMark,
+} = appInitialChunk;
 
 type AnimationMode = "animate" | "fanned" | "tucked";
 type AnimationSpeed = "normal" | "slow";
@@ -60,8 +75,8 @@ const NORMAL_SPEED = 1.1;
 const CARD_STAGGER_MS = 50;
 const RELEASE_STAGGER_MS = 150;
 
-let React: any;
-let jsx: any;
+let React: import("@rchunk/app-shared").ReactRuntime;
+let jsx: import("@rchunk/app-shared").JsxRuntime;
 let initialized = false;
 let layers: readonly WalletLayer[];
 
@@ -311,8 +326,6 @@ function WalletOnboardingAnnouncementModal({
   onSetUpWallet,
 }: WalletOnboardingAnnouncementModalProps): unknown {
   initializeWalletOnboardingAnnouncementModal();
-  const FormattedMessage = appShared.Y2 ?? "span";
-  const AnnouncementModal = appInitial.l2 ?? "AnnouncementModal";
   return jsx.jsx(AnnouncementModal, {
     actionLayout: "stacked",
     body: jsx.jsx("p", {
@@ -358,7 +371,7 @@ function WalletCardsMedia({
   animationMode: AnimationMode;
   animationSpeed: AnimationSpeed;
 }): unknown {
-  const tucked = appInitial.Slt?.() || animationMode === "tucked";
+  const tucked = useReducedMotion?.() || animationMode === "tucked";
   const sceneRef = React.useRef(null);
   React.useEffect(() => {
     const scene: HTMLElement | null = sceneRef.current;
@@ -413,10 +426,6 @@ function WalletCardLayer({
   initialState: "fanned" | "tucked";
   layer: WalletLayer;
 }): unknown {
-  const classNames =
-    appShared.m4 ??
-    ((...values: unknown[]) => values.filter(Boolean).join(" "));
-  const WalletMark = appInitial.o3t ?? "span";
   return jsx.jsxs("div", {
     className: styles.layer,
     children: [
@@ -448,14 +457,20 @@ function WalletCardLayer({
 function initializeWalletOnboardingAnnouncementModal(): void {
   if (initialized) return;
   initialized = true;
-  appShared.$3?.();
-  appShared.h4?.();
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
-  appShared.K2?.();
-  appInitial.u2?.();
-  appInitial.xlt?.();
-  appInitial.s3t?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeRuntimeLazy?.();
+  initializeClassNames?.();
+  React = typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
+  initializeSharedComponents?.();
+  initializeAnnouncementModal?.();
+  initializeReducedMotion?.();
+  initializeWalletMark?.();
+  const resolvedJsxRuntime = jsxRuntime as unknown as
+    | import("@rchunk/app-shared").JsxRuntime
+    | (() => import("@rchunk/app-shared").JsxRuntime);
+  jsx =
+    typeof resolvedJsxRuntime === "function"
+      ? resolvedJsxRuntime()
+      : resolvedJsxRuntime;
   layers = [
     {
       id: "cyan",

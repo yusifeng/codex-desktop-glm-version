@@ -10,12 +10,6 @@ import * as migratedNoticeChunk from "@rchunk/migrated-plugin-notice";
 import * as failureChunk from "@rchunk/gpt-plugin-migration-failure";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const migratedAccess = migratedAccessChunk as Record<string, any>;
-const managementUrl = managementUrlChunk as Record<string, any>;
-const migratedNotice = migratedNoticeChunk as Record<string, any>;
-const migrationFailure = failureChunk as Record<string, any>;
 
 const {
   $3: initializeRuntimeLazy,
@@ -38,12 +32,46 @@ const {
   Zh: initializeButton,
   e6: reactRuntime,
   zh: DialogFooter,
-} = appShared;
+} = appSharedChunk;
 const {
   _L: useQuery,
   gL: initializeUseQuery,
   pL: defineQueryOptions,
 } = appSharedChunk;
+const {
+  rJt: apiClient,
+  q6t: normalizeConnectorId,
+  o_n: useNavigate,
+  N6t: useSessionIdentity,
+  uht: useAccount,
+  ofn: useFeatureGate,
+  m0t: experimentFamily,
+  Dln: workspacePermissionsFamily,
+  u1: openPlugin,
+  Oft: openExternalLink,
+  Qgn: initializeAccountContext,
+  Sun: initializeGptRoutes,
+  Oln: initializeWorkspacePermissions,
+  M6t: initializeGptResource,
+  rht: initializeAccountQueries,
+  Dft: initializeExternalLinkBridge,
+  l1: initializeNavigation,
+  ifn: initializeFeatureGates,
+  p0t: initializeExperiments,
+  cJt: initializeApiClient,
+} = appInitialChunk;
+const { r: canMigrateResource, i: hasMigrationWorkspaceAccess } =
+  migratedAccessChunk;
+const { t: buildGptManagementUrl, n: initializeGptManagementUrl } =
+  managementUrlChunk;
+const { n: MigratedPluginOpenAction, r: initializeMigratedPluginNotice } =
+  migratedNoticeChunk;
+const {
+  i: migrationFailureFamily,
+  t: MigrationFailureDetails,
+  r: initializeMigrationFailureState,
+  n: initializeMigrationFailureDetails,
+} = failureChunk;
 
 interface JsxRuntime {
   jsx(component: unknown, props: unknown, key?: string): unknown;
@@ -75,6 +103,7 @@ interface MigrationGizmo extends Record<string, unknown> {
   current_user_permission?: { can_write?: boolean };
   display: { name: string };
   gizmo_config_id?: string | null;
+  gizmo_type: string;
   id: string;
   migrated_plugin_id?: string | null;
 }
@@ -141,6 +170,20 @@ interface GptPluginMigrationDialogProps {
 
 interface FormSubmitEvent {
   preventDefault(): void;
+}
+
+interface MigrationQueryClient {
+  fetchQuery(options: unknown): Promise<MigrationPreview>;
+  invalidateQueries(options: { queryKey: readonly unknown[] }): unknown;
+}
+
+interface ConnectorBatchResponse {
+  connectors?: MigratedConnector[];
+}
+
+interface MigrationPostResponse {
+  failed_files?: unknown[];
+  plugin_id: string;
 }
 
 function objectRecord(value: unknown): Record<string, unknown> | undefined {
@@ -311,30 +354,32 @@ async function checkRequiredApps(
 ): Promise<MigrationApps> {
   const ids = connectorIds(resource);
   if (ids.length === 0) return { unavailable: [], disabledByAdmin: [] };
-  const response = await appInitial.rJt.safePost("/aip/connectors/batch", {
-    surface: "plugin_management",
-    parameters: { query: { apply_eligibility_filter: false } },
-    requestBody: { connector_ids: ids, include_actions: false },
-    additionalHeaders: {
-      "ChatGPT-Account-ID": accountId,
-      "OAI-Product-Sku": "CONNECTOR_SETTING",
+  const response = await apiClient.safePost<ConnectorBatchResponse>(
+    "/aip/connectors/batch",
+    {
+      surface: "plugin_management",
+      parameters: { query: { apply_eligibility_filter: false } },
+      requestBody: { connector_ids: ids, include_actions: false },
+      additionalHeaders: {
+        "ChatGPT-Account-ID": accountId,
+        "OAI-Product-Sku": "CONNECTOR_SETTING",
+      },
+      expectedErrorStatuses: [401, 403, 404],
+      signal,
     },
-    expectedErrorStatuses: [401, 403, 404],
-    signal,
-  });
+  );
   const connectors = response.connectors ?? [];
   const normalized = new Map(
     connectors.map((connector: MigratedConnector) => [
-      appInitial.q6t?.(connector.id) ?? connector.id,
+      normalizeConnectorId(connector.id),
       connector,
     ]),
   );
   return {
-    unavailable: ids.filter(
-      (id) => !normalized.has(appInitial.q6t?.(id) ?? id),
-    ),
+    unavailable: ids.filter((id) => !normalized.has(normalizeConnectorId(id))),
     disabledByAdmin: connectors.filter(
-      (connector: MigratedConnector) => connector.status === "DISABLED_BY_ADMIN",
+      (connector: MigratedConnector) =>
+        connector.status === "DISABLED_BY_ADMIN",
     ),
   };
 }
@@ -566,7 +611,7 @@ function MigrationDialogView(props: MigrationDialogViewProps): unknown {
           })
         : null,
       failedFiles?.length
-        ? jsx.jsx(migrationFailure.t, {
+        ? jsx.jsx(MigrationFailureDetails, {
             failedFiles,
             files: resource.files,
             migrationSucceeded: pluginId != null,
@@ -628,23 +673,31 @@ function GptPluginMigrationDialog({
   const React =
     typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
   const scope = useSignalScope?.(applicationScope);
-  const navigate = appInitial.o_n?.() ?? (() => {});
-  const { accountId, userId } = appInitial.N6t?.() ?? {};
-  const account = appInitial.uht?.(undefined, { preview: false })?.data;
-  const eligibilityGate = appInitial.ofn?.("2160578039") ?? false;
+  const navigate = useNavigate();
+  const { accountId, userId } = useSessionIdentity();
+  const account = useAccount(undefined, { preview: false }).data;
+  const eligibilityGate = useFeatureGate("2160578039");
   const migrationEnabled =
-    useSignalFamilyValue?.(appInitial.m0t, "2562735250")?.get?.("enabled", false) ??
-    false;
+    useSignalFamilyValue(experimentFamily, "2562735250").get(
+      "enabled",
+      false,
+    ) ?? false;
   const editingDisabled =
-    useSignalFamilyValue?.(appInitial.m0t, "2513446768")
-      ?.get?.("disable_gpt_updates", false) === true;
-  const workspaceGate = appInitial.ofn?.("1355972088") ?? false;
-  const workspacePermissions = useSignalFamilyValue?.(appInitial.Dln, accountId ?? "", {
-    enabled:
-      accountId != null &&
-      account?.id === accountId &&
-      account?.structure === "workspace",
-  })?.data?.permissions;
+    useSignalFamilyValue(experimentFamily, "2513446768").get<boolean>(
+      "disable_gpt_updates",
+      false,
+    ) === true;
+  const workspaceGate = useFeatureGate("1355972088");
+  const workspacePermissions = useSignalFamilyValue(
+    workspacePermissionsFamily,
+    accountId ?? "",
+    {
+      enabled:
+        accountId != null &&
+        account?.id === accountId &&
+        account?.structure === "workspace",
+    },
+  )?.data?.permissions;
   const [pluginId, setPluginId] = React.useState(
     resource.gizmo.migrated_plugin_id,
   );
@@ -655,7 +708,7 @@ function GptPluginMigrationDialog({
   const inFlight = React.useRef(false);
   const canMigrate =
     migrationEnabled &&
-    migratedAccess.r?.({
+    canMigrateResource({
       resource,
       account,
       accountId,
@@ -663,7 +716,7 @@ function GptPluginMigrationDialog({
       enabled: eligibilityGate,
       allowMigrated,
     }) &&
-    migratedAccess.i?.(account, workspaceGate, workspacePermissions);
+    hasMigrationWorkspaceAccess(account, workspaceGate, workspacePermissions);
   const previewQuery = defineQueryOptions({
     queryKey: [
       "chatgpt-gizmos",
@@ -679,7 +732,7 @@ function GptPluginMigrationDialog({
       signal: AbortSignal;
     }): Promise<MigrationPreview> => {
       if (accountId == null) throw Error("GPT migration requires an account");
-      const latest = await appInitial.rJt.safeGet(
+      const latest = await apiClient.safeGet<MigrationResource>(
         "/gizmos/{gizmo_id_or_short_url}",
         {
           parameters: {
@@ -735,15 +788,16 @@ function GptPluginMigrationDialog({
     setFailure(undefined);
     setFailedFiles([]);
     const execute = async () => {
+      const queryClient = scope.queryClient as MigrationQueryClient;
       const latest =
-        (await scope.queryClient?.fetchQuery?.(previewQuery)) ?? preview.data;
+        (await queryClient.fetchQuery(previewQuery)) ?? preview.data;
       if (latest == null) return;
       let destinationPluginId = latest.resource.gizmo.migrated_plugin_id;
       if (destinationPluginId == null || allowMigrated) {
         const configId = latest.resource.gizmo.gizmo_config_id;
         if (!configId)
           throw Error("Missing published GPT configuration for migration");
-        const result = await appInitial.rJt.safePost(
+        const result = await apiClient.safePost<MigrationPostResponse>(
           "/gizmos/{gizmo_id}/migrate/plugin",
           {
             parameters: { path: { gizmo_id: latest.resource.gizmo.id } },
@@ -756,13 +810,15 @@ function GptPluginMigrationDialog({
         setAllowMigrated(false);
       }
       setPluginId(destinationPluginId);
-      scope.queryClient?.invalidateQueries?.({ queryKey: ["chatgpt-gizmos"] });
+      queryClient.invalidateQueries({ queryKey: ["chatgpt-gizmos"] });
       if (
-        (scope.get?.(migrationFailure.i, `${accountId}:${destinationPluginId}`)
-          ?.failedFiles?.length ?? 0) === 0
+        (scope.get(
+          migrationFailureFamily,
+          `${accountId}:${destinationPluginId}`,
+        )?.failedFiles?.length ?? 0) === 0
       ) {
         onClose();
-        if (onMigrated == null) appInitial.u1?.(destinationPluginId, navigate);
+        if (onMigrated == null) openPlugin(destinationPluginId, navigate);
         else onMigrated(destinationPluginId);
       }
     };
@@ -790,9 +846,9 @@ function GptPluginMigrationDialog({
   const onEdit = canEdit
     ? (event: unknown) => {
         close();
-        appInitial.Oft?.({
+        openExternalLink({
           event,
-          href: `${managementUrl.t?.("/gpts/editor")}/${encodeURIComponent(resource.gizmo.id)}`,
+          href: `${buildGptManagementUrl("/gpts/editor")}/${encodeURIComponent(resource.gizmo.id)}`,
           initiator: "open_in_browser_bridge",
           openTarget: "external-browser",
         });
@@ -801,10 +857,10 @@ function GptPluginMigrationDialog({
   const pluginAction =
     pluginId == null
       ? undefined
-      : jsx.jsx(migratedNotice.n, {
+      : jsx.jsx(MigratedPluginOpenAction, {
           onOpen: () => {
             close();
-            appInitial.u1?.(pluginId, navigate);
+            openPlugin(pluginId, navigate);
           },
         });
   return jsx.jsx(MigrationDialogView, {
@@ -834,25 +890,25 @@ function initializeGptPluginMigrationDialog(): void {
   initializeUseQuery();
   initializeSignalRuntime?.();
   initializeSharedComponents?.();
-  appInitial.Qgn?.();
+  initializeAccountContext?.();
   initializeDynamicConfiguration?.();
-  appInitial.Sun?.();
-  appInitial.Oln?.();
-  appInitial.M6t?.();
-  appInitial.rht?.();
+  initializeGptRoutes?.();
+  initializeWorkspacePermissions?.();
+  initializeGptResource?.();
+  initializeAccountQueries?.();
   initializeButton?.();
   initializeDialogRuntime?.();
   initializeDialogLayout?.();
-  appInitial.Dft?.();
-  appInitial.l1?.();
+  initializeExternalLinkBridge?.();
+  initializeNavigation?.();
   initializeSharedRuntime?.();
-  appInitial.ifn?.();
-  appInitial.p0t?.();
-  appInitial.cJt?.();
-  migrationFailure.r?.();
-  migrationFailure.n?.();
-  managementUrl.n?.();
-  migratedNotice.r?.();
+  initializeFeatureGates?.();
+  initializeExperiments?.();
+  initializeApiClient?.();
+  initializeMigrationFailureState?.();
+  initializeMigrationFailureDetails?.();
+  initializeGptManagementUrl?.();
+  initializeMigratedPluginNotice?.();
   jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
   initialized = true;
 }
