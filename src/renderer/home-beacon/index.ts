@@ -7,8 +7,6 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
 const {
   BX: useSignalFamilyValue,
   FX: initializeSignalRuntime,
@@ -19,6 +17,47 @@ const {
   _Z: releaseSignalFamilyMember,
   e6: reactRuntime,
 } = appSharedChunk;
+const {
+  $Nt: shouldSuppressHomepageTakeover,
+  CNt: isHomepageTakeoverBeacon,
+  DNt: initializeBeaconPredicates,
+  GNt: focusedModalSuppressionSignal,
+  JNt: initializeOnboardingState,
+  KNt: getSuppressedPageContextClaims,
+  M6t: initializeIdentityState,
+  N6t: useAccountIdentity,
+  ONt: logBeaconLifecycle,
+  Qgn: initializeAccountQueries,
+  SNt: isBannerBeacon,
+  WNt: pageContextClaims,
+  YNt: activePageContextClaimsSignal,
+  ZNt: pageContextSuppressionEnabledSignal,
+  bNt: isContainerBeacon,
+  ePt: debugBeaconId,
+  iPt: initializeBeaconDebugState,
+  i_n: useRouterLocation,
+  ifn: initializeTelemetryIdentity,
+  lfn: getTelemetrySession,
+  mpn: localeSignal,
+  nPt: debugBeaconEnabledSignal,
+  ppn: initializeBeaconAnalytics,
+  rht: initializeAccountState,
+  uht: useCurrentAccount,
+} = appInitialChunk;
+const {
+  Dh: initializePageContextAvailability,
+  Eh: getPageContextAvailability,
+  Fh: defaultShouldSuppressFocusedModal,
+  Ih: createBeaconVisitKey,
+  Lh: initializeBeaconQuery,
+  Mh: initializeBeaconSelection,
+  Nh: beaconSelectionFamily,
+  Ph: initializeBeaconVisitState,
+  Th: PageContext,
+  bh: initializeBeaconLifecycle,
+  jh: beaconSelectionValueFamily,
+  wh: viewedBeaconKeysSignal,
+} = appPrimaryChunk;
 
 interface ReactRuntime {
   useContext<Value>(context: unknown): Value;
@@ -31,6 +70,7 @@ interface ReactRuntime {
 
 interface HomeBeaconRecord extends Record<string, unknown> {
   beacon_id: string;
+  custom_fields?: { show_after_onboarding?: boolean };
 }
 
 type BeaconSelection =
@@ -96,13 +136,13 @@ function recordBeaconViewOnce(
   initializeHomeBeacon();
   if (message?.suppressLifecycle === true) return false;
   const key = beaconExposureKey(accountId, beacon.beacon_id, message);
-  if (scope.get(appPrimary.wh).has(key)) return false;
-  scope.set(appPrimary.wh, (current) => {
+  if (scope.get(viewedBeaconKeysSignal).has(key)) return false;
+  scope.set(viewedBeaconKeysSignal, (current) => {
     const next = new Set(current);
     next.add(key);
     return next;
   });
-  appInitial.ONt?.(
+  logBeaconLifecycle?.(
     message == null
       ? { beacon, eventType: "view", accountId }
       : { beacon, eventType: "view", metadata: message },
@@ -112,26 +152,29 @@ function recordBeaconViewOnce(
 
 function useHomeBeacon(
   product = "codex",
-  options: { shouldSuppressFocusedModal?: boolean } = {},
+  options: { shouldSuppressFocusedModal?: () => boolean } = {},
 ): HomeBeaconResult {
   initializeHomeBeacon();
   const shouldSuppressFocusedModal =
-    options.shouldSuppressFocusedModal ?? appPrimary.Fh;
-  const navigation = appInitial.i_n?.() ?? { key: "", pathname: "/" };
+    options.shouldSuppressFocusedModal ?? defaultShouldSuppressFocusedModal;
+  const navigation = useRouterLocation?.() ?? { key: "", pathname: "/" };
   const scope = useSignalScope(applicationScope);
-  const identity = appInitial.N6t?.() ?? {};
-  const accountQuery = appInitial.uht?.() ?? {};
-  const session = appInitial.lfn?.();
-  const localeState = useSignalValue<{ locale: string }>(appInitial.mpn) ?? {
+  const identity = useAccountIdentity?.() ?? {};
+  const accountQuery = useCurrentAccount?.() ?? {
+    data: undefined,
+    isLoading: false,
+  };
+  const session = getTelemetrySession?.();
+  const localeState = useSignalValue<{ locale: string }>(localeSignal) ?? {
     locale: "en",
   };
-  const debug = useSignalValue<boolean>(appInitial.nPt) === true;
-  const activeClaims = useSignalValue<unknown>(appInitial.YNt);
+  const debug = useSignalValue<boolean>(debugBeaconEnabledSignal) === true;
+  const activeClaims = useSignalValue<unknown>(activePageContextClaimsSignal);
   const focusedModalSuppressed =
-    useSignalValue<boolean>(appInitial.GNt) === true;
+    useSignalValue<boolean>(focusedModalSuppressionSignal) === true;
   const pageContextSuppressionEnabled =
-    useSignalValue<boolean>(appInitial.ZNt) === true;
-  const pageContext = React.useContext<unknown>(appPrimary.Th);
+    useSignalValue<boolean>(pageContextSuppressionEnabledSignal) === true;
+  const pageContext = React.useContext<unknown>(PageContext);
   const telemetryAccountId =
     session?.getContext?.().user?.customIDs?.account_id ?? null;
   const accountId =
@@ -148,14 +191,14 @@ function useHomeBeacon(
   const visitKey =
     accountId == null
       ? null
-      : appPrimary.Ih?.({
+        : createBeaconVisitKey?.({
           accountId,
           locale: localeState.locale,
           navigationKey: navigation.key,
           pathname: navigation.pathname,
           product,
         });
-  const selection = (useSignalFamilyValue?.(appPrimary.jh, {
+  const selection = (useSignalFamilyValue?.(beaconSelectionValueFamily, {
     accountId,
     locale: localeState.locale,
     pathname: navigation.pathname,
@@ -186,12 +229,12 @@ function useHomeBeacon(
           state.cleanupGeneration === generation ||
           state.activeKey !== cleanupKey
         ) {
-          releaseSignalFamilyMember?.(scope, appPrimary.Nh, {
+          releaseSignalFamilyMember?.(scope, beaconSelectionFamily, {
             accountId,
             locale: localeState.locale,
             pathname: navigation.pathname,
             product,
-            shouldSuppressFocusedModal: appPrimary.Fh,
+            shouldSuppressFocusedModal: defaultShouldSuppressFocusedModal,
             visitKey: visitKey ?? "",
           });
         }
@@ -211,11 +254,11 @@ function useHomeBeacon(
   const homepageTakeoverSuppression =
     !debug &&
     canFetch &&
-    appInitial.$Nt?.({
+    shouldSuppressHomepageTakeover?.({
       activeClaims,
       isCurrentHomeBeacon: true,
       isHomepageTakeoverOwner:
-        selected != null && appInitial.CNt?.(selected) === true,
+        selected != null && isHomepageTakeoverBeacon?.(selected) === true,
       isPageContextUpsellSuppressionEnabled: pageContextSuppressionEnabled,
     });
   const suppressSelected =
@@ -224,22 +267,22 @@ function useHomeBeacon(
     (focusedModalSuppressed || homepageTakeoverSuppression);
   const suppressedClaims =
     !debug &&
-    appInitial.KNt?.({
+    getSuppressedPageContextClaims?.({
       activeClaims,
       isPageContextUpsellSuppressionEnabled: pageContextSuppressionEnabled,
     });
   const shouldSuppressNonLegalBanners =
-    suppressedClaims?.has?.(appInitial.WNt?.NonLegalBanners) === true;
+    suppressedClaims?.has?.(pageContextClaims.NonLegalBanners) === true;
 
   let candidate = null;
   if (debug) candidate = debugBeacon;
   else if (canFetch && !suppressSelected) candidate = selected;
   let beacon =
-    candidate != null && appInitial.SNt?.(candidate) ? candidate : null;
+    candidate != null && isBannerBeacon?.(candidate) ? candidate : null;
   const containerBeacon =
-    candidate != null && appInitial.bNt?.(candidate) ? candidate : null;
-  const availability = appPrimary.Eh?.(
-    beacon != null && appInitial.CNt?.(beacon) === true,
+    candidate != null && isContainerBeacon?.(candidate) ? candidate : null;
+  const availability = getPageContextAvailability?.(
+    beacon != null && isHomepageTakeoverBeacon?.(beacon) === true,
     pageContext,
   ) ?? { isPending: false, isUnavailable: false };
   if (availability.isPending || availability.isUnavailable) beacon = null;
@@ -273,23 +316,23 @@ function initializeHomeBeacon(): void {
   initialized = true;
   initializeSignalRuntime?.();
   React = resolveRuntime<ReactRuntime>(reactRuntime);
-  appInitial.Qgn?.();
-  appInitial.M6t?.();
-  appInitial.DNt?.();
-  appPrimary.Lh?.();
-  appPrimary.Ph?.();
-  appPrimary.Mh?.();
-  appInitial.rht?.();
-  appPrimary.bh?.();
-  appInitial.iPt?.();
-  appPrimary.Dh?.();
-  appInitial.ppn?.();
-  appInitial.JNt?.();
+  initializeAccountQueries?.();
+  initializeIdentityState?.();
+  initializeBeaconPredicates?.();
+  initializeBeaconQuery?.();
+  initializeBeaconVisitState?.();
+  initializeBeaconSelection?.();
+  initializeAccountState?.();
+  initializeBeaconLifecycle?.();
+  initializeBeaconDebugState?.();
+  initializePageContextAvailability?.();
+  initializeBeaconAnalytics?.();
+  initializeOnboardingState?.();
   initializeSharedRuntime?.();
-  appInitial.ifn?.();
+  initializeTelemetryIdentity?.();
   debugBeacon = {
     type: "beacon_ui_response",
-    beacon_id: appInitial.ePt,
+    beacon_id: debugBeaconId,
     beacon_name: "Codex App Home Beacon Debug",
     show_timing: "immediate",
     ui_info: {

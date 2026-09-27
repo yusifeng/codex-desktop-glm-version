@@ -1920,6 +1920,8 @@ declare module "@rchunk/app-shared" {
   export const j_: () => void;
   /** dismiss icon asset（worktree onboarding banner）。 */
   export const ig: IconAssetPreset;
+  /** close icon asset（Home Beacon banner）。 */
+  export const cw: IconAssetPreset;
   export const ag: () => void;
   /** Worktree onboarding analytics event descriptor。 */
   export const MA: unknown;
@@ -2761,7 +2763,12 @@ declare module "@rchunk/app-initial" {
   export const i5: (
     data: UsageQueryData | null,
   ) => { remainingPercent: number } | null;
-  export const lfn: () => unknown;
+  export interface TelemetrySession {
+    getContext?(): {
+      user?: { customIDs?: { account_id?: string | null } };
+    };
+  }
+  export const lfn: () => TelemetrySession | undefined;
   export const rfn: (context: unknown, experimentId: string) => Experiment;
   export const $M: (
     experiment: unknown,
@@ -2915,7 +2922,10 @@ declare module "@rchunk/app-initial" {
   /** Home 公告测试/实验覆盖入口。 */
   export const D0t: () => HomeAnnouncementOverrides;
   /** Home 的 rate-limit-reset 候选。 */
-  export const CNt: () => HomeAnnouncementCandidate;
+  export const CNt: {
+    (): HomeAnnouncementCandidate;
+    (beacon: unknown): boolean;
+  };
   export const Fk: (entryPoint: string) => (() => unknown) | null | undefined;
   export interface WeeklyRecapCandidate {
     availableCount: number;
@@ -3210,6 +3220,7 @@ declare module "@rchunk/app-initial" {
   export const pfn: () => void;
   export const N6t: () => {
     accountId?: string | null;
+    authMethod?: string | null;
     isLoading?: boolean;
     planAtLogin?: unknown;
     userId?: string | null;
@@ -3293,6 +3304,7 @@ declare module "@rchunk/app-initial" {
   export const ofn: (gateId: string) => boolean;
   export interface RouterLocationState {
     hash: string;
+    key?: string;
     pathname: string;
     search: string;
     state: unknown;
@@ -3355,12 +3367,135 @@ declare module "@rchunk/app-initial" {
   export const u1: (pluginId: string, navigate: (path: string) => void) => void;
   export const mun: import("@rchunk/app-shared").ReadableSignal<string | null>;
   export interface AppgenConversationIntl {
+    locale: string;
     formatMessage(
       descriptor: import("@rchunk/app-shared").MessageDescriptor,
       values?: Record<string, unknown>,
     ): string;
   }
   export const mpn: import("@rchunk/app-shared").ReadableSignal<AppgenConversationIntl>;
+  export interface BeaconLifecycleMetadata {
+    conversationId?: string;
+    messageId?: string;
+    suppressLifecycle?: boolean;
+  }
+  export const $Nt: (input: {
+    activeClaims: unknown;
+    isCurrentHomeBeacon: boolean;
+    isHomepageTakeoverOwner: boolean;
+    isPageContextUpsellSuppressionEnabled: boolean;
+  }) => boolean;
+  export const DNt: () => void;
+  export const GNt: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const KNt: (input: {
+    activeClaims: unknown;
+    isPageContextUpsellSuppressionEnabled: boolean;
+  }) => Set<unknown>;
+  export const ONt: (input:
+    | {
+        accountId: string;
+        beacon: unknown;
+        eventType: "view";
+      }
+    | {
+        beacon: unknown;
+        eventCtaId?: string;
+        eventType: "click" | "view";
+        accountId?: string;
+        metadata: BeaconLifecycleMetadata;
+      }
+  ) => void;
+  export const SNt: (beacon: unknown) => boolean;
+  export const WNt: { NonLegalBanners: unknown };
+  export const YNt: import("@rchunk/app-shared").ReadableSignal<unknown>;
+  export const ZNt: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const bNt: (beacon: unknown) => boolean;
+  export const ePt: string;
+  export const iPt: () => void;
+  export const nPt: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export interface FinanceConnectorApp {
+    canonicalAppId?: string | null;
+    plugin?: {
+      availability?: string;
+      disabledReason?: string;
+      enabled?: boolean;
+      installPolicy?: string;
+    };
+  }
+  export interface FinanceMarketplacePlugin {
+    displayName: string;
+    pluginId: string;
+  }
+  export interface PluginInstallRequestState {
+    kind: string;
+    requestId?: string;
+  }
+  export const Fzt: (name: string) => import("@rchunk/app-info").AppInfo;
+  export const HW: unknown;
+  export const Izt: () => void;
+  export const L2: () => void;
+  export const Mzt: unknown;
+  export const NOt: (input: {
+    messageMetadata: Record<string, unknown>;
+    prompt: string;
+    systemHints: unknown[];
+  }) => unknown;
+  export const POt: () => void;
+  export const R2: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    plugin: {
+      displayName: string;
+      remoteMarketplaceName: string;
+      remotePluginId: string;
+    },
+    callbacks: {
+      hostId: string;
+      onCancel(): void;
+      onError(): void;
+      onSuccess(): void;
+    },
+  ) => boolean;
+  export const UW: () => void;
+  export const WW: unknown;
+  export const _fn: unknown;
+  export const f2t: (state: PluginInstallRequestState) => PluginInstallRequestState;
+  export const fW: unknown;
+  export const g2t: () => void;
+  export const hW: () => void;
+  export const hfn: unknown;
+  export const i4t: () => void;
+  export const jW: () => void;
+  export const jzt: string;
+  export const ly: unknown;
+  export const n4t: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    options: { productContext: string; signal: AbortSignal },
+  ) => Promise<FinanceConnectorApp[]>;
+  export const q6t: (canonicalAppId: string) => string;
+  export const uy: () => void;
+  export const v2t: unknown;
+  export const yNt: (beacon: unknown) => boolean;
+  export const zW: unknown;
+  export const ANt: () => void;
+  export const Ae: () => (destination: unknown) => void;
+  export const FNt: (
+    scope: unknown,
+    beacon: unknown,
+    input: {
+      navigationMethod: string;
+      page: unknown;
+      pageIndex: number;
+    },
+  ) => void;
+  export const Mdn: string;
+  export const Ndn: () => void;
+  export const TNt: (beacon: unknown) => boolean;
+  export const gln: (conversation: unknown) => unknown;
+  export const jNt: (
+    scope: unknown,
+    input: Record<string, unknown>,
+  ) => void;
+  export const wNt: (beacon: unknown) => boolean;
   export const jan: string;
   export const snn: (projectId: string) => string;
   export const HWt: (input: { projectId: string; title: string }) => string;
@@ -3805,6 +3940,85 @@ declare module "@rchunk/confirm-subscription-upgrade" {
 }
 
 declare module "@rchunk/app-primary" {
+  export interface BeaconSelectionParameter {
+    accountId: string | null;
+    locale: string;
+    pathname: string;
+    product: string;
+    shouldFetch: boolean;
+    shouldSuppressFocusedModal: () => boolean;
+    visitKey: string;
+  }
+  export type BeaconSelectionCleanupParameter = Omit<
+    BeaconSelectionParameter,
+    "shouldFetch"
+  >;
+  export interface BeaconSelection {
+    beacon?: import("@rchunk/home-beacon").HomeBeaconRecord;
+    status: "idle" | "pending" | "selected";
+  }
+  export const Dh: () => void;
+  export const Eh: (
+    isHomepageTakeover: boolean,
+    pageContext: unknown,
+  ) => { isPending: boolean; isUnavailable: boolean };
+  export const Fh: () => boolean;
+  export const Ih: (input: {
+    accountId: string;
+    locale: string;
+    navigationKey?: string;
+    pathname: string;
+    product: string;
+  }) => string;
+  export const Lh: () => void;
+  export const Mh: () => void;
+  export const Nh: import("@rchunk/app-shared").SignalFamily<
+    BeaconSelectionCleanupParameter,
+    unknown
+  >;
+  export const Ph: () => void;
+  export const Th: unknown;
+  export const bh: () => void;
+  export const jh: import("@rchunk/app-shared").SignalFamily<
+    BeaconSelectionParameter,
+    BeaconSelection
+  >;
+  export const wh: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    Set<string>
+  >;
+  export const co: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    pluginId: string,
+  ) => Promise<import("@rchunk/app-initial").FinanceMarketplacePlugin | null>;
+  export const lo: () => void;
+  export const $m: (url: string) => boolean;
+  export const Hm: unknown;
+  export const Hp: string;
+  export const Km: () => void;
+  export const Up: () => void;
+  export const Vp: () => void;
+  export const _h: (
+    scope: unknown,
+    accountId: string,
+    beacon: unknown,
+  ) => void;
+  export const th: () => void;
+  export const vh: (
+    scope: unknown,
+    accountId: string,
+    beacon: unknown,
+  ) => void;
+  export const xh: (
+    scope: unknown,
+    accountId: string,
+    beacon: unknown,
+    metadata?: unknown,
+  ) => void;
+  export const yh: (input: {
+    actionId: string;
+    beaconId: string;
+  }) => string;
   export interface BannerAction {
     ariaLabel?: string;
     disabled?: boolean;
@@ -4081,17 +4295,31 @@ declare module "@rchunk/codex-app-home-beacon-announcement-core" {
 }
 
 declare module "@rchunk/pca-connector-eligibility" {
-  export const a: any;
-  export const c: any;
-  export const d: any;
-  export const i: (...args: any[]) => any;
-  export const l: any;
-  export const n: any;
-  export const o: any;
-  export const r: any;
-  export const s: any;
-  export const t: any;
-  export const u: any;
+  export interface PcaActionSupport {
+    diagnostic?: unknown;
+    status: "supported" | "unsupported" | string;
+  }
+  export interface PcaActionSupportInput extends Record<string, unknown> {
+    actionItems: readonly unknown[];
+    context: Record<string, unknown>;
+    referencedActionIds?: string[];
+    variant: "banner" | "carousel" | "modal" | "takeover";
+  }
+  export const a: () => void;
+  export const c: (props: Record<string, unknown>) => unknown;
+  export const d: () => void;
+  export const i: (input: PcaActionSupportInput) => PcaActionSupport;
+  export const l: () => void;
+  export const n: () => void;
+  export const o: (props: {
+    connectorId?: string;
+    onOpenChange(open: boolean): void;
+    pcaResumeTarget?: unknown;
+  }) => unknown;
+  export const r: unknown;
+  export const s: () => void;
+  export const t: unknown;
+  export const u: unknown;
 }
 
 declare module "@rchunk/country-codes" {
@@ -4231,7 +4459,6 @@ declare module "@rchunk/app-connect-modal" {
   }
   export const n: () => void;
   export const t: (props: AppConnectModalProps) => unknown;
-  export const _any: any;
 }
 
 declare module "@rchunk/app-info" {
@@ -4945,17 +5172,40 @@ declare module "@rchunk/home-beacon" {
 }
 
 declare module "@rchunk/home-beacon-finance" {
-  export const connectPersonalFinanceFromHomeBeacon: (...args: any[]) => Promise<boolean>;
+  export interface ConnectPersonalFinanceOptions {
+    accountId: string;
+    beacon: unknown;
+    onConversationStarted(conversation: unknown): void;
+    signal: AbortSignal;
+    suppressAnalytics?: boolean;
+  }
+  export const connectPersonalFinanceFromHomeBeacon: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    options: ConnectPersonalFinanceOptions,
+  ) => Promise<boolean>;
 }
 
 declare module "@rchunk/conversation-start" {
-  export const n: (...args: any[]) => Promise<any>;
+  export const n: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    input: {
+      accountId: string;
+      forceOnboarding: boolean;
+      prompt: string;
+      requireServerConversation: boolean;
+      signal: AbortSignal;
+      userCompletionMessages?: unknown;
+    },
+  ) => Promise<unknown>;
   export const t: () => void;
 }
 
 declare module "@rchunk/plaid-link" {
   export const n: () => void;
-  export const r: (...args: any[]) => Promise<boolean>;
+  export const r: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    options: { accountId: string; signal: AbortSignal },
+  ) => Promise<boolean>;
 }
 declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
