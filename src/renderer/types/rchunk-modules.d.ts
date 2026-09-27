@@ -5274,7 +5274,7 @@ declare module "@rchunk/surface" {
   export const t: (props: { entries: MetadataEntry[] }) => unknown;
 }
 declare module "@rchunk/pdf-preview-diff" { export const PdfPreviewDiff: (props: { currentPage?: number; error?: string | null; isLoading?: boolean; leftLabel?: string; rightLabel?: string; totalPages?: number; onNextPage?(): void; onPreviousPage?(): void }) => unknown; }
-declare module "@rchunk/tiny-invariant" { const invariant: (condition: unknown, message?: string) => asserts condition; export default invariant; }
+declare module "@rchunk/tiny-invariant" { export const n: (condition: unknown, message?: string) => asserts condition; export const t: () => void }
 declare module "@rchunk/conversation-diff-comments" { export interface ConversationDiffComment { id?: string; path?: string | null; text?: string; [key: string]: unknown } export interface ConversationDiffCommentService { getComments?(conversationId: string): ConversationDiffComment[]; getModelComments?(conversationId: string): ConversationDiffComment[]; setComments?(conversationId: string, comments: ConversationDiffComment[]): void } export const n: (conversationId: string, service?: ConversationDiffCommentService) => { comments: ConversationDiffComment[]; modelComments: ConversationDiffComment[]; setComments(next: ConversationDiffComment[]): void }; export const t: () => void; }
 declare module "@rchunk/artifact-preview-header" { export const n: () => void; export const r: (action: (() => Promise<void> | void) | undefined) => Promise<{ ok: boolean; error?: string }>; export const t: (props: { canDownload?: boolean; downloading?: boolean; openTargets?: Array<{ id: string; label: string }>; title?: string; onDownload?(): Promise<void> | void; onOpen?(targetId: string): void; onReveal?(): void }) => unknown; }
 declare module "@rchunk/compact-empty-state" { export const n: () => void; export const t: (props: { actions?: unknown; className?: string; contentClassName?: string; description?: unknown; icon: unknown; title: unknown }) => unknown }
@@ -6143,8 +6143,8 @@ declare module "@rchunk/checkout-page-core" {
 }
 
 declare module "@rchunk/billing-icons";
-declare module "@rchunk/prop-types-runtime";
-declare module "@rchunk/stripe-payment-element-options";
+declare module "@rchunk/prop-types-runtime" { export interface Validator { (...arguments_: unknown[]): void; isRequired: Validator } export interface PropTypesRuntime { PropTypes: PropTypesRuntime; any: Validator; array: Validator; arrayOf(): Validator; bool: Validator; checkPropTypes(): void; number: Validator; object: Validator; oneOf(): Validator; resetWarningCache(): void; string: Validator; [key: string]: unknown } export const t: () => PropTypesRuntime }
+declare module "@rchunk/stripe-payment-element-options" { export interface PaymentElementOptions { billingDetails?: Record<string, unknown>; defaultValues?: Record<string, unknown>; fields?: Record<string, unknown>; wallets?: Record<string, unknown>; [key: string]: unknown } export interface PaymentElementOverrides { checkoutSessionId?: string; isGooglePayEnabled?: boolean; isNewStripeCustomer?: boolean; minimalBillingAddress?: Record<string, unknown>; paymentElementLayoutMode?: "accordion" | "auto" | "tabs"; paymentMethodOrder?: string[]; shouldHidePaymentElementName?: boolean; useMinimalBillingAddress?: boolean } export const n: () => void; export const r: (id: unknown) => id is string; export const t: (options?: PaymentElementOptions, overrides?: PaymentElementOverrides) => Record<string, unknown> }
 declare module "@rchunk/tax-types";
 
 declare module "@rchunk/credit-purchase-page-core" {
@@ -11240,11 +11240,11 @@ declare module "@rchunk/portable-thumbnail-pdf-document" {
 }
 
 declare module "@rchunk/portable-thumbnail-font-metrics" {
-  export const c: () => void;
-  export const i: () => void;
+  export interface FontDescriptor { family: string; stretch?: string; style?: string; weight?: string } export interface TextMetricsLike { actualBoundingBoxAscent?: number; actualBoundingBoxDescent?: number; fontBoundingBoxAscent?: number; fontBoundingBoxDescent?: number } export interface FontMetrics { ascentEm: number; descentEm: number; lineGapEm: number; measuredAtPx: number }
+  export const a: (listener: () => void) => () => void; export const c: () => void; export const i: () => void; export const n: { getFontKey(font: FontDescriptor): string; getMetrics(font: FontDescriptor): FontMetrics; getMetricsForSize(font: FontDescriptor, size: number): { ascentPx: number; descentPx: number; lineGapPx: number }; reset(): void; dispose(): void }; export const o: (cap: TextMetricsLike, descender: TextMetricsLike, size?: number) => FontMetrics; export const r: () => OffscreenCanvasRenderingContext2D; export const s: (value: number) => number; export const t: (font: FontDescriptor, size: number) => string;
 }
 declare module "@rchunk/thumbnail-worker-font-metrics" {
-  export const s: () => void;
+  export { type FontDescriptor, type FontMetrics, type TextMetricsLike } from "@rchunk/portable-thumbnail-font-metrics"; export const a: typeof import("@rchunk/portable-thumbnail-font-metrics").o; export const i: typeof import("@rchunk/portable-thumbnail-font-metrics").a; export const n: { getFontKey(font: import("@rchunk/portable-thumbnail-font-metrics").FontDescriptor): string; getMetrics(font: import("@rchunk/portable-thumbnail-font-metrics").FontDescriptor): import("@rchunk/portable-thumbnail-font-metrics").FontMetrics; reset(): void; dispose(): void }; export const o: (value: number) => number; export const r: () => OffscreenCanvasRenderingContext2D; export const s: () => void; export const t: typeof import("@rchunk/portable-thumbnail-font-metrics").t;
 }
 declare module "@rchunk/portable-pdfjs-runtime" {
   export const AbortException: unknown; export const AnnotationEditorLayer: unknown; export const AnnotationEditorParamsType: unknown; export const AnnotationEditorType: unknown; export const AnnotationEditorUIManager: unknown; export const AnnotationLayer: unknown; export const AnnotationMode: unknown; export const AnnotationType: unknown; export const CSSConstants: unknown; export const ColorPicker: unknown; export const DOMSVGFactory: unknown; export const DrawLayer: unknown; export const FeatureTest: unknown; export const ImageKind: unknown; export const InvalidPDFException: unknown; export const MathClamp: unknown; export const OPS: unknown; export const OutputScale: unknown; export const PDFDataRangeTransport: unknown; export const PDFDateString: unknown; export const PDFWorker: unknown; export const PasswordResponses: unknown; export const PermissionFlag: unknown; export const PixelsPerInch: unknown; export const RenderingCancelledException: unknown; export const ResponseException: unknown; export const SignatureExtractor: unknown; export const SupportedImageMimeTypes: unknown; export const TextLayer: unknown; export const TouchManager: unknown; export const Util: unknown; export const VerbosityLevel: unknown; export const XfaLayer: unknown; export const applyOpacity: unknown; export const build: unknown; export const createValidAbsoluteUrl: unknown; export const fetchData: unknown; export const findContrastColor: unknown; export const getFilenameFromUrl: unknown; export const getPdfFilenameFromUrl: unknown; export const getRGB: unknown; export const getUuid: unknown; export const getXfaPageViewport: unknown; export const isDataScheme: unknown; export const isPdfFile: unknown; export const isValidExplicitDest: unknown; export const noContextMenu: unknown; export const normalizeUnicode: unknown; export const renderRichText: unknown; export const setLayerDimensions: unknown; export const shadow: unknown; export const stopEvent: unknown; export const updateUrlHash: unknown; export const version: unknown;
@@ -11429,6 +11429,7 @@ declare module "@rchunk/app-initial" {
   export const XRt: (...arguments_: unknown[]) => unknown;
   export const YRt: (...arguments_: unknown[]) => unknown;
   export const qRt: (...arguments_: unknown[]) => unknown;
+  export const kHt: () => unknown;
 }
 
 declare module "@rchunk/active-tool-activity-label" {
@@ -14476,7 +14477,7 @@ declare module "@rchunk/writing-block-surface" {
   export const r: (props: WritingBlockRegionProps) => unknown;
   export const t: (props: WritingBlockRegionProps) => unknown;
 }
-declare module "@rchunk/vite-browser-external";
+declare module "@rchunk/vite-browser-external" { const browserExternal: unknown; export default browserExternal }
 declare module "@rchunk/artifact-workbook-model-runtime";
 declare module "@rchunk/artifact-document-model-runtime";
 declare module "@rchunk/artifact-presentation-model-runtime";

@@ -2366,4 +2366,10 @@ export const REWRITTEN = new Set([
   "writing-block-directive-renderer",
   "chatgpt-file-upload",
   "terminal-workspace-warning-state",
+  "prop-types-runtime",
+  "stripe-payment-element-options",
+  "tiny-invariant",
+  "vite-browser-external",
+  "portable-thumbnail-font-metrics",
+  "thumbnail-worker-font-metrics",
 ]);
