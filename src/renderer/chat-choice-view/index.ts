@@ -5,25 +5,46 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as retirementChunk from "@rchunk/gpt-plugin-retirement";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const retirement = retirementChunk as Record<string, any>;
+const {
+  $3: initializeJsxRuntime,
+  C_: initializeIconPreset,
+  I3: getJsxRuntime,
+  K2: initializeIntlRuntime,
+  S_: IconAsset,
+  Tl: pluginAnnouncementIcon,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+  n4: useIntl,
+  wl: initializePluginAnnouncementIcon,
+} = appSharedChunk;
+const {
+  afn: useExperiment,
+  ifn: initializeExperiments,
+  n7: Announcement,
+  r7: initializeAnnouncement,
+} = appInitialChunk;
+const {
+  r: initializePluginRetirement,
+  t: parseRetirementDate,
+} = retirementChunk;
 
-let jsx: any;
+let jsxRuntime: JsxRuntime | null = null;
 let initialized = false;
 function initializeChatChoiceView(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.wl?.();
-  appShared.K2?.();
-  appInitial.r7?.();
-  appShared.Zh?.();
-  appShared.C_?.();
-  appInitial.ifn?.();
-  retirement.r?.();
-  jsx = appShared.I3?.();
+  initializeJsxRuntime?.();
+  initializePluginAnnouncementIcon?.();
+  initializeIntlRuntime?.();
+  initializeAnnouncement?.();
+  initializeButton?.();
+  initializeIconPreset?.();
+  initializeExperiments?.();
+  initializePluginRetirement();
+  jsxRuntime = getJsxRuntime();
   initialized = true;
 }
 
@@ -42,7 +63,12 @@ function message(
   description: string,
   values?: Record<string, unknown>,
 ): unknown {
-  return jsx.jsx(appShared.Y2, { id, defaultMessage, description, values });
+  return getInitializedJsxRuntime().jsx(FormattedMessage, {
+    id,
+    defaultMessage,
+    description,
+    values,
+  });
 }
 
 function ChatChoiceView({
@@ -53,10 +79,11 @@ function ChatChoiceView({
   onRetry,
 }: ChatChoiceViewProps): unknown {
   initializeChatChoiceView();
-  const intl = appShared.n4?.();
-  const experiment = appInitial.afn?.("2513446768");
+  const jsx = getInitializedJsxRuntime();
+  const intl = useIntl();
+  const experiment = useExperiment("2513446768");
   const deadline = intl.formatDate(
-    retirement.t?.(experiment.get("retirement_date", "")),
+    parseRetirementDate(experiment.get("retirement_date", "")),
     { month: "long", day: "numeric", timeZone: "UTC" },
   );
 
@@ -131,7 +158,6 @@ function ChatChoiceView({
         "This GPT is now a plugin",
         "Title of the migrated GPT chat choice when the GPT has no display name.",
       );
-  const Button = appShared.Yh;
   const primaryAction = jsx.jsx(Button, {
     color: "primary",
     disabled: accessState === "pending",
@@ -158,13 +184,13 @@ function ChatChoiceView({
     className: "flex flex-wrap items-center gap-2",
     children: [primaryAction, keepUsingAction],
   });
-  const icon = jsx.jsx(appShared.S_, {
-    asset: appShared.Tl,
+  const icon = jsx.jsx(IconAsset, {
+    asset: pluginAnnouncementIcon,
     className: "text-secondary",
   });
   return jsx.jsx("div", {
     className: "mx-auto mb-3 w-full max-w-[var(--thread-content-max-width)]",
-    children: jsx.jsx(appInitial.n7, {
+    children: jsx.jsx(Announcement, {
       variant: "announcement",
       icon,
       stackOnNarrow: true,
@@ -174,6 +200,14 @@ function ChatChoiceView({
       customCtas,
     }),
   });
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializeChatChoiceView();
+  if (jsxRuntime == null) {
+    throw new Error("Chat choice JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 initializeChatChoiceView();

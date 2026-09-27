@@ -3244,7 +3244,16 @@ declare module "@rchunk/app-initial" {
     initiator: "open_in_browser_bridge";
     openTarget?: "external-browser";
   }) => void;
-  export const n7: (props: Record<string, unknown>) => unknown;
+  export interface AnnouncementProps extends Record<string, unknown> {
+    content: unknown;
+    customCtas?: unknown;
+    icon?: unknown;
+    stackOnNarrow?: boolean;
+    title: unknown;
+    variant: "announcement" | string;
+    wrapCtas?: boolean;
+  }
+  export const n7: (props: AnnouncementProps) => unknown;
   export const Dft: () => void;
   export const E6t: () => { platform: string };
   export const a7: () => void;
@@ -4614,14 +4623,20 @@ declare module "@rchunk/gpt-plugin-migration-banner-content" {
 }
 
 declare module "@rchunk/chat-choice-view" {
-  export const n: () => void;
-  export const t: (props: {
-    accessState: "allowed" | "denied" | "error" | "pending";
+  export type ChatChoiceAccessState =
+    | "allowed"
+    | "denied"
+    | "error"
+    | "pending";
+  export interface ChatChoiceViewProps {
+    accessState: ChatChoiceAccessState;
     gptName: string;
     onKeepUsingGpt?: () => void;
     onRetry?: () => void;
-    onUsePlugin: () => void;
-  }) => unknown;
+    onUsePlugin(): void;
+  }
+  export const n: () => void;
+  export const t: (props: ChatChoiceViewProps) => unknown;
 }
 
 declare module "@rchunk/gpt-plugin-migration-dialog" {
