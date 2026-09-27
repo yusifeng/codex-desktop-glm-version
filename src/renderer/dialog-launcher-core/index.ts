@@ -5,40 +5,71 @@ import * as availabilityChunk from "@rchunk/browser-profile-import-availability"
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type { MaitaiScopeApi } from "@rchunk/app-shared";
+import type { BrowserProfileImportEntryPoint } from "@rchunk/browser-profile-import-analytics";
+import type { BrowserProfileImportService } from "@rchunk/browser-profile-import-dialog";
 
 void runtimeChunk;
 
-const analytics = analyticsChunk as Record<string, any>;
-const availability = availabilityChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  a: recordDialogOpened,
+  t: initializeBrowserProfileImportAnalytics,
+} = analyticsChunk;
+const {
+  n: browserProfileImportAvailableSignal,
+  t: initializeBrowserProfileImportAvailability,
+} = availabilityChunk;
+const {
+  Hzt: isDialogOpen,
+  Uzt: openDialog,
+  Vzt: initializeDialogManager,
+} = appInitialChunk;
+const {
+  H3: initializeReactLazy,
+  e6: getReactRuntime,
+} = appSharedChunk;
 
-let BrowserProfileImportDialog: unknown = null;
+interface BrowserProfileImportLauncherProps extends Record<string, unknown> {
+  entryPoint: BrowserProfileImportEntryPoint;
+  flowId: string;
+  service: BrowserProfileImportService;
+}
+
+type BrowserProfileImportDialogComponent = (
+  props: BrowserProfileImportLauncherProps & { onClose(): void },
+) => unknown;
+
+let BrowserProfileImportDialog: BrowserProfileImportDialogComponent | null = null;
 
 function initializeDialogComponent(): void {
   if (BrowserProfileImportDialog != null) return;
-  appShared.H3?.();
+  initializeReactLazy?.();
   const React =
-    typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
+    typeof getReactRuntime === "function" ? getReactRuntime() : getReactRuntime;
   const loader = async () => ({
     default: (await import("@rchunk/browser-profile-import-dialog"))
       .BrowserProfileImportDialogModal,
   });
-  BrowserProfileImportDialog = React?.lazy?.(loader) ?? loader;
+  BrowserProfileImportDialog = React.lazy(loader);
 }
 
 function openBrowserProfileImportDialog(
-  scope: { get(signal: unknown): any },
-  service: unknown,
-  entryPoint: unknown,
+  scope: MaitaiScopeApi<unknown>,
+  service: BrowserProfileImportService | null | undefined,
+  entryPoint: BrowserProfileImportEntryPoint,
   flowId?: string,
 ): boolean {
   initializeDialogLauncher();
-  if (service == null || !scope.get(availability.n)) return false;
-  if (appInitial.Hzt?.(scope, BrowserProfileImportDialog)) return true;
+  if (
+    service == null ||
+    !scope.get<boolean>(browserProfileImportAvailableSignal)
+  ) {
+    return false;
+  }
+  if (isDialogOpen(scope, BrowserProfileImportDialog)) return true;
   const id = flowId ?? crypto.randomUUID();
-  analytics.a?.(scope, entryPoint, id);
-  appInitial.Uzt?.(scope, BrowserProfileImportDialog, {
+  recordDialogOpened(scope, entryPoint, id);
+  openDialog(scope, BrowserProfileImportDialog, {
     entryPoint,
     flowId: id,
     service,
@@ -47,9 +78,9 @@ function openBrowserProfileImportDialog(
 }
 
 function initializeDialogLauncher(): void {
-  appInitial.Vzt?.();
-  analytics.t?.();
-  availability.t?.();
+  initializeDialogManager?.();
+  initializeBrowserProfileImportAnalytics?.();
+  initializeBrowserProfileImportAvailability?.();
   initializeDialogComponent();
 }
 

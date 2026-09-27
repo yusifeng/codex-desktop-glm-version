@@ -778,6 +778,9 @@ declare module "@rchunk/app-shared" {
     };
     Fragment: unknown;
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
+    lazy<Props extends Record<string, unknown>>(
+      loader: () => Promise<{ default: (props: Props) => unknown }>,
+    ): (props: Props) => unknown;
     use<T>(context: unknown): T;
     useEffect(effect: () => void | (() => void), dependencies?: readonly unknown[]): void;
     useEffectEvent?<Callback extends (...args: never[]) => unknown>(callback: Callback): Callback;
@@ -2909,6 +2912,17 @@ declare module "@rchunk/app-initial" {
   export const Qgn: () => void;
   export const rht: () => void;
   export const Vzt: () => void;
+  export interface DialogScope {
+    get<Value>(signal: unknown): Value;
+  }
+  export type ManagedDialogComponent<Props extends Record<string, unknown>> = (
+    props: Props & { onClose(): void },
+  ) => unknown;
+  /** isDialogOpen（内部 Hzt）。 */
+  export const Hzt: <Props extends Record<string, unknown>>(
+    scope: DialogScope,
+    component: ManagedDialogComponent<Props>,
+  ) => boolean;
   /** initializePepperOnboarding（Pepper Beacon modal 状态依赖）。 */
   export const Sqt: () => void;
   /** Pepper onboarding 使用的当前账户 ID signal。 */
@@ -2950,8 +2964,8 @@ declare module "@rchunk/app-initial" {
     options?: { preview?: boolean },
   ) => { data: Account | undefined; isLoading: boolean };
   export const Uzt: <Props extends Record<string, unknown>>(
-    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
-    component: import("@rchunk/app-shared").LazyComponent<Props>,
+    scope: DialogScope,
+    component: ManagedDialogComponent<Props>,
     props: Props,
   ) => void;
   export const u1: (pluginId: string, navigate: (path: string) => void) => void;
@@ -3392,7 +3406,15 @@ declare module "@rchunk/sidebar-onboarding-checklist-task-config" {
 }
 
 declare module "@rchunk/dialog-launcher-core" {
-  export const n: (...args: any[]) => any;
+  export const n: (
+    scope: import("@rchunk/app-initial").DialogScope,
+    service:
+      | import("@rchunk/browser-profile-import-dialog").BrowserProfileImportService
+      | null
+      | undefined,
+    entryPoint: import("@rchunk/browser-profile-import-analytics").BrowserProfileImportEntryPoint,
+    flowId?: string,
+  ) => boolean;
   export const t: () => void;
 }
 
@@ -3524,7 +3546,7 @@ declare module "@rchunk/worktree-onboarding-state" {
 }
 
 declare module "@rchunk/browser-profile-import-availability" {
-  export const n: unknown;
+  export const n: import("@rchunk/app-shared").ScopedSignal<unknown, boolean>;
   export const t: () => void;
 }
 
@@ -3576,7 +3598,7 @@ declare module "@rchunk/browser-profile-import-dialog" {
     extends import("@rchunk/browser-profile-import-query").BrowserProfileImportService {
     importBrowserProfile(request: Record<string, unknown>): Promise<unknown>;
   }
-  export interface BrowserProfileImportDialogProps {
+  export interface BrowserProfileImportDialogProps extends Record<string, unknown> {
     entryPoint: string;
     flowId: string;
     onClose(): void;
