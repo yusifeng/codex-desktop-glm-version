@@ -4102,8 +4102,42 @@ declare module "@rchunk/gpt-report-dialog" {
 }
 
 declare module "@rchunk/codex-thread-report-dialog" {
+  export type ReportEntityType =
+    | "conversation"
+    | "connector"
+    | "project"
+    | "share_link"
+    | string;
+  export interface AdReportAdapter {
+    loadReasons(signal: AbortSignal): Promise<unknown>;
+    queryKey?: readonly unknown[];
+    submit(
+      reason: { details?: string; id: string },
+      additionalFields: unknown,
+    ): Promise<void>;
+    title?: unknown;
+  }
+  export interface CodexThreadReportDialogProps
+    extends Record<string, unknown> {
+    adReport?: AdReportAdapter;
+    chatGptMessageId?: string;
+    connectorId?: string;
+    contentClassName?: string;
+    onBackToFeedback?: () => void;
+    onClose(): void;
+    productArea?: string;
+    reportEntityType: ReportEntityType;
+    reportReasonsEntityType?: ReportEntityType;
+    reportRequest?: (
+      path: string,
+      init?: Record<string, unknown>,
+    ) => Promise<{ json(): Promise<unknown>; ok: boolean }>;
+    successBody?: unknown;
+    threadId: string;
+    title?: unknown;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: CodexThreadReportDialogProps) => unknown;
 }
 
 declare module "@rchunk/chatgpt-project-report-dialog" {
@@ -4185,7 +4219,9 @@ declare module "@rchunk/source-file-delete-dialog" {
 }
 
 declare module "@rchunk/codex-thread-report-dialog-entry" {
-  export const CodexThreadReportDialog: (...args: any[]) => any;
+  export const CodexThreadReportDialog: (
+    props: import("@rchunk/codex-thread-report-dialog").CodexThreadReportDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/trusted-contact-no-thanks-dialog" {

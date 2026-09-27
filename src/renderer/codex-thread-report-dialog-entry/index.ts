@@ -5,10 +5,11 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as reportDialogChunk from "@rchunk/codex-thread-report-dialog";
 
 void appSharedChunk;
-const reportDialog = reportDialogChunk as Record<string, any>;
+const {
+  n: initializeCodexThreadReportDialog,
+  t: CodexThreadReportDialog,
+} = reportDialogChunk;
 
-reportDialog.n();
-
-const CodexThreadReportDialog = reportDialog.t;
+initializeCodexThreadReportDialog();
 
 export { CodexThreadReportDialog };
