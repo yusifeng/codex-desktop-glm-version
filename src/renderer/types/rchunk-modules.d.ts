@@ -9496,6 +9496,28 @@ declare module "@rchunk/icloud-hosted-page" {
   export const ICloudHostedCompletionPage: (props: Pick<ICloudHostedPageProps, "onReturn">) => unknown;
 }
 
+declare module "@rchunk/subscription-plan-status" { const subscriptionPlanStatus: unknown; export default subscriptionPlanStatus; }
+declare module "@rchunk/feedback-legal-notice" { const feedbackLegalNotice: unknown; export default feedbackLegalNotice; }
+declare module "@rchunk/feedback-form-dialog" { const feedbackFormDialog: unknown; export default feedbackFormDialog; }
+declare module "@rchunk/subscription-platform-dialog" {
+  export type SubscriptionManagementSource = "app_store" | "google_play_store" | "partner_managed";
+  export const SubscriptionPlatformDialog: (props: { account: { account: { plan_type?: string | null } }; managementSource: SubscriptionManagementSource; showProLevels?: boolean; onClose(): void; onOpenStore?(url: string): void }) => unknown;
+}
+declare module "@rchunk/project-folder-consent-dialog" {
+  export const ProjectFolderConsentDialog: (props: { folders: readonly string[]; hostName?: string | null; explicitlyUntrusted?: boolean; onConfirm(): void; onClose(): void }) => unknown;
+}
+declare module "@rchunk/feedback-submission-dialog" {
+  export type FeedbackClassification = "bug" | "bad-result" | "good-result" | "safety_check" | "research-failure" | "high-ram-usage" | "other";
+  export interface FeedbackSubmission { classification: FeedbackClassification; description: string; extraTags: undefined; includeBrowserTabs: boolean; includeLogs: boolean; }
+  export const FeedbackSubmissionDialog: (props: { additionalOptionsEnabled?: boolean; browserTabsAvailable?: boolean; chatGptConversationAvailable?: boolean; initialDetails?: string; initialExtraTags?: readonly string[]; logsAvailable?: boolean; processMemoryDiagnosticsAvailable?: boolean; onClose(): void; onSubmit(value: FeedbackSubmission): void }) => unknown;
+}
+declare module "@rchunk/delete-thread-dialog" {
+  export const DeleteThreadDialog: (props: { conversationId: string; hostId?: string; returnFocusTo?: HTMLElement | null; onClose(): void; onDelete?(input: { threadId: string; hostId?: string }): Promise<void> | void; onError?(error: unknown): void }) => unknown;
+}
+declare module "@rchunk/browser-site-annotation-permission-dialog" {
+  export const BrowserSiteAnnotationPermissionDialog: (props: { hostname: string; isExitingAnnotationMode?: boolean; onRespond(allowed: boolean): Promise<boolean> | boolean; onCloseAutoFocus?(): void; onError?(error: unknown): void }) => unknown;
+}
+
 declare module "@rchunk/app-shared" {
   /** invokeDesktopBridgePromise（桌面桥 Promise 规范化）。 */
   export const UI: <Result>(request: Promise<Result>, signal?: AbortSignal) => Promise<Result>;

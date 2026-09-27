@@ -1,0 +1,6 @@
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+export interface DeleteThreadDialogProps { conversationId:string;hostId?:string;returnFocusTo?:HTMLElement|null;onClose():void;onDelete?(input:{threadId:string;hostId?:string}):Promise<void>|void;onError?(error:unknown):void; }
+let jsx:JsxRuntime;function ensureJsx():JsxRuntime{if(jsx==null)jsx=getJsxRuntime();return jsx;}
+function DeleteThreadDialog(props:DeleteThreadDialogProps):unknown{const runtime=ensureJsx();const submit=async(event:{preventDefault():void})=>{event.preventDefault();try{await props.onDelete?.({threadId:props.conversationId,hostId:props.hostId});props.onClose();}catch(error){props.onError?.(error);}};return runtime.jsx("dialog",{open:true,className:"delete-thread-dialog",children:runtime.jsxs("form",{onSubmit:submit,children:[runtime.jsx("h1",{children:"Delete task?"}),runtime.jsx("p",{children:"This permanently deletes the task and its subagent tasks. This cannot be undone."}),runtime.jsxs("footer",{children:[runtime.jsx("button",{type:"button",autoFocus:true,onClick:props.onClose,children:"Cancel"}),runtime.jsx("button",{type:"submit","data-color":"danger",children:"Delete"})]})]})});}
+export { DeleteThreadDialog };
