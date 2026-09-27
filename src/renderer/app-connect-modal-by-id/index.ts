@@ -4,27 +4,41 @@ import * as appConnectModalChunk from "@rchunk/app-connect-modal";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type { AppInfo } from "@rchunk/app-info";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appConnectModal = appConnectModalChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const { n: initializeAppConnectModal, t: AppConnectModal } =
+  appConnectModalChunk;
+const { B$: initializeConnectorQuery, V$: useConnectorAppsQuery } =
+  appInitialChunk;
+const {
+  $3: initializeJsxRuntime,
+  $h: initializeResourceButtonDependencies,
+  I3: getJsxRuntime,
+  K2: initializeIntlRuntime,
+  Ph: initializeDialogLayout,
+  Zh: initializeButton,
+  zh: initializeDialog,
+} = appSharedChunk;
 
-let jsx: any;
+let jsxRuntime: JsxRuntime | null = null;
+
+interface ConnectorLoadStateProps {
+  isPending: boolean;
+  isFetching: boolean;
+  onOpenChange(open: boolean): void;
+  onRetry(): void;
+}
 
 function ConnectorLoadState({
   isPending,
   isFetching,
   onOpenChange,
   onRetry,
-}: {
-  isPending: boolean;
-  isFetching: boolean;
-  onOpenChange(open: boolean): void;
-  onRetry(): void;
-}): unknown {
-  initializeAppConnectModalById();
+}: ConnectorLoadStateProps): unknown {
+  const jsx = getInitializedJsxRuntime();
   const title = isPending ? "Connect app" : "Couldn’t load connector";
   return jsx.jsx("div", {
     role: "dialog",
@@ -65,13 +79,17 @@ function ConnectorLoadState({
   });
 }
 
-function AppConnectModalById(props: Record<string, any>): unknown {
-  initializeAppConnectModalById();
+interface AppConnectModalByIdProps extends Record<string, unknown> {
+  connectorId: string;
+  hostId?: string;
+  onOpenChange(open: boolean): void;
+}
+
+function AppConnectModalById(props: AppConnectModalByIdProps): unknown {
+  const jsx = getInitializedJsxRuntime();
   const { connectorId, hostId, onOpenChange, ...modalProps } = props;
-  const query = appInitial.V$({ appIds: [connectorId], hostId });
-  const app = query.data?.find(
-    (entry: { id: string }) => entry.id === connectorId,
-  );
+  const query = useConnectorAppsQuery({ appIds: [connectorId], hostId });
+  const app = query.data?.find((entry) => entry.id === connectorId);
   if (app == null) {
     return jsx.jsx(ConnectorLoadState, {
       isPending: query.isPending,
@@ -80,7 +98,7 @@ function AppConnectModalById(props: Record<string, any>): unknown {
       onRetry: () => query.refetch(),
     });
   }
-  const normalizedApp = {
+  const normalizedApp: AppInfo = {
     appMetadata: null,
     branding: null,
     description: app.description,
@@ -97,7 +115,7 @@ function AppConnectModalById(props: Record<string, any>): unknown {
     name: app.name,
     pluginDisplayNames: app.pluginDisplayNames,
   };
-  return jsx.jsx(appConnectModal.t, {
+  return jsx.jsx(AppConnectModal, {
     ...modalProps,
     app: normalizedApp,
     hostId,
@@ -106,15 +124,25 @@ function AppConnectModalById(props: Record<string, any>): unknown {
 }
 
 function initializeAppConnectModalById(): void {
-  if (jsx != null) return;
-  appShared.K2?.();
-  appShared.Zh?.();
-  appShared.zh?.();
-  appShared.Ph?.();
-  appShared.$h?.();
-  appInitial.B$?.();
-  appConnectModal.n?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  if (jsxRuntime != null) return;
+  initializeJsxRuntime?.();
+  initializeIntlRuntime?.();
+  initializeButton?.();
+  initializeDialog?.();
+  initializeDialogLayout?.();
+  initializeResourceButtonDependencies?.();
+  initializeConnectorQuery?.();
+  initializeAppConnectModal();
+  jsxRuntime =
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializeAppConnectModalById();
+  if (jsxRuntime == null) {
+    throw new Error("App connect modal JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 export {

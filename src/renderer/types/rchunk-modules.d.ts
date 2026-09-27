@@ -2675,6 +2675,26 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 
 declare module "@rchunk/app-initial" {
   // 15MB 聚合块：应用启动逻辑 + Shiki 语法 grammars + math/learning blocks。
+  export type ConnectorCatalogApp =
+    import("@rchunk/app-info").ConnectorApp & {
+      pluginDisplayNames: string[];
+    };
+  export interface ConnectorAppsQueryOptions {
+    appIds: string[];
+    hostId?: string;
+  }
+  export interface ConnectorAppsQueryResult {
+    data?: ConnectorCatalogApp[];
+    isFetching: boolean;
+    isPending: boolean;
+    refetch(): unknown;
+  }
+  /** initializeConnectorAppsQuery（内部 Emn）。 */
+  export const B$: () => void;
+  /** useConnectorAppsQuery（内部 Omn）。 */
+  export const V$: (
+    options: ConnectorAppsQueryOptions,
+  ) => ConnectorAppsQueryResult;
   export type SetupCodexStep = "role" | "task" | "complete";
   export interface SetupCodexStepArguments {
     step: SetupCodexStep;
@@ -3530,9 +3550,20 @@ declare module "@rchunk/pca-connector-action" {
 }
 
 declare module "@rchunk/app-connect-modal-by-id" {
-  export const n: unknown;
+  export interface AppConnectModalByIdProps extends Record<string, unknown> {
+    connectorId: string;
+    hostId?: string;
+    onOpenChange(open: boolean): void;
+  }
+  export interface ConnectorLoadStateProps {
+    isPending: boolean;
+    isFetching: boolean;
+    onOpenChange(open: boolean): void;
+    onRetry(): void;
+  }
+  export const n: (props: AppConnectModalByIdProps) => unknown;
   export const r: () => void;
-  export const t: unknown;
+  export const t: (props: ConnectorLoadStateProps) => unknown;
 }
 
 declare module "@rchunk/use-app-connect-flow" {
@@ -3554,13 +3585,13 @@ declare module "@rchunk/app-connect-modal" {
   export type ConnectorAuthReason = "missing_link" | "reauth_required";
   export interface AppConnectModalProps extends Record<string, unknown> {
     app: import("@rchunk/app-info").AppInfo;
-    connectorAuth: {
+    connectorAuth?: {
       authReason: ConnectorAuthReason;
       linkId?: string;
     };
-    isReconnecting: boolean;
-    onConnected(): void;
-    onOAuthStarted(event: Record<string, unknown>): void;
+    isReconnecting?: boolean;
+    onConnected?(): void;
+    onOAuthStarted?(event: Record<string, unknown>): void;
     onOpenChange(open: boolean): void;
     reauthLinkId?: string;
   }
