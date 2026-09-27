@@ -1032,6 +1032,16 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "settings-host-dropdown",
+  "personalization-state",
+  "plugins-settings-row",
+  "settings-loading-row",
+  "dock-icon-setting-visibility",
+  "import-settings-gate",
+  "chronicle-settings",
+  "memory-manager-gate",
+  "hooks-settings-copy",
+  "hooks-settings-model",
   "linked-app-logo",
   "confirmation",
   "history",

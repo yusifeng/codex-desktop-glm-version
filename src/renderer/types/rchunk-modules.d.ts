@@ -13,6 +13,7 @@ declare module "@rchunk/rolldown-runtime" {
 
 declare module "@rchunk/app-shared" {
   export const k: unknown;
+  export const db: (props: Record<string, unknown>) => unknown;
   /** parseConfigError（恢复会话失败时提取 config.toml 定位）。 */
   export const hG: (error: unknown) => {
     column?: number;
@@ -2793,6 +2794,14 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 declare module "@rchunk/app-initial" {
   export const aa: (props: Record<string, unknown>) => unknown;
   export const oa: (props: Record<string, unknown>) => unknown;
+  export const Yg: (props: Record<string, unknown>) => unknown;
+  export const gb: (props: Record<string, unknown>) => unknown;
+  export const bRt: (
+    scope: unknown,
+    imageFile: unknown,
+    signal: AbortSignal,
+  ) => Promise<Blob & { name: string }>;
+  export const yRt: () => void;
   /** 恢复会话相关信号与宿主服务适配器。 */
   export const B8t: (
     scope: unknown,
@@ -10329,6 +10338,101 @@ declare module "@rchunk/settings-route-state" {
   export const o: () => void;
   export const r: (value: unknown) => string | null;
   export const t: (value: unknown) => boolean;
+}
+
+declare module "@rchunk/settings-host-dropdown" {
+  export interface SettingsHostDropdownProps {
+    align?: "center" | "end" | "start";
+    connectedRemoteConnections: Array<{ displayName: string; hostId: string }>;
+    contentWidth?: string;
+    disabled?: boolean;
+    includeLocalHost?: boolean;
+    localIcon?: unknown;
+    localLabel?: string;
+    onSelectHost(hostId: string): void;
+    selectedHostId: string;
+    showConnectedIndicator?: boolean;
+    triggerVariant?: "filter" | "selected-host";
+  }
+  export const n: () => void;
+  export const t: (props: SettingsHostDropdownProps) => unknown;
+}
+
+declare module "@rchunk/personalization-state" {
+  export interface ReferencePhoto extends Record<string, unknown> {
+    created_at: string;
+    id: string;
+    kind: string;
+  }
+  export const a: (accountId: string) => Record<string, unknown>;
+  export const i: () => void;
+  export const n: () => void;
+  export const o: (
+    photos: ReferencePhoto[] | null | undefined,
+    kind?: string | null,
+  ) => ReferencePhoto | null;
+  export const r: unknown;
+  export const s: (scope: unknown, input: Record<string, unknown>) => Promise<ReferencePhoto>;
+  export const t: unknown;
+}
+
+declare module "@rchunk/plugins-settings-row" {
+  export const n: () => void;
+  export const t: (props: { hostId: string }) => unknown;
+}
+
+declare module "@rchunk/settings-loading-row" {
+  export const n: () => void;
+  export const t: (props: { children?: unknown }) => unknown;
+}
+
+declare module "@rchunk/dock-icon-setting-visibility" {
+  export const n: () => void;
+  export const t: (props: {
+    buildFlavor?: string;
+    dockIconPreviews: unknown;
+    platform: string;
+  }) => unknown;
+}
+
+declare module "@rchunk/import-settings-gate" {
+  export const n: () => void;
+  export const t: string;
+}
+
+declare module "@rchunk/chronicle-settings" {
+  export const n: () => void;
+  export const t: string;
+}
+
+declare module "@rchunk/memory-manager-gate" {
+  export const n: () => void;
+  export const t: () => string;
+}
+
+declare module "@rchunk/hooks-settings-copy" {
+  export const a: () => void;
+  export const i: (value: string | null | undefined) => string | null;
+  export const n: (eventName: string, intl: import("@rchunk/app-shared").IntlShape) => string | undefined;
+  export const r: (index: number, intl: import("@rchunk/app-shared").IntlShape) => string;
+  export const t: (eventName: string, intl: import("@rchunk/app-shared").IntlShape) => string | undefined;
+}
+
+declare module "@rchunk/hooks-settings-model" {
+  export const a: (hooks: Array<Record<string, unknown>>, eventName: string) => Array<Record<string, unknown>>;
+  export const c: (...arguments_: unknown[]) => string[] | undefined;
+  export const d: (...arguments_: unknown[]) => unknown;
+  export const f: (...arguments_: unknown[]) => string | null | undefined;
+  export const i: (...arguments_: unknown[]) => Array<Record<string, unknown>>;
+  export const l: (...arguments_: unknown[]) => Array<Record<string, unknown>>;
+  export const m: (hook: Record<string, unknown>) => boolean;
+  export const n: (...arguments_: unknown[]) => { issueCount: number; needsReview: number };
+  export const o: (hooks: Array<Record<string, unknown>>) => number;
+  export const p: () => void;
+  export const r: (...arguments_: unknown[]) => Array<Record<string, unknown>>;
+  export const s: (...arguments_: unknown[]) => string[];
+  export const t: "__unknown__";
+  export const u: (...arguments_: unknown[]) => Record<string, unknown> | null;
 }
 
 declare module "@rchunk/chatgpt-desktop-auth-url" {
