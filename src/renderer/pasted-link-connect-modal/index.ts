@@ -5,15 +5,27 @@ import * as appInfoChunk from "@rchunk/app-info";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as useConnectFlowChunk from "@rchunk/use-app-connect-flow";
+import type { ConnectorApp } from "@rchunk/app-info";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appConnectModal = appConnectModalChunk as Record<string, any>;
-const appInfo = appInfoChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const useConnectFlow = useConnectFlowChunk as Record<string, any>;
+const { n: initializeAppConnectModal, t: AppConnectModal } =
+  appConnectModalChunk;
+const { t: toAppInfo } = appInfoChunk;
+const { $3: initializeJsxRuntime, I3: getJsxRuntime } = appSharedChunk;
+const { n: useAppConnectFlow, t: initializeAppConnectFlow } =
+  useConnectFlowChunk;
 
-let jsx: any;
+let jsxRuntime: JsxRuntime | null = null;
+
+interface LibraryPastedLinkConnectModalProps {
+  app: ConnectorApp;
+  area: unknown;
+  onConnected(): void;
+  onOpenChange(open: boolean): void;
+  reauthLinkId?: string;
+}
 
 function LibraryPastedLinkConnectModal({
   app,
@@ -21,19 +33,13 @@ function LibraryPastedLinkConnectModal({
   onConnected,
   onOpenChange,
   reauthLinkId,
-}: {
-  app: any;
-  area: unknown;
-  onConnected(): void;
-  onOpenChange(open: boolean): void;
-  reauthLinkId?: string;
-}): unknown {
-  initializePastedLinkConnectModal();
+}: LibraryPastedLinkConnectModalProps): unknown {
+  const jsx = initializePastedLinkConnectModal();
   const { handleAppConnected, handleAppConnectOAuthStarted } =
-    useConnectFlow.n();
-  const normalizedApp = appInfo.t(app);
+    useAppConnectFlow();
+  const normalizedApp = toAppInfo(app);
   const authReason = reauthLinkId == null ? "missing_link" : "reauth_required";
-  return jsx.jsx(appConnectModal.t, {
+  return jsx.jsx(AppConnectModal, {
     app: normalizedApp,
     connectorAuth: { authReason, linkId: reauthLinkId },
     isReconnecting: reauthLinkId != null,
@@ -51,12 +57,14 @@ function LibraryPastedLinkConnectModal({
   });
 }
 
-function initializePastedLinkConnectModal(): void {
-  if (jsx != null) return;
-  useConnectFlow.t?.();
-  appConnectModal.n?.();
-  appInfo.n?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+function initializePastedLinkConnectModal(): JsxRuntime {
+  if (jsxRuntime != null) return jsxRuntime;
+  initializeJsxRuntime?.();
+  initializeAppConnectFlow();
+  initializeAppConnectModal();
+  jsxRuntime =
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
+  return jsxRuntime;
 }
 
 initializePastedLinkConnectModal();

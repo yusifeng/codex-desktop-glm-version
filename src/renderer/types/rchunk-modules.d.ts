@@ -3536,19 +3536,82 @@ declare module "@rchunk/app-connect-modal-by-id" {
 }
 
 declare module "@rchunk/use-app-connect-flow" {
-  export const n: (...args: any[]) => any;
+  export interface AppConnectFlowOptions {
+    hostId?: string;
+    marketplaceAnalytics?: unknown;
+    onConnectStarted?(appId: string): void;
+    onExternalConnectStarted?(appId: string): void;
+  }
+  export interface AppConnectFlow {
+    handleAppConnected(appId: string): void;
+    handleAppConnectOAuthStarted(event: Record<string, unknown>): void;
+  }
+  export const n: (options?: AppConnectFlowOptions) => AppConnectFlow;
   export const t: () => void;
 }
 
 declare module "@rchunk/app-connect-modal" {
+  export type ConnectorAuthReason = "missing_link" | "reauth_required";
+  export interface AppConnectModalProps extends Record<string, unknown> {
+    app: import("@rchunk/app-info").AppInfo;
+    connectorAuth: {
+      authReason: ConnectorAuthReason;
+      linkId?: string;
+    };
+    isReconnecting: boolean;
+    onConnected(): void;
+    onOAuthStarted(event: Record<string, unknown>): void;
+    onOpenChange(open: boolean): void;
+    reauthLinkId?: string;
+  }
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: AppConnectModalProps) => unknown;
   export const _any: any;
 }
 
 declare module "@rchunk/app-info" {
+  export interface ConnectorApp extends Record<string, unknown> {
+    id: string;
+    name: string;
+    description?: string;
+    iconUrl?: string;
+    iconUrlDark?: string;
+    distributionChannel?: unknown;
+    installUrl?: string;
+    pluginDisplayNames?: string[];
+  }
+  export interface AppInfo extends Record<string, unknown> {
+    id: string;
+    name: string;
+    description?: string;
+    logoUrl?: string;
+    logoUrlDark?: string;
+    iconAssets: null;
+    iconDarkAssets: null;
+    distributionChannel?: unknown;
+    branding: null;
+    appMetadata: null;
+    labels: null;
+    installUrl?: string;
+    isAccessible: boolean;
+    isEnabled: boolean;
+    pluginDisplayNames: string[];
+  }
   export const n: () => void;
-  export const t: (app: any) => any;
+  export const t: (app: ConnectorApp) => AppInfo;
+}
+
+declare module "@rchunk/pasted-link-connect-modal" {
+  export interface LibraryPastedLinkConnectModalProps {
+    app: import("@rchunk/app-info").ConnectorApp;
+    area: unknown;
+    onConnected(): void;
+    onOpenChange(open: boolean): void;
+    reauthLinkId?: string;
+  }
+  export const LibraryPastedLinkConnectModal: (
+    props: LibraryPastedLinkConnectModalProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/use-codex-worktrees" {
