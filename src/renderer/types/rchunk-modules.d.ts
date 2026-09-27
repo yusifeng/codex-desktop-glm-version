@@ -4144,7 +4144,14 @@ declare module "@rchunk/settings-unsaved-changes-dialog" {
 }
 
 declare module "@rchunk/chatgpt-saved-memory-source-delete-dialog" {
-  export const ChatGptSavedMemorySourceDeleteDialog: (...args: any[]) => any;
+  export interface ChatGptSavedMemorySourceDeleteDialogProps {
+    onClose(): void;
+    onConfirm(): void;
+    title: string;
+  }
+  export const ChatGptSavedMemorySourceDeleteDialog: (
+    props: ChatGptSavedMemorySourceDeleteDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/my-gpt-delete-dialog" {
