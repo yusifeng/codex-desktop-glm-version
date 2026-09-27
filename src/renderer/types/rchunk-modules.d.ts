@@ -5227,6 +5227,30 @@ declare module "@rchunk/schedule-fields" {
   export const u: () => void;
 }
 declare module "@rchunk/automation-frequency-section";
+declare module "@rchunk/platform-ui-kit-provider";
+declare module "@rchunk/navigation-blocker";
+declare module "@rchunk/automation-share-dialog";
+declare module "@rchunk/automation-editor-dialog" {
+  import type { AutomationDraft, AutomationRecord } from "@rchunk/schedule-draft";
+  import type { AutomationItem } from "@rchunk/schedule-fields";
+  export interface AutomationEditorItem extends Omit<AutomationItem, "automation"> { automation: AutomationRecord & { canDelete?: boolean; canManage?: boolean; conversation_id?: string | null; display_emoji?: string | null; executor?: string; status?: string } }
+  export const a: () => void; export const d: () => void; export const h: () => void; export const l: () => void; export const n: () => void; export const p: () => void; export const s: () => void;
+  export const c: (props: { triggers?: Array<{ connector_type?: string; id: string; presentation?: { display_name?: string; icon_url?: string } }> | null; onOpenTrigger?(trigger: Record<string, unknown>): void; showUnavailableConditions?: boolean }) => unknown;
+  export const f: (props: { automationId: string; children?(content: unknown): unknown; presentation?: "detail-footer" | "editor-footer" | "inline" | "run-result"; sites?: Array<{ project_id: string; title: string }>; onOpenSite?(projectId: string): void }) => unknown;
+  export const i: (props: Record<string, unknown> & { onClose(): void; title: unknown }) => unknown;
+  export const m: (props: Record<string, unknown>) => unknown;
+  export const o: (props: Record<string, unknown> & { item: AutomationEditorItem }) => unknown;
+  export const r: (props: Record<string, unknown> & { item: AutomationEditorItem; onClose(): void }) => unknown;
+  export const t: (props: { conversationId?: string | null; item: AutomationEditorItem; onClose(): void; presentation?: "dialog" | "panel"; ref?: unknown; relatedActions?: unknown }) => unknown;
+  export const u: (props: Record<string, unknown> & { item: AutomationEditorItem }) => unknown;
+}
+declare module "@rchunk/cloud-automation-detail-panel" {
+  import type { AutomationEditorItem } from "@rchunk/automation-editor-dialog";
+  export const a: (props: Record<string, unknown>) => unknown; export const c: () => void; export const i: () => void; export const n: () => void; export const o: () => void;
+  export const r: (props: Record<string, unknown> & { name: string }) => unknown;
+  export const s: (props: Record<string, unknown>) => unknown;
+  export const t: (props: { item: AutomationEditorItem; onClose(): void; onOpenConversation?(): void; onSaved?(automation: unknown): void; showRunResults?: boolean }) => unknown;
+}
 declare module "@rchunk/share-analytics";
 declare module "@rchunk/create-pull-request-modal-content";
 
