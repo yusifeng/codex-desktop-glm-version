@@ -14187,19 +14187,19 @@ declare module "@rchunk/header-content-fade";
 declare module "@rchunk/artifact-layout";
 declare module "@rchunk/lazy-version-history";
 declare module "@rchunk/library-cloud-file-preview";
-declare module "@rchunk/library-file-display-title";
-declare module "@rchunk/library-file-download";
-declare module "@rchunk/library-file-preview-kind";
-declare module "@rchunk/library-file-preview-loading";
+declare module "@rchunk/library-file-display-title" { export const n: () => void; export const t: (name: string, kind: string | null | undefined, intl: { formatMessage(descriptor: { defaultMessage: string; id: string }, values?: Record<string, string>): string }) => string }
+declare module "@rchunk/library-file-download" { export interface DownloadableLibraryFile { downloadUrl?: string; file_name: string; requestHeaders?: Record<string, string> } export const a: () => void; export const i: (file: DownloadableLibraryFile, signal?: AbortSignal) => Promise<string>; export const n: (file: DownloadableLibraryFile, signal?: AbortSignal) => Promise<Response>; export const r: (file: DownloadableLibraryFile, signal?: AbortSignal) => Promise<Uint8Array>; export const t: (file: DownloadableLibraryFile) => Promise<void> }
+declare module "@rchunk/library-file-preview-kind" { export interface PreviewableLibraryFile { file_name: string; library_file_category?: string | null; mime_type?: string | null } export const i: () => void; export const n: (file: PreviewableLibraryFile) => string | null; export const r: (file: PreviewableLibraryFile) => "artifact" | "html" | "image" | "markdown" | "pdf" | "text" | "unsupported"; export const t: (input: { fileId: string; mimeType?: string | null; sourceUrl?: string | null }) => string | null }
+declare module "@rchunk/library-file-preview-loading" { export const n: () => void; export const t: () => unknown }
 declare module "@rchunk/library-multiplayer-access";
 declare module "@rchunk/loading-controls";
 declare module "@rchunk/open-image-preview";
-declare module "@rchunk/open-in-library-item";
+declare module "@rchunk/open-in-library-item" { export const n: () => void; export const t: (props: { disabled?: boolean; libraryFileId: string; onOpen?(path: string): void }) => unknown }
 declare module "@rchunk/artifact-presentation";
 declare module "@rchunk/presentation-annotation-coachmark";
 declare module "@rchunk/presentation-annotation-cursor-coachmark";
-declare module "@rchunk/preview-layout";
-declare module "@rchunk/render-file-children";
+declare module "@rchunk/preview-layout" { export const n: () => void; export const t: (props: { assetName: string; bottomContent?: unknown; children?: unknown; contentOwnsHeader?: boolean; endContent?: unknown; headerVariant?: "default" | "document"; onClose(): void; titleEndContent?: unknown }) => unknown }
+declare module "@rchunk/render-file-children" { export interface FileLineAnnotation { id?: string | number; line?: number; [key: string]: unknown } export const n: <FileValue>(props: { file: FileValue; getAnnotationSlotName?(annotation: FileLineAnnotation): string; getHoveredLine?(): number | null; lineAnnotations?: FileLineAnnotation[]; renderAnnotation?(annotation: FileLineAnnotation): unknown; renderCustomHeader?(file: FileValue): unknown; renderGutterUtility?(getHoveredLine?: () => number | null): unknown; renderHeaderFilenameSuffix?(file: FileValue): unknown; renderHeaderMetadata?(file: FileValue): unknown; renderHeaderPrefix?(file: FileValue): unknown }) => unknown; export const t: () => void }
 declare module "@rchunk/spreadsheet-editor";
 declare module "@rchunk/version-history";
 
