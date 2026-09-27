@@ -8932,6 +8932,53 @@ declare module "@rchunk/pending-environment-onboarding" {
   export const r: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, Map<string, PendingEnvironmentOnboarding>>;
   export const t: () => void;
 }
+declare module "@rchunk/cloud-preferences" {
+  export interface PathTemplateVariable { value: string; example: string; char_count: number; }
+  export type PathTemplateError = "bracket-mismatch" | "invalid-characters" | "invalid-pattern" | "leading-slash" | "missing-pattern" | "too-long";
+  export const a: () => unknown; export const i: () => unknown;
+  export const n: (template: string, maxLength: number, variables: readonly PathTemplateVariable[]) => PathTemplateError | null;
+  export const o: () => unknown; export const r: () => void;
+  export const t: (template: string, variables: readonly PathTemplateVariable[]) => string;
+}
+declare module "@rchunk/settings-row-disclosure" {
+  export interface SettingsRowDisclosureProps { children: unknown; content: unknown; contentId: string; expanded: boolean; }
+  export const n: () => void;
+  export const t: (props: SettingsRowDisclosureProps) => unknown;
+}
+declare module "@rchunk/environment-configuration-fields" {
+  export interface EnvironmentIssue { code: string; field?: string; message?: string; valuesSaved?: boolean; }
+  export interface EnvironmentVariable { name: string; value: string; optional?: boolean; }
+  export interface EnvironmentSecret { id: string | number; name: string; value: string; source?: "environment" | "user_provided"; serverId?: string | null; isMissing?: boolean; injectionTarget?: { type: string; name?: string; domain?: string | null }; }
+  export interface EnvironmentDraft { access?: "organization" | "private"; maintenanceSetupScript?: string; networkDomains?: string[]; networkEnabled?: boolean; networkPreset?: "all" | "none" | "package_managers"; outboundIdentityRequirements?: unknown[]; repositories?: string[]; setupScript?: string; [key: string]: unknown; }
+  export const i: () => void; export const n: () => void;
+  export const r: (props: { disabled?: boolean; domains: string[]; onChange(domains: string[]): void; issues?: EnvironmentIssue[] }) => unknown;
+  export const t: (props: Record<string, unknown> & { draft: EnvironmentDraft; onDraftChange(change: Partial<EnvironmentDraft>): void; secrets: EnvironmentSecret[]; setSecrets(secrets: EnvironmentSecret[]): void }) => unknown;
+}
+declare module "@rchunk/diff-file-view" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/outbound-identity-connection-dialog" { export const OutboundIdentityConnectionDialog: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/code-editor-runtime" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/outbound-identity-error" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/publish-actions" {
+  export interface PublishActionButtonProps { children: unknown; disabled?: boolean; loading?: boolean; tooltipContent?: unknown; color?: "primary" | "secondary"; onClick?(): void; }
+  export interface EnvironmentPublishActionsProps { conversationId: string; children?: unknown; onReview?(): void; hasPendingVpn?: boolean; }
+  export const i: () => void; export const n: () => void;
+  export const r: (props: PublishActionButtonProps) => unknown;
+  export const t: (props: EnvironmentPublishActionsProps) => unknown;
+}
+declare module "@rchunk/app-initial" {
+  export const $m: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const Bm: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const Fm: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const Gm: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const Jpt: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const Km: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const Kpt: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const Ypt: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+  export const pmt: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
+}
+declare module "@rchunk/side-panel" {
+  export const r: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, boolean>;
+}
 declare module "@rchunk/validation-message" {
   export type EnvironmentValidationError = "missing-key" | "invalid-key" | "reserved-key" | "duplicate" | "missing-value" | "invalid-value";
   export const n: (props: { error: EnvironmentValidationError }) => unknown; export const r: () => void; export const t: (props: { name: string }) => unknown;
