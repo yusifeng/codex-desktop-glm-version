@@ -5,10 +5,11 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as reminderDialogChunk from "@rchunk/chatgpt-image-upload-reminder-dialog-core";
 
 void appSharedChunk;
-const reminderDialog = reminderDialogChunk as Record<string, any>;
+const {
+  n: initializeChatGptImageUploadReminderDialog,
+  t: ChatGptImageUploadReminderDialog,
+} = reminderDialogChunk;
 
-reminderDialog.n();
-
-const ChatGptImageUploadReminderDialog = reminderDialog.t;
+initializeChatGptImageUploadReminderDialog();
 
 export { ChatGptImageUploadReminderDialog };
