@@ -4298,6 +4298,19 @@ declare module "@rchunk/app-initial" {
   export const kF: () => void;
   export const wdn: () => void;
   export const CT: () => void;
+  export const KG: () => void;
+  export const X7: () => void;
+  export const l9: (props: Record<string, unknown>) => unknown;
+  export const qG: {
+    (props: Record<string, unknown>): unknown;
+    Body: unknown;
+    Close: unknown;
+    Content: unknown;
+    Description: unknown;
+    Footer: unknown;
+    Header: unknown;
+    Title: unknown;
+  };
   /** defineMessages（订阅与定价消息描述）。 */
   export const TT: {
     (): void;
@@ -7315,8 +7328,36 @@ declare module "@rchunk/pricing" {
 
 declare module "@rchunk/offer-notice" {
   export const i: () => void;
-  export const n: (props: Record<string, unknown>) => unknown;
-  export const r: (props: Record<string, unknown>) => unknown;
+  export const n: (props: {
+    billingInterval: "month" | "year";
+    currencySign: string;
+    currentPlanName?: string | null;
+    formattedDiscountedCost: string;
+    fullPriceResumeDateFormatted: string;
+    planCost: string;
+    planName: string;
+    renewalDateFormatted: string;
+  }) => unknown;
+  export const r: (props: {
+    currencyCode?: string;
+    currencySign?: string;
+    currentPlanName: string;
+    planCost?: string | null;
+    planName: string;
+    renewalDateFormatted?: string | null;
+    useTreatmentContentStyle?: boolean;
+  }) => unknown;
+  export const t: (props: {
+    closeLabel: unknown;
+    isDarkMode?: boolean;
+    message: unknown;
+    onClose(): void;
+    open: boolean;
+    portalClassName?: string;
+    retry?: { label: unknown; onClick(): void };
+    testId?: string;
+    title: unknown;
+  }) => unknown;
 }
 
 declare module "@rchunk/stripe-payment-confirmation" {

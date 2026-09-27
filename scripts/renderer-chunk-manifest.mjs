@@ -1370,6 +1370,7 @@ export const REWRITTEN = new Set([
   "plan-names",
   "pricing",
   "pricing-promotions",
+  "offer-notice",
   "model-and-reasoning-effort-translations",
   "stripe-pure",
   "stripe-payment-confirmation",
