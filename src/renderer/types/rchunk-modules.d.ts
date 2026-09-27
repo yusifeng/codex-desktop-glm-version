@@ -14441,7 +14441,16 @@ declare module "@rchunk/editor-header" { export interface EditorHeaderControls {
 declare module "@rchunk/editor-header-controls" { export interface EditorHeaderControls { annotationControl: unknown; commentsControl: unknown; editingControls: unknown; navigationControl: unknown; supplementalActions: unknown; zoomControl: unknown } export const n: () => void; export const t: EditorHeaderControls }
 declare module "@rchunk/artifact-entry" { export const n: () => Promise<unknown>; export const r: () => Promise<unknown>; export const t: () => void }
 declare module "@rchunk/multiplayer-document-runtime";
-declare module "@rchunk/writing-block-surface";
+declare module "@rchunk/writing-block-surface" {
+  export interface WritingBlockSurfaceProps { children?: unknown; className?: string; header?: unknown; leadingContent?: unknown; style?: Record<string, string | number> }
+  export interface WritingBlockRegionProps { children?: unknown; className?: string }
+  export const a: () => void;
+  export const i: () => void;
+  export const n: (props: WritingBlockSurfaceProps) => unknown;
+  export const o: Record<string, string>;
+  export const r: (props: WritingBlockRegionProps) => unknown;
+  export const t: (props: WritingBlockRegionProps) => unknown;
+}
 declare module "@rchunk/vite-browser-external";
 declare module "@rchunk/artifact-workbook-model-runtime";
 declare module "@rchunk/artifact-document-model-runtime";
@@ -14450,10 +14459,27 @@ declare module "@rchunk/artifact-spreadsheet-model-runtime";
 declare module "@rchunk/popcorn-presentation-panel";
 declare module "@rchunk/popcorn-workbook-panel";
 declare module "@rchunk/popcorn-document-panel";
-declare module "@rchunk/docx-preview-panel";
-declare module "@rchunk/notebook-preview-panel";
-declare module "@rchunk/pdf-preview-panel";
-declare module "@rchunk/library-json-preview";
+declare module "@rchunk/docx-preview-panel" {
+  export interface DocumentPreviewPage { alt?: string; id?: string | number; src?: string; text?: string }
+  export interface DocxPreviewPanelProps { currentPage?: number; error?: string | null; fileName?: string; isLoading?: boolean; libraryFileId?: string; onClose?(): void; onDownload?(): void; onOpenInLibrary?(libraryFileId: string): void; onPageChange?(page: number): void; onRetry?(): void; onZoomChange?(zoom: number): void; pages?: readonly DocumentPreviewPage[]; title?: string; zoom?: number }
+  export const DocxPreviewPanel: (props: DocxPreviewPanelProps) => unknown;
+}
+declare module "@rchunk/notebook-preview-panel" {
+  export interface NotebookCell { cellType?: "code" | "markdown" | "raw"; executionCount?: number | null; id?: string; outputs?: readonly unknown[]; source?: string | readonly string[] }
+  export interface NotebookPreviewPanelProps { cells?: readonly NotebookCell[]; error?: string | null; fileName?: string; isLoading?: boolean; onClose?(): void; onDownload?(): void; onRetry?(): void; title?: string }
+  export const NotebookPreviewPanel: (props: NotebookPreviewPanelProps) => unknown;
+}
+declare module "@rchunk/pdf-preview-panel" {
+  export interface PdfPreviewPage { alt?: string; height?: number; id?: string | number; src?: string; width?: number }
+  export interface PdfPreviewPanelProps { currentPage?: number; error?: string | null; fileName?: string; isLoading?: boolean; libraryFileId?: string; onClose?(): void; onDownload?(): void; onOpenInLibrary?(libraryFileId: string): void; onPageChange?(page: number): void; onRetry?(): void; onZoomChange?(zoom: number): void; pages?: readonly PdfPreviewPage[]; title?: string; zoom?: number }
+  export const PdfPreviewPanel: (props: PdfPreviewPanelProps) => unknown;
+}
+declare module "@rchunk/library-json-preview" { export interface LibraryJsonPreviewProps { content: string; fileName: string } export const LibraryJsonPreview: (props: LibraryJsonPreviewProps) => unknown }
+declare module "@rchunk/annotation-comment-editor-card";
+declare module "@rchunk/popcorn-review-bar-overlay";
+declare module "@rchunk/docx-preview-runtime";
+declare module "@rchunk/codemirror-json-runtime";
+declare module "@rchunk/chatgpt-code-block-highlighting";
 declare module "@rchunk/multiplayer-note" { export const MultiplayerNote: (props: { content?: string | null; error?: string | null; isLoading?: boolean; name?: string; onClose(): void }) => unknown; }
 declare module "@rchunk/multiplayer-writing-block" { export const MultiplayerWritingBlock: (props: { content?: string | null; name?: string; onOpen?(): void }) => unknown; }
 declare module "@rchunk/file-preview" { export const ChatGptSearchFilePreview: (props: { accountId: string; authenticatedAccountId: string; authenticatedUserId?: string; item: { cloudFile: { name: string }; [key: string]: unknown }; onClose(): void; renderPreview?(item: { cloudFile: { name: string }; [key: string]: unknown }): unknown; sessionReady?: boolean; userId: string }) => unknown }
