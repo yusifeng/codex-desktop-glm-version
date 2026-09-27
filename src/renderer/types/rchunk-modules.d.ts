@@ -5251,6 +5251,20 @@ declare module "@rchunk/pull-request-tab-content" { export const PullRequestWork
 declare module "@rchunk/auto-review-approval-nudge" { export const AutoReviewApprovalNudge: (props: { conversationId: string; hostId: string; learnMoreUrl?: string; onDismiss?(input: { conversationId: string; hostId: string }): void; onEnable?(input: { conversationId: string; hostId: string }): Promise<void> | void }) => unknown; }
 declare module "@rchunk/editor-diff-page" { export const EditorDiffPage: (props?: { conversationId?: string | null; diffContent?: string | null; error?: string | null; initialViewType?: "split" | "unified"; richPreviewEnabled?: boolean }) => unknown; }
 declare module "@rchunk/review-slash-command-submenu-registration" { export const ReviewSlashCommandSubmenuRegistration: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/debug-modal" { export const DebugModal: (props: { initialRect?: Partial<{ height: number; width: number; x: number; y: number }>; onClose(): void; viewport?: { height: number; width: number } }) => unknown; }
+declare module "@rchunk/pet-install-modal-host" { export const PetInstallModalHost: (props: Record<string, unknown> & { onClose(): void }) => unknown; }
+declare module "@rchunk/subscription-renewal-dialog" { export const SubscriptionRenewalDialog: (props: Record<string, unknown> & { onClose(): void }) => unknown; }
+declare module "@rchunk/upgrade-plan-dialog" { export const UpgradePlanDialog: (props: Record<string, unknown>) => unknown; export const UpgradePlanDialogModal: (props: Record<string, unknown> & { onClose(): void }) => unknown; }
+declare module "@rchunk/voice-personalization-dialog" { export const VoicePersonalizationDialog: (props: Record<string, unknown> & { accountId: string; onBack(): void; onClose(): void; onComplete(): void }) => unknown; }
+declare module "@rchunk/slides-outline-template-picker" { export const SlidesOutlineTemplatePicker: (props: Record<string, unknown> & { onOpenChange(open: boolean): void; onSelect(template: unknown): void; open: boolean }) => unknown; }
+declare module "@rchunk/avatar-mascot-button";
+declare module "@rchunk/pet-install-state";
+declare module "@rchunk/subscription-plan-status";
+declare module "@rchunk/format-amount";
+declare module "@rchunk/chatgpt-subscription-events";
+declare module "@rchunk/pricing-plan-comparison";
+declare module "@rchunk/voice-configuration-manager";
+declare module "@rchunk/chatgpt-voices-query";
 declare module "@rchunk/review-file-source-breadcrumb" {
   export const a: () => void; export const c: () => void; export const d: (line: number, lineCount: number) => number; export const i: () => void; export const l: (contents: string) => number; export const n: () => void; export const o: (element: HTMLElement, line: number, character: number) => boolean; export const r: (props: Record<string, unknown>) => unknown; export const s: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; export const u: (value: string, lineCount?: number) => number | null;
 }
