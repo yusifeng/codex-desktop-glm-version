@@ -1,0 +1,45 @@
+import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+import "@rchunk/spreadsheet-editor";
+import "@rchunk/app-primary";
+import "@rchunk/artifact-annotation-batch-controls";
+import "@rchunk/artifact-layout";
+import "@rchunk/editor-header";
+import "@rchunk/artifact-feedback-button";
+import "@rchunk/artifact-annotation-comment";
+import "@rchunk/sidebar-panel";
+import "@rchunk/presentation-annotation-cursor-coachmark";
+import "@rchunk/presentation-annotation-coachmark";
+import "@rchunk/open-in-library-item";
+import "@rchunk/version-history";
+import "@rchunk/header-content-fade";
+import "@rchunk/artifact-originating-turn";
+import "@rchunk/artifact-preview-header";
+import "@rchunk/review-file-source-item";
+import "@rchunk/artifact-preview-status";
+import "@rchunk/artifact-preview-zoom";
+import "@rchunk/right-panel-composer-overlay-alignment";
+import "@rchunk/vite-browser-external";
+import "@rchunk/artifact-workbook-model-runtime";
+import "@rchunk/artifact-document-model-runtime";
+import "@rchunk/artifact-presentation-model-runtime";
+import "@rchunk/artifact-spreadsheet-model-runtime";
+import "@rchunk/popcorn-presentation-panel";
+import "@rchunk/popcorn-workbook-panel";
+import "@rchunk/popcorn-document-panel";
+import "@rchunk/docx-preview-panel";
+import "@rchunk/notebook-preview-panel";
+import "@rchunk/pdf-preview-panel";
+interface ArtifactTabProps { annotations?: Array<{ id: string; prompt?: string }>; content?: unknown; error?: string | null; isLoading?: boolean; kind?: "document" | "presentation" | "site" | "spreadsheet" | "text"; status?: string; title?: string; version?: string | null; onClose?(): void; onDownload?(): void; onRequestEdit?(prompt: string): void; onRetry?(): void }
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function renderArtifact({ annotations = [], content = null, error = null, isLoading = false, kind = "document", status = "ready", title = "Artifact", version = null, onClose, onDownload, onRequestEdit, onRetry }: ArtifactTabProps): unknown { if (isLoading) return jsx().jsx("div", { role: "status", children: "Loading artifact" }); if (error != null) return jsx().jsxs("div", { role: "alert", children: [error, jsx().jsx("button", { onClick: onRetry, type: "button", children: "Try again" })] }); return jsx().jsxs("section", { "aria-label": title, "data-artifact-kind": kind, children: [jsx().jsxs("header", { children: [jsx().jsx("h2", { children: title }), version == null ? null : jsx().jsx("span", { children: version }), jsx().jsx("button", { onClick: onDownload, type: "button", children: "Download" }), jsx().jsx("button", { onClick: onClose, type: "button", children: "Close" })] }), jsx().jsx("div", { "data-status": status, children: content }), annotations.length === 0 ? null : jsx().jsx("ul", { "aria-label": "Artifact annotations", children: annotations.map(annotation => jsx().jsx("li", { children: jsx().jsx("button", { onClick: () => onRequestEdit?.(annotation.prompt ?? ""), type: "button", children: annotation.prompt ?? "Ask for change" }) }, annotation.id)) })] }); }
+const a = renderArtifact;
+const i = renderArtifact;
+const n = renderArtifact;
+const o = renderArtifact;
+const r = renderArtifact;
+const s = renderArtifact;
+const t = renderArtifact;
+export { a, i, n, o, r, s, t };
