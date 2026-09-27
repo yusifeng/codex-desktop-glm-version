@@ -3450,6 +3450,9 @@ declare module "@rchunk/app-initial" {
   ) => Promise<void>;
   export const kF: () => void;
   export const wdn: () => void;
+  export const CT: () => void;
+  export const TT: () => void;
+  export const wT: () => void;
   export interface CurrencyAmountInput {
     amount: number;
     currencyCode: string;
@@ -4950,18 +4953,49 @@ declare module "@rchunk/realtime-voice-home-announcement" {
 }
 
 declare module "@rchunk/subscription-onboarding-content" {
-  export const a: (account: unknown) => void;
-  export const d: unknown;
+  export interface StudentAccount {
+    accountUserId?: string;
+    discount?: {
+      discount_expires_at?: string | null;
+      promo_campaign_id?: string;
+    } | null;
+    id?: string;
+    isPaidPlus?: boolean;
+  }
+  export interface TourAction {
+    action: "finish" | "try_feature";
+    pageId: string;
+  }
+  export interface TourProps extends Record<string, unknown> {
+    Frame: unknown;
+    featurePageIds?: string[];
+    onAction(event: TourAction): void;
+    onOpenChange(open: boolean): void;
+    open: boolean;
+  }
+  export interface CheckoutThemeFrameProps extends Record<string, unknown> {
+    className?: string;
+    isDarkMode?: boolean;
+  }
+  export const _: () => void;
+  export const a: (account: StudentAccount) => void;
+  export const c: () => void;
+  export const d: (props: CheckoutThemeFrameProps) => unknown;
+  export const f: () => void;
   export const g: string[];
   export const h: string[];
-  export const l: unknown;
-  export const n: (account: unknown) => boolean;
-  export const o: (account: unknown) => boolean;
-  export const p: unknown;
-  export const r: (account: unknown) => boolean;
-  export const s: unknown;
+  export const i: () => void;
+  export const l: (props: TourProps) => unknown;
+  export const m: () => void;
+  export const n: (account: StudentAccount | null) => boolean;
+  export const o: (account: StudentAccount) => boolean;
+  export const p: (props: TourProps) => unknown;
+  export const r: (account: StudentAccount) => boolean;
+  export const s: (props: TourProps) => unknown;
   export const t: () => void;
-  export const v: unknown;
+  export const u: () => void;
+  export const v: (props: TourProps) => unknown;
+  export const y: () => void;
 }
 
 declare module "@rchunk/subscription-onboarding" {

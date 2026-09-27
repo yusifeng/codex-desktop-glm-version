@@ -6,8 +6,24 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  $3: initializeDialogPrimitives,
+  I3: getJsxRuntime,
+  K2: initializeReactRuntime,
+  e6: getReactRuntime,
+  h4: initializeClassNames,
+  m4: classNames,
+  n4: useIntl,
+} = appSharedChunk;
+const {
+  CT: initializeSubscriptionOnboardingAnalytics,
+  TT: initializeSubscriptionOnboardingAssets,
+  wT: initializeSubscriptionOnboardingStorage,
+} = appInitialChunk;
+
+type IntlShape = import("@rchunk/app-shared").IntlShape;
+type JsxRuntime = import("@rchunk/app-shared").JsxRuntime;
+type ReactRuntime = import("@rchunk/app-shared").ReactRuntime;
 
 type NavigationMethod = "initial" | "next" | "previous" | "picker";
 interface CarouselPage {
@@ -26,7 +42,7 @@ interface PageEvent {
   navigationMethod: NavigationMethod;
 }
 interface CarouselProps {
-  Frame: any;
+  Frame: unknown;
   direction?: "ltr" | "rtl";
   initialPageId?: string;
   onCloseComplete?(): void;
@@ -37,9 +53,10 @@ interface CarouselProps {
   onSecondaryAction?(event: PageEvent): void;
   open: boolean;
   pages: CarouselPage[];
-  [key: string]: any;
 }
 interface TourProps extends Omit<CarouselProps, "pages"> {
+  canStartVoice?: boolean;
+  canStartWork?: boolean;
   featurePageIds?: string[];
   onAction(event: { action: "finish" | "try_feature"; pageId: string }): void;
   onInteraction?(event: {
@@ -48,6 +65,17 @@ interface TourProps extends Omit<CarouselProps, "pages"> {
     pageIndex: number;
     presentedPageIds: string[];
   }): void;
+  showFilesAction?: boolean;
+  showImagesAction?: boolean;
+  showPluginsAction?: boolean;
+  showSitesAction?: boolean;
+  showVoiceAction?: boolean;
+  showWorkAction?: boolean;
+  trialDaysRemaining?: number;
+  trialExtensionAvailable?: boolean;
+  trialPluginsAvailable?: boolean;
+  trialWorkAvailable?: boolean;
+  welcomeVariant?: "no_payment_trial" | string;
 }
 interface StudentAccount {
   id?: string;
@@ -70,27 +98,37 @@ const SHOWN_PREFIX = "oai/apps/students2026/onboardingShown.v1";
 const CAMPAIGN = "students-2026-four-month-free";
 const MAX_PENDING_AGE_MS = 30 * 60 * 1_000;
 
-let React: any;
-let jsx: any;
+interface KeyboardNavigationEvent {
+  key: string;
+  preventDefault?(): void;
+}
+
+interface CheckoutThemeFrameProps extends Record<string, unknown> {
+  className?: string;
+  isDarkMode?: boolean;
+}
+
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 let initialized = false;
 function initializeSubscriptionOnboarding(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.h4?.();
-  appInitial.CT?.();
-  appInitial.TT?.();
-  appInitial.wT?.();
-  React = appShared.e6?.();
-  jsx = appShared.I3?.();
+  initializeDialogPrimitives();
+  initializeReactRuntime();
+  initializeClassNames();
+  initializeSubscriptionOnboardingAnalytics();
+  initializeSubscriptionOnboardingAssets();
+  initializeSubscriptionOnboardingStorage();
+  React = getReactRuntime();
+  jsx = getJsxRuntime();
   initialized = true;
 }
 
 function msg(
-  intl: any,
+  intl: IntlShape,
   id: string,
   defaultMessage: string,
-  values?: any,
+  values?: import("@rchunk/app-shared").MessageValues,
 ): unknown {
   return intl.formatMessage(
     { id, defaultMessage, description: defaultMessage },
@@ -182,7 +220,7 @@ function CarouselModal(props: CarouselProps): unknown {
     "aria-describedby": `carousel-modal-description-${current}`,
     "aria-labelledby": "carousel-modal-title",
     onCloseComplete,
-    onKeyDown: (keyboardEvent: any) => {
+    onKeyDown: (keyboardEvent: KeyboardNavigationEvent) => {
       const delta =
         keyboardEvent.key === "ArrowRight"
           ? direction === "rtl"
@@ -297,7 +335,7 @@ function wireTour(
 }
 
 function featurePage(
-  intl: any,
+  intl: IntlShape,
   plan: string,
   id: string,
   title: string,
@@ -323,9 +361,9 @@ function featurePage(
 }
 
 function plusPages(
-  intl: any,
+  intl: IntlShape,
   ids: string[],
-  props: Record<string, any>,
+  props: TourProps,
 ): CarouselPage[] {
   const trial = props.welcomeVariant === "no_payment_trial";
   const next = msg(intl, "chatgpt.plus_onboarding.next", "Next");
@@ -392,8 +430,8 @@ function plusPages(
       intl,
       "plus",
       "trial_extension",
-      props.trialDaysRemaining > 0
-        ? `${props.trialDaysRemaining} days left in your Plus access`
+      (props.trialDaysRemaining ?? 0) > 0
+        ? `${props.trialDaysRemaining ?? 0} days left in your Plus access`
         : "Keep exploring Plus",
       props.trialExtensionAvailable
         ? "You can extend your access now."
@@ -422,15 +460,15 @@ function PlusSubscriptionOnboarding(props: TourProps): unknown {
   const ids = props.featurePageIds ?? PLUS_FEATURES;
   return wireTour(
     props,
-    plusPages(appShared.n4?.(), ids, props),
+    plusPages(useIntl(), ids, props),
     new Set(PLUS_FEATURES),
   );
 }
 
 function proPages(
-  intl: any,
+  intl: IntlShape,
   ids: string[],
-  props: Record<string, any>,
+  props: TourProps,
 ): CarouselPage[] {
   const next = msg(intl, "chatgpt.pro_onboarding.next", "Next");
   const tryIt = msg(intl, "chatgpt.pro_onboarding.try", "Try it");
@@ -512,7 +550,7 @@ function ProSubscriptionOnboarding(props: TourProps): unknown {
   const ids = props.featurePageIds ?? PRO_DESKTOP_FEATURES;
   return wireTour(
     props,
-    proPages(appShared.n4?.(), ids, props),
+    proPages(useIntl(), ids, props),
     new Set(PRO_ALL_FEATURES),
   );
 }
@@ -521,13 +559,13 @@ function CheckoutThemeFrame({
   isDarkMode,
   className,
   ...props
-}: Record<string, any>): unknown {
+}: CheckoutThemeFrameProps): unknown {
   const theme = isDarkMode ? "dark" : "light";
   return jsx.jsx("div", {
     ...props,
     "data-checkout-theme": theme,
     "data-theme": theme,
-    className: appShared.m4?.(
+    className: classNames(
       "relative w-full overflow-hidden bg-[var(--checkout-bg-primary)]",
       className,
     ),
@@ -535,7 +573,7 @@ function CheckoutThemeFrame({
 }
 
 function studentPage(
-  intl: any,
+  intl: IntlShape,
   variant: string,
   id: string,
   title: string,
@@ -561,9 +599,9 @@ function studentPage(
 }
 
 function studentPages(
-  intl: any,
+  intl: IntlShape,
   modern: boolean,
-  props: Record<string, any>,
+  props: TourProps,
 ): CarouselPage[] {
   const variant = modern ? "students-2026" : "subscription";
   const definition = modern
@@ -655,14 +693,14 @@ function studentPages(
 function Student2026SubscriptionOnboarding(props: TourProps): unknown {
   return wireTour(
     props,
-    studentPages(appShared.n4?.(), true, props),
+    studentPages(useIntl(), true, props),
     new Set(STUDENT_2026_PAGES.slice(1)),
   );
 }
 function StudentSubscriptionOnboarding(props: TourProps): unknown {
   return wireTour(
     props,
-    studentPages(appShared.n4?.(), false, props),
+    studentPages(useIntl(), false, props),
     new Set(STUDENT_CLASSIC_PAGES.slice(1)),
   );
 }
