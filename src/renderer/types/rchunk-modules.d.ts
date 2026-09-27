@@ -5293,7 +5293,13 @@ declare module "@rchunk/cadence-events" {
   export const s: (account: Record<string, unknown>) => boolean;
   export const t: () => void;
 }
-declare module "@rchunk/add-payment-method";
+declare module "@rchunk/add-payment-method" {
+  export interface AddedPaymentMethod { billingDetails?: Record<string, unknown>; paymentMethodId?: string; token?: string }
+  export interface AddPaymentMethodProps { accountId: string; error?: string | null; isLoading?: boolean; isSubmitting?: boolean; onClose(): void; onCloseAutoFocus?(): void; onRetry?(): void; onSubmit?(input: { accountId: string; billingName: string; cardComplete: boolean }): Promise<AddedPaymentMethod | void> | AddedPaymentMethod | void; onSuccess?(method?: AddedPaymentMethod): void }
+  export const n: () => void;
+  export const t: (props: AddPaymentMethodProps) => unknown;
+}
+declare module "@rchunk/billing-form-options";
 declare module "@rchunk/delinquent-upgrade-preparation" {
   export interface DelinquentUpgradePreparationInput extends Record<string, unknown> { accountId: string; hasPromotion?: boolean; initialPlan: string; pricingInfo?: unknown; updatedPlan: string; userId: string }
   export const n: () => void;
@@ -5305,7 +5311,12 @@ declare module "@rchunk/payment-method-display" {
   export const n: () => void;
   export const t: (method: DisplayPaymentMethod) => { description: unknown; label: unknown };
 }
-declare module "@rchunk/edit-payment-method";
+declare module "@rchunk/edit-payment-method" {
+  export interface EditablePaymentMethod { billing_details?: { address?: Record<string, unknown>; name?: string | null }; card?: { brand?: string; exp_month?: number; exp_year?: number; last4?: string }; id: string }
+  export interface EditPaymentMethodProps { accountId: string; error?: string | null; isLoading?: boolean; isSubmitting?: boolean; method?: EditablePaymentMethod | null; methodId: string; now?: Date; onClose(): void; onCloseAutoFocus?(): void; onRetry?(): void; onSave?(input: { accountId: string; billingName: string; expMonth: number; expYear: number; methodId: string }): Promise<void> | void }
+  export const n: () => void;
+  export const t: (props: EditPaymentMethodProps) => unknown;
+}
 declare module "@rchunk/subscription-recovery-events" {
   export interface SubscriptionRecoveryEventScope { logProductEvent?(descriptor: string, payload: Record<string, unknown>): void }
   export const n: () => void;
