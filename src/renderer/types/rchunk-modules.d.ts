@@ -9087,6 +9087,68 @@ declare module "@rchunk/pull-request-detail-model" {
 }
 
 declare module "@rchunk/pull-request-fix-workflow" {
+  export interface PullRequestTarget { cwd: string; hostId: string; root: string }
+  export interface PullRequestCheck { link?: string | null; name: string; status: string; workflow?: string | null; [key: string]: unknown }
+  export interface ReviewComment {
+    authorLogin?: string | null;
+    body: string;
+    isResolved?: boolean;
+    line?: number | null;
+    path?: string | null;
+    replies?: Array<{ authorLogin?: string | null; body: string }>;
+    reviewThreadId?: string;
+    side?: string | null;
+    startLine?: number | null;
+    startSide?: string | null;
+  }
+  export interface CommentAttachment {
+    content: Array<{ content_type: "text"; text: string }>;
+    localPullRequestCommentGuidance?: string;
+    localWorkspaceRoot?: string;
+    position: { line: number; path: string; side: string; start_line?: number; start_side?: string };
+    reviewThreadId?: string;
+    type: "comment";
+  }
+  export interface MergeConflict { baseBranch: string; headBranch: string; number: number; repo?: string | null; url: string }
+  export interface PullRequestRepairState {
+    pullRequestChecks: PullRequestCheck[];
+    pullRequestMergeConflict: MergeConflict | null;
+    pullRequestRepair: { pullRequestNumber: number | null; target: PullRequestTarget } | null;
+  }
+  export interface RepairScope extends import("@rchunk/app-shared").MaitaiScopeApi<unknown> { focusComposer?(): void }
+  export interface PullRequestStatus {
+    activityItems: ReviewComment[];
+    checks: PullRequestCheck[];
+    mergeBlocker?: "conflicts" | "unknown" | string | null;
+    number?: number | null;
+    repo?: string | null;
+    url?: string | null;
+  }
+  export const C: () => void;
+  export const S: () => void;
+  export const T: () => void;
+  export const _: (scope: RepairScope, input: { baseBranch: string | null; comments: ReviewComment[]; conversationId: string | null; focusComposer: boolean; headBranch: string | null; number: number | null; repo?: string | null; target: PullRequestTarget }) => boolean;
+  export const a: (scope: RepairScope, conflict: MergeConflict | null) => void;
+  export const b: () => void;
+  export const c: (scope: RepairScope, conflict: MergeConflict | null, target: PullRequestTarget) => boolean;
+  export const d: (comments: ReviewComment[]) => ReviewComment[];
+  export const f: (input: { baseBranch?: string | null; conversationId?: string | null; headBranch?: string | null; prNumber?: number | null }) => string | null;
+  export const g: (scope: RepairScope, input: { commentAttachment: CommentAttachment; conversationId: string | null; guidance: string }) => boolean;
+  export const h: (scope: RepairScope, input: { baseBranch: string | null; commentAttachments: CommentAttachment[]; conversationId: string | null; headBranch: string | null; number: number | null; repo?: string | null; target: PullRequestTarget }) => boolean;
+  export const i: (scope: RepairScope, input: { attached: boolean; checks: PullRequestCheck[]; pullRequestNumber: number; target: PullRequestTarget }) => boolean;
+  export const l: (left: PullRequestTarget, right: PullRequestTarget) => boolean;
+  export const m: import("@rchunk/app-shared").ScopedDerivedSignal<Record<string, unknown>, PullRequestTarget | null>;
+  export const n: (check: PullRequestCheck) => string;
+  export const o: (scope: RepairScope, input: { baseBranch: string | null; checks: PullRequestCheck[]; headBranch: string | null; number: number | null; repo?: string | null; target: PullRequestTarget }) => boolean;
+  export const p: () => void;
+  export const r: () => void;
+  export const s: (scope: RepairScope, input: { baseBranch: string | null; conversationId: string | null; headBranch: string | null; pullRequestStatus: PullRequestStatus; target: PullRequestTarget }) => boolean;
+  export const t: (input: { baseBranch: string; headBranch: string; number: number; repo?: string | null; target: PullRequestTarget }) => string;
+  export const u: (attachment: CommentAttachment) => string;
+  export const v: (scope: RepairScope, input: { comment: CommentAttachment; conversationId?: string | null; target: PullRequestTarget; workspaceRoots?: string[] }) => CommentAttachment;
+  export const w: () => void;
+  export const x: (props: Record<string, unknown>) => unknown;
+  export const y: (props: Record<string, unknown>) => unknown;
   const _default: unknown;
   export default _default;
 }
