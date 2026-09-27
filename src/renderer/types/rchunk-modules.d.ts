@@ -6005,17 +6005,49 @@ declare module "@rchunk/chatgpt-conversation-page-core" {
   export const u: () => void;
 }
 
-declare module "@rchunk/conversation-screen";
-declare module "@rchunk/conversation-summary";
-declare module "@rchunk/archived-conversation-preview-footer";
-declare module "@rchunk/chatgpt-sources-message";
+declare module "@rchunk/conversation-screen" {
+  export interface SeatAccessState { accountId?: string; canSwitchToWork?: boolean; email?: string; isCapable?: boolean; isLoading?: boolean; status?: "allowed" | "restricted" | "unknown"; userId?: string }
+  export interface SeatAccessScreenProps extends SeatAccessState { modeToggle?: unknown; onRequestAccess?(): void; onSwitchToWork?(): void }
+  export interface SeatAccessGateProps extends SeatAccessState { children?: unknown; enabled?: boolean; modeToggle?: unknown; onRequestAccess?(): void; onSwitchToWork?(): void }
+  export const n: (props?: SeatAccessScreenProps) => unknown;
+  export const r: () => void;
+  export const t: (props: SeatAccessGateProps) => unknown;
+}
+declare module "@rchunk/conversation-summary" {
+  export type AutomationStatus = "active" | "completed" | "paused";
+  export interface AutomationSummary { id: string; display_schedule?: string | null; is_enabled: boolean; last_run_time?: string | null; next_run_times: string[]; schedule_components: { end_date?: string | null; frequency: string; start_time?: string | null }; timing_mode?: string; updated_at: string }
+  export interface AutomationSummaryItem { automation: AutomationSummary }
+  export interface AutomationGroups { active: AutomationSummaryItem[]; recent: AutomationSummaryItem[]; paused: AutomationSummaryItem[]; completed: AutomationSummaryItem[] }
+  export const a: (items: readonly AutomationSummaryItem[], now: number, pausedAt?: Record<string, number>) => AutomationGroups;
+  export const i: (automation: AutomationSummary) => AutomationStatus;
+  export const n: () => void;
+  export const o: () => void;
+  export const r: (...groups: Array<readonly AutomationSummary[] | null | undefined>) => AutomationSummaryItem[];
+  export const t: (props: { item: AutomationSummaryItem; now?: Date; runPhase?: "executing" | "starting" | null; status?: AutomationStatus }) => unknown;
+}
+declare module "@rchunk/archived-conversation-preview-footer" {
+  export interface ArchivedConversationPreviewFooterProps { conversationId: string; kind: "chatgpt" | "cloud" | "local"; onDone?(): void; onError?(error: unknown): void; onRecover?(input: { conversationId: string; kind: "chatgpt" | "cloud" | "local" }): Promise<void> | void; restored?: boolean; restoring?: boolean }
+  export const n: () => void;
+  export const t: (props: ArchivedConversationPreviewFooterProps) => unknown;
+}
+declare module "@rchunk/chatgpt-sources-message" {
+  export interface MessageDescriptor { id: string; defaultMessage: string; description: string }
+  export const a: () => void;
+  export const i: MessageDescriptor;
+  export const n: Readonly<Record<"plugin" | "skill", MessageDescriptor>>;
+  export const r: Readonly<Record<"apps" | "files" | "links" | "memory" | "more" | "skills" | "web", MessageDescriptor>>;
+  export const t: Readonly<Record<"generalMemory" | "userInstructions" | "userMemory", MessageDescriptor>>;
+}
 declare module "@rchunk/chatgpt-gizmo-header";
 declare module "@rchunk/chatgpt-temporary-chat-ui";
 declare module "@rchunk/cloud-browser-preview";
 declare module "@rchunk/chatgpt-sources-side-panel-tab";
 declare module "@rchunk/open-audio-summary-dialog";
 declare module "@rchunk/open-conversation-files";
-declare module "@rchunk/chatgpt-entity-side-panel-tab";
+declare module "@rchunk/chatgpt-entity-side-panel-tab" {
+  export interface EntityPanelParameters { memorySource?: string | null; sourceId?: string | null; [key: string]: unknown }
+  export const ChatGptEntitySidePanelTab: (props: { conversationId: string; params: EntityPanelParameters; renderEntity?(input: { conversationId: string; flushTop: boolean; params: EntityPanelParameters }): unknown }) => unknown;
+}
 
 declare module "@rchunk/plugin-detail-page-core" {
   export const _: <T>(value: T) => T; export const a: () => void; export const b: (plugin: { id?: string; name: string }) => string;
