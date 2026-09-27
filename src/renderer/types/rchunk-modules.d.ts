@@ -9517,6 +9517,23 @@ declare module "@rchunk/delete-thread-dialog" {
 declare module "@rchunk/browser-site-annotation-permission-dialog" {
   export const BrowserSiteAnnotationPermissionDialog: (props: { hostname: string; isExitingAnnotationMode?: boolean; onRespond(allowed: boolean): Promise<boolean> | boolean; onCloseAutoFocus?(): void; onError?(error: unknown): void }) => unknown;
 }
+declare module "@rchunk/habitat-automation-migration-state" { const migrationState: unknown; export default migrationState; }
+declare module "@rchunk/business-checkout-switch-workspace-dialog" {
+  export const BusinessCheckoutSwitchWorkspaceDialog: (props: { workspaceId: string; pending?: boolean; error?: string | null; onClose(): void; onSwitch?(workspaceId: string): Promise<void> | void; onError?(error: unknown): void }) => unknown;
+}
+declare module "@rchunk/personal-workspace-access-blocked-dialog" {
+  export interface ManagedWorkspace { workspaceAccountId: string; workspaceName?: string | null; isPersonalWorkspace?: boolean; isDeactivated?: boolean; }
+  export const PersonalWorkspaceAccessBlockedDialog: (props: { workspaceId: string; authGeneration?: string; workspaces?: readonly ManagedWorkspace[]; isLoading?: boolean; hasLoadError?: boolean; openingWorkspaceId?: string | null; switchError?: string | null; onRetry?(): void; onSelect?(workspaceId: string): Promise<void> | void; onClose(): void }) => unknown;
+}
+declare module "@rchunk/stable-worktree-status-dialog" {
+  export type WorktreeSetupPhase = "queued" | "preparing" | "creating" | "failed" | "complete";
+  export interface PendingStableWorktree { id: string; hostId?: string; label: string; launchMode?: string; phase: WorktreeSetupPhase; phaseLabel?: string; sourceWorkspaceRoot?: string; worktreeGitRoot?: string | null; worktreeWorkspaceRoot?: string | null; localEnvironmentConfigPath?: string | null; }
+  export const StableWorktreeStatusDialog: (props: { pendingWorktreeId: string; pendingWorktree?: PendingStableWorktree | null; onClose(): void; onCancel?(id: string): void; onRetry?(id: string): void; onEditEnvironment?(worktree: PendingStableWorktree): void; onAutoFix?(worktree: PendingStableWorktree): Promise<void> | void }) => unknown;
+}
+declare module "@rchunk/habitat-automation-migration-prompt" {
+  export type AutomationMigrationStatus = "available" | "declined" | "migrating" | "error" | "complete" | "unavailable";
+  export const HabitatAutomationMigrationPrompt: (props?: { accountId?: string | null; userId?: string | null; visibility?: "open" | "dismissed"; state?: { status: AutomationMigrationStatus; pendingCount?: number; migratedCount?: number; consentAccepted?: boolean } | null; isPending?: boolean; onDecline?(): void; onMigrate?(): void }) => unknown;
+}
 
 declare module "@rchunk/app-shared" {
   /** invokeDesktopBridgePromise（桌面桥 Promise 规范化）。 */
