@@ -39,13 +39,13 @@ async function load(name) {
                 return {
                   loader: "js",
                   contents:
-                    "export const I3=()=>globalThis.__jsx;export const $O={FIVE_MINUTES:300000};export const CL=()=>({setQueryData:(key,value)=>globalThis.__queryData={key,value}});export const SL=()=>{};export const _L=(options)=>({kind:'query',options});export const ek=()=>{};export const gL=()=>{};export const iL=(options)=>({kind:'mutation',options});export const rL=()=>{};export const BX=(signal)=>globalThis.__scopedValues[signal.kind];export const HX=(signal)=>globalThis.__scopedValues[signal.kind];",
+                    "export const I3=()=>globalThis.__jsx;export const $O={FIVE_MINUTES:300000};export const CL=()=>({setQueryData:(key,value)=>globalThis.__queryData={key,value}});export const SL=()=>{};export const _L=(options)=>({kind:'query',options});export const ek=()=>{};export const gL=()=>{};export const iL=(options)=>({kind:'mutation',options});export const rL=()=>{};export const BX=(signal)=>globalThis.__scopedValues[signal.kind];export const HX=(signal)=>globalThis.__scopedValues[signal.kind];export const rJ=(id)=>id.startsWith('client');",
                 };
               if (modulePath === "app-initial")
                 return {
                   loader: "js",
                   contents:
-                    "export const pdn=()=>{};export const udn={safeGet:(path)=>{globalThis.__requests.push({method:'GET',path});return Promise.resolve({path})},safePatch:(path,options)=>{globalThis.__requests.push({method:'PATCH',path,options});return Promise.resolve(options.requestBody)}};export const $m={kind:'review'};export const Bm={kind:'save'};export const Fm={kind:'publish'};export const Gm={kind:'draftSave'};export const Jpt={kind:'operation'};export const Km={kind:'queryConfig'};export const Kpt={kind:'setup'};export const Ypt={kind:'configuration'};export const pmt={kind:'task'};",
+                    "export const pdn=()=>{};export const udn={safeGet:(path)=>{globalThis.__requests.push({method:'GET',path});return Promise.resolve({path})},safePatch:(path,options)=>{globalThis.__requests.push({method:'PATCH',path,options});return Promise.resolve(options.requestBody)}};export const $m={kind:'review'};export const Bm={kind:'save'};export const Fm={kind:'publish'};export const Gm={kind:'draftSave'};export const Jpt={kind:'operation'};export const Km={kind:'queryConfig'};export const Kpt={kind:'setup'};export const Ltn={kind:'conversation'};export const Ypt={kind:'configuration'};export const pmt={kind:'task'};",
                 };
               if (modulePath === "side-panel")
                 return {
@@ -57,6 +57,23 @@ async function load(name) {
                   loader: "js",
                   contents:
                     "export const t=(props)=>globalThis.__jsx.jsx('allowed-domains',props);export const r=({issue})=>globalThis.__jsx.jsx('issue',{children:issue.message??issue.code});",
+                };
+              if (modulePath === "environment-configuration-fields")
+                return {
+                  loader: "js",
+                  contents:
+                    "export const t=(props)=>globalThis.__jsx.jsx('environment-fields',props);",
+                };
+              if (modulePath === "pending-environment-onboarding")
+                return {
+                  loader: "js",
+                  contents: "export const n={kind:'pending'};",
+                };
+              if (modulePath === "publish-actions")
+                return {
+                  loader: "js",
+                  contents:
+                    "export const t=(props)=>globalThis.__jsx.jsx('publish-actions',props);",
                 };
               return { loader: "js", contents: "export default {};" };
             },
@@ -297,5 +314,71 @@ assert.equal(
   "Environment published",
 );
 assert.equal(published.props.children[1], "next");
+
+const setupPanel = await load("environment-setup-tab-panel");
+globalThis.__scopedValues = {
+  pending: { accountId: "account", userId: "user", name: "Creating" },
+  conversation: null,
+  configuration: null,
+  queryConfig: null,
+  operation: null,
+  setup: { phase: "creating" },
+  draftSave: null,
+};
+const creatingPanel = setupPanel.EnvironmentSetupTabPanel({
+  conversationId: "client-1",
+});
+assert.equal(creatingPanel.type, "aside");
+assert.equal(creatingPanel.props.children[0].props.children, "Creating");
+assert.equal(
+  creatingPanel.props.children[1].props.children,
+  "Creating environment configuration…",
+);
+
+globalThis.__scopedValues.pending = null;
+globalThis.__scopedValues.queryConfig = { isPending: true };
+const loadingPanel = setupPanel.EnvironmentSetupTabPanel({
+  conversationId: "server-1",
+});
+assert.equal(loadingPanel.props.role, "status");
+assert.match(loadingPanel.props.children, /Loading/);
+
+let savedPanelInput = null;
+globalThis.__scopedValues = {
+  pending: null,
+  conversation: { title: "Task environment" },
+  configuration: { configId: "config", name: "Environment" },
+  queryConfig: {
+    data: {
+      id: "config",
+      name: "Environment",
+      draft: { networkEnabled: false },
+    },
+  },
+  operation: { repositories: ["openai/codex"] },
+  setup: { phase: "ready" },
+  draftSave: {
+    isPending: false,
+    mutate: (input) => {
+      savedPanelInput = input;
+    },
+  },
+};
+const readyPanel = setupPanel.EnvironmentSetupTabPanel({
+  conversationId: "server-1",
+});
+assert.equal(readyPanel.props["data-conversation-id"], "server-1");
+assert.match(readyPanel.props.children[1].props.children, /1 changes/);
+const readyFields = readyPanel.props.children[2].type(
+  readyPanel.props.children[2].props,
+);
+assert.equal(readyFields.type, "environment-fields");
+readyPanel.props.children[2].props.onDraftChange({ networkEnabled: true });
+readyPanel.props.children[3].props.children[1].props.onClick();
+assert.equal(savedPanelInput.changes.networkEnabled, true);
+const readyPublish = readyPanel.props.children[3].props.children[2].type(
+  readyPanel.props.children[3].props.children[2].props,
+);
+assert.equal(readyPublish.type, "publish-actions");
 
 console.log("environment configuration cluster complete");

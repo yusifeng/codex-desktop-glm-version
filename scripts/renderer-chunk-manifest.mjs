@@ -1340,6 +1340,7 @@ export const REWRITTEN = new Set([
   "settings-row-disclosure",
   "environment-configuration-fields",
   "publish-actions",
+  "environment-setup-tab-panel",
   "open-sources-side-panel-tab",
   "verify-descendant",
   "editable-plan-tab",

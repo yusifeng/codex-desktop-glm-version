@@ -8965,6 +8965,10 @@ declare module "@rchunk/publish-actions" {
   export const r: (props: PublishActionButtonProps) => unknown;
   export const t: (props: EnvironmentPublishActionsProps) => unknown;
 }
+declare module "@rchunk/environment-setup-tab-panel" {
+  export interface EnvironmentSetupTabPanelProps { conversationId: string; onClose?(): void; }
+  export const EnvironmentSetupTabPanel: (props: Record<string, unknown>) => unknown;
+}
 declare module "@rchunk/app-initial" {
   export const $m: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
   export const Bm: import("@rchunk/app-shared").ScopedSignalFamily<Record<string, unknown>, string, unknown>;
