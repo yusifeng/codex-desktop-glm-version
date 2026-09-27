@@ -2559,6 +2559,18 @@ declare module "@rchunk/app-shared" {
   export const q3: (event: MessageEvent) => RendererHostMessage | null;
   /** initializeHostMessageBridge（内部 z）。 */
   export const W3: () => void;
+  /** 独立窗口页面的路径编码、Quick Chat 枚举与调试菜单策略。 */
+  export const UB: (conversationId: string) => string;
+  export const lY: (conversationId: string) => string;
+  export const XN: {
+    readonly CODEX_QUICK_CHAT_SURFACE_WINDOW: string;
+  };
+  export const qN: {
+    readonly CODEX_QUICK_CHAT_LIFECYCLE_ACTION_CLOSED: string;
+  };
+  export const Cq: {
+    allowDebugMenu(environment: unknown): boolean;
+  };
   export const l3: (left: unknown, right: unknown) => boolean; // Yt：lodash isEqual
   export const zI: unknown;
   // 5.1MB 应用核心：RPC 桥、状态/信号、路由、主题、i18n、UI 基础件。
@@ -3130,6 +3142,13 @@ declare module "@rchunk/app-initial" {
   export const hnt: () => Promise<void>; // initializeAppHostServices
   export const mnt: () => void; // 懒初始化器（遥测/基础设施装配）
   export const pnt: {
+    hotkeyWindowHotkeys?: {
+      open(options: { path: string }): void;
+    };
+    quickChatWindow?: {
+      addToComposer(content: unknown): Promise<void>;
+      rendererReady(conversationId: string | null): void;
+    };
     codexMicro?: {
       getInputMonitoringPermissionStatus(): Promise<
         "denied" | "granted" | "unavailable"
@@ -3361,6 +3380,30 @@ declare module "@rchunk/app-initial" {
     accountId: string,
   ) => void;
   export const Qgn: () => void;
+  /** Quick Chat 与 debug 独立窗口的路由、会话和分析依赖。 */
+  export interface QuickChatSessionState extends Record<string, unknown> {
+    hasConversation: boolean;
+  }
+  export const Evt: () => void;
+  export const W_: () => void;
+  export const bX: () => void;
+  export const i_: () => void;
+  export const oqt: () => void;
+  export const G_: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    event: {
+      action: string;
+      hasConversation: boolean;
+      source: string;
+      surface: string;
+    },
+  ) => void;
+  export const aqt: (conversationId: string) => string;
+  export const h_: import("@rchunk/app-shared").ReadableSignal<QuickChatSessionState | null>;
+  export const sqt: (conversationId: string) => boolean;
+  export const xvt: () => void;
+  export const yX: (props: { children?: unknown; value: string }) => unknown;
+  export const Oun: () => unknown;
   /** new-thread-panel-page 依赖的面板状态、Composer 与空状态组件。 */
   export const Dht: () => void;
   export const Du: () => void;
@@ -3430,6 +3473,7 @@ declare module "@rchunk/app-initial" {
     pathname: string,
   ) => Record<string, string> | null;
   export const l_n: () => {
+    conversationId?: string | null;
     postId?: string | null;
     projectId?: string | null;
   };
@@ -4124,6 +4168,17 @@ declare module "@rchunk/app-primary" {
   export const r: () => void;
   export const rt: () => void;
   export const us: string;
+  export const Oo: (props: { children?: unknown }) => unknown;
+  export const c: (props: { variant?: string }) => unknown;
+  export const l: () => void;
+  export const nt: (props: { children?: unknown; className?: string }) => unknown;
+  export const o: (props: { className?: string }) => unknown;
+  export const s: () => void;
+  export const ut: (props: {
+    onLocalConversationCreated(conversationId: string): void;
+    selectedProject: unknown;
+    showWorkspaceDropdownInUtilityBar: boolean;
+  }) => unknown;
   export const gc: () => void;
   export const hc: (...arguments_: unknown[]) => unknown;
   export interface BeaconSelectionParameter {
@@ -7280,8 +7335,42 @@ declare module "@rchunk/thread-pin-shortcut-bridge" {
 }
 
 declare module "@rchunk/thread-scroll-layout" {
+  export const n: () => void;
+  export const t: (props: { children?: unknown; footer?: unknown }) => unknown;
   const _default: unknown;
   export default _default;
+}
+
+declare module "@rchunk/use-hotkey-window-detail-layout" {
+  export interface HotkeyWindowDetailLayout {
+    canCollapseToHome: boolean;
+    mainWindowPath: string;
+    title: unknown;
+  }
+  export const n: () => void;
+  export const r: (layout: HotkeyWindowDetailLayout) => void;
+  export const t: unknown;
+}
+
+declare module "@rchunk/quick-chat-window" {
+  export const n: () => void;
+  export const t: (props: {
+    canPopOut: boolean;
+    onAddToComposer(content: unknown): Promise<void>;
+    onClose(source: string): void;
+    session: Record<string, unknown>;
+    variant: "window";
+  }) => unknown;
+}
+
+declare module "@rchunk/panel" {
+  export const n: () => void;
+  export const t: (props: {
+    clientAnalyticsHistory: readonly unknown[];
+    conversationIdOverride: string | null;
+    onClose(): void;
+    showHeader: boolean;
+  }) => unknown;
 }
 
 declare module "@rchunk/use-element-in-view" {
