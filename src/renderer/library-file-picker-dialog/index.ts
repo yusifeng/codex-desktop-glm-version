@@ -7,10 +7,11 @@ import * as appPrimaryChunk from "@rchunk/app-primary";
 
 void appSharedChunk;
 void appInitialChunk;
-const appPrimary = appPrimaryChunk as Record<string, any>;
+const {
+  no: initializeLibraryFilePickerDialog,
+  to: LibraryFilePickerDialog,
+} = appPrimaryChunk;
 
-appPrimary.no();
-
-const LibraryFilePickerDialog = appPrimary.to;
+initializeLibraryFilePickerDialog();
 
 export { LibraryFilePickerDialog };

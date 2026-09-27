@@ -3455,6 +3455,27 @@ declare module "@rchunk/app-primary" {
     title?: unknown;
   }
   export const Sm: (props: BannerProps) => unknown;
+  export interface LibraryFilePickerDialogProps
+    extends Record<string, unknown> {
+    analytics?: unknown;
+    attachmentTarget?: "chat" | string;
+    attachedFileCount?: number;
+    attachedFileIds?: ReadonlySet<string | undefined>;
+    attachedLibraryFileIds?: ReadonlySet<string>;
+    disabled?: boolean;
+    onAttachFiles?: (files: unknown[]) => void;
+    onAttachSharedItems?: (items: unknown[]) => void;
+    onCloseAutoFocus?: (event: unknown) => void;
+    onOpenChange(open: boolean): void;
+    onUploadFiles?: (files: unknown[]) => void;
+    open: boolean;
+    sharedAttachmentState?: {
+      fileIds?: ReadonlySet<string>;
+      folderIds?: ReadonlySet<string>;
+    };
+  }
+  export const no: () => void;
+  export const to: (props: LibraryFilePickerDialogProps) => unknown;
   export interface SurfaceClaimProps extends Record<string, unknown> {
     children: unknown;
     claim: unknown;
@@ -4004,7 +4025,9 @@ declare module "@rchunk/create-project-dialog-entry" {
 }
 
 declare module "@rchunk/library-file-picker-dialog" {
-  export const LibraryFilePickerDialog: (...args: any[]) => any;
+  export const LibraryFilePickerDialog: (
+    props: import("@rchunk/app-primary").LibraryFilePickerDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/appgen-settings-page" {
