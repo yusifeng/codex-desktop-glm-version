@@ -2419,4 +2419,10 @@ export const REWRITTEN = new Set([
   "profile-site-details",
   "annotation-comment-editor-card",
   "artifact-viewer",
+  "workbook-from-csv",
+  "respond",
+  "turn-bibliography",
+  "summary",
+  "payload",
+  "image-validation-session",
 ]);
