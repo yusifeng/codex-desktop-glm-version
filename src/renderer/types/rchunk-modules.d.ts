@@ -9497,8 +9497,28 @@ declare module "@rchunk/icloud-hosted-page" {
 }
 
 declare module "@rchunk/subscription-plan-status" { const subscriptionPlanStatus: unknown; export default subscriptionPlanStatus; }
-declare module "@rchunk/feedback-legal-notice" { const feedbackLegalNotice: unknown; export default feedbackLegalNotice; }
-declare module "@rchunk/feedback-form-dialog" { const feedbackFormDialog: unknown; export default feedbackFormDialog; }
+declare module "@rchunk/feedback-legal-notice" { export const n: () => void; export const t: () => unknown; }
+declare module "@rchunk/feedback-form-dialog" {
+  export interface FeedbackOption { id: string; label: string | { defaultMessage?: string; [key: string]: unknown }; }
+  export interface FeedbackFormValue { selectedOptionId: string; details: string; }
+  export const n: () => void;
+  export const t: (props: { belowFreeformContent?: unknown; closeOnSubmit?: "after-submit" | "immediate"; freeformFeedbackRequired?: boolean; hideFreeformInput?: boolean; initialDetails?: string; initialSelectedOptionId?: string | null; onClose(): void; onOptionSelect?(value: FeedbackFormValue): void; onSubmit(value: FeedbackFormValue): boolean | void | Promise<boolean | void>; options: readonly FeedbackOption[]; size?: "wide" | "xxwide" }) => unknown;
+}
+declare module "@rchunk/feedback-upload" {
+  export type FeedbackUploadStatus = "uploading" | "uploaded" | "incomplete" | "disabled" | "failed" | "unconfirmed";
+  export interface FeedbackUploadUpdate { correlationId?: string; status: FeedbackUploadStatus; onDismiss(): void; onRetry?(): void; }
+  export const startFeedbackUpload: (options: { scope?: unknown; hostId?: string; initialCorrelationId?: string; internalSlackMessage?: string; submit(): Promise<string | undefined>; onStatusChange?(update: FeedbackUploadUpdate): void; onUploadError?(error: unknown): void }) => { dismiss(): void; completion: Promise<FeedbackUploadStatus> };
+}
+declare module "@rchunk/submit-feedback" {
+  export interface FeedbackAppInfo { version: string; buildNumber?: string; buildFlavor?: string; }
+  export interface FeedbackTransport { upload(input: { classification: string; reason: string; threadId?: string; includeLogs: boolean; extraLogFiles?: readonly string[]; tags: Record<string, unknown> }): Promise<{ threadId: string }>; createDesktopLogArchive?(input: { hostId: string; includeBrowserTabs: boolean; includeDesktopLogs: boolean; includeNativeHostDiagnostics: boolean; includeProcessMemoryDiagnostics: boolean }): Promise<{ archiveId: string; filePaths: string[] }>; deleteDesktopLogArchive?(archiveId: string): Promise<void>; remove?(path: string): Promise<void>; }
+  export const n: (options: { scope?: unknown; attachmentPaths?: readonly string[]; classification: string; description: string; extraTags?: Record<string, unknown>; hostId?: string; includeDesktopLogArchive?: boolean; includeBrowserTabs?: boolean; includeLogs?: boolean; includeNativeHostDiagnostics?: boolean; appInfo?: FeedbackAppInfo; threadId?: string; runtimeBundleVersion?: string | null; transport: FeedbackTransport }) => Promise<{ feedbackId: string }>;
+  export const t: () => void;
+}
+declare module "@rchunk/submit-artifact-feedback" {
+  import type { FeedbackAppInfo, FeedbackTransport } from "@rchunk/submit-feedback";
+  export const submitArtifactFeedback: (scope: unknown, context: { appInfo?: FeedbackAppInfo; artifactType: string; classification: string; description: string; fileFormat: string; fileSizeBytes?: number; hostId?: string; path?: string; planType?: string; threadId?: string; metadata?: { authoringTurnCount?: number; modelConfigurations?: readonly string[]; connectorIds?: readonly string[]; connectorNames?: readonly string[]; pluginIds?: readonly string[]; skillIds?: readonly string[]; platform?: string; skillPluginConnectorUsageCollected?: boolean; generatedSourcePaths?: readonly string[] }; transport: FeedbackTransport }, answers: { attachArtifact: boolean; includeLogs: boolean; influences: readonly string[]; rating: string; timeSaved?: string | null }) => Promise<{ feedbackId: string }>;
+}
 declare module "@rchunk/subscription-platform-dialog" {
   export type SubscriptionManagementSource = "app_store" | "google_play_store" | "partner_managed";
   export const SubscriptionPlatformDialog: (props: { account: { account: { plan_type?: string | null } }; managementSource: SubscriptionManagementSource; showProLevels?: boolean; onClose(): void; onOpenStore?(url: string): void }) => unknown;
