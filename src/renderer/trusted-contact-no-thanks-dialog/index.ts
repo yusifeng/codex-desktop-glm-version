@@ -5,10 +5,11 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void appSharedChunk;
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  vL: TrustedContactNoThanksDialog,
+  yL: initializeTrustedContactNoThanksDialog,
+} = appInitialChunk;
 
-appInitial.yL();
-
-const TrustedContactNoThanksDialog = appInitial.vL;
+initializeTrustedContactNoThanksDialog();
 
 export { TrustedContactNoThanksDialog };

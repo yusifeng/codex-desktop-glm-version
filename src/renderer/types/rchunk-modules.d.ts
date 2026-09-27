@@ -2763,6 +2763,17 @@ declare module "@rchunk/app-initial" {
   export const kX: (
     props: McpAppFollowUpConfirmationDialogProps,
   ) => unknown;
+  export interface TrustedContactNoThanksDialogProps {
+    dismissOnDoneWithoutOptOut?: boolean;
+    onClose(): void;
+    onDone(): void;
+    onOpenSettings(): void;
+    open: boolean;
+  }
+  /** TrustedContactNoThanksDialog（内部 SOo）。 */
+  export const vL: (props: TrustedContactNoThanksDialogProps) => unknown;
+  /** initializeTrustedContactNoThanksDialog（内部 DOo）。 */
+  export const yL: () => void;
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices
@@ -3880,7 +3891,9 @@ declare module "@rchunk/codex-thread-report-dialog-entry" {
 }
 
 declare module "@rchunk/trusted-contact-no-thanks-dialog" {
-  export const TrustedContactNoThanksDialog: (...args: any[]) => any;
+  export const TrustedContactNoThanksDialog: (
+    props: import("@rchunk/app-initial").TrustedContactNoThanksDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/external-link-confirmation-dialog" {
