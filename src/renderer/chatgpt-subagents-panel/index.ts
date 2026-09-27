@@ -1,0 +1,11 @@
+import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+import "@rchunk/subagent-panel";
+import "@rchunk/chatgpt-subagent-final-response-query";
+export type SubagentStatus = "waiting" | "working" | "done" | "failed";
+export interface ChatGptSubagent { displayName?: string | null; prompt?: string; status: SubagentStatus; statusMessage?: string | null; threadId: string }
+export interface ChatGptSubagentsPanelTabProps { conversationId: string; onSelect(threadId: string | null): void; selectedThreadId?: string | null; subagents?: readonly ChatGptSubagent[] }
+let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function ChatGptSubagentsPanelTab({ conversationId, onSelect, selectedThreadId = null, subagents = [] }: ChatGptSubagentsPanelTabProps): unknown { const selected = selectedThreadId == null ? null : subagents.find(item => item.threadId === selectedThreadId); if (selectedThreadId != null) return jsx().jsxs("section", { "data-conversation-id": conversationId, "data-selected-subagent": selectedThreadId, children: [jsx().jsx("button", { onClick: () => onSelect(null), type: "button", children: "Back" }), jsx().jsx("h2", { children: selected?.displayName ?? "Subagent" }), jsx().jsx("p", { "data-status": selected?.status ?? "failed", children: selected?.statusMessage ?? selected?.prompt ?? "Subagent unavailable" })] }); const active = subagents.filter(item => item.status === "waiting" || item.status === "working"); const done = subagents.filter(item => item.status === "done" || item.status === "failed"); const render = (item: ChatGptSubagent) => jsx().jsx("button", { "data-status": item.status, onClick: () => onSelect(item.threadId), type: "button", children: item.displayName ?? "Subagent" }, item.threadId); return jsx().jsxs("section", { "data-conversation-id": conversationId, children: [jsx().jsxs("div", { children: [jsx().jsx("h2", { children: "Active" }), active.length ? active.map(render) : jsx().jsx("p", { children: "No active subagents" })] }), jsx().jsxs("div", { children: [jsx().jsx("h2", { children: "Done" }), done.map(render)] })] }); }
+export { ChatGptSubagentsPanelTab };
