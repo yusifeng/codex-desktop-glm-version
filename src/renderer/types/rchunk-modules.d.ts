@@ -13574,6 +13574,93 @@ declare module "@rchunk/offer-queries" {
   export const t: (input: PromotionSelectionInput) => { lockedProPlanName: string | null; proPromotionPending: boolean; proSelectionBlocked: boolean };
 }
 
+// Latest-turn preview and local conversation sources panel cluster.
+declare module "@rchunk/app-shared" {
+  export const Cf: (props: Record<string, unknown>) => unknown;
+  export const Tf: (props: Record<string, unknown>) => unknown;
+  export const xf: (props: Record<string, unknown>) => unknown;
+  export const HF: unknown;
+  export const UF: {
+    CODEX_SOURCES_SECTION_TYPE_MCP_TOOL_CALLS: string;
+    CODEX_SOURCES_SECTION_TYPE_WEB_PAGES: string;
+    CODEX_SOURCES_SECTION_TYPE_WEB_SEARCHES: string;
+  };
+  export const qT: import("@rchunk/app-shared").IconAssetPreset;
+}
+
+declare module "@rchunk/app-initial" {
+  export const Dbt: unknown;
+  export const Ebt: () => void;
+  export const Fbt: unknown;
+  export const bbt: (key: string, expanded: boolean) => Record<string, boolean>;
+  export const wbt: (value: unknown, key: true | string) => boolean;
+  export const G3: unknown;
+  export const W3: (props: Record<string, unknown>) => unknown;
+  export const tn: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const xpn: (
+    scope: unknown,
+    analytics: unknown,
+    event: { appName?: string; itemCount: number; sectionType: string },
+  ) => void;
+}
+
+declare module "@rchunk/app-primary" {
+  export const Io: {
+    Body: (props: Record<string, unknown>) => unknown;
+    DisclosureBody: (props: Record<string, unknown>) => unknown;
+    DisclosureRow: (props: Record<string, unknown>) => unknown;
+    Item: (props: Record<string, unknown>) => unknown;
+  };
+}
+
+declare module "@rchunk/conversation-blocks" {
+  export const v: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/open-pending-site-preview" {
+  export const OpenPendingSitePreview: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/site-preview-persistence-bridge" {
+  export const SitePreviewPersistenceBridge: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/registered-conversation-thumbnail-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/local-conversation-webmcp-tools-model" {
+  export const i: () => void;
+  export const r: <Call extends Record<string, unknown>>(
+    calls: Call[],
+  ) => Array<{ calls: Call[]; name: string }>;
+  export const t: (url: string) => string | null;
+}
+
+declare module "@rchunk/local-conversation-external-resource-icon" {
+  export const i: () => void;
+  export const n: () => void;
+  export const r: (source: Record<string, unknown>) => string | undefined;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/use-local-conversation-sources" {
+  export const n: (conversationId: string, hostId: string) => Record<string, unknown>;
+  export const t: () => void;
+}
+
+declare module "@rchunk/mcp-tool-item-content" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/registered-conversation-thumbnail" {
+  export const RegisteredConversationThumbnail: (
+    props: Record<string, unknown>,
+  ) => unknown;
+}
+
 declare module "@rchunk/app-initial" {
   /** initializeSearchInput（通用 SearchInput 组件依赖）。 */
   export const mT: () => void;
