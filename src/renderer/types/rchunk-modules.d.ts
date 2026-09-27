@@ -14089,11 +14089,41 @@ declare module "@rchunk/text-shorter" { export const n: () => void; export const
 declare module "@rchunk/thumb-mixed" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/twitter-logo" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 
-declare module "@rchunk/command-menu-availability";
-declare module "@rchunk/command-menu-client";
-declare module "@rchunk/command-menu-holdout";
-declare module "@rchunk/command-menu-queries";
-declare module "@rchunk/command-menu-search-results";
+declare module "@rchunk/command-menu-availability" {
+  export const n: () => void;
+  export const t: (context: Record<string, unknown>) => boolean;
+}
+declare module "@rchunk/command-menu-client" {
+  export const i: (...args: unknown[]) => Record<string, Record<string, unknown>>;
+  export const n: (contact: Record<string, unknown>, fallbackName: string) => Record<string, unknown> | null;
+  export const r: () => void;
+  export const t: (accountId: string) => Record<string, string>;
+}
+declare module "@rchunk/command-menu-holdout" {
+  export interface CommandMenuDynamicConfig { details?: { reason?: string }; get(key: string, fallback: boolean): boolean; }
+  export const n: () => void;
+  export const t: (client: { getDynamicConfig?(id: string): CommandMenuDynamicConfig }) => boolean;
+}
+declare module "@rchunk/command-menu-queries" {
+  export const a: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const c: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const i: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const l: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const n: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const o: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const r: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const s: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const t: () => void;
+  export const u: (options: Record<string, unknown>) => Record<string, unknown>;
+}
+declare module "@rchunk/command-menu-search-results" {
+  export const a: () => void;
+  export const i: () => void;
+  export const n: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const o: (items: Array<Record<string, unknown>>, libraryItemId: string) => Array<Record<string, unknown>>;
+  export const r: Array<Record<string, unknown>>;
+  export const t: () => void;
+}
 declare module "@rchunk/popcorn-icons";
 declare module "@rchunk/popcorn-manual-edit-header-controls";
 declare module "@rchunk/artifact-annotation-batch-controls";
