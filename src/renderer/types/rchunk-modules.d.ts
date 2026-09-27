@@ -779,6 +779,10 @@ declare module "@rchunk/app-shared" {
       toArray(children: unknown): unknown[];
     };
     Fragment: unknown;
+    createElement(
+      component: unknown,
+      props: Record<string, unknown>,
+    ): unknown;
     createContext<T>(defaultValue: T): { Provider: unknown; Consumer: unknown };
     lazy<Props extends Record<string, unknown>>(
       loader: () => Promise<{ default: (props: Props) => unknown }>,
@@ -2985,6 +2989,59 @@ declare module "@rchunk/app-initial" {
   export const $en: import("@rchunk/app-shared").MaitaiScope<
     Record<string, unknown>
   >; // zb：RouteScope atom
+  export interface ArtifactTemplateSkill extends Record<string, unknown> {
+    description?: unknown;
+    name?: string;
+    path: string;
+    templateId?: string | null;
+    title?: string;
+  }
+  export type ArtifactTemplateComponent = (
+    props: Record<string, unknown>,
+  ) => unknown;
+  export const X3: (
+    skill: ArtifactTemplateSkill,
+    options: { renderCustomSvgAsImage: boolean; size: "large" },
+  ) => ArtifactTemplateComponent;
+  export const M5t: (skill: ArtifactTemplateSkill) => string | null;
+  export const S5t: (
+    skill: ArtifactTemplateSkill,
+    templateKind: string,
+  ) => string | null;
+  export const k5t: (templateKind: string) => boolean;
+  export const $Wt: (skill: ArtifactTemplateSkill) => unknown;
+  export const kft: (options: {
+    href: string;
+    initiator: "open_in_browser_bridge";
+    openTarget: "in-app-browser";
+    originHostId: string;
+  }) => void;
+  export interface TemplateViewerProps extends Record<string, unknown> {
+    description?: unknown;
+    icon?: unknown;
+    isOpen: boolean;
+    onOpenChange(open: boolean): void;
+    title: unknown;
+    titleText: string;
+  }
+  export interface TemplateViewerContentProps extends Record<string, unknown> {
+    hostId: string;
+    isOpen: boolean;
+    skillPath: string;
+    titleText: string;
+  }
+  export const YY: (props: TemplateViewerProps) => unknown;
+  export const JY: (props: TemplateViewerContentProps) => unknown;
+  export const O3t: ArtifactTemplateComponent;
+  export const E3t: ArtifactTemplateComponent;
+  export const w3t: ArtifactTemplateComponent;
+  export const O5t: () => void;
+  export const w5t: () => void;
+  export const D3t: () => void;
+  export const T3t: () => void;
+  export const $3: () => void;
+  export const QY: () => void;
+  export const P5t: () => void;
   export const bS: Record<string, unknown>; // Bms：侧面板 UI 组件注册表
   export const C: unknown; // XXc：PermissionsModeDropdown 懒加载组件
   export const CS: unknown; // ems：侧面板 List 组件
@@ -4934,12 +4991,50 @@ declare module "@rchunk/first-app-connect-ambient-suggestions" {
 
 declare module "@rchunk/home-suggestion-staggered-item" {
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/home-artifact-template-card" {
+  export interface ArtifactSkill extends Record<string, unknown> {
+    description?: unknown;
+    name?: string;
+    path: string;
+    templateId?: string | null;
+    title?: string;
+  }
+  export interface HomeArtifactTemplateCardProps
+    extends Record<string, unknown> {
+    deleteDisabled?: boolean;
+    hostId: string;
+    isGoogleDriveGallery?: boolean;
+    isSelected?: boolean;
+    onBeforeView?(): void;
+    onDelete?(): void;
+    onEdit?(): void;
+    onUse(): void;
+    showAddOverlay?: boolean;
+    skill: ArtifactSkill;
+    sourceUrl?: string | null;
+    templateKind: string;
+    useLabel?: string;
+  }
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: HomeArtifactTemplateCardProps) => unknown;
+}
+
+declare module "@rchunk/home-artifact-templates" {
+  export interface ArtifactTemplatePickerProps
+    extends Record<string, unknown> {
+    canUseTemplateAttachments?: boolean;
+    onAddFileAssetAttachment?: (input: {
+      assetUrl: string;
+      label: string;
+    }) => Promise<{ path: string } | null | undefined>;
+    placement?: "top" | "bottom" | string;
+  }
+  export const ArtifactTemplatePicker: (
+    props: ArtifactTemplatePickerProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/queries" {

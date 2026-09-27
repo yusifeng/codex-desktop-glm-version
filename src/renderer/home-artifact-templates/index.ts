@@ -313,10 +313,8 @@ const {
   wi: AppPrimaryBindings["recordOpen"];
 };
 
-const { n: initializeStaggeredItem, t: StaggeredItem } =
-  staggeredItemChunk as unknown as { n: () => void; t: Component };
-const { n: initializeTemplateCardChunk, t: TemplateCard } =
-  templateCardChunk as unknown as { n: () => void; t: Component };
+const { n: initializeStaggeredItem, t: StaggeredItem } = staggeredItemChunk;
+const { n: initializeTemplateCardChunk, t: TemplateCard } = templateCardChunk;
 
 type TemplateKind =
   | "document"

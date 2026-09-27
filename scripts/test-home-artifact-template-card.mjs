@@ -86,6 +86,7 @@ const templateCard = await loadModule({
     export const Oh = "DialogBody";
     export const kh = "DialogActions";
     export const Yh = "Button";
+    export const Ah = "DialogHeader";
     export const $h = "DialogHeader";
   `,
   "app-initial": `

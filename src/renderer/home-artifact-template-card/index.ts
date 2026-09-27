@@ -6,22 +6,119 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  $3: initializeRuntimeLazy,
+  Ah: DialogHeader,
+  Ct: initializeIntl,
+  FX: initializeScopeRuntime,
+  I3: getJsxRuntime,
+  If: initializeMenu,
+  Ih: Dialog,
+  K2: initializeSharedComponents,
+  LX: useScope,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  Yh: Button,
+  Zh: initializeButton,
+  e6: getReactRuntime,
+  gu: MoreButton,
+  jf: MenuComponents,
+  kf: DropdownMenu,
+  kh: DialogActions,
+  n4: useIntl,
+} = appSharedChunk;
+const {
+  $3: initializeArtifactRuntime,
+  $Wt: getSkillDescription,
+  $en: routeScope,
+  D3t: initializeGoogleDocsIcon,
+  Dft: initializeAppgenState,
+  E3t: GoogleSheetsIcon,
+  Hlt: initializeArtifactPreview,
+  JY: TemplateViewerContent,
+  M5t: getSkillTitle,
+  O3t: GoogleDocsIcon,
+  O5t: initializeArtifactThumbnails,
+  P5t: initializeTemplateKinds,
+  QY: initializeTemplateViewer,
+  S5t: getArtifactTemplateId,
+  T3t: initializeGoogleSheetsIcon,
+  Ult: openArtifactPreview,
+  X3: createArtifactThumbnail,
+  YY: TemplateViewer,
+  itn: initializeArtifactRoutes,
+  k5t: isGoogleTemplateKind,
+  kft: openExternalLink,
+  w3t: GoogleSlidesIcon,
+  w5t: initializeArtifactSkills,
+} = appInitialChunk;
 
-let React: any;
-let jsx: any;
+type Component = (props: Record<string, unknown>) => unknown;
+interface ArtifactSkill extends Record<string, unknown> {
+  description?: unknown;
+  name?: string;
+  path: string;
+  templateId?: string | null;
+  title?: string;
+}
+type TemplateKind =
+  | "document"
+  | "presentation"
+  | "spreadsheet"
+  | "google-docs"
+  | "google-sheets"
+  | "google-slides"
+  | string;
+
+interface TemplateActionsMenuProps {
+  deleteDisabled?: boolean;
+  label: string;
+  onDelete?(): void;
+  onEdit?(): void;
+  onView(): void;
+}
+
+interface DeleteTemplateDialogProps {
+  deleteDisabled?: boolean;
+  onConfirm(): void;
+  onOpenChange(open: boolean): void;
+  open: boolean;
+  title: string;
+}
+
+interface HomeArtifactTemplateCardProps {
+  deleteDisabled?: boolean;
+  hostId: string;
+  isGoogleDriveGallery?: boolean;
+  isSelected?: boolean;
+  onBeforeView?(): void;
+  onDelete?(): void;
+  onEdit?(): void;
+  onUse(): void;
+  showAddOverlay?: boolean;
+  skill: ArtifactSkill;
+  sourceUrl?: string | null;
+  templateKind: TemplateKind;
+  useLabel?: string;
+}
+
+interface FormSubmitEvent {
+  preventDefault(): void;
+}
+
+let React: import("@rchunk/app-shared").ReactRuntime;
+let jsx: import("@rchunk/app-shared").JsxRuntime;
 let initialized = false;
-let normalThumbnailCache = new WeakMap<object, any>();
-let galleryThumbnailCache = new WeakMap<object, any>();
+let normalThumbnailCache = new WeakMap<object, Component>();
+let galleryThumbnailCache = new WeakMap<object, Component>();
 
-const GOOGLE_KIND_ICONS: Record<string, any> = {};
+const GOOGLE_KIND_ICONS: Record<string, Component> = {};
 
-function thumbnailFor(skill: object, gallery: boolean): any {
+function thumbnailFor(skill: ArtifactSkill, gallery: boolean): Component {
   const cache = gallery ? galleryThumbnailCache : normalThumbnailCache;
   const existing = cache.get(skill);
   if (existing != null) return existing;
-  const component = appInitial.X3?.(skill, {
+  const component = createArtifactThumbnail(skill, {
     size: "large",
     renderCustomSvgAsImage: gallery,
   });
@@ -35,14 +132,12 @@ function TemplateActionsMenu({
   onDelete,
   onEdit,
   onView,
-}: Record<string, any>): unknown {
-  const Menu = appShared.kf ?? "div";
-  const MenuItem = appShared.jf?.Item ?? "button";
-  const Trigger = appShared.gu ?? "button";
-  return jsx.jsxs(Menu, {
+}: TemplateActionsMenuProps): unknown {
+  const MenuItem = MenuComponents.Item;
+  return jsx.jsxs(DropdownMenu, {
     align: "end",
     contentWidth: "xs",
-    triggerButton: jsx.jsx(Trigger, { color: "outline", label }),
+    triggerButton: jsx.jsx(MoreButton, { color: "outline", label }),
     children: [
       jsx.jsx(MenuItem, { onSelect: onView, children: "View" }),
       jsx.jsx(MenuItem, {
@@ -68,23 +163,19 @@ function DeleteTemplateDialog({
   onOpenChange,
   open,
   title,
-}: Record<string, any>): unknown {
-  const Dialog = appShared.Ih ?? "div";
-  const DialogBody = appShared.Oh ?? "div";
-  const DialogActions = appShared.kh ?? "div";
-  const Button = appShared.Yh ?? "button";
+}: DeleteTemplateDialogProps): unknown {
   return jsx.jsx(Dialog, {
     open,
     onOpenChange,
     size: "compact",
     children: jsx.jsxs(DialogBody, {
       as: "form",
-      onSubmit: (event: any) => {
+      onSubmit: (event: FormSubmitEvent) => {
         event.preventDefault();
         onConfirm();
       },
       children: [
-        jsx.jsx(appShared.$h ?? "header", {
+        jsx.jsx(DialogHeader, {
           title: `Delete ${title}?`,
           subtitle:
             "This template will be permanently deleted. This cannot be undone.",
@@ -125,23 +216,22 @@ function HomeArtifactTemplateCard({
   templateKind,
   useLabel,
   isGoogleDriveGallery = false,
-}: Record<string, any>): unknown {
+}: HomeArtifactTemplateCardProps): unknown {
   initializeHomeArtifactTemplateCard();
-  const scope = appShared.LX?.(appInitial.$en);
-  const intl = appShared.n4?.();
+  const scope = useScope(routeScope);
+  const intl = useIntl();
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [viewerOpen, setViewerOpen] = React.useState(false);
-  const title =
-    appInitial.M5t?.(skill) ?? skill.title ?? skill.name ?? "Template";
-  const templateId = appInitial.S5t?.(skill, templateKind) ?? null;
+  const title = getSkillTitle(skill) ?? skill.title ?? skill.name ?? "Template";
+  const templateId = getArtifactTemplateId(skill, templateKind) ?? null;
   const Thumbnail = thumbnailFor(skill, isGoogleDriveGallery);
-  const kindIcon = appInitial.k5t?.(templateKind)
+  const kindIcon = isGoogleTemplateKind(templateKind)
     ? GOOGLE_KIND_ICONS[templateKind]
     : null;
   const view = () => {
     if (sourceUrl != null) {
       onBeforeView?.();
-      appInitial.kft?.({
+      openExternalLink({
         href: sourceUrl,
         initiator: "open_in_browser_bridge",
         openTarget: "in-app-browser",
@@ -154,7 +244,7 @@ function HomeArtifactTemplateCard({
       return;
     }
     onBeforeView?.();
-    appInitial.Ult?.(scope, templateId, {
+    openArtifactPreview(scope, templateId, {
       artifactTemplateSkill: skill,
       hostId,
       isPreview: true,
@@ -164,7 +254,7 @@ function HomeArtifactTemplateCard({
   };
   const useAriaLabel =
     useLabel ??
-    intl?.formatMessage?.(
+    intl.formatMessage(
       {
         id: "home.artifactTemplates.useSkill",
         defaultMessage: "Use {title}",
@@ -175,7 +265,7 @@ function HomeArtifactTemplateCard({
     ) ??
     `Use ${title}`;
   const actionsLabel =
-    intl?.formatMessage?.(
+    intl.formatMessage(
       {
         id: "home.artifactTemplates.actions",
         defaultMessage: "Template actions for {title}",
@@ -244,14 +334,14 @@ function HomeArtifactTemplateCard({
         }),
       }),
       templateId == null
-        ? jsx.jsx(appInitial.YY ?? "TemplateViewer", {
-            description: appInitial.$Wt?.(skill),
+        ? jsx.jsx(TemplateViewer, {
+            description: getSkillDescription(skill),
             icon: null,
             isOpen: viewerOpen,
             onOpenChange: setViewerOpen,
             title,
             titleText: title,
-            children: jsx.jsx(appInitial.JY ?? "TemplateViewerContent", {
+            children: jsx.jsx(TemplateViewerContent, {
               hostId,
               isOpen: viewerOpen,
               skillPath: skill.path,
@@ -275,29 +365,30 @@ function HomeArtifactTemplateCard({
 function initializeHomeArtifactTemplateCard(): void {
   if (initialized) return;
   initialized = true;
-  appShared.Ct?.();
-  React = typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
-  appShared.FX?.();
-  appShared.K2?.();
-  appInitial.O5t?.();
-  appInitial.w5t?.();
-  appInitial.Hlt?.();
-  appShared.Zh?.();
-  appInitial.Dft?.();
-  appShared.Ph?.();
-  appShared.If?.();
-  appInitial.D3t?.();
-  appInitial.T3t?.();
-  appInitial.itn?.();
-  appInitial.$3?.();
-  appInitial.QY?.();
-  appInitial.P5t?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeIntl?.();
+  React =
+    typeof getReactRuntime === "function" ? getReactRuntime() : getReactRuntime;
+  initializeScopeRuntime?.();
+  initializeSharedComponents?.();
+  initializeArtifactThumbnails?.();
+  initializeArtifactSkills?.();
+  initializeArtifactPreview?.();
+  initializeButton?.();
+  initializeAppgenState?.();
+  initializeDialogLayout?.();
+  initializeMenu?.();
+  initializeGoogleDocsIcon?.();
+  initializeGoogleSheetsIcon?.();
+  initializeArtifactRoutes?.();
+  initializeArtifactRuntime?.();
+  initializeTemplateViewer?.();
+  initializeTemplateKinds?.();
+  jsx = typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
   normalThumbnailCache = new WeakMap();
   galleryThumbnailCache = new WeakMap();
-  GOOGLE_KIND_ICONS["google-docs"] = appInitial.O3t;
-  GOOGLE_KIND_ICONS["google-sheets"] = appInitial.E3t;
-  GOOGLE_KIND_ICONS["google-slides"] = appInitial.w3t;
+  GOOGLE_KIND_ICONS["google-docs"] = GoogleDocsIcon;
+  GOOGLE_KIND_ICONS["google-sheets"] = GoogleSheetsIcon;
+  GOOGLE_KIND_ICONS["google-slides"] = GoogleSlidesIcon;
 }
 
 initializeHomeArtifactTemplateCard();
