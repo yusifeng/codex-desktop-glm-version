@@ -3093,6 +3093,7 @@ declare module "@rchunk/app-initial" {
   export const x3: () => void;
   export const Lb: {
     delete: import("@rchunk/app-shared").MessageDescriptor;
+    unarchive: import("@rchunk/app-shared").MessageDescriptor;
   };
   export const Rb: () => void;
   export interface CompactFormDialogProps extends Record<string, unknown> {
@@ -3646,7 +3647,10 @@ declare module "@rchunk/app-initial" {
       useHostedLoginSuccessPage: boolean;
       useStreamlinedLogin?: boolean;
     }): DesktopLoginSession;
-    hydrateBackgroundThreads(ids: string[]): Promise<void>;
+    hydrateBackgroundThreads(
+      ids: string[],
+      options?: { includeTurns?: boolean },
+    ): Promise<void>;
     sendRequest(method: string, parameters: unknown): Promise<void>;
   };
   export const Vgn: () => {
@@ -9010,6 +9014,8 @@ declare module "@rchunk/pull-request-status-label" {
 declare module "@rchunk/app-shared" {
   /** invokeDesktopBridgePromise（桌面桥 Promise 规范化）。 */
   export const UI: <Result>(request: Promise<Result>, signal?: AbortSignal) => Promise<Result>;
+  /** Archived conversation unarchive icon。 */
+  export const V_: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/app-initial" {
@@ -9047,6 +9053,32 @@ declare module "@rchunk/app-initial" {
   export const xu: () => void;
   /** Feature configuration hook。 */
   export const ufn: (featureId: string) => Experiment;
+  /** Chat tab title metadata state。 */
+  export const Xct: import("@rchunk/app-shared").ScopedSignal<unknown, string | null>;
+  export const Yct: () => void;
+  /** Local conversation subagents panel state。 */
+  export const GZt: unknown;
+  export const ag: (definition: { open: (...arguments_: unknown[]) => unknown }) => unknown;
+  export const cg: () => void;
+  export const ig: () => void;
+  export const kZt: unknown;
+  export const og: string;
+  export const qvt: { tabById$: unknown; activeTab$?: unknown };
+  export const sg: (parentConversationId: string) => string;
+  export const wZt: unknown;
+}
+
+declare module "@rchunk/verify-descendant" {
+  export const n: (
+    scope: unknown,
+    input: {
+      hostId: string;
+      hydrateMissingAncestors: boolean;
+      parentConversationId: string;
+      selectedConversationId: string;
+    },
+  ) => boolean | Promise<boolean>;
+  export const t: () => void;
 }
 
 // Conversation workflow, source panels, and local-workspace foundations.

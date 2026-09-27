@@ -1101,11 +1101,14 @@ export const CHUNKS = {
   "diff-worker-runtime-parser": "dist-15e5c1229202.js",
   "diff-worker-utils-parser": "dist-9a2f61daa4d5.js",
   "katex-runtime": "katex-b62b0c0d6a07.js",
+  "verify-descendant": "verify-descendant-7045b49cb284.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "chat-tab-metadata-bridge",
+  "open-local-conversation-subagents-panel",
   "queries",
   "task-announcement-state",
   "entry-point-availability",
