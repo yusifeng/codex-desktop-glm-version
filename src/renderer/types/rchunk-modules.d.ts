@@ -4933,6 +4933,52 @@ declare module "@rchunk/remote-connection-editor-draft" {
   export const r: () => void;
 }
 
+declare module "@rchunk/billing-queries";
+declare module "@rchunk/billing-query-error";
+declare module "@rchunk/stripe-client";
+declare module "@rchunk/billing-state";
+declare module "@rchunk/billing-pricing";
+declare module "@rchunk/subscription-queries";
+declare module "@rchunk/billing-events";
+declare module "@rchunk/card-tile";
+declare module "@rchunk/plugin-settings-url";
+declare module "@rchunk/cloud-environment-queries";
+
+declare module "@rchunk/create-pull-request-modal-content" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/automation-dialog" {
+  export const a: () => void;
+  export const i: (props: Record<string, unknown>) => unknown;
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/plan-downgrade-dialog-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/create-project-dialog-core" {
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/gpt-about-dialog-core" {
+  export const a: (...arguments_: unknown[]) => string;
+  export const c: () => void;
+  export const i: (resource: Record<string, unknown>) => string;
+  export const n: () => void;
+  export const o: (resource: Record<string, unknown>) => string | null;
+  export const r: (...arguments_: unknown[]) => unknown;
+  export const s: (...arguments_: unknown[]) => boolean;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/create-dialog" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
 declare module "@rchunk/app-main" {
   export const _any: any;
 }

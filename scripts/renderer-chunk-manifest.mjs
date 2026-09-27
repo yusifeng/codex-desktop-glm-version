@@ -1037,11 +1037,27 @@ export const CHUNKS = {
   "schedule-draft": "schedule-draft-ca74099ea5b9.js",
   "share-analytics": "share-analytics-bd38c16d6a05.js",
   "create-pull-request-modal-content": "create-pull-request-modal-content-a56e677534f4.js",
+  "billing-queries": "queries-75df5b2ce147.js",
+  "billing-query-error": "query-error-84d2fab3c467.js",
+  "stripe-client": "stripe-client-5cc289885357.js",
+  "billing-state": "billing-state-788082ee5c84.js",
+  "billing-pricing": "billing-pricing-2d4bb88403b8.js",
+  "subscription-queries": "queries-c2eea224fb16.js",
+  "billing-events": "events-a597a301b54a.js",
+  "card-tile": "card-tile-58cfccd9fb3f.js",
+  "plugin-settings-url": "plugin-settings-url-cb4b412ead63.js",
+  "cloud-environment-queries": "cloud-environment-queries-fe64a79d8109.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "create-pull-request-modal-content",
+  "automation-dialog",
+  "plan-downgrade-dialog-core",
+  "create-project-dialog-core",
+  "gpt-about-dialog-core",
+  "create-dialog",
   "report-dialog-core",
   "codex-thread-report-dialog",
   "remote-connection-editor-dialog",
