@@ -11150,8 +11150,13 @@ declare module "@rchunk/result-values" {
 }
 
 declare module "@rchunk/runtime" {
-  const _default: unknown;
-  export default _default;
+  export type TerminalPanel = "bottom" | "right";
+  export interface TerminalSessionSnapshot { cwd?: string; hostId?: string; title?: string; [key: string]: unknown }
+  export interface TerminalTab { panel: TerminalPanel; sessionId: string; title: string }
+  export interface TerminalScope { route: { clientThreadId?: string; conversationId?: string; conversationTitle?: string | null; cwd?: string; hostId?: string; routeKind: "home" | "local-thread" | "client-local-thread" | "new-thread-panel" | "chatgpt-thread" | "remote-thread" | "other" }; defaultTerminalLocation?: TerminalPanel; isTerminalDisabled?: boolean; isWorkspaceReady?: boolean; locale?: { formatMessage(descriptor: { defaultMessage: string }, values: { index: number }): string }; onTabsChanged?(tabs: readonly TerminalTab[]): void }
+  export interface TerminalController { open(scope: TerminalScope, sessionId?: string, panel?: TerminalPanel, options?: { cwd?: string; hostId?: string; insertPosition?: number; revealAndFocus?: boolean }): string | null; preloadExisting(scope: TerminalScope, sessionId: string, snapshot: TerminalSessionSnapshot, panel?: TerminalPanel): Promise<boolean>; close(scope: TerminalScope, sessionId: string): TerminalSessionSnapshot | null; getTabs(scope: TerminalScope): readonly TerminalTab[] }
+  export const a: (scope: TerminalScope) => void; export const c: (scope: TerminalScope) => boolean; export const d: TerminalController; export const f: (scope: TerminalScope) => void; export const i: (scope: TerminalScope, input: { panel: TerminalPanel; sessionId: string; snapshot: TerminalSessionSnapshot }) => void; export const l: (scope: TerminalScope) => TerminalPanel; export const m: (scope: TerminalScope) => () => void; export const n: () => void; export const o: (scope: TerminalScope, panel: TerminalPanel, replaceSessionId?: string) => void; export const p: (scope: TerminalScope, panel?: TerminalPanel) => void; export const r: TerminalController["open"]; export const s: (scope: TerminalScope) => void; export const t: (scope: TerminalScope) => boolean; export const u: (scope: TerminalScope) => boolean;
+  const _default: unknown; export default _default;
 }
 
 declare module "@rchunk/security-keys" {

@@ -2457,4 +2457,5 @@ export const REWRITTEN = new Set([
   "draw-presence-label",
   "library-writing-block-core",
   "writing-block-floating-slash-menu",
+  "runtime",
 ]);
