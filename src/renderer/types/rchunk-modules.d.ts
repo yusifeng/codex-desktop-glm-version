@@ -9098,13 +9098,35 @@ declare module "@rchunk/use-hotkey-window-detail-layout" {
 declare module "@rchunk/quick-chat-window" {
   export const n: () => void;
   export const t: (props: {
-    canPopOut: boolean;
-    onAddToComposer(content: unknown): Promise<void>;
-    onClose(source: string): void;
+    canPopOut?: boolean;
+    onAddToComposer?(conversationId: string): void;
+    onClose?(): void;
+    onConversationSelect?(conversationId: string): void;
+    onPopOut?(): void;
+    onViewAll?(): void;
     session: Record<string, unknown>;
-    variant: "window";
+    variant?: "floating" | "window";
   }) => unknown;
 }
+
+declare module "@rchunk/content-quick-chat-overlay" {
+  export const i: () => void;
+  export const n: () => void;
+  export const r: { defaultValue: "compact"; key: string };
+  export const t: (props: {
+    children?: unknown;
+    composerOnly?: boolean;
+    hasElicitation?: boolean;
+    onStop?(): void;
+    renderTranscript?: (() => unknown) | null;
+    statusState?: string;
+    title?: string;
+    titleContent?: unknown;
+    workingStatus?: string;
+  }) => unknown;
+}
+
+declare module "@rchunk/chatgpt-image-lightbox";
 
 declare module "@rchunk/panel" {
   export const n: () => void;
