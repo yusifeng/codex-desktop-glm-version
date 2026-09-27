@@ -3141,6 +3141,24 @@ declare module "@rchunk/app-initial" {
     destination: RouterDestination,
     options?: { replace?: boolean; state?: unknown },
   ) => void;
+  export interface PrefetchableRoute {
+    prefetch(): unknown;
+  }
+  export const $gn: (
+    pattern: string,
+    pathname: string,
+  ) => Record<string, string> | null;
+  export const l_n: () => { projectId?: string | null };
+  export const Xgn: (props: Record<string, unknown>) => unknown;
+  export const Ygn: (props: {
+    replace?: boolean;
+    to: string;
+  }) => unknown;
+  export const WT: PrefetchableRoute;
+  export const KT: PrefetchableRoute;
+  export const GT: PrefetchableRoute;
+  export const qT: PrefetchableRoute;
+  export const JT: () => void;
   export const Pan: (
     scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
     event: {
@@ -5885,7 +5903,7 @@ declare module "@rchunk/toolbar-breadcrumb" {
 }
 
 declare module "@rchunk/appgen-site-detail-route" {
-  export const AppgenSiteDetailRoute: (...args: any[]) => any;
+  export const AppgenSiteDetailRoute: () => unknown;
 }
 
 declare module "@rchunk/appgen-publication-terms-route" {

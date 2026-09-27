@@ -7,47 +7,65 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as detailLayoutChunk from "@rchunk/appgen-site-detail-layout";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const detailLayout = detailLayoutChunk as Record<string, any>;
-const jsx = appShared.I3();
+const { $3: initializeRuntimeLazy, I3: getJsxRuntime } = appSharedChunk;
+const {
+  $gn: matchRoutePattern,
+  GT: automationsRoute,
+  JT: initializeAppgenRouteState,
+  KT: databaseRoute,
+  Qgn: initializeRouter,
+  WT: analyticsRoute,
+  Xgn: RouterOutlet,
+  Ygn: Navigate,
+  i_n: useRouterLocation,
+  l_n: useRouteParameters,
+  lnn: initializeAppgenQueries,
+  qT: settingsRoute,
+} = appInitialChunk;
+const { n: initializeSiteDetailLayout, t: SiteDetailLayout } =
+  detailLayoutChunk;
+const jsx = getJsxRuntime();
 
-function SiteDetailOutlet() {
-  return jsx.jsx(appInitial.Xgn, {});
+type SiteDetailTab = "analytics" | "automations" | "database" | "settings";
+
+function SiteDetailOutlet(): unknown {
+  return jsx.jsx(RouterOutlet, {});
 }
 
-function prefetchSiteDetailTab(tab: string) {
+function prefetchSiteDetailTab(tab: SiteDetailTab): unknown {
   switch (tab) {
     case "analytics":
-      return appInitial.WT.prefetch();
+      return analyticsRoute.prefetch();
     case "database":
-      return appInitial.KT.prefetch();
+      return databaseRoute.prefetch();
     case "automations":
-      return appInitial.GT.prefetch();
+      return automationsRoute.prefetch();
     case "settings":
-      return appInitial.qT.prefetch();
+      return settingsRoute.prefetch();
   }
 }
 
-function AppgenSiteDetailRoute() {
-  const { pathname } = appInitial.i_n();
-  const { projectId } = appInitial.l_n();
+function AppgenSiteDetailRoute(): unknown {
+  const { pathname } = useRouterLocation();
+  const { projectId } = useRouteParameters();
   if (projectId == null) {
-    return jsx.jsx(appInitial.Ygn, { replace: true, to: "/sites" });
+    return jsx.jsx(Navigate, { replace: true, to: "/sites" });
   }
 
-  let selectedTab = "analytics";
-  if (appInitial.$gn("/sites/:projectId/settings", pathname) != null) {
+  let selectedTab: SiteDetailTab = "analytics";
+  if (matchRoutePattern("/sites/:projectId/settings", pathname) != null) {
     selectedTab = "settings";
   } else if (
-    appInitial.$gn("/sites/:projectId/automations", pathname) != null
+    matchRoutePattern("/sites/:projectId/automations", pathname) != null
   ) {
     selectedTab = "automations";
-  } else if (appInitial.$gn("/sites/:projectId/database", pathname) != null) {
+  } else if (
+    matchRoutePattern("/sites/:projectId/database", pathname) != null
+  ) {
     selectedTab = "database";
   }
 
-  return jsx.jsx(detailLayout.t, {
+  return jsx.jsx(SiteDetailLayout, {
     prefetchTab: prefetchSiteDetailTab,
     projectId,
     selectedTab,
@@ -56,11 +74,11 @@ function AppgenSiteDetailRoute() {
 }
 
 function initializeAppgenSiteDetailRoute(): void {
-  appShared.$3?.();
-  appInitial.Qgn?.();
-  appInitial.JT?.();
-  appInitial.lnn?.();
-  detailLayout.n?.();
+  initializeRuntimeLazy();
+  initializeRouter();
+  initializeAppgenRouteState();
+  initializeAppgenQueries();
+  initializeSiteDetailLayout();
 }
 
 initializeAppgenSiteDetailRoute();
