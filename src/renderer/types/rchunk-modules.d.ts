@@ -6009,6 +6009,39 @@ declare module "@rchunk/gpt-plugin-migration-dialog" {
   } & Record<string, unknown>>;
 }
 
+declare module "@rchunk/plan-downgrade-dialog-core" {
+  export interface PlanDowngradeDialogProps extends Record<string, unknown> {
+    onClose(): void;
+  }
+  export const n: () => void;
+  export const t: (props: PlanDowngradeDialogProps) => unknown;
+}
+
+declare module "@rchunk/plugin-share-dialog-core" {
+  export interface PluginShareDialogProps extends Record<string, unknown> {
+    onClose(): void;
+  }
+  export const n: () => void;
+  export const t: (props: PluginShareDialogProps) => unknown;
+}
+
+declare module "@rchunk/scheduled-shared-task-dialog-core" {
+  export interface ScheduledSharedTaskDialogProps extends Record<string, unknown> {
+    onClose(): void;
+  }
+  export const n: () => void;
+  export const t: (props: ScheduledSharedTaskDialogProps) => unknown;
+}
+
+declare module "@rchunk/mcp-extension-quick-action-dialog-core" {
+  export interface McpExtensionQuickActionDialogProps
+    extends Record<string, unknown> {
+    onClose(): void;
+  }
+  export const n: () => void;
+  export const t: (props: McpExtensionQuickActionDialogProps) => unknown;
+}
+
 declare module "@rchunk/gpt-plugin-migration-failure" {
   export interface MigrationFailedFile extends Record<string, unknown> {
     file_id?: string;
