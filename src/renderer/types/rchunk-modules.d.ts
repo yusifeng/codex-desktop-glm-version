@@ -5237,8 +5237,38 @@ declare module "@rchunk/dialog-launcher-core" {
 
 declare module "@rchunk/realtime-voice-launch-surface" {
   export const n: () => void;
-  export const t: unknown;
-  export const _any: any;
+  export const t: (props: {
+    error?: string | null;
+    microphonePermissionDenied?: boolean;
+    onBack?(): void;
+    onOpenSettings?(): void;
+    phase?: "connecting" | "connected" | "failed";
+    threadLocator?: { conversationId: string; hostId: string } | null;
+  }) => unknown;
+}
+
+declare module "@rchunk/realtime-voice-motion" {
+  export const i: () => void;
+  export const n: { duration: number; ease: readonly number[] };
+  export const r: { duration: number };
+  export const t: { duration: number; ease: readonly number[] };
+}
+declare module "@rchunk/use-realtime-voice-native-overlay-transition-enabled" {
+  export const n: () => boolean;
+  export const t: () => void;
+}
+declare module "@rchunk/realtime-voice-handoff-target" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/realtime-voice-stage-layout" {
+  export const a: () => void;
+  export const i: string;
+  export const n: string;
+  export const o: (props: Record<string, unknown>) => unknown;
+  export const r: string;
+  export const s: () => void;
+  export const t: string;
 }
 
 declare module "@rchunk/codex-app-home-beacon-announcement-core" {
