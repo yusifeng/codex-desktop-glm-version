@@ -2476,6 +2476,7 @@ export const PRESERVED_ASSETS = new Map([
   ["loader-icon", "data:lottie"],
   ["memory-footnote-icon", "data:lottie"],
   ["billing-icons", "generated:icon-library"],
+  ["Icon", "generated:brand-icon-library"],
   ["multiplayer-document-runtime", "generated:document-model"],
   ["artifact-workbook-model-runtime", "generated:protobuf-model"],
   ["artifact-document-model-runtime", "generated:protobuf-model"],
@@ -2501,6 +2502,7 @@ export const PRESERVED_ASSETS = new Map([
   ["code-editor-runtime", "vendor:code-editor"],
   ["security-browser", "vendor:qrcode"],
   ["form-runtime", "vendor:tanstack-form"],
+  ["date-picker-runtime", "vendor:luxon-date-picker"],
   ["mcp-oauth-runtime", "vendor:oauth-client"],
   ["pdfjs-core", "vendor:pdfjs"],
   ["diff-worker-algorithm-parser", "worker:generated-parser"],
@@ -2513,4 +2515,12 @@ export const PRESERVED_ASSETS = new Map([
   ["rolldown-runtime", "build-runtime"],
   ["artifact-presentation", "vendor:presentation-editor"],
   ["spreadsheet-editor", "vendor:spreadsheet-editor"],
+]);
+
+// 聚合 chunk 采用“按已消费导出增量语义化”，不要求复制整个发布版 bundle。
+// audit-app-shared-consumption.mjs 负责验证 app-shared 的实际消费面。
+export const INCREMENTAL_HUBS = new Map([
+  ["app-shared", "typed-consumer-surface"],
+  ["app-initial", "typed-consumer-surface"],
+  ["app-primary", "typed-consumer-surface"],
 ]);

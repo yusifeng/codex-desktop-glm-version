@@ -10569,6 +10569,9 @@ declare module "@rchunk/habitat-automation-migration-prompt" {
 }
 
 declare module "@rchunk/app-shared" {
+  /** useIsMounted；返回在卸载后变为 false 的稳定读取函数。 */
+  const useIsMounted: () => () => boolean;
+  export { useIsMounted as if };
   /** invokeDesktopBridgePromise（桌面桥 Promise 规范化）。 */
   export const UI: <Result>(request: Promise<Result>, signal?: AbortSignal) => Promise<Result>;
   /** Archived conversation unarchive icon。 */
