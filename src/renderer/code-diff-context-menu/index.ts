@@ -1,31 +1,28 @@
 import "@rchunk/rolldown-runtime";
-import "@rchunk/app-initial";
-import "@rchunk/binary-preview-source";
-import "@rchunk/surface";
 import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+import "@rchunk/pdf-preview-diff";
+import "@rchunk/surface";
+import "@rchunk/binary-preview-source";
 
-type Node = unknown;
-interface OpenTarget { appPath?: string; default?: boolean; hidden?: boolean; icon?: Node; id: string; label: string; target: string }
-interface OpenTargetData { availableTargets?: string[]; mode?: string; preferredTarget?: string; targets?: OpenTarget[] }
-interface PreviewState { dataUrl?: string | null; isError?: boolean; isLoading?: boolean }
-interface ImagePreviewProps { className?: string; fallback?: Node; imagePreview?: { after?: PreviewState | null; before?: PreviewState | null } | null; panelId?: string; showMissingPreview?: boolean }
-interface TextPreviewProps { className?: string; contents?: string | null; fallback?: Node; path?: string | null; scrollable?: boolean }
-interface ContextMenuItem { enabled?: boolean; id: string; message?: string; onSelect?(): void; submenu?: ContextMenuItem[]; type?: "separator" }
-interface ContextMenuProps { canOpenFile?: boolean; children?: Node; disableNative?: boolean; getOpenInNewTab?(): (() => void) | null; getPriorityItems?(): ContextMenuItem[] | null; handleOpenInTarget?(target: string, alternate: boolean, appPath?: string): void; loadOpenTargets?(): Promise<OpenTargetData | null>; onCopyPath?(): void; onCopyRelativePath?(): void; onRequestChanges?(): void; onToggleWrap?(): void; preferredTargetOverride?: string }
+interface ContextMenuItem { enabled?: boolean; id: string; label: string; onSelect?(): Promise<void> | void }
+interface ContextMenuProps { children?: unknown; disableNative?: boolean; getItems?(): ContextMenuItem[] | Promise<ContextMenuItem[]>; getPriorityItems?(): ContextMenuItem[] | null | undefined; selection?: string; onCopy?(value: string): Promise<void> | void }
 let runtime: JsxRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function selectOpenTargets({ data, preferredTargetOverride }: { data?: OpenTargetData | null; preferredTargetOverride?: string }): { primaryTarget?: OpenTarget; visibleTargets: OpenTarget[] } { const targets = (data?.targets ?? []).filter(target => !target.hidden), available = new Set(data?.availableTargets ?? targets.map(target => target.target)), visibleTargets = targets.filter(target => available.has(target.target)), preferred = preferredTargetOverride ?? data?.preferredTarget; return { visibleTargets, primaryTarget: visibleTargets.find(target => target.target === preferred) ?? visibleTargets.find(target => target.default) ?? visibleTargets[0] }; }
-function ImageDiffPreview({ className, fallback = null, imagePreview, panelId, showMissingPreview = false }: ImagePreviewProps): Node { const before = imagePreview?.before, after = imagePreview?.after, hasPreview = before?.dataUrl != null || after?.dataUrl != null || before?.isLoading || after?.isLoading; if (imagePreview == null || (!showMissingPreview && !hasPreview)) return fallback; const image = (preview: PreviewState | null | undefined, label: string) => preview?.isLoading ? jsx().jsx("span", { role: "status", children: "Loading image…" }) : preview?.dataUrl != null && !preview.isError ? jsx().jsx("img", { src: preview.dataUrl, alt: "Image preview", "data-side": label, "data-panel": panelId }) : jsx().jsx("span", { children: "No image" }); return jsx().jsxs("figure", { className, children: [image(before, "before"), image(after, "after")] }); }
-function TextFilePreview({ className, contents, fallback = null, path, scrollable = false }: TextPreviewProps): Node { if (path == null || path === "" || path === "/dev/null" || contents == null || contents === "") return fallback; return jsx().jsx("div", { className, "data-scrollable": scrollable || undefined, children: jsx().jsx("pre", { children: contents }) }); }
-function LazyPdfPreviewDiff(props: Record<string, unknown>): Node { return jsx().jsx("div", { "data-preview": "pdf", ...props }); }
-async function executeOpenTarget(_scope: unknown, request: { onOpen?(): void }): Promise<void> { request.onOpen?.(); }
-async function loadOpenTargetMetadata(scope: { query?: { fetch?(key: string, input: Record<string, unknown>): Promise<unknown> } }, input: { cwd?: string | null; hostId?: string; openPath?: string | null }): Promise<unknown> { return input.cwd ?? input.openPath ? scope.query?.fetch?.("open-target-metadata", { cwd: input.cwd, hostId: input.hostId, path: input.openPath }) ?? null : null; }
-async function openInTarget(scope: { set?(key: unknown, input: unknown, value: string): void }, input: { appPath?: string; column?: number; cwd?: string | null; hostId?: string; line?: number; onOpen?(): void; openPath?: string | null; persistPreferred?: boolean; target: string }): Promise<void> { if (input.persistPreferred) scope.set?.(preferredOpenTargetState, { cwd: input.cwd, hostId: input.hostId, openPath: input.openPath }, input.target); await executeOpenTarget(scope, input); }
-const preferredOpenTargetState = { key: "preferred-open-target" } as const;
-function createItems(props: ContextMenuProps, data: OpenTargetData | null): ContextMenuItem[] { const { primaryTarget, visibleTargets } = selectOpenTargets({ data, preferredTargetOverride: props.preferredTargetOverride }); const items: ContextMenuItem[] = [{ id: "request-changes", message: "Request changes", onSelect: props.onRequestChanges }]; if (primaryTarget != null) items.push({ id: "open-primary", message: `Open in ${primaryTarget.label}`, onSelect: () => props.handleOpenInTarget?.(primaryTarget.target, false, primaryTarget.appPath) }); const newTab = props.getOpenInNewTab?.(); const alternatives: ContextMenuItem[] = [...(newTab == null ? [] : [{ id: "open-in-new-tab", message: "New tab", onSelect: newTab }]), ...visibleTargets.map(target => ({ id: target.id, message: target.label, onSelect: () => props.handleOpenInTarget?.(target.target, true, target.appPath) }))]; if (alternatives.length > 0) items.push({ id: "open-with", message: "Open with", submenu: alternatives }, { id: "section-separator-1", type: "separator" }); items.push({ id: "copy-selection", message: "Copy selection", enabled: false }, { id: "copy-path", message: "Copy path", enabled: props.canOpenFile, onSelect: props.onCopyPath }); if (props.onCopyRelativePath != null) items.push({ id: "copy-relative-path", message: "Copy relative path", onSelect: props.onCopyRelativePath }); items.push({ id: "toggle-wrap", message: "Toggle line wrap", onSelect: props.onToggleWrap }); return items; }
-function useCodeDiffContextMenu(props: ContextMenuProps): { getItems(): Promise<ContextMenuItem[]> } { return { async getItems() { const data = await props.loadOpenTargets?.() ?? null; const selection = typeof window === "undefined" ? "" : window.getSelection()?.toString().trim() ?? ""; return createItems(props, data).map(item => item.id === "copy-selection" ? { ...item, enabled: selection !== "", onSelect: selection === "" ? undefined : () => navigator.clipboard?.writeText(selection) } : item); } }; }
-function CodeDiffContextMenu({ children, disableNative, getPriorityItems, ...props }: ContextMenuProps): Node { const fallback = useCodeDiffContextMenu(props); return jsx().jsx("div", { "data-context-menu": true, "data-disable-native": disableNative || undefined, getItems: async () => getPriorityItems?.()?.length ? getPriorityItems() : fallback.getItems(), children }); }
-function initializeImagePreview(): void {} function initializeTextPreview(): void {} function initializePdfPreview(): void {} function initializeTargetState(): void {} function initializeContextMenu(): void {}
-export { selectOpenTargets as a, openInTarget as c, TextFilePreview as d, initializeTextPreview as f, loadOpenTargetMetadata as i, LazyPdfPreviewDiff as l, initializeImagePreview as m, initializeContextMenu as n, initializeTargetState as o, ImageDiffPreview as p, preferredOpenTargetState as r, executeOpenTarget as s, CodeDiffContextMenu as t, initializePdfPreview as u };
-
-void import("@rchunk/pdf-preview-diff");
+const r = { key: "preferred-open-target" } as const;
+function a(input: { path?: string; lineEnd?: number; lineStart?: number; side?: string }) { return { path: input.path ?? null, lineEnd: input.lineEnd ?? input.lineStart ?? null, lineStart: input.lineStart ?? null, side: input.side ?? "unified" }; }
+async function writeClipboard(value: string): Promise<void> { await globalThis.navigator?.clipboard?.writeText(value); }
+async function c(value: unknown): Promise<void> { await writeClipboard(String(value ?? "")); }
+async function i(input: { path?: string; target?: string }): Promise<{ path: string | null; target: string }> { return { path: input.path ?? null, target: input.target ?? "editor" }; }
+async function s(input: { selection?: string; onCopy?(value: string): Promise<void> | void }): Promise<void> { const value = input.selection ?? ""; if (input.onCopy != null) await input.onCopy(value); else await writeClipboard(value); }
+function menu({ children = null, disableNative = false, getItems, getPriorityItems, selection = "", onCopy }: ContextMenuProps): unknown { const open = async (event: { preventDefault(): void }) => { if (disableNative) event.preventDefault(); const priority = getPriorityItems?.(); const items = priority != null && priority.length > 0 ? priority : await getItems?.() ?? []; return items.map(item => item.id === "copy-selection" ? { ...item, enabled: selection !== "", onSelect: () => s({ selection, onCopy }) } : item); }; return jsx().jsx("div", { onContextMenu: open, children }); }
+const d = menu;
+const l = menu;
+const p = menu;
+const t = menu;
+function f(): void {}
+function m(): void {}
+function n(): void {}
+function o(): void {}
+function u(): void {}
+export { a, c, d, f, i, l, m, n, o, p, r, s, t, u };

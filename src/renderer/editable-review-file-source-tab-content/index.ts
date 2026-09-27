@@ -1,13 +1,13 @@
 import "@rchunk/rolldown-runtime";
-import "@rchunk/app-initial";
-import "@rchunk/text-file-editor-tab-content";
-import "@rchunk/compact-empty-state";
-import "@rchunk/review-file-tree-side-pane";
 import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import { t as ReviewFileSource, type ReviewFileSourceProps } from "@rchunk/review-file-source-item";
+import "@rchunk/app-initial";
+import "@rchunk/compact-empty-state";
+import "@rchunk/review-file-source-item";
+import "@rchunk/review-file-tree-side-pane";
+import "@rchunk/text-file-editor-tab-content";
 
-interface EditableProps extends Omit<ReviewFileSourceProps, "onOpenLocation" | "onSelectFile"> { environmentId?: string | null; onOpenLocation?(scope: unknown, location: unknown): void; onSelectFile?(scope: unknown, path: string, options?: { preview?: boolean }): void; refresh?(): void; scope?: unknown; tabId?: string }
+interface EditableReviewFileSourceTabContentProps { contents?: string | null; cwd?: string | null; error?: string | null; isActive?: boolean; isLoading?: boolean; path?: string | null; readOnly?: boolean; tabId?: string; workspaceRoot?: string | null; onChange?(contents: string): void; onSelectFile?(path: string): void }
 let runtime: JsxRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function EditableReviewFileSourceTabContent({ environmentId, onOpenLocation, onSelectFile, refresh, scope, ...props }: EditableProps): unknown { if (environmentId == null && props.workspaceRoot == null && props.cwd == null) return jsx().jsxs("section", { children: [jsx().jsx("h2", { children: "Files unavailable" }), jsx().jsx("p", { children: "Files will be available when the task has an environment" }), refresh == null ? null : jsx().jsx("button", { type: "button", onClick: refresh, children: "Refresh" })] }); return jsx().jsx(ReviewFileSource, { ...props, onOpenLocation: location => onOpenLocation?.(scope, location), onSelectFile: (path, options) => onSelectFile?.(scope, path, options), headerActions: refresh == null ? props.headerActions : jsx().jsx("button", { type: "button", onClick: refresh, children: "Refresh" }) }); }
+function EditableReviewFileSourceTabContent({ contents = null, cwd = null, error = null, isActive = true, isLoading = false, path = null, readOnly = false, tabId, workspaceRoot = null, onChange, onSelectFile }: EditableReviewFileSourceTabContentProps): unknown { if (isLoading) return jsx().jsx("div", { role: "status", children: "Loading file" }); if (error != null) return jsx().jsx("div", { role: "alert", children: error }); if (path == null) return jsx().jsx("div", { children: "Select a file to review" }); return jsx().jsxs("section", { "aria-label": `Edit ${path}`, "data-active": isActive, "data-tab-id": tabId, children: [jsx().jsx("header", { children: workspaceRoot == null ? path : `${workspaceRoot}/${path}` }), jsx().jsx("textarea", { "aria-label": "File contents", disabled: readOnly, value: contents ?? "", onChange: (event: { currentTarget: { value: string } }) => onChange?.(event.currentTarget.value) }), jsx().jsx("button", { onClick: () => onSelectFile?.(path), type: "button", children: cwd == null ? "Reveal file" : `Reveal in ${cwd}` })] }); }
 export { EditableReviewFileSourceTabContent };

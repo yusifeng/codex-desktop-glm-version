@@ -1,33 +1,28 @@
 import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import "@rchunk/app-initial";
 import "@rchunk/app-primary";
-import "@rchunk/codex-diff-css";
-import "@rchunk/register-pierre-themes";
-import "@rchunk/File";
+import "@rchunk/diff-file-view";
 import "@rchunk/artifact-preview-header";
-import "@rchunk/diff-source";
+import "@rchunk/codex-diff-css";
 import "@rchunk/compact-empty-state";
-import "@rchunk/review-preferences-model";
-import "@rchunk/code-diff-context-menu";
-import "@rchunk/file-diff";
-import "@rchunk/review-file-tree-side-pane";
-import "@rchunk/review-file-source-breadcrumb";
-import "@rchunk/file-blank";
+import "@rchunk/diff-source";
+import "@rchunk/file-blank-icon";
+import "@rchunk/file-diff-alt";
 import "@rchunk/file-viewer-frame";
+import "@rchunk/register-pierre-themes";
 import "@rchunk/review-diff-virtualizer-metrics";
+import "@rchunk/review-file-source-breadcrumb";
+import "@rchunk/review-file-tree-side-pane";
+import "@rchunk/review-preferences-model";
 import "@rchunk/scroll-to-match";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import { t as FileBreadcrumb } from "@rchunk/review-file-source-breadcrumb";
+import "@rchunk/code-diff-context-menu";
 
-type Node = unknown;
-export type PreviewKind = "audio" | "image" | "pdf" | "presentation" | "spreadsheet" | "text" | "video" | "word-document";
-export interface ReviewFileSourceProps { contents?: string | null; contentKind?: string | null; cwd?: string | null; error?: unknown; headerActions?: Node; hideFileNavigation?: boolean; hostId?: string; initialColumn?: number; initialEndLine?: number; initialLine?: number; isActive?: boolean; isLoading?: boolean; onOpenLocation?(location: unknown): void; onSelectFile?(path: string, options?: { preview?: boolean }): void; path?: string | null; renderSlots?(slots: { content: Node; headerRows: Node[] }): Node; workspaceRoot?: string | null; workspaceRoots?: string[] }
+type PreviewKind = "audio" | "image" | "pdf" | "presentation" | "spreadsheet" | "text" | "video" | "word-document";
+interface ReviewFileSourceProps { contents?: string | null; contentKind?: string | null; cwd?: string | null; error?: unknown; headerActions?: unknown; hideFileNavigation?: boolean; hostId?: string; isActive?: boolean; isLoading?: boolean; onOpenLocation?(location: unknown): void; onSelectFile?(path: string, options?: { preview?: boolean }): void; path?: string | null; renderSlots?(slots: { content: unknown; headerRows: unknown[] }): unknown; workspaceRoot?: string | null; workspaceRoots?: string[] }
 let runtime: JsxRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function previewKind(path: string, contentKind?: string | null): PreviewKind { const extension = path.split(".").at(-1)?.toLocaleLowerCase(); if (contentKind === "image" || ["gif", "jpeg", "jpg", "png", "svg", "webp"].includes(extension ?? "")) return "image"; if (contentKind === "audio" || ["mp3", "wav", "m4a"].includes(extension ?? "")) return "audio"; if (contentKind === "video" || ["mp4", "mov", "webm"].includes(extension ?? "")) return "video"; if (extension === "pdf") return "pdf"; if (["ppt", "pptx"].includes(extension ?? "")) return "presentation"; if (["xls", "xlsx", "csv"].includes(extension ?? "")) return "spreadsheet"; if (["doc", "docx", "rtf"].includes(extension ?? "")) return "word-document"; return "text"; }
-function isTooLarge(sizeBytes: number | null | undefined): boolean { return sizeBytes != null && sizeBytes > 10 * 1024 * 1024; }
-function ReviewFileSource(props: ReviewFileSourceProps): Node { const { contents, contentKind, error, headerActions, hideFileNavigation = false, isLoading = false, onSelectFile, path, renderSlots, workspaceRoot, cwd } = props; let content: Node; if (path == null) content = jsx().jsx("p", { role: "status", children: "Select a file" }); else if (error != null) content = jsx().jsx("p", { role: "alert", children: error instanceof Error ? error.message : "Unable to load file" }); else if (isLoading) content = jsx().jsx("p", { role: "status", children: "Loading file…" }); else { const kind = previewKind(path, contentKind); content = kind === "text" ? jsx().jsx("pre", { "data-preview-kind": kind, children: contents ?? "" }) : ["image", "audio", "video"].includes(kind) ? jsx().jsx(kind === "image" ? "img" : kind, { "data-preview-kind": kind, src: path, alt: kind === "image" ? path.split("/").at(-1) : undefined, controls: kind !== "image" || undefined }) : jsx().jsx("div", { "data-preview-kind": kind, children: `${kind} preview` }); }
-  const headerRows = hideFileNavigation ? [] : [jsx().jsx(FileBreadcrumb, { cwd, path, workspaceRoot, onSelectFile, hostId: props.hostId, pathActions: headerActions })]; return renderSlots?.({ headerRows, content }) ?? jsx().jsxs("article", { children: [...headerRows, content] }); }
-function initializeReviewFileSource(): void {}
-export { initializeReviewFileSource as n, ReviewFileSource as t };
-void isTooLarge;
+function previewKind(path: string, contentKind?: string | null): PreviewKind { const extension = path.split(".").at(-1)?.toLowerCase(); if (contentKind?.startsWith("image/") || ["gif", "jpeg", "jpg", "png", "svg", "webp"].includes(extension ?? "")) return "image"; if (contentKind === "application/pdf" || extension === "pdf") return "pdf"; if (contentKind?.startsWith("audio/")) return "audio"; if (contentKind?.startsWith("video/")) return "video"; if (["ppt", "pptx"].includes(extension ?? "")) return "presentation"; if (["xls", "xlsx"].includes(extension ?? "")) return "spreadsheet"; if (["doc", "docx"].includes(extension ?? "")) return "word-document"; return "text"; }
+function t({ contents = null, contentKind = null, error = null, headerActions = null, hideFileNavigation = false, isActive = true, isLoading = false, onSelectFile, path = null, renderSlots, workspaceRoot = null }: ReviewFileSourceProps): unknown { if (isLoading) return jsx().jsx("div", { role: "status", children: "Loading file" }); if (error != null) return jsx().jsx("div", { role: "alert", children: error instanceof Error ? error.message : String(error) }); if (path == null) return jsx().jsx("div", { children: "Select a file" }); const kind = previewKind(path, contentKind); const content = kind === "text" ? jsx().jsx("pre", { children: contents ?? "" }) : jsx().jsx("div", { "data-preview-kind": kind, children: `${kind} preview` }); const view = jsx().jsxs("section", { "aria-label": path, "data-active": isActive, children: [jsx().jsxs("header", { children: [workspaceRoot == null ? path : `${workspaceRoot}/${path}`, headerActions] }), hideFileNavigation ? null : jsx().jsx("button", { onClick: () => onSelectFile?.(path, { preview: true }), type: "button", children: "Reveal file" }), content] }); return renderSlots?.({ content: view, headerRows: [] }) ?? view; }
+function n(): void {}
+export { n, t };

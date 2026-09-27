@@ -5245,8 +5245,9 @@ declare module "@rchunk/automation-share-dialog";
 declare module "@rchunk/date-picker-runtime";
 declare module "@rchunk/binary-preview-source" { export interface BinaryPreviewSource { contentsBase64?: string | null; cwd?: string | null; environmentId?: string; hostId?: string; isError?: boolean; isLoading?: boolean; kind: "git" | "worktree"; mimeType?: string | null; path?: string; ref?: string } export const a: () => void; export const i: (props: { children?: unknown }) => unknown; export const n: (source?: BinaryPreviewSource | null) => { dataUrl: string | null; isError: boolean; isLoading: boolean }; export const o: (props: { after?: unknown; before?: unknown; className?: string; showAfterOnly?: boolean }) => unknown; export const r: (props: { className?: string }) => unknown; export const s: () => void; export const t: () => void }
 declare module "@rchunk/surface";
-declare module "@rchunk/pdf-preview-diff";
-declare module "@rchunk/conversation-diff-comments";
+declare module "@rchunk/pdf-preview-diff" { export const PdfPreviewDiff: (props: { currentPage?: number; error?: string | null; isLoading?: boolean; leftLabel?: string; rightLabel?: string; totalPages?: number; onNextPage?(): void; onPreviousPage?(): void }) => unknown; }
+declare module "@rchunk/tiny-invariant" { const invariant: (condition: unknown, message?: string) => asserts condition; export default invariant; }
+declare module "@rchunk/conversation-diff-comments" { export interface ConversationDiffComment { id?: string; path?: string | null; text?: string; [key: string]: unknown } export interface ConversationDiffCommentService { getComments?(conversationId: string): ConversationDiffComment[]; getModelComments?(conversationId: string): ConversationDiffComment[]; setComments?(conversationId: string, comments: ConversationDiffComment[]): void } export const n: (conversationId: string, service?: ConversationDiffCommentService) => { comments: ConversationDiffComment[]; modelComments: ConversationDiffComment[]; setComments(next: ConversationDiffComment[]): void }; export const t: () => void; }
 declare module "@rchunk/artifact-preview-header";
 declare module "@rchunk/compact-empty-state" { export const n: () => void; export const t: (props: { actions?: unknown; className?: string; contentClassName?: string; description?: unknown; icon: unknown; title: unknown }) => unknown }
 declare module "@rchunk/file-viewer-frame" { export const n: () => void; export const t: (props: { className?: string; filePath: string; fileViewer: { hostId?: string; [key: string]: unknown }; lifetime?: unknown; mcpAppId: string; recipient?: unknown }) => unknown }
@@ -5259,6 +5260,7 @@ declare module "@rchunk/pull-request-revision-queries";
 declare module "@rchunk/commit";
 declare module "@rchunk/open-pull-request-fix-automation-panel";
 declare module "@rchunk/pull-request-detail-query" { export interface PullRequestDetail { additions?: number; baseBranch?: string | null; canMerge?: boolean; checks?: Array<{ id?: string; link?: string | null; name: string; status: "failing" | "neutral" | "passing" | "pending" | "skipped" | "unknown" }>; ciStatus?: string; deletions?: number; headBranch?: string | null; isAuthor?: boolean; isDraft?: boolean; mergeBlocker?: string | null; number?: number; repo?: string; state?: string; title?: string; url?: string } export const C: () => void; export const S: (props: Record<string, unknown>) => unknown; export const _: (props: Record<string, unknown>) => unknown; export const a: () => void; export const b: (props: Record<string, unknown>) => unknown; export const c: (props: Record<string, unknown>) => unknown; export const d: () => void; export const f: (props: Record<string, unknown>) => unknown; export const g: (props: Record<string, unknown>) => unknown; export const h: (props: Record<string, unknown>) => unknown; export const i: (props: Record<string, unknown>) => unknown; export const l: () => void; export const m: (props: Record<string, unknown>) => unknown; export const n: (props: Record<string, unknown>) => unknown; export const o: () => void; export const p: () => void; export const r: () => void; export const s: Readonly<{ key: "pull-request-repository-compatibility" }>; export const t: (props: Record<string, unknown>) => unknown; export const u: (input: Record<string, unknown>) => string | null; export const v: () => void; export const x: () => void; export const y: () => unknown; }
+declare module "@rchunk/pull-request-code-review" { export const PullRequestCodeReview: (props: { baseBranch?: string | null; headBranch?: string | null; headRevision?: string | null; request?: unknown }) => unknown; }
 declare module "@rchunk/pull-request-route" { export const PullRequestsRoute: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/pull-request-tab-content" { export const PullRequestWorkspaceTab: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/auto-review-approval-nudge" { export const AutoReviewApprovalNudge: (props: { conversationId: string; hostId: string; learnMoreUrl?: string; onDismiss?(input: { conversationId: string; hostId: string }): void; onEnable?(input: { conversationId: string; hostId: string }): Promise<void> | void }) => unknown; }
@@ -13868,7 +13870,19 @@ declare module "@rchunk/review-file-tree-pane" {
   export const u: () => void;
 }
 declare module "@rchunk/text-shorter" { const _default: unknown; export default _default; }
-declare module "@rchunk/code-diff" { const _default: unknown; export default _default; }
+declare module "@rchunk/code-diff" {
+  export interface ParsedDiffFile { additions: number; deletions: number; hunks: string[]; path: string; status: "added" | "deleted" | "modified" | "renamed" }
+  export const a: (diff: string) => ParsedDiffFile[];
+  export const c: (path: string) => string;
+  export const i: (props: { diff?: string; files?: ParsedDiffFile[]; viewType?: "split" | "unified"; onSelectFile?(path: string): void }) => unknown;
+  export const l: typeof i;
+  export const n: () => void;
+  export const o: () => void;
+  export const r: () => void;
+  export const s: () => void;
+  export const t: typeof i;
+  export const u: () => void;
+}
 declare module "@rchunk/review-preferences-model" {
   export const a: () => void;
   export const c: unknown;

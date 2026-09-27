@@ -1,49 +1,55 @@
 import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import "@rchunk/app-initial";
 import "@rchunk/app-primary";
-import "@rchunk/pull-request-readonly-comment";
+import "@rchunk/commit-icon";
+import "@rchunk/detail-page";
+import "@rchunk/detail-section-state";
+import "@rchunk/git-action-review-state";
+import "@rchunk/open-pull-request-fix-automation-panel-core";
+import "@rchunk/open-thread-pull-request-code-tab";
 import "@rchunk/pull-request-actions";
-import "@rchunk/pull-request-revision-queries";
+import "@rchunk/pull-request-checks-summary";
+import "@rchunk/pull-request-code-review";
 import "@rchunk/pull-request-comment";
 import "@rchunk/pull-request-detail-model";
-import "@rchunk/commit";
-import "@rchunk/git-action-review-state";
-import "@rchunk/pull-request-status-label";
-import "@rchunk/pull-request-fix-workflow";
-import "@rchunk/open-thread-pull-request-code-tab";
-import "@rchunk/detail-page";
 import "@rchunk/pull-request-error-description";
-import "@rchunk/open-pull-request-fix-automation-panel";
-import "@rchunk/pull-request-checks-summary";
-import "@rchunk/detail-section-state";
 import "@rchunk/pull-request-fix-automation";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/pull-request-fix-workflow";
+import "@rchunk/pull-request-readonly-comment";
+import "@rchunk/pull-request-revision-queries-core";
+import "@rchunk/pull-request-status-label";
 
-type Node = unknown;
-export type CheckStatus = "failing" | "neutral" | "passing" | "pending" | "skipped" | "unknown";
-export interface PullRequestCheck { id?: string; link?: string | null; name: string; status: CheckStatus }
-export interface PullRequestDetail { additions?: number; baseBranch?: string | null; canMerge?: boolean; checks?: PullRequestCheck[]; ciStatus?: string; deletions?: number; headBranch?: string | null; isAuthor?: boolean; isDraft?: boolean; mergeBlocker?: string | null; number?: number; repo?: string; state?: string; title?: string; url?: string }
-interface ChecksListProps { canFix?: boolean; checks: PullRequestCheck[]; isCheckAttached?(check: PullRequestCheck): boolean; onFixCheck?(check: PullRequestCheck): void; onRemoveCheck?(check: PullRequestCheck): void; wrapLabels?: boolean }
-interface ChecksSectionProps { actions?: Node; checks?: PullRequestCheck[] | null; empty?: Node; error?: Node; loading?: boolean; notice?: Node; renderChecks?(checks: PullRequestCheck[]): Node }
-interface ActivitySectionProps { actions?: Node; count?: number; error?: Node; footer?: Node; items?: Array<{ id: string; type: string }> | null; loading?: boolean; notice?: Node; renderItem(item: { id: string; type: string }): Node; variant?: "activity" | "comments" }
-interface DetailLayoutProps { actions?: Node; checks?: Node; comments?: Node; conflicts?: Node; description?: Node; footer?: Node; header?: Node; overview?: Node }
+interface PullRequestCheck { id?: string; link?: string | null; name: string; status: "failing" | "neutral" | "passing" | "pending" | "skipped" | "unknown" }
+interface PullRequestDetail { additions?: number; baseBranch?: string | null; canMerge?: boolean; checks?: PullRequestCheck[]; ciStatus?: string; deletions?: number; description?: string | null; headBranch?: string | null; isAuthor?: boolean; isDraft?: boolean; mergeBlocker?: string | null; number?: number; repo?: string; state?: string; title?: string; url?: string }
+interface PullRequestPanelProps { detail?: PullRequestDetail | null; error?: unknown; isLoading?: boolean; onRetry?(): void; request?: { pullRequest?: { number?: number } }; summaryOnly?: boolean }
 let runtime: JsxRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-const STATUS_ORDER: Record<CheckStatus, number> = { failing: 0, pending: 1, neutral: 2, skipped: 3, unknown: 4, passing: 5 };
-function checkStatusLabel(status: CheckStatus): string { return status === "failing" ? "Failed" : status === "pending" ? "In progress" : status === "passing" ? "Passed" : status[0].toUpperCase() + status.slice(1); }
-function PullRequestChecksList({ canFix = false, checks, isCheckAttached, onFixCheck, onRemoveCheck, wrapLabels = false }: ChecksListProps): Node { const ordered = [...checks].sort((left, right) => STATUS_ORDER[left.status] - STATUS_ORDER[right.status]); return jsx().jsx("ul", { "data-wrap-labels": wrapLabels || undefined, children: ordered.map((check, index) => { const attached = isCheckAttached?.(check) === true, handler = attached ? onRemoveCheck : onFixCheck; return jsx().jsxs("li", { "data-status": check.status, children: [check.link == null ? jsx().jsx("span", { children: check.name }) : jsx().jsx("a", { href: check.link, children: check.name }), jsx().jsx("span", { children: checkStatusLabel(check.status) }), check.status === "failing" && handler != null ? jsx().jsx("button", { type: "button", disabled: !attached && !canFix, onClick: () => handler(check), children: attached ? "Remove" : "Fix" }) : null] }, check.id ?? `${check.name}:${index}`); }) }); }
-function PullRequestError({ description }: { description?: Node }): Node { return jsx().jsx("div", { role: "alert", children: description ?? "Couldn’t load this pull request section" }); }
-function PullRequestDescription({ actions, body, editing, error, loading }: { actions?: Node; body?: string | null; editing?: Node; error?: Node; loading?: boolean }): Node { const content = editing ?? (error != null ? jsx().jsx(PullRequestError, { description: error }) : loading || body == null ? jsx().jsx("span", { role: "status", children: "Loading…" }) : body.trim() === "" ? jsx().jsx("p", { children: "No description" }) : jsx().jsx("div", { children: body })); return jsx().jsxs("section", { "aria-label": "Description", children: [actions, content] }); }
-function PullRequestChecksSection({ actions, checks, empty, error, loading, notice, renderChecks = values => jsx().jsx(PullRequestChecksList, { checks: values }) }: ChecksSectionProps): Node { const content = error != null ? jsx().jsx(PullRequestError, { description: error }) : loading || checks == null ? jsx().jsx("span", { role: "status", children: "Loading checks" }) : checks.length === 0 ? (empty ?? "No checks reported") : renderChecks(checks); return jsx().jsxs("section", { id: "pull-request-checks", children: [jsx().jsxs("header", { children: [jsx().jsx("h2", { children: "Checks" }), actions] }), notice, content] }); }
-function PullRequestActivitySection({ actions, count, error, footer, items, loading, notice, renderItem, variant = "comments" }: ActivitySectionProps): Node { const title = variant === "activity" ? "Activity" : "Comments", content = error != null ? jsx().jsx(PullRequestError, { description: error }) : loading || items == null ? jsx().jsx("span", { role: "status", children: `Loading ${title.toLocaleLowerCase()}` }) : items.length === 0 ? `No ${title.toLocaleLowerCase()}` : jsx().jsx("ol", { children: items.map(item => jsx().jsx("li", { children: renderItem(item) }, `${item.type}:${item.id}`)) }); return jsx().jsxs("section", { id: variant === "activity" ? "pull-request-activity" : "pull-request-comments", children: [jsx().jsxs("header", { children: [jsx().jsx("h2", { children: title }), jsx().jsx("span", { children: count ?? items?.length ?? 0 }), actions] }), notice, content, footer] }); }
-function PartialDataNotice({ type }: { type: "checks" | "reviews" }): Node { return jsx().jsx("div", { role: "status", children: type === "checks" ? "Some check details couldn’t be loaded." : "Some review details couldn’t be loaded." }); }
-function PullRequestDetailLayout({ actions, checks, comments, conflicts, description, footer, header, overview }: DetailLayoutProps): Node { return jsx().jsx("main", { children: jsx().jsxs("div", { children: [header, overview, actions, description, checks, conflicts, comments, footer == null ? null : jsx().jsx("footer", { children: footer })] }) }); }
-function PullRequestTitleEditor({ inputLabel = "Pull request title", isPending = false, subtitle, titleEdit }: { inputLabel?: string; isPending?: boolean; subtitle?: Node; titleEdit?: { onCancel?(): void; onSave?(value: string): void; value: string } }): Node { if (titleEdit == null) return jsx().jsxs("header", { children: [subtitle] }); let value = titleEdit.value; return jsx().jsxs("form", { onSubmit: (event: { preventDefault(): void }) => { event.preventDefault(); if (!isPending) titleEdit.onSave?.(value); }, children: [jsx().jsx("input", { "aria-label": inputLabel, defaultValue: value, onChange: (event: { currentTarget: { value: string } }) => { value = event.currentTarget.value; } }), jsx().jsx("button", { type: "button", disabled: isPending, onClick: titleEdit.onCancel, children: "Cancel" }), jsx().jsx("button", { type: "submit", disabled: isPending || value.trim() === "", children: "Save" }), subtitle] }); }
-function fixDisabledReason(input: { baseBranch?: string | null; conversationId?: string | null; fixDisabledReason?: string | null; hasOpenPr?: boolean | null; headBranch?: string | null; prNumber?: number | null }): string | null { return (input.hasOpenPr === false ? "closed-pr" : input.fixDisabledReason) ?? (input.conversationId == null ? "missing-conversation" : null) ?? (input.baseBranch == null || input.headBranch == null ? "missing-branch-info" : null) ?? (input.prNumber == null ? "missing-pr-info" : null); }
-function PullRequestTaskDetail({ detail, error, item }: { detail?: PullRequestDetail | null; error?: Node; item: PullRequestDetail }): Node { return jsx().jsx(PullRequestDetailLayout, { header: jsx().jsx("h1", { children: detail?.title ?? item.title ?? "Pull request" }), overview: error == null ? jsx().jsx("p", { children: detail?.state ?? item.state ?? "unknown" }) : jsx().jsx(PullRequestError, { description: error }), checks: jsx().jsx(PullRequestChecksSection, { checks: detail?.checks ?? null }) }); }
-function PullRequestRemoteDetail({ detail, error, isLoading = false, onRetry, request }: { detail?: PullRequestDetail | null; error?: Node; isLoading?: boolean; onRetry?(): void; request?: { pullRequest?: { number?: number } } }): Node { if (isLoading) return jsx().jsx("p", { role: "status", children: "Loading pull request details" }); if (detail == null) return jsx().jsxs("section", { children: [jsx().jsx("h2", { children: "Pull request details are unavailable" }), error, jsx().jsx("button", { type: "button", onClick: onRetry, children: "Try again" })] }); return jsx().jsx(PullRequestTaskDetail, { item: { ...detail, number: detail.number ?? request?.pullRequest?.number }, detail }); }
-function PullRequestUnavailable({ error, isLoading, onRetry }: { error?: Node; isLoading?: boolean; onRetry?(): void }): Node { return jsx().jsx(PullRequestRemoteDetail, { detail: null, error, isLoading, onRetry }); }
-const pullRequestRepositoryCompatibility = { key: "pull-request-repository-compatibility" } as const;
-function emptyInitializer(): void {}
-function LoadingValue(): Node { return jsx().jsx("span", { role: "status", children: "Loading…" }); }
-export { emptyInitializer as C, PullRequestChecksList as S, PullRequestDescription as _, emptyInitializer as a, PullRequestError as b, PullRequestDetailLayout as c, emptyInitializer as d, PullRequestTitleEditor as f, PartialDataNotice as g, PullRequestActivitySection as h, PullRequestTaskDetail as i, emptyInitializer as l, PullRequestChecksSection as m, PullRequestRemoteDetail as n, emptyInitializer as o, emptyInitializer as p, emptyInitializer as r, pullRequestRepositoryCompatibility as s, PullRequestUnavailable as t, fixDisabledReason as u, emptyInitializer as v, emptyInitializer as x, LoadingValue as y };
+const s = { key: "pull-request-repository-compatibility" } as const;
+function statusLabel(status: PullRequestCheck["status"]): string { return ({ failing: "Failed", neutral: "Neutral", passing: "Passed", pending: "In progress", skipped: "Skipped", unknown: "Unknown" } as const)[status]; }
+function S({ checks = [], onFixCheck, onRemoveCheck }: { checks?: PullRequestCheck[]; onFixCheck?(check: PullRequestCheck): void; onRemoveCheck?(check: PullRequestCheck): void }): unknown { const ordered = [...checks].sort((left, right) => ["failing", "pending", "neutral", "skipped", "unknown", "passing"].indexOf(left.status) - ["failing", "pending", "neutral", "skipped", "unknown", "passing"].indexOf(right.status)); return jsx().jsx("ul", { "aria-label": "Checks", children: ordered.map((check, index) => jsx().jsxs("li", { children: [check.name, ` · ${statusLabel(check.status)}`, check.status === "failing" ? jsx().jsx("button", { onClick: () => check.id == null ? onFixCheck?.(check) : onRemoveCheck?.(check), type: "button", children: check.id == null ? "Fix" : "Remove" }) : null] }, check.id ?? `${check.name}:${index}`)) }); }
+function descriptionSection({ body = null, editing = null, error = null, loading = false }: { body?: string | null; editing?: { draft: string; onChange?(value: string): void; onSave?(): void }; error?: unknown; loading?: boolean }): unknown { if (error != null) return errorBox({ description: error }); if (loading) return loadingValue(); if (editing != null) return jsx().jsxs("form", { "aria-label": "Description editor", onSubmit: (event: { preventDefault(): void }) => { event.preventDefault(); editing.onSave?.(); }, children: [jsx().jsx("textarea", { value: editing.draft, onChange: (event: { currentTarget: { value: string } }) => editing.onChange?.(event.currentTarget.value) }), jsx().jsx("button", { type: "submit", children: "Save" })] }); return jsx().jsx("section", { "aria-label": "Description", children: body?.trim() || "No description provided" }); }
+function errorBox({ description }: { description?: unknown }): unknown { return jsx().jsx("div", { role: "alert", children: description == null ? "Couldn’t load this pull request section" : String(description) }); }
+function loadingValue(): unknown { return jsx().jsx("span", { role: "status", children: "Loading…" }); }
+function t({ error = null, isLoading = false, onRetry }: PullRequestPanelProps): unknown { return isLoading ? jsx().jsx("div", { role: "status", children: "Loading pull request details" }) : jsx().jsxs("section", { children: [jsx().jsx("h2", { children: "Pull request details are unavailable" }), error == null ? null : errorBox({ description: error }), jsx().jsx("button", { onClick: onRetry, type: "button", children: "Try again" })] }); }
+function n({ detail = null, error = null, isLoading = false, onRetry, summaryOnly = false }: PullRequestPanelProps): unknown { if (isLoading || detail == null) return t({ error, isLoading, onRetry }); return jsx().jsxs("article", { "aria-label": detail.title ?? "Pull request", children: [jsx().jsx("h1", { children: detail.title ?? `Pull request #${detail.number ?? ""}` }), jsx().jsx("p", { children: `${detail.baseBranch ?? "base"} ← ${detail.headBranch ?? "head"}` }), jsx().jsx("p", { children: `+${detail.additions ?? 0} −${detail.deletions ?? 0}` }), summaryOnly ? null : S({ checks: detail.checks ?? [] }), descriptionSection({ body: detail.description })] }); }
+function u(input: { baseBranch?: string | null; conversationId?: string | null; fixDisabledReason?: string | null; hasOpenPr?: boolean | null; headBranch?: string | null; prNumber?: number | null }): string | null { return (input.hasOpenPr === false ? "closed-pr" : input.fixDisabledReason) ?? (input.conversationId == null ? "missing-conversation" : null) ?? (input.baseBranch == null || input.headBranch == null ? "missing-branch-info" : null) ?? (input.prNumber == null ? "missing-pr-info" : null); }
+const _ = descriptionSection;
+const b = errorBox;
+const c = n;
+const f = n;
+const g = n;
+const h = n;
+const i = n;
+const m = n;
+const y = loadingValue;
+function C(): void {}
+function a(): void {}
+function d(): void {}
+function l(): void {}
+function o(): void {}
+function p(): void {}
+function r(): void {}
+function v(): void {}
+function x(): void {}
+export { C, S, _, a, b, c, d, f, g, h, i, l, m, n, o, p, r, s, t, u, v, x, y };

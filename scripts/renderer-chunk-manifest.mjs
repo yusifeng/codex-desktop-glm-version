@@ -15,6 +15,7 @@
 // value = 发布版 chunk 文件名。
 
 export const CHUNKS = {
+  "tiny-invariant": "tiny-invariant-b34bc475860a.js",
   "app-shared": "app-shared-7b9edc1bfb7f.js",
   "app-initial": "app-initial-51da50e6c6e3.js",
   "app-primary": "app-primary-d66705000d76.js",
@@ -2251,4 +2252,19 @@ export const REWRITTEN = new Set([
   "workspace-discovery",
   "workspace-agent-detail-query",
   "duplicate-agent",
+  "pull-request-detail-query",
+  "pull-request-route",
+  "pull-request-tab-content",
+  "review-file-source-item",
+  "review-file-source-breadcrumb",
+  "review-file-tree-side-pane",
+  "editable-review-file-source-tab-content",
+  "conversation-diff-comments",
+  "code-diff-context-menu",
+  "auto-review-approval-nudge",
+  "editor-diff-page",
+  "review-slash-command-submenu-registration",
+  "pdf-preview-diff",
+  "diff-source",
+  "code-diff",
 ]);
