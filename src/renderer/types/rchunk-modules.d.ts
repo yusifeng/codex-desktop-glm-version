@@ -8906,6 +8906,32 @@ declare module "@rchunk/secret-scope" {
   export const s: (props: SecretValueInputProps) => unknown;
   export const t: (props: { name: string; source: SecretScope; disabled?: boolean; attached?: boolean; onChange(scope: SecretScope): void }) => unknown;
 }
+declare module "@rchunk/personal-secret-dialog" {
+  export type SecretNamespace = "not_sensitive" | "sensitive";
+  export type SecretTarget = { type: "all_environment_configs" } | { type: "environment_config_ids"; ids: string[] };
+  export interface PersonalSecret { id: string; name: string; env_var: string; target?: SecretTarget; }
+  export interface PersonalSecretDialogProps { accountId: string; userId: string; initialNamespace: SecretNamespace; secret?: PersonalSecret | null; deleting?: boolean; onClose(namespace: SecretNamespace): void; }
+  export const PersonalSecretDialog: (props: PersonalSecretDialogProps) => unknown;
+}
+declare module "@rchunk/entry-type" {
+  export const n: () => void;
+  export const t: (props: { namespace: "not_sensitive" | "sensitive" }) => unknown;
+}
+declare module "@rchunk/play-outline" {
+  export interface IconProps { className?: string; [key: string]: unknown; }
+  export const i: () => void; export const n: () => void;
+  export const r: (props: IconProps) => unknown; export const t: (props: IconProps) => unknown;
+}
+declare module "@rchunk/environment-change-messages" {
+  export const n: () => void;
+  export const t: Record<string, { id: string; defaultMessage: string; description: string }>;
+}
+declare module "@rchunk/pending-environment-onboarding" {
+  export interface PendingEnvironmentOnboarding { accountId: string; userId: string; [key: string]: unknown; }
+  export const n: import("@rchunk/app-shared").ScopedDerivedFamily<Record<string, unknown>, string | null, PendingEnvironmentOnboarding | null>;
+  export const r: import("@rchunk/app-shared").ScopedSignal<Record<string, unknown>, Map<string, PendingEnvironmentOnboarding>>;
+  export const t: () => void;
+}
 declare module "@rchunk/validation-message" {
   export type EnvironmentValidationError = "missing-key" | "invalid-key" | "reserved-key" | "duplicate" | "missing-value" | "invalid-value";
   export const n: (props: { error: EnvironmentValidationError }) => unknown; export const r: () => void; export const t: (props: { name: string }) => unknown;
@@ -9337,8 +9363,16 @@ declare module "@rchunk/local-conversation-webmcp-tools-model" {
 }
 
 declare module "@rchunk/local-environment-editor" {
-  const _default: unknown;
-  export default _default;
+  export type Platform = "darwin" | "linux" | "win32";
+  export type ActionIcon = "tool" | "run" | "debug" | "test";
+  export interface EnvironmentAction { id: string; name: string; icon: ActionIcon; command: string; platform: Platform | null; }
+  export interface PlatformScripts { darwin: string; linux: string; win32: string; }
+  export interface LocalEnvironmentDraft { actions: EnvironmentAction[]; cleanupPlatformScripts: PlatformScripts; cleanupScript: string; name: string; setupPlatformScripts: PlatformScripts; setupScript: string; }
+  export const _: () => void; export const a: (props: Record<string, unknown>) => unknown; export const c: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  export const d: () => EnvironmentAction; export const f: (input: Record<string, unknown>) => LocalEnvironmentDraft; export const g: (props: { icon: ActionIcon; className?: string }) => unknown;
+  export const h: () => void; export const i: () => void; export const l: () => void; export const m: ReadonlyArray<{ value: ActionIcon; message: { defaultMessage: string } }>;
+  export const n: () => void; export const o: () => void; export const p: () => void; export const r: () => unknown; export const s: () => void;
+  export const t: (props: Record<string, unknown>) => unknown; export const u: Record<string, { defaultMessage: string }>;
 }
 
 declare module "@rchunk/local-environment-workflow-messages" {
@@ -10576,10 +10610,7 @@ declare module "@rchunk/local-conversation-webmcp-tools-model" {
   export default _default;
 }
 
-declare module "@rchunk/local-environment-editor" {
-  const _default: unknown;
-  export default _default;
-}
+// @rchunk/local-environment-editor is declared above with its semantic API.
 
 declare module "@rchunk/local-environment-workflow-messages" {
   const _default: unknown;
@@ -10926,10 +10957,7 @@ declare module "@rchunk/local-conversation-webmcp-tools-model" {
   export default _default;
 }
 
-declare module "@rchunk/local-environment-editor" {
-  const _default: unknown;
-  export default _default;
-}
+// @rchunk/local-environment-editor is declared above with its semantic API.
 
 declare module "@rchunk/local-environment-workflow-messages" {
   const _default: unknown;
@@ -11276,10 +11304,7 @@ declare module "@rchunk/local-conversation-webmcp-tools-model" {
   export default _default;
 }
 
-declare module "@rchunk/local-environment-editor" {
-  const _default: unknown;
-  export default _default;
-}
+// @rchunk/local-environment-editor is declared above with its semantic API.
 
 declare module "@rchunk/local-environment-workflow-messages" {
   const _default: unknown;
@@ -12561,12 +12586,7 @@ declare module "@rchunk/codex-micro-joystick-hud" {
   export const CodexMicroJoystickHud: () => unknown;
 }
 
-declare module "@rchunk/play-outline" {
-  export const i: () => void;
-  export const n: () => void;
-  export const r: (props: Record<string, unknown>) => unknown;
-  export const t: () => void;
-}
+// @rchunk/play-outline is declared above with its semantic icon props.
 
 declare module "@rchunk/codex-micro-layout" {
   export type KeycapAction =
