@@ -13964,8 +13964,21 @@ declare module "@rchunk/cloud-automation-detail-panel" {
 }
 
 declare module "@rchunk/automation-editor-dialog" {
-  export const h: unknown;
-  export const m: unknown;
+  export const a: () => void;
+  export const c: (props: Record<string, unknown>) => unknown;
+  export const d: () => void;
+  export const f: (props: Record<string, unknown>) => unknown;
+  export const h: () => void;
+  export const i: <Value>(value: Value) => Value;
+  export const l: () => void;
+  export const m: (props: Record<string, unknown>) => unknown;
+  export const n: () => void;
+  export const o: (props: Record<string, unknown>) => unknown;
+  export const p: () => void;
+  export const r: (event: { preventDefault(): void }) => void;
+  export const s: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+  export const u: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/local-conversation-thread-entry" {

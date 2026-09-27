@@ -2068,6 +2068,7 @@ export const REWRITTEN = new Set([
   "chatgpt-search-dialog",
   "skill-share-dialog-runtime",
   "ad-control-dialog-runtime",
+  "automation-editor-dialog",
   "plugin-share-dialogs-runtime",
   "pull-request-comment",
   "review-file-tree-pane",
