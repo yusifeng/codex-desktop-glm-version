@@ -8898,6 +8898,47 @@ declare module "@rchunk/artifact-feedback-button" {
   const _default: unknown;
   export default _default;
 }
+declare module "@rchunk/secret-scope" { const secretScope: unknown; export default secretScope; }
+declare module "@rchunk/validation-message" { const validationMessage: unknown; export default validationMessage; }
+declare module "@rchunk/allowed-domains-input" { const allowedDomainsInput: unknown; export default allowedDomainsInput; }
+declare module "@rchunk/environment-entry-input" {
+  export type EnvironmentParseFailure = { ok: false; reason: "duplicate" | "limit" | "malformed"; line: number };
+  export type EnvironmentParseResult = { ok: true; entries: Map<string, string> } | EnvironmentParseFailure;
+  export const a: () => unknown; export const i: () => void;
+  export const n: (source: string, maxKeyLength: number, unavailableNames?: readonly string[], existingNames?: readonly string[]) => EnvironmentParseResult;
+  export const o: () => void;
+  export const r: (props: { limit: number; entryCount: number; onAddKey(key: string, restoreFocus: (element?: { focus?(): void } | null) => void): void; onImport(source: string): EnvironmentParseResult; onPendingChange(pending: boolean): void }) => unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/environment-variable-row" {
+  export interface EnvironmentVariable { name: string; value: string; optional?: boolean; serverId?: string; source?: string; }
+  export const n: () => void;
+  export const t: (props: { variable: EnvironmentVariable; configuration?: unknown; keyError?: string | null; valueError?: string | null; onChange(variable: EnvironmentVariable): void; onDelete(): void }) => unknown;
+}
+declare module "@rchunk/environment-secret-row" {
+  export interface EnvironmentSecret { id: number; name: string; value: string; source?: string; requested?: boolean; injectionTarget?: { type: "environment_variable"; name: string; domain?: string } | { type: "http_header"; name: string; domain?: string }; }
+  export const n: () => void;
+  export const t: (props: { secret: EnvironmentSecret; secrets: readonly EnvironmentSecret[]; issues?: readonly string[]; configuration?: unknown; readOnly?: boolean; disabled?: boolean; onChange(secret: EnvironmentSecret): void; onDelete(): void }) => unknown;
+}
+declare module "@rchunk/personal-secrets-service" {
+  export interface PersonalSecretsIssue { namespace: "sensitive" | "not_sensitive"; env_var: string; code: string; id?: string; error?: string; }
+  export interface PersonalSecretsPreflight { issues: PersonalSecretsIssue[]; }
+  export interface PersonalSecretsSelection { accountId: string; userId: string; config: { id: string; name?: string }; preflightPersonalSecrets?(input: { accountId: string; userId: string; configId: string }): Promise<{ ok: boolean; data?: PersonalSecretsPreflight }>; }
+  export const n: (selection: PersonalSecretsSelection) => Promise<PersonalSecretsPreflight | null>;
+  export const t: () => void;
+}
+declare module "@rchunk/environment-variables-batch-dialog" {
+  import type { EnvironmentVariable } from "@rchunk/environment-variable-row";
+  export const EnvironmentVariablesBatchDialog: (props: { initialVariables: readonly EnvironmentVariable[]; unavailableNames: readonly string[]; hasConflict?: boolean; configuration?: unknown; onClose(): void; onSave(variables: EnvironmentVariable[]): void }) => unknown;
+}
+declare module "@rchunk/environment-batch-secrets-dialog" {
+  import type { EnvironmentSecret } from "@rchunk/environment-secret-row";
+  export const EnvironmentBatchSecretsDialog: (props: { initialSecrets: readonly EnvironmentSecret[]; hasConflict?: boolean; requireValues?: boolean; configuration?: unknown; onClose(): void; onLocalSave(secrets: EnvironmentSecret[]): void }) => unknown;
+}
+declare module "@rchunk/personal-secrets-dialog" {
+  import type { PersonalSecretsPreflight, PersonalSecretsSelection } from "@rchunk/personal-secrets-service";
+  export const PersonalSecretsDialog: (props: { selection: PersonalSecretsSelection; initialPreflight: PersonalSecretsPreflight | null; isCurrent(): boolean; onClose(): void; requestPersonalSecrets?(input: { namespace: "sensitive" | "not_sensitive"; secrets: { env_var: string; name: string; value: string }[] }): Promise<boolean> }) => unknown;
+}
 
 declare module "@rchunk/artifact-originating-turn" {
   const _default: unknown;
