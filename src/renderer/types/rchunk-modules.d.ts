@@ -7210,9 +7210,70 @@ declare module "@rchunk/queries" {
 }
 
 declare module "@rchunk/pricing-promotions" {
+  export interface PromotionDuration {
+    num_periods: number;
+    period: "hour" | "month" | "year";
+  }
+  export interface PromotionMetadata {
+    credit_grant?: { amount?: number | string | null };
+    discount: { amount?: number; percentage?: number };
+    duration?: PromotionDuration;
+    id?: string;
+    metadata?: { plan_name?: string };
+    no_auto_renewal_at_discount_end?: boolean;
+    plan_type_change?: string;
+    schedule?: {
+      period?: "hour" | "month" | "year";
+      start_after_num_periods?: number;
+    };
+    summary?: string;
+  }
+  export const a: (
+    plan: "go" | "plus",
+    currentPlan: string,
+    promotion?: PromotionMetadata | null,
+  ) => PromotionMetadata | null;
+  export const c: (input: {
+    eligiblePromoCampaignId?: string;
+    plan: "go" | "plus";
+    promoCampaignId?: string;
+    suppressGoFallback?: boolean;
+  }) => string | undefined;
+  export const d: (input: {
+    daysUntilPlanRenews?: number;
+    daysUntilSubscriptionCancelAt?: number;
+  }) => Date | null;
   export const f: () => void;
+  export const h: Record<
+    string,
+    import("@rchunk/app-shared").MessageDescriptor
+  >;
+  export const i: (input: {
+    eligibleGoPromoCampaignId?: string;
+    eligiblePlusPromoCampaignId?: string;
+    promoCampaignHandoffId?: string;
+    requestedPromoCampaignId?: string | null;
+    shouldAutoApplyPlusOneMonthFreePromo?: boolean;
+  }) => string | undefined;
+  export const l: (input: Record<string, unknown>) => Record<string, unknown>;
   export const m: () => void;
-  export const n: string;
+  export const n: "plus-1-month-free-for-go";
+  export const o: (
+    useConfiguredCopy: boolean,
+    copy?: string,
+  ) => import("@rchunk/app-shared").MessageDescriptor;
+  export const p: (promotion?: PromotionMetadata | null) => boolean;
+  export const r: "plus-1-month-free";
+  export const s: (
+    plan: "go" | "plus",
+    campaignId: string | undefined,
+    intl: import("@rchunk/app-shared").IntlShape,
+  ) => (PromotionMetadata & Record<string, unknown>) | null;
+  export const t: "go-1-month-free";
+  export const u: (
+    intl: import("@rchunk/app-shared").IntlShape,
+    duration: PromotionDuration,
+  ) => string | readonly unknown[];
 }
 
 declare module "@rchunk/plan-names" {

@@ -1369,6 +1369,7 @@ export const REWRITTEN = new Set([
   "quick-chat-window",
   "plan-names",
   "pricing",
+  "pricing-promotions",
   "model-and-reasoning-effort-translations",
   "stripe-pure",
   "stripe-payment-confirmation",
