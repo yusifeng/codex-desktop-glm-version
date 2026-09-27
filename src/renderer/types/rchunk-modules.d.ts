@@ -5265,6 +5265,21 @@ declare module "@rchunk/chatgpt-subscription-events";
 declare module "@rchunk/pricing-plan-comparison";
 declare module "@rchunk/voice-configuration-manager";
 declare module "@rchunk/chatgpt-voices-query";
+declare module "@rchunk/library-item-actions";
+declare module "@rchunk/library-trash-analytics";
+declare module "@rchunk/source-dashed-border";
+
+declare module "@rchunk/dictionary-dialog" {
+  export interface DictionaryWord { id: string; text: string; }
+  export const DictionaryDialog: (props: Record<string, unknown> & { accountId: string; onClose(): void; userId: string; words?: DictionaryWord[] }) => unknown;
+}
+declare module "@rchunk/library-item-dialogs" {
+  export const ConfirmLibraryItemsDialog: (props: Record<string, unknown> & { accountId: string; entries: Array<Record<string, unknown>>; onClose(): void; userId: string }) => unknown;
+  export const RenameLibraryItemDialog: (props: Record<string, unknown> & { accountId: string; entry: Record<string, unknown>; onClose(): void; userId: string }) => unknown;
+}
+declare module "@rchunk/library-move-dialog" { export const MoveLibraryItemsDialog: (props: Record<string, unknown> & { accountId: string; entries: Array<Record<string, unknown>>; onClose(): void; onMoved(ids: string[]): void; userId: string }) => unknown; }
+declare module "@rchunk/chatgpt-project-create-dialog" { export const ChatGptProjectCreateDialog: (props: Record<string, unknown> & { onClose(): void }) => unknown; }
+declare module "@rchunk/chatgpt-project-add-sources-dialog" { export const ChatGptProjectAddSourcesDialog: (props: Record<string, unknown> & { onClose(): void; onFilesSelected(files: File[]): void; projectId: string }) => unknown; }
 declare module "@rchunk/review-file-source-breadcrumb" {
   export const a: () => void; export const c: () => void; export const d: (line: number, lineCount: number) => number; export const i: () => void; export const l: (contents: string) => number; export const n: () => void; export const o: (element: HTMLElement, line: number, character: number) => boolean; export const r: (props: Record<string, unknown>) => unknown; export const s: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; export const u: (value: string, lineCount?: number) => number | null;
 }
