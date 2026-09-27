@@ -62,11 +62,17 @@ function initializeSourcesPanelComponents(): void {
 
 function openLocalConversationSourcesSidePanelTab(
   scope: unknown,
-  conversationId: string,
-  hostId: string,
-  options?: Record<string, unknown>,
+  props: unknown,
+  title: string,
+  openerTabId?: string,
 ): void {
-  openSourcesSidePanelTab(scope, sourcesPanelDefinition, conversationId, hostId, options);
+  openSourcesSidePanelTab(
+    scope,
+    sourcesPanelDefinition,
+    props,
+    title,
+    openerTabId,
+  );
 }
 
 function initializeOpenLocalConversationSourcesSidePanelTab(): void {

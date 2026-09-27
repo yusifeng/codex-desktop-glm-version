@@ -2096,7 +2096,7 @@ declare module "@rchunk/app-shared" {
   export const W2: <const Descriptor extends MessageDescriptor>(
     descriptor: Descriptor,
   ) => Descriptor;
-  export const Yi: unknown;
+  export const Yi: () => void;
   /** AppScope（app-shared/runtime/atom-signal.ts，内部 YW）。 */
   export const ZI: MaitaiScope<Record<string, unknown>>;
   export const __: unknown;
@@ -9019,6 +9019,13 @@ declare module "@rchunk/app-shared" {
   /** 是否为 client conversation id。 */
   export const rJ: (conversationId: string) => boolean;
   export const Hy: (props: Record<string, unknown>) => unknown;
+  /** Codex Micro command registry。 */
+  export const Ep: () => void;
+  export const Xp: Array<Record<string, unknown> & { id: string; kind: string }>;
+  export const qp: (command: Record<string, unknown>, platform: string) => boolean;
+  /** Editable plan icon dependencies。 */
+  export const Nu: () => void;
+  export const Pu: IconAssetPreset;
 }
 
 declare module "@rchunk/app-initial" {
@@ -9098,6 +9105,12 @@ declare module "@rchunk/app-initial" {
   export const stt: () => void;
   export const ttt: unknown;
   export const zg: (directiveKey: string) => string;
+  export const hEt: () => void;
+  export const mEt: (commandId: string) => boolean;
+}
+
+declare module "@rchunk/app-primary" {
+  export const hn: unknown;
 }
 
 declare module "@rchunk/verify-descendant" {
@@ -9117,9 +9130,10 @@ declare module "@rchunk/open-sources-side-panel-tab" {
   export const n: (
     scope: unknown,
     definition: unknown,
-    conversationId: string,
-    hostId: string,
-    options?: Record<string, unknown>,
+    props: unknown,
+    title: string,
+    openerTabId?: string,
+    trailingContent?: unknown,
   ) => void;
   export const t: () => void;
 }
@@ -11725,8 +11739,10 @@ declare module "@rchunk/codex-micro-analog-action-title" {
 }
 
 declare module "@rchunk/codex-micro-commands" {
-  const _default: unknown;
-  export default _default;
+  export const i: () => void;
+  export const n: (commandId: string) => Record<string, unknown> | null;
+  export const r: (commandId: string) => number | null;
+  export const t: Array<Record<string, unknown>>;
 }
 
 declare module "@rchunk/codex-micro-keyboard-surface" {
@@ -11814,8 +11830,8 @@ declare module "@rchunk/codex-micro-slot-signals" {
 }
 
 declare module "@rchunk/command-messages" {
-  const _default: unknown;
-  export default _default;
+  export const n: (command: Record<string, unknown>, intl: unknown) => string;
+  export const r: () => void;
 }
 
 declare module "@rchunk/keyboard-shortcuts-search-input" {

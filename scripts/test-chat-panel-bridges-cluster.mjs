@@ -182,8 +182,9 @@ const thumbnail = state.registered[0].renderThumbnail(
   { conversationId: "c1", hostId: "h1" }, { title: "Sources" },
 );
 assert.equal(thumbnail.props.title, "Sources");
-sources.n({ value: {} }, "c1", "h1", { revealAndFocus: false });
-assert.deepEqual(state.sourceOpens[0].slice(2), ["c1", "h1", { revealAndFocus: false }]);
+const sourceProps = { conversationId: "c1", hostId: "h1" };
+sources.n({ value: {} }, sourceProps, "Sources", "opener");
+assert.deepEqual(state.sourceOpens[0].slice(2), [sourceProps, "Sources", "opener"]);
 
 state = resetState();
 const environmentPanel = await bundle("side-panel");

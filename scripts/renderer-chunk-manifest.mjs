@@ -1113,6 +1113,11 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "codex-micro-commands",
+  "codex-micro-analog-action-title",
+  "open-sources-side-panel-tab",
+  "verify-descendant",
+  "editable-plan-tab",
   "chat-tab-metadata-bridge",
   "open-local-conversation-subagents-panel",
   "open-local-conversation-sources-side-panel-tab",
