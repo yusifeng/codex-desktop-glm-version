@@ -10,13 +10,6 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
-const keyboardSurface = keyboardSurfaceChunk as Record<string, any>;
-const layout = layoutChunk as Record<string, any>;
-const onboardingAnimation = onboardingAnimationChunk as Record<string, any>;
-
 const {
   $O: queryTiming,
   C_: initializeIconAssets,
@@ -30,8 +23,52 @@ const {
   ZI: applicationScope,
   e6: reactRuntime,
   g_: initializeSharedIcons,
-} = appShared;
-const { _L: useQuery } = appSharedChunk;
+  _L: useQuery,
+} = appSharedChunk;
+const {
+  $C: deviceStatusSignal,
+  E6t: getPlatformInfo,
+  Oft: openExternalLink,
+  Qgn: initializeAccountQueries,
+  Slt: useReducedMotion,
+  T6t: initializePlatformInfo,
+  aw: initializeCodexMicroBridge,
+  c$t: appInfoSignal,
+  ew: codexMicroModelSignal,
+  fw: hasEverDetectedCodexMicroSignal,
+  l$t: initializeAppInfo,
+  l2: OnboardingPanel,
+  mnt: initializeSystemPermissions,
+  mw: initializeCodexMicroState,
+  nw: codexMicroAnnouncementEnabledSignal,
+  o_n: useNavigate,
+  pnt: desktopBridge,
+  tw: codexMicroJoystickSignal,
+  xlt: initializeReducedMotion,
+} = appInitialChunk;
+const {
+  Sc: initializeCodexMicroEligibility,
+  Tc: isCodexMicroOnboardingEligible,
+  xc: codexMicroOnboardingStateSignal,
+} = appPrimaryChunk;
+const {
+  d: inputMonitoringPermissionQueryKey,
+  f: inputMonitoringRefetchInterval,
+  i: CodexMicroKeyboard,
+  l: CodexMicroActionKey,
+  o: CodexMicroAgentKey,
+  p: initializeCodexMicroKeyboard,
+  t: CodexMicroJoystick,
+} = keyboardSurfaceChunk;
+const { r: getCodexMicroKeycap } = layoutChunk;
+const {
+  a: startOnboardingAnimation,
+  c: recordOnboardingLifecycleStep,
+  i: initializeOnboardingAnimation,
+  o: initializeCodexMicroAnalytics,
+  r: buildOnboardingAnimationFrame,
+  t: onboardingAnimationFrameSignal,
+} = onboardingAnimationChunk;
 
 type OnboardingStep = "welcome" | "agent-keys" | "command-keys";
 type InputMonitoringPermissionStatus = "denied" | "granted" | "unavailable";
@@ -74,13 +111,13 @@ interface OnboardingLifecycleProps
 }
 
 const INPUT_SETUP_URL = "https://worklouder.cc/micro-setup";
-const STATIC_FRAME = onboardingAnimation.r?.(0) ?? {
+const STATIC_FRAME = buildOnboardingAnimationFrame?.(0) ?? {
   agentSlots: [],
   actionKeycapIds: [],
 };
 
-let React: any;
-let jsx: any;
+let React: import("@rchunk/app-shared").ReactRuntime;
+let jsx: import("@rchunk/app-shared").JsxRuntime;
 let initialized = false;
 
 const LEGEND = [
@@ -101,8 +138,8 @@ function message(
   return jsx.jsx(FormattedMessage, { id, defaultMessage, description, values });
 }
 
-function openWorkLouderInput(event: any): void {
-  appInitial.Oft?.({
+function openWorkLouderInput(event: unknown): void {
+  openExternalLink?.({
     event,
     href: INPUT_SETUP_URL,
     initiator: "open_in_browser_bridge",
@@ -148,7 +185,7 @@ function PermissionHelp({
           jsx.jsx(PermissionButton, {
             color: "secondary",
             onClick: () =>
-              appInitial.pnt?.systemPermissions
+              desktopBridge?.systemPermissions
                 ?.showPermissionSettingsAppInFinder?.()
                 .catch(() => {}),
             children: message(
@@ -165,18 +202,19 @@ function PermissionHelp({
 }
 
 function AnimatedKeyboard(): unknown {
-  const shouldReduceMotion = appInitial.Slt?.() === true;
-  const joystick = useSignalValue?.(appInitial.tw);
-  const frame = useSignalValue?.(onboardingAnimation.t) ?? STATIC_FRAME;
-  const Keyboard = keyboardSurface.i ?? "div";
-  const AgentKey = keyboardSurface.o ?? "div";
-  const ActionKey = keyboardSurface.l ?? "div";
-  const KeyboardJoystick = keyboardSurface.t ?? "div";
+  const shouldReduceMotion = useReducedMotion?.() === true;
+  const joystick = useSignalValue?.(codexMicroJoystickSignal);
+  const frame =
+    useSignalValue?.(onboardingAnimationFrameSignal) ?? STATIC_FRAME;
+  const Keyboard = CodexMicroKeyboard ?? "div";
+  const AgentKey = CodexMicroAgentKey ?? "div";
+  const ActionKey = CodexMicroActionKey ?? "div";
+  const KeyboardJoystick = CodexMicroJoystick ?? "div";
   return jsx.jsxs(Keyboard, {
     className:
       "max-w-[14rem] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.72),0_14px_32px_rgba(25,28,38,0.18)]",
     children: [
-      ...(frame.agentSlots ?? []).map((slot: any, index: number) =>
+      ...(frame.agentSlots ?? []).map((slot, index: number) =>
         jsx.jsx(
           AgentKey,
           {
@@ -195,7 +233,7 @@ function AnimatedKeyboard(): unknown {
           ActionKey,
           {
             "aria-label": "Animated keyboard action key",
-            keycap: layout.r?.(keycapId) ?? keycapId,
+            keycap: getCodexMicroKeycap?.(keycapId) ?? keycapId,
             shouldReduceMotion,
           },
           index,
@@ -368,7 +406,7 @@ function CodexMicroTour({
     OnboardingStep,
     (step: OnboardingStep) => void,
   ];
-  const Panel = appInitial.l2 ?? "div";
+  const Panel = OnboardingPanel ?? "div";
   const advance = () => {
     if (step === "welcome") {
       onLifecycleStep("screen-continued", step);
@@ -435,7 +473,7 @@ function CodexMicroTour({
 
 function OnboardingLifecycle(props: OnboardingLifecycleProps): unknown {
   const scope = useSignalScope?.(applicationScope);
-  const [flowId] = React.useState(() => crypto.randomUUID());
+  const [flowId] = React.useState<string>(crypto.randomUUID());
   const initialPermission = React.useRef(props.inputMonitoringAnalyticsState);
   const shown = React.useRef(new Set<string>());
   const queue = React.useRef(Promise.resolve());
@@ -449,7 +487,7 @@ function OnboardingLifecycle(props: OnboardingLifecycleProps): unknown {
         if (!(await props.codexMicro.ownsPrimaryWindow())) return;
         if (!shown.current.has(screen) && step !== "screen-shown") {
           shown.current.add(screen);
-          onboardingAnimation.c?.(scope, {
+          recordOnboardingLifecycleStep?.(scope, {
             flowId,
             inputMonitoringPermissionState: permission,
             screen,
@@ -457,7 +495,7 @@ function OnboardingLifecycle(props: OnboardingLifecycleProps): unknown {
           });
         }
         if (step === "screen-shown") shown.current.add(screen);
-        onboardingAnimation.c?.(scope, {
+        recordOnboardingLifecycleStep?.(scope, {
           flowId,
           inputMonitoringPermissionState: permission,
           screen,
@@ -494,22 +532,24 @@ function CodexMicroOnboardingHost({
   dismissAnnouncement(): void;
 }): unknown {
   initializeCodexMicroOnboardingHost();
-  const codexMicro = appInitial.pnt?.codexMicro as
+  const codexMicro = desktopBridge?.codexMicro as
     | CodexMicroBridge
     | undefined;
   if (codexMicro == null) return null;
   const scope = useSignalScope?.(applicationScope);
-  const reducedMotion = appInitial.Slt?.() === true;
-  const navigate = appInitial.o_n?.();
-  const appInfo = useSignalValue?.(appInitial.c$t)?.data;
-  const deviceStatus = useSignalValue?.(appInitial.$C)?.status;
-  const model = useSignalValue?.(appInitial.ew) ?? "codex-micro";
-  const hasEverBeenDetected = useSignalValue?.(appInitial.fw) === true;
-  const onboardingState = useSignalValue?.(appPrimary.xc);
-  const announcementEnabled = useSignalValue?.(appInitial.nw) === true;
-  const platform = appInitial.E6t?.().platform;
+  const reducedMotion = useReducedMotion?.() === true;
+  const navigate = useNavigate?.();
+  const appInfo = useSignalValue?.(appInfoSignal)?.data;
+  const deviceStatus = useSignalValue?.(deviceStatusSignal)?.status;
+  const model = useSignalValue?.(codexMicroModelSignal) ?? "codex-micro";
+  const hasEverBeenDetected =
+    useSignalValue?.(hasEverDetectedCodexMicroSignal) === true;
+  const onboardingState = useSignalValue?.(codexMicroOnboardingStateSignal);
+  const announcementEnabled =
+    useSignalValue?.(codexMicroAnnouncementEnabledSignal) === true;
+  const platform = getPlatformInfo?.().platform;
   const eligible =
-    (appPrimary.Tc?.({
+    (isCodexMicroOnboardingEligible?.({
       deviceStatus,
       hasEverBeenDetected,
       onboardingState,
@@ -519,8 +559,8 @@ function CodexMicroOnboardingHost({
   const permissionQuery = useQuery<InputMonitoringPermissionStatus>({
     enabled: eligible && platform === "macOS",
     queryFn: () => codexMicro.getInputMonitoringPermissionStatus(),
-    queryKey: keyboardSurface.d,
-    refetchInterval: keyboardSurface.f,
+    queryKey: inputMonitoringPermissionQueryKey,
+    refetchInterval: inputMonitoringRefetchInterval,
     refetchIntervalInBackground: true,
     refetchOnMount: "always",
     staleTime: queryTiming?.FIVE_SECONDS,
@@ -528,12 +568,12 @@ function CodexMicroOnboardingHost({
   const ready =
     eligible && (platform !== "macOS" || !permissionQuery.isPending);
   React.useEffect(() => {
-    if (ready) return onboardingAnimation.a?.(scope, reducedMotion);
+    if (ready) return startOnboardingAnimation?.(scope, reducedMotion);
   }, [ready, reducedMotion, scope]);
   if (!ready) return null;
   const complete = () => {
-    scope.set(appPrimary.xc, "complete");
-    scope.set(appInitial.fw, true);
+    scope.set(codexMicroOnboardingStateSignal, "complete");
+    scope.set(hasEverDetectedCodexMicroSignal, true);
     dismissAnnouncement();
   };
   const completeAndOpenSettings = () => {
@@ -565,20 +605,20 @@ function initializeCodexMicroOnboardingHost(): void {
   initializeSignalRuntime?.();
   React = typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
   jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
-  appInitial.Qgn?.();
-  appInitial.aw?.();
-  appInitial.T6t?.();
-  appInitial.xlt?.();
-  appInitial.l$t?.();
-  appInitial.mnt?.();
+  initializeAccountQueries?.();
+  initializeCodexMicroBridge?.();
+  initializePlatformInfo?.();
+  initializeReducedMotion?.();
+  initializeAppInfo?.();
+  initializeSystemPermissions?.();
   initializeSharedRuntime?.();
   initializeIconAssets?.();
   initializeSharedIcons?.();
-  onboardingAnimation.o?.();
-  appInitial.mw?.();
-  keyboardSurface.p?.();
-  onboardingAnimation.i?.();
-  appPrimary.Sc?.();
+  initializeCodexMicroAnalytics?.();
+  initializeCodexMicroState?.();
+  initializeCodexMicroKeyboard?.();
+  initializeOnboardingAnimation?.();
+  initializeCodexMicroEligibility?.();
 }
 
 initializeCodexMicroOnboardingHost();

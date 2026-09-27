@@ -6,7 +6,18 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
+const {
+  cs: deviceLifecycleEvent,
+  ds: onboardingLifecycleEvent,
+  fs: onboardingLifecycleSteps,
+  ls: deviceLifecycleSteps,
+  ms: initializeCodexMicroAnalyticsEvents,
+  ps: onboardingScreens,
+  ss: connectionTransports,
+  us: inputMonitoringPermissionStates,
+  xpn: logAnalyticsEvent,
+  ypn: initializeAnalytics,
+} = appInitialChunk;
 const {
   FX: initializeSignalRuntime,
   QI: initializeSharedRuntime,
@@ -82,32 +93,30 @@ let initialized = false;
 function mapDeviceLifecycleStatus(status: string): unknown {
   switch (status) {
     case "connected":
-      return appInitial.ls?.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTED;
+      return deviceLifecycleSteps.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTED;
     case "connection-failed":
-      return appInitial.ls
-        ?.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTION_FAILED;
+      return deviceLifecycleSteps.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTION_FAILED;
     case "connection-lost":
-      return appInitial.ls
-        ?.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTION_LOST;
+      return deviceLifecycleSteps.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_CONNECTION_LOST;
     case "reconnected":
-      return appInitial.ls?.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_RECONNECTED;
+      return deviceLifecycleSteps.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_RECONNECTED;
   }
 }
 
 function mapConnectionTransport(transport: string | null): unknown {
   switch (transport) {
     case "bluetooth":
-      return appInitial.ss?.CODEX_MICRO_CONNECTION_TRANSPORT_BLUETOOTH;
+      return connectionTransports.CODEX_MICRO_CONNECTION_TRANSPORT_BLUETOOTH;
     case "usb":
-      return appInitial.ss?.CODEX_MICRO_CONNECTION_TRANSPORT_USB;
+      return connectionTransports.CODEX_MICRO_CONNECTION_TRANSPORT_USB;
     case "unknown":
     case null:
-      return appInitial.ss?.CODEX_MICRO_CONNECTION_TRANSPORT_UNSPECIFIED;
+      return connectionTransports.CODEX_MICRO_CONNECTION_TRANSPORT_UNSPECIFIED;
   }
 }
 
 function mapOnboardingStep(step: string): unknown {
-  const steps = appInitial.fs;
+  const steps = onboardingLifecycleSteps;
   switch (step) {
     case "flow-completed":
       return steps?.CODEX_MICRO_ONBOARDING_LIFECYCLE_STEP_TYPE_FLOW_COMPLETED;
@@ -129,16 +138,16 @@ function mapOnboardingStep(step: string): unknown {
 function mapOnboardingScreen(screen: string): unknown {
   switch (screen) {
     case "welcome":
-      return appInitial.ps?.CODEX_MICRO_ONBOARDING_SCREEN_WELCOME;
+      return onboardingScreens.CODEX_MICRO_ONBOARDING_SCREEN_WELCOME;
     case "agent-keys":
-      return appInitial.ps?.CODEX_MICRO_ONBOARDING_SCREEN_AGENT_KEYS;
+      return onboardingScreens.CODEX_MICRO_ONBOARDING_SCREEN_AGENT_KEYS;
     case "command-keys":
-      return appInitial.ps?.CODEX_MICRO_ONBOARDING_SCREEN_COMMAND_KEYS;
+      return onboardingScreens.CODEX_MICRO_ONBOARDING_SCREEN_COMMAND_KEYS;
   }
 }
 
 function mapInputMonitoringPermission(state: string): unknown {
-  const states = appInitial.us;
+  const states = inputMonitoringPermissionStates;
   switch (state) {
     case "granted":
       return states?.CODEX_MICRO_INPUT_MONITORING_PERMISSION_STATE_GRANTED;
@@ -152,18 +161,18 @@ function mapInputMonitoringPermission(state: string): unknown {
 }
 
 function recordDeviceLifecycleStep(
-  scope: unknown,
+  scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
   stepType: unknown,
   transport: string | null,
 ): void {
-  appInitial.xpn?.(scope, appInitial.cs, {
+  logAnalyticsEvent?.(scope, deviceLifecycleEvent, {
     connectionTransport: mapConnectionTransport(transport),
     stepType,
   });
 }
 
 function recordDeviceLifecycleTransition(
-  scope: unknown,
+  scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
   device: { status: string },
   transition: string | null,
   transport: string | null,
@@ -175,7 +184,7 @@ function recordDeviceLifecycleTransition(
   ) {
     recordDeviceLifecycleStep(
       scope,
-      appInitial.ls?.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_FIRST_DETECTED,
+      deviceLifecycleSteps.CODEX_MICRO_DEVICE_LIFECYCLE_STEP_TYPE_FIRST_DETECTED,
       transport,
     );
   }
@@ -189,7 +198,7 @@ function recordDeviceLifecycleTransition(
 }
 
 function recordOnboardingLifecycleStep(
-  scope: unknown,
+  scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
   input: {
     flowId: string;
     inputMonitoringPermissionState: string;
@@ -197,7 +206,7 @@ function recordOnboardingLifecycleStep(
     step: string;
   },
 ): void {
-  appInitial.xpn?.(scope, appInitial.ds, {
+  logAnalyticsEvent?.(scope, onboardingLifecycleEvent, {
     flowId: input.flowId,
     inputMonitoringPermissionState: mapInputMonitoringPermission(
       input.inputMonitoringPermissionState,
@@ -208,8 +217,8 @@ function recordOnboardingLifecycleStep(
 }
 
 function initializeCodexMicroAnalytics(): void {
-  appInitial.ms?.();
-  appInitial.ypn?.();
+  initializeCodexMicroAnalyticsEvents?.();
+  initializeAnalytics?.();
 }
 
 function phaseIndex(elapsedMs: number): number {

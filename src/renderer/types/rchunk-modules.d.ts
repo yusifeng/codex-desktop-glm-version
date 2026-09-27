@@ -822,6 +822,7 @@ declare module "@rchunk/app-shared" {
   export const $r: () => void; // Rwt：skills-light-16 图标初始化器
   export const $K: string;
   export const $O: {
+    FIVE_SECONDS: number;
     FIVE_MINUTES: number;
     ONE_MINUTE: number;
     THIRTY_SECONDS: number;
@@ -2002,7 +2003,7 @@ declare module "@rchunk/app-shared" {
   export const b_: unknown; // React use（ait）
   export const ek: () => void;
   export const fk: unknown;
-  export const g_: unknown;
+  export const g_: () => void;
   /** initializeClassNames（app-shared/ui/class-names.ts，内部 Eh）。 */
   export const h4: () => void;
   export const i$: unknown;
@@ -3087,8 +3088,16 @@ declare module "@rchunk/app-initial" {
   export const hnt: () => Promise<void>; // initializeAppHostServices
   export const mnt: () => void; // 懒初始化器（遥测/基础设施装配）
   export const pnt: {
+    codexMicro?: {
+      getInputMonitoringPermissionStatus(): Promise<
+        "denied" | "granted" | "unavailable"
+      >;
+      openInputMonitoringSettings(): Promise<void> | void;
+      ownsPrimaryWindow(): Promise<boolean>;
+    };
     systemPermissions: {
       openNotificationSettings(): Promise<void>;
+      showPermissionSettingsAppInFinder?(): Promise<void>;
     };
   }; // appServices：已解析的服务集合
   export const $en: import("@rchunk/app-shared").MaitaiScope<
@@ -3413,6 +3422,35 @@ declare module "@rchunk/app-initial" {
   export const ePt: string;
   export const iPt: () => void;
   export const nPt: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const cs: unknown;
+  export const ds: unknown;
+  export const fs: Readonly<Record<string, unknown>>;
+  export const ls: Readonly<Record<string, unknown>>;
+  export const ms: () => void;
+  export const ps: Readonly<Record<string, unknown>>;
+  export const ss: Readonly<Record<string, unknown>>;
+  export const us: Readonly<Record<string, unknown>>;
+  export interface CodexMicroAppInfo {
+    appIconMedium?: string | null;
+    appName?: string;
+  }
+  export const $C: import("@rchunk/app-shared").ReadableSignal<{
+    status?: string;
+  }>;
+  export const aw: () => void;
+  export const c$t: import("@rchunk/app-shared").ReadableSignal<{
+    data?: CodexMicroAppInfo;
+  }>;
+  export const ew: import("@rchunk/app-shared").ReadableSignal<string>;
+  export const fw: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    boolean
+  >;
+  export const l$t: () => void;
+  export const l2: (props: Record<string, unknown>) => unknown;
+  export const mw: () => void;
+  export const nw: import("@rchunk/app-shared").ReadableSignal<boolean>;
+  export const tw: import("@rchunk/app-shared").ReadableSignal<unknown>;
   export interface FinanceConnectorApp {
     canonicalAppId?: string | null;
     plugin?: {
@@ -4019,6 +4057,16 @@ declare module "@rchunk/app-primary" {
     actionId: string;
     beaconId: string;
   }) => string;
+  export const Sc: () => void;
+  export const Tc: (input: {
+    deviceStatus?: string;
+    hasEverBeenDetected: boolean;
+    onboardingState: unknown;
+  }) => boolean;
+  export const xc: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    "complete" | "pending" | string
+  >;
   export interface BannerAction {
     ariaLabel?: string;
     disabled?: boolean;
@@ -8699,24 +8747,24 @@ declare module "@rchunk/codex-micro-commands" {
 }
 
 declare module "@rchunk/codex-micro-keyboard-surface" {
-  export const a: any;
-  export const c: any;
-  export const d: any;
-  export const f: any;
-  export const i: any;
-  export const l: any;
-  export const n: any;
-  export const o: any;
-  export const p: any;
-  export const r: any;
-  export const s: any;
-  export const t: any;
-  export const u: any;
+  export const a: unknown;
+  export const c: unknown;
+  export const d: readonly unknown[];
+  export const f: number;
+  export const i: (props: Record<string, unknown>) => unknown;
+  export const l: (props: Record<string, unknown>) => unknown;
+  export const n: unknown;
+  export const o: (props: Record<string, unknown>) => unknown;
+  export const p: () => void;
+  export const r: unknown;
+  export const s: unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
+  export const u: unknown;
 }
 
 declare module "@rchunk/codex-micro-layout" {
-  export const o: any;
-  export const r: (...args: any[]) => any;
+  export const o: () => void;
+  export const r: (keycapId: string) => unknown;
 }
 
 declare module "@rchunk/codex-micro-onboarding-animation" {
@@ -8743,7 +8791,7 @@ declare module "@rchunk/codex-micro-onboarding-animation" {
     reducedMotion: boolean,
   ) => () => void;
   export const c: (
-    scope: unknown,
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
     input: {
       flowId: string;
       inputMonitoringPermissionState: string;
@@ -8759,7 +8807,7 @@ declare module "@rchunk/codex-micro-onboarding-animation" {
   export const o: () => void;
   export const r: (elapsedMs: number) => CodexMicroOnboardingAnimationFrame;
   export const s: (
-    scope: unknown,
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
     device: { status: string },
     transition: string | null,
     transport: string | null,
@@ -8769,6 +8817,12 @@ declare module "@rchunk/codex-micro-onboarding-animation" {
     unknown,
     CodexMicroOnboardingAnimationFrame | null
   >;
+}
+
+declare module "@rchunk/codex-micro-onboarding-host" {
+  export const CodexMicroOnboardingHost: (props: {
+    dismissAnnouncement(): void;
+  }) => unknown;
 }
 
 declare module "@rchunk/codex-micro-slot-signals" {
