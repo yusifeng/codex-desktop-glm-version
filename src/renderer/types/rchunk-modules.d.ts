@@ -5270,6 +5270,39 @@ declare module "@rchunk/realtime-voice-stage-layout" {
   export const s: () => void;
   export const t: string;
 }
+declare module "@rchunk/quick-chat-obstacles" {
+  export const a: (callback: () => void) => () => void;
+  export const c: (...arguments_: unknown[]) => string | null;
+  export const d: (...arguments_: unknown[]) => string | null;
+  export const f: () => void;
+  export const i: (element: HTMLElement | null) => (() => void) | undefined;
+  export const l: (...arguments_: unknown[]) => number;
+  export const n: () => string;
+  export const o: () => unknown;
+  export const r: () => void;
+  export const s: () => void;
+  export const t: () => DOMRect[];
+  export const u: (...arguments_: unknown[]) => { x: number; y: number };
+}
+declare module "@rchunk/quick-chat-frame" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/quick-chat-drop-zones" {
+  export const n: (props?: Record<string, unknown>) => unknown;
+  export const r: () => void;
+  export const t: (destination: "bottom" | "left" | "right", size: number) => Record<string, number>;
+}
+declare module "@rchunk/remote-hosted-pip-anchor-bridge" {
+  export const i: () => void;
+  export const n: (scale?: number) => {
+    computeLayout(input: Record<string, unknown>): Record<string, unknown>;
+    setCodexHomeAvailable(available: boolean): void;
+    stop(): void;
+  };
+  export const r: string;
+  export const t: () => void;
+}
 
 declare module "@rchunk/codex-app-home-beacon-announcement-core" {
   export interface BeaconAnnouncementProps extends Record<string, unknown> {
