@@ -1000,7 +1000,7 @@ declare module "@rchunk/app-shared" {
   export type KnownServiceTierKind = "fast" | "ultrafast";
   export interface ModelServiceTier extends Record<string, unknown> {
     id: string;
-    name: string;
+    name?: string;
   }
   export interface ServiceTierModel extends Record<string, unknown> {
     defaultServiceTier?: string | null;
@@ -7059,22 +7059,61 @@ declare module "@rchunk/image-suggestions-core" {
 }
 
 declare module "@rchunk/browser-skills-state" {
-  export const a: any;
-  export const b: any;
-  export const c: any;
-  export const d: any;
-  export const f: any;
-  export const g: any;
-  export const n: any;
-  export const s: any;
-  export const u: any;
-  export const v: any;
-  export const y: any;
+  export interface BrowserSkill {
+    creator_id?: string | null;
+    display_name?: string | null;
+    enabled?: boolean;
+    id: string;
+    name?: string;
+    permissions?: { can_write?: boolean };
+    safety_check_status?: string | null;
+    safety_scan?: { risk_score?: number | null } | null;
+    surfaces?: string[] | null;
+    updated_at?: string;
+    [key: string]: unknown;
+  }
+  export interface SafetySettings { blockedScore: number; enabledFrom: string; warningScore: number; }
+  export const _: (skill: BrowserSkill) => string;
+  export const a: import("@rchunk/app-shared").ScopedDerivedSignal<unknown, SafetySettings>;
+  export const b: (skill: BrowserSkill, surface: string) => boolean;
+  export const c: import("@rchunk/app-shared").ScopedDerivedSignal<unknown, boolean>;
+  export const d: import("@rchunk/app-shared").ScopedDerivedSignal<unknown, { accountId: string; isWorkspace: boolean; userId: string } | null>;
+  export const f: import("@rchunk/app-shared").ScopedDerivedSignal<unknown, boolean>;
+  export const g: (skill: BrowserSkill, enabled: boolean) => boolean;
+  export const h: (skill: BrowserSkill, userId: string) => boolean;
+  export const i: unknown;
+  export const l: import("@rchunk/app-shared").ScopedDerivedSignal<unknown, boolean>;
+  export const m: string;
+  export const n: () => void;
+  export const o: unknown;
+  export const p: import("@rchunk/app-shared").ScopedDerivedSignal<unknown, { enableWorkspace: boolean; individuals: boolean; workspace: boolean }>;
+  export const r: (scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>, skill: BrowserSkill, enabled: boolean) => Promise<boolean>;
+  export const s: import("@rchunk/app-shared").ScopedDerivedSignal<unknown, boolean | null>;
+  export const t: (scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>, skill: BrowserSkill) => Promise<void>;
+  export const u: import("@rchunk/app-shared").ScopedQueryFamily<Record<string, unknown>, string, BrowserSkill[]>;
+  export const v: (skill: BrowserSkill, settings: SafetySettings) => "blocked" | "needsReview" | null;
+  export const y: () => void;
 }
 
 declare module "@rchunk/skill-icon-source" {
-  export const n: () => void;
-  export const r: unknown;
+  export const a: () => void;
+  export const i: (skill: { icon_small?: string | null }) => string | null;
+  export const n: (skill: Record<string, unknown>, dark: boolean) => string;
+  export const o: (skill: Record<string, unknown>, search: string) => boolean;
+  export const r: () => void;
+  export const s: <T extends { id: string; name: string; updated_at: string }>(skills: T[]) => T[];
+  export const t: (skill: Record<string, unknown>, dark: boolean) => string;
+}
+
+declare module "@rchunk/text-bubble-figure-light" {
+  export const E: string; export const F: string; export const G: string;
+  export const L: string; export const N: string; export const O: string;
+  export const S: string; export const U: string; export const V: string;
+  export const b: string; export const c: string; export const f: string;
+  export const g: string; export const i: string; export const j: string;
+  export const k: string; export const m: string; export const n: string;
+  export const o: string; export const q: string; export const u: string;
+  export const v: string; export const w: string; export const z: string;
 }
 
 declare module "@rchunk/browser-skills-composer" {
@@ -9174,6 +9213,12 @@ declare module "@rchunk/app-initial" {
   export const r_t: (theme: unknown, colorScheme: "dark" | "light") => { name: string };
   export const wk: () => void;
   export const xW: () => void;
+  /** Browser Skills authentication and experiment dependencies. */
+  export const G6t: () => void;
+  export const K6t: unknown;
+  export const gfn: unknown;
+  export const vfn: unknown;
+  export const yun: unknown;
 }
 
 declare module "@rchunk/app-primary" {

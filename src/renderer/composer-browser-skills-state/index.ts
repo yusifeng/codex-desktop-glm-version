@@ -50,6 +50,11 @@ interface BrowserSkillIdentity {
 
 interface BrowserSkillRecord {
   id: string;
+  name?: string;
+  safety_check_status?: string | null;
+  safety_scan?: { risk_score?: number | null } | null;
+  surfaces?: string[] | null;
+  updated_at?: string;
   [key: string]: unknown;
 }
 
@@ -63,7 +68,7 @@ let browserSkillResolutionFailedSignal: ScopedSignal<unknown, boolean>;
 async function submitWithBrowserSkills(
   rootScope: MaitaiScopeApi<unknown>,
   composerStateKey: unknown,
-  surface: unknown,
+  surface: string,
   input: unknown,
   submit: SubmitCallback,
 ): Promise<boolean> {

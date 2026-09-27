@@ -127,6 +127,7 @@ export const CHUNKS = {
   "composer-announcement-slot": "composer-announcement-slot-6e5975fb94c1.js",
   "browser-skills-state": "state-925b506801ef.js",
   "skill-icon-source": "skill-icon-source-226733e753a8.js",
+  "text-bubble-figure-light": "text-bubble-figure-light-c974e4c8b638.js",
   "browser-skills-composer": "composer-ab5081483162.js",
   "use-chatgpt-composer-controller": "use-chatgpt-composer-controller-d0283af53f81.js",
   "primary-composer-at-mention-list": "primary-composer-at-mention-list-9532ce06fc83.js",
@@ -1115,6 +1116,8 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "browser-skills-state",
+  "skill-icon-source",
   "ansi-block",
   "shiki-highlight-provider",
   "codex-diff-css",
