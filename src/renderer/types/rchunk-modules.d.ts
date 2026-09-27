@@ -25,6 +25,9 @@ declare module "@rchunk/app-shared" {
   export interface OptionalSchema<T> extends SafeParseSchema<T | undefined> {
     optional(): OptionalSchema<T>;
   }
+  export interface NullishSchema<T> extends SafeParseSchema<T | null | undefined> {
+    nullish(): NullishSchema<T>;
+  }
   export interface StringSchema extends SafeParseSchema<string> {
     min(length: number): StringSchema;
     nullable(): OptionalSchema<string | null>;
@@ -33,6 +36,7 @@ declare module "@rchunk/app-shared" {
   export interface ObjectSchema<T extends Record<string, unknown>>
     extends SafeParseSchema<T> {
     loose(): ObjectSchema<T>;
+    nullish(): NullishSchema<T>;
   }
   export const H4: <T extends Record<string, unknown>>(
     shape: Record<string, SafeParseSchema<unknown>>,
@@ -412,7 +416,7 @@ declare module "@rchunk/app-shared" {
     isLoading: boolean;
     isPending: boolean;
     isSuccess: boolean;
-    refetch(): Promise<UseQueryResult<Data, QueryError>>;
+    refetch(options?: { cancelRefetch?: boolean }): Promise<UseQueryResult<Data, QueryError>>;
     status: "error" | "pending" | "success";
   }
   export interface MutationFunctionContext {
@@ -3380,6 +3384,28 @@ declare module "@rchunk/app-initial" {
     accountId: string,
   ) => void;
   export const Qgn: () => void;
+  /** 浏览器认证 handoff 与 Magic Link 的 URL、Cookie 和会话依赖。 */
+  export interface CookieStore {
+    getCookie(name: string): string | undefined;
+    setCookie(
+      name: string,
+      value: string,
+      options?: { path?: string; sameSite?: "lax" | "strict" | "none" },
+    ): void;
+  }
+  export const Pun: (flow: "login" | string) => URL;
+  export const Run: () => void;
+  export const Rx: (
+    url: string,
+    parameters: Record<string, string>,
+    signal: AbortSignal,
+    flow?: string,
+  ) => Promise<{ ok: true; url: string } | { ok: false }>;
+  export const dJt: () => void;
+  export const uJt: () => string;
+  export const Ycn: () => CookieStore;
+  export const bfn: () => void;
+  export const yfn: () => { authStatus: string };
   /** Quick Chat 与 debug 独立窗口的路由、会话和分析依赖。 */
   export interface QuickChatSessionState extends Record<string, unknown> {
     hasConversation: boolean;
@@ -7339,6 +7365,28 @@ declare module "@rchunk/thread-scroll-layout" {
   export const t: (props: { children?: unknown; footer?: unknown }) => unknown;
   const _default: unknown;
   export default _default;
+}
+
+declare module "@rchunk/page-layout" {
+  export interface PageLayoutProps {
+    children?: unknown;
+    embedded?: boolean;
+    showFooter?: boolean;
+    title: unknown;
+  }
+  export const n: () => void;
+  export const t: (props: PageLayoutProps) => unknown;
+}
+
+declare module "@rchunk/auth-handoff-page" {
+  export type AuthHandoffResult = { ok: true; url: string } | { ok: false };
+  export interface AuthHandoffPageProps {
+    onRetry(): void;
+    pending: boolean;
+    result?: AuthHandoffResult;
+  }
+  export const n: () => void;
+  export const t: (props: AuthHandoffPageProps) => unknown;
 }
 
 declare module "@rchunk/use-hotkey-window-detail-layout" {
