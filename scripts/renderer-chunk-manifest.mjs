@@ -15,6 +15,7 @@
 // value = 发布版 chunk 文件名。
 
 export const CHUNKS = {
+  "chatgpt-file-upload": "chatgpt-file-upload-81c175d920b7.js",
   "terminal-workspace-warning-state": "terminal-workspace-warning-state-888b5e947714.js",
   "codex-pet-assets": "codex-pet-assets-5f01c10f2955.js",
   "animated-icon-svg": "animated-icon-svg-6d0bf1a76c25.js",
@@ -2326,4 +2327,9 @@ export const REWRITTEN = new Set([
   "use-visible-settings-sections",
   "personal-vault-settings",
   "appgen-settings-page",
+  "builder-analytics",
+  "api",
+  "plaid-link",
+  "chatgpt-sites",
+  "chatgpt-tasks-runtime",
 ]);

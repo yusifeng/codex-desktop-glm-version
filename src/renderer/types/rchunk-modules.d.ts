@@ -4716,7 +4716,13 @@ declare module "@rchunk/changelog-modal" {
   export const ChangelogModal: (props: { onClose(): void; post: ChangelogPost }) => unknown;
 }
 
-declare module "@rchunk/chatgpt-sites";
+declare module "@rchunk/chatgpt-sites" {
+  export const a: () => void;
+  export const i: Readonly<Record<string, string>>;
+  export const n: Readonly<Record<string, string>>;
+  export const r: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptSitesResponseCardViewed" }>;
+  export const t: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptSitesInteraction" }>;
+}
 declare module "@rchunk/duplicate-agent" { export interface AgentManagementService { canDelete?(agentId: string): boolean; canDuplicate?(agentId: string): boolean; clone?(agentId: string, name: string): Promise<{ id: string }>; delete?(agentId: string): Promise<void>; invalidate?(keys: readonly unknown[]): void; navigateToAgent?(agentId: string): void; notify?(tone: "danger" | "success", message: string): void } export const a: (props: { agentId: string; onClose(): void; onDeleted?(): void; service?: AgentManagementService }) => unknown; export const i: () => void; export const n: (props: { onSelect(): void }) => unknown; export const o: () => void; export const r: (props: { agentId: string; onSelect(): void; service?: AgentManagementService }) => unknown; export const t: (props: { agentId: string; agentName: string; onClose(): void; service?: AgentManagementService }) => unknown }
 declare module "@rchunk/use-visible-settings-sections" {
   export type SettingsSurface = "chatGpt" | "codex" | "codexLocal" | "codexOrWorkLocal" | "chatGptOrCodex";
@@ -5384,7 +5390,13 @@ declare module "@rchunk/project-share-model" {
   export const s: (subject: ProjectShareSubject) => string | undefined;
   export const t: Readonly<Record<"chat" | "edit", ProjectShareCapabilities>>;
 }
-declare module "@rchunk/builder-analytics";
+declare module "@rchunk/builder-analytics" {
+  export interface BuilderAnalyticsScope { get?<Value>(key: symbol): Value; set?<Value>(key: symbol, value: Value): void; track?(schema: { $type: string }, payload: Record<string, unknown>): void }
+  export const a: Readonly<Record<string, string>>; export const c: Readonly<Record<string, string>>; export const i: Readonly<Record<string, string>>; export const l: Readonly<Record<string, string>>;
+  export const n: (scope: BuilderAnalyticsScope, payload: Record<string, unknown>) => void;
+  export const o: Readonly<Record<string, string>>; export const r: Readonly<Record<string, string>>; export const s: Readonly<Record<string, string>>;
+  export const t: () => void; export const u: () => void;
+}
 declare module "@rchunk/read-error" { export const n: () => void; export const t: (props: { children?: unknown; loading?: boolean; onRetry?(): void }) => unknown }
 declare module "@rchunk/animated-segmented-toggle" {
   export interface AnimatedSegmentedToggleProps { animateSelection?: boolean; ariaLabel: string; className?: string; onSelect(id: string): void; options: Array<{ ariaLabel?: string; id: string; label: unknown }>; selectedId: string; size?: "compact" | "default" }
@@ -6398,10 +6410,17 @@ declare module "@rchunk/use-plugin-scheduled-tasks";
 declare module "@rchunk/apps-availability" { export interface AvailableApp { id: string; isEnabled: boolean; name?: string } export interface AppsAvailabilityOptions { apps?: AvailableApp[]; hostId?: string; invalidate?(queryKey: readonly unknown[]): Promise<unknown> | unknown; notify?(tone: "danger" | "success", message: string): void; readApps?(): AvailableApp[] | undefined; writeConfig?(input: { edits: Array<{ keyPath: string; mergeStrategy: "upsert"; value: boolean }>; hostId: string }): Promise<{ status?: string }>; writeOptimistic?(apps: AvailableApp[]): void } export const n: (options?: AppsAvailabilityOptions) => { isUpdating: boolean; setAppEnabled(update: { appId: string; appName?: string; enabled: boolean }): Promise<void>; updatingAppId: string | null }; export const t: () => void }
 declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-card";
 declare module "@rchunk/api" {
-  export const a: (file: File) => string | null;
+  export interface PluginArchiveFile { arrayBuffer(): Promise<ArrayBuffer>; name: string; size: number; type?: string }
+  export interface HostedPluginRecord extends Record<string, unknown> { can_refresh_from_source?: boolean; id: string }
+  export const a: (file: Pick<PluginArchiveFile, "name" | "size">) => "size" | "type" | null;
+  export const i: (pluginId: string, accountId: string, signal?: AbortSignal) => Promise<HostedPluginRecord | null>;
+  export const n: (accountId: string, file: PluginArchiveFile) => Promise<string>;
   export const o: () => void;
-  export const s: (pluginId: string, accountId: string, file: File) => Promise<unknown>;
+  export const r: (pluginId: string, accountId: string) => Promise<Blob>;
+  export const s: (pluginId: string, accountId: string, file: PluginArchiveFile) => Promise<void>;
+  export const t: (pluginId: string, accountId: string, signal?: AbortSignal) => Promise<boolean>;
 }
+declare module "@rchunk/chatgpt-file-upload";
 declare module "@rchunk/share-menu-item" {
   export interface SharePlugin { can_publish_to_workspace?: boolean; can_share_to_workspace?: boolean; canonical_app_id?: string | null; creator_account_user_id?: string | null; discoverability?: string | null; installPolicy?: string; installed?: boolean; is_deletable_workspace_plugin?: boolean; scope?: "GLOBAL" | "USER" | "WORKSPACE"; source?: { type?: string }; workspace_id?: string | null; [key: string]: unknown }
   export interface ShareAccount { account_user_id?: string; account_user_role?: string; id: string; structure: "personal" | "workspace" }
@@ -7888,13 +7907,17 @@ declare module "@rchunk/conversation-start" {
 }
 
 declare module "@rchunk/plaid-link" {
+  export interface PlaidScope { queryClient?: unknown; startPlaid?(input: { accountId: string; linkId?: string; receivedRedirectUri?: string; returnTo: string; signal?: AbortSignal }): Promise<{ connected: boolean; publicToken?: string }> }
+  export const i: (scope: PlaidScope, options: { accountId: string; linkToken: string; oauthStateId: string; signal?: AbortSignal }) => Promise<{ plaidErrorCode?: string; publicToken?: string; type: "completed" | "exited" }>;
   export const n: () => void;
   export const r: (
-    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
+    scope: PlaidScope,
     options: {
       accountId: string;
+      linkId?: string;
       receivedRedirectUri?: string;
-      signal: AbortSignal;
+      returnTo?: string;
+      signal?: AbortSignal;
     },
   ) => Promise<boolean>;
   export const t: (accountId: string) => string;
@@ -10804,10 +10827,13 @@ declare module "@rchunk/persona-runtime" {
 }
 
 declare module "@rchunk/chatgpt-tasks-runtime" {
-  export const i: Record<string, unknown>;
-  export const n: unknown;
-  export const r: Record<string, unknown>;
+  export const a: Readonly<Record<string, string>>;
+  export const i: Readonly<Record<string, string>>;
+  export const n: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptTasksEvent" }>;
+  export const o: Readonly<Record<string, string>>;
+  export const r: Readonly<Record<string, string>>;
   export const s: () => void;
+  export const t: Readonly<Record<string, string>>;
 }
 
 // Conversation workflow, source panels, and local-workspace foundations.

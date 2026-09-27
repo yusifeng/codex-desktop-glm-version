@@ -1,0 +1,12 @@
+import "@rchunk/rolldown-runtime";
+import "@rchunk/app-shared";
+import "@rchunk/app-initial";
+
+export interface PlaidScope { queryClient?: unknown; startPlaid?(input: { accountId: string; linkId?: string; receivedRedirectUri?: string; returnTo: string; signal?: AbortSignal }): Promise<{ connected: boolean; publicToken?: string }> }
+const storageKey = "codex:finance:pending-plaid-link";
+let flowActive = false;
+function readReturnTo(accountId: string): string { try { const raw = globalThis.sessionStorage?.getItem(storageKey); if (!raw) return "/finances"; const state = JSON.parse(raw) as { accountId?: string; createdAt?: number; returnTo?: string }; if (state.accountId !== accountId || typeof state.createdAt !== "number" || Date.now() - state.createdAt > 30 * 60 * 1000) return "/finances"; return typeof state.returnTo === "string" ? state.returnTo : "/finances"; } catch { return "/finances"; } }
+async function runPlaid(scope: PlaidScope, options: { accountId: string; linkId?: string; receivedRedirectUri?: string; returnTo?: string; signal?: AbortSignal }): Promise<boolean> { if (flowActive || options.signal?.aborted) return false; flowActive = true; const returnTo = options.returnTo ?? readReturnTo(options.accountId); try { globalThis.sessionStorage?.setItem(storageKey, JSON.stringify({ accountId: options.accountId, createdAt: Date.now(), returnTo })); const result = await scope.startPlaid?.({ ...options, returnTo }); if (!result?.connected || options.signal?.aborted) return false; const queryClient = scope.queryClient; if (queryClient != null && typeof queryClient === "object" && "invalidateQueries" in queryClient && typeof queryClient.invalidateQueries === "function") await queryClient.invalidateQueries({ queryKey: ["personal-finance", options.accountId] }); return true; } finally { flowActive = false; } }
+async function openPlaidFromWidget(scope: PlaidScope, options: { accountId: string; linkToken: string; oauthStateId: string; signal?: AbortSignal }): Promise<{ plaidErrorCode?: string; publicToken?: string; type: "completed" | "exited" }> { if (flowActive) return { type: "exited", plaidErrorCode: "flow_already_in_progress" }; const connected = await runPlaid(scope, { accountId: options.accountId, signal: options.signal }); return connected ? { type: "completed" } : { type: "exited", plaidErrorCode: options.signal?.aborted ? "launch_cancelled" : undefined }; }
+function initializePlaidLink(): void {}
+export { openPlaidFromWidget as i, initializePlaidLink as n, runPlaid as r, readReturnTo as t };
