@@ -3,40 +3,65 @@
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeJsxRuntime,
+  Ah: DialogHeader,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeIntlRuntime,
+  Lh: DialogDescription,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+  jh: DialogSection,
+  kh: DialogFooter,
+  zh: initializeDialog,
+} = appSharedChunk;
+
+let jsxRuntime: JsxRuntime | null = null;
+
+interface SettingsUnsavedChangesDialogProps {
+  pendingNavigation?: (() => void) | null;
+  onClearPendingNavigation(): void;
+}
+
+interface FormSubmitEvent {
+  preventDefault(): void;
+}
 
 function SettingsUnsavedChangesDialog({
   pendingNavigation,
   onClearPendingNavigation,
-}: {
-  pendingNavigation: (() => void) | null | undefined;
-  onClearPendingNavigation: () => void;
-}) {
+}: SettingsUnsavedChangesDialogProps): unknown {
+  const jsx = getInitializedJsxRuntime();
   const handleOpenChange = (open: boolean) => {
     if (!open) onClearPendingNavigation();
   };
-  const handleSubmit = (event: { preventDefault: () => void }) => {
+  const handleSubmit = (event: FormSubmitEvent) => {
     event.preventDefault();
     const navigate = pendingNavigation;
     onClearPendingNavigation();
     navigate?.();
   };
-  const title = jsx.jsx(appShared.Rh, {
-    children: jsx.jsx(appShared.Y2, {
+  const title = jsx.jsx(DialogTitle, {
+    children: jsx.jsx(FormattedMessage, {
       id: "settings.unsavedChanges.discardTitle",
       defaultMessage: "Discard changes?",
       description:
         "Title for the confirmation dialog shown before leaving Settings with unsaved changes",
     }),
   });
-  const heading = jsx.jsx(appShared.jh, {
-    children: jsx.jsx(appShared.Ah, {
+  const heading = jsx.jsx(DialogSection, {
+    children: jsx.jsx(DialogHeader, {
       title,
-      subtitle: jsx.jsx(appShared.Lh, {
-        children: jsx.jsx(appShared.Y2, {
+      subtitle: jsx.jsx(DialogDescription, {
+        children: jsx.jsx(FormattedMessage, {
           id: "settings.unsavedChanges.discardDescription",
           defaultMessage:
             "You have unsaved changes. If you leave now, your changes will be lost.",
@@ -46,38 +71,38 @@ function SettingsUnsavedChangesDialog({
       }),
     }),
   });
-  const keepEditingButton = jsx.jsx(appShared.Yh, {
+  const keepEditingButton = jsx.jsx(Button, {
     color: "secondary",
     type: "button",
     onClick: onClearPendingNavigation,
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "settings.unsavedChanges.keepEditing",
       defaultMessage: "Keep editing",
       description:
         "Button label for returning to Settings instead of discarding unsaved changes",
     }),
   });
-  const discardButton = jsx.jsx(appShared.Yh, {
+  const discardButton = jsx.jsx(Button, {
     color: "danger",
     type: "submit",
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "settings.unsavedChanges.discard",
       defaultMessage: "Discard changes",
       description: "Button label for discarding unsaved Settings changes",
     }),
   });
-  const footer = jsx.jsx(appShared.jh, {
-    children: jsx.jsxs(appShared.kh, {
+  const footer = jsx.jsx(DialogSection, {
+    children: jsx.jsxs(DialogFooter, {
       children: [keepEditingButton, discardButton],
     }),
   });
-  const form = jsx.jsxs(appShared.Oh, {
+  const form = jsx.jsxs(DialogBody, {
     as: "form",
     onSubmit: handleSubmit,
     children: [heading, footer],
   });
 
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: pendingNavigation != null,
     showDialogClose: false,
     size: "compact",
@@ -87,11 +112,21 @@ function SettingsUnsavedChangesDialog({
 }
 
 function initializeSettingsUnsavedChangesDialog(): void {
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.Zh?.();
-  appShared.zh?.();
-  appShared.Ph?.();
+  if (jsxRuntime != null) return;
+  initializeJsxRuntime();
+  initializeIntlRuntime();
+  initializeButton();
+  initializeDialog();
+  initializeDialogLayout();
+  jsxRuntime = getJsxRuntime();
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializeSettingsUnsavedChangesDialog();
+  if (jsxRuntime == null) {
+    throw new Error("Unsaved settings dialog JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 initializeSettingsUnsavedChangesDialog();

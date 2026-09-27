@@ -4135,8 +4135,12 @@ declare module "@rchunk/pending-edits-dialog" {
 }
 
 declare module "@rchunk/settings-unsaved-changes-dialog" {
+  export interface SettingsUnsavedChangesDialogProps {
+    onClearPendingNavigation(): void;
+    pendingNavigation?: (() => void) | null;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: SettingsUnsavedChangesDialogProps) => unknown;
 }
 
 declare module "@rchunk/chatgpt-saved-memory-source-delete-dialog" {
