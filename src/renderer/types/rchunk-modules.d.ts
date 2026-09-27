@@ -6038,9 +6038,26 @@ declare module "@rchunk/chatgpt-sources-message" {
   export const r: Readonly<Record<"apps" | "files" | "links" | "memory" | "more" | "skills" | "web", MessageDescriptor>>;
   export const t: Readonly<Record<"generalMemory" | "userInstructions" | "userMemory", MessageDescriptor>>;
 }
-declare module "@rchunk/chatgpt-gizmo-header";
-declare module "@rchunk/chatgpt-temporary-chat-ui";
-declare module "@rchunk/cloud-browser-preview";
+declare module "@rchunk/chatgpt-gizmo-header" {
+  export interface ChatGptGizmo { id: string; name: string; canWrite?: boolean; isMigratedPlugin?: boolean; isPinned?: boolean }
+  export interface ChatGptGizmoHeaderProps { conversationId?: string | null; gizmo?: ChatGptGizmo | null; gizmoId: string; onAbout?(gizmo: ChatGptGizmo): void; onEdit?(gizmo: ChatGptGizmo): void; onPinChange?(gizmo: ChatGptGizmo, pinned: boolean): Promise<void> | void; onReport?(gizmo: ChatGptGizmo): void }
+  export const n: (props: ChatGptGizmoHeaderProps) => unknown;
+  export const r: () => void;
+  export const t: (props: ChatGptGizmoHeaderProps & { gizmo: ChatGptGizmo }) => unknown;
+}
+declare module "@rchunk/chatgpt-temporary-chat-ui" {
+  export interface TemporaryChatToggleProps { conversationId?: string | null; isIndicator?: boolean; isTemporaryChat: boolean; onToggle?(temporary: boolean): void }
+  export interface TemporaryChatOnboardingProps { children?(eligible: boolean): unknown; isEligible?: boolean; isLoading?: boolean; isTemporaryChat: boolean; onAcknowledge?(): Promise<void> | void }
+  export const i: () => void;
+  export const n: (props: TemporaryChatOnboardingProps) => unknown;
+  export const r: (props: TemporaryChatToggleProps) => unknown;
+  export const t: (props?: Pick<TemporaryChatToggleProps, "onToggle">) => unknown;
+}
+declare module "@rchunk/cloud-browser-preview" {
+  export interface CloudBrowserScreenshot { browser_conversation_id?: string | null; hostname?: string | null; image_asset_pointer: { asset_pointer: string }; src?: string | null; tool_summary?: string | null }
+  export const n: () => void;
+  export const t: (props: { conversationId: string; liveView?: unknown; onOpen?(): void; onSelect?(index: number): void; screenshots: readonly CloudBrowserScreenshot[]; variant?: "compact" | "expanded" }) => unknown;
+}
 declare module "@rchunk/chatgpt-sources-side-panel-tab";
 declare module "@rchunk/open-audio-summary-dialog";
 declare module "@rchunk/open-conversation-files";

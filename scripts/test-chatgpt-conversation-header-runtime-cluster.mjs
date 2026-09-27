@@ -1,0 +1,104 @@
+import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as esbuild from "esbuild";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const MODULES = ["chatgpt-gizmo-header", "chatgpt-temporary-chat-ui", "cloud-browser-preview"];
+const state = globalThis.__conversationHeaderRuntimeTest = { stateValues: [], updates: [] };
+state.jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
+state.react = { useState(initial) { const value = state.stateValues.length > 0 ? state.stateValues.shift() : typeof initial === "function" ? initial() : initial; return [value, (next) => state.updates.push(next)]; } };
+const imports = new Map();
+for (const directory of MODULES) {
+  const source = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8");
+  for (const match of source.matchAll(/import\s*(?:type\s*)?{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g)) {
+    const names = imports.get(match[2]) ?? new Set();
+    for (const item of match[1].split(",")) { const name = item.trim().replace(/^type\s+/, "").split(/\s+as\s+/)[0]; if (name) names.add(name); }
+    imports.set(match[2], names);
+  }
+}
+const overrides = { I3: `() => globalThis.__conversationHeaderRuntimeTest.jsx`, Yh: `(props) => ({ type: "Button", props })`, e6: `() => globalThis.__conversationHeaderRuntimeTest.react` };
+function mockModule(name) { if (name !== "app-shared") return "export {};"; return [...(imports.get(name) ?? [])].map((exportName) => `export const ${exportName} = ${overrides[exportName] ?? "undefined"};`).join("\n"); }
+let index = 0;
+async function bundle(directory) {
+  const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "header-runtime-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: mockModule(importPath), loader: "js" })); } }] });
+  return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}-${index++}`);
+}
+function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach((child) => walk(child, visit)); else walk(children, visit); }
+function find(node, predicate) { let result; walk(node, (candidate) => { if (result == null && predicate(candidate)) result = candidate; }); return result; }
+function findAll(node, predicate) { const result = []; walk(node, (candidate) => { if (predicate(candidate)) result.push(candidate); }); return result; }
+
+// chatgpt-gizmo-header: 14
+const gizmoHeader = await bundle("chatgpt-gizmo-header");
+assert.deepEqual(Object.keys(gizmoHeader).sort(), ["n", "r", "t"]);
+assert.equal(gizmoHeader.n({ gizmoId: "missing" }), null);
+let action = "";
+const gizmo = { id: "g1", name: "  Analyst  ", canWrite: true, isPinned: false };
+const header = gizmoHeader.n({ gizmoId: "g1", gizmo, onAbout: () => { action = "about"; }, onPinChange: (_item, pinned) => { action = `pin:${pinned}`; }, onEdit: () => { action = "edit"; }, onReport: () => { action = "report"; } });
+assert.equal(header.type, "div");
+assert.equal(header.props["data-gizmo-id"], "g1");
+assert.equal(find(header, (node) => node.props?.className === "truncate").props.children, "Analyst");
+assert.equal(find(header, (node) => node.type === "details").props.className, "gizmo-actions");
+const gizmoButtons = findAll(header, (node) => node.type === "button");
+assert.equal(gizmoButtons.length, 4);
+gizmoButtons[0].props.onClick(); assert.equal(action, "about");
+gizmoButtons[1].props.onClick(); assert.equal(action, "pin:true");
+gizmoButtons[2].props.onClick(); assert.equal(action, "edit");
+gizmoButtons[3].props.onClick(); assert.equal(action, "report");
+assert.equal(find(gizmoHeader.t({ gizmoId: "g1", gizmo: { ...gizmo, isPinned: true } }), (node) => node.props?.children === "Unpin GPT").type, "button");
+assert.equal(findAll(gizmoHeader.t({ gizmoId: "g1", gizmo: { ...gizmo, isMigratedPlugin: true } }), (node) => node.type === "button").length, 3);
+gizmoHeader.r(); assert.equal(typeof gizmoHeader.n, "function");
+
+// chatgpt-temporary-chat-ui: 14
+const temporary = await bundle("chatgpt-temporary-chat-ui");
+assert.deepEqual(Object.keys(temporary).sort(), ["i", "n", "r", "t"]);
+let toggled;
+const off = temporary.t({ onToggle: (value) => { toggled = value; } });
+assert.equal(off.type, "Button");
+assert.equal(off.props["aria-label"], "Temporary chat");
+off.props.onClick(); assert.equal(toggled, false);
+const indicator = temporary.r({ isIndicator: true, isTemporaryChat: true });
+assert.equal(indicator.type, "span");
+assert.match(indicator.props.title, /history/);
+const toggle = temporary.r({ isTemporaryChat: false, onToggle: (value) => { toggled = value; } });
+assert.equal(toggle.type, "Button");
+assert.equal(toggle.props["aria-pressed"], false);
+toggle.props.onClick(); assert.equal(toggled, true);
+let acknowledged = 0;
+const onboarding = temporary.n({ isEligible: true, isTemporaryChat: true, onAcknowledge: () => { acknowledged++; }, children: (eligible) => eligible ? "eligible" : "ineligible" });
+assert.equal(find(onboarding, (node) => node.props?.role === "dialog").type, "section");
+assert.equal(find(onboarding, (node) => node.type === "h2").props.children, "Temporary Chat");
+assert.equal(onboarding.props.children[1], "eligible");
+await find(onboarding, (node) => node.type === "Button").props.onClick(); assert.equal(acknowledged, 1);
+assert.equal(find(temporary.n({ isEligible: true, isLoading: true, isTemporaryChat: true }), (node) => node.props?.role === "dialog"), undefined);
+
+// cloud-browser-preview: 14
+const cloud = await bundle("cloud-browser-preview");
+assert.deepEqual(Object.keys(cloud).sort(), ["n", "t"]);
+assert.equal(cloud.t({ conversationId: "c", screenshots: [], liveView: "live" }), "live");
+assert.equal(cloud.t({ conversationId: "c", screenshots: [] }), null);
+const screenshots = [
+  { hostname: "one.example", image_asset_pointer: { asset_pointer: "a1" }, src: "one.png", tool_summary: "First" },
+  { hostname: "two.example", image_asset_pointer: { asset_pointer: "a2" }, src: "two.png", tool_summary: "Second" },
+];
+state.stateValues.push(0, false);
+let opened = 0;
+const compact = cloud.t({ conversationId: "c9", screenshots, onOpen: () => { opened++; } });
+assert.equal(compact.type, "section");
+assert.equal(find(compact, (node) => node.type === "img").props.src, "one.png");
+assert.equal(find(compact, (node) => node.type === "figcaption").props.children, "one.example");
+assert.equal(find(compact, (node) => node.type === "input").props.max, 1);
+assert.equal(find(compact, (node) => node.props?.children === "Open browser").type, "Button");
+find(compact, (node) => node.props?.children === "Open browser").props.onClick(); assert.equal(opened, 1);
+state.stateValues.push(0, false);
+let selected = -1;
+const expanded = cloud.t({ conversationId: "c10", screenshots, variant: "expanded", onSelect: (value) => { selected = value; } });
+assert.equal(find(expanded, (node) => node.props?.children === "LIVE").type, "Button");
+assert.equal(find(expanded, (node) => node.props?.children === "LIVE").props["aria-pressed"], false);
+assert.equal(find(expanded, (node) => node.type === "input").props.max, 2);
+find(expanded, (node) => node.type === "input").props.onChange({ currentTarget: { valueAsNumber: 1 } }); assert.equal(selected, 1);
+cloud.n(); assert.equal(typeof cloud.t, "function");
+
+console.log("chatgpt conversation header runtime cluster tests passed");
