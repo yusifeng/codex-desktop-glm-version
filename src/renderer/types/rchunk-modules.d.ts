@@ -4726,8 +4726,17 @@ declare module "@rchunk/gpt-management-url" {
 }
 
 declare module "@rchunk/automation-delete-confirmation-dialog" {
+  export interface AutomationDeleteConfirmationDialogProps {
+    isPending: boolean;
+    name: string;
+    onCancel(): void;
+    onConfirm(): void;
+    open: boolean;
+  }
   export const n: () => void;
-  export const t: unknown;
+  export const t: (
+    props: AutomationDeleteConfirmationDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/delete-archived-chats-dialog" {

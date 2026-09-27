@@ -3,21 +3,50 @@
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
+import type { JsxRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-let jsx: any;
+const {
+  $3: initializeJsxRuntime,
+  Ah: DialogHeader,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeIntlRuntime,
+  Lh: DialogDescription,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  Yh: Button,
+  Zh: initializeButton,
+  jh: DialogSection,
+  kh: DialogFooter,
+  zh: initializeDialog,
+} = appSharedChunk;
+let jsxRuntime: JsxRuntime | null = null;
 let initialized = false;
 
 function initializeAutomationDeleteConfirmationDialog(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.Zh?.();
-  appShared.zh?.();
-  appShared.Ph?.();
-  jsx = appShared.I3?.();
+  initializeJsxRuntime();
+  initializeIntlRuntime();
+  initializeButton();
+  initializeDialog();
+  initializeDialogLayout();
+  jsxRuntime = getJsxRuntime();
   initialized = true;
+}
+
+interface AutomationDeleteConfirmationDialogProps {
+  isPending: boolean;
+  name: string;
+  onCancel(): void;
+  onConfirm(): void;
+  open: boolean;
+}
+
+interface FormSubmitEvent {
+  preventDefault(): void;
 }
 
 function AutomationDeleteConfirmationDialog({
@@ -26,16 +55,11 @@ function AutomationDeleteConfirmationDialog({
   onCancel,
   onConfirm,
   open,
-}: {
-  isPending: boolean;
-  name: string;
-  onCancel: () => void;
-  onConfirm: () => void;
-  open: boolean;
-}): unknown {
+}: AutomationDeleteConfirmationDialogProps): unknown {
   initializeAutomationDeleteConfirmationDialog();
-  const title = jsx.jsx(appShared.Rh, {
-    children: jsx.jsx(appShared.Y2, {
+  const jsx = getInitializedJsxRuntime();
+  const title = jsx.jsx(DialogTitle, {
+    children: jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.title",
       defaultMessage: "Delete {name}?",
       description: "Title for the delete automation confirmation dialog",
@@ -47,8 +71,8 @@ function AutomationDeleteConfirmationDialog({
       },
     }),
   });
-  const subtitle = jsx.jsx(appShared.Lh, {
-    children: jsx.jsx(appShared.Y2, {
+  const subtitle = jsx.jsx(DialogDescription, {
+    children: jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.descriptionNoPeriod",
       defaultMessage:
         "This will permanently delete the scheduled task and stop future runs",
@@ -56,48 +80,56 @@ function AutomationDeleteConfirmationDialog({
         "Description for the delete scheduled task confirmation dialog",
     }),
   });
-  const header = jsx.jsx(appShared.jh, {
-    children: jsx.jsx(appShared.Ah, { title, subtitle }),
+  const header = jsx.jsx(DialogSection, {
+    children: jsx.jsx(DialogHeader, { title, subtitle }),
   });
-  const cancel = jsx.jsx(appShared.Yh, {
+  const cancel = jsx.jsx(Button, {
     color: "outline",
     onClick: onCancel,
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.cancel",
       defaultMessage: "Cancel",
       description:
         "Cancel button label for delete automation confirmation dialog",
     }),
   });
-  const confirm = jsx.jsx(appShared.Yh, {
+  const confirm = jsx.jsx(Button, {
     color: "danger",
     loading: isPending,
     type: "submit",
-    children: jsx.jsx(appShared.Y2, {
+    children: jsx.jsx(FormattedMessage, {
       id: "inbox.automations.deleteConfirm.confirm",
       defaultMessage: "Delete scheduled task",
       description:
         "Confirm button label for delete scheduled task confirmation dialog",
     }),
   });
-  const footer = jsx.jsx(appShared.jh, {
-    children: jsx.jsxs(appShared.kh, { children: [cancel, confirm] }),
+  const footer = jsx.jsx(DialogSection, {
+    children: jsx.jsxs(DialogFooter, { children: [cancel, confirm] }),
   });
-  const content = jsx.jsxs(appShared.Oh, {
+  const content = jsx.jsxs(DialogBody, {
     as: "form",
-    onSubmit: (event: any) => {
+    onSubmit: (event: FormSubmitEvent) => {
       event.preventDefault();
       onConfirm();
     },
     children: [header, footer],
   });
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open,
     onOpenChange: (nextOpen: boolean) => {
       if (!nextOpen) onCancel();
     },
     children: content,
   });
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializeAutomationDeleteConfirmationDialog();
+  if (jsxRuntime == null) {
+    throw new Error("Automation delete dialog JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 initializeAutomationDeleteConfirmationDialog();
