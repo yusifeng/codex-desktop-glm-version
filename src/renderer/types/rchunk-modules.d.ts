@@ -5644,8 +5644,30 @@ declare module "@rchunk/credit-purchase-page-core" {
   }) => unknown;
 }
 
-declare module "@rchunk/plugin-request-empty-state";
-declare module "@rchunk/plugins-store-page";
+declare module "@rchunk/plugin-request-empty-state" {
+  export interface PluginSummary { id: string; installed?: boolean; name: string; description?: string; marketplaceName?: string; [key: string]: unknown }
+  export interface PluginRecord { plugin: PluginSummary; logoDarkPath?: string; logoPath?: string; [key: string]: unknown }
+  export interface PluginDirectoryConfig { categoryIds: string[]; collapsedCategoryIds: string[]; sections: Array<{ id: string; pluginIds: string[] }> }
+  export const A: (input: { creatorPath: string; includeStarterPrompt: boolean; kind: "plugin" | "skill" }) => string;
+  export const C: { key: string; defaultValue: string }; export const D: (props: { children?: unknown; hostId: string; mode?: string; source?: string }) => unknown;
+  export const E: { key: string; defaultValue: string | null }; export const M: () => void; export const O: () => void; export const S: () => void;
+  export const T: { key: string; defaultValue: string }; export const _: () => void; export const a: (props: { errorMessage?: string | null; isPageLoading?: boolean }) => unknown;
+  export const b: () => void; export const c: (props: { plugins: PluginRecord[] } & Record<string, unknown>) => unknown; export const d: () => void;
+  export const f: (props: { plugins?: PluginRecord[]; onOpenPluginDetails?(plugin: PluginRecord): void }) => unknown; export const g: (props: Record<string, unknown>) => unknown;
+  export const h: () => void; export const i: () => void; export const j: { key: string; defaultValue: boolean }; export const k: string; export const l: () => void;
+  export const m: (props: { plugins: PluginRecord[] } & Record<string, unknown>) => unknown; export const n: () => void; export const o: () => void; export const p: () => void;
+  export const r: (props: { initialSuggestion?: string; onClose?(): void; onSubmit?(suggestion: string): void }) => unknown;
+  export const s: (props: { id?: string; plugins: PluginRecord[] } & Record<string, unknown>) => unknown; export const t: (props: { onRequestPlugin?(): void }) => unknown;
+  export const u: (props: { banner?: { browserFamily: string; displayName: string; installUrl: string } | null; onDismiss?(): void; onInstall?(): void }) => unknown;
+  export const v: (props: { phase?: "installing" | "loading"; progressPercent?: number }) => unknown; export const w: { key: string; defaultValue: boolean };
+  export const x: (value: unknown) => PluginDirectoryConfig; export const y: () => void;
+}
+declare module "@rchunk/plugins-store-page" {
+  export interface StorePlugin { categoryIds?: string[]; description?: string; directory?: "openai" | "personal" | "workspace"; id: string; installed?: boolean; name: string; [key: string]: unknown }
+  export const i: () => void; export const n: () => void;
+  export const r: (props?: { children?: unknown; initialTab?: "plugins" | "skills"; onBrowseTabSelect?(tab: "plugins" | "skills"): void }) => unknown;
+  export const t: (props?: { category?: string | null; directory?: "openai" | "personal" | "workspace"; hostId?: string; onInstall?(plugin: StorePlugin): void; onOpenPlugin?(plugin: StorePlugin): void; plugins?: StorePlugin[]; query?: string; selectedPlugin?: StorePlugin | null }) => unknown;
+}
 declare module "@rchunk/plugins-page-section" {
   export interface Skill { id: string; name: string; description?: string; shortDescription?: string; path?: string; scope?: string; [key: string]: unknown }
   export interface InstalledSkill { skill: Skill; [key: string]: unknown }
@@ -5667,7 +5689,20 @@ declare module "@rchunk/plugins-page-section" {
   export const v: (input: { query: string; suggestions?: App[] | null }) => App[]; export const w: (apps: App[]) => App[];
   export const x: (input: { configuredMarketplaceNames: Set<string>; marketplaces: Plugin[]; query: string }) => Plugin[]; export const y: (input: { apps: App[]; query: string }) => App[];
 }
-declare module "@rchunk/plugin-detail-view";
+declare module "@rchunk/plugin-detail-view" {
+  export interface DetailPlugin { summary: { description?: string; id?: string; installed?: boolean; name: string; remotePluginId?: string; [key: string]: unknown }; [key: string]: unknown }
+  export const a: (input: { size?: "large" | "small"; hasLargeIcon?: boolean; smallClassName?: string; largeFallbackClassName?: string }) => string;
+  export const c: () => void; export const i: () => void; export const n: () => void; export const o: () => void;
+  export const r: (props: { actionLabel?: unknown; displayName?: string; onSkillsUpdated?(success: boolean): void; skill: { description?: string; installed?: boolean; name: string; path?: string; [key: string]: unknown } }) => unknown;
+  export const s: (props: { cardActions?: unknown; cardDescription?: unknown; cardIcon?: unknown; cardTitle: unknown; modalBody?: unknown; modalDescription?: unknown; modalFooter?: unknown; modalHeaderActions?: unknown; modalTitle?: unknown; onOpenPreview?(): void }) => unknown;
+  export const t: (input: { state: "loading" } | { errorMessage?: string; state: "error" } | { description?: string; state: "missing" } | ({ plugin: DetailPlugin; presentation?: "dialog" | "page"; state: "ready" } & Record<string, unknown>)) => unknown;
+}
+declare module "@rchunk/hosted-plugin-creation-actions";
+declare module "@rchunk/plugin-setup";
+declare module "@rchunk/profile-lock";
+declare module "@rchunk/browser-extension-setup-messages";
+declare module "@rchunk/category-plugins-query";
+declare module "@rchunk/hosted-plugin-create-dialog";
 declare module "@rchunk/plugins-page" { export const i: () => void; export const n: () => void; export const r: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; }
 
 declare module "@rchunk/skills-page-core" {
