@@ -13697,6 +13697,20 @@ declare module "@rchunk/automation-editor-dialog" {
   export const m: unknown;
 }
 
+declare module "@rchunk/local-conversation-thread-entry" {
+  export const LocalConversationSideChatTab: (
+    props: Record<string, unknown>,
+  ) => unknown;
+}
+
+declare module "@rchunk/avatar-overlay-debug-state";
+declare module "@rchunk/comment-mode-coachmark-state";
+declare module "@rchunk/thread-panel-secondary-state";
+declare module "@rchunk/browser-session-queries";
+declare module "@rchunk/tab-input";
+declare module "@rchunk/view-control-labels";
+declare module "@rchunk/thread-tab-entity";
+
 declare module "@rchunk/app-initial" {
   /** initializeSearchInput（通用 SearchInput 组件依赖）。 */
   export const mT: () => void;
