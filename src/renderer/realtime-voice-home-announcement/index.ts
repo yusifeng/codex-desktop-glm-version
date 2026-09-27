@@ -7,8 +7,16 @@ import * as appPrimaryChunk from "@rchunk/app-primary";
 
 void runtimeChunk;
 
-const appShared = appSharedChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
+const {
+  $3: initializeRuntimeLazy,
+  I3: getJsxRuntime,
+  K2: initializeSharedComponents,
+  Y2: FormattedMessage,
+  ag: initializeDismissIcon,
+  ig: dismissIcon,
+  n4: useIntl,
+} = appSharedChunk;
+const { Cm: initializeAnnouncement, Sm: Announcement } = appPrimaryChunk;
 
 const DEFAULT_ORB_SRC =
   "https://persistent.oaistatic.com/voice/bidi-homepage-banner-orb.21107572.webp";
@@ -20,16 +28,16 @@ interface RealtimeVoiceHomeAnnouncementContentProps {
   orbSrc?: string;
 }
 
-let jsx: any;
+let jsx: import("@rchunk/app-shared").JsxRuntime;
 let initialized = false;
 
 function initializeRealtimeVoiceHomeAnnouncement(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  appPrimary.Cm?.();
-  appShared.ag?.();
-  jsx = appShared.I3?.();
+  initializeRuntimeLazy();
+  initializeSharedComponents();
+  initializeAnnouncement();
+  initializeDismissIcon();
+  jsx = getJsxRuntime();
   initialized = true;
 }
 
@@ -40,9 +48,7 @@ function RealtimeVoiceHomeAnnouncementContent({
   orbSrc = DEFAULT_ORB_SRC,
 }: RealtimeVoiceHomeAnnouncementContentProps): unknown {
   initializeRealtimeVoiceHomeAnnouncement();
-  const intl = appShared.n4?.();
-  const FormattedMessage = appShared.Y2;
-  const Announcement = appPrimary.Sm;
+  const intl = useIntl();
 
   const title = jsx.jsx(FormattedMessage, {
     id: "realtimeVoice.homeAnnouncement.title",
@@ -78,13 +84,13 @@ function RealtimeVoiceHomeAnnouncementContent({
     onClick: onStart,
   };
   const dismissAction = {
-    ariaLabel: intl?.formatMessage?.({
+    ariaLabel: intl.formatMessage({
       id: "realtimeVoice.homeAnnouncement.dismiss",
       defaultMessage: "Dismiss voice chat banner",
       description:
         "Accessible label for dismissing the realtime voice Home banner",
     }),
-    icon: appShared.ig,
+    icon: dismissIcon,
     onClick: onDismiss,
   };
 

@@ -1912,6 +1912,7 @@ declare module "@rchunk/app-shared" {
   export const j_: () => void;
   /** dismiss icon asset（worktree onboarding banner）。 */
   export const ig: IconAssetPreset;
+  export const ag: () => void;
   /** Worktree onboarding analytics event descriptor。 */
   export const MA: unknown;
   /** check icon asset（Wallet enrollment 成功态）。 */
@@ -3647,6 +3648,7 @@ declare module "@rchunk/app-primary" {
     title?: unknown;
   }
   export const Sm: (props: BannerProps) => unknown;
+  export const Cm: () => void;
   export interface LibraryFilePickerDialogProps
     extends Record<string, unknown> {
     analytics?: unknown;
@@ -4827,7 +4829,6 @@ declare module "@rchunk/home-suggestion-list" {
 declare module "@rchunk/home-composer-announcement-candidates" { export const HomeComposerAnnouncementCandidates: unknown; }
 declare module "@rchunk/codex-home-announcements" { export const _any: any; }
 declare module "@rchunk/announcement-entry-points" { export const _any: any; }
-declare module "@rchunk/realtime-voice-home-announcement" { export const _any: any; }
 declare module "@rchunk/worktree-onboarding-banner-controller" {
   export const WorktreeOnboardingBannerController: () => unknown;
 }
@@ -5011,7 +5012,16 @@ declare module "@rchunk/wallet-onboarding-announcement-content" {
 }
 
 declare module "@rchunk/realtime-voice-home-announcement" {
-  export const RealtimeVoiceHomeAnnouncementContent: unknown;
+  export interface RealtimeVoiceHomeAnnouncementContentProps
+    extends Record<string, unknown> {
+    entryPoint: "chatgpt" | "codex" | string;
+    onDismiss(): void;
+    onStart(): void;
+    orbSrc?: string;
+  }
+  export const RealtimeVoiceHomeAnnouncementContent: (
+    props: RealtimeVoiceHomeAnnouncementContentProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/subscription-onboarding-content" {
