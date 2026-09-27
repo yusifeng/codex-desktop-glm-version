@@ -6058,9 +6058,24 @@ declare module "@rchunk/cloud-browser-preview" {
   export const n: () => void;
   export const t: (props: { conversationId: string; liveView?: unknown; onOpen?(): void; onSelect?(index: number): void; screenshots: readonly CloudBrowserScreenshot[]; variant?: "compact" | "expanded" }) => unknown;
 }
-declare module "@rchunk/chatgpt-sources-side-panel-tab";
-declare module "@rchunk/open-audio-summary-dialog";
-declare module "@rchunk/open-conversation-files";
+declare module "@rchunk/chatgpt-sources-side-panel-tab" {
+  export type ChatGptSourceKind = "app" | "file" | "link" | "memory" | "skill" | "web";
+  export interface ChatGptSource { attribution?: string | null; conversationContextType?: "general_memory" | "past_conversation" | "user_instructions" | "user_memory" | null; href?: string | null; key: string; kind: ChatGptSourceKind; label: string; memoryId?: string | null; snippet?: string | null; url?: string | null }
+  export interface ChatGptSourcesSidePanelTabProps { conversationId?: string | null; inputCount?: number; isLoading?: boolean; onDeleteMemory?(source: ChatGptSource): Promise<void> | void; onOpenSource?(source: ChatGptSource): void; presentation?: "side-panel" | "summary"; shouldBlockExternalEgress?: boolean; sourceAccountId?: string | null; sources: readonly ChatGptSource[] }
+  export const ChatGptSourcesSidePanelTab: (props: ChatGptSourcesSidePanelTabProps) => unknown;
+  export const ChatGptSummarySourcesCount: (props: { inputCount?: number; sourceAccountId?: string | null; sources: readonly ChatGptSource[] }) => unknown;
+}
+declare module "@rchunk/open-audio-summary-dialog" {
+  export interface AudioSummaryDialogRequest { conversationId: string; format?: "executive_briefing" | "podcast" | "study_guide"; instructions?: string }
+  export const openAudioSummaryDialog: (host: { openDialog?(id: string, request: AudioSummaryDialogRequest): void }, conversationId: string) => void;
+}
+declare module "@rchunk/open-conversation-files" {
+  export interface ConversationFilesRequest { accountId?: string | null; conversationId?: string | null; userId?: string | null; [key: string]: unknown }
+  export const openConversationFiles: (host: { accountId?: string | null; userId?: string | null; openPanel?(panel: { id: string; kind: string; props: ConversationFilesRequest; target: "right"; title: string }): void }, request?: ConversationFilesRequest) => void;
+}
+declare module "@rchunk/chatgpt-about-you-summary-panel";
+declare module "@rchunk/chatgpt-saved-memories-panel";
+declare module "@rchunk/chatgpt-personalization-route";
 declare module "@rchunk/chatgpt-entity-side-panel-tab" {
   export interface EntityPanelParameters { memorySource?: string | null; sourceId?: string | null; [key: string]: unknown }
   export const ChatGptEntitySidePanelTab: (props: { conversationId: string; params: EntityPanelParameters; renderEntity?(input: { conversationId: string; flushTop: boolean; params: EntityPanelParameters }): unknown }) => unknown;
