@@ -4490,9 +4490,29 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/pull-request-code-review-navigation-core" {
+  export const C: (...arguments_: unknown[]) => void;
+  export const S: (...arguments_: unknown[]) => void;
+  export const _: symbol;
+  export const a: symbol;
+  export const b: (...arguments_: unknown[]) => void;
+  export const c: symbol;
+  export const d: symbol;
+  export const f: symbol;
+  export const g: symbol;
+  export const h: symbol;
+  export const i: () => void;
+  export const l: symbol;
+  export const m: symbol;
   export const n: () => void;
-  export const r: (...arguments_: unknown[]) => unknown;
-  export const t: (...arguments_: unknown[]) => unknown;
+  export const o: symbol;
+  export const p: symbol;
+  export const r: (...arguments_: unknown[]) => void;
+  export const s: symbol;
+  export const t: (scope: { value?: { pathname?: string } }, request: Record<string, unknown>, path: string) => string;
+  export const u: symbol;
+  export const v: (...arguments_: unknown[]) => void;
+  export const x: (...arguments_: unknown[]) => void;
+  export const y: (...arguments_: unknown[]) => void;
 }
 
 declare module "@rchunk/pull-request-revision-queries-core" {
@@ -5485,10 +5505,24 @@ declare module "@rchunk/mcp-view-surface" {
   export const t: (props: { isLoading?: boolean; loadingContent?: unknown; partition?: string; showBackButton?: boolean; src: string; webviewRef?(element: unknown): void }) => unknown;
 }
 
-declare module "@rchunk/diff-preview-content";
+declare module "@rchunk/diff-preview-content" {
+  export const DiffHighlightPreloader: (props: { fileDiff: unknown }) => unknown;
+  export const DiffPreviewContent: (props: { diff: { metadata?: unknown }; displayPath?: string; linesAdded?: number; linesRemoved?: number; onOpen?(event?: unknown): void }) => unknown;
+}
 declare module "@rchunk/ansi-block";
 declare module "@rchunk/shell-label";
 declare module "@rchunk/stripe-pure";
+declare module "@rchunk/shiki-highlight-provider";
+declare module "@rchunk/codex-diff-css";
+declare module "@rchunk/diff-worker-runtime";
+declare module "@rchunk/diff-worker-algorithm";
+declare module "@rchunk/diff-worker-model";
+declare module "@rchunk/diff-worker-renderer";
+declare module "@rchunk/diff-worker-utils";
+declare module "@rchunk/pull-request-actions";
+declare module "@rchunk/pull-request-revision-tab";
+declare module "@rchunk/registered-pull-request-thumbnail";
+declare module "@rchunk/virtualized-file-diff-line-position";
 
 declare module "@rchunk/detail-page" {
   export const n: (props: { children?: unknown }) => unknown;
@@ -5902,7 +5936,7 @@ declare module "@rchunk/conversation-markdown" {
 }
 
 declare module "@rchunk/open-thread-pull-request-code-tab" {
-  export const n: (...arguments_: unknown[]) => unknown;
+  export const n: (...arguments_: unknown[]) => { tabId: string; placement: string; status: "opened" };
   export const t: () => void;
 }
 
@@ -5953,8 +5987,8 @@ declare module "@rchunk/local-conversation-sources-signals" {
 
 declare module "@rchunk/open-thread-pull-request-side-panel-tab" {
   export const i: (...arguments_: unknown[]) => Promise<boolean>;
-  export const n: (...arguments_: unknown[]) => unknown;
-  export const r: (...arguments_: unknown[]) => unknown;
+  export const n: (...arguments_: unknown[]) => boolean;
+  export const r: (...arguments_: unknown[]) => boolean;
   export const t: () => void;
 }
 
@@ -11180,23 +11214,29 @@ declare module "@rchunk/pull-request-readonly-comment" {
 }
 
 declare module "@rchunk/review-row" {
+  export const n: () => void;
+  export const t: (props: { authorAvatar?: unknown; children?: unknown; disabled?: boolean; loading?: boolean; layout?: "inline" | "card"; showSubmit?: boolean; submitLabel?: string; submitType?: "button" | "submit"; onSubmit?(): void }) => unknown;
   const _default: unknown;
   export default _default;
 }
 
 declare module "@rchunk/diff-core" {
   export const n: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const t: ReadonlyArray<Readonly<Record<string, unknown>>>;
 }
 
 declare module "@rchunk/file-diff-alt" {
+  export const i: () => void;
   export const n: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const r: (props: { children?: unknown }) => unknown;
+  export const t: (props: { alignCommentGutter?: boolean; fileDiff: unknown; lineDiffType?: string; [key: string]: unknown }) => unknown;
 }
 
 declare module "@rchunk/file-diff-presentation-core" {
+  export const i: (input?: { diffStyle?: string; lineDiffType?: string }) => { diffStyle: string; lineDiffType: string; hunkSeparators: string };
   export const n: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const r: () => void;
+  export const t: (props: { fileDiff: unknown; diffStyle?: string; lineDiffType?: string; hunkSeparators?: string; onPostRender?(): void; [key: string]: unknown }) => unknown;
 }
 
 declare module "@rchunk/register-pierre-themes" {
