@@ -4621,6 +4621,26 @@ declare module "@rchunk/personal-vault-settings" {
   export const PersonalVaultSettings: (props: { onBack(): void }) => unknown;
 }
 
+declare module "@rchunk/artifact-preview-page-navigation" {
+  export interface PageNavigationOptions { containerRef: { current: Element | null }; initialPage?: number; isPageLayoutReady: boolean; onPageChange?(page: number): void; pageSelector: string; totalPages: number; }
+  export interface PageNavigation { currentPage: number; goToPage(page: number, behavior?: ScrollBehavior): void; goToNextPage(): void; goToPreviousPage(): void; }
+  export const n: (options: PageNavigationOptions) => PageNavigation;
+  export const t: () => void;
+}
+
+declare module "@rchunk/keyboard-shortcuts-dialog" {
+  export interface KeyboardShortcutItem { description?: string; id: string; section: string; shortcutLabels: string[]; title: string; }
+  export const KeyboardShortcutsDialog: (props: { commands?: readonly KeyboardShortcutItem[]; onOpenChange(open: boolean): void }) => unknown;
+}
+
+declare module "@rchunk/keyboard-shortcuts-gate";
+declare module "@rchunk/keyboard-shortcut-command-order";
+
+declare module "@rchunk/changelog-modal" {
+  export interface ChangelogPost { bodyMarkdown: string; date: string; image?: string | null; summary?: string | null; title: string; url: string; version?: string | null; }
+  export const ChangelogModal: (props: { onClose(): void; post: ChangelogPost }) => unknown;
+}
+
 declare module "@rchunk/pull-request-code-review-navigation-core" {
   export const C: (...arguments_: unknown[]) => void;
   export const S: (...arguments_: unknown[]) => void;
