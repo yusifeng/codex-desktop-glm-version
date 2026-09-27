@@ -4141,7 +4141,20 @@ declare module "@rchunk/codex-thread-report-dialog" {
 }
 
 declare module "@rchunk/chatgpt-project-report-dialog" {
-  export const ChatGptProjectReportDialog: (...args: any[]) => any;
+  export interface ChatGptProject {
+    gizmo: {
+      display: { name: string };
+      id: string;
+    };
+  }
+  export interface ChatGptProjectReportDialogProps {
+    accountId: string;
+    onClose(): void;
+    project: ChatGptProject;
+  }
+  export const ChatGptProjectReportDialog: (
+    props: ChatGptProjectReportDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/gpt-report-menu-item" {
