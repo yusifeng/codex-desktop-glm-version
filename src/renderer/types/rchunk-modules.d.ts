@@ -5233,6 +5233,20 @@ declare module "@rchunk/automation-share-dialog";
 declare module "@rchunk/binary-preview-source";
 declare module "@rchunk/surface";
 declare module "@rchunk/pdf-preview-diff";
+declare module "@rchunk/conversation-diff-comments";
+declare module "@rchunk/artifact-preview-header";
+declare module "@rchunk/compact-empty-state";
+declare module "@rchunk/file-viewer-frame";
+declare module "@rchunk/text-file-editor-tab-content";
+declare module "@rchunk/gate";
+declare module "@rchunk/File";
+declare module "@rchunk/file-blank";
+declare module "@rchunk/review-file-source-breadcrumb" {
+  export const a: () => void; export const c: () => void; export const d: (line: number, lineCount: number) => number; export const i: () => void; export const l: (contents: string) => number; export const n: () => void; export const o: (element: HTMLElement, line: number, character: number) => boolean; export const r: (props: Record<string, unknown>) => unknown; export const s: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; export const u: (value: string, lineCount?: number) => number | null;
+}
+declare module "@rchunk/review-file-tree-side-pane" { export interface ReviewFile { additions?: number; comments?: number; deletions?: number; generated?: boolean; path: string; status?: string } export const a: (props: Record<string, unknown>) => unknown; export const c: (input: Record<string, unknown>) => { commentProps: Record<string, unknown> }; export const i: () => void; export const n: () => void; export const o: () => void; export const r: (props: Record<string, unknown>) => unknown; export const s: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/review-file-source-item" { export type PreviewKind = "audio" | "image" | "pdf" | "presentation" | "spreadsheet" | "text" | "video" | "word-document"; export interface ReviewFileSourceProps { contents?: string | null; contentKind?: string | null; cwd?: string | null; error?: unknown; headerActions?: unknown; hideFileNavigation?: boolean; hostId?: string; isActive?: boolean; isLoading?: boolean; onOpenLocation?(location: unknown): void; onSelectFile?(path: string, options?: { preview?: boolean }): void; path?: string | null; renderSlots?(slots: { content: unknown; headerRows: unknown[] }): unknown; workspaceRoot?: string | null; workspaceRoots?: string[] } export const n: () => void; export const t: (props: ReviewFileSourceProps) => unknown; }
+declare module "@rchunk/editable-review-file-source-tab-content" { export const EditableReviewFileSourceTabContent: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/diff-source" {
   export interface DiffHunk { hunkId: string; lineEnd: number; lineMapping?: "contiguous" | string; lineSpans?: Array<{ end: number; lineEnd: number; lineStart: number; side?: "left" | "right" | "unified"; start: number }>; lineStart: number; text: string }
   export interface DiffFile { hunks: DiffHunk[]; path: string }
