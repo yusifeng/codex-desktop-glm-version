@@ -8,9 +8,27 @@ import * as stripeConfirmationChunk from "@rchunk/stripe-payment-confirmation";
 
 void runtimeChunk;
 
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const stripeConfirmation = stripeConfirmationChunk as Record<string, any>;
+const { vW: expectedAccountIdHeader, wL: initializeAppSharedRuntime } =
+  appSharedChunk;
+const {
+  NF: updateSubscription,
+  Sdn: ApiResponseError,
+  Sun: initializeSubscriptionState,
+  _un: currentUserIdSignal,
+  cJt: initializeApiClient,
+  jF: clearPendingSubscriptionUpdate,
+  kF: initializePendingSubscriptionUpdate,
+  mun: currentAccountIdSignal,
+  rJt: subscriptionApiClient,
+  wdn: initializeSubscriptionUpdate,
+} = appInitialChunk;
+const {
+  a: getStripeErrorReason,
+  n: getPaymentIntentFailureReason,
+  o: initializeStripeIntentHelpers,
+  r: initializeStripeErrorHelpers,
+  t: confirmStripePaymentWithRetry,
+} = stripeConfirmationChunk;
 
 const UPI_NEXT_ACTION = "upi_handle_redirect_or_display_qr_code";
 const PIX_NEXT_ACTION = "pix_display_qr_code";
@@ -26,13 +44,40 @@ type UpgradeResult =
     }
   | { status: "request_failed"; error: Error };
 
+type SubscriptionPlan = import("@rchunk/app-initial").SubscriptionPlan;
+type SubscriptionUpdateResult =
+  import("@rchunk/app-initial").SubscriptionUpdateResult;
+type StripeConfirmationResult =
+  import("@rchunk/stripe-payment-confirmation").StripeConfirmationResult;
+
+interface StripeClient {
+  confirmCardPayment(clientSecret: string): Promise<StripeConfirmationResult>;
+  confirmPayment(input: {
+    clientSecret: string;
+    confirmParams: { return_url: string };
+    redirect: "if_required";
+  }): Promise<StripeConfirmationResult>;
+  confirmPixPayment(clientSecret: string): Promise<StripeConfirmationResult>;
+  confirmSetup(input: {
+    clientSecret: string;
+    confirmParams: { return_url: string };
+    redirect: "if_required";
+  }): Promise<import("@rchunk/stripe-payment-confirmation").StripeSetupResult>;
+}
+
+interface UpgradeScope {
+  get(
+    signal: import("@rchunk/app-shared").ReadableSignal<string | null>,
+  ): string | null;
+}
+
 interface ConfirmUpgradeOptions {
   accountId: string;
-  updatedPlan: unknown;
+  updatedPlan: SubscriptionPlan;
   userId: string;
   isActive(): boolean;
   signal?: AbortSignal;
-  stripe: any;
+  stripe: StripeClient;
   willRenew: boolean;
   promoCode?: string | null;
   promoCampaign?: string | null;
@@ -45,11 +90,11 @@ interface ConfirmUpgradeOptions {
 }
 
 function confirmPaymentIntent(
-  stripe: any,
+  stripe: StripeClient,
   clientSecret: string,
   nextActionType: string | null,
   recoveryEnabled: boolean,
-): Promise<any> {
+): Promise<StripeConfirmationResult> {
   if (recoveryEnabled && nextActionType === PIX_NEXT_ACTION) {
     return stripe.confirmPixPayment(clientSecret);
   }
@@ -63,6 +108,18 @@ function confirmPaymentIntent(
   return stripe.confirmCardPayment(clientSecret);
 }
 
+interface ConfirmRequiredActionOptions {
+  cleanupPendingSubscriptionUpdate(
+    paymentIntentId: string | undefined,
+    invoiceId: string | undefined,
+  ): void;
+  isOpen(): boolean;
+  isPaymentMethodRecoveryEnabled: boolean;
+  isStripeClientBootstrapError: boolean;
+  stripePromise: Promise<StripeClient> | null;
+  updateResult: SubscriptionUpdateResult;
+}
+
 async function confirmRequiredAction({
   updateResult,
   stripePromise,
@@ -70,7 +127,7 @@ async function confirmRequiredAction({
   isPaymentMethodRecoveryEnabled,
   isOpen,
   cleanupPendingSubscriptionUpdate,
-}: Record<string, any>): Promise<UpgradeResult> {
+}: ConfirmRequiredActionOptions): Promise<UpgradeResult> {
   if (updateResult.status !== "requires_action") return { status: "complete" };
   const paymentFailed = (reason: string): UpgradeResult => {
     cleanupPendingSubscriptionUpdate(
@@ -109,7 +166,7 @@ async function confirmRequiredAction({
       );
       return { status: "closed" };
     }
-    const confirmation = await stripeConfirmation.t({
+    const confirmation = await confirmStripePaymentWithRetry({
       confirmPaymentIntent: () =>
         confirmPaymentIntent(
           stripe,
@@ -131,7 +188,7 @@ async function confirmRequiredAction({
         throw new Error(confirmation.error.message);
       }
       if (isPaymentMethodRecoveryEnabled) {
-        return paymentFailed(stripeConfirmation.a(confirmation.error));
+        return paymentFailed(getStripeErrorReason(confirmation.error));
       }
       throw new Error(confirmation.error.message);
     }
@@ -146,7 +203,7 @@ async function confirmRequiredAction({
       return { status: "pending" };
     }
     if (paymentIntent != null) {
-      const reason = stripeConfirmation.n(paymentIntent);
+      const reason = getPaymentIntentFailureReason(paymentIntent);
       if (
         reason != null &&
         (paymentIntent.status === "requires_payment_method" ||
@@ -172,7 +229,7 @@ async function confirmRequiredAction({
 }
 
 async function classifyUpdateResult(
-  input: Record<string, any>,
+  input: ConfirmRequiredActionOptions,
 ): Promise<UpgradeResult> {
   const updateResult = input.updateResult;
   if (updateResult.status === "pending") return { status: "pending" };
@@ -201,7 +258,7 @@ async function classifyUpdateResult(
 }
 
 async function confirmSubscriptionUpgrade(
-  scope: any,
+  scope: UpgradeScope,
   options: ConfirmUpgradeOptions,
 ): Promise<UpgradeResult> {
   const { accountId, updatedPlan, userId } = options;
@@ -213,13 +270,13 @@ async function confirmSubscriptionUpgrade(
   const cancelCompensatingRenewal = async () => {
     if (
       renewedSubscription &&
-      scope.get(appInitial.mun) === accountId &&
-      scope.get(appInitial._un) === userId
+      scope.get(currentAccountIdSignal) === accountId &&
+      scope.get(currentUserIdSignal) === userId
     ) {
       renewedSubscription = false;
-      await appInitial.rJt.safePost("/subscriptions/cancel", {
+      await subscriptionApiClient.safePost("/subscriptions/cancel", {
         requestBody: { account_id: accountId },
-        additionalHeaders: { [appShared.vW]: accountId },
+        additionalHeaders: { [expectedAccountIdHeader]: accountId },
       });
     }
   };
@@ -230,10 +287,10 @@ async function confirmSubscriptionUpgrade(
       updateReturned = false;
       if (!options.isActive()) return { status: "closed" };
       if (!options.willRenew && !options.promoCode) {
-        await appInitial.rJt.safePost("/subscriptions/renew", {
+        await subscriptionApiClient.safePost("/subscriptions/renew", {
           requestBody: { account_id: accountId },
           signal: options.signal,
-          additionalHeaders: { [appShared.vW]: accountId },
+          additionalHeaders: { [expectedAccountIdHeader]: accountId },
         });
         renewedSubscription = true;
         if (!options.isActive()) return { status: "closed" };
@@ -249,7 +306,7 @@ async function confirmSubscriptionUpgrade(
 
       options.onSubmit?.();
       submitted = true;
-      const updateResult = await appInitial.NF({
+      const updateResult = await updateSubscription({
         accountId,
         updatedPlan,
         promoCampaign: options.promoCampaign,
@@ -274,30 +331,25 @@ async function confirmSubscriptionUpgrade(
           invoiceId: string | undefined,
         ) => {
           if (
-            scope.get(appInitial.mun) === accountId &&
-            scope.get(appInitial._un) === userId
+            scope.get(currentAccountIdSignal) === accountId &&
+            scope.get(currentUserIdSignal) === userId
           ) {
-            cleanupPromise = appInitial
-              .jF({
-                accountId,
-                expectedPaymentIntentId: paymentIntentId,
-                pendingUpdateInvoiceId: invoiceId,
-                expectedAccountId: accountId,
-              })
-              .then(
-                () => undefined,
-                (error: unknown) => {
-                  cleanupError =
-                    error instanceof Error
-                      ? error
-                      : new Error(
-                          "Unable to clear pending subscription update",
-                          {
-                            cause: error,
-                          },
-                        );
-                },
-              );
+            cleanupPromise = clearPendingSubscriptionUpdate({
+              accountId,
+              expectedPaymentIntentId: paymentIntentId,
+              pendingUpdateInvoiceId: invoiceId,
+              expectedAccountId: accountId,
+            }).then(
+              () => undefined,
+              (error: unknown) => {
+                cleanupError =
+                  error instanceof Error
+                    ? error
+                    : new Error("Unable to clear pending subscription update", {
+                        cause: error,
+                      });
+              },
+            );
           }
         },
       }).finally(() => cleanupPromise);
@@ -322,7 +374,7 @@ async function confirmSubscriptionUpgrade(
         if (confirmation.error) {
           return {
             status: "payment_method_failed",
-            reason: stripeConfirmation.a(confirmation.error),
+            reason: getStripeErrorReason(confirmation.error),
             source: "confirmation",
           };
         }
@@ -345,7 +397,7 @@ async function confirmSubscriptionUpgrade(
     if (!options.isActive()) return { status: "closed" };
     if (cleanupError != null) return { status: "unknown" };
     const isClientHttpError =
-      error instanceof appInitial.Sdn &&
+      error instanceof ApiResponseError &&
       error.status >= 400 &&
       error.status < 500 &&
       error.status !== 408;
@@ -372,17 +424,17 @@ async function confirmSubscriptionUpgrade(
 }
 
 function initializePaymentActionConstants(): void {
-  stripeConfirmation.r?.();
-  stripeConfirmation.o?.();
+  initializeStripeErrorHelpers();
+  initializeStripeIntentHelpers();
 }
 
 function initializeConfirmSubscriptionUpgrade(): void {
   initializePaymentActionConstants();
-  appShared.wL?.();
-  appInitial.Sun?.();
-  appInitial.cJt?.();
-  appInitial.kF?.();
-  appInitial.wdn?.();
+  initializeAppSharedRuntime();
+  initializeSubscriptionState();
+  initializeApiClient();
+  initializePendingSubscriptionUpdate();
+  initializeSubscriptionUpdate();
 }
 
 export {

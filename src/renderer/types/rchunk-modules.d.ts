@@ -3398,6 +3398,58 @@ declare module "@rchunk/app-initial" {
   export const r7: () => void;
   export const sP: () => void;
   export type SubscriptionPlan = "go" | "plus" | "prolite" | "pro";
+  export interface SubscriptionPaymentIntent {
+    client_secret?: string | null;
+    id: string;
+    next_action_type?: unknown;
+  }
+  export type SubscriptionUpdateResult =
+    | { status: "complete" | "pending" }
+    | {
+        status: "payment_method_failed";
+        payment_method_failure_detail?: string | null;
+        payment_method_failure_reason?: string | null;
+        pending_update_invoice_id?: string;
+        pending_update_payment_intent_id?: string;
+      }
+    | {
+        status: "requires_action";
+        payment_intent: SubscriptionPaymentIntent;
+        pending_update_invoice_id?: string;
+      }
+    | {
+        status: "setup_required";
+        setup_intent_client_secret: string;
+      };
+  export interface UpdateSubscriptionInput {
+    accountId: string;
+    expectedAccountId: string;
+    paymentMethodId?: string | null;
+    promoCampaign?: string | null;
+    promoCode?: string | null;
+    setupIntentId?: string;
+    signal?: AbortSignal;
+    updatedPlan: SubscriptionPlan;
+  }
+  export interface ClearPendingSubscriptionUpdateInput {
+    accountId: string;
+    expectedAccountId: string;
+    expectedPaymentIntentId?: string;
+    pendingUpdateInvoiceId?: string;
+  }
+  export class Sdn extends Error {
+    readonly status: number;
+  }
+  /** 提交订阅套餐更新。 */
+  export const NF: (
+    input: UpdateSubscriptionInput,
+  ) => Promise<SubscriptionUpdateResult>;
+  /** 清除服务器上的待处理订阅更新。 */
+  export const jF: (
+    input: ClearPendingSubscriptionUpdateInput,
+  ) => Promise<void>;
+  export const kF: () => void;
+  export const wdn: () => void;
   /** 订阅产品类型到内部 plan 值的稳定映射。 */
   export const Pdn: {
     readonly GO: "go";
@@ -3463,6 +3515,65 @@ declare module "@rchunk/subscription-update-plan" {
   export const t: (
     plan: import("@rchunk/app-initial").SubscriptionPlan,
   ) => SubscriptionPlanSlug | undefined;
+}
+
+declare module "@rchunk/confirm-subscription-upgrade" {
+  export interface StripeClient {
+    confirmCardPayment(
+      clientSecret: string,
+    ): Promise<import("@rchunk/stripe-payment-confirmation").StripeConfirmationResult>;
+    confirmPayment(input: {
+      clientSecret: string;
+      confirmParams: { return_url: string };
+      redirect: "if_required";
+    }): Promise<import("@rchunk/stripe-payment-confirmation").StripeConfirmationResult>;
+    confirmPixPayment(
+      clientSecret: string,
+    ): Promise<import("@rchunk/stripe-payment-confirmation").StripeConfirmationResult>;
+    confirmSetup(input: {
+      clientSecret: string;
+      confirmParams: { return_url: string };
+      redirect: "if_required";
+    }): Promise<import("@rchunk/stripe-payment-confirmation").StripeSetupResult>;
+  }
+  export interface UpgradeScope {
+    get(
+      signal: import("@rchunk/app-shared").ReadableSignal<string | null>,
+    ): string | null;
+  }
+  export interface ConfirmUpgradeOptions {
+    accountId: string;
+    isActive(): boolean;
+    isPaymentMethodRecoveryEnabled?: boolean;
+    isPendingUpdateError(error: unknown): boolean;
+    mandateRecovery?: boolean;
+    onSubmit?(): void;
+    paymentMethodId?: string | null;
+    promoCampaign?: string | null;
+    promoCode?: string | null;
+    revalidatePaymentMethod(): Promise<boolean>;
+    signal?: AbortSignal;
+    stripe: StripeClient;
+    updatedPlan: import("@rchunk/app-initial").SubscriptionPlan;
+    userId: string;
+    willRenew: boolean;
+  }
+  export type UpgradeResult =
+    | { status: "complete" | "pending" | "closed" | "unknown" }
+    | { status: "setup_required"; setupIntentClientSecret: string }
+    | {
+        status: "payment_method_failed";
+        reason: string;
+        detail?: string | null;
+        source: "update" | "confirmation";
+      }
+    | { status: "request_failed"; error: Error };
+  export const n: () => void;
+  export const r: () => void;
+  export const t: (
+    scope: UpgradeScope,
+    options: ConfirmUpgradeOptions,
+  ) => Promise<UpgradeResult>;
 }
 
 declare module "@rchunk/app-primary" {
@@ -4758,15 +4869,32 @@ declare module "@rchunk/offer-notice" {
 }
 
 declare module "@rchunk/stripe-payment-confirmation" {
-  export const a: (error: unknown) => string;
+  export interface StripeError {
+    code?: string;
+    message?: string;
+    reason?: string;
+  }
+  export interface StripePaymentIntent {
+    id?: string;
+    status: string;
+  }
+  export interface StripeConfirmationResult {
+    error?: StripeError;
+    paymentIntent?: StripePaymentIntent;
+  }
+  export interface StripeSetupResult {
+    error?: StripeError;
+    setupIntent?: { id: string; status: string };
+  }
+  export const a: (error: StripeError) => string;
   export const i: string;
-  export const n: (paymentIntent: unknown) => string | null;
+  export const n: (paymentIntent: StripePaymentIntent) => string | null;
   export const o: () => void;
   export const r: () => void;
   export const t: (input: {
-    confirmPaymentIntent: () => Promise<unknown>;
+    confirmPaymentIntent: () => Promise<StripeConfirmationResult>;
     shouldRetry: () => boolean;
-  }) => Promise<any>;
+  }) => Promise<StripeConfirmationResult>;
 }
 
 declare module "@rchunk/wallet-onboarding-announcement-modal" {
