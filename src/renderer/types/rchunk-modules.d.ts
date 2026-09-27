@@ -131,6 +131,10 @@ declare module "@rchunk/app-shared" {
   export const Qh: (props: LoadingSpinnerProps) => unknown;
   export const Xh: (props: Omit<ButtonProps, "as">) => unknown;
   export const Yh: (props: ButtonProps) => unknown;
+  /** Outbound identity provider brand icon assets. */
+  export const Bt: IconAssetPreset;
+  export const Vt: IconAssetPreset;
+  export const an: IconAssetPreset;
   /** initializeChevronAsset（面包屑分隔符资源初始化器）。 */
   export const Xd: () => void;
   /** initializeButton（app-shared/ui/button.ts，内部 c8）。 */
@@ -403,6 +407,7 @@ declare module "@rchunk/app-shared" {
   ) => LazyComponent<Props>;
   /** initializeLazyComponent（内部 sct）。 */
   export const Xm: () => void;
+  export const Ym: (text: string, event?: unknown) => void;
   export interface QueryOptionsShape {
     queryKey: readonly unknown[];
   }
@@ -630,6 +635,11 @@ declare module "@rchunk/app-shared" {
   export const Lf: (props: SwitchProps) => unknown;
   /** initializeSwitch（内部 Zdt）。 */
   export const Rf: () => void;
+  export const nf: () => void;
+  export const on: () => void;
+  export const tf: (props: Record<string, unknown>) => unknown;
+  export const zt: () => void;
+  export const Ht: () => void;
   export type SettingsRowVariant =
     | "default" | "featured" | "recommendation" | "stacked" | "nested";
   export type SettingsRowSize = "default" | "compact";
@@ -5913,7 +5923,25 @@ declare module "@rchunk/category-plugins-query" {
 declare module "@rchunk/hosted-plugin-create-dialog" {
   export const HostedPluginCreateDialog: (props: { canCreateMcpApp: boolean; canUploadArchive: boolean; initialMode?: "archive" | "mcp"; isPending?: boolean; onAppCreated?(app: Record<string, unknown>): void; onArchiveCreated?(plugin: Record<string, unknown>): void; onClose(): void }) => unknown;
 }
-declare module "@rchunk/mcp-oauth-runtime";
+declare module "@rchunk/mcp-oauth-runtime" {
+  export interface DropzoneOptions {
+    accept?: Record<string, string[]>;
+    disabled?: boolean;
+    multiple?: boolean;
+    noClick?: boolean;
+    noKeyboard?: boolean;
+    onDrop?(acceptedFiles: File[], rejectedFiles: unknown[]): void;
+    onError?(error: unknown): void;
+  }
+  export interface DropzoneResult {
+    getInputProps(props?: Record<string, unknown>): Record<string, unknown>;
+    getRootProps(props?: Record<string, unknown>): Record<string, unknown>;
+    inputRef: { current: { disabled?: boolean; isConnected?: boolean } | null };
+    open(): void;
+  }
+  export const n: (options: DropzoneOptions) => DropzoneResult;
+  export const t: () => void;
+}
 declare module "@rchunk/plugins-page" { export const i: () => void; export const n: () => void; export const r: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; }
 
 declare module "@rchunk/skills-page-core" {
@@ -5968,7 +5996,12 @@ declare module "@rchunk/plugin-detail-page-core" {
 
 declare module "@rchunk/app-connect-link-navigation"; declare module "@rchunk/plugin-connector-setup";
 declare module "@rchunk/use-plugin-scheduled-tasks"; declare module "@rchunk/apps-availability";
-declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-card"; declare module "@rchunk/api";
+declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-card";
+declare module "@rchunk/api" {
+  export const a: (file: File) => string | null;
+  export const o: () => void;
+  export const s: (pluginId: string, accountId: string, file: File) => Promise<unknown>;
+}
 declare module "@rchunk/share-menu-item" {
   export interface SharePlugin { can_publish_to_workspace?: boolean; can_share_to_workspace?: boolean; canonical_app_id?: string | null; creator_account_user_id?: string | null; discoverability?: string | null; installPolicy?: string; installed?: boolean; is_deletable_workspace_plugin?: boolean; scope?: "GLOBAL" | "USER" | "WORKSPACE"; source?: { type?: string }; workspace_id?: string | null; [key: string]: unknown }
   export interface ShareAccount { account_user_id?: string; account_user_role?: string; id: string; structure: "personal" | "workspace" }
@@ -5985,7 +6018,25 @@ declare module "@rchunk/local-conversation-side-chat" { export const i: { id: st
 declare module "@rchunk/local-conversation-git-actions" { export const i: () => void; export const n: () => void; export const r: (props: { phase: string }) => unknown; export const t: (props: Record<string, unknown> & { target: { hostId: string } }) => unknown; }
 declare module "@rchunk/open-in-google-drive-menu-item" { export const a: (path: string) => "document" | "presentation" | "spreadsheet" | null; export const c: (input: Record<string, unknown>) => void; export const i: () => void; export const n: () => unknown; export const o: () => void; export const r: (props: { onOpen?(): void; path?: string; targetType?: "document" | "presentation" | "spreadsheet" }) => unknown; export const s: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/registered-conversation-thumbnail";
-declare module "@rchunk/plugin-share-dialogs-runtime";
+declare module "@rchunk/plugin-share-dialogs-runtime" {
+  export interface HostedPlugin extends Record<string, unknown> {
+    id: string;
+    release: { display_name: string };
+    scope: "USER" | string;
+  }
+  export const PluginDeleteDialog: (props: {
+    accountId: string;
+    onClose(): void;
+    onDeleted(): Promise<void> | void;
+    plugin: HostedPlugin;
+  }) => unknown;
+  export const PluginUploadDialog: (props: {
+    accountId: string;
+    onClose(): void;
+    onUpdated?(): void;
+    pluginId: string;
+  }) => unknown;
+}
 declare module "@rchunk/loading-page";
 declare module "@rchunk/plugin-share-dialog-entry";
 declare module "@rchunk/thread-shell-runtime";
@@ -9165,7 +9216,24 @@ declare module "@rchunk/environment-configuration-fields" {
   export const t: (props: Record<string, unknown> & { draft: EnvironmentDraft; onDraftChange(change: Partial<EnvironmentDraft>): void; secrets: EnvironmentSecret[]; setSecrets(secrets: EnvironmentSecret[]): void }) => unknown;
 }
 declare module "@rchunk/diff-file-view" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
-declare module "@rchunk/outbound-identity-connection-dialog" { export const OutboundIdentityConnectionDialog: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/outbound-identity-connection-dialog" {
+  export interface OutboundIdentityConnection extends Record<string, unknown> {
+    connection_id: string;
+    display_name?: string;
+    provider_kind: "azure" | "aws" | "gcp";
+  }
+  export const OutboundIdentityConnectionDialog: (props: {
+    connection?: OutboundIdentityConnection | null;
+    isOpen: boolean;
+    onClose(): void;
+    onSubmit(input: Record<string, unknown>): Promise<{
+      data?: OutboundIdentityConnection;
+      error?: string;
+      ok: boolean;
+      status?: number;
+    }>;
+  }) => unknown;
+}
 declare module "@rchunk/code-editor-runtime" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/outbound-identity-error" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/publish-actions" {
@@ -10108,6 +10176,16 @@ declare module "@rchunk/app-initial" {
   ) => unknown;
   /** Browser MFA access token bridge. */
   export const Vun: () => Promise<{ accessToken: string } | null>;
+  /** Outbound identity connection form dependencies. */
+  export const $W: () => void;
+  export const Jat: (props: Record<string, unknown>) => unknown;
+  export const QW: (props: Record<string, unknown>) => unknown;
+  export const Xat: (props: Record<string, unknown>) => unknown;
+  export const Yat: {
+    parse(value: unknown): Record<string, unknown>;
+  };
+  export const bmt: () => void;
+  export const xmt: () => void;
   /** Cloud environment connector constants。 */
   export const Jr: string;
   export const Kr: string;
