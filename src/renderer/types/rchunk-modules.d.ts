@@ -8249,10 +8249,91 @@ declare module "@rchunk/drawing-size-slider" {
 }
 
 declare module "@rchunk/sketch" {
-  export const l: unknown;
-  export const n: (options: unknown) => any;
-  export const o: () => void;
+  export type SketchTool = "pen" | "eraser" | "line" | "arrow" | "rectangle" | "ellipse" | "triangle" | "diamond" | "star" | "heart" | "text" | "comment" | "select";
+  export interface Point { x: number; y: number; pressure?: number; breakBefore?: boolean }
+  export interface Bounds { x: number; y: number; width: number; height: number }
+  export interface SketchStyle { color: string; width: number }
+  export interface TextFormat { bold: boolean; italic: boolean; underline: boolean }
+  export interface SketchObject extends Record<string, unknown> { id: string; kind: string }
+  export interface SketchDocument { schemaVersion?: 1; objects: SketchObject[]; [key: string]: unknown }
+  export interface SketchSnapshot {
+    document: SketchDocument;
+    effectiveDocument: SketchDocument;
+    hasPendingTextEdit: boolean;
+    activeTool: SketchTool;
+    eraserSizePx: number;
+    drawingWidthPx?: number;
+    textSizePx?: number;
+    style: SketchStyle;
+    textFormat: TextFormat;
+    selectionId: string | null;
+    canUndo: boolean;
+    canRedo: boolean;
+    hasActiveGesture: boolean;
+    erasurePreview: SketchDocument | null;
+    preview: { object: SketchObject; replaceObjectId?: string; transformKind?: "move" | "resize" } | null;
+    snapGuides: readonly unknown[];
+    cursor: string;
+  }
+  export interface PointerInput { pointerId: number; point: Point; tolerance?: number; viewportScale?: number; shiftKey?: boolean; surfaceBounds?: Bounds; sample?: { timestamp?: number } }
+  export interface PendingTextEdit { objectId?: string; text: string; bounds: Bounds; minHeight?: number; padding?: number; style?: Partial<SketchStyle>; format?: Partial<TextFormat> }
+  export interface ExportOptions { backgroundColor?: string; clipBounds?: Bounds; maxDimension?: number; maxPixelCount?: number; mimeType?: string; outputBounds?: Bounds; padding?: number; scale?: number }
+  export type ExportResult = { kind: "empty" | "unavailable" | "busy" } | { kind: "too-large"; width: number; height: number } | { kind: "success"; blob: Blob; width: number; height: number; bounds: Bounds };
+  export interface SketchEditor {
+    getSnapshot(): SketchSnapshot;
+    subscribe(listener: () => void): () => void;
+    attachTextLayoutResources(resources: unknown): () => void;
+    setPendingTextEdit(edit: PendingTextEdit | null): void;
+    commitPendingTextEdit(): boolean;
+    discardPendingTextEdit(): boolean;
+    setTool(tool: SketchTool): void;
+    setEraserSize(size: number): void;
+    setDrawingWidth(width: number): void;
+    setTextSize(size: number): void;
+    setStyle(style: Partial<SketchStyle>, options?: { historyGroup?: string }): void;
+    setTextFormat(format: Partial<TextFormat>, options?: { historyGroup?: string }): void;
+    insertTextBox(input: Omit<PendingTextEdit, "objectId">): string | null;
+    insertComment(input: { text: string; bounds: Bounds }): string | null;
+    updateComment(id: string, text: string): boolean;
+    pasteObject(object: SketchObject, options?: { offset?: Point }): string | null;
+    updateTextBox(id: string, input: { text: string; bounds?: Bounds }, options?: { historyGroup?: string }): boolean;
+    selectObject(id: string): boolean;
+    deleteObject(id: string): boolean;
+    getObjectAtPoint(point: Point, tolerance?: number): SketchObject | null;
+    clearSelection(): void;
+    deleteSelection(): boolean;
+    clear(): boolean;
+    undo(): boolean;
+    redo(): boolean;
+    replaceDocument(document: { objects: unknown[]; [key: string]: unknown }, options?: { preserveHistory?: boolean }): void;
+    setSurfaceBounds(bounds: Bounds | null): void;
+    nudgeSelection(delta: Point, options?: { historyGroup?: string; viewportScale?: number }): boolean;
+    pointerDown(input: PointerInput): boolean;
+    pointerMove(input: PointerInput): boolean;
+    pointerMoves(inputs: readonly PointerInput[]): boolean;
+    pointerUp(input: PointerInput): boolean;
+    pointerCommit(pointerId?: number): boolean;
+    pointerCancel(pointerId?: number, options?: { preserveReleasedErasure?: boolean }): boolean;
+    pointerLeave(): void;
+    export(options?: ExportOptions): Promise<ExportResult>;
+  }
+  export interface CreateSketchOptions { document?: SketchDocument; tool?: SketchTool; style?: Partial<SketchStyle>; eraserSizePx?: number; drawingWidthPx?: number; textSizePx?: number; textLayoutResources?: unknown }
+  export interface SketchSurfaceProps extends Record<string, unknown> { editor: SketchEditor; surfaceSize: { width: number; height: number }; viewport?: unknown; className?: string; readOnly?: boolean; backgroundColor?: string; "aria-label"?: string; "aria-labelledby"?: string }
+  export const a: () => void;
+  export const c: () => void;
+  export const d: (document: SketchDocument) => SketchObject[];
+  export const f: () => void;
+  export const h: () => void;
+  export const i: (document: SketchDocument, options?: ExportOptions) => Promise<ExportResult>;
+  export const l: (editor: SketchEditor) => SketchSnapshot;
+  export const m: (object: { bounds: Bounds }) => Point;
+  export const n: (options?: CreateSketchOptions) => SketchEditor;
+  export const o: (props: SketchSurfaceProps) => unknown;
+  export const p: (bounds: Bounds, viewportScale?: number) => Bounds;
+  export const r: () => void;
+  export const s: () => void;
   export const t: () => void;
+  export const u: () => void;
 }
 
 declare module "@rchunk/right-panel-composer-overlay-alignment" {

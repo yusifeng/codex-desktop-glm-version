@@ -11,7 +11,7 @@ interface Editor {
   pointerCancel(): void; discardPendingTextEdit(): void; commitPendingTextEdit(): void;
   replaceDocument(document: SketchDocument): void;
   getSnapshot(): { document: SketchDocument; effectiveDocument: SketchDocument; hasActiveGesture: boolean };
-  export(options: unknown): Promise<{ kind: string; blob: Blob }>;
+  export(options: unknown): Promise<{ kind: "success"; blob: Blob } | { kind: "empty" | "unavailable" | "busy" | "too-large" }>;
 }
 interface UploadService {
   subscribe(listener: (ids: string[]) => void): () => void;

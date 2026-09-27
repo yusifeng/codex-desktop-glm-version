@@ -1500,6 +1500,7 @@ export const CHUNKS = {
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "sketch",
   "portable-thumbnail-font-runtime",
   "portable-thumbnail-font-face-source-runtime",
   "portable-thumbnail-pdf-document",
