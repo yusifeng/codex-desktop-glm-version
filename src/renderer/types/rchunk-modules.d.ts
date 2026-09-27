@@ -13324,3 +13324,20 @@ declare module "@rchunk/keyboard-shortcuts-search-input" {
   export const n: () => void;
   export const t: (props: KeyboardShortcutsSearchInputProps) => unknown;
 }
+
+declare module "@rchunk/arrow-curved-right" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/arrow-rotate-ccw" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/bar-chart-icon" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/document-search-icon" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/file-blank-icon" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/filter" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/filter-alt" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/filter-alt-badged" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/folder-light-icon" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/hand-icon" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/plus-sm-icon" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/reddit-logo" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/shield-check" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/text-shorter" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/thumb-mixed" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/twitter-logo" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
