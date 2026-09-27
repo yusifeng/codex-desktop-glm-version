@@ -10218,6 +10218,8 @@ declare module "@rchunk/app-initial" {
     tabById$: unknown;
     tabStateById$: unknown;
     activeTab$?: unknown;
+    closeTab?(tabId: string): void;
+    updateTab?(tabId: string, update: Record<string, unknown>): void;
   };
   export const sg: (parentConversationId: string) => string;
   export const wZt: unknown;
@@ -13611,6 +13613,7 @@ declare module "@rchunk/app-primary" {
     DisclosureRow: (props: Record<string, unknown>) => unknown;
     Item: (props: Record<string, unknown>) => unknown;
   };
+  export const pf: unknown;
 }
 
 declare module "@rchunk/conversation-blocks" {
@@ -13659,6 +13662,39 @@ declare module "@rchunk/registered-conversation-thumbnail" {
   export const RegisteredConversationThumbnail: (
     props: Record<string, unknown>,
   ) => unknown;
+}
+
+declare module "@rchunk/app-shared" {
+  export const Ib: (props: Record<string, unknown>) => unknown;
+  export const mg: (path: string) => (props: Record<string, unknown>) => unknown;
+  export const wy: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/app-initial" {
+  export const Rl: (
+    scope: unknown,
+    tab: { projectId: string; title: string; type: "appgen-app"; url: string },
+  ) => boolean;
+  export const _Bt: (scope: unknown, conversationId: string) => boolean;
+  export const Hl: unknown;
+  export const Lbt: unknown;
+  export const Vl: (projectId: string, previewId: string, revision: unknown) => void;
+  export const zl: (projectId: string | null) => { isOpen?: boolean; projectId: string } | null;
+  export const Xd: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/conversation-thumbnail-ui" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/cloud-automation-detail-panel" {
+  export const r: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/automation-editor-dialog" {
+  export const h: unknown;
+  export const m: unknown;
 }
 
 declare module "@rchunk/app-initial" {
