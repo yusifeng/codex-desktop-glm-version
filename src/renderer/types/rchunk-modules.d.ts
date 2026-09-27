@@ -3061,6 +3061,15 @@ declare module "@rchunk/app-initial" {
   };
   /** 是否由全局状态抑制订阅 onboarding。 */
   export const Gzt: () => boolean;
+  export const _N: () => boolean;
+  export const E4: () => boolean;
+  export const gN: () => void;
+  export const C4: () => void;
+  export const QAt: () => void;
+  export const tjt: (input: {
+    projectType: "remote" | "local";
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>;
+  }) => void;
   export interface SidebarChecklistItemState extends Record<string, unknown> {
     action?: string;
     completed?: boolean;
@@ -4318,7 +4327,15 @@ declare module "@rchunk/building" {
 }
 
 declare module "@rchunk/create-remote-project-modal" {
-  export const CreateRemoteProjectModal: (...args: any[]) => any;
+  export interface RemoteProjectRequest extends Record<string, unknown> {
+    mode?: "pick" | string;
+  }
+  export interface CreateRemoteProjectModalProps {
+    initialRequest?: RemoteProjectRequest;
+  }
+  export const CreateRemoteProjectModal: (
+    props?: CreateRemoteProjectModalProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/location-permission-denied-dialog" {

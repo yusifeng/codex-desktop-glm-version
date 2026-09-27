@@ -7,9 +7,28 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as createProjectDialogChunk from "@rchunk/create-project-dialog-core";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const createProjectDialog = createProjectDialogChunk as Record<string, any>;
+const {
+  FX: initializeScopeRuntime,
+  I3: getJsxRuntime,
+  K3: useHostMessageHandler,
+  LX: useScope,
+  QI: initializeAppScope,
+  W3: initializeHostMessageBridge,
+  ZI: appScope,
+  e6: getReactRuntime,
+} = appSharedChunk;
+const {
+  C4: initializeRemoteProjects,
+  E4: useRemoteProjectsEnabled,
+  QAt: initializeRemoteWorkspaceRequests,
+  _N: useLocalProjectsDisabled,
+  gN: initializeProjectAvailability,
+  tjt: trackProjectCreation,
+} = appInitialChunk;
+const { r: initializeCreateProjectDialog, t: CreateProjectDialog } =
+  createProjectDialogChunk;
+const React = getReactRuntime();
+const jsx = getJsxRuntime();
 
 type RemoteProjectRequest = {
   mode?: "pick" | string;
@@ -18,43 +37,43 @@ type RemoteProjectRequest = {
 
 function CreateRemoteProjectModal(
   props: { initialRequest?: RemoteProjectRequest } = {},
-) {
+): unknown {
   const { initialRequest } = props;
-  const scope = appShared.LX(appShared.ZI);
-  const localProjectsDisabled = appInitial._N();
-  const remoteProjectsEnabled = appInitial.E4();
-  const [request, setRequest] = appShared.e6().useState(initialRequest);
-  const [requestKey, setRequestKey] = appShared.e6().useState(0);
+  const scope = useScope(appScope);
+  const localProjectsDisabled = useLocalProjectsDisabled();
+  const remoteProjectsEnabled = useRemoteProjectsEnabled();
+  const [request, setRequest] = React.useState<
+    RemoteProjectRequest | undefined
+  >(initialRequest);
+  const [requestKey, setRequestKey] = React.useState(0);
 
   const open = (nextRequest: RemoteProjectRequest) => {
     setRequest(nextRequest);
     setRequestKey((value: number) => value + 1);
   };
 
-  appShared.K3(
-    "open-create-remote-project-modal",
-    (nextRequest: RemoteProjectRequest) => {
-      if (!remoteProjectsEnabled || localProjectsDisabled) return;
-      appInitial.tjt({ scope, projectType: "remote" });
-      open(nextRequest);
-    },
-  );
+  useHostMessageHandler<
+    import("@rchunk/app-shared").RendererHostMessage & RemoteProjectRequest
+  >("open-create-remote-project-modal", (nextRequest: RemoteProjectRequest) => {
+    if (!remoteProjectsEnabled || localProjectsDisabled) return;
+    trackProjectCreation({ scope, projectType: "remote" });
+    open(nextRequest);
+  });
 
-  appShared.K3(
-    "remote-workspace-root-requested",
-    (nextRequest: RemoteProjectRequest) => {
-      if (!remoteProjectsEnabled) return;
-      if (nextRequest.mode !== "pick") {
-        appInitial.tjt({ scope, projectType: "remote" });
-      }
-      open(nextRequest);
-    },
-  );
+  useHostMessageHandler<
+    import("@rchunk/app-shared").RendererHostMessage & RemoteProjectRequest
+  >("remote-workspace-root-requested", (nextRequest: RemoteProjectRequest) => {
+    if (!remoteProjectsEnabled) return;
+    if (nextRequest.mode !== "pick") {
+      trackProjectCreation({ scope, projectType: "remote" });
+    }
+    open(nextRequest);
+  });
 
   return request == null
     ? null
-    : appShared.I3().jsx(
-        createProjectDialog.t,
+    : jsx.jsx(
+        CreateProjectDialog,
         {
           initialRequest: request,
           onClose: () => setRequest(undefined),
@@ -64,13 +83,13 @@ function CreateRemoteProjectModal(
 }
 
 function initializeCreateRemoteProjectModal(): void {
-  appShared.FX?.();
-  appInitial.gN?.();
-  appShared.W3?.();
-  appInitial.C4?.();
-  appShared.QI?.();
-  createProjectDialog.r?.();
-  appInitial.QAt?.();
+  initializeScopeRuntime();
+  initializeProjectAvailability();
+  initializeHostMessageBridge();
+  initializeRemoteProjects();
+  initializeAppScope();
+  initializeCreateProjectDialog();
+  initializeRemoteWorkspaceRequests();
 }
 
 initializeCreateRemoteProjectModal();
