@@ -1107,6 +1107,10 @@ declare module "@rchunk/app-shared" {
   export const FQ: unknown;
   /** initializeMaitaiRuntime（app-shared/runtime/atom-signal.ts）。 */
   export const FX: () => void;
+  /** 永远拒绝的 queryFn，用于缺少必要参数时阻止请求。 */
+  export const FZ: (
+    context: ScopedQueryFunctionContext,
+  ) => Promise<never>;
   /** useSignalValue（app-shared/runtime/atom-signal.ts）。 */
   export const HX: <T>(
     signal: ReadableSignal<T>,
@@ -5547,8 +5551,13 @@ declare module "@rchunk/plaid-link" {
   export const n: () => void;
   export const r: (
     scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
-    options: { accountId: string; signal: AbortSignal },
+    options: {
+      accountId: string;
+      receivedRedirectUri?: string;
+      signal: AbortSignal;
+    },
   ) => Promise<boolean>;
+  export const t: (accountId: string) => string;
 }
 declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
