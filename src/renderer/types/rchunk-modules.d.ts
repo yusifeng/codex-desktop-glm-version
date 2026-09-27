@@ -5427,6 +5427,142 @@ declare module "@rchunk/mcp-quick-action-dialog" {
   export const t: (props: Record<string, unknown>) => unknown;
 }
 
+declare module "@rchunk/app-initial" {
+  export const Ict: (...arguments_: unknown[]) => unknown;
+  export const Pct: () => void;
+  export const gAt: (...arguments_: unknown[]) => Promise<unknown>;
+  export const mAt: () => void;
+  export const fvt: (...arguments_: unknown[]) => unknown;
+  export const hvt: (...arguments_: unknown[]) => unknown;
+  export const f2: (...arguments_: unknown[]) => unknown;
+  export const m2: (...arguments_: unknown[]) => Promise<unknown>;
+  export const p2: (...arguments_: unknown[]) => boolean;
+  export const FR: (...arguments_: unknown[]) => unknown;
+  export const IR: (...arguments_: unknown[]) => Promise<boolean>;
+  export const MR: () => void;
+  export const NR: string;
+  export const PR: (...arguments_: unknown[]) => unknown;
+  export const Qen: () => void;
+  export const jct: () => void;
+  export const B4t: () => void;
+  export const U3t: () => void;
+  export const V3t: (value: unknown) => unknown | null;
+  export const Y9t: () => void;
+  export const q9t: (value: unknown) => string;
+  export const z4t: (value: unknown) => unknown;
+}
+
+declare module "@rchunk/conversation-markdown" {
+  export const n: (input: Record<string, unknown>) => string;
+}
+
+declare module "@rchunk/open-thread-pull-request-code-tab" {
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/open-local-conversation-subagents-panel" {
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/thread-app-shell-chrome" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/open-local-conversation-sources-side-panel-tab" {
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/open-local-conversation-background-terminal-tab" {
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/chatgpt-conversation-transcript" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/conversation-ui" {
+  export const i: () => void;
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/local-conversation-webmcp-tools-model" {
+  export const i: () => void;
+  export const n: (...arguments_: unknown[]) => unknown[];
+  export const r: (...arguments_: unknown[]) => Map<string, unknown[]>;
+  export const t: (url: string) => string | null;
+}
+
+declare module "@rchunk/local-conversation-sources-signals" {
+  export const i: import("@rchunk/app-shared").SignalFamily<string, unknown>;
+  export const n: import("@rchunk/app-shared").SignalFamily<string, unknown>;
+  export const r: import("@rchunk/app-shared").SignalFamily<string, unknown>;
+  export const t: () => void;
+}
+
+declare module "@rchunk/open-thread-pull-request-side-panel-tab" {
+  export const i: (...arguments_: unknown[]) => Promise<boolean>;
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const r: (...arguments_: unknown[]) => unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/thread-right-panel-state" {
+  export const toggleThreadSidePanel: (...arguments_: unknown[]) => unknown;
+}
+
+declare module "@rchunk/conversation-markdown-entry" {
+  export const renderConversationMarkdown: (
+    input: Record<string, unknown>,
+  ) => string;
+}
+
+declare module "@rchunk/chatgpt-conversation-updates-runtime" {
+  export const refetchChatGptConversation: (
+    ...arguments_: unknown[]
+  ) => Promise<unknown>;
+}
+
+declare module "@rchunk/thread-panel-state" {
+  export const activateThreadPanelTab: (...arguments_: unknown[]) => unknown;
+  export const getThreadPanelTabController: (...arguments_: unknown[]) => unknown;
+}
+
+declare module "@rchunk/local-conversation-summary-panel-image-preview" {
+  export const n: () => void;
+  export const t: (value: unknown) => unknown | null;
+}
+
+declare module "@rchunk/thread-side-panel-tabs" {
+  export const n: (
+    scope: unknown,
+    tabType: unknown,
+    reveal?: boolean,
+    options?: Record<string, unknown>,
+  ) => boolean;
+  export const r: (
+    scope: unknown,
+    tabType: unknown,
+    options?: Record<string, unknown>,
+  ) => boolean;
+  export const t: () => void;
+}
+
+declare module "@rchunk/conversation-navigation-state" {
+  export const n: import("@rchunk/app-shared").ScopedSignalFamily<
+    Record<string, unknown>,
+    unknown,
+    boolean
+  >;
+  export const t: () => void;
+}
+
 declare module "@rchunk/worktree-onboarding-state" {
   export interface UseWorktreeOnboardingStateOptions {
     enabled: boolean;
