@@ -7858,7 +7858,7 @@ declare module "@rchunk/plaid-link" {
   ) => Promise<boolean>;
   export const t: (accountId: string) => string;
 }
-declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
+declare module "@rchunk/catalog" { export interface ComposerTipContext { browserExtensionInstalled?: boolean; capabilities?: Iterable<string>; notificationOnboardingResolved?: boolean; notificationPermissionStatus?: string } export interface ComposerTip { action: { type: "navigate" | "open-notification-settings"; path?: string }; actionLabel: string; badgeLabel: string; content: string; id: string; isEligible(context: ComposerTipContext): boolean } export const n: () => void; export const t: (campaignId: string) => ComposerTip | null; }
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
 declare module "@rchunk/codex-micro-mini-games" {
   export const a: (game: { game: string } | null) => Array<Record<string, unknown>> | null;
@@ -13356,6 +13356,19 @@ declare module "@rchunk/codex-mobile-setup-dialog" {
 }
 
 declare module "@rchunk/codex-mobile-setup-flow" {
+  export interface RemoteControlClient { clientId: string; name?: string }
+  export type RemoteControlStatus = "disabled" | "errored" | "connecting" | "connected";
+  export type MobileSetupStep = "initial" | "allow-host" | "mfa-required" | "waiting" | "connected" | "dismiss";
+  export const a: (input: { initialRemoteControlStatus?: RemoteControlStatus; isMfaSetupRequiredError?: boolean; mfaSetupRequired?: boolean; remoteControlStatus?: RemoteControlStatus; setupStepDebugOverride?: string }) => boolean;
+  export const c: Readonly<{ refetchInterval: 1000; staleTime: 0 }>;
+  export const d: (clients: RemoteControlClient[] | null | undefined, existingClientIds: Set<string>) => "connected" | "dismiss" | null;
+  export const f: (clients: RemoteControlClient[] | null | undefined, localClientId: string | null | undefined) => RemoteControlClient[] | undefined;
+  export const i: () => void; export const l: () => void; export const n: () => void; export const o: () => void;
+  export const p: (clients: RemoteControlClient[] | null | undefined, existingClientIds: Set<string>) => boolean;
+  export const r: (input: { isMfaSetupRequiredError?: boolean; mfaSetupRequired?: boolean; remoteControlStatus?: RemoteControlStatus }) => "initial" | "mfa-required" | undefined;
+  export const s: Readonly<{ staleTime: 30000 }>;
+  export const t: (props: { initialStep?: MobileSetupStep | null; remoteControlHostEnabled?: boolean; clients?: RemoteControlClient[] | null; existingClientIds?: Set<string>; localRemoteControlClientId?: string | null; setupInProgress?: boolean; showAllowHostError?: boolean; showStartSetupError?: boolean; variant?: "dialog" | "page"; onAllowHost?(): void; onClose(): void; onSkip?(): void; onStartSetup?(): void }) => unknown;
+  export const u: (input: { remoteControlHostEnabled?: boolean; hasEnrolledRemoteControlClient?: boolean }) => MobileSetupStep;
   const _default: unknown;
   export default _default;
 }

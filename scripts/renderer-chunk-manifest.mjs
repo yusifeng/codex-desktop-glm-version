@@ -2315,4 +2315,6 @@ export const REWRITTEN = new Set([
   "google-logo",
   "color-icon",
   "animated-icon",
+  "catalog",
+  "codex-mobile-setup-flow",
 ]);

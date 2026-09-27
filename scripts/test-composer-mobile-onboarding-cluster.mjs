@@ -1,0 +1,55 @@
+import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as esbuild from "esbuild";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+globalThis.__mobileOnboardingTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mobile-onboarding-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__mobileOnboardingTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
+function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
+function text(node) { const values = []; const collect = value => { if (typeof value === "string") values.push(value); else if (value != null && typeof value === "object") { const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); } }; collect(node); return values.join(" "); }
+
+// catalog: 10
+const catalog = await bundle("catalog");
+assert.deepEqual(Object.keys(catalog), ["n", "t"]);
+assert.equal(catalog.t("unknown"), null);
+assert.equal(catalog.t("codex_composer_tip_missing"), null);
+const documents = catalog.t("codex_composer_tip_documents");
+assert.equal(documents.id, "documents");
+assert.equal(documents.badgeLabel, "TIP");
+assert.equal(documents.isEligible({}), true);
+const notifications = catalog.t("codex_composer_tip_notifications");
+assert.equal(notifications.isEligible({ notificationOnboardingResolved: true, notificationPermissionStatus: "disabled" }), true);
+assert.equal(notifications.isEligible({ notificationOnboardingResolved: false, notificationPermissionStatus: "disabled" }), false);
+assert.equal(catalog.t("codex_composer_tip_browser_use").isEligible({ browserExtensionInstalled: false }), true);
+assert.equal(catalog.n(), undefined);
+
+// codex-mobile-setup-flow: 20
+const mobile = await bundle("codex-mobile-setup-flow");
+assert.deepEqual(Object.keys(mobile), ["a", "c", "d", "f", "i", "l", "n", "o", "p", "r", "s", "t", "u"]);
+const clients = [{ clientId: "local" }, { clientId: "phone", name: "Phone" }];
+assert.deepEqual(mobile.f(clients, "local"), [{ clientId: "phone", name: "Phone" }]);
+assert.equal(mobile.p(clients, new Set(["local"])), true);
+assert.equal(mobile.p(clients, new Set(["local", "phone"])), false);
+assert.equal(mobile.d([{ clientId: "phone" }], new Set()), "connected");
+assert.equal(mobile.d(clients, new Set(["local"])), "dismiss");
+assert.equal(mobile.d(clients, new Set(["local", "phone"])), null);
+assert.equal(mobile.r({ remoteControlStatus: "disabled" }), "initial");
+assert.equal(mobile.r({ remoteControlStatus: "connected", mfaSetupRequired: true }), "mfa-required");
+assert.equal(mobile.u({ remoteControlHostEnabled: false }), "initial");
+assert.equal(mobile.u({ remoteControlHostEnabled: true, hasEnrolledRemoteControlClient: false }), "waiting");
+assert.equal(mobile.u({ remoteControlHostEnabled: true, hasEnrolledRemoteControlClient: true }), "connected");
+assert.equal(mobile.a({ remoteControlStatus: "connected", setupStepDebugOverride: "auto" }), false);
+assert.equal(mobile.a({ remoteControlStatus: "errored", setupStepDebugOverride: "auto" }), true);
+let started = 0;
+const initialUi = mobile.t({ onClose() {}, onStartSetup() { started++; } });
+assert.equal(initialUi.props["data-setup-step"], "initial");
+find(initialUi, node => node.props?.children === "Start setup").props.onClick();
+assert.equal(started, 1);
+assert.match(text(mobile.t({ initialStep: "mfa-required", onClose() {} })), /multi-factor authentication/);
+assert.match(text(mobile.t({ remoteControlHostEnabled: true, onClose() {} })), /Waiting for a mobile device/);
+assert.equal(mobile.s.staleTime, 30000);
+assert.equal(mobile.c.refetchInterval, 1000);
+
+console.log("30 composer and mobile onboarding cluster assertions passed");
