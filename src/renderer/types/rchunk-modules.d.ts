@@ -5195,7 +5195,30 @@ declare module "@rchunk/use-git-submodule-paths" {
 }
 
 declare module "@rchunk/git-branch-switcher" {
-  export const _any: any;
+  export interface HostConfig { id: string; [key: string]: unknown }
+  export interface RepositoryTarget { cwd: string; hostConfig: HostConfig; hostId?: string; repo?: string | null; root?: string | null }
+  export interface BranchSwitcherProps {
+    align?: "start" | "center" | "end"; cwd: string; gitRoot?: string | null; hostConfig: HostConfig;
+    isLoading?: boolean; isReadOnly?: boolean; open?: boolean; shouldShow?: boolean;
+    side?: "top" | "right" | "bottom" | "left"; onOpenChange?(open: boolean): void; onSelectBranch?(branch: string): void;
+    [key: string]: unknown;
+  }
+  export const a: (props: { showSetPrefix?: boolean }) => unknown;
+  export const c: (root: string | null | undefined, hostConfig: HostConfig, operationSource: string, options?: Record<string, unknown>) => Record<string, unknown>;
+  export const d: () => void;
+  export const f: (target: RepositoryTarget | null, operationSource: string) => { mutationKey: unknown[]; mutationFn(input: { branch: string }): Promise<Record<string, unknown>> };
+  export const g: () => void;
+  export const h: (target: RepositoryTarget | null | undefined) => string;
+  export const i: () => void;
+  export const l: () => void;
+  export const m: () => void;
+  export const n: () => void;
+  export const o: (props: { showSetPrefix?: boolean }) => unknown;
+  export const p: (props: Record<string, unknown>) => unknown;
+  export const r: (target: RepositoryTarget | null, operationSource: string) => { mutationKey: unknown[]; mutationFn(input: { branch: string; mode?: string }): Promise<Record<string, unknown>> };
+  export const s: (input: { cwd?: string | null; enabled: boolean; hostConfig: HostConfig; operationSource: string; preserveRemoteRefs?: boolean; query: string }) => string;
+  export const t: (props: BranchSwitcherProps) => unknown;
+  export const u: (root: string | null | undefined, hostConfig: HostConfig, operationSource: string, options?: Record<string, unknown>) => Record<string, unknown>;
 }
 
 declare module "@rchunk/dock" {
@@ -5212,7 +5235,16 @@ declare module "@rchunk/use-create-git-repository" {
 }
 
 declare module "@rchunk/worktree-environment-dropdown" {
-  export const _any: any;
+  export interface StartingState { branchName?: string; remoteRef?: string; type: "branch" | "working-tree" }
+  export interface Environment { configPath: string | null; name: string }
+  export const a: (props: { categoryLabel?: unknown; className?: string; icon?: unknown; value: unknown; valueClassName?: string }) => unknown;
+  export const c: () => void;
+  export const i: () => void;
+  export const n: () => void;
+  export const o: () => void;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const s: (props: { branchSource?: "worktree" | "repository"; className?: string; gitRootOverride?: string | null; hostConfig: { id: string; [key: string]: unknown }; side?: "top" | "right" | "bottom" | "left"; startingState: StartingState; setStartingState(value: StartingState): void }) => unknown;
+  export const t: (props: { align?: "start" | "center" | "end"; className?: string; environments: Environment[]; hasError?: boolean; isLoading?: boolean; labelClassName?: string; repairConfigPath?: string | null; selectedConfigPath?: string | null; showDefaultOption?: boolean; showIcon?: boolean; side?: "top" | "right" | "bottom" | "left"; workspaceRoot: string; onOpenSettings?(): void; onSelectConfigPath?(configPath: string | null): void }) => unknown;
 }
 
 declare module "@rchunk/color-icon" {
@@ -8965,6 +8997,91 @@ declare module "@rchunk/environment-labels" {
 }
 
 declare module "@rchunk/git-action-new-branch-field" {
+  export type CommitBlockedReason = "changes-loading" | "changes-unavailable" | "no-changes";
+  export type PushBlockedReason = "branch-missing" | "nothing-to-push" | "push-status-loading";
+  export type PullRequestBlockedReason = "branch-missing" | "checking-existing-pr" | "default-branch-checked-out" | "default-branch-missing" | "gh-auth-required" | "gh-cli-missing" | "no-git-repository" | "pull-request-exists" | "pull-request-source-loading" | "pull-request-source-unavailable" | "push-status-loading" | "upstream-missing";
+  export type GitNextStep = "commit-push-and-create-pr" | "push-and-create-pr" | "create-pr";
+  export interface PushStatus { branch?: string | null; commitsAhead: number; defaultBranch?: string | null; gitRoot?: string | null; upstreamRef?: string | null }
+  export interface NewBranchFieldProps { branchAlreadyExists?: boolean; disabled?: boolean; placeholder?: string; value: string; onChange(value: string): void }
+  export const $: (props: { blockedStep?: { kind: "commit" | "create-pr" | "push"; reason: string } | null }) => unknown;
+  export const A: () => void;
+  export const B: () => void;
+  export const C: () => null;
+  export const D: (scope: { set(...args: unknown[]): void }, options?: { defaultToDraft?: boolean }) => void;
+  export const E: (scope: { set(...args: unknown[]): void }) => void;
+  export const F: unknown;
+  export const G: (input: { ignoreNothingToPush?: boolean; pushStatus?: PushStatus }) => PushBlockedReason | null;
+  export const H: (input: Record<string, unknown>) => { canCommitPushAndCreatePullRequest: boolean; canCreatePullRequest: boolean; canPushAndCreatePullRequest: boolean };
+  export const I: unknown;
+  export const J: (results: Array<{ files: Array<{ additions?: number | null; deletions?: number | null; path: string; previousPath?: string | null }>; type: "success" | "error" } | null | undefined>) => { files: Array<{ additions: number; deletions: number; path: string }>; totalAdditions: number; totalDeletions: number } | null;
+  export const K: () => void;
+  export const L: unknown;
+  export const M: (scope: { set(...args: unknown[]): void }, target: unknown) => void;
+  export const N: (target: { cwd: string; hostId: string }) => { cwd: string; hostId: string };
+  export const O: (scope: { set(...args: unknown[]): void }) => void;
+  export const P: (input: { hasSomeUncommittedChanges: boolean; isChangesLoading: boolean; isChangesUnavailable: boolean }) => CommitBlockedReason | null;
+  export const Q: (props: { reason?: CommitBlockedReason | null }) => unknown;
+  export const R: unknown;
+  export const S: () => Promise<void>;
+  export const T: unknown;
+  export const U: (input: Record<string, unknown>) => { kind: "commit" | "create-pr" | "push"; reason: string } | null;
+  export const V: () => null;
+  export const W: typeof G;
+  export const X: (input: { canCommitPushAndCreatePullRequest: boolean; canCreatePullRequest: boolean; canPushAndCreatePullRequest: boolean; createsBranch: boolean; includeLocalChanges: boolean }) => GitNextStep;
+  export const Y: () => void;
+  export const Z: () => void;
+  export const _: () => null;
+  export const a: () => { run(kind: "commit" | "create-pr"): Promise<boolean> };
+  export const at: () => void;
+  export const b: () => null;
+  export const c: (value: { target: unknown }) => unknown;
+  export const d: (props: Record<string, unknown>) => unknown;
+  export const et: (props: { reason?: PushBlockedReason | null }) => unknown;
+  export const f: () => void;
+  export const g: () => null;
+  export const h: (input: { currentBranch?: string | null; storedThreadBranch?: string | null }) => string;
+  export const i: () => { run(kind: "commit" | "create-pr"): Promise<boolean> };
+  export const it: () => null;
+  export const j: (target: { cwd: string; hostId: string }) => void;
+  export const k: { key(value: { target: { cwd: string; hostId: string } }): string };
+  export const l: (phase: string) => string;
+  export const m: (scope: { set(...args: unknown[]): void }) => void;
+  export const n: () => void;
+  export const nt: (target: { cwd: string; hostConfig: { id: string; [key: string]: unknown } }) => { cwd: string; hostConfig: { id: string; [key: string]: unknown }; operationSource: string };
+  export const o: () => void;
+  export const p: unknown;
+  export const q: (path: string, results: Array<{ files: Array<{ additions?: number | null; deletions?: number | null; path: string; previousPath?: string | null }>; type: "success" | "error" } | null | undefined>) => { linesAdded: number; linesRemoved: number } | null;
+  export const r: () => void;
+  export const rt: () => void;
+  export const s: (input: { baseBranch?: string | null; filePaths: string[]; headBranch?: string | null; pullRequestInstructions?: string | null; uncommittedDiff?: string | null }) => string;
+  export const t: (props: NewBranchFieldProps) => unknown;
+  export const tt: () => void;
+  export const u: () => void;
+  export const v: () => void;
+  export const w: (value: { target: unknown }) => unknown;
+  export const x: typeof U;
+  export const y: () => null;
+  export const z: unknown;
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/git-action-review-state" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/codex-analytics-attribution" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/commit-icon" {
+  const _default: unknown;
+  export default _default;
+}
+
+declare module "@rchunk/use-git-recent-branches" {
   const _default: unknown;
   export default _default;
 }
