@@ -5780,7 +5780,25 @@ declare module "@rchunk/plugin-detail-page-core" {
 declare module "@rchunk/app-connect-link-navigation"; declare module "@rchunk/plugin-connector-setup";
 declare module "@rchunk/use-plugin-scheduled-tasks"; declare module "@rchunk/apps-availability";
 declare module "@rchunk/prepare-plugin-creator"; declare module "@rchunk/app-card"; declare module "@rchunk/api";
-declare module "@rchunk/share-menu-item";
+declare module "@rchunk/share-menu-item" {
+  export interface SharePlugin { can_publish_to_workspace?: boolean; can_share_to_workspace?: boolean; canonical_app_id?: string | null; creator_account_user_id?: string | null; discoverability?: string | null; installPolicy?: string; installed?: boolean; is_deletable_workspace_plugin?: boolean; scope?: "GLOBAL" | "USER" | "WORKSPACE"; source?: { type?: string }; workspace_id?: string | null; [key: string]: unknown }
+  export interface ShareAccount { account_user_id?: string; account_user_role?: string; id: string; structure: "personal" | "workspace" }
+  export const _: () => void; export const a: (input: Record<string, unknown>) => Record<string, unknown>; export const b: () => void; export const c: (input: Record<string, unknown>) => unknown;
+  export const d: (props: Record<string, unknown>) => unknown; export const f: (props: { children?: unknown; measurement?: unknown }) => unknown; export const g: (props: { onCopyLink(): Promise<boolean>; color?: string; size?: string }) => unknown;
+  export const h: () => void; export const i: (scope: unknown, input: { pluginId: string }, accountId: string, share?: Record<string, unknown> | null) => Promise<unknown>; export const l: () => void;
+  export const m: (props: { onCopyLink(): Promise<boolean>; onOpenChange(open: boolean): void; open: boolean; pluginName: string }) => unknown; export const n: () => void;
+  export const o: (input: { pluginShareUrl?: string | null; shareContext?: { shareUrl?: string | null } | null; savedShareUrl?: string | null; configuredShareUrl?: string | null }) => string | null | undefined;
+  export const p: () => void; export const r: () => void; export const s: () => void; export const t: (props: { canShare?: boolean; onShare?(): void }) => unknown;
+  export const u: (plugin: SharePlugin) => boolean; export const v: (input: { plugin: SharePlugin; account: ShareAccount; userId?: string | null }) => boolean; export const y: (input: { plugin: SharePlugin; account: ShareAccount; canPublish: boolean }) => boolean;
+}
+declare module "@rchunk/thread-overflow-menu" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/local-conversation-side-chat" { export const i: { id: string; isAvailable(routeKind: string): boolean }; export const n: () => void; export const r: (input: Record<string, unknown>, open?: (input: Record<string, unknown>) => Promise<unknown> | unknown) => Promise<Record<string, unknown>>; export const t: { displayName: string; defaultValue: Record<string, unknown> | null }; }
+declare module "@rchunk/local-conversation-git-actions" { export const i: () => void; export const n: () => void; export const r: (props: { phase: string }) => unknown; export const t: (props: Record<string, unknown> & { target: { hostId: string } }) => unknown; }
+declare module "@rchunk/open-in-google-drive-menu-item" { export const a: (path: string) => "document" | "presentation" | "spreadsheet" | null; export const c: (input: Record<string, unknown>) => void; export const i: () => void; export const n: () => unknown; export const o: () => void; export const r: (props: { onOpen?(): void; path?: string; targetType?: "document" | "presentation" | "spreadsheet" }) => unknown; export const s: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/registered-conversation-thumbnail";
+declare module "@rchunk/plugin-share-dialogs-runtime";
+declare module "@rchunk/loading-page";
+declare module "@rchunk/plugin-share-dialog-entry";
 declare module "@rchunk/find-plugin-mcp-extension-view"; declare module "@rchunk/control-group"; declare module "@rchunk/filter";
 declare module "@rchunk/plugin-connected-account-links"; declare module "@rchunk/plugin-disabled-reason";
 declare module "@rchunk/plugin-connected-account-links" {
