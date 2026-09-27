@@ -66,6 +66,8 @@ declare module "@rchunk/app-shared" {
   export const Qh: (props: LoadingSpinnerProps) => unknown;
   export const Xh: (props: Omit<ButtonProps, "as">) => unknown;
   export const Yh: (props: ButtonProps) => unknown;
+  /** initializeChevronAsset（面包屑分隔符资源初始化器）。 */
+  export const Xd: () => void;
   /** initializeButton（app-shared/ui/button.ts，内部 c8）。 */
   export const Zh: () => void;
   export interface MoreButtonClickEvent {
@@ -5922,11 +5924,16 @@ declare module "@rchunk/appgen-site-detail-layout" {
 }
 
 declare module "@rchunk/toolbar-breadcrumb" {
+  export type BreadcrumbAncestor =
+    | { content: unknown; id: string }
+    | { id: string; label: unknown; onClick(): void };
+  export interface ToolbarBreadcrumbProps {
+    ancestors: BreadcrumbAncestor[];
+    current?: unknown;
+    textSm?: boolean;
+  }
   export const n: () => void;
-  export const t: (props: {
-    ancestors: Array<{ id: string; label: unknown; onClick(): void }>;
-    current?: string;
-  }) => unknown;
+  export const t: (props: ToolbarBreadcrumbProps) => unknown;
 }
 
 declare module "@rchunk/appgen-site-detail-route" {

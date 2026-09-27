@@ -5,37 +5,66 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-let React: any;
-let jsx: any;
+const {
+  $3: initializeRuntimeLazy,
+  C_: initializeIconAsset,
+  I3: getJsxRuntime,
+  K2: initializeSharedComponents,
+  S_: IconAsset,
+  Xd: initializeChevronAsset,
+  Yd: chevronAsset,
+  Yh: Button,
+  Zh: initializeButton,
+  e6: getReactRuntime,
+  h4: initializeClassNames,
+  m4: classNames,
+  n4: useIntl,
+} = appSharedChunk;
 
-function ToolbarBreadcrumb({ ancestors, current, textSm }: any) {
-  const intl = appShared.n4();
+type BreadcrumbAncestor =
+  | { content: unknown; id: string }
+  | { id: string; label: unknown; onClick(): void };
+
+interface ToolbarBreadcrumbProps {
+  ancestors: BreadcrumbAncestor[];
+  current?: unknown;
+  textSm?: boolean;
+}
+
+let React: import("@rchunk/app-shared").ReactRuntime;
+let jsx: import("@rchunk/app-shared").JsxRuntime;
+
+function ToolbarBreadcrumb({
+  ancestors,
+  current,
+  textSm,
+}: ToolbarBreadcrumbProps): unknown {
+  const intl = useIntl();
   const ariaLabel = intl.formatMessage({
     id: "toolbarBreadcrumb.label",
     defaultMessage: "Breadcrumb",
     description: "Accessible label for toolbar breadcrumb navigation",
   });
   const textClassName = textSm ? "text-sm" : "text-base";
-  const className = appShared.m4(
+  const className = classNames(
     "flex min-w-0 items-center gap-1 text-codex-description",
     textClassName,
   );
-  const ancestorNodes = ancestors.map((ancestor: any, index: number) =>
+  const ancestorNodes = ancestors.map((ancestor, index) =>
     jsx.jsxs(
       React.Fragment,
       {
         children: [
           index > 0
-            ? jsx.jsx(appShared.S_, {
+            ? jsx.jsx(IconAsset, {
                 className: "shrink-0",
-                asset: appShared.Yd,
+                asset: chevronAsset,
               })
             : null,
           "content" in ancestor
             ? ancestor.content
-            : jsx.jsx(appShared.Yh, {
-                className: appShared.m4("min-w-0", textSm && "text-sm"),
+            : jsx.jsx(Button, {
+                className: classNames("min-w-0", textSm && "text-sm"),
                 color: "ghost",
                 size: "toolbar",
                 onClick: ancestor.onClick,
@@ -55,9 +84,9 @@ function ToolbarBreadcrumb({ ancestors, current, textSm }: any) {
       : jsx.jsxs(React.Fragment, {
           children: [
             ancestors.length > 0
-              ? jsx.jsx(appShared.S_, {
+              ? jsx.jsx(IconAsset, {
                   className: "shrink-0",
-                  asset: appShared.Yd,
+                  asset: chevronAsset,
                 })
               : null,
             jsx.jsx("span", {
@@ -77,14 +106,14 @@ function ToolbarBreadcrumb({ ancestors, current, textSm }: any) {
 }
 
 function initializeToolbarBreadcrumb(): void {
-  appShared.$3();
-  appShared.Xd();
-  appShared.h4();
-  React = appShared.e6();
-  appShared.K2();
-  appShared.C_();
-  appShared.Zh();
-  jsx = appShared.I3();
+  initializeRuntimeLazy();
+  initializeChevronAsset();
+  initializeClassNames();
+  React = getReactRuntime();
+  initializeSharedComponents();
+  initializeIconAsset();
+  initializeButton();
+  jsx = getJsxRuntime();
 }
 
 export { initializeToolbarBreadcrumb as n, ToolbarBreadcrumb as t };
