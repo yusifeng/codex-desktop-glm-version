@@ -14,27 +14,17 @@ import * as entryPointsChunk from "@rchunk/announcement-entry-points";
 import * as announcementSlotChunk from "@rchunk/home-announcement-slot";
 import * as realtimeVoiceChunk from "@rchunk/realtime-voice-home-announcement";
 import * as worktreeControllerChunk from "@rchunk/worktree-onboarding-banner-controller";
+import type { ServiceTierModel } from "@rchunk/app-shared";
 
 void runtimeChunk;
 void modalSourceChunk;
-void bannerChunk;
 void worktreeStateChunk;
-
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const beacon = beaconChunk as Record<string, any>;
-const entryPoints = entryPointsChunk as Record<string, any>;
-const announcementSlot = announcementSlotChunk as Record<string, any>;
-const realtimeVoice = realtimeVoiceChunk as Record<string, any>;
-const worktreeController = worktreeControllerChunk as Record<string, any>;
 
 const {
   $3: initializeJsxRuntimeLazy,
   I3: jsxRuntime,
   K2: initializeIntl,
   LX: useSignalScope,
-  T: fastModeBannerDismissedEvent,
   Y2: FormattedMessage,
   ZI: applicationScope,
   _j: fastModeBannerActionEvent,
@@ -44,7 +34,41 @@ const {
   kz: parseServiceTier,
   m4: classNames,
   n4: useIntl,
-} = appShared;
+  vj: fastModeBannerDismissedEvent,
+} = appSharedChunk;
+const {
+  CNt: useRateLimitResetCandidate,
+  D0t: useHomeAnnouncementOverrides,
+  Fk: useRealtimeVoiceStart,
+  Nk: useWeeklyRecapCandidate,
+  i_n: useRouterLocation,
+  kNt: getBeaconTreatment,
+  qk: useRealtimeVoiceAvailability,
+  sbt: shouldHideHomePromos,
+  vN: FastModeIcon,
+  xpn: logAnalyticsEvent,
+} = appInitialChunk;
+const {
+  $p: getAnnouncementStatus,
+  Ch: useHomeBeaconCandidate,
+  Ne: AnnouncementEntriesHost,
+  Sm: AnnouncementShell,
+} = appPrimaryChunk;
+const {
+  r: initializeBeaconAnnouncement,
+  t: BeaconAnnouncement,
+} = beaconChunk;
+const {
+  i: useGiftCreditsCandidate,
+  o: useBrowserProfileImportCandidate,
+  s: useComputerHistoryCandidate,
+  t: initializeAnnouncementEntryPoints,
+} = entryPointsChunk;
+const { n: initializeHomeAnnouncementSlot } = announcementSlotChunk;
+const { t: CustomGptBanner } = bannerChunk;
+const { RealtimeVoiceHomeAnnouncementContent } = realtimeVoiceChunk;
+const { WorktreeOnboardingBannerController } = worktreeControllerChunk;
+const { n: useWorktreeOnboardingCandidate } = worktreeStateChunk;
 const {
   r: RateLimitResetHomeAnnouncement,
   t: initializeRateLimitResetAnnouncementState,
@@ -76,7 +100,7 @@ type SetState<Value> = (
 ) => void;
 
 interface AnnouncementEntry {
-  content: unknown;
+  content?: unknown;
   isEligible: boolean;
   isLoading: boolean;
   pageContextClaim?: unknown;
@@ -84,7 +108,7 @@ interface AnnouncementEntry {
 
 interface FastModeCandidate extends AnnouncementEntry {
   content: unknown;
-  fastModeModel: unknown;
+  fastModeModel: ServiceTierModel | null;
   intl: IntlShape;
   isSubmitting: boolean;
   setHasSeenFastModeHomeBanner(seen: boolean): void;
@@ -134,10 +158,10 @@ function initializeCodexHomeAnnouncements(): void {
   initializeJsxRuntimeLazy?.();
   initializeIntl?.();
   initializeClassNames?.();
-  announcementSlot.n?.();
+  initializeHomeAnnouncementSlot?.();
   initializeRateLimitResetAnnouncementState();
-  entryPoints.t?.();
-  beacon.r?.();
+  initializeAnnouncementEntryPoints?.();
+  initializeBeaconAnnouncement?.();
   React = (typeof reactRuntime === "function"
     ? reactRuntime()
     : reactRuntime) as ReactRuntime;
@@ -147,7 +171,7 @@ function initializeCodexHomeAnnouncements(): void {
 
 function statusFor(entry: AnnouncementEntry): unknown {
   return (
-    appPrimary.$p?.({
+    getAnnouncementStatus?.({
       isEligible: entry.isEligible,
       isLoading: entry.isLoading,
     }) ??
@@ -166,7 +190,7 @@ function AnnouncementEntries({
   entries: AnnouncementEntry[];
   trackVisibility?: boolean;
 }): unknown {
-  const Host = appPrimary.Ne ?? "div";
+  const Host = AnnouncementEntriesHost ?? "div";
   return jsx.jsx(Host, { entries, trackVisibility });
 }
 
@@ -179,12 +203,12 @@ function FastModeBanner({
   setIsSubmitting,
   setServiceTier,
 }: FastModeCandidate): unknown {
-  const Shell = appPrimary.Sm ?? "div";
+  const Shell = AnnouncementShell ?? "div";
   const scope = useSignalScope?.(applicationScope);
   const enable = () => {
     if (fastModeModel == null) return;
     setIsSubmitting(true);
-    appInitial.xpn?.(scope, fastModeBannerActionEvent, {});
+    logAnalyticsEvent?.(scope, fastModeBannerActionEvent, {});
     Promise.resolve(
       setServiceTier(
         parseServiceTier?.(fastModeModel)?.id ?? "priority",
@@ -196,7 +220,7 @@ function FastModeBanner({
     });
   };
   const dismiss = () => {
-    appInitial.xpn?.(scope, fastModeBannerDismissedEvent, {});
+    logAnalyticsEvent?.(scope, fastModeBannerDismissedEvent, {});
     setHasSeenFastModeHomeBanner(true);
   };
   return jsx.jsx(Shell, {
@@ -206,7 +230,7 @@ function FastModeBanner({
       description: "Title shown in the Fast mode home banner",
     }),
     description: content,
-    leadingVisual: jsx.jsx(appInitial.vN ?? "span", {
+    leadingVisual: jsx.jsx(FastModeIcon ?? "span", {
       className: "icon-sm text-chart-yellow",
     }),
     primaryAction: {
@@ -235,7 +259,7 @@ function FastModeBanner({
 function useFastModeCandidate(): FastModeCandidate {
   const intl = useIntl?.() as IntlShape;
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const override = appInitial.D0t?.() ?? {};
+  const override = useHomeAnnouncementOverrides?.() ?? {};
   if (override.fastModeCandidate != null)
     return {
       ...override.fastModeCandidate,
@@ -257,7 +281,7 @@ function useFastModeCandidate(): FastModeCandidate {
 }
 
 function useBeaconCandidate(product?: string): BeaconCandidate {
-  const candidate = appPrimary.Ch?.(product, {
+  const candidate = useHomeBeaconCandidate?.(product, {
     shouldSuppressFocusedModal: () => false,
   });
   return (
@@ -277,7 +301,7 @@ function BeaconContent({
   candidate: BeaconCandidate;
   product?: string;
 }): unknown {
-  const Component = beacon.t;
+  const Component = BeaconAnnouncement;
   if (
     candidate.accountId == null ||
     candidate.beacon == null ||
@@ -295,7 +319,7 @@ function BeaconContent({
             ? "codex_home"
             : "homepage",
       productExperience: product === "work_tab" ? "work" : "chat",
-      treatment: appInitial.qNt?.(candidate.beacon),
+      treatment: getBeaconTreatment?.(candidate.beacon),
     },
     beacon: candidate.beacon,
   });
@@ -307,34 +331,35 @@ function HomeAnnouncementCandidates({
   isLocalModeRemote,
   shouldHideOnboardingPromos,
 }: HomeAnnouncementCandidatesProps): unknown {
-  const candidateOverride = appInitial.D0t?.()?.homeAnnouncementCandidates;
+  const candidateOverride = useHomeAnnouncementOverrides?.()
+    ?.homeAnnouncementCandidates;
   if (candidateOverride != null)
     return jsx.jsx(AnnouncementEntries, {
       entries: candidateOverride,
       trackVisibility: false,
     });
-  const worktree = appInitial.Wk?.({
+  const worktree = useWorktreeOnboardingCandidate?.({
     enabled: !shouldHideOnboardingPromos,
     entryPoint,
     isLocalModeRemote,
   }) ?? { isEligible: false, isLoading: false };
-  const recap = appInitial.Nk?.() ?? {
+  const recap = useWeeklyRecapCandidate?.() ?? {
     isEligible: false,
     isLoading: false,
     availableCount: 0,
     dismiss() {},
   };
-  const voiceStart = appInitial.Fk?.(
+  const voiceStart = useRealtimeVoiceStart?.(
     beaconProduct === "work_tab" ? "work" : entryPoint,
   );
-  const voiceAvailable = appInitial.qk?.();
+  const voiceAvailable = useRealtimeVoiceAvailability?.();
   const voiceEntry: AnnouncementEntry = {
     isEligible: voiceStart != null && voiceAvailable === true,
     isLoading: voiceStart != null && voiceAvailable === undefined,
     content:
       voiceStart == null
         ? null
-        : jsx.jsx(realtimeVoice.RealtimeVoiceHomeAnnouncementContent, {
+        : jsx.jsx(RealtimeVoiceHomeAnnouncementContent, {
             entryPoint,
             onDismiss: () => {},
             onStart: () => void voiceStart(),
@@ -344,7 +369,7 @@ function HomeAnnouncementCandidates({
     isEligible: worktree.isEligible,
     isLoading: false,
     content: worktree.isEligible
-      ? jsx.jsx(worktreeController.WorktreeOnboardingBannerController, {})
+      ? jsx.jsx(WorktreeOnboardingBannerController, {})
       : null,
   };
   const recapEntry: AnnouncementEntry = {
@@ -364,20 +389,20 @@ function HomeAnnouncementCandidates({
     }),
   };
   const entries = [
-    appInitial.iPt?.({ enabled: !shouldHideOnboardingPromos }) ?? {
+    useGiftCreditsCandidate?.({ enabled: !shouldHideOnboardingPromos }) ?? {
       isEligible: false,
       isLoading: false,
       content: null,
     },
     voiceEntry,
-    appInitial.qNt?.({ enabled: true }) ?? {
+    useBrowserProfileImportCandidate?.({ enabled: true }) ?? {
       isEligible: false,
       isLoading: false,
       content: null,
     },
     worktreeEntry,
     recapEntry,
-    appInitial.HNt?.({ enabled: true }) ?? {
+    useComputerHistoryCandidate?.({ enabled: true }) ?? {
       isEligible: false,
       isLoading: false,
       content: null,
@@ -394,8 +419,8 @@ function HomeComposerAnnouncements({
   selectedCustomGptId,
 }: HomeComposerAnnouncementsProps): unknown {
   void hasSeparateCodexAnnouncements;
-  const source = appInitial.i_n?.()?.pathname ?? "/";
-  const hidePromos = appInitial.sbt?.({
+  const source = useRouterLocation?.()?.pathname ?? "/";
+  const hidePromos = shouldHideHomePromos?.({
     hideFirstNewThreadOnboardingPromos: false,
     pathname: source,
   });
@@ -408,7 +433,7 @@ function HomeComposerAnnouncements({
   const customGpt =
     selectedCustomGptId == null
       ? null
-      : jsx.jsx(bannerChunk.t, { gizmoId: selectedCustomGptId });
+      : jsx.jsx(CustomGptBanner, { gizmoId: selectedCustomGptId });
   return jsx.jsxs("div", {
     className: classNames?.(
       "empty:hidden",
@@ -441,7 +466,7 @@ function CodexHomeAnnouncementEntries({
     product: "codex",
   });
   const entries: AnnouncementEntry[] = [
-    appInitial.CNt?.() ?? {
+    useRateLimitResetCandidate?.() ?? {
       isEligible: false,
       isLoading: false,
       content: null,
@@ -468,8 +493,8 @@ function CodexHomeAnnouncements({
   homeRunLocationRemoteProject = null,
   includeGitCheckoutWarning = true,
 }: CodexHomeAnnouncementsProps): unknown {
-  const pathname = appInitial.i_n?.()?.pathname ?? "/";
-  const hidePromos = appInitial.sbt?.({
+  const pathname = useRouterLocation?.()?.pathname ?? "/";
+  const hidePromos = shouldHideHomePromos?.({
     hideFirstNewThreadOnboardingPromos: false,
     pathname,
   });

@@ -53,8 +53,8 @@ const result = await esbuild.build({
                 `,
                 "app-primary": `export const Sm = "AnnouncementShell";`,
                 "home-beacon": `
-                  export const r = () => {};
-                  export const t = () => ({ accountId: null, beacon: null, isEligible: false, isLoading: false, shouldSuppressVanillaPromos: false });
+                  export const r = () => ({ accountId: null, beacon: null, containerBeacon: null, isEligible: false, isLoading: false, shouldSuppressVanillaPromos: false });
+                  export const t = () => {};
                 `,
                 "composer-announcement-slot": `export const n = () => {}; export const t = "CandidateHost";`,
                 "workspace-renewal-payment": `export const n = () => ({ isEligible: false, isLoading: false, content: null });`,

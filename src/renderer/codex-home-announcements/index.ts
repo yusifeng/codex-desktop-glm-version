@@ -13,43 +13,139 @@ import * as beaconAnnouncementChunk from "@rchunk/codex-app-home-beacon-announce
 import * as announcementStateChunk from "@rchunk/home-announcement-state";
 import * as bannerChunk from "@rchunk/banner";
 import * as composerCandidatesChunk from "@rchunk/home-composer-announcement-candidates";
+import type {
+  IntlShape,
+  JsxRuntime,
+  ReactRuntime,
+  ServiceTierModel,
+} from "@rchunk/app-shared";
+import type { HomeBeaconResult } from "@rchunk/home-beacon";
 
 void runtimeChunk;
 void modalSourceChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const homeBeacon = homeBeaconChunk as Record<string, any>;
-const composerSlot = composerSlotChunk as Record<string, any>;
-const renewal = renewalChunk as Record<string, any>;
-const beaconAnnouncement = beaconAnnouncementChunk as Record<string, any>;
-const announcementState = announcementStateChunk as Record<string, any>;
-const banner = bannerChunk as Record<string, any>;
-const composerCandidates = composerCandidatesChunk as Record<string, any>;
+const {
+  $3: initializeJsxRuntimeLazy,
+  I3: jsxRuntime,
+  K2: initializeIntl,
+  LX: useSignalScope,
+  Y2: FormattedMessage,
+  ZI: applicationScope,
+  e6: reactRuntime,
+  ig: DismissIcon,
+  kz: findFastServiceTier,
+  m4: classNames,
+  n4: useIntl,
+  vj: fastModeBannerDismissedEvent,
+} = appSharedChunk;
+const {
+  CNt: useRateLimitResetCandidate,
+  D0t: useHomeAnnouncementOverrides,
+  i_n: useRouterLocation,
+  kNt: getBeaconTreatment,
+  sbt: shouldHideHomePromos,
+  vN: FastModeIcon,
+  xpn: logAnalyticsEvent,
+} = appInitialChunk;
+const { Sm: AnnouncementShell } = appPrimaryChunk;
+const {
+  r: useHomeBeacon,
+  t: initializeHomeBeacon,
+} = homeBeaconChunk;
+const {
+  n: initializeComposerAnnouncementSlot,
+  t: ComposerAnnouncementSlot,
+} = composerSlotChunk;
+const { n: useWorkspaceRenewalCandidate } = renewalChunk;
+const {
+  r: initializeBeaconAnnouncement,
+  t: BeaconAnnouncement,
+} = beaconAnnouncementChunk;
+const {
+  t: initializeHomeAnnouncementState,
+  u: useMultiAgentAnnouncementEligibility,
+} = announcementStateChunk;
+const { t: CustomGptBanner } = bannerChunk;
+const { HomeComposerAnnouncementCandidates } = composerCandidatesChunk;
 
 interface Candidate {
   id?: string;
-  content: unknown;
+  content?: unknown;
   isEligible: boolean;
   isLoading: boolean;
   pageContextClaim?: unknown;
   trackVisibility?: boolean;
 }
 
-let React: any;
-let jsx: any;
+type CandidateRenderer = (candidates: Candidate[]) => unknown;
+
+interface RenderCandidatesProps {
+  entries: Candidate[];
+  fallbackContent?: unknown;
+  renderCandidates?: CandidateRenderer;
+  trackVisibility?: boolean;
+}
+
+interface CandidateStackProps extends Omit<RenderCandidatesProps, "entries"> {
+  entries?: Candidate[] | null;
+  renderSlot?: (entries: Candidate[]) => unknown;
+}
+
+interface FastModeCandidate extends Candidate {
+  fastModeModel: ServiceTierModel | null;
+  intl: IntlShape;
+  isSubmitting: boolean;
+  setHasSeenFastModeHomeBanner(seen: boolean): void;
+  setIsSubmitting(
+    value: boolean | ((current: boolean) => boolean),
+  ): void;
+  setServiceTier(
+    tier: string,
+    source: "home_banner",
+  ): Promise<unknown> | unknown;
+}
+
+interface BeaconContentProps {
+  candidate: HomeBeaconResult;
+  product?: string;
+}
+
+interface HomeAnnouncementCompositionProps {
+  entries: Candidate[];
+  fallbackContent?: unknown;
+  product?: string;
+  renderCandidates?: CandidateRenderer;
+  shouldHideOnboardingPromos: boolean;
+}
+
+interface HomeComposerAnnouncementsProps {
+  entryPoint: string;
+  homeComposerMode: "chat" | "work" | string;
+  renderCandidates?: CandidateRenderer;
+  selectedCustomGptId?: string | null;
+}
+
+interface CodexHomeAnnouncementsProps {
+  composerEntries?: Candidate[];
+  fallbackContent?: unknown;
+  homeRunLocationRemoteProject?: unknown;
+  includeGitCheckoutWarning?: boolean;
+  renderCandidates?: CandidateRenderer;
+  shouldHideOnboardingPromos: boolean;
+}
+
+let React: ReactRuntime;
+let jsx: JsxRuntime;
 let initialized = false;
 function initializeCodexHomeAnnouncements(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  homeBeacon.r?.();
-  composerSlot.n?.();
-  renewal.n?.();
-  beaconAnnouncement.r?.();
-  announcementState.t?.();
-  React = appShared.e6?.();
-  jsx = appShared.I3?.();
+  initializeJsxRuntimeLazy?.();
+  initializeIntl?.();
+  initializeHomeBeacon?.();
+  initializeComposerAnnouncementSlot?.();
+  initializeBeaconAnnouncement?.();
+  initializeHomeAnnouncementState?.();
+  React = typeof reactRuntime === "function" ? reactRuntime() : reactRuntime;
+  jsx = typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime;
   initialized = true;
 }
 
@@ -58,7 +154,7 @@ function renderCandidates({
   fallbackContent,
   renderCandidates: render,
   trackVisibility = true,
-}: Record<string, any>): unknown {
+}: RenderCandidatesProps): unknown {
   const candidates = [
     ...entries.map((entry: Candidate) => ({ ...entry, trackVisibility })),
     {
@@ -69,7 +165,7 @@ function renderCandidates({
     },
   ];
   if (render != null) return render(candidates);
-  const Host = composerSlot.t ?? "div";
+  const Host = ComposerAnnouncementSlot ?? "div";
   return jsx.jsx(Host, { area: "home", candidates });
 }
 
@@ -79,8 +175,8 @@ function CandidateStack({
   renderCandidates: render,
   renderSlot,
   trackVisibility = true,
-}: Record<string, any>): unknown {
-  const renewalCandidate = renewal.n?.() ?? {
+}: CandidateStackProps): unknown {
+  const renewalCandidate = useWorkspaceRenewalCandidate?.() ?? {
     isEligible: false,
     isLoading: false,
     content: null,
@@ -101,34 +197,34 @@ function CandidateStack({
   );
 }
 
-function useFastModeCandidate(): Record<string, any> {
-  const override = appInitial.D0t?.()?.fastModeCandidate;
+function useFastModeCandidate(): FastModeCandidate {
+  const override = useHomeAnnouncementOverrides?.()?.fastModeCandidate;
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  return (
-    override ?? {
-      content: null,
-      fastModeModel: null,
-      isEligible: false,
-      isLoading: false,
-      isSubmitting,
-      setHasSeenFastModeHomeBanner() {},
-      setIsSubmitting,
-      setServiceTier: async () => {},
-      intl: appShared.n4?.(),
-    }
-  );
+  const intl = useIntl();
+  if (override != null)
+    return { ...override, intl, isSubmitting, setIsSubmitting };
+  return {
+    content: null,
+    fastModeModel: null,
+    isEligible: false,
+    isLoading: false,
+    isSubmitting,
+    setHasSeenFastModeHomeBanner() {},
+    setIsSubmitting,
+    setServiceTier: async () => {},
+    intl,
+  };
 }
 
-function FastModeBanner(props: Record<string, any>): unknown {
-  const Shell = appPrimary.Sm ?? "div";
-  const FormattedMessage = appShared.Y2;
-  const scope = appShared.LX?.(appShared.ZI);
+function FastModeBanner(props: FastModeCandidate): unknown {
+  const Shell = AnnouncementShell ?? "div";
+  const scope = useSignalScope(applicationScope);
   const enable = () => {
     if (props.fastModeModel == null) return;
     props.setIsSubmitting(true);
     Promise.resolve(
       props.setServiceTier(
-        appShared.kz?.(props.fastModeModel)?.id ?? "priority",
+        findFastServiceTier(props.fastModeModel)?.id ?? "priority",
         "home_banner",
       ),
     ).finally(() => {
@@ -143,7 +239,7 @@ function FastModeBanner(props: Record<string, any>): unknown {
       description: "Title shown in the Fast mode home banner",
     }),
     description: props.content,
-    leadingVisual: jsx.jsx(appInitial.vN ?? "span", {
+    leadingVisual: jsx.jsx(FastModeIcon ?? "span", {
       className: "icon-sm text-chart-yellow",
     }),
     primaryAction: {
@@ -162,36 +258,37 @@ function FastModeBanner(props: Record<string, any>): unknown {
         description:
           "Accessible label for dismissing the Fast mode home banner",
       }),
-      icon: appShared.ig,
+      icon: DismissIcon,
       disabled: props.isSubmitting,
       onClick: () => {
-        appInitial.xpn?.(scope, appShared.vj, {});
+        logAnalyticsEvent?.(scope, fastModeBannerDismissedEvent, {});
         props.setHasSeenFastModeHomeBanner(true);
       },
     },
   });
 }
 
-function useBeacon(product?: string): Record<string, any> {
+function useBeacon(product?: string): HomeBeaconResult {
   return (
-    homeBeacon.t?.(product, { shouldSuppressFocusedModal: () => false }) ?? {
+    useHomeBeacon?.(product, { shouldSuppressFocusedModal: () => false }) ?? {
       accountId: null,
       beacon: null,
+      containerBeacon: null,
       isEligible: false,
       isLoading: false,
       shouldSuppressVanillaPromos: false,
     }
   );
 }
-function BeaconContent({ candidate, product }: Record<string, any>): unknown {
+function BeaconContent({ candidate, product }: BeaconContentProps): unknown {
   if (candidate.accountId == null || candidate.beacon == null) return null;
-  return jsx.jsx(beaconAnnouncement.t, {
+  return jsx.jsx(BeaconAnnouncement, {
     accountId: candidate.accountId,
     actionAccountId: candidate.accountId,
     analyticsContext: {
       placement: product === "work_tab" ? "work_tab_home" : "homepage",
       productExperience: product === "work_tab" ? "work" : "chat",
-      treatment: appInitial.kNt?.(candidate.beacon),
+      treatment: getBeaconTreatment?.(candidate.beacon),
     },
     beacon: candidate.beacon,
   });
@@ -203,7 +300,7 @@ function HomeAnnouncementComposition({
   product,
   renderCandidates: render,
   shouldHideOnboardingPromos,
-}: Record<string, any>): unknown {
+}: HomeAnnouncementCompositionProps): unknown {
   const beaconCandidate = useBeacon(product);
   const beaconContent = jsx.jsx(BeaconContent, {
     candidate: beaconCandidate,
@@ -243,9 +340,9 @@ function HomeComposerAnnouncements({
   homeComposerMode,
   renderCandidates: render,
   selectedCustomGptId,
-}: Record<string, any>): unknown {
-  const pathname = appInitial.i_n?.()?.pathname ?? "/";
-  const hidePromos = appInitial.sbt?.({
+}: HomeComposerAnnouncementsProps): unknown {
+  const pathname = useRouterLocation?.()?.pathname ?? "/";
+  const hidePromos = shouldHideHomePromos?.({
     hideFirstNewThreadOnboardingPromos: false,
     pathname,
   });
@@ -255,7 +352,7 @@ function HomeComposerAnnouncements({
       : homeComposerMode === "work"
         ? "work_tab"
         : undefined;
-  const className = appShared.m4?.(
+  const className = classNames(
     "empty:hidden",
     entryPoint === "codex" && "electron:mx-[var(--home-composer-inline-inset)]",
   );
@@ -264,9 +361,9 @@ function HomeComposerAnnouncements({
       ? null
       : jsx.jsx("div", {
           className,
-          children: jsx.jsx(banner.t, { gizmoId: selectedCustomGptId }),
+          children: jsx.jsx(CustomGptBanner, { gizmoId: selectedCustomGptId }),
         });
-  const CandidateSource = composerCandidates.HomeComposerAnnouncementCandidates;
+  const CandidateSource = HomeComposerAnnouncementCandidates;
   const content =
     CandidateSource == null
       ? jsx.jsx(HomeAnnouncementComposition, {
@@ -301,14 +398,14 @@ function CodexHomeAnnouncements({
   includeGitCheckoutWarning,
   renderCandidates: render,
   shouldHideOnboardingPromos,
-}: Record<string, any>): unknown {
+}: CodexHomeAnnouncementsProps): unknown {
   void homeRunLocationRemoteProject;
   void includeGitCheckoutWarning;
   const fast = useFastModeCandidate();
   const beaconCandidate = useBeacon("codex");
   const suppress = beaconCandidate.shouldSuppressVanillaPromos;
   const entries: Candidate[] = [
-    appInitial.CNt?.() ?? {
+    useRateLimitResetCandidate?.() ?? {
       id: "rate-limit-reset",
       isEligible: false,
       isLoading: false,
@@ -330,7 +427,7 @@ function CodexHomeAnnouncements({
           isLoading: false,
         }))
       : composerEntries),
-    announcementState.u?.() ?? {
+    useMultiAgentAnnouncementEligibility?.() ?? {
       id: "multi-agent",
       isEligible: false,
       isLoading: false,

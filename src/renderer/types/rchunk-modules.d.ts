@@ -2836,6 +2836,44 @@ declare module "@rchunk/app-initial" {
     FullscreenOnboarding: string;
     HomeAnnouncement: string;
   };
+  export interface HomeAnnouncementCandidate {
+    content: unknown;
+    id?: string;
+    isEligible: boolean;
+    isLoading: boolean;
+    pageContextClaim?: unknown;
+  }
+  export interface FastModeHomeCandidate extends HomeAnnouncementCandidate {
+    fastModeModel: import("@rchunk/app-shared").ServiceTierModel | null;
+    setHasSeenFastModeHomeBanner(seen: boolean): void;
+    setServiceTier(
+      tier: string,
+      source: "home_banner",
+    ): Promise<unknown> | unknown;
+  }
+  export interface HomeAnnouncementOverrides {
+    fastModeCandidate?: FastModeHomeCandidate;
+    homeAnnouncementCandidates?: HomeAnnouncementCandidate[];
+  }
+  /** Home 公告测试/实验覆盖入口。 */
+  export const D0t: () => HomeAnnouncementOverrides;
+  /** Home 的 rate-limit-reset 候选。 */
+  export const CNt: () => HomeAnnouncementCandidate;
+  export const Fk: (entryPoint: string) => (() => unknown) | null | undefined;
+  export interface WeeklyRecapCandidate {
+    availableCount: number;
+    dismiss(): void;
+    isEligible: boolean;
+    isLoading: boolean;
+  }
+  export const Nk: () => WeeklyRecapCandidate;
+  export const qk: () => boolean | undefined;
+  export const kNt: (beacon: unknown) => unknown;
+  export const sbt: (options: {
+    hideFirstNewThreadOnboardingPromos: boolean;
+    pathname: string;
+  }) => boolean;
+  export const vN: unknown;
   export const JNt: () => void;
   export type SetupCodexStep = "role" | "task" | "complete";
   export interface SetupCodexStepArguments {
@@ -3724,6 +3762,19 @@ declare module "@rchunk/app-primary" {
     title?: unknown;
   }
   export const Sm: (props: BannerProps) => unknown;
+  export type AnnouncementStatus = "eligible" | "ineligible" | "loading";
+  export const $p: (state: {
+    isEligible: boolean;
+    isLoading: boolean;
+  }) => AnnouncementStatus;
+  export const Ne: (props: {
+    entries: import("@rchunk/app-initial").HomeAnnouncementCandidate[];
+    trackVisibility?: boolean;
+  }) => unknown;
+  export const Ch: (
+    product?: string,
+    options?: { shouldSuppressFocusedModal?: () => boolean },
+  ) => import("@rchunk/home-beacon").HomeBeaconResult;
   export const Cm: () => void;
   export interface LibraryFilePickerDialogProps
     extends Record<string, unknown> {
@@ -3949,9 +4000,19 @@ declare module "@rchunk/realtime-voice-launch-surface" {
 }
 
 declare module "@rchunk/codex-app-home-beacon-announcement-core" {
-  export const n: (...args: any[]) => unknown;
+  export interface BeaconAnnouncementProps extends Record<string, unknown> {
+    accountId: string;
+    actionAccountId: string;
+    analyticsContext: {
+      placement: string;
+      productExperience: "chat" | "work";
+      treatment?: unknown;
+    };
+    beacon: unknown;
+  }
+  export const n: (props: BeaconAnnouncementProps) => unknown;
   export const r: () => void;
-  export const t: (...args: any[]) => unknown;
+  export const t: (props: BeaconAnnouncementProps) => unknown;
 }
 
 declare module "@rchunk/pca-connector-eligibility" {
@@ -4770,6 +4831,10 @@ declare module "@rchunk/home-beacon" {
   }
   export interface HomeBeaconRecord extends Record<string, unknown> {
     beacon_id: string;
+    custom_fields?: {
+      show_after_onboarding?: boolean;
+      [key: string]: unknown;
+    };
   }
   export interface HomeBeaconResult {
     accountId: string | null;
@@ -4793,7 +4858,7 @@ declare module "@rchunk/home-beacon" {
   ) => boolean;
   export const r: (
     product?: string,
-    options?: { shouldSuppressFocusedModal?: boolean },
+    options?: { shouldSuppressFocusedModal?: () => boolean },
   ) => HomeBeaconResult;
   export const t: () => void;
 }
@@ -4914,9 +4979,31 @@ declare module "@rchunk/home-suggestion-list" {
   export const t: unknown;
 }
 
-declare module "@rchunk/home-composer-announcement-candidates" { export const HomeComposerAnnouncementCandidates: unknown; }
-declare module "@rchunk/codex-home-announcements" { export const _any: any; }
-declare module "@rchunk/announcement-entry-points" { export const _any: any; }
+declare module "@rchunk/home-composer-announcement-candidates" {
+  export interface HomeComposerAnnouncementCandidatesProps {
+    beaconProduct?: "chatgpt" | "work_tab";
+    entryPoint: string;
+    renderCandidates?: (
+      candidates: import("@rchunk/composer-announcement-slot").ComposerAnnouncementCandidate[],
+    ) => unknown;
+    shouldHideOnboardingPromos: boolean;
+  }
+  export const HomeComposerAnnouncementCandidates: (
+    props: HomeComposerAnnouncementCandidatesProps,
+  ) => unknown;
+}
+declare module "@rchunk/announcement-entry-points" {
+  export const i: (options: {
+    enabled: boolean;
+  }) => import("@rchunk/app-initial").HomeAnnouncementCandidate;
+  export const o: (options: {
+    enabled: boolean;
+  }) => import("@rchunk/app-initial").HomeAnnouncementCandidate;
+  export const s: (options: {
+    enabled: boolean;
+  }) => import("@rchunk/app-initial").HomeAnnouncementCandidate;
+  export const t: () => void;
+}
 declare module "@rchunk/worktree-onboarding-banner-controller" {
   export const WorktreeOnboardingBannerController: () => unknown;
 }
@@ -5318,12 +5405,41 @@ declare module "@rchunk/codex-home-announcements-current-entry" {
 }
 
 declare module "@rchunk/codex-home-announcements" {
+  export interface AnnouncementCandidate {
+    content: unknown;
+    id?: string;
+    isEligible: boolean;
+    isLoading: boolean;
+    pageContextClaim?: unknown;
+    trackVisibility?: boolean;
+  }
+  export interface HomeAnnouncementCompositionProps {
+    entries: AnnouncementCandidate[];
+    fallbackContent?: unknown;
+    product?: string;
+    renderCandidates?: (candidates: AnnouncementCandidate[]) => unknown;
+    shouldHideOnboardingPromos: boolean;
+  }
+  export interface HomeComposerAnnouncementsProps {
+    entryPoint: string;
+    homeComposerMode: "chat" | "work" | string;
+    renderCandidates?: (candidates: AnnouncementCandidate[]) => unknown;
+    selectedCustomGptId?: string | null;
+  }
+  export interface CodexHomeAnnouncementsProps {
+    composerEntries?: AnnouncementCandidate[];
+    fallbackContent?: unknown;
+    homeRunLocationRemoteProject?: unknown;
+    includeGitCheckoutWarning?: boolean;
+    renderCandidates?: (candidates: AnnouncementCandidate[]) => unknown;
+    shouldHideOnboardingPromos: boolean;
+  }
   export const a: () => void;
-  export const i: unknown;
-  export const n: unknown;
+  export const i: (props: HomeAnnouncementCompositionProps) => unknown;
+  export const n: (props: HomeComposerAnnouncementsProps) => unknown;
   export const o: () => void;
   export const r: () => void;
-  export const t: unknown;
+  export const t: (props: CodexHomeAnnouncementsProps) => unknown;
 }
 
 declare module "@rchunk/codex-home-announcements-entry" {
@@ -5627,10 +5743,22 @@ declare module "@rchunk/suggestion-card" {
 }
 
 declare module "@rchunk/composer-announcement-slot" {
+  export interface ComposerAnnouncementCandidate {
+    content: unknown;
+    id?: string;
+    isEligible: boolean;
+    isLoading: boolean;
+    pageContextClaim?: unknown;
+    trackVisibility?: boolean;
+  }
+  export interface ComposerAnnouncementSlotProps {
+    area: "home" | string;
+    candidates: ComposerAnnouncementCandidate[];
+  }
   export const i: () => void;
   export const n: () => void;
   export const r: unknown;
-  export const t: unknown;
+  export const t: (props: ComposerAnnouncementSlotProps) => unknown;
 }
 
 declare module "@rchunk/rpc" {
