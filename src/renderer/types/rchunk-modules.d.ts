@@ -4714,7 +4714,7 @@ declare module "@rchunk/changelog-modal" {
 }
 
 declare module "@rchunk/chatgpt-sites";
-declare module "@rchunk/duplicate-agent";
+declare module "@rchunk/duplicate-agent" { export interface AgentManagementService { canDelete?(agentId: string): boolean; canDuplicate?(agentId: string): boolean; clone?(agentId: string, name: string): Promise<{ id: string }>; delete?(agentId: string): Promise<void>; invalidate?(keys: readonly unknown[]): void; navigateToAgent?(agentId: string): void; notify?(tone: "danger" | "success", message: string): void } export const a: (props: { agentId: string; onClose(): void; onDeleted?(): void; service?: AgentManagementService }) => unknown; export const i: () => void; export const n: (props: { onSelect(): void }) => unknown; export const o: () => void; export const r: (props: { agentId: string; onSelect(): void; service?: AgentManagementService }) => unknown; export const t: (props: { agentId: string; agentName: string; onClose(): void; service?: AgentManagementService }) => unknown }
 declare module "@rchunk/use-visible-settings-sections";
 
 declare module "@rchunk/create-output-menu" {
@@ -6881,7 +6881,7 @@ declare module "@rchunk/app-initial" {
   };
   export const mC: import("@rchunk/app-shared").SignalFamily<
     { accountId: string | null; userId: string | null },
-    { data?: unknown }
+    { data?: { email: string; email_domain_type?: string | null } | null }
   >;
 }
 
@@ -6907,12 +6907,16 @@ declare module "@rchunk/conversation-markdown" {
 }
 
 declare module "@rchunk/workspace-discovery" {
-  export const c: (value: unknown) => boolean;
+  export const a: { getOptions(userId: string | null): Record<string, unknown> };
+  export const c: (value: { email: string; email_domain_type?: string | null }) => boolean;
   export const i: () => void;
   export const l: () => void;
   export const n: () => void;
-  export const r: unknown;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const o: () => void;
+  export const r: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptWorkspaceDiscoveryModalShown" }>;
+  export const s: "oai/apps/hasSeenWorkspaceDiscoveryFirstLogin";
+  export const t: (props: { accessibleWorkspaces?: Array<{ id: string; imageUrl?: string | null; name: string }>; discoverableWorkspaces?: Array<{ id: string; image_url?: string | null; name: string; requested?: boolean }>; email?: string; loading?: boolean; mode?: "blocking" | "dismissible"; onClose?(): void; onRequest?(workspace: { id: string; image_url?: string | null; name: string; requested?: boolean }): Promise<void> | void; section?: "both" | "discoverable" | "existing" }) => unknown;
+  export const u: (token: string | null | undefined, nowMs: number) => boolean;
 }
 
 declare module "@rchunk/view-frame" {
@@ -10264,7 +10268,20 @@ declare module "@rchunk/pull-request-status-label" {
 }
 
 declare module "@rchunk/profile-view" { const profileView: unknown; export default profileView; }
-declare module "@rchunk/workspace-agent-detail-query" { const workspaceAgentDetailQuery: unknown; export default workspaceAgentDetailQuery; }
+declare module "@rchunk/workspace-agent-detail-query" {
+  export interface WorkspaceAgentQueryContext { accountId?: string | null; enabled?: boolean }
+  export const a: { getOptions(input: { agentId: string; fileId?: string | null; fileName?: string; mimeType?: string | null; sizeBytes?: number | null; updatedAt?: string | null }, context?: WorkspaceAgentQueryContext): Record<string, unknown> };
+  export const c: (accountId: string, connectorId: string) => Record<string, unknown>;
+  export const d: () => void;
+  export const i: { getOptions(agentId: string, context?: WorkspaceAgentQueryContext): Record<string, unknown> };
+  export const l: (reference: { connector_identifier: { connector_id?: string; type: string } }) => string | null;
+  export const n: { getOptions(agentId: string, context?: WorkspaceAgentQueryContext): Record<string, unknown> };
+  export const o: { getOptions(input: { agentId: string; channel: { channelId?: string; linkId?: string; type: string } }, context?: WorkspaceAgentQueryContext): Record<string, unknown> };
+  export const r: { getOptions(connectorIds: readonly string[], context?: WorkspaceAgentQueryContext): Record<string, unknown> };
+  export const s: (input: { accountId: string; connectorIds: readonly string[]; enabled?: boolean }) => Record<string, unknown>;
+  export const t: () => void;
+  export const u: (input: { accountId: string; agentId: string; versionScope: string; enabled?: boolean }) => Record<string, unknown>;
+}
 
 declare module "@rchunk/profile-page" {
   export interface ProfilePageProps { today?: Date | string; username?: string; editPaneOpen?: boolean; header?: unknown; children?: unknown; onUsernameChanged?(username: string): void; }

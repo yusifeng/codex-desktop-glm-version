@@ -1,0 +1,18 @@
+import "@rchunk/rolldown-runtime";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import "@rchunk/app-initial";
+import "@rchunk/workspace-agent-detail-query";
+
+interface AgentManagementService { canDelete?(agentId: string): boolean; canDuplicate?(agentId: string): boolean; clone?(agentId: string, name: string): Promise<{ id: string }>; delete?(agentId: string): Promise<void>; invalidate?(keys: readonly unknown[]): void; navigateToAgent?(agentId: string): void; notify?(tone: "danger" | "success", message: string): void }
+interface DeleteAgentProps { agentId: string; onClose(): void; onDeleted?(): void; service?: AgentManagementService }
+interface DuplicateAgentProps { agentId: string; agentName: string; onClose(): void; service?: AgentManagementService }
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function invalidate(service: AgentManagementService | undefined, accountId: string | undefined, agentId: string): void { for (const key of [["workspace-agents", accountId], ["workspace-agents", "directory", accountId], ["workspace-agent-pins", accountId], ...["detail", "builder", "activity", "memory", "memory-file", "published-versions"].map(kind => ["workspace-agent", kind, accountId, agentId])]) service?.invalidate?.(key); }
+function a({ agentId, onClose, onDeleted, service }: DeleteAgentProps): unknown { const submit = async (event?: { preventDefault(): void }) => { event?.preventDefault(); if (service?.canDelete?.(agentId) === false || service?.delete == null) return; try { await service.delete(agentId); invalidate(service, undefined, agentId); service.notify?.("success", "Agent deleted"); onClose(); onDeleted?.(); } catch { service.notify?.("danger", "Failed to delete agent"); onClose(); } }; return jsx().jsxs("form", { "aria-label": "Delete agent?", onSubmit: submit, children: [jsx().jsx("p", { children: "Are you sure you want to delete this agent? This action cannot be undone." }), jsx().jsx("button", { onClick: onClose, type: "button", children: "Cancel" }), jsx().jsx("button", { disabled: service?.canDelete?.(agentId) === false, type: "submit", children: "Delete" })] }); }
+function n({ onSelect }: { onSelect(): void }): unknown { return jsx().jsx("button", { onClick: onSelect, role: "menuitem", type: "button", children: "Duplicate" }); }
+function r({ agentId, onSelect, service }: { agentId: string; onSelect(): void; service?: AgentManagementService }): unknown { return service?.canDuplicate?.(agentId) === false ? null : n({ onSelect }); }
+function t({ agentId, agentName, onClose, service }: DuplicateAgentProps): unknown { const trimmed = agentName.trim(); const copyName = trimmed === "" ? "Unnamed agent (Copy)" : `${trimmed} (Copy)`; const submit = async (event?: { preventDefault(): void }) => { event?.preventDefault(); if (service?.canDuplicate?.(agentId) === false || service?.clone == null) return; try { const cloned = await service.clone(agentId, copyName); service.invalidate?.(["workspace-agents", "created"]); onClose(); service.navigateToAgent?.(cloned.id); } catch { service.notify?.("danger", "Failed to duplicate agent"); } }; return jsx().jsxs("form", { "aria-label": trimmed === "" ? "Duplicate Unnamed agent?" : `Duplicate ${trimmed}?`, onSubmit: submit, children: [jsx().jsx("p", { children: "This won't copy channels, automations, or agent-owned app connections" }), jsx().jsx("button", { onClick: onClose, type: "button", children: "Cancel" }), jsx().jsx("button", { disabled: service?.canDuplicate?.(agentId) === false, type: "submit", children: "Duplicate" })] }); }
+function o(): void {}
+function i(): void {}
+export { a, i, n, o, r, t };

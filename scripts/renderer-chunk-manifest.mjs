@@ -2248,4 +2248,7 @@ export const REWRITTEN = new Set([
   "index-entry",
   "artifact-entry",
   "portable-pdfjs-runtime",
+  "workspace-discovery",
+  "workspace-agent-detail-query",
+  "duplicate-agent",
 ]);

@@ -94,8 +94,8 @@ function WorkspaceDiscoveryMenuItem({
         location: "expanded_sidebar",
       });
       openModal(scope, WorkspaceDiscoveryDialog, {
-        mode: "dismissible",
-        section: "discoverable",
+        mode: "dismissible" as const,
+        section: "discoverable" as const,
       });
     },
     children: label,
