@@ -1,0 +1,20 @@
+import "@rchunk/rolldown-runtime";
+import "@rchunk/animated-segmented-toggle";
+import "@rchunk/app-initial";
+import "@rchunk/chatgpt-cme";
+import "@rchunk/radio-group";
+import "@rchunk/cme-state";
+import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+interface CmeConversation { conversation_id: string; credits?: number; title: string }
+interface CmeEvaluation { knowledge_improvement: "increased_significantly" | "increased_slightly" | "no_change"; no_commercial_bias: boolean; practice_changed: "did_not_affect_current_clinical_practice" | "modified_clinical_practice" | "reinforced_current_clinical_practice" }
+interface CmeDialogProps { conversations?: CmeConversation[]; error?: string | null; identity?: { accountId: string; userId: string } | null; isLoading?: boolean; onClose(): void; onRetry?(): void; onSubmit?(claim: { consent: boolean; conversations: Array<CmeConversation & { evaluation: CmeEvaluation }> }): Promise<{ approved: boolean; year?: number }> | { approved: boolean; year?: number } }
+let runtime: JsxRuntime | undefined;
+function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function CmeDialog({ conversations = [], error, identity = { accountId: "active", userId: "active" }, isLoading = false, onClose, onRetry, onSubmit }: CmeDialogProps): unknown {
+  if (identity == null) return null;
+  let selected = new Set<string>(), consent = false, pending = false, result: string | null = null;
+  const evaluations = new Map<string, CmeEvaluation>();
+  const submit = async () => { const chosen = conversations.filter(item => selected.has(item.conversation_id)); if (pending || !consent || chosen.length === 0 || chosen.some(item => !evaluations.has(item.conversation_id))) return; pending = true; try { const response = await onSubmit?.({ consent, conversations: chosen.map(item => ({ ...item, evaluation: evaluations.get(item.conversation_id) as CmeEvaluation })) }); result = response?.approved ? "Credits approved" : "Credits could not be approved"; } catch { result = "Unable to submit your claim. Please try again."; } finally { pending = false; } };
+  return jsx().jsxs("dialog", { open: true, children: [jsx().jsxs("header", { children: [jsx().jsx("h2", { children: "Claim CME credits" }), jsx().jsx("button", { type: "button", "aria-label": "Close", onClick: onClose, children: "Close" })] }), isLoading ? jsx().jsx("p", { role: "status", children: "Loading eligible conversations" }) : error != null ? jsx().jsxs("div", { role: "alert", children: [error, jsx().jsx("button", { type: "button", onClick: onRetry, children: "Try again" })] }) : conversations.length === 0 ? jsx().jsx("p", { children: "No conversations are eligible for CME credits" }) : jsx().jsx("ul", { children: conversations.map(item => jsx().jsx("li", { children: jsx().jsxs("section", { children: [jsx().jsx("label", { children: [jsx().jsx("input", { type: "checkbox", onChange: (event: { currentTarget: { checked: boolean } }) => { event.currentTarget.checked ? selected.add(item.conversation_id) : selected.delete(item.conversation_id); } }), item.title, item.credits == null ? null : ` · ${item.credits} credits`] }), jsx().jsx("button", { type: "button", onClick: () => { evaluations.set(item.conversation_id, { knowledge_improvement: "increased_slightly", no_commercial_bias: true, practice_changed: "reinforced_current_clinical_practice" }); }, children: "Mark evaluation complete" })] }) }, item.conversation_id)) }), jsx().jsx("label", { children: [jsx().jsx("input", { type: "checkbox", onChange: (event: { currentTarget: { checked: boolean } }) => { consent = event.currentTarget.checked; } }), "I certify this claim is accurate"] }), result == null ? null : jsx().jsx("p", { role: "status", children: result }), jsx().jsxs("footer", { children: [jsx().jsx("button", { type: "button", disabled: pending, onClick: onClose, children: "Cancel" }), jsx().jsx("button", { type: "button", disabled: pending, onClick: () => void submit(), children: "Submit claim" })] })] });
+}
+export { CmeDialog, type CmeDialogProps };

@@ -5276,6 +5276,12 @@ declare module "@rchunk/delinquent-upgrade-preparation";
 declare module "@rchunk/payment-method-display";
 declare module "@rchunk/edit-payment-method";
 declare module "@rchunk/subscription-recovery-events";
+declare module "@rchunk/project-share-model";
+declare module "@rchunk/builder-analytics";
+declare module "@rchunk/read-error";
+declare module "@rchunk/animated-segmented-toggle";
+declare module "@rchunk/radio-group";
+declare module "@rchunk/cme-state";
 
 declare module "@rchunk/dictionary-dialog" {
   export interface DictionaryWord { id: string; text: string; }
@@ -5297,6 +5303,10 @@ declare module "@rchunk/billing-cadence-dialog" { export const BillingCadenceDia
 declare module "@rchunk/subscription-recovery-dialog" { export const RecoveryDialog: (props: Record<string, unknown> & { accountId: string; onClose(): void; onComplete(): void; planName: string }) => unknown; }
 declare module "@rchunk/subscription-cancellation-dialog" { export const CancellationDialog: (props: Record<string, unknown> & { account: Record<string, unknown>; accountId: string; onClose(): void }) => unknown; }
 declare module "@rchunk/credit-reload-dialog-host" { export const CreditReloadDialogHost: (props: Record<string, unknown> & { onClose(): void; source: string; variant: string }) => unknown; }
+declare module "@rchunk/product-report-dialog" { export const ProductReportDialog: (props: Record<string, unknown> & { onClose(): void; product: Record<string, unknown> }) => unknown; }
+declare module "@rchunk/chatgpt-project-share-dialog" { export const ChatGptProjectShareDialog: (props: Record<string, unknown> & { accountId: string; onClose(): void; projectId: string }) => unknown; }
+declare module "@rchunk/workspace-agent-schedules-dialog" { export const WorkspaceAgentSchedulesDialog: (props: Record<string, unknown> & { accountId: string; agentId: string; onClose(): void }) => unknown; }
+declare module "@rchunk/cme-dialog" { export const CmeDialog: (props: Record<string, unknown> & { onClose(): void }) => unknown; }
 declare module "@rchunk/review-file-source-breadcrumb" {
   export const a: () => void; export const c: () => void; export const d: (line: number, lineCount: number) => number; export const i: () => void; export const l: (contents: string) => number; export const n: () => void; export const o: (element: HTMLElement, line: number, character: number) => boolean; export const r: (props: Record<string, unknown>) => unknown; export const s: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; export const u: (value: string, lineCount?: number) => number | null;
 }
