@@ -859,6 +859,7 @@ declare module "@rchunk/app-shared" {
   export const $O: {
     FIVE_SECONDS: number;
     FIVE_MINUTES: number;
+    INFINITE: number;
     ONE_MINUTE: number;
     THIRTY_SECONDS: number;
   };
@@ -1466,7 +1467,7 @@ declare module "@rchunk/app-shared" {
   /** initializeRemoteModelConfiguration（内部 ZL）。 */
   export const HY: () => void;
   /** isHeartbeatAutomation（内部 TNe）。 */
-  export const zY: (automation: AutomationDefinition) => boolean;
+  export const zY: (automation: unknown) => automation is AutomationDefinition;
   /** normalizeAutomationExecutionEnvironment（内部 ENe）。 */
   export const BY: (environment: unknown) => "worktree" | "local";
   /** findAutomationModel（内部 QL）。 */
@@ -3309,7 +3310,7 @@ declare module "@rchunk/app-initial" {
   export const kht: any;
   export const zPt: any;
   export const $ln: (key: string, parameters?: unknown) => readonly unknown[];
-  export const Qln: (event: string, payload: unknown) => Promise<unknown>;
+  export const Qln: (event: string, payload?: unknown) => Promise<unknown>;
   export const aun: () => void;
   export const nun: () => void;
   export const oun: (queryClient: unknown, key: unknown) => Promise<unknown>;
@@ -3462,14 +3463,16 @@ declare module "@rchunk/app-initial" {
   >;
   export const Ton: () => Error;
   export const Ugn: (
-    scope: import("@rchunk/app-shared").MaitaiScopeApi<unknown>,
-    hostId: string,
+    scope: unknown,
+    hostId: unknown,
   ) => {
     createChatGptLoginSession(options: {
       appBrand?: "chatgpt";
       useHostedLoginSuccessPage: boolean;
       useStreamlinedLogin?: boolean;
     }): DesktopLoginSession;
+    hydrateBackgroundThreads(ids: string[]): Promise<void>;
+    sendRequest(method: string, parameters: unknown): Promise<void>;
   };
   export const Vgn: () => {
     StableID: { get(key: unknown): string };
@@ -4204,6 +4207,64 @@ declare module "@rchunk/app-initial" {
   export const dgn: string;
   export const Sln: unknown;
   export const Ysn: unknown;
+  /** PR 自动修复侧栏、heartbeat 与 worktree 查询依赖。 */
+  export const FCt: () => void;
+  export const Gvt: (
+    scope: unknown,
+    definition: unknown,
+    options: Record<string, unknown>,
+  ) => unknown;
+  export const HZt: () => void;
+  export const dg: () => void;
+  export const ICt: (value: unknown) => boolean;
+  export const QCt: unknown;
+  export const Wvt: () => void;
+  export const ZCt: () => void;
+  export const _vt: () => void;
+  export const fg: (definition: {
+    open: (...arguments_: unknown[]) => unknown;
+    restore: (...arguments_: unknown[]) => Promise<boolean>;
+  }) => unknown;
+  export const gvt: (scope: unknown, tabId: string) => string | null | undefined;
+  export const hsn: (value: unknown) => boolean;
+  export const mg: () => void;
+  export const msn: () => void;
+  export const pg: unknown;
+  export const wQt: unknown;
+  export const zZt: unknown;
+  export const GYt: () => void;
+  export const LYt: (input: Record<string, unknown>) => unknown;
+  export const PCt: string;
+  export const zYt: () => Record<string, unknown>;
+  export const Bcn: (
+    get: (signal: unknown, parameter?: unknown) => unknown,
+    setting: { key: string },
+  ) => unknown;
+  export const Con: () => void;
+  export const Gcn: unknown;
+  export const Gsn: readonly unknown[];
+  export const Jht: (...arguments_: unknown[]) => unknown;
+  export const Jsn: readonly unknown[];
+  export const Kht: (...arguments_: unknown[]) => readonly unknown[];
+  export const Ksn: readonly unknown[];
+  export const Ucn: (
+    scope: unknown,
+    setting: { key: string },
+    value: unknown,
+  ) => Promise<void>;
+  export const Vcn: () => void;
+  export const _cn: () => void;
+  export const _on: (host: unknown) => string;
+  export const lcn: unknown;
+  export const mcn: unknown;
+  export const qht: () => void;
+  export const won: (service: string) => {
+    request(input: {
+      method: string;
+      params: Record<string, unknown>;
+      signal: AbortSignal;
+    }): Promise<unknown>;
+  };
   /** Pull request revision/checks 基础依赖。 */
   export const $v: (props: Record<string, unknown>) => unknown;
   export const Hg: () => void;
@@ -5122,10 +5183,33 @@ declare module "@rchunk/use-codex-worktrees" {
   }
   export const n: (
     host: unknown,
-    surface: "home_page",
+    surface: string,
     options: { enabled: boolean },
   ) => CodexWorktreesQueryResult;
+  export const a: unknown;
+  export const i: (
+    scope: unknown,
+    hostId: string,
+    setting: { key: string },
+    value: unknown,
+  ) => Promise<void>;
+  export const r: () => void;
   export const t: () => void;
+}
+
+declare module "@rchunk/pull-request-fix-automation" {
+  export const a: (input: Record<string, unknown>) => Promise<unknown>;
+  export const i: (automation: Record<string, unknown>) => Promise<unknown>;
+  export const n: () => void;
+  export const o: (preferences: {
+    autoMerge: boolean;
+    instructions: string;
+  }) => Promise<unknown[]>;
+  export const r: (automation: { status?: string } | null | undefined) => boolean;
+  export const t: (
+    automations: readonly Record<string, unknown>[] | null | undefined,
+    pullRequestUrl: string | null | undefined,
+  ) => unknown;
 }
 
 declare module "@rchunk/worktree-onboarding-state" {
