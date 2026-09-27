@@ -2796,6 +2796,25 @@ declare module "@rchunk/app-initial" {
   >;
   /** initializeSkillDetails（内部 a9o）。 */
   export const gE: () => void;
+  /** 当前宿主 ID signal。 */
+  export const Dyt: import("@rchunk/app-shared").ReadableSignal<string>;
+  export interface ArtifactPreviewOptions extends Record<string, unknown> {
+    artifactTemplateSkill?: unknown;
+    hostId: string;
+    isPreview?: boolean;
+    tabId?: string;
+    title?: string;
+  }
+  /** openArtifactPreview。 */
+  export const Ult: (
+    scope: import("@rchunk/app-shared").MaitaiScopeApi<Record<string, unknown>>,
+    path: string,
+    options: ArtifactPreviewOptions,
+  ) => void;
+  /** artifact preview、automation routes 与 Home prefill 状态初始化器。 */
+  export const Hlt: () => void;
+  export const itn: () => void;
+  export const byt: () => void;
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices
@@ -2805,7 +2824,9 @@ declare module "@rchunk/app-initial" {
       openNotificationSettings(): Promise<void>;
     };
   }; // appServices：已解析的服务集合
-  export const $en: unknown; // zb：RouteScope atom
+  export const $en: import("@rchunk/app-shared").MaitaiScope<
+    Record<string, unknown>
+  >; // zb：RouteScope atom
   export const bS: Record<string, unknown>; // Bms：侧面板 UI 组件注册表
   export const C: unknown; // XXc：PermissionsModeDropdown 懒加载组件
   export const CS: unknown; // ems：侧面板 List 组件

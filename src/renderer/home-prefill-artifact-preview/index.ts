@@ -6,8 +6,20 @@ import * as runtimeChunk from "@rchunk/rolldown-runtime";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  $en: routeScope,
+  Dyt: hostIdSignal,
+  Hlt: initializeArtifactPreview,
+  Ult: openArtifactPreview,
+  byt: initializeHomePrefillState,
+  itn: initializeAutomationRoutes,
+} = appInitialChunk;
+const {
+  $3: initializeJsxRuntime,
+  FX: initializeSignalRuntime,
+  LX: useScope,
+  e6: getReactRuntime,
+} = appSharedChunk;
 
 interface ReactRuntime {
   useEffect(effect: () => void, dependencies: unknown[]): void;
@@ -20,28 +32,30 @@ export interface PrefillPreviewFile {
   path?: string;
 }
 
+export interface HomePrefillArtifactPreviewProps {
+  locationKey: unknown;
+  previewFiles: PrefillPreviewFile[];
+}
+
 let React: ReactRuntime | null = null;
 
 function HomePrefillArtifactPreview({
   locationKey,
   previewFiles,
-}: {
-  locationKey: unknown;
-  previewFiles: PrefillPreviewFile[];
-}): null {
+}: HomePrefillArtifactPreviewProps): null {
   initializeHomePrefillArtifactPreview();
   const react = React as ReactRuntime;
-  const scope = appShared.LX(appInitial.$en);
+  const scope = useScope(routeScope);
   const handledLocation = react.useRef<unknown>(null);
   react.useEffect(() => {
     if (previewFiles.length === 0 || handledLocation.current === locationKey)
       return;
-    const hostId = scope.get(appInitial.Dyt);
+    const hostId = scope.get<string>(hostIdSignal);
     handledLocation.current = locationKey;
     for (const file of previewFiles) {
       const filePath = file.fsPath || file.path;
       if (filePath != null && filePath.length !== 0) {
-        appInitial.Ult(scope, filePath, { hostId, title: file.label });
+        openArtifactPreview(scope, filePath, { hostId, title: file.label });
       }
     }
   }, [locationKey, previewFiles, scope]);
@@ -49,11 +63,13 @@ function HomePrefillArtifactPreview({
 }
 
 function initializeHomePrefillArtifactPreview(): void {
-  appShared.FX?.();
-  appInitial.Hlt?.();
-  appInitial.itn?.();
-  appInitial.byt?.();
-  React ??= typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
+  initializeJsxRuntime?.();
+  initializeSignalRuntime?.();
+  initializeArtifactPreview?.();
+  initializeAutomationRoutes?.();
+  initializeHomePrefillState?.();
+  React ??=
+    typeof getReactRuntime === "function" ? getReactRuntime() : getReactRuntime;
 }
 
 initializeHomePrefillArtifactPreview();
