@@ -1106,6 +1106,8 @@ export const CHUNKS = {
   "local-conversation-sources-side-panel-tab-core": "local-conversation-sources-side-panel-tab-bf34acdaf32e.js",
   "registered-sources": "registered-sources-1291c9a6cab3.js",
   "environment-setup-tab-panel": "tab-panel-f36ccc73e17f.js",
+  "automation-side-panel-tab-core": "automation-side-panel-tab-cb6c559690f8.js",
+  "site-automation-setup-state": "site-automation-setup-state-75f372a61373.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -1115,6 +1117,8 @@ export const REWRITTEN = new Set([
   "open-local-conversation-subagents-panel",
   "open-local-conversation-sources-side-panel-tab",
   "side-panel",
+  "site-automation-setup-state",
+  "open-automation-side-panel-tab",
   "queries",
   "task-announcement-state",
   "entry-point-availability",

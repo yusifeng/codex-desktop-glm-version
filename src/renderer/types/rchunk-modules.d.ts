@@ -9066,7 +9066,11 @@ declare module "@rchunk/app-initial" {
   export const ig: () => void;
   export const kZt: unknown;
   export const og: string;
-  export const qvt: { tabById$: unknown; activeTab$?: unknown };
+  export const qvt: {
+    tabById$: unknown;
+    tabStateById$: unknown;
+    activeTab$?: unknown;
+  };
   export const sg: (parentConversationId: string) => string;
   export const wZt: unknown;
   /** Side-panel definition registry and environment setup state。 */
@@ -9082,6 +9086,18 @@ declare module "@rchunk/app-initial" {
   export const vbt: unknown;
   export const vvt: (scope: unknown, placement: string) => boolean;
   export const wtn: import("@rchunk/app-shared").MaitaiScope<unknown>;
+  /** Automation side-panel registration and query dependencies。 */
+  export const Fg: string;
+  export const Ig: () => void;
+  export const Ng: () => void;
+  export const Pg: (definition: {
+    open: (...arguments_: unknown[]) => unknown;
+    restore: (...arguments_: unknown[]) => Promise<boolean>;
+  }) => unknown;
+  export const Vvt: { tabStateById$: unknown };
+  export const stt: () => void;
+  export const ttt: unknown;
+  export const zg: (directiveKey: string) => string;
 }
 
 declare module "@rchunk/verify-descendant" {
@@ -9122,6 +9138,17 @@ declare module "@rchunk/registered-sources" {
 
 declare module "@rchunk/environment-setup-tab-panel" {
   export const EnvironmentSetupTabPanel: (
+    props: Record<string, unknown>,
+  ) => unknown;
+}
+
+declare module "@rchunk/site-automation-setup-state" {
+  export const n: unknown;
+  export const t: () => void;
+}
+
+declare module "@rchunk/automation-side-panel-tab-core" {
+  export const AutomationSidePanelTabIcon: (
     props: Record<string, unknown>,
   ) => unknown;
 }
