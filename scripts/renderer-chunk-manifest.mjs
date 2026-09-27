@@ -2296,4 +2296,8 @@ export const REWRITTEN = new Set([
   "tab-address-input",
   "conversation-thumbnail-ui",
   "thread-tab-entity",
+  "mcp-tool-activity-label",
+  "mcp-tool-approval-message",
+  "mcp-tool-item-content",
+  "plan-summary-item-content",
 ]);

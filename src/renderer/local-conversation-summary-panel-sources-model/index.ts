@@ -29,6 +29,7 @@ import {
 import {
   i as initializeMcpToolActivityLabels,
   t as getMcpToolActivityLabel,
+  type McpToolIntl,
 } from "@rchunk/mcp-tool-activity-label";
 import {
   r as initializeLocalConversationExternalResources,
@@ -235,7 +236,7 @@ function buildToolSource(
 function collectToolSources(
   turns: ConversationTurn[],
   apps: McpApp[],
-  intl: unknown,
+  intl: McpToolIntl,
   knownMcpAppIds?: Set<string> | null,
   serverInfoQuery?: ServerInfoQuery | null,
   excludedProviderIds?: Set<string> | null,
