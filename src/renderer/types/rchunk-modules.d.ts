@@ -14133,3 +14133,52 @@ declare module "@rchunk/chatgpt-search-dialog" {
   }
   export const ChatGptSearchDialog: (props: ChatGptSearchDialogProps) => unknown;
 }
+
+declare module "@rchunk/skill-share-dialog-runtime" {
+  export const a: () => void;
+  export const c: (group: { id: string; name: string }) => Record<string, unknown>;
+  export const d: (...args: unknown[]) => Promise<boolean>;
+  export const f: (...args: unknown[]) => Promise<Record<string, unknown>>;
+  export const i: (...args: unknown[]) => Promise<void>;
+  export const l: (error: unknown) => "FORCE_CREATE" | "UPDATE_EXISTING" | null;
+  export const n: () => void;
+  export const o: (...args: unknown[]) => Promise<boolean>;
+  export const r: (...args: unknown[]) => Promise<void>;
+  export const s: (props: Record<string, unknown>) => unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
+  export const u: () => void;
+}
+
+declare module "@rchunk/ad-control-dialog-runtime" {
+  export const A: (content: Record<string, unknown>) => Array<Record<string, unknown>>;
+  export const C: (formatter: Record<string, unknown>) => { sendLabel: string; title: string };
+  export const D: () => void;
+  export const E: (url: string) => string | null;
+  export const O: (props: Record<string, unknown>) => unknown;
+  export const S: (value: unknown) => boolean;
+  export const T: (value: string) => string;
+  export const _: () => void;
+  export const a: () => void;
+  export const b: (event: { preventDefault(): void }) => void;
+  export const c: (props: Record<string, unknown>) => Record<string, unknown>;
+  export const d: () => void;
+  export const f: () => void;
+  export const g: () => void;
+  export const h: () => void;
+  export const i: () => void;
+  export const j: () => void;
+  export const k: () => void;
+  export const l: () => void;
+  export const m: () => void;
+  export const n: () => unknown;
+  export const o: Record<string, string>;
+  export const p: () => void;
+  export const r: () => unknown;
+  export const s: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+  export const u: () => void;
+  export const v: () => void;
+  export const w: () => void;
+  export const x: () => void;
+  export const y: () => unknown;
+}
