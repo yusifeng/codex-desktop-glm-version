@@ -4207,8 +4207,14 @@ declare module "@rchunk/mcp-app-follow-up-confirmation-dialog" {
 }
 
 declare module "@rchunk/chatgpt-image-upload-reminder-dialog-core" {
+  export interface ChatGptImageUploadReminderDialogProps {
+    onAcknowledge(): void;
+    overlayClassName?: string;
+  }
   export const n: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (
+    props: ChatGptImageUploadReminderDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/chatgpt-image-upload-reminder-dialog-entry" {
