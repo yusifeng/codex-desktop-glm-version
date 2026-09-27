@@ -4216,13 +4216,23 @@ declare module "@rchunk/library-file-picker-dialog" {
 }
 
 declare module "@rchunk/appgen-settings-page" {
+  export interface AppgenSettingsPageProps extends Record<string, unknown> {
+    onDeleted(): void;
+    projectId: string;
+  }
   export const n: () => unknown;
   export const r: () => void;
-  export const t: (...args: any[]) => any;
+  export const t: (props: AppgenSettingsPageProps) => unknown;
 }
 
 declare module "@rchunk/appgen-settings-dialog" {
-  export const AppgenSettingsDialog: (...args: any[]) => any;
+  export interface AppgenSettingsDialogProps extends Record<string, unknown> {
+    onClose(): void;
+    projectId: string;
+  }
+  export const AppgenSettingsDialog: (
+    props: AppgenSettingsDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/appgen-share-dialog" {

@@ -6,19 +6,34 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appgenSettingsPageChunk from "@rchunk/appgen-settings-page";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appgenSettingsPage = appgenSettingsPageChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeRuntimeLazy,
+  Ah: DialogHeader,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeSharedComponents,
+  Oh: DialogBody,
+  Ph: initializeDialogLayout,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  n4: useIntl,
+  zh: initializeDialog,
+} = appSharedChunk;
+const { r: initializeAppgenSettingsPage, t: AppgenSettingsPage } =
+  appgenSettingsPageChunk;
+const jsx = getJsxRuntime();
+
+interface AppgenSettingsDialogProps {
+  onClose(): void;
+  projectId: string;
+}
 
 function AppgenSettingsDialog({
   onClose,
   projectId,
-}: {
-  onClose: () => void;
-  projectId: string;
-}) {
-  const intl = appShared.n4();
-  const title = jsx.jsx(appShared.Y2, {
+}: AppgenSettingsDialogProps): unknown {
+  const intl = useIntl();
+  const title = jsx.jsx(FormattedMessage, {
     id: "appgenSettings.dialog.title",
     defaultMessage: "Site settings",
     description: "Title for the Site settings dialog",
@@ -34,23 +49,23 @@ function AppgenSettingsDialog({
   const heading = jsx.jsxs("div", {
     className: "flex w-full flex-col px-4 pt-3",
     children: [
-      jsx.jsx(appShared.Rh, { className: "sr-only", children: title }),
-      jsx.jsx(appShared.Ah, {
+      jsx.jsx(DialogTitle, { className: "sr-only", children: title }),
+      jsx.jsx(DialogHeader, {
         title,
         titleClassName: "truncate pe-8",
       }),
     ],
   });
-  const content = jsx.jsxs(appShared.Oh, {
+  const content = jsx.jsxs(DialogBody, {
     className: "!px-1 !py-1",
     size: "full",
     children: [
       heading,
-      jsx.jsx(appgenSettingsPage.t, { projectId, onDeleted: onClose }),
+      jsx.jsx(AppgenSettingsPage, { projectId, onDeleted: onClose }),
     ],
   });
 
-  return jsx.jsx(appShared.Ih, {
+  return jsx.jsx(Dialog, {
     open: true,
     contentClassName: "h-[720px] max-h-[92vh]",
     contentProps: { "aria-describedby": undefined },
@@ -62,11 +77,11 @@ function AppgenSettingsDialog({
 }
 
 function initializeAppgenSettingsDialog(): void {
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.zh?.();
-  appShared.Ph?.();
-  appgenSettingsPage.r?.();
+  initializeRuntimeLazy();
+  initializeSharedComponents();
+  initializeDialog();
+  initializeDialogLayout();
+  initializeAppgenSettingsPage();
 }
 
 initializeAppgenSettingsDialog();
