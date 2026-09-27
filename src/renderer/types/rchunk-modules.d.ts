@@ -1165,6 +1165,11 @@ declare module "@rchunk/app-shared" {
   };
   /** Extensions 图标组件。 */
   export const AS: (props: IconAssetProps) => unknown;
+  /** 生成站点在连接应用列表与详情中的图标资源。 */
+  export const Ot: IconAssetPreset;
+  export const zw: IconAssetPreset;
+  /** Apple 账号连接图标。 */
+  export const R_: (props: IconAssetProps) => unknown;
   /** browser-profile-import 图标依赖初始化器。 */
   export const lw: () => void;
   /** ChatGPT 标志组件。 */
@@ -2786,6 +2791,8 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const aa: (props: Record<string, unknown>) => unknown;
+  export const oa: (props: Record<string, unknown>) => unknown;
   /** 恢复会话相关信号与宿主服务适配器。 */
   export const B8t: (
     scope: unknown,
@@ -2962,6 +2969,7 @@ declare module "@rchunk/app-initial" {
   export const vP: ManagedDialogComponent<RateLimitResetDialogProps>;
   export const Kot: (props: { className?: string }) => unknown;
   export const n6: (props: { className?: string }) => unknown;
+  export const r6: () => void;
   export interface WorkspaceState {
     cwd: string;
     hostId: string;
@@ -3380,10 +3388,11 @@ declare module "@rchunk/app-initial" {
   export const k5t: (templateKind: string) => boolean;
   export const $Wt: (skill: ArtifactTemplateSkill) => unknown;
   export const kft: (options: {
+    disposition?: "current-tab" | "new-tab";
     href: string;
     initiator: "open_in_browser_bridge";
-    openTarget: "in-app-browser";
-    originHostId: string;
+    openTarget: "external-browser" | "in-app-browser";
+    originHostId?: string;
   }) => void;
   export interface TemplateViewerProps extends Record<string, unknown> {
     description?: unknown;
@@ -10104,33 +10113,106 @@ declare module "@rchunk/file-diff-alt" {
 }
 
 declare module "@rchunk/security-browser" {
-  const _default: unknown;
-  export default _default;
+  export interface SecurityQrCodeApi {
+    create(value: string | Uint8Array, options?: Record<string, unknown>): unknown;
+    toCanvas(...arguments_: unknown[]): Promise<unknown> | void;
+    toDataURL(...arguments_: unknown[]): Promise<string> | void;
+    toString(value: string | Uint8Array, options?: Record<string, unknown>): Promise<string>;
+  }
+  export const t: SecurityQrCodeApi;
 }
 
 declare module "@rchunk/security-client" {
-  const _default: unknown;
-  export default _default;
+  export interface SecurityQuery {
+    queryFn(context: { signal?: AbortSignal }): Promise<unknown>;
+    queryKey: string[];
+    refetchOnWindowFocus?: "always";
+    retry: false;
+    staleTime: number;
+  }
+  export interface SecurityQueries {
+    addPassword: SecurityQuery;
+    changePassword: SecurityQuery;
+    cyber: SecurityQuery;
+    linkedApps: SecurityQuery;
+    mfa: SecurityQuery;
+    protection: SecurityQuery;
+    sessions: SecurityQuery;
+  }
+  export interface SecurityApiClient {
+    safeGet(path: string, options: Record<string, unknown>): Promise<unknown>;
+  }
+  export const n: (accountId: string) => SecurityQueries;
+  export const r: SecurityApiClient;
+  export const t: () => void;
 }
 
 declare module "@rchunk/linked-app-logo" {
-  const _default: unknown;
-  export default _default;
+  export interface LinkedApplicationLogoProps {
+    app: { client_app_type?: string; logo_uri?: string | null; name: string };
+    borderless?: boolean;
+    size?: "detail" | "list";
+  }
+  export interface AccountConnectionLogoProps {
+    app: {
+      name: string;
+      type: "apple" | "codex_cli" | "kakao_talk" | "oai_apps" | "viber";
+    };
+    borderless?: boolean;
+  }
+  export const n: (props: LinkedApplicationLogoProps) => unknown;
+  export const r: () => void;
+  export const t: (props: AccountConnectionLogoProps) => unknown;
 }
 
 declare module "@rchunk/security-messages" {
-  const _default: unknown;
-  export default _default;
+  export const n: () => void;
+  export const t: {
+    description: import("@rchunk/app-shared").MessageDescriptor;
+    title: import("@rchunk/app-shared").MessageDescriptor;
+  };
 }
 
 declare module "@rchunk/security-shared" {
-  const _default: unknown;
-  export default _default;
+  export interface SecuritySubpageProps {
+    action?: unknown;
+    children?: unknown;
+    onBack(): void;
+    subtitle?: unknown;
+    title: unknown;
+  }
+  export interface SecurityLoadingStateProps {
+    isError: boolean;
+    onRetry(): void;
+  }
+  export interface SecurityConfirmationDialogProps {
+    children?: unknown;
+    confirmLabel: unknown;
+    informational?: boolean;
+    isError?: boolean;
+    isPending?: boolean;
+    onClose(): void;
+    onConfirm(): void;
+    title: unknown;
+  }
+  export const i: () => void;
+  export const n: (props: SecurityLoadingStateProps) => unknown;
+  export const r: (props: SecuritySubpageProps) => unknown;
+  export const t: (props: SecurityConfirmationDialogProps) => unknown;
 }
 
 declare module "@rchunk/security-src" {
-  const _default: unknown;
-  export default _default;
+  export interface SecurityPermissionMessage {
+    defaultMessage: string;
+    description: string;
+    id: string;
+  }
+  export const a: (scope: string) => SecurityPermissionMessage | undefined;
+  export const i: (scope: string) => SecurityPermissionMessage | undefined;
+  export const n: Record<string, SecurityPermissionMessage | undefined>;
+  export const o: () => void;
+  export const r: Record<string, SecurityPermissionMessage>;
+  export const t: () => void;
 }
 
 declare module "@rchunk/security-tabs" {
@@ -10192,18 +10274,61 @@ declare module "@rchunk/sidebar-panel" {
 }
 
 declare module "@rchunk/confirmation" {
-  const _default: unknown;
-  export default _default;
+  export const LockdownConfirmation: (props: {
+    disablesDeveloperMode: boolean;
+    isPending: boolean;
+    onClose(): void;
+    onConfirm(): void;
+  }) => unknown;
 }
 
 declare module "@rchunk/history" {
-  const _default: unknown;
-  export default _default;
+  export const SecurityHistorySettings: (props: {
+    accountId: string;
+    onBack(): void;
+  }) => unknown;
 }
 
 declare module "@rchunk/order-yubikey-dialog" {
-  const _default: unknown;
-  export default _default;
+  export const OrderYubikeyDialog: (props: {
+    accountId: string;
+    onClose(): void;
+  }) => unknown;
+}
+
+declare module "@rchunk/security-keys" {
+  export interface SecurityKeysIconProps extends Record<string, unknown> {
+    className?: string;
+  }
+  export const n: () => void;
+  export const t: (props: SecurityKeysIconProps) => unknown;
+}
+
+declare module "@rchunk/use-resume-conversation-if-needed" {
+  export interface ResumeConversationState {
+    hasResumeFailed: boolean;
+    isResuming: boolean;
+    isUnavailable: boolean;
+    isWriterConflict: boolean;
+    retryResume(): void;
+  }
+  export const n: (
+    conversationId: string | null,
+    threadAccess: "shared" | "private" | string,
+  ) => ResumeConversationState;
+  export const t: () => void;
+}
+
+declare module "@rchunk/settings-route-state" {
+  export const a: (value: unknown) => {
+    hasValue: boolean;
+    workspaceRoot: string | null;
+  };
+  export const i: (value: unknown) => boolean;
+  export const n: (value: unknown) => boolean;
+  export const o: () => void;
+  export const r: (value: unknown) => string | null;
+  export const t: (value: unknown) => boolean;
 }
 
 declare module "@rchunk/chatgpt-desktop-auth-url" {

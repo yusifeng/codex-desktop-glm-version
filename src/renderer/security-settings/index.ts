@@ -19,22 +19,27 @@
 
 import { $3 as runtimeLazy } from "@rchunk/app-shared";
 import { C as appInitialInit } from "@rchunk/app-initial";
-import { default as browserVariant } from "@rchunk/security-browser";
-import { default as clientVariant } from "@rchunk/security-client";
-import { default as linkedAppLogo } from "@rchunk/linked-app-logo";
-import { default as messagesChunk } from "@rchunk/security-messages";
-import { default as sharedVariant } from "@rchunk/security-shared";
-import { default as srcVariant } from "@rchunk/security-src";
-import { default as tabs } from "@rchunk/security-tabs";
-import { default as settingsRouteState } from "@rchunk/settings-route-state";
-import { default as confirmation } from "@rchunk/confirmation";
-import { default as historyChunk } from "@rchunk/history";
-import { default as orderYubikeyDialog } from "@rchunk/order-yubikey-dialog";
+import { t as QrCode } from "@rchunk/security-browser";
+import { n as createSecurityQueries, t as initializeSecurityClient } from "@rchunk/security-client";
+import { n as LinkedAppLogo, r as initializeLinkedAppLogo, t as AccountConnectionLogo } from "@rchunk/linked-app-logo";
+import { n as initializeSecurityMessages, t as securityMessages } from "@rchunk/security-messages";
+import { i as initializeSecurityShared, n as SecurityLoadingState, r as SecuritySubpage, t as SecurityConfirmationDialog } from "@rchunk/security-shared";
+import { a as getPermissionTitle, i as getPermissionDescription, t as initializeSecurityPermissions } from "@rchunk/security-src";
+import { n as initializeSecurityTabs, t as SecurityTabs } from "@rchunk/security-tabs";
+import { a as readWorkspaceRoot, i as shouldReturnToPreviousHistoryEntry, n as didCompletePasskeyEnrollment, t as hasSecuritySubviewParent } from "@rchunk/settings-route-state";
+import { LockdownConfirmation } from "@rchunk/confirmation";
+import { SecurityHistorySettings } from "@rchunk/history";
+import { OrderYubikeyDialog } from "@rchunk/order-yubikey-dialog";
 
 void runtimeLazy; void appInitialInit;
-void browserVariant; void clientVariant; void linkedAppLogo;
-void messagesChunk; void sharedVariant; void srcVariant; void tabs;
-void settingsRouteState; void confirmation; void historyChunk; void orderYubikeyDialog;
+void QrCode; void createSecurityQueries; void initializeSecurityClient;
+void LinkedAppLogo; void initializeLinkedAppLogo; void AccountConnectionLogo;
+void initializeSecurityMessages; void securityMessages;
+void initializeSecurityShared; void SecurityLoadingState; void SecuritySubpage; void SecurityConfirmationDialog;
+void getPermissionTitle; void getPermissionDescription; void initializeSecurityPermissions;
+void initializeSecurityTabs; void SecurityTabs;
+void readWorkspaceRoot; void shouldReturnToPreviousHistoryEntry; void didCompletePasskeyEnrollment; void hasSecuritySubviewParent;
+void LockdownConfirmation; void SecurityHistorySettings; void OrderYubikeyDialog;
 
 // ---------------------------------------------------------------------------
 // 类型
