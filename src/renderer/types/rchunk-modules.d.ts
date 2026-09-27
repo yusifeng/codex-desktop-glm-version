@@ -834,6 +834,7 @@ declare module "@rchunk/app-shared" {
   }
   export interface ReactRuntime {
     Children: {
+      map<T, R>(children: T | readonly T[], mapper: (child: T) => R): R[];
       toArray(children: unknown): unknown[];
     };
     Fragment: unknown;
@@ -2673,11 +2674,16 @@ declare module "@rchunk/portable-thumbnail-pdf-runtime" {
 }
 
 declare module "@rchunk/portable-thumbnail-fonts" {
+  export const arePopcornSpreadsheetFontsReady: () => boolean;
   export const ensurePopcornSpreadsheetFontsLoaded: () => Promise<void>;
 }
 
 declare module "@rchunk/portable-thumbnail-font-face-sources" {
   export const getPopcornCarlitoFontFaceSourcesFromDocument: () => unknown[];
+  export const getPopcornFontDebugState: () => unknown;
+  export const installPopcornFontFaces: (
+    fonts: readonly unknown[],
+  ) => Promise<void>;
 }
 
 declare module "@rchunk/thumbnail-worker-font-faces" {
@@ -3445,10 +3451,13 @@ declare module "@rchunk/app-initial" {
   export const O3t: ArtifactTemplateComponent;
   export const E3t: ArtifactTemplateComponent;
   export const w3t: ArtifactTemplateComponent;
+  export const f3t: ArtifactTemplateComponent;
   export const O5t: () => void;
   export const w5t: () => void;
   export const D3t: () => void;
   export const T3t: () => void;
+  export const k3t: () => void;
+  export const p3t: () => void;
   export const $3: () => void;
   export const QY: () => void;
   export const P5t: () => void;
@@ -5170,7 +5179,13 @@ declare module "@rchunk/color-icon" {
 }
 
 declare module "@rchunk/connector-logo-stack" {
-  export const _any: any;
+  export const n: () => void;
+  export const t: (props: {
+    ariaLabel?: string;
+    children?: unknown;
+    size?: "medium" | "small";
+    surface?: "default" | "white";
+  }) => unknown;
 }
 
 declare module "@rchunk/onboarding-mail-provider" {
@@ -5397,7 +5412,8 @@ declare module "@rchunk/pca-connector-eligibility" {
 }
 
 declare module "@rchunk/country-codes" {
-  export const _any: any;
+  export const n: () => void;
+  export const t: Set<string>;
 }
 
 declare module "@rchunk/google-logo" {
@@ -5659,11 +5675,11 @@ declare module "@rchunk/stripe-pure" {
 }
 declare module "@rchunk/shiki-highlight-provider";
 declare module "@rchunk/codex-diff-css";
-declare module "@rchunk/diff-worker-runtime";
-declare module "@rchunk/diff-worker-algorithm";
-declare module "@rchunk/diff-worker-model";
-declare module "@rchunk/diff-worker-renderer";
-declare module "@rchunk/diff-worker-utils";
+declare module "@rchunk/diff-worker-runtime" { export const parser: unknown; }
+declare module "@rchunk/diff-worker-algorithm" { export const parser: unknown; }
+declare module "@rchunk/diff-worker-model" { export const parser: unknown; }
+declare module "@rchunk/diff-worker-renderer" { export const parser: unknown; }
+declare module "@rchunk/diff-worker-utils" { export const parser: unknown; }
 declare module "@rchunk/pull-request-actions" {
   export const _: (input: { currentComments: Array<Record<string, unknown>>; nextComments: Array<Record<string, unknown>> }) => Array<Record<string, unknown>>;
   export const a: symbol;
@@ -8613,6 +8629,11 @@ declare module "@rchunk/google-chrome" {
 }
 
 declare module "@rchunk/google-drive-resource-icon" {
+  export const n: () => void;
+  export const t: (props: {
+    className?: string;
+    resourceKind: "document" | "drive" | "presentation" | "spreadsheet";
+  }) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -8885,6 +8906,8 @@ declare module "@rchunk/lock" {
 }
 
 declare module "@rchunk/model-picker-chevron-down-sm" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
   const _default: unknown;
   export default _default;
 }
@@ -9231,6 +9254,8 @@ declare module "@rchunk/security-keys" {
 }
 
 declare module "@rchunk/setup-artwork" {
+  export const n: string;
+  export const t: () => void;
   const _default: unknown;
   export default _default;
 }
@@ -9309,6 +9334,47 @@ declare module "@rchunk/quick-chat-window" {
   }) => unknown;
 }
 
+declare module "@rchunk/portable-thumbnail-font-face-source-runtime" {
+  export const i: (fonts: readonly unknown[]) => Promise<void>;
+  export const n: () => unknown;
+  export const r: () => void;
+  export const t: () => unknown[];
+}
+
+declare module "@rchunk/portable-thumbnail-font-runtime" {
+  export const n: () => Promise<void>;
+  export const r: () => void;
+  export const t: () => boolean;
+}
+
+declare module "@rchunk/portable-thumbnail-pdf-document" {
+  export const n: () => void;
+  export const t: () => Promise<{
+    GlobalWorkerOptions: { workerSrc?: string };
+  }>;
+}
+
+declare module "@rchunk/diff-worker-algorithm-parser" {
+  export const n: unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/diff-worker-model-parser" {
+  export const n: unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/diff-worker-renderer-parser" {
+  export const n: unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/diff-worker-runtime-parser" {
+  export const n: unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/diff-worker-utils-parser" {
+  export const n: unknown;
+  export const t: () => void;
+}
+
 declare module "@rchunk/content-quick-chat-overlay" {
   export const i: () => void;
   export const n: () => void;
@@ -9361,6 +9427,8 @@ declare module "@rchunk/timestamp-separator" {
 }
 
 declare module "@rchunk/triangle-warning" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
   const _default: unknown;
   export default _default;
 }
