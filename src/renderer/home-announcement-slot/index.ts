@@ -4,12 +4,19 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  HNt: surfaceClaims,
+  JNt: initializeHomeAnnouncementContext,
+} = appInitialChunk;
+const {
+  Ah: initializeSurfaceClaim,
+  kh: SurfaceClaim,
+} = appPrimaryChunk;
+const { I3: getJsxRuntime, e6: getReactRuntime } = appSharedChunk;
 
 interface AnnouncementEntry {
   content?: unknown;
@@ -18,16 +25,8 @@ interface AnnouncementEntry {
   pageContextClaim?: unknown;
 }
 
-interface ReactRuntime {
-  useRef<T>(value: T): { current: T };
-}
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-}
-
-let React: ReactRuntime | null = null;
-let jsx: JsxRuntime | null = null;
+let reactRuntime: ReactRuntime | null = null;
+let jsxRuntime: JsxRuntime | null = null;
 
 function firstStableEntry(
   entries: AnnouncementEntry[],
@@ -46,10 +45,8 @@ function HomeAnnouncementSlot({
   entries: AnnouncementEntry[];
   trackVisibility?: boolean;
 }): unknown {
-  initializeHomeAnnouncementSlot();
-  const selectedRef = (React as ReactRuntime).useRef<number | null | undefined>(
-    undefined,
-  );
+  const { React, jsx } = getInitializedAnnouncementRuntime();
+  const selectedRef = React.useRef<number | null | undefined>(undefined);
   let selected = selectedRef.current;
   if (selected === undefined) {
     const candidate = firstStableEntry(entries);
@@ -68,18 +65,16 @@ function HomeAnnouncementSlot({
   ) {
     return null;
   }
-  const renderer = jsx as JsxRuntime;
-  const Claim = appPrimary.kh;
   let content =
-    entry.pageContextClaim == null || Claim == null
+    entry.pageContextClaim == null
       ? entry.content
-      : renderer.jsx(Claim, {
+      : jsx.jsx(SurfaceClaim, {
           claim: entry.pageContextClaim,
           children: entry.content,
         });
-  if (trackVisibility && Claim != null) {
-    content = renderer.jsx(Claim, {
-      claim: appInitial.HNt?.HomeAnnouncement,
+  if (trackVisibility) {
+    content = jsx.jsx(SurfaceClaim, {
+      claim: surfaceClaims.HomeAnnouncement,
       children: content,
     });
   }
@@ -87,10 +82,24 @@ function HomeAnnouncementSlot({
 }
 
 function initializeHomeAnnouncementSlot(): void {
-  appPrimary.Ah?.();
-  appInitial.JNt?.();
-  React ??= typeof appShared.e6 === "function" ? appShared.e6() : appShared.e6;
-  jsx ??= typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  if (reactRuntime != null && jsxRuntime != null) return;
+  reactRuntime =
+    typeof getReactRuntime === "function" ? getReactRuntime() : getReactRuntime;
+  initializeSurfaceClaim();
+  initializeHomeAnnouncementContext();
+  jsxRuntime =
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
+}
+
+function getInitializedAnnouncementRuntime(): {
+  React: ReactRuntime;
+  jsx: JsxRuntime;
+} {
+  initializeHomeAnnouncementSlot();
+  if (reactRuntime == null || jsxRuntime == null) {
+    throw new Error("Home announcement slot runtime failed to initialize");
+  }
+  return { React: reactRuntime, jsx: jsxRuntime };
 }
 
 export { initializeHomeAnnouncementSlot as n, HomeAnnouncementSlot as t };

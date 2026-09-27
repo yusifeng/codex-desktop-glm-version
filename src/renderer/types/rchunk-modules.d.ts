@@ -2733,7 +2733,10 @@ declare module "@rchunk/app-initial" {
     CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_PRIVACY: "privacy";
     CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_KOREA_ADDENDUM: "korea-addendum";
   };
-  export const HNt: { FullscreenOnboarding: string };
+  export const HNt: {
+    FullscreenOnboarding: string;
+    HomeAnnouncement: string;
+  };
   export const JNt: () => void;
   export type SetupCodexStep = "role" | "task" | "complete";
   export interface SetupCodexStepArguments {
@@ -3348,7 +3351,7 @@ declare module "@rchunk/app-initial" {
 declare module "@rchunk/app-primary" {
   export interface SurfaceClaimProps extends Record<string, unknown> {
     children: unknown;
-    claim: string;
+    claim: unknown;
   }
   export const Ah: () => void;
   export const kh: (props: SurfaceClaimProps) => unknown;
@@ -4742,7 +4745,18 @@ declare module "@rchunk/home-announcement-state" {
 }
 
 declare module "@rchunk/home-announcement-slot" {
+  export interface HomeAnnouncementEntry {
+    content?: unknown;
+    isEligible: boolean;
+    isLoading: boolean;
+    pageContextClaim?: unknown;
+  }
+  export interface HomeAnnouncementSlotProps {
+    entries: HomeAnnouncementEntry[];
+    trackVisibility?: boolean;
+  }
   export const n: () => void;
+  export const t: (props: HomeAnnouncementSlotProps) => unknown;
 }
 
 declare module "@rchunk/announcement-modal-source-bridge" {
