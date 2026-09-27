@@ -1030,11 +1030,24 @@ export const CHUNKS = {
   "chatgpt-saved-memory-state": "chatgpt-saved-memory-state-fc941ce42fb3.js",
   "animated-icon": "animated-icon-ac1b587a8839.js",
   "saved-memory-history": "saved-memory-history-1b9a65254851.js",
+  "form-runtime": "useForm-f8b6846e7263.js",
+  "color-palette": "color-palette-fe59e40dd8d4.js",
+  "automation-dialog": "automation-dialog-e8ab58185edc.js",
+  "schedule-fields": "schedule-fields-30da10334404.js",
+  "schedule-draft": "schedule-draft-ca74099ea5b9.js",
+  "share-analytics": "share-analytics-bd38c16d6a05.js",
+  "create-pull-request-modal-content": "create-pull-request-modal-content-a56e677534f4.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "report-dialog-core",
+  "codex-thread-report-dialog",
+  "remote-connection-editor-dialog",
+  "scheduled-shared-task-dialog-core",
+  "plugin-share-dialog-core",
+  "gitlab-merge-request-form-dialog",
   "saved-memories",
   "about-you-summary",
   "notifications-settings",

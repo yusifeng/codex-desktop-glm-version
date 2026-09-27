@@ -4879,6 +4879,60 @@ declare module "@rchunk/app-primary" {
   export const _any: any;
 }
 
+declare module "@rchunk/form-runtime";
+declare module "@rchunk/color-palette";
+declare module "@rchunk/automation-dialog";
+declare module "@rchunk/schedule-fields";
+declare module "@rchunk/schedule-draft";
+declare module "@rchunk/share-analytics";
+declare module "@rchunk/create-pull-request-modal-content";
+
+declare module "@rchunk/report-dialog-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown> & {
+    loadReasons(context: { signal: AbortSignal }): Promise<unknown>;
+    onClose(): void;
+    queryKey: readonly unknown[];
+    submitReport(input: Record<string, unknown>): Promise<unknown>;
+    title: unknown;
+  }) => unknown;
+}
+
+declare module "@rchunk/codex-thread-report-dialog" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown> & {
+    onClose(): void;
+    reportEntityType: string;
+    threadId: string;
+  }) => unknown;
+}
+
+declare module "@rchunk/remote-connection-editor-dialog" {
+  export const i: () => void;
+  export const n: () => void;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/scheduled-shared-task-dialog-core" {
+  export const n: () => void;
+  export const t: (props: { postId: string; onClose(): void }) => unknown;
+}
+
+declare module "@rchunk/plugin-share-dialog-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/remote-connection-editor-draft" {
+  export const n: (input: {
+    draft: Record<string, unknown>;
+    editingHostId?: string;
+    existingConnections: Array<Record<string, unknown>>;
+  }) => unknown[];
+  export const r: () => void;
+}
+
 declare module "@rchunk/app-main" {
   export const _any: any;
 }
