@@ -2453,4 +2453,5 @@ export const REWRITTEN = new Set([
   "tax-types",
   "design-editor-state",
   "workbook-review-utils",
+  "popcorn-chart-hover-tooltip",
 ]);
