@@ -16,6 +16,8 @@
 
 export const CHUNKS = {
   "chatgpt-file-upload": "chatgpt-file-upload-81c175d920b7.js",
+  "use-avatar-options": "use-avatar-options-88289755a2ab.js",
+  "profile-site-details": "site-details-bf62c13b615c.js",
   "terminal-workspace-warning-state": "terminal-workspace-warning-state-888b5e947714.js",
   "codex-pet-assets": "codex-pet-assets-5f01c10f2955.js",
   "animated-icon-svg": "animated-icon-svg-6d0bf1a76c25.js",
@@ -2332,4 +2334,8 @@ export const REWRITTEN = new Set([
   "plaid-link",
   "chatgpt-sites",
   "chatgpt-tasks-runtime",
+  "codex-pet-assets",
+  "use-avatar-options",
+  "profile-view",
+  "app-card",
 ]);
