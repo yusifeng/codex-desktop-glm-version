@@ -1117,6 +1117,7 @@ export const CHUNKS = {
   "play-outline": "play-outline-dd4b549787d6.js",
   "codex-micro-joystick-feedback": "codex-micro-joystick-feedback-6271b17ee457.js",
   "codex-micro-joystick-hud": "codex-micro-joystick-hud-6d7a529fb1ed.js",
+  "codex-micro-bridge": "codex-micro-bridge-6b74dba6b0b6.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
@@ -1142,6 +1143,7 @@ export const REWRITTEN = new Set([
   "codex-micro-slot-signals",
   "codex-micro-joystick-feedback",
   "codex-micro-joystick-hud",
+  "codex-micro-bridge",
   "open-sources-side-panel-tab",
   "verify-descendant",
   "editable-plan-tab",

@@ -7012,7 +7012,19 @@ declare module "@rchunk/plaid-link" {
 }
 declare module "@rchunk/catalog" { export const n: () => void; export const t: unknown; }
 declare module "@rchunk/composer-tip" { export const useComposerTip: unknown; }
-declare module "@rchunk/codex-micro-mini-games" { export const _any: any; }
+declare module "@rchunk/codex-micro-mini-games" {
+  export const a: (game: { game: string } | null) => Array<Record<string, unknown>> | null;
+  export const c: Record<string, unknown>;
+  export const d: (id: string, element: HTMLElement, onLastRemoved?: () => void) => () => void;
+  export const i: (...arguments_: unknown[]) => Record<string, unknown>;
+  export const l: (input: { act: number; key: string }) => boolean;
+  export const n: import("@rchunk/app-shared").ScopedSignal<unknown, unknown>;
+  export const o: (random?: () => number) => "asteroids" | "brick-breaker" | "snake";
+  export const r: () => string | null;
+  export const s: () => void;
+  export const t: (scope: { set(signal: unknown, value: unknown): void }) => void;
+  export const u: (game: { game?: string } | null, input: { act: number; key: string }) => boolean;
+}
 declare module "@rchunk/codex-micro-mini-game-composer" { export const CodexMicroMiniGameComposer: unknown; }
 declare module "@rchunk/wheel-swipe-gesture" {
   export const n: () => void;
@@ -11898,6 +11910,10 @@ declare module "@rchunk/codex-micro-commands" {
   export const n: (commandId: string) => Record<string, unknown> | null;
   export const r: (commandId: string) => number | null;
   export const t: Array<Record<string, unknown>>;
+}
+
+declare module "@rchunk/codex-micro-bridge" {
+  export const CodexMicroBridge: () => null;
 }
 
 declare module "@rchunk/codex-micro-keyboard-surface" {
