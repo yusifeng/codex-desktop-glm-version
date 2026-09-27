@@ -2774,6 +2774,13 @@ declare module "@rchunk/app-initial" {
   export const vL: (props: TrustedContactNoThanksDialogProps) => unknown;
   /** initializeTrustedContactNoThanksDialog（内部 DOo）。 */
   export const yL: () => void;
+  export interface PublicationTermsNoticeProps {
+    showWhenUnseen?: boolean;
+  }
+  /** PublicationTermsNotice（内部 asc）。 */
+  export const dl: (props: PublicationTermsNoticeProps) => unknown;
+  /** initializePublicationTermsNotice（内部 csc）。 */
+  export const fl: () => void;
   // rpc chunk 转发的四个符号（fnt/hnt/mnt/pnt 的压缩导出名）：
   export const fnt: unknown; // appHost：服务容器宿主
   export const hnt: () => Promise<void>; // initializeAppHostServices
@@ -5020,7 +5027,12 @@ declare module "@rchunk/appgen-site-detail-route" {
 }
 
 declare module "@rchunk/appgen-publication-terms-route" {
-  export const AppgenPublicationTermsRoute: (...args: any[]) => any;
+  export interface AppgenPublicationTermsRouteProps {
+    children?: unknown;
+  }
+  export const AppgenPublicationTermsRoute: (
+    props: AppgenPublicationTermsRouteProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/appgen-browser-site-core" {

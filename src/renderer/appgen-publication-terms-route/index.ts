@@ -6,19 +6,31 @@ import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const jsx = appShared.I3();
+const {
+  $3: initializeJsxRuntime,
+  I3: getJsxRuntime,
+} = appSharedChunk;
+const {
+  dl: PublicationTermsNotice,
+  fl: initializePublicationTermsNotice,
+} = appInitialChunk;
+const jsx = getJsxRuntime();
 
-function AppgenPublicationTermsRoute({ children }: { children: any }) {
+interface AppgenPublicationTermsRouteProps {
+  children?: unknown;
+}
+
+function AppgenPublicationTermsRoute({
+  children,
+}: AppgenPublicationTermsRouteProps): unknown {
   return jsx.jsxs(jsx.Fragment, {
-    children: [children, jsx.jsx(appInitial.dl, { showWhenUnseen: true })],
+    children: [children, jsx.jsx(PublicationTermsNotice, { showWhenUnseen: true })],
   });
 }
 
 function initializeAppgenPublicationTermsRoute(): void {
-  appShared.$3?.();
-  appInitial.fl?.();
+  initializeJsxRuntime();
+  initializePublicationTermsNotice();
 }
 
 initializeAppgenPublicationTermsRoute();
