@@ -5279,8 +5279,8 @@ declare module "@rchunk/chatgpt-voices-query";
 declare module "@rchunk/library-item-actions" { export interface LibraryActionNode { downloadUrl?: string; file_id?: string | null; id: string; kind: "directory" | "file"; mime_type?: string | null; name: string; parent_directory_id?: string | null; requestHeaders?: Record<string, string> } export interface LibraryActionSelection { canDelete?: boolean; canDownload?: boolean; canMove?: boolean; canRename?: boolean; canRestore?: boolean; node: LibraryActionNode } export type LibraryItemAction = { type: "delete"; permanently?: boolean } | { type: "download"; analyticsContext?: unknown } | { type: "move"; directoryId: string | null } | { type: "rename"; name: string } | { type: "restore" }; export interface LibraryItemActionScope { api: { delete(path: string, input?: Record<string, unknown>): Promise<{ success?: boolean }>; patch(path: string, input?: Record<string, unknown>): Promise<unknown>; post(path: string, input?: Record<string, unknown>): Promise<unknown> }; download?(node: LibraryActionNode): Promise<void> | void; invalidate?(action: LibraryItemAction): Promise<void> | void; notifyError?(message: string): void } export const i: (scope: LibraryItemActionScope, item: LibraryActionSelection, action: LibraryItemAction, skipInvalidation?: boolean) => Promise<boolean>; export const n: Map<string, boolean>; export const r: (scope: LibraryItemActionScope, items: LibraryActionSelection[], action: LibraryItemAction) => Promise<string[]>; export const t: () => void }
 declare module "@rchunk/library-trash-analytics" { export interface LibraryTrashAnalyticsScope { get?(key: unknown): unknown; log?(event: Record<string, unknown>): void } export const a: { value: string }; export const i: (scope: LibraryTrashAnalyticsScope, items: Array<{ node: { id: string } }>) => void; export const n: (scope: LibraryTrashAnalyticsScope, sessionId: string, interactionType: string, error: unknown) => void; export const r: (scope: LibraryTrashAnalyticsScope, items: Array<{ node: { id: string } }>) => void; export const t: () => void }
 declare module "@rchunk/source-dashed-border" { export const n: () => void; export const t: (props: { isDragActive?: boolean }) => unknown }
-declare module "@rchunk/analytics-runtime";
-declare module "@rchunk/chatgpt-projects-runtime";
+declare module "@rchunk/analytics-runtime" { export interface SharedPromptAnalytics { promptTextLength: number; shareId?: string; sourceConversationIsWorkMode?: boolean } export interface SharedPromptAnalyticsScope { log?(descriptor: string, payload: Record<string, unknown>): void } export const a: (scope: SharedPromptAnalyticsScope) => void; export const i: (scope: SharedPromptAnalyticsScope, shared: SharedPromptAnalytics, submittedLength?: number) => void; export const n: (scope: SharedPromptAnalyticsScope, result: "failure" | "success", payload?: Record<string, unknown>) => void; export const r: (scope: SharedPromptAnalyticsScope, shared: SharedPromptAnalytics) => void; export const t: () => void }
+declare module "@rchunk/chatgpt-projects-runtime" { export const a: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsSaveInitiated" }>; export const i: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsSaveFailed" }>; export const n: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsOpened" }>; export const o: () => void; export const r: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsSaveCompleted" }>; export const t: Readonly<{ $type: "protobuf_analytics_events.v1.ChatgptProjectFileLimitUpgradeClicked" }> }
 declare module "@rchunk/cadence-events" {
   export type BillingCadence = "monthly" | "yearly";
   export interface BillingCadenceState { annualPrice: { amount: number; tax?: number }; annualSavingsAmount: number; annualSavingsPercentage: number; billingCurrency: string; currentCadence: BillingCadence; displayPricingSource: string; effectiveNextCadence: BillingCadence; isAcquisitionCandidate: boolean; isRetentionCandidate: boolean; monthlyPrice: { amount: number; tax?: number }; renewalDate: Date; requiresReactivation: boolean; scheduledCadence: BillingCadence | null }
@@ -5325,11 +5325,11 @@ declare module "@rchunk/subscription-recovery-events" {
 }
 declare module "@rchunk/project-share-model";
 declare module "@rchunk/builder-analytics";
-declare module "@rchunk/read-error";
+declare module "@rchunk/read-error" { export const n: () => void; export const t: (props: { children?: unknown; loading?: boolean; onRetry?(): void }) => unknown }
 declare module "@rchunk/animated-segmented-toggle";
 declare module "@rchunk/radio-group";
 declare module "@rchunk/cme-state";
-declare module "@rchunk/format-bytes";
+declare module "@rchunk/format-bytes" { export const n: () => void; export const t: (bytes: number, intl: { formatNumber(value: number, options: Intl.NumberFormatOptions): string }) => string }
 
 declare module "@rchunk/dictionary-dialog" {
   export interface DictionaryWord { id: string; text: string; }
@@ -6295,8 +6295,8 @@ declare module "@rchunk/open-conversation-files" {
   export interface ConversationFilesRequest { accountId?: string | null; conversationId?: string | null; userId?: string | null; [key: string]: unknown }
   export const openConversationFiles: (host: { accountId?: string | null; userId?: string | null; openPanel?(panel: { id: string; kind: string; props: ConversationFilesRequest; target: "right"; title: string }): void }, request?: ConversationFilesRequest) => void;
 }
-declare module "@rchunk/chatgpt-about-you-summary-panel";
-declare module "@rchunk/chatgpt-saved-memories-panel";
+declare module "@rchunk/chatgpt-about-you-summary-panel" { export const MemorySummaryDialog: typeof import("@rchunk/about-you-summary").n }
+declare module "@rchunk/chatgpt-saved-memories-panel" { export const SavedMemoriesDialog: (props: Record<string, unknown>) => unknown }
 declare module "@rchunk/chatgpt-personalization-route";
 declare module "@rchunk/chatgpt-entity-side-panel-tab" {
   export interface EntityPanelParameters { memorySource?: string | null; sourceId?: string | null; [key: string]: unknown }
@@ -13556,6 +13556,8 @@ declare module "@rchunk/memory-manager-gate" {
 declare module "@rchunk/saved-memories" {
   const _default: unknown;
   export default _default;
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/chatgpt-saved-memory-state" {
@@ -14177,7 +14179,7 @@ declare module "@rchunk/artifact-annotation-comment";
 declare module "@rchunk/artifact-preview-status" { export const n: (status: string) => unknown; export const t: () => void }
 declare module "@rchunk/artifact-preview-zoom" { export const a: (x1: number, y1: number, x2: number, y2: number) => number; export const i: (zoomPercent: number, wheelDelta: number) => number; export const n: (value: number) => number; export const o: () => void; export const r: (input: { initialDistance: number; initialZoomPercent: number; nextDistance: number }) => number; export const t: readonly number[] }
 declare module "@rchunk/artifact-tab-content-electron";
-declare module "@rchunk/app-connect-availability";
+declare module "@rchunk/app-connect-availability" { export interface AppConnectAvailabilityInput { appId: string; availableAppIds?: Iterable<string>; companionConnectorIds: string[]; connectors?: Array<{ id: string; [key: string]: unknown }>; getLink?(id: string): Promise<unknown>; primaryLink?: unknown } export const i: (input: AppConnectAvailabilityInput) => Promise<Array<{ id: string; [key: string]: unknown }>>; export const n: typeof i; export const r: () => void; export const t: () => void }
 declare module "@rchunk/cloud-file-preview";
 declare module "@rchunk/editor-header";
 declare module "@rchunk/editor-header-controls" { export interface EditorHeaderControls { annotationControl: unknown; commentsControl: unknown; editingControls: unknown; navigationControl: unknown; supplementalActions: unknown; zoomControl: unknown } export const n: () => void; export const t: EditorHeaderControls }
