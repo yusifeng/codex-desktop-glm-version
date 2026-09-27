@@ -9565,3 +9565,63 @@ declare module "@rchunk/review-row" {
   const _default: unknown;
   export default _default;
 }
+
+declare module "@rchunk/diff-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/file-diff-alt" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/file-diff-presentation-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/register-pierre-themes" {
+  export const a: unknown;
+  export const i: () => void;
+  export const n: unknown;
+  export const r: unknown;
+  export const t: unknown;
+}
+
+declare module "@rchunk/open-pull-request-fix-automation-panel-core" {
+  export const n: (...arguments_: unknown[]) => unknown;
+  export const r: (...arguments_: unknown[]) => Promise<boolean>;
+  export const t: () => void;
+}
+
+declare module "@rchunk/pull-request-code-review-core" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/diff-comment-card" {
+  export const n: (props: {
+    action?: unknown;
+    children?: unknown;
+    footer?: unknown;
+  }) => unknown;
+  export const r: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/file-diff" {
+  export const FileDiff: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/pull-request" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+
+declare module "@rchunk/pull-request-status-label" {
+  export const n: () => void;
+  export const t: (props: {
+    status: "closed" | "draft" | "merged" | "open";
+  }) => unknown;
+}
