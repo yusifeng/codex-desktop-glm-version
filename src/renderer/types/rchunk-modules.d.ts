@@ -12,6 +12,16 @@ declare module "@rchunk/rolldown-runtime" {
 }
 
 declare module "@rchunk/app-shared" {
+  export const k: unknown;
+  /** parseConfigError（恢复会话失败时提取 config.toml 定位）。 */
+  export const hG: (error: unknown) => {
+    column?: number;
+    detail: string;
+    filePath?: string;
+    line?: number;
+  } | null;
+  /** isTransportUnavailableError（识别宿主传输断开）。 */
+  export const oY: (error: unknown) => boolean;
   export const OK: (url: string) => string;
   export const PK: (value: string) => boolean;
   /** getPathBasename（来源面板的本地文件标签）。 */
@@ -2776,6 +2786,29 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  /** 恢复会话相关信号与宿主服务适配器。 */
+  export const B8t: (
+    scope: unknown,
+    identity: { hostId: string; threadId: string },
+    error: unknown,
+  ) => boolean;
+  export const DZt: unknown;
+  export const Jmn: (error: unknown) => boolean;
+  export const VZt: unknown;
+  export const Vsn: (scope: unknown, hostId: string) => unknown;
+  export const Yon: (
+    scope: unknown,
+    conversationId: string,
+    options: { allowProjectSourceRoots: boolean },
+  ) => Promise<unknown>;
+  export const o0t: unknown;
+  export const p4: (conversationId: string | null) => { activeMode?: unknown };
+  export const ul: (error: unknown) => boolean;
+  export const au: (props: Record<string, unknown>) => unknown;
+  export const ddn: new (options: Record<string, unknown>) => unknown;
+  export const oJt: (...arguments_: unknown[]) => Record<string, string>;
+  export const pdn: () => void;
+  export const su: () => void;
   export const A_: (entry: Record<string, unknown>) => boolean;
   export const A9t: (input: Record<string, unknown>) => boolean;
   export const D9t: (input: Record<string, unknown>) => boolean;
