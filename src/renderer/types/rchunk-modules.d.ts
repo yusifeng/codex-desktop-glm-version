@@ -3450,6 +3450,14 @@ declare module "@rchunk/app-initial" {
   ) => Promise<void>;
   export const kF: () => void;
   export const wdn: () => void;
+  export interface CurrencyAmountInput {
+    amount: number;
+    currencyCode: string;
+    currencyFractionDigits: number;
+    intl: import("@rchunk/app-shared").IntlShape;
+  }
+  /** 使用应用 locale 格式化货币金额。 */
+  export const TI: (input: CurrencyAmountInput) => string | null | undefined;
   /** 订阅产品类型到内部 plan 值的稳定映射。 */
   export const Pdn: {
     readonly GO: "go";
@@ -4854,18 +4862,34 @@ declare module "@rchunk/pricing-promotions" {
 }
 
 declare module "@rchunk/plan-names" {
-  export const n: (input: unknown) => string | null;
+  export interface PlanNameInput {
+    initialPlanType: string;
+    planType: string;
+    updatedPlanType: string;
+  }
+  export const n: (input: PlanNameInput) => string | null;
   export const r: () => void;
 }
 
 declare module "@rchunk/pricing" {
-  export const n: (input: unknown) => any;
+  export interface FormattedPrice {
+    currencyCodeLabel?: string | null;
+    formatted?: string | null;
+    parts?: Intl.NumberFormatPart[];
+  }
+  export interface FormatPriceInput {
+    amount: number;
+    currencyCode: string;
+    intl: import("@rchunk/app-shared").IntlShape;
+    minorUnitExponent: number;
+  }
+  export const n: (input: FormatPriceInput) => FormattedPrice;
 }
 
 declare module "@rchunk/offer-notice" {
   export const i: () => void;
-  export const n: unknown;
-  export const r: unknown;
+  export const n: (props: Record<string, unknown>) => unknown;
+  export const r: (props: Record<string, unknown>) => unknown;
 }
 
 declare module "@rchunk/stripe-payment-confirmation" {
@@ -4945,8 +4969,64 @@ declare module "@rchunk/subscription-onboarding" {
 }
 
 declare module "@rchunk/subscription-update-dialog" {
+  export interface PaymentMethod {
+    card_brand?: string | null;
+    card_last4?: string | null;
+  }
+  export interface SubscriptionPreview {
+    amount_due: {
+      amount: number;
+      amount_excluding_tax: number;
+      tax_amount: number;
+    };
+    currency: string;
+    positive_line_item_total: number;
+    renewal_date?: string | number | Date | null;
+  }
+  export interface PricingInfo {
+    currencyCode: string;
+    minorUnitExponent: number;
+    monthlyAmounts: Record<string, number>;
+  }
+  export interface SavedCardSubscriptionUpdate {
+    fullyCoveredByWallet?: boolean;
+    kind: "saved_card_upgrade";
+    minorUnitExponent: number;
+    paymentMethod?: PaymentMethod;
+    paymentMethodLabel?: string;
+    preview: SubscriptionPreview;
+    promotionDisclaimer?: unknown;
+    updatedPlan: import("@rchunk/subscription-update-plan").SubscriptionPlanSlug;
+    upgrade?: { promoCampaign?: string | null };
+  }
+  export interface ScheduledSubscriptionUpdate {
+    currentPlan?: string;
+    kind: "scheduled_downgrade";
+    preview: Pick<SubscriptionPreview, "renewal_date">;
+    updatedPlan: import("@rchunk/subscription-update-plan").SubscriptionPlanSlug;
+  }
+  export interface RenewalSubscriptionUpdate {
+    renewal: Record<string, unknown>;
+  }
+  export interface SubscriptionUpdateDialogProps {
+    disableConfirm?: boolean;
+    error?: unknown;
+    isUpdating?: boolean;
+    onBack?(): void;
+    onCancel(): void;
+    onConfirm(): void;
+    onGoToWeb?(): void;
+    onOpenChange(open: boolean): void;
+    onShown?(): void;
+    pricingInfo?: PricingInfo | null;
+    scheduledPrice?: import("@rchunk/pricing").FormattedPrice | null;
+    subscriptionUpdate:
+      | RenewalSubscriptionUpdate
+      | SavedCardSubscriptionUpdate
+      | ScheduledSubscriptionUpdate;
+  }
   export const n: () => void;
-  export const t: unknown;
+  export const t: (props: SubscriptionUpdateDialogProps) => unknown;
 }
 
 declare module "@rchunk/codex-home-announcements-current" {

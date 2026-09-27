@@ -10,30 +10,131 @@ import * as pricingChunk from "@rchunk/pricing";
 import * as offerNoticeChunk from "@rchunk/offer-notice";
 
 void runtimeChunk;
-const appShared = appSharedChunk as Record<string, any>;
-const appInitial = appInitialChunk as Record<string, any>;
-const promotions = promotionsChunk as Record<string, any>;
-const planNames = planNamesChunk as Record<string, any>;
-const pricing = pricingChunk as Record<string, any>;
-const offerNotice = offerNoticeChunk as Record<string, any>;
+const {
+  $3: initializeDialogPrimitives,
+  Ah: DialogHeader,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeReactRuntime,
+  Oh: DialogBody,
+  Y2: FormattedMessage,
+  Yh: Button,
+  h4: initializeClassNames,
+  jh: DialogSection,
+  kh: DialogActions,
+  m4: classNames,
+  n4: useIntl,
+} = appSharedChunk;
+const { TI: formatCurrencyAmount } = appInitialChunk;
+const {
+  f: initializePromotionMessages,
+  m: initializePromotionPricing,
+  n: nativeTrialCampaign,
+} = promotionsChunk;
+const { n: getPlanName, r: initializePlanNames } = planNamesChunk;
+const { n: getFormattedPrice } = pricingChunk;
+const {
+  i: initializeOfferNotice,
+  n: RenewalNotice,
+  r: PlanChangeNotice,
+} = offerNoticeChunk;
 
-let jsx: any;
+type IntlShape = import("@rchunk/app-shared").IntlShape;
+type JsxRuntime = import("@rchunk/app-shared").JsxRuntime;
+type SubscriptionPlanSlug =
+  import("@rchunk/subscription-update-plan").SubscriptionPlanSlug;
+
+interface PaymentMethod {
+  card_brand?: string | null;
+  card_last4?: string | null;
+}
+
+interface AmountDue {
+  amount: number;
+  amount_excluding_tax: number;
+  tax_amount: number;
+}
+
+interface SubscriptionPreview {
+  amount_due: AmountDue;
+  currency: string;
+  positive_line_item_total: number;
+  renewal_date?: string | number | Date | null;
+}
+
+interface PricingInfo {
+  currencyCode: string;
+  minorUnitExponent: number;
+  monthlyAmounts: Record<string, number>;
+}
+
+interface SavedCardSubscriptionUpdate {
+  fullyCoveredByWallet?: boolean;
+  kind: "saved_card_upgrade";
+  minorUnitExponent: number;
+  paymentMethod?: PaymentMethod;
+  paymentMethodLabel?: string;
+  preview: SubscriptionPreview;
+  promotionDisclaimer?: unknown;
+  updatedPlan: SubscriptionPlanSlug;
+  upgrade?: { promoCampaign?: string | null };
+}
+
+interface ScheduledSubscriptionUpdate {
+  currentPlan?: string;
+  kind: "scheduled_downgrade";
+  preview: Pick<SubscriptionPreview, "renewal_date">;
+  updatedPlan: SubscriptionPlanSlug;
+}
+
+interface RenewalSubscriptionUpdate {
+  renewal: Record<string, unknown>;
+}
+
+type SubscriptionUpdate =
+  | RenewalSubscriptionUpdate
+  | SavedCardSubscriptionUpdate
+  | ScheduledSubscriptionUpdate;
+
+interface FormSubmitEvent {
+  preventDefault(): void;
+}
+
+interface SubscriptionUpdateDialogProps {
+  disableConfirm?: boolean;
+  error?: unknown;
+  isUpdating?: boolean;
+  onBack?(): void;
+  onCancel(): void;
+  onConfirm(): void;
+  onGoToWeb?(): void;
+  onOpenChange(open: boolean): void;
+  onShown?(): void;
+  pricingInfo?: PricingInfo | null;
+  scheduledPrice?: import("@rchunk/pricing").FormattedPrice | null;
+  subscriptionUpdate: SubscriptionUpdate;
+}
+
+let jsx: JsxRuntime;
 let initialized = false;
 function initializeSubscriptionUpdateDialog(): void {
   if (initialized) return;
-  appShared.$3?.();
-  appShared.K2?.();
-  appShared.h4?.();
-  offerNotice.i?.();
-  planNames.r?.();
-  promotions.m?.();
-  promotions.f?.();
-  jsx = appShared.I3?.();
+  initializeDialogPrimitives();
+  initializeReactRuntime();
+  initializeClassNames();
+  initializeOfferNotice();
+  initializePlanNames();
+  initializePromotionPricing();
+  initializePromotionMessages();
+  jsx = getJsxRuntime();
   initialized = true;
 }
 
-function message(id: string, defaultMessage: string, values?: any): unknown {
-  const FormattedMessage = appShared.Y2;
+function message(
+  id: string,
+  defaultMessage: string,
+  values?: import("@rchunk/app-shared").MessageValues,
+): unknown {
   return jsx.jsx(FormattedMessage, {
     id,
     defaultMessage,
@@ -42,7 +143,7 @@ function message(id: string, defaultMessage: string, values?: any): unknown {
   });
 }
 function formatAmount(
-  intl: any,
+  intl: IntlShape,
   amount: number,
   currency: string,
   exponent: number,
@@ -54,7 +155,7 @@ function formatAmount(
     currencyFractionDigits: exponent,
   };
   return (
-    appInitial.TI?.(input) ??
+    formatCurrencyAmount(input) ??
     new Intl.NumberFormat(undefined, {
       style: "currency",
       currency: input.currencyCode,
@@ -77,7 +178,7 @@ function planLabel(plan: string): string {
       return plan;
   }
 }
-function paymentMethodLabel(paymentMethod?: Record<string, any>): string {
+function paymentMethodLabel(paymentMethod?: PaymentMethod): string {
   const brand = paymentMethod?.card_brand?.trim() ?? "";
   const last4 = paymentMethod?.card_last4?.trim() ?? "";
   if (brand && last4) return `${brand.toUpperCase()} *${last4}`;
@@ -88,12 +189,17 @@ function SavedCardSummary({
   intl,
   pricingInfo,
   subscriptionUpdate,
-}: Record<string, any>): Record<string, any> {
+}: {
+  intl: IntlShape;
+  pricingInfo?: PricingInfo | null;
+  subscriptionUpdate: SavedCardSubscriptionUpdate;
+}): { body: unknown; confirmLabel: unknown; description: unknown } {
   const update = subscriptionUpdate;
   const preview = update.preview;
   const target = planLabel(update.updatedPlan);
   const promoTrial =
-    update.upgrade?.promoCampaign === promotions.n && pricingInfo != null;
+    update.upgrade?.promoCampaign === nativeTrialCampaign &&
+    pricingInfo != null;
   const description =
     promoTrial ||
     update.fullyCoveredByWallet ||
@@ -186,7 +292,7 @@ function SavedCardSummary({
             })
           : null,
         jsx.jsxs("div", {
-          className: appShared.m4?.(
+          className: classNames(
             "flex justify-between gap-4 font-semibold",
             preview.amount_due.tax_amount > 0 && "mt-2",
           ),
@@ -225,7 +331,12 @@ function ScheduledChangeSummary({
   pricingInfo,
   scheduledPrice,
   update,
-}: Record<string, any>): unknown {
+}: {
+  intl: IntlShape;
+  pricingInfo?: PricingInfo | null;
+  scheduledPrice?: import("@rchunk/pricing").FormattedPrice | null;
+  update: ScheduledSubscriptionUpdate;
+}): unknown {
   const preview = update.preview;
   const targetKey =
     update.updatedPlan === "chatgptgoplan"
@@ -236,13 +347,13 @@ function ScheduledChangeSummary({
   const currentKey =
     update.currentPlan ?? (targetKey === "go" ? "plus" : "pro");
   const currentPlanName =
-    planNames.n?.({
+    getPlanName({
       planType: currentKey,
       initialPlanType: currentKey,
       updatedPlanType: targetKey,
     }) ?? currentKey;
   const planName =
-    planNames.n?.({
+    getPlanName({
       planType: targetKey,
       initialPlanType: currentKey,
       updatedPlanType: targetKey,
@@ -251,14 +362,13 @@ function ScheduledChangeSummary({
     scheduledPrice ??
     (pricingInfo == null
       ? null
-      : pricing.n?.({
+      : getFormattedPrice({
           intl,
           amount: pricingInfo.monthlyAmounts[targetKey],
           currencyCode: pricingInfo.currencyCode,
           minorUnitExponent: pricingInfo.minorUnitExponent,
         }));
-  const Notice = offerNotice.r ?? "div";
-  return jsx.jsx(Notice, {
+  return jsx.jsx(PlanChangeNotice, {
     currentPlanName,
     planName,
     renewalDateFormatted:
@@ -275,7 +385,9 @@ function ScheduledChangeSummary({
   });
 }
 
-function SubscriptionUpdateDialog(props: Record<string, any>): unknown {
+function SubscriptionUpdateDialog(
+  props: SubscriptionUpdateDialogProps,
+): unknown {
   initializeSubscriptionUpdateDialog();
   const {
     disableConfirm = false,
@@ -291,13 +403,14 @@ function SubscriptionUpdateDialog(props: Record<string, any>): unknown {
     scheduledPrice,
     subscriptionUpdate,
   } = props;
-  const intl = appShared.n4?.();
-  const scheduled = subscriptionUpdate.kind === "scheduled_downgrade";
+  const intl = useIntl();
+  const scheduled =
+    "kind" in subscriptionUpdate &&
+    subscriptionUpdate.kind === "scheduled_downgrade";
   let description: unknown = null;
   let body: unknown;
   let confirmLabel: unknown = message("planRenewalModal.confirm", "Confirm");
   if ("renewal" in subscriptionUpdate) {
-    const RenewalNotice = offerNotice.n ?? "div";
     body = jsx.jsx(RenewalNotice, { ...subscriptionUpdate.renewal });
   } else if (subscriptionUpdate.kind === "saved_card_upgrade") {
     const summary = SavedCardSummary({ intl, pricingInfo, subscriptionUpdate });
@@ -313,12 +426,6 @@ function SubscriptionUpdateDialog(props: Record<string, any>): unknown {
     });
     confirmLabel = message("subscriptionUpdate.downgrade.confirm", "Confirm");
   }
-  const Dialog = appShared.Ih ?? "div";
-  const DialogBody = appShared.Oh ?? "form";
-  const DialogHeader = appShared.Ah ?? "header";
-  const DialogSection = appShared.jh ?? "div";
-  const DialogActions = appShared.kh ?? "footer";
-  const Button = appShared.Yh ?? "button";
   const cancel = onBack ?? onCancel;
   return jsx.jsx(Dialog, {
     open: true,
@@ -332,7 +439,7 @@ function SubscriptionUpdateDialog(props: Record<string, any>): unknown {
       as: "form",
       variant: scheduled ? "chatgpt" : "default",
       className: scheduled ? "px-6 pb-6" : undefined,
-      onSubmit: (event: any) => {
+      onSubmit: (event: FormSubmitEvent) => {
         event.preventDefault();
         if (!isUpdating && !disableConfirm) onConfirm();
       },
