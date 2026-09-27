@@ -4,47 +4,94 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
+import type { OnboardingLegalLink } from "@rchunk/app-initial";
+import type { JsxRuntime, MaitaiScopeApi } from "@rchunk/app-shared";
 
 void runtimeChunk;
 
-const appInitial = appInitialChunk as Record<string, any>;
-const appPrimary = appPrimaryChunk as Record<string, any>;
-const appShared = appSharedChunk as Record<string, any>;
+const {
+  As: initializeChatGptOnboarding,
+  Cpn: productAnalyticsSignal,
+  Ds: onboardingLegalLinkClickedEvent,
+  Es: onboardingLegalLinks,
+  HNt: surfaceClaims,
+  JNt: initializeOnboardingAnalytics,
+  Jot: ExternalLink,
+  Xot: initializeExternalLink,
+  ypn: initializeProductAnalytics,
+} = appInitialChunk;
+const {
+  Ah: initializeSurfaceClaim,
+  kh: SurfaceClaim,
+} = appPrimaryChunk;
+const {
+  $3: initializeJsxRuntime,
+  FX: initializeMaitaiRuntime,
+  I3: getJsxRuntime,
+  Ih: Dialog,
+  K2: initializeIntlRuntime,
+  LX: useScope,
+  Lh: DialogDescription,
+  QI: initializeAppScopeRuntime,
+  Rh: DialogTitle,
+  Y2: FormattedMessage,
+  Yh: Button,
+  ZI: AppScope,
+  Zh: initializeButton,
+  lw: initializeChatGptLogo,
+  ty: ChatGptLogo,
+  zh: initializeDialog,
+} = appSharedChunk;
 
-let jsx: any;
+let jsxRuntime: JsxRuntime | null = null;
 let initialized = false;
+
+interface PreventDefaultEvent {
+  preventDefault(): void;
+}
+
+interface TrainingDisclaimerProps {
+  country: string;
+}
+
+interface ChatGptOnboardingDialogProps {
+  country: string;
+  onContinue(): void;
+  onShown(): void;
+}
 
 function initializeChatGptOnboardingDialog(): void {
   if (initialized) return;
   initialized = true;
-  appInitial.As?.();
-  appShared.FX?.();
-  appShared.K2?.();
-  appShared.Zh?.();
-  appShared.zh?.();
-  appInitial.Xot?.();
-  appShared.lw?.();
-  appPrimary.Ah?.();
-  appInitial.JNt?.();
-  appInitial.ypn?.();
-  appShared.QI?.();
-  jsx = typeof appShared.I3 === "function" ? appShared.I3() : appShared.I3;
+  initializeJsxRuntime?.();
+  initializeChatGptOnboarding?.();
+  initializeMaitaiRuntime?.();
+  initializeIntlRuntime?.();
+  initializeButton?.();
+  initializeDialog?.();
+  initializeExternalLink?.();
+  initializeChatGptLogo?.();
+  initializeSurfaceClaim?.();
+  initializeOnboardingAnalytics?.();
+  initializeProductAnalytics?.();
+  initializeAppScopeRuntime?.();
+  jsxRuntime =
+    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
 }
 
-function preventDefault(event: { preventDefault(): void }): void {
+function preventDefault(event: PreventDefaultEvent): void {
   event.preventDefault();
 }
 
 function policyLink(
-  scope: any,
+  scope: MaitaiScopeApi<Record<string, unknown>>,
   key: string,
   href: string,
-  analyticsValue: unknown,
+  analyticsValue: OnboardingLegalLink,
 ): (children: unknown) => unknown {
-  const Link = appInitial.Jot ?? "a";
   return (children: unknown) =>
-    jsx.jsx(
-      Link,
+    getInitializedJsxRuntime().jsx(
+      ExternalLink,
       {
         className: "underline",
         href,
@@ -53,8 +100,10 @@ function policyLink(
         openTarget: "external-browser",
         onClick: () =>
           scope
-            ?.get?.(appInitial.Cpn)
-            ?.logProductEvent?.(appInitial.Ds, { link: analyticsValue }),
+            .get(productAnalyticsSignal)
+            .logProductEvent(onboardingLegalLinkClickedEvent, {
+              link: analyticsValue,
+            }),
         children,
       },
       key,
@@ -62,9 +111,8 @@ function policyLink(
 }
 
 function LearnMoreLink(children: unknown): unknown {
-  const Link = appInitial.Jot ?? "a";
-  return jsx.jsx(
-    Link,
+  return getInitializedJsxRuntime().jsx(
+    ExternalLink,
     {
       className: "underline",
       href: "https://help.openai.com/en/articles/5722486-how-your-data-is-used-to-improve-model-performance",
@@ -77,8 +125,8 @@ function LearnMoreLink(children: unknown): unknown {
   );
 }
 
-function TrainingDisclaimer({ country }: { country: string }): unknown {
-  const FormattedMessage = appShared.Y2;
+function TrainingDisclaimer({ country }: TrainingDisclaimerProps): unknown {
+  const jsx = getInitializedJsxRuntime();
   return jsx.jsx(FormattedMessage, {
     id:
       country === "CA"
@@ -100,41 +148,31 @@ function ChatGptOnboardingDialog({
   country,
   onContinue,
   onShown,
-}: {
-  country: string;
-  onContinue(): void;
-  onShown(): void;
-}): unknown {
+}: ChatGptOnboardingDialogProps): unknown {
   initializeChatGptOnboardingDialog();
-  const scope = appShared.LX?.(appShared.ZI);
-  const FormattedMessage = appShared.Y2;
-  const Dialog = appShared.Ih ?? "div";
-  const Heading = appShared.Rh ?? "h1";
-  const Text = appShared.Lh ?? "p";
-  const Button = appShared.Yh ?? "button";
-  const Logo = appShared.ty ?? "span";
-  const Claim = appPrimary.kh ?? jsx.Fragment;
+  const jsx = getInitializedJsxRuntime();
+  const scope = useScope(AppScope);
   const legalValues = {
     termsLink: policyLink(
       scope,
       "terms",
       "https://openai.com/terms",
-      appInitial.Es?.CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_TERMS,
+      onboardingLegalLinks.CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_TERMS,
     ),
     privacyLink: policyLink(
       scope,
       "privacy",
       "https://openai.com/privacy",
-      appInitial.Es?.CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_PRIVACY,
+      onboardingLegalLinks.CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_PRIVACY,
     ),
     koreaAddendumLink: policyLink(
       scope,
       "korea-addendum",
       "https://openai.com/ko/policies/kr-privacy-policy-addendum",
-      appInitial.Es?.CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_KOREA_ADDENDUM,
+      onboardingLegalLinks.CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_KOREA_ADDENDUM,
     ),
   };
-  const submit = (event: { preventDefault(): void }) => {
+  const submit = (event: PreventDefaultEvent) => {
     event.preventDefault();
     onContinue();
   };
@@ -152,9 +190,9 @@ function ChatGptOnboardingDialog({
           children: [
             jsx.jsx("div", {
               className: "flex size-9 items-center justify-center",
-              children: jsx.jsx(Logo, {}),
+              children: jsx.jsx(ChatGptLogo, {}),
             }),
-            jsx.jsx(Heading, {
+            jsx.jsx(DialogTitle, {
               className: "text-3xl leading-9 font-normal",
               children: jsx.jsx(FormattedMessage, {
                 id: "chatgpt.new-onboarding.all-done-2",
@@ -168,7 +206,7 @@ function ChatGptOnboardingDialog({
         jsx.jsxs("div", {
           className: "flex w-full flex-col gap-y-4 max-sm:px-6",
           children: [
-            jsx.jsx(Text, {
+            jsx.jsx(DialogDescription, {
               className: "text-center text-base leading-6 text-secondary",
               children: jsx.jsx(TrainingDisclaimer, { country }),
             }),
@@ -207,8 +245,8 @@ function ChatGptOnboardingDialog({
     }),
   });
 
-  return jsx.jsx(Claim, {
-    claim: appInitial.HNt?.FullscreenOnboarding,
+  return jsx.jsx(SurfaceClaim, {
+    claim: surfaceClaims.FullscreenOnboarding,
     children: jsx.jsx(Dialog, {
       open: true,
       showDialogClose: false,
@@ -223,6 +261,14 @@ function ChatGptOnboardingDialog({
       children: content,
     }),
   });
+}
+
+function getInitializedJsxRuntime(): JsxRuntime {
+  initializeChatGptOnboardingDialog();
+  if (jsxRuntime == null) {
+    throw new Error("ChatGPT onboarding JSX runtime failed to initialize");
+  }
+  return jsxRuntime;
 }
 
 initializeChatGptOnboardingDialog();

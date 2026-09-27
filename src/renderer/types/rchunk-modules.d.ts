@@ -1096,6 +1096,8 @@ declare module "@rchunk/app-shared" {
   export const AS: (props: IconAssetProps) => unknown;
   /** browser-profile-import 图标依赖初始化器。 */
   export const lw: () => void;
+  /** ChatGPT 标志组件。 */
+  export const ty: (props: Record<string, unknown>) => unknown;
   /** 插件技能来源图标组件。 */
   export const rC: (props: Record<string, unknown>) => unknown;
   export interface SimpleIconProps extends Record<string, unknown> {
@@ -2695,6 +2697,29 @@ declare module "@rchunk/app-initial" {
   export const V$: (
     options: ConnectorAppsQueryOptions,
   ) => ConnectorAppsQueryResult;
+  export interface ProductAnalytics {
+    logProductEvent(
+      event: unknown,
+      payload: { link: OnboardingLegalLink },
+    ): void;
+  }
+  export type OnboardingLegalLink =
+    | "terms"
+    | "privacy"
+    | "korea-addendum";
+  export const As: () => void;
+  export const Cpn: import("@rchunk/app-shared").ScopedSignal<
+    Record<string, unknown>,
+    ProductAnalytics
+  >;
+  export const Ds: unknown;
+  export const Es: {
+    CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_TERMS: "terms";
+    CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_PRIVACY: "privacy";
+    CODEX_CHATGPT_ONBOARDING_LEGAL_LINK_KOREA_ADDENDUM: "korea-addendum";
+  };
+  export const HNt: { FullscreenOnboarding: string };
+  export const JNt: () => void;
   export type SetupCodexStep = "role" | "task" | "complete";
   export interface SetupCodexStepArguments {
     step: SetupCodexStep;
@@ -3306,6 +3331,12 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-primary" {
+  export interface SurfaceClaimProps extends Record<string, unknown> {
+    children: unknown;
+    claim: string;
+  }
+  export const Ah: () => void;
+  export const kh: (props: SurfaceClaimProps) => unknown;
   export const Jp: (props: Record<string, unknown>) => unknown;
   export const Yp: () => void;
   export interface GptMigrationVisitKey {
@@ -4637,6 +4668,17 @@ declare module "@rchunk/chat-choice-view" {
   }
   export const n: () => void;
   export const t: (props: ChatChoiceViewProps) => unknown;
+}
+
+declare module "@rchunk/chatgpt-onboarding-dialog" {
+  export interface ChatGptOnboardingDialogProps {
+    country: string;
+    onContinue(): void;
+    onShown(): void;
+  }
+  export const ChatGptOnboardingDialog: (
+    props: ChatGptOnboardingDialogProps,
+  ) => unknown;
 }
 
 declare module "@rchunk/gpt-plugin-migration-dialog" {
