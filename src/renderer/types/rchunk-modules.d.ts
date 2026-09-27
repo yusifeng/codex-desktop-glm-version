@@ -5270,8 +5270,25 @@ declare module "@rchunk/beacon-modal" {
 
 declare module "@rchunk/chatgpt-work-home-page-core" {
   export const n: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const t: (props: {
+    additionalDeveloperInstructions?: string;
+    initialPrompt?: string;
+    onSubmit?(input: {
+      developerInstructions?: string;
+      prompt: string;
+    }): Promise<unknown> | unknown;
+    onTaskSuggestionSelected?(suggestion: string): void;
+    renderHomeContent?(context: { setPrompt(value: string): void }): unknown;
+    suggestions?: string[];
+  }) => unknown;
 }
+
+declare module "@rchunk/checkout-policy";
+declare module "@rchunk/checkout-dialog-fields";
+declare module "@rchunk/checkout-error";
+declare module "@rchunk/account-action-integrity";
+declare module "@rchunk/checkout-session";
+declare module "@rchunk/checkout-confirm-latency";
 
 declare module "@rchunk/checkout-page-core" {
   export const r: () => void;
@@ -5280,13 +5297,42 @@ declare module "@rchunk/checkout-page-core" {
 
 declare module "@rchunk/credit-purchase-page-core" {
   export const n: () => void;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const t: (props?: {
+    accountId?: string;
+    audience?: "personal" | "workspace";
+    currencyCode?: string;
+    defaultQuantity?: number;
+    maximum?: number;
+    minimum?: number;
+    onComplete?(result: unknown): void;
+    userId?: string;
+  }) => unknown;
 }
 
+declare module "@rchunk/plugin-request-empty-state";
+declare module "@rchunk/plugins-store-page";
+declare module "@rchunk/plugins-page-section";
+declare module "@rchunk/plugin-detail-view";
+declare module "@rchunk/plugins-page";
+
 declare module "@rchunk/skills-page-core" {
-  export const n: (props: Record<string, unknown>) => unknown;
-  export const r: (props: Record<string, unknown>) => unknown;
-  export const t: () => void;
+  interface Skill {
+    description?: string;
+    id: string;
+    installed?: boolean;
+    name: string;
+    [key: string]: unknown;
+  }
+  interface SkillsPageProps {
+    initialQuery?: string;
+    initialTab?: "plugins" | "skills";
+    onInstall?(skill: Skill): Promise<unknown>;
+    onOpen?(skill: Skill): void;
+    skills?: Skill[];
+  }
+  export const n: () => unknown;
+  export const r: () => void;
+  export const t: (props?: SkillsPageProps) => unknown;
 }
 
 declare module "@rchunk/browser-login-handoff-page-core" {
@@ -5314,10 +5360,29 @@ declare module "@rchunk/plugin-detail-page-core" {
 
 declare module "@rchunk/mcp-extension-view-page-core" {
   export const i: () => void;
-  export const n: (props: Record<string, unknown>) => unknown;
-  export const r: (props: Record<string, unknown>) => unknown;
-  export const t: (props: Record<string, unknown>) => unknown;
+  export const n: () => void;
+  export const r: () => unknown;
+  export const t: (props?: {
+    deepLink?: string;
+    locationState?: unknown;
+    mcpAppId?: string;
+    path?: string;
+    view?: {
+      entrypoint?: { type?: string };
+      id?: string;
+      title?: string;
+      [key: string]: unknown;
+    } | null;
+    views?: Array<{
+      entrypoint?: { type?: string };
+      id?: string;
+      title?: string;
+      [key: string]: unknown;
+    }>;
+  }) => unknown;
 }
+
+declare module "@rchunk/mcp-view-surface";
 
 declare module "@rchunk/detail-page" {
   export const n: (props: { children?: unknown }) => unknown;

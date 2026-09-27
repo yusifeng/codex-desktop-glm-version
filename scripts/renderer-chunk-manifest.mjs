@@ -1052,11 +1052,27 @@ export const CHUNKS = {
   "use-home-directory": "use-home-directory-590afb3c7fc1.js",
   "voice-personalization-dialog-entry": "entry-9b0cd9d2d508.js",
   "connector-post-connect-dialog": "dialog-4073966912d7.js",
+  "checkout-policy": "checkout-policy-ef9f1355d482.js",
+  "checkout-dialog-fields": "dialog-fields-9cb0a693b328.js",
+  "checkout-error": "error-726f28532d62.js",
+  "account-action-integrity": "chatgpt-account-action-integrity-f16d96deb62f.js",
+  "checkout-session": "session-3ec40b7dd28e.js",
+  "checkout-confirm-latency": "confirm-latency-80d190bb1c8b.js",
+  "plugin-request-empty-state": "plugin-request-empty-state-44bc76026d2c.js",
+  "plugins-store-page": "plugins-store-page-c507a4ccaef5.js",
+  "plugins-page-section": "plugins-page-section-1f9dd2d984ea.js",
+  "plugin-detail-view": "plugin-detail-view-514feb8d1f55.js",
+  "plugins-page": "plugins-page-fe136f0c8463.js",
+  "mcp-view-surface": "surface-a350805dc637.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
 export const REWRITTEN = new Set([
+  "chatgpt-work-home-page-core",
+  "credit-purchase-page-core",
+  "skills-page-core",
+  "mcp-extension-view-page-core",
   "pepper-onboarding-modal",
   "appgen-share-dialog",
   "thread-handoff-modal",
