@@ -39,6 +39,8 @@ declare module "@rchunk/app-shared" {
     success: false;
   }
   export interface SafeParseSchema<T> {
+    catch(fallback: T): SafeParseSchema<T>;
+    parse(value: unknown): T;
     safeParse(value: unknown): SafeParseSuccess<T> | SafeParseFailure;
   }
   export interface OptionalSchema<T> extends SafeParseSchema<T | undefined> {
@@ -56,12 +58,25 @@ declare module "@rchunk/app-shared" {
     extends SafeParseSchema<T> {
     loose(): ObjectSchema<T>;
     nullish(): NullishSchema<T>;
+    optional(): OptionalSchema<T>;
+  }
+  export interface NumberSchema extends SafeParseSchema<number> {
+    optional(): OptionalSchema<number>;
+  }
+  export interface BooleanSchema extends SafeParseSchema<boolean> {
+    nullish(): NullishSchema<boolean>;
+  }
+  export interface RecordSchema<Key extends string, Value>
+    extends SafeParseSchema<Record<Key, Value>> {
+    nullish(): NullishSchema<Record<Key, Value>>;
   }
   export const H4: <T extends Record<string, unknown>>(
     shape: Record<string, SafeParseSchema<unknown>>,
   ) => ObjectSchema<T>;
   export const R4: <T>(value: T) => OptionalSchema<T>;
   export const q4: () => StringSchema;
+  export const V4: () => NumberSchema;
+  export const k4: () => BooleanSchema;
   // app-shared/ui/button.ts（内部 n8/a8/pot；压缩导出 Qh/Yh/Xh）。
   export type ButtonColor =
     | "accent" | "accentInverse" | "accentSubtle" | "activity"
@@ -2568,7 +2583,10 @@ declare module "@rchunk/app-shared" {
   export const t$: unknown;
   export const x_: unknown; // useIconScaleContext（_3）
   export const y_: unknown;
-  export const G4: unknown;
+  export const G4: <Key extends string, Value>(
+    key: SafeParseSchema<Key>,
+    value: SafeParseSchema<Value>,
+  ) => RecordSchema<Key, Value>;
   export const Gs: unknown; // jbt：pin-window-light-16 IconAsset
   export const H3: () => void; // detachedWindow 入口的 preload helper
   export const RI: {
@@ -3405,6 +3423,12 @@ declare module "@rchunk/app-initial" {
       detectTarget(options: { target: string }): Promise<{ available: boolean }>;
       loadTargetIcon(options: { target: string }): Promise<{ icon: unknown }>;
     };
+    browserUsePermissions?: {
+      clearPrewarmedThreads(): Promise<void>;
+      updateIabHistoryApprovalMode(value: unknown): Promise<unknown>;
+      updateOriginRules(value: unknown): Promise<unknown>;
+      updateWebMcpEnabled(value: unknown): Promise<unknown>;
+    };
   }; // appServices：已解析的服务集合
   export const $en: import("@rchunk/app-shared").MaitaiScope<
     Record<string, unknown>
@@ -3684,7 +3708,7 @@ declare module "@rchunk/app-initial" {
       ids: string[],
       options?: { includeTurns?: boolean },
     ): Promise<void>;
-    sendRequest(method: string, parameters: unknown): Promise<void>;
+    sendRequest(method: string, parameters: unknown): Promise<unknown>;
   };
   export const Vgn: () => {
     StableID: { get(key: unknown): string };
@@ -3714,7 +3738,10 @@ declare module "@rchunk/app-initial" {
   export const uJt: () => string;
   export const Ycn: () => CookieStore;
   export const bfn: () => void;
-  export const yfn: () => { authStatus: string };
+  export const yfn: () => {
+    auth: { reauthenticationParams: Record<string, string> };
+    authStatus: string;
+  };
   /** Quick Chat 与 debug 独立窗口的路由、会话和分析依赖。 */
   export interface QuickChatSessionState extends Record<string, unknown> {
     hasConversation: boolean;
@@ -4355,6 +4382,7 @@ declare module "@rchunk/app-initial" {
     pendingUpdateInvoiceId?: string;
   }
   export class Sdn extends Error {
+    readonly errorCode?: string;
     readonly status: number;
   }
   /** 提交订阅套餐更新。 */
@@ -9824,7 +9852,24 @@ declare module "@rchunk/workspace-agent-detail-page" {
 }
 
 declare module "@rchunk/datadog-rum-browser" { const rum: unknown; export default rum; }
-declare module "@rchunk/browser-mfa-session" { const session: unknown; export default session; }
+declare module "@rchunk/browser-mfa-jwt" {
+  export const n: (token: string, options?: { header?: boolean }) => Record<string, unknown>;
+  export const t: () => void;
+}
+declare module "@rchunk/browser-mfa-session" {
+  export const a: (url: string, signal?: AbortSignal) => Promise<boolean>;
+  export const i: (ignoreMfaRequirement?: boolean) => Promise<boolean>;
+  export const n: () => void;
+  export const r: (error: unknown) => boolean;
+  export const t: (accountId: string) => {
+    gcTime: 0;
+    queryFn(context: { signal: AbortSignal }): Promise<unknown>;
+    queryKey: [string, string];
+    refetchOnWindowFocus: false;
+    retry: false;
+    staleTime: 0;
+  };
+}
 declare module "@rchunk/mobile-age-verification-page" {
   export type MobileAgeVerificationStatus = "loading" | "active" | "success" | "cancelled" | "error";
   export const MobileAgeVerificationPage: (props: { inquiryId?: string; status?: MobileAgeVerificationStatus; errorCode?: string; errorStatus?: string; onStart?(): void; onResult?(url: string): void }) => unknown;
@@ -9974,6 +10019,7 @@ declare module "@rchunk/app-shared" {
   export const uW: (bytes: Uint8Array) => Promise<string>;
   /** React Query client hooks。 */
   export const CL: () => {
+    getQueryData(queryKey: readonly unknown[]): unknown;
     invalidateQueries(options: { queryKey: readonly unknown[] }): Promise<unknown>;
   };
   export const SL: () => void;
@@ -10039,6 +10085,29 @@ declare module "@rchunk/app-initial" {
       [key: string]: unknown;
     }>;
   }>;
+  /** Browser-use origin policy parsing and query dependencies. */
+  export interface ParsedBrowserOrigin {
+    canonicalKey: string;
+    canonicalPattern: string;
+    hostname: string;
+  }
+  export const Asn: (url: string) => ParsedBrowserOrigin | null;
+  export const Fsn: (pattern: ParsedBrowserOrigin, hostname: string) => boolean;
+  export const Kdn: (layers: unknown) => { name: string; config?: Record<string, unknown> } | null;
+  export const Msn: (pattern: string) => ParsedBrowserOrigin | null;
+  export const Nsn: (pattern: string) => ParsedBrowserOrigin | null;
+  export const Xdn: () => void;
+  export const Ydn: (layerName: string) => string | null;
+  export const bsn: () => void;
+  export const ksn: (pattern: ParsedBrowserOrigin, origin: ParsedBrowserOrigin) => boolean;
+  export const sun: () => (queryKey: readonly unknown[]) => Promise<void>;
+  export const tun: (
+    scope: import("@rchunk/app-shared").MaitaiScope<Record<string, unknown>>,
+    command: string,
+    options: Record<string, unknown>,
+  ) => unknown;
+  /** Browser MFA access token bridge. */
+  export const Vun: () => Promise<{ accessToken: string } | null>;
   /** Cloud environment connector constants。 */
   export const Jr: string;
   export const Kr: string;
@@ -13163,8 +13232,33 @@ declare module "@rchunk/virtual-try-on" {
 }
 
 declare module "@rchunk/browser-use-origin-state-queries" {
-  const _default: unknown;
-  export default _default;
+  export const C: () => void;
+  export const D: (configuration?: Record<string, unknown> | null) => boolean;
+  export const E: (configuration: Record<string, unknown> | null | undefined, capability: string) => boolean;
+  export const S: (configuration?: Record<string, unknown> | null) => boolean;
+  export const T: (configuration: Record<string, unknown> | null | undefined, mode?: "iab" | "extension" | "cdp") => boolean;
+  export const _: () => void;
+  export const a: () => import("@rchunk/app-shared").UseMutationResult<unknown, Error, unknown>;
+  export const b: (configuration?: Record<string, unknown> | null) => Array<{ decision: "allow" | "deny"; pattern: Record<string, unknown> }>;
+  export const c: () => import("@rchunk/app-shared").UseMutationResult<unknown, Error, { approvalMode: unknown; kind: unknown }>;
+  export const d: (hostId?: string) => import("@rchunk/app-shared").UseMutationResult<unknown, Error, unknown>;
+  export const f: () => import("@rchunk/app-shared").UseMutationResult<unknown, Error, unknown>;
+  export const g: (policy: Record<string, unknown> | null | undefined, capability: string) => unknown;
+  export const h: (value?: Record<string, unknown> | null) => Record<string, unknown> | null;
+  export const i: () => void;
+  export const l: (options: { hostId: string }) => import("@rchunk/app-shared").UseMutationResult<unknown, Error, unknown>;
+  export const m: () => void;
+  export const n: import("@rchunk/app-shared").ScopedDerivedFamily<unknown, string, "unsupported" | "loading" | "error" | "supported">;
+  export const o: () => import("@rchunk/app-shared").UseMutationResult<unknown, Error, unknown>;
+  export const p: (...arguments_: unknown[]) => Promise<void>;
+  export const r: (dataTypes: unknown) => Promise<unknown>;
+  export const s: () => import("@rchunk/app-shared").UseMutationResult<unknown, Error, unknown>;
+  export const t: unknown;
+  export const u: () => import("@rchunk/app-shared").UseMutationResult<unknown, Error, unknown>;
+  export const v: (entry: { pattern: Record<string, unknown> }, url: string) => boolean;
+  export const w: (configuration: Record<string, unknown> | null | undefined, url: string, capability: string) => boolean;
+  export const x: (configuration?: Record<string, unknown> | null) => Array<{ pattern: string; policy: Record<string, unknown> }>;
+  export const y: (entry: { pattern: string }, url: string) => boolean;
 }
 
 declare module "@rchunk/diff-comment-card" {
