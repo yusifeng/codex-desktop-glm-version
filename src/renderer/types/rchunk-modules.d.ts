@@ -12516,8 +12516,16 @@ declare module "@rchunk/register-pierre-themes" {
   export const a: () => { setRenderOptions(options: { lineDiffType: string; theme: string }): unknown } | null;
   export const i: () => void;
   export const n: unknown;
+  export const o: { LRUMap: new <Key, Value>(limit?: number, entries?: Iterable<[Key, Value]>) => MapLike<Key, Value> };
   export const r: (props: { children?: unknown; highlighterOptions: Record<string, unknown>; poolOptions: Record<string, unknown> }) => unknown;
   export const t: () => void;
+
+  interface MapLike<Key, Value> extends Iterable<[Key, Value]> {
+    readonly limit: number; readonly size: number; clear(): void; delete(key: Key): Value | undefined;
+    entries(): IterableIterator<[Key, Value]>; find(key: Key): Value | undefined; get(key: Key): Value | undefined;
+    has(key: Key): boolean; keys(): IterableIterator<Key>; set(key: Key, value: Value): this;
+    shift(): [Key, Value] | undefined; toJSON(): Array<{ key: Key; value: Value }>; values(): IterableIterator<Value>;
+  }
 }
 
 declare module "@rchunk/open-pull-request-fix-automation-panel-core" {
@@ -12527,9 +12535,31 @@ declare module "@rchunk/open-pull-request-fix-automation-panel-core" {
 }
 
 declare module "@rchunk/pull-request-code-review-core" {
+  export interface DiffControls {
+    diffMode: "left" | "right" | "split" | "unified"; expanded: boolean; hideWhitespace: boolean;
+    loadFullFilesEnabled: boolean; richPreviewEnabled: boolean; wordDiffsEnabled: boolean; wrap: boolean;
+    onSelectDiffMode(mode: "left" | "right" | "split" | "unified"): void; onToggleExpanded(): void;
+    onToggleHideWhitespace(): void; onToggleLoadFullFiles(): void; onToggleRichPreview(): void;
+    onToggleWordDiffs(): void; onToggleWrap(): void;
+  }
+  export const a: (props: { copyGitApplyCommandDisabled?: boolean; diffControls: DiffControls; refreshGitQueriesDisabled?: boolean; showCopyGitApplyCommand?: boolean; showHideWhitespace?: boolean; showLoadFullFiles?: boolean; showRefreshGitQueries?: boolean; onClickCopyGitApplyCommand?(): void; onRefreshGitQueries?(): void }) => unknown;
+  export const c: () => void;
+  export const i: () => void;
   export const n: () => void;
+  export const o: () => void;
+  export const r: (props: { diff: { metadata?: { additionLines?: unknown }; [key: string]: unknown }; [key: string]: unknown }) => unknown;
+  export const s: (props: { bottomInset?: "actions" | "composer" | null; children(width: number): unknown; className?: string; disableScrollAnchoring?: boolean; isFileTreeOpen?: boolean; [key: string]: unknown }) => unknown;
   export const t: (props: Record<string, unknown>) => unknown;
 }
+
+declare module "@rchunk/pull-request-comment" { const _default: unknown; export default _default; }
+declare module "@rchunk/arrow-curved-right" { const _default: unknown; export default _default; }
+declare module "@rchunk/review-file-tree-pane" { const _default: unknown; export default _default; }
+declare module "@rchunk/text-shorter" { const _default: unknown; export default _default; }
+declare module "@rchunk/code-diff" { const _default: unknown; export default _default; }
+declare module "@rchunk/review-preferences-model" { const _default: unknown; export default _default; }
+declare module "@rchunk/review-diff-virtualizer-metrics" { const _default: unknown; export default _default; }
+declare module "@rchunk/pull-request-error-description" { const _default: unknown; export default _default; }
 
 declare module "@rchunk/diff-comment-card" {
   export const n: (props: {
