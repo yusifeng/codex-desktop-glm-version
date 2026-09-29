@@ -8092,6 +8092,28 @@ declare module "@rchunk/profile-settings" {
   export const CmeAccountSettings: () => unknown;
   export const CmeProfileSettings: () => unknown;
 }
+declare module "@rchunk/appshots-settings" {
+  export const AppshotsSettings: () => unknown;
+}
+declare module "@rchunk/code-review-settings" {
+  export const CodeReviewSettings: () => unknown;
+}
+declare module "@rchunk/usage-code-review-settings" {
+  export const UsageCodeReviewSettings: (props: { isPolling?: boolean }) => unknown;
+}
+declare module "@rchunk/worktrees-settings-page" {
+  export const WorktreesSettingsPage: () => unknown;
+}
+declare module "@rchunk/activity-chart" {
+  export const H: (props: {
+    ariaLabel: string;
+    days: number;
+    onChange(days: number): void;
+  }) => unknown;
+  export const U: () => void;
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
 declare module "@rchunk/symbol-browser" {
   export interface SymbolBrowserSelection {
     kind: "emoji" | "icon";

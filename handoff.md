@@ -55,18 +55,18 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：991 个语义 chunk；`verify-renderer` 为 991/991。
+- `REWRITTEN`：995 个语义 chunk；`verify-renderer` 为 995/995。
 - `PRESERVED_ASSETS`：50 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
-- `INCREMENTAL_HUBS`：11 个聚合边界。`app-shared/app-initial/app-primary` 按
+- `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
   由消费审计锁定，禁止无声明的压缩导出扩张。
 - `node scripts/audit-renderer-tail.mjs` 的 0 pending **只表示当前 `CHUNKS` 登记集
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2250 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  990/2250 tracked、1260 pending；composer 47/47、sidebar 12/12、terminal 6/6、
-  browser 19/19 已覆盖，settings 52/70。
+  995/2250 tracked、1255 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  browser 19/19 已覆盖，settings 56/70。
 - `node scripts/audit-app-shared-consumption.mjs`：330 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -112,6 +112,14 @@ annotation 消息与捕获预算、导航/刷新/标注/分享/关闭控件，�
 埋点；connector settings redirect 恢复 canonical plugin 跳转和非 canonical 连接
 modal 兜底；profile settings 恢复 CME 医疗资质表单、校验与保存 toast。专项行为测试
 108/108；renderer 全量门禁 991/991、main 11/11、tsc 73，settings 覆盖达到 52/70。
+
+2026-09-29 已完成 settings 第二批四个缺口：Appshots 恢复可用性门控、双键热键、
+目标会话、音效与演示视频；Code Review 恢复个人/安全审查触发策略、严重级别与 credits
+偏好；Usage Code Review 恢复 7/30 天用量查询、五类图表、priority 补差与情绪汇总；
+Worktrees Settings 恢复管理摘要、状态、关联会话、打开/新聊天、清理与刷新。专项行为
+测试 98/98；renderer 全量门禁 995/995、main 11/11、tsc 73，settings 覆盖达到
+56/70。`activity-chart` 发布包暴露 43 个图表聚合导出，当前仅消费 `H/U/n/t`，因此
+按第 12 个 typed-consumer-surface hub 登记，未复制未消费图表实现。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、
