@@ -6145,6 +6145,65 @@ declare module "@rchunk/general-settings" {
   export const r: (props?: Record<string, unknown>) => unknown;
   export const t: (props?: Record<string, unknown>) => unknown;
 }
+declare module "@rchunk/mark-session-create" {
+  export const dt: unknown;
+  export const ft: () => void;
+  export const n: () => void;
+  export const r: (scope: unknown, surface: string, options?: { allowOverride?: boolean }) => void;
+  export const t: (scope: unknown, options?: { resetTimings?: boolean }) => void;
+}
+declare module "@rchunk/terminal-panel-bootstrap" { export const t: () => void; }
+declare module "@rchunk/terminal-thumbnail" {
+  export interface TerminalOutputSpan { style?: Record<string, string | number>; text: string }
+  export const n: () => void;
+  export const t: (props: { cwd?: string | null; homeDirectory?: string | null; outputTail?: readonly TerminalOutputSpan[] | null; title: string }) => unknown;
+}
+declare module "@rchunk/app-shared" {
+  export const kC: (props?: Record<string, unknown>) => unknown;
+  export const xL: (props: { children?: unknown; client: unknown }) => unknown;
+}
+declare module "@rchunk/app-initial" {
+  export const C6t: () => void;
+  export const sfn: (gateId: string) => boolean;
+  export const w6t: (options: { featureName: string; hostId: string }) => { enabled: boolean; isLoading: boolean };
+}
+declare module "@rchunk/local-conversation-artifacts-signals" {
+  export const r: () => void;
+  export const t: unknown;
+}
+declare module "@rchunk/background-terminal-thumbnail" {
+  export const BackgroundTerminalThumbnail: (props: { readState?: () => { readOutput?: () => readonly import("@rchunk/terminal-thumbnail").TerminalOutputSpan[] | null } | null | undefined; title: string }) => unknown;
+}
+declare module "@rchunk/ascii-engine" {
+  export type AsciiMode = "noise" | "video" | "composite";
+  export const i: () => void;
+  export const n: (options?: { initialColumns?: number; initialMode?: AsciiMode; initialRows?: number; preferredVideoKeyword?: string }) => { asciiChars: string; columns: number; lines: readonly string[]; mode: AsciiMode; rows: number; setAsciiChars(value: string): void; setColumns(value: number): void; setMode(value: AsciiMode): void; setRows(value: number): void; setShowControls(value: boolean): void; showControls: boolean };
+  export const r: (props: { autoCover?: boolean; backgroundColor?: string; columns: number; foregroundColor?: string; lines: readonly string[]; rows: number; scale?: number }) => unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/browser-voice-availability" {
+  export const canShowVoiceModeAction$: unknown;
+  export const clearSessionCreate: typeof import("@rchunk/mark-session-create").t;
+  export const markSessionCreate: typeof import("@rchunk/mark-session-create").r;
+}
+declare module "@rchunk/browser-site-actions-state" {
+  export const getBrowserSiteActionsState: (scope: { get<Value>(signal: unknown, parameter?: unknown): Value }, conversation: { conversationId: string }, siteUrl: string, hostId: string) => { canManage: boolean; isOwnerOnly: boolean; projectId: string; siteUrl: string } | null;
+}
+declare module "@rchunk/browser-extension-status-description" {
+  export const n: () => void;
+  export const t: (props: { status: { isInstalled: boolean; isLoading: boolean } }) => unknown;
+}
+declare module "@rchunk/browser-settings-visibility" {
+  export interface BrowserSettingVisibility { enabled: boolean; isLoading: boolean }
+  export const i: () => void;
+  export const n: (props: { hostId: string }) => { contactInfo: BrowserSettingVisibility; downloads: BrowserSettingVisibility; extensions: BrowserSettingVisibility; history: BrowserSettingVisibility; passwordManager: BrowserSettingVisibility; siteSettings: BrowserSettingVisibility };
+  export const r: (props: { browsingDataSettings?: unknown; browsingHistory?: unknown; onClose?: () => void }) => unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/browser-browsing-data-dialog" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
 declare module "@rchunk/checkout-confirm-latency" {
   export const a: (email: string | null | undefined, fallback?: string) => { checkoutEmail: string; hasCheckoutEmail: boolean; defaultEmail: string };
   export const c: () => void;

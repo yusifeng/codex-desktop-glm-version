@@ -36,6 +36,15 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 `checkout-session` 的 60 个导出当前没有命名消费者，仅作为 checkout 簇的副作用
 依赖边保留。二者都由同一 hub 测试锁定，避免为未使用的压缩导出制造占位源码。
 
+`billing-analytics` 与 `mark-session-create` 也采用消费面增量策略。前者只承接设置页
+实际使用的 billing analytics API；后者虽然发布资产包含完整 voice 会话运行时，
+当前 browser voice availability 只消费 `dt/ft/n/r/t`，因此仅为这五个符号提供
+精确声明，禁止为了提高重写数量复制 138KB 的未消费聚合实现。
+
+截至 2026-09-29，尾部审计为 979 rewritten / 50 preserved / 10 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 977/2250 tracked、1273 pending，其中
+terminal 4/6、browser 14/19。尾部 0 pending 仍不能替代全量覆盖审计。
+
 注意：`audit-renderer-tail.mjs` 只审计已经登记进 `CHUNKS` 的集合，不能证明
 `docs/renderer-app-chunks.json` 中的 2250 个 app-code 文件已经全部处理。全量覆盖
 必须以 `node scripts/audit-renderer-app-coverage.mjs` 为准；它会报告当前 manifest
