@@ -15371,3 +15371,17 @@ declare module "@rchunk/paypal-page" { export const PayPalCheckoutPage: () => un
 declare module "@rchunk/verify-page" { export const CheckoutVerifyPage: () => unknown; }
 declare module "@rchunk/connect-screen-fill" { const ConnectScreenFill: (props?: Record<string, unknown>) => unknown; export default ConnectScreenFill; }
 declare module "@rchunk/my-gpts-page" { export const MyGptsPage: () => unknown; }
+declare module "@rchunk/workspace-settings-webview-page" {
+  export const WorkspaceSettingsWebviewHost: (props?: Record<string, unknown>) => unknown;
+  export const WorkspaceSettingsWebviewPage: () => unknown;
+}
+declare module "@rchunk/checkout-webview-page" {
+  export const CheckoutWebviewPage: () => unknown;
+  export const CheckoutPricingWebviewHost: () => unknown;
+  export const CheckoutCreditWebviewHost: () => unknown;
+}
+declare module "@rchunk/create-workspace-page" { export const CreateWorkspacePage: () => unknown; }
+declare module "@rchunk/purchase-page" {
+  export const PricingCheckoutPreparation: (props: Record<string, unknown>) => unknown;
+  export const PurchasePage: () => unknown;
+}
