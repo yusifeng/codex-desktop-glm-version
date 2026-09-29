@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1741 个语义 chunk；`verify-renderer` 为 1741/1741。
-- `PRESERVED_ASSETS`：159 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1771 个语义 chunk；`verify-renderer` 为 1771/1771。
+- `PRESERVED_ASSETS`：179 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,7 +65,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1847/2247 tracked、400 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1897/2247 tracked、350 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
@@ -437,9 +437,17 @@ preserve 167、incremental-hub 110、进一步消费者审计 39。
 当前 553/953。剩余 400 个缺口按审计动作分为 rewrite 104、preserve 147、
 incremental-hub 110、进一步消费者审计 39。
 
+2026-09-29 已完成 misc-ui-utils 第八批：恢复 30 个 rewrite 模块，覆盖 sandbox
+连接、Mermaid size capture 双变体、library/file preview、低亮 AST、按钮与响应式图片、
+数值积分、几何基础工具及物理/化学/统计教学模型；另登记 20 个生成图标、语法主题和
+vendor 小入口为 preserved。三组 rewrite 专项测试共 301 条断言，preserve 专项验证
+20 个资产；renderer 1771/1771、tsc 73，全量覆盖 1897/2247，misc-ui-utils 当前
+603/953。剩余 350 个缺口按审计动作分为 rewrite 74、preserve 127、incremental-hub
+110、进一步消费者审计 39。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
-但“继续处理全量应用代码”的任务仍然有效。剩余 400 个真实缺口全部位于
-misc-ui-utils（当前 553/953）；结构化审计已完成，下一步优先恢复高消费者基础工具与
+但“继续处理全量应用代码”的任务仍然有效。剩余 350 个真实缺口全部位于
+misc-ui-utils（当前 603/953）；结构化审计已完成，下一步优先恢复高消费者基础工具与
 明确业务逻辑，同时分批登记有逐文件证据的 generated/vendor 资产，并继续核验 39 个
 消费者不明确项。增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见

@@ -15639,6 +15639,10 @@ declare module "@rchunk/learning-model-selection-process" {
 declare module "@rchunk/tokenize-math-block" { export const n: () => void; export const r: (source: string) => unknown; export const t: (expression: unknown) => string[]; }
 declare module "@rchunk/null-throws" { export const n: () => void; export const t: <T>(value: T | null | undefined) => T; }
 declare module "@rchunk/numerical-integration" { export const n: (source: string) => { hasUnsupportedLetter: boolean; integrand: string }; export const t: () => void; }
+declare module "@rchunk/code-execution-sandbox-connection" { export const n: () => void; export const t: (input: Record<string, unknown> & { host: unknown; signal?: AbortSignal }) => unknown; }
+declare module "@rchunk/mermaid-function-name-runtime" { export const n: <T extends Function>(value: T, name: string) => T; export const t: (target: object, members: Record<string, PropertyKey>) => void; }
+declare module "@rchunk/chunk-Y2CYZVJY" { export const n: (value: (...arguments_: never[]) => unknown, name: string) => void; export const r: () => void; }
+declare module "@rchunk/parental-controls-invitation-background" { export const n: string; export const t: () => void; }
 declare module "@rchunk/chunk-KEIR6QF5" { export const w: () => void; }
 declare module "@rchunk/chunk-BIQX33UG" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
 declare module "@rchunk/chunk-QBLGF6JB" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
