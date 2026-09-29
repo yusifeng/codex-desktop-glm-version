@@ -15434,3 +15434,18 @@ declare module "@rchunk/library-note-preview";
 declare module "@rchunk/library-image-preview";
 declare module "@rchunk/library-empty-trash";
 declare module "@rchunk/onboarding-route" { export const OnboardingRoute: () => unknown; }
+declare module "@rchunk/meetings-page" { export const MeetingsPage: () => unknown; }
+declare module "@rchunk/gpt-builder-page" { export const GptBuilderPage: () => unknown; }
+declare module "@rchunk/personal-finance-page" { export const PersonalFinancePage: () => unknown; }
+declare module "@rchunk/health-page" { export const HealthPage: () => unknown; }
+declare module "@rchunk/index-ymUnTRBB";
+declare module "@rchunk/dist-e0bb3d63cc62";
+declare module "@rchunk/conversation";
+declare module "@rchunk/transactions";
+declare module "@rchunk/accounts-valdi";
+declare module "@rchunk/workspace-agent-builder-page" { export const WorkspaceAgentBuilderPage: () => unknown; }
+declare module "@rchunk/usage-settings-page" { export const UsageSettingsPage: () => unknown; }
+declare module "@rchunk/chatgpt-project-home-page" { export const ChatGptProjectHome: () => unknown; }
+declare module "@rchunk/usage-analytics-settings";
+declare module "@rchunk/consumer-view-settings";
+declare module "@rchunk/usd";

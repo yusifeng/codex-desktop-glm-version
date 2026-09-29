@@ -1602,6 +1602,13 @@ export const CHUNKS = {
   "avatar-overlay-native-page": "avatar-overlay-native-page-910b190b3a21.js",
   "library-page": "library-page-d23eecab1f03.js",
   "onboarding-route": "route-bd3ddb8a53e9.js",
+  "meetings-page": "page-1519c1ee4d5f.js",
+  "gpt-builder-page": "page-2ef0ad3788bd.js",
+  "personal-finance-page": "page-48b74041216d.js",
+  "health-page": "page-4bcb7d23798a.js",
+  "workspace-agent-builder-page": "page-a015abcc998f.js",
+  "usage-settings-page": "page-48d1753092e5.js",
+  "chatgpt-project-home-page": "page-9f96939bf3a5.js",
 };
 
 // 已重写模块可依赖尚未进入 CHUNKS 跟踪集的发布资产。这里仅提供
@@ -1665,6 +1672,12 @@ export const IMPORT_ALIASES = {
   "workspace-auto-generated-name": "workspace-auto-generated-name-aed2cf823284.js",
   "xterm-output-panel": "xterm-output-panel-3c9e6c4f3b52.js",
   "create-workspace-presentation": "presentation-60f04fb3065c.js",
+  "index-ymUnTRBB": "index-ymUnTRBB-f8fc7d2840a9.js",
+  "dist-e0bb3d63cc62": "dist-e0bb3d63cc62.js",
+  "conversation": "conversation-230f461d8d3d.js",
+  "transactions": "transactions-25a7e8fb0b81.js",
+  "accounts-valdi": "accounts-valdi-2c11bfad7ebf.js",
+  "usd": "usd-5d2c7710cf01.js",
   "open-library-item": "open-library-item-f723e5be688a.js",
   "library-cloud-file-preview-entry": "cloud-file-preview-44837fe1255d.js",
   "library-note-preview": "preview-bbb8736a48d1.js",
@@ -2732,6 +2745,13 @@ export const REWRITTEN = new Set([
   "avatar-overlay-native-page",
   "library-page",
   "onboarding-route",
+  "meetings-page",
+  "gpt-builder-page",
+  "personal-finance-page",
+  "health-page",
+  "workspace-agent-builder-page",
+  "usage-settings-page",
+  "chatgpt-project-home-page",
 ]);
 
 // 已审计并明确保留发布版资产的尾部 chunk。这些模块属于第三方运行时、
