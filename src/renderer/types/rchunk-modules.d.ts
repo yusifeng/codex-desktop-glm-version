@@ -15643,6 +15643,52 @@ declare module "@rchunk/code-execution-sandbox-connection" { export const n: () 
 declare module "@rchunk/mermaid-function-name-runtime" { export const n: <T extends Function>(value: T, name: string) => T; export const t: (target: object, members: Record<string, PropertyKey>) => void; }
 declare module "@rchunk/chunk-Y2CYZVJY" { export const n: (value: (...arguments_: never[]) => unknown, name: string) => void; export const r: () => void; }
 declare module "@rchunk/parental-controls-invitation-background" { export const n: string; export const t: () => void; }
+declare module "@rchunk/codex-app-home-beacon-announcement" { export const r: () => void; export const t: () => void; }
+declare module "@rchunk/classify" { export const a: () => void; }
+declare module "@rchunk/registered" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/input-selector-group" { export const r: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/button" { export const n: (props: Record<string, unknown>) => unknown; export const r: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/proxy" { export const n: () => void; export const t: { div: unknown }; }
+declare module "@rchunk/learning-block-katex" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/learning-block-stroke" { export const i: () => void; export const n: string; export const s: (input: Record<string, unknown>) => unknown; }
+declare module "@rchunk/x-like" { export const r: () => void; }
+declare module "@rchunk/math-block-utils" { export const r: () => void; }
+declare module "@rchunk/sort-bar-visualization" { export const a: (props: Record<string, unknown>) => unknown; export const i: () => void; export const n: () => void; export const o: () => void; export const r: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/registered-subagents-thumbnail" { export const RegisteredSubagentsThumbnail: (props: Record<string, string | null | undefined>) => unknown; }
+declare module "@rchunk/conversation-beacon-surfaces" { export const ChatGptConversationBeaconSurfaces: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/svg-arrow" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/system-of-equations" { export const n: () => void; export const t: (input: string) => string[] | null; }
+declare module "@rchunk/learning-model-inverse-trigonometric-function-template" { export const a: (input: string) => unknown; export const i: () => void; export const n: (name: string) => string; export const r: (...arguments_: unknown[]) => unknown; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/learning-model-rectangular-prism-volume-template" { export const a: (...arguments_: unknown[]) => unknown; export const c: (...arguments_: unknown[]) => unknown; export const d: () => void; export const f: (...arguments_: unknown[]) => unknown; export const i: (...arguments_: unknown[]) => unknown; export const l: (...arguments_: unknown[]) => unknown; export const m: Record<string, unknown>; export const n: (...arguments_: unknown[]) => unknown; export const o: unknown; export const p: () => void; export const r: unknown; export const s: unknown; export const t: (...arguments_: unknown[]) => unknown; export const u: unknown; }
+declare module "@rchunk/learning-model-distance-between-points-template" { export const n: () => void; export const r: (input: string) => unknown; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/text-file-thumbnail" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/file-image-thumbnail" { export const i: () => void; export const n: () => void; export const r: (props: Record<string, unknown>) => unknown; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/lowlight-core" { export const n: () => void; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/is-plan-event-enabled" { export const n: (schema: unknown, entry: unknown) => boolean; export const t: () => void; }
+declare module "@rchunk/pull-request-review-hover-card-data" { export const PullRequestReviewHoverCardData: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/chatgpt-ads-hydration" { export const hydrateChatGptAds: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/interactive-sampling" { export const a: (...arguments_: unknown[]) => unknown; export const i: (...arguments_: unknown[]) => unknown; export const n: () => void; export const r: (...arguments_: unknown[]) => unknown; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/file-preview-loading" { export const ChatGptFilePreviewLoading: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/lowlight-runtime" { export const createLowlight: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/voice-reasoning-notice" { export const VoiceReasoningNoticeController: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/ads-placement-policy" { export const a: unknown; export const c: unknown; export const d: unknown; export const i: unknown; export const l: unknown; export const n: unknown; export const o: (...arguments_: unknown[]) => unknown; export const r: unknown; export const s: (...arguments_: unknown[]) => unknown; export const t: unknown; export const u: unknown; }
+declare module "@rchunk/realtime-buffered-audio-worklet" {}
+declare module "@rchunk/resource-updates-bridge" { export const ResourceUpdatesBridge: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/plan-event-schema-filter" { export const schemaFilter: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/webview" { export const n: (...arguments_: unknown[]) => unknown; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/view-state-persistence" { export const n: (...arguments_: unknown[]) => unknown; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/equation" { export const n: (...arguments_: unknown[]) => unknown; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/rehype-katex-runtime-lib" { export const a: unknown; export const c: unknown; export const i: unknown; export const n: unknown; export const o: unknown; export const r: unknown; export const s: unknown; export const t: unknown; }
+declare module "@rchunk/pinned-content-tab-preload-bridge" { export const PinnedContentTabPreloadBridge: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/rehype-katex" { const rehypeKatex: (...arguments_: unknown[]) => unknown; export default rehypeKatex; }
+declare module "@rchunk/interactive-poll-renderer" { export const InteractivePoll: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/conversational-onboarding-writing-renderer" { export const ConversationalOnboardingWriting: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/background-terminal-tab-restoration" { export const restoreBackgroundTerminalTabRoute: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/plan-tab-restoration" { export const restorePlanTabRoute: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/math-expression-restrictions" { export const a: (...arguments_: unknown[]) => unknown; export const i: (...arguments_: unknown[]) => unknown; export const n: () => void; export const r: (...arguments_: unknown[]) => unknown; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/sensitive-image-reminder" { export const ChatGptSensitiveImageReminder: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/shared-snapshot-continuation" { export const SharedSnapshotContinuation: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/spoken-language-options" { export const n: readonly unknown[]; export const r: () => void; export const t: (language: string) => string; }
 declare module "@rchunk/chunk-KEIR6QF5" { export const w: () => void; }
 declare module "@rchunk/chunk-BIQX33UG" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
 declare module "@rchunk/chunk-QBLGF6JB" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }

@@ -169,6 +169,13 @@ library/file preview、低亮 AST、按钮与响应式图片、数值积分、�
 rewrite 专项测试共 301 条断言，preserve 专项验证 20 个资产；renderer 1771/1771、
 tsc 73，misc-ui-utils 当前 603/953 tracked、350 pending。剩余动作分布为 rewrite 74、
 preserve 127、incremental-hub 110、进一步消费者审计 39。
+第九批恢复 30 个 rewrite 模块，覆盖广告 placement/hydration、文件预览与 thumbnail、
+交互采样、语音 worklet、Katex/数学解析、subagents/plan/background terminal 路由恢复、
+beacon surface 与 preload bridge；另登记 20 个静态图片、语法/主题数据、生成 UI 和
+vendor 运行时为 preserved。三组 rewrite 专项测试共 235 条断言，preserve 专项验证
+20 个资产；renderer 1801/1801、tsc 73，misc-ui-utils 当前 653/953 tracked、300
+pending。剩余动作分布为 rewrite 44、preserve 107、incremental-hub 110、进一步消费者
+审计 39。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入

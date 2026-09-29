@@ -1,6 +1,5 @@
 import "@rchunk/rolldown-runtime";
 import { I3 as getJsxRuntime, h4 as initializeJsxRuntime, m4 as classNames } from "@rchunk/app-shared";
-// @ts-expect-error The semantic dependency is registered by the shared manifest owner.
 import { n as initializeLearningBlockKatex, t as LearningBlockKatex } from "@rchunk/learning-block-katex";
 
 export interface ControlPanelProps {
