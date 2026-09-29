@@ -60,6 +60,12 @@ export const CHUNKS = {
   "pets-settings-route": "pets-settings-route-965aa70e25ab.js",
   "trusted-contact-settings": "trusted-contact-settings-b71f926a1121.js",
   "voice-settings": "voice-settings-3a0651cd977e.js",
+  "agent-settings": "agent-settings-27cdda401037.js",
+  "billing-settings": "billing-settings-d5b5419393a0.js",
+  "chronicle-settings-page": "chronicle-settings-page-e92cf619a884.js",
+  "computer-use-settings": "computer-use-settings-6786672692bb.js",
+  "settings": "settings-e03d8d0b0de2.js",
+  "settings-page": "settings-page-9811299ef92c.js",
   "usage-code-review-settings": "code-review-settings-bdd10a089628.js",
   "worktrees-settings-page": "worktrees-settings-page-f7e1c38f9bb4.js",
   "activity-chart": "activity-chart-816f6e49aa7a.js",
@@ -1545,6 +1551,8 @@ export const CHUNKS = {
   "reddit-logo": "reddit-7cd517f2e808.js",
   "twitter-logo": "twitter-4ec2d9a72253.js",
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
+  "mermaid-git-graph-services-bundled": "gitGraph-TEB2WS4Q-505aa8e90e88.js",
+  "mermaid-git-graph-services-split": "gitGraph-TEB2WS4Q-967748f03a8e.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
@@ -1592,6 +1600,12 @@ export const REWRITTEN = new Set([
   "pets-settings-route",
   "trusted-contact-settings",
   "voice-settings",
+  "agent-settings",
+  "billing-settings",
+  "chronicle-settings-page",
+  "computer-use-settings",
+  "settings",
+  "settings-page",
   "usage-code-review-settings",
   "worktrees-settings-page",
   "sketch",
@@ -2610,6 +2624,8 @@ export const PRESERVED_ASSETS = new Map([
   ["rolldown-runtime", "build-runtime"],
   ["artifact-presentation", "vendor:presentation-editor"],
   ["spreadsheet-editor", "vendor:spreadsheet-editor"],
+  ["mermaid-git-graph-services-bundled", "vendor:diagram-mermaid"],
+  ["mermaid-git-graph-services-split", "vendor:diagram-mermaid"],
 ]);
 
 // 聚合 chunk 采用“按已消费导出增量语义化”，不要求复制整个发布版 bundle。

@@ -12,7 +12,7 @@
 | lucide-icon | 6535 | 2.31MB | `import createLucideIcon`（两份核心：`lucide-createLucideIcon-c0d201` 与 `createLucideIcon-BrIFp4GW`）；lucide- 前缀 3,274 个 + kebab名-6位bundleId-hash12 第二副本 + 再导出 facade 壳（高） |
 | locale | 128 | 130.41MB | 文件名=语言 tag；内容为 `defaultMessage`/`"ConversationTurn.*"` 翻译键或运行时字典（高） |
 | math-learning-blocks | 1481 | 15.83MB | `visualization-*`(904)/`type-*`(209)/`examples-*`(552) 定义数学/物理教学卡片（如 `GAY_LUSSACS_LAW`、`initialValues`、`kind: "number"`），依赖 `chatgpt_math_blocks-*`（高） |
-| vendor:diagram-mermaid | 292 | 16.42MB | mermaid 全家桶：`chunk-XXXXXX` 内部模块（ImperativeState）、`*Diagram-ZJ3FMSHR` 图定义、`dagre-*` 布局、`render-X3XFXER2`(elkjs)、独立 rolldown-runtime-7467d20d835c（高） |
+| vendor:diagram-mermaid | 294 | 16.42MB | mermaid 全家桶：`chunk-XXXXXX` 内部模块（ImperativeState）、`*Diagram-ZJ3FMSHR` 图定义、`dagre-*` 布局、`render-X3XFXER2`(elkjs)、独立 rolldown-runtime-7467d20d835c（高） |
 | shiki-grammar | 225 | 7.38MB | `{"displayName":"ABAP"...}` TextMate 语法 JSON，含 scopeName/patterns/repository（高） |
 | shiki-theme | 135 | 2.89MB | `"tokenColors"` VSCode 主题 JSON（everforest/catppuccin 等）（高） |
 | editor-doc | 28 | 11.00MB | `presentation-*`/`workbook-*`/`PopcornElectron*`（幻灯片/表格编辑器）+ `walnut-*-decoder.worker`（高） |
@@ -33,7 +33,7 @@
 | data | 2 | 0.17MB | base64/wasm 数据主导（`wasm-7a831618` 内嵌 wasm、wreath-* base64）（高） |
 | build-runtime | 2 | 0.00MB | rolldown-runtime ×2（主 + mermaid 子运行时）+ modulepreload polyfill（高） |
 | app-hub | 8 | 30.48MB | index-e0f46 → rpc + app-initial(15MB, 引用 2,284 chunk) → app-shared(5.1MB 核心) + app-primary/app-main/register-CNkVP8uC(7.1MB markdown 注册枢纽)（高） |
-| app-code | 2250 | 49.22MB | 其余：真正的 Codex 桌面 GUI 逻辑（见分簇） |
+| app-code | 2248 | 49.22MB | 其余：真正的 Codex 桌面 GUI 逻辑（见分簇） |
 | **合计** | **11201** | **302.22MB** | |
 
 > 说明：lucide 有**两份副本**（`lucide-` 前缀主副本 + 无前缀 kebab 名第二副本，后者服务于 app-initial/register 等枢纽）。locale 共 113 种语言、128 个文件（同语言一般 2 份：react-intl 消息 + 运行时字典）。
@@ -66,7 +66,7 @@
 
 ## 三、应用代码 chunk 语义分簇
 
-应用代码共 **2250** 个 chunk，**49.22MB**。按文件名语义分簇（含 app-shared/app-primary 等枢纽内的逻辑，但枢纽本体单列）：
+应用代码共 **2248** 个 chunk，**49.22MB**。按文件名语义分簇（含 app-shared/app-primary 等枢纽内的逻辑，但枢纽本体单列）：
 
 | 簇 | chunk 数 | 体积 | 代表文件 |
 |---|---:|---:|---|
@@ -80,7 +80,7 @@
 | dialogs-menus 对话框/菜单 | 108 | 2,572.6KB | options-menu-view-260b98308bf3.js, DatePicker-14d6de970c7c.js, codex-mobile-setup-dialog-bf03c0869420.js |
 | artifact-preview 产物/预览 | 53 | 2,238.4KB | artifact-source-bootstrap-583ed8de587e.js, viewer-22044df35298.js, docx-preview-8513c2dacad2.js |
 | markdown-render Markdown/代码高亮 | 24 | 2,164.8KB | i18n-147d032388be.js, highlight-code-7c4c2ef3d4d8.js, chatgpt-code-block-5f1819755161.js |
-| git-github-worktree 代码协作 | 65 | 1,553.0KB | review-file-tree-pane-d59081dc4b8c.js, pull-request-detail-query-bec089c5268f.js, pull-request-code-review-5ce1a9c20ee4.js |
+| git-github-worktree 代码协作 | 63 | 1,553.0KB | review-file-tree-pane-d59081dc4b8c.js, pull-request-detail-query-bec089c5268f.js, pull-request-code-review-5ce1a9c20ee4.js |
 | skills-plugins-mcp 技能/工具 | 30 | 1,216.2KB | mcp-tool-activity-label-87ba9ef42b0b.js, plugin-detail-view-514feb8d1f55.js, plugin-installation-content-a311dd9d483e.js |
 | home-onboarding 首页/引导 | 40 | 1,005.0KB | onboarding-page-905dd8894724.js, subscription-onboarding-dcd9d9af0fe0.js, app-connect-modal-7b842fd077d6.js |
 | panels 面板 | 20 | 776.7KB | panel-3f0c2778c5e0.js, pending-request-item-panel-32378914c639.js, chatgpt-sources-side-panel-tab-de643adc6524.js |

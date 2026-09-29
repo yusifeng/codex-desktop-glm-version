@@ -15281,6 +15281,16 @@ declare module "@rchunk/client";
 declare module "@rchunk/phone-number-input";
 declare module "@rchunk/trusted-contact-hero";
 declare module "@rchunk/spoken-language-options";
+declare module "@rchunk/experimental-feature-visibility";
+declare module "@rchunk/eligibility";
+declare module "@rchunk/invitations";
+declare module "@rchunk/settings-search-documents" {
+  export const settingsSearchDocuments: Array<{ messages?: Array<{ defaultMessage?: string }>; sectionSlug: string; terms?: string[] }>;
+}
+declare module "@rchunk/browser-extension-connection-status-description" {
+  export const n: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
 declare module "@rchunk/hooks-settings" { export const HooksSettings: () => unknown; }
 declare module "@rchunk/import-settings" { export const ImportSettings: () => unknown; }
 declare module "@rchunk/pets-settings-route" { export const PetsSettingsRoute: () => unknown; }
@@ -15289,3 +15299,9 @@ declare module "@rchunk/trusted-contact-settings" {
   export const TrustedContactEnrollment: (props: { entryPoint?: string; initialDialog?: "intro" | "invite" | null; onClose?(): void; onSuccess?(): void }) => unknown;
 }
 declare module "@rchunk/voice-settings" { export const VoiceSettings: () => unknown; }
+declare module "@rchunk/agent-settings" { export const AgentSettings: () => unknown; }
+declare module "@rchunk/billing-settings" { export const ConsumerBillingSettings: () => unknown; }
+declare module "@rchunk/chronicle-settings-page" { export const ComputerHistorySettingsPage: () => unknown; }
+declare module "@rchunk/computer-use-settings" { export const ComputerUseSettings: () => unknown; }
+declare module "@rchunk/settings" { export const ChatGptParentalControlsSettings: () => unknown; }
+declare module "@rchunk/settings-page" { export const SettingsPage: () => unknown; }
