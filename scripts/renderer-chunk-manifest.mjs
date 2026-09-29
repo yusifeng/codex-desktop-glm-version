@@ -77,6 +77,12 @@ export const CHUNKS = {
   "select-workspace-page": "select-workspace-page-24b6eafe1d84.js",
   "local-conversation-background-terminal-tab": "local-conversation-background-terminal-tab-6df6e965ecce.js",
   "offer-page": "offer-page-87c435879de2.js",
+  "open-local-conversation-background-agent-entry": "open-local-conversation-background-agent-76630c38e6cf.js",
+  "thread-mcp-app-side-panel-tab": "thread-mcp-app-side-panel-tab-be12e84f4b39.js",
+  "messages": "messages-b95e0ae2fd6f.js",
+  "trusted-contact-link-page": "link-page-48e946677996.js",
+  "remote-conversation-page": "remote-conversation-page-9acc03bfbb05.js",
+  "cfc-plan-page": "cfc-plan-page-153aa1ca17ef.js",
   "usage-code-review-settings": "code-review-settings-bdd10a089628.js",
   "worktrees-settings-page": "worktrees-settings-page-f7e1c38f9bb4.js",
   "activity-chart": "activity-chart-816f6e49aa7a.js",
@@ -1628,6 +1634,11 @@ export const REWRITTEN = new Set([
   "select-workspace-page",
   "local-conversation-background-terminal-tab",
   "offer-page",
+  "open-local-conversation-background-agent-entry",
+  "thread-mcp-app-side-panel-tab",
+  "trusted-contact-link-page",
+  "remote-conversation-page",
+  "cfc-plan-page",
   "usage-code-review-settings",
   "worktrees-settings-page",
   "sketch",
@@ -2648,6 +2659,7 @@ export const PRESERVED_ASSETS = new Map([
   ["spreadsheet-editor", "vendor:spreadsheet-editor"],
   ["mermaid-git-graph-services-bundled", "vendor:diagram-mermaid"],
   ["mermaid-git-graph-services-split", "vendor:diagram-mermaid"],
+  ["messages", "data:intl-messages"],
 ]);
 
 // 聚合 chunk 采用“按已消费导出增量语义化”，不要求复制整个发布版 bundle。

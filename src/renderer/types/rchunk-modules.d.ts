@@ -15352,3 +15352,16 @@ declare module "@rchunk/select-workspace-page" { export const SelectWorkspacePag
 declare module "@rchunk/xterm-output-panel";
 declare module "@rchunk/local-conversation-background-terminal-tab" { export const LocalConversationBackgroundTerminalTab: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/offer-page" { export const OfferPage: () => unknown; }
+declare module "@rchunk/open-local-conversation-background-agent-entry" {
+  export const backgroundAgentTabType: unknown;
+  export const getLocalConversationBackgroundAgentOpenTarget: (...arguments_: unknown[]) => unknown;
+  export const openHydratedLocalConversationSubagent: (...arguments_: unknown[]) => unknown;
+  export const openLocalConversationBackgroundAgent: (...arguments_: unknown[]) => unknown;
+}
+declare module "@rchunk/thread-mcp-app-side-panel-tab" { export const McpAppThreadSidePanelTab: (props: { onPanelElementChange(element: unknown): void }) => unknown; }
+declare module "@rchunk/trusted-contact-link-page" { export const TrustedContactLinkPage: () => unknown; }
+declare module "@rchunk/preview-footer";
+declare module "@rchunk/datadog-rum.browser";
+declare module "@rchunk/messages";
+declare module "@rchunk/remote-conversation-page" { export const RemoteConversationPage: () => unknown; }
+declare module "@rchunk/cfc-plan-page" { export const CfcPlanPage: () => unknown; }

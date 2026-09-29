@@ -55,20 +55,20 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1021 个语义 chunk；`verify-renderer` 为 1021/1021。
-- `PRESERVED_ASSETS`：52 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1026 个语义 chunk；`verify-renderer` 为 1026/1026。
+- `PRESERVED_ASSETS`：53 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
   由消费审计锁定，禁止无声明的压缩导出扩张。
 - `node scripts/audit-renderer-tail.mjs` 的 0 pending **只表示当前 `CHUNKS` 登记集
   内部无悬空项**，不能当成全量 renderer 完成证明。
-- 全量 `docs/renderer-app-chunks.json` 有 2248 个 app-code 文件；必须运行
+- 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1021/2248 tracked、1227 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1026/2247 tracked、1221 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 97/102，pages-routes
-  52/92。
+  54/92。
 - `node scripts/audit-app-shared-consumption.mjs`：331 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -161,6 +161,14 @@ MCP/timeline/sandbox 侧栏动作恢复为语义导出；Select Workspace Page �
 Add project 与宿主事件；Offer Page 恢复身份 gate、资格查询和个人/团队结账跳转。专项行为
 测试 179/179；renderer 1021/1021、main 11/11、tsc 73，conversation-thread 97/102、
 pages-routes 52/92。
+
+2026-09-29 已完成 renderer GUI 第八批：Background Agent entry 恢复 hydrated/background
+agent 打开动作与 tab 类型；MCP App Thread Side Panel 恢复宿主 frame 容器；Trusted Contact
+Link Page 恢复邀请/接受/拒绝/移除流程；Remote Conversation Page 恢复 main/hotkey 布局、
+transcript/composer、review 和归档预览；CFC Plan Page 恢复 clinician 身份、登录、资格、
+workspace 和条款流程。医疗验证 `messages-*` 经审计仅包含 intl 文案表，改列 preserved data。
+专项行为测试 120/120；renderer 1026/1026、main 11/11、tsc 73，conversation-thread
+100/101，仅余大型 review 工作台；pages-routes 54/92。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、

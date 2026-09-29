@@ -30,10 +30,10 @@
 | vendor:three | 2 | 0.71MB | `three.module-`、`OrbitControls-`（高） |
 | vendor:mathlive | 1 | 1.11MB | `mathlive.min-`（MathLive 数学输入，1.1MB）（高） |
 | runtime-worker | 3 | 17.82MB | `runtime.worker-*` ×3（valdi_core 沙箱运行时，17.8MB）（高） |
-| data | 2 | 0.17MB | base64/wasm 数据主导（`wasm-7a831618` 内嵌 wasm、wreath-* base64）（高） |
+| data | 3 | 0.19MB | base64/wasm 或静态消息数据主导（`wasm-7a831618` 内嵌 wasm、wreath-* base64、healthcare verification intl messages）（高） |
 | build-runtime | 2 | 0.00MB | rolldown-runtime ×2（主 + mermaid 子运行时）+ modulepreload polyfill（高） |
 | app-hub | 8 | 30.48MB | index-e0f46 → rpc + app-initial(15MB, 引用 2,284 chunk) → app-shared(5.1MB 核心) + app-primary/app-main/register-CNkVP8uC(7.1MB markdown 注册枢纽)（高） |
-| app-code | 2248 | 49.22MB | 其余：真正的 Codex 桌面 GUI 逻辑（见分簇） |
+| app-code | 2247 | 49.20MB | 其余：真正的 Codex 桌面 GUI 逻辑（见分簇） |
 | **合计** | **11201** | **302.22MB** | |
 
 > 说明：lucide 有**两份副本**（`lucide-` 前缀主副本 + 无前缀 kebab 名第二副本，后者服务于 app-initial/register 等枢纽）。locale 共 113 种语言、128 个文件（同语言一般 2 份：react-intl 消息 + 运行时字典）。
@@ -66,7 +66,7 @@
 
 ## 三、应用代码 chunk 语义分簇
 
-应用代码共 **2248** 个 chunk，**49.22MB**。按文件名语义分簇（含 app-shared/app-primary 等枢纽内的逻辑，但枢纽本体单列）：
+应用代码共 **2247** 个 chunk，**49.20MB**。按文件名语义分簇（含 app-shared/app-primary 等枢纽内的逻辑，但枢纽本体单列）：
 
 | 簇 | chunk 数 | 体积 | 代表文件 |
 |---|---:|---:|---|
@@ -76,7 +76,7 @@
 | settings 设置页 | 70 | 3,235.6KB | _virtual_settings-search-documents-d81257e4909b.js, remote-connections-settings-12e860fd2983.js, security-settings-2da2a3b205ab.js |
 | appgen-valdi-platform App生成平台 | 78 | 2,823.5KB | product-intervention-notice-846d1e2feea6.js, response-883c9a267b7e.js, checkout-page-4a1ddf45d850.js |
 | editor-docs 富文本/文档编辑 | 42 | 2,619.2KB | sketch-559c02939086.js, document-model-d51fb9528b57.js, spreadsheet-83d23b306ef9.js |
-| conversation-thread 会话/消息流 | 102 | 2,593.4KB | local-conversation-thread-c6e40fdd6d59.js, conversation-blocks-3f59e850f9fb.js, chatgpt-conversation-page-5973e560922b.js |
+| conversation-thread 会话/消息流 | 101 | 2,570.4KB | local-conversation-thread-c6e40fdd6d59.js, conversation-blocks-3f59e850f9fb.js, chatgpt-conversation-page-5973e560922b.js |
 | dialogs-menus 对话框/菜单 | 108 | 2,572.6KB | options-menu-view-260b98308bf3.js, DatePicker-14d6de970c7c.js, codex-mobile-setup-dialog-bf03c0869420.js |
 | artifact-preview 产物/预览 | 53 | 2,238.4KB | artifact-source-bootstrap-583ed8de587e.js, viewer-22044df35298.js, docx-preview-8513c2dacad2.js |
 | markdown-render Markdown/代码高亮 | 24 | 2,164.8KB | i18n-147d032388be.js, highlight-code-7c4c2ef3d4d8.js, chatgpt-code-block-5f1819755161.js |
