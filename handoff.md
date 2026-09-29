@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1049 个语义 chunk；`verify-renderer` 为 1049/1049。
+- `REWRITTEN`：1054 个语义 chunk；`verify-renderer` 为 1054/1054。
 - `PRESERVED_ASSETS`：53 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,10 +65,10 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1049/2247 tracked、1198 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1054/2247 tracked、1193 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 100/101，pages-routes
-  76/92。
+  81/92。
 - `node scripts/audit-app-shared-consumption.mjs`：332 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -215,6 +215,14 @@ workspace owner 资格、16 位 PIN 与可选 20 位卡号校验、integrity 请
 专项行为测试 170/170；renderer 1049/1049、main 11/11、tsc 73，pages-routes 76/92。
 同期为构建器新增 `IMPORT_ALIASES` 解析轨道，将历史语义依赖名精确映射回原发布文件名，
 不膨胀 `CHUNKS`/覆盖统计；并修复 9 处既有导出或依赖边漂移，结构验证保持全绿。
+
+2026-09-29 已完成 renderer GUI 第十五批：Scheduled Tasks 恢复加载/错误/重试、状态筛选、
+分页、建议任务、权限、详情/编辑/分享与导航；Detached Browser 恢复宿主注册、toolbar/
+webview 同步、消息转发、窗口 transfer、异常与幂等卸载；Pricing Plan 恢复账户/计划 gate、
+促销、外部 checkout、in-app preview、升级降级确认与网页回退；Checkout Success 恢复个人/
+Business 路由、履约重试、wallet、workspace access、图片下载与 auto-top-up 警告；Security
+Route 恢复插件/管理员/主机 gate、扫描/发现/仓库列表、新扫描提交与错误空态。专项行为测试
+184/184；renderer 1054/1054、main 11/11、tsc 73，pages-routes 81/92。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、

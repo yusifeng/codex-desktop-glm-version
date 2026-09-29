@@ -15305,6 +15305,21 @@ declare module "@rchunk/gift-card-redemption-page" { export const GiftCardRedemp
 declare module "@rchunk/lighthouse-work-home-page" { export const LighthouseWorkHomePage: () => unknown; }
 declare module "@rchunk/browser-skill-editor" { export const BrowserSkillEditor: () => unknown; }
 declare module "@rchunk/appgen-analytics-page" { export const AppgenAnalyticsPage: () => unknown; }
+declare module "@rchunk/scheduled-tasks-page" { export const ScheduledTasksPage: () => unknown; }
+declare module "@rchunk/detached-browser-page" { export const mountDetachedBrowserPage: () => () => void; }
+declare module "@rchunk/pricing-plan-page" { export const PricingPlanPage: () => unknown; }
+declare module "@rchunk/checkout-success-page" { export const CheckoutSuccessPage: () => unknown; }
+declare module "@rchunk/security-route" { export const SecurityRoute: () => unknown; }
+declare module "@rchunk/annotation-controls";
+declare module "@rchunk/automations-page";
+declare module "@rchunk/tweaks-toolbar-view";
+declare module "@rchunk/bar-chart";
+declare module "@rchunk/commit";
+declare module "@rchunk/pending-image-download";
+declare module "@rchunk/plus-sm";
+declare module "@rchunk/tabs";
+declare module "@rchunk/useForm";
+declare module "@rchunk/workspace-access.browser";
 declare module "@rchunk/chronicle-settings-page" { export const ComputerHistorySettingsPage: () => unknown; }
 declare module "@rchunk/computer-use-settings" { export const ComputerUseSettings: () => unknown; }
 declare module "@rchunk/settings" { export const n: () => unknown; export const t: () => void; }
