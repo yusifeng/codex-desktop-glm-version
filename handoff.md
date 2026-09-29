@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1054 个语义 chunk；`verify-renderer` 为 1054/1054。
+- `REWRITTEN`：1058 个语义 chunk；`verify-renderer` 为 1058/1058。
 - `PRESERVED_ASSETS`：53 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,10 +65,10 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1054/2247 tracked、1193 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1058/2247 tracked、1189 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 100/101，pages-routes
-  81/92。
+  85/92。
 - `node scripts/audit-app-shared-consumption.mjs`：332 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -223,6 +223,13 @@ webview 同步、消息转发、窗口 transfer、异常与幂等卸载；Pricin
 Business 路由、履约重试、wallet、workspace access、图片下载与 auto-top-up 警告；Security
 Route 恢复插件/管理员/主机 gate、扫描/发现/仓库列表、新扫描提交与错误空态。专项行为测试
 184/184；renderer 1054/1054、main 11/11、tsc 73，pages-routes 81/92。
+
+2026-09-29 已完成 renderer GUI 第十六批：Projects Index 恢复项目列表、搜索、空态、
+菜单与页面标题；Avatar Overlay Native 恢复实时语音悬浮窗、工具活动、权限请求、交互切换
+与 handoff；Library 恢复访问门禁、URL 搜索/分类/回收站、列表状态、打开/恢复/上传和按类型
+懒加载预览与操作对话框；Onboarding Route 恢复工作区门禁、角色/部门问卷、personalization
+持久化、示例 tour、跳过与完成导航。专项行为测试 143/143；renderer 1058/1058、main
+11/11、tsc 73，pages-routes 85/92。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、

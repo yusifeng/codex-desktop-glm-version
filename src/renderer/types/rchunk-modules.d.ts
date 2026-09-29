@@ -15425,3 +15425,12 @@ declare module "@rchunk/cfc-verification-page" { export const CfcVerificationPag
 declare module "@rchunk/ads-controls-settings" { export const AdsControlsSettings: () => unknown; }
 declare module "@rchunk/chatgpt-shared-post-page" { export const ChatGptSharedPostPage: () => unknown; }
 declare module "@rchunk/global-dictation-page" { export const GlobalDictationPage: () => unknown; }
+declare module "@rchunk/projects-index-page" { export const ProjectsIndexPage: () => unknown; }
+declare module "@rchunk/avatar-overlay-native-page" { export const AvatarOverlayNativePage: () => unknown; }
+declare module "@rchunk/library-page" { export const LibraryPage: () => unknown; }
+declare module "@rchunk/open-library-item";
+declare module "@rchunk/library-cloud-file-preview-entry";
+declare module "@rchunk/library-note-preview";
+declare module "@rchunk/library-image-preview";
+declare module "@rchunk/library-empty-trash";
+declare module "@rchunk/onboarding-route" { export const OnboardingRoute: () => unknown; }

@@ -1598,6 +1598,10 @@ export const CHUNKS = {
   "rolldown-runtime": "rolldown-runtime-2d059c5e81f4.js",
   "mermaid-git-graph-services-bundled": "gitGraph-TEB2WS4Q-505aa8e90e88.js",
   "mermaid-git-graph-services-split": "gitGraph-TEB2WS4Q-967748f03a8e.js",
+  "projects-index-page": "projects-index-page-fc2463bb226b.js",
+  "avatar-overlay-native-page": "avatar-overlay-native-page-910b190b3a21.js",
+  "library-page": "library-page-d23eecab1f03.js",
+  "onboarding-route": "route-bd3ddb8a53e9.js",
 };
 
 // 已重写模块可依赖尚未进入 CHUNKS 跟踪集的发布资产。这里仅提供
@@ -1661,6 +1665,11 @@ export const IMPORT_ALIASES = {
   "workspace-auto-generated-name": "workspace-auto-generated-name-aed2cf823284.js",
   "xterm-output-panel": "xterm-output-panel-3c9e6c4f3b52.js",
   "create-workspace-presentation": "presentation-60f04fb3065c.js",
+  "open-library-item": "open-library-item-f723e5be688a.js",
+  "library-cloud-file-preview-entry": "cloud-file-preview-44837fe1255d.js",
+  "library-note-preview": "preview-bbb8736a48d1.js",
+  "library-image-preview": "image-preview-9ee5939dfbfd.js",
+  "library-empty-trash": "library-empty-trash-758597c77867.js",
 };
 
 // 已完成逆向重写的 chunk（源码在 src/renderer/<语义名>/ 下）。
@@ -2719,6 +2728,10 @@ export const REWRITTEN = new Set([
   "library-writing-block-core",
   "writing-block-floating-slash-menu",
   "runtime",
+  "projects-index-page",
+  "avatar-overlay-native-page",
+  "library-page",
+  "onboarding-route",
 ]);
 
 // 已审计并明确保留发布版资产的尾部 chunk。这些模块属于第三方运行时、
