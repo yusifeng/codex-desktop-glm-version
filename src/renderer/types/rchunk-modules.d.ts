@@ -15226,6 +15226,34 @@ declare module "@rchunk/registered-goal-thumbnail" { export const RegisteredGoal
 declare module "@rchunk/registered-cloud-browser-thumbnail" { export const RegisteredCloudBrowserThumbnail: (props: Record<string, unknown>) => unknown }
 declare module "@rchunk/registered-review-thumbnail" { export const RegisteredReviewThumbnail: (props: Record<string, unknown>) => unknown }
 declare module "@rchunk/create-image-tab-thumbnail" { export const CreateImageTabThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/use-searchable-page-title-visibility" { export const n: () => { scrollContainerRef: { current: unknown }; showTitleInToolbar: boolean; titleRef: { current: unknown } }; export const t: () => void }
+declare module "@rchunk/secret-row" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/change-messages" { export const n: () => void; export const t: Readonly<Record<string, unknown>> }
+declare module "@rchunk/configuration-fields" { export const i: () => void; export const n: () => void; export const r: unknown; export const t: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/chatgpt-ecosystem-widget-queries" { export const n: () => void; export const t: unknown }
+declare module "@rchunk/voice-dsp" { export const initializeVoiceDsp: () => unknown }
+declare module "@rchunk/silero-vad" { export const preloadSileroVoiceActivityDetector: (options: unknown) => unknown }
+declare module "@rchunk/shopping-bag-fill-icon" { const ShoppingBagFill: (props: Record<string, unknown>) => unknown; export default ShoppingBagFill }
+declare module "@rchunk/checkout-telemetry" { export const n: unknown; export const r: unknown; export const t: unknown }
+declare module "@rchunk/epic-chart-indicator-entry" { export const loadEpicChartIndicator: () => Promise<unknown> }
+declare module "@rchunk/voice-dsp-entry" { export const loadVoiceDsp: () => Promise<unknown>; export const preloadSileroVoiceActivityDetector: (options: unknown) => Promise<unknown> }
+declare module "@rchunk/code-block-execution-entry" { export const loadCodeBlockExecution: () => Promise<unknown> }
+declare module "@rchunk/experimental-feature-visibility" { export const n: () => void; export const t: (feature: unknown) => boolean }
+declare module "@rchunk/product-favorite-action-core" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/product-favorite-action-entry" { export const ProductFavoriteAction: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/library-file-route" { export const LibraryFileRoute: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/note-icon" { const NoteIcon: (props: Record<string, unknown>) => unknown; export default NoteIcon }
+declare module "@rchunk/open-automation-side-panel-tab-entry" { export const openAutomationSidePanelTab: (...args: unknown[]) => unknown; export const openAutomationSuggestionSidePanelTab: (...args: unknown[]) => unknown; export const openSiteAutomationSidePanelTab: (...args: unknown[]) => unknown; export const restoreAutomationSidePanelTab: (...args: unknown[]) => unknown }
+declare module "@rchunk/restore-image-preview-tab" { export const restoreImagePreviewTab: (...args: unknown[]) => unknown }
+declare module "@rchunk/personal-finance-account-detail" { export const PersonalFinanceAccountDetail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/appgen-page" { export const AppgenPage: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/environment-setup-review-entry" { export const EnvironmentSetupReviewEntry: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/workspace-agent-landing" { export const WorkspaceAgentLanding: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/workspace-agents-page" { export const WorkspaceAgentsPage: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/flight-search-form" { export const FlightSearchForm: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/editor-dialog" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/document-search" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/automations-page" { export const AutomationsLayoutPage: (props?: { presentation?: unknown }) => unknown }
 declare module "@rchunk/loading-controls" { export const n: () => void; export const t: (props: { paginated: boolean }) => import("@rchunk/editor-header-controls").EditorHeaderControls }
 declare module "@rchunk/open-image-preview" { export interface ImagePreviewTarget { alt?: string; id?: string; sourceUrl?: string; src: string } export const openChatGptSearchImagePreview: (image: ImagePreviewTarget, images?: ImagePreviewTarget[], service?: { open(input: { image: ImagePreviewTarget; images: ImagePreviewTarget[]; index: number }): void }) => { image: ImagePreviewTarget; images: ImagePreviewTarget[]; index: number }; }
 declare module "@rchunk/open-in-library-item" { export const n: () => void; export const t: (props: { disabled?: boolean; libraryFileId: string; onOpen?(path: string): void }) => unknown }

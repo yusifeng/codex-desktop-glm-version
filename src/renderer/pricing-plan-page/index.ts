@@ -3,7 +3,6 @@ import { I3 as getJsxRuntime, e6 as getReactRuntime, type JsxRuntime, type React
 import { Ygn as Navigate, i_n as useLocation, o_n as useNavigate, uht as useAccountQuery, type SubscriptionPlan as UpdatablePlan } from "@rchunk/app-initial";
 import "@rchunk/app-primary";
 import "@rchunk/chatgpt-subscription-events";
-// @ts-expect-error The semantic chunk is registered by the renderer build.
 import "@rchunk/checkout-telemetry";
 import { n as initializePlanComparison, t as PlanComparison } from "@rchunk/pricing-plan-comparison";
 import { f as initializePricingPromotions } from "@rchunk/pricing-promotions";

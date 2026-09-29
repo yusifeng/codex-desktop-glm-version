@@ -5,7 +5,6 @@ import "@rchunk/app-primary";
 // @ts-expect-error The semantic exports are supplied by the renderer chunk.
 import { n as initializeThreadEmoji, t as ThreadEmoji } from "@rchunk/thread-emoji";
 import { n as initializeThreadOverflowMenu, t as ThreadOverflowMenu } from "@rchunk/thread-overflow-menu";
-// @ts-expect-error The semantic chunk is registered by the renderer build.
 import { n as useSearchablePageTitleVisibility, t as initializeSearchablePageTitleVisibility } from "@rchunk/use-searchable-page-title-visibility";
 
 type ProjectKind = "cloud" | "local";

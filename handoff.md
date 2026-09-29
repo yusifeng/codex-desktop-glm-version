@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1152 个语义 chunk；`verify-renderer` 为 1152/1152。
-- `PRESERVED_ASSETS`：66 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1171 个语义 chunk；`verify-renderer` 为 1171/1171。
+- `PRESERVED_ASSETS`：71 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,12 +65,13 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1165/2247 tracked、1082 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1189/2247 tracked、1058 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
   hooks 24/24、skills-plugins-mcp 30/30、panels 20/20、charts-ui 17/17 已收官；
-  editor-docs、artifact-preview 与 markdown-render 已分别达到 42/42、53/53、24/24。
+  editor-docs、artifact-preview、markdown-render 与 appgen-valdi-platform 已分别达到
+  42/42、53/53、24/24、78/78。
 - `node scripts/audit-app-shared-consumption.mjs`：341 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -310,9 +311,16 @@ i18n locale bundle 与 TextMate Markdown grammar shim 分别登记为 vendor/gen
 不伪造业务源码。五组专项测试共 140 条断言；构建器补充发布资产动态 import 的
 external 解析后，renderer 1152/1152、tsc 73，markdown-render 达到 24/24。
 
+2026-09-29 已收官 appgen-valdi-platform：恢复 Automations 页面、航班搜索表单、
+个人财务账户页、workspace agent 页面、环境设置 review、voice DSP / code execution
+lazy entry，以及 favorite、note、restore、library route 等小型入口，共 19 个语义 chunk；
+Valdi finance bundle、产品干预运行时、DIL response runtime 与 note data URI 等 5 个
+大型生成/vendor 资产继续走 transform-only 保留轨道。四组专项测试共 126 条断言；
+renderer 1171/1171、tsc 73，appgen-valdi-platform 达到 78/78。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
-但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 appgen-valdi-platform 的
-24 个真实缺口（当前 54/78）；增量 hub 只在出现真实消费者时拆出
+但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 rpc-bridge 的
+380 个真实缺口（当前 30/410）；增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 
