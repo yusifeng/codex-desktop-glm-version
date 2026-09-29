@@ -49,9 +49,9 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 999 rewritten / 50 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 999/2250 tracked、1251 pending，其中
-terminal 6/6、browser 19/19、settings 59/70。尾部 0 pending 仍不能替代全量覆盖审计。
+截至 2026-09-29，尾部审计为 1004 rewritten / 50 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1004/2250 tracked、1246 pending，其中
+terminal 6/6、browser 19/19、settings 64/70。尾部 0 pending 仍不能替代全量覆盖审计。
 
 注意：`audit-renderer-tail.mjs` 只审计已经登记进 `CHUNKS` 的集合，不能证明
 `docs/renderer-app-chunks.json` 中的 2250 个 app-code 文件已经全部处理。全量覆盖

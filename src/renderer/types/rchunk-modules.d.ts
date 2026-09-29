@@ -15276,3 +15276,16 @@ declare module "@rchunk/ad-control-dialog-runtime" {
   export const x: () => void;
   export const y: () => unknown;
 }
+
+declare module "@rchunk/client";
+declare module "@rchunk/phone-number-input";
+declare module "@rchunk/trusted-contact-hero";
+declare module "@rchunk/spoken-language-options";
+declare module "@rchunk/hooks-settings" { export const HooksSettings: () => unknown; }
+declare module "@rchunk/import-settings" { export const ImportSettings: () => unknown; }
+declare module "@rchunk/pets-settings-route" { export const PetsSettingsRoute: () => unknown; }
+declare module "@rchunk/trusted-contact-settings" {
+  export const ChatGptTrustedContactSettings: () => unknown;
+  export const TrustedContactEnrollment: (props: { entryPoint?: string; initialDialog?: "intro" | "invite" | null; onClose?(): void; onSuccess?(): void }) => unknown;
+}
+declare module "@rchunk/voice-settings" { export const VoiceSettings: () => unknown; }
