@@ -49,8 +49,8 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 1361 rewritten / 86 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 1394/2247 tracked、853 pending，其中
+截至 2026-09-29，尾部审计为 1391 rewritten / 86 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1424/2247 tracked、823 pending，其中
 terminal 6/6、browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding
 40/40、git-github-worktree 63/63，conversation-thread 101/101，pages-routes 92/92；
 animations 7/7、observability-cloud 8/8、auth-profile 13/13、hooks 24/24、
@@ -98,6 +98,10 @@ rpc-bridge 第七批恢复 30 个教学模型，覆盖流行病学、化学平�
 概率分布、生物免疫与生态、数列与函数、机器学习分类、视觉生理和有机构象等主题。
 三组专项测试共 299 条断言；renderer 1361/1361、tsc 73，rpc-bridge 当前
 235/410 tracked、175 pending。
+rpc-bridge 第八批恢复 30 个教学模型，新增溶解度与缓冲体系、反应速率和酶抑制、
+统计检验、遗传图谱、电子表格函数、环境风险、区块链、运动学与相图等主题。三组
+专项测试共 314 条断言；renderer 1391/1391、tsc 73，rpc-bridge 当前 265/410
+tracked、145 pending。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入
