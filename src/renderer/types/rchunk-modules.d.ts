@@ -15389,3 +15389,16 @@ declare module "@rchunk/gpt-discovery-page" { export const GptDiscoveryPage: () 
 declare module "@rchunk/hotkey-window-home-page" { export const HotkeyWindowHomePage: () => unknown; }
 declare module "@rchunk/login-route" { export const LoginRoute: () => unknown; }
 declare module "@rchunk/standalone-elicitation-page" { export const StandaloneElicitationPage: () => unknown; }
+declare module "@rchunk/cfc-persona-verification" {
+  export const openPersonaVerification: (options: {
+    accountId?: string | null;
+    onCancel(): void;
+    onComplete(): void;
+    onError(error: Error): void;
+    onLoad?(): void;
+  }) => () => void;
+}
+declare module "@rchunk/cfc-verification-page" { export const CfcVerificationPage: () => unknown; }
+declare module "@rchunk/ads-controls-settings" { export const AdsControlsSettings: () => unknown; }
+declare module "@rchunk/chatgpt-shared-post-page" { export const ChatGptSharedPostPage: () => unknown; }
+declare module "@rchunk/global-dictation-page" { export const GlobalDictationPage: () => unknown; }
