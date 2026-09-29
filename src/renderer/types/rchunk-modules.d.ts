@@ -8076,6 +8076,22 @@ declare module "@rchunk/site-preview" {
 declare module "@rchunk/browser-use-settings" {
   export const BrowserUseSettings: () => unknown;
 }
+declare module "@rchunk/debug-settings" {
+  export const DebugSettings: () => unknown;
+}
+declare module "@rchunk/cloud-preferences-settings" {
+  export const CloudPreferencesSettings: () => unknown;
+}
+declare module "@rchunk/storage-settings" {
+  export const ChatGptStorageSettings: () => unknown;
+}
+declare module "@rchunk/connector-settings-redirect" {
+  export const ConnectorSettingsRedirect: (props: { startConnection?: boolean }) => unknown;
+}
+declare module "@rchunk/profile-settings" {
+  export const CmeAccountSettings: () => unknown;
+  export const CmeProfileSettings: () => unknown;
+}
 declare module "@rchunk/symbol-browser" {
   export interface SymbolBrowserSelection {
     kind: "emoji" | "icon";
