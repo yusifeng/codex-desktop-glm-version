@@ -8098,6 +8098,22 @@ declare module "@rchunk/appshots-settings" {
 declare module "@rchunk/code-review-settings" {
   export const CodeReviewSettings: () => unknown;
 }
+declare module "@rchunk/legacy-study-hours-schedule" {
+  export interface LegacyScheduleBlock { days: readonly string[]; end_time: string; id: string; start_time: string; }
+  export interface LegacyScheduleState { blocks: LegacyScheduleBlock[]; enabled: boolean; }
+  export const n: () => LegacyScheduleState;
+  export const r: () => void;
+  export const t: (state: LegacyScheduleState, action: Record<string, unknown> & { type: string }) => LegacyScheduleState;
+}
+declare module "@rchunk/git-settings" {
+  export const GitSettings: () => unknown;
+}
+declare module "@rchunk/safety-settings" {
+  export const ChatGptSafetySettings: () => unknown;
+}
+declare module "@rchunk/keyboard-shortcuts-settings" {
+  export const KeyboardShortcutsSettings: () => unknown;
+}
 declare module "@rchunk/usage-code-review-settings" {
   export const UsageCodeReviewSettings: (props: { isPolling?: boolean }) => unknown;
 }

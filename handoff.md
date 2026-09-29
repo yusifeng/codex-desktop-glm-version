@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：995 个语义 chunk；`verify-renderer` 为 995/995。
+- `REWRITTEN`：999 个语义 chunk；`verify-renderer` 为 999/999。
 - `PRESERVED_ASSETS`：50 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,8 +65,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2250 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  995/2250 tracked、1255 pending；composer 47/47、sidebar 12/12、terminal 6/6、
-  browser 19/19 已覆盖，settings 56/70。
+  999/2250 tracked、1251 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  browser 19/19 已覆盖，settings 59/70。
 - `node scripts/audit-app-shared-consumption.mjs`：330 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -120,6 +120,12 @@ Worktrees Settings 恢复管理摘要、状态、关联会话、打开/新聊天
 测试 98/98；renderer 全量门禁 995/995、main 11/11、tsc 73，settings 覆盖达到
 56/70。`activity-chart` 发布包暴露 43 个图表聚合导出，当前仅消费 `H/U/n/t`，因此
 按第 12 个 typed-consumer-surface hub 登记，未复制未消费图表实现。
+
+2026-09-29 已完成 settings 第三批：Git settings 恢复 review mode、branch prefix、
+merge/force-push/draft PR、指令与 PR watcher automation；Safety settings 恢复 quiet/study
+schedule 编辑、校验、未保存变更与保存反馈；Keyboard Shortcuts 恢复搜索、分组排序、
+平台键位、冲突、清除/替换与重置。并补齐 662B 的 legacy study hours schedule 三函数
+叶子依赖。专项行为测试 90/90；renderer 999/999、main 11/11、tsc 73，settings 59/70。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、
