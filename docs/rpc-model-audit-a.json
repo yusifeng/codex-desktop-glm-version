@@ -1,0 +1,3238 @@
+[
+  {
+    "file": "model-10252d82a04c.js",
+    "classification": "pure-data-generated-runtime",
+    "reason": "Pure generated model data: only a static parameter object is initialized and exported, with no substantive branching, parsing, simulation, or derived-state logic.",
+    "size": 592,
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-106204ffd60a.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BLOOD_GLUCOSE_REGULATION with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 4 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1230,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-11da4540b9d5.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for TCP_THREE_WAY_HANDSHAKE with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 7 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1706,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-124c142a08f6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 24 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1438,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-12db92e98e26.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for HARDY_WEINBERG_EQUILIBRIUM with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 16 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1358,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-12f159b04c73.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for EVEN_ODD_FUNCTION_SYMMETRY with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 1 list transform, 21 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1866,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-13e640ef3d2a.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 35 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1606,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-15af4e81d3df.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 1 arithmetic/logical expression); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3200,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-16139428a7b1.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (9 branch/conditional nodes, 1 loop, 43 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2028,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-17b71618727c.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for GEOMETRIC_DISTRIBUTION with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 19 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1942,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-17f916a4e975.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SOLUBILITY_CURVE with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 21 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2087,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-18012d55d891.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CO2_AND_TEMPERATURE_TIME_SERIES with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 1 list transform, 16 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 5359,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-18526f90a546.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for EMPIRICAL_RULE with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 list transform, 12 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1462,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-18e3a40ddc3a.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ENZYME_AND_TEMPERATURE with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 20 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1633,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-18f5968002b2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ANOVA_INTERACTION_PLOT with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 list transform, 5 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1299,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-19c0720a550e.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (15 branch/conditional nodes, 9 list transforms, 78 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3140,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1b1a0d17905e.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SIMPLE_DIVISION with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 5 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1124,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1bd246abc23b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 10 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 647,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1bde8be079ab.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CROSS_PRICE_ELASTICITY with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 18 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2703,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1cc997c09d9b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for NET_IONIC_EQUATIONS with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 4 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3823,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1d942a9d7c86.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 1 list transform, 25 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1241,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1d9447e10398.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for POSITIVE_FEEDBACK_LOOP with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 5 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1046,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1f60271bdbb7.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 1 arithmetic/logical expression); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 7600,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./app-shared-7b9edc1bfb7f.js",
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1fb3f3c173eb.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ARITHMETIC_SEQUENCE with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 6 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1848,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-1ff2e69cbdc9.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ADDING_INTEGERS with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 6 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1307,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2050d7dfdf59.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 10 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1237,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-20fa5aabbc94.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ABO_RH_BLOOD_TYPING with executable normalization, formula, simulation, parsing, or derived-state behavior (9 branch/conditional nodes, 2 list transforms, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1714,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-21889c1e147f.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CPU_FETCH_DECODE_EXECUTE with executable normalization, formula, simulation, parsing, or derived-state behavior (37 branch/conditional nodes, 50 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2578,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-21bcfa25d0a8.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ANOVA_DECOMPOSITION with executable normalization, formula, simulation, parsing, or derived-state behavior (24 branch/conditional nodes, 1 loop, 27 list transforms, 159 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 8892,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "g",
+      "h",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-21c44dea4af5.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MICROBIAL_TOLERANCE_CURVE with executable normalization, formula, simulation, parsing, or derived-state behavior (13 branch/conditional nodes, 1 list transform, 37 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2951,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2219d04986cb.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ABSOLUTE_VALUE_DISTANCE with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 2 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 999,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-22f6fd6b2321.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (9 branch/conditional nodes, 18 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1155,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2389f073136d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CARBON_CYCLE with executable normalization, formula, simulation, parsing, or derived-state behavior (9 branch/conditional nodes, 10 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3687,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-23fa1b82de8d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ECOLOGICAL_TOLERANCE_CURVE with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 20 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1695,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2470e84b6d61.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for TWO_SAMPLE_T_TEST with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 2 loops, 109 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3148,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2519c21474d3.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for T_STAT_P_SCORE with executable normalization, formula, simulation, parsing, or derived-state behavior (11 branch/conditional nodes, 2 loops, 108 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3831,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-253b6086c636.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for POISSON_DISTRIBUTION with executable normalization, formula, simulation, parsing, or derived-state behavior (10 branch/conditional nodes, 1 loop, 4 list transforms, 31 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2634,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2553fb5c0f9e.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ISLAND_BIOGEOGRAPHY with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 12 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1304,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-276f1b14e837.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for EQUILIBRIUM_CONCENTRATION_GRAPH with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 27 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2248,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2921ad175a74.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 25 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3431,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-29b9b40f1c67.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 loop, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 868,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2a0b00285795.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for GEOMETRIC_SERIES with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 1 loop, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1393,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./adaptive-slider-field-6d316e0b7a10.js",
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2bfb73b82959.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for LEWIS_STRUCTURE_BUILDER with executable normalization, formula, simulation, parsing, or derived-state behavior (16 branch/conditional nodes, 15 list transforms, 66 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 5886,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-2e9de4cfd2c8.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (32 branch/conditional nodes, 2 loops, 87 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 6956,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./build-graph-data-ee6e0d8e135a.js",
+      "./null-throws-c7a886463bcb.js",
+      "./numerical-integration-e14603542012.js",
+      "./rolldown-runtime-2d059c5e81f4.js",
+      "./tokenize-math-block-92dba400da42.js"
+    ]
+  },
+  {
+    "file": "model-3074940ffbb8.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 386,
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-307f3d994796.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for OPERANT_CONDITIONING with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1331,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-30adaa39a8dd.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SLEEP_CYCLE_HYPNOGRAM with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 3 list transforms, 21 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2725,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-31563588c1d0.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for HUMAN_BODY_SYSTEMS_MAP with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 1 list transform, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3124,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3228e752e987.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 10 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1401,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-329288b68a29.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 16 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1744,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-33ec5072ad67.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (16 branch/conditional nodes, 21 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1166,
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-34404a0ff6b5.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MEAN_VS_MEDIAN with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 1 loop, 10 list transforms, 62 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2995,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-362f6f6503f1.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 4 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1108,
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-365838113234.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CELL_MEMBRANE_TRANSPORT with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 1 list transform, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2822,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-379965cd8d4f.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SPREADSHEET_IF_FUNCTION with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 13 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2209,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-380eb31b2348.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 13 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1316,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-38ab54fedb73.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 855,
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3985c0526691.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1174,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3afae384a050.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 11 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1994,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3beba148e294.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for FIXED_PERIMETER_RECTANGLE_AREA with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1002,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3c197e2ac9a2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 loop, 38 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1273,
+    "exports": [
+      "n",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3cc878663baa.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 4 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 759,
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3d95a574c11d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ELECTRON_ORBITAL_FILLING with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 1 loop, 8 list transforms, 17 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4227,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3dc4ab96d69c.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for PROCESS_CAPABILITY_CP_CPK with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 25 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1789,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3defe9d7f514.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 2 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 877,
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3df6827423e2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for T_DISTRIBUTION with executable normalization, formula, simulation, parsing, or derived-state behavior (15 branch/conditional nodes, 4 loops, 167 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4906,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3df69373af20.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MATCHED_PAIRS_DESIGN with executable normalization, formula, simulation, parsing, or derived-state behavior (12 branch/conditional nodes, 4 list transforms, 28 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2066,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3eedc6e81e01.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for VELOCITY_AS_SLOPE_GRAPH with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 1 loop, 8 list transforms, 58 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4452,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "h",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-3fdea9ffafb6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 list transform, 10 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1392,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-405fb8197cad.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BINOMIAL_DISTRIBUTION with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 1 loop, 2 list transforms, 18 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1977,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-40afec118948.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 31 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1735,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-4298405efab5.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BACTERIAL_GROWTH_CURVE with executable normalization, formula, simulation, parsing, or derived-state behavior (15 branch/conditional nodes, 45 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2620,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-434aeec5110b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CURRENT_TO_MAGNETIC_FIELD with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 12 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1769,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-439233109749.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 7 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 786,
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-43a9f02da387.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for DENSITY_DEPENDENCE with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 8 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1885,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-4513eb800a0e.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MERGE_SORT with executable normalization, formula, simulation, parsing, or derived-state behavior (12 branch/conditional nodes, 4 loops, 3 list transforms, 48 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 6730,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-456ae69d4c49.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CONJUGATED_DIENES_AND_DIELS_ALDER with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 5 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1525,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-456e3b59f525.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (7 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1048,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-469e05313030.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ENTHALPY with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1438,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-47702d2695d6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for LAW_OF_REFLECTION with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 41 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4155,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-47d542dd6d67.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 2 list transforms, 12 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1211,
+    "exports": [
+      "n",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-48fb6d2122d9.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MEAN_VALUE_THEOREM with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 2 loops, 3 list transforms, 94 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4868,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-4ade1fb3e1f8.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for NITROGEN_CYCLE with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 4 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4449,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-4b01cc6c2e76.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (11 branch/conditional nodes, 15 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 952,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-4db1a43b78c0.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for POPULATION_DENSITY with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 30 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2602,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "g",
+      "h",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-4dfc962979f9.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 5 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 562,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-4f70c67288f2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ELECTRIC_FIELD with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 28 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2217,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5109996801ed.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for VAPOR_PRESSURE_LOWERING with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1178,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-512171a54d75.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SCIENTIFIC_NOTATION with executable normalization, formula, simulation, parsing, or derived-state behavior (10 branch/conditional nodes, 1 loop, 29 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3150,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5170f20e545d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for COUNTING_SEQUENCES with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1988,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./model-e47d7e4cfcac.js",
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-53fab9bbba36.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 7 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3916,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-54778b6d513f.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SIDE_BY_SIDE_BOX_PLOTS with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 10 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2195,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-554288d91497.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for PREDATOR_PREY_DYNAMICS with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 1 loop, 72 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3586,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-55ff7ae3fc50.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for POLYNOMIAL_MULTIPLICITY_INTERCEPTS with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 1 loop, 27 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3777,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-57ce9234be9d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for RATES_AND_BONDS with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 1 loop, 17 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1658,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5a0d6a0ec95c.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for PYTHON_RANGE_FOR_LOOP with executable normalization, formula, simulation, parsing, or derived-state behavior (9 branch/conditional nodes, 1 loop, 19 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1849,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5a3880d5e780.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SKEWNESS_DIRECTION with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 1 loop, 68 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2804,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5a5542c48ccf.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ENDOCRINE_FEEDBACK_AXIS with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 8 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1856,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5abcde22832d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BINARY_SEARCH_TREE_INSERTION with executable normalization, formula, simulation, parsing, or derived-state behavior (12 branch/conditional nodes, 2 loops, 1 list transform, 20 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3117,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5ae66660a0d1.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BUFFER_PH_STRONG_ACID_BASE with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 18 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2141,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5b5c3055d254.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ADDING_NEGATIVE_INTEGER with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 6 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1283,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5b6dc1b6bd89.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for HETEROSKEDASTICITY with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 5 list transforms, 39 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2160,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5ba45a3a952c.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for PRIMARY_VS_SECONDARY_POLLUTANTS with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 6 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2373,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5cfd5db05e74.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for TWOS_COMPLEMENT with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 4 list transforms, 20 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1732,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5e45c222a8d6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for NEWMAN_PROJECTIONS with executable normalization, formula, simulation, parsing, or derived-state behavior (13 branch/conditional nodes, 20 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2071,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5e6bf7ab6165.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 1 arithmetic/logical expression); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3715,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./app-shared-7b9edc1bfb7f.js",
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5e6e1cc23b29.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for LD50_DOSE_RESPONSE_CURVE with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 11 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2015,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5e953d82d89b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 3 list transforms, 27 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1401,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5fdbc0dfab74.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ROUND_ROBIN_CPU_SCHEDULING with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 3 loops, 7 list transforms, 22 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3590,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-5fdcbc5a8461.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (11 branch/conditional nodes); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2746,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-607b6057cda2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 3 list transforms, 62 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3130,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6157f9be0476.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for TWO_DIMENSIONAL_ARRAY_INDEXING with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 7 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1253,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-65944a036c44.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for RATIONAL_LIMITS_AT_INFINITY with executable normalization, formula, simulation, parsing, or derived-state behavior (18 branch/conditional nodes, 4 loops, 51 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4817,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-659be7554447.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 18 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 748,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-65fc78301123.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for WILCOXON_RANK_SUM with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 3 loops, 9 list transforms, 22 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2202,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-66d4b6ae060b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for NEGATIVE_FEEDBACK_LOOP with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 6 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1715,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-68069144a19f.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for GAY_LUSSACS_LAW with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 5 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1509,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-689c31877cb2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for SAMPLING_DISTRIBUTION with executable normalization, formula, simulation, parsing, or derived-state behavior (10 branch/conditional nodes, 2 loops, 6 list transforms, 79 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4792,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6941c5713844.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 9 list transforms, 34 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1567,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-69c39ccdb2ba.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 21 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1329,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6ab8da229be6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MIXED_NUMBERS with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 886,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6b56e43ed230.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 17 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1211,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6bc352ee4868.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MONEY_MARKET with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 20 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1938,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6d0fe1644e34.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ENDOMEMBRANE_PATHWAY with executable normalization, formula, simulation, parsing, or derived-state behavior (12 branch/conditional nodes, 14 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1733,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6d69b6507959.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (16 branch/conditional nodes, 2 list transforms, 31 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4008,
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6d7b03cccde0.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for EUTROPHICATION with executable normalization, formula, simulation, parsing, or derived-state behavior (14 branch/conditional nodes, 1 list transform, 19 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1947,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6d9c94a4186b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MENSTRUAL_CYCLE_FERTILIZATION with executable normalization, formula, simulation, parsing, or derived-state behavior (22 branch/conditional nodes, 68 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2746,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6e039b1d844f.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for RESTRICTION_ENZYME_MAP with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 11 list transforms, 28 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2178,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6e9bbef00f51.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MULTIPLICATION_AS_REPEATED_ADDITION with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 2 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1516,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6f57c84b253e.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ACID_BASE_TITRATION with executable normalization, formula, simulation, parsing, or derived-state behavior (15 branch/conditional nodes, 1 loop, 68 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4101,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-6fb8590b711d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ECONOMIC_EXTERNALITIES with executable normalization, formula, simulation, parsing, or derived-state behavior (13 branch/conditional nodes, 27 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4377,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./app-shared-7b9edc1bfb7f.js",
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-70d42efdc777.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 1 loop, 14 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1274,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7164ede642a6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 12 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 920,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-71af2c81ea03.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for METAL_REACTIVITY_SERIES with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 13 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2929,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7206de562b9d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for ACID_STRENGTH_AND_CONJUGATE_BASE_STABILITY with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 2 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2398,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7354fd8cc5a6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for PHOTOSYNTHESIS_OVERVIEW with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 8 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2835,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7501d5f703e7.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (6 branch/conditional nodes, 1 list transform, 39 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2398,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-75b9f873ec1d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 list transform, 4 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1335,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-75fbe3dbe692.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 6 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1100,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-761532c576d5.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 6 list transforms, 21 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2248,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-76ebc088bb95.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CHI_SQUARE_DISTRIBUTION with executable normalization, formula, simulation, parsing, or derived-state behavior (13 branch/conditional nodes, 2 loops, 67 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2965,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-775baaf06261.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BINARY_HEAP_OPERATIONS with executable normalization, formula, simulation, parsing, or derived-state behavior (16 branch/conditional nodes, 2 loops, 35 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4649,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-77c142ff4062.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for AVOGADROS_LAW with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 5 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1445,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7840deb060fa.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 376,
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-78dd2f7b3a04.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (31 branch/conditional nodes, 56 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3888,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-79d3c05c2f18.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for RADIOMETRIC_DATING with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 7 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2518,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7cc667e32642.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 11 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 796,
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7e5397a87b87.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (18 branch/conditional nodes, 2 loops, 8 list transforms, 77 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 4444,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7eb2f6a715c8.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 107 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3055,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7f8b73e7da12.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for DIGESTIVE_TRACT_ABSORPTION with executable normalization, formula, simulation, parsing, or derived-state behavior (13 branch/conditional nodes, 1 list transform, 13 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3959,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-7fc37b4d721d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CODON_CHART with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 6 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2212,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-80c56120bdff.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for IR_SPECTROSCOPY with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 3 list transforms, 30 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2523,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-810bae520b6d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 18 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1114,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-8122293b00e1.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 arithmetic/logical expression); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2729,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./app-shared-7b9edc1bfb7f.js",
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-81531df3f2e2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 580,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-82b31c2ac45b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for QUADRATIC_INEQUALITIES with executable normalization, formula, simulation, parsing, or derived-state behavior (58 branch/conditional nodes, 4 loops, 7 list transforms, 161 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 7630,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-838233d701ed.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 9 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1128,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-83dea67c5a42.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for NERNST_EQUATION with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 10 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1896,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-84524f724fa2.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for LINEAR_INEQUALITIES_FEASIBLE_REGION with executable normalization, formula, simulation, parsing, or derived-state behavior (29 branch/conditional nodes, 5 loops, 3 list transforms, 110 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 8488,
+    "exports": [
+      "_",
+      "a",
+      "c",
+      "d",
+      "f",
+      "g",
+      "h",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "y"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-848a1637af6a.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for TWO_DIGIT_MULTIPLY with executable normalization, formula, simulation, parsing, or derived-state behavior (2 branch/conditional nodes, 1 list transform, 19 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2050,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-84d7b391405a.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for MOLECULAR_ORBITAL_DIAGRAM with executable normalization, formula, simulation, parsing, or derived-state behavior (8 branch/conditional nodes, 7 list transforms, 28 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2869,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-8535eecf9273.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for FARADAYS_LAW_ELECTROLYSIS with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 16 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1805,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-85aa75328d7c.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for FOUR_TO_ONE_MULTIPLEXER with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 3 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1651,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-85b44c5c18b6.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (13 branch/conditional nodes, 11 list transforms, 20 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3929,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-86d466c7f97d.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (24 branch/conditional nodes, 2 loops, 54 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 6165,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./build-graph-data-ee6e0d8e135a.js",
+      "./null-throws-c7a886463bcb.js",
+      "./numerical-integration-e14603542012.js",
+      "./rolldown-runtime-2d059c5e81f4.js",
+      "./tokenize-math-block-92dba400da42.js"
+    ]
+  },
+  {
+    "file": "model-870d28c04213.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 28 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1251,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-89a71102ad15.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BINOMIAL_THEOREM_PASCAL_TRIANGLE with executable normalization, formula, simulation, parsing, or derived-state behavior (5 branch/conditional nodes, 1 loop, 2 list transforms, 13 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1618,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-8a1ce53f2bd0.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for HASH_TABLE_COLLISIONS with executable normalization, formula, simulation, parsing, or derived-state behavior (21 branch/conditional nodes, 1 loop, 1 list transform, 47 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2616,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-8a2addb2a518.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for CRITICAL_PATH_NETWORK with executable normalization, formula, simulation, parsing, or derived-state behavior (3 branch/conditional nodes, 3 loops, 6 list transforms, 19 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 3975,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-8a51aa448316.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for BAYESIAN_BETA_BINOMIAL_UPDATING with executable normalization, formula, simulation, parsing, or derived-state behavior (4 branch/conditional nodes, 1 loop, 36 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2746,
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-8b840e3306b1.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model for COMPETITION_AND_NICHES with executable normalization, formula, simulation, parsing, or derived-state behavior (7 branch/conditional nodes, 1 loop, 2 list transforms, 36 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 2332,
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  },
+  {
+    "file": "model-8b9f3f1fca9b.js",
+    "classification": "semantic-business-logic",
+    "reason": "AppGen model with executable normalization, formula, simulation, parsing, or derived-state behavior (1 branch/conditional node, 7 list transforms, 8 arithmetic/logical expressions); this should be semantically rewritten rather than preserved as generated schema data.",
+    "size": 1811,
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "imports": [
+      "./rolldown-runtime-2d059c5e81f4.js"
+    ]
+  }
+]
+

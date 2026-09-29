@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1171 个语义 chunk；`verify-renderer` 为 1171/1171。
-- `PRESERVED_ASSETS`：71 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1181 个语义 chunk；`verify-renderer` 为 1181/1181。
+- `PRESERVED_ASSETS`：86 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,7 +65,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1189/2247 tracked、1058 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1214/2247 tracked、1033 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
@@ -318,9 +318,17 @@ Valdi finance bundle、产品干预运行时、DIL response runtime 与 note dat
 大型生成/vendor 资产继续走 transform-only 保留轨道。四组专项测试共 126 条断言；
 renderer 1171/1171、tsc 73，appgen-valdi-platform 达到 78/78。
 
+2026-09-29 已推进 rpc-bridge 第一批：审计全部 35 个非 model 尾部，恢复 array helper、
+文件树、坐标/角度/数值格式化、analytics query string 与 browser profile import NUX
+等 10 个语义叶子；Datadog、KaTeX、remark-math、photo-sphere-viewer、Lucide barrel、
+WASM binary 等 15 个明确 vendor/generated 资产进入保留轨道。专项测试 49 条断言；
+renderer 1181/1181，rpc-bridge 当前 55/410。另对剩余 345 个 model chunk 完成结构化
+审计：343 个含公式、归一化、模拟或派生状态逻辑，必须语义重写；仅 2 个属于纯静态
+模型数据候选。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 rpc-bridge 的
-380 个真实缺口（当前 30/410）；增量 hub 只在出现真实消费者时拆出
+355 个真实缺口（当前 55/410），优先分批恢复已审计的教学模型；增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 

@@ -49,8 +49,8 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 1171 rewritten / 71 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 1189/2247 tracked、1058 pending，其中
+截至 2026-09-29，尾部审计为 1181 rewritten / 86 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1214/2247 tracked、1033 pending，其中
 terminal 6/6、browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding
 40/40、git-github-worktree 63/63，conversation-thread 101/101，pages-routes 92/92；
 animations 7/7、observability-cloud 8/8、auth-profile 13/13、hooks 24/24、
@@ -69,6 +69,13 @@ vendor/generated 轨道。appgen-valdi-platform 最后一批恢复 Automations �
 依赖验证覆盖。Valdi finance bundle、产品干预运行时、DIL response runtime 与 note data URI
 等 5 个大型生成/vendor 资产继续走保留轨道。四组专项测试共 126 条断言；renderer
 1171/1171、tsc 73。下一批转入 rpc-bridge，当前 30/410 tracked、380 pending。
+rpc-bridge 第一批完成 35 个非 model 尾部的逐文件审计，恢复 array helper、文件树、
+坐标/角度/数值格式化、analytics query string 与 browser profile import NUX 等 10 个
+语义叶子；Datadog、KaTeX、remark-math、photo-sphere-viewer、Lucide barrel、WASM binary
+等 15 个明确 vendor/generated 资产进入保留轨道。专项测试 49 条断言；renderer
+1181/1181，rpc-bridge 当前 55/410 tracked、355 pending。另已完成 345 个 model chunk
+的结构化审计：其中 343 个包含公式、归一化、模拟或派生状态逻辑，必须分批语义重写，
+不能按文件名前缀批量 preserve；仅 2 个纯静态模型数据候选可继续核验保留策略。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入
