@@ -15492,7 +15492,14 @@ declare module "@rchunk/cloud-browser-side-panel" { export const ChatGptCloudBro
 declare module "@rchunk/plugin" { export const getMcpExtensionContextMenuItems: (...arguments_: unknown[]) => unknown; }
 declare module "@rchunk/legacy-video-plugins" { export const loadLegacyVideoPlugins: (target: { _plugins?: unknown }) => Promise<void>; }
 declare module "@rchunk/gpt-create-plugin-prompt" { export const GptCreatePluginPrompt: (props: Record<string, unknown>) => unknown; }
-declare module "@rchunk/tweaks-toolbar-view" { export const a: (props?: Record<string, unknown>) => unknown; export const c: () => void; export const i: () => void; export const l: (event: unknown) => void; export const n: () => void; export const o: () => void; export const r: (props?: Record<string, unknown>) => unknown; export const s: (props?: Record<string, unknown>) => unknown; export const t: (props?: Record<string, unknown>) => unknown; export const u: () => void; }
+declare module "@rchunk/tweaks-toolbar-view" { export const a: (props?: Record<string, unknown>) => unknown; export const c: () => void; export const i: () => void; export const l: (event: unknown, active?: boolean, options?: Record<string, unknown>) => boolean | undefined; export const n: () => void; export const o: () => void; export const r: (props?: Record<string, unknown>) => unknown; export const s: (props?: Record<string, unknown>) => unknown; export const t: (props?: Record<string, unknown>) => unknown; export const u: () => void; }
+declare module "@rchunk/detached-browser-annotation-controls" { export const DetachedBrowserAnnotationButton: (props: Record<string, unknown>) => unknown; export const DetachedBrowserTweaksToolbar: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/image-markup-editor" { export const ImageMarkupEditor: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/visualization-annotation-editor" { export const VisualizationAnnotationEditor: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/image-edit-size-control" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/composer-host" { export const n: (props: Record<string, unknown>) => unknown; export const r: () => void; }
+declare module "@rchunk/image-export" { export const i: () => void; export const r: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/writing-block" { export const i: () => void; export const n: () => void; export const r: unknown; export const t: unknown; }
 declare module "@rchunk/source-toolbar" { export const createBrowserWindowToolbarContribution: (...arguments_: unknown[]) => unknown; }
 declare module "@rchunk/plugin-installation-content" { export const PluginInstallationContent: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/linear";
@@ -15512,7 +15519,7 @@ declare module "@rchunk/library-cloud-file-preview-entry" { export const Library
 declare module "@rchunk/artifact-tab-content-electron-entry" { export const ArtifactPreviewPanel: typeof import("@rchunk/artifact-tab-content-electron").a; export const ArtifactTabContent: typeof import("@rchunk/artifact-tab-content-electron").a; }
 declare module "@rchunk/open-artifact-side-panel-tab" { export const openArtifactSidePanelTab: (...arguments_: unknown[]) => unknown; export const restoreArtifactSidePanelTab: (...arguments_: unknown[]) => unknown; export const updateArtifactSidePanelTabOriginatingTurn: (...arguments_: unknown[]) => unknown; }
 declare module "@rchunk/pending-image-download" { export const resumePendingCheckoutImageDownload: (options: { hasPaidSubscription: boolean; intl: unknown; signal: AbortSignal }) => Promise<void>; }
-declare module "@rchunk/quick-chat-writing-block-adapter" { export const r: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/quick-chat-writing-block-adapter" { export const n: (props: Record<string, unknown>) => unknown; export const r: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/markdown-writing-block" { export const MarkdownWritingBlock: (props: { className?: string; content: string; onAddSelectedTextToChat?(text: string, range: Range): void; showCopyButton?: boolean }) => unknown; }
 declare module "@rchunk/dil-writing-block" { export const DilWritingBlock: (props: { contentReferenceIndex: number; data: unknown; isStreaming?: boolean; readOnly?: boolean }) => unknown; }
 declare module "@rchunk/composer-annotation-editor" { export const ComposerAnnotationEditor: (props: Record<string, unknown>) => unknown; }
