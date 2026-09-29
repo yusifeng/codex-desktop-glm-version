@@ -17,7 +17,7 @@ import * as esbuild from "esbuild";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS, REWRITTEN } from "./renderer-chunk-manifest.mjs";
+import { CHUNKS, IMPORT_ALIASES, REWRITTEN } from "./renderer-chunk-manifest.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -29,7 +29,7 @@ const chunkImportPlugin = {
   setup(build) {
     build.onResolve({ filter: /^@rchunk\// }, (args) => {
       const name = args.path.slice("@rchunk/".length);
-      const output = CHUNKS[name];
+      const output = CHUNKS[name] ?? IMPORT_ALIASES[name];
       if (output == null) throw new Error(`Unknown renderer chunk referenced as @rchunk/${name}`);
       return { path: `./${output}`, external: true };
     });

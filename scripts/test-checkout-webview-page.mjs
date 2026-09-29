@@ -197,7 +197,7 @@ const mocks = {
     `export const rht=${initializer};`,
     "export const uht=()=>({data:r.state.account,isLoading:r.state.accountLoading});",
   ].join("\n"),
-  surface: [
+  "workspace-webview-surface": [
     "const r=globalThis.__checkoutWebview;",
     `export const n=${initializer};`,
     "export const t=props=>{r.state.surfaceProps=props;return r.node('webview-surface',props)};",
@@ -250,7 +250,7 @@ assert.deepEqual(imports, [
   "rolldown-runtime",
   "app-shared",
   "app-initial",
-  "surface",
+  "workspace-webview-surface",
 ]);
 assert.equal(/\bany\b/.test(source), false);
 assert.equal(

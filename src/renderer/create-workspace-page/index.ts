@@ -39,7 +39,7 @@ import {
   n as initializeBillingPricing,
   t as resolvePricingConfig,
 } from "@rchunk/billing-pricing";
-import "@rchunk/presentation";
+import "@rchunk/create-workspace-presentation";
 import "@rchunk/checkout-session";
 import {
   n as HostedCheckoutPage,

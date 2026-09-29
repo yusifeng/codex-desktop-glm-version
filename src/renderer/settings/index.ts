@@ -4,7 +4,7 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as invitationsChunk from "@rchunk/invitations";
 import * as legacyStudyHoursScheduleChunk from "@rchunk/legacy-study-hours-schedule";
-import * as presentationChunk from "@rchunk/presentation";
+import * as presentationChunk from "@rchunk/settings-parental-presentation";
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as settingsLoadingRowChunk from "@rchunk/settings-loading-row";
 
@@ -712,4 +712,4 @@ function initializeSettings(): void {
 }
 
 initializeSettings();
-export { ChatGptParentalControlsSettings };
+export { ChatGptParentalControlsSettings as n, initializeSettings as t };

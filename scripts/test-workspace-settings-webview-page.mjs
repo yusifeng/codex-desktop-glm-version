@@ -225,7 +225,7 @@ const mocks = {
     `export const n=${initializer};`,
     "export const t=props=>r.nodes('compact-empty-state',props);",
   ].join("\n"),
-  surface: [
+  "workspace-webview-surface": [
     "const runtime=globalThis.__workspaceSettingsWebview;",
     `export const n=${initializer};`,
     "export const t=props=>{runtime.state.surfaceProps=props;return runtime.nodes('webview-surface',props)};",
@@ -279,7 +279,7 @@ assert.deepEqual(imports, [
   "app-shared",
   "app-initial",
   "compact-empty-state",
-  "surface",
+  "workspace-webview-surface",
 ]);
 assert.equal(/\bany\b/.test(source), false);
 assert.equal(

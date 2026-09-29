@@ -73,19 +73,25 @@ function tick() {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-assert.deepEqual(Object.keys(module), ["openPersonaVerification"]); assertions += 1;
+assert.deepEqual(Object.keys(module), ["n", "t"]); assertions += 1;
+const { n: openPersonaVerification, t: initializePersonaVerification } = module;
+assert.equal(typeof openPersonaVerification, "function"); assertions += 1;
+assert.equal(typeof initializePersonaVerification, "function"); assertions += 1;
 assert.equal(state.initialized, 2); assertions += 1;
 assert.deepEqual(
-  [...source.matchAll(/from \"@rchunk\/([^\"]+)\"/g)].map((match) => match[1]),
-  ["app-shared", "app-initial"],
+  [...source.matchAll(/^import(?:\s+[^"\n]+?\s+from)?\s+"@rchunk\/([^"]+)";$/gm)]
+    .map((match) => match[1]),
+  ["rolldown-runtime", "app-shared", "app-initial"],
 ); assertions += 1;
-assert.equal(source.includes('import "@rchunk/rolldown-runtime"'), true); assertions += 1;
-assert.equal(source.includes('import("@rchunk/persona-runtime")'), true); assertions += 1;
+assert.deepEqual(
+  [...source.matchAll(/import\("@rchunk\/([^"]+)"\)/g)].map((match) => match[1]),
+  ["persona-runtime"],
+); assertions += 1;
 assert.equal(/\bany\b/.test(source), false); assertions += 1;
 assert.equal(/\b(?:appSharedChunk|appInitialChunk)\s*\./.test(source), false); assertions += 1;
 
 const received = [];
-const dispose = module.openPersonaVerification({
+const dispose = openPersonaVerification({
   accountId: "account-1",
   onLoad: () => received.push("load"),
   onComplete: () => received.push("complete"),
@@ -106,7 +112,7 @@ dispose();
 check(state.destroyed === 1, "dispose is idempotent");
 
 state.postError = new Error("network down");
-module.openPersonaVerification({
+openPersonaVerification({
   onCancel() {},
   onComplete() {},
   onError: (error) => received.push(error.message),

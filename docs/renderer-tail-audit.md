@@ -49,13 +49,17 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 1045 rewritten / 53 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 1045/2247 tracked、1202 pending，其中
+截至 2026-09-29，尾部审计为 1049 rewritten / 53 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1049/2247 tracked、1198 pending，其中
 terminal 6/6、browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding
-40/40、git-github-worktree 63/63，conversation-thread 100/101，pages-routes 72/92。医疗验证
+40/40、git-github-worktree 63/63，conversation-thread 100/101，pages-routes 76/92。医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入
 `vendor:diagram-mermaid`，不再误算为应用代码。尾部 0 pending 仍不能替代全量覆盖审计。
+
+构建器另维护 `IMPORT_ALIASES`：它只负责把语义源码中的历史依赖别名解析为原始发布
+文件名，用于恢复精确 import 边，不把这些别名加入 `CHUNKS`，因此不会虚增 rewritten
+数量或全量覆盖率。新增别名时仍必须由 `verify-renderer.mjs` 核对最终依赖集合。
 
 注意：`audit-renderer-tail.mjs` 只审计已经登记进 `CHUNKS` 的集合，不能证明
 `docs/renderer-app-chunks.json` 中的 2247 个 app-code 文件已经全部处理。全量覆盖

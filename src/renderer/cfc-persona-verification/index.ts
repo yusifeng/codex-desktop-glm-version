@@ -62,8 +62,12 @@ const {
   rJt: api,
 } = initialRuntime;
 
-initializeNavigation?.();
-initializeChunkLoader?.();
+function initializePersonaVerification(): void {
+  initializeNavigation?.();
+  initializeChunkLoader?.();
+}
+
+initializePersonaVerification();
 
 async function loadPersonaModule(): Promise<PersonaModule> {
   const loader = () => import("@rchunk/persona-runtime") as Promise<PersonaModule>;
@@ -144,4 +148,4 @@ function openPersonaVerification(options: OpenPersonaOptions): () => void {
   return destroy;
 }
 
-export { openPersonaVerification };
+export { openPersonaVerification as n, initializePersonaVerification as t };

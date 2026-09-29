@@ -73,7 +73,8 @@ const mocks = {
   ].join("\n"),
   "cfc-persona-verification": [
     "const s=globalThis.__cfcVerification.state;",
-    "export const openPersonaVerification=options=>{s.personaOptions.push(options);return ()=>{s.personaDisposals+=1}};",
+    "export const n=options=>{s.personaOptions.push(options);return ()=>{s.personaDisposals+=1}};",
+    "export const t=" + initializer + ";",
   ].join("\n"),
 };
 
@@ -130,7 +131,7 @@ function byType(view, type) { return find(view, (item) => item.type === type); }
 function byData(view, key, value) { return find(view, (item) => item.props?.[key] === value); }
 
 assert.deepEqual(Object.keys(module), ["CfcVerificationPage"]); assertions += 1;
-assert.equal(state.initialized, 13); assertions += 1;
+assert.equal(state.initialized, 14); assertions += 1;
 assert.deepEqual([...source.matchAll(/from \"@rchunk\/([^\"]+)\"/g)].map((match) => match[1]), ["app-shared", "app-initial", "messages", "cfc-persona-verification"]); assertions += 1;
 assert.equal(source.includes('import "@rchunk/rolldown-runtime"'), true); assertions += 1;
 assert.equal(/\bany\b/.test(source), false); assertions += 1;

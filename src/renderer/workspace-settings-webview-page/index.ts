@@ -2,7 +2,7 @@ import "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as compactEmptyStateChunk from "@rchunk/compact-empty-state";
-import * as surfaceChunk from "@rchunk/surface";
+import * as surfaceChunk from "@rchunk/workspace-webview-surface";
 
 type LoadState = "failed" | "loading" | "ready";
 

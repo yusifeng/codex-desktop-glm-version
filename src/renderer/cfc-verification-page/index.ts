@@ -156,7 +156,8 @@ const messageRuntime = messagesChunk as unknown as {
   t?: Record<string, { defaultMessage: string; id: string }>;
 };
 const personaRuntime = personaChunk as unknown as {
-  openPersonaVerification(options: PersonaOptions): () => void;
+  n(options: PersonaOptions): () => void;
+  t(): void;
 };
 
 const {
@@ -198,7 +199,7 @@ const {
   xpn: trackAnalytics,
 } = initialRuntime;
 const { n: initializeMessages, t: messages = {} } = messageRuntime;
-const { openPersonaVerification } = personaRuntime;
+const { n: openPersonaVerification, t: initializePersonaVerification } = personaRuntime;
 
 initializeSharedRuntime?.();
 initializeAnalyticsRuntime?.();
@@ -213,6 +214,7 @@ initializeVerificationAnalytics?.();
 initializeAccountQueries?.();
 initializeAuthRuntime?.();
 initializeMessages?.();
+initializePersonaVerification();
 
 const React = getReactRuntime();
 const jsx = getJsxRuntime();

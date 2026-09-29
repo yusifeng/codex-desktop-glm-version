@@ -15301,9 +15301,13 @@ declare module "@rchunk/trusted-contact-settings" {
 declare module "@rchunk/voice-settings" { export const VoiceSettings: () => unknown; }
 declare module "@rchunk/agent-settings" { export const AgentSettings: () => unknown; }
 declare module "@rchunk/billing-settings" { export const ConsumerBillingSettings: () => unknown; }
+declare module "@rchunk/gift-card-redemption-page" { export const GiftCardRedemptionPage: () => unknown; }
+declare module "@rchunk/lighthouse-work-home-page" { export const LighthouseWorkHomePage: () => unknown; }
+declare module "@rchunk/browser-skill-editor" { export const BrowserSkillEditor: () => unknown; }
+declare module "@rchunk/appgen-analytics-page" { export const AppgenAnalyticsPage: () => unknown; }
 declare module "@rchunk/chronicle-settings-page" { export const ComputerHistorySettingsPage: () => unknown; }
 declare module "@rchunk/computer-use-settings" { export const ComputerUseSettings: () => unknown; }
-declare module "@rchunk/settings" { export const ChatGptParentalControlsSettings: () => unknown; }
+declare module "@rchunk/settings" { export const n: () => unknown; export const t: () => void; }
 declare module "@rchunk/settings-page" { export const SettingsPage: () => unknown; }
 declare module "@rchunk/browser-clear-browsing-data-dialog-view";
 declare module "@rchunk/profile";
@@ -15390,14 +15394,18 @@ declare module "@rchunk/hotkey-window-home-page" { export const HotkeyWindowHome
 declare module "@rchunk/login-route" { export const LoginRoute: () => unknown; }
 declare module "@rchunk/standalone-elicitation-page" { export const StandaloneElicitationPage: () => unknown; }
 declare module "@rchunk/cfc-persona-verification" {
-  export const openPersonaVerification: (options: {
+  export const n: (options: {
     accountId?: string | null;
     onCancel(): void;
     onComplete(): void;
     onError(error: Error): void;
     onLoad?(): void;
   }) => () => void;
+  export const t: () => void;
 }
+declare module "@rchunk/settings-parental-presentation";
+declare module "@rchunk/workspace-webview-surface";
+declare module "@rchunk/create-workspace-presentation";
 declare module "@rchunk/cfc-verification-page" { export const CfcVerificationPage: () => unknown; }
 declare module "@rchunk/ads-controls-settings" { export const AdsControlsSettings: () => unknown; }
 declare module "@rchunk/chatgpt-shared-post-page" { export const ChatGptSharedPostPage: () => unknown; }

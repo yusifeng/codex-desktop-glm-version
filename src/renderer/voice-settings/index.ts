@@ -5,6 +5,7 @@ import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as settingsLoadingRowChunk from "@rchunk/settings-loading-row";
 import * as chatgptVoicesQueryChunk from "@rchunk/chatgpt-voices-query";
 import * as spokenLanguageOptionsChunk from "@rchunk/spoken-language-options";
+import "@rchunk/dictionary-dialog";
 
 interface ReactReference<Value> { current: Value }
 interface ReactRuntime {

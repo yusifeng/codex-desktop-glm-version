@@ -23,10 +23,6 @@ const mocks = {
     "export const Rgn={getSnapshot:id=>r.state.snapshots.get(id)??null,subscribeToSessionSnapshot:(id,listener)=>{r.state.subscriptions.push({id,listener});return()=>{r.state.subscriptions.push({id,unsubscribed:true})}}};",
   ].join("\n"),
   "xterm-output-panel": "export const XtermOutputPanel=props=>({type:'xterm-output-panel',props});",
-  "terminal-panel": "export {};",
-  "theme-font-face-loader": "export {};",
-  "theme-font-family": "export {};",
-  "xterm-window-zoom": "export {};",
 };
 const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer/local-conversation-background-terminal-tab/index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "background-terminal-tab-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: module }) => ({ contents: mocks[module] ?? "export {};", loader: "js" })); } }] });
 const module = await import("data:text/javascript;base64," + Buffer.from(result.outputFiles[0].text).toString("base64"));
@@ -39,7 +35,7 @@ function walk(value, output = []) { if (value == null || typeof value !== "objec
 function textContent(value) { if (value == null || typeof value === "boolean") return ""; if (typeof value === "string" || typeof value === "number") return String(value); if (Array.isArray(value)) return value.map(textContent).join(" " ); return textContent(value.props?.children); }
 
 assert.deepEqual(Object.keys(module), ["LocalConversationBackgroundTerminalTab"]);
-assert.deepEqual([...source.matchAll(/@rchunk\/([^"]+)/g)].map((match) => match[1]).sort(), ["app-initial", "app-shared", "rolldown-runtime", "terminal-panel", "theme-font-face-loader", "theme-font-family", "xterm-output-panel", "xterm-window-zoom"].sort());
+assert.deepEqual([...source.matchAll(/@rchunk\/([^"]+)/g)].map((match) => match[1]).sort(), ["app-initial", "app-shared", "rolldown-runtime", "xterm-output-panel"].sort());
 assert.equal(/\b(?:appSharedChunk|appInitialChunk|xtermOutputPanelChunk)\s*\./.test(source), false);
 assert.equal(/\bany\b/.test(source), false);
 assert.equal(state.initialized, 7);

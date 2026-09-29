@@ -29,8 +29,6 @@ import * as onboardingEntrypointChunk from "@rchunk/onboarding-entrypoint";
 import * as chronicleQueriesChunk from "@rchunk/chronicle-service-queries";
 import * as chroniclePermissionsChunk from "@rchunk/chronicle-permissions-dialog";
 import * as rosalindHelixChunk from "@rchunk/rosalind-helix";
-import * as threeCoreChunk from "@rchunk/three.core";
-import * as threeModuleChunk from "@rchunk/three.module";
 
 type StateUpdater<Value> = Value | ((previous: Value) => Value);
 
@@ -138,8 +136,6 @@ const { n: onboardingLoginEntrypointSignal, t: initializeOnboardingEntrypoint } 
 const { n: initializeChronicleQueries } = chronicleQueriesChunk as unknown as { n?: () => void };
 const { n: initializeChroniclePermissions } = chroniclePermissionsChunk as unknown as { n?: () => void };
 const { t: initializeRosalindHelix } = rosalindHelixChunk as unknown as { t?: () => void };
-const { n: initializeThreeCore } = threeCoreChunk as unknown as { n?: () => void };
-const { n: initializeThreeModule } = threeModuleChunk as unknown as { n?: () => void };
 
 initializeSharedRuntime?.();
 initializePrimaryRuntime?.();
@@ -171,8 +167,6 @@ initializeOnboardingEntrypoint?.();
 initializeChronicleQueries?.();
 initializeChroniclePermissions?.();
 initializeRosalindHelix?.();
-initializeThreeCore?.();
-initializeThreeModule?.();
 
 const React = getReactRuntime();
 const jsx = getJsxRuntime();

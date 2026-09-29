@@ -110,7 +110,7 @@ const mocks = {
   ].join("\n"),
   "legacy-study-hours-schedule":
     "export const r=()=>{globalThis.__settingsChunk.state.initialized+=1};",
-  presentation: [
+  "settings-parental-presentation": [
     "const runtime=globalThis.__settingsChunk;",
     "export const a=()=>{runtime.state.initialized+=1};export const u=()=>{runtime.state.initialized+=1};",
     "export const d=(userId,accountId)=>({current:{queryKey:['parental',userId,accountId,'current']},layout:{queryKey:['parental',userId,accountId,'layout']},members:familyId=>({queryKey:['parental',familyId,'members']}),settings:(familyId,memberId)=>({queryKey:['parental',familyId,memberId,'settings']})});",
@@ -175,10 +175,10 @@ function button(view, label) {
 }
 function render() {
   resetHooks();
-  return module.ChatGptParentalControlsSettings();
+  return module.n();
 }
 
-assert.deepEqual(Object.keys(module), ["ChatGptParentalControlsSettings"]);
+assert.deepEqual(Object.keys(module), ["n", "t"]);
 assert.equal(state.initialized, 9);
 assert.deepEqual(
   [...source.matchAll(/import\s+(?:[^;]*?from\s*)?"@rchunk\/([^"]+)"/g)].map(
@@ -189,7 +189,7 @@ assert.deepEqual(
     "app-shared",
     "invitations",
     "legacy-study-hours-schedule",
-    "presentation",
+    "settings-parental-presentation",
     "rolldown-runtime",
     "settings-loading-row",
   ],

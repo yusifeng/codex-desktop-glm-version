@@ -135,7 +135,7 @@ assert.deepEqual(Object.keys(module), ["VoiceSettings"]);
 assert.equal(state.initialized, 7);
 assert.deepEqual(
   [...source.matchAll(/import\s+(?:[^;]*?from\s*)?"@rchunk\/([^"]+)"/g)].map((match) => match[1]),
-  ["rolldown-runtime", "app-shared", "app-initial", "app-primary", "settings-loading-row", "chatgpt-voices-query", "spoken-language-options"],
+  ["rolldown-runtime", "app-shared", "app-initial", "app-primary", "settings-loading-row", "chatgpt-voices-query", "spoken-language-options", "dictionary-dialog"],
 );
 assert.equal(/\b(?:appSharedChunk|appInitialChunk|appPrimaryChunk|settingsLoadingRowChunk|chatgptVoicesQueryChunk|spokenLanguageOptionsChunk)\s*\./.test(source), false);
 assert.equal(/\bany\b/.test(source), false);

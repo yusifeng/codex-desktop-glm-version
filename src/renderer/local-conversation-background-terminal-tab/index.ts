@@ -2,10 +2,6 @@ import "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as xtermOutputPanelChunk from "@rchunk/xterm-output-panel";
-import "@rchunk/terminal-panel";
-import "@rchunk/theme-font-face-loader";
-import "@rchunk/theme-font-family";
-import "@rchunk/xterm-window-zoom";
 
 interface ReactRuntime { useSyncExternalStore<Value>(subscribe: (listener: () => void) => () => void, getSnapshot: () => Value, getServerSnapshot: () => Value): Value }
 interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown }

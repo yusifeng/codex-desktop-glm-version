@@ -1,7 +1,7 @@
 import "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
-import * as surfaceChunk from "@rchunk/surface";
+import * as surfaceChunk from "@rchunk/workspace-webview-surface";
 
 type CheckoutLoadState = "failed" | "loading" | "ready";
 type CheckoutCacheState = "available" | "discarded" | "presented";
