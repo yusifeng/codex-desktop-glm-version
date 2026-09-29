@@ -15428,10 +15428,10 @@ declare module "@rchunk/global-dictation-page" { export const GlobalDictationPag
 declare module "@rchunk/projects-index-page" { export const ProjectsIndexPage: () => unknown; }
 declare module "@rchunk/avatar-overlay-native-page" { export const AvatarOverlayNativePage: () => unknown; }
 declare module "@rchunk/library-page" { export const LibraryPage: () => unknown; }
-declare module "@rchunk/open-library-item";
+declare module "@rchunk/open-library-item" { export const t: () => void; }
 declare module "@rchunk/library-cloud-file-preview-entry";
-declare module "@rchunk/library-note-preview";
-declare module "@rchunk/library-image-preview";
+declare module "@rchunk/library-note-preview" { export const LibraryNotePreview: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/library-image-preview" { export const LibraryImagePreview: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/library-empty-trash";
 declare module "@rchunk/onboarding-route" { export const OnboardingRoute: () => unknown; }
 declare module "@rchunk/meetings-page" { export const MeetingsPage: () => unknown; }
@@ -15547,6 +15547,11 @@ declare module "@rchunk/mermaid-grammar" { const grammar: ReadonlyArray<Record<s
 declare module "@rchunk/mermaid-code-editor" { export const MermaidCodeEditor: (props: { editStateKey: string; initialCode: string; onBlur(): void; onChange(value: string): void }) => unknown; }
 declare module "@rchunk/image" { export const a: () => void; export const i: (props: Record<string, unknown>) => unknown; export const n: (...arguments_: unknown[]) => { height: number; src: string; width: number } | null; export const r: () => void; export const t: (...arguments_: unknown[]) => Promise<string | null>; }
 declare module "@rchunk/mermaid-editable-preview" { export const MermaidEditablePreview: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/artifact-session-tab-content" { export const ArtifactSessionTabContent: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/text-document-preview" { export const ChatGptTextDocumentPreview: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/image-side-panel" { export const a: (props: Record<string, unknown>) => unknown; export const c: (...arguments_: unknown[]) => unknown; export const d: (props: Record<string, unknown>) => unknown; export const f: () => void; export const i: () => void; export const l: (props: Record<string, unknown>) => unknown; export const n: () => void; export const o: () => void; export const r: (props: Record<string, unknown>) => unknown; export const s: () => void; export const t: (props: Record<string, unknown>) => unknown; export const u: () => void; }
+declare module "@rchunk/row" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/panorama-renderer" { export const Viewer: unknown; }
 declare module "@rchunk/binary-classification-metrics" { export const n: () => void; export const t: (...arguments_: unknown[]) => Record<string, unknown>; }
 declare module "@rchunk/chatgpt-video-lightbox" { export const ChatGptVideoLightbox: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/app-initial" {

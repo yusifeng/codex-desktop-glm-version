@@ -10,7 +10,7 @@ const trackedFiles = new Set(Object.values(CHUNKS));
 const appFiles = new Set(Object.values(groups).flat());
 const trackedAppFiles = [...appFiles].filter((file) => trackedFiles.has(file));
 const pendingAppFiles = [...appFiles].filter((file) => !trackedFiles.has(file));
-const priorityGroups = ["composer", "sidebar", "dialogs-menus", "git-github-worktree", "conversation-thread", "home-onboarding", "terminal", "browser", "settings", "pages-routes"];
+const priorityGroups = ["composer", "sidebar", "dialogs-menus", "git-github-worktree", "conversation-thread", "home-onboarding", "terminal", "browser", "settings", "pages-routes", "editor-docs", "artifact-preview", "markdown-render"];
 
 console.log(`${trackedAppFiles.length}/${appFiles.size} classified app-code chunks tracked; ${pendingAppFiles.length} pending`);
 for (const group of priorityGroups) {
