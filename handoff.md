@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1036 个语义 chunk；`verify-renderer` 为 1036/1036。
+- `REWRITTEN`：1039 个语义 chunk；`verify-renderer` 为 1039/1039。
 - `PRESERVED_ASSETS`：53 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,11 +65,11 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1036/2247 tracked、1211 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1039/2247 tracked、1208 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 100/101，pages-routes
-  64/92。
-- `node scripts/audit-app-shared-consumption.mjs`：331 个实际消费导出均有语义
+  67/92。
+- `node scripts/audit-app-shared-consumption.mjs`：332 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
 
@@ -184,6 +184,14 @@ Verify Page 恢复 continuation/offer、三次轮询、成功/失败/账户错�
 resume/create/close 选择、团队 seat/promo checkout 与 token-auth 动态边；Purchase Page 恢复
 plan/credits/identity gate、账户订阅错误、团队 owner/seat、promo/referral 及 hosted/custom checkout。
 专项行为测试 192/192；renderer 1036/1036、main 11/11、tsc 73，pages-routes 64/92。
+
+2026-09-29 已完成 renderer GUI 第十一批：GPT Discovery 恢复 Public/Workspace 视图、
+分类与搜索、creator/directory 分页、详情开聊和 My GPTs gate；Hotkey Window Home 恢复
+workspace/projectless/remote 派生、local/cloud/worktree 模式、environment/branch/permissions、
+composer、pointer、拖拽与浮层感知布局；Login Route 恢复浏览器账号探测/换号、Google/
+Microsoft/signup/API key、可取消登录、链接复制、workspaceRecovery 回跳、错误分类和 Snake
+入口。专项行为测试 122/122；renderer 1039/1039、main 11/11、tsc 73，app-shared 332 个
+消费导出全部语义化，pages-routes 67/92。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、
