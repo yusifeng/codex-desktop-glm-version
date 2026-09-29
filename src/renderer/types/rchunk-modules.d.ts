@@ -15611,6 +15611,7 @@ declare module "@rchunk/math-lazy-runtime" {
   export const t: typeof Math.abs;
   export const u: typeof Math.min;
 }
+declare module "@rchunk/link-layout" { export const TrustedContactLinkLayout: () => unknown; }
 declare module "@rchunk/artifact-tab-content-shell" { export const ArtifactTabContentShell: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/comment-light-dismiss";
 declare module "@rchunk/comment-popup-portal";
