@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1511 个语义 chunk；`verify-renderer` 为 1511/1511。
-- `PRESERVED_ASSETS`：86 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1531 个语义 chunk；`verify-renderer` 为 1531/1531。
+- `PRESERVED_ASSETS`：91 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,7 +65,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1544/2247 tracked、703 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1569/2247 tracked、678 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
@@ -380,9 +380,14 @@ adaptive slider、数学 tokenizer、null guard 与 numerical integration 补齐
 别名和类型声明。三组专项测试共 302 条断言；renderer 1511/1511、tsc 73，
 rpc-bridge 当前 385/410。
 
+2026-09-29 已完成 rpc-bridge 收官：恢复最后 20 个语义模块，两个原纯数据候选经消费者
+审计改判并重写为语义小模块；5 个大型聚合运行时依据真实消费者、副作用与动态依赖
+证据进入 generated preserve 轨道。三组专项测试共 228 条断言；renderer 1531/1531、
+tsc 73，rpc-bridge 达到 410/410。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 rpc-bridge 的
-25 个真实缺口（当前 385/410），完成剩余多依赖教学模型与纯静态模型候选的逐文件收官审计；增量 hub 只在出现真实消费者时拆出
+678 个真实缺口全部位于 misc-ui-utils（当前 275/953）；下一步对该区建立结构化审计并按语义小模块、聚合运行时和 vendor/generated 三轨分批收敛。增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 
