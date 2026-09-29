@@ -2678,6 +2678,7 @@ declare module "@rchunk/app-shared" {
   /** 独立窗口页面的路径编码、Quick Chat 枚举与调试菜单策略。 */
   export const UB: (conversationId: string) => string;
   export const lY: (conversationId: string) => string;
+  export const WB: (conversationId: string) => string;
   export const XN: {
     readonly CODEX_QUICK_CHAT_SURFACE_WINDOW: string;
   };
@@ -8051,6 +8052,9 @@ declare module "@rchunk/browser-address-shortcut" {
     composerId: string;
     placement?: string;
   }) => unknown;
+}
+declare module "@rchunk/site-edit-route" {
+  export const SiteEditRoute: () => null;
 }
 declare module "@rchunk/home-beacon" {
   export interface BeaconMessageIdentity {
