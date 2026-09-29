@@ -4,7 +4,6 @@ import "@rchunk/app-initial";
 import "@rchunk/app-primary";
 import "@rchunk/local-conversation-artifacts-signals";
 import "@rchunk/comment-mode-coachmark-state";
-// @ts-expect-error The annotation host registry alias is registered with this rewrite.
 import "@rchunk/source-annotation-host-registry";
 import "@rchunk/browser-profile-import-availability";
 import "@rchunk/browser-use-origin-state-queries";

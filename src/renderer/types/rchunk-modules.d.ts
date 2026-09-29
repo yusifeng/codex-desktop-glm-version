@@ -15527,7 +15527,27 @@ declare module "@rchunk/format-coordinate" { export const r: () => void; export 
 declare module "@rchunk/hammer-runtime";
 declare module "@rchunk/chartjs-plugin-zoom";
 declare module "@rchunk/interactive-chart" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/pane-layout" { export const n: (slots: unknown, parts: unknown) => unknown; export const t: () => void; }
+declare module "@rchunk/artifact-tab-content-shell" { export const ArtifactTabContentShell: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/comment-light-dismiss";
+declare module "@rchunk/comment-popup-portal";
+declare module "@rchunk/source-annotation-host-registry" { export const a: (browserTabId: string, conversationId: string, listener: () => void) => () => void; export const i: (browserTabId: string, conversationId: string, callback: () => boolean) => () => void; export const n: () => void; export const r: (browserTabId: string, conversationId: string) => boolean; export const t: (browserTabId: string, conversationId: string) => boolean; }
+declare module "@rchunk/selected-text-annotation-editor" { export const SelectedTextAnnotationEditor: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/detached-browser-annotation-host" { export const DetachedBrowserAnnotationHost: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/pierre-file-editor" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/pierre-editor-runtime" { export const n: () => void; export const t: new (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/mermaid-grammar" { const grammar: ReadonlyArray<Record<string, unknown>>; export default grammar; }
+declare module "@rchunk/mermaid-code-editor" { export const MermaidCodeEditor: (props: { editStateKey: string; initialCode: string; onBlur(): void; onChange(value: string): void }) => unknown; }
+declare module "@rchunk/image" { export const a: () => void; export const i: (props: Record<string, unknown>) => unknown; export const n: (...arguments_: unknown[]) => { height: number; src: string; width: number } | null; export const r: () => void; export const t: (...arguments_: unknown[]) => Promise<string | null>; }
+declare module "@rchunk/mermaid-editable-preview" { export const MermaidEditablePreview: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/binary-classification-metrics" { export const n: () => void; export const t: (...arguments_: unknown[]) => Record<string, unknown>; }
+declare module "@rchunk/chatgpt-video-lightbox" { export const ChatGptVideoLightbox: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/app-initial" {
+  export const Y_n: (languageId: string, load: () => Promise<unknown>) => void;
+  export const Nat: (props: Record<string, unknown>) => unknown;
+  export const Pat: () => void;
+  export const Trt: () => void;
+  export const wrt: (props: Record<string, unknown>) => unknown;
   export const TGt: (...arguments_: unknown[]) => Promise<Blob>;
   export const jGt: () => void;
   export const Glt: (...arguments_: unknown[]) => unknown;
@@ -15538,6 +15558,7 @@ declare module "@rchunk/app-initial" {
 }
 
 declare module "@rchunk/app-shared" {
+  export const ck: () => { danger(message: string, options?: Record<string, unknown>): void };
   export const d0: () => void;
   export const f0: { current: boolean };
   export const m0: { current: boolean };

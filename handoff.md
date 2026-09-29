@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1120 个语义 chunk；`verify-renderer` 为 1120/1120。
+- `REWRITTEN`：1128 个语义 chunk；`verify-renderer` 为 1128/1128。
 - `PRESERVED_ASSETS`：63 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,13 +65,13 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1130/2247 tracked、1117 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1138/2247 tracked、1109 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
   hooks 24/24、skills-plugins-mcp 30/30、panels 20/20、charts-ui 17/17 已收官；
-  editor-docs 为 34/42，artifact-preview 为 43/53。
-- `node scripts/audit-app-shared-consumption.mjs`：340 个实际消费导出均有语义
+  editor-docs 为 38/42，artifact-preview 为 47/53。
+- `node scripts/audit-app-shared-consumption.mjs`：341 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
 
@@ -281,6 +281,12 @@ reference 与 interactive chart，覆盖图表解析、表格/TSV、PNG 下载�
 artifact preview 初始化/重导出入口。四个 75–171B 的 editor worker/entry 转发壳经审计
 登记为 generated/worker 保留资产。专项断言 195 条；renderer 1120/1120、tsc 73，
 charts-ui 达到 17/17，editor-docs 34/42，artifact-preview 43/53。
+
+2026-09-29 已继续推进 editor-docs/artifact-preview：恢复 artifact tab shell、selected
+text annotation editor、detached browser annotation host、source annotation registry、
+Mermaid code editor、binary classification metrics、video lightbox 与 Mermaid preview core。
+专项断言 213 条；renderer 1128/1128、tsc 73，app-shared 消费声明 341/341。
+editor-docs 达到 38/42，artifact-preview 达到 47/53。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 editor-docs 与
