@@ -15449,3 +15449,11 @@ declare module "@rchunk/chatgpt-project-home-page" { export const ChatGptProject
 declare module "@rchunk/usage-analytics-settings";
 declare module "@rchunk/consumer-view-settings";
 declare module "@rchunk/usd";
+declare module "@rchunk/deep-research-fill" { const DeepResearchFill: (props?: Record<string, unknown>) => unknown; export default DeepResearchFill; }
+declare module "@rchunk/regex-search-worker";
+declare module "@rchunk/pca-connector-action-entry" { export const resumeChatGptPcaConnectorBeaconAction: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/members-filled" { const MembersFilled: (props?: Record<string, unknown>) => unknown; export default MembersFilled; }
+declare module "@rchunk/thread-side-panel-tab-content" { export const ReviewThreadSidePanelTab: (props?: Record<string, unknown>) => unknown; }
+declare module "@rchunk/review-thread-file-diff";
+declare module "@rchunk/review-thread-pull-request-revision-queries";
+declare module "@rchunk/review-thread-pull-request-code-review" { export const PullRequestCodeReview: (props: { baseBranch?: string | null; headBranch?: string | null; headRevision?: string | null; request?: unknown }) => unknown; }

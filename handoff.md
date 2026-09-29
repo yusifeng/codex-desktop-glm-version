@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1065 个语义 chunk；`verify-renderer` 为 1065/1065。
+- `REWRITTEN`：1070 个语义 chunk；`verify-renderer` 为 1070/1070。
 - `PRESERVED_ASSETS`：53 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,9 +65,9 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1065/2247 tracked、1182 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1070/2247 tracked、1177 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
-  git-github-worktree 63/63 已覆盖；conversation-thread 当前 100/101，pages-routes
+  git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92。
 - `node scripts/audit-app-shared-consumption.mjs`：332 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
@@ -240,6 +240,14 @@ Dashboard/Chats/Accounts/Transactions、敏感值、记忆和实体侧栏；Heal
 Chats/Sources、项目操作和五类懒对话框；Workspace Agent Builder 恢复 apps/model/capabilities、
 starter prompts、版本历史、Slack、草稿保存/发布/删除与权限。专项行为测试 353/353；renderer
 1065/1065、main 11/11、tsc 73，pages-routes 92/92。
+
+2026-09-29 已完成 renderer 小簇收口批次：Review Thread Side Panel 恢复 PR/branch/last-turn/
+uncommitted/staged/committed 来源、Git 初始化、stage/unstage/revert、文件导航搜索、刷新、命令
+复制和 large-diff 模式，使 conversation-thread 达到 101/101；Deep Research Fill 与
+Members Filled 恢复原 SVG 与 props 覆盖；Regex Search Worker 恢复全局正则、匹配上限和
+LaTeX 命令/分组范围处理，使 search-command-menu 达到 5/5；PCA Connector Action Entry
+恢复 eager 初始化与 action 重导出，使 connectors 达到 5/5。专项测试 129/129；renderer
+1070/1070、main 11/11、tsc 73。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、
