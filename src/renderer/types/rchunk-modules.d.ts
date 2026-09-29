@@ -8056,6 +8056,23 @@ declare module "@rchunk/browser-address-shortcut" {
 declare module "@rchunk/site-edit-route" {
   export const SiteEditRoute: () => null;
 }
+declare module "@rchunk/site-preview" {
+  export interface SitePreviewResource extends Record<string, unknown> {
+    currentLiveUrl?: string | null;
+    projectId: string;
+    publishedRevision?: number | string | null;
+    title?: string | null;
+    url?: string | null;
+  }
+  export interface SitePreviewControls {
+    confirmAction(action: () => void): boolean;
+  }
+  export const SitePreview: (props: {
+    controlsRef?: import("@rchunk/app-shared").ReactRef<SitePreviewControls | null>;
+    onClose(): void;
+    resource: SitePreviewResource;
+  }) => unknown;
+}
 declare module "@rchunk/home-beacon" {
   export interface BeaconMessageIdentity {
     conversationId: string;
