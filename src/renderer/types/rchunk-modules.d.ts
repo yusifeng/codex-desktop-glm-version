@@ -14898,7 +14898,7 @@ declare module "@rchunk/artifact-annotation-batch-controls" { export interface A
 declare module "@rchunk/artifact-annotation-comment" { export interface ArtifactAnnotationComment extends Record<string, unknown> { localArtifactAnnotationContext?: { annotationId?: string; artifactKind: "document" | "presentation" | "site" | "spreadsheet"; label?: string; path: string }; localArtifactAnnotationMetadata?: { target?: Record<string, unknown> & { type: string } }; position: { line: number }; text?: string } export const a: (input: { currentComments: ArtifactAnnotationComment[]; path: string; previousComments: ArtifactAnnotationComment[] }) => string[]; export const i: (comments: ArtifactAnnotationComment[]) => Array<Record<string, unknown>>; export const n: (comments: ArtifactAnnotationComment[], path: string) => ArtifactAnnotationComment[]; export const o: () => void; export const r: (comments: ArtifactAnnotationComment[]) => number; export const s: (comments: ArtifactAnnotationComment[], path: string) => ArtifactAnnotationComment[]; export const t: (input: Record<string, unknown>) => ArtifactAnnotationComment | undefined }
 declare module "@rchunk/artifact-preview-status" { export const n: (status: string) => unknown; export const t: () => void }
 declare module "@rchunk/artifact-preview-zoom" { export const a: (x1: number, y1: number, x2: number, y2: number) => number; export const i: (zoomPercent: number, wheelDelta: number) => number; export const n: (value: number) => number; export const o: () => void; export const r: (input: { initialDistance: number; initialZoomPercent: number; nextDistance: number }) => number; export const t: readonly number[] }
-declare module "@rchunk/artifact-tab-content-electron" { export interface ArtifactTabContentProps { annotations?: Array<{ id: string; prompt?: string }>; content?: unknown; error?: string | null; isLoading?: boolean; kind?: "document" | "presentation" | "site" | "spreadsheet" | "text"; status?: string; title?: string; version?: string | null; onClose?(): void; onDownload?(): void; onRequestEdit?(prompt: string): void; onRetry?(): void } export const a: (props: ArtifactTabContentProps) => unknown; export const i: typeof a; export const n: typeof a; export const o: typeof a; export const r: typeof a; export const s: typeof a; export const t: typeof a; }
+declare module "@rchunk/artifact-tab-content-electron" { export interface ArtifactTabContentProps { annotations?: Array<{ id: string; prompt?: string }>; content?: unknown; error?: string | null; isLoading?: boolean; kind?: "document" | "presentation" | "site" | "spreadsheet" | "text"; status?: string; title?: string; version?: string | null; onClose?(): void; onDownload?(): void; onRequestEdit?(prompt: string): void; onRetry?(): void } export const a: (props: ArtifactTabContentProps) => unknown; export const i: typeof a; export const n: typeof a; export const o: typeof a; export const r: () => void; export const s: typeof a; export const t: typeof a; }
 declare module "@rchunk/app-connect-availability" { export interface AppConnectAvailabilityInput { appId: string; availableAppIds?: Iterable<string>; companionConnectorIds: string[]; connectors?: Array<{ id: string; [key: string]: unknown }>; getLink?(id: string): Promise<unknown>; primaryLink?: unknown } export const i: (input: AppConnectAvailabilityInput) => Promise<Array<{ id: string; [key: string]: unknown }>>; export const n: typeof i; export const r: () => void; export const t: () => void }
 declare module "@rchunk/cloud-file-preview" { export const t: () => void }
 declare module "@rchunk/editor-header" { export interface EditorHeaderControls { annotationControl?: unknown; commentsControl?: unknown; editingControls?: unknown; navigationControl?: unknown; supplementalActions?: unknown; zoomControl?: unknown } export const n: (props: { onOpenChange(open: boolean): void; open: boolean }) => unknown; export const r: () => void; export const t: (props: { actions?: unknown; annotationControlPlacement?: "editing" | "review"; commentsControl?: unknown; contentFade?: boolean; controls: EditorHeaderControls; downloadControl?: unknown; downloadPending?: boolean; onClose?(): void; onDownload?(): void; onShare?(): void; tabId?: string; title?: unknown }) => unknown }
@@ -15497,13 +15497,45 @@ declare module "@rchunk/source-toolbar" { export const createBrowserWindowToolba
 declare module "@rchunk/plugin-installation-content" { export const PluginInstallationContent: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/linear";
 declare module "@rchunk/i18n";
-declare module "@rchunk/bar-sizing";
+declare module "@rchunk/bar-sizing" { export const a: () => void; export const n: (...arguments_: unknown[]) => Record<string, unknown>; }
 declare module "@rchunk/build-graph-data" { export const a: () => void; export const c: number; export const i: (...arguments_: unknown[]) => number | null; export const l: number; export const n: (...arguments_: unknown[]) => number; export const o: { width: number; height: number; padding: number }; export const r: (...arguments_: unknown[]) => Record<string, number[]>; export const s: { width: number; height: number; padding: number }; export const t: (...arguments_: unknown[]) => unknown; export const u: () => void; }
 declare module "@rchunk/PieChart" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/chart-indicator" { export const EpicChartIndicator: (props: { conversationId: string }) => unknown; }
 declare module "@rchunk/chart" { export const ChartWidget: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/mcp-server-elicitation-request-panel" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/pending-request-item-panel" { export const PendingRequestItemPanel: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/chatgpt-mermaid-preview-core" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/chatgpt-content-reference-file-download" { export const fetchChatGptFileBlob: (...arguments_: unknown[]) => Promise<Blob>; }
+declare module "@rchunk/chatgpt-mermaid-preview-entry" { export const ChatGptMermaidPreview: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/chatgpt-image-lightbox-entry" { export const ChatGptImageLightbox: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/library-cloud-file-preview-entry" { export const LibraryCloudFilePreview: import("@rchunk/library-cloud-file-preview").LibraryCloudFilePreviewComponent; }
+declare module "@rchunk/artifact-tab-content-electron-entry" { export const ArtifactPreviewPanel: typeof import("@rchunk/artifact-tab-content-electron").a; export const ArtifactTabContent: typeof import("@rchunk/artifact-tab-content-electron").a; }
+declare module "@rchunk/open-artifact-side-panel-tab" { export const openArtifactSidePanelTab: (...arguments_: unknown[]) => unknown; export const restoreArtifactSidePanelTab: (...arguments_: unknown[]) => unknown; export const updateArtifactSidePanelTabOriginatingTurn: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/pending-image-download" { export const resumePendingCheckoutImageDownload: (options: { hasPaidSubscription: boolean; intl: unknown; signal: AbortSignal }) => Promise<void>; }
+declare module "@rchunk/quick-chat-writing-block-adapter" { export const r: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/markdown-writing-block" { export const MarkdownWritingBlock: (props: { className?: string; content: string; onAddSelectedTextToChat?(text: string, range: Range): void; showCopyButton?: boolean }) => unknown; }
+declare module "@rchunk/dil-writing-block" { export const DilWritingBlock: (props: { contentReferenceIndex: number; data: unknown; isStreaming?: boolean; readOnly?: boolean }) => unknown; }
+declare module "@rchunk/composer-annotation-editor" { export const ComposerAnnotationEditor: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/dom-to-blob" { export const domToBlob: (node: HTMLElement, options?: Record<string, unknown>) => Promise<Blob>; }
+declare module "@rchunk/chart-content-reference" { export const ChatGptChartContentReference: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/render-cache-key" { export const r: () => void; export const t: (...arguments_: unknown[]) => string; }
+declare module "@rchunk/learning-block-pointer-label" { export const u: () => void; }
+declare module "@rchunk/chartjs-dataset-helpers";
+declare module "@rchunk/color-roles" { export const r: () => void; }
+declare module "@rchunk/interactive-sampling" { export const r: () => void; export const t: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/format-coordinate" { export const r: () => void; export const t: (...arguments_: unknown[]) => string; }
+declare module "@rchunk/hammer-runtime";
+declare module "@rchunk/chartjs-plugin-zoom";
+declare module "@rchunk/interactive-chart" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/app-initial" {
+  export const TGt: (...arguments_: unknown[]) => Promise<Blob>;
+  export const jGt: () => void;
+  export const Glt: (...arguments_: unknown[]) => unknown;
+  export const Wlt: (...arguments_: unknown[]) => unknown;
+  export const GGt: () => void;
+  export const HGt: () => void;
+  export const krt: () => void;
+}
 
 declare module "@rchunk/app-shared" {
   export const d0: () => void;
