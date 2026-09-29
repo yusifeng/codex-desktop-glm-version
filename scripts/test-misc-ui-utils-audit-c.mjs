@@ -2,14 +2,15 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS } from "./renderer-chunk-manifest.mjs";
 
 const scriptsDir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(scriptsDir, "..");
 const inventory = JSON.parse(fs.readFileSync(path.join(root, "docs/renderer-app-chunks.json"), "utf8"));
 const audit = JSON.parse(fs.readFileSync(path.join(root, "docs/misc-ui-utils-audit-c.json"), "utf8"));
-const tracked = new Set(Object.values(CHUNKS));
-const expectedFiles = inventory["misc-ui-utils"].filter((file) => !tracked.has(file)).slice(452, 678);
+const auditA = JSON.parse(fs.readFileSync(path.join(root, "docs/misc-ui-utils-audit-a.json"), "utf8"));
+const auditB = JSON.parse(fs.readFileSync(path.join(root, "docs/misc-ui-utils-audit-b.json"), "utf8"));
+const auditedFiles = new Set([...auditA.entries, ...auditB, ...audit.entries].map(({ file }) => file));
+const expectedFiles = inventory["misc-ui-utils"].filter((file) => auditedFiles.has(file)).slice(452, 678);
 const classifications = new Set(["semantic-small", "semantic-business-logic", "aggregation-runtime", "generated-icon-or-data", "vendor-generated-preserve"]);
 const actions = new Set(["rewrite", "preserve", "incremental-hub", "further-consumer-audit"]);
 

@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS } from "./renderer-chunk-manifest.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceList = JSON.parse(
@@ -11,10 +10,10 @@ const sourceList = JSON.parse(
 const audit = JSON.parse(
   fs.readFileSync(path.join(root, "docs/misc-ui-utils-audit-a.json"), "utf8"),
 );
-const tracked = new Set(Object.values(CHUNKS));
-const expectedFiles = sourceList["misc-ui-utils"]
-  .filter((file) => !tracked.has(file))
-  .slice(0, 226);
+const auditB = JSON.parse(fs.readFileSync(path.join(root, "docs/misc-ui-utils-audit-b.json"), "utf8"));
+const auditC = JSON.parse(fs.readFileSync(path.join(root, "docs/misc-ui-utils-audit-c.json"), "utf8"));
+const auditedFiles = new Set([...audit.entries, ...auditB, ...auditC.entries].map(({ file }) => file));
+const expectedFiles = sourceList["misc-ui-utils"].filter((file) => auditedFiles.has(file)).slice(0, 226);
 const requiredFields = [
   "file",
   "bytes",

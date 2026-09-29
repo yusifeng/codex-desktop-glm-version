@@ -2,13 +2,14 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS } from "./renderer-chunk-manifest.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const catalog = JSON.parse(fs.readFileSync(path.join(ROOT, "docs/renderer-app-chunks.json"), "utf8"))["misc-ui-utils"];
 const audit = JSON.parse(fs.readFileSync(path.join(ROOT, "docs/misc-ui-utils-audit-b.json"), "utf8"));
-const tracked = new Set(Object.values(CHUNKS));
-const expected = catalog.filter(file => !tracked.has(file)).slice(226, 452);
+const auditA = JSON.parse(fs.readFileSync(path.join(ROOT, "docs/misc-ui-utils-audit-a.json"), "utf8"));
+const auditC = JSON.parse(fs.readFileSync(path.join(ROOT, "docs/misc-ui-utils-audit-c.json"), "utf8"));
+const auditedFiles = new Set([...auditA.entries, ...audit, ...auditC.entries].map(({ file }) => file));
+const expected = catalog.filter(file => auditedFiles.has(file)).slice(226, 452);
 const fields = ["file", "bytes", "imports", "dynamicImports", "exports", "classification", "semantic", "action", "reason"];
 const classifications = new Set(["semantic-small", "semantic-business-logic", "aggregation-runtime", "generated-icon-or-data", "vendor-generated-preserve"]);
 const actions = new Set(["rewrite", "preserve", "incremental-hub", "further-consumer-audit"]);

@@ -49,8 +49,8 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 1531 rewritten / 91 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 1569/2247 tracked、678 pending，其中
+截至 2026-09-29，尾部审计为 1561 rewritten / 91 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1599/2247 tracked、648 pending，其中
 terminal 6/6、browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding
 40/40、git-github-worktree 63/63，conversation-thread 101/101，pages-routes 92/92；
 animations 7/7、observability-cloud 8/8、auth-profile 13/13、hooks 24/24、
@@ -127,9 +127,12 @@ rpc-bridge 收官批次恢复最后 20 个语义模块，覆盖排序、几何�
 misc-ui-utils 已完成 678 个缺口的三分区结构化审计，并由全局验证器证明原顺序覆盖、
 无重复、无遗漏。分类为 semantic-small 274、semantic-business-logic 66、
 aggregation-runtime 123、generated-icon-or-data 161、vendor-generated-preserve 54；
-建议动作分为 rewrite 314、preserve 215、incremental-hub 110、进一步消费者审计 39。
-下一阶段从高消费者基础工具和明确生成资产两端并行收敛，不按图标或文件名前缀批量
-登记。
+首批已恢复 30 个 rewrite 模块，覆盖 Mermaid railroad/radar/packet/treemap 初始化包装器、
+stable callback、空值与计划事件工具，以及 18 个教学模型和 template 入口。三组专项
+测试共 198 条断言，既有 Hook 回归另有 42 条断言；renderer 1561/1561、tsc 73，
+misc-ui-utils 当前 305/953 tracked、648 pending。剩余动作分布为 rewrite 284、
+preserve 215、incremental-hub 110、进一步消费者审计 39。下一阶段继续从高消费者基础
+工具和明确生成资产两端并行收敛，不按图标或文件名前缀批量登记。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入

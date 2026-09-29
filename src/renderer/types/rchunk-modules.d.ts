@@ -15622,6 +15622,16 @@ declare module "@rchunk/learning-model-selection-process" {
 declare module "@rchunk/tokenize-math-block" { export const n: () => void; export const r: (source: string) => unknown; export const t: (expression: unknown) => string[]; }
 declare module "@rchunk/null-throws" { export const n: () => void; export const t: <T>(value: T | null | undefined) => T; }
 declare module "@rchunk/numerical-integration" { export const n: (source: string) => { hasUnsupportedLetter: boolean; integrand: string }; export const t: () => void; }
+declare module "@rchunk/chunk-KEIR6QF5" { export const w: () => void; }
+declare module "@rchunk/chunk-BIQX33UG" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-QBLGF6JB" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-EMLP6XTP" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-R7FJI6CG" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-5TONJI2A" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-CQNSW5MT" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-JG7HCLWE" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-5HE753X5" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
+declare module "@rchunk/chunk-U6XO7XAA" { export const n: (...arguments_: unknown[]) => unknown; export const r: () => void; }
 declare module "@rchunk/chatgpt-video-lightbox" { export const ChatGptVideoLightbox: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/app-initial" {
   export const Y_n: (languageId: string, load: () => Promise<unknown>) => void;

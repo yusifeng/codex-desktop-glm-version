@@ -10,8 +10,10 @@ const readEntries = (suffix) => {
 
 const catalog = JSON.parse(fs.readFileSync("docs/renderer-app-chunks.json", "utf8"));
 const trackedFiles = new Set(Object.values(CHUNKS));
-const expectedFiles = catalog["misc-ui-utils"].filter((file) => !trackedFiles.has(file));
 const entries = ["a", "b", "c"].flatMap(readEntries);
+const auditedFiles = new Set(entries.map(({ file }) => file));
+const expectedFiles = catalog["misc-ui-utils"].filter((file) => auditedFiles.has(file));
+const currentPendingFiles = catalog["misc-ui-utils"].filter((file) => !trackedFiles.has(file));
 const allowedClassifications = new Set([
   "semantic-small",
   "semantic-business-logic",
@@ -24,6 +26,7 @@ const allowedActions = new Set(["rewrite", "preserve", "incremental-hub", "furth
 assert.equal(entries.length, 678);
 assert.equal(new Set(entries.map(({ file }) => file)).size, entries.length);
 assert.deepEqual(entries.map(({ file }) => file), expectedFiles);
+assert.ok(currentPendingFiles.every((file) => auditedFiles.has(file)), "current pending files must remain inside the audited baseline");
 for (const entry of entries) {
   assert.ok(allowedClassifications.has(entry.classification), `${entry.file}: classification`);
   assert.ok(allowedActions.has(entry.action), `${entry.file}: action`);
