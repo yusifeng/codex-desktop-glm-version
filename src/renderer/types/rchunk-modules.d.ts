@@ -8073,6 +8073,10 @@ declare module "@rchunk/site-preview" {
     resource: SitePreviewResource;
   }) => unknown;
 }
+declare module "@rchunk/browser-use-settings" {
+  export const BrowserUseSettings: () => unknown;
+}
+declare module "@rchunk/settings-plugin-selection";
 declare module "@rchunk/home-beacon" {
   export interface BeaconMessageIdentity {
     conversationId: string;
