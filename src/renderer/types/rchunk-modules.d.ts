@@ -6153,6 +6153,78 @@ declare module "@rchunk/mark-session-create" {
   export const t: (scope: unknown, options?: { resetTimings?: boolean }) => void;
 }
 declare module "@rchunk/terminal-panel-bootstrap" { export const t: () => void; }
+declare module "@rchunk/xterm-window-zoom" {}
+declare module "@rchunk/app-initial" {
+  export interface TerminalSnapshot {
+    error?: unknown;
+    output?: string;
+    shell?: string;
+    title?: string;
+  }
+  export interface TerminalWorkspaceBinding {
+    environmentId?: string | null;
+    workspaceRoot?: string | null;
+  }
+  export interface ConversationTerminalSnapshot {
+    cwdBySessionId?: Record<string, string>;
+    sessionIds: readonly string[];
+  }
+  export interface TerminalSessionManager {
+    close?(sessionId: string): void;
+    create(options: Record<string, unknown>): string;
+    getConversationSnapshot?(conversationId: string): ConversationTerminalSnapshot | null;
+    getShellCwd?(sessionId: string, workspaceRoot: string): Promise<string | null>;
+    getSnapshot?(sessionId: string): TerminalSnapshot | null | undefined;
+    getWorkspaceBinding?(sessionId: string): TerminalWorkspaceBinding | null;
+    hasUserInteraction?(sessionId: string): boolean;
+    isSessionAttached?(sessionId: string): boolean;
+    isSessionStarted?(sessionId: string): boolean;
+    recordUserInteraction?(sessionId: string): void;
+    register?(sessionId: string, handlers: {
+      getRenderedOutput(): string;
+      onAttach(): void;
+      onClearActive(): void;
+      onData(data: string): void;
+      onInitLog(data: string): void;
+    }): () => void;
+    subscribeToConversation?(conversationId: string, listener: () => void): () => void;
+    subscribeToSessionSnapshot?(sessionId: string, listener: () => void): () => void;
+    write(sessionId: string, data: string, source: "terminal-generated" | "user"): void;
+  }
+  export const Rgn: TerminalSessionManager;
+  export const jet: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/terminal-panel" {
+  export interface TerminalPanelProps {
+    conversationId: string;
+    conversationTitle: string;
+    cwd?: string | null;
+    environmentId?: string | null;
+    hostId?: string | null;
+    initialPromptHint?: unknown;
+    loadingOverlay?: unknown;
+    onKeyEvent?: (event: KeyboardEvent) => boolean | void;
+    onNewTerminalTab?: () => void;
+    sessionId?: string;
+    workspaceRoot?: string | null;
+  }
+  export const TerminalPanel: (props: TerminalPanelProps) => unknown;
+}
+declare module "@rchunk/terminal-tab" {
+  export interface TerminalTabProps {
+    conversationId: string;
+    conversationTitle: string;
+    cwd?: string | null;
+    currentWorkspaceRoot?: string | null;
+    environmentId?: string | null;
+    hostId: string;
+    onNewTerminalTab(value?: unknown): void;
+    renderSlots(slots: { content: unknown; headerRows: readonly unknown[] }): unknown;
+    sessionId: string;
+    workspaceRoots?: readonly string[];
+  }
+  export const TerminalTab: (props: TerminalTabProps) => unknown;
+}
 declare module "@rchunk/terminal-thumbnail" {
   export interface TerminalOutputSpan { style?: Record<string, string | number>; text: string }
   export const n: () => void;

@@ -41,9 +41,13 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 当前 browser voice availability 只消费 `dt/ft/n/r/t`，因此仅为这五个符号提供
 精确声明，禁止为了提高重写数量复制 138KB 的未消费聚合实现。
 
-截至 2026-09-29，尾部审计为 979 rewritten / 50 preserved / 10 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 977/2250 tracked、1273 pending，其中
-terminal 4/6、browser 14/19。尾部 0 pending 仍不能替代全量覆盖审计。
+`xterm-window-zoom` 是 terminal panel 的第三方终端聚合边界，当前语义源码只需要
+它的副作用初始化，不直接消费压缩导出。因此它与其他构建聚合包一样登记为
+incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
+
+截至 2026-09-29，尾部审计为 981 rewritten / 50 preserved / 11 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 980/2250 tracked、1270 pending，其中
+terminal 6/6、browser 14/19。尾部 0 pending 仍不能替代全量覆盖审计。
 
 注意：`audit-renderer-tail.mjs` 只审计已经登记进 `CHUNKS` 的集合，不能证明
 `docs/renderer-app-chunks.json` 中的 2250 个 app-code 文件已经全部处理。全量覆盖
