@@ -15388,3 +15388,4 @@ declare module "@rchunk/purchase-page" {
 declare module "@rchunk/gpt-discovery-page" { export const GptDiscoveryPage: () => unknown; }
 declare module "@rchunk/hotkey-window-home-page" { export const HotkeyWindowHomePage: () => unknown; }
 declare module "@rchunk/login-route" { export const LoginRoute: () => unknown; }
+declare module "@rchunk/standalone-elicitation-page" { export const StandaloneElicitationPage: () => unknown; }
