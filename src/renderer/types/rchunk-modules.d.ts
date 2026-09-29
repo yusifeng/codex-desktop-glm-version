@@ -15471,11 +15471,36 @@ declare module "@rchunk/chatgpt-token-auth-browser";
 declare module "@rchunk/plan-tab-content" { export const PlanSidePanelTabContent: (props?: Record<string, unknown>) => unknown; }
 declare module "@rchunk/browser-extension-profile-state" { export const n: () => void; export const r: () => Promise<void>; export const t: unknown; }
 declare module "@rchunk/browser-extension-profile-state-entry" { export const initializeBrowserExtensionProfile: () => Promise<void>; }
+declare module "@rchunk/bar-chart-fill" { const BarChartFill: (props?: Record<string, unknown>) => unknown; export default BarChartFill; }
+declare module "@rchunk/chart-colors" { export const n: () => void; export const t: (options: { chatTheme: unknown; colorCount: number; isDarkMode: boolean }) => string[]; }
+declare module "@rchunk/use-external-agent-import-setup-actions" {
+  export const a: (props: Record<string, unknown>) => unknown;
+  export const i: (props: Record<string, unknown>) => unknown;
+  export const n: (options: Record<string, unknown>) => Record<string, unknown>;
+  export const o: () => void;
+  export const r: (props: Record<string, unknown>) => unknown;
+  export const t: () => void;
+}
+declare module "@rchunk/open-text-file-editor-side-panel-tab-electron" { export const openTextFileEditorSidePanelTab: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/panel-tabs" { export const getConversationBrowserTabIdsForTransfer: (...arguments_: unknown[]) => unknown; export const getLastFocusedBrowserTabId: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/control-panel" { export const a: () => void; export const i: (props?: Record<string, unknown>) => unknown; export const n: (props?: Record<string, unknown>) => unknown; export const r: (props?: Record<string, unknown>) => unknown; export const t: (props?: Record<string, unknown>) => unknown; }
+declare module "@rchunk/side-panel-tab-frame" { export const McpExtensionSidePanelTabFrame: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/panel-visibility" { export const n: (scope: unknown, options: Record<string, unknown>) => unknown; export const t: () => void; }
+declare module "@rchunk/plan-side-panel-entry" { export const activePlan$: unknown; export const editablePlanByKey$: unknown; export const editablePlanContentByKey$: unknown; export const openPlanSidePanel: (...arguments_: unknown[]) => unknown; export const openReadOnlyPlanSidePanel: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/xterm-output-panel" { export const XtermOutputPanel: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/cloud-browser-side-panel" { export const ChatGptCloudBrowserSidePanel: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/plugin" { export const getMcpExtensionContextMenuItems: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/legacy-video-plugins" { export const loadLegacyVideoPlugins: (target: { _plugins?: unknown }) => Promise<void>; }
+declare module "@rchunk/gpt-create-plugin-prompt" { export const GptCreatePluginPrompt: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/tweaks-toolbar-view" { export const a: (props?: Record<string, unknown>) => unknown; export const c: () => void; export const i: () => void; export const l: (event: unknown) => void; export const n: () => void; export const o: () => void; export const r: (props?: Record<string, unknown>) => unknown; export const s: (props?: Record<string, unknown>) => unknown; export const t: (props?: Record<string, unknown>) => unknown; export const u: () => void; }
+declare module "@rchunk/source-toolbar" { export const createBrowserWindowToolbarContribution: (...arguments_: unknown[]) => unknown; }
+declare module "@rchunk/plugin-installation-content" { export const PluginInstallationContent: (props: Record<string, unknown>) => unknown; }
 
 declare module "@rchunk/app-shared" {
   export const d0: () => void;
   export const f0: { current: boolean };
   export const m0: { current: boolean };
+  export const p4: () => void;
   export const p0: () => void;
   export const u0: () => void;
 }
