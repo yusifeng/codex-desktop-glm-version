@@ -15495,6 +15495,15 @@ declare module "@rchunk/gpt-create-plugin-prompt" { export const GptCreatePlugin
 declare module "@rchunk/tweaks-toolbar-view" { export const a: (props?: Record<string, unknown>) => unknown; export const c: () => void; export const i: () => void; export const l: (event: unknown) => void; export const n: () => void; export const o: () => void; export const r: (props?: Record<string, unknown>) => unknown; export const s: (props?: Record<string, unknown>) => unknown; export const t: (props?: Record<string, unknown>) => unknown; export const u: () => void; }
 declare module "@rchunk/source-toolbar" { export const createBrowserWindowToolbarContribution: (...arguments_: unknown[]) => unknown; }
 declare module "@rchunk/plugin-installation-content" { export const PluginInstallationContent: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/linear";
+declare module "@rchunk/i18n";
+declare module "@rchunk/bar-sizing";
+declare module "@rchunk/build-graph-data" { export const a: () => void; export const c: number; export const i: (...arguments_: unknown[]) => number | null; export const l: number; export const n: (...arguments_: unknown[]) => number; export const o: { width: number; height: number; padding: number }; export const r: (...arguments_: unknown[]) => Record<string, number[]>; export const s: { width: number; height: number; padding: number }; export const t: (...arguments_: unknown[]) => unknown; export const u: () => void; }
+declare module "@rchunk/PieChart" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/chart-indicator" { export const EpicChartIndicator: (props: { conversationId: string }) => unknown; }
+declare module "@rchunk/chart" { export const ChartWidget: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/mcp-server-elicitation-request-panel" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/pending-request-item-panel" { export const PendingRequestItemPanel: (props: Record<string, unknown>) => unknown; }
 
 declare module "@rchunk/app-shared" {
   export const d0: () => void;

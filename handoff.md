@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1102 个语义 chunk；`verify-renderer` 为 1102/1102。
-- `PRESERVED_ASSETS`：58 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1108 个语义 chunk；`verify-renderer` 为 1108/1108。
+- `PRESERVED_ASSETS`：59 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,11 +65,11 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1107/2247 tracked、1140 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1114/2247 tracked、1133 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
-  hooks 24/24、skills-plugins-mcp 30/30 已收官，panels 为 18/20，charts-ui 为 10/17。
+  hooks 24/24、skills-plugins-mcp 30/30、panels 20/20 已收官，charts-ui 为 15/17。
 - `node scripts/audit-app-shared-consumption.mjs`：340 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -268,9 +268,15 @@ entry 明确归入第三方保留轨道。专项测试源码 64/64、行为断�
 1102/1102、main 11/11、tsc 73，新增 any 0。hooks 24/24、skills-plugins-mcp 30/30，
 panels 18/20，charts-ui 10/17。
 
+2026-09-29 已完成 panels 收官与 charts-ui 第二批：恢复 MCP server elicitation request
+panel、pending request item panel、图表表达式求值/采样、PieChart、Epic chart indicator
+和 ChartWidget，并将 Datadog Session Replay telemetry 明确登记为 vendor 保留资产。专项
+行为测试 137/137；renderer 全量门禁 1108/1108、main 11/11、tsc 73，新增 any 0。
+panels 达到 20/20，charts-ui 达到 15/17，仅余 chart content reference 与 interactive chart。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
-但“继续处理全量应用代码”的任务仍然有效。优先处理 panels 剩余 2 个与 charts-ui
-剩余 7 个真实缺口，再进入 editor-docs/artifact-preview；增量 hub 只在出现真实消费者时拆出
+但“继续处理全量应用代码”的任务仍然有效。优先处理 charts-ui 剩余 2 个真实缺口，
+再进入 editor-docs/artifact-preview；增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 
