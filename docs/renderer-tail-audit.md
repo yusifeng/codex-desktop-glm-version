@@ -49,10 +49,10 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 1015 rewritten / 52 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 1015/2248 tracked、1233 pending，其中
+截至 2026-09-29，尾部审计为 1021 rewritten / 52 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1021/2248 tracked、1227 pending，其中
 terminal 6/6、browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding
-40/40、git-github-worktree 63/63，conversation-thread 93/102。两个文件名
+40/40、git-github-worktree 63/63，conversation-thread 97/102，pages-routes 52/92。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入
 `vendor:diagram-mermaid`，不再误算为应用代码。尾部 0 pending 仍不能替代全量覆盖审计。
 

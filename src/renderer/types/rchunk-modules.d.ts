@@ -15310,6 +15310,7 @@ declare module "@rchunk/profile";
 declare module "@rchunk/NewsPaper";
 declare module "@rchunk/computer-use-app-approval-request-card";
 declare module "@rchunk/use-external-agent-import-setup-actions";
+declare module "@rchunk/setup";
 declare module "@rchunk/rosalind-helix";
 declare module "@rchunk/three.core";
 declare module "@rchunk/three.module";
@@ -15328,3 +15329,26 @@ declare module "@rchunk/options-menu-view" {
   export const s: unknown; export const t: unknown; export const u: unknown; export const v: unknown; export const w: unknown;
   export const x: unknown; export const y: unknown;
 }
+declare module "@rchunk/local-conversation-subagents-panel-tab" { export const LocalConversationSubagentsPanelTab: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/thread-context" {
+  export const fileGitHostConfigByHostId$: unknown;
+  export const threadCodexHome$: unknown;
+  export const threadCwd$: unknown;
+  export const threadExecutorTarget$: unknown;
+  export const threadGitHostConfig$: unknown;
+  export const threadGitHostKey$: unknown;
+  export const threadHostConfig$: unknown;
+  export const threadHostId$: unknown;
+}
+declare module "@rchunk/thread-side-panel-tabs-entry" {
+  export const THREAD_SIDE_PANEL_TAB: unknown;
+  export const closeThreadMcpAppSidePanelTab: (...arguments_: unknown[]) => unknown;
+  export const getThreadMcpAppSidePanelTabId: (threadId: string, appId: string) => string;
+  export const openSessionSandboxSidePanel: (...arguments_: unknown[]) => unknown;
+  export const openThreadMcpAppSidePanelTab: (...arguments_: unknown[]) => unknown;
+  export const openThreadTimelineSidePanel: (...arguments_: unknown[]) => unknown;
+}
+declare module "@rchunk/select-workspace-page" { export const SelectWorkspacePage: () => unknown; }
+declare module "@rchunk/xterm-output-panel";
+declare module "@rchunk/local-conversation-background-terminal-tab" { export const LocalConversationBackgroundTerminalTab: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/offer-page" { export const OfferPage: () => unknown; }

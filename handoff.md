@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1015 个语义 chunk；`verify-renderer` 为 1015/1015。
+- `REWRITTEN`：1021 个语义 chunk；`verify-renderer` 为 1021/1021。
 - `PRESERVED_ASSETS`：52 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,10 +65,11 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2248 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1015/2248 tracked、1233 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1021/2248 tracked、1227 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
-  git-github-worktree 63/63 已覆盖；conversation-thread 当前 93/102。
-- `node scripts/audit-app-shared-consumption.mjs`：330 个实际消费导出均有语义
+  git-github-worktree 63/63 已覆盖；conversation-thread 当前 97/102，pages-routes
+  52/92。
+- `node scripts/audit-app-shared-consumption.mjs`：331 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
 
@@ -152,6 +153,14 @@ Thread Goal 侧栏恢复草稿、revert、快捷保存和 materialize/cleanup；
 暂停/继续、编辑/删除/side chat、拖拽重排和多类型附件摘要。专项行为测试 221/221；renderer
 1015/1015、tsc 对本批零新增。dialogs-menus 108/108、home-onboarding 40/40 已全覆盖，
 conversation-thread 推进至 93/102。
+
+2026-09-29 已完成 renderer GUI 第七批：Local Conversation Subagents Panel 恢复 active/done
+分组、状态/耗时、选择和详情；Background Terminal Tab 恢复 command output 聚合、snapshot
+回退、订阅和已读状态；Thread Context 与 Side Panel Tabs facade 将线程 host/git/cwd signals 及
+MCP/timeline/sandbox 侧栏动作恢复为语义导出；Select Workspace Page 恢复候选目录、全选、
+Add project 与宿主事件；Offer Page 恢复身份 gate、资格查询和个人/团队结账跳转。专项行为
+测试 179/179；renderer 1021/1021、main 11/11、tsc 73，conversation-thread 97/102、
+pages-routes 52/92。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、

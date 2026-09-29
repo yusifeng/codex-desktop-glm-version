@@ -4,9 +4,7 @@ import * as appInitialChunk from "@rchunk/app-initial";
 import "@rchunk/app-primary";
 import "@rchunk/app-connect-modal";
 import * as hooksSettingsRouteChunk from "@rchunk/hooks-settings-route";
-// @ts-expect-error The release dependency has not received a semantic declaration yet.
 import "@rchunk/use-external-agent-import-setup-actions";
-// @ts-expect-error The release dependency has not received a semantic declaration yet.
 import "@rchunk/setup";
 import "@rchunk/settings-loading-row";
 import "@rchunk/settings-row-disclosure";
