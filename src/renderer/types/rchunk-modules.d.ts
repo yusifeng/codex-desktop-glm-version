@@ -15613,6 +15613,15 @@ declare module "@rchunk/image-side-panel" { export const a: (props: Record<strin
 declare module "@rchunk/row" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/panorama-renderer" { export const Viewer: unknown; }
 declare module "@rchunk/binary-classification-metrics" { export const n: () => void; export const t: (...arguments_: unknown[]) => Record<string, unknown>; }
+declare module "@rchunk/adaptive-slider-field";
+declare module "@rchunk/learning-model-selection-process" {
+  export const a: () => void;
+  export const n: (optionCount: number, selectionCount: number, withReplacement: boolean) => number;
+  export const t: (options: { mode: "ordered-with-replacement" | "ordered-without-replacement" | "unordered-without-replacement"; optionCount: number; selectionCount: number }) => Record<string, unknown>;
+}
+declare module "@rchunk/tokenize-math-block" { export const n: () => void; export const r: (source: string) => unknown; export const t: (expression: unknown) => string[]; }
+declare module "@rchunk/null-throws" { export const n: () => void; export const t: <T>(value: T | null | undefined) => T; }
+declare module "@rchunk/numerical-integration" { export const n: (source: string) => { hasUnsupportedLetter: boolean; integrand: string }; export const t: () => void; }
 declare module "@rchunk/chatgpt-video-lightbox" { export const ChatGptVideoLightbox: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/app-initial" {
   export const Y_n: (languageId: string, load: () => Promise<unknown>) => void;

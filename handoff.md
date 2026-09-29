@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1481 个语义 chunk；`verify-renderer` 为 1481/1481。
+- `REWRITTEN`：1511 个语义 chunk；`verify-renderer` 为 1511/1511。
 - `PRESERVED_ASSETS`：86 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,7 +65,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1514/2247 tracked、733 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1544/2247 tracked、703 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
@@ -374,9 +374,15 @@ rpc-bridge 当前 325/410。
 图像等主题。三组专项测试共 347 条断言；renderer 1481/1481、tsc 73，rpc-bridge
 当前 355/410。
 
+2026-09-29 已推进 rpc-bridge 第十二批：恢复 30 个教学模型，新增分类指标、生命科学
+过程、概率推断、数值积分、数列与微积分、数据结构、生态经济及物理化学等主题；并为
+adaptive slider、数学 tokenizer、null guard 与 numerical integration 补齐精确发布依赖
+别名和类型声明。三组专项测试共 302 条断言；renderer 1511/1511、tsc 73，
+rpc-bridge 当前 385/410。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 rpc-bridge 的
-55 个真实缺口（当前 355/410），继续按复杂度分批恢复已审计的教学模型；增量 hub 只在出现真实消费者时拆出
+25 个真实缺口（当前 385/410），完成剩余多依赖教学模型与纯静态模型候选的逐文件收官审计；增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 
