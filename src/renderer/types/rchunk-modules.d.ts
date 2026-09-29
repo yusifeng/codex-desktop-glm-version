@@ -8076,6 +8076,48 @@ declare module "@rchunk/site-preview" {
 declare module "@rchunk/browser-use-settings" {
   export const BrowserUseSettings: () => unknown;
 }
+declare module "@rchunk/symbol-browser" {
+  export interface SymbolBrowserSelection {
+    kind: "emoji" | "icon";
+    metadata: {
+      categoryId?: string;
+      color?: string;
+      keywords?: readonly string[];
+      label: string;
+    };
+    source: "keyboard" | "pointer";
+    value: string;
+  }
+  export interface SymbolBrowserProps {
+    autoFocus?: boolean;
+    availableHeight?: number | string;
+    capabilities: {
+      emoji?: {
+        allowedEmojis?: readonly string[];
+        getEmojiLabel?(emoji: string): string;
+        selectedEmojis?: readonly string[];
+      };
+      icons?: {
+        allowedIcons?: readonly string[];
+        color?: string;
+        onColorChange?(color: string): void;
+        selectedIcon?: string;
+      };
+    };
+    disabled?: boolean;
+    footer?: unknown;
+    inputValue?: string;
+    kind: "emoji" | "icon";
+    onClear?(): void;
+    onKindChange?(kind: "emoji" | "icon"): void;
+    onQueryChange(query: string): void;
+    onReturnToSearch?(): void;
+    onSelect(selection: SymbolBrowserSelection): void;
+    query: string;
+    showSearch?: boolean;
+  }
+  export const SymbolBrowser: (props: SymbolBrowserProps) => unknown;
+}
 declare module "@rchunk/settings-plugin-selection";
 declare module "@rchunk/home-beacon" {
   export interface BeaconMessageIdentity {

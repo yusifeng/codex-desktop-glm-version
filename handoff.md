@@ -55,7 +55,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：985 个语义 chunk；`verify-renderer` 为 985/985。
+- `REWRITTEN`：986 个语义 chunk；`verify-renderer` 为 986/986。
 - `PRESERVED_ASSETS`：50 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：11 个聚合边界。`app-shared/app-initial/app-primary` 按
@@ -65,8 +65,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2250 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  984/2250 tracked、1266 pending；composer 47/47、sidebar 12/12、terminal 6/6
-  已覆盖，browser 18/19、settings 47/70。
+  985/2250 tracked、1265 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  browser 19/19 已覆盖，settings 47/70。
 - `node scripts/audit-app-shared-consumption.mjs`：330 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -100,6 +100,11 @@ annotation 消息与捕获预算、导航/刷新/标注/分享/关闭控件，�
 与密码、扩展、下载和站点设置分区，以及 history/downloads/extensions 等子路由的
 可见性门控与回退导航；设置写入、下载目录选择和清理数据错误提示均接回宿主运行时。
 专项行为测试 19/19；renderer 全量门禁 985/985，browser 覆盖达到 18/19。
+
+2026-09-29 已完成 symbol browser，恢复 emoji/icon 双模式、全文搜索、受限可选集、
+最近使用、分类导航、键盘移动、受控查询、图标颜色和选中态。新增生成器从发布资产
+机械提取 1898 个 Unicode emoji（含旗帜与 ZWJ 序列），避免复制压缩组件实现。专项
+行为测试 18/18；renderer 全量门禁 986/986，browser 覆盖达到 19/19。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、
