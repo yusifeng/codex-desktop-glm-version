@@ -1,0 +1,5043 @@
+[
+  {
+    "file": "hover-card-data-95a14e835743.js",
+    "bytes": 3948,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "PullRequestReviewHoverCardData"
+    ],
+    "classification": "semantic-small",
+    "semantic": "hover-card-data",
+    "action": "rewrite",
+    "reason": "The source contains a focused 3948-byte implementation with 7 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface PullRequestReviewHoverCardData; it is small enough to restore directly."
+  },
+  {
+    "file": "html-derivative-60c0018e2a7c.js",
+    "bytes": 108,
+    "imports": [
+      "html-derivative-97c7bc70986e.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "html-derivative",
+    "action": "incremental-hub",
+    "reason": "The file is a 108-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "html-e0b96e3e1725.js",
+    "bytes": 97,
+    "imports": [
+      "html-e4355dc6819b.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "html",
+    "action": "incremental-hub",
+    "reason": "The file is a 97-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "hydration-8c45073f777c.js",
+    "bytes": 3534,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "placement-policy-c8f98920d800.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "hydrateChatGptAds"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "hydration",
+    "action": "rewrite",
+    "reason": "The 3534-byte module implements app-specific ChatGptAds behavior with 12 functions and 4 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "image-1b6037d6ba79.js",
+    "bytes": 29416,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "chunk-ZW26E7AF-c8fea83f7f61.js",
+      "app-initial-51da50e6c6e3.js",
+      "chart-colors-7214911051c2.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "image",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 5 static dependencies, 0 literal dynamic imports, 11 exports, and 81 functions through loader/initialization machinery; inspect its 4 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "image-edit-size-control-585ada304286.js",
+    "bytes": 1476,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "image-edit-size-control",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1476-byte implementation with 3 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "impl-70e51521c772.js",
+    "bytes": 43428,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ModelPickerPowerSliderImpl"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "model-picker-power-slider-impl",
+    "action": "rewrite",
+    "reason": "The 43428-byte module implements app-specific ModelPickerPowerSliderThumbInputMotion_bzmd8_1, ModelPickerPowerSliderThumbInputMotion, ModelPickerPowerSliderImpl behavior with 95 functions and 2 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "info-DKCQHKI2-6cd828785a90.js",
+    "bytes": 299,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-BIQX33UG-4ee00f04a87a.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createInfoServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "info-dkcqhki2",
+    "action": "rewrite",
+    "reason": "The source contains a focused 299-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createInfoServices; it is small enough to restore directly."
+  },
+  {
+    "file": "info-DKCQHKI2-8310f358bb35.js",
+    "bytes": 158,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createInfoServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "info-dkcqhki2",
+    "action": "incremental-hub",
+    "reason": "The file is a 158-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "input-selector-d6854a7f5fbb.js",
+    "bytes": 29798,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "learning-block-katex-ce1ac0551587.js",
+      "adaptive-slider-7a51d6c629a2.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "input-selector",
+    "action": "preserve",
+    "reason": "The 29798-byte source is dominated by SVG component geometry; it has 4 static imports, 0 dynamic imports, and 5 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "interactive-sampling-1ac392c5c15b.js",
+    "bytes": 8340,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "build-graph-data-ee6e0d8e135a.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "interactive-sampling",
+    "action": "rewrite",
+    "reason": "The source contains a focused 8340-byte implementation with 26 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "invitations-44091c7ba43a.js",
+    "bytes": 74703,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "presentation-eeb7ac6fced2.js",
+      "radio-group-1d8aa20bbfc8.js",
+      "withMetadataArgument-d4cb51a53bdb.js",
+      "parental-controls-invitation-background-c88ddd8be059.js",
+      "phone-number-input-6ac1e964b07b.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "invitations",
+    "action": "preserve",
+    "reason": "The 74703-byte source is dominated by SVG component geometry; it has 8 static imports, 0 dynamic imports, and 14 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "is-plan-event-enabled-edb7e7f2c465.js",
+    "bytes": 256,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "is-plan-event-enabled",
+    "action": "rewrite",
+    "reason": "The source contains a focused 256-byte implementation with 3 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "java-e7082f9b5716.js",
+    "bytes": 97,
+    "imports": [
+      "java-49a633209a8d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "java",
+    "action": "incremental-hub",
+    "reason": "The file is a 97-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "javascript-4ffd1caf0873.js",
+    "bytes": 103,
+    "imports": [
+      "javascript-f4061ef937b2.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "javascript",
+    "action": "incremental-hub",
+    "reason": "The file is a 103-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "jordy-A7ktmsqa-b7d8d80d8089.js",
+    "bytes": 11429,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "jordy-a7ktmsqa-asset",
+    "action": "preserve",
+    "reason": "The 11429-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "jordy-da7a9572aca8.js",
+    "bytes": 10763,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "jordy",
+    "action": "preserve",
+    "reason": "The 10763-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "jsx-1d597b40cbbc.js",
+    "bytes": 96,
+    "imports": [
+      "jsx-114d4b77e22d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "jsx",
+    "action": "incremental-hub",
+    "reason": "The file is a 96-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "kakao-f616aba8a943.js",
+    "bytes": 205538,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "kakao-asset",
+    "action": "preserve",
+    "reason": "The 205538-byte source is dominated by encoded image asset; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "learning-block-9a37c1b2cdda.js",
+    "bytes": 1851915,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "chatgpt_math_blocks-9905574f666f.js",
+      "katex-b62b0c0d6a07.js",
+      "input-selector-d6854a7f5fbb.js",
+      "model-20fa5aabbc94.js",
+      "learning-block-stroke-e5db4228ffca.js",
+      "type-99cca3d49ce0.js",
+      "model-2219d04986cb.js",
+      "learning-block-pointer-label-e7006c4e2e6d.js",
+      "type-725e1a69e8d4.js",
+      "learning-block-currency-locale-provider-35928ec03e30.js",
+      "type-6531d19cb2c0.js",
+      "model-f1935756f5ec.js",
+      "type-c3de85d12da6.js",
+      "model-935a8b1b1821.js",
+      "model-9acbe8f8d181.js",
+      "button-6de526bfdc3d.js",
+      "model-6f57c84b253e.js",
+      "model-7840deb060fa.js",
+      "model-7206de562b9d.js",
+      "learning-block-time-loop-ab72ee42c8a3.js",
+      "visualization-animations-aba8de94ff56.js",
+      "model-1f60271bdbb7.js",
+      "model-a6184aabc0d8.js",
+      "type-62dc7c323bbd.js",
+      "model-c57d1e222f54.js",
+      "triangle-family-visualization-fd60f9de90c5.js",
+      "type-86695f24afe6.js",
+      "model-1ff2e69cbdc9.js",
+      "model-5b5c3055d254.js",
+      "model-8c99a3e1e197.js",
+      "type-895220240c77.js",
+      "model-1d942a9d7c86.js",
+      "model-33ec5072ad67.js",
+      "model-9f7763fa34f6.js",
+      "model-a0d2b57a7427.js",
+      "model-3defe9d7f514.js",
+      "type-ea9c53801ecf.js",
+      "type-11d77b78e3d4.js",
+      "model-21bcfa25d0a8.js",
+      "model-18f5968002b2.js",
+      "type-17e8e3509fa5.js",
+      "model-3985c0526691.js",
+      "model-1fb3f3c173eb.js",
+      "model-d049b0702e2b.js",
+      "type-4644d5bf838d.js",
+      "model-a997b73f0b6d.js",
+      "model-d30b7c46ced0.js",
+      "type-fa58981eb0e3.js",
+      "type-48b2d5373e6f.js",
+      "model-3afae384a050.js",
+      "model-77c142ff4062.js",
+      "model-4298405efab5.js",
+      "type-d05467b5cc3d.js",
+      "model-f98f1fe44a91.js",
+      "model-607b6057cda2.js",
+      "model-8a51aa448316.js",
+      "type-b8a457382aa2.js",
+      "model-af7055c80ce0.js",
+      "model-d45c8c7b3dc6.js",
+      "model-29b9b40f1c67.js",
+      "model-775baaf06261.js",
+      "model-fc99fbfc09c1.js",
+      "model-5abcde22832d.js",
+      "model-f933cb6f652a.js",
+      "model-405fb8197cad.js",
+      "model-89a71102ad15.js",
+      "type-2c1c76fd09a3.js",
+      "model-aae321d23dad.js",
+      "type-894614f7a446.js",
+      "model-bea8f9895437.js",
+      "model-f8f17b609087.js",
+      "model-106204ffd60a.js",
+      "model-e9d53ce0f19d.js",
+      "model-af6d2214b8dd.js",
+      "type-85e042e70c11.js",
+      "model-329288b68a29.js",
+      "model-a088736870ca.js",
+      "model-940064895671.js",
+      "type-502dfab37449.js",
+      "model-c2269da17f9b.js",
+      "model-7e5397a87b87.js",
+      "model-6d69b6507959.js",
+      "model-456e3b59f525.js",
+      "tokenize-math-block-92dba400da42.js",
+      "model-75fbe3dbe692.js",
+      "model-bc60e7a4d945.js",
+      "type-b5d60db25e60.js",
+      "model-5ae66660a0d1.js",
+      "model-13e640ef3d2a.js",
+      "model-ee92fe7d6857.js",
+      "model-cf824d6bcceb.js",
+      "type-a9d2bd86b24e.js",
+      "model-1bd246abc23b.js",
+      "model-b09e8c8b101b.js",
+      "model-2389f073136d.js",
+      "model-3074940ffbb8.js",
+      "type-b94332d030e5.js",
+      "type-661332749edd.js",
+      "model-a538838ccb34.js",
+      "model-365838113234.js",
+      "type-33287eb94059.js",
+      "type-3b03c35824de.js",
+      "type-ff2ce34a0edd.js",
+      "model-b0c57c4c50ba.js",
+      "model-76ebc088bb95.js",
+      "type-85ee1f375ae5.js",
+      "model-eed7806c8445.js",
+      "model-cc7884047369.js",
+      "model-3cc878663baa.js",
+      "template-97cafe2997c3.js",
+      "template-a78ebcc58f49.js",
+      "color-roles-603bada8cfb1.js",
+      "type-973549a4c4d1.js",
+      "type-358a8002801a.js",
+      "type-81172b31949f.js",
+      "type-940292164259.js",
+      "model-18012d55d891.js",
+      "model-7fc37b4d721d.js",
+      "type-bd561e5dd245.js",
+      "model-a922e6cdd48b.js",
+      "type-ff70f856f345.js",
+      "type-e23de7285313.js",
+      "model-a1c2220761f3.js",
+      "model-85b44c5c18b6.js",
+      "model-d9ab7382d7d3.js",
+      "model-af8c2c2496fb.js",
+      "model-380eb31b2348.js",
+      "model-8b840e3306b1.js",
+      "type-94076f401ee2.js",
+      "type-1a3e6eca2001.js",
+      "type-2eeac8e139a3.js",
+      "type-facf186bb1fa.js",
+      "model-ae2c3d093d91.js",
+      "geometry-shapes-22f10631ebb5.js",
+      "type-3a1bd5a62fd7.js",
+      "type-27a1646b6027.js",
+      "type-113723ef7bdc.js",
+      "model-fb1e0a186deb.js",
+      "model-e55a4bb09880.js",
+      "model-ba96dde00fb4.js",
+      "model-456ae69d4c49.js",
+      "type-d8ff967dcf16.js",
+      "model-870d28c04213.js",
+      "model-f9b654a51eac.js",
+      "type-19d8b437a2d9.js",
+      "model-adb41ae5837c.js",
+      "model-e2e4caeb8a59.js",
+      "model-8dcf9b79ed1a.js",
+      "model-81531df3f2e2.js",
+      "type-80e98d19d04d.js",
+      "model-5170f20e545d.js",
+      "model-21889c1e147f.js",
+      "type-79fafd7cdcf3.js",
+      "model-8a2addb2a518.js",
+      "model-1bde8be079ab.js",
+      "type-25a004ce6551.js",
+      "model-69c39ccdb2ba.js",
+      "model-f07b2dfecde5.js",
+      "type-8ea75e03943c.js",
+      "model-434aeec5110b.js",
+      "model-8fbbd3b034e1.js",
+      "type-d71c312af838.js",
+      "type-4140aed3b047.js",
+      "type-fec75962c1bf.js",
+      "model-9e677a243050.js",
+      "model-16139428a7b1.js",
+      "type-60f4e9362b4d.js",
+      "model-f237c900e681.js",
+      "model-bded2e8c51b8.js",
+      "type-1f93f10ec695.js",
+      "model-43a9f02da387.js",
+      "x-like-435c693d8722.js",
+      "type-a2f2d61e4f86.js",
+      "type-37bbc177d1c1.js",
+      "math-block-utils-ca3c4f5321e8.js",
+      "classify-475110c4b36d.js",
+      "model-ee7c309af38a.js",
+      "model-dc14533cccec.js",
+      "model-4b01cc6c2e76.js",
+      "type-dae3a0497d9a.js",
+      "shape-fill-8f10786c12a1.js",
+      "model-916bb0f1566f.js",
+      "model-7f8b73e7da12.js",
+      "model-fa57376c055c.js",
+      "type-251f9425afe7.js",
+      "type-ee21e9db5696.js",
+      "template-bf8ec7576e3e.js",
+      "model-d7299d1f96a7.js",
+      "model-d1116d214359.js",
+      "type-50c9fc73ec1d.js",
+      "type-603f86db5a64.js",
+      "type-d83a95defdf3.js",
+      "model-d2117f3b9ac5.js",
+      "model-47d542dd6d67.js",
+      "format-angle-label-c36b95245319.js",
+      "model-9aaba6ef3b2a.js",
+      "model-6941c5713844.js",
+      "model-f7b896cb4e3e.js",
+      "type-08e97dfb647e.js",
+      "model-d0cb06603224.js",
+      "model-23fa1b82de8d.js",
+      "model-6fb8590b711d.js",
+      "model-838233d701ed.js",
+      "type-bbf18f237f67.js",
+      "model-5e6bf7ab6165.js",
+      "type-44fc1ec684df.js",
+      "type-e4a418c02712.js",
+      "model-4f70c67288f2.js",
+      "type-36d833db1430.js",
+      "model-e1311981a87b.js",
+      "type-856560998265.js",
+      "model-ffbb570f1ec8.js",
+      "model-e044398b5fd7.js",
+      "model-3d95a574c11d.js",
+      "type-ea91da6d3b05.js",
+      "model-18526f90a546.js",
+      "model-5a5542c48ccf.js",
+      "model-6d0fe1644e34.js",
+      "model-7164ede642a6.js",
+      "type-835190510733.js",
+      "type-402ae30c42ae.js",
+      "model-469e05313030.js",
+      "type-a2cf34c518e9.js",
+      "model-18e3a40ddc3a.js",
+      "model-c372f8b17ac7.js",
+      "model-5e953d82d89b.js",
+      "model-276f1b14e837.js",
+      "model-b729a24f3575.js",
+      "model-6d7b03cccde0.js",
+      "type-119bdab76cbe.js",
+      "model-12f159b04c73.js",
+      "model-bc3894cd0f1f.js",
+      "type-5ab56173322c.js",
+      "model-c7c82547bc35.js",
+      "type-d30facd9fda1.js",
+      "type-42a870b7bbdb.js",
+      "type-ba89e7f5dcc4.js",
+      "model-b7e30c22fb74.js",
+      "type-7ff60fd7b3ba.js",
+      "model-8535eecf9273.js",
+      "model-a41a580621d5.js",
+      "model-e9d1e1169b7a.js",
+      "model-8ce870eed550.js",
+      "type-419e85f400c3.js",
+      "model-e94bf9953de3.js",
+      "model-bad65c3e95b0.js",
+      "content-960bb4aa1af7.js",
+      "model-e86d7d0aa38a.js",
+      "model-fc6b1e7ecc32.js",
+      "model-3beba148e294.js",
+      "type-4a4927d40e3e.js",
+      "model-eed880ff8885.js",
+      "type-49e9f66a2d98.js",
+      "model-b3392fd69f76.js",
+      "model-c8be72ed6ac0.js",
+      "model-659be7554447.js",
+      "type-7c6088477dd8.js",
+      "model-85aa75328d7c.js",
+      "model-e01a7cfd8d48.js",
+      "type-6f5ca4a9b344.js",
+      "model-aad91beb6420.js",
+      "model-e9f5407ef986.js",
+      "model-b09af98071e8.js",
+      "type-08ab5fc42dc6.js",
+      "model-a4298e623c35.js",
+      "type-448ce06dc011.js",
+      "model-3fdea9ffafb6.js",
+      "model-68069144a19f.js",
+      "type-a2fa2066a9f8.js",
+      "type-1dfb8358847e.js",
+      "type-18452383754a.js",
+      "model-17b71618727c.js",
+      "model-2a0b00285795.js",
+      "model-f5fc9c2ff44e.js",
+      "type-b2f3bbb776a0.js",
+      "type-32a04963cef2.js",
+      "model-e7c8cc43e8df.js",
+      "type-1aff40f97e6c.js",
+      "type-6ec40c0e5685.js",
+      "model-f80a40d80f01.js",
+      "equation-44cf0b1d4b75.js",
+      "model-c4c3d4ac3d2a.js",
+      "model-b2437ad8584d.js",
+      "circuit-diagram-65e238b589f2.js",
+      "type-6637f6f4ce37.js",
+      "model-caf19a86c5d2.js",
+      "model-9811711de13c.js",
+      "model-12db92e98e26.js",
+      "model-8a1ce53f2bd0.js",
+      "type-9f5bb286483b.js",
+      "template-aa40bbaeb218.js",
+      "model-5b6dc1b6bd89.js",
+      "model-dbdb00b115a8.js",
+      "type-ad01baf2ce65.js",
+      "model-31563588c1d0.js",
+      "type-6fafbd960065.js",
+      "model-53fab9bbba36.js",
+      "model-f6632531dca6.js",
+      "type-28180140955e.js",
+      "type-221c87938b30.js",
+      "type-62569be7b3b6.js",
+      "model-8122293b00e1.js",
+      "model-8b9f3f1fca9b.js",
+      "type-3ebb2891016a.js",
+      "type-f80006839631.js",
+      "model-a89ed6905d41.js",
+      "model-9ce2e0b98e4f.js",
+      "model-fe380b24f817.js",
+      "model-4dfc962979f9.js",
+      "model-2e9de4cfd2c8.js",
+      "type-9e89df8b418e.js",
+      "model-9176b81a016b.js",
+      "model-cd68a3225de8.js",
+      "type-892c2b1ba446.js",
+      "type-3d72495926ec.js",
+      "type-103197d7f37d.js",
+      "model-80c56120bdff.js",
+      "model-2553fb5c0f9e.js",
+      "type-35ea69d98390.js",
+      "model-9c56b533bfd3.js",
+      "model-f9166bfaea80.js",
+      "model-a5deb44334b8.js",
+      "type-e25b068b7941.js",
+      "type-5b4bf103a88b.js",
+      "model-9d831e60e68f.js",
+      "model-22f6fd6b2321.js",
+      "type-b77b9fb94c5f.js",
+      "model-8e907fa97b63.js",
+      "model-a050f4969274.js",
+      "model-fe09a72207e2.js",
+      "model-6b56e43ed230.js",
+      "model-47702d2695d6.js",
+      "type-2a7d2e0bc5c2.js",
+      "model-5e6e1cc23b29.js",
+      "model-19c0720a550e.js",
+      "type-9cab42e2673f.js",
+      "type-84ec9bea3a73.js",
+      "model-2bfb73b82959.js",
+      "type-708888491b1d.js",
+      "type-44949bae7160.js",
+      "type-4e7d1b324604.js",
+      "model-84524f724fa2.js",
+      "model-f27f59868f2e.js",
+      "model-8e7988200d5b.js",
+      "model-bd1bf2ad0c21.js",
+      "type-f76de9a47b83.js",
+      "type-eb0199ee4cef.js",
+      "type-b7a8fbf7a420.js",
+      "type-8a9437331f93.js",
+      "type-ee3c6146db4d.js",
+      "visualization-9106c475a93c.js",
+      "model-bd1ef1923f57.js",
+      "type-f09422f3bf66.js",
+      "model-124c142a08f6.js",
+      "type-dd4d43aba596.js",
+      "type-d5b1a1a74ceb.js",
+      "type-b8020010f7f1.js",
+      "model-3df69373af20.js",
+      "model-f6e5e84f2aaf.js",
+      "type-505786a161fa.js",
+      "model-761532c576d5.js",
+      "model-48fb6d2122d9.js",
+      "model-34404a0ff6b5.js",
+      "type-e52ae9a5f679.js",
+      "model-d55f2d6e70df.js",
+      "model-6d9c94a4186b.js",
+      "model-4513eb800a0e.js",
+      "type-72e940cb9aa1.js",
+      "model-71af2c81ea03.js",
+      "type-aa70f27546d0.js",
+      "model-d908b4b52347.js",
+      "model-e1970db810b5.js",
+      "model-21c44dea4af5.js",
+      "type-dc0d0206de54.js",
+      "model-6ab8da229be6.js",
+      "type-d31ca122ade1.js",
+      "model-df6cdf0cba2f.js",
+      "type-bd9c85267933.js",
+      "model-84d7b391405a.js",
+      "type-af64de236b87.js",
+      "type-5e07bdb97091.js",
+      "model-6bc352ee4868.js",
+      "model-70d42efdc777.js",
+      "model-810bae520b6d.js",
+      "model-6e9bbef00f51.js",
+      "type-eb61c94728f0.js",
+      "type-b02d73c8ed7c.js",
+      "type-3bc326afff31.js",
+      "visualization-9cf5d82ca092.js",
+      "model-66d4b6ae060b.js",
+      "model-83dea67c5a42.js",
+      "model-1cc997c09d9b.js",
+      "model-cf3822ac6f6a.js",
+      "model-5e45c222a8d6.js",
+      "type-b1c6d85108ef.js",
+      "model-c3a40de9815b.js",
+      "model-4ade1fb3e1f8.js",
+      "model-e535a6efec39.js",
+      "model-3c197e2ac9a2.js",
+      "model-40afec118948.js",
+      "type-61dd1475bb3a.js",
+      "model-a41dd4bab755.js",
+      "model-307f3d994796.js",
+      "type-278df50fffd4.js",
+      "type-8b31d5042d39.js",
+      "type-ff74ecd72106.js",
+      "type-082fed8ad380.js",
+      "model-e016c396c3b2.js",
+      "type-bc00b8c55dd6.js",
+      "type-d4e64b7c7369.js",
+      "model-bc73e06612d8.js",
+      "model-a39f1b9e2e01.js",
+      "model-d5476457f411.js",
+      "type-9c26345ce2cb.js",
+      "type-5d4a85edaa4f.js",
+      "type-df7c33e35927.js",
+      "type-39f5bace963c.js",
+      "type-5afefdccef0f.js",
+      "type-df7152d06cac.js",
+      "model-f0617ef38ba2.js",
+      "model-9a70bfbca159.js",
+      "type-389cfab21292.js",
+      "model-7354fd8cc5a6.js",
+      "type-5b3d00b051e8.js",
+      "model-c52682da7ea4.js",
+      "type-f409ad2953b1.js",
+      "model-2921ad175a74.js",
+      "type-98cbaaa40c49.js",
+      "type-a2c1e373aef7.js",
+      "model-9badbb3726c5.js",
+      "type-9302b5a4f072.js",
+      "type-96ed8dbb8a85.js",
+      "model-253b6086c636.js",
+      "type-edf05c1a49b7.js",
+      "model-38ab54fedb73.js",
+      "model-55ff7ae3fc50.js",
+      "model-4db1a43b78c0.js",
+      "model-1d9447e10398.js",
+      "type-36e7bc0980f2.js",
+      "type-18490a17e5a9.js",
+      "model-554288d91497.js",
+      "model-ac6f56bf9c33.js",
+      "model-b1ec25402bfa.js",
+      "type-e695696a56c8.js",
+      "model-3228e752e987.js",
+      "model-5ba45a3a952c.js",
+      "model-d132ad04f855.js",
+      "type-bb80ea70b787.js",
+      "model-3dc4ab96d69c.js",
+      "type-b11bc1c3afbb.js",
+      "model-d5f4853cc9bc.js",
+      "type-6f1a8a4562be.js",
+      "model-fbf35e51044d.js",
+      "type-4bab13b66760.js",
+      "type-e9e5c33af31e.js",
+      "model-5a0d6a0ec95c.js",
+      "model-974cd7d1aaf7.js",
+      "type-2451a41f0046.js",
+      "model-82b31c2ac45b.js",
+      "model-10252d82a04c.js",
+      "model-f92e3f01a456.js",
+      "type-7a83abf1c6c4.js",
+      "model-79d3c05c2f18.js",
+      "model-5fdcbc5a8461.js",
+      "type-b2315d4b532d.js",
+      "model-57ce9234be9d.js",
+      "model-75b9f873ec1d.js",
+      "model-65944a036c44.js",
+      "type-9eaaebe29f2e.js",
+      "model-9e207cede0f7.js",
+      "type-67623f2e9dfc.js",
+      "model-eeab59a705d6.js",
+      "template-9f62da8bf8e9.js",
+      "model-ac14e3b51310.js",
+      "model-bf9f007f736e.js",
+      "type-fa418230ee38.js",
+      "type-2ba608a4bdee.js",
+      "model-6e039b1d844f.js",
+      "type-94130cd0d6af.js",
+      "model-86d466c7f97d.js",
+      "type-f95346c939a7.js",
+      "model-f77673a9b8ed.js",
+      "model-a63f96a401b8.js",
+      "model-f531b58f0936.js",
+      "model-5fdbc0dfab74.js",
+      "model-f4dbaa3dfc38.js",
+      "model-689c31877cb2.js",
+      "type-9a0c50e93ce3.js",
+      "model-e852ad5f07c0.js",
+      "model-512171a54d75.js",
+      "model-f1afb214c3ce.js",
+      "type-afd9de5814d9.js",
+      "type-10f0ea8edfaf.js",
+      "type-9a4e4be29b1b.js",
+      "type-d22103ac12d0.js",
+      "model-ec0b6a77f077.js",
+      "model-f675b47b1a69.js",
+      "model-54778b6d513f.js",
+      "type-d56e7431251b.js",
+      "model-1b1a0d17905e.js",
+      "type-fff8bf6df8e9.js",
+      "type-b2d049022561.js",
+      "model-c91680043005.js",
+      "type-d9aefcd7f05e.js",
+      "model-5a3880d5e780.js",
+      "model-30adaa39a8dd.js",
+      "type-110ca488953a.js",
+      "model-d08d16b0a6e8.js",
+      "type-4ea25b9db993.js",
+      "type-f31fc951c570.js",
+      "type-17796e12b6d2.js",
+      "type-729304fc6ff2.js",
+      "model-17f916a4e975.js",
+      "model-e5951484f222.js",
+      "type-b20da9986277.js",
+      "type-34ba530d4dd9.js",
+      "type-7a2e9c974468.js",
+      "model-379965cd8d4f.js",
+      "model-96e3711e4510.js",
+      "model-c27d4359f518.js",
+      "model-b26f29efe99c.js",
+      "model-a45393aa052e.js",
+      "type-cb89af0c10e5.js",
+      "model-ac19e1b3688e.js",
+      "model-d86232dd9f20.js",
+      "type-1cd86e5f325c.js",
+      "model-a3291de53919.js",
+      "model-dc171645f526.js",
+      "type-e8c4aa2e5b51.js",
+      "model-daf7badaab95.js",
+      "model-fd2977478028.js",
+      "type-dbcd7d4a7976.js",
+      "model-439233109749.js",
+      "model-c0b34fe474ad.js",
+      "template-eafd23e9a003.js",
+      "template-dc2706837280.js",
+      "type-96f57cd357c8.js",
+      "model-ec3f9e09db1f.js",
+      "model-a3cdaa2df5f4.js",
+      "model-dabd83a67c23.js",
+      "system-of-equations-a765decfc54f.js",
+      "model-3df6827423e2.js",
+      "model-2519c21474d3.js",
+      "type-32562c107c2d.js",
+      "model-b1f0f57fbf1c.js",
+      "model-caf3a6be4af3.js",
+      "visualization-646ca1fe44ae.js",
+      "model-11da4540b9d5.js",
+      "model-a7c5b23f898c.js",
+      "model-ed067671e3fb.js",
+      "visualization-2c70b84ce018.js",
+      "model-92f4db76ba27.js",
+      "model-e4734bd04660.js",
+      "model-a5eccdbf7b42.js",
+      "model-c9c30b7e8b26.js",
+      "type-dc693d0c1945.js",
+      "template-224b997c2ad7.js",
+      "type-6fdfb08a7fa3.js",
+      "visualization-42ee558b3505.js",
+      "type-e01a2e47390f.js",
+      "model-848a1637af6a.js",
+      "model-6157f9be0476.js",
+      "model-2470e84b6d61.js",
+      "model-5cfd5db05e74.js",
+      "model-7eb2f6a715c8.js",
+      "type-d8fc0e5b690c.js",
+      "model-5109996801ed.js",
+      "type-eccf29c88c2c.js",
+      "type-8f4414a8a97c.js",
+      "model-78dd2f7b3a04.js",
+      "model-3eedc6e81e01.js",
+      "model-2050d7dfdf59.js",
+      "model-e912e553e6df.js",
+      "template-d8d6d1996e0d.js",
+      "model-cde8f9761457.js",
+      "model-15af4e81d3df.js",
+      "type-9acfe2203543.js",
+      "model-7501d5f703e7.js",
+      "type-8e1db5391d62.js",
+      "model-7cc667e32642.js",
+      "type-568af520e20e.js",
+      "model-362f6f6503f1.js",
+      "type-161aea9178de.js",
+      "model-65fc78301123.js",
+      "type-1425ccb81454.js",
+      "model-adbf96dad63f.js",
+      "model-f9237046088a.js",
+      "arrow-curved-right-f88ac704e2f7.js",
+      "undo-56dd6481731f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ChatGptLearningBlockContentReference"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "learning-block",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 592 static dependencies, 0 literal dynamic imports, 1 exports, and 13205 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "less-6e450891a185.js",
+    "bytes": 97,
+    "imports": [
+      "less-4e351974aeb6.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "less",
+    "action": "incremental-hub",
+    "reason": "The file is a 97-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "lib-94a0a161a542.js",
+    "bytes": 35739,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "ComposedChart-12232a23b4b3.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "lib",
+    "action": "preserve",
+    "reason": "The 35739-byte source is a generic library/runtime implementation with 64 functions, 16 prototype operations, and 8 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "library-empty-trash-758597c77867.js",
+    "bytes": 6748,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "reset-image-library-state-acd4cb23c6bc.js",
+      "library-trash-analytics-ae6451d327a4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "EmptyLibraryTrashDialog"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "library-empty-trash",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 5 static dependencies, 0 literal dynamic imports, 1 exports, and 9 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "link-layout-678c303b5a32.js",
+    "bytes": 762,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "TrustedContactLinkLayout"
+    ],
+    "classification": "semantic-small",
+    "semantic": "link-layout",
+    "action": "rewrite",
+    "reason": "The source contains a focused 762-byte implementation with 3 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface TrustedContactLinkLayout; it is small enough to restore directly."
+  },
+  {
+    "file": "load-script-d64a1e7ce422.js",
+    "bytes": 2878,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "load-script",
+    "action": "preserve",
+    "reason": "The 2878-byte source is a generic library/runtime implementation with 29 functions, 2 prototype operations, and 14 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "loading-cba17c98d28e.js",
+    "bytes": 4308,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "editor-header-c92933e59212.js",
+      "header-content-fade-9fcd899f41c6.js",
+      "editor-header-controls-c672034e8ec1.js",
+      "loading-controls-b167fbacd28d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ChatGptFilePreviewLoading"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "loading",
+    "action": "rewrite",
+    "reason": "The 4308-byte module implements app-specific ChatGptFilePreview, ChatGptFilePreviewLoading, query/state transport behavior with 5 functions and 7 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "lobster-dark-3c7e0b666bb2.js",
+    "bytes": 3974,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "bg",
+      "chromeTheme",
+      "colors",
+      "default",
+      "fg",
+      "name",
+      "settings",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "lobster-dark-theme",
+    "action": "preserve",
+    "reason": "The 3974-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 8 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "loud-speaker-U3ESQshD-272109e38b5b.js",
+    "bytes": 1885,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "loud-speaker-u3esqshd-asset",
+    "action": "preserve",
+    "reason": "The 1885-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "loud-speaker-cf46ca316049.js",
+    "bytes": 2726,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "loud-speaker",
+    "action": "preserve",
+    "reason": "The 2726-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "lowlight-62906d2993ab.js",
+    "bytes": 3729,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-initial-51da50e6c6e3.js",
+      "core-e0ac85b4f9b8.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createLowlight"
+    ],
+    "classification": "semantic-small",
+    "semantic": "lowlight",
+    "action": "rewrite",
+    "reason": "The source contains a focused 3729-byte implementation with 12 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createLowlight; it is small enough to restore directly."
+  },
+  {
+    "file": "lowlight-7c9b2445f652.js",
+    "bytes": 1178,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createParser"
+    ],
+    "classification": "semantic-small",
+    "semantic": "lowlight",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1178-byte implementation with 10 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface createParser; it is small enough to restore directly."
+  },
+  {
+    "file": "lua-2129c39c5c75.js",
+    "bytes": 4298,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "lua"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "lua",
+    "action": "preserve",
+    "reason": "The 4298-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "lua-ac29337895f8.js",
+    "bytes": 96,
+    "imports": [
+      "lua-ec4138ed9dd4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "lua",
+    "action": "incremental-hub",
+    "reason": "The file is a 96-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "math-d32c9f1b6861.js",
+    "bytes": 465,
+    "imports": [],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "semantic-small",
+    "semantic": "math",
+    "action": "rewrite",
+    "reason": "The source contains a focused 465-byte implementation with 2 functions, 0 static dependencies, 0 dynamic imports, and the concrete export surface a, c, d, f, i; it is small enough to restore directly."
+  },
+  {
+    "file": "math-de3a0e0db4e2.js",
+    "bytes": 670,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "semantic-small",
+    "semantic": "math",
+    "action": "rewrite",
+    "reason": "The source contains a focused 670-byte implementation with 4 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface a, c, d, f, i; it is small enough to restore directly."
+  },
+  {
+    "file": "matrix-dark-fa9710869ce4.js",
+    "bytes": 3220,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "bg",
+      "chromeTheme",
+      "colors",
+      "default",
+      "fg",
+      "name",
+      "settings",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "matrix-dark-theme",
+    "action": "preserve",
+    "reason": "The 3220-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 8 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "metric-helpers-107c5da7f8a5.js",
+    "bytes": 18251,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "middleware-8ddcb7d6b81f.js",
+      "load-script-d64a1e7ce422.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "A",
+      "C",
+      "D",
+      "E",
+      "F",
+      "M",
+      "N",
+      "O",
+      "P",
+      "S",
+      "T",
+      "_",
+      "a",
+      "b",
+      "c",
+      "d",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "metric-helpers",
+    "action": "rewrite",
+    "reason": "The 18251-byte module implements app-specific query/state transport behavior with 142 functions and 4 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "middleware-75f9c3c91f3c.js",
+    "bytes": 164,
+    "imports": [
+      "middleware-8ddcb7d6b81f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "applyDestinationMiddleware",
+      "sourceMiddlewarePlugin"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "middleware",
+    "action": "incremental-hub",
+    "reason": "The file is a 164-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "middleware-8ddcb7d6b81f.js",
+    "bytes": 39295,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "metric-helpers-107c5da7f8a5.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "h",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "middleware",
+    "action": "preserve",
+    "reason": "The 39295-byte source is a generic library/runtime implementation with 233 functions, 55 prototype operations, and 15 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "mllike-18ec050dd84d.js",
+    "bytes": 7760,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "oCaml"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "mllike",
+    "action": "preserve",
+    "reason": "The 7760-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "monotone-68fb4f84bd88.js",
+    "bytes": 2922,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "monotone",
+    "action": "preserve",
+    "reason": "The 2922-byte source is a generic library/runtime implementation with 21 functions, 5 prototype operations, and 3 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "monotone-7fd3405b5c97.js",
+    "bytes": 7313,
+    "imports": [
+      "math-d32c9f1b6861.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "monotone",
+    "action": "preserve",
+    "reason": "The 7313-byte source is a generic library/runtime implementation with 46 functions, 8 prototype operations, and 7 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "national-museum-CYJiaf6d-e4734899d6c1.js",
+    "bytes": 23137,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "national-museum-cyjiaf6d-asset",
+    "action": "preserve",
+    "reason": "The 23137-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "national-museum-f400e6fb39f2.js",
+    "bytes": 31041,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "national-museum",
+    "action": "preserve",
+    "reason": "The 31041-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "native-code-execution-sandbox-fa3ec5081637.js",
+    "bytes": 1094,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "connect-code-execution-sandbox-b02ae1d03047.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "connectNativeCodeExecutionSandbox"
+    ],
+    "classification": "semantic-small",
+    "semantic": "native-code-execution-sandbox",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1094-byte implementation with 3 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface connectNativeCodeExecutionSandbox; it is small enough to restore directly."
+  },
+  {
+    "file": "noop-4d1a48b9db0c.js",
+    "bytes": 166,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "noop",
+    "action": "rewrite",
+    "reason": "The source contains a focused 166-byte implementation with 3 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "notebook-225a2f6a47b0.js",
+    "bytes": 1957,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "notebook",
+    "action": "preserve",
+    "reason": "The 1957-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "notebook-ByY4JUol-290e573f9def.js",
+    "bytes": 1901,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "notebook-byy4juol-asset",
+    "action": "preserve",
+    "reason": "The 1901-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "notice-2197fe51f059.js",
+    "bytes": 4563,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "state-1f9742e6c1d9.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "VoiceReasoningNoticeController"
+    ],
+    "classification": "semantic-small",
+    "semantic": "notice",
+    "action": "rewrite",
+    "reason": "The source contains a focused 4563-byte implementation with 13 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface VoiceReasoningNoticeController; it is small enough to restore directly."
+  },
+  {
+    "file": "notifications-3700d6e3cd47.js",
+    "bytes": 1947,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "observeParentalControlNotifications"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "notifications",
+    "action": "incremental-hub",
+    "reason": "The source coordinates 3 static dependencies, 0 literal dynamic imports, 1 exports, and 12 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "notifications-runtime-a5056e67819a.js",
+    "bytes": 9529,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "presentation-eeb7ac6fced2.js",
+      "u18-banner-logging-126c6aef16d2.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "listenForParentalControlNotifications"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "notifications-runtime",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 5 static dependencies, 0 literal dynamic imports, 1 exports, and 39 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "notion-dark-53bed5670fb6.js",
+    "bytes": 2781,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "bg",
+      "chromeTheme",
+      "colors",
+      "default",
+      "fg",
+      "name",
+      "settings",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "notion-dark-theme",
+    "action": "preserve",
+    "reason": "The 2781-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 8 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "notion-light-616fcde10962.js",
+    "bytes": 2783,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "bg",
+      "chromeTheme",
+      "colors",
+      "default",
+      "fg",
+      "name",
+      "settings",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "notion-light-theme",
+    "action": "preserve",
+    "reason": "The 2783-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 8 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "null-throws-c7a886463bcb.js",
+    "bytes": 272,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "null-throws",
+    "action": "rewrite",
+    "reason": "The source contains a focused 272-byte implementation with 3 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "numerical-integration-e14603542012.js",
+    "bytes": 1549,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "numerical-integration",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1549-byte implementation with 7 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "open-1b0a301cf0a9.js",
+    "bytes": 120,
+    "imports": [
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openImagePreview"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "open",
+    "action": "incremental-hub",
+    "reason": "The file is a 120-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "open-b6f75ec82551.js",
+    "bytes": 118,
+    "imports": [
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openReviewLink"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "open",
+    "action": "incremental-hub",
+    "reason": "The file is a 118-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "open-ba3f56946b08.js",
+    "bytes": 31993,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openShoppingBrowseTab"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "open",
+    "action": "rewrite",
+    "reason": "The 31993-byte module implements app-specific ShoppingBrowseTab, query/state transport behavior with 102 functions and 3 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "open-chatgpt-file-24878c96465f.js",
+    "bytes": 158,
+    "imports": [
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openChatGptFile"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "open-chatgpt-file",
+    "action": "incremental-hub",
+    "reason": "The file is a 158-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "open-details-ea11bcecbc49.js",
+    "bytes": 2844,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "details-cache-7f541ad230b1.js",
+      "favorite-action-a9a2227e0262.js",
+      "action-88b2df6de39c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openProductDetails"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "open-details",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 6 static dependencies, 0 literal dynamic imports, 1 exports, and 29 functions through loader/initialization machinery; inspect its 0 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "open-handler-391752d0848c.js",
+    "bytes": 28026,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "panel-visibility-5fac9957906d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "BrowserOpenHandler"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "open-handler",
+    "action": "rewrite",
+    "reason": "The 28026-byte module implements app-specific BrowserTabId, ConversationId, BrowserOpenHandler behavior with 32 functions and 5 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "open-in-codex-c690ffed81f6.js",
+    "bytes": 5071,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "runtime-4b6d284756d8.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "runWindowsTabsOpen"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "open-in-codex",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 4 static dependencies, 0 literal dynamic imports, 1 exports, and 9 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "open-library-item-f723e5be688a.js",
+    "bytes": 1363,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "open-library-item",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1363-byte implementation with 6 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "open-tab-16d5f147da46.js",
+    "bytes": 384,
+    "imports": [
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "browserTabType",
+      "getBrowserTabIdForOpen",
+      "openBrowserThreadPanelTab",
+      "openBrowserThreadPanelTabWithPendingOpenState",
+      "openBrowserThreadPanelTabWithoutAnimation"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "open-tab",
+    "action": "incremental-hub",
+    "reason": "The file is a 384-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "oscurange-8a344130cdcd.js",
+    "bytes": 4518,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "$schema",
+      "colors",
+      "default",
+      "displayName",
+      "name",
+      "tokenColors",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "oscurange-theme",
+    "action": "preserve",
+    "reason": "The 4518-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 7 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "packet-7NZHBO7P-a556b9452792.js",
+    "bytes": 160,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createPacketServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "packet-7nzhbo7p",
+    "action": "incremental-hub",
+    "reason": "The file is a 160-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "packet-7NZHBO7P-d3ff92a34860.js",
+    "bytes": 301,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-EMLP6XTP-c01ea67d7b7b.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createPacketServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "packet-7nzhbo7p",
+    "action": "rewrite",
+    "reason": "The source contains a focused 301-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createPacketServices; it is small enough to restore directly."
+  },
+  {
+    "file": "pane-layout-da45b15f9a56.js",
+    "bytes": 498,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "pane-layout",
+    "action": "rewrite",
+    "reason": "The source contains a focused 498-byte implementation with 3 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "parental-controls-invitation-background-c88ddd8be059.js",
+    "bytes": 276,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "parental-controls-invitation-background",
+    "action": "preserve",
+    "reason": "The 276-byte source is dominated by generated static tables; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "perl-f304e93a1a94.js",
+    "bytes": 16482,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "perl"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "perl",
+    "action": "preserve",
+    "reason": "The 16482-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "permissions-mode-dropdown-c2d1ab2cace3.js",
+    "bytes": 67848,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "lock-5827e2327f82.js",
+      "triangle-warning-a4c8d38a1f88.js",
+      "hand-ab2b3e50d560.js",
+      "folder-light-2f9486c690e0.js",
+      "shield-check-cd8c69f429ca.js",
+      "permissions-mode-visibility-e061b3d4458c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "PermissionsModeDropdown"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "permissions-mode-dropdown",
+    "action": "preserve",
+    "reason": "The 67848-byte source is dominated by SVG component geometry; it has 10 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "persona-f7ec1fc1014b.js",
+    "bytes": 113,
+    "imports": [
+      "persona-a3bb93441dce.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "startAgeVerification"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "persona",
+    "action": "incremental-hub",
+    "reason": "The file is a 113-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "pet-install-state-6816a4423a9e.js",
+    "bytes": 224,
+    "imports": [
+      "pet-install-state-bd4c33fcb028.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "closePetInstallSession",
+      "installPet",
+      "petInstallSession$",
+      "startPetInstallSession"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "pet-install-state",
+    "action": "incremental-hub",
+    "reason": "The file is a 224-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "phone-number-input-6ac1e964b07b.js",
+    "bytes": 80891,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "prop-types-1ebacf647ac7.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "phone-number-input",
+    "action": "preserve",
+    "reason": "The 80891-byte source is a generic library/runtime implementation with 306 functions, 31 prototype operations, and 2 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "php-cf1b91dd2d19.js",
+    "bytes": 96,
+    "imports": [
+      "php-c02d2a7395b0.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "php",
+    "action": "incremental-hub",
+    "reason": "The file is a 96-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "pin-6ee0779a4956.js",
+    "bytes": 3511,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "pin",
+    "action": "preserve",
+    "reason": "The 3511-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "pin-BwR8bHoP-d2ab983d5646.js",
+    "bytes": 3768,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "pin-bwr8bhop-asset",
+    "action": "preserve",
+    "reason": "The 3768-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "pkg-24dfada4ece0.js",
+    "bytes": 110440,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "middleware-8ddcb7d6b81f.js",
+      "helpers-acb0f45721c0.js",
+      "callback-d3e2038dfd64.js",
+      "metric-helpers-107c5da7f8a5.js",
+      "gracefulDecodeURIComponent-c5c02606df15.js",
+      "load-script-d64a1e7ce422.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "Analytics",
+      "AnalyticsBrowser",
+      "AnalyticsNode",
+      "Context",
+      "ContextCancelation",
+      "EventFactory",
+      "Group",
+      "UniversalStorage",
+      "User",
+      "getGlobalAnalytics",
+      "isDestinationPluginWithAddMiddleware",
+      "resolveAliasArguments",
+      "resolveArguments",
+      "resolvePageArguments",
+      "resolveUserArguments",
+      "segmentio"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "pkg",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 8 static dependencies, 0 literal dynamic imports, 16 exports, and 597 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "placement-15206b2c8ead.js",
+    "bytes": 279675,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "codex-thread-report-dialog-77d856cf550b.js",
+      "draft-state-b6af9e5f8526.js",
+      "control-dialog-5f9759a98bae.js",
+      "placement-policy-c8f98920d800.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ChatGptAdsPlacement"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "placement",
+    "action": "preserve",
+    "reason": "The 279675-byte source is dominated by generated static tables; it has 8 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "placement-policy-c8f98920d800.js",
+    "bytes": 9741,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "holdout-9b0bc5fb2d23.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "placement-policy",
+    "action": "rewrite",
+    "reason": "The 9741-byte module implements app-specific Conversation, AdsOptOut behavior with 46 functions and 4 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "plaid-link-987be8700124.js",
+    "bytes": 235,
+    "imports": [
+      "plaid-link-a9255a11a708.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "getPersonalFinancePlaidReturnTo",
+      "openPersonalFinancePlaidLink",
+      "openPersonalFinancePlaidLinkFromWidget"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "plaid-link",
+    "action": "incremental-hub",
+    "reason": "The file is a 235-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "postcss-866e5266f689.js",
+    "bytes": 100,
+    "imports": [
+      "postcss-f5a8d7f48b2f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "postcss",
+    "action": "incremental-hub",
+    "reason": "The file is a 100-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "powershell-242ce14e5ebb.js",
+    "bytes": 11049,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "powerShell"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "powershell",
+    "action": "preserve",
+    "reason": "The 11049-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "preflight-4a4cc944d9a1.js",
+    "bytes": 1938,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "service-b997f0ada36b.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "preparePersonalSecrets"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "preflight",
+    "action": "incremental-hub",
+    "reason": "The source coordinates 4 static dependencies, 0 literal dynamic imports, 1 exports, and 10 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "preload-bridge-a281bb5f90a3.js",
+    "bytes": 14867,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "webview-b1b7b13a4120.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "PinnedContentTabPreloadBridge"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "preload-bridge",
+    "action": "rewrite",
+    "reason": "The 14867-byte module implements app-specific BrowserTabId, BrowserUseTab behavior with 43 functions and 4 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "project-import-prompt-host-2f3e62e079da.js",
+    "bytes": 13005,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ProjectImportPromptHost"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "project-import-prompt-host",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 3 static dependencies, 0 literal dynamic imports, 1 exports, and 31 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "proof-light-818ee16fd59b.js",
+    "bytes": 2782,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "bg",
+      "chromeTheme",
+      "colors",
+      "default",
+      "fg",
+      "name",
+      "settings",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "proof-light-theme",
+    "action": "preserve",
+    "reason": "The 2782-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 8 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "proxy-898332770620.js",
+    "bytes": 48447,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "proxy",
+    "action": "preserve",
+    "reason": "The 48447-byte source is a generic library/runtime implementation with 253 functions, 1 prototype operations, and 14 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "python-805c25541893.js",
+    "bytes": 99,
+    "imports": [
+      "python-fdf8b6adcc28.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "python",
+    "action": "incremental-hub",
+    "reason": "The file is a 99-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "quick-chat-state-17d2fafb85f9.js",
+    "bytes": 162,
+    "imports": [
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openQuickChatEntity"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "quick-chat-state",
+    "action": "incremental-hub",
+    "reason": "The file is a 162-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "quick-chat-window-e97b2c4526e4.js",
+    "bytes": 157,
+    "imports": [
+      "app-shared-7b9edc1bfb7f.js",
+      "quick-chat-window-94914e3751bb.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "QuickChatWindow"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "quick-chat-window",
+    "action": "incremental-hub",
+    "reason": "The file is a 157-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "r-880e4ee3048b.js",
+    "bytes": 94,
+    "imports": [
+      "r-24747feccd98.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "r",
+    "action": "incremental-hub",
+    "reason": "The file is a 94-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "r-e2816acf1612.js",
+    "bytes": 4998,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "r"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "r",
+    "action": "preserve",
+    "reason": "The 4998-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "radar-I7S5WNFK-d8a8341910a0.js",
+    "bytes": 300,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-QBLGF6JB-8be53d6ec2ba.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRadarServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "radar-i7s5wnfk",
+    "action": "rewrite",
+    "reason": "The source contains a focused 300-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createRadarServices; it is small enough to restore directly."
+  },
+  {
+    "file": "radar-I7S5WNFK-ea6bd36b3fbc.js",
+    "bytes": 159,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRadarServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "radar-i7s5wnfk",
+    "action": "incremental-hub",
+    "reason": "The file is a 159-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "railroad-3IZDKUUU-120ea05f1fcb.js",
+    "bytes": 303,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-5TONJI2A-33abea505b35.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "railroad-3izdkuuu",
+    "action": "rewrite",
+    "reason": "The source contains a focused 303-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createRailroadServices; it is small enough to restore directly."
+  },
+  {
+    "file": "railroad-3IZDKUUU-1907123bcc7a.js",
+    "bytes": 162,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "railroad-3izdkuuu",
+    "action": "incremental-hub",
+    "reason": "The file is a 162-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "railroad-abnf-AHOZXSZD-bc0d6db82b89.js",
+    "bytes": 307,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-5HE753X5-e62fd240b775.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadAbnfServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "railroad-abnf-ahozxszd",
+    "action": "rewrite",
+    "reason": "The source contains a focused 307-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createRailroadAbnfServices; it is small enough to restore directly."
+  },
+  {
+    "file": "railroad-abnf-AHOZXSZD-d91ab9f0b260.js",
+    "bytes": 166,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadAbnfServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "railroad-abnf-ahozxszd",
+    "action": "incremental-hub",
+    "reason": "The file is a 166-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "railroad-ebnf-EBAXGLYW-24586b366634.js",
+    "bytes": 166,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadEbnfServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "railroad-ebnf-ebaxglyw",
+    "action": "incremental-hub",
+    "reason": "The file is a 166-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "railroad-ebnf-EBAXGLYW-9fbab3318627.js",
+    "bytes": 307,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-U6XO7XAA-fc49ee8cfc87.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadEbnfServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "railroad-ebnf-ebaxglyw",
+    "action": "rewrite",
+    "reason": "The source contains a focused 307-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createRailroadEbnfServices; it is small enough to restore directly."
+  },
+  {
+    "file": "railroad-peg-LSFZ7HO6-2720ed1045e5.js",
+    "bytes": 165,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadPegServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "railroad-peg-lsfz7ho6",
+    "action": "incremental-hub",
+    "reason": "The file is a 165-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "railroad-peg-LSFZ7HO6-a2fd40f087ca.js",
+    "bytes": 306,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-JG7HCLWE-a27dc6b4472c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createRailroadPegServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "railroad-peg-lsfz7ho6",
+    "action": "rewrite",
+    "reason": "The source contains a focused 306-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createRailroadPegServices; it is small enough to restore directly."
+  },
+  {
+    "file": "raycast-dark-d8918c2e5e09.js",
+    "bytes": 11039,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "chromeTheme",
+      "colors",
+      "default",
+      "name",
+      "tokenColors",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "raycast-dark-theme",
+    "action": "preserve",
+    "reason": "The 11039-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 6 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "raycast-light-b4a56c15bc92.js",
+    "bytes": 11204,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "chromeTheme",
+      "colors",
+      "default",
+      "name",
+      "tokenColors",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "raycast-light-theme",
+    "action": "preserve",
+    "reason": "The 11204-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 6 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "react-redux-14f5167095ae.js",
+    "bytes": 5092,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "react-redux",
+    "action": "preserve",
+    "reason": "The 5092-byte source is a generic library/runtime implementation with 34 functions, 1 prototype operations, and 4 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "read-saved-plan-content-485c714fd0a9.js",
+    "bytes": 129,
+    "imports": [
+      "read-saved-plan-content-da11d8f5bc70.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "readSavedPlanContent"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "read-saved-plan-content",
+    "action": "incremental-hub",
+    "reason": "The file is a 129-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "realtime-buffered-audio-worklet-773c5f6cc0c3.js",
+    "bytes": 3442,
+    "imports": [],
+    "dynamicImports": [],
+    "exports": [],
+    "classification": "semantic-small",
+    "semantic": "realtime-buffered-audio-worklet",
+    "action": "rewrite",
+    "reason": "The source contains a focused 3442-byte implementation with 2 functions, 0 static dependencies, 0 dynamic imports, and the concrete export surface (side effects only); it is small enough to restore directly."
+  },
+  {
+    "file": "regexp-ad3b2e1330ac.js",
+    "bytes": 99,
+    "imports": [
+      "regexp-8a0959d878b9.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "regexp",
+    "action": "incremental-hub",
+    "reason": "The file is a 99-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "registry-a50f1d1438fa.js",
+    "bytes": 18041,
+    "imports": [],
+    "dynamicImports": [
+      "@oai/granola/plugins/workbook-help",
+      "@oai/granola/plugins/workbook-export",
+      "@oai/granola/plugins/presentation-help",
+      "@oai/granola/node",
+      "@oai/granola/plugins/google-sheets",
+      "@oai/granola/plugins/preset-shape-definitions"
+    ],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "i",
+      "l",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "registry",
+    "action": "preserve",
+    "reason": "The 18041-byte source is dominated by generated static tables; it has 0 static imports, 6 dynamic imports, and 11 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "rehype-katex-afac91f609b4.js",
+    "bytes": 9862,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-initial-51da50e6c6e3.js",
+      "katex-b62b0c0d6a07.js",
+      "lib-94a0a161a542.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "semantic-small",
+    "semantic": "rehype-katex",
+    "action": "rewrite",
+    "reason": "The source contains a focused 9862-byte implementation with 52 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface default; it is small enough to restore directly."
+  },
+  {
+    "file": "reminder-9829ac9965d5.js",
+    "bytes": 3417,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "reminder",
+    "action": "preserve",
+    "reason": "The 3417-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "reminder-Cij-3xHI-0aae7c31d5b9.js",
+    "bytes": 3639,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "reminder-cij-3xhi-asset",
+    "action": "preserve",
+    "reason": "The 3639-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "renderer-60f4bb7aa0fd.js",
+    "bytes": 11967,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "index-ymUnTRBB-f8fc7d2840a9.js",
+      "dist-e0bb3d63cc62.js",
+      "app-initial-51da50e6c6e3.js",
+      "view-state-persistence-43de2d864034.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "InteractivePoll"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "renderer",
+    "action": "rewrite",
+    "reason": "The 11967-byte module implements app-specific Conversations, ConversationId behavior with 20 functions and 6 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "renderer-d200041fe18f.js",
+    "bytes": 5341,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "tabs-285592374a40.js",
+      "quick-chat-writing-block-adapter-aa381a91e9bc.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ConversationalOnboardingWriting"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "renderer",
+    "action": "rewrite",
+    "reason": "The 5341-byte module implements app-specific ConversationalOnboardingWriting behavior with 5 functions and 5 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "request-27018f915975.js",
+    "bytes": 74751,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "recent-uploads-155ca1261e4d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ImagegenRequestForm"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "request",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 5 static dependencies, 0 literal dynamic imports, 1 exports, and 158 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "resistor-comparison-cc070edadd95.js",
+    "bytes": 676,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "resistor-comparison",
+    "action": "rewrite",
+    "reason": "The source contains a focused 676-byte implementation with 11 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "resource-updates-bridge-2f9138580a72.js",
+    "bytes": 2135,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ResourceUpdatesBridge"
+    ],
+    "classification": "semantic-small",
+    "semantic": "resource-updates-bridge",
+    "action": "rewrite",
+    "reason": "The source contains a focused 2135-byte implementation with 10 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface ResourceUpdatesBridge; it is small enough to restore directly."
+  },
+  {
+    "file": "respond-36c75f33bf0b.js",
+    "bytes": 120,
+    "imports": [
+      "respond-2af05a87e5a6.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "respondToChatGptToolRequest"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "respond",
+    "action": "incremental-hub",
+    "reason": "The file is a 120-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "responsive-image-visualization-9fbd0706e5fc.js",
+    "bytes": 1362,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "responsive-image-visualization",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1362-byte implementation with 4 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "restoration-10682af29157.js",
+    "bytes": 1661,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-initial-51da50e6c6e3.js",
+      "command-execution-command-615dea847916.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "restoreBackgroundTerminalTabRoute"
+    ],
+    "classification": "semantic-small",
+    "semantic": "restoration",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1661-byte implementation with 7 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface restoreBackgroundTerminalTabRoute; it is small enough to restore directly."
+  },
+  {
+    "file": "restoration-4033c505a6bf.js",
+    "bytes": 1242,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-initial-51da50e6c6e3.js",
+      "open-target-b8efcedac8b5.js",
+      "verify-descendant-7045b49cb284.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "restoreBackgroundAgentTabRoute"
+    ],
+    "classification": "semantic-small",
+    "semantic": "restoration",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1242-byte implementation with 3 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface restoreBackgroundAgentTabRoute; it is small enough to restore directly."
+  },
+  {
+    "file": "restoration-c01e65520ca7.js",
+    "bytes": 795,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "restoreSubagentsTabRoute"
+    ],
+    "classification": "semantic-small",
+    "semantic": "restoration",
+    "action": "rewrite",
+    "reason": "The source contains a focused 795-byte implementation with 3 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface restoreSubagentsTabRoute; it is small enough to restore directly."
+  },
+  {
+    "file": "restoration-f11722b5d1a1.js",
+    "bytes": 1560,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "local-conversation-plan-model-d9e386c760e5.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "restorePlanTabRoute"
+    ],
+    "classification": "semantic-small",
+    "semantic": "restoration",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1560-byte implementation with 3 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface restorePlanTabRoute; it is small enough to restore directly."
+  },
+  {
+    "file": "restrictions-e423e45ffc9f.js",
+    "bytes": 5668,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "equation-44cf0b1d4b75.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "restrictions",
+    "action": "rewrite",
+    "reason": "The source contains a focused 5668-byte implementation with 26 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "resume-chatgpt-completion-b6f2a2305780.js",
+    "bytes": 236,
+    "imports": [
+      "app-initial-51da50e6c6e3.js",
+      "resume-chatgpt-completion-4b505ffe8dcf.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "chatGptCompletionResumeQueryById$",
+      "resumeChatGptCompletionFromTopic"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "resume-chatgpt-completion",
+    "action": "incremental-hub",
+    "reason": "The file is a 236-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "rosalind-helix-db030adb2faf.js",
+    "bytes": 44538,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "three.core-cb39b1271a0d.js",
+      "three.module-b65ff644899d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "LifeSciencesHelixBackground"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "rosalind-helix",
+    "action": "rewrite",
+    "reason": "The 44538-byte module implements app-specific LifeSciencesHelixBackground behavior with 59 functions and 4 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "rough.esm-3e53fd338f7d.js",
+    "bytes": 44678,
+    "imports": [],
+    "dynamicImports": [],
+    "exports": [
+      "t"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "rough-esm",
+    "action": "preserve",
+    "reason": "The 44678-byte source is a generic library/runtime implementation with 77 functions, 0 prototype operations, and 1 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "rough.esm-dc8b11ccd8a8.js",
+    "bytes": 47818,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "rough-esm",
+    "action": "preserve",
+    "reason": "The 47818-byte source is a generic library/runtime implementation with 79 functions, 0 prototype operations, and 2 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "routing-middleware-7ff0d0c09cc6.js",
+    "bytes": 42055,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "tsubMiddleware"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "routing-middleware",
+    "action": "preserve",
+    "reason": "The 42055-byte source is a generic library/runtime implementation with 209 functions, 5 prototype operations, and 1 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "rtp-transform-worker.client-27691be44d13.js",
+    "bytes": 787,
+    "imports": [],
+    "dynamicImports": [],
+    "exports": [],
+    "classification": "semantic-small",
+    "semantic": "rtp-transform-worker-client",
+    "action": "rewrite",
+    "reason": "The source contains a focused 787-byte implementation with 3 functions, 0 static dependencies, 0 dynamic imports, and the concrete export surface (side effects only); it is small enough to restore directly."
+  },
+  {
+    "file": "ruby-4b369efc8a8f.js",
+    "bytes": 7799,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ruby"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "ruby",
+    "action": "preserve",
+    "reason": "The 7799-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "ruby-6366a38aef51.js",
+    "bytes": 97,
+    "imports": [
+      "ruby-13d4043d144f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "ruby",
+    "action": "incremental-hub",
+    "reason": "The file is a 97-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "schema-filter-d9fe65a26d7e.js",
+    "bytes": 1732,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "is-plan-event-enabled-edb7e7f2c465.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "schemaFilter"
+    ],
+    "classification": "semantic-small",
+    "semantic": "schema-filter",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1732-byte implementation with 12 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface schemaFilter; it is small enough to restore directly."
+  },
+  {
+    "file": "scss-53bcf4f12d13.js",
+    "bytes": 97,
+    "imports": [
+      "scss-95abe03f682f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "scss",
+    "action": "incremental-hub",
+    "reason": "The file is a 97-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "sdbl-193315ecf9e2.js",
+    "bytes": 97,
+    "imports": [
+      "sdbl-6070b1c9ddb9.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "sdbl",
+    "action": "incremental-hub",
+    "reason": "The file is a 97-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "sensitive-image-reminder-e42962fc2c0e.js",
+    "bytes": 7057,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "chatgpt-image-upload-reminder-dialog-6d64e2b29a8f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ChatGptSensitiveImageReminder"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "sensitive-image-reminder",
+    "action": "rewrite",
+    "reason": "The 7057-byte module implements app-specific ChatGptSensitiveImageReminder, query/state transport behavior with 23 functions and 5 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "shape-fill-8f10786c12a1.js",
+    "bytes": 1273,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "shape-fill",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1273-byte implementation with 4 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "share-icon-CbWc0sFW-7906276a0810.js",
+    "bytes": 875,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "share-icon-cbwc0sfw-asset",
+    "action": "preserve",
+    "reason": "The 875-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "share-icon-cd41e1d8e1f4.js",
+    "bytes": 1127,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "share-icon",
+    "action": "preserve",
+    "reason": "The 1127-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "shared-snapshot-continuation-c3634fe7a1b8.js",
+    "bytes": 4159,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "SharedSnapshotContinuation"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "shared-snapshot-continuation",
+    "action": "rewrite",
+    "reason": "The 4159-byte module implements app-specific Codex, query/state transport behavior with 10 functions and 4 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "shelf-364dc403e149.js",
+    "bytes": 24116,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "thread-scroll-controller-context-value-144c8345e935.js",
+      "conversation-navigation-state-81ffa455dce9.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ConversationFollowupShelf"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "shelf",
+    "action": "rewrite",
+    "reason": "The 24116-byte module implements app-specific ConversationFollowupSuggestionInteraction, Conversations, Conversation, query/state transport behavior with 59 functions and 6 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "shell-d2f5d33d6a1d.js",
+    "bytes": 3626,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "shell"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "shell",
+    "action": "preserve",
+    "reason": "The 3626-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "shellscript-8ccca808d9e0.js",
+    "bytes": 104,
+    "imports": [
+      "shellscript-de7df40ae1fa.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "shellscript",
+    "action": "incremental-hub",
+    "reason": "The file is a 104-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "shortcut-BPZOg55_-58cd8503c5d3.js",
+    "bytes": 3334,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "shortcut-bpzog55-asset",
+    "action": "preserve",
+    "reason": "The 3334-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "shortcut-fbabb0d66a01.js",
+    "bytes": 3071,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "shortcut",
+    "action": "preserve",
+    "reason": "The 3071-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "silero-vad-52ec2f0850d3.js",
+    "bytes": 99459,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "SileroVoiceActivityDetector",
+      "preloadSileroVoiceActivityDetector"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "silero-vad",
+    "action": "preserve",
+    "reason": "The 99459-byte source is a generic library/runtime implementation with 224 functions, 1 prototype operations, and 2 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "sizeCapture-X5ZJPWSS-35cad884972a.js",
+    "bytes": 1110,
+    "imports": [
+      "chunk-Y2CYZVJY-ec17b93e265e.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "captureNodeSizes"
+    ],
+    "classification": "semantic-small",
+    "semantic": "sizecapture-x5zjpwss",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1110-byte implementation with 5 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface captureNodeSizes; it is small enough to restore directly."
+  },
+  {
+    "file": "sizeCapture-X5ZJPWSS-e07f13f62d02.js",
+    "bytes": 1286,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-Y2CYZVJY-24cce454fd91.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "captureNodeSizes"
+    ],
+    "classification": "semantic-small",
+    "semantic": "sizecapture-x5zjpwss",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1286-byte implementation with 7 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface captureNodeSizes; it is small enough to restore directly."
+  },
+  {
+    "file": "sms-enrollment-3a13954e91cf.js",
+    "bytes": 33832,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "page-layout-ca2711c2c3fe.js",
+      "withMetadataArgument-d4cb51a53bdb.js",
+      "client-4e5b397fbaf6.js",
+      "session-75b8207fa9a4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "BrowserMfaSmsEnrollment"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "sms-enrollment",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 7 static dependencies, 0 literal dynamic imports, 1 exports, and 30 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "soccer-ball-6c1d6824d40b.js",
+    "bytes": 14273,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "soccer-ball",
+    "action": "preserve",
+    "reason": "The 14273-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "soccer-ball-DQQcTqwp-752da15540f3.js",
+    "bytes": 13984,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "soccer-ball-dqqctqwp-asset",
+    "action": "preserve",
+    "reason": "The 13984-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "sort-bar-visualization-b904625976aa.js",
+    "bytes": 10050,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "input-selector-group-c5ab39b64319.js",
+      "button-6de526bfdc3d.js",
+      "proxy-898332770620.js",
+      "use-reduced-motion-b66137c700c8.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "sort-bar-visualization",
+    "action": "rewrite",
+    "reason": "The source contains a focused 10050-byte implementation with 17 functions, 6 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, o, r; it is small enough to restore directly."
+  },
+  {
+    "file": "south-korea-flag-CUfO4zo2-f7bc58108b90.js",
+    "bytes": 3994,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "south-korea-flag-cufo4zo2-asset",
+    "action": "preserve",
+    "reason": "The 3994-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "south-korea-flag-f24fcc414014.js",
+    "bytes": 6600,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "south-korea-flag",
+    "action": "preserve",
+    "reason": "The 6600-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "space-785a695b5536.js",
+    "bytes": 1970,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "space",
+    "action": "preserve",
+    "reason": "The 1970-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "space-Dyd6AUbM-80c9339344aa.js",
+    "bytes": 2005,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "space-dyd6aubm-asset",
+    "action": "preserve",
+    "reason": "The 2005-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "spoken-language-options-a8b38a93da0c.js",
+    "bytes": 2381,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "spoken-language-options",
+    "action": "rewrite",
+    "reason": "The source contains a focused 2381-byte implementation with 6 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "sql-1bbe31b620be.js",
+    "bytes": 96,
+    "imports": [
+      "sql-9c46a3cc15ad.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "sql",
+    "action": "incremental-hub",
+    "reason": "The file is a 96-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "step-cc59eba019a7.js",
+    "bytes": 10360,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "_",
+      "a",
+      "b",
+      "c",
+      "d",
+      "f",
+      "g",
+      "h",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "y"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "step",
+    "action": "preserve",
+    "reason": "The 10360-byte source is a generic library/runtime implementation with 61 functions, 6 prototype operations, and 20 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "stylus-c53b33630761.js",
+    "bytes": 99,
+    "imports": [
+      "stylus-832d4facd004.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "stylus",
+    "action": "incremental-hub",
+    "reason": "The file is a 99-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "subagents-f011dd080466.js",
+    "bytes": 3913,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "subagent-row-3d94360f648f.js",
+      "registered-76121d1c3a01.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "RegisteredSubagentsThumbnail"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "subagents",
+    "action": "rewrite",
+    "reason": "The 3913-byte module implements app-specific ConversationId behavior with 7 functions and 5 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "submit-feedback-8cb673d3211e.js",
+    "bytes": 120,
+    "imports": [
+      "submit-feedback-89c5adad0a0c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "submitCodexFeedback"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "submit-feedback",
+    "action": "incremental-hub",
+    "reason": "The file is a 120-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "surface-7956345c70dd.js",
+    "bytes": 39740,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "persona-a3bb93441dce.js",
+      "presentation-eeb7ac6fced2.js",
+      "invitations-44091c7ba43a.js",
+      "u18-banner-logging-126c6aef16d2.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "FamilyNotification"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "surface",
+    "action": "rewrite",
+    "reason": "The 39740-byte module implements app-specific Invitation, Notification, query/state transport behavior with 41 functions and 7 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "surfaces-b85863b30be8.js",
+    "bytes": 13448,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "share-conversation-action-d9662851aef1.js",
+      "announcement-modal-source-bridge-336771f4b06b.js",
+      "codex-app-home-beacon-announcement-8c94f69eb080.js",
+      "chatgpt-temporary-chat-ui-9fb0c710b365.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ChatGptConversationBeaconSurfaces"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "surfaces",
+    "action": "rewrite",
+    "reason": "The 13448-byte module implements app-specific ConversationSharing, ConversationEligible, ConversationOverride behavior with 31 functions and 7 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "svg-arrow-6f79fa010fe2.js",
+    "bytes": 6060,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "learning-block-katex-ce1ac0551587.js",
+      "learning-block-stroke-e5db4228ffca.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "svg-arrow",
+    "action": "rewrite",
+    "reason": "The source contains a focused 6060-byte implementation with 6 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "swift-8dfd81d616cd.js",
+    "bytes": 5438,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "swift"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "swift",
+    "action": "preserve",
+    "reason": "The 5438-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "system-of-equations-a765decfc54f.js",
+    "bytes": 2901,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "tokenize-math-block-92dba400da42.js",
+      "x-like-435c693d8722.js",
+      "math-block-utils-ca3c4f5321e8.js",
+      "classify-475110c4b36d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "system-of-equations",
+    "action": "rewrite",
+    "reason": "The source contains a focused 2901-byte implementation with 8 functions, 5 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "tab-558b44c65ee3.js",
+    "bytes": 123,
+    "imports": [
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openImagePreviewTab"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "tab",
+    "action": "incremental-hub",
+    "reason": "The file is a 123-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "tab-content-2527923eeaf8.js",
+    "bytes": 91018,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "image-validation-session-be2c776a9aef.js",
+      "image-side-panel-c75517d69c6d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ImagePreviewPanel"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "tab-content",
+    "action": "preserve",
+    "reason": "The 91018-byte source is dominated by SVG component geometry; it has 6 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "tab-content-53aa2f34f4c5.js",
+    "bytes": 198768,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js",
+      "webview-b1b7b13a4120.js",
+      "appgen-access-50974c702eaf.js",
+      "appgen-browser-site-e3ffe94b8e86.js",
+      "open-appgen-share-dialog-adecffea4fba.js",
+      "compact-empty-state-7d00ecb673ed.js",
+      "use-conversation-diff-comments-4360bc3ecccb.js",
+      "tweaks-toolbar-view-96ee22916a78.js",
+      "options-menu-view-260b98308bf3.js",
+      "browser-clear-browsing-data-dialog-view-32f0f308148f.js",
+      "local-conversation-artifacts-signals-adff984a1c7d.js",
+      "local-conversation-sources-signals-ad456834558e.js",
+      "comment-mode-coachmark-state-4ad0aae781cf.js",
+      "comment-popup-portal-f8916f9c2211.js",
+      "availability-7faf4f21a73f.js",
+      "browser-use-origin-state-queries-e7dace496e66.js",
+      "profile-state-dbf66f9b8ba1.js",
+      "analytics-363d04057f73.js",
+      "dialog-launcher-3ba4460e21d5.js",
+      "query-8542d2419280.js",
+      "state-158647999406.js",
+      "tab-input-63d87e5c3c7b.js",
+      "open-local-conversation-sources-side-panel-tab-563925042515.js",
+      "browser-use-settings-visibility-9396b96f40c5.js",
+      "local-conversation-webmcp-tools-model-933537f85a0f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "BrowserThreadPanelTab"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "tab-content",
+    "action": "further-consumer-audit",
+    "reason": "The source coordinates 28 static dependencies, 0 literal dynamic imports, 1 exports, and 418 functions through loader/initialization machinery; inspect its 1 direct asset consumers before splitting the hub."
+  },
+  {
+    "file": "tab-d6bbb8bc9acd.js",
+    "bytes": 1517,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "library-cloud-file-preview-b3ddfaa823c0.js",
+      "cloud-file-preview-617eec01bc9e.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ConnectedFilePreview"
+    ],
+    "classification": "semantic-small",
+    "semantic": "tab",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1517-byte implementation with 3 functions, 5 static dependencies, 0 dynamic imports, and the concrete export surface ConnectedFilePreview; it is small enough to restore directly."
+  },
+  {
+    "file": "tab-identity-b378dc7c1330.js",
+    "bytes": 303,
+    "imports": [
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "getThreadBrowserConversationId",
+      "getThreadBrowserConversationIdForServerConversation",
+      "getThreadBrowserTabIdFromPanelTab",
+      "isThreadBrowserPanelTab"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "tab-identity",
+    "action": "incremental-hub",
+    "reason": "The file is a 303-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "task-B1GDU_ll-27e9aa8ce080.js",
+    "bytes": 1274,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "task-b1gdu-ll-asset",
+    "action": "preserve",
+    "reason": "The 1274-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "task-b01feccffcb3.js",
+    "bytes": 1334,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "task",
+    "action": "preserve",
+    "reason": "The 1334-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "template-224b997c2ad7.js",
+    "bytes": 3405,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "classify-475110c4b36d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 3405-byte implementation with 14 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "template-97cafe2997c3.js",
+    "bytes": 849,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 849-byte implementation with 4 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "template-9f62da8bf8e9.js",
+    "bytes": 3006,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "adaptive-slider-field-6d316e0b7a10.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 3006-byte implementation with 6 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface a, c, d, f, i; it is small enough to restore directly."
+  },
+  {
+    "file": "template-a78ebcc58f49.js",
+    "bytes": 918,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 918-byte implementation with 4 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "template-aa40bbaeb218.js",
+    "bytes": 443,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 443-byte implementation with 2 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "template-bf8ec7576e3e.js",
+    "bytes": 1710,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "classify-475110c4b36d.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1710-byte implementation with 12 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "template-d8d6d1996e0d.js",
+    "bytes": 1448,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "adaptive-slider-field-6d316e0b7a10.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1448-byte implementation with 6 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface a, c, i, n, o; it is small enough to restore directly."
+  },
+  {
+    "file": "template-dc2706837280.js",
+    "bytes": 844,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 844-byte implementation with 4 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface a, i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "template-eafd23e9a003.js",
+    "bytes": 1465,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "adaptive-slider-field-6d316e0b7a10.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "i",
+      "n",
+      "o",
+      "r",
+      "s",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "template",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1465-byte implementation with 6 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface a, c, i, n, o; it is small enough to restore directly."
+  },
+  {
+    "file": "temple-dark-9eae56d88ac5.js",
+    "bytes": 3013,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "bg",
+      "colors",
+      "default",
+      "fg",
+      "name",
+      "settings",
+      "type"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "temple-dark-theme",
+    "action": "preserve",
+    "reason": "The 3013-byte source is dominated by editor theme tables; it has 1 static imports, 0 dynamic imports, and 7 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "tex-f9292bf27eba.js",
+    "bytes": 96,
+    "imports": [
+      "tex-88a281e4c36a.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "tex",
+    "action": "incremental-hub",
+    "reason": "The file is a 96-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "thin-optics-509819bab7fc.js",
+    "bytes": 552,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "thin-optics",
+    "action": "rewrite",
+    "reason": "The source contains a focused 552-byte implementation with 3 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "three-3d-renderer-2525bc9c3e2f.js",
+    "bytes": 91086,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "three.core-cb39b1271a0d.js",
+      "three.module-b65ff644899d.js",
+      "learning-block-pointer-label-e7006c4e2e6d.js",
+      "format-coordinate-734ce4ce99ea.js",
+      "equation-44cf0b1d4b75.js",
+      "restrictions-e423e45ffc9f.js",
+      "extends-df342f7c2e8b.js",
+      "OrbitControls-b357711bbe57.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "Three3DRenderer"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "three-3d-renderer",
+    "action": "preserve",
+    "reason": "The 91086-byte source is dominated by SVG component geometry; it has 10 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "three.core-cb39b1271a0d.js",
+    "bytes": 659830,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "$",
+      "$a",
+      "$i",
+      "$n",
+      "$r",
+      "$t",
+      "A",
+      "Aa",
+      "Ai",
+      "An",
+      "Ar",
+      "At",
+      "B",
+      "Ba",
+      "Bi",
+      "Bn",
+      "Br",
+      "Bt",
+      "C",
+      "Ca",
+      "Ci",
+      "Cn",
+      "Cr",
+      "Ct",
+      "D",
+      "Da",
+      "Di",
+      "Dn",
+      "Dr",
+      "Dt",
+      "E",
+      "Ea",
+      "Ei",
+      "En",
+      "Er",
+      "Et",
+      "F",
+      "Fa",
+      "Fi",
+      "Fn",
+      "Fr",
+      "Ft",
+      "G",
+      "Ga",
+      "Gi",
+      "Gn",
+      "Gr",
+      "Gt",
+      "H",
+      "Ha",
+      "Hi",
+      "Hn",
+      "Hr",
+      "Ht",
+      "I",
+      "Ia",
+      "Ii",
+      "In",
+      "Ir",
+      "It",
+      "J",
+      "Ja",
+      "Ji",
+      "Jn",
+      "Jr",
+      "Jt",
+      "K",
+      "Ka",
+      "Ki",
+      "Kn",
+      "Kr",
+      "Kt",
+      "L",
+      "La",
+      "Li",
+      "Ln",
+      "Lr",
+      "Lt",
+      "M",
+      "Ma",
+      "Mi",
+      "Mn",
+      "Mr",
+      "Mt",
+      "N",
+      "Na",
+      "Ni",
+      "Nn",
+      "Nr",
+      "Nt",
+      "O",
+      "Oa",
+      "Oi",
+      "On",
+      "Or",
+      "Ot",
+      "P",
+      "Pa",
+      "Pi",
+      "Pn",
+      "Pr",
+      "Pt",
+      "Q",
+      "Qa",
+      "Qi",
+      "Qn",
+      "Qr",
+      "Qt",
+      "R",
+      "Ra",
+      "Ri",
+      "Rn",
+      "Rr",
+      "Rt",
+      "S",
+      "Sa",
+      "Si",
+      "Sn",
+      "Sr",
+      "St",
+      "T",
+      "Ta",
+      "Ti",
+      "Tn",
+      "Tr",
+      "Tt",
+      "U",
+      "Ua",
+      "Ui",
+      "Un",
+      "Ur",
+      "Ut",
+      "V",
+      "Va",
+      "Vi",
+      "Vn",
+      "Vr",
+      "Vt",
+      "W",
+      "Wa",
+      "Wi",
+      "Wn",
+      "Wr",
+      "Wt",
+      "X",
+      "Xa",
+      "Xi",
+      "Xn",
+      "Xr",
+      "Xt",
+      "Y",
+      "Ya",
+      "Yi",
+      "Yn",
+      "Yr",
+      "Yt",
+      "Z",
+      "Za",
+      "Zi",
+      "Zn",
+      "Zr",
+      "Zt",
+      "_",
+      "_a",
+      "_i",
+      "_n",
+      "_r",
+      "_t",
+      "a",
+      "aa",
+      "ai",
+      "an",
+      "ao",
+      "ar",
+      "at",
+      "b",
+      "ba",
+      "bi",
+      "bn",
+      "br",
+      "bt",
+      "c",
+      "ca",
+      "ci",
+      "cn",
+      "co",
+      "cr",
+      "ct",
+      "d",
+      "da",
+      "di",
+      "dn",
+      "do",
+      "dr",
+      "dt",
+      "ea",
+      "ei",
+      "en",
+      "eo",
+      "er",
+      "et",
+      "f",
+      "fa",
+      "fi",
+      "fn",
+      "fo",
+      "fr",
+      "ft",
+      "g",
+      "ga",
+      "gi",
+      "gn",
+      "gr",
+      "gt",
+      "h",
+      "ha",
+      "hi",
+      "hn",
+      "hr",
+      "ht",
+      "i",
+      "ia",
+      "ii",
+      "in",
+      "io",
+      "ir",
+      "it",
+      "j",
+      "ja",
+      "ji",
+      "jn",
+      "jr",
+      "jt",
+      "k",
+      "ka",
+      "ki",
+      "kn",
+      "kr",
+      "kt",
+      "l",
+      "la",
+      "li",
+      "ln",
+      "lo",
+      "lr",
+      "lt",
+      "m",
+      "ma",
+      "mi",
+      "mn",
+      "mr",
+      "mt",
+      "n",
+      "na",
+      "ni",
+      "nn",
+      "no",
+      "nr",
+      "nt",
+      "o",
+      "oa",
+      "oi",
+      "on",
+      "oo",
+      "or",
+      "ot",
+      "p",
+      "pa",
+      "pi",
+      "pn",
+      "po",
+      "pr",
+      "pt",
+      "q",
+      "qa",
+      "qi",
+      "qn",
+      "qr",
+      "qt",
+      "r",
+      "ra",
+      "ri",
+      "rn",
+      "ro",
+      "rr",
+      "rt",
+      "s",
+      "sa",
+      "si",
+      "sn",
+      "so",
+      "sr",
+      "st",
+      "t",
+      "ta",
+      "ti",
+      "tn",
+      "to",
+      "tr",
+      "tt",
+      "u",
+      "ua",
+      "ui",
+      "un",
+      "uo",
+      "ur",
+      "ut",
+      "v",
+      "va",
+      "vi",
+      "vn",
+      "vr",
+      "vt",
+      "w",
+      "wa",
+      "wi",
+      "wn",
+      "wr",
+      "wt",
+      "x",
+      "xa",
+      "xi",
+      "xn",
+      "xr",
+      "xt",
+      "y",
+      "ya",
+      "yi",
+      "yn",
+      "yr",
+      "yt",
+      "z",
+      "za",
+      "zi",
+      "zn",
+      "zr",
+      "zt"
+    ],
+    "classification": "vendor-generated-preserve",
+    "semantic": "three-core",
+    "action": "preserve",
+    "reason": "The 659830-byte source is a generic library/runtime implementation with 270 functions, 48 prototype operations, and 337 exports rather than app-specific semantics; preserve the shipped vendor surface."
+  },
+  {
+    "file": "thumbnail-1390eeb9998f.js",
+    "bytes": 157,
+    "imports": [
+      "app-shared-7b9edc1bfb7f.js",
+      "thumbnail-386f09e9e7b3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "CreateTextFileThumbnail"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "thumbnail",
+    "action": "incremental-hub",
+    "reason": "The file is a 157-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "thumbnail-386f09e9e7b3.js",
+    "bytes": 4931,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "thumbnail",
+    "action": "rewrite",
+    "reason": "The source contains a focused 4931-byte implementation with 5 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "thumbnail-7c714f359bb7.js",
+    "bytes": 3977,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "format-bytes-9f828acaa58f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "thumbnail",
+    "action": "rewrite",
+    "reason": "The source contains a focused 3977-byte implementation with 8 functions, 4 static dependencies, 0 dynamic imports, and the concrete export surface i, n, r, t; it is small enough to restore directly."
+  },
+  {
+    "file": "toggle-b02ae5564000.js",
+    "bytes": 2648,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js",
+      "app-primary-d66705000d76.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "ChatGptThinkingToggle"
+    ],
+    "classification": "semantic-business-logic",
+    "semantic": "toggle",
+    "action": "rewrite",
+    "reason": "The 2648-byte module implements app-specific Conversations, ChatGptThinkingToggle behavior with 5 functions and 4 dependencies; its decisions and state transitions merit a semantic rewrite."
+  },
+  {
+    "file": "trash-9d3c16e94b66.js",
+    "bytes": 1544,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "trash",
+    "action": "preserve",
+    "reason": "The 1544-byte source is dominated by SVG component geometry; it has 2 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "trash-wft7htfk-a80db900856e.js",
+    "bytes": 1333,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "trash-wft7htfk-asset",
+    "action": "preserve",
+    "reason": "The 1333-byte source is dominated by encoded image asset; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "treeView-QDETBFTQ-5a62f64dd50d.js",
+    "bytes": 162,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createTreeViewServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "treeview-qdetbftq",
+    "action": "incremental-hub",
+    "reason": "The file is a 162-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "treeView-QDETBFTQ-b788caf185e0.js",
+    "bytes": 303,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-CQNSW5MT-4e18ae57bf27.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createTreeViewServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "treeview-qdetbftq",
+    "action": "rewrite",
+    "reason": "The source contains a focused 303-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createTreeViewServices; it is small enough to restore directly."
+  },
+  {
+    "file": "treemap-6X3UGDF4-3ad64d68581e.js",
+    "bytes": 302,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "chunk-KEIR6QF5-95b0e7b7ebae.js",
+      "chunk-R7FJI6CG-e4ace00f94f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createTreemapServices"
+    ],
+    "classification": "semantic-small",
+    "semantic": "treemap-6x3ugdf4",
+    "action": "rewrite",
+    "reason": "The source contains a focused 302-byte implementation with 2 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface createTreemapServices; it is small enough to restore directly."
+  },
+  {
+    "file": "treemap-6X3UGDF4-bd0c63007aa8.js",
+    "bytes": 161,
+    "imports": [
+      "chunk-KEIR6QF5-326e1da7e0a5.js",
+      "mermaid-parser.core-9ffe5a9fb28c.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "createTreemapServices"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "treemap-6x3ugdf4",
+    "action": "incremental-hub",
+    "reason": "The file is a 161-byte initialization/re-export facade over 2 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "triangle-family-visualization-fd60f9de90c5.js",
+    "bytes": 24157,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "chatgpt_math_blocks-9905574f666f.js",
+      "control-panel-9789995ccf0d.js",
+      "triangle-visual-language-46f026eb70c8.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "i",
+      "n",
+      "o",
+      "r",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "triangle-family-visualization",
+    "action": "preserve",
+    "reason": "The 24157-byte source is dominated by SVG component geometry; it has 5 static imports, 0 dynamic imports, and 6 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "triangle-visual-language-46f026eb70c8.js",
+    "bytes": 5450,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "a",
+      "c",
+      "d",
+      "f",
+      "i",
+      "l",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u"
+    ],
+    "classification": "semantic-small",
+    "semantic": "triangle-visual-language",
+    "action": "rewrite",
+    "reason": "The source contains a focused 5450-byte implementation with 20 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface a, c, d, f, i; it is small enough to restore directly."
+  },
+  {
+    "file": "trusted-contact-actions-684784399376.js",
+    "bytes": 25458,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "app-initial-51da50e6c6e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "i",
+      "n",
+      "r",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "trusted-contact-actions",
+    "action": "preserve",
+    "reason": "The 25458-byte source is dominated by SVG component geometry; it has 3 static imports, 0 dynamic imports, and 4 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "trusted-contact-actions-6d04a3870e90.js",
+    "bytes": 139,
+    "imports": [
+      "trusted-contact-actions-684784399376.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "openTrustedContactBeaconAction"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "trusted-contact-actions",
+    "action": "incremental-hub",
+    "reason": "The file is a 139-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "trusted-contact-hero-7b0737a0d525.js",
+    "bytes": 1195,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js",
+      "parental-controls-invitation-background-c88ddd8be059.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "trusted-contact-hero",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1195-byte implementation with 3 functions, 3 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "tsrx-grammar-schema-39f17e710f9c.js",
+    "bytes": 1440,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js",
+      "app-shared-7b9edc1bfb7f.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "assembleTsrxGrammar"
+    ],
+    "classification": "semantic-small",
+    "semantic": "tsrx-grammar-schema",
+    "action": "rewrite",
+    "reason": "The source contains a focused 1440-byte implementation with 4 functions, 2 static dependencies, 0 dynamic imports, and the concrete export surface assembleTsrxGrammar; it is small enough to restore directly."
+  },
+  {
+    "file": "tsrx.declarations-93502ef017af.js",
+    "bytes": 55749,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "tsrx-declarations",
+    "action": "preserve",
+    "reason": "The 55749-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 1 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "tsrx.statements-and-expressions-531d58afef27.js",
+    "bytes": 63882,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default",
+      "identifiers",
+      "literal"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "tsrx-statements-and-expressions",
+    "action": "preserve",
+    "reason": "The 63882-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 3 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "tsrx.tmLanguage-8ec48b56e0ab.js",
+    "bytes": 68126,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default",
+      "fileTypes",
+      "information_for_contributors",
+      "name",
+      "patterns",
+      "repository",
+      "scopeName",
+      "version"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "tsrx-tmlanguage",
+    "action": "preserve",
+    "reason": "The 68126-byte source is dominated by syntax/grammar tables; it has 1 static imports, 0 dynamic imports, and 8 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "tsrx.types-and-jsx-7076429c22c1.js",
+    "bytes": 70746,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "brackets",
+      "comment",
+      "default",
+      "directives",
+      "docblock",
+      "jsdoctype",
+      "jsx",
+      "regex",
+      "regexp",
+      "string",
+      "template",
+      "type"
+    ],
+    "classification": "semantic-small",
+    "semantic": "tsrx-types-and-jsx",
+    "action": "rewrite",
+    "reason": "The source contains a focused 70746-byte implementation with 57 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface brackets, comment, default, directives, docblock; it is small enough to restore directly."
+  },
+  {
+    "file": "tsx-c2aadc6c4d39.js",
+    "bytes": 96,
+    "imports": [
+      "tsx-b05f45ec50d2.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "tsx",
+    "action": "incremental-hub",
+    "reason": "The file is a 96-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "turtle-37245fe51e76.js",
+    "bytes": 99,
+    "imports": [
+      "turtle-3789894e20e3.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "default"
+    ],
+    "classification": "aggregation-runtime",
+    "semantic": "turtle",
+    "action": "incremental-hub",
+    "reason": "The file is a 99-byte initialization/re-export facade over 1 dependencies; 1 asset sources consume this exact chunk, so it is an integration boundary rather than standalone logic."
+  },
+  {
+    "file": "type-082fed8ad380.js",
+    "bytes": 555,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-p-series-threshold",
+    "action": "preserve",
+    "reason": "The 555-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-08ab5fc42dc6.js",
+    "bytes": 905,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "semantic-small",
+    "semantic": "type",
+    "action": "rewrite",
+    "reason": "The source contains a focused 905-byte implementation with 3 functions, 1 static dependencies, 0 dynamic imports, and the concrete export surface n, t; it is small enough to restore directly."
+  },
+  {
+    "file": "type-08e97dfb647e.js",
+    "bytes": 409,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-ecological-footprint",
+    "action": "preserve",
+    "reason": "The 409-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-103197d7f37d.js",
+    "bytes": 754,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-ipv4-subnetting-cidr",
+    "action": "preserve",
+    "reason": "The 754-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-10f0ea8edfaf.js",
+    "bytes": 839,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-segment-ratio",
+    "action": "preserve",
+    "reason": "The 839-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-110ca488953a.js",
+    "bytes": 658,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-slope-intercept",
+    "action": "preserve",
+    "reason": "The 658-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-113723ef7bdc.js",
+    "bytes": 710,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-confidence-interval-proportion",
+    "action": "preserve",
+    "reason": "The 710-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-119bdab76cbe.js",
+    "bytes": 830,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-evaporation-rate-factors",
+    "action": "preserve",
+    "reason": "The 830-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-11d77b78e3d4.js",
+    "bytes": 494,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-animal-life-cycle",
+    "action": "preserve",
+    "reason": "The 494-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-1425ccb81454.js",
+    "bytes": 393,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-wind-turbine",
+    "action": "preserve",
+    "reason": "The 393-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-161aea9178de.js",
+    "bytes": 514,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-while-loop-boolean-condition",
+    "action": "preserve",
+    "reason": "The 514-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-17796e12b6d2.js",
+    "bytes": 722,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-solenoid-internal-field",
+    "action": "preserve",
+    "reason": "The 722-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-17e8e3509fa5.js",
+    "bytes": 562,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-arithmetic-mean",
+    "action": "preserve",
+    "reason": "The 562-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-18452383754a.js",
+    "bytes": 451,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-gdp-value-double-counting",
+    "action": "preserve",
+    "reason": "The 451-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  },
+  {
+    "file": "type-18490a17e5a9.js",
+    "bytes": 533,
+    "imports": [
+      "rolldown-runtime-2d059c5e81f4.js"
+    ],
+    "dynamicImports": [],
+    "exports": [
+      "n",
+      "t"
+    ],
+    "classification": "generated-icon-or-data",
+    "semantic": "learning-model-predator-prey-cycle",
+    "action": "preserve",
+    "reason": "The 533-byte source is dominated by learning-model descriptor data; it has 1 static imports, 0 dynamic imports, and 2 exports, so hand rewriting would only duplicate generated data."
+  }
+]

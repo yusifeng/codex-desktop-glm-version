@@ -124,6 +124,12 @@ rpc-bridge 收官批次恢复最后 20 个语义模块，覆盖排序、几何�
 依据真实消费者、副作用和动态依赖证据走 generated preserve 轨道。三组专项测试共
 228 条断言；renderer 1531/1531、tsc 73，rpc-bridge 达到 410/410。当前剩余
 678 个全量缺口全部位于 misc-ui-utils（275/953）。
+misc-ui-utils 已完成 678 个缺口的三分区结构化审计，并由全局验证器证明原顺序覆盖、
+无重复、无遗漏。分类为 semantic-small 274、semantic-business-logic 66、
+aggregation-runtime 123、generated-icon-or-data 161、vendor-generated-preserve 54；
+建议动作分为 rewrite 314、preserve 215、incremental-hub 110、进一步消费者审计 39。
+下一阶段从高消费者基础工具和明确生成资产两端并行收敛，不按图标或文件名前缀批量
+登记。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入

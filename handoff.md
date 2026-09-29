@@ -385,9 +385,15 @@ rpc-bridge 当前 385/410。
 证据进入 generated preserve 轨道。三组专项测试共 228 条断言；renderer 1531/1531、
 tsc 73，rpc-bridge 达到 410/410。
 
+2026-09-29 已完成 misc-ui-utils 全部 678 个缺口的结构化审计；三份分区清单和全局
+验证器证明原顺序覆盖、无重复、无遗漏。分类为 semantic-small 274、
+semantic-business-logic 66、aggregation-runtime 123、generated-icon-or-data 161、
+vendor-generated-preserve 54；动作建议为 rewrite 314、preserve 215、incremental-hub
+110、进一步消费者审计 39。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
 但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 rpc-bridge 的
-678 个真实缺口全部位于 misc-ui-utils（当前 275/953）；下一步对该区建立结构化审计并按语义小模块、聚合运行时和 vendor/generated 三轨分批收敛。增量 hub 只在出现真实消费者时拆出
+678 个真实缺口全部位于 misc-ui-utils（当前 275/953）；结构化审计已完成，下一步优先恢复高消费者基础工具与明确业务逻辑，同时分批登记有逐文件证据的 generated/vendor 资产，并继续核验 39 个消费者不明确项。增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 

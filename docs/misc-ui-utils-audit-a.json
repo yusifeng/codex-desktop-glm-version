@@ -1,0 +1,4162 @@
+{
+  "category": "misc-ui-utils",
+  "batch": "A",
+  "pendingIndexRange": [
+    0,
+    225
+  ],
+  "expectedCount": 226,
+  "sourceList": "docs/renderer-app-chunks.json",
+  "trackedManifest": "scripts/renderer-chunk-manifest.mjs",
+  "auditedOn": "2026-09-29",
+  "entries": [
+    {
+      "file": "Aime-91ab7b051a2f.js",
+      "bytes": 24735,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "aime-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 71 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Aime-e93e12a8c91b.js",
+      "bytes": 167,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Aime-91ab7b051a2f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "AimeIcon",
+        "AimeIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "aime-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Aime illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "AmericanFootballFill-d27bc16b01a4.js",
+      "bytes": 2864,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "american-football-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Appy-2dead6be5548.js",
+      "bytes": 62022,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "appy-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 213 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Appy-3cec6511ba13.js",
+      "bytes": 167,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Appy-2dead6be5548.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "AppyIcon",
+        "AppyIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "appy-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Appy illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "BellFill-11165dd535e7.js",
+      "bytes": 1980,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bell-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Bloop-56209ce096cd.js",
+      "bytes": 47078,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bloop-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 158 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Bloop-baeff79d0bc4.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Bloop-56209ce096cd.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "BloopIcon",
+        "BloopIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "bloop-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Bloop illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "BookmarkFilled-8398e992a776.js",
+      "bytes": 1124,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bookmark-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Brief-630d4f63891e.js",
+      "bytes": 52725,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "brief-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 176 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Brief-e0e65e580b93.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Brief-630d4f63891e.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "BriefIcon",
+        "BriefIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "brief-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Brief illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "BriefcaseFill-374b76a063c2.js",
+      "bytes": 1760,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "briefcase-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "BusinessPlanFill-b23a31420c7d.js",
+      "bytes": 1942,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "business-plan-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "CalendarFill-971b555310d4.js",
+      "bytes": 1957,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "calendar-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "CartFill-5155ee01a7b8.js",
+      "bytes": 1767,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "cart-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "ChatBubbleFill-9487b08ae922.js",
+      "bytes": 1256,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "chat-bubble-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "CheckboxCheckedFilled-934dc0e4769b.js",
+      "bytes": 2368,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "checkbox-checked-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Chip-83dbc51e0b2d.js",
+      "bytes": 34667,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "chip-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 107 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Chip-d385aa7a4a4a.js",
+      "bytes": 167,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Chip-83dbc51e0b2d.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ChipIcon",
+        "ChipIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "chip-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Chip illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Clank-2e215b11c8ba.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Clank-b77db511676e.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ClankIcon",
+        "ClankIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "clank-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Clank illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Clank-b77db511676e.js",
+      "bytes": 32443,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "clank-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 111 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "ClipboardFill-e1d06fdde8ed.js",
+      "bytes": 1590,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "clipboard-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Clippy-f5e78a7bbf83.js",
+      "bytes": 44357,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "clippy-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 142 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Clippy-faf288dc573a.js",
+      "bytes": 173,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Clippy-f5e78a7bbf83.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ClippyIcon",
+        "ClippyIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "clippy-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Clippy illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Collab-46c38405cdae.js",
+      "bytes": 173,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Collab-ff6011978bce.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "CollabIcon",
+        "CollabIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "collab-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Collab illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Collab-ff6011978bce.js",
+      "bytes": 66476,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "collab-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 198 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "CreditCardFill-4f2f80f9b833.js",
+      "bytes": 1436,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "credit-card-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Dailee-187bdc9d8c74.js",
+      "bytes": 173,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Dailee-8a251b73d777.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "DaileeIcon",
+        "DaileeIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "dailee-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Dailee illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Dailee-8a251b73d777.js",
+      "bytes": 67530,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "dailee-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 243 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Digit-b4a775a3ccc5.js",
+      "bytes": 26334,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "digit-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 79 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Digit-d2988275dc6b.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Digit-b4a775a3ccc5.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "DigitIcon",
+        "DigitIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "digit-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Digit illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Dot-8f910bbe37cf.js",
+      "bytes": 164,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Dot-df6e0d4e452f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "DotIcon",
+        "DotIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "dot-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Dot illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Dot-df6e0d4e452f.js",
+      "bytes": 19747,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "dot-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 47 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "FileCodeSquareFill-3444fa647b71.js",
+      "bytes": 2036,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "file-code-square-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "FlaskFill-9c4717b08ec4.js",
+      "bytes": 1299,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "flask-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "FolderFill-87acbca8375f.js",
+      "bytes": 1260,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "folder-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Fuego-5b01dac6efab.js",
+      "bytes": 46405,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "fuego-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 164 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Fuego-6d2c150cceb3.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Fuego-5b01dac6efab.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "FuegoIcon",
+        "FuegoIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "fuego-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Fuego illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "HeartFill-b521f607871f.js",
+      "bytes": 1309,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "heart-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "HeartMessageFill-396488d89422.js",
+      "bytes": 1658,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "heart-message-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "ImageCaptionFilled-6ffa86d29a11.js",
+      "bytes": 2961,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "image-caption-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "ImageSquareFill-64da94532a2d.js",
+      "bytes": 1525,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "image-square-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Kit-100debb1035f.js",
+      "bytes": 48338,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "kit-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 165 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Kit-fcbb2a3b5227.js",
+      "bytes": 164,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Kit-100debb1035f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "KitIcon",
+        "KitIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "kit-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Kit illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "LightbulbFilled-e8d4e10695cd.js",
+      "bytes": 1185,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "lightbulb-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "LightningBoltFill-a1014595e9d8.js",
+      "bytes": 1578,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "lightning-bolt-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "MadamLuminary-ba2d4ffb6b96.js",
+      "bytes": 47291,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "madam-luminary-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 171 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "MadamLuminary-ce592da60552.js",
+      "bytes": 194,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "MadamLuminary-ba2d4ffb6b96.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "MadamLuminaryIcon",
+        "MadamLuminaryIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "madam-luminary-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired MadamLuminary illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Mailman-4f0b44049f71.js",
+      "bytes": 53352,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "mailman-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 170 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Mailman-7e7912bf627d.js",
+      "bytes": 176,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Mailman-4f0b44049f71.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "MailmanIcon",
+        "MailmanIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "mailman-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Mailman illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "MapFill-b27bf0a7df30.js",
+      "bytes": 1310,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "map-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "MapPinAltFill-c5f1a8a6b0f0.js",
+      "bytes": 1436,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "map-pin-alt-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "NewsPaper-4739abdcdbac.js",
+      "bytes": 3441,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "news-paper-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "NewspaperFill-be4ab0a5118b.js",
+      "bytes": 2928,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "newspaper-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Paige-aaae89ef4358.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Paige-ca36e15bdf52.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "PaigeIcon",
+        "PaigeIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "paige-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Paige illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Paige-ca36e15bdf52.js",
+      "bytes": 25292,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "paige-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 87 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "PencilFill-b0c7a54578fe.js",
+      "bytes": 1623,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "pencil-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Pocket-af4c4ccb300e.js",
+      "bytes": 35563,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "pocket-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 108 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Pocket-f9eee8bee6ec.js",
+      "bytes": 173,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Pocket-af4c4ccb300e.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "PocketIcon",
+        "PocketIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "pocket-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Pocket illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "ProductTag-d3b05b25b4e5.js",
+      "bytes": 2274,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "product-tag",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 2 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "Scout-9888dce8b84d.js",
+      "bytes": 29999,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "scout-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 93 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Scout-a9979c91000d.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Scout-9888dce8b84d.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ScoutIcon",
+        "ScoutIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "scout-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Scout illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Scribble-410fea1250b3.js",
+      "bytes": 179,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Scribble-affdf5c25f92.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ScribbleIcon",
+        "ScribbleIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "scribble-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Scribble illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Scribble-affdf5c25f92.js",
+      "bytes": 47706,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "scribble-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 161 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "SparkleFill-8c8677c86cda.js",
+      "bytes": 150,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "sparkle-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "StarFilled-5bb66bb8ebda.js",
+      "bytes": 1696,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "star-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Starry-223439111246.js",
+      "bytes": 173,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Starry-976e236d423e.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "StarryIcon",
+        "StarryIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "starry-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Starry illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Starry-976e236d423e.js",
+      "bytes": 27551,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "starry-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 76 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Stax-ab6daf072499.js",
+      "bytes": 47264,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "stax-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 155 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Stax-c33b1e551d02.js",
+      "bytes": 167,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Stax-ab6daf072499.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "StaxIcon",
+        "StaxIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "stax-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Stax illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "StudyFill-e7763d107837.js",
+      "bytes": 1685,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "study-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "StuffFill-c2cd481c378e.js",
+      "bytes": 3504,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "stuff-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Table2x2Fill-70adc4ff4dd5.js",
+      "bytes": 1203,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "table2x2-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "TaskClockFill-4fa6d1621c9f.js",
+      "bytes": 2348,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "task-clock-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "ThumbDownFilled-878011a97ee4.js",
+      "bytes": 1601,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "thumb-down-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "ThumbUpFilled-657b027f9b41.js",
+      "bytes": 1620,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "thumb-up-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Tome-87064b654669.js",
+      "bytes": 56271,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "tome-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 187 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Tome-f4be331aca2c.js",
+      "bytes": 167,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Tome-87064b654669.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "TomeIcon",
+        "TomeIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "tome-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Tome illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "VideoFilled-e7035ebb2080.js",
+      "bytes": 2282,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "video-filled-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "WarningFill-70afa944d48f.js",
+      "bytes": 1624,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "warning-fill-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "Whirr-2f001aeee1e0.js",
+      "bytes": 43268,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "whirr-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 142 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Whirr-44da1c804282.js",
+      "bytes": 170,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Whirr-2f001aeee1e0.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "WhirrIcon",
+        "WhirrIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "whirr-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Whirr illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Yo-f3493b8fd851.js",
+      "bytes": 161,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Yo-fa8e77dc63ac.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "YoIcon",
+        "YoIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "yo-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Yo illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Yo-fa8e77dc63ac.js",
+      "bytes": 17478,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "yo-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 49 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "Zapp-968a97f7ddea.js",
+      "bytes": 167,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "Zapp-ec77929753b5.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ZappIcon",
+        "ZappIconSm"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "zapp-illustration-entry",
+      "action": "incremental-hub",
+      "reason": "Thin two-import re-export/initialization wrapper for the paired Zapp illustration; keep it coupled to its large sibling and rewrite only as a hub."
+    },
+    {
+      "file": "Zapp-ec77929753b5.js",
+      "bytes": 20812,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "zapp-illustration",
+      "action": "preserve",
+      "reason": "Large JSX/vector illustration with 59 generated element calls and a paired thin entry chunk; semantic hand-rewrite would add little value."
+    },
+    {
+      "file": "_localized_strings-ec31ac05191c.js",
+      "bytes": 9706,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "LocaleResolver-d056a648395d.js"
+      ],
+      "dynamicImports": [
+        "am-4923d18a4f4f.js",
+        "ar-a0855080d692.js",
+        "bg-1f5a6fba665e.js",
+        "bn-cf9d8cd31c9a.js",
+        "bs-fbd5549c935a.js",
+        "ca-ceac8a5dcf72.js",
+        "cs-b71a8f9e0525.js",
+        "da-345034c0a3f8.js",
+        "de-77139fbc44bc.js",
+        "el-4e001f8f2fb2.js",
+        "es-793fc2c92ecd.js",
+        "es-ES-72542540c2ef.js",
+        "et-c15a198620cd.js",
+        "fi-9419f9206712.js",
+        "fr-225ff0cc6425.js",
+        "fr-CA-b9c51cb4b918.js",
+        "gu-5a202c5bad15.js",
+        "hi-575ed7679fee.js",
+        "hr-32a74720a5a9.js",
+        "hu-7a7311344d43.js",
+        "hy-97e632dff4f4.js",
+        "id-ID-889750fea51e.js",
+        "is-7d9e54100379.js",
+        "it-bec7b1858670.js",
+        "ja-ac40f89db1fb.js",
+        "ka-f585b19f6a4e.js",
+        "kk-3f5cf125389f.js",
+        "kn-95f56362dc60.js",
+        "ko-b71b0572ad12.js",
+        "lt-8db8e9d45d87.js",
+        "lv-dc41e3a71135.js",
+        "mk-7f8f2ef7115d.js",
+        "ml-e23812a0131e.js",
+        "mn-8619573fc1d9.js",
+        "mr-fdcdea028580.js",
+        "ms-f04a7d034687.js",
+        "my-a4ce9a83279c.js",
+        "nb-593841340ccc.js",
+        "nl-5fe0ba75d660.js",
+        "pa-d4020ac37376.js",
+        "pl-a01389de3356.js",
+        "pt-cc8861b18247.js",
+        "pt-PT-8de28e2ccc36.js",
+        "ro-4315f65a29f5.js",
+        "ru-54b9aaccb410.js",
+        "sk-48d8d305c35a.js",
+        "sl-65655a932c34.js",
+        "so-fd3ab268a612.js",
+        "sq-c26bff0f0546.js",
+        "sr-9c40b03ae72a.js",
+        "sv-b09c71348b5e.js",
+        "sw-e294ef26f96a.js",
+        "ta-22595aef02ed.js",
+        "te-9fc27068472f.js",
+        "th-33135978d706.js",
+        "tl-3d6c6cf848c3.js",
+        "tr-f2c74e51c15c.js",
+        "uk-d6c99c6a507f.js",
+        "ur-9bb0398cbf27.js",
+        "vi-abc967c62087.js",
+        "zh-HK-298615a82d09.js",
+        "zh-Hans-586d0836472f.js",
+        "zh-Hant-41c3cc10962a.js"
+      ],
+      "exports": [
+        "preloadValdiLocale",
+        "valdiLocaleLoaders",
+        "default"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "localized-strings-loader",
+      "action": "incremental-hub",
+      "reason": "Locale-loader aggregation hub with 63 explicit dynamic locale imports; preserve ordering and migrate only together with the locale resolver/runtime contract."
+    },
+    {
+      "file": "absolutely-dark-f50f351ee0a4.js",
+      "bytes": 2092,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "bg",
+        "colors",
+        "default",
+        "fg",
+        "name",
+        "settings",
+        "type"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "absolutely-dark-theme-tokens",
+      "action": "preserve",
+      "reason": "Generated theme/token data with parallel light/dark variants and no business branching; preserve exact values."
+    },
+    {
+      "file": "absolutely-light-79eaa93587de.js",
+      "bytes": 2094,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "bg",
+        "colors",
+        "default",
+        "fg",
+        "name",
+        "settings",
+        "type"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "absolutely-light-theme-tokens",
+      "action": "preserve",
+      "reason": "Generated theme/token data with parallel light/dark variants and no business branching; preserve exact values."
+    },
+    {
+      "file": "action-1e2563405a5e.js",
+      "bytes": 156,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "action-88b2df6de39c.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "VirtualTryOnProductAction"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "action-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (156 bytes, 2 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "action-88b2df6de39c.js",
+      "bytes": 65794,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "chatgpt-personalization-route-36526df91ee9.js",
+        "state-18d9effd66a2.js",
+        "details-cache-7f541ad230b1.js",
+        "virtual_try_on-973471b1fae5.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "action",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 7 static imports, 3 exports and 3 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "active-theme-font-face-loader-932b256c28db.js",
+      "bytes": 1555,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "theme-font-family-dc698ab60879.js",
+        "theme-font-face-loader-c998b13292c3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ActiveThemeFontFaceLoader"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "active-theme-font-face-loader",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (1555 bytes, 1 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "adaptive-slider-7a51d6c629a2.js",
+      "bytes": 5242,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "c",
+        "i",
+        "l",
+        "n",
+        "o",
+        "r",
+        "s",
+        "t",
+        "u"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "adaptive-slider",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (5242 bytes, 10 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "adaptive-slider-field-6d316e0b7a10.js",
+      "bytes": 6524,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "adaptive-slider-7a51d6c629a2.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "adaptive-slider-field",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (6524 bytes, 6 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "add-method-afab5885229a.js",
+      "bytes": 198,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "form-options-1e57f86b2564.js",
+        "add-method-2829ddee8c5b.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "AddPaymentMethodDialog"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "add-method-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (198 bytes, 3 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "ajs-destination-9284d38cb533.js",
+      "bytes": 16435,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "middleware-8ddcb7d6b81f.js",
+        "helpers-acb0f45721c0.js",
+        "metric-helpers-107c5da7f8a5.js",
+        "load-script-d64a1e7ce422.js",
+        "is-plan-event-enabled-edb7e7f2c465.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ajsDestinations"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "ajs-destination-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (16435 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "anatomy-feedback-schematic-88345e8df0bb.js",
+      "bytes": 2148,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "learning-block-stroke-e5db4228ffca.js",
+        "learning-block-path-74045b6d1532.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "anatomy-feedback-schematic",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 4 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "angular-html-af8a1b408ff5.js",
+      "bytes": 105,
+      "imports": [
+        "angular-html-d4489a2bd77e.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "angular-html-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (105 bytes, 1 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "announcement-1bd76f90c419.js",
+      "bytes": 13159,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "state-92adb03a8a05.js",
+        "home-announcement-slot-e1c7dd804e24.js",
+        "queries-c2eea224fb16.js",
+        "events-f978a623b4c2.js"
+      ],
+      "dynamicImports": [
+        "dialog-910ee61091c4.js"
+      ],
+      "exports": [
+        "SubscriptionPaymentAnnouncement"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "announcement",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 8 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "announcement-host-46a475b49467.js",
+      "bytes": 3039,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "workspace-discovery-d569efe7ed15.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "WorkspaceDiscoveryAnnouncementHost"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "announcement-host",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "app-prefetch-impl-b09df14f7d97.js",
+      "bytes": 22534,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "computer-history-suggestions-55e8abf166e7.js",
+        "use-git-config-value-d5ec387379f6.js",
+        "use-git-submodule-paths-b4885fafb7e7.js"
+      ],
+      "dynamicImports": [
+        "local-conversation-page-4e7583bd972f.js",
+        "upgrade-dialog-f2529a5d5f14.js",
+        "pricing-page-36fee2aeb2d5.js",
+        "thread-side-panel-tabs-2710ef7b552b.js"
+      ],
+      "exports": [
+        "AppPrefetchImpl"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "app-prefetch-impl-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (22534 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "architecture-TIHT7OUA-ad8e527a0b6e.js",
+      "bytes": 166,
+      "imports": [
+        "chunk-KEIR6QF5-326e1da7e0a5.js",
+        "mermaid-parser.core-9ffe5a9fb28c.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "createArchitectureServices"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "architecture-tiht7-oua-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (166 bytes, 2 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "architecture-TIHT7OUA-cfc5657bcd33.js",
+      "bytes": 307,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "chunk-KEIR6QF5-95b0e7b7ebae.js",
+        "chunk-MOZMSUNE-b97bb692aa30.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "createArchitectureServices"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "architecture-tiht7-oua-entry-variant-2",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (307 bytes, 3 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "auto-track-c4c9b822fca3.js",
+      "bytes": 2310,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "callback-d3e2038dfd64.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "form",
+        "link"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "auto-track",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (2310 bytes, 2 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "banner-235b1db18610.js",
+      "bytes": 15626,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ViewOnlySeatBanner",
+        "WorkspaceSeatTopBanner"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "banner",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 3 static imports, 2 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "banner-45681dba535f.js",
+      "bytes": 6197,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "share-conversation-action-d9662851aef1.js",
+        "constants-5740dedf4d5e.js",
+        "codex-app-home-beacon-announcement-8c94f69eb080.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ChatGptConversationBeaconBanner"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "banner-variant-2",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 7 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "bar-sizing-fa3b2a70455c.js",
+      "bytes": 3085,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "bar-sizing",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (3085 bytes, 6 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "bell-1a0f5d7a0fc0.js",
+      "bytes": 2910,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bell-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "bell-BoHq-7gy-5a0d1c0ad91e.js",
+      "bytes": 5312,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bell-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "bell-DFgib1XV-a9d529970bdb.js",
+      "bytes": 3074,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bell-icon-definition-variant-2",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "bell-f190ed5fc2db.js",
+      "bytes": 7997,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bell-icon-variant-2",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "bin-BmIDzUhB-ad9359ef136a.js",
+      "bytes": 1927,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bin-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "bin-e5229a0d7a84.js",
+      "bytes": 1895,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "bin-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "button-6de526bfdc3d.js",
+      "bytes": 1349,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "button",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (1349 bytes, 3 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "c-ac5eb10559fb.js",
+      "bytes": 94,
+      "imports": [
+        "c-3dc82c570549.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "c-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (94 bytes, 1 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "calendar-BM0FjOnq-2fd6280945c2.js",
+      "bytes": 4475,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "calendar-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "calendar-d074c0f6f12a.js",
+      "bytes": 4547,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "calendar-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "cannon-83a86e614bd8.js",
+      "bytes": 16000,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "fireConfettiCannon"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "cannon",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "card-CZrXqcnR-657261a0d01a.js",
+      "bytes": 3844,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "card-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "card-ccdd7a82e0c2.js",
+      "bytes": 6649,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "card-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "catmullRom-b244076d0269.js",
+      "bytes": 5033,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "math-de3a0e0db4e2.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "catmull-rom",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (5033 bytes, 6 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "championship-cup-DVJjBfBN-159a1c5732e5.js",
+      "bytes": 2971,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "championship-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "championship-cup-a99b20ab1516.js",
+      "bytes": 3032,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "championship-cup-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "channel-6a55bfb120f8.js",
+      "bytes": 152,
+      "imports": [
+        "chunk-WYO6CB5R-c05f1bd885f2.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "t"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "channel-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (152 bytes, 1 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "channel-b05b0fc90e5c.js",
+      "bytes": 308,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "chunk-WYO6CB5R-48e89393abef.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "channel-entry-variant-2",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (308 bytes, 2 imports, 2 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "chatgpt-announcement-candidates-2877ea4f3612.js",
+      "bytes": 32230,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "share-conversation-action-d9662851aef1.js",
+        "constants-5740dedf4d5e.js",
+        "usage-5ab4582aac77.js",
+        "composer-announcement-slot-6e5975fb94c1.js"
+      ],
+      "dynamicImports": [
+        "codex-app-home-beacon-announcement-8a3d3ccd4244.js",
+        "composer-tip-fda4ea1a2c09.js",
+        "pasted-link-connect-modal-730ca5a9f5d7.js"
+      ],
+      "exports": [
+        "ChatGptAnnouncementCandidates"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "chatgpt-announcement-candidates",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 8 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "chatgpt-gizmo-header-b2d164e126a5.js",
+      "bytes": 168,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "chatgpt-gizmo-header-1c15908228d6.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ChatGptGizmoHeader"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "chatgpt-gizmo-header-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (168 bytes, 2 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "chatgpt-header-upgrade-b1c003dededb.js",
+      "bytes": 8609,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ChatGptHeaderUpgrade"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "chatgpt-header-upgrade",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 3 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "chatgpt-project-query-b2bce6d9b6ee.js",
+      "bytes": 125,
+      "imports": [
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "fetchChatGptProject"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "chatgpt-project-query-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (125 bytes, 1 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "chatgpt-request-670b0ddb78e4.js",
+      "bytes": 378,
+      "imports": [
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "Request",
+        "chatGptCloudBrowserFormFillResponseSchema",
+        "getChatGPTBrowserProxiedBackendUrl",
+        "getChatGPTRequestHeaders",
+        "getChatGptRequestProfile",
+        "isChatGPTNativeDesktopSurface"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "chatgpt-request-exports",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (378 bytes, 1 imports, 6 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "chatgpt-temporary-chat-ui-9a5f159b3461.js",
+      "bytes": 241,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "chatgpt-temporary-chat-ui-9fb0c710b365.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ChatGptTemporaryChatOnboardingModalHost",
+        "ChatGptTemporaryChatToggleButton"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "chatgpt-temporary-chat-ui-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (241 bytes, 2 imports, 2 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "chatgpt_voice-cb350881bdb5.js",
+      "bytes": 2950,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "c",
+        "i",
+        "l",
+        "n",
+        "o",
+        "r",
+        "s",
+        "t"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "chatgpt-voice-analytics-protobuf",
+      "action": "preserve",
+      "reason": "Generated protobuf analytics enums and message type descriptors; preserve generated values and compressed export compatibility."
+    },
+    {
+      "file": "christmas-CEq7vk6b-d68d93ab1ae5.js",
+      "bytes": 4064,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "christmas-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "christmas-f6408fae1325.js",
+      "bytes": 4641,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "christmas-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "circular-solid-geometry-3f972b28e3c0.js",
+      "bytes": 1163,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "circular-solid-geometry",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (1163 bytes, 2 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "classify-475110c4b36d.js",
+      "bytes": 2729,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "math-block-utils-ca3c4f5321e8.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "c",
+        "d",
+        "i",
+        "l",
+        "n",
+        "o",
+        "r",
+        "s",
+        "t",
+        "u"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "classify",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (2729 bytes, 11 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "client-206f71f5a32c.js",
+      "bytes": 5422,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "clearPersistedConversationSnapshots",
+        "createConversationSnapshotClient"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "client",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 3 static imports, 2 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "clike-ce9cd077a325.js",
+      "bytes": 30033,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "c",
+        "csharp",
+        "dart",
+        "kotlin",
+        "objectiveC",
+        "scala"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "clike-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "clojure-c69d8cb25c09.js",
+      "bytes": 10906,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "clojure"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "clojure-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "cmake-1858d5f79e7c.js",
+      "bytes": 98,
+      "imports": [
+        "cmake-41f37fc34f77.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "cmake-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "codex-dark-5fb95d1c65ca.js",
+      "bytes": 34949,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "colors",
+        "default",
+        "name",
+        "semanticTokenColors",
+        "tokenColors",
+        "type"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "codex-dark-syntax-theme",
+      "action": "preserve",
+      "reason": "Generated theme/token data with parallel light/dark variants and no business branching; preserve exact values."
+    },
+    {
+      "file": "codex-light-53d4e35e1869.js",
+      "bytes": 34951,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "colors",
+        "default",
+        "name",
+        "semanticTokenColors",
+        "tokenColors",
+        "type"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "codex-light-syntax-theme",
+      "action": "preserve",
+      "reason": "Generated theme/token data with parallel light/dark variants and no business branching; preserve exact values."
+    },
+    {
+      "file": "comment-light-dismiss-4ad7bc38388a.js",
+      "bytes": 1625,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "comment-light-dismiss",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (1625 bytes, 4 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "comment-popup-portal-f8916f9c2211.js",
+      "bytes": 34208,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "annotation-comment-editor-card-d93daf522823.js",
+        "comment-light-dismiss-4ad7bc38388a.js",
+        "comment-mode-coachmark-state-4ad0aae781cf.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "comment-popup-portal",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 6 static imports, 2 exports and 3 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "commentary-36eecb6e11d3.js",
+      "bytes": 3888,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "s",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "commentary",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (3888 bytes, 7 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "commonlisp-7766ebc65967.js",
+      "bytes": 3632,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "commonLisp"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "commonlisp-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "computer-use-app-approval-request-card-63cdc4e7642f.js",
+      "bytes": 6528,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "computer-use-app-approval-request-card",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 3 static imports, 4 exports and 5 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "cone-visualization-221d5bdd2dfe.js",
+      "bytes": 3987,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "circular-solid-geometry-3f972b28e3c0.js",
+        "geometry-shapes-22f10631ebb5.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "cone-visualization",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 3 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "confirm-pricing-plan-upgrade-32a0f7010a57.js",
+      "bytes": 2916,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-initial-51da50e6c6e3.js",
+        "queries-286723afe196.js",
+        "subscription-update-plan-21755a439e4a.js",
+        "queries-75df5b2ce147.js",
+        "stripe-client-5cc289885357.js",
+        "billing-state-788082ee5c84.js",
+        "display-7469cc8285f9.js",
+        "confirm-subscription-upgrade-f595e87039bb.js",
+        "delinquent-upgrade-preparation-e29199d95d54.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "confirmPricingPlanUpgrade",
+        "getPricingPlanDefaultPaymentMethod",
+        "getPricingPlanPaymentMethod"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "confirm-pricing-plan-upgrade",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 10 static imports, 3 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "connect-code-execution-sandbox-b02ae1d03047.js",
+      "bytes": 10748,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "code-execution-sandbox-connection",
+      "action": "rewrite",
+      "reason": "Self-contained sandbox connection and lifecycle logic used by code execution entry points; clear protocol behavior makes it a high-value typed rewrite."
+    },
+    {
+      "file": "consent-1e345bc20d6a.js",
+      "bytes": 8948,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "control-dialog-5f9759a98bae.js",
+        "state-2c971b0a2903.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ChatGptAdsConsentBoundary"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "consent",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 5 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "constant-acceleration-visualization-5cb4c2e637e4.js",
+      "bytes": 12345,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "control-panel-9789995ccf0d.js",
+        "input-selector-group-c5ab39b64319.js",
+        "math-block-coordinate-plane-5112206272ca.js",
+        "format-number-input-963055547a11.js",
+        "escape-latex-text-77b4ee5f398b.js",
+        "type-d8ff967dcf16.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "c",
+        "i",
+        "n",
+        "o",
+        "r",
+        "s",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "constant-acceleration-visualization",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 5 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "content-960bb4aa1af7.js",
+      "bytes": 1862,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "content",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (1862 bytes, 4 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "contracts-96b363340ff1.js",
+      "bytes": 578,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "voice-contracts-exports",
+      "action": "incremental-hub",
+      "reason": "Compact voice contract/export bridge shared by entry and DSP consumers; migrate only with the complete voice protocol hub."
+    },
+    {
+      "file": "controller-db23a3ccb086.js",
+      "bytes": 14048,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "ambient-suggestion-apps-75842c7ad68b.js",
+        "catalog-a1acd6460594.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ComposerTipController"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "controller",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 6 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "controls-fedbfda05b6b.js",
+      "bytes": 119318,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "avatar-mascot-button-ae197b2778b9.js",
+        "realtime-voice-handoff-target-f35f43cc3d00.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "I",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "R",
+        "S",
+        "T",
+        "V",
+        "_",
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "controls",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 5 static imports, 41 exports and 3 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "core-51383d4e7880.js",
+      "bytes": 32697,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "t"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "core-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (32697 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "core-cd4391224cfa.js",
+      "bytes": 95706,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "FileTypeParser",
+        "fileTypeFromBlob",
+        "fileTypeFromBuffer",
+        "fileTypeFromStream",
+        "fileTypeFromTokenizer",
+        "fileTypeStream",
+        "normalizeSampleSize",
+        "reasonableDetectionSizeInBytes",
+        "supportedExtensions",
+        "supportedMimeTypes"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "core-vendor-runtime-variant-2",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (95706 bytes, 10 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "core-e0ac85b4f9b8.js",
+      "bytes": 257,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "core-51383d4e7880.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "core-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (257 bytes, 2 imports, 2 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "cose-bilkent-JH36ORCC-dccf435aa34f.js",
+      "bytes": 155068,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "src-d4879d58b20a.js",
+        "chunk-X3CZISLH-994f10fe4442.js",
+        "chunk-Y2CYZVJY-24cce454fd91.js",
+        "cytoscape.esm-9c90b5045aa0.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "render"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "cose-bilkent-jh36-orcc-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (155068 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "cpp-115418ba4245.js",
+      "bytes": 96,
+      "imports": [
+        "cpp-73c01217e4f2.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "cpp-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "create-session-976e086b152c.js",
+      "bytes": 1999,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-initial-51da50e6c6e3.js",
+        "checkout-policy-ef9f1355d482.js",
+        "chatgpt-account-action-integrity-f16d96deb62f.js",
+        "session-3ec40b7dd28e.js",
+        "promo-funnel-context-9480e9b31063.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "create-session",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 3 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "createLucideIcon-BrIFp4GW-30982a428a75.js",
+      "bytes": 1772,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "create-lucide-icon-br-ifp4-gw-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (1772 bytes, 2 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "csharp-8c303cc1438c.js",
+      "bytes": 99,
+      "imports": [
+        "csharp-3b3778d82232.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "csharp-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "csv-b6e2b8c81267.js",
+      "bytes": 96,
+      "imports": [
+        "csv-ce71efbe80f9.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "csv-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "cynefin-VYW2F7L2-669e53f980a8.js",
+      "bytes": 302,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "chunk-KEIR6QF5-95b0e7b7ebae.js",
+        "chunk-OSBZ3O6U-44384f658d84.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "createCynefinServices"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "cynefin-vyw2-f7-l2-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (302 bytes, 3 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "cynefin-VYW2F7L2-7ae4cdc77c53.js",
+      "bytes": 161,
+      "imports": [
+        "chunk-KEIR6QF5-326e1da7e0a5.js",
+        "mermaid-parser.core-9ffe5a9fb28c.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "createCynefinServices"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "cynefin-vyw2-f7-l2-entry-variant-2",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (161 bytes, 2 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "cytoscape.esm-1029c72ddab6.js",
+      "bytes": 698496,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [
+        "t"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "cytoscape-esm-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (698496 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "cytoscape.esm-9c90b5045aa0.js",
+      "bytes": 833343,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "cytoscape-esm-vendor-runtime-variant-2",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (833343 bytes, 2 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "data-controls-77428d3ea6b7.js",
+      "bytes": 63896,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "delete-archived-chats-dialog-c9e21f2b6f91.js",
+        "thread-emoji-77f099a25a67.js",
+        "settings-loading-row-bc154f92cd90.js",
+        "control-group-d36c30955310.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "DataControlsSettings"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "data-controls",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 7 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "deferred-verification-banner-e314c15c65cb.js",
+      "bytes": 6107,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "persona-c20d99cab572.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "DeferredClinicianVerificationBanner"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "deferred-verification-banner",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 4 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "delinquent-upgrade-e92376d1fe9d.js",
+      "bytes": 46167,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "queries-286723afe196.js",
+        "subscription-update-plan-21755a439e4a.js",
+        "subscription-update-dialog-4a5f993296a4.js",
+        "queries-75df5b2ce147.js",
+        "error-726f28532d62.js",
+        "stripe-client-5cc289885357.js",
+        "billing-state-788082ee5c84.js",
+        "add-method-2829ddee8c5b.js",
+        "display-7469cc8285f9.js",
+        "edit-method-fdb1b490d19f.js",
+        "queries-c2eea224fb16.js",
+        "stripe-payment-confirmation-ff492adf70b6.js",
+        "confirm-subscription-upgrade-f595e87039bb.js",
+        "delinquent-upgrade-preparation-e29199d95d54.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "DelinquentUpgradeDialog"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "delinquent-upgrade",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 17 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "delinquent-upgrade-preparation-846faddf31c3.js",
+      "bytes": 176,
+      "imports": [
+        "delinquent-upgrade-preparation-e29199d95d54.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "getRecoveryError",
+        "prepareDelinquentUpgrade"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "delinquent-upgrade-preparation-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (176 bytes, 1 imports, 2 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "details-a0d511b36499.js",
+      "bytes": 144,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "details-fbd0d4043904.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "SkillDetails"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "details-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (144 bytes, 2 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "details-cache-1e493bfd7846.js",
+      "bytes": 126,
+      "imports": [
+        "details-cache-7f541ad230b1.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "prefetchProductDetails"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "details-cache-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (126 bytes, 1 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "details-cache-7f541ad230b1.js",
+      "bytes": 9289,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "request-context-78a35acf49b6.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "c",
+        "i",
+        "n",
+        "o",
+        "r",
+        "s",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "details-cache",
+      "action": "rewrite",
+      "reason": "Bounded details-cache state and lookup behavior with eight exports and explicit consumers; recover before the larger details UI chunk."
+    },
+    {
+      "file": "details-fbd0d4043904.js",
+      "bytes": 26991,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "plugin-skill-preview-2b63e487edb1.js",
+        "state-925b506801ef.js",
+        "skill-icon-source-226733e753a8.js",
+        "file-rows-f334bd086a2a.js",
+        "files-e0b4a62d9675.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "details",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 9 static imports, 4 exports and 3 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "dictation-audio-worklet-be694bf1dbf5.js",
+      "bytes": 1071,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "dictation-audio-worklet-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (1071 bytes, 0 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "directory-a7494315f12b.js",
+      "bytes": 54187,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "document-title-5abab3e90efd.js",
+        "skills-page-grid-5ae92027bbba.js",
+        "card-tile-58cfccd9fb3f.js",
+        "state-925b506801ef.js",
+        "skill-icon-source-226733e753a8.js",
+        "details-fbd0d4043904.js",
+        "connector-logo-stack-3da1aaa1ab00.js",
+        "plugins-store-page-c507a4ccaef5.js",
+        "plugins-page-section-1f9dd2d984ea.js",
+        "share-dialog-700ca28006a6.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "BrowserSkillsDirectory"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "directory",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 13 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "directory-banner-443a333e7ccd.js",
+      "bytes": 34717,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "hosted-plugin-creation-actions-4e853be1a532.js",
+        "skills-page-grid-5ae92027bbba.js",
+        "card-tile-58cfccd9fb3f.js",
+        "gpt-about-dialog-7509f0d1e79e.js",
+        "migrated-plugin-access-912829d71f23.js",
+        "notices-dbed4ccd62e0.js"
+      ],
+      "dynamicImports": [
+        "gpt-create-plugin-prompt-d643d2e56f2d.js"
+      ],
+      "exports": [
+        "a",
+        "c",
+        "d",
+        "i",
+        "l",
+        "n",
+        "o",
+        "r",
+        "s",
+        "t",
+        "u"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "directory-banner",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 9 static imports, 11 exports and 3 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "dockerfile-52b80bf56b3a.js",
+      "bytes": 6395,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "dockerFile"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "dockerfile-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "dotnet.js",
+      "bytes": 59781,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [
+        "default",
+        "dotnet",
+        "exit"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "dotnet-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (59781 bytes, 3 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "dotnet.native.k09zdxq5tw.js",
+      "bytes": 177532,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "dotnet-native-k09zdxq5tw-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (177532 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "dotnet.runtime.8ha609180a.js",
+      "bytes": 306066,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [
+        "configureEmscriptenStartup",
+        "configureRuntimeStartup",
+        "configureWorkerStartup",
+        "initializeExports",
+        "initializeReplacements",
+        "passEmscriptenInternals",
+        "runtimeList",
+        "setRuntimeGlobals"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "dotnet-runtime-8ha609180a-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (306066 bytes, 8 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "draft-state-252f268b22b4.js",
+      "bytes": 181,
+      "imports": [
+        "draft-state-b6af9e5f8526.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "recoverBusinessAgentDraft",
+        "removeBusinessAgentDraftsForInteraction"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "draft-state-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (181 bytes, 1 imports, 2 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "draft-state-b6af9e5f8526.js",
+      "bytes": 3762,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "draft-state",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 3 static imports, 4 exports and 4 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "dsp-d76b3132336b.js",
+      "bytes": 442,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "dsp-exports",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (442 bytes, 2 imports, 5 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "editable-plan-tab-8cd53c10d41a.js",
+      "bytes": 171,
+      "imports": [
+        "app-shared-7b9edc1bfb7f.js",
+        "editable-plan-tab-fc207ca5374e.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "openEditablePlanTabWithEditor"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "editable-plan-tab-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (171 bytes, 2 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "eligibility-d6f5d74b3829.js",
+      "bytes": 2553,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "eligibility",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (2553 bytes, 6 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "equation-44cf0b1d4b75.js",
+      "bytes": 23574,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "build-graph-data-ee6e0d8e135a.js",
+        "tokenize-math-block-92dba400da42.js",
+        "x-like-435c693d8722.js",
+        "classify-475110c4b36d.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "S",
+        "_",
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "g",
+        "h",
+        "i",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "x",
+        "y"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "equation-analysis",
+      "action": "rewrite",
+      "reason": "Central equation parsing/classification utility with 22 exports and direct learning/graph consumers; typed recovery would unlock several dependent visualization chunks."
+    },
+    {
+      "file": "escape-latex-text-77b4ee5f398b.js",
+      "bytes": 553,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "escape-latex-text",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (553 bytes, 2 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "evernote-e9492a3aad7c.js",
+      "bytes": 39685,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "evernote-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "expand-15b520e3daf3.js",
+      "bytes": 8099,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "linear-32e1d819583b.js",
+        "nice-2b3cc20611af.js",
+        "defaultLocale-99084237f459.js",
+        "init-cd6c1f803e47.js",
+        "constant-363a14bf6d8f.js",
+        "array-15adaa1bc228.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "_",
+        "a",
+        "c",
+        "d",
+        "f",
+        "g",
+        "h",
+        "i",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "expand",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (8099 bytes, 18 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "export-22cc6e2352c3.js",
+      "bytes": 188,
+      "imports": [
+        "export-6cf67894f30b.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "createLocalMarkupPreview",
+        "exportImageMarkup",
+        "getMarkupSurfaceSize"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "export-exports",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (188 bytes, 1 imports, 3 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "export-6cf67894f30b.js",
+      "bytes": 1980,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-initial-51da50e6c6e3.js",
+        "sketch-559c02939086.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "export",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 3 static imports, 4 exports and 3 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "extends-df342f7c2e8b.js",
+      "bytes": 488,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "extends",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (488 bytes, 2 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "external-agent-import-setup-66dccaf0e5b4.js",
+      "bytes": 9309,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-connect-modal-7b842fd077d6.js",
+        "use-external-agent-import-setup-actions-c839faa9dba2.js",
+        "setup-2f040eea0a81.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "ExternalAgentImportSetupModal"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "external-agent-import-setup",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "fire-957a2a11da75.js",
+      "bytes": 2205,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "fire-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "fire-DsrXeFJ2-7e72a4308d84.js",
+      "bytes": 1826,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "fire-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "first-run-8b4767446d20.js",
+      "bytes": 35190,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "use-ascii-engine-dea3f8f79bb0.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "FirstRunPage",
+        "collection"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "first-run",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 5 static imports, 2 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "fortran-free-form-cdbb0f6ffbe0.js",
+      "bytes": 110,
+      "imports": [
+        "fortran-free-form-29925ea254af.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "fortran-free-form-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (110 bytes, 1 imports, 1 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "garden-expo-C-1eaTwJ-deb2ff3190ef.js",
+      "bytes": 6868,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "garden-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "garden-expo-e7f355b8c6f1.js",
+      "bytes": 10561,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "garden-expo-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "gate.electron-622b420b2745.js",
+      "bytes": 30887,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "WorkspaceRecoveryGate"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "gate-electron",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 4 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "gdscript-f14b099b0cfd.js",
+      "bytes": 101,
+      "imports": [
+        "gdscript-a2165fb2e1cc.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "gdscript-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "gdshader-df74c669b2ed.js",
+      "bytes": 101,
+      "imports": [
+        "gdshader-19d346c8700a.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "gdshader-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "geometry-shapes-22f10631ebb5.js",
+      "bytes": 14871,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "c",
+        "d",
+        "f",
+        "i",
+        "l",
+        "n",
+        "o",
+        "p",
+        "r",
+        "s",
+        "t",
+        "u"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "geometry-shapes",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (14871 bytes, 13 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "get-plus-header-button-4fc6736dd0bd.js",
+      "bytes": 2792,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [
+        "upgrade-dialog-f2529a5d5f14.js"
+      ],
+      "exports": [
+        "GetPlusHeaderButton"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "get-plus-header-button",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "globe-3e04dc794d34.js",
+      "bytes": 6210,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "globe-icon",
+      "action": "preserve",
+      "reason": "Static rendered icon/vector asset with fixed path data; preserve exact geometry rather than manually rewriting."
+    },
+    {
+      "file": "globe-CIKsZs85-4798bf5743a6.js",
+      "bytes": 5400,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "globe-icon-definition",
+      "action": "preserve",
+      "reason": "Static registered icon path definition consumed by the icon registry; preserve generated coordinates and export shape."
+    },
+    {
+      "file": "glsl-a0fe947a2b45.js",
+      "bytes": 97,
+      "imports": [
+        "glsl-984664825cc1.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "glsl-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "go-9a5eb757db6b.js",
+      "bytes": 95,
+      "imports": [
+        "go-9204c07b28c2.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "go-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "gpt-management-access-2072635b520e.js",
+      "bytes": 3328,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "gpt-management-access",
+      "action": "rewrite",
+      "reason": "Focused utility/component with bounded logic (3328 bytes, 4 exports) and identifiable consumers; suitable for a direct typed semantic rewrite."
+    },
+    {
+      "file": "gracefulDecodeURIComponent-c5c02606df15.js",
+      "bytes": 250,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "graceful-decode-uricomponent-entry",
+      "action": "incremental-hub",
+      "reason": "Small dependency/export bridge (250 bytes, 1 imports, 2 exports) with little standalone logic; migrate only with its consumer hub."
+    },
+    {
+      "file": "haml-d470fdfe9f4c.js",
+      "bytes": 97,
+      "imports": [
+        "haml-3bbab7efb1b9.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "haml-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "hammer-af276e28ba3d.js",
+      "bytes": 33423,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "t"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "hammer-vendor-runtime",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (33423 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "hammer-edb1316c3532.js",
+      "bytes": 86,
+      "imports": [
+        "hammer-af276e28ba3d.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "hammer-vendor-runtime-variant-2",
+      "action": "preserve",
+      "reason": "Bundled third-party/generated runtime (86 bytes, 1 exports); preserve upstream behavior and avoid semantic fork maintenance."
+    },
+    {
+      "file": "haskell-99fa71648973.js",
+      "bytes": 8852,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "haskell"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "haskell-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "haxe-5f4404ed24c9.js",
+      "bytes": 97,
+      "imports": [
+        "haxe-4b8170017548.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "haxe-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "header-d5a6f0c17802.js",
+      "bytes": 19641,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "dock-127e7a9fd453.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "Header"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "header",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 4 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "hidden-background-webview-host-31e6685d725d.js",
+      "bytes": 3830,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "webview-b1b7b13a4120.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "HiddenBackgroundBrowserWebviewHost"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "hidden-background-webview-host",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "hidden-browser-use-webview-host-7226ca67ad08.js",
+      "bytes": 3637,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "webview-b1b7b13a4120.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "HiddenBrowserUseWebviewHost"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "hidden-browser-use-webview-host",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "hlsl-246e1a652ff1.js",
+      "bytes": 97,
+      "imports": [
+        "hlsl-a292573f74ca.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "hlsl-syntax-definition",
+      "action": "preserve",
+      "reason": "Third-party syntax grammar registration consumed by the code editor; generated regex tables should remain byte-faithful."
+    },
+    {
+      "file": "host-f06bd3ee2bff.js",
+      "bytes": 2926,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [
+        "modal-66828775ce7a.js"
+      ],
+      "exports": [
+        "PepperOnboardingAnnouncementHost"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "host",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    },
+    {
+      "file": "hosted-map-64aff905504e.js",
+      "bytes": 85570,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "use-chatgpt-composer-controller-d0283af53f81.js",
+        "chatgpt-conversation-transcript-892e17d899b3.js",
+        "mapbox-canvas-b25a11c53c2b.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "HostedImmersiveMap"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "hosted-map",
+      "action": "further-consumer-audit",
+      "reason": "Product-facing UI/state logic with 7 static imports, 1 exports and 1 detected consumer(s); inspect call contracts before rewriting."
+    },
+    {
+      "file": "hotkey-window-detail-layout-28496c4c6613.js",
+      "bytes": 13432,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "use-hotkey-window-detail-layout-5fb9006ac05e.js",
+        "use-hotkey-window-dismiss-on-escape-39c556aae5b7.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "HotkeyWindowDetailLayout"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "hotkey-window-detail-layout",
+      "action": "rewrite",
+      "reason": "Self-contained product/visualization behavior with clear inputs and 1 known consumer(s); high-value candidate for typed semantic recovery."
+    }
+  ]
+}

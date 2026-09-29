@@ -1,0 +1,4007 @@
+{
+  "category": "misc-ui-utils",
+  "batch": "C",
+  "pendingIndexRange": [
+    452,
+    677
+  ],
+  "expectedCount": 226,
+  "sourceList": "docs/renderer-app-chunks.json",
+  "trackedManifest": "scripts/renderer-chunk-manifest.mjs",
+  "auditedOn": "2026-09-29",
+  "entries": [
+    {
+      "file": "type-19d8b437a2d9.js",
+      "bytes": 517,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-continuous-uniform-distribution",
+      "action": "rewrite",
+      "reason": "Source defines the CONTINUOUS_UNIFORM_DISTRIBUTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-1a3e6eca2001.js",
+      "bytes": 728,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-compound-interest",
+      "action": "rewrite",
+      "reason": "Source defines the COMPOUND_INTEREST learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-1aff40f97e6c.js",
+      "bytes": 576,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-gpp-vs-npp",
+      "action": "rewrite",
+      "reason": "Source defines the GPP_VS_NPP learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-1cd86e5f325c.js",
+      "bytes": 771,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-stopping-distance-safe-following",
+      "action": "rewrite",
+      "reason": "Source defines the STOPPING_DISTANCE_SAFE_FOLLOWING learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-1dfb8358847e.js",
+      "bytes": 12637,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "color-roles-603bada8cfb1.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "learning-model-gcf-lcm-shape-renderer",
+      "action": "rewrite",
+      "reason": "Source combines the GCF_LCM schema with shape rendering, label-fit geometry, rounded-polygon path construction, motion states, and four public exports."
+    },
+    {
+      "file": "type-1f93f10ec695.js",
+      "bytes": 528,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-denial-of-service-overload",
+      "action": "rewrite",
+      "reason": "Source defines the DENIAL_OF_SERVICE_OVERLOAD learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-221c87938b30.js",
+      "bytes": 568,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-ideal-transformer",
+      "action": "rewrite",
+      "reason": "Source defines the IDEAL_TRANSFORMER learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-2451a41f0046.js",
+      "bytes": 408,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-qt-prolongation-torsades",
+      "action": "rewrite",
+      "reason": "Source defines the QT_PROLONGATION_TORSADES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-251f9425afe7.js",
+      "bytes": 474,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-direct-inverse-proportion",
+      "action": "rewrite",
+      "reason": "Source defines the DIRECT_INVERSE_PROPORTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-25a004ce6551.js",
+      "bytes": 1075,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-cross-product-geometry",
+      "action": "rewrite",
+      "reason": "Source defines the CROSS_PRODUCT_GEOMETRY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-278df50fffd4.js",
+      "bytes": 649,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-osmotic-pressure",
+      "action": "rewrite",
+      "reason": "Source defines the OSMOTIC_PRESSURE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-27a1646b6027.js",
+      "bytes": 1268,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-cone-volume",
+      "action": "rewrite",
+      "reason": "Source defines the CONE_VOLUME learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-28180140955e.js",
+      "bytes": 392,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-hyperopia",
+      "action": "rewrite",
+      "reason": "Source defines the HYPEROPIA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-2a7d2e0bc5c2.js",
+      "bytes": 444,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-lcm",
+      "action": "rewrite",
+      "reason": "Source defines the LCM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-2ba608a4bdee.js",
+      "bytes": 941,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-resistors-in-series-equivalent",
+      "action": "rewrite",
+      "reason": "Source defines the RESISTORS_IN_SERIES_EQUIVALENT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-2c1c76fd09a3.js",
+      "bytes": 523,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-biological-ph-and-buffers",
+      "action": "rewrite",
+      "reason": "Source defines the BIOLOGICAL_PH_AND_BUFFERS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-2eeac8e139a3.js",
+      "bytes": 492,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-compound-pulley-mechanical-advantage",
+      "action": "rewrite",
+      "reason": "Source defines the COMPOUND_PULLEY_MECHANICAL_ADVANTAGE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-32562c107c2d.js",
+      "bytes": 645,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-tangent-segments-common-point",
+      "action": "rewrite",
+      "reason": "Source defines the TANGENT_SEGMENTS_COMMON_POINT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-32a04963cef2.js",
+      "bytes": 619,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-gibbs-free-energy",
+      "action": "rewrite",
+      "reason": "Source defines the GIBBS_FREE_ENERGY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-33287eb94059.js",
+      "bytes": 598,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-central-limit-theorem",
+      "action": "rewrite",
+      "reason": "Source defines the CENTRAL_LIMIT_THEOREM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-34ba530d4dd9.js",
+      "bytes": 605,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-specific-heat",
+      "action": "rewrite",
+      "reason": "Source defines the SPECIFIC_HEAT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-358a8002801a.js",
+      "bytes": 408,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-classification-threshold",
+      "action": "rewrite",
+      "reason": "Source defines the CLASSIFICATION_THRESHOLD learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-35ea69d98390.js",
+      "bytes": 528,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-isotope-atomic-mass",
+      "action": "rewrite",
+      "reason": "Source defines the ISOTOPE_ATOMIC_MASS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-36d833db1430.js",
+      "bytes": 671,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-electric-flux-flat-surface",
+      "action": "rewrite",
+      "reason": "Source defines the ELECTRIC_FLUX_FLAT_SURFACE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-36e7bc0980f2.js",
+      "bytes": 1098,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-potential-energy",
+      "action": "rewrite",
+      "reason": "Source defines the POTENTIAL_ENERGY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-37bbc177d1c1.js",
+      "bytes": 461,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-derivative-product-rule",
+      "action": "rewrite",
+      "reason": "Source defines the DERIVATIVE_PRODUCT_RULE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-389cfab21292.js",
+      "bytes": 683,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-photoelectric-energy-balance",
+      "action": "rewrite",
+      "reason": "Source defines the PHOTOELECTRIC_ENERGY_BALANCE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-39f5bace963c.js",
+      "bytes": 596,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-perpendicular-line",
+      "action": "rewrite",
+      "reason": "Source defines the PERPENDICULAR_LINE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-3a1bd5a62fd7.js",
+      "bytes": 1205,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-cone-surface-area",
+      "action": "rewrite",
+      "reason": "Source defines the CONE_SURFACE_AREA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-3b03c35824de.js",
+      "bytes": 640,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-centripetal-force-mvr",
+      "action": "rewrite",
+      "reason": "Source defines the CENTRIPETAL_FORCE_MVR learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-3bc326afff31.js",
+      "bytes": 384,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-myopia",
+      "action": "rewrite",
+      "reason": "Source defines the MYOPIA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-3d72495926ec.js",
+      "bytes": 371,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-ionic-vs-covalent",
+      "action": "rewrite",
+      "reason": "Source defines the IONIC_VS_COVALENT learning-model type, versioned parameter schema, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-3ebb2891016a.js",
+      "bytes": 576,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-inclined-plane-acceleration",
+      "action": "rewrite",
+      "reason": "Source defines the INCLINED_PLANE_ACCELERATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-402ae30c42ae.js",
+      "bytes": 505,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-energy-pyramid",
+      "action": "rewrite",
+      "reason": "Source defines the ENERGY_PYRAMID learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-4140aed3b047.js",
+      "bytes": 534,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-dc-circuit-power",
+      "action": "rewrite",
+      "reason": "Source defines the DC_CIRCUIT_POWER learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-419e85f400c3.js",
+      "bytes": 596,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-filling-rates",
+      "action": "rewrite",
+      "reason": "Source defines the FILLING_RATES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-42a870b7bbdb.js",
+      "bytes": 406,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-eye-accommodation",
+      "action": "rewrite",
+      "reason": "Source defines the EYE_ACCOMMODATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-448ce06dc011.js",
+      "bytes": 481,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-galvanic-cell",
+      "action": "rewrite",
+      "reason": "Source defines the GALVANIC_CELL learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-44949bae7160.js",
+      "bytes": 557,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-linear-combination",
+      "action": "rewrite",
+      "reason": "Source defines the LINEAR_COMBINATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-44fc1ec684df.js",
+      "bytes": 496,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-el-nino-and-la-nina",
+      "action": "rewrite",
+      "reason": "Source defines the EL_NINO_AND_LA_NINA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-4644d5bf838d.js",
+      "bytes": 654,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-aromaticity-and-huckels-rule",
+      "action": "rewrite",
+      "reason": "Source defines the AROMATICITY_AND_HUCKELS_RULE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-48b2d5373e6f.js",
+      "bytes": 553,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-atmospheric-pollution-plume",
+      "action": "rewrite",
+      "reason": "Source defines the ATMOSPHERIC_POLLUTION_PLUME learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-49e9f66a2d98.js",
+      "bytes": 595,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-foil-binomial",
+      "action": "rewrite",
+      "reason": "Source defines the FOIL_BINOMIAL learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-4a4927d40e3e.js",
+      "bytes": 402,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-fixed-ratio-scaling",
+      "action": "rewrite",
+      "reason": "Source defines the FIXED_RATIO_SCALING learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-4bab13b66760.js",
+      "bytes": 1134,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-pv-nrt-equation",
+      "action": "rewrite",
+      "reason": "Source defines the PV_NRT_EQUATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-4e7d1b324604.js",
+      "bytes": 937,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-linear-independence-discriminant",
+      "action": "rewrite",
+      "reason": "Source defines the LINEAR_INDEPENDENCE_DISCRIMINANT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-4ea25b9db993.js",
+      "bytes": 499,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-soil-texture-triangle",
+      "action": "rewrite",
+      "reason": "Source defines the SOIL_TEXTURE_TRIANGLE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-502dfab37449.js",
+      "bytes": 524,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-boolean-logic",
+      "action": "rewrite",
+      "reason": "Source defines the BOOLEAN_LOGIC learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-505786a161fa.js",
+      "bytes": 533,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-maxwell-boltzmann-distribution",
+      "action": "rewrite",
+      "reason": "Source defines the MAXWELL_BOLTZMANN_DISTRIBUTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-50c9fc73ec1d.js",
+      "bytes": 590,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-distributive-property",
+      "action": "rewrite",
+      "reason": "Source defines the DISTRIBUTIVE_PROPERTY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-568af520e20e.js",
+      "bytes": 833,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-weight-force",
+      "action": "rewrite",
+      "reason": "Source defines the WEIGHT_FORCE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-5ab56173322c.js",
+      "bytes": 793,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-exponential-decay",
+      "action": "rewrite",
+      "reason": "Source defines the EXPONENTIAL_DECAY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-5afefdccef0f.js",
+      "bytes": 578,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-ph-from-concentration",
+      "action": "rewrite",
+      "reason": "Source defines the PH_FROM_CONCENTRATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-5b3d00b051e8.js",
+      "bytes": 712,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-photosynthesis",
+      "action": "rewrite",
+      "reason": "Source defines the PHOTOSYNTHESIS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-5b4bf103a88b.js",
+      "bytes": 816,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-kinetic-energy",
+      "action": "rewrite",
+      "reason": "Source defines the KINETIC_ENERGY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-5d4a85edaa4f.js",
+      "bytes": 524,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-periodic-trends",
+      "action": "rewrite",
+      "reason": "Source defines the PERIODIC_TRENDS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-5e07bdb97091.js",
+      "bytes": 713,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-momentum",
+      "action": "rewrite",
+      "reason": "Source defines the MOMENTUM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-603f86db5a64.js",
+      "bytes": 567,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-divide-conquer-recurrence-tree",
+      "action": "rewrite",
+      "reason": "Source defines the DIVIDE_CONQUER_RECURRENCE_TREE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-60f4e9362b4d.js",
+      "bytes": 529,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-degree-of-unsaturation",
+      "action": "rewrite",
+      "reason": "Source defines the DEGREE_OF_UNSATURATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-61dd1475bb3a.js",
+      "bytes": 1116,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-ohms-law",
+      "action": "rewrite",
+      "reason": "Source defines the OHMS_LAW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-62569be7b3b6.js",
+      "bytes": 412,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-if-statement-execution-flow",
+      "action": "rewrite",
+      "reason": "Source defines the IF_STATEMENT_EXECUTION_FLOW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-62dc7c323bbd.js",
+      "bytes": 540,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-activation-energy-distribution",
+      "action": "rewrite",
+      "reason": "Source defines the ACTIVATION_ENERGY_DISTRIBUTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-6531d19cb2c0.js",
+      "bytes": 659,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-absorption-variable-costing-inventory-profit",
+      "action": "rewrite",
+      "reason": "Source defines the ABSORPTION_VARIABLE_COSTING_INVENTORY_PROFIT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-661332749edd.js",
+      "bytes": 447,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-catalyst-activation-energy",
+      "action": "rewrite",
+      "reason": "Source defines the CATALYST_ACTIVATION_ENERGY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-6637f6f4ce37.js",
+      "bytes": 499,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-half-full-adder-logic",
+      "action": "rewrite",
+      "reason": "Source defines the HALF_FULL_ADDER_LOGIC learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-67623f2e9dfc.js",
+      "bytes": 646,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-reaction-thermodynamics",
+      "action": "rewrite",
+      "reason": "Source defines the REACTION_THERMODYNAMICS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-6ec40c0e5685.js",
+      "bytes": 467,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-gram-stain",
+      "action": "rewrite",
+      "reason": "Source defines the GRAM_STAIN learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-6f1a8a4562be.js",
+      "bytes": 488,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-proton-nmr-splitting",
+      "action": "rewrite",
+      "reason": "Source defines the PROTON_NMR_SPLITTING learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-6f5ca4a9b344.js",
+      "bytes": 573,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-free-fall",
+      "action": "rewrite",
+      "reason": "Source defines the FREE_FALL learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-6fafbd960065.js",
+      "bytes": 456,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-hybridization-sigma-pi-bonds",
+      "action": "rewrite",
+      "reason": "Source defines the HYBRIDIZATION_SIGMA_PI_BONDS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-6fdfb08a7fa3.js",
+      "bytes": 799,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-trig-ratio-tangent",
+      "action": "rewrite",
+      "reason": "Source defines the TRIG_RATIO_TANGENT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-708888491b1d.js",
+      "bytes": 563,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-likelihood-function",
+      "action": "rewrite",
+      "reason": "Source defines the LIKELIHOOD_FUNCTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-725e1a69e8d4.js",
+      "bytes": 406,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-absorbance-spectrum",
+      "action": "rewrite",
+      "reason": "Source defines the ABSORBANCE_SPECTRUM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-729304fc6ff2.js",
+      "bytes": 764,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-solow-steady-state",
+      "action": "rewrite",
+      "reason": "Source defines the SOLOW_STEADY_STATE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-72e940cb9aa1.js",
+      "bytes": 1106,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-meta-analysis-forest-weights",
+      "action": "rewrite",
+      "reason": "Source defines the META_ANALYSIS_FOREST_WEIGHTS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-79fafd7cdcf3.js",
+      "bytes": 496,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-critical-angle-sine-relation",
+      "action": "rewrite",
+      "reason": "Source defines the CRITICAL_ANGLE_SINE_RELATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-7a2e9c974468.js",
+      "bytes": 805,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-sphere-volume",
+      "action": "rewrite",
+      "reason": "Source defines the SPHERE_VOLUME learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-7a83abf1c6c4.js",
+      "bytes": 539,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-radiation-penetration",
+      "action": "rewrite",
+      "reason": "Source defines the RADIATION_PENETRATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-7c6088477dd8.js",
+      "bytes": 523,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-formal-charge",
+      "action": "rewrite",
+      "reason": "Source defines the FORMAL_CHARGE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-7ff60fd7b3ba.js",
+      "bytes": 470,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-fahrenheit-celsius-scale",
+      "action": "rewrite",
+      "reason": "Source defines the FAHRENHEIT_CELSIUS_SCALE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-80e98d19d04d.js",
+      "bytes": 1082,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-coulombs-law",
+      "action": "rewrite",
+      "reason": "Source defines the COULOMBS_LAW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-81172b31949f.js",
+      "bytes": 670,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-climate-feedback-loops",
+      "action": "rewrite",
+      "reason": "Source defines the CLIMATE_FEEDBACK_LOOPS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-835190510733.js",
+      "bytes": 823,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-energy-efficiency-sankey-diagram",
+      "action": "rewrite",
+      "reason": "Source defines the ENERGY_EFFICIENCY_SANKEY_DIAGRAM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-84ec9bea3a73.js",
+      "bytes": 774,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-lewis-dot-symbols",
+      "action": "rewrite",
+      "reason": "Source defines the LEWIS_DOT_SYMBOLS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-856560998265.js",
+      "bytes": 621,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-electrolyte-conductivity",
+      "action": "rewrite",
+      "reason": "Source defines the ELECTROLYTE_CONDUCTIVITY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-85e042e70c11.js",
+      "bytes": 603,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-bomb-calorimetry",
+      "action": "rewrite",
+      "reason": "Source defines the BOMB_CALORIMETRY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-85ee1f375ae5.js",
+      "bytes": 733,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-chi-square-goodness-of-fit",
+      "action": "rewrite",
+      "reason": "Source defines the CHI_SQUARE_GOODNESS_OF_FIT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-86695f24afe6.js",
+      "bytes": 645,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-add-fractions",
+      "action": "rewrite",
+      "reason": "Source defines the ADD_FRACTIONS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-892c2b1ba446.js",
+      "bytes": 953,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-ionic-formulas",
+      "action": "rewrite",
+      "reason": "Source defines the IONIC_FORMULAS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-894614f7a446.js",
+      "bytes": 519,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-biome-climatograph",
+      "action": "rewrite",
+      "reason": "Source defines the BIOME_CLIMATOGRAPH learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-895220240c77.js",
+      "bytes": 512,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-age-structure-pyramid",
+      "action": "rewrite",
+      "reason": "Source defines the AGE_STRUCTURE_PYRAMID learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-8a9437331f93.js",
+      "bytes": 838,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-lung-gas-gradient",
+      "action": "rewrite",
+      "reason": "Source defines the LUNG_GAS_GRADIENT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-8b31d5042d39.js",
+      "bytes": 537,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-outlier-leverage-influence",
+      "action": "rewrite",
+      "reason": "Source defines the OUTLIER_LEVERAGE_INFLUENCE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-8e1db5391d62.js",
+      "bytes": 826,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-wave-speed",
+      "action": "rewrite",
+      "reason": "Source defines the WAVE_SPEED learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-8ea75e03943c.js",
+      "bytes": 466,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-current-to-magnetic-field-direction",
+      "action": "rewrite",
+      "reason": "Source defines the CURRENT_TO_MAGNETIC_FIELD_DIRECTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-8f4414a8a97c.js",
+      "bytes": 790,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-vector-components",
+      "action": "rewrite",
+      "reason": "Source defines the VECTOR_COMPONENTS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9302b5a4f072.js",
+      "bytes": 609,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-point-slope-line",
+      "action": "rewrite",
+      "reason": "Source defines the POINT_SLOPE_LINE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-940292164259.js",
+      "bytes": 512,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-climate-mitigation-wedges",
+      "action": "rewrite",
+      "reason": "Source defines the CLIMATE_MITIGATION_WEDGES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-94076f401ee2.js",
+      "bytes": 814,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-composite-perimeter-area",
+      "action": "rewrite",
+      "reason": "Source defines the COMPOSITE_PERIMETER_AREA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-94130cd0d6af.js",
+      "bytes": 555,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-rgb-additive-mixing",
+      "action": "rewrite",
+      "reason": "Source defines the RGB_ADDITIVE_MIXING learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-96ed8dbb8a85.js",
+      "bytes": 621,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-point-to-plane-distance",
+      "action": "rewrite",
+      "reason": "Source defines the POINT_TO_PLANE_DISTANCE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-96f57cd357c8.js",
+      "bytes": 417,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-surface-area-to-volume-ratio",
+      "action": "rewrite",
+      "reason": "Source defines the SURFACE_AREA_TO_VOLUME_RATIO learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-973549a4c4d1.js",
+      "bytes": 480,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-classes-of-levers",
+      "action": "rewrite",
+      "reason": "Source defines the CLASSES_OF_LEVERS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-98cbaaa40c49.js",
+      "bytes": 384,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-place-value",
+      "action": "rewrite",
+      "reason": "Source defines the PLACE_VALUE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-99cca3d49ce0.js",
+      "bytes": 695,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-abo-rh-transfusion-compatibility",
+      "action": "rewrite",
+      "reason": "Source defines the ABO_RH_TRANSFUSION_COMPATIBILITY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9a0c50e93ce3.js",
+      "bytes": 519,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-sampling-without-replacement",
+      "action": "rewrite",
+      "reason": "Source defines the SAMPLING_WITHOUT_REPLACEMENT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9a4e4be29b1b.js",
+      "bytes": 519,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-selection-patterns",
+      "action": "rewrite",
+      "reason": "Source defines the SELECTION_PATTERNS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9acfe2203543.js",
+      "bytes": 507,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-water-phase-diagram",
+      "action": "rewrite",
+      "reason": "Source defines the WATER_PHASE_DIAGRAM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9c26345ce2cb.js",
+      "bytes": 746,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-period-frequency-relation",
+      "action": "rewrite",
+      "reason": "Source defines the PERIOD_FREQUENCY_RELATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9cab42e2673f.js",
+      "bytes": 908,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-lens-equation",
+      "action": "rewrite",
+      "reason": "Source defines the LENS_EQUATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9e89df8b418e.js",
+      "bytes": 506,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-intermolecular-forces",
+      "action": "rewrite",
+      "reason": "Source defines the INTERMOLECULAR_FORCES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9eaaebe29f2e.js",
+      "bytes": 513,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-reaction-order-plots",
+      "action": "rewrite",
+      "reason": "Source defines the REACTION_ORDER_PLOTS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-9f5bb286483b.js",
+      "bytes": 677,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-hemoglobin-curve",
+      "action": "rewrite",
+      "reason": "Source defines the HEMOGLOBIN_CURVE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-a2c1e373aef7.js",
+      "bytes": 620,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-plant-anatomy",
+      "action": "rewrite",
+      "reason": "Source defines the PLANT_ANATOMY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-a2cf34c518e9.js",
+      "bytes": 970,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-entropy-of-phase-changes",
+      "action": "rewrite",
+      "reason": "Source defines the ENTROPY_OF_PHASE_CHANGES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-a2f2d61e4f86.js",
+      "bytes": 737,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-derivative-as-secant",
+      "action": "rewrite",
+      "reason": "Source defines the DERIVATIVE_AS_SECANT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-a2fa2066a9f8.js",
+      "bytes": 446,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-gcd",
+      "action": "rewrite",
+      "reason": "Source defines the GCD learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-a9d2bd86b24e.js",
+      "bytes": 839,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-capillary-starling-forces",
+      "action": "rewrite",
+      "reason": "Source defines the CAPILLARY_STARLING_FORCES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-aa70f27546d0.js",
+      "bytes": 497,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-metric-distance",
+      "action": "rewrite",
+      "reason": "Source defines the METRIC_DISTANCE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ad01baf2ce65.js",
+      "bytes": 601,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-homogeneous-ode-roots",
+      "action": "rewrite",
+      "reason": "Source defines the HOMOGENEOUS_ODE_ROOTS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-af64de236b87.js",
+      "bytes": 495,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-molecular-polarity",
+      "action": "rewrite",
+      "reason": "Source defines the MOLECULAR_POLARITY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-afd9de5814d9.js",
+      "bytes": 415,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-seasons-and-solar-angle",
+      "action": "rewrite",
+      "reason": "Source defines the SEASONS_AND_SOLAR_ANGLE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b02d73c8ed7c.js",
+      "bytes": 746,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-musical-interval-chart",
+      "action": "rewrite",
+      "reason": "Source defines the MUSICAL_INTERVAL_CHART learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b11bc1c3afbb.js",
+      "bytes": 524,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-production-possibilities-frontier",
+      "action": "rewrite",
+      "reason": "Source defines the PRODUCTION_POSSIBILITIES_FRONTIER learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b1c6d85108ef.js",
+      "bytes": 678,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-newton-second-law",
+      "action": "rewrite",
+      "reason": "Source defines the NEWTON_SECOND_LAW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b20da9986277.js",
+      "bytes": 651,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-solution-dilution",
+      "action": "rewrite",
+      "reason": "Source defines the SOLUTION_DILUTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b2315d4b532d.js",
+      "bytes": 509,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-randomized-experiment",
+      "action": "rewrite",
+      "reason": "Source defines the RANDOMIZED_EXPERIMENT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b2d049022561.js",
+      "bytes": 489,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-simplified-fraction",
+      "action": "rewrite",
+      "reason": "Source defines the SIMPLIFIED_FRACTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b2f3bbb776a0.js",
+      "bytes": 702,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-ghk-membrane-potential",
+      "action": "rewrite",
+      "reason": "Source defines the GHK_MEMBRANE_POTENTIAL learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b5d60db25e60.js",
+      "bytes": 605,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-buffer-composition",
+      "action": "rewrite",
+      "reason": "Source defines the BUFFER_COMPOSITION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b77b9fb94c5f.js",
+      "bytes": 492,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-lagrange-gradient-parallelism",
+      "action": "rewrite",
+      "reason": "Source defines the LAGRANGE_GRADIENT_PARALLELISM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b7a8fbf7a420.js",
+      "bytes": 587,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-loop-break-control-flow",
+      "action": "rewrite",
+      "reason": "Source defines the LOOP_BREAK_CONTROL_FLOW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b8020010f7f1.js",
+      "bytes": 662,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-mass-spring-shm",
+      "action": "rewrite",
+      "reason": "Source defines the MASS_SPRING_SHM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b8a457382aa2.js",
+      "bytes": 931,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-beer-lambert-law",
+      "action": "rewrite",
+      "reason": "Source defines the BEER_LAMBERT_LAW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-b94332d030e5.js",
+      "bytes": 583,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-cardiac-output-product",
+      "action": "rewrite",
+      "reason": "Source defines the CARDIAC_OUTPUT_PRODUCT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ba89e7f5dcc4.js",
+      "bytes": 576,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-eye-prescription",
+      "action": "rewrite",
+      "reason": "Source defines the EYE_PRESCRIPTION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-bb80ea70b787.js",
+      "bytes": 567,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-probability-tree",
+      "action": "rewrite",
+      "reason": "Source defines the PROBABILITY_TREE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-bbf18f237f67.js",
+      "bytes": 671,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-eigendirections",
+      "action": "rewrite",
+      "reason": "Source defines the EIGENDIRECTIONS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-bc00b8c55dd6.js",
+      "bytes": 563,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-parallel-line",
+      "action": "rewrite",
+      "reason": "Source defines the PARALLEL_LINE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-bd561e5dd245.js",
+      "bytes": 594,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-cohens-d",
+      "action": "rewrite",
+      "reason": "Source defines the COHENS_D learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-bd9c85267933.js",
+      "bytes": 580,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-mole-avogadro-number-visual",
+      "action": "rewrite",
+      "reason": "Source defines the MOLE_AVOGADRO_NUMBER_VISUAL learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-c3de85d12da6.js",
+      "bytes": 645,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-accuracy-vs-precision-targets",
+      "action": "rewrite",
+      "reason": "Source defines the ACCURACY_VS_PRECISION_TARGETS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-cb89af0c10e5.js",
+      "bytes": 887,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-standard-score-z",
+      "action": "rewrite",
+      "reason": "Source defines the STANDARD_SCORE_Z learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d05467b5cc3d.js",
+      "bytes": 624,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-balancing-equations",
+      "action": "rewrite",
+      "reason": "Source defines the BALANCING_EQUATIONS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d22103ac12d0.js",
+      "bytes": 588,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-selection-sort",
+      "action": "rewrite",
+      "reason": "Source defines the SELECTION_SORT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d30facd9fda1.js",
+      "bytes": 665,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-exponential-population-growth",
+      "action": "rewrite",
+      "reason": "Source defines the EXPONENTIAL_POPULATION_GROWTH learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d31ca122ade1.js",
+      "bytes": 803,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-mixing-solutions",
+      "action": "rewrite",
+      "reason": "Source defines the MIXING_SOLUTIONS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d4e64b7c7369.js",
+      "bytes": 671,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-pascals-law-hydraulics",
+      "action": "rewrite",
+      "reason": "Source defines the PASCALS_LAW_HYDRAULICS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d56e7431251b.js",
+      "bytes": 392,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-similar-triangles",
+      "action": "rewrite",
+      "reason": "Source defines the SIMILAR_TRIANGLES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d5b1a1a74ceb.js",
+      "bytes": 616,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-mass-spectrum",
+      "action": "rewrite",
+      "reason": "Source defines the MASS_SPECTRUM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d71c312af838.js",
+      "bytes": 1136,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-cylinder-volume",
+      "action": "rewrite",
+      "reason": "Source defines the CYLINDER_VOLUME learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d83a95defdf3.js",
+      "bytes": 524,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-dna-gel-fragment-migration",
+      "action": "rewrite",
+      "reason": "Source defines the DNA_GEL_FRAGMENT_MIGRATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d8fc0e5b690c.js",
+      "bytes": 674,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-unit-circle",
+      "action": "rewrite",
+      "reason": "Source defines the UNIT_CIRCLE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d8ff967dcf16.js",
+      "bytes": 804,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-kinematics-velocity",
+      "action": "rewrite",
+      "reason": "Source defines the KINEMATICS_VELOCITY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-d9aefcd7f05e.js",
+      "bytes": 453,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-singly-linked-list-pointers",
+      "action": "rewrite",
+      "reason": "Source defines the SINGLY_LINKED_LIST_POINTERS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-dae3a0497d9a.js",
+      "bytes": 773,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-difference-in-differences",
+      "action": "rewrite",
+      "reason": "Source defines the DIFFERENCE_IN_DIFFERENCES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-dbcd7d4a7976.js",
+      "bytes": 635,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-successive-percent-change",
+      "action": "rewrite",
+      "reason": "Source defines the SUCCESSIVE_PERCENT_CHANGE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-dc0d0206de54.js",
+      "bytes": 877,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-mirror-equation",
+      "action": "rewrite",
+      "reason": "Source defines the MIRROR_EQUATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-dc693d0c1945.js",
+      "bytes": 1149,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-triangle-area",
+      "action": "rewrite",
+      "reason": "Source defines the TRIANGLE_AREA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-dd4d43aba596.js",
+      "bytes": 862,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-mass-density-volume-relation",
+      "action": "rewrite",
+      "reason": "Source defines the MASS_DENSITY_VOLUME_RELATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-df7152d06cac.js",
+      "bytes": 701,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-pharmacokinetic-curve",
+      "action": "rewrite",
+      "reason": "Source defines the PHARMACOKINETIC_CURVE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-df7c33e35927.js",
+      "bytes": 469,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-permutation-formula",
+      "action": "rewrite",
+      "reason": "Source defines the PERMUTATION_FORMULA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e01a2e47390f.js",
+      "bytes": 603,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-two-cable-static-equilibrium",
+      "action": "rewrite",
+      "reason": "Source defines the TWO_CABLE_STATIC_EQUILIBRIUM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e23de7285313.js",
+      "bytes": 469,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-combination-formula",
+      "action": "rewrite",
+      "reason": "Source defines the COMBINATION_FORMULA learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e25b068b7941.js",
+      "bytes": 490,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-kinetic-and-potential-energy",
+      "action": "rewrite",
+      "reason": "Source defines the KINETIC_AND_POTENTIAL_ENERGY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e4a418c02712.js",
+      "bytes": 583,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-electric-current-charge-flow",
+      "action": "rewrite",
+      "reason": "Source defines the ELECTRIC_CURRENT_CHARGE_FLOW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e52ae9a5f679.js",
+      "bytes": 632,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-mediation-indirect-effect",
+      "action": "rewrite",
+      "reason": "Source defines the MEDIATION_INDIRECT_EFFECT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e695696a56c8.js",
+      "bytes": 666,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-pressure",
+      "action": "rewrite",
+      "reason": "Source defines the PRESSURE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e8c4aa2e5b51.js",
+      "bytes": 437,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-strong-vs-weak-acid",
+      "action": "rewrite",
+      "reason": "Source defines the STRONG_VS_WEAK_ACID learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-e9e5c33af31e.js",
+      "bytes": 987,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "o",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-pythagorean-theorem",
+      "action": "rewrite",
+      "reason": "Source defines the PYTHAGOREAN_THEOREM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ea91da6d3b05.js",
+      "bytes": 724,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-element-vs-compound-vs-mixture",
+      "action": "rewrite",
+      "reason": "Source defines the ELEMENT_VS_COMPOUND_VS_MIXTURE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ea9c53801ecf.js",
+      "bytes": 1290,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-angular-frequency-relation",
+      "action": "rewrite",
+      "reason": "Source defines the ANGULAR_FREQUENCY_RELATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-eb0199ee4cef.js",
+      "bytes": 476,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-long-division",
+      "action": "rewrite",
+      "reason": "Source defines the LONG_DIVISION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-eb61c94728f0.js",
+      "bytes": 424,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-musical-harmonic-series",
+      "action": "rewrite",
+      "reason": "Source defines the MUSICAL_HARMONIC_SERIES learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-eccf29c88c2c.js",
+      "bytes": 511,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-vapor-pressure",
+      "action": "rewrite",
+      "reason": "Source defines the VAPOR_PRESSURE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-edf05c1a49b7.js",
+      "bytes": 947,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "a",
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-polygon-interior-angle-sum",
+      "action": "rewrite",
+      "reason": "Source defines the POLYGON_INTERIOR_ANGLE_SUM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ee21e9db5696.js",
+      "bytes": 460,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-discrete-event-queue-simulation",
+      "action": "rewrite",
+      "reason": "Source defines the DISCRETE_EVENT_QUEUE_SIMULATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ee3c6146db4d.js",
+      "bytes": 505,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-lytic-vs-lysogenic-virus-cycle",
+      "action": "rewrite",
+      "reason": "Source defines the LYTIC_VS_LYSOGENIC_VIRUS_CYCLE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-f09422f3bf66.js",
+      "bytes": 823,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-magnetic-field-direction-on-charge",
+      "action": "rewrite",
+      "reason": "Source defines the MAGNETIC_FIELD_DIRECTION_ON_CHARGE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-f31fc951c570.js",
+      "bytes": 417,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-solar-photovoltaic-system",
+      "action": "rewrite",
+      "reason": "Source defines the SOLAR_PHOTOVOLTAIC_SYSTEM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-f409ad2953b1.js",
+      "bytes": 605,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-piano-chord-chart",
+      "action": "rewrite",
+      "reason": "Source defines the PIANO_CHORD_CHART learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-f76de9a47b83.js",
+      "bytes": 588,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-logistic-regression",
+      "action": "rewrite",
+      "reason": "Source defines the LOGISTIC_REGRESSION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-f80006839631.js",
+      "bytes": 647,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-inflation-cpi",
+      "action": "rewrite",
+      "reason": "Source defines the INFLATION_CPI learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-f95346c939a7.js",
+      "bytes": 469,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-roc-curve",
+      "action": "rewrite",
+      "reason": "Source defines the ROC_CURVE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-fa418230ee38.js",
+      "bytes": 1007,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-resistors-in-parallel-equivalent",
+      "action": "rewrite",
+      "reason": "Source defines the RESISTORS_IN_PARALLEL_EQUIVALENT learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-fa58981eb0e3.js",
+      "bytes": 612,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-atherosclerosis",
+      "action": "rewrite",
+      "reason": "Source defines the ATHEROSCLEROSIS learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-facf186bb1fa.js",
+      "bytes": 891,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-concentration-cell",
+      "action": "rewrite",
+      "reason": "Source defines the CONCENTRATION_CELL learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-fec75962c1bf.js",
+      "bytes": 504,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-decibel-safety",
+      "action": "rewrite",
+      "reason": "Source defines the DECIBEL_SAFETY learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ff2ce34a0edd.js",
+      "bytes": 960,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-charles-law",
+      "action": "rewrite",
+      "reason": "Source defines the CHARLES_LAW learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ff70f856f345.js",
+      "bytes": 762,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-collision-simulation",
+      "action": "rewrite",
+      "reason": "Source defines the COLLISION_SIMULATION learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-ff74ecd72106.js",
+      "bytes": 710,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-oxygen-sag-curve",
+      "action": "rewrite",
+      "reason": "Source defines the OXYGEN_SAG_CURVE learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "type-fff8bf6df8e9.js",
+      "bytes": 571,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "learning-model-simple-pendulum",
+      "action": "rewrite",
+      "reason": "Source defines the SIMPLE_PENDULUM learning-model type, versioned parameter schema, thumbnail asset key, initializer, and compressed export surface; it is stable domain metadata suitable for a typed rewrite."
+    },
+    {
+      "file": "u18-banner-logging-126c6aef16d2.js",
+      "bytes": 676,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-initial-51da50e6c6e3.js",
+        "presentation-eeb7ac6fced2.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "u18-banner-logging",
+      "action": "rewrite",
+      "reason": "Small policy-banner telemetry helper with eligibility checks, normalized timestamps, and two named event paths used by four consumers."
+    },
+    {
+      "file": "union-2f12e2dfc01f.js",
+      "bytes": 38887,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "$",
+        "$t",
+        "A",
+        "At",
+        "B",
+        "Bt",
+        "C",
+        "Ct",
+        "D",
+        "Dt",
+        "E",
+        "Et",
+        "F",
+        "Ft",
+        "G",
+        "Gt",
+        "H",
+        "Ht",
+        "I",
+        "It",
+        "J",
+        "Jt",
+        "K",
+        "Kt",
+        "L",
+        "Lt",
+        "M",
+        "Mt",
+        "N",
+        "Nt",
+        "O",
+        "Ot",
+        "P",
+        "Pt",
+        "Q",
+        "Qt",
+        "R",
+        "Rt",
+        "S",
+        "St",
+        "T",
+        "Tt",
+        "U",
+        "Ut",
+        "V",
+        "Vt",
+        "W",
+        "Wt",
+        "X",
+        "Xt",
+        "Y",
+        "Yt",
+        "Z",
+        "Zt",
+        "_",
+        "_t",
+        "a",
+        "an",
+        "at",
+        "b",
+        "bt",
+        "c",
+        "cn",
+        "ct",
+        "d",
+        "dt",
+        "en",
+        "et",
+        "f",
+        "ft",
+        "g",
+        "gt",
+        "h",
+        "ht",
+        "i",
+        "in",
+        "it",
+        "j",
+        "jt",
+        "k",
+        "kt",
+        "l",
+        "ln",
+        "lt",
+        "m",
+        "mt",
+        "n",
+        "nn",
+        "nt",
+        "o",
+        "on",
+        "ot",
+        "p",
+        "pt",
+        "q",
+        "qt",
+        "r",
+        "rn",
+        "rt",
+        "s",
+        "sn",
+        "st",
+        "t",
+        "tn",
+        "tt",
+        "u",
+        "un",
+        "ut",
+        "v",
+        "vt",
+        "w",
+        "wt",
+        "x",
+        "xt",
+        "y",
+        "yt",
+        "z",
+        "zt"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "lodash-union-runtime-initialized",
+      "action": "preserve",
+      "reason": "Bundled Lodash union implementation with initializer-wrapped internals and ten consumers; preserving the helper graph avoids semantic drift."
+    },
+    {
+      "file": "union-5a693e552c13.js",
+      "bytes": 25805,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [
+        "$",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "U",
+        "V",
+        "W",
+        "X",
+        "Y",
+        "Z",
+        "_",
+        "a",
+        "at",
+        "b",
+        "c",
+        "d",
+        "et",
+        "f",
+        "g",
+        "h",
+        "i",
+        "it",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "nt",
+        "o",
+        "p",
+        "q",
+        "r",
+        "rt",
+        "s",
+        "t",
+        "tt",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "lodash-union-runtime-direct",
+      "action": "preserve",
+      "reason": "Bundled direct Lodash union implementation with deep equality and cache machinery used by thirteen consumers."
+    },
+    {
+      "file": "unselected-circle-cbf957c104fc.js",
+      "bytes": 2050,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "selection-circle-icons",
+      "action": "preserve",
+      "reason": "Two static SVG circle glyphs with fixed path geometry consumed by learning-block visualization surfaces."
+    },
+    {
+      "file": "usd-5d2c7710cf01.js",
+      "bytes": 455,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "usd-currency-formatter",
+      "action": "rewrite",
+      "reason": "Compact USD formatting policy covering notation, sub-cent significant digits, and currency precision across four consumers."
+    },
+    {
+      "file": "useStableCallback-43628b79218b.js",
+      "bytes": 349,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "use-stable-callback",
+      "action": "rewrite",
+      "reason": "Focused React hook that keeps callback identity stable while forwarding calls to the latest ref value across eight consumers."
+    },
+    {
+      "file": "vad-audio-frame-processor-b6bea101f49a.js",
+      "bytes": 1118,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "vad-audio-frame-processor",
+      "action": "rewrite",
+      "reason": "Self-registering AudioWorklet processor that buffers samples into duration-based frames for the voice DSP pipeline."
+    },
+    {
+      "file": "vb-22c198681731.js",
+      "bytes": 5538,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "vb"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "codemirror-visual-basic-mode",
+      "action": "preserve",
+      "reason": "Generated CodeMirror Visual Basic tokenizer and language tables consumed only by the code editor."
+    },
+    {
+      "file": "vercel-dark-fe3b20ba4c28.js",
+      "bytes": 3258,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "bg",
+        "chromeTheme",
+        "colors",
+        "default",
+        "fg",
+        "name",
+        "settings"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "vercel-dark-theme",
+      "action": "preserve",
+      "reason": "Static editor and application theme palette plus token-color data consumed by the central theme registry."
+    },
+    {
+      "file": "vercel-light-91ea99803eaa.js",
+      "bytes": 3320,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "bg",
+        "chromeTheme",
+        "colors",
+        "default",
+        "fg",
+        "name",
+        "settings",
+        "type"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "vercel-light-theme",
+      "action": "preserve",
+      "reason": "Static editor and application theme palette plus token-color data consumed by the central theme registry."
+    },
+    {
+      "file": "verilog-6d1b0f2b4c27.js",
+      "bytes": 12834,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "verilog"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "codemirror-verilog-mode",
+      "action": "preserve",
+      "reason": "Generated CodeMirror Verilog mode with extensive keyword and indentation tables consumed only by the code editor."
+    },
+    {
+      "file": "view-state-persistence-43de2d864034.js",
+      "bytes": 365440,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "Buffer-894a440955a0.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "_",
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "g",
+        "h",
+        "i",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "x",
+        "y"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "view-state-persistence-runtime",
+      "action": "further-consumer-audit",
+      "reason": "Large cross-window persistence, messaging, serialization, and transport runtime with broad exports and three high-level consumers."
+    },
+    {
+      "file": "voice-commentary-message-660e8302f224.js",
+      "bytes": 7678,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "realtime-voice-motion-1152410890e5.js",
+        "content-bd6ed75ea274.js",
+        "chatgpt_voice-cb350881bdb5.js",
+        "commentary-36eecb6e11d3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "VoiceCommentaryMessage"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "voice-commentary-message",
+      "action": "rewrite",
+      "reason": "Voice commentary React surface with playback, motion, content, and conversation-state integrations used by voice-session."
+    },
+    {
+      "file": "voice-dsp-14683bb15d00.js",
+      "bytes": 39716,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "contracts-96b363340ff1.js",
+        "preferences-c824e7299e20.js",
+        "dsp-d76b3132336b.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "initializeVoiceDsp"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "voice-dsp-runtime",
+      "action": "incremental-hub",
+      "reason": "Voice DSP composition root with audio-device state, VAD worklet loading, media tracks, dynamic imports, and one initializer export."
+    },
+    {
+      "file": "voice-session-3a0fb6a67a2d.js",
+      "bytes": 133179,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "app-primary-d66705000d76.js",
+        "use-navigation-blocker-7587499d4b25.js",
+        "thread-scroll-controller-context-value-144c8345e935.js",
+        "realtime-voice-stage-layout-855d5d26c78e.js",
+        "realtime-voice-motion-1152410890e5.js",
+        "contracts-96b363340ff1.js",
+        "preferences-c824e7299e20.js",
+        "dsp-d76b3132336b.js",
+        "voice-configuration-manager-459bb6c6d96a.js",
+        "mark-session-create-6f7d531b2a15.js",
+        "chatgpt_voice-cb350881bdb5.js",
+        "commentary-36eecb6e11d3.js",
+        "chatgpt-voices-query-e9985913606a.js",
+        "spoken-language-options-a8b38a93da0c.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "initializeVoiceSession"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "voice-session-runtime",
+      "action": "incremental-hub",
+      "reason": "Large voice-session composition root with seventeen static dependencies, four dynamic imports, event publication, and access-token flow."
+    },
+    {
+      "file": "vue-eb78715a4a6b.js",
+      "bytes": 96,
+      "imports": [
+        "vue-7951fbedcefd.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "vue-language-entry",
+      "action": "incremental-hub",
+      "reason": "Thin initialization and default re-export entry for the generated Vue language definition; side-effect ordering must remain intact."
+    },
+    {
+      "file": "walnut-presentation-decoder.worker-85cd19519fff.js",
+      "bytes": 104,
+      "imports": [
+        "runtime.worker-d416e15ec6d3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "Presentation"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "walnut-presentation-decoder-worker-entry",
+      "action": "incremental-hub",
+      "reason": "One-line worker-facing re-export of the presentation decoder runtime; it is an entry hub rather than standalone logic."
+    },
+    {
+      "file": "walnut-workbook-decoder.worker-958a75a246b2.js",
+      "bytes": 100,
+      "imports": [
+        "runtime.worker-d1cc73385b86.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "Workbook"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "walnut-workbook-decoder-worker-entry",
+      "action": "incremental-hub",
+      "reason": "One-line worker-facing re-export of the workbook decoder runtime; it is an entry hub rather than standalone logic."
+    },
+    {
+      "file": "wardley-OPB4EBWU-255259239636.js",
+      "bytes": 302,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "chunk-KEIR6QF5-95b0e7b7ebae.js",
+        "chunk-5FCAYU7R-efa02fef2b8e.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "createWardleyServices"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "wardley-parser-services-entry",
+      "action": "incremental-hub",
+      "reason": "Wardley parser service entry that initializes two generated parser chunks before re-exporting createWardleyServices."
+    },
+    {
+      "file": "wardley-OPB4EBWU-73d89dac25a5.js",
+      "bytes": 161,
+      "imports": [
+        "mermaid-parser.core-9ffe5a9fb28c.js",
+        "chunk-KEIR6QF5-326e1da7e0a5.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "createWardleyServices"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "wardley-parser-services-entry-direct",
+      "action": "incremental-hub",
+      "reason": "Thin alternate Wardley parser entry with a required side-effect import and createWardleyServices re-export."
+    },
+    {
+      "file": "webview-b1b7b13a4120.js",
+      "bytes": 6782,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "browser-webview-host",
+      "action": "rewrite",
+      "reason": "Application webview host with adoption leases, visibility and paint policy, bounds, lifecycle, and bootstrap decisions across six consumers."
+    },
+    {
+      "file": "withMetadataArgument-d4cb51a53bdb.js",
+      "bytes": 164796,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "phone-metadata-argument-wrapper",
+      "action": "preserve",
+      "reason": "Generated libphonenumber metadata table plus argument-injection wrapper; the country and format dataset should remain byte-faithful."
+    },
+    {
+      "file": "worker-3fe306248590.js",
+      "bytes": 396881,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "pdf-processing-worker",
+      "action": "preserve",
+      "reason": "Self-contained 396 KB generated worker bundle consumed through a client entry with no stable application-level boundary."
+    },
+    {
+      "file": "worker-49a232674c13.js",
+      "bytes": 306520,
+      "imports": [],
+      "dynamicImports": [],
+      "exports": [],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "shiki-highlight-worker",
+      "action": "preserve",
+      "reason": "Self-contained 306 KB Shiki highlighting worker with generated grammar machinery and one dynamic import."
+    },
+    {
+      "file": "workspace-access.browser-2151c8cf5d1a.js",
+      "bytes": 3404,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-initial-51da50e6c6e3.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "prepareWorkspaceAccess"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "workspace-access-browser",
+      "action": "rewrite",
+      "reason": "Checkout-success access workflow with abort checks, session refresh, account discovery, polling, and stage callbacks."
+    },
+    {
+      "file": "workspace-auto-generated-name-aed2cf823284.js",
+      "bytes": 140984,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "confirm-latency-80d190bb1c8b.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "n",
+        "t"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "workspace-auto-generated-name-runtime",
+      "action": "further-consumer-audit",
+      "reason": "Large bundled naming runtime combining Punycode and domain handling with workspace-name generation across purchase and success flows."
+    },
+    {
+      "file": "workspace-layout-step-handler-57d8db9fac40.js",
+      "bytes": 4165,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "app-shared-7b9edc1bfb7f.js",
+        "app-initial-51da50e6c6e3.js",
+        "panel-visibility-5fac9957906d.js",
+        "view-control-labels-e06a319d91d7.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "WorkspaceLayoutStepHandler"
+      ],
+      "classification": "semantic-business-logic",
+      "suggestedSemanticName": "workspace-layout-step-handler",
+      "action": "rewrite",
+      "reason": "Command-step handler deriving workspace layout state and toggling content tabs through stores and localized labels."
+    },
+    {
+      "file": "x-like-435c693d8722.js",
+      "bytes": 741,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "i",
+        "n",
+        "r",
+        "t"
+      ],
+      "classification": "semantic-small",
+      "suggestedSemanticName": "x-like-identifier-normalization",
+      "action": "rewrite",
+      "reason": "Token utility that discovers x-like identifiers, normalizes a sole x_N symbol to x, and detects imaginary-unit identifiers."
+    },
+    {
+      "file": "xcode-dark-70031158a53b.js",
+      "bytes": 2678,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "chromeTheme",
+        "colors",
+        "default",
+        "name",
+        "tokenColors",
+        "type"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "xcode-dark-theme",
+      "action": "preserve",
+      "reason": "Static Xcode dark editor and application theme palette plus token-color data."
+    },
+    {
+      "file": "xcode-light-ad6a361cdfec.js",
+      "bytes": 2681,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "chromeTheme",
+        "colors",
+        "default",
+        "name",
+        "tokenColors",
+        "type"
+      ],
+      "classification": "generated-icon-or-data",
+      "suggestedSemanticName": "xcode-light-theme",
+      "action": "preserve",
+      "reason": "Static Xcode light editor and application theme palette plus token-color data."
+    },
+    {
+      "file": "xml-e376fa40de0a.js",
+      "bytes": 96,
+      "imports": [
+        "xml-e3156ce65998.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "xml-language-entry",
+      "action": "incremental-hub",
+      "reason": "Thin initialization and default re-export entry for the generated XML language definition."
+    },
+    {
+      "file": "yaml-84335cdfd018.js",
+      "bytes": 97,
+      "imports": [
+        "yaml-bd5a72a355a2.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "default"
+      ],
+      "classification": "aggregation-runtime",
+      "suggestedSemanticName": "yaml-language-entry",
+      "action": "incremental-hub",
+      "reason": "Thin initialization and default re-export entry for the generated YAML language definition."
+    },
+    {
+      "file": "yjs-ce18c78ffd5e.js",
+      "bytes": 170757,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "$",
+        "A",
+        "B",
+        "C",
+        "Ct",
+        "D",
+        "E",
+        "Et",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "St",
+        "T",
+        "Tt",
+        "U",
+        "V",
+        "W",
+        "X",
+        "Y",
+        "Z",
+        "_",
+        "_t",
+        "a",
+        "at",
+        "b",
+        "bt",
+        "c",
+        "ct",
+        "d",
+        "dt",
+        "et",
+        "f",
+        "ft",
+        "g",
+        "gt",
+        "h",
+        "ht",
+        "i",
+        "it",
+        "j",
+        "k",
+        "l",
+        "lt",
+        "m",
+        "mt",
+        "n",
+        "nt",
+        "o",
+        "ot",
+        "p",
+        "pt",
+        "q",
+        "r",
+        "rt",
+        "s",
+        "st",
+        "t",
+        "tt",
+        "u",
+        "ut",
+        "v",
+        "vt",
+        "w",
+        "wt",
+        "x",
+        "xt",
+        "y",
+        "yt",
+        "z"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "yjs-runtime",
+      "action": "preserve",
+      "reason": "Bundled 171 KB Yjs CRDT runtime with a broad compressed export surface and six artifact and workbook consumers."
+    },
+    {
+      "file": "zipObject-b39425e8947b.js",
+      "bytes": 15864,
+      "imports": [
+        "rolldown-runtime-2d059c5e81f4.js",
+        "union-2f12e2dfc01f.js",
+        "map-3ea4bc6d7205.js"
+      ],
+      "dynamicImports": [],
+      "exports": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "I",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "R",
+        "S",
+        "T",
+        "_",
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z"
+      ],
+      "classification": "vendor-generated-preserve",
+      "suggestedSemanticName": "lodash-zip-object-runtime",
+      "action": "preserve",
+      "reason": "Bundled Lodash helper graph centered on zipObject with many internal re-exports and six consumers."
+    }
+  ]
+}
