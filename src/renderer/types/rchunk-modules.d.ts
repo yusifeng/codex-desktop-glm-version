@@ -1204,8 +1204,22 @@ declare module "@rchunk/app-shared" {
   export const Vb: (props: IconAssetProps) => unknown;
   /** Composer mention/plugin state reader。 */
   export const wu: {
-    getState(editorState: unknown): { active?: boolean } | undefined;
+    getState(editorState: unknown): { active?: boolean; kind?: string; [key: string]: unknown } | undefined;
   };
+  export interface BrowserTabMentionIdentity {
+    browserId: string;
+    pluginId?: string | null;
+    snapshot?: unknown;
+    source: string;
+    tabId: string;
+  }
+  export const HG: (identity: BrowserTabMentionIdentity) => string;
+  export const LG: {
+    safeParse(value: unknown):
+      | { success: true; data: BrowserTabMentionIdentity }
+      | { success: false; error?: unknown };
+  };
+  export const VG: (path: string) => BrowserTabMentionIdentity | null;
   /** Extensions 图标组件。 */
   export const AS: (props: IconAssetProps) => unknown;
   /** 生成站点在连接应用列表与详情中的图标资源。 */
@@ -8030,6 +8044,14 @@ declare module "@rchunk/popup" {
   export const t: (props: { label: string; listboxId: string; suggestions: AddressSuggestion[]; selectedIndex: number; onDelete?(suggestion: AddressSuggestion): void; onDeleteBlur?(target: EventTarget | null): void; onSelect(suggestion: AddressSuggestion): void }) => unknown;
 }
 declare module "@rchunk/browser-address-suggestion-overlay" { export const BrowserAddressSuggestionOverlay: unknown; }
+declare module "@rchunk/browser-address-shortcut" {
+  export const BrowserAddressShortcut: (props: {
+    browserConversationId?: string | null;
+    composerController: Record<string, unknown>;
+    composerId: string;
+    placement?: string;
+  }) => unknown;
+}
 declare module "@rchunk/home-beacon" {
   export interface BeaconMessageIdentity {
     conversationId: string;
