@@ -4,7 +4,6 @@ import "@rchunk/rolldown-runtime";
 import * as appSharedChunk from "@rchunk/app-shared";
 import * as appInitialChunk from "@rchunk/app-initial";
 import "@rchunk/plan-implementation-request";
-// @ts-expect-error The release dependency has not received a semantic declaration yet.
 import * as pointerInteractivityChunk from "@rchunk/use-floating-window-pointer-interactivity";
 import "@rchunk/mcp-tool-activity-label";
 import * as nativeVoiceTransitionChunk from "@rchunk/use-realtime-voice-native-overlay-transition-enabled";

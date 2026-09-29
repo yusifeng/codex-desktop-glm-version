@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1070 个语义 chunk；`verify-renderer` 为 1070/1070。
-- `PRESERVED_ASSETS`：53 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1085 个语义 chunk；`verify-renderer` 为 1085/1085。
+- `PRESERVED_ASSETS`：54 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,11 +65,12 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1070/2247 tracked、1177 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1086/2247 tracked、1161 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
-  92/92。
-- `node scripts/audit-app-shared-consumption.mjs`：332 个实际消费导出均有语义
+  92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
+  hooks 为 23/24。
+- `node scripts/audit-app-shared-consumption.mjs`：339 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
 
@@ -249,9 +250,18 @@ LaTeX 命令/分组范围处理，使 search-command-menu 达到 5/5；PCA Conne
 恢复 eager 初始化与 action 重导出，使 connectors 达到 5/5。专项测试 129/129；renderer
 1070/1070、main 11/11、tsc 73。
 
+2026-09-29 已完成 hooks/animations/observability/auth-profile 批次：补齐 stable callback、
+reduced motion、Escape dismiss、learning block 布局/拖拽与 floating-window pointer
+interactivity；恢复 AnimatedIcon 公共入口与 frequency visual motion；恢复 remote PiP frame
+filter worker、remote middleware，并将 sentry dark 明确登记为主题数据资产；补齐 ChatGPT
+token auth、Plan tab、profile store 与 browser-extension profile 初始化入口。专项测试源码
+105/105，运行时行为断言 228 条；renderer 1085/1085、main 11/11、tsc 73，新增 any 0。
+animations、observability-cloud、auth-profile 均已全覆盖，hooks 仅余 external-agent import
+setup actions。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
-但“继续处理全量应用代码”的任务仍然有效。优先从全量覆盖审计中的 settings、
-pages-routes、browser、settings 等真实缺口继续；增量 hub 只在出现真实消费者时拆出
+但“继续处理全量应用代码”的任务仍然有效。优先处理 hooks 最后 1 个、
+skills-plugins-mcp 的 6 个与 panels 的 10 个真实缺口；增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 

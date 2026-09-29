@@ -29,7 +29,6 @@ import {
   ypn as initializeAnalyticsRuntime,
 } from "@rchunk/app-initial";
 import "@rchunk/app-primary";
-// @ts-expect-error This shipped chunk has no shared declaration yet.
 import "@rchunk/use-floating-window-pointer-interactivity";
 
 initializeJsxRuntime();

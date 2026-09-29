@@ -15457,3 +15457,25 @@ declare module "@rchunk/thread-side-panel-tab-content" { export const ReviewThre
 declare module "@rchunk/review-thread-file-diff";
 declare module "@rchunk/review-thread-pull-request-revision-queries";
 declare module "@rchunk/review-thread-pull-request-code-review" { export const PullRequestCodeReview: (props: { baseBranch?: string | null; headBranch?: string | null; headRevision?: string | null; request?: unknown }) => unknown; }
+declare module "@rchunk/use-stable-callback" { export const n: <Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result) => (...arguments_: Arguments) => Result; export const t: () => void; }
+declare module "@rchunk/use-reduced-motion" { export const n: () => boolean; export const t: () => void; }
+declare module "@rchunk/use-hotkey-window-dismiss-on-escape" { export const n: () => void; export const t: () => void; }
+declare module "@rchunk/use-learning-block-wide-layout" { export const n: (options?: { disabled?: boolean; minWidth?: number }) => { isWideLayout: boolean; visualizationRef(element: HTMLElement | null): void }; export const t: () => void; }
+declare module "@rchunk/use-learning-block-drag" { export const n: (options: Record<string, unknown>) => Record<string, unknown>; export const t: () => void; }
+declare module "@rchunk/use-floating-window-pointer-interactivity" { export const n: (options: Record<string, unknown>) => boolean; export const t: () => void; }
+declare module "@rchunk/animated-icon-public-entry" { export const AnimatedIcon: (props?: Record<string, unknown>) => unknown; }
+declare module "@rchunk/frequency-visual-motion" { export const n: () => void; export const t: (frequency: number) => { phaseSpeed: number; visibleCycles: number }; }
+declare module "@rchunk/remote-hosted-pip-frame-filter.worker";
+declare module "@rchunk/remote-middleware" { export const remoteMiddlewares: (logger: unknown, settings: unknown, obfuscateNames?: boolean) => Promise<unknown[]>; }
+declare module "@rchunk/chatgpt-token-auth-browser";
+declare module "@rchunk/plan-tab-content" { export const PlanSidePanelTabContent: (props?: Record<string, unknown>) => unknown; }
+declare module "@rchunk/browser-extension-profile-state" { export const n: () => void; export const r: () => Promise<void>; export const t: unknown; }
+declare module "@rchunk/browser-extension-profile-state-entry" { export const initializeBrowserExtensionProfile: () => Promise<void>; }
+
+declare module "@rchunk/app-shared" {
+  export const d0: () => void;
+  export const f0: { current: boolean };
+  export const m0: { current: boolean };
+  export const p0: () => void;
+  export const u0: () => void;
+}
