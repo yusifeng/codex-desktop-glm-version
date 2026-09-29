@@ -33,6 +33,14 @@ const chunkImportPlugin = {
       if (output == null) throw new Error(`Unknown renderer chunk referenced as @rchunk/${name}`);
       return { path: `./${output}`, external: true };
     });
+    // A few restored chunks retain exact release-file imports for lazily loaded
+    // language runtimes and preview entries. They already live beside the output
+    // chunk in app/webview/assets, so preserve the basename and keep them external
+    // instead of recursively bundling the transform-only source tree.
+    build.onResolve({ filter: /^\.\.\/\.\.\/webview\/assets\/.+\.js$/ }, (args) => ({
+      path: `./${path.basename(args.path)}`,
+      external: true,
+    }));
     // npm 依赖（react/react-dom 等）：按 external 处理——renderer 发布包没有
     // node_modules，这些依赖已在被引用的共享 chunk 里，重写模块应通过
     // @rchunk/app-shared 或后续登记的 vendor chunk 引入。

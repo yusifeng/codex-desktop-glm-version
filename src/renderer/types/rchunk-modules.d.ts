@@ -15197,6 +15197,35 @@ declare module "@rchunk/file-preview-version-history" { export const ChatGptFile
 declare module "@rchunk/library-file-preview-kind" { export interface PreviewableLibraryFile { file_name: string; library_file_category?: string | null; mime_type?: string | null } export const i: () => void; export const n: (file: PreviewableLibraryFile) => string | null; export const r: (file: PreviewableLibraryFile) => "artifact" | "html" | "image" | "markdown" | "pdf" | "text" | "unsupported"; export const t: (input: { fileId: string; mimeType?: string | null; sourceUrl?: string | null }) => string | null }
 declare module "@rchunk/library-file-preview-loading" { export const n: () => void; export const t: () => unknown }
 declare module "@rchunk/library-multiplayer-access" { export interface LibraryAccessState { accountFeatures?: readonly string[]; access: "allowed" | "denied" | "loading"; featureGateEnabled?: boolean; isInternal?: boolean; isLoadingAccount?: boolean; sharedContentGateEnabled?: boolean } export const n: { evaluate(state: LibraryAccessState): boolean }; export const r: { evaluate(state: LibraryAccessState): boolean }; export const t: () => void }
+
+declare module "@rchunk/app-initial" {
+  /** Published Markdown renderer component and its one-time initializer. */
+  export const BY: unknown;
+  export const LY: () => void;
+}
+declare module "@rchunk/thumbnail-386f09e9e7b3" { export const n: () => void; export const t: unknown }
+declare module "@rchunk/thumbnail-7c714f359bb7" { export const i: () => void; export const n: () => void; export const r: unknown; export const t: unknown }
+declare module "@rchunk/registered-text-file-thumbnail-core" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/chatgpt-code-block-editor" {
+  export const a: (language: string) => boolean;
+  export const i: (language: string) => unknown;
+  export const n: () => void;
+  export const o: () => void;
+  export const r: (language: string) => Promise<unknown>;
+  export const t: (props: Record<string, unknown>) => unknown;
+}
+declare module "@rchunk/markdown-renderer-entry" { export const Markdown: unknown }
+declare module "@rchunk/chatgpt-code-block" { export const ChatGptCodeBlock: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/code-block-execution" { export const CodeBlockExecution: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/registered-automation-thumbnail" { export const RegisteredAutomationThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/create-text-file-tab-thumbnail" { export const CreateTextFileTabThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/registered-browser-thumbnail" { export const RegisteredBrowserThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/registered-terminal-thumbnail" { export const RegisteredTerminalThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/create-file-tab-thumbnail" { export const CreateFileTabThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/registered-goal-thumbnail" { export const RegisteredGoalThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/registered-cloud-browser-thumbnail" { export const RegisteredCloudBrowserThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/registered-review-thumbnail" { export const RegisteredReviewThumbnail: (props: Record<string, unknown>) => unknown }
+declare module "@rchunk/create-image-tab-thumbnail" { export const CreateImageTabThumbnail: (props: Record<string, unknown>) => unknown }
 declare module "@rchunk/loading-controls" { export const n: () => void; export const t: (props: { paginated: boolean }) => import("@rchunk/editor-header-controls").EditorHeaderControls }
 declare module "@rchunk/open-image-preview" { export interface ImagePreviewTarget { alt?: string; id?: string; sourceUrl?: string; src: string } export const openChatGptSearchImagePreview: (image: ImagePreviewTarget, images?: ImagePreviewTarget[], service?: { open(input: { image: ImagePreviewTarget; images: ImagePreviewTarget[]; index: number }): void }) => { image: ImagePreviewTarget; images: ImagePreviewTarget[]; index: number }; }
 declare module "@rchunk/open-in-library-item" { export const n: () => void; export const t: (props: { disabled?: boolean; libraryFileId: string; onOpen?(path: string): void }) => unknown }

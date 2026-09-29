@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1138 个语义 chunk；`verify-renderer` 为 1138/1138。
-- `PRESERVED_ASSETS`：63 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1152 个语义 chunk；`verify-renderer` 为 1152/1152。
+- `PRESERVED_ASSETS`：66 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,12 +65,12 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1148/2247 tracked、1099 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1165/2247 tracked、1082 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
   hooks 24/24、skills-plugins-mcp 30/30、panels 20/20、charts-ui 17/17 已收官；
-  editor-docs 与 artifact-preview 已分别达到 42/42、53/53；markdown-render 为 7/24。
+  editor-docs、artifact-preview 与 markdown-render 已分别达到 42/42、53/53、24/24。
 - `node scripts/audit-app-shared-consumption.mjs`：341 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
 - main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
@@ -303,9 +303,16 @@ library image 加载/编辑/下载、评论与缩放，并补回 360° panorama 
 五组专项测试共 166 条断言；renderer 1138/1138、tsc 73，artifact-preview 达到
 53/53。下一批转入 markdown-render 剩余 17 个 chunk。
 
+2026-09-29 已收官 markdown-render：恢复 Markdown 入口、ChatGPT code block/editor、
+代码执行控制器和 10 个 registered thumbnail；代码编辑器保留 35 个语言运行时动态
+依赖，代码块保留 Mermaid/HTML/React/Vega 预览与 Python 执行入口。highlight.js 语言包、
+i18n locale bundle 与 TextMate Markdown grammar shim 分别登记为 vendor/generated 资产，
+不伪造业务源码。五组专项测试共 140 条断言；构建器补充发布资产动态 import 的
+external 解析后，renderer 1152/1152、tsc 73，markdown-render 达到 24/24。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
-但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 markdown-render 的
-17 个真实缺口；增量 hub 只在出现真实消费者时拆出
+但“继续处理全量应用代码”的任务仍然有效。下一步继续处理 appgen-valdi-platform 的
+24 个真实缺口（当前 54/78）；增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
 `docs/renderer-tail-audit.md`。
 

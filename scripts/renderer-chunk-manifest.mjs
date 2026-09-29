@@ -1692,6 +1692,23 @@ export const CHUNKS = {
   "profile": "profile-c8800e4c561a.js",
   "browser-extension-profile-state": "profile-state-dbf66f9b8ba1.js",
   "browser-extension-profile-state-entry": "profile-state-a44a7592f7bc.js",
+  "markdown-renderer-entry": "markdown-c37ec73b8e6d.js",
+  "chatgpt-code-block": "chatgpt-code-block-5f1819755161.js",
+  "chatgpt-code-block-editor": "chatgpt-code-block-editor-c6d384b76164.js",
+  "code-block-execution": "code-block-execution-4181c76c1863.js",
+  "registered-automation-thumbnail": "registered-259e95b201a1.js",
+  "create-text-file-tab-thumbnail": "registered-2ae5391b2895.js",
+  "registered-browser-thumbnail": "registered-46260ac3ea7c.js",
+  "registered-terminal-thumbnail": "registered-483fa461bc54.js",
+  "registered-text-file-thumbnail-core": "registered-484054f34b2a.js",
+  "create-file-tab-thumbnail": "registered-62c229b82dd8.js",
+  "registered-goal-thumbnail": "registered-7d9ee157cc5e.js",
+  "registered-cloud-browser-thumbnail": "registered-c064579e1975.js",
+  "registered-review-thumbnail": "registered-c3ff9a250803.js",
+  "create-image-tab-thumbnail": "registered-d34965da6e22.js",
+  "highlight-code-language-bundle": "highlight-code-7c4c2ef3d4d8.js",
+  "i18n-runtime-locale-bundle": "i18n-147d032388be.js",
+  "markdown-textmate-grammar-entry": "markdown-d7043fbbade8.js",
 };
 
 // 已重写模块可依赖尚未进入 CHUNKS 跟踪集的发布资产。这里仅提供
@@ -1707,6 +1724,8 @@ export const IMPORT_ALIASES = {
   "writing-block": "writing-block-5495cbf2b289.js",
   row: "row-794dad9b1eb6.js",
   "panorama-renderer": "index.module-9e940567d3f5.js",
+  "thumbnail-386f09e9e7b3": "thumbnail-386f09e9e7b3.js",
+  "thumbnail-7c714f359bb7": "thumbnail-7c714f359bb7.js",
   "dom-to-blob": "dist-e185f75a4ca6.js",
   "render-cache-key": "render-cache-key-6a5bc1b4dbdc.js",
   "learning-block-pointer-label": "learning-block-pointer-label-e7006c4e2e6d.js",
@@ -2945,6 +2964,20 @@ export const REWRITTEN = new Set([
   "interactive-chart",
   "mcp-server-elicitation-request-panel",
   "pending-request-item-panel",
+  "markdown-renderer-entry",
+  "chatgpt-code-block",
+  "chatgpt-code-block-editor",
+  "code-block-execution",
+  "registered-automation-thumbnail",
+  "create-text-file-tab-thumbnail",
+  "registered-browser-thumbnail",
+  "registered-terminal-thumbnail",
+  "registered-text-file-thumbnail-core",
+  "create-file-tab-thumbnail",
+  "registered-goal-thumbnail",
+  "registered-cloud-browser-thumbnail",
+  "registered-review-thumbnail",
+  "create-image-tab-thumbnail",
 ]);
 
 // 已审计并明确保留发布版资产的尾部 chunk。这些模块属于第三方运行时、
@@ -3015,6 +3048,9 @@ export const PRESERVED_ASSETS = new Map([
   ["text-file-editor-tab-content-electron-entry", "generated:entry-shim"],
   ["writing-block-directive-renderer-entry", "generated:entry-shim"],
   ["quick-chat-writing-block-adapter-entry", "generated:entry-shim"],
+  ["highlight-code-language-bundle", "vendor:highlightjs-language-bundle"],
+  ["i18n-runtime-locale-bundle", "vendor:i18n-runtime-locale-bundle"],
+  ["markdown-textmate-grammar-entry", "generated:textmate-grammar-entry"],
 ]);
 
 // 聚合 chunk 采用“按已消费导出增量语义化”，不要求复制整个发布版 bundle。

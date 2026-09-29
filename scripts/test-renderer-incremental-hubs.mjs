@@ -54,7 +54,15 @@ const checkoutSession = inspectHub("checkout-session");
 assert.equal(checkoutSession.strategy, "typed-consumer-surface");
 assert.equal(typeof checkoutSession.chunk, "string");
 assert.equal(checkoutSession.exportCount, 60);
-assert.ok(checkoutSession.imports.length > 0 && checkoutSession.imports.every((item) => item.clause == null));
+assert.ok(checkoutSession.imports.some((item) => item.clause == null));
+const checkoutSessionConsumers = checkoutSession.imports.filter((item) => item.clause != null);
+assert.equal(checkoutSessionConsumers.length, 2);
+assert.ok(checkoutSessionConsumers.every((item) => item.clause?.includes("* as checkoutSessionChunk")));
+for (const { file } of checkoutSessionConsumers) {
+  const source = fs.readFileSync(file, "utf8");
+  assert.match(source, /checkoutSessionChunk as unknown as CheckoutSessionApi/);
+  assert.doesNotMatch(source, /checkoutSessionChunk\./);
+}
 
 const billingAnalytics = inspectHub("billing-analytics");
 assert.equal(billingAnalytics.strategy, "typed-consumer-surface");
@@ -65,4 +73,4 @@ assert.ok(billingAnalytics.imports.every((item) => item.clause?.includes("initia
 const billingDeclaration = declarationSource.slice(declarationSource.indexOf('declare module "@rchunk/billing-analytics"'), declarationSource.indexOf('declare module "@rchunk/plugins-settings-core"'));
 assert.doesNotMatch(billingDeclaration, /\bany\b/);
 
-console.log("28 renderer incremental hub assertions passed");
+console.log("34 renderer incremental hub assertions passed");

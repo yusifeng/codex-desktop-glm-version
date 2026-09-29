@@ -49,18 +49,22 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 1138 rewritten / 63 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 1148/2247 tracked、1099 pending，其中
+截至 2026-09-29，尾部审计为 1152 rewritten / 66 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1165/2247 tracked、1082 pending，其中
 terminal 6/6、browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding
 40/40、git-github-worktree 63/63，conversation-thread 101/101，pages-routes 92/92；
 animations 7/7、observability-cloud 8/8、auth-profile 13/13、hooks 24/24、
 skills-plugins-mcp 30/30、panels 20/20、charts-ui 17/17、editor-docs 42/42、
-artifact-preview 53/53 已覆盖，markdown-render 为 7/24。editor-docs 最后一批恢复 detached browser annotation
+artifact-preview 53/53、markdown-render 24/24 已覆盖。editor-docs 最后一批恢复 detached browser annotation
 controls、image markup editor、visualization annotation editor 与 quick-chat writing block
 adapter；四个输出均通过精确依赖/导出验证，未把其 dependency-only 叶子别名误计入
 全量覆盖。artifact-preview 最后一批恢复 artifact session、text document、Mermaid
 editable、library note/image preview 与 image side panel；360° panorama renderer 继续通过
-动态 `IMPORT_ALIASES` 指向发布资产，不把 dependency-only 模块计入覆盖。医疗验证
+动态 `IMPORT_ALIASES` 指向发布资产，不把 dependency-only 模块计入覆盖。
+markdown-render 最后一批恢复 Markdown entry、code block/editor、code execution 与 10 个
+registered thumbnail；highlight.js、i18n locale bundle 和 TextMate grammar shim 保留在
+vendor/generated 轨道。下一批转入 appgen-valdi-platform 剩余 24 个应用 chunk。
+医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入
 `vendor:diagram-mermaid`，不再误算为应用代码。尾部 0 pending 仍不能替代全量覆盖审计。
