@@ -15365,3 +15365,9 @@ declare module "@rchunk/datadog-rum.browser";
 declare module "@rchunk/messages";
 declare module "@rchunk/remote-conversation-page" { export const RemoteConversationPage: () => unknown; }
 declare module "@rchunk/cfc-plan-page" { export const CfcPlanPage: () => unknown; }
+declare module "@rchunk/chat-seat-access-screen-entry" { export const ChatSeatAccessScreen: (props?: Record<string, unknown>) => unknown; }
+declare module "@rchunk/images-page" { export const ImagesPage: () => unknown; }
+declare module "@rchunk/paypal-page" { export const PayPalCheckoutPage: () => unknown; }
+declare module "@rchunk/verify-page" { export const CheckoutVerifyPage: () => unknown; }
+declare module "@rchunk/connect-screen-fill" { const ConnectScreenFill: (props?: Record<string, unknown>) => unknown; export default ConnectScreenFill; }
+declare module "@rchunk/my-gpts-page" { export const MyGptsPage: () => unknown; }
