@@ -49,8 +49,8 @@ incremental hub，由消费审计阻止未来绕过语义声明直接扩张。
 组件和工具导出，当前设置页只消费日期范围控件、ActivityChart 组件及两个初始化器
 `H/U/n/t`；因此沿用 typed-consumer-surface 策略，只声明实际消费面。
 
-截至 2026-09-29，尾部审计为 1651 rewritten / 103 preserved / 12 incremental hubs / 0
-semantic tail pending；全量 app-code 覆盖为 1701/2247 tracked、546 pending，其中
+截至 2026-09-29，尾部审计为 1681 rewritten / 119 preserved / 12 incremental hubs / 0
+semantic tail pending；全量 app-code 覆盖为 1747/2247 tracked、500 pending，其中
 terminal 6/6、browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding
 40/40、git-github-worktree 63/63，conversation-thread 101/101，pages-routes 92/92；
 animations 7/7、observability-cloud 8/8、auth-profile 13/13、hooks 24/24、
@@ -147,6 +147,12 @@ pending。剩余动作分布为 rewrite 224、preserve 215、incremental-hub 110
 preserved vendor。三组 rewrite 专项测试共 203 条断言，preserve 专项验证 12 个包装器；
 renderer 1651/1651、tsc 73，misc-ui-utils 当前 407/953 tracked、546 pending。剩余动作
 分布为 rewrite 194、preserve 203、incremental-hub 110、进一步消费者审计 39。
+第五批恢复 30 个 rewrite 模块，覆盖热力学、化学、生物、几何、统计、经济、力学和
+电磁学模型，并将第二个 math 变体独立恢复为 lazy runtime；另登记 14 个纯静态教学规格
+与 2 个视觉资产为 preserved data/generated。三组 rewrite 专项测试共 214 条断言，
+preserve 专项验证 16 个资产；renderer 1681/1681、tsc 73，misc-ui-utils 当前 453/953
+tracked、500 pending。剩余动作分布为 rewrite 164、preserve 187、incremental-hub 110、
+进一步消费者审计 39。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入

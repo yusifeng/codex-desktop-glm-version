@@ -15595,6 +15595,22 @@ declare module "@rchunk/hammer-runtime";
 declare module "@rchunk/chartjs-plugin-zoom";
 declare module "@rchunk/interactive-chart" { export const n: () => void; export const t: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/pane-layout" { export const n: (slots: unknown, parts: unknown) => unknown; export const t: () => void; }
+declare module "@rchunk/math-lazy-runtime" {
+  export const a: typeof Math.cos;
+  export const c: () => void;
+  export const d: number;
+  export const f: typeof Math.sin;
+  export const i: typeof Math.atan2;
+  export const l: typeof Math.max;
+  export const m: number;
+  export const n: (value: number) => number;
+  export const o: number;
+  export const p: typeof Math.sqrt;
+  export const r: (value: number) => number;
+  export const s: number;
+  export const t: typeof Math.abs;
+  export const u: typeof Math.min;
+}
 declare module "@rchunk/artifact-tab-content-shell" { export const ArtifactTabContentShell: (props: Record<string, unknown>) => unknown; }
 declare module "@rchunk/comment-light-dismiss";
 declare module "@rchunk/comment-popup-portal";
