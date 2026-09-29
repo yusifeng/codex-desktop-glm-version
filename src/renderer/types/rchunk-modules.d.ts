@@ -15305,3 +15305,26 @@ declare module "@rchunk/chronicle-settings-page" { export const ComputerHistoryS
 declare module "@rchunk/computer-use-settings" { export const ComputerUseSettings: () => unknown; }
 declare module "@rchunk/settings" { export const ChatGptParentalControlsSettings: () => unknown; }
 declare module "@rchunk/settings-page" { export const SettingsPage: () => unknown; }
+declare module "@rchunk/browser-clear-browsing-data-dialog-view";
+declare module "@rchunk/profile";
+declare module "@rchunk/NewsPaper";
+declare module "@rchunk/computer-use-app-approval-request-card";
+declare module "@rchunk/use-external-agent-import-setup-actions";
+declare module "@rchunk/rosalind-helix";
+declare module "@rchunk/three.core";
+declare module "@rchunk/three.module";
+declare module "@rchunk/modifiers.esm";
+declare module "@rchunk/onboarding-page" { export const OnboardingPage: () => unknown; }
+declare module "@rchunk/onboarding" { export const ExtensionOnboarding: () => unknown; }
+declare module "@rchunk/thread-goal-side-panel-content" { export const ThreadGoalSidePanelTab: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/queued-message-list" { export const QueuedMessageList: (props: Record<string, unknown>) => unknown; }
+declare module "@rchunk/options-menu-view" {
+  export const A: unknown; export const C: unknown; export const D: unknown; export const E: unknown; export const F: unknown;
+  export const I: unknown; export const L: unknown; export const M: unknown; export const N: unknown; export const O: unknown;
+  export const P: unknown; export const S: unknown; export const T: unknown; export const _: unknown; export const a: unknown;
+  export const b: unknown; export const c: unknown; export const d: unknown; export const f: unknown; export const g: unknown;
+  export const h: unknown; export const i: unknown; export const j: unknown; export const k: unknown; export const l: unknown;
+  export const m: unknown; export const n: unknown; export const o: unknown; export const p: unknown; export const r: unknown;
+  export const s: unknown; export const t: unknown; export const u: unknown; export const v: unknown; export const w: unknown;
+  export const x: unknown; export const y: unknown;
+}
