@@ -15,7 +15,6 @@ import {
   ofn as useGate,
 } from "@rchunk/app-initial";
 import "@rchunk/command-menu-availability";
-// @ts-expect-error The recovered direct edge has no shared declaration yet.
 import "@rchunk/ads-controls-state";
 
 interface AdsSettings {

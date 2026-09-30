@@ -199,6 +199,12 @@ project import prompt 共 11 个模块，并登记 8 个生成 UI/vendor/无操�
 preserved。三组 rewrite 专项测试共 148 条断言，preserve 专项验证 8 个资产；renderer
 1856/1856、tsc 73，misc-ui-utils 当前 823/953 tracked、130 pending。消费者审计队列已
 清空，剩余动作分布为 rewrite 10、incremental-hub 120。
+第十二批第二段恢复剩余 10 个明确 rewrite 模块：subscription payment announcement、
+workspace seat banner、ChatGPT header upgrade、ads consent boundary、conversation header、
+workspace recovery gate、Mermaid image rendering、imagegen request form、browser MFA SMS
+enrollment 与 workspace auto-generated name。三组专项测试共 112 条断言；renderer
+1866/1866、tsc 73，misc-ui-utils 当前 833/953 tracked、120 pending。明确 rewrite 队列
+已经清空，剩余动作全部为 incremental-hub 120。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入
