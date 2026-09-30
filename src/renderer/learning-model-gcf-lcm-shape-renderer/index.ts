@@ -1,0 +1,15 @@
+import '@rchunk/rolldown-runtime';
+import * as SharedChunk from '@rchunk/app-shared';
+import * as ColorRolesChunk from '@rchunk/color-roles';
+type Variant='roundedSquare'|'circle'|'roundedRectangle'|'triangle'|'hexagon';
+interface Point{x:number;y:number} interface Geometry{width:number;height:number;borderRadius?:number;polygon?:Point[];labelCenter:Point;fallbackSlotHeight?:number}
+interface Jsx{jsx(type:unknown,props:Record<string,unknown>,key?:unknown):unknown;jsxs(type:unknown,props:Record<string,unknown>,key?:unknown):unknown}
+let jsx:Jsx;
+const geometries:Record<Variant,Geometry>={roundedSquare:{width:48,height:48,borderRadius:4,labelCenter:{x:.5,y:.5}},circle:{width:48,height:48,borderRadius:9999,labelCenter:{x:.5,y:.5}},roundedRectangle:{width:48,height:32,borderRadius:4,fallbackSlotHeight:60,labelCenter:{x:.5,y:.5}},triangle:{width:48,height:48,borderRadius:4,fallbackSlotHeight:60,labelCenter:{x:.5,y:7/12},polygon:[{x:.5,y:0},{x:1,y:1},{x:0,y:1}]},hexagon:{width:62.03,height:48,borderRadius:4,fallbackSlotHeight:60,labelCenter:{x:.5,y:.5},polygon:[{x:.25,y:0},{x:.75,y:0},{x:1,y:.5},{x:.75,y:1},{x:.25,y:1},{x:0,y:.5}]}};
+function polygonPath(points:Point[],width:number,height:number){if(points.length<3)return'';return points.map((p,index)=>(index===0?'M ':'L ')+(p.x*width).toFixed(3)+' '+(p.y*height).toFixed(3)).join(' ')+' Z'}
+function ShapeRenderer(props:{variant:Variant;size?:number;color?:string;label?:unknown;outerLabel?:unknown;dragState?:'rest'|'interactive'|'dragging';reducedMotion?:boolean}){const geometry=geometries[props.variant],scale=(Number.isFinite(props.size)&&Number(props.size)>0?Number(props.size):48)/48,width=geometry.width*scale,height=geometry.height*scale,color=props.color??'var(--icon-accent, #0285ff)',shadow=props.dragState==='rest'||props.dragState==null?'none':'0 7px 10px -6px rgba(0,0,0,.4)';const fill=geometry.polygon?jsx.jsx('svg',{viewBox:'0 0 '+geometry.width+' '+geometry.height,children:jsx.jsx('path',{d:polygonPath(geometry.polygon,geometry.width,geometry.height),fill:color})}):jsx.jsx('span',{style:{backgroundColor:color,borderRadius:geometry.borderRadius}});return jsx.jsxs('div',{'data-learning-block-shape':props.variant,style:{minWidth:width,height:Math.max(height,(geometry.fallbackSlotHeight??height)*scale)},children:[jsx.jsx('span',{style:{width,height,boxShadow:shadow},children:fill}),jsx.jsx('span',{'data-learning-block-shape-label':true,children:props.label}),props.outerLabel==null?null:jsx.jsx('span',{'data-learning-block-shape-outer-label':true,children:props.outerLabel})]})}
+const model={type:'GCF_LCM',version:1,thumbnailAssetKey:'gcf-lcm-v1',parameters:{first_number:{kind:'integer',defaultValue:60,min:1,max:100},second_number:{kind:'integer',defaultValue:90,min:1,max:100}}};
+function initialize(){void ColorRolesChunk;jsx=(SharedChunk as unknown as{I3():Jsx}).I3()}
+function initializeModel(){return model}
+initialize();initializeModel();
+export{initialize as i,model as n,ShapeRenderer as r,initializeModel as t};

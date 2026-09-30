@@ -184,6 +184,13 @@ Redux/Silero 等 vendor 运行时为 preserved。新增 rewrite 专项测试共 
 preserve 专项验证 33 个资产；renderer 1811/1811、tsc 73，misc-ui-utils 当前 696/953
 tracked、257 pending。剩余动作分布为 rewrite 34、preserve 74、incremental-hub 110、
 进一步消费者审计 39。
+第十一批恢复剩余 34 个明确 rewrite 模块，覆盖 adaptive slider、数学分类/方程/几何、
+ODE 内容解析、购物详情缓存、sandbox/webview、workspace access/layout、voice commentary
+与 onboarding/announcement 等业务表面；同时将剩余 74 个逐文件证据明确的插画、图标、
+语法/主题、worker、Cytoscape/Yjs/.NET/Lodash 等生成或 vendor 资产全部登记为 preserved。
+三组 rewrite 专项测试共 270 条断言，preserve 专项验证 74 个资产；renderer 1845/1845、
+tsc 73，misc-ui-utils 当前 804/953 tracked、149 pending。明确 rewrite/preserve 队列已
+清空，剩余动作分布为 incremental-hub 110、进一步消费者审计 39。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入

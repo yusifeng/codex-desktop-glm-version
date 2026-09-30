@@ -15737,3 +15737,33 @@ declare module "@rchunk/app-shared" {
   export const p0: () => void;
   export const u0: () => void;
 }
+
+declare module "@rchunk/callback-utility" { export const r: (...arguments_: unknown[]) => Promise<unknown>; }
+declare module "@rchunk/learning-block-path" { export const n: (...arguments_: unknown[]) => string; export const t: (...arguments_: unknown[]) => string; }
+declare module "@rchunk/adaptive-slider" {
+  interface Range { min: number; max: number; }
+  interface Bounds extends Range { step: number; }
+  interface Config { allowed: Range; base: Bounds; localWindowRatio?: number; maxAlignedWindowStepCount?: number; maxFractionDigits?: number; maxPreciseWindowStepCount?: number; minWindowStepHeadroom?: number; targetLocalStepCount?: number; }
+  export const c: (value: number, range: Range, options?: { maxFractionDigits?: number }) => number;
+  export const l: (value: number, range: Range, options?: { maxFractionDigits?: number; maxPreciseWindowStepCount?: number; targetLocalStepCount?: number }) => number;
+  export const n: (value: number, maximum?: number) => number;
+  export const o: (value: number, minimum: number, step: number) => boolean;
+  export const r: (value: number, config: Config) => Bounds;
+  export const s: (left: Config, right: Config) => boolean;
+  export const t: number;
+  export const u: (value: number, digits: number) => number;
+}
+declare module "@rchunk/classify" {
+  export const c: (source: string) => string;
+  export const d: (source: string) => string;
+  export const i: (source: string) => boolean;
+  export const l: (source: string) => string;
+  export const n: (source: string) => boolean;
+  export const o: (source: string) => string;
+  export const r: (source: string) => boolean;
+  export const s: (source: string) => string[];
+  export const t: (source: string) => Array<{ lhs: string; rhs: string }>;
+  export const u: (source: string) => string;
+}
+declare module "@rchunk/commentary" { export const a: unknown; export const i: unknown; export const n: unknown; export const o: unknown; export const r: unknown; export const s: unknown; export const t: unknown; }
+declare module "@rchunk/chatgpt-voice-analytics-protobuf" { export const a: unknown; export const c: unknown; export const d: unknown; export const f: unknown; export const i: unknown; export const l: unknown; export const n: unknown; export const o: unknown; export const p: unknown; export const r: unknown; export const s: unknown; export const t: unknown; export const u: unknown; }
