@@ -2,6 +2,18 @@
 import "@rchunk/rolldown-runtime";
 import * as AppShared from "@rchunk/app-shared";
 
+type ClassValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | readonly ClassValue[]
+  | Record<string, boolean>;
+interface JsxRuntime {
+  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
+}
+
 interface ActionButtonProps extends Record<string, unknown> {
   className?: string;
   onClick?: () => void;
@@ -14,14 +26,18 @@ interface ActionButtonGroupProps extends Record<string, unknown> {
 }
 
 const sharedRuntime = AppShared as unknown as {
-  I3(): AppShared.JsxRuntime;
+  I3(): JsxRuntime;
   h4(): void;
-  m4(...values: AppShared.ClassValue[]): string;
+  m4(...values: ClassValue[]): string;
 };
 
-let jsxRuntime: AppShared.JsxRuntime;
+let jsxRuntime: JsxRuntime;
 
-function ActionButton({ className, onClick, ...buttonProps }: ActionButtonProps): unknown {
+function ActionButton({
+  className,
+  onClick,
+  ...buttonProps
+}: ActionButtonProps): unknown {
   const deferredClick = onClick
     ? () => {
         window.requestAnimationFrame(() => {
@@ -41,7 +57,12 @@ function ActionButton({ className, onClick, ...buttonProps }: ActionButtonProps)
   });
 }
 
-function ActionButtonGroup({ children, className, columns = 1, ...groupProps }: ActionButtonGroupProps): unknown {
+function ActionButtonGroup({
+  children,
+  className,
+  columns = 1,
+  ...groupProps
+}: ActionButtonGroupProps): unknown {
   return jsxRuntime.jsx("div", {
     ...groupProps,
     className: sharedRuntime.m4(
@@ -60,4 +81,8 @@ function initializeLearningBlockButtons(): void {
   jsxRuntime = sharedRuntime.I3();
 }
 
-export { ActionButtonGroup as n, initializeLearningBlockButtons as r, ActionButton as t };
+export {
+  ActionButtonGroup as n,
+  initializeLearningBlockButtons as r,
+  ActionButton as t,
+};

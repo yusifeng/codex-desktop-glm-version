@@ -5,6 +5,10 @@ import * as AppInitial from "@rchunk/app-initial";
 import * as LibraryCloudFilePreview from "@rchunk/library-cloud-file-preview";
 import * as CloudFilePreview from "@rchunk/cloud-file-preview";
 
+interface JsxRuntime {
+  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
+}
+
 interface CompilerRuntime {
   c(size: number): unknown[];
 }
@@ -32,7 +36,7 @@ const sharedRuntime = AppShared as unknown as {
   $3(): CompilerRuntime;
   FX(): void;
   HX<Value>(signal: unknown): Value;
-  I3(): AppShared.JsxRuntime;
+  I3(): JsxRuntime;
 };
 const connectedRuntime = AppInitial as unknown as {
   Sun(): void;
@@ -46,14 +50,22 @@ const libraryPreviewRuntime = LibraryCloudFilePreview as unknown as {
 const cloudPreviewRuntime = CloudFilePreview as unknown as { t(): void };
 
 let compilerRuntime: CompilerRuntime;
-let jsxRuntime: AppShared.JsxRuntime;
+let jsxRuntime: JsxRuntime;
 
-function ConnectedFilePreview({ file, identity, onClose }: ConnectedFilePreviewProps): unknown {
+function ConnectedFilePreview({
+  file,
+  identity,
+  onClose,
+}: ConnectedFilePreviewProps): unknown {
   const cache = compilerRuntime.c(11);
   const accountId = sharedRuntime.HX<string | null>(connectedRuntime.mun);
   const userId = sharedRuntime.HX<string | null>(connectedRuntime._un);
   const isReady = sharedRuntime.HX<boolean>(connectedRuntime.xun);
-  if (accountId !== identity.accountId || userId !== identity.userId || !isReady) {
+  if (
+    accountId !== identity.accountId ||
+    userId !== identity.userId ||
+    !isReady
+  ) {
     return null;
   }
 
@@ -66,7 +78,12 @@ function ConnectedFilePreview({ file, identity, onClose }: ConnectedFilePreviewP
   ) {
     key = cache[4];
   } else {
-    key = JSON.stringify([identity, file.fileId, file.currentVersion, file.modifiedAt]);
+    key = JSON.stringify([
+      identity,
+      file.fileId,
+      file.currentVersion,
+      file.modifiedAt,
+    ]);
     cache[0] = file.currentVersion;
     cache[1] = file.fileId;
     cache[2] = file.modifiedAt;

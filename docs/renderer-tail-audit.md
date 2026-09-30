@@ -205,6 +205,13 @@ workspace recovery gate、Mermaid image rendering、imagegen request form、brow
 enrollment 与 workspace auto-generated name。三组专项测试共 112 条断言；renderer
 1866/1866、tsc 73，misc-ui-utils 当前 833/953 tracked、120 pending。明确 rewrite 队列
 已经清空，剩余动作全部为 incremental-hub 120。
+incremental-hub 收官批次对 120 个剩余入口/聚合运行时逐项核对真实消费者、精确依赖与
+导出面：恢复 graceful URI decoder、voice DSP state、parental-control notification observer、
+personal-secrets preflight、conversation beacon banner、两代 color channel parser 与
+media-device contracts 共 8 个语义模块；112 个纯生成插画/语法入口、Mermaid parser
+bootstrap、worker model、initializer facade、locale/learning registry 和大型编译
+UI/voice/persistence surface 进入 audited preserve。六组专项验证共 1077 条断言；renderer
+1874/1874、tsc 73，misc-ui-utils 达到 953/953，app-code 覆盖 2247/2247、0 pending。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入

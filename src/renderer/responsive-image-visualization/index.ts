@@ -17,7 +17,11 @@ interface ResponsiveImageProps {
   objectFit?: string;
 }
 
-let jsxRuntime: AppShared.JsxRuntime;
+interface JsxRuntime {
+  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
+}
+
+let jsxRuntime: JsxRuntime;
 
 function createSourceSet({ oneX, twoX, threeX }: ResponsiveImageSources): string | undefined {
   const candidates = [oneX + " 1x"];
@@ -58,7 +62,7 @@ function ResponsiveImageVisualization({
 }
 
 function initializeResponsiveImageVisualization(): void {
-  jsxRuntime = (AppShared as unknown as { I3(): AppShared.JsxRuntime }).I3();
+  jsxRuntime = (AppShared as unknown as { I3(): JsxRuntime }).I3();
 }
 
 export { initializeResponsiveImageVisualization as n, ResponsiveImageVisualization as t };

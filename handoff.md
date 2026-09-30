@@ -52,11 +52,10 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 
 ### 2026-09-30 当前状态（优先以本节为准）
 
-交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
-但尚未完成全量 app-code：
+交接后的 renderer 主线已经完成全量 app-code 审计、语义恢复与保留轨道登记：
 
-- `REWRITTEN`：1866 个语义 chunk；`verify-renderer` 为 1866/1866。
-- `PRESERVED_ASSETS`：314 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1874 个语义 chunk；`verify-renderer` 为 1874/1874。
+- `PRESERVED_ASSETS`：426 个经审计的 vendor/generated/data/worker/compiled-surface 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,7 +64,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  2127/2247 tracked、120 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  2247/2247 tracked、0 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
@@ -489,12 +488,19 @@ imagegen request form、browser MFA SMS enrollment 与 workspace auto-generated 
 misc-ui-utils 当前 833/953。剩余 120 个缺口全部为 incremental-hub，后续只按真实消费者
 拆出语义 API。
 
-因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
-但“继续处理全量应用代码”的任务仍然有效。剩余 120 个真实缺口全部位于
-misc-ui-utils（当前 833/953）；结构化审计、消费者审计和明确 rewrite/preserve 队列均已
-完成，下一步按真实消费面处理 120 个聚合/入口 hub。增量 hub 只在出现真实消费者时拆出
-语义 API，不为未消费导出制造占位源码。完整依据见
-`docs/renderer-tail-audit.md`。
+2026-09-30 已完成 misc-ui-utils incremental-hub 收官：120 个入口/聚合运行时全部按真实
+消费者完成逐文件审计，其中恢复 graceful URI decoder、voice DSP state、parental-control
+notification observer、personal-secrets preflight、conversation beacon banner、两代 color
+channel parser 与 media-device contracts 共 8 个语义模块；其余 112 个生成插画/语法入口、
+Mermaid parser bootstrap、worker model、initializer facade、locale/learning registry 与大型
+编译 UI/voice/persistence surface 均以精确依赖、导出和消费者证据登记为 preserved。六组
+专项验证共 1077 条断言；renderer 1874/1874、tsc 73，全量覆盖 2247/2247，
+misc-ui-utils 达到 953/953。renderer app-code 当前 0 pending。
+
+因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字仅为初始交接快照；
+renderer 全量应用代码现已完成。后续实现任务转为清理 main TypeScript 73 个既有缺失
+模块/导出错误，并继续保持 renderer 2247/2247、main 结构 11/11 与 app-shared 消费
+声明 341/341 不回退。完整依据见 `docs/renderer-tail-audit.md`。
 
 ### 已完成
 

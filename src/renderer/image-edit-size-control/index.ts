@@ -11,6 +11,10 @@ interface PortalRuntime {
   createPortal(children: unknown, container: Element): unknown;
 }
 
+interface JsxRuntime {
+  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
+}
+
 interface ImageEditSizeControlProps {
   children?: unknown;
   container?: Element | null;
@@ -20,10 +24,10 @@ interface ImageEditSizeControlProps {
 
 const sharedRuntime = AppShared as unknown as {
   $3(): CompilerRuntime;
-  I3(): AppShared.JsxRuntime;
+  I3(): JsxRuntime;
   P3(): PortalRuntime;
   h4(): void;
-  m4(...values: AppShared.ClassValue[]): string;
+  m4(...values: unknown[]): string;
 };
 const imageRuntime = AppInitial as unknown as {
   GB: (props: Record<string, unknown>) => unknown;
@@ -32,7 +36,7 @@ const imageRuntime = AppInitial as unknown as {
 
 let compilerRuntime: CompilerRuntime;
 let portalRuntime: PortalRuntime;
-let jsxRuntime: AppShared.JsxRuntime;
+let jsxRuntime: JsxRuntime;
 
 function ImageEditSizeControl({ children, container, ref, zoom }: ImageEditSizeControlProps): unknown {
   const cache = compilerRuntime.c(15);

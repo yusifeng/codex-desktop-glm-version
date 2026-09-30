@@ -5,13 +5,14 @@ import * as ShareAction from "@rchunk/share-conversation-action";
 import * as Announcement from "@rchunk/announcement-modal-source-bridge";
 import * as HomeBeacon from "@rchunk/codex-app-home-beacon-announcement";
 import * as TemporaryChat from "@rchunk/chatgpt-temporary-chat-ui";
-const shared = Shared as unknown as { $3(): { c(n: number): unknown[] }; FX(): void; I3(): Shared.JsxRuntime; LX(s: unknown): unknown; QI(): void; ZI: unknown; e6(): unknown };
+interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown }
+const shared = Shared as unknown as { $3(): { c(n: number): unknown[] }; FX(): void; I3(): JsxRuntime; LX(s: unknown): unknown; QI(): void; ZI: unknown; e6(): unknown };
 const initial = Initial as unknown as { ANt(): void; aqt(id: string): string; dHt(): void; uHt(): void };
 const share = ShareAction as unknown as { o(input: Record<string, unknown>): unknown; s(): void };
 const announcement = Announcement as unknown as { n(): void; t: unknown };
 const home = HomeBeacon as unknown as { r(): void; t(): void };
 const temporary = TemporaryChat as unknown as { i(): void; n: unknown };
-let compiler: { c(n: number): unknown[] }, jsx: Shared.JsxRuntime;
+let compiler: { c(n: number): unknown[] }, jsx: JsxRuntime;
 function ConversationBeaconSurface(props: Record<string, unknown>): unknown { return jsx.jsx(announcement.t, { source: "conversation", candidate: { id: props.conversationId, status: "eligible", render: () => null } }); }
 function ChatGptConversationBeaconSurfaces(props: Record<string, unknown>): unknown {
   compiler.c(22);

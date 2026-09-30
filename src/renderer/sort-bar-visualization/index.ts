@@ -7,12 +7,13 @@ import * as ReducedMotion from "@rchunk/use-reduced-motion";
 
 type Role = "candidate" | "comparison" | "sorted" | "remaining";
 interface Item { id: string; value: number; label: unknown; positionLabel: unknown; role: Role }
-const shared = Shared as unknown as { I3(): Shared.JsxRuntime; K2(): void; Y2: (p: Record<string, unknown>) => unknown; h4(): void; m4(...v: Shared.ClassValue[]): string };
+interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown }
+const shared = Shared as unknown as { I3(): JsxRuntime; K2(): void; Y2: (p: Record<string, unknown>) => unknown; h4(): void; m4(...v: unknown[]): string };
 const inputs = InputSelector as unknown as { r(): void; t: (p: Record<string, unknown>) => unknown };
 const buttons = Buttons as unknown as { n: (p: Record<string, unknown>) => unknown; r(): void; t: (p: Record<string, unknown>) => unknown };
 const motion = Motion as unknown as { n(): void; t: { div: unknown } };
 const reduced = ReducedMotion as unknown as { n: () => boolean; t(): void };
-let jsx: Shared.JsxRuntime;
+let jsx: JsxRuntime;
 
 function SortControls(props: Record<string, unknown>): unknown {
   const message = (id: string, defaultMessage: string) => jsx.jsx(shared.Y2, { id, defaultMessage });

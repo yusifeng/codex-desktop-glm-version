@@ -2566,6 +2566,22 @@ declare module "@rchunk/app-shared" {
     | undefined;
   /** classNames（app-shared/ui/class-names.ts，内部 J）。 */
   export const m4: (...values: ClassValue[]) => string;
+  /** instanceOf schema builder consumed by the sandbox connection handshake. */
+  export const S4: <Instance, Arguments extends unknown[]>(
+    constructor: abstract new (...arguments_: Arguments) => Instance,
+    options?: unknown,
+  ) => SafeParseSchema<Instance>;
+  export interface ScopedSignalTransactionChange {
+    hasChanged(): boolean;
+    redo(): void;
+    refresh(): void;
+    undo(): void;
+  }
+  /** Run a scoped signal mutation transaction and retain reversible changes. */
+  export const zZ: <TScope, Result>(
+    scope: MaitaiScopeApi<TScope>,
+    callback: (scope: MaitaiScopeApi<TScope>) => Result,
+  ) => { changes: ScopedSignalTransactionChange[]; value: Result };
   /** getRetainedScopeState（app-shared/runtime/atom-signal.ts，内部 dje）。 */
   export const mZ: <T>(
     activeScope: MaitaiScopeApi<unknown>,
@@ -15773,3 +15789,7 @@ declare module "@rchunk/mermaid-support" { export const a: unknown; export const
 declare module "@rchunk/mermaid-elk-renderer" { const renderer: unknown; export default renderer; }
 declare module "@rchunk/mermaid-core" { export const a: unknown; export const c: unknown; export const d: unknown; export const i: unknown; export const l: unknown; export const n: unknown; export const o: unknown; export const r: unknown; export const s: unknown; export const t: unknown; export const u: unknown; }
 declare module "@rchunk/phone-metadata-argument-wrapper" { export const w: <Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result) => (...arguments_: Arguments) => Result; }
+declare module "@rchunk/parental-control-notifications-runtime" { export const listenForParentalControlNotifications: (scope: unknown, userId: string, accountId: string) => () => void; }
+declare module "@rchunk/precise-location-banner-constants" { export const n: () => void; }
+declare module "@rchunk/color-channel-runtime-modern" { export const at: (source: string) => unknown; export const ot: { lang: { round(value: number): number } }; }
+declare module "@rchunk/color-channel-runtime-legacy" { export const ft: (source: string) => unknown; export const ht: () => void; export const mt: { lang: { round(value: number): number } }; export const pt: () => void; }
