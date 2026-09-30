@@ -191,6 +191,14 @@ ODE 内容解析、购物详情缓存、sandbox/webview、workspace access/layou
 三组 rewrite 专项测试共 270 条断言，preserve 专项验证 74 个资产；renderer 1845/1845、
 tsc 73，misc-ui-utils 当前 804/953 tracked、149 pending。明确 rewrite/preserve 队列已
 清空，剩余动作分布为 incremental-hub 110、进一步消费者审计 39。
+第十二批首先完成 39 个消费者不明确项的真实消费审计：21 个改判为 rewrite、8 个改判为
+preserve、10 个改判为 incremental-hub。本段已恢复 ProductTag、pricing upgrade、
+computer-use approval、conversation snapshot、image markup export、business-agent draft、
+clinician verification、library trash、parental-control notifications、Windows tab open 与
+project import prompt 共 11 个模块，并登记 8 个生成 UI/vendor/无操作 facade 资产为
+preserved。三组 rewrite 专项测试共 148 条断言，preserve 专项验证 8 个资产；renderer
+1856/1856、tsc 73，misc-ui-utils 当前 823/953 tracked、130 pending。消费者审计队列已
+清空，剩余动作分布为 rewrite 10、incremental-hub 120。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入
