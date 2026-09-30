@@ -2,7 +2,6 @@
 
 import "@rchunk/rolldown-runtime";
 import "@rchunk/app-shared";
-// @ts-expect-error Preserved release asset; its semantic alias is registered by the shared manifest owner.
 import * as loadScriptChunk from "@rchunk/load-script";
 
 interface Logger {

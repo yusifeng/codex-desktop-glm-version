@@ -5,87 +5,511 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ASSET_ROOT = path.join(ROOT, "src/webview/assets");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const assetRoot = path.join(root, "src/webview/assets");
 const modules = [
-  ["type-725e1a69e8d4.js", "learning-model-absorbance-spectrum", ["n", "t"]],
-  ["type-2451a41f0046.js", "learning-model-qt-prolongation-torsades", ["n", "t"]],
-  ["type-358a8002801a.js", "learning-model-classification-threshold", ["n", "t"]],
-  ["type-62569be7b3b6.js", "learning-model-if-statement-execution-flow", ["n", "t"]],
-  ["type-afd9de5814d9.js", "learning-model-seasons-and-solar-angle", ["n", "t"]],
-  ["type-96f57cd357c8.js", "learning-model-surface-area-to-volume-ratio", ["n", "t"]],
-  ["type-f31fc951c570.js", "learning-model-solar-photovoltaic-system", ["n", "t"]],
-  ["type-eb61c94728f0.js", "learning-model-musical-harmonic-series", ["n", "t"]],
-  ["type-e8c4aa2e5b51.js", "learning-model-strong-vs-weak-acid", ["n", "t"]],
-  ["template-aa40bbaeb218.js", "template", ["a", "i", "n", "r", "t"]],
+  [
+    "metric-helpers-107c5da7f8a5.js",
+    "analytics-metric-helpers",
+    [
+      "A",
+      "C",
+      "D",
+      "E",
+      "F",
+      "M",
+      "N",
+      "O",
+      "P",
+      "S",
+      "T",
+      "_",
+      "a",
+      "b",
+      "c",
+      "d",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+    ],
+  ],
+  [
+    "rosalind-helix-db030adb2faf.js",
+    "life-sciences-helix-background",
+    ["LifeSciencesHelixBackground"],
+  ],
+  [
+    "tsrx.types-and-jsx-7076429c22c1.js",
+    "tsrx-types-and-jsx",
+    [
+      "brackets",
+      "comment",
+      "default",
+      "directives",
+      "docblock",
+      "jsdoctype",
+      "jsx",
+      "regex",
+      "regexp",
+      "string",
+      "template",
+      "type",
+    ],
+  ],
 ];
+const dependencyAliases = { "analytics-middleware": "middleware" };
+const dependencies = (source, pattern) =>
+  [...source.matchAll(pattern)].map((match) => {
+    const name = match[1].replace(/-[a-f0-9]{12}$/u, "");
+    return dependencyAliases[name] ?? name;
+  });
 
-const dependencies = (source, expression) => [...source.matchAll(expression)].map((match) => match[1]);
 let sourceAssertions = 0;
 for (const [asset, directory] of modules) {
-  const original = fs.readFileSync(path.join(ASSET_ROOT, asset.replace(/\.js$/, ".ts")), "utf8");
-  const recovered = fs.readFileSync(path.join(ROOT, "src/renderer", directory, "index.ts"), "utf8");
-  const originalDependencies = dependencies(original, /from "\.\/([^"/]+)-[a-f0-9]{12}\.js"/g);
-  const recoveredDependencies = dependencies(recovered, /(?:from\s+|import\s*)["']@rchunk\/([^"']+)/g);
-  assert.deepEqual(recoveredDependencies, originalDependencies, directory + " preserves static dependencies");
-  assert.equal((original.match(/import\(/g) ?? []).length, (recovered.match(/import\(/g) ?? []).length, directory + " preserves dynamic import count");
-  assert.equal(/\bany\b|@ts-expect-error|@ts-nocheck/.test(recovered), false, directory + " has no type escape hatch");
-  sourceAssertions += 3;
+  const original = fs.readFileSync(
+    path.join(assetRoot, asset.replace(/\.js$/u, ".ts")),
+    "utf8",
+  );
+  const recovered = fs.readFileSync(
+    path.join(root, "src/renderer", directory, "index.ts"),
+    "utf8",
+  );
+  assert.deepEqual(
+    dependencies(original, /from "\.\/([^"]+)\.js"/gu),
+    dependencies(recovered, /(?:from\s*|import\s*)["']@rchunk\/([^"']+)/gu),
+  );
+  assert.equal(
+    (original.match(/import\(/gu) ?? []).length,
+    (recovered.match(/import\(/gu) ?? []).length,
+  );
+  assert.equal(
+    /(?:\bas\s+any\b|:\s*any\b|<any>)|@ts-expect-error/u.test(recovered),
+    false,
+  );
+  assert.ok(recovered.includes(`Release chunk: ${asset}`));
+  assert.equal(/from\s+["']\./u.test(recovered), false);
+  sourceAssertions += 5;
 }
+
+globalThis.window = {
+  addEventListener() {},
+  removeEventListener() {},
+  navigator: { onLine: true },
+  localStorage: {
+    clear() {},
+    getItem() {
+      return null;
+    },
+    key() {
+      return null;
+    },
+    get length() {
+      return 0;
+    },
+    removeItem() {},
+    setItem() {},
+  },
+};
+globalThis.document = { documentElement: {}, visibilityState: "visible" };
+const jsx = { jsx: (type, props) => ({ type, props }) };
+const React = {
+  useEffect: (effect) => effect(),
+  useRef: (value) => ({ current: value }),
+};
+class BaseStats {
+  increments = [];
+  gauges = [];
+  gauge(metric, value, tags) {
+    this.gauges.push({ metric, value, tags });
+  }
+  increment(metric, value, tags) {
+    this.increments.push({ metric, value, tags });
+  }
+}
+class BaseContext {
+  constructor(event, id, stats = new BaseStats()) {
+    this.event = event;
+    this.id = id;
+    this.stats = stats;
+    this.logs = [];
+  }
+  cancel(reason) {
+    this.cancelReason = reason;
+  }
+  log(level, message, detail) {
+    this.logs.push({ level, message, detail });
+  }
+}
+class MiddlewareFailure extends Error {
+  constructor(type) {
+    super(type);
+    this.type = type;
+  }
+}
+class Vector2 {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+  lerp(target, alpha) {
+    this.x += (target.x - this.x) * alpha;
+    this.y += (target.y - this.y) * alpha;
+    return this;
+  }
+  set(x, y) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+}
+class Color {
+  constructor() {
+    this.r = 0.5;
+    this.g = 0.5;
+    this.b = 0.5;
+  }
+  copy(color) {
+    Object.assign(this, color);
+    return this;
+  }
+}
+class Geometry {
+  setAttribute() {
+    return this;
+  }
+  dispose() {}
+}
+class Material {
+  constructor(options = {}) {
+    this.blending = options.blending ?? 1;
+    this.needsUpdate = false;
+    this.uniforms = options.uniforms ?? {};
+  }
+  dispose() {}
+}
+class SceneObject {
+  constructor(geometry, material) {
+    this.geometry = geometry;
+    this.material = material;
+    this.position = { z: 0 };
+    this.rotation = { z: 0 };
+    this.renderOrder = 0;
+    this.frustumCulled = true;
+  }
+}
+class Camera {
+  constructor(fov, aspect) {
+    this.fov = fov;
+    this.aspect = aspect;
+    this.position = { z: 0 };
+  }
+  updateProjectionMatrix() {}
+}
+class Scene {
+  add() {}
+  remove() {}
+}
+class Renderer {
+  setClearColor() {}
+  setPixelRatio() {}
+  setSize() {}
+  render() {}
+  dispose() {}
+}
+
+globalThis.__mcMocks = {
+  "@rchunk/rolldown-runtime": {
+    n: (initializer) => {
+      let initialized = false;
+      return () => {
+        if (!initialized) {
+          initialized = true;
+          initializer();
+        }
+      };
+    },
+  },
+  "@rchunk/app-shared": {
+    I3: () => jsx,
+    XQ: () => false,
+    YQ() {},
+    e6: () => React,
+    p4() {},
+  },
+  "@rchunk/analytics-middleware": {
+    c: BaseContext,
+    d() {},
+    l() {},
+    s: MiddlewareFailure,
+    u: BaseStats,
+  },
+  "@rchunk/load-script": { p: () => false },
+  "@rchunk/three.core": {
+    A: Geometry,
+    H: Color,
+    Hi: Material,
+    Ii: Geometry,
+    Jn: { degToRad: (degrees) => (degrees * Math.PI) / 180 },
+    Kn: Material,
+    Nt: class {},
+    Or: SceneObject,
+    Qn: SceneObject,
+    Sr: Camera,
+    Va: Vector2,
+    Vi: Scene,
+  },
+  "@rchunk/three.module": { n: Renderer, r() {} },
+};
 
 async function bundle(directory) {
+  const entry = path.join(root, "src/renderer", directory, "index.ts");
   const result = await esbuild.build({
-    entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")],
     bundle: true,
+    entryPoints: [entry],
     format: "esm",
-    platform: "node",
-    target: "node22",
+    platform: "browser",
     write: false,
-    logLevel: "silent",
-    plugins: [{
-      name: "mc-rchunk-mock",
-      setup(build) {
-        build.onResolve({ filter: /^@rchunk\// }, ({ path: modulePath }) => ({ path: modulePath, namespace: "mock" }));
-        build.onLoad({ filter: /.*/, namespace: "mock" }, () => ({ contents: "export {};", loader: "js" }));
+    plugins: [
+      {
+        name: "mc-mocks",
+        setup(build) {
+          build.onResolve({ filter: /^@rchunk\// }, (args) => ({
+            path: args.path,
+            namespace: "mc-mock",
+          }));
+          build.onLoad({ filter: /.*/, namespace: "mc-mock" }, (args) => ({
+            contents: `module.exports = globalThis.__mcMocks[${JSON.stringify(args.path)}];`,
+            loader: "js",
+          }));
+        },
       },
-    }],
+    ],
   });
-  return import("data:text/javascript;base64," + Buffer.from(result.outputFiles[0].text).toString("base64") + "#" + directory);
+  const code = result.outputFiles[0].text;
+  return import(
+    `data:text/javascript;base64,${Buffer.from(code).toString("base64")}#${directory}`
+  );
 }
 
-const loaded = new Map();
+const metric = await bundle("analytics-metric-helpers");
+const helix = await bundle("life-sciences-helix-background");
+let grammar;
+try {
+  grammar = await bundle("tsrx-types-and-jsx");
+} catch (error) {
+  throw new Error(
+    `TSRX bundle import failed: ${error instanceof Error ? error.message.split("\n")[0] : String(error)}`,
+  );
+}
 let runtimeAssertions = 0;
-for (const [_asset, directory, expectedExports] of modules) {
-  const module = await bundle(directory);
-  loaded.set(directory, module);
-  assert.deepEqual(Object.keys(module).sort(), [...expectedExports].sort(), directory + " preserves compressed exports");
+for (const [asset, directory, expectedExports] of modules) {
+  const target =
+    directory === "analytics-metric-helpers"
+      ? metric
+      : directory === "life-sciences-helix-background"
+        ? helix
+        : grammar;
+  assert.deepEqual(
+    Object.keys(target).sort(),
+    [...expectedExports].sort(),
+    `${asset} export surface`,
+  );
   runtimeAssertions += 1;
 }
 
-const specifications = [
-  ["learning-model-absorbance-spectrum", "ABSORBANCE_SPECTRUM", 2, "absorbance-spectrum-v1", "lambda_max_nm", { kind: "number", defaultValue: 520, min: 210, max: 740 }],
-  ["learning-model-qt-prolongation-torsades", "QT_PROLONGATION_TORSADES", 1, "qt-prolongation-torsades-v1", "qtcMs", { kind: "number", defaultValue: 420, min: 360, max: 560 }],
-  ["learning-model-classification-threshold", "CLASSIFICATION_THRESHOLD", 3, "classification-threshold-v1", "threshold", { kind: "number", defaultValue: 0.5, min: 0, max: 1 }],
-  ["learning-model-if-statement-execution-flow", "IF_STATEMENT_EXECUTION_FLOW", 1, "if-statement-execution-flow-v1", "score", { kind: "integer", defaultValue: 60, min: 0, max: 100 }],
-  ["learning-model-seasons-and-solar-angle", "SEASONS_AND_SOLAR_ANGLE", 3, "seasons-and-solar-angle-v2", "latitude_degrees", { kind: "number", defaultValue: 40, min: -80, max: 80 }],
-  ["learning-model-surface-area-to-volume-ratio", "SURFACE_AREA_TO_VOLUME_RATIO", 1, "surface-area-to-volume-ratio-v2", "side_length", { kind: "integer", defaultValue: 3, min: 1, max: 6 }],
-  ["learning-model-solar-photovoltaic-system", "SOLAR_PHOTOVOLTAIC_SYSTEM", 2, "solar-photovoltaic-system-v2", "array_capacity_kw", { kind: "number", defaultValue: 6, min: 1, max: 20 }],
-  ["learning-model-musical-harmonic-series", "MUSICAL_HARMONIC_SERIES", 2, "musical-harmonic-series-v1", "fundamental_frequency_hz", { kind: "number", defaultValue: 220, min: 20, max: 2_000 }],
-  ["learning-model-strong-vs-weak-acid", "STRONG_VS_WEAK_ACID", 2, "strong-vs-weak-acid-v2", "initial_concentration_molar", { kind: "number", defaultValue: 0.15, min: 0.1, max: 0.25 }],
-];
-for (const [directory, type, version, thumbnailAssetKey, parameterName, parameter] of specifications) {
-  const module = loaded.get(directory);
-  module.t();
-  assert.deepEqual(module.n, { type, version, thumbnailAssetKey, parameters: { [parameterName]: parameter } });
-  runtimeAssertions += 1;
-}
-
-const template = loaded.get("template");
-template.a();
-assert.deepEqual(template.t, { min: 4, max: 12, step: 0.1, label: "a", defaultValue: 7 });
-assert.deepEqual(template.n, { min: 4, max: 12, step: 0.1, label: "b", defaultValue: 8 });
-assert.deepEqual(template.r, { min: 4, max: 12, step: 0.1, label: "c", defaultValue: 9 });
-assert.deepEqual(template.i, { properties: { a: template.t, b: template.n, c: template.r } });
+metric.F();
+const deferred = metric.P();
+assert.equal(deferred.isSettled(), false);
+deferred.resolve(42);
+assert.equal(await deferred.promise, 42);
+assert.equal(deferred.isSettled(), true);
+runtimeAssertions += 3;
+metric.N();
+const emitter = new metric.M({ maxListeners: 2 });
+let emitted = 0;
+emitter.once("tick", (value) => {
+  emitted += value;
+});
+emitter.emit("tick", 3).emit("tick", 5);
+assert.equal(emitted, 3);
+runtimeAssertions += 1;
+metric.j();
+const queue = new metric.A(2, []);
+assert.deepEqual(queue.push({ id: "a" }, { id: "b" }), [true, true]);
+assert.equal(queue.length, 2);
+assert.equal(queue.push({ id: "a" })[0], false);
+assert.equal(queue.pop().id, "b");
 runtimeAssertions += 4;
+assert.equal(metric.T(), true);
+assert.equal(metric.w(), false);
+assert.equal(metric.h(), "npm");
+assert.equal(metric.v, "1.82.0");
+assert.equal(metric.p, "api.segment.io/v1");
+runtimeAssertions += 5;
+assert.deepEqual(
+  metric.i(
+    { integrations: { alpha: { base: true }, beta: {} } },
+    { integrations: { alpha: { override: true }, beta: false } },
+  ),
+  { alpha: { base: true, override: true }, beta: {} },
+);
+runtimeAssertions += 1;
+const stats = new BaseStats();
+metric.n(stats, {
+  integrationName: "demo",
+  methodName: "track",
+  type: "destination",
+  didError: true,
+});
+assert.equal(
+  stats.increments[0].metric,
+  "analytics_js.integration.invoke.error",
+);
+assert.deepEqual(stats.increments[0].tags, [
+  "method:track",
+  "integration_name:demo",
+  "type:destination",
+]);
+runtimeAssertions += 2;
+let repeats = 0;
+const repeated = await metric.o(
+  (value) => value == null || value < 3,
+  async () => ++repeats,
+);
+assert.equal(repeated, 3);
+assert.equal(repeats, 3);
+runtimeAssertions += 2;
+const context = new BaseContext({ type: "track" });
+const pluginResult = await metric.E(context, {
+  name: "plugin",
+  track: (value) => value,
+});
+assert.equal(pluginResult, context);
+assert.equal(context.stats.gauges[0].metric, "plugin_time");
+runtimeAssertions += 2;
 
-console.log(sourceAssertions + " source assertions and " + runtimeAssertions + " runtime assertions passed");
+const canvas = helix.LifeSciencesHelixBackground({
+  className: "helix",
+  disableRendering: true,
+});
+assert.equal(canvas.type, "canvas");
+assert.equal(canvas.props.className, "helix");
+assert.equal(canvas.props["aria-hidden"], "true");
+runtimeAssertions += 3;
+
+assert.equal(Object.keys(grammar.default).length, 75);
+runtimeAssertions += 1;
+const fragments = [
+  "type",
+  "string",
+  "template",
+  "regex",
+  "regexp",
+  "comment",
+  "directives",
+  "docblock",
+  "brackets",
+  "jsdoctype",
+  "jsx",
+];
+for (const name of fragments) {
+  assert.equal(grammar.default[name], grammar[name], `${name} identity`);
+  runtimeAssertions += 1;
+}
+assert.deepEqual(
+  Object.fromEntries(
+    fragments.map((name) => [name, grammar[name].patterns.length]),
+  ),
+  {
+    type: 15,
+    string: 3,
+    template: 2,
+    regex: 2,
+    regexp: 8,
+    comment: 3,
+    directives: 1,
+    docblock: 18,
+    brackets: 2,
+    jsdoctype: 1,
+    jsx: 7,
+  },
+);
+runtimeAssertions += 1;
+assert.match(grammar.default["type-primitive"].match, /unknown/u);
+assert.equal(grammar.default["template-substitution-element"].begin, "\\$\\{");
+assert.equal(grammar.default["template-substitution-element"].end, "\\}");
+assert.ok(
+  grammar.regexp.patterns.some(
+    (rule) => rule.name === "meta.group.assertion.regexp",
+  ),
+);
+assert.equal(grammar.default["jsx-tag-fragment"].begin, "(<)(>)");
+assert.equal(
+  grammar.default["module-declaration"].patterns[0].include,
+  "#statements",
+);
+runtimeAssertions += 6;
+const includes = [];
+const collectIncludes = (value) => {
+  if (Array.isArray(value)) for (const item of value) collectIncludes(item);
+  else if (value != null && typeof value === "object") {
+    if (typeof value.include === "string") includes.push(value.include);
+    for (const nested of Object.values(value)) collectIncludes(nested);
+  }
+};
+collectIncludes([grammar.default, ...fragments.map((name) => grammar[name])]);
+assert.equal(includes.length, 224);
+assert.deepEqual(
+  [...new Set(includes.filter((value) => !value.startsWith("#")))].sort(),
+  ["source.css", "source.ts"],
+);
+const local = new Set(
+  includes
+    .filter((value) => value.startsWith("#"))
+    .map((value) => value.slice(1)),
+);
+const unresolved = [...local]
+  .filter((name) => !(name in grammar.default))
+  .sort();
+assert.deepEqual(unresolved, [
+  "expression",
+  "expressionPunctuations",
+  "expressionWithoutIdentifiers",
+  "field-declaration",
+  "function-parameters",
+  "identifiers",
+  "indexer-declaration",
+  "indexer-mapped-type-declaration",
+  "method-declaration",
+  "numeric-literal",
+  "statements",
+  "support-function-call-identifiers",
+  "tsrx-template-block-directive",
+  "tsrx-template-child-directive",
+  "tsrx-template-comment",
+  "tsrx-template-directive",
+  "typeof-operator",
+]);
+runtimeAssertions += 3;
+assert.deepEqual(JSON.parse(JSON.stringify(grammar.default)), grammar.default);
+runtimeAssertions += 1;
+
+console.log(
+  `${sourceAssertions} source assertions and ${runtimeAssertions} runtime assertions passed`,
+);

@@ -176,6 +176,14 @@ vendor 运行时为 preserved。三组 rewrite 专项测试共 235 条断言，p
 20 个资产；renderer 1801/1801、tsc 73，misc-ui-utils 当前 653/953 tracked、300
 pending。剩余动作分布为 rewrite 44、preserve 107、incremental-hub 110、进一步消费者
 审计 39。
+第十批处理显式剩余的 10 个 rewrite 候选，覆盖 model picker power slider、thinking
+toggle、triangle visual language、analytics metric helpers、生命科学 helix 背景、TSRX
+types/JSX grammar、shopping/browser open handler、followup shelf 与 family notification
+surface；另按逐文件证据登记 33 个图片、语法/主题数据、生成 UI/可视化及 Three/Rough/
+Redux/Silero 等 vendor 运行时为 preserved。新增 rewrite 专项测试共 128 条断言，
+preserve 专项验证 33 个资产；renderer 1811/1811、tsc 73，misc-ui-utils 当前 696/953
+tracked、257 pending。剩余动作分布为 rewrite 34、preserve 74、incremental-hub 110、
+进一步消费者审计 39。
 医疗验证
 `messages-*` 仅包含静态 intl 文案表，已改列 `data:intl-messages`。两个文件名
 含 `gitGraph` 的小型 chunk 已确认属于 Mermaid/Langium 生成服务包装器，归入

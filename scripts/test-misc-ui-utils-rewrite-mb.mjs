@@ -18,7 +18,11 @@ const modules = [
     "railroad-ebnf-ebaxglyw",
     ["createRailroadEbnfServices"],
   ],
-  ["useStableCallback-43628b79218b.js", "use-stable-callback-render-ref", ["n", "t"]],
+  [
+    "useStableCallback-43628b79218b.js",
+    "use-stable-callback-render-ref",
+    ["n", "t"],
+  ],
   ["type-3d72495926ec.js", "learning-model-ionic-vs-covalent", ["n", "t"]],
   ["type-3bc326afff31.js", "learning-model-myopia", ["n", "t"]],
   ["type-98cbaaa40c49.js", "learning-model-place-value", ["n", "t"]],
@@ -189,13 +193,10 @@ async function bundle(directory) {
       {
         name: "rchunk-mocks",
         setup(build) {
-          build.onResolve(
-            { filter: /^@rchunk\// },
-            ({ path: modulePath }) => ({
-              path: modulePath.slice(8),
-              namespace: "mock",
-            }),
-          );
+          build.onResolve({ filter: /^@rchunk\// }, ({ path: modulePath }) => ({
+            path: modulePath.slice(8),
+            namespace: "mock",
+          }));
           build.onLoad(
             { filter: /.*/, namespace: "mock" },
             ({ path: name }) => ({ contents: mockSource(name), loader: "js" }),
@@ -265,3 +266,225 @@ runtimeAssertions += 4;
 console.log(
   `${sourceAssertions} source assertions and ${runtimeAssertions} runtime assertions passed`,
 );
+
+{
+  const mb2AssetRoot = path.resolve(
+    root,
+    "../chatgpt-desktop-src/app/webview/assets",
+  );
+  const mb2Modules = [
+    [
+      "impl-70e51521c772.js",
+      "model-picker-power-slider-impl",
+      ["rolldown-runtime", "app-shared"],
+    ],
+    [
+      "toggle-b02ae5564000.js",
+      "chatgpt-thinking-toggle",
+      ["rolldown-runtime", "app-shared", "app-initial", "app-primary"],
+    ],
+    [
+      "triangle-visual-language-46f026eb70c8.js",
+      "triangle-visual-language",
+      ["rolldown-runtime", "app-shared"],
+    ],
+  ];
+  const mb2Aliases = new Map([
+    ["rolldown-runtime-2d059c5e81f4", "rolldown-runtime"],
+    ["app-shared-7b9edc1bfb7f", "app-shared"],
+    ["app-initial-51da50e6c6e3", "app-initial"],
+    ["app-primary-d66705000d76", "app-primary"],
+  ]);
+  const mb2Dependencies = (source, recovered) =>
+    recovered
+      ? [...source.matchAll(/(?:from\s*|import\s*)["']@rchunk\/([^"']+)/g)].map(
+          (match) => match[1],
+        )
+      : [...source.matchAll(/import[\s\S]*?;/g)]
+          .map(
+            (statement) => statement[0].match(/["']\.\/([^"']+)\.js["']/)?.[1],
+          )
+          .filter((dependency) => dependency != null)
+          .map((dependency) => mb2Aliases.get(dependency) ?? dependency);
+  const mb2Exports = (source) =>
+    [...source.matchAll(/export\s*\{([\s\S]*?)\};/g)]
+      .flatMap((match) => match[1].split(","))
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .map((entry) => entry.match(/\bas\s+([A-Za-z_$][\w$]*)$/)?.[1] ?? entry)
+      .sort();
+
+  let mb2SourceAssertions = 0;
+  for (const [asset, directory, expectedDependencies] of mb2Modules) {
+    const original = fs.readFileSync(path.join(mb2AssetRoot, asset), "utf8");
+    const recovered = fs.readFileSync(
+      path.join(root, "src/renderer", directory, "index.ts"),
+      "utf8",
+    );
+    assert.deepEqual(mb2Dependencies(original, false), expectedDependencies);
+    assert.deepEqual(mb2Dependencies(recovered, true), expectedDependencies);
+    assert.deepEqual(mb2Exports(recovered), mb2Exports(original));
+    assert.equal(
+      (original.match(/import\(/g) ?? []).length,
+      (recovered.match(/import\(/g) ?? []).length,
+    );
+    assert.equal(/\bany\b|@ts-expect-error/.test(recovered), false);
+    assert.ok(recovered.includes("Release chunk: " + asset));
+    assert.ok(recovered.length > 1_000);
+    mb2SourceAssertions += 7;
+  }
+
+  const mb2SharedMock = `
+const element=(type,props,key)=>({type,props,key});
+export const I3=()=>({jsx:element,jsxs:element});
+export const e6=()=>({useRef:value=>({current:value}),useState:value=>{let current=value;return [current,next=>{current=typeof next==='function'?next(current):next}]}});
+export const m4=(...values)=>values.filter(Boolean).join(' ');
+export const LX=signal=>({signal});export const ZI={};
+export const Y2='FormattedMessage';export const Uv='ThinkingIcon';export const Yh='Button';export const o_='Tooltip';
+`;
+  const mb2Mocks = {
+    "@rchunk/rolldown-runtime": "export {};",
+    "@rchunk/app-shared": mb2SharedMock,
+    "@rchunk/app-initial":
+      "export const xpn=(...args)=>globalThis.__mb2Analytics.push(args);export const ypn=()=>globalThis.__mb2Init.push('initial');",
+    "@rchunk/app-primary":
+      "export const Ga='event';export const Ja=()=>globalThis.__mb2Init.push('primary');export const Ka={CHATGPT_MODEL_PICKER_SURFACE_TOGGLE:'toggle'};export const qa={CHATGPT_MODEL_PICKER_UI_EVENT_TYPE_AUTO_SWITCH_TO_THINKING_TOGGLE_CLICKED:'clicked'};",
+  };
+  async function mb2Bundle(directory) {
+    const result = await esbuild.build({
+      entryPoints: [path.join(root, "src/renderer", directory, "index.ts")],
+      bundle: true,
+      format: "esm",
+      platform: "node",
+      target: "node22",
+      write: false,
+      logLevel: "silent",
+      plugins: [
+        {
+          name: "mb2-mocks",
+          setup(build) {
+            build.onResolve(
+              { filter: /^@rchunk\// },
+              ({ path: modulePath }) => ({
+                path: modulePath,
+                namespace: "mb2-mock",
+              }),
+            );
+            build.onLoad(
+              { filter: /.*/, namespace: "mb2-mock" },
+              ({ path: modulePath }) => ({
+                contents: mb2Mocks[modulePath] ?? "export {};",
+                loader: "js",
+              }),
+            );
+          },
+        },
+      ],
+    });
+    return import(
+      "data:text/javascript;base64," +
+        Buffer.from(result.outputFiles[0].text).toString("base64") +
+        "#" +
+        directory
+    );
+  }
+
+  globalThis.__mb2Init = [];
+  globalThis.__mb2Analytics = [];
+  let mb2RuntimeAssertions = 0;
+  const triangle = await mb2Bundle("triangle-visual-language");
+  triangle.p();
+  assert.deepEqual(triangle.f("ArrowLeft"), { x: -6, y: 0 });
+  assert.deepEqual(triangle.f("Enter"), null);
+  assert.deepEqual(triangle.d({ x: 100, y: 100 }, { x: 100, y: 200 }), {
+    x: 100,
+    y: 62,
+  });
+  const polygon = triangle.u({
+    points: [
+      { x: 0, y: 0 },
+      { x: 2, y: 3 },
+    ],
+  });
+  assert.equal(polygon.props.points, "0,0 2,3");
+  mb2RuntimeAssertions += 4;
+
+  const toggle = await mb2Bundle("chatgpt-thinking-toggle");
+  assert.deepEqual(globalThis.__mb2Init, ["primary", "initial"]);
+  const updates = [];
+  const toggleTree = toggle.ChatGptThinkingToggle({
+    selectedSystemHints: [],
+    onSystemHintsChange: (hints) => updates.push(hints),
+  });
+  toggleTree.props.children.props.onClick();
+  assert.deepEqual(updates, [["reason"]]);
+  assert.equal(globalThis.__mb2Analytics.length, 1);
+  const selectedTree = toggle.ChatGptThinkingToggle({
+    selectedSystemHints: ["browse", "reason"],
+    onSystemHintsChange: (hints) => updates.push(hints),
+  });
+  selectedTree.props.children.props.onClick();
+  assert.deepEqual(updates.at(-1), ["browse"]);
+  mb2RuntimeAssertions += 4;
+
+  const slider = await mb2Bundle("model-picker-power-slider-impl");
+  const options = [
+    { id: "a", label: "A" },
+    { id: "b", label: "B", isLocked: true },
+    { id: "c", label: "C", isMax: true },
+    {
+      id: "manual",
+      label: "Manual",
+      requiresExplicitSelection: true,
+    },
+  ];
+  const selected = [];
+  const committed = [];
+  let draggedToMax = 0;
+  const sliderTree = slider.ModelPickerPowerSliderImpl({
+    active: true,
+    fastModeEnabled: false,
+    onCommitOption: (option) => committed.push(option.id),
+    onDragToMax: () => {
+      draggedToMax += 1;
+    },
+    onSelectOption: (option) => selected.push(option.id),
+    options,
+    selectedOptionId: "a",
+  });
+  const track = sliderTree.props.children[0];
+  track.props.onKeyDown({
+    key: "ArrowRight",
+    preventDefault() {},
+    stopPropagation() {},
+  });
+  assert.deepEqual(selected, ["c"]);
+  assert.deepEqual(committed, ["c"]);
+  assert.equal(draggedToMax, 1);
+  assert.throws(
+    () =>
+      slider.ModelPickerPowerSliderImpl({
+        active: true,
+        fastModeEnabled: false,
+        onDragToMax() {},
+        onSelectOption() {},
+        options: [
+          { id: "x", label: "X", requiresExplicitSelection: true },
+          { id: "y", label: "Y" },
+        ],
+        selectedOptionId: "x",
+      }),
+    /Explicit-selection options/,
+  );
+  mb2RuntimeAssertions += 4;
+
+  console.log(
+    "MB remaining rewrite: " +
+      (mb2SourceAssertions + mb2RuntimeAssertions) +
+      " assertions (" +
+      mb2SourceAssertions +
+      " source, " +
+      mb2RuntimeAssertions +
+      " runtime)",
+  );
+}

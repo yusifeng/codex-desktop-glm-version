@@ -55,8 +55,8 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
 交接后的 renderer 主线已经完成 composer、sidebar 和当前登记清单的大批重写，
 但尚未完成全量 app-code：
 
-- `REWRITTEN`：1801 个语义 chunk；`verify-renderer` 为 1801/1801。
-- `PRESERVED_ASSETS`：199 个经审计的 vendor/generated/data/worker 资产，继续
+- `REWRITTEN`：1811 个语义 chunk；`verify-renderer` 为 1811/1811。
+- `PRESERVED_ASSETS`：232 个经审计的 vendor/generated/data/worker 资产，继续
   使用 transform-only 轨道，不伪造业务源码。
 - `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
   实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
@@ -65,7 +65,7 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   内部无悬空项**，不能当成全量 renderer 完成证明。
 - 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
   `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  1947/2247 tracked、300 pending；composer 47/47、sidebar 12/12、terminal 6/6、
+  1990/2247 tracked、257 pending；composer 47/47、sidebar 12/12、terminal 6/6、
   browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
   git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
   92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
@@ -453,9 +453,18 @@ plan/background terminal 路由恢复、beacon surface 与 preload bridge；另�
 1947/2247，misc-ui-utils 当前 653/953。剩余 300 个缺口按审计动作分为 rewrite 44、
 preserve 107、incremental-hub 110、进一步消费者审计 39。
 
+2026-09-29 已完成 misc-ui-utils 第十批：处理显式剩余的 10 个 rewrite 候选，覆盖
+model picker power slider、thinking toggle、triangle visual language、analytics metric
+helpers、生命科学 helix 背景、TSRX types/JSX grammar、shopping/browser open handler、
+followup shelf 与 family notification surface；另按逐文件证据登记 33 个图片、语法/主题
+数据、生成 UI/可视化及 Three/Rough/Redux/Silero 等 vendor 运行时为 preserved。新增
+rewrite 专项测试共 128 条断言，preserve 专项验证 33 个资产；renderer 1811/1811、
+tsc 73，全量覆盖 1990/2247，misc-ui-utils 当前 696/953。剩余 257 个缺口按既定审计
+动作分为 rewrite 34、preserve 74、incremental-hub 110、进一步消费者审计 39。
+
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字是初始交接快照，
-但“继续处理全量应用代码”的任务仍然有效。剩余 300 个真实缺口全部位于
-misc-ui-utils（当前 653/953）；结构化审计已完成，下一步优先恢复高消费者基础工具与
+但“继续处理全量应用代码”的任务仍然有效。剩余 257 个真实缺口全部位于
+misc-ui-utils（当前 696/953）；结构化审计已完成，下一步优先恢复高消费者基础工具与
 明确业务逻辑，同时分批登记有逐文件证据的 generated/vendor 资产，并继续核验 39 个
 消费者不明确项。增量 hub 只在出现真实消费者时拆出
 语义 API，不为未消费导出制造占位源码。完整依据见
