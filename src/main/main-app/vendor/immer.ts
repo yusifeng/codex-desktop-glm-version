@@ -54,3 +54,6 @@ export const current: <T>(value: T) => T = immerCurrent;
 export function freezeIdentity<T>(value: T): T {
   return value;
 }
+
+/** 原压缩导出名兼容。 */
+export { freezeIdentity as hh };

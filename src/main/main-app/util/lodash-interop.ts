@@ -34,3 +34,28 @@ export const memoize: <T extends (...args: any[]) => any>(
   fn: T,
   options?: { max?: number; promise?: boolean },
 ) => T = (requireMemoize() as { default: any }).default;
+
+/** lodash cloneDeep 的窄用途兼容层；当前调用点均为可 structured-clone 的状态对象。 */
+export function cloneDeep<T>(value: T): T {
+  return structuredClone(value);
+}
+
+/** lodash omit：浅复制对象并删除指定自有键。 */
+export function omit<T extends object, K extends keyof T>(value: T, keys: readonly K[]): Omit<T, K> {
+  let result = { ...value };
+  for (let key of keys) delete result[key];
+  return result;
+}
+
+/** lodash uniqBy：保留每个 iteratee key 首次出现的元素。 */
+export function uniqBy<T, K>(values: readonly T[], iteratee: (value: T) => K): T[] {
+  let seen = new Set<K>();
+  let result: T[] = [];
+  for (let value of values) {
+    let key = iteratee(value);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(value);
+  }
+  return result;
+}

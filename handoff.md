@@ -18,7 +18,8 @@
 **优先级（用户明确指定）：GUI 优先（renderer 网页界面部分）**。即：
 主窗口 HTML 界面（消息流、composer、设置页、侧边栏、内置浏览器等）
 > 主进程逻辑（main）> 共享库（shared）> 其余 chunk。
-main 和 shared 的"已消费 API"层已基本完成（见下），接下来的主战场是 renderer。
+renderer 全量 app-code、main 结构与 shared 已消费 API 层均已完成；当前仓库已
+达到本交接文档定义的实现与验证目标。
 
 ---
 
@@ -71,9 +72,12 @@ main 和 shared 的"已消费 API"层已基本完成（见下），接下来的�
   hooks 24/24、skills-plugins-mcp 30/30、panels 20/20、charts-ui 17/17 已收官；
   editor-docs、artifact-preview、markdown-render 与 appgen-valdi-platform 已分别达到
   42/42、53/53、24/24、78/78。
-- `node scripts/audit-app-shared-consumption.mjs`：341 个实际消费导出均有语义
+- `node scripts/audit-app-shared-consumption.mjs`：343 个实际消费导出均有语义
   声明，0 missing、0 any、0 direct namespace use。
-- main 结构验证 11/11；TypeScript 错误基线已经从 139 降至 73。
+- main 结构验证 11/11；TypeScript 错误已经从 139 清零，`npm run typecheck`
+  全量通过。
+- main 最后一批补齐 23 个缺失模块/兼容面，覆盖线程/工作区、会话/文件/流、
+  归档、认证、附件、动态工具与 dispose handles；专项测试 28 + 36 条断言通过。
 
 2026-09-29 已完成 terminal/browser 运行时批次：terminal panel bootstrap、终端
 thumbnail/background thumbnail、ASCII canvas/engine、browser voice availability、
@@ -494,13 +498,14 @@ notification observer、personal-secrets preflight、conversation beacon banner�
 channel parser 与 media-device contracts 共 8 个语义模块；其余 112 个生成插画/语法入口、
 Mermaid parser bootstrap、worker model、initializer facade、locale/learning registry 与大型
 编译 UI/voice/persistence surface 均以精确依赖、导出和消费者证据登记为 preserved。六组
-专项验证共 1077 条断言；renderer 1874/1874、tsc 73，全量覆盖 2247/2247，
+专项验证共 1077 条断言；renderer 1874/1874、tsc 0，全量覆盖 2247/2247，
 misc-ui-utils 达到 953/953。renderer app-code 当前 0 pending。
 
 因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字仅为初始交接快照；
-renderer 全量应用代码现已完成。后续实现任务转为清理 main TypeScript 73 个既有缺失
-模块/导出错误，并继续保持 renderer 2247/2247、main 结构 11/11 与 app-shared 消费
-声明 341/341 不回退。完整依据见 `docs/renderer-tail-audit.md`。
+renderer 全量应用代码现已完成，main TypeScript 的 73 个既有缺失模块/导出错误也已
+全部清理。最终门禁为 renderer 1874/1874、全量覆盖 2247/2247、main 结构 11/11、
+app-shared 消费 343/343、TypeScript 0 错误。完整依据见
+`docs/renderer-tail-audit.md`。
 
 ### 已完成
 
@@ -701,7 +706,7 @@ npm run verify-renderer-cluster -- \
 会自动执行定向测试、核对测试源码实际断言数、构建 renderer、运行
 renderer/main 结构验证、检查 TypeScript 基线、`git diff --check`、新增 any
 以及直接 namespace chunk 消费，并输出可直接复制进 commit message 的模块
-验证清单。当前 TypeScript 基线为 **73**；可用
+验证清单。当前 TypeScript 基线为 **0**；可用
 `--tsc-baseline <count>` 显式覆盖。
 
 完整门禁在当前机器约 16 秒；主要成本是人工收口与上下文切换。因此不要为了

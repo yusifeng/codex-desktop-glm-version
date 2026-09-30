@@ -62,6 +62,101 @@ export interface ItemNotificationHandlerParams {
 const OUTPUT_TRUNCATED_PREFIX = `[output truncated]
 `;
 
+interface RealtimeTranscriptEntry {
+  role: string;
+  text: string;
+}
+
+interface RealtimeHandoffItem {
+  type: 'handoff_request';
+  handoff_id: string;
+  item_id?: string;
+  input_transcript: string;
+  active_transcript: RealtimeTranscriptEntry[];
+}
+
+function isRealtimeHandoffItem(value: unknown): value is RealtimeHandoffItem {
+  if (value == null || typeof value !== 'object') return false;
+  let item = value as Record<string, unknown>;
+  return (
+    item.type === 'handoff_request' &&
+    typeof item.handoff_id === 'string' &&
+    (item.item_id == null || typeof item.item_id === 'string') &&
+    typeof item.input_transcript === 'string' &&
+    Array.isArray(item.active_transcript) &&
+    item.active_transcript.every(
+      (entry) =>
+        entry != null &&
+        typeof entry === 'object' &&
+        typeof (entry as Record<string, unknown>).role === 'string' &&
+        typeof (entry as Record<string, unknown>).text === 'string',
+    )
+  );
+}
+
+function unescapeRealtimeXml(value: string): string {
+  return value
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&apos;', "'")
+    .replaceAll('&amp;', '&');
+}
+
+function realtimeXmlField(value: string, field: string): string | null {
+  let match = new RegExp(`<${field}>\\s*([\\s\\S]*?)\\s*<\\/${field}>`, 'i').exec(value)?.[1]?.trim();
+  return match == null ? null : unescapeRealtimeXml(match);
+}
+
+/** realtime handoff_request 条目解析（原版 Cy）。 */
+export function parseRealtimeItemAddedItem(value: unknown) {
+  if (!isRealtimeHandoffItem(value)) return null;
+  let raw = value.input_transcript.trim();
+  let delegation =
+    raw.startsWith('<realtime_delegation>') && raw.endsWith('</realtime_delegation>')
+      ? {
+          input: realtimeXmlField(raw, 'input'),
+          transcriptDelta: realtimeXmlField(raw, 'transcript_delta'),
+        }
+      : null;
+  let itemId = value.item_id ?? null;
+  if (delegation?.input != null)
+    return {
+      codexItemId: `realtime-delegation-${itemId ?? value.handoff_id}`,
+      handoffId: value.handoff_id,
+      input: delegation.input,
+      itemId,
+      transcriptDelta: delegation.transcriptDelta,
+    };
+  let activeTranscript = value.active_transcript.map(({ role, text }) => `${role}: ${text}`).join('\n');
+  let input = raw.length > 0 ? value.input_transcript : activeTranscript;
+  if (input.trim().length === 0) return null;
+  return {
+    codexItemId: `realtime-delegation-${itemId ?? value.handoff_id}`,
+    handoffId: value.handoff_id,
+    input,
+    itemId,
+    transcriptDelta: raw.length > 0 && activeTranscript.length > 0 ? activeTranscript : null,
+  };
+}
+
+function escapeRealtimeXml(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+/** realtime 转写构造为普通 text input（原版 Wve）。 */
+export function buildRealtimeTranscriptItems(input: string, transcriptDelta: string | null = null) {
+  let inputLine = `  <input>${escapeRealtimeXml(input)}</input>`;
+  let text =
+    transcriptDelta == null || transcriptDelta.trim().length === 0
+      ? `<realtime_delegation>\n${inputLine}\n</realtime_delegation>`
+      : `<realtime_delegation>\n${inputLine}\n  <transcript_delta>${escapeRealtimeXml(transcriptDelta)}</transcript_delta>\n</realtime_delegation>`;
+  return [{ type: 'text' as const, text, text_elements: [] }];
+}
+
+/** 原压缩导出名兼容。 */
+export { parseRealtimeItemAddedItem as Cy, buildRealtimeTranscriptItems as Wve };
+
 /**
  * 尾岛历史失效判定（原版 zve）：canonical 且全部 delta 都指向尾岛最后
  * 一个实体时，只失效该实体；否则返回 undefined（整体失效）。legacy 路径

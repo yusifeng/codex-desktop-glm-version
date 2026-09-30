@@ -596,17 +596,21 @@ function environmentInputPending(params: Record<string, any>): { status: string;
 /** 会话当前等待的交互种类（原 `mv`/`pv`）。 */
 export function pendingInteraction(
   conversation: Record<string, any> | null,
-  _hostId: string,
+  parseUrlOrHostId: ((url: string) => unknown) | string,
   includeEnvironmentInput = false,
 ): { kind: string; userInputRequestId: string | null } | null {
   if (conversation == null) return null;
+  const parseUrl =
+    typeof parseUrlOrHostId === "function"
+      ? parseUrlOrHostId
+      : (url: string) => url;
   const byTurn = new Map<string, PendingInteractionState>();
   let hasTurnlessElicitation = false;
   for (let i = conversation.requests.length - 1; i >= 0; --i) {
     const request = conversation.requests[i];
     switch (request.method) {
       case "mcpServer/elicitation/request":
-        if (("completed" in request && request.completed === true) || isElicitationForTurn(request.params, true, _hostId) == null) continue;
+        if (("completed" in request && request.completed === true) || isElicitationForTurn(request.params, true, parseUrl) == null) continue;
         if (request.params.turnId == null || request.params.turnId.length === 0) hasTurnlessElicitation = true;
         else pendingStateFor(byTurn, request.params.turnId).hasElicitation = true;
         continue;

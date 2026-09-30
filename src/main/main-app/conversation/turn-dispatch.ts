@@ -214,7 +214,9 @@ async function resolveTurnPermissionsAndWorkspace(
   });
   let effectivePendingWorkspace =
     pendingWorkspace == null || environmentCwd == null ? pendingWorkspace : { ...pendingWorkspace, cwd: environmentCwd };
-  let appliedRoots = collectWorkspaceRoots(applied, fallbackCwd);
+  let appliedRoots = collectWorkspaceRoots(applied, fallbackCwd).filter(
+    (root: unknown): root is string => typeof root === `string`,
+  );
   let projectlessWorkspace =
     capabilities.canUseProjectlessWorkspace &&
     (await shouldUseProjectlessWorkspace({

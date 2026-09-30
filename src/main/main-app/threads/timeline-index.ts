@@ -15,7 +15,7 @@
 import { lastTurn, timelineEntryKey, type AnyTurn, type ConversationLike } from "../turns/canonical-history";
 import { AUTOMATION_DETECTOR } from "./automation-detector";
 // mv（pendingRequest 计算）：定义于状态投影簇（32,988-33,603，尚未重写）。
-import { mv as computePendingRequest } from "./projection";
+import { pendingInteraction as computePendingRequest } from "./hydration";
 
 /** 索引访问器（ThreadStore 提供的实体读取面）。 */
 export interface ThreadItemIndexAccess {

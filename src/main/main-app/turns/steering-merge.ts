@@ -45,6 +45,45 @@ interface SteeringUserMessage {
   [key: string]: unknown;
 }
 
+/** 构造待发送的 steeringUserMessage（原版 dg）。 */
+export function buildSteeringUserMessage(
+  id: string,
+  input: unknown,
+  restoreMessage: { context: { commentAttachments?: unknown; [key: string]: unknown }; [key: string]: unknown },
+  {
+    attachments = [],
+    clientUserMessageId = null,
+    shouldStripImageDisplayPlaceholderLines = false,
+    targetTurnId = null,
+    targetTurnStartedAtMs = null,
+  }: {
+    attachments?: unknown[];
+    clientUserMessageId?: string | null;
+    shouldStripImageDisplayPlaceholderLines?: boolean;
+    targetTurnId?: string | null;
+    targetTurnStartedAtMs?: number | null;
+  } = {},
+) {
+  let normalized = normalizeUserInput({
+    input,
+    commentAttachments: restoreMessage.context.commentAttachments,
+    shouldStripImageDisplayPlaceholderLines,
+  });
+  return {
+    type: 'steeringUserMessage' as const,
+    id,
+    targetTurnId,
+    targetTurnStartedAtMs,
+    status: 'pending',
+    serverUserMessageId: null,
+    clientUserMessageId,
+    input,
+    attachments,
+    restoreMessage,
+    compareKey: { rawText: normalized.rawText, imageCount: normalized.imageCount },
+  };
+}
+
 /** 是否 steeringUserMessage item（原版 yg）。 */
 export function isSteeringUserMessage(item: any): item is SteeringUserMessage {
   return item.type === `steeringUserMessage`;
@@ -331,4 +370,4 @@ function buildSteeredMatch({
 // 兼容导出（原版压缩名；R4 切换语义名后移除）
 // ---------------------------------------------------------------------------
 
-export { findMatchingSteeringMessage as fg };
+export { buildSteeringUserMessage as dg, findMatchingSteeringMessage as fg };

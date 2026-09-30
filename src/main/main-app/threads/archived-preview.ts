@@ -40,7 +40,6 @@ export interface ArchivedPreviewConnection {
   listThreadTurns(threadId: string, options: any): Promise<any>;
   sendRequest(method: string, params: any, options?: any): Promise<any>;
   supportsPaginatedThreadHistory(): boolean;
-  [key: string]: unknown;
 }
 
 /** 预览结果。 */

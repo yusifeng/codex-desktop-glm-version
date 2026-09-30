@@ -16,7 +16,7 @@
 import { $u as normalizeThreadId, Cs as isDurableHost } from "@chunk/shared";
 import { kg as mergedConversationTurns } from "../turns/canonical-history";
 // uv（33,447）= 父线程 id 解析（thread_spawn/subAgent source）——R3 threads/projection。
-import { uv as resolveParentThreadId } from "../threads/projection";
+import { parentThreadIdOf as resolveParentThreadId } from "../threads/hydration";
 
 /**
  * subagent 拓扑发现的 app-server 版本门（原 _Se）。

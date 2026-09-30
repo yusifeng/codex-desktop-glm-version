@@ -238,6 +238,9 @@ export function subAgentMetadata(source: any): any {
   return descriptor == null ? null : parseSubAgentDescriptor(descriptor);
 }
 
+/** 原压缩导出名兼容。 */
+export { subAgentMetadata as H_ };
+
 /** nickname 清洗（原版 W_）。 */
 function cleanNickname(nickname: string | null | undefined): string | null {
   if (nickname == null) return null;

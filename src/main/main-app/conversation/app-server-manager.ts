@@ -132,7 +132,7 @@ import { Th as buildOnboardingToolResponse } from "../tools/dynamic-app-tools";
 // R1 杂项带（66-322）：me（thread_not_found 判定）、Xt（中断响应构造）。
 import { me as isThreadNotFoundError, Xt as buildInterruptResponse } from "../misc/thread-errors";
 // zge（33,263 中断命令执行标记）——R3 threads/projection。
-import { zge as markInterruptedCommandExecutionsInPlace } from "../threads/projection";
+import { markInterruptedCommandExecutions as markInterruptedCommandExecutionsInPlace } from "../turns/canonical-history";
 // compactThread 的 follower 委托包装（原 ave，37,585 files/open-file-watches）。
 import { ave as compactThreadViaFollower } from "../files/open-file-watches";
 import {
