@@ -86,6 +86,9 @@ Worktree snapshot/state 的候选目录、snapshot commit、路径 inspection �
 Worktree owner 的 `codex-thread.json` 定位、schema 解析、读写与 owner 更新已迁移至
 `src/main/worker/git-thread-config.ts`；原三个实现函数已删除，两个旧符号只保留薄适配器，
 由 11 项行为断言覆盖。
+Thread worktree resolution 的 metadata 快路径、owner fallback、候选排序、子路径映射与 dirty
+检查已迁移至 `src/main/worker/git-worktree-resolution.ts`；原六个实现函数已删除，dispatcher
+仅保留 envelope 和现有 query/cache 依赖注入，由 22 项行为断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为

@@ -21,6 +21,7 @@ const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveRe
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
+const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
@@ -69888,90 +69889,6 @@ async function p4(e, t) {
 async function m4(e, t, n) {
   await setWorktreeOwnerThread(e, t, n, pgeDeps());
 }
-async function fge(e, t, n, r, i, a, o) {
-  let s = await n.getWorktreeRepository(e, r);
-  if (!s)
-    return X({ worktreeGitRoot: null, worktreeWorkspaceRoot: null, hasUncommittedChanges: !1 });
-  let c = await R$(r, o),
-    l = await r.platformPath(),
-    u = await D2(s, e, a);
-  if (i != null) {
-    let [o, s] = await Promise.all([n.getStableMetadata(e, r), n.getStableMetadata(i, r)]);
-    if (
-      o != null &&
-      s != null &&
-      g4(s.commonDir) === g4(o.commonDir) &&
-      (c.some((e) => mge(s.root, e.path)) ||
-        (await p4(n.getWorktreeRepositoryForRoot(s.root, r), a))?.ownerThreadId === t)
-    ) {
-      let e = xz(u.length > 0 ? l.join(s.root, u) : s.root);
-      return h4(s.root, e, n, r);
-    }
-  }
-  let d = await $2(s, a),
-    f = (
-      await Promise.all(
-        d.map(async (e) => {
-          if ((await p4(n.getWorktreeRepositoryForRoot(e.root, r), a))?.ownerThreadId !== t)
-            return null;
-          let i = xz(u.length > 0 ? l.join(e.root, u) : e.root),
-            o = await hge(e.root, r);
-          return { worktreeGitRoot: e.root, worktreeWorkspaceRoot: i, sortTimestamp: o };
-        }),
-      )
-    ).filter((e) => e != null);
-  if (f.length === 0)
-    return X({ worktreeGitRoot: null, worktreeWorkspaceRoot: null, hasUncommittedChanges: !1 });
-  f.sort((e, t) =>
-    e.sortTimestamp === t.sortTimestamp
-      ? t.worktreeGitRoot.localeCompare(e.worktreeGitRoot)
-      : t.sortTimestamp - e.sortTimestamp,
-  );
-  let p = f[0];
-  return h4(p.worktreeGitRoot, p.worktreeWorkspaceRoot, n, r);
-}
-async function h4(e, t, n, r) {
-  return X({
-    worktreeGitRoot: e,
-    worktreeWorkspaceRoot: t,
-    hasUncommittedChanges: await pge(n.getWorktreeRepositoryForRoot(e, r)),
-  });
-}
-async function pge(e) {
-  let t = new AbortController(),
-    n = J2(e, !1),
-    r = f2(e, void 0, void 0, t.signal);
-  r.catch(() => {});
-  let i;
-  try {
-    i = await n;
-  } catch (e) {
-    throw (t.abort(), e);
-  }
-  if (i.type !== `success`) return (t.abort(), !1);
-  if (i.stagedCount + i.unstagedCount > 0) return (t.abort(), !0);
-  let a = await r;
-  return a.success && a.paths.length > 0;
-}
-function g4(e) {
-  return I$(e).replace(/\/+$/, ``);
-}
-function mge(e, t) {
-  let n = g4(e),
-    r = g4(t);
-  return r === `/` ? n === `/` : n === r || n.startsWith(`${r}/`);
-}
-async function hge(e, t) {
-  try {
-    let n = await t.stat(e),
-      r = n.birthtimeMs;
-    if (r > 0) return r;
-    let i = n.mtimeMs;
-    return i > 0 ? i : 0;
-  } catch {
-    return 0;
-  }
-}
 async function _4(
   e,
   t,
@@ -77650,15 +77567,19 @@ var I6 = kW(`git`),
             p = X(await this.getWorktrees(e.params.cwd, o, i.signal));
             break;
           case `resolve-worktree-for-thread`:
-            p = await fge(
-              e.params.cwd,
-              e.params.conversationId,
-              this.gitManager,
-              o,
-              e.params.threadCwd,
-              i.signal,
-              e.params.worktreesRoot,
-            );
+            p = X(await resolveWorktreeForThread(e.params, {
+              gitManager: this.gitManager,
+              host: o,
+              signal: i.signal,
+              getManagedWorktreeLocations: R$,
+              getRootRelativeCwd: D2,
+              listWorktrees: $2,
+              readThreadConfig: p4,
+              getTrackedStatus: J2,
+              getUntrackedPaths: (e, t) => f2(e, void 0, void 0, t),
+              normalizeWorkspaceRoot: xz,
+              normalizeComparisonPath: I$,
+            }));
             break;
           case `worktree-snapshot-ref`:
             p = X(

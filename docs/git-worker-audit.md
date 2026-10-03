@@ -127,6 +127,11 @@ Worktree owner 的 `codex-thread.json` 定位、schema 解析、读取、写入�
 `src/main/worker/git-thread-config.ts`。原 `f4`/`uge`/`dge` 实现已删除，`p4`/`m4` 仅保留
 worktree/handoff 内部调用所需的薄适配器；11 项断言覆盖格式、缺失文件与无 repository 错误。
 
+Thread worktree resolution 的 current-thread 快路径、owner fallback、候选时间排序、workspace
+路径映射与 tracked/untracked dirty 检查已完整迁移至
+`src/main/worker/git-worktree-resolution.ts`。原 `fge`/`h4`/`pge`/`g4`/`mge`/`hge` 已删除，
+dispatcher 继续持有 envelope 与 query/cache 依赖；22 项断言覆盖关键选择与取消语义。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
