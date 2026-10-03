@@ -482,7 +482,7 @@ declare module "@chunk/shared" {
   export const es: any; // 内部符号: LE
   export const et: any; // 内部符号: Zie
   export { buildNodeReplMcpConfig as eu } from "../../shared/app-config";
-  export const f: any; // 内部符号: sce
+  export { isPathlike as f } from "../../shared/tail-runtime";
   export const fa: any; // 内部符号: Gne
   export const fc: any; // 内部符号: $C
   export { parseHeartbeatFromBlocks as fd } from "../../shared/automation-settings";
@@ -601,7 +601,7 @@ declare module "@chunk/shared" {
   export const ns: any; // 内部符号: BE
   export { TextGenerator as nt } from "../../shared/structured-generation";
   export { isNodeReplSandboxPlatform as nu } from "../../shared/app-config";
-  export const o: any; // 内部符号: Lce
+  export { StartupConfigClient as o } from "../../shared/tail-runtime";
   export const oa: any; // 内部符号: hj
   export { configKeyPath as oc } from "../../shared/app-config";
   export { unescapeHtml as od } from "../../shared/app-config";
@@ -668,7 +668,7 @@ declare module "@chunk/shared" {
   export const ss: any; // 内部符号: NE
   export { COMMIT_MESSAGE_GENERATION_BUNDLE as st } from "../../shared/structured-generation";
   export { BROWSER_USE_PLUGIN_NAME as su } from "../../shared/app-constants";
-  export const t: any; // 内部符号: Zce
+  export { workspaceAuthErrorOf as t } from "../../shared/tail-runtime";
   export const ta: any; // 内部符号: ere
   export { composeFeatureOverrides as tc } from "../../shared/app-config";
   export { InMemoryInterceptor as td } from "../../shared/app-config";
