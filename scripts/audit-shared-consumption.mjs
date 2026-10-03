@@ -23,7 +23,7 @@ async function walk(dir) {
 await walk(path.join(ROOT, "src/main"));
 for (const file of files) {
   const src = await fs.readFile(file, "utf8");
-  for (const stmt of src.matchAll(/import\s*\{([\s\S]*?)\}\s*from\s*["']@chunk\/shared["']/g)) {
+  for (const stmt of src.matchAll(/import\s*\{([^}]*)\}\s*from\s*["']@chunk\/shared["']/g)) {
     for (const item of stmt[1].split(",")) {
       const match = item.trim().match(/^([A-Za-z_$][\w$]*)(?:\s+as\s+[A-Za-z_$][\w$]*)?$/);
       if (!match) continue;
