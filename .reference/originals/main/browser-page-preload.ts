@@ -26953,46 +26953,7 @@ function Jb() {
 function Yb(e) {
   Cb == null ? (wb = e) : Cb.setSiteAnnotationPreview(e);
 }
-var Xb = !1;
-function Zb() {
-  (window.addEventListener(`dragstart`, Qb, !0), window.addEventListener(`dragend`, $b, !0));
-}
-function Qb(e) {
-  if (!e.isTrusted) return;
-  let t = ex(e),
-    n = t?.currentSrc || t?.src;
-  n != null &&
-    n.length !== 0 &&
-    ((Xb = !0),
-    d.ipcRenderer.invoke(Bd, { type: `browser-sidebar-runtime-image-drag-started`, sourceUrl: n }));
-}
-function $b(e) {
-  e.isTrusted &&
-    Xb &&
-    ((Xb = !1), d.ipcRenderer.invoke(Bd, { type: `browser-sidebar-runtime-image-drag-ended` }));
-}
-function ex(e) {
-  for (let t of e.composedPath()) if (t instanceof HTMLImageElement) return t;
-  return e.target instanceof HTMLImageElement ? e.target : null;
-}
-function tx() {
-  (window.addEventListener(`mousedown`, rx, !0),
-    window.addEventListener(`mouseup`, nx, !0),
-    window.addEventListener(`auxclick`, rx, !0));
-}
-function nx(e) {
-  let t = ix(e);
-  t != null &&
-    e.isTrusted &&
-    (rx(e),
-    d.ipcRenderer.invoke(Bd, { type: `browser-sidebar-runtime-mouse-navigation`, direction: t }));
-}
-function rx(e) {
-  ix(e) != null && (e.preventDefault(), e.stopPropagation());
-}
-function ix(e) {
-  return e.button === 3 ? `back` : e.button === 4 ? `forward` : null;
-}
+var { installBrowserInputBridge } = require("./browser-page-preload/browser-input-bridge");
 Object.freeze([`http:`, `https:`]);
 var { extensionDistribution: cx } = require("./browser-page-preload/extension-distribution");
 (cx.chrome.dev, cx.chrome.internal, cx.chrome.prod, cx.edge.dev, cx.edge.internal, cx.edge.prod);
@@ -29765,4 +29726,10 @@ installWebMcpProtocol({
   webmcpChangedEvent: lx,
   modelContextProperty: `__codexWebMcpModelContext`,
 });
-(d.webFrame.setVisualZoomLevelLimits?.(1, 3), Bb(), tx(), Zb());
+(d.webFrame.setVisualZoomLevelLimits?.(1, 3),
+  Bb(),
+  installBrowserInputBridge({
+    windowLike: window,
+    imageElementConstructor: HTMLImageElement,
+    invokeHost: (e) => d.ipcRenderer.invoke(Bd, e),
+  }));
