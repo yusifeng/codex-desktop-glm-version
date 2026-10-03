@@ -155,6 +155,10 @@ Handoff branch/stash 的分支存在与 commit 一致性检查、创建/强制�
 `H3/U3/Ive/W3/Nve` 五个实现及其压缩调用名已删除。34 项断言覆盖命令序列、错误输出优先级、
 默认 mode 和 stash SHA 映射。
 
+Handoff rollback 的通用 branch/stash 恢复、source worktree 恢复，以及新建/复用 host worktree
+回滚已迁移至 `src/main/worker/git-handoff-rollback.ts`；原 `$3/e6/K3/q3` 四个实现与调用名已删除。
+19 项断言覆盖错误累计顺序、可忽略 cleanup/checkout 失败和必须继续传播的复用 worktree 失败。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
