@@ -123,6 +123,10 @@ Worktree snapshot/state 的候选目录过滤、snapshot ref/commit 查找、路
 `available/gone/restorable/unavailable` 状态机已迁移至
 `src/main/worker/git-worktree-snapshot.ts`；原 `k4`/`Mve`/`V3` 已删除，由 12 项断言覆盖。
 
+Worktree owner 的 `codex-thread.json` 定位、schema 解析、读取、写入与 owner 更新已迁移至
+`src/main/worker/git-thread-config.ts`。原 `f4`/`uge`/`dge` 实现已删除，`p4`/`m4` 仅保留
+worktree/handoff 内部调用所需的薄适配器；11 项断言覆盖格式、缺失文件与无 repository 错误。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

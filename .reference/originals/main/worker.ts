@@ -20,6 +20,7 @@ const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfi
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
+const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
@@ -69872,47 +69873,20 @@ function l4(e) {
 var d4 = kW(`threadConfig`),
   cge = `codex-thread.json`,
   lge = K({ version: J(1), ownerThreadId: H() });
-async function f4(e, t) {
-  return d0(e, cge, t);
-}
-function uge(e) {
-  try {
-    let t = lge.safeParse(JSON.parse(e));
-    return t.success
-      ? t.data
-      : (d4().warning(`Invalid thread config}`, {
-          safe: {},
-          sensitive: { error: t.error.message },
-        }),
-        null);
-  } catch (e) {
-    return (
-      d4().warning(`Failed to parse thread config`, { safe: {}, sensitive: { error: e } }),
-      null
-    );
-  }
+function pgeDeps() {
+  return {
+    configFileName: cge,
+    findConfigFile: d0,
+    parseSchema: (e) => lge.safeParse(e),
+    isMissingError: (e) => e?.code === `ENOENT`,
+    warn: (e, t) => d4().warning(e, { safe: {}, sensitive: { error: t } }),
+  };
 }
 async function p4(e, t) {
-  let n = await f4(e, t);
-  if (n == null) return null;
-  try {
-    return uge(await new Response(await e.host.readFile(n)).text());
-  } catch (e) {
-    return (
-      e.code === `ENOENT` ||
-        d4().warning(`Failed to read thread config`, { safe: {}, sensitive: { error: e } }),
-      null
-    );
-  }
-}
-async function dge(e, t, n) {
-  let r = await f4(e, n);
-  if (r == null) throw Error(`No git repository found for thread config`);
-  let i = `${JSON.stringify(t, null, 2)}\n`;
-  await e.host.writeFile(r, i);
+  return readThreadConfig(e, t, pgeDeps());
 }
 async function m4(e, t, n) {
-  await dge(e, { version: 1, ownerThreadId: t }, n);
+  await setWorktreeOwnerThread(e, t, n, pgeDeps());
 }
 async function fge(e, t, n, r, i, a, o) {
   let s = await n.getWorktreeRepository(e, r);
