@@ -89,6 +89,12 @@ symlink、submodule 三类 untracked patch 生成已迁移至
 `src/main/worker/git-review-file-diff.ts`；原 `R4`/`B4`/`V4` 已删除。33 项断言覆盖
 query key/options、POSIX/Windows 命令、no-newline marker、binary diff 和错误映射。
 
+Review comparison 的 merge-conflict/commit-parent/HEAD 查询、branch/commit/worktree source 参数、
+empty-tree fallback 以及 untracked/unmerged 扫描已迁移至
+`src/main/worker/git-review-comparison.ts`；原 `Bge`/`G4`/`Vge`/`K4`/`q4`/`J4`/`X4`/`Z4`/`Q4`/`Hge`
+与 `Y4` 已删除。53 项断言覆盖 query cache 参数、SHA 校验、source 矩阵、repository fallback、
+untracked 上限与 unmerged 路径过滤。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的

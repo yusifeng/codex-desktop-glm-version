@@ -35,6 +35,7 @@ const { pushGitRepository } = require("./worker/git-push-request-handler");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { getGitBlobDiff, getUntrackedWorkingTreeDiff, readWorkingTreeSymlink } = require("./worker/git-review-file-diff");
+const { getCurrentHeadSnapshot, hasGitMergeConflicts, prepareReviewComparison: prepareGitReviewComparison, readCurrentHeadSnapshot, resolveReviewComparisonArgs: resolveGitReviewComparisonArgs, resolveReviewComparisonForRepository: resolveGitReviewComparisonForRepository } = require("./worker/git-review-comparison");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
@@ -57,6 +58,18 @@ const { describeShell } = require("./worker/shell-config");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
+const gitReviewComparisonDeps = {
+  findMergeBase: (...args) => X2(...args),
+  getDefaultBranch: (...args) => k2(...args),
+  getHeadCommit: (...args) => N0(...args),
+  getQueryMeta: () => _1,
+  getUntrackedPaths: (...args) => f2(...args),
+  normalizeCommitSha: (sha) => Sz(sha),
+  normalizeCwd: (cwd) => xz(cwd),
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  validateObjectId: (sha) => M0(sha),
+};
 const handoffBranchDeps = {
   runGit: $,
   formatBranchRef: F0,
@@ -72,7 +85,8 @@ const restoreHandoffState = (params) => restoreHandoffBranchAndStash(params, han
 const restoreSourceHandoffState = (params) => restoreHandoffSource(params, handoffRollbackDeps);
 const handoffDestinationDeps = {
   getStatusConfig: e2,
-  getHeadCommit: q4,
+  getHeadCommit: (repository, signal) =>
+    readCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   runGit: $,
   getCurrentBranch: w0,
   getDefaultRemoteBranch: k2,
@@ -109,7 +123,8 @@ const hostHandoffDeps = {
   resolveCleanWorktreeCommit: (repository, signal) =>
     resolveCleanWorktreeCommit(repository, signal, handoffDestinationDeps),
   getCurrentBranch: (repository) => w0(repository),
-  getCurrentBranchSnapshot: (repository, signal) => K4(repository, signal),
+  getCurrentBranchSnapshot: (repository, signal) =>
+    getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   checkoutBranch: (params, gitManager, host) => t4(params, gitManager, host),
   prepareDestinationCheckout: (params) =>
     prepareHandoffDestinationCheckout(params, handoffDestinationDeps),
@@ -123,7 +138,8 @@ const hostHandoffDeps = {
 const moveToLocalDeps = {
   getCurrentBranch: w0,
   listWorktrees: $2,
-  getHeadCommit: K4,
+  getHeadCommit: (repository, signal) =>
+    getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   checkoutBranch: t4,
   getStatus: J2,
   ensureBranch: (params) => ensureHandoffBranch(params, handoffBranchDeps),
@@ -142,7 +158,8 @@ const syncedBranchOverwriteDeps = {
   resolveObject: N0,
   isObjectId: M0,
   normalizeTreeSha: Cz,
-  getHeadCommit: K4,
+  getHeadCommit: (repository, signal) =>
+    getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   createCommit: _4,
   runGit: $,
   formatExecOutput: mR,
@@ -159,7 +176,8 @@ const branchSearchDeps = {
 };
 const syncedBranchStateDeps = {
   readConfig: P2,
-  hasConflicts: Bge,
+  hasConflicts: (repository, signal) =>
+    hasGitMergeConflicts(repository, signal, gitReviewComparisonDeps),
   normalizeBranch: E3,
   queryKey: Q,
   queryMeta: () => _1,
@@ -170,7 +188,8 @@ const syncedBranchStateDeps = {
   normalizeCommitSha: Sz,
   getUntrackedPaths: f2,
   getWorkingTree: x4,
-  getHeadCommit: K4,
+  getHeadCommit: (repository, signal) =>
+    getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   getCurrentBranch: w0,
   compareAhead: A0,
   logger: {
@@ -190,7 +209,8 @@ const turnDiffSnapshotDeps = {
 const turnDiffCaptureDeps = {
   captureSnapshotTree: (repository) =>
     captureTurnDiffSnapshotTree(repository, turnDiffSnapshotDeps),
-  getHeadCommit: q4,
+  getHeadCommit: (repository, signal) =>
+    readCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   getRepositoryStatus: P3,
   runGit: $,
   runDiff: y0,
@@ -70419,148 +70439,6 @@ function Mge(e) {
   }
   return t;
 }
-async function Bge(e, t) {
-  return (await G4(e, t)).length > 0;
-}
-function G4(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `merge-conflict-status`),
-    gcTime: 250,
-    meta: _1,
-    queryFn: async () => {
-      let n = await $(e.root, [`ls-files`, `-u`, `-z`], e.host, { signal: t });
-      if (!n.success) return [];
-      let r = new Set();
-      for (let e of n.stdout.split(`\0`)) {
-        let t = e.indexOf(`	`);
-        t !== -1 && r.add(e.slice(t + 1));
-      }
-      return [...r];
-    },
-    staleTime: 250,
-  });
-}
-function Vge(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `commit-parent-sha`, t),
-    queryFn: async () => {
-      let r = await $(e.root, [`rev-parse`, `--verify`, `--quiet`, `${t}^`], e.host, {
-        allowedNonZeroExitCodes: [1, 128],
-        signal: n,
-      });
-      return r.success ? r.stdout.trim() : null;
-    },
-    staleTime: 1 / 0,
-  });
-}
-async function K4(e, t) {
-  return J4(await N0(e, `HEAD`, t));
-}
-async function q4(e, t) {
-  let n = await $(e.root, [`rev-parse`, `--verify`, `--quiet`, `HEAD`], e.host, {
-    allowedNonZeroExitCodes: [1, 128],
-    signal: t,
-  });
-  return J4(n.success ? n.stdout.trim() : null);
-}
-function J4(e) {
-  if (e && !M0(e)) throw Error(`Unexpected HEAD SHA: ${e}`);
-  return e ? Sz(e) : null;
-}
-var Y4 = `4b825dc642cb6eb9a060e54bf8d69288fbee4904`;
-async function X4({ baseBranch: e, commitSha: t, signal: n, source: r, worktreeRepo: i }) {
-  switch (r) {
-    case `branch`: {
-      if (i == null) return { type: `error`, failureReason: `review_comparison` };
-      if (e != null) {
-        let t = await X2(i, e);
-        return t == null
-          ? { type: `expected`, reason: `merge_base_unavailable` }
-          : { type: `success`, args: [t] };
-      }
-      let t = await k2(i);
-      if (t == null) return { type: `expected`, reason: `default_branch_unavailable` };
-      let n = t.branch;
-      n.includes(`/`) || (n = `${t.remote}/${n}`);
-      let r = await X2(i, n);
-      return r == null
-        ? { type: `expected`, reason: `merge_base_unavailable` }
-        : { type: `success`, args: [r] };
-    }
-    case `commit`:
-      return t == null || i == null
-        ? { type: `error`, failureReason: `review_comparison` }
-        : { type: `success`, args: [(await Vge(i, t, n)) ?? Y4, t] };
-    case `staged`:
-      return { type: `success`, args: [`--cached`] };
-    case `uncommitted`:
-      return i == null
-        ? { type: `error`, failureReason: `review_comparison` }
-        : { type: `success`, args: [(await q4(i, n)) == null ? Y4 : `HEAD`] };
-    case `unstaged`:
-      return { type: `success`, args: [] };
-  }
-}
-async function Z4({
-  host: e,
-  baseBranch: t,
-  commitSha: n,
-  cwd: r,
-  gitManager: i,
-  includeUntrackedFiles: a,
-  maxUntrackedFiles: o,
-  paths: s,
-  source: c,
-}) {
-  let l = await i.getWorktreeRepository(xz(r), e);
-  return l == null
-    ? { type: `error`, failureReason: `repository_unavailable` }
-    : Q4({
-        baseBranch: t,
-        commitSha: n,
-        includeUntrackedFiles: a,
-        maxUntrackedFiles: o,
-        paths: s,
-        reviewSnapshot: l.reviewSnapshot,
-        source: c,
-      });
-}
-async function Q4({
-  baseBranch: e,
-  commitSha: t,
-  includeUnmergedPaths: n = !0,
-  includeUntrackedFiles: r,
-  maxUntrackedFiles: i,
-  paths: a,
-  reviewSnapshot: o,
-  source: s,
-}) {
-  let { worktreeRepo: c } = o,
-    l = s === `branch` || s === `uncommitted` || s === `unstaged`,
-    [u, d, f] = await Promise.all([
-      X4({ baseBranch: e, commitSha: t, signal: o.signal, source: s, worktreeRepo: c }),
-      l && r ? f2(c, a, o) : Promise.resolve(Hge(c.root)),
-      (s === `uncommitted` || s === `unstaged`) && n ? G4(c, o.signal) : Promise.resolve(null),
-    ]);
-  if (u.type !== `success`) return u;
-  if (!d.success) return { type: `error`, failureReason: `untracked_paths` };
-  let p = i != null && d.paths.length > i ? { ...d, paths: [] } : d;
-  return {
-    type: `success`,
-    diffArgs: u.args,
-    gitRoot: c.root,
-    reviewSnapshot: o,
-    unmergedPaths:
-      f == null
-        ? { type: `not-scanned` }
-        : { type: `scanned`, pathSet: new Set(a == null ? f : f.filter((e) => a.includes(e))) },
-    untrackedPaths: p,
-    untrackedPathSet: new Set(p.paths),
-  };
-}
-function Hge(e) {
-  return { success: !0, gitRoot: e, paths: [] };
-}
 async function $4(
   e,
   t,
@@ -70579,7 +70457,7 @@ async function $4(
     d = [
       ...new Set(u.flatMap((e) => (e.previousPath == null ? [e.path] : [e.previousPath, e.path]))),
     ],
-    f = await Q4({
+    f = await prepareGitReviewComparison({
       baseBranch: r,
       commitSha: a,
       includeUnmergedPaths: !1,
@@ -70587,7 +70465,7 @@ async function $4(
       paths: d,
       reviewSnapshot: e,
       source: t,
-    });
+    }, gitReviewComparisonDeps);
   if (f.type !== `success`)
     return {
       source: t,
@@ -71117,12 +70995,12 @@ async function o3(e, t, n, r, i = !1, a = !0, o) {
   if (s == null) return null;
   let c = s.reviewSnapshot;
   if (await c.read(() => f_e(s))) return null;
-  let l = await Q4({
+  let l = await prepareGitReviewComparison({
     baseBranch: r,
     includeUntrackedFiles: a,
     reviewSnapshot: c,
     source: `branch`,
-  });
+  }, gitReviewComparisonDeps);
   if (l.type !== `success`) return null;
   let u = _3(l.untrackedPaths.paths.length, o),
     [d, f] = await Promise.all([Y2(s, !1, c), y3(c, u == null ? l.untrackedPaths.paths : [])]);
@@ -71369,14 +71247,14 @@ async function l3({
     c = o === `branch` || o === `uncommitted` || o === `unstaged`,
     l = o === `branch` || o === `uncommitted`,
     [u, d] = await Promise.all([
-      Q4({
+      prepareGitReviewComparison({
         baseBranch: e,
         commitSha: t,
         includeUntrackedFiles: r,
         paths: i,
         reviewSnapshot: a,
         source: o,
-      }),
+      }, gitReviewComparisonDeps),
       c ? Y2(s, !1, a, void 0, r && (i == null || i.length === 0)) : null,
     ]);
   if (u.type !== `success`) return u;
@@ -71534,8 +71412,8 @@ async function d3({
 }
 async function b_e({ includeUntrackedFiles: e, reviewSnapshot: t, untrackedFileCount: n }) {
   let [r, i] = await Promise.all([
-    Q4({ includeUntrackedFiles: !1, reviewSnapshot: t, source: `staged` }),
-    Q4({ includeUntrackedFiles: e && n == null, reviewSnapshot: t, source: `unstaged` }),
+    prepareGitReviewComparison({ includeUntrackedFiles: !1, reviewSnapshot: t, source: `staged` }, gitReviewComparisonDeps),
+    prepareGitReviewComparison({ includeUntrackedFiles: e && n == null, reviewSnapshot: t, source: `unstaged` }, gitReviewComparisonDeps),
   ]);
   if (r.type !== `success` || i.type !== `success`) return null;
   let a = await Y2(t.worktreeRepo, !1, t);
@@ -72029,7 +71907,7 @@ async function V_e(e, t, n, r, i) {
 var C3 = 100,
   w3 = 2097152;
 async function T3(e, t, n) {
-  let r = await X4({ baseBranch: t, signal: n, source: `branch`, worktreeRepo: e }),
+  let r = await resolveGitReviewComparisonArgs({ baseBranch: t, signal: n, source: `branch`, worktreeRepo: e }, gitReviewComparisonDeps),
     i = r.type === `success` ? r.args[0] : null;
   return i == null ? [] : U_e(e, i, n);
 }
@@ -72281,7 +72159,7 @@ async function O3(e, t, n) {
   );
 }
 async function k3(e, t, n, r, i, a, o, s) {
-  let c = await Z4({
+  let c = await resolveGitReviewComparisonForRepository({
     host: r,
     baseBranch: a,
     commitSha: o,
@@ -72290,7 +72168,7 @@ async function k3(e, t, n, r, i, a, o, s) {
     includeUntrackedFiles: !0,
     maxUntrackedFiles: s,
     source: t,
-  });
+  }, gitReviewComparisonDeps);
   if (c.type !== `success`) return { source: t, diff: Y_e() };
   let [l, u] = await Promise.all([
     J_e(c.diffArgs, c.reviewSnapshot),
@@ -72505,7 +72383,7 @@ async function ove(e, t, n, r, i, a, o, s, c = !0, l) {
   let u = n.trim();
   if (u.length === 0)
     return { type: `success`, source: t, query: u, matches: [], totalMatches: 0, isCapped: !1 };
-  let d = await Z4({
+  let d = await resolveGitReviewComparisonForRepository({
     host: i,
     baseBranch: o,
     commitSha: s,
@@ -72514,7 +72392,7 @@ async function ove(e, t, n, r, i, a, o, s, c = !0, l) {
     includeUntrackedFiles: c,
     maxUntrackedFiles: l,
     source: t,
-  });
+  }, gitReviewComparisonDeps);
   if (d.type !== `success`) return { type: `error`, source: t, query: u };
   let f = await cve({
     diffArgs: d.diffArgs,
