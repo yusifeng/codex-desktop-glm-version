@@ -25,6 +25,7 @@ const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution")
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
+const { disposeGitInitWatch, recoverGitLiveQueries, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
@@ -77112,6 +77113,16 @@ var I6 = kW(`git`),
           invalidateUntrackedPathsCache: p2,
           refreshRepository: (hostId, root) => this.liveQueryRegistry.refreshRepository(hostId, root),
         },
+        watchRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          liveQueryRegistry: this.liveQueryRegistry,
+          disposeGitInitWatcher: (cwd, host) => this.disposeGitInitWatcher(cwd, host),
+          getExistingWatch: (root) => this.watchesByKey.get(this.getWatchKey(root, o)),
+          ensureWatching: (metadata, host) => this.ensureWatching(metadata, host),
+          trace: OH,
+          unwatchRepo: (root, host) => this.unwatchRepo(root, host),
+        },
         gitInitRequestDeps = {
           gitManager: this.gitManager,
           host: o,
@@ -77376,25 +77387,10 @@ var I6 = kW(`git`),
             break;
           }
           case `dispose-git-init-watch`:
-            (this.disposeGitInitWatcher(e.params.cwd, o), (p = X({ success: !0 })));
+            p = X(disposeGitInitWatch(e.params.cwd, watchRequestDeps));
             break;
           case `watch-repo`: {
-            let t = { commonDir: e.params.commonDir, root: e.params.root },
-              n = this.watchesByKey.get(this.getWatchKey(t.root, o));
-            (await OH(
-              {
-                attributes: {
-                  "git.watcher_reused": n != null,
-                  "worker.id": `git`,
-                  "worker.method": `watch-repo`,
-                },
-                links: n?.startTrace == null ? [] : [n.startTrace],
-                name: `git.watcher_start`,
-                op: `codex.git.watcher_start`,
-              },
-              () => this.ensureWatching(t, o),
-            ),
-              (p = X({ success: !0 })));
+            p = X(await watchGitRepository(e.params, watchRequestDeps));
             break;
           }
           case `subscribe-live-query`: {
@@ -77479,21 +77475,12 @@ var I6 = kW(`git`),
             break;
           }
           case `recover-live-queries`: {
-            let t =
-              e.params.cwd == null
-                ? null
-                : await this.gitManager.getStableMetadata(e.params.cwd, o);
-            ((e.params.cwd == null || t != null) &&
-              (await this.liveQueryRegistry.recover({
-                hostId: o.id,
-                root: t?.root,
-                subscriptionIds: e.params.subscriptionIds,
-              })),
-              (p = X(void 0)));
+            await recoverGitLiveQueries(e.params, watchRequestDeps);
+            p = X(void 0);
             break;
           }
           case `unwatch-repo`:
-            (this.unwatchRepo(e.params.root, o), (p = X({ success: !0 })));
+            p = X(unwatchGitRepository(e.params.root, watchRequestDeps));
             break;
           case `git-init-repo`:
             p = X(await initializeGitRepository(e.params, gitInitRequestDeps));
