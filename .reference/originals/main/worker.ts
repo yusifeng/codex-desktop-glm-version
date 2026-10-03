@@ -10,7 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
-const { fsmonitorCacheKey, gitQueryKey, hostId, isCacheableGitCommand, matchesGitQuery, normalizeGitPath, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
+const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -66098,11 +66098,8 @@ async function t0(e, t, n, r, i, a) {
     if (o !== 0 || !s.endsWith(`\0`)) return ``;
     let c = s.slice(0, -1);
     if (c.includes(`\0`)) return ``;
-    let l = c.toLowerCase(),
-      u;
-    if ([`true`, `yes`, `on`].includes(l)) u = !0;
-    else if ([`false`, `no`, `off`].includes(l)) u = !1;
-    else {
+    let u = parseFsmonitorConfigValue(c);
+    if (u == null) {
       let { code: o, stdout: s } = await n0(
         e,
         [`config`, `--null`, `--type=bool`, `--fixed-value`, `--get`, `core.fsmonitor`, c],
@@ -66116,15 +66113,7 @@ async function t0(e, t, n, r, i, a) {
     }
     if (!u) return ``;
     let { code: d, stdout: f } = await n0(e, [`version`, `--build-options`], t, n, r, i, a);
-    return d === 0 &&
-      f
-        .split(
-          `
-`,
-        )
-        .some((e) => e.trim() === `feature: fsmonitor--daemon`)
-      ? `true`
-      : ``;
+    return d === 0 && hasFsmonitorDaemonFeature(f) ? `true` : ``;
   } catch {
     return ``;
   }

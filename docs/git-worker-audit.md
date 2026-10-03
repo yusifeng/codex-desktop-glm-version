@@ -24,8 +24,8 @@ cache outcome 状态更新也已迁出，行为由 `scripts/test-worker-git-obse
 覆盖。
 
 Git query key、host id、路径归一化、UTF-8 字节长度、query host 匹配、watched
-path overlap、可缓存命令判定和 fsmonitor cache key（原入口约 65,338-65,439、
-65,616-66,080）已迁至 `worker/git-query-utils.ts`，由
+path overlap、可缓存命令判定、fsmonitor cache key、配置值解析和 daemon feature
+判定（原入口约 65,338-65,439、65,616-66,131）已迁至 `worker/git-query-utils.ts`，由
 `scripts/test-worker-git-query-utils.mjs` 覆盖。
 
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
