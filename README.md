@@ -20,9 +20,9 @@
 
 真实的模块化 TypeScript：有命名、有类型、有注释，用 esbuild 打包回官方的 chunk 文件名。目前主进程有 11 个 REWRITTEN chunk；其余 chunk 已逐项审计并登记为 PRESERVED（vendor、生成物或必须保留启动协议的入口）。改语义目录中的代码就是正常迭代。
 
-**第 2 层：未重写的 chunk（`src/main/<chunk 文件名>.ts`）——格式化原版**
+**第 2 层：未重写的 chunk（`.reference/originals/main/<chunk 文件名>.ts`）——格式化原版**
 
-发布代码经 prettier 格式化的逐字保留（带 `// @ts-nocheck`），仅做 TS→JS 转换，输出与发布版逐字节一致。重写一个 chunk 时：新建 `src/main/<语义名>/`，逐段把对应旧文件重写成真实源码，删掉旧文件，在 `scripts/chunk-manifest.mjs` 的 `REWRITTEN` 里登记，然后 `npm run build && npm run verify`。
+发布代码经 prettier 格式化的逐字保留（带 `// @ts-nocheck`），仅做 TS→JS 转换，输出与发布版逐字节一致。原始对照输入集中在 `.reference/originals/main/`，构建时仍恢复官方输出文件名。重写一个 chunk 时：新建 `src/main/<语义名>/`，逐段把对应旧文件重写成真实源码，在 `scripts/chunk-manifest.mjs` 的 `REWRITTEN` 里登记，然后 `npm run build && npm run verify`。
 
 两层可以任意比例混合：重写一个 chunk 不需要同时动它的依赖方或被依赖方——chunk 间的兼容靠「导出面保持不变」（见下）。
 
@@ -40,7 +40,7 @@
 │   ├── main/
 │   │   ├── types/chunk-modules.d.ts  # 未重写 chunk 的 @chunk/* 类型声明
 │   │   ├── <语义名>/              # 已重写 chunk 的真实源码（见下表）
-│   │   └── <chunk 文件名>.ts      # 未重写 chunk（格式化原版，@ts-nocheck）
+│   │   └── <语义名>/              # 主进程真实源码与抽取的业务 helper
 │   └── webview/                  # 渲染进程（11202 个 chunk，全部未重写）
 ├── app/                          # asar 运行树（payload 提交；*.js 由 build 生成，gitignore）
 │   ├── package.json              #   原版应用的 package.json（入口 .vite/build/early-bootstrap.js）
@@ -49,6 +49,7 @@
 │   ├── .vite/build/              #   [生成] 主进程 chunk
 │   └── webview/                  #   渲染进程静态资源 + [生成] JS
 ├── .reference/app-original/      # 未修改的 asar 解包（gitignore，verify 的对照基准）
+├── .reference/originals/main/    # 已迁出的主进程原始对照 chunk（构建输入）
 ├── scripts/
 │   ├── chunk-manifest.mjs        # chunk 清单：语义名 ↔ 输出文件名，REWRITTEN 列表
 │   ├── restore-ts.mjs            # app/**/*.js → src/**/*.ts 机械恢复（跳过已重写 chunk）
