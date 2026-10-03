@@ -81,18 +81,21 @@ async function worker() {
       // The published worker entry is CommonJS and loads extracted helpers via
       // require(). Keep those helper files CommonJS too; plain transform would
       // preserve TypeScript's ESM export syntax under the repo's module mode.
-      const workerHelper = /[\\/]src[\\/]main[\\/]worker[\\/]/.test(src);
+      const commonJsHelper =
+        /[\\/]src[\\/]main[\\/]worker[\\/]/.test(src) ||
+        /[\\/]src[\\/]main[\\/]browser-page-preload[\\/]/.test(src) ||
+        src.endsWith("/src/main/main-app/util/main-business.ts");
       const ts = await esbuild.transform(code, {
         ...common,
         loader: "ts",
         tsconfigRaw,
-        ...(workerHelper ? { format: "cjs" } : {}),
+        ...(commonJsHelper ? { format: "cjs" } : {}),
       });
       // Semantic source directories are authored TypeScript modules. The
       // transform-only JS parity check applies only to preserved published
       // chunks; parsing these modules as plain JS would reject interfaces,
       // type-only imports, and generic syntax by design.
-      const semanticSource = /[\\/]src[\\/]main[\\/](shared|main-app|worker)[\\/]/.test(src);
+      const semanticSource = /[\\/]src[\\/]main[\\/](shared|main-app|worker|browser-page-preload)[\\/]/.test(src);
       if (check && !semanticSource) {
         const js = await esbuild.transform(code, { ...common, loader: "js" });
         if (js.code !== ts.code) mismatches.push(src);

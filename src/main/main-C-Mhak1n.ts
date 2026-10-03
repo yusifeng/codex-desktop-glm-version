@@ -7,6 +7,7 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
   a = require("./bootstrap-C4dRql4x.js"),
   o = require("./electron-resources-path-BDLw2lp0.js"),
   s = require("./dist-wQAv1pJP.js");
+const mainBusiness = require("./main-app/util/main-business.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -65,37 +66,23 @@ let re = require("node:path/posix"),
 U = e.a(U);
 var ie = `https://chatgpt.com/codex`;
 function ae(e) {
-  let t = e.trim();
-  if (!t.startsWith(`<codex_delegation>`) || !t.endsWith(`</codex_delegation>`)) return null;
-  let n = oe(t, `source_thread_id`),
-    r = oe(t, `input`);
-  return n == null || r == null ? null : { sourceThreadId: n, input: r };
+  return mainBusiness.parseDelegationEnvelope(e);
 }
 function oe(e, t) {
-  let n = RegExp(`<${t}>\\s*([\\s\\S]*?)\\s*<\\/${t}>`, `i`).exec(e)?.[1].trim() ?? null;
-  return n == null ? null : se(n);
+  return mainBusiness.readDelegationTag(e, t);
 }
 function se(e) {
-  return e.replaceAll(`&lt;`, `<`).replaceAll(`&gt;`, `>`).replaceAll(`&amp;`, `&`);
+  return mainBusiness.decodeXmlText(e);
 }
 function ce(e) {
-  return e?.toLowerCase().endsWith(`@openai.com`) === !0;
+  return mainBusiness.isOpenAiEmployee(e);
 }
-var le = [
-  `plus`,
-  `pro`,
-  `business`,
-  `team`,
-  `self_serve_business_prolite`,
-  `self_serve_business_usage_based`,
-];
+var le = mainBusiness.eligibleAccountPlans;
 function ue(e) {
-  return e == null
-    ? !1
-    : e.type === `apiKey` || (e.type === `chatgpt` && de({ email: e.email, plan: e.planType }));
+  return mainBusiness.isEligibleAccount(e);
 }
 function de({ email: e, plan: t }) {
-  return ce(e) || le.some((e) => e === t);
+  return mainBusiness.isEligibleAccount({ type: `chatgpt`, email: e, planType: t });
 }
 var fe = class {
   handlers = new Set();
