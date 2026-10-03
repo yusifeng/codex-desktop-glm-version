@@ -8,6 +8,10 @@
 模块均以 CommonJS helper 形式由 `worker.ts` 加载，并有独立回归断言；其余
 business 区段仍按下表保持审计标记，不能视为已完成。
 
+WSL 平台的纯输出解析（约 47,122-47,584 中的 UTF-16/UTF-8 解码、活动发行版
+识别与排序）也已迁至 `worker/platform-wsl.ts`；仍需继续迁移的是其命令执行、
+缓存和宿主生命周期副作用。
+
 审计对象：`src/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含
 Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表示第三方库
