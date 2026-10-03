@@ -9,6 +9,7 @@ const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
+const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
@@ -77543,6 +77544,25 @@ var I6 = kW(`git`),
           getBranchCommits: T3,
           getReviewCommitLineCounts: H_e,
         },
+        reviewRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          attribution: n,
+          signal: i.signal,
+          runAbortable: yR,
+          maxUntrackedFiles: z6,
+          applyAttribution: H6,
+          getStatusSummary: J2,
+          getBranchDiffStats: o3,
+          getReviewSummary: c3,
+          getReviewSourceLineCounts: g_e,
+          getReviewSnapshot: R6,
+          getReviewDiffFallback: qge,
+          getReviewDiff: $4,
+          staleSnapshotError: s4,
+          searchReview: ove,
+          getReviewPatch: k3,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77700,136 +77720,38 @@ var I6 = kW(`git`),
             p = X(await W_e(this.gitManager, e.params.cwd, o, i.signal));
             break;
           case `status-summary`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o),
-              n =
-                t == null
-                  ? { type: `error`, failureReason: `repository_unavailable` }
-                  : await J2(t, e.params.includeUntrackedFiles, void 0, i.signal);
-            ((p = X(n)), (l = { operation: `status-summary`, result: n }));
+            let t = await resolveStatusSummary(e.params, reviewRequestDeps);
+            ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `branch-diff-stats`: {
-            let t = await yR(
-              o3(
-                String(e.params.cwd),
-                this.gitManager,
-                o,
-                e.params.baseBranch,
-                e.params.hideWhitespace,
-                e.params.includeUntrackedFiles,
-                z6(e.params.operationSource),
-              ),
-              i.signal,
-            );
-            ((p = X(t)), (l = { operation: `branch-diff-stats`, result: t }));
+            let t = await resolveBranchDiffStats(e.params, reviewRequestDeps);
+            ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-summary`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o),
-              r = H6(
-                t == null
-                  ? {
-                      type: `error`,
-                      source: e.params.source,
-                      failureReason: `repository_unavailable`,
-                    }
-                  : await yR(
-                      c3({
-                        ...e.params,
-                        maxUntrackedFiles: z6(e.params.operationSource),
-                        worktreeRepo: t,
-                      }),
-                      i.signal,
-                    ),
-                n,
-              );
-            ((p = X(r)), (l = { operation: `review-summary`, result: r }));
+            let t = await resolveReviewSummary(e.params, reviewRequestDeps);
+            ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-source-line-counts`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o),
-              n;
-            ((n =
-              t == null
-                ? e.params.sources.map((e) => ({
-                    source: e,
-                    type: `error`,
-                    failureReason: `repository_unavailable`,
-                  }))
-                : await yR(
-                    g_e({
-                      ...e.params,
-                      maxUntrackedFiles: z6(e.params.operationSource),
-                      worktreeRepo: t,
-                    }),
-                    i.signal,
-                  )),
-              (p = X(n)),
-              (l = { operation: `review-source-line-counts`, result: n }));
+            let t = await resolveReviewSourceLineCounts(e.params, reviewRequestDeps);
+            ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-diff`: {
-            let t = R6(
-                await this.gitManager.getWorktreeRepository(e.params.cwd, o),
-                e.params.snapshotGeneration,
-              ),
-              n = qge(e.params.source, e.params.files),
-              r = { type: `stale-snapshot`, source: e.params.source },
-              a;
-            if (t == null) a = r;
-            else
-              try {
-                a = {
-                  type: `success`,
-                  ...(await yR(
-                    $4(t, e.params.source, e.params.files, {
-                      baseBranch: e.params.baseBranch,
-                      commitSha: e.params.commitSha,
-                      hideWhitespace: e.params.hideWhitespace,
-                    }),
-                    i.signal,
-                  )),
-                };
-              } catch (e) {
-                a = e instanceof s4 ? r : { type: `success`, ...n };
-              }
-            ((p = X(a)), (l = { operation: `review-diff`, result: a }));
+            let t = await resolveReviewDiff(e.params, reviewRequestDeps);
+            ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-search`: {
-            let t = await yR(
-              ove(
-                String(e.params.cwd),
-                e.params.source,
-                e.params.query,
-                this.gitManager,
-                o,
-                i.signal,
-                e.params.baseBranch,
-                e.params.commitSha,
-                e.params.includeUntrackedFiles,
-                z6(e.params.operationSource),
-              ),
-              i.signal,
-            );
-            ((p = X(t)), (l = { operation: `review-search`, result: t }));
+            let t = await resolveReviewSearch(e.params, reviewRequestDeps);
+            ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-patch`: {
-            let t = await yR(
-              k3(
-                String(e.params.cwd),
-                e.params.source,
-                this.gitManager,
-                o,
-                void 0,
-                e.params.baseBranch,
-                e.params.commitSha,
-                z6(e.params.operationSource),
-              ),
-              i.signal,
-            );
-            ((p = X(t)), (l = { operation: `review-patch`, result: t }));
+            let t = await resolveReviewPatch(e.params, reviewRequestDeps);
+            ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `synced-branch`: {

@@ -62,6 +62,13 @@ branch commits 与 review commit line counts，原约 77,560-78,050）已迁移�
 检查、telemetry 和响应包装。`scripts/test-worker-git-read-request-handlers.mjs`
 覆盖 repository unavailable 与正常结果，共 21 项断言。
 
+紧随其后的 status/review 请求分支（`status-summary`、`branch-diff-stats`、
+`review-summary`、`review-source-line-counts`、`review-diff`、`review-search`、
+`review-patch`）已迁移至 `src/main/worker/git-review-request-handlers.ts`。入口仍负责
+请求级取消信号、response/performance 包装和最终 telemetry；helper 保留 attribution、
+repository unavailable、stale snapshot 与 generic-error fallback 语义，由
+`scripts/test-worker-git-review-request-handlers.mjs` 的 15 项断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
