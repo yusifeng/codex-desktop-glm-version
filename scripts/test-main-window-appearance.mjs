@@ -14,5 +14,7 @@ assert.equal(appearance.vibrancyForAppearance("primary", false), "menu");
 assert.equal(appearance.framelessWindowOptions({ platform: "darwin", resizable: false }).type, "panel");
 assert.deepEqual(appearance.trafficLightPosition(1), { x: 16, y: 16 });
 assert.deepEqual(appearance.trafficLightPosition(2), { x: 16, y: 39 });
+assert.deepEqual(appearance.titleBarOverlay(1, true), { color: "#00000000", symbolColor: "#ffffff", height: 36 });
+assert.deepEqual(appearance.titleBarOverlay(1.5, false), { color: "#00000000", symbolColor: "#1f1f1f", height: 54 });
 
-console.log("10 main window appearance assertions passed");
+console.log("12 main window appearance assertions passed");

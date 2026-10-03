@@ -8,6 +8,14 @@ function trafficLightPosition(windowZoom: number): { x: number; y: number } {
   return { x: 16, y: Math.round((46 * windowZoom - 14) / 2) };
 }
 
+function titleBarOverlay(windowZoom: number, prefersDarkColors: boolean) {
+  return {
+    color: `#00000000`,
+    symbolColor: prefersDarkColors ? `#ffffff` : `#1f1f1f`,
+    height: Math.round(36 * windowZoom),
+  };
+}
+
 function isOverlayAppearance(appearance: string): boolean {
   return [`avatarOverlay`, `browserCommentPopup`, `globalDictation`, `screenOverlay`, `hotkeyWindowHome`, `hotkeyWindowThread`].includes(appearance);
 }
@@ -55,5 +63,5 @@ function framelessWindowOptions({ alwaysOnTop, hasShadow = true, platform, resiz
   };
 }
 
-export { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };
-if (typeof module !== `undefined`) module.exports = { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };
+export { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, titleBarOverlay, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };
+if (typeof module !== `undefined`) module.exports = { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, titleBarOverlay, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };

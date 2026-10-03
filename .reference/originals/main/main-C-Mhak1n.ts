@@ -172761,6 +172761,8 @@ function A9(e) {
   return { x: Got, y: Math.round((Uot * e - Wot) / 2) };
 }
 function j9(e = 1) {
+  return windowAppearance.titleBarOverlay(e, l.nativeTheme.shouldUseDarkColors);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return {
     color: k9,
     symbolColor: l.nativeTheme.shouldUseDarkColors ? Jot : qot,
