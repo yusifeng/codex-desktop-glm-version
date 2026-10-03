@@ -10,7 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
-const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
+const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
@@ -77548,15 +77548,7 @@ var I6 = kW(`git`),
         u = null,
         d = null,
         f =
-          e.method !== `delete-worktree` &&
-          e.method !== `dispose-git-init-watch` &&
-          e.method !== `invalidate-stable-metadata` &&
-          e.method !== `invalidate-git-read-caches` &&
-          e.method !== `git-init-repo` &&
-          e.method !== `cleanup-host-handoff-transfer` &&
-          e.method !== `cancel-worktree-upstream-refresh` &&
-          e.method !== `watch-repo` &&
-          e.method !== `unwatch-repo`;
+        isGitRequestTracked(e.method);
       if (f) {
         if ((this.inFlightRequests.set(e.id, i), this.canceledRequests.has(e.id))) {
           (this.canceledRequests.delete(e.id),

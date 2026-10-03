@@ -93,5 +93,9 @@ function shouldCheckGitAvailability(method: string, isLocal: boolean, isMutation
   return isLocal && !isMutation && isCancelableGitRequest(method);
 }
 
-export { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
-if (typeof module !== `undefined`) module.exports = { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
+function isGitRequestTracked(method: string): boolean {
+  return ![`delete-worktree`, `dispose-git-init-watch`, `invalidate-stable-metadata`, `invalidate-git-read-caches`, `git-init-repo`, `cleanup-host-handoff-transfer`, `cancel-worktree-upstream-refresh`, `watch-repo`, `unwatch-repo`].includes(method);
+}
+
+export { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
+if (typeof module !== `undefined`) module.exports = { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
