@@ -159,6 +159,10 @@ Handoff rollback 的通用 branch/stash 恢复、source worktree 恢复，以及
 回滚已迁移至 `src/main/worker/git-handoff-rollback.ts`；原 `$3/e6/K3/q3` 四个实现与调用名已删除。
 19 项断言覆盖错误累计顺序、可忽略 cleanup/checkout 失败和必须继续传播的复用 worktree 失败。
 
+Host handoff destination checkout 的干净 commit 解析、默认分支选择与安全 detach 判定已迁移至
+`src/main/worker/git-handoff-destination.ts`；原 `Lve/G3` 实现和调用名已删除。19 项断言覆盖
+status 异常降级、已切离 handoff branch、默认分支 checkout、同分支 detach 和 checkout 错误映射。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

@@ -12,6 +12,7 @@ const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktre
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
 const { restoreHandoffBranchAndStash, restoreHandoffSource, rollbackHostHandoffWorktree } = require("./worker/git-handoff-rollback");
+const { prepareHandoffDestinationCheckout, resolveCleanWorktreeCommit } = require("./worker/git-handoff-destination");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -51,6 +52,14 @@ const handoffRollbackDeps = {
 const restoreHandoffState = (params) => restoreHandoffBranchAndStash(params, handoffRollbackDeps);
 const restoreSourceHandoffState = (params) => restoreHandoffSource(params, handoffRollbackDeps);
 const rollbackHostWorktree = (params) => rollbackHostHandoffWorktree(params, handoffRollbackDeps);
+const handoffDestinationDeps = {
+  getStatusConfig: e2,
+  getHeadCommit: q4,
+  runGit: $,
+  getCurrentBranch: w0,
+  getDefaultRemoteBranch: k2,
+  checkoutBranch: t4,
+};
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
 const rG = orderEligibleDistros;
@@ -73292,7 +73301,7 @@ async function Pve(
         O(`create-new-worktree`, `completed`));
     } else {
       let n = t.getWorktreeRepositoryForRoot(x, r);
-      ((C = (await G3(n, i)) === d),
+      ((C = (await resolveCleanWorktreeCommit(n, i, handoffDestinationDeps)) === d),
         n.invalidateGitReadCachesForRepoChange(`head`),
         (w = (await w0(n)) ?? (await K4(n, i))));
       let a = await t4({ cwd: S, branch: _, stashUncommitted: e.stashDestinationWorktree }, t, r);
@@ -73327,15 +73336,18 @@ async function Pve(
           execOutput: mR({ command: ne.command, stdout: ne.stdout, stderr: ne.stderr }),
         })
       );
-    let re = await Lve({
-      branch: e.sourceBranch,
-      cwd: c.root,
-      sourceHeadSha: d,
-      canDetachDefaultBranch: C,
-      gitManager: t,
-      host: r,
-      signal: i,
-    });
+    let re = await prepareHandoffDestinationCheckout(
+      {
+        branch: e.sourceBranch,
+        cwd: c.root,
+        sourceHeadSha: d,
+        canDetachDefaultBranch: C,
+        gitManager: t,
+        host: r,
+        signal: i,
+      },
+      handoffDestinationDeps,
+    );
     if (re.error != null)
       return (
         await rollbackHostWorktree({
@@ -73450,52 +73462,6 @@ async function Pve(
         v && y ? Promise.resolve() : n.remove(l, { recursive: !0, force: !0 }),
         y ? r.remove(m, { recursive: !1, force: !0 }) : r.remove(u, { recursive: !0, force: !0 }),
       ]));
-  }
-}
-async function Lve({
-  branch: e,
-  cwd: t,
-  sourceHeadSha: n,
-  canDetachDefaultBranch: r,
-  gitManager: i,
-  host: a,
-  signal: o,
-}) {
-  let s = i.getWorktreeRepositoryForRoot(t, a);
-  s.invalidateGitReadCachesForRepoChange(`head`);
-  let c = await w0(s);
-  if (c !== e) return { previousBranch: null, error: null };
-  let l = (await k2(s))?.branch ?? null,
-    u = l;
-  if (l === e) {
-    let e = r ? await G3(s, o) : null;
-    u = e === n ? e : null;
-  }
-  if (u == null)
-    return {
-      previousBranch: null,
-      error: {
-        message: `Destination checkout is already using the handoff branch, and Codex could not switch it to a default branch`,
-      },
-    };
-  let d = await t4({ cwd: t, branch: u, stashUncommitted: !1 }, i, a);
-  return d.status === `error`
-    ? { previousBranch: null, error: { message: d.error, execOutput: d.execOutput } }
-    : { previousBranch: c, error: null };
-}
-async function G3(e, t) {
-  try {
-    let n = await e2(e, t),
-      [r, i] = await Promise.all([
-        q4(e, t),
-        $(e.root, [`status`, `--porcelain=v1`, `--untracked-files=normal`], e.host, {
-          configOverrides: n,
-          signal: t,
-        }),
-      ]);
-    return i.success && i.stdout.length === 0 ? r : null;
-  } catch {
-    return null;
   }
 }
 async function Y3(e, t, n) {
