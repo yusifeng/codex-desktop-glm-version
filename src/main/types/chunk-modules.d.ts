@@ -86,7 +86,7 @@ declare module "@chunk/shared" {
   export { sanitizedProcessEnv as Bi } from "../../shared/wsl-paths";
   export { VISUALIZE_PLUGIN_NAME as Bl } from "../../shared/app-constants";
   export { Bn } from "../../shared/runtime-state";
-  export const Br: any; // 内部符号: oB
+  export { setMigrationOwner as Br } from "../../shared/automation-registry";
   export { HEADER_ATTACH_AUTH as Bs } from "../../shared/http-headers";
   export { agentInstructionsForThread as Bt } from "../../shared/agent-instructions";
   export { normalizeAppVersion as Bu } from "../../shared/app-server-version";
@@ -101,7 +101,7 @@ declare module "@chunk/shared" {
   export { joinPath as Cl } from "../../shared/app-constants";
   export const Cn: any; // 内部符号: OX
   export const Co: any; // 内部符号: Mk
-  export const Cr: any; // 内部符号: cB
+  export { automationScopeParams as Cr } from "../../shared/automation-registry";
   export { isDurableHost as Cs } from "../../shared/host-config";
   export { readKeymapSync as Ct } from "../../shared/command-registry";
   export const Cu: any; // 内部符号: Xy
@@ -113,7 +113,7 @@ declare module "@chunk/shared" {
   export { appServerFileSystem as Di } from "../../shared/wsl-paths";
   export { toPosixPath as Dl } from "../../shared/app-constants";
   export const Dn: any; // 内部符号: oX
-  export const Dr: any; // 内部符号: mB
+  export { hasMigrationConflicts as Dr } from "../../shared/automation-registry";
   export const Ds: any; // 内部符号: jT
   export { WEBVIEW_THREAD_COMMANDS as Dt } from "../../shared/command-registry";
   export const Du: any; // 内部符号: Py
@@ -125,7 +125,7 @@ declare module "@chunk/shared" {
   export { stripDriveLetterSlash as El } from "../../shared/app-constants";
   export { primaryRuntimeDiagnostics as En } from "../../shared/mcp-runtime";
   export const Eo: any; // 内部符号: PO
-  export const Er: any; // 内部符号: kB
+  export { computeNextRunAtFromRrule as Er } from "../../shared/automation-registry";
   export { isRemoteHostConfig as Es } from "../../shared/host-config";
   export { WEBVIEW_FOCUS_TAB_COMMANDS as Et } from "../../shared/command-registry";
   export const Eu: any; // 内部符号: Jy
@@ -137,7 +137,7 @@ declare module "@chunk/shared" {
   export { COMPUTER_USE_PLUGIN_NAME as Fl } from "../../shared/app-constants";
   export const Fn: any; // 内部符号: xY
   export const Fo: any; // 内部符号: HD
-  export const Fr: any; // 内部符号: CB
+  export { adoptMigratedAutomation as Fr } from "../../shared/automation-registry";
   export const Fs: any; // 内部符号: bT
   export { COMMAND_DEFINITIONS as Ft } from "../../shared/command-registry";
   export { parseElementName as Fu } from "../../shared/browser-context";
@@ -207,7 +207,7 @@ declare module "@chunk/shared" {
   export { BUNDLED_PLUGIN_DESCRIPTORS as Ll } from "../../shared/app-constants";
   export { resolveNodePath as Ln } from "../../shared/mcp-runtime";
   export const Lo: any; // 内部符号: RD
-  export const Lr: any; // 内部符号: fB
+  export { pruneNonCloudAutomations as Lr } from "../../shared/automation-registry";
   export const Ls: any; // 内部符号: iT
   export { resolveRealpaths as Lt } from "../../shared/realpath";
   export { parseBrowserContextKind as Lu } from "../../shared/browser-context";
@@ -220,7 +220,7 @@ declare module "@chunk/shared" {
   export { CHROME_PLUGIN_NAME as Ml } from "../../shared/app-constants";
   export { resolveNodeModuleDirs as Mn } from "../../shared/mcp-runtime";
   export const Mo: any; // 内部符号: nO
-  export const Mr: any; // 内部符号: pB
+  export { collectPendingMigrations as Mr } from "../../shared/automation-registry";
   export const Ms: any; // 内部符号: xT
   export { menuTitleForCommand as Mt } from "../../shared/command-registry";
   export const Mu: any; // 内部符号: zy
@@ -233,7 +233,7 @@ declare module "@chunk/shared" {
   export { CODEX_APP_TOOLS_PLUGIN_NAME as Nl } from "../../shared/app-constants";
   export { resolveWindowsComputerUseHelperPath as Nn } from "../../shared/mcp-runtime";
   export const No: any; // 内部符号: JD
-  export const Nr: any; // 内部符号: SB
+  export { getArchivedHeartbeatIds as Nr } from "../../shared/automation-registry";
   export { normalizeProjectPath as Ns } from "../../shared/host-config";
   export { commandAvailableForAccess as Nt } from "../../shared/command-registry";
   export const Nu: any; // 内部符号: Cy
@@ -244,7 +244,7 @@ declare module "@chunk/shared" {
   export { resolveCodexHome as Oi } from "../../shared/wsl-paths";
   export { stripDrivePrefix as Ol } from "../../shared/app-constants";
   export { resolveRuntimeInstallRoot as On } from "../../shared/mcp-runtime";
-  export const Or: any; // 内部符号: uB
+  export { isMigratedAutomation as Or } from "../../shared/automation-registry";
   export { isSshHostConfig as Os } from "../../shared/host-config";
   export { findCommandDefinition as Ot } from "../../shared/command-registry";
   export const Ou: any; // 内部符号: Yy
@@ -256,7 +256,7 @@ declare module "@chunk/shared" {
   export { COMPUTER_HISTORY_PLUGIN_NAME as Pl } from "../../shared/app-constants";
   export { resolveWindowsComputerUseHelperTransportModulePath as Pn } from "../../shared/mcp-runtime";
   export const Po: any; // 内部符号: GD
-  export const Pr: any; // 内部符号: KB
+  export { recordAutomationRunStart as Pr } from "../../shared/automation-registry";
   export const Ps: any; // 内部符号: ST
   export { isMouseAccelerator as Pt } from "../../shared/command-registry";
   export { parseElementMetadata as Pu } from "../../shared/browser-context";
@@ -289,7 +289,7 @@ declare module "@chunk/shared" {
   export { joinHostPath as Sl } from "../../shared/app-constants";
   export { resolveInstalledRuntime as Sn } from "../../shared/mcp-runtime";
   export const So: any; // 内部符号: kk
-  export const Sr: any; // 内部符号: dB
+  export { getLocalIdentity as Sr } from "../../shared/automation-registry";
   export const Ss: any; // 内部符号: AT
   export { readKeymap as St } from "../../shared/command-registry";
   export const Su: any; // 内部符号: Uy
@@ -301,7 +301,7 @@ declare module "@chunk/shared" {
   export { toForwardSlashes as Tl } from "../../shared/app-constants";
   export const Tn: any; // 内部符号: kX
   export const To: any; // 内部符号: WO
-  export const Tr: any; // 内部符号: AB
+  export { computeAutomationNextRun as Tr } from "../../shared/automation-registry";
   export const Ts: any; // 内部符号: PT
   export { updateKeymapBinding as Tt } from "../../shared/command-registry";
   export const Tu: any; // 内部符号: Ry
@@ -326,7 +326,7 @@ declare module "@chunk/shared" {
   export { windowsToWslPath as Vi } from "../../shared/wsl-paths";
   export { DEFAULT_MARKETPLACE_NAME as Vl } from "../../shared/app-constants";
   export { recordExecutableResolution as Vn } from "../../shared/mcp-runtime";
-  export const Vr: any; // 内部符号: HB
+  export { updateCanonicalRecord as Vr } from "../../shared/automation-registry";
   export { HEADER_DESKTOP_SURFACE as Vs } from "../../shared/http-headers";
   export { collectScheduledTemplates as Vt } from "../../shared/agent-instructions";
   export { buildMsixPackageIdentity as Vu } from "../../shared/app-server-version";
@@ -381,7 +381,7 @@ declare module "@chunk/shared" {
   export { stripWindowsExtendedPrefix as _l } from "../../shared/app-constants";
   export { WebSocket as _n } from "../../shared/mcp-2-runtime";
   export const _o: any; // 内部符号: Hk
-  export const _r: any; // 内部符号: WB
+  export { pruneAutomationRegistry as _r } from "../../shared/automation-registry";
   export { DURABLE_HOST_ID as _s } from "../../shared/host-config";
   export { listCustomAvatars as _t } from "../../shared/pet-spritesheet";
   export const _u: any; // 内部符号: Gy
@@ -407,7 +407,7 @@ declare module "@chunk/shared" {
   export { isWindowsPath as bl } from "../../shared/app-constants";
   export const bn: any; // 内部符号: pX
   export const bo: any; // 内部符号: Vk
-  export const br: any; // 内部符号: UB
+  export { removeLocalAutomation as br } from "../../shared/automation-registry";
   export { hostIdOfEnvId as bs } from "../../shared/host-config";
   export { firstAcceleratorSync as bt } from "../../shared/command-registry";
   export { POPUP_WINDOW_SIZE as bu } from "../../shared/app-constants";
@@ -518,7 +518,7 @@ declare module "@chunk/shared" {
   export { BROWSER_PLUGIN_NAME as kl } from "../../shared/unlocated-runtime";
   export const kn: any; // 内部符号: EX
   export const ko: any; // 内部符号: xO
-  export const kr: any; // 内部符号: jB
+  export { isSingleRrule as kr } from "../../shared/automation-registry";
   export const ks: any; // 内部符号: MT
   export { firstAcceleratorForCommand as kt } from "../../shared/command-registry";
   export const ku: any; // 内部符号: By
@@ -650,7 +650,7 @@ declare module "@chunk/shared" {
   export { isPosixAbsolutePath as vl } from "../../shared/app-constants";
   export const vn: any; // 内部符号: ZY
   export const vo: any; // 内部符号: Rk
-  export const vr: any; // 内部符号: xB
+  export { cacheCloudAutomation as vr } from "../../shared/automation-registry";
   export const vs: any; // 内部符号: TT
   export { validatePetSpritesheet as vt } from "../../shared/pet-spritesheet";
   export const vu: any; // 内部符号: Vy
@@ -675,7 +675,7 @@ declare module "@chunk/shared" {
   export { isUncPath as xl } from "../../shared/app-constants";
   export const xn: any; // 内部符号: CX
   export const xo: any; // 内部符号: Fk
-  export const xr: any; // 内部符号: RB
+  export { getCanonicalAutomation as xr } from "../../shared/automation-registry";
   export const xs: any; // 内部符号: kT
   export { acceleratorsForCommandSync as xt } from "../../shared/command-registry";
   export const xu: any; // 内部符号: Zy
@@ -688,7 +688,7 @@ declare module "@chunk/shared" {
   export { isNotNetworkUncPath as yl } from "../../shared/app-constants";
   export const yn: any; // 内部符号: XY
   export const yo: any; // 内部符号: Bk
-  export const yr: any; // 内部符号: VB
+  export { createLocalAutomation as yr } from "../../shared/automation-registry";
   export const ys: any; // 内部符号: DT
   export const yt: any; // 内部符号: C8
   export const yu: any; // 内部符号: Hy
@@ -700,7 +700,7 @@ declare module "@chunk/shared" {
   export { shouldUseWslPaths as zi } from "../../shared/wsl-paths";
   export { USER_WRITING_PLUGIN_NAME as zl } from "../../shared/app-constants";
   export { resolveRipgrepPath as zn } from "../../shared/mcp-runtime";
-  export const zr: any; // 内部符号: qB
+  export { updateAutomationNextRunAt as zr } from "../../shared/automation-registry";
   export const zs: any; // 内部符号: sT
   export { withHeartbeatInstructions as zt } from "../../shared/agent-instructions";
   export { parseAppVersionAsDate as zu } from "../../shared/app-server-version";
