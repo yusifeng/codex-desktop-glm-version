@@ -13,6 +13,7 @@ const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHand
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
 const { restoreHandoffBranchAndStash, restoreHandoffSource, rollbackHostHandoffWorktree } = require("./worker/git-handoff-rollback");
 const { prepareHandoffDestinationCheckout, resolveCleanWorktreeCommit } = require("./worker/git-handoff-destination");
+const { findHandoffSharedBase, hasHandoffCommit, resolveHandoffRepositoryMetadata } = require("./worker/git-handoff-shared-base");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -59,6 +60,16 @@ const handoffDestinationDeps = {
   getCurrentBranch: w0,
   getDefaultRemoteBranch: k2,
   checkoutBranch: t4,
+};
+const handoffSharedBaseDeps = {
+  runGit: $,
+  getDefaultRemoteBranch: k2,
+  getMergeBase: X2,
+  getRemotes: j0,
+  logger: {
+    debug: (message, detail) => CW().debug(message, detail),
+    warning: (message, detail) => CW().warning(message, detail),
+  },
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73170,7 +73181,10 @@ async function Pve(
       message: `Destination worktree roots must be provided together`,
     });
   let o = crypto.randomUUID(),
-    [s, c] = await Promise.all([Y3(t, e.sourceCwd, n), Y3(t, e.destinationWorkspaceRoot, r)]);
+    [s, c] = await Promise.all([
+      resolveHandoffRepositoryMetadata(t, e.sourceCwd, n),
+      resolveHandoffRepositoryMetadata(t, e.destinationWorkspaceRoot, r),
+    ]);
   if (s == null)
     return X({
       status: `error`,
@@ -73243,21 +73257,24 @@ async function Pve(
       n.createDirectory(l, { recursive: !0 }),
       r.createDirectory(u, { recursive: !0 }),
     ]);
-    let te = await X3(c.root, k, r, i);
+    let te = await hasHandoffCommit(c.root, k, r, i, handoffSharedBaseDeps);
     if (te) {
       let e = await $(c.root, [`update-ref`, _, k], r, { signal: i });
       if (!e.success)
         return Q3(`bundle-import-failed`, `Failed to prepare destination handoff ref`, e);
     } else {
-      let e = await Rve({
-        gitManager: t,
-        sourceGitRoot: s.root,
-        destinationGitRoot: c.root,
-        headSha: d,
-        sourceHost: n,
-        destinationHost: r,
-        signal: i,
-      });
+      let e = await findHandoffSharedBase(
+        {
+          gitManager: t,
+          sourceGitRoot: s.root,
+          destinationGitRoot: c.root,
+          headSha: d,
+          sourceHost: n,
+          destinationHost: r,
+          signal: i,
+        },
+        handoffSharedBaseDeps,
+      );
       if (e == null)
         return X({
           status: `error`,
@@ -73463,113 +73480,6 @@ async function Pve(
         y ? r.remove(m, { recursive: !1, force: !0 }) : r.remove(u, { recursive: !0, force: !0 }),
       ]));
   }
-}
-async function Y3(e, t, n) {
-  try {
-    return await e.getStableMetadata(t, n);
-  } catch (r) {
-    if (n.isLocal || !(r instanceof Error) || !r.message.startsWith(`Failed to resolve git root:`))
-      throw r;
-    return e.getStableMetadata(t, n);
-  }
-}
-async function X3(e, t, n, r) {
-  let i = await $(e, [`cat-file`, `-e`, `${t}^{commit}`], n, {
-    allowedNonZeroExitCodes: [1, 128],
-    env: { GIT_NO_LAZY_FETCH: `1` },
-    signal: r,
-  });
-  return i.success && i.code === 0;
-}
-async function Rve({
-  gitManager: e,
-  sourceGitRoot: t,
-  destinationGitRoot: n,
-  headSha: r,
-  sourceHost: i,
-  destinationHost: a,
-  signal: o,
-}) {
-  let s = e.getWorktreeRepositoryForRoot(t, i),
-    c = e.getWorktreeRepositoryForRoot(n, a),
-    l = await X3(n, r, a, o);
-  if (
-    (CW().debug(`[host-handoff] destination-head-check`, {
-      safe: { destinationHasHead: l },
-      sensitive: {},
-    }),
-    l)
-  )
-    return r;
-  let u = await k2(s);
-  if (
-    (CW().debug(`[host-handoff] source-default-branch`, {
-      safe: { found: u != null },
-      sensitive: u ?? {},
-    }),
-    u == null)
-  )
-    return null;
-  let d = await X2(s, `${u.remote}/${u.branch}`);
-  if (
-    (CW().debug(`[host-handoff] source-merge-base`, {
-      safe: { found: d != null },
-      sensitive: d == null ? {} : { mergeBaseSha: d },
-    }),
-    d == null)
-  )
-    return null;
-  let f = await X3(n, d, a, o);
-  if (
-    (CW().debug(`[host-handoff] destination-merge-base-check`, {
-      safe: { destinationHasMergeBase: f },
-      sensitive: {},
-    }),
-    f)
-  )
-    return d;
-  let p = await k2(c),
-    m = p == null ? (await j0(c)).map((e) => ({ remote: e, branch: u.branch })) : [p];
-  CW().debug(`[host-handoff] destination-fetch-targets`, {
-    safe: { count: m.length, usedDestinationDefaultBranch: p != null },
-    sensitive: {
-      sourceDefaultRemoteAndBranch: u,
-      destinationDefaultRemoteAndBranch: p,
-      fetchTargets: m,
-    },
-  });
-  for (let e of m) {
-    let t = await $(n, [`fetch`, e.remote, e.branch], a, { signal: o });
-    if (
-      (CW().debug(`[host-handoff] destination-fetch-result`, {
-        safe: { success: t.success },
-        sensitive: { fetchTarget: e, stderr: t.stderr },
-      }),
-      !t.success)
-    )
-      continue;
-    let r = await X3(n, d, a, o);
-    if (
-      (CW().debug(`[host-handoff] destination-fetch-base-check`, {
-        safe: { hasFetchedBase: r },
-        sensitive: { fetchTarget: e },
-      }),
-      r)
-    )
-      return d;
-  }
-  return (
-    CW().warning(`[host-handoff] shared-base-not-found`, {
-      safe: { fetchTargetCount: m.length },
-      sensitive: {
-        sourceDefaultRemoteAndBranch: u,
-        destinationDefaultRemoteAndBranch: p,
-        mergeBaseSha: d,
-        fetchTargets: m,
-      },
-    }),
-    null
-  );
 }
 function Q3(e, t, n) {
   return X({

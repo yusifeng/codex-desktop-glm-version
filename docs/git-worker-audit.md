@@ -163,6 +163,11 @@ Host handoff destination checkout 的干净 commit 解析、默认分支选择�
 `src/main/worker/git-handoff-destination.ts`；原 `Lve/G3` 实现和调用名已删除。19 项断言覆盖
 status 异常降级、已切离 handoff branch、默认分支 checkout、同分支 detach 和 checkout 错误映射。
 
+Host handoff 的 repository metadata 重试、commit 存在性检查与 shared-base fetch fallback
+已迁移至 `src/main/worker/git-handoff-shared-base.ts`；原 `Y3/X3/Rve` 实现和调用名已删除。
+27 项断言覆盖本地错误不重试、远程 git-root 错误单次重试、禁用 lazy fetch 的 commit 检查、
+destination head/merge-base 快路径、默认分支 fetch、多 remote fallback 与最终 warning。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
