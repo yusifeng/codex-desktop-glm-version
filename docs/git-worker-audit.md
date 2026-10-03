@@ -75,6 +75,12 @@ repository unavailable、stale snapshot 与 generic-error fallback 语义，由
 refresh root 显式交回入口；入口后续仍按原 finally 顺序清理 metadata/untracked cache 并刷新
 live query。`scripts/test-worker-git-synced-branch-request-handlers.mjs` 由 11 项断言覆盖。
 
+repository/file read 请求（`repository-identity`、`commit-message-diff`、`submodule-paths`、
+`cat-file`、`blame-file`、`index-info`、`config-value`）已迁移至
+`src/main/worker/git-repository-read-request-handlers.ts`。模块保留 repository unavailable、
+指定 review snapshot 失效时的逐请求 unknown error、abort wrapper 与精确参数收窄；turn-diff
+capture 因依赖 watcher readiness 回调仍保留在入口。对应回归脚本由 15 项断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

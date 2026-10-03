@@ -9,6 +9,7 @@ const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
+const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
@@ -77572,6 +77573,19 @@ var I6 = kW(`git`),
           getSyncedBranchState: rye,
           overwriteRepository: Uve,
         },
+        repositoryReadRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          runAbortable: yR,
+          getRepositoryIdentity: P3,
+          getCommitMessageDiff: X_e,
+          getSubmodulePaths: gve,
+          getReviewSnapshot: R6,
+          catFile: Sve,
+          blameFile: whe,
+          getIndexInfo: eve,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77911,8 +77925,7 @@ var I6 = kW(`git`),
             p = X(await Rhe(e.params, this.gitManager, o));
             break;
           case `repository-identity`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            p = X(t == null ? null : await P3(t, { signal: i.signal }));
+            p = X(await resolveRepositoryIdentity(e.params.cwd, repositoryReadRequestDeps));
             break;
           }
           case `turn-diff-capture-start`:
@@ -77944,52 +77957,24 @@ var I6 = kW(`git`),
             );
             break;
           case `commit-message-diff`:
-            p = X(
-              await yR(X_e(e.params.cwd, e.params.includeUnstaged, this.gitManager, o), i.signal),
-            );
+            p = X(await resolveCommitMessageDiff(e.params, repositoryReadRequestDeps));
             break;
           case `submodule-paths`:
-            p = X({
-              paths: await gve(
-                this.gitManager.getWorktreeRepositoryForRoot(e.params.root, o),
-                i.signal,
-              ),
-            });
+            p = X(await resolveSubmodulePaths(e.params.root, repositoryReadRequestDeps));
             break;
           case `cat-file`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o),
-              n = e.params.snapshotGeneration == null ? void 0 : R6(t, e.params.snapshotGeneration);
-            p = X(
-              t == null || (e.params.snapshotGeneration != null && n == null)
-                ? e.params.requests.map(() => ({ type: `error`, error: { type: `unknown` } }))
-                : await Sve(
-                    t,
-                    {
-                      maxObjectBytes: e.params.maxObjectBytes,
-                      requests: e.params.requests,
-                      reviewSnapshot: n,
-                    },
-                    i.signal,
-                  ),
-            );
+            p = X(await resolveCatFile(e.params, repositoryReadRequestDeps));
             break;
           }
           case `blame-file`:
-            p = X(
-              await whe(this.gitManager, { cwd: e.params.cwd, path: e.params.path }, o, i.signal),
-            );
+            p = X(await resolveBlameFile(e.params, repositoryReadRequestDeps));
             break;
           case `index-info`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            p = X(t == null ? { lastModified: 0 } : await eve(t, i.signal));
+            p = X(await resolveIndexInfo(e.params.cwd, repositoryReadRequestDeps));
             break;
           }
           case `config-value`:
-            p = X({
-              value: await this.gitManager
-                .getWorktreeRepositoryForRoot(e.params.root, o)
-                .getConfigValueForScope(e.params.key, e.params.scope, i.signal),
-            });
+            p = X(await resolveConfigValue(e.params.root, e.params.key, e.params.scope, repositoryReadRequestDeps));
             break;
           case `git-origins`: {
             let t = Date.now(),
