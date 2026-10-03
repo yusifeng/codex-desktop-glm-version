@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url);
 const {
   buildGitHostCacheKey,
   classifyProcessExecutable,
+  classifyGitHubOperation,
   createGitCommandStats,
   exitCodeBucket,
   isGitMutationRequest,
@@ -38,5 +39,13 @@ assert.equal(classifyProcessExecutable("ssh"), "ssh");
 assert.equal(classifyProcessExecutable("node"), "node");
 assert.equal(classifyProcessExecutable("unknown-tool"), "other");
 assert.equal(classifyProcessExecutable("/usr/bin/wsl.exe"), "wsl");
+assert.equal(classifyGitHubOperation(["gh", "pr", "view"], "gh"), "pr.view");
+assert.equal(classifyGitHubOperation(["gh", "api", "graphql"], "gh"), "api.graphql");
+assert.equal(classifyGitHubOperation(["gh", "api", "repos"], "gh"), "api.rest");
+assert.equal(classifyGitHubOperation(["gh", "version"], "gh"), "version");
+assert.equal(classifyGitHubOperation(["gh", "unknown", "thing"], "gh"), "other");
+assert.equal(classifyGitHubOperation(["sh", "-lc", "gh pr checks"], "shell"), "pr.checks");
+assert.equal(classifyGitHubOperation(["sh", "-c", "echo gh pr view"], "shell"), undefined);
+assert.equal(classifyGitHubOperation(["git", "status"], "git"), undefined);
 
-console.log("20 worker git observability assertions passed");
+console.log("28 worker git observability assertions passed");

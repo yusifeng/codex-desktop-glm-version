@@ -5,6 +5,10 @@ const operationSources = new Set([
 const mutatingRequestKinds = new Set([
   `checkout-branch`, `create-branch`, `git-checkout-branch`, `git-create-branch`, `git-init-repo`,
 ]);
+const gitHubOperations = new Set([
+  `auth.status`, `auth.token`, `pr.checks`, `pr.close`, `pr.comment`, `pr.create`, `pr.diff`,
+  `pr.edit`, `pr.list`, `pr.merge`, `pr.ready`, `pr.reopen`, `pr.review`, `pr.view`,
+]);
 
 function createGitCommandStats(concurrentOperationCount: number) {
   return {
@@ -77,5 +81,21 @@ function classifyProcessExecutable(command: string | null | undefined): string {
   }
 }
 
-export { buildGitHostCacheKey, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
-if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+/** Maps GitHub CLI arguments to the bounded process.operation telemetry values. */
+function classifyGitHubOperation(args: string[], processKind: string): string | undefined {
+  let command: string | undefined;
+  let subcommand: string | undefined;
+  if (processKind === `gh`) [command, subcommand] = args.slice(1, 3);
+  else if (processKind === `shell` && (args[1] === `-c` || args[1] === `-lc`)) {
+    const match = /^gh(?:\s+([a-z-]+))?(?:\s+([a-z-]+))?(?:\s|$)/u.exec(args[2] ?? ``);
+    if (match == null) return undefined;
+    [, command, subcommand] = match;
+  } else return undefined;
+  if (command === `--version` || command === `version`) return `version`;
+  if (command === `api`) return subcommand === `graphql` ? `api.graphql` : `api.rest`;
+  const operation = `${command}.${subcommand}`;
+  return gitHubOperations.has(operation) ? operation : `other`;
+}
+
+export { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
