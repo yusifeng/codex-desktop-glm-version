@@ -5,7 +5,8 @@
 > **本阶段把验收标准从「消费面语义化」升级为「完全反编译」**：仓库里不再
 > 存在未分类的压缩业务代码，且工程本身达到「新人可读、可导航、可一键
 > 验证」的状态。本文做完，整个项目即为真正的完全反编译。
-> 双轨构建、批次流程、坑纪律沿用旧版（git 历史可查），并发上限 5 subagent。
+> 双轨构建、批次流程、坑纪律沿用旧版（git 历史可查），并发上限 6 subagent
+> （实际执行仍受当前运行环境并发槽限制）。
 > 所有路径相对 `/Users/david/Workspace/ppio_github/codex-desktop-glm-version`。
 
 ## 当前进度快照（2026-10-04）
@@ -84,6 +85,9 @@ helper 已删除，由 37 项断言覆盖。
 Branch diff stats 的 repository operation marker 防护、comparison/status/untracked metadata 汇总、
 rename stats 修正与 omission 结果已迁移至 `src/main/worker/git-review-branch-stats.ts`；原四个
 helper 与 marker 常量已删除，由 33 项断言覆盖。
+Review metadata diff 的 cached raw/numstat query、tracked path 选择、whitespace 过滤和 staged
+rename 推断/重组已迁移至 `src/main/worker/git-review-metadata-diff.ts`；原五个 helper 与 512-path
+常量已删除，由 42 项断言覆盖。
 synced branch/state 与 overwrite repository 编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`，由 11 项行为断言覆盖；overwrite
 成功后的 metadata/live-query refresh root 仍显式交回入口，cache/watch 生命周期未混入该模块。
@@ -259,8 +263,8 @@ tooltip 与 region 去重非 React runtime 已迁移至
 
 | # | 位置 | 体量 | 现状 | 问题 |
 |---|---|---|---|---|
-| A1 | `.reference/originals/main/worker.ts`（git-worker） | **90,836 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
-| A2 | `.reference/originals/main/browser-page-preload.ts` | **30,217 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP | annotation/design runtime 等业务区段仍待迁移 |
+| A1 | `.reference/originals/main/worker.ts`（git-worker） | **85,858 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
+| A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP | annotation/design runtime 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
 | A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计与消费契约审计 | `docs/app-shared-internal-audit.md`、`docs/renderer-classification.md` 明确 semantic 边界与 preserved asset 家族；仍有未消费业务逻辑待物理迁出 |
@@ -272,7 +276,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 643 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 644 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -281,7 +285,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 
 ### T1 · git-worker 逐段审计与业务语义化（A1，最大件）★
 
-1. **审计先行**：对 `src/main/worker.ts` 做逐段扫描，产出
+1. **审计先行**：对 `.reference/originals/main/worker.ts` 做逐段扫描，产出
    `docs/git-worker-audit.md`：每一段标注 `business`（git 操作 RPC 面、
    session/生命周期、协议处理）或 `vendored`（libgit 绑定、HTTP/stream
    库、node 依赖），附行号区间与判定证据（包名/版本号/UA 特征）。
@@ -347,17 +351,14 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
 1. **tsconfig 瘦身（已完成）**：`"exclude": ["src/webview/assets"]` 已生效
    （transform-only 不参与类型检查），typecheck 基线保持 0；后续若出现新错误，
    说明有语义源码偷偷依赖了原版类型——修复依赖而不是恢复 include。
-2. **原版对照迁出**：把 `src/main/src-DldfpmrL.ts`、`main-C-Mhak1n.ts`、
-   `worker.ts`、`browser-page-preload.ts`、`core-*.ts`、`dist-*.ts`、
-   `src-BSoROW9v.ts`、`src-C9YLnbgY.ts` 迁至 `.reference/originals/`
-   （或加 tsconfig exclude + 构建脚本同步改路径）。verify 脚本对照
-   `../chatgpt-desktop-src` 的逻辑不受影响。**迁移后 build/verify 全套
-   必须复跑确认。**
+2. **原版对照迁出（已完成）**：10 个主进程原始 chunk 已迁至
+   `.reference/originals/main/`，构建脚本按历史输出文件名重新编译；后续修改映射时必须复跑
+   build/verify 全套，且 `../chatgpt-desktop-src` 对照逻辑不得受影响。
 3. **README 重写**：反映真实状态（11+1874 REWRITTEN、双轨机制、
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 643 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 644 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5）

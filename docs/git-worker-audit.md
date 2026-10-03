@@ -116,6 +116,11 @@ rename stats 修正与 omission 结果已迁移至 `src/main/worker/git-review-b
 `f_e`/`p_e`/`o3`/`h_e` 与 marker 常量已删除。33 项断言覆盖 conservative busy 判定、
 依赖失败短路、untracked omission、rename reconciliation 与聚合结果。
 
+Review metadata diff 的 cached raw/numstat query、tracked path 选择、whitespace 过滤和 staged
+rename 推断/重组已迁移至 `src/main/worker/git-review-metadata-diff.ts`；原
+`y_e`/`d3`/`f3`/`p3`/`m3` 与 512-path 常量已删除。42 项断言覆盖 query key/options、
+source/path 矩阵、路径上限回退、raw entry 可见性、blob diff 失败与 rename metadata 修复。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的
