@@ -69,6 +69,12 @@ branch commits 与 review commit line counts，原约 77,560-78,050）已迁移�
 repository unavailable、stale snapshot 与 generic-error fallback 语义，由
 `scripts/test-worker-git-review-request-handlers.mjs` 的 15 项断言覆盖。
 
+`synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
+`src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
+默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的
+refresh root 显式交回入口；入口后续仍按原 finally 顺序清理 metadata/untracked cache 并刷新
+live query。`scripts/test-worker-git-synced-branch-request-handlers.mjs` 由 11 项断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

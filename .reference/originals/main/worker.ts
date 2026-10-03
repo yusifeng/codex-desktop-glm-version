@@ -10,6 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
+const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
@@ -77563,6 +77564,14 @@ var I6 = kW(`git`),
           searchReview: ove,
           getReviewPatch: k3,
         },
+        syncedBranchRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          getSyncedBranch: Zve,
+          getSyncedBranchState: rye,
+          overwriteRepository: Uve,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77755,24 +77764,15 @@ var I6 = kW(`git`),
             break;
           }
           case `synced-branch`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            p = X(
-              t == null ? { branch: null, base: null, hasConflicts: !1 } : await Zve(t, i.signal),
-            );
+            p = X(await resolveSyncedBranch(e.params.cwd, syncedBranchRequestDeps));
             break;
           }
           case `synced-branch-state`:
-            p = X(await rye(e.params.cwd, this.gitManager, o, i.signal));
+            p = X(await resolveSyncedBranchState(e.params.cwd, syncedBranchRequestDeps));
             break;
           case `overwrite-repo`: {
-            let t = await Uve({
-              ...e.params,
-              gitManager: this.gitManager,
-              host: o,
-              signal: i.signal,
-            });
-            (t.status !== `command-error` && (d = e.params.targetRoot ?? e.params.gitRoot),
-              (p = X(t)));
+            let t = await overwriteSyncedBranchRepository(e.params, syncedBranchRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `invalidate-stable-metadata`:

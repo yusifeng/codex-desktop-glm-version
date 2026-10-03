@@ -54,8 +54,11 @@ remote branch 与 merge-base 只读请求已迁移至 `src/main/worker/git-read-
 line counts，由 21 项行为断言覆盖；其余 Git request cases 和 dispatcher 生命周期仍在入口。
 status summary、branch diff stats、review summary/source line counts/diff/search/patch 已迁移至
 `src/main/worker/git-review-request-handlers.ts`，由 15 项行为断言覆盖正常、repository
-unavailable、stale snapshot 与 fallback 路径；synced branch、repository identity、file reads
-等其余 Git request cases 和 dispatcher 生命周期仍在入口。
+unavailable、stale snapshot 与 fallback 路径；repository identity、file reads 等其余
+Git request cases 和 dispatcher 生命周期仍在入口。
+synced branch/state 与 overwrite repository 编排已迁移至
+`src/main/worker/git-synced-branch-request-handlers.ts`，由 11 项行为断言覆盖；overwrite
+成功后的 metadata/live-query refresh root 仍显式交回入口，cache/watch 生命周期未混入该模块。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
