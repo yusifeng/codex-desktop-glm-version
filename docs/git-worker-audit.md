@@ -106,6 +106,10 @@ checkpoint scope 串行队列和 start/complete 生命周期已迁移至
 `src/main/worker/git-turn-diff-capture.ts`；原 `uye/dye/fye/pye/mye/p6/m6/h6/hye/g6/gye/_6/v6`
 实现、共享 Map 与常量已删除。19 项断言覆盖错误分类、ref cleanup、start state 和 checkpoint retention。
 
+Automation writable roots 的 worktree/source repository 定位、common dir 解析，以及 index/`.git`
+fallback 已迁移至 `src/main/worker/git-automation-writable-roots.ts`；原 `_ye` 已删除。9 项断言覆盖
+absolute/relative common dir、重复 root 抑制和 repository 缺失边界。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步

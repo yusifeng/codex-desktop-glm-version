@@ -6,6 +6,7 @@ let t = require("node:worker_threads"),
   i = require("path");
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
+const { resolveAutomationWritableRoots } = require("./worker/git-automation-writable-roots");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
@@ -73290,23 +73291,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function _ye({ sourceCwd: e, worktreeCwd: t, gitManager: n, host: r }) {
-  let i = [],
-    a = await n.getWorktreeRepository(xz(t), r),
-    o = a?.root;
-  o && o !== t && i.push(o);
-  let s = await n.getWorktreeRepository(xz(e), r),
-    c = s?.root;
-  c && c !== t && c !== o && i.push(c);
-  let l = (await n.getRepoRepository(xz(a?.root ?? e), r))?.getCommonDir();
-  if (l) {
-    let t = g.default.isAbsolute(l) ? l : g.default.resolve(c ?? e, l);
-    return (i.push(t), i);
-  }
-  let u = a ?? s,
-    d = u == null ? null : await f0(u);
-  return (d ? i.push(g.default.dirname(d)) : c && i.push(g.default.join(c, `.git`)), i);
-}
 var y6 = 250,
   vye = 5e3,
   yye = class {
@@ -75769,7 +75753,14 @@ var I6 = kW(`git`),
             break;
           }
           case `automation-writable-roots`:
-            p = X({ roots: await _ye({ ...e.params, gitManager: this.gitManager, host: o }) });
+            p = X({
+              roots: await resolveAutomationWritableRoots(e.params, {
+                gitManager: this.gitManager,
+                host: o,
+                getIndexPath: f0,
+                path: g.default,
+              }),
+            });
             break;
           case `merge-base`: {
             p = X(await resolveMergeBase(e.params.cwd, e.params.baseBranch, readRequestDeps));

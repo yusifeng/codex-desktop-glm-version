@@ -1,0 +1,63 @@
+type AutomationWritableRootsDependencies = {
+  gitManager: any;
+  host: any;
+  getIndexPath: (repository: any) => Promise<string | null>;
+  path: {
+    isAbsolute: (value: string) => boolean;
+    resolve: (...parts: string[]) => string;
+    dirname: (value: string) => string;
+    join: (...parts: string[]) => string;
+  };
+};
+
+async function resolveAutomationWritableRoots(
+  params: any,
+  deps: AutomationWritableRootsDependencies,
+) {
+  const roots: string[] = [];
+  const worktreeRepository = await deps.gitManager.getWorktreeRepository(
+    params.worktreeCwd,
+    deps.host,
+  );
+  const worktreeRoot = worktreeRepository?.root;
+  if (worktreeRoot && worktreeRoot !== params.worktreeCwd)
+    roots.push(worktreeRoot);
+
+  const sourceRepository = await deps.gitManager.getWorktreeRepository(
+    params.sourceCwd,
+    deps.host,
+  );
+  const sourceRoot = sourceRepository?.root;
+  if (
+    sourceRoot &&
+    sourceRoot !== params.worktreeCwd &&
+    sourceRoot !== worktreeRoot
+  )
+    roots.push(sourceRoot);
+
+  const commonDir = (
+    await deps.gitManager.getRepoRepository(
+      worktreeRepository?.root ?? params.sourceCwd,
+      deps.host,
+    )
+  )?.getCommonDir();
+  if (commonDir) {
+    roots.push(
+      deps.path.isAbsolute(commonDir)
+        ? commonDir
+        : deps.path.resolve(sourceRoot ?? params.sourceCwd, commonDir),
+    );
+    return roots;
+  }
+
+  const repository = worktreeRepository ?? sourceRepository;
+  const indexPath =
+    repository == null ? null : await deps.getIndexPath(repository);
+  if (indexPath) roots.push(deps.path.dirname(indexPath));
+  else if (sourceRoot) roots.push(deps.path.join(sourceRoot, `.git`));
+  return roots;
+}
+
+export { resolveAutomationWritableRoots };
+if (typeof module !== `undefined`)
+  module.exports = { resolveAutomationWritableRoots };
