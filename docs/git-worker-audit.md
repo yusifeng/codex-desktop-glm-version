@@ -110,6 +110,11 @@ Automation writable roots 的 worktree/source repository 定位、common dir 解
 fallback 已迁移至 `src/main/worker/git-automation-writable-roots.ts`；原 `_ye` 已删除。9 项断言覆盖
 absolute/relative common dir、重复 root 抑制和 repository 缺失边界。
 
+Git live-query 的 trace sampled 优先级、最多四条 link 去重合并，以及 query method 对 repository
+change type 的刷新矩阵已迁移至 `src/main/worker/git-live-query-policy.ts`；原 `b6/x6/S6/Tye` 与
+link 上限常量已删除。其纯策略由 101 项矩阵与 trace 断言覆盖，manager 的 timer/abort/shared-run
+生命周期仍保留在入口。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步

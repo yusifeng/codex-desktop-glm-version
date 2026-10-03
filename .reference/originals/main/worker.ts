@@ -24,6 +24,7 @@ const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
+const { appendTraceLink, mergeLiveQueryTrace, shouldRefreshLiveQuery } = require("./worker/git-live-query-policy");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
 const { pushGitRepository } = require("./worker/git-push-request-handler");
@@ -73443,7 +73444,6 @@ var y6 = 250,
   bye = 100,
   xye = 1e3,
   Sye = 3,
-  Cye = 4,
   wye = class {
     dependencies;
     nextGeneration = 1;
@@ -73517,7 +73517,7 @@ var y6 = 250,
           t.host.id === e.hostId &&
           t.commonDir === e.commonDir &&
           t.root === e.root &&
-          Tye(t.query, e.changeType),
+          shouldRefreshLiveQuery(t.query, e.changeType),
       );
       return (t?.(n.length), this.refreshStates(n, `invalidation`, e.trace));
     }
@@ -73556,7 +73556,7 @@ var y6 = 250,
           (e.dirty = !0),
           (e.errorRetryCount = 0),
           (e.trigger = t),
-          x6(e, n));
+          mergeLiveQueryTrace(e, n));
         let r = new Promise((t) => e.refreshWaiters.push(t));
         return (this.scheduleRefresh(e), r);
       });
@@ -73599,8 +73599,8 @@ var y6 = 250,
               o && e.errorRetryCount < Sye
                 ? ((e.errorRetryCount += 1),
                   (e.dirty = !0),
-                  x6(e, i),
-                  a.forEach((t) => x6(e, t)),
+                  mergeLiveQueryTrace(e, i),
+                  a.forEach((t) => mergeLiveQueryTrace(e, t)),
                   (r = xye))
                 : o || (e.errorRetryCount = 0);
             }
@@ -73705,8 +73705,8 @@ var y6 = 250,
       if (n == null || (s.trace?.traceparent === n.traceparent && r.length === 0)) return l;
       let u = [];
       return (
-        s.trace != null && s.trace.traceparent !== n.traceparent && S6(u, s.trace),
-        r.forEach((e) => S6(u, e)),
+        s.trace != null && s.trace.traceparent !== n.traceparent && appendTraceLink(u, s.trace),
+        r.forEach((e) => appendTraceLink(u, e)),
         OH(
           {
             attributes: {
@@ -73739,133 +73739,6 @@ var y6 = 250,
       });
     }
   };
-function b6(e) {
-  let t = Number.parseInt(e.traceparent.slice(-2), 16);
-  return Number.isFinite(t) && t % 2 == 1;
-}
-function x6(e, t) {
-  t != null &&
-    e.trace?.traceparent !== t.traceparent &&
-    (e.trace == null
-      ? (e.trace = t)
-      : !b6(e.trace) && b6(t)
-        ? (S6(e.traceLinks, e.trace), (e.trace = t))
-        : S6(e.traceLinks, t));
-}
-function S6(e, t) {
-  e.length < Cye && !e.some((e) => e.traceparent === t.traceparent) && e.push(t);
-}
-function Tye(e, t) {
-  switch (e.method) {
-    case `status-summary`:
-      switch (t) {
-        case `config`:
-        case `head`:
-        case `index`:
-        case `working-tree`:
-          return !0;
-        case `remote-refs`:
-        case `local-refs`:
-        case `synced-branch`:
-        case `worktree-topology`:
-          return !1;
-      }
-    case `review-summary`:
-    case `branch-diff-stats`:
-      switch (t) {
-        case `config`:
-        case `head`:
-        case `index`:
-        case `remote-refs`:
-        case `working-tree`:
-          return !0;
-        case `synced-branch`:
-        case `local-refs`:
-        case `worktree-topology`:
-          return !1;
-      }
-    case `recent-branches`:
-      switch (t) {
-        case `config`:
-        case `head`:
-        case `local-refs`:
-        case `remote-refs`:
-          return !0;
-        case `index`:
-        case `synced-branch`:
-        case `worktree-topology`:
-        case `working-tree`:
-          return !1;
-      }
-    case `current-branch`:
-      switch (t) {
-        case `head`:
-          return !0;
-        case `config`:
-        case `index`:
-        case `local-refs`:
-        case `remote-refs`:
-        case `synced-branch`:
-        case `worktree-topology`:
-        case `working-tree`:
-          return !1;
-      }
-    case `upstream-branch`:
-      switch (t) {
-        case `config`:
-        case `head`:
-          return !0;
-        case `index`:
-        case `local-refs`:
-        case `remote-refs`:
-        case `synced-branch`:
-        case `worktree-topology`:
-        case `working-tree`:
-          return !1;
-      }
-    case `branch-ahead-count`:
-    case `branch-commits`:
-      switch (t) {
-        case `config`:
-        case `head`:
-        case `remote-refs`:
-          return !0;
-        case `index`:
-        case `local-refs`:
-        case `synced-branch`:
-        case `worktree-topology`:
-        case `working-tree`:
-          return !1;
-      }
-    case `default-branch`:
-    case `base-branch`:
-      switch (t) {
-        case `config`:
-        case `head`:
-        case `remote-refs`:
-          return !0;
-        case `index`:
-        case `local-refs`:
-        case `synced-branch`:
-        case `worktree-topology`:
-        case `working-tree`:
-          return !1;
-      }
-    case `list-worktrees`:
-      switch (t) {
-        case `head`:
-        case `worktree-topology`:
-          return !0;
-        case `config`:
-        case `index`:
-        case `local-refs`:
-        case `remote-refs`:
-        case `synced-branch`:
-        case `working-tree`:
-          return !1;
-      }
-  }
-}
 var C6 = 0.05,
   Eye = 7e3,
   Dye = 1e4,
