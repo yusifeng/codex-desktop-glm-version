@@ -10,6 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
+const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -35,6 +36,12 @@ const { describeShell } = require("./worker/shell-config");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
+const handoffBranchDeps = {
+  runGit: $,
+  formatBranchRef: F0,
+  formatExecOutput: mR,
+  isObjectId: M0,
+};
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
 const rG = orderEligibleDistros;
@@ -73130,64 +73137,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function H3({ branch: e, cwd: t, commitSha: n, host: r }) {
-  let i = await U3({ branch: e, cwd: t, commitSha: n, host: r });
-  if (i.status === `same-commit`) return null;
-  if (i.status === `different-commit`) return { message: i.message, execOutput: i.execOutput };
-  let a = await $(t, [`branch`, e, n], r);
-  if (a.success) return null;
-  let o = a.stderr || a.stdout || `Failed to create branch`;
-  return {
-    message: o,
-    execOutput: mR({ command: a.command, stdout: a.stdout, stderr: a.stderr, fallbackOutput: o }),
-  };
-}
-async function U3({ branch: e, cwd: t, commitSha: n, host: r }) {
-  let i = F0(e),
-    a = await $(t, [`show-ref`, `--verify`, i], r);
-  if (a.success && a.code === 0) {
-    let a = await $(t, [`rev-parse`, i], r);
-    if (a.success && a.stdout.trim() === n) return { status: `same-commit` };
-    let o = `Branch ${e} already exists at a different commit`;
-    return {
-      status: `different-commit`,
-      message: o,
-      execOutput: mR({ command: a.command, stdout: a.stdout, stderr: a.stderr, fallbackOutput: o }),
-    };
-  }
-  return { status: `missing` };
-}
-async function W3({ cwd: e, stashRef: t, mode: n = `apply` }, r) {
-  let i = e.trim();
-  if (!i) return { status: `error`, error: `No workspace available for stash apply` };
-  let a = t.trim();
-  if (!a) return { status: `error`, error: `Stash reference is required` };
-  let o = await $(i, [`stash`, n, await Nve(i, a, r)], r);
-  if (!o.success) {
-    let e = o.stderr || o.stdout || `Failed to apply stash`;
-    return {
-      status: `error`,
-      error: e,
-      execOutput: mR({ command: o.command, stdout: o.stdout, stderr: o.stderr, fallbackOutput: e }),
-    };
-  }
-  return { status: `success`, stashRef: a, mode: n };
-}
-async function Nve(e, t, n) {
-  if (!M0(t)) return t;
-  let r = await $(e, [`stash`, `list`, `--format=%H %gd`], n);
-  return !r.success || r.stdout.length === 0
-    ? t
-    : (r.stdout
-        .split(
-          `
-`,
-        )
-        .map((e) => e.trim())
-        .filter((e) => e.length > 0)
-        .map((e) => e.split(/\s+/, 2))
-        .find(([e]) => e === t)?.[1] ?? t);
-}
 async function Pve(
   e,
   { gitManager: t, sourceHost: n, destinationHost: r, signal: i, onProgress: a },
@@ -73245,7 +73194,10 @@ async function Pve(
     if (!o.success || !o.stdout.trim())
       return Q3(`snapshot-failed`, `Unable to resolve source HEAD commit`, o);
     let d = o.stdout.trim(),
-      f = await U3({ branch: e.sourceBranch, cwd: c.root, commitSha: d, host: r });
+      f = await inspectHandoffBranch(
+        { branch: e.sourceBranch, cwd: c.root, commitSha: d, host: r },
+        handoffBranchDeps,
+      );
     if (f.status === `different-commit` && !b)
       return X({
         status: `error`,
@@ -73397,8 +73349,14 @@ async function Pve(
       );
     E = re.previousBranch;
     let ie = b
-      ? await Ive({ branch: e.sourceBranch, cwd: x, commitSha: d, host: r })
-      : await H3({ branch: e.sourceBranch, cwd: x, commitSha: d, host: r });
+      ? await forceHandoffBranch(
+          { branch: e.sourceBranch, cwd: x, commitSha: d, host: r },
+          handoffBranchDeps,
+        )
+      : await ensureHandoffBranch(
+          { branch: e.sourceBranch, cwd: x, commitSha: d, host: r },
+          handoffBranchDeps,
+        );
     if (ie != null)
       return (
         await K3({
@@ -73441,7 +73399,7 @@ async function Pve(
         })
       );
     if (T != null) {
-      let e = await W3({ cwd: S, stashRef: T, mode: `drop` }, r);
+      let e = await applyHandoffStash({ cwd: S, stashRef: T, mode: `drop` }, r, handoffBranchDeps);
       e.status === `error` &&
         CW().warning(`[host-handoff] failed to drop reused worktree stash`, {
           safe: {},
@@ -73484,15 +73442,6 @@ async function Pve(
         y ? r.remove(m, { recursive: !1, force: !0 }) : r.remove(u, { recursive: !0, force: !0 }),
       ]));
   }
-}
-async function Ive({ branch: e, cwd: t, commitSha: n, host: r }) {
-  let i = await $(t, [`branch`, `-f`, e, n], r);
-  if (i.success) return null;
-  let a = i.stderr || i.stdout || `Failed to update destination branch`;
-  return {
-    message: a,
-    execOutput: mR({ command: i.command, stdout: i.stdout, stderr: i.stderr, fallbackOutput: a }),
-  };
 }
 async function Lve({
   branch: e,
@@ -73557,7 +73506,8 @@ async function K3({
     return;
   }
   (r != null && (await t4({ cwd: n, branch: r, stashUncommitted: !1 }, s, c)),
-    i != null && (await W3({ cwd: n, stashRef: i, mode: `pop` }, c)),
+    i != null &&
+      (await applyHandoffStash({ cwd: n, stashRef: i, mode: `pop` }, c, handoffBranchDeps)),
     await q3({ branch: o, cwd: a, gitManager: s, host: c }));
 }
 async function q3({ branch: e, cwd: t, gitManager: n, host: r }) {
@@ -73693,7 +73643,7 @@ async function $3({
     : ((await t4({ cwd: e, branch: t, stashUncommitted: !1 }, a, o)).status === `error` &&
         s.push(r),
       n != null &&
-        (await W3({ cwd: e, stashRef: n, mode: `pop` }, o)).status === `error` &&
+        (await applyHandoffStash({ cwd: e, stashRef: n, mode: `pop` }, o, handoffBranchDeps)).status === `error` &&
         s.push(i),
       s);
 }
@@ -73792,7 +73742,10 @@ async function zve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
         warnings: a,
       });
     if (c !== e.sourceBranch) {
-      let r = await H3({ branch: e.sourceBranch, cwd: e.localGitRoot, commitSha: g, host: t });
+      let r = await ensureHandoffBranch(
+        { branch: e.sourceBranch, cwd: e.localGitRoot, commitSha: g, host: t },
+        handoffBranchDeps,
+      );
       if (r != null) {
         let i = await e6({
           cwd: e.sourceWorktreeCwd,
@@ -73841,7 +73794,11 @@ async function zve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
     } else i?.(`checkout-local-branch`, `skipped`);
     if (o != null) {
       i?.(`apply-changes-to-local`, `started`);
-      let r = await W3({ cwd: e.localGitRoot, stashRef: o, mode: `apply` }, t);
+      let r = await applyHandoffStash(
+        { cwd: e.localGitRoot, stashRef: o, mode: `apply` },
+        t,
+        handoffBranchDeps,
+      );
       if (r.status === `error`) {
         i?.(`apply-changes-to-local`, `failed`);
         let l = [];
@@ -73879,7 +73836,7 @@ async function zve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
         );
       }
       (i?.(`apply-changes-to-local`, `completed`),
-        (await W3({ cwd: e.localGitRoot, stashRef: o, mode: `drop` }, t)).status === `error` &&
+        (await applyHandoffStash({ cwd: e.localGitRoot, stashRef: o, mode: `drop` }, t, handoffBranchDeps)).status === `error` &&
           a.push(`drop-source-stash-failed`));
     } else i?.(`apply-changes-to-local`, `skipped`);
     return X({ status: `success`, warnings: a });
@@ -73924,7 +73881,7 @@ async function e6({ cwd: e, branch: t, stashRef: n, gitManager: r, host: i }) {
   return t == null
     ? n == null
       ? []
-      : (await W3({ cwd: e, stashRef: n, mode: `pop` }, i)).status === `error`
+      : (await applyHandoffStash({ cwd: e, stashRef: n, mode: `pop` }, i, handoffBranchDeps)).status === `error`
         ? [`restore-source-stash-failed`]
         : []
     : $3({
@@ -74070,13 +74027,17 @@ async function Bve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
       s != null)
     ) {
       i?.(`apply-changes-to-worktree`, `started`);
-      let o = await W3({ cwd: e.worktreeWorkspaceRoot, stashRef: s, mode: `apply` }, t);
+      let o = await applyHandoffStash(
+        { cwd: e.worktreeWorkspaceRoot, stashRef: s, mode: `apply` },
+        t,
+        handoffBranchDeps,
+      );
       if (o.status === `error`) {
         i?.(`apply-changes-to-worktree`, `failed`);
         let d = [];
         if (
           (c != null &&
-            (await W3({ cwd: e.worktreeWorkspaceRoot, stashRef: c, mode: `pop` }, t)).status ===
+            (await applyHandoffStash({ cwd: e.worktreeWorkspaceRoot, stashRef: c, mode: `pop` }, t, handoffBranchDeps)).status ===
               `error` &&
             d.push(`restore-target-stash-failed`),
           u &&
@@ -74112,11 +74073,11 @@ async function Bve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
     } else i?.(`apply-changes-to-worktree`, `skipped`);
     return (
       c != null &&
-        (await W3({ cwd: e.worktreeWorkspaceRoot, stashRef: c, mode: `drop` }, t)).status ===
+        (await applyHandoffStash({ cwd: e.worktreeWorkspaceRoot, stashRef: c, mode: `drop` }, t, handoffBranchDeps)).status ===
           `error` &&
         a.push(`drop-target-stash-failed`),
       s != null &&
-        (await W3({ cwd: e.localCwd, stashRef: s, mode: `drop` }, t)).status === `error` &&
+        (await applyHandoffStash({ cwd: e.localCwd, stashRef: s, mode: `drop` }, t, handoffBranchDeps)).status === `error` &&
         a.push(`drop-source-stash-failed`),
       X({ status: `success`, warnings: a })
     );
@@ -74125,7 +74086,7 @@ async function Bve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
     if (
       (!f &&
         c != null &&
-        (await W3({ cwd: e.worktreeWorkspaceRoot, stashRef: c, mode: `pop` }, t)).status ===
+        (await applyHandoffStash({ cwd: e.worktreeWorkspaceRoot, stashRef: c, mode: `pop` }, t, handoffBranchDeps)).status ===
           `error` &&
         i.push(`restore-target-stash-failed`),
       u &&
