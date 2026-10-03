@@ -216,9 +216,11 @@ Git checkout 的完整实现（原 `jhe`/`Mhe`/`t4`/`Fhe`/`n4`）已迁移至
 detached ref 解析、stash 状态、失败 rollback、working-tree conflict paths、exec output、两类
 read-cache invalidation 与成功 refresh root，由 16 项行为断言覆盖。
 
-`commit` case 的 repository lookup、可选 staging、message/attribution、nothing-to-commit 分类、
-commit SHA 读取及 refresh-root 时序已迁移至 `src/main/worker/git-commit-request-handler.ts`。
-18 项行为断言特别覆盖 staging 成功后 commit 失败仍刷新、普通 commit 失败不刷新的差异。
+`commit` case 的 repository lookup、可选 staging、nothing-to-commit 分类、commit SHA 读取及
+refresh-root 时序已迁移至 `src/main/worker/git-commit-request-handler.ts`；attribution 默认值/清洗、
+co-author trailer 去重与 trailer block 换行规则也已并入该模块，原
+`N_e`/`P_e`/`F_e`/`I_e`/`L_e`/`R_e`/`z_e` 和默认 attribution 常量已删除。48 项行为断言
+覆盖 staging 后失败刷新差异，以及空值、大小写、正则字符和 trailer 边界。
 
 Origin discovery 的目录去重、平台路径快速判定、向上查找 `.git`/`HEAD`、stable metadata/
 root/origin 组合与单目录失败隔离已完整迁移至 `src/main/worker/git-origin-discovery.ts`；原

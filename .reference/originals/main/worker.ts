@@ -23,7 +23,7 @@ const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
-const { commitGitChanges } = require("./worker/git-commit-request-handler");
+const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
 const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
@@ -44209,7 +44209,6 @@ var NH = e.n((e, t) => {
       (t.exports = d));
   }),
   PH = e.o(NH()),
-  FH = `Codex <noreply@openai.com>`,
   IH = class {
     emit;
     constructor(e) {
@@ -70806,49 +70805,6 @@ var j_e = e.n((e, t) => {
     t.exports = a;
   }),
   M_e = e.o(j_e());
-function N_e(e) {
-  let t = P_e(e);
-  return t === void 0 ? FH : t;
-}
-function P_e(e) {
-  return e == null ? e : e.trim() || null;
-}
-function F_e(e, t) {
-  if (!t) return e;
-  let n = I_e(t);
-  if (L_e(e, n)) return e;
-  let r = e.trimEnd();
-  return r
-    ? `${r}${
-        R_e(r)
-          ? `
-`
-          : `
-
-`
-      }${n}`
-    : n;
-}
-function I_e(e) {
-  return `Co-authored-by: ${e}`;
-}
-function L_e(e, t) {
-  let n = (0, M_e.default)(t);
-  return RegExp(`^${n}$`, `gim`).test(e);
-}
-function R_e(e) {
-  let t = e.split(/\r?\n/),
-    n = t.length - 1,
-    r = !1;
-  for (; n >= 0 && t[n]?.trim() !== ``;) {
-    if (!z_e(t[n])) return !1;
-    ((r = !0), --n);
-  }
-  return r;
-}
-function z_e(e) {
-  return /^[A-Za-z][A-Za-z0-9-]*:\s+\S/.test(e);
-}
 var B_e = kW(`worktree-snapshot`);
 async function V_e(e, t, n, r, i) {
   try {
@@ -72908,8 +72864,11 @@ var I6 = kW(`git`),
           getUntrackedPaths: f2,
           stageWorktree: v4,
           runGit: (root, args, host, options) => $(root, args, host, options),
-          formatCommitMessage: F_e,
-          formatCommitAttribution: N_e,
+          formatCommitMessage: (message, attribution) =>
+            formatCommitMessage(message, attribution, {
+              escapeRegExp: (value) => (0, M_e.default)(value),
+            }),
+          formatCommitAttribution,
           formatExecOutput: mR,
         },
         gitConfigRequestDeps = {

@@ -2,7 +2,67 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { commitGitChanges } = require("../app/.vite/build/worker/git-commit-request-handler.js");
+const {
+  DEFAULT_COMMIT_ATTRIBUTION,
+  commitGitChanges,
+  endsWithCommitTrailerBlock,
+  formatCoAuthorTrailer,
+  formatCommitAttribution,
+  formatCommitMessage,
+  hasCommitAttribution,
+  hasCommitTrailerLine,
+  trimOptionalString,
+} = require("../app/.vite/build/worker/git-commit-request-handler.js");
+
+const messageDeps = {
+  escapeRegExp: (value) => value.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&"),
+};
+
+assert.equal(DEFAULT_COMMIT_ATTRIBUTION, "Codex <noreply@openai.com>");
+assert.equal(trimOptionalString(undefined), undefined);
+assert.equal(trimOptionalString(null), null);
+assert.equal(trimOptionalString("  \t "), null);
+assert.equal(trimOptionalString("  Person <p@example.com>  "), "Person <p@example.com>");
+assert.equal(formatCommitAttribution(undefined), DEFAULT_COMMIT_ATTRIBUTION);
+assert.equal(formatCommitAttribution(null), null);
+assert.equal(formatCommitAttribution("  "), null);
+assert.equal(formatCommitAttribution(" Person <p@example.com> "), "Person <p@example.com>");
+assert.equal(formatCoAuthorTrailer("Person <p@example.com>"), "Co-authored-by: Person <p@example.com>");
+assert.equal(hasCommitTrailerLine("Co-authored-by: Person <p@example.com>"), true);
+assert.equal(hasCommitTrailerLine("Signed-off-by:\tPerson"), true);
+assert.equal(hasCommitTrailerLine("2nd-trailer: value"), false);
+assert.equal(hasCommitTrailerLine("Trailer_no: value"), false);
+assert.equal(hasCommitTrailerLine("Trailer:"), false);
+assert.equal(endsWithCommitTrailerBlock("subject\n\nCo-authored-by: Person"), true);
+assert.equal(endsWithCommitTrailerBlock("subject\r\n\r\nKey: value\r\nOther: value"), true);
+assert.equal(endsWithCommitTrailerBlock("subject"), false);
+assert.equal(endsWithCommitTrailerBlock("subject\n\nKey: value\nnot a trailer"), false);
+assert.equal(endsWithCommitTrailerBlock(""), false);
+assert.equal(
+  hasCommitAttribution("subject\n\nco-AUTHORED-by: A+B <a@example.com>", "Co-authored-by: A+B <a@example.com>", messageDeps),
+  true,
+);
+assert.equal(hasCommitAttribution("prefix Co-authored-by: Person", "Co-authored-by: Person", messageDeps), false);
+assert.equal(hasCommitAttribution("Co-authored-by: Person extra", "Co-authored-by: Person", messageDeps), false);
+assert.equal(formatCommitMessage("subject  ", null, messageDeps), "subject  ");
+assert.equal(formatCommitMessage("", "Person", messageDeps), "Co-authored-by: Person");
+assert.equal(formatCommitMessage("subject  ", "Person", messageDeps), "subject\n\nCo-authored-by: Person");
+assert.equal(
+  formatCommitMessage("subject\n\nSigned-off-by: Other", "Person", messageDeps),
+  "subject\n\nSigned-off-by: Other\nCo-authored-by: Person",
+);
+assert.equal(
+  formatCommitMessage("subject\n\nco-authored-BY: Person", "Person", messageDeps),
+  "subject\n\nco-authored-BY: Person",
+);
+assert.equal(
+  formatCommitMessage("Co-authored-by: A+B <a@example.com>", "A+B <a@example.com>", messageDeps),
+  "Co-authored-by: A+B <a@example.com>",
+);
+assert.equal(
+  formatCommitMessage("subject\n\nKey: value\n", "Person", messageDeps),
+  "subject\n\nKey: value\nCo-authored-by: Person",
+);
 
 function fixture({ repository = { root: "/root" }, responses = [], stageResult = { success: true } } = {}) {
   const events = [];
@@ -70,4 +130,4 @@ function fixture({ repository = { root: "/root" }, responses = [], stageResult =
   assert.equal(output.result.execOutput.formatted.fallbackOutput, "commit failed");
 }
 
-console.log("18 worker git commit request handler assertions passed");
+console.log("48 worker git commit request handler assertions passed");

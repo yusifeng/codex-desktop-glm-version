@@ -12,6 +12,64 @@ type CommitDependencies = {
   formatExecOutput: (args: any) => any;
 };
 
+type CommitMessageDependencies = {
+  escapeRegExp: (value: string) => string;
+};
+
+const DEFAULT_COMMIT_ATTRIBUTION = `Codex <noreply@openai.com>`;
+
+function trimOptionalString(value: any) {
+  return value == null ? value : value.trim() || null;
+}
+
+function formatCommitAttribution(value: any) {
+  const attribution = trimOptionalString(value);
+  return attribution === undefined ? DEFAULT_COMMIT_ATTRIBUTION : attribution;
+}
+
+function formatCoAuthorTrailer(attribution: string) {
+  return `Co-authored-by: ${attribution}`;
+}
+
+function hasCommitTrailerLine(line: string) {
+  return /^[A-Za-z][A-Za-z0-9-]*:\s+\S/.test(line);
+}
+
+function endsWithCommitTrailerBlock(message: string) {
+  const lines = message.split(/\r?\n/);
+  let index = lines.length - 1;
+  let foundTrailer = false;
+  while (index >= 0 && lines[index]?.trim() !== ``) {
+    if (!hasCommitTrailerLine(lines[index])) return false;
+    foundTrailer = true;
+    index--;
+  }
+  return foundTrailer;
+}
+
+function hasCommitAttribution(
+  message: string,
+  trailer: string,
+  dependencies: CommitMessageDependencies,
+) {
+  return RegExp(`^${dependencies.escapeRegExp(trailer)}$`, `gim`).test(message);
+}
+
+function formatCommitMessage(
+  message: string,
+  attribution: string | null | undefined,
+  dependencies: CommitMessageDependencies,
+) {
+  if (!attribution) return message;
+  const trailer = formatCoAuthorTrailer(attribution);
+  if (hasCommitAttribution(message, trailer, dependencies)) return message;
+  const trimmedMessage = message.trimEnd();
+  if (!trimmedMessage) return trailer;
+  return `${trimmedMessage}${
+    endsWithCommitTrailerBlock(trimmedMessage) ? `\n` : `\n\n`
+  }${trailer}`;
+}
+
 function commandFailure(execution: any, fallback: string, deps: CommitDependencies) {
   const error = execution.stderr || execution.stdout || fallback;
   return {
@@ -74,5 +132,26 @@ async function commitGitChanges(params: any, deps: CommitDependencies) {
   };
 }
 
-export { commitGitChanges };
-if (typeof module !== `undefined`) module.exports = { commitGitChanges };
+export {
+  DEFAULT_COMMIT_ATTRIBUTION,
+  commitGitChanges,
+  endsWithCommitTrailerBlock,
+  formatCoAuthorTrailer,
+  formatCommitAttribution,
+  formatCommitMessage,
+  hasCommitAttribution,
+  hasCommitTrailerLine,
+  trimOptionalString,
+};
+if (typeof module !== `undefined`)
+  module.exports = {
+    DEFAULT_COMMIT_ATTRIBUTION,
+    commitGitChanges,
+    endsWithCommitTrailerBlock,
+    formatCoAuthorTrailer,
+    formatCommitAttribution,
+    formatCommitMessage,
+    hasCommitAttribution,
+    hasCommitTrailerLine,
+    trimOptionalString,
+  };

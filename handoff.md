@@ -138,8 +138,10 @@ Git push 的 remote 选择、参数组装、porcelain 错误分类、exec output
 Git checkout 的 local/remote/detached ref 解析、stash/rollback、冲突路径分类、cache invalidation
 与成功 refresh root 已完整迁移至 `src/main/worker/git-checkout-request-handler.ts`，原五个压缩
 函数实现已删除（`t4` 保留薄兼容适配器），由 16 项行为断言覆盖。
-Git commit 的 repository/staging、message attribution、nothing-to-commit、commit SHA 与 refresh-root
-时序已迁移至 `src/main/worker/git-commit-request-handler.ts`，由 18 项行为断言覆盖。
+Git commit 的 repository/staging、nothing-to-commit、commit SHA 与 refresh-root 时序，以及
+attribution 清洗、co-author trailer 去重和 trailer block 换行规则已迁移至
+`src/main/worker/git-commit-request-handler.ts`；原七个 message helper 与默认 attribution 常量已删除，
+由 48 项行为断言覆盖。
 Origin discovery 的去重、平台路径判定、Git marker 向上查找、metadata/root/origin 组合和失败
 隔离已完整迁移至 `src/main/worker/git-origin-discovery.ts`，原七个压缩函数已删除，由 11 项断言覆盖。
 `set-config-value` 的参数透传和 refresh-root 规则已迁移至
@@ -267,7 +269,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 
 | # | 位置 | 体量 | 现状 | 问题 |
 |---|---|---|---|---|
-| A1 | `.reference/originals/main/worker.ts`（git-worker） | **85,675 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
+| A1 | `.reference/originals/main/worker.ts`（git-worker） | **85,634 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP | annotation/design runtime 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
