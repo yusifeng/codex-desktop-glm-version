@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77123,13 +77123,7 @@ var Jye = 1e3,
                 c = new Map();
               e.handlers.forEach((e) => {
                 let n = e.changeType === `working-tree`,
-                  r = t.flatMap((t) => {
-                    if (!e.shouldHandleChangedPath(t, c)) return [];
-                    if (!n) return [t];
-                    let r =
-                      this.pathApi == null ? t : this.getAffectedWorkingTreePath(this.pathApi, t);
-                    return r == null ? [] : [r];
-                  });
+                  r = collectGitWatchHandlerPaths(this.pathApi, this.options.root, e, t, c);
                 if (t.length > 0 && r.length === 0) return;
                 ((e.changeType === `index` ||
                   e.changeType === `config` ||
