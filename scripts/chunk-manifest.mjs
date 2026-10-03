@@ -54,6 +54,30 @@ export const REWRITTEN = new Set([
 // bundler 生成 chunk。Map 的值是保留理由，禁止为这些内容伪造业务源码。
 export const PRESERVED = new Map([
   [
+    "bundler-runtime",
+    "Rolldown runtime bootstrap；仅提供 chunk/module loader，不含 app 业务代码",
+  ],
+  [
+    "main",
+    "主进程 transform-only 入口保留；业务子系统已在 main-app/shared 语义源码中重写，入口仍需保持官方启动顺序与 CJS 导出面",
+  ],
+  [
+    "git-worker",
+    "CJS worker 入口混合 git/HTTP/stream/node 依赖与 worker 生命周期；保持原始入口和 vendored 依赖的精确运行时布局，避免拆分破坏 worker_threads 启动协议",
+  ],
+  [
+    "browser-page-preload",
+    "Electron browser-page 沙箱 preload；包含内嵌 schema/runtime 与 contextBridge IPC 协议，transform-only 保留可验证的隔离世界初始化顺序",
+  ],
+  [
+    "shared",
+    "原始 shared 发布 chunk 继续提供未消费 vendor/低频导出；已消费导出通过语义 shared 模块接入，保留原 chunk 保证未迁移调用方兼容",
+  ],
+  [
+    "css-selector",
+    "HTML parser/css-selector vendor chunk；主进程仅通过其惰性 parser loader 消费，RpcTarget 已由 shared/rpc-core 提供语义门面",
+  ],
+  [
     "worker-shared",
     "rolldown CJS/ESM 互操作辅助与 npm ms/debug 实现；worker 专用 vendor 运行时",
   ],
