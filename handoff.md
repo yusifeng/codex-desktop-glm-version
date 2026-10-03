@@ -35,7 +35,7 @@ topology marker、变更路径归一化、Git 内部路径过滤、working-tree 
 state initialization、change emission deduplication、操作标记路径表、可选状态合并）
 已抽取为 `src/main/worker/git-watch-paths.ts`，并新增 metadata refresh 路径筛选
 策略 `selectGitMetadataRefreshPaths` 与启动 promise 后的 retry 决策，回归断言增至
-59 项；异步 watcher/session
+63 项；异步 watcher/session
 生命周期仍在继续拆分。本轮新增 `getGitWorkingTreeWatchRefreshAction`，覆盖
 ignore policy 刷新后的 skip/apply/restart 纯决策，回归断言增至 51 项；异步
 dispose/restart 与 session timer 副作用仍保留在入口。
