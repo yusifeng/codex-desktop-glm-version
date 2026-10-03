@@ -138,5 +138,23 @@ function createProcessTelemetryEvent(processKind: string, operation?: string, op
   };
 }
 
-export { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
-if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+/** Recognizes Git subprocess invocations, including the Windows cmd wrapper form. */
+function createGitProcessTelemetry(args: string[], getGitSubcommand: (args: string[], startIndex: number) => string): { op: `git.exec`; name: `git.subprocess`; attributes: { [`git.subcommand`]: string } } | null {
+  const basename = (value: string | undefined): string => {
+    if (value == null) return ``;
+    const posix = value.split(`/`).at(-1)?.toLowerCase() ?? ``;
+    const windows = value.split(`\\`).at(-1)?.toLowerCase() ?? ``;
+    return posix.length <= windows.length ? posix : windows;
+  };
+  const isGit = (value: string | undefined): boolean => [`git`, `git.exe`, `git.cmd`, `git.bat`, `git.com`].includes(basename(value));
+  const isCmd = (value: string | undefined): boolean => [`cmd`, `cmd.exe`].includes(basename(value));
+  if (isGit(args[0])) return { op: `git.exec`, name: `git.subprocess`, attributes: { [`git.subcommand`]: getGitSubcommand(args, 1) } };
+  if (!isCmd(args[0])) return null;
+  const wrapper = args.slice(1, 4).map((value) => value.toLowerCase());
+  return wrapper.length === 3 && wrapper[0] === `/d` && wrapper[1] === `/s` && wrapper[2] === `/c` && isGit(args[4])
+    ? { op: `git.exec`, name: `git.subprocess`, attributes: { [`git.subcommand`]: getGitSubcommand(args, 5) } }
+    : null;
+}
+
+export { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };

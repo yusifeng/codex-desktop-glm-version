@@ -9,6 +9,7 @@ const {
   classifySshOperation,
   createGitCommandStats,
   createProcessTelemetryEvent,
+  createGitProcessTelemetry,
   exitCodeBucket,
   isGitMutationRequest,
   recordUntrackedCacheOutcome,
@@ -60,5 +61,14 @@ assert.equal(classifySshOperation(["ssh", "--", "host", "echo", "ok"]), "remote_
 assert.deepEqual(createProcessTelemetryEvent("ssh", "remote_command"), { attributes: { "process.kind": "ssh", "process.operation": "remote_command" }, op: "process.exec", name: "subprocess" });
 assert.deepEqual(createProcessTelemetryEvent("gh", "pr.view", true), { attributes: { "process.kind": "gh", "process.operation": "pr.view" }, op: "process.exec", name: "subprocess" });
 assert.deepEqual(createProcessTelemetryEvent("node"), { attributes: { "process.kind": "node" }, op: "process.exec", name: "subprocess" });
+const subcommand = (args, start) => args.slice(start).join(" ");
+assert.deepEqual(createGitProcessTelemetry(["git", "status"], subcommand), { op: "git.exec", name: "git.subprocess", attributes: { "git.subcommand": "status" } });
+assert.deepEqual(createGitProcessTelemetry(["/usr/bin/git.exe", "diff", "--stat"], subcommand), { op: "git.exec", name: "git.subprocess", attributes: { "git.subcommand": "diff --stat" } });
+assert.deepEqual(createGitProcessTelemetry(["cmd.exe", "/d", "/s", "/c", "git.exe", "status"], subcommand), { op: "git.exec", name: "git.subprocess", attributes: { "git.subcommand": "status" } });
+assert.equal(createGitProcessTelemetry(["cmd.exe", "/c", "git", "status"], subcommand), null);
+assert.equal(createGitProcessTelemetry(["bash", "-c", "git status"], subcommand), null);
+assert.equal(createGitProcessTelemetry(["node", "script.js"], subcommand), null);
+assert.deepEqual(createGitProcessTelemetry(["git.com", "log"], subcommand).attributes, { "git.subcommand": "log" });
+assert.equal(createGitProcessTelemetry(["cmd", "/d", "/s", "/c", "python", "x"], subcommand), null);
 
-console.log("39 worker git observability assertions passed");
+console.log("47 worker git observability assertions passed");
