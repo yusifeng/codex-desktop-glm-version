@@ -182,5 +182,29 @@ function parseAnnotationControlTargetList(value: unknown, documentRef: object, e
   return targets;
 }
 
-export { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
-if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+function attachAnnotationControlTargets(record: { targets: WeakRef<object>[] }, targets: Set<object>, targetIndex: WeakMap<object, Array<{ order: number; targets: WeakRef<object>[] }>>, order: number): number {
+  record.targets = Array.from(targets, (target) => new WeakRef(target));
+  for (const target of targets) {
+    const records = targetIndex.get(target);
+    if (records == null) targetIndex.set(target, [record as { order: number; targets: WeakRef<object>[] }]);
+    else { records.push(record as { order: number; targets: WeakRef<object>[] }); records.sort((left, right) => left.order - right.order); }
+  }
+  return targets.size;
+}
+
+function detachAnnotationControlTargets(record: { targets: WeakRef<object>[] }, targetIndex: WeakMap<object, Array<{ order: number; targets: WeakRef<object>[] }>>): number {
+  let removed = record.targets.length;
+  for (const reference of record.targets) {
+    const target = reference.deref();
+    if (target == null) continue;
+    const records = targetIndex.get(target);
+    if (records == null) continue;
+    const index = records.indexOf(record as { order: number; targets: WeakRef<object>[] });
+    if (index !== -1) records.splice(index, 1);
+    if (records.length === 0) targetIndex.delete(target);
+  }
+  return removed;
+}
+
+export { attachAnnotationControlTargets, cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+if (typeof module !== `undefined`) module.exports = { attachAnnotationControlTargets, cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };

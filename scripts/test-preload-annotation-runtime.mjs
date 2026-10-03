@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { attachAnnotationControlTargets, cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -43,5 +43,11 @@ assert.equal(parseAnnotationControlsPayload("not-json", parser, patchParser), un
 const targetList = [firstTarget, firstTarget];
 assert.equal(parseAnnotationControlTargetList(targetList, fakeDocument, FakeElement, () => false, 128).size, 1);
 assert.equal(parseAnnotationControlTargetList([firstTarget], fakeDocument, FakeElement, () => true, 128), undefined);
+const targetIndex = new WeakMap();
+const targetRecord = { order: 2, targets: [] };
+assert.equal(attachAnnotationControlTargets(targetRecord, new Set([firstTarget]), targetIndex, 2), 1);
+assert.equal(targetIndex.get(firstTarget).length, 1);
+assert.equal(detachAnnotationControlTargets(targetRecord, targetIndex), 1);
+assert.equal(targetIndex.has(firstTarget), false);
 
-console.log("27 preload annotation runtime assertions passed");
+console.log("31 preload annotation runtime assertions passed");

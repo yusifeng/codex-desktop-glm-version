@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
+var { attachAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -7204,22 +7204,10 @@ function Cf() {
     i = 0,
     a = 0,
     o = (e, t) => {
-      ((e.targets = Array.from(t, (e) => new WeakRef(e))), (i += t.size));
-      for (let n of t) {
-        let t = r.get(n);
-        t == null ? r.set(n, [e]) : (t.push(e), t.sort((e, t) => e.order - t.order));
-      }
+      i += attachAnnotationControlTargets(e, t, r, e.order);
     },
     s = (e) => {
-      i -= e.targets.length;
-      for (let t of e.targets) {
-        let n = t.deref();
-        if (n == null) continue;
-        let i = r.get(n);
-        if (i == null) continue;
-        let a = i.indexOf(e);
-        (a !== -1 && i.splice(a, 1), i.length === 0 && r.delete(n));
-      }
+      i -= detachAnnotationControlTargets(e, r);
     },
     c = (t) => {
       try {
