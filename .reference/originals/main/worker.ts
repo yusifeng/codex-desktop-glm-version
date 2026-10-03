@@ -37,6 +37,7 @@ const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfi
 const { getGitBlobDiff, getUntrackedWorkingTreeDiff, readWorkingTreeSymlink } = require("./worker/git-review-file-diff");
 const { getCurrentHeadSnapshot, hasGitMergeConflicts, prepareReviewComparison: prepareGitReviewComparison, readCurrentHeadSnapshot, resolveReviewComparisonArgs: resolveGitReviewComparisonArgs, resolveReviewComparisonForRepository: resolveGitReviewComparisonForRepository } = require("./worker/git-review-comparison");
 const { getBranchDiffStats: getGitBranchDiffStats } = require("./worker/git-review-branch-stats");
+const { getBranchCommits: getGitBranchCommits, getReviewCommitLineCounts: getGitReviewCommitLineCounts } = require("./worker/git-review-commit-queries");
 const { createReviewDiffFallback, getReviewDiff } = require("./worker/git-review-diffs");
 const { attachReviewFileRevisions, createUnmergedReviewFiles, deduplicateReviewFiles, getOmittedUntrackedFiles, gitStatusToReviewChangeKind, mergeReviewMetadata, parseReviewMetadataDiff, reconcileRenameStats, reconcileUntrackedRenames, reviewFileKey, selectUntrackedReviewPaths } = require("./worker/git-review-metadata-utils");
 const { inferReviewRenames, readReviewDiffMetadata, reconcileStagedReviewRenames, resolveReviewMetadataPaths } = require("./worker/git-review-metadata-diff");
@@ -347,6 +348,17 @@ const gitReviewSectionChangesDeps = {
   normalizeCwd: (cwd) => xz(cwd),
   normalizePathFromRoot: (...args) => o2(...args),
   runGit: (...args) => $(...args),
+};
+const gitReviewCommitQueryDeps = {
+  fetchQueryWithSignal: (queryClient, options, signal) =>
+    w1(queryClient, options, signal),
+  getQueryMeta: () => _1,
+  normalizeCommitSha: (sha) => Sz(sha),
+  queryKey: (...args) => Q(...args),
+  resolveReviewComparisonArgs: (params) =>
+    resolveGitReviewComparisonArgs(params, gitReviewComparisonDeps),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70806,101 +70818,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-var C3 = 100,
-  w3 = 2097152;
-async function T3(e, t, n) {
-  let r = await resolveGitReviewComparisonArgs({ baseBranch: t, signal: n, source: `branch`, worktreeRepo: e }, gitReviewComparisonDeps),
-    i = r.type === `success` ? r.args[0] : null;
-  return i == null ? [] : U_e(e, i, n);
-}
-function H_e(e, t, n = !1, r) {
-  return t.length === 0 || t.length > C3
-    ? Promise.resolve([])
-    : w1(
-        e.queryClient,
-        {
-          queryKey: Q(
-            e.root,
-            e.host,
-            `review-commit-line-counts`,
-            t,
-            n ? `ignore-whitespace` : `include-whitespace`,
-          ),
-          gcTime: 250,
-          meta: _1,
-          staleTime: 1 / 0,
-          queryFn: async (r) => {
-            let i = await $(
-              e.root,
-              [
-                `log`,
-                `--no-walk=unsorted`,
-                `--format=%x1e%H`,
-                `--numstat`,
-                ...(n ? [`--ignore-all-space`] : []),
-                `--diff-merges=first-parent`,
-                ...t,
-                `--`,
-              ],
-              e.host,
-              { maxOutputBytes: w3, signal: r },
-            );
-            return !i.success || !i.stdout
-              ? []
-              : i.stdout.split(``).flatMap((e) => {
-                  let [t, ...n] = e.trim().split(/\r?\n/);
-                  if (!t) return [];
-                  let r = 0,
-                    i = 0;
-                  for (let e of n) {
-                    if (e.length === 0) continue;
-                    let [t, n, a] = e.split(`	`);
-                    if (t == null || n == null || a == null || t === `-` || n === `-`) {
-                      ((r = null), (i = null));
-                      break;
-                    }
-                    let o = Number(t),
-                      s = Number(n);
-                    if (!Number.isSafeInteger(o) || !Number.isSafeInteger(s)) {
-                      ((r = null), (i = null));
-                      break;
-                    }
-                    ((r += o), (i += s));
-                  }
-                  return [{ additions: r, deletions: i, sha: Sz(t) }];
-                });
-          },
-        },
-        r,
-      );
-}
-function U_e(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `branch-commits`, t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: async () => {
-      let r = await $(
-        e.root,
-        [`log`, `--max-count=${C3}`, `--format=%H%x00%cI%x00%s%x00%B%x1e`, `${t}..HEAD`],
-        e.host,
-        { maxOutputBytes: w3, signal: n },
-      );
-      return !r.success || !r.stdout
-        ? []
-        : r.stdout
-            .split(``)
-            .map((e) => {
-              let [t, n, r, i] = e.trim().split(`\0`);
-              return !t || !n || r == null || i == null
-                ? null
-                : { committedAt: n, message: i, sha: Sz(t), subject: r };
-            })
-            .filter((e) => e != null);
-    },
-    staleTime: 250,
-  });
-}
 function E3(e) {
   return e.startsWith(`refs/heads/`) ? Tz(e.slice(11)) : Tz(e);
 }
@@ -72728,8 +72645,21 @@ var I6 = kW(`git`),
           branchExists: O2,
           createBranch: Lhe,
           resolveStartingRef: I0,
-          getBranchCommits: T3,
-          getReviewCommitLineCounts: H_e,
+          getBranchCommits: (repository, baseBranch, signal) =>
+            getGitBranchCommits(
+              repository,
+              baseBranch,
+              signal,
+              gitReviewCommitQueryDeps,
+            ),
+          getReviewCommitLineCounts: (repository, commits, hideWhitespace, signal) =>
+            getGitReviewCommitLineCounts(
+              repository,
+              commits,
+              hideWhitespace,
+              signal,
+              gitReviewCommitQueryDeps,
+            ),
         },
         reviewRequestDeps = {
           gitManager: this.gitManager,
@@ -73840,10 +73770,11 @@ var I6 = kW(`git`),
           return {
             method: `branch-commits`,
             result: {
-              commits: await T3(
+              commits: await getGitBranchCommits(
                 this.gitManager.getWorktreeRepositoryForRoot(t, n),
                 e.params.baseBranch,
                 r,
+                gitReviewCommitQueryDeps,
               ),
             },
           };

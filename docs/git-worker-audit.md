@@ -71,6 +71,11 @@ branch commits 与 review commit line counts，原约 77,560-78,050）已迁移�
 检查、telemetry 和响应包装。`scripts/test-worker-git-read-request-handlers.mjs`
 覆盖 repository unavailable 与正常结果，共 21 项断言。
 
+上述 branch commits/review commit line counts 的 comparison、query cache、Git log 与
+record/numstat 解析已进一步迁移至 `src/main/worker/git-review-commit-queries.ts`；原
+`T3`/`H_e`/`U_e` 与 commit 数量/输出大小常量已删除。36 项断言覆盖缓存参数、命令矩阵、
+100 commit 上限、binary/malformed numstat、unsafe integer 和不完整 commit record。
+
 紧随其后的 status/review 请求分支（`status-summary`、`branch-diff-stats`、
 `review-summary`、`review-source-line-counts`、`review-diff`、`review-search`、
 `review-patch`）已迁移至 `src/main/worker/git-review-request-handlers.ts`。入口仍负责
