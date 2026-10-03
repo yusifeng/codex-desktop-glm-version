@@ -74,7 +74,7 @@ declare module "@chunk/shared" {
   export const Aa: any; // 内部符号: One
   export { createDeferred as Ac } from "../../shared/http-headers";
   export { normalizeApprovalsReviewer as Ad } from "../../shared/sandbox-permissions";
-  export const Af: any; // 内部符号: nm
+  export { Af } from "../../shared/zod-facade";
   export { buildWslEnvDirective as Ai } from "../../shared/wsl-paths";
   export { CHROME_DEV_PLUGIN_NAME as Al } from "../../shared/app-constants";
   export const An: any; // 内部符号: jX
@@ -103,7 +103,7 @@ declare module "@chunk/shared" {
   // 注：zod builder 导出（Cf/Of 等）在 main-app 重写中被大量链式调用
   // （.trim()/.int()/.refine()/.catchall() 等），d.ts 无法完整还原 zod 的 builder 面，
   // 故放宽为 any；内部符号名见原粗扫/深析文档。
-  export const Cf: any; // 内部符号: hZ（zod number builder）
+  export { Cf } from "../../shared/zod-facade";
   export const Ci: any; // 内部符号: ZM
   export { joinPath as Cl } from "../../shared/app-constants";
   export const Cn: any; // 内部符号: OX
@@ -116,7 +116,7 @@ declare module "@chunk/shared" {
   export const Da: any; // 内部符号: tj
   export { configOverrideKeyForVersion as Dc } from "../../shared/app-config";
   export { permissionsForProfile as Dd } from "../../shared/sandbox-permissions";
-  export const Df: any; // 内部符号: Gp
+  export { Df } from "../../shared/zod-facade";
   export { appServerFileSystem as Di } from "../../shared/wsl-paths";
   export { toPosixPath as Dl } from "../../shared/app-constants";
   export const Dn: any; // 内部符号: oX
@@ -129,7 +129,7 @@ declare module "@chunk/shared" {
   export const Ea: any; // 内部符号: ej
   export { dynamicAppToolResultSchema as Ec } from "../../shared/app-config";
   export const Ed: any; // 内部符号: j_
-  export const Ef: any; // 内部符号: im
+  export { Ef } from "../../shared/zod-facade";
   export const Ei: any; // 内部符号: DM
   export { stripDriveLetterSlash as El } from "../../shared/app-constants";
   export const En: any; // 内部符号: DX
@@ -142,7 +142,7 @@ declare module "@chunk/shared" {
   export const Fa: any; // 内部符号: qA
   export { buildChromiumExtensionManagementUrl as Fc } from "../../shared/browser-tab-mentions";
   export { permissionSetAllowed as Fd } from "../../shared/sandbox-permissions";
-  export const Ff: any; // 内部符号: Zd
+  export { Ff } from "../../shared/zod-facade";
   export { getInteractivePathFromWslBash as Fi } from "../../shared/wsl-paths";
   export { COMPUTER_USE_PLUGIN_NAME as Fl } from "../../shared/app-constants";
   export const Fn: any; // 内部符号: xY
@@ -154,7 +154,7 @@ declare module "@chunk/shared" {
   export const G: any; // 内部符号: k5
   export const Ga: any; // 内部符号: kA
   export { deserializeBrowserTabMention as Gc } from "../../shared/browser-tab-mentions";
-  export const Gd: any; // 内部符号: Pg
+  export { Gd } from "../../shared/zod-facade";
   export const Gi: any; // 内部符号: cre
   export { CODEX_CLI_PATH_ENV_KEY as Gl } from "../../shared/app-constants";
   export const Gn: any; // 内部符号: ZJ
@@ -180,7 +180,7 @@ declare module "@chunk/shared" {
   export const Ia: any; // 内部符号: GA
   export { browserFamilyForProgId as Ic } from "../../shared/browser-tab-mentions";
   export { availablePermissionProfileKinds as Id } from "../../shared/sandbox-permissions";
-  export const If: any; // 内部符号: Gd
+  export { If } from "../../shared/zod-facade";
   export const Ii: any; // 内部符号: hre
   export const Il: any; // 内部符号: Pb
   export const In: any; // 内部符号: CY
@@ -217,7 +217,7 @@ declare module "@chunk/shared" {
   export const La: any; // 内部符号: WA
   export { findDistribution as Lc } from "../../shared/browser-tab-mentions";
   export { deepEquals as Ld } from "../../shared/sandbox-permissions";
-  export const Lf: any; // 内部符号: Ud
+  export { Lf } from "../../shared/zod-facade";
   export { setShouldSpawnInsideWsl as Li } from "../../shared/wsl-paths";
   export { BUNDLED_PLUGIN_DESCRIPTORS as Ll } from "../../shared/app-constants";
   export const Ln: any; // 内部符号: vY
@@ -230,7 +230,7 @@ declare module "@chunk/shared" {
   export const Ma: any; // 内部符号: XA
   export { candidateLimitForQuery as Mc } from "../../shared/browser-tab-mentions";
   export { sandboxModeOfPolicy as Md } from "../../shared/sandbox-permissions";
-  export const Mf: any; // 内部符号: Fp
+  export { Mf } from "../../shared/zod-facade";
   export { wslDistroName as Mi } from "../../shared/wsl-paths";
   export { CHROME_PLUGIN_NAME as Ml } from "../../shared/app-constants";
   export const Mn: any; // 内部符号: yY
@@ -243,7 +243,7 @@ declare module "@chunk/shared" {
   export const Na: any; // 内部符号: YA
   export { dedupeTabCandidates as Nc } from "../../shared/browser-tab-mentions";
   export { permissionParamsOf as Nd } from "../../shared/sandbox-permissions";
-  export const Nf: any; // 内部符号: Of
+  export { Nf } from "../../shared/zod-facade";
   export { resolveWslDistro as Ni } from "../../shared/wsl-paths";
   export { CODEX_APP_TOOLS_PLUGIN_NAME as Nl } from "../../shared/app-constants";
   export const Nn: any; // 内部符号: bY
@@ -256,7 +256,7 @@ declare module "@chunk/shared" {
   export const Oa: any; // 内部符号: Ane
   export const Oc: any; // 内部符号: TC
   export { readOnlyPermissions as Od } from "../../shared/sandbox-permissions";
-  export const Of: any; // 内部符号: kF（zod string builder，链式调用放宽为 any）
+  export { Of } from "../../shared/zod-facade";
   export { resolveCodexHome as Oi } from "../../shared/wsl-paths";
   export { stripDrivePrefix as Ol } from "../../shared/app-constants";
   export const On: any; // 内部符号: hX
@@ -269,7 +269,7 @@ declare module "@chunk/shared" {
   export const Pa: any; // 内部符号: JA
   export { BROWSER_FAMILY_CONFIGS as Pc } from "../../shared/browser-tab-mentions";
   export { isAutomaticApprovalsReviewer as Pd } from "../../shared/sandbox-permissions";
-  export const Pf: any; // 内部符号: Cf
+  export { Pf } from "../../shared/zod-facade";
   export const Pi: any; // 内部符号: mre
   export { COMPUTER_HISTORY_PLUGIN_NAME as Pl } from "../../shared/app-constants";
   export const Pn: any; // 内部符号: SY
@@ -294,7 +294,7 @@ declare module "@chunk/shared" {
   export const Ra: any; // 内部符号: HA
   export { chromeExtensionIdsForChannel as Rc } from "../../shared/browser-tab-mentions";
   export const Rd: any; // 内部符号: i_
-  export const Rf: any; // 内部符号: Id
+  export { Rf } from "../../shared/zod-facade";
   export { shouldSpawnInsideWsl as Ri } from "../../shared/wsl-paths";
   export { UNIFIED_COMPUTER_USE_PLUGIN_NAME as Rl } from "../../shared/app-constants";
   export const Rn: any; // 内部符号: _Y
@@ -307,7 +307,7 @@ declare module "@chunk/shared" {
   export const Sa: any; // 内部符号: sj
   export const Sc: any; // 内部符号: DC
   export { DEFAULT_MODELS as Sd } from "../../shared/automation-settings";
-  export const Sf: any; // 内部符号: Lp
+  export { Sf } from "../../shared/zod-facade";
   export const Si: any; // 内部符号: eN
   export { joinHostPath as Sl } from "../../shared/app-constants";
   export const Sn: any; // 内部符号: wX
@@ -320,7 +320,7 @@ declare module "@chunk/shared" {
   export const Ta: any; // 内部符号: nj
   export const Tc: any; // 内部符号: CC
   export { AGENT_MODE_BY_HOST_ID_KEY as Td } from "../../shared/automation-settings";
-  export const Tf: any; // 内部符号: lh
+  export { Tf } from "../../shared/zod-facade";
   export const Ti: any; // 内部符号: EM
   export { toForwardSlashes as Tl } from "../../shared/app-constants";
   export const Tn: any; // 内部符号: kX
@@ -408,7 +408,7 @@ declare module "@chunk/shared" {
   export const _a: any; // 内部符号: Une
   export const _c: any; // 内部符号: KC
   export { reasoningEffortSchema as _d } from "../../shared/automation-settings";
-  export const _f: any; // 内部符号: th
+  export { _f } from "../../shared/zod-facade";
   export const _i: any; // 内部符号: UN
   export { stripWindowsExtendedPrefix as _l } from "../../shared/app-constants";
   export const _n: any; // 内部符号: _Q
@@ -421,7 +421,7 @@ declare module "@chunk/shared" {
   export const aa: any; // 内部符号: wj
   export { jsonSchema as ac } from "../../shared/app-config";
   export const ad: any; // 内部符号: hv
-  export const af: any; // 内部符号: Hp
+  export { af } from "../../shared/zod-facade";
   export const ai: any; // 内部符号: JF
   export const al: any; // 内部符号: wx
   export const an: any; // 内部符号: I1
@@ -434,7 +434,7 @@ declare module "@chunk/shared" {
   export const ba: any; // 内部符号: oj
   export const bc: any; // 内部符号: NC
   export { isCronAutomation as bd } from "../../shared/automation-settings";
-  export const bf: any; // 内部符号: Jx（zod literal builder，链式调用放宽为 any）
+  export { bf } from "../../shared/zod-facade";
   export const bi: any; // 内部符号: dN
   export { isWindowsPath as bl } from "../../shared/app-constants";
   export const bn: any; // 内部符号: pX
@@ -447,7 +447,7 @@ declare module "@chunk/shared" {
   export const ca: any; // 内部符号: Xne
   export const cc: any; // 内部符号: hw
   export const cd: any; // 内部符号: sv
-  export const cf: any; // 内部符号: Wp
+  export { cf } from "../../shared/zod-facade";
   export const ci: any; // 内部符号: qF
   export const cl: any; // 内部符号: Tx
   export const cn: any; // 内部符号: i1
@@ -460,7 +460,7 @@ declare module "@chunk/shared" {
   export const da: any; // 内部符号: dj
   export const dc: any; // 内部符号: tw
   export { parseAutomationUpdateOutput as dd } from "../../shared/automation-settings";
-  export const df: any; // 内部符号: J
+  export { df } from "../../shared/zod-facade";
   export const di: any; // 内部符号: IP
   export const dl: any; // 内部符号: Ax
   export const dn: any; // 内部符号: GQ
@@ -486,7 +486,7 @@ declare module "@chunk/shared" {
   export const fa: any; // 内部符号: Gne
   export const fc: any; // 内部符号: $C
   export { parseHeartbeatFromBlocks as fd } from "../../shared/automation-settings";
-  export const ff: any; // 内部符号: oh
+  export { ff } from "../../shared/zod-facade";
   export const fi: any; // 内部符号: SP
   export const fl: any; // 内部符号: cx
   export const fn: any; // 内部符号: QQ
@@ -499,7 +499,7 @@ declare module "@chunk/shared" {
   export const ga: any; // 内部符号: lj
   export const gc: any; // 内部符号: qC
   export { notificationPolicySchema as gd } from "../../shared/automation-settings";
-  export const gf: any; // 内部符号: G
+  export { gf } from "../../shared/zod-facade";
   export const gi: any; // 内部符号: CP
   export { isSamePath as gl } from "../../shared/app-constants";
   export const gn: any; // 内部符号: vQ
@@ -512,7 +512,7 @@ declare module "@chunk/shared" {
   export const ha: any; // 内部符号: fj
   export const hc: any; // 内部符号: JC
   export const hd: any; // 内部符号: B_
-  export const hf: any; // 内部符号: cj（zod array builder，链式调用放宽为 any）
+  export { hf } from "../../shared/zod-facade";
   export const hi: any; // 内部符号: wP
   export const hl: any; // 内部符号: sx
   export const hn: any; // 内部符号: xQ
@@ -540,7 +540,7 @@ declare module "@chunk/shared" {
   export const ja: any; // 内部符号: ZA
   export const jc: any; // 内部符号: mC
   export { runtimeWorkspaceRootsOf as jd } from "../../shared/sandbox-permissions";
-  export const jf: any; // 内部符号: Jp
+  export { jf } from "../../shared/zod-facade";
   export { wslToWindowsPath as ji } from "../../shared/wsl-paths";
   export { CHROME_INTERNAL_PLUGIN_NAME as jl } from "../../shared/app-constants";
   export const jn: any; // 内部符号: gX
@@ -553,7 +553,7 @@ declare module "@chunk/shared" {
   export const ka: any; // 内部符号: $A
   export { raceWithAbortSignal as kc } from "../../shared/http-headers";
   export { workspaceWritePermissions as kd } from "../../shared/sandbox-permissions";
-  export const kf: any; // 内部符号: Km
+  export { kf } from "../../shared/zod-facade";
   export { resolveExecutionCodexHome as ki } from "../../shared/wsl-paths";
   export const kl: any; // 内部符号: Db
   export const kn: any; // 内部符号: EX
@@ -566,7 +566,7 @@ declare module "@chunk/shared" {
   export const la: any; // 内部符号: pj
   export const lc: any; // 内部符号: cw
   export const ld: any; // 内部符号: ov
-  export const lf: any; // 内部符号: vm
+  export { lf } from "../../shared/zod-facade";
   export const li: any; // 内部符号: TP
   export const ll: any; // 内部符号: Ox
   export const ln: any; // 内部符号: a1
@@ -579,7 +579,7 @@ declare module "@chunk/shared" {
   export const ma: any; // 内部符号: Kne
   export const mc: any; // 内部符号: XC
   export { AUTOMATION_MISSING_ERROR as md } from "../../shared/automation-settings";
-  export const mf: any; // 内部符号: kp
+  export { mf } from "../../shared/zod-facade";
   export const mi: any; // 内部符号: EP
   export const ml: any; // 内部符号: px
   export const mn: any; // 内部符号: wQ
@@ -605,7 +605,7 @@ declare module "@chunk/shared" {
   export const oa: any; // 内部符号: hj
   export { configKeyPath as oc } from "../../shared/app-config";
   export { unescapeHtml as od } from "../../shared/app-config";
-  export const of: any; // 内部符号: Tm
+  export { of } from "../../shared/zod-facade";
   export const oi: any; // 内部符号: GF
   export const ol: any; // 内部符号: Cx
   export const on: any; // 内部符号: l1
@@ -618,7 +618,7 @@ declare module "@chunk/shared" {
   export const pa: any; // 内部符号: uj
   export const pc: any; // 内部符号: ZC
   export { NO_FUTURE_RUNS_ERROR as pd } from "../../shared/automation-settings";
-  export const pf: any; // 内部符号: jp
+  export { pf } from "../../shared/zod-facade";
   export const pi: any; // 内部符号: xP
   export const pl: any; // 内部符号: mx
   export const pn: any; // 内部符号: CQ
@@ -646,7 +646,7 @@ declare module "@chunk/shared" {
   export const ra: any; // 内部符号: Ej
   export { composeDefaultEnableFeatures as rc } from "../../shared/app-config";
   export const rd: any; // 内部符号: bv
-  export const rf: any; // 内部符号: mh
+  export { rf } from "../../shared/zod-facade";
   export const ri: any; // 内部符号: nI
   export const rl: any; // 内部符号: vx
   export const rn: any; // 内部符号: S1
@@ -659,7 +659,7 @@ declare module "@chunk/shared" {
   export const sa: any; // 内部符号: gj
   export const sc: any; // 内部符号: gw
   export const sd: any; // 内部符号: fv
-  export const sf: any; // 内部符号: Sm
+  export { sf } from "../../shared/zod-facade";
   export const si: any; // 内部符号: KF
   export const sl: any; // 内部符号: Dx
   export const sn: any; // 内部符号: o1
@@ -686,7 +686,7 @@ declare module "@chunk/shared" {
   export const ua: any; // 内部符号: Wne
   export const uc: any; // 内部符号: iw
   export { parseAppBrand as ud } from "../../shared/app-config";
-  export const uf: any; // 内部符号: rm
+  export { uf } from "../../shared/zod-facade";
   export const ui: any; // 内部符号: LP
   export const ul: any; // 内部符号: jx
   export const un: any; // 内部符号: r1
@@ -699,7 +699,7 @@ declare module "@chunk/shared" {
   export const va: any; // 内部符号: Hne
   export const vc: any; // 内部符号: GC
   export { findModel as vd } from "../../shared/automation-settings";
-  export const vf: any; // 内部符号: h9（zod discriminated-union builder，放宽为 any）
+  export { vf } from "../../shared/zod-facade";
   export const vi: any; // 内部符号: HN
   export { isPosixAbsolutePath as vl } from "../../shared/app-constants";
   export const vn: any; // 内部符号: ZY
@@ -712,7 +712,7 @@ declare module "@chunk/shared" {
   export const wa: any; // 内部符号: Rne
   export const wc: any; // 内部符号: bC
   export { EMPTY_AMBIENT_SUGGESTIONS as wd } from "../../shared/automation-settings";
-  export const wf: any; // 内部符号: j3（zod object builder，链式调用放宽为 any）
+  export { wf } from "../../shared/zod-facade";
   export const wi: any; // 内部符号: YM
   export { normalizeUncPath as wl } from "../../shared/app-constants";
   export const wn: any; // 内部符号: TX
@@ -725,7 +725,7 @@ declare module "@chunk/shared" {
   export const xa: any; // 内部符号: Vne
   export const xc: any; // 内部符号: FC
   export { isHeartbeatAutomation as xd } from "../../shared/automation-settings";
-  export const xf: any; // 内部符号: Kp
+  export { xf } from "../../shared/zod-facade";
   export const xi: any; // 内部符号: sN
   export { isUncPath as xl } from "../../shared/app-constants";
   export const xn: any; // 内部符号: CX
@@ -738,7 +738,7 @@ declare module "@chunk/shared" {
   export const ya: any; // 内部符号: cj
   export const yc: any; // 内部符号: MC
   export { effectiveModelForAutomation as yd } from "../../shared/automation-settings";
-  export const yf: any; // 内部符号: ch
+  export { yf } from "../../shared/zod-facade";
   export const yi: any; // 内部符号: CN
   export { isNotNetworkUncPath as yl } from "../../shared/app-constants";
   export const yn: any; // 内部符号: XY

@@ -61,6 +61,27 @@ export const arraySchema = z.array as never;
 export const recordSchema = z.record as never;
 /** z.enum（原 `uf` = rm）。 */
 export const enumSchema = z.enum as never;
+/** Additional primitive builders used by main-app schema consumers. */
+export const literalSchema = z.literal as never;
+export const unionSchema = z.union as never;
+export const discriminatedUnionSchema = z.discriminatedUnion as never;
+export const tupleSchema = z.tuple as never;
+export const nullableSchema = z.nullable as never;
+export const optionalSchema = z.optional as never;
+export const defaultSchema = ((schema: { default(value: unknown): unknown }, value: unknown) =>
+  schema.default(value)) as never;
+export const dateSchema = z.date as never;
+export const bigintSchema = z.bigint as never;
+export const nullSchema = z.null as never;
+export const undefinedSchema = z.undefined as never;
+export const voidSchema = z.void as never;
+export const symbolSchema = z.symbol as never;
+export const arraySchemaFactory = z.array as never;
+export const literalSchemaAlt = z.literal as never;
+export const extendSchema = ((shape: unknown) => z.object(shape as never)) as never;
+export const catchSchema = z.any as never;
+export const preprocessSchema = z.preprocess as never;
+export const refineSchema = z.any as never;
 const zodError = ZodError;
 const zodArrayClass = ZodArray;
 const zodObjectClass = ZodObject;
@@ -80,12 +101,10 @@ export {
   stringFormatSchema as Nf,
   numberSchema as Cf,
   intSchema as mf,
-  intSchema as pf,
   booleanSchema as Ef,
   unknownSchema as If,
   jsonSchemaPlaceholder as Lf,
   neverSchema as Mf,
-  zodError as Ff,
   objectSchema as vf,
   objectSchema as wf,
   arraySchema as Df,
@@ -94,7 +113,23 @@ export {
   enumSchema as uf,
   zodArrayClass as af,
   zodObjectClass as cf,
-  zodOptionalClass as lf,
-  zodNullableClass as sf,
-  zodDefaultClass as of,
+  zodError as Ff,
+  literalSchema as bf,
+  unionSchema as jf,
+  discriminatedUnionSchema as Sf,
+  tupleSchema as Tf,
+  nullableSchema as sf,
+  optionalSchema as lf,
+  defaultSchema as of,
+  dateSchema as rf,
+  bigintSchema as yf,
+  nullSchema as pf,
+  undefinedSchema as if,
+  voidSchema as kf,
+  symbolSchema as Af,
+  literalSchemaAlt as df,
+  extendSchema as xf,
+  catchSchema as ff,
+  preprocessSchema as _f,
+  refineSchema as Gd,
 };
