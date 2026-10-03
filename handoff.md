@@ -96,6 +96,8 @@ virtual annotation target payload 组装已抽取为
 surface/viewport rect clipping 已抽取为
 `src/main/browser-page-preload/annotation-surface-geometry.ts`，由 4 项行为断言覆盖。
 其中也承载 region rect union，geometry 回归断言增至 6 项。
+共享的按轴 rect intersection、rect scale、coordinate clamp 与大区域判定也已迁入同一模块，
+marker/scroll/frame 入口直接接回，geometry 回归断言增至 14 项。
 annotation 空格键拦截与输入保护策略已抽取为
 `src/main/browser-page-preload/annotation-keyboard.ts`，由 5 项行为断言覆盖。
 

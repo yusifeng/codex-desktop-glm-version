@@ -6439,7 +6439,7 @@ var { createAnnotationControlsRegistry } = require("./browser-page-preload/annot
 var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
-var { clipAnnotationSurfaceRect, unionAnnotationRects } = require("./browser-page-preload/annotation-surface-geometry");
+var { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects } = require("./browser-page-preload/annotation-surface-geometry");
 var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation-keyboard");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
@@ -23054,7 +23054,7 @@ function C_() {
   };
 }
 function w_(e, t) {
-  return { x: e.x * t, y: e.y * t, width: e.width * t, height: e.height * t };
+  return scaleAnnotationRect(e, t);
 }
 function T_(e, t, n = Ic(t.ownerDocument.defaultView ?? window), r = !1) {
   let i = t.ownerDocument.defaultView ?? window,
@@ -23133,11 +23133,7 @@ function k_(e, t) {
   return A_(e, t, { x: !0, y: !0 });
 }
 function A_(e, t, n) {
-  let r = n.x ? Math.max(e.x, t.x) : e.x,
-    i = n.y ? Math.max(e.y, t.y) : e.y,
-    a = n.x ? Math.min(e.x + e.width, t.x + t.width) : e.x + e.width,
-    o = n.y ? Math.min(e.y + e.height, t.y + t.height) : e.y + e.height;
-  return a <= r || o <= i ? null : { x: r, y: i, width: a - r, height: o - i };
+  return intersectAnnotationRect(e, t, n);
 }
 function j_(e, t) {
   if (t == null) return;
@@ -23154,10 +23150,10 @@ function N_(e) {
   return e == null ? gs(fd()) : Xl.isGoogleDocsAnchor(e) || gs(e.pageUrl);
 }
 function P_(e, t, n) {
-  return e == null || t <= 0 || n <= 0 ? !1 : e.width >= t * L_ && e.height >= n * R_;
+  return isLargeAnnotationRect(e, t, n, L_, R_);
 }
 function F_(e, t, n) {
-  return Math.min(Math.max(e, t), n);
+  return clampAnnotationCoordinate(e, t, n);
 }
 var I_,
   L_,
