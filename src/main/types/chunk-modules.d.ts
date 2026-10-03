@@ -379,7 +379,7 @@ declare module "@chunk/shared" {
   export { _f } from "../../shared/zod-facade";
   export { principalOfToken as _i } from "../../shared/sql-git-registry";
   export { stripWindowsExtendedPrefix as _l } from "../../shared/app-constants";
-  export const _n: any; // 内部符号: _Q
+  export { WebSocket as _n } from "../../shared/mcp-2-runtime";
   export const _o: any; // 内部符号: Hk
   export const _r: any; // 内部符号: WB
   export { DURABLE_HOST_ID as _s } from "../../shared/host-config";
@@ -430,7 +430,7 @@ declare module "@chunk/shared" {
   export { df } from "../../shared/zod-facade";
   export const di: any; // 内部符号: IP
   export const dl: any; // 内部符号: Ax
-  export const dn: any; // 内部符号: GQ
+  export { StdioTransport as dn } from "../../shared/mcp-2-runtime";
   declare const do_: any; // 内部符号: wk（保留字导出）
   export { do_ as "do" };
   export { requireMemoize as dr } from "../../shared/misc-runtime";
@@ -467,7 +467,7 @@ declare module "@chunk/shared" {
   export { gf } from "../../shared/zod-facade";
   export const gi: any; // 内部符号: CP
   export { isSamePath as gl } from "../../shared/app-constants";
-  export const gn: any; // 内部符号: vQ
+  export { WebSocketWrapper as gn } from "../../shared/mcp-2-runtime";
   export const go: any; // 内部符号: Dk
   export { classifyComputerUsePermission as gr } from "../../shared/process-exec";
   export const gs: any; // 内部符号: ZT
@@ -480,7 +480,7 @@ declare module "@chunk/shared" {
   export { hf } from "../../shared/zod-facade";
   export const hi: any; // 内部符号: wP
   export const hl: any; // 内部符号: sx
-  export const hn: any; // 内部符号: xQ
+  export { attachHeartbeat as hn } from "../../shared/mcp-2-runtime";
   export const ho: any; // 内部符号: Ck
   export { classifyComputerUseError as hr } from "../../shared/process-exec";
   export const hs: any; // 内部符号: QT
