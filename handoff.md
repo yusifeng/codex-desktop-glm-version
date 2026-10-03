@@ -16,7 +16,8 @@
 并接回入口，静态门禁全绿。
 
 后续增量已实际接回：worker 入口消息分发与 Git 错误分类、preload WebMCP
-协议、main delegation/account 与 URL trust helpers，均有独立回归断言。
+协议、main delegation/account 与 URL trust helpers、WSL 输出解析，均有独立
+回归断言。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
