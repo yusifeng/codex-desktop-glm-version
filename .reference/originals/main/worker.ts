@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77316,15 +77316,14 @@ var Jye = 1e3,
       try {
         let r = await this.getGitOperationState();
         if (this.disposed) return;
-        let i = {
-          type: `git-repo-changed`,
+        let i = createGitRepoChangedEvent({
           changeType: e,
           commonDir: this.options.commonDir,
           hostId: this.options.host.id,
           rebaseInProgress: r.rebaseInProgress,
           root: this.options.root,
-          changedPaths: n ?? void 0,
-        };
+          changedPaths: n,
+        });
         if (
           (this.options.onCoalescedChange?.({ changeType: e, rawEventCount: t }),
           await this.options.emit({ type: `worker-event`, event: i }),

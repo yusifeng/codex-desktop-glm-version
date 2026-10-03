@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const {
   combineOptionalBooleans,
+  createGitRepoChangedEvent,
   addPendingWorkingTreePath,
   getAffectedWorkingTreePath,
   isGitInternalPath,
@@ -60,5 +61,7 @@ assert.equal(requiresGitWatcherRecovery([{ recursive: true, session: null }], fa
 assert.equal(requiresGitWatcherRecovery([{ recursive: true, metadataDirectory: { missing: true }, session: null }], false), false);
 assert.equal(requiresGitWatcherRecovery([{ recursive: true, session: { coverage: { recursive: true } } }], false), false);
 assert.equal(requiresGitWatcherRecovery([], true), true);
+assert.deepEqual(createGitRepoChangedEvent({ changeType: "working-tree", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: false, root: "/repo", changedPaths: ["/repo/a"] }), { type: "git-repo-changed", changeType: "working-tree", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: false, root: "/repo", changedPaths: ["/repo/a"] });
+assert.deepEqual(createGitRepoChangedEvent({ changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" }), { type: "git-repo-changed", changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" });
 
-console.log("27 worker git watch path assertions passed");
+console.log("29 worker git watch path assertions passed");

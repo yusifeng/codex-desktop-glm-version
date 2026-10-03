@@ -74,5 +74,17 @@ function requiresGitWatcherRecovery(targets: Array<{ metadataDirectory?: { missi
   );
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };
+function createGitRepoChangedEvent(input: { changeType: string; commonDir: string; hostId: string; rebaseInProgress: boolean | null; root: string; changedPaths?: string[] | null }): Record<string, unknown> {
+  return {
+    type: `git-repo-changed`,
+    changeType: input.changeType,
+    commonDir: input.commonDir,
+    hostId: input.hostId,
+    rebaseInProgress: input.rebaseInProgress,
+    root: input.root,
+    ...(input.changedPaths == null ? {} : { changedPaths: input.changedPaths }),
+  };
+}
+
+export { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };

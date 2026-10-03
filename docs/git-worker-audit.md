@@ -30,7 +30,8 @@ path overlap、可缓存命令判定、fsmonitor cache key、配置值解析、d
 
 Git repository watcher 的路径/状态策略已迁至 `worker/git-watch-paths.ts`：
 `isWithinPath`、锁文件过滤、worktree topology marker 匹配、可选状态合并、变更路径归一化、
-Git 内部路径过滤、working-tree 变更集合合并、recovery 判定和 `ENOENT`/`ENOTDIR` 缺失判断（原入口约 77,417-77,438、77,381-77,393、77,545-77,580）。原 watcher 通过
+Git 内部路径过滤、working-tree 变更集合合并、recovery 判定、repo-changed 事件 payload
+和 `ENOENT`/`ENOTDIR` 缺失判断（原入口约 77,417-77,438、77,381-77,393、77,545-77,580）。原 watcher 通过
 同名适配函数接回，行为由 `scripts/test-worker-git-watch-paths.mjs` 覆盖。
 
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
