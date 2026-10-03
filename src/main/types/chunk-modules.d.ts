@@ -362,7 +362,7 @@ declare module "@chunk/shared" {
   export { expectedAccountIdOf as Ys } from "../../shared/http-headers";
   export const Yt: any; // 内部符号: W2
   export { isSupportedAppServerVersion as Yu } from "../../shared/app-server-version";
-  export const Z: any; // 内部符号: eae
+  export { downloadPluginsAsset as Z } from "../../shared/lowlevel-runtime";
   export const Za: any; // 内部符号: rA
   export const Zc: any; // 内部符号: tS
   export const Zd: any; // 内部符号: xg
@@ -398,7 +398,7 @@ declare module "@chunk/shared" {
   export const as: any; // 内部符号: RE
   export const at: any; // 内部符号: Sie
   export { getAtomStateDefault as au } from "../../shared/app-constants";
-  export const b: any; // 内部符号: Lse
+  export { markAllAutomationRunsRead as b } from "../../shared/lowlevel-runtime";
   export const ba: any; // 内部符号: oj
   export const bc: any; // 内部符号: NC
   export { isCronAutomation as bd } from "../../shared/automation-settings";
@@ -510,7 +510,7 @@ declare module "@chunk/shared" {
   export { GIT_SOURCE_HEADER_KEY as js } from "../../shared/host-config";
   export { defaultAcceleratorsForCommand as jt } from "../../shared/command-registry";
   export const ju: any; // 内部符号: Iy
-  export const k: any; // 内部符号: Uoe
+  export { killNodeReplExecution as k } from "../../shared/lowlevel-runtime";
   export { raceWithAbortSignal as kc } from "../../shared/http-headers";
   export { workspaceWritePermissions as kd } from "../../shared/sandbox-permissions";
   export { kf } from "../../shared/zod-facade";
@@ -533,7 +533,7 @@ declare module "@chunk/shared" {
   export { elicitationForTurn as lr } from "../../shared/misc-runtime";
   export { PULL_REQUEST_GENERATION_BUNDLE as lt } from "../../shared/structured-generation";
   export const lu: any; // 内部符号: tb
-  export const m: any; // 内部符号: y9
+  export { requestThreadUnsubscribe as m } from "../../shared/lowlevel-runtime";
   export const ma: any; // 内部符号: Kne
   export const mc: any; // 内部符号: XC
   export { AUTOMATION_MISSING_ERROR as md } from "../../shared/automation-settings";
@@ -654,7 +654,7 @@ declare module "@chunk/shared" {
   export const vs: any; // 内部符号: TT
   export { validatePetSpritesheet as vt } from "../../shared/pet-spritesheet";
   export const vu: any; // 内部符号: Vy
-  export const w: any; // 内部符号: Nse
+  export { persistInboxItems as w } from "../../shared/lowlevel-runtime";
   export const wa: any; // 内部符号: Rne
   export const wc: any; // 内部符号: bC
   export { EMPTY_AMBIENT_SUGGESTIONS as wd } from "../../shared/automation-settings";
@@ -667,7 +667,7 @@ declare module "@chunk/shared" {
   export const ws: any; // 内部符号: NT
   export { resetKeybindings as wt } from "../../shared/command-registry";
   export const wu: any; // 内部符号: jy
-  export const x: any; // 内部符号: Ise
+  export { markInboxItemsReadState as x } from "../../shared/lowlevel-runtime";
   export const xc: any; // 内部符号: FC
   export { isHeartbeatAutomation as xd } from "../../shared/automation-settings";
   export { xf } from "../../shared/zod-facade";
