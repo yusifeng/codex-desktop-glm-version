@@ -6,7 +6,7 @@ import { z } from "zod";
 import { BUNDLED_PLUGIN_DESCRIPTORS, DEFAULT_MARKETPLACE_NAME } from "./app-constants";
 import { changeTouchesVisualizationArtifact } from "./browser-context";
 import { isDurableHost, isRemoteHostConfig, isSshHostConfig, normalizeProjectPath } from "./host-config";
-import { isWslPath, resolveCodexHome } from "./wsl-paths";
+import { buildWslEnvDirective, isWslPath, resolveCodexHome, wslDistroName, windowsToWslPath } from "./wsl-paths";
 
 export function errorToMessage(error: unknown): string { if (error instanceof Error) return error.message; if (typeof error === "string") return error; if (error && typeof error === "object" && "message" in error && typeof error.message === "string") return error.message; try { return JSON.stringify(error); } catch { return String(error); } }
 export const errorMessage = errorToMessage, errorToString = errorToMessage, toError = errorToMessage;
@@ -54,10 +54,10 @@ export const extractBundleOperationErrorCode = (error: unknown): string | null =
 export const sniffContentKind = (value: Uint8Array | string): string => { const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value; return bytes[0] === 0x25 && bytes[1] === 0x50 ? "pdf" : bytes[0] === 0x50 && bytes[1] === 0x4b ? "zip" : "unknown"; };
 export const withSpawnTracing = async <T>(operation: () => T | Promise<T>): Promise<T> => await operation();
 export const shouldUseWslPathsForHostConfig = (config: { kind?: string | null } | null | undefined): boolean => isWslPath(config?.kind ?? "");
-export const convertPathForWsl = (value: string): string => value;
+export const convertPathForWsl = windowsToWslPath;
 export const pathForAgentEnvironmentShared = normalizeProjectPath;
-export const wslHostPathShared = (value: string): string => value;
-export const wslDistroNameShared = (): string | null => null;
+export const wslHostPathShared = windowsToWslPath;
+export const wslDistroNameShared = wslDistroName;
 export const localPluginPath = (home: string, marketplace: string, plugin: string): string => join(home, "plugins", marketplace, plugin);
 export const getBundledPluginCachePath = (home: string, version: string, marketplace: string, plugin: string): string => join(home, "plugins", "cache", marketplace, plugin, version);
 export const internalPluginsConfigSchema = z.record(z.string(), z.unknown());
@@ -80,7 +80,7 @@ export const effectiveSettingValue = (key: string, fallback: unknown): unknown =
 export const settingDefinitionFor = findSettingDescriptor;
 export const agentReadableSettings: readonly unknown[] = SETTING_DESCRIPTORS;
 export const appServerFileSystem = Object.freeze({ readFile, writeFile, mkdir, stat, readdir, rm, copyFile });
-export const settingKeyList = (keys: readonly string[]): string[] => [...keys], browserFamilyConfig = Object.freeze({}), zUnknownSchema = z.unknown(), shouldUseWslPaths = shouldUseWslPathsForHostConfig, buildWslEnvDirective = (value: string): string => value;
+export const settingKeyList = (keys: readonly string[]): string[] => [...keys], browserFamilyConfig = Object.freeze({}), zUnknownSchema = z.unknown(), shouldUseWslPaths = shouldUseWslPathsForHostConfig;
 export const remoteControlEnrollmentAccountMismatch = "remote_control_enrollment_account_mismatch", parseSharedJson = parseStoredJson, sandboxScheme = "codex-sandbox", parseApiResponse = parseStoredJson, agentAccessVisible = [] as readonly unknown[];
 export const normalizeThreadOrders = (value: unknown): unknown => value, defaultModeSettingsForHost = defaultModeSettings, settingsDescriptor = SETTINGS, appearanceSettings = APPEARANCE_SETTINGS, pluginsConfigSchema = internalPluginsConfigSchema, chromeTabFocusSchema = z.object({}), compareProjects = compareProjectsShared, mapSettingValue = effectiveSettingValue, hostValueMap = mapValuesModule, openLinkPreference = openLinkTargetPreference, flavorDirectoryName = (value: unknown): string => typeof value === "string" ? value : "prod", hostEnvironmentState = parseStoredJson, pluginState = parseStoredJson, shellEnvFlagKey = "CODEX_SHELL", tabsLivenessSchema = z.object({}), turnRequestStripper = stripTurnRequestForVersion, queueContextPredicate = isUntrustedQueueContext, sourceSettings = SETTINGS, sourceKinds = DEFAULT_THREAD_SOURCE_KINDS, tabMentionSearchSchema = z.object({}), errorAttributes = (error: unknown): Record<string, string> => ({ message: errorToMessage(error) }), installSharedTracingBridge = <T>(value: T): T => value, errorToSpanAttributes = errorAttributes, queueContextError = untrustedQueueContextError, unknownSchema = z.unknown(), safeAttachmentFilename = isSafeFilename;
 
