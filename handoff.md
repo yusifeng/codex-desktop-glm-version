@@ -8,6 +8,18 @@
 > 双轨构建、批次流程、坑纪律沿用旧版（git 历史可查），并发上限 5 subagent。
 > 所有路径相对 `/Users/david/Workspace/ppio_github/codex-desktop-glm-version`。
 
+## 当前进度快照（2026-10-03）
+
+本轮已完成 worker/preload/main 逐段审计、shared 692 导出全量分类、renderer
+三大 hub 内部审计、tsconfig 排除、测试索引、README 更新，以及 smoke/e2e
+验证说明。worker 的 main-RPC 边界已提取为 `src/main/worker/rpc-client.ts`
+并接回入口，静态门禁全绿。
+
+**尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
+迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
+遵守双轨构建与导出契约。B2 采用了对 `src/webview/assets/` 的显式类型排除
+作为等价隔离，尚未移动原始资产文件。
+
 ---
 
 ## 一、为什么还没「完全」反编译（2026-10-03 审计结论）
@@ -168,5 +180,6 @@ node scripts/verify-renderer.mjs && node scripts/verify-chunks.mjs && \
 npm run typecheck && node scripts/audit-shared-consumption.mjs
 ```
 
-健康值：1874/1874、11/11、typecheck 0、TOTAL 0。然后从 **T1 git-worker
-审计**开始——它是最大件（90K 行）且解锁 T3 的联动缺口。
+健康值：1874/1874、11/11、typecheck 0、TOTAL 0。后续继续处理审计表中
+标记为 `business-preserved` 的区段；不得把审计文档或 preserved 登记误当成
+业务语义化完成。
