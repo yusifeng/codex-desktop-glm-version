@@ -33,6 +33,7 @@ const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranc
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
 const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchState: collectSyncedBranchState } = require("./worker/git-synced-branch-state");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
+const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
@@ -164,6 +165,16 @@ const syncedBranchStateDeps = {
   logger: {
     warning: (message, detail) => kW(`git`)().warning(message, detail),
   },
+};
+const turnDiffSnapshotDeps = {
+  queryKey: Q,
+  getStatusConfig: e2,
+  runGit: $,
+  getIndexPath: m0,
+  withTemporaryIndex: b4,
+  stageWorktree: v4,
+  isObjectId: M0,
+  normalizeTreeSha: Cz,
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73260,76 +73271,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-function s6(e) {
-  let t = e.reviewSnapshot;
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `turn-diff-snapshot-tree`, `${t.generation}`),
-    gcTime: 250,
-    queryFn: () => t.read(() => iye(e, t.signal)),
-    staleTime: 0,
-  });
-}
-async function iye(e, t) {
-  let { hasTrackedChanges: n, untrackedPaths: r } = await aye(e, t);
-  if (!n && r.length === 0) {
-    let n = await $(e.root, [`rev-parse`, `--verify`, `HEAD^{tree}`], e.host, {
-      allowedNonZeroExitCodes: [1, 128],
-      signal: t,
-    });
-    if (n.code === 0) return c6(n.stdout);
-    if (!n.success) throw Error(n.stderr || n.stdout || `Failed to resolve HEAD tree`);
-  }
-  let i = await m0(e, t);
-  if (i == null) throw Error(`Failed to resolve git index path`);
-  return b4(
-    i,
-    async (i) => {
-      let a = await v4({
-        gitRoot: e.root,
-        env: i,
-        fallback: `error`,
-        host: e.host,
-        includeTrackedChanges: n,
-        signal: t,
-        untrackedPathsPromise: Promise.resolve({ success: !0, gitRoot: e.root, paths: r }),
-      });
-      if (!a.success) throw Error(a.stderr || a.stdout || `Failed to stage turn diff snapshot`);
-      let o = await $(e.root, [`write-tree`], e.host, { env: i, signal: t });
-      if (!o.success) throw Error(o.stderr || o.stdout || `Failed to write turn diff snapshot`);
-      return c6(o.stdout);
-    },
-    e.host,
-  );
-}
-async function aye(e, t) {
-  let n = await e2(e, t),
-    r = await $(
-      e.root,
-      [`status`, `--no-renames`, `--porcelain=v1`, `-z`, `--untracked-files=normal`],
-      e.host,
-      { configOverrides: n, signal: t, trim: !1 },
-    );
-  if (!r.success) throw Error(r.stderr || r.stdout || `Failed to read turn diff status`);
-  return oye(r.stdout);
-}
-function oye(e) {
-  let t = !1,
-    n = [],
-    r = 0;
-  for (; r < e.length;) {
-    let i = e.indexOf(`\0`, r);
-    if (i === -1 || i < r + 3) throw Error(`Malformed turn diff status output`);
-    let a = e[r],
-      o = e[r + 1];
-    (a === `?` && o === `?` ? n.push(e.slice(r + 3, i)) : (t = !0), (r = i + 1));
-  }
-  return { hasTrackedChanges: t, untrackedPaths: n };
-}
-function c6(e) {
-  let t = e.trim();
-  if (!M0(t)) throw Error(`Unexpected tree SHA: ${t}`);
-  return Cz(t);
-}
 var l6 = `refs/codex/turn-diffs/captures`,
   u6 = `refs/codex/turn-diffs/checkpoints`,
   sye = i4,
@@ -73350,7 +73291,7 @@ async function uye({
   let c = await i.getWorktreeRepository(r, e);
   if (c == null) return null;
   let l = t == null ? await q4(c, o) : null,
-    u = await s6(c),
+    u = await captureTurnDiffSnapshotTree(c, turnDiffSnapshotDeps),
     [d, f] = await Promise.all([
       P3(c, { isRepoWatched: a?.(c.root), signal: o }),
       l == null
@@ -73406,7 +73347,10 @@ function dye({ host: e, capture: t, gitManager: n, retainCheckpoint: r, signal: 
 }
 async function fye({ host: e, capture: t, gitManager: n, signal: r }) {
   try {
-    let i = await s6(n.getWorktreeRepositoryForRoot(t.root, e));
+    let i = await captureTurnDiffSnapshotTree(
+      n.getWorktreeRepositoryForRoot(t.root, e),
+      turnDiffSnapshotDeps,
+    );
     await m6({ host: e, ref: `${t.refPrefix}/head`, root: t.root, signal: r, treeSha: i });
     let [a, o] = await Promise.all([
       p6({ host: e, baseRef: t.baseTreeSha, headTreeSha: i, root: t.root, signal: r }),

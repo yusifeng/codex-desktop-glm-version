@@ -96,6 +96,11 @@ turn diff capture 的 start/complete 请求编排已迁移至
 拥有 `watchesByKey`、ready/recovery 状态和 response 包装；capture helper 的参数收窄与 watcher
 判定透传由 `scripts/test-worker-git-turn-diff-request-handlers.mjs` 的 8 项断言覆盖。
 
+Turn-diff snapshot 的 reviewSnapshot generation cache、porcelain v1 `-z` 状态解析、无变化时
+`HEAD^{tree}` 快路径，以及 tracked/untracked 变化的临时 index staging/write-tree 已迁移至
+`src/main/worker/git-turn-diff-snapshot.ts`；原 `s6/iye/aye/oye/c6` 已删除。21 项断言覆盖
+状态配置、tree SHA 校验、临时 index 参数、malformed output 和 snapshot read 边界。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步
