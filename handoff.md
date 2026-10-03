@@ -245,7 +245,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 
 | # | 问题 | 现状 |
 |---|---|---|
-| B1 | tsconfig 吞 586 万行 transform-only 文件 | `include: src/**/*.ts` 未排除 `src/webview/assets/`，typecheck 约 44 秒 |
+| B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
 | B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 632 个 `scripts/test-*.mjs` 脚本 |
@@ -320,8 +320,8 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
 
 ### T6 · 工程可读性（B1-B4）
 
-1. **tsconfig 瘦身**：`"exclude": ["src/webview/assets"]`（transform-only
-   不参与类型检查）。排除后 typecheck 基线应保持 0；若出现新错误，
+1. **tsconfig 瘦身（已完成）**：`"exclude": ["src/webview/assets"]` 已生效
+   （transform-only 不参与类型检查），typecheck 基线保持 0；后续若出现新错误，
    说明有语义源码偷偷依赖了原版类型——修复依赖而不是恢复 include。
 2. **原版对照迁出**：把 `src/main/src-DldfpmrL.ts`、`main-C-Mhak1n.ts`、
    `worker.ts`、`browser-page-preload.ts`、`core-*.ts`、`dist-*.ts`、
