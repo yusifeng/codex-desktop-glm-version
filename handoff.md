@@ -21,8 +21,9 @@
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
-遵守双轨构建与导出契约。B2 采用了对 `src/webview/assets/` 的显式类型排除
-作为等价隔离，尚未移动原始资产文件。
+遵守双轨构建与导出契约。B2 已将主进程原始对照 chunk 移至
+`.reference/originals/main/`，并由构建脚本按历史输出文件名重新编译；
+`src/webview/assets/` 仍通过 tsconfig 显式排除。
 
 ---
 
@@ -37,9 +38,9 @@
 
 | # | 位置 | 体量 | 现状 | 问题 |
 |---|---|---|---|---|
-| A1 | `src/main/worker.ts`（git-worker） | **90,836 行** | 整体 PRESERVED，理由"worker_threads 启动协议" | 无逐段审计。git RPC 面、session 生命周期是业务代码，vendored 依赖混在其中——需要拆开：业务语义化、vendor 登记 |
-| A2 | `src/main/browser-page-preload.ts` | **30,217 行** | 整体 PRESERVED | contextBridge IPC 协议、schema 定义是业务代码 |
-| A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | T6 审计从未执行 | ~44K 行 gap 被断言为"vendored + 低频路径"，**无审计报告支撑** |
+| A1 | `.reference/originals/main/worker.ts`（git-worker） | **90,836 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
+| A2 | `.reference/originals/main/browser-page-preload.ts` | **30,217 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP | annotation/design runtime 等业务区段仍待迁移 |
+| A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 未消费导出 | **330 个**（692 总量 − 362 已消费） | 未分类 | 其中 vendor（lodash shim 等）与真实业务混杂；A1/A2 语义化后消费面会增长，联动出现新缺口 |
 | A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 仅 343 个被消费导出类型化 | hub 内部未消费的应用逻辑仍是压缩（app-initial 里有 i18n 核心等真实业务，也有大量 micromark/zod/valdi 胶水） |
 

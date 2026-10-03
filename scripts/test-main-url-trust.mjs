@@ -24,7 +24,7 @@ assert.equal(trust.sameAppPath("app://openai/index.html", "app://openai/index.ht
 assert.equal(trust.sameTrustedPath("https://chatgpt.com/a", "https://chatgpt.com/a", "https://chatgpt.com"), true);
 assert.equal(trust.sameTrustedPath("app://-/index.html", "app://-/index.html", null), true);
 
-const main = await fs.readFile("src/main/main-C-Mhak1n.ts", "utf8");
+const main = await fs.readFile(".reference/originals/main/main-C-Mhak1n.ts", "utf8");
 assert.match(main, /require\("\.\/main-app\/util\/url-trust\.js"\)/);
 assert.match(main, /return mainUrlTrust\.sameTrustedPath\(e, t, n \?\? null\)/);
 console.log("14 main URL trust assertions passed");

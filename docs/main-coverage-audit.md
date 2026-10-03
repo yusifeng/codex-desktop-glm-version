@@ -7,7 +7,7 @@
 `main-app/util/url-trust.ts`）。两者均保留原别名调用面并有行为断言；表中
 其余 `semantic/business` 区段仍表示待继续物理迁出或已由既有模块覆盖。
 
-审计对象：`src/main/main-C-Mhak1n.ts`（原始 main chunk）。
+审计对象：`.reference/originals/main/main-C-Mhak1n.ts`（原始 main chunk）。
 
 ## 结论摘要
 
@@ -68,7 +68,7 @@ rolldown 的 `e.t/e.r/e.a/e.n` 包装、模块编号表、`__export`/`__toCommon
 ## 审计复核
 
 ```sh
-wc -l src/main/main-C-Mhak1n.ts
+wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs
 node scripts/audit-shared-consumption.mjs
 ```

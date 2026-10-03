@@ -65,6 +65,13 @@ for (const src of await listTs(path.join(ROOT, "src/main"))) {
   }
   jobs.push([src, path.join(ROOT, "app/.vite/build", rel.replace(/\.ts$/, ".js"))]);
 }
+// Original comparison chunks live outside src/ so the source tree remains
+// navigable. They still compile to their historical output basenames.
+const referenceMain = path.join(ROOT, ".reference/originals/main");
+for (const src of await listTs(referenceMain)) {
+  const rel = path.relative(referenceMain, src);
+  jobs.push([src, path.join(ROOT, "app/.vite/build", rel.replace(/\.ts$/, ".js"))]);
+}
 for (const src of await listTs(path.join(ROOT, "src/webview"))) {
   const rel = path.relative(path.join(ROOT, "src/webview"), src);
   jobs.push([src, path.join(ROOT, "app/webview", rel.replace(/\.ts$/, ".js"))]);

@@ -8,7 +8,7 @@ CommonJS 依赖注入接回。schema、policy gate、刷新生命周期和两条
 contextBridge 路径均有 VM smoke 覆盖；其余 preload business 区段仍保持
 原文件并按下表审计。
 
-审计对象：`src/main/browser-page-preload.ts`（当前文件 30,217 行）。
+审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
 

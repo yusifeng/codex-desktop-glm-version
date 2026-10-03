@@ -9,4 +9,7 @@
 /app/webview/**/*.js
 
 .DS_Store
-/.reference/
+/.reference/*
+!/.reference/originals/
+!/.reference/originals/main/
+!/.reference/originals/main/*.ts
