@@ -6435,6 +6435,7 @@ var zd = `codex_desktop:message-for-view`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
 var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationControlsRegistry } = require("./browser-page-preload/annotation-controls-registry");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
@@ -7190,90 +7191,26 @@ var mf = 64,
     controlsMode: ff.shape.controlsMode,
   });
 function Cf() {
-  let e = document,
-    t = window,
-    n = new Map(),
-    r = new WeakMap(),
-    i = 0,
-    a = 0,
-    o = (e, t) => {
-      i += attachAnnotationControlTargets(e, t, r, e.order);
-    },
-    s = (e) => {
-      i -= detachAnnotationControlTargets(e, r);
-    },
-    c = (t) => {
-      try {
-        let r = wf(t);
-        if (r == null) return;
-        let s = Tf(r, `id`),
-          c = Tf(r, `payload`),
-          l = Tf(r, `targets`);
-        if (typeof s != `string` || s.length === 0 || s.length > 80 || n.has(s) || n.size >= mf)
-          return;
-        let u = Ef(c);
-        if (u == null) return;
-        let d = Df(e, l);
-        if (d == null || d.size === 0 || n.has(s) || n.size >= mf || i + d.size > gf) return;
-        let f = { controls: u, id: s, order: a++, targets: [] };
-        (n.set(s, f), o(f, d), t.preventDefault());
-      } catch {}
-    },
-    l = (t) => {
-      try {
-        let r = wf(t);
-        if (r == null) return;
-        let a = Tf(r, `id`),
-          c = Tf(r, `payload`),
-          l = Tf(r, `targets`);
-        if (typeof a != `string`) return;
-        let u = n.get(a);
-        if (u == null) return;
-        let d = l === void 0 ? void 0 : Df(e, l);
-        if ((l !== void 0 && d == null) || n.get(a) !== u) return;
-        let f = Ef(c, u.controls);
-        if (f == null || (d != null && i - u.targets.length + d.size > gf)) return;
-        ((u.controls = f), d != null && (s(u), o(u, d)), t.preventDefault());
-      } catch {}
-    },
-    u = (e) => {
-      try {
-        let t = wf(e);
-        if (t == null) return;
-        let r = Tf(t, `id`);
-        if (typeof r != `string`) return;
-        let i = n.get(r);
-        if (i == null) return;
-        (n.delete(r), s(i), e.preventDefault());
-      } catch {}
-    },
-    d = () => {
-      (n.clear(),
-        (r = new WeakMap()),
-        (i = 0),
-        t.removeEventListener(vf, c),
-        t.removeEventListener(yf, l),
-        t.removeEventListener(bf, u),
-        t.removeEventListener(`pagehide`, f));
-    },
-    f = (e) => {
-      shouldDisposeAnnotationRegistryOnPagehide(e) && d();
-    };
-  return (
-    t.addEventListener(vf, c),
-    t.addEventListener(yf, l),
-    t.addEventListener(bf, u),
-    t.addEventListener(`pagehide`, f),
-    {
-      dispose: d,
-      getTargets() {
-        return collectAnnotationControlTargets(n.values(), (t) => t instanceof HTMLElement && t.isConnected && t.ownerDocument === e);
-      },
-      getControls(t) {
-        return getAnnotationControlsForTarget(t, e, r);
-      },
-    }
-  );
+  return createAnnotationControlsRegistry({
+    documentRef: document,
+    windowRef: window,
+    registerEvent: vf,
+    updateEvent: yf,
+    disposeEvent: bf,
+    pagehideEvent: `pagehide`,
+    maxControls: mf,
+    maxTotalTargets: gf,
+    readDetail: wf,
+    readField: Tf,
+    parsePayload: (value, current) => Ef(value, current),
+    parseTargets: (value) => Df(document, value),
+    attachTargets: attachAnnotationControlTargets,
+    detachTargets: detachAnnotationControlTargets,
+    collectTargets: collectAnnotationControlTargets,
+    getControls: getAnnotationControlsForTarget,
+    isValidTarget: (target) => target instanceof HTMLElement && target.isConnected && target.ownerDocument === document,
+    shouldDisposePagehide: shouldDisposeAnnotationRegistryOnPagehide,
+  });
 }
 function wf(e) {
   return readAnnotationEventDetail(e);
