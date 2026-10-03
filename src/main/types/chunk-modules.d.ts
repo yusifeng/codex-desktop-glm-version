@@ -267,7 +267,7 @@ declare module "@chunk/shared" {
   export const Ql: any; // 内部符号: wb
   export const Qn: any; // 内部符号: XK
   export const Qo: any; // 内部符号: CE
-  export const Qr: any; // 内部符号: ZF
+  export { recordAutomationRunStart as Qr } from "../../shared/sql-git-registry";
   export { joinBackendApiPath as Qs } from "../../shared/http-headers";
   export const Qt: any; // 内部符号: g2
   export { isValidSemver as Qu } from "../../shared/app-server-version";
@@ -368,7 +368,7 @@ declare module "@chunk/shared" {
   export const Zd: any; // 内部符号: xg
   export const Zl: any; // 内部符号: Cb
   export { loadLoginShellEnv as Zn } from "../../shared/mcp-runtime";
-  export const Zr: any; // 内部符号: aI
+  export { createAutomationGuard as Zr } from "../../shared/sql-git-registry";
   export { hasHeader as Zs } from "../../shared/http-headers";
   export const Zt: any; // 内部符号: m2
   export { compareSemver as Zu } from "../../shared/app-server-version";
@@ -390,7 +390,7 @@ declare module "@chunk/shared" {
   export { jsonSchema as ac } from "../../shared/app-config";
   export const ad: any; // 内部符号: hv
   export { af } from "../../shared/zod-facade";
-  export const ai: any; // 内部符号: JF
+  export { closeSqlite as ai } from "../../shared/sql-git-registry";
   export const al: any; // 内部符号: wx
   export const an: any; // 内部符号: I1
   export const ao: any; // 内部符号: sk
@@ -428,7 +428,7 @@ declare module "@chunk/shared" {
   export const dc: any; // 内部符号: tw
   export { parseAutomationUpdateOutput as dd } from "../../shared/automation-settings";
   export { df } from "../../shared/zod-facade";
-  export const di: any; // 内部符号: IP
+  export { getAccessibleApps as di } from "../../shared/sql-git-registry";
   export const dl: any; // 内部符号: Ax
   export { StdioTransport as dn } from "../../shared/mcp-2-runtime";
   declare const do_: any; // 内部符号: wk（保留字导出）
@@ -441,7 +441,7 @@ declare module "@chunk/shared" {
   export const ec: any; // 内部符号: Sw
   export { identity as ed } from "../../shared/app-server-version";
   export { DEFAULT_OPEN_TARGET_PREFERENCE as ef } from "../../shared/automation-settings";
-  export const ei: any; // 内部符号: cI
+  export { removeRuntimeDirectory as ei } from "../../shared/sql-git-registry";
   export const el: any; // 内部符号: bx
   export const en: any; // 内部符号: G1
   export { shellSplit as er } from "../../shared/misc-runtime";
@@ -453,7 +453,7 @@ declare module "@chunk/shared" {
   export const fc: any; // 内部符号: $C
   export { parseHeartbeatFromBlocks as fd } from "../../shared/automation-settings";
   export { ff } from "../../shared/zod-facade";
-  export const fi: any; // 内部符号: SP
+  export { getGenerationStatuses as fi } from "../../shared/sql-git-registry";
   export const fl: any; // 内部符号: cx
   export const fn: any; // 内部符号: QQ
   export const fo: any; // 内部符号: Ok
@@ -491,7 +491,7 @@ declare module "@chunk/shared" {
   export { last as id } from "../../shared/app-config";
   declare const if_: any; // 内部符号: ph（保留字导出）
   export { if_ as "if" };
-  export const ii: any; // 内部符号: eI
+  export { deleteRunsForAutomation as ii } from "../../shared/sql-git-registry";
   export const il: any; // 内部符号: Sx
   declare const in_: any; // 内部符号: v1（保留字导出）
   export { in_ as "in" };
@@ -526,7 +526,7 @@ declare module "@chunk/shared" {
   export const lc: any; // 内部符号: cw
   export const ld: any; // 内部符号: ov
   export { lf } from "../../shared/zod-facade";
-  export const li: any; // 内部符号: TP
+  export { getChatGptComposerItems as li } from "../../shared/sql-git-registry";
   export const ll: any; // 内部符号: Ox
   export const ln: any; // 内部符号: a1
   export const lo: any; // 内部符号: Tk
@@ -538,7 +538,7 @@ declare module "@chunk/shared" {
   export const mc: any; // 内部符号: XC
   export { AUTOMATION_MISSING_ERROR as md } from "../../shared/automation-settings";
   export { mf } from "../../shared/zod-facade";
-  export const mi: any; // 内部符号: EP
+  export { recordComposerItemInteraction as mi } from "../../shared/sql-git-registry";
   export const ml: any; // 内部符号: px
   export const mn: any; // 内部符号: wQ
   export const mo: any; // 内部符号: jk
@@ -549,7 +549,7 @@ declare module "@chunk/shared" {
   export const nc: any; // 内部符号: jw
   export const nd: any; // 内部符号: Cv
   export const nf: any; // 内部符号: bte
-  export const ni: any; // 内部符号: oI
+  export { removeRuntimeDirectory as ni } from "../../shared/sql-git-registry";
   export const nl: any; // 内部符号: _x
   export const nn: any; // 内部符号: x1
   export { parseMarkdownPathLinks as nr } from "../../shared/misc-runtime";
@@ -561,7 +561,7 @@ declare module "@chunk/shared" {
   export { configKeyPath as oc } from "../../shared/app-config";
   export { unescapeHtml as od } from "../../shared/app-config";
   export { of } from "../../shared/zod-facade";
-  export const oi: any; // 内部符号: GF
+  export { withTimeout as oi } from "../../shared/sql-git-registry";
   export const ol: any; // 内部符号: Cx
   export const on: any; // 内部符号: l1
   export const oo: any; // 内部符号: ik
@@ -609,7 +609,7 @@ declare module "@chunk/shared" {
   export const sc: any; // 内部符号: gw
   export const sd: any; // 内部符号: fv
   export { sf } from "../../shared/zod-facade";
-  export const si: any; // 内部符号: KF
+  export { stateDatabasePath as si } from "../../shared/sql-git-registry";
   export const sl: any; // 内部符号: Dx
   export const sn: any; // 内部符号: o1
   export const so: any; // 内部符号: ak
@@ -622,7 +622,7 @@ declare module "@chunk/shared" {
   export { InMemoryInterceptor as td } from "../../shared/app-config";
   /** 线程状态 → RGB 颜色码（内部符号 Cte，switch 返回各状态颜色常量）。 */
   export { colorForThreadStatus as tf } from "../../shared/browser-context";
-  export const ti: any; // 内部符号: tI
+  export { archiveAutomationRun as ti } from "../../shared/sql-git-registry";
   export const tl: any; // 内部符号: xx
   export const tn: any; // 内部符号: W1
   export const tr: any; // 内部符号: jK
@@ -634,7 +634,7 @@ declare module "@chunk/shared" {
   export const uc: any; // 内部符号: iw
   export { parseAppBrand as ud } from "../../shared/app-config";
   export { uf } from "../../shared/zod-facade";
-  export const ui: any; // 内部符号: LP
+  export { isEnabledApp as ui } from "../../shared/sql-git-registry";
   export const ul: any; // 内部符号: jx
   export const un: any; // 内部符号: r1
   export const uo: any; // 内部符号: Ek
@@ -659,7 +659,7 @@ declare module "@chunk/shared" {
   export const wc: any; // 内部符号: bC
   export { EMPTY_AMBIENT_SUGGESTIONS as wd } from "../../shared/automation-settings";
   export { wf } from "../../shared/zod-facade";
-  export const wi: any; // 内部符号: YM
+  export { parseToml as wi } from "../../shared/sql-git-registry";
   export { normalizeUncPath as wl } from "../../shared/app-constants";
   export const wn: any; // 内部符号: TX
   export const wo: any; // 内部符号: JO
