@@ -7,6 +7,7 @@ let t = require("node:worker_threads"),
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
+const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -77113,6 +77114,14 @@ var I6 = kW(`git`),
           invalidateUntrackedPathsCache: p2,
           refreshRepository: (hostId, root) => this.liveQueryRegistry.refreshRepository(hostId, root),
         },
+        applyRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          applyChanges: Ige,
+          applyPatch: S2,
+          applyReviewSectionChanges: D_e,
+        },
         watchRequestDeps = {
           gitManager: this.gitManager,
           host: o,
@@ -77623,28 +77632,18 @@ var I6 = kW(`git`),
             (await Fve(e.params.rolloutPath, o), (p = X({ success: !0 })));
             break;
           case `apply-changes`: {
-            let t = await Ige({
-              ...e.params,
-              gitManager: this.gitManager,
-              host: o,
-              signal: i.signal,
-            });
-            (t.status !== `command-error` && (d = e.params.destinationRoot), (p = X(t)));
+            let t = await applyGitChanges(e.params, applyRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `apply-patch`: {
-            let t = await S2(e.params, this.gitManager, o, { signal: i.signal });
-            ((t.status !== `error` || t.appliedPaths.length > 0) && (d = e.params.cwd), (p = X(t)));
+            let t = await applyGitPatch(e.params, applyRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `apply-review-section-changes`: {
-            let t = await D_e({
-              ...e.params,
-              gitManager: this.gitManager,
-              host: o,
-              signal: i.signal,
-            });
-            ((t.status !== `error` || t.appliedPaths.length > 0) && (d = e.params.cwd), (p = X(t)));
+            let t = await applyGitReviewSectionChanges(e.params, applyRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `commit`: {

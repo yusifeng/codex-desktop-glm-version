@@ -92,6 +92,8 @@ Thread worktree resolution 的 metadata 快路径、owner fallback、候选排�
 Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-query recovery/unwatch，
 以及长生命周期 `subscribe-live-query` 的 metadata coalescing、abort、subscribe/unsubscribe 与
 releaseWatch `finally` 已迁移至 `src/main/worker/git-watch-request-handlers.ts`，由 25 项行为断言覆盖。
+Git apply changes/patch/review-section 三类 mutation 的参数注入、partial apply 判定与 refresh-root
+规则已迁移至 `src/main/worker/git-apply-request-handlers.ts`，由 11 项行为断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为

@@ -136,6 +136,10 @@ Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-quer
 以及 `subscribe-live-query` 的 metadata coalescing、abort、subscription 与 releaseWatch `finally`
 状态机已迁移至 `src/main/worker/git-watch-request-handlers.ts`，25 项断言覆盖该完整请求边界。
 
+`apply-changes`、`apply-patch` 与 `apply-review-section-changes` 的参数注入、partial-apply
+成功判定及 refresh-root 规则已迁移至 `src/main/worker/git-apply-request-handlers.ts`；dispatcher
+继续持有 envelope 与 finally cache/live-query refresh，由 11 项断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
