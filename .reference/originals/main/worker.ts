@@ -9,6 +9,7 @@ const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
+const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest } = require("./worker/git-observability");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -65496,12 +65497,16 @@ function ppe(e) {
   (P1.delete(e.id), F1.delete(e));
 }
 function z1({ requestKind: e, source: t }) {
+  return isGitMutationRequest({ requestKind: e, source: t });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return fpe.has(e ?? ``) || mpe(t);
 }
 function mpe(e) {
   return dpe.has(e);
 }
 function B1(e) {
+  return buildGitHostCacheKey(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return JSON.stringify([
     e.id,
     e.hostConfig.kind,
@@ -65535,6 +65540,8 @@ async function hpe(e, t) {
   );
 }
 function gpe(e) {
+  return createGitCommandStats(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return {
     canceledCommandCount: 0,
     closed: !1,
@@ -65612,6 +65619,8 @@ function vpe(e) {
   };
 }
 function ype(e) {
+  return exitCodeBucket(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e) {
     case null:
       return null;

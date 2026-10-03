@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 567.
+Total scripts: 569.
 
 - [`test-account-modals-cluster.mjs`](./test-account-modals-cluster.mjs)
 - [`test-account-query-managed-state-cluster.mjs`](./test-account-query-managed-state-cluster.mjs)
@@ -293,6 +293,7 @@ Total scripts: 567.
 - [`test-login-route.mjs`](./test-login-route.mjs)
 - [`test-main-business.mjs`](./test-main-business.mjs)
 - [`test-main-conversation-files-streams-gaps.mjs`](./test-main-conversation-files-streams-gaps.mjs)
+- [`test-main-thread-metadata.mjs`](./test-main-thread-metadata.mjs)
 - [`test-main-thread-workspace-gaps.mjs`](./test-main-thread-workspace-gaps.mjs)
 - [`test-main-url-trust.mjs`](./test-main-url-trust.mjs)
 - [`test-markdown-renderer-entry.mjs`](./test-markdown-renderer-entry.mjs)
@@ -555,6 +556,7 @@ Total scripts: 567.
 - [`test-workbook-review-utils.mjs`](./test-workbook-review-utils.mjs)
 - [`test-worker-entry-dispatcher.mjs`](./test-worker-entry-dispatcher.mjs)
 - [`test-worker-git-errors.mjs`](./test-worker-git-errors.mjs)
+- [`test-worker-git-observability.mjs`](./test-worker-git-observability.mjs)
 - [`test-worker-platform-wsl.mjs`](./test-worker-platform-wsl.mjs)
 - [`test-worker-remote-host-config.mjs`](./test-worker-remote-host-config.mjs)
 - [`test-worker-rpc-client.mjs`](./test-worker-rpc-client.mjs)

@@ -17,6 +17,11 @@ WSL 平台的纯输出解析（约 47,122-47,584 中的 UTF-16/UTF-8 解码、�
 别名优先级、IPv6 bracket 与 `-p`/`-i` 命令行规则，入口仍负责原始 host
 对象装配；行为由 `scripts/test-worker-remote-host-config.mjs` 覆盖。
 
+Git 命令统计初始化、变更请求来源判定、host cache key 和 exit-code bucket
+（原入口约 65,498-65,559、65,614-65,628）已迁至
+`worker/git-observability.ts`，原 `z1`/`gpe`/`B1`/`ype` 别名接回；行为由
+`scripts/test-worker-git-observability.mjs` 覆盖。
+
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含
 Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表示第三方库
