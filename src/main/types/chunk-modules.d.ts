@@ -64,7 +64,7 @@ declare module "@chunk/shared" {
   export { NODE_REPL_TRUSTED_SERVICES_ENV_KEY as $l } from "../../shared/app-constants";
   export { shellQuote as $n } from "../../shared/misc-runtime";
   export const $r: any; // 内部符号: sI
-  export const $t: any; // 内部符号: _2
+  export { installChromePluginRuntime as $t } from "../../shared/streams-runtime";
   export { threadIdOf as $u } from "../../shared/browser-context";
   export { resolveApplication as A } from "../../shared/fs-diagnostics";
   export { createDeferred as Ac } from "../../shared/http-headers";
@@ -151,7 +151,7 @@ declare module "@chunk/shared" {
   export const Go: any; // 内部符号: aD
   export const Gr: any; // 内部符号: NI
   export { shouldAttachAuthHeaders as Gs } from "../../shared/http-headers";
-  export const Gt: any; // 内部符号: Y2
+  export { chromeNativeHostsV2Path as Gt } from "../../shared/streams-runtime";
   export { supportsRecencySortKey as Gu } from "../../shared/app-server-version";
   export const H: any; // 内部符号: q5
   export { mentionsWithinBudget as Hc } from "../../shared/browser-tab-mentions";
@@ -185,7 +185,7 @@ declare module "@chunk/shared" {
   export const Jo: any; // 内部符号: tD
   export const Jr: any; // 内部符号: hI
   export { wantsIntegrityState as Js } from "../../shared/http-headers";
-  export const Jt: any; // 内部符号: h2
+  export { reconcileChromeNativeHost as Jt } from "../../shared/streams-runtime";
   export { parseVersionOutput as Ju } from "../../shared/app-server-version";
   export const K: any; // 内部符号: pae
   export const Ka: any; // 内部符号: SA
@@ -196,7 +196,7 @@ declare module "@chunk/shared" {
   export { spawnProcess as Kn } from "../../shared/mcp-runtime";
   export const Kr: any; // 内部符号: MI
   export { wantsDesktopSurface as Ks } from "../../shared/http-headers";
-  export const Kt: any; // 内部符号: U2
+  export { getChromeNativeHostName as Kt } from "../../shared/streams-runtime";
   export { supportsPaginatedHistory as Ku } from "../../shared/app-server-version";
   export const L: any; // 内部符号: toe
   export const La: any; // 内部符号: WA
@@ -269,7 +269,7 @@ declare module "@chunk/shared" {
   export const Qo: any; // 内部符号: CE
   export { recordAutomationRunStart as Qr } from "../../shared/sql-git-registry";
   export { joinBackendApiPath as Qs } from "../../shared/http-headers";
-  export const Qt: any; // 内部符号: g2
+  export { installChromeNativeHostManifest as Qt } from "../../shared/streams-runtime";
   export { isValidSemver as Qu } from "../../shared/app-server-version";
   export const R: any; // 内部符号: noe
   export { chromeExtensionIdsForChannel as Rc } from "../../shared/browser-tab-mentions";
@@ -316,7 +316,7 @@ declare module "@chunk/shared" {
   export const Uo: any; // 内部符号: sD
   export { localPathForHost as Ur } from "../../shared/sql-git-registry";
   export const Us: any; // 内部符号: Nw
-  export const Ut: any; // 内部符号: U4
+  export { WebSocketConnectionBase as Ut } from "../../shared/streams-runtime";
   export { parseSemanticVersion as Uu } from "../../shared/app-server-version";
   export const V: any; // 内部符号: Jae
   export const Va: any; // 内部符号: RA
@@ -349,7 +349,7 @@ declare module "@chunk/shared" {
   export const Xn: any; // 内部符号: $q
   export const Xr: any; // 内部符号: gI
   export { errorKindOf as Xs } from "../../shared/http-headers";
-  export const Xt: any; // 内部符号: v2
+  export { uninstallChromePluginRuntime as Xt } from "../../shared/streams-runtime";
   export const Xu: any; // 内部符号: Bv
   export const Y: any; // 内部符号: fae
   export const Yc: any; // 内部符号: eS
@@ -360,7 +360,7 @@ declare module "@chunk/shared" {
   export const Yo: any; // 内部符号: $E
   export const Yr: any; // 内部符号: _I
   export { expectedAccountIdOf as Ys } from "../../shared/http-headers";
-  export const Yt: any; // 内部符号: W2
+  export { pointLatestCacheAtVersion as Yt } from "../../shared/streams-runtime";
   export { isSupportedAppServerVersion as Yu } from "../../shared/app-server-version";
   export { downloadPluginsAsset as Z } from "../../shared/lowlevel-runtime";
   export const Za: any; // 内部符号: rA
@@ -370,7 +370,7 @@ declare module "@chunk/shared" {
   export { loadLoginShellEnv as Zn } from "../../shared/mcp-runtime";
   export { createAutomationGuard as Zr } from "../../shared/sql-git-registry";
   export { hasHeader as Zs } from "../../shared/http-headers";
-  export const Zt: any; // 内部符号: m2
+  export { uninstallChromePluginRuntime as Zt } from "../../shared/streams-runtime";
   export { compareSemver as Zu } from "../../shared/app-server-version";
   export const _: any; // 内部符号: v9
   export const _a: any; // 内部符号: Une
@@ -417,7 +417,7 @@ declare module "@chunk/shared" {
   export { cf } from "../../shared/zod-facade";
   export { openSqlite as ci } from "../../shared/sql-git-registry";
   export const cl: any; // 内部符号: Tx
-  export const cn: any; // 内部符号: i1
+  export { SSH_WEBSOCKET_TRANSPORT_KEY as cn } from "../../shared/streams-runtime";
   export const co: any; // 内部符号: nk
   export const cr: any; // 内部符号: EW
   export const cs: any; // 内部符号: PE
@@ -563,7 +563,7 @@ declare module "@chunk/shared" {
   export { of } from "../../shared/zod-facade";
   export { withTimeout as oi } from "../../shared/sql-git-registry";
   export const ol: any; // 内部符号: Cx
-  export const on: any; // 内部符号: l1
+  export { readExtensionIds as on } from "../../shared/streams-runtime";
   export const oo: any; // 内部符号: ik
   export { requestErrorOf as or } from "../../shared/misc-runtime";
   export const os: any; // 内部符号: jE
@@ -589,7 +589,7 @@ declare module "@chunk/shared" {
   export { executableResolver as qn } from "../../shared/mcp-runtime";
   export const qr: any; // 内部符号: AI
   export { wantsDeviceCheckToken as qs } from "../../shared/http-headers";
-  export const qt: any; // 内部符号: A2
+  export { chromeHostsConfigPath as qt } from "../../shared/streams-runtime";
   export { APP_SERVER_UNSUPPORTED_PREFIX as qu } from "../../shared/app-server-version";
   export const r: any; // 内部符号: Gce
   export const ra: any; // 内部符号: Ej
@@ -598,7 +598,7 @@ declare module "@chunk/shared" {
   export { rf } from "../../shared/zod-facade";
   export const ri: any; // 内部符号: nI
   export const rl: any; // 内部符号: vx
-  export const rn: any; // 内部符号: S1
+  export { readProcessTable as rn } from "../../shared/streams-runtime";
   export const ro: any; // 内部符号: Jk
   export { unescapeMarkdownPunctuation as rr } from "../../shared/misc-runtime";
   export const rs: any; // 内部符号: FE
@@ -871,7 +871,7 @@ declare module "@chunk/bootstrap" {
   export { "hn" as "hn" } from "../../bootstrap/index";
   export { "ht" as "ht" } from "../../bootstrap/index";
   export { "i" as "i" } from "../../bootstrap/index";
-  export { "in" as "in" } from "../../bootstrap/index";
+  export { resolveAuthPrincipal as in } from "../../shared/streams-runtime";
   export { "it" as "it" } from "../../bootstrap/index";
   export { "j" as "j" } from "../../bootstrap/index";
   export { "jt" as "jt" } from "../../bootstrap/index";
