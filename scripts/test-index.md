@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 569.
+Total scripts: 570.
 
 - [`test-account-modals-cluster.mjs`](./test-account-modals-cluster.mjs)
 - [`test-account-query-managed-state-cluster.mjs`](./test-account-query-managed-state-cluster.mjs)
@@ -557,6 +557,7 @@ Total scripts: 569.
 - [`test-worker-entry-dispatcher.mjs`](./test-worker-entry-dispatcher.mjs)
 - [`test-worker-git-errors.mjs`](./test-worker-git-errors.mjs)
 - [`test-worker-git-observability.mjs`](./test-worker-git-observability.mjs)
+- [`test-worker-git-query-utils.mjs`](./test-worker-git-query-utils.mjs)
 - [`test-worker-platform-wsl.mjs`](./test-worker-platform-wsl.mjs)
 - [`test-worker-remote-host-config.mjs`](./test-worker-remote-host-config.mjs)
 - [`test-worker-rpc-client.mjs`](./test-worker-rpc-client.mjs)

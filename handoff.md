@@ -24,7 +24,9 @@ deployment channel/policy 配置已抽取为 `src/main/browser-page-preload/depl
 由 8 项行为断言覆盖；main 的 thread metadata emoji 校验和不可变更新已抽取为
 `src/main/main-app/thread-metadata.ts`，由 6 项行为断言覆盖；worker 的 Git
 命令统计/变更来源/cache key/exit-code 纯函数已抽取为
-`src/main/worker/git-observability.ts`，由 9 项行为断言覆盖。
+`src/main/worker/git-observability.ts`，由 9 项行为断言覆盖；worker 的 Git
+query key、host id、路径归一化和 UTF-8 字节长度已抽取为
+`src/main/worker/git-query-utils.ts`，由 5 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

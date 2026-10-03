@@ -10,6 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest } = require("./worker/git-observability");
+const { gitQueryKey, hostId, normalizeGitPath, utf8ByteLength } = require("./worker/git-query-utils");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -65337,6 +65338,8 @@ var npe = class extends H$ {
     }
   };
 function h1(e) {
+  return hostId(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e.id;
 }
 var g1 = 1 / 0,
@@ -65356,6 +65359,8 @@ function ope() {
   return new rpe({ defaultOptions: { queries: { gcTime: 1 / 0, retry: !1 } } });
 }
 function Q(e, t, n, ...r) {
+  return gitQueryKey(e, t, n, ...r);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return [`git`, h1(t), e, n, ...r];
 }
 function w1(e, t, n) {
@@ -65433,10 +65438,14 @@ function O1(e, t, n) {
   });
 }
 function k1(e) {
+  return normalizeGitPath(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e.replaceAll(`\\`, `/`).replace(/\/+$/, ``);
 }
 var lpe = new TextEncoder();
 function A1(e) {
+  return utf8ByteLength(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return lpe.encode(e).byteLength;
 }
 var j1 = `Git is unavailable`,
