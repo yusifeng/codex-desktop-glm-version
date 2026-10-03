@@ -30,6 +30,7 @@ const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBran
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
+const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
@@ -123,6 +124,20 @@ const moveToWorktreeDeps = {
   applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
   restoreBranchAndStash: restoreHandoffState,
   removeWorktree: $0,
+};
+const syncedBranchOverwriteDeps = {
+  resolveObject: N0,
+  isObjectId: M0,
+  normalizeTreeSha: Cz,
+  getHeadCommit: K4,
+  createCommit: _4,
+  runGit: $,
+  formatExecOutput: mR,
+  chunkPaths: (paths, size) => (0, kG.default)(paths, size),
+  logger: {
+    info: (message) => AW(`syncedBranch.overwrite`).info(message),
+    warning: (message) => AW(`syncedBranch.overwrite`).warning(message),
+  },
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73219,127 +73234,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function Vve(e, t, n) {
-  let r = await N0(e, `${t}^{tree}`, n);
-  if (r && !M0(r)) throw Error(`Unexpected ${t} SHA: ${r}`);
-  return r ? Cz(r) : null;
-}
-var Hve = 1024;
-async function Uve({
-  gitRoot: e,
-  targetRoot: t,
-  branchName: n,
-  headCommitSha: r,
-  treeSha: i,
-  targetCurrentBranch: a,
-  gitManager: o,
-  host: s,
-  signal: c,
-}) {
-  let l = AW(`syncedBranch.overwrite`),
-    u = o.getWorktreeRepositoryForRoot(e, s),
-    d = t ? o.getWorktreeRepositoryForRoot(t, s) : null,
-    f = d ? await K4(d, c) : null,
-    p = await Vve(u, r, c);
-  if (!p) return { status: `command-error` };
-  let m = i && i !== p && (!t || !(!a || a === n)),
-    h;
-  if (m) {
-    let t = await _4(e, i, s, { parentSha: r, signal: c });
-    if (!t.success)
-      return {
-        status: `command-error`,
-        execOutput: mR({
-          command: `git commit-tree`,
-          stdout: ``,
-          stderr: t.error.stderr,
-          fallbackOutput: t.error.stderr || t.error.stdout || `Failed to create synthetic commit`,
-        }),
-      };
-    h = t.commitSha;
-  } else h = r;
-  let [g, _] = await Promise.all([
-      e && h !== r ? $(e, [`reset`, `--hard`, h], s, { signal: c }) : Promise.resolve(null),
-      t
-        ? $(t, [`update-ref`, a ? `refs/heads/${a}` : `HEAD`, h], s, { signal: c })
-        : e
-          ? $(e, [`branch`, `-f`, n, h], s, { signal: c })
-          : Promise.resolve(null),
-    ]),
-    v = _ && !_.success ? _ : g?.success === !1 ? g : null;
-  if (v) {
-    let e = v.stderr || v.stdout || `Failed to reset branch`;
-    return {
-      status: `command-error`,
-      execOutput: mR({ command: v.command, stdout: v.stdout, stderr: v.stderr, fallbackOutput: e }),
-    };
-  }
-  if (t) {
-    let e = await $(t, [`reset`, `--mixed`, `HEAD`], s, { signal: c });
-    if (!e.success) {
-      let t = e.stderr || e.stdout || `Failed to reset index`;
-      return {
-        status: `command-error`,
-        execOutput: mR({
-          command: e.command,
-          stdout: e.stdout,
-          stderr: e.stderr,
-          fallbackOutput: t,
-        }),
-      };
-    }
-    let n = i ? Cz(i) : p;
-    f && (await Gve({ gitRoot: t, baseRef: f, treeToRestore: n, host: s, signal: c, logger: l }));
-    let r = await $(t, [`restore`, `--source`, n, `--worktree`, `--`, `.`], s, { signal: c });
-    if (!r.success) {
-      let e = r.stderr || r.stdout || `Failed to restore working tree`;
-      return {
-        status: `command-error`,
-        execOutput: mR({
-          command: r.command,
-          stdout: r.stdout,
-          stderr: r.stderr,
-          fallbackOutput: e,
-        }),
-      };
-    }
-  }
-  return (l.info(`Synced branch applied to branch checkout`), { status: `success` });
-}
-async function Wve(e, t, n, r) {
-  let i = null;
-  for (let a of (0, kG.default)(t, Hve)) {
-    let t = await $(e, [`clean`, `-fd`, `--`, ...a], n, { signal: r });
-    if (!t.success) {
-      i = t;
-      break;
-    }
-  }
-  return i;
-}
-async function Gve({ gitRoot: e, baseRef: t, treeToRestore: n, host: r, signal: i, logger: a }) {
-  let o = await $(e, [`diff`, `--name-only`, `--diff-filter=D`, `--no-renames`, t, n], r, {
-    allowedNonZeroExitCodes: [1],
-    signal: i,
-  });
-  if (!o.success) {
-    a.warning(`Failed to compute deleted paths before cleaning untracked files.`);
-    return;
-  }
-  let s =
-    o.stdout.length > 0
-      ? o.stdout
-          .split(
-            `
-`,
-          )
-          .map((e) => e.trim())
-          .filter((e) => e.length > 0)
-      : [];
-  s.length !== 0 &&
-    (await Wve(e, s, r, i)) &&
-    a.warning(`Failed to clean untracked files for deleted paths before restore.`);
-}
 async function Kve({ worktreeRepo: e, query: t, limit: n, preserveRemoteRefs: r = !1, signal: i }) {
   let a = Math.max(1, Math.min(n, 20)),
     o = n6(t)
@@ -76092,7 +75986,8 @@ var I6 = kW(`git`),
           signal: i.signal,
           getSyncedBranch: Zve,
           getSyncedBranchState: rye,
-          overwriteRepository: Uve,
+          overwriteRepository: (params) =>
+            overwriteSyncedBranch(params, syncedBranchOverwriteDeps),
         },
         repositoryReadRequestDeps = {
           gitManager: this.gitManager,

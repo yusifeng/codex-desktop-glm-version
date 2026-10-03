@@ -75,6 +75,11 @@ repository unavailable、stale snapshot 与 generic-error fallback 语义，由
 refresh root 显式交回入口；入口后续仍按原 finally 顺序清理 metadata/untracked cache 并刷新
 live query。`scripts/test-worker-git-synced-branch-request-handlers.mjs` 由 11 项断言覆盖。
 
+`overwrite-repo` 的底层 Git 算法已迁移至 `src/main/worker/git-synced-branch-overwrite.ts`；
+原 `Vve/Uve/Wve/Gve` 实现和 clean chunk 常量已删除。模块保留 tree SHA 校验、synthetic commit、
+source hard reset、target ref/index/worktree restore、deleted-path 分块 clean 与 warning-only 降级，
+由 24 项断言覆盖命令分支、错误优先级和 fallback output。
+
 repository/file read 请求（`repository-identity`、`commit-message-diff`、`submodule-paths`、
 `cat-file`、`blame-file`、`index-info`、`config-value`）已迁移至
 `src/main/worker/git-repository-read-request-handlers.ts`。模块保留 repository unavailable、
