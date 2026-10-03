@@ -100,6 +100,12 @@ rename blob fallback 已迁移至 `src/main/worker/git-review-diffs.ts`；原
 `$4`/`Uge`/`Wge`/`Gge`/`Kge`/`qge`/`Jge`/`e3` 已删除。41 项断言覆盖 query 参数、
 失败映射、whitespace 空 diff、request path 保留与 branch/unstaged rename 边界。
 
+Review working-tree metadata 的 per-file generation cache、批量 stat/hash、目录/symlink/regular
+分流、untracked `--no-index` metadata 分批与旧 Git fallback 已迁移至
+`src/main/worker/git-review-working-tree-metadata.ts`；原 `Xge` class、十五个 helper、并发/分批
+常量及 capability `WeakSet` 已删除。55 项断言覆盖 batch lifecycle、SHA 校验、NUL parser、
+旧 Git 降级、临时目录 cleanup、generation cache 和三类文件 metadata。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的

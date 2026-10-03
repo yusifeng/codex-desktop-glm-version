@@ -37,6 +37,7 @@ const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfi
 const { getGitBlobDiff, getUntrackedWorkingTreeDiff, readWorkingTreeSymlink } = require("./worker/git-review-file-diff");
 const { getCurrentHeadSnapshot, hasGitMergeConflicts, prepareReviewComparison: prepareGitReviewComparison, readCurrentHeadSnapshot, resolveReviewComparisonArgs: resolveGitReviewComparisonArgs, resolveReviewComparisonForRepository: resolveGitReviewComparisonForRepository } = require("./worker/git-review-comparison");
 const { createReviewDiffFallback, getReviewDiff } = require("./worker/git-review-diffs");
+const { getReviewWorkingTreeMetadata } = require("./worker/git-review-working-tree-metadata");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
@@ -271,6 +272,19 @@ const gitReviewDiffDeps = {
     prepareGitReviewComparison(params, gitReviewComparisonDeps),
   rewriteRenameDiff: (diff, previousPath, path) =>
     rewriteGitRenameDiff(diff, previousPath, path),
+};
+const gitReviewWorkingTreeMetadataDeps = {
+  byteLength: (value) => A1(value),
+  createDeferred: () => vR(),
+  createTemporaryDirectory: (...args) => z$(...args),
+  getQueryMeta: () => _1,
+  normalizePathFromRoot: (...args) => o2(...args),
+  queryKey: (...args) => Q(...args),
+  quoteGitPath: (path) => quoteGitDiffPath(path),
+  readWorkingTreeSymlink: (reviewSnapshot, path) =>
+    readWorkingTreeSymlink(reviewSnapshot, path, gitReviewFileDiffDeps),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70455,373 +70469,6 @@ function Mge(e) {
   }
   return t;
 }
-var Yge = 8,
-  Xge = class {
-    reviewSnapshot;
-    readPreparedFile;
-    prepareRegularFiles;
-    pending = new Map();
-    started = !1;
-    flushScheduled = !1;
-    flushing = !1;
-    constructor(e, t, n) {
-      ((this.reviewSnapshot = e), (this.readPreparedFile = t), (this.prepareRegularFiles = n));
-    }
-    read(e) {
-      let t = this.pending.get(e);
-      return (
-        t ?? ((t = vR()), this.pending.set(e, t)),
-        this.started && this.scheduleFlush(),
-        t.promise
-      );
-    }
-    start() {
-      ((this.started = !0), this.scheduleFlush());
-    }
-    scheduleFlush() {
-      this.pending.size === 0 ||
-        this.flushScheduled ||
-        this.flushing ||
-        !this.started ||
-        ((this.flushScheduled = !0),
-        queueMicrotask(() => {
-          ((this.flushScheduled = !1), this.flush());
-        }));
-    }
-    async flush() {
-      if (this.flushing || this.pending.size === 0) return;
-      this.flushing = !0;
-      let e = new Map(this.pending);
-      this.pending.clear();
-      try {
-        let t = await Zge(
-          this.reviewSnapshot,
-          [...e.keys()],
-          this.readPreparedFile,
-          this.prepareRegularFiles,
-        );
-        for (let [n, r] of e) {
-          let e = t.get(n);
-          if (e == null) throw Error(`Missing batched working-tree metadata`);
-          r.resolve(e);
-        }
-      } catch (t) {
-        for (let n of e.values()) n.reject(t);
-      } finally {
-        ((this.flushing = !1), this.scheduleFlush());
-      }
-    }
-  };
-async function Zge(e, t, n, r) {
-  let { worktreeRepo: i } = e;
-  return e.read(async () => {
-    let a = await i.host.platformPath(),
-      o = new Map();
-    await t3(t, async (e) => {
-      let t = a.join(i.root, e),
-        n = await i.host.stat(t, { bypassCache: !0, followSymlinks: !1 });
-      o.set(e, { stat: n });
-    });
-    let s = t.filter((e) => {
-      let t = o.get(e)?.stat;
-      return t != null && !t.isDirectory() && !t.isSymbolicLink();
-    });
-    (await Qge(e, s, o), await r?.(s));
-    let c = new Map();
-    return (
-      await t3(t, async (e) => {
-        let t = o.get(e);
-        if (t == null) throw Error(`Missing prepared working-tree file`);
-        c.set(e, await n(e, t));
-      }),
-      c
-    );
-  });
-}
-async function Qge(e, t, n) {
-  if (t.length === 0) return;
-  let r = await e.git([`hash-object`, `--stdin-paths`], {
-    stdin:
-      t.map(quoteGitDiffPath).join(`
-`) +
-      `
-`,
-  });
-  if (!r.success) throw Error(`Failed to hash working-tree files`);
-  let i = r.stdout.trim(),
-    a = i.length === 0 ? [] : i.split(/\r?\n/);
-  if (a.length !== t.length || a.some((e) => !/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(e)))
-    throw Error(`Failed to parse batched working-tree hashes`);
-  for (let [e, r] of t.entries()) {
-    let t = n.get(r),
-      i = a[e];
-    if (t == null || i == null) throw Error(`Missing batched working-tree hash`);
-    t.oid = i;
-  }
-}
-async function t3(e, t) {
-  let n = 0,
-    r = !1,
-    i = null,
-    a = async () => {
-      for (; !r;) {
-        let a = e[n];
-        if (((n += 1), a == null)) return;
-        try {
-          await t(a);
-        } catch (e) {
-          r ||
-            ((r = !0),
-            (i = e instanceof Error ? e : Error(`Review metadata worker failed`, { cause: e })));
-        }
-      }
-    };
-  if ((await Promise.all(Array.from({ length: Math.min(Yge, e.length) }, () => a())), i != null))
-    throw Error(`Review metadata worker failed`, { cause: i });
-}
-var $ge = 256,
-  e_e = 16e3,
-  t_e = 8,
-  n3 = new WeakSet();
-async function n_e(e, t) {
-  let n = new Map();
-  if (t.length === 0) return n;
-  let r = r_e(t),
-    { worktreeRepo: i } = e,
-    a = await i.host.platformPath(),
-    o = !n3.has(i),
-    s = null;
-  try {
-    for (let t of r) {
-      if (!o || t.length === 1) {
-        r3(n, await i3(e, t));
-        continue;
-      }
-      if (s == null)
-        try {
-          s = await z$(i.host, `codex-review-empty-`, e.signal);
-        } catch {
-          ((o = !1), r3(n, await i3(e, t)));
-          continue;
-        }
-      let r = await e.gitDiff(
-        [
-          `--no-index`,
-          `--raw`,
-          `--numstat`,
-          `-z`,
-          `--`,
-          s,
-          i.root,
-          ...t.map((e) => `:(literal)` + e),
-        ],
-        { allowedNonZeroExitCodes: [0, 1], trim: !1 },
-      );
-      if (!r.success) {
-        (i_e(r) && n3.add(i), (o = !1), r3(n, await i3(e, t)));
-        continue;
-      }
-      r3(n, a_e(r.stdout, i.root, t, a));
-    }
-  } finally {
-    s != null && (await i.host.remove(s, { recursive: !0, force: !0 }));
-  }
-  return n;
-}
-function r3(e, t) {
-  for (let [n, r] of t) e.set(n, r);
-}
-async function i3(e, t) {
-  let n = new Map();
-  return (
-    await c_e(t, async (t) => {
-      n.set(t, await o_e(e, t));
-    }),
-    n
-  );
-}
-function r_e(e) {
-  let t = [],
-    n = [],
-    r = 0;
-  for (let i of e) {
-    let e = 10 + Math.max(i.length, A1(i)) + 1;
-    (n.length > 0 && (n.length >= $ge || r + e > e_e) && (t.push(n), (n = []), (r = 0)),
-      n.push(i),
-      (r += e));
-  }
-  return (n.length > 0 && t.push(n), t);
-}
-function i_e(e) {
-  return (
-    e.code === 129 &&
-    (e.stderr.includes(`Limiting comparison with pathspecs`) ||
-      e.stderr.includes(`usage: git diff --no-index`))
-  );
-}
-function a_e(e, t, n, r) {
-  let i = new Set(n),
-    a = new Map(n.map((e) => [r.normalize(r.join(t, e)), e])),
-    o = new Map(),
-    s = (e) => {
-      if (e == null) throw Error(`Missing batched untracked Git path`);
-      let n = r.normalize(r.isAbsolute(e) ? e : r.resolve(t, e)),
-        s = a.get(n) ?? (r.sep === `\\` ? o2(r, t, t, e) : null);
-      if (s == null || !i.has(s)) throw Error(`Unexpected batched untracked Git path`);
-      let c = o.get(s);
-      return (c ?? ((c = {}), o.set(s, c)), c);
-    },
-    c = e.split(`\0`),
-    l = 0;
-  for (; l < c.length;) {
-    if (c[l] === ``) {
-      if (l === c.length - 1) break;
-      throw Error(`Failed to parse batched untracked Git metadata`);
-    }
-    let e = /^:\d{6} (\d{6}) [0-9a-f]+ [0-9a-f]+ A$/.exec(c[l])?.[1];
-    if (e != null) {
-      let t = s(c[l + 1]);
-      if (t.mode != null) throw Error(`Duplicate batched untracked Git mode`);
-      ((t.mode = e), (l += 2));
-      continue;
-    }
-    let t = /^(-|\d+)\t(-|\d+)\t$/.exec(c[l]);
-    if (t?.[1] == null || t[2] == null || c[l + 1] == null)
-      throw Error(`Failed to parse batched untracked Git stats`);
-    let n = s(c[l + 2]);
-    if (n.stats != null) throw Error(`Duplicate batched untracked Git stats`);
-    ((n.stats = {
-      additions: t[1] === `-` ? null : Number.parseInt(t[1], 10),
-      deletions: t[2] === `-` ? null : Number.parseInt(t[2], 10),
-    }),
-      (l += 3));
-  }
-  if (l !== c.length - 1) throw Error(`Failed to parse batched untracked Git metadata`);
-  let u = new Map();
-  for (let e of n) {
-    let t = o.get(e);
-    if (t?.mode == null || t.stats == null) throw Error(`Missing batched untracked Git metadata`);
-    u.set(e, { ...t.stats, mode: t.mode });
-  }
-  return u;
-}
-async function o_e(e, t) {
-  let n = await e.gitDiff([`--no-index`, `--raw`, `--numstat`, `-z`, `--`, `/dev/null`, t], {
-    allowedNonZeroExitCodes: [0, 1],
-    trim: !1,
-  });
-  if (!n.success) throw Error(`Failed to read untracked Git metadata`);
-  return s_e(n.stdout);
-}
-function s_e(e) {
-  let t = e.split(`\0`),
-    n = t.map((e) => /^:\d{6} (\d{6}) [0-9a-f]+ [0-9a-f]+ A$/.exec(e)?.[1]).find((e) => e != null),
-    r = t.map((e) => /^(-|\d+)\t(-|\d+)\t/s.exec(e)).find((e) => e != null);
-  if (n == null || r?.[1] == null || r[2] == null)
-    throw Error(`Failed to parse untracked Git metadata`);
-  return {
-    additions: r[1] === `-` ? null : Number.parseInt(r[1], 10),
-    deletions: r[2] === `-` ? null : Number.parseInt(r[2], 10),
-    mode: n,
-  };
-}
-async function c_e(e, t) {
-  let n = 0,
-    r = !1,
-    i = null,
-    a = async () => {
-      for (; !r;) {
-        let a = e[n];
-        if (((n += 1), a == null)) return;
-        try {
-          await t(a);
-        } catch (e) {
-          r ||
-            ((r = !0),
-            (i =
-              e instanceof Error
-                ? e
-                : Error(`Review no-index metadata worker failed`, { cause: e })));
-        }
-      }
-    };
-  if ((await Promise.all(Array.from({ length: Math.min(t_e, e.length) }, () => a())), i != null))
-    throw Error(`Review no-index metadata worker failed`, { cause: i });
-}
-async function a3(e, t, { includeDiffMetadata: n = !1 } = {}) {
-  let r = new Map(),
-    i = new Xge(
-      e,
-      (t, i) => u_e(e, t, i, n, r.get(t) ?? null),
-      n
-        ? async (t) => {
-            let n = await n_e(e, t);
-            for (let [e, t] of n) r.set(e, t);
-          }
-        : void 0,
-    ),
-    a = t.map((t) => l_e(e, t, n, i).then((e) => [t, e]));
-  i.start();
-  try {
-    return new Map(await Promise.all(a));
-  } catch {
-    return null;
-  }
-}
-function l_e(e, t, n, r) {
-  let { worktreeRepo: i } = e;
-  return i.queryClient.fetchQuery({
-    queryKey: Q(
-      i.root,
-      i.host,
-      `review-working-tree-file-metadata`,
-      n ? `with-diff` : `identity-only`,
-      t,
-      `${i.getReviewWorkingTreeFileGeneration(t)}`,
-    ),
-    meta: { ..._1, gitReadPaths: i.getReviewWorkingTreeFileReadPaths(t) },
-    queryFn: () => r.read(t),
-    staleTime: g1,
-  });
-}
-async function u_e(e, t, n, r, i) {
-  let { worktreeRepo: a } = e;
-  if (n.stat.isDirectory()) {
-    let n = await $(
-      (await a.host.platformPath()).join(a.root, t),
-      [`rev-parse`, `--verify`, `HEAD^{commit}`],
-      a.host,
-      { signal: e.signal },
-    );
-    if (!n.success) throw Error(`Failed to read embedded repository HEAD`);
-    return { additions: 1, deletions: 0, mode: `160000`, oid: n.stdout.trim() };
-  }
-  if (n.stat.isSymbolicLink()) {
-    let n = await readWorkingTreeSymlink(e, t, gitReviewFileDiffDeps);
-    return {
-      additions:
-        n.target.split(`
-`).length -
-        1 +
-        +(
-          n.target.length > 0 &&
-          !n.target.endsWith(`
-`)
-        ),
-      deletions: 0,
-      mode: `120000`,
-      oid: n.oid,
-    };
-  }
-  if (n.oid == null) throw Error(`Missing working-tree file hash`);
-  if (r && i == null) throw Error(`Missing working-tree diff metadata`);
-  return {
-    additions: i?.additions ?? null,
-    deletions: i?.deletions ?? null,
-    mode: i?.mode ?? null,
-    oid: n.oid,
-  };
-}
 var d_e = [
   `MERGE_HEAD`,
   `CHERRY_PICK_HEAD`,
@@ -71374,9 +71021,11 @@ async function x_e({
         e.previousPath == null && a.has(e.path) ? { ...e, changeKind: `untracked` } : e,
       ),
     ),
-    s = await a3(
+    s = await getReviewWorkingTreeMetadata(
       r,
       n.rawEntries.filter((e) => e.status !== `D` && /^0+$/.test(e.newOid)).map((e) => e.path),
+      {},
+      gitReviewWorkingTreeMetadataDeps,
     );
   return s == null
     ? null
@@ -71423,7 +71072,12 @@ function v3(e, t) {
 }
 async function y3(e, t) {
   if (t.length === 0) return { files: [], rawEntries: [], stats: [] };
-  let n = await a3(e, t, { includeDiffMetadata: !0 });
+  let n = await getReviewWorkingTreeMetadata(
+    e,
+    t,
+    { includeDiffMetadata: !0 },
+    gitReviewWorkingTreeMetadataDeps,
+  );
   return n == null
     ? null
     : {
