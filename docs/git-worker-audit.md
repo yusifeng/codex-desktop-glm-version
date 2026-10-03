@@ -498,6 +498,12 @@ Blame file 的 repository-relative containment、250ms query cache、30s/20MiB G
 metadata 复用、GitHub noreply login 与 repository web URL 推导已迁移至
 `src/main/worker/git-blame-file.ts`。原 `whe`、七个专用 helper 与三个专用常量已删除，
 repository-read 消费者注入路径/query/remote URL 能力，由 29 项断言覆盖。
+
+### 增量抽取：Worktree list
+
+Worktree list 的 250ms query、porcelain record parser、branch/detached head、locked/prunable 状态
+已迁移至 `src/main/worker/git-worktree-list.ts`。原 `$2`/`bhe` 已删除，class request wrapper
+继续负责 repository 缺失时返回空列表，由 14 项断言覆盖。
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

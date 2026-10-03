@@ -72,6 +72,7 @@ const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution")
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
+const { listGitWorktrees } = require("./worker/git-worktree-list");
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
 const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./worker/git-watcher-metadata");
@@ -122,6 +123,12 @@ const gitSubmodulePathsDeps = {
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
   staleTime: Infinity,
+};
+const gitWorktreeListDeps = {
+  getQueryMeta: () => _1,
+  normalizeRoot: (...args) => bz(...args),
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
 };
 const gitReviewComparisonDeps = {
   findMergeBase: (...args) => X2(...args),
@@ -69256,66 +69263,6 @@ function Q2(e, t) {
     staleTime: g1,
   });
 }
-function $2(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `worktrees`),
-    gcTime: 250,
-    meta: _1,
-    queryFn: async () => {
-      let n = await $(e.root, [`worktree`, `list`, `--porcelain`], e.host, { signal: t });
-      if (!n.success)
-        throw Error(n.stderr || n.stdout || `Failed to list worktrees for repository`);
-      return bhe(n.stdout ?? ``);
-    },
-    staleTime: 250,
-  });
-}
-function bhe(e) {
-  let t = [],
-    n = null,
-    r = e.split(/\r?\n/);
-  for (let e of r) {
-    let r = e.trim();
-    if (r.length === 0) {
-      n &&= (t.push(n), null);
-      continue;
-    }
-    if (r.startsWith(`worktree `)) {
-      n && t.push(n);
-      let e = bz(r.slice(9).trim());
-      if (!e) {
-        n = null;
-        continue;
-      }
-      n = { root: e, prunable: !1, locked: !1, headRef: { sha: ``, type: `detached` } };
-      continue;
-    }
-    if (n) {
-      if (r.startsWith(`HEAD `)) {
-        let e = r.slice(5).trim();
-        n.headRef = { sha: e, type: `detached` };
-        continue;
-      }
-      if (r.startsWith(`branch `)) {
-        let e = r.slice(7).trim();
-        e.startsWith(`refs/heads/`)
-          ? (n.headRef = { sha: n.headRef.sha, type: `branch`, string: e.slice(11) })
-          : (n.headRef = { sha: n.headRef.sha, type: `branch`, string: e });
-        continue;
-      }
-      if (r === `detached`) {
-        n.headRef = { sha: n.headRef.sha, type: `detached` };
-        continue;
-      }
-      if (r.startsWith(`prunable`)) {
-        n.prunable = !0;
-        continue;
-      }
-      r.startsWith(`locked`) && (n.locked = !0);
-    }
-  }
-  return (n && t.push(n), t);
-}
 async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, signal: a } = {}) {
   let { result: o } = await checkoutGitBranch(
     e,
@@ -72716,7 +72663,9 @@ var I6 = kW(`git`),
     }
     async getWorktrees(e, t, n) {
       let r = await this.gitManager.getWorktreeRepository(e, t);
-      return { worktrees: r == null ? [] : await $2(r, n) };
+      return {
+        worktrees: r == null ? [] : await listGitWorktrees(r, n, gitWorktreeListDeps),
+      };
     }
     async handleRecentBranches(e, { host: t, signal: n }) {
       let r = Math.max(1, Math.min(e.limit ?? 10, 100));
