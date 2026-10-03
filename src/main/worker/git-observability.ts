@@ -69,7 +69,6 @@ function classifyProcessExecutable(command: string | null | undefined): string {
       return `shell`;
     case `codex`:
     case `gh`:
-    case `git`:
     case `node`:
     case `rg`:
     case `ssh`:

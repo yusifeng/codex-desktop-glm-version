@@ -34,7 +34,7 @@ assert.equal(classifyProcessExecutable(null), "other");
 assert.equal(classifyProcessExecutable("python3.11"), "python");
 assert.equal(classifyProcessExecutable("/bin/bash"), "shell");
 assert.equal(classifyProcessExecutable("C:\\Windows\\System32\\cmd.exe"), "shell");
-assert.equal(classifyProcessExecutable("git.exe"), "git");
+assert.equal(classifyProcessExecutable("git.exe"), "other");
 assert.equal(classifyProcessExecutable("gh"), "gh");
 assert.equal(classifyProcessExecutable("ssh"), "ssh");
 assert.equal(classifyProcessExecutable("node"), "node");
