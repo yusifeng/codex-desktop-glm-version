@@ -8,6 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
+const { cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, restoreWorktree } = require("./worker/git-worktree-request-handlers");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -77188,6 +77189,24 @@ var I6 = kW(`git`),
           getCommitSha: N0,
           isMissingError: sB,
         },
+        worktreeRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          emit: (event) => this.emit(event),
+          scheduleRestore: (repoRoot, worktreePath, cwd, host, signal) =>
+            this.scheduleWorktreeRestore(repoRoot, worktreePath, cwd, host, signal),
+          scheduleDelete: (params, host) => this.scheduleWorktreeDelete(params, host),
+          unwatchRepository: (worktreePath, host) => this.unwatchRepo(worktreePath, host),
+          normalizeWorktreePath: bz,
+          setOwnerThread: m4,
+          warn: (message, detail) => I6().warning(message, detail),
+          moveToLocal: zve,
+          moveToWorktree: Bve,
+          moveToHostWorktree: Pve,
+          createExecutionHost: (config) => this.dependencies.createExecutionHost(config),
+          cleanupHostTransfer: Fve,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77515,35 +77534,11 @@ var I6 = kW(`git`),
             );
             break;
           case `restore-worktree`: {
-            let t = await this.scheduleWorktreeRestore(
-              e.params.repoRoot,
-              e.params.worktreePath,
-              e.params.cwd,
-              o,
-              i.signal,
-            );
-            if (t)
-              try {
-                await m4(
-                  this.gitManager.getWorktreeRepositoryForRoot(bz(e.params.worktreePath), o),
-                  e.params.conversationId,
-                  i.signal,
-                );
-              } catch (t) {
-                I6().warning(`[worktree-restore] failed to set restored worktree owner thread`, {
-                  safe: {
-                    worktreePath: e.params.worktreePath,
-                    conversationId: e.params.conversationId,
-                  },
-                  sensitive: { error: t },
-                });
-              }
-            p = X({ success: t });
+            p = X(await restoreWorktree(e.params, worktreeRequestDeps));
             break;
           }
           case `delete-worktree`: {
-            let t = await this.scheduleWorktreeDelete(e.params, o);
-            (this.unwatchRepo(e.params.worktree, o), (p = X({ success: !0, worktreeId: t })));
+            p = X(await deleteWorktree(e.params, worktreeRequestDeps));
             break;
           }
           case `set-worktree-owner-thread`:
@@ -77559,77 +77554,19 @@ var I6 = kW(`git`),
             }
             break;
           case `move-thread-to-local`: {
-            let t = e.params.operationId ?? String(e.id);
-            p = await zve(e.params, {
-              host: o,
-              gitManager: this.gitManager,
-              signal: i.signal,
-              onProgress: (e, n) => {
-                this.emit({
-                  type: `worker-event`,
-                  event: {
-                    type: `thread-handoff-progress`,
-                    operationId: t,
-                    direction: `to-local`,
-                    step: e,
-                    status: n,
-                  },
-                });
-              },
-            });
+            p = await moveThreadToLocal(e.params, e.id, worktreeRequestDeps);
             break;
           }
           case `move-thread-to-worktree`: {
-            let t = e.params.operationId ?? String(e.id);
-            p = await Bve(e.params, {
-              host: o,
-              gitManager: this.gitManager,
-              signal: i.signal,
-              onProgress: (e, n) => {
-                this.emit({
-                  type: `worker-event`,
-                  event: {
-                    type: `thread-handoff-progress`,
-                    operationId: t,
-                    direction: `to-worktree`,
-                    step: e,
-                    status: n,
-                  },
-                });
-              },
-            });
+            p = await moveThreadToWorktree(e.params, e.id, worktreeRequestDeps);
             break;
           }
           case `move-thread-to-host-worktree`: {
-            let t = e.params.operationId ?? String(e.id),
-              n = this.dependencies.createExecutionHost(e.params.destinationHostConfig);
-            try {
-              p = await Pve(e.params, {
-                gitManager: this.gitManager,
-                sourceHost: o,
-                destinationHost: n,
-                signal: i.signal,
-                onProgress: (e, n) => {
-                  this.emit({
-                    type: `worker-event`,
-                    event: {
-                      type: `thread-handoff-progress`,
-                      operationId: t,
-                      direction: `to-host-worktree`,
-                      step: e,
-                      status: n,
-                    },
-                  });
-                },
-              });
-            } finally {
-              (this.gitManager.invalidateUntrackedPathsCache(n),
-                this.gitManager.invalidateShortLivedGitReadCaches(n));
-            }
+            p = await moveThreadToHostWorktree(e.params, e.id, worktreeRequestDeps);
             break;
           }
           case `cleanup-host-handoff-transfer`:
-            (await Fve(e.params.rolloutPath, o), (p = X({ success: !0 })));
+            p = X(await cleanupHostHandoffTransfer(e.params, worktreeRequestDeps));
             break;
           case `apply-changes`: {
             let t = await applyGitChanges(e.params, applyRequestDeps);
