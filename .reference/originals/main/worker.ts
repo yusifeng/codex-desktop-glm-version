@@ -8,6 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { resolveAutomationWritableRoots } = require("./worker/git-automation-writable-roots");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
+const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenameDiff } = require("./worker/git-diff-text");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
@@ -41513,68 +41514,6 @@ function Fz(e) {
     unquotedQuery: t,
   };
 }
-function Iz(e, t) {
-  if (e[t] !== `"`) return null;
-  let n = t + 1,
-    r = ``,
-    i = ``;
-  for (; n < e.length;) {
-    let t = e[n];
-    if (t == null) return null;
-    if (t === `"`) return { nextIndex: n + 1, path: r, pathForUnquotedDiffHeader: i };
-    if (t !== `\\`) {
-      ((r += t), (i += t), (n += 1));
-      continue;
-    }
-    let a = Lz(e, n + 1);
-    if (a == null) return null;
-    ((r += a.path), (i += a.pathForUnquotedDiffHeader), (n = a.nextIndex));
-  }
-  return null;
-}
-function Lz(e, t) {
-  let n = e[t];
-  if (n == null) return null;
-  if (n === `\\` || n === `"`) return { nextIndex: t + 1, path: n, pathForUnquotedDiffHeader: n };
-  if (n === `a`) return { nextIndex: t + 1, path: `\x07`, pathForUnquotedDiffHeader: `\\a` };
-  if (n === `b`) return { nextIndex: t + 1, path: `\b`, pathForUnquotedDiffHeader: `\\b` };
-  if (n === `f`) return { nextIndex: t + 1, path: `\f`, pathForUnquotedDiffHeader: `\\f` };
-  if (n === `n`)
-    return {
-      nextIndex: t + 1,
-      path: `
-`,
-      pathForUnquotedDiffHeader: `\\n`,
-    };
-  if (n === `r`) return { nextIndex: t + 1, path: `\r`, pathForUnquotedDiffHeader: `\\r` };
-  if (n === `t`) return { nextIndex: t + 1, path: `	`, pathForUnquotedDiffHeader: `\\t` };
-  if (n === `v`) return { nextIndex: t + 1, path: `\v`, pathForUnquotedDiffHeader: `\\v` };
-  if (!zz(n)) return { nextIndex: t + 1, path: n, pathForUnquotedDiffHeader: n };
-  let r = [],
-    i = t;
-  for (;;) {
-    let t = e.slice(i, i + 3);
-    if (!Rz(t)) return null;
-    if ((r.push(Number.parseInt(t, 8)), (i += 3), e[i] !== `\\` || !zz(e[i + 1] ?? ``))) break;
-    i += 1;
-  }
-  let a;
-  try {
-    a = new TextDecoder(`utf-8`, { fatal: !0, ignoreBOM: !0 }).decode(Uint8Array.from(r));
-  } catch {
-    a = r.map((e) => String.fromCharCode(e)).join(``);
-  }
-  return { nextIndex: i, path: a, pathForUnquotedDiffHeader: e.slice(t - 1, i) };
-}
-function Rz(e) {
-  let t = e[0],
-    n = e[1],
-    r = e[2];
-  return e.length === 3 && t != null && n != null && r != null && zz(t) && zz(n) && zz(r);
-}
-function zz(e) {
-  return e >= `0` && e <= `7`;
-}
 var Bz = `remote-control`;
 function Vz(e) {
   return e?.kind === Bz;
@@ -70483,48 +70422,6 @@ function R4(e, t, n, { binary: r = !1, hideWhitespace: i = !1 }) {
     staleTime: 250,
   });
 }
-function Rge(e) {
-  if (e.includes(`GIT binary patch`) || e.includes(`Binary files `)) return null;
-  let t = 0,
-    n = 0,
-    r = !1;
-  for (let i of e.split(`
-`))
-    i.startsWith(`diff --git `)
-      ? (r = !1)
-      : i.startsWith(`@@`)
-        ? (r = !0)
-        : r && i.startsWith(`+`)
-          ? (t += 1)
-          : r && i.startsWith(`-`) && (n += 1);
-  return { additions: t, deletions: n };
-}
-function zge(e, t, n) {
-  let r = z4(`a/${t}`),
-    i = z4(`b/${n}`),
-    a = `rename from ${z4(t)}\nrename to ${z4(n)}\n`;
-  return e.length === 0
-    ? `diff --git ${r} ${i}\nsimilarity index 100%\n${a}`
-    : e
-        .replace(/^diff --git .*$/m, (e) => `${e}\nsimilarity index 0%\n${a.trimEnd()}`)
-        .replace(/^--- .*$/m, `--- ${r}`)
-        .replace(/^\+\+\+ .*$/m, `+++ ${i}`)
-        .replace(/^diff --git .*$/m, `diff --git ${r} ${i}`);
-}
-function z4(e) {
-  return /[\\"\n\r\t]/.test(e)
-    ? `"${e
-        .replaceAll(`\\`, `\\\\`)
-        .replaceAll(`"`, `\\"`)
-        .replaceAll(
-          `
-`,
-          `\\n`,
-        )
-        .replaceAll(`\r`, `\\r`)
-        .replaceAll(`	`, `\\t`)}"`
-    : e;
-}
 function B4(e, t) {
   let { worktreeRepo: n } = e;
   return n.queryClient.fetchQuery({
@@ -70574,8 +70471,8 @@ function V4(e, t, { binary: n = !1 } = {}) {
           a = await r.host.stat(i, { bypassCache: !0, followSymlinks: !1 });
         if (a.isSymbolicLink()) {
           let { oid: n, target: r } = await B4(e, t),
-            i = z4(`a/${t}`),
-            a = z4(`b/${t}`),
+            i = quoteGitDiffPath(`a/${t}`),
+            a = quoteGitDiffPath(`b/${t}`),
             o = r.endsWith(`
 `)
               ? ``
@@ -70600,8 +70497,8 @@ function V4(e, t, { binary: n = !1 } = {}) {
           });
           if (!n.success) return { type: `error`, error: { type: `unknown` } };
           let a = n.stdout.trim(),
-            o = z4(`a/${t}`),
-            s = z4(`b/${t}`),
+            o = quoteGitDiffPath(`a/${t}`),
+            s = quoteGitDiffPath(`b/${t}`),
             c = `diff --git ${o} ${s}\nnew file mode 160000\nindex 0000000..${a.slice(0, 7)}\n--- /dev/null\n+++ ${s}\n@@ -0,0 +1 @@\n+Subproject commit ${a}\n`;
           return {
             type: `success`,
@@ -70620,30 +70517,6 @@ function V4(e, t, { binary: n = !1 } = {}) {
       }),
     staleTime: 250,
   });
-}
-function H4(e) {
-  if (e.startsWith(`diff --cc `)) return U4(e.slice(10));
-  if (e.startsWith(`diff --combined `)) return U4(e.slice(16));
-  if (!e.startsWith(`diff --git `)) return null;
-  let t = e.slice(11);
-  if (t.startsWith(`"`)) {
-    let e = Iz(t, 0);
-    if (e == null || t[e.nextIndex] !== ` `) return null;
-    let n = Iz(t, e.nextIndex + 1);
-    return n == null ? null : W4(e.path, n.path);
-  }
-  let n = t.lastIndexOf(` b/`);
-  return n < 0 ? null : W4(t.slice(0, n), t.slice(n + 1));
-}
-function U4(e) {
-  if (!e.startsWith(`"`)) return { oldPath: e, newPath: e };
-  let t = Iz(e, 0);
-  return t == null || t.nextIndex !== e.length ? null : { oldPath: t.path, newPath: t.path };
-}
-function W4(e, t) {
-  return !e.startsWith(`a/`) || !t.startsWith(`b/`)
-    ? null
-    : { oldPath: e.slice(2), newPath: t.slice(2) };
 }
 async function Bge(e, t) {
   return (await G4(e, t)).length > 0;
@@ -70849,7 +70722,7 @@ async function $4(
             _.set(r.path, e3(g0(s)));
             return;
           }
-          let c = zge(s.stdout, r.previousPath, r.path);
+          let c = rewriteGitRenameDiff(s.stdout, r.previousPath, r.path);
           _.set(r.path, { type: `success`, diff: c, diffBytes: Buffer.byteLength(c, `utf8`) });
         }),
       ));
@@ -70885,7 +70758,7 @@ async function Uge({ binary: e, paths: t, reviewSnapshot: n }) {
 }
 function Wge(e, t, n) {
   let r = /^diff --(?:git|cc|combined) .*$/m.exec(e)?.[0],
-    i = r == null ? null : H4(r);
+    i = r == null ? null : parseGitDiffHeader(r);
   return i?.oldPath === t && i.newPath === n;
 }
 async function Gge({ binary: e, diffArgs: t, hideWhitespace: n, paths: r, reviewSnapshot: i }) {
@@ -70924,7 +70797,7 @@ function Jge(e) {
   let t = new Map(),
     n = Array.from(e.matchAll(/^diff --(?:git|cc|combined) .*$/gm));
   for (let [r, i] of n.entries()) {
-    let a = H4(i[0]);
+    let a = parseGitDiffHeader(i[0]);
     if (a == null) continue;
     let o = i.index ?? 0,
       s = r + 1 < n.length ? (n[r + 1]?.index ?? e.length) : e.length,
@@ -71024,7 +70897,7 @@ async function Qge(e, t, n) {
   if (t.length === 0) return;
   let r = await e.git([`hash-object`, `--stdin-paths`], {
     stdin:
-      t.map(z4).join(`
+      t.map(quoteGitDiffPath).join(`
 `) +
       `
 `,
@@ -71740,7 +71613,7 @@ async function d3({
               return null;
             let i = await R4(a, `${o}:${t.previousPath}`, t.path, { hideWhitespace: r });
             if (!i.success || i.outputLimitExceeded) return null;
-            let s = Rge(i.stdout);
+            let s = countGitDiffLines(i.stdout);
             return { ...t, additions: s?.additions ?? null, deletions: s?.deletions ?? null };
           }),
         )
@@ -72870,7 +72743,7 @@ function fve(e) {
     pushLine(e, t) {
       if (e.startsWith(`diff --git `)) {
         u();
-        let i = H4(e);
+        let i = parseGitDiffHeader(e);
         ((n = i?.newPath ?? null),
           (r = null),
           (s = 0),

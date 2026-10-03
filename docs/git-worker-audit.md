@@ -78,6 +78,12 @@ branch commits 与 review commit line counts，原约 77,560-78,050）已迁移�
 repository unavailable、stale snapshot 与 generic-error fallback 语义，由
 `scripts/test-worker-git-review-request-handlers.mjs` 的 15 项断言覆盖。
 
+review diff 共用的 quoted-path C escape/octal 解码、`diff --git`/combined header 路径解析、
+rename patch 重写、路径 quoting 与 hunk 增删行统计已迁移至
+`src/main/worker/git-diff-text.ts`。原 `Iz`/`Lz`/`Rz`/`zz` 与
+`Rge`/`zge`/`z4`/`H4`/`U4`/`W4` 已删除，由 33 项 UTF-8、malformed header、
+binary diff、rename 和多 hunk 断言覆盖。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的
