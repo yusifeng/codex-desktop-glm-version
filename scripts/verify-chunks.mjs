@@ -12,7 +12,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS, REWRITTEN } from "./chunk-manifest.mjs";
+import { CHUNKS, PRESERVED, REWRITTEN } from "./chunk-manifest.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -62,6 +62,22 @@ function diffSets(a, b) {
 
 let failures = 0;
 for (const name of REWRITTEN) {
+  if (PRESERVED.has(name)) {
+    console.error(`${name}: 同时登记为 REWRITTEN 与 PRESERVED`);
+    failures++;
+  }
+}
+for (const [name, reason] of PRESERVED) {
+  if (!(name in CHUNKS)) {
+    console.error(`${name}: PRESERVED 条目未登记到 CHUNKS`);
+    failures++;
+  }
+  if (reason.trim().length === 0) {
+    console.error(`${name}: PRESERVED 缺少保留理由`);
+    failures++;
+  }
+}
+for (const name of REWRITTEN) {
   const output = CHUNKS[name];
   const originalCode = await fs
     .readFile(path.join(ORIGINAL_DIR, ".vite/build", output), "utf8")
@@ -97,6 +113,10 @@ for (const name of REWRITTEN) {
     );
   }
 }
+
+const pending = Object.keys(CHUNKS).filter((name) => !REWRITTEN.has(name) && !PRESERVED.has(name));
+if (pending.length) console.log(`\n尚未分类 ${pending.length} 个 chunk: ${pending.join(", ")}`);
+console.log(`已登记保留 ${PRESERVED.size} 个 vendor/generated chunk`);
 
 if (failures) {
   console.error(`\n${failures} 个 chunk 验证失败`);

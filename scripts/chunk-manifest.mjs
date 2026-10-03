@@ -49,3 +49,24 @@ export const REWRITTEN = new Set([
   "device-service",
   "bootstrap",
 ]);
+
+// 经逐段审计确认无 Codex 业务逻辑、应继续走 transform-only 保真的第三方或
+// bundler 生成 chunk。Map 的值是保留理由，禁止为这些内容伪造业务源码。
+export const PRESERVED = new Map([
+  [
+    "worker-shared",
+    "rolldown CJS/ESM 互操作辅助与 npm ms/debug 实现；worker 专用 vendor 运行时",
+  ],
+  [
+    "main-shared",
+    "rolldown runtime 包装的 npm ms/debug 实现；无 Codex 业务状态或协议",
+  ],
+  [
+    "file-type-main",
+    "file-type/tokenizer 的 magic-bytes 数据与解析器；主进程构建变体",
+  ],
+  [
+    "file-type-worker",
+    "file-type/tokenizer 的 magic-bytes 数据与解析器；worker 自包含构建变体",
+  ],
+]);
