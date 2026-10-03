@@ -86,5 +86,9 @@ function createGitRepoChangedEvent(input: { changeType: string; commonDir: strin
   };
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };
+function nextGitWatcherRetryDelay(currentDelayMs: number, maxDelayMs: number): number {
+  return Math.min(currentDelayMs * 2, maxDelayMs);
+}
+
+export { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };

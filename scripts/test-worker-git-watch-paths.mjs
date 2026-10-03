@@ -12,6 +12,7 @@ const {
   isWithinPath,
   isWatchedRefPath,
   isWorktreeTopologyPath,
+  nextGitWatcherRetryDelay,
   requiresGitWatcherRecovery,
 } = require("../app/.vite/build/worker/git-watch-paths.js");
 
@@ -63,5 +64,7 @@ assert.equal(requiresGitWatcherRecovery([{ recursive: true, session: { coverage:
 assert.equal(requiresGitWatcherRecovery([], true), true);
 assert.deepEqual(createGitRepoChangedEvent({ changeType: "working-tree", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: false, root: "/repo", changedPaths: ["/repo/a"] }), { type: "git-repo-changed", changeType: "working-tree", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: false, root: "/repo", changedPaths: ["/repo/a"] });
 assert.deepEqual(createGitRepoChangedEvent({ changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" }), { type: "git-repo-changed", changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" });
+assert.equal(nextGitWatcherRetryDelay(1000, 60000), 2000);
+assert.equal(nextGitWatcherRetryDelay(50000, 60000), 60000);
 
-console.log("29 worker git watch path assertions passed");
+console.log("31 worker git watch path assertions passed");
