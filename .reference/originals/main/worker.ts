@@ -47,6 +47,7 @@ const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./work
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
 const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./worker/git-watcher-metadata");
+const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
@@ -206,6 +207,12 @@ const gitWatcherMetadataDeps = {
   queryKey: (...args) => Q(...args),
   resolveGitPath: (...args) => d0(...args),
   runGit: (...args) => $(...args),
+};
+const gitWorktreeFilesDeps = {
+  getQueryMeta: () => _1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  utf8ByteLength,
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70440,107 +70447,6 @@ function M4(e) {
 function N4(e) {
   return `Codex worktree snapshot: ${e}`;
 }
-var wge = 8e3,
-  Tge = 2;
-function Ege(e) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `worktree-files`),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () => Dge(e.root, e.host),
-    staleTime: 250,
-  });
-}
-async function Dge(e, t) {
-  let n = await Age(e, t);
-  if (n == null) return P4(e, t);
-  for (let r = 0; r < Tge; r += 1) {
-    let r = await F4(n, t);
-    if (r == null) break;
-    let i = await Oge(e, t);
-    if ((await F4(n, t)) === r) return i;
-  }
-  return P4(e, t);
-}
-async function Oge(e, t) {
-  let [n, r] = await Promise.all([
-    $(e, [`ls-files`, `--cached`, `-z`], t, { trim: !1 }),
-    kge(e, t),
-  ]);
-  if (!n.success) {
-    let e = n.stderr || n.stdout;
-    throw Error(`git ls-files failed${e ? `: ${e}` : ``}`);
-  }
-  return [...n.stdout.split(`\0`).filter((e) => e.length > 0), ...r];
-}
-async function P4(e, t) {
-  let n = await $(e, [`ls-files`, `--cached`, `--others`, `--exclude-standard`, `-z`], t, {
-    trim: !1,
-  });
-  if (!n.success) {
-    let e = n.stderr || n.stdout;
-    throw Error(`git ls-files failed${e ? `: ${e}` : ``}`);
-  }
-  return I4(n.stdout);
-}
-async function kge(e, t) {
-  let n = await $(
-    e,
-    [`status`, `--no-renames`, `--porcelain=v1`, `-z`, `--untracked-files=normal`],
-    t,
-    { trim: !1, timeoutMs: null },
-  );
-  if (!n.success) {
-    let e = n.stderr || n.stdout;
-    throw Error(`git status failed${e ? `: ${e}` : ``}`);
-  }
-  let r = I4(n.stdout)
-      .filter((e) => e.startsWith(`?? `))
-      .map((e) => e.slice(3)),
-    i = r.filter((e) => e.endsWith(`/`));
-  if (i.length === 0) return r;
-  let a = [];
-  for (let n of jge(i)) {
-    let r = await $(e, [`ls-files`, `--others`, `--exclude-standard`, `-z`, `--`, ...n], t, {
-      trim: !1,
-      timeoutMs: null,
-    });
-    if (!r.success) {
-      let e = r.stderr || r.stdout;
-      throw Error(`git ls-files failed${e ? `: ${e}` : ``}`);
-    }
-    a.push(...I4(r.stdout));
-  }
-  return [...r.filter((e) => !e.endsWith(`/`)), ...a];
-}
-async function Age(e, t) {
-  let n = await $(e, [`rev-parse`, `--git-path`, `index`], t);
-  if (!n.success || n.stdout.length === 0) return null;
-  let r = await t.platformPath();
-  return r.isAbsolute(n.stdout) ? n.stdout : r.resolve(e, n.stdout);
-}
-async function F4(e, t) {
-  try {
-    let n = await t.stat(e, { bypassCache: !0 });
-    return [n.size ?? 0, n.mtimeMs, n.ctimeMs, n.ino ?? 0].join(`:`);
-  } catch (e) {
-    return typeof e == `object` && e && `code` in e && e.code === `ENOENT` ? `missing` : null;
-  }
-}
-function jge(e) {
-  let t = [],
-    n = [],
-    r = 0;
-  for (let i of e) {
-    let e = `:(literal)${i}`,
-      a = A1(e) + 1;
-    (n.length > 0 && r + a > wge && (t.push(n), (n = []), (r = 0)), n.push(e), (r += a));
-  }
-  return (n.length > 0 && t.push(n), t);
-}
-function I4(e) {
-  return e.split(`\0`).filter((e) => e.length > 0);
-}
 function Mge(e) {
   let t = {};
   for (let n of e.split(/\r?\n/)) {
@@ -76455,7 +76361,7 @@ async function Obe(e, t) {
       let t = e.stderr || e.stdout;
       throw Error(`git archive failed${t ? `: ${t}` : ``}`);
     }
-  } else await Dbe(r, l, await Ege(e));
+  } else await Dbe(r, l, await listGitWorktreeFiles(e, gitWorktreeFilesDeps));
   return {
     tarballPath: l,
     tarballFilename: c,

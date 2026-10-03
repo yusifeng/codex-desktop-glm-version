@@ -180,6 +180,12 @@ Worktree snapshot/state 的候选目录过滤、snapshot ref/commit 查找、路
 `available/gone/restorable/unavailable` 状态机已迁移至
 `src/main/worker/git-worktree-snapshot.ts`；原 `k4`/`Mve`/`V3` 已删除，由 12 项断言覆盖。
 
+Worktree snapshot 打包前的文件枚举已迁移至 `src/main/worker/git-worktree-files.ts`：
+保留 query cache、index 指纹双读、最多两次稳定读取、tracked/untracked 合并、目录型
+untracked 展开、8KB literal pathspec 分批，以及 index 变化时的单命令 fallback。原
+`Ege`/`Dge`/`Oge`/`P4`/`kge`/`Age`/`F4`/`jge`/`I4` 与两个专用常量已删除，
+由 32 项缓存、命令、错误和一致性断言覆盖。
+
 Worktree owner 的 `codex-thread.json` 定位、schema 解析、读取、写入与 owner 更新已迁移至
 `src/main/worker/git-thread-config.ts`。原 `f4`/`uge`/`dge` 实现已删除，`p4`/`m4` 仅保留
 worktree/handoff 内部调用所需的薄适配器；11 项断言覆盖格式、缺失文件与无 repository 错误。

@@ -116,6 +116,9 @@ Origin discovery 的去重、平台路径判定、Git marker 向上查找、meta
 `src/main/worker/git-config-request-handler.ts`，由 5 项行为断言覆盖 worktree-local 特例。
 Worktree snapshot/state 的候选目录、snapshot commit、路径 inspection 与 managed-state 状态机已
 迁移至 `src/main/worker/git-worktree-snapshot.ts`，原三个压缩函数已删除，由 12 项断言覆盖。
+Worktree snapshot 打包的文件枚举、index 指纹稳定读、tracked/untracked 合并、目录展开与
+8KB literal pathspec 分批已迁移至 `src/main/worker/git-worktree-files.ts`；原九个 helper 和
+两个常量已删除，由 32 项断言覆盖。
 Worktree owner 的 `codex-thread.json` 定位、schema 解析、读写与 owner 更新已迁移至
 `src/main/worker/git-thread-config.ts`；原三个实现函数已删除，两个旧符号只保留薄适配器，
 由 11 项行为断言覆盖。
