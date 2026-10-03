@@ -48,11 +48,11 @@ function createWebMcpRegistry({
   const stringify = JSON.stringify;
   const parse = JSON.parse;
   const defer = globalThis.setTimeout.bind(globalThis);
-  const context = Object.freeze({
+  const context = {
     async requestUserInteraction(): Promise<never> {
       throw Error(`requestUserInteraction is not supported by the Codex WebMCP shim.`);
     },
-  });
+  };
 
   const notify = () => {
     try { onToolsChanged?.(); } catch {}
@@ -70,7 +70,12 @@ function createWebMcpRegistry({
     requireSecureContext(locationLike);
     let parsed: unknown;
     try {
-      parsed = serialized ? parse(input as string) : input;
+      if (serialized) parsed = parse(input as string);
+      else {
+        const encoded = stringify(input);
+        if (encoded === undefined) throw Error();
+        parsed = parse(encoded);
+      }
     } catch {
       throw Error(serialized
         ? `WebMCP executeTool requires a JSON-stringified input.`
@@ -94,9 +99,9 @@ function createWebMcpRegistry({
       if (typeof tool.description !== `string` || tool.description.length === 0)
         throw new DOMException(`WebMCP tools must have a non-empty description.`, `InvalidStateError`);
       if (typeof tool.execute !== `function`) throw Error(`WebMCP tool ${name} is missing an execute callback.`);
-      const inputSchema = tool.inputSchema === undefined ? undefined : stringify(tool.inputSchema);
       if (tool.inputSchema !== undefined && (typeof tool.inputSchema !== `object` || !tool.inputSchema))
         throw TypeError(`WebMCP tool inputSchema must be an object.`);
+      const inputSchema = tool.inputSchema === undefined ? undefined : stringify(tool.inputSchema);
       if (tool.inputSchema !== undefined && inputSchema === undefined)
         throw Error(`WebMCP tool inputSchema must be JSON-serializable.`);
       const signal = options?.signal;

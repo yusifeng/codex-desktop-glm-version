@@ -97,7 +97,7 @@ preload 的 Chrome/Edge 扩展发行配置已抽取为
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
 `src/main/browser-page-preload/local-url.ts`，由 9 项行为断言覆盖；
 preload 的 WebMCP registry shim 已抽取为
-`src/main/browser-page-preload/webmcp-registry.ts`，由 7 项行为断言覆盖；main
+`src/main/browser-page-preload/webmcp-registry.ts`；旧压缩实现已物理删除，并由 9 项行为断言覆盖；main
 窗口外观策略已抽取为 `src/main/main-app/window-appearance.ts`，并包含 traffic-light
 geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation surface
 协议 schema 已抽取为 `src/main/browser-page-preload/annotation-protocol.ts`，由 6 项
