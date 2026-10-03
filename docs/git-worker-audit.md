@@ -491,6 +491,13 @@ Cat-file 的四请求批量上限、5 MiB 对象限制、batch 二进制协议�
 snapshot 一致性边界与限长磁盘 fallback 已迁移至 `src/main/worker/git-cat-file.ts`。原 `Sve`、
 十二个专用 helper、五个专用常量及共享声明中的独占对象上限已删除，repository-read 消费者
 只注入 Git 执行能力，由 43 项断言覆盖。
+
+### 增量抽取：Blame file reads
+
+Blame file 的 repository-relative containment、250ms query cache、30s/20MiB Git 限制、porcelain
+metadata 复用、GitHub noreply login 与 repository web URL 推导已迁移至
+`src/main/worker/git-blame-file.ts`。原 `whe`、七个专用 helper 与三个专用常量已删除，
+repository-read 消费者注入路径/query/remote URL 能力，由 29 项断言覆盖。
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

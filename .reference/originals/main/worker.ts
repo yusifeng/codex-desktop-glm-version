@@ -23,6 +23,7 @@ const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { getBranchAheadCount } = require("./worker/git-branch-ahead");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
+const { blameFile: getGitBlameFile } = require("./worker/git-blame-file");
 const { readGitCatFile } = require("./worker/git-cat-file");
 const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
@@ -81,6 +82,13 @@ const { describeShell } = require("./worker/shell-config");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
+const gitBlameFileDeps = {
+  getQueryMeta: () => _1,
+  parseRemoteUrl: (...args) => wB(...args),
+  queryKey: (...args) => Q(...args),
+  resolveGitPath: (...args) => o2(...args),
+  runGit: (...args) => $(...args),
+};
 const gitCatFileDeps = { runGit: (...args) => $(...args) };
 const gitIndexInfoDeps = {
   getGitDir: (...args) => u0(...args),
@@ -69308,111 +69316,6 @@ function bhe(e) {
   }
   return (n && t.push(n), t);
 }
-var xhe = 3e4,
-  She = 20971520,
-  Che = { GIT_NO_LAZY_FETCH: `1` };
-async function whe(e, { cwd: t, path: n }, r, i) {
-  try {
-    let a = await e.getStableMetadata(t, r);
-    if (a == null) return { type: `error`, error: { type: `unknown` } };
-    let o = await r.platformPath(),
-      s = o2(o, a.root, t, n);
-    if (o.isAbsolute(s) || s === `..` || s.startsWith(`../`) || s.startsWith(`..\\`))
-      return { type: `error`, error: { type: `not-found` } };
-    let [c, l] = await Promise.all([
-      The(e.getWorktreeRepositoryForRoot(a.root, r), s, i),
-      khe(e, t, r, i),
-    ]);
-    return c.code === 0
-      ? c.outputLimitExceeded == null
-        ? { type: `success`, lines: Ehe(c.stdout), repositoryWebUrl: l }
-        : { type: `error`, error: { type: `unknown` } }
-      : { type: `error`, error: { type: c.code === 128 ? `not-found` : `unknown` } };
-  } catch {
-    return { type: `error`, error: { type: `unknown` } };
-  }
-}
-function The(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `blame-file`, t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () =>
-      $(e.root, [`blame`, `--porcelain`, `--`, t], e.host, {
-        env: Che,
-        maxOutputBytes: She,
-        signal: n,
-        timeoutMs: xhe,
-        trim: !1,
-      }),
-    staleTime: 250,
-  });
-}
-function Ehe(e) {
-  let t = [],
-    n = new Map(),
-    r = null;
-  for (let i of e.split(`
-`)) {
-    if (i === ``) continue;
-    if (i.startsWith(`	`)) {
-      r != null &&
-        (t.push(r),
-        n.set(r.commitSha, {
-          author: r.author,
-          authorLogin: r.authorLogin,
-          authorTime: r.authorTime,
-          summary: r.summary,
-        }),
-        (r = null));
-      continue;
-    }
-    if (r == null) {
-      r = Dhe(i, n);
-      continue;
-    }
-    let e = i.indexOf(` `),
-      a = e === -1 ? i : i.slice(0, e),
-      o = e === -1 ? `` : i.slice(e + 1);
-    if (a === `author`) r.author = o || null;
-    else if (a === `author-mail`) r.authorLogin = Ohe(o);
-    else if (a === `author-time`) {
-      let e = Number.parseInt(o, 10);
-      r.authorTime = Number.isNaN(e) ? null : e;
-    } else a === `summary` && (r.summary = o || null);
-  }
-  return t;
-}
-function Dhe(e, t) {
-  let [n = ``, , r = ``] = e.split(` `),
-    i = Number.parseInt(r, 10),
-    a = t.get(n);
-  return {
-    author: a?.author ?? null,
-    authorLogin: a?.authorLogin ?? null,
-    authorTime: a?.authorTime ?? null,
-    commitSha: n,
-    lineNumber: Number.isNaN(i) ? 0 : i,
-    summary: a?.summary ?? null,
-  };
-}
-function Ohe(e) {
-  let t = e.trim().replace(/^<|>$/g, ``);
-  return /^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/i.exec(t)?.[1] ?? null;
-}
-async function khe(e, t, n, r) {
-  try {
-    let i = await (await e.getRepoRepository(t, n))?.getOriginUrl(r);
-    if (i == null) return null;
-    let a = wB(i);
-    return a == null || !Ahe(a.host) ? null : `https://${a.host}/${a.owner}/${a.repo}`;
-  } catch {
-    return null;
-  }
-}
-function Ahe(e) {
-  return e === `github.com` || e.endsWith(`.github.com`);
-}
 async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, signal: a } = {}) {
   let { result: o } = await checkoutGitBranch(
     e,
@@ -72122,7 +72025,8 @@ var I6 = kW(`git`),
           getReviewSnapshot: R6,
           catFile: (repository, options, signal) =>
             readGitCatFile(repository, options, signal, gitCatFileDeps),
-          blameFile: whe,
+          blameFile: (gitManager, params, host, signal) =>
+            getGitBlameFile(gitManager, params, host, signal, gitBlameFileDeps),
           getIndexInfo: (repository, signal) =>
             getGitIndexInfo(repository, signal, gitIndexInfoDeps),
         },
