@@ -10,7 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest } = require("./worker/git-observability");
-const { gitQueryKey, hostId, normalizeGitPath, utf8ByteLength } = require("./worker/git-query-utils");
+const { gitQueryKey, hostId, matchesGitQuery, normalizeGitPath, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -65424,9 +65424,13 @@ function D1(e, t) {
     }));
 }
 function cpe(e, t) {
+  return matchesGitQuery(e, t);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e[0] === `git` && (t == null || e[1] === h1(t));
 }
 function O1(e, t, n) {
+  return pathsOverlap(e, t, n);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (!Array.isArray(t) || n == null) return !0;
   let r = k1(e);
   return n.some((e) => {
