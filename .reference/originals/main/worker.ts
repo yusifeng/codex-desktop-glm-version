@@ -12,6 +12,7 @@ const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
+const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
 const { pushGitRepository } = require("./worker/git-push-request-handler");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
@@ -69866,93 +69867,6 @@ function Xhe(e) {
 function l4(e) {
   return e instanceof Error && e.message.includes(`git process timed out after`);
 }
-async function u4(e, t, n) {
-  return (
-    await Promise.all(
-      e.map(async (e) => {
-        try {
-          return await Zhe(xz(e), t, n);
-        } catch (e) {
-          return (
-            CW().warning(`[git-origin-and-roots] Failed to resolve origin for workspace`, {
-              safe: {},
-              sensitive: { error: e },
-            }),
-            null
-          );
-        }
-      }),
-    )
-  ).filter((e) => e != null);
-}
-async function Zhe(e, t, n) {
-  let r = await t.getStableMetadata(e, n);
-  if (r == null) return null;
-  let i = t.getWorktreeRepositoryForRoot(r.root, n),
-    a = await t.getRepoRepository(e, n);
-  return a == null
-    ? null
-    : { dir: e, root: i.root, originUrl: await a.getOriginUrl(), commonDir: a.getCommonDir() };
-}
-var nge = [`.git`, `HEAD`];
-async function rge(e, t) {
-  let n = await ige(t);
-  return n == null
-    ? e
-    : (await Promise.all(e.map(async (e) => ({ dir: e, requiresDiscovery: await age(e, t, n) }))))
-        .filter(({ requiresDiscovery: e }) => e)
-        .map(({ dir: e }) => e);
-}
-async function ige(e) {
-  if (
-    !e.isLocal ||
-    typeof process > `u` ||
-    (process.platform !== `darwin` && process.platform !== `linux`) ||
-    process.env.GIT_DIR !== void 0 ||
-    process.env.GIT_WORK_TREE !== void 0
-  )
-    return null;
-  try {
-    let t = process.platform === `darwin` ? `macos` : process.platform,
-      [n, r] = await Promise.all([e.platformOs(), e.platformPath()]);
-    return n === t ? r : null;
-  } catch {
-    return null;
-  }
-}
-async function age(e, t, n) {
-  if (!n.isAbsolute(e) || n.normalize(e) !== e || (e.endsWith(n.sep) && e !== n.parse(e).root))
-    return !0;
-  let r = e;
-  for (;;) {
-    try {
-      let e = await t.stat(r, { bypassCache: !0, followSymlinks: !1 });
-      if (e.isSymbolicLink() || !e.isDirectory()) return !0;
-    } catch {
-      return !0;
-    }
-    for (let e of nge)
-      try {
-        return (await t.stat(n.join(r, e), { bypassCache: !0, followSymlinks: !1 }), !0);
-      } catch (e) {
-        if (!sB(e)) return !0;
-      }
-    let e = n.dirname(r);
-    if (e === r) return !1;
-    r = e;
-  }
-}
-async function oge(e, t, n) {
-  return { origins: await u4(await rge(sge(e), n), t, n) };
-}
-function sge(e) {
-  let t = new Map();
-  for (let n of e) {
-    let e = a2(n);
-    t.has(e) || t.set(e, n);
-  }
-  return Array.from(t.values());
-}
 var d4 = kW(`threadConfig`),
   cge = `codex-thread.json`,
   lge = K({ version: J(1), ownerThreadId: H() });
@@ -77285,11 +77199,21 @@ var I6 = kW(`git`),
       let i = new AbortController(),
         a = e.params.hostConfig ?? { id: `local`, display_name: `Local`, kind: `local` },
         o = this.dependencies.createExecutionHost(a),
+        originDiscoveryDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          platform: process.platform,
+          environment: process.env,
+          normalizeDiscoveryPath: a2,
+          normalizeRoot: xz,
+          isMissingError: sB,
+          warnOriginFailure: (error) => CW().warning(`[git-origin-and-roots] Failed to resolve origin for workspace`, { safe: {}, sensitive: { error } }),
+        },
         readRequestDeps = {
           gitManager: this.gitManager,
           host: o,
           getOriginUrl: (repository) => repository.getOriginUrl(),
-          getOrigins: u4,
+          getOrigins: (directories) => resolveOriginAndRoots(directories, originDiscoveryDeps),
           getShellEnvironment: ehe,
           getOwnerThreadId: p4,
           getDefaultRemoteBranch: k2,
@@ -77766,7 +77690,7 @@ var I6 = kW(`git`),
             break;
           case `git-origins`: {
             let t = Date.now(),
-              { origins: n } = await oge(e.params.dirs, this.gitManager, o);
+              { origins: n } = await discoverGitOrigins(e.params.dirs, originDiscoveryDeps);
             (I6().info(`[git-origins] worker-complete`, {
               safe: {
                 dirCount: e.params.dirs.length,

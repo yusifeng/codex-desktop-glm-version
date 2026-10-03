@@ -111,6 +111,10 @@ read-cache invalidation 与成功 refresh root，由 16 项行为断言覆盖。
 commit SHA 读取及 refresh-root 时序已迁移至 `src/main/worker/git-commit-request-handler.ts`。
 18 项行为断言特别覆盖 staging 成功后 commit 失败仍刷新、普通 commit 失败不刷新的差异。
 
+Origin discovery 的目录去重、平台路径快速判定、向上查找 `.git`/`HEAD`、stable metadata/
+root/origin 组合与单目录失败隔离已完整迁移至 `src/main/worker/git-origin-discovery.ts`；原
+`u4`/`Zhe`/`rge`/`ige`/`age`/`oge`/`sge` 已删除，11 项断言覆盖 local/remote 与失败路径。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
