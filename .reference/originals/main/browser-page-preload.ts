@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -7310,16 +7310,7 @@ function Ef(e, t) {
   return parseAnnotationControlsPayload(e, (e) => ff.safeParse(e), (e) => Sf.safeParse(e), t, _f);
 }
 function Df(e, t) {
-  if (!Array.isArray(t)) return;
-  let n = t.length;
-  if (!Number.isSafeInteger(n) || n < 0 || n > hf) return;
-  let r = new Set();
-  for (let i = 0; i < n; i += 1) {
-    let n = Tf(t, String(i));
-    if (!(n instanceof Element) || n.ownerDocument !== e || Of(e, n)) return;
-    r.add(n);
-  }
-  return r;
+  return parseAnnotationControlTargetList(t, e, Element, (t) => Of(e, t), hf);
 }
 function Of(e, t) {
   let n = e.getElementById?.(xf);
