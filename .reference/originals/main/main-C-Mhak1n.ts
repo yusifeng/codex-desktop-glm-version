@@ -10,6 +10,7 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
 const mainBusiness = require("./main-app/util/main-business.js");
 const mainUrlTrust = require("./main-app/util/url-trust.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
+const windowAppearance = require("./main-app/window-appearance.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -173917,6 +173918,8 @@ function F9(e) {
   }
 }
 function I9(e) {
+  return windowAppearance.isOverlayAppearance(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return (
     e === `avatarOverlay` ||
     e === `browserCommentPopup` ||
@@ -173927,21 +173930,31 @@ function I9(e) {
   );
 }
 function rst({ appearance: e, platform: t, scaleFactor: n, windowBounds: r }) {
+  return windowAppearance.isLargeEnoughForNativeWindow({ appearance: e, platform: t, scaleFactor: n, windowBounds: r });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (t !== `darwin` || I9(e)) return !1;
   let i = r.width * n,
     a = r.height * n;
   return Math.max(i, a) >= Lot && Math.min(i, a) >= Rot;
 }
 function ist({ appearance: e, opaqueWindowsEnabled: t, platform: n }) {
+  return windowAppearance.shouldUseOpaqueWindows({ appearance: e, opaqueWindowsEnabled: t, platform: n });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return t && !I9(e) && (n === `darwin` || n === `win32`);
 }
 function ast({ appearance: e, isFocused: t, platform: n }) {
+  return windowAppearance.shouldHideInactiveWindow({ appearance: e, isFocused: t, platform: n });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return !t && !I9(e) && n === `darwin`;
 }
 function ost(e) {
+  return windowAppearance.supportsEmbeddedWebview(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e === `primary` || e === `detached` || e === `hotkeyWindowThread` || e === `hud`;
 }
 function sst(e, t) {
+  return windowAppearance.minimumWindowSize(e, t);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e) {
     case `avatarOverlay`:
     case `browserCommentPopup`:
@@ -173962,6 +173975,8 @@ function sst(e, t) {
   }
 }
 function L9({ platform: e, appearance: t, opaqueWindowSurfaceEnabled: n, prefersDarkColors: r }) {
+  return windowAppearance.windowSurfaceColors({ platform: e, appearance: t, opaqueWindowSurfaceEnabled: n, prefersDarkColors: r });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return n
     ? { backgroundColor: r ? Fot : Iot, backgroundMaterial: e === `win32` ? `none` : null }
     : e !== `win32` || I9(t)
@@ -173969,6 +173984,8 @@ function L9({ platform: e, appearance: t, opaqueWindowSurfaceEnabled: n, prefers
       : { backgroundColor: k9, backgroundMaterial: `mica` };
 }
 function cst(e, t) {
+  return windowAppearance.vibrancyForAppearance(e, t);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return t || I9(e) ? null : `menu`;
 }
 function R9({
@@ -173979,6 +173996,8 @@ function R9({
   thickFrame: i,
   transparent: a = !0,
 }) {
+  return windowAppearance.framelessWindowOptions({ alwaysOnTop: e, hasShadow: t, platform: n, resizable: r, thickFrame: i, transparent: a });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return {
     frame: !1,
     transparent: a,

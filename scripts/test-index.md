@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 572.
+Total scripts: 573.
 
 - [`test-account-modals-cluster.mjs`](./test-account-modals-cluster.mjs)
 - [`test-account-query-managed-state-cluster.mjs`](./test-account-query-managed-state-cluster.mjs)
@@ -296,6 +296,7 @@ Total scripts: 572.
 - [`test-main-thread-metadata.mjs`](./test-main-thread-metadata.mjs)
 - [`test-main-thread-workspace-gaps.mjs`](./test-main-thread-workspace-gaps.mjs)
 - [`test-main-url-trust.mjs`](./test-main-url-trust.mjs)
+- [`test-main-window-appearance.mjs`](./test-main-window-appearance.mjs)
 - [`test-markdown-renderer-entry.mjs`](./test-markdown-renderer-entry.mjs)
 - [`test-mcp-app-follow-up-confirmation-dialog.mjs`](./test-mcp-app-follow-up-confirmation-dialog.mjs)
 - [`test-mcp-server-elicitation-request-panel.mjs`](./test-mcp-server-elicitation-request-panel.mjs)
