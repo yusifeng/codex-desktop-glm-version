@@ -504,6 +504,12 @@ repository-read 消费者注入路径/query/remote URL 能力，由 29 项断言
 Worktree list 的 250ms query、porcelain record parser、branch/detached head、locked/prunable 状态
 已迁移至 `src/main/worker/git-worktree-list.ts`。原 `$2`/`bhe` 已删除，class request wrapper
 继续负责 repository 缺失时返回空列表，由 14 项断言覆盖。
+
+### 增量抽取：Ref SHA resolution
+
+Git object ID 校验、ref-sha query、fresh 精确失效、rev-parse 错误与 SHA branding 已迁移至
+`src/main/worker/git-ref-resolution.ts`。原 `M0`/`N0` 已删除，worker 中 branch/review/turn-diff/
+handoff/snapshot 等全部消费者改用语义名称，由 20 项模块断言及六组下游回归覆盖。
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

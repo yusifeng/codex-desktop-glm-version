@@ -31,6 +31,7 @@ const { getGitCloneState } = require("./worker/git-clone-state");
 const { getGitIndexInfo } = require("./worker/git-index-info");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
+const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./worker/git-ref-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
@@ -104,6 +105,15 @@ const gitRecentBranchesDeps = {
   runGit: (...args) => $(...args),
   staleTime: Infinity,
 };
+const gitRefResolutionDeps = {
+  getQueryMeta: () => x1,
+  normalizeSha: (...args) => wz(...args),
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const resolveGitRefSha = (repository, ref, signal, options) =>
+  resolveGitRefShaQuery(repository, ref, signal, options, gitRefResolutionDeps);
 const gitRepositoryIdentityDeps = {
   fetchQueryWithSignal: (...args) => w1(...args),
   getConfigQueryMeta: () => y1,
@@ -133,20 +143,20 @@ const gitWorktreeListDeps = {
 const gitReviewComparisonDeps = {
   findMergeBase: (...args) => X2(...args),
   getDefaultBranch: (...args) => k2(...args),
-  getHeadCommit: (...args) => N0(...args),
+  getHeadCommit: (...args) => resolveGitRefSha(...args),
   getQueryMeta: () => _1,
   getUntrackedPaths: (...args) => f2(...args),
   normalizeCommitSha: (sha) => Sz(sha),
   normalizeCwd: (cwd) => xz(cwd),
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
-  validateObjectId: (sha) => M0(sha),
+  validateObjectId: (sha) => isGitObjectId(sha),
 };
 const handoffBranchDeps = {
   runGit: $,
   formatBranchRef: F0,
   formatExecOutput: mR,
-  isObjectId: M0,
+  isObjectId: isGitObjectId,
 };
 const handoffRollbackDeps = {
   checkoutBranch: t4,
@@ -227,8 +237,8 @@ const moveToWorktreeDeps = {
   removeWorktree: $0,
 };
 const syncedBranchOverwriteDeps = {
-  resolveObject: N0,
-  isObjectId: M0,
+  resolveObject: resolveGitRefSha,
+  isObjectId: isGitObjectId,
   normalizeTreeSha: Cz,
   getHeadCommit: (repository, signal) =>
     getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
@@ -319,8 +329,8 @@ const syncedBranchStateDeps = {
   queryMeta: () => _1,
   runDiff: y0,
   listWorktrees: $2,
-  resolveObject: N0,
-  isObjectId: M0,
+  resolveObject: resolveGitRefSha,
+  isObjectId: isGitObjectId,
   normalizeCommitSha: Sz,
   getUntrackedPaths: f2,
   getWorkingTree: x4,
@@ -339,7 +349,7 @@ const turnDiffSnapshotDeps = {
   getIndexPath: m0,
   withTemporaryIndex: b4,
   stageWorktree: v4,
-  isObjectId: M0,
+  isObjectId: isGitObjectId,
   normalizeTreeSha: Cz,
 };
 const turnDiffCaptureDeps = {
@@ -66912,30 +66922,6 @@ function j0(e) {
     staleTime: g1,
   });
 }
-function M0(e) {
-  return /^[0-9a-f]{7,40}$/i.test(e);
-}
-async function N0(e, t, n, { fresh: r = !1 } = {}) {
-  let i = Q(e.root, e.host, `ref-sha`, t);
-  return (
-    r && (await e.queryClient.invalidateQueries({ queryKey: i, exact: !0, refetchType: `none` })),
-    e.queryClient.fetchQuery({
-      queryKey: i,
-      meta: x1,
-      queryFn: async () => {
-        let r = await $(e.root, [`rev-parse`, `--verify`, `--quiet`, t], e.host, {
-          allowedNonZeroExitCodes: [1],
-          signal: n,
-        });
-        if (!r.success) throw Error(`Git ref lookup failed`);
-        let i = r.stdout.trim();
-        if (i && !M0(i)) throw Error(`Git ref lookup returned an invalid object ID`);
-        return i ? wz(i) : null;
-      },
-      staleTime: g1,
-    })
-  );
-}
 function P0(e, t, n) {
   return e.queryClient.fetchQuery({
     queryKey: Q(e.root, e.host, `upstream-ref`, t),
@@ -66971,7 +66957,7 @@ async function Ipe(e, t, n, r, i, a) {
         let r = e.slice(`refs/remotes/${n}/`.length),
           o = await $(i.root, [`fetch`, n, `+refs/heads/${r}:${e}`], i.host, { signal: a });
         if (!o.success) throw Error(`Failed to fetch latest ${n}/${r}: ${o.stderr || o.stdout}`);
-        let s = await N0(i, e, a, { fresh: !0 });
+        let s = await resolveGitRefSha(i, e, a, { fresh: !0 });
         if (s == null) throw Error(`Failed to resolve latest ${n}/${r}`);
         return s;
       }
@@ -66995,21 +66981,21 @@ async function Ipe(e, t, n, r, i, a) {
 }
 async function I0(e, t, n) {
   if (t === `HEAD` || t === `@`)
-    return (await N0(e, `${t}^{commit}`, n)) == null ? null : { ref: t };
+    return (await resolveGitRefSha(e, `${t}^{commit}`, n)) == null ? null : { ref: t };
   let r = Rpe(t),
     i = await P0(e, t, n);
   if (i != null) {
     let a = `refs/remotes/${i}`,
-      o = (await N0(e, `${a}^{commit}`, n)) == null ? F0(i) : a;
+      o = (await resolveGitRefSha(e, `${a}^{commit}`, n)) == null ? F0(i) : a;
     return (await A0(e, r ?? t, o, n))?.state === `right-ahead` ? { ref: o } : { ref: r ?? t };
   }
-  if (r != null && (await N0(e, `${r}^{commit}`, n)) != null) return { ref: r };
+  if (r != null && (await resolveGitRefSha(e, `${r}^{commit}`, n)) != null) return { ref: r };
   let a = await j0(e);
-  if (t.startsWith(`refs/remotes/`) && (await N0(e, `${t}^{commit}`, n)) != null)
+  if (t.startsWith(`refs/remotes/`) && (await resolveGitRefSha(e, `${t}^{commit}`, n)) != null)
     return { ref: t, remoteRef: t };
   let o = zpe(t, a);
   for (let t of o)
-    if ((await N0(e, `${t.ref}^{commit}`, n)) != null) return { ref: t.ref, remoteRef: t.ref };
+    if ((await resolveGitRefSha(e, `${t.ref}^{commit}`, n)) != null) return { ref: t.ref, remoteRef: t.ref };
   let s = null;
   for (let t of o)
     try {
@@ -67020,7 +67006,7 @@ async function I0(e, t, n) {
       if (n?.aborted || !(e instanceof L0)) throw t;
       s ??= t;
     }
-  let c = await N0(e, `${t}^{commit}`, n);
+  let c = await resolveGitRefSha(e, `${t}^{commit}`, n);
   if (c != null) return { ref: c };
   if (s != null) throw s;
   return null;
@@ -67040,7 +67026,7 @@ async function Lpe(e, t, n) {
         signal: n,
       })
     ).success ||
-    (await N0(e, `${t.ref}^{commit}`, n, { fresh: !0 })) == null
+    (await resolveGitRefSha(e, `${t.ref}^{commit}`, n, { fresh: !0 })) == null
   )
     throw Error(`Failed to fetch the worktree starting ref`);
   return { ref: t.ref, remoteRef: t.ref };
@@ -68457,11 +68443,11 @@ async function Vme(e, t, n) {
     i = (await j0(e)).find((e) => r.startsWith(`${e}/`));
   if (i == null) return null;
   let a = r.slice(i.length + 1);
-  if (!a || a === `HEAD` || (await N0(e, `refs/heads/${a}`, n)) != null) return null;
+  if (!a || a === `HEAD` || (await resolveGitRefSha(e, `refs/heads/${a}`, n)) != null) return null;
   let o = await $(e.root, [`branch`, `--track`, a, t], e.host);
   if (!o.success) throw Error(o.stderr || o.stdout);
   try {
-    return (await N0(e, `refs/heads/${a}`, void 0, { fresh: !0 }), a);
+    return (await resolveGitRefSha(e, `refs/heads/${a}`, void 0, { fresh: !0 }), a);
   } catch (t) {
     throw (await E2(e, a), t);
   }
@@ -68473,7 +68459,7 @@ async function E2(e, t) {
       safe: {},
       sensitive: { error: n.stderr || n.stdout },
     }),
-    await N0(e, `refs/heads/${t}`, void 0, { fresh: !0 }));
+    await resolveGitRefSha(e, `refs/heads/${t}`, void 0, { fresh: !0 }));
 }
 function Hme(e) {
   return e instanceof Error ? e : Error(String(e));
@@ -69192,7 +69178,7 @@ async function vhe(e, t) {
   if (!n) return null;
   let r = await Q2(e, n);
   if (!r.requiresRefCheck) return r.mergeBase;
-  let [i, a] = await Promise.all([N0(e, `HEAD`), N0(e, n)]);
+  let [i, a] = await Promise.all([resolveGitRefSha(e, `HEAD`), resolveGitRefSha(e, n)]);
   if (i == null) return null;
   if (a != null) return Z2(e, n);
   let o = [],
@@ -69218,9 +69204,9 @@ async function vhe(e, t) {
   }
   c(l);
   let [d, ...f] = o,
-    p = d != null && (await N0(e, d)) ? d : null;
+    p = d != null && (await resolveGitRefSha(e, d)) ? d : null;
   if (
-    ((p ??= f[(await Promise.all(f.map((t) => N0(e, t)))).findIndex((e) => e != null)] ?? null),
+    ((p ??= f[(await Promise.all(f.map((t) => resolveGitRefSha(e, t)))).findIndex((e) => e != null)] ?? null),
     p == null)
   )
     return null;
@@ -70100,7 +70086,7 @@ async function x4(e, t) {
   let n = await yge(e, t);
   if (n !== `HEAD`) return n;
   let r = (await A2(e, n, t.signal)).trim();
-  if (!M0(r)) throw Error(`Unexpected tree SHA: ${r}`);
+  if (!isGitObjectId(r)) throw Error(`Unexpected tree SHA: ${r}`);
   return Cz(r);
 }
 function yge(e, t) {
@@ -70136,7 +70122,7 @@ function S4(e, t) {
       return n.type === `success` &&
         n.stagedCount === 0 &&
         n.unstagedCount === 0 &&
-        (await N0(e, `HEAD`, t.signal)) != null
+        (await resolveGitRefSha(e, `HEAD`, t.signal)) != null
         ? `HEAD`
         : w4(
             e,
@@ -70220,7 +70206,7 @@ async function D4(e, t, n) {
   let r = await $(e.root, [`write-tree`], e.host, { env: t, signal: n }),
     i = r.success ? r.stdout.trim() : null;
   if (!i) throw Error(`Failed to write temporary index tree snapshot`);
-  if (!M0(i)) throw Error(`Unexpected tree SHA: ${i}`);
+  if (!isGitObjectId(i)) throw Error(`Unexpected tree SHA: ${i}`);
   return Cz(i);
 }
 var xge = `refs/codex/snapshots`,
@@ -70246,7 +70232,7 @@ async function Sge(e, t, n, r, i) {
         t2(o.root, n, { configOverrides: e, signal: i }),
       ),
     }),
-    u = await N0(o, `HEAD`, i),
+    u = await resolveGitRefSha(o, `HEAD`, i),
     d = u;
   if (u) {
     if ((await A2(o, u, i)).trim() !== l) {
@@ -72070,7 +72056,7 @@ var I6 = kW(`git`),
           normalizeWorktreePath: bz,
           getSnapshotRef: M4,
           normalizeRoot: xz,
-          getCommitSha: N0,
+          getCommitSha: resolveGitRefSha,
           isMissingError: sB,
         },
         worktreeRequestDeps = {
@@ -74088,7 +74074,7 @@ async function Obe(e, t) {
   let r = e.root;
   await fhe(e, Dpe);
   let i = (0, g.basename)(r) || `repo`,
-    [a, o, s] = await Promise.all([N0(e, `HEAD`), w0(e), kbe(e)]);
+    [a, o, s] = await Promise.all([resolveGitRefSha(e, `HEAD`), w0(e), kbe(e)]);
   if (a == null) throw Error(`Cannot create a worktree snapshot without a HEAD commit`);
   let c = `${i}-snapshot-${Date.now()}.tar.gz`,
     l = (0, g.join)((0, h.tmpdir)(), c);
