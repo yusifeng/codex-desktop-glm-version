@@ -7,6 +7,7 @@ let t = require("node:worker_threads"),
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
+const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
@@ -76697,7 +76698,7 @@ var Jye = 1e3,
     constructor(e) {
       ((this.options = e),
         (this.ignorePolicy = e.watchIgnoreSources
-          ? new Xye({
+          ? new GitIgnorePolicy({
               readIgnoredDirectories: () => this.readIgnoredDirectories(),
               refresh: () => this.refreshWorkingTreeWatchPolicy(),
               onRequiresRecoveryChanged: () => this.updateRequiresRecovery(),

@@ -43,6 +43,9 @@ state initialization、change emission deduplication、操作标记路径表、�
 生命周期仍在继续拆分。本轮新增 `getGitWorkingTreeWatchRefreshAction`，覆盖
 ignore policy 刷新后的 skip/apply/restart 纯决策，回归断言增至 51 项；异步
 dispose/restart 与 session timer 副作用仍保留在入口。
+Git ignore policy 的 generation/read/refresh/recovery 状态机已抽取为
+`src/main/worker/git-ignore-policy.ts`，由 10 项行为断言覆盖；watcher 的 session
+创建与 dispose 副作用仍保留在入口。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为

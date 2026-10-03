@@ -47,6 +47,12 @@ watch retry backoff、Git operation state mapping、watch target state initializ
 `refreshWorkingTreeWatchPolicy`
 仍负责等待 policy/session、dispose/restart 与事件副作用。
 
+Git ignore policy（原 `Xye`，约 76,500-76,620）已迁移至
+`src/main/worker/git-ignore-policy.ts`，入口通过 `GitIgnorePolicy` 接回；generation
+快照、read 去重、refresh timer、recovery 状态和 dispose 等行为由
+`scripts/test-worker-git-ignore-policy.mjs` 覆盖，共 10 项断言。GitRepoWatcher
+仍保留 session 创建、重启和文件事件副作用。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
