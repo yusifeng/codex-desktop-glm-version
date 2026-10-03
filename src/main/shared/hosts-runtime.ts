@@ -1,6 +1,7 @@
 // hosts-wsl-plugins shared helpers consumed by the main process.
 import { homedir } from "node:os";
 import { join, normalize, sep } from "node:path";
+import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { z } from "zod";
 import { BUNDLED_PLUGIN_DESCRIPTORS, DEFAULT_MARKETPLACE_NAME } from "./app-constants";
 import { changeTouchesVisualizationArtifact } from "./browser-context";
@@ -64,8 +65,21 @@ export const enrollmentRecordSchema = z.record(z.string(), z.unknown());
 export const keychainErrorOf = (error: unknown): { code?: string; message: string } => ({ message: errorToMessage(error), ...(error && typeof error === "object" && "code" in error && typeof error.code === "string" ? { code: error.code } : {}) });
 export const parseJwt = (token: string): Record<string, unknown> | null => { try { return JSON.parse(Buffer.from(token.split(".")[1] ?? "", "base64url").toString("utf8")) as Record<string, unknown>; } catch { return null; } };
 export const openLinkTargetPreference = (value: unknown): string => typeof value === "string" ? value : "system";
-export const appServerFileSystem = Object.freeze({}), agentReadableSettings: readonly unknown[] = [], SETTINGS = Object.freeze({}), LOCAL_SETTINGS = Object.freeze({}), APPEARANCE_SETTINGS = Object.freeze({});
-export const SETTING_DESCRIPTORS: readonly unknown[] = [], findSettingDescriptor = (_key: string): unknown => undefined, effectiveSettingValue = (_key: string, fallback: unknown): unknown => fallback, settingDefinitionFor = (_key: string): unknown => undefined;
+const setting = (key: string, defaultValue: unknown, hostStorage = "configuration") => ({ key, default: defaultValue, hostStorage: { kind: hostStorage, key } });
+export const SETTINGS = Object.freeze({
+  followUpQueueMode: setting("follow-up-queue-mode", "steer"),
+  composerEnterBehavior: setting("composer-enter-behavior", "enter"),
+  keepRemoteControlAwakeWhilePluggedIn: setting("keep-remote-control-awake-while-plugged-in", false),
+  preventSleepWhileRunning: setting("prevent-sleep-while-running", false),
+});
+export const LOCAL_SETTINGS = Object.freeze({ defaultServiceTier: setting("default-service-tier", null, "persisted-atom") });
+export const APPEARANCE_SETTINGS = Object.freeze({ theme: setting("theme", "system"), density: setting("density", "comfortable") });
+export const SETTING_DESCRIPTORS = Object.freeze([...Object.values(SETTINGS), ...Object.values(LOCAL_SETTINGS), ...Object.values(APPEARANCE_SETTINGS)]);
+export const findSettingDescriptor = (key: string): unknown => SETTING_DESCRIPTORS.find((descriptor) => (descriptor as { key: string }).key === key);
+export const effectiveSettingValue = (key: string, fallback: unknown): unknown => { const descriptor = findSettingDescriptor(key) as { default?: unknown } | undefined; return descriptor?.default ?? fallback; };
+export const settingDefinitionFor = findSettingDescriptor;
+export const agentReadableSettings: readonly unknown[] = SETTING_DESCRIPTORS;
+export const appServerFileSystem = Object.freeze({ readFile, writeFile, mkdir, stat, readdir, rm, copyFile });
 export const settingKeyList = (keys: readonly string[]): string[] => [...keys], browserFamilyConfig = Object.freeze({}), zUnknownSchema = z.unknown(), shouldUseWslPaths = shouldUseWslPathsForHostConfig, buildWslEnvDirective = (value: string): string => value;
 export const remoteControlEnrollmentAccountMismatch = "remote_control_enrollment_account_mismatch", parseSharedJson = parseStoredJson, sandboxScheme = "codex-sandbox", parseApiResponse = parseStoredJson, agentAccessVisible = [] as readonly unknown[];
 export const normalizeThreadOrders = (value: unknown): unknown => value, defaultModeSettingsForHost = defaultModeSettings, settingsDescriptor = SETTINGS, appearanceSettings = APPEARANCE_SETTINGS, pluginsConfigSchema = internalPluginsConfigSchema, chromeTabFocusSchema = z.object({}), compareProjects = compareProjectsShared, mapSettingValue = effectiveSettingValue, hostValueMap = mapValuesModule, openLinkPreference = openLinkTargetPreference, flavorDirectoryName = (value: unknown): string => typeof value === "string" ? value : "prod", hostEnvironmentState = parseStoredJson, pluginState = parseStoredJson, shellEnvFlagKey = "CODEX_SHELL", tabsLivenessSchema = z.object({}), turnRequestStripper = stripTurnRequestForVersion, queueContextPredicate = isUntrustedQueueContext, sourceSettings = SETTINGS, sourceKinds = DEFAULT_THREAD_SOURCE_KINDS, tabMentionSearchSchema = z.object({}), errorAttributes = (error: unknown): Record<string, string> => ({ message: errorToMessage(error) }), installSharedTracingBridge = <T>(value: T): T => value, errorToSpanAttributes = errorAttributes, queueContextError = untrustedQueueContextError, unknownSchema = z.unknown(), safeAttachmentFilename = isSafeFilename;
