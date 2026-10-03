@@ -56,10 +56,10 @@ Git ignore policy（原 `Xye`，约 76,500-76,620）已迁移至
 `GitRepoManager.handleRequestWithContext` 的连续只读请求分支（`origin-url`、
 `origin-and-roots`、`worktree-shell-environment`、`worktree-owner`、
 `default-remote-branch`、`merge-base`、current/upstream/default/base branch 与
-branch-ahead 查询，原约 77,560-77,760）已迁移至
+branch-ahead、recent-branches、branch-exists 查询，原约 77,560-77,850）已迁移至
 `src/main/worker/git-read-request-handlers.ts`；原入口继续负责取消信号、Git 可用性
 检查、telemetry 和响应包装。`scripts/test-worker-git-read-request-handlers.mjs`
-覆盖 repository unavailable 与正常结果，共 14 项断言。
+覆盖 repository unavailable 与正常结果，共 17 项断言。
 
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、

@@ -8,7 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
-const { resolveBaseBranch, resolveBranchAheadCount, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
+const { resolveBaseBranch, resolveBranchAheadCount, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
@@ -77536,6 +77536,8 @@ var I6 = kW(`git`),
           getBranchAheadCount: (root, args) => this.handleBranchAheadCount(root, args),
           getDefaultBranch: (root, host, signal) => this.getDefaultBranch(root, host, signal),
           getBaseBranch: (root, host) => this.getBaseBranch(root, host),
+          getRecentBranches: (params, args) => this.handleRecentBranches(params, args),
+          branchExists: O2,
         },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
@@ -77659,10 +77661,10 @@ var I6 = kW(`git`),
             p = X(await resolveBaseBranch(e.params.root, readRequestDeps));
             break;
           case `recent-branches`:
-            p = await this.handleRecentBranches(e.params, { host: o, signal: i.signal });
+            p = await resolveRecentBranches(e.params, i.signal, readRequestDeps);
             break;
           case `branch-exists`:
-            p = X({ exists: await O2(e.params.root, e.params.branch, o, i.signal) });
+            p = X(await resolveBranchExists(e.params.root, e.params.branch, i.signal, readRequestDeps));
             break;
           case `create-branch`: {
             let { branch: t, cwd: n, failIfExists: r, mode: a, startPoint: s } = e.params;

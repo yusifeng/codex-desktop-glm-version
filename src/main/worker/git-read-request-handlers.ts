@@ -13,6 +13,8 @@ type ReadHandlerDependencies = {
   getBranchAheadCount: (root: string, args: { host: any; signal: AbortSignal }) => Promise<unknown>;
   getDefaultBranch: (root: string, host: any, signal: AbortSignal) => Promise<unknown>;
   getBaseBranch: (root: string, host: any) => Promise<unknown>;
+  getRecentBranches: (params: any, args: { host: any; signal: AbortSignal }) => Promise<unknown>;
+  branchExists: (root: string, branch: string, host: any, signal: AbortSignal) => Promise<boolean>;
 };
 
 async function resolveOriginUrl(cwd: string, deps: ReadHandlerDependencies) {
@@ -69,5 +71,13 @@ async function resolveBaseBranch(root: string, deps: ReadHandlerDependencies) {
   return deps.getBaseBranch(root, deps.host);
 }
 
-export { resolveBaseBranch, resolveBranchAheadCount, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
-if (typeof module !== `undefined`) module.exports = { resolveBaseBranch, resolveBranchAheadCount, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
+async function resolveRecentBranches(params: any, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  return deps.getRecentBranches(params, { host: deps.host, signal });
+}
+
+async function resolveBranchExists(root: string, branch: string, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  return { exists: await deps.branchExists(root, branch, deps.host, signal) };
+}
+
+export { resolveBaseBranch, resolveBranchAheadCount, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
+if (typeof module !== `undefined`) module.exports = { resolveBaseBranch, resolveBranchAheadCount, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
