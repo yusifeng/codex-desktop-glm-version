@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -76701,6 +76701,8 @@ var Jye = 1e3,
           : null));
     }
     get requiresRecovery() {
+      return requiresGitWatcherRecovery(this.watchTargets, this.ignorePolicy?.requiresRecovery === !0);
+      /* istanbul ignore next -- retained generated implementation for source parity reference */
       return (
         this.ignorePolicy?.requiresRecovery === !0 ||
         this.watchTargets.some(

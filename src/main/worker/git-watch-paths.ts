@@ -67,5 +67,12 @@ function addPendingWorkingTreePath(pathApi: (PathApi & { join(...parts: string[]
   return roots;
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
+function requiresGitWatcherRecovery(targets: Array<{ metadataDirectory?: { missing?: boolean }; session?: { coverage?: { recursive?: boolean } } | null; recursive: boolean }>, ignorePolicyRequiresRecovery: boolean): boolean {
+  return ignorePolicyRequiresRecovery || targets.some((target) =>
+    !target.metadataDirectory?.missing &&
+    (target.session == null || (target.recursive && !target.session.coverage?.recursive)),
+  );
+}
+
+export { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, requiresGitWatcherRecovery };

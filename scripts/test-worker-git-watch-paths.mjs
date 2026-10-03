@@ -11,6 +11,7 @@ const {
   isWithinPath,
   isWatchedRefPath,
   isWorktreeTopologyPath,
+  requiresGitWatcherRecovery,
 } = require("../app/.vite/build/worker/git-watch-paths.js");
 
 const pathApi = {
@@ -54,5 +55,10 @@ assert.equal(addPendingWorkingTreePath(pathApi, "/repo", pending, "/repo/src/fil
 pending = new Set(["/repo/src/file.ts"]);
 assert.deepEqual([...addPendingWorkingTreePath(pathApi, "/repo", pending, "/repo/src", 4)], ["/repo/src"]);
 assert.equal(addPendingWorkingTreePath(pathApi, "/repo", new Set(["/repo/a", "/repo/b", "/repo/c"]), "/repo/d", 2), null);
+assert.equal(requiresGitWatcherRecovery([], false), false);
+assert.equal(requiresGitWatcherRecovery([{ recursive: true, session: null }], false), true);
+assert.equal(requiresGitWatcherRecovery([{ recursive: true, metadataDirectory: { missing: true }, session: null }], false), false);
+assert.equal(requiresGitWatcherRecovery([{ recursive: true, session: { coverage: { recursive: true } } }], false), false);
+assert.equal(requiresGitWatcherRecovery([], true), true);
 
-console.log("22 worker git watch path assertions passed");
+console.log("27 worker git watch path assertions passed");
