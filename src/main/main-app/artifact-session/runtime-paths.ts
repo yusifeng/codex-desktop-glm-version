@@ -1,7 +1,7 @@
 import { accessSync, constants, existsSync, statSync } from "node:fs";
 import path from "node:path";
 import { resolveElectronResourcesPath } from "@chunk/electron-resources-path";
-import { Bn as resolveWslDistro, In as resolveCodexPath, Ln as resolveNodePath, Mn as resolveNodeModuleDirs, On as resolvePrimaryRuntimePath, Rn as resolveNodeReplPath, Vn as recordExecutableResolution } from "@chunk/shared";
+import { Ni as resolveWslDistro, In as resolveCodexPath, Ln as resolveNodePath, Mn as resolveNodeModuleDirs, On as resolvePrimaryRuntimePath, Rn as resolveNodeReplPath, Vn as recordExecutableResolution } from "@chunk/shared";
 
 export interface RuntimePathsOptions {
   env?: NodeJS.ProcessEnv;
