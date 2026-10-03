@@ -23,6 +23,7 @@ const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
+const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
@@ -73301,181 +73302,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-var D6 = 1048576,
-  Hye = `^(core\\.excludesfile|include(if\\..*)?\\.path)$`;
-async function Uye(e, { defaultExcludesFile: t, globalConfigFiles: n }) {
-  let r = await $(e.root, [`var`, `GIT_CONFIG_SYSTEM`], e.host, {
-    trim: !1,
-    allowedNonZeroExitCodes: [1, 129],
-    maxOutputBytes: D6,
-    timeoutMs: 6e4,
-  });
-  if (!r.success) throw Error(`Failed to discover Git ignore configuration files`);
-  let [i, a, o, s, c] = await Promise.all([
-    $(
-      e.root,
-      [`config`, `--includes`, `--null`, `--show-origin`, `--path`, `--get-regexp`, Hye],
-      e.host,
-      { trim: !1, allowedNonZeroExitCodes: [1], maxOutputBytes: D6, env: { GIT_CONFIG: void 0 } },
-    ),
-    $(e.root, [`rev-parse`, `--git-path`, `config`], e.host, { trim: !1, maxOutputBytes: D6 }),
-    $(e.root, [`rev-parse`, `--git-path`, `config.worktree`], e.host, {
-      trim: !1,
-      maxOutputBytes: D6,
-    }),
-    r.code === 129
-      ? $(
-          e.root,
-          [`config`, `--includes`, `--null`, `--show-origin`, `--name-only`, `--list`],
-          e.host,
-          { trim: !1, maxOutputBytes: D6, env: { GIT_CONFIG: void 0 } },
-        )
-      : null,
-    e.host.platformPath(),
-  ]);
-  if (!i.success || !a.success || !o.success || (s != null && !s.success))
-    throw Error(`Failed to discover Git ignore configuration files`);
-  let l = (t, n = e.root) => (c.isAbsolute(t) ? t : `${n}${n.endsWith(c.sep) ? `` : c.sep}${t}`),
-    u = new Set(
-      [
-        ...n,
-        ...(r.code === 0 &&
-        r.stdout !==
-          `
-`
-          ? [O6(r.stdout)]
-          : []),
-        O6(a.stdout),
-        O6(o.stdout),
-      ].map((e) => l(e)),
-    );
-  if (s != null) {
-    u.add(`/etc/gitconfig`);
-    let e = s.stdout.split(`\0`);
-    if (e.pop() !== `` || e.length % 2 != 0) throw Error(`Invalid Git configuration origin output`);
-    for (let t = 0; t < e.length; t += 2) {
-      let n = e[t];
-      n?.startsWith(`file:`) && u.add(l(n.slice(5)));
-    }
-  }
-  let d = t == null ? null : l(t),
-    f = i.stdout.split(`\0`);
-  if (f.pop() !== `` || f.length % 2 != 0) throw Error(`Invalid Git ignore configuration output`);
-  for (let t = 0; t < f.length; t += 2) {
-    let n = f[t],
-      r = f[t + 1];
-    if (
-      n == null ||
-      r == null ||
-      !r.includes(`
-`)
-    )
-      throw Error(`Invalid Git ignore configuration output`);
-    let i = r.indexOf(`
-`),
-      a = r.slice(0, i),
-      o = r.slice(i + 1),
-      s = n.startsWith(`file:`) ? l(n.slice(5)) : null;
-    (s != null && u.add(s),
-      a === `core.excludesfile`
-        ? (d = o === `` ? null : l(o))
-        : o !== `` && u.add(l(o, s == null ? e.root : c.dirname(s))));
-  }
-  return { ignoreFile: d, configFiles: [...u].sort() };
-}
-function O6(e) {
-  if (
-    !e.endsWith(`
-`) ||
-    e.length === 1
-  )
-    throw Error(`Invalid Git configuration path output`);
-  return e.slice(0, -1);
-}
-var Wye = e.n((e, t) => {
-    var n = kI(),
-      r = 4294967294,
-      i = Math.floor,
-      a = Math.min;
-    function o(e, t, o, s) {
-      var c = 0,
-        l = e == null ? 0 : e.length;
-      if (l === 0) return 0;
-      t = o(t);
-      for (var u = t !== t, d = t === null, f = n(t), p = t === void 0; c < l;) {
-        var m = i((c + l) / 2),
-          h = o(e[m]),
-          g = h !== void 0,
-          _ = h === null,
-          v = h === h,
-          y = n(h);
-        if (u) var b = s || v;
-        else
-          b = p
-            ? v && (s || g)
-            : d
-              ? v && g && (s || !_)
-              : f
-                ? v && g && !_ && (s || !y)
-                : _ || y
-                  ? !1
-                  : s
-                    ? h <= t
-                    : h < t;
-        b ? (c = m + 1) : (l = m);
-      }
-      return a(l, r);
-    }
-    t.exports = o;
-  }),
-  Gye = e.n((e, t) => {
-    var n = Wye(),
-      r = qR(),
-      i = kI(),
-      a = 2147483647;
-    function o(e, t, o) {
-      var s = 0,
-        c = e == null ? s : e.length;
-      if (typeof t == `number` && t === t && c <= a) {
-        for (; s < c;) {
-          var l = (s + c) >>> 1,
-            u = e[l];
-          u !== null && !i(u) && (o ? u <= t : u < t) ? (s = l + 1) : (c = l);
-        }
-        return c;
-      }
-      return n(e, t, r, o);
-    }
-    t.exports = o;
-  }),
-  Kye = e.n((e, t) => {
-    var n = Gye();
-    function r(e, t) {
-      return n(e, t);
-    }
-    t.exports = r;
-  }),
-  k6 = e.o(Kye());
-async function qye(e) {
-  let [t, n, r] = await Promise.all([i2(e, []), r2(e, []), e.host.platformPath()]);
-  if (!t.success || !n.success) throw Error(`Failed to read Git watcher ignored directories`);
-  let i = [...n.paths].sort();
-  return t.ignoredPaths
-    .filter((e) => e.endsWith(`/`))
-    .map((e) => e.slice(0, -1))
-    .filter((e) => {
-      let t = `${e}/`;
-      if (i[(0, k6.default)(i, t)]?.startsWith(t)) return !1;
-      let n = e;
-      for (; n !== `.`;) {
-        if (i[(0, k6.default)(i, n)] === n) return !1;
-        n = r.dirname(n);
-      }
-      return !0;
-    })
-    .map((t) => r.join(e.root, t))
-    .sort();
-}
 var Jye = 1e3,
   Yye = 6e4,
   Xye = class {
@@ -73762,7 +73588,7 @@ var Jye = 1e3,
       if (e == null) return [];
       let t = await e.getEnvironment();
       for (; !this.disposed;) {
-        let n = await Uye(this.options.worktreeRepo, t),
+        let n = await discoverGitIgnoreConfigurationFiles(this.options.worktreeRepo, t, { runGit: $ }),
           r = await e.getWatchTargets([
             ...n.configFiles,
             ...(n.ignoreFile == null ? [] : [n.ignoreFile]),
@@ -73770,7 +73596,11 @@ var Jye = 1e3,
         if (this.disposed) return [];
         let i = await this.updateIgnoreSourceWatches(r);
         if (this.disposed) return [];
-        if (!i) return qye(this.options.worktreeRepo);
+        if (!i)
+          return readGitWatcherIgnoredDirectories(this.options.worktreeRepo, {
+            readPathStatus: i2,
+            readTrackedPaths: r2,
+          });
       }
       return [];
     }

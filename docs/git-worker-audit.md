@@ -56,6 +56,12 @@ Git ignore policy（原 `Xye`，约 76,500-76,620）已迁移至
 `scripts/test-worker-git-ignore-policy.mjs` 覆盖，共 10 项断言。GitRepoWatcher
 仍保留 session 创建、重启和文件事件副作用。
 
+Git watcher ignore-source discovery 已迁移至 `src/main/worker/git-ignore-discovery.ts`：
+保留 system/global/local/worktree config 来源、旧 Git 129 fallback、include 与
+`core.excludesfile` 路径解析，以及 ignored directory 对 tracked descendant/ancestor 的排除。
+原 `Uye`/`O6`/`qye`、专用常量及仅由该算法使用的 bundled lower-bound 链
+`Wye`/`Gye`/`Kye`/`k6` 已删除，由 37 项命令、解析、平台路径和筛选断言覆盖。
+
 `GitRepoManager.handleRequestWithContext` 的连续只读请求分支（`origin-url`、
 `origin-and-roots`、`worktree-shell-environment`、`worktree-owner`、
 `default-remote-branch`、`merge-base`、current/upstream/default/base branch 与

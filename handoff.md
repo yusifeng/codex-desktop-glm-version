@@ -48,6 +48,10 @@ dispose/restart 与 session timer 副作用仍保留在入口。
 Git ignore policy 的 generation/read/refresh/recovery 状态机已抽取为
 `src/main/worker/git-ignore-policy.ts`，由 10 项行为断言覆盖；watcher 的 session
 创建与 dispose 副作用仍保留在入口。
+Git watcher ignore-source 的 config discovery、旧 Git fallback、include/excludes 路径解析和
+tracked-path-aware ignored directory 筛选已迁移至
+`src/main/worker/git-ignore-discovery.ts`；原三个 helper、两个常量及专用 bundled lower-bound
+链已删除，由 37 项断言覆盖。
 worker `handleRequestWithContext` 的 origin/roots、shell environment、owner、default
 remote branch 与 merge-base 只读请求已迁移至 `src/main/worker/git-read-request-handlers.ts`，
 并扩展至 current/upstream/default/base branch、branch-ahead、recent-branches 与 branch-exists
