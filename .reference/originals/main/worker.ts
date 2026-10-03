@@ -23,6 +23,7 @@ const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { getBranchAheadCount } = require("./worker/git-branch-ahead");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
+const { readGitCatFile } = require("./worker/git-cat-file");
 const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { getGitCloneState } = require("./worker/git-clone-state");
@@ -80,6 +81,7 @@ const { describeShell } = require("./worker/shell-config");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
+const gitCatFileDeps = { runGit: (...args) => $(...args) };
 const gitIndexInfoDeps = {
   getGitDir: (...args) => u0(...args),
   logger: { error: (message, detail) => kW(`git`)().error(message, detail) },
@@ -66709,7 +66711,6 @@ function g0(e) {
     : { type: `unknown` };
 }
 var Dpe = 209715200,
-  Ope = 5242880,
   _0 = 33554432,
   kpe = 67108864,
   v0 = `origin`,
@@ -71049,170 +71050,6 @@ function hve(e, t, n) {
   }
   return { offsets: a, totalMatches: o, isCapped: s };
 }
-var _ve = /(?<=\n)/,
-  vve = /^0+$/,
-  yve = 3e4,
-  bve = 64,
-  xve = { GIT_NO_LAZY_FETCH: `1` };
-async function Sve(e, { maxObjectBytes: t, requests: n, reviewSnapshot: r }, i) {
-  if (n.length > 4) return n.map(L3);
-  let a = Math.max(0, Math.min(t ?? 5242880, Ope));
-  try {
-    let t = [...new Set(n.flatMap(({ oid: e }) => (z3(e) ? [e] : [])))],
-      o = t.length === 0 ? [] : await B3(e, t, a, i, r),
-      s = new Map(t.map((e, t) => [e, o[t] ?? L3()])),
-      c = n.map(({ oid: e }) =>
-        z3(e) ? (s.get(e) ?? L3()) : { type: `error`, error: { type: `not-found` } },
-      );
-    if (
-      !c.some(
-        (e, t) => n[t]?.fallbackToDisk === !0 && e.type === `error` && e.error.type === `not-found`,
-      )
-    )
-      return c;
-    let l = e.host.platformPath();
-    return await Promise.all(
-      c.map(async (t, i) => {
-        let o = n[i];
-        if (o?.fallbackToDisk !== !0 || t.type !== `error` || t.error.type !== `not-found`)
-          return t;
-        try {
-          return await wve((await l).join(e.root, o.path), e, a, r);
-        } catch (e) {
-          return Cve(e);
-        }
-      }),
-    );
-  } catch {
-    return n.map(L3);
-  }
-}
-function L3() {
-  return { type: `error`, error: { type: `unknown` } };
-}
-function Cve(e) {
-  return { type: `error`, error: { type: kve(e) ? `not-found` : `unknown` } };
-}
-function wve(e, t, n, r) {
-  let i = () => Dve(e, t.host, n);
-  return r == null ? i() : r.read(i);
-}
-function Tve(e) {
-  return e.includes(`No such file`) || e.includes(`cannot open`) || e.includes(`not found`);
-}
-function R3(e) {
-  let t = e.split(_ve);
-  return t.length === 1 && t[0] === `` ? [] : (t.at(-1) === `` && t.pop(), t);
-}
-function z3(e) {
-  return e ? !vve.test(e) : !1;
-}
-function Eve(e) {
-  return e.code === 128 ? `not-found` : `unknown`;
-}
-async function Dve(e, t, n) {
-  let { size: r } = await t.stat(e, { bypassCache: !0 });
-  if (r != null && r > n) return { type: `error`, error: { type: `too-large`, limitBytes: n } };
-  let i = await Ove(await t.readFile(e), n + 1);
-  return i.byteLength > n
-    ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
-    : { type: `success`, lines: R3(new TextDecoder(`utf-8`, { ignoreBOM: !0 }).decode(i)) };
-}
-async function Ove(e, t) {
-  let n = e.getReader(),
-    r = [],
-    i = 0;
-  try {
-    for (; i < t;) {
-      let { done: e, value: a } = await n.read();
-      if (e) break;
-      let o = a.subarray(0, t - i);
-      (r.push(o), (i += o.byteLength));
-    }
-    i === t && (await n.cancel());
-  } finally {
-    n.releaseLock();
-  }
-  let a = new Uint8Array(i),
-    o = 0;
-  for (let e of r) (a.set(e, o), (o += e.byteLength));
-  return a;
-}
-function kve(e) {
-  return e instanceof Error && ((`code` in e && e.code === `ENOENT`) || Tve(e.message));
-}
-async function B3(e, t, n, r, i) {
-  let a = new TextEncoder(),
-    o = {
-      collectStdoutBuffer: !0,
-      env: xve,
-      maxOutputBytes: t.reduce(
-        (e, t) => Math.min(2 ** 53 - 1, e + n + a.encode(t).byteLength + bve),
-        0,
-      ),
-      signal: r,
-      stdin: `${t.join(`
-`)}\n`,
-      timeoutMs: yve,
-      trim: !1,
-    },
-    s =
-      i == null
-        ? await $(e.root, [`cat-file`, `--batch`], e.host, o)
-        : await i.git([`cat-file`, `--batch`], o),
-    { results: c, retryStartIndex: l } = Ave(t.length, s, n);
-  return l == null ? c : [...c, ...(await B3(e, t.slice(l), n, r, i))];
-}
-function Ave(e, t, n) {
-  let r = jve(e, t, n);
-  if (!t.success && t.outputLimitExceeded == null)
-    return { results: Array.from({ length: e }, () => r), retryStartIndex: null };
-  let i = t.stdoutBuffer ?? new TextEncoder().encode(t.stdout ?? ``),
-    a = new TextDecoder(),
-    o = [],
-    s = 0,
-    c = !1;
-  for (let l = 0; l < e; l += 1) {
-    let u = i.indexOf(10, s);
-    if (u === -1) {
-      if (t.outputLimitExceeded != null && c) return { results: o, retryStartIndex: l };
-      o.push(r);
-      continue;
-    }
-    let d = a.decode(i.subarray(s, u));
-    if (((s = u + 1), d.endsWith(` missing`))) {
-      o.push({ type: `error`, error: { type: `not-found` } });
-      continue;
-    }
-    let f = /^[0-9a-f]+ [^ ]+ ([0-9]+)$/.exec(d),
-      p = f?.[1] == null ? NaN : Number(f[1]);
-    if (!Number.isSafeInteger(p) || p < 0) {
-      ((s = i.byteLength), o.push({ type: `error`, error: { type: `unknown` } }));
-      continue;
-    }
-    let m = s + p;
-    if (m >= i.byteLength || i[m] !== 10) {
-      if (((s = i.byteLength), p > n))
-        return (
-          o.push({ type: `error`, error: { type: `too-large`, limitBytes: n } }),
-          { results: o, retryStartIndex: l + 1 < e ? l + 1 : null }
-        );
-      if (t.outputLimitExceeded != null && c) return { results: o, retryStartIndex: l };
-      o.push(r);
-      continue;
-    }
-    (p > n
-      ? ((c = !0), o.push({ type: `error`, error: { type: `too-large`, limitBytes: n } }))
-      : o.push({ type: `success`, lines: R3(a.decode(i.subarray(s, m))) }),
-      (s = m + 1));
-  }
-  return { results: o, retryStartIndex: null };
-}
-function jve(e, t, n) {
-  return t.outputLimitExceeded != null && e === 1
-    ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
-    : { type: `error`, error: { type: Eve(t) } };
-}
 var Jye = 1e3,
   Yye = 6e4,
   Xye = class {
@@ -72283,7 +72120,8 @@ var I6 = kW(`git`),
           getSubmodulePaths: (repository, signal) =>
             getGitSubmodulePaths(repository, signal, gitSubmodulePathsDeps),
           getReviewSnapshot: R6,
-          catFile: Sve,
+          catFile: (repository, options, signal) =>
+            readGitCatFile(repository, options, signal, gitCatFileDeps),
           blameFile: whe,
           getIndexInfo: (repository, signal) =>
             getGitIndexInfo(repository, signal, gitIndexInfoDeps),

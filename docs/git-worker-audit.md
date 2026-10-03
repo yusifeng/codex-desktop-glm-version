@@ -484,6 +484,13 @@ capture 两个消费者均注入窄依赖，由 28 项断言覆盖。
 Submodule paths 的 `.gitmodules` 缺失快路径、可取消 stat、Git config 查询、路径分隔符规范化
 与稳定去重已迁移至 `src/main/worker/git-submodule-paths.ts`。原 `gve` 已删除，repository-read
 消费者注入现有 query/runGit/path 能力，由 15 项断言覆盖。
+
+### 增量抽取：Cat-file batch reads
+
+Cat-file 的四请求批量上限、5 MiB 对象限制、batch 二进制协议解析、输出截断后的尾部递归重试、
+snapshot 一致性边界与限长磁盘 fallback 已迁移至 `src/main/worker/git-cat-file.ts`。原 `Sve`、
+十二个专用 helper、五个专用常量及共享声明中的独占对象上限已删除，repository-read 消费者
+只注入 Git 执行能力，由 43 项断言覆盖。
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
