@@ -4,6 +4,7 @@ let t = require("node:worker_threads"),
   n = require("util"),
   r = require("perf_hooks"),
   i = require("path");
+const { WorkerMainRpcClient } = require("./worker/rpc-client");
 i = e.o(i);
 let a = require("module");
 a = e.o(a);
@@ -90675,7 +90676,7 @@ var {
   } = t.workerData,
   H9 = t.parentPort;
 if (!H9) throw Error(`worker-entry must be run in a worker thread`);
-var U9 = new xDe(z9, H9),
+var U9 = new WorkerMainRpcClient(z9, H9),
   W9 = I9(CDe),
   G9 = gDe(
     B9,

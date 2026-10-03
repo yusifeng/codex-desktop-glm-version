@@ -18,7 +18,7 @@
 
 **第 1 层：已重写的 chunk（`src/main/<语义名>/`）——真实源码**
 
-真实的模块化 TypeScript：有命名、有类型、有注释，用 esbuild 打包回官方的 chunk 文件名。目前 21 个主进程 chunk 中已重写 9 个（入口链 + preload + 日志等基础设施），见下表。改这些代码就是正常迭代。
+真实的模块化 TypeScript：有命名、有类型、有注释，用 esbuild 打包回官方的 chunk 文件名。目前主进程有 11 个 REWRITTEN chunk；其余 chunk 已逐项审计并登记为 PRESERVED（vendor、生成物或必须保留启动协议的入口）。改语义目录中的代码就是正常迭代。
 
 **第 2 层：未重写的 chunk（`src/main/<chunk 文件名>.ts`）——格式化原版**
 
@@ -74,15 +74,15 @@
 | `windows-file-copy/` | windows-file-copy-B0DNtkPq.js | Windows 加密目录复制降级 | ✅ 已重写 |
 | `sandbox-preload/` | sandbox-preload.js | MCP 沙箱 guest 侧 preload | ✅ 已重写 |
 | `preload/` | preload.js | 主窗口 preload：electronBridge、Sentry IPC、PIP 视频解码 | ✅ 已重写 |
-| `bootstrap` | bootstrap-C4dRql4x.js | 主进程引导：Sentry、自动更新（808KB） | 待重写 |
-| `main` | main-C-Mhak1n.js | 主进程主体：窗口/菜单/IPC/账号（5.5MB） | 待重写 |
-| `git-worker` | worker.js | git 操作 worker（vscode-jsonrpc，2.8MB） | 待重写 |
-| `shared` | src-DldfpmrL.js | 主进程共享库：内嵌 zod、which 解析等（2.1MB） | 待重写 |
-| `css-selector` | dist-wQAv1pJP.js | css-select 选择器引擎（网页内容提取） | 待重写（vendored 库） |
-| `file-type-main` / `file-type-worker` | core-B-w7xKIn.js / core-DlTZhmo0.js | file-type 文件魔数检测 ×2 | 待重写（vendored 库） |
-| `device-service` | service-CtZiLFyH.js | 设备服务（device-kit 生命周期） | 待重写 |
-| `worker-shared` / `main-shared` | src-BSoROW9v.js / src-C9YLnbgY.js | 小型共享库 | 待重写 |
-| `browser-page-preload` | browser-page-preload.js | 浏览器页面注入 preload（computer use，855KB） | 待重写 |
+| `bootstrap` | bootstrap-C4dRql4x.js | 主进程引导：Sentry、自动更新（808KB） | PRESERVED（启动协议） |
+| `main` | main-C-Mhak1n.js | 主进程主体：窗口/菜单/IPC/账号（5.5MB） | PRESERVED（入口装配） |
+| `git-worker` | worker.js | git 操作 worker（vscode-jsonrpc，2.8MB） | 分段审计中（见 `docs/git-worker-audit.md`） |
+| `shared` | src-DldfpmrL.js | 主进程共享库与兼容导出 | 分段审计中 |
+| `css-selector` | dist-wQAv1pJP.js | css-select 选择器引擎（网页内容提取） | PRESERVED（vendor） |
+| `file-type-main` / `file-type-worker` | core-B-w7xKIn.js / core-DlTZhmo0.js | file-type 文件魔数检测 ×2 | PRESERVED（vendor） |
+| `device-service` | service-CtZiLFyH.js | 设备服务（device-kit 生命周期） | REWRITTEN |
+| `worker-shared` / `main-shared` | src-BSoROW9v.js / src-C9YLnbgY.js | 小型共享库 | PRESERVED（runtime/vendor） |
+| `browser-page-preload` | browser-page-preload.js | 浏览器页面注入 preload（computer use，855KB） | 分段审计中 |
 | `bundler-runtime` | rolldown-runtime-CPUxUITh.js | rolldown 打包运行时 | 不需要重写 |
 
 ## 使用
@@ -120,8 +120,10 @@ npm run pack         # build + 打包 asar
 
 ## 验证状态
 
-- `npm run typecheck`：通过（含 9 个已重写 chunk 的全部源码，electron 42.3.0 类型）。
-- `npm run verify`：9 个已重写 chunk 与官方原始产物的 require 依赖图、导出符号面全部一致。
+- `npm run typecheck`：通过（语义源码与排除 webview transform-only 资产后的工程源码）。
+- `node scripts/verify-chunks.mjs`：11 个已重写 chunk 与官方原始产物的 require 依赖图、导出符号面全部一致。
+- `node scripts/verify-renderer.mjs`：1874/1874 renderer chunks verified。
+- `node scripts/audit-shared-consumption.mjs`：当前消费面 `TOTAL: 0`；全量分类仍按终局 handoff 推进。
 - 未重写 chunk 的构建输出与发布版逐字节一致（`build --check` 0 语义分歧）。
 - 重写时的语义对照靠逐行核对原版产物（`.reference/app-original`）；运行行为最终以 `npm run pack` 后 `./scripts/run.sh` 的冒烟测试为准。
 
