@@ -10,6 +10,52 @@ type SnapshotDependencies = {
   isMissingError: (error: unknown) => boolean;
 };
 
+type DeleteWorktreeWithSnapshotDependencies = {
+  captureWorktreeSnapshot: (
+    gitManager: any,
+    worktree: string,
+    host: any,
+    reason: string,
+  ) => Promise<any>;
+  deleteWorktree: (
+    worktree: string,
+    host: any,
+    force: boolean,
+  ) => Promise<any>;
+  getWorktreeId: (worktree: string) => Promise<string>;
+  logSnapshotFailure: (params: {
+    error: unknown;
+    reason: string;
+    worktreeId: Promise<string>;
+  }) => void;
+};
+
+async function deleteWorktreeWithSnapshot(
+  gitManager: any,
+  worktree: string,
+  host: any,
+  reason: string,
+  force: boolean,
+  dependencies: DeleteWorktreeWithSnapshotDependencies,
+) {
+  try {
+    await dependencies.captureWorktreeSnapshot(
+      gitManager,
+      worktree,
+      host,
+      reason,
+    );
+  } catch (error) {
+    dependencies.logSnapshotFailure({
+      error,
+      reason,
+      worktreeId: dependencies.getWorktreeId(worktree),
+    });
+    if (reason !== `settings-delete-targeted`) throw error;
+  }
+  await dependencies.deleteWorktree(worktree, host, force);
+}
+
 async function inspectWorktreePath(host: any, path: string, isMissingError: (error: unknown) => boolean) {
   try {
     return (await host.stat(path, { bypassCache: true })).isDirectory() ? `available` : `unavailable`;
@@ -76,5 +122,16 @@ async function resolveManagedWorktreeState(candidateRoots: string[], cwd: string
   }
 }
 
-export { inspectWorktreePath, resolveManagedWorktreeState, resolveWorktreeSnapshot };
-if (typeof module !== `undefined`) module.exports = { inspectWorktreePath, resolveManagedWorktreeState, resolveWorktreeSnapshot };
+export {
+  deleteWorktreeWithSnapshot,
+  inspectWorktreePath,
+  resolveManagedWorktreeState,
+  resolveWorktreeSnapshot,
+};
+if (typeof module !== `undefined`)
+  module.exports = {
+    deleteWorktreeWithSnapshot,
+    inspectWorktreePath,
+    resolveManagedWorktreeState,
+    resolveWorktreeSnapshot,
+  };

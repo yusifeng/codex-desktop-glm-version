@@ -54,7 +54,7 @@ const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-threa
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
-const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
+const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
 const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./worker/git-watcher-metadata");
@@ -70806,21 +70806,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-async function V_e(e, t, n, r, i) {
-  try {
-    await Sge(e, t, n, r);
-  } catch (e) {
-    if (
-      (B_e().warning(`[worktree-snapshot] failed to snapshot worktree`, {
-        safe: { worktreeId: X0(t), reason: r },
-        sensitive: { error: e },
-      }),
-      r !== `settings-delete-targeted`)
-    )
-      throw e;
-  }
-  await $0(t, n, i);
-}
 var C3 = 100,
   w3 = 2097152;
 async function T3(e, t, n) {
@@ -73375,7 +73360,24 @@ var I6 = kW(`git`),
         sensitive: { reason: e.reason, force: e.force ?? !1, hasHostConfig: e.hostConfig != null },
       });
       try {
-        await V_e(this.gitManager, e.worktree, t, e.reason, e.force ?? !1);
+        await deleteWorktreeWithSnapshot(
+          this.gitManager,
+          e.worktree,
+          t,
+          e.reason,
+          e.force ?? !1,
+          {
+            captureWorktreeSnapshot: (gitManager, worktree, host, reason) =>
+              Sge(gitManager, worktree, host, reason),
+            deleteWorktree: (worktree, host, force) => $0(worktree, host, force),
+            getWorktreeId: X0,
+            logSnapshotFailure: ({ error, reason, worktreeId }) =>
+              B_e().warning(`[worktree-snapshot] failed to snapshot worktree`, {
+                safe: { worktreeId, reason },
+                sensitive: { error },
+              }),
+          },
+        );
       } catch (e) {
         throw (
           I6().warning(`[worktree-delete] worker-failed`, {

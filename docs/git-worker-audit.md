@@ -232,7 +232,9 @@ root/origin 组合与单目录失败隔离已完整迁移至 `src/main/worker/gi
 
 Worktree snapshot/state 的候选目录过滤、snapshot ref/commit 查找、路径 inspection 和
 `available/gone/restorable/unavailable` 状态机已迁移至
-`src/main/worker/git-worktree-snapshot.ts`；原 `k4`/`Mve`/`V3` 已删除，由 12 项断言覆盖。
+`src/main/worker/git-worktree-snapshot.ts`；snapshot 后删除的失败策略也已并入，原
+`k4`/`Mve`/`V3`/`V_e` 已删除。22 项断言覆盖 snapshot 成功、普通失败抛出、
+`settings-delete-targeted` 降级和 force 透传。
 
 Worktree snapshot 打包前的文件枚举已迁移至 `src/main/worker/git-worktree-files.ts`：
 保留 query cache、index 指纹双读、最多两次稳定读取、tracked/untracked 合并、目录型

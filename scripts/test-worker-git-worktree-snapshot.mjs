@@ -2,7 +2,78 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { inspectWorktreePath, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("../app/.vite/build/worker/git-worktree-snapshot.js");
+const {
+  deleteWorktreeWithSnapshot,
+  inspectWorktreePath,
+  resolveManagedWorktreeState,
+  resolveWorktreeSnapshot,
+} = require("../app/.vite/build/worker/git-worktree-snapshot.js");
+
+function deleteFixture({ snapshotError } = {}) {
+  const events = [];
+  const dependencies = {
+    captureWorktreeSnapshot: async (...args) => {
+      events.push(["snapshot", ...args]);
+      if (snapshotError) throw snapshotError;
+    },
+    deleteWorktree: async (...args) => events.push(["delete", ...args]),
+    getWorktreeId: async (worktree) => `id:${worktree}`,
+    logSnapshotFailure: (params) => events.push(["warning", params]),
+  };
+  return { dependencies, events };
+}
+
+const deleteManager = { id: "git" };
+const deleteHost = { id: "host" };
+let deleteState = deleteFixture();
+assert.equal(
+  await deleteWorktreeWithSnapshot(
+    deleteManager,
+    "/worktree",
+    deleteHost,
+    "user-delete",
+    true,
+    deleteState.dependencies,
+  ),
+  undefined,
+);
+assert.deepEqual(deleteState.events, [
+  ["snapshot", deleteManager, "/worktree", deleteHost, "user-delete"],
+  ["delete", "/worktree", deleteHost, true],
+]);
+
+const snapshotError = Error("snapshot failed");
+deleteState = deleteFixture({ snapshotError });
+await assert.rejects(
+  deleteWorktreeWithSnapshot(
+    deleteManager,
+    "/worktree",
+    deleteHost,
+    "user-delete",
+    false,
+    deleteState.dependencies,
+  ),
+  snapshotError,
+);
+assert.equal(deleteState.events[1][1].reason, "user-delete");
+assert.equal(deleteState.events[1][1].error, snapshotError);
+assert.equal(deleteState.events[1][1].worktreeId instanceof Promise, true);
+assert.equal(await deleteState.events[1][1].worktreeId, "id:/worktree");
+assert.equal(deleteState.events.some((event) => event[0] === "delete"), false);
+
+deleteState = deleteFixture({ snapshotError });
+assert.equal(
+  await deleteWorktreeWithSnapshot(
+    deleteManager,
+    "/worktree",
+    deleteHost,
+    "settings-delete-targeted",
+    false,
+    deleteState.dependencies,
+  ),
+  undefined,
+);
+assert.deepEqual(deleteState.events.at(-1), ["delete", "/worktree", deleteHost, false]);
 
 const missing = () => Object.assign(new Error("missing"), { code: "ENOENT" });
 const states = new Map();
@@ -57,4 +128,4 @@ assert.deepEqual((await resolveManagedWorktreeState(["/repo"], "/cwd-missing", "
 states.set("/broken", "error");
 assert.deepEqual(await resolveManagedWorktreeState([], "/broken", "/worktree", deps), { kind: "unavailable", reason: "inspection-failed" });
 
-console.log("12 worker git worktree snapshot assertions passed");
+console.log("22 worker git worktree snapshot assertions passed");

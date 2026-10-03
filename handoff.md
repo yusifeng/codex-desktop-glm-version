@@ -146,8 +146,9 @@ Origin discovery 的去重、平台路径判定、Git marker 向上查找、meta
 隔离已完整迁移至 `src/main/worker/git-origin-discovery.ts`，原七个压缩函数已删除，由 11 项断言覆盖。
 `set-config-value` 的参数透传和 refresh-root 规则已迁移至
 `src/main/worker/git-config-request-handler.ts`，由 5 项行为断言覆盖 worktree-local 特例。
-Worktree snapshot/state 的候选目录、snapshot commit、路径 inspection 与 managed-state 状态机已
-迁移至 `src/main/worker/git-worktree-snapshot.ts`，原三个压缩函数已删除，由 12 项断言覆盖。
+Worktree snapshot/state 的候选目录、snapshot commit、路径 inspection、managed-state 状态机与
+snapshot 后删除失败策略已迁移至 `src/main/worker/git-worktree-snapshot.ts`，原四个压缩函数已删除，
+由 22 项断言覆盖。
 Worktree snapshot 打包的文件枚举、index 指纹稳定读、tracked/untracked 合并、目录展开与
 8KB literal pathspec 分批已迁移至 `src/main/worker/git-worktree-files.ts`；原九个 helper 和
 两个常量已删除，由 32 项断言覆盖。
@@ -269,7 +270,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 
 | # | 位置 | 体量 | 现状 | 问题 |
 |---|---|---|---|---|
-| A1 | `.reference/originals/main/worker.ts`（git-worker） | **85,634 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
+| A1 | `.reference/originals/main/worker.ts`（git-worker） | **85,636 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP | annotation/design runtime 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
