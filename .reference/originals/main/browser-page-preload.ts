@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationResponseDetail, sanitizeAnnotationHit } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6644,13 +6644,7 @@ function Qd(e, t) {
             x(o, { hoveredId: r.hoveredId, selectedId: r.selectedId });
           return;
         }
-        r.type !== `hit-test` ||
-          typeof r.requestId != `string` ||
-          r.requestId.length > 128 ||
-          typeof r.x != `number` ||
-          !Number.isFinite(r.x) ||
-          typeof r.y != `number` ||
-          !Number.isFinite(r.y) ||
+        !isValidAnnotationHitTestRequest(r, 128) ||
           (b(),
           (i = {
             registration: o,

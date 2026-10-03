@@ -32,7 +32,7 @@ Annotation hit payload 的安全对象克隆、rect/role/id 校验、metadata �
 （原 `Qd` 内部 6,783-6,862 行）已迁移至
 `src/main/browser-page-preload/annotation-runtime.ts`，入口 `re` 通过 helper 接回，响应 detail
 payload 也由同一模块组装；`scripts/test-preload-annotation-runtime.mjs` 覆盖恶意对象、几何边界、
-metadata 过滤和 response JSON 形状，共 8 项行为断言。
+metadata 过滤、hit-test request 边界和 response JSON 形状，共 10 项行为断言。
 
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
