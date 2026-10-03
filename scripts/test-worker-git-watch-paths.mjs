@@ -4,6 +4,8 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const {
   combineOptionalBooleans,
+  getAffectedWorkingTreePath,
+  isGitInternalPath,
   isMissingPathError,
   isWithinPath,
   isWatchedRefPath,
@@ -19,6 +21,9 @@ const pathApi = {
   },
   isAbsolute(value) {
     return value.startsWith("/");
+  },
+  join(...parts) {
+    return parts.join("/").replaceAll("//", "/");
   },
 };
 
@@ -39,5 +44,9 @@ assert.equal(isMissingPathError({ code: "ENOENT" }), true);
 assert.equal(isMissingPathError({ code: "ENOTDIR" }), true);
 assert.equal(isMissingPathError({ code: "EACCES" }), false);
 assert.equal(isMissingPathError(null), false);
+assert.equal(getAffectedWorkingTreePath(pathApi, "/repo", "/repo/src/.git/HEAD"), "/repo/src");
+assert.equal(getAffectedWorkingTreePath(pathApi, "/repo", "/repo/src/.git/config"), null);
+assert.equal(isGitInternalPath(pathApi, "/repo/.git", "/repo", "/repo/.git/HEAD"), true);
+assert.equal(isGitInternalPath(pathApi, "/repo/.git", "/repo", "/repo/src/file"), false);
 
-console.log("15 worker git watch path assertions passed");
+console.log("19 worker git watch path assertions passed");

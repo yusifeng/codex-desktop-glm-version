@@ -34,5 +34,19 @@ function isMissingPathError(error: unknown): boolean {
     ((error as { code?: unknown }).code === `ENOENT` || (error as { code?: unknown }).code === `ENOTDIR`);
 }
 
-export { combineOptionalBooleans, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
-if (typeof module !== `undefined`) module.exports = { combineOptionalBooleans, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
+function getAffectedWorkingTreePath(pathApi: PathApi & { join(...parts: string[]): string }, root: string, changedPath: string): string | null {
+  const parts = pathApi.relative(root, changedPath).split(pathApi.sep);
+  const gitIndex = parts.indexOf(`.git`);
+  if (gitIndex < 1) return changedPath;
+  const marker = parts[gitIndex + 1];
+  return marker !== `HEAD` && marker !== `packed-refs` && marker !== `refs`
+    ? null
+    : pathApi.join(root, ...parts.slice(0, gitIndex));
+}
+
+function isGitInternalPath(pathApi: PathApi, commonDir: string, root: string, candidate: string): boolean {
+  return isWithinPath(pathApi, commonDir, candidate) || isWithinPath(pathApi, `${root}${pathApi.sep}.git`, candidate);
+}
+
+export { combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
+if (typeof module !== `undefined`) module.exports = { combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };

@@ -563,6 +563,7 @@ Total scripts: 575.
 - [`test-worker-git-errors.mjs`](./test-worker-git-errors.mjs)
 - [`test-worker-git-observability.mjs`](./test-worker-git-observability.mjs)
 - [`test-worker-git-query-utils.mjs`](./test-worker-git-query-utils.mjs)
+- [`test-worker-git-watch-paths.mjs`](./test-worker-git-watch-paths.mjs)
 - [`test-worker-platform-wsl.mjs`](./test-worker-platform-wsl.mjs)
 - [`test-worker-remote-host-config.mjs`](./test-worker-remote-host-config.mjs)
 - [`test-worker-rpc-client.mjs`](./test-worker-rpc-client.mjs)
