@@ -96,6 +96,11 @@ untracked cache invalidation、short-lived cache clear、可选 live-query refre
 `Rhe` 函数已删除。模块保留 workspace root trim/空值校验、`git init` 参数、stderr/stdout/
 default 错误优先级和成功后的 stable metadata invalidation，由 11 项断言覆盖。
 
+Git push 的完整请求实现（原 `tge` 及 `Qhe`/`$he`/`ege`）已迁移至
+`src/main/worker/git-push-request-handler.ts`，压缩实现已删除。模块保留 force/upstream/refspec
+参数顺序、default/fallback remote 选择、porcelain/stdio 错误分类、exec output 和成功 refresh root，
+由 17 项行为断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

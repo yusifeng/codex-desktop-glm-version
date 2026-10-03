@@ -10,6 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
+const { pushGitRepository } = require("./worker/git-push-request-handler");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
@@ -70047,88 +70048,6 @@ async function Zhe(e, t, n) {
     ? null
     : { dir: e, root: i.root, originUrl: await a.getOriginUrl(), commonDir: a.getCommonDir() };
 }
-function Qhe(e, t) {
-  let n = [];
-  for (let t of e.split(`
-`)) {
-    let e = t.trim();
-    e && $he(e) && n.push(e);
-  }
-  for (let e of n) {
-    let t = ege(e);
-    if (t) {
-      if (t.includes(`non-fast-forward`) || t.includes(`fetch first`) || t.includes(`stale info`))
-        return `remote-updated`;
-      if (
-        t.includes(`remote rejected`) ||
-        t.includes(`remote failure`) ||
-        t.includes(`pre-receive hook declined`)
-      )
-        return `remote-rejected`;
-    }
-  }
-  let r = t.toLowerCase();
-  return r.includes(`no upstream`) ||
-    r.includes(`set the remote as upstream`) ||
-    r.includes(`has no upstream branch`)
-    ? `no-upstream`
-    : r.includes(`authentication failed`) ||
-        r.includes(`could not read username`) ||
-        r.includes(`permission denied`) ||
-        r.includes(`access denied`)
-      ? `auth`
-      : `unknown`;
-}
-function $he(e) {
-  let t = e.toLowerCase();
-  if (t.startsWith(`ok `) || t.startsWith(`error`)) return !0;
-  let n = e[0];
-  return n === `!` || n === `=` || n === `+` || n === `-` || n === `*` || n === `?`;
-}
-function ege(e) {
-  let t = [],
-    n = e.match(/\[([^\]]+)\]/);
-  n && t.push(n[1]);
-  let r = e.match(/\(([^)]+)\)\s*$/);
-  r && t.push(r[1]);
-  let i = e.match(/^error[: ]+(.+)$/i);
-  return (i && t.push(i[1]), t.length === 0 ? null : t.join(` `).toLowerCase());
-}
-async function tge({ cwd: e, refspec: t, setUpstream: n, force: r }, i, a, o) {
-  let s = [`push`, `--porcelain`];
-  (r && s.push(`--force-with-lease`), n && s.push(`-u`));
-  let c = e.trim();
-  if (!c)
-    return {
-      status: `error`,
-      error: `unknown`,
-      execOutput: { command: KX([`git`, ...s]), output: `No workspace available for push` },
-    };
-  let l = ``;
-  if (!l) {
-    let e = await i.getWorktreeRepository(xz(c), a);
-    e && ((l = (await k2(e))?.remote ?? ``), (l ||= (await j0(e))[0] ?? ``));
-  }
-  if (!l)
-    return {
-      status: `error`,
-      error: `unknown`,
-      execOutput: { command: KX([`git`, ...s]), output: `No git remote configured for push` },
-    };
-  s.push(l);
-  let u = t?.trim();
-  u && s.push(u);
-  let d = await $(c, s, a, { signal: o });
-  if (!d.success) {
-    let e = d.stderr || d.stdout || `Failed to push changes`;
-    return {
-      status: `error`,
-      error: Qhe(d.stdout, d.stderr),
-      execOutput: mR({ command: d.command, stdout: d.stdout, stderr: d.stderr, fallbackOutput: e }),
-    };
-  }
-  return { status: `success`, remote: l, refspec: u ?? null };
-}
 var nge = [`.git`, `HEAD`];
 async function rge(e, t) {
   let n = await ige(t);
@@ -77604,6 +77523,17 @@ var I6 = kW(`git`),
           host: o,
           runGit: (root, args, host) => $(root, args, host),
         },
+        gitPushRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          normalizeRoot: xz,
+          getDefaultRemoteBranch: k2,
+          getRemotes: j0,
+          runGit: (cwd, args, host, options) => $(cwd, args, host, options),
+          formatCommand: KX,
+          formatExecOutput: mR,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77687,8 +77617,8 @@ var I6 = kW(`git`),
             break;
           }
           case `push`: {
-            let t = await tge(e.params, this.gitManager, o, i.signal);
-            ((p = X(t)), t.status === `success` && (d = xz(e.params.cwd)));
+            let t = await pushGitRepository(e.params, gitPushRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `checkout-branch`: {
