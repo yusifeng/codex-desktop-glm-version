@@ -28,7 +28,10 @@ deployment channel/policy 配置已抽取为 `src/main/browser-page-preload/depl
 query key、host id、路径归一化和 UTF-8 字节长度已抽取为
 `src/main/worker/git-query-utils.ts`，并补充 query host 匹配和 watched path overlap，
 由 16 项行为断言覆盖，并补充可缓存 Git 命令判定、fsmonitor cache key、配置
-值解析、fsmonitor daemon feature 判定、平台支持判定和请求取消策略判定。
+值解析、fsmonitor daemon feature 判定、平台支持判定、请求取消和 Git 可用性策略判定。
+Git repository watcher 的路径归属与缺失状态策略（内部路径、锁文件过滤、worktree
+topology marker、可选状态合并）已抽取为 `src/main/worker/git-watch-paths.ts`，由
+15 项行为断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload 的 WebMCP registry shim 已抽取为

@@ -10,7 +10,8 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
-const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
+const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
+const { combineOptionalBooleans, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77415,13 +77416,19 @@ var Jye = 1e3,
     }
   };
 function M6(e, t, n) {
+  return isWithinPath(e, t, n);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let r = e.relative(t, n);
   return r === `` || (r !== `..` && !r.startsWith(`..${e.sep}`) && !e.isAbsolute(r));
 }
 function N6(e, t, n) {
+  return isWatchedRefPath(e, t, n);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return !n.endsWith(`.lock`) && M6(e, t, n);
 }
 function P6(e, t, n) {
+  return isWorktreeTopologyPath(e, t, n, ebe);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (!M6(e, t, n)) return !1;
   let r = e.relative(t, n);
   if (r === ``) return !0;
@@ -77429,9 +77436,13 @@ function P6(e, t, n) {
   return i.length === 1 || (i.length === 2 && ebe.has(i[1]));
 }
 function nbe(e) {
+  return combineOptionalBooleans(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e.some((e) => e === !0) ? !0 : e.some((e) => e == null) ? null : !1;
 }
 function F6(e) {
+  return isMissingPathError(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return (
     typeof e == `object` && !!e && `code` in e && (e.code === `ENOENT` || e.code === `ENOTDIR`)
   );
@@ -77569,9 +77580,7 @@ var I6 = kW(`git`),
       let p;
       try {
         if (
-          rbe(e.method) &&
-          o.isLocal &&
-          !z1({ requestKind: e.method, source: e.params.operationSource }) &&
+          shouldCheckGitAvailability(e.method, o.isLocal, z1({ requestKind: e.method, source: e.params.operationSource })) &&
           !(this.localGitAvailable ??= await yR(L1(o), i.signal))
         )
           throw L6;

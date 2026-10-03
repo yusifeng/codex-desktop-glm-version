@@ -28,6 +28,11 @@ path overlap、可缓存命令判定、fsmonitor cache key、配置值解析、d
 判定和平台支持判定（原入口约 65,338-65,439、65,616-66,136）已迁至 `worker/git-query-utils.ts`，由
 `scripts/test-worker-git-query-utils.mjs` 覆盖。
 
+Git repository watcher 的路径/状态策略已迁至 `worker/git-watch-paths.ts`：
+`isWithinPath`、锁文件过滤、worktree topology marker 匹配、可选状态合并和
+`ENOENT`/`ENOTDIR` 缺失判断（原入口约 77,417-77,438）。原 watcher 通过
+同名适配函数接回，行为由 `scripts/test-worker-git-watch-paths.mjs` 覆盖。
+
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含
 Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表示第三方库
@@ -96,8 +101,9 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
 ## 保留登记建议
 
 当前 `scripts/chunk-manifest.mjs` 的整文件 `git-worker` PRESERVED 理由不足。
-本轮新增 `isCancelableGitRequest`，迁移请求取消策略表；`rbe` 入口保留生成实现作为
-对照，行为由 worker query utility 接管并由 21 项断言覆盖。Git manager/watch/session
+本轮新增 `isCancelableGitRequest` 与 `shouldCheckGitAvailability`，迁移请求取消和本地
+Git 可用性策略表；`rbe` 入口保留生成实现作为对照，行为由 worker query utility 接管并由
+24 项断言覆盖。Git manager/watch/session
 主路由仍待继续拆分。
 完成 T1 后应改成分段登记：
 

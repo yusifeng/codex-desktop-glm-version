@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength } = require(
+const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require(
   "../app/.vite/build/worker/git-query-utils.js",
 );
 
@@ -28,5 +28,8 @@ assert.equal(isFsmonitorPlatformSupported({ isLocal: true, platformFamily: "linu
 assert.equal(isFsmonitorPlatformSupported({ isLocal: false, platformFamily: "linux", platformOs: "linux" }), true);
 assert.equal(isCancelableGitRequest("status-summary"), true);
 assert.equal(isCancelableGitRequest("push"), false);
+assert.equal(shouldCheckGitAvailability("status-summary", true, false), true);
+assert.equal(shouldCheckGitAvailability("status-summary", true, true), false);
+assert.equal(shouldCheckGitAvailability("push", true, false), false);
 
-console.log("21 worker git query utility assertions passed");
+console.log("24 worker git query utility assertions passed");
