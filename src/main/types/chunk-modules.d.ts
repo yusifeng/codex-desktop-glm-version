@@ -759,6 +759,7 @@ declare module "@chunk/shared" {
     isAllowedAttachmentType as xa,
     appNameForFlavor as zo
   } from "../../shared/hosts-runtime";
+  export const qo: any; // 内部符号: iD
 }
 declare module "@chunk/electron-resources-path" {
   // electron-resources-path-BDLw2lp0.js —— 已重写 chunk（src/main/electron-resources-path/）。
