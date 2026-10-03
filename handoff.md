@@ -49,7 +49,7 @@
 | # | 问题 | 现状 |
 |---|---|---|
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | `include: src/**/*.ts` 未排除 `src/webview/assets/`，typecheck 约 44 秒 |
-| B2 | 原版对照文件躺在 src/ 里 | `src-DldfpmrLL`(70K)/`main-C-Mhak1n`(177K)/`worker`(91K)/`browser-page-preload`(30K) 等与语义源码混放，干扰导航 |
+| B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | 仍写着"已重写 9 个 chunk"（实际 main 11 + renderer 1874） |
 | B4 | 559 个测试脚本无索引 | `scripts/test-*.mjs` 散落，无统一 runner / 清单 |
 | B5 | 端到端验证深度浅 | `smoke-test.sh` 只验证"主进程 15 秒不崩"，未验证 GUI 渲染 |
