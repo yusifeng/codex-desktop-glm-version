@@ -45,7 +45,7 @@ const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/rem
 const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
-const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
+const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
@@ -73294,382 +73294,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-var C6 = 0.05,
-  Eye = 7e3;
-function w6(e) {
-  return e === `branch-diff-stats` ||
-    e === `review-diff` ||
-    e === `review-patch` ||
-    e === `review-search` ||
-    e === `review-source-line-counts` ||
-    e === `review-summary` ||
-    e === `status-summary`
-    ? e
-    : null;
-}
-function kye(e) {
-  switch (e.method) {
-    case `branch-diff-stats`:
-      return { operation: `branch-diff-stats`, result: e.result };
-    case `review-summary`:
-      return { operation: `review-summary`, result: e.result };
-    case `status-summary`:
-      return { operation: `status-summary`, result: e.result };
-    case `base-branch`:
-    case `branch-ahead-count`:
-    case `branch-commits`:
-    case `current-branch`:
-    case `default-branch`:
-    case `list-worktrees`:
-    case `recent-branches`:
-    case `upstream-branch`:
-      return;
-  }
-}
-function Aye({
-  attribution: e,
-  canceled: t,
-  durationMs: n,
-  firstResultMs: r,
-  hostKind: i,
-  operation: a,
-  queueDurationMs: o,
-  repoIndexSizeBucket: s,
-  result: c,
-  resultDisposition: l = t ? `canceled` : c == null ? null : `completed`,
-  resultFields: u,
-  reviewSource: d,
-  retryAttempt: f = null,
-  source: p,
-  trigger: m,
-}) {
-  let h = u ?? T6(c),
-    g = Rye(e),
-    _ = jye(c),
-    v = Fye({ result: c, resultDisposition: l }),
-    y = Nye({
-      canceled: t,
-      canceledCommandCount: e.canceledCommandCount,
-      failedCommandCount: e.failedCommandCount,
-      outputLimitExceededCount: e.outputLimitExceededCount,
-      result: c,
-      resultDisposition: l,
-      resultFields: h,
-      timedOutCommandCount: e.timedOutCommandCount,
-    });
-  return {
-    additions: h.additions,
-    cacheStatus: g,
-    canceledCommandCount: e.canceledCommandCount,
-    commandCount: e.commandCount,
-    commandDurationMsMax: e.commandDurationMsMax,
-    commandDurationMsSum: e.commandDurationMsSum,
-    concurrentOperationCount: e.concurrentOperationCount,
-    deletions: h.deletions,
-    diffBytes: h.diffBytes,
-    diffCommandCount: e.diffCommandCount,
-    durationMs: n,
-    failedCommandCount: e.failedCommandCount,
-    failedCommandDurationMs: e.slowestFailedCommand?.durationMs ?? null,
-    failedCommandErrorKind: e.slowestFailedCommand?.errorKind ?? null,
-    failedCommandExitCodeBucket: e.slowestFailedCommand?.exitCodeBucket ?? null,
-    failedCommandFailureKind: e.slowestFailedCommand?.failureKind ?? null,
-    failedCommandSubcommand: e.slowestFailedCommand?.subcommand ?? null,
-    fileCount: h.fileCount,
-    firstResultMs: r,
-    hostKind: i,
-    matchCount: h.matchCount,
-    operation: a,
-    outcome: y,
-    outputLimitExceededCount: e.outputLimitExceededCount,
-    peakCommandConcurrency: e.peakCommandConcurrency,
-    queueDurationMs: o,
-    reason: Pye({
-      attribution: e,
-      canceled: t,
-      expectedReason: _,
-      outcome: y,
-      resultFailureReason: v,
-    }),
-    repoIndexSizeBucket: s,
-    resultDisposition: l,
-    resultFailureReason: v,
-    reviewSource: d,
-    retryAttempt: f,
-    source: p,
-    statusCommandCount: e.statusCommandCount,
-    stderrBytes: e.stderrBytes,
-    stdoutBytes: e.stdoutBytes,
-    timedOutCommandCount: e.timedOutCommandCount,
-    trigger: m,
-    truncated: h.truncated || e.outputLimitExceededCount > 0,
-    untrackedCacheCoalescedCount: e.untrackedCacheCoalescedCount,
-    untrackedCacheHitCount: e.untrackedCacheHitCount,
-    untrackedCacheMissCount: e.untrackedCacheMissCount,
-    untrackedFileCount: h.untrackedFileCount,
-    untrackedListCommandCount: e.untrackedListCommandCount,
-    untrackedStatusCommandCount: e.untrackedStatusCommandCount,
-  };
-}
-function jye(e) {
-  if (e?.operation === `review-summary`)
-    return e.result.type === `expected` ? e.result.reason : null;
-  if (e?.operation === `review-source-line-counts`) {
-    let t = null;
-    for (let n of e.result) {
-      if (n.type === `error`) return null;
-      n.type === `expected` && t == null && (t = n.reason);
-    }
-    return t;
-  }
-  return null;
-}
-function Mye(e, t, n, r) {
-  return e === `expected`
-    ? { samplingRatio: 1, samplingReason: `expected` }
-    : e === `success`
-      ? t.untrackedStatusCommandCount > 1
-        ? { samplingRatio: 1, samplingReason: `repeated-untracked-scan` }
-        : t.concurrentOperationCount >= 4
-          ? { samplingRatio: 1, samplingReason: `concurrency` }
-          : n >= Eye
-            ? { samplingRatio: 1, samplingReason: `slow` }
-            : r() >= C6
-              ? null
-              : { samplingRatio: C6, samplingReason: `routine` }
-      : { samplingRatio: 1, samplingReason: `abnormal` };
-}
-function Nye({
-  canceled: e,
-  canceledCommandCount: t,
-  failedCommandCount: n,
-  outputLimitExceededCount: r,
-  result: i,
-  resultDisposition: a,
-  resultFields: o,
-  timedOutCommandCount: s,
-}) {
-  if (e || (n > 0 && t === n && r === 0 && s === 0)) return `canceled`;
-  if (a === `stale_snapshot`) return `stale`;
-  if (n > 0 || i == null) return `failure`;
-  switch (i.operation) {
-    case `branch-diff-stats`:
-      return `success`;
-    case `review-diff`:
-    case `review-source-line-counts`:
-    case `review-summary`:
-      return (o ?? T6(i)).outcome;
-    case `review-patch`:
-      return i.result.diff.type === `error` ? `failure` : `success`;
-    case `review-search`:
-    case `status-summary`:
-      return i.result.type === `error` ? `failure` : `success`;
-  }
-}
-function Pye({
-  attribution: e,
-  canceled: t,
-  expectedReason: n,
-  outcome: r,
-  resultFailureReason: i,
-}) {
-  return r === `success`
-    ? null
-    : t
-      ? `canceled`
-      : e.timedOutCommandCount > 0
-        ? `command_timeout`
-        : e.outputLimitExceededCount > 0
-          ? `command_output_limit`
-          : e.failedCommandCount > 0
-            ? e.canceledCommandCount === e.failedCommandCount
-              ? `command_canceled`
-              : `command_failure`
-            : (n ?? i);
-}
-function Fye({ result: e, resultDisposition: t }) {
-  if (t === `canceled`) return null;
-  if (t === `stale_snapshot`) return `stale_snapshot`;
-  if (t === `git_unavailable`) return `repository_unavailable`;
-  if (e == null) return `missing_result`;
-  switch (e.operation) {
-    case `branch-diff-stats`:
-      return null;
-    case `review-diff`: {
-      let t = T6(e).outcome;
-      return t === `stale` ? `stale_snapshot` : t === `failure` ? `review_diff_error` : null;
-    }
-    case `review-patch`:
-      return e.result.diff.type === `error` ? `review_patch_error` : null;
-    case `review-search`:
-      return e.result.type === `error` ? `review_search_error` : null;
-    case `review-source-line-counts`:
-      for (let t of e.result)
-        if (t.type === `error`) return t.failureReason ?? `review_summary_error`;
-      return null;
-    case `review-summary`:
-      return e.result.type === `error` ? (e.result.failureReason ?? `review_summary_error`) : null;
-    case `status-summary`:
-      return e.result.type === `error` ? (e.result.failureReason ?? `status_summary_error`) : null;
-  }
-}
-function Lye(e) {
-  return e == null
-    ? `unknown`
-    : e < 1048576
-      ? `lt_1mb`
-      : e < 10485760
-        ? `lt_10mb`
-        : e < 52428800
-          ? `lt_50mb`
-          : `gte_50mb`;
-}
-function Rye(e) {
-  return e.untrackedCacheCoalescedCount > 0
-    ? `coalesced`
-    : e.untrackedCacheHitCount > 0 && e.untrackedCacheMissCount > 0
-      ? `mixed`
-      : e.untrackedCacheHitCount > 0
-        ? `hit`
-        : e.untrackedCacheMissCount > 0
-          ? `miss`
-          : `none`;
-}
-function T6(e) {
-  if (e == null)
-    return {
-      additions: null,
-      deletions: null,
-      diffBytes: null,
-      fileCount: null,
-      matchCount: null,
-      outcome: `failure`,
-      truncated: !1,
-      untrackedFileCount: null,
-    };
-  switch (e.operation) {
-    case `branch-diff-stats`:
-      return {
-        additions: e.result?.additions ?? 0,
-        deletions: e.result?.deletions ?? 0,
-        diffBytes: null,
-        fileCount: e.result?.fileCount ?? 0,
-        matchCount: null,
-        outcome: `success`,
-        truncated: !1,
-        untrackedFileCount: null,
-      };
-    case `review-diff`: {
-      if (e.result.type === `stale-snapshot`) return { ...T6(void 0), outcome: `stale` };
-      let t = 0,
-        n = 0,
-        r = `success`,
-        i = !1;
-      for (let a in e.result.diffs) {
-        let o = e.result.diffs[a];
-        if (o != null) {
-          if (((n += 1), o.type === `success`)) {
-            t += o.diffBytes;
-            continue;
-          }
-          ((r = `failure`), (i ||= o.error.type === `diff-too-large`));
-        }
-      }
-      return {
-        additions: null,
-        deletions: null,
-        diffBytes: t,
-        fileCount: n,
-        matchCount: null,
-        outcome: r,
-        truncated: i,
-        untrackedFileCount: null,
-      };
-    }
-    case `review-patch`:
-      return e.result.diff.type === `error`
-        ? { ...T6(void 0), truncated: e.result.diff.error.type === `diff-too-large` }
-        : {
-            additions: null,
-            deletions: null,
-            diffBytes: e.result.diff.unifiedDiffBytes ?? null,
-            fileCount: null,
-            matchCount: null,
-            outcome: `success`,
-            truncated: !1,
-            untrackedFileCount: null,
-          };
-    case `review-search`:
-      return e.result.type === `error`
-        ? T6(void 0)
-        : {
-            additions: null,
-            deletions: null,
-            diffBytes: null,
-            fileCount: null,
-            matchCount: e.result.totalMatches,
-            outcome: `success`,
-            truncated: e.result.isCapped,
-            untrackedFileCount: null,
-          };
-    case `review-source-line-counts`: {
-      let t = 0,
-        n = 0,
-        r = `success`,
-        i = !1;
-      for (let a of e.result)
-        a.type === `success`
-          ? ((t += a.additions), (n += a.deletions))
-          : a.type === `error`
-            ? (r = `failure`)
-            : a.type === `expected` && r !== `failure`
-              ? (r = `expected`)
-              : a.type === `incomplete` && (i = !0);
-      return {
-        additions: t,
-        deletions: n,
-        diffBytes: null,
-        fileCount: null,
-        matchCount: null,
-        outcome: r,
-        truncated: i,
-        untrackedFileCount: null,
-      };
-    }
-    case `review-summary`:
-      if (e.result.type === `error`) return T6(void 0);
-      if (e.result.type === `expected`) return { ...T6(void 0), outcome: `expected` };
-      {
-        let t = 0,
-          n = 0;
-        for (let r of e.result.files) ((t += r.additions ?? 0), (n += r.deletions ?? 0));
-        return {
-          additions: t,
-          deletions: n,
-          diffBytes: null,
-          fileCount: e.result.files.length,
-          matchCount: null,
-          outcome: `success`,
-          truncated: !1,
-          untrackedFileCount: e.result.stageCounts.untrackedFileCount,
-        };
-      }
-    case `status-summary`:
-      return e.result.type === `error`
-        ? T6(void 0)
-        : {
-            additions: null,
-            deletions: null,
-            diffBytes: null,
-            fileCount:
-              e.result.stagedCount + e.result.unstagedCount + (e.result.untrackedCount ?? 0),
-            matchCount: null,
-            outcome: `success`,
-            truncated: !1,
-            untrackedFileCount: e.result.untrackedCount,
-          };
-  }
-}
 async function zye(e) {
   return d0(e, `HEAD`);
 }
@@ -74850,7 +74474,7 @@ var I6 = kW(`git`),
         })));
     }
     async handleRequest(e) {
-      let t = w6(e.method),
+      let t = resolveGitPerformanceOperation(e.method),
         n = t == null ? void 0 : W1(),
         r = Date.now();
       try {
@@ -75726,7 +75350,7 @@ var I6 = kW(`git`),
           trace: s,
         },
         async () => {
-          let s = w6(e.method);
+          let s = resolveGitPerformanceOperation(e.method);
           if (s == null)
             return q1(
               { metadataCommonDir: o, source: e.params.operationSource, requestKind: e.method },
@@ -75752,7 +75376,7 @@ var I6 = kW(`git`),
                   }),
                   c,
                 );
-                return ((f = kye(a)), a);
+                return ((f = mapLiveQueryPerformanceResult(a)), a);
               },
             );
           } catch (e) {
@@ -75798,8 +75422,8 @@ var I6 = kW(`git`),
     }) {
       if (e == null || a == null) return;
       G1(e);
-      let m = c?.operation === `review-diff` ? T6(c) : void 0,
-        h = Aye({
+      let m = c?.operation === `review-diff` ? getGitPerformanceResultFields(c) : void 0,
+        h = createGitPerformanceFields({
           attribution: e,
           canceled: t,
           durationMs: n,
@@ -75844,7 +75468,7 @@ var I6 = kW(`git`),
         ...(h.retryAttempt == null ? {} : { "git.retry_attempt": h.retryAttempt }),
       }),
         g !== `success` && jH(g));
-      let v = Mye(g, e, n, Math.random);
+      let v = selectGitPerformanceSample(g, e, n, Math.random);
       if (v == null) return;
       let y = kH();
       this.emit({
@@ -76340,7 +75964,7 @@ var I6 = kW(`git`),
               (t
                 .stat(n.join(e.commonDir, `index`))
                 .then(({ size: t }) => {
-                  this.watchesByKey.get(i) === e && (e.repoIndexSizeBucket = Lye(t));
+                  this.watchesByKey.get(i) === e && (e.repoIndexSizeBucket = bucketGitIndexSize(t));
                 })
                 .catch(() => {}),
                 await e.watcher.start());

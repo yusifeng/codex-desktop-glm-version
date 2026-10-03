@@ -21,10 +21,13 @@ Git 命令统计初始化、变更请求来源判定、host cache key 和 exit-c
 （原入口约 65,498-65,559、65,614-65,628）已迁至
 `worker/git-observability.ts`，原 `z1`/`gpe`/`B1`/`ype`/`K1` 别名接回；untracked
 cache outcome 状态更新也已迁出，行为由 `scripts/test-worker-git-observability.mjs`
-覆盖；进程 executable 的 `process.kind` 分类也已迁至同一模块，保留入口的
+的 99 项断言覆盖；进程 executable 的 `process.kind` 分类也已迁至同一模块，保留入口的
 operation 属性和 telemetry 组装；GitHub CLI operation、SSH operation 与 Git
 subprocess wrapper 的有限集合分类也由同一模块提供，入口保留 command telemetry
-组装。
+组装。Git performance 的 operation/result/outcome/failure reason 归一化、untracked cache
+状态、采样策略和 index size bucket 亦已完整迁入该模块；原
+`w6`/`kye`/`Aye`/`jye`/`Mye`/`Nye`/`Pye`/`Fye`/`Lye`/`Rye`/`T6` 实现及
+`C6`/`Eye` 阈值常量已从入口物理删除。
 
 Git query key、host id、路径归一化、UTF-8 字节长度、query host 匹配、watched
 path overlap、可缓存命令判定、fsmonitor cache key、配置值解析、daemon feature
