@@ -126,5 +126,17 @@ function classifySshOperation(args: string[]): `config` | `control` | `port_forw
   return config ? `config` : control ? `control` : portForward ? `port_forward` : positionalCount > 1 ? `remote_command` : `connection`;
 }
 
-export { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
-if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+/** Builds the stable telemetry envelope for a non-Git subprocess. */
+function createProcessTelemetryEvent(processKind: string, operation?: string, operationIsGitHub = false): { attributes: Record<string, string>; op: `process.exec`; name: `subprocess` } {
+  return {
+    attributes: {
+      [`process.kind`]: operationIsGitHub ? `gh` : processKind,
+      ...(operation == null ? {} : { [`process.operation`]: operation }),
+    },
+    op: `process.exec`,
+    name: `subprocess`,
+  };
+}
+
+export { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };

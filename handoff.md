@@ -26,7 +26,7 @@ deployment channel/policy 配置已抽取为 `src/main/browser-page-preload/depl
 由 8 项行为断言覆盖；main 的 thread metadata emoji 校验和不可变更新已抽取为
 `src/main/main-app/thread-metadata.ts`，由 6 项行为断言覆盖；worker 的 Git
 命令统计/变更来源/cache key/exit-code/untracked cache outcome 纯函数已抽取为
-`src/main/worker/git-observability.ts`，由 36 项行为断言覆盖；其中包含 process
+`src/main/worker/git-observability.ts`，由 39 项行为断言覆盖；其中包含 process
 executable 分类；worker 的 Git
 query key、host id、路径归一化和 UTF-8 字节长度已抽取为
 `src/main/worker/git-query-utils.ts`，并补充 query host 匹配和 watched path overlap，

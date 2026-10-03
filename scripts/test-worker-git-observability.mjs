@@ -8,6 +8,7 @@ const {
   classifyGitHubOperation,
   classifySshOperation,
   createGitCommandStats,
+  createProcessTelemetryEvent,
   exitCodeBucket,
   isGitMutationRequest,
   recordUntrackedCacheOutcome,
@@ -56,5 +57,8 @@ assert.equal(classifySshOperation(["ssh", "-L", "8080:localhost:80", "host"]), "
 assert.equal(classifySshOperation(["ssh", "-o", "LocalForward=8080:localhost:80", "host"]), "port_forward");
 assert.equal(classifySshOperation(["ssh", "-o", "StrictHostKeyChecking=no", "host"]), "connection");
 assert.equal(classifySshOperation(["ssh", "--", "host", "echo", "ok"]), "remote_command");
+assert.deepEqual(createProcessTelemetryEvent("ssh", "remote_command"), { attributes: { "process.kind": "ssh", "process.operation": "remote_command" }, op: "process.exec", name: "subprocess" });
+assert.deepEqual(createProcessTelemetryEvent("gh", "pr.view", true), { attributes: { "process.kind": "gh", "process.operation": "pr.view" }, op: "process.exec", name: "subprocess" });
+assert.deepEqual(createProcessTelemetryEvent("node"), { attributes: { "process.kind": "node" }, op: "process.exec", name: "subprocess" });
 
-console.log("36 worker git observability assertions passed");
+console.log("39 worker git observability assertions passed");
