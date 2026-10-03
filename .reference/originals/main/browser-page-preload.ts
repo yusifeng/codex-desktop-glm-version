@@ -6439,6 +6439,7 @@ var { createAnnotationControlsRegistry } = require("./browser-page-preload/annot
 var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
+var { clipAnnotationSurfaceRect } = require("./browser-page-preload/annotation-surface-geometry");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 Yo();
@@ -22570,12 +22571,8 @@ function Zg(e) {
   );
 }
 function Qg(e, t) {
-  let n = e.getBoundingClientRect(),
-    r = Math.max(0, n.x, t.x),
-    i = Math.max(0, n.y, t.y),
-    a = Math.min(window.innerWidth, n.right, t.x + t.width),
-    o = Math.min(window.innerHeight, n.bottom, t.y + t.height);
-  return a > r && o > i ? { x: r, y: i, width: a - r, height: o - i } : null;
+  let n = e.getBoundingClientRect();
+  return clipAnnotationSurfaceRect(n, t, { width: window.innerWidth, height: window.innerHeight });
 }
 var $g,
   e_ = o(() => {

@@ -58,6 +58,11 @@ Virtual annotation target payload（原 `n_` 22777-22800）已迁移至
 回调接回；page URL、virtual target identity、viewport point 和 rect fallback 由
 `scripts/test-preload-annotation-virtual-target.mjs` 覆盖，共 6 项断言。
 
+Surface/viewport rect clipping（原 `Qg` 22525-22535）已迁移至
+`src/main/browser-page-preload/annotation-surface-geometry.ts`，由 surface registry
+和入口兼容函数共同使用；viewport 边界、空交集和负坐标由
+`scripts/test-preload-annotation-surface-geometry.mjs` 覆盖，共 4 项断言。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
