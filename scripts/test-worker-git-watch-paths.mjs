@@ -20,6 +20,7 @@ const {
   shouldScheduleGitRepoChange,
   requiresGitWatcherRecovery,
   selectGitMetadataRefreshPaths,
+  shouldRetryGitWatchTargetAfterStart,
 } = require("../app/.vite/build/worker/git-watch-paths.js");
 
 const pathApi = {
@@ -86,6 +87,10 @@ assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retrySchedul
 assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: false, policyCurrent: true, sessionActive: true, nextDirectories: ["/repo/.git/info/exclude"], previousDirectories: ["/repo/.git/info/exclude"] }), "apply");
 assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: false, policyCurrent: true, sessionActive: true, nextDirectories: ["/repo/.git/info/exclude"], previousDirectories: [] }), "restart");
 assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: false, policyCurrent: true, sessionActive: false, nextDirectories: [], previousDirectories: [] }), "restart");
+assert.equal(shouldRetryGitWatchTargetAfterStart({ recovering: true, disposed: false, generationUnchanged: true, hasSession: false, metadataMissing: false }), true);
+assert.equal(shouldRetryGitWatchTargetAfterStart({ recovering: false, disposed: false, generationUnchanged: true, hasSession: false, metadataMissing: false }), false);
+assert.equal(shouldRetryGitWatchTargetAfterStart({ recovering: true, disposed: false, generationUnchanged: false, hasSession: false, metadataMissing: false }), false);
+assert.equal(shouldRetryGitWatchTargetAfterStart({ recovering: true, disposed: false, generationUnchanged: true, hasSession: true, metadataMissing: false }), false);
 assert.deepEqual(createGitOperationState({ cherryPickInProgress: false, mergeInProgress: null, rebaseHead: false, rebaseMerge: false, rebaseApply: false, revertInProgress: true }), { cherryPickInProgress: false, mergeInProgress: null, rebaseInProgress: false, revertInProgress: true });
 assert.equal(createGitOperationState({ cherryPickInProgress: null, mergeInProgress: null, rebaseHead: false, rebaseMerge: null, rebaseApply: false, revertInProgress: null }).rebaseInProgress, null);
 assert.deepEqual(createGitOperationMarkerPaths(pathApi, "/repo/.git"), [
@@ -121,4 +126,4 @@ assert.deepEqual(target.handlers, [handler]);
 assert.equal(target.retryDelayMs, 1000);
 assert.equal(target.session, null);
 
-console.log("51 worker git watch path assertions passed");
+console.log("55 worker git watch path assertions passed");
