@@ -27468,38 +27468,7 @@ function hx(e, t) {
     throw Error(`WebMCP tool result is not JSON-serializable.`);
   }
 }
-var gx = {
-    Dev: `dev`,
-    Agent: `agent`,
-    Nightly: `nightly`,
-    InternalAlpha: `internal-alpha`,
-    PublicBeta: `public-beta`,
-    Prod: `prod`,
-  },
-  _x = Object.values(gx),
-  vx = [gx.Dev, gx.Agent, gx.Nightly, gx.InternalAlpha],
-  yx = {
-    ...gx,
-    values: _x,
-    help: _x.join(`, `),
-    isValid(e) {
-      return _x.includes(e);
-    },
-    parse(e) {
-      let t = e?.trim();
-      return t && yx.isValid(t) ? t : null;
-    },
-    isInternal(e) {
-      return vx.includes(e);
-    },
-    allowDebugMenu(e) {
-      return yx.isInternal(e);
-    },
-    supportsReactScan(e) {
-      return e === yx.Dev || e === yx.Agent || e === yx.Nightly;
-    },
-  },
-  bx = `codex_desktop:get-browser-webmcp-policy`,
+var { deploymentChannel: gx, deploymentChannelApi: yx, webmcpPolicyChannel: bx } = require("./browser-page-preload/deployment-channel"),
   xx;
 (function (e) {
   e.assertEqual = (e) => {};

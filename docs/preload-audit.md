@@ -8,6 +8,11 @@ CommonJS 依赖注入接回。schema、policy gate、刷新生命周期和两条
 contextBridge 路径均有 VM smoke 覆盖；其余 preload business 区段仍保持
 原文件并按下表审计。
 
+deployment channel 与 WebMCP policy channel 配置（原 27,471-27,503 行）已迁移至
+`src/main/browser-page-preload/deployment-channel.ts`，原入口保留 `gx`/`yx`/`bx`
+兼容别名并直接调用 helper；`scripts/test-preload-deployment-channel.mjs` 覆盖
+解析、内部 channel、debug menu、React Scan 和 policy channel。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
