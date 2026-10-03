@@ -17,7 +17,7 @@ const { findHandoffSharedBase, hasHandoffCommit, resolveHandoffRepositoryMetadat
 const { moveThreadToHostWorktree: performHostWorktreeHandoff } = require("./worker/git-host-handoff");
 const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-move-to-local");
 const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/git-move-to-worktree");
-const { buildGitBranchSearchRefPatterns: Jve, gitBranchNameFromRef: Xve, normalizeGitBranchSearchText: n6, parseGitBranchSearchRef: Yve, stripGitRemoteRefPrefix: r6 } = require("./worker/git-branch-search");
+const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -138,6 +138,11 @@ const syncedBranchOverwriteDeps = {
     info: (message) => AW(`syncedBranch.overwrite`).info(message),
     warning: (message) => AW(`syncedBranch.overwrite`).warning(message),
   },
+};
+const branchSearchDeps = {
+  queryKey: Q,
+  queryMeta: () => v1,
+  runGit: $,
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73234,114 +73239,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function Kve({ worktreeRepo: e, query: t, limit: n, preserveRemoteRefs: r = !1, signal: i }) {
-  let a = Math.max(1, Math.min(n, 20)),
-    o = n6(t)
-      .split(` `)
-      .filter((e) => e.length > 0);
-  if (o.length === 0) return { branches: [], remoteBranchRefs: [] };
-  let s = await t6({
-    boundedLimit: a,
-    preserveRemoteRefs: !1,
-    refPattern: `refs/heads`,
-    signal: i,
-    terms: o,
-    worktreeRepo: e,
-  });
-  if (s.length >= a || i?.aborted) return { branches: s, remoteBranchRefs: [] };
-  let c = await t6({
-    boundedLimit: a - s.length,
-    excludedBranchNames: new Set(s),
-    preserveRemoteRefs: r,
-    refPattern: `refs/remotes`,
-    signal: i,
-    terms: o,
-    worktreeRepo: e,
-  });
-  return r
-    ? { branches: s, remoteBranchRefs: c }
-    : { branches: [...s, ...c], remoteBranchRefs: [] };
-}
-function t6({
-  boundedLimit: e,
-  excludedBranchNames: t,
-  preserveRemoteRefs: n,
-  refPattern: r,
-  signal: i,
-  terms: a,
-  worktreeRepo: o,
-}) {
-  return o.queryClient.fetchQuery({
-    queryKey: Q(o.root, o.host, `branch-search`, r, a, String(e), String(n)),
-    gcTime: 250,
-    meta: v1,
-    queryFn: () =>
-      qve({
-        boundedLimit: e,
-        excludedBranchNames: t,
-        preserveRemoteRefs: n,
-        refPattern: r,
-        signal: i,
-        terms: a,
-        worktreeRepo: o,
-      }),
-    staleTime: 250,
-  });
-}
-async function qve({
-  boundedLimit: e,
-  excludedBranchNames: t,
-  preserveRemoteRefs: n,
-  refPattern: r,
-  signal: i,
-  terms: a,
-  worktreeRepo: o,
-}) {
-  let s = new Set(),
-    c = [],
-    l = Jve(r, a),
-    u = new AbortController(),
-    d = null,
-    f = ``,
-    p = new TextDecoder(),
-    m = () => {
-      u.signal.aborted || ((d = `parent`), u.abort());
-    };
-  i?.aborted ? m() : i?.addEventListener(`abort`, m);
-  let h = (r) => {
-      if (c.length >= e) return;
-      let i = Yve(r.trim(), n);
-      if (i == null || s.has(i) || t?.has(Xve(i))) return;
-      let o = n6(r6(i));
-      a.every((e) => o.includes(e)) &&
-        (s.add(i), c.push(i), c.length >= e && ((d = `limit`), u.abort()));
-    },
-    g = !1;
-  try {
-    ({ success: g } = await $(
-      o.root,
-      [`for-each-ref`, `--sort=-committerdate`, ...l, `--format=%(refname)`],
-      o.host,
-      {
-        signal: u.signal,
-        collectOutput: !1,
-        onStdoutRaw: (e) => {
-          let t = `${f}${p.decode(e, { stream: !0 })}`.split(`
-`);
-          f = t.pop() ?? ``;
-          for (let e of t) h(e);
-        },
-      },
-    ));
-  } finally {
-    i?.removeEventListener(`abort`, m);
-  }
-  if (((f += p.decode()), d === `parent`)) {
-    let e = Error(`The operation was aborted`);
-    throw ((e.name = `AbortError`), i?.reason ?? e);
-  }
-  return !g && d !== `limit` ? [] : (f.length > 0 && h(f), c);
-}
 async function Zve(e, t) {
   let n = await P2(e, t);
   if (!n) return { branch: null, base: null, hasConflicts: !1 };
@@ -76691,13 +76588,16 @@ var I6 = kW(`git`),
     }
     async handleSearchBranches(e, { host: t, signal: n }) {
       return X(
-        await Kve({
-          worktreeRepo: this.gitManager.getWorktreeRepositoryForRoot(e.root, t),
-          query: e.query,
-          limit: e.limit ?? 20,
-          preserveRemoteRefs: e.preserveRemoteRefs,
-          signal: n,
-        }),
+        await searchGitBranches(
+          {
+            worktreeRepo: this.gitManager.getWorktreeRepositoryForRoot(e.root, t),
+            query: e.query,
+            limit: e.limit ?? 20,
+            preserveRemoteRefs: e.preserveRemoteRefs,
+            signal: n,
+          },
+          branchSearchDeps,
+        ),
       );
     }
     async handleCreateWorktree(e, { host: t, signal: n }) {

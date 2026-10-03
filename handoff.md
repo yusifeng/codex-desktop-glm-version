@@ -125,6 +125,9 @@ Move-to-worktree 的 local/target checkout、双 stash 迁移、created-worktree
 已迁移至 `src/main/worker/git-move-to-worktree.ts`；原 `Bve` 实现已删除，由 26 项断言覆盖。
 Git branch search 的 query 规范化、ref pattern、local/remote ref 解析和 branch-name 去前缀
 已迁移至 `src/main/worker/git-branch-search.ts`；原五个压缩 helper 已删除，由 16 项断言覆盖。
+Git branch search 的 query-cache、local-first/remote fallback、流式输出解码、limit abort 与父 signal
+传播已迁移至 `src/main/worker/git-branch-search-runtime.ts`；原三个异步压缩实现已删除，由 15 项
+缓存参数、分片、去重、限额和取消断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
@@ -212,7 +215,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | `include: src/**/*.ts` 未排除 `src/webview/assets/`，typecheck 约 44 秒 |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 623 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 624 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -297,7 +300,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引**：`scripts/test-*.mjs` 623 个脚本建 `scripts/test-index.md`
+4. **测试索引**：`scripts/test-*.mjs` 624 个脚本建 `scripts/test-index.md`
    （或 npm script `test:all` 串行 runner + 按簇分组清单），并标注
    哪些是历史一次性脚本、哪些是长期回归套件。
 
