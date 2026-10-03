@@ -8,6 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
+const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { pushGitRepository } = require("./worker/git-push-request-handler");
@@ -69158,176 +69159,20 @@ async function khe(e, t, n, r) {
 function Ahe(e) {
   return e === `github.com` || e.endsWith(`.github.com`);
 }
-function jhe(e, t) {
-  let { conflictedPaths: n, hasConflictHeader: r } = Mhe(
-    [t, e].filter(Boolean).join(`
-`),
+async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, signal: a } = {}) {
+  let { result: o } = await checkoutGitBranch(
+    e,
+    {
+      gitManager: t,
+      host: n,
+      signal: a,
+      normalizeRoot: xz,
+      runGit: (e, t, n, r) => $(e, t, n, r),
+      formatExecOutput: mR,
+    },
+    { onCheckoutStatusChange: r, onStashStatusChange: i },
   );
-  return r || n.length > 0
-    ? { errorType: `blocked-by-working-tree-changes`, conflictedPaths: n }
-    : { errorType: `unknown`, conflictedPaths: [] };
-}
-function Mhe(e) {
-  let t = e.split(/\r?\n/),
-    n = /^(error:\s*)?.*\bwould be overwritten by checkout:\s*$/i,
-    r = new Set(),
-    i = !1,
-    a = !1;
-  for (let e of t) {
-    let t = e.replace(/\r$/, ``).trim();
-    if (!i) {
-      n.test(t) && ((a = !0), (i = !0));
-      continue;
-    }
-    if (t.length === 0) continue;
-    let o = t.toLowerCase();
-    if (o.startsWith(`please `) || o.startsWith(`error:`) || o === `aborting`) break;
-    r.add(t);
-  }
-  return { conflictedPaths: Array.from(r), hasConflictHeader: a };
-}
-var Nhe = `Stashed Codex worktree changes`,
-  Phe = `refs/stash`,
-  e4 = `No local changes to save`;
-async function t4(
-  { cwd: e, branch: t, stashUncommitted: n = !1 },
-  r,
-  i,
-  { onCheckoutStatusChange: a, onStashStatusChange: o, signal: s } = {},
-) {
-  let c = e.trim();
-  if (!c)
-    return {
-      status: `error`,
-      error: `No workspace available for branch checkout`,
-      errorType: `unknown`,
-    };
-  let l = t.trim();
-  if (!l) return { status: `error`, error: `Branch name is required`, errorType: `unknown` };
-  let u = await Fhe(c, l, i, s);
-  if (u.status === `error`) return u;
-  let d = null,
-    f = null;
-  if (n) {
-    o?.(`started`);
-    let e = await $(c, [`stash`, `push`, `--include-untracked`, `-m`, Nhe], i, {
-        signal: s,
-        trim: !1,
-      }),
-      t = e.stdout.includes(e4) || e.stderr.includes(e4);
-    if (!t && !e.success) {
-      o?.(`failed`);
-      let t = e.stderr || e.stdout || `Failed to stash changes`;
-      return {
-        status: `error`,
-        error: t,
-        errorType: `failed-to-stash-changes`,
-        execOutput: mR({
-          command: e.command,
-          stdout: e.stdout,
-          stderr: e.stderr,
-          fallbackOutput: t,
-        }),
-      };
-    }
-    if (t) o?.(`skipped`);
-    else {
-      f = `stash@{0}`;
-      let e = await $(c, [`rev-parse`, `--verify`, Phe], i, { signal: s });
-      if (!e.success || e.stdout.length === 0) {
-        o?.(`failed`);
-        let t = e.stderr || e.stdout || `Failed to resolve stash reference`,
-          n = await n4({ cwd: c, stashRollbackRef: f, host: i }),
-          r = n ? `${t}\n${n}` : t;
-        return {
-          status: `error`,
-          error: r,
-          errorType: `failed-to-stash-changes`,
-          execOutput: mR({
-            command: e.command,
-            stdout: e.stdout,
-            stderr: e.stderr,
-            fallbackOutput: r,
-          }),
-        };
-      }
-      ((d = e.stdout), o?.(`completed`));
-    }
-  } else o?.(`skipped`);
-  a?.(`started`);
-  let p = await $(c, u.args, i, { signal: s });
-  if (!p.success) {
-    a?.(`failed`);
-    let e = await n4({ cwd: c, stashRollbackRef: f, host: i }),
-      t = p.stderr || p.stdout || `Failed to checkout branch`,
-      { errorType: n, conflictedPaths: r } = jhe(p.stdout, p.stderr),
-      o = e ? `${t}\n${e}` : t;
-    return {
-      status: `error`,
-      error: o,
-      errorType: n,
-      conflictedPaths: r.length > 0 ? r : void 0,
-      execOutput: mR({ command: p.command, stdout: p.stdout, stderr: p.stderr, fallbackOutput: o }),
-    };
-  }
-  return (
-    r.invalidateGitReadCachesForRepoChange(`head`, i),
-    r.invalidateGitReadCachesForRepoChange(`working-tree`, i),
-    a?.(`completed`),
-    { status: `success`, branch: l, stashRef: d }
-  );
-}
-async function Fhe(e, t, n, r) {
-  if (
-    !t.startsWith(`-`) &&
-    (await $(e, [`check-ref-format`, `refs/heads/${t}`], n, { signal: r })).success
-  ) {
-    if (
-      (await $(e, [`show-ref`, `--verify`, `--quiet`, `refs/heads/${t}`], n, { signal: r })).success
-    )
-      return { status: `success`, args: [`checkout`, t] };
-    let i = await $(
-      e,
-      [`for-each-ref`, `--count=2`, `--format=%(refname)`, `refs/remotes/*/${t}`],
-      n,
-      { signal: r },
-    );
-    if (i.success) {
-      let e = i.stdout
-        .split(
-          `
-`,
-        )
-        .map((e) => e.trim())
-        .filter((e) => e.length > 0);
-      if (e.length === 1)
-        return { status: `success`, args: [`checkout`, `--track`, `-b`, t, e[0]] };
-      if (e.length > 1)
-        return {
-          status: `error`,
-          error: `Branch '${t}' exists on multiple remotes`,
-          errorType: `unknown`,
-        };
-    }
-  }
-  let i = await $(e, [`rev-parse`, `--verify`, `--quiet`, `--end-of-options`, `${t}^{commit}`], n, {
-      signal: r,
-    }),
-    a = i.stdout.trim();
-  if (i.success && /^[0-9a-f]{40,64}$/.test(a))
-    return { status: `success`, args: [`checkout`, `--detach`, a] };
-  let o = i.stderr || i.stdout || `Branch or ref '${t}' was not found`;
-  return {
-    status: `error`,
-    error: o,
-    errorType: `unknown`,
-    execOutput: mR({ command: i.command, stdout: i.stdout, stderr: i.stderr, fallbackOutput: o }),
-  };
-}
-async function n4({ cwd: e, stashRollbackRef: t, host: n }) {
-  if (t == null) return null;
-  let r = await $(e, [`stash`, `pop`, t], n);
-  return r.success ? null : r.stderr || r.stdout || `Failed to restore stashed changes`;
+  return o;
 }
 async function r4(e, t, n, r, i, a) {
   let o = F0(t);
@@ -77534,6 +77379,14 @@ var I6 = kW(`git`),
           formatCommand: KX,
           formatExecOutput: mR,
         },
+        gitCheckoutRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          normalizeRoot: xz,
+          runGit: (cwd, args, host, options) => $(cwd, args, host, options),
+          formatExecOutput: mR,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77622,8 +77475,8 @@ var I6 = kW(`git`),
             break;
           }
           case `checkout-branch`: {
-            let t = await t4(e.params, this.gitManager, o, { signal: i.signal });
-            ((p = X(t)), t.status === `success` && (d = xz(e.params.cwd)));
+            let t = await checkoutGitBranch(e.params, gitCheckoutRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `availability`: {
