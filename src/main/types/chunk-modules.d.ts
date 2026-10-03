@@ -499,7 +499,7 @@ declare module "@chunk/shared" {
   export const is: any; // 内部符号: IE
   export const it: any; // 内部符号: bie
   export { STATE_KEYS as iu } from "../../shared/app-constants";
-  export const j: any; // 内部符号: Aoe
+  export { isSystemOnlyApplication as j } from "../../shared/fs-diagnostics";
   export { isCloudRequirementsAuthError as jc } from "../../shared/app-config";
   export { runtimeWorkspaceRootsOf as jd } from "../../shared/sandbox-permissions";
   export { jf } from "../../shared/zod-facade";

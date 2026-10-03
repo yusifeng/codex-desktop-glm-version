@@ -214,6 +214,18 @@ export async function readPlistValue(
   }
 }
 
+/** System/background-only application check (原 `Aoe`, 导出 `j`). */
+export async function isSystemOnlyApplication(
+  application: { appPath: string },
+  { platform = process.platform, runCommand = defaultRunCommand }: { platform?: NodeJS.Platform; runCommand?: PlatformCommand } = {},
+): Promise<boolean> {
+  if (platform !== `darwin` || (!application.appPath.startsWith(`/System/Applications/`) && !application.appPath.startsWith(`/System/Library/`))) return false;
+  const value = await readPlistValue(join(application.appPath, `Contents`, `Info.plist`), `LSUIElement`, { platform, runCommand });
+  if (value === `true`) return true;
+  const background = await readPlistValue(join(application.appPath, `Contents`, `Info.plist`), `LSBackgroundOnly`, { platform, runCommand });
+  return background === `true`;
+}
+
 /** macOS 应用清单（原 `C7`，导出 M）。 */
 export async function listInstalledApplications(
   { lastUsedWithinDays, order }: { lastUsedWithinDays?: number; order?: string } = {},
@@ -282,5 +294,6 @@ export {
   listInstalledApplications as M,
   listWebBrowsers as P,
   pluginsDirectoryOf as Q,
+  isSystemOnlyApplication as j,
   INTERNAL_TESTING_MARKETPLACE as X,
 };
