@@ -6437,6 +6437,7 @@ var { createAnnotationProtocol } = require("./browser-page-preload/annotation-pr
 var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("./browser-page-preload/annotation-runtime");
 var { createAnnotationControlsRegistry } = require("./browser-page-preload/annotation-controls-registry");
 var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
+var { installAnnotationFramePointerGuard } = require("./browser-page-preload/annotation-frame-pointer-guard");
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
 var { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects } = require("./browser-page-preload/annotation-surface-geometry");
@@ -22294,60 +22295,13 @@ var Bg = o(() => {
   (pf(), wd(), tl());
 });
 function Vg() {
-  return dc((e, t, n) => {
-    let r = new Map(),
-      i = new Set(),
-      a = (e) => {
-        let t = r.get(e);
-        t != null &&
-          (r.delete(e),
-          e.style.getPropertyValue(`pointer-events`) === `none` &&
-            e.style.getPropertyPriority(`pointer-events`) === `important` &&
-            e.style.setProperty(`pointer-events`, t.value, t.priority));
-      },
-      o = (e) => {
-        if (sc(e) != null) {
-          a(e);
-          return;
-        }
-        r.has(e) ||
-          (r.set(e, {
-            value: e.style.getPropertyValue(`pointer-events`),
-            priority: e.style.getPropertyPriority(`pointer-events`),
-          }),
-          e.style.setProperty(`pointer-events`, `none`, `important`));
-      },
-      s = (e) => {
-        if (F(e) && gl(e)) return !1;
-        let t = !1;
-        !F(e) &&
-          !i.has(e) &&
-          (i.add(e),
-          c.observe(e, { childList: !0, subtree: !0 }),
-          e.addEventListener(`load`, l, !0));
-        for (let n of F(e) ? [e, ...e.querySelectorAll(`*`)] : e.querySelectorAll(`*`))
-          F(n) &&
-            !gl(n) &&
-            (ac(n) && (o(n), (t = !0)),
-            n.shadowRoot != null && !i.has(n.shadowRoot) && (t = s(n.shadowRoot) || t));
-        return t;
-      },
-      c = new MutationObserver((e) => {
-        let t = !1;
-        for (let n of e) for (let e of n.addedNodes) F(e) && (t = s(e) || t);
-        t && n();
-      }),
-      l = (e) => {
-        ac(e.target) && (o(e.target), n());
-      };
-    return (
-      s(e),
-      () => {
-        c.disconnect();
-        for (let e of i) e.removeEventListener(`load`, l, !0);
-        for (let e of r.keys()) a(e);
-      }
-    );
+  return installAnnotationFramePointerGuard({
+    installAcrossFrames: dc,
+    mutationObserverConstructor: MutationObserver,
+    isElement: F,
+    isFrame: ac,
+    getFrameWindow: sc,
+    isOverlayElement: gl,
   });
 }
 var Hg = o(() => {

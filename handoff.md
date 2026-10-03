@@ -103,6 +103,9 @@ surface/viewport rect clipping 已抽取为
 marker/scroll/frame 入口直接接回，geometry 回归断言增至 14 项。
 annotation 空格键拦截与输入保护策略已抽取为
 `src/main/browser-page-preload/annotation-keyboard.ts`，由 5 项行为断言覆盖。
+annotation 模式的跨域 iframe pointer-events guard 已完整迁移至
+`src/main/browser-page-preload/annotation-frame-pointer-guard.ts`，由 13 项行为断言覆盖
+document/shadow-root 扫描、动态 frame、load 恢复、overlay 排除和 dispose 样式所有权。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
