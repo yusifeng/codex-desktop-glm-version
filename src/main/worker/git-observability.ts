@@ -39,5 +39,12 @@ function exitCodeBucket(exitCode: number | null): string | null {
   }
 }
 
-export { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest };
-if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest };
+function recordUntrackedCacheOutcome(attribution: { closed?: boolean; untrackedCacheCoalescedCount: number; untrackedCacheHitCount: number; untrackedCacheMissCount: number } | null | undefined, outcome: string): void {
+  if (attribution == null || attribution.closed) return;
+  if (outcome === `coalesced`) attribution.untrackedCacheCoalescedCount += 1;
+  else if (outcome === `hit`) attribution.untrackedCacheHitCount += 1;
+  else if (outcome === `miss`) attribution.untrackedCacheMissCount += 1;
+}
+
+export { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };

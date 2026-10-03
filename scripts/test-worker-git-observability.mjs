@@ -7,6 +7,7 @@ const {
   createGitCommandStats,
   exitCodeBucket,
   isGitMutationRequest,
+  recordUntrackedCacheOutcome,
 } = require("../app/.vite/build/worker/git-observability.js");
 
 assert.equal(createGitCommandStats(3).concurrentOperationCount, 3);
@@ -21,5 +22,10 @@ assert.equal(
   buildGitHostCacheKey({ id: "host-1", hostConfig: { kind: "local", os: "darwin" }}),
   JSON.stringify(["host-1", "local", undefined, undefined, undefined, undefined, undefined, undefined, "darwin", undefined, undefined, undefined, undefined]),
 );
+const attribution = { closed: false, untrackedCacheCoalescedCount: 0, untrackedCacheHitCount: 0, untrackedCacheMissCount: 0 };
+recordUntrackedCacheOutcome(attribution, "coalesced");
+recordUntrackedCacheOutcome(attribution, "hit");
+recordUntrackedCacheOutcome(attribution, "miss");
+assert.deepEqual(attribution, { closed: false, untrackedCacheCoalescedCount: 1, untrackedCacheHitCount: 1, untrackedCacheMissCount: 1 });
 
-console.log("9 worker git observability assertions passed");
+console.log("10 worker git observability assertions passed");

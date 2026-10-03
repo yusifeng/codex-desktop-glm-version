@@ -19,8 +19,9 @@ WSL 平台的纯输出解析（约 47,122-47,584 中的 UTF-16/UTF-8 解码、�
 
 Git 命令统计初始化、变更请求来源判定、host cache key 和 exit-code bucket
 （原入口约 65,498-65,559、65,614-65,628）已迁至
-`worker/git-observability.ts`，原 `z1`/`gpe`/`B1`/`ype` 别名接回；行为由
-`scripts/test-worker-git-observability.mjs` 覆盖。
+`worker/git-observability.ts`，原 `z1`/`gpe`/`B1`/`ype`/`K1` 别名接回；untracked
+cache outcome 状态更新也已迁出，行为由 `scripts/test-worker-git-observability.mjs`
+覆盖。
 
 Git query key、host id、路径归一化、UTF-8 字节长度、query host 匹配、watched
 path overlap、可缓存命令判定和 fsmonitor cache key（原入口约 65,338-65,439、
