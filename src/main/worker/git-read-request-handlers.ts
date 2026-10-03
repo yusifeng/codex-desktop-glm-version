@@ -15,6 +15,10 @@ type ReadHandlerDependencies = {
   getBaseBranch: (root: string, host: any) => Promise<unknown>;
   getRecentBranches: (params: any, args: { host: any; signal: AbortSignal }) => Promise<unknown>;
   branchExists: (root: string, branch: string, host: any, signal: AbortSignal) => Promise<boolean>;
+  createBranch: (params: any, gitManager: any, host: any, signal: AbortSignal) => Promise<unknown>;
+  resolveStartingRef: (repository: any, ref: string, signal: AbortSignal) => Promise<unknown>;
+  getBranchCommits: (repository: any, baseBranch: string, signal: AbortSignal) => Promise<unknown>;
+  getReviewCommitLineCounts: (repository: any, commits: unknown, hideWhitespace: boolean, signal: AbortSignal) => Promise<unknown>;
 };
 
 async function resolveOriginUrl(cwd: string, deps: ReadHandlerDependencies) {
@@ -79,5 +83,25 @@ async function resolveBranchExists(root: string, branch: string, signal: AbortSi
   return { exists: await deps.branchExists(root, branch, deps.host, signal) };
 }
 
-export { resolveBaseBranch, resolveBranchAheadCount, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
-if (typeof module !== `undefined`) module.exports = { resolveBaseBranch, resolveBranchAheadCount, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
+async function createGitBranch(params: any, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  const { branch, cwd, failIfExists, mode, startPoint } = params;
+  return deps.createBranch({ branch, cwd, failIfExists, mode, startPoint }, deps.gitManager, deps.host, signal);
+}
+
+async function resolveWorktreeStartingRef(root: string, ref: string, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  const repository = deps.gitManager.getWorktreeRepositoryForRoot(root, deps.host);
+  return deps.resolveStartingRef(repository, ref, signal);
+}
+
+async function resolveBranchCommits(root: string, baseBranch: string, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  const repository = deps.gitManager.getWorktreeRepositoryForRoot(root, deps.host);
+  return { commits: await deps.getBranchCommits(repository, baseBranch, signal) };
+}
+
+async function resolveReviewCommitLineCounts(root: string, commits: unknown, hideWhitespace: boolean, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  const repository = deps.gitManager.getWorktreeRepositoryForRoot(root, deps.host);
+  return deps.getReviewCommitLineCounts(repository, commits, hideWhitespace, signal);
+}
+
+export { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner };
+if (typeof module !== `undefined`) module.exports = { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner };

@@ -8,7 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
-const { resolveBaseBranch, resolveBranchAheadCount, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
+const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
@@ -77538,6 +77538,10 @@ var I6 = kW(`git`),
           getBaseBranch: (root, host) => this.getBaseBranch(root, host),
           getRecentBranches: (params, args) => this.handleRecentBranches(params, args),
           branchExists: O2,
+          createBranch: Lhe,
+          resolveStartingRef: I0,
+          getBranchCommits: T3,
+          getReviewCommitLineCounts: H_e,
         },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
@@ -77667,44 +77671,17 @@ var I6 = kW(`git`),
             p = X(await resolveBranchExists(e.params.root, e.params.branch, i.signal, readRequestDeps));
             break;
           case `create-branch`: {
-            let { branch: t, cwd: n, failIfExists: r, mode: a, startPoint: s } = e.params;
-            p = X(
-              await Lhe(
-                { branch: t, cwd: n, failIfExists: r, mode: a, startPoint: s },
-                this.gitManager,
-                o,
-                i.signal,
-              ),
-            );
+            p = X(await createGitBranch(e.params, i.signal, readRequestDeps));
             break;
           }
           case `resolve-worktree-starting-ref`:
-            p = X(
-              await I0(
-                this.gitManager.getWorktreeRepositoryForRoot(e.params.root, o),
-                e.params.ref,
-                i.signal,
-              ),
-            );
+            p = X(await resolveWorktreeStartingRef(e.params.root, e.params.ref, i.signal, readRequestDeps));
             break;
           case `branch-commits`:
-            p = X({
-              commits: await T3(
-                this.gitManager.getWorktreeRepositoryForRoot(e.params.root, o),
-                e.params.baseBranch,
-                i.signal,
-              ),
-            });
+            p = X(await resolveBranchCommits(e.params.root, e.params.baseBranch, i.signal, readRequestDeps));
             break;
           case `review-commit-line-counts`:
-            p = X(
-              await H_e(
-                this.gitManager.getWorktreeRepositoryForRoot(e.params.root, o),
-                e.params.commits,
-                e.params.hideWhitespace,
-                i.signal,
-              ),
-            );
+            p = X(await resolveReviewCommitLineCounts(e.params.root, e.params.commits, e.params.hideWhitespace, i.signal, readRequestDeps));
             break;
           case `search-branches`:
             p = await this.handleSearchBranches(e.params, { host: o, signal: i.signal });

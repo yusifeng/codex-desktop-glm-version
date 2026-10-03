@@ -50,7 +50,8 @@ worker `handleRequestWithContext` 的 origin/roots、shell environment、owner�
 remote branch 与 merge-base 只读请求已迁移至 `src/main/worker/git-read-request-handlers.ts`，
 并扩展至 current/upstream/default/base branch、branch-ahead、recent-branches 与 branch-exists
 查询，由 17 项行为断言覆盖；
-其余 Git request cases 和 dispatcher 生命周期仍在入口。
+并继续覆盖 create-branch、resolve worktree starting ref、branch commits 与 review commit
+line counts，由 21 项行为断言覆盖；其余 Git request cases 和 dispatcher 生命周期仍在入口。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为

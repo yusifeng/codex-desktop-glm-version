@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { resolveBaseBranch, resolveBranchAheadCount, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner } = require("../app/.vite/build/worker/git-read-request-handlers.js");
+const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("../app/.vite/build/worker/git-read-request-handlers.js");
 const repository = { id: "repo" };
 const gitManager = { getRepoRepository: async () => repository, getWorktreeRepository: async () => repository };
-const deps = { gitManager: { ...gitManager, getWorktreeRepositoryForRoot: async () => repository }, host: { id: "local" }, getOriginUrl: async () => "origin", getOrigins: async (dirs) => dirs.map((dir) => ({ dir })), getShellEnvironment: async () => ({ shell: "bash" }), getOwnerThreadId: async () => "thread-1", getDefaultRemoteBranch: async () => ({ branch: "origin/main" }), getMergeBase: async (_repo, branch) => `sha:${branch}`, getCurrentBranch: async () => ({ branch: "main" }), getCurrentBranchSnapshot: async () => "snapshot-branch", getUpstreamBranch: async () => ({ branch: "origin/main" }), getBranchAheadCount: async () => ({ ahead: 2, behind: 1 }), getDefaultBranch: async () => ({ branch: "main" }), getBaseBranch: async () => ({ branch: "main" }), getRecentBranches: async (params) => ({ branches: params.limit ? ["main"] : [] }), branchExists: async (_root, branch) => branch === "main" };
+const deps = { gitManager: { ...gitManager, getWorktreeRepositoryForRoot: async () => repository }, host: { id: "local" }, getOriginUrl: async () => "origin", getOrigins: async (dirs) => dirs.map((dir) => ({ dir })), getShellEnvironment: async () => ({ shell: "bash" }), getOwnerThreadId: async () => "thread-1", getDefaultRemoteBranch: async () => ({ branch: "origin/main" }), getMergeBase: async (_repo, branch) => `sha:${branch}`, getCurrentBranch: async () => ({ branch: "main" }), getCurrentBranchSnapshot: async () => "snapshot-branch", getUpstreamBranch: async () => ({ branch: "origin/main" }), getBranchAheadCount: async () => ({ ahead: 2, behind: 1 }), getDefaultBranch: async () => ({ branch: "main" }), getBaseBranch: async () => ({ branch: "main" }), getRecentBranches: async (params) => ({ branches: params.limit ? ["main"] : [] }), branchExists: async (_root, branch) => branch === "main", createBranch: async (params) => ({ created: params.branch }), resolveStartingRef: async (_repo, ref) => ({ ref }), getBranchCommits: async (_repo, baseBranch) => [`commit:${baseBranch}`], getReviewCommitLineCounts: async (_repo, commits, hideWhitespace) => ({ commits, hideWhitespace }) };
 assert.deepEqual(await resolveOriginUrl("/repo", deps), { originUrl: "origin" });
 assert.deepEqual(await resolveOrigins(["/one", "/two"], deps), { origins: [{ dir: "/one" }, { dir: "/two" }] });
 assert.deepEqual(await resolveShellEnvironment("/repo", new AbortController().signal, deps), { shellEnvironment: { shell: "bash" } });
@@ -21,8 +21,12 @@ assert.deepEqual(await resolveBaseBranch("/repo", deps), { branch: "main" });
 assert.deepEqual(await resolveRecentBranches({ limit: 1 }, new AbortController().signal, deps), { branches: ["main"] });
 assert.deepEqual(await resolveBranchExists("/repo", "main", new AbortController().signal, deps), { exists: true });
 assert.deepEqual(await resolveBranchExists("/repo", "missing", new AbortController().signal, deps), { exists: false });
+assert.deepEqual(await createGitBranch({ branch: "feature", cwd: "/repo", mode: "start" }, new AbortController().signal, deps), { created: "feature" });
+assert.deepEqual(await resolveWorktreeStartingRef("/repo", "HEAD", new AbortController().signal, deps), { ref: "HEAD" });
+assert.deepEqual(await resolveBranchCommits("/repo", "main", new AbortController().signal, deps), { commits: ["commit:main"] });
+assert.deepEqual(await resolveReviewCommitLineCounts("/repo", ["a"], true, new AbortController().signal, deps), { commits: ["a"], hideWhitespace: true });
 const empty = { ...deps, gitManager: { getRepoRepository: async () => null, getWorktreeRepository: async () => null } };
 assert.deepEqual(await resolveOriginUrl("/missing", empty), { originUrl: null });
 assert.deepEqual(await resolveMergeBase("/missing", "main", empty), { mergeBaseSha: null });
 
-console.log("17 worker git read request handler assertions passed");
+console.log("21 worker git read request handler assertions passed");
