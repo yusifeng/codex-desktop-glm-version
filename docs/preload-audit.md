@@ -48,6 +48,11 @@ Annotation surface feature observer（原 `Ff` 7239-7326，含 `If` 的 attachSh
 observer、pageshow、recordUse 优先级和 dispose 由 `scripts/test-preload-annotation-surface-observer.mjs`
 覆盖，共 13 项断言。
 
+Annotation surface registry（原 `Yg` 22359-22510）已迁移至
+`src/main/browser-page-preload/annotation-surface-registry.ts`，由 `t_` 接回；surface
+registration、hit-test response 校验、render/cancel/clear、invalidated/disposed 和 dispose
+由 `scripts/test-preload-annotation-surface-registry.mjs` 覆盖，共 9 项断言。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。

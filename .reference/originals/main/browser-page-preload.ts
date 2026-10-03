@@ -6437,6 +6437,7 @@ var { createAnnotationProtocol } = require("./browser-page-preload/annotation-pr
 var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("./browser-page-preload/annotation-runtime");
 var { createAnnotationControlsRegistry } = require("./browser-page-preload/annotation-controls-registry");
 var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
+var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 Yo();
@@ -22375,6 +22376,33 @@ var Jg = o(() => {
   Kg();
 });
 function Yg({ getElementAtPoint: e, onInvalidated: t, onRenderingFailed: n }) {
+  return createAnnotationSurfaceRegistry({
+    documentRef: document,
+    windowRef: window,
+    mutationObserverConstructor: MutationObserver,
+    responseEvent: $g.responseEvent,
+    requestEvent: $g.requestEvent,
+    maxPayloadLength: $g.maxPayloadLength,
+    deadlineMs: $g.deadlineMs,
+    isValidSurface: Zg,
+    getElementAtPoint: e,
+    parseResponse: (detail) => {
+      try {
+        const parsed = Xd.safeParse(JSON.parse(detail));
+        return parsed.success ? parsed.data : undefined;
+      } catch { return undefined; }
+    },
+    createRequestId: () => Rl(),
+    clipRect: Qg,
+    normalizeName: Xo,
+    normalizeRole: Kd,
+    sanitizeMetadata: Zo,
+    dispatchRequest: (target, payload) => Xg(target, payload),
+    isResponseEvent: (event) => event instanceof CustomEvent,
+    onInvalidated: t,
+    onRenderingFailed: n,
+  });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let r = new Map(),
     i = new WeakSet(),
     a = Rl(),
