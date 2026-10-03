@@ -20,7 +20,7 @@
 |---|---|---|
 | bootstrap | ✅ 完成 | 全量重写 |
 | main（5.5MB） | ✅ 结构性完成 | R1-R12 全区落地、133K 行语义源码、typecheck 0 错误、verify-chunks 11/11。深度打磨为可选项（T6） |
-| shared（2.1MB，692 导出） | ⚠️ **剩 228 个已消费未语义化别名**，分布九个小分区 | 本文 T1 附实时统计脚本 |
+| shared（2.1MB，692 导出） | ⚠️ **剩 49 个已消费未语义化别名**，集中在 process-exec、sql-git-registry、streams | 本文 T1 附实时统计脚本 |
 | renderer GUI | ✅ **业务 chunk 0 pending** | verify-renderer 1874/1874；coverage 2247/2247；app-shared 消费 343/343（0 any） |
 | 其余独立 chunk | ❌ **6 个未重写**（transform-only） | T2-T5 |
 
@@ -40,18 +40,18 @@
 
 ## 二、剩余任务清单（按此顺序执行）
 
-### T1 · shared 九个小分区收尾（~228 别名）★ 首选，方法完全成熟
+### T1 · shared 剩余分区收尾（49 别名）★ 首选，方法完全成熟
 
 数据源：`docs/shared-export-map.json`（导出名 → 内部符号 + 行号）。
 先运行下面的权威脚本拿最新缺口清单。它只解析实际来自
 `@chunk/shared` 的 import，避免把其它 chunk 中的 `as` 误计入 shared；
-数字以脚本输出为准（228 仅是 09-30 快照）：
+数字以脚本输出为准（本文快照为 49）：
 
 ```bash
 node scripts/audit-shared-consumption.mjs
 ```
 
-分区速览（09-30 快照）：process-exec 28、schema-primitives 30（zod
+分区速览（当前快照）：process-exec 20、sql-git-registry 15、streams 14、mcp-2 0、lowlevel-export-shim 0、unlocated 0；schema-primitives 30（zod
 builder 链式族——**沿用 `src/main/shared/zod-facade.ts` 既有门面，勿重造**）、
 sql-git-registry 22、mcp-rpc 22、streams 17、lowlevel-export-shim 19
 （单字母 lodash/runtime shim）、misc 7、tail 6（单字母重导出壳）、
