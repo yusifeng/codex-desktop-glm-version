@@ -81,6 +81,11 @@ repository/file read 请求（`repository-identity`、`commit-message-diff`、`s
 指定 review snapshot 失效时的逐请求 unknown error、abort wrapper 与精确参数收窄；turn-diff
 capture 因依赖 watcher readiness 回调仍保留在入口。对应回归脚本由 15 项断言覆盖。
 
+turn diff capture 的 start/complete 请求编排已迁移至
+`src/main/worker/git-turn-diff-request-handlers.ts`。模块显式接收 `isRepoWatched`，入口继续
+拥有 `watchesByKey`、ready/recovery 状态和 response 包装；capture helper 的参数收窄与 watcher
+判定透传由 `scripts/test-worker-git-turn-diff-request-handlers.mjs` 的 8 项断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

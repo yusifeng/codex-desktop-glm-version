@@ -12,6 +12,7 @@ const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBran
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
+const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
@@ -77586,6 +77587,17 @@ var I6 = kW(`git`),
           blameFile: whe,
           getIndexInfo: eve,
         },
+        turnDiffRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          isRepoWatched: (root) => {
+            let watch = this.watchesByKey.get(this.getWatchKey(root, o));
+            return watch?.isReady === !0 && !watch.watcher.requiresRecovery;
+          },
+          startCapture: uye,
+          completeCapture: dye,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77929,32 +77941,10 @@ var I6 = kW(`git`),
             break;
           }
           case `turn-diff-capture-start`:
-            p = X(
-              await uye({
-                host: o,
-                baseTurnId: e.params.baseTurnId,
-                checkpointKey: e.params.checkpointKey,
-                cwd: e.params.cwd,
-                gitManager: this.gitManager,
-                isRepoWatched: (e) => {
-                  let t = this.watchesByKey.get(this.getWatchKey(e, o));
-                  return t?.isReady === !0 && !t.watcher.requiresRecovery;
-                },
-                signal: i.signal,
-                turnId: e.params.turnId,
-              }),
-            );
+            p = X(await startTurnDiffCapture(e.params, turnDiffRequestDeps));
             break;
           case `turn-diff-capture-complete`:
-            p = X(
-              await dye({
-                host: o,
-                capture: e.params.capture,
-                gitManager: this.gitManager,
-                retainCheckpoint: e.params.retainCheckpoint,
-                signal: i.signal,
-              }),
-            );
+            p = X(await completeTurnDiffCapture(e.params, turnDiffRequestDeps));
             break;
           case `commit-message-diff`:
             p = X(await resolveCommitMessageDiff(e.params, repositoryReadRequestDeps));

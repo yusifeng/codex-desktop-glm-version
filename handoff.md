@@ -61,7 +61,10 @@ synced branch/state 与 overwrite repository 编排已迁移至
 成功后的 metadata/live-query refresh root 仍显式交回入口，cache/watch 生命周期未混入该模块。
 repository identity、commit-message diff、submodule paths、cat-file、blame、index info 与
 config value 已迁移至 `src/main/worker/git-repository-read-request-handlers.ts`，由 15 项行为
-断言覆盖 repository/snapshot 缺失和参数透传；turn diff capture 与 watcher 状态仍留在入口。
+断言覆盖 repository/snapshot 缺失和参数透传。
+turn diff capture start/complete 编排已迁移至
+`src/main/worker/git-turn-diff-request-handlers.ts`，由 8 项行为断言覆盖；watcher ready/recovery
+状态所有权仍留在入口，并通过显式 `isRepoWatched` 回调注入。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
