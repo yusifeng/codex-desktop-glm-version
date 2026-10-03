@@ -510,6 +510,15 @@ Worktree list 的 250ms query、porcelain record parser、branch/detached head�
 Git object ID 校验、ref-sha query、fresh 精确失效、rev-parse 错误与 SHA branding 已迁移至
 `src/main/worker/git-ref-resolution.ts`。原 `M0`/`N0` 已删除，worker 中 branch/review/turn-diff/
 handoff/snapshot 等全部消费者改用语义名称，由 20 项模块断言及六组下游回归覆盖。
+
+### 增量抽取：Current branch reads
+
+Current branch 的 HEAD/symbolic fallback、branch/detached/unknown 状态、15 秒 snapshot cache、
+head generation 防陈旧重试与精确 query invalidation 已迁移至
+`src/main/worker/git-current-branch.ts`。原 `w0`/`T0`/`Mpe`/`E0`/`D0`/`O0` 与专用常量
+`C0` 已删除，worker 中 watcher、handoff、branch metadata/ahead 与 request handler 消费者
+全部改用语义名称，由 26 项模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

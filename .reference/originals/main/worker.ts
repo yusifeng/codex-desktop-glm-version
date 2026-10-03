@@ -28,6 +28,7 @@ const { readGitCatFile } = require("./worker/git-cat-file");
 const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { getGitCloneState } = require("./worker/git-clone-state");
+const { getCurrentBranch: getCurrentGitBranchQuery, getCurrentBranchSnapshot: getCurrentGitBranchSnapshotQuery, getCurrentBranchState: getCurrentGitBranchStateQuery } = require("./worker/git-current-branch");
 const { getGitIndexInfo } = require("./worker/git-index-info");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
@@ -92,6 +93,19 @@ const gitBlameFileDeps = {
   runGit: (...args) => $(...args),
 };
 const gitCatFileDeps = { runGit: (...args) => $(...args) };
+const gitCurrentBranchDeps = {
+  fetchQueryWithSignal: (...args) => w1(...args),
+  getQueryMeta: () => b1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const getCurrentGitBranch = (repository) =>
+  getCurrentGitBranchQuery(repository, gitCurrentBranchDeps);
+const getCurrentGitBranchState = (repository) =>
+  getCurrentGitBranchStateQuery(repository, gitCurrentBranchDeps);
+const getCurrentGitBranchSnapshot = (repository, signal) =>
+  getCurrentGitBranchSnapshotQuery(repository, signal, gitCurrentBranchDeps);
 const gitIndexInfoDeps = {
   getGitDir: (...args) => u0(...args),
   logger: { error: (message, detail) => kW(`git`)().error(message, detail) },
@@ -170,7 +184,7 @@ const handoffDestinationDeps = {
   getHeadCommit: (repository, signal) =>
     readCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   runGit: $,
-  getCurrentBranch: w0,
+  getCurrentBranch: getCurrentGitBranch,
   getDefaultRemoteBranch: k2,
   checkoutBranch: t4,
 };
@@ -204,7 +218,7 @@ const hostHandoffDeps = {
   createWorktree: (params) => V2(params),
   resolveCleanWorktreeCommit: (repository, signal) =>
     resolveCleanWorktreeCommit(repository, signal, handoffDestinationDeps),
-  getCurrentBranch: (repository) => w0(repository),
+  getCurrentBranch: (repository) => getCurrentGitBranch(repository),
   getCurrentBranchSnapshot: (repository, signal) =>
     getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   checkoutBranch: (params, gitManager, host) => t4(params, gitManager, host),
@@ -218,7 +232,7 @@ const hostHandoffDeps = {
   warn: (message, detail) => CW().warning(message, detail),
 };
 const moveToLocalDeps = {
-  getCurrentBranch: w0,
+  getCurrentBranch: getCurrentGitBranch,
   listWorktrees: $2,
   getHeadCommit: (repository, signal) =>
     getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
@@ -230,7 +244,7 @@ const moveToLocalDeps = {
   applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
 };
 const moveToWorktreeDeps = {
-  getCurrentBranch: w0,
+  getCurrentBranch: getCurrentGitBranch,
   checkoutBranch: t4,
   applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
   restoreBranchAndStash: restoreHandoffState,
@@ -257,7 +271,7 @@ const branchSearchDeps = {
   runGit: $,
 };
 const gitBranchAheadDeps = {
-  getCurrentBranch: w0,
+  getCurrentBranch: getCurrentGitBranch,
   getDefaultRemoteBranch: k2,
   getMergeBase: X2,
   getQueryMeta: () => _1,
@@ -267,7 +281,7 @@ const gitBranchAheadDeps = {
   runGit: $,
 };
 const gitBranchMetadataDeps = {
-  getCurrentBranch: w0,
+  getCurrentBranch: getCurrentGitBranch,
   getDefaultRemoteBranch: k2,
   normalizeBranch: Tz,
   normalizeCwd: xz,
@@ -336,7 +350,7 @@ const syncedBranchStateDeps = {
   getWorkingTree: x4,
   getHeadCommit: (repository, signal) =>
     getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
-  getCurrentBranch: w0,
+  getCurrentBranch: getCurrentGitBranch,
   compareAhead: A0,
   logger: {
     warning: (message, detail) => kW(`git`)().warning(message, detail),
@@ -66764,80 +66778,6 @@ async function y0(e, t, n, r = {}) {
     maxOutputBytes: c,
   });
 }
-var C0 = 15e3;
-async function w0(e) {
-  let t = await T0(e);
-  return t.type === `branch` ? t.branch : null;
-}
-async function T0(e) {
-  let t = await E0(e);
-  if (t.success && t.stdout && t.stdout !== `HEAD`) return { type: `branch`, branch: t.stdout };
-  let n = await D0(e);
-  return n.success && n.stdout
-    ? { type: `branch`, branch: n.stdout }
-    : n.code === 1
-      ? { type: `detached` }
-      : { type: `unknown` };
-}
-async function Mpe(e, t) {
-  let n = await E0(e, { signal: t, staleTime: C0 });
-  if (!n.success && n.stdout !== `HEAD`)
-    throw (O0(e, `head-branch-name`), Error(n.stderr || `Failed to read current Git branch`));
-  if (n.stdout && n.stdout !== `HEAD`) return n.stdout;
-  let r = await D0(e, { signal: t, staleTime: C0 });
-  if (!r.success)
-    throw (
-      O0(e, `symbolic-head-branch-name`),
-      Error(r.stderr || `Failed to read symbolic Git branch`)
-    );
-  return r.stdout || null;
-}
-async function E0(e, t) {
-  let n = await w1(
-    e.queryClient,
-    {
-      queryKey: Q(e.root, e.host, `head-branch-name`),
-      meta: b1,
-      queryFn: async (t) => ({
-        generation: e.gitHeadReadGeneration,
-        result: await $(e.root, [`rev-parse`, `--abbrev-ref`, `HEAD`], e.host, { signal: t }),
-      }),
-      staleTime: t?.staleTime ?? 1 / 0,
-    },
-    t?.signal,
-  );
-  return e.gitHeadReadGeneration === n.generation
-    ? n.result
-    : (O0(e, `head-branch-name`), E0(e, t));
-}
-async function D0(e, t) {
-  let n = await w1(
-    e.queryClient,
-    {
-      queryKey: Q(e.root, e.host, `symbolic-head-branch-name`),
-      meta: b1,
-      queryFn: async (t) => ({
-        generation: e.gitHeadReadGeneration,
-        result: await $(e.root, [`symbolic-ref`, `--quiet`, `--short`, `HEAD`], e.host, {
-          allowedNonZeroExitCodes: [1],
-          signal: t,
-        }),
-      }),
-      staleTime: t?.staleTime ?? 1 / 0,
-    },
-    t?.signal,
-  );
-  return e.gitHeadReadGeneration === n.generation
-    ? n.result
-    : (O0(e, `symbolic-head-branch-name`), D0(e, t));
-}
-function O0(e, t) {
-  e.queryClient.invalidateQueries({
-    queryKey: Q(e.root, e.host, t),
-    exact: !0,
-    refetchType: `none`,
-  });
-}
 async function Npe(e, t = v0) {
   return (await k0(e, t)) || Ppe(e, t);
 }
@@ -66961,7 +66901,7 @@ async function Ipe(e, t, n, r, i, a) {
         if (s == null) throw Error(`Failed to resolve latest ${n}/${r}`);
         return s;
       }
-      return i == null ? `HEAD` : ((await w0(i)) ?? (await k0(i)) ?? `HEAD`);
+      return i == null ? `HEAD` : ((await getCurrentGitBranch(i)) ?? (await k0(i)) ?? `HEAD`);
     })(),
     (async () => {
       if (t.type !== `working-tree`) return null;
@@ -68162,7 +68102,7 @@ async function Ime({
   upstreamRefreshSignal: a,
 }) {
   if (n === `never` || t.type !== `branch` || t.remoteRef != null) return;
-  let o = t.branchName === `HEAD` ? await w0(e) : t.branchName;
+  let o = t.branchName === `HEAD` ? await getCurrentGitBranch(e) : t.branchName;
   if (o == null) return;
   let [s, c] = await Promise.all([
     e.getConfigValue(`branch.${o}.remote`, i),
@@ -68969,7 +68909,7 @@ async function G2(e, t, n, r, i) {
   }
 }
 async function che(e, t, n, r) {
-  if (t.type === `working-tree` || t.branchName === `HEAD` || t.branchName === `@`) return w0(e);
+  if (t.type === `working-tree` || t.branchName === `HEAD` || t.branchName === `@`) return getCurrentGitBranch(e);
   if (n.startsWith(`refs/heads/`)) {
     let t = n.slice(11);
     return (await O2(e.root, t, e.host, r)) ? t : null;
@@ -71059,7 +70999,7 @@ var Jye = 1e3,
                 f0(this.options.worktreeRepo),
                 Zme(this.options.worktreeRepo),
                 u0(this.options.worktreeRepo),
-                T0(this.options.worktreeRepo),
+                getCurrentGitBranchState(this.options.worktreeRepo),
               ])
             : [
                 e.headPath,
@@ -71638,7 +71578,7 @@ var Jye = 1e3,
           await this.options.emit({ type: `worker-event`, event: i }),
           e === `head` && !this.currentHeadRefKnown)
         ) {
-          let e = await T0(this.options.worktreeRepo);
+          let e = await getCurrentGitBranchState(this.options.worktreeRepo);
           ((this.currentHeadRefPath =
             e.type === `branch`
               ? (this.pathApi?.join(
@@ -71880,7 +71820,7 @@ var I6 = kW(`git`),
           getDefaultRemoteBranch: k2,
           getMergeBase: X2,
           getCurrentBranch: (root, host) => this.getCurrentBranch(root, host),
-          getCurrentBranchSnapshot: Mpe,
+          getCurrentBranchSnapshot: getCurrentGitBranchSnapshot,
           getUpstreamBranch: (root, args) => this.handleUpstreamBranch(root, args),
           getBranchAheadCount: (root, args) => this.handleBranchAheadCount(root, args),
           getDefaultBranch: (root, host, signal) => this.getDefaultBranch(root, host, signal),
@@ -72621,7 +72561,7 @@ var I6 = kW(`git`),
     }
     async handleUpstreamBranch(e, { host: t, signal: n }) {
       let r = this.gitManager.getWorktreeRepositoryForRoot(e, t),
-        i = await w0(r),
+        i = await getCurrentGitBranch(r),
         a = await P0(r, i ?? `HEAD`, n);
       return a ? { branch: i, upstream: { branch: a } } : { branch: i, upstream: null };
     }
@@ -72644,7 +72584,7 @@ var I6 = kW(`git`),
       return { local: n?.branch ?? null, remote: n?.remote ?? null };
     }
     async getCurrentBranch(e, t) {
-      let n = await T0(this.gitManager.getWorktreeRepositoryForRoot(e, t));
+      let n = await getCurrentGitBranchState(this.gitManager.getWorktreeRepositoryForRoot(e, t));
       return { branch: n.type === `branch` ? n.branch : null, isDetached: n.type === `detached` };
     }
     async getWorktrees(e, t, n) {
@@ -74074,7 +74014,7 @@ async function Obe(e, t) {
   let r = e.root;
   await fhe(e, Dpe);
   let i = (0, g.basename)(r) || `repo`,
-    [a, o, s] = await Promise.all([resolveGitRefSha(e, `HEAD`), w0(e), kbe(e)]);
+    [a, o, s] = await Promise.all([resolveGitRefSha(e, `HEAD`), getCurrentGitBranch(e), kbe(e)]);
   if (a == null) throw Error(`Cannot create a worktree snapshot without a HEAD commit`);
   let c = `${i}-snapshot-${Date.now()}.tar.gz`,
     l = (0, g.join)((0, h.tmpdir)(), c);
