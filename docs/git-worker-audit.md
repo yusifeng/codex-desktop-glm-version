@@ -95,6 +95,11 @@ empty-tree fallback 以及 untracked/unmerged 扫描已迁移至
 与 `Y4` 已删除。53 项断言覆盖 query cache 参数、SHA 校验、source 矩阵、repository fallback、
 untracked 上限与 unmerged 路径过滤。
 
+Review diff 的请求路径规范化、tracked/untracked 并发聚合、250ms diff query、unified diff 分片与
+rename blob fallback 已迁移至 `src/main/worker/git-review-diffs.ts`；原
+`$4`/`Uge`/`Wge`/`Gge`/`Kge`/`qge`/`Jge`/`e3` 已删除。41 项断言覆盖 query 参数、
+失败映射、whitespace 空 diff、request path 保留与 branch/unstaged rename 边界。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的

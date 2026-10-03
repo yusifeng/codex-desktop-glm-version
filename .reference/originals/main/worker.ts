@@ -36,6 +36,7 @@ const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBran
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { getGitBlobDiff, getUntrackedWorkingTreeDiff, readWorkingTreeSymlink } = require("./worker/git-review-file-diff");
 const { getCurrentHeadSnapshot, hasGitMergeConflicts, prepareReviewComparison: prepareGitReviewComparison, readCurrentHeadSnapshot, resolveReviewComparisonArgs: resolveGitReviewComparisonArgs, resolveReviewComparisonForRepository: resolveGitReviewComparisonForRepository } = require("./worker/git-review-comparison");
+const { createReviewDiffFallback, getReviewDiff } = require("./worker/git-review-diffs");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
@@ -255,6 +256,21 @@ const gitReviewFileDiffDeps = {
   parseGitError: (result) => g0(result),
   quoteGitDiffPath,
   runGit: (...args) => $(...args),
+};
+const gitReviewDiffDeps = {
+  byteLength: (value) => A1(value),
+  getBlobDiff: (reviewSnapshot, oldObject, newObject, options) =>
+    getGitBlobDiff(reviewSnapshot, oldObject, newObject, options, gitReviewFileDiffDeps),
+  getQueryMeta: () => _1,
+  getUntrackedWorkingTreeDiff: (reviewSnapshot, path, options) =>
+    getUntrackedWorkingTreeDiff(reviewSnapshot, path, options, gitReviewFileDiffDeps),
+  normalizePathFromRoot: (...args) => o2(...args),
+  parseDiffHeader: (header) => parseGitDiffHeader(header),
+  parseGitError: (result) => g0(result),
+  prepareReviewComparison: (params) =>
+    prepareGitReviewComparison(params, gitReviewComparisonDeps),
+  rewriteRenameDiff: (diff, previousPath, path) =>
+    rewriteGitRenameDiff(diff, previousPath, path),
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70439,162 +70455,6 @@ function Mge(e) {
   }
   return t;
 }
-async function $4(
-  e,
-  t,
-  n,
-  { baseBranch: r, binary: i = !1, commitSha: a, hideWhitespace: o = !1 } = {},
-) {
-  let { worktreeRepo: s } = e,
-    { root: c } = s,
-    l = await s.host.platformPath(),
-    u = n.map((e) => ({
-      ...e,
-      path: o2(l, c, c, e.path),
-      previousPath: e.previousPath == null ? null : o2(l, c, c, e.previousPath),
-      requestPath: e.path,
-    })),
-    d = [
-      ...new Set(u.flatMap((e) => (e.previousPath == null ? [e.path] : [e.previousPath, e.path]))),
-    ],
-    f = await prepareGitReviewComparison({
-      baseBranch: r,
-      commitSha: a,
-      includeUnmergedPaths: !1,
-      includeUntrackedFiles: u.some((e) => e.changeKind === `untracked` || e.previousPath != null),
-      paths: d,
-      reviewSnapshot: e,
-      source: t,
-    }, gitReviewComparisonDeps);
-  if (f.type !== `success`)
-    return {
-      source: t,
-      diffs: Object.fromEntries(u.map((e) => [e.requestPath, e3({ type: `unknown` })])),
-    };
-  let p = d.filter((e) => f.untrackedPathSet.has(e)),
-    m = d.filter((e) => !f.untrackedPathSet.has(e)),
-    [h, g] = await Promise.all([
-      Gge({ binary: i, diffArgs: f.diffArgs, hideWhitespace: o, paths: m, reviewSnapshot: e }),
-      Uge({ binary: i, paths: p, reviewSnapshot: e }),
-    ]),
-    _ = new Map([...h, ...g]);
-  if (t === `branch` || t === `uncommitted` || t === `unstaged`) {
-    let [n] = f.diffArgs;
-    (t === `unstaged` || n != null) &&
-      (await Promise.all(
-        u.map(async (r) => {
-          if (r.previousPath == null) return;
-          let a = _.get(r.path);
-          if (
-            a?.type === `success` &&
-            typeof a.diff == `string` &&
-            Wge(a.diff, r.previousPath, r.path)
-          )
-            return;
-          let s = await getGitBlobDiff(
-            e,
-            t === `unstaged` ? `:${r.previousPath}` : `${n}:${r.previousPath}`,
-            r.path,
-            { binary: i, hideWhitespace: o },
-            gitReviewFileDiffDeps,
-          );
-          if (s.outputLimitExceeded || !s.success) {
-            _.set(r.path, e3(g0(s)));
-            return;
-          }
-          let c = rewriteGitRenameDiff(s.stdout, r.previousPath, r.path);
-          _.set(r.path, { type: `success`, diff: c, diffBytes: Buffer.byteLength(c, `utf8`) });
-        }),
-      ));
-  }
-  return e.read(async () => ({
-    source: t,
-    diffs: Object.fromEntries(
-      u.map((e) => [e.requestPath, _.get(e.path) ?? e3({ type: `unknown` })]),
-    ),
-  }));
-}
-async function Uge({ binary: e, paths: t, reviewSnapshot: n }) {
-  let r = new Map(),
-    i = 0,
-    a = async () => {
-      for (;;) {
-        let a = t[i];
-        if (((i += 1), a == null)) return;
-        let o = await getUntrackedWorkingTreeDiff(
-          n,
-          a,
-          { binary: e },
-          gitReviewFileDiffDeps,
-        );
-        r.set(
-          a,
-          o.type === `error`
-            ? e3(o.error)
-            : {
-                type: `success`,
-                diff: o.unifiedDiff,
-                diffBytes: o.unifiedDiffBytes ?? Buffer.byteLength(o.unifiedDiff, `utf8`),
-              },
-        );
-      }
-    };
-  return (await Promise.all(Array.from({ length: Math.min(8, t.length) }, () => a())), r);
-}
-function Wge(e, t, n) {
-  let r = /^diff --(?:git|cc|combined) .*$/m.exec(e)?.[0],
-    i = r == null ? null : parseGitDiffHeader(r);
-  return i?.oldPath === t && i.newPath === n;
-}
-async function Gge({ binary: e, diffArgs: t, hideWhitespace: n, paths: r, reviewSnapshot: i }) {
-  if (r.length === 0) return new Map();
-  let a = await Kge(t, e, n, r, i);
-  if (a.outputLimitExceeded || !a.success) {
-    let e = e3(g0(a));
-    return new Map(r.map((t) => [t, e]));
-  }
-  let o = Jge(a.stdout);
-  if (!n) return o;
-  for (let e of r) o.has(e) || o.set(e, { type: `success`, diff: ``, diffBytes: 0 });
-  return o;
-}
-function Kge(e, t, n, r, i) {
-  let a = [
-    ...e,
-    ...(n ? [`--ignore-all-space`] : []),
-    `--full-index`,
-    `--find-renames`,
-    `--`,
-    ...r,
-  ];
-  return i.worktreeRepo.queryClient.fetchQuery({
-    queryKey: i.queryKey(`review-diffs`, [...(t ? [`--binary`] : []), ...a]),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () => i.gitDiff(a, { allowedNonZeroExitCodes: [0, 1], binary: t, trim: !1 }),
-    staleTime: 250,
-  });
-}
-function qge(e, t) {
-  return { source: e, diffs: Object.fromEntries(t.map((e) => [e.path, e3({ type: `unknown` })])) };
-}
-function Jge(e) {
-  let t = new Map(),
-    n = Array.from(e.matchAll(/^diff --(?:git|cc|combined) .*$/gm));
-  for (let [r, i] of n.entries()) {
-    let a = parseGitDiffHeader(i[0]);
-    if (a == null) continue;
-    let o = i.index ?? 0,
-      s = r + 1 < n.length ? (n[r + 1]?.index ?? e.length) : e.length,
-      c = e.slice(o, s),
-      l = { type: `success`, diff: c, diffBytes: A1(c) };
-    (t.set(a.oldPath, l), t.set(a.newPath, l));
-  }
-  return t;
-}
-function e3(e) {
-  return { type: `error`, error: e };
-}
 var Yge = 8,
   Xge = class {
     reviewSnapshot;
@@ -71705,7 +71565,7 @@ async function D_e({ action: e, host: t, cwd: n, files: r, gitManager: i, signal
   if (l.length === 0)
     return { status: `error`, appliedPaths: [], skippedPaths: [], conflictedPaths: [] };
   (p2(s), s.clearShortLivedGitReadCaches());
-  let u = await $4(s.reviewSnapshot, o, l, { binary: !0 }).catch(() => null);
+  let u = await getReviewDiff(s.reviewSnapshot, o, l, { binary: !0 }, gitReviewDiffDeps).catch(() => null);
   if (u == null)
     return { status: `error`, appliedPaths: [], skippedPaths: [], conflictedPaths: [] };
   s.clearShortLivedGitReadCaches();
@@ -73842,8 +73702,9 @@ var I6 = kW(`git`),
           getReviewSummary: c3,
           getReviewSourceLineCounts: g_e,
           getReviewSnapshot: R6,
-          getReviewDiffFallback: qge,
-          getReviewDiff: $4,
+          getReviewDiffFallback: createReviewDiffFallback,
+          getReviewDiff: (reviewSnapshot, source, files, options) =>
+            getReviewDiff(reviewSnapshot, source, files, options, gitReviewDiffDeps),
           staleSnapshotError: s4,
           searchReview: ove,
           getReviewPatch: k3,
