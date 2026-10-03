@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 已抽取边界
+
+当前已有可执行语义 helper 接回 main 入口：delegation/account helpers
+（入口早期工具带）以及 URL trust predicates（原 172,625-172,665，对应
+`main-app/util/url-trust.ts`）。两者均保留原别名调用面并有行为断言；表中
+其余 `semantic/business` 区段仍表示待继续物理迁出或已由既有模块覆盖。
+
 审计对象：`src/main/main-C-Mhak1n.ts`（原始 main chunk）。
 
 ## 结论摘要

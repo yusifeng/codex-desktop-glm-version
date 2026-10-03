@@ -1,5 +1,13 @@
 # `browser-page-preload.ts` 逐段审计
 
+## 已抽取边界
+
+WebMCP 协议闭环（原 30,084-30,216 行）已迁移至
+`src/main/browser-page-preload/webmcp-protocol.ts`，由原 preload 通过
+CommonJS 依赖注入接回。schema、policy gate、刷新生命周期和两条
+contextBridge 路径均有 VM smoke 覆盖；其余 preload business 区段仍保持
+原文件并按下表审计。
+
 审计对象：`src/main/browser-page-preload.ts`（当前文件 30,217 行）。
 
 审计日期：2026-10-03。
