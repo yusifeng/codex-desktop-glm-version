@@ -119,7 +119,7 @@ declare module "@chunk/shared" {
   export const Du: any; // 内部符号: Py
   export const E: any; // 内部符号: _se
   export { dynamicAppToolResultSchema as Ec } from "../../shared/app-config";
-  export const Ed: any; // 内部符号: j_
+  export { permissionProfileSchema as Ed } from "../../shared/unlocated-runtime";
   export { Ef } from "../../shared/zod-facade";
   export const Ei: any; // 内部符号: DM
   export { stripDriveLetterSlash as El } from "../../shared/app-constants";
@@ -515,7 +515,7 @@ declare module "@chunk/shared" {
   export { workspaceWritePermissions as kd } from "../../shared/sandbox-permissions";
   export { kf } from "../../shared/zod-facade";
   export { resolveExecutionCodexHome as ki } from "../../shared/wsl-paths";
-  export const kl: any; // 内部符号: Db
+  export { BROWSER_PLUGIN_NAME as kl } from "../../shared/unlocated-runtime";
   export const kn: any; // 内部符号: EX
   export const ko: any; // 内部符号: xO
   export const kr: any; // 内部符号: jB
@@ -579,7 +579,7 @@ declare module "@chunk/shared" {
   export const po: any; // 内部符号: Ak
   export { WebSocketReadyState as pr } from "../../shared/process-exec";
   export { TelemetryHttpTransport as pt } from "../../shared/telemetry";
-  export const pu: any; // 内部符号: $y
+  export { MAX_DIRECT_TRANSFER_BYTES as pu } from "../../shared/unlocated-runtime";
   export const q: any; // 内部符号: x5
   export const qc: any; // 内部符号: sS
   export const qd: any; // 内部符号: jg
@@ -613,7 +613,7 @@ declare module "@chunk/shared" {
   export const sl: any; // 内部符号: Dx
   export const sn: any; // 内部符号: o1
   export const so: any; // 内部符号: ak
-  export const sr: any; // 内部符号: FW
+  export { parseUrl as sr } from "../../shared/unlocated-runtime";
   export const ss: any; // 内部符号: NE
   export { COMMIT_MESSAGE_GENERATION_BUNDLE as st } from "../../shared/structured-generation";
   export { BROWSER_USE_PLUGIN_NAME as su } from "../../shared/app-constants";
