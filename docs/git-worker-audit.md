@@ -92,6 +92,10 @@ untracked cache invalidation、short-lived cache clear、可选 live-query refre
 仍为 fire-and-forget，不等待 refresh Promise。17 项回归断言覆盖正常路径、pending refresh 与
 各阶段同步异常短路。
 
+`git-init-repo` 的完整业务实现已迁移至 `src/main/worker/git-init-request-handler.ts`，原压缩
+`Rhe` 函数已删除。模块保留 workspace root trim/空值校验、`git init` 参数、stderr/stdout/
+default 错误优先级和成功后的 stable metadata invalidation，由 11 项断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

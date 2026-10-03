@@ -9,6 +9,7 @@ const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
+const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
@@ -69392,13 +69393,6 @@ async function Lhe({ cwd: e, branch: t, mode: n, failIfExists: r = !1, startPoin
     return { status: `error`, error: e instanceof Error ? e.message : String(e) };
   }
 }
-async function Rhe({ cwd: e }, t, n) {
-  let r = String(e).trim();
-  if (!r) throw Error(`Workspace root is required`);
-  let i = await $(r, [`init`], n);
-  if (!i.success) throw Error(i.stderr || i.stdout || `Failed to run git init`);
-  return (t.invalidateStableMetadata(), { success: !0 });
-}
 var i4 = 864e5,
   zhe = kW(`git`);
 async function Bhe(e, t, n) {
@@ -77605,6 +77599,11 @@ var I6 = kW(`git`),
           invalidateUntrackedPathsCache: p2,
           refreshRepository: (hostId, root) => this.liveQueryRegistry.refreshRepository(hostId, root),
         },
+        gitInitRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          runGit: (root, args, host) => $(root, args, host),
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77936,7 +77935,7 @@ var I6 = kW(`git`),
             (this.unwatchRepo(e.params.root, o), (p = X({ success: !0 })));
             break;
           case `git-init-repo`:
-            p = X(await Rhe(e.params, this.gitManager, o));
+            p = X(await initializeGitRepository(e.params, gitInitRequestDeps));
             break;
           case `repository-identity`: {
             p = X(await resolveRepositoryIdentity(e.params.cwd, repositoryReadRequestDeps));

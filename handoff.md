@@ -68,6 +68,8 @@ turn diff capture start/complete 编排已迁移至
 stable metadata 与 Git read cache invalidation 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`，由 17 项行为断言覆盖严格副作用顺序、异常
 短路及 live-query refresh 的 fire-and-forget 时序。
+`git-init-repo` 的 cwd 校验、命令执行、错误优先级与 metadata invalidation 已完整迁移至
+`src/main/worker/git-init-request-handler.ts`，原压缩实现已删除，由 11 项行为断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
