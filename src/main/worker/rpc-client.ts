@@ -25,12 +25,18 @@ interface WorkerRpcResponse {
   result: { type: "ok"; value: unknown } | { type: "error"; error: { code?: string; message: string } };
 }
 
+function isWorkerRpcMethod(value: unknown): value is WorkerRpcMethod {
+  return value === "ces-telemetry" || value === "otel-export" ||
+    value === "computer-use-invalidate-service-pid" || value === "computer-use-service-pid" ||
+    value === "read-shortcut-link";
+}
+
 function isResponse(value: unknown): value is WorkerRpcResponse {
   if (value == null || typeof value !== "object") return false;
   const message = value as Record<string, unknown>;
   const result = message.result;
   return message.type === "worker-main-rpc-response" && typeof message.workerId === "string" &&
-    typeof message.requestId === "string" && typeof message.method === "string" &&
+    typeof message.requestId === "string" && isWorkerRpcMethod(message.method) &&
     result != null && typeof result === "object" && ((result as Record<string, unknown>).type === "ok" || (result as Record<string, unknown>).type === "error");
 }
 

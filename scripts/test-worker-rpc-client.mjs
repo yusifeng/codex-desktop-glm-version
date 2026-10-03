@@ -1,0 +1,26 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+
+const root = path.resolve(import.meta.dirname, "..");
+const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-worker-rpc-"));
+const output = path.join(tempDir, "rpc-client.cjs");
+await esbuild.build({ entryPoints: [path.join(root, "src/main/worker/rpc-client.ts")], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { WorkerMainRpcClient } = createRequire(import.meta.url)(output);
+const posted = [];
+const client = new WorkerMainRpcClient("git", { postMessage(message) { posted.push(message); } });
+const result = client.request({ method: "read-shortcut-link", params: { path: "/tmp/link" } });
+assert.equal(posted[0].type, "worker-main-rpc-request");
+assert.equal(client.handleMessage({ type: "worker-main-rpc-response", workerId: "other", requestId: posted[0].requestId, method: "read-shortcut-link", result: { type: "ok", value: "ignored" } }), false);
+assert.equal(client.handleMessage({ type: "worker-main-rpc-response", workerId: "git", requestId: posted[0].requestId, method: "unknown", result: { type: "ok", value: "ignored" } }), false);
+assert.equal(client.handleMessage({ type: "worker-main-rpc-response", workerId: "git", requestId: posted[0].requestId, method: "read-shortcut-link", result: { type: "ok", value: "resolved" } }), true);
+assert.equal(await result, "resolved");
+const controller = new AbortController();
+const aborted = client.request({ method: "otel-export", params: { bytes: [] }, signal: controller.signal });
+controller.abort();
+await assert.rejects(aborted, /aborted/);
+assert.equal(posted.at(-1).type, "worker-main-rpc-cancel");
+console.log("8 worker RPC client assertions passed");
