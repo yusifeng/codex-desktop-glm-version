@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { cloneRecord, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -28,5 +28,12 @@ assert.throws(() => normalizeAnnotationControlTargets([new FakeElement({})], Fak
 assert.throws(() => normalizeAnnotationControlTargets([firstTarget, firstTarget, firstTarget], FakeElement, fakeDocument, 2), /Too many/);
 assert.deepEqual(createAnnotationRangeDetail({ startPath: [0, 1], endPath: [0, 2], startOffset: 3, endOffset: 7, rangeText: "selected" }), { startPath: [0, 1], endPath: [0, 2], startOffset: 3, endOffset: 7, rangeText: "selected" });
 assert.deepEqual(createAnnotationOpenRequestDetail({ mode: "advanced", enterAnnotationMode: true, metadata: { source: "toolbar" }, initialComment: "Note", range: { startOffset: 1 } }), { mode: "advanced", enterAnnotationMode: true, metadata: { source: "toolbar" }, initialComment: "Note", range: { startOffset: 1 } });
+const emitted = [];
+const control = createAnnotationControlHandle("1", (value) => JSON.stringify(value), (value) => value, (type, detail) => { emitted.push([type, detail]); return true; });
+control.update({ targets: ["a"] });
+control.dispose();
+control.dispose();
+assert.equal(emitted.length, 2);
+assert.throws(() => control.update({}), /disposed/);
 
-console.log("19 preload annotation runtime assertions passed");
+console.log("22 preload annotation runtime assertions passed");

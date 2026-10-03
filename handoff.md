@@ -41,7 +41,7 @@ preload 的 WebMCP registry shim 已抽取为
 geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation surface
 协议 schema 已抽取为 `src/main/browser-page-preload/annotation-protocol.ts`，由 6 项
 行为断言覆盖；annotation hit payload 安全清洗已抽取为
-`src/main/browser-page-preload/annotation-runtime.ts`，由 19 项行为断言覆盖。
+`src/main/browser-page-preload/annotation-runtime.ts`，由 22 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

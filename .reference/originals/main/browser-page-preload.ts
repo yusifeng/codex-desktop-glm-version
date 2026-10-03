@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -7009,19 +7009,7 @@ function ef(e, t, n, r, i) {
         return normalizeAnnotationControlTargets(e, Element, document, 128);
       }
       function p(e) {
-        let t = !1;
-        return Object.freeze({
-          update(n) {
-            if (t) throw TypeError(`Annotation controls have been disposed`);
-            let i = l(n),
-              a = n.targets;
-            if (!r(`update`, { id: e, payload: i, targets: a === void 0 ? void 0 : f(a) }))
-              throw TypeError(`Invalid annotation controls update`);
-          },
-          dispose() {
-            t || ((t = !0), r(`dispose`, { id: e }));
-          },
-        });
+        return createAnnotationControlHandle(e, l, f, (t, n) => r(t, n));
       }
       function m() {
         return navigator.userActivation?.isActive === !0;
