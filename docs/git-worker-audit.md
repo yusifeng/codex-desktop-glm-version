@@ -93,6 +93,10 @@ Safe attribute filter override 的 config discovery、driver 去重、override �
 generation 竞争重试已迁移至 `src/main/worker/git-safe-attribute-filters.ts`；原 `lme`/`ume`/`e2`/`dme`
 已删除，全部消费者改用语义入口。18 项断言覆盖 parser、query 参数、signal、invalidate/retry 和错误。
 
+Tracked uncommitted diff 的 index context、临时 index 复制、`git add -u`、cached diff、错误日志与
+`finally` cleanup 已迁移至 `src/main/worker/git-uncommitted-diff.ts`；原 `b0`/`x0`/`S0` 已删除，
+worktree starting state 与 commit-message diff 均改用语义入口。28 项断言覆盖命令与失败矩阵。
+
 Managed worktree discovery 的 root/boundary 去重、无 symlink 目录读取、legacy/named
 目录识别、候选复检与 `.git` 文件验证已迁移至
 `src/main/worker/git-managed-worktree-discovery.ts`；原 `R$`/`jfe`/`Ofe`/`kfe`/`G_e`/`K_e`

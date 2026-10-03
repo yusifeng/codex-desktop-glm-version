@@ -56,6 +56,7 @@ const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranc
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
 const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchState: collectSyncedBranchState } = require("./worker/git-synced-branch-state");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
+const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
 const { completeTurnDiffCapture: performCompleteTurnDiffCapture, startTurnDiffCapture: performStartTurnDiffCapture } = require("./worker/git-turn-diff-capture");
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
@@ -221,6 +222,18 @@ const gitSafeAttributeFilterDeps = {
   queryKey: Q,
   runGit: $,
   staleTime: Infinity,
+};
+const gitUncommittedDiffDeps = {
+  copyIndex: B$,
+  createTemporaryDirectory: z$,
+  getIndexContext: m0,
+  logger: {
+    error: (message, detail) => kW(`git`)().error(message, detail),
+    warning: (message, detail) => kW(`git`)().warning(message, detail),
+  },
+  parseGitError: g0,
+  runDiff: y0,
+  runGit: $,
 };
 const syncedBranchStateDeps = {
   readConfig: P2,
@@ -66666,53 +66679,6 @@ async function y0(e, t, n, r = {}) {
     maxOutputBytes: c,
   });
 }
-var b0 = kW(`git`);
-function x0(e) {
-  return {
-    command: e.command,
-    success: e.success,
-    code: e.code,
-    stdout: e.stdout,
-    stderr: e.stderr,
-    outputLimitExceeded: e.outputLimitExceeded,
-  };
-}
-async function S0(e, t = [], n, { binary: r = !1 } = {}) {
-  let i = await m0(e, n);
-  if (!i) return { type: `error`, error: { type: `unknown` } };
-  let a = null;
-  try {
-    a = await z$(e.host, `codex-git-index-`, n);
-    let o = { GIT_INDEX_FILE: await B$(a, i, e.host) },
-      s = await $(e.root, [`add`, `-u`], e.host, { configOverrides: t, env: o, signal: n });
-    if (!s.success)
-      return (
-        b0().warning(`Failed to stage uncommitted diff`, { safe: {}, sensitive: { ...x0(s) } }),
-        { type: `error`, error: { type: `unknown` } }
-      );
-    let c = await y0(e.root, [`--cached`], e.host, {
-      binary: r,
-      trim: !1,
-      allowedNonZeroExitCodes: [0, 1],
-      env: o,
-      signal: n,
-    });
-    return c.outputLimitExceeded || !c.success
-      ? (b0().warning(`Failed to collect uncommitted diff`, { safe: {}, sensitive: { ...x0(c) } }),
-        { type: `error`, error: g0(c) })
-      : { type: `success`, unifiedDiff: c.stdout, unifiedDiffBytes: c.stdoutBytes };
-  } catch (e) {
-    return (
-      b0().error(`failed to collect tracked uncommitted diff`, {
-        safe: {},
-        sensitive: { error: e },
-      }),
-      { type: `error`, error: { type: `unknown` } }
-    );
-  } finally {
-    a && (await e.host.remove(a, { recursive: !0, force: !0 }));
-  }
-}
 var C0 = 15e3;
 async function w0(e) {
   let t = await T0(e);
@@ -66940,7 +66906,7 @@ async function Ipe(e, t, n, r, i, a) {
       if (t.type !== `working-tree`) return null;
       let o = await n.getWorktreeRepository(xz(e), r);
       if (o == null) throw Error(`Failed to collect working tree diff`);
-      let s = await S0(o, i, a, { binary: !0 });
+      let s = await collectTrackedUncommittedDiff(o, i, a, { binary: !0 }, gitUncommittedDiffDeps);
       if (s.type === `error`)
         throw Error(
           s.error.type === `diff-too-large`
@@ -70789,7 +70755,7 @@ async function X_e(e, t, n, r, i) {
   } catch {
     return { type: `error`, error: { type: `unknown` } };
   }
-  return S0(a, o, i);
+  return collectTrackedUncommittedDiff(a, o, i, {}, gitUncommittedDiffDeps);
 }
 var $_e = kW(`git`);
 async function eve(e, t) {
