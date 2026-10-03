@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide } = require("./browser-page-preload/annotation-runtime");
+var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6718,11 +6718,7 @@ function Qd(e, t) {
   }
   function x(e, t) {
     let n = e.options.renderSelection;
-    if (!(
-      n == null ||
-      (e.renderFailed && (t.hoveredId != null || t.selectedId != null)) ||
-      (e.selection.hoveredId === t.hoveredId && e.selection.selectedId === t.selectedId)
-    )) {
+    if (shouldRenderAnnotationSelection(e.selection, t, e.renderFailed, n != null)) {
       e.selection = t;
       try {
         let r = n({ ...t });

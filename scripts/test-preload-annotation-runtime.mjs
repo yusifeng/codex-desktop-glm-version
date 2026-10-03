@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { attachAnnotationControlTargets, cloneRecord, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { attachAnnotationControlTargets, cloneRecord, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -63,5 +63,9 @@ assert.equal(isValidAnnotationSurfaceElement(surface, fakeDocument, FakeHtmlElem
 assert.equal(isValidAnnotationSurfaceElement(new FakeHtmlElement(fakeDocument, false), fakeDocument, FakeHtmlElement, FakeIFrame), false);
 assert.equal(isValidAnnotationSurfaceElement(new FakeIFrame(fakeDocument), fakeDocument, FakeHtmlElement, FakeIFrame), false);
 assert.equal(isValidAnnotationSurfaceElement(new FakeHtmlElement({}), fakeDocument, FakeHtmlElement, FakeIFrame), false);
+assert.equal(shouldRenderAnnotationSelection({ hoveredId: null, selectedId: null }, { hoveredId: "h", selectedId: null }, false, true), true);
+assert.equal(shouldRenderAnnotationSelection({ hoveredId: "h", selectedId: null }, { hoveredId: "h", selectedId: null }, false, true), false);
+assert.equal(shouldRenderAnnotationSelection({ hoveredId: null, selectedId: null }, { hoveredId: "h", selectedId: null }, true, true), false);
+assert.equal(shouldRenderAnnotationSelection({ hoveredId: null, selectedId: null }, { hoveredId: "h", selectedId: null }, false, false), false);
 
-console.log("41 preload annotation runtime assertions passed");
+console.log("45 preload annotation runtime assertions passed");

@@ -35,7 +35,9 @@ topology marker、变更路径归一化、Git 内部路径过滤、working-tree 
 state initialization、change emission deduplication、操作标记路径表、可选状态合并）
 已抽取为 `src/main/worker/git-watch-paths.ts`，并新增 metadata refresh 路径筛选
 策略 `selectGitMetadataRefreshPaths`，由 45 项行为断言覆盖；异步 watcher/session
-生命周期仍在继续拆分。
+生命周期仍在继续拆分。本轮新增 `getGitWorkingTreeWatchRefreshAction`，覆盖
+ignore policy 刷新后的 skip/apply/restart 纯决策，回归断言增至 51 项；异步
+dispose/restart 与 session timer 副作用仍保留在入口。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload 的 WebMCP registry shim 已抽取为
@@ -43,8 +45,9 @@ preload 的 WebMCP registry shim 已抽取为
 窗口外观策略已抽取为 `src/main/main-app/window-appearance.ts`，并包含 traffic-light
 geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation surface
 协议 schema 已抽取为 `src/main/browser-page-preload/annotation-protocol.ts`，由 6 项
-行为断言覆盖；annotation hit payload 安全清洗与 surface 元素安全边界已抽取为
-`src/main/browser-page-preload/annotation-runtime.ts`，由 41 项行为断言覆盖。
+行为断言覆盖；annotation hit payload 安全清洗、surface 元素安全边界与 selection
+渲染策略已抽取为 `src/main/browser-page-preload/annotation-runtime.ts`，由 45 项
+行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
