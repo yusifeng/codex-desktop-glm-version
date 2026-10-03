@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { cloneRecord, sanitizeAnnotationHit } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { cloneRecord, createAnnotationResponseDetail, sanitizeAnnotationHit } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -12,5 +12,7 @@ assert.equal(sanitizeAnnotationHit({ id: "" }, limits), undefined);
 assert.equal(sanitizeAnnotationHit({ id: "hit-1", rect: { x: 0, y: 0, width: 0, height: 1 } }, limits), undefined);
 assert.equal(sanitizeAnnotationHit(null, limits), null);
 assert.equal(sanitizeAnnotationHit({ id: "hit-1", metadata: { "bad key!": true } }, limits).metadata, undefined);
+assert.deepEqual(createAnnotationResponseDetail({ type: "result", registrationId: "surface-1", customRendering: true, requestId: "request-1", hit: { id: "hit-1" } }), { type: "result", registrationId: "surface-1", customRendering: true, requestId: "request-1", hit: { id: "hit-1" } });
+assert.equal(JSON.stringify(createAnnotationResponseDetail({ type: "disposed", registrationId: "surface-1", customRendering: false })), '{"type":"disposed","registrationId":"surface-1","customRendering":false}');
 
-console.log("6 preload annotation runtime assertions passed");
+console.log("8 preload annotation runtime assertions passed");

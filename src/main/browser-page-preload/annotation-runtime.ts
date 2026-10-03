@@ -39,5 +39,15 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
   }
 }
 
-export { cloneRecord, sanitizeAnnotationHit };
-if (typeof module !== `undefined`) module.exports = { cloneRecord, sanitizeAnnotationHit };
+function createAnnotationResponseDetail(input: { type: string; registrationId: string; customRendering: boolean; requestId?: string; hit?: Record<string, unknown> | null }): Record<string, unknown> {
+  return {
+    type: input.type,
+    registrationId: input.registrationId,
+    customRendering: input.customRendering,
+    requestId: input.requestId,
+    hit: input.hit,
+  };
+}
+
+export { cloneRecord, createAnnotationResponseDetail, sanitizeAnnotationHit };
+if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationResponseDetail, sanitizeAnnotationHit };

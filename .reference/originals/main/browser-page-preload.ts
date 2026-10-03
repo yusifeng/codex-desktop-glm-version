@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { sanitizeAnnotationHit } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationResponseDetail, sanitizeAnnotationHit } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6760,13 +6760,13 @@ function Qd(e, t) {
       n.options.element.dispatchEvent(
         new CustomEvent(e.responseEvent, {
           bubbles: !0,
-          detail: JSON.stringify({
+          detail: JSON.stringify(createAnnotationResponseDetail({
             type: r,
             registrationId: n.id,
             customRendering: n.options.renderSelection != null && !n.renderFailed,
             requestId: i,
             hit: a,
-          }),
+          })),
         }),
       ));
   }
