@@ -7,6 +7,12 @@ type ReadHandlerDependencies = {
   getOwnerThreadId: (repository: any) => Promise<string | null | undefined>;
   getDefaultRemoteBranch: (repository: any) => Promise<string | null | undefined>;
   getMergeBase: (repository: any, baseBranch: string) => Promise<string | null>;
+  getCurrentBranch: (root: string, host: any) => Promise<unknown>;
+  getCurrentBranchSnapshot: (repository: any, signal: AbortSignal) => Promise<unknown>;
+  getUpstreamBranch: (root: string, args: { host: any; signal: AbortSignal }) => Promise<unknown>;
+  getBranchAheadCount: (root: string, args: { host: any; signal: AbortSignal }) => Promise<unknown>;
+  getDefaultBranch: (root: string, host: any, signal: AbortSignal) => Promise<unknown>;
+  getBaseBranch: (root: string, host: any) => Promise<unknown>;
 };
 
 async function resolveOriginUrl(cwd: string, deps: ReadHandlerDependencies) {
@@ -38,5 +44,30 @@ async function resolveMergeBase(cwd: string, baseBranch: string | null | undefin
   return { mergeBaseSha: repository == null || !baseBranch ? null : await deps.getMergeBase(repository, baseBranch) };
 }
 
-export { resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveWorktreeOwner };
-if (typeof module !== `undefined`) module.exports = { resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveWorktreeOwner };
+async function resolveCurrentBranch(root: string, deps: ReadHandlerDependencies) {
+  return deps.getCurrentBranch(root, deps.host);
+}
+
+async function resolveCurrentBranchSnapshot(root: string, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  const repository = deps.gitManager.getWorktreeRepositoryForRoot(root, deps.host);
+  return { branch: await deps.getCurrentBranchSnapshot(repository, signal) };
+}
+
+async function resolveUpstreamBranch(root: string, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  return deps.getUpstreamBranch(root, { host: deps.host, signal });
+}
+
+async function resolveBranchAheadCount(root: string, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  return deps.getBranchAheadCount(root, { host: deps.host, signal });
+}
+
+async function resolveDefaultBranch(root: string, signal: AbortSignal, deps: ReadHandlerDependencies) {
+  return deps.getDefaultBranch(root, deps.host, signal);
+}
+
+async function resolveBaseBranch(root: string, deps: ReadHandlerDependencies) {
+  return deps.getBaseBranch(root, deps.host);
+}
+
+export { resolveBaseBranch, resolveBranchAheadCount, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
+if (typeof module !== `undefined`) module.exports = { resolveBaseBranch, resolveBranchAheadCount, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeOwner };
