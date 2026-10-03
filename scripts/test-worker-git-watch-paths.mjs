@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const {
   combineOptionalBooleans,
+  createGitOperationMarkerPaths,
   createGitRepoChangedEvent,
   createGitOperationState,
   createGitWatchTarget,
@@ -75,6 +76,14 @@ assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(["head"]), new M
 assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(), new Map([["head", 1]])), false);
 assert.deepEqual(createGitOperationState({ cherryPickInProgress: false, mergeInProgress: null, rebaseHead: false, rebaseMerge: false, rebaseApply: false, revertInProgress: true }), { cherryPickInProgress: false, mergeInProgress: null, rebaseInProgress: false, revertInProgress: true });
 assert.equal(createGitOperationState({ cherryPickInProgress: null, mergeInProgress: null, rebaseHead: false, rebaseMerge: null, rebaseApply: false, revertInProgress: null }).rebaseInProgress, null);
+assert.deepEqual(createGitOperationMarkerPaths(pathApi, "/repo/.git"), [
+  "/repo/.git/CHERRY_PICK_HEAD",
+  "/repo/.git/MERGE_HEAD",
+  "/repo/.git/REBASE_HEAD",
+  "/repo/.git/rebase-merge",
+  "/repo/.git/rebase-apply",
+  "/repo/.git/REVERT_HEAD",
+]);
 const handler = { changeType: "head", shouldHandleChangedPath: () => true };
 const target = createGitWatchTarget({ watchPath: "/repo/.git/HEAD", recursive: false, handler, metadataDirectory: null, retryDelayMs: 1000 });
 assert.equal(target.generation, 0);
@@ -82,4 +91,4 @@ assert.deepEqual(target.handlers, [handler]);
 assert.equal(target.retryDelayMs, 1000);
 assert.equal(target.session, null);
 
-console.log("41 worker git watch path assertions passed");
+console.log("42 worker git watch path assertions passed");

@@ -119,3 +119,10 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
 本报告只做审计和边界确定，不宣称 T1 语义化已完成。下一步应以第一个
 `xDe`/入口协议闭环为基线，迁移后运行 `verify-chunks`、`typecheck`，再根据
 新增 import 运行 `audit-shared-consumption`。
+### 增量抽取：Git operation marker paths
+
+`GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
+已迁移到 `src/main/worker/git-watch-paths.ts` 的
+`createGitOperationMarkerPaths`，入口保留异步读取和状态映射。该边界覆盖
+`CHERRY_PICK_HEAD`、`MERGE_HEAD`、`REBASE_HEAD`、`rebase-merge`、
+`rebase-apply`、`REVERT_HEAD`，由 worker git watch path 回归脚本断言。

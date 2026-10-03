@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77347,14 +77347,7 @@ var Jye = 1e3,
           rebaseInProgress: null,
           revertInProgress: null,
         };
-      let [n, r, i, a, o, s] = await Promise.all([
-        this.gitPathExists(e.join(t, `CHERRY_PICK_HEAD`)),
-        this.gitPathExists(e.join(t, `MERGE_HEAD`)),
-        this.gitPathExists(e.join(t, `REBASE_HEAD`)),
-        this.gitPathExists(e.join(t, `rebase-merge`)),
-        this.gitPathExists(e.join(t, `rebase-apply`)),
-        this.gitPathExists(e.join(t, `REVERT_HEAD`)),
-      ]);
+      let [n, r, i, a, o, s] = await Promise.all(createGitOperationMarkerPaths(e, t).map((e) => this.gitPathExists(e)));
       return createGitOperationState({ cherryPickInProgress: n, mergeInProgress: r, rebaseHead: i, rebaseMerge: a, rebaseApply: o, revertInProgress: s });
     }
     async gitPathExists(e) {
