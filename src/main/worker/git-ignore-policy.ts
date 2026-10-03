@@ -1,11 +1,12 @@
+type TimerHandle = ReturnType<typeof setTimeout> | number;
 type GitIgnorePolicyOptions = {
   readIgnoredDirectories: () => Promise<string[]>;
   refresh: () => Promise<unknown>;
   onRequiresRecoveryChanged: () => void;
   initialRetryDelayMs?: number;
   recoveryRetryDelayMs?: number;
-  setTimeoutFn?: (callback: () => void, delayMs: number) => ReturnType<typeof setTimeout>;
-  clearTimeoutFn?: (timer: ReturnType<typeof setTimeout>) => void;
+  setTimeoutFn?: (callback: () => void, delayMs: number) => TimerHandle;
+  clearTimeoutFn?: (timer: TimerHandle) => void;
 };
 type Snapshot = { generation: number; directories: string[] };
 
@@ -17,7 +18,7 @@ class GitIgnorePolicy {
   private refreshPromise: Promise<unknown> | null = null;
   private refreshRequested = false;
   private reconciliationRequested = false;
-  private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  private refreshTimer: TimerHandle | null = null;
   private failed = false;
   private disposed = false;
 
