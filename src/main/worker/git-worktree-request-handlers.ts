@@ -20,6 +20,9 @@ type WorktreeRequestDependencies = {
   moveToHostWorktree: (params: any, options: any) => Promise<any>;
   createExecutionHost: (config: any) => any;
   cleanupHostTransfer: (rolloutPath: string, host: any) => Promise<void>;
+  upstreamRefreshControllers: Map<any, AbortController>;
+  listCodexWorktrees: (gitManager: any, host: any, worktreesRoot: string) => Promise<any>;
+  listWorktrees: (cwd: string, host: any, signal: AbortSignal) => Promise<any>;
 };
 
 type HandoffDirection = `to-local` | `to-worktree` | `to-host-worktree`;
@@ -79,6 +82,31 @@ async function deleteWorktree(params: any, deps: WorktreeRequestDependencies) {
   return { success: true, worktreeId };
 }
 
+function cancelWorktreeUpstreamRefresh(params: any, deps: WorktreeRequestDependencies) {
+  const controller = deps.upstreamRefreshControllers.get(params.pendingWorktreeId);
+  controller?.abort();
+  return { success: controller != null };
+}
+
+async function resolveCodexWorktrees(params: any, deps: WorktreeRequestDependencies) {
+  return {
+    worktrees: await deps.listCodexWorktrees(deps.gitManager, deps.host, params.worktreesRoot),
+  };
+}
+
+async function resolveWorktrees(params: any, deps: WorktreeRequestDependencies) {
+  return deps.listWorktrees(params.cwd, deps.host, deps.signal);
+}
+
+async function setWorktreeOwnerThread(params: any, deps: WorktreeRequestDependencies) {
+  await deps.setOwnerThread(
+    deps.gitManager.getWorktreeRepositoryForRoot(params.worktree, deps.host),
+    params.conversationId,
+    deps.signal,
+  );
+  return { success: true };
+}
+
 async function moveThreadToLocal(
   params: any,
   requestId: string | number,
@@ -136,20 +164,28 @@ async function cleanupHostHandoffTransfer(params: any, deps: WorktreeRequestDepe
 }
 
 export {
+  cancelWorktreeUpstreamRefresh,
   cleanupHostHandoffTransfer,
   createHandoffProgressReporter,
   deleteWorktree,
   moveThreadToHostWorktree,
   moveThreadToLocal,
   moveThreadToWorktree,
+  resolveCodexWorktrees,
+  resolveWorktrees,
   restoreWorktree,
+  setWorktreeOwnerThread,
 };
 if (typeof module !== `undefined`) module.exports = {
+  cancelWorktreeUpstreamRefresh,
   cleanupHostHandoffTransfer,
   createHandoffProgressReporter,
   deleteWorktree,
   moveThreadToHostWorktree,
   moveThreadToLocal,
   moveThreadToWorktree,
+  resolveCodexWorktrees,
+  resolveWorktrees,
   restoreWorktree,
+  setWorktreeOwnerThread,
 };

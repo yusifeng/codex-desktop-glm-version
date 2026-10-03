@@ -94,9 +94,9 @@ Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-quer
 releaseWatch `finally` 已迁移至 `src/main/worker/git-watch-request-handlers.ts`，由 25 项行为断言覆盖。
 Git apply changes/patch/review-section 三类 mutation 的参数注入、partial apply 判定与 refresh-root
 规则已迁移至 `src/main/worker/git-apply-request-handlers.ts`，由 11 项行为断言覆盖。
-Worktree restore/delete 和三类 thread handoff 请求编排已迁移至
+Worktree cancel/list/owner/restore/delete 和三类 thread handoff 请求编排已迁移至
 `src/main/worker/git-worktree-request-handlers.ts`；owner 写入容错、progress event、跨 host cache
-失效与 transfer cleanup 由 35 项行为断言覆盖，底层 move/snapshot 算法继续分批迁移。
+失效与 transfer cleanup 由 45 项行为断言覆盖，底层 move/snapshot 算法继续分批迁移。
 Host handoff transfer 的临时目录、跨 host 文件复制与 cleanup 路径安全边界已迁移至
 `src/main/worker/git-handoff-transfer.ts`；原三个压缩实现已删除，由 19 项 POSIX/Windows
 路径与传输断言覆盖。

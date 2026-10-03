@@ -3,13 +3,17 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const {
+  cancelWorktreeUpstreamRefresh,
   cleanupHostHandoffTransfer,
   createHandoffProgressReporter,
   deleteWorktree,
   moveThreadToHostWorktree,
   moveThreadToLocal,
   moveThreadToWorktree,
+  resolveCodexWorktrees,
+  resolveWorktrees,
   restoreWorktree,
+  setWorktreeOwnerThread,
 } = require("../app/.vite/build/worker/git-worktree-request-handlers.js");
 
 const calls = [];
@@ -20,6 +24,7 @@ let restoreResult = true;
 let moveResult = { status: "success" };
 let ownerError = null;
 let hostMoveError = null;
+const refreshController = new AbortController();
 const gitManager = {
   getWorktreeRepositoryForRoot(root, targetHost) {
     calls.push(["repository", root, targetHost]);
@@ -70,6 +75,15 @@ const deps = {
     return destinationHost;
   },
   cleanupHostTransfer: async (...args) => calls.push(["cleanup", ...args]),
+  upstreamRefreshControllers: new Map([["pending", refreshController]]),
+  listCodexWorktrees: async (...args) => {
+    calls.push(["codex-worktrees", ...args]);
+    return ["codex-worktree"];
+  },
+  listWorktrees: async (...args) => {
+    calls.push(["list-worktrees", ...args]);
+    return ["worktree"];
+  },
 };
 
 const progressEvents = [];
@@ -186,4 +200,38 @@ assert.deepEqual(await cleanupHostHandoffTransfer({ rolloutPath: "/tmp/rollout" 
 });
 assert.deepEqual(calls, [["cleanup", "/tmp/rollout", host]]);
 
-console.log("35 worker git worktree request handler assertions passed");
+assert.deepEqual(
+  cancelWorktreeUpstreamRefresh({ pendingWorktreeId: "missing" }, deps),
+  { success: false },
+);
+assert.equal(refreshController.signal.aborted, false);
+assert.deepEqual(
+  cancelWorktreeUpstreamRefresh({ pendingWorktreeId: "pending" }, deps),
+  { success: true },
+);
+assert.equal(refreshController.signal.aborted, true);
+
+calls.length = 0;
+assert.deepEqual(await resolveCodexWorktrees({ worktreesRoot: "/managed" }, deps), {
+  worktrees: ["codex-worktree"],
+});
+assert.deepEqual(calls, [["codex-worktrees", gitManager, host, "/managed"]]);
+
+calls.length = 0;
+assert.deepEqual(await resolveWorktrees({ cwd: "/repo" }, deps), ["worktree"]);
+assert.deepEqual(calls, [["list-worktrees", "/repo", host, signal]]);
+
+calls.length = 0;
+assert.deepEqual(
+  await setWorktreeOwnerThread(
+    { worktree: "/repo/worktree", conversationId: "thread-2" },
+    deps,
+  ),
+  { success: true },
+);
+assert.deepEqual(calls, [
+  ["repository", "/repo/worktree", host],
+  ["set-owner", { root: "/repo/worktree", host }, "thread-2", signal],
+]);
+
+console.log("45 worker git worktree request handler assertions passed");

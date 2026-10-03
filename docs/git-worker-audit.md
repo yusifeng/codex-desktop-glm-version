@@ -140,10 +140,10 @@ Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-quer
 成功判定及 refresh-root 规则已迁移至 `src/main/worker/git-apply-request-handlers.ts`；dispatcher
 继续持有 envelope 与 finally cache/live-query refresh，由 11 项断言覆盖。
 
-Worktree restore/delete 与 thread handoff 请求编排已迁移至
-`src/main/worker/git-worktree-request-handlers.ts`：restore 后 owner 写入的容错、delete 后 unwatch、
-三种 handoff progress event、跨 host destination cache 的 `finally` 失效和 transfer cleanup 均由
-该模块持有；底层 snapshot/move 算法继续通过窄依赖注入。35 项断言覆盖成功、容错和异常路径。
+Worktree 请求层已迁移至 `src/main/worker/git-worktree-request-handlers.ts`：upstream refresh 取消、
+Codex/普通 worktree 列表、owner 设置、restore 后 owner 写入容错、delete 后 unwatch、三种 handoff
+progress event、跨 host destination cache 的 `finally` 失效和 transfer cleanup 均由该模块持有；
+底层 snapshot/move 算法继续通过窄依赖注入。45 项断言覆盖成功、容错和异常路径。
 
 Host handoff transfer 的临时目录定位、同 host 免复制/跨 host 文件复制和 cleanup 路径安全边界
 已迁移至 `src/main/worker/git-handoff-transfer.ts`；原 `J3/Z3/Fve` 实现已删除。cleanup 只允许

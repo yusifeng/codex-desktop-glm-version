@@ -8,7 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
-const { cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, restoreWorktree } = require("./worker/git-worktree-request-handlers");
+const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
@@ -77186,6 +77186,9 @@ var I6 = kW(`git`),
           moveToHostWorktree: Pve,
           createExecutionHost: (config) => this.dependencies.createExecutionHost(config),
           cleanupHostTransfer: cleanupHostHandoffTransferFiles,
+          upstreamRefreshControllers: this.worktreeUpstreamRefreshAbortControllers,
+          listCodexWorktrees: K_e,
+          listWorktrees: (cwd, host, signal) => this.getWorktrees(cwd, host, signal),
         },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
@@ -77474,19 +77477,18 @@ var I6 = kW(`git`),
             p = await this.handleCreateWorktree(e.params, { host: o, signal: i.signal });
             break;
           case `cancel-worktree-upstream-refresh`: {
-            let t = this.worktreeUpstreamRefreshAbortControllers.get(e.params.pendingWorktreeId);
-            (t?.abort(), (p = X({ success: t != null })));
+            p = X(cancelWorktreeUpstreamRefresh(e.params, worktreeRequestDeps));
             break;
           }
           case `codex-worktrees`:
             try {
-              p = X({ worktrees: await K_e(this.gitManager, o, e.params.worktreesRoot) });
+              p = X(await resolveCodexWorktrees(e.params, worktreeRequestDeps));
             } catch (e) {
               p = EV(e instanceof Error ? e.message : String(e));
             }
             break;
           case `list-worktrees`:
-            p = X(await this.getWorktrees(e.params.cwd, o, i.signal));
+            p = X(await resolveWorktrees(e.params, worktreeRequestDeps));
             break;
           case `resolve-worktree-for-thread`:
             p = X(await resolveWorktreeForThread(e.params, {
@@ -77523,12 +77525,7 @@ var I6 = kW(`git`),
           }
           case `set-worktree-owner-thread`:
             try {
-              (await m4(
-                this.gitManager.getWorktreeRepositoryForRoot(e.params.worktree, o),
-                e.params.conversationId,
-                i.signal,
-              ),
-                (p = X({ success: !0 })));
+              p = X(await updateWorktreeOwnerRequest(e.params, worktreeRequestDeps));
             } catch {
               p = EV(`Failed to set thread worktree owner`);
             }
