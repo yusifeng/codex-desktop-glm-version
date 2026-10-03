@@ -75,6 +75,8 @@ Git push 的 remote 选择、参数组装、porcelain 错误分类、exec output
 Git checkout 的 local/remote/detached ref 解析、stash/rollback、冲突路径分类、cache invalidation
 与成功 refresh root 已完整迁移至 `src/main/worker/git-checkout-request-handler.ts`，原五个压缩
 函数实现已删除（`t4` 保留薄兼容适配器），由 16 项行为断言覆盖。
+Git commit 的 repository/staging、message attribution、nothing-to-commit、commit SHA 与 refresh-root
+时序已迁移至 `src/main/worker/git-commit-request-handler.ts`，由 18 项行为断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为

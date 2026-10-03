@@ -9,6 +9,7 @@ const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
+const { commitGitChanges } = require("./worker/git-commit-request-handler");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { pushGitRepository } = require("./worker/git-push-request-handler");
@@ -77387,6 +77388,19 @@ var I6 = kW(`git`),
           runGit: (cwd, args, host, options) => $(cwd, args, host, options),
           formatExecOutput: mR,
         },
+        gitCommitRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          environment: process.env,
+          invalidateUntrackedPathsCache: p2,
+          getUntrackedPaths: f2,
+          stageWorktree: v4,
+          runGit: (root, args, host, options) => $(root, args, host, options),
+          formatCommitMessage: F_e,
+          formatCommitAttribution: N_e,
+          formatExecOutput: mR,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77971,65 +77985,8 @@ var I6 = kW(`git`),
             break;
           }
           case `commit`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            t != null && p2(t);
-            let n = t?.root ?? String(e.params.cwd);
-            if (e.params.includeUnstaged) {
-              let r = t
-                ? await v4({
-                    gitRoot: t.root,
-                    env: o.isLocal ? process.env : {},
-                    signal: i.signal,
-                    host: o,
-                    untrackedPathsPromise: f2(t),
-                  })
-                : await $(n, [`add`, `-A`], o, { signal: i.signal });
-              if (!r.success) {
-                let e = r.stderr || r.stdout || `Failed to stage changes`;
-                p = X({
-                  status: `error`,
-                  error: e,
-                  execOutput: mR({
-                    command: r.command,
-                    stdout: r.stdout,
-                    stderr: r.stderr,
-                    fallbackOutput: e,
-                  }),
-                });
-                break;
-              }
-              d = e.params.cwd;
-            }
-            let r = await $(
-              n,
-              [`commit`, `-m`, F_e(e.params.message, N_e(e.params.commitAttribution))],
-              o,
-              { signal: i.signal },
-            );
-            if (!r.success) {
-              let e = r.stderr || r.stdout || `Failed to commit changes`;
-              p = X({
-                status: `error`,
-                error: e,
-                errorType: (
-                  await $(n, [`diff`, `--cached`, `--quiet`, `--exit-code`], o, {
-                    signal: i.signal,
-                  })
-                ).success
-                  ? `nothing-to-commit`
-                  : void 0,
-                execOutput: mR({
-                  command: r.command,
-                  stdout: r.stdout,
-                  stderr: r.stderr,
-                  fallbackOutput: e,
-                }),
-              });
-              break;
-            }
-            let a = await $(n, [`rev-parse`, `HEAD`], o, { signal: i.signal }),
-              s = a.success ? a.stdout : null;
-            ((d = e.params.cwd), (p = X({ status: `success`, commitSha: s })));
+            let t = await commitGitChanges(e.params, gitCommitRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
         }
