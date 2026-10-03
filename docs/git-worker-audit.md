@@ -22,8 +22,9 @@ Git 命令统计初始化、变更请求来源判定、host cache key 和 exit-c
 `worker/git-observability.ts`，原 `z1`/`gpe`/`B1`/`ype` 别名接回；行为由
 `scripts/test-worker-git-observability.mjs` 覆盖。
 
-Git query key、host id、路径归一化、UTF-8 字节长度、query host 匹配和 watched
-path overlap（原入口约 65,338-65,439）已迁至 `worker/git-query-utils.ts`，由
+Git query key、host id、路径归一化、UTF-8 字节长度、query host 匹配、watched
+path overlap、可缓存命令判定和 fsmonitor cache key（原入口约 65,338-65,439、
+65,616-66,080）已迁至 `worker/git-query-utils.ts`，由
 `scripts/test-worker-git-query-utils.mjs` 覆盖。
 
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker

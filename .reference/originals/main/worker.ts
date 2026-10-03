@@ -10,7 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest } = require("./worker/git-observability");
-const { gitQueryKey, hostId, matchesGitQuery, normalizeGitPath, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
+const { fsmonitorCacheKey, gitQueryKey, hostId, isCacheableGitCommand, matchesGitQuery, normalizeGitPath, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -66014,6 +66014,8 @@ async function $(e, t, n, r = {}) {
   }
 }
 function Spe(e) {
+  return isCacheableGitCommand(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e[0]) {
     case `check-ignore`:
     case `for-each-ref`:
@@ -66070,6 +66072,8 @@ async function Cpe(e, t, n, r, i, a = !1, o) {
   return d;
 }
 function e0(e, t, n) {
+  return fsmonitorCacheKey(e, t, n);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return JSON.stringify([
     t.id,
     e,
