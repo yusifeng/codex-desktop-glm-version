@@ -26713,11 +26713,16 @@ var Cb = null,
   Mb = !1,
   Nb = !1,
   Pb = !1,
-  Fb = null,
   Ib = null,
   Lb = null,
   Rb = null,
   zb = null;
+var { createAnnotationPermissionController } = require("./browser-page-preload/annotation-permission-controller"),
+  annotationPermissionController = createAnnotationPermissionController({
+    isPermissionGranted: () => Pb,
+    createRequestId: () => crypto.randomUUID(),
+    invokeHost: (e) => d.ipcRenderer.invoke(Bd, e),
+  });
 function Bb() {
   if ((d.ipcRenderer.on(zd, Wb), globalThis.isSecureContext === !0 && window === window.top)) {
     let e = d.ipcRenderer.sendSync(Hd);
@@ -26733,7 +26738,7 @@ function Bb() {
       e.enabled &&
         ((zb = Cf()),
         (Ib = Ed({
-          requestPermission: Gb,
+          requestPermission: annotationPermissionController.requestPermission,
           getState: () => ({
             canUseSiteAnnotationApi: Tb.canUseSiteAnnotationApi === !0,
             canUseTweaks: Tb.canUseTweaks === !0,
@@ -26768,7 +26773,7 @@ function Bb() {
     : Hb(),
     window.addEventListener(`pagehide`, (e) => {
       (Yb(null),
-        e.isTrusted && (Fb?.resolve(!1), (Fb = null)),
+        e.isTrusted && annotationPermissionController.reset(),
         e.isTrusted &&
           !e.persisted &&
           ((Mb = !0),
@@ -26781,8 +26786,7 @@ function Bb() {
     }));
 }
 function Vb() {
-  (Fb?.resolve(!1),
-    (Fb = null),
+  (annotationPermissionController.reset(),
     (Pb = !1),
     Yb(null),
     (Ab = !1),
@@ -26872,7 +26876,7 @@ function Ub() {
 function Wb(e, t) {
   switch (t.type) {
     case `browser-sidebar-runtime-annotation-permission-result`:
-      Fb?.requestId === t.requestId && (Fb.resolve(t.allowed), (Fb = null));
+      annotationPermissionController.handleResult(t.requestId, t.allowed);
       return;
     case `browser-site-annotation-feature-preview`:
       Yb(Tb.canUseSiteAnnotationApi && !Tb.isAgentControllingBrowser ? t.preview : null);
@@ -26901,23 +26905,6 @@ function Wb(e, t) {
     case `browser-sidebar-runtime-clear-comment-screenshot`:
       return;
   }
-}
-function Gb() {
-  if (Pb) return !0;
-  if (Fb != null) return Fb.promise;
-  let e = { ...Promise.withResolvers(), requestId: crypto.randomUUID() };
-  return (
-    (Fb = e),
-    d.ipcRenderer
-      .invoke(Bd, {
-        type: `browser-sidebar-runtime-request-annotation-permission`,
-        requestId: e.requestId,
-      })
-      .catch(() => {
-        Fb === e && ((Fb = null), e.resolve(!1));
-      }),
-    e.promise
-  );
 }
 function Kb(e) {
   Ob = reducePendingEditorMessage(Ob, e);

@@ -128,6 +128,8 @@ document/shadow-root 扫描、动态 frame、load 恢复、overlay 排除和 dis
 浏览器图片拖拽与鼠标前进/后退输入桥已迁移至
 `src/main/browser-page-preload/browser-input-bridge.ts`，由 22 项行为断言覆盖 trusted-event、
 capture phase、图片来源优先级、active drag 状态与宿主消息协议。
+annotation permission 的请求去重、request-id 配对、invoke 失败与 reset 生命周期已迁移至
+`src/main/browser-page-preload/annotation-permission-controller.ts`，由 14 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
