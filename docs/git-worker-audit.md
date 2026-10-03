@@ -464,6 +464,13 @@ Git index info 的 git-dir 定位、index mtime 读取以及 ENOENT/其他读取
 并行 ahead comparison 和输入顺序稳定的最短距离选择已迁移至
 `src/main/worker/git-nearest-ancestor-branch.ts`。原 `eve`/`tve`/`nve`/`rve` 已删除，
 repository read 与 request dispatcher 分别注入窄依赖，两模块各由 10 项断言覆盖。
+
+### 增量抽取：Recent branches query
+
+Recent branches 的固定 100 条 local-ref 查询、250ms short-lived cache、watch-scoped live cache、
+失败/取消降级以及 generation 变化后的旧 key 清理已迁移至
+`src/main/worker/git-recent-branches.ts`。原 `j3`/`M3`/`N3` 已删除，default branch 回退、
+普通请求和 live-query 三处消费者均注入现有 query/runGit 能力，由 26 项断言覆盖。
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

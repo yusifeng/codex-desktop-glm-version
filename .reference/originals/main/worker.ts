@@ -28,6 +28,7 @@ const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/
 const { getGitCloneState } = require("./worker/git-clone-state");
 const { getGitIndexInfo } = require("./worker/git-index-info");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
+const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
@@ -82,6 +83,14 @@ const gitIndexInfoDeps = {
   logger: { error: (message, detail) => kW(`git`)().error(message, detail) },
 };
 const gitNearestAncestorDeps = { compareAhead: (...args) => A0(...args) };
+const gitRecentBranchesDeps = {
+  fetchQueryWithSignal: (...args) => w1(...args),
+  getLiveQueryMeta: () => ipe,
+  getShortLivedQueryMeta: () => v1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
 const gitReviewComparisonDeps = {
   findMergeBase: (...args) => X2(...args),
   getDefaultBranch: (...args) => k2(...args),
@@ -70769,56 +70778,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-var j3 = 100,
-  M3 = class extends Error {};
-async function N3(e, t, n, { live: r = !1 } = {}) {
-  let i = Math.max(1, Math.min(t, j3)),
-    a = e.watchScopedGitReadGeneration,
-    o = Q(e.root, e.host, `recent-branches`, r ? `live` : `short-lived`, ...(r ? [String(a)] : []));
-  try {
-    return (
-      await w1(
-        e.queryClient,
-        {
-          queryKey: o,
-          gcTime: r ? void 0 : 250,
-          meta: r ? ipe : v1,
-          queryFn: async (t) => {
-            let { success: n, stdout: r } = await $(
-              e.root,
-              [
-                `for-each-ref`,
-                `--count=${j3}`,
-                `--sort=-committerdate`,
-                `refs/heads`,
-                `--format=%(refname:short)`,
-              ],
-              e.host,
-              { signal: t },
-            );
-            if (!n) throw new M3();
-            return r
-              .split(
-                `
-`,
-              )
-              .map((e) => e.trim())
-              .filter((e) => e.length > 0);
-          },
-          staleTime: r ? g1 : 250,
-        },
-        n,
-      )
-    ).slice(0, i);
-  } catch (e) {
-    if (e instanceof M3 || n?.aborted) return [];
-    throw e;
-  } finally {
-    r &&
-      a !== e.watchScopedGitReadGeneration &&
-      e.queryClient.removeQueries({ queryKey: o, exact: !0 });
-  }
-}
 var ive = 5e3;
 async function P3(e, { isRepoWatched: t = !1, signal: n } = {}) {
   let { host: r } = e,
@@ -73043,7 +73002,9 @@ var I6 = kW(`git`),
         a = (await k2(i))?.branch ?? null;
       return (
         (a ||=
-          (await N3(i, 10, n, { live: r })).find((e) => e === `main` || e === `master`) ?? null),
+          (await getGitRecentBranches(i, 10, n, { live: r }, gitRecentBranchesDeps)).find(
+            (e) => e === `main` || e === `master`,
+          ) ?? null),
         { branch: a }
       );
     }
@@ -73062,7 +73023,13 @@ var I6 = kW(`git`),
     async handleRecentBranches(e, { host: t, signal: n }) {
       let r = Math.max(1, Math.min(e.limit ?? 10, 100));
       return X({
-        branches: await N3(this.gitManager.getWorktreeRepositoryForRoot(e.root, t), r, n),
+        branches: await getGitRecentBranches(
+          this.gitManager.getWorktreeRepositoryForRoot(e.root, t),
+          r,
+          n,
+          {},
+          gitRecentBranchesDeps,
+        ),
       });
     }
     async handleSearchBranches(e, { host: t, signal: n }) {
@@ -73379,7 +73346,13 @@ var I6 = kW(`git`),
           return {
             method: `recent-branches`,
             result: {
-              branches: await N3(a, i, r, { live: o != null && !o.watcher.requiresRecovery }),
+              branches: await getGitRecentBranches(
+                a,
+                i,
+                r,
+                { live: o != null && !o.watcher.requiresRecovery },
+                gitRecentBranchesDeps,
+              ),
             },
           };
         }
