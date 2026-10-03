@@ -28,7 +28,9 @@ deployment channel/policy 配置已抽取为 `src/main/browser-page-preload/depl
 query key、host id、路径归一化和 UTF-8 字节长度已抽取为
 `src/main/worker/git-query-utils.ts`，由 5 项行为断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
-`src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖。
+`src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
+preload 的 WebMCP registry shim 已抽取为
+`src/main/browser-page-preload/webmcp-registry.ts`，由 7 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

@@ -27189,6 +27189,7 @@ var { extensionDistribution: cx } = require("./browser-page-preload/extension-di
 (cx.chrome.dev, cx.chrome.internal, cx.chrome.prod, cx.edge.dev, cx.edge.internal, cx.edge.prod);
 var lx = { type: `webmcp_changed`, version: 1 },
   ux = /^[A-Za-z0-9_.-]{1,128}$/;
+var { createWebMcpRegistry: dx } = require("./browser-page-preload/webmcp-registry");
 function dx({ locationLike: e = location, onToolsChanged: t } = {}) {
   let n = new Map(),
     r = crypto.getRandomValues.bind(crypto),

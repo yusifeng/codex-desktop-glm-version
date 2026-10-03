@@ -18,6 +18,11 @@ Chrome/Edge 扩展发行配置（原 27,187-27,294 行）已迁移至
 配置别名；`scripts/test-preload-extension-distribution.mjs` 覆盖 dev/internal/prod
 分发列表、store 分发类型和输出模式。
 
+WebMCP registry shim（原 27,295-27,470 行）已迁移至
+`src/main/browser-page-preload/webmcp-registry.ts`，原入口的 `dx` 工厂接回该
+模块；注册、枚举、stale registration、AbortSignal、JSON 输入/结果校验由
+`scripts/test-preload-webmcp-registry.mjs` 覆盖。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
