@@ -26693,6 +26693,10 @@ var {
   isAnnotationCommentModeActive,
   resolveAnnotationSyncState,
 } = require("./browser-page-preload/annotation-context-state");
+var {
+  getMountedAnnotationMessageAction,
+  getPreMountAnnotationMessageAction,
+} = require("./browser-page-preload/annotation-host-message-routing");
 var Cb = null,
   wb = null,
   Tb = createInitialAnnotationContextState(Qs),
@@ -26828,29 +26832,10 @@ function Ub() {
       subscribeToHostMessages(e) {
         Eb = !0;
         let t = (t, n) => {
-          switch (n.type) {
-            case `browser-sidebar-runtime-annotation-permission-result`:
-            case `browser-site-annotation-feature-preview`:
-              return;
-            case `browser-sidebar-runtime-sync`:
-              e({ ...n, canUseSiteAnnotationApi: Tb.canUseSiteAnnotationApi });
-              return;
-            case `browser-sidebar-runtime-prepare-comment-screenshot`:
-            case `browser-sidebar-runtime-clear-comment-screenshot`:
-            case `browser-sidebar-runtime-capture-text-selection`:
-            case `browser-sidebar-runtime-select-comment`:
-            case `browser-sidebar-runtime-close-editor`:
-            case `browser-sidebar-runtime-design-scrub-changed`:
-            case `browser-sidebar-runtime-create-comment-at-point`:
-            case `browser-sidebar-runtime-create-comment-from-selection`:
-            case `browser-sidebar-runtime-open-design-editor-at-point`:
-            case `browser-sidebar-runtime-annotation-selection-hover-state`:
-            case `browser-sidebar-runtime-annotation-selection-modifier-state`:
-            case `browser-sidebar-runtime-remove-annotation-selection`:
-            case `browser-sidebar-runtime-restore-editor`:
-              e(n);
-              return;
-          }
+          let r = getMountedAnnotationMessageAction(n.type);
+          r === `sync`
+            ? e({ ...n, canUseSiteAnnotationApi: Tb.canUseSiteAnnotationApi })
+            : r === `forward` && e(n);
         };
         return (
           d.ipcRenderer.on(zd, t),
@@ -26866,35 +26851,24 @@ function Ub() {
   );
 }
 function Wb(e, t) {
-  switch (t.type) {
-    case `browser-sidebar-runtime-annotation-permission-result`:
+  switch (getPreMountAnnotationMessageAction(t.type)) {
+    case `permission-result`:
       annotationPermissionController.handleResult(t.requestId, t.allowed);
       return;
-    case `browser-site-annotation-feature-preview`:
+    case `preview`:
       Yb(Tb.canUseSiteAnnotationApi && !Tb.isAgentControllingBrowser ? t.preview : null);
       return;
-    case `browser-sidebar-runtime-sync`:
+    case `sync`:
       (qb(t), Eb || (Db = { ...t, canUseSiteAnnotationApi: Tb.canUseSiteAnnotationApi }));
       return;
-    case `browser-sidebar-runtime-capture-text-selection`:
+    case `capture-text-selection`:
       Eb || (kb = !0);
       return;
-    case `browser-sidebar-runtime-select-comment`:
-    case `browser-sidebar-runtime-create-comment-at-point`:
-    case `browser-sidebar-runtime-create-comment-from-selection`:
-    case `browser-sidebar-runtime-open-design-editor-at-point`:
-    case `browser-sidebar-runtime-restore-editor`:
+    case `queue-editor-message`:
       (Ib?.clear(), Eb || Kb(t));
       return;
-    case `browser-sidebar-runtime-close-editor`:
+    case `close-editor`:
       ((Nb = !1), Ib?.clear(), Kb(t));
-      return;
-    case `browser-sidebar-runtime-design-scrub-changed`:
-    case `browser-sidebar-runtime-annotation-selection-hover-state`:
-    case `browser-sidebar-runtime-annotation-selection-modifier-state`:
-    case `browser-sidebar-runtime-remove-annotation-selection`:
-    case `browser-sidebar-runtime-prepare-comment-screenshot`:
-    case `browser-sidebar-runtime-clear-comment-screenshot`:
       return;
   }
 }
