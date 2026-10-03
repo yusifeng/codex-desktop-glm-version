@@ -161,8 +161,19 @@ export function createAutomationGuard(threadId: string, owner: { accountId?: str
 }
 export async function getAccessibleApps(connection: { sendAppServerRequest(method: string, params: unknown): Promise<{ apps: Array<{ id: string; callable?: boolean; enabled?: boolean; runtimeName?: string }> }> }) { return (await connection.sendAppServerRequest("app/installed", {})).apps ?? []; }
 export function isEnabledApp(app: { callable?: boolean; enabled?: boolean }): boolean { return app.callable === true && app.enabled === true; }
-export async function getChatGptComposerItems(connection: { getAuthToken?: (options: { refreshToken: boolean }) => Promise<string | null> }, _entrypoint: string): Promise<unknown[]> { if (!(await connection.getAuthToken?.({ refreshToken: false }))) return []; return []; }
-export async function recordComposerItemInteraction(connection: { getAuthToken?: (options: { refreshToken: boolean }) => Promise<string | null> }, item: Record<string, unknown>, interaction: string, entrypoint: string): Promise<void> { if (!(await connection.getAuthToken?.({ refreshToken: false }))) throw Error("ChatGPT authentication is unavailable"); void item; void interaction; void entrypoint; }
+export async function getChatGptComposerItems(connection: { getAuthToken?: (options: { refreshToken: boolean }) => Promise<string | null> }, entrypoint: string): Promise<unknown[]> {
+  const token = await connection.getAuthToken?.({ refreshToken: false }); if (!token) return [];
+  const base = (process.env.CODEX_API_BASE_URL ?? process.env.CODEX_API_ENDPOINT ?? "https://chatgpt.com").replace(/\/$/, "");
+  const response = await fetch(`${base}/composer/items?${new URLSearchParams({ entrypoint, limit: "50" })}`, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } });
+  if (!response.ok) throw Error(`ChatGPT request failed with ${response.status}`);
+  const body = await response.json() as { items?: unknown[] }; return Array.isArray(body.items) ? body.items : [];
+}
+export async function recordComposerItemInteraction(connection: { getAuthToken?: (options: { refreshToken: boolean }) => Promise<string | null> }, item: Record<string, unknown>, interaction: string, entrypoint: string): Promise<void> {
+  const token = await connection.getAuthToken?.({ refreshToken: false }); if (!token) throw Error("ChatGPT authentication is unavailable");
+  const base = (process.env.CODEX_API_BASE_URL ?? process.env.CODEX_API_ENDPOINT ?? "https://chatgpt.com").replace(/\/$/, "");
+  const response = await fetch(`${base}/composer/items/interactions`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ id: item.id, producer: item.producer, item_type: item.item_type, interaction_type: interaction, entrypoint }) });
+  if (!response.ok) throw Error(`ChatGPT request failed with ${response.status}`);
+}
 export function stateDatabasePath(options?: { databaseFileName?: string }): string { const root = process.env.CODEX_HOME ?? process.env.HOME ?? ".codex"; return `${root}/sqlite/${options?.databaseFileName ?? "state_5.sqlite"}`; }
 export async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> { return await Promise.race([promise, new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Operation timed out")), timeoutMs))]); }
 export async function removeRuntimeDirectory(path: string): Promise<void> { const { chmod, rm } = await import("node:fs/promises"); await chmod(path, 0o700).catch(() => undefined); await rm(path, { recursive: true, force: true }); }
