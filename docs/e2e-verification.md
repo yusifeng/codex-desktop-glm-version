@@ -4,8 +4,10 @@
 
 `smoke-test.sh` is the minimum packaged-app check. It builds the current tree,
 launches the isolated Electron profile, verifies the process remains alive for
-the requested duration, and fails on fatal startup signatures (`fatal`, uncaught
-exceptions, segmentation faults, or missing modules).
+the requested duration, asserts the primary window main frame load and the
+app-server initialization handshake, and fails on fatal startup/renderer
+signatures (`fatal`, uncaught exceptions, segmentation faults, missing modules,
+or a crashed renderer).
 
 Run it with:
 

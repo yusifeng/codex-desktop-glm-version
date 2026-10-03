@@ -35,9 +35,38 @@ if ! kill -0 "$PID" 2>/dev/null; then
   exit 1
 fi
 
+wait_for_log() {
+  local pattern="$1"
+  local label="$2"
+  local deadline=$((SECONDS + 15))
+  while (( SECONDS < deadline )); do
+    if grep -q "$pattern" "$LOG"; then
+      return 0
+    fi
+    if ! kill -0 "$PID" 2>/dev/null; then
+      echo "FAIL: 进程在等待${label}时退出。日志尾部："
+      tail -30 "$LOG"
+      exit 1
+    fi
+    sleep 1
+  done
+  echo "FAIL: ${label}超时。日志尾部："
+  tail -30 "$LOG"
+  exit 1
+}
+
 if grep -Eiq 'fatal|uncaught exception|segmentation fault|module not found' "$LOG"; then
   echo "FAIL: 日志包含启动致命错误："
   grep -Ein 'fatal|uncaught exception|segmentation fault|module not found' "$LOG" | tail -20
+  exit 1
+fi
+
+wait_for_log 'window main frame finished load' '主窗口 HTML 主 frame 加载'
+wait_for_log 'initialize_handshake_result' 'app-server 核心 RPC 初始化握手'
+
+if grep -Eiq 'renderer.*(fatal|crash|uncaught)|render-process-gone.*(crashed|killed)' "$LOG"; then
+  echo "FAIL: renderer 出现致命错误："
+  grep -Ein 'renderer.*(fatal|crash|uncaught)|render-process-gone.*(crashed|killed)' "$LOG" | tail -20
   exit 1
 fi
 
