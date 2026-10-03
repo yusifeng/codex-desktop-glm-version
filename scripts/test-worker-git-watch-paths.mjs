@@ -19,6 +19,7 @@ const {
   isWatchedRefPath,
   isWorktreeTopologyPath,
   nextGitWatcherRetryDelay,
+  partitionGitWorktreeWatchPaths,
   shouldScheduleGitRepoChange,
   requiresGitWatcherRecovery,
   selectGitMetadataRefreshPaths,
@@ -135,6 +136,21 @@ assert.deepEqual(selectGitMetadataRefreshPaths(pathApi, "/repo/.git", [
   "/repo/.git/worktrees/feature",
 ]);
 assert.deepEqual(selectGitMetadataRefreshPaths(pathApi, "/repo/.git", ["/repo/.git/worktrees/feature/HEAD"]), []);
+assert.deepEqual(partitionGitWorktreeWatchPaths(
+  ["/repo/.git/worktrees/a", "/repo/.git/worktrees/b"],
+  ["/repo/.git/worktrees/b", "/repo/.git/worktrees/c"],
+), {
+  stalePaths: ["/repo/.git/worktrees/a"],
+  newPaths: ["/repo/.git/worktrees/c"],
+});
+assert.deepEqual(partitionGitWorktreeWatchPaths([], ["/repo/.git/worktrees/a"]), {
+  stalePaths: [],
+  newPaths: ["/repo/.git/worktrees/a"],
+});
+assert.deepEqual(partitionGitWorktreeWatchPaths(["/repo/.git/worktrees/a"], []), {
+  stalePaths: ["/repo/.git/worktrees/a"],
+  newPaths: [],
+});
 const handler = { changeType: "head", shouldHandleChangedPath: () => true };
 const target = createGitWatchTarget({ watchPath: "/repo/.git/HEAD", recursive: false, handler, metadataDirectory: null, retryDelayMs: 1000 });
 assert.equal(target.generation, 0);
@@ -142,4 +158,4 @@ assert.deepEqual(target.handlers, [handler]);
 assert.equal(target.retryDelayMs, 1000);
 assert.equal(target.session, null);
 
-console.log("67 worker git watch path assertions passed");
+console.log("70 worker git watch path assertions passed");
