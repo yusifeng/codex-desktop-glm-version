@@ -28,6 +28,11 @@ Annotation surface channel、feature 列表、role/id/rect/hit/response schemas
 该模块通过入口现有 schema factory 注入，原 `qd/Wd/Jd/Yd/Xd` 绑定接回；
 `scripts/test-preload-annotation-protocol.mjs` 覆盖 channel、限制和 response 类型。
 
+Annotation hit payload 的安全对象克隆、rect/role/id 校验、metadata 限制和序列化
+（原 `Qd` 内部 6,783-6,862 行）已迁移至
+`src/main/browser-page-preload/annotation-runtime.ts`，入口 `re` 通过 helper 接回；
+`scripts/test-preload-annotation-runtime.mjs` 覆盖恶意对象、几何边界和 metadata 过滤。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。

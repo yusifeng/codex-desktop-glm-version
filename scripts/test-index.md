@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 574.
+Total scripts: 575.
 
 - [`test-account-modals-cluster.mjs`](./test-account-modals-cluster.mjs)
 - [`test-account-query-managed-state-cluster.mjs`](./test-account-query-managed-state-cluster.mjs)
@@ -406,6 +406,7 @@ Total scripts: 574.
 - [`test-portable-attachment-thumbnail.mjs`](./test-portable-attachment-thumbnail.mjs)
 - [`test-portable-thumbnail-runtime-cluster.mjs`](./test-portable-thumbnail-runtime-cluster.mjs)
 - [`test-preload-annotation-protocol.mjs`](./test-preload-annotation-protocol.mjs)
+- [`test-preload-annotation-runtime.mjs`](./test-preload-annotation-runtime.mjs)
 - [`test-preload-deployment-channel.mjs`](./test-preload-deployment-channel.mjs)
 - [`test-preload-extension-distribution.mjs`](./test-preload-extension-distribution.mjs)
 - [`test-preload-webmcp-registry.mjs`](./test-preload-webmcp-registry.mjs)

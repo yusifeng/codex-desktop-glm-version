@@ -6434,6 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
+var { sanitizeAnnotationHit } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6802,6 +6803,8 @@ function Qd(e, t) {
     return i;
   }
   function re(t) {
+    return sanitizeAnnotationHit(t, e);
+    /* istanbul ignore next -- retained generated implementation for source parity reference */
     if (t === null) return null;
     try {
       let n = ne(t, 5);
