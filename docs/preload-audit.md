@@ -13,6 +13,11 @@ deployment channel 与 WebMCP policy channel 配置（原 27,471-27,503 行）�
 兼容别名并直接调用 helper；`scripts/test-preload-deployment-channel.mjs` 覆盖
 解析、内部 channel、debug menu、React Scan 和 policy channel。
 
+Chrome/Edge 扩展发行配置（原 27,187-27,294 行）已迁移至
+`src/main/browser-page-preload/extension-distribution.ts`，原入口保留 `cx`
+配置别名；`scripts/test-preload-extension-distribution.mjs` 覆盖 dev/internal/prod
+分发列表、store 分发类型和输出模式。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
