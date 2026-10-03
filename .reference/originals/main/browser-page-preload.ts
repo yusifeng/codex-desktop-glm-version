@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -7021,18 +7021,7 @@ function ef(e, t, n, r, i) {
         return n;
       }
       function f(e) {
-        if (!(e instanceof Element) && (e == null || typeof e[Symbol.iterator] != `function`))
-          throw TypeError(`Annotation controls require element targets`);
-        let t = e instanceof Element ? [e] : e,
-          n = new Set(),
-          r = 0;
-        for (let e of t) {
-          if (((r += 1), r > 128)) throw RangeError(`Too many annotation control targets`);
-          if (!(e instanceof Element) || e.ownerDocument !== document)
-            throw TypeError(`Annotation control targets must belong to this document`);
-          n.add(e);
-        }
-        return Array.from(n);
+        return normalizeAnnotationControlTargets(e, Element, document, 128);
       }
       function p(e) {
         let t = !1;
