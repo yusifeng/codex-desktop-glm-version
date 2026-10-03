@@ -26688,22 +26688,14 @@ var G,
       (xb = []));
   });
 ($s(), Rd());
+var {
+  createInitialAnnotationContextState,
+  isAnnotationCommentModeActive,
+  resolveAnnotationSyncState,
+} = require("./browser-page-preload/annotation-context-state");
 var Cb = null,
   wb = null,
-  Tb = {
-    interactionMode: `browse`,
-    annotationEditorMode: `comment`,
-    isAgentControllingBrowser: !1,
-    canUseTweaks: !1,
-    canUseAnnotationMultiSelect: !1,
-    canUseSiteAnnotationApi: !1,
-    isDesignModifierPressed: !1,
-    isTweaksEditorOpen: !1,
-    comments: [],
-    intlConfig: Qs,
-    viewportScale: 1,
-    zoomPercent: 100,
-  },
+  Tb = createInitialAnnotationContextState(Qs),
   Eb = !1,
   Db = null,
   Ob = null,
@@ -26762,7 +26754,7 @@ function Bb() {
                   force: e,
                 }),
                 !0),
-          Jb,
+          () => isAnnotationCommentModeActive(Tb),
           Rb.recordUse,
           () => Tb.canUseSiteAnnotationApi === !0,
         )),
@@ -26910,32 +26902,14 @@ function Kb(e) {
   Ob = reducePendingEditorMessage(Ob, e);
 }
 function qb(e) {
-  let t = Lb != null && Jb();
+  let t = Lb != null && isAnnotationCommentModeActive(Tb);
   (e.canUseSiteAnnotationApi === !1 && Vb(),
     (e.isAgentControllingBrowser || e.siteAnnotationFeaturesEnabled === !1) &&
       (Ib?.clear(), Yb(null)),
-    (Tb = {
-      interactionMode: e.interactionMode,
-      annotationEditorMode: e.annotationEditorMode ?? `comment`,
-      isAgentControllingBrowser: e.isAgentControllingBrowser,
-      canUseTweaks: e.canUseTweaks !== !1,
-      canUseAnnotationMultiSelect: e.canUseAnnotationMultiSelect === !0,
-      canUseSiteAnnotationApi: Ab && e.siteAnnotationFeaturesEnabled !== !1,
-      isDesignModifierPressed: e.isDesignModifierPressed === !0,
-      areAnnotationMarkersVisible: e.areAnnotationMarkersVisible !== !1,
-      isAnnotationSuspended: e.isAnnotationSuspended === !0,
-      isTweaksEditorOpen: e.isTweaksEditorOpen === !0,
-      comments: e.comments,
-      intlConfig: e.intlConfig,
-      viewportScale: e.viewportScale ?? 1,
-      zoomPercent: e.zoomPercent,
-    }));
-  let n = Lb != null && Jb();
+    (Tb = resolveAnnotationSyncState(e, Ab)));
+  let n = Lb != null && isAnnotationCommentModeActive(Tb);
   n !== t &&
     document.dispatchEvent(new CustomEvent(`oaiannotationmodechange`, { detail: { active: n } }));
-}
-function Jb() {
-  return Tb.canUseSiteAnnotationApi === !0 && Tb.interactionMode === `comment`;
 }
 function Yb(e) {
   Cb == null ? (wb = e) : Cb.setSiteAnnotationPreview(e);
