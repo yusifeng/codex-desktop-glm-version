@@ -43,34 +43,12 @@
 ### T1 · shared 九个小分区收尾（~228 别名）★ 首选，方法完全成熟
 
 数据源：`docs/shared-export-map.json`（导出名 → 内部符号 + 行号）。
-先跑下面的统计脚本拿最新缺口清单（数字以脚本输出为准，228 是 09-30 快照；
-九小分区约 160 个，其余散在已完成分区的后消费导出里）：
+先运行下面的权威脚本拿最新缺口清单。它只解析实际来自
+`@chunk/shared` 的 import，避免把其它 chunk 中的 `as` 误计入 shared；
+数字以脚本输出为准（228 仅是 09-30 快照）：
 
 ```bash
-python3 - <<'EOF'
-import json, os, re
-data = json.load(open('docs/shared-export-map.json'))
-semantic = set()
-for line in open('src/main/types/chunk-modules.d.ts'):
-    m = re.search(r'export \{ (\w+) as (\w+) \}', line)
-    if m and 'from "../../shared/' in line: semantic.add(m.group(2))
-consumed = {}
-for root, dirs, files in os.walk('src/main'):
-    for f in files:
-        if not f.endswith('.ts') or f == 'src-DldfpmrL.ts': continue
-        try: src = open(os.path.join(root, f)).read()
-        except: continue
-        if '@chunk/shared' not in src: continue
-        for m in re.finditer(r'([A-Za-z_$][A-Za-z0-9_$]*)\s+as\s+[a-zA-Z_]+', src):
-            consumed[m.group(1)] = consumed.get(m.group(1), 0) + 1
-todo = {}
-for name, info in data.items():
-    if name in consumed and name not in semantic:
-        todo.setdefault(info.get('zone','?'), []).append((info.get('line',0), name))
-for zone, items in sorted(todo.items(), key=lambda x:-len(x[1])):
-    print(f"{zone}: {len(items)} -> {sorted(items)[:8]}")
-print('TOTAL:', sum(len(v) for v in todo.values()))
-EOF
+node scripts/audit-shared-consumption.mjs
 ```
 
 分区速览（09-30 快照）：process-exec 28、schema-primitives 30（zod
