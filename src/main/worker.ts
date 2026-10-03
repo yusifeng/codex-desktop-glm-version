@@ -47497,6 +47497,7 @@ async function eG(e, t, n) {
   );
 }
 function legacy_tG(e) {
+  return decodeCommandOutput(e);
   let t;
   if (Buffer.isBuffer(e)) {
     let n = e;
@@ -47526,6 +47527,7 @@ function legacy_tG(e) {
     .trim();
 }
 function legacy_nG(e) {
+  return findActiveDistro(e);
   let t = e
     .split(
       `
@@ -47543,6 +47545,7 @@ function legacy_nG(e) {
   );
 }
 function legacy_rG(e) {
+  return orderEligibleDistros(e);
   let t = legacy_nG(e),
     n = e
       .split(
