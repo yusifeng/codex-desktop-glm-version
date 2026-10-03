@@ -49,6 +49,7 @@ const { finalizeReviewMetadata, readUntrackedReviewMetadata } = require("./worke
 const { applyReviewSectionChanges } = require("./worker/git-review-section-changes");
 const { getReviewWorkingTreeMetadata } = require("./worker/git-review-working-tree-metadata");
 const { collectNonEmptySections, collectUntrackedDiffSections } = require("./worker/git-review-patch-sections");
+const { getReviewPatch: getGitReviewPatch } = require("./worker/git-review-patch");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
@@ -309,6 +310,17 @@ const gitReviewDiffDeps = {
     prepareGitReviewComparison(params, gitReviewComparisonDeps),
   rewriteRenameDiff: (diff, previousPath, path) =>
     rewriteGitRenameDiff(diff, previousPath, path),
+};
+const gitReviewPatchDeps = {
+  collectNonEmptySections,
+  collectUntrackedDiffSections,
+  getQueryMeta: () => _1,
+  getUntrackedWorkingTreeDiff: (reviewSnapshot, path) =>
+    getUntrackedWorkingTreeDiff(reviewSnapshot, path, {}, gitReviewFileDiffDeps),
+  parseGitError: (result) => g0(result),
+  resolveReviewComparisonForRepository: (params) =>
+    resolveGitReviewComparisonForRepository(params, gitReviewComparisonDeps),
+  utf8ByteLength,
 };
 const gitReviewWorkingTreeMetadataDeps = {
   byteLength: (value) => A1(value),
@@ -70801,56 +70813,11 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-async function k3(e, t, n, r, i, a, o, s) {
-  let c = await resolveGitReviewComparisonForRepository({
-    host: r,
-    baseBranch: a,
-    commitSha: o,
-    cwd: e,
-    gitManager: n,
-    includeUntrackedFiles: !0,
-    maxUntrackedFiles: s,
-    source: t,
-  }, gitReviewComparisonDeps);
-  if (c.type !== `success`) return { source: t, diff: Y_e() };
-  let [l, u] = await Promise.all([
-    J_e(c.diffArgs, c.reviewSnapshot),
-    collectUntrackedDiffSections(
-      (e) =>
-        getUntrackedWorkingTreeDiff(
-          c.reviewSnapshot,
-          e,
-          {},
-          gitReviewFileDiffDeps,
-        ),
-      c.untrackedPaths,
-      c.reviewSnapshot.signal,
-    ),
-  ]);
-  if (l.outputLimitExceeded || !l.success)
-    return { source: t, diff: { type: `error`, error: g0(l) } };
-  if (!u.success) return { source: t, diff: { type: `error`, error: u.error } };
-  let d = collectNonEmptySections([l.stdout], u.sections).join(`
-`);
-  return c.reviewSnapshot.read(async () => ({
-    source: t,
-    diff: { type: `success`, unifiedDiff: d, unifiedDiffBytes: Buffer.byteLength(d, `utf8`) },
-  }));
-}
-function J_e(e, t) {
-  return t.worktreeRepo.queryClient.fetchQuery({
-    queryKey: t.queryKey(`review-patch-diff`, e),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () => t.gitDiff(e, { allowedNonZeroExitCodes: [0, 1], trim: !1 }),
-    staleTime: 250,
-  });
-}
-function Y_e() {
-  return { type: `error`, error: { type: `unknown` } };
-}
 async function X_e(e, t, n, r, i) {
-  if (!t) return (await k3(e, `staged`, n, r, i)).diff;
+  if (!t)
+    return (
+      await getGitReviewPatch(e, `staged`, n, r, i, void 0, void 0, void 0, gitReviewPatchDeps)
+    ).diff;
   let a = await n.getWorktreeRepository(xz(e), r);
   if (a == null) return { type: `error`, error: { type: `unknown` } };
   let o;
@@ -72474,7 +72441,7 @@ var I6 = kW(`git`),
             getReviewDiff(reviewSnapshot, source, files, options, gitReviewDiffDeps),
           staleSnapshotError: s4,
           searchReview: ove,
-          getReviewPatch: k3,
+          getReviewPatch: (...args) => getGitReviewPatch(...args, gitReviewPatchDeps),
         },
         syncedBranchRequestDeps = {
           gitManager: this.gitManager,

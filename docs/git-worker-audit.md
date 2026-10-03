@@ -128,6 +128,10 @@ Review patch/search 共用的非空 section 合并、untracked diff 八路并发
 64 MiB 总量限制已迁移至 `src/main/worker/git-review-patch-sections.ts`；原 `q_e`/`O3` 已删除。
 15 项断言覆盖乱序完成、空 section、读取失败、字节计数优先、精确上限与超限错误。
 
+Review patch 的 comparison、cached tracked diff、untracked section 并发合成、错误映射与 snapshot
+read 已迁移至 `src/main/worker/git-review-patch.ts`；原 `k3`/`J_e`/`Y_e` 已删除，commit-message
+diff 的 staged fallback 也复用该语义入口。33 项断言覆盖 cache、并行、失败、output-limit 和 UTF-8。
+
 Review working-tree metadata 的 per-file generation cache、批量 stat/hash、目录/symlink/regular
 分流、untracked `--no-index` metadata 分批与旧 Git fallback 已迁移至
 `src/main/worker/git-review-working-tree-metadata.ts`；原 `Xge` class、十五个 helper、并发/分批
