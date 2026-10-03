@@ -97,6 +97,10 @@ Tracked uncommitted diff 的 index context、临时 index 复制、`git add -u`�
 `finally` cleanup 已迁移至 `src/main/worker/git-uncommitted-diff.ts`；原 `b0`/`x0`/`S0` 已删除，
 worktree starting state 与 commit-message diff 均改用语义入口。28 项断言覆盖命令与失败矩阵。
 
+Commit-message diff 的 staged patch、repository 缺失、safe-filter 失败与 tracked-uncommitted
+分支编排已迁移至 `src/main/worker/git-commit-message-diff.ts`；原 `X_e` 已删除，repository-read
+handler 直接注入语义入口。11 项断言覆盖分支选择、参数透传和既有无内部 signal 行为。
+
 Managed worktree discovery 的 root/boundary 去重、无 symlink 目录读取、legacy/named
 目录识别、候选复检与 `.git` 文件验证已迁移至
 `src/main/worker/git-managed-worktree-discovery.ts`；原 `R$`/`jfe`/`Ofe`/`kfe`/`G_e`/`K_e`

@@ -29,6 +29,7 @@ const { getGitCloneState } = require("./worker/git-clone-state");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
+const { getCommitMessageDiff } = require("./worker/git-commit-message-diff");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
 const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
@@ -234,6 +235,25 @@ const gitUncommittedDiffDeps = {
   parseGitError: g0,
   runDiff: y0,
   runGit: $,
+};
+const gitCommitMessageDiffDeps = {
+  collectTrackedUncommittedDiff: (repository, configOverrides, signal) =>
+    collectTrackedUncommittedDiff(repository, configOverrides, signal, {}, gitUncommittedDiffDeps),
+  getReviewPatch: (cwd, source, gitManager, host, signal) =>
+    getGitReviewPatch(
+      cwd,
+      source,
+      gitManager,
+      host,
+      signal,
+      void 0,
+      void 0,
+      void 0,
+      gitReviewPatchDeps,
+    ),
+  getSafeAttributeFilterOverrides: (repository, signal) =>
+    getSafeAttributeFilterOverrides(repository, signal, gitSafeAttributeFilterDeps),
+  normalizeCwd: xz,
 };
 const syncedBranchStateDeps = {
   readConfig: P2,
@@ -70742,21 +70762,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-async function X_e(e, t, n, r, i) {
-  if (!t)
-    return (
-      await getGitReviewPatch(e, `staged`, n, r, i, void 0, void 0, void 0, gitReviewPatchDeps)
-    ).diff;
-  let a = await n.getWorktreeRepository(xz(e), r);
-  if (a == null) return { type: `error`, error: { type: `unknown` } };
-  let o;
-  try {
-    o = await getSafeAttributeFilterOverrides(a, i, gitSafeAttributeFilterDeps);
-  } catch {
-    return { type: `error`, error: { type: `unknown` } };
-  }
-  return collectTrackedUncommittedDiff(a, o, i, {}, gitUncommittedDiffDeps);
-}
 var $_e = kW(`git`);
 async function eve(e, t) {
   let n = await u0(e, t);
@@ -72389,7 +72394,15 @@ var I6 = kW(`git`),
           signal: i.signal,
           runAbortable: yR,
           getRepositoryIdentity: P3,
-          getCommitMessageDiff: X_e,
+          getCommitMessageDiff: (cwd, includeUnstaged, gitManager, host) =>
+            getCommitMessageDiff(
+              cwd,
+              includeUnstaged,
+              gitManager,
+              host,
+              void 0,
+              gitCommitMessageDiffDeps,
+            ),
           getSubmodulePaths: gve,
           getReviewSnapshot: R6,
           catFile: Sve,
