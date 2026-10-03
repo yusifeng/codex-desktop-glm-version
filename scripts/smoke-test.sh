@@ -8,6 +8,10 @@ cd "$(dirname "$0")/.."
 
 DURATION="${1:-15}"
 
+case "$DURATION" in
+  ''|*[!0-9]*) echo "用法: $0 [持续秒数]" >&2; exit 2 ;;
+esac
+
 ./scripts/pack.sh
 
 export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
@@ -28,6 +32,12 @@ sleep "$DURATION"
 if ! kill -0 "$PID" 2>/dev/null; then
   echo "FAIL: 进程提前退出。日志尾部："
   tail -30 "$LOG"
+  exit 1
+fi
+
+if grep -Eiq 'fatal|uncaught exception|segmentation fault|module not found' "$LOG"; then
+  echo "FAIL: 日志包含启动致命错误："
+  grep -Ein 'fatal|uncaught exception|segmentation fault|module not found' "$LOG" | tail -20
   exit 1
 fi
 
