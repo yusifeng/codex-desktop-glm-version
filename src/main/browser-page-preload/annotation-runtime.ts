@@ -55,5 +55,19 @@ function isValidAnnotationHitTestRequest(value: unknown, maxRequestIdLength: num
   return request.type === `hit-test` && typeof request.requestId === `string` && request.requestId.length > 0 && request.requestId.length <= maxRequestIdLength && typeof request.x === `number` && Number.isFinite(request.x) && typeof request.y === `number` && Number.isFinite(request.y);
 }
 
-export { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit };
-if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit };
+function serializeAnnotationControls(value: unknown, maxBytes: number): string {
+  if (typeof value !== `object` || !value) throw new TypeError(`Invalid annotation controls`);
+  const serialized = JSON.stringify({
+    controls: (value as Record<string, unknown>).controls,
+    controlsHeading: (value as Record<string, unknown>).controlsHeading,
+    controlsMode: (value as Record<string, unknown>).controlsMode,
+  }, (_key, item) => {
+    if (typeof item === `function` || typeof item === `symbol` || typeof item === `bigint`) throw new TypeError(`Annotation controls must contain only data`);
+    return item;
+  });
+  if (new TextEncoder().encode(serialized).byteLength > maxBytes) throw new RangeError(`Annotation controls exceed the maximum size`);
+  return serialized;
+}
+
+export { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit, serializeAnnotationControls };
+if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit, serializeAnnotationControls };

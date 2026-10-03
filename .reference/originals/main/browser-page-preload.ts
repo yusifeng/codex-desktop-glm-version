@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6887,20 +6887,7 @@ function ef(e, t, n, r, i) {
         c = !1,
         l = (e) => {
           if (typeof e != `object` || !e) throw TypeError(`Invalid annotation controls`);
-          let t = JSON.stringify(
-            {
-              controls: e.controls,
-              controlsHeading: e.controlsHeading,
-              controlsMode: e.controlsMode,
-            },
-            (e, t) => {
-              if (typeof t == `function` || typeof t == `symbol` || typeof t == `bigint`)
-                throw TypeError(`Annotation controls must contain only data`);
-              return t;
-            },
-          );
-          if (t.length > 16384) throw RangeError(`Annotation controls exceed the maximum size`);
-          return t;
+          return serializeAnnotationControls(e, 16384);
         },
         u = {
           toggle: (e) => ({
