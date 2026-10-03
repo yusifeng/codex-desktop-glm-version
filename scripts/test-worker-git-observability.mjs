@@ -6,6 +6,7 @@ const {
   buildGitHostCacheKey,
   classifyProcessExecutable,
   classifyGitHubOperation,
+  classifySshOperation,
   createGitCommandStats,
   exitCodeBucket,
   isGitMutationRequest,
@@ -47,5 +48,13 @@ assert.equal(classifyGitHubOperation(["gh", "unknown", "thing"], "gh"), "other")
 assert.equal(classifyGitHubOperation(["sh", "-lc", "gh pr checks"], "shell"), "pr.checks");
 assert.equal(classifyGitHubOperation(["sh", "-c", "echo gh pr view"], "shell"), undefined);
 assert.equal(classifyGitHubOperation(["git", "status"], "git"), undefined);
+assert.equal(classifySshOperation(["ssh", "host"]), "connection");
+assert.equal(classifySshOperation(["ssh", "host", "uname", "-a"]), "remote_command");
+assert.equal(classifySshOperation(["ssh", "-G", "host"]), "config");
+assert.equal(classifySshOperation(["ssh", "-O", "check", "host"]), "control");
+assert.equal(classifySshOperation(["ssh", "-L", "8080:localhost:80", "host"]), "port_forward");
+assert.equal(classifySshOperation(["ssh", "-o", "LocalForward=8080:localhost:80", "host"]), "port_forward");
+assert.equal(classifySshOperation(["ssh", "-o", "StrictHostKeyChecking=no", "host"]), "connection");
+assert.equal(classifySshOperation(["ssh", "--", "host", "echo", "ok"]), "remote_command");
 
-console.log("28 worker git observability assertions passed");
+console.log("36 worker git observability assertions passed");

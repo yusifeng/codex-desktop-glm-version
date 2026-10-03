@@ -22,8 +22,8 @@ Git 命令统计初始化、变更请求来源判定、host cache key 和 exit-c
 `worker/git-observability.ts`，原 `z1`/`gpe`/`B1`/`ype`/`K1` 别名接回；untracked
 cache outcome 状态更新也已迁出，行为由 `scripts/test-worker-git-observability.mjs`
 覆盖；进程 executable 的 `process.kind` 分类也已迁至同一模块，保留入口的
-operation 属性和 telemetry 组装；GitHub CLI operation 的有限集合分类也由同一
-模块提供，入口保留 command telemetry 组装。
+operation 属性和 telemetry 组装；GitHub CLI operation 与 SSH operation 的有限
+集合分类也由同一模块提供，入口保留 command telemetry 组装。
 
 Git query key、host id、路径归一化、UTF-8 字节长度、query host 匹配、watched
 path overlap、可缓存命令判定、fsmonitor cache key、配置值解析、daemon feature

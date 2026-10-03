@@ -9,6 +9,7 @@ const gitHubOperations = new Set([
   `auth.status`, `auth.token`, `pr.checks`, `pr.close`, `pr.comment`, `pr.create`, `pr.diff`,
   `pr.edit`, `pr.list`, `pr.merge`, `pr.ready`, `pr.reopen`, `pr.review`, `pr.view`,
 ]);
+const sshOptionsWithArguments = new Set([`-B`, `-b`, `-c`, `-D`, `-E`, `-e`, `-F`, `-I`, `-i`, `-J`, `-L`, `-l`, `-m`, `-O`, `-o`, `-p`, `-P`, `-Q`, `-R`, `-S`, `-W`, `-w`]);
 
 function createGitCommandStats(concurrentOperationCount: number) {
   return {
@@ -97,5 +98,34 @@ function classifyGitHubOperation(args: string[], processKind: string): string | 
   return gitHubOperations.has(operation) ? operation : `other`;
 }
 
-export { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
-if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+/** Classifies SSH command intent while ignoring option arguments and the `--` separator. */
+function classifySshOperation(args: string[]): `config` | `control` | `port_forward` | `remote_command` | `connection` {
+  const options = args.slice(1);
+  let config = false;
+  let control = false;
+  let portForward = false;
+  let positionalCount = 0;
+  for (let index = 0; index < options.length; index += 1) {
+    const option = options[index];
+    if (option == null) continue;
+    if (option === `--`) {
+      positionalCount += options.length - index - 1;
+      break;
+    }
+    if (option === `-G`) config = true;
+    if (/^-O(?:.|$)/u.test(option)) control = true;
+    if (/^-(?:D|L|R|W)(?:.|$)/u.test(option) || /^-o(?:DynamicForward|LocalForward|RemoteForward)=/iu.test(option) || (option === `-o` && /^(?:DynamicForward|LocalForward|RemoteForward)(?:=|\s)/iu.test(options[index + 1] ?? ``))) portForward = true;
+    if (sshOptionsWithArguments.has(option)) {
+      index += 1;
+      continue;
+    }
+    if (!option.startsWith(`-`)) {
+      positionalCount += 1;
+      if (positionalCount > 1) break;
+    }
+  }
+  return config ? `config` : control ? `control` : portForward ? `port_forward` : positionalCount > 1 ? `remote_command` : `connection`;
+}
+
+export { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
