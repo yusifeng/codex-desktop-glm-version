@@ -4,6 +4,10 @@ const LIGHT_SURFACE = `#f9f9f9`;
 const primaryMinimum = { width: 320, height: 140 };
 const threadMinimum = { width: 400, height: 400 };
 
+function trafficLightPosition(windowZoom: number): { x: number; y: number } {
+  return { x: 16, y: Math.round((46 * windowZoom - 14) / 2) };
+}
+
 function isOverlayAppearance(appearance: string): boolean {
   return [`avatarOverlay`, `browserCommentPopup`, `globalDictation`, `screenOverlay`, `hotkeyWindowHome`, `hotkeyWindowThread`].includes(appearance);
 }
@@ -51,5 +55,5 @@ function framelessWindowOptions({ alwaysOnTop, hasShadow = true, platform, resiz
   };
 }
 
-export { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, vibrancyForAppearance, windowSurfaceColors };
-if (typeof module !== `undefined`) module.exports = { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, vibrancyForAppearance, windowSurfaceColors };
+export { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };
+if (typeof module !== `undefined`) module.exports = { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };

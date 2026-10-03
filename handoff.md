@@ -33,7 +33,8 @@ preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload 的 WebMCP registry shim 已抽取为
 `src/main/browser-page-preload/webmcp-registry.ts`，由 7 项行为断言覆盖；main
-窗口外观策略已抽取为 `src/main/main-app/window-appearance.ts`，由 8 项行为断言覆盖。
+窗口外观策略已抽取为 `src/main/main-app/window-appearance.ts`，并包含 traffic-light
+geometry，由 10 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

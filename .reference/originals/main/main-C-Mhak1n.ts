@@ -172756,6 +172756,8 @@ var k9 = `#00000000`,
   Xot = 1e3,
   Zot = 5e3;
 function A9(e) {
+  return windowAppearance.trafficLightPosition(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return { x: Got, y: Math.round((Uot * e - Wot) / 2) };
 }
 function j9(e = 1) {

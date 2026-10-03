@@ -12,5 +12,7 @@ assert.equal(appearance.shouldUseOpaqueWindows({ appearance: "primary", opaqueWi
 assert.deepEqual(appearance.windowSurfaceColors({ platform: "win32", appearance: "primary", opaqueWindowSurfaceEnabled: false, prefersDarkColors: false }), { backgroundColor: "#00000000", backgroundMaterial: "mica" });
 assert.equal(appearance.vibrancyForAppearance("primary", false), "menu");
 assert.equal(appearance.framelessWindowOptions({ platform: "darwin", resizable: false }).type, "panel");
+assert.deepEqual(appearance.trafficLightPosition(1), { x: 16, y: 16 });
+assert.deepEqual(appearance.trafficLightPosition(2), { x: 16, y: 39 });
 
-console.log("8 main window appearance assertions passed");
+console.log("10 main window appearance assertions passed");
