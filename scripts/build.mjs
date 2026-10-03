@@ -79,18 +79,28 @@ async function worker() {
     const code = await fs.readFile(src, "utf8");
     try {
       const ts = await esbuild.transform(code, { ...common, loader: "ts", tsconfigRaw });
-      if (check) {
+      // Semantic source directories are authored TypeScript modules. The
+      // transform-only JS parity check applies only to preserved published
+      // chunks; parsing these modules as plain JS would reject interfaces,
+      // type-only imports, and generic syntax by design.
+      const semanticSource = /[\\/]src[\\/]main[\\/](shared|main-app|worker)[\\/]/.test(src);
+      if (check && !semanticSource) {
         const js = await esbuild.transform(code, { ...common, loader: "js" });
         if (js.code !== ts.code) mismatches.push(src);
       }
       await fs.mkdir(path.dirname(dst), { recursive: true });
       await fs.writeFile(dst, ts.code);
     } catch (err) {
-      errors.push(`${path.relative(ROOT, src)}: ${err.message.split("\n")[0]}`);
+      const detail = err.errors?.[0]?.text ?? err.message.split("\n")[0];
+      errors.push(`${path.relative(ROOT, src)}: ${detail}`);
     }
   }
 }
-await Promise.all(Array.from({ length: os.cpus().length }, worker));
+// CI and developer hosts can report hundreds of logical CPUs. Spawning one
+// esbuild transform loop per CPU exhausts descriptors and makes otherwise
+// valid files fail with opaque "Transform failed" errors.
+const transformWorkers = Math.min(os.cpus().length, 2);
+await Promise.all(Array.from({ length: transformWorkers }, worker));
 
 // ---- 2. bundle：已重写的 chunk ----
 const bundleSummaries = [];
