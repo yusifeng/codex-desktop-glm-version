@@ -11,6 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
+const { describeShell } = require("./worker/shell-config");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
@@ -55330,6 +55331,8 @@ function WZ(e) {
   return n;
 }
 function GZ(e, t) {
+  return describeShell(e, KZ(t), qZ(t, `COMSPEC`) ?? `cmd.exe`);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e !== `win32`)
     return { executable: `bash`, args: [], scriptExtension: `sh`, shellKind: `posix` };
   let n = KZ(t) ?? qZ(t, `COMSPEC`) ?? `cmd.exe`,

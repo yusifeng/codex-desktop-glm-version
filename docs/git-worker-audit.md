@@ -44,6 +44,10 @@ watch retry backoff、Git operation state mapping、watch target state initializ
 `refreshWorkingTreeWatchPolicy`
 仍负责等待 policy/session、dispose/restart 与事件副作用。
 
+`GZ` 的平台 shell descriptor 映射已迁移至 `worker/shell-config.ts`：入口仍负责
+PowerShell 探测、环境变量读取和进程执行；helper 只决定 executable、参数、脚本
+扩展名及 `posix`/`powershell`/`cmd` 类型，由 shell config 回归脚本覆盖。
+
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含
 Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表示第三方库

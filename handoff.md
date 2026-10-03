@@ -20,6 +20,8 @@
 协议、main delegation/account 与 URL trust helpers、WSL 输出解析，均有独立
 回归断言；worker 的 remote host SSH 展示名/identity 解析也已抽取为
 `src/main/worker/remote-host-config.ts`，并由 6 项行为断言覆盖；preload 的
+worker Windows/POSIX shell descriptor 策略已抽取为 `src/main/worker/shell-config.ts`，
+由 6 项行为断言覆盖；preload 的
 deployment channel/policy 配置已抽取为 `src/main/browser-page-preload/deployment-channel.ts`，
 由 8 项行为断言覆盖；main 的 thread metadata emoji 校验和不可变更新已抽取为
 `src/main/main-app/thread-metadata.ts`，由 6 项行为断言覆盖；worker 的 Git
