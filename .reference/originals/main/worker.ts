@@ -7,6 +7,7 @@ let t = require("node:worker_threads"),
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
+const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
@@ -77598,6 +77599,12 @@ var I6 = kW(`git`),
           startCapture: uye,
           completeCapture: dye,
         },
+        cacheRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          invalidateUntrackedPathsCache: p2,
+          refreshRepository: (hostId, root) => this.liveQueryRegistry.refreshRepository(hostId, root),
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77802,15 +77809,10 @@ var I6 = kW(`git`),
             break;
           }
           case `invalidate-stable-metadata`:
-            (this.gitManager.invalidateStableMetadata(), (p = X({ success: !0 })));
+            p = X(invalidateStableMetadata(cacheRequestDeps));
             break;
           case `invalidate-git-read-caches`: {
-            let t = this.gitManager.getWorktreeRepositoryForRoot(e.params.root, o);
-            (e.params.clearUntrackedPathsCache && p2(t),
-              t.clearShortLivedGitReadCaches(),
-              e.params.clearUntrackedPathsCache &&
-                this.liveQueryRegistry.refreshRepository(o.id, e.params.root),
-              (p = X({ success: !0 })));
+            p = X(invalidateGitReadCaches(e.params, cacheRequestDeps));
             break;
           }
           case `dispose-git-init-watch`:

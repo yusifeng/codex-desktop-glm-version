@@ -86,6 +86,12 @@ turn diff capture 的 start/complete 请求编排已迁移至
 拥有 `watchesByKey`、ready/recovery 状态和 response 包装；capture helper 的参数收窄与 watcher
 判定透传由 `scripts/test-worker-git-turn-diff-request-handlers.mjs` 的 8 项断言覆盖。
 
+`invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
+`src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
+untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步
+仍为 fire-and-forget，不等待 refresh Promise。17 项回归断言覆盖正常路径、pending refresh 与
+各阶段同步异常短路。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
