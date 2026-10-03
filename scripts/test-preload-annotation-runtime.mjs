@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { cloneRecord, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -26,5 +26,6 @@ const firstTarget = new FakeElement(fakeDocument);
 assert.deepEqual(normalizeAnnotationControlTargets([firstTarget, firstTarget], FakeElement, fakeDocument, 2), [firstTarget]);
 assert.throws(() => normalizeAnnotationControlTargets([new FakeElement({})], FakeElement, fakeDocument, 2), /belong to this document/);
 assert.throws(() => normalizeAnnotationControlTargets([firstTarget, firstTarget, firstTarget], FakeElement, fakeDocument, 2), /Too many/);
+assert.deepEqual(createAnnotationRangeDetail({ startPath: [0, 1], endPath: [0, 2], startOffset: 3, endOffset: 7, rangeText: "selected" }), { startPath: [0, 1], endPath: [0, 2], startOffset: 3, endOffset: 7, rangeText: "selected" });
 
-console.log("17 preload annotation runtime assertions passed");
+console.log("18 preload annotation runtime assertions passed");

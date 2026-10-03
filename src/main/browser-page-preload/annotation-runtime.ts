@@ -106,5 +106,15 @@ function normalizeAnnotationControlTargets(value: unknown, elementConstructor: {
   return Array.from(result);
 }
 
-export { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
-if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+function createAnnotationRangeDetail(input: { startPath: number[]; endPath: number[]; startOffset: number; endOffset: number; rangeText: string }): Record<string, unknown> {
+  return {
+    startPath: input.startPath,
+    endPath: input.endPath,
+    startOffset: input.startOffset,
+    endOffset: input.endOffset,
+    rangeText: input.rangeText,
+  };
+}
+
+export { cloneRecord, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
