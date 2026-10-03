@@ -25,7 +25,7 @@ const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution")
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
-const { disposeGitInitWatch, recoverGitLiveQueries, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
+const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
@@ -77116,12 +77116,15 @@ var I6 = kW(`git`),
         watchRequestDeps = {
           gitManager: this.gitManager,
           host: o,
+          signal: i.signal,
           liveQueryRegistry: this.liveQueryRegistry,
           disposeGitInitWatcher: (cwd, host) => this.disposeGitInitWatcher(cwd, host),
           getExistingWatch: (root) => this.watchesByKey.get(this.getWatchKey(root, o)),
-          ensureWatching: (metadata, host) => this.ensureWatching(metadata, host),
+          ensureWatching: (metadata, host, signal) => this.ensureWatching(metadata, host, signal),
+          resolveQueryRoot: obe,
           trace: OH,
           unwatchRepo: (root, host) => this.unwatchRepo(root, host),
+          waitForAbort: fbe,
         },
         gitInitRequestDeps = {
           gitManager: this.gitManager,
@@ -77394,83 +77397,7 @@ var I6 = kW(`git`),
             break;
           }
           case `subscribe-live-query`: {
-            let t = await OH(
-              {
-                attributes: {
-                  "git.operation": e.params.query.method,
-                  "worker.id": `git`,
-                  "worker.method": `subscribe-live-query`,
-                },
-                name: `git.subscription_setup`,
-                op: `codex.git.subscription_setup`,
-                trace: e.trace,
-              },
-              async () => {
-                let t = obe(e.params.query),
-                  n = this.gitManager.getPendingStableMetadataTrace(t, o),
-                  r = await OH(
-                    {
-                      attributes: {
-                        "git.metadata_coalesced": n != null,
-                        "git.operation": e.params.query.method,
-                        "worker.id": `git`,
-                        "worker.method": `subscribe-live-query`,
-                      },
-                      links: n == null ? [] : [n],
-                      name: `git.metadata_lookup`,
-                      op: `codex.git.metadata_lookup`,
-                    },
-                    () => this.gitManager.getStableMetadata(t, o),
-                  );
-                if (i.signal.aborted) return null;
-                if (r == null) throw Error(`Live Git query requires repository metadata`);
-                let a = this.watchesByKey.get(this.getWatchKey(r.root, o));
-                return {
-                  metadata: r,
-                  releaseWatch: await OH(
-                    {
-                      attributes: {
-                        "git.operation": e.params.query.method,
-                        "git.watcher_reused": a != null,
-                        "worker.id": `git`,
-                        "worker.method": `subscribe-live-query`,
-                      },
-                      links: a?.startTrace == null ? [] : [a.startTrace],
-                      name: `git.watcher_start`,
-                      op: `codex.git.watcher_start`,
-                    },
-                    () => this.ensureWatching(r, o, i.signal),
-                  ),
-                };
-              },
-            );
-            if (t == null) {
-              p = X(void 0);
-              break;
-            }
-            let { metadata: n, releaseWatch: r } = t;
-            try {
-              if (!i.signal.aborted) {
-                this.liveQueryRegistry.subscribe({
-                  commonDir: n.commonDir,
-                  host: o,
-                  query: e.params.query,
-                  requiresRecovery:
-                    this.watchesByKey.get(this.getWatchKey(n.root, o))?.watcher.requiresRecovery ??
-                    !0,
-                  root: n.root,
-                  subscriptionId: e.params.subscriptionId,
-                  trace: e.trace,
-                });
-                try {
-                  await fbe(i.signal);
-                } finally {
-                  this.liveQueryRegistry.unsubscribe(e.params.subscriptionId);
-                }
-              }
-            } finally {
-              r();
-            }
+            await subscribeGitLiveQuery({ ...e.params, trace: e.trace }, watchRequestDeps);
             p = X(void 0);
             break;
           }

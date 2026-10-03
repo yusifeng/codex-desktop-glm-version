@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url);
 const {
   disposeGitInitWatch,
   recoverGitLiveQueries,
+  subscribeGitLiveQuery,
   unwatchGitRepository,
   watchGitRepository,
 } = require("../app/.vite/build/worker/git-watch-request-handlers.js");
@@ -14,26 +15,35 @@ let existingWatch = null;
 let stableMetadata = null;
 const deps = {
   gitManager: {
+    getPendingStableMetadataTrace: () => "metadata-trace",
     getStableMetadata: async (...args) => {
       calls.push(["metadata", ...args]);
       return stableMetadata;
     },
   },
   host: { id: "host" },
+  signal: new AbortController().signal,
   liveQueryRegistry: {
     recover: async (options) => calls.push(["recover", options]),
+    subscribe: (options) => calls.push(["subscribe", options]),
+    unsubscribe: (id) => calls.push(["unsubscribe", id]),
   },
   disposeGitInitWatcher: (...args) => calls.push(["dispose", ...args]),
   getExistingWatch: (root) => {
     calls.push(["existing", root]);
     return existingWatch;
   },
-  ensureWatching: async (...args) => calls.push(["ensure", ...args]),
+  ensureWatching: async (...args) => {
+    calls.push(["ensure", ...args]);
+    return () => calls.push(["release"]);
+  },
+  resolveQueryRoot: (query) => query.params.root,
   trace: async (options, operation) => {
     calls.push(["trace", options]);
     return operation();
   },
   unwatchRepo: (...args) => calls.push(["unwatch", ...args]),
+  waitForAbort: async (signal) => calls.push(["wait", signal]),
 };
 
 assert.deepEqual(disposeGitInitWatch("/cwd", deps), { success: true });
@@ -79,4 +89,67 @@ stableMetadata = null;
 await recoverGitLiveQueries({ cwd: "/missing", subscriptionIds: [] }, deps);
 assert.deepEqual(calls, [["metadata", "/missing", deps.host]]);
 
-console.log("13 worker git watch request handler assertions passed");
+calls.length = 0;
+stableMetadata = { root: "/repo", commonDir: "/common" };
+existingWatch = { startTrace: "watch-trace", watcher: { requiresRecovery: false } };
+const query = { method: "current-branch", params: { root: "/repo" } };
+await subscribeGitLiveQuery({ query, subscriptionId: "subscription", trace: "request-trace" }, deps);
+assert.deepEqual(calls.filter(([name]) => name === "trace").map(([, options]) => options.name), [
+  "git.subscription_setup",
+  "git.metadata_lookup",
+  "git.watcher_start",
+]);
+assert.deepEqual(calls.find(([name]) => name === "subscribe")[1], {
+  commonDir: "/common",
+  host: deps.host,
+  query,
+  requiresRecovery: false,
+  root: "/repo",
+  subscriptionId: "subscription",
+  trace: "request-trace",
+});
+assert.deepEqual(calls.slice(-3).map(([name]) => name), ["wait", "unsubscribe", "release"]);
+const metadataTrace = calls.find(([, options]) => options?.name === "git.metadata_lookup")[1];
+assert.deepEqual(metadataTrace.links, ["metadata-trace"]);
+
+calls.length = 0;
+stableMetadata = null;
+await assert.rejects(
+  subscribeGitLiveQuery({ query, subscriptionId: "missing" }, deps),
+  /requires repository metadata/,
+);
+assert.equal(calls.some(([name]) => name === "ensure"), false);
+
+calls.length = 0;
+stableMetadata = { root: "/repo", commonDir: "/common" };
+const aborted = new AbortController();
+aborted.abort();
+deps.signal = aborted.signal;
+await subscribeGitLiveQuery({ query, subscriptionId: "aborted" }, deps);
+assert.equal(calls.some(([name]) => name === "ensure" || name === "subscribe"), false);
+
+calls.length = 0;
+deps.signal = new AbortController().signal;
+deps.waitForAbort = async () => {
+  calls.push(["wait"]);
+  throw new Error("wait failed");
+};
+await assert.rejects(
+  subscribeGitLiveQuery({ query, subscriptionId: "wait-error" }, deps),
+  /wait failed/,
+);
+assert.deepEqual(calls.slice(-3).map(([name]) => name), ["wait", "unsubscribe", "release"]);
+
+calls.length = 0;
+deps.waitForAbort = async () => {};
+const subscribe = deps.liveQueryRegistry.subscribe;
+deps.liveQueryRegistry.subscribe = () => { throw new Error("subscribe failed"); };
+await assert.rejects(
+  subscribeGitLiveQuery({ query, subscriptionId: "subscribe-error" }, deps),
+  /subscribe failed/,
+);
+assert.equal(calls.at(-1)[0], "release");
+assert.equal(calls.some(([name]) => name === "unsubscribe"), false);
+deps.liveQueryRegistry.subscribe = subscribe;
+
+console.log("25 worker git watch request handler assertions passed");

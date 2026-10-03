@@ -132,9 +132,9 @@ Thread worktree resolution 的 current-thread 快路径、owner fallback、候�
 `src/main/worker/git-worktree-resolution.ts`。原 `fge`/`h4`/`pge`/`g4`/`mge`/`hge` 已删除，
 dispatcher 继续持有 envelope 与 query/cache 依赖；22 项断言覆盖关键选择与取消语义。
 
-Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-query recovery 与 unwatch
-编排已迁移至 `src/main/worker/git-watch-request-handlers.ts`；长生命周期的
-`subscribe-live-query` abort/subscription/finally release 状态机仍留在入口，13 项断言覆盖本批边界。
+Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-query recovery/unwatch，
+以及 `subscribe-live-query` 的 metadata coalescing、abort、subscription 与 releaseWatch `finally`
+状态机已迁移至 `src/main/worker/git-watch-request-handlers.ts`，25 项断言覆盖该完整请求边界。
 
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
