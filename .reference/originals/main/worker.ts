@@ -29,6 +29,7 @@ const { getGitCloneState } = require("./worker/git-clone-state");
 const { getGitIndexInfo } = require("./worker/git-index-info");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
+const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
@@ -87,6 +88,17 @@ const gitRecentBranchesDeps = {
   fetchQueryWithSignal: (...args) => w1(...args),
   getLiveQueryMeta: () => ipe,
   getShortLivedQueryMeta: () => v1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const gitRepositoryIdentityDeps = {
+  fetchQueryWithSignal: (...args) => w1(...args),
+  getConfigQueryMeta: () => y1,
+  getWorktreeId: (...args) => X0(...args),
+  isCancelledError: (error) => error instanceof c1,
+  originTimeoutMs: 5000,
+  parseRemoteUrl: (...args) => wB(...args),
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
   staleTime: Infinity,
@@ -308,7 +320,8 @@ const turnDiffCaptureDeps = {
     captureTurnDiffSnapshotTree(repository, turnDiffSnapshotDeps),
   getHeadCommit: (repository, signal) =>
     readCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
-  getRepositoryStatus: P3,
+  getRepositoryStatus: (repository, options) =>
+    getGitRepositoryIdentity(repository, options, gitRepositoryIdentityDeps),
   runGit: $,
   runDiff: y0,
   parseDiffError: g0,
@@ -70778,39 +70791,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-var ive = 5e3;
-async function P3(e, { isRepoWatched: t = !1, signal: n } = {}) {
-  let { host: r } = e,
-    i = async (t) => {
-      let n = await $(e.root, [`remote`, `get-url`, `origin`], r, { signal: t, timeoutMs: ive });
-      if (!n.success && n.code == null) throw Error(n.stderr);
-      return n.success && n.stdout ? n.stdout : null;
-    },
-    a = await (
-      t
-        ? w1(
-            e.queryClient,
-            { queryKey: Q(e.root, r, `effective-origin-url`), meta: y1, queryFn: i, staleTime: g1 },
-            n,
-          ).catch((e) => (e instanceof c1 && !n?.aborted ? i(n) : null))
-        : i(n)
-    ).catch(() => null),
-    o = a == null ? null : wB(a.replace(/\/+$/, ``)),
-    s = o?.host.toLowerCase(),
-    c = o != null && a?.includes(`://`) ? new URL(a) : null,
-    l =
-      (c?.port === `22` &&
-        (c.protocol === `ssh:` || c.protocol === `git+ssh:` || c.protocol === `ssh+git:`)) ||
-      (c?.protocol === `git:` && c.port === `9418`)
-        ? ``
-        : c?.port,
-    u = null;
-  if (o != null) {
-    let e = s === `github.com` ? `${o.owner}/${o.repo}`.toLowerCase() : `${o.owner}/${o.repo}`;
-    u = s === `github.com` && !l ? e : `${s}${l ? `:${l}` : ``}/${e}`;
-  }
-  return { repositoryFullName: u, worktreeId: await X0(e.root) };
-}
 var F3 = 250,
   I3 = 24,
   ave =
@@ -72315,7 +72295,8 @@ var I6 = kW(`git`),
           host: o,
           signal: i.signal,
           runAbortable: yR,
-          getRepositoryIdentity: P3,
+          getRepositoryIdentity: (repository, options) =>
+            getGitRepositoryIdentity(repository, options, gitRepositoryIdentityDeps),
           getCommitMessageDiff: (cwd, includeUnstaged, gitManager, host) =>
             getCommitMessageDiff(
               cwd,
