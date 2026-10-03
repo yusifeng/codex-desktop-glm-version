@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects } = require("../app/.vite/build/browser-page-preload/annotation-surface-geometry.js");
+const { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag } = require("../app/.vite/build/browser-page-preload/annotation-surface-geometry.js");
 assert.deepEqual(clipAnnotationSurfaceRect({ x: 10, y: 10, width: 100, height: 100 }, { x: 0, y: 20, width: 40, height: 40 }, { width: 80, height: 80 }), { x: 10, y: 20, width: 30, height: 40 });
 assert.equal(clipAnnotationSurfaceRect({ x: 0, y: 0, width: 10, height: 10 }, { x: 20, y: 20, width: 5, height: 5 }, { width: 100, height: 100 }), null);
 assert.equal(clipAnnotationSurfaceRect({ x: 0, y: 0, width: 10, height: 10 }, { x: 5, y: 5, width: 20, height: 20 }, { width: 10, height: 10 }).width, 5);
@@ -17,5 +17,16 @@ assert.equal(clampAnnotationCoordinate(-1, 0, 10), 0);
 assert.equal(clampAnnotationCoordinate(12, 0, 10), 10);
 assert.equal(isLargeAnnotationRect({ width: 45, height: 30 }, 100, 100, 0.45, 0.3), true);
 assert.equal(isLargeAnnotationRect({ width: 44, height: 30 }, 100, 100, 0.45, 0.3), false);
+assert.equal(isAnnotationPointInViewport({ x: 0, y: 0 }, { width: 10, height: 10 }), true);
+assert.equal(isAnnotationPointInViewport({ x: 10, y: 5 }, { width: 10, height: 10 }), false);
+assert.equal(isAnnotationPointInViewport({ x: -1, y: 5 }, { width: 10, height: 10 }), false);
+assert.equal(hasAnnotationDragThreshold({ x: 0, y: 0 }, { x: 3, y: 3 }), false);
+assert.equal(hasAnnotationDragThreshold({ x: 0, y: 0 }, { x: 4, y: 0 }), true);
+assert.equal(hasAnnotationDragThreshold({ x: 0, y: 0 }, { x: 0, y: -5 }), true);
+assert.deepEqual(createAnnotationRectFromPoints({ x: 8, y: 9 }, { x: 2, y: 3 }), { x: 2, y: 3, width: 6, height: 6 });
+const pendingDrag = { start: { x: 1, y: 1 }, current: { x: 1, y: 1 }, rect: null, isDraggingRegion: false };
+assert.deepEqual(updateAnnotationRegionDrag(pendingDrag, { x: 3, y: 3 }, 4), { ...pendingDrag, current: { x: 3, y: 3 } });
+assert.deepEqual(updateAnnotationRegionDrag(pendingDrag, { x: 5, y: 2 }, 4), { ...pendingDrag, current: { x: 5, y: 2 }, rect: { x: 1, y: 1, width: 4, height: 1 }, isDraggingRegion: true });
+assert.equal(updateAnnotationRegionDrag({ ...pendingDrag, isDraggingRegion: true }, { x: 2, y: 2 }, 4).isDraggingRegion, true);
 
-console.log("14 preload annotation surface geometry assertions passed");
+console.log("24 preload annotation surface geometry assertions passed");

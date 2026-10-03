@@ -167,6 +167,9 @@ nl -ba src/main/browser-page-preload.ts | sed -n '30084,30217p'
 Annotation overlay 的 HTTP(S) loopback/`.localhost` URL 判定已迁移至
 `src/main/browser-page-preload/local-url.ts`，原 `qg` 入口保留兼容调用面；该安全
 边界由 `scripts/test-preload-local-url.mjs` 覆盖。
+
+Annotation region drag 的 viewport 判定、drag threshold、双点 rect 与状态推进已迁移至
+`annotation-surface-geometry.ts`；原全局 `Is/Ls/Rs` 与 UI 尾部 `ab/ob/sb/cb` 已删除。
 ### 增量抽取：annotation surface element boundary
 
 annotation surface 注册与 MutationObserver 清理共用的顶层元素判定已迁移为

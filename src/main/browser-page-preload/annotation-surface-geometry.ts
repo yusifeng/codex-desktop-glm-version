@@ -41,5 +41,27 @@ function isLargeAnnotationRect(rect: Pick<Rect, `width` | `height`> | null | und
   return rect != null && width > 0 && height > 0 && rect.width >= width * minimumWidthRatio && rect.height >= height * minimumHeightRatio;
 }
 
-export { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects };
-if (typeof module !== `undefined`) module.exports = { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects };
+function isAnnotationPointInViewport(point: { x: number; y: number }, viewport: { width: number; height: number }) {
+  return point.x >= 0 && point.y >= 0 && point.x < viewport.width && point.y < viewport.height;
+}
+
+function hasAnnotationDragThreshold(start: { x: number; y: number }, current: { x: number; y: number }, threshold = 4) {
+  return Math.abs(current.x - start.x) >= threshold || Math.abs(current.y - start.y) >= threshold;
+}
+
+function createAnnotationRectFromPoints(start: { x: number; y: number }, current: { x: number; y: number }): Rect {
+  return {
+    x: Math.min(start.x, current.x),
+    y: Math.min(start.y, current.y),
+    width: Math.abs(current.x - start.x),
+    height: Math.abs(current.y - start.y),
+  };
+}
+
+function updateAnnotationRegionDrag(state: any, current: { x: number; y: number }, threshold: number) {
+  const isDraggingRegion = state.isDraggingRegion || hasAnnotationDragThreshold(state.start, current, threshold);
+  return { ...state, current, rect: isDraggingRegion ? createAnnotationRectFromPoints(state.start, current) : null, isDraggingRegion };
+}
+
+export { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag };
+if (typeof module !== `undefined`) module.exports = { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag };

@@ -4202,20 +4202,6 @@ function Fs(e, t) {
       );
   }
 }
-function Is(e, t) {
-  return e.x >= 0 && e.y >= 0 && e.x < t.width && e.y < t.height;
-}
-function Ls(e, t, n = 4) {
-  return Math.abs(t.x - e.x) >= n || Math.abs(t.y - e.y) >= n;
-}
-function Rs(e, t) {
-  return {
-    x: Math.min(e.x, t.x),
-    y: Math.min(e.y, t.y),
-    width: Math.abs(t.x - e.x),
-    height: Math.abs(t.y - e.y),
-  };
-}
 var zs,
   Bs,
   Vs,
@@ -6440,7 +6426,7 @@ var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annot
 var { installAnnotationFramePointerGuard } = require("./browser-page-preload/annotation-frame-pointer-guard");
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
-var { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects } = require("./browser-page-preload/annotation-surface-geometry");
+var { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag } = require("./browser-page-preload/annotation-surface-geometry");
 var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation-keyboard");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
@@ -25528,7 +25514,9 @@ function Wy({ rootHost: e, bridge: t }) {
             return;
           }
           let o = Lc(r, { x: i.clientX, y: i.clientY });
-          (a != null && ab(o)) || n();
+          (a != null &&
+            isAnnotationPointInViewport(o, { width: window.innerWidth, height: window.innerHeight })) ||
+            n();
         },
         l = () => {
           (Te.isDragging && document.hasFocus()) ||
@@ -25617,7 +25605,7 @@ function Wy({ rootHost: e, bridge: t }) {
           }
           if (
             O.current != null &&
-            u({ currentDragSelection: cb(O.current, o), suppressFollowUpClick: !0 })
+            u({ currentDragSelection: updateAnnotationRegionDrag(O.current, o, pb), suppressFollowUpClick: !0 })
           ) {
             Jc(n);
             return;
@@ -25662,7 +25650,7 @@ function Wy({ rootHost: e, bridge: t }) {
           if (n == null || t.pointerId !== n.pointerId) return;
           Jc(t);
           let r = Lc(e, { x: t.clientX, y: t.clientY }),
-            i = cb(n, r);
+            i = updateAnnotationRegionDrag(n, r, pb);
           ((O.current = i), oe(i), (E.current = r), f(r), o(null), c(null));
         },
         _ = (e, n) => {
@@ -25674,7 +25662,7 @@ function Wy({ rootHost: e, bridge: t }) {
             return;
           let i = O.current;
           if (i == null || n.pointerId !== i.pointerId) return;
-          let a = cb(i, Lc(e, { x: n.clientX, y: n.clientY }));
+          let a = updateAnnotationRegionDrag(i, Lc(e, { x: n.clientX, y: n.clientY }), pb);
           if (
             ((O.current = null),
             oe(null),
@@ -25770,7 +25758,7 @@ function Wy({ rootHost: e, bridge: t }) {
           let d = Lc(n, { x: a.clientX, y: a.clientY }),
             p = O.current;
           if (p != null) {
-            let e = cb(p, d);
+            let e = updateAnnotationRegionDrag(p, d, pb);
             if (
               ((O.current = null),
               oe(null),
@@ -26602,19 +26590,6 @@ function ib(e, t, n) {
   return [e.anchor, ...(e.additionalAnchors ?? [])].some(
     (e) => e.kind === `region` && i.some((t) => Fs(e, t)),
   );
-}
-function ab(e) {
-  return Is(e, { width: window.innerWidth, height: window.innerHeight });
-}
-function ob(e, t) {
-  return Ls(e, t, pb);
-}
-function sb(e, t) {
-  return Rs(e, t);
-}
-function cb(e, t) {
-  let n = e.isDraggingRegion || ob(e.start, t);
-  return { ...e, current: t, rect: n ? sb(e.start, t) : null, isDraggingRegion: n };
 }
 var G,
   lb,
