@@ -56,6 +56,8 @@ geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation s
 行为断言覆盖；annotation controls registry 的注册、更新、target 索引、dispose
 与可信 pagehide 清理由 `src/main/browser-page-preload/annotation-controls-registry.ts`
 承载，并由 10 项行为断言覆盖。
+pending editor message reducer 已进一步抽取为 `src/main/browser-page-preload/pending-editor-message.ts`，
+并由 6 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

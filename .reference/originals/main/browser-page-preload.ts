@@ -6436,6 +6436,7 @@ var zd = `codex_desktop:message-for-view`,
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
 var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("./browser-page-preload/annotation-runtime");
 var { createAnnotationControlsRegistry } = require("./browser-page-preload/annotation-controls-registry");
+var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
@@ -26927,7 +26928,7 @@ function Gb() {
   );
 }
 function Kb(e) {
-  Ob = Lf(Ob, e);
+  Ob = reducePendingEditorMessage(Ob, e);
 }
 function qb(e) {
   let t = Lb != null && Jb();

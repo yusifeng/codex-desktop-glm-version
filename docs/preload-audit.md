@@ -38,6 +38,9 @@ Annotation controls registry 的生命周期实现（注册、更新、target �
 可信 pagehide 清理）已迁移至 `src/main/browser-page-preload/annotation-controls-registry.ts`，
 原入口 `Cf` 通过依赖注入接回；`scripts/test-preload-annotation-controls-registry.mjs`
 覆盖注册、更新替换 target、覆盖顺序、dispose、target 总量限制和 pagehide 清理，共 10 项断言。
+pending editor message reducer 也已迁移至 `src/main/browser-page-preload/pending-editor-message.ts`，
+由 `Kb` 接回，并由 `scripts/test-preload-pending-editor-message.mjs` 覆盖 restore、close、sync
+和未知消息处理，共 6 项断言。
 
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
@@ -67,7 +70,7 @@ Annotation controls registry 的生命周期实现（注册、更新、target �
 | 3863-5049 | `business` | 安全序列化和浏览器上下文/批注协议基础：`Xo`/`Zo`/`Qo`/`$o` 限制可传输对象，3900-3917 声明 2 KiB/6 keys/256 字符限制；4313 起是 DOM/window、selection、element snapshot、viewport 和 annotation anchor 工具；6432-6435 声明 IPC event 名。 | 业务逻辑必须和 annotation schema 一起迁移，不能只迁 helper。 |
 | 5050-5119 | `vendor` | UUID v4 生成器：`crypto.getRandomValues`、`randomUUID`、byte layout；5084 行包含 uuidjs 文档 URL，5101-5113 是标准 v4 写入逻辑。 | 保留或改为显式依赖，禁止 identity stub。 |
 | 5120-7259 | `business` | 页面文档上下文、Google Docs 检测、元素/文本/可见区域采样、批注 surface 和请求验证。证据：5167-5237 的 document context class；6169 起 annotation request schema；6400-6849 的事件校验、surface hit-test、selection/render 回调。 | 这是可提取的业务核心，但需保留 frame/shadow-root/timeout 语义。 |
-| 7260-7553 | `business` | annotation controls registry：`codex:register-annotation-controls`、update/dispose channel，控制项 schema、DOM MutationObserver、跨 frame target 跟踪。证据：7260-7272 常量/schema，7273-7529 `Cf` registry，7532-7551 pending editor message reducer。 | registry 生命周期已迁移至 `src/main/browser-page-preload/annotation-controls-registry.ts` 并由 `Cf` 注入接回；pending editor message reducer 仍保留在入口，继续与主进程 `browser-sidebar-runtime-*` 消息协议成对迁移。 |
+| 7260-7553 | `business` | annotation controls registry：`codex:register-annotation-controls`、update/dispose channel，控制项 schema、DOM MutationObserver、跨 frame target 跟踪。证据：7260-7272 常量/schema，7273-7529 `Cf` registry，7532-7551 pending editor message reducer。 | registry 生命周期已迁移至 `src/main/browser-page-preload/annotation-controls-registry.ts`，pending editor message reducer 已迁移至 `src/main/browser-page-preload/pending-editor-message.ts`，均由入口接回并有独立行为断言；仍需继续迁移后续 annotation UI/runtime 业务段。 |
 | 7554-19016 | `vendor/generated` | Vite preload error wrapper（7554-7563）后为 React 19.2.7 + React DOM reconciler/runtime。证据：7565 起 `Symbol.for("react.*")`；7983、8141、18959-18973 明确版本 `19.2.7` 和 `rendererPackageName: react-dom`；19003-19015 是 React devtools hook。 | 整段保留；React reconciler 不能伪造业务源码。 |
 | 19017-21896 | `vendor/generated` | TypeScript helpers、memoize、FormatJS/React Intl runtime。证据：19017 `__extends`/object spread helper；20844 `[formatjs Error`；20977、21106、21468、21649-21867 的 FormatJS API/locale fallback 文本。 | 保留 vendor；业务只依赖其公开 formatter。 |
 | 21897-22290 | `vendor/generated` | React Intl 组件/provider 和 react-is compatibility layer。证据：21897-21903 React Intl assertion；21940 起 `Symbol.for("react.*")` type predicates；22266-22282 `IntlProvider`。 | 保留 vendor/runtime。 |
