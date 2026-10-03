@@ -6436,6 +6436,7 @@ var zd = `codex_desktop:message-for-view`,
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
 var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("./browser-page-preload/annotation-runtime");
 var { createAnnotationControlsRegistry } = require("./browser-page-preload/annotation-controls-registry");
+var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 Yo();
@@ -7237,6 +7238,23 @@ var kf = `oai-annotation-container`,
   Nf = `codex:annotation-shadow-root-attached`,
   Pf = { childList: !0, subtree: !0, attributes: !0, attributeFilter: [kf, Af, jf, Mf] };
 function Ff(e) {
+  return installAnnotationSurfaceObserver({
+    documentRef: document,
+    windowRef: window,
+    elementConstructor: Element,
+    htmlElementConstructor: HTMLElement,
+    mutationObserverConstructor: MutationObserver,
+    shadowEvent: Nf,
+    containersAttribute: kf,
+    containerTextAttribute: Af,
+    metadataAttribute: jf,
+    annotatableAttribute: Mf,
+    observerOptions: Pf,
+    parseMetadata: Qo,
+    executeInMainWorld: (args) => d.contextBridge.executeInMainWorld(args),
+    onFeaturesChanged: (features) => e(features),
+  });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let t = new Set(),
     n = new Set(),
     r = new Set(),

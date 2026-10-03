@@ -42,6 +42,12 @@ pending editor message reducer 也已迁移至 `src/main/browser-page-preload/pe
 由 `Kb` 接回，并由 `scripts/test-preload-pending-editor-message.mjs` 覆盖 restore、close、sync
 和未知消息处理，共 6 项断言。
 
+Annotation surface feature observer（原 `Ff` 7239-7326，含 `If` 的 attachShadow hook
+7327-7345）已迁移至 `src/main/browser-page-preload/annotation-surface-observer.ts`，
+由 `Bb` 注入 parser、contextBridge 和 feature callback 接回；containers/metadata、shadow-root
+observer、pageshow、recordUse 优先级和 dispose 由 `scripts/test-preload-annotation-surface-observer.mjs`
+覆盖，共 13 项断言。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。

@@ -58,6 +58,10 @@ geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation s
 承载，并由 10 项行为断言覆盖。
 pending editor message reducer 已进一步抽取为 `src/main/browser-page-preload/pending-editor-message.ts`，
 并由 6 项行为断言覆盖。
+annotation surface feature observer（DOM/shadow-root 扫描、feature 状态、pageshow 与
+dispose 生命周期）已抽取为 `src/main/browser-page-preload/annotation-surface-observer.ts`，
+由 13 项行为断言覆盖；main 启动 flavor/platform flags 与阶段计时策略已抽取为
+`src/main/main-app/startup/startup-policy.ts`，由 9 项矩阵断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

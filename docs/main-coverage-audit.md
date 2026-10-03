@@ -75,6 +75,30 @@ rolldown 的 `e.t/e.r/e.a/e.n` 包装、模块编号表、`__export`/`__toCommon
 3. `109,475-126,987` 的 IAB/MCP sandbox 与 `152,560-168,047` 的窗口/终端簇跨越 Electron 生命周期，不能仅凭导出消费量判断完成。
 4. vendor 区间的 npm 替换只能在行为验证后进行；在未完成等价验证前，继续走 transform-only 是有意的 `preserved` 状态，不是遗漏。
 
+### 下一条低风险抽取建议（审计增量）
+
+优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含
+Electron/worker 副作用）：
+
+该边界现已迁移至 `src/main/main-app/startup/startup-policy.ts`：
+`resolveStartupFlavorFlags` 接回 `Ust` 的 flavor/platform flags，
+`createStartupPhaseTracker` 接回阶段 elapsed/trace 记录；
+`scripts/test-main-startup-policy.mjs` 覆盖 9 项矩阵和计时断言。
+
+- `175,824-175,859` 的 `S/C/w/T/E` 是纯 build-flavor/platform 映射，输入仅为
+  `buildFlavor`、`process.platform` 和环境状态；可落为 `resolveStartupFlavorFlags`
+  并用矩阵断言覆盖 Dev/Agent/Prod + darwin/win32/linux。
+- `175,849-175,859` 的 `M` 计时闭包只写 `phaseElapsedMs` 并调用 logger，可抽为
+  注入 `now`/`trace` 的 `createStartupPhaseTracker`；保持 `background` 时不写阶段
+  累计的原语义。
+- 该边界不触碰 `app.whenReady()`、协议注册、window services 或 worker-bus，因而
+  不改变启动副作用顺序；验证入口为 `node scripts/build.mjs --check`、
+  `node scripts/verify-chunks.mjs`、`npm run typecheck -- --pretty false`，并新增
+  `scripts/test-main-startup-policy.mjs` 的矩阵断言。
+
+这是当前启动区最适合作为下一批的物理迁出点；`Ust` 的其余区段仍需按 G1-G12
+副作用边界拆分，不应一次性重写。
+
 ## 审计复核
 
 ```sh

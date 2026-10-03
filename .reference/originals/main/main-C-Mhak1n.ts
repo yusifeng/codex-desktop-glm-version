@@ -12,6 +12,7 @@ const mainUrlTrust = require("./main-app/util/url-trust.js");
 const appshotShortcut = require("./main-app/hotkey/appshot-shortcut.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
 const windowAppearance = require("./main-app/window-appearance.js");
+const { createStartupPhaseTracker, resolveStartupFlavorFlags } = require("./main-app/startup/startup-policy.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175823,25 +175824,22 @@ async function Ust() {
       .get()
       .then((e) => !1)
       .catch(() => !1),
-    S = a.in.shouldIncludeSparkle(s, process.platform, process.env),
-    C = a.in.shouldIncludeUpdater(s, process.platform, process.env),
-    w = a.in.allowDevtools(s),
-    T = s === a.in.Dev || s === a.in.Agent,
-    E = a.in.allowDebugMenu(s),
+    startupFlags = resolveStartupFlavorFlags({ buildFlavor: s, platform: process.platform, env: process.env, isPackaged: l.app.isPackaged, policy: a.in }),
+    S = startupFlags.enableSparkle,
+    C = startupFlags.enableUpdater,
+    w = startupFlags.allowDevtools,
+    T = startupFlags.allowInspectElement,
+    E = startupFlags.allowDebugMenu,
     D = l.app.getVersion(),
     O = Zoe({ app: l.app }),
     k = Qoe({ app: l.app }),
     A = r.a(`startup`),
     j = {},
-    M = (t, n, r = {}) => {
-      let i = Date.now();
-      (r.background !== !0 && (j[t] = i - n),
-        A.trace(t, { safe: { phaseElapsedMs: i - n, startupElapsedMs: i - e, ...r } }));
-    };
+    M = createStartupPhaseTracker({ startedAtMs: e, now: Date.now, phaseDurations: j, trace: (phase, detail) => A.trace(phase, detail) });
   M(`bootstrap handoff complete`, e, { appWhenReadyResolved: l.app.isReady() });
-  let N = process.platform === `darwin`,
-    P = process.platform === `win32`,
-    F = !l.app.isPackaged,
+  let N = startupFlags.isDarwin,
+    P = startupFlags.isWindows,
+    F = startupFlags.isUnpackaged,
     I = new n.Wr();
   (I.add(_),
     I.add(O),
