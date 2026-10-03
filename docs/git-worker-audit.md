@@ -119,6 +119,10 @@ root/origin 组合与单目录失败隔离已完整迁移至 `src/main/worker/gi
 透传及成功时 refresh-root 规则；worktree scope 的 `codex.localEnvironmentConfigPath` 明确不刷新，
 由 5 项行为断言覆盖。
 
+Worktree snapshot/state 的候选目录过滤、snapshot ref/commit 查找、路径 inspection 和
+`available/gone/restorable/unavailable` 状态机已迁移至
+`src/main/worker/git-worktree-snapshot.ts`；原 `k4`/`Mve`/`V3` 已删除，由 12 项断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

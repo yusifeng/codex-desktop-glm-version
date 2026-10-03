@@ -22,6 +22,7 @@ const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranc
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
+const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
@@ -70288,51 +70289,6 @@ async function Sge(e, t, n, r, i) {
     { snapshotRef: c, worktreeId: s, repoRoot: a.root, commonDir: a.commonDir, commitSha: d }
   );
 }
-async function k4(e, t, n, r, i) {
-  let a = await X0(bz(n)),
-    o = M4(a),
-    s = (
-      await Promise.all(
-        t.map(async (e) => {
-          try {
-            return (await r.stat(e)).isDirectory() ? e : null;
-          } catch {
-            return null;
-          }
-        }),
-      )
-    ).filter((e) => e != null);
-  if (s.length === 0) throw Error(`No candidate workspace roots exist on disk`);
-  let c = (
-    await Promise.all(
-      s.map(async (t) => {
-        try {
-          return await e.getStableMetadata(xz(t), r);
-        } catch {
-          return null;
-        }
-      }),
-    )
-  ).filter((e) => !!e);
-  if (c.length === 0) throw Error(`No candidate workspace roots are valid git repositories`);
-  let l = await Promise.all(
-    c.map(async (t) => ({
-      metadata: t,
-      commitSha: await N0(e.getWorktreeRepositoryForRoot(t.root, r), o, i, { fresh: !0 }),
-    })),
-  );
-  for (let { metadata: e, commitSha: t } of l)
-    if (t != null)
-      return {
-        snapshotRef: o,
-        worktreeId: a,
-        repoRoot: e.root,
-        commonDir: e.commonDir,
-        exists: !0,
-        commitSha: t,
-      };
-  return { snapshotRef: o, worktreeId: a, exists: !1, commitSha: null };
-}
 async function Cge(e, t, n, r, i) {
   let a = await X0(bz(t)),
     o = M4(a);
@@ -73278,30 +73234,6 @@ function jve(e, t, n) {
   return t.outputLimitExceeded != null && e === 1
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
-}
-async function Mve(e, t, n, r, i, a) {
-  let o = await V3(i, n);
-  if (o === `available`) return { kind: `available` };
-  if (o === `unavailable`) return { kind: `unavailable`, reason: `inspection-failed` };
-  if (n !== r) {
-    let e = await V3(i, r);
-    if (e === `available`) return { kind: `gone` };
-    if (e === `unavailable`) return { kind: `unavailable`, reason: `inspection-failed` };
-  }
-  if (t.length === 0) return { kind: `unavailable`, reason: `no-candidate-roots` };
-  try {
-    let n = await k4(e, t, r, i, a);
-    return n.exists ? { kind: `restorable`, snapshot: n } : { kind: `gone` };
-  } catch {
-    return { kind: `unavailable`, reason: `inspection-failed` };
-  }
-}
-async function V3(e, t) {
-  try {
-    return (await e.stat(t, { bypassCache: !0 })).isDirectory() ? `available` : `unavailable`;
-  } catch (e) {
-    return sB(e) ? `missing` : `unavailable`;
-  }
 }
 async function H3({ branch: e, cwd: t, commitSha: n, host: r }) {
   let i = await U3({ branch: e, cwd: t, commitSha: n, host: r });
@@ -77331,6 +77263,17 @@ var I6 = kW(`git`),
           host: o,
           signal: i.signal,
         },
+        worktreeSnapshotDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+          getWorktreeId: X0,
+          normalizeWorktreePath: bz,
+          getSnapshotRef: M4,
+          normalizeRoot: xz,
+          getCommitSha: N0,
+          isMissingError: sB,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77745,25 +77688,12 @@ var I6 = kW(`git`),
             break;
           case `worktree-snapshot-ref`:
             p = X(
-              await k4(
-                this.gitManager,
-                e.params.candidateRoots,
-                e.params.worktreePath,
-                o,
-                i.signal,
-              ),
+              await resolveWorktreeSnapshot(e.params.candidateRoots, e.params.worktreePath, worktreeSnapshotDeps),
             );
             break;
           case `managed-worktree-state`:
             p = X(
-              await Mve(
-                this.gitManager,
-                e.params.candidateRoots,
-                e.params.cwd,
-                e.params.worktreePath,
-                o,
-                i.signal,
-              ),
+              await resolveManagedWorktreeState(e.params.candidateRoots, e.params.cwd, e.params.worktreePath, worktreeSnapshotDeps),
             );
             break;
           case `restore-worktree`: {

@@ -81,6 +81,8 @@ Origin discovery 的去重、平台路径判定、Git marker 向上查找、meta
 隔离已完整迁移至 `src/main/worker/git-origin-discovery.ts`，原七个压缩函数已删除，由 11 项断言覆盖。
 `set-config-value` 的参数透传和 refresh-root 规则已迁移至
 `src/main/worker/git-config-request-handler.ts`，由 5 项行为断言覆盖 worktree-local 特例。
+Worktree snapshot/state 的候选目录、snapshot commit、路径 inspection 与 managed-state 状态机已
+迁移至 `src/main/worker/git-worktree-snapshot.ts`，原三个压缩函数已删除，由 12 项断言覆盖。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
