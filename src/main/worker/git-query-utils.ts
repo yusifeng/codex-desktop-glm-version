@@ -63,5 +63,9 @@ function hasFsmonitorDaemonFeature(output: string): boolean {
   return output.split(`\n`).some((line) => line.trim() === `feature: fsmonitor--daemon`);
 }
 
-export { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength };
-if (typeof module !== `undefined`) module.exports = { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength };
+function isFsmonitorPlatformSupported({ isLocal, platformFamily, platformOs }: { isLocal: boolean; platformFamily: string; platformOs: string }): boolean {
+  return isLocal ? platformFamily === `windows` || platformOs === `macos` : platformOs === `linux`;
+}
+
+export { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength };
+if (typeof module !== `undefined`) module.exports = { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength };

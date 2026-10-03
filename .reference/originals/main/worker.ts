@@ -10,7 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
-const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
+const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -66119,6 +66119,10 @@ async function t0(e, t, n, r, i, a) {
   }
 }
 async function wpe(e) {
+  const local = e.isLocal;
+  const [family, os] = await Promise.all([e.platformFamily(), e.platformOs()]);
+  return isFsmonitorPlatformSupported({ isLocal: local, platformFamily: family, platformOs: os });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (!e.isLocal) return (await e.platformOs()) === `linux`;
   let [t, n] = await Promise.all([e.platformFamily(), e.platformOs()]);
   return t === `windows` || n === `macos`;
