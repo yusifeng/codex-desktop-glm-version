@@ -41,6 +41,7 @@ const { createReviewDiffFallback, getReviewDiff } = require("./worker/git-review
 const { attachReviewFileRevisions, createUnmergedReviewFiles, deduplicateReviewFiles, getOmittedUntrackedFiles, gitStatusToReviewChangeKind, mergeReviewMetadata, parseReviewMetadataDiff, reconcileRenameStats, reconcileUntrackedRenames, reviewFileKey, selectUntrackedReviewPaths } = require("./worker/git-review-metadata-utils");
 const { inferReviewRenames, readReviewDiffMetadata, reconcileStagedReviewRenames, resolveReviewMetadataPaths } = require("./worker/git-review-metadata-diff");
 const { finalizeReviewMetadata, readUntrackedReviewMetadata } = require("./worker/git-review-metadata-finalize");
+const { applyReviewSectionChanges } = require("./worker/git-review-section-changes");
 const { getReviewWorkingTreeMetadata } = require("./worker/git-review-working-tree-metadata");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
@@ -336,6 +337,16 @@ const gitReviewBranchStatsDeps = {
   resolveReviewPaths: (params) =>
     resolveReviewMetadataPaths(params, gitReviewMetadataDiffDeps),
   reviewFileKey,
+};
+const gitReviewSectionChangesDeps = {
+  applyPatch: (...args) => S2(...args),
+  getReviewDiff: (reviewSnapshot, source, files, options) =>
+    getReviewDiff(reviewSnapshot, source, files, options, gitReviewDiffDeps),
+  getReviewFiles: (params) => v_e(params),
+  invalidateUntrackedPathsCache: (repository) => p2(repository),
+  normalizeCwd: (cwd) => xz(cwd),
+  normalizePathFromRoot: (...args) => o2(...args),
+  runGit: (...args) => $(...args),
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70785,151 +70796,6 @@ async function b_e({ includeUntrackedFiles: e, reviewSnapshot: t, untrackedFileC
     untrackedFileCount: d,
   }));
 }
-async function D_e({ action: e, host: t, cwd: n, files: r, gitManager: i, signal: a, source: o }) {
-  let s = await i.getWorktreeRepository(xz(n), t);
-  if (s?.root == null)
-    return {
-      status: `error`,
-      appliedPaths: [],
-      skippedPaths: [],
-      conflictedPaths: [],
-      errorCode: `not-git-repo`,
-    };
-  let c = await t.platformPath(),
-    l = r.map((e) => ({ ...e, path: A_e(c, s.root, n, e.path) }));
-  if (l.length === 0)
-    return { status: `error`, appliedPaths: [], skippedPaths: [], conflictedPaths: [] };
-  (p2(s), s.clearShortLivedGitReadCaches());
-  let u = await getReviewDiff(s.reviewSnapshot, o, l, { binary: !0 }, gitReviewDiffDeps).catch(() => null);
-  if (u == null)
-    return { status: `error`, appliedPaths: [], skippedPaths: [], conflictedPaths: [] };
-  s.clearShortLivedGitReadCaches();
-  let d = await v_e({
-      paths: [
-        ...new Set(
-          l.flatMap((e) => (e.previousPath == null ? [e.path] : [e.path, e.previousPath])),
-        ),
-      ],
-      source: o,
-      worktreeRepo: s,
-    }),
-    f = d.type === `success` ? new Map(d.files.map((e) => [e.path, e.revision])) : null;
-  if (f == null || l.some((e) => f.get(e.path) !== e.revision))
-    return { status: `error`, appliedPaths: [], skippedPaths: [], conflictedPaths: [] };
-  let p = l.flatMap((e) => {
-      let t = u.diffs[e.path];
-      return t?.type === `success` ? [t.diff] : [];
-    }),
-    m = l.flatMap((e) => {
-      let t = u.diffs[e.path],
-        n = e.changeKind === `untracked` && t?.type === `success` ? O_e(t.diff) : null;
-      return n == null ? [] : [{ path: e.path, sha: n }];
-    }),
-    h = p.join(``);
-  if (p.length !== l.length || h.trim().length === 0)
-    return { status: `error`, appliedPaths: [], skippedPaths: [], conflictedPaths: [] };
-  switch (e) {
-    case `stage`:
-      return S3({ host: t, diff: h, gitManager: i, repoRoot: s.root, signal: a, target: `staged` });
-    case `unstage`:
-      return S3({
-        host: t,
-        diff: h,
-        gitManager: i,
-        repoRoot: s.root,
-        revert: !0,
-        signal: a,
-        target: `staged`,
-      });
-    case `revert`: {
-      if (o === `staged`) {
-        let e = await S3({
-          host: t,
-          diff: h,
-          gitManager: i,
-          repoRoot: s.root,
-          revert: !0,
-          signal: a,
-          target: `staged`,
-        });
-        if (e.status !== `success`) return e;
-        let n = await S3({
-          host: t,
-          diff: h,
-          gitManager: i,
-          repoRoot: s.root,
-          revert: !0,
-          signal: a,
-          target: `unstaged`,
-        });
-        return n.status === `success` ? n : { ...n, status: `partial-success` };
-      }
-      let e = await k_e({ gitlinks: m, host: t, path: c, repoRoot: s.root, signal: a });
-      if (e == null)
-        return {
-          status: `error`,
-          appliedPaths: [],
-          skippedPaths: m.map((e) => e.path),
-          conflictedPaths: [],
-        };
-      let n = await S3({
-        host: t,
-        diff: h,
-        gitManager: i,
-        repoRoot: s.root,
-        revert: !0,
-        signal: a,
-        target: `unstaged`,
-      });
-      if (n.status !== `success` || e.length === 0) return n;
-      try {
-        return (
-          await Promise.all(e.map((e) => t.remove(e, { recursive: !0, force: !0 }))),
-          p2(s),
-          n
-        );
-      } catch {
-        return {
-          ...n,
-          status: `partial-success`,
-          skippedPaths: [...n.skippedPaths, ...m.map((e) => e.path)],
-        };
-      }
-    }
-  }
-}
-function O_e(e) {
-  return /^new file mode 160000$/m.test(e)
-    ? (/^\+Subproject commit ([0-9a-f]{40,64})$/m.exec(e)?.[1] ?? null)
-    : null;
-}
-async function k_e({ gitlinks: e, host: t, path: n, repoRoot: r, signal: i }) {
-  let a = await Promise.all(
-    e.map(async (e) => {
-      let a = n.join(r, e.path),
-        [o, s] = await Promise.all([
-          $(a, [`rev-parse`, `HEAD`], t, { signal: i }),
-          $(a, [`status`, `--porcelain=v1`, `--untracked-files=all`, `--ignored=matching`], t, {
-            signal: i,
-          }),
-        ]);
-      return !o.success || !s.success || o.stdout.trim() !== e.sha || s.stdout.trim().length > 0
-        ? null
-        : a;
-    }),
-  );
-  return a.some((e) => e == null) ? null : a.filter((e) => e != null);
-}
-function A_e(e, t, n, r) {
-  return r.startsWith(`./`) || r.startsWith(`../`) || r.startsWith(`.\\`) || r.startsWith(`..\\`)
-    ? o2(e, t, n, r)
-    : o2(e, t, t, r);
-}
-function S3({ host: e, diff: t, gitManager: n, repoRoot: r, revert: i, signal: a, target: o }) {
-  return S2({ allowBinary: !0, atomic: !0, cwd: r, diff: t, revert: i, target: o }, n, e, {
-    signal: a,
-  });
-}
 var j_e = e.n((e, t) => {
     var n = II(),
       r = /[\\^$.*+?()[\]{}|]/g,
@@ -72993,7 +72859,8 @@ var I6 = kW(`git`),
           signal: i.signal,
           applyChanges: (params) => applyGitChangesBetweenTrees(params, gitApplyChangesDeps),
           applyPatch: S2,
-          applyReviewSectionChanges: D_e,
+          applyReviewSectionChanges: (params) =>
+            applyReviewSectionChanges(params, gitReviewSectionChangesDeps),
         },
         watchRequestDeps = {
           gitManager: this.gitManager,

@@ -125,6 +125,11 @@ Review metadata 的 working-tree 最终补全与 untracked metadata 合成已迁
 `src/main/worker/git-review-metadata-finalize.ts`；原 `x_e`/`y3` 已删除。25 项断言覆盖空输入、
 重复路径、缺失 metadata 默认值、零 OID 定向补全、untracked 标记、revision 参数透传与排序。
 
+Review section 的 stage/unstage/revert 编排、revision 防陈旧校验和 untracked gitlink 清理已迁移至
+`src/main/worker/git-review-section-changes.ts`；原 `D_e`/`O_e`/`k_e`/`A_e`/`S3` 已删除。
+56 项断言覆盖路径归一化、diff/revision 失败、双阶段 staged revert、gitlink HEAD/dirty 校验、
+删除成功与 partial-success 降级。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的
