@@ -41,6 +41,8 @@ ignore policy 刷新后的 skip/apply/restart 纯决策，回归断言增至 51 
 dispose/restart 与 session timer 副作用仍保留在入口。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
+preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
+`src/main/browser-page-preload/local-url.ts`，由 9 项行为断言覆盖；
 preload 的 WebMCP registry shim 已抽取为
 `src/main/browser-page-preload/webmcp-registry.ts`，由 7 项行为断言覆盖；main
 窗口外观策略已抽取为 `src/main/main-app/window-appearance.ts`，并包含 traffic-light

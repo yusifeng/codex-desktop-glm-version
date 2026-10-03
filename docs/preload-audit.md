@@ -122,6 +122,10 @@ rg -n 'contextBridge|ipcRenderer|Zod|react-dom|formatjs|uuidjs|WebMCP' src/main/
 nl -ba src/main/browser-page-preload.ts | sed -n '26882,27217p'
 nl -ba src/main/browser-page-preload.ts | sed -n '30084,30217p'
 ```
+
+Annotation overlay 的 HTTP(S) loopback/`.localhost` URL 判定已迁移至
+`src/main/browser-page-preload/local-url.ts`，原 `qg` 入口保留兼容调用面；该安全
+边界由 `scripts/test-preload-local-url.mjs` 覆盖。
 ### 增量抽取：annotation surface element boundary
 
 annotation surface 注册与 MutationObserver 清理共用的顶层元素判定已迁移为
