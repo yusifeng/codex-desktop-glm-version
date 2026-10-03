@@ -145,6 +145,11 @@ Worktree restore/delete 与 thread handoff 请求编排已迁移至
 三种 handoff progress event、跨 host destination cache 的 `finally` 失效和 transfer cleanup 均由
 该模块持有；底层 snapshot/move 算法继续通过窄依赖注入。35 项断言覆盖成功、容错和异常路径。
 
+Host handoff transfer 的临时目录定位、同 host 免复制/跨 host 文件复制和 cleanup 路径安全边界
+已迁移至 `src/main/worker/git-handoff-transfer.ts`；原 `J3/Z3/Fve` 实现已删除。cleanup 只允许
+删除 `<codexHome>/handoffs/<单层 id>/rollout.jsonl` 的父目录，19 项断言覆盖 POSIX、Windows、
+跨目录和 traversal 路径。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

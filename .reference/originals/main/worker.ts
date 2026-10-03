@@ -9,6 +9,7 @@ const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, restoreWorktree } = require("./worker/git-worktree-request-handlers");
+const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -73215,8 +73216,8 @@ async function Pve(
       error: `destination-not-in-repository`,
       message: `Destination workspace is not in a git repository`,
     });
-  let l = await J3(n, o),
-    u = await J3(r, o),
+  let l = await getHostHandoffDirectory(n, o),
+    u = await getHostHandoffDirectory(r, o),
     d = await n.platformPath(),
     f = await r.platformPath(),
     p = d.join(l, `handoff.bundle`),
@@ -73298,7 +73299,7 @@ async function Pve(
       if (!o.success) return Q3(`bundle-export-failed`, `Failed to export git handoff bundle`, o);
       (O(`prepare-host-transfer`, `completed`),
         O(`transfer-host-artifacts`, `started`),
-        await Z3(p, n, m, r, i));
+        await transferHostFile(p, n, m, r, i));
       let l = await $(c.root, [`bundle`, `unbundle`, m], r, { signal: i });
       if (!l.success) return Q3(`bundle-import-failed`, `Failed to import git handoff bundle`, l);
       let u = await $(c.root, [`update-ref`, _, k], r, { signal: i });
@@ -73307,7 +73308,7 @@ async function Pve(
     }
     if (
       (te && (O(`prepare-host-transfer`, `completed`), O(`transfer-host-artifacts`, `started`)),
-      await Z3(e.sourceRolloutPath, n, h, r, i),
+      await transferHostFile(e.sourceRolloutPath, n, h, r, i),
       O(`transfer-host-artifacts`, `completed`),
       x == null || S == null)
     ) {
@@ -73484,21 +73485,6 @@ async function Pve(
       ]));
   }
 }
-async function Fve(e, t) {
-  let n = await t.platformPath(),
-    r = n.dirname(e),
-    i = n.relative(n.join(await t.codexHome(), `handoffs`), r);
-  if (
-    n.basename(e) !== `rollout.jsonl` ||
-    i.length === 0 ||
-    i === `..` ||
-    i.startsWith(`..${n.sep}`) ||
-    n.isAbsolute(i) ||
-    i.includes(n.sep)
-  )
-    throw Error(`Host handoff cleanup requires a copied rollout path`);
-  await t.remove(r, { recursive: !0, force: !0 });
-}
 async function Ive({ branch: e, cwd: t, commitSha: n, host: r }) {
   let i = await $(t, [`branch`, `-f`, e, n], r);
   if (i.success) return null;
@@ -73576,9 +73562,6 @@ async function K3({
 }
 async function q3({ branch: e, cwd: t, gitManager: n, host: r }) {
   e != null && (await t4({ cwd: t, branch: e, stashUncommitted: !1 }, n, r).catch(() => void 0));
-}
-async function J3(e, t) {
-  return (await e.platformPath()).join(await e.codexHome(), `handoffs`, t);
 }
 async function Y3(e, t, n) {
   try {
@@ -73686,9 +73669,6 @@ async function Rve({
     }),
     null
   );
-}
-async function Z3(e, t, n, r, i) {
-  (t.id !== r.id || e !== n) && (await r.writeFile(n, await t.readFile(e), { signal: i }));
 }
 function Q3(e, t, n) {
   return X({
@@ -77205,7 +77185,7 @@ var I6 = kW(`git`),
           moveToWorktree: Bve,
           moveToHostWorktree: Pve,
           createExecutionHost: (config) => this.dependencies.createExecutionHost(config),
-          cleanupHostTransfer: Fve,
+          cleanupHostTransfer: cleanupHostHandoffTransferFiles,
         },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
