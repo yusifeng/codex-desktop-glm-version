@@ -73,6 +73,8 @@ virtual annotation target payload 组装已抽取为
 `src/main/browser-page-preload/annotation-virtual-target.ts`，由 6 项行为断言覆盖。
 surface/viewport rect clipping 已抽取为
 `src/main/browser-page-preload/annotation-surface-geometry.ts`，由 4 项行为断言覆盖。
+annotation 空格键拦截与输入保护策略已抽取为
+`src/main/browser-page-preload/annotation-keyboard.ts`，由 5 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
@@ -85,8 +87,8 @@ surface/viewport rect clipping 已抽取为
 ## 一、为什么还没「完全」反编译（2026-10-03 审计结论）
 
 前一阶段的方法论是**消费驱动**：只语义化被重写代码实际 import 的导出。
-这保证了结构等价与门禁，但留下了五处「整体保留、未逐段审计」的压缩原版，
-以及五处工程可读性缺口。**它们不是待办清单的尾巴，而是「完全反编译」
+这保证了结构等价与门禁，但留下了四处「整体保留、未逐段物理迁出」的压缩原版，
+以及五处工程可读性缺口；shared 692 导出全量分类已经完成。**它们不是待办清单的尾巴，而是「完全反编译」
 与「结构等价完成」之间的全部差距。**
 
 ### A. 仍是压缩原版的业务代码（5 处）
@@ -96,8 +98,8 @@ surface/viewport rect clipping 已抽取为
 | A1 | `.reference/originals/main/worker.ts`（git-worker） | **90,836 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **30,217 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP | annotation/design runtime 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
-| A4 | shared 未消费导出 | **330 个**（692 总量 − 362 已消费） | 未分类 | 其中 vendor（lodash shim 等）与真实业务混杂；A1/A2 语义化后消费面会增长，联动出现新缺口 |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 仅 343 个被消费导出类型化 | hub 内部未消费的应用逻辑仍是压缩（app-initial 里有 i18n 核心等真实业务，也有大量 micromark/zod/valdi 胶水） |
+| A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计与消费契约审计 | `docs/app-shared-internal-audit.md`、`docs/renderer-classification.md` 明确 semantic 边界与 preserved asset 家族；仍有未消费业务逻辑待物理迁出 |
 
 ### B. 工程可读性缺口（5 处）
 
@@ -136,15 +138,15 @@ schema、消息处理语义化到 `src/main/browser-page-preload/`；内嵌
 runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
 两个先例的验证方式。
 
-### T3 · shared 未消费导出全量分类（A4，与 T1/T2 联动）
+### T3 · shared 导出全量分类（A4，已完成；与 T1/T2 联动）
 
-1. 对 330 个未消费导出逐一判定：`business`（语义化到
+1. 对全部 692 个导出逐一判定：`business`（语义化到
    `src/main/shared/<模块>.ts`，方法同前）或 `vendor/generated`
    （登记保留理由）。判定依据：导出符号的原文实现是否含业务语义
    （协议/状态/配置）vs 纯库转发（lodash/ms/debug shim）。
 2. T1/T2 语义化产生的新消费缺口随做随清；本任务完成判据是
    **692 个导出全部有归属**：语义化声明或保留登记，二选一，无未分类。
-3. 产出 `docs/shared-full-classification.md`（692 行清单 + 归属 + 证据）。
+3. 已产出 `docs/shared-full-classification.md`（692 个导出清单 + 归属 + 证据），当前 `audit-shared-consumption` 为 `TOTAL: 0`。
 
 ### T4 · main chunk 未消费区域审计（A3，原可选 T6 转正）
 

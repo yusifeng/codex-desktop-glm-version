@@ -6440,6 +6440,7 @@ var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annot
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
 var { clipAnnotationSurfaceRect } = require("./browser-page-preload/annotation-surface-geometry");
+var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation-keyboard");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 Yo();
@@ -22797,6 +22798,8 @@ var r_ = o(() => {
   (Dl(), wd(), e_());
 });
 function i_(e, t, { preserveTyping: n }) {
+  return interceptAnnotationSpaceKey(e, t, n, (value) => F(value));
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (
     e.isTrusted &&
     e.code === `Space` &&

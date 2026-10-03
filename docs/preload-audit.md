@@ -63,6 +63,11 @@ Surface/viewport rect clipping（原 `Qg` 22525-22535）已迁移至
 和入口兼容函数共同使用；viewport 边界、空交集和负坐标由
 `scripts/test-preload-annotation-surface-geometry.mjs` 覆盖，共 4 项断言。
 
+Annotation 空格键拦截策略（原 `i_` 22799-22824）已迁移至
+`src/main/browser-page-preload/annotation-keyboard.ts`，由键盘 listener 入口接回；
+trusted/Space、typing context、修饰键和 keydown/keyup 行为由
+`scripts/test-preload-annotation-keyboard.mjs` 覆盖，共 5 项断言。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
