@@ -62,6 +62,7 @@ Surface/viewport rect clipping（原 `Qg` 22525-22535）已迁移至
 `src/main/browser-page-preload/annotation-surface-geometry.ts`，由 surface registry
 和入口兼容函数共同使用；viewport 边界、空交集和负坐标由
 `scripts/test-preload-annotation-surface-geometry.mjs` 覆盖，共 4 项断言。
+该模块同时承载 region rect union（原 `s_` 22838-22845），geometry 回归断言共 6 项。
 
 Annotation 空格键拦截策略（原 `i_` 22799-22824）已迁移至
 `src/main/browser-page-preload/annotation-keyboard.ts`，由键盘 listener 入口接回；

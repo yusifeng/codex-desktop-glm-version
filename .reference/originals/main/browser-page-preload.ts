@@ -6439,7 +6439,7 @@ var { createAnnotationControlsRegistry } = require("./browser-page-preload/annot
 var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
-var { clipAnnotationSurfaceRect } = require("./browser-page-preload/annotation-surface-geometry");
+var { clipAnnotationSurfaceRect, unionAnnotationRects } = require("./browser-page-preload/annotation-surface-geometry");
 var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation-keyboard");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
@@ -22839,12 +22839,7 @@ function o_(
   return Ss(e, { viewport: t, viewportScale: n, zoomFactor: r });
 }
 function s_(e) {
-  if (e.length === 0) return null;
-  let t = Math.min(...e.map((e) => e.x)),
-    n = Math.min(...e.map((e) => e.y)),
-    r = Math.max(...e.map((e) => e.x + e.width)),
-    i = Math.max(...e.map((e) => e.y + e.height));
-  return { x: t, y: n, width: r - t, height: i - n };
+  return unionAnnotationRects(e);
 }
 function c_(e, t = dd(e), n = null) {
   if (t == null) return null;

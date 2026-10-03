@@ -12,5 +12,14 @@ function clipAnnotationSurfaceRect(
   return right > left && bottom > top ? { x: left, y: top, width: right - left, height: bottom - top } : null;
 }
 
-export { clipAnnotationSurfaceRect };
-if (typeof module !== `undefined`) module.exports = { clipAnnotationSurfaceRect };
+function unionAnnotationRects(rects: Rect[]): Rect | null {
+  if (rects.length === 0) return null;
+  const left = Math.min(...rects.map((rect) => rect.x));
+  const top = Math.min(...rects.map((rect) => rect.y));
+  const right = Math.max(...rects.map((rect) => rect.x + rect.width));
+  const bottom = Math.max(...rects.map((rect) => rect.y + rect.height));
+  return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
+export { clipAnnotationSurfaceRect, unionAnnotationRects };
+if (typeof module !== `undefined`) module.exports = { clipAnnotationSurfaceRect, unionAnnotationRects };
