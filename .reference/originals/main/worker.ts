@@ -15,6 +15,7 @@ const { restoreHandoffBranchAndStash, restoreHandoffSource, rollbackHostHandoffW
 const { prepareHandoffDestinationCheckout, resolveCleanWorktreeCommit } = require("./worker/git-handoff-destination");
 const { findHandoffSharedBase, hasHandoffCommit, resolveHandoffRepositoryMetadata } = require("./worker/git-handoff-shared-base");
 const { moveThreadToHostWorktree: performHostWorktreeHandoff } = require("./worker/git-host-handoff");
+const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-move-to-local");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -102,6 +103,17 @@ const hostHandoffDeps = {
   applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
   formatExecOutput: mR,
   warn: (message, detail) => CW().warning(message, detail),
+};
+const moveToLocalDeps = {
+  getCurrentBranch: w0,
+  listWorktrees: $2,
+  getHeadCommit: K4,
+  checkoutBranch: t4,
+  getStatus: J2,
+  ensureBranch: (params) => ensureHandoffBranch(params, handoffBranchDeps),
+  restoreSource: restoreSourceHandoffState,
+  restoreBranchAndStash: restoreHandoffState,
+  applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73198,236 +73210,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function zve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
-  let a = [];
-  if (e.sourceBranch.trim().length === 0)
-    return X({
-      status: `error`,
-      error: `invalid-params`,
-      message: `Missing source branch`,
-      rollbackErrors: [],
-      warnings: a,
-    });
-  let o = null,
-    s = null,
-    c = null,
-    l = !1,
-    u = !1;
-  try {
-    let d = await n.getWorktreeRepository(e.sourceWorktreeCwd, t),
-      f = n.getWorktreeRepositoryForRoot(e.localGitRoot, t);
-    if (d == null || f == null) throw Error(`Unable to resolve move-to-local repositories`);
-    s = await w0(d);
-    let p = await t.platformPath(),
-      m = p.normalize(p.resolve(e.localGitRoot)),
-      h = p.normalize(p.resolve(e.sourceWorktreeRoot));
-    if (
-      (await $2(f, r)).some((t) => {
-        if (t.headRef.type !== `branch` || t.headRef.string !== e.sourceBranch) return !1;
-        let n = p.normalize(p.resolve(t.root));
-        return n !== m && n !== h;
-      })
-    )
-      return X({
-        status: `error`,
-        error: `branch-checked-out-elsewhere`,
-        message: `Branch is already checked out in another worktree`,
-        rollbackErrors: [],
-        warnings: a,
-      });
-    c = await w0(f);
-    let g = await K4(d, r);
-    if (g == null)
-      return X({
-        status: `error`,
-        error: `source-detach-failed`,
-        message: `Unable to resolve worktree HEAD commit`,
-        rollbackErrors: [],
-        warnings: a,
-      });
-    let _ = await t4({ cwd: e.sourceWorktreeCwd, branch: g, stashUncommitted: !0 }, n, t, {
-      onStashStatusChange: (e) => {
-        i?.(`stash-source-changes`, e);
-      },
-      onCheckoutStatusChange: (e) => {
-        i?.(`detach-worktree-branch`, e);
-      },
-    });
-    if (_.status === `error`)
-      return X({
-        status: `error`,
-        error: `source-detach-failed`,
-        message: _.error,
-        rollbackErrors: [],
-        warnings: a,
-        execOutput: _.execOutput,
-      });
-    ((o = _.stashRef), (l = !0));
-    let v = await J2(f);
-    if (v.type !== `success` || v.untrackedCount == null)
-      return X({
-        status: `error`,
-        error: `local-status-check-failed`,
-        message: `Failed to read destination local status`,
-        rollbackErrors: await restoreSourceHandoffState({
-          cwd: e.sourceWorktreeCwd,
-          branch: s,
-          stashRef: o,
-          gitManager: n,
-          host: t,
-        }),
-        warnings: a,
-      });
-    if (v.stagedCount + v.unstagedCount + v.untrackedCount > 0)
-      return X({
-        status: `error`,
-        error: `local-destination-has-tracked-changes`,
-        message: `You have uncommitted local changes. Commit or stash them first.`,
-        rollbackErrors: await restoreSourceHandoffState({
-          cwd: e.sourceWorktreeCwd,
-          branch: s,
-          stashRef: o,
-          gitManager: n,
-          host: t,
-        }),
-        warnings: a,
-      });
-    if (c !== e.sourceBranch) {
-      let r = await ensureHandoffBranch(
-        { branch: e.sourceBranch, cwd: e.localGitRoot, commitSha: g, host: t },
-        handoffBranchDeps,
-      );
-      if (r != null) {
-        let i = await restoreSourceHandoffState({
-          cwd: e.sourceWorktreeCwd,
-          branch: s,
-          stashRef: o,
-          gitManager: n,
-          host: t,
-        });
-        return X({
-          status: `error`,
-          error: `local-branch-head-mismatch`,
-          message: r.message,
-          rollbackErrors: i,
-          warnings: a,
-          execOutput: r.execOutput,
-        });
-      }
-      let c = await t4(
-        { cwd: e.localGitRoot, branch: e.sourceBranch, stashUncommitted: !1 },
-        n,
-        t,
-        {
-          onCheckoutStatusChange: (e) => {
-            i?.(`checkout-local-branch`, e);
-          },
-        },
-      );
-      if (c.status === `error`) {
-        let r = await restoreSourceHandoffState({
-          cwd: e.sourceWorktreeCwd,
-          branch: s,
-          stashRef: o,
-          gitManager: n,
-          host: t,
-        });
-        return X({
-          status: `error`,
-          error: `checkout-local-failed`,
-          message: c.error,
-          rollbackErrors: r,
-          warnings: a,
-          execOutput: c.execOutput,
-        });
-      }
-      u = !0;
-    } else i?.(`checkout-local-branch`, `skipped`);
-    if (o != null) {
-      i?.(`apply-changes-to-local`, `started`);
-      let r = await applyHandoffStash(
-        { cwd: e.localGitRoot, stashRef: o, mode: `apply` },
-        t,
-        handoffBranchDeps,
-      );
-      if (r.status === `error`) {
-        i?.(`apply-changes-to-local`, `failed`);
-        let l = [];
-        return (
-          (l = [
-            ...l,
-            ...(await restoreHandoffState({
-              cwd: e.localGitRoot,
-              branch: c,
-              stashRef: null,
-              restoreBranchError: `restore-local-branch-failed`,
-              restoreStashError: `restore-local-stash-failed`,
-              gitManager: n,
-              host: t,
-            })),
-          ]),
-          (l = [
-            ...l,
-            ...(await restoreSourceHandoffState({
-              cwd: e.sourceWorktreeCwd,
-              branch: s,
-              stashRef: o,
-              gitManager: n,
-              host: t,
-            })),
-          ]),
-          X({
-            status: `error`,
-            error: `apply-source-stash-failed`,
-            message: r.error,
-            rollbackErrors: l,
-            warnings: a,
-            execOutput: r.execOutput,
-          })
-        );
-      }
-      (i?.(`apply-changes-to-local`, `completed`),
-        (await applyHandoffStash({ cwd: e.localGitRoot, stashRef: o, mode: `drop` }, t, handoffBranchDeps)).status === `error` &&
-          a.push(`drop-source-stash-failed`));
-    } else i?.(`apply-changes-to-local`, `skipped`);
-    return X({ status: `success`, warnings: a });
-  } catch {
-    let r = [];
-    return (
-      u &&
-        (r = [
-          ...r,
-          ...(await restoreHandoffState({
-            cwd: e.localGitRoot,
-            branch: c,
-            stashRef: null,
-            restoreBranchError: `restore-local-branch-failed`,
-            restoreStashError: `restore-local-stash-failed`,
-            gitManager: n,
-            host: t,
-          })),
-        ]),
-      l &&
-        (r = [
-          ...r,
-          ...(await restoreSourceHandoffState({
-            cwd: e.sourceWorktreeCwd,
-            branch: s,
-            stashRef: o,
-            gitManager: n,
-            host: t,
-          })),
-        ]),
-      X({
-        status: `error`,
-        error: `unexpected-error`,
-        message: `Failed to move thread to local`,
-        rollbackErrors: r,
-        warnings: a,
-      })
-    );
-  }
-}
 async function Bve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
   let a = [];
   if (e.sourceBranch.trim().length === 0)
@@ -76676,7 +76458,8 @@ var I6 = kW(`git`),
           normalizeWorktreePath: bz,
           setOwnerThread: m4,
           warn: (message, detail) => I6().warning(message, detail),
-          moveToLocal: zve,
+          moveToLocal: (params, options) =>
+            performMoveThreadToLocal(params, options, moveToLocalDeps),
           moveToWorktree: Bve,
           moveToHostWorktree: (params, options) =>
             performHostWorktreeHandoff(params, options, hostHandoffDeps),

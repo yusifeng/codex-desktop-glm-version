@@ -174,6 +174,11 @@ Host handoff 的完整跨 host 主编排已迁移至 `src/main/worker/git-host-h
 48 项断言覆盖参数与 metadata 错误、两类传输路径、复用 worktree stash、分支/checkout/reset
 失败回滚、unexpected error 和成功/失败 cleanup。
 
+Move-to-local 的完整编排已迁移至 `src/main/worker/git-move-to-local.ts`；原 `zve` 实现已删除。
+模块保留 branch checked-out-elsewhere 防护、source detach/stash、local dirty guard、目标分支创建与
+checkout、stash apply/drop warning，以及 local/source 两侧的条件回滚顺序。31 项断言覆盖参数、
+占用、detach/status/branch/apply 错误、无 stash 快路径、drop warning 与 unexpected error。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
