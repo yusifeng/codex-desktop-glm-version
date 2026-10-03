@@ -342,7 +342,7 @@ declare module "@chunk/shared" {
   export { HEADER_SURFACE as Ws } from "../../shared/http-headers";
   export { toWebSocketUrl as Wt } from "../../shared/ws-url";
   export { appServerSupportsFeature as Wu } from "../../shared/app-server-version";
-  export const X: any; // 内部符号: n5
+  export { INTERNAL_TESTING_MARKETPLACE as X } from "../../shared/fs-diagnostics";
   export const Xc: any; // 内部符号: nS
   export const Xd: any; // 内部符号: Dg
   export { NODE_REPL_MCP_SERVER_NAME as Xl } from "../../shared/app-constants";
