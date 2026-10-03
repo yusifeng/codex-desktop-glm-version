@@ -9,6 +9,7 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
   s = require("./dist-wQAv1pJP.js");
 const mainBusiness = require("./main-app/util/main-business.js");
 const mainUrlTrust = require("./main-app/util/url-trust.js");
+const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -172687,11 +172688,15 @@ var Oot = RegExp(`^(?:\\p{RGI_Emoji})$`, `v`),
     }
   };
 function Aot(e) {
+  return validateThreadMetadataUpdate(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e.threadId.length === 0) throw Error(`Thread id must not be empty.`);
   if (e.emoji != null && !Oot.test(e.emoji))
     throw Error(`Thread emoji must be exactly one emoji sequence.`);
 }
 function jot(e, t) {
+  return updateThreadMetadata(e, t);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (t.emoji === void 0 && t.labelColor === void 0) return e;
   let n = e[t.threadId] ?? {},
     r = t.emoji === void 0 ? n.emoji : (t.emoji ?? void 0),

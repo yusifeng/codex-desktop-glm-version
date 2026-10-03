@@ -7,6 +7,10 @@
 `main-app/util/url-trust.ts`）。两者均保留原别名调用面并有行为断言；表中
 其余 `semantic/business` 区段仍表示待继续物理迁出或已由既有模块覆盖。
 
+线程 metadata 的 emoji 校验和不可变更新（原 172,689-172,708）已迁移至
+`src/main/main-app/thread-metadata.ts`，入口通过 `Aot`/`jot` 兼容别名接回，
+由 `scripts/test-main-thread-metadata.mjs` 覆盖。
+
 审计对象：`.reference/originals/main/main-C-Mhak1n.ts`（原始 main chunk）。
 
 ## 结论摘要

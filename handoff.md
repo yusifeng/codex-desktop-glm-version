@@ -21,7 +21,8 @@
 回归断言；worker 的 remote host SSH 展示名/identity 解析也已抽取为
 `src/main/worker/remote-host-config.ts`，并由 6 项行为断言覆盖；preload 的
 deployment channel/policy 配置已抽取为 `src/main/browser-page-preload/deployment-channel.ts`，
-由 8 项行为断言覆盖。
+由 8 项行为断言覆盖；main 的 thread metadata emoji 校验和不可变更新已抽取为
+`src/main/main-app/thread-metadata.ts`，由 6 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
