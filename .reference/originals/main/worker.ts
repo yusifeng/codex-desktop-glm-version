@@ -22,6 +22,7 @@ const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-mo
 const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/git-move-to-worktree");
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
+const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
@@ -189,6 +190,12 @@ const gitBranchMetadataDeps = {
   normalizeBranch: Tz,
   normalizeCwd: xz,
   readBranchSnapshot: P2,
+};
+const managedWorktreeDiscoveryDeps = {
+  normalizeComparisonPath: I$,
+  normalizeWorktreePath: bz,
+  toLocalHostPath: UH,
+  getGitDir: (repository) => u0(repository),
 };
 const syncedBranchStateDeps = {
   readConfig: P2,
@@ -64053,15 +64060,7 @@ async function F$(e, t) {
     return !1;
   }
 }
-var Tfe = `.codex-worktree-name`,
-  Efe = /^[0-9a-f]{4}$/i,
-  Dfe = /^\d{6}-\d{4}-[0-9a-f]{8}$/i;
-function Ofe(e) {
-  return Efe.test(e);
-}
-function kfe(e) {
-  return Dfe.test(e);
-}
+var Tfe = `.codex-worktree-name`;
 function I$(e) {
   let t = SL(DL(e));
   return BH(t)
@@ -64084,46 +64083,6 @@ async function Afe(e, t) {
   let [n, r, i] = await Promise.all([L$(e, t), e.platformOs(), e.platformPath()]);
   (await e.createDirectory(n, { recursive: !0 }),
     r === `macos` && (await e.writeFile(i.join(n, `.metadata_never_index`), ``)));
-}
-async function R$(e, t) {
-  let [n, r, i] = await Promise.all([
-      e.workspacesRoot().catch(() => null),
-      e.codexHome().catch(() => null),
-      e.platformPath(),
-    ]),
-    a = [
-      { path: t?.trim(), boundary: t?.trim(), legacy: !1 },
-      { path: n == null ? null : i.join(n, `worktrees`), boundary: n, legacy: !1 },
-      { path: r == null ? null : i.join(r, `worktrees`), boundary: r, legacy: !0 },
-    ],
-    o = new Map();
-  for (let t of a) {
-    if (!t.path || !t.boundary) continue;
-    let n = e.isLocal && i.sep === `/` ? UH(t.path) : t.path,
-      r = I$(n),
-      a = o.get(r);
-    o.set(r, {
-      path: n,
-      boundary: e.isLocal && i.sep === `/` ? UH(t.boundary) : t.boundary,
-      legacy: t.legacy || a?.legacy === !0,
-    });
-  }
-  return [...o.values()];
-}
-async function jfe(e, t) {
-  try {
-    return (
-      await Promise.all(
-        [...new Set([t.path, t.boundary])].map((t) =>
-          e.stat(t, { bypassCache: !0, followSymlinks: !1 }),
-        ),
-      )
-    ).some((e) => !e.isDirectory() || e.isSymbolicLink())
-      ? []
-      : await e.readDirectory(t.path);
-  } catch {
-    return [];
-  }
 }
 async function z$(e, t, n) {
   if ((n?.throwIfAborted(), (await e.platformFamily()) === `windows`)) {
@@ -70826,66 +70785,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-function G_e(e) {
-  return u0(e);
-}
-async function K_e(e, t, n) {
-  let [r, i] = await Promise.all([t.platformPath(), R$(t, n)]),
-    a = (
-      await Promise.all(
-        i.map(async (e) => {
-          let n = await jfe(t, e);
-          return Promise.all(
-            n
-              .filter((e) => e.isDirectory() && !e.isSymbolicLink())
-              .map(async (n) => {
-                let i = r.join(e.path, n.name);
-                try {
-                  let e = await t.stat(i, { bypassCache: !0, followSymlinks: !1 });
-                  return !e.isDirectory() || e.isSymbolicLink()
-                    ? null
-                    : {
-                        parentName: n.name,
-                        parentPath: i,
-                        worktreeEntries: await t.readDirectory(i),
-                      };
-                } catch {
-                  return null;
-                }
-              }),
-          );
-        }),
-      )
-    ).flat(),
-    o = [];
-  for (let n of a) {
-    if (!n) continue;
-    let i = Ofe(n.parentName),
-      a =
-        LH.safeParse(n.parentName).success &&
-        n.worktreeEntries.some((e) => e.name === `.codex-worktree-name` && e.isFile());
-    for (let s of n.worktreeEntries) {
-      if (!s.isDirectory() || s.isSymbolicLink() || (!i && !a && !kfe(s.name))) continue;
-      let c = bz(r.join(n.parentPath, s.name));
-      c &&
-        o.push(
-          t
-            .stat(c, { bypassCache: !0, followSymlinks: !1 })
-            .catch(() => null)
-            .then(async (n) => {
-              if (n == null || !n.isDirectory() || n.isSymbolicLink()) return null;
-              let o = await G_e(e.getWorktreeRepositoryForRoot(c, t));
-              if (!i && a) {
-                let e = await t.stat(r.join(c, `.git`)).catch(() => null);
-                if (o == null || !e?.isFile()) return null;
-              }
-              return { dir: c, gitDir: o };
-            }),
-        );
-    }
-  }
-  return (await Promise.all(o)).filter((e) => e != null);
-}
 function D3(e, t, n) {
   return e.queryClient.fetchQuery({
     queryKey: Q(e.root, e.host, `commit-count`, t),
@@ -72812,7 +72711,8 @@ var I6 = kW(`git`),
           createExecutionHost: (config) => this.dependencies.createExecutionHost(config),
           cleanupHostTransfer: cleanupHostHandoffTransferFiles,
           upstreamRefreshControllers: this.worktreeUpstreamRefreshAbortControllers,
-          listCodexWorktrees: K_e,
+          listCodexWorktrees: (gitManager, host, worktreesRoot) =>
+            listCodexWorktrees(gitManager, host, worktreesRoot, managedWorktreeDiscoveryDeps),
           listWorktrees: (cwd, host, signal) => this.getWorktrees(cwd, host, signal),
         },
         s = ube(e),
@@ -73127,7 +73027,8 @@ var I6 = kW(`git`),
               gitManager: this.gitManager,
               host: o,
               signal: i.signal,
-              getManagedWorktreeLocations: R$,
+              getManagedWorktreeLocations: (host, worktreesRoot) =>
+                getManagedWorktreeLocations(host, worktreesRoot, managedWorktreeDiscoveryDeps),
               getRootRelativeCwd: D2,
               listWorktrees: $2,
               readThreadConfig: p4,
