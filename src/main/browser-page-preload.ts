@@ -30081,137 +30081,14 @@ var QS = CS.create;
   HS.create,
   BS.createWithPreprocess,
   qS.create);
-var $S = QS({
-    readOnlyHint: XS().optional(),
-    untrustedContentHint: XS().optional(),
-    consequentialHint: XS().optional(),
-  }),
-  eC = QS({
-    name: YS(),
-    registration_id: YS(),
-    title: YS().optional(),
-    description: YS().optional(),
-    input_schema: ZS(),
-    annotations: $S.optional(),
-    origin: YS().optional(),
-    pageUrl: YS().optional(),
-  });
-function tC(e) {
-  return new TextEncoder().encode(JSON.stringify(e)).byteLength;
-}
-var nC = { type: `webmcp_ui_tools_changed`, version: 1 },
-  rC = eC
-    .omit({ registration_id: !0, input_schema: !0 })
-    .extend({ inputSchema: eC.shape.input_schema, name: eC.shape.name.min(1) })
-    .array();
-function iC(e, t) {
-  return e.length > t.maxTools
-    ? []
-    : (aC(
-        e.map((e) => ({
-          ...e,
-          inputSchema: e.inputSchema == null ? null : JSON.parse(e.inputSchema),
-        })),
-        t,
-      ) ?? []);
-}
-function aC(e, t) {
-  if (e.length === 0) return [];
-  if (e.length > t.maxTools) return null;
-  let n = rC.safeParse(e);
-  if (!n.success) return null;
-  let r;
-  try {
-    r = tC(n.data);
-  } catch {
-    return null;
-  }
-  return r <= t.maxTotalDescriptorBytes ? n.data : null;
-}
-var oC = `__codexWebMcpModelContext`;
-function sC() {
-  if (
-    globalThis.isSecureContext !== !0 ||
-    !d.ipcRenderer.sendSync(`codex_desktop:get-browser-webmcp-policy`).enabled
-  )
-    return;
-  let e,
-    t = () => {
-      e ??
-        new Promise((t) => {
-          e = setTimeout(t, 0);
-        })
-          .then(() => ((e = void 0), n.codexGetTools()))
-          .catch((e) => {
-            if (e instanceof DOMException && e.name === `SecurityError`) return [];
-            throw e;
-          })
-          .then((e) => {
-            let t = d.ipcRenderer.sendSync(bx);
-            d.ipcRenderer.send(Vd, { ...nC, payload: { tools: t.enabled ? iC(e, t.limits) : [] } });
-          });
-    },
-    n = dx({
-      onToolsChanged() {
-        (d.ipcRenderer.send(Vd, lx), t());
-      },
-    }),
-    r = (e) => {
-      e.from.url !== window.location.href && t();
-    };
-  (window.addEventListener(`pageshow`, t),
-    window.navigation.addEventListener(`currententrychange`, r),
-    window.addEventListener(`pagehide`, (n) => {
-      n.persisted ||
-        (clearTimeout(e),
-        (e = void 0),
-        window.removeEventListener(`pageshow`, t),
-        window.navigation.removeEventListener(`currententrychange`, r));
-    }));
-  let i = d.contextBridge.internalContextBridge;
-  (i?.overrideGlobalPropertyFromIsolatedWorld == null
-    ? (d.contextBridge.exposeInMainWorld(oC, n),
-      d.contextBridge.executeInMainWorld({
-        args: [oC],
-        func: (e) => {
-          let t = window[e],
-            n = Object.freeze({
-              ...t,
-              async registerTool(e, n) {
-                let r = n?.signal,
-                  i = t.registerTool(
-                    e,
-                    r == null
-                      ? n
-                      : {
-                          ...n,
-                          signal: Object.assign({}, r, {
-                            aborted: r.aborted,
-                            reason: r.reason,
-                            addEventListener: (...e) => {
-                              if ((r.addEventListener(...e), r.aborted)) throw r.reason;
-                            },
-                          }),
-                        },
-                  );
-                return r == null
-                  ? i
-                  : new Promise((e, t) => {
-                      let n = () => t(r.reason);
-                      (r.addEventListener(`abort`, n, { once: !0 }),
-                        i.finally(() => r.removeEventListener(`abort`, n)).then(e, t));
-                    });
-              },
-            });
-          Object.defineProperty(document, "modelContext", {
-            configurable: !1,
-            enumerable: !1,
-            value: n,
-            writable: !1,
-          });
-        },
-      }))
-    : i.overrideGlobalPropertyFromIsolatedWorld([`document`, `modelContext`], () => n),
-    d.ipcRenderer.send(Vd, lx));
-}
-(sC(), d.webFrame.setVisualZoomLevelLimits?.(1, 3), Bb(), tx(), Zb());
+var { installWebMcpProtocol: installWebMcpProtocol } = require("./browser-page-preload/webmcp-protocol");
+installWebMcpProtocol({
+  electron: d,
+  createRegistry: dx,
+  zod: { object: QS, string: YS, boolean: XS, unknown: ZS },
+  pageEventChannel: Vd,
+  policyChannel: bx,
+  webmcpChangedEvent: lx,
+  modelContextProperty: `__codexWebMcpModelContext`,
+});
+(d.webFrame.setVisualZoomLevelLimits?.(1, 3), Bb(), tx(), Zb());
