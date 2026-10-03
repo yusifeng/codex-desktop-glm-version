@@ -5,6 +5,7 @@ let t = require("node:worker_threads"),
   r = require("perf_hooks"),
   i = require("path");
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
+const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 i = e.o(i);
 let a = require("module");
 a = e.o(a);
@@ -90507,103 +90508,6 @@ function vDe(e, t, n) {
 function I9(e, t) {
   return mW(e, t);
 }
-function L9(e) {
-  return typeof e == `object` && !!e;
-}
-function yDe(e) {
-  return (
-    e === `ces-telemetry` ||
-    e === `otel-export` ||
-    e === `computer-use-invalidate-service-pid` ||
-    e === `computer-use-service-pid` ||
-    e === `read-shortcut-link`
-  );
-}
-function bDe(e) {
-  return (
-    L9(e) &&
-    e.type === `worker-main-rpc-response` &&
-    typeof e.workerId == `string` &&
-    typeof e.requestId == `string` &&
-    yDe(e.method) &&
-    L9(e.result) &&
-    (e.result.type === `ok` || e.result.type === `error`)
-  );
-}
-var xDe = class {
-  workerId;
-  port;
-  pending = new Map();
-  constructor(e, t) {
-    ((this.workerId = e), (this.port = t));
-  }
-  request(e) {
-    let { signal: t } = e;
-    if (t?.aborted) return Promise.reject(Error(`Worker main RPC request aborted`));
-    let n = (0, E.randomUUID)(),
-      r = {
-        type: `worker-main-rpc-request`,
-        workerId: this.workerId,
-        requestId: n,
-        method: e.method,
-        params: e.params,
-      },
-      i = new Promise((t, r) => {
-        this.pending.set(n, {
-          method: e.method,
-          resolve: (e) => {
-            t(e);
-          },
-          reject: r,
-        });
-      }),
-      a = () => {
-        let e = this.pending.get(n);
-        if (e == null) return;
-        (this.pending.delete(n), e.reject(Error(`Worker main RPC request aborted`)));
-        let t = { type: `worker-main-rpc-cancel`, workerId: this.workerId, requestId: n };
-        try {
-          this.port.postMessage(t);
-        } catch {}
-      };
-    t?.addEventListener(`abort`, a, { once: !0 });
-    try {
-      this.port.postMessage(r);
-    } catch (e) {
-      return (
-        this.pending.delete(n),
-        t?.removeEventListener(`abort`, a),
-        Promise.reject(
-          e instanceof Error ? e : Error(`Failed to send main RPC request: ${String(e)}`),
-        )
-      );
-    }
-    return i.finally(() => t?.removeEventListener(`abort`, a));
-  }
-  handleMessage(e) {
-    if (!bDe(e) || e.workerId !== this.workerId) return !1;
-    let t = this.pending.get(e.requestId);
-    return (
-      !t ||
-      (this.pending.delete(e.requestId),
-      t.method === e.method
-        ? e.result.type === `ok`
-          ? (t.resolve(e.result.value), !0)
-          : (t.reject(
-              e.result.error.code == null
-                ? Error(e.result.error.message)
-                : Object.assign(Error(e.result.error.message), { code: e.result.error.code }),
-            ),
-            !0)
-        : (t.reject(Error(`Mismatched main RPC response method`)), !0))
-    );
-  }
-  dispose() {
-    let e = Error(`Worker main RPC client disposed`);
-    for (let t of this.pending.values()) t.reject(e);
-    this.pending.clear();
-  }
-};
 function SDe() {
   var e =
       typeof SuppressedError == `function`
@@ -90753,85 +90657,66 @@ var X9 = new hI(),
           },
           Q9,
         );
-H9.on(`message`, (e) => {
-  if (!U9.handleMessage(e)) {
-    if (e.type === `worker-sentry-user-update`) {
+H9.on(
+  `message`,
+  createWorkerMessageDispatcher({
+    workerId: z9,
+    rpcClient: U9,
+    onSentryUserUpdate: (e) => {
       vDe(e.authMethod, e.userId, e.accountId);
       let t = e.authMethod == null ? null : { id: e.userId ?? void 0, authMethod: e.authMethod };
       Y9.setUserInfo(t);
-      return;
-    }
-    if (e.type === `worker-app-event`) {
-      X9.emit(e.event.type, e.event.at);
-      return;
-    }
-    if (e.type === `worker-flush-and-exit`) {
+    },
+    onAppEvent: (e) => X9.emit(e.event.type, e.event.at),
+    onFlushAndExit: () => {
       XCe().then(
         () => process.exit(0),
         () => process.exit(0),
       );
-      return;
-    }
-    if (e.type === `worker-git-turn-complete`) {
-      Z9?.invalidateGitReadCachesForTurn(e.cwds, e.hostId);
-      return;
-    }
-    if (e.type === `worker-tracing-sample-rate-update`) {
-      qCe(e.sampleRate);
-      return;
-    }
-    if (e.type === `worker-analytics-enabled-update`) {
-      (J9.setEnabled(e.enabled), e.enabled && G9());
-      return;
-    }
-    if (e.workerId !== z9) return;
-    switch (e.type) {
-      case `worker-request`: {
-        let t = e.request.trace,
-          n = e.request.enqueuedAtMs;
-        z9 === `git` &&
-          n != null &&
-          OH(
-            {
-              attributes: {
-                "git.queue_wait_ms": Math.max(0, Date.now() - n),
-                "worker.id": `git`,
-                "worker.method": e.request.method,
-              },
-              name: `git.queue_wait`,
-              op: `codex.git.queue_wait`,
-              startTimeMs: n,
-              trace: t,
-            },
-            () => {
-              t = AH() ?? t;
-            },
-          );
-        let r = () => $9.handleRequest({ ...e.request, trace: t });
-        if (z9 === `git` && e.request.method === `subscribe-live-query`) {
-          r();
-          return;
-        }
+    },
+    onGitTurnComplete: (e) => Z9?.invalidateGitReadCachesForTurn(e.cwds, e.hostId),
+    onTracingSampleRateUpdate: (e) => qCe(e.sampleRate),
+    onAnalyticsEnabledUpdate: (e) => (J9.setEnabled(e.enabled), e.enabled && G9()),
+    onRequest: (e) => {
+      let t = e.trace,
+        n = e.enqueuedAtMs;
+      z9 === `git` &&
+        n != null &&
         OH(
           {
-            op: `codex.worker.request`,
-            name: z9 === `git` ? `git.worker_operation` : `worker.operation`,
             attributes: {
-              ...(z9 === `git` ? { "git.operation": e.request.method } : {}),
-              "worker.id": z9,
-              "worker.method": e.request.method,
+              "git.queue_wait_ms": Math.max(0, Date.now() - n),
+              "worker.id": `git`,
+              "worker.method": e.method,
             },
+            name: `git.queue_wait`,
+            op: `codex.git.queue_wait`,
+            startTimeMs: n,
             trace: t,
           },
-          r,
+          () => {
+            t = AH() ?? t;
+          },
         );
+      let r = () => $9.handleRequest({ ...e, trace: t });
+      if (z9 === `git` && e.method === `subscribe-live-query`) {
+        r();
         return;
       }
-      case `worker-request-cancel`:
-        $9.handleCancel(e.id);
-        return;
-      case `worker-main-rpc-response`:
-        return;
-    }
-  }
-});
+      OH(
+        {
+          op: `codex.worker.request`,
+          name: z9 === `git` ? `git.worker_operation` : `worker.operation`,
+          attributes: {
+            ...(z9 === `git` ? { "git.operation": e.method } : {}),
+            "worker.id": z9,
+            "worker.method": e.method,
+          },
+          trace: t,
+        },
+        r,
+      );
+    },
+    onCancel: (e) => $9.handleCancel(e),
+  }),
+);

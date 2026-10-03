@@ -35,7 +35,7 @@ function isResponse(value: unknown): value is WorkerRpcResponse {
 }
 
 /** Typed counterpart of the worker xDe main-RPC client. */
-export class WorkerMainRpcClient {
+class WorkerMainRpcClient {
   readonly workerId: string;
   readonly port: WorkerRpcPort;
   private readonly pending = new Map<string, { method: WorkerRpcMethod; resolve(value: unknown): void; reject(error: Error): void }>();
@@ -69,3 +69,7 @@ export class WorkerMainRpcClient {
 
   dispose(): void { for (const pending of this.pending.values()) pending.reject(new Error("Worker main RPC client disposed")); this.pending.clear(); }
 }
+
+// worker.ts is a transform-only CommonJS chunk, so this boundary must remain
+// require()-able after the TypeScript transform (without an ESM wrapper).
+module.exports = { WorkerMainRpcClient };
