@@ -8,6 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
+const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -88588,6 +88589,8 @@ var DTe = K({
   identity: H().nullable(),
 });
 function OTe(e) {
+  return resolveHostDisplayName(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e.kind === `ssh`) {
     let t = Y7(q7(e));
     if (t) return t;
@@ -88597,6 +88600,8 @@ function OTe(e) {
   return e.name?.trim() || J7(e.id);
 }
 function kTe(e) {
+  return resolveHostSshIdentity(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let t = q7(e),
     n = Y7(t);
   if (n) return n;
