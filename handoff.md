@@ -1,714 +1,194 @@
-# Handoff：ChatGPT/Codex 桌面版（v26.917.71314）macOS 客户端源码还原
+# Handoff（终章）：剩余 goal 的收尾清单
 
-> 本文档是交接 prompt，也是 goal 说明。请通读全文再动手；所有「必须/禁止」
-> 都是前一轮工作中真实踩过的坑。
-
----
-
-## 一、使命（Objective）
-
-把 macOS `ChatGPT.app`（Codex 桌面版，Electron + React 19）从解包 ASAR 的
-编译产物**还原为可迭代的真实源码**——语义化命名 + 真实模块结构，而不是
-"格式化过的 minified 代码"。
-
-**核心验收标准（不可妥协）：** 每个"已重写" chunk 的构建产物与官方发布版
-**结构等价**——import 依赖集合一致 + ESM 导出符号面一致（由 verify 脚本
-机器验证）。语义源码与逐字节兼容的双轨并存，任意比例混合可构建出完整 app。
-
-**优先级（用户明确指定）：GUI 优先（renderer 网页界面部分）**。即：
-主窗口 HTML 界面（消息流、composer、设置页、侧边栏、内置浏览器等）
-> 主进程逻辑（main）> 共享库（shared）> 其余 chunk。
-renderer 全量 app-code、main 结构与 shared 已消费 API 层均已完成；当前仓库已
-达到本交接文档定义的实现与验证目标。
+> 本文档是 goal 的 handoff prompt，接替上一版（GUI 优先阶段，已验收完成）。
+> 双轨构建、验证流水线、坑纪律**全部继续有效**（压缩收录于第四节，完整
+> 历史见 git log 的旧版 handoff）。本文只写增量：还剩什么、按什么顺序、
+> 怎么验收。所有路径相对
+> `/Users/david/Workspace/ppio_github/codex-desktop-glm-version`。
+> 并发约束：最多 5 个 subagent。
 
 ---
 
-## 二、两个仓库与目录约定
+## 一、使命与当前完成度（2026-09-30 收官后快照）
 
-- **工作仓库**：`/Users/david/Workspace/ppio_github/codex-desktop-glm-version`
-  （git 管理，main 分支，124+ commits，工作树保持干净）
-- **只读参考**：`/Users/david/Workspace/ppio_github/chatgpt-desktop-src`
-  ——未修改的 asar 解包目录（verify 脚本默认从这里取"官方原始产物"）
-  **绝对不要改动这个目录**。
-- 参考仓库（只读，价值有限）：`/tmp/codex-refs/decode-codex/restored/`
-  可用作部分模块边界的地图（如 conversations/composer 的组件划分思路）；
-  `codex-analysis` 已确认无 renderer 内容，可忽略。
+原始 goal 顺序【bootstrap 808KB → main 5.5MB 按子系统拆 → shared 2.1MB
+→ 其余】，核心验收标准不变：每个 REWRITTEN chunk 的构建产物与官方发布版
+结构等价（import/require 依赖集合 + 导出符号面，verify 脚本机器验证），
+语义源码与 transform-only 双轨并存可构建完整 app。
 
-关键路径：
-| 路径 | 内容 |
-|---|---|
-| `src/main/` | 主进程语义源码（bootstrap/main-app/shared…） |
-| `src/main/src-DldfpmrL.ts` | shared chunk（692 导出）的格式化原版（**只读对照**，勿改） |
-| `src/main/main-C-Mhak1n.ts` | main chunk 的格式化原版（同上） |
-| `src/renderer/<语义名>/` | 已重写 renderer chunk 的语义源码 |
-| `src/webview/assets/` | 其余 renderer chunk 的"原版格式化"形态（transform-only） |
-| `src/main/types/chunk-modules.d.ts` | 未重写 main/shared 导出的 TS 声明（压缩别名 → any/语义类型） |
-| `src/renderer/types/rchunk-modules.d.ts` | 未重写 renderer chunk 的 `@rchunk/*` 声明 |
-| `scripts/` | 构建与验证流水线（见第四节） |
-| `docs/` | 分析文档与导出地图（见第五节） |
+| 侧 | 状态 | 证据（命令可复跑） |
+|---|---|---|
+| bootstrap | ✅ 完成 | 全量重写 |
+| main（5.5MB） | ✅ 结构性完成 | R1-R12 全区落地、133K 行语义源码、typecheck 0 错误、verify-chunks 11/11。深度打磨为可选项（T6） |
+| shared（2.1MB，692 导出） | ⚠️ **剩 228 个已消费未语义化别名**，分布九个小分区 | 本文 T1 附实时统计脚本 |
+| renderer GUI | ✅ **业务 chunk 0 pending** | verify-renderer 1874/1874；coverage 2247/2247；app-shared 消费 343/343（0 any） |
+| 其余独立 chunk | ❌ **6 个未重写**（transform-only） | T2-T5 |
+
+**GUI 完成度的准确回答（接手者必读，防止回头翻 GUI）：**
+业务代码层面不差了。三个"深度注意点"是**设计决定或可选项，不是待办**：
+
+1. `INCREMENTAL_HUBS`（12+ 个聚合边界）按**实际消费面**语义化——被消费的
+   导出全类型化，hub 内部未消费的压缩导出不语义化。这是登记在
+   `scripts/renderer-chunk-manifest.mjs` 的机制，勿扩张。
+2. `PRESERVED_ASSETS`（426 个 vendor/generated/data/worker 资产）刻意保留
+   原资产，**禁止**给它们伪造业务源码（CodeMirror/Lottie/pdf.js/编辑器/
+   locale/lucide/shiki/math-blocks/教学模型生成物等）。
+3. renderer 已冻结：**禁止任何"顺手优化/补齐/重构"**——那是已验收工作。
+   verify-renderer 数字只应因 renderer 变更而变，正常应恒为 1874/1874。
 
 ---
 
-## 三、当前状态（截至交接时）
-
-### 2026-09-30 当前状态（优先以本节为准）
-
-交接后的 renderer 主线已经完成全量 app-code 审计、语义恢复与保留轨道登记：
-
-- `REWRITTEN`：1874 个语义 chunk；`verify-renderer` 为 1874/1874。
-- `PRESERVED_ASSETS`：426 个经审计的 vendor/generated/data/worker/compiled-surface 资产，继续
-  使用 transform-only 轨道，不伪造业务源码。
-- `INCREMENTAL_HUBS`：12 个聚合边界。`app-shared/app-initial/app-primary` 按
-  实际消费面类型化；构建器合并出的 Popcorn、imported-setup、checkout hub
-  由消费审计锁定，禁止无声明的压缩导出扩张。
-- `node scripts/audit-renderer-tail.mjs` 的 0 pending **只表示当前 `CHUNKS` 登记集
-  内部无悬空项**，不能当成全量 renderer 完成证明。
-- 全量 `docs/renderer-app-chunks.json` 有 2247 个 app-code 文件；必须运行
-  `node scripts/audit-renderer-app-coverage.mjs` 查看真实覆盖与剩余数量。当前为
-  2247/2247 tracked、0 pending；composer 47/47、sidebar 12/12、terminal 6/6、
-  browser 19/19、settings 70/70、dialogs-menus 108/108、home-onboarding 40/40 与
-  git-github-worktree 63/63 已覆盖；conversation-thread 当前 101/101，pages-routes
-  92/92；animations 7/7、observability-cloud 8/8、auth-profile 13/13 也已收官，
-  hooks 24/24、skills-plugins-mcp 30/30、panels 20/20、charts-ui 17/17 已收官；
-  editor-docs、artifact-preview、markdown-render 与 appgen-valdi-platform 已分别达到
-  42/42、53/53、24/24、78/78。
-- `node scripts/audit-app-shared-consumption.mjs`：343 个实际消费导出均有语义
-  声明，0 missing、0 any、0 direct namespace use。
-- main 结构验证 11/11；TypeScript 错误已经从 139 清零，`npm run typecheck`
-  全量通过。
-- main 最后一批补齐 23 个缺失模块/兼容面，覆盖线程/工作区、会话/文件/流、
-  归档、认证、附件、动态工具与 dispose handles；专项测试 28 + 36 条断言通过。
-
-2026-09-29 已完成 terminal/browser 运行时批次：terminal panel bootstrap、终端
-thumbnail/background thumbnail、ASCII canvas/engine、browser voice availability、
-site actions state、扩展连接状态说明和 browser settings visibility。专项行为测试
-34/34；`mark-session-create` 按实际消费的 `dt/ft/n/r/t` 登记为增量 hub，未复制
-其余未消费 voice 聚合导出。
-
-2026-09-29 已继续完成 terminal panel 与 terminal tab，覆盖会话创建/注册、键盘
-控制序列、粘贴、云端环境状态、本地 workspace root 切换和 shell 感知的 `cd`
-命令。专项行为测试 29/29；renderer 全量门禁 981/981、main 11/11、tsc 73。
-`xterm-window-zoom` 按真实副作用消费登记为第 11 个增量 hub，terminal 全量覆盖
-达到 6/6。
-
-2026-09-29 已完成 browser address shortcut，语义化浏览器标签 mention 的挂载、
-失焦消退、宿主指针事件、metadata 更新与 overlay 状态传递。专项行为测试 15/15；
-renderer 全量门禁 982/982，browser 覆盖达到 15/19。
-
-2026-09-29 已完成 site edit route，恢复站点编辑入口对可复用 ChatGPT/Codex
-会话的探测、恢复与导航，并在不可复用时携带预填 prompt 回退首页；有效站点上下文
-还会重新打开 live URL。专项行为测试 16/16；renderer 全量门禁 983/983，browser
-覆盖达到 16/19。
-
-2026-09-29 已完成 site preview，恢复预览 iframe 生命周期、可信站点来源校验、
-annotation 消息与捕获预算、导航/刷新/标注/分享/关闭控件，以及 loading/error
-状态。专项行为测试 20/20；renderer 全量门禁 984/984，browser 覆盖达到 17/19。
-
-2026-09-29 已完成 browser use settings，恢复宿主可用性、通用浏览器偏好、自动填充
-与密码、扩展、下载和站点设置分区，以及 history/downloads/extensions 等子路由的
-可见性门控与回退导航；设置写入、下载目录选择和清理数据错误提示均接回宿主运行时。
-专项行为测试 19/19；renderer 全量门禁 985/985，browser 覆盖达到 18/19。
-
-2026-09-29 已完成 symbol browser，恢复 emoji/icon 双模式、全文搜索、受限可选集、
-最近使用、分类导航、键盘移动、受控查询、图标颜色和选中态。新增生成器从发布资产
-机械提取 1898 个 Unicode emoji（含旗帜与 ZWJ 序列），避免复制压缩组件实现。专项
-行为测试 18/18；renderer 全量门禁 986/986，browser 覆盖达到 19/19。
-
-2026-09-29 已完成 settings 第一批五个缺口：debug settings 恢复 Chrome 调试页与
-六个 GPU tearing 隔离开关；cloud preferences 恢复 diff 视图、branch format 校验、
-预览和保存反馈；storage settings 恢复容量进度、Files/Images 汇总、Library 导航与
-埋点；connector settings redirect 恢复 canonical plugin 跳转和非 canonical 连接
-modal 兜底；profile settings 恢复 CME 医疗资质表单、校验与保存 toast。专项行为测试
-108/108；renderer 全量门禁 991/991、main 11/11、tsc 73，settings 覆盖达到 52/70。
-
-2026-09-29 已完成 settings 第二批四个缺口：Appshots 恢复可用性门控、双键热键、
-目标会话、音效与演示视频；Code Review 恢复个人/安全审查触发策略、严重级别与 credits
-偏好；Usage Code Review 恢复 7/30 天用量查询、五类图表、priority 补差与情绪汇总；
-Worktrees Settings 恢复管理摘要、状态、关联会话、打开/新聊天、清理与刷新。专项行为
-测试 98/98；renderer 全量门禁 995/995、main 11/11、tsc 73，settings 覆盖达到
-56/70。`activity-chart` 发布包暴露 43 个图表聚合导出，当前仅消费 `H/U/n/t`，因此
-按第 12 个 typed-consumer-surface hub 登记，未复制未消费图表实现。
-
-2026-09-29 已完成 settings 第三批：Git settings 恢复 review mode、branch prefix、
-merge/force-push/draft PR、指令与 PR watcher automation；Safety settings 恢复 quiet/study
-schedule 编辑、校验、未保存变更与保存反馈；Keyboard Shortcuts 恢复搜索、分组排序、
-平台键位、冲突、清除/替换与重置。并补齐 662B 的 legacy study hours schedule 三函数
-叶子依赖。专项行为测试 90/90；renderer 999/999、main 11/11、tsc 73，settings 59/70。
-
-2026-09-29 已完成 settings 第四批：Hooks settings 恢复项目根目录探测、来源列表、
-详情、启停、信任、受管状态、打开配置与刷新；Import settings 恢复可用性门控、来源
-选择、导入进度/历史、失败重试、Hooks 导航与自动同步；Pets route 恢复内置/自定义
-宠物、预览、Mini 禁用、尺寸与显隐桥接；Voice settings 恢复麦克风、语言、语音可用性、
-选择试听、保存与快捷键；Trusted Contact 恢复资格、邀请、不可用、重发、取消/移除和
-personal note 流程。专项行为测试 139/139；renderer 1004/1004、main 11/11、tsc 73，
- settings 64/70。
-
-2026-09-29 已完成 settings 第五批：Agent settings 恢复主机配置层、审批、sandbox、
-web search、reasoning、实验功能与运行时依赖诊断；Billing settings 恢复资格、计划、
-钱包、付款方式和订阅管理；Computer History 恢复启停/暂停、权限、指示器、历史加载、
-单项删除与分时段清理；Computer Use 恢复宿主可用性、应用授权、扩展状态、home 目录、
-声音与锁定使用；Parental Controls 恢复资格、家庭成员、邀请、深链和只读 child 视图；
-Settings Page 恢复主机切换、可见分区、路由与未保存变更。专项行为测试 202/202；renderer
-1010/1010、main 11/11、tsc 73，settings 达到 70/70。同期确认两个 `gitGraph-*` 是
-Mermaid/Langium 生成包装器，改列为 preserved vendor，app-code 总数校正为 2248。
-
-2026-09-29 已完成 renderer GUI 第六批：Options Menu 恢复浏览器菜单、zoom、页面动作、
-清理数据与扩展列表/触发/固定/管理；Onboarding Page 恢复首次登录 gate、角色、设置和完成
-步骤；Extension Onboarding 恢复多浏览器检测、侧栏/固定 checklist、样例与 inventory 流程；
-Thread Goal 侧栏恢复草稿、revert、快捷保存和 materialize/cleanup；Queued Message List 恢复
-暂停/继续、编辑/删除/side chat、拖拽重排和多类型附件摘要。专项行为测试 221/221；renderer
-1015/1015、tsc 对本批零新增。dialogs-menus 108/108、home-onboarding 40/40 已全覆盖，
-conversation-thread 推进至 93/102。
-
-2026-09-29 已完成 renderer GUI 第七批：Local Conversation Subagents Panel 恢复 active/done
-分组、状态/耗时、选择和详情；Background Terminal Tab 恢复 command output 聚合、snapshot
-回退、订阅和已读状态；Thread Context 与 Side Panel Tabs facade 将线程 host/git/cwd signals 及
-MCP/timeline/sandbox 侧栏动作恢复为语义导出；Select Workspace Page 恢复候选目录、全选、
-Add project 与宿主事件；Offer Page 恢复身份 gate、资格查询和个人/团队结账跳转。专项行为
-测试 179/179；renderer 1021/1021、main 11/11、tsc 73，conversation-thread 97/102、
-pages-routes 52/92。
-
-2026-09-29 已完成 renderer GUI 第八批：Background Agent entry 恢复 hydrated/background
-agent 打开动作与 tab 类型；MCP App Thread Side Panel 恢复宿主 frame 容器；Trusted Contact
-Link Page 恢复邀请/接受/拒绝/移除流程；Remote Conversation Page 恢复 main/hotkey 布局、
-transcript/composer、review 和归档预览；CFC Plan Page 恢复 clinician 身份、登录、资格、
-workspace 和条款流程。医疗验证 `messages-*` 经审计仅包含 intl 文案表，改列 preserved data。
-专项行为测试 120/120；renderer 1026/1026、main 11/11、tsc 73，conversation-thread
-100/101，仅余大型 review 工作台；pages-routes 54/92。
-
-2026-09-29 已完成 renderer GUI 第九批：Chat Seat Access Screen entry 保留 conversation
-screen 初始化与公开入口；Images Page 恢复账户隔离的图片会话、composer、拖放和 suggestion
-提交；PayPal Checkout Page 恢复账户校验、promo、实验 gate、checkout session 与跳转；Checkout
-Verify Page 恢复 continuation/offer、三次轮询、成功/失败/账户错配分支；Connect Screen Fill
-恢复原始 SVG path、尺寸、viewBox、currentColor 与 props 覆盖语义；My GPTs Page 恢复 mine/shared
-分页、草稿/发布导航、迁移/删除权限和 migrated 禁用态。专项行为测试 226/226；renderer
-1032/1032、main 11/11，本批模块 tsc 零新增，pages-routes 推进至 60/92。
-
-2026-09-29 已完成 renderer GUI 第十批：Workspace Settings Webview 恢复资格/路由 gate、
-账户切换清理、指数退避与 webview analytics；Checkout Webview 恢复 pricing/credits 预热缓存、
-分级重试、导航白名单与 presentation bridge；Create Workspace Page 恢复 provisioning 恢复、
-resume/create/close 选择、团队 seat/promo checkout 与 token-auth 动态边；Purchase Page 恢复
-plan/credits/identity gate、账户订阅错误、团队 owner/seat、promo/referral 及 hosted/custom checkout。
-专项行为测试 192/192；renderer 1036/1036、main 11/11、tsc 73，pages-routes 64/92。
-
-2026-09-29 已完成 renderer GUI 第十一批：GPT Discovery 恢复 Public/Workspace 视图、
-分类与搜索、creator/directory 分页、详情开聊和 My GPTs gate；Hotkey Window Home 恢复
-workspace/projectless/remote 派生、local/cloud/worktree 模式、environment/branch/permissions、
-composer、pointer、拖拽与浮层感知布局；Login Route 恢复浏览器账号探测/换号、Google/
-Microsoft/signup/API key、可取消登录、链接复制、workspaceRecovery 回跳、错误分类和 Snake
-入口。专项行为测试 122/122；renderer 1039/1039、main 11/11、tsc 73，app-shared 332 个
-消费导出全部语义化，pages-routes 67/92。
-
-2026-09-29 已完成 renderer GUI 第十二批：Standalone Elicitation Page 恢复 URL 参数校验、
-host/user 缺失、连接失效与重试、通用 MCP elicitation、browser auth 标题、选项/字段/必填
-校验、密码显隐、accept/decline、skip/cancel 以及成功/跳过/不可用/错误态。专项行为测试
-47/47；renderer 1040/1040、main 11/11、tsc 73，pages-routes 68/92。
-
-2026-09-29 已完成 renderer GUI 第十三批：CFC Verification 恢复 enrollment 轮询、NPI
-预验证、Persona 启动/取消/完成、延期 workspace 恢复、条款确认、Quorum workspace 创建与
-账户切换，并拆出可独立清理的 Persona inquiry/SDK 启动器；Ads Controls 恢复可用性门禁、
-历史/主题分页、个性化、免费降额广告选择、删除确认和 Plus 外链；Shared Post 恢复 prompt/
-conversation/image 分享加载、错误、自动提交、图片选择、composer 与导航；Global Dictation
-恢复麦克风/录音/转写、取消重试、paste fallback、窗口与 pointer 交互。专项行为测试 188/188；
-renderer 1045/1045、main 11/11、tsc 73，pages-routes 72/92。
-
-2026-09-29 已完成 renderer GUI 第十四批：Gift Card Redemption 恢复登录/账户/地区/
-workspace owner 资格、16 位 PIN 与可选 20 位卡号校验、integrity 请求、兑换错误分类、
-序列号展示、billing 刷新与升级/继续；Lighthouse Work Home 恢复账户/workspace gate、
-个人与工作上下文、follow-up 会话、建议、connector 流程和 takeover；Browser Skill Editor
-恢复权限/校验、文件编辑上传、冲突处理、保存/分享/下载/删除及未保存拦截；Appgen Analytics
-恢复项目 gate、Overview/Traffic/Events、7/30 天窗口、指标/流量/事件查询、空态与 refetch。
-专项行为测试 170/170；renderer 1049/1049、main 11/11、tsc 73，pages-routes 76/92。
-同期为构建器新增 `IMPORT_ALIASES` 解析轨道，将历史语义依赖名精确映射回原发布文件名，
-不膨胀 `CHUNKS`/覆盖统计；并修复 9 处既有导出或依赖边漂移，结构验证保持全绿。
-
-2026-09-29 已完成 renderer GUI 第十五批：Scheduled Tasks 恢复加载/错误/重试、状态筛选、
-分页、建议任务、权限、详情/编辑/分享与导航；Detached Browser 恢复宿主注册、toolbar/
-webview 同步、消息转发、窗口 transfer、异常与幂等卸载；Pricing Plan 恢复账户/计划 gate、
-促销、外部 checkout、in-app preview、升级降级确认与网页回退；Checkout Success 恢复个人/
-Business 路由、履约重试、wallet、workspace access、图片下载与 auto-top-up 警告；Security
-Route 恢复插件/管理员/主机 gate、扫描/发现/仓库列表、新扫描提交与错误空态。专项行为测试
-184/184；renderer 1054/1054、main 11/11、tsc 73，pages-routes 81/92。
-
-2026-09-29 已完成 renderer GUI 第十六批：Projects Index 恢复项目列表、搜索、空态、
-菜单与页面标题；Avatar Overlay Native 恢复实时语音悬浮窗、工具活动、权限请求、交互切换
-与 handoff；Library 恢复访问门禁、URL 搜索/分类/回收站、列表状态、打开/恢复/上传和按类型
-懒加载预览与操作对话框；Onboarding Route 恢复工作区门禁、角色/部门问卷、personalization
-持久化、示例 tour、跳过与完成导航。专项行为测试 143/143；renderer 1058/1058、main
-11/11、tsc 73，pages-routes 85/92。
-
-2026-09-29 已完成 renderer GUI 第十七批并收官 pages-routes：Meetings 恢复会议列表、
-搜索筛选、详情/摘要/转录、分享反馈、Calendar 连接与日历视图；GPT Builder 恢复草稿字段、
-校验、自动保存、knowledge、能力开关、预览和发布；Personal Finance 恢复连接 onboarding、
-Dashboard/Chats/Accounts/Transactions、敏感值、记忆和实体侧栏；Health 恢复资格/年龄门禁、
-连接、Home/Records/Chats/Accounts、composer 和 starter prompts；Usage Settings 恢复 URL tab、
-计划/价格/限额/credits/reset/services 与三个懒加载分区；ChatGPT Project Home 恢复邀请、
-Chats/Sources、项目操作和五类懒对话框；Workspace Agent Builder 恢复 apps/model/capabilities、
-starter prompts、版本历史、Slack、草稿保存/发布/删除与权限。专项行为测试 353/353；renderer
-1065/1065、main 11/11、tsc 73，pages-routes 92/92。
-
-2026-09-29 已完成 renderer 小簇收口批次：Review Thread Side Panel 恢复 PR/branch/last-turn/
-uncommitted/staged/committed 来源、Git 初始化、stage/unstage/revert、文件导航搜索、刷新、命令
-复制和 large-diff 模式，使 conversation-thread 达到 101/101；Deep Research Fill 与
-Members Filled 恢复原 SVG 与 props 覆盖；Regex Search Worker 恢复全局正则、匹配上限和
-LaTeX 命令/分组范围处理，使 search-command-menu 达到 5/5；PCA Connector Action Entry
-恢复 eager 初始化与 action 重导出，使 connectors 达到 5/5。专项测试 129/129；renderer
-1070/1070、main 11/11、tsc 73。
-
-2026-09-29 已完成 hooks/animations/observability/auth-profile 批次：补齐 stable callback、
-reduced motion、Escape dismiss、learning block 布局/拖拽与 floating-window pointer
-interactivity；恢复 AnimatedIcon 公共入口与 frequency visual motion；恢复 remote PiP frame
-filter worker、remote middleware，并将 sentry dark 明确登记为主题数据资产；补齐 ChatGPT
-token auth、Plan tab、profile store 与 browser-extension profile 初始化入口。专项测试源码
-105/105，运行时行为断言 228 条；renderer 1085/1085、main 11/11、tsc 73，新增 any 0。
-animations、observability-cloud、auth-profile 均已全覆盖，hooks 仅余 external-agent import
-setup actions。
-
-2026-09-29 已完成 hooks/plugins/panels/charts 原语批次：收官 external-agent import setup
-actions 与 skills-plugins-mcp 六项，恢复插件创建/安装、legacy video loader、source/tweaks
-toolbar；panels 补齐 text editor entry、tab helpers、control/frame/visibility、plan entry、
-xterm output 与 cloud browser 实时控制，只余 MCP elicitation 与 pending request 两个大块；
-charts-ui 补齐 BarChartFill 与 chart colors，并将 graphlib 双版本、Chart.js zoom 和 GraphQL
-entry 明确归入第三方保留轨道。专项测试源码 64/64、行为断言 327 条；renderer
-1102/1102、main 11/11、tsc 73，新增 any 0。hooks 24/24、skills-plugins-mcp 30/30，
-panels 18/20，charts-ui 10/17。
-
-2026-09-29 已完成 panels 收官与 charts-ui 第二批：恢复 MCP server elicitation request
-panel、pending request item panel、图表表达式求值/采样、PieChart、Epic chart indicator
-和 ChartWidget，并将 Datadog Session Replay telemetry 明确登记为 vendor 保留资产。专项
-行为测试 137/137；renderer 全量门禁 1108/1108、main 11/11、tsc 73，新增 any 0。
-panels 达到 20/20，charts-ui 达到 15/17，仅余 chart content reference 与 interactive chart。
-
-2026-09-29 已收官 charts-ui 并推进 editor-docs/artifact-preview：恢复 chart content
-reference 与 interactive chart，覆盖图表解析、表格/TSV、PNG 下载、交互采样、几何叠加、
-拖点和缩放；恢复 Markdown/DIL writing block、composer annotation editor，并补齐七个
-artifact preview 初始化/重导出入口。四个 75–171B 的 editor worker/entry 转发壳经审计
-登记为 generated/worker 保留资产。专项断言 195 条；renderer 1120/1120、tsc 73，
-charts-ui 达到 17/17，editor-docs 34/42，artifact-preview 43/53。
-
-2026-09-29 已继续推进 editor-docs/artifact-preview：恢复 artifact tab shell、selected
-text annotation editor、detached browser annotation host、source annotation registry、
-Mermaid code editor、binary classification metrics、video lightbox 与 Mermaid preview core。
-专项断言 213 条；renderer 1128/1128、tsc 73，app-shared 消费声明 341/341。
-editor-docs 达到 38/42，artifact-preview 达到 47/53。
-
-2026-09-29 已收官 editor-docs：恢复 detached browser annotation controls、image markup
-editor、visualization annotation editor 与 quick-chat writing block adapter，覆盖注释模式
-快捷键/coachmark、原图按压与截图、图片标注工具/评论/未保存确认、可视化注释浮层的拖拽
-缩放与 obstacle placement，以及 writing block 的持久化、tone/email metadata 和 revision
-门控。四组专项测试共 136 条运行时/源码断言；renderer 1132/1132、tsc 73，
-app-shared 消费声明仍为 341/341。editor-docs 达到 42/42；下一批只处理
-artifact-preview 剩余 6 个真实缺口。
-
-2026-09-29 已收官 artifact-preview：恢复 artifact session tab、text document preview、
-Mermaid editable preview、library note/image preview 与 image side panel，覆盖 presentation /
-workbook lazy panel、CRDT 更新、文本下载与版本历史、Mermaid 编辑/重渲染、note autosave、
-library image 加载/编辑/下载、评论与缩放，并补回 360° panorama renderer 的精确动态依赖。
-五组专项测试共 166 条断言；renderer 1138/1138、tsc 73，artifact-preview 达到
-53/53。下一批转入 markdown-render 剩余 17 个 chunk。
-
-2026-09-29 已收官 markdown-render：恢复 Markdown 入口、ChatGPT code block/editor、
-代码执行控制器和 10 个 registered thumbnail；代码编辑器保留 35 个语言运行时动态
-依赖，代码块保留 Mermaid/HTML/React/Vega 预览与 Python 执行入口。highlight.js 语言包、
-i18n locale bundle 与 TextMate Markdown grammar shim 分别登记为 vendor/generated 资产，
-不伪造业务源码。五组专项测试共 140 条断言；构建器补充发布资产动态 import 的
-external 解析后，renderer 1152/1152、tsc 73，markdown-render 达到 24/24。
-
-2026-09-29 已收官 appgen-valdi-platform：恢复 Automations 页面、航班搜索表单、
-个人财务账户页、workspace agent 页面、环境设置 review、voice DSP / code execution
-lazy entry，以及 favorite、note、restore、library route 等小型入口，共 19 个语义 chunk；
-Valdi finance bundle、产品干预运行时、DIL response runtime 与 note data URI 等 5 个
-大型生成/vendor 资产继续走 transform-only 保留轨道。四组专项测试共 126 条断言；
-renderer 1171/1171、tsc 73，appgen-valdi-platform 达到 78/78。
-
-2026-09-29 已推进 rpc-bridge 第一批：审计全部 35 个非 model 尾部，恢复 array helper、
-文件树、坐标/角度/数值格式化、analytics query string 与 browser profile import NUX
-等 10 个语义叶子；Datadog、KaTeX、remark-math、photo-sphere-viewer、Lucide barrel、
-WASM binary 等 15 个明确 vendor/generated 资产进入保留轨道。专项测试 49 条断言；
-renderer 1181/1181，rpc-bridge 当前 55/410。另对剩余 345 个 model chunk 完成结构化
-审计：343 个含公式、归一化、模拟或派生状态逻辑，必须语义重写；仅 2 个属于纯静态
-模型数据候选。
-
-2026-09-29 已推进 rpc-bridge 第二批：按体积恢复 30 个最小教学模型，覆盖化学、生物、
-经济、物理、数学与环境科学主题；每个模型均保留原始初始化边、压缩导出面、输入
-归一化、公式和派生状态。三组专项测试共 236 条断言；renderer 1211/1211、tsc 73，
-rpc-bridge 当前 85/410。
-
-2026-09-29 已推进 rpc-bridge 第三批：继续恢复 30 个低复杂度教学模型，新增会计、
-财政政策、生态、化学、统计、供应链、密码学和劳动力市场等主题。三组专项测试共
-249 条断言；renderer 1241/1241、tsc 73，rpc-bridge 当前 115/410。
-
-2026-09-29 已推进 rpc-bridge 第四批：恢复 30 个教学模型，新增溶液性质、整数运算、
-内分泌反馈、概率统计、生物循环、微观/宏观经济、数据库事务与矩阵运算等主题。
-三组专项测试共 275 条断言；renderer 1271/1271、tsc 73，rpc-bridge 当前 145/410。
-
-2026-09-29 已推进 rpc-bridge 第五批：再恢复 30 个教学模型，覆盖国际贸易与价格管制、
-条件反射、数组与指针、SQL 聚合、电子传递链与 GPCR、气体定律、酸碱与化学计量等
-主题。三组专项测试共 277 条断言；renderer 1301/1301、tsc 73，rpc-bridge 当前
-175/410。
-
-2026-09-29 已推进 rpc-bridge 第六批：恢复 30 个教学模型，新增商业周期、税收补贴、
-组合数学与几何、计算机网络与数字逻辑、生物调节、数据库连接、算法复杂度、质量控制
-和电磁化学等主题。三组专项测试共 306 条断言；renderer 1331/1331、tsc 73，
-rpc-bridge 当前 205/410。
-
-2026-09-29 已推进 rpc-bridge 第七批：恢复 30 个教学模型，覆盖流行病学、化学平衡与
-电化学、货币市场、概率分布、生物免疫与生态、数列与函数、机器学习分类、视觉生理和
-有机构象等主题。三组专项测试共 299 条断言；renderer 1361/1361、tsc 73，
-rpc-bridge 当前 235/410。
-
-2026-09-29 已推进 rpc-bridge 第八批：恢复 30 个教学模型，新增溶解度与缓冲体系、反应
-速率和酶抑制、统计检验、遗传图谱、电子表格函数、环境风险、区块链、运动学与相图等
-主题。三组专项测试共 314 条断言；renderer 1391/1391、tsc 73，rpc-bridge 当前
-265/410。
-
-2026-09-29 已推进 rpc-bridge 第九批：恢复 30 个教学模型，覆盖集合与数列、导数定理、
-计算机算法与体系结构、光谱和反应动力学、概率统计、人口生态、机器学习、生理周期及
-会计成本流等主题。三组专项测试共 318 条断言；renderer 1421/1421、tsc 73，
-rpc-bridge 当前 295/410。
-
-2026-09-29 已推进 rpc-bridge 第十批：恢复 30 个教学模型，新增统计分布与假设检验、
-化学依数性和电磁学、数据结构与调度、数据库建模、遗传与生理系统、材料力学、污染
-治理及音符编辑等主题。三组专项测试共 328 条断言；renderer 1451/1451、tsc 73，
-rpc-bridge 当前 325/410。
-
-2026-09-29 已推进 rpc-bridge 第十一批：恢复 30 个教学模型，覆盖相关分析、统计检验、
-遗传与消化系统、有机与无机化学、能源与元素循环、排序和关键路径、地形、光学及运动
-图像等主题。三组专项测试共 347 条断言；renderer 1481/1481、tsc 73，rpc-bridge
-当前 355/410。
-
-2026-09-29 已推进 rpc-bridge 第十二批：恢复 30 个教学模型，新增分类指标、生命科学
-过程、概率推断、数值积分、数列与微积分、数据结构、生态经济及物理化学等主题；并为
-adaptive slider、数学 tokenizer、null guard 与 numerical integration 补齐精确发布依赖
-别名和类型声明。三组专项测试共 302 条断言；renderer 1511/1511、tsc 73，
-rpc-bridge 当前 385/410。
-
-2026-09-29 已完成 rpc-bridge 收官：恢复最后 20 个语义模块，两个原纯数据候选经消费者
-审计改判并重写为语义小模块；5 个大型聚合运行时依据真实消费者、副作用与动态依赖
-证据进入 generated preserve 轨道。三组专项测试共 228 条断言；renderer 1531/1531、
-tsc 73，rpc-bridge 达到 410/410。
-
-2026-09-29 已完成 misc-ui-utils 全部 678 个缺口的结构化审计；三份分区清单和全局
-验证器证明原顺序覆盖、无重复、无遗漏。分类为 semantic-small 274、
-semantic-business-logic 66、aggregation-runtime 123、generated-icon-or-data 161、
-vendor-generated-preserve 54；动作建议为 rewrite 314、preserve 215、incremental-hub
-110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 首批 30 个 rewrite：恢复 Mermaid railroad/radar/
-packet/treemap 初始化包装器、stable callback、空值与计划事件工具、18 个教学模型及
-template 入口。三组专项测试共 198 条断言，既有 Hook 回归另有 42 条断言；renderer
-1561/1561、tsc 73，全量覆盖 1599/2247，misc-ui-utils 当前 305/953。剩余 648 个缺口
-按审计动作分为 rewrite 284、preserve 215、incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第二批 30 个 rewrite：恢复数论、化学、生物、物理、
-统计、数据结构教学模型，以及 math、USD formatter、extends 与 pane layout 基础工具。
-三组专项测试共 220 条断言；renderer 1591/1591、tsc 73，全量覆盖 1629/2247，
-misc-ui-utils 当前 335/953。剩余 618 个缺口按审计动作分为 rewrite 254、preserve 215、
-incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第三批 30 个 rewrite：恢复环境科学、数字逻辑、声学、
-生态、病毒生命周期、分子作用力、实验设计、统计分布、化学结构、电路、网络过载与
-辐射安全教学模型。三组专项测试共 200 条断言；renderer 1621/1621、tsc 73，全量覆盖
-1659/2247，misc-ui-utils 当前 365/953。剩余 588 个缺口按审计动作分为 rewrite 224、
-preserve 215、incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第四批：恢复 30 个 rewrite 模块，覆盖光学与 LaTeX
-工具、力学、电学、生态、统计、算法、回归与微分方程教学模型；同时以逐文件证据将
-11 个语法定义入口和 1 个 Hammer 入口登记为 preserved vendor。三组 rewrite 专项测试
-共 203 条断言，preserve 专项验证 12 个包装器；renderer 1651/1651、tsc 73，全量覆盖
-1701/2247，misc-ui-utils 当前 407/953。剩余 546 个缺口按审计动作分为 rewrite 194、
-preserve 203、incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第五批：恢复 30 个 rewrite 模块，覆盖热力学、化学、
-生物、几何、统计、经济、力学和电磁学模型，并将第二个 math 变体独立恢复为 lazy
-runtime；另登记 14 个纯静态教学规格与 2 个视觉资产为 preserved data/generated。三组
-rewrite 专项测试共 214 条断言，preserve 专项验证 16 个资产；renderer 1681/1681、
-tsc 73，全量覆盖 1747/2247，misc-ui-utils 当前 453/953。剩余 500 个缺口按审计动作
-分为 rewrite 164、preserve 187、incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第六批：恢复 30 个 rewrite 模块，覆盖 U18 日志、
-电阻归一化、x-like 标识符、可信联系人布局、RTP transform worker 及 24 个教学模型；
-另登记 19 个生成图标入口和 1 个 audio worklet 为 preserved。三组 rewrite 专项测试共
-236 条断言，preserve 专项验证 20 个资产；renderer 1711/1711、tsc 73，全量覆盖
-1797/2247，misc-ui-utils 当前 503/953。剩余 450 个缺口按审计动作分为 rewrite 134、
-preserve 167、incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第七批：恢复 30 个 rewrite 模块，覆盖 subagents tab
-路由恢复、三个几何 template 变体及物理、化学、生理、统计教学模型；另登记 19 个生成
-图标和 1 个 Lucide 工厂为 preserved。三组 rewrite 专项测试共 235 条断言，preserve
-专项验证 20 个资产；renderer 1741/1741、tsc 73，全量覆盖 1847/2247，misc-ui-utils
-当前 553/953。剩余 400 个缺口按审计动作分为 rewrite 104、preserve 147、
-incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第八批：恢复 30 个 rewrite 模块，覆盖 sandbox
-连接、Mermaid size capture 双变体、library/file preview、低亮 AST、按钮与响应式图片、
-数值积分、几何基础工具及物理/化学/统计教学模型；另登记 20 个生成图标、语法主题和
-vendor 小入口为 preserved。三组 rewrite 专项测试共 301 条断言，preserve 专项验证
-20 个资产；renderer 1771/1771、tsc 73，全量覆盖 1897/2247，misc-ui-utils 当前
-603/953。剩余 350 个缺口按审计动作分为 rewrite 74、preserve 127、incremental-hub
-110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第九批：恢复 30 个 rewrite 模块，覆盖广告 placement/
-hydration、文件预览与 thumbnail、交互采样、语音 worklet、Katex/数学解析、subagents/
-plan/background terminal 路由恢复、beacon surface 与 preload bridge；另登记 20 个静态
-图片、语法/主题数据、生成 UI 和 vendor 运行时为 preserved。三组 rewrite 专项测试共
-235 条断言，preserve 专项验证 20 个资产；renderer 1801/1801、tsc 73，全量覆盖
-1947/2247，misc-ui-utils 当前 653/953。剩余 300 个缺口按审计动作分为 rewrite 44、
-preserve 107、incremental-hub 110、进一步消费者审计 39。
-
-2026-09-29 已完成 misc-ui-utils 第十批：处理显式剩余的 10 个 rewrite 候选，覆盖
-model picker power slider、thinking toggle、triangle visual language、analytics metric
-helpers、生命科学 helix 背景、TSRX types/JSX grammar、shopping/browser open handler、
-followup shelf 与 family notification surface；另按逐文件证据登记 33 个图片、语法/主题
-数据、生成 UI/可视化及 Three/Rough/Redux/Silero 等 vendor 运行时为 preserved。新增
-rewrite 专项测试共 128 条断言，preserve 专项验证 33 个资产；renderer 1811/1811、
-tsc 73，全量覆盖 1990/2247，misc-ui-utils 当前 696/953。剩余 257 个缺口按既定审计
-动作分为 rewrite 34、preserve 74、incremental-hub 110、进一步消费者审计 39。
-
-2026-09-30 已完成 misc-ui-utils 第十一批：恢复剩余 34 个明确 rewrite 模块，覆盖
-adaptive slider、数学分类/方程/几何、ODE 内容解析、购物详情缓存、sandbox/webview、
-workspace access/layout、voice commentary 与 onboarding/announcement 等业务表面；同时将
-剩余 74 个逐文件证据明确的插画、图标、语法/主题、worker、Cytoscape/Yjs/.NET/Lodash
-等生成或 vendor 资产全部登记为 preserved。三组 rewrite 专项测试共 270 条断言，
-preserve 专项验证 74 个资产；renderer 1845/1845、tsc 73，全量覆盖 2098/2247，
-misc-ui-utils 当前 804/953。明确 rewrite/preserve 队列已清空，剩余 149 个缺口为
-incremental-hub 110、进一步消费者审计 39。
-
-2026-09-30 已完成 misc-ui-utils 消费者审计与第十二批首段：39 个消费者不明确项已按
-真实引用、副作用和动态依赖全部归类，其中 21 个进入 rewrite、8 个进入 preserve、10 个
-转为 incremental-hub。本段先恢复 ProductTag、pricing upgrade、computer-use approval、
-conversation snapshot、image markup export、business-agent draft、clinician verification、
-library trash、parental-control notifications、Windows tab open 与 project import prompt 共
-11 个模块，并登记 8 个生成 UI/vendor/无操作 facade 资产为 preserved。三组 rewrite 专项
-测试共 148 条断言，preserve 专项验证 8 个资产；renderer 1856/1856、tsc 73，全量覆盖
-2117/2247，misc-ui-utils 当前 823/953。消费者审计队列已经清空，剩余 130 个缺口为
-rewrite 10、incremental-hub 120。
-
-2026-09-30 已完成 misc-ui-utils 第十二批第二段并清空明确 rewrite 队列：恢复
-subscription payment announcement、workspace seat banner、ChatGPT header upgrade、ads
-consent boundary、conversation header、workspace recovery gate、Mermaid image rendering、
-imagegen request form、browser MFA SMS enrollment 与 workspace auto-generated name 共 10 个
-模块。三组专项测试共 112 条断言；renderer 1866/1866、tsc 73，全量覆盖 2127/2247，
-misc-ui-utils 当前 833/953。剩余 120 个缺口全部为 incremental-hub，后续只按真实消费者
-拆出语义 API。
-
-2026-09-30 已完成 misc-ui-utils incremental-hub 收官：120 个入口/聚合运行时全部按真实
-消费者完成逐文件审计，其中恢复 graceful URI decoder、voice DSP state、parental-control
-notification observer、personal-secrets preflight、conversation beacon banner、两代 color
-channel parser 与 media-device contracts 共 8 个语义模块；其余 112 个生成插画/语法入口、
-Mermaid parser bootstrap、worker model、initializer facade、locale/learning registry 与大型
-编译 UI/voice/persistence surface 均以精确依赖、导出和消费者证据登记为 preserved。六组
-专项验证共 1077 条断言；renderer 1874/1874、tsc 0，全量覆盖 2247/2247，
-misc-ui-utils 达到 953/953。renderer app-code 当前 0 pending。
-
-因此，下面“27 个 chunk / composer 与 app-shared 待推进”等数字仅为初始交接快照；
-renderer 全量应用代码现已完成，main TypeScript 的 73 个既有缺失模块/导出错误也已
-全部清理。最终门禁为 renderer 1874/1874、全量覆盖 2247/2247、main 结构 11/11、
-app-shared 消费 343/343、TypeScript 0 错误。完整依据见
-`docs/renderer-tail-audit.md`。
-
-### 已完成
-
-**Bootstrap + Main（主进程）：** 169 个 .ts 文件。bootstrap chunk 全量重写；
-main chunk 按区域 R1-R12 全部落地（fetch-handler 128 RPC、browser-use 五件套、
-window-context、dictation、菜单/启动序列等），文档
-`docs/main-analysis-r1..r12.md` + `docs/main-r8-r12-audit.md`。
-
-**Shared chunk（692 导出）：** 26 个语义模块落地于 `src/main/shared/`
-（keymap-menus/agent-instructions/chunked-message/telemetry/structured-generation/
-sandbox-permissions/automation-settings/app-constants/app-server-version/
-browser-context/browser-tab-mentions/http-headers/app-config/host-config/
-wsl-paths/…），**201 个压缩别名已语义化**。两大区（settings-threads 226、
-hosts-wsl-plugins 176）的"被消费别名"已 100% 语义化；剩余小分区
-（schema-primitives 36 / lowlevel-shim 41 / sql-git-registry 37 / mcp-rpc 34 /
-process-exec 30 / streams 21 等，合计约 151 个已消费别名）待做，
-方法论完全同前（用 `docs/shared-export-map.json` 定位 → 逐符号核实导出目标
-→ 写语义模块 → d.ts 转发）。
-
-**Renderer（GUI，主战场）：27 个 chunk 已重写并通过验证**，
-`node scripts/verify-renderer.mjs` → `27/27`：
-
-- 会话核心链：`local-conversation-thread`(561KB) / `local-conversation-turn`
-  (146KB) / `conversation-blocks` / `conversation-markdown` /
-  `virtualized-turn-list` / `thread-virtualizer` / `user-message` /
-  `agent-activity-*` / `turn-preview-body-items` / `local-conversation-page`
-- 设置页六个：general/security/remote-connections/codex-micro/
-  personalization/settings-plugin-selection + review-preferences-model +
-  settings-search-documents(559KB 纯数据，生成器提取)
-- 基础设施：rpc / thread-scroll-controller / scroll-to-match / timestamps /
-  assert-never / split-items / detachedWindow + detached-entry（第二 HTML 入口）
-- 运行时六模块（`src/renderer/app-shared/runtime/`）：message-bridge
-  （VS Code webview 风格分块协议 `codex-host-chunked-message-v1`）/
-  routes（84 路由 + codex:// deep-link）/ settings-schema（69 项）/
-  theme / persisted-atom / atom-signal（Maitai）
-- 图标生成器：`scripts/generate-icons.mjs`（568 个 icon 模块）
-
-**质量门基线（交接时）：**
-- `npx tsc --noEmit` → 139 个错误，**全部是预期类别**（TS2307/2305/2304，
-  即"未重写 chunk 的声明缺失"），这是正常状态，不是回归。
-  新增任何非预期错误都必须修复。
-- `node scripts/verify-renderer.mjs` → 27/27
-- `node scripts/verify-chunks.mjs` → 11/11（main 侧已重写 chunk）
-
-### Renderer 还剩什么（按 GUI 优先级）
-
-总量：11,201 个 chunk / 302MB，其中**真正需要人工还原的应用代码只有
-2,250 个 chunk / 49.22MB**（app-code）。其余是第三方/纯数据，
-**直接跳过**：locale 128 个（123MB）、lucide 图标 6535 个、shiki
-grammar/theme、math-learning-blocks 1481 个、mermaid、mapbox、
-runtime.worker、editor-doc 的 presentation/workbook 编辑器（巨型 vendored）。
-完整分类与优先级见 `docs/renderer-classification.md`（必读，尤其第四节）。
-
-推荐的下一步顺序（P0 → P2）：
-
-- **P0 composer 输入区簇**（47 chunk）：`composer-utility-bar` /
-  `suggestions` / `home-ambient-suggestions-content`…——GUI 核心的下半屏
-- **P0 app-shared(5.1MB) 剩余应用逻辑**：27 个已验证 chunk 已覆盖其 runtime
-  骨架，但 query key/store/UI 基础组件仍有大量未语义化导出
-  （消费型 chunk 以 `@rchunk/app-shared` 的 any 声明承接，
-  `src/renderer/types/rchunk-modules.d.ts` 共 2,312 行，逐个语义化的
-  方式与 main 侧 chunk-modules.d.ts 完全相同）
-- **P1 sidebar + home-onboarding**（52 chunk）：`sidebar-onboarding-checklist` /
-  `onboarding-page` / `library-page`…
-- **P1 dialogs-menus**（108 chunk）：`options-menu-view` / `DatePicker` /
-  `codex-mobile-setup-dialog`…页面结构清晰、还原性价比高
-- **P1 pages-routes**（92 chunk）：`avatar-overlay-native-page` /
-  `security-route` / `profile`…配合 `docs/renderer-routes.json`（84 路由）
-- **P1 browser 内置浏览器 + terminal**（25 chunk）
-- **P1 git-github-worktree**（65 chunk）：review/diff/PR UI
-- **P2 artifact-preview / markdown-render / charts-ui**：vendor 桥接层优先
-- **P3 / 跳过**：appgen-valdi-platform（Valdi mini-app，实验性商业功能）、
-  connectors、以及所有纯 vendor/locale/data chunk
+## 二、剩余任务清单（按此顺序执行）
+
+### T1 · shared 九个小分区收尾（~228 别名）★ 首选，方法完全成熟
+
+数据源：`docs/shared-export-map.json`（导出名 → 内部符号 + 行号）。
+先跑下面的统计脚本拿最新缺口清单（数字以脚本输出为准，228 是 09-30 快照；
+九小分区约 160 个，其余散在已完成分区的后消费导出里）：
+
+```bash
+python3 - <<'EOF'
+import json, os, re
+data = json.load(open('docs/shared-export-map.json'))
+semantic = set()
+for line in open('src/main/types/chunk-modules.d.ts'):
+    m = re.search(r'export \{ (\w+) as (\w+) \}', line)
+    if m and 'from "../../shared/' in line: semantic.add(m.group(2))
+consumed = {}
+for root, dirs, files in os.walk('src/main'):
+    for f in files:
+        if not f.endswith('.ts') or f == 'src-DldfpmrL.ts': continue
+        try: src = open(os.path.join(root, f)).read()
+        except: continue
+        if '@chunk/shared' not in src: continue
+        for m in re.finditer(r'([A-Za-z_$][A-Za-z0-9_$]*)\s+as\s+[a-zA-Z_]+', src):
+            consumed[m.group(1)] = consumed.get(m.group(1), 0) + 1
+todo = {}
+for name, info in data.items():
+    if name in consumed and name not in semantic:
+        todo.setdefault(info.get('zone','?'), []).append((info.get('line',0), name))
+for zone, items in sorted(todo.items(), key=lambda x:-len(x[1])):
+    print(f"{zone}: {len(items)} -> {sorted(items)[:8]}")
+print('TOTAL:', sum(len(v) for v in todo.values()))
+EOF
+```
+
+分区速览（09-30 快照）：process-exec 28、schema-primitives 30（zod
+builder 链式族——**沿用 `src/main/shared/zod-facade.ts` 既有门面，勿重造**）、
+sql-git-registry 22、mcp-rpc 22、streams 17、lowlevel-export-shim 19
+（单字母 lodash/runtime shim）、misc 7、tail 6（单字母重导出壳）、
+unlocated 5（定位器没找到的，需 grep `src/main/src-DldfpmrL.ts` 内部符号）、
+mcp-2 4。
+
+方法闭环：查行号 → 读原文区段 → 语义重写到 `src/main/shared/<语义名>.ts`
+→ 兼容导出别名（`export { X as 压缩名 }`）→ `chunk-modules.d.ts` 从
+`any` 声明改为 `export { 语义名 as 压缩名 } from "../../shared/<模块>";`
+→ 纯逻辑模块写行为自测（20+ 断言，ts⨯ 直接跑）→ typecheck 0 保持 →
+按簇一 commit。范式参考：`src/main/shared/sandbox-permissions.ts`、
+`automation-settings.ts`（带自测的完整闭环样板）。
+
+### T2 · 独立 chunk：git-worker（`src/main/worker.ts`，90,836 行）★ 最大件
+
+- manifest 条目 `"git-worker": "worker.js"`，CJS worker。先确认加载形态
+  （worker_threads / hidden window）再定拆分粒度。
+- **先做 vendored 识别**（版本号/npm 包名/UA 字符串三证据）：90K 行里
+  预计有大量 libgit/依赖库。能锁定的保留原版（可给 `scripts/chunk-manifest.mjs`
+  加 PRESERVED Map，模仿 renderer 的登记模式并写理由），只语义化业务部分
+  （git 操作的 RPC 面、session 生命周期）。
+- 重写后加入 CHUNKS + REWRITTEN，`verify-chunks.mjs` 会自动比对
+  requires/exports（worker 是 CJS，比对逻辑已支持）。
+- 参考 `docs/main-rewrite-contract.md` 的 main 侧双轨契约。
+
+### T3 · browser-page-preload（`src/main/browser-page-preload.ts`，30,217 行）
+
+browser page 侧的沙箱 preload 桥。已有先例：`preload.js`/`sandbox-preload.js`
+已在 main REWRITTEN 中，验证方式相同。与 `src/main/main-app/browser-use/`
+（Iab API、session registry 等）语义强相关，动笔前先读该目录。
+
+### T4 · 两个 mini shared（各 ~500 行，半天量级）
+
+`src-BSoROW9v.ts`（worker-shared，597 行）、`src-C9YLnbgY.ts`
+（main-shared，525 行）。独立小 chunk，各自登记 CHUNKS/REWRITTEN。
+
+### T5 · css-selector 与 file-type 双核（先审计再动手）
+
+- `css-selector`（`src/main/dist-wQAv1pJP.ts`）：**注意它不纯是 vendor**——
+  `src/main/shared/rpc-core.ts` 的 RpcTarget 基类就来自这个 chunk
+  （`E ? E.RpcTarget : class{}`）。它是混装的 dist 运行时（RPC 基座 +
+  可能的 selector 逻辑）：先逐段审计，RPC 基座部分语义化接入 rpc-core，
+  vendor 部分登记保留。
+- `file-type-main`/`file-type-worker`（core-B-w7xKIn / core-DlTZhmo0，各
+  ~2K 行）：大概率是 file-type npm 包（magic bytes 表特征）——判定 vendored
+  则保留登记，不伪造源码。
+
+### T6 · main 深度打磨（可选，最后做）
+
+main 结构性完成 ≠ 逐行语义化（133K 语义行 vs 177K 原版行，gap 主要是
+原版内嵌 vendored 与低频路径）。可选动作：对照 `docs/main-analysis-r*.md`
+的区域清单做一次"main-C-Mhak1n.ts 未消费区域审计"，列出仍为原样的大段，
+逐段判定 vendored 保留 / 补语义化，报告落盘 `docs/`。
+**这是唯一允许回头碰 main 的入口**；做完即可宣布整个 goal 收官。
 
 ---
 
-## 四、核心方法论（必须严格遵循）
+## 三、验收命令与完成判据
 
-### 双轨构建
+每批次收口用既有工具（约 16 秒）：
 
-- **REWRITTEN chunk**：语义源码 → `scripts/build-renderer.mjs` 用 esbuild
-  打成单个 ESM chunk。输出文件名必须与发布版**逐字符一致**
-  （如 `rpc-971deaddf2c2.js`），即 chunk 清单里的 value。
-- **其余 chunk**：transform-only——原版 JS 原样放 `src/webview/assets/`，
-  只保证与发布版逐字节一致，**不改名不改内容**。
-- 两轨由 import 图缝合：重写 chunk 里对未重写 chunk 的依赖写成
-  `import ... from "@rchunk/<语义名>"`（tsconfig 路径由
-  `src/renderer/types/rchunk-modules.d.ts` 声明；esbuild 构建时经
-  chunkImportPlugin 改写回 `./<发布文件名>` 相对路径）。
+```bash
+npm run verify-renderer-cluster -- --test scripts/test-<cluster>.mjs \
+  --module <module>:<assertions>   # 批次门禁（tsc 基线 --tsc-baseline 0）
+node scripts/verify-renderer.mjs   # 应恒为 1874/1874
+node scripts/verify-chunks.mjs     # 随 main REWRITTEN 增长全绿
+npm run typecheck                  # 当前 0 错误，任何新增必须修复
+node scripts/audit-app-shared-consumption.mjs  # renderer 侧保持 343/343
+```
 
-### 单个 renderer chunk 的重写闭环（每一块都走全流程）
+**整个 goal 的 Definition of Done：**
 
-1. **登记**：`scripts/renderer-chunk-manifest.mjs` 的 `CHUNKS` 加
-   `"语义名": "发布文件名"`，`REWRITTEN` 加语义名。
-2. **定位导出**：用 `docs/renderer-app-shared-export-map.json` /
-   `docs/renderer-app-initial-export-map.json`（导出名 → 内部符号 + 行号）
-   找到该 chunk 的全部导出与依赖；`docs/renderer-chunk-manifest.json`
-   是全量 11,201 chunk 的原始 import 邻接表（edges），重写前先查它拿到
-   该 chunk 的精确依赖集合（verify 比对的正是这个集合）；纯数据 chunk
-   用生成器脚本提取（参照 `scripts/generate-icons.mjs` 的平衡括号提取法）。
-3. **语义重写**：读原版（`src/webview/assets/<发布文件名>.js` 或
-   `.reference/app-original/`），按真实结构命名（组件/类型/hook 的真实语义），
-   写入 `src/renderer/<语义名>/`。
-4. **兼容导出对齐（最容易翻车）**：原版 chunk 的导出是压缩名
-   （如 `export { computeTurnLayout as t }`）。重写版必须**逐一对齐**：
-   `export { computeTurnLayout as t, ... }`——verify 脚本比对的就是
-   ESM 导出的对外符号名。
-5. **import 依赖集合对齐**：verify 还比对 chunk 对 `./xxx.js` 的全部
-   import 集合。漏依赖（如 Icon、file-diff-alt）或多写都会挂。
-   遇到大量对齐时用一次性 python 脚本批量 diff，别手抠。
-6. **验证**：`node scripts/verify-renderer.mjs` 必须全绿；
-   `npx tsc --noEmit` 不得超出基线错误集。
-7. **提交**：一次 chunk 一 commit，中文 commit message 写清
-   符号映射与行为自测结果。
+1. T1 完成：第一节的统计脚本输出 TOTAL = 0（已消费别名 0 个 any 承接）。
+2. T2-T5 完成：`scripts/chunk-manifest.mjs` 的每个 CHUNKS 条目要么在
+   REWRITTEN、要么在带理由的保留登记中，无未分类项。
+3. 全部验收命令绿。
+4. （可选）T6 审计报告落盘。
 
-### 行为自测（强烈建议，不止 verify）
-
-对纯逻辑模块（非 React 组件）写一次性 tsx 脚本跑真实行为
-（参照历史：command-registry 的 keymap 状态机、sandbox-permissions 的
-档构造/降级、chunked-message 的协议全链、wsl-paths 的路径换算——
-每模块 20-40 例断言）。React 组件 chunk 以 verify + tsc 为准即可。
+达成 1-3 即原始 goal【bootstrap → main → shared → 其余】收官。
 
 ---
 
-## 五、必读文档（按顺序）
+## 四、方法论与纪律（浓缩，旧版 handoff 全文见 git 历史）
 
-1. `docs/renderer-classification.md` —— 11,201 chunk 全量分类 + GUI 优先级
-2. `docs/renderer-app-shared-analysis.md` —— renderer 运行时六机制解析
-3. `docs/renderer-entry-and-routes.md` + `docs/renderer-routes.json` ——
-   入口链（index → rpc → app-main createRoot）与 84 路由
-4. `scripts/renderer-chunk-manifest.mjs` 头部注释 —— 双轨契约
-5. `docs/shared-export-map.json` —— shared 692 导出地图（若继续 shared）
-6. `docs/main-rewrite-contract.md` / `docs/bootstrap-rewrite-contract.md`
+**双轨构建**：REWRITTEN chunk 由 esbuild 打包、输出文件名与发布版逐字符
+一致；其余 chunk transform-only 逐字节保真；两轨任意比例混合可构建完整
+app。renderer 靠 `@rchunk/*` 缝合，main 靠 `@chunk/*`。
 
-已重写 renderer chunk 的实际源码是最好的范式，**动笔前先读 1-2 个**：
-- 小而完整：`src/renderer/rpc/index.ts`、`timestamps/index.ts`
-- 中型带兼容别名：`src/renderer/thread-virtualizer/index.ts`
-- 大型组件：`src/renderer/local-conversation-turn/index.ts`、
-  `local-conversation-thread/index.ts`
+**批次流程（2026-09-27 起）**：一个业务批次一 commit（10-25 模块），批次内
+只跑受影响模块的定向测试，批次收口统一 `verify-renderer-cluster` 全门禁。
+不为凑数字硬塞无关模块，但同流程/共享 mock 的模块优先合并。
 
----
-
-## 六、坑与纪律（前人血泪）
-
-1. **shell cwd 每条命令后会重置**到 chatgpt-desktop-src——所有命令
-   一律前缀 `cd /Users/david/Workspace/ppio_github/codex-desktop-glm-version && `。
-2. **Bash/Write 工具会做 HTML 实体解码**：任何包含 `"` `&#39;`
-   `&` 字面量的代码写入时会被解码破坏。绕过：用 `chr(38)` 拼接、
-   或 `String.fromCharCode`、或先写 `chr(38)+'quot;'+chr(59)` 的
-   python 修复脚本。（真实事故：HTML_UNESCAPES 映射连修三次。）
-3. **verify 失败循环**：九成是导出别名/依赖集合没对齐。先跑
-   verify 看缺哪个符号，再回源码补；用脚本比对而不是目测。
-4. **不要"顺手重构"原版行为**：重写版的语义必须与原版逐例一致
-   （包括看起来怪的行为，如 `qb` 路径函数的小写化、`rx` join 不剥
-   子路径尾斜杠）。自测断言写错时先怀疑断言，再怀疑实现。
-5. **命名空间成员不能直接进 export 块**：`export { blocks.X as Y }`
-   非法——先 `const { X } = blocks` 解构。
-6. **React Compiler 形态**：原版大量 `(0, X.c)(n)` memo-cache 槽位调用，
-   语义版用等价的 useRef/useCallback/Memo 表达，导出面不变即可。
-7. **文件名冲突**：两个不同 chunk 请求同一语义名时登记别名
-   （先例：`file-diff` 与 `file-dich-diff-alt`）。
-8. **commit message 用中文**，写清：别名映射表、与原版 diff 核实结论、
-   自测例数。
-9. **绝不改动** `../chatgpt-desktop-src` 与 `.reference/app-original`。
-10. **tsc 基线**：139 个 TS2307/2305/2304 属预期；每完成一批新语义化，
-    基线错误数应只减不增。修复真实错误时把新基线记进 commit。
+**坑（全部真实事故）**：
+1. shell cwd 每条命令后重置——一律前缀
+   `cd /Users/david/Workspace/ppio_github/codex-desktop-glm-version && `。
+2. Bash/Write 工具做 HTML 实体解码：`&` 实体字面量会被写坏，用
+   `chr(38)` 拼接或 python 修复脚本绕过。
+3. verify 失败九成是导出别名/依赖集合没对齐——脚本批量 diff，别目测。
+4. 不"顺手重构"原版行为：语义与原版逐例一致，包括看起来怪的实现；
+   自测失败先怀疑断言再怀疑实现。
+5. 禁止改 `../chatgpt-desktop-src` 与 `.reference/app-original`（只读参考）。
+6. typecheck 当前基线 0；只减不增，新增必须修复。
+7. commit 中文，写清符号映射、diff 核实结论、自测断言数。
 
 ---
 
-## 七、快速开始（建议第一条指令）
+## 五、快速开始（第一条指令）
 
 ```bash
 cd /Users/david/Workspace/ppio_github/codex-desktop-glm-version && \
 node scripts/verify-renderer.mjs && node scripts/verify-chunks.mjs && \
-npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"
+npm run typecheck && git status --short
 ```
 
-健康检查应同时运行 `verify-renderer`、`verify-chunks`、TypeScript 基线、
-`audit-renderer-tail.mjs`、`audit-renderer-app-coverage.mjs` 和
-`audit-app-shared-consumption.mjs`。前者的 0 pending 不得替代全量覆盖审计。
-下方 2026-09-27 流程更新继续有效。
-
-### 2026-09-27 增量流程更新
-
-当前推进已改为“业务批次一 commit、批次末统一门禁”。提交边界应覆盖一个
-完整用户流程或一组共享依赖/测试夹具的模块，通常约 **10–25 个模块**；不要
-因为单个文件名簇完成就中断上下文。批次内部只跑受影响模块的快速定向测试，
-不反复运行 build/verify/tsc。批次收口时再统一使用：
-
-```bash
-npm run verify-renderer-cluster -- \
-  --test scripts/test-<cluster>.mjs \
-  --module <module-a>:<assertions> \
-  --module <module-b>:<assertions>
-```
-
-`--test` 与 `--module` 均可重复，允许一个业务批次汇集多个原有小簇。该命令
-会自动执行定向测试、核对测试源码实际断言数、构建 renderer、运行
-renderer/main 结构验证、检查 TypeScript 基线、`git diff --check`、新增 any
-以及直接 namespace chunk 消费，并输出可直接复制进 commit message 的模块
-验证清单。当前 TypeScript 基线为 **0**；可用
-`--tsc-baseline <count>` 显式覆盖。
-
-完整门禁在当前机器约 16 秒；主要成本是人工收口与上下文切换。因此不要为了
-追求更大的数字把无关功能硬塞进同一提交，但只要模块属于同一用户流程、共享
-同一套 mock/类型声明，优先合并到同一业务批次后再验证、提交。
+健康值：1874/1874、11/11（T2-T5 推进中数字增长）、typecheck 0、工作树
+干净。然后从 **T1（shared 九小分区）** 开始——跑第一节内嵌统计脚本拿
+实时清单，按 process-exec → schema-primitives → sql-git-registry 的顺序
+逐簇清零。
