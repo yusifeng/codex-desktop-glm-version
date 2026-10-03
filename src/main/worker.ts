@@ -7,8 +7,12 @@ let t = require("node:worker_threads"),
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
+const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const LX = classifyGitError;
 const zX = gitSubcommand;
+const tG = decodeCommandOutput;
+const nG = findActiveDistro;
+const rG = orderEligibleDistros;
 i = e.o(i);
 let a = require("module");
 a = e.o(a);
@@ -47492,7 +47496,7 @@ async function eG(e, t, n) {
     })
   );
 }
-function tG(e) {
+function legacy_tG(e) {
   let t;
   if (Buffer.isBuffer(e)) {
     let n = e;
@@ -47521,7 +47525,7 @@ function tG(e) {
     )
     .trim();
 }
-function nG(e) {
+function legacy_nG(e) {
   let t = e
     .split(
       `
@@ -47538,8 +47542,8 @@ function nG(e) {
     null
   );
 }
-function rG(e) {
-  let t = nG(e),
+function legacy_rG(e) {
+  let t = legacy_nG(e),
     n = e
       .split(
         `
