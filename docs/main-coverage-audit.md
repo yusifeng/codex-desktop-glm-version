@@ -83,7 +83,9 @@ Electron/worker 副作用）：
 该边界现已迁移至 `src/main/main-app/startup/startup-policy.ts`：
 `resolveStartupFlavorFlags` 接回 `Ust` 的 flavor/platform flags，
 `createStartupPhaseTracker` 接回阶段 elapsed/trace 记录；
-`scripts/test-main-startup-policy.mjs` 覆盖 9 项矩阵和计时断言。
+`collectStartupPathExtensions`、`shouldEnableDebugChromePages` 与
+`resolveRemoteHostedPipProcessIdentifier` 进一步接回启动前后的路径分类、debug page 和 PIP
+进程号策略；`scripts/test-main-startup-policy.mjs` 覆盖 17 项矩阵、计时和边界断言。
 
 - `175,824-175,859` 的 `S/C/w/T/E` 是纯 build-flavor/platform 映射，输入仅为
   `buildFlavor`、`process.platform` 和环境状态；可落为 `resolveStartupFlavorFlags`

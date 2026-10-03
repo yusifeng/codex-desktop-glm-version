@@ -12,7 +12,7 @@ const mainUrlTrust = require("./main-app/util/url-trust.js");
 const appshotShortcut = require("./main-app/hotkey/appshot-shortcut.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
 const windowAppearance = require("./main-app/window-appearance.js");
-const { createStartupPhaseTracker, resolveStartupFlavorFlags } = require("./main-app/startup/startup-policy.js");
+const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175798,7 +175798,7 @@ function zst(e) {
   );
 }
 function Bst(e) {
-  return Array.from(new Set(e.map((e) => h.extname(e.path).slice(1).toLowerCase()))).sort();
+  return collectStartupPathExtensions(e, h.extname);
 }
 var Vst = `CODEX_ELECTRON_REMOTE_HOSTED_PIP_PROCESS_IDENTIFIER`,
   Hst = 3e4;
@@ -175890,7 +175890,7 @@ async function Ust() {
     await Ice(V.globalState, Pce),
     await V.settingsStore.captureInitialFollowUpQueueMode(),
     await Fce(V.globalState));
-  let te = E && V.settingsStore.getEffective(n.Ba.debugChromePagesEnabled.key) === !0;
+  let te = shouldEnableDebugChromePages(E, V.settingsStore.getEffective(n.Ba.debugChromePagesEnabled.key));
   (l.app.setDebugChromePagesEnabled(te),
     tl(te),
     M(`local data migrations completed`, L),
@@ -175912,8 +175912,7 @@ async function Ust() {
       },
       stateStore: V.globalState,
     }),
-    ie = Number(process.env[Vst]),
-    ae = F && Number.isSafeInteger(ie) && ie > 0 ? ie : null;
+    ae = resolveRemoteHostedPipProcessIdentifier(F, process.env[Vst]);
   (ae != null && U.setServiceProcessIdentifier(ae), I.add(U.dispose));
   let oe = new foe(),
     se,

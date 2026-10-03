@@ -50,5 +50,20 @@ function createStartupPhaseTracker({
   };
 }
 
-export { createStartupPhaseTracker, resolveStartupFlavorFlags };
-if (typeof module !== `undefined`) module.exports = { createStartupPhaseTracker, resolveStartupFlavorFlags };
+function collectStartupPathExtensions(paths: Array<{ path: string }>, extname: (path: string) => string) {
+  return Array.from(new Set(paths.map(({ path }) => extname(path).slice(1).toLowerCase()))).sort();
+}
+
+function shouldEnableDebugChromePages(allowDebugMenu: boolean, configured: unknown) {
+  return allowDebugMenu && configured === true;
+}
+
+function resolveRemoteHostedPipProcessIdentifier(isUnpackaged: boolean, value: string | undefined) {
+  const processIdentifier = Number(value);
+  return isUnpackaged && Number.isSafeInteger(processIdentifier) && processIdentifier > 0
+    ? processIdentifier
+    : null;
+}
+
+export { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages };
+if (typeof module !== `undefined`) module.exports = { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages };

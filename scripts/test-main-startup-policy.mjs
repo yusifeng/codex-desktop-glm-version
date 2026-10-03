@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { createStartupPhaseTracker, resolveStartupFlavorFlags } = require("../app/.vite/build/main-app/startup/startup-policy.js");
+const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("../app/.vite/build/main-app/startup/startup-policy.js");
 const policy = {
   Dev: "dev",
   Agent: "agent",
@@ -28,4 +28,14 @@ assert.equal(durations.background, undefined);
 assert.equal(traces[0][1].safe.startupElapsedMs, 75);
 assert.equal(traces[1][1].safe.background, true);
 
-console.log("9 main startup policy assertions passed");
+const extname = (path) => path.includes(".") ? path.slice(path.lastIndexOf(".")) : "";
+assert.deepEqual(collectStartupPathExtensions([{ path: "A.SKILL" }, { path: "b.skill" }, { path: "README" }, { path: "c.TXT" }], extname), ["", "skill", "txt"]);
+assert.equal(shouldEnableDebugChromePages(true, true), true);
+assert.equal(shouldEnableDebugChromePages(false, true), false);
+assert.equal(shouldEnableDebugChromePages(true, 1), false);
+assert.equal(resolveRemoteHostedPipProcessIdentifier(true, "42"), 42);
+assert.equal(resolveRemoteHostedPipProcessIdentifier(false, "42"), null);
+assert.equal(resolveRemoteHostedPipProcessIdentifier(true, "0"), null);
+assert.equal(resolveRemoteHostedPipProcessIdentifier(true, "1.5"), null);
+
+console.log("17 main startup policy assertions passed");
