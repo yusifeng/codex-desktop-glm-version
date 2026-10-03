@@ -94,6 +94,28 @@ function shouldScheduleGitRepoChange(disposed: boolean, changeType: string, acti
   return !disposed && !activeChanges.has(changeType) && !pendingTimers.has(changeType);
 }
 
+type GitWorkingTreeWatchRefreshAction = `skip` | `apply` | `restart`;
+
+/** Chooses the side effect for a refreshed ignore policy without touching watcher state. */
+function getGitWorkingTreeWatchRefreshAction(input: {
+  disposed: boolean;
+  retryScheduled: boolean;
+  policyCurrent: boolean;
+  sessionActive: boolean;
+  nextDirectories: string[];
+  previousDirectories: string[];
+}): GitWorkingTreeWatchRefreshAction {
+  if (input.disposed || input.retryScheduled || !input.policyCurrent) return `skip`;
+  if (
+    input.sessionActive &&
+    input.nextDirectories.length === input.previousDirectories.length &&
+    input.nextDirectories.every((directory, index) => directory === input.previousDirectories[index])
+  ) {
+    return `apply`;
+  }
+  return `restart`;
+}
+
 function createGitOperationState(flags: { cherryPickInProgress: boolean | null; mergeInProgress: boolean | null; rebaseHead: boolean | null; rebaseMerge: boolean | null; rebaseApply: boolean | null; revertInProgress: boolean | null }): Record<string, boolean | null> {
   return {
     cherryPickInProgress: flags.cherryPickInProgress,
@@ -149,5 +171,5 @@ function selectGitMetadataRefreshPaths(
   );
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange };
+export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange };

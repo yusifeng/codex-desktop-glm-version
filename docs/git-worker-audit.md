@@ -38,7 +38,10 @@ watch retry backoff、Git operation state mapping、watch target state initializ
 本轮继续抽取 metadata refresh 路径筛选策略：`selectGitMetadataRefreshPaths`
 负责将空变更集合映射到 common dir，并只接受 refs/heads/remotes、info、worktrees
 及 worktree 子目录的直接变化；`GitRepoWatcher.refreshMetadataDirectories` 已接回
-该 helper，异步 session 刷新流程仍保留在入口。回归脚本现覆盖 45 项断言。
+该 helper，异步 session 刷新流程仍保留在入口。本轮进一步抽取
+`getGitWorkingTreeWatchRefreshAction`，将 ignore policy 刷新后的 skip/apply/restart
+决策从异步生命周期中分离；回归脚本现覆盖 51 项断言。`refreshWorkingTreeWatchPolicy`
+仍负责等待 policy/session、dispose/restart 与事件副作用。
 
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含

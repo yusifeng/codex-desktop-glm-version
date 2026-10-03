@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -76907,14 +76907,19 @@ var Jye = 1e3,
         return;
       let n = await e.read({ refresh: !0 });
       if ((await t.sessionStartPromise, !this.disposed && e.isCurrent(n) && t.retryTimer == null)) {
-        if (
-          t.session != null &&
-          n.directories.length === this.workingTreeIgnoredDirectories.length &&
-          n.directories.every((e, t) => e === this.workingTreeIgnoredDirectories[t])
-        ) {
+        let r = getGitWorkingTreeWatchRefreshAction({
+          disposed: this.disposed,
+          retryScheduled: t.retryTimer != null,
+          policyCurrent: e.isCurrent(n),
+          sessionActive: t.session != null,
+          nextDirectories: n.directories,
+          previousDirectories: this.workingTreeIgnoredDirectories,
+        });
+        if (r === `apply`) {
           e.didApply(n) && this.handleFileWatchEvent(`working-tree`);
           return;
         }
+        if (r === `skip`) return;
         (await this.disposeSession(t), this.disposed || (await this.tryStartWatchSession(t, !0)));
       }
     }

@@ -9,6 +9,7 @@ const {
   createGitOperationState,
   createGitWatchTarget,
   addPendingWorkingTreePath,
+  getGitWorkingTreeWatchRefreshAction,
   getAffectedWorkingTreePath,
   isGitInternalPath,
   isMissingPathError,
@@ -79,6 +80,12 @@ assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(), new Map()), t
 assert.equal(shouldScheduleGitRepoChange(true, "head", new Set(), new Map()), false);
 assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(["head"]), new Map()), false);
 assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(), new Map([["head", 1]])), false);
+assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: true, retryScheduled: false, policyCurrent: true, sessionActive: true, nextDirectories: [], previousDirectories: [] }), "skip");
+assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: true, policyCurrent: true, sessionActive: true, nextDirectories: [], previousDirectories: [] }), "skip");
+assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: false, policyCurrent: false, sessionActive: true, nextDirectories: [], previousDirectories: [] }), "skip");
+assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: false, policyCurrent: true, sessionActive: true, nextDirectories: ["/repo/.git/info/exclude"], previousDirectories: ["/repo/.git/info/exclude"] }), "apply");
+assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: false, policyCurrent: true, sessionActive: true, nextDirectories: ["/repo/.git/info/exclude"], previousDirectories: [] }), "restart");
+assert.equal(getGitWorkingTreeWatchRefreshAction({ disposed: false, retryScheduled: false, policyCurrent: true, sessionActive: false, nextDirectories: [], previousDirectories: [] }), "restart");
 assert.deepEqual(createGitOperationState({ cherryPickInProgress: false, mergeInProgress: null, rebaseHead: false, rebaseMerge: false, rebaseApply: false, revertInProgress: true }), { cherryPickInProgress: false, mergeInProgress: null, rebaseInProgress: false, revertInProgress: true });
 assert.equal(createGitOperationState({ cherryPickInProgress: null, mergeInProgress: null, rebaseHead: false, rebaseMerge: null, rebaseApply: false, revertInProgress: null }).rebaseInProgress, null);
 assert.deepEqual(createGitOperationMarkerPaths(pathApi, "/repo/.git"), [
@@ -114,4 +121,4 @@ assert.deepEqual(target.handlers, [handler]);
 assert.equal(target.retryDelayMs, 1000);
 assert.equal(target.session, null);
 
-console.log("45 worker git watch path assertions passed");
+console.log("51 worker git watch path assertions passed");
