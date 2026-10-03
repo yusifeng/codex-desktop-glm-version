@@ -89,6 +89,10 @@ Clone state 的 shallow repository 与 partial-clone config 并行探测、confi
 `GIT_NO_LAZY_FETCH` 环境保护已迁移至 `src/main/worker/git-clone-state.ts`；原 `A3`/`Z_e`/`Q_e`
 已删除。29 项断言覆盖命令参数、并行启动、promisor truthy 值、filter/config 识别与失败降级。
 
+Safe attribute filter override 的 config discovery、driver 去重、override 参数组装、query cache 与
+generation 竞争重试已迁移至 `src/main/worker/git-safe-attribute-filters.ts`；原 `lme`/`ume`/`e2`/`dme`
+已删除，全部消费者改用语义入口。18 项断言覆盖 parser、query 参数、signal、invalidate/retry 和错误。
+
 Managed worktree discovery 的 root/boundary 去重、无 symlink 目录读取、legacy/named
 目录识别、候选复检与 `.git` 文件验证已迁移至
 `src/main/worker/git-managed-worktree-discovery.ts`；原 `R$`/`jfe`/`Ofe`/`kfe`/`G_e`/`K_e`

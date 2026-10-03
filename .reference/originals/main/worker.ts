@@ -26,6 +26,7 @@ const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-bra
 const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { getGitCloneState } = require("./worker/git-clone-state");
+const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
@@ -213,6 +214,13 @@ const managedWorktreeDiscoveryDeps = {
 };
 const gitCloneStateDeps = {
   runGit: $,
+};
+const gitSafeAttributeFilterDeps = {
+  fetchQueryWithSignal: w1,
+  getQueryMeta: () => y1,
+  queryKey: Q,
+  runGit: $,
+  staleTime: Infinity,
 };
 const syncedBranchStateDeps = {
   readConfig: P2,
@@ -67510,53 +67518,6 @@ async function cme(e, t, n) {
     sensitive: { removedWorktreeDir: i, removedParentDir: a },
   });
 }
-var lme = `^filter\\..*\\.(clean|smudge|process|required)$`,
-  ume = [`-c`, `attr.tree=`, `-c`, `core.attributesFile=`];
-async function e2(e, t) {
-  let n = Q(e.root, e.host, `safe-attribute-filter-overrides`),
-    r = e.gitConfigReadGeneration,
-    i = await w1(
-      e.queryClient,
-      {
-        queryKey: n,
-        meta: y1,
-        staleTime: g1,
-        queryFn: async (n) => {
-          let r = await $(e.root, [`config`, `--name-only`, `--get-regexp`, lme], e.host, {
-            allowedNonZeroExitCodes: [1],
-            signal: t == null ? void 0 : n,
-          });
-          if (!r.success)
-            throw Error(`git config filter discovery failed: ${r.stderr || r.stdout}`);
-          let i = new Set();
-          for (let e of r.stdout.split(/\r?\n/)) {
-            let t = dme(e.trim());
-            t != null && i.add(t);
-          }
-          return [
-            ...ume,
-            ...[...i].flatMap((e) => [
-              `-c`,
-              `filter.${e}.clean=`,
-              `-c`,
-              `filter.${e}.smudge=`,
-              `-c`,
-              `filter.${e}.process=`,
-              `-c`,
-              `filter.${e}.required=false`,
-            ]),
-          ];
-        },
-      },
-      t,
-    );
-  return e.gitConfigReadGeneration === r
-    ? i
-    : (e.queryClient.invalidateQueries({ queryKey: n, exact: !0, refetchType: `none` }), e2(e, t));
-}
-function dme(e) {
-  return /^filter\.(.+)\.(?:clean|smudge|process|required)$/.exec(e)?.[1] ?? null;
-}
 var fme = e.n((e, t) => {
     function n(e) {
       for (var t = -1, n = e == null ? 0 : e.length, r = 0, i = []; ++t < n;) {
@@ -67886,7 +67847,7 @@ async function v2(e, t, n) {
       queryFn: async (t) => {
         let n;
         try {
-          n = await e2(e, t);
+          n = await getSafeAttributeFilterOverrides(e, t, gitSafeAttributeFilterDeps);
         } catch {
           return { generation: r, result: { success: !1, paths: [], gitRoot: e.root } };
         }
@@ -68387,7 +68348,7 @@ async function Bme(e, t, n, r, i, a) {
     s = a?.signal;
   if (s?.aborted) return { success: !1, error: Error(`Operation canceled`) };
   let c = r.getWorktreeRepositoryForRoot(bz(e), i),
-    l = await e2(c, s);
+    l = await getSafeAttributeFilterOverrides(c, s, gitSafeAttributeFilterDeps);
   if (
     (await Ime({
       worktreeRepo: c,
@@ -69113,7 +69074,7 @@ async function Y2(e, t = !0, n, r, i = !1) {
       if (n == null) {
         let r;
         try {
-          r = await e2(e, t);
+          r = await getSafeAttributeFilterOverrides(e, t, gitSafeAttributeFilterDeps);
         } catch {
           return { type: `error`, failureReason: `status_config` };
         }
@@ -70405,7 +70366,9 @@ async function Sge(e, t, n, r, i) {
   let l = await x4(o, {
       fresh: !0,
       signal: i,
-      untrackedPathsPromise: e2(o, i).then((e) => t2(o.root, n, { configOverrides: e, signal: i })),
+      untrackedPathsPromise: getSafeAttributeFilterOverrides(o, i, gitSafeAttributeFilterDeps).then((e) =>
+        t2(o.root, n, { configOverrides: e, signal: i }),
+      ),
     }),
     u = await N0(o, `HEAD`, i),
     d = u;
@@ -70822,7 +70785,7 @@ async function X_e(e, t, n, r, i) {
   if (a == null) return { type: `error`, error: { type: `unknown` } };
   let o;
   try {
-    o = await e2(a, i);
+    o = await getSafeAttributeFilterOverrides(a, i, gitSafeAttributeFilterDeps);
   } catch {
     return { type: `error`, error: { type: `unknown` } };
   }
