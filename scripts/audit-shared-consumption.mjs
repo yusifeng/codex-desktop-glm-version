@@ -8,8 +8,12 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const map = JSON.parse(await fs.readFile(path.join(ROOT, "docs/shared-export-map.json"), "utf8"));
 const dts = await fs.readFile(path.join(ROOT, "src/main/types/chunk-modules.d.ts"), "utf8");
 const semantic = new Set();
-for (const m of dts.matchAll(/export\s*\{\s*([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)\s*\}\s*from\s*["']\.\.\/\.\.\/shared\/[^"']+["']/g))
-  semantic.add(m[2]);
+for (const stmt of dts.matchAll(/export\s*\{([^}]*)\}\s*from\s*["']\.\.\/\.\.\/shared\/[^"']+["']/g)) {
+  for (const item of stmt[1].split(",")) {
+    const match = item.trim().match(/^([A-Za-z_$][\w$]*)(?:\s+as\s+([A-Za-z_$][\w$]*))?$/);
+    if (match) semantic.add(match[2] ?? match[1]);
+  }
+}
 
 const consumed = new Map();
 const files = [];
