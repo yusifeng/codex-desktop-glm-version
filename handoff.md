@@ -1,172 +1,172 @@
-# Handoff（终章）：剩余 goal 的收尾清单
+# Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
-> 本文档是 goal 的 handoff prompt，接替上一版（GUI 优先阶段，已验收完成）。
-> 双轨构建、验证流水线、坑纪律**全部继续有效**（压缩收录于第四节，完整
-> 历史见 git log 的旧版 handoff）。本文只写增量：还剩什么、按什么顺序、
-> 怎么验收。所有路径相对
-> `/Users/david/Workspace/ppio_github/codex-desktop-glm-version`。
-> 并发约束：最多 5 个 subagent。
+> 本文档是最终 handoff。前一阶段（消费驱动的语义化）已按 DoD 验收完成：
+> 全部门禁绿、被消费的导出 100% 语义化、所有 chunk 已分类。
+> **本阶段把验收标准从「消费面语义化」升级为「完全反编译」**：仓库里不再
+> 存在未分类的压缩业务代码，且工程本身达到「新人可读、可导航、可一键
+> 验证」的状态。本文做完，整个项目即为真正的完全反编译。
+> 双轨构建、批次流程、坑纪律沿用旧版（git 历史可查），并发上限 5 subagent。
+> 所有路径相对 `/Users/david/Workspace/ppio_github/codex-desktop-glm-version`。
 
 ---
 
-## 一、使命与当前完成度（2026-09-30 收官后快照）
+## 一、为什么还没「完全」反编译（2026-10-03 审计结论）
 
-原始 goal 顺序【bootstrap 808KB → main 5.5MB 按子系统拆 → shared 2.1MB
-→ 其余】，核心验收标准不变：每个 REWRITTEN chunk 的构建产物与官方发布版
-结构等价（import/require 依赖集合 + 导出符号面，verify 脚本机器验证），
-语义源码与 transform-only 双轨并存可构建完整 app。
+前一阶段的方法论是**消费驱动**：只语义化被重写代码实际 import 的导出。
+这保证了结构等价与门禁，但留下了五处「整体保留、未逐段审计」的压缩原版，
+以及五处工程可读性缺口。**它们不是待办清单的尾巴，而是「完全反编译」
+与「结构等价完成」之间的全部差距。**
 
-| 侧 | 状态 | 证据（命令可复跑） |
+### A. 仍是压缩原版的业务代码（5 处）
+
+| # | 位置 | 体量 | 现状 | 问题 |
+|---|---|---|---|---|
+| A1 | `src/main/worker.ts`（git-worker） | **90,836 行** | 整体 PRESERVED，理由"worker_threads 启动协议" | 无逐段审计。git RPC 面、session 生命周期是业务代码，vendored 依赖混在其中——需要拆开：业务语义化、vendor 登记 |
+| A2 | `src/main/browser-page-preload.ts` | **30,217 行** | 整体 PRESERVED | contextBridge IPC 协议、schema 定义是业务代码 |
+| A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | T6 审计从未执行 | ~44K 行 gap 被断言为"vendored + 低频路径"，**无审计报告支撑** |
+| A4 | shared 未消费导出 | **330 个**（692 总量 − 362 已消费） | 未分类 | 其中 vendor（lodash shim 等）与真实业务混杂；A1/A2 语义化后消费面会增长，联动出现新缺口 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 仅 343 个被消费导出类型化 | hub 内部未消费的应用逻辑仍是压缩（app-initial 里有 i18n 核心等真实业务，也有大量 micromark/zod/valdi 胶水） |
+
+### B. 工程可读性缺口（5 处）
+
+| # | 问题 | 现状 |
 |---|---|---|
-| bootstrap | ✅ 完成 | 全量重写 |
-| main（5.5MB） | ✅ 结构性完成 | R1-R12 全区落地、133K 行语义源码、typecheck 0 错误、verify-chunks 11/11。深度打磨为可选项（T6） |
-| shared（2.1MB，692 导出） | ✅ **已消费别名 0 个未语义化** | `node scripts/audit-shared-consumption.mjs` → `TOTAL: 0` |
-| renderer GUI | ✅ **业务 chunk 0 pending** | verify-renderer 1874/1874；coverage 2247/2247；app-shared 消费 343/343（0 any） |
-| 其余独立 chunk | ✅ **全部明确分类**：11 个 REWRITTEN、10 个带理由 PRESERVED | `node scripts/verify-chunks.mjs` |
-
-**GUI 完成度的准确回答（接手者必读，防止回头翻 GUI）：**
-业务代码层面不差了。三个"深度注意点"是**设计决定或可选项，不是待办**：
-
-1. `INCREMENTAL_HUBS`（12+ 个聚合边界）按**实际消费面**语义化——被消费的
-   导出全类型化，hub 内部未消费的压缩导出不语义化。这是登记在
-   `scripts/renderer-chunk-manifest.mjs` 的机制，勿扩张。
-2. `PRESERVED_ASSETS`（426 个 vendor/generated/data/worker 资产）刻意保留
-   原资产，**禁止**给它们伪造业务源码（CodeMirror/Lottie/pdf.js/编辑器/
-   locale/lucide/shiki/math-blocks/教学模型生成物等）。
-3. renderer 已冻结：**禁止任何"顺手优化/补齐/重构"**——那是已验收工作。
-   verify-renderer 数字只应因 renderer 变更而变，正常应恒为 1874/1874。
+| B1 | tsconfig 吞 586 万行 transform-only 文件 | `include: src/**/*.ts` 未排除 `src/webview/assets/`，typecheck 约 44 秒 |
+| B2 | 原版对照文件躺在 src/ 里 | `src-DldfpmrLL`(70K)/`main-C-Mhak1n`(177K)/`worker`(91K)/`browser-page-preload`(30K) 等与语义源码混放，干扰导航 |
+| B3 | README 过时 | 仍写着"已重写 9 个 chunk"（实际 main 11 + renderer 1874） |
+| B4 | 559 个测试脚本无索引 | `scripts/test-*.mjs` 散落，无统一 runner / 清单 |
+| B5 | 端到端验证深度浅 | `smoke-test.sh` 只验证"主进程 15 秒不崩"，未验证 GUI 渲染 |
 
 ---
 
-## 二、剩余任务清单（按此顺序执行）
+## 二、任务清单（按序执行；每项完成后更新本表状态）
 
-### T1 · shared 九个小分区收尾 ✅
+### T1 · git-worker 逐段审计与业务语义化（A1，最大件）★
 
-数据源：`docs/shared-export-map.json`（导出名 → 内部符号 + 行号）。
-先运行下面的权威脚本拿最新缺口清单。它只解析实际来自
-`@chunk/shared` 的 import，避免把其它 chunk 中的 `as` 误计入 shared；
-数字以脚本输出为准（本文快照为 0）：
+1. **审计先行**：对 `src/main/worker.ts` 做逐段扫描，产出
+   `docs/git-worker-audit.md`：每一段标注 `business`（git 操作 RPC 面、
+   session/生命周期、协议处理）或 `vendored`（libgit 绑定、HTTP/stream
+   库、node 依赖），附行号区间与判定证据（包名/版本号/UA 特征）。
+2. **业务段语义化**：按既有闭环写入 `src/main/worker/`（或按子系统拆
+   `src/main/worker/<子系统>/`），兼容导出对齐，登记 REWRITTEN。
+   verify-chunks 已支持 CJS requires/exports 比对。
+3. **vendored 段**：保留原版并逐段登记理由（扩展 chunk-manifest 的
+   PRESERVED Map 为分段理由，或新建 `docs/` 审计文档承载）。
+4. **worker_threads 启动协议**确实不可拆的部分（入口薄层）保留原样，
+   在审计文档写明"保留边界"的精确行号。
+5. 完成后重跑 `node scripts/audit-shared-consumption.mjs`——新消费的
+   shared 导出会出现缺口，转入 T3 清零。
 
-```bash
-node scripts/audit-shared-consumption.mjs
-```
+### T2 · browser-page-preload 审计与业务语义化（A2）
 
-分区速览（当前快照）：process-exec 0、sql-git-registry 0、streams 0、mcp-2 0、lowlevel-export-shim 0、unlocated 0；schema-primitives 30（zod
-builder 链式族——**沿用 `src/main/shared/zod-facade.ts` 既有门面，勿重造**）、
-sql-git-registry 22、mcp-rpc 22、streams 17、lowlevel-export-shim 19
-（单字母 lodash/runtime shim）、misc 7、tail 6（单字母重导出壳）、
-unlocated 5（定位器没找到的，需 grep `src/main/src-DldfpmrL.ts` 内部符号）、
-mcp-2 4。
+同 T1 方法：审计 `docs/preload-audit.md` → contextBridge IPC 协议、
+schema、消息处理语义化到 `src/main/browser-page-preload/`；内嵌
+runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
+两个先例的验证方式。
 
-方法闭环：查行号 → 读原文区段 → 语义重写到 `src/main/shared/<语义名>.ts`
-→ 兼容导出别名（`export { X as 压缩名 }`）→ `chunk-modules.d.ts` 从
-`any` 声明改为 `export { 语义名 as 压缩名 } from "../../shared/<模块>";`
-→ 纯逻辑模块写行为自测（20+ 断言，ts⨯ 直接跑）→ typecheck 0 保持 →
-按簇一 commit。范式参考：`src/main/shared/sandbox-permissions.ts`、
-`automation-settings.ts`（带自测的完整闭环样板）。
+### T3 · shared 未消费导出全量分类（A4，与 T1/T2 联动）
 
-### T2 · 独立 chunk：git-worker（`src/main/worker.ts`，90,836 行）✅
+1. 对 330 个未消费导出逐一判定：`business`（语义化到
+   `src/main/shared/<模块>.ts`，方法同前）或 `vendor/generated`
+   （登记保留理由）。判定依据：导出符号的原文实现是否含业务语义
+   （协议/状态/配置）vs 纯库转发（lodash/ms/debug shim）。
+2. T1/T2 语义化产生的新消费缺口随做随清；本任务完成判据是
+   **692 个导出全部有归属**：语义化声明或保留登记，二选一，无未分类。
+3. 产出 `docs/shared-full-classification.md`（692 行清单 + 归属 + 证据）。
 
-- manifest 条目 `"git-worker": "worker.js"`，CJS worker。先确认加载形态
-  （worker_threads / hidden window）再定拆分粒度。
-- **先做 vendored 识别**（版本号/npm 包名/UA 字符串三证据）：90K 行里
-  预计有大量 libgit/依赖库。能锁定的保留原版（可给 `scripts/chunk-manifest.mjs`
-  加 PRESERVED Map，模仿 renderer 的登记模式并写理由），只语义化业务部分
-  （git 操作的 RPC 面、session 生命周期）。
-- 重写后加入 CHUNKS + REWRITTEN，`verify-chunks.mjs` 会自动比对
-  requires/exports（worker 是 CJS，比对逻辑已支持）。
-- 参考 `docs/main-rewrite-contract.md` 的 main 侧双轨契约。
+### T4 · main chunk 未消费区域审计（A3，原可选 T6 转正）
 
-### T3 · browser-page-preload（`src/main/browser-page-preload.ts`，30,217 行）✅
+1. 对照 `docs/main-analysis-r1..r12.md` 的区域清单，对
+   `src/main/main-C-Mhak1n.ts` 做逐段覆盖审计：每段标注已被哪个语义
+   模块覆盖 / 仍为原样 / 属 vendored。
+2. 仍为原样的**业务段**补语义化（预计很少——R1-R12 已全区落地，
+   gap 应主要是 vendored 与低频路径，但必须以审计报告证实，不能沿用断言）。
+3. 产出 `docs/main-coverage-audit.md`，含"原版行号区间 → 语义模块/
+   保留理由"映射表。
 
-browser page 侧的沙箱 preload 桥。已有先例：`preload.js`/`sandbox-preload.js`
-已在 main REWRITTEN 中，验证方式相同。与 `src/main/main-app/browser-use/`
-（Iab API、session registry 等）语义强相关，动笔前先读该目录。
+### T5 · renderer hub 内部审计与语义化（A5）
 
-### T4 · 两个 mini shared（各 ~500 行，半天量级）✅
+1. **app-shared（4.8MB）**：对未被消费的导出做实现级审计。产出
+   `docs/app-shared-internal-audit.md`：业务逻辑（store/query/UI 基础
+   组件）语义化进 `src/renderer/app-shared/`（已有 runtime 六模块骨架，
+   按分区扩展）；vendor/胶水登记。**注意**：语义化后
+   `audit-app-shared-consumption.mjs` 的口径要从"消费驱动"升级为
+   "全量分类"，保持 343/343 不回退。
+2. **app-initial（14.3MB）**：先做构成审计（参照
+   `docs/renderer-classification.md` 第二节：2,284 个引用中 683 lucide、
+   65 locale、219 shiki…真正的 app 逻辑约 654 个引用/18.8MB）。对其中
+   **未被任何已重写 chunk 消费的 app 逻辑**（如 i18n 核心
+   `i18n-147d032388be`、view-state-persistence）逐个语义化；聚合胶水
+   （micromark/zod/valdi）登记保留。
+3. **app-primary（3.1MB）**：同法审计。
+4. **红线不变**：PRESERVED_ASSETS 的 426 个资产禁止伪造源码；
+   INCREMENTAL_HUBS 机制在本任务中被"全量分类"取代——hub 从
+   "按消费面"升级为"按审计分类"，登记集同步更新。
+5. verify-renderer 全程保持绿；hub 语义化走既有 chunk 闭环。
 
-`src-BSoROW9v.ts`（worker-shared，597 行）、`src-C9YLnbgY.ts`
-（main-shared，525 行）。独立小 chunk，各自登记 CHUNKS/REWRITTEN。
+### T6 · 工程可读性（B1-B4）
 
-### T5 · css-selector 与 file-type 双核 ✅
+1. **tsconfig 瘦身**：`"exclude": ["src/webview/assets"]`（transform-only
+   不参与类型检查）。排除后 typecheck 基线应保持 0；若出现新错误，
+   说明有语义源码偷偷依赖了原版类型——修复依赖而不是恢复 include。
+2. **原版对照迁出**：把 `src/main/src-DldfpmrL.ts`、`main-C-Mhak1n.ts`、
+   `worker.ts`、`browser-page-preload.ts`、`core-*.ts`、`dist-*.ts`、
+   `src-BSoROW9v.ts`、`src-C9YLnbgY.ts` 迁至 `.reference/originals/`
+   （或加 tsconfig exclude + 构建脚本同步改路径）。verify 脚本对照
+   `../chatgpt-desktop-src` 的逻辑不受影响。**迁移后 build/verify 全套
+   必须复跑确认。**
+3. **README 重写**：反映真实状态（11+1874 REWRITTEN、双轨机制、
+   目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
+   chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
+   "这是什么、怎么构建、去哪里改"。
+4. **测试索引**：`scripts/test-*.mjs` 559 个脚本建 `scripts/test-index.md`
+   （或 npm script `test:all` 串行 runner + 按簇分组清单），并标注
+   哪些是历史一次性脚本、哪些是长期回归套件。
 
-- `css-selector`（`src/main/dist-wQAv1pJP.ts`）：**注意它不纯是 vendor**——
-  `src/main/shared/rpc-core.ts` 的 RpcTarget 基类就来自这个 chunk
-  （`E ? E.RpcTarget : class{}`）。它是混装的 dist 运行时（RPC 基座 +
-  可能的 selector 逻辑）：先逐段审计，RPC 基座部分语义化接入 rpc-core，
-  vendor 部分登记保留。
-- `file-type-main`/`file-type-worker`（core-B-w7xKIn / core-DlTZhmo0，各
-  ~2K 行）：大概率是 file-type npm 包（magic bytes 表特征）——判定 vendored
-  则保留登记，不伪造源码。
+### T7 · 端到端验证升级（B5）
 
-### T6 · main 深度打磨（可选，最后做）
-
-main 结构性完成 ≠ 逐行语义化（133K 语义行 vs 177K 原版行，gap 主要是
-原版内嵌 vendored 与低频路径）。可选动作：对照 `docs/main-analysis-r*.md`
-的区域清单做一次"main-C-Mhak1n.ts 未消费区域审计"，列出仍为原样的大段，
-逐段判定 vendored 保留 / 补语义化，报告落盘 `docs/`。
-**这是唯一允许回头碰 main 的入口**；做完即可宣布整个 goal 收官。
-
----
-
-## 三、验收命令与完成判据
-
-每批次收口用既有工具（约 16 秒）：
-
-```bash
-npm run verify-renderer-cluster -- --test scripts/test-<cluster>.mjs \
-  --module <module>:<assertions>   # 批次门禁（tsc 基线 --tsc-baseline 0）
-node scripts/verify-renderer.mjs   # 应恒为 1874/1874
-node scripts/verify-chunks.mjs     # 随 main REWRITTEN 增长全绿
-npm run typecheck                  # 当前 0 错误，任何新增必须修复
-node scripts/audit-app-shared-consumption.mjs  # renderer 侧保持 343/343
-```
-
-**整个 goal 的 Definition of Done：**
-
-1. T1 完成：第一节的统计脚本输出 TOTAL = 0（已消费别名 0 个 any 承接）。
-2. T2-T5 完成：`scripts/chunk-manifest.mjs` 的每个 CHUNKS 条目要么在
-   REWRITTEN、要么在带理由的保留登记中，无未分类项。
-3. 全部验收命令绿。
-4. （可选）T6 审计报告落盘。
-
-达成 1-3 即原始 goal【bootstrap → main → shared → 其余】收官。
+1. `scripts/smoke-test.sh` 升级：pack 后启动，除"不崩"外至少验证：
+   主窗口 HTML 加载（webContents 日志/标题断言）、renderer 无致命
+   console error、一条核心 RPC 往返（如 settings read）。
+2. 产出 `docs/e2e-verification.md` 记录验证步骤与结果快照。
 
 ---
 
-## 四、方法论与纪律（浓缩，旧版 handoff 全文见 git 历史）
+## 三、终局 Definition of Done（全部达成 = 完全反编译）
 
-**双轨构建**：REWRITTEN chunk 由 esbuild 打包、输出文件名与发布版逐字符
-一致；其余 chunk transform-only 逐字节保真；两轨任意比例混合可构建完整
-app。renderer 靠 `@rchunk/*` 缝合，main 靠 `@chunk/*`。
+1. **A1-A5 清零**：五处压缩原版全部完成逐段审计，审计文档落盘
+   （git-worker/preload/main 覆盖/shared 全量分类/hub 内部），
+   业务段语义化、vendor 段带证据登记，**仓库内不存在无归属的
+   压缩业务代码**。
+2. **shared 692 导出全量分类**：语义化或保留登记，二选一，0 未分类。
+3. **B1-B5 全部完成**：tsconfig 瘦身生效、原版对照迁出 src/、
+   README 反映真实状态、测试有索引、端到端验证升级并通过。
+4. **全部门禁绿**：verify-renderer、verify-chunks、typecheck 0、
+   audit-shared-consumption TOTAL 0、audit-app-shared-consumption
+   （口径升级后）无缺口、smoke-test 通过。
+5. handoff.md 本身更新为「项目完成」终态快照。
 
-**批次流程（2026-09-27 起）**：一个业务批次一 commit（10-25 模块），批次内
-只跑受影响模块的定向测试，批次收口统一 `verify-renderer-cluster` 全门禁。
-不为凑数字硬塞无关模块，但同流程/共享 mock 的模块优先合并。
-
-**坑（全部真实事故）**：
-1. shell cwd 每条命令后重置——一律前缀
-   `cd /Users/david/Workspace/ppio_github/codex-desktop-glm-version && `。
-2. Bash/Write 工具做 HTML 实体解码：`&` 实体字面量会被写坏，用
-   `chr(38)` 拼接或 python 修复脚本绕过。
-3. verify 失败九成是导出别名/依赖集合没对齐——脚本批量 diff，别目测。
-4. 不"顺手重构"原版行为：语义与原版逐例一致，包括看起来怪的实现；
-   自测失败先怀疑断言再怀疑实现。
-5. 禁止改 `../chatgpt-desktop-src` 与 `.reference/app-original`（只读参考）。
-6. typecheck 当前基线 0；只减不增，新增必须修复。
-7. commit 中文，写清符号映射、diff 核实结论、自测断言数。
+达成以上即宣布：**整个项目完全反编译——语义源码 + 可读工程结构**。
 
 ---
 
-## 五、快速开始（第一条指令）
+## 四、方法论与坑纪律（沿用，全文见 git 历史 handoff）
+
+- 双轨构建 / chunk 闭环七步 / 批次流程（`verify-renderer-cluster`）不变。
+- 坑：cwd 每条命令重置（一律 `cd .../codex-desktop-glm-version && `）；
+  Bash/Write 的 HTML 实体解码（用 chr(38) 拼接绕过）；verify 失败先查
+  导出别名/依赖集合；不重构原版行为；禁改 `../chatgpt-desktop-src`；
+  typecheck 基线 0 只减不增；commit 中文带符号映射与自测数。
+- **本阶段新增纪律**：审计文档是第一产出——先有逐段判定与证据，
+  再动手语义化；「保留」必须给到行号区间级理由，不接受整文件一句话。
+
+## 五、快速开始
 
 ```bash
 cd /Users/david/Workspace/ppio_github/codex-desktop-glm-version && \
 node scripts/verify-renderer.mjs && node scripts/verify-chunks.mjs && \
-npm run typecheck && git status --short
+npm run typecheck && node scripts/audit-shared-consumption.mjs
 ```
 
-健康值：1874/1874、11/11（T2-T5 推进中数字增长）、typecheck 0、工作树
-干净。然后从 **T1（shared 九小分区）** 开始——跑第一节内嵌统计脚本拿
-实时清单，按 process-exec → schema-primitives → sql-git-registry 的顺序
-逐簇清零。
+健康值：1874/1874、11/11、typecheck 0、TOTAL 0。然后从 **T1 git-worker
+审计**开始——它是最大件（90K 行）且解锁 T3 的联动缺口。
