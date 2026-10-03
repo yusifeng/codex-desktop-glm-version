@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const {
   combineOptionalBooleans,
+  addPendingWorkingTreePath,
   getAffectedWorkingTreePath,
   isGitInternalPath,
   isMissingPathError,
@@ -48,5 +49,10 @@ assert.equal(getAffectedWorkingTreePath(pathApi, "/repo", "/repo/src/.git/HEAD")
 assert.equal(getAffectedWorkingTreePath(pathApi, "/repo", "/repo/src/.git/config"), null);
 assert.equal(isGitInternalPath(pathApi, "/repo/.git", "/repo", "/repo/.git/HEAD"), true);
 assert.equal(isGitInternalPath(pathApi, "/repo/.git", "/repo", "/repo/src/file"), false);
+let pending = new Set(["/repo/src"]);
+assert.equal(addPendingWorkingTreePath(pathApi, "/repo", pending, "/repo/src/file.ts", 4), pending);
+pending = new Set(["/repo/src/file.ts"]);
+assert.deepEqual([...addPendingWorkingTreePath(pathApi, "/repo", pending, "/repo/src", 4)], ["/repo/src"]);
+assert.equal(addPendingWorkingTreePath(pathApi, "/repo", new Set(["/repo/a", "/repo/b", "/repo/c"]), "/repo/d", 2), null);
 
-console.log("19 worker git watch path assertions passed");
+console.log("22 worker git watch path assertions passed");

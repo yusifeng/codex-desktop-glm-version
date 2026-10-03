@@ -48,5 +48,24 @@ function isGitInternalPath(pathApi: PathApi, commonDir: string, root: string, ca
   return isWithinPath(pathApi, commonDir, candidate) || isWithinPath(pathApi, `${root}${pathApi.sep}.git`, candidate);
 }
 
-export { combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
-if (typeof module !== `undefined`) module.exports = { combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
+function addPendingWorkingTreePath(pathApi: (PathApi & { join(...parts: string[]): string }) | null, root: string, pendingPaths: Set<string> | null, changedPath: string, maxPaths: number): Set<string> | null {
+  if (pendingPaths == null) return null;
+  if (pathApi != null && [...pendingPaths].some((path) => isWithinPath(pathApi, path, changedPath))) return pendingPaths;
+  if (pathApi != null) {
+    for (const path of pendingPaths) if (isWithinPath(pathApi, changedPath, path)) pendingPaths.delete(path);
+  }
+  pendingPaths.add(changedPath);
+  if (pendingPaths.size <= maxPaths) return pendingPaths;
+  if (pathApi == null) return null;
+  const roots = new Set<string>();
+  for (const path of pendingPaths) {
+    const relative = pathApi.relative(root, path);
+    if (relative === `` || relative === `..` || relative.startsWith(`..${pathApi.sep}`) || pathApi.isAbsolute(relative)) return null;
+    roots.add(pathApi.join(root, relative.split(pathApi.sep, 1)[0]));
+    if (roots.size > maxPaths) return null;
+  }
+  return roots;
+}
+
+export { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath };

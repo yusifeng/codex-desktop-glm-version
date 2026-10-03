@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77251,6 +77251,9 @@ var Jye = 1e3,
       this.scheduleRepoChanged(e);
     }
     addPendingWorkingTreePath(e) {
+      this.pendingWorkingTreePaths = addPendingWorkingTreePath(this.pathApi, this.options.root, this.pendingWorkingTreePaths, e, A6);
+      return;
+      /* istanbul ignore next -- retained generated implementation for source parity reference */
       let t = this.pendingWorkingTreePaths,
         n = this.pathApi;
       if (
