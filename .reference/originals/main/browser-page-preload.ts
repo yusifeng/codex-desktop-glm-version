@@ -6430,6 +6430,7 @@ var { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationR
 var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation-keyboard");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
+var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -26493,103 +26494,37 @@ function qy() {
   });
 }
 function Jy() {
-  let e = document.getElementById(wl);
-  if (e instanceof HTMLDivElement) return e;
-  let t = document.createElement(`div`);
-  return (
-    (t.id = wl),
-    (t.style.position = `fixed`),
-    (t.style.inset = `0`),
-    (t.style.pointerEvents = `none`),
-    (t.style.zIndex = String(jg)),
-    document.documentElement.appendChild(t),
-    t
-  );
+  return annotationOverlayRuntime.ensureOverlayRoot();
 }
 function Yy(e, t = !1) {
-  return e == null || (!t && rc(e)) ? null : nd(e);
+  return annotationOverlayRuntime.snapshotHoverElement(e, t);
 }
 function Xy(e, t, n) {
-  return e == null ? null : pl(e.x, e.y, n, t);
+  return annotationOverlayRuntime.resolveHoverElementAtPoint(e, t, n);
 }
 function Zy(e, t) {
-  if (!md(e.anchor.pageUrl, window.location.href) || e.anchor.kind !== `element`) return null;
-  let n = sd(e.anchor, e.id, t);
-  return n == null
-    ? null
-    : (t.set(e.id, n), { ...e, anchor: ad(n, e.anchor, e.viewportSize, e.markerViewportPoint) });
+  return annotationOverlayRuntime.refreshDesignAnnotation(e, t);
 }
 function Qy(e) {
-  return md(e.anchor.pageUrl, window.location.href);
+  return annotationOverlayRuntime.isAnnotationForCurrentPage(e);
 }
 function $y(e, t, n, r) {
-  if (e == null || (e !== `gap` && e !== `row-gap` && e !== `column-gap`)) return [];
-  let i =
-    t?.anchor.type === `element` ? t.anchor.element : n == null ? null : (r.get(n.id) ?? null);
-  if (i == null) return [];
-  let a = Fc(i).getComputedStyle(i);
-  if (a.display !== `flex` && a.display !== `inline-flex`) return [];
-  let o = Array.from(i.children).flatMap((e, t) => {
-    if (!F(e)) return [];
-    let n = Fc(e).getComputedStyle(e);
-    if (n.position === `absolute` || n.position === `fixed`) return [];
-    let r = cd(e);
-    return r == null
-      ? []
-      : [
-          {
-            borderRadius: n.borderRadius.length === 0 ? `0px` : n.borderRadius,
-            key: `${t}-${Math.round(r.x)}-${Math.round(r.y)}-${Math.round(r.width)}-${Math.round(r.height)}`,
-            rect: r,
-          },
-        ];
-  });
-  return o.length > 1 ? o : [];
+  return annotationOverlayRuntime.collectFlexGapOverlays(e, t, n, r);
 }
 function eb(e) {
-  let t = hb.get(e);
-  if (t != null) return t;
-  let n = new Map();
-  return (hb.set(e, n), n);
+  return annotationOverlayRuntime.getElementCache(e);
 }
 function tb(e, t, n) {
-  let r = new MutationObserver((e) => {
-    e.every((e) => e.target instanceof Node && t.contains(e.target)) || n();
-  });
-  return (
-    r.observe(e.documentElement, Yc),
-    () => {
-      r.disconnect();
-    }
-  );
+  return annotationOverlayRuntime.observeMutationsOutsideOverlay(e, t, n);
 }
 function nb(e) {
-  return e.selectionRects.flatMap((t) => {
-    let n = dd({ ...e, rect: t });
-    return n == null ? [] : [n];
-  });
+  return annotationOverlayRuntime.resolveTextSelectionRects(e);
 }
 function rb(e, t, { viewportScale: n, zoomFactor: r }) {
-  let i = o_(t, { viewportScale: n, zoomFactor: r }),
-    a = e.shadowRoot?.querySelector(`.element-metadata-tooltip`);
-  if (
-    a instanceof HTMLElement &&
-    Number.parseFloat(a.style.left) === i.x &&
-    Number.parseFloat(a.style.top) === i.y
-  ) {
-    let e = a.getBoundingClientRect();
-    return { x: e.x, y: e.y, width: e.width, height: e.height };
-  }
-  return i;
+  return annotationOverlayRuntime.resolveMetadataTooltipRect(e, t, { viewportScale: n, zoomFactor: r });
 }
 function ib(e, t, n) {
-  if (e.id === n?.id) return !0;
-  if (t == null || t.anchor.type === `text` || t.target.mode !== `create`) return !1;
-  let r = G_(t.anchor),
-    i = [r.primary, ...r.additional].map(({ anchor: e }) => e);
-  return [e.anchor, ...(e.additionalAnchors ?? [])].some(
-    (e) => e.kind === `region` && i.some((t) => Fs(e, t)),
-  );
+  return annotationOverlayRuntime.shouldSuppressRegionOverlay(e, t, n);
 }
 var G,
   lb,
@@ -26598,7 +26533,7 @@ var G,
   fb,
   pb,
   mb,
-  hb,
+  annotationOverlayRuntime,
   gb,
   _b,
   vb,
@@ -26639,7 +26574,30 @@ var G,
       (fb = { name: `oai-annotation-editor-default-mode`, values: [`advanced`] }),
       (pb = 4),
       (mb = 72),
-      (hb = new WeakMap()),
+      (annotationOverlayRuntime = createAnnotationOverlayRuntime({
+        documentLike: document,
+        windowLike: window,
+        htmlDivElementConstructor: HTMLDivElement,
+        htmlElementConstructor: HTMLElement,
+        nodeConstructor: Node,
+        mutationObserverConstructor: MutationObserver,
+        mutationObserverOptions: Yc,
+        rootId: wl,
+        maximumZIndex: jg,
+        isRootElement: rc,
+        snapshotElement: nd,
+        resolveElementAtPoint: pl,
+        samePageUrl: md,
+        resolveAnchorElement: sd,
+        refreshElementAnchor: ad,
+        getOwnerWindow: Fc,
+        isElement: F,
+        getVisibleRect: cd,
+        anchorToViewportRect: dd,
+        scaleViewportPoint: o_,
+        getEditorSelections: G_,
+        anchorsEqual: Fs,
+      })),
       (gb = `--browser-sidebar-overlay-size-scale`),
       (_b = [
         `auxclick`,

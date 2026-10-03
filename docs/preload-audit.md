@@ -75,6 +75,13 @@ Annotation 模式的跨域 iframe pointer-events guard（原 `Vg` 22296-22354）
 `src/main/browser-page-preload/annotation-frame-pointer-guard.ts`。document/shadow-root 扫描、
 新增节点和 load 监听、同源 frame 恢复、overlay 排除、样式所有权保护及 dispose 由 13 项断言覆盖。
 
+Annotation overlay 的非 React runtime 尾部（原 `Jy/Yy/Xy/Zy/Qy/$y/eb/tb/nb/rb/ib`
+26495-26592）已迁移至
+`src/main/browser-page-preload/annotation-overlay-runtime.ts`。overlay root、hover snapshot、
+当前页 design refresh、flex gap 子项、按 root 隔离的 element cache、DOM mutation、text selection、
+metadata tooltip 和 region 去重均由该模块持有；原入口只保留调用点兼容代理，React `Uy/Wy/Gy/Ky/qy`
+仍留在 UI 边界。`scripts/test-preload-annotation-overlay-runtime.mjs` 以 48 项行为断言覆盖该闭环。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
@@ -107,7 +114,7 @@ Annotation 模式的跨域 iframe pointer-events guard（原 `Vg` 22296-22354）
 | 7554-19016 | `vendor/generated` | Vite preload error wrapper（7554-7563）后为 React 19.2.7 + React DOM reconciler/runtime。证据：7565 起 `Symbol.for("react.*")`；7983、8141、18959-18973 明确版本 `19.2.7` 和 `rendererPackageName: react-dom`；19003-19015 是 React devtools hook。 | 整段保留；React reconciler 不能伪造业务源码。 |
 | 19017-21896 | `vendor/generated` | TypeScript helpers、memoize、FormatJS/React Intl runtime。证据：19017 `__extends`/object spread helper；20844 `[formatjs Error`；20977、21106、21468、21649-21867 的 FormatJS API/locale fallback 文本。 | 保留 vendor；业务只依赖其公开 formatter。 |
 | 21897-22290 | `vendor/generated` | React Intl 组件/provider 和 react-is compatibility layer。证据：21897-21903 React Intl assertion；21940 起 `Symbol.for("react.*")` type predicates；22266-22282 `IntlProvider`。 | 保留 vendor/runtime。 |
-| 22291-26794 | `business` | 浏览器批注/设计 UI runtime：MutationObserver 监控 annotation containers/shadow roots、selection/scroll/viewport、draft marker 和 React UI component。证据：22291-22334 DOM observer；22351-22455 design control sync/reset；23900-23955 marker/metadata UI；23961-24007 scroll routing；24525-24667 animation/controls observer；26700-26710 overlay root。 | 业务段应迁入 `src/main/browser-page-preload/`，并复用已审计 DOM/schema helper。 |
+| 22291-26794 | `business` | 浏览器批注/设计 UI runtime：MutationObserver 监控 annotation containers/shadow roots、selection/scroll/viewport、draft marker 和 React UI component。证据：22291-22334 DOM observer；22351-22455 design control sync/reset；23900-23955 marker/metadata UI；23961-24007 scroll routing；24525-24667 animation/controls observer；26495-26592 overlay helper。 | overlay 非 React helper 已迁移至 `annotation-overlay-runtime.ts`；React render/hook assembly 与其余业务段继续按闭环迁移。 |
 | 26795-26881 | `business` | frame/anchor resolution、overlay styles 和 browser comment runtime mounting prerequisites；使用 `requestAnimationFrame`、`MutationObserver`、document style attributes。 | 与 22291-26794 同一业务闭环。 |
 | 26882-27185 | `business` | Electron IPC 生命周期和 context state：policy 初始化、feature resources、lazy mount、host bridge、pending replay、permission、pagehide cleanup，以及 drag/mouse navigation。 | 整个 annotation preload IPC/context 生命周期已迁移至 `annotation-preload-runtime.ts`，并复用已拆出的 permission/context/routing/input 模块；原 `Bb/Vb/Hb/Ub/Wb/Kb/qb/Yb` 与私有状态已删除。 |
 | 27187-27294 | `business` | 浏览器扩展发行配置（Chrome/Edge dev/internal/prod、extension IDs、store URLs）。 | 配置数据可迁移为 typed constants；不得归类为通用 vendor。 |

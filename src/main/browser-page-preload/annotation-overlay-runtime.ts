@@ -1,0 +1,172 @@
+type AnnotationOverlayRuntimeDependencies = {
+  documentLike: any;
+  windowLike: any;
+  htmlDivElementConstructor: any;
+  htmlElementConstructor: any;
+  nodeConstructor: any;
+  mutationObserverConstructor: new (callback: (records: any[]) => void) => {
+    observe(target: any, options: any): void;
+    disconnect(): void;
+  };
+  mutationObserverOptions: any;
+  rootId: string;
+  maximumZIndex: number;
+  isRootElement: (element: any) => boolean;
+  snapshotElement: (element: any) => any;
+  resolveElementAtPoint: (x: number, y: number, documentLike: any, allowRoot: boolean) => any;
+  samePageUrl: (left: string, right: string) => boolean;
+  resolveAnchorElement: (anchor: any, annotationId: string, cache: Map<any, any>) => any;
+  refreshElementAnchor: (element: any, anchor: any, viewportSize: any, markerViewportPoint: any) => any;
+  getOwnerWindow: (element: any) => any;
+  isElement: (value: any) => boolean;
+  getVisibleRect: (element: any) => any;
+  anchorToViewportRect: (anchor: any) => any;
+  scaleViewportPoint: (point: any, scale: any) => any;
+  getEditorSelections: (anchor: any) => any;
+  anchorsEqual: (left: any, right: any) => boolean;
+};
+
+function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependencies) {
+  const elementCaches = new WeakMap<object, Map<any, any>>();
+
+  const ensureOverlayRoot = () => {
+    const existing = deps.documentLike.getElementById(deps.rootId);
+    if (existing instanceof deps.htmlDivElementConstructor) return existing;
+    const root = deps.documentLike.createElement(`div`);
+    root.id = deps.rootId;
+    root.style.position = `fixed`;
+    root.style.inset = `0`;
+    root.style.pointerEvents = `none`;
+    root.style.zIndex = String(deps.maximumZIndex);
+    deps.documentLike.documentElement.appendChild(root);
+    return root;
+  };
+
+  const snapshotHoverElement = (element: any, allowRoot = false) =>
+    element == null || (!allowRoot && deps.isRootElement(element)) ? null : deps.snapshotElement(element);
+
+  const resolveHoverElementAtPoint = (point: any, allowRoot: boolean, documentLike: any) =>
+    point == null ? null : deps.resolveElementAtPoint(point.x, point.y, documentLike, allowRoot);
+
+  const refreshDesignAnnotation = (annotation: any, cache: Map<any, any>) => {
+    if (
+      !deps.samePageUrl(annotation.anchor.pageUrl, deps.windowLike.location.href) ||
+      annotation.anchor.kind !== `element`
+    ) return null;
+    const element = deps.resolveAnchorElement(annotation.anchor, annotation.id, cache);
+    if (element == null) return null;
+    cache.set(annotation.id, element);
+    return {
+      ...annotation,
+      anchor: deps.refreshElementAnchor(
+        element,
+        annotation.anchor,
+        annotation.viewportSize,
+        annotation.markerViewportPoint,
+      ),
+    };
+  };
+
+  const isAnnotationForCurrentPage = (annotation: any) =>
+    deps.samePageUrl(annotation.anchor.pageUrl, deps.windowLike.location.href);
+
+  const collectFlexGapOverlays = (
+    property: string | null,
+    editor: any,
+    annotation: any,
+    cache: Map<any, any>,
+  ) => {
+    if (property == null || ![`gap`, `row-gap`, `column-gap`].includes(property)) return [];
+    const target = editor?.anchor.type === `element`
+      ? editor.anchor.element
+      : annotation == null
+        ? null
+        : (cache.get(annotation.id) ?? null);
+    if (target == null) return [];
+    const targetStyle = deps.getOwnerWindow(target).getComputedStyle(target);
+    if (targetStyle.display !== `flex` && targetStyle.display !== `inline-flex`) return [];
+    const overlays = Array.from(target.children).flatMap((child: any, index) => {
+      if (!deps.isElement(child)) return [];
+      const style = deps.getOwnerWindow(child).getComputedStyle(child);
+      if (style.position === `absolute` || style.position === `fixed`) return [];
+      const rect = deps.getVisibleRect(child);
+      return rect == null
+        ? []
+        : [{
+            borderRadius: style.borderRadius.length === 0 ? `0px` : style.borderRadius,
+            key: `${index}-${Math.round(rect.x)}-${Math.round(rect.y)}-${Math.round(rect.width)}-${Math.round(rect.height)}`,
+            rect,
+          }];
+    });
+    return overlays.length > 1 ? overlays : [];
+  };
+
+  const getElementCache = (rootHost: object) => {
+    const existing = elementCaches.get(rootHost);
+    if (existing != null) return existing;
+    const cache = new Map<any, any>();
+    elementCaches.set(rootHost, cache);
+    return cache;
+  };
+
+  const observeMutationsOutsideOverlay = (documentLike: any, rootHost: any, onChange: () => void) => {
+    const observer = new deps.mutationObserverConstructor((records) => {
+      if (!records.every((record) => record.target instanceof deps.nodeConstructor && rootHost.contains(record.target))) {
+        onChange();
+      }
+    });
+    observer.observe(documentLike.documentElement, deps.mutationObserverOptions);
+    return () => observer.disconnect();
+  };
+
+  const resolveTextSelectionRects = (anchor: any) =>
+    anchor.selectionRects.flatMap((rect: any) => {
+      const viewportRect = deps.anchorToViewportRect({ ...anchor, rect });
+      return viewportRect == null ? [] : [viewportRect];
+    });
+
+  const resolveMetadataTooltipRect = (
+    rootHost: any,
+    point: any,
+    scale: { viewportScale: number; zoomFactor: number },
+  ) => {
+    const scaledPoint = deps.scaleViewportPoint(point, scale);
+    const tooltip = rootHost.shadowRoot?.querySelector(`.element-metadata-tooltip`);
+    if (
+      tooltip instanceof deps.htmlElementConstructor &&
+      Number.parseFloat(tooltip.style.left) === scaledPoint.x &&
+      Number.parseFloat(tooltip.style.top) === scaledPoint.y
+    ) {
+      const rect = tooltip.getBoundingClientRect();
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    }
+    return scaledPoint;
+  };
+
+  const shouldSuppressRegionOverlay = (annotation: any, editor: any, activeAnnotation: any) => {
+    if (annotation.id === activeAnnotation?.id) return true;
+    if (editor == null || editor.anchor.type === `text` || editor.target.mode !== `create`) return false;
+    const selections = deps.getEditorSelections(editor.anchor);
+    const editorAnchors = [selections.primary, ...selections.additional].map(({ anchor }: any) => anchor);
+    return [annotation.anchor, ...(annotation.additionalAnchors ?? [])].some(
+      (anchor) => anchor.kind === `region` && editorAnchors.some((candidate) => deps.anchorsEqual(anchor, candidate)),
+    );
+  };
+
+  return {
+    ensureOverlayRoot,
+    snapshotHoverElement,
+    resolveHoverElementAtPoint,
+    refreshDesignAnnotation,
+    isAnnotationForCurrentPage,
+    collectFlexGapOverlays,
+    getElementCache,
+    observeMutationsOutsideOverlay,
+    resolveTextSelectionRects,
+    resolveMetadataTooltipRect,
+    shouldSuppressRegionOverlay,
+  };
+}
+
+export { createAnnotationOverlayRuntime };
+if (typeof module !== `undefined`) module.exports = { createAnnotationOverlayRuntime };

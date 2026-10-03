@@ -2,7 +2,48 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 575.
+Total scripts: 612.
+
+## Recent semantic extraction suites
+
+- [`test-browser-page-preload-annotation-context-state.mjs`](./test-browser-page-preload-annotation-context-state.mjs)
+- [`test-browser-page-preload-annotation-host-message-routing.mjs`](./test-browser-page-preload-annotation-host-message-routing.mjs)
+- [`test-browser-page-preload-annotation-permission-controller.mjs`](./test-browser-page-preload-annotation-permission-controller.mjs)
+- [`test-browser-page-preload-annotation-preload-runtime.mjs`](./test-browser-page-preload-annotation-preload-runtime.mjs)
+- [`test-browser-page-preload-browser-input-bridge.mjs`](./test-browser-page-preload-browser-input-bridge.mjs)
+- [`test-main-appshot-shortcut.mjs`](./test-main-appshot-shortcut.mjs)
+- [`test-main-startup-policy.mjs`](./test-main-startup-policy.mjs)
+- [`test-preload-annotation-controls-registry.mjs`](./test-preload-annotation-controls-registry.mjs)
+- [`test-preload-annotation-frame-pointer-guard.mjs`](./test-preload-annotation-frame-pointer-guard.mjs)
+- [`test-preload-annotation-keyboard.mjs`](./test-preload-annotation-keyboard.mjs)
+- [`test-preload-annotation-overlay-runtime.mjs`](./test-preload-annotation-overlay-runtime.mjs)
+- [`test-preload-annotation-surface-geometry.mjs`](./test-preload-annotation-surface-geometry.mjs)
+- [`test-preload-annotation-surface-observer.mjs`](./test-preload-annotation-surface-observer.mjs)
+- [`test-preload-annotation-surface-registry.mjs`](./test-preload-annotation-surface-registry.mjs)
+- [`test-preload-annotation-virtual-target.mjs`](./test-preload-annotation-virtual-target.mjs)
+- [`test-preload-local-url.mjs`](./test-preload-local-url.mjs)
+- [`test-preload-pending-editor-message.mjs`](./test-preload-pending-editor-message.mjs)
+- [`test-worker-git-apply-request-handlers.mjs`](./test-worker-git-apply-request-handlers.mjs)
+- [`test-worker-git-cache-request-handlers.mjs`](./test-worker-git-cache-request-handlers.mjs)
+- [`test-worker-git-checkout-request-handler.mjs`](./test-worker-git-checkout-request-handler.mjs)
+- [`test-worker-git-commit-request-handler.mjs`](./test-worker-git-commit-request-handler.mjs)
+- [`test-worker-git-config-request-handler.mjs`](./test-worker-git-config-request-handler.mjs)
+- [`test-worker-git-ignore-policy.mjs`](./test-worker-git-ignore-policy.mjs)
+- [`test-worker-git-init-request-handler.mjs`](./test-worker-git-init-request-handler.mjs)
+- [`test-worker-git-origin-discovery.mjs`](./test-worker-git-origin-discovery.mjs)
+- [`test-worker-git-push-request-handler.mjs`](./test-worker-git-push-request-handler.mjs)
+- [`test-worker-git-read-request-handlers.mjs`](./test-worker-git-read-request-handlers.mjs)
+- [`test-worker-git-repository-read-request-handlers.mjs`](./test-worker-git-repository-read-request-handlers.mjs)
+- [`test-worker-git-review-request-handlers.mjs`](./test-worker-git-review-request-handlers.mjs)
+- [`test-worker-git-synced-branch-request-handlers.mjs`](./test-worker-git-synced-branch-request-handlers.mjs)
+- [`test-worker-git-thread-config.mjs`](./test-worker-git-thread-config.mjs)
+- [`test-worker-git-turn-diff-request-handlers.mjs`](./test-worker-git-turn-diff-request-handlers.mjs)
+- [`test-worker-git-watch-request-handlers.mjs`](./test-worker-git-watch-request-handlers.mjs)
+- [`test-worker-git-worktree-resolution.mjs`](./test-worker-git-worktree-resolution.mjs)
+- [`test-worker-git-worktree-snapshot.mjs`](./test-worker-git-worktree-snapshot.mjs)
+- [`test-worker-shell-config.mjs`](./test-worker-shell-config.mjs)
+
+## Existing suites
 
 - [`test-account-modals-cluster.mjs`](./test-account-modals-cluster.mjs)
 - [`test-account-query-managed-state-cluster.mjs`](./test-account-query-managed-state-cluster.mjs)
