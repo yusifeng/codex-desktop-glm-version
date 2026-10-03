@@ -81,6 +81,10 @@ Branch metadata 的 repository 定位、current/default branch 并行读取、de
 `E3`/`W_e` 已删除，synced-branch state 复用同一规范化入口。27 项断言覆盖仓库缺失、
 current branch 优先、snapshot fallback、默认 remote 空值和并行启动语义。
 
+Branch-ahead 的 commit-count query、ancestor 快路径、remote/upstream/default branch 与
+merge-base 回退已迁移至 `src/main/worker/git-branch-ahead.ts`；原 `D3` 与 class 内联算法已删除，
+class 仅保留组合根代理。41 项断言覆盖 cache 参数、命令顺序、空值与全部 fallback 分支。
+
 Managed worktree discovery 的 root/boundary 去重、无 symlink 目录读取、legacy/named
 目录识别、候选复检与 `.git` 文件验证已迁移至
 `src/main/worker/git-managed-worktree-discovery.ts`；原 `R$`/`jfe`/`Ofe`/`kfe`/`G_e`/`K_e`
@@ -115,6 +119,10 @@ Review diff 的请求路径规范化、tracked/untracked 并发聚合、250ms di
 rename blob fallback 已迁移至 `src/main/worker/git-review-diffs.ts`；原
 `$4`/`Uge`/`Wge`/`Gge`/`Kge`/`qge`/`Jge`/`e3` 已删除。41 项断言覆盖 query 参数、
 失败映射、whitespace 空 diff、request path 保留与 branch/unstaged rename 边界。
+
+Review patch/search 共用的非空 section 合并、untracked diff 八路并发、输入顺序提交、首错停止与
+64 MiB 总量限制已迁移至 `src/main/worker/git-review-patch-sections.ts`；原 `q_e`/`O3` 已删除。
+15 项断言覆盖乱序完成、空 section、读取失败、字节计数优先、精确上限与超限错误。
 
 Review working-tree metadata 的 per-file generation cache、批量 stat/hash、目录/symlink/regular
 分流、untracked `--no-index` metadata 分批与旧 Git fallback 已迁移至

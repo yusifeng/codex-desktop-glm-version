@@ -21,6 +21,7 @@ const { moveThreadToHostWorktree: performHostWorktreeHandoff } = require("./work
 const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-move-to-local");
 const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/git-move-to-worktree");
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
+const { getBranchAheadCount } = require("./worker/git-branch-ahead");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
 const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
@@ -46,6 +47,7 @@ const { inferReviewRenames, readReviewDiffMetadata, reconcileStagedReviewRenames
 const { finalizeReviewMetadata, readUntrackedReviewMetadata } = require("./worker/git-review-metadata-finalize");
 const { applyReviewSectionChanges } = require("./worker/git-review-section-changes");
 const { getReviewWorkingTreeMetadata } = require("./worker/git-review-working-tree-metadata");
+const { collectNonEmptySections, collectUntrackedDiffSections } = require("./worker/git-review-patch-sections");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
@@ -182,6 +184,16 @@ const syncedBranchOverwriteDeps = {
 const branchSearchDeps = {
   queryKey: Q,
   queryMeta: () => v1,
+  runGit: $,
+};
+const gitBranchAheadDeps = {
+  getCurrentBranch: w0,
+  getDefaultRemoteBranch: k2,
+  getMergeBase: X2,
+  getQueryMeta: () => _1,
+  getRemotes: j0,
+  getUpstreamBranch: P0,
+  queryKey: Q,
   runGit: $,
 };
 const gitBranchMetadataDeps = {
@@ -70785,86 +70797,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-function D3(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `commit-count`, t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: async () => {
-      let r = await $(e.root, [`rev-list`, `--count`, ...t], e.host, {
-        allowedNonZeroExitCodes: [128, 1],
-        signal: n,
-      });
-      if (!r.success || !r.stdout) return null;
-      let i = Number.parseInt(r.stdout, 10);
-      return Number.isNaN(i) ? null : i;
-    },
-    staleTime: 250,
-  });
-}
-function q_e(...e) {
-  let t = [],
-    n = (e) => {
-      let n = e.trim();
-      n.length !== 0 && t.push(n);
-    };
-  for (let t of e) for (let e of t) n(e);
-  return t;
-}
-async function O3(e, t, n) {
-  if (!t.success) return { success: !1, error: { type: `unknown` } };
-  let r = t.paths,
-    i = [],
-    a = Array.from({ length: r.length }, () => void 0),
-    o = 0,
-    s = 0,
-    c = !1,
-    l = null,
-    u = 0,
-    d = (e) => {
-      c || ((c = !0), (l = e));
-    },
-    f = (e) => {
-      e.trim().length === 0 || c || i.push(e);
-    },
-    p = () => {
-      if (!c)
-        for (; s < a.length;) {
-          let e = a[s];
-          if (e === void 0 || ((s += 1), e != null && e.trim().length !== 0 && (f(e), c))) return;
-        }
-    },
-    m = () => {
-      if (c || o >= r.length) return null;
-      let e = r[o],
-        t = o;
-      return ((o += 1), { index: t, path: e });
-    },
-    h = async () => {
-      if (c) return;
-      let t = m();
-      if (t == null) return;
-      let r = await e(t.path, n);
-      if (r.type === `error`) {
-        d(r.error);
-        return;
-      }
-      let i = u + (r.unifiedDiffBytes ?? r.unifiedDiff.length);
-      if (i > 67108864) {
-        d({ type: `diff-too-large`, limitBytes: kpe });
-        return;
-      }
-      ((u = i),
-        (a[t.index] = r.unifiedDiff.trim().length > 0 ? r.unifiedDiff : null),
-        p(),
-        await h());
-    },
-    g = Math.min(8, r.length);
-  return (
-    await Promise.all(Array.from({ length: g }, () => h())),
-    l ? { success: !1, error: l } : { success: !0, sections: i }
-  );
-}
 async function k3(e, t, n, r, i, a, o, s) {
   let c = await resolveGitReviewComparisonForRepository({
     host: r,
@@ -70879,7 +70811,7 @@ async function k3(e, t, n, r, i, a, o, s) {
   if (c.type !== `success`) return { source: t, diff: Y_e() };
   let [l, u] = await Promise.all([
     J_e(c.diffArgs, c.reviewSnapshot),
-    O3(
+    collectUntrackedDiffSections(
       (e) =>
         getUntrackedWorkingTreeDiff(
           c.reviewSnapshot,
@@ -70894,7 +70826,7 @@ async function k3(e, t, n, r, i, a, o, s) {
   if (l.outputLimitExceeded || !l.success)
     return { source: t, diff: { type: `error`, error: g0(l) } };
   if (!u.success) return { source: t, diff: { type: `error`, error: u.error } };
-  let d = q_e([l.stdout], u.sections).join(`
+  let d = collectNonEmptySections([l.stdout], u.sections).join(`
 `);
   return c.reviewSnapshot.read(async () => ({
     source: t,
@@ -71144,7 +71076,7 @@ async function sve({
       meta: _1,
       queryFn: async (i) => {
         let o = fve(n),
-          s = await O3(
+          s = await collectUntrackedDiffSections(
             (e) =>
               getUntrackedWorkingTreeDiff(r, e, {}, gitReviewFileDiffDeps),
             a,
@@ -73256,34 +73188,7 @@ var I6 = kW(`git`),
       return a ? { branch: i, upstream: { branch: a } } : { branch: i, upstream: null };
     }
     async handleBranchAheadCount(e, { host: t, signal: n }) {
-      let r = this.gitManager.getWorktreeRepositoryForRoot(e, t),
-        i = await k2(r),
-        a = i?.branch ?? null,
-        o = i?.remote ?? null;
-      o ??= (await j0(r))[0] ?? null;
-      let s = await P0(r, (await w0(r)) ?? `HEAD`, n),
-        c = o != null && s?.startsWith(`remotes/${o}/`) ? s.slice(8) : s;
-      if (
-        o != null &&
-        c?.startsWith(`${o}/`) &&
-        (
-          await $(r.root, [`merge-base`, `--is-ancestor`, `HEAD`, `refs/remotes/${c}`], t, {
-            allowedNonZeroExitCodes: [1, 128],
-            signal: n,
-          })
-        ).code === 0
-      )
-        return { commitsAhead: 0 };
-      if (o != null) {
-        let e = await D3(r, [`HEAD`, `--not`, `--remotes=${o}`], n);
-        if (e != null) return { commitsAhead: e };
-      }
-      if (s != null) return { commitsAhead: (await D3(r, [`${s}..HEAD`], n)) ?? 0 };
-      if (a == null) return { commitsAhead: 0 };
-      let l = await X2(r, a.includes(`/`) || o == null ? a : `${o}/${a}`);
-      return l == null
-        ? { commitsAhead: 0 }
-        : { commitsAhead: (await D3(r, [`${l}..HEAD`], n)) ?? 0 };
+      return getBranchAheadCount(e, this.gitManager, t, n, gitBranchAheadDeps);
     }
     async getDefaultBranch(e, t, n, { live: r = !1 } = {}) {
       let i = this.gitManager.getWorktreeRepositoryForRoot(e, t),
