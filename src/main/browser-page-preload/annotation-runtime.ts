@@ -116,5 +116,15 @@ function createAnnotationRangeDetail(input: { startPath: number[]; endPath: numb
   };
 }
 
-export { cloneRecord, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
-if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+function createAnnotationOpenRequestDetail(input: { mode: string; enterAnnotationMode: boolean; metadata?: Record<string, unknown>; initialComment?: string; range?: Record<string, unknown> }): Record<string, unknown> {
+  return {
+    mode: input.mode,
+    enterAnnotationMode: input.enterAnnotationMode,
+    metadata: input.metadata,
+    initialComment: input.initialComment,
+    range: input.range,
+  };
+}
+
+export { cloneRecord, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
