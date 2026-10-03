@@ -16,6 +16,7 @@ const { prepareHandoffDestinationCheckout, resolveCleanWorktreeCommit } = requir
 const { findHandoffSharedBase, hasHandoffCommit, resolveHandoffRepositoryMetadata } = require("./worker/git-handoff-shared-base");
 const { moveThreadToHostWorktree: performHostWorktreeHandoff } = require("./worker/git-host-handoff");
 const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-move-to-local");
+const { buildGitBranchSearchRefPatterns: Jve, gitBranchNameFromRef: Xve, normalizeGitBranchSearchText: n6, parseGitBranchSearchRef: Yve, stripGitRemoteRefPrefix: r6 } = require("./worker/git-branch-search");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -73662,39 +73663,6 @@ async function qve({
     throw ((e.name = `AbortError`), i?.reason ?? e);
   }
   return !g && d !== `limit` ? [] : (f.length > 0 && h(f), c);
-}
-function Jve(e, t) {
-  if (e === `refs/heads`) return [e];
-  let n = [...t]
-    .filter((e) => e.length >= 2 && /^[a-z0-9]+$/.test(e))
-    .sort((e, t) => t.length - e.length)[0];
-  if (n == null) return [e];
-  let r = Array.from(n, (e) =>
-    e === `k` ? `[kKK]` : e >= `a` && e <= `z` ? `[${e}${e.toUpperCase()}]` : e,
-  ).join(``);
-  return [`${e}/**/*${r}*`, `${e}/**/*${r}*/**`];
-}
-function n6(e) {
-  return e
-    .toLowerCase()
-    .replace(/[-_/.\s]+/g, ` `)
-    .trim();
-}
-function Yve(e, t) {
-  if (e.startsWith(`refs/heads/`)) return e.slice(11);
-  if (!e.startsWith(`refs/remotes/`)) return null;
-  let n = e.slice(13),
-    r = n.indexOf(`/`);
-  if (r < 0 || r === n.length - 1) return null;
-  let i = n.slice(r + 1);
-  return i === `HEAD` ? null : t ? e : i;
-}
-function r6(e) {
-  return e.startsWith(`refs/remotes/`) ? e.slice(13) : e;
-}
-function Xve(e) {
-  let t = r6(e);
-  return e.startsWith(`refs/remotes/`) ? t.slice(t.indexOf(`/`) + 1) : t;
 }
 async function Zve(e, t) {
   let n = await P2(e, t);
