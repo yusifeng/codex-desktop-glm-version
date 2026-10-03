@@ -101,6 +101,11 @@ Turn-diff snapshot 的 reviewSnapshot generation cache、porcelain v1 `-z` 状�
 `src/main/worker/git-turn-diff-snapshot.ts`；原 `s6/iye/aye/oye/c6` 已删除。21 项断言覆盖
 状态配置、tree SHA 校验、临时 index 参数、malformed output 和 snapshot read 边界。
 
+Turn-diff capture/checkpoint 的 ref retain/release、bounded diff、recent checkpoint 查询、TTL pruning、
+checkpoint scope 串行队列和 start/complete 生命周期已迁移至
+`src/main/worker/git-turn-diff-capture.ts`；原 `uye/dye/fye/pye/mye/p6/m6/h6/hye/g6/gye/_6/v6`
+实现、共享 Map 与常量已删除。19 项断言覆盖错误分类、ref cleanup、start state 和 checkpoint retention。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步

@@ -34,6 +34,7 @@ const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite"
 const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchState: collectSyncedBranchState } = require("./worker/git-synced-branch-state");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
+const { completeTurnDiffCapture: performCompleteTurnDiffCapture, startTurnDiffCapture: performStartTurnDiffCapture } = require("./worker/git-turn-diff-capture");
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
@@ -175,6 +176,24 @@ const turnDiffSnapshotDeps = {
   stageWorktree: v4,
   isObjectId: M0,
   normalizeTreeSha: Cz,
+};
+const turnDiffCaptureDeps = {
+  captureSnapshotTree: (repository) =>
+    captureTurnDiffSnapshotTree(repository, turnDiffSnapshotDeps),
+  getHeadCommit: q4,
+  getRepositoryStatus: P3,
+  runGit: $,
+  runDiff: y0,
+  parseDiffError: g0,
+  classifyGitError: LX,
+  normalizeTreeSha: Cz,
+  hash: Y0,
+  now: () => Date.now(),
+  randomUUID: () => crypto.randomUUID(),
+  captureTtlMs: 864e5,
+  checkpointTtlMs: 6048e5,
+  maxDiffBytes: 1048576,
+  sessionStartDiffTimeoutMs: 5e3,
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73271,201 +73290,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-var l6 = `refs/codex/turn-diffs/captures`,
-  u6 = `refs/codex/turn-diffs/checkpoints`,
-  sye = i4,
-  d6 = 7 * i4,
-  cye = 1048576,
-  lye = 5e3,
-  f6 = new Map();
-async function uye({
-  host: e,
-  baseTurnId: t,
-  checkpointKey: n,
-  cwd: r,
-  gitManager: i,
-  isRepoWatched: a,
-  signal: o,
-  turnId: s,
-}) {
-  let c = await i.getWorktreeRepository(r, e);
-  if (c == null) return null;
-  let l = t == null ? await q4(c, o) : null,
-    u = await captureTurnDiffSnapshotTree(c, turnDiffSnapshotDeps),
-    [d, f] = await Promise.all([
-      P3(c, { isRepoWatched: a?.(c.root), signal: o }),
-      l == null
-        ? null
-        : p6({ host: e, baseRef: l, headTreeSha: u, root: c.root, signal: o, timeoutMs: lye }),
-    ]),
-    p = Date.now(),
-    m = `${l6}/${p}/${crypto.randomUUID()}`,
-    h = `${u6}/${await _6(n)}`,
-    g = `${h}/${await _6(s)}`;
-  return (
-    await m6({ host: e, ref: `${m}/base`, root: c.root, signal: o, treeSha: u }),
-    await f6.get(v6(c.root, h))?.catch(() => void 0),
-    await hye({ host: e, nowMs: p, root: c.root }).catch(() => void 0),
-    {
-      baseTreeSha: u,
-      baseTurnHeadTreeSha:
-        t == null
-          ? null
-          : await mye({ host: e, nowMs: p, refPrefix: `${h}*/${await _6(t)}*/*/*`, root: c.root }),
-      sessionStartCommitSha: l,
-      sessionStartDiff: f,
-      checkpointRefPrefix: g,
-      checkpointScopeRefPrefix: h,
-      refPrefix: m,
-      ...d,
-      root: c.root,
-    }
-  );
-}
-function dye({ host: e, capture: t, gitManager: n, retainCheckpoint: r, signal: i }) {
-  let a = v6(t.root, t.checkpointScopeRefPrefix),
-    o = fye({ host: e, capture: t, gitManager: n, signal: i }),
-    s = (f6.get(a) ?? Promise.resolve())
-      .then(async () => {
-        let n = await o;
-        r &&
-          n.diff.type === `success` &&
-          (await pye({ host: e, capture: t, headTreeSha: n.headTreeSha, signal: i }));
-      })
-      .then(
-        () => void 0,
-        () => void 0,
-      );
-  return (
-    f6.set(a, s),
-    s
-      .then(() => o)
-      .finally(() => {
-        f6.get(a) === s && f6.delete(a);
-      })
-  );
-}
-async function fye({ host: e, capture: t, gitManager: n, signal: r }) {
-  try {
-    let i = await captureTurnDiffSnapshotTree(
-      n.getWorktreeRepositoryForRoot(t.root, e),
-      turnDiffSnapshotDeps,
-    );
-    await m6({ host: e, ref: `${t.refPrefix}/head`, root: t.root, signal: r, treeSha: i });
-    let [a, o] = await Promise.all([
-      p6({ host: e, baseRef: t.baseTreeSha, headTreeSha: i, root: t.root, signal: r }),
-      t.baseTurnHeadTreeSha == null
-        ? null
-        : p6({
-            host: e,
-            baseRef: t.baseTurnHeadTreeSha,
-            headTreeSha: t.baseTreeSha,
-            root: t.root,
-            signal: r,
-          }),
-    ]);
-    return {
-      baseTreeSha: t.baseTreeSha,
-      baseTurnHeadTreeSha: t.baseTurnHeadTreeSha,
-      betweenTurnDiff: o,
-      sessionStartCommitSha: t.sessionStartCommitSha,
-      sessionStartDiff: t.sessionStartDiff,
-      headTreeSha: i,
-      diff: a,
-    };
-  } finally {
-    await Promise.allSettled([
-      h6({ host: e, ref: `${t.refPrefix}/head`, root: t.root }),
-      h6({ host: e, ref: `${t.refPrefix}/base`, root: t.root }),
-    ]);
-  }
-}
-async function pye({ host: e, capture: t, headTreeSha: n, signal: r }) {
-  let i = `${t.checkpointRefPrefix}/${Date.now()}/${crypto.randomUUID()}`;
-  (await m6({ host: e, ref: i, root: t.root, signal: r, treeSha: n }),
-    await gye({
-      host: e,
-      exceptRef: i,
-      refPrefix: `${t.checkpointScopeRefPrefix}*/*/*/*`,
-      root: t.root,
-    }));
-}
-async function mye({ host: e, nowMs: t, refPrefix: n, root: r }) {
-  let i = await $(r, [`for-each-ref`, `--format=%(refname) %(objectname)`, n], e);
-  if (!i.success) return null;
-  let a = null,
-    o = -1 / 0;
-  for (let e of i.stdout.split(`
-`)) {
-    let [n, r] = e.split(` `),
-      i = Number(n?.split(`/`).at(-2));
-    r != null && Number.isSafeInteger(i) && i > o && t - i <= d6 && ((a = Cz(r)), (o = i));
-  }
-  return a;
-}
-async function p6({ host: e, baseRef: t, headTreeSha: n, root: r, signal: i, timeoutMs: a }) {
-  let o = await y0(r, [t, n], e, {
-    allowedNonZeroExitCodes: [0, 1],
-    maxOutputBytes: cye,
-    signal: i,
-    timeoutMs: a,
-    trim: !1,
-  });
-  if (!o.success || o.outputLimitExceeded) {
-    let e = g0(o);
-    return (e.type === `unknown` && (e.failureReason = LX(o.stderr)), { type: `error`, error: e });
-  }
-  return { type: `success`, unifiedDiff: o.stdout, unifiedDiffBytes: o.stdoutBytes };
-}
-async function m6({ host: e, ref: t, root: n, signal: r, treeSha: i }) {
-  if (!(await $(n, [`update-ref`, t, i], e, { signal: r })).success)
-    throw Error(`Failed to retain a turn diff tree snapshot`);
-}
-async function h6({ host: e, ref: t, root: n }) {
-  if (!(await $(n, [`update-ref`, `-d`, t], e)).success)
-    throw Error(`Failed to release a turn diff tree snapshot`);
-}
-async function hye({ host: e, nowMs: t, root: n }) {
-  await Promise.all([
-    g6({ host: e, createdAtPathIndex: 0, nowMs: t, refPrefix: l6, root: n, ttlMs: sye }),
-    g6({ host: e, createdAtPathIndex: 2, nowMs: t, refPrefix: u6, root: n, ttlMs: d6 }),
-  ]);
-}
-async function g6({ host: e, createdAtPathIndex: t, nowMs: n, refPrefix: r, root: i, ttlMs: a }) {
-  let o = await $(i, [`for-each-ref`, `--format=%(refname)`, r], e);
-  o.success &&
-    (await Promise.allSettled(
-      o.stdout
-        .split(
-          `
-`,
-        )
-        .filter((e) => {
-          let i = Number(e.slice(r.length + 1).split(`/`)[t]);
-          return Number.isSafeInteger(i) && n - i > a;
-        })
-        .map((t) => h6({ host: e, ref: t, root: i })),
-    ));
-}
-async function gye({ host: e, exceptRef: t, refPrefix: n, root: r }) {
-  let i = await $(r, [`for-each-ref`, `--format=%(refname)`, n], e);
-  i.success &&
-    (await Promise.allSettled(
-      i.stdout
-        .split(
-          `
-`,
-        )
-        .filter((e) => e !== t)
-        .map((t) => h6({ host: e, ref: t, root: r })),
-    ));
-}
-async function _6(e) {
-  return (await Y0(`SHA-256`, e)).slice(0, 32);
-}
-function v6(e, t) {
-  return `${e}\0${t}`;
-}
 async function _ye({ sourceCwd: e, worktreeCwd: t, gitManager: n, host: r }) {
   let i = [],
     a = await n.getWorktreeRepository(xz(t), r),
@@ -75774,8 +75598,9 @@ var I6 = kW(`git`),
             let watch = this.watchesByKey.get(this.getWatchKey(root, o));
             return watch?.isReady === !0 && !watch.watcher.requiresRecovery;
           },
-          startCapture: uye,
-          completeCapture: dye,
+          startCapture: (params) => performStartTurnDiffCapture(params, turnDiffCaptureDeps),
+          completeCapture: (params) =>
+            performCompleteTurnDiffCapture(params, turnDiffCaptureDeps),
         },
         cacheRequestDeps = {
           gitManager: this.gitManager,
