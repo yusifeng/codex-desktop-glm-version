@@ -25,7 +25,7 @@ const { commitGitChanges } = require("./worker/git-commit-request-handler");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
-const { appendTraceLink, mergeLiveQueryTrace, shouldRefreshLiveQuery } = require("./worker/git-live-query-policy");
+const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
 const { pushGitRepository } = require("./worker/git-push-request-handler");
@@ -73293,304 +73293,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-var bye = 100,
-  xye = 1e3,
-  Sye = 3,
-  wye = class {
-    dependencies;
-    nextGeneration = 1;
-    localBranchDependencies = new Map();
-    states = new Map();
-    repositoryRuns = new Map();
-    sharedRuns = new Map();
-    constructor(e) {
-      this.dependencies = e;
-    }
-    subscribe(e) {
-      if (this.states.has(e.subscriptionId)) return;
-      let t = {
-        abortController: null,
-        commonDir: e.commonDir,
-        dirty: !0,
-        errorRetryCount: 0,
-        generation: this.nextGeneration++,
-        host: e.host,
-        inFlight: null,
-        query: e.query,
-        requiresRecovery: e.requiresRecovery,
-        refreshTimer: null,
-        refreshWaiters: [],
-        root: e.root,
-        subscriptionId: e.subscriptionId,
-        trace: e.trace,
-        traceLinks: [],
-        trigger: `subscription`,
-      };
-      (this.states.set(e.subscriptionId, t),
-        this.updateLocalBranchDependency(t, 1),
-        this.refresh(t));
-    }
-    unsubscribe(e) {
-      let t = this.states.get(e);
-      t != null &&
-        (t.refreshTimer != null && clearTimeout(t.refreshTimer),
-        t.abortController?.abort(),
-        t.refreshWaiters.forEach((e) => e()),
-        this.updateLocalBranchDependency(t, -1),
-        this.states.delete(e));
-    }
-    hasLocalBranchDependency(e) {
-      return this.localBranchDependencies.has(
-        `${e.hostId}\0${e.commonDir}\0${e.root}\0${e.branch}`,
-      );
-    }
-    updateLocalBranchDependency(e, t) {
-      let n;
-      if (e.query.method === `review-summary`) {
-        if (e.query.params.source !== `branch`) return;
-        n = e.query.params.baseBranch;
-      } else if (e.query.method === `branch-diff-stats` || e.query.method === `branch-commits`)
-        n = e.query.params.baseBranch;
-      else return;
-      let r = n?.trim();
-      if (!r) return;
-      let i = r.startsWith(`refs/heads/`) ? r.slice(11) : r,
-        a = `${e.host.id}\0${e.commonDir}\0${e.root}\0${i}`,
-        o = (this.localBranchDependencies.get(a) ?? 0) + t;
-      if (o === 0) {
-        this.localBranchDependencies.delete(a);
-        return;
-      }
-      this.localBranchDependencies.set(a, o);
-    }
-    handleRepoChanged(e, t) {
-      let n = [...this.states.values()].filter(
-        (t) =>
-          t.host.id === e.hostId &&
-          t.commonDir === e.commonDir &&
-          t.root === e.root &&
-          shouldRefreshLiveQuery(t.query, e.changeType),
-      );
-      return (t?.(n.length), this.refreshStates(n, `invalidation`, e.trace));
-    }
-    setRequiresRecovery(e, t, n) {
-      let r = [...this.states.values()].filter((r) =>
-        r.host.id !== e || r.root !== t || r.requiresRecovery === n
-          ? !1
-          : ((r.requiresRecovery = n), !0),
-      );
-      this.refreshStates(r, `recovery`, AH() ?? void 0);
-    }
-    recover(e) {
-      let t = new Set(e.subscriptionIds),
-        n = [...this.states.values()].filter(
-          (n) =>
-            t.has(n.subscriptionId) &&
-            n.host.id === e.hostId &&
-            (e.root == null || n.root === e.root) &&
-            n.requiresRecovery,
-        ),
-        r = new Map();
-      for (let e of n) r.set(`${e.host.id}\0${e.root}`, e);
-      for (let e of r.values()) this.dependencies.prepareRecovery(e.root, e.host);
-      return this.refreshStates(n, `recovery`, AH() ?? void 0);
-    }
-    refreshRepository(e, t) {
-      return this.refreshStates(
-        [...this.states.values()].filter((n) => n.host.id === e && n.root === t),
-        `mutation`,
-        AH() ?? void 0,
-      );
-    }
-    refreshStates(e, t, n) {
-      let r = e.map((e) => {
-        ((e.generation = this.nextGeneration++),
-          (e.dirty = !0),
-          (e.errorRetryCount = 0),
-          (e.trigger = t),
-          mergeLiveQueryTrace(e, n));
-        let r = new Promise((t) => e.refreshWaiters.push(t));
-        return (this.scheduleRefresh(e), r);
-      });
-      return Promise.all(r).then(() => {});
-    }
-    scheduleRefresh(e, t = e.host.isLocal ? bye : 0) {
-      if (e.inFlight == null && e.refreshTimer == null) {
-        if (t === 0) {
-          this.refresh(e);
-          return;
-        }
-        e.refreshTimer = setTimeout(() => {
-          ((e.refreshTimer = null), this.states.get(e.subscriptionId) === e && this.refresh(e));
-        }, t);
-      }
-    }
-    refresh(e) {
-      if (e.inFlight != null || !e.dirty) return;
-      let t = e.generation,
-        n = new AbortController(),
-        r = null,
-        i = e.trace,
-        a = e.traceLinks;
-      ((e.trace = void 0),
-        (e.traceLinks = []),
-        (e.abortController = n),
-        (e.dirty = !1),
-        (e.inFlight = Promise.resolve()
-          .then(() =>
-            this.runShared(e, n.signal, i, a, (n) => {
-              this.isCurrent(e, t) && this.publish(e, t, { ...n, phase: `tracked` }, i);
-            }),
-          )
-          .then((n) => {
-            if (this.isCurrent(e, t)) {
-              this.publish(e, t, { ...n, phase: `complete` }, i);
-              let o =
-                (n.method === `review-summary` || n.method === `status-summary`) &&
-                n.result.type === `error`;
-              o && e.errorRetryCount < Sye
-                ? ((e.errorRetryCount += 1),
-                  (e.dirty = !0),
-                  mergeLiveQueryTrace(e, i),
-                  a.forEach((t) => mergeLiveQueryTrace(e, t)),
-                  (r = xye))
-                : o || (e.errorRetryCount = 0);
-            }
-          })
-          .catch(() => {
-            this.isCurrent(e, t) &&
-              this.dependencies.emit({
-                type: `git-live-query-failed`,
-                emittedAtMs: Date.now(),
-                generation: t,
-                method: e.query.method,
-                subscriptionId: e.subscriptionId,
-                ...(i == null ? {} : { trace: i }),
-              });
-          })
-          .finally(() => {
-            if (this.states.get(e.subscriptionId) === e) {
-              if (((e.abortController = null), (e.inFlight = null), e.generation === t)) {
-                let t = e.refreshWaiters;
-                ((e.refreshWaiters = []), t.forEach((e) => e()));
-              }
-              e.dirty &&
-                (r != null && e.generation === t && (e.generation = this.nextGeneration++),
-                this.scheduleRefresh(e, r ?? void 0));
-            }
-          })));
-    }
-    runShared(e, t, n, r, i) {
-      let a = `${e.host.id}\0${e.commonDir}`,
-        o = `${a}\0${e.root}\0${JSON.stringify([e.query.method, e.query.params])}`,
-        s = this.sharedRuns.get(o);
-      if (s == null || s.abortController.signal.aborted) {
-        ((s = {
-          abortController: new AbortController(),
-          consumers: new Set(),
-          result: vR(),
-          trackedResult: null,
-          trace: n,
-        }),
-          this.sharedRuns.set(o, s));
-        let t = s,
-          i = this.repositoryRuns.get(a),
-          c = (
-            i == null
-              ? Promise.resolve()
-              : OH(
-                  {
-                    attributes: {
-                      "git.operation": e.query.method,
-                      "git.trigger": e.trigger,
-                      "worker.id": `git`,
-                      "worker.method": `subscribe-live-query`,
-                    },
-                    links: i.trace == null ? [] : [i.trace],
-                    name: `git.repository_queue_wait`,
-                    op: `codex.git.repository_queue_wait`,
-                    trace: n,
-                  },
-                  () => i.completion,
-                )
-          )
-            .then(async () => {
-              if (t.abortController.signal.aborted) {
-                t.result.reject(t.abortController.signal.reason);
-                return;
-              }
-              try {
-                t.result.resolve(
-                  await this.dependencies.run(
-                    e.query,
-                    e.root,
-                    e.host,
-                    t.abortController.signal,
-                    (e) => {
-                      ((t.trackedResult = e), t.consumers.forEach((t) => t(e)));
-                    },
-                    e.trigger,
-                    e.commonDir,
-                    n,
-                    r,
-                    e.errorRetryCount,
-                  ),
-                );
-              } catch (e) {
-                t.result.reject(e);
-              }
-            })
-            .finally(() => {
-              (this.sharedRuns.get(o) === t && this.sharedRuns.delete(o),
-                this.repositoryRuns.get(a)?.completion === c && this.repositoryRuns.delete(a));
-            });
-        this.repositoryRuns.set(a, { completion: c, trace: n });
-      }
-      (s.consumers.add(i), s.trackedResult != null && i(s.trackedResult));
-      let c = () => {
-        (s.consumers.delete(i), s.consumers.size === 0 && s.abortController.abort(t.reason));
-      };
-      (t.addEventListener(`abort`, c, { once: !0 }), t.aborted && c());
-      let l = s.result.promise.finally(() => {
-        (t.removeEventListener(`abort`, c), s.consumers.delete(i));
-      });
-      if (n == null || (s.trace?.traceparent === n.traceparent && r.length === 0)) return l;
-      let u = [];
-      return (
-        s.trace != null && s.trace.traceparent !== n.traceparent && appendTraceLink(u, s.trace),
-        r.forEach((e) => appendTraceLink(u, e)),
-        OH(
-          {
-            attributes: {
-              "git.operation": e.query.method,
-              "git.shared": !0,
-              "worker.id": `git`,
-              "worker.method": `subscribe-live-query`,
-            },
-            links: u,
-            name: `git.shared_query_wait`,
-            op: `codex.git.shared_query_wait`,
-            trace: n,
-          },
-          () => l,
-        )
-      );
-    }
-    isCurrent(e, t) {
-      return this.states.get(e.subscriptionId) === e && e.generation === t;
-    }
-    publish(e, t, n, r) {
-      this.dependencies.emit({
-        type: `git-live-query-updated`,
-        emittedAtMs: Date.now(),
-        generation: t,
-        requiresRecovery: e.requiresRecovery,
-        subscriptionId: e.subscriptionId,
-        ...(r == null ? {} : { trace: r }),
-        ...n,
-      });
-    }
-  };
 var C6 = 0.05,
   Eye = 7e3,
   Dye = 1e4,
@@ -75182,7 +74884,7 @@ var I6 = kW(`git`),
         (this.watcherPerformance = new Iye((e) => {
           this.emit({ type: `worker-event`, event: e });
         })),
-        (this.liveQueryRegistry = new wye({
+        (this.liveQueryRegistry = new GitLiveQueryRegistry({
           emit: (e) => {
             this.emit({ type: `worker-event`, event: e });
           },
@@ -75206,6 +74908,15 @@ var I6 = kW(`git`),
                 },
               });
           },
+          getActiveTrace: () => AH() ?? void 0,
+          trace: OH,
+          createDeferred: vR,
+          now: () => Date.now(),
+          setTimeout,
+          clearTimeout,
+          localRefreshDelayMs: 100,
+          errorRetryDelayMs: 1e3,
+          maxErrorRetries: 3,
         })));
     }
     async handleRequest(e) {

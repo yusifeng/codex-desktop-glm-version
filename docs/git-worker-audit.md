@@ -119,6 +119,11 @@ Git init watcher 的 workspace/metadata 双 watch、git path detection、session
 missing metadata 降级与 250ms-5s reconnect backoff 已迁移至
 `src/main/worker/git-init-watcher.ts`；原 `yye` 类及退避常量已删除，由 35 项生命周期断言覆盖。
 
+Git live-query registry 的 subscription state、generation/waiter、local debounce、error retry、
+shared-query coalescing、repository serialization、consumer abort、recovery 与 branch dependency
+引用计数已迁移至 `src/main/worker/git-live-query-registry.ts`；原 `wye` 类及三个时序常量已删除。
+41 项断言覆盖 tracked/complete 发布、stale 抑制、三次重试、共享执行和恢复去重。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步
