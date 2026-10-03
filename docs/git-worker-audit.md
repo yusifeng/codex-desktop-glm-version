@@ -1,5 +1,10 @@
 # Git worker 逐段审计
 
+> 下方 1-90,836 的覆盖区间以初始审计提交 `423b40b1` 中的
+> `.reference/originals/main/worker.ts` 为基线。后续语义模块持续从该文件物理迁出，
+> 当前行号会前移；历史区间用于证明原始代码归属，继续提取时必须按符号/行为重新定位，
+> 不得把它们直接当作当前文件行号。
+
 ## 已抽取边界
 
 当前已从入口物理迁出并接回的业务边界包括：main-RPC client（约
@@ -451,6 +456,14 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
 本报告只做审计和边界确定，不宣称 T1 语义化已完成。下一步应以第一个
 `xDe`/入口协议闭环为基线，迁移后运行 `verify-chunks`、`typecheck`，再根据
 新增 import 运行 `audit-shared-consumption`。
+
+### 增量抽取：Git index info 与 nearest ancestor branch
+
+Git index info 的 git-dir 定位、index mtime 读取以及 ENOENT/其他读取失败降级已迁移至
+`src/main/worker/git-index-info.ts`。Nearest ancestor branch 的候选 trim/去重、排除当前分支、
+并行 ahead comparison 和输入顺序稳定的最短距离选择已迁移至
+`src/main/worker/git-nearest-ancestor-branch.ts`。原 `eve`/`tve`/`nve`/`rve` 已删除，
+repository read 与 request dispatcher 分别注入窄依赖，两模块各由 10 项断言覆盖。
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

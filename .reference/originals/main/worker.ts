@@ -26,6 +26,8 @@ const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-bra
 const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { getGitCloneState } = require("./worker/git-clone-state");
+const { getGitIndexInfo } = require("./worker/git-index-info");
+const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
@@ -75,6 +77,11 @@ const { describeShell } = require("./worker/shell-config");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
+const gitIndexInfoDeps = {
+  getGitDir: (...args) => u0(...args),
+  logger: { error: (message, detail) => kW(`git`)().error(message, detail) },
+};
+const gitNearestAncestorDeps = { compareAhead: (...args) => A0(...args) };
 const gitReviewComparisonDeps = {
   findMergeBase: (...args) => X2(...args),
   getDefaultBranch: (...args) => k2(...args),
@@ -70762,50 +70769,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-var $_e = kW(`git`);
-async function eve(e, t) {
-  let n = await u0(e, t);
-  if (!n) return { lastModified: 0 };
-  let r = (await e.host.platformPath()).join(n, `index`);
-  try {
-    return { lastModified: (await e.host.stat(r)).mtimeMs };
-  } catch (e) {
-    return (
-      e.code === `ENOENT` ||
-        $_e().error(`Failed to read index info`, {
-          safe: { indexPath: r },
-          sensitive: { error: e },
-        }),
-      { lastModified: 0 }
-    );
-  }
-}
-async function tve(e, t, n, r) {
-  let i = nve(t, n),
-    a = await Promise.all(
-      i.map(async (t) => {
-        let n = await rve(e, t, r);
-        return n == null ? null : { branch: t, distance: n };
-      }),
-    ),
-    o = null,
-    s = null;
-  for (let e of a) e != null && (s == null || e.distance < s) && ((o = e.branch), (s = e.distance));
-  return o;
-}
-function nve(e, t) {
-  let n = [],
-    r = new Set();
-  for (let i of e) {
-    let e = i.trim();
-    e.length === 0 || e === t || r.has(e) || (r.add(e), n.push(e));
-  }
-  return n;
-}
-async function rve(e, t, n) {
-  let r = await A0(e, t, `HEAD`, n);
-  return r?.state !== `right-ahead` || r.rightAhead <= 0 ? null : r.rightAhead;
-}
 var j3 = 100,
   M3 = class extends Error {};
 async function N3(e, t, n, { live: r = !1 } = {}) {
@@ -72407,7 +72370,8 @@ var I6 = kW(`git`),
           getReviewSnapshot: R6,
           catFile: Sve,
           blameFile: whe,
-          getIndexInfo: eve,
+          getIndexInfo: (repository, signal) =>
+            getGitIndexInfo(repository, signal, gitIndexInfoDeps),
         },
         turnDiffRequestDeps = {
           gitManager: this.gitManager,
@@ -72682,11 +72646,12 @@ var I6 = kW(`git`),
             break;
           case `nearest-ancestor-branch`:
             p = X({
-              branch: await tve(
+              branch: await findNearestAncestorBranch(
                 this.gitManager.getWorktreeRepositoryForRoot(e.params.root, o),
                 e.params.candidates,
                 e.params.currentBranch,
                 i.signal,
+                gitNearestAncestorDeps,
               ),
             });
             break;
