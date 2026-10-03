@@ -206,5 +206,19 @@ function detachAnnotationControlTargets(record: { targets: WeakRef<object>[] }, 
   return removed;
 }
 
-export { attachAnnotationControlTargets, cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
-if (typeof module !== `undefined`) module.exports = { attachAnnotationControlTargets, cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+function collectAnnotationControlTargets(records: Iterable<{ targets: WeakRef<object>[] }>, isValidTarget: (target: object) => boolean): object[] {
+  const targets = new Set<object>();
+  for (const record of records) for (const reference of record.targets) {
+    const target = reference.deref();
+    if (target != null && isValidTarget(target)) targets.add(target);
+  }
+  return [...targets];
+}
+
+function getAnnotationControlsForTarget<T extends object, C>(target: T, documentRef: object, targetIndex: WeakMap<T, Array<{ controls: C }>>): C | undefined {
+  if ((target as { ownerDocument?: object }).ownerDocument !== documentRef) return undefined;
+  return targetIndex.get(target)?.at(-1)?.controls;
+}
+
+export { attachAnnotationControlTargets, cloneRecord, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+if (typeof module !== `undefined`) module.exports = { attachAnnotationControlTargets, cloneRecord, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };

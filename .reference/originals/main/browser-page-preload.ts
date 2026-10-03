@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { attachAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
+var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -7274,16 +7274,10 @@ function Cf() {
     {
       dispose: d,
       getTargets() {
-        let t = new Set();
-        for (let r of n.values())
-          for (let n of r.targets) {
-            let r = n.deref();
-            r instanceof HTMLElement && r.isConnected && r.ownerDocument === e && t.add(r);
-          }
-        return [...t];
+        return collectAnnotationControlTargets(n.values(), (t) => t instanceof HTMLElement && t.isConnected && t.ownerDocument === e);
       },
       getControls(t) {
-        return t.ownerDocument === e ? r.get(t)?.at(-1)?.controls : void 0;
+        return getAnnotationControlsForTarget(t, e, r);
       },
     }
   );
