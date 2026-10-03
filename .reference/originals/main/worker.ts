@@ -45,6 +45,7 @@ const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/rem
 const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
+const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./worker/git-watcher-metadata");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
@@ -198,6 +199,12 @@ const turnDiffCaptureDeps = {
   checkpointTtlMs: 6048e5,
   maxDiffBytes: 1048576,
   sessionStartDiffTimeoutMs: 5e3,
+};
+const gitWatcherMetadataDeps = {
+  getSyncedBranchFileName: () => M2,
+  queryKey: (...args) => Q(...args),
+  resolveGitPath: (...args) => d0(...args),
+  runGit: (...args) => $(...args),
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73294,63 +73301,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function zye(e) {
-  return d0(e, `HEAD`);
-}
-async function Bye(e, t) {
-  let n = Q(e.root, e.host, `git-dir`),
-    r = Q(e.root, e.host, `git-path`, `HEAD`),
-    i = Q(e.root, e.host, `git-path`, `index`),
-    a = Q(e.root, e.host, `git-path`, M2);
-  if ([n, r, i, a].some((t) => e.queryClient.getQueryState(t) != null)) return null;
-  let { success: o, stdout: s } = await $(
-    e.root,
-    [
-      `rev-parse`,
-      `--git-dir`,
-      `--git-path`,
-      `HEAD`,
-      `--git-path`,
-      `index`,
-      `--git-path`,
-      M2,
-      `--symbolic-full-name`,
-      `HEAD`,
-    ],
-    e.host,
-    { signal: t },
-  );
-  if (!o || !s) return null;
-  let c = s.split(/\r?\n/);
-  if (
-    c.length !== 5 ||
-    c.some((e) => e.length === 0) ||
-    (c[4] !== `HEAD` && (!c[4].startsWith(`refs/heads/`) || c[4] === `refs/heads/`))
-  )
-    return null;
-  let l = await e.host.platformPath(),
-    u = Vye(l, e.root, c[0]),
-    d = {
-      gitDir: u,
-      headPath: E6(l, e.root, u, c[1]),
-      headRef: c[4].startsWith(`refs/heads/`) ? c[4] : null,
-      indexPath: E6(l, e.root, u, c[2]),
-      syncedBranchPath: E6(l, e.root, u, c[3]),
-    };
-  return (
-    e.queryClient.setQueryData(n, d.gitDir),
-    e.queryClient.setQueryData(r, d.headPath),
-    e.queryClient.setQueryData(i, d.indexPath),
-    e.queryClient.setQueryData(a, d.syncedBranchPath),
-    d
-  );
-}
-function Vye(e, t, n) {
-  return e.isAbsolute(n) ? n : e.join(t, n);
-}
-function E6(e, t, n, r) {
-  return e.isAbsolute(r) ? r : r.startsWith(`.git/`) ? e.join(t, r) : e.join(n, r);
-}
 var D6 = 1048576,
   Hye = `^(core\\.excludesfile|include(if\\..*)?\\.path)$`;
 async function Uye(e, { defaultExcludesFile: t, globalConfigFiles: n }) {
@@ -73685,10 +73635,17 @@ var Jye = 1e3,
           op: `codex.git.watcher_metadata`,
         },
         async () => {
-          let e = await Bye(this.options.worktreeRepo);
+          let e = await prefetchGitWatcherMetadata(
+            this.options.worktreeRepo,
+            void 0,
+            gitWatcherMetadataDeps,
+          );
           return e == null
             ? Promise.all([
-                zye(this.options.worktreeRepo),
+                resolveGitWatcherHeadPath(
+                  this.options.worktreeRepo,
+                  gitWatcherMetadataDeps,
+                ),
                 f0(this.options.worktreeRepo),
                 Zme(this.options.worktreeRepo),
                 u0(this.options.worktreeRepo),

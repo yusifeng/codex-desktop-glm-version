@@ -131,6 +131,12 @@ Git watcher performance 的 10 秒窗口、维度分桶、累计计数、512 raw
 清理已迁移至 `src/main/worker/git-watcher-performance.ts`；原 `Iye` 类及专用常量已删除，由 18 项
 聚合、阈值和 timer 断言覆盖。
 
+Git watcher 启动时的 metadata prefetch 已迁移至
+`src/main/worker/git-watcher-metadata.ts`：单次 `rev-parse` 读取 git dir、HEAD、index、
+synced-branch path 和 symbolic HEAD，并在输出合法时回填四个 query cache；相对路径继续按
+repository root 或 git dir 解析。原 `zye`/`Bye`/`Vye`/`E6` 已删除，由 48 项缓存短路、
+输出校验、POSIX/Windows 路径与 detached/branch 断言覆盖。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步

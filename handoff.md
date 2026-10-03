@@ -91,6 +91,9 @@ repository serialization、consumer abort、recovery 与 branch dependency 引�
 `src/main/worker/git-live-query-registry.ts`；原压缩类和三个常量已删除，由 41 项断言覆盖。
 Git watcher performance 的窗口分桶、累计计数、raw-event 阈值 flush 和 timer 清理已迁移至
 `src/main/worker/git-watcher-performance.ts`；原压缩类与常量已删除，由 18 项断言覆盖。
+Git watcher metadata prefetch 的批量 `rev-parse`、输出校验、query cache 回填、git dir 与
+metadata 路径解析已迁移至 `src/main/worker/git-watcher-metadata.ts`；原
+`zye`/`Bye`/`Vye`/`E6` 已删除，由 48 项断言覆盖。
 stable metadata 与 Git read cache invalidation 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`，由 17 项行为断言覆盖严格副作用顺序、异常
 短路及 live-query refresh 的 fire-and-forget 时序。
