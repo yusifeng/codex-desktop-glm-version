@@ -168,6 +168,12 @@ Host handoff 的 repository metadata 重试、commit 存在性检查与 shared-b
 27 项断言覆盖本地错误不重试、远程 git-root 错误单次重试、禁用 lazy fetch 的 commit 检查、
 destination head/merge-base 快路径、默认分支 fetch、多 remote fallback 与最终 warning。
 
+Host handoff 的完整跨 host 主编排已迁移至 `src/main/worker/git-host-handoff.ts`；原 `Pve/Q3`
+实现已删除。模块通过窄依赖注入保留 snapshot/bundle 快慢路径、新建与复用 worktree、progress
+状态、destination checkout 回滚，以及 source/destination ref 和传输目录的 `finally` 清理。
+48 项断言覆盖参数与 metadata 错误、两类传输路径、复用 worktree stash、分支/checkout/reset
+失败回滚、unexpected error 和成功/失败 cleanup。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。

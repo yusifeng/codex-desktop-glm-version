@@ -14,6 +14,7 @@ const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHando
 const { restoreHandoffBranchAndStash, restoreHandoffSource, rollbackHostHandoffWorktree } = require("./worker/git-handoff-rollback");
 const { prepareHandoffDestinationCheckout, resolveCleanWorktreeCommit } = require("./worker/git-handoff-destination");
 const { findHandoffSharedBase, hasHandoffCommit, resolveHandoffRepositoryMetadata } = require("./worker/git-handoff-shared-base");
+const { moveThreadToHostWorktree: performHostWorktreeHandoff } = require("./worker/git-host-handoff");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
@@ -52,7 +53,6 @@ const handoffRollbackDeps = {
 };
 const restoreHandoffState = (params) => restoreHandoffBranchAndStash(params, handoffRollbackDeps);
 const restoreSourceHandoffState = (params) => restoreHandoffSource(params, handoffRollbackDeps);
-const rollbackHostWorktree = (params) => rollbackHostHandoffWorktree(params, handoffRollbackDeps);
 const handoffDestinationDeps = {
   getStatusConfig: e2,
   getHeadCommit: q4,
@@ -70,6 +70,38 @@ const handoffSharedBaseDeps = {
     debug: (message, detail) => CW().debug(message, detail),
     warning: (message, detail) => CW().warning(message, detail),
   },
+};
+const hostHandoffDeps = {
+  randomUUID: () => crypto.randomUUID(),
+  resolveRepositoryMetadata: (gitManager, cwd, host) =>
+    resolveHandoffRepositoryMetadata(gitManager, cwd, host),
+  getTransferDirectory: (host, transferId) => getHostHandoffDirectory(host, transferId),
+  runGit: (cwd, args, host, options) => $(cwd, args, host, options),
+  inspectBranch: (params) => inspectHandoffBranch(params, handoffBranchDeps),
+  getIndexTree: (repository, options) => x4(repository, options),
+  getUntrackedPaths: (repository) => f2(repository),
+  getCommitTree: (repository, commitSha, signal) => A2(repository, commitSha, signal),
+  createSnapshotCommit: (gitRoot, treeSha, host, options) =>
+    _4(gitRoot, treeSha, host, options),
+  hasCommit: (gitRoot, commitSha, host, signal) =>
+    hasHandoffCommit(gitRoot, commitSha, host, signal, handoffSharedBaseDeps),
+  findSharedBase: (params) => findHandoffSharedBase(params, handoffSharedBaseDeps),
+  transferFile: (sourcePath, sourceHost, destinationPath, destinationHost, signal) =>
+    transferHostFile(sourcePath, sourceHost, destinationPath, destinationHost, signal),
+  createWorktree: (params) => V2(params),
+  resolveCleanWorktreeCommit: (repository, signal) =>
+    resolveCleanWorktreeCommit(repository, signal, handoffDestinationDeps),
+  getCurrentBranch: (repository) => w0(repository),
+  getCurrentBranchSnapshot: (repository, signal) => K4(repository, signal),
+  checkoutBranch: (params, gitManager, host) => t4(params, gitManager, host),
+  prepareDestinationCheckout: (params) =>
+    prepareHandoffDestinationCheckout(params, handoffDestinationDeps),
+  forceBranch: (params) => forceHandoffBranch(params, handoffBranchDeps),
+  ensureBranch: (params) => ensureHandoffBranch(params, handoffBranchDeps),
+  rollbackWorktree: (params) => rollbackHostHandoffWorktree(params, handoffRollbackDeps),
+  applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
+  formatExecOutput: mR,
+  warn: (message, detail) => CW().warning(message, detail),
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73166,329 +73198,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function Pve(
-  e,
-  { gitManager: t, sourceHost: n, destinationHost: r, signal: i, onProgress: a },
-) {
-  if (e.sourceRolloutPath.trim().length === 0)
-    return X({ status: `error`, error: `invalid-params`, message: `Missing source rollout path` });
-  if (e.sourceBranch.trim().length === 0)
-    return X({ status: `error`, error: `invalid-params`, message: `Missing source branch` });
-  if ((e.destinationWorktreeGitRoot == null) != (e.destinationWorktreeWorkspaceRoot == null))
-    return X({
-      status: `error`,
-      error: `invalid-params`,
-      message: `Destination worktree roots must be provided together`,
-    });
-  let o = crypto.randomUUID(),
-    [s, c] = await Promise.all([
-      resolveHandoffRepositoryMetadata(t, e.sourceCwd, n),
-      resolveHandoffRepositoryMetadata(t, e.destinationWorkspaceRoot, r),
-    ]);
-  if (s == null)
-    return X({
-      status: `error`,
-      error: `source-not-in-repository`,
-      message: `Source thread is not in a git repository`,
-    });
-  if (c == null)
-    return X({
-      status: `error`,
-      error: `destination-not-in-repository`,
-      message: `Destination workspace is not in a git repository`,
-    });
-  let l = await getHostHandoffDirectory(n, o),
-    u = await getHostHandoffDirectory(r, o),
-    d = await n.platformPath(),
-    f = await r.platformPath(),
-    p = d.join(l, `handoff.bundle`),
-    m = f.join(u, `handoff.bundle`),
-    h = f.join(u, `rollout.jsonl`),
-    g = `refs/codex/handoff/source/${o}`,
-    _ = `refs/codex/handoff/destination/${o}`,
-    v = n.id === r.id && l === u,
-    y = !1,
-    b = e.destinationWorktreeGitRoot != null && e.destinationWorktreeWorkspaceRoot != null,
-    x = e.destinationWorktreeGitRoot,
-    S = e.destinationWorktreeWorkspaceRoot,
-    C = !b,
-    w = null,
-    T = null,
-    E = null,
-    D = null,
-    O = (e, t) => {
-      (t === `started` ? (D = e) : D === e && (D = null), a?.(e, t));
-    };
-  try {
-    O(`prepare-host-transfer`, `started`);
-    let a = t.getWorktreeRepositoryForRoot(s.root, n),
-      o = await $(s.root, [`rev-parse`, `HEAD`], n, { signal: i });
-    if (!o.success || !o.stdout.trim())
-      return Q3(`snapshot-failed`, `Unable to resolve source HEAD commit`, o);
-    let d = o.stdout.trim(),
-      f = await inspectHandoffBranch(
-        { branch: e.sourceBranch, cwd: c.root, commitSha: d, host: r },
-        handoffBranchDeps,
-      );
-    if (f.status === `different-commit` && !b)
-      return X({
-        status: `error`,
-        error: `destination-branch-exists`,
-        message: f.message,
-        execOutput: f.execOutput,
-      });
-    let v = await x4(a, { signal: i, untrackedPathsPromise: f2(a) }),
-      D = (await A2(a, d, i)).trim(),
-      k = d;
-    if (D !== v) {
-      let e = await _4(s.root, v, n, {
-        parentSha: d,
-        message: `Codex host handoff snapshot`,
-        signal: i,
-      });
-      if (!e.success)
-        return Q3(`snapshot-failed`, `Failed to create host handoff snapshot`, e.error);
-      k = e.commitSha.trim();
-    }
-    let ee = await $(s.root, [`update-ref`, g, k], n, { signal: i });
-    if (!ee.success)
-      return Q3(`snapshot-failed`, `Failed to prepare host handoff snapshot ref`, ee);
-    await Promise.all([
-      n.createDirectory(l, { recursive: !0 }),
-      r.createDirectory(u, { recursive: !0 }),
-    ]);
-    let te = await hasHandoffCommit(c.root, k, r, i, handoffSharedBaseDeps);
-    if (te) {
-      let e = await $(c.root, [`update-ref`, _, k], r, { signal: i });
-      if (!e.success)
-        return Q3(`bundle-import-failed`, `Failed to prepare destination handoff ref`, e);
-    } else {
-      let e = await findHandoffSharedBase(
-        {
-          gitManager: t,
-          sourceGitRoot: s.root,
-          destinationGitRoot: c.root,
-          headSha: d,
-          sourceHost: n,
-          destinationHost: r,
-          signal: i,
-        },
-        handoffSharedBaseDeps,
-      );
-      if (e == null)
-        return X({
-          status: `error`,
-          error: `bundle-export-failed`,
-          message: `Could not find a shared Git base on the destination host`,
-        });
-      let a = [`bundle`, `create`, p, g, `^${e}`],
-        o = await $(s.root, a, n, { signal: i });
-      if (!o.success) return Q3(`bundle-export-failed`, `Failed to export git handoff bundle`, o);
-      (O(`prepare-host-transfer`, `completed`),
-        O(`transfer-host-artifacts`, `started`),
-        await transferHostFile(p, n, m, r, i));
-      let l = await $(c.root, [`bundle`, `unbundle`, m], r, { signal: i });
-      if (!l.success) return Q3(`bundle-import-failed`, `Failed to import git handoff bundle`, l);
-      let u = await $(c.root, [`update-ref`, _, k], r, { signal: i });
-      if (!u.success)
-        return Q3(`bundle-import-failed`, `Failed to prepare destination handoff ref`, u);
-    }
-    if (
-      (te && (O(`prepare-host-transfer`, `completed`), O(`transfer-host-artifacts`, `started`)),
-      await transferHostFile(e.sourceRolloutPath, n, h, r, i),
-      O(`transfer-host-artifacts`, `completed`),
-      x == null || S == null)
-    ) {
-      O(`create-new-worktree`, `started`);
-      let n = await V2({
-        gitManager: t,
-        workspaceRoot: e.destinationWorkspaceRoot,
-        startingState: { type: `branch`, branchName: _ },
-        upstreamRefreshMode: `never`,
-        localEnvironmentConfigPath: null,
-        setUpSyncedBranch: !1,
-        useWorkspaceDir: e.useWorkspaceDir,
-        host: r,
-        signal: i,
-      });
-      if (!n.success)
-        return X({ status: `error`, error: `create-worktree-failed`, message: n.error.message });
-      ((x = n.worktreeGitRoot),
-        (S = n.worktreeWorkspaceRoot),
-        O(`create-new-worktree`, `completed`));
-    } else {
-      let n = t.getWorktreeRepositoryForRoot(x, r);
-      ((C = (await resolveCleanWorktreeCommit(n, i, handoffDestinationDeps)) === d),
-        n.invalidateGitReadCachesForRepoChange(`head`),
-        (w = (await w0(n)) ?? (await K4(n, i))));
-      let a = await t4({ cwd: S, branch: _, stashUncommitted: e.stashDestinationWorktree }, t, r);
-      if (a.status === `error`)
-        return X({
-          status: `error`,
-          error: `restore-worktree-state-failed`,
-          message: a.error,
-          execOutput: a.execOutput,
-        });
-      T = a.stashRef;
-    }
-    O(`apply-changes-to-worktree`, `started`);
-    let ne = await $(x, [`reset`, `--mixed`, d], r, { signal: i });
-    if (!ne.success)
-      return (
-        await rollbackHostWorktree({
-          createdWorktree: !b,
-          worktreeGitRoot: x,
-          worktreeWorkspaceRoot: S,
-          reusedWorktreePreviousCheckout: w,
-          reusedWorktreeStashRef: T,
-          destinationCheckoutGitRoot: c.root,
-          destinationCheckoutPreviousBranch: E,
-          gitManager: t,
-          host: r,
-        }),
-        X({
-          status: `error`,
-          error: `restore-worktree-state-failed`,
-          message: `Failed to restore transferred git state in the worktree`,
-          execOutput: mR({ command: ne.command, stdout: ne.stdout, stderr: ne.stderr }),
-        })
-      );
-    let re = await prepareHandoffDestinationCheckout(
-      {
-        branch: e.sourceBranch,
-        cwd: c.root,
-        sourceHeadSha: d,
-        canDetachDefaultBranch: C,
-        gitManager: t,
-        host: r,
-        signal: i,
-      },
-      handoffDestinationDeps,
-    );
-    if (re.error != null)
-      return (
-        await rollbackHostWorktree({
-          createdWorktree: !b,
-          worktreeGitRoot: x,
-          worktreeWorkspaceRoot: S,
-          reusedWorktreePreviousCheckout: w,
-          reusedWorktreeStashRef: T,
-          destinationCheckoutGitRoot: c.root,
-          destinationCheckoutPreviousBranch: E,
-          gitManager: t,
-          host: r,
-        }),
-        X({
-          status: `error`,
-          error: `restore-worktree-state-failed`,
-          message: re.error.message,
-          execOutput: re.error.execOutput,
-        })
-      );
-    E = re.previousBranch;
-    let ie = b
-      ? await forceHandoffBranch(
-          { branch: e.sourceBranch, cwd: x, commitSha: d, host: r },
-          handoffBranchDeps,
-        )
-      : await ensureHandoffBranch(
-          { branch: e.sourceBranch, cwd: x, commitSha: d, host: r },
-          handoffBranchDeps,
-        );
-    if (ie != null)
-      return (
-        await rollbackHostWorktree({
-          createdWorktree: !b,
-          worktreeGitRoot: x,
-          worktreeWorkspaceRoot: S,
-          reusedWorktreePreviousCheckout: w,
-          reusedWorktreeStashRef: T,
-          destinationCheckoutGitRoot: c.root,
-          destinationCheckoutPreviousBranch: E,
-          gitManager: t,
-          host: r,
-        }),
-        X({
-          status: `error`,
-          error: `restore-worktree-state-failed`,
-          message: ie.message,
-          execOutput: ie.execOutput,
-        })
-      );
-    let ae = await t4({ cwd: x, branch: e.sourceBranch, stashUncommitted: !1 }, t, r);
-    if (ae.status === `error`)
-      return (
-        await rollbackHostWorktree({
-          createdWorktree: !b,
-          worktreeGitRoot: x,
-          worktreeWorkspaceRoot: S,
-          reusedWorktreePreviousCheckout: w,
-          reusedWorktreeStashRef: T,
-          destinationCheckoutGitRoot: c.root,
-          destinationCheckoutPreviousBranch: E,
-          gitManager: t,
-          host: r,
-        }),
-        X({
-          status: `error`,
-          error: `restore-worktree-state-failed`,
-          message: ae.error,
-          execOutput: ae.execOutput,
-        })
-      );
-    if (T != null) {
-      let e = await applyHandoffStash({ cwd: S, stashRef: T, mode: `drop` }, r, handoffBranchDeps);
-      e.status === `error` &&
-        CW().warning(`[host-handoff] failed to drop reused worktree stash`, {
-          safe: {},
-          sensitive: { error: e.error },
-        });
-    }
-    return (
-      O(`apply-changes-to-worktree`, `completed`),
-      (y = !0),
-      X({ status: `success`, rolloutPath: h, worktreeGitRoot: x, worktreeWorkspaceRoot: S })
-    );
-  } catch (e) {
-    return (
-      E != null &&
-        x != null &&
-        S != null &&
-        (await rollbackHostWorktree({
-          createdWorktree: !b,
-          worktreeGitRoot: x,
-          worktreeWorkspaceRoot: S,
-          reusedWorktreePreviousCheckout: w,
-          reusedWorktreeStashRef: T,
-          destinationCheckoutGitRoot: c.root,
-          destinationCheckoutPreviousBranch: E,
-          gitManager: t,
-          host: r,
-        }).catch(() => void 0)),
-      X({
-        status: `error`,
-        error: `unexpected-error`,
-        message: e instanceof Error ? e.message : String(e),
-      })
-    );
-  } finally {
-    (D != null && O(D, `failed`),
-      await Promise.allSettled([
-        $(s.root, [`update-ref`, `-d`, g], n, { signal: i }),
-        $(c.root, [`update-ref`, `-d`, _], r, { signal: i }),
-        v && y ? Promise.resolve() : n.remove(l, { recursive: !0, force: !0 }),
-        y ? r.remove(m, { recursive: !1, force: !0 }) : r.remove(u, { recursive: !0, force: !0 }),
-      ]));
-  }
-}
-function Q3(e, t, n) {
-  return X({
-    status: `error`,
-    error: e,
-    message: t,
-    execOutput: mR({ command: n.command, stdout: n.stdout, stderr: n.stderr }),
-  });
-}
 async function zve(e, { host: t, gitManager: n, signal: r, onProgress: i }) {
   let a = [];
   if (e.sourceBranch.trim().length === 0)
@@ -76969,7 +76678,8 @@ var I6 = kW(`git`),
           warn: (message, detail) => I6().warning(message, detail),
           moveToLocal: zve,
           moveToWorktree: Bve,
-          moveToHostWorktree: Pve,
+          moveToHostWorktree: (params, options) =>
+            performHostWorktreeHandoff(params, options, hostHandoffDeps),
           createExecutionHost: (config) => this.dependencies.createExecutionHost(config),
           cleanupHostTransfer: cleanupHostHandoffTransferFiles,
           upstreamRefreshControllers: this.worktreeUpstreamRefreshAbortControllers,
