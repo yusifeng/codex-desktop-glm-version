@@ -203,6 +203,11 @@ Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-quer
 成功判定及 refresh-root 规则已迁移至 `src/main/worker/git-apply-request-handlers.ts`；dispatcher
 继续持有 envelope 与 finally cache/live-query refresh，由 11 项断言覆盖。
 
+`apply-changes` 的底层 merge-base、binary diff、目标路径预暂存、临时 index 和 apply 结果映射
+已迁移至 `src/main/worker/git-apply-changes.ts`；原 `Ige`/`Nge`/`L4`/`Pge`/`Fge`/`Lge`
+已删除。31 项断言覆盖 merge-base/diff 失败、空 diff、路径存在性、无 index 降级、stage warning、
+command error 与 partial success。
+
 Worktree 请求层已迁移至 `src/main/worker/git-worktree-request-handlers.ts`：upstream refresh 取消、
 Codex/普通 worktree 列表、owner 设置、restore 后 owner 写入容错、delete 后 unwatch、三种 handoff
 progress event、跨 host destination cache 的 `finally` 失效和 transfer cleanup 均由该模块持有；

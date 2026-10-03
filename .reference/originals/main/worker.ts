@@ -9,6 +9,7 @@ const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { resolveAutomationWritableRoots } = require("./worker/git-automation-writable-roots");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
+const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
@@ -213,6 +214,18 @@ const gitWorktreeFilesDeps = {
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
   utf8ByteLength,
+};
+const gitApplyChangesDeps = {
+  applyPatch: (...args) => S2(...args),
+  createLogger: (tag) => AW(tag),
+  getTemporaryIndexContext: async (gitManager, root, host) =>
+    m0(gitManager.getWorktreeRepositoryForRoot(root, host)),
+  normalizeCommitSha: (sha) => Sz(sha),
+  parsePatchPaths: (diff) => x2(diff),
+  runDiff: (...args) => y0(...args),
+  runGit: (...args) => $(...args),
+  serializeExecResult: (result) => mR(result),
+  withTemporaryIndex: (...args) => b4(...args),
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70459,83 +70472,6 @@ function Mge(e) {
   }
   return t;
 }
-async function Nge({ root: e, diff: t, gitManager: n, host: r, signal: i, logger: a }) {
-  let o = await m0(n.getWorktreeRepositoryForRoot(e, r));
-  return o
-    ? b4(o, (o) => L4(e, t, n, r, i, a, o), r)
-    : (a && a.warning(`Unable to resolve git index path; applying without temp index`),
-      L4(e, t, n, r, i, a));
-}
-async function L4(e, t, n, r, i, a, o) {
-  return (
-    (await Pge(e, t, r, i, o)).success || (a && a.error(`Failed to stage target worktree changes`)),
-    S2({ cwd: e, diff: t, allowBinary: !0, revert: !1, env: o }, n, r, { signal: i })
-  );
-}
-async function Pge(e, t, n, r, i) {
-  let a = x2(t);
-  if (a.length === 0) return { success: !0, command: `git add`, stdout: ``, stderr: `` };
-  let o = await Fge(e, a, n);
-  return o.length === 0
-    ? { success: !0, command: `git add`, stdout: ``, stderr: `` }
-    : $(e, [`add`, `--`, ...o], n, { env: i, signal: r });
-}
-async function Fge(e, t, n) {
-  let r = await n.platformPath(),
-    i = [];
-  return (
-    await Promise.all(
-      t.map(async (t) => {
-        let a = r.join(e, t);
-        try {
-          (await n.stat(a), i.push(t));
-        } catch {
-          return;
-        }
-      }),
-    ),
-    i
-  );
-}
-async function Ige({
-  sourceHeadRef: e,
-  sourceTreeRef: t,
-  destinationRoot: n,
-  destinationHeadRef: r,
-  gitManager: i,
-  host: a,
-  signal: o,
-}) {
-  let s = AW(`applyChanges`),
-    c = await Lge(n, e, r, a, o);
-  if (!c) return { status: `command-error` };
-  let l = await y0(n, [c, t], a, {
-    binary: !0,
-    trim: !1,
-    allowedNonZeroExitCodes: [0, 1],
-    signal: o,
-  });
-  if (l.outputLimitExceeded || !l.success) return { status: `command-error`, execOutput: mR(l) };
-  let u = l.stdout;
-  if (!u) return { status: `success` };
-  let d = await Nge({ root: n, diff: u, gitManager: i, host: a, signal: o, logger: s });
-  return d.status === `error`
-    ? { status: `command-error`, execOutput: d.execOutput }
-    : d.status === `partial-success`
-      ? {
-          status: `partial-success`,
-          appliedPaths: d.appliedPaths,
-          skippedPaths: d.skippedPaths,
-          conflictedPaths: d.conflictedPaths,
-        }
-      : { status: `success` };
-}
-async function Lge(e, t, n, r, i) {
-  let a = await $(e, [`merge-base`, t, n], r, { allowedNonZeroExitCodes: [1], signal: i });
-  if (!a.success || !a.stdout) return null;
-  let o = a.stdout.trim();
-  return o ? Sz(o) : null;
-}
 function R4(e, t, n, { binary: r = !1, hideWhitespace: i = !1 }) {
   let { worktreeRepo: a } = e,
     o = [...(i ? [`--ignore-all-space`] : []), `--full-index`, t, n];
@@ -74279,7 +74215,7 @@ var I6 = kW(`git`),
           gitManager: this.gitManager,
           host: o,
           signal: i.signal,
-          applyChanges: Ige,
+          applyChanges: (params) => applyGitChangesBetweenTrees(params, gitApplyChangesDeps),
           applyPatch: S2,
           applyReviewSectionChanges: D_e,
         },

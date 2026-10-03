@@ -130,6 +130,8 @@ Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-quer
 releaseWatch `finally` 已迁移至 `src/main/worker/git-watch-request-handlers.ts`，由 25 项行为断言覆盖。
 Git apply changes/patch/review-section 三类 mutation 的参数注入、partial apply 判定与 refresh-root
 规则已迁移至 `src/main/worker/git-apply-request-handlers.ts`，由 11 项行为断言覆盖。
+其中 `apply-changes` 的 merge-base、binary diff、目标路径预暂存、临时 index 与结果映射已进一步
+迁移至 `src/main/worker/git-apply-changes.ts`；原六个底层压缩 helper 已删除，由 31 项断言覆盖。
 Worktree cancel/list/owner/restore/delete 和三类 thread handoff 请求编排已迁移至
 `src/main/worker/git-worktree-request-handlers.ts`；owner 写入容错、progress event、跨 host cache
 失效与 transfer cleanup 由 45 项行为断言覆盖，底层 move/snapshot 算法继续分批迁移。
@@ -248,7 +250,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 632 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 636 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -333,9 +335,8 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引**：`scripts/test-*.mjs` 632 个脚本建 `scripts/test-index.md`
-   （或 npm script `test:all` 串行 runner + 按簇分组清单），并标注
-   哪些是历史一次性脚本、哪些是长期回归套件。
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 636 个脚本已登记至
+   `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5）
 
