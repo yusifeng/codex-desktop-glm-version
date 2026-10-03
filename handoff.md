@@ -46,6 +46,9 @@ dispose/restart 与 session timer 副作用仍保留在入口。
 Git ignore policy 的 generation/read/refresh/recovery 状态机已抽取为
 `src/main/worker/git-ignore-policy.ts`，由 10 项行为断言覆盖；watcher 的 session
 创建与 dispose 副作用仍保留在入口。
+worker `handleRequestWithContext` 的 origin/roots、shell environment、owner、default
+remote branch 与 merge-base 只读请求已迁移至 `src/main/worker/git-read-request-handlers.ts`，
+由 8 项行为断言覆盖；其余 Git request cases 和 dispatcher 生命周期仍在入口。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为

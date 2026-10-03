@@ -8,6 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
+const { resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveShellEnvironment, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
@@ -77564,37 +77565,29 @@ var I6 = kW(`git`),
             p = X(await this.dependencies.requestGitHub(e.params, i.signal));
             break;
           case `origin-url`: {
-            let t = await this.gitManager.getRepoRepository(e.params.cwd, o);
-            p = X({ originUrl: t == null ? null : await t.getOriginUrl() });
+            p = X(await resolveOriginUrl(e.params.cwd, { gitManager: this.gitManager, host: o, getOriginUrl: (repository) => repository.getOriginUrl(), getOrigins: u4, getShellEnvironment: ehe, getOwnerThreadId: p4, getDefaultRemoteBranch: k2, getMergeBase: X2 }));
             break;
           }
           case `origin-and-roots`:
-            p = X({ origins: await u4(e.params.discoveryDirs, this.gitManager, o) });
+            p = X(await resolveOrigins(e.params.discoveryDirs, { gitManager: this.gitManager, host: o, getOriginUrl: (repository) => repository.getOriginUrl(), getOrigins: u4, getShellEnvironment: ehe, getOwnerThreadId: p4, getDefaultRemoteBranch: k2, getMergeBase: X2 }));
             break;
           case `worktree-shell-environment`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            p = X({ shellEnvironment: t == null ? null : await ehe(t, i.signal) });
+            p = X(await resolveShellEnvironment(e.params.cwd, i.signal, { gitManager: this.gitManager, host: o, getOriginUrl: (repository) => repository.getOriginUrl(), getOrigins: u4, getShellEnvironment: ehe, getOwnerThreadId: p4, getDefaultRemoteBranch: k2, getMergeBase: X2 }));
             break;
           }
           case `worktree-owner`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            p = X({ ownerThreadId: t == null ? null : ((await p4(t))?.ownerThreadId ?? null) });
+            p = X(await resolveWorktreeOwner(e.params.cwd, { gitManager: this.gitManager, host: o, getOriginUrl: (repository) => repository.getOriginUrl(), getOrigins: u4, getShellEnvironment: ehe, getOwnerThreadId: p4, getDefaultRemoteBranch: k2, getMergeBase: X2 }));
             break;
           }
           case `default-remote-branch`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            p = X({ branch: t == null ? null : ((await k2(t))?.branch ?? null) });
+            p = X(await resolveDefaultRemoteBranch(e.params.cwd, { gitManager: this.gitManager, host: o, getOriginUrl: (repository) => repository.getOriginUrl(), getOrigins: u4, getShellEnvironment: ehe, getOwnerThreadId: p4, getDefaultRemoteBranch: k2, getMergeBase: X2 }));
             break;
           }
           case `automation-writable-roots`:
             p = X({ roots: await _ye({ ...e.params, gitManager: this.gitManager, host: o }) });
             break;
           case `merge-base`: {
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            p = X({
-              mergeBaseSha:
-                t == null || !e.params.baseBranch ? null : await X2(t, e.params.baseBranch),
-            });
+            p = X(await resolveMergeBase(e.params.cwd, e.params.baseBranch, { gitManager: this.gitManager, host: o, getOriginUrl: (repository) => repository.getOriginUrl(), getOrigins: u4, getShellEnvironment: ehe, getOwnerThreadId: p4, getDefaultRemoteBranch: k2, getMergeBase: X2 }));
             break;
           }
           case `read-git-file-binary`:

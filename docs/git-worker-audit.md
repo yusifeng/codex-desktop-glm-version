@@ -53,6 +53,13 @@ Git ignore policy（原 `Xye`，约 76,500-76,620）已迁移至
 `scripts/test-worker-git-ignore-policy.mjs` 覆盖，共 10 项断言。GitRepoWatcher
 仍保留 session 创建、重启和文件事件副作用。
 
+`GitRepoManager.handleRequestWithContext` 的连续只读请求分支（`origin-url`、
+`origin-and-roots`、`worktree-shell-environment`、`worktree-owner`、
+`default-remote-branch`、`merge-base`，原约 77,560-77,660）已迁移至
+`src/main/worker/git-read-request-handlers.ts`；原入口继续负责取消信号、Git 可用性
+检查、telemetry 和响应包装。`scripts/test-worker-git-read-request-handlers.mjs`
+覆盖 repository unavailable 与正常结果，共 8 项断言。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
