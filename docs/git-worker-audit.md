@@ -40,7 +40,7 @@ watch retry backoff、Git operation state mapping、watch target state initializ
 及 worktree 子目录的直接变化；`GitRepoWatcher.refreshMetadataDirectories` 已接回
 该 helper，异步 session 刷新流程仍保留在入口。本轮进一步抽取
 `getGitWorkingTreeWatchRefreshAction`，将 ignore policy 刷新后的 skip/apply/restart
-决策从异步生命周期中分离；changed-path handler 归一化与 retry timer 决策共覆盖 63 项断言。
+决策从异步生命周期中分离；changed-path handler、retry timer 与 session close 决策共覆盖 67 项断言。
 `refreshWorkingTreeWatchPolicy`
 仍负责等待 policy/session、dispose/restart 与事件副作用。
 

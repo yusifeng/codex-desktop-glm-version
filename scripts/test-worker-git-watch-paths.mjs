@@ -11,6 +11,7 @@ const {
   createGitWatchTarget,
   addPendingWorkingTreePath,
   getGitWorkingTreeWatchRefreshAction,
+  getGitWatchSessionClosePolicy,
   getAffectedWorkingTreePath,
   isGitInternalPath,
   isMissingPathError,
@@ -102,6 +103,10 @@ assert.equal(shouldScheduleGitWatchSessionRetry({ disposed: false, targetRegiste
 assert.equal(shouldScheduleGitWatchSessionRetry({ disposed: true, targetRegistered: true, hasRetryTimer: false }), false);
 assert.equal(shouldScheduleGitWatchSessionRetry({ disposed: false, targetRegistered: false, hasRetryTimer: false }), false);
 assert.equal(shouldScheduleGitWatchSessionRetry({ disposed: false, targetRegistered: true, hasRetryTimer: true }), false);
+assert.deepEqual(getGitWatchSessionClosePolicy({ disposed: false, sessionMatches: true, elapsedMs: 30_000, stableThresholdMs: 30_000 }), { active: true, resetRetryDelay: true });
+assert.deepEqual(getGitWatchSessionClosePolicy({ disposed: false, sessionMatches: false, elapsedMs: 60_000, stableThresholdMs: 30_000 }), { active: false, resetRetryDelay: true });
+assert.deepEqual(getGitWatchSessionClosePolicy({ disposed: true, sessionMatches: true, elapsedMs: 1, stableThresholdMs: 30_000 }), { active: false, resetRetryDelay: false });
+assert.deepEqual(getGitWatchSessionClosePolicy({ disposed: false, sessionMatches: true, elapsedMs: 1, stableThresholdMs: 30_000 }), { active: true, resetRetryDelay: false });
 assert.deepEqual(createGitOperationState({ cherryPickInProgress: false, mergeInProgress: null, rebaseHead: false, rebaseMerge: false, rebaseApply: false, revertInProgress: true }), { cherryPickInProgress: false, mergeInProgress: null, rebaseInProgress: false, revertInProgress: true });
 assert.equal(createGitOperationState({ cherryPickInProgress: null, mergeInProgress: null, rebaseHead: false, rebaseMerge: null, rebaseApply: false, revertInProgress: null }).rebaseInProgress, null);
 assert.deepEqual(createGitOperationMarkerPaths(pathApi, "/repo/.git"), [
@@ -137,4 +142,4 @@ assert.deepEqual(target.handlers, [handler]);
 assert.equal(target.retryDelayMs, 1000);
 assert.equal(target.session, null);
 
-console.log("63 worker git watch path assertions passed");
+console.log("67 worker git watch path assertions passed");

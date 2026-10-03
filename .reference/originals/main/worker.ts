@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77173,15 +77173,20 @@ var Jye = 1e3,
           c = Date.now();
         (this.updateRequiresRecovery(),
           o.closed.then((t) => {
-            this.disposed ||
-              e.session !== o ||
+            let n = getGitWatchSessionClosePolicy({
+              disposed: this.disposed,
+              sessionMatches: e.session === o,
+              elapsedMs: Date.now() - c,
+              stableThresholdMs: $ye,
+            });
+            n.active &&
               (t.reason === `watch-error` &&
                 this.logger.warning(`Git repo watcher failed`, {
                   safe: {},
                   sensitive: { error: t.error, path: e.watchPath },
                 }),
               (e.session = null),
-              Date.now() - c >= $ye && (e.retryDelayMs = j6),
+              n.resetRetryDelay && (e.retryDelayMs = j6),
               this.updateRequiresRecovery(),
               this.scheduleWatchSessionRetry(e));
           }),
