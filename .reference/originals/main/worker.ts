@@ -34,6 +34,7 @@ const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-orig
 const { pushGitRepository } = require("./worker/git-push-request-handler");
 const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBranchCommits, resolveBranchExists, resolveCurrentBranch, resolveCurrentBranchSnapshot, resolveDefaultBranch, resolveDefaultRemoteBranch, resolveMergeBase, resolveOriginUrl, resolveOrigins, resolveRecentBranches, resolveReviewCommitLineCounts, resolveShellEnvironment, resolveUpstreamBranch, resolveWorktreeStartingRef, resolveWorktreeOwner } = require("./worker/git-read-request-handlers");
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
+const { getGitBlobDiff, getUntrackedWorkingTreeDiff, readWorkingTreeSymlink } = require("./worker/git-review-file-diff");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
@@ -227,6 +228,13 @@ const gitApplyChangesDeps = {
   runGit: (...args) => $(...args),
   serializeExecResult: (result) => mR(result),
   withTemporaryIndex: (...args) => b4(...args),
+};
+const gitReviewFileDiffDeps = {
+  collectProcessResult: (process) => TR(process),
+  getQueryMeta: () => _1,
+  parseGitError: (result) => g0(result),
+  quoteGitDiffPath,
+  runGit: (...args) => $(...args),
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70411,113 +70419,6 @@ function Mge(e) {
   }
   return t;
 }
-function R4(e, t, n, { binary: r = !1, hideWhitespace: i = !1 }) {
-  let { worktreeRepo: a } = e,
-    o = [...(i ? [`--ignore-all-space`] : []), `--full-index`, t, n];
-  return a.queryClient.fetchQuery({
-    queryKey: e.queryKey(`review-blob-diff`, ...(r ? [`binary`] : []), o),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () => e.gitDiff(o, { allowedNonZeroExitCodes: [0, 1], binary: r, trim: !1 }),
-    staleTime: 250,
-  });
-}
-function B4(e, t) {
-  let { worktreeRepo: n } = e;
-  return n.queryClient.fetchQuery({
-    queryKey: e.queryKey(`review-working-tree-symlink`, t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () =>
-      e.read(async () => {
-        let r = (await n.host.platformPath()).join(n.root, t),
-          i = (await n.host.platformFamily()) === `windows`,
-          a = await TR(
-            await n.host.spawn({
-              args: i
-                ? [
-                    `powershell.exe`,
-                    `-NoProfile`,
-                    `-NonInteractive`,
-                    `-Command`,
-                    `[Console]::Out.Write((Get-Item -LiteralPath $args[0] -Force).Target)`,
-                    r,
-                  ]
-                : [`readlink`, r],
-              cwd: n.root,
-              outputBytesCap: 64e3,
-              signal: e.signal,
-              timeoutMs: 1e4,
-            }),
-          );
-        if (a.code !== 0) throw Error(`Failed to read working-tree symlink`);
-        let o = i ? a.stdout : a.stdout.replace(/\n$/, ``),
-          s = await e.git([`hash-object`, `--stdin`], { stdin: o });
-        if (!s.success) throw Error(`Failed to hash working-tree symlink`);
-        return { oid: s.stdout.trim(), target: o };
-      }),
-    staleTime: 250,
-  });
-}
-function V4(e, t, { binary: n = !1 } = {}) {
-  let { worktreeRepo: r } = e;
-  return r.queryClient.fetchQuery({
-    queryKey: e.queryKey(`review-untracked-diff`, ...(n ? [`binary`] : []), t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () =>
-      e.read(async () => {
-        let i = (await r.host.platformPath()).join(r.root, t),
-          a = await r.host.stat(i, { bypassCache: !0, followSymlinks: !1 });
-        if (a.isSymbolicLink()) {
-          let { oid: n, target: r } = await B4(e, t),
-            i = quoteGitDiffPath(`a/${t}`),
-            a = quoteGitDiffPath(`b/${t}`),
-            o = r.endsWith(`
-`)
-              ? ``
-              : `\\ No newline at end of file
-`,
-            s = `diff --git ${i} ${a}\nnew file mode 120000\nindex 0000000..${n.slice(0, 7)}\n--- /dev/null\n+++ ${a}\n@@ -0,0 +1 @@\n+${r}${
-              r.endsWith(`
-`)
-                ? ``
-                : `
-`
-            }${o}`;
-          return {
-            type: `success`,
-            unifiedDiff: s,
-            unifiedDiffBytes: Buffer.byteLength(s, `utf8`),
-          };
-        }
-        if (a.isDirectory()) {
-          let n = await $(i, [`rev-parse`, `--verify`, `HEAD^{commit}`], r.host, {
-            signal: e.signal,
-          });
-          if (!n.success) return { type: `error`, error: { type: `unknown` } };
-          let a = n.stdout.trim(),
-            o = quoteGitDiffPath(`a/${t}`),
-            s = quoteGitDiffPath(`b/${t}`),
-            c = `diff --git ${o} ${s}\nnew file mode 160000\nindex 0000000..${a.slice(0, 7)}\n--- /dev/null\n+++ ${s}\n@@ -0,0 +1 @@\n+Subproject commit ${a}\n`;
-          return {
-            type: `success`,
-            unifiedDiff: c,
-            unifiedDiffBytes: Buffer.byteLength(c, `utf8`),
-          };
-        }
-        let o = await e.gitDiff([`--no-index`, `--`, `/dev/null`, t], {
-          allowedNonZeroExitCodes: [0, 1],
-          binary: n,
-          trim: !1,
-        });
-        return o.outputLimitExceeded || !o.success
-          ? { type: `error`, error: g0(o) }
-          : { type: `success`, unifiedDiff: o.stdout, unifiedDiffBytes: o.stdoutBytes };
-      }),
-    staleTime: 250,
-  });
-}
 async function Bge(e, t) {
   return (await G4(e, t)).length > 0;
 }
@@ -70712,11 +70613,12 @@ async function $4(
             Wge(a.diff, r.previousPath, r.path)
           )
             return;
-          let s = await R4(
+          let s = await getGitBlobDiff(
             e,
             t === `unstaged` ? `:${r.previousPath}` : `${n}:${r.previousPath}`,
             r.path,
             { binary: i, hideWhitespace: o },
+            gitReviewFileDiffDeps,
           );
           if (s.outputLimitExceeded || !s.success) {
             _.set(r.path, e3(g0(s)));
@@ -70741,7 +70643,12 @@ async function Uge({ binary: e, paths: t, reviewSnapshot: n }) {
       for (;;) {
         let a = t[i];
         if (((i += 1), a == null)) return;
-        let o = await V4(n, a, { binary: e });
+        let o = await getUntrackedWorkingTreeDiff(
+          n,
+          a,
+          { binary: e },
+          gitReviewFileDiffDeps,
+        );
         r.set(
           a,
           o.type === `error`
@@ -71152,7 +71059,7 @@ async function u_e(e, t, n, r, i) {
     return { additions: 1, deletions: 0, mode: `160000`, oid: n.stdout.trim() };
   }
   if (n.stat.isSymbolicLink()) {
-    let n = await B4(e, t);
+    let n = await readWorkingTreeSymlink(e, t, gitReviewFileDiffDeps);
     return {
       additions:
         n.target.split(`
@@ -71611,7 +71518,13 @@ async function d3({
           i.map(async (t) => {
             if (n.has(b3(t.path, t.previousPath)) || !e.has(t.previousPath) || !e.has(t.path))
               return null;
-            let i = await R4(a, `${o}:${t.previousPath}`, t.path, { hideWhitespace: r });
+            let i = await getGitBlobDiff(
+              a,
+              `${o}:${t.previousPath}`,
+              t.path,
+              { hideWhitespace: r },
+              gitReviewFileDiffDeps,
+            );
             if (!i.success || i.outputLimitExceeded) return null;
             let s = countGitDiffLines(i.stdout);
             return { ...t, additions: s?.additions ?? null, deletions: s?.deletions ?? null };
@@ -72381,7 +72294,17 @@ async function k3(e, t, n, r, i, a, o, s) {
   if (c.type !== `success`) return { source: t, diff: Y_e() };
   let [l, u] = await Promise.all([
     J_e(c.diffArgs, c.reviewSnapshot),
-    O3((e) => V4(c.reviewSnapshot, e), c.untrackedPaths, c.reviewSnapshot.signal),
+    O3(
+      (e) =>
+        getUntrackedWorkingTreeDiff(
+          c.reviewSnapshot,
+          e,
+          {},
+          gitReviewFileDiffDeps,
+        ),
+      c.untrackedPaths,
+      c.reviewSnapshot.signal,
+    ),
   ]);
   if (l.outputLimitExceeded || !l.success)
     return { source: t, diff: { type: `error`, error: g0(l) } };
@@ -72636,7 +72559,12 @@ async function sve({
       meta: _1,
       queryFn: async (i) => {
         let o = fve(n),
-          s = await O3((e) => V4(r, e), a, r.signal);
+          s = await O3(
+            (e) =>
+              getUntrackedWorkingTreeDiff(r, e, {}, gitReviewFileDiffDeps),
+            a,
+            r.signal,
+          );
         if (!s.success) return null;
         for (let e of s.sections)
           for (let n of e.split(`

@@ -84,6 +84,11 @@ rename patch 重写、路径 quoting 与 hunk 增删行统计已迁移至
 `Rge`/`zge`/`z4`/`H4`/`U4`/`W4` 已删除，由 33 项 UTF-8、malformed header、
 binary diff、rename 和多 hunk 断言覆盖。
 
+Review file diff 的 cached blob query、跨平台 symlink target 读取与 hash，以及 regular file、
+symlink、submodule 三类 untracked patch 生成已迁移至
+`src/main/worker/git-review-file-diff.ts`；原 `R4`/`B4`/`V4` 已删除。33 项断言覆盖
+query key/options、POSIX/Windows 命令、no-newline marker、binary diff 和错误映射。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的
