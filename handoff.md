@@ -66,6 +66,8 @@ dispose 生命周期）已抽取为 `src/main/browser-page-preload/annotation-su
 annotation surface registry（surface registration、hit-test、render/cancel/clear 与
 dispose）已抽取为 `src/main/browser-page-preload/annotation-surface-registry.ts`，
 由 9 项行为断言覆盖。
+virtual annotation target payload 组装已抽取为
+`src/main/browser-page-preload/annotation-virtual-target.ts`，由 6 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

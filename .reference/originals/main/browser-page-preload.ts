@@ -6438,6 +6438,7 @@ var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnn
 var { createAnnotationControlsRegistry } = require("./browser-page-preload/annotation-controls-registry");
 var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
+var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 Yo();
@@ -22653,7 +22654,7 @@ function t_({ rootHost: e, onClearDomHover: t, onFeedback: n, onSelected: r, onF
                   return;
                 }
                 c = window.requestAnimationFrame(() => {
-                  ((c = null), a && d === p && r(n_(p), p.element));
+                  ((c = null), a && d === p && r(createVirtualAnnotationTarget({ hit: p.hit, point: p.point, pageUrl: fd(), title: document.title, viewportWidth: window.innerWidth }), p.element));
                 });
               })));
           }),
