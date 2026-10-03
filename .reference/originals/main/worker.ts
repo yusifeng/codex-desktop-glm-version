@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77368,12 +77368,7 @@ var Jye = 1e3,
         this.gitPathExists(e.join(t, `rebase-apply`)),
         this.gitPathExists(e.join(t, `REVERT_HEAD`)),
       ]);
-      return {
-        cherryPickInProgress: n,
-        mergeInProgress: r,
-        rebaseInProgress: nbe([i, a, o]),
-        revertInProgress: s,
-      };
+      return createGitOperationState({ cherryPickInProgress: n, mergeInProgress: r, rebaseHead: i, rebaseMerge: a, rebaseApply: o, revertInProgress: s });
     }
     async gitPathExists(e) {
       try {

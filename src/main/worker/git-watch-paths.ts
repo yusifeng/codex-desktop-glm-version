@@ -90,5 +90,14 @@ function nextGitWatcherRetryDelay(currentDelayMs: number, maxDelayMs: number): n
   return Math.min(currentDelayMs * 2, maxDelayMs);
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
+function createGitOperationState(flags: { cherryPickInProgress: boolean | null; mergeInProgress: boolean | null; rebaseHead: boolean | null; rebaseMerge: boolean | null; rebaseApply: boolean | null; revertInProgress: boolean | null }): Record<string, boolean | null> {
+  return {
+    cherryPickInProgress: flags.cherryPickInProgress,
+    mergeInProgress: flags.mergeInProgress,
+    rebaseInProgress: combineOptionalBooleans([flags.rebaseHead, flags.rebaseMerge, flags.rebaseApply]),
+    revertInProgress: flags.revertInProgress,
+  };
+}
+
+export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };

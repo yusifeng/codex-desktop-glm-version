@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url);
 const {
   combineOptionalBooleans,
   createGitRepoChangedEvent,
+  createGitOperationState,
   addPendingWorkingTreePath,
   getAffectedWorkingTreePath,
   isGitInternalPath,
@@ -66,5 +67,7 @@ assert.deepEqual(createGitRepoChangedEvent({ changeType: "working-tree", commonD
 assert.deepEqual(createGitRepoChangedEvent({ changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" }), { type: "git-repo-changed", changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" });
 assert.equal(nextGitWatcherRetryDelay(1000, 60000), 2000);
 assert.equal(nextGitWatcherRetryDelay(50000, 60000), 60000);
+assert.deepEqual(createGitOperationState({ cherryPickInProgress: false, mergeInProgress: null, rebaseHead: false, rebaseMerge: false, rebaseApply: false, revertInProgress: true }), { cherryPickInProgress: false, mergeInProgress: null, rebaseInProgress: false, revertInProgress: true });
+assert.equal(createGitOperationState({ cherryPickInProgress: null, mergeInProgress: null, rebaseHead: false, rebaseMerge: null, rebaseApply: false, revertInProgress: null }).rebaseInProgress, null);
 
-console.log("31 worker git watch path assertions passed");
+console.log("33 worker git watch path assertions passed");
