@@ -122,3 +122,9 @@ rg -n 'contextBridge|ipcRenderer|Zod|react-dom|formatjs|uuidjs|WebMCP' src/main/
 nl -ba src/main/browser-page-preload.ts | sed -n '26882,27217p'
 nl -ba src/main/browser-page-preload.ts | sed -n '30084,30217p'
 ```
+### 增量抽取：annotation surface element boundary
+
+annotation surface 注册与 MutationObserver 清理共用的顶层元素判定已迁移为
+`isValidAnnotationSurfaceElement`：要求 HTMLElement、非 iframe、已连接、归属
+当前 document 且 root node 为当前 document。压缩入口仅保留注册生命周期、事件
+调度与回调执行；该策略由 annotation runtime 回归断言覆盖。

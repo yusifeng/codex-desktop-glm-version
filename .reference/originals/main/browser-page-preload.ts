@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide } = require("./browser-page-preload/annotation-runtime");
+var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6533,8 +6533,7 @@ function Qd(e, t) {
     if (
       a ||
       e == null ||
-      !(e.element instanceof HTMLElement) ||
-      !h(e.element) ||
+      !isValidAnnotationSurfaceElement(e.element, document, HTMLElement, HTMLIFrameElement) ||
       typeof e.hitTest != `function` ||
       (e.renderSelection != null && typeof e.renderSelection != `function`)
     )
@@ -6587,7 +6586,7 @@ function Qd(e, t) {
     document.addEventListener(e.removeEvent, f),
     document.addEventListener(e.availableEvent, _));
   let p = new MutationObserver(() => {
-    for (let e of n.values()) h(e.options.element) || ee(e);
+    for (let e of n.values()) isValidAnnotationSurfaceElement(e.options.element, document, HTMLElement, HTMLIFrameElement) || ee(e);
   });
   return (p.observe(document, { childList: !0, subtree: !0 }), !0);
   function m() {
@@ -6602,10 +6601,7 @@ function Qd(e, t) {
   }
   function h(e) {
     return (
-      !(e instanceof HTMLIFrameElement) &&
-      e.isConnected &&
-      e.ownerDocument === document &&
-      e.getRootNode() === document
+      isValidAnnotationSurfaceElement(e, document, HTMLElement, HTMLIFrameElement)
     );
   }
   function g(t) {
