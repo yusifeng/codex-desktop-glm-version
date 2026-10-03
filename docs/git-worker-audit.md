@@ -478,6 +478,12 @@ Repository identity 的 effective origin 查询、watcher-aware config cache、�
 remote URL/name/默认端口规范化与 worktree id 组装已迁移至
 `src/main/worker/git-repository-identity.ts`。原 `ive`/`P3` 已删除，repository-read 与 turn-diff
 capture 两个消费者均注入窄依赖，由 28 项断言覆盖。
+
+### 增量抽取：Submodule paths
+
+Submodule paths 的 `.gitmodules` 缺失快路径、可取消 stat、Git config 查询、路径分隔符规范化
+与稳定去重已迁移至 `src/main/worker/git-submodule-paths.ts`。原 `gve` 已删除，repository-read
+消费者注入现有 query/runGit/path 能力，由 15 项断言覆盖。
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

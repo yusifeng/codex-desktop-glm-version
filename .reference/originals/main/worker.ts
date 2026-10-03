@@ -31,6 +31,7 @@ const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-bra
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
+const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
 const { getCommitMessageDiff } = require("./worker/git-commit-message-diff");
@@ -99,6 +100,15 @@ const gitRepositoryIdentityDeps = {
   isCancelledError: (error) => error instanceof c1,
   originTimeoutMs: 5000,
   parseRemoteUrl: (...args) => wB(...args),
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const gitSubmodulePathsDeps = {
+  awaitAbortable: (...args) => yR(...args),
+  getQueryMeta: () => ape,
+  isMissingPathError: (...args) => sB(...args),
+  normalizeGitPath: (...args) => a2(...args),
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
   staleTime: Infinity,
@@ -71039,42 +71049,6 @@ function hve(e, t, n) {
   }
   return { offsets: a, totalMatches: o, isCapped: s };
 }
-function gve(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `submodule-paths`),
-    meta: ape,
-    queryFn: async () => {
-      try {
-        let n = e.host.stat((await e.host.platformPath()).join(e.root, `.gitmodules`), {
-          bypassCache: !0,
-        });
-        await (t == null ? n : yR(n, t));
-      } catch (e) {
-        if (t?.aborted) throw e;
-        if (sB(e)) return [];
-      }
-      let n = await $(e.root, [`config`, `--file`, `.gitmodules`, `--get-regexp`, `path`], e.host, {
-        allowedNonZeroExitCodes: [1],
-        signal: t,
-      });
-      if (!n.success || !n.stdout) return [];
-      let r = n.stdout
-        .split(
-          `
-`,
-        )
-        .map((e) => e.trim())
-        .filter((e) => e.length > 0)
-        .map((e) => {
-          let t = e.split(/\s+/);
-          return a2(t[t.length - 1] ?? ``);
-        })
-        .filter((e) => e.length > 0);
-      return Array.from(new Set(r));
-    },
-    staleTime: g1,
-  });
-}
 var _ve = /(?<=\n)/,
   vve = /^0+$/,
   yve = 3e4,
@@ -72306,7 +72280,8 @@ var I6 = kW(`git`),
               void 0,
               gitCommitMessageDiffDeps,
             ),
-          getSubmodulePaths: gve,
+          getSubmodulePaths: (repository, signal) =>
+            getGitSubmodulePaths(repository, signal, gitSubmodulePathsDeps),
           getReviewSnapshot: R6,
           catFile: Sve,
           blameFile: whe,
