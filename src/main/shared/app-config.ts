@@ -401,6 +401,18 @@ export function configOverrideKeyForVersion(appServerVersion: string | null): st
   return appServerSupportsFeature(appServerVersion, "pluginMcpConfigOverrides") ? PLUGIN_MCP_CONFIG_OVERRIDE_KEY : BUILTIN_MCP_CONFIG_OVERRIDE_KEY;
 }
 
+/** Whether a config-load error requires re-authentication (原 mC / jc). */
+export function isCloudRequirementsAuthError(value: unknown): boolean {
+  if (value == null || typeof value !== "object") return false;
+  let data = (value as { data?: unknown }).data;
+  if (data == null || typeof data !== "object") return false;
+  let record = data as { reason?: unknown; errorCode?: unknown; action?: unknown };
+  return (
+    (record.reason === "cloudRequirements" || record.reason === "cloudConfigBundle") &&
+    (record.errorCode === "Auth" || record.action === "relogin")
+  );
+}
+
 /** 深合并（lodash mergeWith 语义的受限实现）。 */
 function deepMergeWith(target: Record<string, unknown>, ...sources: Record<string, unknown>[]): Record<string, unknown> {
   for (const source of sources) {

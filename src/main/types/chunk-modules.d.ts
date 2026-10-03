@@ -538,7 +538,7 @@ declare module "@chunk/shared" {
   export { STATE_KEYS as iu } from "../../shared/app-constants";
   export const j: any; // 内部符号: Aoe
   export const ja: any; // 内部符号: ZA
-  export const jc: any; // 内部符号: mC
+  export { isCloudRequirementsAuthError as jc } from "../../shared/app-config";
   export { runtimeWorkspaceRootsOf as jd } from "../../shared/sandbox-permissions";
   export { jf } from "../../shared/zod-facade";
   export { wslToWindowsPath as ji } from "../../shared/wsl-paths";
