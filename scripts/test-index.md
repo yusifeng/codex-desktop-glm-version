@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 621.
+Total scripts: 622.
 
 ## Recent semantic extraction suites
 
@@ -38,6 +38,7 @@ Total scripts: 621.
 - [`test-worker-git-ignore-policy.mjs`](./test-worker-git-ignore-policy.mjs)
 - [`test-worker-git-init-request-handler.mjs`](./test-worker-git-init-request-handler.mjs)
 - [`test-worker-git-move-to-local.mjs`](./test-worker-git-move-to-local.mjs)
+- [`test-worker-git-move-to-worktree.mjs`](./test-worker-git-move-to-worktree.mjs)
 - [`test-worker-git-origin-discovery.mjs`](./test-worker-git-origin-discovery.mjs)
 - [`test-worker-git-push-request-handler.mjs`](./test-worker-git-push-request-handler.mjs)
 - [`test-worker-git-read-request-handlers.mjs`](./test-worker-git-read-request-handlers.mjs)

@@ -179,6 +179,10 @@ Move-to-local 的完整编排已迁移至 `src/main/worker/git-move-to-local.ts`
 checkout、stash apply/drop warning，以及 local/source 两侧的条件回滚顺序。31 项断言覆盖参数、
 占用、detach/status/branch/apply 错误、无 stash 快路径、drop warning 与 unexpected error。
 
+Move-to-worktree 的完整编排已迁移至 `src/main/worker/git-move-to-worktree.ts`；原 `Bve` 实现已删除。
+模块保留 default-branch guard、local/target checkout progress、source/target 双 stash、drop warning、
+apply 失败恢复和 created-worktree 条件 cleanup。26 项断言覆盖参数、成功/跳过路径及分阶段回滚。
+
 Git branch search 的 query 规范化、case-insensitive ref pattern、local/remote ref 解析与 branch-name
 去前缀已迁移至 `src/main/worker/git-branch-search.ts`；原 `Jve/n6/Yve/r6/Xve` 五个 helper 已删除，
 由 16 项断言覆盖 heads 快路径、最长合法 anchor、Kelvin sign、remote HEAD 和嵌套 branch。
