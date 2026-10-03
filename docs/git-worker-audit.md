@@ -13,7 +13,7 @@ WSL 平台的纯输出解析（约 47,122-47,584 中的 UTF-16/UTF-8 解码、�
 缓存和宿主生命周期副作用。
 
 远程 host 的 SSH 展示名、终端命令端口/identity 解析（原入口约
-88,588-88,606）已迁至 `worker/remote-host-config.ts`。模块只保留字段校验、
+88,590-88,646）已迁至 `worker/remote-host-config.ts`。模块只保留字段校验、
 别名优先级、IPv6 bracket 与 `-p`/`-i` 命令行规则，入口仍负责原始 host
 对象装配；行为由 `scripts/test-worker-remote-host-config.mjs` 覆盖。
 
@@ -76,6 +76,11 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
    86,131-90,660。可以先抽纯路径/命令选择函数，再迁移副作用调用。
 6. **Git error classification**：约 53,478-54,100。正则表和命令白名单是
    独立纯函数，迁移后可用现有错误测试验证。
+7. **SSH remote host identity/display**：约 88,590-88,646。`ssh_websocket_v0`
+   配置解析、别名优先级、IPv6 bracket、`-p` 端口和 `-i` identity 规则已迁至
+   `src/main/worker/remote-host-config.ts`，由
+   `scripts/test-worker-remote-host-config.mjs` 覆盖，并由 worker 的 editor/remote
+   open 路径直接调用。
 
 ## 保留登记建议
 
