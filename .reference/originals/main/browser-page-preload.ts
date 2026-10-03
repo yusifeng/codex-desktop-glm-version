@@ -26697,197 +26697,39 @@ var {
   getMountedAnnotationMessageAction,
   getPreMountAnnotationMessageAction,
 } = require("./browser-page-preload/annotation-host-message-routing");
-var Cb = null,
-  wb = null,
-  Tb = createInitialAnnotationContextState(Qs),
-  Eb = !1,
-  Db = null,
-  Ob = null,
-  kb = !1,
-  Ab = !1,
-  jb = !1,
-  Mb = !1,
-  Nb = !1,
-  Pb = !1,
-  Ib = null,
-  Lb = null,
-  Rb = null,
-  zb = null;
 var { createAnnotationPermissionController } = require("./browser-page-preload/annotation-permission-controller"),
-  annotationPermissionController = createAnnotationPermissionController({
-    isPermissionGranted: () => Pb,
+  { createAnnotationPreloadRuntime } = require("./browser-page-preload/annotation-preload-runtime"),
+  annotationPreloadRuntime = createAnnotationPreloadRuntime({
+    ipcRenderer: d.ipcRenderer,
+    windowLike: window,
+    documentLike: document,
+    navigatorLike: navigator,
+    globalLike: globalThis,
+    channels: { hostMessage: zd, policy: Hd, pageEvent: Vd, runtime: Bd },
+    featureEvent: Ud,
+    intlConfig: Qs,
     createRequestId: () => crypto.randomUUID(),
-    invokeHost: (e) => d.ipcRenderer.invoke(Bd, e),
+    createPermissionController: createAnnotationPermissionController,
+    createInitialState: createInitialAnnotationContextState,
+    resolveSyncState: resolveAnnotationSyncState,
+    isCommentModeActive: isAnnotationCommentModeActive,
+    getMountedMessageAction: getMountedAnnotationMessageAction,
+    getPreMountMessageAction: getPreMountAnnotationMessageAction,
+    reducePendingEditorMessage,
+    createControlsRegistry: Cf,
+    createSiteAnnotationRequests: Ed,
+    createFeatureObserver: Ff,
+    createModeController: $d,
+    loadCommentRuntime: () =>
+      Rf(
+        async () => {
+          let { mountBrowserCommentRuntime: e } = await Promise.resolve().then(() => (Sb(), Hy));
+          return { mountBrowserCommentRuntime: e };
+        },
+        void 0,
+      ),
+    createCustomEvent: (e, t) => new CustomEvent(e, t),
   });
-function Bb() {
-  if ((d.ipcRenderer.on(zd, Wb), globalThis.isSecureContext === !0 && window === window.top)) {
-    let e = d.ipcRenderer.sendSync(Hd);
-    ((Ab = e.enabled),
-      (Pb = e.siteAnnotationPermissionGranted),
-      (Tb = {
-        ...Tb,
-        canUseSiteAnnotationApi: e.enabled && e.siteAnnotationFeaturesEnabled,
-        canUseTweaks: e.canUseTweaks,
-        isAgentControllingBrowser: e.isAgentControllingBrowser,
-        interactionMode: e.isAnnotationModeActive ? `comment` : `browse`,
-      }),
-      e.enabled &&
-        ((zb = Cf()),
-        (Ib = Ed({
-          requestPermission: annotationPermissionController.requestPermission,
-          getState: () => ({
-            canUseSiteAnnotationApi: Tb.canUseSiteAnnotationApi === !0,
-            canUseTweaks: Tb.canUseTweaks === !0,
-            isAgentControllingBrowser: Tb.isAgentControllingBrowser,
-            hasActiveEditor: Nb || Ob != null,
-          }),
-        })),
-        (Rb = Ff((e) => {
-          d.ipcRenderer.send(Vd, { ...Ud, payload: { features: e } });
-        })),
-        (Lb = $d(
-          (e) =>
-            Mb ||
-            Tb.canUseSiteAnnotationApi !== !0 ||
-            Tb.isAgentControllingBrowser ||
-            navigator.userActivation?.isActive !== !0
-              ? !1
-              : (e !== !0 && Ib?.clear(),
-                d.ipcRenderer.invoke(Bd, {
-                  type: `browser-sidebar-runtime-toggle-annotation-mode`,
-                  force: e,
-                }),
-                !0),
-          () => isAnnotationCommentModeActive(Tb),
-          Rb.recordUse,
-          () => Tb.canUseSiteAnnotationApi === !0,
-        )),
-        Lb ?? (zb.dispose(), (zb = null), Ib.dispose(), (Ib = null))));
-  }
-  (document.readyState === `loading`
-    ? window.addEventListener(`DOMContentLoaded`, Hb, { once: !0 })
-    : Hb(),
-    window.addEventListener(`pagehide`, (e) => {
-      (Yb(null),
-        e.isTrusted && annotationPermissionController.reset(),
-        e.isTrusted &&
-          !e.persisted &&
-          ((Mb = !0),
-          Vb(),
-          window.removeEventListener(`DOMContentLoaded`, Hb),
-          d.ipcRenderer.removeListener(zd, Wb),
-          Cb?.dispose(),
-          (Ob = null),
-          (Db = null)));
-    }));
-}
-function Vb() {
-  (annotationPermissionController.reset(),
-    (Pb = !1),
-    Yb(null),
-    (Ab = !1),
-    Rb?.dispose(),
-    (Rb = null),
-    Ib?.dispose(),
-    (Ib = null),
-    Lb?.(),
-    (Lb = null),
-    zb?.dispose(),
-    (zb = null));
-}
-function Hb() {
-  jb ||
-    Mb ||
-    ((jb = !0),
-    Rf(
-      async () => {
-        let { mountBrowserCommentRuntime: e } = await Promise.resolve().then(() => (Sb(), Hy));
-        return { mountBrowserCommentRuntime: e };
-      },
-      void 0,
-    ).then(({ mountBrowserCommentRuntime: e }) => {
-      Mb || ((Cb = e(Ub())), Cb.setSiteAnnotationPreview(wb), (wb = null));
-    }));
-}
-function Ub() {
-  let e = Tb;
-  return (
-    (Db = null),
-    {
-      initialState: e,
-      subscribeToSiteAnnotationRequests: Ib?.subscribe,
-      getAnnotationControlTargets: () => zb?.getTargets() ?? [],
-      getAnnotationControls(e) {
-        return Tb.canUseSiteAnnotationApi ? zb?.getControls(e) : void 0;
-      },
-      sendMessageToHost(e) {
-        (e.type === `browser-sidebar-runtime-open-editor` ||
-        e.type === `browser-sidebar-runtime-open-design-editor`
-          ? (Nb = !0)
-          : (e.type === `browser-sidebar-runtime-cancel-editor` ||
-              e.type === `browser-sidebar-runtime-exit-comment-mode`) &&
-            ((Nb = !1), Ib?.clear()),
-          d.ipcRenderer.invoke(Bd, e));
-      },
-      subscribeToHostMessages(e) {
-        Eb = !0;
-        let t = (t, n) => {
-          let r = getMountedAnnotationMessageAction(n.type);
-          r === `sync`
-            ? e({ ...n, canUseSiteAnnotationApi: Tb.canUseSiteAnnotationApi })
-            : r === `forward` && e(n);
-        };
-        return (
-          d.ipcRenderer.on(zd, t),
-          Db != null && (e(Db), (Db = null)),
-          (kb &&= (e({ type: `browser-sidebar-runtime-capture-text-selection` }), !1)),
-          Ob != null && (e(Ob), (Ob = null)),
-          () => {
-            ((Eb = !1), d.ipcRenderer.removeListener(zd, t));
-          }
-        );
-      },
-    }
-  );
-}
-function Wb(e, t) {
-  switch (getPreMountAnnotationMessageAction(t.type)) {
-    case `permission-result`:
-      annotationPermissionController.handleResult(t.requestId, t.allowed);
-      return;
-    case `preview`:
-      Yb(Tb.canUseSiteAnnotationApi && !Tb.isAgentControllingBrowser ? t.preview : null);
-      return;
-    case `sync`:
-      (qb(t), Eb || (Db = { ...t, canUseSiteAnnotationApi: Tb.canUseSiteAnnotationApi }));
-      return;
-    case `capture-text-selection`:
-      Eb || (kb = !0);
-      return;
-    case `queue-editor-message`:
-      (Ib?.clear(), Eb || Kb(t));
-      return;
-    case `close-editor`:
-      ((Nb = !1), Ib?.clear(), Kb(t));
-      return;
-  }
-}
-function Kb(e) {
-  Ob = reducePendingEditorMessage(Ob, e);
-}
-function qb(e) {
-  let t = Lb != null && isAnnotationCommentModeActive(Tb);
-  (e.canUseSiteAnnotationApi === !1 && Vb(),
-    (e.isAgentControllingBrowser || e.siteAnnotationFeaturesEnabled === !1) &&
-      (Ib?.clear(), Yb(null)),
-    (Tb = resolveAnnotationSyncState(e, Ab)));
-  let n = Lb != null && isAnnotationCommentModeActive(Tb);
-  n !== t &&
-    document.dispatchEvent(new CustomEvent(`oaiannotationmodechange`, { detail: { active: n } }));
-}
-function Yb(e) {
-  Cb == null ? (wb = e) : Cb.setSiteAnnotationPreview(e);
-}
 var { installBrowserInputBridge } = require("./browser-page-preload/browser-input-bridge");
 Object.freeze([`http:`, `https:`]);
 var { extensionDistribution: cx } = require("./browser-page-preload/extension-distribution");
@@ -29662,7 +29504,7 @@ installWebMcpProtocol({
   modelContextProperty: `__codexWebMcpModelContext`,
 });
 (d.webFrame.setVisualZoomLevelLimits?.(1, 3),
-  Bb(),
+  annotationPreloadRuntime.initialize(),
   installBrowserInputBridge({
     windowLike: window,
     imageElementConstructor: HTMLImageElement,

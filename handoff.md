@@ -137,6 +137,9 @@ annotation context 初始状态、host sync 默认值/布尔归一化与 comment
 `src/main/browser-page-preload/annotation-context-state.ts`，由 24 项行为断言覆盖。
 annotation host message 的 pre-mount/mounted allowlist 与路由决策已迁移至
 `src/main/browser-page-preload/annotation-host-message-routing.ts`，由 34 项行为断言覆盖。
+annotation preload 的 policy 初始化、feature resources、lazy mount、host bridge、pending replay 与
+pagehide cleanup 已完整迁移至 `src/main/browser-page-preload/annotation-preload-runtime.ts`；原八个
+压缩入口函数及其私有状态已删除，由 20 项集成行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
