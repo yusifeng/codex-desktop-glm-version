@@ -59,15 +59,15 @@ export const PRESERVED = new Map([
   ],
   [
     "main",
-    "主进程 transform-only 入口保留；业务子系统已在 main-app/shared 语义源码中重写，入口仍需保持官方启动顺序与 CJS 导出面",
+    "逐段审计见 docs/main-coverage-audit.md；delegation/account 与 URL trust 等低耦合业务边界已抽取，主入口仍保留启动顺序与尚未迁出的业务/vendor 区段",
   ],
   [
     "git-worker",
-    "CJS worker 入口混合 git/HTTP/stream/node 依赖与 worker 生命周期；保持原始入口和 vendored 依赖的精确运行时布局，避免拆分破坏 worker_threads 启动协议",
+    "逐段审计见 docs/git-worker-audit.md；vendor/generated 区段与 worker-entry 保持原布局，业务边界已分批抽取（RPC、入口分发、Git 错误分类），剩余 business 区段继续由原入口承载",
   ],
   [
     "browser-page-preload",
-    "Electron browser-page 沙箱 preload；包含内嵌 schema/runtime 与 contextBridge IPC 协议，transform-only 保留可验证的隔离世界初始化顺序",
+    "逐段审计见 docs/preload-audit.md；WebMCP 协议已抽取为 CommonJS helper，其余 vendor/runtime 与隔离世界启动顺序保持 transform-only",
   ],
   [
     "shared",
