@@ -79,6 +79,8 @@ Git commit 的 repository/staging、message attribution、nothing-to-commit、co
 时序已迁移至 `src/main/worker/git-commit-request-handler.ts`，由 18 项行为断言覆盖。
 Origin discovery 的去重、平台路径判定、Git marker 向上查找、metadata/root/origin 组合和失败
 隔离已完整迁移至 `src/main/worker/git-origin-discovery.ts`，原七个压缩函数已删除，由 11 项断言覆盖。
+`set-config-value` 的参数透传和 refresh-root 规则已迁移至
+`src/main/worker/git-config-request-handler.ts`，由 5 项行为断言覆盖 worktree-local 特例。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为

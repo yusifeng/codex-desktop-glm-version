@@ -10,6 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
+const { setGitConfigValue } = require("./worker/git-config-request-handler");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -77325,6 +77326,11 @@ var I6 = kW(`git`),
           formatCommitAttribution: N_e,
           formatExecOutput: mR,
         },
+        gitConfigRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          signal: i.signal,
+        },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
         l,
@@ -77704,14 +77710,8 @@ var I6 = kW(`git`),
             break;
           }
           case `set-config-value`: {
-            let t = await this.gitManager
-              .getWorktreeRepositoryForRoot(e.params.root, o)
-              .setConfigValueForScope(e.params.key, e.params.value, e.params.scope, i.signal);
-            (t &&
-              (e.params.scope !== `worktree` ||
-                e.params.key !== `codex.localEnvironmentConfigPath`) &&
-              (d = e.params.root),
-              (p = X({ success: t })));
+            let t = await setGitConfigValue(e.params, gitConfigRequestDeps);
+            (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `create-worktree`:

@@ -115,6 +115,10 @@ Origin discovery 的目录去重、平台路径快速判定、向上查找 `.git
 root/origin 组合与单目录失败隔离已完整迁移至 `src/main/worker/git-origin-discovery.ts`；原
 `u4`/`Zhe`/`rge`/`ige`/`age`/`oge`/`sge` 已删除，11 项断言覆盖 local/remote 与失败路径。
 
+`set-config-value` 已迁移至 `src/main/worker/git-config-request-handler.ts`，保留 repository 参数
+透传及成功时 refresh-root 规则；worktree scope 的 `codex.localEnvironmentConfigPath` 明确不刷新，
+由 5 项行为断言覆盖。
+
 `refreshWorktreeDirectories` 的 worktree watch target 增删差集已抽取为
 `partitionGitWorktreeWatchPaths`；helper 只计算 stale/new 路径，target 的 dispose、
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
