@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 559.
+Total scripts: 567.
 
 - [`test-account-modals-cluster.mjs`](./test-account-modals-cluster.mjs)
 - [`test-account-query-managed-state-cluster.mjs`](./test-account-query-managed-state-cluster.mjs)
@@ -291,8 +291,10 @@ Total scripts: 559.
 - [`test-logic-query-models-cluster.mjs`](./test-logic-query-models-cluster.mjs)
 - [`test-login-auth-model-cluster.mjs`](./test-login-auth-model-cluster.mjs)
 - [`test-login-route.mjs`](./test-login-route.mjs)
+- [`test-main-business.mjs`](./test-main-business.mjs)
 - [`test-main-conversation-files-streams-gaps.mjs`](./test-main-conversation-files-streams-gaps.mjs)
 - [`test-main-thread-workspace-gaps.mjs`](./test-main-thread-workspace-gaps.mjs)
+- [`test-main-url-trust.mjs`](./test-main-url-trust.mjs)
 - [`test-markdown-renderer-entry.mjs`](./test-markdown-renderer-entry.mjs)
 - [`test-mcp-app-follow-up-confirmation-dialog.mjs`](./test-mcp-app-follow-up-confirmation-dialog.mjs)
 - [`test-mcp-server-elicitation-request-panel.mjs`](./test-mcp-server-elicitation-request-panel.mjs)
@@ -401,6 +403,7 @@ Total scripts: 559.
 - [`test-portable-attachment-thumbnail-worker.mjs`](./test-portable-attachment-thumbnail-worker.mjs)
 - [`test-portable-attachment-thumbnail.mjs`](./test-portable-attachment-thumbnail.mjs)
 - [`test-portable-thumbnail-runtime-cluster.mjs`](./test-portable-thumbnail-runtime-cluster.mjs)
+- [`test-preload-deployment-channel.mjs`](./test-preload-deployment-channel.mjs)
 - [`test-preview-interaction-surfaces-cluster.mjs`](./test-preview-interaction-surfaces-cluster.mjs)
 - [`test-pricing-payment-foundation-cluster.mjs`](./test-pricing-payment-foundation-cluster.mjs)
 - [`test-pricing-plan-page.mjs`](./test-pricing-plan-page.mjs)
@@ -550,6 +553,11 @@ Total scripts: 559.
 - [`test-wallet-onboarding-announcement-modal.mjs`](./test-wallet-onboarding-announcement-modal.mjs)
 - [`test-window-pages-cluster.mjs`](./test-window-pages-cluster.mjs)
 - [`test-workbook-review-utils.mjs`](./test-workbook-review-utils.mjs)
+- [`test-worker-entry-dispatcher.mjs`](./test-worker-entry-dispatcher.mjs)
+- [`test-worker-git-errors.mjs`](./test-worker-git-errors.mjs)
+- [`test-worker-platform-wsl.mjs`](./test-worker-platform-wsl.mjs)
+- [`test-worker-remote-host-config.mjs`](./test-worker-remote-host-config.mjs)
+- [`test-worker-rpc-client.mjs`](./test-worker-rpc-client.mjs)
 - [`test-workspace-agent-builder-page.mjs`](./test-workspace-agent-builder-page.mjs)
 - [`test-workspace-discovery-agent-management-cluster.mjs`](./test-workspace-discovery-agent-management-cluster.mjs)
 - [`test-workspace-file-context-menu-cluster.mjs`](./test-workspace-file-context-menu-cluster.mjs)
@@ -563,4 +571,3 @@ Total scripts: 559.
 - [`test-writing-block-action-controls-cluster.mjs`](./test-writing-block-action-controls-cluster.mjs)
 - [`test-writing-block-floating-slash-menu.mjs`](./test-writing-block-floating-slash-menu.mjs)
 - [`test-xterm-output-panel.mjs`](./test-xterm-output-panel.mjs)
-
