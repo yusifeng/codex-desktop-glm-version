@@ -35,6 +35,11 @@ watch retry backoff、Git operation state mapping、watch target state initializ
 和 `ENOENT`/`ENOTDIR` 缺失判断（原入口约 77,417-77,438、77,381-77,393、77,545-77,580）。原 watcher 通过
 同名适配函数接回，行为由 `scripts/test-worker-git-watch-paths.mjs` 覆盖。
 
+本轮继续抽取 metadata refresh 路径筛选策略：`selectGitMetadataRefreshPaths`
+负责将空变更集合映射到 common dir，并只接受 refs/heads/remotes、info、worktrees
+及 worktree 子目录的直接变化；`GitRepoWatcher.refreshMetadataDirectories` 已接回
+该 helper，异步 session 刷新流程仍保留在入口。回归脚本现覆盖 45 项断言。
+
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含
 Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表示第三方库

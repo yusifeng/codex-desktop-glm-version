@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -76941,18 +76941,7 @@ var Jye = 1e3,
       if (this.disposed || n == null) return Promise.resolve();
       let r = n.join(this.options.commonDir, `refs`),
         i = n.join(this.options.commonDir, `worktrees`),
-        a =
-          e.length === 0
-            ? [this.options.commonDir]
-            : e.filter(
-                (e) =>
-                  e === r ||
-                  e === n.join(r, `heads`) ||
-                  e === n.join(r, `remotes`) ||
-                  e === n.join(this.options.commonDir, `info`) ||
-                  e === i ||
-                  n.dirname(e) === i,
-              );
+        a = selectGitMetadataRefreshPaths(n, this.options.commonDir, e);
       if (a.length === 0) return Promise.resolve();
       for (let e of a) this.changedMetadataDirectories.add(e);
       if (this.metadataRefreshPromise != null) return this.metadataRefreshPromise;

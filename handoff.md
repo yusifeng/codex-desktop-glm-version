@@ -33,7 +33,9 @@ Git repository watcher 的路径归属与缺失状态策略（内部路径、锁
 topology marker、变更路径归一化、Git 内部路径过滤、working-tree 变更集合合并、recovery
 判定、repo-changed 事件 payload、watch retry backoff、Git operation state mapping、watch target
 state initialization、change emission deduplication、操作标记路径表、可选状态合并）
-已抽取为 `src/main/worker/git-watch-paths.ts`，由 42 项行为断言覆盖。
+已抽取为 `src/main/worker/git-watch-paths.ts`，并新增 metadata refresh 路径筛选
+策略 `selectGitMetadataRefreshPaths`，由 45 项行为断言覆盖；异步 watcher/session
+生命周期仍在继续拆分。
 preload 的 Chrome/Edge 扩展发行配置已抽取为
 `src/main/browser-page-preload/extension-distribution.ts`，由 5 项行为断言覆盖；
 preload 的 WebMCP registry shim 已抽取为

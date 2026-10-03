@@ -130,5 +130,24 @@ function createGitWatchTarget(input: { watchPath: string; recursive: boolean; ha
   };
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, shouldScheduleGitRepoChange };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, shouldScheduleGitRepoChange };
+/** Selects metadata directories whose changes can affect repository watches. */
+function selectGitMetadataRefreshPaths(
+  pathApi: PathApi & { join(...parts: string[]): string; dirname(path: string): string },
+  commonDir: string,
+  changedPaths: string[],
+): string[] {
+  const refsDir = pathApi.join(commonDir, `refs`);
+  const worktreesDir = pathApi.join(commonDir, `worktrees`);
+  if (changedPaths.length === 0) return [commonDir];
+  return changedPaths.filter((path) =>
+    path === refsDir ||
+    path === pathApi.join(refsDir, `heads`) ||
+    path === pathApi.join(refsDir, `remotes`) ||
+    path === pathApi.join(commonDir, `info`) ||
+    path === worktreesDir ||
+    pathApi.dirname(path) === worktreesDir,
+  );
+}
+
+export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldScheduleGitRepoChange };

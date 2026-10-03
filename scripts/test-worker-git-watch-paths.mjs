@@ -18,6 +18,7 @@ const {
   nextGitWatcherRetryDelay,
   shouldScheduleGitRepoChange,
   requiresGitWatcherRecovery,
+  selectGitMetadataRefreshPaths,
 } = require("../app/.vite/build/worker/git-watch-paths.js");
 
 const pathApi = {
@@ -32,6 +33,10 @@ const pathApi = {
   },
   join(...parts) {
     return parts.join("/").replaceAll("//", "/");
+  },
+  dirname(value) {
+    const index = value.lastIndexOf("/");
+    return index <= 0 ? "/" : value.slice(0, index);
   },
 };
 
@@ -84,6 +89,24 @@ assert.deepEqual(createGitOperationMarkerPaths(pathApi, "/repo/.git"), [
   "/repo/.git/rebase-apply",
   "/repo/.git/REVERT_HEAD",
 ]);
+assert.deepEqual(selectGitMetadataRefreshPaths(pathApi, "/repo/.git", []), ["/repo/.git"]);
+assert.deepEqual(selectGitMetadataRefreshPaths(pathApi, "/repo/.git", [
+  "/repo/.git/refs",
+  "/repo/.git/refs/heads",
+  "/repo/.git/refs/remotes",
+  "/repo/.git/info",
+  "/repo/.git/worktrees",
+  "/repo/.git/worktrees/feature",
+  "/repo/.git/config",
+]), [
+  "/repo/.git/refs",
+  "/repo/.git/refs/heads",
+  "/repo/.git/refs/remotes",
+  "/repo/.git/info",
+  "/repo/.git/worktrees",
+  "/repo/.git/worktrees/feature",
+]);
+assert.deepEqual(selectGitMetadataRefreshPaths(pathApi, "/repo/.git", ["/repo/.git/worktrees/feature/HEAD"]), []);
 const handler = { changeType: "head", shouldHandleChangedPath: () => true };
 const target = createGitWatchTarget({ watchPath: "/repo/.git/HEAD", recursive: false, handler, metadataDirectory: null, retryDelayMs: 1000 });
 assert.equal(target.generation, 0);
@@ -91,4 +114,4 @@ assert.deepEqual(target.handlers, [handler]);
 assert.equal(target.retryDelayMs, 1000);
 assert.equal(target.session, null);
 
-console.log("42 worker git watch path assertions passed");
+console.log("45 worker git watch path assertions passed");
