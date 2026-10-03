@@ -13,7 +13,8 @@
 本轮已完成 worker/preload/main 逐段审计、shared 692 导出全量分类、renderer
 三大 hub 内部审计、tsconfig 排除、测试索引、README 更新，以及 smoke/e2e
 验证说明。worker 的 main-RPC 边界已提取为 `src/main/worker/rpc-client.ts`
-并接回入口，静态门禁全绿。
+并接回入口，静态门禁全绿；smoke 已实际验证主窗口加载、renderer 致命错误
+过滤和 app-server 初始化握手，且对慢启动增加了 15 秒宽限轮询。
 
 后续增量已实际接回：worker 入口消息分发与 Git 错误分类、preload WebMCP
 协议、main delegation/account 与 URL trust helpers、WSL 输出解析，均有独立
@@ -52,7 +53,7 @@
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | 仍写着"已重写 9 个 chunk"（实际 main 11 + renderer 1874） |
 | B4 | 559 个测试脚本无索引 | `scripts/test-*.mjs` 散落，无统一 runner / 清单 |
-| B5 | 端到端验证深度浅 | `smoke-test.sh` 只验证"主进程 15 秒不崩"，未验证 GUI 渲染 |
+| B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
 
