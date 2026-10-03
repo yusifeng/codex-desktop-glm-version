@@ -80,6 +80,11 @@ live query。`scripts/test-worker-git-synced-branch-request-handlers.mjs` 由 11
 source hard reset、target ref/index/worktree restore、deleted-path 分块 clean 与 warning-only 降级，
 由 24 项断言覆盖命令分支、错误优先级和 fallback output。
 
+Synced-branch state 的配置/conflict 状态、checked-out worktree 定位、commit/working-tree 快照、
+ahead counts、双侧 numstat query 与最终响应组装已迁移至
+`src/main/worker/git-synced-branch-state.ts`；原 `Zve/a6/Qve/$ve/o6/eye/tye/rye` 和状态常量已删除。
+23 项断言覆盖 query cache、binary numstat、checked-out/unchecked 分支、SHA 校验与 warning 边界。
+
 repository/file read 请求（`repository-identity`、`commit-message-diff`、`submodule-paths`、
 `cat-file`、`blame-file`、`index-info`、`config-value`）已迁移至
 `src/main/worker/git-repository-read-request-handlers.ts`。模块保留 repository unavailable、

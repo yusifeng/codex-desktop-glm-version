@@ -31,6 +31,7 @@ const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfi
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
+const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchState: collectSyncedBranchState } = require("./worker/git-synced-branch-state");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
@@ -143,6 +144,26 @@ const branchSearchDeps = {
   queryKey: Q,
   queryMeta: () => v1,
   runGit: $,
+};
+const syncedBranchStateDeps = {
+  readConfig: P2,
+  hasConflicts: Bge,
+  normalizeBranch: E3,
+  queryKey: Q,
+  queryMeta: () => _1,
+  runDiff: y0,
+  listWorktrees: $2,
+  resolveObject: N0,
+  isObjectId: M0,
+  normalizeCommitSha: Sz,
+  getUntrackedPaths: f2,
+  getWorkingTree: x4,
+  getHeadCommit: K4,
+  getCurrentBranch: w0,
+  compareAhead: A0,
+  logger: {
+    warning: (message, detail) => kW(`git`)().warning(message, detail),
+  },
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -73239,106 +73260,6 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-async function Zve(e, t) {
-  let n = await P2(e, t);
-  if (!n) return { branch: null, base: null, hasConflicts: !1 };
-  let r = await Bge(e, t);
-  return { branch: E3(n.branch), base: n.lastSyncedTreeRef, hasConflicts: r };
-}
-var i6 = { filesChanged: 0, linesAdded: 0, linesRemoved: 0 };
-async function a6(e, t, n, r) {
-  let i = await Qve(e, t, n, r);
-  return !i.success || !i.stdout ? i6 : $ve(i.stdout);
-}
-function Qve(e, t, n, r) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `diff-stats`, t, n),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () =>
-      y0(e.root, [`--numstat`, t, n], e.host, { allowedNonZeroExitCodes: [0, 1], signal: r }),
-    staleTime: 250,
-  });
-}
-function $ve(e) {
-  let t = e.trim();
-  if (!t) return i6;
-  let n = 0,
-    r = 0,
-    i = 0;
-  for (let e of t.split(/\r?\n/)) {
-    let t = e.trim();
-    if (!t) continue;
-    let [a, o, ...s] = t.split(`	`);
-    a && o && s.length !== 0 && ((n += 1), (r += o6(a)), (i += o6(o)));
-  }
-  return { filesChanged: n, linesAdded: r, linesRemoved: i };
-}
-function o6(e) {
-  if (e === `-`) return 0;
-  let t = Number.parseInt(e, 10);
-  return Number.isFinite(t) ? t : 0;
-}
-async function eye(e, t, n) {
-  return (
-    (await $2(e, n)).find((e) => e.headRef.type === `branch` && e.headRef.string === t)?.root ??
-    null
-  );
-}
-async function tye(e, t, n) {
-  let r = await N0(e, t, n);
-  if (r && !M0(r)) throw Error(`Unexpected ${t} SHA: ${r}`);
-  return r ? Sz(r) : null;
-}
-var nye = kW(`git`);
-async function rye(e, t, n, r) {
-  let i = await t.getWorktreeRepository(e, n);
-  if (!i) throw Error(`Unable to resolve git root for synced branch status.`);
-  let { root: a } = i,
-    o = f2(i),
-    s = await P2(i, r);
-  if (!s) throw Error(`No synced branch config found for the current worktree.`);
-  try {
-    let e = E3(s.branch),
-      c = x4(i, { signal: r, untrackedPathsPromise: o }),
-      [l, u, d, f, p] = await Promise.all([eye(i, e, r), K4(i, r), c, tye(i, s.branch, r), w0(i)]);
-    if (p) throw Error(`Worktree has a branch checked out.`);
-    if (!u) throw Error(`Unable to resolve worktree head state.`);
-    if (!f) throw Error(`Unable to resolve synced branch head SHA.`);
-    let m = null,
-      h;
-    l
-      ? l === a
-        ? ((m = i), (h = x4(i, { signal: r, untrackedPathsPromise: o })))
-        : ((m = t.getWorktreeRepositoryForRoot(l, n)),
-          (h = x4(m, { signal: r, untrackedPathsPromise: f2(m) })))
-      : (h = Promise.resolve(null));
-    let g = A0(i, f, u, r),
-      [_, v] = await Promise.all([g, h]),
-      y = (e) => ({ leftRef: e, rightRef: e, filesChanged: 0, linesAdded: 0, linesRemoved: 0 }),
-      b = d ? { ...(await a6(i, u, d, r)), leftRef: u, rightRef: d } : y(u),
-      x = m && v ? { ...(await a6(m, f, v, r)), leftRef: f, rightRef: v } : y(f);
-    return {
-      branch: s.branch,
-      worktreeSnapshot: { root: a, headCommitSha: u, workingTreeRef: d ?? void 0 },
-      branchSnapshot: l
-        ? { checkedOut: !0, snapshot: { root: l, headCommitSha: f, workingTreeRef: v ?? void 0 } }
-        : { checkedOut: !1, headCommitSha: f },
-      localCommitsAhead: _?.leftAhead ?? 0,
-      worktreeCommitsAhead: _?.rightAhead ?? 0,
-      localUncommittedDiffStats: x,
-      worktreeUncommittedDiffStats: b,
-    };
-  } catch (e) {
-    throw (
-      nye().warning(`failed to collect synced branch status`, {
-        safe: {},
-        sensitive: { error: e },
-      }),
-      e
-    );
-  }
-}
 function s6(e) {
   let t = e.reviewSnapshot;
   return e.queryClient.fetchQuery({
@@ -75881,8 +75802,10 @@ var I6 = kW(`git`),
           gitManager: this.gitManager,
           host: o,
           signal: i.signal,
-          getSyncedBranch: Zve,
-          getSyncedBranchState: rye,
+          getSyncedBranch: (repository, signal) =>
+            resolveSyncedBranchDetails(repository, signal, syncedBranchStateDeps),
+          getSyncedBranchState: (cwd, gitManager, host, signal) =>
+            collectSyncedBranchState(cwd, gitManager, host, signal, syncedBranchStateDeps),
           overwriteRepository: (params) =>
             overwriteSyncedBranch(params, syncedBranchOverwriteDeps),
         },
