@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { attachAnnotationControlTargets, cloneRecord, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { attachAnnotationControlTargets, cloneRecord, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -53,5 +53,8 @@ const records = [{ targets: [new WeakRef(firstTarget)] }, { targets: [new WeakRe
 assert.deepEqual(collectAnnotationControlTargets(records, (target) => target === firstTarget), [firstTarget]);
 const indexed = new WeakMap([[firstTarget, [{ controls: { label: "old" } }, { controls: { label: "new" } }]]]);
 assert.deepEqual(getAnnotationControlsForTarget(firstTarget, fakeDocument, indexed), { label: "new" });
+assert.equal(shouldDisposeAnnotationRegistryOnPagehide({ isTrusted: true, persisted: false }), true);
+assert.equal(shouldDisposeAnnotationRegistryOnPagehide({ isTrusted: true, persisted: true }), false);
+assert.equal(shouldDisposeAnnotationRegistryOnPagehide({ isTrusted: false, persisted: false }), false);
 
-console.log("34 preload annotation runtime assertions passed");
+console.log("37 preload annotation runtime assertions passed");
