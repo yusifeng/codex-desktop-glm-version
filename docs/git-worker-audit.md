@@ -12,6 +12,11 @@ WSL 平台的纯输出解析（约 47,122-47,584 中的 UTF-16/UTF-8 解码、�
 识别与排序）也已迁至 `worker/platform-wsl.ts`；仍需继续迁移的是其命令执行、
 缓存和宿主生命周期副作用。
 
+远程 host 的 SSH 展示名、终端命令端口/identity 解析（原入口约
+88,588-88,606）已迁至 `worker/remote-host-config.ts`。模块只保留字段校验、
+别名优先级、IPv6 bracket 与 `-p`/`-i` 命令行规则，入口仍负责原始 host
+对象装配；行为由 `scripts/test-worker-remote-host-config.mjs` 覆盖。
+
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含
 Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表示第三方库
