@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlsPayload, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -35,5 +35,10 @@ control.dispose();
 control.dispose();
 assert.equal(emitted.length, 2);
 assert.throws(() => control.update({}), /disposed/);
+const parser = (value) => ({ success: value && typeof value === "object" && typeof value.controls === "number", data: value });
+const patchParser = (value) => ({ success: value && typeof value === "object" && typeof value.controls === "number", data: value });
+assert.deepEqual(parseAnnotationControlsPayload('{"controls":1}', parser, patchParser), { controls: 1 });
+assert.deepEqual(parseAnnotationControlsPayload('{"controls":2}', parser, patchParser, { controls: 1 }), { controls: 2 });
+assert.equal(parseAnnotationControlsPayload("not-json", parser, patchParser), undefined);
 
-console.log("22 preload annotation runtime assertions passed");
+console.log("25 preload annotation runtime assertions passed");

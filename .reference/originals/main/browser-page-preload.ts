@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -7301,28 +7301,13 @@ function Cf() {
   );
 }
 function wf(e) {
-  if (!(e instanceof CustomEvent)) return;
-  let t = e.detail;
-  return typeof t == `object` && t ? t : void 0;
+  return readAnnotationEventDetail(e);
 }
 function Tf(e, t) {
-  let n = Object.getOwnPropertyDescriptor(e, t);
-  return n != null && `value` in n ? n.value : void 0;
+  return readAnnotationEventField(e, t);
 }
 function Ef(e, t) {
-  if (!(typeof e != `string` || e.length > _f))
-    try {
-      let n = JSON.parse(e);
-      if (t != null) {
-        let e = Sf.safeParse(n);
-        if (!e.success) return;
-        n = { ...t, ...e.data };
-      }
-      let r = ff.safeParse(n);
-      return r.success ? r.data : void 0;
-    } catch {
-      return;
-    }
+  return parseAnnotationControlsPayload(e, (e) => ff.safeParse(e), (e) => Sf.safeParse(e), t, _f);
 }
 function Df(e, t) {
   if (!Array.isArray(t)) return;

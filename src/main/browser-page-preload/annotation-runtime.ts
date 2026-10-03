@@ -143,5 +143,32 @@ function createAnnotationControlHandle(id: string, serialize: (value: unknown) =
   });
 }
 
-export { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
-if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+function readAnnotationEventDetail(event: unknown): Record<string, unknown> | undefined {
+  if (typeof CustomEvent !== `undefined` && !(event instanceof CustomEvent)) return undefined;
+  const detail = (event as { detail?: unknown } | null)?.detail;
+  return typeof detail === `object` && detail !== null ? detail as Record<string, unknown> : undefined;
+}
+
+function readAnnotationEventField(detail: Record<string, unknown>, key: string): unknown {
+  const descriptor = Object.getOwnPropertyDescriptor(detail, key);
+  return descriptor != null && `value` in descriptor ? descriptor.value : undefined;
+}
+
+function parseAnnotationControlsPayload(serialized: unknown, fullParse: (value: unknown) => { success: boolean; data?: unknown }, patchParse: (value: unknown) => { success: boolean; data?: unknown }, current?: Record<string, unknown>, maxLength = 16384): Record<string, unknown> | undefined {
+  if (typeof serialized !== `string` || serialized.length > maxLength) return undefined;
+  try {
+    let value: unknown = JSON.parse(serialized);
+    if (current != null) {
+      const patch = patchParse(value);
+      if (!patch.success) return undefined;
+      value = { ...current, ...(patch.data as Record<string, unknown>) };
+    }
+    const parsed = fullParse(value);
+    return parsed.success ? parsed.data as Record<string, unknown> : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
+if (typeof module !== `undefined`) module.exports = { cloneRecord, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, normalizeAnnotationControlTargets, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls };
