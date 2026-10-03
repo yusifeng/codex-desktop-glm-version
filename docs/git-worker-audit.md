@@ -121,6 +121,10 @@ rename 推断/重组已迁移至 `src/main/worker/git-review-metadata-diff.ts`�
 `y_e`/`d3`/`f3`/`p3`/`m3` 与 512-path 常量已删除。42 项断言覆盖 query key/options、
 source/path 矩阵、路径上限回退、raw entry 可见性、blob diff 失败与 rename metadata 修复。
 
+Review metadata 的 working-tree 最终补全与 untracked metadata 合成已迁移至
+`src/main/worker/git-review-metadata-finalize.ts`；原 `x_e`/`y3` 已删除。25 项断言覆盖空输入、
+重复路径、缺失 metadata 默认值、零 OID 定向补全、untracked 标记、revision 参数透传与排序。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的

@@ -40,6 +40,7 @@ const { getBranchDiffStats: getGitBranchDiffStats } = require("./worker/git-revi
 const { createReviewDiffFallback, getReviewDiff } = require("./worker/git-review-diffs");
 const { attachReviewFileRevisions, createUnmergedReviewFiles, deduplicateReviewFiles, getOmittedUntrackedFiles, gitStatusToReviewChangeKind, mergeReviewMetadata, parseReviewMetadataDiff, reconcileRenameStats, reconcileUntrackedRenames, reviewFileKey, selectUntrackedReviewPaths } = require("./worker/git-review-metadata-utils");
 const { inferReviewRenames, readReviewDiffMetadata, reconcileStagedReviewRenames, resolveReviewMetadataPaths } = require("./worker/git-review-metadata-diff");
+const { finalizeReviewMetadata, readUntrackedReviewMetadata } = require("./worker/git-review-metadata-finalize");
 const { getReviewWorkingTreeMetadata } = require("./worker/git-review-working-tree-metadata");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
@@ -300,13 +301,29 @@ const gitReviewMetadataDiffDeps = {
   reviewFileKey,
   staleTime: Infinity,
 };
+const gitReviewMetadataFinalizeDeps = {
+  attachReviewFileRevisions,
+  deduplicateReviewFiles,
+  getWorkingTreeMetadata: (reviewSnapshot, paths, options) =>
+    getReviewWorkingTreeMetadata(
+      reviewSnapshot,
+      paths,
+      options,
+      gitReviewWorkingTreeMetadataDeps,
+    ),
+};
 const gitReviewBranchStatsDeps = {
   getDiffMetadata: (params) =>
     readReviewDiffMetadata(params, gitReviewMetadataDiffDeps),
   getGitDir: (repository, signal) => u0(repository, signal),
   getOmittedUntrackedFiles,
   getStatusSummary: (...args) => Y2(...args),
-  getUntrackedMetadata: (reviewSnapshot, paths) => y3(reviewSnapshot, paths),
+  getUntrackedMetadata: (reviewSnapshot, paths) =>
+    readUntrackedReviewMetadata(
+      reviewSnapshot,
+      paths,
+      gitReviewMetadataFinalizeDeps,
+    ),
   inferRenames: (params) =>
     inferReviewRenames(params, gitReviewMetadataDiffDeps),
   isMissingPathError: (error) => sB(error),
@@ -70703,7 +70720,7 @@ async function l3({
         source: o,
         statusPaths: d?.type === `success` ? d.trackedPaths : [],
       }, gitReviewMetadataDiffDeps),
-      y3(a, f),
+      readUntrackedReviewMetadata(a, f, gitReviewMetadataFinalizeDeps),
     ]);
   if (p == null) return { type: `error`, failureReason: `review_tracked_paths` };
   if (m == null) return { type: `error`, failureReason: `review_untracked_metadata` };
@@ -70726,14 +70743,14 @@ async function l3({
   let _ = u.unmergedPaths.type === `scanned` ? createUnmergedReviewFiles(u.unmergedPaths.pathSet) : [];
   _.length > 0 && (g = { ...g, files: [...g.files, ..._] });
   let v = await a.read(async () =>
-    x_e({
+    finalizeReviewMetadata({
       host: s.host,
       gitRoot: u.gitRoot,
       metadata: g,
       reviewSnapshot: a,
       source: o,
       untrackedPathSet: u.untrackedPathSet,
-    }),
+    }, gitReviewMetadataFinalizeDeps),
   );
   return v == null
     ? { type: `error`, failureReason: `review_working_tree_metadata` }
@@ -70767,73 +70784,6 @@ async function b_e({ includeUntrackedFiles: e, reviewSnapshot: t, untrackedFileC
     unstagedFileCount: u.length,
     untrackedFileCount: d,
   }));
-}
-async function x_e({
-  host: e,
-  gitRoot: t,
-  metadata: n,
-  reviewSnapshot: r,
-  source: i,
-  untrackedPathSet: a,
-}) {
-  let o = deduplicateReviewFiles(
-      n.files.map((e) =>
-        e.previousPath == null && a.has(e.path) ? { ...e, changeKind: `untracked` } : e,
-      ),
-    ),
-    s = await getReviewWorkingTreeMetadata(
-      r,
-      n.rawEntries.filter((e) => e.status !== `D` && /^0+$/.test(e.newOid)).map((e) => e.path),
-      {},
-      gitReviewWorkingTreeMetadataDeps,
-    );
-  return s == null
-    ? null
-    : (
-        await attachReviewFileRevisions({
-          host: e,
-          files: o,
-          gitRoot: t,
-          rawEntries: n.rawEntries.map((e) => ({ ...e, newOid: s.get(e.path)?.oid ?? e.newOid })),
-          source: i,
-          stats: n.stats,
-        })
-      ).sort((e, t) => e.path.localeCompare(t.path));
-}
-async function y3(e, t) {
-  if (t.length === 0) return { files: [], rawEntries: [], stats: [] };
-  let n = await getReviewWorkingTreeMetadata(
-    e,
-    t,
-    { includeDiffMetadata: !0 },
-    gitReviewWorkingTreeMetadataDeps,
-  );
-  return n == null
-    ? null
-    : {
-        files: t.map((e) => ({
-          additions: null,
-          changeKind: `added`,
-          deletions: null,
-          path: e,
-          previousPath: null,
-        })),
-        rawEntries: t.map((e) => ({
-          newMode: n.get(e)?.mode ?? `000000`,
-          newOid: n.get(e)?.oid ?? `0`.repeat(40),
-          oldMode: `000000`,
-          oldOid: `0`.repeat(40),
-          path: e,
-          previousPath: null,
-          status: `A`,
-        })),
-        stats: t.map((e) => ({
-          additions: n.get(e)?.additions ?? null,
-          deletions: n.get(e)?.deletions ?? null,
-          path: e,
-          previousPath: null,
-        })),
-      };
 }
 async function D_e({ action: e, host: t, cwd: n, files: r, gitManager: i, signal: a, source: o }) {
   let s = await i.getWorktreeRepository(xz(n), t);
