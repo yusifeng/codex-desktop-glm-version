@@ -84,7 +84,8 @@ async function worker() {
       const commonJsHelper =
         /[\\/]src[\\/]main[\\/]worker[\\/]/.test(src) ||
         /[\\/]src[\\/]main[\\/]browser-page-preload[\\/]/.test(src) ||
-        src.endsWith("/src/main/main-app/util/main-business.ts");
+        src.endsWith("/src/main/main-app/util/main-business.ts") ||
+        src.endsWith("/src/main/main-app/util/url-trust.ts");
       const ts = await esbuild.transform(code, {
         ...common,
         loader: "ts",

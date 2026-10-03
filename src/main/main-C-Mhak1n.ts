@@ -8,6 +8,7 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
   o = require("./electron-resources-path-BDLw2lp0.js"),
   s = require("./dist-wQAv1pJP.js");
 const mainBusiness = require("./main-app/util/main-business.js");
+const mainUrlTrust = require("./main-app/util/url-trust.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -172623,51 +172624,22 @@ var xot = new Set([
     }
   };
 function E9(e, t) {
-  if (!MH(e)) return !1;
-  try {
-    return new URL(e).origin === t;
-  } catch {
-    return !1;
-  }
+  return mainUrlTrust.sameOrigin(e, t);
 }
 function wot(e, t, n) {
-  return n && Tot(e, t, n) ? !0 : Dot(e, t) || Eot(e, t);
+  return mainUrlTrust.sameTrustedPath(e, t, n ?? null);
 }
 function Tot(e, t, n) {
-  let r = D9(e),
-    i = D9(t);
-  return r == null || i == null || !MH(e) || !MH(t) || r.origin !== n || i.origin !== n
-    ? !1
-    : r.pathname === i.pathname;
+  return mainUrlTrust.samePathOnOrigin(e, t, n);
 }
 function Eot(e, t) {
-  let n = D9(e),
-    r = D9(t);
-  return n == null || r == null || n.protocol !== `file:` || r.protocol !== `file:`
-    ? !1
-    : n.pathname === r.pathname;
+  return mainUrlTrust.sameFilePath(e, t);
 }
 function Dot(e, t) {
-  let n = D9(e),
-    r = D9(t);
-  return n == null || r == null
-    ? !1
-    : n.protocol === `app:` &&
-        r.protocol === `app:` &&
-        n.host === `-` &&
-        r.host === `-` &&
-        n.username === `` &&
-        r.username === `` &&
-        n.password === `` &&
-        r.password === `` &&
-        n.pathname === r.pathname;
+  return mainUrlTrust.sameAppPath(e, t);
 }
 function D9(e) {
-  try {
-    return new URL(e);
-  } catch {
-    return null;
-  }
+  return mainUrlTrust.parseUrl(e);
 }
 var Oot = RegExp(`^(?:\\p{RGI_Emoji})$`, `v`),
   kot = class extends n.Uf {

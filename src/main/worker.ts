@@ -6,6 +6,9 @@ let t = require("node:worker_threads"),
   i = require("path");
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
+const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
+const LX = classifyGitError;
+const zX = gitSubcommand;
 i = e.o(i);
 let a = require("module");
 a = e.o(a);
@@ -53415,57 +53418,6 @@ var FX = {
     })),
   ]),
   K({ threadId: H(), turnId: H(), item: zM() }));
-var IX = [
-  [
-    `invalid_config`,
-    /bad (?:boolean |numeric )?config value|bad config line|invalid (?:config|key)|could not parse config|bogus format in git_config_parameters/i,
-  ],
-  [
-    `index_locked`,
-    /unable to create .*\.lock['"]?: file exists|another git process seems to be running|cannot lock ref|could not lock (?:config file|.*ref)/i,
-  ],
-  [
-    `authentication`,
-    /authentication failed|could not read username|permission denied \(publickey\)|http basic: access denied|invalid username or password|repository access denied|requested url returned error: (?:401|403)\b|support for password authentication was removed|terminal prompts disabled/i,
-  ],
-  [`permission_denied`, /permission denied|operation not permitted|access is denied/i],
-  [
-    `resource_exhausted`,
-    /no space left on device|disk quota exceeded|cannot allocate memory|too many open files|resource temporarily unavailable/i,
-  ],
-  [
-    `repository_missing`,
-    /not a git repository|does not appear to be a git repository|cannot (?:change to|chdir to).*no such file or directory/i,
-  ],
-  [`ambiguous_revision`, /ambiguous argument|short object id .* is ambiguous/i],
-  [
-    `bad_revision`,
-    /bad revision|bad object|needed a single revision|not a valid object name|unknown revision or path not in the working tree/i,
-  ],
-  [
-    `corrupt_repository`,
-    /corrupt|index file smaller than expected|bad signature|object file .* is empty|inflate: data stream error|pack has bad object/i,
-  ],
-  [
-    `remote_transport`,
-    /could not resolve host|failed to connect|connection (?:timed out|reset|refused)|network is unreachable|early eof|remote end hung up unexpectedly|rpc failed|http\/2 stream .* was not closed cleanly|ssh: connect to host|unable to access/i,
-  ],
-];
-function LX(e) {
-  for (let [t, n] of IX) if (n.test(e)) return t;
-  return `unknown`;
-}
-var RX = new Set(
-  `--version.add.apply.archive.blame.branch.cat-file.check-attr.check-ignore.check-ref-format.checkout.cherry-pick.clean.clone.commit.config.count-objects.diff.fetch.for-each-ref.fsck.gc.grep.hash-object.init.log.ls-files.ls-remote.merge.merge-base.mv.pull.push.rebase.remote.reset.restore.rev-list.rev-parse.rm.show.show-ref.sparse-checkout.stash.status.submodule.switch.tag.update-index.version.worktree`.split(
-    `.`,
-  ),
-);
-function zX(e, t) {
-  let n = t;
-  for (; e[n] === `-c` && e[n + 1] != null;) n += 2;
-  let r = e[n];
-  return r != null && RX.has(r) ? r : `other`;
-}
 var BX = e.n((e, t) => {
     var n = gV(),
       r = `Expected a function`;
