@@ -44,6 +44,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
+const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
 const { buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
@@ -73294,9 +73295,7 @@ function jve(e, t, n) {
     : { type: `error`, error: { type: Eve(t) } };
 }
 var C6 = 0.05,
-  Eye = 7e3,
-  Dye = 1e4,
-  Oye = 512;
+  Eye = 7e3;
 function w6(e) {
   return e === `branch-diff-stats` ||
     e === `review-diff` ||
@@ -73514,82 +73513,6 @@ function Fye({ result: e, resultDisposition: t }) {
       return e.result.type === `error` ? (e.result.failureReason ?? `status_summary_error`) : null;
   }
 }
-var Iye = class {
-  emit;
-  snapshots = new Map();
-  constructor(e) {
-    this.emit = e;
-  }
-  record({
-    changeType: e,
-    changedPathCount: t,
-    filteredPathCount: n,
-    fullInvalidation: r,
-    hostKind: i,
-    invalidated: a,
-    rawEventCount: o,
-    repoIndexSizeBucket: s,
-    refreshFanoutCount: c,
-    requiresRecovery: l,
-  }) {
-    let u = `${i}:${s}:${e}`,
-      d = this.snapshots.get(u);
-    if (d == null) {
-      let t = Date.now(),
-        n = setTimeout(() => {
-          this.flush(u);
-        }, Dye);
-      (n.unref?.(),
-        (d = {
-          changeType: e,
-          changedPathCount: 0,
-          coalescedBatchCount: 0,
-          filteredPathCount: 0,
-          fullInvalidationCount: 0,
-          hostKind: i,
-          invalidationCount: 0,
-          rawEventCount: 0,
-          repoIndexSizeBucket: s,
-          refreshFanoutCount: 0,
-          requiresRecoveryCount: 0,
-          snapshotDurationMs: 0,
-          startedAtMs: t,
-          timer: n,
-        }),
-        this.snapshots.set(u, d));
-    }
-    ((d.changedPathCount += t),
-      (d.coalescedBatchCount += 1),
-      (d.filteredPathCount += n),
-      (d.fullInvalidationCount += +!!r),
-      (d.invalidationCount += +!!a),
-      (d.rawEventCount += o),
-      (d.refreshFanoutCount += c),
-      (d.requiresRecoveryCount += +!!l),
-      d.rawEventCount >= Oye && this.flush(u));
-  }
-  flush(e) {
-    let t = this.snapshots.get(e);
-    t != null &&
-      (this.snapshots.delete(e),
-      clearTimeout(t.timer),
-      this.emit({
-        type: `git-performance-watcher-snapshot`,
-        changeType: t.changeType,
-        changedPathCount: t.changedPathCount,
-        coalescedBatchCount: t.coalescedBatchCount,
-        filteredPathCount: t.filteredPathCount,
-        fullInvalidationCount: t.fullInvalidationCount,
-        hostKind: t.hostKind,
-        invalidationCount: t.invalidationCount,
-        rawEventCount: t.rawEventCount,
-        repoIndexSizeBucket: t.repoIndexSizeBucket,
-        refreshFanoutCount: t.refreshFanoutCount,
-        requiresRecoveryCount: t.requiresRecoveryCount,
-        snapshotDurationMs: Date.now() - t.startedAtMs,
-      }));
-  }
-};
 function Lye(e) {
   return e == null
     ? `unknown`
@@ -74881,8 +74804,15 @@ var I6 = kW(`git`),
       (super(e),
         (this.gitManager = t),
         (this.dependencies = n),
-        (this.watcherPerformance = new Iye((e) => {
-          this.emit({ type: `worker-event`, event: e });
+        (this.watcherPerformance = new GitWatcherPerformanceAggregator({
+          emit: (e) => {
+            this.emit({ type: `worker-event`, event: e });
+          },
+          now: () => Date.now(),
+          setTimeout,
+          clearTimeout,
+          snapshotDurationMs: 1e4,
+          maxRawEventCount: 512,
         })),
         (this.liveQueryRegistry = new GitLiveQueryRegistry({
           emit: (e) => {

@@ -124,6 +124,10 @@ shared-query coalescing、repository serialization、consumer abort、recovery �
 引用计数已迁移至 `src/main/worker/git-live-query-registry.ts`；原 `wye` 类及三个时序常量已删除。
 41 项断言覆盖 tracked/complete 发布、stale 抑制、三次重试、共享执行和恢复去重。
 
+Git watcher performance 的 10 秒窗口、维度分桶、累计计数、512 raw-event 提前 flush 与 timer
+清理已迁移至 `src/main/worker/git-watcher-performance.ts`；原 `Iye` 类及专用常量已删除，由 18 项
+聚合、阈值和 timer 断言覆盖。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步
