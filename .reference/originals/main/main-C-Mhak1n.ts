@@ -9,6 +9,7 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
   s = require("./dist-wQAv1pJP.js");
 const mainBusiness = require("./main-app/util/main-business.js");
 const mainUrlTrust = require("./main-app/util/url-trust.js");
+const appshotShortcut = require("./main-app/hotkey/appshot-shortcut.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
 const windowAppearance = require("./main-app/window-appearance.js");
 let c = require("node:url"),
@@ -164766,13 +164767,7 @@ var Ait = `DoubleCommand`,
     }
   };
 function S7(e) {
-  let t = e.replace(/[\s_-]/g, ``).toLowerCase();
-  return (
-    t === `doublealt` ||
-    t === `leftalt+rightalt` ||
-    t === `doubleshift` ||
-    t === `leftshift+rightshift`
-  );
+  return appshotShortcut.isDoubleModifierShortcut(e);
 }
 function Fit({ toggleAvatarOverlay: e }) {
   let t = n.bt({ commandId: `openAvatarOverlay`, isMacOS: process.platform === `darwin` }),
