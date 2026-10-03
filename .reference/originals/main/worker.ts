@@ -36,6 +36,7 @@ const { createGitBranch, resolveBaseBranch, resolveBranchAheadCount, resolveBran
 const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfigValue, resolveIndexInfo, resolveRepositoryIdentity, resolveSubmodulePaths } = require("./worker/git-repository-read-request-handlers");
 const { getGitBlobDiff, getUntrackedWorkingTreeDiff, readWorkingTreeSymlink } = require("./worker/git-review-file-diff");
 const { getCurrentHeadSnapshot, hasGitMergeConflicts, prepareReviewComparison: prepareGitReviewComparison, readCurrentHeadSnapshot, resolveReviewComparisonArgs: resolveGitReviewComparisonArgs, resolveReviewComparisonForRepository: resolveGitReviewComparisonForRepository } = require("./worker/git-review-comparison");
+const { getBranchDiffStats: getGitBranchDiffStats } = require("./worker/git-review-branch-stats");
 const { createReviewDiffFallback, getReviewDiff } = require("./worker/git-review-diffs");
 const { attachReviewFileRevisions, createUnmergedReviewFiles, deduplicateReviewFiles, getOmittedUntrackedFiles, gitStatusToReviewChangeKind, mergeReviewMetadata, parseReviewMetadataDiff, reconcileRenameStats, reconcileUntrackedRenames, reviewFileKey, selectUntrackedReviewPaths } = require("./worker/git-review-metadata-utils");
 const { getReviewWorkingTreeMetadata } = require("./worker/git-review-working-tree-metadata");
@@ -286,6 +287,23 @@ const gitReviewWorkingTreeMetadataDeps = {
     readWorkingTreeSymlink(reviewSnapshot, path, gitReviewFileDiffDeps),
   runGit: (...args) => $(...args),
   staleTime: Infinity,
+};
+const gitReviewBranchStatsDeps = {
+  getDiffMetadata: (params) => f3(params),
+  getGitDir: (repository, signal) => u0(repository, signal),
+  getOmittedUntrackedFiles,
+  getStatusSummary: (...args) => Y2(...args),
+  getUntrackedMetadata: (reviewSnapshot, paths) => y3(reviewSnapshot, paths),
+  inferRenames: (params) => d3(params),
+  isMissingPathError: (error) => sB(error),
+  mergeReviewMetadata,
+  normalizeCwd: (cwd) => xz(cwd),
+  prepareReviewComparison: (params) =>
+    prepareGitReviewComparison(params, gitReviewComparisonDeps),
+  reconcileRenameStats,
+  reconcileUntrackedRenames,
+  resolveReviewPaths: (params) => p3(params),
+  reviewFileKey,
 };
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
@@ -70470,96 +70488,7 @@ function Mge(e) {
   }
   return t;
 }
-var d_e = [
-  `MERGE_HEAD`,
-  `CHERRY_PICK_HEAD`,
-  `REVERT_HEAD`,
-  `REBASE_HEAD`,
-  `rebase-merge`,
-  `rebase-apply`,
-  `sequencer`,
-];
-async function f_e(e, t) {
-  let [n, r] = await Promise.all([u0(e, t), e.host.platformPath()]),
-    i = [];
-  if (n != null) {
-    i.push(r.join(n, `index.lock`));
-    for (let e of d_e) i.push(r.join(n, e));
-  }
-  for (let t of await Promise.all(i.map((t) => p_e(t, e.host))))
-    if (t === `exists` || t === `unknown`) return !0;
-  return !1;
-}
-async function p_e(e, t) {
-  try {
-    return (await t.stat(e, { bypassCache: !0 }), `exists`);
-  } catch (e) {
-    return sB(e) ? `missing` : `unknown`;
-  }
-}
 var m_e = 512;
-async function o3(e, t, n, r, i = !1, a = !0, o) {
-  let s = await t.getWorktreeRepository(xz(e), n);
-  if (s == null) return null;
-  let c = s.reviewSnapshot;
-  if (await c.read(() => f_e(s))) return null;
-  let l = await prepareGitReviewComparison({
-    baseBranch: r,
-    includeUntrackedFiles: a,
-    reviewSnapshot: c,
-    source: `branch`,
-  }, gitReviewComparisonDeps);
-  if (l.type !== `success`) return null;
-  let u = getOmittedUntrackedFiles(l.untrackedPaths.paths.length, o),
-    [d, f] = await Promise.all([Y2(s, !1, c), y3(c, u == null ? l.untrackedPaths.paths : [])]);
-  if (d.type !== `success` || f == null) return null;
-  let p = await p3({
-    diffArgs: l.diffArgs,
-    reviewSnapshot: c,
-    source: `branch`,
-    statusPaths: d.trackedPaths,
-  });
-  if (p == null) return null;
-  let m = await f3({ diffArgs: l.diffArgs, hideWhitespace: i, paths: p.paths, reviewSnapshot: c });
-  if (m == null) return null;
-  let h = reconcileUntrackedRenames(mergeReviewMetadata(m, f), l.untrackedPathSet),
-    { stats: g } = h;
-  if (
-    ((g = await h_e({
-      diffArgs: l.diffArgs,
-      hideWhitespace: i,
-      renames: d.stagedRenames,
-      metadata: h,
-      reviewSnapshot: c,
-    })),
-    g.length === 0 && u == null)
-  )
-    return null;
-  let _ = 0,
-    v = 0;
-  for (let e of g) ((_ += e.additions ?? 0), (v += e.deletions ?? 0));
-  return c.read(async () => ({
-    additions: _,
-    deletions: v,
-    fileCount: g.length,
-    untrackedFilesOmitted: u,
-  }));
-}
-async function h_e({ diffArgs: e, hideWhitespace: t, renames: n, metadata: r, reviewSnapshot: i }) {
-  let a = await d3({
-    changedPaths: new Set(r.stats.filter((e) => e.previousPath == null).map((e) => e.path)),
-    diffArgs: e,
-    existingRenameKeys: new Set(
-      r.stats.filter((e) => e.previousPath != null).map((e) => reviewFileKey(e.path, e.previousPath)),
-    ),
-    hideWhitespace: t,
-    renames: n,
-    reviewSnapshot: i,
-  });
-  return a.length === 0
-    ? r.stats
-    : reconcileRenameStats(r.stats, a, new Set(r.rawEntries.filter((e) => e.status === `D`).map((e) => e.path)));
-}
 async function c3({
   baseBranch: e,
   commitSha: t,
@@ -73169,7 +73098,8 @@ var I6 = kW(`git`),
           maxUntrackedFiles: z6,
           applyAttribution: H6,
           getStatusSummary: J2,
-          getBranchDiffStats: o3,
+          getBranchDiffStats: (...args) =>
+            getGitBranchDiffStats(...args, gitReviewBranchStatsDeps),
           getReviewSummary: c3,
           getReviewSourceLineCounts: g_e,
           getReviewSnapshot: R6,
@@ -74168,7 +74098,7 @@ var I6 = kW(`git`),
                 method: `branch-diff-stats`,
                 result: await abe(
                   () =>
-                    o3(
+                    getGitBranchDiffStats(
                       e.params.cwd,
                       this.gitManager,
                       n,
@@ -74176,9 +74106,10 @@ var I6 = kW(`git`),
                       e.params.hideWhitespace,
                       !1,
                       t,
+                      gitReviewBranchStatsDeps,
                     ),
                   () =>
-                    o3(
+                    getGitBranchDiffStats(
                       e.params.cwd,
                       this.gitManager,
                       n,
@@ -74186,13 +74117,14 @@ var I6 = kW(`git`),
                       e.params.hideWhitespace,
                       !0,
                       t,
+                      gitReviewBranchStatsDeps,
                     ),
                   (e) => i({ method: `branch-diff-stats`, result: e }),
                 ),
               }
             : {
                 method: `branch-diff-stats`,
-                result: await o3(
+                result: await getGitBranchDiffStats(
                   e.params.cwd,
                   this.gitManager,
                   n,
@@ -74200,6 +74132,7 @@ var I6 = kW(`git`),
                   e.params.hideWhitespace,
                   e.params.includeUntrackedFiles,
                   t,
+                  gitReviewBranchStatsDeps,
                 ),
               };
         }

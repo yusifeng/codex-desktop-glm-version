@@ -111,6 +111,11 @@ untracked 限额与 metadata 组合已迁移至 `src/main/worker/git-review-meta
 `s3`/`u3`/`h3`/`g3`/`S_e`/`_3`/`v3`/`C_e`/`w_e`/`b3`/`x3`/`T_e`/`E_e`
 已删除。37 项断言覆盖 parser、binary stats、rename/untracked 重组、revision fallback 与状态矩阵。
 
+Branch diff stats 的 repository operation marker 防护、comparison/status/untracked metadata 汇总、
+rename stats 修正与 omission 结果已迁移至 `src/main/worker/git-review-branch-stats.ts`；原
+`f_e`/`p_e`/`o3`/`h_e` 与 marker 常量已删除。33 项断言覆盖 conservative busy 判定、
+依赖失败短路、untracked omission、rename reconciliation 与聚合结果。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的
