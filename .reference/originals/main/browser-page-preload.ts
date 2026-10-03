@@ -6433,6 +6433,7 @@ var zd = `codex_desktop:message-for-view`,
   Bd = `codex_desktop:browser-sidebar-runtime-message`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
+var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6506,6 +6507,15 @@ var qd,
       })));
   });
 Zd();
+({ channels: qd, id: Wd, role: Jd, hit: Yd, response: Xd } = createAnnotationProtocol({
+  object: ja,
+  string: Ca,
+  unknown: Oa,
+  number: wa,
+  boolean: Ea,
+  enumValues: La,
+  metadataLimits: es,
+}));
 function Qd(e, t) {
   let n = new Map(),
     r = null,
