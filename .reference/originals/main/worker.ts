@@ -24,6 +24,7 @@ const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges } = require("./worker/git-commit-request-handler");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
+const { GitInitWatcher } = require("./worker/git-init-watcher");
 const { appendTraceLink, mergeLiveQueryTrace, shouldRefreshLiveQuery } = require("./worker/git-live-query-policy");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -73292,156 +73293,7 @@ function jve(e, t, n) {
     ? { type: `error`, error: { type: `too-large`, limitBytes: n } }
     : { type: `error`, error: { type: Eve(t) } };
 }
-var y6 = 250,
-  vye = 5e3,
-  yye = class {
-    options;
-    logger = OW(`git-init-watcher`);
-    checkForGitDebounced;
-    sessions = new Set();
-    disposed = !1;
-    reconnectDelayMs = y6;
-    reconnectTimer = null;
-    constructor(e) {
-      ((this.options = e),
-        (this.checkForGitDebounced = _R((e) => {
-          this.checkForGitDirectory(e);
-        }, 250)));
-    }
-    async start() {
-      let e, t;
-      try {
-        let n = await this.options.host.platformPath();
-        ((e = n.join(this.options.cwd, `.git`)), (t = n.sep));
-      } catch (e) {
-        return (this.logWatchFailure(e), !1);
-      }
-      let n = await this.startSessions({
-        checkExistingGitDirectory: this.options.watchMode !== `watch-git-metadata`,
-        gitDirectoryPath: e,
-        pathSeparator: t,
-      });
-      return !n && !this.disposed ? (this.scheduleReconnect(e, t), !0) : n;
-    }
-    dispose() {
-      ((this.disposed = !0),
-        this.checkForGitDebounced.cancel(),
-        this.reconnectTimer != null &&
-          (clearTimeout(this.reconnectTimer), (this.reconnectTimer = null)),
-        this.disposeSessions());
-    }
-    async startSessions({ checkExistingGitDirectory: e, gitDirectoryPath: t, pathSeparator: n }) {
-      if (this.disposed) return !1;
-      let r;
-      try {
-        r = await this.startWatch(
-          this.options.cwd,
-          ({ changedPaths: e }) => {
-            (e.length > 0 && !e.some((e) => e === t || e.startsWith(`${t}${n}`))) ||
-              this.checkForGitDebounced(t);
-          },
-          t,
-          n,
-        );
-      } catch (e) {
-        return (this.logWatchFailure(e), !1);
-      }
-      if (r == null) return !1;
-      let i = null;
-      if (this.options.watchMode === `watch-git-metadata`) {
-        try {
-          i = await this.startWatch(
-            t,
-            () => {
-              this.checkForGitDebounced(t);
-            },
-            t,
-            n,
-          );
-        } catch (e) {
-          let n = !1;
-          try {
-            n = !(await this.options.host.stat(t, { bypassCache: !0 })).isDirectory();
-          } catch (e) {
-            n = sB(e);
-          }
-          return n
-            ? (this.logger.warning(`Failed to watch git path; keeping workspace root watch`, {
-                safe: {},
-                sensitive: { cwd: this.options.cwd, error: e },
-              }),
-              this.sessions.has(r))
-            : (this.disposeSessions(), this.logWatchFailure(e), !1);
-        }
-        if (i == null || !this.sessions.has(r) || !this.sessions.has(i))
-          return (this.disposeSessions(), !1);
-      }
-      return (
-        e && (await this.checkForGitDirectory(t)),
-        !this.disposed && this.sessions.has(r) && (i == null || this.sessions.has(i))
-      );
-    }
-    async startWatch(e, t, n, r) {
-      let i = await this.options.host.startFileWatch({
-        path: e,
-        recursive: !1,
-        renameEventHandling: `changed-path`,
-        watchId: `git-init-${crypto.randomUUID()}`,
-        onChange: t,
-      });
-      return this.disposed
-        ? (await i.dispose(), null)
-        : (this.sessions.add(i),
-          i.closed.then((e) => {
-            this.sessions.delete(i) &&
-              (e.reason === `watch-error` &&
-                this.logger.warning(`Git init watcher failed`, {
-                  safe: {},
-                  sensitive: { cwd: this.options.cwd, error: e.error },
-                }),
-              (e.reason === `connection-closed` || e.reason === `watch-error`) &&
-                (this.disposeSessions(), this.scheduleReconnect(n, r)));
-          }),
-          i);
-    }
-    scheduleReconnect(e, t) {
-      if (this.disposed || this.reconnectTimer != null) return;
-      let n = this.reconnectDelayMs;
-      ((this.reconnectDelayMs = Math.min(this.reconnectDelayMs * 2, vye)),
-        (this.reconnectTimer = setTimeout(() => {
-          ((this.reconnectTimer = null),
-            this.startSessions({
-              checkExistingGitDirectory: !0,
-              gitDirectoryPath: e,
-              pathSeparator: t,
-            }).then((n) => {
-              n ? (this.reconnectDelayMs = y6) : this.scheduleReconnect(e, t);
-            }));
-        }, n)));
-    }
-    disposeSessions() {
-      let e = [...this.sessions];
-      this.sessions.clear();
-      for (let t of e) t.dispose();
-    }
-    logWatchFailure(e) {
-      this.logger.warning(`Failed to watch workspace root for git init`, {
-        safe: {},
-        sensitive: { cwd: this.options.cwd, error: e },
-      });
-    }
-    async checkForGitDirectory(e) {
-      if (!this.disposed) {
-        try {
-          await this.options.host.stat(e, { bypassCache: !0 });
-        } catch {
-          return;
-        }
-        this.disposed || (this.dispose(), this.options.onGitInit());
-      }
-    }
-  },
-  bye = 100,
+var bye = 100,
   xye = 1e3,
   Sye = 3,
   wye = class {
@@ -76695,19 +76547,31 @@ var I6 = kW(`git`),
     async startGitInitWatcher(e, t, n) {
       let r = this.getGitInitWatchKey(e, t);
       this.disposeActiveGitInitWatcher();
-      let i = new yye({
-        cwd: e,
-        host: t,
-        onGitInit: () => {
-          this.handleGitInit(e, t, i).catch((t) => {
-            I6().warning(`Failed to refresh git metadata after git init`, {
-              safe: {},
-              sensitive: { cwd: e, error: t },
+      let i = new GitInitWatcher(
+        {
+          cwd: e,
+          host: t,
+          onGitInit: () => {
+            this.handleGitInit(e, t, i).catch((t) => {
+              I6().warning(`Failed to refresh git metadata after git init`, {
+                safe: {},
+                sensitive: { cwd: e, error: t },
+              });
             });
-          });
+          },
+          watchMode: n,
         },
-        watchMode: n,
-      });
+        {
+          createLogger: OW,
+          debounce: _R,
+          isMissingPathError: sB,
+          randomUUID: () => crypto.randomUUID(),
+          setTimeout,
+          clearTimeout,
+          initialReconnectDelayMs: 250,
+          maxReconnectDelayMs: 5e3,
+        },
+      );
       if (((this.gitInitWatch = { key: r, watcher: i }), await i.start())) return `started`;
       let a = this.gitInitWatch?.watcher === i ? `failed` : `superseded`;
       return (a === `failed` && (this.gitInitWatch = null), i.dispose(), a);

@@ -115,6 +115,10 @@ change type 的刷新矩阵已迁移至 `src/main/worker/git-live-query-policy.t
 link 上限常量已删除。其纯策略由 101 项矩阵与 trace 断言覆盖，manager 的 timer/abort/shared-run
 生命周期仍保留在入口。
 
+Git init watcher 的 workspace/metadata 双 watch、git path detection、session close、dispose race、
+missing metadata 降级与 250ms-5s reconnect backoff 已迁移至
+`src/main/worker/git-init-watcher.ts`；原 `yye` 类及退避常量已删除，由 35 项生命周期断言覆盖。
+
 `invalidate-stable-metadata` 与 `invalidate-git-read-caches` 已迁移至
 `src/main/worker/git-cache-request-handlers.ts`。helper 严格保持 repository lookup、可选
 untracked cache invalidation、short-lived cache clear、可选 live-query refresh 的顺序；最后一步
