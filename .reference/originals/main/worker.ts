@@ -37,6 +37,7 @@ const { resolveBlameFile, resolveCatFile, resolveCommitMessageDiff, resolveConfi
 const { getGitBlobDiff, getUntrackedWorkingTreeDiff, readWorkingTreeSymlink } = require("./worker/git-review-file-diff");
 const { getCurrentHeadSnapshot, hasGitMergeConflicts, prepareReviewComparison: prepareGitReviewComparison, readCurrentHeadSnapshot, resolveReviewComparisonArgs: resolveGitReviewComparisonArgs, resolveReviewComparisonForRepository: resolveGitReviewComparisonForRepository } = require("./worker/git-review-comparison");
 const { createReviewDiffFallback, getReviewDiff } = require("./worker/git-review-diffs");
+const { attachReviewFileRevisions, createUnmergedReviewFiles, deduplicateReviewFiles, getOmittedUntrackedFiles, gitStatusToReviewChangeKind, mergeReviewMetadata, parseReviewMetadataDiff, reconcileRenameStats, reconcileUntrackedRenames, reviewFileKey, selectUntrackedReviewPaths } = require("./worker/git-review-metadata-utils");
 const { getReviewWorkingTreeMetadata } = require("./worker/git-review-working-tree-metadata");
 const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveReviewSearch, resolveReviewSourceLineCounts, resolveReviewSummary, resolveStatusSummary } = require("./worker/git-review-request-handlers");
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
@@ -70509,7 +70510,7 @@ async function o3(e, t, n, r, i = !1, a = !0, o) {
     source: `branch`,
   }, gitReviewComparisonDeps);
   if (l.type !== `success`) return null;
-  let u = _3(l.untrackedPaths.paths.length, o),
+  let u = getOmittedUntrackedFiles(l.untrackedPaths.paths.length, o),
     [d, f] = await Promise.all([Y2(s, !1, c), y3(c, u == null ? l.untrackedPaths.paths : [])]);
   if (d.type !== `success` || f == null) return null;
   let p = await p3({
@@ -70521,7 +70522,7 @@ async function o3(e, t, n, r, i = !1, a = !0, o) {
   if (p == null) return null;
   let m = await f3({ diffArgs: l.diffArgs, hideWhitespace: i, paths: p.paths, reviewSnapshot: c });
   if (m == null) return null;
-  let h = u3(v3(m, f), l.untrackedPathSet),
+  let h = reconcileUntrackedRenames(mergeReviewMetadata(m, f), l.untrackedPathSet),
     { stats: g } = h;
   if (
     ((g = await h_e({
@@ -70549,7 +70550,7 @@ async function h_e({ diffArgs: e, hideWhitespace: t, renames: n, metadata: r, re
     changedPaths: new Set(r.stats.filter((e) => e.previousPath == null).map((e) => e.path)),
     diffArgs: e,
     existingRenameKeys: new Set(
-      r.stats.filter((e) => e.previousPath != null).map((e) => b3(e.path, e.previousPath)),
+      r.stats.filter((e) => e.previousPath != null).map((e) => reviewFileKey(e.path, e.previousPath)),
     ),
     hideWhitespace: t,
     renames: n,
@@ -70557,24 +70558,7 @@ async function h_e({ diffArgs: e, hideWhitespace: t, renames: n, metadata: r, re
   });
   return a.length === 0
     ? r.stats
-    : s3(r.stats, a, new Set(r.rawEntries.filter((e) => e.status === `D`).map((e) => e.path)));
-}
-function s3(e, t, n) {
-  let r = new Map(t.map((e) => [e.path, e])),
-    i = new Set(t.map((e) => e.previousPath));
-  return e
-    .filter((e) => e.previousPath != null || !i.has(e.path) || !n.has(e.path))
-    .map((e) => {
-      let t = e.previousPath == null ? r.get(e.path) : null;
-      return t == null
-        ? e
-        : {
-            additions: t.additions,
-            deletions: t.deletions,
-            path: t.path,
-            previousPath: t.previousPath,
-          };
-    });
+    : reconcileRenameStats(r.stats, a, new Set(r.rawEntries.filter((e) => e.status === `D`).map((e) => e.path)));
 }
 async function c3({
   baseBranch: e,
@@ -70600,7 +70584,7 @@ async function c3({
       : null;
   if (l?.success === !1) return { type: `error`, source: o, failureReason: `untracked_paths` };
   let u = l?.paths.length,
-    d = _3(u, i),
+    d = getOmittedUntrackedFiles(u, i),
     [f, p] = await Promise.all([
       OH(
         {
@@ -70767,7 +70751,7 @@ async function l3({
   if (u.type !== `success`) return u;
   if (c && d?.type !== `success`)
     return { type: `error`, failureReason: d?.failureReason ?? `review_files` };
-  let f = S_e(i, u.untrackedPathSet),
+  let f = selectUntrackedReviewPaths(i, u.untrackedPathSet),
     [p, m] = await Promise.all([
       p3({
         diffArgs: u.diffArgs,
@@ -70782,8 +70766,8 @@ async function l3({
   if (m == null) return { type: `error`, failureReason: `review_untracked_metadata` };
   let h = await f3({ diffArgs: u.diffArgs, hideWhitespace: n, paths: p.paths, reviewSnapshot: a });
   if (h == null) return { type: `error`, failureReason: `review_diff_metadata` };
-  let g = v3(h, m);
-  (c && (g = u3(g, u.untrackedPathSet)),
+  let g = mergeReviewMetadata(h, m);
+  (c && (g = reconcileUntrackedRenames(g, u.untrackedPathSet)),
     l &&
       d?.type === `success` &&
       (g = await y_e({
@@ -70793,7 +70777,7 @@ async function l3({
         renames: d.stagedRenames,
         reviewSnapshot: a,
       })));
-  let _ = u.unmergedPaths.type === `scanned` ? g3(u.unmergedPaths.pathSet) : [];
+  let _ = u.unmergedPaths.type === `scanned` ? createUnmergedReviewFiles(u.unmergedPaths.pathSet) : [];
   _.length > 0 && (g = { ...g, files: [...g.files, ..._] });
   let v = await a.read(async () =>
     x_e({
@@ -70814,7 +70798,7 @@ async function y_e({ diffArgs: e, hideWhitespace: t, metadata: n, renames: r, re
     changedPaths: new Set(n.files.filter((e) => e.previousPath == null).map((e) => e.path)),
     diffArgs: e,
     existingRenameKeys: new Set(
-      n.files.filter((e) => e.previousPath != null).map((e) => b3(e.path, e.previousPath)),
+      n.files.filter((e) => e.previousPath != null).map((e) => reviewFileKey(e.path, e.previousPath)),
     ),
     hideWhitespace: t,
     renames: r,
@@ -70846,45 +70830,7 @@ async function y_e({ diffArgs: e, hideWhitespace: t, metadata: n, renames: r, re
               status: `R`,
             };
       }),
-    stats: s3(n.stats, a, new Set(n.rawEntries.filter((e) => e.status === `D`).map((e) => e.path))),
-  };
-}
-function u3(e, t) {
-  let n = e.rawEntries.filter((e) => e.status === `D` && e.previousPath == null),
-    r = e.rawEntries.flatMap((e) => {
-      if (e.status !== `A` || e.previousPath != null || !t.has(e.path)) return [];
-      let r = n.filter((t) => e.newOid.startsWith(t.oldOid)),
-        i = r.length === 1 ? r[0] : null;
-      return i == null ? [] : [{ path: e.path, previousPath: i.path, deleted: i }];
-    });
-  if (r.length === 0) return e;
-  let i = new Map(r.map((e) => [e.path, e])),
-    a = new Set(r.map((e) => e.previousPath));
-  return {
-    files: e.files
-      .filter((e) => e.previousPath != null || !a.has(e.path) || e.changeKind !== `deleted`)
-      .map((e) => {
-        let t = e.previousPath == null ? i.get(e.path) : null;
-        return t == null ? e : { ...e, changeKind: `renamed`, previousPath: t.previousPath };
-      }),
-    rawEntries: e.rawEntries
-      .filter((e) => e.previousPath != null || !a.has(e.path) || e.status !== `D`)
-      .map((e) => {
-        let t = e.previousPath == null ? i.get(e.path) : null;
-        return t == null
-          ? e
-          : {
-              ...e,
-              oldMode: t.deleted.oldMode,
-              oldOid: t.deleted.oldOid,
-              previousPath: t.previousPath,
-              status: `R`,
-            };
-      }),
-    stats: [
-      ...e.stats.filter((e) => e.previousPath != null || (!a.has(e.path) && !i.has(e.path))),
-      ...r.map((e) => ({ additions: 0, deletions: 0, path: e.path, previousPath: e.previousPath })),
-    ],
+    stats: reconcileRenameStats(n.stats, a, new Set(n.rawEntries.filter((e) => e.status === `D`).map((e) => e.path))),
   };
 }
 async function d3({
@@ -70901,7 +70847,7 @@ async function d3({
     : (
         await Promise.all(
           i.map(async (t) => {
-            if (n.has(b3(t.path, t.previousPath)) || !e.has(t.previousPath) || !e.has(t.path))
+            if (n.has(reviewFileKey(t.path, t.previousPath)) || !e.has(t.previousPath) || !e.has(t.path))
               return null;
             let i = await getGitBlobDiff(
               a,
@@ -70937,11 +70883,11 @@ async function b_e({ includeUntrackedFiles: e, reviewSnapshot: t, untrackedFileC
     f3({ diffArgs: i.diffArgs, hideWhitespace: !0, paths: o.paths, reviewSnapshot: t }),
   ]);
   if (s == null || c == null || i.unmergedPaths.type !== `scanned`) return null;
-  let l = g3(i.unmergedPaths.pathSet),
-    u = h3([...c.files, ...l]),
+  let l = createUnmergedReviewFiles(i.unmergedPaths.pathSet),
+    u = deduplicateReviewFiles([...c.files, ...l]),
     d = e ? (n ?? i.untrackedPaths.paths.length) : 0;
   return t.read(async () => ({
-    stagedFileCount: h3([...s.files, ...l]).length,
+    stagedFileCount: deduplicateReviewFiles([...s.files, ...l]).length,
     unstagedFileCount: u.length,
     untrackedFileCount: d,
   }));
@@ -70961,15 +70907,15 @@ async function f3({ diffArgs: e, hideWhitespace: t, paths: n, reviewSnapshot: r 
       ...i,
     ]);
   if (!o.success) return null;
-  let s = C_e(o.stdout),
-    c = t ? new Set(s.stats.map((e) => b3(e.path, e.previousPath))) : null,
+  let s = parseReviewMetadataDiff(o.stdout),
+    c = t ? new Set(s.stats.map((e) => reviewFileKey(e.path, e.previousPath))) : null,
     l = s.rawEntries.filter(
-      (e) => c == null || e.status === `A` || e.status === `U` || c.has(b3(e.path, e.previousPath)),
+      (e) => c == null || e.status === `A` || e.status === `U` || c.has(reviewFileKey(e.path, e.previousPath)),
     );
   return {
     files: l.map(({ path: e, previousPath: t, status: n }) => ({
       additions: null,
-      changeKind: E_e(n),
+      changeKind: gitStatusToReviewChangeKind(n),
       deletions: null,
       path: e,
       previousPath: t,
@@ -71016,7 +70962,7 @@ async function x_e({
   source: i,
   untrackedPathSet: a,
 }) {
-  let o = h3(
+  let o = deduplicateReviewFiles(
       n.files.map((e) =>
         e.previousPath == null && a.has(e.path) ? { ...e, changeKind: `untracked` } : e,
       ),
@@ -71030,7 +70976,7 @@ async function x_e({
   return s == null
     ? null
     : (
-        await w_e({
+        await attachReviewFileRevisions({
           host: e,
           files: o,
           gitRoot: t,
@@ -71039,36 +70985,6 @@ async function x_e({
           stats: n.stats,
         })
       ).sort((e, t) => e.path.localeCompare(t.path));
-}
-function h3(e) {
-  let t = new Map();
-  for (let n of e) {
-    let e = b3(n.path, n.previousPath);
-    t.get(e)?.changeKind !== `unmerged` && t.set(e, n);
-  }
-  return [...t.values()];
-}
-function g3(e) {
-  return [...e].map((e) => ({
-    additions: null,
-    changeKind: `unmerged`,
-    deletions: null,
-    path: e,
-    previousPath: null,
-  }));
-}
-function S_e(e, t) {
-  return e == null || e.length === 0 ? [...t] : e.filter((e) => t.has(e));
-}
-function _3(e, t) {
-  if (!(e == null || t == null || e <= t)) return { count: e, limit: t };
-}
-function v3(e, t) {
-  return {
-    files: [...e.files, ...t.files],
-    rawEntries: [...e.rawEntries, ...t.rawEntries],
-    stats: [...e.stats, ...t.stats],
-  };
 }
 async function y3(e, t) {
   if (t.length === 0) return { files: [], rawEntries: [], stats: [] };
@@ -71104,105 +71020,6 @@ async function y3(e, t) {
           previousPath: null,
         })),
       };
-}
-function C_e(e) {
-  let t = e.split(`\0`).filter((e) => e.length > 0),
-    n = [],
-    r = [];
-  for (let e = 0; e < t.length; e += 1) {
-    let i = t[e];
-    if (i == null) break;
-    let a = /^:(\d{6}) (\d{6}) ([0-9a-f]+) ([0-9a-f]+) ([A-Z])(?:\d+)?$/.exec(i);
-    if (a != null) {
-      let [, r, i, o, s, c] = a;
-      if (r == null || i == null || o == null || s == null || c == null) continue;
-      let l = c === `R` || c === `C`,
-        u = l ? t[e + 1] : null,
-        d = t[e + (l ? 2 : 1)];
-      if (d == null || (l && u == null)) break;
-      (n.push({
-        newMode: i,
-        newOid: s,
-        oldMode: r,
-        oldOid: o,
-        path: d,
-        previousPath: u,
-        status: c,
-      }),
-        (e += l ? 2 : 1));
-      continue;
-    }
-    let o = /^(-|\d+)\t(-|\d+)\t(.*)$/s.exec(i);
-    if (o == null) continue;
-    let [, s, c, l] = o;
-    if (s == null || c == null || l == null) continue;
-    let u = l.length === 0,
-      d = u ? t[e + 1] : null,
-      f = u ? t[e + 2] : l;
-    if (f == null || (u && d == null)) break;
-    (r.push({ additions: x3(s), deletions: x3(c), path: f, previousPath: d }), (e += u ? 2 : 0));
-  }
-  return { rawEntries: n, stats: r };
-}
-async function w_e({ host: e, files: t, gitRoot: n, rawEntries: r, source: i, stats: a }) {
-  let o = new Map(a.map((e) => [b3(e.path, e.previousPath), e])),
-    s = new Map(r.map((e) => [b3(e.path, e.previousPath), e]));
-  return Promise.all(
-    t.map(async (t) => {
-      let r = b3(t.path, t.previousPath),
-        a = o.get(r) ?? null,
-        c = s.get(r) ?? null,
-        l =
-          c == null
-            ? await T_e({
-                fallback: `${i}:${t.changeKind}:${t.previousPath ?? ``}:${t.path}`,
-                host: e,
-                filePath: t.path,
-                gitRoot: n,
-              })
-            : t.changeKind === `untracked`
-              ? `untracked:${c.newMode}:${c.newOid}`
-              : `${i}:${c.status}:${c.oldMode}:${c.oldOid}:${c.newMode}:${c.newOid}`;
-      return {
-        ...t,
-        additions: a?.additions ?? null,
-        deletions: a?.deletions ?? null,
-        revision: l,
-      };
-    }),
-  );
-}
-function b3(e, t) {
-  return `${t ?? ``}\0${e}`;
-}
-function x3(e) {
-  if (e === `-`) return null;
-  let t = Number.parseInt(e, 10);
-  return Number.isNaN(t) ? null : t;
-}
-async function T_e({ fallback: e, host: t, gitRoot: n, filePath: r }) {
-  try {
-    let i = await t.platformPath(),
-      a = await t.stat(i.join(n, r), { bypassCache: !0 });
-    return `${e}:${a.size}:${Math.floor(a.mtimeMs)}`;
-  } catch {
-    return e;
-  }
-}
-function E_e(e) {
-  return e === `A`
-    ? `added`
-    : e === `D`
-      ? `deleted`
-      : e === `R`
-        ? `renamed`
-        : e === `C`
-          ? `copied`
-          : e === `T`
-            ? `type-changed`
-            : e === `U`
-              ? `unmerged`
-              : `modified`;
 }
 async function D_e({ action: e, host: t, cwd: n, files: r, gitManager: i, signal: a, source: o }) {
   let s = await i.getWorktreeRepository(xz(n), t);

@@ -106,6 +106,11 @@ Review working-tree metadata 的 per-file generation cache、批量 stat/hash、
 常量及 capability `WeakSet` 已删除。55 项断言覆盖 batch lifecycle、SHA 校验、NUL parser、
 旧 Git 降级、临时目录 cleanup、generation cache 和三类文件 metadata。
 
+Review metadata 的 raw/numstat NUL parser、change-kind/revision、unmerged 去重、rename 合并、
+untracked 限额与 metadata 组合已迁移至 `src/main/worker/git-review-metadata-utils.ts`；原
+`s3`/`u3`/`h3`/`g3`/`S_e`/`_3`/`v3`/`C_e`/`w_e`/`b3`/`x3`/`T_e`/`E_e`
+已删除。37 项断言覆盖 parser、binary stats、rename/untracked 重组、revision fallback 与状态矩阵。
+
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 的请求编排已迁移至
 `src/main/worker/git-synced-branch-request-handlers.ts`。模块保留 repository unavailable
 默认值、底层错误透传和 overwrite dependency 覆盖顺序，并把非 `command-error` 结果对应的
