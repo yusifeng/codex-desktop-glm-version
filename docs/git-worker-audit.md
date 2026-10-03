@@ -96,6 +96,9 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
 ## 保留登记建议
 
 当前 `scripts/chunk-manifest.mjs` 的整文件 `git-worker` PRESERVED 理由不足。
+本轮新增 `isCancelableGitRequest`，迁移请求取消策略表；`rbe` 入口保留生成实现作为
+对照，行为由 worker query utility 接管并由 21 项断言覆盖。Git manager/watch/session
+主路由仍待继续拆分。
 完成 T1 后应改成分段登记：
 
 - `vendor`: 1-34,560、34,561-38,229、46,601-47,121、47,585-48,151、

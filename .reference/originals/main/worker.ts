@@ -10,7 +10,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
-const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
+const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, utf8ByteLength } = require("./worker/git-query-utils");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77437,6 +77437,8 @@ function F6(e) {
   );
 }
 function rbe(e) {
+  return isCancelableGitRequest(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e) {
     case `availability`:
     case `managed-worktree-state`:
