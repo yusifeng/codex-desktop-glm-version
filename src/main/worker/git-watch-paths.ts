@@ -99,5 +99,20 @@ function createGitOperationState(flags: { cherryPickInProgress: boolean | null; 
   };
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
+function createGitWatchTarget(input: { watchPath: string; recursive: boolean; handler: { changeType: string; shouldHandleChangedPath: (path: string, cache: Map<string, boolean>) => boolean }; metadataDirectory: { parentPath: string; missing: boolean } | null; retryDelayMs: number }): Record<string, unknown> {
+  return {
+    generation: 0,
+    handlers: [input.handler],
+    metadataDirectory: input.metadataDirectory,
+    recursive: input.recursive,
+    retryDelayMs: input.retryDelayMs,
+    retryTimer: null,
+    session: null,
+    sessionDisposePromise: null,
+    sessionStartPromise: null,
+    watchPath: input.watchPath,
+  };
+}
+
+export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };

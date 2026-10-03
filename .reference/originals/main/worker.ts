@@ -11,7 +11,7 @@ const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require(
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const tG = decodeCommandOutput;
@@ -77058,18 +77058,7 @@ var Jye = 1e3,
     addWatchHandler(e, t, n, r) {
       let i = this.watchTargets.find((n) => n.recursive === t && n.watchPath === e);
       if (i != null) return (i.handlers.push(n), i);
-      let a = {
-        generation: 0,
-        handlers: [n],
-        metadataDirectory: r,
-        recursive: t,
-        retryDelayMs: j6,
-        retryTimer: null,
-        session: null,
-        sessionDisposePromise: null,
-        sessionStartPromise: null,
-        watchPath: e,
-      };
+      let a = createGitWatchTarget({ watchPath: e, recursive: t, handler: n, metadataDirectory: r, retryDelayMs: j6 });
       return (this.watchTargets.push(a), a);
     }
     async tryStartWatchSession(e, t) {

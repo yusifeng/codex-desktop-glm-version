@@ -6,6 +6,7 @@ const {
   combineOptionalBooleans,
   createGitRepoChangedEvent,
   createGitOperationState,
+  createGitWatchTarget,
   addPendingWorkingTreePath,
   getAffectedWorkingTreePath,
   isGitInternalPath,
@@ -69,5 +70,11 @@ assert.equal(nextGitWatcherRetryDelay(1000, 60000), 2000);
 assert.equal(nextGitWatcherRetryDelay(50000, 60000), 60000);
 assert.deepEqual(createGitOperationState({ cherryPickInProgress: false, mergeInProgress: null, rebaseHead: false, rebaseMerge: false, rebaseApply: false, revertInProgress: true }), { cherryPickInProgress: false, mergeInProgress: null, rebaseInProgress: false, revertInProgress: true });
 assert.equal(createGitOperationState({ cherryPickInProgress: null, mergeInProgress: null, rebaseHead: false, rebaseMerge: null, rebaseApply: false, revertInProgress: null }).rebaseInProgress, null);
+const handler = { changeType: "head", shouldHandleChangedPath: () => true };
+const target = createGitWatchTarget({ watchPath: "/repo/.git/HEAD", recursive: false, handler, metadataDirectory: null, retryDelayMs: 1000 });
+assert.equal(target.generation, 0);
+assert.deepEqual(target.handlers, [handler]);
+assert.equal(target.retryDelayMs, 1000);
+assert.equal(target.session, null);
 
-console.log("33 worker git watch path assertions passed");
+console.log("37 worker git watch path assertions passed");
