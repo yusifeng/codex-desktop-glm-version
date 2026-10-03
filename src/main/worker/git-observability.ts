@@ -46,5 +46,36 @@ function recordUntrackedCacheOutcome(attribution: { closed?: boolean; untrackedC
   else if (outcome === `miss`) attribution.untrackedCacheMissCount += 1;
 }
 
-export { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
-if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+/** Classifies a subprocess executable for process telemetry. */
+function classifyProcessExecutable(command: string | null | undefined): string {
+  if (command == null) return `other`;
+  const posixBasename = command.split(`/`).at(-1)?.toLowerCase() ?? ``;
+  const windowsBasename = command.split(`\\`).at(-1)?.toLowerCase() ?? ``;
+  const basename = posixBasename.length <= windowsBasename.length ? posixBasename : windowsBasename;
+  const name = basename.replace(/\.(?:bat|cmd|com|exe)$/u, ``);
+  if (/^python(?:3(?:\.\d+)*)?$/u.test(name)) return `python`;
+  switch (name) {
+    case `bash`:
+    case `cmd`:
+    case `powershell`:
+    case `pwsh`:
+    case `sh`:
+    case `zsh`:
+      return `shell`;
+    case `codex`:
+    case `gh`:
+    case `git`:
+    case `node`:
+    case `rg`:
+    case `ssh`:
+    case `tar`:
+    case `tectonic`:
+    case `wsl`:
+      return name;
+    default:
+      return `other`;
+  }
+}
+
+export { buildGitHostCacheKey, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };
+if (typeof module !== `undefined`) module.exports = { buildGitHostCacheKey, classifyProcessExecutable, createGitCommandStats, exitCodeBucket, isGitMutationRequest, recordUntrackedCacheOutcome };

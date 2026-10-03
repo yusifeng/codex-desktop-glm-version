@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const {
   buildGitHostCacheKey,
+  classifyProcessExecutable,
   createGitCommandStats,
   exitCodeBucket,
   isGitMutationRequest,
@@ -27,5 +28,15 @@ recordUntrackedCacheOutcome(attribution, "coalesced");
 recordUntrackedCacheOutcome(attribution, "hit");
 recordUntrackedCacheOutcome(attribution, "miss");
 assert.deepEqual(attribution, { closed: false, untrackedCacheCoalescedCount: 1, untrackedCacheHitCount: 1, untrackedCacheMissCount: 1 });
+assert.equal(classifyProcessExecutable(null), "other");
+assert.equal(classifyProcessExecutable("python3.11"), "python");
+assert.equal(classifyProcessExecutable("/bin/bash"), "shell");
+assert.equal(classifyProcessExecutable("C:\\Windows\\System32\\cmd.exe"), "shell");
+assert.equal(classifyProcessExecutable("git.exe"), "git");
+assert.equal(classifyProcessExecutable("gh"), "gh");
+assert.equal(classifyProcessExecutable("ssh"), "ssh");
+assert.equal(classifyProcessExecutable("node"), "node");
+assert.equal(classifyProcessExecutable("unknown-tool"), "other");
+assert.equal(classifyProcessExecutable("/usr/bin/wsl.exe"), "wsl");
 
-console.log("10 worker git observability assertions passed");
+console.log("20 worker git observability assertions passed");
