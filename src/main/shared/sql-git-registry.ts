@@ -87,12 +87,23 @@ export function pathApiForPlatform(platform: string) {
   return platform === "windows" ? win32 : posix;
 }
 
-/** 原 RI：Windows 主机展示非 Windows execution-host 路径时转换 /mnt/<drive>。 */
+/** 原 RI：Windows 主机向非 Windows execution host 传路径时转换为 POSIX/WSL 形式。 */
 export function localPathForHost(value: { platformFamily: string; localPath: string }): string {
   if (process.platform !== "win32" || value.platformFamily === "windows") return value.localPath;
-  return value.localPath
-    .replace(/^\/mnt\/([a-z])(?:\/|$)/i, (_match, drive: string) => `${drive.toUpperCase()}:\\`)
-    .replaceAll("/", "\\");
+  const extendedUnc = value.localPath.match(/^(?:\\\\|\/\/)\?[\\/](wsl\$|wsl\.localhost)[\\/](.*)$/i);
+  const path = extendedUnc ? `\\\\${extendedUnc[1]}\\${extendedUnc[2]}` : value.localPath;
+  const extendedDrive = path.match(/^(?:\\\\|\/\/)\?[\\/]([a-z]):[\\/](.*)$/i);
+  if (extendedDrive) return `/mnt/${extendedDrive[1].toLowerCase()}/${extendedDrive[2].replaceAll("\\", "/")}`;
+  if (/^(?:\\\\|\/\/)(?:wsl\$|wsl\.localhost)/i.test(path)) {
+    const parts = path.replace(/^((?:\\\\|\/\/)(?:wsl\$|wsl\.localhost)[\\/]+)/i, "").split(/[\\/]/);
+    parts.shift();
+    const result = parts.join("/").replaceAll("\\", "/");
+    return result.length === 0 ? "/" : result.startsWith("/") ? result : `/${result}`;
+  }
+  if (path.startsWith("\\\\") || path.startsWith("//")) return path.replaceAll("/", "\\");
+  if (path.startsWith("/")) return path;
+  const drive = path.match(/^([a-z]):[\\/](.*)$/i);
+  return drive ? `/mnt/${drive[1].toLowerCase()}/${drive[2].replaceAll("\\", "/")}` : path.replaceAll("\\", "/");
 }
 
 export {
