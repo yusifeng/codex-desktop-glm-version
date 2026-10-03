@@ -138,7 +138,7 @@ declare module "@chunk/shared" {
   export { isRemoteHostConfig as Es } from "../../shared/host-config";
   export { WEBVIEW_FOCUS_TAB_COMMANDS as Et } from "../../shared/command-registry";
   export const Eu: any; // 内部符号: Jy
-  export const F: any; // 内部符号: T7
+  export { readPlistValue as F } from "../../shared/fs-diagnostics";
   export const Fa: any; // 内部符号: qA
   export { buildChromiumExtensionManagementUrl as Fc } from "../../shared/browser-tab-mentions";
   export { permissionSetAllowed as Fd } from "../../shared/sandbox-permissions";
@@ -448,7 +448,7 @@ declare module "@chunk/shared" {
   export const cc: any; // 内部符号: hw
   export const cd: any; // 内部符号: sv
   export { cf } from "../../shared/zod-facade";
-  export const ci: any; // 内部符号: qF
+  export { openSqlite as ci } from "../../shared/sql-git-registry";
   export const cl: any; // 内部符号: Tx
   export const cn: any; // 内部符号: i1
   export const co: any; // 内部符号: nk
@@ -597,7 +597,7 @@ declare module "@chunk/shared" {
   export const nl: any; // 内部符号: _x
   export const nn: any; // 内部符号: x1
   export const no: any; // 内部符号: Yk
-  export const nr: any; // 内部符号: bK
+  export { parseMarkdownPathLinks as nr } from "../../shared/misc-runtime";
   export const ns: any; // 内部符号: BE
   export { TextGenerator as nt } from "../../shared/structured-generation";
   export { isNodeReplSandboxPlatform as nu } from "../../shared/app-config";
@@ -700,7 +700,7 @@ declare module "@chunk/shared" {
   export const vc: any; // 内部符号: GC
   export { findModel as vd } from "../../shared/automation-settings";
   export { vf } from "../../shared/zod-facade";
-  export const vi: any; // 内部符号: HN
+  export { chatGptAccountOfToken as vi } from "../../shared/sql-git-registry";
   export { isPosixAbsolutePath as vl } from "../../shared/app-constants";
   export const vn: any; // 内部符号: ZY
   export const vo: any; // 内部符号: Rk
