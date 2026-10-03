@@ -6434,7 +6434,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
-var { createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
+var { createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("./browser-page-preload/annotation-runtime");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
@@ -6923,37 +6923,7 @@ function ef(e, t, n, r, i) {
               _ = typeof g == `string` && g.length <= t ? g : void 0,
               v = S(`mode`) === `advanced` ? `advanced` : `default`,
               y = S(`enterAnnotationMode`) === !0,
-              b = (() => {
-                try {
-                  let t = S(`metadata`);
-                  if (typeof t != `object` || !t) return;
-                  let n = Object.getPrototypeOf(t);
-                  if (n !== Object.prototype && n != null) return;
-                  let r = Object.getOwnPropertyDescriptors(t),
-                    i = Reflect.ownKeys(r);
-                  if (i.length > e.maxKeys) return;
-                  let a = [];
-                  for (let t of i) {
-                    if (typeof t != `string` || t.length > e.maxKeyLength) return;
-                    let n = r[t];
-                    if (!n.enumerable || !Object.hasOwn(n, `value`)) return;
-                    let i = n.value;
-                    if (
-                      i === void 0 ||
-                      (i != null &&
-                        typeof i != `string` &&
-                        typeof i != `boolean` &&
-                        (typeof i != `number` || !Number.isFinite(i))) ||
-                      (typeof i == `string` && i.length > e.maxStringValueLength)
-                    )
-                      return;
-                    a.push([t, i]);
-                  }
-                  return a.length === 0 ? void 0 : Object.fromEntries(a);
-                } catch {
-                  return;
-                }
-              })();
+              b = sanitizeAnnotationControlMetadata(S(`metadata`), e);
             (a != null || l.getRootNode() !== document) && (b = void 0);
             let x = !l.dispatchEvent(
               new CustomEvent(`codex:open-annotation`, {

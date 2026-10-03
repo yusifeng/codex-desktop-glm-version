@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationHit, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
+const { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } = require("../app/.vite/build/browser-page-preload/annotation-runtime.js");
 const limits = { maxIdLength: 128, maxRoleLength: 64, rolePattern: "^[a-z][a-z0-9-]*(?![\\s\\S])", metadataLimits: { maxKeys: 6, maxKeyLength: 32, maxStringValueLength: 128, maxSerializedBytes: 8192 } };
 
 assert.deepEqual(cloneRecord({ id: "x" }, 2).id, "x");
@@ -18,5 +18,7 @@ assert.equal(isValidAnnotationHitTestRequest({ type: "hit-test", requestId: "req
 assert.equal(isValidAnnotationHitTestRequest({ type: "hit-test", requestId: "", x: 1, y: 2 }, 128), false);
 assert.equal(serializeAnnotationControls({ controls: [{ id: "toggle" }], controlsHeading: "Actions" }, 16384), '{"controls":[{"id":"toggle"}],"controlsHeading":"Actions"}');
 assert.throws(() => serializeAnnotationControls({ controls: 1n }, 16384), /only data/);
+assert.deepEqual(sanitizeAnnotationControlMetadata({ source: "toolbar", count: 2, enabled: true }, { maxKeys: 4, maxKeyLength: 32, maxStringValueLength: 64 }), { source: "toolbar", count: 2, enabled: true });
+assert.equal(sanitizeAnnotationControlMetadata({ source: undefined }, { maxKeys: 4, maxKeyLength: 32, maxStringValueLength: 64 }), undefined);
 
-console.log("12 preload annotation runtime assertions passed");
+console.log("14 preload annotation runtime assertions passed");
