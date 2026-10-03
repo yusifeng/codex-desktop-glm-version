@@ -15,6 +15,7 @@ const {
   isWatchedRefPath,
   isWorktreeTopologyPath,
   nextGitWatcherRetryDelay,
+  shouldScheduleGitRepoChange,
   requiresGitWatcherRecovery,
 } = require("../app/.vite/build/worker/git-watch-paths.js");
 
@@ -68,6 +69,10 @@ assert.deepEqual(createGitRepoChangedEvent({ changeType: "working-tree", commonD
 assert.deepEqual(createGitRepoChangedEvent({ changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" }), { type: "git-repo-changed", changeType: "head", commonDir: "/repo/.git", hostId: "local", rebaseInProgress: null, root: "/repo" });
 assert.equal(nextGitWatcherRetryDelay(1000, 60000), 2000);
 assert.equal(nextGitWatcherRetryDelay(50000, 60000), 60000);
+assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(), new Map()), true);
+assert.equal(shouldScheduleGitRepoChange(true, "head", new Set(), new Map()), false);
+assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(["head"]), new Map()), false);
+assert.equal(shouldScheduleGitRepoChange(false, "head", new Set(), new Map([["head", 1]])), false);
 assert.deepEqual(createGitOperationState({ cherryPickInProgress: false, mergeInProgress: null, rebaseHead: false, rebaseMerge: false, rebaseApply: false, revertInProgress: true }), { cherryPickInProgress: false, mergeInProgress: null, rebaseInProgress: false, revertInProgress: true });
 assert.equal(createGitOperationState({ cherryPickInProgress: null, mergeInProgress: null, rebaseHead: false, rebaseMerge: null, rebaseApply: false, revertInProgress: null }).rebaseInProgress, null);
 const handler = { changeType: "head", shouldHandleChangedPath: () => true };
@@ -77,4 +82,4 @@ assert.deepEqual(target.handlers, [handler]);
 assert.equal(target.retryDelayMs, 1000);
 assert.equal(target.session, null);
 
-console.log("37 worker git watch path assertions passed");
+console.log("41 worker git watch path assertions passed");

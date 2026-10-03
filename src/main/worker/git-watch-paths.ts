@@ -90,6 +90,10 @@ function nextGitWatcherRetryDelay(currentDelayMs: number, maxDelayMs: number): n
   return Math.min(currentDelayMs * 2, maxDelayMs);
 }
 
+function shouldScheduleGitRepoChange(disposed: boolean, changeType: string, activeChanges: Set<string>, pendingTimers: Map<string, unknown>): boolean {
+  return !disposed && !activeChanges.has(changeType) && !pendingTimers.has(changeType);
+}
+
 function createGitOperationState(flags: { cherryPickInProgress: boolean | null; mergeInProgress: boolean | null; rebaseHead: boolean | null; rebaseMerge: boolean | null; rebaseApply: boolean | null; revertInProgress: boolean | null }): Record<string, boolean | null> {
   return {
     cherryPickInProgress: flags.cherryPickInProgress,
@@ -114,5 +118,5 @@ function createGitWatchTarget(input: { watchPath: string; recursive: boolean; ha
   };
 }
 
-export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery };
+export { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, shouldScheduleGitRepoChange };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, combineOptionalBooleans, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, requiresGitWatcherRecovery, shouldScheduleGitRepoChange };
