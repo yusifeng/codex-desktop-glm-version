@@ -25,6 +25,7 @@ const { getBranchAheadCount } = require("./worker/git-branch-ahead");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
 const { getManagedWorktreeLocations, listCodexWorktrees } = require("./worker/git-managed-worktree-discovery");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
+const { getGitCloneState } = require("./worker/git-clone-state");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
@@ -208,6 +209,9 @@ const managedWorktreeDiscoveryDeps = {
   normalizeWorktreePath: bz,
   toLocalHostPath: UH,
   getGitDir: (repository) => u0(repository),
+};
+const gitCloneStateDeps = {
+  runGit: $,
 };
 const syncedBranchStateDeps = {
   readConfig: P2,
@@ -70857,36 +70861,6 @@ async function X_e(e, t, n, r, i) {
   }
   return S0(a, o, i);
 }
-var A3 = { GIT_NO_LAZY_FETCH: `1` },
-  Z_e = `^(extensions\\.partialclone|remote\\..*\\.(promisor|partialclonefilter))$`;
-async function Q_e(e, t, n) {
-  let [r, i] = await Promise.all([
-      $(e, [`rev-parse`, `--is-shallow-repository`], t, { env: A3, signal: n }),
-      $(e, [`config`, `--get-regexp`, Z_e], t, {
-        allowedNonZeroExitCodes: [1],
-        env: A3,
-        signal: n,
-      }),
-    ]),
-    a = new Map();
-  if (i.success)
-    for (let e of i.stdout.split(`
-`)) {
-      let t = e.indexOf(` `),
-        n = t === -1 ? e : e.slice(0, t),
-        r = t === -1 ? `` : e.slice(t + 1);
-      a.set(n, r);
-    }
-  return {
-    isPartialClone: Array.from(a).some(
-      ([e, t]) =>
-        e === `extensions.partialclone` ||
-        e.endsWith(`.partialclonefilter`) ||
-        (e.endsWith(`.promisor`) && [``, `1`, `on`, `true`, `yes`].includes(t.toLowerCase())),
-    ),
-    isShallow: r.success && r.stdout === `true`,
-  };
-}
 var $_e = kW(`git`);
 async function eve(e, t) {
   let n = await u0(e, t);
@@ -72755,7 +72729,7 @@ var I6 = kW(`git`),
             p = await this.handleResolveStableMetadata(e.params, { host: o });
             break;
           case `clone-state`:
-            p = X(await Q_e(e.params.root, o, i.signal));
+            p = X(await getGitCloneState(e.params.root, o, i.signal, gitCloneStateDeps));
             break;
           case `current-branch`:
             p = X(await resolveCurrentBranch(e.params.root, readRequestDeps));

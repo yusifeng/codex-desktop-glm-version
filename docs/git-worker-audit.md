@@ -85,6 +85,10 @@ Branch-ahead 的 commit-count query、ancestor 快路径、remote/upstream/defau
 merge-base 回退已迁移至 `src/main/worker/git-branch-ahead.ts`；原 `D3` 与 class 内联算法已删除，
 class 仅保留组合根代理。41 项断言覆盖 cache 参数、命令顺序、空值与全部 fallback 分支。
 
+Clone state 的 shallow repository 与 partial-clone config 并行探测、config entry 解析和
+`GIT_NO_LAZY_FETCH` 环境保护已迁移至 `src/main/worker/git-clone-state.ts`；原 `A3`/`Z_e`/`Q_e`
+已删除。29 项断言覆盖命令参数、并行启动、promisor truthy 值、filter/config 识别与失败降级。
+
 Managed worktree discovery 的 root/boundary 去重、无 symlink 目录读取、legacy/named
 目录识别、候选复检与 `.git` 文件验证已迁移至
 `src/main/worker/git-managed-worktree-discovery.ts`；原 `R$`/`jfe`/`Ofe`/`kfe`/`G_e`/`K_e`
