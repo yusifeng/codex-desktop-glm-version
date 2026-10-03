@@ -62,6 +62,9 @@ line counts，由 21 项行为断言覆盖；其余 Git request cases 和 dispat
 Branch commits/review commit line counts 的 comparison、query cache、Git log 与 record/numstat
 解析已进一步迁移至 `src/main/worker/git-review-commit-queries.ts`；原三个 helper 与两个阈值常量
 已删除，由 36 项断言覆盖。
+Branch metadata 的 repository 定位、current/default branch 并行读取、detached snapshot 回退与
+local branch ref 规范化已迁移至 `src/main/worker/git-branch-metadata.ts`；原两个压缩实现已删除，
+synced-branch state 复用同一规范化入口，由 27 项断言覆盖。
 status summary、branch diff stats、review summary/source line counts/diff/search/patch 已迁移至
 `src/main/worker/git-review-request-handlers.ts`，由 15 项行为断言覆盖正常、repository
 unavailable、stale snapshot 与 fallback 路径；repository identity、file reads 等其余
@@ -273,8 +276,8 @@ tooltip 与 region 去重非 React runtime 已迁移至
 
 | # | 位置 | 体量 | 现状 | 问题 |
 |---|---|---|---|---|
-| A1 | `.reference/originals/main/worker.ts`（git-worker） | **85,567 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
-| A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP | annotation/design runtime 等业务区段仍待迁移 |
+| A1 | `.reference/originals/main/worker.ts`（git-worker） | **85,556 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
+| A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
 | A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计与消费契约审计 | `docs/app-shared-internal-audit.md`、`docs/renderer-classification.md` 明确 semantic 边界与 preserved asset 家族；仍有未消费业务逻辑待物理迁出 |
@@ -286,7 +289,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 647 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 648 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -329,7 +332,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
 ### T4 · main chunk 未消费区域审计（A3，原可选 T6 转正）
 
 1. 对照 `docs/main-analysis-r1..r12.md` 的区域清单，对
-   `src/main/main-C-Mhak1n.ts` 做逐段覆盖审计：每段标注已被哪个语义
+   `.reference/originals/main/main-C-Mhak1n.ts` 做逐段覆盖审计：每段标注已被哪个语义
    模块覆盖 / 仍为原样 / 属 vendored。
 2. 仍为原样的**业务段**补语义化（预计很少——R1-R12 已全区落地，
    gap 应主要是 vendored 与低频路径，但必须以审计报告证实，不能沿用断言）。
@@ -364,19 +367,19 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
 2. **原版对照迁出（已完成）**：10 个主进程原始 chunk 已迁至
    `.reference/originals/main/`，构建脚本按历史输出文件名重新编译；后续修改映射时必须复跑
    build/verify 全套，且 `../chatgpt-desktop-src` 对照逻辑不得受影响。
-3. **README 重写**：反映真实状态（11+1874 REWRITTEN、双轨机制、
+3. **README 重写（已完成）**：反映真实状态（11+1874 REWRITTEN、双轨机制、
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 647 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 648 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
-### T7 · 端到端验证升级（B5）
+### T7 · 端到端验证升级（B5，已完成）
 
-1. `scripts/smoke-test.sh` 升级：pack 后启动，除"不崩"外至少验证：
+1. `scripts/smoke-test.sh` 已升级：pack 后启动，除"不崩"外至少验证：
    主窗口 HTML 加载（webContents 日志/标题断言）、renderer 无致命
    console error、一条核心 RPC 往返（如 settings read）。
-2. 产出 `docs/e2e-verification.md` 记录验证步骤与结果快照。
+2. 已产出 `docs/e2e-verification.md`，记录验证步骤与结果快照。
 
 ---
 

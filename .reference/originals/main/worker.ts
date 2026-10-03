@@ -21,6 +21,7 @@ const { moveThreadToHostWorktree: performHostWorktreeHandoff } = require("./work
 const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-move-to-local");
 const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/git-move-to-worktree");
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
+const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
 const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/git-cache-request-handlers");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
@@ -182,11 +183,18 @@ const branchSearchDeps = {
   queryMeta: () => v1,
   runGit: $,
 };
+const gitBranchMetadataDeps = {
+  getCurrentBranch: w0,
+  getDefaultRemoteBranch: k2,
+  normalizeBranch: Tz,
+  normalizeCwd: xz,
+  readBranchSnapshot: P2,
+};
 const syncedBranchStateDeps = {
   readConfig: P2,
   hasConflicts: (repository, signal) =>
     hasGitMergeConflicts(repository, signal, gitReviewComparisonDeps),
-  normalizeBranch: E3,
+  normalizeBranch: (branch) => normalizeLocalBranchRef(branch, gitBranchMetadataDeps),
   queryKey: Q,
   queryMeta: () => _1,
   runDiff: y0,
@@ -70818,25 +70826,6 @@ var j_e = e.n((e, t) => {
   }),
   M_e = e.o(j_e());
 var B_e = kW(`worktree-snapshot`);
-function E3(e) {
-  return e.startsWith(`refs/heads/`) ? Tz(e.slice(11)) : Tz(e);
-}
-async function W_e(e, t, n, r) {
-  let i = await e.getWorktreeRepository(xz(t), n);
-  if (!i) return { gitRoot: null, branch: null, baseBranch: null, baseBranchRemote: null };
-  let [a, o] = await Promise.all([w0(i), k2(i)]),
-    s = a;
-  if (!s) {
-    let e = await P2(i, r);
-    s = e ? E3(e.branch) : null;
-  }
-  return {
-    gitRoot: i.root,
-    branch: s,
-    baseBranch: o?.branch ?? null,
-    baseBranchRemote: o?.remote ?? null,
-  };
-}
 function G_e(e) {
   return u0(e);
 }
@@ -72987,7 +72976,7 @@ var I6 = kW(`git`),
             });
             break;
           case `branch-metadata`:
-            p = X(await W_e(this.gitManager, e.params.cwd, o, i.signal));
+            p = X(await getBranchMetadata(this.gitManager, e.params.cwd, o, i.signal, gitBranchMetadataDeps));
             break;
           case `status-summary`: {
             let t = await resolveStatusSummary(e.params, reviewRequestDeps);

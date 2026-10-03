@@ -76,6 +76,11 @@ record/numstat 解析已进一步迁移至 `src/main/worker/git-review-commit-qu
 `T3`/`H_e`/`U_e` 与 commit 数量/输出大小常量已删除。36 项断言覆盖缓存参数、命令矩阵、
 100 commit 上限、binary/malformed numstat、unsafe integer 和不完整 commit record。
 
+Branch metadata 的 repository 定位、current/default branch 并行读取、detached snapshot
+回退和 local branch ref 规范化已迁移至 `src/main/worker/git-branch-metadata.ts`；原
+`E3`/`W_e` 已删除，synced-branch state 复用同一规范化入口。27 项断言覆盖仓库缺失、
+current branch 优先、snapshot fallback、默认 remote 空值和并行启动语义。
+
 紧随其后的 status/review 请求分支（`status-summary`、`branch-diff-stats`、
 `review-summary`、`review-source-line-counts`、`review-diff`、`review-search`、
 `review-patch`）已迁移至 `src/main/worker/git-review-request-handlers.ts`。入口仍负责
