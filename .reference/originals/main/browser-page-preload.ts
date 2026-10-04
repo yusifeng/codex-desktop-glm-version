@@ -6099,7 +6099,23 @@ var Td = ja({
     rangeText: Ca().min(1).max(Hs),
   }).optional(),
 });
+var annotationRequestContext;
+function getAnnotationRequestContext() {
+  return (annotationRequestContext ??= createAnnotationRequestContext({
+    documentRef: document,
+    windowRef: window,
+    globalLike: globalThis,
+    isRange: (value) => value instanceof Range,
+    isHTMLElement: (value) => value instanceof HTMLElement,
+    isExcludedElement: gl,
+    getVisibleRect: cd,
+    resolveRangeAnchor: su,
+    getRangeClientRects: (value) => value.getClientRects(),
+    isRangeSelectable: Od,
+  }));
+}
 function Ed({ getState: e, requestPermission: t }) {
+  let context = getAnnotationRequestContext();
   return createAnnotationSiteRequests({
     documentRef: document,
     windowRef: window,
@@ -6107,11 +6123,11 @@ function Ed({ getState: e, requestPermission: t }) {
     getState: e,
     requestPermission: t,
     prepareRequest: (l, state) => {
-      if (!jd(state)) return null;
+      if (!context.isAllowed(state)) return null;
       let u = Md(l),
         d = l.composedPath()[0] ?? l.target;
       if (u == null || !(d instanceof HTMLElement) || gl(d)) return null;
-      let f = u.range == null ? null : kd(d, u.range);
+      let f = u.range == null ? null : context.resolveSerializedRange(d, u.range);
       if (u.range != null && f == null) return null;
       let p = { initialComment: u.initialComment, siteInitiated: !0 };
       (u.enterAnnotationMode && (p.enterAnnotationMode = !0),
@@ -6123,13 +6139,13 @@ function Ed({ getState: e, requestPermission: t }) {
         metadata: u.range == null && d.getRootNode() === document ? u.metadata : void 0,
         permissionGranted: !1,
       };
-      let resolved = Dd(m, state);
+      let resolved = context.resolveTarget(m, state);
       return resolved == null
         ? null
         : { target: m.target, resolvedTarget: resolved, request: m.request, metadata: m.metadata, validationInput: m };
     },
     resolveRequest: (candidate, state) => {
-      let resolved = Dd(candidate.validationInput, state);
+      let resolved = context.resolveTarget(candidate.validationInput, state);
       return resolved == null
         ? null
         : {
@@ -6141,50 +6157,6 @@ function Ed({ getState: e, requestPermission: t }) {
           };
     },
   });
-}
-function Dd({ target: e, request: t, rangeText: n }, r) {
-  if (!jd(r) || (t.openTweaks && !r.canUseTweaks)) return null;
-  if (e instanceof Range) {
-    let r = e.commonAncestorContainer,
-      i = r instanceof HTMLElement ? r : r.parentElement;
-    if (
-      t.openTweaks ||
-      i == null ||
-      gl(i) ||
-      e.startContainer.ownerDocument !== document ||
-      e.toString() !== n ||
-      !Od(e)
-    )
-      return null;
-    let a = su(e);
-    return a != null &&
-      Array.from(e.getClientRects()).some(
-        (e) =>
-          e.width > 0 &&
-          e.height > 0 &&
-          e.x < window.innerWidth &&
-          e.x + e.width > 0 &&
-          e.y < window.innerHeight &&
-          e.y + e.height > 0,
-      )
-      ? a.viewportPoint
-      : null;
-  }
-  if (e.ownerDocument !== document || !e.isConnected || gl(e) || sl(e) == null) return null;
-  let i = cd(e);
-  return i == null ||
-    !Number.isFinite(i.x) ||
-    !Number.isFinite(i.y) ||
-    !Number.isFinite(i.width) ||
-    !Number.isFinite(i.height) ||
-    i.width <= 0 ||
-    i.height <= 0 ||
-    i.x >= window.innerWidth ||
-    i.x + i.width <= 0 ||
-    i.y >= window.innerHeight ||
-    i.y + i.height <= 0
-    ? null
-    : { x: i.x + i.width / 2, y: i.y + i.height / 2 };
 }
 function Od(e) {
   return isAnnotationRangeSelectable(e, {
@@ -6202,30 +6174,6 @@ function B(e) {
     getComputedStyle: (value) => window.getComputedStyle(value),
     getParent: (value) => ic(value),
   });
-}
-function kd(e, t) {
-  let n = Ad(e, t.startPath),
-    r = Ad(e, t.endPath);
-  if (n == null || r == null) return null;
-  let i = document.createRange();
-  try {
-    (i.setStart(n, t.startOffset), i.setEnd(r, t.endOffset));
-  } catch {
-    return null;
-  }
-  return !i.collapsed && i.toString() === t.rangeText ? i : null;
-}
-function Ad(e, t) {
-  let n = e;
-  for (let e of t) {
-    let t = n.childNodes[e];
-    if (t == null) return null;
-    n = t;
-  }
-  return n;
-}
-function jd({ canUseSiteAnnotationApi: e, hasActiveEditor: t, isAgentControllingBrowser: n }) {
-  return globalThis.isSecureContext === !0 && e && !n && !t;
 }
 function Md(e) {
   try {
@@ -6307,6 +6255,7 @@ var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotat
 var { isAnnotationElementVisible } = require("./browser-page-preload/annotation-visibility");
 var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
 var { createAnnotationPreviewVisibilityPredicate } = require("./browser-page-preload/annotation-preview-visibility");
+var { createAnnotationRequestContext } = require("./browser-page-preload/annotation-request-context");
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
 Yo();

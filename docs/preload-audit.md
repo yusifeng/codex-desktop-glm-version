@@ -327,6 +327,14 @@ composed-parent、element 与 frame/window 适配器；模块保留跨 shadow ro
 判定、top-modal 选择及 popover 矩形遮挡语义，`scripts/test-preload-annotation-preview-visibility.mjs`
 覆盖 modal 内外目标与边界过滤，共 3 项断言。
 
+### 增量抽取：annotation request context validation
+
+open-annotation 的 secure-context/active-editor 门控、serialized Range 重建、目标元素与
+viewport 可见性校验已迁移至 `src/main/browser-page-preload/annotation-request-context.ts`。
+入口仍负责事件 payload 与页面运行时适配；模块保留 Range 文本一致性、排除元素、frame/owner
+document 和 open-tweaks 权限语义。`scripts/test-preload-annotation-request-context.mjs`
+覆盖权限矩阵、Range 重建、元素/Range 可见性与边界拒绝，共 8 项断言。
+
 ### 增量抽取：annotation design-control preview sync
 
 design-control preview 的目标索引、当前/原始视图值切换、虚拟 target key、跨 frame/page
