@@ -70,7 +70,7 @@ class PullRequestSummaryBatcher {
   }
 
   private async fetchBatch(host: any, requests: PullRequest[], shouldContinue: () => boolean): Promise<any[]> {
-    const output = requests.map(() => ({ status: `unavailable` }));
+    const output: any[] = requests.map(() => ({ status: `unavailable` }));
     let pages = requests.map((pullRequest, index) => ({ pullRequest, index, cursor: null as string | null, headRevision: null as string | null, checks: [] as any[] }));
     for (let page = 0; pages.length > 0 && page < MAX_CHECK_PAGES && shouldContinue(); page++) {
       const query = `query { viewer { login } ${pages.map(({ pullRequest, index, cursor }) => `p${index}: repository(owner:${JSON.stringify(pullRequest.owner)},name:${JSON.stringify(pullRequest.repository)}) { pullRequest(number:${pullRequest.number}) { number url title baseRefName headRefName state isDraft mergeable mergeStateStatus headRefOid headRepository { url } commits(last:1) { nodes { commit { oid statusCheckRollup { contexts(first:100,after:${JSON.stringify(cursor)}) { nodes { __typename ... on CheckRun { name status conclusion startedAt completedAt detailsUrl checkSuite { workflowRun { event workflow { name } } } } ... on StatusContext { context state createdAt description targetUrl } } pageInfo { hasNextPage endCursor } } } } } } } }`).join(` `)} }`;
