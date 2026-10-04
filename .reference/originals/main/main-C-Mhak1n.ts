@@ -33,6 +33,7 @@ const { isDeviceCheckPlatform: rr, isAppleSilicon: ir, isDeviceCheckSupported: a
 const remoteHost = require("./main-app/open-target/remote-host.js");
 const openTargetFilter = require("./main-app/open-target/target-filter-policy.js");
 const targetInputPolicy = require("./main-app/open-target/target-input-policy.js");
+const targetSelectionPolicy = require("./main-app/open-target/target-selection-policy.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -138053,15 +138054,24 @@ function d4e({
   allowPlatformFallback: o = !0,
   platform: s,
 }) {
-  if (t) return v1({ target: null, hasExplicitTarget: a, allowPlatformFallback: o, platform: s });
-  let c = e ?? n;
-  return (
-    !a && e == null && (r ? (c = `fileManager`) : i && (c = `systemDefault`)),
-    v1({ target: c, hasExplicitTarget: a, allowPlatformFallback: o, platform: s })
-  );
+  return targetSelectionPolicy.resolveRequestedTarget({
+    requestedTarget: e,
+    requestedTargetWasFiltered: t,
+    preferredTarget: n,
+    shouldUseFileManager: r,
+    shouldUsePlatformDefaultViewer: i,
+    hasExplicitTarget: a,
+    allowPlatformFallback: o,
+    platform: s,
+  });
 }
 function v1({ target: e, hasExplicitTarget: t, allowPlatformFallback: n = !0, platform: r }) {
-  return e || (!t && n && r === `win32` ? `fileManager` : null);
+  return targetSelectionPolicy.resolveTargetFallback({
+    target: e,
+    hasExplicitTarget: t,
+    allowPlatformFallback: n,
+    platform: r,
+  });
 }
 var f4e = n.wf({
   sshAlias: n.Of().nullable(),

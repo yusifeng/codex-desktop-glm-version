@@ -134,6 +134,14 @@ path API，不触碰文件系统、Electron 或目标进程；入口保留原有
 `scripts/test-main-target-input-policy.mjs` 覆盖 9 项 app 资源、恶意路径、图片协议和
 POSIX/Windows 路径断言。
 
+### A3 增量抽取：open-in target selection policy
+
+open-in target 的请求目标选择与 Windows file-manager fallback（原 `d4e/v1`，138046-138070）
+已迁移至 `src/main/main-app/open-target/target-selection-policy.ts`。模块通过显式注入
+请求目标、偏好目标、过滤状态、平台 fallback 和默认查看器策略，保留用户显式目标优先级、
+过滤后回退与 Windows 默认 file-manager 语义；入口只负责压缩别名适配。由
+`scripts/test-main-target-selection-policy.mjs` 覆盖 8 项优先级、平台和 fallback 断言。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含
