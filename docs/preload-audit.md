@@ -187,10 +187,14 @@ preview 交接、销毁和异步竞态，共 7 项断言。
    vendor/generated runtime；登记理由应引用本报告的行号，不应只写“preload vendor”。
 2. 将 3863-5049、5120-7553、22291-27470、30084-30217 视为业务候选区，
    以 annotation IPC 和 WebMCP IPC 为两个闭环逐步迁移。
-3. 26912-27185 与 30132-30217 不适合先做局部 identity wrapper：它们依赖
+3. Annotation feature policy 初始化、controls/request/observer 创建与 dispose 已迁移至
+   `src/main/browser-page-preload/annotation-feature-lifecycle.ts`；入口仅保留 state wiring、
+   host message routing 与页面生命周期。11 项 focused assertions 覆盖 enable/disable、
+   permission reset、所有 disposable 子系统清理及 disabled policy 分支。
+4. 26912-27185 与 30132-30217 不适合先做局部 identity wrapper：它们依赖
    状态机、listener cleanup 和 contextBridge 隔离世界，必须在同一迁移批次中
    保持 channel 字符串、消息 allowlist、pagehide 行为和启动顺序。
-4. 本报告没有证明 vendor 以外的业务段已经语义化；因此本报告不能作为
+5. 本报告没有证明 vendor 以外的业务段已经语义化；因此本报告不能作为
    `browser-page-preload` REWRITTEN 的证据，只能作为 A2 审计第一阶段交付物。
 
 ## 可复核命令

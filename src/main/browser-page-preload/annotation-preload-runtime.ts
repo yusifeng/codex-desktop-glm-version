@@ -1,6 +1,7 @@
 import { createAnnotationPreloadBridge } from "./annotation-preload-bridge";
 import { createAnnotationRuntimeMount } from "./annotation-runtime-mount";
 import { dispatchAnnotationHostMessage } from "./annotation-host-message-dispatcher";
+import { createAnnotationFeatureLifecycle } from "./annotation-feature-lifecycle";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -33,17 +34,14 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   let destroyed = false;
   let hasActiveEditor = false;
   let permissionGranted = false;
-  let siteAnnotationRequests: any = null;
-  let modeControllerDispose: any = null;
-  let featureObserver: any = null;
-  let controlsRegistry: any = null;
+  let featureLifecycle: any;
 
   const preloadBridge = createAnnotationPreloadBridge({
     ipcRenderer: deps.ipcRenderer,
     channels: deps.channels,
     getState: () => state,
-    getControlsRegistry: () => controlsRegistry,
-    getSiteAnnotationRequests: () => siteAnnotationRequests,
+    getControlsRegistry: () => featureLifecycle?.controlsRegistry,
+    getSiteAnnotationRequests: () => featureLifecycle?.siteAnnotationRequests,
     getMountedMessageAction: deps.getMountedMessageAction,
     reducePendingEditorMessage: deps.reducePendingEditorMessage,
     setActiveEditor: (active: boolean) => { hasActiveEditor = active; },
@@ -61,30 +59,40 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     bridge: preloadBridge.bridge,
   });
 
+  featureLifecycle = createAnnotationFeatureLifecycle({
+    permissionController,
+    getState: () => ({ ...state, hasActiveEditor: hasActiveEditor || preloadBridge.hasPendingEditorMessage }),
+    setPermissionGranted: (granted) => { permissionGranted = granted; },
+    setFeatureApiAvailable: (available) => { siteAnnotationApiAvailable = available; },
+    createControlsRegistry: deps.createControlsRegistry,
+    createSiteAnnotationRequests: deps.createSiteAnnotationRequests,
+    createFeatureObserver: deps.createFeatureObserver,
+    createModeController: deps.createModeController,
+    sendPageEvent: (features) => deps.ipcRenderer.send(deps.channels.pageEvent, { ...deps.featureEvent, payload: { features } }),
+    toggleAnnotationMode: (force) => {
+      if (destroyed || state.canUseSiteAnnotationApi !== true || state.isAgentControllingBrowser || deps.navigatorLike.userActivation?.isActive !== true) return false;
+      if (force !== true) featureLifecycle.siteAnnotationRequests?.clear();
+      deps.ipcRenderer.invoke(deps.channels.runtime, { type: `browser-sidebar-runtime-toggle-annotation-mode`, force });
+      return true;
+    },
+    isCommentModeActive: () => deps.isCommentModeActive(state),
+  });
+
   const disposeFeatures = () => {
-    permissionController.reset();
-    permissionGranted = false;
+    featureLifecycle.dispose();
     runtimeMount.setPreview(null);
     siteAnnotationApiAvailable = false;
-    featureObserver?.dispose();
-    featureObserver = null;
-    siteAnnotationRequests?.dispose();
-    siteAnnotationRequests = null;
-    modeControllerDispose?.();
-    modeControllerDispose = null;
-    controlsRegistry?.dispose();
-    controlsRegistry = null;
   };
 
   const applySync = (message: any) => {
-    const wasActive = modeControllerDispose != null && deps.isCommentModeActive(state);
+    const wasActive = featureLifecycle.modeControllerDispose != null && deps.isCommentModeActive(state);
     if (message.canUseSiteAnnotationApi === false) disposeFeatures();
     if (message.isAgentControllingBrowser || message.siteAnnotationFeaturesEnabled === false) {
-      siteAnnotationRequests?.clear();
+      featureLifecycle.siteAnnotationRequests?.clear();
       runtimeMount.setPreview(null);
     }
     state = deps.resolveSyncState(message, siteAnnotationApiAvailable);
-    const isActive = modeControllerDispose != null && deps.isCommentModeActive(state);
+    const isActive = featureLifecycle.modeControllerDispose != null && deps.isCommentModeActive(state);
     if (isActive !== wasActive) {
       deps.documentLike.dispatchEvent(
         deps.createCustomEvent(`oaiannotationmodechange`, { detail: { active: isActive } }),
@@ -100,15 +108,14 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
       permissionController,
       runtimeMount,
       preloadBridge,
-      siteAnnotationRequests,
+      siteAnnotationRequests: featureLifecycle.siteAnnotationRequests,
       setActiveEditor: (active) => { hasActiveEditor = active; },
       applySync,
     });
   };
 
   const initializeFeatures = (policy: any) => {
-    siteAnnotationApiAvailable = policy.enabled;
-    permissionGranted = policy.siteAnnotationPermissionGranted;
+    featureLifecycle.initialize(policy);
     state = {
       ...state,
       canUseSiteAnnotationApi: policy.enabled && policy.siteAnnotationFeaturesEnabled,
@@ -116,46 +123,6 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
       isAgentControllingBrowser: policy.isAgentControllingBrowser,
       interactionMode: policy.isAnnotationModeActive ? `comment` : `browse`,
     };
-    if (!policy.enabled) return;
-
-    controlsRegistry = deps.createControlsRegistry();
-    siteAnnotationRequests = deps.createSiteAnnotationRequests({
-      requestPermission: permissionController.requestPermission,
-      getState: () => ({
-        canUseSiteAnnotationApi: state.canUseSiteAnnotationApi === true,
-        canUseTweaks: state.canUseTweaks === true,
-        isAgentControllingBrowser: state.isAgentControllingBrowser,
-        hasActiveEditor: hasActiveEditor || preloadBridge.hasPendingEditorMessage,
-      }),
-    });
-    featureObserver = deps.createFeatureObserver((features) => {
-      deps.ipcRenderer.send(deps.channels.pageEvent, { ...deps.featureEvent, payload: { features } });
-    });
-    modeControllerDispose = deps.createModeController(
-      (force: any) => {
-        if (
-          destroyed ||
-          state.canUseSiteAnnotationApi !== true ||
-          state.isAgentControllingBrowser ||
-          deps.navigatorLike.userActivation?.isActive !== true
-        ) return false;
-        if (force !== true) siteAnnotationRequests?.clear();
-        deps.ipcRenderer.invoke(deps.channels.runtime, {
-          type: `browser-sidebar-runtime-toggle-annotation-mode`,
-          force,
-        });
-        return true;
-      },
-      () => deps.isCommentModeActive(state),
-      featureObserver.recordUse,
-      () => state.canUseSiteAnnotationApi === true,
-    );
-    if (modeControllerDispose == null) {
-      controlsRegistry.dispose();
-      controlsRegistry = null;
-      siteAnnotationRequests.dispose();
-      siteAnnotationRequests = null;
-    }
   };
 
   const onPageHide = (event: any) => {

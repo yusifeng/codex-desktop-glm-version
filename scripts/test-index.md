@@ -908,4 +908,5 @@ Total scripts: 851.
 - [`test-writing-block-floating-slash-menu.mjs`](./test-writing-block-floating-slash-menu.mjs)
 - [`test-xterm-output-panel.mjs`](./test-xterm-output-panel.mjs)
 - [`test-preload-annotation-range-validation.mjs`](./test-preload-annotation-range-validation.mjs)
+- [`test-preload-annotation-feature-lifecycle.mjs`](./test-preload-annotation-feature-lifecycle.mjs)
 - [`test-worker-git-request-invalidation-policy.mjs`](./test-worker-git-request-invalidation-policy.mjs)
