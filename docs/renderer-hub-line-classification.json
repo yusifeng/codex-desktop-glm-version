@@ -48,5 +48,10 @@
     "hub": "app-primary", "alias": "Qm", "sourceSymbol": "nA", "startLine": 5754, "endLine": 5760,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The URL-scheme classifier is an implementation detail of rA/tAe in the generated hub and has no independent renderer call site; preserve the coupled scope until a named consumer establishes a stable contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Ad", "sourceSymbol": "YMe", "startLine": 17541, "endLine": 17550,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The recipient/cc/bcc display projection is coupled to the adjacent NI/MI validators and RI regex initialization; no renderer module names this aggregate export, so extracting it would create an unowned email-surface facade."
   }
 ]

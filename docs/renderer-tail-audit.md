@@ -61,6 +61,12 @@ runtime policy，也不满足独立输入/输出契约，不能以 URL 字符串
 现存模块路径。该登记只提高可复核性，不改变 `unconsumed` 计数，也不制造虚假的
 named consumer。
 
+同一证据表新增 app-primary 的公开别名 `Ad`/`YMe`：它是收件人、抄送与密送的
+display projection，内部依赖相邻的 `NI`/`MI` 解析器和 `RI` 的 email 正则初始化；
+renderer 没有独立 named consumer，因而登记为 `generated-local-helper` 并保留在
+hub 边界。该结论由 `scripts/test-renderer-hub-classification.mjs` 校验 alias、
+source symbol、行号窗口和现存资产路径，避免把未拥有的邮件 UI facade 误报为已迁移。
+
 `app-primary` 的 panel visibility 入口已将纯策略部分迁移至
 `src/renderer/app-primary/runtime/panel-target-policy.ts`。该模块保留
 `bottom-panel` / `right-panel` 优先级、可用 tab 过滤和无候选时返回 `null` 的
