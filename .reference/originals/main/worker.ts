@@ -43,8 +43,10 @@ const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./wo
 const { GitMetadataResolutionError, resolveGitCommonDir: resolveGitCommonDirQuery, resolveGitRoot: resolveGitRootQuery, resolveGitRootAndCommonDir: resolveGitRootAndCommonDirQuery } = require("./worker/git-root-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { createGitRepositoryModels } = require("./worker/git-repository-models");
+const { isRemoteHost, buildEditorOpenArgs, buildRemoteUri, buildRemoteEditorArgs, buildRemoteOpenArgs } = require("./worker/editor-open-args");
 const { createGithubPullRequestRevisionHandlers } = require("./worker/github-pull-request-revision");
 const { createGitHubPullRequestSummaryHandler } = require("./worker/github-pull-request-summary");
+const { createGithubPullRequestBoardHandler } = require("./worker/github-pull-request-board");
 const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
@@ -42263,7 +42265,7 @@ function Uz(e) {
   return e?.kind === `wsl`;
 }
 function Wz(e) {
-  return Hz(e) || Uz(e) || Vz(e);
+  return isRemoteHost(e);
 }
 var Gz = {
     AYU: `ayu`,
@@ -73447,9 +73449,19 @@ var Lxe = 10,
   zxe = [`mergeStateStatus`, `mergeable`, `statusCheckRollup`],
   Bxe = kW(`github`);
 async function Vxe(e, t, n) {
-  return `repos` in e
-    ? Hxe({ gitManager: t, getAppServerClient: n, request: e })
-    : N8({ appServerClient: n(e.hostId), gitManager: t, request: e });
+  return createGithubPullRequestBoardHandler({
+    ensureAuthenticated: (client, hostname) => r8(client, void 0, hostname),
+    getAppServerClient: (hostId) => n(hostId),
+    getWorktreeRepository: (gitManager, cwd, client) => gitManager.getWorktreeRepository(cwd, client),
+    getRepoRepository: (gitManager, cwd, client) => gitManager.getRepoRepository(cwd, client),
+    listPullRequests: (client, options) => P8({ appServerClient: client, cwd: options.cwd, includePullRequestStatusFields: options.args.includes(`statusCheckRollup`), repoArg: options.args.includes(`--repo`) ? options.args[options.args.indexOf(`--repo`) + 1] : void 0, searchQuery: options.args.includes(`--search`) ? options.args[options.args.indexOf(`--search`) + 1] : null, state: options.args[options.args.indexOf(`--state`) + 1] }),
+    parseRemoteUrl: (url) => wB(url),
+    normalizeChecks: (checks) => Dz(Oz(checks)),
+    summarizeChecks: (checks) => kz(checks),
+    canMerge: (value) => Az(value),
+    mergeBlocker: (value) => jz(value),
+    logger: Bxe(),
+  })(e, t);
 }
 async function N8({
   appServerClient: e,
@@ -80490,37 +80502,19 @@ function MTe(e) {
   return !r.includes(`:`) || r.startsWith(`[`) ? e : `${n}[${r}]`;
 }
 function Q7(e, t) {
-  return t
-    ? [`--goto`, `${e}:${t.line}:${t.column}`]
-    : process.platform === `win32`
-      ? [e]
-      : [`--goto`, e];
+  return buildEditorOpenArgs(e, t);
 }
 function $7({ hostConfig: e, remoteWorkspaceRoot: t, remotePath: n, location: r }) {
   if (e.kind === `remote-control`)
     throw Error(`Remote control does not support VS Code remote open yet.`);
   let i = `ssh-remote+${OTe(e)}`,
-    a = t?.trim() || void 0,
-    o = n?.trim() || void 0;
-  if (o != null && r != null)
-    return NTe({ remoteAuthority: i, remoteWorkspaceRoot: a, path: o, location: r });
-  let s = [];
-  return (
-    a != null && s.push(`--folder-uri`, e9(i, a)),
-    o != null && s.push(`--file-uri`, e9(i, o)),
-    s
-  );
+  return buildRemoteOpenArgs({ hostConfig: e, remoteAuthority: i, remoteWorkspaceRoot: t, remotePath: n, location: r });
 }
 function NTe({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r }) {
-  let i = [];
-  return (
-    t != null && i.push(`--folder-uri`, e9(e, t)),
-    i.push(`--remote`, e, `--goto`, `${n}:${r.line}:${r.column}`),
-    i
-  );
+  return buildRemoteEditorArgs({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r });
 }
 function e9(e, t) {
-  return `vscode-remote://${e}${(t.startsWith(`/`) ? t : `/${t}`).split(`/`).map(encodeURIComponent).join(`/`)}`;
+  return buildRemoteUri(e, t);
 }
 function t9({ label: e, icon: t, kind: n, platform: r }) {
   return {
