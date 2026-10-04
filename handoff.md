@@ -811,3 +811,9 @@ Annotation display selection projection（原 `J_` 22849-22873）的 additional-
 rect/class/page/index 投影已迁移至 `src/main/browser-page-preload/annotation-display-selections.ts`；
 入口仅注入 anchor/frame resolver、visible clipping 与 geometry 适配，React render assembly
 仍保留在原边界。由 `scripts/test-preload-annotation-display-selections.mjs` 覆盖 7 项断言。
+
+Annotation feature policy lifecycle（原 preload `initializeFeatures`/`disposeFeatures`）已迁移至
+`src/main/browser-page-preload/annotation-feature-lifecycle.ts`；入口仅保留 policy state、
+IPC toggle 与 host-message wiring。controls、site-request、feature observer、mode controller
+的 enable/disable 和 teardown 由 11 项 focused assertions 覆盖；React/DOM runtime 仍保留在
+原边界。
