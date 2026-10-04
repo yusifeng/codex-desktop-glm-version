@@ -638,6 +638,9 @@ Linux `.desktop` `[Desktop Entry]` 键值解析已迁移至
 assertions 覆盖；入口继续负责平台目录发现与安装副作用。
 WSL open-in 的 `wsl.exe` 参数组装已迁移至 `src/main/worker/wsl-open-target-args.ts`，由 3 项
 focused assertions 覆盖；入口继续负责 WSL 发现、进程执行和错误处理。
+macOS `.app/Contents/MacOS` bundle 可执行路径提取已迁移至
+`src/main/worker/mac-app-path.ts`，由 3 项 focused assertions 覆盖；入口继续负责 bundle 探测
+与进程启动。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
