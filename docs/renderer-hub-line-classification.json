@@ -681,5 +681,29 @@
     "classification": "generated-local-thread-goal-summary-label",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The projection maps thread-goal lifecycle statuses to localized summary labels used above the composer. It is a closed route-local discriminant view with no independent renderer lifecycle or cross-route contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Bs", "sourceSymbol": "QWe", "startLine": 36845, "endLine": 36849,
+    "classification": "generated-local-browser-tab-url-state-write",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper normalizes a browser-tab URL and writes the open/current URL tuple into the local reactive state atom. It is a narrow route-owned state transition paired with adjacent lookup helpers, not an independent renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "Ba", "sourceSymbol": "sZ", "startLine": 53343, "endLine": 53345,
+    "classification": "generated-local-message-value-projection",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper resolves either a literal label or an intl message descriptor through the active formatter. Its behavior is a local presentation projection used by neighboring generated controls and has no standalone lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Bt", "sourceSymbol": "rdt", "startLine": 101262, "endLine": 101280,
+    "classification": "generated-local-remote-workspace-selection",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The async helper selects persisted SSH or first available workspace state, waits for pending workspace refresh, and rejects stale project/host snapshots. It is route-local remote-computer setup owned by the surrounding project surface."
+  },
+  {
+    "hub": "app-primary", "alias": "At", "sourceSymbol": "ept", "startLine": 104285, "endLine": 104287,
+    "classification": "generated-local-empty-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The generated initializer is intentionally empty and exists only as a retained module registration point in the adjacent submission route. It has no semantic behavior or independently consumed renderer lifecycle."
   }
 ]
