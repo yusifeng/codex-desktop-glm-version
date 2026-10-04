@@ -43,6 +43,7 @@ const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./wo
 const { GitMetadataResolutionError, resolveGitCommonDir: resolveGitCommonDirQuery, resolveGitRoot: resolveGitRootQuery, resolveGitRootAndCommonDir: resolveGitRootAndCommonDirQuery } = require("./worker/git-root-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { createGitRepositoryModels } = require("./worker/git-repository-models");
+const { createGitHubPullRequestSummaryHandler } = require("./worker/github-pull-request-summary");
 const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
@@ -117,6 +118,16 @@ const gitBlameFileDeps = {
   runGit: (...args) => $(...args),
 };
 const gitCatFileDeps = { runGit: (...args) => $(...args) };
+const githubPullRequestSummary = createGitHubPullRequestSummaryHandler({
+  runGraphql: (args, options) => Y6(args, options),
+  parseResponse: (text) => $6(text, pSe),
+  normalizeChecks: (checks) => Dz(checks),
+  summarizeChecks: (checks) => kz(checks),
+  canMerge: (value) => Az(value),
+  mergeBlocker: (value) => jz(value),
+  parseRemoteUrl: (url) => wB(url),
+  warn: (message, error) => dSe.warning(message, { safe: {}, sensitive: { error } }),
+});
 const gitBranchComparisonDeps = {
   getQueryMeta: () => x1,
   queryKey: (...args) => Q(...args),
@@ -74182,62 +74193,8 @@ var lSe = 60,
   hSe = K({ pullRequest: fSe.nullable() }).nullable();
 function gSe(e, t, n) {
   a8(e, t);
-  let r = JSON.stringify([t.id, e.account.hostname.toLowerCase(), e.account.login.toLowerCase()]),
-    i = Q8.get(r);
-  return (
-    i ?? ((i = new _Se(e.account, () => Q8.delete(r))), Q8.set(r, i)),
-    i.read(e.pullRequest, t, n)
-  );
+  return githubPullRequestSummary(e, t, n);
 }
-var _Se = class {
-  account;
-  onIdle;
-  pending = new Map();
-  running = !1;
-  constructor(e, t) {
-    ((this.account = e), (this.onIdle = t));
-  }
-  read(e, t, n) {
-    n?.throwIfAborted();
-    let r = JSON.stringify([e.owner.toLowerCase(), e.repository.toLowerCase(), e.number]),
-      i = this.pending.get(r);
-    if (i == null) {
-      let { promise: t, resolve: n } = vR();
-      ((i = { pullRequest: e, promise: t, resolve: n, readers: [] }), this.pending.set(r, i));
-    }
-    return (
-      i.readers.push({ host: t, signal: n }),
-      this.running || ((this.running = !0), setTimeout(() => void this.flush(), 50)),
-      i.promise
-    );
-  }
-  async flush() {
-    for (; this.pending.size > 0;) {
-      let e = Array.from(this.pending.entries()).slice(0, lSe);
-      for (let [t] of e) this.pending.delete(t);
-      let t = e.filter(([, e]) => e.readers.some(({ signal: e }) => !e?.aborted)),
-        n = t[0]?.[1].readers.find(({ signal: e }) => !e?.aborted)?.host,
-        r = [];
-      try {
-        n != null &&
-          (r = await vSe(
-            this.account,
-            n,
-            t.map(([, e]) => e.pullRequest),
-            () => t.some(([, e]) => e.readers.some(({ signal: e }) => !e?.aborted)),
-          ));
-      } catch (e) {
-        dSe.warning(`Pull request summary batch failed`, { safe: {}, sensitive: { error: e } });
-      }
-      let i = new Map(t.map(([e], t) => [e, r[t]]));
-      for (let [t, n] of e) {
-        let e = i.get(t) ?? { status: `unavailable` };
-        n.resolve(e);
-      }
-    }
-    ((this.running = !1), this.onIdle());
-  }
-};
 async function vSe(e, t, n, r) {
   let i = n.map(() => ({ status: `unavailable` })),
     a = n.map((e, t) => ({

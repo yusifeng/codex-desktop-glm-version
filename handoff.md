@@ -545,3 +545,9 @@ npm run typecheck && node scripts/audit-shared-consumption.mjs
 健康值：1874/1874、11/11、typecheck 0、TOTAL 0。后续继续处理审计表中
 标记为 `business-preserved` 的区段；不得把审计文档或 preserved 登记误当成
 业务语义化完成。
+
+### 增量抽取：GitHub pull request summary batcher
+
+GitHub PR summary 的按账号批量去重、debounce、GraphQL 检查分页与 abort 语义已迁移至
+`src/main/worker/github-pull-request-summary.ts`，入口仅保留 `gh-pr-summary` 适配与账户校验。
+新增 `scripts/test-github-pull-request-summary.mjs`，覆盖 2 项基础断言；整体 handoff 仍未完成。

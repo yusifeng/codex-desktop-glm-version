@@ -9,6 +9,7 @@ Total scripts: 690.
 - [`test-worker-git-automation-writable-roots.mjs`](./test-worker-git-automation-writable-roots.mjs)
 - [`test-worker-git-apply-changes.mjs`](./test-worker-git-apply-changes.mjs)
 - [`test-worker-git-apply-patch.mjs`](./test-worker-git-apply-patch.mjs)
+- [`test-github-pull-request-summary.mjs`](./test-github-pull-request-summary.mjs)
 - [`test-worker-git-diff-text.mjs`](./test-worker-git-diff-text.mjs)
 - [`test-worker-git-init-watcher.mjs`](./test-worker-git-init-watcher.mjs)
 - [`test-worker-git-ignore-discovery.mjs`](./test-worker-git-ignore-discovery.mjs)

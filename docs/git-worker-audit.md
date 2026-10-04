@@ -699,3 +699,11 @@ worktree repository 的 query client、配置读写、read generation 和精确 
 `createGitOperationMarkerPaths`，入口保留异步读取和状态映射。该边界覆盖
 `CHERRY_PICK_HEAD`、`MERGE_HEAD`、`REBASE_HEAD`、`rebase-merge`、
 `rebase-apply`、`REVERT_HEAD`，由 worker git watch path 回归脚本断言。
+
+### 增量抽取：GitHub pull request summary batcher
+
+GitHub pull request summary 的按账号批量去重、50ms debounce、最多 60 条请求分批、检查项分页
+及 abort reader 过滤已迁移至 `src/main/worker/github-pull-request-summary.ts`。原 `_Se`/`gSe`
+批处理实现已删除；入口仅保留账户校验与语义 handler 注入，GraphQL 失败继续降级为
+`unavailable`，登录不一致、not-found、HEAD revision 竞争和最多 20 页检查项的既有语义保持不变。
+`scripts/test-github-pull-request-summary.mjs` 覆盖基本 not-found/批处理路径，共 2 项断言。
