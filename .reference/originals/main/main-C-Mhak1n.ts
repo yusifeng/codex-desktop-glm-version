@@ -24,7 +24,7 @@ const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspa
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates } = require("./main-app/startup/tray-icon-paths.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
-const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction } = require("./main-app/computer-use/history-scope-actions.js");
+const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175105,13 +175105,8 @@ function kst({
           case `computer-history/clear-history`: {
             let t = i();
             if (t == null) return;
-            let n = null;
-            if (e.scope === `application_session`) {
-              if (e.startedAt == null) return;
-              let t = Date.parse(e.startedAt),
-                r = e.endedAt == null ? Date.now() : Date.parse(e.endedAt);
-              n = { startMs: t, endMs: Math.max(t + 1, r) };
-            }
+            let n = historyClearRange(e.scope, e.startedAt, e.endedAt);
+            if (e.scope === `application_session` && n == null) return;
             (await t.clearHistory(e.scope, n), o(Ost[e.scope]), a([`chronicle-history`]));
             break;
           }

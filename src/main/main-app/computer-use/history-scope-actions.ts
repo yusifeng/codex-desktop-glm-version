@@ -14,4 +14,18 @@ export function historyScopeAction(scope: keyof typeof HISTORY_SCOPE_ACTIONS, ob
   return HISTORY_SCOPE_ACTIONS[scope][observe ? `include` : `exclude`];
 }
 
-if (typeof module !== `undefined`) module.exports = { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction };
+/** Build the bounded interval used when clearing one application session. */
+export function historyClearRange(
+  scope: keyof typeof HISTORY_CLEAR_ACTIONS,
+  startedAt?: string | null,
+  endedAt?: string | null,
+  now = Date.now(),
+): { startMs: number; endMs: number } | null {
+  if (scope !== `application_session`) return null;
+  if (startedAt == null) return null;
+  const startMs = Date.parse(startedAt);
+  const endMs = endedAt == null ? now : Date.parse(endedAt);
+  return { startMs, endMs: Math.max(startMs + 1, endMs) };
+}
+
+if (typeof module !== `undefined`) module.exports = { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange };

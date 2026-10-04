@@ -162,10 +162,12 @@ worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,31
 保留 invalidate 返回空对象、service-pid 返回进程号、ces-telemetry 拒绝和未知方法
 返回 undefined 的语义；由 `scripts/test-main-computer-use-rpc-handler.mjs` 覆盖 5 项断言。
 
-computer-use history scope/clear action 常量（原 `Dst/Ost`，175,045-175,058）已迁移至
+computer-use history scope/clear action 常量（原 `Dst/Ost`，175,045-175,058）及
+`application_session` 的有界时间区间构造已迁移至
 `src/main/main-app/computer-use/history-scope-actions.ts`，入口保留兼容对象并使用
-`historyScopeAction` 做 include/exclude 映射；由 `scripts/test-main-history-scope-actions.mjs`
-覆盖 6 项常量和映射断言。
+`historyScopeAction`/`historyClearRange` 做映射与时间区间计算；由
+`scripts/test-main-history-scope-actions.mjs` 覆盖常量、映射、缺失起点、相同端点和
+当前时间 fallback 等 10 项断言。
 
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
