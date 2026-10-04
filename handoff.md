@@ -881,3 +881,8 @@ Git request cancellation telemetry envelope 已迁移至 `src/main/worker/git-re
 入口的 queued-cancel 与 in-flight abort 两条生命周期路径共用统一的 canceled/result-disposition/
 queue-duration 字段投影，避免重复的遥测组装逻辑。`scripts/test-worker-request-cancellation.mjs`
 覆盖 9 项 focused assertions；请求取消、性能追踪与 Git I/O 副作用仍由入口保留。
+
+Git worker response envelope 已迁移至 `src/main/worker/git-response-envelope.ts`；入口不再内联
+worker-response 的 id/method/result 与可选 trace/emittedAt 投影，协议字段顺序与缺省语义保持不变。
+`scripts/test-worker-git-response-envelope.mjs` 覆盖 6 项 focused assertions；消息发送副作用与
+trace 采集仍由 worker 入口保留。

@@ -141,6 +141,7 @@ const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/g
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { createGitRequestLifecycle } = require("./worker/git-request-lifecycle");
 const { createGitRequestCancellationTelemetry } = require("./worker/git-request-cancellation");
+const { createGitWorkerResponse } = require("./worker/git-response-envelope");
 const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
@@ -70266,12 +70267,7 @@ var I6 = kW(`git`),
       }
       t == null && dbe(p) && jH(`failure`);
       let m = AH() ?? e.trace,
-        h = {
-          ...(m == null ? {} : { emittedAtMs: Date.now(), trace: m }),
-          id: e.id,
-          method: e.method,
-          result: p,
-        };
+        h = createGitWorkerResponse({ id: e.id, method: e.method, result: p, trace: m });
       (this.emitGitPerformanceOperation({
         attribution: n,
         canceled: !1,
