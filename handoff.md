@@ -463,6 +463,9 @@ tooltip 与 region 去重非 React runtime 已迁移至
 annotation serialization boundary（名称规范化、metadata descriptor/key/value 与 UTF-8 大小限制、
 属性 metadata JSON 解析）已迁移至 `src/main/browser-page-preload/annotation-serialization.ts`，
 入口保留兼容代理，由 11 项行为断言覆盖。
+annotation control payload 的独立安全边界回归已补齐：`scripts/test-preload-annotation-control-payload.mjs`
+以 20 项 focused assertions 直接覆盖 null-prototype 克隆、恶意 descriptor/几何与 metadata 过滤、
+UTF-8 字节限制、hit-test request 和 response envelope；兼容聚合入口仍保留原有 45 项回归。
 annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 `src/main/browser-page-preload/annotation-display-anchors.ts`，入口继续注入既有 DOM resolver
 与 viewport geometry；text 替换、element cache、当前页缺失 selector 过滤、additional anchor

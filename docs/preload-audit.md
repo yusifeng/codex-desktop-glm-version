@@ -38,6 +38,7 @@ Annotation hit/control payload 的安全对象克隆、rect/role/id 校验、met
 `src/main/browser-page-preload/annotation-control-payload.ts`，`annotation-runtime.ts` 仅保留兼容
 导出并通过窄委托接回，响应 detail payload 也由同一模块组装；`scripts/test-preload-annotation-runtime.mjs` 覆盖恶意对象、几何边界、
 metadata 过滤、hit-test request 边界、annotation controls 序列化/metadata/targets、range/open-request detail、control handle lifecycle、registry payload/target parsing/index/read/pagehide lifecycle、surface element boundary、selection 渲染策略和 response JSON 形状，共 45 项行为断言。
+该协议边界另由 `scripts/test-preload-annotation-control-payload.mjs` 以 20 项独立 focused assertions 覆盖，直接回归 null-prototype 克隆、恶意 descriptor/几何与 metadata 过滤、UTF-8 字节限制、hit-test request 和 response envelope。
 
 Annotation surface 的 pagehide disposal、top-document element containment 与 selection
 render gate 已迁移至 `src/main/browser-page-preload/annotation-surface-policies.ts`。
