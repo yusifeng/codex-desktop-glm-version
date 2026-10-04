@@ -1,3 +1,5 @@
+import { LIST_LIMIT, SUMMARY_FIELDS, STATUS_FIELDS, buildPullRequestListArgs, resolveRepositoryCandidates, getBoardState } from "./github-pull-request-board-policy";
+
 type BoardDeps = {
   ensureAuthenticated: (client: any, hostname?: string) => Promise<void>;
   getAppServerClient: (hostId: string) => any;
@@ -11,39 +13,6 @@ type BoardDeps = {
   mergeBlocker: (value: any) => any;
   logger?: { warning: (event: string, fields: any) => void };
 };
-
-const LIST_LIMIT = 10;
-const SUMMARY_FIELDS = [`additions`, `baseRefName`, `createdAt`, `deletions`, `headRefName`, `isDraft`, `number`, `state`, `title`, `updatedAt`, `url`];
-const STATUS_FIELDS = [`mergeStateStatus`, `mergeable`, `statusCheckRollup`];
-
-function buildPullRequestListArgs({ includePullRequestStatusFields = true, repoArg, searchQuery, state = `all` }: any = {}) {
-  const trimmed = searchQuery?.trim() ?? ``;
-  const args = [`pr`, `list`, `--state`, state, `--limit`, String(LIST_LIMIT), `--json`, [...SUMMARY_FIELDS, ...(includePullRequestStatusFields ? STATUS_FIELDS : [])].join(`,`)];
-  if (searchQuery == null) args.push(`--author`, `@me`);
-  else if (trimmed.length > 0) args.push(`--search`, trimmed);
-  if (repoArg != null) args.push(`--repo`, repoArg);
-  return args;
-}
-
-function resolveRepositoryCandidates({ originUrl, upstreamUrl, parseRemoteUrl }: any) {
-  const repoArg = (url: string | null | undefined) => {
-    if (url == null) return null;
-    const parsed = parseRemoteUrl(url);
-    return parsed == null ? null : parsed.host === `github.com` ? `${parsed.owner}/${parsed.repo}` : `${parsed.host}/${parsed.owner}/${parsed.repo}`;
-  };
-  return Array.from(new Set([repoArg(upstreamUrl), repoArg(originUrl)].filter((value) => value != null)));
-}
-
-function getBoardState({ canMerge, ciStatus, isDraft }: any) {
-  if (isDraft) return `draft`;
-  switch (ciStatus) {
-    case `failing`: return `failing`;
-    case `none`:
-    case `passing`:
-    case `pending`: return canMerge ? `ready` : `in_progress`;
-    default: return `in_progress`;
-  }
-}
 
 function mapPullRequestBoardItems({ cwd, hostId, items, repo, searchQuery, normalizeChecks, summarizeChecks, canMerge, mergeBlocker }: any) {
   return items.flatMap((item: any) => {

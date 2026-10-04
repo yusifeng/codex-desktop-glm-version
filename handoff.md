@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：GitHub pull-request board 的列表参数、远端仓库候选归一化与 CI/merge 状态判定已迁移至 `src/main/worker/github-pull-request-board-policy.ts`；board handler 仅保留 GitHub 请求与仓库副作用编排，并由 `scripts/test-worker-github-pull-request-board-policy.mjs` 覆盖 12 项 focused assertions。
+
 > 本文档是最终 handoff。前一阶段（消费驱动的语义化）已按 DoD 验收完成：
 > 全部门禁绿、被消费的导出 100% 语义化、所有 chunk 已分类。
 > **本阶段把验收标准从「消费面语义化」升级为「完全反编译」**：仓库里不再
@@ -12,6 +14,8 @@
 ## 当前进度快照（2026-10-04）
 
 本轮 A2 增量补强 preload annotation context state：同步消息解析现在对空值/非对象输入安全降级，缺省交互模式与 agent 控制位保持明确默认值；新增 `scripts/test-preload-annotation-context-state.mjs` 的 19 项 focused assertions，覆盖初始状态、能力位同步、注释模式判定及空消息边界。
+
+最新增量：annotation preload 的 pagehide 生命周期（preview 清理、trusted/persisted 判定、权限重置、feature/runtime dispose 与监听器移除）已迁移至 `src/main/browser-page-preload/annotation-pagehide.ts`；入口仅保留依赖适配，由 `scripts/test-preload-annotation-pagehide.mjs` 覆盖 8 项生命周期断言。
 
 GitHub Pull Request summary 的身份 key 规范化、取消 reader 过滤、状态映射与 pending-check
 判定已迁移至 `src/main/worker/github-pull-request-summary-policy.ts`；batcher 仅保留 GraphQL
