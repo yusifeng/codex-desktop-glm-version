@@ -68,5 +68,10 @@
     "hub": "app-primary", "alias": "Ag", "sourceSymbol": "JE", "startLine": 3686, "endLine": 3711,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The selection/hover rectangle style builder is coupled to the adjacent annotation SVG and selection overlay renderers; its appearance, zoom scaling, and fill-only branches are consumed only inside the generated hub, so extracting it without a named renderer owner would create an unowned styling facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Am", "sourceSymbol": "jA", "startLine": 6788, "endLine": 6807,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The plan-action projection maps workspace ownership and plan tier to the adjacent upgrade/add-credits/notify-owner actions; it is consumed only by the local plan purchase flow and depends on the generated Gm enum, so extracting it without a named renderer owner would create an unowned billing facade."
   }
 ]

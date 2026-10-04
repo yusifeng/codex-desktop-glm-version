@@ -541,3 +541,10 @@ namespace 先收窄为 `chunk as unknown as { alias?: ... }` 的契约对象，�
 在聚合 hub，避免制造无主 styling facade。行范围、source symbol 和分类由
 `scripts/audit-renderer-hub-classification.mjs` 机器校验，focused suite 同时锁定 `Ag`
 仍属于 unconsumed surface。
+
+本轮再补齐 app-primary 计划购买动作的逐行证据：`jA`（公开别名 `Am`，6788--6807
+行）只按 workspace 所有权、plan tier 与 Pro 购买暂停状态映射升级、加购额度或通知
+owner 动作，并依赖相邻生成的 `Gm` enum。它只在 hub 内部计划购买流程消费，没有独立
+renderer named consumer；因此登记为 `generated-local-helper` 并保留聚合 hub，避免制造
+无主 billing facade。该行范围、source symbol 与分类由
+`scripts/audit-renderer-hub-classification.mjs` 机器校验。
