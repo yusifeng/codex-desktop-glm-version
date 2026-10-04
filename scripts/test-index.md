@@ -6,6 +6,8 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-pathspec-policy.mjs`](./test-worker-git-pathspec-policy.mjs)
+
 - [`test-preload-annotation-theme.mjs`](./test-preload-annotation-theme.mjs)
 
 - [`test-preload-annotation-overflow.mjs`](./test-preload-annotation-overflow.mjs)
