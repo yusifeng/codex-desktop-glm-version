@@ -17,6 +17,7 @@ const deps = {
   resolveLiveElement: () => element,
   readCardViewportRect: (rect, options) => ({ rect, options }),
   readCommentTheme: (comment) => comment.themeVariant,
+  projectAdditionalAnchor: (selection, viewport) => ({ ...selection, projected: viewport.width }),
 };
 const marker = projectAnnotationMarkerViewState({ anchor: { kind: "element", x: 9 }, markerViewportPoint: { x: 1, y: 2 } }, 2, deps);
 assert.equal(marker.anchor.refreshed, true);
@@ -27,7 +28,9 @@ assert.equal(region.additionalAnchors.length, 1);
 const draft = projectAnnotationDraftViewState({ anchor: { type: "element", value: { kind: "element", x: 1 }, element, additionalSelections: [], themeVariant: "light" }, target: { mode: "design" } }, 2, 3, deps);
 assert.equal(draft.themeVariant, "light");
 assert.equal(draft.cardViewportRect.options.viewportScale, 3);
+const projectedDraft = projectAnnotationDraftViewState({ anchor: { type: "region", value: { kind: "region" }, additionalSelections: [{ kind: "region" }] }, target: { mode: "create" } }, 1, undefined, deps);
+assert.equal(projectedDraft.additionalAnchors[0].projected, 800);
 const comment = projectAnnotationCommentViewState({ target: { mode: "edit", commentId: "c1" }, anchor: { type: "element", value: { kind: "element", x: 5 }, additionalSelections: [] } }, [{ id: "c1", themeVariant: "blue" }], "c1", 1, deps);
 assert.equal(comment.themeVariant, "blue");
 assert.equal(projectAnnotationCommentViewState({ target: { commentId: "missing" }, anchor: { type: "text", value: {} } }, [], undefined, 1, deps), null);
-console.log("preload annotation marker view-state tests passed (11 assertions)");
+console.log("preload annotation marker view-state tests passed (12 assertions)");

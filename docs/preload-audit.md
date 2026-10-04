@@ -591,4 +591,4 @@ viewport/theme 投影、同页保留、异页回退和不可见时跳过 clippin
 `src/main/browser-page-preload/annotation-marker-view-state.ts`。模块仅接收 viewport、DOM
 rect、live-element 和 anchor resolver 适配器；原 preload 的 `rv`/`iv`/`av`/`ov` 入口保留
 兼容代理及浏览器副作用。`scripts/test-preload-annotation-marker-view-state.mjs` 覆盖
-element、region、design draft、comment 缺失与主题回退，共 11 项 focused assertions。
+element、region、design draft、additional-anchor projection、comment 缺失与主题回退，共 12 项 focused assertions。
