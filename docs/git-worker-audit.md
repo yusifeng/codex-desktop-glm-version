@@ -683,6 +683,15 @@ Git apply 的 stdout/stderr 路径结果解析、patch header 路径提取、临
 review-section、worktree checkout 与请求分发消费者共用语义入口。模块保留并行 stat 的完成顺序、
 取消边界和预暂存命令非零结果不阻断 apply 的既有语义，由 62 项独立模块断言覆盖。
 
+### 增量抽取：Git repository models
+
+Common repository 的 origin URL memoization、review snapshot 的 generation/abort/stale 保护，以及
+worktree repository 的 query client、配置读写、read generation 和精确 cache invalidation 已迁移至
+`src/main/worker/git-repository-models.ts`。原 `Whe`/`s4`/`c4`/`Khe` class 实现已删除；manager
+继续持有 repository identity map 与 stable metadata 生命周期，通过语义 class 构造实例。模块保留
+24 小时零参数 origin cache、快照前后双检、working-tree path 选择性失效及 topology/local-ref 早退，
+由 142 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

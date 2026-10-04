@@ -42,6 +42,7 @@ const { getDefaultBranchForRemote: getDefaultBranchForRemoteQuery, getDefaultRem
 const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./worker/git-ref-resolution");
 const { GitMetadataResolutionError, resolveGitCommonDir: resolveGitCommonDirQuery, resolveGitRoot: resolveGitRootQuery, resolveGitRootAndCommonDir: resolveGitRootAndCommonDirQuery } = require("./worker/git-root-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
+const { createGitRepositoryModels } = require("./worker/git-repository-models");
 const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
@@ -67390,210 +67391,30 @@ async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, 
   return o;
 }
 var i4 = 864e5;
-var Whe = class {
-    commonDir;
-    host;
-    constructor(e, t) {
-      ((this.commonDir = e), (this.host = t));
-    }
-    getCommonDir() {
-      return this.commonDir;
-    }
-    getOriginUrl = (0, DX.default)(
-      async (e) => await readGitConfigValue(this.commonDir, [`remote.origin.url`], this.host, e),
-      { length: 0, promise: !0, maxAge: i4 },
-    );
-  },
-  s4 = class extends Error {
-    constructor() {
-      (super(`Git snapshot became stale`), (this.name = `GitReviewSnapshotStaleError`));
-    }
-  },
-  c4 = class {
-    worktreeRepo;
-    generation;
-    abortController = new AbortController();
-    signal = this.abortController.signal;
-    constructor(e, t) {
-      ((this.worktreeRepo = e), (this.generation = t));
-    }
-    git(e, t = {}) {
-      return this.read(() =>
-        $(this.worktreeRepo.root, e, this.worktreeRepo.host, this.commandOptions(t)),
-      );
-    }
-    gitDiff(e, t = {}) {
-      return this.read(() =>
-        y0(this.worktreeRepo.root, e, this.worktreeRepo.host, this.commandOptions(t)),
-      );
-    }
-    queryKey(e, ...t) {
-      return Q(
-        this.worktreeRepo.root,
-        this.worktreeRepo.host,
-        e,
-        `review`,
-        `${this.generation}`,
-        ...t,
-      );
-    }
-    async read(e) {
-      this.assertCurrent();
-      try {
-        let t = await e();
-        return (this.assertCurrent(), t);
-      } catch (e) {
-        throw this.worktreeRepo.reviewSnapshot === this ? e : new s4();
-      }
-    }
-    retire() {
-      this.abortController.abort();
-    }
-    assertCurrent() {
-      if (this.signal.aborted || this.worktreeRepo.reviewSnapshot !== this) throw new s4();
-    }
-    commandOptions(e) {
-      return {
-        ...e,
-        signal: e.signal == null ? this.signal : AbortSignal.any([this.signal, e.signal]),
-      };
-    }
-  };
-var Khe = class {
-    root;
-    host;
-    queryClient = ope();
-    gitConfigReadGenerationValue = 0;
-    gitHeadReadGenerationValue = 0;
-    gitReadGenerationValue = 0;
-    nextReviewWorkingTreeFileGeneration = 0;
-    reviewWorkingTreeFileGenerations = new Map();
-    reviewSnapshotValue;
-    watchScopedGitReadGenerationValue = 0;
-    get gitReadGeneration() {
-      return this.gitReadGenerationValue;
-    }
-    get gitConfigReadGeneration() {
-      return this.gitConfigReadGenerationValue;
-    }
-    get gitHeadReadGeneration() {
-      return this.gitHeadReadGenerationValue;
-    }
-    get watchScopedGitReadGeneration() {
-      return this.watchScopedGitReadGenerationValue;
-    }
-    get reviewSnapshot() {
-      return this.reviewSnapshotValue;
-    }
-    getReviewWorkingTreeFileGeneration(e) {
-      let t = this.reviewWorkingTreeFileGenerations.get(e);
-      return (
-        t ??
-          ((t = this.nextReviewWorkingTreeFileGeneration++),
-          this.reviewWorkingTreeFileGenerations.set(e, t)),
-        t
-      );
-    }
-    getReviewWorkingTreeFileReadPaths(e) {
-      let t = [e, `.gitattributes`],
-        n = g.default.posix.dirname(e);
-      for (; n !== `.`;)
-        (t.push(g.default.posix.join(n, `.gitattributes`)), (n = g.default.posix.dirname(n)));
-      return t;
-    }
-    requireReviewSnapshot(e) {
-      if (this.reviewSnapshotValue.generation !== e || this.reviewSnapshotValue.signal.aborted)
-        throw new s4();
-      return this.reviewSnapshotValue;
-    }
-    constructor(e, t) {
-      ((this.root = e), (this.host = t), (this.reviewSnapshotValue = new c4(this, 0)));
-    }
-    async getConfigValue(e, t) {
-      return getGitConfigValue(this, [e], t);
-    }
-    async getConfigValueForScope(e, t, n) {
-      return getGitConfigValueForScope(this, e, t, n);
-    }
-    async setConfigValueForScope(e, t, n, r) {
-      return (await setGitConfigValueForScope(this.root, e, t, n, this.host, r))
-        ? (this.invalidateGitReadCachesForRepoChange(`config`), !0)
-        : !1;
-    }
-    clearGitReadCaches() {
-      ((this.gitConfigReadGenerationValue += 1),
-        (this.gitHeadReadGenerationValue += 1),
-        (this.gitReadGenerationValue += 1),
-        this.reviewWorkingTreeFileGenerations.clear(),
-        this.advanceWatchScopedGitReadGeneration(),
-        this.queryClient.invalidateQueries({ refetchType: `none` }));
-    }
-    invalidateGitReadCachesForRepoRecovery() {
-      (this.clearGitReadCaches(), this.advanceReviewSnapshot());
-    }
-    clearShortLivedGitReadCaches() {
-      ((this.gitReadGenerationValue += 1),
-        this.reviewWorkingTreeFileGenerations.clear(),
-        T1(this.queryClient));
-    }
-    invalidateWatchScopedGitReadCaches() {
-      this.advanceWatchScopedGitReadGeneration();
-    }
-    invalidateGitReadCachesForMutation() {
-      ((this.gitReadGenerationValue += 1),
-        this.reviewWorkingTreeFileGenerations.clear(),
-        this.advanceReviewSnapshot(),
-        T1(this.queryClient),
-        this.invalidateWatchScopedGitReadCaches());
-    }
-    invalidateGitReadCachesForRepoChange(e, t) {
-      if (e === `worktree-topology`) {
-        this.queryClient.invalidateQueries({
-          queryKey: Q(this.root, this.host, `worktrees`),
-          exact: !0,
-          refetchType: `none`,
-        });
-        return;
-      }
-      if (e === `local-refs`) {
-        (this.advanceWatchScopedGitReadGeneration(), E1(this.queryClient, this.root, e, t));
-        return;
-      }
-      (e === `config` && (this.gitConfigReadGenerationValue += 1),
-        e === `head` && (this.gitHeadReadGenerationValue += 1),
-        (e === `config` || e === `head` || e === `remote-refs`) &&
-          this.advanceWatchScopedGitReadGeneration(),
-        (this.gitReadGenerationValue += 1),
-        e === `working-tree` && t != null
-          ? this.reviewWorkingTreeFileGenerations.forEach((e, n) => {
-              O1(this.root, this.getReviewWorkingTreeFileReadPaths(n), t) &&
-                this.reviewWorkingTreeFileGenerations.set(
-                  n,
-                  this.nextReviewWorkingTreeFileGeneration++,
-                );
-            })
-          : this.reviewWorkingTreeFileGenerations.clear(),
-        this.advanceReviewSnapshot(),
-        E1(this.queryClient, this.root, e, t));
-    }
-    advanceReviewSnapshot() {
-      let e = this.reviewSnapshotValue;
-      ((this.reviewSnapshotValue = new c4(this, e.generation + 1)),
-        e.retire(),
-        this.queryClient.removeQueries({
-          type: `inactive`,
-          predicate: (e) =>
-            (e.queryKey[4] === `review` &&
-              e.queryKey[5] !== `${this.reviewSnapshotValue.generation}` &&
-              e.state.fetchStatus !== `fetching`) ||
-            (e.queryKey[3] === `review-working-tree-file-metadata` &&
-              e.state.fetchStatus === `fetching`),
-        }));
-    }
-    advanceWatchScopedGitReadGeneration() {
-      ((this.watchScopedGitReadGenerationValue += 1), spe(this.queryClient));
-    }
-  },
+var {
+    GitRepository: Whe,
+    GitReviewSnapshotStaleError: s4,
+    GitReviewSnapshot: c4,
+    GitWorktreeRepository: Khe,
+  } = createGitRepositoryModels({
+    clearShortLivedQueries: (queryClient, host) => T1(queryClient, host),
+    createQueryClient: () => ope(),
+    getConfigValue: (repository, keys, signal) => getGitConfigValue(repository, keys, signal),
+    getConfigValueForScope: (repository, key, scope, signal) =>
+      getGitConfigValueForScope(repository, key, scope, signal),
+    invalidateQueriesForRepoChange: (queryClient, root, kind, paths) =>
+      E1(queryClient, root, kind, paths),
+    invalidateWatchScopedQueries: (queryClient) => spe(queryClient),
+    memoize: (fn, options) => (0, DX.default)(fn, options),
+    pathPosix: g.default.posix,
+    pathsOverlap: (root, readPaths, changedPaths) => O1(root, readPaths, changedPaths),
+    queryKey: (...parts) => Q(...parts),
+    readConfigValue: (root, keys, host, signal) => readGitConfigValue(root, keys, host, signal),
+    runDiff: (...args) => y0(...args),
+    runGit: (...args) => $(...args),
+    setConfigValueForScope: (root, key, value, scope, host, signal) =>
+      setGitConfigValueForScope(root, key, value, scope, host, signal),
+  }),
   qhe = 1e3,
   Jhe = 1024,
   Yhe = class {
