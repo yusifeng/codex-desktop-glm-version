@@ -304,3 +304,10 @@ DOM Range 的文本节点遍历、selection offset 边界、`assignedSlot`/paren
 `scripts/test-preload-annotation-range-validation.mjs` 覆盖多文本节点、不可见父节点和
 range 根为文本节点三项行为断言。该边界不包含 React/vendor runtime，也不移动选择状态机
 或 DOM 副作用。
+
+### 增量抽取：annotation preview rounded geometry
+
+annotation feature preview 的 CSS 圆角解析、半径缩放/约束和 SVG rounded-rect path
+组装已迁移至 `src/main/browser-page-preload/annotation-preview-geometry.ts`。入口仅保留
+SVG DOM 节点创建与 backdrop 更新副作用，`scripts/test-preload-annotation-preview-geometry.mjs`
+覆盖百分比/像素圆角、双值半径、超界缩放和最终 path 语义，共 3 项断言。

@@ -6382,6 +6382,7 @@ var { resolveAnnotationThemeVariant } = require("./browser-page-preload/annotati
 var { readAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport");
 var { readAnnotationViewportState } = require("./browser-page-preload/annotation-viewport-state");
 var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport-override");
+var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23869,7 +23870,7 @@ function dy() {
     element: t,
     id: e,
     update({ viewport: a, targets: o }) {
-      let s = o.map((e) => ({ path: my(e), clip: e.clipRect })),
+      let s = o.map((e) => ({ path: buildAnnotationRoundedRectPath(e), clip: e.clipRect })),
         c = JSON.stringify({ viewport: a, shapes: s });
       if (c !== i) {
         i = c;
@@ -23888,48 +23889,10 @@ function dy() {
     },
   };
 }
-function fy({ rect: e, style: t, radiusScale: n }) {
-  let { width: r, height: i } = e,
-    a = [
-      t.borderTopLeftRadius,
-      t.borderTopRightRadius,
-      t.borderBottomRightRadius,
-      t.borderBottomLeftRadius,
-    ].map((e) => {
-      let [t, a = t] = e.trim().split(/\s+/);
-      return { x: hy(t, r, n?.x ?? 1), y: hy(a, i, n?.y ?? 1) };
-    }),
-    [o, s, c, l] = a,
-    u = Math.min(1, r / (o.x + s.x), r / (l.x + c.x), i / (o.y + l.y), i / (s.y + c.y));
-  for (let e of a) ((e.x *= u), (e.y *= u));
-  return a;
-}
 function py(e, t) {
   let n = document.createElementNS(`http://www.w3.org/2000/svg`, e);
   for (let [e, r] of Object.entries(t)) n.setAttribute(e, String(r));
   return n;
-}
-function my(e) {
-  let { x: t, y: n, width: r, height: i } = e.rect,
-    [a, o, s, c] = fy(e),
-    l = t + r,
-    u = n + i;
-  return [
-    `M${t + a.x} ${n}`,
-    `H${l - o.x}`,
-    `A${o.x} ${o.y} 0 0 1 ${l} ${n + o.y}`,
-    `V${u - s.y}`,
-    `A${s.x} ${s.y} 0 0 1 ${l - s.x} ${u}`,
-    `H${t + c.x}`,
-    `A${c.x} ${c.y} 0 0 1 ${t} ${u - c.y}`,
-    `V${n + a.y}`,
-    `A${a.x} ${a.y} 0 0 1 ${t + a.x} ${n}`,
-    `Z`,
-  ].join(` `);
-}
-function hy(e, t, n) {
-  let r = Number.parseFloat(e);
-  return Number.isFinite(r) ? Math.max(0, e.endsWith(`%`) ? (r * t) / 100 : r * n) : 0;
 }
 var gy = o(() => {});
 function _y({ layer: e, color: t }) {
@@ -23951,7 +23914,7 @@ function _y({ layer: e, color: t }) {
         s = new Set(t.map(({ element: e }) => e));
       for (let r of t) {
         let { element: t, rect: i, clipRect: a } = r,
-          [s, c, l, u] = fy(r),
+          [s, c, l, u] = resolveAnnotationCornerRadii(r),
           d = o.get(t);
         if (d == null) {
           let r = n.createElement(`div`);
