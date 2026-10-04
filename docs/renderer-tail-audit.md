@@ -278,3 +278,10 @@ coercion、`publishDelayMs` 延迟发布和 `bf/Oat` 持久化写入串成一个
 state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初始化或持久化副作用，
 由 `scripts/test-app-initial-parse-http-url.mjs` 的 4 项断言覆盖。原始导出保留以
 兼容尚未迁移的其他调用面。
+
+同一策略模块中的 `Msn`（内部 `uWt`）也已迁为
+`src/renderer/app-initial/runtime/parse-origin-pattern.ts` 的 `parseOriginPattern`。
+该函数及其 hostname/wildcard 规范化链只做确定性字符串解析，不触碰 signal、query
+或持久化 runtime；策略模块的 5 个调用点已切换到语义导入，并由
+`scripts/test-app-initial-parse-origin-pattern.mjs` 的 4 项断言覆盖。原 hub 导出仍
+保留，供其他尚未迁移的消费面使用。

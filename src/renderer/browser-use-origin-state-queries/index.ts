@@ -31,7 +31,6 @@ import {
   Fsn as domainMatchesPattern,
   Jsn as configurationQueryKey,
   Kdn as getWritableConfigurationLayer,
-  Msn as parseOriginPattern,
   Nsn as parseNetworkPattern,
   Qln as invokeRendererCommand,
   Ugn as getAppServerClient,
@@ -50,6 +49,7 @@ import {
   ugn as defaultHostId,
 } from "@rchunk/app-initial";
 import { parseHttpUrl as parseBrowserUrl } from "../app-initial/runtime/parse-http-url";
+import { parseOriginPattern } from "../app-initial/runtime/parse-origin-pattern";
 
 type OriginDecision = "allow" | "deny" | null;
 type BrowserCapability =
@@ -146,7 +146,7 @@ function getOriginPolicies(
   for (const [pattern, policy] of Object.entries(
     configuration?.browserUse?.origins ?? {},
   )) {
-    const parsed = parseOriginPattern(pattern) as ParsedOrigin | null;
+    const parsed = parseOriginPattern(pattern) as unknown as ParsedOrigin | null;
     if (
       parsed != null &&
       policy != null &&
@@ -288,7 +288,7 @@ function isOriginPolicyAllowed(
   }
   let explicitlyAllowed = false;
   for (const entry of policies) {
-    const pattern = parseOriginPattern(entry.pattern) as ParsedOrigin | null;
+    const pattern = parseOriginPattern(entry.pattern) as unknown as ParsedOrigin | null;
     if (pattern == null || !originPatternMatches(pattern, origin)) continue;
     const value = entry.policy[field];
     if (value === "deny" || value === false) return false;
@@ -330,7 +330,7 @@ function isSiteCapabilityAllowed(
 }
 
 function originPatternMatchesUrl(entry: { pattern: string }, url: string): boolean {
-  const pattern = parseOriginPattern(entry.pattern) as ParsedOrigin | null;
+  const pattern = parseOriginPattern(entry.pattern) as unknown as ParsedOrigin | null;
   const origin = parseBrowserUrl(url) as unknown as ParsedOrigin | null;
   return pattern != null && origin != null && originPatternMatches(pattern, origin);
 }
@@ -414,10 +414,10 @@ function createOriginPolicyEdits(
   configuration: BrowserUseConfiguration | null | undefined,
   update: { origin: string; policy: OriginPolicy | null },
 ): ConfigurationEdit[] {
-  const parsed = parseOriginPattern(update.origin) as ParsedOrigin | null;
+  const parsed = parseOriginPattern(update.origin) as unknown as ParsedOrigin | null;
   if (parsed == null) throw new Error("Invalid Browser Use origin pattern");
   const matchingKeys = Object.keys(configuration?.origins ?? {}).filter(
-    (key) => (parseOriginPattern(key) as ParsedOrigin | null)?.canonicalKey === parsed.canonicalKey,
+    (key) => (parseOriginPattern(key) as unknown as ParsedOrigin | null)?.canonicalKey === parsed.canonicalKey,
   );
   const canonicalKey = matchingKeys[0] ?? parsed.canonicalPattern;
   const basePath = `browser_use.origins.${JSON.stringify(canonicalKey)}`;
