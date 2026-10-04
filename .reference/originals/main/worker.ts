@@ -135,6 +135,7 @@ const { dispatchSyncedBranchRequest } = require("./worker/git-synced-branch-disp
 const { dispatchCacheWatchRequest } = require("./worker/git-cache-watch-dispatch");
 const { dispatchGitApplyRequest } = require("./worker/git-apply-dispatch");
 const { dispatchGitMutationRequest } = require("./worker/git-mutation-dispatch");
+const { dispatchWorktreeSnapshotRead } = require("./worker/git-worktree-snapshot-read-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -70116,14 +70117,10 @@ var I6 = kW(`git`),
             }));
             break;
           case `worktree-snapshot-ref`:
-            p = X(
-              await resolveWorktreeSnapshot(e.params.candidateRoots, e.params.worktreePath, worktreeSnapshotDeps),
-            );
+            p = X(await dispatchWorktreeSnapshotRead(e.method, e.params, { snapshotRef: (roots, path) => resolveWorktreeSnapshot(roots, path, worktreeSnapshotDeps), managedState: (roots, cwd, path) => resolveManagedWorktreeState(roots, cwd, path, worktreeSnapshotDeps) }));
             break;
           case `managed-worktree-state`:
-            p = X(
-              await resolveManagedWorktreeState(e.params.candidateRoots, e.params.cwd, e.params.worktreePath, worktreeSnapshotDeps),
-            );
+            p = X(await dispatchWorktreeSnapshotRead(e.method, e.params, { snapshotRef: (roots, path) => resolveWorktreeSnapshot(roots, path, worktreeSnapshotDeps), managedState: (roots, cwd, path) => resolveManagedWorktreeState(roots, cwd, path, worktreeSnapshotDeps) }));
             break;
           case `restore-worktree`: {
             p = X(await restoreWorktree(e.params, worktreeRequestDeps));
