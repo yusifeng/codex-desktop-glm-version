@@ -435,5 +435,17 @@
     "classification": "generated-local-project-route-effect",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The effect synchronizes project selection from navigation state into the generated project store and removes the transient project field from browser history. Its router and signal ownership are coupled to the adjacent generated route surface, with no named renderer consumer or independent teardown contract."
+  },
+  {
+    "hub": "app-primary", "alias": "B", "sourceSymbol": "W7", "startLine": 113692, "endLine": 113696,
+    "classification": "generated-local-project-dropdown-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer binds JSX, list primitives, project-group rendering and generated styling dependencies for the adjacent project dropdown. Its registration order is local to the dropdown tree and has no independently consumed renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "q", "sourceSymbol": "F7", "startLine": 113391, "endLine": 113395,
+    "classification": "generated-local-account-policy-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires account-policy banner state, identity queries and generated JSX before the neighboring acknowledgement component mounts. Its dependency setup is hub-local glue with no named renderer consumer or independent teardown boundary."
   }
 ]
