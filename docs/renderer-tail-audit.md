@@ -598,3 +598,12 @@ source symbol 与精确行范围。
 契约，属于生成模块内聚的 projection/state helper；因此继续保留在 hub，避免制造无主 identity、
 search、geometry 或 device-state facade。分类记录与 source symbol/精确行范围由 hub audit
 机器校验，focused suite 同时锁定这些 alias 仍在 unconsumed surface。
+
+本轮继续补齐 app-primary 主题/颜色小簇的逐行证据：`bE`/`qg` 读取 computed-style accent
+颜色，`ZOe`/`Qg` 建立主题属性与 head mutation observer，`QOe`/`Xg` 计算祖先背景对比度，
+`$Oe`/`Yg` 与 `eke`/`Jg` 分别格式化 rgb/rgba 颜色，`IE`/`Zg`、`rke`/`Hg`、`ike`/`Vg`
+和 `BE`/`Ug` 则初始化并选择生成的 light/dark token map。它们全部只服务相邻生成式
+annotation/theme styling pipeline，没有独立 renderer named consumer 或 teardown/lifecycle
+边界；因此登记为 generated-local theme/color helper 并保留在聚合 hub，避免制造无主 facade。
+行范围、source symbol 与分类由 hub audit 机器校验，focused suite 锁定 9 个 alias 仍属
+unconsumed surface。

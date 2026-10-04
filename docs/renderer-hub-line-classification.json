@@ -158,5 +158,50 @@
     "hub": "app-primary", "alias": "wc", "sourceSymbol": "DVe", "startLine": 31462, "endLine": 31465,
     "classification": "generated-local-device-state-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The helper resets the adjacent generated device onboarding signals and clears its transient metadata. It is a paired local state transition with EVe rather than a standalone renderer capability, so it remains in the hub."
+  },
+  {
+    "hub": "app-primary", "alias": "qg", "sourceSymbol": "bE", "startLine": 3376, "endLine": 3380,
+    "classification": "generated-local-theme-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper resolves the accent text color from an element's computed style with a stable blue fallback. It is only part of the generated annotation/theme styling pipeline and has no named renderer consumer or independent lifecycle boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Qg", "sourceSymbol": "ZOe", "startLine": 3382, "endLine": 3400,
+    "classification": "generated-local-theme-observer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper observes ancestor/theme attributes and document head mutations, returning a disconnect closure for the adjacent generated color surface. Its observer registration is coupled to that surface rather than a reusable renderer-owned lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Xg", "sourceSymbol": "QOe", "startLine": 3402, "endLine": 3433,
+    "classification": "generated-local-contrast-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper computes effective background luminance across DOM ancestors and appearance hints for the adjacent annotation surface. It has no independent named renderer consumer, so retaining the generated local policy avoids an unowned contrast facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Yg", "startLine": 3435, "endLine": 3437,
+    "classification": "generated-local-color-formatter", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The formatter converts parseable color values to an rgb string and otherwise preserves the original token. It is consumed only by the adjacent generated annotation styling pipeline and has no standalone renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Jg", "sourceSymbol": "eke", "startLine": 3439, "endLine": 3441,
+    "classification": "generated-local-color-formatter", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The formatter converts parseable color values to a translucent rgba token with a generated fallback. Its alpha policy is coupled to the local annotation styling pipeline and is not independently consumed by renderer code."
+  },
+  {
+    "hub": "app-primary", "alias": "Zg", "sourceSymbol": "IE", "startLine": 3525, "endLine": 3537,
+    "classification": "generated-local-theme-constants", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer defines color alpha, accent, and color-mix constants used by the generated theme helpers. These assignments are module-local initialization state with no independent renderer import or teardown boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Hg", "sourceSymbol": "rke", "startLine": 3539, "endLine": 3540,
+    "classification": "generated-local-theme-policy", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The policy selects the Codex theme variable set versus the default set. It is a local branch of generated theme initialization and has no named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "Vg", "sourceSymbol": "ike", "startLine": 3542, "endLine": 3542,
+    "classification": "generated-local-theme-constant", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper returns the fixed white theme color used by the generated styling surface. It is a local compatibility helper with no independent renderer lifecycle or named consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "Ug", "sourceSymbol": "BE", "startLine": 3546, "endLine": 3634,
+    "classification": "generated-local-theme-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer materializes the light/dark CSS token maps and memoizes them for the adjacent generated theme surface. Its state and initialization order are coupled to the hub-local styling runtime, so extraction would create an unowned facade."
   }
 ]
