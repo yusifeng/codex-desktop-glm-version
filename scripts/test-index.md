@@ -11,6 +11,7 @@ Total scripts: 794.
 - [`test-main-target-filter-policy.mjs`](./test-main-target-filter-policy.mjs)
 - [`test-main-target-input-policy.mjs`](./test-main-target-input-policy.mjs)
 - [`test-main-target-selection-policy.mjs`](./test-main-target-selection-policy.mjs)
+- [`test-main-target-launch-args.mjs`](./test-main-target-launch-args.mjs)
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
 - [`test-preload-annotation-scroll-container.mjs`](./test-preload-annotation-scroll-container.mjs)
 

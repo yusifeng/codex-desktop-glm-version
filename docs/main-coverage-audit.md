@@ -142,6 +142,14 @@ open-in target 的请求目标选择与 Windows file-manager fallback（原 `d4e
 过滤后回退与 Windows 默认 file-manager 语义；入口只负责压缩别名适配。由
 `scripts/test-main-target-selection-policy.mjs` 覆盖 8 项优先级、平台和 fallback 断言。
 
+### A3 增量抽取：open-in target launch arguments
+
+编辑器跳转参数、VS Code remote URI 与 remote 命令参数组装（原 `R1/A4e/B1`，138305-138335）
+已迁移至 `src/main/main-app/open-target/target-launch-args.ts`。模块只生成参数数组和
+编码后的 remote URI，通过显式 location/platform 输入保持 Windows、普通编辑器和远程 workspace
+语义；入口仍负责 host 配置解析与进程启动。`scripts/test-main-target-launch-args.mjs`
+覆盖 6 项普通/Windows/远程 URI 与 folder 参数断言。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含

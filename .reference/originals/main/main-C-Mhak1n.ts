@@ -34,6 +34,7 @@ const remoteHost = require("./main-app/open-target/remote-host.js");
 const openTargetFilter = require("./main-app/open-target/target-filter-policy.js");
 const targetInputPolicy = require("./main-app/open-target/target-input-policy.js");
 const targetSelectionPolicy = require("./main-app/open-target/target-selection-policy.js");
+const targetLaunchArgs = require("./main-app/open-target/target-launch-args.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -138313,11 +138314,7 @@ function L1(e) {
   return null;
 }
 function R1(e, t) {
-  return t
-    ? [`--goto`, `${e}:${t.line}:${t.column}`]
-    : process.platform === `win32`
-      ? [e]
-      : [`--goto`, e];
+  return targetLaunchArgs.buildEditorGotoArgs(e, t, process.platform);
 }
 function z1({ hostConfig: e, remoteWorkspaceRoot: t, remotePath: n, location: r }) {
   if (e.kind === `remote-control`)
@@ -138335,15 +138332,10 @@ function z1({ hostConfig: e, remoteWorkspaceRoot: t, remotePath: n, location: r 
   );
 }
 function A4e({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r }) {
-  let i = [];
-  return (
-    t != null && i.push(`--folder-uri`, B1(e, t)),
-    i.push(`--remote`, e, `--goto`, `${n}:${r.line}:${r.column}`),
-    i
-  );
+  return targetLaunchArgs.buildVscodeRemoteArgs({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r });
 }
 function B1(e, t) {
-  return `vscode-remote://${e}${(t.startsWith(`/`) ? t : `/${t}`).split(`/`).map(encodeURIComponent).join(`/`)}`;
+  return targetLaunchArgs.buildVscodeRemoteUri(e, t);
 }
 function V1({ label: e, icon: t, kind: n, platform: r }) {
   return {

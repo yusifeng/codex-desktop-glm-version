@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/main-app/open-target/target-launch-args.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { buildEditorGotoArgs, buildVscodeRemoteUri, buildVscodeRemoteArgs } = module.exports;
+assert.deepEqual(buildEditorGotoArgs("/tmp/a.ts", { line: 2, column: 3 }, "linux"), ["--goto", "/tmp/a.ts:2:3"]);
+assert.deepEqual(buildEditorGotoArgs("C:\\a.ts", null, "win32"), ["C:\\a.ts"]);
+assert.deepEqual(buildEditorGotoArgs("/tmp/a.ts", null, "darwin"), ["--goto", "/tmp/a.ts"]);
+assert.equal(buildVscodeRemoteUri("ssh-remote+prod", "workspace/a b"), "vscode-remote://ssh-remote+prod/workspace/a%20b");
+assert.deepEqual(buildVscodeRemoteArgs({ remoteAuthority: "ssh-remote+prod", remoteWorkspaceRoot: "/workspace", path: "/workspace/a.ts", location: { line: 4, column: 5 } }), ["--folder-uri", "vscode-remote://ssh-remote+prod/workspace", "--remote", "ssh-remote+prod", "--goto", "/workspace/a.ts:4:5"]);
+assert.deepEqual(buildVscodeRemoteArgs({ remoteAuthority: "ssh-remote+prod", path: "a.ts", location: { line: 1, column: 1 } }), ["--remote", "ssh-remote+prod", "--goto", "a.ts:1:1"]);
+console.log("main target launch args passed (6 assertions)");
