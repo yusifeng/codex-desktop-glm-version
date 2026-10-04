@@ -96,6 +96,19 @@ rolldown 的 `e.t/e.r/e.a/e.n` 包装、模块编号表、`__export`/`__toCommon
 3. `109,475-126,987` 的 IAB/MCP sandbox 与 `152,560-168,047` 的窗口/终端簇跨越 Electron 生命周期，不能仅凭导出消费量判断完成。
 4. vendor 区间的 npm 替换只能在行为验证后进行；在未完成等价验证前，继续走 transform-only 是有意的 `preserved` 状态，不是遗漏。
 
+### A3 增量抽取：DeviceCheck attestation
+
+原 `devicecheck-attestation`（3,084-3,264）已迁移至
+`src/main/main-app/security/device-check.ts`，入口仅保留压缩别名兼容导入。该模块保留
+darwin/win32 平台门控、Apple Silicon 能力探测、native addon token 生成与四类失败码，
+并将 DeviceCheck token 的 CBOR/base64url 编码集中到可读实现；logger、addon 和信号采集均
+可注入。`scripts/test-main-device-check.mjs` 覆盖平台/架构矩阵、能力探测异常、成功 token、
+不可用与 native 失败日志、请求过滤及 token 生成，共 13 项 focused assertions。
+
+该抽取不触碰窗口、worker 或 preload 生命周期；原 `main-C-Mhak1n.ts` 的 DeviceCheck
+实现已删除并由语义模块接回，language-server、IAB/MCP sandbox 与启动装配边界仍保持
+business-preserved，A3 不宣称完成。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含
