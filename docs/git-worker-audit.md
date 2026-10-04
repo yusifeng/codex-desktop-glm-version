@@ -946,3 +946,7 @@ worker 请求完成后的仓库缓存失效策略已迁移至
 判定、exact/host 失效目标与 cwd/root 优先级解析；入口仍负责实际缓存失效、Git manager
 和 host 生命周期副作用。`scripts/test-worker-git-request-invalidation-policy.mjs`
 覆盖 mutation/readonly、cwd/root 优先级、exact/host 目标与 commit 条件，共 7 项断言。
+Git watcher session 生命周期纯策略已进一步收敛至
+`src/main/worker/git-watch-session-policy.ts`：指数重连退避、retry timer 单例门控、session close
+稳定阈值、恢复后重试条件均由独立模块提供，`git-watch-paths.ts` 仅复用语义入口；新增 8 项
+focused assertions 覆盖 disposed、generation、session matching 与 delay cap 边界。

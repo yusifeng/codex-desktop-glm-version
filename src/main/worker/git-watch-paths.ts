@@ -4,6 +4,13 @@ type PathApi = {
   isAbsolute(value: string): boolean;
 };
 
+import {
+  getGitWatchSessionClosePolicy,
+  nextGitWatcherRetryDelay,
+  shouldRetryGitWatchTargetAfterStart,
+  shouldScheduleGitWatchSessionRetry,
+} from "./git-watch-session-policy";
+
 /** Returns whether `candidate` is inside `root` (or is root itself). */
 function isWithinPath(pathApi: PathApi, root: string, candidate: string): boolean {
   const relative = pathApi.relative(root, candidate);
@@ -84,10 +91,6 @@ function createGitRepoChangedEvent(input: { changeType: string; commonDir: strin
     root: input.root,
     ...(input.changedPaths == null ? {} : { changedPaths: input.changedPaths }),
   };
-}
-
-function nextGitWatcherRetryDelay(currentDelayMs: number, maxDelayMs: number): number {
-  return Math.min(currentDelayMs * 2, maxDelayMs);
 }
 
 function shouldScheduleGitRepoChange(disposed: boolean, changeType: string, activeChanges: Set<string>, pendingTimers: Map<string, unknown>): boolean {
@@ -181,11 +184,6 @@ function partitionGitWorktreeWatchPaths(existingPaths: string[], discoveredPaths
   };
 }
 
-/** Decides whether a recovered watcher target should be retried after startup settles. */
-function shouldRetryGitWatchTargetAfterStart(input: { recovering: boolean; disposed: boolean; generationUnchanged: boolean; hasSession: boolean; metadataMissing: boolean }): boolean {
-  return input.recovering && !input.disposed && input.generationUnchanged && !input.hasSession && !input.metadataMissing;
-}
-
 /** Filters changed paths for one watcher handler and normalizes working-tree Git metadata paths. */
 function collectGitWatchHandlerPaths(pathApi: (PathApi & { join(...parts: string[]): string }) | null, root: string, handler: { changeType: string; shouldHandleChangedPath: (path: string, cache: Map<string, boolean>) => boolean }, changedPaths: string[], cache: Map<string, boolean>): string[] {
   const workingTree = handler.changeType === `working-tree`;
@@ -195,19 +193,6 @@ function collectGitWatchHandlerPaths(pathApi: (PathApi & { join(...parts: string
     const affected = pathApi == null ? path : getAffectedWorkingTreePath(pathApi, root, path);
     return affected == null ? [] : [affected];
   });
-}
-
-/** Guards creation of a watcher retry timer against disposed or removed targets. */
-function shouldScheduleGitWatchSessionRetry(input: { disposed: boolean; targetRegistered: boolean; hasRetryTimer: boolean }): boolean {
-  return !input.disposed && input.targetRegistered && !input.hasRetryTimer;
-}
-
-/** Describes the state transition permitted when a watcher session closes. */
-function getGitWatchSessionClosePolicy(input: { disposed: boolean; sessionMatches: boolean; elapsedMs: number; stableThresholdMs: number }): { active: boolean; resetRetryDelay: boolean } {
-  return {
-    active: !input.disposed && input.sessionMatches,
-    resetRetryDelay: input.elapsedMs >= input.stableThresholdMs,
-  };
 }
 
 export { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry };
