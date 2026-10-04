@@ -916,6 +916,12 @@ watcher 集合生命周期。`scripts/test-worker-git-watch-index-bucket.mjs` �
 `unwatchRepo` 副作用；helper 仅协调 session 生命周期，由 `scripts/test-worker-git-watch-acquire.mjs`
 覆盖 open-watch 复用、幂等 release、queued abort 和 start rejection，共 8 项断言。
 
+Git init watcher 的重连与 session-ready 纯策略已进一步迁移至
+`src/main/worker/git-init-watcher-policy.ts`：连接关闭/监听失败的重连判定、指数退避上限及
+root/git 双 session 就绪判定不再与异步 watcher 副作用混在一起；`GitInitWatcher` 仍保留
+watch 创建、dispose、stat 与 debounce 生命周期。`scripts/test-worker-git-init-watcher.mjs`
+新增 8 项策略断言（总计 43 项）。
+
 ### 增量抽取：Live-query request handler
 
 GitRepoManager 的 live-query 业务编排（status/review summary、branch diff stats、branch 查询与

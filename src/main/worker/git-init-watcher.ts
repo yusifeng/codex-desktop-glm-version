@@ -129,8 +129,7 @@ class GitInitWatcher {
       }
       if (
         gitSession == null ||
-        !this.sessions.has(rootSession) ||
-        !this.sessions.has(gitSession)
+        !isGitInitWatchSetReady(this.sessions, rootSession, gitSession)
       ) {
         this.disposeSessions();
         return false;
@@ -140,9 +139,7 @@ class GitInitWatcher {
     if (checkExistingGitDirectory)
       await this.checkForGitDirectory(gitDirectoryPath);
     return (
-      !this.disposed &&
-      this.sessions.has(rootSession) &&
-      (gitSession == null || this.sessions.has(gitSession))
+      !this.disposed && isGitInitWatchSetReady(this.sessions, rootSession, gitSession)
     );
   }
 
@@ -171,10 +168,7 @@ class GitInitWatcher {
             safe: {},
             sensitive: { cwd: this.options.cwd, error: result.error },
           });
-        if (
-          result.reason === `connection-closed` ||
-          result.reason === `watch-error`
-        ) {
+        if (shouldReconnectGitInitWatch(result.reason)) {
           this.disposeSessions();
           this.scheduleReconnect(gitDirectoryPath, pathSeparator);
         }
@@ -186,8 +180,8 @@ class GitInitWatcher {
   scheduleReconnect(gitDirectoryPath: string, pathSeparator: string) {
     if (this.disposed || this.reconnectTimer != null) return;
     const delayMs = this.reconnectDelayMs;
-    this.reconnectDelayMs = Math.min(
-      this.reconnectDelayMs * 2,
+    this.reconnectDelayMs = nextGitInitReconnectDelay(
+      this.reconnectDelayMs,
       this.dependencies.maxReconnectDelayMs,
     );
     this.reconnectTimer = this.dependencies.setTimeout(() => {
@@ -234,3 +228,8 @@ class GitInitWatcher {
 
 export { GitInitWatcher };
 if (typeof module !== `undefined`) module.exports = { GitInitWatcher };
+import {
+  isGitInitWatchSetReady,
+  nextGitInitReconnectDelay,
+  shouldReconnectGitInitWatch,
+} from "./git-init-watcher-policy";

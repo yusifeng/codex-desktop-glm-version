@@ -6,6 +6,11 @@ const require = createRequire(import.meta.url);
 const { GitInitWatcher } = require(
   "../app/.vite/build/worker/git-init-watcher.js",
 );
+const {
+  isGitInitWatchSetReady,
+  nextGitInitReconnectDelay,
+  shouldReconnectGitInitWatch,
+} = require("../app/.vite/build/worker/git-init-watcher-policy.js");
 
 let count = 0;
 const equal = (...args) => {
@@ -16,6 +21,20 @@ const deepEqual = (...args) => {
   count++;
   assert.deepEqual(...args);
 };
+
+equal(shouldReconnectGitInitWatch("connection-closed"), true);
+equal(shouldReconnectGitInitWatch("watch-error"), true);
+equal(shouldReconnectGitInitWatch("disposed"), false);
+equal(nextGitInitReconnectDelay(250, 1000), 500);
+equal(nextGitInitReconnectDelay(800, 1000), 1000);
+const rootSession = {};
+const gitSession = {};
+equal(isGitInitWatchSetReady(new Set([rootSession]), rootSession), true);
+equal(isGitInitWatchSetReady(new Set([rootSession]), rootSession, gitSession), false);
+equal(
+  isGitInitWatchSetReady(new Set([rootSession, gitSession]), rootSession, gitSession),
+  true,
+);
 
 const deferred = () => {
   let resolve;
