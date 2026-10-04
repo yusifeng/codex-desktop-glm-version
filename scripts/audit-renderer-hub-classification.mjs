@@ -73,6 +73,17 @@ function readConsumption(hub) {
       if (namespace) {
         const re = new RegExp(`\\b${namespace[1]}\\.([A-Za-z_$][\\w$]*)\\b`, "g");
         for (const member of source.matchAll(re)) namespaceMembers.add(member[1]);
+        // A large portion of the renderer uses a namespace import as a typed
+        // binding table (`const { alias: semanticName } = chunk`).  Those
+        // aliases are real consumers just like `chunk.alias`; include the
+        // left-hand export name while retaining the existing namespace scan.
+        const destructuring = new RegExp(`(?:const|let|var)\\s*\\{([\\s\\S]*?)\\}\\s*=\\s*${namespace[1]}\\b`, "g");
+        for (const binding of source.matchAll(destructuring)) {
+          for (const item of binding[1].split(",")) {
+            const exportName = item.trim().split(/\s*:\s*/)[0].replace(/^type\s+/, "");
+            if (/^[A-Za-z_$][\\w$]*$/.test(exportName)) namespaceMembers.add(exportName);
+          }
+        }
       }
       const braces = clause.match(/\{([\s\S]*)\}/);
       if (braces) {

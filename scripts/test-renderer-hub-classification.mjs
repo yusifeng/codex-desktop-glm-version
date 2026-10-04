@@ -10,6 +10,11 @@ for (const result of results) {
   assert.ok(result.unconsumed.every((alias) => /^[A-Za-z_$][\w$]*$/.test(alias)));
 }
 const primary = results[2];
+// Namespace imports are frequently narrowed through a destructuring binding
+// (`const { Sm: AnnouncementShell } = appPrimaryChunk`).  The audit must count
+// the public alias on the left-hand side as a real consumer, not classify it as
+// an unreferenced export merely because no `chunk.Sm` member expression exists.
+assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
 assert.equal(primary.reviewedCount, 1, "line-level A5 classification must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");

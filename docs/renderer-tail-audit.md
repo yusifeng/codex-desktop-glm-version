@@ -35,7 +35,9 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 命名消费计入 `consumed`，仅副作用导入单独计数，剩余别名明确列为
 `unconsumed`。当前门禁报告三座 hub 仍有大量未消费业务表面（这正是 A5 的物理
 迁移缺口），因此 `--strict` 预期失败；不允许把“export 表已登记”误报成“hub
-已完成语义化”。`scripts/test-renderer-hub-classification.mjs` 固定三座 hub
+已完成语义化”。审计同时识别 namespace import 的解构绑定（例如
+`const { Sm: AnnouncementShell } = appPrimaryChunk`），按左侧公开别名计入真实
+消费；这避免把 typed binding table 误报成 zero-consumer。`scripts/test-renderer-hub-classification.mjs` 固定三座 hub
 均存在消费面且保留未消费缺口，防止以后通过删除审计来掩盖尾部。
 
 本轮对 `app-primary` 再做一次实现级、逐行抽样，而不是按压缩别名数量猜测迁移
