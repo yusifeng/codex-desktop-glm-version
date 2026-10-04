@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/platform-entry-order.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { sortPlatformEntryNames } = module.exports;
+assert.deepEqual(sortPlatformEntryNames(["2022", "2019", "2024"]), ["2024", "2022", "2019"]);
+assert.deepEqual(sortPlatformEntryNames(new Set(["Community", "Enterprise", "Preview"])), ["Preview", "Enterprise", "Community"]);
+assert.deepEqual(sortPlatformEntryNames([]), []);
+console.log("worker platform entry order tests passed (3 assertions)");

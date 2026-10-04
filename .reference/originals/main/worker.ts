@@ -121,6 +121,7 @@ const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
+const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
 const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation } = require("./worker/editor-target-args");
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
@@ -81170,7 +81171,7 @@ function DEe(e, t) {
   return (0, m.existsSync)(r) ? r : G7(_Ee[e]);
 }
 function x9(e) {
-  return [...e].sort((e, t) => t.localeCompare(e));
+  return sortPlatformEntryNames(e);
 }
 function OEe() {
   if (y9) return y9;
