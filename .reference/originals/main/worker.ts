@@ -136,6 +136,7 @@ const { dispatchCacheWatchRequest } = require("./worker/git-cache-watch-dispatch
 const { dispatchGitApplyRequest } = require("./worker/git-apply-dispatch");
 const { dispatchGitMutationRequest } = require("./worker/git-mutation-dispatch");
 const { dispatchWorktreeSnapshotRead } = require("./worker/git-worktree-snapshot-read-dispatch");
+const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69839,9 +69840,20 @@ var I6 = kW(`git`),
           throw L6;
         switch (e.method) {
           case `github-request`:
-            if (this.dependencies.requestGitHub == null)
-              throw Error(`GitHub requests require a Node Git worker`);
-            p = X(await this.dependencies.requestGitHub(e.params, i.signal));
+            p = X((await dispatchGitNodeRequest(e.method, e.params, {
+              host: o,
+              signal: i.signal,
+              requestGitHub: this.dependencies.requestGitHub,
+              resolveAutomationWritableRoots: (params) => resolveAutomationWritableRoots(params, {
+                gitManager: this.gitManager,
+                host: o,
+                getIndexPath: getGitIndexPath,
+                path: g.default,
+              }),
+              readGitFileBinary: this.dependencies.readGitFileBinary,
+              getWorktreeRepository: (cwd, host) => this.gitManager.getWorktreeRepository(cwd, host),
+              prepareWorktreeSnapshot: this.dependencies.prepareWorktreeSnapshot,
+            })).result);
             break;
           case `origin-url`: {
             p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
@@ -69863,30 +69875,36 @@ var I6 = kW(`git`),
             break;
           }
           case `automation-writable-roots`:
-            p = X({
-              roots: await resolveAutomationWritableRoots(e.params, {
+            p = X((await dispatchGitNodeRequest(e.method, e.params, {
+              host: o,
+              signal: i.signal,
+              resolveAutomationWritableRoots: (params) => resolveAutomationWritableRoots(params, {
                 gitManager: this.gitManager,
                 host: o,
                 getIndexPath: getGitIndexPath,
                 path: g.default,
               }),
-            });
+              getWorktreeRepository: (cwd, host) => this.gitManager.getWorktreeRepository(cwd, host),
+            })).result);
             break;
           case `merge-base`: {
             p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
             break;
           }
           case `read-git-file-binary`:
-            if (this.dependencies.readGitFileBinary == null)
-              throw Error(`Reading Git binary files requires a Node Git worker`);
-            p = X(await this.dependencies.readGitFileBinary(e.params, o, i.signal));
+            p = X((await dispatchGitNodeRequest(e.method, e.params, {
+              host: o,
+              signal: i.signal,
+              readGitFileBinary: this.dependencies.readGitFileBinary,
+            })).result);
             break;
           case `prepare-worktree-snapshot`: {
-            if (this.dependencies.prepareWorktreeSnapshot == null)
-              throw Error(`Preparing worktree snapshots requires a Node Git worker`);
-            let t = await this.gitManager.getWorktreeRepository(e.params.cwd, o);
-            if (t == null) throw Error(`gitRoot must belong to a Git worktree`);
-            p = X(await this.dependencies.prepareWorktreeSnapshot(t, e.params.snapshotBranch));
+            p = X((await dispatchGitNodeRequest(e.method, e.params, {
+              host: o,
+              signal: i.signal,
+              getWorktreeRepository: (cwd, host) => this.gitManager.getWorktreeRepository(cwd, host),
+              prepareWorktreeSnapshot: this.dependencies.prepareWorktreeSnapshot,
+            })).result);
             break;
           }
           case `push`: {
