@@ -38,6 +38,15 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 已完成语义化”。`scripts/test-renderer-hub-classification.mjs` 固定三座 hub
 均存在消费面且保留未消费缺口，防止以后通过删除审计来掩盖尾部。
 
+本轮对一个具体未消费导出做了实现级判定：`app-shared` 的 `qhe`（公开别名
+`U$`，原始定义行约 91,xxx）与其懒初始化器 `Jhe`（公开别名 `W$`）是
+`chat-bubble-rounded-rectangle-text-light-20` 图标资产，而不是业务 helper。
+`src/renderer/app-shared/ui/icons/manifest.json` 已有对应 `var/init` 记录，且
+`chat-bubble-rounded-rectangle-text-light-20.ts` 已由 `createIconPreset` 提供可读
+语义实现；当前 renderer 没有命名消费者，故不能把该导出强行计入业务迁移，继续
+保留为 generated icon surface。该证据也说明 A5 的 unconsumed 数量包含已语义化
+但暂无消费者的图标，不应仅按数量批量迁移。
+
 `use-imported-setup-opportunity` 同样是 74 导出的构建聚合边界，但当前仅消费
 `ft/pt`。消费侧已经分别命名为 `resolveImportedSetupLabel` 与
 `projectImportedSetupItems`，声明也固定为具体函数签名；审计禁止扩大该表面。
