@@ -1,6 +1,6 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
-最新增量：GitHub pull-request board 的列表参数、远端仓库候选归一化与 CI/merge 状态判定已迁移至 `src/main/worker/github-pull-request-board-policy.ts`；board handler 仅保留 GitHub 请求与仓库副作用编排，并由 `scripts/test-worker-github-pull-request-board-policy.mjs` 覆盖 12 项 focused assertions。
+最新增量：GitHub pull-request board 的列表参数、远端仓库候选归一化与 CI/merge 状态判定已迁移至 `src/main/worker/github-pull-request-board-policy.ts`；board handler 仅保留 GitHub 请求与仓库副作用编排，并由 `scripts/test-worker-github-pull-request-board-policy.mjs` 覆盖 13 项 focused assertions。
 
 > 本文档是最终 handoff。前一阶段（消费驱动的语义化）已按 DoD 验收完成：
 > 全部门禁绿、被消费的导出 100% 语义化、所有 chunk 已分类。
