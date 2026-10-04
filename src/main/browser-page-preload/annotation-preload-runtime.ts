@@ -2,6 +2,7 @@ import { createAnnotationPreloadBridge } from "./annotation-preload-bridge";
 import { createAnnotationRuntimeMount } from "./annotation-runtime-mount";
 import { dispatchAnnotationHostMessage } from "./annotation-host-message-dispatcher";
 import { createAnnotationFeatureLifecycle } from "./annotation-feature-lifecycle";
+import { applyAnnotationSyncState } from "./annotation-sync-state";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -85,17 +86,21 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   };
 
   const applySync = (message: any) => {
-    const wasActive = featureLifecycle.modeControllerDispose != null && deps.isCommentModeActive(state);
-    if (message.canUseSiteAnnotationApi === false) disposeFeatures();
-    if (message.isAgentControllingBrowser || message.siteAnnotationFeaturesEnabled === false) {
-      featureLifecycle.siteAnnotationRequests?.clear();
-      runtimeMount.setPreview(null);
-    }
-    state = deps.resolveSyncState(message, siteAnnotationApiAvailable);
-    const isActive = featureLifecycle.modeControllerDispose != null && deps.isCommentModeActive(state);
-    if (isActive !== wasActive) {
+    const result = applyAnnotationSyncState({
+      state,
+      message,
+      siteAnnotationApiAvailable,
+      modeControllerMounted: featureLifecycle.modeControllerDispose != null,
+      resolveSyncState: deps.resolveSyncState,
+      isCommentModeActive: deps.isCommentModeActive,
+      disposeFeatures,
+      clearSiteAnnotationRequests: () => featureLifecycle.siteAnnotationRequests?.clear(),
+      clearPreview: () => runtimeMount.setPreview(null),
+    });
+    state = result.state;
+    if (result.modeChanged) {
       deps.documentLike.dispatchEvent(
-        deps.createCustomEvent(`oaiannotationmodechange`, { detail: { active: isActive } }),
+        deps.createCustomEvent(`oaiannotationmodechange`, { detail: { active: result.active } }),
       );
     }
   };

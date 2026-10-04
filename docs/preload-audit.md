@@ -496,3 +496,11 @@ region、virtual 三类 selection、clip/no-clip、border radius、source index 
 兼容委托；DOM 文本读取仍由入口提供元素对象，React render 与设计变更副作用未移入该模块。
 `scripts/test-preload-annotation-design-styles.mjs` 覆盖样式值归一化、previousValue 保留、
 混合文本拒绝、provenance 投影和三种 target mode，共 9 项断言。
+
+### 增量抽取：annotation host sync state boundary
+
+批注 host sync 消息对能力关闭、agent 控制清理、preview/request 清理以及 comment-mode
+transition 的状态编排已迁移至 `src/main/browser-page-preload/annotation-sync-state.ts`。
+入口仅注入既有 feature lifecycle、runtime mount 和状态解析器，仍保留 DOM event dispatch
+等副作用；`scripts/test-preload-annotation-sync-state.mjs` 覆盖正常模式切换、能力关闭和
+agent 控制清理，共 7 项行为断言。
