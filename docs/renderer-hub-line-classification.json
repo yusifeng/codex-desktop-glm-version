@@ -399,5 +399,17 @@
     "classification": "generated-local-file-drop-runtime-initializer",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer binds JSX, state and drag/drop dependencies for the generated file-drop surface. Import order and dependency registry ownership belong to the adjacent local runtime rather than an independently consumed renderer module."
+  },
+  {
+    "hub": "app-primary", "alias": "J", "sourceSymbol": "ugt", "startLine": 113045, "endLine": 113175,
+    "classification": "generated-local-review-pane-metrics-lifecycle",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The generated effect component synchronizes review-pane metrics, local-thread file-change invalidation and persisted review visibility. Its subscriptions are lifecycle glue for the neighboring review route and have no separately named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "I", "sourceSymbol": "J7", "startLine": 113801, "endLine": 113805,
+    "classification": "generated-local-review-pane-runtime-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires review-pane state, query and style registries before the neighboring generated review lifecycle runs. Its dependency setup is local runtime glue rather than an independently consumed renderer boundary."
   }
 ]
