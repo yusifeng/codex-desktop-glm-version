@@ -6263,6 +6263,7 @@ var { createAnnotationRequestContext } = require("./browser-page-preload/annotat
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
 var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annotation-draft-runtime");
+var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23979,12 +23980,7 @@ function zy(e, t, n) {
   );
 }
 function By(e) {
-  let t = e;
-  for (; t != null;) {
-    if (t.matches(`input, button, select, audio, video`)) return !Ju(t);
-    t = ic(t);
-  }
-  return !1;
+  return isAnnotationSelectionBlocked(e, { getParent: ic, isTextInput: Ju });
 }
 var Vy = o(() => {
     (Dl(), dl(), tl(), td());

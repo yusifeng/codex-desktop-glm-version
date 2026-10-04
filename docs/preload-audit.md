@@ -429,3 +429,11 @@ gate、sync payload 和 editor queue 清理。
 `src/main/browser-page-preload/annotation-anchor-geometry.ts`。入口仅保留既有 DOM/frame 依赖的
 注入和兼容函数名委托；跨 frame、scroll offset、viewport clamp 与 box style 语义由
 `scripts/test-preload-annotation-anchor-geometry.mjs` 覆盖，共 3 项断言。
+
+### 增量抽取：annotation selection control boundary
+
+指针选区控制元素门控（原 `By`）已迁移至
+`src/main/browser-page-preload/annotation-selection.ts`。模块只负责沿 DOM 父链识别
+`input/button/select/audio/video` 并委托 text-input 判定；入口保留 `By` 兼容包装，
+由 `scripts/test-preload-annotation-selection.mjs` 覆盖普通节点、文本输入、原生按钮和
+嵌套节点共 4 项断言。
