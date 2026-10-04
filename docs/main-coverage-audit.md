@@ -213,3 +213,7 @@ node scripts/audit-shared-consumption.mjs
 原 `s7/Lrt`（161,783-161,788、175,938）的异步清理等待与超时竞态已迁移至
 `src/main/main-app/startup/cleanup-timeout.ts`，由 `scripts/test-main-cleanup-timeout.mjs`
 覆盖成功、拒绝和超时路径共 4 项断言；具体清理副作用与超时常量仍由入口注入。
+
+tray ready 状态谓词（原 `Z9`，175,280-175,282）已迁移至
+`src/main/main-app/tray/tray-readiness.ts`，入口保留兼容函数并隔离 tray 对象可选调用；
+由 `scripts/test-main-tray-readiness.mjs` 覆盖 5 项状态/空值断言。

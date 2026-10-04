@@ -55,6 +55,7 @@ Total scripts: 731.
 - [`test-main-tray-icon-paths.mjs`](./test-main-tray-icon-paths.mjs)
 - [`test-main-computer-use-rpc-handler.mjs`](./test-main-computer-use-rpc-handler.mjs)
 - [`test-main-history-scope-actions.mjs`](./test-main-history-scope-actions.mjs)
+- [`test-main-tray-readiness.mjs`](./test-main-tray-readiness.mjs)
 - [`test-preload-annotation-controls-registry.mjs`](./test-preload-annotation-controls-registry.mjs)
 - [`test-preload-annotation-surface-events.mjs`](./test-preload-annotation-surface-events.mjs)
 - [`test-preload-annotation-editor-default-mode.mjs`](./test-preload-annotation-editor-default-mode.mjs)

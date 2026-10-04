@@ -376,6 +376,8 @@ computer-use history scope/clear action 常量及 application-session 时间区�
 `Dst/Ost` 与 `kst` 内联计算）已迁移至
 `src/main/main-app/computer-use/history-scope-actions.ts`，由
 `scripts/test-main-history-scope-actions.mjs` 覆盖 10 项断言；入口仍保留 native status
+tray ready 状态谓词已迁移至 `src/main/main-app/tray/tray-readiness.ts`，由
+`scripts/test-main-tray-readiness.mjs` 覆盖 5 项断言。
 item 的 Electron、worker 与导航副作用。
 由 13 项行为断言覆盖；main 启动 flavor/platform flags 与阶段计时策略已抽取为
 `src/main/main-app/startup/startup-policy.ts`；路径扩展名分类、debug Chrome page 和 remote-hosted

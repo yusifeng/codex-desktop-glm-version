@@ -26,6 +26,7 @@ const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspa
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates } = require("./main-app/startup/tray-icon-paths.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
+const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
 let c = require("node:url"),
   l = require("electron"),
@@ -175278,7 +175279,7 @@ function X9() {
   return G9;
 }
 function Z9() {
-  return Y9 && G9?.isReady() === !0;
+  return isTrayReady(Y9, G9);
 }
 async function Pst(e) {
   return (
