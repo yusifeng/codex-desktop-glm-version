@@ -112,6 +112,7 @@ const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, class
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
 const { parseShellEnvironmentOutput, getEnvironmentValue } = require("./worker/shell-environment-parser");
+const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
@@ -71572,12 +71573,15 @@ function _be(e) {
   });
 }
 function vbe(e, t, n, r = G6(t)) {
+  return rewriteGitCommandForWindows(e, t, n, { platform: process.platform });
+  /*
   if (n || process.platform !== `win32` || e[0] !== `git`) return e;
   let i = ybe(t),
     a = bbe(i, r);
   return /\.(cmd|bat)$/i.test(a)
     ? [K6(i, `ComSpec`) ?? `cmd.exe`, `/d`, `/s`, `/c`, a, ...e.slice(1)]
     : [a, ...e.slice(1)];
+  */
 }
 function ybe(e) {
   let t = { ...process.env };

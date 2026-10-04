@@ -347,6 +347,7 @@ annotation surface feature observer（DOM/shadow-root 扫描、feature 状态、
 dispose 生命周期）已抽取为 `src/main/browser-page-preload/annotation-surface-observer.ts`，
 annotation shadow-root discovery observer（原 `Ng` 22064-22116）已进一步迁移至 `src/main/browser-page-preload/annotation-shadow-root-observer.ts`，由 4 项行为断言覆盖动态 shadow-root 注册、失效清理、annotation selector 变更通知与 attachShadow 事件监听。
 worker shell 环境输出 delimiter/ANSI 解析与大小写不敏感环境变量读取已迁移至 `src/main/worker/shell-environment-parser.ts`，由 5 项行为断言覆盖 newline/NUL 分隔、转义清理、边界错误与环境键查找。
+worker Windows Git executable resolution、PATH 大小写覆盖与 `.cmd/.bat` command wrapper 已迁移至 `src/main/worker/git-executable.ts`，入口通过窄委托接回，由 6 项行为断言覆盖平台早退、环境合并、where 候选与 ComSpec 包装。
 main worker bus 的启动结果与事件类型纯谓词已迁移至
 `src/main/main-app/worker/worker-event-predicates.ts`，入口保留 `Sst/Cst/wst` 兼容委托，
 由 `scripts/test-main-worker-event-predicates.mjs` 覆盖 8 项断言；worker 启动与 IPC

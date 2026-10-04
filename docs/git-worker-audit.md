@@ -34,6 +34,12 @@ subprocess wrapper 的有限集合分类也由同一模块提供，入口保留 
 `w6`/`kye`/`Aye`/`jye`/`Mye`/`Nye`/`Pye`/`Fye`/`Lye`/`Rye`/`T6` 实现及
 `C6`/`Eye` 阈值常量已从入口物理删除。
 
+Windows Git executable resolution and command adaptation（原 `vbe`/`ybe`/`bbe`/`xbe`/
+`K6`，约 71,574-71,609）已迁移至 `src/main/worker/git-executable.ts`。该模块保留
+PATH 大小写覆盖、`where.exe` 候选顺序、resolver cache、`ComSpec` 及 `.cmd/.bat`
+包装规则；worker 入口仅保留平台调用委托，由 6 项行为断言覆盖 WSL/POSIX 早退、环境
+合并、Git 路径解析和 Windows command wrapper。
+
 Git query key、host id、路径归一化、UTF-8 字节长度、query host 匹配、watched
 path overlap、可缓存命令判定、fsmonitor cache key、配置值解析、daemon feature
 判定和平台支持判定（原入口约 65,338-65,439、65,616-66,136）已迁至 `worker/git-query-utils.ts`，由
