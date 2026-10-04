@@ -3860,43 +3860,11 @@ var Za,
   Yo = o(() => {
     (Jo(), Jo());
   });
-function Xo(e) {
-  let t = as.safeParse(e);
-  return t.success ? t.data : void 0;
-}
-function Zo(e) {
-  if (typeof e == `object` && e)
-    try {
-      let t = Object.getPrototypeOf(e);
-      if (t !== Object.prototype && t != null) return;
-      let n = Object.getOwnPropertyDescriptors(e),
-        r = Reflect.ownKeys(n);
-      if (
-        r.length > es.maxKeys ||
-        r.some((e) => !ns.safeParse(e).success) ||
-        Object.values(n).some((e) => !e.enumerable || !Object.hasOwn(e, `value`))
-      )
-        return;
-      let i = is.safeParse(Object.fromEntries(Object.entries(n).map(([e, t]) => [e, t.value])));
-      return !i.success || !$o(JSON.stringify(i.data)) ? void 0 : i.data;
-    } catch {
-      return;
-    }
-}
-function Qo(e) {
-  if (e != null && $o(e))
-    try {
-      return Zo(JSON.parse(e));
-    } catch {
-      return;
-    }
-}
-function $o(e) {
-  return (
-    e.length <= es.maxSerializedBytes &&
-    new TextEncoder().encode(e).byteLength <= es.maxSerializedBytes
-  );
-}
+function Xo(e) { return annotationSerialization.normalizeName(e); }
+function Zo(e) { return annotationSerialization.sanitizeMetadata(e); }
+function Qo(e) { return annotationSerialization.parseMetadata(e); }
+function $o(e) { return annotationSerialization.withinLimit(e); }
+var annotationSerialization;
 var es,
   ts,
   ns,
@@ -6389,6 +6357,7 @@ var zd = `codex_desktop:message-for-view`,
   Vd = `codex_desktop:browser-page-event`,
   Hd = `codex_desktop:get-browser-annotation-api-policy`;
 var { createAnnotationProtocol } = require("./browser-page-preload/annotation-protocol");
+var { createAnnotationSerialization } = require("./browser-page-preload/annotation-serialization");
 var { attachAnnotationControlTargets, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } = require("./browser-page-preload/annotation-runtime");
 var { createAnnotationControlsRegistry } = require("./browser-page-preload/annotation-controls-registry");
 var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annotation-surface-observer");
@@ -6403,6 +6372,14 @@ var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotat
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 Yo();
+annotationSerialization = createAnnotationSerialization({
+  getLimits: () => es,
+  parseName: (value) => as.safeParse(value),
+  parseKey: (value) => ns.safeParse(value),
+  parseValue: (value) => rs.safeParse(value),
+  parseMetadata: (value) => is.safeParse(value),
+  parseString: (value) => ts.safeParse(value),
+});
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
   type: Ra(Ud.type),

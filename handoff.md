@@ -386,6 +386,9 @@ annotation overlay 的 root、hover/design refresh、flex gap、element cache、
 tooltip 与 region 去重非 React runtime 已迁移至
 `src/main/browser-page-preload/annotation-overlay-runtime.ts`；原十一段压缩实现改为薄入口代理，
 缓存状态移入模块内部，由 48 项行为断言覆盖。
+annotation serialization boundary（名称规范化、metadata descriptor/key/value 与 UTF-8 大小限制、
+属性 metadata JSON 解析）已迁移至 `src/main/browser-page-preload/annotation-serialization.ts`，
+入口保留兼容代理，由 11 项行为断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续

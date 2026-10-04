@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 696.
+Total scripts: 698.
 
 ## Recent semantic extraction suites
 
@@ -532,6 +532,7 @@ Total scripts: 696.
 - [`test-portable-thumbnail-runtime-cluster.mjs`](./test-portable-thumbnail-runtime-cluster.mjs)
 - [`test-preload-annotation-protocol.mjs`](./test-preload-annotation-protocol.mjs)
 - [`test-preload-annotation-runtime.mjs`](./test-preload-annotation-runtime.mjs)
+- [`test-preload-annotation-serialization.mjs`](./test-preload-annotation-serialization.mjs)
 - [`test-preload-deployment-channel.mjs`](./test-preload-deployment-channel.mjs)
 - [`test-preload-extension-distribution.mjs`](./test-preload-extension-distribution.mjs)
 - [`test-preload-webmcp-registry.mjs`](./test-preload-webmcp-registry.mjs)

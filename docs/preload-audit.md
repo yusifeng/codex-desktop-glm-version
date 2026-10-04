@@ -177,6 +177,13 @@ Annotation overlay 的 HTTP(S) loopback/`.localhost` URL 判定已迁移至
 
 Annotation region drag 的 viewport 判定、drag threshold、双点 rect 与状态推进已迁移至
 `annotation-surface-geometry.ts`；原全局 `Is/Ls/Rs` 与 UI 尾部 `ab/ob/sb/cb` 已删除。
+
+### 增量抽取：annotation serialization boundary
+
+批注名称规范化、metadata 的 prototype/descriptors/key/value/UTF-8 大小校验，以及属性
+metadata JSON 解析已迁移至 `src/main/browser-page-preload/annotation-serialization.ts`。
+入口仅保留 `Xo/Zo/Qo/$o` 兼容代理并注入原 Zod parsers；`scripts/test-preload-annotation-serialization.mjs`
+覆盖名称、继承对象、非法 key、key 数量、JSON/字节上限等 11 项断言。
 ### 增量抽取：Google Docs context helpers
 
 Google Docs/Sheets URL 识别、文档/表格 ID 与 tab 参数解析、标题/选中文本规范化，
