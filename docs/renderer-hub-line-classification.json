@@ -103,5 +103,10 @@
     "hub": "app-primary", "alias": "An", "sourceSymbol": "sst", "startLine": 93876, "endLine": 93880,
     "classification": "generated-local-repository-url-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The helper projects a selected repository clone URL from generated repo-map state and delegates feature gating to the adjacent cst helper. It has no named renderer consumer or independent repository-query boundary, so retaining the exact generated implementation is safer than introducing an unowned facade."
+  },
+  {
+    "hub": "app-primary", "alias": "og", "sourceSymbol": "yke", "startLine": 4290, "endLine": 4292,
+    "classification": "generated-local-project-kind-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper only excludes the cloud execution kind for the adjacent composer target projection. It has no named renderer consumer or independent execution-target lifecycle, so retaining the generated local predicate avoids creating an unowned host-selection facade."
   }
 ]

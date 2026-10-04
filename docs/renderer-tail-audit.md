@@ -582,3 +582,10 @@ symbol 与精确行范围。
 边界，因此登记为 `generated-local-repository-url-helper` 并保留在聚合 hub，避免制造无主
 repository facade；分类记录由 `scripts/audit-renderer-hub-classification.mjs` 校验 source
 symbol 与精确行范围。
+
+本轮再补齐 app-primary execution-target project-kind helper 的逐行证据：`yke`（公开别名
+`og`，4290--4292 行）仅排除 cloud execution kind，供相邻 composer target projection
+决定可用的本地执行目标。它没有独立 renderer named consumer 或 execution-target lifecycle
+边界，因此登记为 `generated-local-project-kind-helper` 并保留在聚合 hub，避免制造无主
+host-selection facade；分类记录由 `scripts/audit-renderer-hub-classification.mjs` 校验
+source symbol 与精确行范围。
