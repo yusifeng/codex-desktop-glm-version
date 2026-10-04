@@ -29,6 +29,8 @@ Total scripts: 858.
 - [`test-main-mcp-sandbox-guest-policy.mjs`](./test-main-mcp-sandbox-guest-policy.mjs)
 - [`test-preload-annotation-ui-mode-policy.mjs`](./test-preload-annotation-ui-mode-policy.mjs)
 - [`test-worker-git-ignore-source-watch.mjs`](./test-worker-git-ignore-source-watch.mjs)
+- [`test-worker-git-init-watcher-path-policy.mjs`](./test-worker-git-init-watcher-path-policy.mjs)
+- [`test-preload-annotation-design-styles.mjs`](./test-preload-annotation-design-styles.mjs)
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
 - [`test-app-initial-electron-command-policy.mjs`](./test-app-initial-electron-command-policy.mjs)
 - [`test-preload-annotation-preload-bridge.mjs`](./test-preload-annotation-preload-bridge.mjs)
