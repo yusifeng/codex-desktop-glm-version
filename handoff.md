@@ -347,6 +347,10 @@ annotation surface feature observer（DOM/shadow-root 扫描、feature 状态、
 dispose 生命周期）已抽取为 `src/main/browser-page-preload/annotation-surface-observer.ts`，
 annotation shadow-root discovery observer（原 `Ng` 22064-22116）已进一步迁移至 `src/main/browser-page-preload/annotation-shadow-root-observer.ts`，由 4 项行为断言覆盖动态 shadow-root 注册、失效清理、annotation selector 变更通知与 attachShadow 事件监听。
 worker shell 环境输出 delimiter/ANSI 解析与大小写不敏感环境变量读取已迁移至 `src/main/worker/shell-environment-parser.ts`，由 5 项行为断言覆盖 newline/NUL 分隔、转义清理、边界错误与环境键查找。
+main worker bus 的启动结果与事件类型纯谓词已迁移至
+`src/main/main-app/worker/worker-event-predicates.ts`，入口保留 `Sst/Cst/wst` 兼容委托，
+由 `scripts/test-main-worker-event-predicates.mjs` 覆盖 8 项断言；worker 启动与 IPC
+副作用仍保留在原入口。
 由 13 项行为断言覆盖；main 启动 flavor/platform flags 与阶段计时策略已抽取为
 `src/main/main-app/startup/startup-policy.ts`；路径扩展名分类、debug Chrome page 和 remote-hosted
 PIP 进程号策略也已接回该模块，由 17 项矩阵与边界断言覆盖。
@@ -426,7 +430,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 706 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 707 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---

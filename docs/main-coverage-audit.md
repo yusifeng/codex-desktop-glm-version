@@ -129,6 +129,14 @@ descriptor 已迁移至 `src/main/main-app/files/open-path-arguments.ts`（原
 普通路径严格先允许临时退出再触发更新退出；入口继续注入 `quitState` 与真实退出副作用。
 由 `scripts/test-main-quit-for-update-policy.mjs` 覆盖 2 项顺序断言。
 
+### 增量抽取：worker bus 事件谓词
+
+worker bus 装配附近的 `Sst/Cst/wst` 纯谓词（原 175,015-175,023）已迁移至
+`src/main/main-app/worker/worker-event-predicates.ts`，入口保留兼容别名并委托
+`isWorkerStartResult`、`isWorkerEventType` 与 `isWorkerNotificationType`。这些谓词
+不触碰 worker 启动、IPC 或 Electron 副作用，由
+`scripts/test-main-worker-event-predicates.mjs` 覆盖 8 项结果/事件类型断言。
+
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs

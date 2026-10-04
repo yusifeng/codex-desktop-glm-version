@@ -16,6 +16,7 @@ const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHo
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
+const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175013,13 +175014,13 @@ function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicati
   }
 }
 function Sst(e) {
-  return typeof e == `object` && !!e && `result` in e && e.result === `started`;
+  return isWorkerStartResult(e);
 }
 function Cst(e, t) {
-  return e.type === t;
+  return isWorkerEventType(e, t);
 }
 function wst(e, t) {
-  return e.type === t;
+  return isWorkerNotificationType(e, t);
 }
 var U9 = {
   title: {
