@@ -472,6 +472,13 @@ hub 的 UI 注册副作用。`conversation-followup-shelf` 新增可选的
 仅比较协议/端口、规范化 ChatGPT team/public 站点主机别名，并按边界安全地匹配站点
 路径及其子路径；站点浏览器真实 consumer 已切换语义导入，初始化入口仍保留原
 `Sf` 以维持 hub 的启动契约。`scripts/test-app-primary-is-site-url-match.mjs`
+
+本轮继续将 app-primary 的 annotation/comment attachment 摘要格式化函数 `iKe`
+（公开别名 `is`，约 38527 行）迁为
+`src/renderer/app-primary/runtime/format-annotation-summary.ts`。模块保留设计 tweak
+并入 annotation 数量、混合摘要和空摘要分支，通过显式 formatter/message 参数隔离
+国际化与 hub 初始化。`scripts/test-app-primary-format-annotation-summary.mjs`
+覆盖混合、空和单类三条路径。
 覆盖主机别名、尾斜杠、路径前缀边界、非法 URL 与端口隔离共 5 项断言。
 
 本轮再将 app-primary 的纯预填插件 mention helper `I7`（公开别名 `Rf`）迁为

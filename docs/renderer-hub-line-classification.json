@@ -28,5 +28,10 @@
     "hub": "app-primary", "alias": "Du", "sourceSymbol": "tPe", "startLine": 21821, "endLine": 21834,
     "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/normalize-suggested-followups.ts",
     "evidence": "Suggested follow-up payload normalization validates, trims, preserves source indexes, and caps output without primary hub side effects."
+  },
+  {
+    "hub": "app-primary", "alias": "is", "sourceSymbol": "iKe", "startLine": 38527, "endLine": 38539,
+    "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/format-annotation-summary.ts",
+    "evidence": "Attachment summary formatting combines annotation/design-tweak and comment counts through the supplied formatter; the extracted module has no renderer lifecycle or signal registration."
   }
 ]
