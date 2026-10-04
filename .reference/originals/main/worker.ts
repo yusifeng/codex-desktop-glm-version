@@ -137,6 +137,7 @@ const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { createGitRequestLifecycle } = require("./worker/git-request-lifecycle");
+const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
 const { dispatchReviewReadRequest } = require("./worker/git-review-read-dispatch");
@@ -70551,156 +70552,27 @@ var I6 = kW(`git`),
       });
     }
     async runLiveQuery(e, t, n, r, i) {
-      switch (e.method) {
-        case `status-summary`: {
-          let a = this.gitManager.getWorktreeRepositoryForRoot(t, n);
-          if (!e.params.includeUntrackedFiles)
-            return { method: `status-summary`, result: await J2(a, !1, void 0, r) };
-          let o = await J2(a, !1, void 0, r);
-          return (
-            i({ method: `status-summary`, result: o }),
-            o.type === `error`
-              ? { method: `status-summary`, result: o }
-              : { method: `status-summary`, result: await J2(a, !0, void 0, r) }
-          );
-        }
-        case `review-summary`: {
-          let r = this.gitManager.getWorktreeRepositoryForRoot(t, n),
-            a = z6(e.params.operationSource),
-            o = null;
-          if (
-            e.params.includeUntrackedFiles !== !1 &&
-            (e.params.source === `branch` ||
-              e.params.source === `uncommitted` ||
-              e.params.source === `unstaged`)
-          ) {
-            let t = await c3({
-              ...e.params,
-              includeUntrackedFiles: !1,
-              maxUntrackedFiles: a,
-              worktreeRepo: r,
-            });
-            if (
-              (t.type === `success` &&
-                t.files.length > 0 &&
-                ((o = t), i({ method: `review-summary`, result: t })),
-              t.type !== `success`)
-            )
-              return { method: `review-summary`, result: t };
-            let n = await c3({ ...e.params, maxUntrackedFiles: a, worktreeRepo: r });
-            return { method: `review-summary`, result: n.type === `error` && o != null ? o : n };
-          }
-          return {
-            method: `review-summary`,
-            result: await c3({ ...e.params, maxUntrackedFiles: a, worktreeRepo: r }),
-          };
-        }
-        case `branch-diff-stats`: {
-          let t = z6(e.params.operationSource);
-          return e.params.includeUntrackedFiles
-            ? {
-                method: `branch-diff-stats`,
-                result: await abe(
-                  () =>
-                    getGitBranchDiffStats(
-                      e.params.cwd,
-                      this.gitManager,
-                      n,
-                      e.params.baseBranch,
-                      e.params.hideWhitespace,
-                      !1,
-                      t,
-                      gitReviewBranchStatsDeps,
-                    ),
-                  () =>
-                    getGitBranchDiffStats(
-                      e.params.cwd,
-                      this.gitManager,
-                      n,
-                      e.params.baseBranch,
-                      e.params.hideWhitespace,
-                      !0,
-                      t,
-                      gitReviewBranchStatsDeps,
-                    ),
-                  (e) => i({ method: `branch-diff-stats`, result: e }),
-                ),
-              }
-            : {
-                method: `branch-diff-stats`,
-                result: await getGitBranchDiffStats(
-                  e.params.cwd,
-                  this.gitManager,
-                  n,
-                  e.params.baseBranch,
-                  e.params.hideWhitespace,
-                  e.params.includeUntrackedFiles,
-                  t,
-                  gitReviewBranchStatsDeps,
-                ),
-              };
-        }
-        case `recent-branches`: {
-          let i = Math.max(1, Math.min(e.params.limit ?? 10, 100)),
-            a = this.gitManager.getWorktreeRepositoryForRoot(t, n),
-            o = this.watchesByKey.get(this.getWatchKey(t, n));
-          return {
-            method: `recent-branches`,
-            result: {
-              branches: await getGitRecentBranches(
-                a,
-                i,
-                r,
-                { live: o != null && !o.watcher.requiresRecovery },
-                gitRecentBranchesDeps,
-              ),
-            },
-          };
-        }
-        case `current-branch`:
-          return {
-            method: `current-branch`,
-            result: await this.getCurrentBranch(e.params.root, n),
-          };
-        case `upstream-branch`:
-          return {
-            method: `upstream-branch`,
-            result: await this.handleUpstreamBranch(e.params.root, { host: n, signal: r }),
-          };
-        case `branch-ahead-count`:
-          return {
-            method: `branch-ahead-count`,
-            result: await this.handleBranchAheadCount(e.params.root, { host: n, signal: r }),
-          };
-        case `default-branch`: {
-          let i = this.watchesByKey.get(this.getWatchKey(t, n));
-          return {
-            method: `default-branch`,
-            result: await this.getDefaultBranch(e.params.root, n, r, {
-              live: i != null && !i.watcher.requiresRecovery,
-            }),
-          };
-        }
-        case `base-branch`:
-          return { method: `base-branch`, result: await this.getBaseBranch(e.params.root, n) };
-        case `branch-commits`:
-          return {
-            method: `branch-commits`,
-            result: {
-              commits: await getGitBranchCommits(
-                this.gitManager.getWorktreeRepositoryForRoot(t, n),
-                e.params.baseBranch,
-                r,
-                gitReviewCommitQueryDeps,
-              ),
-            },
-          };
-        case `list-worktrees`:
-          return { method: `list-worktrees`, result: await resolveWorktreeList(e.params.cwd, n, r, {
-            getWorktreeRepository: (cwd, host) => this.gitManager.getWorktreeRepository(cwd, host),
-            listWorktrees: (repository, signal) => listGitWorktrees(repository, signal, gitWorktreeListDeps),
-          }) };
-      }
+      return handleGitLiveQuery(e, t, n, r, i, {
+        gitManager: this.gitManager,
+        getWorktreeRepositoryForRoot: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
+        getWatch: (root, host) => this.watchesByKey.get(this.getWatchKey(root, host)),
+        getStatusSummary: J2,
+        getReviewSummary: (params) => c3(params),
+        getBranchDiffStats: (...args) => getGitBranchDiffStats(...args, gitReviewBranchStatsDeps),
+        getRecentBranches: (...args) => getGitRecentBranches(...args, gitRecentBranchesDeps),
+        getCurrentBranch: (root, host) => this.getCurrentBranch(root, host),
+        getUpstreamBranch: (root, args) => this.handleUpstreamBranch(root, args),
+        getBranchAheadCount: (root, args) => this.handleBranchAheadCount(root, args),
+        getDefaultBranch: (root, host, signal, options) => this.getDefaultBranch(root, host, signal, options),
+        getBaseBranch: (root, host) => this.getBaseBranch(root, host),
+        getBranchCommits: (...args) => getGitBranchCommits(...args, gitReviewCommitQueryDeps),
+        resolveWorktreeList: (cwd, host, signal) => resolveWorktreeList(cwd, host, signal, {
+          getWorktreeRepository: (root, executionHost) => this.gitManager.getWorktreeRepository(root, executionHost),
+          listWorktrees: (repository, requestSignal) => listGitWorktrees(repository, requestSignal, gitWorktreeListDeps),
+        }),
+        getMaxUntrackedFiles: z6,
+        runWithUntracked: abe,
+      });
     }
     async ensureWatching(e, t, n) {
       return acquireGitWatch({

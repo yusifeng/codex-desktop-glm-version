@@ -915,3 +915,12 @@ watcher 集合生命周期。`scripts/test-worker-git-watch-index-bucket.mjs` �
 `src/main/worker/git-watch-acquire.ts`。入口仍持有 `watchesByKey`、`createRepoWatch` 和实际
 `unwatchRepo` 副作用；helper 仅协调 session 生命周期，由 `scripts/test-worker-git-watch-acquire.mjs`
 覆盖 open-watch 复用、幂等 release、queued abort 和 start rejection，共 8 项断言。
+
+### 增量抽取：Live-query request handler
+
+GitRepoManager 的 live-query 业务编排（status/review summary、branch diff stats、branch 查询与
+worktree 列表）已迁移至 `src/main/worker/git-live-query-handler.ts`。语义模块通过窄依赖接收
+repository、watch 状态、Git 查询和中间结果回调；worker 入口仅负责 manager/watcher 绑定、
+性能依赖注入和 `runLiveQuery` 生命周期边界，watch session、live-query registry 与实际 Git I/O
+仍保留在入口。`scripts/test-worker-git-live-query-handler.mjs` 覆盖 tracked/untracked 中间结果、
+stats 双阶段执行、watch-aware recent/default branch、未知方法旁路，共 5 项断言。
