@@ -632,6 +632,13 @@ Worktree shell environment 配置的 Git path 解析、JSON/schema 读取、ENOE
 `L2`/`ehe`/`the`/`nhe` 已删除；schema 由入口窄依赖注入，create 与只读请求消费者改用语义
 入口，由 25 项独立模块断言覆盖。
 
+### 增量抽取：Worktree branch tracking
+
+Worktree create 的远端起点自动 tracking branch 创建/强制清理、fresh ref cache refresh，以及创建后
+实际本地分支解析已迁移至 `src/main/worker/git-worktree-branch-tracking.ts`。原 `Vme`/`E2`/`che`
+已删除；通用 `O2` branch-exists helper 仍由入口和 create-branch 请求共享，取消回滚与
+synced-branch 初始化消费者改用语义入口，由 31 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

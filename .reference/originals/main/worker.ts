@@ -85,6 +85,7 @@ const { createWorktreeDelete } = require("./worker/git-worktree-delete");
 const { createLocalEnvironmentRuntime } = require("./worker/git-local-environment");
 const { WORKTREE_INCLUDE_FILE, copyAgentOverrideFiles, copyWorktreeFiles, findWorktreeIncludeFiles, resolveWorktreeLocalEnvironmentConfig } = require("./worker/git-worktree-copy-files");
 const { WORKTREE_NAME_MARKER, createWorktreePath: createGitWorktreePath, ensureWorktreesRoot, getRootRelativeCwd: getGitRootRelativeCwdQuery, reserveWorktreeNameDirectory } = require("./worker/git-worktree-path-allocation");
+const { createLocalTrackingBranch: createLocalTrackingBranchQuery, deleteLocalTrackingBranch: deleteLocalTrackingBranchQuery, resolveCreatedWorktreeBranchName: resolveCreatedWorktreeBranchNameQuery } = require("./worker/git-worktree-branch-tracking");
 const { readWorktreeShellEnvironment: readWorktreeShellEnvironmentQuery, removeWorktreeShellEnvironment: removeWorktreeShellEnvironmentQuery, writeWorktreeShellEnvironment: writeWorktreeShellEnvironmentQuery } = require("./worker/git-worktree-shell-environment");
 const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
@@ -533,6 +534,34 @@ const removeWorktreeShellEnvironment = (repository, signal) =>
   removeWorktreeShellEnvironmentQuery(repository, signal, worktreeShellEnvironmentDeps);
 const writeWorktreeShellEnvironment = (repository, value, signal) =>
   writeWorktreeShellEnvironmentQuery(repository, value, signal, worktreeShellEnvironmentDeps);
+const worktreeBranchTrackingDeps = {
+  getCurrentBranch: (repository) => getCurrentGitBranch(repository),
+  getOrderedRemotes: (repository) => getOrderedGitRemotes(repository),
+  localBranchExists: (root, branch, host, signal) => O2(root, branch, host, signal),
+  logger: {
+    warning: (message, detail) => T2().warning(message, detail),
+  },
+  resolveRef: (repository, ref, signal, options) =>
+    resolveGitRefSha(repository, ref, signal, options),
+  runGit: (root, args, host) => $(root, args, host),
+};
+const createLocalTrackingBranch = (repository, startingRef, signal) =>
+  createLocalTrackingBranchQuery(
+    repository,
+    startingRef,
+    signal,
+    worktreeBranchTrackingDeps,
+  );
+const deleteLocalTrackingBranch = (repository, branch) =>
+  deleteLocalTrackingBranchQuery(repository, branch, worktreeBranchTrackingDeps);
+const resolveCreatedWorktreeBranchName = (repository, startingState, startingRef, signal) =>
+  resolveCreatedWorktreeBranchNameQuery(
+    repository,
+    startingState,
+    startingRef,
+    signal,
+    worktreeBranchTrackingDeps,
+  );
 const gitBranchMetadataDeps = {
   getCurrentBranch: getCurrentGitBranch,
   getDefaultRemoteBranch: getDefaultGitRemoteBranch,
@@ -67511,34 +67540,16 @@ async function Bme(e, t, n, r, i, a) {
       (await i.createDirectory(n.dirname(a), { recursive: !0 }), await i.copy(n.join(e, r), a));
     }
   }
-  let m = n.type === `branch` && n.remoteRef != null ? null : await Vme(c, u, s);
+  let m =
+    n.type === `branch` && n.remoteRef != null
+      ? null
+      : await createLocalTrackingBranch(c, u, s);
   return s?.aborted
-    ? (m != null && (await E2(c, m)), { success: !1, error: Error(`Operation canceled`) })
+    ? (
+        m != null && (await deleteLocalTrackingBranch(c, m)),
+        { success: !1, error: Error(`Operation canceled`) }
+      )
     : { success: !0, startingRef: u };
-}
-async function Vme(e, t, n) {
-  if (!t.startsWith(`refs/remotes/`)) return null;
-  let r = t.slice(13),
-    i = (await getOrderedGitRemotes(e)).find((e) => r.startsWith(`${e}/`));
-  if (i == null) return null;
-  let a = r.slice(i.length + 1);
-  if (!a || a === `HEAD` || (await resolveGitRefSha(e, `refs/heads/${a}`, n)) != null) return null;
-  let o = await $(e.root, [`branch`, `--track`, a, t], e.host);
-  if (!o.success) throw Error(o.stderr || o.stdout);
-  try {
-    return (await resolveGitRefSha(e, `refs/heads/${a}`, void 0, { fresh: !0 }), a);
-  } catch (t) {
-    throw (await E2(e, a), t);
-  }
-}
-async function E2(e, t) {
-  let n = await $(e.root, [`branch`, `-D`, t], e.host);
-  (n.success ||
-    T2().warning(`Failed to cleanup local tracking branch`, {
-      safe: {},
-      sensitive: { error: n.stderr || n.stdout },
-    }),
-    await resolveGitRefSha(e, `refs/heads/${t}`, void 0, { fresh: !0 }));
 }
 function Hme(e) {
   return e instanceof Error ? e : Error(String(e));
@@ -67645,7 +67656,7 @@ async function V2({
     );
   if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
   let T = t.getWorktreeRepositoryForRoot(b, c),
-    E = await che(g, r, w.startingRef, l),
+    E = await resolveCreatedWorktreeBranchName(g, r, w.startingRef, l),
     D = s && E != null && E !== _ && (r.type !== `branch` || r.remoteRef == null);
   if (c.isLocal) {
     await copyAgentOverrideFiles(g.root, b, c, gitWorktreeCopyDependencies);
@@ -67769,19 +67780,6 @@ async function V2({
     setupResult: ne,
     setupError: null,
   };
-}
-async function che(e, t, n, r) {
-  if (t.type === `working-tree` || t.branchName === `HEAD` || t.branchName === `@`) return getCurrentGitBranch(e);
-  if (n.startsWith(`refs/heads/`)) {
-    let t = n.slice(11);
-    return (await O2(e.root, t, e.host, r)) ? t : null;
-  }
-  if (!n.startsWith(`refs/remotes/`)) return null;
-  let i = n.slice(13),
-    a = (await getOrderedGitRemotes(e)).find((e) => i.startsWith(`${e}/`));
-  if (a == null) return null;
-  let o = i.slice(a.length + 1);
-  return !o || o === `HEAD` ? null : (await O2(e.root, o, e.host, r)) ? o : null;
 }
 async function J2(e, t = !0, n, r) {
   let i;
