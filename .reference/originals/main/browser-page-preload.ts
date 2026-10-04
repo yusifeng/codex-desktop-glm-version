@@ -6378,6 +6378,7 @@ var { isAnnotationTextInput } = require("./browser-page-preload/annotation-input
 var { hasRunningAnnotationAnimation } = require("./browser-page-preload/annotation-motion");
 var { isStableAnnotationFrame } = require("./browser-page-preload/annotation-frame-stability");
 var { isAnnotationContainedBy } = require("./browser-page-preload/annotation-containment");
+var { findLatestDraftTextChange } = require("./browser-page-preload/annotation-draft-text");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23788,11 +23789,7 @@ function Xv(e, t) {
   }
 }
 function Zv(e) {
-  for (let t = e.length - 1; t >= 0; --t) {
-    let n = e[t]?.text;
-    if (n != null && n.value !== n.previousValue) return n;
-  }
-  return null;
+  return findLatestDraftTextChange(e);
 }
 function Qv(e) {
   for (let t of e.querySelectorAll(`[${iy}]`)) F(t) && $v(t);

@@ -237,6 +237,10 @@ Annotation controls 的 containment ancestor 判定（原 `Oy` 24383-24410）已
 `src/main/browser-page-preload/annotation-containment.ts`；入口注入 DOM/CSS 依赖，
 由 `scripts/test-preload-annotation-containment.mjs` 覆盖祖先命中、无关 target、position/contain 边界与 null。
 
+Annotation design draft text 的最新变更选择（原 `Zv` 23790-23796）已迁移至
+`src/main/browser-page-preload/annotation-draft-text.ts`；入口保留 DOM 更新副作用，
+由 `scripts/test-preload-annotation-draft-text.mjs` 覆盖空输入、未变化项、倒序选择与缺失 previous 值。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）
