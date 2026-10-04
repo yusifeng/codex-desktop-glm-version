@@ -689,6 +689,9 @@ dispatcher；入口继续保留 trace、依赖构造、结果包装与生命周�
 Git apply mutation family 已新增 `src/main/worker/git-apply-dispatch.ts`，将 `apply-changes`、
 `apply-patch` 与 `apply-review-section-changes` 接入 dispatcher；由 4 项 focused assertions
 覆盖，入口继续保留 refreshRoot、缓存刷新、性能追踪和结果包装。
+Git mutation family 已新增 `src/main/worker/git-mutation-dispatch.ts`，将 `push`、
+`checkout-branch`、`commit` 与 `set-config-value` 接入 dispatcher；由 5 项 focused assertions
+覆盖，入口继续保留 refreshRoot、缓存清理、性能追踪与结果包装。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。

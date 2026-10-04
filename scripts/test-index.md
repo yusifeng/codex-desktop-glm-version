@@ -6,6 +6,9 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-app-shared-command-visibility-predicates.mjs`](./test-app-shared-command-visibility-predicates.mjs)
+- [`test-worker-git-mutation-dispatch.mjs`](./test-worker-git-mutation-dispatch.mjs)
+
 - [`test-worker-git-apply-dispatch.mjs`](./test-worker-git-apply-dispatch.mjs)
 
 - [`test-worker-git-cache-watch-dispatch.mjs`](./test-worker-git-cache-watch-dispatch.mjs)
