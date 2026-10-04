@@ -241,6 +241,10 @@ Annotation design draft text 的最新变更选择（原 `Zv` 23790-23796）已�
 `src/main/browser-page-preload/annotation-draft-text.ts`；入口保留 DOM 更新副作用，
 由 `scripts/test-preload-annotation-draft-text.mjs` 覆盖空输入、未变化项、倒序选择与缺失 previous 值。
 
+Annotation design draft attribute token 解析（原 `ny` 23797-23802）已迁移至
+`src/main/browser-page-preload/annotation-attribute-tokens.ts`；入口保留属性读写副作用，
+由 `scripts/test-preload-annotation-attribute-tokens.mjs` 覆盖缺失、空值与多空白 token。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）

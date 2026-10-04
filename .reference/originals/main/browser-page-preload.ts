@@ -6379,6 +6379,7 @@ var { hasRunningAnnotationAnimation } = require("./browser-page-preload/annotati
 var { isStableAnnotationFrame } = require("./browser-page-preload/annotation-frame-stability");
 var { isAnnotationContainedBy } = require("./browser-page-preload/annotation-containment");
 var { findLatestDraftTextChange } = require("./browser-page-preload/annotation-draft-text");
+var { parseAnnotationAttributeTokens } = require("./browser-page-preload/annotation-attribute-tokens");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23810,7 +23811,7 @@ function ty(e, t) {
   e.getAttribute(ry) !== n && e.setAttribute(ry, n);
 }
 function ny(e) {
-  return (e.getAttribute(ry) ?? ``).split(/\s+/).filter((e) => e.length > 0);
+  return parseAnnotationAttributeTokens(e.getAttribute(ry));
 }
 var ry,
   iy,

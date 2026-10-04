@@ -665,6 +665,9 @@ Annotation controls 的 containment ancestor 判定（原 `Oy`）已抽取为
 Annotation design draft text 的最新变更选择（原 `Zv`）已抽取为
 `src/main/browser-page-preload/annotation-draft-text.ts`，入口保留 DOM 更新副作用；由 4 项断言覆盖
 空输入、未变化项、倒序选择与缺失 previous 值。
+Annotation design draft attribute token 解析（原 `ny`）已抽取为
+`src/main/browser-page-preload/annotation-attribute-tokens.ts`，入口保留属性读写副作用；由 3 项断言覆盖
+缺失、空值与多空白 token。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。
