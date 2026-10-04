@@ -13,6 +13,7 @@ import {
   scheduleGitLiveQueryRefresh,
 } from "./git-live-query-subscription-lifecycle";
 import { refreshGitLiveQuery } from "./git-live-query-refresh";
+import { planGitLiveQueryRefresh } from "./git-live-query-refresh-plan";
 
 type GitLiveQueryRegistryDependencies = {
   emit: (event: any) => void;
@@ -135,18 +136,11 @@ class GitLiveQueryRegistry {
   }
 
   refreshStates(states: any[], trigger: string, trace: any) {
-    const waiters = states.map((state) => {
-      state.generation = this.nextGeneration++;
-      state.dirty = true;
-      state.errorRetryCount = 0;
-      state.trigger = trigger;
-      mergeLiveQueryTrace(state, trace);
-      const waiter = new Promise<void>((resolve) =>
-        state.refreshWaiters.push(resolve),
-      );
-      this.scheduleRefresh(state);
-      return waiter;
+    const waiters = planGitLiveQueryRefresh(states, trigger, trace, {
+      nextGeneration: () => this.nextGeneration++,
+      mergeTrace: mergeLiveQueryTrace,
     });
+    states.forEach((state) => this.scheduleRefresh(state));
     return Promise.all(waiters).then(() => {});
   }
 

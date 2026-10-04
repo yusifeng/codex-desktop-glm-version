@@ -1001,3 +1001,8 @@ Live-query 单次 generation 的 abort、tracked/complete 发布、错误重试�
 `src/main/worker/git-live-query-refresh.ts`。registry 仅负责状态映射、依赖注入和调度；新模块
 保留 generation 竞态保护及 retry trace 合并顺序，由
 `scripts/test-worker-git-live-query-refresh.mjs` 覆盖 6 项行为断言。
+
+Live-query refresh generation 的 dirty/trigger/retry 重置、generation 分配、trace 合并与
+completion waiter 注册已迁移至 `src/main/worker/git-live-query-refresh-plan.ts`。registry
+仅负责对选中 subscription 调用计划并安排 timer，避免在异步 refresh 编排中重复维护状态
+转换；`scripts/test-worker-git-live-query-refresh-plan.mjs` 覆盖 9 项行为断言。

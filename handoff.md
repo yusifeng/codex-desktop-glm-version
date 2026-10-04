@@ -11,6 +11,11 @@
 
 ## 当前进度快照（2026-10-04）
 
+最新增量：live-query refresh generation 的 dirty/trigger/retry 重置、generation 分配、trace
+合并与 completion waiter 注册已迁移至 `src/main/worker/git-live-query-refresh-plan.ts`；registry
+仅负责对选中 subscription 调用计划并安排 timer，由
+`scripts/test-worker-git-live-query-refresh-plan.mjs` 覆盖 9 项行为断言。
+
 本轮已完成 worker/preload/main 逐段审计、shared 692 导出全量分类、renderer
 三大 hub 内部审计、tsconfig 排除、测试索引、README 更新，以及 smoke/e2e
 验证说明。worker 的 main-RPC 边界已提取为 `src/main/worker/rpc-client.ts`
