@@ -20,6 +20,7 @@ const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = req
 const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
+const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction } = require("./main-app/computer-use/history-scope-actions.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175042,16 +175043,8 @@ function Est(e) {
   }
   (e.markQuitApproved(), a7());
 }
-var Dst = {
-    app: { include: `include_application`, exclude: `exclude_application` },
-    url: { include: `include_url`, exclude: `exclude_url` },
-  },
-  Ost = {
-    application_session: `clear_application_session`,
-    last_ten_minutes: `clear_last_ten_minutes`,
-    last_hour: `clear_last_hour`,
-    last_day: `clear_last_day`,
-  };
+var Dst = HISTORY_SCOPE_ACTIONS,
+  Ost = HISTORY_CLEAR_ACTIONS;
 function kst({
   getConnection: e,
   getFeatureAvailability: t,
@@ -175146,7 +175139,7 @@ function kst({
                     : { scope: `url`, bundleID: null, urlDomain: e.target },
               },
             }),
-              o(Dst[e.scope][e.observe ? `include` : `exclude`]),
+              o(historyScopeAction(e.scope, e.observe)),
               a([`chronicle-settings`]));
             break;
           case `computer-history/clear-history`: {
