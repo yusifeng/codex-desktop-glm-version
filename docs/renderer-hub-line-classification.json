@@ -603,5 +603,29 @@
     "classification": "generated-local-fuzzy-file-search-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer installs fuzzy-file-search dependencies, excluded-directory policy, and the controller-backed async search hook consumed by the adjacent file projection. This is generated composer wiring without an independent renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Xl", "sourceSymbol": "uV", "startLine": 23242, "endLine": 23251,
+    "classification": "generated-local-annotation-site-focus-effect",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper focuses a site-element annotation only when the conversation, project target, and annotation context all match. It is a narrow generated callback owned by the annotation route and has no standalone renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Zl", "sourceSymbol": "fV", "startLine": 23253, "endLine": 23257,
+    "classification": "generated-local-annotation-focus-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires the annotation context atom and shared hooks consumed by the adjacent site-element focus callback. It is generated route setup rather than an independently consumed semantic module."
+  },
+  {
+    "hub": "app-primary", "alias": "Yl", "sourceSymbol": "hV", "startLine": 23259, "endLine": 23277,
+    "classification": "generated-local-composer-account-icon-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer creates the local account icon SVG component used by nearby composer controls. The icon factory is generated presentation wiring with no external state or lifecycle contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Kl", "sourceSymbol": "gV", "startLine": 23278, "endLine": 23704,
+    "classification": "generated-local-split-action-button",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component composes the primary action and dropdown trigger, forwarding disabled/loading, tooltip, popup, and ref props into the local split-button surface. Its state is entirely owned by the generated composer route."
   }
 ]
