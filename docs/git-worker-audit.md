@@ -653,6 +653,13 @@ local environment 选择/setup、失败容忍和 shell environment 持久化完�
 `src/main/worker/git-worktree-create.ts`。原 `V2` 与 `B2` encoder 状态已删除；host handoff 与
 create-worktree 请求消费者共用语义入口，由 52 项独立模块断言覆盖。
 
+### 增量抽取：Repository status summary
+
+Repository status summary 的 tracked porcelain v1 NUL/rename 解析、generation query cache、
+review snapshot 与 request signal 组合、safe-filter/Git fallback、失败 query 精确失效和 untracked
+合并已迁移至 `src/main/worker/git-status-summary.ts`。原 `J2`/`Y2`/`ghe`/`_he` 已删除；
+review、handoff 与 status-summary 请求消费者改用语义入口，由 26 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

@@ -42,6 +42,7 @@ const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/gi
 const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
+const { getStatusCounts: getGitStatusCountsQuery, getStatusSummary: getGitStatusSummaryQuery } = require("./worker/git-status-summary");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
 const { getCommitMessageDiff } = require("./worker/git-commit-message-diff");
@@ -426,6 +427,38 @@ const handoffSharedBaseDeps = {
     warning: (message, detail) => CW().warning(message, detail),
   },
 };
+const gitStatusSummaryDeps = {
+  awaitAbortable: (promise, signal) => yR(promise, signal),
+  fetchQueryWithSignal: (queryClient, options, signal) =>
+    w1(queryClient, options, signal),
+  getQueryMeta: () => _1,
+  getSafeAttributeFilterOverrides: (repository, signal) =>
+    getSafeAttributeFilterOverrides(repository, signal, gitSafeAttributeFilterDeps),
+  getUntrackedPaths: (repository, paths, snapshot, signal) =>
+    f2(repository, paths, snapshot, signal),
+  queryKey: (...parts) => Q(...parts),
+  readCachedStatus: (repository, generation, force, signal) =>
+    wme(repository, generation, force, signal),
+  runGit: (root, args, host, options) => $(root, args, host, options),
+  staleTime: Infinity,
+};
+const Y2 = (repository, includeUntracked = true, snapshot, signal, force = false) =>
+  getGitStatusSummaryQuery(
+    repository,
+    includeUntracked,
+    snapshot,
+    signal,
+    force,
+    gitStatusSummaryDeps,
+  );
+const J2 = (repository, includeUntracked = true, snapshot, signal) =>
+  getGitStatusCountsQuery(
+    repository,
+    includeUntracked,
+    snapshot,
+    signal,
+    gitStatusSummaryDeps,
+  );
 const hostHandoffDeps = {
   randomUUID: () => crypto.randomUUID(),
   resolveRepositoryMetadata: (gitManager, cwd, host) =>
@@ -67551,101 +67584,6 @@ function A2(e, t, n) {
 }
 var Jme = K({ branch: H(), lastSyncedTreeRef: H() });
 var $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
-async function J2(e, t = !0, n, r) {
-  let i;
-  try {
-    i = await Y2(e, t, n, r);
-  } catch (e) {
-    if (r?.aborted) return { type: `error`, failureReason: `canceled` };
-    throw e;
-  }
-  return i.type === `error`
-    ? i
-    : {
-        type: `success`,
-        stagedCount: i.stagedCount,
-        unstagedCount: i.unstagedCount,
-        untrackedCount: i.untrackedCount,
-      };
-}
-async function Y2(e, t = !0, n, r, i = !1) {
-  if (t) return ghe(e, n, r);
-  let a = e.gitReadGeneration,
-    o = Q(e.root, e.host, `git-status-summary`, `${a}`, `tracked-only`),
-    s = async (t) => {
-      let n = await wme(e, a, i, t);
-      if (n == null) {
-        let r;
-        try {
-          r = await getSafeAttributeFilterOverrides(e, t, gitSafeAttributeFilterDeps);
-        } catch {
-          return { type: `error`, failureReason: `status_config` };
-        }
-        let i = await $(
-          e.root,
-          [`status`, `--renames`, `--porcelain=v1`, `-z`, `--untracked-files=no`],
-          e.host,
-          { configOverrides: r, signal: t, trim: !1 },
-        );
-        if (!i.success) return { type: `error`, failureReason: `status_command` };
-        n = i.stdout;
-      }
-      let r = 0,
-        o = [],
-        s = [],
-        c = 0,
-        l = 0;
-      for (; l < n.length && !(l + 1 >= n.length);) {
-        let e = n[l],
-          t = n[l + 1],
-          i = n.indexOf(`\0`, l);
-        if (i === -1) break;
-        let a = n.slice(l + 3, i);
-        if (
-          ((l = i + 1),
-          (e !== `?` || t !== `?`) &&
-            (e !== ` ` && (r += 1),
-            t !== ` ` && (c += 1),
-            s.push(a),
-            e === `R` || e === `C` || t === `R` || t === `C`))
-        ) {
-          let t = n.indexOf(`\0`, l);
-          if (t === -1) break;
-          let r = n.slice(l, t);
-          (e === `R` && o.push({ path: a, previousPath: r }), s.push(r), (l = t + 1));
-        }
-      }
-      return {
-        type: `success`,
-        stagedCount: r,
-        stagedRenames: o,
-        trackedPaths: s,
-        unstagedCount: c,
-        untrackedCount: null,
-      };
-    },
-    c = n == null ? r : r == null ? n.signal : AbortSignal.any([n.signal, r]);
-  return _he(n, async () => {
-    let t = w1(e.queryClient, { queryKey: o, meta: _1, queryFn: s, staleTime: g1 }, c),
-      r = n == null ? await t : await yR(t, n.signal);
-    return (
-      r.type === `error` &&
-        e.queryClient.invalidateQueries({ queryKey: o, exact: !0, refetchType: `none` }),
-      r
-    );
-  });
-}
-async function ghe(e, t, n) {
-  let [r, i] = await Promise.all([f2(e, void 0, t, n), Y2(e, !1, t, n, !0)]);
-  return i.type === `error`
-    ? i
-    : r.success
-      ? { ...i, untrackedCount: r.paths.length }
-      : { type: `error`, failureReason: `untracked_paths` };
-}
-function _he(e, t) {
-  return e == null ? t() : e.read(t);
-}
 function X2(e, t) {
   return vhe(e, t);
 }
