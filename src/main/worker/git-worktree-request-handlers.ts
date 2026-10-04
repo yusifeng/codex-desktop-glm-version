@@ -1,3 +1,5 @@
+import { dispatchWorktreeOwnerRequest } from "./git-worktree-owner-dispatch";
+
 type WorktreeRequestDependencies = {
   gitManager: any;
   host: any;
@@ -98,13 +100,10 @@ async function resolveWorktrees(params: any, deps: WorktreeRequestDependencies) 
   return deps.listWorktrees(params.cwd, deps.host, deps.signal);
 }
 
+// Compatibility adapter for restore-era callers/tests; owner mutation semantics
+// live in the dedicated dispatcher and remain on the same success/error contract.
 async function setWorktreeOwnerThread(params: any, deps: WorktreeRequestDependencies) {
-  await deps.setOwnerThread(
-    deps.gitManager.getWorktreeRepositoryForRoot(params.worktree, deps.host),
-    params.conversationId,
-    deps.signal,
-  );
-  return { success: true };
+  return (await dispatchWorktreeOwnerRequest(`set-worktree-owner-thread`, params, deps)).result;
 }
 
 async function moveThreadToLocal(

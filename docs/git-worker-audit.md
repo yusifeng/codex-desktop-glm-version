@@ -856,3 +856,12 @@ Worktree 删除/恢复的 host+path 去重、删除 promise 清理，以及恢�
 managed-worktree discovery、thread config 与状态读取等窄依赖；语义模块仅负责方法匹配、参数转发和
 结果 envelope，保持原有工作区选择与未提交变更判定。`scripts/test-worker-git-worktree-resolution-dispatch.mjs`
 覆盖成功转发、参数保持及未知方法旁路，共 3 项断言。
+
+### 增量抽取：Worktree owner-thread mutation dispatch
+
+`set-worktree-owner-thread` 的 repository 定位、host/manager/signal 注入与 owner thread
+写入已迁移至 `src/main/worker/git-worktree-owner-dispatch.ts`。入口仅保留请求错误协议
+（失败统一映射为 `Failed to set thread worktree owner`）和 worker response envelope；旧的
+worktree request handler 仅保留兼容适配器，确保 restore/历史调用路径不变。
+`scripts/test-worker-git-worktree-owner-dispatch.mjs` 覆盖成功结果、manager/host/root/thread/signal
+参数保持、未知方法旁路及写入失败传播，共 6 项断言。

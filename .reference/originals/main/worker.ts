@@ -12,7 +12,8 @@ const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenam
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = require("./worker/git-apply-patch");
-const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
+const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveWorktrees, restoreWorktree } = require("./worker/git-worktree-request-handlers");
+const { dispatchWorktreeOwnerRequest } = require("./worker/git-worktree-owner-dispatch");
 const { createWorktreeRequest } = require("./worker/git-worktree-create-request");
 const { dispatchCodexWorktreeRequest } = require("./worker/git-codex-worktree-dispatch");
 const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-dispatch");
@@ -70194,7 +70195,13 @@ var I6 = kW(`git`),
           }
           case `set-worktree-owner-thread`:
             try {
-              p = X(await updateWorktreeOwnerRequest(e.params, worktreeRequestDeps));
+              p = X((await dispatchWorktreeOwnerRequest(e.method, e.params, {
+                gitManager: this.gitManager,
+                host: o,
+                signal: i.signal,
+                setOwnerThread: (repository, conversationId, signal) =>
+                  worktreeRequestDeps.setOwnerThread(repository, conversationId, signal),
+              })).result);
             } catch {
               p = EV(`Failed to set thread worktree owner`);
             }
