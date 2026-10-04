@@ -360,6 +360,12 @@ environmentId，且当前 renderer 只有 façade re-export、没有真实调用
 helper，登记为 `vendor-generated-preserve`，保留原 hub 边以维持打包器 external
 语义，不制造手写空对象模块。
 
+`conversation-markdown` 簇的 app-shared `VI`/`zI`（consumer 名
+`normalizeSeparatorsImport`/`isAbsolutePathLikeImport`）经检查已无真实调用：模块内
+已有 `normalizeSeparators` 与 `isAbsolutePathLike` 的语义实现，hub 导入仅通过
+`void` 维持兼容依赖边。同组 `BI`/`RI`/`iW` 也仅为 preserve 引用。该面登记为
+`semantic-local-replacement`，不应把 void import 误计为待复制的业务 helper。
+
 `tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
 command、query config、params/cache key 与 app-server `queryFn`、response priority
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
