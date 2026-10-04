@@ -245,6 +245,10 @@ Annotation design draft attribute token 解析（原 `ny` 23797-23802）已迁�
 `src/main/browser-page-preload/annotation-attribute-tokens.ts`；入口保留属性读写副作用，
 由 `scripts/test-preload-annotation-attribute-tokens.mjs` 覆盖缺失、空值与多空白 token。
 
+Annotation design snapshot 的字段投影（原 `cy` 23871-23888）已迁移至
+`src/main/browser-page-preload/annotation-design-snapshot.ts`；入口保留 live annotation 编排，
+由 `scripts/test-preload-annotation-design-snapshot.mjs` 覆盖稳定字段投影与纯函数重入。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）

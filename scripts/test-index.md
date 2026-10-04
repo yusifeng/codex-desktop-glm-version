@@ -6,6 +6,8 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-preload-annotation-design-snapshot.mjs`](./test-preload-annotation-design-snapshot.mjs)
+
 - [`test-app-initial-parse-origin-pattern.mjs`](./test-app-initial-parse-origin-pattern.mjs)
 - [`test-worker-linux-desktop-entry-parser.mjs`](./test-worker-linux-desktop-entry-parser.mjs)
 

@@ -6380,6 +6380,7 @@ var { isStableAnnotationFrame } = require("./browser-page-preload/annotation-fra
 var { isAnnotationContainedBy } = require("./browser-page-preload/annotation-containment");
 var { findLatestDraftTextChange } = require("./browser-page-preload/annotation-draft-text");
 var { parseAnnotationAttributeTokens } = require("./browser-page-preload/annotation-attribute-tokens");
+var { snapshotAnnotationDesign } = require("./browser-page-preload/annotation-design-snapshot");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23867,22 +23868,7 @@ function sy(e, t, n, r, i) {
   };
 }
 function cy(e) {
-  return {
-    id: e.id,
-    anchor: e.anchor,
-    annotationControls: e.annotationControls,
-    annotationControlChanges: e.annotationControlChanges,
-    declarations: e.declarations,
-    draftAttribute: e.draftAttribute,
-    markerViewportPoint: e.markerViewportPoint,
-    provenance: e.provenance,
-    selector: e.selector,
-    targetLabel: e.targetLabel,
-    elementTagName: e.elementTagName,
-    text: e.text,
-    themeVariant: e.themeVariant,
-    viewportSize: e.viewportSize,
-  };
+  return snapshotAnnotationDesign(e);
 }
 function ly(e) {
   let t = e.tagName.toLowerCase(),
