@@ -12,8 +12,9 @@ const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenam
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = require("./worker/git-apply-patch");
-const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
+const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
 const { createWorktreeRequest } = require("./worker/git-worktree-create-request");
+const { dispatchCodexWorktreeRequest } = require("./worker/git-codex-worktree-dispatch");
 const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-dispatch");
 const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
@@ -70142,7 +70143,13 @@ var I6 = kW(`git`),
           }
           case `codex-worktrees`:
             try {
-              p = X(await resolveCodexWorktrees(e.params, worktreeRequestDeps));
+              p = X((await dispatchCodexWorktreeRequest(e.method, e.params, {
+                gitManager: this.gitManager,
+                host: o,
+                signal: i.signal,
+                listCodexWorktrees: (gitManager, host, worktreesRoot, _signal) =>
+                  worktreeRequestDeps.listCodexWorktrees(gitManager, host, worktreesRoot),
+              })).result);
             } catch (e) {
               p = EV(e instanceof Error ? e.message : String(e));
             }

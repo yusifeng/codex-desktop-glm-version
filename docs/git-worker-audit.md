@@ -835,3 +835,11 @@ Worktree 删除/恢复的 host+path 去重、删除 promise 清理，以及恢�
 入口继续提供 host、取消信号及实际 worktree 查询回调，语义模块仅负责请求方法匹配与参数转发；
 `scripts/test-worker-git-worktree-list-dispatch.mjs` 覆盖成功转发、host/signal 保持及未知方法旁路，
 共 3 项断言。
+
+### 增量抽取：Codex worktree discovery request dispatch
+
+`codex-worktrees` 的只读请求分派已迁移至 `src/main/worker/git-codex-worktree-dispatch.ts`。
+入口继续注入 Git manager、执行 host、取消信号和 managed-worktree discovery 回调；语义模块只负责
+方法匹配、`worktreesRoot` 转发及 `{ worktrees }` 响应 envelope，发现失败仍由入口保持原有错误映射。
+`scripts/test-worker-git-codex-worktree-dispatch.mjs` 覆盖成功结果、manager/host/root/signal 契约、
+未知方法旁路与发现失败传播，共 4 项断言。
