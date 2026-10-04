@@ -69904,19 +69904,19 @@ var I6 = kW(`git`),
             p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `current-branch-snapshot`:
-            p = X(await resolveCurrentBranchSnapshot(e.params.root, i.signal, readRequestDeps));
+            p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `upstream-branch`:
-            p = X(await resolveUpstreamBranch(e.params.root, i.signal, readRequestDeps));
+            p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `branch-ahead-count`:
-            p = X(await resolveBranchAheadCount(e.params.root, i.signal, readRequestDeps));
+            p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `default-branch`:
-            p = X(await resolveDefaultBranch(e.params.root, i.signal, readRequestDeps));
+            p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `base-branch`:
-            p = X(await resolveBaseBranch(e.params.root, readRequestDeps));
+            p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `recent-branches`:
             p = await resolveRecentBranches(e.params, i.signal, readRequestDeps);
