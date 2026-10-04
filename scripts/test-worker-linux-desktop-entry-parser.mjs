@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/linux-desktop-entry-parser.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { parseDesktopEntryFields } = module.exports;
+assert.deepEqual([...parseDesktopEntryFields("[Desktop Entry]\nName=Cursor\nExec=cursor %U")], [["Name", "Cursor"], ["Exec", "cursor %U"]]);
+assert.equal(parseDesktopEntryFields("[Other]\nName=Wrong\n[Desktop Entry]\nName=Right").get("Name"), "Right");
+assert.equal(parseDesktopEntryFields("[Desktop Entry]\n# Name=Ignored\nName = Value = extra").get("Name"), "Value = extra");
+assert.equal(parseDesktopEntryFields("[Desktop Entry]\nName=One\n[Other]\nName=Two").get("Name"), "One");
+assert.equal(parseDesktopEntryFields("").size, 0);
+console.log("worker Linux desktop entry parser tests passed (5 assertions)");

@@ -120,6 +120,7 @@ const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
+const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation } = require("./worker/editor-target-args");
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
@@ -80314,18 +80315,7 @@ function TTe(e, t, n) {
   } catch {
     return null;
   }
-  let i = new Map(),
-    a = !1;
-  for (let e of r.split(/\r?\n/u)) {
-    let t = e.trim();
-    if (t.startsWith(`[`) && t.endsWith(`]`)) {
-      a = t === `[Desktop Entry]`;
-      continue;
-    }
-    if (!a || t.startsWith(`#`)) continue;
-    let n = t.indexOf(`=`);
-    n > 0 && i.set(t.slice(0, n).trim(), t.slice(n + 1).trim());
-  }
+  let i = parseDesktopEntryFields(r);
   let o = i.get(`Exec`);
   if (
     i.get(`Hidden`) === `true` ||
