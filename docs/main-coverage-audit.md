@@ -103,6 +103,17 @@ Electron/worker 副作用）：
 
 ## 审计复核
 
+### 增量抽取：更新即时退出清理
+
+原 `Wst`（176,933-176,955）已迁移至
+`src/main/main-app/app-shell/immediate-update-exit.ts`，入口层通过
+`run-main-app-startup.ts` 的窄代理接入。该模块以依赖注入方式保留
+`markAppQuitting`、Windows 进程树清理、异步 cleanup、未销毁窗口销毁、错误告警
+以及 `app.exit(0)` 的顺序和 finally 语义；不直接导入 Electron。由
+`scripts/test-main-immediate-update-exit.mjs` 覆盖正常顺序、进程树失败、cleanup
+失败、非 Error 失败和始终退出等 4 组断言。原入口仍负责传入真实副作用，Ust
+其余启动装配保持在原边界内。
+
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs

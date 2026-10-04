@@ -19,6 +19,7 @@
 // 消费者：bootstrap chunk 的 app.whenReady。
 
 import { createTaggedLogger } from "@chunk/logger";
+import { cleanupForImmediateQuitOnUpdate as cleanupImmediateUpdateExit } from "./immediate-update-exit";
 
 const startupLogger = createTaggedLogger("startup");
 
@@ -110,6 +111,6 @@ export async function runMainAppStartup(context: MainStartupContext): Promise<vo
 }
 
 /** 更新即时退出清理（原 `Wst`）。 */
-export function cleanupForImmediateQuitOnUpdate(): void {
-  startupLogger.info("immediate quit for update", { safe: {} });
+export async function cleanupForImmediateQuitOnUpdate(dependencies: Parameters<typeof cleanupImmediateUpdateExit>[0]): Promise<void> {
+  return cleanupImmediateUpdateExit(dependencies);
 }
