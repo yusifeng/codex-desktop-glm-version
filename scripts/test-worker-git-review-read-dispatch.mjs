@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-review-read-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchReviewReadRequest } = module.exports; const deps = {}; for (const name of ["statusSummary", "branchDiffStats", "reviewSummary", "reviewSourceLineCounts", "reviewDiff", "reviewSearch", "reviewPatch"]) deps[name] = (params) => ({ result: `${name}:${params.id}`, performance: name });
+assert.equal((await dispatchReviewReadRequest("status-summary", { id: 1 }, deps)).result, "statusSummary:1");
+assert.equal((await dispatchReviewReadRequest("branch-diff-stats", { id: 2 }, deps)).result, "branchDiffStats:2");
+assert.equal((await dispatchReviewReadRequest("review-summary", { id: 3 }, deps)).result, "reviewSummary:3");
+assert.equal((await dispatchReviewReadRequest("review-source-line-counts", { id: 4 }, deps)).result, "reviewSourceLineCounts:4");
+assert.equal((await dispatchReviewReadRequest("review-diff", { id: 5 }, deps)).result, "reviewDiff:5");
+assert.equal((await dispatchReviewReadRequest("review-search", { id: 6 }, deps)).result, "reviewSearch:6");
+assert.equal((await dispatchReviewReadRequest("review-patch", { id: 7 }, deps)).result, "reviewPatch:7");
+assert.equal(await dispatchReviewReadRequest("unknown", {}, deps), undefined);
+console.log("worker Git review read dispatch tests passed (8 assertions)");

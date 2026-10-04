@@ -126,6 +126,7 @@ const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/g
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
+const { dispatchReviewReadRequest } = require("./worker/git-review-read-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69955,37 +69956,37 @@ var I6 = kW(`git`),
             p = X(await getBranchMetadata(this.gitManager, e.params.cwd, o, i.signal, gitBranchMetadataDeps));
             break;
           case `status-summary`: {
-            let t = await resolveStatusSummary(e.params, reviewRequestDeps);
+            let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
             ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `branch-diff-stats`: {
-            let t = await resolveBranchDiffStats(e.params, reviewRequestDeps);
+            let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
             ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-summary`: {
-            let t = await resolveReviewSummary(e.params, reviewRequestDeps);
+            let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
             ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-source-line-counts`: {
-            let t = await resolveReviewSourceLineCounts(e.params, reviewRequestDeps);
+            let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
             ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-diff`: {
-            let t = await resolveReviewDiff(e.params, reviewRequestDeps);
+            let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
             ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-search`: {
-            let t = await resolveReviewSearch(e.params, reviewRequestDeps);
+            let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
             ((p = X(t.result)), (l = t.performance));
             break;
           }
           case `review-patch`: {
-            let t = await resolveReviewPatch(e.params, reviewRequestDeps);
+            let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
             ((p = X(t.result)), (l = t.performance));
             break;
           }
