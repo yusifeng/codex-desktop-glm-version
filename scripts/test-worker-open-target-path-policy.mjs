@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/open-target-path-policy.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = module.exports;
+const dirname = (pathname) => pathname.includes("/") ? pathname.slice(0, pathname.lastIndexOf("/") || 1) : ".";
+assert.equal(resolveOpenTargetDirectory("/tmp/project", () => true, dirname), "/tmp/project");
+assert.equal(resolveOpenTargetDirectory("/tmp/project/file.txt", () => false, dirname), "/tmp/project");
+assert.equal(resolveOpenTargetDirectory("relative.txt", () => false, dirname), ".");
+assert.deepEqual(buildWindowsTerminalArgs("/tmp/project/file.txt", () => "/tmp/project"), ["-d", "/tmp/project"]);
+assert.deepEqual(buildWindowsTerminalArgs("/tmp/project", (p) => p), ["-d", "/tmp/project"]);
+console.log("worker open target path policy tests passed (5 assertions)");

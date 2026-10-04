@@ -119,6 +119,7 @@ const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
+const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
@@ -80635,7 +80636,7 @@ function VTe(e) {
   return null;
 }
 function l9(e) {
-  return (0, m.existsSync)(e) && (0, m.statSync)(e).isDirectory() ? e : (0, g.dirname)(e);
+  return resolveOpenTargetDirectory(e, (e) => (0, m.existsSync)(e) && (0, m.statSync)(e).isDirectory(), g.dirname);
 }
 var HTe = [`nvim`, `vim`, `nano`, `less`],
   u9 = `wt.exe`,
@@ -80646,7 +80647,7 @@ async function d9(e) {
   return t ? (L7((await e(t)).target) ?? u9) : null;
 }
 function f9(e) {
-  return [`-d`, l9(e)];
+  return buildWindowsTerminalArgs(e, l9);
 }
 async function p9(e, t) {
   await w7(`cmd.exe`, [`/d`, `/s`, `/c`, `start`, ``, e, ...t], { env: WTe() });
