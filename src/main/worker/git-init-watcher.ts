@@ -1,3 +1,5 @@
+const { shouldCheckGitInitPath } = require("./git-init-watcher-path-policy");
+
 type GitInitWatcherDependencies = {
   createLogger: (tag: string) => any;
   debounce: (callback: (...args: any[]) => void, delayMs: number) => any;
@@ -73,14 +75,7 @@ class GitInitWatcher {
       rootSession = await this.startWatch(
         this.options.cwd,
         ({ changedPaths }: any) => {
-          if (
-            changedPaths.length === 0 ||
-            changedPaths.some(
-              (changedPath: string) =>
-                changedPath === gitDirectoryPath ||
-                changedPath.startsWith(`${gitDirectoryPath}${pathSeparator}`),
-            )
-          )
+          if (shouldCheckGitInitPath(changedPaths, gitDirectoryPath, pathSeparator))
             this.checkForGitDebounced(gitDirectoryPath);
         },
         gitDirectoryPath,

@@ -925,6 +925,12 @@ root/git 双 session 就绪判定不再与异步 watcher 副作用混在一起�
 watch 创建、dispose、stat 与 debounce 生命周期。`scripts/test-worker-git-init-watcher.mjs`
 新增 8 项策略断言（总计 43 项）。
 
+Git init watcher 的 workspace 变更路径筛选已迁移至
+`src/main/worker/git-init-watcher-path-policy.ts`：空/缺失事件批次的保守触发、`.git` 根路径
+及其子路径匹配、分隔符边界与跨平台字符串校验不再内联于 watcher callback；异步 debounce、
+watch session 和 stat 副作用仍留在 `GitInitWatcher`。`scripts/test-worker-git-init-watcher-path-policy.mjs`
+覆盖 7 项路径断言。
+
 ### 增量抽取：Live-query request handler
 
 GitRepoManager 的 live-query 业务编排（status/review summary、branch diff stats、branch 查询与
