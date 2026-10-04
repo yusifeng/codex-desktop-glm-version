@@ -7,6 +7,7 @@ Total scripts: 787.
 ## Recent semantic extraction suites
 
 - [`test-main-device-check.mjs`](./test-main-device-check.mjs)
+- [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
 - [`test-preload-annotation-scroll-container.mjs`](./test-preload-annotation-scroll-container.mjs)
 
 - [`test-app-shared-command-visibility-predicates.mjs`](./test-app-shared-command-visibility-predicates.mjs)

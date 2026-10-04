@@ -388,3 +388,10 @@ contract 后再迁移。
 直接导入 `src/renderer/app-shared/runtime/sandbox-url.ts` 的语义实现。该切换覆盖真实
 sandbox consumer，保留同一 partition 格式与初始化行为；既有 sandbox URL focused
 suite 另增加 consumer import 边界断言。
+
+本轮再将 app-initial 的 canonical-history 纯访问器 `Dhn`（内部 `cp`）迁为
+`src/renderer/app-initial/runtime/canonical-history.ts` 的
+`getCanonicalHistoryEntries`。它只读取 `islands` 的最新项，并在其
+`newerBoundary.status === "exhausted"` 时返回完整岛屿；否则返回 `null`。真实的
+`artifact-originating-turn` consumer 已切换语义导入，focused suite 覆盖完整、加载中、
+空历史和空输入四种边界。

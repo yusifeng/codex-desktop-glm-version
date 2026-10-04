@@ -1,11 +1,11 @@
 import "@rchunk/rolldown-runtime";
+import { getCanonicalHistoryEntries } from "../app-initial/runtime/canonical-history";
 import {
   HI as normalizePath,
   IK as pathsEqual,
   RI as joinPath,
 } from "@rchunk/app-shared";
 import {
-  Dhn as getCanonicalHistoryEntries,
   Dpn as initializeConversationHistory,
   Fin as getConversationTurns,
   HZt as initializeSidePanelRoutes,
@@ -112,7 +112,7 @@ function findArtifactOriginatingTurn(
   let candidateTurns = turns;
   if (getForkPoint(conversation) == null) {
     const turnHistory = conversation.turnHistory as
-      | { kind: string; history: { entries?: unknown[]; entitiesByKey: Record<string, unknown> } }
+      | { kind: string; history: { islands?: Array<{ entries: unknown[]; newerBoundary?: { status?: string } | null }>; entitiesByKey: Record<string, unknown> } }
       | undefined;
     if (turnHistory?.kind !== "canonical") return undefined;
     const firstEntry = getCanonicalHistoryEntries(turnHistory.history)?.entries[0] as
