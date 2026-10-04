@@ -563,3 +563,9 @@ default-branch RPC、live-query 与 cache runtime，明确拥有 hub 初始化�
 独立 renderer named consumer，因此登记为 `generated-local-helper` 并保留原聚合边：前者
 避免无主状态 facade，后者避免复制初始化顺序。focused classification suite 锁定 `Eh`/
 `Ef` 仍属未消费面，并由 hub audit 校验 source symbol 与精确行范围。
+
+本轮继续补齐 app-primary 的 CSS 能力判定逐行证据：`tke`（公开别名 `$g`，3443--3445
+行）只检查 `var()` 与 `color-mix()` token，供相邻的生成式颜色管线决定是否保留 CSS
+表达式。该 helper 没有独立 renderer named consumer 或 lifecycle 边界，因此登记为
+`generated-local-helper` 并保留聚合 hub，避免制造无主 styling facade。分类记录由
+`scripts/audit-renderer-hub-classification.mjs` 校验 source symbol 与精确行范围。

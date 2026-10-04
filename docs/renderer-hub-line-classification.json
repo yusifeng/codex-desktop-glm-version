@@ -88,5 +88,10 @@
     "hub": "app-primary", "alias": "Ef", "sourceSymbol": "gF", "startLine": 15611, "endLine": 15617,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The default-branch query initializer wires hub-local RPC state and cache registration; its side effects are inseparable from the generated request runtime and there is no independent renderer consumer to own a facade."
+  },
+  {
+    "hub": "app-primary", "alias": "$g", "sourceSymbol": "tke", "startLine": 3443, "endLine": 3445,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The CSS capability predicate detects var() and color-mix() tokens for the adjacent generated color pipeline; it has no independent renderer import or lifecycle boundary, so preserving the coupled helper avoids creating an unowned styling facade."
   }
 ]
