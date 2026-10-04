@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 863.
+Total scripts: 862.
 
 ## Recent semantic extraction suites
 
@@ -10,6 +10,14 @@ Total scripts: 863.
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)
 - [`test-preload-annotation-display-anchors.mjs`](./test-preload-annotation-display-anchors.mjs)
 - [`test-worker-git-file-content.mjs`](./test-worker-git-file-content.mjs)
+- [`test-app-primary-extract-site-subdomain.mjs`](./test-app-primary-extract-site-subdomain.mjs)
+- [`test-preload-annotation-mode-controller.mjs`](./test-preload-annotation-mode-controller.mjs)
+- [`test-preload-annotation-selection.mjs`](./test-preload-annotation-selection.mjs)
+- [`test-preload-annotation-sync-state.mjs`](./test-preload-annotation-sync-state.mjs)
+- [`test-worker-git-live-query-handler.mjs`](./test-worker-git-live-query-handler.mjs)
+- [`test-worker-git-live-query-run-coordinator.mjs`](./test-worker-git-live-query-run-coordinator.mjs)
+- [`test-worker-git-live-query-subscription-lifecycle.mjs`](./test-worker-git-live-query-subscription-lifecycle.mjs)
+- [`test-worker-git-worktree-handoff-dispatch.mjs`](./test-worker-git-worktree-handoff-dispatch.mjs)
 
 - [`test-main-device-check.mjs`](./test-main-device-check.mjs)
 - [`test-main-remote-host.mjs`](./test-main-remote-host.mjs)
