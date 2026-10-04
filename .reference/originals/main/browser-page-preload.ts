@@ -6372,6 +6372,7 @@ var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotat
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
+var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22256,7 +22257,7 @@ function Yg({ getElementAtPoint: e, onInvalidated: t, onRenderingFailed: n }) {
     normalizeRole: Kd,
     sanitizeMetadata: Zo,
     dispatchRequest: (target, payload) => Xg(target, payload),
-    isResponseEvent: (event) => event instanceof CustomEvent,
+    isResponseEvent: (event) => isAnnotationSurfaceResponseEvent(event, CustomEvent),
     onInvalidated: t,
     onRenderingFailed: n,
   });
@@ -22413,7 +22414,7 @@ function Yg({ getElementAtPoint: e, onInvalidated: t, onRenderingFailed: n }) {
   return { hasSurface: d, hitTest: f, renderSelection: m, cancel: h, clear: g, dispose: _ };
 }
 function Xg(e, t) {
-  e.dispatchEvent(new CustomEvent($g.requestEvent, { bubbles: !0, detail: JSON.stringify(t) }));
+  return dispatchAnnotationSurfaceRequest(e, $g.requestEvent, t, CustomEvent);
 }
 function Zg(e) {
   return (

@@ -214,3 +214,5 @@ annotation surface 注册与 MutationObserver 清理共用的顶层元素判定�
 调度与回调执行；该策略由 annotation runtime 回归断言覆盖。
 
 Annotation shadow-root discovery observer（原 `Ng` 22064-22116）已迁移至 `src/main/browser-page-preload/annotation-shadow-root-observer.ts`，保留动态 shadow-root 注册、失效清理、annotation selector 变更通知与 attachShadow 事件监听；由 `scripts/test-preload-annotation-shadow-root-observer.mjs` 覆盖 4 项断言。
+
+Annotation surface IPC event dispatch/response-event 判定（原 `Xg` 22415-22417 及其 `Yg` 注入）已迁移至 `src/main/browser-page-preload/annotation-surface-events.ts`，保留 bubbling、JSON detail 序列化和 `CustomEvent` 类型判定；由 `scripts/test-preload-annotation-surface-events.mjs` 覆盖 5 项断言。

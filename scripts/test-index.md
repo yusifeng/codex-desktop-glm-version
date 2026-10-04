@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 710.
+Total scripts: 712.
 
 ## Recent semantic extraction suites
 
@@ -38,6 +38,7 @@ Total scripts: 710.
 - [`test-main-worker-rpc-message-predicates.mjs`](./test-main-worker-rpc-message-predicates.mjs)
 - [`test-main-workspace-policy-checker.mjs`](./test-main-workspace-policy-checker.mjs)
 - [`test-preload-annotation-controls-registry.mjs`](./test-preload-annotation-controls-registry.mjs)
+- [`test-preload-annotation-surface-events.mjs`](./test-preload-annotation-surface-events.mjs)
 - [`test-preload-annotation-frame-pointer-guard.mjs`](./test-preload-annotation-frame-pointer-guard.mjs)
 - [`test-preload-annotation-keyboard.mjs`](./test-preload-annotation-keyboard.mjs)
 - [`test-preload-annotation-overlay-runtime.mjs`](./test-preload-annotation-overlay-runtime.mjs)

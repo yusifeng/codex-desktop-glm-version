@@ -346,6 +346,7 @@ pending editor message reducer 已进一步抽取为 `src/main/browser-page-prel
 annotation surface feature observer（DOM/shadow-root 扫描、feature 状态、pageshow 与
 dispose 生命周期）已抽取为 `src/main/browser-page-preload/annotation-surface-observer.ts`，
 annotation shadow-root discovery observer（原 `Ng` 22064-22116）已进一步迁移至 `src/main/browser-page-preload/annotation-shadow-root-observer.ts`，由 4 项行为断言覆盖动态 shadow-root 注册、失效清理、annotation selector 变更通知与 attachShadow 事件监听。
+annotation surface IPC event dispatch/response-event 判定（原 `Xg` 22415-22417）已迁移至 `src/main/browser-page-preload/annotation-surface-events.ts`，保留 bubbling、JSON detail 序列化和 `CustomEvent` 判定，由 5 项行为断言覆盖。
 worker shell 环境输出 delimiter/ANSI 解析与大小写不敏感环境变量读取已迁移至 `src/main/worker/shell-environment-parser.ts`，由 5 项行为断言覆盖 newline/NUL 分隔、转义清理、边界错误与环境键查找。
 worker Windows Git executable resolution、PATH 大小写覆盖与 `.cmd/.bat` command wrapper 已迁移至 `src/main/worker/git-executable.ts`，入口通过窄委托接回，由 6 项行为断言覆盖平台早退、环境合并、where 候选与 ComSpec 包装。
 main worker bus 的启动结果与事件类型纯谓词已迁移至
@@ -439,7 +440,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 710 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 712 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
