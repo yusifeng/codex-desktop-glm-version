@@ -137,6 +137,7 @@ const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { createGitRequestLifecycle } = require("./worker/git-request-lifecycle");
+const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
@@ -70995,6 +70996,8 @@ function obe(e) {
   }
 }
 function sbe(e) {
+  return resolveMutationRoot(e, xz, bz);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return typeof e.params.cwd == `string`
     ? xz(e.params.cwd)
     : typeof e.params.sourceCwd == `string`
@@ -71014,6 +71017,8 @@ function sbe(e) {
                   : null;
 }
 function cbe(e) {
+  return resolveGitInvalidationTarget(e, xz, bz);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e.method) {
     case `restore-worktree`:
       return { type: `exact`, cwd: e.params.worktreePath };
@@ -71041,6 +71046,8 @@ function cbe(e) {
   }
 }
 function lbe(e) {
+  return isGitMutationMethod(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e) {
     case `push`:
     case `checkout-branch`:

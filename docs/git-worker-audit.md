@@ -932,3 +932,11 @@ transfer cleanup 已迁移至 `src/main/worker/git-worktree-handoff-dispatch.ts`
 handoff 语义与目标 host cache invalidation；restore/delete/cancel 生命周期仍由 request handler
 保留，实际迁移副作用继续通过窄依赖注入。`scripts/test-worker-git-worktree-handoff-dispatch.mjs`
 覆盖 progress operation id/direction、跨 host cleanup 与 cache invalidation，共 6 项断言。
+
+### 增量抽取：Git request invalidation policy
+
+worker 请求完成后的仓库缓存失效策略已迁移至
+`src/main/worker/git-request-invalidation-policy.ts`。该模块集中处理 mutation method
+判定、exact/host 失效目标与 cwd/root 优先级解析；入口仍负责实际缓存失效、Git manager
+和 host 生命周期副作用。`scripts/test-worker-git-request-invalidation-policy.mjs`
+覆盖 mutation/readonly、cwd/root 优先级、exact/host 目标与 commit 条件，共 7 项断言。
