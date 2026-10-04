@@ -35,6 +35,7 @@ const openTargetFilter = require("./main-app/open-target/target-filter-policy.js
 const targetInputPolicy = require("./main-app/open-target/target-input-policy.js");
 const targetSelectionPolicy = require("./main-app/open-target/target-selection-policy.js");
 const targetLaunchArgs = require("./main-app/open-target/target-launch-args.js");
+const targetDescriptorPolicy = require("./main-app/open-target/target-descriptor-policy.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -138338,27 +138339,24 @@ function B1(e, t) {
   return targetLaunchArgs.buildVscodeRemoteUri(e, t);
 }
 function V1({ label: e, icon: t, kind: n, platform: r }) {
-  return {
-    label: r.label ?? e,
-    icon: r.icon ?? t,
-    kind: r.kind ?? n,
-    hidden: r.hidden,
-    detect: r.detect,
-    iconPath: r.iconPath,
-    args: r.args,
-    env: r.env,
-    open: r.open,
-  };
+  return targetDescriptorPolicy.mergeTargetPlatformDescriptor({
+    label: e,
+    icon: t,
+    kind: n,
+    platform: r,
+  });
 }
 function H1({ id: e, label: t, icon: n, kind: r, hidden: i, darwin: a, win32: o, linux: s }) {
-  return {
+  return targetDescriptorPolicy.createTargetDescriptor({
     id: e,
-    platforms: {
-      darwin: a ? V1({ label: t, icon: n, kind: r, platform: { hidden: i, ...a } }) : void 0,
-      win32: o ? V1({ label: t, icon: n, kind: r, platform: { hidden: i, ...o } }) : void 0,
-      linux: s ? V1({ label: t, icon: n, kind: r, platform: { hidden: i, ...s } }) : void 0,
-    },
-  };
+    label: t,
+    icon: n,
+    kind: r,
+    hidden: i,
+    darwin: a,
+    win32: o,
+    linux: s,
+  });
 }
 function U1({
   id: e,
