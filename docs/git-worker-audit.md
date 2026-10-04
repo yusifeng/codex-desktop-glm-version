@@ -777,6 +777,10 @@ URL 安全校验、browser auth、OpenAI form、tool suggestion 与 MCP tool cal
 Git sparse pathspec 的不支持错误分类与 `git add` 失败结果构造已迁移至
 `src/main/worker/git-pathspec-policy.ts`；入口仍保留重试编排，
 `scripts/test-worker-git-pathspec-policy.mjs` 覆盖 5 项错误分类/结果字段断言。
+
+Git/session 工作目录权限错误与 Git 超时错误判定已迁移至
+`src/main/worker/git-session-error-policy.ts`；session 生命周期与实际 Git 调用仍在入口，
+`scripts/test-worker-git-session-error-policy.mjs` 覆盖 6 项分类断言。
 ### 增量抽取：Linux terminal 参数策略
 
 Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令拼接与安全 quoting）已迁移至
