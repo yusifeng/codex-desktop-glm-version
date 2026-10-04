@@ -477,5 +477,23 @@
     "classification": "generated-local-composer-route-runtime",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer wires the composer route's query, feature, account and UI registries before its generated controller mounts. This is route-local lifecycle glue with no separately named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "C", "sourceSymbol": "u_t", "startLine": 114946, "endLine": 114992,
+    "classification": "generated-local-project-state-sync-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The hook synchronizes selected project route state into the project store and removes the transient state field after navigation. It is effect-local routing glue with no separately named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "T", "sourceSymbol": "f9", "startLine": 114934, "endLine": 114942,
+    "classification": "generated-local-project-capability-predicate",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The predicate checks project kind and repository presence for the neighboring project route capability gate. Its decision remains coupled to that generated route wrapper and has no independent renderer owner."
+  },
+  {
+    "hub": "app-primary", "alias": "v", "sourceSymbol": "h_t", "startLine": 115043, "endLine": 115113,
+    "classification": "generated-local-home-composer-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component binds home-composer mode, diff source, prefill preview and recording markers into the generated composer surface. Its effects and child composition are route-local lifecycle glue."
   }
 ]
