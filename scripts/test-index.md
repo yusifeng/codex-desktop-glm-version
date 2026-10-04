@@ -2,13 +2,14 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 861.
+Total scripts: 863.
 
 ## Recent semantic extraction suites
 
 - [`test-preload-annotation-flex-gap-overlays.mjs`](./test-preload-annotation-flex-gap-overlays.mjs)
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)
 - [`test-preload-annotation-display-anchors.mjs`](./test-preload-annotation-display-anchors.mjs)
+- [`test-worker-git-file-content.mjs`](./test-worker-git-file-content.mjs)
 
 - [`test-main-device-check.mjs`](./test-main-device-check.mjs)
 - [`test-main-remote-host.mjs`](./test-main-remote-host.mjs)

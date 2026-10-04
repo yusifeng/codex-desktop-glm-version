@@ -984,3 +984,9 @@ map、generation/retry 状态和实际 refresh 编排；新模块只接收 timer
 回调，保持取消时 abort、定时刷新以及完成时 waiter 唤醒的原有顺序。
 `scripts/test-worker-git-live-query-subscription-lifecycle.mjs` 覆盖立即刷新、延迟刷新、
 订阅取消和 waiter 清理，共 10 项断言。
+
+Git 文件内容读取的 repository-relative path 校验、HEAD/index ref 选择、二进制 Git 输出
+读取、空结果降级与 MIME 投影已迁移至 `src/main/worker/git-file-content.ts`。模块通过窄依赖
+接收 repository lookup、platform path、Git 执行与 MIME 检测；调用方仍负责 Node worker
+host 绑定和响应 envelope。`scripts/test-worker-git-file-content.mjs` 覆盖 HEAD ref、路径越界、
+空内容及 MIME 结果，共 4 项断言。
