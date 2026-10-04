@@ -83,6 +83,7 @@ const { resolveWorktreeStartingState: resolveGitWorktreeStartingStateQuery } = r
 const { createWorktreeDelete } = require("./worker/git-worktree-delete");
 const { createLocalEnvironmentRuntime } = require("./worker/git-local-environment");
 const { WORKTREE_INCLUDE_FILE, copyAgentOverrideFiles, copyWorktreeFiles, findWorktreeIncludeFiles, resolveWorktreeLocalEnvironmentConfig } = require("./worker/git-worktree-copy-files");
+const { WORKTREE_NAME_MARKER, createWorktreePath: createGitWorktreePath, ensureWorktreesRoot, getRootRelativeCwd: getGitRootRelativeCwdQuery, reserveWorktreeNameDirectory } = require("./worker/git-worktree-path-allocation");
 const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
@@ -291,6 +292,21 @@ const gitWorktreeCopyDependencies = {
   createSemaphore: (capacity) => new k$.Sema(capacity),
   runGit: (...args) => $(...args),
 };
+const gitWorktreePathDependencies = {
+  logger: { error: (message) => kW(`git`)().error(message) },
+  normalizeCwd: (path) => xz(path),
+  normalizeRoot: (path) => bz(path),
+  normalizeWindowsPath: (path) => UH(path),
+  processPlatform: process.platform,
+  queryKey: (...args) => Q(...args),
+  random: () => Math.random(),
+  randomUUID: () => crypto.randomUUID(),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+  validateWorktreeName: (name) => LH.safeParse(name).success,
+};
+const getGitRootRelativeCwd = (repository, cwd, signal) =>
+  getGitRootRelativeCwdQuery(repository, cwd, signal, gitWorktreePathDependencies);
 const { removeWorktree: removeGitWorktree } = createWorktreeDelete({
   createSemaphore: (capacity) => new k$.Sema(capacity),
   getHostId: (...args) => h1(...args),
@@ -64415,7 +64431,6 @@ async function F$(e, t) {
     return !1;
   }
 }
-var Tfe = `.codex-worktree-name`;
 function I$(e) {
   let t = SL(DL(e));
   return BH(t)
@@ -64427,17 +64442,6 @@ function I$(e) {
         : t.startsWith(`//`)
           ? t.toLowerCase()
           : t;
-}
-async function L$(e, t) {
-  let n = t?.trim(),
-    [r, i] = await Promise.all([n || e.workspacesRoot(), e.platformPath()]),
-    a = n ? r : i.join(r, `worktrees`);
-  return e.isLocal && process.platform === `win32` && i.sep === `/` ? UH(a) : a;
-}
-async function Afe(e, t) {
-  let [n, r, i] = await Promise.all([L$(e, t), e.platformOs(), e.platformPath()]);
-  (await e.createDirectory(n, { recursive: !0 }),
-    r === `macos` && (await e.writeFile(i.join(n, `.metadata_never_index`), ``)));
 }
 async function z$(e, t, n) {
   if ((n?.throwIfAborted(), (await e.platformFamily()) === `windows`)) {
@@ -67509,42 +67513,6 @@ async function E2(e, t) {
 function Hme(e) {
   return e instanceof Error ? e : Error(String(e));
 }
-function D2(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `root-relative-cwd`, t),
-    queryFn: async () => {
-      let r = await $(t, [`rev-parse`, `--show-prefix`], e.host, { signal: n });
-      if (r.success) return r.stdout.replace(/\/+$/, ``);
-      throw Error(
-        `Failed to resolve git-root-relative cwd: ${r.stderr || r.stdout || `Unknown error`}`,
-      );
-    },
-    staleTime: g1,
-  });
-}
-var Ume = kW(`git`);
-async function Wme(e, t, n, r, i, a) {
-  if (a != null && !LH.safeParse(a).success)
-    return {
-      success: !1,
-      error: Error(
-        `Invalid worktree name. Use 1–64 lowercase letters, numbers, or single hyphens; hexadecimal IDs and Windows device names are reserved.`,
-      ),
-    };
-  let o = await t.getWorktreeRepository(xz(n), r);
-  if (!o?.root)
-    return (
-      Ume().error(`[createWorktreePath] failed to resolve git root for workspace`),
-      { success: !1, error: Error(`Failed to resolve the worktree repository.`) }
-    );
-  let s = await r.platformPath(),
-    c = await L$(r, i),
-    l = a ?? crypto.randomUUID().slice(0, 4),
-    u = s.basename(e),
-    d = bz(s.join(c, l, u)),
-    f = await D2(o, xz(n));
-  return { success: !0, worktreeGitRoot: d, worktreeWorkspaceRoot: xz(s.join(d, f)) };
-}
 async function O2(e, t, n, r) {
   let i = await $(e, [`show-ref`, `--verify`, `--quiet`, formatLocalBranchRef(t)], n, { signal: r });
   return i.success && i.code === 0;
@@ -67678,8 +67646,16 @@ async function V2({
     let [e, t] = await Promise.all([c.codexHome(), c.platformPath()]);
     v = t.join(e, `worktrees`);
   }
-  await Afe(c, v);
-  let y = await Wme(g.root, t, n, c, v, e);
+  await ensureWorktreesRoot(c, v, gitWorktreePathDependencies);
+  let y = await createGitWorktreePath(
+    g.root,
+    t,
+    n,
+    c,
+    v,
+    e,
+    gitWorktreePathDependencies,
+  );
   if (!y.success) return { success: !1, error: y.error };
   if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
   let { worktreeGitRoot: b, worktreeWorkspaceRoot: x } = y,
@@ -67688,11 +67664,12 @@ async function V2({
   if (C != null) {
     let e = null;
     try {
-      ((C = await lhe(C, c, l)), (e = C));
+      ((C = await reserveWorktreeNameDirectory(C, c, l, gitWorktreePathDependencies)),
+        (e = C));
       let t = S.relative(b, x);
       ((b = bz(S.join(C, S.basename(b)))),
         (x = xz(S.join(b, t))),
-        await c.writeFile(S.join(C, Tfe), ``));
+        await c.writeFile(S.join(C, WORKTREE_NAME_MARKER), ``));
     } catch (t) {
       return (
         e != null && (await c.remove(e, { recursive: !0, force: !0 }).catch(() => void 0)),
@@ -67855,24 +67832,6 @@ async function che(e, t, n, r) {
   if (a == null) return null;
   let o = i.slice(a.length + 1);
   return !o || o === `HEAD` ? null : (await O2(e.root, o, e.host, r)) ? o : null;
-}
-async function lhe(e, t, n) {
-  let r = await t.platformPath(),
-    i = r.basename(e).slice(0, 59).replace(/-+$/, ``),
-    a = e;
-  for (let o = 0; ; o += 1) {
-    n?.throwIfAborted();
-    try {
-      return (await t.createDirectory(a, { recursive: !1 }), a);
-    } catch (e) {
-      let n = await t.stat(a, { bypassCache: !0, followSymlinks: !1 }).catch(() => null);
-      if (o === 5 || n == null) throw e;
-    }
-    let s = Math.floor(Math.random() * 1e4)
-      .toString()
-      .padStart(4, `0`);
-    a = r.join(r.dirname(e), `${i}-${s}`);
-  }
 }
 async function J2(e, t = !0, n, r) {
   let i;
@@ -71098,7 +71057,7 @@ var I6 = kW(`git`),
               signal: i.signal,
               getManagedWorktreeLocations: (host, worktreesRoot) =>
                 getManagedWorktreeLocations(host, worktreesRoot, managedWorktreeDiscoveryDeps),
-              getRootRelativeCwd: D2,
+              getRootRelativeCwd: getGitRootRelativeCwd,
               listWorktrees: $2,
               readThreadConfig: p4,
               getTrackedStatus: J2,

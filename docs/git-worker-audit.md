@@ -611,6 +611,13 @@ Worktree snapshot 的 repository size guard 已迁移至 `src/main/worker/git-re
 语义模块持有。原 `q2`/`uhe`/`dhe`/`fhe`/`phe`/`mhe` 与 `Dpe` 常量已删除，snapshot 消费者注入
 现有 query/runGit 能力，由 25 项独立模块断言覆盖。
 
+### 增量抽取：Worktree path allocation
+
+Worktree 的 root-relative cwd query、默认/显式 worktrees 根目录解析、macOS metadata 创建、名称
+校验、Git/workspace 路径计算，以及命名冲突时最多六次的目录预留已迁移至
+`src/main/worker/git-worktree-path-allocation.ts`。原 `D2`/`Wme`/`lhe`/`L$`/`Afe`、`Ume` 日志和
+`Tfe` marker 常量已删除；create 与 resolve-worktree 消费者共用语义入口，由 34 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
