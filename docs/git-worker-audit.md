@@ -534,6 +534,13 @@ equal/left-ahead/right-ahead/diverged 状态分类已迁移至
 `src/main/worker/git-branch-comparison.ts`。原 `A0`/`Fpe` 已删除，nearest ancestor、starting
 ref 与 synced-branch state 消费者改用语义名称，由 21 项模块断言覆盖。
 
+### 增量抽取：Worktree starting ref
+
+Worktree starting ref 的 local/remote ref 规范化、upstream ahead 选择、remote 候选生成、
+`ls-remote` 验证、fetch 与 fresh ref 复检已迁移至
+`src/main/worker/git-worktree-starting-ref.ts`。原 `F0`/`I0`/`Lpe`/`L0`/`Rpe`/`zpe`/`R0`
+已删除，repository-read、worktree create 与 handoff 消费者改用语义名称，由 27 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

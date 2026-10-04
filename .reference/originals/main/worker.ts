@@ -73,6 +73,7 @@ const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot
 const { completeTurnDiffCapture: performCompleteTurnDiffCapture, startTurnDiffCapture: performStartTurnDiffCapture } = require("./worker/git-turn-diff-capture");
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
+const { formatLocalBranchRef: formatLocalBranchRefQuery, resolveWorktreeStartingRef: resolveGitWorktreeStartingRefQuery } = require("./worker/git-worktree-starting-ref");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
@@ -146,6 +147,16 @@ const getOrderedGitRemotes = (repository) =>
   getOrderedGitRemotesQuery(repository, gitRemoteBranchesDeps);
 const getGitUpstreamRef = (repository, ref, signal) =>
   getGitUpstreamRefQuery(repository, ref, signal, gitRemoteBranchesDeps);
+const gitWorktreeStartingRefDeps = {
+  compareBranches: (...args) => compareGitBranches(...args),
+  getOrderedRemotes: (...args) => getOrderedGitRemotes(...args),
+  getUpstreamRef: (...args) => getGitUpstreamRef(...args),
+  resolveRef: (...args) => resolveGitRefSha(...args),
+  runGit: (...args) => $(...args),
+};
+const formatLocalBranchRef = (ref) => formatLocalBranchRefQuery(ref);
+const resolveGitWorktreeStartingRef = (repository, ref, signal) =>
+  resolveGitWorktreeStartingRefQuery(repository, ref, signal, gitWorktreeStartingRefDeps);
 const gitRefResolutionDeps = {
   getQueryMeta: () => x1,
   normalizeSha: (...args) => wz(...args),
@@ -195,7 +206,7 @@ const gitReviewComparisonDeps = {
 };
 const handoffBranchDeps = {
   runGit: $,
-  formatBranchRef: F0,
+  formatBranchRef: formatLocalBranchRef,
   formatExecOutput: mR,
   isObjectId: isGitObjectId,
 };
@@ -42368,7 +42379,7 @@ var OB = H()
     ),
   kB = H()
     .trim()
-    .regex(/^[a-fA-F0-9]{64}$/);
+    .regex(/^[a-fA-formatLocalBranchRef-9]{64}$/);
 K({
   internalCdnUrl: H()
     .trim()
@@ -42928,7 +42939,7 @@ var kV = H()
     ),
   AV = H()
     .trim()
-    .regex(/^[a-fA-F0-9]{64}$/),
+    .regex(/^[a-fA-formatLocalBranchRef-9]{64}$/),
   jV = H()
     .trim()
     .pipe(Mj())
@@ -66804,9 +66815,6 @@ async function y0(e, t, n, r = {}) {
     maxOutputBytes: c,
   });
 }
-function F0(e) {
-  return e.startsWith(`refs/`) ? e : `refs/heads/${e}`;
-}
 async function Ipe(e, t, n, r, i, a) {
   let [o, s] = await Promise.all([
     (async () => {
@@ -66815,7 +66823,7 @@ async function Ipe(e, t, n, r, i, a) {
       if (t.type === `branch`) {
         if (i == null || t.branchName === `HEAD` || t.branchName === `@`) return t.branchName;
         let e = t.remoteRef;
-        if (e == null) return (await I0(i, t.branchName, a))?.ref ?? t.branchName;
+        if (e == null) return (await resolveGitWorktreeStartingRef(i, t.branchName, a))?.ref ?? t.branchName;
         let n = (await getOrderedGitRemotes(i))
           .filter((t) => e.startsWith(`refs/remotes/${t}/`))
           .sort((e, t) => t.length - e.length)[0];
@@ -66844,80 +66852,6 @@ async function Ipe(e, t, n, r, i, a) {
     })(),
   ]);
   return { startingRef: o, startingDiff: s };
-}
-async function I0(e, t, n) {
-  if (t === `HEAD` || t === `@`)
-    return (await resolveGitRefSha(e, `${t}^{commit}`, n)) == null ? null : { ref: t };
-  let r = Rpe(t),
-    i = await getGitUpstreamRef(e, t, n);
-  if (i != null) {
-    let a = `refs/remotes/${i}`,
-      o = (await resolveGitRefSha(e, `${a}^{commit}`, n)) == null ? F0(i) : a;
-    return (await compareGitBranches(e, r ?? t, o, n))?.state === `right-ahead` ? { ref: o } : { ref: r ?? t };
-  }
-  if (r != null && (await resolveGitRefSha(e, `${r}^{commit}`, n)) != null) return { ref: r };
-  let a = await getOrderedGitRemotes(e);
-  if (t.startsWith(`refs/remotes/`) && (await resolveGitRefSha(e, `${t}^{commit}`, n)) != null)
-    return { ref: t, remoteRef: t };
-  let o = zpe(t, a);
-  for (let t of o)
-    if ((await resolveGitRefSha(e, `${t.ref}^{commit}`, n)) != null) return { ref: t.ref, remoteRef: t.ref };
-  let s = null;
-  for (let t of o)
-    try {
-      let r = await Lpe(e, t, n);
-      if (r != null) return r;
-    } catch (e) {
-      let t = e instanceof Error ? e : Error(String(e));
-      if (n?.aborted || !(e instanceof L0)) throw t;
-      s ??= t;
-    }
-  let c = await resolveGitRefSha(e, `${t}^{commit}`, n);
-  if (c != null) return { ref: c };
-  if (s != null) throw s;
-  return null;
-}
-async function Lpe(e, t, n) {
-  let r = await $(
-    e.root,
-    [`ls-remote`, `--exit-code`, t.remote, `refs/heads/${t.branchName}`],
-    e.host,
-    { allowedNonZeroExitCodes: [2], signal: n },
-  );
-  if (!r.success) throw new L0();
-  if (r.code === 2) return null;
-  if (
-    !(
-      await $(e.root, [`fetch`, t.remote, `+refs/heads/${t.branchName}:${t.ref}`], e.host, {
-        signal: n,
-      })
-    ).success ||
-    (await resolveGitRefSha(e, `${t.ref}^{commit}`, n, { fresh: !0 })) == null
-  )
-    throw Error(`Failed to fetch the worktree starting ref`);
-  return { ref: t.ref, remoteRef: t.ref };
-}
-var L0 = class extends Error {
-  constructor() {
-    super(`Failed to validate the worktree starting ref`);
-  }
-};
-function Rpe(e) {
-  return e.startsWith(`refs/heads/`) ? e : e.startsWith(`refs/`) ? null : F0(e);
-}
-function zpe(e, t) {
-  let n = `refs/remotes/`,
-    r = e.startsWith(n) ? e.slice(13) : e;
-  if (e.startsWith(`refs/`) && !e.startsWith(n)) return [];
-  let i = t.find((e) => r.startsWith(`${e}/`));
-  return i == null
-    ? e.startsWith(n)
-      ? []
-      : t.map((t) => R0(t, e))
-    : [R0(i, r.slice(i.length + 1))];
-}
-function R0(e, t) {
-  return { remote: e, branchName: t, ref: `refs/remotes/${e}/${t}` };
 }
 async function Bpe(e, t, n, r, i) {
   let a = await $(e, [`config`, n === `local` ? `--local` : `--worktree`, `--get`, t], r, {
@@ -68367,7 +68301,7 @@ async function Wme(e, t, n, r, i, a) {
   return { success: !0, worktreeGitRoot: d, worktreeWorkspaceRoot: xz(s.join(d, f)) };
 }
 async function O2(e, t, n, r) {
-  let i = await $(e, [`show-ref`, `--verify`, `--quiet`, F0(t)], n, { signal: r });
+  let i = await $(e, [`show-ref`, `--verify`, `--quiet`, formatLocalBranchRef(t)], n, { signal: r });
   return i.success && i.code === 0;
 }
 function A2(e, t, n) {
@@ -68559,7 +68493,7 @@ async function V2({
     });
   }
   if (D && E) {
-    let e = F0(E);
+    let e = formatLocalBranchRef(E);
     await F2(T, e, await A2(g, e, l), l);
   }
   d?.(`info`, B2.encode(`Worktree created at ${x}\n`));
@@ -69101,7 +69035,7 @@ async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, 
   return o;
 }
 async function r4(e, t, n, r, i, a) {
-  let o = F0(t);
+  let o = formatLocalBranchRef(t);
   if (await O2(e, t, n, a))
     return r
       ? { success: !1, reason: `already-exists`, error: `Branch already exists` }
@@ -71724,7 +71658,7 @@ var I6 = kW(`git`),
           getRecentBranches: (params, args) => this.handleRecentBranches(params, args),
           branchExists: O2,
           createBranch: Lhe,
-          resolveStartingRef: I0,
+          resolveStartingRef: resolveGitWorktreeStartingRef,
           getBranchCommits: (repository, baseBranch, signal) =>
             getGitBranchCommits(
               repository,
