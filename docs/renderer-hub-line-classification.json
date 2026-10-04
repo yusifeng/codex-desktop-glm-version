@@ -765,5 +765,23 @@
     "classification": "generated-local-review-entrypoint-predicate",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The predicate narrows local operation entries to the pull-request-review entrypoint before the surrounding project action route handles them. It is an inline generated discriminant with no independent renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "D", "sourceSymbol": "d9", "startLine": 114891, "endLine": 114919,
+    "classification": "generated-local-work-mode-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers the generated work-mode dependency graph and lazy-loads pet content through the surrounding renderer runtime. Its registrations are one-time hub startup wiring with no independent named renderer consumer or reusable lifecycle boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "$i", "sourceSymbol": "o1", "startLine": 68579, "endLine": 68590,
+    "classification": "generated-local-annotation-style-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers annotation style dependencies and caches three generated class-name constants for the adjacent choice-list surface. This is route-local setup performed by the hub and has no independent renderer import or lifecycle owner."
+  },
+  {
+    "hub": "app-primary", "alias": "Ac", "sourceSymbol": "MW", "startLine": 31411, "endLine": 31417,
+    "classification": "generated-local-annotation-preview-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires the generated annotation preview formatter dependencies and JSX runtime before the neighboring preview projection executes. It is side-effectful hub assembly rather than a separately consumed renderer service."
   }
 ]
