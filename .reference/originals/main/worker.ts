@@ -32,6 +32,7 @@ const { getGitCloneState } = require("./worker/git-clone-state");
 const { getCurrentBranch: getCurrentGitBranchQuery, getCurrentBranchSnapshot: getCurrentGitBranchSnapshotQuery, getCurrentBranchState: getCurrentGitBranchStateQuery } = require("./worker/git-current-branch");
 const { getGitIndexInfo } = require("./worker/git-index-info");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
+const { getGitDir: getGitDirQuery, getIndexContext: getGitIndexContextQuery, getIndexPath: getGitIndexPathQuery, resolveGitPath: resolveGitPathQuery } = require("./worker/git-path-resolution");
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
 const { getDefaultBranchForRemote: getDefaultBranchForRemoteQuery, getDefaultRemoteBranch: getDefaultGitRemoteBranchQuery, getLocallyKnownDefaultBranch: getLocallyKnownDefaultBranchQuery, getOrderedRemotes: getOrderedGitRemotesQuery, getUpstreamRef: getGitUpstreamRefQuery } = require("./worker/git-remote-branches");
 const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./worker/git-ref-resolution");
@@ -137,8 +138,21 @@ const getCurrentGitBranchState = (repository) =>
   getCurrentGitBranchStateQuery(repository, gitCurrentBranchDeps);
 const getCurrentGitBranchSnapshot = (repository, signal) =>
   getCurrentGitBranchSnapshotQuery(repository, signal, gitCurrentBranchDeps);
+const gitPathResolutionDeps = {
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const getGitDir = (repository, signal) =>
+  getGitDirQuery(repository, signal, gitPathResolutionDeps);
+const resolveGitPath = (repository, path, signal) =>
+  resolveGitPathQuery(repository, path, signal, gitPathResolutionDeps);
+const getGitIndexPath = (repository) =>
+  getGitIndexPathQuery(repository, gitPathResolutionDeps);
+const getGitIndexContext = (repository, signal) =>
+  getGitIndexContextQuery(repository, signal, gitPathResolutionDeps);
 const gitIndexInfoDeps = {
-  getGitDir: (...args) => u0(...args),
+  getGitDir: (...args) => getGitDir(...args),
   logger: { error: (message, detail) => kW(`git`)().error(message, detail) },
 };
 const gitNearestAncestorDeps = { compareAhead: (...args) => compareGitBranches(...args) };
@@ -397,7 +411,7 @@ const managedWorktreeDiscoveryDeps = {
   normalizeComparisonPath: I$,
   normalizeWorktreePath: bz,
   toLocalHostPath: UH,
-  getGitDir: (repository) => u0(repository),
+  getGitDir: (repository) => getGitDir(repository),
 };
 const gitCloneStateDeps = {
   runGit: $,
@@ -412,7 +426,7 @@ const gitSafeAttributeFilterDeps = {
 const gitUncommittedDiffDeps = {
   copyIndex: B$,
   createTemporaryDirectory: z$,
-  getIndexContext: m0,
+  getIndexContext: getGitIndexContext,
   logger: {
     error: (message, detail) => kW(`git`)().error(message, detail),
     warning: (message, detail) => kW(`git`)().warning(message, detail),
@@ -466,7 +480,7 @@ const turnDiffSnapshotDeps = {
   queryKey: Q,
   getStatusConfig: e2,
   runGit: $,
-  getIndexPath: m0,
+  getIndexPath: getGitIndexContext,
   withTemporaryIndex: b4,
   stageWorktree: v4,
   isObjectId: isGitObjectId,
@@ -495,7 +509,7 @@ const turnDiffCaptureDeps = {
 const gitWatcherMetadataDeps = {
   getSyncedBranchFileName: () => M2,
   queryKey: (...args) => Q(...args),
-  resolveGitPath: (...args) => d0(...args),
+  resolveGitPath: (...args) => resolveGitPath(...args),
   runGit: (...args) => $(...args),
 };
 const gitWorktreeFilesDeps = {
@@ -508,7 +522,7 @@ const gitApplyChangesDeps = {
   applyPatch: (...args) => S2(...args),
   createLogger: (tag) => AW(tag),
   getTemporaryIndexContext: async (gitManager, root, host) =>
-    m0(gitManager.getWorktreeRepositoryForRoot(root, host)),
+    getGitIndexContext(gitManager.getWorktreeRepositoryForRoot(root, host)),
   normalizeCommitSha: (sha) => Sz(sha),
   parsePatchPaths: (diff) => x2(diff),
   runDiff: (...args) => y0(...args),
@@ -587,7 +601,7 @@ const gitReviewMetadataFinalizeDeps = {
 const gitReviewBranchStatsDeps = {
   getDiffMetadata: (params) =>
     readReviewDiffMetadata(params, gitReviewMetadataDiffDeps),
-  getGitDir: (repository, signal) => u0(repository, signal),
+  getGitDir: (repository, signal) => getGitDir(repository, signal),
   getOmittedUntrackedFiles,
   getStatusSummary: (...args) => Y2(...args),
   getUntrackedMetadata: (reviewSnapshot, paths) =>
@@ -66782,73 +66796,6 @@ function l0(e) {
   for (let r of e) (t.set(r, n), (n += r.byteLength));
   return t;
 }
-function u0(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `git-dir`),
-    queryFn: async () => {
-      let { success: n, stdout: r } = await $(e.root, [`rev-parse`, `--git-dir`], e.host, {
-        signal: t,
-      });
-      if (!n || !r) return null;
-      let i = await e.host.platformPath();
-      return i.isAbsolute(r) ? r : i.join(e.root, r);
-    },
-    staleTime: g1,
-  });
-}
-function d0(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `git-path`, t),
-    queryFn: async () => {
-      let { success: r, stdout: i } = await $(e.root, [`rev-parse`, `--git-path`, t], e.host, {
-        signal: n,
-      });
-      if (!r || !i) return null;
-      let a = await e.host.platformPath();
-      if (a.isAbsolute(i)) return i;
-      if (i.startsWith(`.git/`)) return a.join(e.root, i);
-      let o = await u0(e, n);
-      return o ? a.join(o, i) : null;
-    },
-    staleTime: g1,
-  });
-}
-async function f0(e) {
-  return d0(e, `index`);
-}
-var p0 = new WeakMap();
-async function m0(e, t) {
-  let n = await f0(e);
-  return n ? { indexPath: n, sharedIndexPath: await Tpe(e, n, t) } : null;
-}
-async function Tpe(e, t, n) {
-  let r = await Epe(t, e);
-  if (r == null) return (await h0(e, n)) ?? null;
-  let i = p0.get(e);
-  if (i?.indexPath === t && i.indexFingerprint === r) return i.sharedIndexPath;
-  let a = await h0(e, n);
-  return (
-    a !== void 0 && p0.set(e, { indexFingerprint: r, indexPath: t, sharedIndexPath: a }),
-    a ?? null
-  );
-}
-async function Epe(e, t) {
-  try {
-    let n = await t.host.stat(e, { bypassCache: !0 });
-    return [n.size ?? 0, n.mtimeMs ?? 0, n.ctimeMs ?? 0, n.ino ?? 0].join(`:`);
-  } catch (e) {
-    return typeof e == `object` && e && `code` in e && e.code === `ENOENT` ? `missing` : null;
-  }
-}
-async function h0(e, t) {
-  let { success: n, stdout: r } = await $(e.root, [`rev-parse`, `--shared-index-path`], e.host, {
-    signal: t,
-  });
-  if (!n) return;
-  if (!r) return null;
-  let i = await e.host.platformPath();
-  return i.isAbsolute(r) ? r : i.resolve(e.root, r);
-}
 function g0(e) {
   return e?.outputLimitExceeded
     ? { type: `diff-too-large`, limitBytes: e.outputLimitExceeded.limitBytes }
@@ -67862,7 +67809,7 @@ async function S2(e, t, n, { gitConfigOverrides: r = [], signal: i } = {}) {
   try {
     let e = o;
     if (u === `unstaged` && !c) {
-      let t = await m0(m, i);
+      let t = await getGitIndexContext(m, i);
       if (!t)
         f.warning(`[applyPatch] Unable to resolve git index path; applying without temp index`);
       else {
@@ -68319,7 +68266,7 @@ var j2 = kW(`syncedBranchConfig`),
   M2 = `codex-synced-branch.json`,
   Jme = K({ branch: H(), lastSyncedTreeRef: H() });
 async function N2(e, t) {
-  let n = await u0(e, t);
+  let n = await getGitDir(e, t);
   return n ? (await e.host.platformPath()).join(n, M2) : null;
 }
 function Yme(e) {
@@ -68358,13 +68305,13 @@ async function F2(e, t, n, r) {
   await Xme(e, { branch: t, lastSyncedTreeRef: n }, r);
 }
 async function Zme(e, t) {
-  return d0(e, M2, t);
+  return resolveGitPath(e, M2, t);
 }
 var I2 = kW(`worktreeShellEnvironmentConfig`),
   Qme = `codex-shell-environment.json`,
   $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
 async function L2(e, t) {
-  return d0(e, Qme, t);
+  return resolveGitPath(e, Qme, t);
 }
 async function ehe(e, t) {
   let n = await L2(e, t);
@@ -69606,7 +69553,7 @@ var d4 = kW(`threadConfig`),
 function pgeDeps() {
   return {
     configFileName: cge,
-    findConfigFile: d0,
+    findConfigFile: resolveGitPath,
     parseSchema: (e) => lge.safeParse(e),
     isMissingError: (e) => e?.code === `ENOENT`,
     warn: (e, t) => d4().warning(e, { safe: {}, sensitive: { error: t } }),
@@ -69837,7 +69784,7 @@ async function C4(e, t) {
   );
 }
 async function w4(e, t) {
-  let n = await m0(e);
+  let n = await getGitIndexContext(e);
   if (n == null) throw Error(`Failed to resolve git index path`);
   return b4(n, t, e.host);
 }
@@ -70701,9 +70648,9 @@ var Jye = 1e3,
                   this.options.worktreeRepo,
                   gitWatcherMetadataDeps,
                 ),
-                f0(this.options.worktreeRepo),
+                getGitIndexPath(this.options.worktreeRepo),
                 Zme(this.options.worktreeRepo),
-                u0(this.options.worktreeRepo),
+                getGitDir(this.options.worktreeRepo),
                 getCurrentGitBranchState(this.options.worktreeRepo),
               ])
             : [
@@ -71796,7 +71743,7 @@ var I6 = kW(`git`),
               roots: await resolveAutomationWritableRoots(e.params, {
                 gitManager: this.gitManager,
                 host: o,
-                getIndexPath: f0,
+                getIndexPath: getGitIndexPath,
                 path: g.default,
               }),
             });

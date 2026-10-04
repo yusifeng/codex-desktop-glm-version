@@ -562,6 +562,13 @@ fallback、非仓库识别与专用降级错误已迁移至 `src/main/worker/git
 `Bhe`/`Vhe`/`hhe`/`a4`、`o4` 错误类及 `zhe` 日志常量已删除；manager 保留 memoization、trace
 与 stable metadata cache 生命周期，由 43 项断言覆盖。
 
+### 增量抽取：Git path and index resolution
+
+Git dir/path 与 index/shared-index 的 query cache、相对路径解析、stat fingerprint 和 repository
+WeakMap 缓存已迁移至 `src/main/worker/git-path-resolution.ts`。原 `u0`/`d0`/`f0`/`m0`/`Tpe`/
+`Epe`/`h0` 与 `p0` 缓存已删除，diff、watcher、thread config、automation 与 index-info 消费者
+全部改用语义入口，由 36 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
