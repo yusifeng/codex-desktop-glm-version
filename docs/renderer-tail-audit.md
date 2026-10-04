@@ -54,6 +54,13 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 契约。因而本轮将其归类为 `aggregation-runtime`，保留原始 hub 依赖，不伪造一个
 只会执行部分注册的语义模块；后续只有在能从单一消费者证明完整初始化边界时才迁移。
 
+`app-initial` 的公开别名 `C` 也完成了实现级判定。export map 将它定位到内部
+`XXc`；现有声明与消费者证据表明它是 PermissionsModeDropdown 的 lazy component
+句柄，而 13 个主要消费者都将其重命名为 `appInitialInit` 并仅保留副作用依赖，
+没有调用参数或返回值契约。这属于由 bundler 合并进 initial hub 的 lazy-registration
+边界，不是纯业务 helper；在 PermissionsModeDropdown 本体已经由独立语义 chunk
+承接的前提下，`C/XXc` 继续归类为 `aggregation-runtime`，避免重复实现或破坏注册顺序。
+
 `use-imported-setup-opportunity` 同样是 74 导出的构建聚合边界，但当前仅消费
 `ft/pt`。消费侧已经分别命名为 `resolveImportedSetupLabel` 与
 `projectImportedSetupItems`，声明也固定为具体函数签名；审计禁止扩大该表面。
