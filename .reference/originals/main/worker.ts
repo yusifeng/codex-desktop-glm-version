@@ -69837,18 +69837,18 @@ var I6 = kW(`git`),
             break;
           }
           case `origin-and-roots`:
-            p = X(await resolveOrigins(e.params.discoveryDirs, readRequestDeps));
+            p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
             break;
           case `worktree-shell-environment`: {
-            p = X(await resolveShellEnvironment(e.params.cwd, i.signal, readRequestDeps));
+            p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
             break;
           }
           case `worktree-owner`: {
-            p = X(await resolveWorktreeOwner(e.params.cwd, readRequestDeps));
+            p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
             break;
           }
           case `default-remote-branch`: {
-            p = X(await resolveDefaultRemoteBranch(e.params.cwd, readRequestDeps));
+            p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
             break;
           }
           case `automation-writable-roots`:
@@ -69862,7 +69862,7 @@ var I6 = kW(`git`),
             });
             break;
           case `merge-base`: {
-            p = X(await resolveMergeBase(e.params.cwd, e.params.baseBranch, readRequestDeps));
+            p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
             break;
           }
           case `read-git-file-binary`:
