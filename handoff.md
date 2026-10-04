@@ -365,6 +365,8 @@ workspace startup policy checker（原 `Tst`）已迁移至
 workspace policy restart dialog（原 `Est`，175,026-175,046）已迁移至
 `src/main/main-app/startup/workspace-policy-restart-dialog.ts`，由
 `scripts/test-main-workspace-policy-restart-dialog.mjs` 覆盖同步展示、格式化文案、错误降级及始终执行 quit approval/退出顺序。
+main 托盘图标候选路径解析（原 `Fst/$9`，175,431-175,471）已迁移至
+`src/main/main-app/startup/tray-icon-paths.ts`，由 `scripts/test-main-tray-icon-paths.mjs` 覆盖平台、flavor、打包与开发路径组合。
 computer-use worker RPC handler（原 `Lst`）已迁移至
 `src/main/main-app/worker/computer-use-rpc-handler.ts`，入口只保留服务 PID 管理副作用，
 由 `scripts/test-main-computer-use-rpc-handler.mjs` 覆盖 5 项断言。
@@ -450,7 +452,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 717 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 720 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---

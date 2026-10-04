@@ -171,6 +171,10 @@ node scripts/audit-shared-consumption.mjs
 
 本报告只新增审计证据，不改变源码、构建路径或 chunk manifest；它是 T4 的覆盖基线，后续每次抽取应在表中把对应区间的 `business-preserved`/`generated` 更新为具体语义模块，并保留原始行号引用。
 
+原 `Fst/$9`（175,431-175,471）的托盘图标候选路径解析已迁移至
+`src/main/main-app/startup/tray-icon-paths.ts`；平台/flavor、打包 resources 与开发仓库路径组合由
+`scripts/test-main-tray-icon-paths.mjs` 覆盖，nativeImage 读取与 Electron fallback 仍留在入口。
+
 ### 增量抽取：workspace policy restart dialog
 
 原 `Est`（175,026-175,046）的 workspace policy 重启提示已迁移至
