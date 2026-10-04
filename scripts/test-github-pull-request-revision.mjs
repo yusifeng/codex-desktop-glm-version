@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { createGithubPullRequestRevisionHandlers } from "../src/main/worker/github-pull-request-revision.ts";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const { createGithubPullRequestRevisionHandlers } = require("../app/.vite/build/worker/github-pull-request-revision.js");
 
 const sha = "a".repeat(40);
 const head = "b".repeat(40);
