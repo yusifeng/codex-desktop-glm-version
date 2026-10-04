@@ -31,6 +31,7 @@ const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, histor
 const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
 const { isDeviceCheckPlatform: rr, isAppleSilicon: ir, isDeviceCheckSupported: ar, createDeviceAttestationHandler: or, generateDeviceCheckToken: cr } = require("./main-app/security/device-check.js");
 const remoteHost = require("./main-app/open-target/remote-host.js");
+const openTargetFilter = require("./main-app/open-target/target-filter-policy.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -138116,26 +138117,31 @@ function g4e(e) {
   return remoteHost.bracketIpv6Host(e);
 }
 function T1(e, t, r) {
-  if (!n.Es(e)) return t;
-  let i = new Map(r.map((e) => [e.id, e]));
-  return t.filter((t) => {
-    let n = i.get(t);
-    return n != null && D1(n, e);
+  return openTargetFilter.filterTargetIdsForHost(e, t, r, {
+    isHostConfig: n.Es,
+    isLocalHost: n.As,
+    isRemoteHost: n.Os,
+    remoteHostLabel: y1,
+    platform: process.platform,
   });
 }
 function E1(e, t) {
-  return e.filter((e) => D1(e, t));
+  return openTargetFilter.filterTargetsForHost(t, e, {
+    isHostConfig: n.Es,
+    isLocalHost: n.As,
+    isRemoteHost: n.Os,
+    remoteHostLabel: y1,
+    platform: process.platform,
+  });
 }
 function D1(e, t) {
-  return n.Es(t)
-    ? n.As(t)
-      ? process.platform === `win32` && e.id === `fileManager`
-      : n.Os(t)
-        ? e.id === `zed`
-          ? e.supportsSsh !== !1 && y1(t) != null
-          : !!e.supportsSsh
-        : !1
-    : !0;
+  return openTargetFilter.isTargetSupported(t, e, {
+    isHostConfig: n.Es,
+    isLocalHost: n.As,
+    isRemoteHost: n.Os,
+    remoteHostLabel: y1,
+    platform: process.platform,
+  });
 }
 var _4e = `apps/`;
 function O1(e) {

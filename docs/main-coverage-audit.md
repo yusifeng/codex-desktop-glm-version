@@ -117,6 +117,14 @@ open-in target 的远程主机展示与 SSH 命令解析纯函数（原 `x1/S1/C
 Electron、文件系统或目标进程启动；入口通过窄委托保留原 helper 名称和调用顺序。由
 `scripts/test-main-remote-host.mjs` 覆盖 11 项标识符、端口、identity 与 IPv6 边界断言。
 
+### A3 增量抽取：open-in target host filtering
+
+open-in target 的本地/SSH host 过滤策略（原 `T1/E1/D1`，138110-138143）已迁移至
+`src/main/main-app/open-target/target-filter-policy.ts`。模块通过注入 host 类型判定、
+远程主机标签和平台参数，保留 Windows file-manager、本地 host、SSH-capable target 与
+Zed alias 的过滤语义；入口只负责压缩别名/schema 适配，不触碰 Electron 或目标进程。
+`scripts/test-main-target-filter-policy.mjs` 覆盖 8 项本地、远程、缺失 alias 和 ID 过滤断言。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含
