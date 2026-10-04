@@ -663,6 +663,10 @@ Git branch read request family 已新增 `src/main/worker/git-branch-read-dispat
 `current-branch`、`current-branch-snapshot`、`upstream-branch`、`branch-ahead-count`、
 `default-branch` 与 `base-branch` 分支全部接入入口 dispatcher；由 7 项 focused assertions
 覆盖，入口继续保留 class/I/O/取消与结果包装边界。
+Git review read family 已新增 `src/main/worker/git-review-read-dispatch.ts`，将
+`status-summary`、`branch-diff-stats`、`review-summary`、`review-source-line-counts`、
+`review-diff`、`review-search` 与 `review-patch` 全部接入统一 dispatcher；由 8 项 focused
+assertions 覆盖，入口继续保留 I/O、性能结果与响应包装。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
