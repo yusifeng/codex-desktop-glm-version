@@ -555,3 +555,11 @@ owner 动作，并依赖相邻生成的 `Gm` enum。它只在 hub 内部计划�
 renderer named consumer；因此登记为 `generated-local-helper` 并保留聚合 hub，避免制造
 无主 billing facade。该行范围、source symbol 与分类由
 `scripts/audit-renderer-hub-classification.mjs` 机器校验。
+
+本轮继续补齐 app-primary 两类不同生命周期边界的逐行证据。`sk`（公开别名 `Eh`，
+5014--5016 行）只把 feature availability 与 target 状态投影为 pending/unavailable，
+但仅由相邻 takeover UI 组装消费；`gF`（公开别名 `Ef`，15611--15617 行）则注册
+default-branch RPC、live-query 与 cache runtime，明确拥有 hub 初始化副作用。两者均无
+独立 renderer named consumer，因此登记为 `generated-local-helper` 并保留原聚合边：前者
+避免无主状态 facade，后者避免复制初始化顺序。focused classification suite 锁定 `Eh`/
+`Ef` 仍属未消费面，并由 hub audit 校验 source symbol 与精确行范围。

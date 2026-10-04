@@ -78,5 +78,15 @@
     "hub": "app-primary", "alias": "T", "sourceSymbol": "f9", "startLine": 114934, "endLine": 114942,
     "classification": "zero-consumer-project-kind-predicate", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The predicate checks whether a selected creation target is Git-backed by consulting the project list and project kind. The published alias has no named renderer consumer (only the generated hub scope owns it), so extracting it now would create an unowned project-target facade; preserve the exact line-level implementation until a renderer boundary establishes the target contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Eh", "sourceSymbol": "sk", "startLine": 5014, "endLine": 5016,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The pending/unavailable projection is a two-flag local formatter consumed by the adjacent takeover UI assembly and has no named renderer import or independent lifecycle boundary; retain the coupled generated helper rather than creating an unowned status facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Ef", "sourceSymbol": "gF", "startLine": 15611, "endLine": 15617,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The default-branch query initializer wires hub-local RPC state and cache registration; its side effects are inseparable from the generated request runtime and there is no independent renderer consumer to own a facade."
   }
 ]
