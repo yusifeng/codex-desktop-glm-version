@@ -31,6 +31,7 @@ const { invalidateGitReadCaches, invalidateStableMetadata } = require("./worker/
 const { getGitCloneState } = require("./worker/git-clone-state");
 const { getCurrentBranch: getCurrentGitBranchQuery, getCurrentBranchSnapshot: getCurrentGitBranchSnapshotQuery, getCurrentBranchState: getCurrentGitBranchStateQuery } = require("./worker/git-current-branch");
 const { getGitIndexInfo } = require("./worker/git-index-info");
+const { resolveMergeBase: resolveGitMergeBaseQuery } = require("./worker/git-merge-base");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
 const { getGitDir: getGitDirQuery, getIndexContext: getGitIndexContextQuery, getIndexPath: getGitIndexPathQuery, resolveGitPath: resolveGitPathQuery } = require("./worker/git-path-resolution");
 const { expandUntrackedDirectories: expandGitUntrackedDirectoriesQuery, getPathStatus: getGitPathStatusQuery, getTrackedPaths: getGitTrackedPathsQuery, readPathStatus: readGitPathStatusQuery, readTrackedPaths: readGitTrackedPathsQuery, readUntrackedPaths: readGitUntrackedPathsQuery } = require("./worker/git-path-status");
@@ -383,6 +384,17 @@ const gitWorktreeListDeps = {
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
 };
+const gitMergeBaseDeps = {
+  getConfigQueryMeta: () => y1,
+  getQueryMeta: () => x1,
+  getOrderedRemotes: (repository) => getOrderedGitRemotes(repository),
+  queryKey: (...parts) => Q(...parts),
+  resolveRef: (repository, ref) => resolveGitRefSha(repository, ref),
+  runGit: (root, args, host, options) => $(root, args, host, options),
+  staleTime: Infinity,
+};
+const X2 = (repository, branch) =>
+  resolveGitMergeBaseQuery(repository, branch, gitMergeBaseDeps);
 const gitReviewComparisonDeps = {
   findMergeBase: (...args) => X2(...args),
   getDefaultBranch: (...args) => getDefaultGitRemoteBranch(...args),
@@ -67584,85 +67596,6 @@ function A2(e, t, n) {
 }
 var Jme = K({ branch: H(), lastSyncedTreeRef: H() });
 var $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
-function X2(e, t) {
-  return vhe(e, t);
-}
-async function vhe(e, t) {
-  let n = t.trim();
-  if (!n) return null;
-  let r = await Q2(e, n);
-  if (!r.requiresRefCheck) return r.mergeBase;
-  let [i, a] = await Promise.all([resolveGitRefSha(e, `HEAD`), resolveGitRefSha(e, n)]);
-  if (i == null) return null;
-  if (a != null) return Z2(e, n);
-  let o = [],
-    s = new Set(),
-    c = (e) => {
-      let t = e?.trim();
-      t && !s.has(t) && (o.push(t), s.add(t));
-    },
-    [l, u] = await Promise.all([yhe(e, n), getOrderedGitRemotes(e)]);
-  if (u.length > 0) {
-    let e = new Set(u),
-      t = n.indexOf(`/`),
-      r = t > 0 ? n.slice(0, t) : null,
-      i = r != null && e.has(r),
-      a = i && t + 1 < n.length ? n.slice(t + 1) : null;
-    for (let e of u) {
-      if (i && e === r) {
-        a && c(`refs/remotes/${e}/${a}`);
-        continue;
-      }
-      (c(`${e}/${n}`), c(`refs/remotes/${e}/${n}`));
-    }
-  }
-  c(l);
-  let [d, ...f] = o,
-    p = d != null && (await resolveGitRefSha(e, d)) ? d : null;
-  if (
-    ((p ??= f[(await Promise.all(f.map((t) => resolveGitRefSha(e, t)))).findIndex((e) => e != null)] ?? null),
-    p == null)
-  )
-    return null;
-  let m = await Q2(e, p);
-  return m.requiresRefCheck ? Z2(e, p) : m.mergeBase;
-}
-async function Z2(e, t) {
-  let n = await $(e.root, [`merge-base`, `HEAD`, t], e.host, { allowedNonZeroExitCodes: [1] });
-  if (!n.success) throw Error(`Git merge-base failed`);
-  return n.stdout.trim() || null;
-}
-function yhe(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `branch-upstream`, t),
-    meta: y1,
-    queryFn: async () => {
-      let n = await $(
-        e.root,
-        [`for-each-ref`, `--format=%(upstream:short)`, `refs/heads/${t}`],
-        e.host,
-      );
-      return n.success && n.stdout ? n.stdout.trim() : null;
-    },
-    staleTime: g1,
-  });
-}
-function Q2(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `head-merge-base`, t),
-    meta: x1,
-    queryFn: async () => {
-      let n = await $(e.root, [`merge-base`, `HEAD`, t], e.host, {
-        allowedNonZeroExitCodes: [1, 128],
-      });
-      if (n.code === 128) return { mergeBase: null, requiresRefCheck: !0 };
-      if (!n.success || !n.stdout) return { mergeBase: null, requiresRefCheck: !1 };
-      let r = n.stdout.trim();
-      return { mergeBase: r.length > 0 ? r : null, requiresRefCheck: !1 };
-    },
-    staleTime: g1,
-  });
-}
 async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, signal: a } = {}) {
   let { result: o } = await checkoutGitBranch(
     e,

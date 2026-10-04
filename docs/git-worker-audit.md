@@ -660,6 +660,13 @@ review snapshot 与 request signal 组合、safe-filter/Git fallback、失败 qu
 合并已迁移至 `src/main/worker/git-status-summary.ts`。原 `J2`/`Y2`/`ghe`/`_he` 已删除；
 review、handoff 与 status-summary 请求消费者改用语义入口，由 26 项独立模块断言覆盖。
 
+### 增量抽取：Merge-base resolution
+
+Merge-base 的 cached HEAD query、Git 128 ref-check、HEAD/requested ref 存在性检查、ordered
+remote/upstream 候选生成、稳定去重、ref 验证与 direct fallback 已迁移至
+`src/main/worker/git-merge-base.ts`。原 `X2`/`vhe`/`Z2`/`yhe`/`Q2` 已删除；review、
+branch-ahead 和 read-request 消费者改用语义入口，由 35 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
