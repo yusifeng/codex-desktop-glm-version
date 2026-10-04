@@ -642,6 +642,8 @@ app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 导出暂保留以维持结构等价，已不再是无归属业务实现。
 main 的 app 协议 URL frame/protocol 判定（原 `nst/F9`）已迁移至
 `src/main/main-app/util/url-trust.ts`，由 URL trust focused suite 新增 5 项断言覆盖。
+main webview 入口文件路径计算（原 `tst`）已迁移至
+`src/main/bootstrap/protocol/app-protocol.ts`，由 3 项 focused 断言覆盖。
 main 窗口错误页 HTML 模板（原 `Pot`）已迁移至
 `src/main/main-app/window/error-page-html.ts`，由 4 项 focused 断言覆盖。
 main worker session 的 `V9` 非空对象判定已并入

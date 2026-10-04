@@ -173780,7 +173780,7 @@ function N9() {
   return MH(e) ? new URL(e).origin : null;
 }
 function tst(e) {
-  return (0, h.join)(e, `..`, `..`, `webview`, `index.html`);
+  return require("./bootstrap/protocol/app-protocol.js").getWebviewEntryPath(e);
 }
 function P9(e, t) {
   if (e === `about:blank` || nst(e)) return !0;

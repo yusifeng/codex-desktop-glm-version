@@ -58,6 +58,11 @@ export function getWebviewDir(root: string): string {
   return join(root, "..", "..", "webview");
 }
 
+/** Resolve the file path used by the main-process trust gate for the webview entry. */
+export function getWebviewEntryPath(moduleDir: string): string {
+  return join(getWebviewDir(moduleDir), INDEX_ENTRY);
+}
+
 /** 渲染入口文件名（原 dt）：detached-window 路由用独立入口。 */
 export function rendererEntryForRoute(route: string): string {
   return route === "/detached-window" ? DETACHED_WINDOW_ENTRY : INDEX_ENTRY;
