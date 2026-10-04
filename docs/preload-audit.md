@@ -452,3 +452,11 @@ gate、sync payload 和 editor queue 清理。
 协调器）已迁移至 `src/main/browser-page-preload/annotation-mode-controller.ts`。入口仅保留
 `contextBridge.executeInMainWorld`、原有 `ef` controls 注册器和 DOM event 适配；模块测试覆盖
 controls 注册失败、main-world listener 安装、事件转发及 dispose 后的 late event，共 5 项断言。
+
+### 增量抽取：annotation pointer selection controller
+
+批注拖拽文本选区的 pointer lifecycle（原 `Ry` 23897-23945）已迁移至
+`src/main/browser-page-preload/annotation-pointer-selection.ts`。模块只协调跨 frame
+命中、selection highlight、cursor/selection 样式、pointer-id 与 trusted-event 门控，入口
+继续注入既有 DOM/frame 适配器和副作用；`scripts/test-preload-annotation-pointer-selection.mjs`
+覆盖拖拽开始/移动/结束、selection 回传、highlight 清理及 blocked target，共 11 项断言。

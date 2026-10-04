@@ -6254,6 +6254,7 @@ var { createAnnotationRequestContext } = require("./browser-page-preload/annotat
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
 var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annotation-draft-runtime");
+var { createAnnotationPointerSelection } = require("./browser-page-preload/annotation-pointer-selection");
 var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23895,67 +23896,25 @@ function Iy(e, t) {
 }
 var Ly = o(() => {});
 function Ry({ rootHost: e, onPointerModeChange: t, onPointerChange: n, onClearHover: r }) {
-  let i = null,
-    a = () => {
-      (i?.disposeHighlight(), (i = null));
-    },
-    o = () => i != null && (a(), gu(), !0),
-    s = (a, o) => {
-      let s = o && a != null ? hl(a.x, a.y, e, `text`) : null,
-        c = o && (i != null || (rl(s) != null && !By(s)));
-      return (
-        t(c),
-        c &&
-          (r(), n(a), fc(s?.ownerDocument ?? document, wl, !0, s ?? void 0), a != null && _l(a, e)),
-        c
-      );
-    };
-  return {
-    get isDragging() {
-      return i != null;
-    },
-    updatePointer: s,
-    dispose: a,
-    cancel: o,
-    disposeFrame(e) {
-      i?.frameWindow === e && a();
-    },
-    handlePointerDown(t, n, r, o) {
-      return fl(r.x, r.y, e) == null
-        ? !1
-        : !o || By(hl(r.x, r.y, e, `text`))
-          ? (Jc(n), !0)
-          : (gu(),
-            a(),
-            (i = { pointerId: n.pointerId, frameWindow: t, disposeHighlight: mu(t) }),
-            s(r, !0),
-            Jc(n, { preventDefault: !1 }),
-            !0);
-    },
-    handlePointerMove(e, t) {
-      return i?.pointerId === t.pointerId
-        ? t.buttons & 1
-          ? (n(Lc(e, { x: t.clientX, y: t.clientY })), Jc(t, { preventDefault: !1 }), !0)
-          : (o(), !1)
-        : !1;
-    },
-    handlePointerUp(e, t) {
-      if (!e.isTrusted || i?.pointerId !== e.pointerId) return !1;
-      let n = i.frameWindow;
-      (a(), Jc(e, { preventDefault: !1 }));
-      let r;
+  return createAnnotationPointerSelection(e, { onPointerModeChange: t, onPointerChange: n, onClearHover: r }, {
+    resolvePoint: (x, y, rootHost, mode) => hl(x, y, rootHost, mode),
+    canStartSelection: (x, y, rootHost) => fl(x, y, rootHost) != null,
+    isSelectionBlocked: (element) => By(element),
+    clearSelection: () => gu(),
+    createHighlight: (windowLike) => mu(windowLike),
+    applySelection: (documentLike, nativeSelection, range) => fc(documentLike, wl, nativeSelection, range),
+    hideHover: (point, rootHost) => _l(point, rootHost),
+    stopEvent: (event, options) => Jc(event, options),
+    readSelection: (windowLike) => {
       try {
-        r = ou(n);
-      } catch (e) {
-        if (!(e instanceof DOMException && e.name === `SecurityError`)) throw e;
-        r = null;
+        return ou(windowLike);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === `SecurityError`) return null;
+        throw error;
       }
-      return (t(r), !0);
     },
-    handlePointerCancel(e) {
-      return i?.pointerId === e.pointerId && o();
-    },
-  };
+    toViewportPoint: (windowLike, point) => Lc(windowLike, point),
+  });
 }
 function zy(e, t, n) {
   let r = n && t != null ? hl(t.x, t.y, e, `text`) : null;
