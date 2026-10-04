@@ -576,6 +576,13 @@ tracked/path-status 的 250ms query cache 已迁移至 `src/main/worker/git-path
 `t2`/`n2`/`mme`/`r2`/`hme`/`i2` 已删除，untracked cache、snapshot、watcher ignore discovery
 消费者改用语义入口，由 31 项断言覆盖。
 
+### 增量抽取：Worktree delete primitive
+
+Worktree 删除的 per-host 三并发 semaphore、local environment cleanup、Git remove 与 force 模式
+文件系统兜底已迁移至 `src/main/worker/git-worktree-delete.ts`。原 `ome`/`$0`/`sme`/`cme`、
+`Q0` Map 及 `ame`/`Z0` 常量已删除；快照、请求去重、unwatch 和 rollback 错误映射仍由上层负责，
+由 37 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

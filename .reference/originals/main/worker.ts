@@ -79,6 +79,7 @@ const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-threa
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
 const { formatLocalBranchRef: formatLocalBranchRefQuery, resolveWorktreeStartingRef: resolveGitWorktreeStartingRefQuery } = require("./worker/git-worktree-starting-ref");
 const { resolveWorktreeStartingState: resolveGitWorktreeStartingStateQuery } = require("./worker/git-worktree-starting-state");
+const { createWorktreeDelete } = require("./worker/git-worktree-delete");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
@@ -245,6 +246,22 @@ const resolveGitWorktreeStartingState = (
     signal,
     gitWorktreeStartingStateDeps,
   );
+const { removeWorktree: removeGitWorktree } = createWorktreeDelete({
+  createSemaphore: (capacity) => new k$.Sema(capacity),
+  getHostId: (...args) => h1(...args),
+  getLocalEnvironmentConfigPath: (worktree, host, signal) =>
+    getGitLocalEnvironmentConfigPath(worktree, host, `worktree`, signal),
+  getWorktreeId: (worktree) => X0(bz(worktree)),
+  logger: {
+    debug: (message, detail) => kW(`git`)().debug(message, detail),
+    info: (message, detail) => kW(`git`)().info(message, detail),
+    warning: (message, detail) => kW(`git`)().warning(message, detail),
+  },
+  readLocalEnvironmentConfig: (...args) => A$(...args),
+  runCleanupScript: (worktree, config, signal, host) =>
+    Kpe(worktree, config, void 0, signal, host),
+  runGit: (...args) => $(...args),
+});
 const gitRefResolutionDeps = {
   getQueryMeta: () => x1,
   normalizeSha: (...args) => wz(...args),
@@ -315,7 +332,7 @@ const handoffBranchDeps = {
 const handoffRollbackDeps = {
   checkoutBranch: t4,
   applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
-  removeWorktree: $0,
+  removeWorktree: removeGitWorktree,
 };
 const restoreHandoffState = (params) => restoreHandoffBranchAndStash(params, handoffRollbackDeps);
 const restoreSourceHandoffState = (params) => restoreHandoffSource(params, handoffRollbackDeps);
@@ -388,7 +405,7 @@ const moveToWorktreeDeps = {
   checkoutBranch: t4,
   applyStash: (params, host) => applyHandoffStash(params, host, handoffBranchDeps),
   restoreBranchAndStash: restoreHandoffState,
-  removeWorktree: $0,
+  removeWorktree: removeGitWorktree,
 };
 const syncedBranchOverwriteDeps = {
   resolveObject: resolveGitRefSha,
@@ -67212,101 +67229,6 @@ async function Y0(e, t) {
 function X0(e) {
   return Y0(`SHA-1`, e);
 }
-var Z0 = kW(`git`),
-  ame = 3,
-  Q0 = new Map();
-function ome(e) {
-  let t = h1(e),
-    n = Q0.get(t);
-  if (n) return n;
-  let r = new k$.Sema(ame);
-  return (Q0.set(t, r), r);
-}
-async function $0(e, t, n = !1, r) {
-  let i = await X0(bz(e)),
-    a = ome(t);
-  await a.acquire();
-  try {
-    (Z0().info(`[worktree-delete] start`, {
-      safe: { worktreeId: i, force: n, hasHostConfig: t != null },
-      sensitive: {},
-    }),
-      await sme(e, i, t, r));
-    let a = [`worktree`, `remove`];
-    (n && a.push(`--force`), a.push(e));
-    let o = await $(e, a, t, { signal: r });
-    (Z0().info(`[worktree-delete] git-remove-result`, {
-      safe: {
-        worktreeId: i,
-        force: n,
-        success: o.success,
-        code: o.code,
-        outputLimitExceeded: o.outputLimitExceeded != null,
-      },
-      sensitive: {},
-    }),
-      (o.success || n) && (await cme(e, i, t)));
-  } finally {
-    a.release();
-  }
-}
-async function sme(e, t, n, r) {
-  let i = await getGitLocalEnvironmentConfigPath(e, n, `worktree`, r);
-  if (i == null || i === `__none__`) return;
-  let a = await A$(i, n);
-  if (a.type === `error`) {
-    Z0().warning(`[worktree-delete] cleanup-config-unavailable`, {
-      safe: { worktreeId: t },
-      sensitive: { configPath: i, error: a.error },
-    });
-    return;
-  }
-  if (!a.environment.cleanup) return;
-  Z0().info(`[worktree-delete] cleanup-script-start`, {
-    safe: { worktreeId: t },
-    sensitive: { configPath: i },
-  });
-  let o = await Kpe(e, a, void 0, r, n);
-  if (o != null) {
-    if (o?.status === `failed`)
-      throw (
-        Z0().warning(`[worktree-delete] cleanup-script-failed`, {
-          safe: { worktreeId: t },
-          sensitive: { configPath: i, error: o.error },
-        }),
-        Error(o.error ?? `Cleanup script failed`)
-      );
-    Z0().info(`[worktree-delete] cleanup-script-finished`, {
-      safe: { worktreeId: t },
-      sensitive: { configPath: i },
-    });
-  }
-}
-async function cme(e, t, n) {
-  let r = await n.platformPath(),
-    i = !1,
-    a = !1;
-  try {
-    (await n.remove(e, { recursive: !0, force: !0 }), (i = !0));
-  } catch (e) {
-    Z0().warning(`Failed to remove worktree directory`, { safe: {}, sensitive: { error: e } });
-  }
-  try {
-    let t = r.dirname(e);
-    if (t === e) return;
-    (await n.readDirectory(t)).length === 0 &&
-      (await n.remove(t, { recursive: !0, force: !0 }), (a = !0));
-  } catch (e) {
-    Z0().warning(`Failed to remove worktree parent directory`, {
-      safe: {},
-      sensitive: { error: e },
-    });
-  }
-  Z0().debug(`[worktree-delete] cleanup-finished`, {
-    safe: { worktreeId: t },
-    sensitive: { removedWorktreeDir: i, removedParentDir: a },
-  });
-}
 var fme = e.n((e, t) => {
     function n(e) {
       for (var t = -1, n = e == null ? 0 : e.length, r = 0, i = []; ++t < n;) {
@@ -67988,14 +67910,14 @@ async function zme(e, t, n, r, i, a) {
     let o = await Bme(e, t, n, r, i, a);
     if (!o.success)
       try {
-        await $0(t, i, !0);
+        await removeGitWorktree(t, i, !0);
       } catch (e) {
         T2().warning(`Failed to cleanup worktree`, { safe: {}, sensitive: { error: e } });
       }
     return o;
   } catch (e) {
     try {
-      await $0(t, i, !0);
+      await removeGitWorktree(t, i, !0);
     } catch (e) {
       T2().warning(`Failed to cleanup worktree`, { safe: {}, sensitive: { error: e } });
     }
@@ -72041,7 +71963,8 @@ var I6 = kW(`git`),
           {
             captureWorktreeSnapshot: (gitManager, worktree, host, reason) =>
               Sge(gitManager, worktree, host, reason),
-            deleteWorktree: (worktree, host, force) => $0(worktree, host, force),
+            deleteWorktree: (worktree, host, force) =>
+              removeGitWorktree(worktree, host, force),
             getWorktreeId: X0,
             logSnapshotFailure: ({ error, reason, worktreeId }) =>
               B_e().warning(`[worktree-snapshot] failed to snapshot worktree`, {
