@@ -348,6 +348,12 @@ consumer 后再按 identity/query-key 契约迁移。
 `node_repl` 与 `cua_repl` 识别为 Web MCP server；consumer 已切换语义导入，并由
 `scripts/test-app-shared-is-web-mcp-server.mjs` 的 4 项断言覆盖。
 
+`review-file-source-tab` 簇的 `Xst`（内部 `axi`，`getReviewFileSourceTabId`）也已做
+实现级检查：主体是 tab-id formatter，但环境分支会调用 `oxi(scope, options)` 取得
+environmentId，且当前 renderer 只有 façade re-export、没有真实调用者。该面登记为
+`zero-consumer-scope-aware-formatter`，待出现 consumer 并明确 scope/environment 契约
+后再迁移，避免复制出只覆盖 host/path 分支的残缺 helper。
+
 `tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
 command、query config、params/cache key 与 app-server `queryFn`、response priority
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
