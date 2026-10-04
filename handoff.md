@@ -673,6 +673,9 @@ Repository read family 已新增 `src/main/worker/git-repository-read-dispatch.t
 Branch extra read family 已新增 `src/main/worker/git-branch-extra-read-dispatch.ts`，将
 `recent-branches`、`resolve-worktree-starting-ref`、`branch-commits` 与 `review-commit-line-counts`
 接入 dispatcher；由 5 项 focused assertions 覆盖，入口继续保留 Git I/O、缓存与性能副作用。
+Worktree read family 已新增 `src/main/worker/git-worktree-read-dispatch.ts`，将
+`search-branches` 与 `nearest-ancestor-branch` 接入 dispatcher；由 3 项 focused assertions
+覆盖，入口继续保留 Git manager、repository 查询、signal、I/O 与结果包装。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
