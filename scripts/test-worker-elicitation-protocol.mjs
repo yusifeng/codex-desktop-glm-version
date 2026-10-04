@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { elicitationForTurn } = require("../app/.vite/build/shared/elicitation-protocol.js");
+const parseUrl = (value) => new URL(value);
+assert.deepEqual(elicitationForTurn({ mode: "openai/userVerification", serverName: "s", title: "T" }, false, parseUrl), { kind: "userVerification", serverName: "s", title: "T", description: undefined, challenge: undefined });
+assert.equal(elicitationForTurn({ mode: "url", url: "http://example.test" }, false, parseUrl), null);
+assert.deepEqual(elicitationForTurn({ mode: "url", url: "https://example.test/x", message: "m" }, false, parseUrl), { kind: "urlAction", message: "m", serverName: "", url: "https://example.test/x" });
+assert.equal(elicitationForTurn({ mode: "form", _meta: { codex_approval_kind: "browser_auth" } }, false, parseUrl), null);
+assert.deepEqual(elicitationForTurn({ mode: "form", message: "m", _meta: { codex_approval_kind: "mcp_tool_call", tool_params_display: "x" } }, false, parseUrl), { kind: "mcpToolCall", message: "m", approval: { codex_approval_kind: "mcp_tool_call", tool_params_display: "x" }, toolParamsDisplay: "x" });
+assert.deepEqual(elicitationForTurn({ mode: "openai/form", serverName: "s" }, false, parseUrl), { kind: "unsupportedOpenAIForm", serverName: "s" });
+console.log("6 worker elicitation protocol assertions passed");

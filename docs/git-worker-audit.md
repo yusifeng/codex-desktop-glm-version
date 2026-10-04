@@ -743,3 +743,8 @@ base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的
 `src/main/worker/github-pull-request-board.ts`；入口仅保留 host、GitHub CLI 与 Git manager
 适配，原 `Vxe/N8/Hxe/P8/F8/Wxe/I8/Gxe/Kxe/qxe` 业务实现不再留在入口。新增
 `scripts/test-github-pull-request-board.mjs`，共 6 项断言。
+
+本轮将 53,200-53,477 协议 schema 的 elicitation/approval 归一化纯函数迁至
+`src/main/shared/elicitation-protocol.ts`；`misc-runtime` 仅保留兼容 re-export，
+URL 安全校验、browser auth、OpenAI form、tool suggestion 与 MCP tool call 形状由
+`scripts/test-worker-elicitation-protocol.mjs` 的 6 项断言覆盖。

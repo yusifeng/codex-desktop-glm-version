@@ -611,3 +611,5 @@ WSL active distro fallback 与 `wsl.exe` command argv 构造已补充迁移至
 GitHub pull-request board 的仓库候选、查询参数、open/merged 编排和状态映射已迁移至
 `src/main/worker/github-pull-request-board.ts`；入口仅保留 host/GitHub CLI/Git manager 适配，
 由 `scripts/test-github-pull-request-board.mjs` 的 6 项断言覆盖。整体 handoff 仍未完成。
+
+- worker 协议 schema 的 elicitation/approval 归一化已迁至 `shared/elicitation-protocol.ts`，保留 `misc-runtime` 兼容导出并由 6 项行为断言覆盖。
