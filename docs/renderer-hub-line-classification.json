@@ -8,5 +8,25 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/ensure-conversation-ready.ts",
     "evidence": "Conversation lookup, missing-thread hydration recursion, and older-history loading are preserved as a typed readiness policy; no UI initialization side effects are copied."
+  },
+  {
+    "hub": "app-primary", "alias": "Jc", "sourceSymbol": "fW", "startLine": 30853, "endLine": 30870,
+    "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/is-element.ts",
+    "evidence": "Cross-realm DOM element detection is isolated as a deterministic predicate; ownerDocument constructors and structural fallbacks are preserved without primary runtime registration."
+  },
+  {
+    "hub": "app-primary", "alias": "xf", "sourceSymbol": "bF", "startLine": 15656, "endLine": 15660,
+    "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/format-browser-url.ts",
+    "evidence": "Absolute browser URL formatting is a pure host/path/query/hash projection with no UI or signal lifecycle dependency."
+  },
+  {
+    "hub": "app-primary", "alias": "yf", "sourceSymbol": "aMe", "startLine": 15673, "endLine": 15684,
+    "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/is-site-url-match.ts",
+    "evidence": "Site URL matching only compares normalized protocol, port, host aliases, and path boundaries; initialization remains in the hub."
+  },
+  {
+    "hub": "app-primary", "alias": "Du", "sourceSymbol": "tPe", "startLine": 21821, "endLine": 21834,
+    "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/normalize-suggested-followups.ts",
+    "evidence": "Suggested follow-up payload normalization validates, trims, preserves source indexes, and caps output without primary hub side effects."
   }
 ]

@@ -488,3 +488,10 @@ hub 的 UI 注册副作用。`conversation-followup-shelf` 新增可选的
 保留 `H5`（公开别名 `wt`）初始化器以维持聚合 hub 的注册顺序；该边界不复制任何
 React 或 signal runtime。`scripts/test-app-primary-plan-selection-surface.mjs`
 覆盖语义导入边界和属性值契约共 2 项断言。
+
+本轮补齐 app-primary 已迁出纯 helper 的逐行 hub 证据：`Jc`/`fW` 对应跨 realm
+`isElement`，`xf`/`bF` 对应浏览器 URL 格式化，`yf`/`aMe` 对应站点 URL 边界匹配，
+`Du`/`tPe` 对应 suggested-followups 归一化。四段均标记为
+`semantic-business-logic`，分别指向语义 runtime 文件；行号与 source symbol 由
+`scripts/audit-renderer-hub-classification.mjs` 校验，避免将已有迁移误报成未审计 hub
+导出。
