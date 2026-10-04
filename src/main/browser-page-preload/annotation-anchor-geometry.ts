@@ -1,4 +1,5 @@
 type AnnotationRect = { x: number; y: number; width: number; height: number };
+import { applyAnnotationScrollContainerClips } from './annotation-anchor-clip-policy';
 
 type AnnotationAnchorGeometryDependencies = {
   getDefaultWindow: () => any;
@@ -130,14 +131,13 @@ function createAnnotationAnchorGeometry(deps: AnnotationAnchorGeometryDependenci
       ? liveElement
       : anchor.kind === `element` && anchor.selector != null ? currentDocument.querySelector(anchor.selector) : null;
     const containingBlocks = target == null ? null : elementContainingBlocks(target, currentWindow);
-    for (const descriptor of anchor.scrollContainers ?? []) {
-      const container = currentDocument.querySelector(descriptor.selector);
-      if (container == null || (containingBlocks != null && !containingBlocks.has(container))) continue;
-      const style = currentWindow.getComputedStyle(container);
-      clip = intersect(clip, elementViewportRect(container, scroll), { x: deps.isClippingOverflow(style.overflowX || style.overflow), y: deps.isClippingOverflow(style.overflowY || style.overflow) });
-      if (clip == null) return null;
-    }
-    return clip;
+    return applyAnnotationScrollContainerClips(clip, anchor.scrollContainers, {
+      resolveContainer: (selector) => currentDocument.querySelector(selector),
+      isContainingBlock: (container) => containingBlocks == null || containingBlocks.has(container),
+      getStyle: (container) => currentWindow.getComputedStyle(container),
+      isClippingOverflow: deps.isClippingOverflow,
+      getViewportRect: (container) => elementViewportRect(container, scroll),
+    });
   };
 
   const resolveElementFrameGeometry = (element: any) => {
