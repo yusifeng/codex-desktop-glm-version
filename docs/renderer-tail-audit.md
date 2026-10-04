@@ -298,3 +298,9 @@ state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初
 或持久化 runtime；策略模块的 5 个调用点已切换到语义导入，并由
 `scripts/test-app-initial-parse-origin-pattern.mjs` 的 4 项断言覆盖。原 hub 导出仍
 保留，供其他尚未迁移的消费面使用。
+
+另审计 `Ydn`（内部 `Qh`，`configurationLayerPath`）：实现本身是纯映射，但其
+输入契约是带 `type`/`file`/`dotCodexFolder` 字段的 layer 对象，而当前 renderer
+调用点先取 writable layer 的 `name` 再传入。该对象/字符串形状差异不能靠复制函数
+体安全消除，暂登记为 `config-layer-contract`，待配置层类型统一后再迁移并补路径
+映射契约测试。
