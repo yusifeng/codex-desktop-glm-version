@@ -6,6 +6,10 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-preload-annotation-overflow.mjs`](./test-preload-annotation-overflow.mjs)
+
+- [`test-worker-executable-candidate.mjs`](./test-worker-executable-candidate.mjs)
+
 - [`test-worker-mac-app-path.mjs`](./test-worker-mac-app-path.mjs)
 
 - [`test-preload-annotation-scroll-boundary.mjs`](./test-preload-annotation-scroll-boundary.mjs)

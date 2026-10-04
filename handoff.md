@@ -641,6 +641,9 @@ focused assertions 覆盖；入口继续负责 WSL 发现、进程执行和错�
 macOS `.app/Contents/MacOS` bundle 可执行路径提取已迁移至
 `src/main/worker/mac-app-path.ts`，由 3 项 focused assertions 覆盖；入口继续负责 bundle 探测
 与进程启动。
+worker 可执行候选的扩展名与 Windows `.cmd/.bat/.exe` fallback 已迁移至
+`src/main/worker/executable-candidate.ts`，由 4 项 focused assertions 覆盖；入口继续负责
+文件系统探测和进程启动。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
@@ -690,6 +693,9 @@ line/page/pixel 三种 delta mode。
 Annotation scroll boundary 方向判定（原 `Vv`）已抽取为
 `src/main/browser-page-preload/annotation-scroll-boundary.ts`，入口保留容器滚动副作用；由 5 项断言覆盖
 起点、终点、可滚动与 zero delta。
+Annotation overflow 值判定（原 `tc/nc`）已抽取为
+`src/main/browser-page-preload/annotation-overflow.ts`，frame clipping 与 scroll-container 消费者已接回；
+原 helper 已删除，由 11 项断言覆盖 scrollable/clipping/visible 值。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。
