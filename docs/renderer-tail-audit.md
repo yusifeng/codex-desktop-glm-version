@@ -425,3 +425,12 @@ query/hash；`detached-browser-annotation-controls` 已改用该语义入口并�
 host/path 展示契约，非法输入仍由调用方回退原始字符串。`scripts/test-renderer-browser-url.mjs`
 覆盖根路径、query/hash、紧凑模式、非法 URL 与空值 5 项断言。原 hub 导出继续保留
 以兼容尚未迁移调用方。
+
+本轮继续将 app-primary 的纯 payload helper `tPe`（公开别名 `Du`）迁为
+`src/renderer/app-primary/runtime/normalize-suggested-followups.ts` 的
+`normalizeSuggestedFollowups`。实现只读取 `suggested_followups` 数组，过滤无效项、
+裁剪 prompt/title 空白并保持原始 source index，最多返回三个建议；不引入 primary
+hub 的 UI 注册副作用。`conversation-followup-shelf` 新增可选的
+`suggestedFollowups` 输入并通过该语义入口装配展示项，已有结构化 `suggestions` 输入
+优先级与渲染行为保持不变。`scripts/test-app-primary-normalize-suggested-followups.mjs`
+覆盖无效 payload、空标题回退、索引保留与三项上限共 4 项断言。

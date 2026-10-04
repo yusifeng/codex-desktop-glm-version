@@ -125,6 +125,7 @@ Total scripts: 810.
 
 - [`test-renderer-capability-default-availability.mjs`](./test-renderer-capability-default-availability.mjs)
 - [`test-app-primary-is-element.mjs`](./test-app-primary-is-element.mjs)
+- [`test-app-primary-normalize-suggested-followups.mjs`](./test-app-primary-normalize-suggested-followups.mjs)
 
 - [`test-worker-elicitation-protocol.mjs`](./test-worker-elicitation-protocol.mjs)
 - [`test-main-cleanup-timeout.mjs`](./test-main-cleanup-timeout.mjs)
