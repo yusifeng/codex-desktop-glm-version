@@ -35,6 +35,7 @@ const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-bra
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
 const { getDefaultBranchForRemote: getDefaultBranchForRemoteQuery, getDefaultRemoteBranch: getDefaultGitRemoteBranchQuery, getLocallyKnownDefaultBranch: getLocallyKnownDefaultBranchQuery, getOrderedRemotes: getOrderedGitRemotesQuery, getUpstreamRef: getGitUpstreamRefQuery } = require("./worker/git-remote-branches");
 const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./worker/git-ref-resolution");
+const { GitMetadataResolutionError, resolveGitCommonDir: resolveGitCommonDirQuery, resolveGitRoot: resolveGitRootQuery, resolveGitRootAndCommonDir: resolveGitRootAndCommonDirQuery } = require("./worker/git-root-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
@@ -219,6 +220,20 @@ const gitRefResolutionDeps = {
 };
 const resolveGitRefSha = (repository, ref, signal, options) =>
   resolveGitRefShaQuery(repository, ref, signal, options, gitRefResolutionDeps);
+const gitRootResolutionDeps = {
+  createGitUnavailableError: () => new I1(),
+  isMissingPathError: (...args) => sB(...args),
+  logger: { debug: (message, detail) => kW(`git`)().debug(message, detail) },
+  normalizeCommonDir: (...args) => yz(...args),
+  normalizeRoot: (...args) => bz(...args),
+  runGit: (...args) => $(...args),
+};
+const resolveGitRoot = (cwd, host, signal) =>
+  resolveGitRootQuery(cwd, host, signal, gitRootResolutionDeps);
+const resolveGitRootAndCommonDir = (cwd, host, signal) =>
+  resolveGitRootAndCommonDirQuery(cwd, host, signal, gitRootResolutionDeps);
+const resolveGitCommonDir = (cwd, host, signal) =>
+  resolveGitCommonDirQuery(cwd, host, signal, gitRootResolutionDeps);
 const gitRepositoryIdentityDeps = {
   fetchQueryWithSignal: (...args) => w1(...args),
   getConfigQueryMeta: () => y1,
@@ -68805,26 +68820,6 @@ function mhe(e, t) {
   if (t == null) throw Error(`host is required for raw Git roots`);
   return uhe(e, [`count-objects`, `-v`], t);
 }
-async function hhe(e, t, n) {
-  if (t.isLocal)
-    try {
-      await t.stat(e, { bypassCache: !0 });
-    } catch (t) {
-      throw sB(t) ? Error(`ENOENT: path does not exist: ${e}`) : t;
-    }
-  let {
-    success: r,
-    stdout: i,
-    stderr: a,
-    code: o,
-  } = await $(e, [`rev-parse`, `--git-common-dir`], t, { signal: n });
-  if (r && i) {
-    let n = await t.platformPath();
-    return yz(n.isAbsolute(i) ? i : n.resolve(e, i));
-  }
-  if (o === 128 && a.toLowerCase().includes(`not a git repository`)) return null;
-  throw Error(`Failed to resolve git common dir: ${a || i || `Unknown error`}`);
-}
 async function J2(e, t = !0, n, r) {
   let i;
   try {
@@ -69079,82 +69074,7 @@ async function Lhe({ cwd: e, branch: t, mode: n, failIfExists: r = !1, startPoin
     return { status: `error`, error: e instanceof Error ? e.message : String(e) };
   }
 }
-var i4 = 864e5,
-  zhe = kW(`git`);
-async function Bhe(e, t, n) {
-  if (t.isLocal)
-    try {
-      await t.stat(e, { bypassCache: !0 });
-    } catch (e) {
-      if (sB(e)) return null;
-      throw e;
-    }
-  let {
-    success: r,
-    stdout: i,
-    stderr: a,
-    code: o,
-  } = await $(e, [`rev-parse`, `--show-toplevel`], t, {
-    allowedNonZeroExitCodes: [128],
-    signal: n,
-  });
-  if (r && i) return bz(i);
-  if (o === 128 && a4(a)) return null;
-  throw a === `Git is unavailable`
-    ? new I1()
-    : (zhe().debug(`[getGitRoot] failed to resolve git root`, {
-        safe: {},
-        sensitive: { stderr: a, stdout: i },
-      }),
-      Error(`Failed to resolve git root: ${a || i || `Unknown error`}`));
-}
-function a4(e) {
-  let t = e.toLowerCase();
-  return (
-    t.includes(`not a git repository`) ||
-    t.includes(`cannot use bare repository`) ||
-    t.includes(`invalid gitfile format`) ||
-    t.includes(`no path in gitfile`) ||
-    t.includes(`invalid gitdir`)
-  );
-}
-var o4 = class extends Error {};
-async function Vhe(e, t, n) {
-  if (t.isLocal)
-    try {
-      await t.stat(e, { bypassCache: !0 });
-    } catch (e) {
-      if (sB(e)) return null;
-      throw e;
-    }
-  let {
-    success: r,
-    stdout: i,
-    stderr: a,
-    code: o,
-  } = await $(
-    e,
-    [`rev-parse`, `--path-format=absolute`, `--show-toplevel`, `--git-common-dir`],
-    t,
-    { allowedNonZeroExitCodes: [128], signal: n },
-  );
-  if (r && o === 0) {
-    let e = i.split(/\r?\n/),
-      n = e[0],
-      r = e[1];
-    if (e.length !== 2 || n == null || n.length === 0 || r == null || r.length === 0)
-      throw new o4(`Failed to resolve git root and common dir: malformed output`);
-    if (!(await t.platformPath()).isAbsolute(r))
-      throw new o4(`Failed to resolve git root and common dir: relative common dir output`);
-    return { commonDir: yz(r), root: bz(n) };
-  }
-  if (o === 128 && a4(a)) return null;
-  throw a === `Git is unavailable`
-    ? new I1()
-    : o === 129 || a.toLowerCase().includes(`unknown option`)
-      ? new o4(`Failed to resolve git root and common dir: ${a || i || `Unknown error`}`)
-      : Error(`Failed to resolve git root and common dir: ${a || i || `Unknown error`}`);
-}
+var i4 = 864e5;
 var Whe = class {
     commonDir;
     host;
@@ -69581,7 +69501,7 @@ var Khe = class {
     }
     getStableRootMemoized = (0, DX.default)(
       async (e, t, n) => {
-        let r = await Bhe(e, t);
+        let r = await resolveGitRoot(e, t);
         return (this.cacheStableRoot(e, t, r, n), r);
       },
       {
@@ -69603,11 +69523,11 @@ var Khe = class {
                 name: `git.metadata_root`,
                 op: `codex.git.metadata_root`,
               },
-              () => Vhe(e, t),
+              () => resolveGitRootAndCommonDir(e, t),
             );
             return (this.cacheStableRoot(e, t, r?.root ?? null, n), r);
           } catch (e) {
-            if (!(e instanceof o4)) throw e;
+            if (!(e instanceof GitMetadataResolutionError)) throw e;
           }
           let r = await OH(
             {
@@ -69624,7 +69544,7 @@ var Khe = class {
               name: `git.metadata_common_dir`,
               op: `codex.git.metadata_common_dir`,
             },
-            () => hhe(r, t),
+            () => resolveGitCommonDir(r, t),
           );
           return i ? { root: r, commonDir: i } : null;
         } finally {

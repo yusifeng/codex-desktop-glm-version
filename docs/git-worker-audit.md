@@ -555,6 +555,13 @@ Git config 的普通/缓存读取、local/worktree scope 参数映射、缺失�
 `src/main/worker/git-config-scope.ts`。原 `Bpe`/`Vpe`/`Hpe`/`Hhe`/`Uhe`/`Ghe` 与专用键常量已删除，
 repository 方法、origin URL 读取和 worktree cleanup 改用语义入口，由 49 项断言覆盖。
 
+### 增量抽取：Git root resolution
+
+Git root/common-dir 的本地路径预检、新版 `--path-format=absolute` 单命令读取、旧版双命令
+fallback、非仓库识别与专用降级错误已迁移至 `src/main/worker/git-root-resolution.ts`。原
+`Bhe`/`Vhe`/`hhe`/`a4`、`o4` 错误类及 `zhe` 日志常量已删除；manager 保留 memoization、trace
+与 stable metadata cache 生命周期，由 43 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
