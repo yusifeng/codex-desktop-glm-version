@@ -696,6 +696,9 @@ Annotation scroll boundary 方向判定（原 `Vv`）已抽取为
 Annotation overflow 值判定（原 `tc/nc`）已抽取为
 `src/main/browser-page-preload/annotation-overflow.ts`，frame clipping 与 scroll-container 消费者已接回；
 原 helper 已删除，由 11 项断言覆盖 scrollable/clipping/visible 值。
+Annotation theme variant 读取（原 `f_`）已抽取为
+`src/main/browser-page-preload/annotation-theme.ts`，入口注入 window.matchMedia；由 3 项断言覆盖
+dark/light 与缺失 matchMedia。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。

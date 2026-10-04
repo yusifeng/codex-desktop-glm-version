@@ -6379,6 +6379,7 @@ var { getAnnotationTargetLabel } = require("./browser-page-preload/annotation-ta
 var { normalizeAnnotationWheelDelta } = require("./browser-page-preload/annotation-wheel-delta");
 var { canScrollAnnotationAxis } = require("./browser-page-preload/annotation-scroll-boundary");
 var { isClippingAnnotationOverflow, isScrollableAnnotationOverflow } = require("./browser-page-preload/annotation-overflow");
+var { resolveAnnotationThemeVariant } = require("./browser-page-preload/annotation-theme");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22832,7 +22833,7 @@ function d_(e) {
         };
 }
 function f_() {
-  return window.matchMedia?.(`(prefers-color-scheme: dark)`)?.matches ? `dark` : `light`;
+  return resolveAnnotationThemeVariant(window);
 }
 function p_() {
   return { height: window.innerHeight, width: window.innerWidth };

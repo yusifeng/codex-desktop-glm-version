@@ -266,6 +266,10 @@ Annotation overflow 值判定（原 `tc/nc` 4244-4249）已迁移至
 判定改用语义入口，原 helper 已物理删除；由 `scripts/test-preload-annotation-overflow.mjs` 覆盖
 scrollable/clipping/visible 三类值。
 
+Annotation theme variant 读取（原 `f_` 22830-22832）已迁移至
+`src/main/browser-page-preload/annotation-theme.ts`；入口仅注入 window.matchMedia，
+由 `scripts/test-preload-annotation-theme.mjs` 覆盖 dark/light 与缺失 matchMedia。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）
