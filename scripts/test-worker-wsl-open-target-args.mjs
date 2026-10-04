@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/wsl-open-target-args.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { buildWslOpenTargetArgs } = module.exports;
+const dir = () => ["-d", "/tmp"];
+assert.deepEqual(buildWslOpenTargetArgs("/tmp/a", () => "/mnt/c/tmp", () => "Ubuntu", dir), ["-d", "/tmp", "wsl.exe", "-d", "Ubuntu", "--cd", "/mnt/c/tmp"]);
+assert.deepEqual(buildWslOpenTargetArgs("/tmp/a", () => "\\\\server\\share", () => null, dir), ["-d", "/tmp", "wsl.exe"]);
+assert.deepEqual(buildWslOpenTargetArgs("/tmp/a", () => "/mnt/c/tmp", () => null, dir, "custom-wsl"), ["-d", "/tmp", "custom-wsl", "--cd", "/mnt/c/tmp"]);
+console.log("worker WSL open target args tests passed (3 assertions)");

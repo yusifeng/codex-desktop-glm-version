@@ -119,6 +119,7 @@ const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
+const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
@@ -81446,11 +81447,7 @@ var ZEe = s9({
     },
   });
 function D9(e) {
-  let t = l9(e),
-    n = UH(t),
-    r = [...f9(e), E9],
-    i = VH(t);
-  return (i != null && r.push(`-d`, i), n.startsWith(`\\\\`) || r.push(`--cd`, n), r);
+  return buildWslOpenTargetArgs(e, UH, VH, f9, E9);
 }
 function eDe() {
   return V7([`WSL.lnk`]) ?? z7(E9);
