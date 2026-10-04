@@ -18,7 +18,7 @@ const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
 const rejects = async (...args) => { assertions += 1; await assert.rejects(...args); };
 
 function fixture(result = { success: true, stdout: "value", stderr: "", code: 0 }) {
-  const calls = { fetch: [], queryKey: [], run: [] };
+  const calls = { fetch: [], queryFetch: [], queryKey: [], run: [] };
   const querySignal = new AbortController().signal;
   const dependencies = {
     fetchQueryWithSignal: async (queryClient, options, signal) => {
@@ -33,7 +33,12 @@ function fixture(result = { success: true, stdout: "value", stderr: "", code: 0 
   const repository = {
     root: "/repo",
     host: { id: "local" },
-    queryClient: { fetchQuery: async (options) => options.queryFn() },
+    queryClient: {
+      fetchQuery: async (options) => {
+        calls.queryFetch.push(options);
+        return options.queryFn();
+      },
+    },
   };
   return { calls, dependencies, querySignal, repository };
 }
@@ -51,7 +56,11 @@ equal(await getConfigValue(state.repository, ["remote.origin.url"], signal, stat
 deepEqual(state.calls.queryKey[0], ["/repo", state.repository.host, "config-value", ["remote.origin.url"]]);
 equal(state.calls.fetch.length, 0);
 equal(state.calls.run[0][3].signal, signal);
+equal(state.calls.queryFetch[0].meta.source, "config");
+equal(state.calls.queryFetch[0].staleTime, Infinity);
 state = fixture({ success: true, stdout: "", stderr: "", code: 0 });
+equal(await getConfigValue(state.repository, ["missing"], signal, state.dependencies), null);
+state = fixture({ success: false, stdout: "ignored", stderr: "failure", code: 2 });
 equal(await getConfigValue(state.repository, ["missing"], signal, state.dependencies), null);
 
 state = fixture();
@@ -98,6 +107,9 @@ deepEqual(state.calls.run[0], ["/repo", ["config", "--worktree", "--get", LOCAL_
 state = fixture();
 equal(await setConfigValueForScope("/repo", "user.name", "Codex", "local", state.repository.host, signal, state.dependencies), true);
 deepEqual(state.calls.run[0], ["/repo", ["config", "--local", "user.name", "Codex"], state.repository.host, { signal }]);
+state = fixture();
+equal(await setConfigValueForScope("/repo", "user.name", "Codex", "worktree", state.repository.host, signal, state.dependencies), true);
+equal(state.calls.run.length, 1);
 state = fixture({ success: false, stdout: "", stderr: "failure", code: 2 });
 equal(await setConfigValueForScope("/repo", "user.name", "Codex", "local", null, signal, state.dependencies), false);
 equal(state.calls.run.length, 1);
@@ -119,6 +131,7 @@ equal(state.calls.run.length, 1);
     ["config", "extensions.worktreeConfig", "true"],
     ["config", "--worktree", "user.name", "Codex"],
   ]);
+  equal(state.calls.run.every((call) => call[3].signal === signal), true);
 }
 {
   const results = [
@@ -129,6 +142,17 @@ equal(state.calls.run.length, 1);
   state.dependencies.runGit = async (...args) => { state.calls.run.push(args); return results.shift(); };
   equal(await setConfigValueForScope("/repo", "user.name", "Codex", "worktree", null, signal, state.dependencies), false);
   equal(state.calls.run.length, 2);
+}
+{
+  const results = [
+    { success: false, stdout: "", stderr: "fatal: worktreeconfig is disabled", code: 128 },
+    { success: true, stdout: "", stderr: "", code: 0 },
+    { success: false, stdout: "", stderr: "still denied", code: 2 },
+  ];
+  state = fixture();
+  state.dependencies.runGit = async (...args) => { state.calls.run.push(args); return results.shift(); };
+  equal(await setConfigValueForScope("/repo", "user.name", "Codex", "worktree", null, signal, state.dependencies), false);
+  equal(state.calls.run.length, 3);
 }
 
 console.log(`${assertions} worker git config scope assertions passed`);

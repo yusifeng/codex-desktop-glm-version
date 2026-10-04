@@ -120,7 +120,7 @@ Worktree create 的 branch/default/working-tree 起始引用选择、remote-ref 
 `src/main/worker/git-worktree-starting-state.ts`；原压缩编排已删除，由 27 项断言覆盖。
 Git config 的普通/缓存读取、local/worktree 参数映射、缺失值兼容、worktreeConfig 自动启用重试，
 以及 worktree 删除使用的 local environment config path 直读已迁移至
-`src/main/worker/git-config-scope.ts`；原六个压缩 helper 和专用键常量已删除，由 41 项断言覆盖。
+`src/main/worker/git-config-scope.ts`；原六个压缩 helper 和专用键常量已删除，由 49 项断言覆盖。
 Managed worktree discovery 的 root/boundary 去重、无 symlink 目录读取、legacy/named 目录识别、
 候选复检与 `.git` 文件验证已迁移至 `src/main/worker/git-managed-worktree-discovery.ts`；原六个
 压缩实现已删除，平台路径转换通过窄依赖保留，由 52 项断言覆盖。

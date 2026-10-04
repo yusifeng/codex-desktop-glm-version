@@ -553,7 +553,7 @@ Worktree create 的 branch/default/working-tree 起始引用选择、remote-ref 
 Git config 的普通/缓存读取、local/worktree scope 参数映射、缺失值兼容、worktreeConfig 自动启用
 重试，以及 worktree 删除使用的 `codex.localEnvironmentConfigPath` 直读已迁移至
 `src/main/worker/git-config-scope.ts`。原 `Bpe`/`Vpe`/`Hpe`/`Hhe`/`Uhe`/`Ghe` 与专用键常量已删除，
-repository 方法、origin URL 读取和 worktree cleanup 改用语义入口，由 41 项断言覆盖。
+repository 方法、origin URL 读取和 worktree cleanup 改用语义入口，由 49 项断言覆盖。
 
 ### 增量抽取：Git operation marker paths
 
