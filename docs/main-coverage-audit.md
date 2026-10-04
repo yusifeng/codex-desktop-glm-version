@@ -137,6 +137,13 @@ worker bus 装配附近的 `Sst/Cst/wst` 纯谓词（原 175,015-175,023）已�
 不触碰 worker 启动、IPC 或 Electron 副作用，由
 `scripts/test-main-worker-event-predicates.mjs` 覆盖 8 项结果/事件类型断言。
 
+### 增量抽取：worker RPC 消息谓词
+
+worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至
+`src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托。
+模块只负责对象形状和方法白名单判断，不触碰 RPC 调度或 worker 生命周期；由
+`scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言。
+
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs

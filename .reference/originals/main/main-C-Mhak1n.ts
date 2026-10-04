@@ -17,6 +17,7 @@ const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
+const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -174320,30 +174321,13 @@ function V9(e) {
   return typeof e == `object` && !!e;
 }
 function gst(e) {
-  return (
-    e === `ces-telemetry` ||
-    e === `otel-export` ||
-    e === `computer-use-invalidate-service-pid` ||
-    e === `computer-use-service-pid` ||
-    e === `read-shortcut-link`
-  );
+  return isAllowedMainRpcMethod(e);
 }
 function _st(e) {
-  return (
-    V9(e) &&
-    e.type === `worker-main-rpc-cancel` &&
-    typeof e.workerId == `string` &&
-    typeof e.requestId == `string`
-  );
+  return isWorkerMainRpcCancel(e);
 }
 function vst(e) {
-  return (
-    V9(e) &&
-    e.type === `worker-main-rpc-request` &&
-    typeof e.workerId == `string` &&
-    typeof e.requestId == `string` &&
-    gst(e.method)
-  );
+  return isWorkerMainRpcRequest(e);
 }
 var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
   bst = class {

@@ -34,6 +34,7 @@ Total scripts: 708.
 - [`test-main-open-path-arguments.mjs`](./test-main-open-path-arguments.mjs)
 - [`test-main-immediate-update-exit.mjs`](./test-main-immediate-update-exit.mjs)
 - [`test-main-worker-event-predicates.mjs`](./test-main-worker-event-predicates.mjs)
+- [`test-main-worker-rpc-message-predicates.mjs`](./test-main-worker-rpc-message-predicates.mjs)
 - [`test-preload-annotation-controls-registry.mjs`](./test-preload-annotation-controls-registry.mjs)
 - [`test-preload-annotation-frame-pointer-guard.mjs`](./test-preload-annotation-frame-pointer-guard.mjs)
 - [`test-preload-annotation-keyboard.mjs`](./test-preload-annotation-keyboard.mjs)
