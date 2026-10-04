@@ -9,6 +9,7 @@ import {
   moveThreadToLocal,
   moveThreadToWorktree,
 } from "./git-worktree-handoff-dispatch";
+import { getWorktreeMutationMethod } from "./git-worktree-request-policy";
 
 type WorktreeMutationDispatchDependencies = Parameters<typeof restoreWorktree>[1];
 
@@ -23,7 +24,7 @@ async function dispatchWorktreeMutationRequest(
   requestId: string | number,
   deps: WorktreeMutationDispatchDependencies,
 ) {
-  switch (method) {
+  switch (getWorktreeMutationMethod(method)) {
     case `restore-worktree`:
       return { handled: true, result: await restoreWorktree(params, deps), wrapped: true };
     case `delete-worktree`:
