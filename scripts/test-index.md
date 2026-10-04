@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 825.
+Total scripts: 826.
 
 ## Recent semantic extraction suites
 
@@ -15,10 +15,12 @@ Total scripts: 825.
 - [`test-main-target-descriptor-policy.mjs`](./test-main-target-descriptor-policy.mjs)
 - [`test-main-language-server-protocol-helpers.mjs`](./test-main-language-server-protocol-helpers.mjs)
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
+- [`test-app-initial-electron-command-policy.mjs`](./test-app-initial-electron-command-policy.mjs)
 - [`test-preload-annotation-scroll-container.mjs`](./test-preload-annotation-scroll-container.mjs)
 - [`test-preload-annotation-anchor-state.mjs`](./test-preload-annotation-anchor-state.mjs)
 - [`test-preload-annotation-anchor-geometry.mjs`](./test-preload-annotation-anchor-geometry.mjs)
 - [`test-preload-annotation-preview-geometry.mjs`](./test-preload-annotation-preview-geometry.mjs)
+- [`test-preload-annotation-preview-scheduler.mjs`](./test-preload-annotation-preview-scheduler.mjs)
 - [`test-preload-annotation-preview-layer.mjs`](./test-preload-annotation-preview-layer.mjs)
 - [`test-preload-annotation-preview-visibility.mjs`](./test-preload-annotation-preview-visibility.mjs)
 - [`test-preload-annotation-draft-runtime.mjs`](./test-preload-annotation-draft-runtime.mjs)

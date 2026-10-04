@@ -6257,6 +6257,7 @@ var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotat
 var { isAnnotationElementVisible } = require("./browser-page-preload/annotation-visibility");
 var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
 var { createAnnotationPreviewVisibilityPredicate } = require("./browser-page-preload/annotation-preview-visibility");
+var { createAnnotationPreviewScheduler } = require("./browser-page-preload/annotation-preview-scheduler");
 var { createAnnotationRequestContext } = require("./browser-page-preload/annotation-request-context");
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
@@ -23603,40 +23604,30 @@ function Ty({ shadowRoot: e, getControlTargets: t }, n) {
   let i = _y({ layer: r, color: n.color });
   (e.append(r), _c(r, !1));
   let a = !0,
-    o = null,
     s = null,
-    c = new Set(),
-    l = new Set(),
     u = new Map(),
     d = new Set(),
     f = new Map(),
-    p = new ResizeObserver(h),
-    m = new IntersectionObserver((e) => {
-      for (let { target: t, isIntersecting: n } of e)
-        F(t) && c.has(t) && (n ? (l.add(t), p.observe(t)) : (l.delete(t), p.unobserve(t)));
-      h();
-    });
+    scheduler = createAnnotationPreviewScheduler({ windowLike: window, isElement: F, onInvalidate: () => { s = null; }, onFrame: y });
   function h() {
-    ((s = null), g());
+    scheduler.invalidate();
   }
   function g() {
-    a && o == null && (o = window.requestAnimationFrame(y));
+    scheduler.schedule();
   }
   function _(e, t) {
-    t && !c.has(e)
-      ? (c.add(e), m.observe(e))
-      : !t && c.delete(e) && (l.delete(e), m.unobserve(e), p.unobserve(e));
+    scheduler.setCandidate(e, t);
   }
   function v() {
     let e = new Set(t());
-    for (let t of c) _(t, e.has(t));
+    for (let t of scheduler.getCandidates()) _(t, e.has(t));
     for (let t of e) _(t, t.isConnected && t.ownerDocument === document && !gl(t));
   }
   function y() {
-    if (((o = null), !a)) return;
+    if (!a) return;
     if (s == null) {
-      (n.feature === `controls` && v(),
-        (s = { candidates: l.values(), targets: [], hasMotion: !1, isVisible: by(d) }));
+        (n.feature === `controls` && v(),
+        (s = { candidates: scheduler.getVisibleCandidates().values(), targets: [], hasMotion: !1, isVisible: by(d) }));
       for (let [e, t] of f) (!t.isConnected || e.playState !== `running`) && f.delete(e);
     }
     let { targets: e } = s,
@@ -23702,7 +23693,7 @@ function Ty({ shadowRoot: e, getControlTargets: t }, n) {
             for (let t of e.addedNodes) F(t) && (u(t), f(t));
           }
         if (r) {
-          for (let e of c) e.isConnected || _(e, !1);
+          for (let e of scheduler.getCandidates()) e.isConnected || _(e, !1);
           l.disconnect();
           for (let t of a)
             if (t !== e && !t.isConnected) {
@@ -23758,7 +23749,7 @@ function Ty({ shadowRoot: e, getControlTargets: t }, n) {
     for (let n of e.getAnimations?.() ?? []) x(n, t);
     let b = e.documentElement;
     return (
-      b != null && p.observe(b),
+      b != null && scheduler.observeDocumentElement(b),
       e.addEventListener(jy, v),
       e.addEventListener(`fullscreenchange`, y),
       t.addEventListener(`resize`, h),
@@ -23766,8 +23757,7 @@ function Ty({ shadowRoot: e, getControlTargets: t }, n) {
       t.visualViewport?.addEventListener(`scroll`, h),
       () => {
         l.disconnect();
-        for (let t of c) t.ownerDocument === e && _(t, !1);
-        b != null && p.unobserve(b);
+        b != null && scheduler.unobserveDocumentElement(b);
         for (let e of a) {
           (d.delete(e), e.removeEventListener(`toggle`, y, !0));
           for (let t of Ny) e.removeEventListener(t, g, !0);
@@ -23826,7 +23816,7 @@ function Ty({ shadowRoot: e, getControlTargets: t }, n) {
   return (
     h(),
     () => {
-      ((a = !1), o != null && window.cancelAnimationFrame(o), C(), m.disconnect(), p.disconnect());
+      ((a = !1), C(), scheduler.dispose());
       for (let e of My) window.removeEventListener(e, h);
       (document.removeEventListener(qd.responseEvent, S), vc(r), i.dispose(), r.remove());
     }

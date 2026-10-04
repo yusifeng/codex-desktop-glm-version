@@ -341,6 +341,15 @@ composed-parent、element 与 frame/window 适配器；模块保留跨 shadow ro
 判定、top-modal 选择及 popover 矩形遮挡语义，`scripts/test-preload-annotation-preview-visibility.mjs`
 覆盖 modal 内外目标与边界过滤，共 3 项断言。
 
+### 增量抽取：annotation preview observer/RAF scheduler
+
+annotation feature preview 的 ResizeObserver/IntersectionObserver candidate queue、RAF 调度和
+dispose cleanup 已迁移至 `src/main/browser-page-preload/annotation-preview-scheduler.ts`。入口仍注入
+页面元素判定与 frame callback，并保留 MutationObserver、跨 frame 观察和 controls registry wiring；
+模块负责候选集合与可见集合的一致性、observer 回调触发 invalidate，以及取消待处理 RAF。
+`scripts/test-preload-annotation-preview-scheduler.mjs` 覆盖 candidate 注册、intersection/resize
+触发、RAF 执行和 observer cleanup，共 5 项断言。
+
 ### 增量抽取：annotation request context validation
 
 open-annotation 的 secure-context/active-editor 门控、serialized Range 重建、目标元素与
