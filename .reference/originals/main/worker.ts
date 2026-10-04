@@ -112,6 +112,7 @@ const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, class
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { parseShellEnvironmentOutput, getEnvironmentValue } = require("./worker/shell-environment-parser");
+const { isPathWithinRoot } = require("./worker/git-path-containment");
 const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
@@ -56123,9 +56124,7 @@ function PZ(e) {
   }
 }
 function FZ(e, t, n) {
-  let r = n.isLocal ? g.default : g.default.posix,
-    i = r.relative(e, t);
-  return i === `` || (i !== `..` && !i.startsWith(`..${r.sep}`) && !r.isAbsolute(i));
+  return isPathWithinRoot(e, t, n, { local: g.default, posix: g.default.posix });
 }
 var IZ = [
     `entry=$(getent passwd "$(id -u)" 2>/dev/null) || entry=$(id -P 2>/dev/null) || exit 1`,

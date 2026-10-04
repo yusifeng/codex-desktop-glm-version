@@ -34,6 +34,9 @@ subprocess wrapper 的有限集合分类也由同一模块提供，入口保留 
 `w6`/`kye`/`Aye`/`jye`/`Mye`/`Nye`/`Pye`/`Fye`/`Lye`/`Rye`/`T6` 实现及
 `C6`/`Eye` 阈值常量已从入口物理删除。
 
+worktree 缓存失效使用的 host-aware 路径包含判定已迁移至
+`src/main/worker/git-path-containment.ts`；入口 `FZ` 仅保留兼容委托，由 5 项断言覆盖 root、子路径和越界路径。
+
 Windows Git executable resolution and command adaptation（原 `vbe`/`ybe`/`bbe`/`xbe`/
 `K6`，约 71,574-71,609）已迁移至 `src/main/worker/git-executable.ts`。该模块保留
 PATH 大小写覆盖、`where.exe` 候选顺序、resolver cache、`ComSpec` 及 `.cmd/.bat`

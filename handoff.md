@@ -611,6 +611,8 @@ GitHub exact-revision review 的 diff/file handlers 已迁移至
 worker 子进程环境清洗已抽取为 `src/main/worker/platform-env.ts`，统一过滤
 Crashpad/Electron 注入变量并保持大小写不敏感、非变异语义，由
 `scripts/test-worker-platform-env.mjs` 的 6 项断言覆盖；平台命令执行和环境合并副作用仍留在入口。
+worktree 缓存失效的 host-aware 路径包含判定已抽取为 `src/main/worker/git-path-containment.ts`，
+入口 `FZ` 保留兼容委托，由 5 项行为断言覆盖 local/remote 路径与边界。
 WSL active distro fallback 与 `wsl.exe` command argv 构造已补充迁移至
 `src/main/worker/platform-wsl.ts`，由 7 项 WSL 平台断言覆盖；实际进程执行与日志副作用仍在入口。
 
