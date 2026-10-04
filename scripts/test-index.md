@@ -9,6 +9,7 @@ Total scripts: 905.
 - [`test-worker-git-host-handoff-progress.mjs`](./test-worker-git-host-handoff-progress.mjs)
 - [`test-worker-git-branch-request-runtime.mjs`](./test-worker-git-branch-request-runtime.mjs)
 - [`test-worker-git-host-handoff-validation.mjs`](./test-worker-git-host-handoff-validation.mjs)
+- [`test-worker-git-worktree-request-policy.mjs`](./test-worker-git-worktree-request-policy.mjs)
 - [`test-preload-annotation-interaction-policy.mjs`](./test-preload-annotation-interaction-policy.mjs)
 - [`test-preload-annotation-additional-anchor-projection.mjs`](./test-preload-annotation-additional-anchor-projection.mjs)
 - [`test-preload-annotation-visible-text.mjs`](./test-preload-annotation-visible-text.mjs)

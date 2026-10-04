@@ -82,6 +82,9 @@ upstream refresh controller 注册/清理、三类 stream event 与响应 envelo
 Worktree delete/restore 的 promise 生命周期调度已迁移至 `src/main/worker/git-worktree-lifecycle.ts`，覆盖
 同 host+path 去重、restore 串行化、失败后继续和状态清理；入口仅保留实际副作用回调，由 12 项 focused
 断言覆盖。
+Worktree mutation request 的协议方法分类已迁移至 `src/main/worker/git-worktree-request-policy.ts`，dispatcher
+仅负责选择后的业务调用；restore/delete/cancel/host-handoff 等 7 个方法和未知方法回退由 11 项 focused
+断言覆盖。
 worker `handleRequestWithContext` 的 origin/roots、shell environment、owner、default
 remote branch 与 merge-base 只读请求已迁移至 `src/main/worker/git-read-request-handlers.ts`，
 并扩展至 current/upstream/default/base branch、branch-ahead、recent-branches 与 branch-exists
