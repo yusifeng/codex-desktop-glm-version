@@ -38,6 +38,21 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 已完成语义化”。`scripts/test-renderer-hub-classification.mjs` 固定三座 hub
 均存在消费面且保留未消费缺口，防止以后通过删除审计来掩盖尾部。
 
+本轮对 `app-primary` 再做一次实现级、逐行抽样，而不是按压缩别名数量猜测迁移
+边界。发布资产 `app-primary-d66705000d76.ts:5758-5770` 中的 `rA`/`nA`（公开
+别名 `$m`/未稳定导出别名）虽是看起来纯粹的 URL predicate，但 `rA` 只作为同段的
+`tAe`（foreground image 选择器）内部实现使用；`src/renderer` 没有对应的
+named consumer，复制它会制造一个没有真实调用面的伪语义模块。该行簇登记为
+`zero-consumer-scope-aware-formatter`/`generated-local-helper`，继续保留 hub
+边界，待出现真实调用者后再抽取。相邻的 `eAe`/`tA` 还依赖 action-v2 状态和
+runtime policy，也不满足独立输入/输出契约，不能以 URL 字符串 helper 名义拆出。
+
+因此本轮没有为 A5 强行增加一个新 runtime 文件；`audit-renderer-hub-classification`
+仍明确显示 app-primary 的大部分 export 未被命名消费，属于待按真实 consumer
+逐个收敛的物理缺口，而非可以用占位导入清零的数字。focused classification suite
+同时锁定以上 `rA`/`nA` 无 named consumer 的审计结论，防止后续只为降低计数而伪造
+消费边。
+
 `app-primary` 的 panel visibility 入口已将纯策略部分迁移至
 `src/renderer/app-primary/runtime/panel-target-policy.ts`。该模块保留
 `bottom-panel` / `right-panel` 优先级、可用 tab 过滤和无候选时返回 `null` 的
