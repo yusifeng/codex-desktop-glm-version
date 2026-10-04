@@ -572,6 +572,8 @@ GitHub exact-revision review 的 diff/file handlers 已迁移至
 worker 子进程环境清洗已抽取为 `src/main/worker/platform-env.ts`，统一过滤
 Crashpad/Electron 注入变量并保持大小写不敏感、非变异语义，由
 `scripts/test-worker-platform-env.mjs` 的 6 项断言覆盖；平台命令执行和环境合并副作用仍留在入口。
+WSL active distro fallback 与 `wsl.exe` command argv 构造已补充迁移至
+`src/main/worker/platform-wsl.ts`，由 7 项 WSL 平台断言覆盖；实际进程执行与日志副作用仍在入口。
 
 GitHub pull-request board 的仓库候选、查询参数、open/merged 编排和状态映射已迁移至
 `src/main/worker/github-pull-request-board.ts`；入口仅保留 host/GitHub CLI/Git manager 适配，

@@ -14,7 +14,7 @@
 business 区段仍按下表保持审计标记，不能视为已完成。
 
 WSL 平台的纯输出解析、命令参数构造与 quiet-list fallback（约 47,122-47,584 中的
-UTF-16/UTF-8 解码、活动发行版识别与排序）已迁至 `worker/platform-wsl.ts`；入口
+UTF-16/UTF-8 解码、活动发行版识别、排序与 fallback 选择）已迁至 `worker/platform-wsl.ts`；入口
 仍负责 spawn/exec 副作用、缓存和宿主生命周期。
 
 远程 host 的 SSH 展示名、终端命令端口/identity 解析（原入口约
