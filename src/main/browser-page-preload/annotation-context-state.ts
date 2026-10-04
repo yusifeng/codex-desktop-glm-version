@@ -16,21 +16,22 @@ function createInitialAnnotationContextState(intlConfig: any) {
 }
 
 function resolveAnnotationSyncState(message: any, isSiteAnnotationApiAvailable: boolean) {
+  const source = message != null && typeof message === `object` ? message : {};
   return {
-    interactionMode: message.interactionMode,
-    annotationEditorMode: message.annotationEditorMode ?? `comment`,
-    isAgentControllingBrowser: message.isAgentControllingBrowser,
-    canUseTweaks: message.canUseTweaks !== false,
-    canUseAnnotationMultiSelect: message.canUseAnnotationMultiSelect === true,
-    canUseSiteAnnotationApi: isSiteAnnotationApiAvailable && message.siteAnnotationFeaturesEnabled !== false,
-    isDesignModifierPressed: message.isDesignModifierPressed === true,
-    areAnnotationMarkersVisible: message.areAnnotationMarkersVisible !== false,
-    isAnnotationSuspended: message.isAnnotationSuspended === true,
-    isTweaksEditorOpen: message.isTweaksEditorOpen === true,
-    comments: message.comments,
-    intlConfig: message.intlConfig,
-    viewportScale: message.viewportScale ?? 1,
-    zoomPercent: message.zoomPercent,
+    interactionMode: source.interactionMode ?? `browse`,
+    annotationEditorMode: source.annotationEditorMode ?? `comment`,
+    isAgentControllingBrowser: source.isAgentControllingBrowser === true,
+    canUseTweaks: source.canUseTweaks !== false,
+    canUseAnnotationMultiSelect: source.canUseAnnotationMultiSelect === true,
+    canUseSiteAnnotationApi: isSiteAnnotationApiAvailable && source.siteAnnotationFeaturesEnabled !== false,
+    isDesignModifierPressed: source.isDesignModifierPressed === true,
+    areAnnotationMarkersVisible: source.areAnnotationMarkersVisible !== false,
+    isAnnotationSuspended: source.isAnnotationSuspended === true,
+    isTweaksEditorOpen: source.isTweaksEditorOpen === true,
+    comments: source.comments,
+    intlConfig: source.intlConfig,
+    viewportScale: source.viewportScale ?? 1,
+    zoomPercent: source.zoomPercent,
   };
 }
 

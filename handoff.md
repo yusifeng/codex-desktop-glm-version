@@ -11,6 +11,13 @@
 
 ## 当前进度快照（2026-10-04）
 
+本轮 A2 增量补强 preload annotation context state：同步消息解析现在对空值/非对象输入安全降级，缺省交互模式与 agent 控制位保持明确默认值；新增 `scripts/test-preload-annotation-context-state.mjs` 的 20 项 focused assertions，覆盖初始状态、能力位同步、注释模式判定及空消息边界。
+
+GitHub Pull Request summary 的身份 key 规范化、取消 reader 过滤、状态映射与 pending-check
+判定已迁移至 `src/main/worker/github-pull-request-summary-policy.ts`；batcher 仅保留 GraphQL
+分页与结果编排。新增 `scripts/test-worker-github-pull-request-summary-policy.mjs` 覆盖 9 项
+纯策略断言，原 summary handler 回归测试继续验证批处理边界。
+
 最新增量：Annotation controls 的弱引用 target 索引、排序绑定、去绑定与有效 target 收集已迁移至
 `src/main/browser-page-preload/annotation-control-targets.ts`；runtime 仅保留兼容导出，由
 `scripts/test-preload-annotation-control-targets.mjs` 覆盖 10 项生命周期断言。
@@ -951,3 +958,4 @@ Annotation document context 的 viewport visible-text 收集已迁移至
 range 相交与 2,000 字符上限不再与 Google Docs context class 混杂，document-context 入口仅
 保留页面判定与依赖适配，由 `scripts/test-preload-annotation-visible-text.mjs` 覆盖 3 项
 focused assertions，原 `annotation-document-context` 回归测试继续通过。
+2026-10-05 A5 继续批次：app-primary 新增 `Ah`/`ok`、`Af`/`pF`、`Al`/`ZH`、`Au`/`CB` 四条逐行分类证据，均判定为生成局部 bootstrap/initializer（无独立 named consumer 或 teardown 边界），登记于 `docs/renderer-hub-line-classification.json`。`scripts/test-renderer-hub-classification.mjs` 期望 reviewedCount 从 145 同步至 149；审计脚本保持 74/914 consumed、840 unconsumed。
