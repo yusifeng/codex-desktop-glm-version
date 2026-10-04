@@ -545,6 +545,14 @@ annotation overlay 对页面 DOM 的 mutation 监听、overlay 自身 mutation �
 依赖适配和兼容调用入口。`scripts/test-preload-annotation-overlay-observer.mjs` 覆盖 observer 注册、
 overlay 内部过滤、页面 mutation、空批次、非 Node target、幂等 dispose 与 dispose 后回调抑制。
 
+### 增量抽取：annotation overlay region suppression policy
+
+overlay runtime 在 editor 创建 region 时对重叠 annotation 的隐藏判定已迁移至
+`src/main/browser-page-preload/annotation-overlay-policies.ts`。模块只接收 editor
+selection 与 anchor equality 适配器，覆盖 active annotation、text editor、create/edit
+模式及 additional anchors；`scripts/test-preload-annotation-overlay-policies.mjs`
+提供 7 项 focused assertions。
+
 ### 增量抽取：annotation anchor viewport policy
 
 annotation anchor 的当前页面判定（含 Google Docs anchor 兼容）与大矩形阈值策略已迁移至

@@ -1,5 +1,6 @@
 import { collectAnnotationFlexGapOverlays } from "./annotation-flex-gap-overlays";
 import { observeAnnotationMutationsOutsideOverlay } from "./annotation-overlay-observer";
+import { shouldSuppressAnnotationRegionOverlay } from "./annotation-overlay-policies";
 
 type AnnotationOverlayRuntimeDependencies = {
   documentLike: any;
@@ -109,16 +110,6 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
     return scaledPoint;
   };
 
-  const shouldSuppressRegionOverlay = (annotation: any, editor: any, activeAnnotation: any) => {
-    if (annotation.id === activeAnnotation?.id) return true;
-    if (editor == null || editor.anchor.type === `text` || editor.target.mode !== `create`) return false;
-    const selections = deps.getEditorSelections(editor.anchor);
-    const editorAnchors = [selections.primary, ...selections.additional].map(({ anchor }: any) => anchor);
-    return [annotation.anchor, ...(annotation.additionalAnchors ?? [])].some(
-      (anchor) => anchor.kind === `region` && editorAnchors.some((candidate) => deps.anchorsEqual(anchor, candidate)),
-    );
-  };
-
   return {
     ensureOverlayRoot,
     snapshotHoverElement,
@@ -131,7 +122,8 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
     observeMutationsOutsideOverlay,
     resolveTextSelectionRects,
     resolveMetadataTooltipRect,
-    shouldSuppressRegionOverlay,
+    shouldSuppressRegionOverlay: (annotation: any, editor: any, activeAnnotation: any) =>
+      shouldSuppressAnnotationRegionOverlay(annotation, editor, activeAnnotation, deps),
   };
 }
 
