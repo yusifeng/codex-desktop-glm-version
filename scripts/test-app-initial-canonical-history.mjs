@@ -13,7 +13,7 @@ await build({
   outfile: output,
   logLevel: "silent",
 });
-const { getCanonicalHistoryEntries } = await import(`${output}?test=${Date.now()}`);
+const { getCanonicalHistoryEntries, findCanonicalHistoryIslandIndex } = await import(`${output}?test=${Date.now()}`);
 const complete = { islands: [{ entries: ["old"], newerBoundary: { status: "exhausted" } }] };
 assert.deepEqual(getCanonicalHistoryEntries(complete)?.entries, ["old"]);
 assert.equal(
@@ -22,4 +22,10 @@ assert.equal(
 );
 assert.equal(getCanonicalHistoryEntries({ islands: [] }), null);
 assert.equal(getCanonicalHistoryEntries(null), null);
-console.log("app-initial canonical history: 4 assertions passed");
+const boundary = { status: "available", boundaryId: "island-1:older", progressKey: "p1" };
+const islands = [{ id: "island-1", entries: [], olderBoundary: boundary, newerBoundary: { status: "loading" } }];
+assert.equal(findCanonicalHistoryIslandIndex(islands, { islandId: "island-1", edge: "older", boundaryId: "island-1:older", progressKey: "p1" }), 0);
+assert.equal(findCanonicalHistoryIslandIndex(islands, { edge: "older", boundaryId: "island-1:older", progressKey: "p1" }), 0);
+assert.equal(findCanonicalHistoryIslandIndex(islands, { edge: "newer", boundaryId: "island-1:newer", progressKey: "p1" }), null);
+assert.equal(findCanonicalHistoryIslandIndex([{ ...islands[0] }, { ...islands[0], id: "island-2" }], { edge: "older", boundaryId: "island-1:older", progressKey: "p1" }), null);
+console.log("app-initial canonical history: 8 assertions passed");
