@@ -11,6 +11,7 @@ const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenameDiff } = require("./worker/git-diff-text");
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
+const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = require("./worker/git-apply-patch");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
@@ -166,6 +167,18 @@ const getGitIndexPath = (repository) =>
   getGitIndexPathQuery(repository, gitPathResolutionDeps);
 const getGitIndexContext = (repository, signal) =>
   getGitIndexContextQuery(repository, signal, gitPathResolutionDeps);
+const gitApplyPatchDeps = {
+  copyIndexToTemporaryDirectory: (directory, context, host) => B$(directory, context, host),
+  createLogger: (tag) => OW(tag),
+  createTemporaryDirectory: (host, prefix, signal) => z$(host, prefix, signal),
+  formatExecOutput: (params) => mR(params),
+  getIndexContext: (repository, signal) => getGitIndexContext(repository, signal),
+  normalizeCwd: (cwd) => xz(cwd),
+  normalizePatchPath: (...args) => o2(...args),
+  runGit: (...args) => $(...args),
+};
+const applyGitPatchRuntime = (params, gitManager, host, options) =>
+  applyGitPatchQuery(params, gitManager, host, options, gitApplyPatchDeps);
 const gitPathStatusDeps = {
   chunk: (...args) => kG.default(...args),
   compact: (...args) => pme.default(...args),
@@ -627,7 +640,8 @@ const resolveCreatedWorktreeBranchName = (repository, startingState, startingRef
     worktreeBranchTrackingDeps,
   );
 const worktreeCheckoutDeps = {
-  applyPatch: (params, gitManager, host, options) => S2(params, gitManager, host, options),
+  applyPatch: (params, gitManager, host, options) =>
+    applyGitPatchRuntime(params, gitManager, host, options),
   createLocalTrackingBranch,
   deleteLocalTrackingBranch,
   getSafeAttributeFilterOverrides: (repository, signal) =>
@@ -814,12 +828,12 @@ const gitWorktreeFilesDeps = {
   utf8ByteLength,
 };
 const gitApplyChangesDeps = {
-  applyPatch: (...args) => S2(...args),
+  applyPatch: (...args) => applyGitPatchRuntime(...args),
   createLogger: (tag) => AW(tag),
   getTemporaryIndexContext: async (gitManager, root, host) =>
     getGitIndexContext(gitManager.getWorktreeRepositoryForRoot(root, host)),
   normalizeCommitSha: (sha) => Sz(sha),
-  parsePatchPaths: (diff) => x2(diff),
+  parsePatchPaths: (diff) => parseGitPatchPaths(diff),
   runDiff: (...args) => y0(...args),
   runGit: (...args) => $(...args),
   serializeExecResult: (result) => mR(result),
@@ -919,7 +933,7 @@ const gitReviewBranchStatsDeps = {
   reviewFileKey,
 };
 const gitReviewSectionChangesDeps = {
-  applyPatch: (...args) => S2(...args),
+  applyPatch: (...args) => applyGitPatchRuntime(...args),
   getReviewDiff: (reviewSnapshot, source, files, options) =>
     getReviewDiff(reviewSnapshot, source, files, options, gitReviewDiffDeps),
   getReviewFiles: (params) => v_e(params),
@@ -67358,239 +67372,6 @@ function y2(e) {
 function b2(e, t) {
   return e == null ? t() : e.read(t);
 }
-function Ame(e, t) {
-  let n = new Set(),
-    r = new Set(),
-    i = new Set(),
-    a = null,
-    o = [e, t].filter(Boolean).join(`
-`),
-    s = (e, t) => {
-      let n = (t ?? ``).trim();
-      if (!n) return;
-      let r = n.charAt(0),
-        i = n.charAt(n.length - 1),
-        a = n;
-      ((r === `'` || r === `"`) && i === r && n.length >= 2 && (a = n.slice(1, -1)), a && e.add(a));
-    },
-    c = (e, t) => {
-      for (let n of t) if (e[n]) return e[n];
-    },
-    l = /^(?:Applied patch(?: to)?\s+(?:(["'])(?<qpath>.+?)\1|(?<path>.+?))\s+cleanly\.?)$/i,
-    u = /^(?:Applied patch(?: to)?\s+(?:(["'])(?<qpath>.+?)\1|(?<path>.+?))\s+with conflicts\.?)$/i,
-    d =
-      /^(?:Applying patch\s+(?:(["'])(?<qpath>.+?)\1|(?<path>.+?))\s+with\s+\d+\s+rejects?\.{0,3})$/i,
-    f = /^(?:Checking patch\s+(?:(["'])(?<qpath>.+?)\1|(?<path>.+?))\.\.\.)$/i,
-    p = /^(?:Performing three-way merge|Falling back to three-way merge)\.\.\.$/i,
-    m = /^Failed to perform three-way merge\.\.\.$/i,
-    h = /^Falling back to direct application\.\.\.$/i,
-    g = /^U\s+(?<path>.+)$/,
-    _ = /^error:\s+patch failed:\s+(?<path>.+?)(?::\d+)?(?:\s|$)/i,
-    v = /^error:\s+(?<path>.+?):\s+patch does not apply$/i,
-    y =
-      /^(?:error: )?repository lacks the necessary blob to (?:perform|fall back on) 3-?way merge\.?$/i,
-    b = /^error:\s+(?<path>.+?):\s+does not match index\b/i,
-    x = /^error:\s+(?<path>.+?):\s+does not exist in index\b/i,
-    S = /^error:\s+(?<path>.+?)\s+already exists in (?:the )?working directory\b/i,
-    C = /^error:\s+patch failed:\s+(?<path>.+?)\s+File exists/i,
-    w = /^error:\s+path\s+(?<path>.+?)\s+has been renamed\/deleted/i,
-    T =
-      /^error:\s+cannot apply binary patch to\s+['"]?(?<path>.+?)['"]?\s+without full index line$/i,
-    E = /^error:\s+binary patch does not apply to\s+['"]?(?<path>.+?)['"]?$/i,
-    D = /^error:\s+binary patch to\s+['"]?(?<path>.+?)['"]?\s+creates incorrect result\b/i,
-    O = /^error:\s+cannot read the current contents of\s+['"]?(?<path>.+?)['"]?$/i,
-    k = /^Skipped patch\s+['"]?(?<path>.+?)['"]\.$/i,
-    ee = /^warning:\s*Cannot merge binary files:\s+(?<path>.+?)\s+\(ours\s+vs\.\s+theirs\)/i;
-  for (let e of o.split(/\r?\n/)) {
-    let t = e.trim();
-    if (!t) continue;
-    let o;
-    if ((o = t.match(l))) {
-      let e = c(o.groups ?? {}, [`qpath`, `path`]);
-      (s(n, e), (a = e ?? a), i.delete(e ?? ``), r.delete(e ?? ``));
-      continue;
-    }
-    if ((o = t.match(u))) {
-      let e = c(o.groups ?? {}, [`qpath`, `path`]);
-      (s(i, e), (a = e ?? a), n.delete(e ?? ``), r.delete(e ?? ``));
-      continue;
-    }
-    if ((o = t.match(d))) {
-      let e = c(o.groups ?? {}, [`qpath`, `path`]);
-      (s(i, e), (a = e ?? a), n.delete(e ?? ``), r.delete(e ?? ``));
-      continue;
-    }
-    if ((o = t.match(g))) {
-      (s(i, o.groups?.path),
-        (a = o.groups?.path ?? a),
-        n.delete(o.groups?.path ?? ``),
-        r.delete(o.groups?.path ?? ``));
-      continue;
-    }
-    if ((o = t.match(f))) {
-      a = c(o.groups ?? {}, [`qpath`, `path`]) ?? a;
-      continue;
-    }
-    if ((o = t.match(_)) || (o = t.match(v))) {
-      (s(r, o.groups?.path), (a = o.groups?.path ?? a));
-      continue;
-    }
-    if (!(p.test(t) || h.test(t))) {
-      if (m.test(t)) {
-        a && (s(r, a), n.delete(a), i.delete(a));
-        continue;
-      }
-      if (y.test(t)) {
-        a && (s(r, a), n.delete(a), i.delete(a));
-        continue;
-      }
-      if (
-        (o = t.match(b)) ||
-        (o = t.match(x)) ||
-        (o = t.match(S)) ||
-        (o = t.match(C)) ||
-        (o = t.match(w)) ||
-        (o = t.match(T)) ||
-        (o = t.match(E)) ||
-        (o = t.match(D)) ||
-        (o = t.match(O)) ||
-        (o = t.match(k))
-      ) {
-        (s(r, o.groups?.path),
-          (a = o.groups?.path ?? a),
-          n.delete(o.groups?.path ?? ``),
-          i.delete(o.groups?.path ?? ``));
-        continue;
-      }
-      if ((o = t.match(ee))) {
-        (s(i, o.groups?.path),
-          (a = o.groups?.path ?? a),
-          n.delete(o.groups?.path ?? ``),
-          r.delete(o.groups?.path ?? ``));
-        continue;
-      }
-    }
-  }
-  for (let e of i) (n.delete(e), r.delete(e));
-  for (let e of n) r.delete(e);
-  return {
-    appliedPaths: Array.from(n).sort(),
-    skippedPaths: Array.from(r).sort(),
-    conflictedPaths: Array.from(i).sort(),
-  };
-}
-function x2(e) {
-  let t = new Set(),
-    n = /^diff --git a\/(.*?) b\/(.*)$/gm,
-    r;
-  for (; (r = n.exec(e)) != null;) {
-    let [e, n, i] = r;
-    (n && n !== `/dev/null` && t.add(n), i && i !== `/dev/null` && t.add(i));
-  }
-  return Array.from(t);
-}
-async function S2(e, t, n, { gitConfigOverrides: r = [], signal: i } = {}) {
-  let { cwd: a, env: o, diff: s, atomic: c, revert: l, target: u = `unstaged`, allowBinary: d } = e,
-    f = OW(`applyPatch`),
-    p = xz(a),
-    m = await t.getWorktreeRepository(p, n);
-  if (((m ||= (t.invalidateStableMetadata(), await t.getWorktreeRepository(p, n))), !m))
-    return {
-      status: `error`,
-      appliedPaths: [],
-      skippedPaths: [],
-      conflictedPaths: [],
-      errorCode: `not-git-repo`,
-    };
-  let h = m.root;
-  if (i?.aborted)
-    return { status: `error`, appliedPaths: [], skippedPaths: [], conflictedPaths: [] };
-  let g = await z$(n, `codex-apply-`, i),
-    _ = (await n.platformPath()).join(g, `patch.diff`);
-  await n.writeFile(_, s, { signal: i });
-  try {
-    let e = o;
-    if (u === `unstaged` && !c) {
-      let t = await getGitIndexContext(m, i);
-      if (!t)
-        f.warning(`[applyPatch] Unable to resolve git index path; applying without temp index`);
-      else {
-        let a = await B$(g, t, n);
-        ((e = { ...o, GIT_INDEX_FILE: a }),
-          await jme(h, s, n, { env: e, gitConfigOverrides: r, signal: i }));
-      }
-    }
-    let t = [`apply`];
-    (l && t.push(`-R`),
-      d && t.push(`--binary`),
-      c || t.push(`--3way`),
-      u === `staged` ? t.push(`--cached`) : u === `staged-and-unstaged` && t.push(`--index`),
-      t.push(_));
-    let {
-        code: a,
-        stdout: p,
-        stderr: v,
-      } = await $(h, t, n, { configOverrides: r, env: e, signal: i, allowedNonZeroExitCodes: [1] }),
-      { appliedPaths: y, skippedPaths: b, conflictedPaths: x } = Ame(p, v);
-    return (
-      f.debug(`ApplyPatch result metadata`, {
-        safe: {
-          revert: l,
-          target: u,
-          code: a,
-          stdoutLength: p.length,
-          stderrLength: v.length,
-          appliedCount: y.length,
-          skippedCount: b.length,
-          conflictedCount: x.length,
-        },
-        sensitive: {},
-      }),
-      {
-        status:
-          i?.aborted || a == null
-            ? `error`
-            : a === 0
-              ? `success`
-              : a === 1 && !c
-                ? `partial-success`
-                : `error`,
-        appliedPaths: y,
-        skippedPaths: b,
-        conflictedPaths: x,
-        execOutput: mR({ command: t.join(` `), stdout: p, stderr: v }),
-      }
-    );
-  } finally {
-    await n.remove(g, { recursive: !0, force: !0 });
-  }
-}
-async function jme(e, t, n, { env: r, gitConfigOverrides: i = [], signal: a }) {
-  let o = x2(t);
-  if (o.length === 0) return;
-  let s = [],
-    c = await n.platformPath();
-  if (
-    (await Promise.all(
-      o.map(async (t) => {
-        let r = o2(c, e, e, t);
-        (await Mme(c.join(e, r), { host: n, signal: a })) && s.push(r);
-      }),
-    ),
-    s.length !== 0)
-  ) {
-    if (a?.aborted) throw Error(`Apply patch canceled`);
-    await $(e, [`add`, `--`, ...s], n, { configOverrides: i, env: r, signal: a });
-  }
-}
-async function Mme(e, { host: t, signal: n }) {
-  n?.throwIfAborted();
-  try {
-    return (await t.stat(e), !0);
-  } catch {
-    return !1;
-  }
-}
 var Jme = K({ branch: H(), lastSyncedTreeRef: H() });
 var $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
 async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, signal: a } = {}) {
@@ -70165,7 +69946,7 @@ var I6 = kW(`git`),
           host: o,
           signal: i.signal,
           applyChanges: (params) => applyGitChangesBetweenTrees(params, gitApplyChangesDeps),
-          applyPatch: S2,
+          applyPatch: applyGitPatchRuntime,
           applyReviewSectionChanges: (params) =>
             applyReviewSectionChanges(params, gitReviewSectionChangesDeps),
         },

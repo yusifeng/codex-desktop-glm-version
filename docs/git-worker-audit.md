@@ -675,6 +675,14 @@ Local branch existence、commit tree query、普通分支创建、unborn HEAD fa
 入口。模块保留单层 `refs/heads/` 规范化、250ms tree cache、start-point fallback 门控与原错误映射，
 由 62 项独立模块断言覆盖。
 
+### 增量抽取：Git apply patch runtime
+
+Git apply 的 stdout/stderr 路径结果解析、patch header 路径提取、临时 index、现有目标路径预暂存、
+`--3way`/binary/revert/target 参数编排、结果状态映射与临时目录 cleanup 已迁移至
+`src/main/worker/git-apply-patch.ts`。原 `Ame`/`x2`/`S2`/`jme`/`Mme` 已删除；apply-changes、
+review-section、worktree checkout 与请求分发消费者共用语义入口。模块保留并行 stat 的完成顺序、
+取消边界和预暂存命令非零结果不阻断 apply 的既有语义，由 62 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
