@@ -6197,6 +6197,7 @@ var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
+var { getAnnotationElementOverlayClassName } = require("./browser-page-preload/annotation-overlay-class-policy");
 var { createAnnotationPreviewLayer } = require("./browser-page-preload/annotation-preview-layer");
 var { createAnnotationAnchorGeometry } = require("./browser-page-preload/annotation-anchor-geometry");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
@@ -22600,9 +22601,10 @@ function p_() {
   return readAnnotationViewportSize(window);
 }
 function m_(e, t, n, r) {
-  return M_(e, t, n, r)
-    ? `hover-box google-docs-annotation-box google-docs-element-box`
-    : `hover-box`;
+  return getAnnotationElementOverlayClassName(e, t, n, r, {
+    isAnchorOnCurrentPage: (anchor) => N_(anchor),
+    isRectLargeEnough: (rect, width, height) => P_(rect, width, height),
+  });
 }
 function h_(e, t = C_(), { includeElementFrameScroll: n = !1, markerPointInset: r = I_ } = {}) {
   return annotationAnchorGeometry.resolveMarkerPoint(e, t, { includeElementFrameScroll: n, markerPointInset: r });
