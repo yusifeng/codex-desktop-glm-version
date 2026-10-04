@@ -550,10 +550,10 @@ Worktree create 的 branch/default/working-tree 起始引用选择、remote-ref 
 
 ### 增量抽取：Git config scope
 
-Git config 的 local/worktree scope 参数映射、query cache、缺失值与旧版 worktreeConfig 兼容，
-以及 worktree 删除使用的 `codex.localEnvironmentConfigPath` 直读已迁移至
-`src/main/worker/git-config-scope.ts`。原 `Bpe`/`Vpe`/`Hpe` 与专用键常量已删除，repository
-方法和 worktree cleanup 改用语义入口，由 23 项断言覆盖。
+Git config 的普通/缓存读取、local/worktree scope 参数映射、缺失值兼容、worktreeConfig 自动启用
+重试，以及 worktree 删除使用的 `codex.localEnvironmentConfigPath` 直读已迁移至
+`src/main/worker/git-config-scope.ts`。原 `Bpe`/`Vpe`/`Hpe`/`Hhe`/`Uhe`/`Ghe` 与专用键常量已删除，
+repository 方法、origin URL 读取和 worktree cleanup 改用语义入口，由 41 项断言覆盖。
 
 ### 增量抽取：Git operation marker paths
 

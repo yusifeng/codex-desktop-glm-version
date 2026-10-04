@@ -42,7 +42,7 @@ const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
 const { getCommitMessageDiff } = require("./worker/git-commit-message-diff");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
-const { getConfigValueForScope: getGitConfigValueForScopeQuery, getLocalEnvironmentConfigPath: getGitLocalEnvironmentConfigPathQuery } = require("./worker/git-config-scope");
+const { getConfigValue: getGitConfigValueQuery, getConfigValueForScope: getGitConfigValueForScopeQuery, getLocalEnvironmentConfigPath: getGitLocalEnvironmentConfigPathQuery, readConfigValue: readGitConfigValueQuery, setConfigValueForScope: setGitConfigValueForScopeQuery } = require("./worker/git-config-scope");
 const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
@@ -113,8 +113,14 @@ const gitConfigScopeDeps = {
 };
 const getGitConfigValueForScope = (repository, key, scope, signal) =>
   getGitConfigValueForScopeQuery(repository, key, scope, signal, gitConfigScopeDeps);
+const getGitConfigValue = (repository, keys, signal) =>
+  getGitConfigValueQuery(repository, keys, signal, gitConfigScopeDeps);
 const getGitLocalEnvironmentConfigPath = (root, host, scope = `worktree`, signal) =>
   getGitLocalEnvironmentConfigPathQuery(root, host, scope, signal, gitConfigScopeDeps);
+const readGitConfigValue = (root, keys, host, signal) =>
+  readGitConfigValueQuery(root, keys, host, signal, gitConfigScopeDeps);
+const setGitConfigValueForScope = (root, key, value, scope, host, signal) =>
+  setGitConfigValueForScopeQuery(root, key, value, scope, host, signal, gitConfigScopeDeps);
 const compareGitBranches = (repository, left, right, signal) =>
   compareGitBranchesQuery(repository, left, right, signal, gitBranchComparisonDeps);
 const gitCurrentBranchDeps = {
@@ -69149,21 +69155,6 @@ async function Vhe(e, t, n) {
       ? new o4(`Failed to resolve git root and common dir: ${a || i || `Unknown error`}`)
       : Error(`Failed to resolve git root and common dir: ${a || i || `Unknown error`}`);
 }
-async function Hhe(e, t, n, r) {
-  let i = await $(e, [`config`, `--get`, ...t], n, { signal: r });
-  return i.success && i.stdout ? i.stdout : null;
-}
-function Uhe(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `config-value`, t),
-    meta: y1,
-    queryFn: async () => {
-      let r = await $(e.root, [`config`, `--get`, ...t], e.host, { signal: n });
-      return r.success && r.stdout ? r.stdout : null;
-    },
-    staleTime: g1,
-  });
-}
 var Whe = class {
     commonDir;
     host;
@@ -69174,7 +69165,7 @@ var Whe = class {
       return this.commonDir;
     }
     getOriginUrl = (0, DX.default)(
-      async (e) => await Hhe(this.commonDir, [`remote.origin.url`], this.host, e),
+      async (e) => await readGitConfigValue(this.commonDir, [`remote.origin.url`], this.host, e),
       { length: 0, promise: !0, maxAge: i4 },
     );
   },
@@ -69233,16 +69224,6 @@ var Whe = class {
       };
     }
   };
-async function Ghe(e, t, n, r, i, a) {
-  let o = [`config`, r === `local` ? `--local` : `--worktree`, t, n],
-    s = await $(e, o, i, { signal: a });
-  return s.success || r !== `worktree`
-    ? s.success
-    : !s.stderr.toLowerCase().includes(`worktreeconfig`) ||
-        !(await $(e, [`config`, `extensions.worktreeConfig`, `true`], i, { signal: a })).success
-      ? !1
-      : (await $(e, o, i, { signal: a })).success;
-}
 var Khe = class {
     root;
     host;
@@ -69294,13 +69275,13 @@ var Khe = class {
       ((this.root = e), (this.host = t), (this.reviewSnapshotValue = new c4(this, 0)));
     }
     async getConfigValue(e, t) {
-      return Uhe(this, [e], t);
+      return getGitConfigValue(this, [e], t);
     }
     async getConfigValueForScope(e, t, n) {
       return getGitConfigValueForScope(this, e, t, n);
     }
     async setConfigValueForScope(e, t, n, r) {
-      return (await Ghe(this.root, e, t, n, this.host, r))
+      return (await setGitConfigValueForScope(this.root, e, t, n, this.host, r))
         ? (this.invalidateGitReadCachesForRepoChange(`config`), !0)
         : !1;
     }

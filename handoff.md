@@ -118,9 +118,9 @@ Worktree starting ref 的 local/remote ref 规范化、upstream ahead 选择、r
 Worktree create 的 branch/default/working-tree 起始引用选择、remote-ref 强制刷新、最长 remote
 名称匹配，以及 tracked binary diff 并行收集已迁移至
 `src/main/worker/git-worktree-starting-state.ts`；原压缩编排已删除，由 27 项断言覆盖。
-Git config scope 的 local/worktree 参数映射、query cache、缺失值与旧版 worktreeConfig 兼容，
+Git config 的普通/缓存读取、local/worktree 参数映射、缺失值兼容、worktreeConfig 自动启用重试，
 以及 worktree 删除使用的 local environment config path 直读已迁移至
-`src/main/worker/git-config-scope.ts`；原三个压缩 helper 和专用键常量已删除，由 23 项断言覆盖。
+`src/main/worker/git-config-scope.ts`；原六个压缩 helper 和专用键常量已删除，由 41 项断言覆盖。
 Managed worktree discovery 的 root/boundary 去重、无 symlink 目录读取、legacy/named 目录识别、
 候选复检与 `.git` 文件验证已迁移至 `src/main/worker/git-managed-worktree-discovery.ts`；原六个
 压缩实现已删除，平台路径转换通过窄依赖保留，由 52 项断言覆盖。
@@ -341,7 +341,7 @@ tooltip 与 region 去重非 React runtime 已迁移至
 
 | # | 位置 | 体量 | 现状 | 问题 |
 |---|---|---|---|---|
-| A1 | `.reference/originals/main/worker.ts`（git-worker） | **84,560 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
+| A1 | `.reference/originals/main/worker.ts`（git-worker） | **84,541 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |

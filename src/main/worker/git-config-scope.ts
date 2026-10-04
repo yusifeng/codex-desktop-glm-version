@@ -23,6 +23,39 @@ function scopeFlag(scope: ConfigScope) {
   return scope === `local` ? `--local` : `--worktree`;
 }
 
+async function readConfigValue(
+  root: string,
+  keys: string[],
+  host: any,
+  signal: AbortSignal | undefined,
+  dependencies: Pick<ConfigScopeDependencies, `runGit`>,
+) {
+  const result = await dependencies.runGit(root, [`config`, `--get`, ...keys], host, { signal });
+  return result.success && result.stdout ? result.stdout : null;
+}
+
+function getConfigValue(
+  repository: any,
+  keys: string[],
+  signal: AbortSignal | undefined,
+  dependencies: ConfigScopeDependencies,
+) {
+  return repository.queryClient.fetchQuery({
+    queryKey: dependencies.queryKey(repository.root, repository.host, `config-value`, keys),
+    meta: dependencies.getConfigQueryMeta(),
+    queryFn: async () => {
+      const result = await dependencies.runGit(
+        repository.root,
+        [`config`, `--get`, ...keys],
+        repository.host,
+        { signal },
+      );
+      return result.success && result.stdout ? result.stdout : null;
+    },
+    staleTime: dependencies.staleTime,
+  });
+}
+
 async function readConfigValueForScope(
   root: string,
   key: string,
@@ -103,16 +136,46 @@ function getLocalEnvironmentConfigPath(
   );
 }
 
+async function setConfigValueForScope(
+  root: string,
+  key: string,
+  value: string,
+  scope: ConfigScope,
+  host: any,
+  signal: AbortSignal | undefined,
+  dependencies: Pick<ConfigScopeDependencies, `runGit`>,
+) {
+  const args = [`config`, scopeFlag(scope), key, value];
+  const result = await dependencies.runGit(root, args, host, { signal });
+  if (result.success || scope !== `worktree`) return result.success;
+  if (!result.stderr.toLowerCase().includes(`worktreeconfig`)) return false;
+  const enable = await dependencies.runGit(
+    root,
+    [`config`, `extensions.worktreeConfig`, `true`],
+    host,
+    { signal },
+  );
+  return enable.success
+    ? (await dependencies.runGit(root, args, host, { signal })).success
+    : false;
+}
+
 export {
   LOCAL_ENVIRONMENT_CONFIG_PATH_KEY,
+  getConfigValue,
   getConfigValueForScope,
   getLocalEnvironmentConfigPath,
+  readConfigValue,
   readConfigValueForScope,
+  setConfigValueForScope,
 };
 if (typeof module !== `undefined`)
   module.exports = {
     LOCAL_ENVIRONMENT_CONFIG_PATH_KEY,
+    getConfigValue,
     getConfigValueForScope,
     getLocalEnvironmentConfigPath,
+    readConfigValue,
     readConfigValueForScope,
+    setConfigValueForScope,
   };
