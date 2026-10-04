@@ -5796,7 +5796,7 @@ function Ju(e) {
   let t = e.ownerDocument.defaultView,
     n = t?.HTMLInputElement,
     r = t?.HTMLTextAreaElement;
-  return (r != null && e instanceof r) || (n != null && e instanceof n && Yu.has(e.type));
+  return isAnnotationTextInput(e, t, Yu);
 }
 var Yu,
   Xu,
@@ -6374,6 +6374,7 @@ var { createAnnotationDocumentContext } = require("./browser-page-preload/annota
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
 var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annotation-editor-default-mode");
+var { isAnnotationTextInput } = require("./browser-page-preload/annotation-input-target");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
