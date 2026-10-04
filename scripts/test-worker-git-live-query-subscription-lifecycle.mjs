@@ -1,0 +1,32 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import * as esbuild from "esbuild";
+
+const root = path.resolve(import.meta.dirname, "..");
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-live-query-lifecycle-"));
+const out = path.join(dir, "lifecycle.cjs");
+await esbuild.build({ entryPoints: [path.join(root, "src/main/worker/git-live-query-subscription-lifecycle.ts")], outfile: out, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const lifecycle = createRequire(import.meta.url)(out);
+
+const timers = [];
+const state = { inFlight: null, refreshTimer: null, abortController: new AbortController(), refreshWaiters: [] };
+let refreshes = 0;
+assert.equal(lifecycle.scheduleGitLiveQueryRefresh(state, 0, { setTimeout() {}, refresh: () => { refreshes += 1; }, isSubscribed: () => true }), true);
+assert.equal(refreshes, 1);
+assert.equal(lifecycle.scheduleGitLiveQueryRefresh(state, 25, { setTimeout(callback, delay) { timers.push({ callback, delay }); return 1; }, refresh: () => { refreshes += 1; }, isSubscribed: () => true }), true);
+assert.equal(timers[0].delay, 25);
+timers[0].callback();
+assert.equal(refreshes, 2);
+let resolved = 0;
+state.refreshWaiters = [() => { resolved += 1; }, () => { resolved += 1; }];
+assert.equal(lifecycle.resolveGitLiveQueryRefreshWaiters(state), 2);
+assert.equal(resolved, 2);
+state.refreshTimer = 99;
+state.abortController = new AbortController();
+assert.equal(lifecycle.cancelGitLiveQuerySubscription(state, () => {}), 0);
+assert.equal(state.refreshTimer, null);
+assert.equal(state.abortController.signal.aborted, true);
+console.log("10 worker git live-query subscription lifecycle assertions passed");

@@ -7,6 +7,11 @@ import {
   getGitLiveQueryBranchDependencyKey,
 } from "./git-live-query-state";
 import { GitLiveQueryRunCoordinator } from "./git-live-query-run-coordinator";
+import {
+  cancelGitLiveQuerySubscription,
+  resolveGitLiveQueryRefreshWaiters,
+  scheduleGitLiveQueryRefresh,
+} from "./git-live-query-subscription-lifecycle";
 
 type GitLiveQueryRegistryDependencies = {
   emit: (event: any) => void;
@@ -46,10 +51,10 @@ class GitLiveQueryRegistry {
   unsubscribe(subscriptionId: any) {
     const state = this.states.get(subscriptionId);
     if (state == null) return;
-    if (state.refreshTimer != null)
-      this.dependencies.clearTimeout(state.refreshTimer);
-    state.abortController?.abort();
-    state.refreshWaiters.forEach((resolve: () => void) => resolve());
+    cancelGitLiveQuerySubscription(
+      state,
+      this.dependencies.clearTimeout,
+    );
     this.updateLocalBranchDependency(state, -1);
     this.states.delete(subscriptionId);
   }
@@ -168,16 +173,11 @@ class GitLiveQueryRegistry {
       ? this.dependencies.localRefreshDelayMs
       : 0,
   ) {
-    if (state.inFlight != null || state.refreshTimer != null) return;
-    if (delayMs === 0) {
-      this.refresh(state);
-      return;
-    }
-    state.refreshTimer = this.dependencies.setTimeout(() => {
-      state.refreshTimer = null;
-      if (this.states.get(state.subscriptionId) === state)
-        this.refresh(state);
-    }, delayMs);
+    scheduleGitLiveQueryRefresh(state, delayMs, {
+      setTimeout: this.dependencies.setTimeout,
+      refresh: () => this.refresh(state),
+      isSubscribed: () => this.states.get(state.subscriptionId) === state,
+    });
   }
 
   refresh(state: any) {
@@ -250,9 +250,7 @@ class GitLiveQueryRegistry {
         state.abortController = null;
         state.inFlight = null;
         if (state.generation === generation) {
-          const waiters = state.refreshWaiters;
-          state.refreshWaiters = [];
-          waiters.forEach((resolve: () => void) => resolve());
+          resolveGitLiveQueryRefreshWaiters(state);
         }
         if (state.dirty) {
           if (retryDelayMs != null && state.generation === generation)

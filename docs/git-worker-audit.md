@@ -976,3 +976,11 @@ Git watcher ignore-source 的 stale target 清理、路径集合更新、变更�
 `src/main/worker/git-ignore-source-watch.ts`。worker 入口继续持有 watch target、session
 副作用和路径 API，并通过窄依赖注入；`scripts/test-worker-git-ignore-source-watch.mjs`
 覆盖旧 source 更新、新 source 注册、changed-path 清理与 session start，共 5 项断言。
+### 增量抽取：Live-query subscription lifecycle
+
+live-query registry 的订阅取消、refresh timer 调度和 refresh waiter 清理已迁移至
+`src/main/worker/git-live-query-subscription-lifecycle.ts`。registry 仍保留 subscription
+map、generation/retry 状态和实际 refresh 编排；新模块只接收 timer、订阅状态与 refresh
+回调，保持取消时 abort、定时刷新以及完成时 waiter 唤醒的原有顺序。
+`scripts/test-worker-git-live-query-subscription-lifecycle.mjs` 覆盖立即刷新、延迟刷新、
+订阅取消和 waiter 清理，共 10 项断言。
