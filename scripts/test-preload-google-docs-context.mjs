@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createGoogleDocsContext, isGoogleDocsOrSheetsUrl, parseGoogleDocsUrl, parseGoogleSheetsId, readTabId } = require("../app/.vite/build/browser-page-preload/google-docs-context.js");
+assert.deepEqual(parseGoogleDocsUrl("https://docs.google.com/document/d/abc/edit?tab=t.1"), { documentId: "abc", tabId: "t.1" });
+assert.deepEqual(parseGoogleDocsUrl("https://docs.google.com/document/d/e/pub/abc"), { documentId: "abc" });
+assert.equal(readTabId(new URL("https://docs.google.com/document/d/abc/edit#tab=t.2")), "t.2");
+assert.equal(parseGoogleDocsUrl("https://example.com/document/d/abc"), null);
+assert.equal(parseGoogleSheetsId("https://docs.google.com/spreadsheets/d/sheet123/edit"), "sheet123");
+assert.equal(isGoogleDocsOrSheetsUrl("https://docs.google.com/spreadsheets/d/sheet123/edit"), true);
+assert.equal(isGoogleDocsOrSheetsUrl("not a url"), false);
+assert.deepEqual(createGoogleDocsContext({ pageUrl: "https://docs.google.com/document/d/abc", documentTitle: "  Hello\nworld ", selectedText: " a  b ", visibleText: "" }), { provider: "google-docs", kind: "google-docs", documentId: "abc", tabId: undefined, documentTitle: "Hello world", selectedText: "a b", visibleText: undefined });
+assert.equal(createGoogleDocsContext({ pageUrl: "https://example.com" }), undefined);
+console.log("9 preload Google Docs context assertions passed");

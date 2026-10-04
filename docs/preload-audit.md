@@ -177,6 +177,14 @@ Annotation overlay 的 HTTP(S) loopback/`.localhost` URL 判定已迁移至
 
 Annotation region drag 的 viewport 判定、drag threshold、双点 rect 与状态推进已迁移至
 `annotation-surface-geometry.ts`；原全局 `Is/Ls/Rs` 与 UI 尾部 `ab/ob/sb/cb` 已删除。
+### 增量抽取：Google Docs context helpers
+
+Google Docs/Sheets URL 识别、文档/表格 ID 与 tab 参数解析、标题/选中文本规范化，
+以及 document context payload 组装（原 3966-4021、5162-5184）已迁移至
+`src/main/browser-page-preload/google-docs-context.ts`。入口保留 `hs/gs/_s/vs/ys/bs`
+兼容别名并委托 helper；9 项行为断言覆盖普通/发布 URL、query/hash tab、跨域拒绝、
+Sheets ID 和 context 文本规范化。
+
 ### 增量抽取：annotation surface element boundary
 
 annotation surface 注册与 MutationObserver 清理共用的顶层元素判定已迁移为

@@ -3964,61 +3964,22 @@ function ms(e, t) {
   }
 }
 function hs(e) {
-  let t;
-  try {
-    t = new URL(e);
-  } catch {
-    return null;
-  }
-  if (t.hostname !== `docs.google.com`) return null;
-  let n = t.pathname.split(`/`).filter((e) => e.length > 0),
-    r = n.indexOf(`document`),
-    i = r === -1 ? -1 : n.indexOf(`d`, r + 1),
-    a = i === -1 ? void 0 : n[i + 1],
-    o = a === `e` && n[i + 3] === `pub` ? n[i + 2] : a;
-  return o == null || o.length === 0 ? null : { documentId: o, tabId: ys(t) ?? void 0 };
+  return parseGoogleDocsUrlHelper(e);
 }
 function gs(e) {
-  return hs(e) != null || _s(e) != null;
+  return isGoogleDocsOrSheetsUrlHelper(e);
 }
 function _s(e) {
-  let t;
-  try {
-    t = new URL(e);
-  } catch {
-    return null;
-  }
-  if (t.hostname !== `docs.google.com`) return null;
-  let n = t.pathname.split(`/`).filter((e) => e.length > 0),
-    r = n.indexOf(`spreadsheets`),
-    i = r === -1 ? -1 : n.indexOf(`d`, r + 1);
-  return i === -1 ? null : (n[i + 1] ?? null);
+  return parseGoogleSheetsIdHelper(e);
 }
 function vs({ documentTitle: e, pageUrl: t, selectedText: n, visibleText: r }) {
-  let i = hs(t);
-  if (i == null) return;
-  let a = bs(e),
-    o = bs(n),
-    s = bs(r);
-  return {
-    provider: `google-docs`,
-    kind: `google-docs`,
-    documentId: i.documentId,
-    tabId: i.tabId,
-    documentTitle: a,
-    selectedText: o,
-    visibleText: s,
-  };
+  return createGoogleDocsContextHelper({ documentTitle: e, pageUrl: t, selectedText: n, visibleText: r });
 }
 function ys(e) {
-  let t = bs(e.searchParams.get(`tab`));
-  if (t != null) return t;
-  let n = e.hash.startsWith(`#`) ? e.hash.slice(1) : e.hash;
-  return bs(new URLSearchParams(n).get(`tab`)) ?? null;
+  return readTabIdHelper(e);
 }
 function bs(e) {
-  let t = e?.replace(/\s+/g, ` `).trim();
-  return t == null || t.length === 0 ? void 0 : t;
+  return normalizeGoogleDocsText(e);
 }
 function xs(e) {
   return e == null || e <= 0 ? 1 : 1 / e;
@@ -6431,6 +6392,7 @@ var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
+var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
