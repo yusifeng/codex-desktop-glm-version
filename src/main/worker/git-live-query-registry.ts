@@ -14,6 +14,11 @@ import {
 } from "./git-live-query-subscription-lifecycle";
 import { refreshGitLiveQuery } from "./git-live-query-refresh";
 import { planGitLiveQueryRefresh } from "./git-live-query-refresh-plan";
+import {
+  selectGitLiveQueriesForRepoChange,
+  selectGitLiveQueriesForRecovery,
+  selectGitLiveQueriesForRepository,
+} from "./git-live-query-selection-policy";
 
 type GitLiveQueryRegistryDependencies = {
   emit: (event: any) => void;
@@ -75,12 +80,8 @@ class GitLiveQueryRegistry {
   }
 
   handleRepoChanged(event: any, onFanout?: (count: number) => void) {
-    const states = [...this.states.values()].filter(
-      (state) =>
-        state.host.id === event.hostId &&
-        state.commonDir === event.commonDir &&
-        state.root === event.root &&
-        shouldRefreshLiveQuery(state.query, event.changeType),
+    const states = selectGitLiveQueriesForRepoChange(
+      [...this.states.values()], event, shouldRefreshLiveQuery,
     );
     onFanout?.(states.length);
     return this.refreshStates(states, `invalidation`, event.trace);
@@ -105,13 +106,8 @@ class GitLiveQueryRegistry {
   }
 
   recover(params: any) {
-    const subscriptionIds = new Set(params.subscriptionIds);
-    const states = [...this.states.values()].filter(
-      (state) =>
-        subscriptionIds.has(state.subscriptionId) &&
-        state.host.id === params.hostId &&
-        (params.root == null || state.root === params.root) &&
-        state.requiresRecovery,
+    const states = selectGitLiveQueriesForRecovery(
+      [...this.states.values()], params,
     );
     const repositories = new Map<string, any>();
     for (const state of states)
@@ -127,9 +123,7 @@ class GitLiveQueryRegistry {
 
   refreshRepository(hostId: string, root: string) {
     return this.refreshStates(
-      [...this.states.values()].filter(
-        (state) => state.host.id === hostId && state.root === root,
-      ),
+      selectGitLiveQueriesForRepository([...this.states.values()], hostId, root),
       `mutation`,
       this.dependencies.getActiveTrace() ?? undefined,
     );
