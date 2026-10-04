@@ -1,0 +1,44 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+
+const root = path.resolve(import.meta.dirname, "..");
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-worktree-lifecycle-"));
+const out = path.join(dir, "lifecycle.cjs");
+await esbuild.build({ entryPoints: [path.join(root, "src/main/worker/git-worktree-lifecycle.ts")], outfile: out, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { createWorktreeLifecycle } = createRequire(import.meta.url)(out);
+const state = { deletePromises: new Map(), restorePromises: new Map(), hostKey: (host) => host.id };
+const lifecycle = createWorktreeLifecycle(state);
+const host = { id: "local" };
+const params = { worktree: "/repo/wt" };
+let release;
+const gate = new Promise((resolve) => { release = resolve; });
+let runs = 0;
+const first = lifecycle.scheduleDelete(params, host, async () => { runs += 1; await gate; return "deleted"; });
+const second = lifecycle.scheduleDelete(params, host, async () => { runs += 1; return "other"; });
+release();
+assert.equal(await first, "deleted");
+assert.equal(await second, "deleted");
+assert.equal(runs, 1);
+assert.equal(state.deletePromises.size, 0);
+assert.equal(await lifecycle.scheduleDelete(params, { id: "remote" }, async () => "remote-delete"), "remote-delete");
+
+let restoreRuns = 0;
+let restoreRelease;
+const restoreGate = new Promise((resolve) => { restoreRelease = resolve; });
+const restore = lifecycle.scheduleRestore("/repo", "/repo/wt", "/repo", host, new AbortController().signal, async () => { restoreRuns += 1; await restoreGate; return true; });
+const queued = lifecycle.scheduleRestore("/repo", "/repo/wt", "/repo", host, new AbortController().signal, async () => { restoreRuns += 1; return false; });
+restoreRelease();
+assert.equal(await restore, true);
+assert.equal(await queued, false);
+assert.equal(restoreRuns, 2);
+assert.equal(state.restorePromises.size, 0);
+
+let rejectedRuns = 0;
+await assert.rejects(lifecycle.scheduleRestore("/repo", "/repo/err", "/repo", host, new AbortController().signal, async () => { rejectedRuns += 1; throw new Error("boom"); }), /boom/);
+assert.equal(await lifecycle.scheduleRestore("/repo", "/repo/err", "/repo", host, new AbortController().signal, async () => { rejectedRuns += 1; return true; }), true);
+assert.equal(rejectedRuns, 2);
+console.log("12 worker git worktree lifecycle assertions passed");

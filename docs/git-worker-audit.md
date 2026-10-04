@@ -798,3 +798,9 @@ Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令�
 `src/main/worker/git-worktree-create-request.ts`。入口 class 的 `handleCreateWorktree` 实现已删除，
 请求 dispatcher 只注入现有 create runtime、host、signal、emit 与 controller registry；24 项 focused
 断言覆盖默认/显式 synced-branch 选项、事件字段、失败映射和并发 controller 替换边界。
+
+### 增量抽取：Worktree lifecycle scheduling
+
+Worktree 删除/恢复的 host+path 去重、删除 promise 清理，以及恢复操作的串行排队与失败后继续策略已迁移至
+`src/main/worker/git-worktree-lifecycle.ts`。入口保留实际 snapshot/delete/restore 副作用，只注入运行回调；
+12 项 focused 断言覆盖同 key 复用、跨 host 隔离、restore 排队、失败恢复和 map cleanup。

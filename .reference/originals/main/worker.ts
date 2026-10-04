@@ -14,6 +14,7 @@ const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = require("./worker/git-apply-patch");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
 const { createWorktreeRequest } = require("./worker/git-worktree-create-request");
+const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
 const { restoreHandoffBranchAndStash, restoreHandoffSource, rollbackHostHandoffWorktree } = require("./worker/git-handoff-rollback");
@@ -69514,6 +69515,11 @@ var I6 = kW(`git`),
     uncancelableRequestIds = new Set();
     worktreeDeletePromises = new Map();
     worktreeRestorePromises = new Map();
+    worktreeLifecycle = createWorktreeLifecycle({
+      deletePromises: this.worktreeDeletePromises,
+      restorePromises: this.worktreeRestorePromises,
+      hostKey: h1,
+    });
     constructor(e, t, n) {
       (super(e),
         (this.gitManager = t),
@@ -69784,8 +69790,11 @@ var I6 = kW(`git`),
           signal: i.signal,
           emit: (event) => this.emit(event),
           scheduleRestore: (repoRoot, worktreePath, cwd, host, signal) =>
-            this.scheduleWorktreeRestore(repoRoot, worktreePath, cwd, host, signal),
-          scheduleDelete: (params, host) => this.scheduleWorktreeDelete(params, host),
+            this.worktreeLifecycle.scheduleRestore(repoRoot, worktreePath, cwd, host, signal, () =>
+              Cge(repoRoot, worktreePath, cwd, host, signal),
+            ),
+          scheduleDelete: (params, host) =>
+            this.worktreeLifecycle.scheduleDelete(params, host, () => this.deleteWorktreeWithLimit(params, host)),
           unwatchRepository: (worktreePath, host) => this.unwatchRepo(worktreePath, host),
           normalizeWorktreePath: bz,
           setOwnerThread: m4,
@@ -70325,30 +70334,6 @@ var I6 = kW(`git`),
         }),
         n
       );
-    }
-    async scheduleWorktreeDelete(e, t) {
-      let n = `${h1(t)}|${e.worktree}`,
-        r = this.worktreeDeletePromises.get(n);
-      if (r) return r;
-      let i = this.deleteWorktreeWithLimit(e, t);
-      this.worktreeDeletePromises.set(n, i);
-      try {
-        return await i;
-      } finally {
-        this.worktreeDeletePromises.delete(n);
-      }
-    }
-    async scheduleWorktreeRestore(e, t, n, r, i) {
-      let a = `${h1(r)}|${t}`,
-        o = (this.worktreeRestorePromises.get(a) ?? Promise.resolve(!0))
-          .catch(() => !0)
-          .then(() => Cge(e, t, n, r, i));
-      this.worktreeRestorePromises.set(a, o);
-      try {
-        return await o;
-      } finally {
-        this.worktreeRestorePromises.get(a) === o && this.worktreeRestorePromises.delete(a);
-      }
     }
     async handleResolveStableMetadata(e, { host: t }) {
       let n = await this.gitManager.getStableMetadata(e.cwd, t);
