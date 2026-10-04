@@ -667,6 +667,14 @@ remote/upstream 候选生成、稳定去重、ref 验证与 direct fallback 已�
 `src/main/worker/git-merge-base.ts`。原 `X2`/`vhe`/`Z2`/`yhe`/`Q2` 已删除；review、
 branch-ahead 和 read-request 消费者改用语义入口，由 35 项独立模块断言覆盖。
 
+### 增量抽取：Branch creation
+
+Local branch existence、commit tree query、普通分支创建、unborn HEAD fallback，以及 synced/worktree
+两种 create-branch 编排已迁移至 `src/main/worker/git-branch-create.ts`。原 `O2`/`A2`/`r4`/`Ihe`/
+`Lhe` 已删除；worktree tracking、worktree create、handoff/snapshot 与 read-request 消费者共用语义
+入口。模块保留单层 `refs/heads/` 规范化、250ms tree cache、start-point fallback 门控与原错误映射，
+由 62 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

@@ -22,6 +22,7 @@ const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-mo
 const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/git-move-to-worktree");
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { getBranchAheadCount } = require("./worker/git-branch-ahead");
+const { branchExists: gitBranchExistsQuery, createBranch: createGitBranchQuery, getCommitTree: getGitCommitTreeQuery } = require("./worker/git-branch-create");
 const { compareGitBranches: compareGitBranchesQuery } = require("./worker/git-branch-comparison");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
 const { blameFile: getGitBlameFile } = require("./worker/git-blame-file");
@@ -480,7 +481,8 @@ const hostHandoffDeps = {
   inspectBranch: (params) => inspectHandoffBranch(params, handoffBranchDeps),
   getIndexTree: (repository, options) => x4(repository, options),
   getUntrackedPaths: (repository) => f2(repository),
-  getCommitTree: (repository, commitSha, signal) => A2(repository, commitSha, signal),
+  getCommitTree: (repository, commitSha, signal) =>
+    getGitCommitTree(repository, commitSha, signal),
   createSnapshotCommit: (gitRoot, treeSha, host, options) =>
     _4(gitRoot, treeSha, host, options),
   hasCommit: (gitRoot, commitSha, host, signal) =>
@@ -567,6 +569,21 @@ const resolveSyncedBranchConfigPath = (repository, signal) =>
   resolveSyncedBranchConfigPathQuery(repository, signal, syncedBranchConfigDeps);
 const setSyncedBranchConfig = (repository, branch, treeRef, signal) =>
   setSyncedBranchConfigQuery(repository, branch, treeRef, signal, syncedBranchConfigDeps);
+const gitBranchCreateDeps = {
+  formatExecOutput: mR,
+  formatLocalBranchRef,
+  getQueryMeta: () => _1,
+  normalizeCwd: xz,
+  queryKey: Q,
+  runGit: $,
+  setSyncedBranchConfig,
+};
+const gitBranchExists = (root, branch, host, signal) =>
+  gitBranchExistsQuery(root, branch, host, signal, gitBranchCreateDeps);
+const getGitCommitTree = (repository, ref, signal) =>
+  getGitCommitTreeQuery(repository, ref, signal, gitBranchCreateDeps);
+const createGitBranchRequest = (params, gitManager, host, signal) =>
+  createGitBranchQuery(params, gitManager, host, signal, gitBranchCreateDeps);
 const worktreeShellEnvironmentDeps = {
   logger: {
     warning: (message, detail) =>
@@ -584,7 +601,7 @@ const writeWorktreeShellEnvironment = (repository, value, signal) =>
 const worktreeBranchTrackingDeps = {
   getCurrentBranch: (repository) => getCurrentGitBranch(repository),
   getOrderedRemotes: (repository) => getOrderedGitRemotes(repository),
-  localBranchExists: (root, branch, host, signal) => O2(root, branch, host, signal),
+  localBranchExists: gitBranchExists,
   logger: {
     warning: (message, detail) => kW(`git`)().warning(message, detail),
   },
@@ -657,7 +674,7 @@ const worktreeCreateDeps = {
   findWorktreeIncludeFiles: (root, host) =>
     findWorktreeIncludeFiles(root, host, gitWorktreeCopyDependencies),
   formatLocalBranchRef,
-  getCommitTree: (repository, ref, signal) => A2(repository, ref, signal),
+  getCommitTree: getGitCommitTree,
   getDefaultRemoteBranch: getDefaultGitRemoteBranch,
   normalizeCwd: xz,
   normalizeRoot: bz,
@@ -67574,26 +67591,6 @@ async function Mme(e, { host: t, signal: n }) {
     return !1;
   }
 }
-async function O2(e, t, n, r) {
-  let i = await $(e, [`show-ref`, `--verify`, `--quiet`, formatLocalBranchRef(t)], n, { signal: r });
-  return i.success && i.code === 0;
-}
-function A2(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `tree`, t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: async () => {
-      let r = await $(e.root, [`rev-parse`, `${t}^{tree}`], e.host, {
-        allowedNonZeroExitCodes: [128],
-        signal: n,
-      });
-      if (!r.success || !r.stdout) throw Error(r.stderr || r.stdout || `Failed to resolve tree`);
-      return r.stdout;
-    },
-    staleTime: 250,
-  });
-}
 var Jme = K({ branch: H(), lastSyncedTreeRef: H() });
 var $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
 async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, signal: a } = {}) {
@@ -67610,74 +67607,6 @@ async function t4(e, t, n, { onCheckoutStatusChange: r, onStashStatusChange: i, 
     { onCheckoutStatusChange: r, onStashStatusChange: i },
   );
   return o;
-}
-async function r4(e, t, n, r, i, a) {
-  let o = formatLocalBranchRef(t);
-  if (await O2(e, t, n, a))
-    return r
-      ? { success: !1, reason: `already-exists`, error: `Branch already exists` }
-      : { success: !0, branchRef: o };
-  let s = await $(e, [`branch`, `--`, t, ...(i == null ? [] : [i])], n, { signal: a });
-  if (s.success) return { success: !0, branchRef: o };
-  let c = s.stderr || s.stdout || `Failed to create branch`;
-  return {
-    success: !1,
-    reason: `create-failed`,
-    error: c,
-    execOutput: mR({ command: s.command, stdout: s.stdout, stderr: s.stderr, fallbackOutput: c }),
-  };
-}
-async function Ihe(e, t, n, r) {
-  if ((await $(e, [`rev-parse`, `--verify`, `HEAD`], n, { signal: r })).success) return null;
-  let i = await $(e, [`switch`, `-c`, t], n, { signal: r });
-  if (i.success) return { success: !0 };
-  let a = i.stderr || i.stdout || `Failed to create branch`;
-  return {
-    success: !1,
-    error: a,
-    execOutput: mR({ command: i.command, stdout: i.stdout, stderr: i.stderr, fallbackOutput: a }),
-  };
-}
-async function Lhe({ cwd: e, branch: t, mode: n, failIfExists: r = !1, startPoint: i }, a, o, s) {
-  let c = e.trim();
-  if (!c) return { status: `error`, error: `No workspace available for branch creation` };
-  let l = t.trim(),
-    u = l.startsWith(`refs/heads/`) ? l.slice(11) : l;
-  if (!u) return { status: `error`, error: `Branch name is required` };
-  if (u.startsWith(`refs/heads/`) || u.startsWith(`refs/remotes/`) || u.startsWith(`refs/tags/`))
-    return { status: `error`, error: `Only local branches can be created` };
-  try {
-    switch (n) {
-      case `synced`: {
-        let e = await a.getWorktreeRepository(xz(c), o),
-          t = e?.root;
-        if (!t) return { status: `error`, error: `No git repository found for branch creation` };
-        let n = await r4(t, u, o, r, i, s);
-        if (!n.success) return { status: `error`, error: n.error, execOutput: n.execOutput };
-        let l = n.branchRef;
-        return (
-          await setSyncedBranchConfig(e, l, await A2(e, l, s), s),
-          { status: `success`, branch: u }
-        );
-      }
-      case `worktree`: {
-        let e = await r4(c, u, o, r, i, s);
-        if (!e.success) {
-          if (e.reason === `already-exists` || i != null)
-            return { status: `error`, error: e.error, execOutput: e.execOutput };
-          let t = await Ihe(c, u, o, s);
-          return t?.success
-            ? { status: `success`, branch: u }
-            : t == null
-              ? { status: `error`, error: e.error, execOutput: e.execOutput }
-              : { status: `error`, error: t.error, execOutput: t.execOutput };
-        }
-        return { status: `success`, branch: u };
-      }
-    }
-  } catch (e) {
-    return { status: `error`, error: e instanceof Error ? e.message : String(e) };
-  }
 }
 var i4 = 864e5;
 var Whe = class {
@@ -68335,7 +68264,7 @@ async function x4(e, t) {
   if (t.fresh === !0) return C4(e, t);
   let n = await yge(e, t);
   if (n !== `HEAD`) return n;
-  let r = (await A2(e, n, t.signal)).trim();
+  let r = (await getGitCommitTree(e, n, t.signal)).trim();
   if (!isGitObjectId(r)) throw Error(`Unexpected tree SHA: ${r}`);
   return Cz(r);
 }
@@ -68485,7 +68414,7 @@ async function Sge(e, t, n, r, i) {
     u = await resolveGitRefSha(o, `HEAD`, i),
     d = u;
   if (u) {
-    if ((await A2(o, u, i)).trim() !== l) {
+    if ((await getGitCommitTree(o, u, i)).trim() !== l) {
       let e = await _4(a.root, l, n, { parentSha: u, message: N4(r), signal: i });
       if (!e.success) throw Error(`Failed to create synthetic commit`);
       d = e.commitSha.trim();
@@ -70136,8 +70065,8 @@ var I6 = kW(`git`),
           getDefaultBranch: (root, host, signal) => this.getDefaultBranch(root, host, signal),
           getBaseBranch: (root, host) => this.getBaseBranch(root, host),
           getRecentBranches: (params, args) => this.handleRecentBranches(params, args),
-          branchExists: O2,
-          createBranch: Lhe,
+          branchExists: gitBranchExists,
+          createBranch: createGitBranchRequest,
           resolveStartingRef: resolveGitWorktreeStartingRef,
           getBranchCommits: (repository, baseBranch, signal) =>
             getGitBranchCommits(
