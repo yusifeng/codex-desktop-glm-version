@@ -95,6 +95,7 @@ const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchStat
 const { SYNCED_BRANCH_CONFIG_FILE, readSyncedBranchConfig: readSyncedBranchConfigQuery, resolveSyncedBranchConfigPath: resolveSyncedBranchConfigPathQuery, setSyncedBranchConfig: setSyncedBranchConfigQuery } = require("./worker/git-synced-branch-config");
 const { dispatchTurnDiffRequest } = require("./worker/git-turn-diff-request-dispatch");
 const { releaseGitRepoWatch } = require("./worker/git-watch-lifecycle");
+const { closeGitRepoWatch } = require("./worker/git-watch-close");
 const { scheduleGitWatchSetup } = require("./worker/git-watch-setup");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
@@ -70886,34 +70887,16 @@ var I6 = kW(`git`),
       });
     }
     closeRepoWatch(e, t, n = !0) {
-      if (e.closingPromise != null) return e.closingPromise;
-      let r = this.getWatchKey(e.root, t);
-      if (((e.isReady = !1), this.watchesByKey.get(r) === e)) {
-        let n = this.gitManager.getWorktreeRepositoryForRoot(e.root, t);
-        (p2(n), n.clearGitReadCaches());
-      }
-      return (
-        (e.closingPromise = Promise.resolve()
-          .then(() => e.watcher.dispose())
-          .catch((e) => {
-            I6().warning(`Failed to close git repo watch`, { safe: {}, sensitive: { error: e } });
-          })
-          .then(() => {
-            this.watchesByKey.get(r) === e &&
-              (this.watchesByKey.delete(r),
-              n &&
-                this.emit({
-                  type: `worker-event`,
-                  event: {
-                    type: `git-repo-unwatched`,
-                    commonDir: e.commonDir,
-                    hostId: t.id,
-                    root: e.root,
-                  },
-                }));
-          })),
-        e.closingPromise
-      );
+      return closeGitRepoWatch(e, t, n, {
+        getWatchKey: (root, host) => this.getWatchKey(root, host),
+        getCurrentWatch: (key) => this.watchesByKey.get(key),
+        getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
+        invalidateRepository: (repository) => p2(repository),
+        clearRepositoryCaches: (repository) => repository.clearGitReadCaches(),
+        removeWatch: (key) => this.watchesByKey.delete(key),
+        emit: (event) => this.emit(event),
+        logger: I6(),
+      });
     }
     handleCancel(e) {
       this.requestLifecycle.cancel(e);

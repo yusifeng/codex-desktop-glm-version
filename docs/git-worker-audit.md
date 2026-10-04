@@ -1029,6 +1029,11 @@ origin-query 清理已迁移至 `src/main/worker/git-watch-setup.ts`；入口仅
 启动、repository cache 与 close 副作用，由 `scripts/test-worker-git-watch-setup.mjs` 覆盖 11 项
 生命周期断言。watcher 本身和 worker host 绑定仍保留在入口。
 
+Git repository watcher 的 close 副作用（幂等 closing promise、repository cache invalidation、
+watcher dispose、registry removal 与 `git-repo-unwatched` envelope）已迁移至
+`src/main/worker/git-watch-close.ts`；入口仅注入 host、repository/cache 与 logger 适配，
+由 `scripts/test-worker-git-watch-close.mjs` 覆盖 8 项生命周期断言。
+
 ### 增量抽取：Live-query subscription setup boundary
 
 live-query 订阅前的 repository metadata 查询、pending-metadata trace 关联、watcher 复用/启动

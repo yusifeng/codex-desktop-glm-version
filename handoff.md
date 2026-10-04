@@ -11,7 +11,11 @@
 
 ## 当前进度快照（2026-10-04）
 
-最新增量：live-query refresh generation 的 dirty/trigger/retry 重置、generation 分配、trace
+最新增量：Git watcher close 的幂等 dispose、cache invalidation、registry removal 与 unwatched
+事件 envelope 已迁移至 `src/main/worker/git-watch-close.ts`；入口仅保留 host/repository
+适配，由 `scripts/test-worker-git-watch-close.mjs` 覆盖 8 项生命周期断言。
+
+live-query refresh generation 的 dirty/trigger/retry 重置、generation 分配、trace
 合并与 completion waiter 注册已迁移至 `src/main/worker/git-live-query-refresh-plan.ts`；registry
 仅负责对选中 subscription 调用计划并安排 timer，由
 `scripts/test-worker-git-live-query-refresh-plan.mjs` 覆盖 9 项行为断言。
@@ -496,7 +500,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 879 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 880 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
