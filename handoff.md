@@ -623,6 +623,9 @@ GitHub exact-revision review 的 diff/file handlers 已迁移至
 worker 子进程环境清洗已抽取为 `src/main/worker/platform-env.ts`，统一过滤
 Crashpad/Electron 注入变量并保持大小写不敏感、非变异语义，由
 `scripts/test-worker-platform-env.mjs` 的 6 项断言覆盖；平台命令执行和环境合并副作用仍留在入口。
+worker open-in target 的平台描述符合并、跨平台 target 构造与 editor SSH 能力矩阵已迁移至
+`src/main/worker/open-in-target-descriptors.ts`；原 `t9` 已删除，`n9/r9` 仅保留薄委托，
+由 12 项 focused assertions 覆盖字段覆盖、缺失平台、hidden、默认参数与 Linux open 绑定。
 worktree 缓存失效的 host-aware 路径包含判定已抽取为 `src/main/worker/git-path-containment.ts`，
 入口 `FZ` 保留兼容委托，由 5 项行为断言覆盖 local/remote 路径与边界。
 桌面 prompt context 包裹与可选 instruction section 拼接已抽取为 `src/main/worker/prompt-context-format.ts`，
@@ -639,6 +642,9 @@ Linux terminal 参数策略已抽取为 `src/main/worker/linux-terminal-args.ts`
 Annotation text input target 的 `HTMLInputElement` 类型白名单与 textarea 判定已抽取为
 `src/main/browser-page-preload/annotation-input-target.ts`，入口 `Ju` 保留兼容委托；由
 `scripts/test-preload-annotation-input-target.mjs` 覆盖 6 项行为断言。
+Annotation overlay 的条件 class-name 归一化/拼接（原 `cv/lv`）已抽取为
+`src/main/browser-page-preload/annotation-class-names.ts`，两个 cursor 组件改用语义入口，
+原压缩 helper 已物理删除；由 9 项行为断言覆盖递归数组、对象 map 与 falsey 过滤。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。

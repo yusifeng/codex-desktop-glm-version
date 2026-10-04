@@ -741,6 +741,12 @@ GitHub pull request summary 的按账号批量去重、50ms debounce、最多 60
 及带行列号的远程参数已迁移至 `src/main/worker/editor-open-args.ts`。入口继续负责编辑器探测、
 进程启动和 remote-control 拒绝；纯参数构造由 9 项独立断言覆盖。
 
+Open-in target 的平台描述符合并、跨平台 target 构造与 editor SSH 能力矩阵已进一步迁移至
+`src/main/worker/open-in-target-descriptors.ts`。原 `t9` 实现已删除，`n9`/`r9` 仅保留
+对语义工厂的薄委托；编辑器探测、Linux `.desktop` 启动与进程副作用仍留在入口。
+`scripts/test-worker-open-in-target-descriptors.mjs` 以 12 项断言覆盖字段覆盖优先级、缺失平台、
+hidden 继承、SSH 标记、默认参数及 Linux open 回调绑定。
+
 GitHub exact-revision review 的 diff/file handlers（`eSe`/`tSe`）已迁移至
 `src/main/worker/github-pull-request-revision.ts`：SHA/path 校验、账号校验、diff API、
 base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的双并发 semaphore 均由

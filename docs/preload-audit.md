@@ -219,6 +219,11 @@ Annotation surface IPC event dispatch/response-event 判定（原 `Xg` 22415-224
 
 Annotation editor default-mode meta lookup（原 `Iy` 24484-24492）已迁移至 `src/main/browser-page-preload/annotation-editor-default-mode.ts`，保留 meta selector、允许值过滤及缺失 head/content 的安全回退；由 `scripts/test-preload-annotation-editor-default-mode.mjs` 覆盖 3 项断言。
 
+Annotation overlay 的条件 class-name 归一化与拼接（原 `cv/lv` 23340-23356）已迁移至
+`src/main/browser-page-preload/annotation-class-names.ts`；两个 cursor 组件改用语义入口，
+原压缩 helper 已物理删除。`scripts/test-preload-annotation-class-names.mjs` 以 9 项断言覆盖
+字符串/数字、递归数组、对象 map、falsey 过滤、非支持 primitive 与原有 `for-in` 语义。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）
