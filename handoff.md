@@ -601,7 +601,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 899 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 900 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5，已完成）
@@ -933,3 +933,7 @@ Git-init metadata watcher 失败后的 stat/recovery 判定已迁移至
 Worktree create 的本地环境 setup 生命周期（环境读取、setup failure policy、shell environment
 写回/清理与稳定日志）已迁移至 `src/main/worker/git-worktree-setup.ts`；create 入口仅保留
 路径/checkout 编排与兼容适配，由 `scripts/test-worker-git-worktree-setup.mjs` 覆盖 9 项断言。
+Annotation marker/draft/comment view-state 的 additional-anchor 投影已统一迁移至
+`src/main/browser-page-preload/annotation-additional-anchor-projection.ts`；marker runtime
+不再在三条投影路径内重复处理 viewport/projector 回退，由
+`scripts/test-preload-annotation-additional-anchor-projection.mjs` 覆盖 5 项 focused assertions。
