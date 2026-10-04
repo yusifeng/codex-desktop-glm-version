@@ -686,6 +686,9 @@ assertions 覆盖，`overwrite-repo` 的 `refreshRoot` 副作用仍由入口处�
 Cache/watch family 已新增 `src/main/worker/git-cache-watch-dispatch.ts`，将稳定 metadata/read
 cache 失效、init-watch dispose、watch/subscribe/recover/unwatch 与 git-init 共 8 个分支接入
 dispatcher；入口继续保留 trace、依赖构造、结果包装与生命周期副作用。
+Git apply mutation family 已新增 `src/main/worker/git-apply-dispatch.ts`，将 `apply-changes`、
+`apply-patch` 与 `apply-review-section-changes` 接入 dispatcher；由 4 项 focused assertions
+覆盖，入口继续保留 refreshRoot、缓存刷新、性能追踪和结果包装。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
