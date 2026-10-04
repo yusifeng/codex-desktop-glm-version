@@ -9,9 +9,9 @@ import {
 import { GitLiveQueryRunCoordinator } from "./git-live-query-run-coordinator";
 import {
   cancelGitLiveQuerySubscription,
-  resolveGitLiveQueryRefreshWaiters,
   scheduleGitLiveQueryRefresh,
 } from "./git-live-query-subscription-lifecycle";
+import { refreshGitLiveQuery } from "./git-live-query-refresh";
 
 type GitLiveQueryRegistryDependencies = {
   emit: (event: any) => void;
@@ -181,83 +181,21 @@ class GitLiveQueryRegistry {
   }
 
   refresh(state: any) {
-    if (state.inFlight != null || !state.dirty) return;
-    const generation = state.generation;
-    const abortController = new AbortController();
-    let retryDelayMs = null;
-    const trace = state.trace;
-    const traceLinks = state.traceLinks;
-    state.trace = undefined;
-    state.traceLinks = [];
-    state.abortController = abortController;
-    state.dirty = false;
-    state.inFlight = Promise.resolve()
-      .then(() =>
-        this.runShared(
-          state,
-          abortController.signal,
-          trace,
-          traceLinks,
-          (result) => {
-            if (this.isCurrent(state, generation))
-              this.publish(
-                state,
-                generation,
-                { ...result, phase: `tracked` },
-                trace,
-              );
-          },
-        ),
-      )
-      .then((result) => {
-        if (!this.isCurrent(state, generation)) return;
-        this.publish(
-          state,
-          generation,
-          { ...result, phase: `complete` },
-          trace,
-        );
-        const shouldRetry =
-          (result.method === `review-summary` ||
-            result.method === `status-summary`) &&
-          result.result.type === `error`;
-        if (
-          shouldRetry &&
-          state.errorRetryCount < this.dependencies.maxErrorRetries
-        ) {
-          state.errorRetryCount += 1;
-          state.dirty = true;
-          mergeLiveQueryTrace(state, trace);
-          traceLinks.forEach((link: any) =>
-            mergeLiveQueryTrace(state, link),
-          );
-          retryDelayMs = this.dependencies.errorRetryDelayMs;
-        } else if (!shouldRetry) state.errorRetryCount = 0;
-      })
-      .catch(() => {
-        if (this.isCurrent(state, generation))
-          this.dependencies.emit({
-            type: `git-live-query-failed`,
-            emittedAtMs: this.dependencies.now(),
-            generation,
-            method: state.query.method,
-            subscriptionId: state.subscriptionId,
-            ...(trace == null ? {} : { trace }),
-          });
-      })
-      .finally(() => {
-        if (this.states.get(state.subscriptionId) !== state) return;
-        state.abortController = null;
-        state.inFlight = null;
-        if (state.generation === generation) {
-          resolveGitLiveQueryRefreshWaiters(state);
-        }
-        if (state.dirty) {
-          if (retryDelayMs != null && state.generation === generation)
-            state.generation = this.nextGeneration++;
-          this.scheduleRefresh(state, retryDelayMs ?? undefined);
-        }
-      });
+    return refreshGitLiveQuery(state, {
+      runShared: (currentState, signal, trace, traceLinks, onTracked) =>
+        this.runShared(currentState, signal, trace, traceLinks, onTracked),
+      isCurrent: (currentState, generation) => this.isCurrent(currentState, generation),
+      publish: (currentState, generation, result, trace) =>
+        this.publish(currentState, generation, result, trace),
+      emit: this.dependencies.emit,
+      now: this.dependencies.now,
+      scheduleRefresh: (currentState, delayMs) =>
+        this.scheduleRefresh(currentState, delayMs),
+      mergeTrace: mergeLiveQueryTrace,
+      nextGeneration: () => this.nextGeneration++,
+      errorRetryDelayMs: this.dependencies.errorRetryDelayMs,
+      maxErrorRetries: this.dependencies.maxErrorRetries,
+    });
   }
 
   runShared(

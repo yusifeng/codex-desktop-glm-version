@@ -990,3 +990,8 @@ Git 文件内容读取的 repository-relative path 校验、HEAD/index ref 选�
 接收 repository lookup、platform path、Git 执行与 MIME 检测；调用方仍负责 Node worker
 host 绑定和响应 envelope。`scripts/test-worker-git-file-content.mjs` 覆盖 HEAD ref、路径越界、
 空内容及 MIME 结果，共 4 项断言。
+
+Live-query 单次 generation 的 abort、tracked/complete 发布、错误重试与 waiter 清理已迁移至
+`src/main/worker/git-live-query-refresh.ts`。registry 仅负责状态映射、依赖注入和调度；新模块
+保留 generation 竞态保护及 retry trace 合并顺序，由
+`scripts/test-worker-git-live-query-refresh.mjs` 覆盖 6 项行为断言。
