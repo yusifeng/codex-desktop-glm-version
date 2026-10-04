@@ -828,3 +828,10 @@ Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令�
 Worktree 删除/恢复的 host+path 去重、删除 promise 清理，以及恢复操作的串行排队与失败后继续策略已迁移至
 `src/main/worker/git-worktree-lifecycle.ts`。入口保留实际 snapshot/delete/restore 副作用，只注入运行回调；
 12 项 focused 断言覆盖同 key 复用、跨 host 隔离、restore 排队、失败恢复和 map cleanup。
+
+### 增量抽取：Worktree list request dispatch
+
+`list-worktrees` 的只读请求分派已迁移至 `src/main/worker/git-worktree-list-dispatch.ts`。
+入口继续提供 host、取消信号及实际 worktree 查询回调，语义模块仅负责请求方法匹配与参数转发；
+`scripts/test-worker-git-worktree-list-dispatch.mjs` 覆盖成功转发、host/signal 保持及未知方法旁路，
+共 3 项断言。
