@@ -626,6 +626,9 @@ Crashpad/Electron 注入变量并保持大小写不敏感、非变异语义，�
 worker open-in target 的平台描述符合并、跨平台 target 构造与 editor SSH 能力矩阵已迁移至
 `src/main/worker/open-in-target-descriptors.ts`；原 `t9` 已删除，`n9/r9` 仅保留薄委托，
 由 12 项 focused assertions 覆盖字段覆盖、缺失平台、hidden、默认参数与 Linux open 绑定。
+worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
+`src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
+新增 11 项 focused assertions。
 worktree 缓存失效的 host-aware 路径包含判定已抽取为 `src/main/worker/git-path-containment.ts`，
 入口 `FZ` 保留兼容委托，由 5 项行为断言覆盖 local/remote 路径与边界。
 桌面 prompt context 包裹与可选 instruction section 拼接已抽取为 `src/main/worker/prompt-context-format.ts`，

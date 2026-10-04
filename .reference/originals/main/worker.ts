@@ -118,6 +118,7 @@ const { formatAppContext, joinInstructionSections } = require("./worker/prompt-c
 const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
+const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
@@ -80662,9 +80663,6 @@ function WTe() {
 function m9() {
   return VTe(S7);
 }
-function GTe(e) {
-  return e.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
-}
 function KTe(e) {
   try {
     let t = WX(e),
@@ -80681,58 +80679,19 @@ function KTe(e) {
     return null;
   }
 }
-function qTe(e, t) {
-  return t
-    ? e === `nvim` || e === `vim`
-      ? [`+call cursor(${t.line},${t.column})`]
-      : e === `nano`
-        ? [`+${t.line},${t.column}`]
-        : e === `less`
-          ? [`+${t.line}g`]
-          : []
-    : [];
-}
 function h9(e, t, n) {
   let r = (0, g.dirname)(t),
     i = KTe(e);
   if (i == null) return `cd ${GX(r)} && ${e} ${GX(t)}`;
-  let a = qTe(i.executableName, n),
+  let a = buildTerminalEditorArgs(i.executableName, n),
     o = i.args.indexOf(`--`),
     s = o < 0 ? [...i.args, ...a, t] : [...i.args.slice(0, o), ...a, ...i.args.slice(o), t];
   return `cd ${GX(r)} && ${KX(s)}`;
 }
-function JTe(e, t) {
-  let n = process.env.SHELL?.trim() || `/bin/zsh`,
-    r = GTe(t);
-  return e === `kitty`
-    ? { command: `/usr/bin/open`, args: [`-na`, `kitty.app`, `--args`, n, `-lc`, t] }
-    : e === `ghostty`
-      ? { command: `/usr/bin/open`, args: [`-na`, `Ghostty.app`, `--args`, `-e`, n, `-lc`, t] }
-      : e === `terminal`
-        ? {
-            command: `/usr/bin/osascript`,
-            args: [`-e`, `tell application "Terminal" to do script "${r}"`],
-          }
-        : e === `iterm2`
-          ? {
-              command: `/usr/bin/osascript`,
-              args: [
-                `-e`,
-                [
-                  `tell application "iTerm"`,
-                  `create window with default profile`,
-                  `tell current session of current window to write text "${r}"`,
-                  `end tell`,
-                ].join(`
-`),
-              ],
-            }
-          : null;
-}
 async function YTe(e, t, n) {
   let r = m9();
   if (!r || !(0, m.existsSync)(t) || (0, m.statSync)(t).isDirectory()) return !1;
-  let i = JTe(e, h9(r, t, n));
+  let i = buildMacTerminalLaunch(e, h9(r, t, n), process.env.SHELL?.trim() || `/bin/zsh`);
   if (i == null) return !1;
   try {
     return (await w7(i.command, i.args), !0);

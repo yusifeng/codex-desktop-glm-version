@@ -737,6 +737,11 @@ GitHub pull request summary 的按账号批量去重、50ms debounce、最多 60
 
 ### 增量抽取：Editor open arguments
 
+终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
+`src/main/worker/terminal-open-policy.ts`；入口继续负责 `$EDITOR` 探测、命令执行和失败 fallback。
+`scripts/test-worker-terminal-open-policy.mjs` 覆盖行列参数、shell 传递、AppleScript 转义和未知
+终端拒绝，共 11 项断言。
+
 编辑器打开参数的远程 host 判定、普通 `--goto` 参数、VS Code remote URI 编码、folder/file URI
 及带行列号的远程参数已迁移至 `src/main/worker/editor-open-args.ts`。入口继续负责编辑器探测、
 进程启动和 remote-control 拒绝；纯参数构造由 9 项独立断言覆盖。
