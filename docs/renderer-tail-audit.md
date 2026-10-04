@@ -331,6 +331,12 @@ host identity，而非独立业务常量。为避免在不同 bootstrap 顺序�
 配置查询调用面已切换导入，并由 `scripts/test-app-initial-configuration-query-key.mjs`
 的 2 项断言覆盖；原 hub 导出保留兼容其他消费者。
 
+切换到 `pull-request-query-key` 簇后，`By`（内部 `h3`）的 pull-request identity
+归一化计算虽为纯函数，但当前 renderer 没有命名消费者，只有 façade re-export；其
+配套 `Vy`（内部 `RTs`）还绑定 hub 内部 query-key builder 与 provider 分支。该面
+登记为 `zero-consumer-query-facade`，暂不为零消费导出制造语义占位，待出现真实
+consumer 后再按 identity/query-key 契约迁移。
+
 `tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
 command、query config、params/cache key 与 app-server `queryFn`、response priority
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
