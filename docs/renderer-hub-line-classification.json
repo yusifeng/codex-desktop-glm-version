@@ -308,5 +308,20 @@
     "hub": "app-primary", "alias": "Lc", "sourceSymbol": "wW", "startLine": 31155, "endLine": 31315,
     "classification": "generated-local-dictation-control", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The hook coordinates global dictation capability, keyboard focus, session dismissal, and start/stop side effects for the generated composer. Its lifecycle is owned by the adjacent composer integration and has no named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "qc", "sourceSymbol": "mW", "startLine": 30915, "endLine": 30919,
+    "classification": "generated-local-shadow-selector-constants", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer defines the shadow-root selector prefixes consumed by the generated annotation locator. These strings are private protocol details of the adjacent selection mirror and have no independent renderer owner."
+  },
+  {
+    "hub": "app-primary", "alias": "Kc", "sourceSymbol": "vW", "startLine": 31058, "endLine": 31066,
+    "classification": "generated-local-selection-observer-constants", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer installs MutationObserver options, transition event names, and mirror markers for generated annotation selection tracking. The constants are consumed only by the neighboring observer lifecycle and cannot be extracted without moving that state machine."
+  },
+  {
+    "hub": "app-primary", "alias": "zc", "sourceSymbol": "lVe", "startLine": 31099, "endLine": 31138,
+    "classification": "generated-local-composer-surface-shell", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component builds the generated composer surface shell, merging typography tokens, transient reveal transitions, and caller props. Its visual contract is owned by the adjacent composer tree and has no separately consumed renderer boundary."
   }
 ]

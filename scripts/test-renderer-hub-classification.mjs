@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 61, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 64, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -66,6 +66,9 @@ assert.ok(primary.unconsumed.includes("Zc"), "Zc remains coupled to generated an
 assert.ok(primary.unconsumed.includes("Gc"), "Gc remains coupled to generated composer styling");
 assert.ok(primary.unconsumed.includes("Bc"), "Bc remains coupled to generated composer initialization");
 assert.ok(primary.unconsumed.includes("Lc"), "Lc remains coupled to generated dictation lifecycle");
+assert.ok(primary.unconsumed.includes("qc"), "qc remains coupled to generated shadow selector constants");
+assert.ok(primary.unconsumed.includes("Kc"), "Kc remains coupled to generated selection observer constants");
+assert.ok(primary.unconsumed.includes("zc"), "zc remains coupled to generated composer surface shell");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
