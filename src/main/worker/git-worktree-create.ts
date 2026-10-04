@@ -1,4 +1,5 @@
 import { runWorktreeSetup } from "./git-worktree-setup";
+import { shouldSetUpSyncedBranch } from "./git-worktree-branch-setup-policy";
 
 type WorktreeCreateDependencies = {
   copyAgentOverrideFiles: (sourceRoot: string, targetRoot: string, host: any) => Promise<void>;
@@ -137,11 +138,12 @@ async function createWorktree(params: any, dependencies: WorktreeCreateDependenc
     checkout.startingRef,
     signal,
   );
-  const shouldSetUpSyncedBranch =
-    setUpSyncedBranch &&
-    branch != null &&
-    branch !== defaultBranch &&
-    (startingState.type !== `branch` || startingState.remoteRef == null);
+  const shouldConfigureSyncedBranch = shouldSetUpSyncedBranch({
+    setUpSyncedBranch,
+    branch,
+    defaultBranch,
+    startingState,
+  });
   if (host.isLocal) {
     await dependencies.copyAgentOverrideFiles(
       sourceRepository.root,
@@ -161,7 +163,7 @@ async function createWorktree(params: any, dependencies: WorktreeCreateDependenc
       onLog,
     });
   }
-  if (shouldSetUpSyncedBranch && branch) {
+  if (shouldConfigureSyncedBranch && branch) {
     const branchRef = dependencies.formatLocalBranchRef(branch);
     await dependencies.setSyncedBranchConfig(
       worktreeRepository,
