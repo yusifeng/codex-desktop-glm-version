@@ -409,7 +409,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 
 | # | 位置 | 体量 | 现状 | 问题 |
 |---|---|---|---|---|
-| A1 | `.reference/originals/main/worker.ts`（git-worker） | **82,600 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
+| A1 | `.reference/originals/main/worker.ts`（git-worker） | **82,510 行** | 整体 PRESERVED，已完成逐段审计并开始分批抽取 | Git RPC 面、session 生命周期仍有大量业务区段待迁移 |
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
@@ -568,6 +568,10 @@ GitHub exact-revision review 的 diff/file handlers 已迁移至
 
 编辑器打开参数的远程 host 判定、VS Code remote URI 与 folder/file/`--goto` 参数构造已迁移至
 `src/main/worker/editor-open-args.ts`，由 9 项独立断言覆盖；编辑器发现与进程执行副作用仍留在入口。
+
+worker 子进程环境清洗已抽取为 `src/main/worker/platform-env.ts`，统一过滤
+Crashpad/Electron 注入变量并保持大小写不敏感、非变异语义，由
+`scripts/test-worker-platform-env.mjs` 的 6 项断言覆盖；平台命令执行和环境合并副作用仍留在入口。
 
 GitHub pull-request board 的仓库候选、查询参数、open/merged 编排和状态映射已迁移至
 `src/main/worker/github-pull-request-board.ts`；入口仅保留 host/GitHub CLI/Git manager 适配，

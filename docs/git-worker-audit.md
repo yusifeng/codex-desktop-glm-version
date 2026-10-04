@@ -379,6 +379,11 @@ directory watch 创建和 session 启动仍由入口负责。worker watch path �
 PowerShell 探测、环境变量读取和进程执行；helper 只决定 executable、参数、脚本
 扩展名及 `posix`/`powershell`/`cmd` 类型，由 shell config 回归脚本覆盖。
 
+子进程环境清洗已迁移至 `worker/platform-env.ts`：入口不再持有 Crashpad/Electron
+注入变量黑名单，所有 WSL、Git、shell 与 editor 子进程统一通过窄 `sanitizeChildProcessEnv`
+适配器复制并过滤环境。过滤键按大小写不敏感匹配且不修改调用方对象，由
+`scripts/test-worker-platform-env.mjs` 的 6 项断言覆盖；平台命令执行和环境合并副作用仍留在入口。
+
 审计对象：`.reference/originals/main/worker.ts`（90,836 行，当前构建产物的 CommonJS worker
 入口）。审计原则是先按连续区间归属，再决定是否抽取；`business` 表示包含
 Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表示第三方库
