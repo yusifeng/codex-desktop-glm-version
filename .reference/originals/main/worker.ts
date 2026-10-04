@@ -128,6 +128,7 @@ const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispat
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
 const { dispatchReviewReadRequest } = require("./worker/git-review-read-dispatch");
 const { dispatchRepositoryReadRequest } = require("./worker/git-repository-read-dispatch");
+const { dispatchBranchExtraReadRequest } = require("./worker/git-branch-extra-read-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69921,7 +69922,7 @@ var I6 = kW(`git`),
             p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `recent-branches`:
-            p = await resolveRecentBranches(e.params, i.signal, readRequestDeps);
+            p = await dispatchBranchExtraReadRequest(e.method, e.params, { recentBranches: (params) => resolveRecentBranches(params, i.signal, readRequestDeps), resolveStartingRef: (root, ref) => resolveWorktreeStartingRef(root, ref, i.signal, readRequestDeps), branchCommits: (root, base) => resolveBranchCommits(root, base, i.signal, readRequestDeps), reviewCommitLineCounts: (root, commits, hideWhitespace) => resolveReviewCommitLineCounts(root, commits, hideWhitespace, i.signal, readRequestDeps) });
             break;
           case `branch-exists`:
             p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
@@ -69931,13 +69932,13 @@ var I6 = kW(`git`),
             break;
           }
           case `resolve-worktree-starting-ref`:
-            p = X(await resolveWorktreeStartingRef(e.params.root, e.params.ref, i.signal, readRequestDeps));
+            p = X(await dispatchBranchExtraReadRequest(e.method, e.params, { recentBranches: (params) => resolveRecentBranches(params, i.signal, readRequestDeps), resolveStartingRef: (root, ref) => resolveWorktreeStartingRef(root, ref, i.signal, readRequestDeps), branchCommits: (root, base) => resolveBranchCommits(root, base, i.signal, readRequestDeps), reviewCommitLineCounts: (root, commits, hideWhitespace) => resolveReviewCommitLineCounts(root, commits, hideWhitespace, i.signal, readRequestDeps) }));
             break;
           case `branch-commits`:
-            p = X(await resolveBranchCommits(e.params.root, e.params.baseBranch, i.signal, readRequestDeps));
+            p = X(await dispatchBranchExtraReadRequest(e.method, e.params, { recentBranches: (params) => resolveRecentBranches(params, i.signal, readRequestDeps), resolveStartingRef: (root, ref) => resolveWorktreeStartingRef(root, ref, i.signal, readRequestDeps), branchCommits: (root, base) => resolveBranchCommits(root, base, i.signal, readRequestDeps), reviewCommitLineCounts: (root, commits, hideWhitespace) => resolveReviewCommitLineCounts(root, commits, hideWhitespace, i.signal, readRequestDeps) }));
             break;
           case `review-commit-line-counts`:
-            p = X(await resolveReviewCommitLineCounts(e.params.root, e.params.commits, e.params.hideWhitespace, i.signal, readRequestDeps));
+            p = X(await dispatchBranchExtraReadRequest(e.method, e.params, { recentBranches: (params) => resolveRecentBranches(params, i.signal, readRequestDeps), resolveStartingRef: (root, ref) => resolveWorktreeStartingRef(root, ref, i.signal, readRequestDeps), branchCommits: (root, base) => resolveBranchCommits(root, base, i.signal, readRequestDeps), reviewCommitLineCounts: (root, commits, hideWhitespace) => resolveReviewCommitLineCounts(root, commits, hideWhitespace, i.signal, readRequestDeps) }));
             break;
           case `search-branches`:
             p = await this.handleSearchBranches(e.params, { host: o, signal: i.signal });

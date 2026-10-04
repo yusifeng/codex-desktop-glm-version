@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-branch-extra-read-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchBranchExtraReadRequest } = module.exports;
+const deps = { recentBranches: (p) => `recent:${p.root}`, resolveStartingRef: (r, ref) => `${r}:${ref}`, branchCommits: (r, b) => `${r}:${b}`, reviewCommitLineCounts: (r, c, h) => `${r}:${c.join(",")}:${h}` };
+assert.equal(await dispatchBranchExtraReadRequest("recent-branches", { root: "/r" }, deps), "recent:/r");
+assert.equal(await dispatchBranchExtraReadRequest("resolve-worktree-starting-ref", { root: "/r", ref: "main" }, deps), "/r:main");
+assert.equal(await dispatchBranchExtraReadRequest("branch-commits", { root: "/r", baseBranch: "main" }, deps), "/r:main");
+assert.equal(await dispatchBranchExtraReadRequest("review-commit-line-counts", { root: "/r", commits: ["a", "b"], hideWhitespace: true }, deps), "/r:a,b:true");
+assert.equal(await dispatchBranchExtraReadRequest("unknown", {}, deps), undefined);
+console.log("worker Git branch extra read dispatch tests passed (5 assertions)");
