@@ -117,6 +117,7 @@ const { isPathWithinRoot } = require("./worker/git-path-containment");
 const { formatAppContext, joinInstructionSections } = require("./worker/prompt-context-format");
 const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
+const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
@@ -80443,28 +80444,8 @@ function NTe({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r 
 function e9(e, t) {
   return buildRemoteUri(e, t);
 }
-function t9({ label: e, icon: t, kind: n, platform: r }) {
-  return {
-    label: r.label ?? e,
-    icon: r.icon ?? t,
-    kind: r.kind ?? n,
-    hidden: r.hidden,
-    detect: r.detect,
-    iconPath: r.iconPath,
-    args: r.args,
-    env: r.env,
-    open: r.open,
-  };
-}
 function n9({ id: e, label: t, icon: n, kind: r, hidden: i, darwin: a, win32: o, linux: s }) {
-  return {
-    id: e,
-    platforms: {
-      darwin: a ? t9({ label: t, icon: n, kind: r, platform: { hidden: i, ...a } }) : void 0,
-      win32: o ? t9({ label: t, icon: n, kind: r, platform: { hidden: i, ...o } }) : void 0,
-      linux: s ? t9({ label: t, icon: n, kind: r, platform: { hidden: i, ...s } }) : void 0,
-    },
-  };
+  return createCrossPlatformTarget({ id: e, label: t, icon: n, kind: r, hidden: i, darwin: a, win32: o, linux: s });
 }
 function r9({
   id: e,
@@ -80477,38 +80458,7 @@ function r9({
   darwinArgs: s,
   hidden: c,
 }) {
-  return {
-    id: e,
-    platforms: {
-      darwin: r
-        ? {
-            label: t,
-            icon: n,
-            kind: `editor`,
-            hidden: c,
-            detect: r,
-            env: o,
-            args: s ?? o9,
-            supportsSsh: !0,
-          }
-        : void 0,
-      win32: i
-        ? { label: t, icon: n, kind: `editor`, hidden: c, detect: i, args: o9, supportsSsh: !0 }
-        : void 0,
-      linux: a
-        ? {
-            label: t,
-            icon: n,
-            kind: `editor`,
-            hidden: c,
-            detect: a,
-            args: o9,
-            supportsSsh: !0,
-            open: (e) => a9(e, o9),
-          }
-        : void 0,
-    },
-  };
+  return createEditorTarget({ id: e, label: t, icon: n, darwinDetect: r, win32Detect: i, linuxDetect: a, darwinEnv: o, darwinArgs: s, hidden: c, defaultArgs: o9, openLinux: a9 });
 }
 function i9(e, t) {
   for (let t of e) {
