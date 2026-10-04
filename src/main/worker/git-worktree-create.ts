@@ -1,3 +1,5 @@
+import { runWorktreeSetup } from "./git-worktree-setup";
+
 type WorktreeCreateDependencies = {
   copyAgentOverrideFiles: (sourceRoot: string, targetRoot: string, host: any) => Promise<void>;
   copyWorktreeFiles: (params: any) => Promise<void>;
@@ -209,4 +211,3 @@ async function createWorktree(params: any, dependencies: WorktreeCreateDependenc
 
 export { createWorktree };
 if (typeof module !== `undefined`) module.exports = { createWorktree };
-import { runWorktreeSetup } from "./git-worktree-setup";
