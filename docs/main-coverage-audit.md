@@ -144,6 +144,13 @@ worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,31
 模块只负责对象形状和方法白名单判断，不触碰 RPC 调度或 worker 生命周期；由
 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言。
 
+### 增量抽取：workspace startup policy checker
+
+原 `Tst`（175,020-175,058）的登录竞态、startup policy 变更探测和一次性重启通知状态机
+已迁移至 `src/main/main-app/startup/workspace-policy-checker.ts`。入口只注入 quit state、
+认证/配置查询、重启提示和错误日志，保持通知取消、generation 防竞态与 app-quitting
+守卫；由 `scripts/test-main-workspace-policy-checker.mjs` 覆盖 7 项异步状态断言。
+
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs

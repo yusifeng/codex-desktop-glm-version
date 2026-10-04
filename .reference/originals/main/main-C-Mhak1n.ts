@@ -18,6 +18,7 @@ const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
 const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
+const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175018,31 +175019,7 @@ var U9 = {
   restart: { messageId: `desktop.workspacePolicyRestart.restart`, defaultMessage: `Restart` },
 };
 function Tst({ quitState: e, isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i }) {
-  let a = !1,
-    o = !1,
-    s = 0,
-    c = async () => {
-      let c = ++s;
-      if (!(a || o || t()))
-        try {
-          if ((await n()) !== `chatgpt` || c !== s || !(await i()) || o || t() || c !== s) return;
-          ((o = !0), Est(e));
-        } catch (e) {
-          r.n().warning(`Failed to check workspace startup settings`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        }
-    };
-  return {
-    checkForChanges: c,
-    handleNotification: async (e) => {
-      e.method === `account/login/completed`
-        ? e.params?.success === !0 && ((a = !0), (s += 1))
-        : e.method === `account/updated` &&
-          ((a = !1), (s += 1), e.params?.authMode === `chatgpt` && (await c()));
-    },
-  };
+  return createWorkspacePolicyChecker({ isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i, onRestartRequired: () => Est(e), onError: (error) => r.n().warning(`Failed to check workspace startup settings`, { safe: {}, sensitive: { error } }) });
 }
 function Est(e) {
   try {

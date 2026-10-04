@@ -36,6 +36,7 @@ Total scripts: 710.
 - [`test-renderer-hub-classification.mjs`](./test-renderer-hub-classification.mjs)
 - [`test-main-worker-event-predicates.mjs`](./test-main-worker-event-predicates.mjs)
 - [`test-main-worker-rpc-message-predicates.mjs`](./test-main-worker-rpc-message-predicates.mjs)
+- [`test-main-workspace-policy-checker.mjs`](./test-main-workspace-policy-checker.mjs)
 - [`test-preload-annotation-controls-registry.mjs`](./test-preload-annotation-controls-registry.mjs)
 - [`test-preload-annotation-frame-pointer-guard.mjs`](./test-preload-annotation-frame-pointer-guard.mjs)
 - [`test-preload-annotation-keyboard.mjs`](./test-preload-annotation-keyboard.mjs)

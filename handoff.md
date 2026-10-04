@@ -356,6 +356,10 @@ worker-main RPC 的方法白名单、取消消息和请求消息校验已迁移�
 `src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托，
 由 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言；RPC 调度与
 worker 生命周期仍保留在原入口。
+workspace startup policy checker（原 `Tst`）已迁移至
+`src/main/main-app/startup/workspace-policy-checker.ts`，保留登录状态、generation
+竞态、app-quitting 守卫和一次性重启通知语义，由
+`scripts/test-main-workspace-policy-checker.mjs` 覆盖 7 项异步断言。
 由 13 项行为断言覆盖；main 启动 flavor/platform flags 与阶段计时策略已抽取为
 `src/main/main-app/startup/startup-policy.ts`；路径扩展名分类、debug Chrome page 和 remote-hosted
 PIP 进程号策略也已接回该模块，由 17 项矩阵与边界断言覆盖。
