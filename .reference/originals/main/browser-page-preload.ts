@@ -6306,6 +6306,7 @@ var { readAnnotationViewportState } = require("./browser-page-preload/annotation
 var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport-override");
 var { isAnnotationElementVisible } = require("./browser-page-preload/annotation-visibility");
 var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
+var { createAnnotationPreviewVisibilityPredicate } = require("./browser-page-preload/annotation-preview-visibility");
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
 Yo();
@@ -23807,63 +23808,12 @@ var vy,
 `));
   });
 function by(e) {
-  let t = new Map();
-  for (let n of e) {
-    let e = `host` in n ? n.ownerDocument : n,
-      r = t.get(e) ?? { boundaries: [], modals: [], popovers: [] };
-    (t.set(e, r), n.fullscreenElement != null && r.boundaries.push(n.fullscreenElement));
-    for (let e of n.querySelectorAll(`dialog[open], [popover]`))
-      e.matches(`:modal`)
-        ? r.modals.push(e)
-        : e.matches(`:popover-open`) &&
-          r.popovers.push({ element: e, rect: e.getBoundingClientRect() });
-  }
-  for (let [e, n] of t) {
-    let t = xy(e, n.modals);
-    n.boundaries.push(...(t == null ? n.modals : [t]));
-  }
-  return (e) => {
-    let n = e;
-    for (; n != null;) {
-      let e = t.get(n.ownerDocument);
-      if (e != null) {
-        let { boundaries: t, popovers: r } = e;
-        for (let e of t) if (!Sy(e, n)) return !1;
-        let i;
-        for (let e of r)
-          if (
-            !Sy(e.element, n) &&
-            ((i ??= n.getBoundingClientRect()),
-            i.left < e.rect.right &&
-              i.right > e.rect.left &&
-              i.top < e.rect.bottom &&
-              i.bottom > e.rect.top)
-          )
-            return !1;
-      }
-      let r = n.ownerDocument.defaultView?.frameElement;
-      n = F(r) ? r : null;
-    }
-    return !0;
-  };
-}
-function xy(e, t) {
-  if (t.length < 2) return t[0];
-  for (let n of [e.activeElement, e.elementFromPoint?.(0, 0)]) {
-    for (; n?.shadowRoot?.activeElement != null;) n = n.shadowRoot.activeElement;
-    for (; F(n);) {
-      if (t.includes(n)) return n;
-      n = ic(n);
-    }
-  }
-}
-function Sy(e, t) {
-  let n = t;
-  for (; n != null;) {
-    if (n === e) return !0;
-    n = ic(n);
-  }
-  return !1;
+  return createAnnotationPreviewVisibilityPredicate(e, {
+    getParent: ic,
+    isElement: F,
+    getFrameElement: (e) => e?.frameElement ?? null,
+    getOwnerWindow: (e) => e.ownerDocument?.defaultView,
+  });
 }
 var Cy = o(() => {
   tl();
