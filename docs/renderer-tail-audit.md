@@ -284,6 +284,10 @@ state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初
 匹配，策略模块的 2 个调用点已切换，测试扩展为 7 项断言覆盖大小写、子域和 apex
 排除行为。
 
+`ksn`（内部 `CWt`）也已并入该语义 runtime 的 `originPatternsMatch`：它只比较
+protocol、port 并复用 hostname pattern 匹配，不携带 hub 生命周期；测试扩展为 9 项
+断言，覆盖协议/端口不匹配拒绝。
+
 同模块的 `Nsn`（内部 `wWt`，`parseNetworkPattern`）暂不直接复制：虽然主体无
 副作用，但它同时执行 scheme/authority 分隔、IPv6 bracket 与端口合法性、URL
 协议检查、`%2a` wildcard 解码，以及返回 `canonicalKey`、`canonicalPattern`、

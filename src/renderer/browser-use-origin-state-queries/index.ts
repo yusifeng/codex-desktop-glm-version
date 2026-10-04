@@ -36,7 +36,6 @@ import {
   Ydn as configurationLayerPath,
   aun as initializeCommandQueries,
   bsn as initializeOriginParser,
-  ksn as originPatternMatches,
   lcn as configurationQuery,
   mnt as initializeAppServices,
   nun as initializeRendererCommands,
@@ -48,6 +47,7 @@ import {
 import { parseHttpUrl as parseBrowserUrl } from "../app-initial/runtime/parse-http-url";
 import {
   domainMatchesPattern,
+  originPatternsMatch as originPatternMatches,
   parseOriginPattern,
 } from "../app-initial/runtime/parse-origin-pattern";
 import { configurationQueryKey } from "../app-initial/runtime/configuration-query-key";

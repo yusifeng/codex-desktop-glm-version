@@ -13,7 +13,7 @@ await build({
   platform: "node",
   outfile: output,
 });
-const { domainMatchesPattern, parseOriginPattern } = await import(`${output}?test=${Date.now()}`);
+const { domainMatchesPattern, originPatternsMatch, parseOriginPattern } = await import(`${output}?test=${Date.now()}`);
 assert.deepEqual(parseOriginPattern("Example.COM."), {
   canonicalPattern: "example.com",
   hostnamePattern: "example.com",
@@ -25,4 +25,12 @@ assert.equal(parseOriginPattern("bad[pattern]"), null);
 assert.equal(domainMatchesPattern(parseOriginPattern("example.com"), "EXAMPLE.com"), true);
 assert.equal(domainMatchesPattern(parseOriginPattern("*.example.com"), "api.example.com"), true);
 assert.equal(domainMatchesPattern(parseOriginPattern("*.example.com"), "example.com"), false);
-console.log("7 app-initial origin pattern assertions passed");
+assert.equal(originPatternsMatch(
+  { protocol: "https:", port: "443", hostnamePattern: "example.com", kind: "exact" },
+  { protocol: "https:", port: "443", hostname: "example.com" },
+), true);
+assert.equal(originPatternsMatch(
+  { protocol: "https:", port: "443", hostnamePattern: "example.com", kind: "exact" },
+  { protocol: "http:", port: "80", hostname: "example.com" },
+), false);
+console.log("9 app-initial origin pattern assertions passed");

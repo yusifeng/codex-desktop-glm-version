@@ -120,3 +120,12 @@ export function domainMatchesPattern(
         matchesSubdomain(hostnamePattern, normalizedHostname);
   }
 }
+
+export function originPatternsMatch(
+  pattern: { protocol?: string; port?: string; hostnamePattern?: string; hostname?: string; kind?: OriginPattern["kind"] },
+  origin: { protocol?: string; port?: string; hostname: string },
+): boolean {
+  return (pattern.protocol == null || pattern.protocol === origin.protocol) &&
+    (pattern.port == null || pattern.port === origin.port) &&
+    domainMatchesPattern(pattern, origin.hostname);
+}
