@@ -110,6 +110,7 @@ Total scripts: 743.
 - [`test-worker-elicitation-protocol.mjs`](./test-worker-elicitation-protocol.mjs)
 - [`test-main-cleanup-timeout.mjs`](./test-main-cleanup-timeout.mjs)
 - [`test-worker-git-automation-writable-roots.mjs`](./test-worker-git-automation-writable-roots.mjs)
+- [`test-worker-git-core-request-dispatch.mjs`](./test-worker-git-core-request-dispatch.mjs)
 - [`test-worker-git-node-request-dispatch.mjs`](./test-worker-git-node-request-dispatch.mjs)
 - [`test-worker-git-apply-changes.mjs`](./test-worker-git-apply-changes.mjs)
 - [`test-worker-git-apply-patch.mjs`](./test-worker-git-apply-patch.mjs)

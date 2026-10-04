@@ -137,6 +137,7 @@ const { dispatchGitApplyRequest } = require("./worker/git-apply-dispatch");
 const { dispatchGitMutationRequest } = require("./worker/git-mutation-dispatch");
 const { dispatchWorktreeSnapshotRead } = require("./worker/git-worktree-snapshot-read-dispatch");
 const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch");
+const { dispatchGitCoreRequest } = require("./worker/git-core-request-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69918,8 +69919,13 @@ var I6 = kW(`git`),
             break;
           }
           case `availability`: {
-            let e = await yR(L1(o), i.signal);
-            (o.isLocal && (this.localGitAvailable = e), (p = X({ available: e })));
+            let t = await dispatchGitCoreRequest(e.method, e.params, {
+              signal: i.signal,
+              checkAvailability: (signal) => yR(L1(o), signal),
+              createBranch: (params, signal) => createGitBranch(params, signal, readRequestDeps),
+              discoverOrigins: (dirs) => discoverGitOrigins(dirs, originDiscoveryDeps),
+            });
+            (o.isLocal && (this.localGitAvailable = t.result.available), (p = X(t.result)));
             break;
           }
           case `stable-metadata`:
@@ -69953,7 +69959,12 @@ var I6 = kW(`git`),
             p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
             break;
           case `create-branch`: {
-            p = X(await createGitBranch(e.params, i.signal, readRequestDeps));
+            p = X((await dispatchGitCoreRequest(e.method, e.params, {
+              signal: i.signal,
+              checkAvailability: (signal) => yR(L1(o), signal),
+              createBranch: (params, signal) => createGitBranch(params, signal, readRequestDeps),
+              discoverOrigins: (dirs) => discoverGitOrigins(dirs, originDiscoveryDeps),
+            })).result);
             break;
           }
           case `resolve-worktree-starting-ref`:
@@ -70083,7 +70094,12 @@ var I6 = kW(`git`),
             break;
           case `git-origins`: {
             let t = Date.now(),
-              { origins: n } = await discoverGitOrigins(e.params.dirs, originDiscoveryDeps);
+              { origins: n } = (await dispatchGitCoreRequest(e.method, e.params, {
+                signal: i.signal,
+                checkAvailability: (signal) => yR(L1(o), signal),
+                createBranch: (params, signal) => createGitBranch(params, signal, readRequestDeps),
+                discoverOrigins: (dirs) => discoverGitOrigins(dirs, originDiscoveryDeps),
+              })).result;
             (I6().info(`[git-origins] worker-complete`, {
               safe: {
                 dirCount: e.params.dirs.length,
