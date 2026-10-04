@@ -2,20 +2,7 @@ import { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRe
 import { createAnnotationOpenRequestDetail, createAnnotationRangeDetail, readAnnotationEventDetail, readAnnotationEventField } from "./annotation-event-details";
 import { isValidAnnotationSurfaceElement, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } from "./annotation-surface-policies";
 import { attachAnnotationControlTargets, collectAnnotationControlTargets, detachAnnotationControlTargets, getAnnotationControlsForTarget } from "./annotation-control-targets";
-
-function normalizeAnnotationControlTargets(value: unknown, elementConstructor: { new (...args: any[]): any }, documentRef: object, maxTargets: number): unknown[] {
-  if (!(value instanceof elementConstructor) && (value == null || typeof (value as { [Symbol.iterator]?: unknown })[Symbol.iterator] !== `function`)) throw new TypeError(`Annotation controls require element targets`);
-  const targets = value instanceof elementConstructor ? [value] : value as Iterable<unknown>;
-  const result = new Set<unknown>();
-  let count = 0;
-  for (const target of targets) {
-    count += 1;
-    if (count > maxTargets) throw new RangeError(`Too many annotation control targets`);
-    if (!(target instanceof elementConstructor) || (target as { ownerDocument?: object }).ownerDocument !== documentRef) throw new TypeError(`Annotation control targets must belong to this document`);
-    result.add(target);
-  }
-  return Array.from(result);
-}
+import { normalizeAnnotationControlTargets } from "./annotation-control-target-validation";
 
 function createAnnotationControlHandle(id: string, serialize: (value: unknown) => string, normalizeTargets: (value: unknown) => unknown[], emit: (type: `update` | `dispose`, detail: Record<string, unknown>) => boolean): Readonly<{ update(value: { targets?: unknown }): void; dispose(): void }> {
   let disposed = false;
