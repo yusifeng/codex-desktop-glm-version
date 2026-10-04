@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-worktree-read-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchWorktreeReadRequest } = module.exports;
+const deps = { nearestAncestorBranch: (p) => `ancestor:${p.currentBranch}`, searchBranches: (p) => `search:${p.query}` };
+assert.equal(await dispatchWorktreeReadRequest("nearest-ancestor-branch", { currentBranch: "main" }, deps), "ancestor:main");
+assert.equal(await dispatchWorktreeReadRequest("search-branches", { query: "feature" }, deps), "search:feature");
+assert.equal(await dispatchWorktreeReadRequest("unknown", {}, deps), undefined);
+console.log("worker Git worktree read dispatch tests passed (3 assertions)");

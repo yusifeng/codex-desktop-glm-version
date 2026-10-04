@@ -129,6 +129,7 @@ const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch
 const { dispatchReviewReadRequest } = require("./worker/git-review-read-dispatch");
 const { dispatchRepositoryReadRequest } = require("./worker/git-repository-read-dispatch");
 const { dispatchBranchExtraReadRequest } = require("./worker/git-branch-extra-read-dispatch");
+const { dispatchWorktreeReadRequest } = require("./worker/git-worktree-read-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69941,18 +69942,10 @@ var I6 = kW(`git`),
             p = X(await dispatchBranchExtraReadRequest(e.method, e.params, { recentBranches: (params) => resolveRecentBranches(params, i.signal, readRequestDeps), resolveStartingRef: (root, ref) => resolveWorktreeStartingRef(root, ref, i.signal, readRequestDeps), branchCommits: (root, base) => resolveBranchCommits(root, base, i.signal, readRequestDeps), reviewCommitLineCounts: (root, commits, hideWhitespace) => resolveReviewCommitLineCounts(root, commits, hideWhitespace, i.signal, readRequestDeps) }));
             break;
           case `search-branches`:
-            p = await this.handleSearchBranches(e.params, { host: o, signal: i.signal });
+            p = await dispatchWorktreeReadRequest(e.method, e.params, { nearestAncestorBranch: (params) => findNearestAncestorBranch(this.gitManager.getWorktreeRepositoryForRoot(params.root, o), params.candidates, params.currentBranch, i.signal, gitNearestAncestorDeps), searchBranches: (params) => this.handleSearchBranches(params, { host: o, signal: i.signal }) });
             break;
           case `nearest-ancestor-branch`:
-            p = X({
-              branch: await findNearestAncestorBranch(
-                this.gitManager.getWorktreeRepositoryForRoot(e.params.root, o),
-                e.params.candidates,
-                e.params.currentBranch,
-                i.signal,
-                gitNearestAncestorDeps,
-              ),
-            });
+            p = X({ branch: await dispatchWorktreeReadRequest(e.method, e.params, { nearestAncestorBranch: (params) => findNearestAncestorBranch(this.gitManager.getWorktreeRepositoryForRoot(params.root, o), params.candidates, params.currentBranch, i.signal, gitNearestAncestorDeps), searchBranches: (params) => this.handleSearchBranches(params, { host: o, signal: i.signal }) }) });
             break;
           case `branch-metadata`:
             p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
