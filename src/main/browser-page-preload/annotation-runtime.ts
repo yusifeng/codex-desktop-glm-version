@@ -1,5 +1,6 @@
 import { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } from "./annotation-control-payload";
 import { createAnnotationOpenRequestDetail, createAnnotationRangeDetail, readAnnotationEventDetail, readAnnotationEventField } from "./annotation-event-details";
+import { isValidAnnotationSurfaceElement, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } from "./annotation-surface-policies";
 
 function normalizeAnnotationControlTargets(value: unknown, elementConstructor: { new (...args: any[]): any }, documentRef: object, maxTargets: number): unknown[] {
   if (!(value instanceof elementConstructor) && (value == null || typeof (value as { [Symbol.iterator]?: unknown })[Symbol.iterator] !== `function`)) throw new TypeError(`Annotation controls require element targets`);
@@ -96,27 +97,6 @@ function collectAnnotationControlTargets(records: Iterable<{ targets: WeakRef<ob
 function getAnnotationControlsForTarget<T extends object, C>(target: T, documentRef: object, targetIndex: WeakMap<T, Array<{ controls: C }>>): C | undefined {
   if ((target as { ownerDocument?: object }).ownerDocument !== documentRef) return undefined;
   return targetIndex.get(target)?.at(-1)?.controls;
-}
-
-function shouldDisposeAnnotationRegistryOnPagehide(event: { isTrusted?: boolean; persisted?: boolean }): boolean {
-  return event.isTrusted === true && event.persisted !== true;
-}
-
-/** Accepts only connected elements owned by the top document, excluding iframes. */
-function isValidAnnotationSurfaceElement(value: unknown, documentRef: object, htmlElementConstructor: { new (...args: any[]): any }, iframeConstructor: { new (...args: any[]): any }): boolean {
-  return value instanceof htmlElementConstructor &&
-    !(value instanceof iframeConstructor) &&
-    (value as { isConnected?: boolean }).isConnected === true &&
-    (value as { ownerDocument?: object }).ownerDocument === documentRef &&
-    typeof (value as { getRootNode?: () => unknown }).getRootNode === `function` &&
-    (value as { getRootNode: () => unknown }).getRootNode() === documentRef;
-}
-
-/** Determines whether a surface selection change should invoke custom rendering. */
-function shouldRenderAnnotationSelection(current: { hoveredId: string | null; selectedId: string | null }, next: { hoveredId: string | null; selectedId: string | null }, renderFailed: boolean, hasRenderer: boolean): boolean {
-  return hasRenderer &&
-    !(renderFailed && (next.hoveredId != null || next.selectedId != null)) &&
-    (current.hoveredId !== next.hoveredId || current.selectedId !== next.selectedId);
 }
 
 export { attachAnnotationControlTargets, cloneRecord, collectAnnotationControlTargets, createAnnotationControlHandle, createAnnotationOpenRequestDetail, createAnnotationRangeDetail, createAnnotationResponseDetail, detachAnnotationControlTargets, getAnnotationControlsForTarget, isValidAnnotationHitTestRequest, isValidAnnotationSurfaceElement, normalizeAnnotationControlTargets, parseAnnotationControlTargetList, parseAnnotationControlsPayload, readAnnotationEventDetail, readAnnotationEventField, sanitizeAnnotationHit, sanitizeAnnotationControlMetadata, serializeAnnotationControls, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection };

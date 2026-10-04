@@ -39,6 +39,12 @@ Annotation hit/control payload 的安全对象克隆、rect/role/id 校验、met
 导出并通过窄委托接回，响应 detail payload 也由同一模块组装；`scripts/test-preload-annotation-runtime.mjs` 覆盖恶意对象、几何边界、
 metadata 过滤、hit-test request 边界、annotation controls 序列化/metadata/targets、range/open-request detail、control handle lifecycle、registry payload/target parsing/index/read/pagehide lifecycle、surface element boundary、selection 渲染策略和 response JSON 形状，共 45 项行为断言。
 
+Annotation surface 的 pagehide disposal、top-document element containment 与 selection
+render gate 已迁移至 `src/main/browser-page-preload/annotation-surface-policies.ts`。
+该模块仅保留不依赖 DOM 副作用的生命周期/渲染判定，`annotation-runtime.ts` 继续提供
+兼容导出；`scripts/test-preload-annotation-surface-policies.mjs` 覆盖可信 pagehide、
+iframe/断开元素过滤和 renderer 失败/状态变化门控，共 11 项断言。
+
 Annotation controls registry 的生命周期实现（注册、更新、target 索引、dispose 与
 可信 pagehide 清理）已迁移至 `src/main/browser-page-preload/annotation-controls-registry.ts`，
 原入口 `Cf` 通过依赖注入接回；`scripts/test-preload-annotation-controls-registry.mjs`
