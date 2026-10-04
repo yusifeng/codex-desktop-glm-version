@@ -565,3 +565,7 @@ GitHub PR summary 的按账号批量去重、debounce、GraphQL 检查分页与 
 GitHub exact-revision review 的 diff/file handlers 已迁移至
 `src/main/worker/github-pull-request-revision.ts`，入口仅保留 API 适配；SHA/path、账号、
 文件大小/编码安全限制和 host 并发语义由 6 项断言覆盖，整体 handoff 仍未完成。
+
+GitHub pull-request board 的仓库候选、查询参数、open/merged 编排和状态映射已迁移至
+`src/main/worker/github-pull-request-board.ts`；入口仅保留 host/GitHub CLI/Git manager 适配，
+由 `scripts/test-github-pull-request-board.mjs` 的 6 项断言覆盖。整体 handoff 仍未完成。

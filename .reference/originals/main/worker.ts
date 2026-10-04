@@ -80507,7 +80507,7 @@ function Q7(e, t) {
 function $7({ hostConfig: e, remoteWorkspaceRoot: t, remotePath: n, location: r }) {
   if (e.kind === `remote-control`)
     throw Error(`Remote control does not support VS Code remote open yet.`);
-  let i = `ssh-remote+${OTe(e)}`,
+  let i = `ssh-remote+${OTe(e)}`;
   return buildRemoteOpenArgs({ hostConfig: e, remoteAuthority: i, remoteWorkspaceRoot: t, remotePath: n, location: r });
 }
 function NTe({ remoteAuthority: e, remoteWorkspaceRoot: t, path: n, location: r }) {

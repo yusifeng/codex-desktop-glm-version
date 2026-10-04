@@ -713,3 +713,10 @@ GitHub exact-revision review 的 diff/file handlers（`eSe`/`tSe`）已迁移至
 base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的双并发 semaphore 均由
 语义模块负责；入口仅保留 API 适配。`scripts/test-github-pull-request-revision.mjs`
 覆盖成功路径与空路径，共 6 项断言。
+
+### 增量抽取：GitHub pull request board
+
+`gh-pr-board` 的仓库候选推导、open/merged 查询编排、CLI 参数构造及 PR 状态映射已迁移至
+`src/main/worker/github-pull-request-board.ts`；入口仅保留 host、GitHub CLI 与 Git manager
+适配，原 `Vxe/N8/Hxe/P8/F8/Wxe/I8/Gxe/Kxe/qxe` 业务实现不再留在入口。新增
+`scripts/test-github-pull-request-board.mjs`，共 6 项断言。

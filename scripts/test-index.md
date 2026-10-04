@@ -11,6 +11,7 @@ Total scripts: 698.
 - [`test-worker-git-apply-patch.mjs`](./test-worker-git-apply-patch.mjs)
 - [`test-github-pull-request-summary.mjs`](./test-github-pull-request-summary.mjs)
 - [`test-github-pull-request-revision.mjs`](./test-github-pull-request-revision.mjs)
+- [`test-github-pull-request-board.mjs`](./test-github-pull-request-board.mjs)
 - [`test-worker-git-diff-text.mjs`](./test-worker-git-diff-text.mjs)
 - [`test-worker-git-init-watcher.mjs`](./test-worker-git-init-watcher.mjs)
 - [`test-worker-git-ignore-discovery.mjs`](./test-worker-git-ignore-discovery.mjs)
