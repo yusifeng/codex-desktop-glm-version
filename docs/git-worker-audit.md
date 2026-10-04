@@ -900,3 +900,11 @@ GitRepoManager 的 watcher 引用释放边界已迁移至 `src/main/worker/git-w
 入口仍负责实际 watcher dispose 与 `git-repo-unwatched` 事件副作用。
 `scripts/test-worker-git-watch-lifecycle.mjs` 覆盖多引用保留、最终释放、setup reject 和零引用早退，
 共 5 项断言。
+
+### 增量抽取：Git watcher index bucket lookup
+
+Git 性能事件使用的 host-aware repository index size bucket 判定已迁移至
+`src/main/worker/git-watch-index-bucket.ts`。helper 仅负责按 host、根路径包含关系选择
+watcher bucket，并对 host 不匹配或越界路径返回 `unknown`；入口仍保留 path module 选择和
+watcher 集合生命周期。`scripts/test-worker-git-watch-index-bucket.mjs` 覆盖同根、子路径、
+越界路径与 host 隔离，共 4 项断言。

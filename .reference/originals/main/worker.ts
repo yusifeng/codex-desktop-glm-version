@@ -94,6 +94,7 @@ const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchStat
 const { SYNCED_BRANCH_CONFIG_FILE, readSyncedBranchConfig: readSyncedBranchConfigQuery, resolveSyncedBranchConfigPath: resolveSyncedBranchConfigPathQuery, setSyncedBranchConfig: setSyncedBranchConfigQuery } = require("./worker/git-synced-branch-config");
 const { dispatchTurnDiffRequest } = require("./worker/git-turn-diff-request-dispatch");
 const { releaseGitRepoWatch } = require("./worker/git-watch-lifecycle");
+const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
 const { completeTurnDiffCapture: performCompleteTurnDiffCapture, startTurnDiffCapture: performStartTurnDiffCapture } = require("./worker/git-turn-diff-capture");
@@ -69832,7 +69833,7 @@ var I6 = kW(`git`),
           }),
         },
         s = ube(e),
-        c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
+        c = s == null ? `unknown` : getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), s, o, o.isLocal ? g.default : g.default.posix),
         l,
         u = null,
         d = null,
@@ -70463,7 +70464,7 @@ var I6 = kW(`git`),
               host: n,
               operation: s,
               queueDurationMs: null,
-              repoIndexSizeBucket: this.getGitPerformanceRepoIndexSizeBucket(t, n),
+              repoIndexSizeBucket: getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), t, n, n.isLocal ? g.default : g.default.posix),
               result: f,
               resultDisposition: r.aborted ? `canceled` : (p ?? void 0),
               reviewSource: e.method === `review-summary` ? e.params.source : null,
@@ -70700,15 +70701,6 @@ var I6 = kW(`git`),
           }) };
       }
     }
-    getGitPerformanceRepoIndexSizeBucket(e, t) {
-      let n = t.isLocal ? g.default : g.default.posix;
-      for (let r of this.watchesByKey.values()) {
-        if (r.hostId !== t.id) continue;
-        let i = n.relative(r.root, e);
-        if (i === `` || (i !== `..` && !i.startsWith(`..${n.sep}`))) return r.repoIndexSizeBucket;
-      }
-      return `unknown`;
-    }
     async ensureWatching(e, t, n) {
       if (n?.aborted) return () => {};
       let r = this.getWatchKey(e.root, t),
@@ -70805,7 +70797,7 @@ var I6 = kW(`git`),
                         hostKind: t.isLocal ? `local` : `remote`,
                         invalidated: d,
                         rawEventCount: v,
-                        repoIndexSizeBucket: this.getGitPerformanceRepoIndexSizeBucket(e.root, t),
+                        repoIndexSizeBucket: getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), e.root, t, t.isLocal ? g.default : g.default.posix),
                         refreshFanoutCount: m,
                         requiresRecovery: a,
                       }),
