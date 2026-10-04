@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/executable-candidate.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { resolveExecutableCandidate } = module.exports;
+const files = new Set(["tool.exe", "script", "script.cmd", "plain"]);
+const exists = (path) => files.has(path);
+const ext = (path) => path.includes(".") ? path.slice(path.lastIndexOf(".")) : "";
+assert.equal(resolveExecutableCandidate("tool.exe", exists, ext), "tool.exe");
+assert.equal(resolveExecutableCandidate("script", exists, ext), "script.cmd");
+assert.equal(resolveExecutableCandidate("plain", exists, ext), "plain");
+assert.equal(resolveExecutableCandidate("missing", exists, ext), null);
+console.log("worker executable candidate tests passed (4 assertions)");
