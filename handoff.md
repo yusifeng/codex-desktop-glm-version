@@ -827,3 +827,9 @@ Annotation flex-gap overlay projection（原 overlay runtime 内联 flex 子项�
 `src/main/browser-page-preload/annotation-flex-gap-overlays.ts`；目标选择、flex display gate、
 绝对/固定定位过滤、可见 rect 与稳定 key 均由注入式 DOM 依赖承载，overlay runtime 仅保留
 兼容调用代理。`scripts/test-preload-annotation-flex-gap-overlays.mjs` 覆盖 7 项行为断言。
+
+Annotation design-editor state projection（原 `sy/cy`）已迁移至
+`src/main/browser-page-preload/annotation-design-editor-state.ts`；stable id、anchor/control/
+declaration/text/provenance/target-label/viewport 投影由纯协调器负责，DOM snapshot、control
+读取与 React render assembly 仍由入口注入或保留。由
+`scripts/test-preload-annotation-design-editor-state.mjs` 覆盖 6 项 focused assertions。

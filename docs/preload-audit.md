@@ -501,6 +501,13 @@ region、virtual 三类 selection、clip/no-clip、border radius、source index 
 `scripts/test-preload-annotation-design-styles.mjs` 覆盖样式值归一化、previousValue 保留、
 混合文本拒绝、provenance 投影和三种 target mode，共 9 项断言。
 
+Annotation design-editor state projection（原 `sy/cy`）已迁移至
+`src/main/browser-page-preload/annotation-design-editor-state.ts`。模块集中负责 design target
+的 stable id、anchor/control/declaration/text/provenance/label 投影，以及 virtual target 的
+安全回退；入口仍注入 DOM snapshot、control value 和 target-label 读取，React render/hook
+assembly 与副作用保持在原边界。`scripts/test-preload-annotation-design-editor-state.mjs`
+覆盖 element/virtual target、stable id、text/provenance/label 与 viewport/theme 字段，共 6 项断言。
+
 ### 增量抽取：annotation host sync state boundary
 
 批注 host sync 消息对能力关闭、agent 控制清理、preview/request 清理以及 comment-mode
