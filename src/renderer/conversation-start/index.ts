@@ -8,11 +8,11 @@ import {
   ROt as startConversation,
   UBt as modelOptionsSignal,
   YVt as conversationStatusSignal,
-  dHt as isTerminalConversationStatus,
   jOt as deleteConversation,
   uHt as initializeConversationLifecycle,
   wVt as serverConversationIdSignal,
 } from "@rchunk/app-initial";
+import { isTerminalConversationStatus } from "../app-initial/runtime/is-terminal-conversation-status";
 
 export interface ConversationStartScope {
   get(signal: unknown, parameter?: unknown): unknown;

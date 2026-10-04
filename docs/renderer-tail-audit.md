@@ -449,6 +449,13 @@ host/path 展示契约，非法输入仍由调用方回退原始字符串。`scr
 覆盖根路径、query/hash、紧凑模式、非法 URL 与空值 5 项断言。原 hub 导出继续保留
 以兼容尚未迁移调用方。
 
+本轮将 `app-initial` 的已命名消费 predicate `dHt`（公开别名，内部实现 `PA`）迁出
+为 `src/renderer/app-initial/runtime/is-terminal-conversation-status.ts` 的
+`isTerminalConversationStatus`。实现只对 `active-async-turn`、`active-tpp-turn` 和
+`streaming` 返回 `true`，对 `error`、`idle` 及未知状态返回 `false`；
+`conversation-start` 已切换语义导入，保留原 hub 导出以兼容其他调用面。
+`scripts/test-app-initial-terminal-conversation-status.mjs` 覆盖 7 项状态断言。
+
 本轮继续将 app-primary 的纯 payload helper `tPe`（公开别名 `Du`）迁为
 `src/renderer/app-primary/runtime/normalize-suggested-followups.ts` 的
 `normalizeSuggestedFollowups`。实现只读取 `suggested_followups` 数组，过滤无效项、
