@@ -633,3 +633,12 @@ runtime registry/lifecycle bootstrap，`pF`（公开别名 `Af`）负责 provide
 消息 markup delimiter 常量初始化。四者都只在聚合 hub 内由邻近生成投影使用，没有
 独立 named renderer consumer 或 teardown/lifecycle 契约；逐行证据登记在
 `docs/renderer-hub-line-classification.json`，分类门禁期望数由 145 提升至 149。
+
+本轮继续从 app-primary 未消费区补齐九个逐行边界：`$h`（`oO`）是 host capability
+signal，`$s`/`$u`（`IWe`/`mNe`）是 expandable-content transition 与 markdown editor
+controller，`Ai`/`Ap`/`Ar`（`x0`/`EM`/`R2`）是 retry surface、security/provider icon 的
+生成式初始化或展示资产，`As`/`Bu`（`qK`/`ZR`）分别负责 attachment runtime 与 slash-menu
+bootstrap，`Br`（`ltt`）负责 message/answer kind state projection。它们均没有独立 named
+renderer consumer 或可安全迁移的 teardown/lifecycle 契约，继续保留在聚合 hub；逐行范围、
+source symbol 与分类由 `scripts/audit-renderer-hub-classification.mjs` 校验，focused suite
+将 reviewedCount 从 149 提升至 158。
