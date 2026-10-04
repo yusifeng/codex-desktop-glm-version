@@ -65,6 +65,20 @@ function framelessWindowOptions({ alwaysOnTop, hasShadow = true, platform, resiz
     ...(platform === `darwin` ? { type: `panel` } : {}),
   };
 }
+export function windowOptions({ appearance, opaqueWindowSurfaceEnabled, platform, windowZoom = 1 }: { appearance: string; opaqueWindowSurfaceEnabled: boolean; platform: string; windowZoom?: number }): Record<string, unknown> {
+  switch (appearance) {
+    case "browserCommentPopup": return framelessWindowOptions({ hasShadow: false, platform, resizable: false, thickFrame: false });
+    case "globalDictation": case "screenOverlay": return { ...framelessWindowOptions({ alwaysOnTop: true, hasShadow: false, platform, resizable: false, thickFrame: false }), ...(platform === "darwin" ? { acceptFirstMouse: true, enableLargerThanScreen: appearance === "screenOverlay" } : {}) };
+    case "avatarOverlay": return { ...framelessWindowOptions({ alwaysOnTop: true, platform, resizable: false, thickFrame: false }), ...(platform === "darwin" ? { enableLargerThanScreen: true } : {}), hasShadow: false };
+    case "hotkeyWindowHome": return { ...framelessWindowOptions({ platform, resizable: false, thickFrame: false }), ...(platform === "darwin" ? { acceptFirstMouse: true } : {}) };
+    case "hotkeyWindowThread": return framelessWindowOptions({ platform, resizable: true });
+    case "quickChat": case "primary": return platform === "darwin" ? { titleBarStyle: "hiddenInset", trafficLightPosition: trafficLightPosition(windowZoom), ...(appearance === "primary" ? { acceptFirstMouse: true } : {}), ...(appearance === "quickChat" ? { hasShadow: true, resizable: true, transparent: true } : {}), ...(opaqueWindowSurfaceEnabled ? {} : { vibrancy: "menu" }) } : platform === "win32" || platform === "linux" ? { titleBarStyle: "hidden", titleBarOverlay: titleBarOverlay(windowZoom, false), ...(appearance === "quickChat" ? { resizable: true } : {}) } : { titleBarStyle: "default", ...(appearance === "quickChat" ? { resizable: true } : {}) };
+    case "detached": return { titleBarStyle: "hidden", titleBarOverlay: platform === "darwin" || titleBarOverlay(windowZoom, false) };
+    case "secondary": return platform === "darwin" ? (opaqueWindowSurfaceEnabled ? { titleBarStyle: "default" } : { vibrancy: "menu", titleBarStyle: "default" }) : { titleBarStyle: "default" };
+    case "hud": return platform === "darwin" ? (opaqueWindowSurfaceEnabled ? { titleBarStyle: "hiddenInset", minimizable: false, maximizable: false, fullscreenable: false, alwaysOnTop: true, trafficLightPosition: { x: 10, y: 10 } } : { vibrancy: "menu", titleBarStyle: "hiddenInset", minimizable: false, maximizable: false, fullscreenable: false, alwaysOnTop: true, trafficLightPosition: { x: 10, y: 10 } }) : { titleBarStyle: "default", minimizable: false, maximizable: false, fullscreenable: false, alwaysOnTop: true };
+    default: return {};
+  }
+}
 
 export { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, titleBarOverlay, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };
-if (typeof module !== `undefined`) module.exports = { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, resolveAppearanceTheme, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, titleBarOverlay, trafficLightPosition, vibrancyForAppearance, windowSurfaceColors };
+if (typeof module !== `undefined`) module.exports = { framelessWindowOptions, isLargeEnoughForNativeWindow, isOverlayAppearance, minimumWindowSize, resolveAppearanceTheme, shouldHideInactiveWindow, shouldUseOpaqueWindows, supportsEmbeddedWebview, titleBarOverlay, trafficLightPosition, vibrancyForAppearance, windowOptions, windowSurfaceColors };

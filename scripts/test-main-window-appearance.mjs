@@ -19,5 +19,8 @@ assert.deepEqual(appearance.titleBarOverlay(1.5, false), { color: "#00000000", s
 assert.equal(appearance.resolveAppearanceTheme("system", true), "dark");
 assert.equal(appearance.resolveAppearanceTheme("system", false), "light");
 assert.equal(appearance.resolveAppearanceTheme("dark", false), "dark");
+assert.equal(appearance.windowOptions({ appearance: "browserCommentPopup", opaqueWindowSurfaceEnabled: false, platform: "darwin" }).frame, false);
+assert.equal(appearance.windowOptions({ appearance: "primary", opaqueWindowSurfaceEnabled: true, platform: "darwin" }).titleBarStyle, "hiddenInset");
+assert.equal(appearance.windowOptions({ appearance: "hud", opaqueWindowSurfaceEnabled: true, platform: "darwin" }).alwaysOnTop, true);
 
-console.log("15 main window appearance assertions passed");
+console.log("18 main window appearance assertions passed");

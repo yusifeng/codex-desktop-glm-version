@@ -335,6 +335,7 @@ preload 的 WebMCP descriptor 序列化与数量/字节限制已抽取为
 `src/main/browser-page-preload/webmcp-descriptor.ts`，由 5 项行为断言覆盖。
 窗口外观策略已抽取为 `src/main/main-app/window-appearance.ts`，并包含 traffic-light
 system theme 归一化策略，新增 3 项 focused 断言。
+BrowserWindow appearance options 的纯策略（原 `z9`）也已迁移至该模块，新增 3 项 focused 断言。
 geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation surface
 协议 schema 已抽取为 `src/main/browser-page-preload/annotation-protocol.ts`，由 6 项
 行为断言覆盖；annotation hit payload 安全清洗、surface 元素安全边界与 selection

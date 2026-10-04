@@ -173891,6 +173891,8 @@ function R9({
   };
 }
 function z9({ appearance: e, opaqueWindowSurfaceEnabled: t, platform: n, windowZoom: r = 1 }) {
+  return windowAppearance.windowOptions({ appearance: e, opaqueWindowSurfaceEnabled: t, platform: n, windowZoom: r });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e) {
     case `browserCommentPopup`:
       return R9({ hasShadow: !1, platform: n, resizable: !1, thickFrame: !1, transparent: !0 });
