@@ -533,3 +533,11 @@ namespace 先收窄为 `chunk as unknown as { alias?: ... }` 的契约对象，�
 会把这些明确的类型契约误报为 unconsumed。审计器现在逐个解析这种 cast object
 的顶层导出键，并将其计为 named consumer；focused test 对三类 hub 设置消费数量
 回归下限，同时继续保留未消费导出和逐行证据门禁。
+
+本轮继续补齐 app-primary 的 selection overlay 样式逐行证据：`JE`（公开别名 `Ag`，
+3686--3711 行）根据 hover/selection 外观、fill-only 分支与 zoom scale 计算边框、填充、
+阴影和 dashed 样式。它与相邻 annotation SVG 及 selection overlay renderer 共享内部
+生命周期，renderer 没有独立 named consumer；因此登记为 `generated-local-helper` 并保留
+在聚合 hub，避免制造无主 styling facade。行范围、source symbol 和分类由
+`scripts/audit-renderer-hub-classification.mjs` 机器校验，focused suite 同时锁定 `Ag`
+仍属于 unconsumed surface。

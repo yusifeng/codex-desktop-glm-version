@@ -63,5 +63,10 @@
     "hub": "app-primary", "alias": "$p", "sourceSymbol": "IAe", "startLine": 10340, "endLine": 10342,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The loading/eligibility status projection is a two-branch local formatter exported only through the generated hub; there is no named renderer consumer or independent lifecycle boundary to own a facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Ag", "sourceSymbol": "JE", "startLine": 3686, "endLine": 3711,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The selection/hover rectangle style builder is coupled to the adjacent annotation SVG and selection overlay renderers; its appearance, zoom scaling, and fill-only branches are consumed only inside the generated hub, so extracting it without a named renderer owner would create an unowned styling facade."
   }
 ]
