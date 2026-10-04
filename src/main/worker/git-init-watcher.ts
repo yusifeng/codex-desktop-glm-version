@@ -1,4 +1,5 @@
 const { shouldCheckGitInitPath } = require("./git-init-watcher-path-policy");
+const { isGitMetadataDirectoryUnavailable } = require("./git-init-watcher-recovery");
 
 type GitInitWatcherDependencies = {
   createLogger: (tag: string) => any;
@@ -97,17 +98,13 @@ class GitInitWatcher {
           pathSeparator,
         );
       } catch (error) {
-        let gitDirectoryMissing = false;
-        try {
-          gitDirectoryMissing = !(
-            await this.options.host.stat(gitDirectoryPath, {
-              bypassCache: true,
-            })
-          ).isDirectory();
-        } catch (statError) {
-          gitDirectoryMissing =
-            this.dependencies.isMissingPathError(statError);
-        }
+        const gitDirectoryMissing = await isGitMetadataDirectoryUnavailable(
+          gitDirectoryPath,
+          {
+            stat: this.options.host.stat,
+            isMissingPathError: this.dependencies.isMissingPathError,
+          },
+        );
         if (gitDirectoryMissing) {
           this.logger.warning(
             `Failed to watch git path; keeping workspace root watch`,
