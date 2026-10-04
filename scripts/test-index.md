@@ -940,3 +940,7 @@ Total scripts: 881.
 - [`test-preload-annotation-feature-lifecycle.mjs`](./test-preload-annotation-feature-lifecycle.mjs)
 - [`test-worker-git-request-invalidation-policy.mjs`](./test-worker-git-request-invalidation-policy.mjs)
 - [`test-worker-computer-use-capture-policy.mjs`](./test-worker-computer-use-capture-policy.mjs)
+- [`test-preload-annotation-anchor-viewport-policy.mjs`](./test-preload-annotation-anchor-viewport-policy.mjs)
+- [`test-preload-annotation-overlay-class-policy.mjs`](./test-preload-annotation-overlay-class-policy.mjs)
+- [`test-worker-git-live-query-refresh-plan.mjs`](./test-worker-git-live-query-refresh-plan.mjs)
+- [`test-worker-git-watch-close.mjs`](./test-worker-git-watch-close.mjs)
