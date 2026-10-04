@@ -18,6 +18,7 @@ Total scripts: 805.
 - [`test-preload-annotation-preview-geometry.mjs`](./test-preload-annotation-preview-geometry.mjs)
 - [`test-preload-annotation-visibility.mjs`](./test-preload-annotation-visibility.mjs)
 - [`test-renderer-conversation-ready.mjs`](./test-renderer-conversation-ready.mjs)
+- [`test-renderer-browser-url.mjs`](./test-renderer-browser-url.mjs)
 
 - [`test-app-shared-command-visibility-predicates.mjs`](./test-app-shared-command-visibility-predicates.mjs)
 - [`test-worker-git-mutation-dispatch.mjs`](./test-worker-git-mutation-dispatch.mjs)
