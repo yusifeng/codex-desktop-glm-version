@@ -627,7 +627,7 @@ worker open-in target 的平台描述符合并、跨平台 target 构造与 edit
 `src/main/worker/open-in-target-descriptors.ts`；原 `t9` 已删除，`n9/r9` 仅保留薄委托，
 由 12 项 focused assertions 覆盖字段覆盖、缺失平台、hidden、默认参数与 Linux open 绑定。
 worker editor target 参数构造已迁移至 `src/main/worker/editor-target-args.ts`，覆盖
-JetBrains 参数、Zed SSH URI 与行列位置追加，由 7 项 focused assertions 覆盖。
+JetBrains 参数、Zed SSH URI、TextMate txmt URI 与行列位置追加，由 9 项 focused assertions 覆盖。
 worker Windows `PATH`/`Path` 环境键合并策略已迁移至
 `src/main/worker/windows-command-env.ts`，由 6 项 focused assertions 覆盖；入口继续负责
 命令执行与平台环境注入。

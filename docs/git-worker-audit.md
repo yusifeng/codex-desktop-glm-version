@@ -754,7 +754,7 @@ hidden 继承、SSH 标记、默认参数及 Linux open 回调绑定。
 
 Editor target 的 JetBrains 参数、Zed SSH URI 与行列位置追加策略已迁移至
 `src/main/worker/editor-target-args.ts`；入口继续负责编辑器发现和进程执行，
-`scripts/test-worker-editor-target-args.mjs` 覆盖 7 项参数/URI/行列断言。
+`scripts/test-worker-editor-target-args.mjs` 覆盖 9 项参数/URI/行列断言（含 TextMate txmt URI）。
 
 GitHub exact-revision review 的 diff/file handlers（`eSe`/`tSe`）已迁移至
 `src/main/worker/github-pull-request-revision.ts`：SHA/path 校验、账号校验、diff API、
