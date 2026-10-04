@@ -14,6 +14,7 @@ Total scripts: 908.
 - [`test-preload-annotation-interaction-policy.mjs`](./test-preload-annotation-interaction-policy.mjs)
 - [`test-preload-annotation-additional-anchor-projection.mjs`](./test-preload-annotation-additional-anchor-projection.mjs)
 - [`test-preload-annotation-visible-text.mjs`](./test-preload-annotation-visible-text.mjs)
+- [`test-preload-annotation-control-target-list.mjs`](./test-preload-annotation-control-target-list.mjs)
 
 - [`test-preload-annotation-metadata-tooltip.mjs`](./test-preload-annotation-metadata-tooltip.mjs)
 - [`test-preload-annotation-flex-gap-overlays.mjs`](./test-preload-annotation-flex-gap-overlays.mjs)
