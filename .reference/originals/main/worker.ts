@@ -138,6 +138,7 @@ const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { createGitRequestLifecycle } = require("./worker/git-request-lifecycle");
+const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
@@ -75077,7 +75078,7 @@ var c5 = kW(`computer-use-worker`),
           sensitive: {},
         }),
           this.emitCaptureUpdate(e, n),
-          cCe(n) && (await this.readCaptureUpdates(e)));
+          shouldContinueComputerUseCaptureUpdates(n) && (await this.readCaptureUpdates(e)));
       } catch (t) {
         (c5().warning(`Computer Use capture worker update poll failed`, {
           safe: { requestId: e },
@@ -75120,18 +75121,6 @@ var c5 = kW(`computer-use-worker`),
       this.emit({ type: `worker-event`, event: { type: `update`, requestId: e, update: t } });
     }
   };
-function cCe(e) {
-  switch (e.type) {
-    case `metadata`:
-    case `axText`:
-      return !0;
-    case `screenshot`:
-      return !(e.transitionSnapshotDataURL != null && e.transitionSnapshotDataURL.length > 0);
-    case `completed`:
-    case `failed`:
-      return !1;
-  }
-}
 var lCe = class extends IH {
   dependencies;
   iconSemaphore = new k$.Sema(1);

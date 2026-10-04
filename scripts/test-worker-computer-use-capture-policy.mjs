@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { shouldContinueComputerUseCaptureUpdates } = require("../app/.vite/build/worker/computer-use-capture-policy.js");
+assert.equal(shouldContinueComputerUseCaptureUpdates({ type: "metadata" }), true);
+assert.equal(shouldContinueComputerUseCaptureUpdates({ type: "axText" }), true);
+assert.equal(shouldContinueComputerUseCaptureUpdates({ type: "screenshot" }), true);
+assert.equal(shouldContinueComputerUseCaptureUpdates({ type: "screenshot", transitionSnapshotDataURL: "data:image/png;base64,x" }), false);
+assert.equal(shouldContinueComputerUseCaptureUpdates({ type: "completed" }), false);
+assert.equal(shouldContinueComputerUseCaptureUpdates({ type: "failed" }), false);
+assert.equal(shouldContinueComputerUseCaptureUpdates({ type: "unknown" }), false);
+console.log("computer-use capture policy tests passed (7 assertions)");

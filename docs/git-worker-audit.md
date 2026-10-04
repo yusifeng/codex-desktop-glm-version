@@ -1015,3 +1015,8 @@ Live-query fan-out 的 host/commonDir/root/change-type 与 recovery/repository �
 Live-query 完成事件的 `git-live-query-updated` envelope（generation、recovery、subscription
 identity、result 与可选 trace）已迁移至 `src/main/worker/git-live-query-events.ts`；registry 只保留
 发布时机与 emit 副作用，由 `scripts/test-worker-git-live-query-events.mjs` 的 4 项断言覆盖。
+
+Computer-use capture worker 的 update continuation policy 已迁移至
+`src/main/worker/computer-use-capture-policy.ts`；metadata/AX text 会继续轮询，带 transition
+snapshot 的 screenshot 与 completed/failed 会停止轮询，入口仍保留 worker service、日志、事件
+发射和递归副作用。`scripts/test-worker-computer-use-capture-policy.mjs` 覆盖 7 项协议断言。
