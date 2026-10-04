@@ -908,3 +908,10 @@ Git 性能事件使用的 host-aware repository index size bucket 判定已迁�
 watcher bucket，并对 host 不匹配或越界路径返回 `unknown`；入口仍保留 path module 选择和
 watcher 集合生命周期。`scripts/test-worker-git-watch-index-bucket.mjs` 覆盖同根、子路径、
 越界路径与 host 隔离，共 4 项断言。
+
+### 增量抽取：Git watcher acquire lifecycle
+
+`GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至
+`src/main/worker/git-watch-acquire.ts`。入口仍持有 `watchesByKey`、`createRepoWatch` 和实际
+`unwatchRepo` 副作用；helper 仅协调 session 生命周期，由 `scripts/test-worker-git-watch-acquire.mjs`
+覆盖 open-watch 复用、幂等 release、queued abort 和 start rejection，共 8 项断言。

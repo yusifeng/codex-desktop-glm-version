@@ -117,6 +117,7 @@ const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktree
 const { listGitWorktrees } = require("./worker/git-worktree-list");
 const { resolveWorktreeList } = require("./worker/git-worktree-list-request-handler");
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
+const { acquireGitWatch } = require("./worker/git-watch-acquire");
 const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
 const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./worker/git-watcher-metadata");
 const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
@@ -70702,25 +70703,15 @@ var I6 = kW(`git`),
       }
     }
     async ensureWatching(e, t, n) {
-      if (n?.aborted) return () => {};
-      let r = this.getWatchKey(e.root, t),
-        i = this.watchesByKey.get(r),
-        a =
-          i != null && i.closingPromise == null ? i : this.createRepoWatch(e, t, i?.closingPromise);
-      a.refCount += 1;
-      let o = !1,
-        s = () => {
-          o ||
-            ((o = !0),
-            n?.removeEventListener(`abort`, s),
-            this.unwatchRepo(e.root, t, { watch: a }));
-        };
-      n?.addEventListener(`abort`, s, { once: !0 });
-      try {
-        return (await a.startPromise, s);
-      } catch (e) {
-        throw (s(), e);
-      }
+      return acquireGitWatch({
+        metadata: e,
+        host: t,
+        signal: n,
+        getWatchKey: (root, host) => this.getWatchKey(root, host),
+        getWatch: (key) => this.watchesByKey.get(key),
+        createWatch: (metadata, host, closingPromise) => this.createRepoWatch(metadata, host, closingPromise),
+        releaseWatch: (root, host, options) => this.unwatchRepo(root, host, options),
+      });
     }
     createRepoWatch(e, t, n) {
       let r = this.getWatchKey(e.root, t),
