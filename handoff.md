@@ -655,7 +655,8 @@ session 生命周期和实际 Git 调用。
 Git review 搜索的路径标签、上下文片段与大小写不敏感匹配限额已迁移至
 `src/main/worker/git-review-search-utils.ts`，由 7 项 focused assertions 覆盖（含跨 chunk 行解码）；入口继续负责
 Git 查询、文件读取与 review 编排。
-Git read-only request dispatch 的 `origin-url` 首批分支已接入
+Git read-only request dispatch 的 `origin-url`、`origin-and-roots`、`worktree-shell-environment`、
+`worktree-owner`、`default-remote-branch` 与 `merge-base` 分支已全部接入
 `src/main/worker/git-read-request-dispatch.ts`，由 8 项 focused assertions 覆盖；入口继续负责
 取消/性能追踪、Git I/O、class 生命周期与响应包装。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
