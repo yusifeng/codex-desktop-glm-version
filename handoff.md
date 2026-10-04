@@ -900,3 +900,9 @@ Annotation scroll-container clip projection 已迁移至
 `src/main/browser-page-preload/annotation-anchor-clip-policy.ts`；元素包含块判定、CSS overflow
 读取与 viewport clip 相交由注入式策略承载，anchor geometry 入口仅保留 document/window DOM
 适配。`scripts/test-preload-annotation-anchor-clip-policy.mjs` 覆盖 5 项 focused assertions。
+
+Annotation mode toggle 的 capability、user-activation、agent-control 与销毁态门禁，以及稳定的
+page-to-host IPC command envelope 已迁移至
+`src/main/browser-page-preload/annotation-mode-command-policy.ts`；preload runtime 仅保留
+feature lifecycle、pending-request 清理和 IPC 副作用，由
+`scripts/test-preload-annotation-mode-command-policy.mjs` 覆盖 8 项 focused assertions。

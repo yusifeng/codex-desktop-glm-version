@@ -206,6 +206,7 @@ Total scripts: 886.
 - [`test-browser-page-preload-annotation-permission-controller.mjs`](./test-browser-page-preload-annotation-permission-controller.mjs)
 - [`test-preload-annotation-input-target.mjs`](./test-preload-annotation-input-target.mjs)
 - [`test-browser-page-preload-annotation-preload-runtime.mjs`](./test-browser-page-preload-annotation-preload-runtime.mjs)
+- [`test-preload-annotation-mode-command-policy.mjs`](./test-preload-annotation-mode-command-policy.mjs)
 - [`test-browser-page-preload-browser-input-bridge.mjs`](./test-browser-page-preload-browser-input-bridge.mjs)
 - [`test-main-appshot-shortcut.mjs`](./test-main-appshot-shortcut.mjs)
 - [`test-main-startup-policy.mjs`](./test-main-startup-policy.mjs)

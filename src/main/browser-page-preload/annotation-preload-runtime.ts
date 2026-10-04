@@ -3,6 +3,7 @@ import { createAnnotationRuntimeMount } from "./annotation-runtime-mount";
 import { dispatchAnnotationHostMessage } from "./annotation-host-message-dispatcher";
 import { createAnnotationFeatureLifecycle } from "./annotation-feature-lifecycle";
 import { applyAnnotationSyncState } from "./annotation-sync-state";
+import { createAnnotationModeToggleCommand, shouldClearAnnotationRequestsForToggle } from "./annotation-mode-command-policy";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -24,7 +25,7 @@ type AnnotationPreloadRuntimeDependencies = {
   createControlsRegistry: () => any;
   createSiteAnnotationRequests: (options: any) => any;
   createFeatureObserver: (onFeatures: (features: any) => void) => any;
-  createModeController: (...args: any[]) => any;
+    createModeController: (...args: any[]) => any;
   loadCommentRuntime: () => Promise<{ mountBrowserCommentRuntime: (bridge: any) => any }>;
   createCustomEvent: (type: string, init: any) => any;
 };
@@ -71,9 +72,16 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     createModeController: deps.createModeController,
     sendPageEvent: (features) => deps.ipcRenderer.send(deps.channels.pageEvent, { ...deps.featureEvent, payload: { features } }),
     toggleAnnotationMode: (force) => {
-      if (destroyed || state.canUseSiteAnnotationApi !== true || state.isAgentControllingBrowser || deps.navigatorLike.userActivation?.isActive !== true) return false;
-      if (force !== true) featureLifecycle.siteAnnotationRequests?.clear();
-      deps.ipcRenderer.invoke(deps.channels.runtime, { type: `browser-sidebar-runtime-toggle-annotation-mode`, force });
+      const command = createAnnotationModeToggleCommand({
+        destroyed,
+        canUseSiteAnnotationApi: state.canUseSiteAnnotationApi === true,
+        isAgentControllingBrowser: state.isAgentControllingBrowser === true,
+        userActivationActive: deps.navigatorLike.userActivation?.isActive === true,
+        force,
+      });
+      if (command == null) return false;
+      if (shouldClearAnnotationRequestsForToggle(force)) featureLifecycle.siteAnnotationRequests?.clear();
+      deps.ipcRenderer.invoke(deps.channels.runtime, command);
       return true;
     },
     isCommentModeActive: () => deps.isCommentModeActive(state),
