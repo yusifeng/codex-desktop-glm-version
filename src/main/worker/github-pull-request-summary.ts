@@ -1,4 +1,10 @@
 type PullRequest = { owner: string; repository: string; number: number };
+import {
+  getActivePullRequestReaders,
+  getPullRequestSummaryKey,
+  getPullRequestSummaryState,
+  hasPendingPullRequestChecks,
+} from "./github-pull-request-summary-policy";
 type SummaryDeps = {
   runGraphql: (args: string[], options: any) => Promise<any>;
   parseResponse: (text: string) => any;
@@ -30,7 +36,7 @@ class PullRequestSummaryBatcher {
 
   read(pullRequest: PullRequest, host: any, signal?: AbortSignal): Promise<any> {
     signal?.throwIfAborted();
-    const key = JSON.stringify([pullRequest.owner.toLowerCase(), pullRequest.repository.toLowerCase(), pullRequest.number]);
+    const key = getPullRequestSummaryKey(pullRequest);
     let entry = this.pending.get(key);
     if (entry == null) {
       let resolve!: (value: any) => void;
@@ -50,8 +56,8 @@ class PullRequestSummaryBatcher {
     for (; this.pending.size > 0;) {
       const batch = [...this.pending.entries()].slice(0, BATCH_SIZE);
       for (const [key] of batch) this.pending.delete(key);
-      const active = batch.filter(([, e]) => e.readers.some(({ signal }) => !signal?.aborted));
-      const host = active[0]?.[1].readers.find(({ signal }) => !signal?.aborted)?.host;
+      const active = batch.filter(([, e]) => getActivePullRequestReaders(e.readers).length > 0);
+      const host = getActivePullRequestReaders(active[0]?.[1].readers ?? [])[0]?.host;
       let results: any[] = [];
       try {
         if (host != null) {
@@ -95,7 +101,7 @@ class PullRequestSummaryBatcher {
         }
         const open = pr.state === `OPEN`;
         const summary = this.deps.summarizeChecks(this.deps.normalizeChecks(open ? checks : []));
-        output[state.index] = { status: `success`, baseBranch: pr.baseRefName, canMerge: this.deps.canMerge({ ...pr, hasOpenPr: open }), checks: summary.checks, checksComplete: true, ciStatus: summary.ciStatus, headBranch: pr.headRefName, hasOpenPr: open, hasPendingChecks: summary.ciStatus === `pending` || summary.checks.some((check: any) => check.status === `pending`), headRepository: pr.headRepository == null ? null : this.deps.parseRemoteUrl(pr.headRepository.url), headRevision: pr.headRefOid, isDraft: pr.isDraft, mergeBlocker: open ? this.deps.mergeBlocker(pr) : null, state: ({ OPEN: `open`, MERGED: `merged`, CLOSED: `closed` } as any)[pr.state], title: pr.title, url: pr.url };
+        output[state.index] = { status: `success`, baseBranch: pr.baseRefName, canMerge: this.deps.canMerge({ ...pr, hasOpenPr: open }), checks: summary.checks, checksComplete: true, ciStatus: summary.ciStatus, headBranch: pr.headRefName, hasOpenPr: open, hasPendingChecks: hasPendingPullRequestChecks(summary), headRepository: pr.headRepository == null ? null : this.deps.parseRemoteUrl(pr.headRepository.url), headRevision: pr.headRefOid, isDraft: pr.isDraft, mergeBlocker: open ? this.deps.mergeBlocker(pr) : null, state: getPullRequestSummaryState(pr.state), title: pr.title, url: pr.url };
       }
       pages = next;
     }
