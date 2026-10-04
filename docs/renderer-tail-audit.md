@@ -329,6 +329,14 @@ origin-state query 已切换到语义导入；该函数只组装稳定的 `vscod
 可选 cache key 与序列化 params，无初始化副作用，由
 `scripts/test-app-initial-create-command-query-key.mjs` 的 3 项断言覆盖。
 
+本轮进一步将 app-initial 的 Electron command membership policy（公开别名 `mEt`，
+内部 `Gzr`）迁为 `src/renderer/app-initial/runtime/electron-command-policy.ts`。
+原实现只是检查 Electron command registry 的静态 handler map 是否包含给定 id；
+handler 注册、host message 和快捷键副作用仍由 `hEt` 初始化器留在 hub。`codex-
+micro-commands` 的命令列表过滤已切换语义 predicate，并由
+`scripts/test-app-initial-electron-command-policy.mjs` 锁定 25 个注册 id、正负成员
+边界共 4 项断言。
+
 本轮再将 `Kdn`（内部 `KNt`）的 writable configuration layer 选择逻辑迁为
 `selectWritableConfigurationLayer`。该函数仅按 `name.type === "user"` 选择最后一个
 layer，对空/无匹配输入返回 `null`，browser-use mutation 已切换语义导入，并由
