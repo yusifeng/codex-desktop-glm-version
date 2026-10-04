@@ -836,6 +836,11 @@ Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令�
 `git-worktree-create-request.ts` 负责；`scripts/test-worker-git-worktree-create-dispatch.mjs`
 覆盖方法匹配、参数转发、结果 envelope 与未知方法旁路，共 5 项断言。
 
+`stable-metadata` 方法选择与结果转发已迁移至
+`src/main/worker/git-stable-metadata-dispatch.ts`；Git-init watcher 的缺失 metadata 三态策略仍由
+`git-stable-metadata-request-handler.ts` 保持，`scripts/test-worker-git-stable-metadata-dispatch.mjs`
+覆盖成功编码、watcher ensure 和未知方法旁路，共 5 项断言。
+
 ### 增量抽取：Worktree lifecycle scheduling
 
 Worktree 删除/恢复的 host+path 去重、删除 promise 清理，以及恢复操作的串行排队与失败后继续策略已迁移至

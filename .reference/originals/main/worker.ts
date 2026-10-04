@@ -68,7 +68,7 @@ const { getConfigValue: getGitConfigValueQuery, getConfigValueForScope: getGitCo
 const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
-const { resolveStableMetadata } = require("./worker/git-stable-metadata-request-handler");
+const { dispatchStableMetadataRequest } = require("./worker/git-stable-metadata-dispatch");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -69949,7 +69949,7 @@ var I6 = kW(`git`),
             break;
           }
           case `stable-metadata`:
-            p = await resolveStableMetadata(e.params, stableMetadataRequestDeps);
+            p = (await dispatchStableMetadataRequest(e.method, e.params, stableMetadataRequestDeps)).result;
             break;
           case `clone-state`:
             p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
