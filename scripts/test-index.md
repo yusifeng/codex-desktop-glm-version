@@ -2,11 +2,12 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 906.
+Total scripts: 908.
 
 ## Recent semantic extraction suites
 
 - [`test-worker-git-host-handoff-progress.mjs`](./test-worker-git-host-handoff-progress.mjs)
+- [`test-worker-git-move-to-worktree-policy.mjs`](./test-worker-git-move-to-worktree-policy.mjs)
 - [`test-worker-git-branch-request-runtime.mjs`](./test-worker-git-branch-request-runtime.mjs)
 - [`test-worker-git-host-handoff-validation.mjs`](./test-worker-git-host-handoff-validation.mjs)
 - [`test-worker-git-worktree-request-policy.mjs`](./test-worker-git-worktree-request-policy.mjs)

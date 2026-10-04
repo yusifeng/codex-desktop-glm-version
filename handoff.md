@@ -366,6 +366,9 @@ Move-to-local 的分支占用检查、source detach/stash、local dirty guard、
 成功、失败、warning 与异常恢复断言覆盖。
 Move-to-worktree 的 local/target checkout、双 stash 迁移、created-worktree cleanup 与分阶段回滚
 已迁移至 `src/main/worker/git-move-to-worktree.ts`；原 `Bve` 实现已删除，由 26 项断言覆盖。
+Move-to-worktree 的 source/target branch 参数校验与 default-branch 安全门禁已进一步迁移至
+`src/main/worker/git-move-to-worktree-policy.ts`；破坏性 checkout/stash 编排入口仅保留 I/O
+与 rollback，新增 `scripts/test-worker-git-move-to-worktree-policy.mjs` 覆盖 6 项断言。
 Git branch search 的 query 规范化、ref pattern、local/remote ref 解析和 branch-name 去前缀
 已迁移至 `src/main/worker/git-branch-search.ts`；原五个压缩 helper 已删除，由 16 项断言覆盖。
 Git branch search 的 query-cache、local-first/remote fallback、流式输出解码、limit abort 与父 signal

@@ -25,40 +25,9 @@ async function moveThreadToWorktree(
   { host, gitManager, signal, onProgress }: any,
   deps: MoveToWorktreeDependencies,
 ) {
-  const warnings: string[] = [];
-  if (params.sourceBranch.trim().length === 0) {
-    return ok({
-      status: `error`,
-      error: `invalid-params`,
-      message: `Missing source branch`,
-      rollbackErrors: [],
-      warnings,
-    });
-  }
-  const worktreeCheckoutBranch = (
-    params.worktreeCheckoutBranch ?? params.sourceBranch
-  ).trim();
-  if (worktreeCheckoutBranch.length === 0) {
-    return ok({
-      status: `error`,
-      error: `invalid-params`,
-      message: `Missing worktree checkout branch`,
-      rollbackErrors: [],
-      warnings,
-    });
-  }
-  if (
-    params.defaultBranch != null &&
-    params.defaultBranch === worktreeCheckoutBranch
-  ) {
-    return ok({
-      status: `error`,
-      error: `default-branch-blocked`,
-      message: `Move to worktree is not available on the default branch`,
-      rollbackErrors: [],
-      warnings,
-    });
-  }
+  const validation = validateMoveToWorktreeParams(params);
+  if (`error` in validation) return ok(validation.error);
+  const { worktreeCheckoutBranch, warnings } = validation;
 
   let sourceStashRef = null;
   let targetStashRef = null;
@@ -289,3 +258,4 @@ async function moveThreadToWorktree(
 
 export { moveThreadToWorktree };
 if (typeof module !== `undefined`) module.exports = { moveThreadToWorktree };
+import { validateMoveToWorktreeParams } from './git-move-to-worktree-policy';
