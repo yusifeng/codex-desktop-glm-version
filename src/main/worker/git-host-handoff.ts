@@ -1,4 +1,5 @@
 import { validateHostHandoffParams } from './git-host-handoff-validation';
+import { createHostHandoffProgress } from './git-host-handoff-progress';
 
 type HostHandoffDependencies = {
   randomUUID: () => string;
@@ -150,12 +151,8 @@ async function moveThreadToHostWorktree(
   let reusedWorktreePreviousCheckout = null;
   let reusedWorktreeStashRef = null;
   let destinationCheckoutPreviousBranch = null;
-  let activeProgressStep = null;
-  const progress = (step: string, status: string) => {
-    if (status === `started`) activeProgressStep = step;
-    else if (activeProgressStep === step) activeProgressStep = null;
-    onProgress?.(step, status);
-  };
+  const progressState = createHostHandoffProgress((step, status) => onProgress?.(step, status));
+  const progress = progressState.progress;
 
   const rollback = () =>
     deps.rollbackWorktree({
@@ -538,7 +535,7 @@ async function moveThreadToHostWorktree(
       message: error instanceof Error ? error.message : String(error),
     });
   } finally {
-    if (activeProgressStep != null) progress(activeProgressStep, `failed`);
+    progressState.failActive();
     await Promise.allSettled([
       deps.runGit(
         sourceMetadata.root,

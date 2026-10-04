@@ -603,7 +603,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 902 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 903 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5，已完成）
