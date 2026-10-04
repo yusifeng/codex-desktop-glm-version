@@ -274,6 +274,10 @@ Annotation viewport size 读取（原 `p_` 22833-22835）已迁移至
 `src/main/browser-page-preload/annotation-viewport.ts`；入口仅注入 window 尺寸，
 由 `scripts/test-preload-annotation-viewport.mjs` 覆盖正常与零尺寸。
 
+Annotation viewport state 读取（原 `C_` 22902-22913）已迁移至
+`src/main/browser-page-preload/annotation-viewport-state.ts`；入口仅注入 window/visualViewport，
+由 `scripts/test-preload-annotation-viewport-state.mjs` 覆盖基础、偏移与默认 visual viewport。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）

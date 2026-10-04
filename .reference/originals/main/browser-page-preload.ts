@@ -6381,6 +6381,7 @@ var { canScrollAnnotationAxis } = require("./browser-page-preload/annotation-scr
 var { isClippingAnnotationOverflow, isScrollableAnnotationOverflow } = require("./browser-page-preload/annotation-overflow");
 var { resolveAnnotationThemeVariant } = require("./browser-page-preload/annotation-theme");
 var { readAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport");
+var { readAnnotationViewportState } = require("./browser-page-preload/annotation-viewport-state");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22906,16 +22907,7 @@ function S_(e, t, n, r) {
     : `hover-box region-box`;
 }
 function C_() {
-  let e = window.visualViewport,
-    t = e != null && (e.offsetLeft !== 0 || e.offsetTop !== 0 || e.scale !== 1);
-  return {
-    height: window.innerHeight,
-    scrollY: window.scrollY,
-    ...(t
-      ? { visualViewport: { offsetLeft: e.offsetLeft, offsetTop: e.offsetTop, scale: e.scale } }
-      : {}),
-    width: window.innerWidth,
-  };
+  return readAnnotationViewportState(window);
 }
 function w_(e, t) {
   return scaleAnnotationRect(e, t);
