@@ -487,3 +487,12 @@ selection index；DOM/frame 解析和 geometry 仍由入口注入，避免将 Re
 提升到独立模块。`scripts/test-preload-annotation-display-selections.mjs` 覆盖 element、
 region、virtual 三类 selection、clip/no-clip、border radius、source index 与 page marker，
 共 7 项断言。
+
+### 增量抽取：annotation design styles boundary
+
+设计批注的 computed-style 声明收集、声明合并、direct-text draft、style provenance
+投影和 create/edit/design target 匹配已迁移至
+`src/main/browser-page-preload/annotation-design-styles.ts`。入口仅保留原 `ls/us/ds/fs/ps/ms`
+兼容委托；DOM 文本读取仍由入口提供元素对象，React render 与设计变更副作用未移入该模块。
+`scripts/test-preload-annotation-design-styles.mjs` 覆盖样式值归一化、previousValue 保留、
+混合文本拒绝、provenance 投影和三种 target mode，共 9 项断言。

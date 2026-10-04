@@ -3890,46 +3890,22 @@ function cs(e) {
   return e.length;
 }
 function ls(e, t) {
-  return t.map((t) => {
-    let n = e.getPropertyValue(t).trim();
-    return { property: t, value: n, previousValue: n };
-  });
+  return annotationDesignStyles.collectAnnotationStyleDeclarations(e, t);
 }
 function us(e, t) {
-  let n = new Map(t.map((e) => [e.property, e]));
-  return e.map((e) => {
-    let t = n.get(e.property);
-    return t == null ? e : { ...e, previousValue: t.previousValue, value: t.value };
-  });
+  return annotationDesignStyles.mergeAnnotationStyleDeclarations(e, t);
 }
 function ds(e) {
-  let t = Array.from(e.childNodes)
-    .filter((e) => e.nodeType === Vs)
-    .map((e) => e.textContent?.replace(/\s+/g, ` `).trim() ?? ``)
-    .join(` `)
-    .replace(/\s+/g, ` `)
-    .trim();
-  return t.length === 0 ||
-    Array.from(e.children).some((e) => (e.textContent?.replace(/\s+/g, ` `).trim().length ?? 0) > 0)
-    ? null
-    : t;
+  return annotationDesignStyles.readAnnotationDirectText(e);
 }
 function fs(e) {
-  let t = ds(e);
-  if (t != null) return { value: t, previousValue: t };
+  return annotationDesignStyles.createAnnotationTextDraft(e);
 }
 function ps(e) {
-  return e.map((e) => ({ property: e.property }));
+  return annotationDesignStyles.projectAnnotationStyleProvenance(e);
 }
 function ms(e, t) {
-  switch (e.mode) {
-    case `create`:
-      return t.mode === `create`;
-    case `edit`:
-      return t.mode === `edit` && e.commentId === t.commentId;
-    case `design`:
-      return t.mode === `design` && e.groupId === t.groupId;
-  }
+  return annotationDesignStyles.isAnnotationInteractionTargetMatch(e, t);
 }
 function hs(e) {
   return parseGoogleDocsUrlHelper(e);
@@ -6252,6 +6228,7 @@ var { createAnnotationPreviewScheduler } = require("./browser-page-preload/annot
 var { createAnnotationPreviewController } = require("./browser-page-preload/annotation-preview-controller");
 var { createAnnotationPreloadBridge } = require("./browser-page-preload/annotation-preload-bridge");
 var { createAnnotationRequestContext } = require("./browser-page-preload/annotation-request-context");
+var annotationDesignStyles = require("./browser-page-preload/annotation-design-styles");
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
 var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annotation-draft-runtime");

@@ -817,3 +817,8 @@ Annotation feature policy lifecycle（原 preload `initializeFeatures`/`disposeF
 IPC toggle 与 host-message wiring。controls、site-request、feature observer、mode controller
 的 enable/disable 和 teardown 由 11 项 focused assertions 覆盖；React/DOM runtime 仍保留在
 原边界。
+
+Annotation design styles boundary（原 `ls/us/ds/fs/ps/ms`）已迁移至
+`src/main/browser-page-preload/annotation-design-styles.ts`，覆盖 computed-style 声明收集与合并、
+direct-text draft、style provenance 投影和 create/edit/design target 匹配；入口保留原兼容委托，
+由 `scripts/test-preload-annotation-design-styles.mjs` 的 9 项断言覆盖。
