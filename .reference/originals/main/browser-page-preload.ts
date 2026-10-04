@@ -4241,12 +4241,6 @@ function ec(e) {
   }
   return t;
 }
-function tc(e) {
-  return e === `auto` || e === `scroll` || e === `overlay`;
-}
-function nc(e) {
-  return tc(e) || e === `clip` || e === `hidden`;
-}
 function rc(e) {
   return e === document.documentElement || e === document.body;
 }
@@ -6384,6 +6378,7 @@ var { snapshotAnnotationDesign } = require("./browser-page-preload/annotation-de
 var { getAnnotationTargetLabel } = require("./browser-page-preload/annotation-target-label");
 var { normalizeAnnotationWheelDelta } = require("./browser-page-preload/annotation-wheel-delta");
 var { canScrollAnnotationAxis } = require("./browser-page-preload/annotation-scroll-boundary");
+var { isClippingAnnotationOverflow, isScrollableAnnotationOverflow } = require("./browser-page-preload/annotation-overflow");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22742,8 +22737,8 @@ function c_(e, t = dd(e), n = null) {
     let n = a.getComputedStyle(e);
     if (
       ((r = A_(r, O_(e, o), {
-        x: nc(n.overflowX || n.overflow),
-        y: nc(n.overflowY || n.overflow),
+        x: isClippingAnnotationOverflow(n.overflowX || n.overflow),
+        y: isClippingAnnotationOverflow(n.overflowY || n.overflow),
       })),
       r == null)
     )
@@ -22934,8 +22929,8 @@ function T_(e, t, n = Ic(t.ownerDocument.defaultView ?? window), r = !1) {
       continue;
     }
     let e = i.getComputedStyle(s),
-      t = nc(e.overflowX || e.overflow),
-      c = nc(e.overflowY || e.overflow);
+      t = isClippingAnnotationOverflow(e.overflowX || e.overflow),
+      c = isClippingAnnotationOverflow(e.overflowY || e.overflow);
     if ((t || c) && ((a = A_(a, O_(s, n, r), { x: t, y: c })), a == null)) return null;
     s = ic(s);
   }
@@ -23699,8 +23694,8 @@ function zv(e, t, n) {
 function Bv(e, t, n) {
   let r = n.getComputedStyle(e);
   return (
-    (tc(r.overflowY) && Vv(t.y, e.scrollTop, e.clientHeight, e.scrollHeight)) ||
-    (tc(r.overflowX) && Vv(t.x, e.scrollLeft, e.clientWidth, e.scrollWidth))
+    (isScrollableAnnotationOverflow(r.overflowY) && Vv(t.y, e.scrollTop, e.clientHeight, e.scrollHeight)) ||
+    (isScrollableAnnotationOverflow(r.overflowX) && Vv(t.x, e.scrollLeft, e.clientWidth, e.scrollWidth))
   );
 }
 function Vv(e, t, n, r) {

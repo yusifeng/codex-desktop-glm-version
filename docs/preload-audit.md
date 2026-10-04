@@ -261,6 +261,11 @@ Annotation scroll boundary 方向判定（原 `Vv` 23704-23707）已迁移至
 `src/main/browser-page-preload/annotation-scroll-boundary.ts`；入口保留容器滚动副作用，
 由 `scripts/test-preload-annotation-scroll-boundary.mjs` 覆盖起点、终点、可滚动与 zero delta。
 
+Annotation overflow 值判定（原 `tc/nc` 4244-4249）已迁移至
+`src/main/browser-page-preload/annotation-overflow.ts`；入口的 frame clipping 与 scroll-container
+判定改用语义入口，原 helper 已物理删除；由 `scripts/test-preload-annotation-overflow.mjs` 覆盖
+scrollable/clipping/visible 三类值。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）
