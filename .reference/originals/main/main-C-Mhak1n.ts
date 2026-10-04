@@ -14,6 +14,7 @@ const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-a
 const windowAppearance = require("./main-app/window-appearance.js");
 const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
+const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175201,21 +175202,7 @@ function kst({
     },
   };
 }
-function Ast(e) {
-  switch (e) {
-    case a.in.Agent:
-    case a.in.Dev:
-      return;
-    case a.in.Nightly:
-      return `c4c933ff-16f4-47c7-a231-29e6bb84dccc`;
-    case a.in.InternalAlpha:
-      return `c4607cac-3138-48bd-8b2a-5bc99d08e393`;
-    case a.in.PublicBeta:
-      return `758400cf-36c7-43be-9335-6354d603be3a`;
-    case a.in.Prod:
-      return `e5768d8b-6936-4f45-b1ad-4c5fb414cb35`;
-  }
-}
+const Ast = (e) => resolveWindowsPackageIdentity(e, a.in);
 var jst = n.vf(`type`, [
     n.wf({ type: n.bf(`menu-update`) }),
     n.wf({ type: n.bf(`menu-open`) }),

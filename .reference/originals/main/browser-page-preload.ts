@@ -6371,6 +6371,7 @@ var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
+var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22062,49 +22063,14 @@ var Dg,
     jg = 2147483647;
   });
 function Ng(e, t) {
-  let n = new Set([e]),
-    r = new MutationObserver((a) => {
-      let o = n.size;
-      for (let e of a) for (let t of e.addedNodes) F(t) && i(t);
-      let s = !1;
-      for (let t of n)
-        t !== e && (!t.isConnected || t.ownerDocument !== e) && (n.delete(t), (s = !0));
-      if (s) {
-        r.disconnect();
-        for (let e of n) r.observe(e, Fg);
-      }
-      (s ||
-        n.size !== o ||
-        a.some(
-          (e) =>
-            e.type === `attributes` ||
-            [...e.addedNodes, ...e.removedNodes].some(
-              (e) => F(e) && (e.matches(Pg) || e.querySelector(Pg) != null),
-            ),
-        )) &&
-        t();
-    });
-  function i(e) {
-    let t = e.querySelectorAll(`*`);
-    for (let a of F(e) ? [e, ...t] : t)
-      !F(a) ||
-        gl(a) ||
-        a.shadowRoot == null ||
-        n.has(a.shadowRoot) ||
-        (n.add(a.shadowRoot), r.observe(a.shadowRoot, Fg), i(a.shadowRoot));
-  }
-  let a = (e) => {
-    let n = e.composedPath()[0];
-    F(n) && !gl(n) && (i(n), t());
-  };
-  return (
-    r.observe(e, Fg),
-    i(e),
-    e.addEventListener(Ig, a),
-    () => {
-      (r.disconnect(), e.removeEventListener(Ig, a));
-    }
-  );
+  return observeAnnotationShadowRoots(e, t, {
+    mutationObserverConstructor: MutationObserver,
+    observerOptions: Fg,
+    selector: Pg,
+    isElement: F,
+    isIgnored: gl,
+    shadowEvent: Ig,
+  });
 }
 var Pg,
   Fg,
