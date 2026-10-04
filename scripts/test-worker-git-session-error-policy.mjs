@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-session-error-policy.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = module.exports;
+assert.equal(isWorkingDirectoryPermissionError(new Error("Unable to read current working directory: Permission denied")), true);
+assert.equal(isWorkingDirectoryPermissionError(new Error("Unable to read current working directory: operation not permitted")), true);
+assert.equal(isWorkingDirectoryPermissionError(new Error("Unable to read current working directory")), false);
+assert.equal(isWorkingDirectoryPermissionError("permission denied"), false);
+assert.equal(isGitProcessTimeout(new Error("git process timed out after 1000ms")), true);
+assert.equal(isGitProcessTimeout(new Error("git process failed")), false);
+console.log("worker Git session error policy tests passed (6 assertions)");

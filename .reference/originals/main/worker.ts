@@ -123,6 +123,7 @@ const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
 const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
+const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
@@ -67676,14 +67677,10 @@ var {
     }
   };
 function Xhe(e) {
-  let t = (e instanceof Error ? e.message : String(e)).toLowerCase();
-  return (
-    t.includes(`unable to read current working directory`) &&
-    (t.includes(`operation not permitted`) || t.includes(`permission denied`))
-  );
+  return isWorkingDirectoryPermissionError(e);
 }
 function l4(e) {
-  return e instanceof Error && e.message.includes(`git process timed out after`);
+  return isGitProcessTimeout(e);
 }
 var d4 = kW(`threadConfig`),
   cge = `codex-thread.json`,
