@@ -114,6 +114,14 @@ Electron/worker 副作用）：
 失败、非 Error 失败和始终退出等 4 组断言。原入口仍负责传入真实副作用，Ust
 其余启动装配保持在原边界内。
 
+### 增量抽取：启动打开文件参数
+
+可打开文件类型、`file://` 归一化、绝对路径/深链过滤、`--open-project` 跳过与去重
+descriptor 已迁移至 `src/main/main-app/files/open-path-arguments.ts`（原
+12,855-12,948、启动消费点 175,698 与 176,281-176,313）。入口仅保留兼容别名并继续
+负责窗口与 deep-link 副作用；`scripts/test-main-open-path-arguments.mjs` 覆盖 13 项
+平台、URL、扩展名、过滤与去重断言。
+
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs
