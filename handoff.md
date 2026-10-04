@@ -907,6 +907,11 @@ page-to-host IPC command envelope 已迁移至
 feature lifecycle、pending-request 清理和 IPC 副作用，由
 `scripts/test-preload-annotation-mode-command-policy.mjs` 覆盖 8 项 focused assertions。
 
+Annotation editor view-state boundary 已迁移至
+`src/main/browser-page-preload/annotation-editor-view-state.ts`：pointer 命中后的 anchor state
+投影、viewport/theme 字段和当前页面可见性/placement 回退由 7 项 focused assertions 覆盖；
+原 preload `tv`/`nv` 仅保留 DOM/geometry 适配。
+
 Git-init metadata watcher 失败后的 stat/recovery 判定已迁移至
 `src/main/worker/git-init-watcher-recovery.ts`；watcher 入口仅保留 session dispose、日志与
 重连副作用，由 `scripts/test-worker-git-init-watcher-recovery.mjs` 覆盖存在目录、非目录、

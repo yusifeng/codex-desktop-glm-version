@@ -953,3 +953,4 @@ Total scripts: 890.
 - [`test-worker-git-response-envelope.mjs`](./test-worker-git-response-envelope.mjs)
 - [`test-worker-git-live-query-watch-options.mjs`](./test-worker-git-live-query-watch-options.mjs)
 - [`test-worker-git-live-query-recovery.mjs`](./test-worker-git-live-query-recovery.mjs)
+- [`test-preload-annotation-editor-view-state.mjs`](./test-preload-annotation-editor-view-state.mjs)

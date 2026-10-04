@@ -576,3 +576,11 @@ surface observer 对 containers、metadata 与 metadata-with-targets 的 feature
 event path 适配器，入口保留 DOM 类型判断与历史 `gl`/`Cl`/`xl` 兼容代理；
 `scripts/test-preload-annotation-interaction-policy.mjs` 覆盖 root、ancestor、shadow-host、
 blocker 与 marker 边界，共 8 项 focused assertions。
+
+### 增量抽取：annotation editor view-state boundary
+
+批注编辑器从 pointer 命中创建 anchor state，以及当前页面/可见裁剪失败时的 placement
+回退已迁移至 `src/main/browser-page-preload/annotation-editor-view-state.ts`。模块仅接收
+viewport、DOM rect、anchor builder 和 clipping 适配器；原 preload 的 `tv`/`nv` 入口保留
+浏览器依赖注入。`scripts/test-preload-annotation-editor-view-state.mjs` 覆盖 fixed anchor、
+viewport/theme 投影、同页保留、异页回退和不可见时跳过 clipping，共 7 项断言。

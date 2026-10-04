@@ -22808,6 +22808,7 @@ var {
   splitAnnotationAnchorState: splitAnnotationAnchorState,
 } = require("./browser-page-preload/annotation-anchor-state");
 var { projectAnnotationDisplaySelections } = require("./browser-page-preload/annotation-display-selections");
+var { createAnnotationEditorAnchorState, normalizeAnnotationEditorPlacement } = require("./browser-page-preload/annotation-editor-view-state");
 function B_(e, t, n) {
   return createAnnotationAnchorState(e, t, {
     resolveThemeVariant: f_,
@@ -22879,26 +22880,20 @@ var ev = o(() => {
   (wd(), z_());
 });
 function tv(e, t, n) {
-  let r = p_(),
-    i = cd(e),
-    a = { x: t, y: n };
-  return {
-    anchor: id(e, i ?? { x: t, y: n, width: 0, height: 0 }, a, i != null && Ac(e), r.width),
-    themeVariant: f_(),
-    viewportRect: i,
-    viewportPoint: a,
-    viewportSize: r,
-  };
+  return createAnnotationEditorAnchorState(e, { x: t, y: n }, {
+    readViewportSize: p_,
+    readElementRect: cd,
+    buildAnchor: id,
+    isFixed: Ac,
+    readThemeVariant: f_,
+  });
 }
 function nv(e, t) {
-  let { anchor: n } = e;
-  return (md(n.pageUrl, fd()) &&
-  (n.kind !== `element` || t != null) &&
-  (n.kind !== `text` || lu(n) != null)
-    ? c_(n, e.viewportRect, t)
-    : null) == null
-    ? { ...e, placement: `top-left`, viewportRect: null, viewportPoint: { x: 0, y: 0 } }
-    : e;
+  return normalizeAnnotationEditorPlacement(e, t, {
+    isCurrentPage: (pageUrl) => md(pageUrl, fd()),
+    isTextAnchorResolved: (anchor) => lu(anchor) != null,
+    clipAnchor: c_,
+  });
 }
 function rv(e, t, n) {
   if (e.anchor.kind === `text`) return lu(e.anchor) ?? iv(e.anchor, n, e.themeVariant);
