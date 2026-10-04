@@ -858,3 +858,8 @@ Annotation overlay 的页面 mutation observer 生命周期已迁移至
 `src/main/browser-page-preload/annotation-overlay-observer.ts`；overlay 自身 mutation 过滤、页面
 mutation 刷新和幂等 teardown 不再内联于 overlay runtime，由
 `scripts/test-preload-annotation-overlay-observer.mjs` 覆盖 9 项 focused assertions。
+
+Live-query subscription setup 的 repository metadata 查询、pending trace 关联与 watcher
+复用/启动已迁移至 `src/main/worker/git-live-query-subscription-setup.ts`；入口仅保留订阅
+注册、abort 等待、取消和 watcher 引用释放副作用。`scripts/test-worker-git-watch-request-handlers.mjs`
+现覆盖 30 项断言，并直接验证 setup helper 的 metadata、trace 与 release contract。

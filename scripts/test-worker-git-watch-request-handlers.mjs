@@ -9,6 +9,7 @@ const {
   unwatchGitRepository,
   watchGitRepository,
 } = require("../app/.vite/build/worker/git-watch-request-handlers.js");
+const { prepareGitLiveQuerySubscription } = require("../app/.vite/build/worker/git-live-query-subscription-setup.js");
 
 const calls = [];
 let existingWatch = null;
@@ -113,6 +114,18 @@ const metadataTrace = calls.find(([, options]) => options?.name === "git.metadat
 assert.deepEqual(metadataTrace.links, ["metadata-trace"]);
 
 calls.length = 0;
+const prepared = await prepareGitLiveQuerySubscription({ query, trace: "direct-trace" }, deps);
+assert.deepEqual(prepared.metadata, { root: "/repo", commonDir: "/common" });
+assert.equal(typeof prepared.releaseWatch, "function");
+assert.deepEqual(calls.filter(([name]) => name === "trace").map(([, options]) => options.name), [
+  "git.subscription_setup",
+  "git.metadata_lookup",
+  "git.watcher_start",
+]);
+prepared.releaseWatch();
+assert.equal(calls.at(-1)[0], "release");
+
+calls.length = 0;
 stableMetadata = null;
 await assert.rejects(
   subscribeGitLiveQuery({ query, subscriptionId: "missing" }, deps),
@@ -152,4 +165,4 @@ assert.equal(calls.at(-1)[0], "release");
 assert.equal(calls.some(([name]) => name === "unsubscribe"), false);
 deps.liveQueryRegistry.subscribe = subscribe;
 
-console.log("25 worker git watch request handler assertions passed");
+console.log("30 worker git watch request handler assertions passed");

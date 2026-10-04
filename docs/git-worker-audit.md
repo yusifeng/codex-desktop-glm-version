@@ -1028,3 +1028,11 @@ Git watcher setup 的 per-host 串行排队、index size bucket 采样、watcher
 origin-query 清理已迁移至 `src/main/worker/git-watch-setup.ts`；入口仅注入 host/path、watcher
 启动、repository cache 与 close 副作用，由 `scripts/test-worker-git-watch-setup.mjs` 覆盖 11 项
 生命周期断言。watcher 本身和 worker host 绑定仍保留在入口。
+
+### 增量抽取：Live-query subscription setup boundary
+
+live-query 订阅前的 repository metadata 查询、pending-metadata trace 关联、watcher 复用/启动
+及 setup trace envelope 已迁移至 `src/main/worker/git-live-query-subscription-setup.ts`。
+`git-watch-request-handlers.ts` 现在仅保留订阅注册、abort 等待、取消和 watcher 引用释放副作用，
+由 `scripts/test-worker-git-watch-request-handlers.mjs` 增至 30 项断言，并直接覆盖 setup helper
+的 metadata、trace 与 release contract。
