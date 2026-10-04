@@ -131,6 +131,7 @@ const { dispatchRepositoryReadRequest } = require("./worker/git-repository-read-
 const { dispatchBranchExtraReadRequest } = require("./worker/git-branch-extra-read-dispatch");
 const { dispatchWorktreeReadRequest } = require("./worker/git-worktree-read-dispatch");
 const { dispatchRepositoryContentRequest } = require("./worker/git-repository-content-dispatch");
+const { dispatchSyncedBranchRequest } = require("./worker/git-synced-branch-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69987,14 +69988,14 @@ var I6 = kW(`git`),
             break;
           }
           case `synced-branch`: {
-            p = X(await resolveSyncedBranch(e.params.cwd, syncedBranchRequestDeps));
+            p = X(await dispatchSyncedBranchRequest(e.method, e.params, { syncedBranch: (cwd) => resolveSyncedBranch(cwd, syncedBranchRequestDeps), syncedBranchState: (cwd) => resolveSyncedBranchState(cwd, syncedBranchRequestDeps), overwriteRepository: (params) => overwriteSyncedBranchRepository(params, syncedBranchRequestDeps) }));
             break;
           }
           case `synced-branch-state`:
-            p = X(await resolveSyncedBranchState(e.params.cwd, syncedBranchRequestDeps));
+            p = X(await dispatchSyncedBranchRequest(e.method, e.params, { syncedBranch: (cwd) => resolveSyncedBranch(cwd, syncedBranchRequestDeps), syncedBranchState: (cwd) => resolveSyncedBranchState(cwd, syncedBranchRequestDeps), overwriteRepository: (params) => overwriteSyncedBranchRepository(params, syncedBranchRequestDeps) }));
             break;
           case `overwrite-repo`: {
-            let t = await overwriteSyncedBranchRepository(e.params, syncedBranchRequestDeps);
+            let t = await dispatchSyncedBranchRequest(e.method, e.params, { syncedBranch: (cwd) => resolveSyncedBranch(cwd, syncedBranchRequestDeps), syncedBranchState: (cwd) => resolveSyncedBranchState(cwd, syncedBranchRequestDeps), overwriteRepository: (params) => overwriteSyncedBranchRepository(params, syncedBranchRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }

@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-synced-branch-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchSyncedBranchRequest } = module.exports;
+const deps = { syncedBranch: (cwd) => `branch:${cwd}`, syncedBranchState: (cwd) => `state:${cwd}`, overwriteRepository: (p) => ({ result: p.mode, refreshRoot: p.cwd }) };
+assert.equal(await dispatchSyncedBranchRequest("synced-branch", { cwd: "/r" }, deps), "branch:/r");
+assert.equal(await dispatchSyncedBranchRequest("synced-branch-state", { cwd: "/r" }, deps), "state:/r");
+assert.deepEqual(await dispatchSyncedBranchRequest("overwrite-repo", { cwd: "/r", mode: "force" }, deps), { result: "force", refreshRoot: "/r" });
+assert.equal(await dispatchSyncedBranchRequest("unknown", {}, deps), undefined);
+console.log("worker Git synced branch dispatch tests passed (4 assertions)");
