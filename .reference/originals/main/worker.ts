@@ -47,6 +47,7 @@ const { isRemoteHost, buildEditorOpenArgs, buildRemoteUri, buildRemoteEditorArgs
 const { createGithubPullRequestRevisionHandlers } = require("./worker/github-pull-request-revision");
 const { createGitHubPullRequestSummaryHandler } = require("./worker/github-pull-request-summary");
 const { createGithubPullRequestBoardHandler } = require("./worker/github-pull-request-board");
+const { quoteShellArg, joinShellArgs } = require("./worker/shell-quoting");
 const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
@@ -54441,7 +54442,7 @@ var BX = e.n((e, t) => {
 function WX(e) {
   return Array.from(new UX(e));
 }
-function GX(e) {
+/* function GX(e) {
   return e === ``
     ? `''`
     : /[^\w@%\-+=:,./]/.test(e)
@@ -54451,7 +54452,9 @@ function GX(e) {
 function KX(e) {
   if (!Array.isArray(e)) throw TypeError(`args should be an array`);
   return e.map(GX).join(` `);
-}
+} */
+const GX = quoteShellArg;
+const KX = joinShellArgs;
 var qX = e.n((e) => {
     (Object.defineProperty(e, "__esModule", { value: !0 }), (e.sync = e.isexe = void 0));
     var t = require("fs"),
