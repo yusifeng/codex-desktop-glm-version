@@ -5,10 +5,10 @@ import {
   QI as initializeScopedSignals,
   QX as createScopedQuery,
   ZI as conversationIdScope,
-  _H as parseGitRemoteUrl,
   ek as initializeQueryRuntime,
   wL as initializeUtilities,
 } from "@rchunk/app-shared";
+import { parseGitRemoteUrl } from "../app-shared/runtime/parse-git-remote-url";
 import {
   $sn as initializeExternalResources,
   AXt as initializeGitQueries,

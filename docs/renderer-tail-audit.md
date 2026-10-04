@@ -337,6 +337,12 @@ host identity，而非独立业务常量。为避免在不同 bootstrap 顺序�
 登记为 `zero-consumer-query-facade`，暂不为零消费导出制造语义占位，待出现真实
 consumer 后再按 identity/query-key 契约迁移。
 
+本轮在 `creation-target-query` 簇将 app-shared `_H`（内部 `rHe`）迁为
+`src/renderer/app-shared/runtime/parse-git-remote-url.ts`。该完整纯 parser 支持 URL
+与 SCP-style remote、嵌套 owner path 和 `.git` 后缀，并拒绝 Windows 本地路径及
+无效 remote；2 个 creation-target 调用点已切换语义导入，由
+`scripts/test-app-shared-parse-git-remote-url.mjs` 的 4 项断言覆盖。
+
 `tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
 command、query config、params/cache key 与 app-server `queryFn`、response priority
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
