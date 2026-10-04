@@ -46,4 +46,8 @@ export function showWorkspacePolicyRestartDialog(options: WorkspacePolicyRestart
   options.quit();
 }
 
-if (typeof module !== `undefined`) module.exports = { showWorkspacePolicyRestartDialog };
+export function formatWorkspacePolicyRestartDetail(formatMessage: (descriptor: { messageId: string; defaultMessage: string; values?: Record<string, string> }) => string, appName: string): string {
+  return formatMessage({ ...RESTART_MESSAGES.detail, values: { appName } });
+}
+
+if (typeof module !== `undefined`) module.exports = { formatWorkspacePolicyRestartDetail, showWorkspacePolicyRestartDialog };

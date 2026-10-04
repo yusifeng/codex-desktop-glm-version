@@ -2,7 +2,8 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const { showWorkspacePolicyRestartDialog } = require("../app/.vite/build/main-app/startup/workspace-policy-restart-dialog.js");
+const { formatWorkspacePolicyRestartDetail, showWorkspacePolicyRestartDialog } = require("../app/.vite/build/main-app/startup/workspace-policy-restart-dialog.js");
+assert.equal(formatWorkspacePolicyRestartDetail((descriptor) => descriptor.defaultMessage.replace("{appName}", descriptor.values.appName), "Codex"), "Restart Codex to apply your workspace settings. Active local chats will be interrupted");
 const calls = []; let approved = 0; let quit = 0;
 const intl = { formatMessage: (descriptor) => descriptor.messageId === `desktop.workspacePolicyRestart.detail` ? `Restart Codex to apply settings` : descriptor.defaultMessage };
 showWorkspacePolicyRestartDialog({ getIntl: () => intl, getAppName: () => `Codex`, showMessageBoxSync: (options) => calls.push(options), markQuitApproved: () => approved++, quit: () => quit++ });
