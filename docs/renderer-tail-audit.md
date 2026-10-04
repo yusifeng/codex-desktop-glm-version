@@ -526,3 +526,10 @@ React 或 signal runtime。`scripts/test-app-primary-plan-selection-surface.mjs`
 它没有独立 renderer named consumer；为避免制造无主 facade，归类为
 `generated-local-helper` 并保留在聚合 hub。该行范围、source symbol 与分类由
 `scripts/audit-renderer-hub-classification.mjs` 机器校验。
+
+本轮修正 hub 消费审计对另一种真实 renderer 边界的识别：许多组件将聚合
+namespace 先收窄为 `chunk as unknown as { alias?: ... }` 的契约对象，再通过该
+局部契约调用运行时。此前审计只识别 `chunk.alias`、named import 与解构左值，
+会把这些明确的类型契约误报为 unconsumed。审计器现在逐个解析这种 cast object
+的顶层导出键，并将其计为 named consumer；focused test 对三类 hub 设置消费数量
+回归下限，同时继续保留未消费导出和逐行证据门禁。

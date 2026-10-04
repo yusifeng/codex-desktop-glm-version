@@ -84,6 +84,62 @@ function readConsumption(hub) {
             if (/^[A-Za-z_$][\\w$]*$/.test(exportName)) namespaceMembers.add(exportName);
           }
         }
+
+        // Renderer boundaries often narrow a namespace import through an
+        // explicit object type cast before destructuring or member access:
+        // `chunk as unknown as { Ab?: (value: T) => U }`.  The type keys are
+        // real public export consumers even when the runtime binding is later
+        // passed around under a local name (so no `chunk.Ab` expression is
+        // present for the textual scan above).  Parse only top-level keys of
+        // each cast object, avoiding nested function/object type members.
+        const castMarker = new RegExp(`\\b${namespace[1]}\\s+as\\s+unknown\\s+as\\s*\\{`, "g");
+        for (const marker of source.matchAll(castMarker)) {
+          let depth = 1;
+          let quote = null;
+          let escaped = false;
+          let end = marker.index + marker[0].length;
+          for (; end < source.length && depth > 0; end++) {
+            const character = source[end];
+            if (quote) {
+              if (escaped) escaped = false;
+              else if (character === "\\") escaped = true;
+              else if (character === quote) quote = null;
+              continue;
+            }
+            if (character === "\"" || character === "'" || character === "`") {
+              quote = character;
+            } else if (character === "{") {
+              depth++;
+            } else if (character === "}") {
+              depth--;
+            }
+          }
+          const objectType = source.slice(marker.index + marker[0].length, end - 1);
+          let objectDepth = 0;
+          let objectQuote = null;
+          let objectEscaped = false;
+          for (let index = 0; index < objectType.length; index++) {
+            const character = objectType[index];
+            if (objectQuote) {
+              if (objectEscaped) objectEscaped = false;
+              else if (character === "\\") objectEscaped = true;
+              else if (character === objectQuote) objectQuote = null;
+              continue;
+            }
+            if (character === "\"" || character === "'" || character === "`") {
+              objectQuote = character;
+              continue;
+            }
+            if (character === "{" || character === "(" || character === "[") objectDepth++;
+            else if (character === "}" || character === ")" || character === "]") objectDepth--;
+            if (objectDepth !== 0) continue;
+            const property = objectType.slice(index).match(/^([A-Za-z_$][\w$]*)\s*\??\s*(?=:|\()/);
+            if (property) {
+              namespaceMembers.add(property[1]);
+              index += property[0].length - 1;
+            }
+          }
+        }
       }
       const braces = clause.match(/\{([\s\S]*)\}/);
       if (braces) {

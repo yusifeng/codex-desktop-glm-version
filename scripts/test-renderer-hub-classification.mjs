@@ -10,6 +10,11 @@ for (const result of results) {
   assert.ok(result.unconsumed.every((alias) => /^[A-Za-z_$][\w$]*$/.test(alias)));
 }
 const primary = results[2];
+// Cast-narrowed namespace bindings are real consumers too.  Keep a floor for
+// each hub so a future audit cannot silently regress to dot-access-only scans.
+assert.ok(results[0].consumedCount >= 110, "app-shared cast consumers must be counted");
+assert.ok(results[1].consumedCount >= 400, "app-initial cast consumers must be counted");
+assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be counted");
 // Namespace imports are frequently narrowed through a destructuring binding
 // (`const { Sm: AnnouncementShell } = appPrimaryChunk`).  The audit must count
 // the public alias on the left-hand side as a real consumer, not classify it as
@@ -26,4 +31,4 @@ assert.match(audit, /没有对应的\n?named consumer/);
 assert.match(audit, /公开别名 `Ur`/);
 assert.match(audit, /公开别名 `Ad`\/`YMe`/);
 assert.match(audit, /公开别名 `Zm`/);
-console.log("13 renderer hub classification assertions passed");
+console.log("16 renderer hub classification assertions passed");
