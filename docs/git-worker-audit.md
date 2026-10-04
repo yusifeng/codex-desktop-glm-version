@@ -342,6 +342,9 @@ dispatcher 继续持有 envelope 与 query/cache 依赖；22 项断言覆盖关�
 Git watch 请求层的 init-watch dispose、watch-repo tracing/reuse、live-query recovery/unwatch，
 以及 `subscribe-live-query` 的 metadata coalescing、abort、subscription 与 releaseWatch `finally`
 状态机已迁移至 `src/main/worker/git-watch-request-handlers.ts`，25 项断言覆盖该完整请求边界。
+订阅请求在 metadata/watch ready 之后的 `commonDir`、root 与 recovery 默认值选择已进一步迁移至
+`src/main/worker/git-watch-subscription-policy.ts`；handler 仅保留生命周期与 registry 副作用，
+由 `scripts/test-worker-git-watch-subscription-policy.mjs` 的 3 项断言覆盖缺省与显式 recovery。
 
 `apply-changes`、`apply-patch` 与 `apply-review-section-changes` 的参数注入、partial-apply
 成功判定及 refresh-root 规则已迁移至 `src/main/worker/git-apply-request-handlers.ts`；dispatcher

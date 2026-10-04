@@ -1,3 +1,5 @@
+import { selectGitWatchSubscriptionState } from "./git-watch-subscription-policy";
+
 type WatchRequestDependencies = {
   gitManager: any;
   host: any;
@@ -112,11 +114,9 @@ async function subscribeGitLiveQuery(
   try {
     if (!deps.signal.aborted) {
       deps.liveQueryRegistry.subscribe({
-        commonDir: metadata.commonDir,
+        ...selectGitWatchSubscriptionState({ metadata, watch: deps.getExistingWatch(metadata.root) }),
         host: deps.host,
         query: params.query,
-        requiresRecovery: deps.getExistingWatch(metadata.root)?.watcher.requiresRecovery ?? true,
-        root: metadata.root,
         subscriptionId: params.subscriptionId,
         trace: params.trace,
       });
