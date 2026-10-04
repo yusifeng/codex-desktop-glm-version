@@ -514,3 +514,9 @@ React 或 signal runtime。`scripts/test-app-primary-plan-selection-surface.mjs`
 `semantic-business-logic`，分别指向语义 runtime 文件；行号与 source symbol 由
 `scripts/audit-renderer-hub-classification.mjs` 校验，避免将已有迁移误报成未审计 hub
 导出。
+
+本轮继续补齐 app-primary 的状态 formatter 逐行证据：`IAe`（公开别名 `$p`，约
+10340 行）仅将 `isLoading` 与 `isEligible` 投影为 `loading`/`eligible`/`ineligible`
+三态字符串。它没有独立 renderer named consumer，也不拥有 signal、DOM 或初始化副作用，
+因此归类为 `generated-local-helper` 并保留在聚合 hub；分类记录由
+`scripts/audit-renderer-hub-classification.mjs` 校验。

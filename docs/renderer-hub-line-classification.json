@@ -53,5 +53,10 @@
     "hub": "app-primary", "alias": "Ad", "sourceSymbol": "YMe", "startLine": 17541, "endLine": 17550,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The recipient/cc/bcc display projection is coupled to the adjacent NI/MI validators and RI regex initialization; no renderer module names this aggregate export, so extracting it would create an unowned email-surface facade."
+  },
+  {
+    "hub": "app-primary", "alias": "$p", "sourceSymbol": "IAe", "startLine": 10340, "endLine": 10342,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The loading/eligibility status projection is a two-branch local formatter exported only through the generated hub; there is no named renderer consumer or independent lifecycle boundary to own a facade."
   }
 ]
