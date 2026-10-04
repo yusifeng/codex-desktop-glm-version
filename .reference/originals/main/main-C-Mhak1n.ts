@@ -32,6 +32,7 @@ const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
 const { isDeviceCheckPlatform: rr, isAppleSilicon: ir, isDeviceCheckSupported: ar, createDeviceAttestationHandler: or, generateDeviceCheckToken: cr } = require("./main-app/security/device-check.js");
 const remoteHost = require("./main-app/open-target/remote-host.js");
 const openTargetFilter = require("./main-app/open-target/target-filter-policy.js");
+const targetInputPolicy = require("./main-app/open-target/target-input-policy.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -138145,7 +138146,7 @@ function D1(e, t) {
 }
 var _4e = `apps/`;
 function O1(e) {
-  return e.startsWith(_4e) ? `/${e}` : e;
+  return targetInputPolicy.normalizeAppsPath(e);
 }
 var v4e = `app://fs`,
   y4e = `/@fs`,
@@ -138241,19 +138242,16 @@ function E4e(e) {
   return `${v4e}${y4e}${encodeURI(t).replaceAll(`#`, `%23`).replaceAll(`?`, `%3F`)}`;
 }
 function D4e(e) {
-  let t = e.startsWith(`/`) ? e.slice(1) : e;
-  return t.startsWith(`apps/`) && !t.split(`/`).includes(`..`);
+  return targetInputPolicy.isPackagedAppPath(e);
 }
 function O4e(e) {
-  return /^data:image\/(?:png|jpe?g|gif|webp|bmp|x-icon|vnd\.microsoft\.icon);base64,/i.test(e);
+  return targetInputPolicy.isDataImage(e);
 }
 function k4e(e, t) {
   return A1(e, t) ? ((0, v.existsSync)(e) ? e : null) : Yi(e);
 }
 function A1(e, t) {
-  if (t !== `win32`) return h.default.posix.isAbsolute(e);
-  let n = h.default.win32.parse(e).root;
-  return h.default.win32.isAbsolute(e) && (n.includes(`:`) || n.startsWith(`\\\\`));
+  return targetInputPolicy.isAbsoluteTargetPath(e, t, h.default);
 }
 var j1 = `/Applications`,
   M1 = (0, h.join)((0, p.homedir)(), `Applications`),

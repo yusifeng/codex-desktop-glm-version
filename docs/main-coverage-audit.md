@@ -125,6 +125,15 @@ open-in target 的本地/SSH host 过滤策略（原 `T1/E1/D1`，138110-138143�
 Zed alias 的过滤语义；入口只负责压缩别名/schema 适配，不触碰 Electron 或目标进程。
 `scripts/test-main-target-filter-policy.mjs` 覆盖 8 项本地、远程、缺失 alias 和 ID 过滤断言。
 
+### A3 增量抽取：open-in target input policy
+
+open-in target 的应用资源路径归一化、内置 app 路径校验、data-image 校验和跨平台绝对路径
+判定（原 `O1/D4e/O4e/A1`，138145-138164）已迁移至
+`src/main/main-app/open-target/target-input-policy.ts`。模块仅接受路径字符串与注入的
+path API，不触碰文件系统、Electron 或目标进程；入口保留原有压缩别名与平台调用边界。
+`scripts/test-main-target-input-policy.mjs` 覆盖 9 项 app 资源、恶意路径、图片协议和
+POSIX/Windows 路径断言。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含
