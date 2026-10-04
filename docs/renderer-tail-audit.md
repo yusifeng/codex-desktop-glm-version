@@ -434,3 +434,10 @@ hub 的 UI 注册副作用。`conversation-followup-shelf` 新增可选的
 `suggestedFollowups` 输入并通过该语义入口装配展示项，已有结构化 `suggestions` 输入
 优先级与渲染行为保持不变。`scripts/test-app-primary-normalize-suggested-followups.mjs`
 覆盖无效 payload、空标题回退、索引保留与三项上限共 4 项断言。
+
+本轮再将 app-primary 的 Appgen 站点 URL 匹配策略 `aMe`（公开别名 `yf`）迁为
+`src/renderer/app-primary/runtime/is-site-url-match.ts` 的 `isSiteUrlMatch`。该策略
+仅比较协议/端口、规范化 ChatGPT team/public 站点主机别名，并按边界安全地匹配站点
+路径及其子路径；站点浏览器真实 consumer 已切换语义导入，初始化入口仍保留原
+`Sf` 以维持 hub 的启动契约。`scripts/test-app-primary-is-site-url-match.mjs`
+覆盖主机别名、尾斜杠、路径前缀边界、非法 URL 与端口隔离共 5 项断言。

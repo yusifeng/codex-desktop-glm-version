@@ -3,11 +3,11 @@
 
 import * as runtimeChunk from "@rchunk/rolldown-runtime";
 import * as appPrimaryChunk from "@rchunk/app-primary";
+import { isSiteUrlMatch } from "../app-primary/runtime/is-site-url-match";
 
 void runtimeChunk;
 const {
   Sf: initializeSiteUrlMatcher,
-  yf: isSiteUrlMatch,
 } = appPrimaryChunk;
 
 export interface BrowserSiteEntry extends Record<string, unknown> {
