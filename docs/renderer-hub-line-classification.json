@@ -33,5 +33,10 @@
     "hub": "app-primary", "alias": "is", "sourceSymbol": "iKe", "startLine": 38527, "endLine": 38539,
     "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/format-annotation-summary.ts",
     "evidence": "Attachment summary formatting combines annotation/design-tweak and comment counts through the supplied formatter; the extracted module has no renderer lifecycle or signal registration."
+  },
+  {
+    "hub": "app-primary", "alias": "bf", "sourceSymbol": "iMe", "startLine": 15661, "endLine": 15670,
+    "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/extract-site-subdomain.ts",
+    "evidence": "Tenant-subdomain extraction is a deterministic URL/hostname policy with explicit suffix allowlisting; the hub keeps its compatibility export because no independent renderer import currently owns this boundary."
   }
 ]
