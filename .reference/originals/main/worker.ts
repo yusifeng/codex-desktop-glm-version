@@ -110,6 +110,7 @@ const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
+const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
@@ -48174,18 +48175,7 @@ function AW(e) {
     },
   };
 }
-var jW = new Set([
-  `BREAKPAD_DUMP_LOCATION`,
-  `CHROME_CRASHPAD_PIPE_NAME`,
-  `CRASHPAD_HANDLER_PID`,
-  `ELECTRON_CRASH_REPORTER_PROCESS_TYPE`,
-  `__CFBUNDLEIDENTIFIER`,
-]);
-function MW(e) {
-  let t = { ...e };
-  for (let e of Object.keys(t)) jW.has(e.toUpperCase()) && delete t[e];
-  return t;
-}
+const MW = sanitizeChildProcessEnv;
 var NW,
   PW = void 0,
   FW,
