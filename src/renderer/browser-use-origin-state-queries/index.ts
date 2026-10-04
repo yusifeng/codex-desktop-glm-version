@@ -28,7 +28,6 @@ import {
   $ln as createCommandQueryKey,
   $sn as initializeBrowserUseSettings,
   Bfn as initializeConfigurationState,
-  Fsn as domainMatchesPattern,
   Jsn as configurationQueryKey,
   Kdn as getWritableConfigurationLayer,
   Nsn as parseNetworkPattern,
@@ -49,7 +48,10 @@ import {
   ugn as defaultHostId,
 } from "@rchunk/app-initial";
 import { parseHttpUrl as parseBrowserUrl } from "../app-initial/runtime/parse-http-url";
-import { parseOriginPattern } from "../app-initial/runtime/parse-origin-pattern";
+import {
+  domainMatchesPattern,
+  parseOriginPattern,
+} from "../app-initial/runtime/parse-origin-pattern";
 
 type OriginDecision = "allow" | "deny" | null;
 type BrowserCapability =

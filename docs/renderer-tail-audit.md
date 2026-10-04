@@ -279,6 +279,11 @@ state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初
 由 `scripts/test-app-initial-parse-http-url.mjs` 的 4 项断言覆盖。原始导出保留以
 兼容尚未迁移的其他调用面。
 
+同一纯策略链的 `Fsn`（内部 `dWt`）现由上述 runtime 导出的
+`domainMatchesPattern` 承接；它仅执行规范化 hostname 与 exact/subdomain/wildcard
+匹配，策略模块的 2 个调用点已切换，测试扩展为 7 项断言覆盖大小写、子域和 apex
+排除行为。
+
 同一策略模块中的 `Msn`（内部 `uWt`）也已迁为
 `src/renderer/app-initial/runtime/parse-origin-pattern.ts` 的 `parseOriginPattern`。
 该函数及其 hostname/wildcard 规范化链只做确定性字符串解析，不触碰 signal、query

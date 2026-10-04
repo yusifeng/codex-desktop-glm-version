@@ -67,3 +67,56 @@ export function parseOriginPattern(value: string): OriginPattern | null {
   }
   return { canonicalPattern: pattern, hostnamePattern: pattern, kind: "exact" };
 }
+
+function matchesWildcard(pattern: string, value: string): boolean {
+  let patternIndex = 0;
+  let valueIndex = 0;
+  let wildcardIndex = -1;
+  let wildcardValueIndex = 0;
+  while (valueIndex < value.length) {
+    if (pattern[patternIndex] === "?" || pattern[patternIndex] === value[valueIndex]) {
+      patternIndex += 1;
+      valueIndex += 1;
+    } else if (pattern[patternIndex] === "*") {
+      wildcardIndex = patternIndex;
+      patternIndex += 1;
+      wildcardValueIndex = valueIndex;
+    } else if (wildcardIndex !== -1) {
+      patternIndex = wildcardIndex + 1;
+      wildcardValueIndex += 1;
+      valueIndex = wildcardValueIndex;
+    } else {
+      return false;
+    }
+  }
+  while (pattern[patternIndex] === "*") patternIndex += 1;
+  return patternIndex === pattern.length;
+}
+
+function matchesSubdomain(pattern: string, value: string): boolean {
+  for (let index = value.indexOf("."); index > 0; index = value.indexOf(".", index + 1)) {
+    if (matchesWildcard(pattern, value.slice(index + 1))) return true;
+  }
+  return false;
+}
+
+export function domainMatchesPattern(
+  pattern: {
+    hostnamePattern?: string;
+    hostname?: string;
+    kind?: OriginPattern["kind"];
+  },
+  hostname: string,
+): boolean {
+  const normalizedHostname = normalizeHost(hostname);
+  const hostnamePattern = pattern.hostnamePattern ?? pattern.hostname ?? "";
+  switch (pattern.kind ?? "exact") {
+    case "exact":
+      return matchesWildcard(hostnamePattern, normalizedHostname);
+    case "subdomains-only":
+      return matchesSubdomain(hostnamePattern, normalizedHostname);
+    case "apex-and-subdomains":
+      return matchesWildcard(hostnamePattern, normalizedHostname) ||
+        matchesSubdomain(hostnamePattern, normalizedHostname);
+  }
+}

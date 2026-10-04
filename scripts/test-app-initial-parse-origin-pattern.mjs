@@ -13,7 +13,7 @@ await build({
   platform: "node",
   outfile: output,
 });
-const { parseOriginPattern } = await import(`${output}?test=${Date.now()}`);
+const { domainMatchesPattern, parseOriginPattern } = await import(`${output}?test=${Date.now()}`);
 assert.deepEqual(parseOriginPattern("Example.COM."), {
   canonicalPattern: "example.com",
   hostnamePattern: "example.com",
@@ -22,4 +22,7 @@ assert.deepEqual(parseOriginPattern("Example.COM."), {
 assert.equal(parseOriginPattern("*.example.com")?.kind, "subdomains-only");
 assert.equal(parseOriginPattern("**.example.com")?.kind, "apex-and-subdomains");
 assert.equal(parseOriginPattern("bad[pattern]"), null);
-console.log("4 app-initial parseOriginPattern assertions passed");
+assert.equal(domainMatchesPattern(parseOriginPattern("example.com"), "EXAMPLE.com"), true);
+assert.equal(domainMatchesPattern(parseOriginPattern("*.example.com"), "api.example.com"), true);
+assert.equal(domainMatchesPattern(parseOriginPattern("*.example.com"), "example.com"), false);
+console.log("7 app-initial origin pattern assertions passed");
