@@ -203,5 +203,55 @@
     "hub": "app-primary", "alias": "Ug", "sourceSymbol": "BE", "startLine": 3546, "endLine": 3634,
     "classification": "generated-local-theme-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer materializes the light/dark CSS token maps and memoizes them for the adjacent generated theme surface. Its state and initialization order are coupled to the hub-local styling runtime, so extraction would create an unowned facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Fd", "sourceSymbol": "JMe", "startLine": 17530, "endLine": 17540,
+    "classification": "generated-local-recipient-parser", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The recipient parser splits and trims comma/semicolon/newline-delimited addresses for the adjacent generated email surface. It has no named renderer consumer or independent validation lifecycle, so its delimiter and casing policy remains hub-local until a typed recipient boundary owns it."
+  },
+  {
+    "hub": "app-primary", "alias": "Dd", "sourceSymbol": "eNe", "startLine": 17666, "endLine": 17669,
+    "classification": "generated-local-message-status-predicate", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The predicate recognizes terminal message-send states for the adjacent generated message projection. Its status vocabulary is coupled to the neighboring HI/tNe helpers and has no independent renderer consumer or lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Cd", "sourceSymbol": "iNe", "startLine": 17685, "endLine": 17690,
+    "classification": "generated-local-message-metadata-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper reads a generated message metadata key and normalizes string values for one adjacent message surface. No named renderer module consumes the alias, so extracting it would create an unowned metadata facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Ig", "sourceSymbol": "VE", "startLine": 3636, "endLine": 3641,
+    "classification": "generated-local-cyclic-selection-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper performs wraparound selection in the generated annotation control using the supplied index and offset. It is consumed only by the local control state machine and has no standalone renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Ih", "sourceSymbol": "kO", "startLine": 4569, "endLine": 4572,
+    "classification": "generated-local-navigation-key-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper serializes account, locale, product, path, and navigation state into the adjacent generated navigation cache key. Its key schema is local to that cache and is not independently consumed by renderer code."
+  },
+  {
+    "hub": "app-primary", "alias": "El", "sourceSymbol": "QH", "startLine": 27354, "endLine": 27359,
+    "classification": "generated-local-search-projection", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The projection merges asynchronous and ChatGPT search results before applying query and limit filtering for one generated search surface. Pagination and ranking assumptions are coupled to the neighboring SRe/TRe pipeline and have no named renderer owner."
+  },
+  {
+    "hub": "app-primary", "alias": "Bp", "sourceSymbol": "zAe", "startLine": 10582, "endLine": 10591,
+    "classification": "generated-local-action-dispatcher", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The dispatcher maps an action-v2 payload into a work-tab prompt flow and is coupled to generated account/scope telemetry. No renderer module imports the alias or owns its side effects, so retaining the local dispatcher preserves the original action lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Gh", "sourceSymbol": "xke", "startLine": 4438, "endLine": 4444,
+    "classification": "generated-local-overlay-state-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper updates the generated overlay listener state and associated signal store for the adjacent annotation surface. Its store keys and mutation order are hub-local and no independent renderer consumer provides a safe lifecycle boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Gm", "sourceSymbol": "rAe", "startLine": 5778, "endLine": 5782,
+    "classification": "generated-local-plan-action-status", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The status helper projects generated action-v2 payloads into plan-surface state for the adjacent billing flow. Its action enum assumptions are local to that flow and there is no named renderer consumer or independent lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Gs", "sourceSymbol": "YWe", "startLine": 36800, "endLine": 36806,
+    "classification": "generated-local-overlay-listener-registration", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The registration helper tracks overlay listeners in a generated Set and returns a local removal closure. Its storage and teardown are coupled to the adjacent overlay runtime, so extraction without a named renderer owner would split lifecycle ownership."
   }
 ]

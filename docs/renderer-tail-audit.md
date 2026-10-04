@@ -607,3 +607,12 @@ annotation/theme styling pipeline，没有独立 renderer named consumer 或 tea
 边界；因此登记为 generated-local theme/color helper 并保留在聚合 hub，避免制造无主 facade。
 行范围、source symbol 与分类由 hub audit 机器校验，focused suite 锁定 9 个 alias 仍属
 unconsumed surface。
+
+本轮继续登记 app-primary 中 10 个未消费局部边界：`Fd`/`JMe` 负责收件人分隔解析，
+`Dd`/`eNe` 与 `Cd`/`iNe` 负责消息状态和 metadata 读取，`Ig`/`VE` 负责标注控件循环选择，
+`Ih`/`kO` 负责导航缓存 key，`El`/`QH` 负责搜索结果投影，`Bp`/`zAe` 负责 action-v2
+派发，`Gm`/`rAe` 负责计划动作状态，`Gs`/`YWe` 与 `Gh`/`xke` 负责 overlay listener/state
+生命周期。它们的输入契约、状态 key 和副作用顺序均只由相邻生成 surface 持有，没有独立
+renderer named consumer 或可安全转移的 teardown 边界；因此登记为 generated-local
+projection/state helpers 并保留在聚合 hub。分类记录、source symbol 和精确行范围由
+hub audit 校验，focused suite 已锁定 10 个 alias 仍属于 unconsumed surface。

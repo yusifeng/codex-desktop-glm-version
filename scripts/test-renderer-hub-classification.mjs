@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 40, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 50, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -45,6 +45,16 @@ assert.ok(primary.unconsumed.includes("Zg"), "Zg remains coupled to generated th
 assert.ok(primary.unconsumed.includes("Hg"), "Hg remains coupled to generated theme policy");
 assert.ok(primary.unconsumed.includes("Vg"), "Vg remains coupled to generated theme constant");
 assert.ok(primary.unconsumed.includes("Ug"), "Ug remains coupled to generated theme initializer");
+assert.ok(primary.unconsumed.includes("Fd"), "Fd remains coupled to generated recipient parsing");
+assert.ok(primary.unconsumed.includes("Dd"), "Dd remains coupled to generated message status projection");
+assert.ok(primary.unconsumed.includes("Cd"), "Cd remains coupled to generated message metadata projection");
+assert.ok(primary.unconsumed.includes("Ig"), "Ig remains coupled to generated cyclic selection control");
+assert.ok(primary.unconsumed.includes("Ih"), "Ih remains coupled to generated navigation cache key");
+assert.ok(primary.unconsumed.includes("El"), "El remains coupled to generated search projection");
+assert.ok(primary.unconsumed.includes("Bp"), "Bp remains coupled to generated action dispatcher");
+assert.ok(primary.unconsumed.includes("Gh"), "Gh remains coupled to generated overlay state");
+assert.ok(primary.unconsumed.includes("Gm"), "Gm remains coupled to generated plan action status");
+assert.ok(primary.unconsumed.includes("Gs"), "Gs remains coupled to generated overlay listener lifecycle");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
@@ -59,4 +69,4 @@ assert.match(audit, /公开别名 `\$g`/);
 assert.match(audit, /公开别名 `\$a`/);
 assert.match(audit, /公开别名 `An`/);
 assert.match(audit, /公开别名[\s\S]*`og`/);
-console.log("20 renderer hub classification assertions passed");
+console.log("30 renderer hub classification assertions passed");
