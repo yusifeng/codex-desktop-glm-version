@@ -6373,6 +6373,7 @@ var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrShee
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
+var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annotation-editor-default-mode");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -24483,13 +24484,7 @@ var ky,
       }));
   });
 function Iy(e, t) {
-  let n = e.head?.querySelectorAll(`meta[name="${t.name}"]`);
-  if (n != null)
-    for (let e of n) {
-      let n = e.getAttribute(`content`),
-        r = t.values.find((e) => e === n);
-      if (r != null) return r;
-    }
+  return readAnnotationEditorDefaultMode(e, t);
 }
 var Ly = o(() => {});
 function Ry({ rootHost: e, onPointerModeChange: t, onPointerChange: n, onClearHover: r }) {
