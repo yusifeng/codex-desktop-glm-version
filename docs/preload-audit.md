@@ -328,3 +328,12 @@ frame document、默认 control 值和 `CustomEvent` dispatch 适配器；DOM �
 component assembly 仍保留在入口边界。`scripts/test-preload-annotation-design-control-sync.mjs`
 覆盖初次 preview、幂等同步、original-view 回退、stale/reset、断开 target、URL 失配、virtual
 target 和 agent-control 清理，共 8 项断言。
+
+### 增量抽取：annotation open-request IPC lifecycle
+
+`codex:open-annotation` 的 permission/pending request 生命周期已迁移至
+`src/main/browser-page-preload/annotation-site-requests.ts`。模块保留同步与异步 permission
+结果的竞态保护、subscriber 延迟挂载、Escape/pagehide 清理、BFCache pageshow 恢复，以及
+dispose 时的四个 DOM listener 移除；入口仅保留事件 payload/target/range 解析和既有
+`Dd` 语义适配。`scripts/test-preload-annotation-site-requests.mjs` 覆盖 listener 注册与
+清理、permission resolve/reject、pagehide/keydown 竞态和 subscriber 重放，共 11 项断言。

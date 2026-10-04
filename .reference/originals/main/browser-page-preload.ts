@@ -6100,38 +6100,19 @@ var Td = ja({
   }).optional(),
 });
 function Ed({ getState: e, requestPermission: t }) {
-  let n = null,
-    r = null,
-    i = !1,
-    a = !1,
-    o = !1,
-    s = () => {
-      r = null;
-    },
-    c = (t) => {
-      let r = Dd(t, e());
-      if (n == null || r == null || a || o) return !1;
-      i = !0;
-      try {
-        return n(
-          t.target,
-          r,
-          t.request,
-          t.target instanceof HTMLElement && t.target.getRootNode() === document
-            ? t.metadata
-            : void 0,
-        );
-      } finally {
-        i = !1;
-      }
-    },
-    l = (l) => {
-      if (o || a || r != null || i || navigator.userActivation?.isActive !== !0 || !jd(e())) return;
+  return createAnnotationSiteRequests({
+    documentRef: document,
+    windowRef: window,
+    navigatorRef: navigator,
+    getState: e,
+    requestPermission: t,
+    prepareRequest: (l, state) => {
+      if (!jd(state)) return null;
       let u = Md(l),
         d = l.composedPath()[0] ?? l.target;
-      if (u == null || !(d instanceof HTMLElement) || gl(d)) return;
+      if (u == null || !(d instanceof HTMLElement) || gl(d)) return null;
       let f = u.range == null ? null : kd(d, u.range);
-      if (u.range != null && f == null) return;
+      if (u.range != null && f == null) return null;
       let p = { initialComment: u.initialComment, siteInitiated: !0 };
       (u.enterAnnotationMode && (p.enterAnnotationMode = !0),
         u.mode === `advanced` && (p.openTweaks = !0));
@@ -6142,75 +6123,12 @@ function Ed({ getState: e, requestPermission: t }) {
         metadata: u.range == null && d.getRootNode() === document ? u.metadata : void 0,
         permissionGranted: !1,
       };
-      if (Dd(m, e()) == null) return;
-      r = m;
-      let h = t();
-      if (typeof h == `boolean`) {
-        if (((m.permissionGranted = h), !h)) {
-          s();
-          return;
-        }
-        if (n != null && (s(), !c(m))) return;
-        l.preventDefault();
-        return;
-      }
-      (l.preventDefault(),
-        h.then(
-          (e) => {
-            if (!(r !== m || o || a)) {
-              if (!e) {
-                s();
-                return;
-              }
-              ((m.permissionGranted = !0), n != null && (s(), c(m)));
-            }
-          },
-          () => {
-            r === m && s();
-          },
-        ));
+      let resolved = Dd(m, state);
+      return resolved == null
+        ? null
+        : { target: m.target, resolvedTarget: resolved, request: m.request, metadata: m.metadata };
     },
-    u = (e) => {
-      e.isTrusted && ((a = !0), s(), e.persisted || p());
-    },
-    d = (e) => {
-      e.isTrusted && (a = !1);
-    },
-    f = (e) => {
-      e.isTrusted && e.key === `Escape` && s();
-    },
-    p = () => {
-      ((o = !0),
-        s(),
-        (n = null),
-        document.removeEventListener(`codex:open-annotation`, l),
-        window.removeEventListener(`pagehide`, u),
-        window.removeEventListener(`pageshow`, d),
-        window.removeEventListener(`keydown`, f, !0));
-    };
-  return (
-    document.addEventListener(`codex:open-annotation`, l),
-    window.addEventListener(`pagehide`, u),
-    window.addEventListener(`pageshow`, d),
-    window.addEventListener(`keydown`, f, !0),
-    {
-      subscribe(e) {
-        if (!o) {
-          n = e;
-          let t = r;
-          t?.permissionGranted &&
-            queueMicrotask(() => {
-              n === e && r === t && !o && (s(), c(t));
-            });
-        }
-        return () => {
-          n === e && ((n = null), s());
-        };
-      },
-      clear: s,
-      dispose: p,
-    }
-  );
+  });
 }
 function Dd({ target: e, request: t, rangeText: n }, r) {
   if (!jd(r) || (t.openTweaks && !r.canUseTweaks)) return null;
@@ -6377,6 +6295,7 @@ var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotat
 var { isAnnotationElementVisible } = require("./browser-page-preload/annotation-visibility");
 var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
+var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
