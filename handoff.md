@@ -939,3 +939,9 @@ Annotation marker/draft/comment view-state 的 additional-anchor 投影已统一
 `src/main/browser-page-preload/annotation-additional-anchor-projection.ts`；marker runtime
 不再在三条投影路径内重复处理 viewport/projector 回退，由
 `scripts/test-preload-annotation-additional-anchor-projection.mjs` 覆盖 5 项 focused assertions。
+
+Annotation document context 的 viewport visible-text 收集已迁移至
+`src/main/browser-page-preload/annotation-visible-text.ts`；TreeWalker、可见元素过滤、
+range 相交与 2,000 字符上限不再与 Google Docs context class 混杂，document-context 入口仅
+保留页面判定与依赖适配，由 `scripts/test-preload-annotation-visible-text.mjs` 覆盖 3 项
+focused assertions，原 `annotation-document-context` 回归测试继续通过。

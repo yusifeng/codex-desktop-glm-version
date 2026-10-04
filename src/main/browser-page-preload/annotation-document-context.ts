@@ -1,7 +1,4 @@
-const MAX_VISIBLE_TEXT_LENGTH = 2_000;
-const TEXT_NODE = 4;
-const ACCEPT = 1;
-const REJECT = 2;
+import { collectAnnotationVisibleText, MAX_VISIBLE_TEXT_LENGTH } from "./annotation-visible-text";
 
 function createAnnotationDocumentContext(dependencies: {
   parseGoogleDocsUrl: (value: unknown) => unknown;
@@ -66,27 +63,13 @@ function createAnnotationDocumentContext(dependencies: {
     }
 
     getVisibleTextInViewportRect(windowObject: any, viewportRect: any) {
-      const documentObject = getDocument(windowObject);
-      const body = documentObject?.body;
-      if (documentObject == null || body == null) return null;
-      let text = ``;
-      const walker = documentObject.createTreeWalker(body, TEXT_NODE, {
-        acceptNode: (node: any) => {
-          if (normalizeText(node.textContent) == null) return REJECT;
-          const parent = node.parentElement;
-          return !isHTMLElement(parent) || !isVisibleElement(parent) ? REJECT : ACCEPT;
-        },
+      return collectAnnotationVisibleText(windowObject, viewportRect, {
+        getDocument,
+        normalizeText,
+        isHTMLElement,
+        isVisibleElement,
+        rangeIntersectsRect,
       });
-      let node = walker.nextNode();
-      while (node != null) {
-        const value = normalizeText(node.textContent);
-        if (value != null && rangeIntersectsRect(documentObject, node, viewportRect)) {
-          text = text.length === 0 ? value : `${text} ${value}`;
-          if (text.length >= MAX_VISIBLE_TEXT_LENGTH) break;
-        }
-        node = walker.nextNode();
-      }
-      return normalizeText(text);
     }
   }
 
