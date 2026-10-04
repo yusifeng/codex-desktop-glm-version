@@ -4,6 +4,7 @@ import { dispatchAnnotationHostMessage } from "./annotation-host-message-dispatc
 import { createAnnotationFeatureLifecycle } from "./annotation-feature-lifecycle";
 import { applyAnnotationSyncState } from "./annotation-sync-state";
 import { createAnnotationModeToggleCommand, shouldClearAnnotationRequestsForToggle } from "./annotation-mode-command-policy";
+import { handleAnnotationPagehide } from "./annotation-pagehide";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -139,14 +140,15 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   };
 
   const onPageHide = (event: any) => {
-    runtimeMount.setPreview(null);
-    if (event.isTrusted) permissionController.reset();
-    if (!event.isTrusted || event.persisted) return;
-    destroyed = true;
-    disposeFeatures();
-    deps.windowLike.removeEventListener(`DOMContentLoaded`, runtimeMount.mount);
-    deps.ipcRenderer.removeListener(deps.channels.hostMessage, handleHostMessage);
-    runtimeMount.dispose();
+    handleAnnotationPagehide(event, {
+      clearPreview: () => runtimeMount.setPreview(null),
+      resetPermission: () => permissionController.reset(),
+      disposeFeatures,
+      markDestroyed: () => { destroyed = true; },
+      removeDOMContentLoaded: () => deps.windowLike.removeEventListener(`DOMContentLoaded`, runtimeMount.mount),
+      removeHostMessageListener: () => deps.ipcRenderer.removeListener(deps.channels.hostMessage, handleHostMessage),
+      disposeRuntimeMount: () => runtimeMount.dispose(),
+    });
   };
 
   const initialize = () => {

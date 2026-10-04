@@ -523,6 +523,14 @@ transition 的状态编排已迁移至 `src/main/browser-page-preload/annotation
 等副作用；`scripts/test-preload-annotation-sync-state.mjs` 覆盖正常模式切换、能力关闭和
 agent 控制清理，共 7 项行为断言。
 
+### 增量抽取：annotation pagehide lifecycle boundary
+
+annotation preload 的 pagehide 生命周期已迁移至 `src/main/browser-page-preload/annotation-pagehide.ts`。
+模块保留 preview 总是清理、trusted 事件才重置权限、persisted 页面不销毁，以及最终销毁时的
+feature/runtime dispose、DOMContentLoaded 与 host-message listener 移除顺序；入口仅注入既有
+runtime/feature 副作用。`scripts/test-preload-annotation-pagehide.mjs` 覆盖不可信、persisted、
+正常销毁与空事件四类边界，共 8 项断言。
+
 ### 增量抽取：annotation event detail boundary
 
 批注 range/open-request detail 的稳定 payload 组装，以及 CustomEvent detail/own-property
