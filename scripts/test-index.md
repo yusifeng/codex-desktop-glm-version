@@ -6,6 +6,8 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-cache-watch-dispatch.mjs`](./test-worker-git-cache-watch-dispatch.mjs)
+
 - [`test-worker-git-synced-branch-dispatch.mjs`](./test-worker-git-synced-branch-dispatch.mjs)
 
 - [`test-app-shared-is-web-mcp-server.mjs`](./test-app-shared-is-web-mcp-server.mjs)

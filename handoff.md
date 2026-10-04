@@ -683,6 +683,9 @@ Repository content family 已新增 `src/main/worker/git-repository-content-disp
 Synced branch family 已新增 `src/main/worker/git-synced-branch-dispatch.ts`，将
 `synced-branch`、`synced-branch-state` 与 `overwrite-repo` 接入 dispatcher；由 4 项 focused
 assertions 覆盖，`overwrite-repo` 的 `refreshRoot` 副作用仍由入口处理。
+Cache/watch family 已新增 `src/main/worker/git-cache-watch-dispatch.ts`，将稳定 metadata/read
+cache 失效、init-watch dispose、watch/subscribe/recover/unwatch 与 git-init 共 8 个分支接入
+dispatcher；入口继续保留 trace、依赖构造、结果包装与生命周期副作用。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
