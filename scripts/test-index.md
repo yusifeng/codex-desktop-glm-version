@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 813.
+Total scripts: 814.
 
 ## Recent semantic extraction suites
 
@@ -16,6 +16,7 @@ Total scripts: 813.
 - [`test-main-language-server-protocol-helpers.mjs`](./test-main-language-server-protocol-helpers.mjs)
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
 - [`test-preload-annotation-scroll-container.mjs`](./test-preload-annotation-scroll-container.mjs)
+- [`test-preload-annotation-anchor-state.mjs`](./test-preload-annotation-anchor-state.mjs)
 - [`test-preload-annotation-preview-geometry.mjs`](./test-preload-annotation-preview-geometry.mjs)
 - [`test-preload-annotation-preview-visibility.mjs`](./test-preload-annotation-preview-visibility.mjs)
 - [`test-preload-annotation-request-context.mjs`](./test-preload-annotation-request-context.mjs)
@@ -127,6 +128,7 @@ Total scripts: 813.
 - [`test-renderer-capability-default-availability.mjs`](./test-renderer-capability-default-availability.mjs)
 - [`test-app-primary-is-element.mjs`](./test-app-primary-is-element.mjs)
 - [`test-app-primary-normalize-suggested-followups.mjs`](./test-app-primary-normalize-suggested-followups.mjs)
+- [`test-app-primary-is-site-url-match.mjs`](./test-app-primary-is-site-url-match.mjs)
 
 - [`test-worker-elicitation-protocol.mjs`](./test-worker-elicitation-protocol.mjs)
 - [`test-main-cleanup-timeout.mjs`](./test-main-cleanup-timeout.mjs)

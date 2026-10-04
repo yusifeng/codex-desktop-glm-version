@@ -354,3 +354,22 @@ dispose 时的四个 DOM listener 移除；入口仅保留事件 payload/target/
 `Dd` 语义适配。`scripts/test-preload-annotation-site-requests.mjs` 覆盖 listener 注册与
 清理、permission resolve/reject、pagehide/keydown 竞态、stale-state 重验证和 subscriber
 重放，共 12 项断言。
+
+### 增量抽取：annotation request permission/context policy
+
+`codex:open-annotation` 的 secure-context、agent/editor 状态门控，以及 element/range target
+的 owner-document、连接状态、viewport 可见性、range 文本与序列化路径重建已迁移至
+`src/main/browser-page-preload/annotation-request-context.ts`。入口仅注入页面 DOM、可见矩形、
+range anchor 与既有 selection-validation 适配器；`annotation-site-requests.ts` 继续负责
+permission pending、subscriber、pagehide 与 IPC 生命周期。`scripts/test-preload-annotation-request-context.mjs`
+覆盖 permission gate、range path 重建/拒绝、element center/offscreen/excluded 以及 range
+viewport/text 校验，共 8 项断言。
+
+### 增量抽取：annotation anchor state/payload transformations
+
+批注 anchor 的 element/region/virtual/text 状态构造、live selection 包装、editor payload
+投影、状态拆分/合并、元素重解析与 selection 替换已迁移至
+`src/main/browser-page-preload/annotation-anchor-state.ts`。入口仅保留页面 DOM 查找、主题/viewport
+读取和 anchor refresh 适配；React marker/render 编排仍留在原边界。`scripts/test-preload-annotation-anchor-state.mjs`
+覆盖四类 anchor、additional selection、payload element、state merge、live-element fallback
+和 primary replacement，共 10 项断言。

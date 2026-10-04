@@ -22793,142 +22793,48 @@ var I_,
   z_ = o(() => {
     ($s(), wd(), tl(), Zl(), td(), (I_ = 16 + Zs / 2), (L_ = 0.45), (R_ = 0.3));
   });
+var {
+  buildAnnotationAnchorPayload: buildAnnotationAnchorPayload,
+  createAnnotationAnchorSelection: createAnnotationAnchorSelection,
+  createAnnotationAnchorState: createAnnotationAnchorState,
+  mergeAnnotationAnchorState: mergeAnnotationAnchorState,
+  replaceAnnotationSelection: replaceAnnotationSelection,
+  resolveAnnotationAnchorValue: resolveAnnotationAnchorValue,
+  resolveAnnotationLiveElement: resolveAnnotationLiveElement,
+  resolveAnnotationSelection: resolveAnnotationSelection,
+  splitAnnotationAnchorState: splitAnnotationAnchorState,
+} = require("./browser-page-preload/annotation-anchor-state");
 function B_(e, t, n) {
-  return e.anchor.kind === `virtual`
-    ? {
-        type: `virtual`,
-        additionalSelections: [],
-        themeVariant: e.themeVariant ?? f_(),
-        value: e.anchor,
-        viewportSize: e.viewportSize,
-      }
-    : e.anchor.kind === `text`
-      ? { type: `text`, themeVariant: e.themeVariant ?? f_(), value: e.anchor }
-      : e.anchor.kind === `region`
-        ? {
-            type: `region`,
-            additionalSelections: (e.additionalAnchors ?? []).map((e) => V_(e, n)),
-            themeVariant: e.themeVariant ?? f_(),
-            value: e.anchor,
-            viewportSize: p_(),
-          }
-        : {
-            type: `element`,
-            additionalSelections: (e.additionalAnchors ?? []).map((e) => V_(e, n)),
-            element: t,
-            markerViewportPoint: e.markerViewportPoint,
-            themeVariant: e.themeVariant ?? f_(),
-            value: e.anchor,
-            viewportSize: p_(),
-          };
+  return createAnnotationAnchorState(e, t, {
+    resolveThemeVariant: f_,
+    readViewportSize: p_,
+    resolveLiveElement: (anchor, id) => sd(anchor, void 0, id === undefined ? n : id),
+  });
 }
 function V_(e, t) {
-  return e.kind === `element`
-    ? { anchor: e, liveElement: sd(e, void 0, t) }
-    : { anchor: e, liveElement: null };
+  return createAnnotationAnchorSelection(e, { resolveLiveElement: (anchor, id) => sd(anchor, void 0, id === undefined ? t : id) });
 }
 function H_(e, t) {
-  let n = e.anchorState.anchor;
-  if (n.kind === `virtual`)
-    return {
-      target: e.target,
-      anchor: {
-        type: `virtual`,
-        additionalSelections: [],
-        themeVariant: e.anchorState.themeVariant,
-        value: n,
-        viewportSize: e.anchorState.viewportSize,
-      },
-    };
-  if (n.kind === `text`)
-    return {
-      target: e.target,
-      anchor: {
-        type: `text`,
-        ...(e.anchorState.themeVariant == null ? {} : { themeVariant: e.anchorState.themeVariant }),
-        value: n,
-      },
-    };
-  let r = (e.anchorState.additionalAnchors ?? []).map((e) => V_(e, t));
-  if (n.kind === `region`)
-    return {
-      target: e.target,
-      anchor: {
-        type: `region`,
-        additionalSelections: r,
-        themeVariant: e.anchorState.themeVariant,
-        value: n,
-        viewportSize: e.anchorState.viewportSize,
-      },
-    };
-  let i = sd(n, void 0, t);
-  return {
-    target: e.target,
-    anchor: {
-      type: `element`,
-      additionalSelections: r,
-      cardViewportRect: e.anchorState.cardViewportRect,
-      element: i,
-      markerViewportPoint: e.anchorState.viewportPoint,
-      themeVariant: e.anchorState.themeVariant,
-      viewportSize: e.anchorState.viewportSize,
-      value: n,
-    },
-  };
+  return buildAnnotationAnchorPayload(e, { resolveLiveElement: (anchor) => sd(anchor, void 0, t) });
 }
 function U_(e) {
-  return e.type === `element` ? Y_(e.element, e.value, e.viewportSize) : e.value;
+  return resolveAnnotationAnchorValue(e, { refreshElement: (element, anchor, viewportSize) => Y_(element, anchor, viewportSize) });
 }
 function W_(e, t) {
-  return e.type === `element`
-    ? e.element?.isConnected && e.element.ownerDocument === Dc(e.value.framePath)
-      ? e.element
-      : sd(e.value, void 0, t)
-    : null;
+  return resolveAnnotationLiveElement(e, {
+    isConnected: (element) => element?.isConnected === true,
+    ownerDocumentMatches: (element, framePath) => element.ownerDocument === Dc(framePath),
+    resolveElement: (anchor) => sd(anchor, void 0, t),
+  });
 }
 function G_(e) {
-  return {
-    additional: e.additionalSelections,
-    primary:
-      e.type === `element`
-        ? { anchor: e.value, liveElement: e.element }
-        : { anchor: e.value, liveElement: null },
-  };
+  return splitAnnotationAnchorState(e);
 }
 function K_(e, t, n) {
-  let r = n?.themeVariant ?? e.themeVariant,
-    i = n?.viewportSize ?? e.viewportSize;
-  return t.primary.anchor.kind === `virtual`
-    ? {
-        type: `virtual`,
-        additionalSelections: [],
-        themeVariant: r,
-        value: t.primary.anchor,
-        viewportSize: i,
-      }
-    : t.primary.anchor.kind === `region`
-      ? {
-          type: `region`,
-          additionalSelections: t.additional,
-          themeVariant: r,
-          value: t.primary.anchor,
-          viewportSize: i,
-        }
-      : {
-          type: `element`,
-          additionalSelections: t.additional,
-          ...(e.type === `element` && e.cardViewportRect != null
-            ? { cardViewportRect: e.cardViewportRect }
-            : {}),
-          element: t.primary.liveElement,
-          markerViewportPoint: e.type === `element` ? e.markerViewportPoint : void 0,
-          themeVariant: r,
-          value: t.primary.anchor,
-          viewportSize: i,
-        };
+  return mergeAnnotationAnchorState(e, t, n);
 }
 function q_(e, t) {
-  return e.anchor.kind === `element` ? Y_(e.liveElement, e.anchor, t) : e.anchor;
+  return resolveAnnotationSelection(e, { refreshElement: (element, anchor, viewportSize) => Y_(element, anchor, viewportSize) }, t);
 }
 function J_(
   e,
