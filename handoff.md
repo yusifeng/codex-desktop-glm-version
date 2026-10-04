@@ -53,6 +53,10 @@ Git watcher ignore-source 的 config discovery、旧 Git fallback、include/excl
 tracked-path-aware ignored directory 筛选已迁移至
 `src/main/worker/git-ignore-discovery.ts`；原三个 helper、两个常量及专用 bundled lower-bound
 链已删除，由 37 项断言覆盖。
+Worktree create 请求生命周期已迁移至 `src/main/worker/git-worktree-create-request.ts`：入口不再持有
+upstream refresh controller 注册/清理、三类 stream event 与响应 envelope 映射，24 项 focused 断言
+覆盖取消抑制、成功/失败结果及并发 controller 身份保护；底层 checkout/setup runtime 继续由既有
+`git-worktree-create.ts` 承担。
 worker `handleRequestWithContext` 的 origin/roots、shell environment、owner、default
 remote branch 与 merge-base 只读请求已迁移至 `src/main/worker/git-read-request-handlers.ts`，
 并扩展至 current/upstream/default/base branch、branch-ahead、recent-branches 与 branch-exists

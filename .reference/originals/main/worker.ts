@@ -13,6 +13,7 @@ const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require
 const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = require("./worker/git-apply-patch");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
+const { createWorktreeRequest } = require("./worker/git-worktree-create-request");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
 const { restoreHandoffBranchAndStash, restoreHandoffSource, rollbackHostHandoffWorktree } = require("./worker/git-handoff-rollback");
@@ -69798,6 +69799,7 @@ var I6 = kW(`git`),
           createExecutionHost: (config) => this.dependencies.createExecutionHost(config),
           cleanupHostTransfer: cleanupHostHandoffTransferFiles,
           upstreamRefreshControllers: this.worktreeUpstreamRefreshAbortControllers,
+          createWorktree: (params) => V2(params),
           listCodexWorktrees: (gitManager, host, worktreesRoot) =>
             listCodexWorktrees(gitManager, host, worktreesRoot, managedWorktreeDiscoveryDeps),
           listWorktrees: (cwd, host, signal) => this.getWorktrees(cwd, host, signal),
@@ -70118,7 +70120,7 @@ var I6 = kW(`git`),
             break;
           }
           case `create-worktree`:
-            p = await this.handleCreateWorktree(e.params, { host: o, signal: i.signal });
+            p = await createWorktreeRequest(e.params, worktreeRequestDeps);
             break;
           case `cancel-worktree-upstream-refresh`: {
             p = X(cancelWorktreeUpstreamRefresh(e.params, worktreeRequestDeps));
@@ -70417,65 +70419,6 @@ var I6 = kW(`git`),
           branchSearchDeps,
         ),
       );
-    }
-    async handleCreateWorktree(e, { host: t, signal: n }) {
-      let r = this.emit.bind(this),
-        i = e.streamId,
-        a = new AbortController();
-      e.pendingWorktreeId != null &&
-        this.worktreeUpstreamRefreshAbortControllers.set(e.pendingWorktreeId, a);
-      let o = await V2({
-        gitManager: this.gitManager,
-        workspaceRoot: e.cwd,
-        name: e.name,
-        startingState: e.startingState,
-        upstreamRefreshMode: e.upstreamRefreshMode,
-        localEnvironmentConfigPath: e.localEnvironmentConfigPath,
-        allowSetupFailure: e.allowSetupFailure,
-        setUpSyncedBranch: e.setUpSyncedBranch ?? !0,
-        host: t,
-        signal: n,
-        upstreamRefreshSignal: a.signal,
-        worktreesRoot: e.worktreesRoot,
-        useWorkspaceDir: e.useWorkspaceDir,
-        onWorktreePathAllocated: (e) => {
-          n.aborted ||
-            r({
-              type: `worker-event`,
-              event: {
-                type: `create-worktree-path`,
-                hostId: t.id,
-                streamId: i,
-                worktreeGitRoot: e,
-              },
-            });
-        },
-        onSetupStart: () => {
-          n.aborted ||
-            r({
-              type: `worker-event`,
-              event: { type: `create-worktree-setup-started`, streamId: i },
-            });
-        },
-        onLog: (e, t) => {
-          n.aborted ||
-            r({
-              type: `worker-event`,
-              event: { type: `create-worktree-stream`, streamId: i, stream: e, data: t },
-            });
-        },
-      }).finally(() => {
-        e.pendingWorktreeId != null &&
-          this.worktreeUpstreamRefreshAbortControllers.get(e.pendingWorktreeId) === a &&
-          this.worktreeUpstreamRefreshAbortControllers.delete(e.pendingWorktreeId);
-      });
-      return o.success
-        ? X({
-            worktreeGitRoot: o.worktreeGitRoot,
-            worktreeWorkspaceRoot: o.worktreeWorkspaceRoot,
-            setupError: o.setupError?.message ?? null,
-          })
-        : EV(o.error.message);
     }
     getWatchKey(e, t) {
       return `${h1(t)}|${e}`;

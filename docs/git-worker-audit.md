@@ -790,3 +790,11 @@ review diff/search/patch 已统一接入 `src/main/worker/git-review-read-dispat
 
 Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令拼接与安全 quoting）已迁移至
 `src/main/worker/linux-terminal-args.ts`；worker 入口仅保留路径归一化和环境读取，6 项断言覆盖 kitty、ghostty、konsole、常规终端及 shell fallback。
+
+### 增量抽取：Worktree create request lifecycle
+
+`create-worktree` 请求的 upstream refresh controller 注册/身份保护清理、path/setup/log 三类流事件、
+请求取消后的事件抑制，以及成功/失败 worker envelope 映射已迁移至
+`src/main/worker/git-worktree-create-request.ts`。入口 class 的 `handleCreateWorktree` 实现已删除，
+请求 dispatcher 只注入现有 create runtime、host、signal、emit 与 controller registry；24 项 focused
+断言覆盖默认/显式 synced-branch 选项、事件字段、失败映射和并发 controller 替换边界。
