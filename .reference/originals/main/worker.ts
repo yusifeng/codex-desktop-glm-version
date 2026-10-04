@@ -87,6 +87,7 @@ const { WORKTREE_INCLUDE_FILE, copyAgentOverrideFiles, copyWorktreeFiles, findWo
 const { WORKTREE_NAME_MARKER, createWorktreePath: createGitWorktreePath, ensureWorktreesRoot, getRootRelativeCwd: getGitRootRelativeCwdQuery, reserveWorktreeNameDirectory } = require("./worker/git-worktree-path-allocation");
 const { createLocalTrackingBranch: createLocalTrackingBranchQuery, deleteLocalTrackingBranch: deleteLocalTrackingBranchQuery, resolveCreatedWorktreeBranchName: resolveCreatedWorktreeBranchNameQuery } = require("./worker/git-worktree-branch-tracking");
 const { createWorktreeCheckout: createWorktreeCheckoutQuery } = require("./worker/git-worktree-checkout");
+const { createWorktree: createGitWorktreeQuery } = require("./worker/git-worktree-create");
 const { readWorktreeShellEnvironment: readWorktreeShellEnvironmentQuery, removeWorktreeShellEnvironment: removeWorktreeShellEnvironmentQuery, writeWorktreeShellEnvironment: writeWorktreeShellEnvironmentQuery } = require("./worker/git-worktree-shell-environment");
 const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
@@ -591,6 +592,47 @@ const createWorktreeCheckout = (root, worktreeRoot, state, gitManager, host, opt
     options,
     worktreeCheckoutDeps,
   );
+const worktreeCreateDeps = {
+  copyAgentOverrideFiles: (sourceRoot, targetRoot, host) =>
+    copyAgentOverrideFiles(sourceRoot, targetRoot, host, gitWorktreeCopyDependencies),
+  copyWorktreeFiles: (params) => copyWorktreeFiles(params, gitWorktreeCopyDependencies),
+  createWorktreeCheckout,
+  createWorktreePath: (root, gitManager, workspaceRoot, host, worktreesRoot, name) =>
+    createGitWorktreePath(
+      root,
+      gitManager,
+      workspaceRoot,
+      host,
+      worktreesRoot,
+      name,
+      gitWorktreePathDependencies,
+    ),
+  ensureWorktreesRoot: (host, root) =>
+    ensureWorktreesRoot(host, root, gitWorktreePathDependencies),
+  findWorktreeIncludeFiles: (root, host) =>
+    findWorktreeIncludeFiles(root, host, gitWorktreeCopyDependencies),
+  formatLocalBranchRef,
+  getCommitTree: (repository, ref, signal) => A2(repository, ref, signal),
+  getDefaultRemoteBranch: getDefaultGitRemoteBranch,
+  normalizeCwd: xz,
+  normalizeRoot: bz,
+  originalWorkspaceEnv: `CODEX_SOURCE_TREE_PATH`,
+  readLocalEnvironmentConfig: (path, host) => A$(path, host),
+  removeWorktreeShellEnvironment,
+  reserveWorktreeNameDirectory: (path, host, signal) =>
+    reserveWorktreeNameDirectory(path, host, signal, gitWorktreePathDependencies),
+  resolveCreatedWorktreeBranchName,
+  resolveWorktreeLocalEnvironmentConfig: (params) =>
+    resolveWorktreeLocalEnvironmentConfig(params, gitWorktreeCopyDependencies),
+  runSetupScript: (root, config, onLog, signal, environment, host) =>
+    runGitSetupScript(root, config, onLog, signal, environment, host),
+  setSyncedBranchConfig,
+  worktreeIncludeFile: WORKTREE_INCLUDE_FILE,
+  worktreeNameMarker: WORKTREE_NAME_MARKER,
+  worktreeWorkspaceEnv: `CODEX_WORKTREE_PATH`,
+  writeWorktreeShellEnvironment,
+};
+const V2 = (params) => createGitWorktreeQuery(params, worktreeCreateDeps);
 const gitBranchMetadataDeps = {
   getCurrentBranch: getCurrentGitBranch,
   getDefaultRemoteBranch: getDefaultGitRemoteBranch,
@@ -67509,211 +67551,6 @@ function A2(e, t, n) {
 }
 var Jme = K({ branch: H(), lastSyncedTreeRef: H() });
 var $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
-var B2 = new TextEncoder();
-async function V2({
-  name: e,
-  gitManager: t,
-  workspaceRoot: n,
-  startingState: r,
-  upstreamRefreshMode: i,
-  localEnvironmentConfigPath: a,
-  allowSetupFailure: o = !1,
-  setUpSyncedBranch: s = !0,
-  host: c,
-  signal: l,
-  upstreamRefreshSignal: u,
-  onLog: d,
-  onWorktreePathAllocated: f,
-  onSetupStart: p,
-  worktreesRoot: m,
-  useWorkspaceDir: h = !1,
-}) {
-  if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
-  let g = await t.getWorktreeRepository(xz(n), c);
-  if (!g) return { success: !1, error: Error(`Not a git repository`) };
-  if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
-  let _ = (await getDefaultGitRemoteBranch(g))?.branch ?? null,
-    v = m;
-  if (!v?.trim() && !h) {
-    let [e, t] = await Promise.all([c.codexHome(), c.platformPath()]);
-    v = t.join(e, `worktrees`);
-  }
-  await ensureWorktreesRoot(c, v, gitWorktreePathDependencies);
-  let y = await createGitWorktreePath(
-    g.root,
-    t,
-    n,
-    c,
-    v,
-    e,
-    gitWorktreePathDependencies,
-  );
-  if (!y.success) return { success: !1, error: y.error };
-  if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
-  let { worktreeGitRoot: b, worktreeWorkspaceRoot: x } = y,
-    S = await c.platformPath(),
-    C = e == null ? null : S.dirname(b);
-  if (C != null) {
-    let e = null;
-    try {
-      ((C = await reserveWorktreeNameDirectory(C, c, l, gitWorktreePathDependencies)),
-        (e = C));
-      let t = S.relative(b, x);
-      ((b = bz(S.join(C, S.basename(b)))),
-        (x = xz(S.join(b, t))),
-        await c.writeFile(S.join(C, WORKTREE_NAME_MARKER), ``));
-    } catch (t) {
-      return (
-        e != null && (await c.remove(e, { recursive: !0, force: !0 }).catch(() => void 0)),
-        {
-          success: !1,
-          error: Error(
-            `Could not reserve the worktree name. Choose an unused name and check the worktrees directory permissions.`,
-            { cause: t },
-          ),
-        }
-      );
-    }
-  }
-  f?.(b);
-  let w = await createWorktreeCheckout(g.root, b, r, t, c, {
-    onLog: d,
-    signal: l,
-    upstreamRefreshMode: i,
-    upstreamRefreshSignal: u,
-  });
-  if (!w.success)
-    return (
-      C != null && (await c.remove(C, { recursive: !0, force: !0 })),
-      { success: !1, error: w.error }
-    );
-  if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
-  let T = t.getWorktreeRepositoryForRoot(b, c),
-    E = await resolveCreatedWorktreeBranchName(g, r, w.startingRef, l),
-    D = s && E != null && E !== _ && (r.type !== `branch` || r.remoteRef == null);
-  if (c.isLocal) {
-    await copyAgentOverrideFiles(g.root, b, c, gitWorktreeCopyDependencies);
-    let e = await findWorktreeIncludeFiles(g.root, c, gitWorktreeCopyDependencies);
-    await copyWorktreeFiles(
-      {
-        sourceGitRoot: g.root,
-        worktreeGitRoot: b,
-        relativePaths: e,
-        label: WORKTREE_INCLUDE_FILE,
-        host: c,
-        onLog: d,
-      },
-      gitWorktreeCopyDependencies,
-    );
-  }
-  if (D && E) {
-    let e = formatLocalBranchRef(E);
-    await setSyncedBranchConfig(T, e, await A2(g, e, l), l);
-  }
-  d?.(`info`, B2.encode(`Worktree created at ${x}\n`));
-  let O =
-      a == null
-        ? null
-        : await resolveWorktreeLocalEnvironmentConfig(
-            {
-              localEnvironmentConfigPath: a,
-              sourceGitRoot: g.root,
-              worktreeGitRoot: b,
-              host: c,
-              signal: l,
-            },
-            gitWorktreeCopyDependencies,
-          ).catch(() => a),
-    k = O ?? `__none__`;
-  if (
-    ((await T.setConfigValueForScope(`codex.localEnvironmentConfigPath`, k, `worktree`, l)) ||
-      d?.(
-        `stderr`,
-        B2.encode(`Failed to store selected environment in git config
-`),
-      ),
-    O == null)
-  )
-    return (
-      d?.(
-        `info`,
-        B2.encode(`No local environment selected
-`),
-      ),
-      {
-        success: !0,
-        worktreeGitRoot: b,
-        worktreeWorkspaceRoot: x,
-        setupResult: null,
-        setupError: null,
-      }
-    );
-  p?.();
-  let ee = await A$(O, c);
-  if (ee.type === `error`) {
-    let e = Error(ee.error.message);
-    return (
-      d?.(`stderr`, B2.encode(`${e.message}\n`)),
-      o
-        ? {
-            success: !0,
-            worktreeGitRoot: b,
-            worktreeWorkspaceRoot: x,
-            setupResult: null,
-            setupError: e,
-          }
-        : { success: !1, error: e }
-    );
-  }
-  d?.(`info`, B2.encode(`Running setup script ${ee.configPath}\n`));
-  let te = await runGitSetupScript(
-    b,
-    ee,
-    (e, t) => {
-      d?.(e, t);
-    },
-    l,
-    { [lB]: n, [uB]: x },
-    c,
-  );
-  if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
-  let ne = te?.setupResult ?? null;
-  if (ne?.status === `failed`) {
-    let e = Error(ne.error ?? `Setup script failed`);
-    return (
-      d?.(`stderr`, B2.encode(`${ne.error ?? `Setup script failed`}\n`)),
-      o
-        ? {
-            success: !0,
-            worktreeGitRoot: b,
-            worktreeWorkspaceRoot: x,
-            setupResult: ne,
-            setupError: e,
-          }
-        : { success: !1, error: e }
-    );
-  }
-  ne?.status === `succeeded` &&
-    d?.(
-      `info`,
-      B2.encode(`Setup script completed
-`),
-    );
-  try {
-    te?.shellEnvironment == null
-      ? await removeWorktreeShellEnvironment(T, l)
-      : await writeWorktreeShellEnvironment(T, te.shellEnvironment, l);
-  } catch (e) {
-    d?.(`stderr`, B2.encode(`Failed to store worktree shell environment: ${String(e)}\n`));
-  }
-  return {
-    success: !0,
-    worktreeGitRoot: b,
-    worktreeWorkspaceRoot: x,
-    setupResult: ne,
-    setupError: null,
-  };
-}
 async function J2(e, t = !0, n, r) {
   let i;
   try {

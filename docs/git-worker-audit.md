@@ -646,6 +646,13 @@ detached `worktree add`、working-tree diff 与 untracked 文件恢复、trackin
 主编排已迁移至 `src/main/worker/git-worktree-checkout.ts`。原 `zme`/`Bme`/`Hme` 与 `T2` 专用
 日志状态已删除，上层 create 只保留路径分配和 setup/config 生命周期，由 44 项独立断言覆盖。
 
+### 增量抽取：Worktree create orchestration
+
+Worktree create 的 repository/root 解析、命名目录预留、checkout、辅助文件复制、synced config、
+local environment 选择/setup、失败容忍和 shell environment 持久化完整编排已迁移至
+`src/main/worker/git-worktree-create.ts`。原 `V2` 与 `B2` encoder 状态已删除；host handoff 与
+create-worktree 请求消费者共用语义入口，由 52 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
