@@ -515,3 +515,11 @@ transition 的状态编排已迁移至 `src/main/browser-page-preload/annotation
 入口仅注入既有 feature lifecycle、runtime mount 和状态解析器，仍保留 DOM event dispatch
 等副作用；`scripts/test-preload-annotation-sync-state.mjs` 覆盖正常模式切换、能力关闭和
 agent 控制清理，共 7 项行为断言。
+
+### 增量抽取：annotation event detail boundary
+
+批注 range/open-request detail 的稳定 payload 组装，以及 CustomEvent detail/own-property
+读取已迁移至 `src/main/browser-page-preload/annotation-event-details.ts`。入口的
+`annotation-runtime.ts` 仅保留兼容 re-export；该边界不改变事件副作用或 React/UI 编排，
+由 `scripts/test-preload-annotation-event-details.mjs` 覆盖 range/open-request 投影、
+own-property 防原型污染读取与空 detail 回退，共 6 项断言。

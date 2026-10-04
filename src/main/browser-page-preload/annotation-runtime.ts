@@ -1,4 +1,5 @@
 import { cloneRecord, createAnnotationResponseDetail, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls } from "./annotation-control-payload";
+import { createAnnotationOpenRequestDetail, createAnnotationRangeDetail, readAnnotationEventDetail, readAnnotationEventField } from "./annotation-event-details";
 
 function normalizeAnnotationControlTargets(value: unknown, elementConstructor: { new (...args: any[]): any }, documentRef: object, maxTargets: number): unknown[] {
   if (!(value instanceof elementConstructor) && (value == null || typeof (value as { [Symbol.iterator]?: unknown })[Symbol.iterator] !== `function`)) throw new TypeError(`Annotation controls require element targets`);
@@ -12,26 +13,6 @@ function normalizeAnnotationControlTargets(value: unknown, elementConstructor: {
     result.add(target);
   }
   return Array.from(result);
-}
-
-function createAnnotationRangeDetail(input: { startPath: number[]; endPath: number[]; startOffset: number; endOffset: number; rangeText: string }): Record<string, unknown> {
-  return {
-    startPath: input.startPath,
-    endPath: input.endPath,
-    startOffset: input.startOffset,
-    endOffset: input.endOffset,
-    rangeText: input.rangeText,
-  };
-}
-
-function createAnnotationOpenRequestDetail(input: { mode: string; enterAnnotationMode: boolean; metadata?: Record<string, unknown>; initialComment?: string; range?: Record<string, unknown> }): Record<string, unknown> {
-  return {
-    mode: input.mode,
-    enterAnnotationMode: input.enterAnnotationMode,
-    metadata: input.metadata,
-    initialComment: input.initialComment,
-    range: input.range,
-  };
 }
 
 function createAnnotationControlHandle(id: string, serialize: (value: unknown) => string, normalizeTargets: (value: unknown) => unknown[], emit: (type: `update` | `dispose`, detail: Record<string, unknown>) => boolean): Readonly<{ update(value: { targets?: unknown }): void; dispose(): void }> {
@@ -49,17 +30,6 @@ function createAnnotationControlHandle(id: string, serialize: (value: unknown) =
       emit(`dispose`, { id });
     },
   });
-}
-
-function readAnnotationEventDetail(event: unknown): Record<string, unknown> | undefined {
-  if (typeof CustomEvent !== `undefined` && !(event instanceof CustomEvent)) return undefined;
-  const detail = (event as { detail?: unknown } | null)?.detail;
-  return typeof detail === `object` && detail !== null ? detail as Record<string, unknown> : undefined;
-}
-
-function readAnnotationEventField(detail: Record<string, unknown>, key: string): unknown {
-  const descriptor = Object.getOwnPropertyDescriptor(detail, key);
-  return descriptor != null && `value` in descriptor ? descriptor.value : undefined;
 }
 
 function parseAnnotationControlsPayload(serialized: unknown, fullParse: (value: unknown) => { success: boolean; data?: unknown }, patchParse: (value: unknown) => { success: boolean; data?: unknown }, current?: Record<string, unknown>, maxLength = 16384): Record<string, unknown> | undefined {
