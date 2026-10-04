@@ -380,6 +380,9 @@ main 更新即时退出清理（原 `Wst`，176,933-176,955）已抽取为
 `src/main/main-app/app-shell/immediate-update-exit.ts`，通过注入式依赖保留进程树清理、
 异步 cleanup、窗口销毁、错误告警与 `app.exit(0)` 顺序，由
 `scripts/test-main-immediate-update-exit.mjs` 覆盖行为断言；Ust 其余启动装配仍在入口。
+启动清理等待与超时原语（原 `s7/Lrt`，161,783-161,788、175,938）已抽取为
+`src/main/main-app/startup/cleanup-timeout.ts`，保留 cleanup 成功、拒绝和超时均完成的关停语义，
+由 `scripts/test-main-cleanup-timeout.mjs` 覆盖 4 项断言；具体清理副作用仍由入口注入。
 启动阶段延迟展示进度窗口的 timer、异步 show、取消及 cleanup 竞态已迁移至
 `src/main/main-app/startup/delayed-progress-window.ts`，由
 `scripts/test-main-delayed-progress-window.mjs` 覆盖 5 项时序断言。

@@ -183,3 +183,9 @@ node scripts/audit-shared-consumption.mjs
 
 原 `Est`（175,026-175,046）的 workspace policy 重启提示已迁移至
 `src/main/main-app/startup/workspace-policy-restart-dialog.ts`。模块通过注入国际化、应用名、同步对话框、quit approval 与退出回调，保留提示失败后的 warning 语义以及始终执行 `markQuitApproved`/退出的顺序；入口仅负责 Electron/quit 适配，由 `scripts/test-main-workspace-policy-restart-dialog.mjs` 覆盖正常展示和失败降级路径。
+
+### 增量抽取：启动清理超时原语
+
+原 `s7/Lrt`（161,783-161,788、175,938）的异步清理等待与超时竞态已迁移至
+`src/main/main-app/startup/cleanup-timeout.ts`，由 `scripts/test-main-cleanup-timeout.mjs`
+覆盖成功、拒绝和超时路径共 4 项断言；具体清理副作用与超时常量仍由入口注入。

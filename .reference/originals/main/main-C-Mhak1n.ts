@@ -21,6 +21,7 @@ const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = req
 const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
 const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
+const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates } = require("./main-app/startup/tray-icon-paths.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction } = require("./main-app/computer-use/history-scope-actions.js");
@@ -161783,16 +161784,10 @@ async function Irt({
   (e.dispose(), t.dispose(), await s7(n, o7), r.dispose());
 }
 function Lrt(e) {
-  return s7(e, Prt);
+  return waitForCleanupWithTimeout(e, Prt);
 }
 function s7(e, t) {
-  return new Promise((n) => {
-    let r = setTimeout(n, t),
-      i = () => {
-        (clearTimeout(r), n());
-      };
-    e().then(i, i);
-  });
+  return waitForCleanupWithTimeout(e, t);
 }
 function Rrt(e) {
   let t = a.l(),
