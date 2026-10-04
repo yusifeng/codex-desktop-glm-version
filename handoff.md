@@ -16,6 +16,8 @@
 仅负责对选中 subscription 调用计划并安排 timer，由
 `scripts/test-worker-git-live-query-refresh-plan.mjs` 覆盖 9 项行为断言。
 
+Git watcher setup 的 per-host 串行排队、index size bucket 采样、ready/close 竞态与 origin-query 清理已迁移至 `src/main/worker/git-watch-setup.ts`；入口仅保留 host/path、watcher 启动、repository cache 与 close 副作用，由 `scripts/test-worker-git-watch-setup.mjs` 覆盖 11 项生命周期断言。
+
 本轮已完成 worker/preload/main 逐段审计、shared 692 导出全量分类、renderer
 三大 hub 内部审计、tsconfig 排除、测试索引、README 更新，以及 smoke/e2e
 验证说明。worker 的 main-RPC 边界已提取为 `src/main/worker/rpc-client.ts`

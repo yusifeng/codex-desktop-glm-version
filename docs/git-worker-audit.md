@@ -1023,3 +1023,8 @@ Computer-use capture worker 的 update continuation policy 已迁移至
 `src/main/worker/computer-use-capture-policy.ts`；metadata/AX text 会继续轮询，带 transition
 snapshot 的 screenshot 与 completed/failed 会停止轮询，入口仍保留 worker service、日志、事件
 发射和递归副作用。`scripts/test-worker-computer-use-capture-policy.mjs` 覆盖 7 项协议断言。
+
+Git watcher setup 的 per-host 串行排队、index size bucket 采样、watcher ready/close 竞态与
+origin-query 清理已迁移至 `src/main/worker/git-watch-setup.ts`；入口仅注入 host/path、watcher
+启动、repository cache 与 close 副作用，由 `scripts/test-worker-git-watch-setup.mjs` 覆盖 11 项
+生命周期断言。watcher 本身和 worker host 绑定仍保留在入口。

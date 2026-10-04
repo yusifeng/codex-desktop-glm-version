@@ -95,6 +95,7 @@ const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchStat
 const { SYNCED_BRANCH_CONFIG_FILE, readSyncedBranchConfig: readSyncedBranchConfigQuery, resolveSyncedBranchConfigPath: resolveSyncedBranchConfigPathQuery, setSyncedBranchConfig: setSyncedBranchConfigQuery } = require("./worker/git-synced-branch-config");
 const { dispatchTurnDiffRequest } = require("./worker/git-turn-diff-request-dispatch");
 const { releaseGitRepoWatch } = require("./worker/git-watch-lifecycle");
+const { scheduleGitWatchSetup } = require("./worker/git-watch-setup");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70864,43 +70865,25 @@ var I6 = kW(`git`),
       let r = h1(t),
         i = this.getWatchKey(e.root, t),
         a = this.watchSetupByHost.get(r);
-      e.startTrace = AH() ?? void 0;
-      let o = (a ?? Promise.resolve()).then(async () => {
-          await n;
-          try {
-            if (e.refCount > 0 && this.watchesByKey.get(i) === e) {
-              let n = t.isLocal ? g.default : g.default.posix;
-              (t
-                .stat(n.join(e.commonDir, `index`))
-                .then(({ size: t }) => {
-                  this.watchesByKey.get(i) === e && (e.repoIndexSizeBucket = bucketGitIndexSize(t));
-                })
-                .catch(() => {}),
-                await e.watcher.start());
-            }
-            e.refCount > 0 && this.watchesByKey.get(i) === e
-              ? (this.gitManager
-                  .getWorktreeRepositoryForRoot(e.root, t)
-                  .queryClient.removeQueries({
-                    queryKey: Q(e.root, t, `effective-origin-url`),
-                    exact: !0,
-                  }),
-                (e.isReady = !0))
-              : await this.closeRepoWatch(e, t);
-          } catch (n) {
-            throw (await this.closeRepoWatch(e, t), n);
-          } finally {
-            e.startTrace = void 0;
-          }
-        }),
-        s = o.catch(() => {});
-      return (
-        this.watchSetupByHost.set(r, s),
-        s.then(() => {
-          this.watchSetupByHost.get(r) === s && this.watchSetupByHost.delete(r);
-        }),
-        o
-      );
+      return scheduleGitWatchSetup(a, {
+        hostKey: r,
+        watchKey: i,
+        hostIsLocal: t.isLocal,
+        commonDir: e.commonDir,
+        indexPath: (commonDir, hostIsLocal) => (hostIsLocal ? g.default : g.default.posix).join(commonDir, `index`),
+        statIndex: (indexPath) => t.stat(indexPath),
+        bucketIndexSize: (size) => { if (this.watchesByKey.get(i) === e) e.repoIndexSizeBucket = bucketGitIndexSize(size); },
+        isCurrent: () => e.refCount > 0 && this.watchesByKey.get(i) === e,
+        startWatcher: () => e.watcher.start(),
+        clearOriginQueries: () => this.gitManager.getWorktreeRepositoryForRoot(e.root, t).queryClient.removeQueries({ queryKey: Q(e.root, t, `effective-origin-url`), exact: !0 }),
+        markReady: () => { e.isReady = !0; },
+        closeWatch: () => this.closeRepoWatch(e, t),
+        getActiveSetup: () => this.watchSetupByHost.get(r),
+        setActiveSetup: (setup) => this.watchSetupByHost.set(r, setup),
+        clearActiveSetup: (setup) => { if (this.watchSetupByHost.get(r) === setup) this.watchSetupByHost.delete(r); },
+        setStartTrace: (trace) => { e.startTrace = trace; },
+        getTrace: () => AH() ?? void 0,
+      });
     }
     closeRepoWatch(e, t, n = !0) {
       if (e.closingPromise != null) return e.closingPromise;
