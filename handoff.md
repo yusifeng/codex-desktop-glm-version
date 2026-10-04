@@ -18,7 +18,7 @@
 过滤和 app-server 初始化握手，且对慢启动增加了 15 秒宽限轮询。
 
 后续增量已实际接回：worker 入口消息分发与 Git 错误分类、preload WebMCP
-协议、main delegation/account 与 URL trust helpers、WSL 输出解析，均有独立
+协议、main delegation/account 与 URL trust helpers、WSL 输出解析与命令参数构造，均有独立
 回归断言；worker 的 remote host SSH 展示名/identity 解析也已抽取为
 `src/main/worker/remote-host-config.ts`，并由 6 项行为断言覆盖；preload 的
 worker Windows/POSIX shell descriptor 策略已抽取为 `src/main/worker/shell-config.ts`，

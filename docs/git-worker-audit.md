@@ -13,9 +13,9 @@
 模块均以 CommonJS helper 形式由 `worker.ts` 加载，并有独立回归断言；其余
 business 区段仍按下表保持审计标记，不能视为已完成。
 
-WSL 平台的纯输出解析（约 47,122-47,584 中的 UTF-16/UTF-8 解码、活动发行版
-识别与排序）也已迁至 `worker/platform-wsl.ts`；仍需继续迁移的是其命令执行、
-缓存和宿主生命周期副作用。
+WSL 平台的纯输出解析、命令参数构造与 quiet-list fallback（约 47,122-47,584 中的
+UTF-16/UTF-8 解码、活动发行版识别与排序）已迁至 `worker/platform-wsl.ts`；入口
+仍负责 spawn/exec 副作用、缓存和宿主生命周期。
 
 远程 host 的 SSH 展示名、终端命令端口/identity 解析（原入口约
 88,590-88,646）已迁至 `worker/remote-host-config.ts`。模块只保留字段校验、
