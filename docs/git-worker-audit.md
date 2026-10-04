@@ -527,6 +527,13 @@ Remote branch 的 ordered remotes、local/remote default branch、main/master fa
 default branch、starting ref、handoff、push 与 branch metadata/ahead 消费者全部改用语义名称，
 由 44 项模块断言覆盖。
 
+### 增量抽取：Branch comparison
+
+Left/right commit counts 的 query cache、`rev-list --left-right --count`、宽松整数解析与
+equal/left-ahead/right-ahead/diverged 状态分类已迁移至
+`src/main/worker/git-branch-comparison.ts`。原 `A0`/`Fpe` 已删除，nearest ancestor、starting
+ref 与 synced-branch state 消费者改用语义名称，由 21 项模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

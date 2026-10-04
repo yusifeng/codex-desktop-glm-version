@@ -22,6 +22,7 @@ const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-mo
 const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/git-move-to-worktree");
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { getBranchAheadCount } = require("./worker/git-branch-ahead");
+const { compareGitBranches: compareGitBranchesQuery } = require("./worker/git-branch-comparison");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
 const { blameFile: getGitBlameFile } = require("./worker/git-blame-file");
 const { readGitCatFile } = require("./worker/git-cat-file");
@@ -94,6 +95,14 @@ const gitBlameFileDeps = {
   runGit: (...args) => $(...args),
 };
 const gitCatFileDeps = { runGit: (...args) => $(...args) };
+const gitBranchComparisonDeps = {
+  getQueryMeta: () => x1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const compareGitBranches = (repository, left, right, signal) =>
+  compareGitBranchesQuery(repository, left, right, signal, gitBranchComparisonDeps);
 const gitCurrentBranchDeps = {
   fetchQueryWithSignal: (...args) => w1(...args),
   getQueryMeta: () => b1,
@@ -111,7 +120,7 @@ const gitIndexInfoDeps = {
   getGitDir: (...args) => u0(...args),
   logger: { error: (message, detail) => kW(`git`)().error(message, detail) },
 };
-const gitNearestAncestorDeps = { compareAhead: (...args) => A0(...args) };
+const gitNearestAncestorDeps = { compareAhead: (...args) => compareGitBranches(...args) };
 const gitRecentBranchesDeps = {
   fetchQueryWithSignal: (...args) => w1(...args),
   getLiveQueryMeta: () => ipe,
@@ -369,7 +378,7 @@ const syncedBranchStateDeps = {
   getHeadCommit: (repository, signal) =>
     getCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   getCurrentBranch: getCurrentGitBranch,
-  compareAhead: A0,
+  compareAhead: compareGitBranches,
   logger: {
     warning: (message, detail) => kW(`git`)().warning(message, detail),
   },
@@ -66795,40 +66804,6 @@ async function y0(e, t, n, r = {}) {
     maxOutputBytes: c,
   });
 }
-function A0(e, t, n, r) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `left-right-commit-counts`, t, n),
-    meta: x1,
-    queryFn: async () => {
-      let i = await $(e.root, [`rev-list`, `--left-right`, `--count`, `${t}...${n}`], e.host, {
-        allowedNonZeroExitCodes: [128, 1],
-        signal: r,
-      });
-      if (!i.success || !i.stdout) return null;
-      let a = Fpe(i.stdout);
-      if (!a) return null;
-      let o = `equal`;
-      return (
-        a.leftAhead > 0 && a.rightAhead > 0
-          ? (o = `diverged`)
-          : a.leftAhead > 0
-            ? (o = `left-ahead`)
-            : a.rightAhead > 0 && (o = `right-ahead`),
-        { leftAhead: a.leftAhead, rightAhead: a.rightAhead, state: o }
-      );
-    },
-    staleTime: g1,
-  });
-}
-function Fpe(e) {
-  let t = e.trim();
-  if (!t) return null;
-  let n = t.split(/\s+/);
-  if (n.length < 2) return null;
-  let r = Number.parseInt(n[0] ?? ``, 10),
-    i = Number.parseInt(n[1] ?? ``, 10);
-  return !Number.isFinite(r) || !Number.isFinite(i) ? null : { leftAhead: r, rightAhead: i };
-}
 function F0(e) {
   return e.startsWith(`refs/`) ? e : `refs/heads/${e}`;
 }
@@ -66878,7 +66853,7 @@ async function I0(e, t, n) {
   if (i != null) {
     let a = `refs/remotes/${i}`,
       o = (await resolveGitRefSha(e, `${a}^{commit}`, n)) == null ? F0(i) : a;
-    return (await A0(e, r ?? t, o, n))?.state === `right-ahead` ? { ref: o } : { ref: r ?? t };
+    return (await compareGitBranches(e, r ?? t, o, n))?.state === `right-ahead` ? { ref: o } : { ref: r ?? t };
   }
   if (r != null && (await resolveGitRefSha(e, `${r}^{commit}`, n)) != null) return { ref: r };
   let a = await getOrderedGitRemotes(e);
