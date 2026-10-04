@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 19, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 20, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -29,6 +29,7 @@ assert.ok(primary.unconsumed.includes("Eh"), "Eh remains coupled to the generate
 assert.ok(primary.unconsumed.includes("Ef"), "Ef remains coupled to the generated default-branch query runtime");
 assert.ok(primary.unconsumed.includes("$g"), "$g remains coupled to generated CSS capability styling");
 assert.ok(primary.unconsumed.includes("$a"), "$a remains coupled to the generated slash-command pin surface");
+assert.ok(primary.unconsumed.includes("An"), "An remains coupled to generated repository URL projection");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
@@ -41,4 +42,5 @@ assert.match(audit, /公开别名 `Eh`/);
 assert.match(audit, /公开别名 `Ef`/);
 assert.match(audit, /公开别名 `\$g`/);
 assert.match(audit, /公开别名 `\$a`/);
+assert.match(audit, /公开别名 `An`/);
 console.log("20 renderer hub classification assertions passed");

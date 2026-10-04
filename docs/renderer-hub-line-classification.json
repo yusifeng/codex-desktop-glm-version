@@ -98,5 +98,10 @@
     "hub": "app-primary", "alias": "$a", "sourceSymbol": "mQe", "startLine": 51476, "endLine": 51518,
     "classification": "generated-local-react-surface", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The slash-command pin surface resolves localized title/description and registers a Pin chat command through the adjacent composer runtime; it is rendered only by the local chat-route branch and has no independent renderer named consumer or lifecycle boundary, so preserving the coupled generated React surface avoids an unowned facade."
+  },
+  {
+    "hub": "app-primary", "alias": "An", "sourceSymbol": "sst", "startLine": 93876, "endLine": 93880,
+    "classification": "generated-local-repository-url-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper projects a selected repository clone URL from generated repo-map state and delegates feature gating to the adjacent cst helper. It has no named renderer consumer or independent repository-query boundary, so retaining the exact generated implementation is safer than introducing an unowned facade."
   }
 ]

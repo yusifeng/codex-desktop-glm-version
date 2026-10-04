@@ -576,3 +576,9 @@ default-branch RPC、live-query 与 cache runtime，明确拥有 hub 初始化�
 `generated-local-react-surface` 并保留聚合 hub，避免复制 composer runtime 与 React
 初始化契约；分类记录由 `scripts/audit-renderer-hub-classification.mjs` 校验 source
 symbol 与精确行范围。
+本轮继续补齐 app-primary repository URL projection 的逐行证据：`sst`（公开别名 `An`，
+93876--93880 行）从生成的 repo-map 状态读取当前仓库 clone URL，并委托相邻 `cst` helper
+执行 feature gate。该 helper 没有独立 renderer named consumer 或 repository-query 生命周期
+边界，因此登记为 `generated-local-repository-url-helper` 并保留在聚合 hub，避免制造无主
+repository facade；分类记录由 `scripts/audit-renderer-hub-classification.mjs` 校验 source
+symbol 与精确行范围。
