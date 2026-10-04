@@ -589,3 +589,4 @@ symbol 与精确行范围。
 边界，因此登记为 `generated-local-project-kind-helper` 并保留在聚合 hub，避免制造无主
 host-selection facade；分类记录由 `scripts/audit-renderer-hub-classification.mjs` 校验
 source symbol 与精确行范围。
+新增 app-primary 逐行分类证据：`$d`/`mI` 是搜索 RPC 分页与 provider 默认值的生成局部 helper；`Cr`/`Fnt` 是自动审批提醒与 coordinator threshold 的耦合流程；`$f`/`MN`、`$l`/`lV`、`$n`/`K4` 是模块初始化副作用。五者均无独立 named renderer consumer 或 teardown/lifecycle 边界，继续保留在聚合模块，避免制造无主 facade。

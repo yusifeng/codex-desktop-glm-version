@@ -108,5 +108,30 @@
     "hub": "app-primary", "alias": "og", "sourceSymbol": "yke", "startLine": 4290, "endLine": 4292,
     "classification": "generated-local-project-kind-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The helper only excludes the cloud execution kind for the adjacent composer target projection. It has no named renderer consumer or independent execution-target lifecycle, so retaining the generated local predicate avoids creating an unowned host-selection facade."
+  },
+  {
+    "hub": "app-primary", "alias": "$d", "sourceSymbol": "mI", "startLine": 17031, "endLine": 17055,
+    "classification": "generated-local-search-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The search helper composes provider defaults, empty-query handling, and RPC pagination for the adjacent generated search surface. It has no named renderer import or independent data-fetch lifecycle, so extracting it would create an unowned search facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Cr", "sourceSymbol": "Fnt", "startLine": 83718, "endLine": 83742,
+    "classification": "generated-local-approval-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper coordinates automatic-turn approval nudges, coordinator deferral, and threshold state in one local flow. Its timing and store side effects are coupled to the generated approval runtime and there is no independent renderer consumer to own a facade."
+  },
+  {
+    "hub": "app-primary", "alias": "$f", "sourceSymbol": "MN", "startLine": 12764, "endLine": 12769,
+    "classification": "generated-local-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer eagerly registers the generated composer dependencies and resource loaders; it is invoked for module setup rather than as a named renderer capability, so preserving the local side-effect boundary avoids a misleading public helper."
+  },
+  {
+    "hub": "app-primary", "alias": "$l", "sourceSymbol": "lV", "startLine": 23190, "endLine": 23208,
+    "classification": "generated-local-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires annotation and shared UI registries before the adjacent feature surface mounts. It has no standalone renderer consumer or teardown contract, so it remains coupled to the generated module initialization sequence."
+  },
+  {
+    "hub": "app-primary", "alias": "$n", "sourceSymbol": "K4", "startLine": 85970, "endLine": 85977,
+    "classification": "generated-local-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers conversation runtime dependencies and caches through generated module side effects. No named renderer boundary consumes the exported alias, so extraction would create an unowned lifecycle facade."
   }
 ]
