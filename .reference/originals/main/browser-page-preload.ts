@@ -4667,9 +4667,7 @@ function Kc(e, t) {
   return [n.overflow, n.overflowX, n.overflowY].some(nc);
 }
 function qc(e) {
-  return typeof CSS < `u` && typeof CSS.escape == `function`
-    ? CSS.escape(e)
-    : e.replace(/[^a-zA-Z0-9_-]/g, `\\$&`);
+  return escapeAnnotationSelectorToken(e, typeof CSS < `u` && typeof CSS.escape == `function` ? CSS.escape.bind(CSS) : undefined);
 }
 function Jc(e, { preventDefault: t = !0 } = {}) {
   (t && e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation?.());
@@ -6212,6 +6210,7 @@ var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotat
 var { getAnnotationElementOverlayClassName } = require("./browser-page-preload/annotation-overlay-class-policy");
 var { createAnnotationPreviewLayer } = require("./browser-page-preload/annotation-preview-layer");
 var { createAnnotationAnchorGeometry } = require("./browser-page-preload/annotation-anchor-geometry");
+var { escapeAnnotationSelectorToken } = require("./browser-page-preload/annotation-selector-token");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
