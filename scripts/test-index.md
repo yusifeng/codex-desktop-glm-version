@@ -6,6 +6,8 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-repository-read-dispatch.mjs`](./test-worker-git-repository-read-dispatch.mjs)
+
 - [`test-worker-git-review-read-dispatch.mjs`](./test-worker-git-review-read-dispatch.mjs)
 
 - [`test-worker-git-branch-read-dispatch.mjs`](./test-worker-git-branch-read-dispatch.mjs)
