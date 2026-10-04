@@ -293,3 +293,11 @@ node scripts/audit-shared-consumption.mjs
 tray ready 状态谓词（原 `Z9`，175,280-175,282）已迁移至
 `src/main/main-app/tray/tray-readiness.ts`，入口保留兼容函数并隔离 tray 对象可选调用；
 由 `scripts/test-main-tray-readiness.mjs` 覆盖 5 项状态/空值断言。
+
+### 增量抽取：Artifact Session host 环境装配
+
+Artifact Session 宿主启动过程中的 daemon 路径、socket/ready 文件、认证 token 与受信任服务环境
+装配已迁移至 `createArtifactSessionHostEnvironment`（`src/main/main-app/artifact-session/host-lifecycle.ts`）。
+生命周期类仍负责 runtime pinning、临时目录清理和进程副作用，仅将确定性的环境/连接描述构造抽出；由
+`scripts/test-main-artifact-session-host-environment.mjs` 覆盖路径、环境键、transaction key 与 viewer token
+等 6 项断言。

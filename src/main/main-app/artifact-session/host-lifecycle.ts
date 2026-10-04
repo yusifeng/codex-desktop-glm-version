@@ -131,6 +131,59 @@ export interface ArtifactSessionHostStartOptions {
   viewerReconciliationTimeoutMs?: number;
 }
 
+export interface ArtifactSessionHostEnvironmentFactoryOptions {
+  pinnedRuntimeDirectory: string;
+  pinnedRuntimePaths: PinnedRuntimePaths;
+  rootDirectory: string;
+  runtimeDirectory: string;
+  transactionKey: string;
+  tokens: { admin: string; mcp: string; viewer: string };
+}
+
+/** Assemble the daemon environment and authenticated connection descriptors. */
+export function createArtifactSessionHostEnvironment({
+  pinnedRuntimeDirectory,
+  pinnedRuntimePaths,
+  rootDirectory,
+  runtimeDirectory,
+  transactionKey,
+  tokens,
+}: ArtifactSessionHostEnvironmentFactoryOptions): ArtifactSessionHostEnvironment {
+  let daemonPath = path.join(pinnedRuntimePaths.nodeModulesPath, ARTIFACT_TOOL_HOST_DAEMON_PATH),
+    socketPath = path.join(runtimeDirectory, `host.sock`),
+    readyFile = path.join(runtimeDirectory, `ready`),
+    hostClientModulePath = path.join(pinnedRuntimePaths.nodeModulesPath, ARTIFACT_TOOL_HOST_CLIENT_PATH),
+    daemonEnv = Object.freeze({
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.adminToken]: tokens.admin,
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.exportRoot]: path.join(rootDirectory, `exports`),
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.mcpToken]: tokens.mcp,
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.parentStdinLease]: `1`,
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.processExitTimeoutMs]: String(PROCESS_EXIT_TIMEOUT_MS),
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.readyFile]: readyFile,
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.requireAdmission]: `1`,
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.shutdownGraceMs]: String(DAEMON_SHUTDOWN_GRACE_MS),
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.socket]: socketPath,
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.store]: path.join(rootDirectory, `store`),
+      [ARTIFACT_SESSION_HOST_ENV_KEYS.viewerToken]: tokens.viewer,
+    });
+  return Object.freeze({
+    adminConnectionInfo: Object.freeze({ hostClientModulePath, socketPath, token: tokens.admin }),
+    daemonEnv,
+    daemonPath,
+    pinnedRuntimeDirectory,
+    readyFile,
+    runtimeDirectory,
+    runtimePaths: pinnedRuntimePaths,
+    trustedServiceEnv: Object.freeze({
+      ARTIFACT_SESSION_HOST_MCP_TOKEN: tokens.mcp,
+      ARTIFACT_SESSION_HOST_SOCKET: socketPath,
+      ARTIFACT_SESSION_TRANSACTION_KEY: transactionKey,
+      NODE_REPL_SANDBOX_ALLOWED_UNIX_SOCKETS: socketPath,
+    }),
+    viewerConnectionInfo: Object.freeze({ hostClientModulePath, socketPath, token: tokens.viewer }),
+  });
+}
+
 // ---- 进程 helpers（原 ri/Jte/Yte/ii/ai/oi/Xte，4,358-4,432）--------------------
 
 /** 32 字节随机 token（base64url；原 `ri`）。 */
@@ -550,50 +603,13 @@ export class ArtifactSessionHostLifecycle {
         }),
         { runtimePaths: pinnedRuntimePaths } = pinned;
       pinnedRuntimeDirectory = pinned.pinnedRuntimeDirectory;
-      let daemonPath = path.join(pinnedRuntimePaths.nodeModulesPath, ARTIFACT_TOOL_HOST_DAEMON_PATH),
-        socketPath = path.join(runtimeDirectory, `host.sock`),
-        readyFile = path.join(runtimeDirectory, `ready`),
-        tokens = { admin: randomToken(), mcp: randomToken(), viewer: randomToken() },
-        daemonEnv = Object.freeze({
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.adminToken]: tokens.admin,
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.exportRoot]: path.join(this.#rootDirectory, `exports`),
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.mcpToken]: tokens.mcp,
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.parentStdinLease]: `1`,
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.processExitTimeoutMs]: String(PROCESS_EXIT_TIMEOUT_MS),
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.readyFile]: readyFile,
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.requireAdmission]: `1`,
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.shutdownGraceMs]: String(DAEMON_SHUTDOWN_GRACE_MS),
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.socket]: socketPath,
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.store]: path.join(this.#rootDirectory, `store`),
-          [ARTIFACT_SESSION_HOST_ENV_KEYS.viewerToken]: tokens.viewer,
-        }),
-        hostClientModulePath = path.join(
-          pinnedRuntimePaths.nodeModulesPath,
-          ARTIFACT_TOOL_HOST_CLIENT_PATH,
-        );
-      return Object.freeze({
-        adminConnectionInfo: Object.freeze({
-          hostClientModulePath,
-          socketPath,
-          token: tokens.admin,
-        }),
-        daemonEnv,
-        daemonPath,
+      return createArtifactSessionHostEnvironment({
         pinnedRuntimeDirectory,
-        readyFile,
+        pinnedRuntimePaths,
+        rootDirectory: this.#rootDirectory,
         runtimeDirectory,
-        runtimePaths: pinnedRuntimePaths,
-        trustedServiceEnv: Object.freeze({
-          ARTIFACT_SESSION_HOST_MCP_TOKEN: tokens.mcp,
-          ARTIFACT_SESSION_HOST_SOCKET: socketPath,
-          ARTIFACT_SESSION_TRANSACTION_KEY: this.#transactionKey,
-          NODE_REPL_SANDBOX_ALLOWED_UNIX_SOCKETS: socketPath,
-        }),
-        viewerConnectionInfo: Object.freeze({
-          hostClientModulePath,
-          socketPath,
-          token: tokens.viewer,
-        }),
+        transactionKey: this.#transactionKey,
+        tokens: { admin: randomToken(), mcp: randomToken(), viewer: randomToken() },
       });
     } catch (error) {
       throw (
