@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 53, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 61, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -58,6 +58,14 @@ assert.ok(primary.unconsumed.includes("Gs"), "Gs remains coupled to generated ov
 assert.ok(primary.unconsumed.includes("Tc"), "Tc remains coupled to generated device-onboarding state");
 assert.ok(primary.unconsumed.includes("Oc"), "Oc remains coupled to generated ads lazy loading");
 assert.ok(primary.unconsumed.includes("Dc"), "Dc remains coupled to generated ads hydration");
+assert.ok(primary.unconsumed.includes("Xc"), "Xc remains coupled to generated mention tokenization");
+assert.ok(primary.unconsumed.includes("Qc"), "Qc remains coupled to generated mention preview initialization");
+assert.ok(primary.unconsumed.includes("Yc"), "Yc remains coupled to generated mention pattern initialization");
+assert.ok(primary.unconsumed.includes("Jc"), "Jc remains coupled to generated cross-realm DOM resolution");
+assert.ok(primary.unconsumed.includes("Zc"), "Zc remains coupled to generated annotation surface rendering");
+assert.ok(primary.unconsumed.includes("Gc"), "Gc remains coupled to generated composer styling");
+assert.ok(primary.unconsumed.includes("Bc"), "Bc remains coupled to generated composer initialization");
+assert.ok(primary.unconsumed.includes("Lc"), "Lc remains coupled to generated dictation lifecycle");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
