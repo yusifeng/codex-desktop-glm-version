@@ -1,4 +1,5 @@
 import { collectAnnotationFlexGapOverlays } from "./annotation-flex-gap-overlays";
+import { observeAnnotationMutationsOutsideOverlay } from "./annotation-overlay-observer";
 
 type AnnotationOverlayRuntimeDependencies = {
   documentLike: any;
@@ -81,13 +82,7 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
   };
 
   const observeMutationsOutsideOverlay = (documentLike: any, rootHost: any, onChange: () => void) => {
-    const observer = new deps.mutationObserverConstructor((records) => {
-      if (!records.every((record) => record.target instanceof deps.nodeConstructor && rootHost.contains(record.target))) {
-        onChange();
-      }
-    });
-    observer.observe(documentLike.documentElement, deps.mutationObserverOptions);
-    return () => observer.disconnect();
+    return observeAnnotationMutationsOutsideOverlay(documentLike, rootHost, onChange, deps);
   };
 
   const resolveTextSelectionRects = (anchor: any) =>

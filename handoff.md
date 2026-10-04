@@ -851,3 +851,8 @@ Annotation metadata tooltip 的稳定行投影（原 React `Nv` 组件内联的 
 Git live-query 完成事件的稳定 envelope（generation、recovery、subscription identity、result
 与可选 trace）已迁移至 `src/main/worker/git-live-query-events.ts`；registry 仅保留发布时机与
 emit 副作用，由 `scripts/test-worker-git-live-query-events.mjs` 覆盖 4 项断言。
+
+Annotation overlay 的页面 mutation observer 生命周期已迁移至
+`src/main/browser-page-preload/annotation-overlay-observer.ts`；overlay 自身 mutation 过滤、页面
+mutation 刷新和幂等 teardown 不再内联于 overlay runtime，由
+`scripts/test-preload-annotation-overlay-observer.mjs` 覆盖 9 项 focused assertions。

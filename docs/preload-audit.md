@@ -537,3 +537,10 @@ annotation hover metadata tooltip 的 tag、size、color、font 行投影已迁�
 本地化文案、布局与 DOM 渲染，`Nv` 组件通过语义模块消费稳定行模型。由
 `scripts/test-preload-annotation-metadata-tooltip.mjs` 覆盖空快照、行顺序、值保留与
 存在性判定，共 5 项断言。
+
+### 增量抽取：annotation overlay mutation observer lifecycle
+
+annotation overlay 对页面 DOM 的 mutation 监听、overlay 自身 mutation 过滤与幂等 teardown 已迁移至
+`src/main/browser-page-preload/annotation-overlay-observer.ts`；`annotation-overlay-runtime.ts` 只保留
+依赖适配和兼容调用入口。`scripts/test-preload-annotation-overlay-observer.mjs` 覆盖 observer 注册、
+overlay 内部过滤、页面 mutation、空批次、非 Node target、幂等 dispose 与 dispose 后回调抑制。
