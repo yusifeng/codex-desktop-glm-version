@@ -707,3 +707,9 @@ GitHub pull request summary 的按账号批量去重、50ms debounce、最多 60
 批处理实现已删除；入口仅保留账户校验与语义 handler 注入，GraphQL 失败继续降级为
 `unavailable`，登录不一致、not-found、HEAD revision 竞争和最多 20 页检查项的既有语义保持不变。
 `scripts/test-github-pull-request-summary.mjs` 覆盖基本 not-found/批处理路径，共 2 项断言。
+
+GitHub exact-revision review 的 diff/file handlers（`eSe`/`tSe`）已迁移至
+`src/main/worker/github-pull-request-revision.ts`：SHA/path 校验、账号校验、diff API、
+base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的双并发 semaphore 均由
+语义模块负责；入口仅保留 API 适配。`scripts/test-github-pull-request-revision.mjs`
+覆盖成功路径与空路径，共 6 项断言。

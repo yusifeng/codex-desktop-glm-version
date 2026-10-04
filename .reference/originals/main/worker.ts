@@ -43,6 +43,7 @@ const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./wo
 const { GitMetadataResolutionError, resolveGitCommonDir: resolveGitCommonDirQuery, resolveGitRoot: resolveGitRootQuery, resolveGitRootAndCommonDir: resolveGitRootAndCommonDirQuery } = require("./worker/git-root-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { createGitRepositoryModels } = require("./worker/git-repository-models");
+const { createGithubPullRequestRevisionHandlers } = require("./worker/github-pull-request-revision");
 const { createGitHubPullRequestSummaryHandler } = require("./worker/github-pull-request-summary");
 const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
@@ -73757,51 +73758,10 @@ async function $xe(e, t, n) {
   }
 }
 async function eSe(e, t, n) {
-  try {
-    let r = R8.parse(e.comparison.baseRevision),
-      i = R8.parse(e.comparison.headRevision);
-    return (
-      await H8(e, t),
-      {
-        status: `success`,
-        headRevision: i,
-        unifiedDiff: await U8(
-          e,
-          t,
-          `compare/${r}...${i}`,
-          [`-H`, `Accept: application/vnd.github.diff`],
-          n,
-        ),
-      }
-    );
-  } catch (e) {
-    return { status: `error`, error: e instanceof Error ? e.message : String(e) };
-  }
+  return revisionHandlers.diff(e, t, n);
 }
 async function tSe(e, t, n) {
-  let r = L8.get(t.id);
-  (r ?? ((r = { semaphore: new k$.Sema(2), requests: 0 }), L8.set(t.id, r)), (r.requests += 1));
-  let i = r.semaphore.acquire();
-  try {
-    (await (n == null ? i : yR(i, n)), n?.throwIfAborted());
-    let r = R8.parse(e.comparison.baseRevision),
-      a = R8.parse(e.comparison.headRevision),
-      o = z8.nullable().parse(e.basePath),
-      s = z8.nullable().parse(e.headPath);
-    (await H8(e, t), n?.throwIfAborted());
-    let [c, l] = await Promise.allSettled([V8(e, t, o, r, n), V8(e, t, s, a, n)]);
-    if (c.status === `rejected`) throw c.reason;
-    if (l.status === `rejected`) throw l.reason;
-    return c.value == null || l.value == null
-      ? { status: `unavailable` }
-      : { status: `success`, baseContent: c.value, headContent: l.value };
-  } catch (e) {
-    return { status: `error`, error: e instanceof Error ? e.message : String(e) };
-  } finally {
-    i.then(() => {
-      (r.semaphore.release(), --r.requests, r.requests === 0 && L8.delete(t.id));
-    });
-  }
+  return revisionHandlers.file(e, t, n);
 }
 async function V8(e, t, n, r, i) {
   if (n == null) return ``;
@@ -73850,6 +73810,12 @@ async function U8(e, t, n, r, i) {
   if (!c.success) throw Error(c.stderr || `Could not read pull request revisions`);
   return c.stdout;
 }
+var revisionHandlers = createGithubPullRequestRevisionHandlers({
+  parseSha: (e) => R8.parse(e),
+  parsePath: (e) => z8.nullable().parse(e),
+  assertAccount: H8,
+  requestApi: U8,
+});
 var nSe = K({
   data: K({ repository: cN(H(), K({ text: H().nullable(), isTruncated: W() }).nullable()) }),
 });

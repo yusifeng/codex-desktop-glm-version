@@ -346,6 +346,10 @@ dispose 生命周期）已抽取为 `src/main/browser-page-preload/annotation-su
 由 13 项行为断言覆盖；main 启动 flavor/platform flags 与阶段计时策略已抽取为
 `src/main/main-app/startup/startup-policy.ts`；路径扩展名分类、debug Chrome page 和 remote-hosted
 PIP 进程号策略也已接回该模块，由 17 项矩阵与边界断言覆盖。
+main 更新即时退出清理（原 `Wst`，176,933-176,955）已抽取为
+`src/main/main-app/app-shell/immediate-update-exit.ts`，通过注入式依赖保留进程树清理、
+异步 cleanup、窗口销毁、错误告警与 `app.exit(0)` 顺序，由
+`scripts/test-main-immediate-update-exit.mjs` 覆盖行为断言；Ust 其余启动装配仍在入口。
 annotation surface registry（surface registration、hit-test、render/cancel/clear 与
 dispose）已抽取为 `src/main/browser-page-preload/annotation-surface-registry.ts`，
 由 9 项行为断言覆盖。
@@ -551,3 +555,7 @@ npm run typecheck && node scripts/audit-shared-consumption.mjs
 GitHub PR summary 的按账号批量去重、debounce、GraphQL 检查分页与 abort 语义已迁移至
 `src/main/worker/github-pull-request-summary.ts`，入口仅保留 `gh-pr-summary` 适配与账户校验。
 新增 `scripts/test-github-pull-request-summary.mjs`，覆盖 2 项基础断言；整体 handoff 仍未完成。
+
+GitHub exact-revision review 的 diff/file handlers 已迁移至
+`src/main/worker/github-pull-request-revision.ts`，入口仅保留 API 适配；SHA/path、账号、
+文件大小/编码安全限制和 host 并发语义由 6 项断言覆盖，整体 handoff 仍未完成。
