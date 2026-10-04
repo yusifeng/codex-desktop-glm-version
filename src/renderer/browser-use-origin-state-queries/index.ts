@@ -25,7 +25,6 @@ import {
   type UseMutationResult,
 } from "@rchunk/app-shared";
 import {
-  $ln as createCommandQueryKey,
   $sn as initializeBrowserUseSettings,
   Bfn as initializeConfigurationState,
   Kdn as getWritableConfigurationLayer,
@@ -52,6 +51,7 @@ import {
   parseOriginPattern,
 } from "../app-initial/runtime/parse-origin-pattern";
 import { configurationQueryKey } from "../app-initial/runtime/configuration-query-key";
+import { createCommandQueryKey } from "../app-initial/runtime/create-command-query-key";
 
 type OriginDecision = "allow" | "deny" | null;
 type BrowserCapability =

@@ -305,6 +305,12 @@ state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初
 体安全消除，暂登记为 `config-layer-contract`，待配置层类型统一后再迁移并补路径
 映射契约测试。
 
+本轮再将 app-initial `$ln`（内部 `i_`）的纯 command query-key 构造器迁为
+`src/renderer/app-initial/runtime/create-command-query-key.ts`。browser-use 的
+origin-state query 已切换到语义导入；该函数只组装稳定的 `vscode` 前缀、command、
+可选 cache key 与序列化 params，无初始化副作用，由
+`scripts/test-app-initial-create-command-query-key.mjs` 的 3 项断言覆盖。
+
 本轮另将 app-initial `Jsn`（内部 `Av`）的配置查询 key 常量迁为
 `src/renderer/app-initial/runtime/configuration-query-key.ts` 的语义导出
 `configurationQueryKey`。它仅提供稳定的 `['config', 'user']` 前缀，browser-use
