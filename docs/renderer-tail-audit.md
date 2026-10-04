@@ -627,3 +627,9 @@ hub audit 校验，focused suite 已锁定 10 个 alias 仍属于 unconsumed sur
 同时登记 `e_t`（公开别名 `E`，114488--114889 行）的 home starter surface；它组合 starter
 prompt、temporary-chat 与 business-agent 分支，回调和子树均由相邻 home route 持有，没有独立
 renderer consumer 或 teardown 边界。
+本轮继续补齐 app-primary 四个真实生成边界：`i9`（公开别名 `A`）负责一次性
+runtime registry/lifecycle bootstrap，`pF`（公开别名 `Af`）负责 provider setup，
+`ZH`（公开别名 `Al`）负责 query/cache runtime wiring，`CB`（公开别名 `Au`）负责
+消息 markup delimiter 常量初始化。四者都只在聚合 hub 内由邻近生成投影使用，没有
+独立 named renderer consumer 或 teardown/lifecycle 契约；逐行证据登记在
+`docs/renderer-hub-line-classification.json`，分类门禁期望数由 145 提升至 149。

@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 145, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 149, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -102,6 +102,10 @@ assert.ok(primary.unconsumed.includes("Di"), "Di remains coupled to generated tu
 assert.ok(primary.unconsumed.includes("Co"), "Co remains coupled to generated composer input surface");
 assert.ok(primary.unconsumed.includes("Dm"), "Dm remains coupled to generated image-generation presentation");
 assert.ok(primary.unconsumed.includes("Bn"), "Bn remains coupled to generated review entrypoint predicate");
+assert.ok(primary.unconsumed.includes("A"), "A remains coupled to generated work-mode bootstrap");
+assert.ok(primary.unconsumed.includes("Af"), "Af remains coupled to generated provider bootstrap");
+assert.ok(primary.unconsumed.includes("Al"), "Al remains coupled to generated query runtime bootstrap");
+assert.ok(primary.unconsumed.includes("Au"), "Au remains coupled to generated markup delimiter bootstrap");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);

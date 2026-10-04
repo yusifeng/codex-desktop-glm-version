@@ -801,5 +801,29 @@
     "classification": "generated-local-entity-autocomplete-initializer",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer wires the generated entity-autocomplete dependencies and JSX runtime for its neighboring autocomplete projection. Its side effects are hub-local setup rather than a separate renderer lifecycle boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "A", "sourceSymbol": "i9", "startLine": 114095, "endLine": 114110,
+    "classification": "generated-local-work-mode-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The bootstrap memo initializes neighboring work-mode registries and lifecycle hooks in a single generated startup path. It is hub-local assembly with no independently named renderer consumer or teardown contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Af", "sourceSymbol": "pF", "startLine": 15605, "endLine": 15610,
+    "classification": "generated-local-provider-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The memoized provider bootstrap invokes the adjacent generated dependency setup exactly once before local projections read it. This side-effect boundary remains coupled to the hub route rather than exposing a reusable renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "Al", "sourceSymbol": "ZH", "startLine": 27276, "endLine": 27288,
+    "classification": "generated-local-query-runtime-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer memo wires query/cache helpers and neighboring generated runtime state for a local projection. No renderer module imports this alias by name, and its lifecycle is owned by hub startup."
+  },
+  {
+    "hub": "app-primary", "alias": "Au", "sourceSymbol": "CB", "startLine": 21789, "endLine": 21795,
+    "classification": "generated-local-markup-delimiter-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer memo sets the generated markup delimiter constants consumed by the adjacent message projection. It is a local one-time setup helper without an independent named renderer boundary."
   }
 ]
