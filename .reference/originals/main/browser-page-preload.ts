@@ -6126,7 +6126,19 @@ function Ed({ getState: e, requestPermission: t }) {
       let resolved = Dd(m, state);
       return resolved == null
         ? null
-        : { target: m.target, resolvedTarget: resolved, request: m.request, metadata: m.metadata };
+        : { target: m.target, resolvedTarget: resolved, request: m.request, metadata: m.metadata, validationInput: m };
+    },
+    resolveRequest: (candidate, state) => {
+      let resolved = Dd(candidate.validationInput, state);
+      return resolved == null
+        ? null
+        : {
+            resolvedTarget: resolved,
+            metadata:
+              candidate.target instanceof HTMLElement && candidate.target.getRootNode() === document
+                ? candidate.metadata
+                : void 0,
+          };
     },
   });
 }

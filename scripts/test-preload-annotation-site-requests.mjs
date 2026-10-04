@@ -27,13 +27,15 @@ const documentRef = eventTarget();
 const windowRef = eventTarget();
 const navigatorRef = { userActivation: { isActive: true } };
 let permission = true;
+let enabled = true;
 const dispatched = [];
 const api = createAnnotationSiteRequests({
   documentRef,
   windowRef,
   navigatorRef,
-  getState: () => ({ enabled: true }),
+  getState: () => ({ enabled }),
   requestPermission: () => permission,
+  resolveRequest: (candidate, state) => state.enabled ? { resolvedTarget: candidate.resolvedTarget, metadata: candidate.metadata } : null,
   prepareRequest: () => ({
     target: `target-${dispatched.length + 1}`,
     resolvedTarget: `resolved-${dispatched.length + 1}`,
@@ -66,6 +68,15 @@ await Promise.resolve();
 assert.equal(received.length, 1);
 windowRef.emit(`pageshow`, { isTrusted: true });
 
+let resolveStalePermission;
+permission = new Promise((resolve) => { resolveStalePermission = resolve; });
+documentRef.emit(`codex:open-annotation`, { composedPath: () => [], target: {}, preventDefault: () => {} });
+enabled = false;
+resolveStalePermission(true);
+await Promise.resolve();
+assert.equal(received.length, 1);
+enabled = true;
+
 let resolveEscapePermission;
 permission = new Promise((resolve) => { resolveEscapePermission = resolve; });
 documentRef.emit(`codex:open-annotation`, { composedPath: () => [], target: {}, preventDefault: () => {} });
@@ -79,4 +90,4 @@ assert.equal(documentRef.count(`codex:open-annotation`), 0);
 assert.equal(windowRef.count(`pagehide`), 0);
 assert.equal(windowRef.count(`pageshow`), 0);
 assert.equal(windowRef.count(`keydown`, true), 0);
-console.log(`test-preload-annotation-site-requests: 11 assertions passed`);
+console.log(`test-preload-annotation-site-requests: 12 assertions passed`);

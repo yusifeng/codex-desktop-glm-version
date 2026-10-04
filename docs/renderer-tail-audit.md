@@ -417,3 +417,11 @@ window 的 `HTMLElement`/`Node` 构造器，并保留 nodeType、ownerDocument�
 host realm 不同而误判。`tweaks-toolbar-view` 已切换到语义导入，原 hub 仍保留
 `Jc` 以兼容其他聚合边。`scripts/test-app-primary-is-element.mjs` 覆盖 null/空对象、
 跨 realm 形状、文本节点拒绝及 consumer import 边界共 4 项断言。
+
+本轮继续从 `app-primary` 的未消费纯 URL helper `bF`（公开别名 `xf`）抽出
+`src/renderer/app-primary/runtime/format-browser-url.ts` 的
+`formatBrowserUrl`。它只负责解析绝对 URL 并稳定组装 host/path，可显式保留或省略
+query/hash；`detached-browser-annotation-controls` 已改用该语义入口并保持原有紧凑
+host/path 展示契约，非法输入仍由调用方回退原始字符串。`scripts/test-renderer-browser-url.mjs`
+覆盖根路径、query/hash、紧凑模式、非法 URL 与空值 5 项断言。原 hub 导出继续保留
+以兼容尚未迁移调用方。

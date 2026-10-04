@@ -336,4 +336,5 @@ target 和 agent-control 清理，共 8 项断言。
 结果的竞态保护、subscriber 延迟挂载、Escape/pagehide 清理、BFCache pageshow 恢复，以及
 dispose 时的四个 DOM listener 移除；入口仅保留事件 payload/target/range 解析和既有
 `Dd` 语义适配。`scripts/test-preload-annotation-site-requests.mjs` 覆盖 listener 注册与
-清理、permission resolve/reject、pagehide/keydown 竞态和 subscriber 重放，共 11 项断言。
+清理、permission resolve/reject、pagehide/keydown 竞态、stale-state 重验证和 subscriber
+重放，共 12 项断言。

@@ -3,6 +3,7 @@ type AnnotationOpenRequestCandidate = {
   resolvedTarget: any;
   request: any;
   metadata?: any;
+  validationInput?: any;
 };
 
 type AnnotationSiteRequestsDependencies = {
@@ -12,6 +13,7 @@ type AnnotationSiteRequestsDependencies = {
   getState: () => any;
   requestPermission: () => boolean | Promise<boolean>;
   prepareRequest: (event: any, state: any) => AnnotationOpenRequestCandidate | null;
+  resolveRequest?: (candidate: AnnotationOpenRequestCandidate, state: any) => { resolvedTarget: any; metadata?: any } | null;
 };
 type AnnotationSiteRequestListener =
   (target: any, resolvedTarget: any, request: any, metadata?: any) => unknown;
@@ -30,13 +32,17 @@ function createAnnotationSiteRequests(deps: AnnotationSiteRequestsDependencies) 
 
   const dispatch = (candidate: AnnotationOpenRequestCandidate) => {
     if (subscriber == null || pageHidden || disposed) return false;
+    const resolved = deps.resolveRequest == null
+      ? { resolvedTarget: candidate.resolvedTarget, metadata: candidate.metadata }
+      : deps.resolveRequest(candidate, deps.getState());
+    if (resolved == null) return false;
     dispatching = true;
     try {
       return subscriber(
         candidate.target,
-        candidate.resolvedTarget,
+        resolved.resolvedTarget,
         candidate.request,
-        candidate.metadata,
+        resolved.metadata,
       );
     } finally {
       dispatching = false;
