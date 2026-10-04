@@ -382,8 +382,9 @@ TextDecoder 流式分片、结果去重、limit internal abort 和父 signal rea
 directory watch 创建和 session 启动仍由入口负责。worker watch path 回归现覆盖 70 项断言。
 
 `GZ` 的平台 shell descriptor 映射已迁移至 `worker/shell-config.ts`：入口仍负责
-PowerShell 探测、环境变量读取和进程执行；helper 只决定 executable、参数、脚本
-扩展名及 `posix`/`powershell`/`cmd` 类型，由 shell config 回归脚本覆盖。
+环境变量读取和进程执行；PowerShell 路径发现与 helper 的 executable、参数、脚本
+扩展名及 `posix`/`powershell`/`cmd` 类型均已迁移，入口只保留窄依赖注入，
+由 shell config 回归脚本覆盖。
 
 子进程环境清洗已迁移至 `worker/platform-env.ts`：入口不再持有 Crashpad/Electron
 注入变量黑名单，所有 WSL、Git、shell 与 editor 子进程统一通过窄 `sanitizeChildProcessEnv`

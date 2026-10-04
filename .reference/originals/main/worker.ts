@@ -110,7 +110,7 @@ const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./wor
 const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
-const { describeShell } = require("./worker/shell-config");
+const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { parseShellEnvironmentOutput, getEnvironmentValue } = require("./worker/shell-environment-parser");
 const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
@@ -56181,7 +56181,15 @@ function WZ(e) {
   return n;
 }
 function GZ(e, t) {
-  return describeShell(e, KZ(t), getEnvironmentValue(t, `COMSPEC`) ?? `cmd.exe`);
+  return describeShell(
+    e,
+    resolvePowerShellExecutable(t, {
+      pathWin32Join: (...parts) => g.default.win32.join(...parts),
+      pathJoin: (...parts) => g.default.join(...parts),
+      resolveCandidate: PZ,
+    }),
+    getEnvironmentValue(t, `COMSPEC`) ?? `cmd.exe`,
+  );
   /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e !== `win32`)
     return { executable: `bash`, args: [], scriptExtension: `sh`, shellKind: `posix` };
@@ -56192,45 +56200,6 @@ function GZ(e, t) {
     : r !== `cmd` && r !== `cmd.exe`
       ? { executable: n, args: [], scriptExtension: `sh`, shellKind: `posix` }
       : { executable: n, args: [`/c`], scriptExtension: `cmd`, shellKind: `cmd` };
-}
-function KZ(e) {
-  let t = getEnvironmentValue(e, `SHELL`);
-  if (t != null && /(?:^|[\\/])(?:pwsh|powershell)(?:\.exe)?$/i.test(t)) return t;
-  let n = [
-      [
-        getEnvironmentValue(e, `SystemRoot`) ?? getEnvironmentValue(e, `windir`) ?? `C:\\Windows`,
-        `System32`,
-        `WindowsPowerShell`,
-        `v1.0`,
-      ],
-      ...[`ProgramFiles`, `ProgramW6432`, `ProgramFiles(x86)`].flatMap((t) => {
-        let n = getEnvironmentValue(e, t);
-        return n == null ? [] : [`7`, `7-preview`, `6`].map((e) => [n, `PowerShell`, e]);
-      }),
-    ],
-    r = [
-      ...(getEnvironmentValue(e, `PATH`)?.split(`;`) ?? []),
-      ...n.flatMap((e) => [g.default.win32.join(...e), g.default.join(...e)]),
-    ],
-    i = getEnvironmentValue(e, `LOCALAPPDATA`),
-    a =
-      i == null
-        ? null
-        : g.default.win32
-            .normalize(g.default.win32.join(i, `Microsoft`, `WindowsApps`))
-            .toLowerCase();
-  for (let e of r) {
-    let t = e.trim().replace(/^"|"$/g, ``);
-    if (t.length === 0) continue;
-    let n = g.default.win32.normalize(t).toLowerCase();
-    if (a == null || (n !== a && !n.startsWith(`${a}${g.default.win32.sep}`)))
-      for (let e of [`pwsh.exe`, `powershell.exe`])
-        for (let n of [g.default.win32.join(t, e), g.default.join(t, e)]) {
-          let e = PZ(n);
-          if (e != null) return e;
-        }
-  }
-  return null;
 }
 (`${mH}${mH}`, `${mH}${mH}`);
 function JZ(e) {
