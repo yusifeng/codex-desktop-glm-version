@@ -626,6 +626,8 @@ Crashpad/Electron 注入变量并保持大小写不敏感、非变异语义，�
 worker open-in target 的平台描述符合并、跨平台 target 构造与 editor SSH 能力矩阵已迁移至
 `src/main/worker/open-in-target-descriptors.ts`；原 `t9` 已删除，`n9/r9` 仅保留薄委托，
 由 12 项 focused assertions 覆盖字段覆盖、缺失平台、hidden、默认参数与 Linux open 绑定。
+worker editor target 参数构造已迁移至 `src/main/worker/editor-target-args.ts`，覆盖
+JetBrains 参数、Zed SSH URI 与行列位置追加，由 7 项 focused assertions 覆盖。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
@@ -654,6 +656,9 @@ Annotation controls 的 running-animation ancestor/frame 判定（原 `Dy`）已
 Annotation controls 的 candidate/frame 稳定性判定（原 `Ey`）已抽取为
 `src/main/browser-page-preload/annotation-frame-stability.ts`，入口注入 anchor/frame 依赖；由 5 项断言覆盖
 顶层、嵌套 frame、anchor mismatch、非 iframe 与 null 边界。
+Annotation controls 的 containment ancestor 判定（原 `Oy`）已抽取为
+`src/main/browser-page-preload/annotation-containment.ts`，入口注入 DOM/CSS 依赖；由 5 项断言覆盖
+祖先命中、无关 target、position/contain 边界与 null。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。

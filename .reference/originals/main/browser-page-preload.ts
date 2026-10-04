@@ -6377,6 +6377,7 @@ var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annota
 var { isAnnotationTextInput } = require("./browser-page-preload/annotation-input-target");
 var { hasRunningAnnotationAnimation } = require("./browser-page-preload/annotation-motion");
 var { isStableAnnotationFrame } = require("./browser-page-preload/annotation-frame-stability");
+var { isAnnotationContainedBy } = require("./browser-page-preload/annotation-containment");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -24381,34 +24382,13 @@ function Dy(e) {
   });
 }
 function Oy(e, t) {
-  let n = e.ownerDocument.defaultView;
-  if (n == null) return !1;
-  let r = e;
-  for (; r != null;) {
-    let e = n.getComputedStyle(r);
-    if (e.position === `absolute` || e.position === `fixed`) return !1;
-    let i = ic(r);
-    if (i == null) return !1;
-    let a = t;
-    for (; a != null;) {
-      if (i === a) return !0;
-      let e = ic(a);
-      if (e != null) a = e;
-      else {
-        let e = a.ownerDocument.defaultView?.frameElement;
-        a = F(e) ? e : null;
-      }
-    }
-    if (
-      n
-        .getComputedStyle(i)
-        .contain.split(/\s+/)
-        .some((e) => e === `size` || e === `strict`)
-    )
-      return !1;
-    r = i;
-  }
-  return !1;
+  return isAnnotationContainedBy(e, t, {
+    getOwnerWindow: (e) => e.ownerDocument?.defaultView,
+    getComputedStyle: (e, t) => e.getComputedStyle(t),
+    getParent: ic,
+    getFrameElement: (e) => e?.frameElement ?? null,
+    isElement: F,
+  });
 }
 var ky,
   Ay,

@@ -233,6 +233,10 @@ Annotation controls 的 candidate/frame 稳定性判定（原 `Ey` 24365-24373�
 由 `scripts/test-preload-annotation-frame-stability.mjs` 覆盖顶层、嵌套 frame、anchor mismatch、
 非 iframe 与 null 边界。
 
+Annotation controls 的 containment ancestor 判定（原 `Oy` 24383-24410）已迁移至
+`src/main/browser-page-preload/annotation-containment.ts`；入口注入 DOM/CSS 依赖，
+由 `scripts/test-preload-annotation-containment.mjs` 覆盖祖先命中、无关 target、position/contain 边界与 null。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）
