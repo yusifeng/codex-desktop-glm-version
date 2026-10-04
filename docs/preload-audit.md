@@ -33,10 +33,10 @@ Annotation surface channel、feature 列表、role/id/rect/hit/response schemas
 该模块通过入口现有 schema factory 注入，原 `qd/Wd/Jd/Yd/Xd` 绑定接回；
 `scripts/test-preload-annotation-protocol.mjs` 覆盖 channel、限制和 response 类型。
 
-Annotation hit payload 的安全对象克隆、rect/role/id 校验、metadata 限制和序列化
+Annotation hit/control payload 的安全对象克隆、rect/role/id 校验、metadata 限制和序列化
 （原 `Qd` 内部 6,783-6,862 行）已迁移至
-`src/main/browser-page-preload/annotation-runtime.ts`，入口 `re` 通过 helper 接回，响应 detail
-payload 也由同一模块组装；`scripts/test-preload-annotation-runtime.mjs` 覆盖恶意对象、几何边界、
+`src/main/browser-page-preload/annotation-control-payload.ts`，`annotation-runtime.ts` 仅保留兼容
+导出并通过窄委托接回，响应 detail payload 也由同一模块组装；`scripts/test-preload-annotation-runtime.mjs` 覆盖恶意对象、几何边界、
 metadata 过滤、hit-test request 边界、annotation controls 序列化/metadata/targets、range/open-request detail、control handle lifecycle、registry payload/target parsing/index/read/pagehide lifecycle、surface element boundary、selection 渲染策略和 response JSON 形状，共 45 项行为断言。
 
 Annotation controls registry 的生命周期实现（注册、更新、target 索引、dispose 与
