@@ -14,6 +14,7 @@ const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = require("./worker/git-apply-patch");
 const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveCodexWorktrees, resolveWorktrees, restoreWorktree, setWorktreeOwnerThread: updateWorktreeOwnerRequest } = require("./worker/git-worktree-request-handlers");
 const { createWorktreeRequest } = require("./worker/git-worktree-create-request");
+const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-dispatch");
 const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
@@ -70147,7 +70148,11 @@ var I6 = kW(`git`),
             }
             break;
           case `list-worktrees`:
-            p = X(await resolveWorktrees(e.params, worktreeRequestDeps));
+            p = X((await dispatchWorktreeListRequest(e.method, e.params, {
+              listWorktrees: (cwd, host, signal) => resolveWorktrees({ cwd, host, signal }, worktreeRequestDeps),
+              host: o,
+              signal: i.signal,
+            })).result);
             break;
           case `resolve-worktree-for-thread`:
             p = X(await resolveWorktreeForThread(e.params, {
