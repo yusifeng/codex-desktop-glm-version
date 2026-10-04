@@ -42,6 +42,14 @@ import { homedir } from "node:os";
 import { z } from "zod";
 
 import { memoizedTaggedLogger } from "@chunk/logger";
+import {
+  commandsConflict,
+  isModifiedEnter,
+  isMouseAccelerator,
+  normalizeAccelerator,
+} from "./command-registry-policy";
+
+export { isMouseAccelerator } from "./command-registry-policy";
 
 // ---------------------------------------------------------------------------
 // 类型
@@ -1458,11 +1466,6 @@ function accessAvailable(required: RequiredAccess | undefined, flags: PlatformAc
   }
 }
 
-/** 鼠标加速键判定（原 `z6`，导出 `Pt`）。 */
-export function isMouseAccelerator(accelerator: string): boolean {
-  return accelerator === "MouseBack" || accelerator === "MouseForward";
-}
-
 /** vscode-only 命令判定（原 `J6`）。 */
 function isVscodeOnly(definition: CommandDefinition): boolean {
   return definition.kind === "vscode-only";
@@ -1474,26 +1477,6 @@ export function isShortcutConfigurable(definition: CommandDefinition): boolean {
   if ("shortcutConfigurable" in definition && definition.shortcutConfigurable === false) return false;
   const bindings = definition.electron?.defaultKeybindings ?? [];
   return !bindings.some((binding) => isMouseAccelerator(binding.key));
-}
-
-/** 语义冲突命令组（原 `k6`：同组命令互相抢占绑定）。 */
-const CONFLICTING_COMMAND_GROUPS: [string, string][] = [
-  ["globalDictationHold", "globalDictationToggle"],
-  ["closeTab", "closeWindow"],
-  ["nextTab", "nextThread"],
-  ["nextTab", "nextRecentThread"],
-  ["previousTab", "previousThread"],
-  ["previousTab", "previousRecentThread"],
-  ["goToLine", "focusBrowserAddressBar"],
-  ["file.goToDefinition", "navigateForward"],
-];
-
-/** 命令是否同属一个冲突组（原 `B6`）。 */
-function commandsConflict(commandId: string, otherCommandId: string): boolean {
-  return (
-    commandId === otherCommandId ||
-    CONFLICTING_COMMAND_GROUPS.some((group) => group.includes(commandId) && group.includes(otherCommandId))
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1626,44 +1609,6 @@ export function menuTitleForCommand({ commandId }: { commandId: string }): { men
   return binding?.menuTitle == null || binding.menuTitleIntlId == null
     ? null
     : { menuTitle: binding.menuTitle, menuTitleIntlId: binding.menuTitleIntlId };
-}
-
-/** 修饰键归一化（原 `G6`）：CmdOrCtrl → meta/ctrl、排序 join。 */
-function normalizeAccelerator(accelerator: string, isMacOS: boolean): string {
-  return (accelerator.trim().split(/\s+/, 1)[0] ?? "")
-    .toLowerCase()
-    .split("+")
-    .map((token) => {
-      switch (token) {
-        case "cmdorctrl":
-        case "commandorcontrol":
-          return isMacOS === false ? "ctrl" : "meta";
-        case "cmd":
-        case "command":
-        case "super":
-          return "meta";
-        case "control":
-          return "ctrl";
-        case "option":
-          return "alt";
-        default:
-          return token;
-      }
-    })
-    .sort()
-    .join("+");
-}
-
-/** 修饰 + Enter 判定（原 `K6`）。 */
-function isModifiedEnter(accelerator: string, isMacOS: boolean): boolean {
-  const parts = accelerator.trim().split(/\s+/, 1)[0]?.split("+");
-  if (parts?.length !== 2 || !parts.some((part) => part.toLowerCase() === "enter")) return false;
-  const modifier = parts[0]?.toLowerCase() === "enter" ? parts[1] : parts[0];
-  return (
-    modifier === "CmdOrCtrl" ||
-    (isMacOS !== false && (modifier === "Command" || modifier === "Cmd")) ||
-    (isMacOS !== true && (modifier === "Ctrl" || modifier === "Control"))
-  );
 }
 
 // ---------------------------------------------------------------------------

@@ -386,6 +386,11 @@ directory watch 创建和 session 启动仍由入口负责。worker watch path �
 扩展名及 `posix`/`powershell`/`cmd` 类型均已迁移，入口只保留窄依赖注入，
 由 shell config 回归脚本覆盖。
 
+Command/shortcut registry 的纯策略边界已迁移至
+`src/main/shared/command-registry-policy.ts`：鼠标快捷键判定、命令冲突组、跨平台
+accelerator 归一化与 modified-Enter 判定由该模块提供，`command-registry.ts` 保留
+命令定义、keymap 读写及副作用编排；9 项 focused 断言覆盖跨平台与冲突边界。
+
 子进程环境清洗已迁移至 `worker/platform-env.ts`：入口不再持有 Crashpad/Electron
 注入变量黑名单，所有 WSL、Git、shell 与 editor 子进程统一通过窄 `sanitizeChildProcessEnv`
 适配器复制并过滤环境。过滤键按大小写不敏感匹配且不修改调用方对象，由
