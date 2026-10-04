@@ -782,6 +782,14 @@ Git/session 工作目录权限错误与 Git 超时错误判定已迁移至
 `src/main/worker/git-session-error-policy.ts`；session 生命周期与实际 Git 调用仍在入口，
 `scripts/test-worker-git-session-error-policy.mjs` 覆盖 6 项分类断言。
 
+### 增量抽取：Git request cancellation lifecycle
+
+`handleRequestWithContext` 的 request cancellation 状态转移已迁移至
+`src/main/worker/git-request-lifecycle.ts`：请求开始时登记可取消/不可取消集合，处理
+请求开始前的取消竞态，完成时清理状态，以及对运行中请求执行 abort。入口仅保留
+`AbortController` 创建、性能事件和实际请求编排；`scripts/test-git-request-lifecycle.mjs`
+覆盖 queued/active/uncancelable 三类边界，共 11 项断言。
+
 Git review read request 的状态摘要、branch diff stats、review summary、source line counts、
 review diff/search/patch 已统一接入 `src/main/worker/git-review-read-dispatch.ts`；入口继续
 负责 review I/O、性能结果和响应包装，`scripts/test-worker-git-review-read-dispatch.mjs`

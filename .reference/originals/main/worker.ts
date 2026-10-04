@@ -126,6 +126,7 @@ const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
+const { createGitRequestLifecycle } = require("./worker/git-request-lifecycle");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
 const { dispatchReviewReadRequest } = require("./worker/git-review-read-dispatch");
@@ -69508,11 +69509,9 @@ var I6 = kW(`git`),
     desiredGitInitWatchKey = null;
     handledGitInitWatchers = new WeakSet();
     gitInitMetadataRefreshes = new Map();
-    inFlightRequests = new Map();
     worktreeUpstreamRefreshAbortControllers = new Map();
-    canceledRequests = new Set();
+    requestLifecycle = createGitRequestLifecycle();
     localGitAvailable = null;
-    uncancelableRequestIds = new Set();
     worktreeDeletePromises = new Map();
     worktreeRestorePromises = new Map();
     worktreeLifecycle = createWorktreeLifecycle({
@@ -69820,11 +69819,8 @@ var I6 = kW(`git`),
         d = null,
         f =
         isGitRequestTracked(e.method);
-      if (f) {
-        if ((this.inFlightRequests.set(e.id, i), this.canceledRequests.has(e.id))) {
-          (this.canceledRequests.delete(e.id),
-            i.abort(),
-            this.inFlightRequests.delete(e.id),
+      if (this.requestLifecycle.begin(e.id, f, i) === `canceled`) {
+          (
             this.emitGitPerformanceOperation({
               attribution: n,
               canceled: !0,
@@ -69840,9 +69836,8 @@ var I6 = kW(`git`),
               trigger: `request`,
             }),
             t ?? jH(`canceled`));
-          return;
-        }
-      } else (this.uncancelableRequestIds.add(e.id), this.canceledRequests.delete(e.id));
+        return;
+      }
       let p;
       try {
         if (
@@ -70247,8 +70242,7 @@ var I6 = kW(`git`),
               (p2(this.gitManager.getWorktreeRepositoryForRoot(e.root, o)),
               await this.liveQueryRegistry.refreshRepository(o.id, e.root));
           } catch {}
-        (f ? this.inFlightRequests.delete(e.id) : this.uncancelableRequestIds.delete(e.id),
-          this.canceledRequests.delete(e.id));
+        this.requestLifecycle.finish(e.id, f);
       }
       if (f && i.signal.aborted) {
         (this.emitGitPerformanceOperation({
@@ -71107,13 +71101,7 @@ var I6 = kW(`git`),
       );
     }
     handleCancel(e) {
-      if (this.uncancelableRequestIds.has(e)) return;
-      let t = this.inFlightRequests.get(e);
-      if (!t) {
-        this.canceledRequests.add(e);
-        return;
-      }
-      (this.inFlightRequests.delete(e), t.abort());
+      this.requestLifecycle.cancel(e);
     }
   };
 function R6(e, t) {
