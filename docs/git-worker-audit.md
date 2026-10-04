@@ -595,7 +595,14 @@ worktree create 与 delete cleanup 消费者改用语义 runtime，并由 76 项
 Worktree create 的 upstream refresh 前置检查、system/global credential config 透传、隔离 fetch
 环境、双 signal 取消、超时状态与 Git progress 流解码已迁移至
 `src/main/worker/git-worktree-upstream-refresh.ts`。原 `Ime`/`Lme`/`Rme`、`Nme` 日志与
-`C2`/`Pme`/`Fme`/`w2` 专用状态已删除，create 编排改用语义 runtime，并由 48 项独立模块断言覆盖。
+`C2`/`Pme`/`Fme`/`w2` 专用状态已删除，create 编排改用语义 runtime，并由 53 项独立模块断言覆盖。
+
+### 增量抽取：Worktree auxiliary file copy
+
+Worktree create 的 `AGENTS.override.md`、`.worktreeinclude` 和选中 local-environment 配置发现与复制
+已迁移至 `src/main/worker/git-worktree-copy-files.ts`。原 `ihe`/`ahe`/`ohe`/`H2`/`U2`/`she`/
+`W2`/`G2`/`K2` 及 `R2`/`z2`/`rhe` 专用常量已删除；模块保留 symlink 路径拒绝、exclusive copy、
+16 并发、ignored/tracked 判定与 remote host 回退，由 43 项独立模块断言覆盖。
 
 ### 增量抽取：Git operation marker paths
 

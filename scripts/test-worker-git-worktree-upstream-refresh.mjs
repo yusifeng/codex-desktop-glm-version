@@ -42,6 +42,10 @@ deepEqual(parseProgress([
 ]);
 deepEqual(parseProgress([`noise\nReceiving objects: 100% (4/4)`]), [`Receiving objects: 100% (4/4)\n`]);
 deepEqual(parseProgress([`Resolving deltas: 3\r`]), [`Resolving deltas: 3\r`, `\n`]);
+deepEqual(parseProgress([`Counting objects: 1\r`, `\nReceiving objects: 2\n`]), [
+  `Counting objects: 1\r`,
+  `Receiving objects: 2\n`,
+]);
 deepEqual(parseProgress([`x`.repeat(MAX_PROGRESS_LINE_LENGTH + 1), `\nCounting objects: 2\n`]), [`Counting objects: 2\n`]);
 deepEqual(parseProgress([`x`.repeat(MAX_PROGRESS_LINE_LENGTH), `\n`]), []);
 
@@ -154,6 +158,15 @@ for (const inputOverride of [
   equal(state.calls.some((call) => call[0] === `git`), false);
 }
 
+{
+  const state = fixture();
+  await createWorktreeUpstreamRefresh(state.dependencies)(baseInput(state, {
+    startingState: { type: `branch`, branchName: `HEAD`, remoteRef: null },
+  }));
+  equal(state.calls.some((call) => call[0] === `current-branch`), true);
+  equal(state.calls.some((call) => call[0] === `config` && call[1] === `branch.main.remote`), true);
+}
+
 for (const [key, value] of [
   [`branch.main.remote`, null],
   [`branch.main.merge`, null],
@@ -257,6 +270,19 @@ for (const [key, value] of [
     sensitive: { branchName: `main`, remote: `origin`, stderr: `fatal: auth` },
   }]);
   equal(state.logs.at(-1)[1], `[warning] Git authentication failed; sign in again before retrying\n[warning] Could not refresh upstream; using cached Git state\n`);
+}
+
+{
+  const state = fixture();
+  state.dependencies.runGit = async (root, args, host, options) => {
+    state.calls.push([`git`, root, args, host, options]);
+    if (args[0] === `config`) return { success: true, stdout: `` };
+    if (args[0] === `for-each-ref`) return { success: true, stdout: `refs/remotes/origin/main` };
+    return { success: false, code: 1, stderr: `network unavailable` };
+  };
+  await createWorktreeUpstreamRefresh(state.dependencies)(baseInput(state));
+  equal(state.logs.at(-1)[1], `[warning] Could not refresh upstream; using cached Git state\n`);
+  equal(state.calls.filter((call) => call[0] === `warning`).length, 1);
 }
 
 {

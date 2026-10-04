@@ -81,6 +81,7 @@ const { formatLocalBranchRef: formatLocalBranchRefQuery, resolveWorktreeStarting
 const { resolveWorktreeStartingState: resolveGitWorktreeStartingStateQuery } = require("./worker/git-worktree-starting-state");
 const { createWorktreeDelete } = require("./worker/git-worktree-delete");
 const { createLocalEnvironmentRuntime } = require("./worker/git-local-environment");
+const { WORKTREE_INCLUDE_FILE, copyAgentOverrideFiles, copyWorktreeFiles, findWorktreeIncludeFiles, resolveWorktreeLocalEnvironmentConfig } = require("./worker/git-worktree-copy-files");
 const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
@@ -285,6 +286,10 @@ const refreshWorktreeUpstream = createWorktreeUpstreamRefresh({
   runGit: (...args) => $(...args),
   setInterval: (callback, delay) => setInterval(callback, delay),
 });
+const gitWorktreeCopyDependencies = {
+  createSemaphore: (capacity) => new k$.Sema(capacity),
+  runGit: (...args) => $(...args),
+};
 const { removeWorktree: removeGitWorktree } = createWorktreeDelete({
   createSemaphore: (capacity) => new k$.Sema(capacity),
   getHostId: (...args) => h1(...args),
@@ -67639,10 +67644,7 @@ async function nhe(e, t) {
   let n = await L2(e, t);
   n != null && (await e.host.remove(n));
 }
-var R2 = `AGENTS.override.md`,
-  z2 = `.worktreeinclude`,
-  rhe = 16,
-  B2 = new TextEncoder();
+var B2 = new TextEncoder();
 async function V2({
   name: e,
   gitManager: t,
@@ -67716,16 +67718,19 @@ async function V2({
     E = await che(g, r, w.startingRef, l),
     D = s && E != null && E !== _ && (r.type !== `branch` || r.remoteRef == null);
   if (c.isLocal) {
-    await ihe(g.root, b, c);
-    let e = await she(g.root, c);
-    await H2({
-      sourceGitRoot: g.root,
-      worktreeGitRoot: b,
-      relativePaths: e,
-      label: z2,
-      host: c,
-      onLog: d,
-    });
+    await copyAgentOverrideFiles(g.root, b, c, gitWorktreeCopyDependencies);
+    let e = await findWorktreeIncludeFiles(g.root, c, gitWorktreeCopyDependencies);
+    await copyWorktreeFiles(
+      {
+        sourceGitRoot: g.root,
+        worktreeGitRoot: b,
+        relativePaths: e,
+        label: WORKTREE_INCLUDE_FILE,
+        host: c,
+        onLog: d,
+      },
+      gitWorktreeCopyDependencies,
+    );
   }
   if (D && E) {
     let e = formatLocalBranchRef(E);
@@ -67735,13 +67740,16 @@ async function V2({
   let O =
       a == null
         ? null
-        : await ahe({
-            localEnvironmentConfigPath: a,
-            sourceGitRoot: g.root,
-            worktreeGitRoot: b,
-            host: c,
-            signal: l,
-          }).catch(() => a),
+        : await resolveWorktreeLocalEnvironmentConfig(
+            {
+              localEnvironmentConfigPath: a,
+              sourceGitRoot: g.root,
+              worktreeGitRoot: b,
+              host: c,
+              signal: l,
+            },
+            gitWorktreeCopyDependencies,
+          ).catch(() => a),
     k = O ?? `__none__`;
   if (
     ((await T.setConfigValueForScope(`codex.localEnvironmentConfigPath`, k, `worktree`, l)) ||
@@ -67830,149 +67838,6 @@ async function V2({
     setupError: null,
   };
 }
-async function ihe(e, t, n) {
-  await H2({
-    sourceGitRoot: e,
-    worktreeGitRoot: t,
-    relativePaths: await ohe(e, n),
-    label: R2,
-    host: n,
-  });
-}
-async function ahe({
-  localEnvironmentConfigPath: e,
-  sourceGitRoot: t,
-  worktreeGitRoot: n,
-  host: r,
-  signal: i,
-}) {
-  let a = await r.platformPath(),
-    o = a.relative(t, e),
-    s = a.join(n, o),
-    c = await r.stat(s, { followSymlinks: !1 }).catch((e) => {
-      if (K2(e, `ENOENT`)) return null;
-      throw e;
-    });
-  if (c != null) {
-    if (!c.isFile()) throw Error(`Selected local environment configuration is not a regular file`);
-    return (await G2(n, a.dirname(s), a, r, `selected local environment`), s);
-  }
-  if (!r.isLocal) return e;
-  let l = await $(t, [`ls-files`, `--error-unmatch`, `--`, o], r, {
-    allowedNonZeroExitCodes: [1],
-    signal: i,
-  });
-  if (!l.success) throw Error(`Failed to check selected environment tracking`);
-  if (l.code === 0) return null;
-  let u = await $(t, [`check-ignore`, `--quiet`, `--`, o], r, {
-    allowedNonZeroExitCodes: [1],
-    signal: i,
-  });
-  if (!u.success) return e;
-  if (u.code === 0) {
-    let t = await $(n, [`check-ignore`, `--quiet`, `--`, o], r, {
-      allowedNonZeroExitCodes: [1],
-      signal: i,
-    });
-    if (!t.success || t.code !== 0) return e;
-  }
-  if (
-    (await U2(e, s, n, a, `selected local environment`, r),
-    !(await r.stat(s, { followSymlinks: !1 })).isFile())
-  )
-    throw Error(`Selected local environment configuration is not a regular file`);
-  return s;
-}
-async function ohe(e, t) {
-  let n = await $(
-      e,
-      [`ls-files`, `--others`, `--ignored`, `--exclude-standard`, `-z`, `--`, `:(glob)**/${R2}`],
-      t,
-      { trim: !1 },
-    ),
-    r = new Set();
-  if (!n.success) throw Error(`git ls-files failed while locating ${R2}`);
-  for (let e of n.stdout.split(`\0`)) (e === R2 || e.endsWith(`/${R2}`)) && r.add(e);
-  return [...r];
-}
-async function H2({
-  sourceGitRoot: e,
-  worktreeGitRoot: t,
-  relativePaths: n,
-  label: r,
-  host: i,
-  onLog: a,
-}) {
-  if (n.length === 0) return 0;
-  let o = await i.platformPath(),
-    s = new k$.Sema(rhe),
-    c = 0;
-  return (
-    await Promise.all(
-      n.map(async (n) => {
-        await s.acquire();
-        try {
-          (await U2(o.join(e, n), o.join(t, n), t, o, r, i)) && (c += 1);
-        } finally {
-          s.release();
-        }
-      }),
-    ),
-    c > 0 && a?.(`info`, B2.encode(`Copied ${c} file${c === 1 ? `` : `s`} from ${r}\n`)),
-    c
-  );
-}
-async function U2(e, t, n, r, i, a) {
-  try {
-    if (!(await a.stat(e, { followSymlinks: !1 })).isFile()) return !1;
-  } catch (e) {
-    if (K2(e, `ENOENT`)) return !1;
-    throw e;
-  }
-  await G2(n, r.dirname(t), r, a, i);
-  try {
-    return (await a.copyFile(e, t, { exclusive: !0 }), !0);
-  } catch (e) {
-    if (K2(e, `EEXIST`)) return !1;
-    throw e;
-  }
-}
-async function she(e, t) {
-  let n = (await t.platformPath()).join(e, z2);
-  try {
-    await t.stat(n);
-  } catch (e) {
-    if (K2(e, `ENOENT`)) return [];
-    throw e;
-  }
-  let [r, i] = await Promise.all([
-    $(e, [`ls-files`, `--others`, `--ignored`, `--exclude-standard`, `-z`], t, { trim: !1 }),
-    $(e, [`ls-files`, `--others`, `--ignored`, `--exclude-from=${z2}`, `-z`], t, { trim: !1 }),
-  ]);
-  if (!r.success || !i.success) throw Error(`git ls-files failed while locating ${z2} files`);
-  let a = W2(r.stdout),
-    o = W2(i.stdout),
-    s = new Set(a);
-  return [...new Set(o.filter((e) => s.has(e)))];
-}
-function W2(e) {
-  return e.split(`\0`).filter((e) => e.length > 0);
-}
-async function G2(e, t, n, r, i) {
-  let a = e,
-    o = n.relative(e, t);
-  for (let e of o.split(n.sep).filter((e) => e !== ``)) {
-    a = n.join(a, e);
-    try {
-      if ((await r.stat(a, { followSymlinks: !1 })).isSymbolicLink())
-        throw Error(`Cannot copy ${i} through a symlinked workspace path`);
-    } catch (e) {
-      if (!K2(e, `ENOENT`)) throw e;
-      await r.createDirectory(t, { recursive: !0 });
-      return;
-    }
-  }
-}
 async function che(e, t, n, r) {
   if (t.type === `working-tree` || t.branchName === `HEAD` || t.branchName === `@`) return getCurrentGitBranch(e);
   if (n.startsWith(`refs/heads/`)) {
@@ -67985,9 +67850,6 @@ async function che(e, t, n, r) {
   if (a == null) return null;
   let o = i.slice(a.length + 1);
   return !o || o === `HEAD` ? null : (await O2(e.root, o, e.host, r)) ? o : null;
-}
-function K2(e, t) {
-  return typeof e == `object` && !!e && `code` in e && e.code === t;
 }
 async function lhe(e, t, n) {
   let r = await t.platformPath(),
