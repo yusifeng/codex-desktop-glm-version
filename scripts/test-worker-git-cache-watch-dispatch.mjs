@@ -1,0 +1,7 @@
+import assert from "node:assert/strict"; import fs from "node:fs/promises"; import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-cache-watch-dispatch.ts", "utf8"); const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" }); const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchCacheWatchRequest } = module.exports; const calls = []; const deps = { invalidateStableMetadata: () => calls.push("stable"), invalidateGitReadCaches: (p) => calls.push(p.id), disposeGitInitWatch: (cwd) => calls.push(cwd), watchRepository: (p) => calls.push(p.root), subscribeLiveQuery: (p) => calls.push(p.query), recoverLiveQueries: (p) => calls.push(p.host), unwatchRepository: (root) => calls.push(root), initializeRepository: (p) => calls.push(p.cwd) };
+for (const [method, params] of [["invalidate-stable-metadata",{}],["invalidate-git-read-caches",{id:"cache"}],["dispose-git-init-watch",{cwd:"dispose"}],["watch-repo",{root:"watch"}],["subscribe-live-query",{query:"query"}],["recover-live-queries",{host:"host"}],["unwatch-repo",{root:"unwatch"}],["git-init-repo",{cwd:"init"}]]) await dispatchCacheWatchRequest(method, params, deps);
+assert.deepEqual(calls, ["stable","cache","dispose","watch","query","host","unwatch","init"]);
+assert.equal(await dispatchCacheWatchRequest("unknown", {}, deps), undefined);
+console.log("worker Git cache watch dispatch tests passed (2 assertions)");

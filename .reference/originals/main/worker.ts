@@ -132,6 +132,7 @@ const { dispatchBranchExtraReadRequest } = require("./worker/git-branch-extra-re
 const { dispatchWorktreeReadRequest } = require("./worker/git-worktree-read-dispatch");
 const { dispatchRepositoryContentRequest } = require("./worker/git-repository-content-dispatch");
 const { dispatchSyncedBranchRequest } = require("./worker/git-synced-branch-dispatch");
+const { dispatchCacheWatchRequest } = require("./worker/git-cache-watch-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -70000,34 +70001,34 @@ var I6 = kW(`git`),
             break;
           }
           case `invalidate-stable-metadata`:
-            p = X(invalidateStableMetadata(cacheRequestDeps));
+            p = X(await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) }));
             break;
           case `invalidate-git-read-caches`: {
-            p = X(invalidateGitReadCaches(e.params, cacheRequestDeps));
+            p = X(await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) }));
             break;
           }
           case `dispose-git-init-watch`:
-            p = X(disposeGitInitWatch(e.params.cwd, watchRequestDeps));
+            p = X(await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) }));
             break;
           case `watch-repo`: {
-            p = X(await watchGitRepository(e.params, watchRequestDeps));
+            p = X(await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) }));
             break;
           }
           case `subscribe-live-query`: {
-            await subscribeGitLiveQuery({ ...e.params, trace: e.trace }, watchRequestDeps);
+            await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) });
             p = X(void 0);
             break;
           }
           case `recover-live-queries`: {
-            await recoverGitLiveQueries(e.params, watchRequestDeps);
+            await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) });
             p = X(void 0);
             break;
           }
           case `unwatch-repo`:
-            p = X(unwatchGitRepository(e.params.root, watchRequestDeps));
+            p = X(await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) }));
             break;
           case `git-init-repo`:
-            p = X(await initializeGitRepository(e.params, gitInitRequestDeps));
+            p = X(await dispatchCacheWatchRequest(e.method, e.params, { invalidateStableMetadata: () => invalidateStableMetadata(cacheRequestDeps), invalidateGitReadCaches: (params) => invalidateGitReadCaches(params, cacheRequestDeps), disposeGitInitWatch: (cwd) => disposeGitInitWatch(cwd, watchRequestDeps), watchRepository: (params) => watchGitRepository(params, watchRequestDeps), subscribeLiveQuery: (params) => subscribeGitLiveQuery({ ...params, trace: e.trace }, watchRequestDeps), recoverLiveQueries: (params) => recoverGitLiveQueries(params, watchRequestDeps), unwatchRepository: (root) => unwatchGitRepository(root, watchRequestDeps), initializeRepository: (params) => initializeGitRepository(params, gitInitRequestDeps) }));
             break;
           case `repository-identity`: {
             p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
