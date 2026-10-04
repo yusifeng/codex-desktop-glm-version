@@ -124,6 +124,10 @@ descriptor 已迁移至 `src/main/main-app/files/open-path-arguments.ts`（原
 
 ### 增量抽取：更新退出策略
 
+启动阶段延迟展示进度窗口的 timer、异步 show、取消及 cleanup 竞态已迁移至
+`src/main/main-app/startup/delayed-progress-window.ts`；入口继续注入真实窗口创建，
+由 `scripts/test-main-delayed-progress-window.mjs` 覆盖 5 项时序断言。
+
 启动更新分支的纯策略判定已迁移至
 `src/main/main-app/startup/quit-for-update-policy.ts`：立即退出路径只调用更新退出，
 普通路径严格先允许临时退出再触发更新退出；入口继续注入 `quitState` 与真实退出副作用。

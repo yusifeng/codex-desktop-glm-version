@@ -15,6 +15,7 @@ const windowAppearance = require("./main-app/window-appearance.js");
 const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
+const { createDelayedProgressWindow } = require("./main-app/startup/delayed-progress-window.js");
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
 const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
@@ -164395,24 +164396,7 @@ async function x7({ activate: e = !0, kind: t, onQuit: n, windowIconPath: r }) {
   );
 }
 function Oit({ delayMs: e, onError: t, ...n }) {
-  let r = !1,
-    i = null,
-    a = setTimeout(() => {
-      x7(n)
-        .then((e) => {
-          if (r) {
-            e();
-            return;
-          }
-          i = e;
-        })
-        .catch((e) => {
-          r || t(e);
-        });
-    }, e);
-  return () => {
-    ((r = !0), clearTimeout(a), i?.());
-  };
+  return createDelayedProgressWindow({ delayMs: e, show: () => x7(n), onError: t });
 }
 function kit(e, t) {
   let n = (0, OU.default)(e);

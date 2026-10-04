@@ -380,6 +380,9 @@ main 更新即时退出清理（原 `Wst`，176,933-176,955）已抽取为
 `src/main/main-app/app-shell/immediate-update-exit.ts`，通过注入式依赖保留进程树清理、
 异步 cleanup、窗口销毁、错误告警与 `app.exit(0)` 顺序，由
 `scripts/test-main-immediate-update-exit.mjs` 覆盖行为断言；Ust 其余启动装配仍在入口。
+启动阶段延迟展示进度窗口的 timer、异步 show、取消及 cleanup 竞态已迁移至
+`src/main/main-app/startup/delayed-progress-window.ts`，由
+`scripts/test-main-delayed-progress-window.mjs` 覆盖 5 项时序断言。
 启动参数中的可打开文件类型、`file://` 归一化、绝对路径/深链过滤、`--open-project`
 跳过和去重 descriptor 已抽取为 `src/main/main-app/files/open-path-arguments.ts`，
 入口仅保留兼容别名；desktop open-path 的 directory、HTML browser-document 与普通 file 分类也已接回同一模块，由 `scripts/test-main-open-path-arguments.mjs` 覆盖 17 项断言。
