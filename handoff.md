@@ -860,6 +860,9 @@ Annotation metadata tooltip 的稳定行投影（原 React `Nv` 组件内联的 
 Git live-query 完成事件的稳定 envelope（generation、recovery、subscription identity、result
 与可选 trace）已迁移至 `src/main/worker/git-live-query-events.ts`；registry 仅保留发布时机与
 emit 副作用，由 `scripts/test-worker-git-live-query-events.mjs` 覆盖 4 项断言。
+Live-query recent/default branch 的 watcher recovery 到 `live` 查询选项映射已迁移至
+`src/main/worker/git-live-query-watch-options.ts`，由 6 项 focused assertions 覆盖缺失 watcher、
+正常 watcher 与 recovery watcher；handler 仅保留查询编排。
 
 Annotation overlay 的页面 mutation observer 生命周期已迁移至
 `src/main/browser-page-preload/annotation-overlay-observer.ts`；overlay 自身 mutation 过滤、页面
@@ -889,3 +892,8 @@ Git worker response envelope 已迁移至 `src/main/worker/git-response-envelope
 worker-response 的 id/method/result 与可选 trace/emittedAt 投影，协议字段顺序与缺省语义保持不变。
 `scripts/test-worker-git-response-envelope.mjs` 覆盖 6 项 focused assertions；消息发送副作用与
 trace 采集仍由 worker 入口保留。
+
+Annotation scroll-container clip projection 已迁移至
+`src/main/browser-page-preload/annotation-anchor-clip-policy.ts`；元素包含块判定、CSS overflow
+读取与 viewport clip 相交由注入式策略承载，anchor geometry 入口仅保留 document/window DOM
+适配。`scripts/test-preload-annotation-anchor-clip-policy.mjs` 覆盖 5 项 focused assertions。

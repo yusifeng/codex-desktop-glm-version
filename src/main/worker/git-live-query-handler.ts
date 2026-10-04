@@ -64,14 +64,14 @@ async function handleGitLiveQuery(
       const limit = Math.max(1, Math.min(query.params.limit ?? 10, 100));
       const repository = deps.getWorktreeRepositoryForRoot(root, host);
       const watch = deps.getWatch(root, host);
-      return { method: `recent-branches`, result: { branches: await deps.getRecentBranches(repository, limit, signal, { live: watch != null && !watch.watcher.requiresRecovery }) } };
+      return { method: `recent-branches`, result: { branches: await deps.getRecentBranches(repository, limit, signal, getLiveQueryWatchOptions(watch)) } };
     }
     case `current-branch`: return { method: `current-branch`, result: await deps.getCurrentBranch(query.params.root, host) };
     case `upstream-branch`: return { method: `upstream-branch`, result: await deps.getUpstreamBranch(query.params.root, { host, signal }) };
     case `branch-ahead-count`: return { method: `branch-ahead-count`, result: await deps.getBranchAheadCount(query.params.root, { host, signal }) };
     case `default-branch`: {
       const watch = deps.getWatch(root, host);
-      return { method: `default-branch`, result: await deps.getDefaultBranch(query.params.root, host, signal, { live: watch != null && !watch.watcher.requiresRecovery }) };
+      return { method: `default-branch`, result: await deps.getDefaultBranch(query.params.root, host, signal, getLiveQueryWatchOptions(watch)) };
     }
     case `base-branch`: return { method: `base-branch`, result: await deps.getBaseBranch(query.params.root, host) };
     case `branch-commits`: return { method: `branch-commits`, result: { commits: await deps.getBranchCommits(deps.getWorktreeRepositoryForRoot(root, host), query.params.baseBranch, signal) } };
@@ -82,3 +82,4 @@ async function handleGitLiveQuery(
 
 export { handleGitLiveQuery };
 if (typeof module !== `undefined`) module.exports = { handleGitLiveQuery };
+import { getLiveQueryWatchOptions } from "./git-live-query-watch-options";
