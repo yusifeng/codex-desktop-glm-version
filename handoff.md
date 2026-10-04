@@ -266,6 +266,9 @@ Git init watcher 的双 watch、git path detection、session close/dispose race�
 Git live-query registry 的 subscription/generation、debounce/retry、shared-query coalescing、
 repository serialization、consumer abort、recovery 与 branch dependency 引用计数已迁移至
 `src/main/worker/git-live-query-registry.ts`；原压缩类和三个常量已删除，由 41 项断言覆盖。
+其 subscription state 构造、repository/shared-run cache key 与 branch dependency key 已进一步迁移至
+`src/main/worker/git-live-query-state.ts`，由 7 项 focused assertions 覆盖；registry 仍负责异步
+refresh、abort、retry 与事件副作用。
 Git watcher performance 的窗口分桶、累计计数、raw-event 阈值 flush 和 timer 清理已迁移至
 `src/main/worker/git-watcher-performance.ts`；原压缩类与常量已删除，由 18 项断言覆盖。
 Git watcher metadata prefetch 的批量 `rev-parse`、输出校验、query cache 回填、git dir 与

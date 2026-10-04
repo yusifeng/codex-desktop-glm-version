@@ -257,6 +257,9 @@ Git live-query registry 的 subscription state、generation/waiter、local debou
 shared-query coalescing、repository serialization、consumer abort、recovery 与 branch dependency
 引用计数已迁移至 `src/main/worker/git-live-query-registry.ts`；原 `wye` 类及三个时序常量已删除。
 41 项断言覆盖 tracked/complete 发布、stale 抑制、三次重试、共享执行和恢复去重。
+本轮进一步将 subscription state 构造和 repository/shared-run/branch dependency key 规范化迁移至
+`src/main/worker/git-live-query-state.ts`；registry 仅保留异步刷新和事件副作用，新增 7 项 focused
+assertions 覆盖 generation、初始状态及 key 稳定性。
 
 Git watcher performance 的 10 秒窗口、维度分桶、累计计数、512 raw-event 提前 flush 与 timer
 清理已迁移至 `src/main/worker/git-watcher-performance.ts`；原 `Iye` 类及专用常量已删除，由 18 项

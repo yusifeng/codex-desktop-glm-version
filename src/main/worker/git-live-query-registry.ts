@@ -3,6 +3,12 @@ import {
   mergeLiveQueryTrace,
   shouldRefreshLiveQuery,
 } from "./git-live-query-policy";
+import {
+  createGitLiveQueryState,
+  getGitLiveQueryBranchDependencyKey,
+  getGitLiveQueryRepositoryKey,
+  getGitLiveQuerySharedKey,
+} from "./git-live-query-state";
 
 type GitLiveQueryRegistryDependencies = {
   emit: (event: any) => void;
@@ -33,24 +39,7 @@ class GitLiveQueryRegistry {
 
   subscribe(params: any) {
     if (this.states.has(params.subscriptionId)) return;
-    const state = {
-      abortController: null,
-      commonDir: params.commonDir,
-      dirty: true,
-      errorRetryCount: 0,
-      generation: this.nextGeneration++,
-      host: params.host,
-      inFlight: null,
-      query: params.query,
-      requiresRecovery: params.requiresRecovery,
-      refreshTimer: null,
-      refreshWaiters: [],
-      root: params.root,
-      subscriptionId: params.subscriptionId,
-      trace: params.trace,
-      traceLinks: [],
-      trigger: `subscription`,
-    };
+    const state = createGitLiveQueryState(params, this.nextGeneration++);
     this.states.set(params.subscriptionId, state);
     this.updateLocalBranchDependency(state, 1);
     this.refresh(state);
@@ -68,9 +57,7 @@ class GitLiveQueryRegistry {
   }
 
   hasLocalBranchDependency(params: any) {
-    return this.localBranchDependencies.has(
-      `${params.hostId}\0${params.commonDir}\0${params.root}\0${params.branch}`,
-    );
+    return this.localBranchDependencies.has(getGitLiveQueryBranchDependencyKey(params));
   }
 
   updateLocalBranchDependency(state: any, delta: number) {
@@ -89,7 +76,12 @@ class GitLiveQueryRegistry {
     const branch = trimmed.startsWith(`refs/heads/`)
       ? trimmed.slice(11)
       : trimmed;
-    const key = `${state.host.id}\0${state.commonDir}\0${state.root}\0${branch}`;
+    const key = getGitLiveQueryBranchDependencyKey({
+      hostId: state.host.id,
+      commonDir: state.commonDir,
+      root: state.root,
+      branch,
+    });
     const count = (this.localBranchDependencies.get(key) ?? 0) + delta;
     if (count === 0) this.localBranchDependencies.delete(key);
     else this.localBranchDependencies.set(key, count);
@@ -279,11 +271,8 @@ class GitLiveQueryRegistry {
     traceLinks: any[],
     onTracked: (result: any) => void,
   ) {
-    const repositoryKey = `${state.host.id}\0${state.commonDir}`;
-    const sharedKey = `${repositoryKey}\0${state.root}\0${JSON.stringify([
-      state.query.method,
-      state.query.params,
-    ])}`;
+    const repositoryKey = getGitLiveQueryRepositoryKey(state);
+    const sharedKey = getGitLiveQuerySharedKey(state);
     let shared = this.sharedRuns.get(sharedKey);
     if (shared == null || shared.abortController.signal.aborted) {
       shared = {
