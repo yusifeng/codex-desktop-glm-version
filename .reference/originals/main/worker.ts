@@ -113,6 +113,7 @@ const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCac
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { parseShellEnvironmentOutput, getEnvironmentValue } = require("./worker/shell-environment-parser");
 const { isPathWithinRoot } = require("./worker/git-path-containment");
+const { formatAppContext, joinInstructionSections } = require("./worker/prompt-context-format");
 const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
@@ -62113,7 +62114,7 @@ var p$ = U().int().nonnegative(),
     scopes: G(H()),
   }));
 function Ede(e) {
-  return `<app-context>\n${e.trim()}\n</app-context>`;
+  return formatAppContext(e);
 }
 var Dde = `# Codex desktop context
 - You are running inside the Codex (desktop) app, which allows some additional features not available in the CLI alone:
@@ -62180,9 +62181,7 @@ function Fde({
 }
 Ede(Fde());
 function Ide(...e) {
-  return e.map((e) => e?.trim()).filter((e) => e != null && e.length > 0).join(`
-
-`);
+  return joinInstructionSections(...e);
 }
 var Lde = [
     {

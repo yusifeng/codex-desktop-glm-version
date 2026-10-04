@@ -37,6 +37,9 @@ subprocess wrapper 的有限集合分类也由同一模块提供，入口保留 
 worktree 缓存失效使用的 host-aware 路径包含判定已迁移至
 `src/main/worker/git-path-containment.ts`；入口 `FZ` 仅保留兼容委托，由 5 项断言覆盖 root、子路径和越界路径。
 
+桌面 prompt context 的包裹与可选 instruction section 拼接已迁移至
+`src/main/worker/prompt-context-format.ts`；入口 `Ede/Ide` 保留兼容委托，由 5 项断言覆盖 trim、空段和顺序拼接。
+
 Windows Git executable resolution and command adaptation（原 `vbe`/`ybe`/`bbe`/`xbe`/
 `K6`，约 71,574-71,609）已迁移至 `src/main/worker/git-executable.ts`。该模块保留
 PATH 大小写覆盖、`where.exe` 候选顺序、resolver cache、`ComSpec` 及 `.cmd/.bat`

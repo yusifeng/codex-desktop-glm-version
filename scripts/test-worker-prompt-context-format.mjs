@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { formatAppContext, joinInstructionSections } = require("../app/.vite/build/worker/prompt-context-format.js");
+assert.equal(formatAppContext("  desktop guidance  "), "<app-context>\ndesktop guidance\n</app-context>");
+assert.equal(formatAppContext("\nline one\nline two\n"), "<app-context>\nline one\nline two\n</app-context>");
+assert.equal(joinInstructionSections(" first ", null, undefined, "second"), "first\n\nsecond");
+assert.equal(joinInstructionSections("", "  ", null), "");
+assert.equal(joinInstructionSections("a", "b", "c"), "a\n\nb\n\nc");
+console.log("5 worker prompt context format assertions passed");
