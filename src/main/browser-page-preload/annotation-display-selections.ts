@@ -7,7 +7,7 @@
  */
 export type AnnotationDisplaySelectionDependencies = {
   resolveSelection: (selection: any, viewportSize: any) => any;
-  resolveLiveElementRect: (element: any) => { rect?: any } | null;
+  resolveLiveElementRect: (element: any) => { rect?: any; borderRadius?: any } | null;
   getRect: (anchor: any) => any;
   clipRect: (anchor: any, rect: any, element?: any) => any;
   getClassName: (anchor: any, rect: any, viewportWidth: number, viewportHeight: number) => string;
