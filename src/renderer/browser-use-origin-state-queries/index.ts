@@ -27,7 +27,6 @@ import {
 import {
   $ln as createCommandQueryKey,
   $sn as initializeBrowserUseSettings,
-  Asn as parseBrowserUrl,
   Bfn as initializeConfigurationState,
   Fsn as domainMatchesPattern,
   Jsn as configurationQueryKey,
@@ -50,6 +49,7 @@ import {
   tun as createCommandQueryFamily,
   ugn as defaultHostId,
 } from "@rchunk/app-initial";
+import { parseHttpUrl as parseBrowserUrl } from "../app-initial/runtime/parse-http-url";
 
 type OriginDecision = "allow" | "deny" | null;
 type BrowserCapability =
@@ -319,7 +319,7 @@ function isSiteCapabilityAllowed(
     (capability === "fullCdp" && configuration?.featureRequirements?.browser_use_full_cdp_access === false) ||
     (capability === "autoReview" && configuration?.browserUse?.disableAutoReview === true)
   ) return false;
-  const origin = parseBrowserUrl(url) as ParsedOrigin | null;
+  const origin = parseBrowserUrl(url) as unknown as ParsedOrigin | null;
   if (
     origin == null ||
     !isNetworkOriginAllowed(configuration, origin) ||
@@ -331,12 +331,12 @@ function isSiteCapabilityAllowed(
 
 function originPatternMatchesUrl(entry: { pattern: string }, url: string): boolean {
   const pattern = parseOriginPattern(entry.pattern) as ParsedOrigin | null;
-  const origin = parseBrowserUrl(url) as ParsedOrigin | null;
+  const origin = parseBrowserUrl(url) as unknown as ParsedOrigin | null;
   return pattern != null && origin != null && originPatternMatches(pattern, origin);
 }
 
 function domainPatternMatchesUrl(entry: { pattern: ParsedOrigin }, url: string): boolean {
-  const origin = parseBrowserUrl(url) as ParsedOrigin | null;
+  const origin = parseBrowserUrl(url) as unknown as ParsedOrigin | null;
   return origin != null && domainMatchesPattern(entry.pattern, origin.hostname);
 }
 

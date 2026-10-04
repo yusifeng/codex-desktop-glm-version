@@ -271,3 +271,10 @@ coercion、`publishDelayMs` 延迟发布和 `bf/Oat` 持久化写入串成一个
 若脱离 app-initial 仅复制函数体，会丢失 signal scope 与持久化 runtime；因此登记为
 `aggregation-runtime`，待先抽出 typed persistence runtime contract 后再迁移，避免
 制造行为相似但生命周期不等价的伪 helper。
+
+本轮进一步将 `app-initial` 的纯业务 URL 边界 `Asn`（内部 `SWt`）迁出为
+`src/renderer/app-initial/runtime/parse-http-url.ts` 的 `parseHttpUrl`：仅解析并
+允许 `http:`/`https:`，对非法 URL 或非 Web 协议返回 `null`。`browser-use-origin-
+state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初始化或持久化副作用，
+由 `scripts/test-app-initial-parse-http-url.mjs` 的 4 项断言覆盖。原始导出保留以
+兼容尚未迁移的其他调用面。
