@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { quoteShellArg, joinShellArgs } = require("../app/.vite/build/worker/shell-quoting.js");
+assert.equal(quoteShellArg(""), "''");
+assert.equal(quoteShellArg("plain-value"), "plain-value");
+assert.equal(quoteShellArg("a b"), "'a b'");
+assert.equal(quoteShellArg("a'b"), `'a"'"b'`);
+assert.equal(joinShellArgs(["git", "status", "a b"]), "git status 'a b'");
+assert.throws(() => joinShellArgs(null), /args should be an array/);
+console.log("worker shell quoting tests passed (6 assertions)");
