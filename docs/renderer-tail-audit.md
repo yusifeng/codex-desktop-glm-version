@@ -354,6 +354,12 @@ environmentId，且当前 renderer 只有 façade re-export、没有真实调用
 `zero-consumer-scope-aware-formatter`，待出现 consumer 并明确 scope/environment 契约
 后再迁移，避免复制出只覆盖 host/path 分支的残缺 helper。
 
+`vite-browser-external` 簇的 `kHt`（内部 `tlr`，consumer 名
+`createBrowserExternal`）经实现级检查是 bundler 生成的空 CommonJS module factory：
+函数体仅令 `module.exports = {}`，随后 consumer 立即调用并默认导出。它不是业务
+helper，登记为 `vendor-generated-preserve`，保留原 hub 边以维持打包器 external
+语义，不制造手写空对象模块。
+
 `tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
 command、query config、params/cache key 与 app-server `queryFn`、response priority
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
