@@ -6256,6 +6256,7 @@ var { createAnnotationSiteRequests } = require("./browser-page-preload/annotatio
 var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annotation-draft-runtime");
 var { createAnnotationPointerSelection } = require("./browser-page-preload/annotation-pointer-selection");
 var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
+var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annotation-display-anchors");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
 annotationSerialization = createAnnotationSerialization({
@@ -22879,30 +22880,12 @@ function Z_(e, t) {
   return e.anchor.kind === `element` ? sd(e.anchor, e.id, t) : null;
 }
 function Q_(e, t, n = !1, r = null) {
-  if (e.anchor.kind === `text`)
-    return { ...e, ...(r == null ? {} : { anchor: r }), selectionSourceIndexes: [0] };
-  let i = d_(e),
-    a = [e.anchor, ...(e.additionalAnchors ?? [])].flatMap((r, a) => {
-      if (r.kind !== `element`) return [{ anchor: r, sourceIndex: a }];
-      let o = sd(r, a === 0 ? e.id : void 0, t);
-      return o == null
-        ? !n && r.selector != null && md(r.pageUrl, fd())
-          ? []
-          : [{ anchor: r, sourceIndex: a }]
-        : (a === 0 && t.set(e.id, o),
-          [{ anchor: ad(o, r, i, a === 0 ? e.markerViewportPoint : void 0), sourceIndex: a }]);
-    }),
-    [o, ...s] = a;
-  return o == null
-    ? null
-    : {
-        ...e,
-        anchor: o.anchor,
-        additionalAnchors: s.length === 0 ? void 0 : s.map(({ anchor: e }) => e),
-        markerViewportPoint: o.sourceIndex === 0 ? e.markerViewportPoint : void 0,
-        markerViewportSize: i,
-        selectionSourceIndexes: a.map(({ sourceIndex: e }) => e),
-      };
+  return resolveAnnotationDisplayAnchors(e, t, n, r, {
+    getViewportSize: d_,
+    resolveElement: sd,
+    isCurrentPage: (pageUrl) => md(pageUrl, fd()),
+    refreshElementAnchor: ad,
+  });
 }
 function $_(e, t, n) {
   if (e.anchor.kind === `text` || t.kind === `text`) return e;

@@ -445,6 +445,10 @@ tooltip 与 region 去重非 React runtime 已迁移至
 annotation serialization boundary（名称规范化、metadata descriptor/key/value 与 UTF-8 大小限制、
 属性 metadata JSON 解析）已迁移至 `src/main/browser-page-preload/annotation-serialization.ts`，
 入口保留兼容代理，由 11 项行为断言覆盖。
+annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
+`src/main/browser-page-preload/annotation-display-anchors.ts`，入口继续注入既有 DOM resolver
+与 viewport geometry；text 替换、element cache、当前页缺失 selector 过滤、additional anchor
+投影和 source-index 保留由 `scripts/test-preload-annotation-display-anchors.mjs` 的 5 项断言覆盖。
 
 **尚未宣称终局完成**：worker/preload/main/hub 中仍有已审计但尚未逐段物理
 迁出的业务区段；它们在审计表中有明确行号和保留理由，后续语义化必须继续
