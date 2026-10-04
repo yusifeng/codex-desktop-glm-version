@@ -583,6 +583,13 @@ Worktree 删除的 per-host 三并发 semaphore、local environment cleanup、Gi
 `Q0` Map 及 `ame`/`Z0` 常量已删除；快照、请求去重、unwatch 和 rollback 错误映射仍由上层负责，
 由 37 项断言覆盖。
 
+### 增量抽取：Local environment scripts
+
+Local environment setup/cleanup 的平台脚本选择、shell wrapper、环境变量差异捕获、流式日志、
+取消与临时目录生命周期已迁移至 `src/main/worker/git-local-environment.ts`。原
+`Gpe`/`Kpe`/`B0`、环境解析与 wrapper helper，以及 `z0`/`Upe`/`Wpe` 专用状态已删除；
+worktree create 与 delete cleanup 消费者改用语义 runtime，并由 76 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

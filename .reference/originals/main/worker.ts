@@ -80,6 +80,7 @@ const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution")
 const { formatLocalBranchRef: formatLocalBranchRefQuery, resolveWorktreeStartingRef: resolveGitWorktreeStartingRefQuery } = require("./worker/git-worktree-starting-ref");
 const { resolveWorktreeStartingState: resolveGitWorktreeStartingStateQuery } = require("./worker/git-worktree-starting-state");
 const { createWorktreeDelete } = require("./worker/git-worktree-delete");
+const { createLocalEnvironmentRuntime } = require("./worker/git-local-environment");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
@@ -246,6 +247,32 @@ const resolveGitWorktreeStartingState = (
     signal,
     gitWorktreeStartingStateDeps,
   );
+const { runCleanupScript: runGitCleanupScript, runSetupScript: runGitSetupScript } =
+  createLocalEnvironmentRuntime({
+    getExcludedEnvironmentVariables: () =>
+      new Set([
+        lB,
+        uB,
+        `CODEX_SETUP_EXIT_CODE`,
+        `OLDPWD`,
+        `PWD`,
+        `SHELLOPTS`,
+        `SHLVL`,
+        `_`,
+        pH.toUpperCase(),
+      ]),
+    getProcessCwd: () => process.cwd(),
+    getProcessEnvironment: () => process.env,
+    getShellDescriptor: (...args) => GZ(...args),
+    getShellEnvironment: (...args) => VZ(...args),
+    logger: {
+      error: (message) => kW(`git`)().error(message),
+      info: (message) => kW(`git`)().info(message),
+      warning: (message, detail) => kW(`git`)().warning(message, detail),
+    },
+    now: () => Date.now(),
+    randomUUID: () => crypto.randomUUID(),
+  });
 const { removeWorktree: removeGitWorktree } = createWorktreeDelete({
   createSemaphore: (capacity) => new k$.Sema(capacity),
   getHostId: (...args) => h1(...args),
@@ -259,7 +286,7 @@ const { removeWorktree: removeGitWorktree } = createWorktreeDelete({
   },
   readLocalEnvironmentConfig: (...args) => A$(...args),
   runCleanupScript: (worktree, config, signal, host) =>
-    Kpe(worktree, config, void 0, signal, host),
+    runGitCleanupScript(worktree, config, void 0, signal, host),
   runGit: (...args) => $(...args),
 });
 const gitRefResolutionDeps = {
@@ -66866,361 +66893,6 @@ async function y0(e, t, n, r = {}) {
     maxOutputBytes: c,
   });
 }
-var z0 = kW(`git`),
-  Upe = { COLORTERM: `truecolor`, FORCE_COLOR: `1`, TERM: `xterm-256color` },
-  Wpe = new Set([
-    lB,
-    uB,
-    `CODEX_SETUP_EXIT_CODE`,
-    `OLDPWD`,
-    `PWD`,
-    `SHELLOPTS`,
-    `SHLVL`,
-    `_`,
-    pH.toUpperCase(),
-  ]);
-async function Gpe(e, t, n, r, i, a) {
-  return B0({
-    workspaceRoot: e,
-    localEnvironment: t,
-    scriptType: `setup`,
-    host: a,
-    injectedEnvironment: i,
-    onLog: n,
-    signal: r,
-  });
-}
-async function Kpe(e, t, n, r, i) {
-  return (
-    (
-      await B0({
-        workspaceRoot: e,
-        localEnvironment: t,
-        scriptType: `cleanup`,
-        host: i,
-        onLog: n,
-        signal: r,
-      })
-    )?.setupResult ?? null
-  );
-}
-async function B0({
-  workspaceRoot: e,
-  localEnvironment: t,
-  scriptType: n,
-  host: r,
-  injectedEnvironment: i,
-  onLog: a,
-  signal: o,
-}) {
-  let s = nme(t, n);
-  if (s == null) return null;
-  let c = rme(n),
-    l = Date.now();
-  if (o?.aborted)
-    return {
-      setupResult: {
-        cwd: e,
-        scriptPath: t.configPath,
-        status: `failed`,
-        startedAt: l,
-        finishedAt: Date.now(),
-        error: `${c} canceled`,
-        log: ``,
-      },
-      shellEnvironment: null,
-    };
-  let u = null;
-  try {
-    let d = await $pe(r),
-      f = tme(s, d);
-    if (!f) return null;
-    let p = await r.platformPath(),
-      m = p.join(e, t.cwdRelativeToGitRoot);
-    ((u = p.join(await r.codexHome(), `tmp`, `local-environment`, crypto.randomUUID())),
-      await r.createDirectory(u, { recursive: !0 }));
-    let h = !r.isLocal,
-      g = GZ(d, h ? {} : process.env),
-      _ = p.join(u, `${crypto.randomUUID()}-setup_script.${g.scriptExtension}`),
-      v = p.join(u, `${crypto.randomUUID()}-setup_wrapper.${g.scriptExtension}`),
-      y = p.join(u, `${crypto.randomUUID()}-before_env.txt`),
-      b = p.join(u, `${crypto.randomUUID()}-captured_env.txt`),
-      x = f.replace(
-        /\r\n/g,
-        `
-`,
-      );
-    (await r.writeFile(_, x), await r.writeFile(v, Jpe(g.shellKind, _, b, y)));
-    let S = { ...(await VZ(r, d, h ? {} : process.env, h ? m : process.cwd())), ...Upe, ...i },
-      C = [],
-      w = new TextDecoder(`utf-8`, { ignoreBOM: !0 }),
-      T = new TextDecoder(`utf-8`, { ignoreBOM: !0 }),
-      E = ``,
-      D = ``,
-      O = (e, t, n) => {
-        let r = new Uint8Array(e);
-        a?.(n, r);
-        let i = (
-            (n === `stdout` ? E : D) + (n === `stdout` ? w : T).decode(r, { stream: !0 })
-          ).split(/\r?\n/),
-          o = i.pop() ?? ``;
-        n === `stdout` ? (E = o) : (D = o);
-        for (let e of i) e && (C.push(e), t(`[${n}] ${e}`));
-      },
-      k = () => {
-        let e = (e, t) => {
-          let n = (e === `stdout` ? E : D) + (e === `stdout` ? w : T).decode();
-          e === `stdout` ? (E = ``) : (D = ``);
-          for (let r of n.split(/\r?\n/)) r && (C.push(r), t(`[${e}] ${r}`));
-        };
-        (e(`stdout`, (e) => z0().info(e)), e(`stderr`, (e) => z0().error(e)));
-      },
-      ee = async () => {
-        u != null && (await r.remove(u, { recursive: !0, force: !0 }));
-      },
-      te = [g.executable, ...g.args, v],
-      ne = await r.spawn({ args: te, cwd: m, env: S }),
-      re = !1,
-      ie = () => {
-        ((re = !0), ne.kill());
-      };
-    o?.addEventListener(`abort`, ie);
-    try {
-      o?.aborted && ie();
-      let [e] = await Promise.all([
-        ne.wait(),
-        J0(ne.stdout, (e) => {
-          O(e, (e) => z0().info(e), `stdout`);
-        }),
-        J0(ne.stderr, (e) => {
-          O(e, (e) => z0().error(e), `stderr`);
-        }),
-      ]);
-      k();
-      let t = n === `setup` && !re && e.code === 0 ? await Qpe(b, d, r, y) : null;
-      await ee();
-      let i, a;
-      return (
-        re
-          ? ((i = `failed`), (a = `${c} canceled`))
-          : e.code === 0
-            ? (i = `succeeded`)
-            : ((i = `failed`),
-              (a =
-                e.signal == null
-                  ? `${c} exited with code ${e.code}`
-                  : `${c} exited with signal ${e.signal}`)),
-        {
-          setupResult: {
-            scriptPath: _,
-            cwd: m,
-            status: i,
-            startedAt: l,
-            finishedAt: Date.now(),
-            error: a,
-            log: C.join(`
-`),
-          },
-          shellEnvironment: t,
-        }
-      );
-    } finally {
-      o?.removeEventListener(`abort`, ie);
-    }
-  } catch (i) {
-    return (
-      u != null && (await r.remove(u, { recursive: !0, force: !0 })),
-      z0().warning(`[local-environment] ${n} script failed`, { safe: {}, sensitive: { error: i } }),
-      {
-        setupResult: {
-          cwd: e,
-          scriptPath: t.configPath,
-          status: `failed`,
-          startedAt: l,
-          finishedAt: Date.now(),
-          error: String(i),
-          log: ``,
-        },
-        shellEnvironment: null,
-      }
-    );
-  }
-}
-function V0(e) {
-  let t = {};
-  for (let n of e.replace(/^\uFEFF/, ``).split(/\r?\n/)) {
-    if (n.length === 0) continue;
-    let e = n.indexOf(`=`);
-    e <= 0 || (t[n.slice(0, e)] = n.slice(e + 1));
-  }
-  return t;
-}
-function qpe(e, t, n) {
-  let r = G0(e, n),
-    i = G0(t, n),
-    a = new Set([...r.keys(), ...i.keys()]),
-    o = {},
-    s = [];
-  for (let e of a) {
-    let t = r.get(e),
-      a = i.get(e),
-      c = a?.key ?? t?.key;
-    if (c != null && !eme(c, n) && !q0(t?.value) && !q0(a?.value)) {
-      if (a == null) {
-        s.push(c);
-        continue;
-      }
-      t?.value !== a.value && (o[c] = a.value);
-    }
-  }
-  return s.length === 0 && Object.keys(o).length === 0
-    ? null
-    : (s.sort(),
-      {
-        version: 1,
-        set: Object.fromEntries(Object.entries(o).sort(([e], [t]) => e.localeCompare(t))),
-        exclude: s,
-      });
-}
-function Jpe(e, t, n, r) {
-  switch (e) {
-    case `cmd`:
-      return Xpe(t, n, r);
-    case `powershell`:
-      return Zpe(t, n, r);
-    case `posix`:
-      return Ype(t, n, r);
-  }
-}
-function Ype(e, t, n) {
-  let r = U0(e);
-  return [
-    `set -xeo pipefail`,
-    `capture_path=${U0(t)}`,
-    `before_capture_path=${U0(n)}`,
-    `env > "$before_capture_path"`,
-    `trap 'code=$?; if [ "$code" -eq 0 ]; then env > "$capture_path"; fi' EXIT`,
-    `. ${r}`,
-  ].join(`
-`);
-}
-function Xpe(e, t, n) {
-  let r = H0(e),
-    i = H0(t);
-  return [
-    `@echo off`,
-    `set > ${H0(n)}`,
-    `call ${r}`,
-    `set CODEX_SETUP_EXIT_CODE=%ERRORLEVEL%`,
-    `if "%CODEX_SETUP_EXIT_CODE%"=="0" set > ${i}`,
-    `exit /b %CODEX_SETUP_EXIT_CODE%`,
-  ].join(`\r
-`);
-}
-function Zpe(e, t, n) {
-  let r = W0(e),
-    i = W0(t);
-  return [
-    `$ErrorActionPreference = 'Stop'`,
-    `$PSNativeCommandUseErrorActionPreference = $true`,
-    `$exitCode = 0`,
-    `Get-ChildItem Env: | Sort-Object Name | ForEach-Object { '{0}={1}' -f $_.Name, $_.Value } | Set-Content -LiteralPath ${W0(n)} -Encoding utf8`,
-    `try {`,
-    `  & ${r}`,
-    `} finally {`,
-    `  $exitCode = if ($null -eq $LASTEXITCODE) {`,
-    `    if ($?) { 0 } else { 1 }`,
-    `  } else {`,
-    `    [int]$LASTEXITCODE`,
-    `  }`,
-    `  if ($exitCode -eq 0) {`,
-    `    Get-ChildItem Env: | Sort-Object Name | ForEach-Object { '{0}={1}' -f $_.Name, $_.Value } | Set-Content -LiteralPath ${i} -Encoding utf8`,
-    `  }`,
-    `}`,
-    `exit $exitCode`,
-  ].join(`
-`);
-}
-function H0(e) {
-  return `"${e.replace(/"/g, `""`)}"`;
-}
-function U0(e) {
-  return `'${e.replace(/'/g, `'\\''`)}'`;
-}
-function W0(e) {
-  return `'${e.replace(/'/g, `''`)}'`;
-}
-async function Qpe(e, t, n, r) {
-  try {
-    let i = await new Response(await n.readFile(e)).text();
-    return qpe(V0(await new Response(await n.readFile(r)).text()), V0(i), t);
-  } catch (e) {
-    return (
-      z0().warning(`[local-environment] failed to capture shell env`, {
-        safe: {},
-        sensitive: { error: e },
-      }),
-      null
-    );
-  }
-}
-async function $pe(e) {
-  let [t, n] = await Promise.all([e.platformFamily(), e.platformOs()]);
-  if (t === `windows`) return `win32`;
-  let r = n.toLowerCase();
-  return r.includes(`darwin`) || r.includes(`macos`) ? `darwin` : `linux`;
-}
-function G0(e, t) {
-  let n = new Map();
-  for (let [r, i] of Object.entries(e)) i != null && n.set(K0(r, t), { key: r, value: i });
-  return n;
-}
-function K0(e, t) {
-  return t === `win32` ? e.toUpperCase() : e;
-}
-function q0(e) {
-  return e == null
-    ? !1
-    : e.includes(`
-`) || e.includes(`\r`);
-}
-function eme(e, t) {
-  let n = K0(e, t);
-  return Wpe.has(n) || n.startsWith(`BASH_FUNC_`);
-}
-async function J0(e, t) {
-  let n = e.getReader();
-  try {
-    for (;;) {
-      let { done: e, value: r } = await n.read();
-      if (e) return;
-      t(r);
-    }
-  } finally {
-    n.releaseLock();
-  }
-}
-function tme(e, t) {
-  if (t === `darwin`) {
-    let t = e.darwin?.script;
-    if (t && t.length > 0) return t;
-  }
-  if (t === `linux`) {
-    let t = e.linux?.script;
-    if (t && t.length > 0) return t;
-  }
-  if (t === `win32`) {
-    let t = e.win32?.script;
-    if (t && t.length > 0) return t;
-  }
-  return e.script;
-}
-function nme(e, t) {
-  return t === `cleanup` ? (e.environment.cleanup ?? null) : e.environment.setup;
-}
-function rme(e) {
-  return e === `cleanup` ? `Cleanup script` : `Setup script`;
-}
 var ime = new TextEncoder();
 async function Y0(e, t) {
   let n = await crypto.subtle.digest(e, ime.encode(t));
@@ -68303,7 +67975,7 @@ async function V2({
     );
   }
   d?.(`info`, B2.encode(`Running setup script ${ee.configPath}\n`));
-  let te = await Gpe(
+  let te = await runGitSetupScript(
     b,
     ee,
     (e, t) => {
