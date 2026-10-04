@@ -6257,18 +6257,15 @@ function Dd({ target: e, request: t, rangeText: n }, r) {
     : { x: i.x + i.width / 2, y: i.y + i.height / 2 };
 }
 function Od(e) {
-  let t = e.commonAncestorContainer,
-    n = document.createTreeWalker(t, NodeFilter.SHOW_TEXT),
-    r = t.nodeType === Node.TEXT_NODE ? t : n.nextNode();
-  for (; r != null;) {
-    let t = r.textContent ?? ``,
-      i = r === e.startContainer ? e.startOffset : 0,
-      a = r === e.endContainer ? e.endOffset : t.length,
-      o = r instanceof Text ? (r.assignedSlot ?? r.parentElement) : r.parentElement;
-    if (a > i && e.intersectsNode(r) && (o == null || !B(o))) return !1;
-    r = n.nextNode();
-  }
-  return !0;
+  return isAnnotationRangeSelectable(e, {
+    createTextWalker: (root) => document.createTreeWalker(root, NodeFilter.SHOW_TEXT),
+    isTextNode: (node) => node instanceof Text,
+    getTextContent: (node) => node.textContent,
+    getAssignedSlot: (node) => node.assignedSlot,
+    getParentElement: (node) => node.parentElement,
+    intersectsNode: (range, node) => range.intersectsNode(node),
+    isVisibleElement: (element) => B(element),
+  });
 }
 function B(e) {
   let t = window.getComputedStyle(e).visibility;
@@ -6365,6 +6362,7 @@ var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
+var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
 var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annotation-editor-default-mode");

@@ -294,3 +294,13 @@ Annotation viewport override 合并（原 `g_` 22858-22860）已迁移至
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）
 已迁移至 `src/main/browser-page-preload/annotation-input-target.ts`；入口仅保留兼容委托，
 由 `scripts/test-preload-annotation-input-target.mjs` 覆盖 6 项行为断言。
+
+### 增量抽取：annotation range selection validation
+
+DOM Range 的文本节点遍历、selection offset 边界、`assignedSlot`/parent fallback 与可见性
+判定（原 `Od`，6226-6270）已迁移至
+`src/main/browser-page-preload/annotation-range-validation.ts`。入口只注入浏览器 DOM
+适配器和既有 `B` 可见性策略，保留 range/intersectsNode 语义；
+`scripts/test-preload-annotation-range-validation.mjs` 覆盖多文本节点、不可见父节点和
+range 根为文本节点三项行为断言。该边界不包含 React/vendor runtime，也不移动选择状态机
+或 DOM 副作用。

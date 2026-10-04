@@ -847,3 +847,4 @@ Total scripts: 788.
 - [`test-writing-block-action-controls-cluster.mjs`](./test-writing-block-action-controls-cluster.mjs)
 - [`test-writing-block-floating-slash-menu.mjs`](./test-writing-block-floating-slash-menu.mjs)
 - [`test-xterm-output-panel.mjs`](./test-xterm-output-panel.mjs)
+- [`test-preload-annotation-range-validation.mjs`](./test-preload-annotation-range-validation.mjs)
