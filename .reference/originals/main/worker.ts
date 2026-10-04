@@ -119,6 +119,7 @@ const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
+const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation } = require("./worker/editor-target-args");
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
@@ -81235,7 +81236,7 @@ function MEe({ installDirPrefixes: e, installExecutables: t }) {
   return null;
 }
 function S9(e, t) {
-  return t ? [`--line`, t.line.toString(), `--column`, t.column.toString(), e] : [e];
+  return buildJetBrainsOpenArgs(e, t);
 }
 var NEe = s9({
   id: `kitty`,
@@ -81255,14 +81256,10 @@ function C9(e, t, n, r, i) {
   return [w9(e, t)];
 }
 function PEe(e, t) {
-  let n = e.trim(),
-    r = t?.trim();
-  return !n || !r
-    ? null
-    : `ssh://${n}${(r.startsWith(`/`) ? r : `/${r}`).split(`/`).map(encodeURIComponent).join(`/`)}`;
+  return buildZedRemoteUri(e, t);
 }
 function w9(e, t) {
-  return t ? `${e}:${t.line}:${t.column}` : e;
+  return appendEditorLocation(e, t);
 }
 var FEe = n9({
   id: `sublimeText`,

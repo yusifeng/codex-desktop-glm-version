@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/editor-target-args.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation } = module.exports;
+assert.deepEqual(buildJetBrainsOpenArgs("/tmp/a.ts"), ["/tmp/a.ts"]);
+assert.deepEqual(buildJetBrainsOpenArgs("/tmp/a.ts", { line: 3, column: 4 }), ["--line", "3", "--column", "4", "/tmp/a.ts"]);
+assert.equal(buildZedRemoteUri("host", "/tmp/a b.ts"), "ssh://host/tmp/a%20b.ts");
+assert.equal(buildZedRemoteUri("", "/tmp/a"), null);
+assert.equal(buildZedRemoteUri("host", ""), null);
+assert.equal(appendEditorLocation("/tmp/a", null), "/tmp/a");
+assert.equal(appendEditorLocation("/tmp/a", { line: 3, column: 4 }), "/tmp/a:3:4");
+console.log("worker editor target args tests passed (7 assertions)");
