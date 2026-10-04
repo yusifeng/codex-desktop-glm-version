@@ -19,6 +19,7 @@ const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-pa
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
 const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
+const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -175484,16 +175485,7 @@ function Ist(options) {
   });
 }
 function Lst(e) {
-  return async (t) => {
-    switch (t.method) {
-      case `computer-use-invalidate-service-pid`:
-        return (await e.invalidateManagedComputerUseService(t.params.processIdentifier), {});
-      case `computer-use-service-pid`:
-        return e.ensureManagedComputerUseService();
-      case `ces-telemetry`:
-        throw Error(`Unsupported computer-use worker request`);
-    }
-  };
+  return createComputerUseRpcHandler(e);
 }
 var Rst = new Set([`.htm`, `.html`, `.xht`, `.xhtml`]);
 function zst(e) {

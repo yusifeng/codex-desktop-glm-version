@@ -151,6 +151,13 @@ worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,31
 认证/配置查询、重启提示和错误日志，保持通知取消、generation 防竞态与 app-quitting
 守卫；由 `scripts/test-main-workspace-policy-checker.mjs` 覆盖 7 项异步状态断言。
 
+### 增量抽取：computer-use worker RPC handler
+
+原 `Lst`（175,486-175,496）的 computer-use service PID 请求编排已迁移至
+`src/main/main-app/worker/computer-use-rpc-handler.ts`。入口仅注入服务确保/失效副作用，
+保留 invalidate 返回空对象、service-pid 返回进程号、ces-telemetry 拒绝和未知方法
+返回 undefined 的语义；由 `scripts/test-main-computer-use-rpc-handler.mjs` 覆盖 5 项断言。
+
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs
