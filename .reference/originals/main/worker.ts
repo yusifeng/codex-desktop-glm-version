@@ -130,6 +130,7 @@ const { dispatchReviewReadRequest } = require("./worker/git-review-read-dispatch
 const { dispatchRepositoryReadRequest } = require("./worker/git-repository-read-dispatch");
 const { dispatchBranchExtraReadRequest } = require("./worker/git-branch-extra-read-dispatch");
 const { dispatchWorktreeReadRequest } = require("./worker/git-worktree-read-dispatch");
+const { dispatchRepositoryContentRequest } = require("./worker/git-repository-content-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -70028,7 +70029,7 @@ var I6 = kW(`git`),
             p = X(await initializeGitRepository(e.params, gitInitRequestDeps));
             break;
           case `repository-identity`: {
-            p = X(await resolveRepositoryIdentity(e.params.cwd, repositoryReadRequestDeps));
+            p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
             break;
           }
           case `turn-diff-capture-start`:
@@ -70038,24 +70039,24 @@ var I6 = kW(`git`),
             p = X(await completeTurnDiffCapture(e.params, turnDiffRequestDeps));
             break;
           case `commit-message-diff`:
-            p = X(await resolveCommitMessageDiff(e.params, repositoryReadRequestDeps));
+            p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
             break;
           case `submodule-paths`:
-            p = X(await resolveSubmodulePaths(e.params.root, repositoryReadRequestDeps));
+            p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
             break;
           case `cat-file`: {
-            p = X(await resolveCatFile(e.params, repositoryReadRequestDeps));
+            p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
             break;
           }
           case `blame-file`:
-            p = X(await resolveBlameFile(e.params, repositoryReadRequestDeps));
+            p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
             break;
           case `index-info`: {
-            p = X(await resolveIndexInfo(e.params.cwd, repositoryReadRequestDeps));
+            p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
             break;
           }
           case `config-value`:
-            p = X(await resolveConfigValue(e.params.root, e.params.key, e.params.scope, repositoryReadRequestDeps));
+            p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));
             break;
           case `git-origins`: {
             let t = Date.now(),

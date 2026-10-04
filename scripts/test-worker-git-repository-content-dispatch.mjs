@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-repository-content-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchRepositoryContentRequest } = module.exports; const deps = {}; for (const name of ["repositoryIdentity", "commitMessageDiff", "submodulePaths", "catFile", "blameFile", "indexInfo", "configValue"]) deps[name] = (p) => `${name}:${p.id}`;
+assert.equal(await dispatchRepositoryContentRequest("repository-identity", { id: 1 }, deps), "repositoryIdentity:1");
+assert.equal(await dispatchRepositoryContentRequest("commit-message-diff", { id: 2 }, deps), "commitMessageDiff:2");
+assert.equal(await dispatchRepositoryContentRequest("submodule-paths", { id: 3 }, deps), "submodulePaths:3");
+assert.equal(await dispatchRepositoryContentRequest("cat-file", { id: 4 }, deps), "catFile:4");
+assert.equal(await dispatchRepositoryContentRequest("blame-file", { id: 5 }, deps), "blameFile:5");
+assert.equal(await dispatchRepositoryContentRequest("index-info", { id: 6 }, deps), "indexInfo:6");
+assert.equal(await dispatchRepositoryContentRequest("config-value", { id: 7 }, deps), "configValue:7");
+assert.equal(await dispatchRepositoryContentRequest("unknown", {}, deps), undefined);
+console.log("worker Git repository content dispatch tests passed (8 assertions)");
