@@ -27,7 +27,6 @@ import {
 import {
   $sn as initializeBrowserUseSettings,
   Bfn as initializeConfigurationState,
-  Kdn as getWritableConfigurationLayer,
   Nsn as parseNetworkPattern,
   Qln as invokeRendererCommand,
   Ugn as getAppServerClient,
@@ -52,6 +51,7 @@ import {
 } from "../app-initial/runtime/parse-origin-pattern";
 import { configurationQueryKey } from "../app-initial/runtime/configuration-query-key";
 import { createCommandQueryKey } from "../app-initial/runtime/create-command-query-key";
+import { selectWritableConfigurationLayer as getWritableConfigurationLayer } from "../app-initial/runtime/select-writable-configuration-layer";
 
 type OriginDecision = "allow" | "deny" | null;
 type BrowserCapability =
