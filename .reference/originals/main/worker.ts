@@ -122,6 +122,7 @@ const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/te
 const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
 const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
+const { isSparsePathspecUnsupported } = require("./worker/git-pathspec-policy");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
@@ -67775,12 +67776,7 @@ async function v4({
   );
 }
 function gge(e) {
-  return (
-    !e.success &&
-    e.code === 129 &&
-    e.stderr.includes(`unknown option`) &&
-    e.stderr.includes(`sparse`)
-  );
+  return isSparsePathspecUnsupported(e);
 }
 async function _ge({ host: e, env: t, gitRoot: n, paths: r, signal: i, untrackedPathSet: a }) {
   if (r.length === 0) return { success: !0, paths: [] };

@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-pathspec-policy.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { isSparsePathspecUnsupported } = module.exports;
+assert.equal(isSparsePathspecUnsupported({ success: false, code: 129, stderr: "unknown option sparse" }), true);
+assert.equal(isSparsePathspecUnsupported({ success: false, code: 1, stderr: "unknown option sparse" }), false);
+assert.equal(isSparsePathspecUnsupported({ success: false, code: 129, stderr: "unknown option" }), false);
+assert.equal(isSparsePathspecUnsupported({ success: true, code: 129, stderr: "unknown option sparse" }), false);
+console.log("worker Git pathspec policy tests passed (4 assertions)");
