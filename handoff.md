@@ -651,6 +651,9 @@ Annotation overlay 的条件 class-name 归一化/拼接（原 `cv/lv`）已抽�
 Annotation controls 的 running-animation ancestor/frame 判定（原 `Dy`）已抽取为
 `src/main/browser-page-preload/annotation-motion.ts`，入口只保留 DOM 依赖适配；由 5 项断言覆盖
 自身、祖先、frame、idle 与 null 边界。
+Annotation controls 的 candidate/frame 稳定性判定（原 `Ey`）已抽取为
+`src/main/browser-page-preload/annotation-frame-stability.ts`，入口注入 anchor/frame 依赖；由 5 项断言覆盖
+顶层、嵌套 frame、anchor mismatch、非 iframe 与 null 边界。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。

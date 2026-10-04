@@ -6376,6 +6376,7 @@ var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = req
 var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annotation-editor-default-mode");
 var { isAnnotationTextInput } = require("./browser-page-preload/annotation-input-target");
 var { hasRunningAnnotationAnimation } = require("./browser-page-preload/annotation-motion");
+var { isStableAnnotationFrame } = require("./browser-page-preload/annotation-frame-stability");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -24364,14 +24365,13 @@ function Ty({ shadowRoot: e, getControlTargets: t }, n) {
   );
 }
 function Ey(e) {
-  if (il(e) !== e) return !1;
-  let t = e.ownerDocument.defaultView;
-  for (; t != null && t !== window;) {
-    let e = t.frameElement;
-    if (!ac(e) || il(e) !== void 0) return !1;
-    t = e.ownerDocument.defaultView;
-  }
-  return t === window;
+  return isStableAnnotationFrame(e, {
+    rootWindow: window,
+    resolveAnnotationElement: il,
+    isFrameElement: ac,
+    getFrameElement: (e) => e?.frameElement ?? null,
+    getOwnerWindow: (e) => e.ownerDocument?.defaultView,
+  });
 }
 function Dy(e) {
   return hasRunningAnnotationAnimation(e, {
