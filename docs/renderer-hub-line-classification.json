@@ -73,5 +73,10 @@
     "hub": "app-primary", "alias": "Am", "sourceSymbol": "jA", "startLine": 6788, "endLine": 6807,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The plan-action projection maps workspace ownership and plan tier to the adjacent upgrade/add-credits/notify-owner actions; it is consumed only by the local plan purchase flow and depends on the generated Gm enum, so extracting it without a named renderer owner would create an unowned billing facade."
+  },
+  {
+    "hub": "app-primary", "alias": "T", "sourceSymbol": "f9", "startLine": 114934, "endLine": 114942,
+    "classification": "zero-consumer-project-kind-predicate", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The predicate checks whether a selected creation target is Git-backed by consulting the project list and project kind. The published alias has no named renderer consumer (only the generated hub scope owns it), so extracting it now would create an unowned project-target facade; preserve the exact line-level implementation until a renderer boundary establishes the target contract."
   }
 ]

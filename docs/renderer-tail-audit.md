@@ -428,6 +428,13 @@ command、query config、params/cache key 与 app-server `queryFn`、response pr
 factory 返回的 query family 生命周期，登记为 `query-runtime-factory`，待先定义
 typed query contract 后再迁移。
 
+本轮补充 app-primary `T`（内部 `f9`，`projectKind`/Git-target predicate）的逐行证据：
+实现会先按 project id 查找 workspace，再结合 `gitRepos` 数量、project kind 与 creation
+target kind 判定是否支持 Git。发布 alias 当前没有 renderer 的命名 consumer，只有生成 hub
+内部使用；因此登记为 `zero-consumer-project-kind-predicate`，保留原实现并记录
+`docs/renderer-hub-line-classification.json` 的 114934-114942 行范围，待出现真实
+project-target owner 后再迁移，避免复制出脱离 workspace contract 的伪 helper。
+
 切换到 `local-conversation-plan-model` 后，`sjt`（内部 `fN`，
 `normalizePlanTitle`）经实现级检查也不属于简单字符串清洗：它委托 `Gp` 的 markdown
 预处理、directive extensions 与 AST 渲染，再做空白归一化。plan consumer 依赖这些
