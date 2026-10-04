@@ -97,6 +97,9 @@ synced-branch state 复用同一规范化入口，由 27 项断言覆盖。
 Branch-ahead 的 commit-count query、ancestor 快路径、remote/upstream/default branch 与 merge-base
 回退已迁移至 `src/main/worker/git-branch-ahead.ts`；原底层 helper 与 class 内联算法已删除，
 由 41 项断言覆盖。
+Git worker 的 upstream/default/base/current/recent branch request runtime 编排已进一步迁移至
+`src/main/worker/git-branch-request-runtime.ts`；入口仅保留 manager/host/signal 与底层 query
+依赖注入，由 `scripts/test-worker-git-branch-request-runtime.mjs` 覆盖 8 项边界断言。
 Clone state 的 shallow repository 与 partial-clone config 并行探测、config entry 解析和
 `GIT_NO_LAZY_FETCH` 环境保护已迁移至 `src/main/worker/git-clone-state.ts`；原三个压缩
 常量/实现已删除，由 29 项断言覆盖。

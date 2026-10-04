@@ -30,6 +30,7 @@ const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
 const { resolveBranchSearchRequest } = require("./worker/git-branch-search-request-handler");
 const { getBranchAheadCount } = require("./worker/git-branch-ahead");
+const { resolveBaseBranch: resolveBranchRequestBaseBranch, resolveBranchAheadCount: resolveBranchRequestAheadCount, resolveCurrentBranch: resolveBranchRequestCurrentBranch, resolveDefaultBranch: resolveBranchRequestDefaultBranch, resolveRecentBranches: resolveBranchRequestRecentBranches, resolveUpstreamBranch: resolveBranchRequestUpstreamBranch } = require("./worker/git-branch-request-runtime");
 const { branchExists: gitBranchExistsQuery, createBranch: createGitBranchQuery, getCommitTree: getGitCommitTreeQuery } = require("./worker/git-branch-create");
 const { compareGitBranches: compareGitBranchesQuery } = require("./worker/git-branch-comparison");
 const { getBranchMetadata, normalizeLocalBranchRef } = require("./worker/git-branch-metadata");
@@ -70328,44 +70329,45 @@ var I6 = kW(`git`),
       );
     }
     async handleUpstreamBranch(e, { host: t, signal: n }) {
-      let r = this.gitManager.getWorktreeRepositoryForRoot(e, t),
-        i = await getCurrentGitBranch(r),
-        a = await getGitUpstreamRef(r, i ?? `HEAD`, n);
-      return a ? { branch: i, upstream: { branch: a } } : { branch: i, upstream: null };
+      return resolveBranchRequestUpstreamBranch(e, t, n, {
+        gitManager: this.gitManager,
+        getCurrentBranch: getCurrentGitBranch,
+        getUpstreamRef: getGitUpstreamRef,
+      });
     }
     async handleBranchAheadCount(e, { host: t, signal: n }) {
-      return getBranchAheadCount(e, this.gitManager, t, n, gitBranchAheadDeps);
+      return resolveBranchRequestAheadCount(e, t, n, {
+        gitManager: this.gitManager,
+        getBranchAheadCount,
+        branchAheadDependencies: gitBranchAheadDeps,
+      });
     }
     async getDefaultBranch(e, t, n, { live: r = !1 } = {}) {
-      let i = this.gitManager.getWorktreeRepositoryForRoot(e, t),
-        a = (await getDefaultGitRemoteBranch(i))?.branch ?? null;
-      return (
-        (a ||=
-          (await getGitRecentBranches(i, 10, n, { live: r }, gitRecentBranchesDeps)).find(
-            (e) => e === `main` || e === `master`,
-          ) ?? null),
-        { branch: a }
-      );
+      return resolveBranchRequestDefaultBranch(e, t, n, { live: r }, {
+        gitManager: this.gitManager,
+        getDefaultRemoteBranch: getDefaultGitRemoteBranch,
+        getRecentBranches: getGitRecentBranches,
+        recentBranchesDependencies: gitRecentBranchesDeps,
+      });
     }
     async getBaseBranch(e, t) {
-      let n = await getDefaultGitRemoteBranch(this.gitManager.getWorktreeRepositoryForRoot(e, t));
-      return { local: n?.branch ?? null, remote: n?.remote ?? null };
+      return resolveBranchRequestBaseBranch(e, t, {
+        gitManager: this.gitManager,
+        getDefaultRemoteBranch: getDefaultGitRemoteBranch,
+      });
     }
     async getCurrentBranch(e, t) {
-      let n = await getCurrentGitBranchState(this.gitManager.getWorktreeRepositoryForRoot(e, t));
-      return { branch: n.type === `branch` ? n.branch : null, isDetached: n.type === `detached` };
+      return resolveBranchRequestCurrentBranch(e, t, {
+        gitManager: this.gitManager,
+        getCurrentBranchState: getCurrentGitBranchState,
+      });
     }
     async handleRecentBranches(e, { host: t, signal: n }) {
-      let r = Math.max(1, Math.min(e.limit ?? 10, 100));
-      return X({
-        branches: await getGitRecentBranches(
-          this.gitManager.getWorktreeRepositoryForRoot(e.root, t),
-          r,
-          n,
-          {},
-          gitRecentBranchesDeps,
-        ),
-      });
+      return X(await resolveBranchRequestRecentBranches(e.root, e.limit, t, n, {
+        gitManager: this.gitManager,
+        getRecentBranches: getGitRecentBranches,
+        recentBranchesDependencies: gitRecentBranchesDeps,
+      }));
     }
     async handleSearchBranches(e, { host: t, signal: n }) {
       return X(await resolveBranchSearchRequest(e, {
