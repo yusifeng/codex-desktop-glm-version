@@ -555,5 +555,11 @@
     "classification": "generated-local-home-announcements-lazy-runtime",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer installs the lazy HomeComposerAnnouncements loader and its generated dependency map for the neighboring home-composer route. Loader ownership and error propagation are route-local and do not form an independent renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "M", "sourceSymbol": "e9", "startLine": 114056, "endLine": 114073,
+    "classification": "generated-local-project-dropdown-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers project-dropdown query, JSX and local project option dependencies before the adjacent dropdown controller mounts. Its dependency order is owned by the generated route and has no independently consumed renderer lifecycle."
   }
 ]
