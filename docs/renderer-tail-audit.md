@@ -330,3 +330,9 @@ host identity，而非独立业务常量。为避免在不同 bootstrap 顺序�
 `configurationQueryKey`。它仅提供稳定的 `['config', 'user']` 前缀，browser-use
 配置查询调用面已切换导入，并由 `scripts/test-app-initial-configuration-query-key.mjs`
 的 2 项断言覆盖；原 hub 导出保留兼容其他消费者。
+
+`tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
+command、query config、params/cache key 与 app-server `queryFn`、response priority
+和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
+factory 返回的 query family 生命周期，登记为 `query-runtime-factory`，待先定义
+typed query contract 后再迁移。
