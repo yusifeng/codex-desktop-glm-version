@@ -77,6 +77,12 @@ Annotation 空格键拦截策略（原 `i_` 22799-22824）已迁移至
 trusted/Space、typing context、修饰键和 keydown/keyup 行为由
 `scripts/test-preload-annotation-keyboard.mjs` 覆盖，共 5 项断言。
 
+滚轮可滚动祖先选择（原 `zv`/`Bv` 23668-23689）已迁移至
+`src/main/browser-page-preload/annotation-scroll-container.ts`。该模块只接收
+DOM parent/style 读取器和既有轴向滚动 predicate，入口仍保留实际 scrollBy/scrollTop
+副作用；`scripts/test-preload-annotation-scroll-container.mjs` 覆盖上/下边界和空起点，
+共 3 项断言。
+
 Annotation 模式的跨域 iframe pointer-events guard（原 `Vg` 22296-22354）已完整迁移至
 `src/main/browser-page-preload/annotation-frame-pointer-guard.ts`。document/shadow-root 扫描、
 新增节点和 load 监听、同源 frame 恢复、overlay 排除、样式所有权保护及 dispose 由 13 项断言覆盖。

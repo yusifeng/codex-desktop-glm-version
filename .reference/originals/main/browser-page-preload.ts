@@ -6378,6 +6378,7 @@ var { snapshotAnnotationDesign } = require("./browser-page-preload/annotation-de
 var { getAnnotationTargetLabel } = require("./browser-page-preload/annotation-target-label");
 var { normalizeAnnotationWheelDelta } = require("./browser-page-preload/annotation-wheel-delta");
 var { canScrollAnnotationAxis } = require("./browser-page-preload/annotation-scroll-boundary");
+var { findScrollableAnnotationAncestor } = require("./browser-page-preload/annotation-scroll-container");
 var { isClippingAnnotationOverflow, isScrollableAnnotationOverflow } = require("./browser-page-preload/annotation-overflow");
 var { resolveAnnotationThemeVariant } = require("./browser-page-preload/annotation-theme");
 var { readAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport");
@@ -23671,13 +23672,7 @@ function Rv(e, t) {
   );
 }
 function zv(e, t, n) {
-  let r = e;
-  for (; r != null;) {
-    if (Bv(r, t, n)) return r;
-    if (r === n.document.body || r === n.document.documentElement) return null;
-    r = ic(r);
-  }
-  return null;
+  return findScrollableAnnotationAncestor(e, t, n.document, ic, (element) => n.getComputedStyle(element), isScrollableAnnotationOverflow, canScrollAnnotationAxis);
 }
 function Bv(e, t, n) {
   let r = n.getComputedStyle(e);

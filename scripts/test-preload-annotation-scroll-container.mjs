@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const { findScrollableAnnotationAncestor } = createRequire(import.meta.url)("../app/.vite/build/browser-page-preload/annotation-scroll-container.js");
+const body = {};
+const root = { body, documentElement: {} };
+const parent = { scrollTop: 2, scrollLeft: 0, clientHeight: 100, clientWidth: 100, scrollHeight: 200, scrollWidth: 100 };
+const child = { scrollTop: 0, scrollLeft: 0, clientHeight: 100, clientWidth: 100, scrollHeight: 100, scrollWidth: 100 };
+const parents = new Map([[child, parent], [parent, body]]);
+const style = (element) => element === parent ? { overflowX: "hidden", overflowY: "auto" } : { overflowX: "visible", overflowY: "visible" };
+const parentOf = (element) => parents.get(element) ?? null;
+const canScroll = (delta, offset, viewport, extent) => delta < 0 ? offset > 0 : delta > 0 && offset < extent - viewport;
+assert.equal(findScrollableAnnotationAncestor(child, { x: 0, y: -1 }, root, parentOf, style, (value) => value === "auto", canScroll), parent);
+parent.scrollTop = 100;
+assert.equal(findScrollableAnnotationAncestor(child, { x: 0, y: 1 }, root, parentOf, style, (value) => value === "auto", canScroll), null);
+assert.equal(findScrollableAnnotationAncestor(null, { x: 0, y: 1 }, root, parentOf, style, (value) => value === "auto", canScroll), null);
+console.log("preload annotation scroll container assertions passed (3 assertions)");
