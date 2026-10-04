@@ -679,6 +679,9 @@ Annotation design snapshot 的字段投影（原 `cy`）已抽取为
 Annotation design target label 生成（原 `ly`）已抽取为
 `src/main/browser-page-preload/annotation-target-label.ts`，入口注入 accessible-label 解析；由 3 项断言覆盖
 tag fallback、可访问名称与空标签。
+Annotation pointer wheel delta 归一化（原 `Lv`）已抽取为
+`src/main/browser-page-preload/annotation-wheel-delta.ts`，入口保留滚动副作用；由 3 项断言覆盖
+line/page/pixel 三种 delta mode。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。

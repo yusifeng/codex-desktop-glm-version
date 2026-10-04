@@ -6382,6 +6382,7 @@ var { findLatestDraftTextChange } = require("./browser-page-preload/annotation-d
 var { parseAnnotationAttributeTokens } = require("./browser-page-preload/annotation-attribute-tokens");
 var { snapshotAnnotationDesign } = require("./browser-page-preload/annotation-design-snapshot");
 var { getAnnotationTargetLabel } = require("./browser-page-preload/annotation-target-label");
+var { normalizeAnnotationWheelDelta } = require("./browser-page-preload/annotation-wheel-delta");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23671,11 +23672,7 @@ function Iv(e, t) {
     : ((r.scrollLeft += t.x), (r.scrollTop += t.y), !0);
 }
 function Lv(e, t) {
-  return e.deltaMode === Hv
-    ? { x: e.deltaX * Wv, y: e.deltaY * Wv }
-    : e.deltaMode === Uv
-      ? { x: e.deltaX * t.innerWidth, y: e.deltaY * t.innerHeight }
-      : { x: e.deltaX, y: e.deltaY };
+  return normalizeAnnotationWheelDelta(e, t, { lineMode: Hv, pageMode: Uv, lineScale: Wv });
 }
 function Rv(e, t) {
   let n = e.closest(`#waffle-grid-container`);

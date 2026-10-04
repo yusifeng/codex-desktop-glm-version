@@ -6,6 +6,8 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-preload-annotation-wheel-delta.mjs`](./test-preload-annotation-wheel-delta.mjs)
+
 - [`test-preload-annotation-target-label.mjs`](./test-preload-annotation-target-label.mjs)
 
 - [`test-worker-platform-entry-order.mjs`](./test-worker-platform-entry-order.mjs)

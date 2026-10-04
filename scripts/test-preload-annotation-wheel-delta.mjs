@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { normalizeAnnotationWheelDelta } = require("../app/.vite/build/browser-page-preload/annotation-wheel-delta.js");
+const viewport = { innerWidth: 800, innerHeight: 600 };
+const modes = { lineMode: 1, pageMode: 2, lineScale: 16 };
+assert.deepEqual(normalizeAnnotationWheelDelta({ deltaMode: 1, deltaX: 2, deltaY: -3 }, viewport, modes), { x: 32, y: -48 }, "line mode");
+assert.deepEqual(normalizeAnnotationWheelDelta({ deltaMode: 2, deltaX: 1, deltaY: -1 }, viewport, modes), { x: 800, y: -600 }, "page mode");
+assert.deepEqual(normalizeAnnotationWheelDelta({ deltaMode: 0, deltaX: 4, deltaY: 5 }, viewport, modes), { x: 4, y: 5 }, "pixel mode");
+console.log("3 preload annotation wheel-delta assertions passed");
