@@ -20,6 +20,9 @@ webview 入口文件路径计算（原 `tst`，173,782）已迁移至
 窗口错误页 HTML 模板（原 `Pot`，172,619-172,637）已迁移至
 `src/main/main-app/window/error-page-html.ts`，应用名通过参数注入；由
 `scripts/test-main-window-error-page.mjs` 覆盖 4 项模板断言。
+renderer 崩溃恢复的纯判定（原窗口管理器方法内联，173,740-173,758）已迁移至
+`main-app/window/renderer-recovery-policy.ts`；reload、timer 和错误日志副作用仍保留在入口，
+由 6 项 focused 断言覆盖。
 
 线程 metadata 的 emoji 校验和不可变更新（原 172,689-172,708）已迁移至
 `src/main/main-app/thread-metadata.ts`，入口通过 `Aot`/`jot` 兼容别名接回，

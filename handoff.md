@@ -646,5 +646,7 @@ main webview 入口文件路径计算（原 `tst`）已迁移至
 `src/main/bootstrap/protocol/app-protocol.ts`，由 3 项 focused 断言覆盖。
 main 窗口错误页 HTML 模板（原 `Pot`）已迁移至
 `src/main/main-app/window/error-page-html.ts`，由 4 项 focused 断言覆盖。
+renderer 崩溃恢复的纯判定已迁移至
+`src/main/main-app/window/renderer-recovery-policy.ts`，reload/timer 副作用仍留在入口，新增 6 项断言。
 main worker session 的 `V9` 非空对象判定已并入
 `src/main/main-app/worker/rpc-message-predicates.ts`，RPC predicate suite 新增 4 项断言。

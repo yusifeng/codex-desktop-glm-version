@@ -2,9 +2,11 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 729.
+Total scripts: 730.
 
 ## Recent semantic extraction suites
+
+- [`test-main-renderer-recovery-policy.mjs`](./test-main-renderer-recovery-policy.mjs)
 
 - [`test-main-webview-entry-path.mjs`](./test-main-webview-entry-path.mjs)
 

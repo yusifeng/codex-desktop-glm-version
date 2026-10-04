@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { shouldRecoverRendererCrash } = require("../app/.vite/build/main-app/window/renderer-recovery-policy.js");
+const base = { isAppQuitting: false, reason: "crashed", isWindowDestroyed: false, isWebContentsDestroyed: false, alreadyAttempted: false };
+assert.equal(shouldRecoverRendererCrash(base), true);
+assert.equal(shouldRecoverRendererCrash({ ...base, isAppQuitting: true }), false);
+assert.equal(shouldRecoverRendererCrash({ ...base, reason: "clean-exit" }), false);
+assert.equal(shouldRecoverRendererCrash({ ...base, isWindowDestroyed: true }), false);
+assert.equal(shouldRecoverRendererCrash({ ...base, isWebContentsDestroyed: true }), false);
+assert.equal(shouldRecoverRendererCrash({ ...base, alreadyAttempted: true }), false);
+console.log("6 main renderer recovery policy assertions passed");

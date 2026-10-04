@@ -13,6 +13,7 @@ const appshotShortcut = require("./main-app/hotkey/appshot-shortcut.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
 const windowAppearance = require("./main-app/window-appearance.js");
 const { buildWindowErrorPage } = require("./main-app/window/error-page-html.js");
+const { shouldRecoverRendererCrash } = require("./main-app/window/renderer-recovery-policy.js");
 const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
@@ -173747,11 +173748,9 @@ var Qot = class {
       }));
   }
   maybeRecoverFromRendererCrash(e, t) {
-    if (this.isAppQuitting || t === `clean-exit` || e.isDestroyed()) return !1;
     let n = e.webContents;
-    return n.isDestroyed() || this.rendererRecoveryAttempts.has(n.id)
-      ? !1
-      : (this.rendererRecoveryAttempts.add(n.id),
+    if (!shouldRecoverRendererCrash({ isAppQuitting: this.isAppQuitting, reason: t, isWindowDestroyed: e.isDestroyed(), isWebContentsDestroyed: n.isDestroyed(), alreadyAttempted: this.rendererRecoveryAttempts.has(n.id) })) return !1;
+    return (this.rendererRecoveryAttempts.add(n.id),
         setTimeout(() => {
           if (!e.isDestroyed() && !e.webContents.isDestroyed())
             try {
