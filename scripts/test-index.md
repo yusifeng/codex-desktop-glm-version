@@ -750,6 +750,7 @@ Total scripts: 890.
 - [`test-portable-attachment-thumbnail.mjs`](./test-portable-attachment-thumbnail.mjs)
 - [`test-portable-thumbnail-runtime-cluster.mjs`](./test-portable-thumbnail-runtime-cluster.mjs)
 - [`test-preload-annotation-protocol.mjs`](./test-preload-annotation-protocol.mjs)
+- [`test-preload-annotation-control-targets.mjs`](./test-preload-annotation-control-targets.mjs)
 - [`test-preload-annotation-runtime.mjs`](./test-preload-annotation-runtime.mjs)
 - [`test-preload-annotation-control-payload.mjs`](./test-preload-annotation-control-payload.mjs)
 - [`test-preload-annotation-serialization.mjs`](./test-preload-annotation-serialization.mjs)
