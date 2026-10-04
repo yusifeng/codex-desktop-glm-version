@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import * as esbuild from "esbuild";
 
-const source = await fs.readFile("src/main/worker/platform-env.ts", "utf8");
-const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const moduleSource = await fs.readFile("src/main/worker/platform-env.ts", "utf8");
+const { code } = await esbuild.transform(moduleSource, { loader: "ts", format: "cjs" });
 const module = { exports: {} };
 new Function("module", "exports", code)(module, module.exports);
 const { CHILD_PROCESS_ENV_BLOCKLIST, sanitizeChildProcessEnv } = module.exports;
