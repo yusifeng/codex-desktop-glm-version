@@ -262,3 +262,12 @@ source consumer 已改用 `src/renderer/app-initial/runtime/flatten-conversation
 中的泛型语义函数。该边界无初始化副作用、输入输出契约明确，并由
 `scripts/test-app-initial-flatten-conversation-items.mjs` 的 4 项行为断言覆盖；原
 hub 导出仍保留以兼容未迁移调用方。
+
+下一个 `app-initial` 消费面 `dun`（内部 `Xg`，语义名
+`createPersistedState/createPersistedSignal`）经实现级检查暂不迁移：它不是单纯的
+业务计算 helper，而是把 `Szt` 持久化注册、`xo` scoped signal resolution、存储
+coercion、`publishDelayMs` 延迟发布和 `bf/Oat` 持久化写入串成一个状态工厂。当前
+至少 6 个 settings/overlay/slot consumer 依赖同一 identity 与 side-effect 顺序。
+若脱离 app-initial 仅复制函数体，会丢失 signal scope 与持久化 runtime；因此登记为
+`aggregation-runtime`，待先抽出 typed persistence runtime contract 后再迁移，避免
+制造行为相似但生命周期不等价的伪 helper。
