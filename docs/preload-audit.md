@@ -567,3 +567,11 @@ surface observer 对 containers、metadata 与 metadata-with-targets 的 feature
 稳定 feature 列表的纯转换；DOM/ShadowRoot MutationObserver、副作用清理和 feature 广播仍由
 `annotation-surface-observer.ts` 负责。`scripts/test-preload-annotation-surface-feature-state.mjs`
 覆盖首次启用、metadata target 切换、请求保活、清空和幂等路径，共 10 项断言。
+
+### 增量抽取：annotation interaction path policy
+
+批注指针运行时对 overlay root、interaction blocker 和 marker composed-path 的判定已迁移至
+`src/main/browser-page-preload/annotation-interaction-policy.ts`。该模块只接收元素/ShadowRoot/
+event path 适配器，入口保留 DOM 类型判断与历史 `gl`/`Cl`/`xl` 兼容代理；
+`scripts/test-preload-annotation-interaction-policy.mjs` 覆盖 root、ancestor、shadow-host、
+blocker 与 marker 边界，共 8 项 focused assertions。

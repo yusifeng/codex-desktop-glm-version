@@ -4872,17 +4872,15 @@ function hl(e, t, n, r = `design`, i = !1) {
   }
 }
 function gl(e) {
-  if (
-    e.id === `codex-browser-sidebar-comments-root` ||
-    e.closest(`#codex-browser-sidebar-comments-root`) != null
-  )
-    return !0;
-  let t = e.getRootNode();
-  return (
-    t instanceof ShadowRoot &&
-    t.host instanceof HTMLElement &&
-    t.host.id === `codex-browser-sidebar-comments-root`
-  );
+  return isAnnotationOverlayElement(e, wl, {
+    isElement: (value) => value instanceof HTMLElement,
+    closest: (element, selector) => element.closest(selector),
+    getRootNode: (element) => element.getRootNode(),
+    isShadowRoot: (value) => value instanceof ShadowRoot,
+    getShadowHost: (root) => root.host,
+    getComposedPath: (event) => event.composedPath(),
+    hasAttribute: (element, attribute) => element.hasAttribute(attribute),
+  });
 }
 function _l(e, t) {
   let n = cc(e.x, e.y);
@@ -4910,9 +4908,15 @@ function bl(e, t) {
   return e.composedPath().includes(t) && !Cl(e);
 }
 function xl(e) {
-  return e
-    .composedPath()
-    .some((e) => e instanceof HTMLElement && e.hasAttribute(`data-browser-comment-marker`));
+  return isAnnotationMarkerEvent(e, `data-browser-comment-marker`, {
+    isElement: (value) => value instanceof HTMLElement,
+    closest: (element, selector) => element.closest(selector),
+    getRootNode: (element) => element.getRootNode(),
+    isShadowRoot: (value) => value instanceof ShadowRoot,
+    getShadowHost: (root) => root.host,
+    getComposedPath: (event) => event.composedPath(),
+    hasAttribute: (element, attribute) => element.hasAttribute(attribute),
+  });
 }
 function Sl(e, t, n, r) {
   if (gl(e)) return null;
@@ -4921,7 +4925,15 @@ function Sl(e, t, n, r) {
   return i == null || gl(i) ? null : i;
 }
 function Cl(e) {
-  return e.composedPath().some((e) => e instanceof HTMLElement && e.hasAttribute(Tl));
+  return isAnnotationInteractionBlocked(e, Tl, {
+    isElement: (value) => value instanceof HTMLElement,
+    closest: (element, selector) => element.closest(selector),
+    getRootNode: (element) => element.getRootNode(),
+    isShadowRoot: (value) => value instanceof ShadowRoot,
+    getShadowHost: (root) => root.host,
+    getComposedPath: (event) => event.composedPath(),
+    hasAttribute: (element, attribute) => element.hasAttribute(attribute),
+  });
 }
 var wl,
   Tl,
@@ -6208,6 +6220,7 @@ var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotatio
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
 var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annotation-editor-default-mode");
 var { isAnnotationTextInput } = require("./browser-page-preload/annotation-input-target");
+var { isAnnotationInteractionBlocked, isAnnotationMarkerEvent, isAnnotationOverlayElement } = require("./browser-page-preload/annotation-interaction-policy");
 var { hasRunningAnnotationAnimation } = require("./browser-page-preload/annotation-motion");
 var { isStableAnnotationFrame } = require("./browser-page-preload/annotation-frame-stability");
 var { isAnnotationContainedBy } = require("./browser-page-preload/annotation-containment");

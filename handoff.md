@@ -867,3 +867,7 @@ Live-query subscription setup 的 repository metadata 查询、pending trace 关
 复用/启动已迁移至 `src/main/worker/git-live-query-subscription-setup.ts`；入口仅保留订阅
 注册、abort 等待、取消和 watcher 引用释放副作用。`scripts/test-worker-git-watch-request-handlers.mjs`
 现覆盖 30 项断言，并直接验证 setup helper 的 metadata、trace 与 release contract。
+
+Annotation interaction path policy 已迁移至 `src/main/browser-page-preload/annotation-interaction-policy.ts`；
+overlay root、interaction blocker 与 marker composed-path 的 DOM 判定由注入式策略承载，原 preload
+保留 `gl`/`Cl`/`xl` 兼容代理。`scripts/test-preload-annotation-interaction-policy.mjs` 覆盖 8 项断言。
