@@ -6,6 +6,8 @@ Total scripts: 832.
 
 ## Recent semantic extraction suites
 
+- [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)
+
 - [`test-main-device-check.mjs`](./test-main-device-check.mjs)
 - [`test-main-remote-host.mjs`](./test-main-remote-host.mjs)
 - [`test-main-target-filter-policy.mjs`](./test-main-target-filter-policy.mjs)

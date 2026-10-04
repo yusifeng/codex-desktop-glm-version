@@ -1,5 +1,6 @@
 import { createAnnotationPreloadBridge } from "./annotation-preload-bridge";
 import { createAnnotationRuntimeMount } from "./annotation-runtime-mount";
+import { dispatchAnnotationHostMessage } from "./annotation-host-message-dispatcher";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -92,30 +93,17 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   };
 
   const handleHostMessage = (_event: any, message: any) => {
-    switch (deps.getPreMountMessageAction(message.type)) {
-      case `permission-result`:
-        permissionController.handleResult(message.requestId, message.allowed);
-        return;
-      case `preview`:
-        runtimeMount.setPreview(state.canUseSiteAnnotationApi && !state.isAgentControllingBrowser ? message.preview : null);
-        return;
-      case `sync`:
-        applySync(message);
-        preloadBridge.bufferSync({ ...message, canUseSiteAnnotationApi: state.canUseSiteAnnotationApi });
-        return;
-      case `capture-text-selection`:
-        preloadBridge.bufferTextSelection();
-        return;
-      case `queue-editor-message`:
-        siteAnnotationRequests?.clear();
-        preloadBridge.bufferEditorMessage(message);
-        return;
-      case `close-editor`:
-        hasActiveEditor = false;
-        siteAnnotationRequests?.clear();
-        preloadBridge.bufferEditorMessage(message);
-        return;
-    }
+    dispatchAnnotationHostMessage({
+      action: deps.getPreMountMessageAction(message.type),
+      message,
+      state,
+      permissionController,
+      runtimeMount,
+      preloadBridge,
+      siteAnnotationRequests,
+      setActiveEditor: (active) => { hasActiveEditor = active; },
+      applySync,
+    });
   };
 
   const initializeFeatures = (policy: any) => {

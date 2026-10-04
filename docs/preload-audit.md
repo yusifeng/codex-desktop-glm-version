@@ -413,6 +413,15 @@ preload 与挂载后的批注 runtime 之间的 bridge 已迁移至
 `scripts/test-preload-annotation-preload-bridge.mjs` 覆盖缓冲重放、editor 状态转发、request
 清理和 capability gate，共 7 项断言。
 
+### 增量抽取：annotation host-message dispatcher
+
+host 到 preload 的批注消息动作（permission、preview、sync、selection、editor queue/close）已迁移至
+`src/main/browser-page-preload/annotation-host-message-dispatcher.ts`。dispatcher 只负责动作到
+bridge/runtime 回调的协议映射，状态、权限对象与页面生命周期仍由
+`annotation-preload-runtime.ts` 持有，避免把副作用错误地提升为全局状态。由
+`scripts/test-preload-annotation-host-message-dispatcher.mjs` 覆盖 7 项行为断言，包括 capability
+gate、sync payload 和 editor queue 清理。
+
 ### 增量抽取：annotation anchor/frame geometry
 
 批注 overlay 使用的 frame/scroll-container clipping、跨 frame element geometry、region anchor
