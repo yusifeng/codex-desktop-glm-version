@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/mac-app-path.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { extractMacAppBundlePath } = module.exports;
+assert.equal(extractMacAppBundlePath("/Applications/Zed.app/Contents/MacOS/zed"), "/Applications/Zed.app");
+assert.equal(extractMacAppBundlePath("/Applications/Zed.app/Contents/Resources/zed"), null);
+assert.equal(extractMacAppBundlePath("/tmp/foo.app/Contents/MacOS/foo.app/Contents/MacOS/bar"), "/tmp/foo.app");
+console.log("worker Mac app path tests passed (3 assertions)");

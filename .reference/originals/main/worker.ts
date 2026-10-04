@@ -120,6 +120,7 @@ const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
 const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
+const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
@@ -81581,8 +81582,7 @@ function sDe() {
   return e ? L7(e) : I7([[`Zed`, `Zed.exe`]]);
 }
 function cDe(e) {
-  let t = e.indexOf(`.app/Contents/MacOS/`);
-  return t === -1 ? null : e.slice(0, t + 4);
+  return extractMacAppBundlePath(e);
 }
 async function lDe({
   command: e,
