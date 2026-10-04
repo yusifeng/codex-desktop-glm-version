@@ -20,6 +20,7 @@ const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = req
 const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
 const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
+const { resolveTrayIconCandidates } = require("./main-app/startup/tray-icon-paths.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction } = require("./main-app/computer-use/history-scope-actions.js");
 let c = require("node:url"),
@@ -175410,11 +175411,7 @@ function Q9() {
 }
 async function Fst(e, t) {
   if (process.platform === `darwin`) {
-    let [e] = xT(),
-      n = [
-        ...(l.app.isPackaged ? [(0, h.join)(process.resourcesPath, e)] : []),
-        (0, h.join)(t, `electron`, `src`, `icons`, e),
-      ];
+    let n = resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: xT(), iconBaseName: ST, windowsIconNames: bT });
     for (let e of n) {
       let t = l.nativeImage.createFromPath(e);
       if (!t.isEmpty()) return (t.setTemplateImage(!0), { defaultIcon: t });
@@ -175422,12 +175419,7 @@ async function Fst(e, t) {
     return { defaultIcon: await l.app.getFileIcon(process.execPath, { size: `normal` }) };
   }
   if (process.platform === `linux`) {
-    let n = `${ST(e)}.png`,
-      r = l.nativeImage.createFromPath(
-        l.app.isPackaged
-          ? (0, h.join)(process.resourcesPath, n)
-          : (0, h.join)(t, `electron`, `src`, `icons`, n),
-      );
+    let r = l.nativeImage.createFromPath(resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: xT(), iconBaseName: ST, windowsIconNames: bT })[0]);
     if (r.isEmpty()) throw Error(`Linux tray application icon is unavailable`);
     return { defaultIcon: r.resize({ width: W9, height: W9, quality: `best` }) };
   }
@@ -175437,12 +175429,7 @@ async function Fst(e, t) {
     : { defaultIcon: n };
 }
 function $9(e, t) {
-  let n = bT(e),
-    r = l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI ? n.dark : n.light,
-    i = [
-      ...(l.app.isPackaged ? [(0, h.join)(process.resourcesPath, r)] : []),
-      (0, h.join)(t, `electron`, `src`, `icons`, r),
-    ];
+  let i = resolveTrayIconCandidates({ platform: `win32`, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, dark: l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI, templateNames: xT(), iconBaseName: ST, windowsIconNames: bT });
   for (let e of i) {
     let t = l.nativeImage.createFromPath(e);
     if (!t.isEmpty()) return t;
