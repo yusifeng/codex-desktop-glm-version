@@ -122,7 +122,7 @@ const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/te
 const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
 const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
-const { isSparsePathspecUnsupported } = require("./worker/git-pathspec-policy");
+const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
@@ -67786,15 +67786,7 @@ async function _ge({ host: e, env: t, gitRoot: n, paths: r, signal: i, untracked
     : { success: !1 };
 }
 function y4(e) {
-  return {
-    code: null,
-    command: `git add`,
-    stderr: e,
-    stderrBytes: Buffer.byteLength(e, `utf8`),
-    stdout: ``,
-    stdoutBytes: 0,
-    success: !1,
-  };
+  return createGitAddFailure(e);
 }
 var vge = `GIT_INDEX_FILE`;
 async function b4(e, t, n) {
