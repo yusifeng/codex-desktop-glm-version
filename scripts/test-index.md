@@ -963,4 +963,5 @@ Total scripts: 900.
 - [`test-worker-git-live-query-recovery.mjs`](./test-worker-git-live-query-recovery.mjs)
 - [`test-preload-annotation-editor-view-state.mjs`](./test-preload-annotation-editor-view-state.mjs)
 - [`test-preload-annotation-marker-view-state.mjs`](./test-preload-annotation-marker-view-state.mjs)
+- [`test-preload-annotation-controls-parser.mjs`](./test-preload-annotation-controls-parser.mjs)
 - [`test-preload-annotation-control-target-validation.mjs`](./test-preload-annotation-control-target-validation.mjs)
