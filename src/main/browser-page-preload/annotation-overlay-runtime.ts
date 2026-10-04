@@ -1,3 +1,5 @@
+import { collectAnnotationFlexGapOverlays } from "./annotation-flex-gap-overlays";
+
 type AnnotationOverlayRuntimeDependencies = {
   documentLike: any;
   windowLike: any;
@@ -70,37 +72,6 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
   const isAnnotationForCurrentPage = (annotation: any) =>
     deps.samePageUrl(annotation.anchor.pageUrl, deps.windowLike.location.href);
 
-  const collectFlexGapOverlays = (
-    property: string | null,
-    editor: any,
-    annotation: any,
-    cache: Map<any, any>,
-  ) => {
-    if (property == null || ![`gap`, `row-gap`, `column-gap`].includes(property)) return [];
-    const target = editor?.anchor.type === `element`
-      ? editor.anchor.element
-      : annotation == null
-        ? null
-        : (cache.get(annotation.id) ?? null);
-    if (target == null) return [];
-    const targetStyle = deps.getOwnerWindow(target).getComputedStyle(target);
-    if (targetStyle.display !== `flex` && targetStyle.display !== `inline-flex`) return [];
-    const overlays = Array.from(target.children).flatMap((child: any, index) => {
-      if (!deps.isElement(child)) return [];
-      const style = deps.getOwnerWindow(child).getComputedStyle(child);
-      if (style.position === `absolute` || style.position === `fixed`) return [];
-      const rect = deps.getVisibleRect(child);
-      return rect == null
-        ? []
-        : [{
-            borderRadius: style.borderRadius.length === 0 ? `0px` : style.borderRadius,
-            key: `${index}-${Math.round(rect.x)}-${Math.round(rect.y)}-${Math.round(rect.width)}-${Math.round(rect.height)}`,
-            rect,
-          }];
-    });
-    return overlays.length > 1 ? overlays : [];
-  };
-
   const getElementCache = (rootHost: object) => {
     const existing = elementCaches.get(rootHost);
     if (existing != null) return existing;
@@ -159,7 +130,8 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
     resolveHoverElementAtPoint,
     refreshDesignAnnotation,
     isAnnotationForCurrentPage,
-    collectFlexGapOverlays,
+    collectFlexGapOverlays: (property: string | null, editor: any, annotation: any, cache: Map<any, any>) =>
+      collectAnnotationFlexGapOverlays(property, editor, annotation, cache, deps),
     getElementCache,
     observeMutationsOutsideOverlay,
     resolveTextSelectionRects,

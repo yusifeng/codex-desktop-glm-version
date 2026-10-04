@@ -93,6 +93,10 @@ Annotation overlay 的非 React runtime 尾部（原 `Jy/Yy/Xy/Zy/Qy/$y/eb/tb/nb
 当前页 design refresh、flex gap 子项、按 root 隔离的 element cache、DOM mutation、text selection、
 metadata tooltip 和 region 去重均由该模块持有；原入口只保留调用点兼容代理，React `Uy/Wy/Gy/Ky/qy`
 仍留在 UI 边界。`scripts/test-preload-annotation-overlay-runtime.mjs` 以 48 项行为断言覆盖该闭环。
+其中 flex-container 子项 gap overlay 的目标选择、display gate、绝对定位过滤、可见 rect
+和稳定 key 已进一步迁移至 `annotation-flex-gap-overlays.ts`，由
+`scripts/test-preload-annotation-flex-gap-overlays.mjs` 的 7 项断言覆盖；overlay runtime
+仅负责注入 DOM 依赖并保留兼容方法。
 
 Annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 `src/main/browser-page-preload/annotation-display-anchors.ts`，入口继续注入既有 DOM resolver

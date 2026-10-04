@@ -822,3 +822,8 @@ Annotation design styles boundary（原 `ls/us/ds/fs/ps/ms`）已迁移至
 `src/main/browser-page-preload/annotation-design-styles.ts`，覆盖 computed-style 声明收集与合并、
 direct-text draft、style provenance 投影和 create/edit/design target 匹配；入口保留原兼容委托，
 由 `scripts/test-preload-annotation-design-styles.mjs` 的 9 项断言覆盖。
+
+Annotation flex-gap overlay projection（原 overlay runtime 内联 flex 子项投影）已进一步迁移至
+`src/main/browser-page-preload/annotation-flex-gap-overlays.ts`；目标选择、flex display gate、
+绝对/固定定位过滤、可见 rect 与稳定 key 均由注入式 DOM 依赖承载，overlay runtime 仅保留
+兼容调用代理。`scripts/test-preload-annotation-flex-gap-overlays.mjs` 覆盖 7 项行为断言。
