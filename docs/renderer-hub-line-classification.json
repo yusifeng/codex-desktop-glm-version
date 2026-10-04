@@ -323,5 +323,45 @@
     "hub": "app-primary", "alias": "zc", "sourceSymbol": "lVe", "startLine": 31099, "endLine": 31138,
     "classification": "generated-local-composer-surface-shell", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The component builds the generated composer surface shell, merging typography tokens, transient reveal transitions, and caller props. Its visual contract is owned by the adjacent composer tree and has no separately consumed renderer boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Ic", "sourceSymbol": "EW", "startLine": 31325, "endLine": 31338,
+    "classification": "generated-local-composer-runtime-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer binds the generated composer runtime hooks and focus selectors used by dictation controls. These dependencies are setup glue for the neighboring composer lifecycle, not an independently owned renderer module."
+  },
+  {
+    "hub": "app-primary", "alias": "Fc", "sourceSymbol": "kW", "startLine": 31340, "endLine": 31357,
+    "classification": "generated-local-settings-icon-renderer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component renders the generated composer settings SVG icon. Its path data and JSX runtime are coupled to the adjacent control surface and have no named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "jc", "sourceSymbol": "vVe", "startLine": 31362, "endLine": 31364,
+    "classification": "generated-local-platform-shortcut-label", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper chooses the platform-specific keyboard shortcut label for the generated composer. The label is local presentation policy with no standalone lifecycle or renderer owner."
+  },
+  {
+    "hub": "app-primary", "alias": "Mc", "sourceSymbol": "yVe", "startLine": 31365, "endLine": 31367,
+    "classification": "generated-local-composer-memo-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The empty generated initializer participates in the neighboring composer memo setup and carries no independent behavior or renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "Nc", "sourceSymbol": "_Ve", "startLine": 31359, "endLine": 31360,
+    "classification": "generated-local-composer-effect-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The empty initializer is retained as generated composer effect wiring and has no independent semantic boundary outside the adjacent control tree."
+  },
+  {
+    "hub": "app-primary", "alias": "Ec", "sourceSymbol": "NW", "startLine": 31452, "endLine": 31455,
+    "classification": "generated-local-ads-runtime-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer binds the generated ads dependency registry before the lazy placement/hydration adapters run. Its import order is owned by the adjacent ads integration and has no named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "Sc", "sourceSymbol": "FW", "startLine": 31473, "endLine": 31477,
+    "classification": "generated-local-device-onboarding-state-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer creates the generated device-onboarding state atom and binds its runtime dependencies. State ownership remains in the adjacent onboarding flow, so extraction would split lifecycle ownership."
+  },
+  {
+    "hub": "app-primary", "alias": "kc", "sourceSymbol": "xVe", "startLine": 31385, "endLine": 31398,
+    "classification": "generated-local-mention-preview-body", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component maps tokenized mention-preview records into generated JSX fragments for the adjacent comment surface. It is only rendered by the neighboring preview wrapper and has no independent renderer consumer."
   }
 ]

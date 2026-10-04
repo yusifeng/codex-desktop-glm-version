@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 64, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 72, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -69,6 +69,14 @@ assert.ok(primary.unconsumed.includes("Lc"), "Lc remains coupled to generated di
 assert.ok(primary.unconsumed.includes("qc"), "qc remains coupled to generated shadow selector constants");
 assert.ok(primary.unconsumed.includes("Kc"), "Kc remains coupled to generated selection observer constants");
 assert.ok(primary.unconsumed.includes("zc"), "zc remains coupled to generated composer surface shell");
+assert.ok(primary.unconsumed.includes("Ic"), "Ic remains coupled to generated composer runtime");
+assert.ok(primary.unconsumed.includes("Fc"), "Fc remains coupled to generated settings icon");
+assert.ok(primary.unconsumed.includes("jc"), "jc remains coupled to generated shortcut label");
+assert.ok(primary.unconsumed.includes("Mc"), "Mc remains coupled to generated composer memo initialization");
+assert.ok(primary.unconsumed.includes("Nc"), "Nc remains coupled to generated composer effect initialization");
+assert.ok(primary.unconsumed.includes("Ec"), "Ec remains coupled to generated ads initialization");
+assert.ok(primary.unconsumed.includes("Sc"), "Sc remains coupled to generated onboarding state initialization");
+assert.ok(primary.unconsumed.includes("kc"), "kc remains coupled to generated mention preview body");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
