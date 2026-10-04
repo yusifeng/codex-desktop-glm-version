@@ -257,6 +257,10 @@ Annotation pointer wheel delta 归一化（原 `Lv` 23669-23675）已迁移至
 `src/main/browser-page-preload/annotation-wheel-delta.ts`；入口保留滚动副作用，
 由 `scripts/test-preload-annotation-wheel-delta.mjs` 覆盖 line/page/pixel 三种 delta mode。
 
+Annotation scroll boundary 方向判定（原 `Vv` 23704-23707）已迁移至
+`src/main/browser-page-preload/annotation-scroll-boundary.ts`；入口保留容器滚动副作用，
+由 `scripts/test-preload-annotation-scroll-boundary.mjs` 覆盖起点、终点、可滚动与 zero delta。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）

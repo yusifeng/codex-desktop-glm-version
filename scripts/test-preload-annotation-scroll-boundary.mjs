@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { canScrollAnnotationAxis } = require("../app/.vite/build/browser-page-preload/annotation-scroll-boundary.js");
+assert.equal(canScrollAnnotationAxis(-1, 10, 100, 300), true, "scroll backward");
+assert.equal(canScrollAnnotationAxis(-1, 0, 100, 300), false, "backward at start");
+assert.equal(canScrollAnnotationAxis(1, 100, 100, 300), true, "scroll forward");
+assert.equal(canScrollAnnotationAxis(1, 200, 100, 300), false, "forward at end");
+assert.equal(canScrollAnnotationAxis(0, 100, 100, 300), false, "zero delta");
+console.log("5 preload annotation scroll-boundary assertions passed");

@@ -6,6 +6,8 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-preload-annotation-scroll-boundary.mjs`](./test-preload-annotation-scroll-boundary.mjs)
+
 - [`test-worker-wsl-open-target-args.mjs`](./test-worker-wsl-open-target-args.mjs)
 
 - [`test-preload-annotation-wheel-delta.mjs`](./test-preload-annotation-wheel-delta.mjs)

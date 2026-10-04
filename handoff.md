@@ -684,6 +684,9 @@ tag fallback、可访问名称与空标签。
 Annotation pointer wheel delta 归一化（原 `Lv`）已抽取为
 `src/main/browser-page-preload/annotation-wheel-delta.ts`，入口保留滚动副作用；由 3 项断言覆盖
 line/page/pixel 三种 delta mode。
+Annotation scroll boundary 方向判定（原 `Vv`）已抽取为
+`src/main/browser-page-preload/annotation-scroll-boundary.ts`，入口保留容器滚动副作用；由 5 项断言覆盖
+起点、终点、可滚动与 zero delta。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。

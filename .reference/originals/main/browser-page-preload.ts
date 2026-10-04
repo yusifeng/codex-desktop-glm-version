@@ -6383,6 +6383,7 @@ var { parseAnnotationAttributeTokens } = require("./browser-page-preload/annotat
 var { snapshotAnnotationDesign } = require("./browser-page-preload/annotation-design-snapshot");
 var { getAnnotationTargetLabel } = require("./browser-page-preload/annotation-target-label");
 var { normalizeAnnotationWheelDelta } = require("./browser-page-preload/annotation-wheel-delta");
+var { canScrollAnnotationAxis } = require("./browser-page-preload/annotation-scroll-boundary");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23703,7 +23704,7 @@ function Bv(e, t, n) {
   );
 }
 function Vv(e, t, n, r) {
-  return e < 0 ? t > 0 : e > 0 && t < r - n;
+  return canScrollAnnotationAxis(e, t, n, r);
 }
 var Hv,
   Uv,
