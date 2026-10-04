@@ -590,3 +590,11 @@ symbol 与精确行范围。
 host-selection facade；分类记录由 `scripts/audit-renderer-hub-classification.mjs` 校验
 source symbol 与精确行范围。
 新增 app-primary 逐行分类证据：`$d`/`mI` 是搜索 RPC 分页与 provider 默认值的生成局部 helper；`Cr`/`Fnt` 是自动审批提醒与 coordinator threshold 的耦合流程；`$f`/`MN`、`$l`/`lV`、`$n`/`K4` 是模块初始化副作用。五者均无独立 named renderer consumer 或 teardown/lifecycle 边界，继续保留在聚合模块，避免制造无主 facade。
+
+本轮再补齐 app-primary 搜索与标注/设备状态的局部边界证据：`Cl`/`wRe` 将 local、remote
+与 ChatGPT thread identity 归一化，`Dl`/`SRe` 将相邻搜索结果整理为 pinned/recent 分组，
+`$c`/`yBe` 仅从编辑锚点或矩形中心投影标注坐标，`Cc`/`EVe` 与 `wc`/`DVe` 成对切换
+设备 onboarding signals。它们都没有独立 renderer named consumer、可复用 store 或 teardown
+契约，属于生成模块内聚的 projection/state helper；因此继续保留在 hub，避免制造无主 identity、
+search、geometry 或 device-state facade。分类记录与 source symbol/精确行范围由 hub audit
+机器校验，focused suite 同时锁定这些 alias 仍在 unconsumed surface。

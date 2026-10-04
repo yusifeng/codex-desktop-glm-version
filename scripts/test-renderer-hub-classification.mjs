@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 26, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 31, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -31,6 +31,11 @@ assert.ok(primary.unconsumed.includes("$g"), "$g remains coupled to generated CS
 assert.ok(primary.unconsumed.includes("$a"), "$a remains coupled to the generated slash-command pin surface");
 assert.ok(primary.unconsumed.includes("An"), "An remains coupled to generated repository URL projection");
 assert.ok(primary.unconsumed.includes("og"), "og remains coupled to generated project-kind projection");
+assert.ok(primary.unconsumed.includes("Cl"), "Cl remains coupled to generated thread-key projection");
+assert.ok(primary.unconsumed.includes("Dl"), "Dl remains coupled to generated search projection");
+assert.ok(primary.unconsumed.includes("$c"), "$c remains coupled to generated annotation geometry");
+assert.ok(primary.unconsumed.includes("Cc"), "Cc remains coupled to generated device-state projection");
+assert.ok(primary.unconsumed.includes("wc"), "wc remains coupled to generated device-state reset");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);

@@ -133,5 +133,30 @@
     "hub": "app-primary", "alias": "$n", "sourceSymbol": "K4", "startLine": 85970, "endLine": 85977,
     "classification": "generated-local-initializer", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer registers conversation runtime dependencies and caches through generated module side effects. No named renderer boundary consumes the exported alias, so extraction would create an unowned lifecycle facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Cl", "sourceSymbol": "wRe", "startLine": 27431, "endLine": 27440,
+    "classification": "generated-local-thread-key-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper normalizes local, remote, and ChatGPT thread identities for the adjacent generated search projection. It has no independent renderer consumer or thread-store lifecycle, so retaining the local projection avoids an unowned identity facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Dl", "sourceSymbol": "SRe", "startLine": 27364, "endLine": 27382,
+    "classification": "generated-local-search-projection", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper groups loaded search results into pinned and recent buckets for one adjacent generated surface. Its filtering and pagination assumptions are coupled to that surface and there is no named renderer consumer or reusable search lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "$c", "sourceSymbol": "yBe", "startLine": 30221, "endLine": 30224,
+    "classification": "generated-local-annotation-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper chooses an annotation anchor point from an explicit edit anchor or rectangle center for the adjacent generated overlay interaction. It has no independent renderer consumer or overlay lifecycle, so extracting it would create an unowned geometry facade."
+  },
+  {
+    "hub": "app-primary", "alias": "Cc", "sourceSymbol": "EVe", "startLine": 31457, "endLine": 31462,
+    "classification": "generated-local-device-state-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper mutates device onboarding signals as part of one adjacent generated UI flow, including pending-state and detection flags. The signal keys and transitions are local to that flow and have no independent renderer consumer or teardown boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "wc", "sourceSymbol": "DVe", "startLine": 31462, "endLine": 31465,
+    "classification": "generated-local-device-state-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper resets the adjacent generated device onboarding signals and clears its transient metadata. It is a paired local state transition with EVe rather than a standalone renderer capability, so it remains in the hub."
   }
 ]
