@@ -30,6 +30,7 @@ const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
 const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
 const { isDeviceCheckPlatform: rr, isAppleSilicon: ir, isDeviceCheckSupported: ar, createDeviceAttestationHandler: or, generateDeviceCheckToken: cr } = require("./main-app/security/device-check.js");
+const remoteHost = require("./main-app/open-target/remote-host.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -138094,34 +138095,25 @@ function b1(e) {
   return t.success ? t.data : null;
 }
 function x1(e) {
-  let t = e.trim();
-  return t.split(/[:/]/).at(-1)?.trim() || t;
+  return remoteHost.fallbackTargetIdentifier(e);
 }
 function S1(e) {
-  return e?.sshAlias?.trim() || null;
+  return remoteHost.readSshAlias(e);
 }
 function C1(e) {
-  return e.at(-1)?.trim() || null;
+  return remoteHost.readTerminalCommandLastArg(e);
 }
 function m4e(e) {
-  let t = e.find((e) => /^-p\d+$/.test(e));
-  if (t != null) return Number(t.slice(2));
-  let n = e.indexOf(`-p`),
-    r = n >= 0 ? e[n + 1] : null;
-  return r == null || !/^\d+$/.test(r) ? null : Number(r);
+  return remoteHost.readTerminalCommandPort(e);
 }
 function h4e(e) {
-  return e.some((e) => e === `-i` || /^-i\S+/.test(e));
+  return remoteHost.terminalCommandHasIdentity(e);
 }
 function w1(e, t) {
-  let n = g4e(e);
-  return t == null ? n : `${n}:${t}`;
+  return remoteHost.formatHostWithPort(e, t);
 }
 function g4e(e) {
-  let t = e.lastIndexOf(`@`),
-    n = t >= 0 ? e.slice(0, t + 1) : ``,
-    r = t >= 0 ? e.slice(t + 1) : e;
-  return !r.includes(`:`) || r.startsWith(`[`) ? e : `${n}[${r}]`;
+  return remoteHost.bracketIpv6Host(e);
 }
 function T1(e, t, r) {
   if (!n.Es(e)) return t;

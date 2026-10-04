@@ -109,6 +109,14 @@ darwin/win32 平台门控、Apple Silicon 能力探测、native addon token 生�
 实现已删除并由语义模块接回，language-server、IAB/MCP sandbox 与启动装配边界仍保持
 business-preserved，A3 不宣称完成。
 
+### A3 增量抽取：remote host display helpers
+
+open-in target 的远程主机展示与 SSH 命令解析纯函数（原 `x1/S1/C1/m4e/h4e/w1/g4e`，
+138100-138123）已迁移至 `src/main/main-app/open-target/remote-host.ts`。模块只处理
+标识符回退、SSH alias、命令行端口/identity 检测以及 IPv6 host 加括号，不触碰
+Electron、文件系统或目标进程启动；入口通过窄委托保留原 helper 名称和调用顺序。由
+`scripts/test-main-remote-host.mjs` 覆盖 11 项标识符、端口、identity 与 IPv6 边界断言。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含
