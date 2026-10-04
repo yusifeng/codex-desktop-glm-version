@@ -1,5 +1,6 @@
 import { selectGitWatchSubscriptionState } from "./git-watch-subscription-policy";
 import { prepareGitLiveQuerySubscription } from "./git-live-query-subscription-setup";
+import { recoverGitLiveQueries } from "./git-live-query-recovery";
 
 type WatchRequestDependencies = {
   gitManager: any;
@@ -37,22 +38,6 @@ async function watchGitRepository(params: { commonDir: string; root: string }, d
     () => deps.ensureWatching(metadata, deps.host),
   );
   return { success: true };
-}
-
-async function recoverGitLiveQueries(
-  params: { cwd?: string | null; subscriptionIds: string[] },
-  deps: WatchRequestDependencies,
-) {
-  const metadata = params.cwd == null
-    ? null
-    : await deps.gitManager.getStableMetadata(params.cwd, deps.host);
-  if (params.cwd == null || metadata != null) {
-    await deps.liveQueryRegistry.recover({
-      hostId: deps.host.id,
-      root: metadata?.root,
-      subscriptionIds: params.subscriptionIds,
-    });
-  }
 }
 
 async function subscribeGitLiveQuery(
