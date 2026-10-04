@@ -15,6 +15,30 @@ const HUBS = {
   "app-initial": "app-initial-51da50e6c6e3.ts",
   "app-primary": "app-primary-d66705000d76.ts",
 };
+const LINE_CLASSIFICATIONS_PATH = path.join(ROOT, "docs/renderer-hub-line-classification.json");
+
+function readLineClassifications() {
+  const entries = JSON.parse(fs.readFileSync(LINE_CLASSIFICATIONS_PATH, "utf8"));
+  if (!Array.isArray(entries)) throw new Error("renderer hub line classifications must be an array");
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") throw new Error("invalid hub line classification entry");
+    if (!(entry.hub in HUBS) || typeof entry.alias !== "string") throw new Error("classification must identify hub and alias");
+    if (!Number.isInteger(entry.startLine) || !Number.isInteger(entry.endLine) || entry.startLine < 1 || entry.endLine < entry.startLine) {
+      throw new Error(`invalid line range for ${entry.hub}:${entry.alias}`);
+    }
+    if (typeof entry.classification !== "string" || typeof entry.module !== "string") {
+      throw new Error(`classification ${entry.hub}:${entry.alias} needs category and module`);
+    }
+    const modulePath = path.join(ROOT, entry.module);
+    if (!fs.existsSync(modulePath)) throw new Error(`missing semantic module for ${entry.hub}:${entry.alias}: ${entry.module}`);
+    const hubLines = fs.readFileSync(path.join(ROOT, "src/webview/assets", HUBS[entry.hub]), "utf8").split("\n");
+    const sourceWindow = hubLines.slice(entry.startLine - 1, entry.endLine).join("\n");
+    if (entry.sourceSymbol && !new RegExp(`\\bfunction\\s+${entry.sourceSymbol}\\b`).test(sourceWindow)) {
+      throw new Error(`source symbol ${entry.sourceSymbol} is outside ${entry.hub}:${entry.startLine}-${entry.endLine}`);
+    }
+  }
+  return entries;
+}
 
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -68,7 +92,11 @@ export function classifyHub(hub) {
   const consumption = readConsumption(hub);
   const consumed = new Set([...consumption.named, ...consumption.namespaceMembers].filter((name) => exports.has(name)));
   const unconsumed = [...exports].filter((name) => !consumed.has(name)).sort();
-  return { hub, exportCount: exports.size, consumedCount: consumed.size, sideEffectImports: consumption.sideEffectImports, unconsumed };
+  const reviewed = readLineClassifications().filter((entry) => entry.hub === hub);
+  for (const entry of reviewed) {
+    if (!exports.has(entry.alias)) throw new Error(`line classification references missing export ${hub}:${entry.alias}`);
+  }
+  return { hub, exportCount: exports.size, consumedCount: consumed.size, sideEffectImports: consumption.sideEffectImports, unconsumed, reviewedCount: reviewed.length };
 }
 
 const strict = process.argv.includes("--strict");
