@@ -6,6 +6,7 @@ import {
   createGitLiveQueryState,
   getGitLiveQueryBranchDependencyKey,
 } from "./git-live-query-state";
+import { updateGitLiveQueryBranchDependency } from "./git-live-query-branch-dependency";
 import { GitLiveQueryRunCoordinator } from "./git-live-query-run-coordinator";
 import {
   cancelGitLiveQuerySubscription,
@@ -64,30 +65,12 @@ class GitLiveQueryRegistry {
   }
 
   updateLocalBranchDependency(state: any, delta: number) {
-    let baseBranch;
-    if (state.query.method === `review-summary`) {
-      if (state.query.params.source !== `branch`) return;
-      baseBranch = state.query.params.baseBranch;
-    } else if (
-      state.query.method === `branch-diff-stats` ||
-      state.query.method === `branch-commits`
-    )
-      baseBranch = state.query.params.baseBranch;
-    else return;
-    const trimmed = baseBranch?.trim();
-    if (!trimmed) return;
-    const branch = trimmed.startsWith(`refs/heads/`)
-      ? trimmed.slice(11)
-      : trimmed;
-    const key = getGitLiveQueryBranchDependencyKey({
-      hostId: state.host.id,
-      commonDir: state.commonDir,
-      root: state.root,
-      branch,
-    });
-    const count = (this.localBranchDependencies.get(key) ?? 0) + delta;
-    if (count === 0) this.localBranchDependencies.delete(key);
-    else this.localBranchDependencies.set(key, count);
+    updateGitLiveQueryBranchDependency(
+      this.localBranchDependencies,
+      state,
+      delta,
+      getGitLiveQueryBranchDependencyKey,
+    );
   }
 
   handleRepoChanged(event: any, onFanout?: (count: number) => void) {

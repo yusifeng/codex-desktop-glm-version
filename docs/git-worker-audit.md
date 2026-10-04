@@ -261,6 +261,12 @@ shared-query coalescing、repository serialization、consumer abort、recovery �
 `src/main/worker/git-live-query-state.ts`；registry 仅保留异步刷新和事件副作用，新增 7 项 focused
 assertions 覆盖 generation、初始状态及 key 稳定性。
 
+Live-query 的本地分支依赖判定与引用计数更新已进一步迁移至
+`src/main/worker/git-live-query-branch-dependency.ts`；该模块只负责
+`review-summary`/`branch-diff-stats`/`branch-commits` 的 branch 参数规范化和计数增减，registry
+仍持有 Map、刷新与事件副作用。新增 8 项 focused assertions 覆盖 refs/heads 规范化、非 branch
+查询过滤、空值与引用计数清理。
+
 Git watcher performance 的 10 秒窗口、维度分桶、累计计数、512 raw-event 提前 flush 与 timer
 清理已迁移至 `src/main/worker/git-watcher-performance.ts`；原 `Iye` 类及专用常量已删除，由 18 项
 聚合、阈值和 timer 断言覆盖。

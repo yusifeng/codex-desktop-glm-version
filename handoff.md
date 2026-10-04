@@ -269,6 +269,10 @@ repository serialization、consumer abort、recovery 与 branch dependency 引�
 其 subscription state 构造、repository/shared-run cache key 与 branch dependency key 已进一步迁移至
 `src/main/worker/git-live-query-state.ts`，由 7 项 focused assertions 覆盖；registry 仍负责异步
 refresh、abort、retry 与事件副作用。
+Live-query 的本地分支依赖判定与引用计数更新已进一步迁移至
+`src/main/worker/git-live-query-branch-dependency.ts`，由 8 项 focused assertions 覆盖
+`refs/heads/` 规范化、非 branch 查询过滤、空值和引用计数清理；registry 仍保留 Map、刷新与
+事件副作用。
 Git watcher performance 的窗口分桶、累计计数、raw-event 阈值 flush 和 timer 清理已迁移至
 `src/main/worker/git-watcher-performance.ts`；原压缩类与常量已删除，由 18 项断言覆盖。
 Git watcher metadata prefetch 的批量 `rev-parse`、输出校验、query cache 回填、git dir 与
