@@ -120,7 +120,7 @@ Electron/worker 副作用）：
 descriptor 已迁移至 `src/main/main-app/files/open-path-arguments.ts`（原
 12,855-12,948、启动消费点 175,698 与 176,281-176,313）。入口仅保留兼容别名并继续
 负责窗口与 deep-link 副作用；`scripts/test-main-open-path-arguments.mjs` 覆盖 13 项
-平台、URL、扩展名、过滤与去重断言。
+平台、URL、扩展名、过滤与去重断言；desktop open-path 的 directory、HTML browser-document 与普通 file 分类另由 4 项 stat-kind 边界断言覆盖。
 
 ### 增量抽取：更新退出策略
 

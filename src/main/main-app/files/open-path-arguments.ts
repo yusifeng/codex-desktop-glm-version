@@ -23,6 +23,18 @@ export const OPENABLE_FILE_TYPES: OpenableFileType[] = [
 ];
 
 const OPENABLE_EXTENSIONS = new Set(OPENABLE_FILE_TYPES.map(({ extension }) => `.${extension}`));
+const BROWSER_DOCUMENT_EXTENSIONS = new Set([`.htm`, `.html`, `.xht`, `.xhtml`]);
+
+export type DesktopOpenPathKind = `directory` | `browser-document` | `file`;
+
+export function classifyDesktopOpenPath(pathname: string, stats: { isDirectory(): boolean; isFile(): boolean }): { kind: DesktopOpenPathKind; path: string } | null {
+  if (stats.isDirectory()) return { kind: `directory`, path: pathname };
+  if (!stats.isFile()) return null;
+  return {
+    kind: BROWSER_DOCUMENT_EXTENSIONS.has(path.extname(pathname).toLowerCase()) ? `browser-document` : `file`,
+    path: pathname,
+  };
+}
 
 export function isCodexDeepLink(value: string): boolean {
   return value.toLowerCase().startsWith("codex://");
@@ -71,6 +83,7 @@ export function collectFileExtensions(paths: Array<{ path: string }>): string[] 
 
 export {
   OPENABLE_EXTENSIONS,
+  BROWSER_DOCUMENT_EXTENSIONS,
 };
 
 if (typeof module !== "undefined") module.exports = {
@@ -83,4 +96,5 @@ if (typeof module !== "undefined") module.exports = {
   isCodexDeepLink,
   isOpenableFilePath,
   normalizeFileArgument,
+  classifyDesktopOpenPath,
 };

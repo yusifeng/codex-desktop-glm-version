@@ -23,4 +23,8 @@ assert.deepEqual(api.createOpenFileDescriptors(["/tmp/report.xlsx", "/tmp/report
   { label: "report.csv", path: "/tmp/report.csv", fsPath: "/tmp/report.csv" },
 ]);
 assert.deepEqual(api.collectFileExtensions([{ path: "/tmp/report.XLSX" }, { path: "/tmp/a.csv" }, { path: "/tmp/b.csv" }]), ["csv", "xlsx"]);
-console.log("13 main open-path argument assertions passed");
+assert.deepEqual(api.classifyDesktopOpenPath("/tmp/index.HTML", { isDirectory: () => false, isFile: () => true }), { kind: "browser-document", path: "/tmp/index.HTML" });
+assert.deepEqual(api.classifyDesktopOpenPath("/tmp/src.ts", { isDirectory: () => false, isFile: () => true }), { kind: "file", path: "/tmp/src.ts" });
+assert.deepEqual(api.classifyDesktopOpenPath("/tmp/project", { isDirectory: () => true, isFile: () => false }), { kind: "directory", path: "/tmp/project" });
+assert.equal(api.classifyDesktopOpenPath("/tmp/missing", { isDirectory: () => false, isFile: () => false }), null);
+console.log("17 main open-path argument assertions passed");

@@ -382,7 +382,7 @@ main 更新即时退出清理（原 `Wst`，176,933-176,955）已抽取为
 `scripts/test-main-immediate-update-exit.mjs` 覆盖行为断言；Ust 其余启动装配仍在入口。
 启动参数中的可打开文件类型、`file://` 归一化、绝对路径/深链过滤、`--open-project`
 跳过和去重 descriptor 已抽取为 `src/main/main-app/files/open-path-arguments.ts`，
-入口仅保留兼容别名；由 `scripts/test-main-open-path-arguments.mjs` 覆盖 13 项断言。
+入口仅保留兼容别名；desktop open-path 的 directory、HTML browser-document 与普通 file 分类也已接回同一模块，由 `scripts/test-main-open-path-arguments.mjs` 覆盖 17 项断言。
 annotation surface registry（surface registration、hit-test、render/cancel/clear 与
 dispose）已抽取为 `src/main/browser-page-preload/annotation-surface-registry.ts`，
 由 9 项行为断言覆盖。
