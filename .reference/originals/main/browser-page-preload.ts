@@ -23337,24 +23337,7 @@ function ov(e, t, n, r) {
 var sv = o(() => {
   (X_(), wd(), tl(), td(), z_());
 });
-function cv(e) {
-  var t,
-    n,
-    r = ``;
-  if (typeof e == `string` || typeof e == `number`) r += e;
-  else if (typeof e == `object`) {
-    if (Array.isArray(e)) {
-      var i = e.length;
-      for (t = 0; t < i; t++) e[t] && (n = cv(e[t])) && (r && (r += ` `), (r += n));
-    } else for (n in e) e[n] && (r && (r += ` `), (r += n));
-  }
-  return r;
-}
-function lv() {
-  for (var e, t, n = 0, r = ``, i = arguments.length; n < i; n++)
-    (e = arguments[n]) && (t = cv(e)) && (r && (r += ` `), (r += t));
-  return r;
-}
+var { annotationClassNames: lv } = require("./browser-page-preload/annotation-class-names");
 var uv = o(() => {}),
   dv,
   fv,
