@@ -6,6 +6,9 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-app-initial-select-writable-configuration-layer.mjs`](./test-app-initial-select-writable-configuration-layer.mjs)
+- [`test-worker-git-read-request-dispatch.mjs`](./test-worker-git-read-request-dispatch.mjs)
+
 - [`test-app-initial-create-command-query-key.mjs`](./test-app-initial-create-command-query-key.mjs)
 - [`test-worker-git-review-search-utils.mjs`](./test-worker-git-review-search-utils.mjs)
 
