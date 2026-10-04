@@ -13,6 +13,7 @@ const appshotShortcut = require("./main-app/hotkey/appshot-shortcut.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
 const windowAppearance = require("./main-app/window-appearance.js");
 const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
+const openPathArguments = require("./main-app/files/open-path-arguments.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -12852,102 +12853,12 @@ var Foe = class {
         }));
     }
   },
-  xl = [
-    {
-      displayName: `CSV`,
-      extension: `csv`,
-      mimeType: `text/csv`,
-      macOSContentType: `public.comma-separated-values-text`,
-      windowsAssociation: `open-with-only`,
-    },
-    {
-      displayName: `DOCX`,
-      extension: `docx`,
-      mimeType: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`,
-      windowsAssociation: `open-with-only`,
-    },
-    {
-      displayName: `PPTX`,
-      extension: `pptx`,
-      mimeType: `application/vnd.openxmlformats-officedocument.presentationml.presentation`,
-      windowsAssociation: `open-with-only`,
-    },
-    {
-      displayName: `TSV`,
-      extension: `tsv`,
-      mimeType: `text/tab-separated-values`,
-      macOSContentType: `public.tab-separated-values-text`,
-      windowsAssociation: `open-with-only`,
-    },
-    {
-      displayName: `XLS`,
-      extension: `xls`,
-      mimeType: `application/vnd.ms-excel`,
-      windowsAssociation: `open-with-only`,
-    },
-    {
-      displayName: `XLSM`,
-      extension: `xlsm`,
-      mimeType: `application/vnd.ms-excel.sheet.macroEnabled.12`,
-      windowsAssociation: `open-with-only`,
-    },
-    {
-      displayName: `XLSX`,
-      extension: `xlsx`,
-      mimeType: `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`,
-      windowsAssociation: `open-with-only`,
-    },
-    {
-      advertiseOnLinux: !1,
-      displayName: `Codex Skill`,
-      extension: `skill`,
-      macOSContentType: `com.openai.codex.skill`,
-      macOSHandlerRank: `Owner`,
-      mimeType: `application/vnd.openai.codex.skill`,
-      windowsAssociation: `default-eligible`,
-    },
-  ],
-  Ioe = xl.map(({ extension: e }) => `.${e}`);
-xl.flatMap(({ advertiseOnLinux: e, mimeType: t }) => (e === !1 ? [] : [t]));
-var Loe = new Set(Ioe);
-function Sl(e) {
-  return Loe.has(h.extname(e).toLowerCase());
-}
-function Cl(e, t = process.platform) {
-  let n = [];
-  for (let r = 1; r < e.length; r += 1) {
-    let i = e[r];
-    if (i == null || i.length === 0) continue;
-    if (i === `--open-project`) {
-      r += 1;
-      continue;
-    }
-    if (i.startsWith(`--open-project=`) || i.startsWith(`-`) || zoe(i)) continue;
-    let a = Boe(i);
-    a != null && Voe(a, t) && Sl(a) && n.push(a);
-  }
-  return n;
-}
-function Roe(e) {
-  let t = [],
-    n = new Set();
-  for (let r of e) n.has(r) || (n.add(r), t.push({ label: h.basename(r), path: r, fsPath: r }));
-  return t;
-}
-function zoe(e) {
-  return e.toLowerCase().startsWith(`codex://`);
-}
-function Boe(e) {
-  if (!e.toLowerCase().startsWith(`file://`)) return e;
-  try {
-    return (0, c.fileURLToPath)(e);
-  } catch {
-    return null;
-  }
-}
-function Voe(e, t) {
-  return t === `win32` ? h.win32.isAbsolute(e) : h.posix.isAbsolute(e);
-}
+  Sl = openPathArguments.isOpenableFilePath,
+  Cl = openPathArguments.collectOpenableFileArguments,
+  Roe = openPathArguments.createOpenFileDescriptors,
+  zoe = openPathArguments.isCodexDeepLink,
+  Boe = openPathArguments.normalizeFileArgument,
+  Voe = openPathArguments.isAbsoluteForPlatform;
 var Hoe = `CODEX_ELECTRON_DEV_PARENT_PID`,
   Uoe = `CODEX_ELECTRON_DEV_WEBVIEW_PID`,
   Woe = `CODEX_ELECTRON_DEV_RELAUNCH_MARKER_PATH`,
