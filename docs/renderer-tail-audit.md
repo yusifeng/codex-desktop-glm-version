@@ -624,3 +624,6 @@ hub audit 校验，focused suite 已锁定 10 个 alias 仍属于 unconsumed sur
 本轮再补充 app-primary 项目下拉初始化边界：`e9`（公开别名 `M`，114056--114073 行）
 注册项目下拉查询、JSX 与本地项目选项依赖，顺序由相邻 dropdown controller 生命周期持有，
 没有独立 renderer named consumer 或 teardown 契约，因此继续保留在聚合 hub。
+同时登记 `e_t`（公开别名 `E`，114488--114889 行）的 home starter surface；它组合 starter
+prompt、temporary-chat 与 business-agent 分支，回调和子树均由相邻 home route 持有，没有独立
+renderer consumer 或 teardown 边界。

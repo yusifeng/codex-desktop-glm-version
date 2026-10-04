@@ -561,5 +561,11 @@
     "classification": "generated-local-project-dropdown-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer registers project-dropdown query, JSX and local project option dependencies before the adjacent dropdown controller mounts. Its dependency order is owned by the generated route and has no independently consumed renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "E", "sourceSymbol": "e_t", "startLine": 114488, "endLine": 114889,
+    "classification": "generated-local-home-starter-surface",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component composes home starter prompts, temporary-chat messaging and business-agent branches through adjacent generated route state. Its callbacks and child surfaces are owned by the home route and do not expose an independent renderer consumer or teardown boundary."
   }
 ]
