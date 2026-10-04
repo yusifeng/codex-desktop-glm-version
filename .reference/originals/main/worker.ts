@@ -39,6 +39,7 @@ const { getDefaultBranchForRemote: getDefaultBranchForRemoteQuery, getDefaultRem
 const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./worker/git-ref-resolution");
 const { GitMetadataResolutionError, resolveGitCommonDir: resolveGitCommonDirQuery, resolveGitRoot: resolveGitRootQuery, resolveGitRootAndCommonDir: resolveGitRootAndCommonDirQuery } = require("./worker/git-root-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
+const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
 const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
@@ -339,6 +340,11 @@ const gitRepositoryIdentityDeps = {
   queryKey: (...args) => Q(...args),
   runGit: (...args) => $(...args),
   staleTime: Infinity,
+};
+const gitRepositorySizeDeps = {
+  getQueryMeta: () => _1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
 };
 const gitSubmodulePathsDeps = {
   awaitAbortable: (...args) => yR(...args),
@@ -66882,8 +66888,7 @@ function g0(e) {
     ? { type: `diff-too-large`, limitBytes: e.outputLimitExceeded.limitBytes }
     : { type: `unknown` };
 }
-var Dpe = 209715200,
-  _0 = 33554432,
+var _0 = 33554432,
   kpe = 67108864,
   Ape = [
     `-c`,
@@ -67868,59 +67873,6 @@ async function lhe(e, t, n) {
       .padStart(4, `0`);
     a = r.join(r.dirname(e), `${i}-${s}`);
   }
-}
-function q2(e) {
-  if (e < 1024) return `${e} B`;
-  let t = [`KB`, `MB`, `GB`, `TB`],
-    n = e / 1024,
-    r = 0;
-  for (; n >= 1024 && r < t.length - 1;) ((n /= 1024), (r += 1));
-  return `${n.toFixed(1)} ${t[r]}`;
-}
-async function uhe(e, t, n) {
-  let r = await $(e, t, n);
-  if (!r.success) {
-    let e = r.stderr || r.stdout;
-    throw Error(`git ${t.join(` `)} failed${e ? `: ${e}` : ``}`);
-  }
-  return r.stdout;
-}
-function dhe(e) {
-  let t = new Map();
-  for (let n of e.split(/\r?\n/)) {
-    let e = n.trim();
-    if (!e) continue;
-    let [r, i] = e.split(`:`);
-    if (!r || i == null) continue;
-    let a = Number.parseInt(i.trim(), 10);
-    Number.isFinite(a) && t.set(r, a);
-  }
-  return t;
-}
-async function fhe(e, t, n) {
-  let r = dhe(typeof e == `string` ? await mhe(e, n) : await phe(e)),
-    i = ((r.get(`size`) ?? 0) + (r.get(`size-pack`) ?? 0)) * 1024;
-  if (i > t) throw Error(`Repository is too large (${q2(i)}). Maximum allowed size is ${q2(t)}.`);
-}
-function phe(e) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `count-objects`),
-    gcTime: 250,
-    meta: _1,
-    queryFn: async () => {
-      let t = await $(e.root, [`count-objects`, `-v`], e.host);
-      if (!t.success) {
-        let e = t.stderr || t.stdout;
-        throw Error(`git count-objects -v failed${e ? `: ${e}` : ``}`);
-      }
-      return t.stdout;
-    },
-    staleTime: 250,
-  });
-}
-function mhe(e, t) {
-  if (t == null) throw Error(`host is required for raw Git roots`);
-  return uhe(e, [`count-objects`, `-v`], t);
 }
 async function J2(e, t = !0, n, r) {
   let i;
@@ -72820,7 +72772,12 @@ async function Obe(e, t) {
   let { host: n } = e;
   if (!n.isLocal) throw Error(`Cannot create a worktree snapshot on a remote host`);
   let r = e.root;
-  await fhe(e, Dpe);
+  await assertRepositorySize(
+    e,
+    MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES,
+    void 0,
+    gitRepositorySizeDeps,
+  );
   let i = (0, g.basename)(r) || `repo`,
     [a, o, s] = await Promise.all([resolveGitRefSha(e, `HEAD`), getCurrentGitBranch(e), kbe(e)]);
   if (a == null) throw Error(`Cannot create a worktree snapshot without a HEAD commit`);

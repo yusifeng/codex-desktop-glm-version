@@ -604,6 +604,13 @@ Worktree create 的 `AGENTS.override.md`、`.worktreeinclude` 和选中 local-en
 `W2`/`G2`/`K2` 及 `R2`/`z2`/`rhe` 专用常量已删除；模块保留 symlink 路径拒绝、exclusive copy、
 16 并发、ignored/tracked 判定与 remote host 回退，由 43 项独立模块断言覆盖。
 
+### 增量抽取：Repository size guard
+
+Worktree snapshot 的 repository size guard 已迁移至 `src/main/worker/git-repository-size.ts`：
+`count-objects -v` 的 raw-root/250ms query 两条读取路径、输出解析、字节格式化和 200 MiB 上限均由
+语义模块持有。原 `q2`/`uhe`/`dhe`/`fhe`/`phe`/`mhe` 与 `Dpe` 常量已删除，snapshot 消费者注入
+现有 query/runGit 能力，由 25 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
