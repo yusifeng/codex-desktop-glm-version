@@ -659,6 +659,9 @@ Git read-only request dispatch 的 `origin-url`、`origin-and-roots`、`worktree
 `worktree-owner`、`default-remote-branch` 与 `merge-base` 分支已全部接入
 `src/main/worker/git-read-request-dispatch.ts`，由 8 项 focused assertions 覆盖；入口继续负责
 取消/性能追踪、Git I/O、class 生命周期与响应包装。
+Git branch read request family 已新增 `src/main/worker/git-branch-read-dispatch.ts`，先将
+`current-branch` 分支接入入口 dispatcher；由 7 项 focused assertions 覆盖，其他 branch-read
+分支仍保留原入口副作用边界并继续迁移。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
