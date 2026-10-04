@@ -173802,19 +173802,10 @@ function P9(e, t) {
   return !!e.startsWith(r);
 }
 function nst(e) {
-  try {
-    let t = new URL(e);
-    return t.protocol === `app:` ? t.host === `-` || t.host === `` : !1;
-  } catch {
-    return !1;
-  }
+  return mainUrlTrust.isAppFrameUrl(e);
 }
 function F9(e) {
-  try {
-    return new URL(e).protocol === `app:`;
-  } catch {
-    return !1;
-  }
+  return mainUrlTrust.isAppProtocolUrl(e);
 }
 function I9(e) {
   return windowAppearance.isOverlayAppearance(e);

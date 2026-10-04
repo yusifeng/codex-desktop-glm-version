@@ -13,6 +13,15 @@ export function parseUrl(value: string): URL | null {
   }
 }
 
+export function isAppFrameUrl(value: string): boolean {
+  const parsed = parseUrl(value);
+  return parsed?.protocol === "app:" && (parsed.host === "-" || parsed.host === "");
+}
+
+export function isAppProtocolUrl(value: string): boolean {
+  return parseUrl(value)?.protocol === "app:";
+}
+
 /** Match the original MH predicate: only HTTP(S) URLs participate in origin checks. */
 function hasOrigin(value: string): boolean {
   try {
@@ -68,3 +77,5 @@ export function sameAppPath(value: string, target: string): boolean {
 export function sameTrustedPath(value: string, target: string, origin: string | null): boolean {
   return (origin != null && samePathOnOrigin(value, target, origin)) || sameAppPath(value, target) || sameFilePath(value, target);
 }
+
+if (typeof module !== "undefined") module.exports = { isAppFrameUrl, isAppProtocolUrl, parseUrl, sameAppPath, sameFilePath, sameOrigin, samePathOnOrigin, sameTrustedPath };

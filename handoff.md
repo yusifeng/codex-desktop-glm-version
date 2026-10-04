@@ -638,3 +638,5 @@ Annotation text input target 的 `HTMLInputElement` 类型白名单与 textarea 
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。
+main 的 app 协议 URL frame/protocol 判定（原 `nst/F9`）已迁移至
+`src/main/main-app/util/url-trust.ts`，由 URL trust focused suite 新增 5 项断言覆盖。
