@@ -331,6 +331,8 @@ preload annotation overlay 的 loopback/localhost URL 安全策略已抽取为
 `src/main/browser-page-preload/local-url.ts`，由 9 项行为断言覆盖；
 preload 的 WebMCP registry shim 已抽取为
 `src/main/browser-page-preload/webmcp-registry.ts`；旧压缩实现已物理删除，并由 9 项行为断言覆盖；main
+preload 的 WebMCP descriptor 序列化与数量/字节限制已抽取为
+`src/main/browser-page-preload/webmcp-descriptor.ts`，由 5 项行为断言覆盖。
 窗口外观策略已抽取为 `src/main/main-app/window-appearance.ts`，并包含 traffic-light
 geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation surface
 协议 schema 已抽取为 `src/main/browser-page-preload/annotation-protocol.ts`，由 6 项
@@ -424,7 +426,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 705 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 706 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---

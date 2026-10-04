@@ -1,4 +1,5 @@
 export {};
+const { createWebMcpDescriptorSerializer } = require(`./webmcp-descriptor`);
 
 /**
  * The WebMCP page bridge used by the browser-page preload.
@@ -37,10 +38,6 @@ type WebMcpProtocolDependencies = {
   modelContextProperty: string;
 };
 
-function descriptorByteSize(value: unknown): number {
-  return new TextEncoder().encode(JSON.stringify(value)).byteLength;
-}
-
 function installWebMcpProtocol(deps: WebMcpProtocolDependencies): void {
   const { electron, createRegistry, zod } = deps;
   const annotationsSchema = zod.object({
@@ -63,32 +60,6 @@ function installWebMcpProtocol(deps: WebMcpProtocolDependencies): void {
     .extend({ inputSchema: descriptorSchema.shape.input_schema, name: descriptorSchema.shape.name.min(1) })
     .array();
   const changedEvent = deps.webmcpChangedEvent;
-
-  function serializeDescriptors(value: unknown[], limits: { maxTools: number; maxTotalDescriptorBytes: number }): unknown[] | null {
-    if (value.length === 0 || value.length > limits.maxTools) return value.length === 0 ? [] : null;
-    const parsed = descriptorForPageSchema.safeParse(value);
-    if (!parsed.success) return null;
-    let bytes: number;
-    try {
-      bytes = descriptorByteSize(parsed.data);
-    } catch {
-      return null;
-    }
-    return bytes <= limits.maxTotalDescriptorBytes ? parsed.data : null;
-  }
-
-  function collectDescriptors(value: unknown[], limits: { maxTools: number; maxTotalDescriptorBytes: number }): unknown[] {
-    if (value.length > limits.maxTools) return [];
-    return (
-      serializeDescriptors(
-        value.map((descriptor: any) => ({
-          ...descriptor,
-          inputSchema: descriptor.inputSchema == null ? null : JSON.parse(descriptor.inputSchema),
-        })),
-        limits,
-      ) ?? []
-    );
-  }
 
   function initialize(): void {
     if (
@@ -121,7 +92,11 @@ function installWebMcpProtocol(deps: WebMcpProtocolDependencies): void {
           const policy = electron.ipcRenderer.sendSync(deps.policyChannel);
           electron.ipcRenderer.send(deps.pageEventChannel, {
             ...changedEvent,
-            payload: { tools: policy.enabled ? collectDescriptors(tools, policy.limits) : [] },
+            payload: {
+              tools: policy.enabled
+                ? createWebMcpDescriptorSerializer({ descriptorForPageSchema, ...policy.limits }).collectDescriptors(tools)
+                : [],
+            },
           });
         })
         .finally(() => {

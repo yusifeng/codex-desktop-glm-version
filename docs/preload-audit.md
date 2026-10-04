@@ -23,6 +23,11 @@ WebMCP registry shim（原 27,295-27,470 行）已迁移至
 模块；注册、枚举、stale registration、AbortSignal、JSON 输入/结果校验由
 `scripts/test-preload-webmcp-registry.mjs` 覆盖。
 
+WebMCP descriptor 序列化与 descriptor 总大小/数量限制（原 30,084-30,129 行）已迁移至
+`src/main/browser-page-preload/webmcp-descriptor.ts`，由协议入口注入 schema 与 policy
+limits；`scripts/test-preload-webmcp-descriptor.mjs` 覆盖 schema 拒绝、inputSchema
+JSON round-trip、工具数量与字节大小边界，共 5 项断言。
+
 Annotation surface channel、feature 列表、role/id/rect/hit/response schemas
 （原 6,432-6,508 行）已迁移至 `src/main/browser-page-preload/annotation-protocol.ts`。
 该模块通过入口现有 schema factory 注入，原 `qd/Wd/Jd/Yd/Xd` 绑定接回；
