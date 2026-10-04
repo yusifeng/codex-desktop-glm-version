@@ -382,3 +382,9 @@ typed query contract 后再迁移。
 预处理、directive extensions 与 AST 渲染，再做空白归一化。plan consumer 依赖这些
 markdown 语义，故登记为 `markdown-runtime`，待先定义稳定的 title normalization
 contract 后再迁移。
+
+本轮继续处理 `sandbox-url` 簇：`native-code-execution-sandbox` 原先从
+`@rchunk/app-shared` 取得 `KH`/`YH`（`createSandboxPartition` 与初始化钩子），现已
+直接导入 `src/renderer/app-shared/runtime/sandbox-url.ts` 的语义实现。该切换覆盖真实
+sandbox consumer，保留同一 partition 格式与初始化行为；既有 sandbox URL focused
+suite 另增加 consumer import 边界断言。

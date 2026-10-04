@@ -1,10 +1,25 @@
 import assert from "node:assert/strict";
 import { Buffer } from "node:buffer";
 import path from "node:path";
+import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const nativeSandboxSource = fs.readFileSync(
+  path.join(ROOT, "src/renderer/native-code-execution-sandbox/index.ts"),
+  "utf8",
+);
+assert.match(
+  nativeSandboxSource,
+  /from "\.\.\/app-shared\/runtime\/sandbox-url"/,
+  "native sandbox consumer uses the semantic sandbox URL module",
+);
+assert.doesNotMatch(
+  nativeSandboxSource,
+  /KH as createSandboxPartition|YH as initializeSandboxUrls/,
+  "native sandbox consumer does not import sandbox URL helpers from the hub",
+);
 const result = await esbuild.build({
   entryPoints: [
     path.join(ROOT, "src/renderer/app-shared/runtime/sandbox-url.ts"),

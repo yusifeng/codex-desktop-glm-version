@@ -1,9 +1,9 @@
 // Native code-execution sandbox connector. Release chunk: native-code-execution-sandbox-fa3ec5081637.js.
 import "@rchunk/rolldown-runtime";
 import {
-  KH as createSandboxPartition,
-  YH as initializeSandboxUrls,
-} from "@rchunk/app-shared";
+  createSandboxPartition,
+  initializeSandboxUrls,
+} from "../app-shared/runtime/sandbox-url";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as sandboxConnectionChunk from "@rchunk/code-execution-sandbox-connection";
 
