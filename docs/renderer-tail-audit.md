@@ -441,3 +441,11 @@ hub 的 UI 注册副作用。`conversation-followup-shelf` 新增可选的
 路径及其子路径；站点浏览器真实 consumer 已切换语义导入，初始化入口仍保留原
 `Sf` 以维持 hub 的启动契约。`scripts/test-app-primary-is-site-url-match.mjs`
 覆盖主机别名、尾斜杠、路径前缀边界、非法 URL 与端口隔离共 5 项断言。
+
+本轮再将 app-primary 的纯预填插件 mention helper `I7`（公开别名 `Rf`）迁为
+`src/renderer/app-primary/runtime/create-prefilled-plugin-prompt.ts` 的
+`createPrefilledPluginPrompt`。它只拼接 `plugin://` mention URL、按原实现转义
+反斜杠和右括号，并裁剪可选 prompt；`computer-history-suggestion-prompt` 已切换
+到语义导入，保留 `Bf` 初始化器所需的 hub 生命周期。由
+`scripts/test-app-primary-create-prefilled-plugin-prompt.mjs` 的 3 项断言覆盖
+插件 ID 空白、Markdown 转义与空 prompt 边界。

@@ -8,7 +8,8 @@ import {
   oq as computerHistoryPluginVersion,
   wL as initializePlugins,
 } from "@rchunk/app-shared";
-import { Bf as initializePrefilledPrompt, Rf as createPrefilledPluginPrompt } from "@rchunk/app-primary";
+import { Bf as initializePrefilledPrompt } from "@rchunk/app-primary";
+import { createPrefilledPluginPrompt } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 
 export interface ComputerHistorySuggestion {
   type: "skill" | "automation";

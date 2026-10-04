@@ -16,3 +16,9 @@ node scripts/audit-renderer-hub-classification.mjs --list
 
 截至本记录，审计结果为 `app-primary: 3/914 consumed`；`vm` 仍位于
 `unconsumed` 集合中，但其实现已有语义源码归属，由 5 项行为断言覆盖。
+
+本轮进一步抽出 app-primary `I7`（公开别名 `Rf`）的纯预填插件 mention helper，
+实现落在 `src/renderer/app-primary/runtime/create-prefilled-plugin-prompt.ts`，
+真实 consumer `computer-history-suggestion-prompt` 已切换语义导入；`Bf` 初始化器
+仍保留在 hub 以维持预填 prompt runtime 的初始化顺序。测试
+`scripts/test-app-primary-create-prefilled-plugin-prompt.mjs` 覆盖 3 项契约。
