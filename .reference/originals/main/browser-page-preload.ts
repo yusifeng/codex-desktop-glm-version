@@ -22823,6 +22823,7 @@ function markerViewStateDeps() {
     resolveLiveElement: (anchor, id) => sd(anchor, void 0, id),
     readCardViewportRect: o_,
     readCommentTheme: (comment) => comment?.themeVariant,
+    projectAdditionalAnchor: (selection, viewportSize) => q_(selection, viewportSize),
   };
 }
 function B_(e, t, n) {

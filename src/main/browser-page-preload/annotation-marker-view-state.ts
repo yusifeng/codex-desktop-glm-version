@@ -12,6 +12,7 @@ export type MarkerViewStateDependencies = {
   resolveLiveElement: (anchor: any, id?: string) => any;
   readCardViewportRect?: (rect: any, options: any) => any;
   readCommentTheme?: (comment: any) => unknown;
+  projectAdditionalAnchor?: (selection: any, viewportSize: any) => any;
 };
 
 function base(anchor: any, zoomFactor: number, themeVariant: unknown, deps: MarkerViewStateDependencies, additionalAnchors?: any[]) {
@@ -46,13 +47,13 @@ export function projectAnnotationMarkerViewState(annotation: any, zoomFactor: nu
 export function projectAnnotationDraftViewState(value: any, zoomFactor: number, viewportScale: number | undefined, deps: MarkerViewStateDependencies) {
   const anchorValue = value.anchor.value;
   if (value.anchor.type === `text`) return deps.resolveTextAnchor(anchorValue, value.anchor.themeVariant) ?? base(anchorValue, zoomFactor, value.anchor.themeVariant, deps);
-  if (value.anchor.type === `region` || value.anchor.type === `virtual`) return base(anchorValue, zoomFactor, value.anchor.themeVariant, deps, value.anchor.additionalSelections?.map((selection: any) => selection));
+  if (value.anchor.type === `region` || value.anchor.type === `virtual`) return base(anchorValue, zoomFactor, value.anchor.themeVariant, deps, value.anchor.additionalSelections?.map((selection: any) => deps.projectAdditionalAnchor?.(selection, deps.readViewportSize()) ?? selection));
   const element = value.anchor.element && deps.isElementConnected(value.anchor.element) ? value.anchor.element : null;
   const viewportSize = deps.readViewportSize();
   const resolved = element == null ? anchorValue : deps.refreshElementAnchor(element, anchorValue, viewportSize);
   return {
     anchor: resolved,
-    additionalAnchors: (value.anchor.additionalSelections ?? []).map((selection: any) => selection),
+    additionalAnchors: (value.anchor.additionalSelections ?? []).map((selection: any) => deps.projectAdditionalAnchor?.(selection, viewportSize) ?? selection),
     cardViewportRect: value.target.mode === `design` && value.anchor.cardViewportRect == null && deps.readCardViewportRect != null && deps.readElementRect(element) != null
       ? deps.readCardViewportRect(deps.readElementRect(element), { viewportScale, zoomFactor })
       : value.target.mode === `design` ? value.anchor.cardViewportRect : undefined,
@@ -68,13 +69,13 @@ export function projectAnnotationCommentViewState(value: any, comments: any[], e
   if (comment == null) return null;
   const themeVariant = deps.readCommentTheme?.(comment) ?? comment.themeVariant ?? value.anchor.themeVariant;
   if (value.anchor.type === `text`) return deps.resolveTextAnchor(value.anchor.value, themeVariant) ?? base(value.anchor.value, zoomFactor, themeVariant, deps);
-  if (value.anchor.type === `region` || value.anchor.type === `virtual`) return base(value.anchor.value, zoomFactor, themeVariant, deps, value.anchor.additionalSelections);
+  if (value.anchor.type === `region` || value.anchor.type === `virtual`) return base(value.anchor.value, zoomFactor, themeVariant, deps, value.anchor.additionalSelections?.map((selection: any) => deps.projectAdditionalAnchor?.(selection, deps.readViewportSize()) ?? selection));
   const element = suppliedLiveElement ?? deps.resolveLiveElement(value.anchor.value, elementId);
   const viewportSize = deps.readViewportSize();
   const resolved = element == null ? value.anchor.value : deps.refreshElementAnchor(element, value.anchor.value, viewportSize, value.anchor.markerViewportPoint);
   return {
     anchor: resolved,
-    additionalAnchors: value.anchor.additionalSelections?.length ? value.anchor.additionalSelections : undefined,
+    additionalAnchors: value.anchor.additionalSelections?.length ? value.anchor.additionalSelections.map((selection: any) => deps.projectAdditionalAnchor?.(selection, viewportSize) ?? selection) : undefined,
     themeVariant,
     viewportRect: element == null ? deps.readViewportRect(resolved) : deps.readElementRect(element),
     viewportPoint: deps.resolveMarkerPoint(resolved, zoomFactor),
