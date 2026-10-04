@@ -124,6 +124,7 @@ const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
+const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69832,7 +69833,7 @@ var I6 = kW(`git`),
             p = X(await this.dependencies.requestGitHub(e.params, i.signal));
             break;
           case `origin-url`: {
-            p = X(await resolveOriginUrl(e.params.cwd, readRequestDeps));
+            p = X(await dispatchReadOnlyGitRequest(e.method, e.params, { ...readRequestDeps, resolveOriginUrl: (cwd) => resolveOriginUrl(cwd, readRequestDeps), resolveOrigins: (dirs) => resolveOrigins(dirs, readRequestDeps), resolveShellEnvironment: (cwd, signal) => resolveShellEnvironment(cwd, signal, readRequestDeps), resolveWorktreeOwner: (cwd) => resolveWorktreeOwner(cwd, readRequestDeps), resolveDefaultRemoteBranch: (cwd) => resolveDefaultRemoteBranch(cwd, readRequestDeps), resolveMergeBase: (cwd, base) => resolveMergeBase(cwd, base, readRequestDeps), signal: i.signal }));
             break;
           }
           case `origin-and-roots`:

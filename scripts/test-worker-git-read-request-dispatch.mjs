@@ -1,0 +1,17 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-read-request-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchReadOnlyGitRequest } = module.exports; const calls = [];
+const deps = { signal: "signal", resolveOriginUrl: (...a) => (calls.push(["origin-url", ...a]), "url"), resolveOrigins: (...a) => (calls.push(["origins", ...a]), "roots"), resolveShellEnvironment: (...a) => (calls.push(["shell", ...a]), "env"), resolveWorktreeOwner: (...a) => (calls.push(["owner", ...a]), "owner"), resolveDefaultRemoteBranch: (...a) => (calls.push(["default", ...a]), "branch"), resolveMergeBase: (...a) => (calls.push(["merge", ...a]), "base") };
+assert.equal(await dispatchReadOnlyGitRequest("origin-url", { cwd: "/repo" }, deps), "url");
+assert.equal(await dispatchReadOnlyGitRequest("origin-and-roots", { discoveryDirs: ["/a"] }, deps), "roots");
+assert.equal(await dispatchReadOnlyGitRequest("worktree-shell-environment", { cwd: "/repo" }, deps), "env");
+assert.equal(await dispatchReadOnlyGitRequest("worktree-owner", { cwd: "/repo" }, deps), "owner");
+assert.equal(await dispatchReadOnlyGitRequest("default-remote-branch", { cwd: "/repo" }, deps), "branch");
+assert.equal(await dispatchReadOnlyGitRequest("merge-base", { cwd: "/repo", baseBranch: "main" }, deps), "base");
+assert.equal(await dispatchReadOnlyGitRequest("unknown", {}, deps), undefined);
+assert.deepEqual(calls[2], ["shell", "/repo", "signal"]);
+console.log("worker Git read request dispatch tests passed (8 assertions)");
