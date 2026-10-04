@@ -478,7 +478,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 816 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 817 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -560,7 +560,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 816 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 817 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5，已完成）
@@ -790,3 +790,7 @@ main worker session 的 `V9` 非空对象判定已并入
 main renderer 的 dev-origin、app/file webview entry 与 sender-frame trust 判定已迁移至
 `src/main/main-app/window/renderer-frame-trust.ts`；入口保留 Electron sender/moduleDir 适配，
 由 11 项 focused assertions 覆盖 URL、origin、frame identity 与 file entry 边界。
+
+Annotation design draft target 收集与缓存（原 `Jv` 23394-23413）已迁移至
+`src/main/browser-page-preload/annotation-draft-runtime.ts`，入口保留 draft attribute
+写回和 DOM 清理副作用；由 4 项行为断言覆盖 target 聚合、frame/page 过滤和 cache 复用。

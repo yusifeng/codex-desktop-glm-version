@@ -6258,6 +6258,7 @@ var { createAnnotationPreviewVisibilityPredicate } = require("./browser-page-pre
 var { createAnnotationRequestContext } = require("./browser-page-preload/annotation-request-context");
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
+var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annotation-draft-runtime");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23392,23 +23393,15 @@ function qv(e, t) {
   (n.add(t), e.setAttribute(ry, Array.from(n).join(` `)));
 }
 function Jv(e, t, n) {
-  let r = new Map();
-  for (let i of t) {
-    if (
-      !md(i.anchor.pageUrl, window.location.href) ||
-      i.anchor.kind !== `element` ||
-      i.anchor.selector == null ||
-      Dc(i.anchor.framePath) !== e
-    )
-      continue;
-    let t = n.get(i.id),
-      a = t?.isConnected && t.ownerDocument === e ? t : ud(e, i.anchor);
-    if (a != null) {
-      n.set(i.id, a);
-      let e = r.get(a) ?? new Set();
-      (e.add(i.draftAttribute), r.set(a, e));
-    }
-  }
+  let r = collectAnnotationDraftAttributes(t, n, {
+    currentPageUrl: window.location.href,
+    resolveFrameDocument: Dc,
+    isSamePageUrl: md,
+    resolveTarget: (t, n) => ud(t, n.anchor),
+    isConnected: (e) => e?.isConnected === !0,
+    getOwnerDocument: (e) => e?.ownerDocument,
+    documentRef: e,
+  });
   for (let t of e.querySelectorAll(`[${ry}]`)) F(t) && (ty(t, r.get(t)), r.delete(t));
   for (let [e, t] of r) ty(e, t);
 }

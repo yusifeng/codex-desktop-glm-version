@@ -248,6 +248,13 @@ Annotation design draft text 的最新变更选择（原 `Zv` 23790-23796）已�
 `src/main/browser-page-preload/annotation-draft-text.ts`；入口保留 DOM 更新副作用，
 由 `scripts/test-preload-annotation-draft-text.mjs` 覆盖空输入、未变化项、倒序选择与缺失 previous 值。
 
+Annotation design draft target 收集与缓存（原 `Jv` 23394-23413）已迁移至
+`src/main/browser-page-preload/annotation-draft-runtime.ts`；入口保留 draft attribute
+写回和已存在 DOM 节点清理，模块注入 frame/document、URL、target resolver 与连接状态
+适配器，维持跨 frame/page 过滤、target cache 复用及同一元素多 draft attribute 合并。
+由 `scripts/test-preload-annotation-draft-runtime.mjs` 覆盖 target 聚合、frame/page
+过滤和 cache 复用，共 4 项行为断言。
+
 Annotation design draft attribute token 解析（原 `ny` 23797-23802）已迁移至
 `src/main/browser-page-preload/annotation-attribute-tokens.ts`；入口保留属性读写副作用，
 由 `scripts/test-preload-annotation-attribute-tokens.mjs` 覆盖缺失、空值与多空白 token。
