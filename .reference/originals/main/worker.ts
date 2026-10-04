@@ -133,6 +133,7 @@ const { dispatchWorktreeReadRequest } = require("./worker/git-worktree-read-disp
 const { dispatchRepositoryContentRequest } = require("./worker/git-repository-content-dispatch");
 const { dispatchSyncedBranchRequest } = require("./worker/git-synced-branch-dispatch");
 const { dispatchCacheWatchRequest } = require("./worker/git-cache-watch-dispatch");
+const { dispatchGitApplyRequest } = require("./worker/git-apply-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -70154,17 +70155,17 @@ var I6 = kW(`git`),
             p = X(await cleanupHostHandoffTransfer(e.params, worktreeRequestDeps));
             break;
           case `apply-changes`: {
-            let t = await applyGitChanges(e.params, applyRequestDeps);
+            let t = await dispatchGitApplyRequest(e.method, e.params, { applyChanges: (params) => applyGitChanges(params, applyRequestDeps), applyPatch: (params) => applyGitPatch(params, applyRequestDeps), applyReviewSectionChanges: (params) => applyGitReviewSectionChanges(params, applyRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `apply-patch`: {
-            let t = await applyGitPatch(e.params, applyRequestDeps);
+            let t = await dispatchGitApplyRequest(e.method, e.params, { applyChanges: (params) => applyGitChanges(params, applyRequestDeps), applyPatch: (params) => applyGitPatch(params, applyRequestDeps), applyReviewSectionChanges: (params) => applyGitReviewSectionChanges(params, applyRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `apply-review-section-changes`: {
-            let t = await applyGitReviewSectionChanges(e.params, applyRequestDeps);
+            let t = await dispatchGitApplyRequest(e.method, e.params, { applyChanges: (params) => applyGitChanges(params, applyRequestDeps), applyPatch: (params) => applyGitPatch(params, applyRequestDeps), applyReviewSectionChanges: (params) => applyGitReviewSectionChanges(params, applyRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
