@@ -843,3 +843,11 @@ Worktree 删除/恢复的 host+path 去重、删除 promise 清理，以及恢�
 方法匹配、`worktreesRoot` 转发及 `{ worktrees }` 响应 envelope，发现失败仍由入口保持原有错误映射。
 `scripts/test-worker-git-codex-worktree-dispatch.mjs` 覆盖成功结果、manager/host/root/signal 契约、
 未知方法旁路与发现失败传播，共 4 项断言。
+
+### 增量抽取：Worktree resolution request dispatch
+
+`resolve-worktree-for-thread` 的只读请求分派已迁移至
+`src/main/worker/git-worktree-resolution-dispatch.ts`。入口继续提供 Git manager、host、取消信号、
+managed-worktree discovery、thread config 与状态读取等窄依赖；语义模块仅负责方法匹配、参数转发和
+结果 envelope，保持原有工作区选择与未提交变更判定。`scripts/test-worker-git-worktree-resolution-dispatch.mjs`
+覆盖成功转发、参数保持及未知方法旁路，共 3 项断言。

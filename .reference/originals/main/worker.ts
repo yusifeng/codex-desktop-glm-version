@@ -143,6 +143,7 @@ const { dispatchCacheWatchRequest } = require("./worker/git-cache-watch-dispatch
 const { dispatchGitApplyRequest } = require("./worker/git-apply-dispatch");
 const { dispatchGitMutationRequest } = require("./worker/git-mutation-dispatch");
 const { dispatchWorktreeSnapshotRead } = require("./worker/git-worktree-snapshot-read-dispatch");
+const { dispatchWorktreeResolutionRequest } = require("./worker/git-worktree-resolution-dispatch");
 const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch");
 const { dispatchGitCoreRequest } = require("./worker/git-core-request-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
@@ -70162,20 +70163,22 @@ var I6 = kW(`git`),
             })).result);
             break;
           case `resolve-worktree-for-thread`:
-            p = X(await resolveWorktreeForThread(e.params, {
-              gitManager: this.gitManager,
-              host: o,
-              signal: i.signal,
-              getManagedWorktreeLocations: (host, worktreesRoot) =>
-                getManagedWorktreeLocations(host, worktreesRoot, managedWorktreeDiscoveryDeps),
-              getRootRelativeCwd: getGitRootRelativeCwd,
-              listWorktrees: $2,
-              readThreadConfig: p4,
-              getTrackedStatus: J2,
-              getUntrackedPaths: (e, t) => f2(e, void 0, void 0, t),
-              normalizeWorkspaceRoot: xz,
-              normalizeComparisonPath: I$,
-            }));
+            p = X((await dispatchWorktreeResolutionRequest(e.method, e.params, {
+              resolveWorktreeForThread: (params) => resolveWorktreeForThread(params, {
+                gitManager: this.gitManager,
+                host: o,
+                signal: i.signal,
+                getManagedWorktreeLocations: (host, worktreesRoot) =>
+                  getManagedWorktreeLocations(host, worktreesRoot, managedWorktreeDiscoveryDeps),
+                getRootRelativeCwd: getGitRootRelativeCwd,
+                listWorktrees: $2,
+                readThreadConfig: p4,
+                getTrackedStatus: J2,
+                getUntrackedPaths: (e, t) => f2(e, void 0, void 0, t),
+                normalizeWorkspaceRoot: xz,
+                normalizeComparisonPath: I$,
+              }),
+            })).result);
             break;
           case `worktree-snapshot-ref`:
             p = X(await dispatchWorktreeSnapshotRead(e.method, e.params, { snapshotRef: (roots, path) => resolveWorktreeSnapshot(roots, path, worktreeSnapshotDeps), managedState: (roots, cwd, path) => resolveManagedWorktreeState(roots, cwd, path, worktreeSnapshotDeps) }));
