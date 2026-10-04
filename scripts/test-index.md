@@ -19,6 +19,7 @@ Total scripts: 872.
 - [`test-preload-annotation-sync-state.mjs`](./test-preload-annotation-sync-state.mjs)
 - [`test-worker-git-live-query-handler.mjs`](./test-worker-git-live-query-handler.mjs)
 - [`test-worker-git-live-query-events.mjs`](./test-worker-git-live-query-events.mjs)
+- [`test-preload-annotation-overlay-observer.mjs`](./test-preload-annotation-overlay-observer.mjs)
 - [`test-worker-git-live-query-refresh.mjs`](./test-worker-git-live-query-refresh.mjs)
 - [`test-worker-git-live-query-run-coordinator.mjs`](./test-worker-git-live-query-run-coordinator.mjs)
 - [`test-worker-git-live-query-branch-dependency.mjs`](./test-worker-git-live-query-branch-dependency.mjs)
