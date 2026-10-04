@@ -74,6 +74,7 @@ const { completeTurnDiffCapture: performCompleteTurnDiffCapture, startTurnDiffCa
 const { readThreadConfig, setWorktreeOwnerThread } = require("./worker/git-thread-config");
 const { resolveWorktreeForThread } = require("./worker/git-worktree-resolution");
 const { formatLocalBranchRef: formatLocalBranchRefQuery, resolveWorktreeStartingRef: resolveGitWorktreeStartingRefQuery } = require("./worker/git-worktree-starting-ref");
+const { resolveWorktreeStartingState: resolveGitWorktreeStartingStateQuery } = require("./worker/git-worktree-starting-state");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
@@ -157,6 +158,40 @@ const gitWorktreeStartingRefDeps = {
 const formatLocalBranchRef = (ref) => formatLocalBranchRefQuery(ref);
 const resolveGitWorktreeStartingRef = (repository, ref, signal) =>
   resolveGitWorktreeStartingRefQuery(repository, ref, signal, gitWorktreeStartingRefDeps);
+const gitWorktreeStartingStateDeps = {
+  collectTrackedDiff: (repository, configOverrides, signal) =>
+    collectTrackedUncommittedDiff(
+      repository,
+      configOverrides,
+      signal,
+      { binary: true },
+      gitUncommittedDiffDeps,
+    ),
+  getCurrentBranch: (...args) => getCurrentGitBranch(...args),
+  getLocallyKnownDefaultBranch: (...args) => getLocallyKnownDefaultBranch(...args),
+  getOrderedRemotes: (...args) => getOrderedGitRemotes(...args),
+  normalizeCwd: (...args) => xz(...args),
+  resolveRef: (...args) => resolveGitRefSha(...args),
+  resolveStartingRef: (...args) => resolveGitWorktreeStartingRef(...args),
+  runGit: (...args) => $(...args),
+};
+const resolveGitWorktreeStartingState = (
+  cwd,
+  startingState,
+  gitManager,
+  host,
+  configOverrides,
+  signal,
+) =>
+  resolveGitWorktreeStartingStateQuery(
+    cwd,
+    startingState,
+    gitManager,
+    host,
+    configOverrides,
+    signal,
+    gitWorktreeStartingStateDeps,
+  );
 const gitRefResolutionDeps = {
   getQueryMeta: () => x1,
   normalizeSha: (...args) => wz(...args),
@@ -66815,44 +66850,6 @@ async function y0(e, t, n, r = {}) {
     maxOutputBytes: c,
   });
 }
-async function Ipe(e, t, n, r, i, a) {
-  let [o, s] = await Promise.all([
-    (async () => {
-      if (t.type === `working-tree`) return `HEAD`;
-      let i = await n.getWorktreeRepository(xz(e), r);
-      if (t.type === `branch`) {
-        if (i == null || t.branchName === `HEAD` || t.branchName === `@`) return t.branchName;
-        let e = t.remoteRef;
-        if (e == null) return (await resolveGitWorktreeStartingRef(i, t.branchName, a))?.ref ?? t.branchName;
-        let n = (await getOrderedGitRemotes(i))
-          .filter((t) => e.startsWith(`refs/remotes/${t}/`))
-          .sort((e, t) => t.length - e.length)[0];
-        if (n == null) return e;
-        let r = e.slice(`refs/remotes/${n}/`.length),
-          o = await $(i.root, [`fetch`, n, `+refs/heads/${r}:${e}`], i.host, { signal: a });
-        if (!o.success) throw Error(`Failed to fetch latest ${n}/${r}: ${o.stderr || o.stdout}`);
-        let s = await resolveGitRefSha(i, e, a, { fresh: !0 });
-        if (s == null) throw Error(`Failed to resolve latest ${n}/${r}`);
-        return s;
-      }
-      return i == null ? `HEAD` : ((await getCurrentGitBranch(i)) ?? (await getLocallyKnownDefaultBranch(i)) ?? `HEAD`);
-    })(),
-    (async () => {
-      if (t.type !== `working-tree`) return null;
-      let o = await n.getWorktreeRepository(xz(e), r);
-      if (o == null) throw Error(`Failed to collect working tree diff`);
-      let s = await collectTrackedUncommittedDiff(o, i, a, { binary: !0 }, gitUncommittedDiffDeps);
-      if (s.type === `error`)
-        throw Error(
-          s.error.type === `diff-too-large`
-            ? `Working tree diff exceeds the ${s.error.limitBytes}-byte limit`
-            : `Failed to collect working tree diff`,
-        );
-      return s.unifiedDiff;
-    })(),
-  ]);
-  return { startingRef: o, startingDiff: s };
-}
 async function Bpe(e, t, n, r, i) {
   let a = await $(e, [`config`, n === `local` ? `--local` : `--worktree`, `--get`, t], r, {
     signal: i,
@@ -68189,7 +68186,7 @@ async function Bme(e, t, n, r, i, a) {
   )
     return { success: !1, error: Error(`Operation canceled`) };
   let [{ startingRef: u, startingDiff: d }, f] = await Promise.all([
-    Ipe(e, n, r, i, l, s),
+    resolveGitWorktreeStartingState(e, n, r, i, l, s),
     n.type === `working-tree` ? f2(c, void 0, void 0, s) : Promise.resolve(null),
   ]);
   if (f != null && !f.success) throw Error(`Failed to collect untracked working tree files`);

@@ -541,6 +541,13 @@ Worktree starting ref 的 local/remote ref 规范化、upstream ahead 选择、r
 `src/main/worker/git-worktree-starting-ref.ts`。原 `F0`/`I0`/`Lpe`/`L0`/`Rpe`/`zpe`/`R0`
 已删除，repository-read、worktree create 与 handoff 消费者改用语义名称，由 27 项断言覆盖。
 
+### 增量抽取：Worktree starting state
+
+Worktree create 的 branch/default/working-tree 起始引用选择、remote-ref 强制刷新、最长 remote
+名称匹配，以及 tracked binary diff 并行收集与错误映射已迁移至
+`src/main/worker/git-worktree-starting-state.ts`。原 `Ipe` 已删除，入口只保留现有能力的显式依赖
+接线，由 27 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
