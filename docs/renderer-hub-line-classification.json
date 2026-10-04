@@ -627,5 +627,29 @@
     "classification": "generated-local-split-action-button",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The component composes the primary action and dropdown trigger, forwarding disabled/loading, tooltip, popup, and ref props into the local split-button surface. Its state is entirely owned by the generated composer route."
+  },
+  {
+    "hub": "app-primary", "alias": "Gl", "sourceSymbol": "OV", "startLine": 23903, "endLine": 23905,
+    "classification": "generated-local-mcp-extension-kind-predicate",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The predicate narrows mention submenu providers to the generated MCP-extension kind used by the neighboring composer list. It is a local discriminant with no independent renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Wl", "sourceSymbol": "PV", "startLine": 24043, "endLine": 24047,
+    "classification": "generated-local-mcp-mention-surface-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires the generated MCP mention surface dependencies and its preload item cap. These registrations belong to the local composer route and are not independently consumed lifecycle code."
+  },
+  {
+    "hub": "app-primary", "alias": "Hl", "sourceSymbol": "FV", "startLine": 24070, "endLine": 24104,
+    "classification": "generated-local-at-mention-section-merge",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper merges context actions into @-mention sections, applies page-specific ordering, and limits inline results. Its policy is coupled to the generated composer route and has no separate renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Ul", "sourceSymbol": "RV", "startLine": 24167, "endLine": 24171,
+    "classification": "generated-local-at-mention-search-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer installs shared query/highlight hooks used by the adjacent mention search projection. It is route-local generated setup rather than an independently consumed UI boundary."
   }
 ]
