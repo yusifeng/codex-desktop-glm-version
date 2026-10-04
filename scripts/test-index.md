@@ -186,6 +186,7 @@ Total scripts: 802.
 - [`test-worker-git-branch-comparison.mjs`](./test-worker-git-branch-comparison.mjs)
 - [`test-worker-git-branch-search.mjs`](./test-worker-git-branch-search.mjs)
 - [`test-worker-git-branch-search-runtime.mjs`](./test-worker-git-branch-search-runtime.mjs)
+- [`test-worker-git-branch-search-request-handler.mjs`](./test-worker-git-branch-search-request-handler.mjs)
 - [`test-worker-git-blame-file.mjs`](./test-worker-git-blame-file.mjs)
 - [`test-worker-git-branch-metadata.mjs`](./test-worker-git-branch-metadata.mjs)
 - [`test-worker-git-cache-request-handlers.mjs`](./test-worker-git-cache-request-handlers.mjs)

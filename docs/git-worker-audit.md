@@ -506,6 +506,16 @@ Recent branches 的固定 100 条 local-ref 查询、250ms short-lived cache、w
 `src/main/worker/git-recent-branches.ts`。原 `j3`/`M3`/`N3` 已删除，default branch 回退、
 普通请求和 live-query 三处消费者均注入现有 query/runGit 能力，由 26 项断言覆盖。
 
+### 增量抽取：Branch search request boundary
+
+`search-branches` 请求的 host-scoped repository 解析与参数组装已迁移至
+`src/main/worker/git-branch-search-request-handler.ts`。该边界保留原有默认 limit（20）、
+`preserveRemoteRefs` 透传、AbortSignal 传播以及 `getWorktreeRepositoryForRoot` 的 host
+绑定；分支扫描、query cache 和 ref 过滤仍由 `git-branch-search-runtime.ts` 负责。原
+`handleSearchBranches` 仅保留响应封装和窄依赖注入，并由
+`scripts/test-worker-git-branch-search-request-handler.mjs` 覆盖默认参数、显式 limit、
+repository 解析和结果透传。
+
 ### 增量抽取：Repository identity
 
 Repository identity 的 effective origin 查询、watcher-aware config cache、取消后的直接读取回退、

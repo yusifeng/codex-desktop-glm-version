@@ -24,6 +24,7 @@ const { moveThreadToHostWorktree: performHostWorktreeHandoff } = require("./work
 const { moveThreadToLocal: performMoveThreadToLocal } = require("./worker/git-move-to-local");
 const { moveThreadToWorktree: performMoveThreadToWorktree } = require("./worker/git-move-to-worktree");
 const { searchGitBranches } = require("./worker/git-branch-search-runtime");
+const { resolveBranchSearchRequest } = require("./worker/git-branch-search-request-handler");
 const { getBranchAheadCount } = require("./worker/git-branch-ahead");
 const { branchExists: gitBranchExistsQuery, createBranch: createGitBranchQuery, getCommitTree: getGitCommitTreeQuery } = require("./worker/git-branch-create");
 const { compareGitBranches: compareGitBranchesQuery } = require("./worker/git-branch-comparison");
@@ -70386,18 +70387,12 @@ var I6 = kW(`git`),
       });
     }
     async handleSearchBranches(e, { host: t, signal: n }) {
-      return X(
-        await searchGitBranches(
-          {
-            worktreeRepo: this.gitManager.getWorktreeRepositoryForRoot(e.root, t),
-            query: e.query,
-            limit: e.limit ?? 20,
-            preserveRemoteRefs: e.preserveRemoteRefs,
-            signal: n,
-          },
-          branchSearchDeps,
-        ),
-      );
+      return X(await resolveBranchSearchRequest(e, {
+        gitManager: this.gitManager,
+        host: t,
+        signal: n,
+        searchBranches: (params) => searchGitBranches(params, branchSearchDeps),
+      }));
     }
     getWatchKey(e, t) {
       return `${h1(t)}|${e}`;
