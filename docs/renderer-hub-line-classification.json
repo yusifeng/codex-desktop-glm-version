@@ -38,5 +38,15 @@
     "hub": "app-primary", "alias": "bf", "sourceSymbol": "iMe", "startLine": 15661, "endLine": 15670,
     "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/extract-site-subdomain.ts",
     "evidence": "Tenant-subdomain extraction is a deterministic URL/hostname policy with explicit suffix allowlisting; the hub keeps its compatibility export because no independent renderer import currently owns this boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "$m", "sourceSymbol": "rA", "startLine": 5762, "endLine": 5764,
+    "classification": "zero-consumer-scope-aware-formatter", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The absolute-URL predicate is only consumed by the adjacent foreground-image selector tAe; no renderer module imports the public alias, so extracting it would create a facade without a real named consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "Qm", "sourceSymbol": "nA", "startLine": 5754, "endLine": 5760,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The URL-scheme classifier is an implementation detail of rA/tAe in the generated hub and has no independent renderer call site; preserve the coupled scope until a named consumer establishes a stable contract."
   }
 ]

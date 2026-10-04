@@ -55,6 +55,12 @@ runtime policy，也不满足独立输入/输出契约，不能以 URL 字符串
 同时锁定以上 `rA`/`nA` 无 named consumer 的审计结论，防止后续只为降低计数而伪造
 消费边。
 
+本轮将上述结论落入 `docs/renderer-hub-line-classification.json` 的逐行证据：
+`$m`/`rA` 标记为 `zero-consumer-scope-aware-formatter`，`Qm`/`nA` 标记为
+`generated-local-helper`，并由审计脚本校验公开别名、source symbol、行号窗口和
+现存模块路径。该登记只提高可复核性，不改变 `unconsumed` 计数，也不制造虚假的
+named consumer。
+
 `app-primary` 的 panel visibility 入口已将纯策略部分迁移至
 `src/renderer/app-primary/runtime/panel-target-policy.ts`。该模块保留
 `bottom-panel` / `right-panel` 优先级、可用 tab 过滤和无候选时返回 `null` 的
