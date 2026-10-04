@@ -23,6 +23,7 @@ import {
   t as TweaksToolbarView,
   u as initializeSpaceKeyHandling,
 } from "@rchunk/tweaks-toolbar-view";
+import { formatBrowserUrl } from "../app-primary/runtime/format-browser-url";
 
 type InteractionMode = "browse" | "comment";
 
@@ -142,12 +143,7 @@ function hasComments(comments: unknown): boolean {
 
 function displayUrl(url: string, showFullUrl: boolean): string {
   if (showFullUrl) return url;
-  try {
-    const parsed = new URL(url);
-    return `${parsed.host}${parsed.pathname === "/" ? "" : parsed.pathname}`;
-  } catch {
-    return url;
-  }
+  return formatBrowserUrl(url, false) ?? url;
 }
 
 function isCommandModifierPressed(event: KeyboardLikeEvent): boolean {
