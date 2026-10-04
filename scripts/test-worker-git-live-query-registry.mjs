@@ -188,7 +188,7 @@ state.registry.unsubscribe("abort-two");
 equal(sharedSignal.aborted, true);
 abortRun.reject(new Error("aborted"));
 await flush();
-equal(state.registry.sharedRuns.size, 0);
+equal(state.registry.runCoordinator.sharedRuns.size, 0);
 
 const firstRun = deferred();
 const secondRun = deferred();
@@ -202,6 +202,7 @@ state.registry.subscribe(subscription("stale"));
 await flush();
 const refresh = state.registry.refreshRepository("host", "/repo");
 firstRun.resolve({ method: "status-summary", result: { type: "success" } });
+await flush();
 await flush();
 equal(state.runs.length, 2);
 equal(state.events.length, 0);

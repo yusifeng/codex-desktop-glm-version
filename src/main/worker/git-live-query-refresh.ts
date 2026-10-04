@@ -26,7 +26,10 @@ function refreshGitLiveQuery(state: any, dependencies: GitLiveQueryRefreshDepend
   state.trace = undefined;
   state.traceLinks = [];
   state.abortController = abortController;
-  state.dirty = false;
+  // A refresh request may arrive while an older generation is in flight. In
+  // that case the newer generation's dirty bit must survive this run so the
+  // completion path can schedule the follow-up instead of dropping it.
+  if (state.generation === generation) state.dirty = false;
   state.inFlight = Promise.resolve()
     .then(() => dependencies.runShared(state, abortController.signal, trace, traceLinks, (result) => {
       if (dependencies.isCurrent(state, generation))
@@ -62,8 +65,8 @@ function refreshGitLiveQuery(state: any, dependencies: GitLiveQueryRefreshDepend
     .finally(() => {
       state.abortController = null;
       state.inFlight = null;
-      if (!dependencies.isCurrent(state, generation)) return;
-      resolveGitLiveQueryRefreshWaiters(state);
+      const current = dependencies.isCurrent(state, generation);
+      if (current) resolveGitLiveQueryRefreshWaiters(state);
       if (state.dirty) {
         if (retryDelayMs != null && state.generation === generation)
           state.generation = dependencies.nextGeneration?.() ?? (state.generation + 1);
