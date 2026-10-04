@@ -23,6 +23,7 @@ Total scripts: 900.
 - [`test-preload-annotation-selection.mjs`](./test-preload-annotation-selection.mjs)
 - [`test-preload-annotation-sync-state.mjs`](./test-preload-annotation-sync-state.mjs)
 - [`test-worker-git-live-query-handler.mjs`](./test-worker-git-live-query-handler.mjs)
+- [`test-worker-git-live-query-registry-refresh.mjs`](./test-worker-git-live-query-registry-refresh.mjs)
 - [`test-worker-git-live-query-events.mjs`](./test-worker-git-live-query-events.mjs)
 - [`test-preload-annotation-overlay-observer.mjs`](./test-preload-annotation-overlay-observer.mjs)
 - [`test-preload-annotation-surface-feature-state.mjs`](./test-preload-annotation-surface-feature-state.mjs)

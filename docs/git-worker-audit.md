@@ -1041,3 +1041,12 @@ live-query 订阅前的 repository metadata 查询、pending-metadata trace 关�
 `git-watch-request-handlers.ts` 现在仅保留订阅注册、abort 等待、取消和 watcher 引用释放副作用，
 由 `scripts/test-worker-git-watch-request-handlers.mjs` 增至 30 项断言，并直接覆盖 setup helper
 的 metadata、trace 与 release contract。
+
+### 增量抽取：Live-query registry refresh boundary
+
+registry 级 repo-change、recovery 与 repository mutation 刷新选择已迁移至
+`src/main/worker/git-live-query-registry-refresh.ts`。新模块集中维护 selection、recovery
+deduplication、active trace 与 refresh trigger contract；registry 仅保留 states、timer、
+subscription 与 run coordinator 所有权。`scripts/test-worker-git-live-query-registry-refresh.mjs`
+覆盖 repo-change fan-out、recovery state transition、跨 subscription recovery 去重及
+repository refresh，共 12 项断言。

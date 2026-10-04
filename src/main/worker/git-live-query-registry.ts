@@ -16,10 +16,11 @@ import { refreshGitLiveQuery } from "./git-live-query-refresh";
 import { planGitLiveQueryRefresh } from "./git-live-query-refresh-plan";
 import { createGitLiveQueryUpdatedEvent } from "./git-live-query-events";
 import {
-  selectGitLiveQueriesForRepoChange,
-  selectGitLiveQueriesForRecovery,
-  selectGitLiveQueriesForRepository,
-} from "./git-live-query-selection-policy";
+  handleGitLiveQueryRepoChanged,
+  recoverGitLiveQueries,
+  refreshGitLiveQueryRepository,
+  setGitLiveQueryRecovery,
+} from "./git-live-query-registry-refresh";
 
 type GitLiveQueryRegistryDependencies = {
   emit: (event: any) => void;
@@ -81,53 +82,19 @@ class GitLiveQueryRegistry {
   }
 
   handleRepoChanged(event: any, onFanout?: (count: number) => void) {
-    const states = selectGitLiveQueriesForRepoChange(
-      [...this.states.values()], event, shouldRefreshLiveQuery,
-    );
-    onFanout?.(states.length);
-    return this.refreshStates(states, `invalidation`, event.trace);
+    return handleGitLiveQueryRepoChanged(this, event, onFanout);
   }
 
   setRequiresRecovery(hostId: string, root: string, requiresRecovery: boolean) {
-    const states = [...this.states.values()].filter((state) => {
-      if (
-        state.host.id !== hostId ||
-        state.root !== root ||
-        state.requiresRecovery === requiresRecovery
-      )
-        return false;
-      state.requiresRecovery = requiresRecovery;
-      return true;
-    });
-    this.refreshStates(
-      states,
-      `recovery`,
-      this.dependencies.getActiveTrace() ?? undefined,
-    );
+    return setGitLiveQueryRecovery(this, hostId, root, requiresRecovery);
   }
 
   recover(params: any) {
-    const states = selectGitLiveQueriesForRecovery(
-      [...this.states.values()], params,
-    );
-    const repositories = new Map<string, any>();
-    for (const state of states)
-      repositories.set(`${state.host.id}\0${state.root}`, state);
-    for (const state of repositories.values())
-      this.dependencies.prepareRecovery(state.root, state.host);
-    return this.refreshStates(
-      states,
-      `recovery`,
-      this.dependencies.getActiveTrace() ?? undefined,
-    );
+    return recoverGitLiveQueries(this, params);
   }
 
   refreshRepository(hostId: string, root: string) {
-    return this.refreshStates(
-      selectGitLiveQueriesForRepository([...this.states.values()], hostId, root),
-      `mutation`,
-      this.dependencies.getActiveTrace() ?? undefined,
-    );
+    return refreshGitLiveQueryRepository(this, hostId, root);
   }
 
   refreshStates(states: any[], trigger: string, trace: any) {
