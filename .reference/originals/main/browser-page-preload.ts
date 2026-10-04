@@ -6268,18 +6268,10 @@ function Od(e) {
   });
 }
 function B(e) {
-  let t = window.getComputedStyle(e).visibility;
-  if (t === `hidden` || t === `collapse`) return !1;
-  for (let t = e; t != null; t = ic(t)) {
-    let e = window.getComputedStyle(t);
-    if (
-      e.display === `none` ||
-      e.contentVisibility === `hidden` ||
-      Number.parseFloat(e.opacity) === 0
-    )
-      return !1;
-  }
-  return !0;
+  return isAnnotationElementVisible(e, {
+    getComputedStyle: (value) => window.getComputedStyle(value),
+    getParent: (value) => ic(value),
+  });
 }
 function kd(e, t) {
   let n = Ad(e, t.startPath),
@@ -6382,6 +6374,7 @@ var { resolveAnnotationThemeVariant } = require("./browser-page-preload/annotati
 var { readAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport");
 var { readAnnotationViewportState } = require("./browser-page-preload/annotation-viewport-state");
 var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport-override");
+var { isAnnotationElementVisible } = require("./browser-page-preload/annotation-visibility");
 var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
 Yo();
 annotationSerialization = createAnnotationSerialization({

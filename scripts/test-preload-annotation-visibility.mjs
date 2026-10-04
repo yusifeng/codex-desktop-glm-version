@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isAnnotationElementVisible } = require("../app/.vite/build/browser-page-preload/annotation-visibility.js");
+const parent = { id: "parent" }, element = { id: "element" };
+const styles = new Map([[element, { visibility: "visible", display: "block", contentVisibility: "visible", opacity: "1" }], [parent, { visibility: "visible", display: "block", contentVisibility: "visible", opacity: "1" }]]);
+const deps = { getComputedStyle: (value) => styles.get(value), getParent: (value) => value === element ? parent : null };
+assert.equal(isAnnotationElementVisible(element, deps), true);
+styles.get(parent).display = "none";
+assert.equal(isAnnotationElementVisible(element, deps), false);
+styles.get(parent).display = "block";
+styles.get(element).visibility = "hidden";
+assert.equal(isAnnotationElementVisible(element, deps), false);
+console.log("test-preload-annotation-visibility: 3 assertions passed");

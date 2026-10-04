@@ -16,6 +16,7 @@ Total scripts: 797.
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
 - [`test-preload-annotation-scroll-container.mjs`](./test-preload-annotation-scroll-container.mjs)
 - [`test-preload-annotation-preview-geometry.mjs`](./test-preload-annotation-preview-geometry.mjs)
+- [`test-preload-annotation-visibility.mjs`](./test-preload-annotation-visibility.mjs)
 
 - [`test-app-shared-command-visibility-predicates.mjs`](./test-app-shared-command-visibility-predicates.mjs)
 - [`test-worker-git-mutation-dispatch.mjs`](./test-worker-git-mutation-dispatch.mjs)

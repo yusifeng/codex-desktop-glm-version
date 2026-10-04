@@ -305,6 +305,13 @@ DOM Range 的文本节点遍历、selection offset 边界、`assignedSlot`/paren
 range 根为文本节点三项行为断言。该边界不包含 React/vendor runtime，也不移动选择状态机
 或 DOM 副作用。
 
+### 增量抽取：annotation visibility predicate
+
+批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate
+已迁移至 `src/main/browser-page-preload/annotation-visibility.ts`；入口仅注入
+`getComputedStyle` 与 parent traversal，`scripts/test-preload-annotation-visibility.mjs`
+覆盖可见、隐藏祖先和自身 visibility 边界，共 3 项断言。
+
 ### 增量抽取：annotation preview rounded geometry
 
 annotation feature preview 的 CSS 圆角解析、半径缩放/约束和 SVG rounded-rect path
