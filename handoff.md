@@ -356,7 +356,8 @@ Host handoff 的 repository metadata 重试、commit 存在性检查与 shared-b
 本地/远程重试、默认分支、merge-base 与多 remote 回退断言覆盖。
 Host handoff 的完整跨 host 主编排已迁移至 `src/main/worker/git-host-handoff.ts`；原 `Pve/Q3`
 实现已删除，参数校验、snapshot/bundle 快慢路径、新建与复用 worktree、progress、rollback 和
-`finally` 清理由 48 项行为断言覆盖。
+`finally` 清理由 48 项行为断言覆盖；参数契约验证另由
+`src/main/worker/git-host-handoff-validation.ts` 提供，并由 8 项 focused 断言覆盖。
 Move-to-local 的分支占用检查、source detach/stash、local dirty guard、branch checkout、stash
 迁移与双侧回滚已迁移至 `src/main/worker/git-move-to-local.ts`；原 `zve` 实现已删除，由 31 项
 成功、失败、warning 与异常恢复断言覆盖。
@@ -385,6 +386,9 @@ geometry/title-bar overlay，由 12 项行为断言覆盖；preload annotation s
 行为断言覆盖；annotation controls registry 的注册、更新、target 索引、dispose
 与可信 pagehide 清理由 `src/main/browser-page-preload/annotation-controls-registry.ts`
 承载，并由 10 项行为断言覆盖。
+annotation controls 的 DOM target 归一化、文档归属、去重与数量上限已迁移至
+`src/main/browser-page-preload/annotation-control-target-validation.ts`，由 6 项 focused
+断言覆盖，runtime 仅保留兼容导出。
 pending editor message reducer 已进一步抽取为 `src/main/browser-page-preload/pending-editor-message.ts`，
 并由 6 项行为断言覆盖。
 annotation surface feature observer（DOM/shadow-root 扫描、feature 状态、pageshow 与

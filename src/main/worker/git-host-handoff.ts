@@ -1,3 +1,5 @@
+import { validateHostHandoffParams } from './git-host-handoff-validation';
+
 type HostHandoffDependencies = {
   randomUUID: () => string;
   resolveRepositoryMetadata: (
@@ -87,30 +89,8 @@ async function moveThreadToHostWorktree(
   { gitManager, sourceHost, destinationHost, signal, onProgress }: any,
   deps: HostHandoffDependencies,
 ) {
-  if (params.sourceRolloutPath.trim().length === 0) {
-    return ok({
-      status: `error`,
-      error: `invalid-params`,
-      message: `Missing source rollout path`,
-    });
-  }
-  if (params.sourceBranch.trim().length === 0) {
-    return ok({
-      status: `error`,
-      error: `invalid-params`,
-      message: `Missing source branch`,
-    });
-  }
-  if (
-    (params.destinationWorktreeGitRoot == null) !==
-    (params.destinationWorktreeWorkspaceRoot == null)
-  ) {
-    return ok({
-      status: `error`,
-      error: `invalid-params`,
-      message: `Destination worktree roots must be provided together`,
-    });
-  }
+  const validationError = validateHostHandoffParams(params);
+  if (validationError != null) return ok(validationError);
 
   const transferId = deps.randomUUID();
   const [sourceMetadata, destinationMetadata] = await Promise.all([
