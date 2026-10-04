@@ -6201,6 +6201,7 @@ var { createAnnotationPreviewLayer } = require("./browser-page-preload/annotatio
 var { createAnnotationAnchorGeometry } = require("./browser-page-preload/annotation-anchor-geometry");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
+var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
@@ -22767,10 +22768,10 @@ function M_(e, t, n, r) {
   return N_(e) && P_(t, n, r);
 }
 function N_(e) {
-  return e == null ? gs(fd()) : Xl.isGoogleDocsAnchor(e) || gs(e.pageUrl);
+  return isAnnotationAnchorOnCurrentPage(e, fd(), { isGoogleDocsAnchor: (anchor) => Xl.isGoogleDocsAnchor(anchor), samePageUrl: gs });
 }
 function P_(e, t, n) {
-  return isLargeAnnotationRect(e, t, n, L_, R_);
+  return isAnnotationRectLargeEnough(e, t, n, L_, R_, isLargeAnnotationRect);
 }
 function F_(e, t, n) {
   return clampAnnotationCoordinate(e, t, n);

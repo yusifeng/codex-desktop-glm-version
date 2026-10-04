@@ -544,3 +544,10 @@ annotation overlay 对页面 DOM 的 mutation 监听、overlay 自身 mutation �
 `src/main/browser-page-preload/annotation-overlay-observer.ts`；`annotation-overlay-runtime.ts` 只保留
 依赖适配和兼容调用入口。`scripts/test-preload-annotation-overlay-observer.mjs` 覆盖 observer 注册、
 overlay 内部过滤、页面 mutation、空批次、非 Node target、幂等 dispose 与 dispose 后回调抑制。
+
+### 增量抽取：annotation anchor viewport policy
+
+annotation anchor 的当前页面判定（含 Google Docs anchor 兼容）与大矩形阈值策略已迁移至
+`src/main/browser-page-preload/annotation-anchor-viewport-policy.ts`；原 preload 仅保留页面
+URL/DOM 依赖注入，`scripts/test-preload-annotation-anchor-viewport-policy.mjs` 覆盖 Google Docs、
+同页/异页、空 anchor 与 viewport 阈值边界，共 7 项断言。
