@@ -6,6 +6,9 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-app-shared-is-web-mcp-server.mjs`](./test-app-shared-is-web-mcp-server.mjs)
+- [`test-worker-git-repository-content-dispatch.mjs`](./test-worker-git-repository-content-dispatch.mjs)
+
 - [`test-main-renderer-frame-trust.mjs`](./test-main-renderer-frame-trust.mjs)
 
 - [`test-app-shared-parse-git-remote-url.mjs`](./test-app-shared-parse-git-remote-url.mjs)
