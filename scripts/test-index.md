@@ -24,6 +24,8 @@ Total scripts: 850.
 - [`test-app-primary-format-annotation-summary.mjs`](./test-app-primary-format-annotation-summary.mjs)
 - [`test-preload-annotation-preview-controller.mjs`](./test-preload-annotation-preview-controller.mjs)
 - [`test-worker-git-watch-session-policy.mjs`](./test-worker-git-watch-session-policy.mjs)
+- [`test-worker-git-live-query-state.mjs`](./test-worker-git-live-query-state.mjs)
+- [`test-preload-annotation-display-selections.mjs`](./test-preload-annotation-display-selections.mjs)
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
 - [`test-app-initial-electron-command-policy.mjs`](./test-app-initial-electron-command-policy.mjs)
 - [`test-preload-annotation-preload-bridge.mjs`](./test-preload-annotation-preload-bridge.mjs)
