@@ -962,3 +962,11 @@ consumer 清理、deferred completion 与 trace-link 包装；`git-live-query-re
 订阅状态、刷新调度和结果发布，并通过窄依赖委托 session/cache 执行边界。
 `scripts/test-worker-git-live-query-run-coordinator.mjs` 覆盖 shared 去重、tracked fan-out、
 完成清理与底层单次执行，共 6 项断言。
+
+### 增量抽取：Git ignore-source watch reconciliation
+
+Git watcher ignore-source 的 stale target 清理、路径集合更新、变更路径触发的 session 重启，
+以及新 ignore source 的 handler/session 注册已迁移至
+`src/main/worker/git-ignore-source-watch.ts`。worker 入口继续持有 watch target、session
+副作用和路径 API，并通过窄依赖注入；`scripts/test-worker-git-ignore-source-watch.mjs`
+覆盖旧 source 更新、新 source 注册、changed-path 清理与 session start，共 5 项断言。

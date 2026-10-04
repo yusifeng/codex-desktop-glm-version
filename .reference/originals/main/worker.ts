@@ -67,6 +67,7 @@ const { setGitConfigValue } = require("./worker/git-config-request-handler");
 const { getConfigValue: getGitConfigValueQuery, getConfigValueForScope: getGitConfigValueForScopeQuery, getLocalEnvironmentConfigPath: getGitLocalEnvironmentConfigPathQuery, readConfigValue: readGitConfigValueQuery, setConfigValueForScope: setGitConfigValueForScopeQuery } = require("./worker/git-config-scope");
 const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
+const { reconcileGitIgnoreSourceWatches } = require("./worker/git-ignore-source-watch");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
 const { dispatchStableMetadataRequest } = require("./worker/git-stable-metadata-dispatch");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
@@ -68923,42 +68924,11 @@ var Jye = 1e3,
       }
       return [];
     }
+    isWithinPath(e, t, n) {
+      return M6(e, t, n);
+    }
     async updateIgnoreSourceWatches(e) {
-      let t = [...this.changedIgnoreSourcePaths];
-      this.changedIgnoreSourcePaths.clear();
-      let n = [],
-        r = !1;
-      for (let [t, i] of this.ignoreSourceWatches) {
-        if (e.has(t) && this.watchTargets.includes(i.target)) continue;
-        ((r = !0), this.ignoreSourceWatches.delete(t));
-        let a = i.target.handlers.indexOf(i.handler);
-        if ((i.target.handlers.splice(a, 1), i.target.handlers.length === 0)) {
-          let e = this.watchTargets.indexOf(i.target);
-          (e !== -1 && this.watchTargets.splice(e, 1), n.push(this.disposeSession(i.target)));
-        }
-      }
-      for (let [i, a] of e) {
-        let e = this.ignoreSourceWatches.get(i);
-        if (e != null) {
-          (e.paths.size !== a.size || [...a].some((t) => !e.paths.has(t))) &&
-            ((r = !0), e.paths.clear(), a.forEach((t) => e.paths.add(t)));
-          let o = this.pathApi;
-          o != null &&
-            e.target.retryTimer == null &&
-            t.some((e) => M6(o, e, i)) &&
-            ((r = !0),
-            n.push(
-              this.disposeSession(e.target).then(() => this.tryStartWatchSession(e.target, !1)),
-            ));
-          continue;
-        }
-        r = !0;
-        let o = { changeType: `config`, shouldHandleChangedPath: (e) => a.has(e) },
-          s = this.addWatchHandler(i, !1, o, null);
-        (this.ignoreSourceWatches.set(i, { target: s, handler: o, paths: a }),
-          n.push(this.tryStartWatchSession(s, !1)));
-      }
-      return (await Promise.all(n), r);
+      return reconcileGitIgnoreSourceWatches(this, e);
     }
     async refreshWorkingTreeWatchPolicy() {
       let e = this.ignorePolicy,
