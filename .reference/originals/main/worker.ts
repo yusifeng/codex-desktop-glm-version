@@ -134,6 +134,7 @@ const { dispatchRepositoryContentRequest } = require("./worker/git-repository-co
 const { dispatchSyncedBranchRequest } = require("./worker/git-synced-branch-dispatch");
 const { dispatchCacheWatchRequest } = require("./worker/git-cache-watch-dispatch");
 const { dispatchGitApplyRequest } = require("./worker/git-apply-dispatch");
+const { dispatchGitMutationRequest } = require("./worker/git-mutation-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69888,12 +69889,12 @@ var I6 = kW(`git`),
             break;
           }
           case `push`: {
-            let t = await pushGitRepository(e.params, gitPushRequestDeps);
+            let t = await dispatchGitMutationRequest(e.method, e.params, { push: (p) => pushGitRepository(p, gitPushRequestDeps), checkout: (p) => checkoutGitBranch(p, gitCheckoutRequestDeps), commit: (p) => commitGitChanges(p, gitCommitRequestDeps), setConfig: (p) => setGitConfigValue(p, gitConfigRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
           case `checkout-branch`: {
-            let t = await checkoutGitBranch(e.params, gitCheckoutRequestDeps);
+            let t = await dispatchGitMutationRequest(e.method, e.params, { push: (p) => pushGitRepository(p, gitPushRequestDeps), checkout: (p) => checkoutGitBranch(p, gitCheckoutRequestDeps), commit: (p) => commitGitChanges(p, gitCommitRequestDeps), setConfig: (p) => setGitConfigValue(p, gitConfigRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
@@ -70077,7 +70078,7 @@ var I6 = kW(`git`),
             break;
           }
           case `set-config-value`: {
-            let t = await setGitConfigValue(e.params, gitConfigRequestDeps);
+            let t = await dispatchGitMutationRequest(e.method, e.params, { push: (p) => pushGitRepository(p, gitPushRequestDeps), checkout: (p) => checkoutGitBranch(p, gitCheckoutRequestDeps), commit: (p) => commitGitChanges(p, gitCommitRequestDeps), setConfig: (p) => setGitConfigValue(p, gitConfigRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
@@ -70170,7 +70171,7 @@ var I6 = kW(`git`),
             break;
           }
           case `commit`: {
-            let t = await commitGitChanges(e.params, gitCommitRequestDeps);
+            let t = await dispatchGitMutationRequest(e.method, e.params, { push: (p) => pushGitRepository(p, gitPushRequestDeps), checkout: (p) => checkoutGitBranch(p, gitCheckoutRequestDeps), commit: (p) => commitGitChanges(p, gitCommitRequestDeps), setConfig: (p) => setGitConfigValue(p, gitConfigRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));
             break;
           }
