@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { buildLinuxTerminalArgs } = require("../app/.vite/build/worker/linux-terminal-args.js");
+assert.deepEqual(buildLinuxTerminalArgs("kitty", "/tmp/work"), ["--directory", "/tmp/work"]);
+assert.deepEqual(buildLinuxTerminalArgs("/usr/bin/ghostty", "/tmp/work"), ["--working-directory=/tmp/work"]);
+assert.deepEqual(buildLinuxTerminalArgs("konsole", "/tmp/work"), ["--workdir", "/tmp/work"]);
+assert.deepEqual(buildLinuxTerminalArgs("gnome-terminal", "/tmp/work"), ["--working-directory", "/tmp/work"]);
+assert.deepEqual(buildLinuxTerminalArgs("x-terminal-emulator", "/tmp/a b", "/bin/zsh"), ["-e", "/bin/zsh", "-lc", "cd '/tmp/a b' && exec /bin/zsh"]);
+assert.throws(() => buildLinuxTerminalArgs("unknown", "/tmp/work"), /Unsupported Linux terminal command/);
+console.log("worker linux terminal args tests passed (6 assertions)");

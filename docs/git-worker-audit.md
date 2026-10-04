@@ -758,3 +758,7 @@ base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的
 `src/main/shared/elicitation-protocol.ts`；`misc-runtime` 仅保留兼容 re-export，
 URL 安全校验、browser auth、OpenAI form、tool suggestion 与 MCP tool call 形状由
 `scripts/test-worker-elicitation-protocol.mjs` 的 6 项断言覆盖。
+### 增量抽取：Linux terminal 参数策略
+
+Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令拼接与安全 quoting）已迁移至
+`src/main/worker/linux-terminal-args.ts`；worker 入口仅保留路径归一化和环境读取，6 项断言覆盖 kitty、ghostty、konsole、常规终端及 shell fallback。

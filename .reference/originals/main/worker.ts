@@ -48,6 +48,7 @@ const { createGithubPullRequestRevisionHandlers } = require("./worker/github-pul
 const { createGitHubPullRequestSummaryHandler } = require("./worker/github-pull-request-summary");
 const { createGithubPullRequestBoardHandler } = require("./worker/github-pull-request-board");
 const { quoteShellArg, joinShellArgs } = require("./worker/shell-quoting");
+const { buildLinuxTerminalArgs } = require("./worker/linux-terminal-args");
 const { MAX_WORKTREE_SNAPSHOT_REPOSITORY_BYTES, assertRepositorySize } = require("./worker/git-repository-size");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
 const { getSubmodulePaths: getGitSubmodulePaths } = require("./worker/git-submodule-paths");
@@ -80635,29 +80636,7 @@ function zTe(e) {
   return null;
 }
 function c9(e, t) {
-  let n = l9(t);
-  switch ((0, g.basename)(e)) {
-    case `kitty`:
-      return [`--directory`, n];
-    case `ghostty`:
-      return [`--working-directory=${n}`];
-    case `konsole`:
-      return [`--workdir`, n];
-    case `alacritty`:
-    case `gnome-terminal`:
-    case `kgx`:
-    case `mate-terminal`:
-    case `tilix`:
-    case `xfce4-terminal`:
-      return [`--working-directory`, n];
-    case `x-terminal-emulator`:
-    case `zutty`: {
-      let e = process.env.SHELL?.trim() || `/bin/sh`;
-      return [`-e`, e, `-lc`, `cd ${GX(n)} && exec ${GX(e)}`];
-    }
-    default:
-      throw Error(`Unsupported Linux terminal command: ${(0, g.basename)(e)}`);
-  }
+  return buildLinuxTerminalArgs((0, g.basename)(e), l9(t), process.env.SHELL?.trim() || `/bin/sh`);
 }
 async function BTe(e, t, n) {
   let r = c9(e, t),

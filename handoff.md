@@ -629,3 +629,4 @@ GitHub pull-request board 的仓库候选、查询参数、open/merged 编排和
 由 `scripts/test-github-pull-request-board.mjs` 的 6 项断言覆盖。整体 handoff 仍未完成。
 
 - worker 协议 schema 的 elicitation/approval 归一化已迁至 `shared/elicitation-protocol.ts`，保留 `misc-runtime` 兼容导出并由 6 项行为断言覆盖。
+Linux terminal 参数策略已抽取为 `src/main/worker/linux-terminal-args.ts`，入口仅保留平台环境与路径适配；新增 6 项 focused 断言并同步测试索引。
