@@ -64,6 +64,7 @@ const { getConfigValue: getGitConfigValueQuery, getConfigValueForScope: getGitCo
 const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
+const { resolveStableMetadata } = require("./worker/git-stable-metadata-request-handler");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -69706,6 +69707,13 @@ var I6 = kW(`git`),
           invalidateUntrackedPathsCache: p2,
           refreshRepository: (hostId, root) => this.liveQueryRegistry.refreshRepository(hostId, root),
         },
+        stableMetadataRequestDeps = {
+          gitManager: this.gitManager,
+          host: o,
+          ensureWatchingForGitInit: (cwd, host) => this.ensureWatchingForGitInit(cwd, host),
+          disposeGitInitWatcher: (cwd, host) => this.disposeGitInitWatcher(cwd, host),
+          encodeResult: X,
+        },
         applyRequestDeps = {
           gitManager: this.gitManager,
           host: o,
@@ -69936,7 +69944,7 @@ var I6 = kW(`git`),
             break;
           }
           case `stable-metadata`:
-            p = await this.handleResolveStableMetadata(e.params, { host: o });
+            p = await resolveStableMetadata(e.params, stableMetadataRequestDeps);
             break;
           case `clone-state`:
             p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
@@ -70329,16 +70337,6 @@ var I6 = kW(`git`),
         }),
         n
       );
-    }
-    async handleResolveStableMetadata(e, { host: t }) {
-      let n = await this.gitManager.getStableMetadata(e.cwd, t);
-      return n == null
-        ? (e.watchForGitInit === !0
-            ? await this.ensureWatchingForGitInit(e.cwd, t)
-            : e.watchForGitInit === !1 && this.disposeGitInitWatcher(e.cwd, t),
-          X(null))
-        : (e.watchForGitInit != null && this.disposeGitInitWatcher(e.cwd, t),
-          X({ commonDir: n.commonDir, root: n.root }));
     }
     async handleUpstreamBranch(e, { host: t, signal: n }) {
       let r = this.gitManager.getWorktreeRepositoryForRoot(e, t),

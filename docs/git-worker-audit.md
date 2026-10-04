@@ -269,6 +269,12 @@ untracked cache invalidation、short-lived cache clear、可选 live-query refre
 仍为 fire-and-forget，不等待 refresh Promise。17 项回归断言覆盖正常路径、pending refresh 与
 各阶段同步异常短路。
 
+`stable-metadata` 请求的 Git-init watcher 三态控制已迁移至
+`src/main/worker/git-stable-metadata-request-handler.ts`。入口只注入 metadata manager、watcher
+生命周期与 `X(...)` envelope；缺失 metadata 时继续区分 `watchForGitInit=true/false`，命中 metadata
+时仍按原协议清理 watcher 并只返回 `root/commonDir`。`scripts/test-worker-git-stable-metadata-request-handler.mjs`
+覆盖三种 watch/metadata 组合，共 3 项断言。
+
 `git-init-repo` 的完整业务实现已迁移至 `src/main/worker/git-init-request-handler.ts`，原压缩
 `Rhe` 函数已删除。模块保留 workspace root trim/空值校验、`git init` 参数、stderr/stdout/
 default 错误优先级和成功后的 stable metadata invalidation，由 11 项断言覆盖。
