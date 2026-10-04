@@ -45,6 +45,13 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 通过独立 bundle 对 fallback、preferred 组合做行为断言，避免把初始化副作用
 误当作可迁移策略。
 
+本轮进一步将 `app-primary` 未消费导出 `w2`（公开别名 `Ur`，约 80576 行）的
+conversation readiness 三态策略迁移至
+`src/renderer/app-primary/runtime/ensure-conversation-ready.ts`：缺失会 hydrate
+后递归确认，未 resumed 或无 messages 会加载更早历史，其余情况直接完成。该模块
+保留 Promise/`true` 返回契约，不接管 UI 初始化副作用；
+`scripts/test-renderer-conversation-ready.mjs` 覆盖 10 项状态与回调断言。
+
 本轮对一个具体未消费导出做了实现级判定：`app-shared` 的 `qhe`（公开别名
 `U$`，原始定义行约 91,xxx）与其懒初始化器 `Jhe`（公开别名 `W$`）是
 `chat-bubble-rounded-rectangle-text-light-20` 图标资产，而不是业务 helper。
