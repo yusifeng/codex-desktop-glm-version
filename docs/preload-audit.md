@@ -207,3 +207,5 @@ annotation surface 注册与 MutationObserver 清理共用的顶层元素判定�
 `isValidAnnotationSurfaceElement`：要求 HTMLElement、非 iframe、已连接、归属
 当前 document 且 root node 为当前 document。压缩入口仅保留注册生命周期、事件
 调度与回调执行；该策略由 annotation runtime 回归断言覆盖。
+
+Annotation shadow-root discovery observer（原 `Ng` 22064-22116）已迁移至 `src/main/browser-page-preload/annotation-shadow-root-observer.ts`，保留动态 shadow-root 注册、失效清理、annotation selector 变更通知与 attachShadow 事件监听；由 `scripts/test-preload-annotation-shadow-root-observer.mjs` 覆盖 4 项断言。

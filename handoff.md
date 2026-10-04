@@ -343,6 +343,7 @@ pending editor message reducer 已进一步抽取为 `src/main/browser-page-prel
 并由 6 项行为断言覆盖。
 annotation surface feature observer（DOM/shadow-root 扫描、feature 状态、pageshow 与
 dispose 生命周期）已抽取为 `src/main/browser-page-preload/annotation-surface-observer.ts`，
+annotation shadow-root discovery observer（原 `Ng` 22064-22116）已进一步迁移至 `src/main/browser-page-preload/annotation-shadow-root-observer.ts`，由 4 项行为断言覆盖动态 shadow-root 注册、失效清理、annotation selector 变更通知与 attachShadow 事件监听。
 由 13 项行为断言覆盖；main 启动 flavor/platform flags 与阶段计时策略已抽取为
 `src/main/main-app/startup/startup-policy.ts`；路径扩展名分类、debug Chrome page 和 remote-hosted
 PIP 进程号策略也已接回该模块，由 17 项矩阵与边界断言覆盖。
