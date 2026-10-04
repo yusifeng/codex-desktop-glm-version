@@ -445,3 +445,10 @@ gate、sync payload 和 editor queue 清理。
 比较、file URL 的 pathname/query 比较、hash 忽略和无效/opaque URL 的精确回退；入口只保留
 `fd`/`md` 兼容委托。`scripts/test-preload-annotation-url.mjs` 覆盖协议、query、hash、file
 路径和 invalid URL 边界，共 8 项断言。
+
+### 增量抽取：annotation mode controller boundary
+
+批注模式 API 的跨世界 listener 安装、可用性门控、使用事件转发与 dispose 清理（原 `$d`
+协调器）已迁移至 `src/main/browser-page-preload/annotation-mode-controller.ts`。入口仅保留
+`contextBridge.executeInMainWorld`、原有 `ef` controls 注册器和 DOM event 适配；模块测试覆盖
+controls 注册失败、main-world listener 安装、事件转发及 dispose 后的 late event，共 5 项断言。

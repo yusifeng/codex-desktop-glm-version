@@ -6680,26 +6680,23 @@ function Qd(e, t) {
   }
 }
 $s();
+var { createAnnotationModeController } = require("./browser-page-preload/annotation-mode-controller");
 function $d(e, t, n, r) {
-  let i = !0,
-    a = ef(() => i, e, t, n, r);
-  if (a == null) return null;
-  let o = !1;
-  try {
-    o =
-      d.contextBridge.executeInMainWorld({
-        func: Qd,
-        args: [
-          qd,
-          (e) => {
-            i && n(e);
-          },
-        ],
-      }) === !0;
-  } catch {}
-  return () => {
-    ((i = !1), o && document.dispatchEvent(new Event(qd.removeEvent)), a());
-  };
+  return createAnnotationModeController({
+    isAvailable: e,
+    isActive: t,
+    recordUse: n,
+    toggle: r,
+    registerControls: (active) => ef(active, e, t, n, r),
+    installMainWorldListener: (notify) => {
+      try {
+        return d.contextBridge.executeInMainWorld({ func: Qd, args: [qd, notify] }) === !0;
+      } catch {
+        return false;
+      }
+    },
+    removeMainWorldListener: () => document.dispatchEvent(new Event(qd.removeEvent)),
+  });
 }
 function ef(e, t, n, r, i) {
   return d.contextBridge.executeInMainWorld({
