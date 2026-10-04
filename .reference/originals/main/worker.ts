@@ -90,7 +90,7 @@ const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranc
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
 const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchState: collectSyncedBranchState } = require("./worker/git-synced-branch-state");
 const { SYNCED_BRANCH_CONFIG_FILE, readSyncedBranchConfig: readSyncedBranchConfigQuery, resolveSyncedBranchConfigPath: resolveSyncedBranchConfigPathQuery, setSyncedBranchConfig: setSyncedBranchConfigQuery } = require("./worker/git-synced-branch-config");
-const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
+const { dispatchTurnDiffRequest } = require("./worker/git-turn-diff-request-dispatch");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
 const { completeTurnDiffCapture: performCompleteTurnDiffCapture, startTurnDiffCapture: performStartTurnDiffCapture } = require("./worker/git-turn-diff-capture");
@@ -70085,10 +70085,8 @@ var I6 = kW(`git`),
             break;
           }
           case `turn-diff-capture-start`:
-            p = X(await startTurnDiffCapture(e.params, turnDiffRequestDeps));
-            break;
           case `turn-diff-capture-complete`:
-            p = X(await completeTurnDiffCapture(e.params, turnDiffRequestDeps));
+            p = X((await dispatchTurnDiffRequest(e.method, e.params, turnDiffRequestDeps)).result);
             break;
           case `commit-message-diff`:
             p = X(await dispatchRepositoryContentRequest(e.method, e.params, { repositoryIdentity: (params) => resolveRepositoryIdentity(params.cwd, repositoryReadRequestDeps), commitMessageDiff: (params) => resolveCommitMessageDiff(params, repositoryReadRequestDeps), submodulePaths: (params) => resolveSubmodulePaths(params.root, repositoryReadRequestDeps), catFile: (params) => resolveCatFile(params, repositoryReadRequestDeps), blameFile: (params) => resolveBlameFile(params, repositoryReadRequestDeps), indexInfo: (params) => resolveIndexInfo(params.cwd, repositoryReadRequestDeps), configValue: (params) => resolveConfigValue(params.root, params.key, params.scope, repositoryReadRequestDeps) }));

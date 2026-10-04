@@ -225,6 +225,11 @@ turn diff capture 的 start/complete 请求编排已迁移至
 拥有 `watchesByKey`、ready/recovery 状态和 response 包装；capture helper 的参数收窄与 watcher
 判定透传由 `scripts/test-worker-git-turn-diff-request-handlers.mjs` 的 8 项断言覆盖。
 
+turn-diff capture 的两个 Git 请求分支已进一步收敛至
+`src/main/worker/git-turn-diff-request-dispatch.ts`。dispatcher 只负责方法选择和结果 envelope，
+capture 参数编排仍由 request-handlers 持有；未知方法返回 `handled: false`，由
+`scripts/test-worker-git-turn-diff-request-dispatch.mjs` 覆盖 4 项入口契约断言。
+
 Turn-diff snapshot 的 reviewSnapshot generation cache、porcelain v1 `-z` 状态解析、无变化时
 `HEAD^{tree}` 快路径，以及 tracked/untracked 变化的临时 index staging/write-tree 已迁移至
 `src/main/worker/git-turn-diff-snapshot.ts`；原 `s6/iye/aye/oye/c6` 已删除。21 项断言覆盖
