@@ -20,6 +20,8 @@ import {
 } from "@chunk/shared";
 import { tt as mimeTypes } from "../vendor";
 import type { NetworkPolicy } from "../net/network-policy";
+import { getWebviewDir, getWebviewEntryPath } from "./webview-paths";
+export { getWebviewDir, getWebviewEntryPath } from "./webview-paths";
 
 const APP_HOST = "-"; // nt
 const FS_HOST = "fs"; // rt
@@ -54,14 +56,6 @@ export function registerPrivilegedAppSchemes(): void {
 }
 
 /** webview 静态资源目录（原 ut）：相对给定根目录向上两级再进 webview。 */
-export function getWebviewDir(root: string): string {
-  return join(root, "..", "..", "webview");
-}
-
-/** Resolve the file path used by the main-process trust gate for the webview entry. */
-export function getWebviewEntryPath(moduleDir: string): string {
-  return join(getWebviewDir(moduleDir), INDEX_ENTRY);
-}
 
 /** 渲染入口文件名（原 dt）：detached-window 路由用独立入口。 */
 export function rendererEntryForRoute(route: string): string {
