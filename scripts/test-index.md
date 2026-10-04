@@ -6,6 +6,8 @@ Total scripts: 736.
 
 ## Recent semantic extraction suites
 
+- [`test-worker-terminal-open-policy.mjs`](./test-worker-terminal-open-policy.mjs)
+
 - [`test-app-initial-flatten-conversation-items.mjs`](./test-app-initial-flatten-conversation-items.mjs)
 
 - [`test-preload-annotation-motion.mjs`](./test-preload-annotation-motion.mjs)
