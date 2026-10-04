@@ -559,3 +559,11 @@ annotation anchor 的当前页面判定（含 Google Docs anchor 兼容）与大
 `src/main/browser-page-preload/annotation-anchor-viewport-policy.ts`；原 preload 仅保留页面
 URL/DOM 依赖注入，`scripts/test-preload-annotation-anchor-viewport-policy.mjs` 覆盖 Google Docs、
 同页/异页、空 anchor 与 viewport 阈值边界，共 7 项断言。
+
+### 增量抽取：annotation surface feature state
+
+surface observer 对 containers、metadata 与 metadata-with-targets 的 feature 归并和互斥切换已迁移至
+`src/main/browser-page-preload/annotation-surface-feature-state.ts`。该模块只处理计数/请求状态到
+稳定 feature 列表的纯转换；DOM/ShadowRoot MutationObserver、副作用清理和 feature 广播仍由
+`annotation-surface-observer.ts` 负责。`scripts/test-preload-annotation-surface-feature-state.mjs`
+覆盖首次启用、metadata target 切换、请求保活、清空和幂等路径，共 10 项断言。

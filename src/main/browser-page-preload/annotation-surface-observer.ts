@@ -41,14 +41,15 @@ function installAnnotationSurfaceObserver(deps: AnnotationSurfaceObserverDepende
     for (const [root, observer] of shadowObservers) {
       if (!root.host.isConnected || root.host.ownerDocument !== deps.documentRef) { observer.disconnect(); shadowObservers.delete(root); }
     }
-    const hadContainers = features.has(`containers`);
-    const metadataFeature = metadataTargets.size > 0 ? `metadata-with-targets` : `metadata`;
-    const hadMetadata = features.has(metadataFeature);
-    const metadataActive = metadataTargets.size > 0 || metadataRequested;
-    const removedOtherMetadata = features.delete(metadataFeature === `metadata` ? `metadata-with-targets` : `metadata`);
-    containers.size > 0 ? features.add(`containers`) : features.delete(`containers`);
-    metadataActive ? features.add(metadataFeature) : features.delete(metadataFeature);
-    if (hadContainers !== features.has(`containers`) || hadMetadata !== metadataActive || removedOtherMetadata) emitFeatures();
+    const result = reconcileAnnotationSurfaceFeatures({
+      features,
+      containerCount: containers.size,
+      metadataTargetCount: metadataTargets.size,
+      metadataRequested,
+    });
+    features.clear();
+    for (const feature of result.features) features.add(feature);
+    if (result.changed) emitFeatures();
   };
   const inspect = (element: any) => {
     if (!element.isConnected || element.ownerDocument !== deps.documentRef) return;
@@ -128,3 +129,4 @@ function installAttachShadowObserver(eventName: string): (() => void) | null {
 
 export { installAnnotationSurfaceObserver };
 if (typeof module !== `undefined`) module.exports = { installAnnotationSurfaceObserver };
+import { reconcileAnnotationSurfaceFeatures } from "./annotation-surface-feature-state";
