@@ -41,9 +41,9 @@ import {
   lQt as latestConversationTurn,
   mnn as projectConversationTurn,
   tin as isHeartbeatAutomationTurn,
-  w$t as flattenConversationItems,
   yhn as getArtifactScanContent,
 } from "@rchunk/app-initial";
+import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
 import {
   gf as initializeAppgenArtifactLinks,
   hf as extractAppgenLinks,

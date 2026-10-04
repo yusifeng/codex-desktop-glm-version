@@ -16,9 +16,9 @@ import {
   lQt as activeConversationTurn,
   n$t as priorConversationTurns,
   t$t as sourceHistorySignal,
-  w$t as flattenConversationItems,
   wQt as hostIdByConversation,
 } from "@rchunk/app-initial";
+import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
 
 export interface SourceTurn {
   attachments?: unknown;

@@ -256,3 +256,9 @@ UI/voice/persistence surface 进入 audited preserve。六组专项验证共 107
 `docs/renderer-app-chunks.json` 中的 2247 个 app-code 文件已经全部处理。全量覆盖
 必须以 `node scripts/audit-renderer-app-coverage.mjs` 为准；它会报告当前 manifest
 覆盖数以及 composer/sidebar/settings/pages-routes 等优先簇的真实剩余数量。
+本轮将 `app-initial` 的真实业务 helper `jFn`（公开别名 `w$t`）迁出 hub：实现仅
+执行 `items.filter(item => item != null)`，5 个 conversation/webmcp、artifact 与
+source consumer 已改用 `src/renderer/app-initial/runtime/flatten-conversation-items.ts`
+中的泛型语义函数。该边界无初始化副作用、输入输出契约明确，并由
+`scripts/test-app-initial-flatten-conversation-items.mjs` 的 4 项行为断言覆盖；原
+hub 导出仍保留以兼容未迁移调用方。

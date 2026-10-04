@@ -18,8 +18,8 @@ import {
   j9t as getGoogleWorkspaceActivity,
   non as parseMarkdown,
   ton as initializeMarkdownLinks,
-  w$t as flattenConversationItems,
 } from "@rchunk/app-initial";
+import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
 
 export type ExternalResourceActivity = "provided" | "read" | "created" | "updated";
 

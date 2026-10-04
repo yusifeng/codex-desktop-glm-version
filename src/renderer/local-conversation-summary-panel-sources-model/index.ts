@@ -22,10 +22,10 @@ import {
   mmn as getAttachmentKey,
   pnn as projectMcpToolCall,
   vhn as initializeMcpCallProjection,
-  w$t as flattenConversationItems,
   wrn as initializeMcpProviderMetadata,
   yrn as computerUseProviderId,
 } from "@rchunk/app-initial";
+import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
 import {
   i as initializeMcpToolActivityLabels,
   t as getMcpToolActivityLabel,
