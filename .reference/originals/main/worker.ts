@@ -122,7 +122,7 @@ const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/te
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
-const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation } = require("./worker/editor-target-args");
+const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation, buildTextMateOpenArgs } = require("./worker/editor-target-args");
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
@@ -81342,14 +81342,7 @@ var VEe = {
   },
 };
 function HEe(e, t) {
-  if (!t) return [`-a`, `TextMate`, e];
-  let n = new URL(`txmt://open/`);
-  return (
-    n.searchParams.set(`url`, (0, ae.pathToFileURL)(e).toString()),
-    n.searchParams.set(`line`, t.line.toString()),
-    n.searchParams.set(`column`, t.column.toString()),
-    [`-a`, `TextMate`, n.toString()]
-  );
+  return buildTextMateOpenArgs(e, t);
 }
 var UEe = [`2022`, `2019`, `2017`],
   WEe = [`Community`, `Professional`, `Enterprise`, `Preview`, `BuildTools`],

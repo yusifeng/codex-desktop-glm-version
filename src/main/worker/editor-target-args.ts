@@ -10,4 +10,12 @@ export function buildZedRemoteUri(host: string, remotePath: string): string | nu
 export function appendEditorLocation(path: string, location?: EditorLocation | null): string {
   return location ? `${path}:${location.line}:${location.column}` : path;
 }
-if (typeof module !== `undefined`) module.exports = { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation };
+export function buildTextMateOpenArgs(path: string, location?: EditorLocation | null): string[] {
+  if (!location) return [`-a`, `TextMate`, path];
+  const uri = new URL(`txmt://open/`);
+  uri.searchParams.set(`url`, `file://${encodeURI(path)}`);
+  uri.searchParams.set(`line`, String(location.line));
+  uri.searchParams.set(`column`, String(location.column));
+  return [`-a`, `TextMate`, uri.toString()];
+}
+if (typeof module !== `undefined`) module.exports = { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation, buildTextMateOpenArgs };
