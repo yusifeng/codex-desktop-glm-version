@@ -391,6 +391,10 @@ Command/shortcut registry 的纯策略边界已迁移至
 accelerator 归一化与 modified-Enter 判定由该模块提供，`command-registry.ts` 保留
 命令定义、keymap 读写及副作用编排；9 项 focused 断言覆盖跨平台与冲突边界。
 
+Command capability 的 required-access 与 shortcut-configurable 判定已进一步迁移至
+`src/main/shared/command-capability-policy.ts`；命令 registry 仅保留定义索引与 keymap
+编排，7 项 focused 断言覆盖 codex/work-local、VS Code-only 与鼠标快捷键边界。
+
 子进程环境清洗已迁移至 `worker/platform-env.ts`：入口不再持有 Crashpad/Electron
 注入变量黑名单，所有 WSL、Git、shell 与 editor 子进程统一通过窄 `sanitizeChildProcessEnv`
 适配器复制并过滤环境。过滤键按大小写不敏感匹配且不修改调用方对象，由

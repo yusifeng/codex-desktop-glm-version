@@ -591,6 +591,10 @@ Command/shortcut registry 的纯策略边界已抽取到
 归一化与 modified-Enter 判定），入口保留命令表、keymap IO 与写入副作用；由 9 项
 focused assertions 覆盖。
 
+Command capability 的 required-access 与 shortcut-configurable 判定已抽取到
+`src/main/shared/command-capability-policy.ts`，入口保留命令索引与 keymap 编排；由 7 项
+focused assertions 覆盖 codex/work-local、VS Code-only 与鼠标快捷键边界。
+
 GitHub PR summary 的按账号批量去重、debounce、GraphQL 检查分页与 abort 语义已迁移至
 `src/main/worker/github-pull-request-summary.ts`，入口仅保留 `gh-pr-summary` 适配与账户校验。
 新增 `scripts/test-github-pull-request-summary.mjs`，覆盖 2 项基础断言；整体 handoff 仍未完成。

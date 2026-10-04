@@ -48,6 +48,12 @@ import {
   isMouseAccelerator,
   normalizeAccelerator,
 } from "./command-registry-policy";
+import {
+  commandAvailableForAccess,
+  isShortcutConfigurable,
+} from "./command-capability-policy";
+
+export { commandAvailableForAccess, isShortcutConfigurable } from "./command-capability-policy";
 
 export { isMouseAccelerator } from "./command-registry-policy";
 
@@ -1449,35 +1455,6 @@ export function isNumberedTabCommand(commandId: string): boolean {
 // ---------------------------------------------------------------------------
 // 可用性 / 可配置性（原 `I6`/`L6`/`R6`/`J6`/`z6`/`B6`）
 // ---------------------------------------------------------------------------
-
-/** requiredAccess 可用性（原 `I6`，导出 `Nt`）。 */
-export function commandAvailableForAccess(definition: CommandDefinition, flags: PlatformAccessFlags): boolean {
-  return accessAvailable("requiredAccess" in definition ? definition.requiredAccess : undefined, flags);
-}
-
-function accessAvailable(required: RequiredAccess | undefined, flags: PlatformAccessFlags): boolean {
-  switch (required) {
-    case "codexLocal":
-      return flags.codexLocal;
-    case "codexOrWorkLocal":
-      return flags.codexLocal || flags.workLocal;
-    case undefined:
-      return true;
-  }
-}
-
-/** vscode-only 命令判定（原 `J6`）。 */
-function isVscodeOnly(definition: CommandDefinition): boolean {
-  return definition.kind === "vscode-only";
-}
-
-/** 可配置快捷键判定（原 `R6`：vscode-only 与鼠标键、显式 false 除外）。 */
-export function isShortcutConfigurable(definition: CommandDefinition): boolean {
-  if (isVscodeOnly(definition)) return false;
-  if ("shortcutConfigurable" in definition && definition.shortcutConfigurable === false) return false;
-  const bindings = definition.electron?.defaultKeybindings ?? [];
-  return !bindings.some((binding) => isMouseAccelerator(binding.key));
-}
 
 // ---------------------------------------------------------------------------
 // 加速键解析（原 `O6`/`q6`/`V6`/`U6`/`H6`/`W6`/`G6`/`K6`）
