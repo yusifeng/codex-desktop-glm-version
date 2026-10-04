@@ -6375,6 +6375,7 @@ var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotatio
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
 var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annotation-editor-default-mode");
 var { isAnnotationTextInput } = require("./browser-page-preload/annotation-input-target");
+var { hasRunningAnnotationAnimation } = require("./browser-page-preload/annotation-motion");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -24373,17 +24374,11 @@ function Ey(e) {
   return t === window;
 }
 function Dy(e) {
-  let t = e;
-  for (; t != null;) {
-    if (t.getAnimations?.().some((e) => e.playState === `running`)) return !0;
-    let e = ic(t);
-    if (e != null) t = e;
-    else {
-      let e = t.ownerDocument.defaultView?.frameElement;
-      t = F(e) ? e : null;
-    }
-  }
-  return !1;
+  return hasRunningAnnotationAnimation(e, {
+    getParent: ic,
+    getFrameElement: (e) => e?.frameElement ?? null,
+    isElement: F,
+  });
 }
 function Oy(e, t) {
   let n = e.ownerDocument.defaultView;

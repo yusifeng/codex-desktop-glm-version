@@ -224,6 +224,10 @@ Annotation overlay 的条件 class-name 归一化与拼接（原 `cv/lv` 23340-2
 原压缩 helper 已物理删除。`scripts/test-preload-annotation-class-names.mjs` 以 9 项断言覆盖
 字符串/数字、递归数组、对象 map、falsey 过滤、非支持 primitive 与原有 `for-in` 语义。
 
+Annotation controls 的 running-animation ancestor/frame 判定（原 `Dy` 24375-24386）已迁移至
+`src/main/browser-page-preload/annotation-motion.ts`；入口仅保留 DOM 依赖适配，
+`scripts/test-preload-annotation-motion.mjs` 覆盖自身、ancestor、frame、idle 与 null 边界。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）

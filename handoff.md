@@ -645,6 +645,9 @@ Annotation text input target 的 `HTMLInputElement` 类型白名单与 textarea 
 Annotation overlay 的条件 class-name 归一化/拼接（原 `cv/lv`）已抽取为
 `src/main/browser-page-preload/annotation-class-names.ts`，两个 cursor 组件改用语义入口，
 原压缩 helper 已物理删除；由 9 项行为断言覆盖递归数组、对象 map 与 falsey 过滤。
+Annotation controls 的 running-animation ancestor/frame 判定（原 `Dy`）已抽取为
+`src/main/browser-page-preload/annotation-motion.ts`，入口只保留 DOM 依赖适配；由 5 项断言覆盖
+自身、祖先、frame、idle 与 null 边界。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。
