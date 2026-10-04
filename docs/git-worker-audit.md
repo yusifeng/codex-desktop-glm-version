@@ -1006,3 +1006,8 @@ Live-query refresh generation 的 dirty/trigger/retry 重置、generation 分配
 completion waiter 注册已迁移至 `src/main/worker/git-live-query-refresh-plan.ts`。registry
 仅负责对选中 subscription 调用计划并安排 timer，避免在异步 refresh 编排中重复维护状态
 转换；`scripts/test-worker-git-live-query-refresh-plan.mjs` 覆盖 9 项行为断言。
+
+Live-query fan-out 的 host/commonDir/root/change-type 与 recovery/repository 选择策略已迁移至
+`src/main/worker/git-live-query-selection-policy.ts`。registry 只保留 refresh 编排和状态副作用，
+避免在订阅状态管理中重复内联筛选；`scripts/test-worker-git-live-query-selection-policy.mjs`
+覆盖 repo-change、recovery、repository 三类选择，共 6 项行为断言。
