@@ -32,6 +32,7 @@ const { getCurrentBranch: getCurrentGitBranchQuery, getCurrentBranchSnapshot: ge
 const { getGitIndexInfo } = require("./worker/git-index-info");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
+const { getDefaultBranchForRemote: getDefaultBranchForRemoteQuery, getDefaultRemoteBranch: getDefaultGitRemoteBranchQuery, getLocallyKnownDefaultBranch: getLocallyKnownDefaultBranchQuery, getOrderedRemotes: getOrderedGitRemotesQuery, getUpstreamRef: getGitUpstreamRefQuery } = require("./worker/git-remote-branches");
 const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./worker/git-ref-resolution");
 const { getRepositoryIdentity: getGitRepositoryIdentity } = require("./worker/git-repository-identity");
 const { getSafeAttributeFilterOverrides } = require("./worker/git-safe-attribute-filters");
@@ -119,6 +120,23 @@ const gitRecentBranchesDeps = {
   runGit: (...args) => $(...args),
   staleTime: Infinity,
 };
+const gitRemoteBranchesDeps = {
+  getConfigQueryMeta: () => y1,
+  getRemoteRefsQueryMeta: () => S1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const getDefaultBranchForRemote = (repository, remote) =>
+  getDefaultBranchForRemoteQuery(repository, remote, gitRemoteBranchesDeps);
+const getDefaultGitRemoteBranch = (repository) =>
+  getDefaultGitRemoteBranchQuery(repository, gitRemoteBranchesDeps);
+const getLocallyKnownDefaultBranch = (repository, remote) =>
+  getLocallyKnownDefaultBranchQuery(repository, remote, gitRemoteBranchesDeps);
+const getOrderedGitRemotes = (repository) =>
+  getOrderedGitRemotesQuery(repository, gitRemoteBranchesDeps);
+const getGitUpstreamRef = (repository, ref, signal) =>
+  getGitUpstreamRefQuery(repository, ref, signal, gitRemoteBranchesDeps);
 const gitRefResolutionDeps = {
   getQueryMeta: () => x1,
   normalizeSha: (...args) => wz(...args),
@@ -156,7 +174,7 @@ const gitWorktreeListDeps = {
 };
 const gitReviewComparisonDeps = {
   findMergeBase: (...args) => X2(...args),
-  getDefaultBranch: (...args) => k2(...args),
+  getDefaultBranch: (...args) => getDefaultGitRemoteBranch(...args),
   getHeadCommit: (...args) => resolveGitRefSha(...args),
   getQueryMeta: () => _1,
   getUntrackedPaths: (...args) => f2(...args),
@@ -185,14 +203,14 @@ const handoffDestinationDeps = {
     readCurrentHeadSnapshot(repository, signal, gitReviewComparisonDeps),
   runGit: $,
   getCurrentBranch: getCurrentGitBranch,
-  getDefaultRemoteBranch: k2,
+  getDefaultRemoteBranch: getDefaultGitRemoteBranch,
   checkoutBranch: t4,
 };
 const handoffSharedBaseDeps = {
   runGit: $,
-  getDefaultRemoteBranch: k2,
+  getDefaultRemoteBranch: getDefaultGitRemoteBranch,
   getMergeBase: X2,
-  getRemotes: j0,
+  getRemotes: getOrderedGitRemotes,
   logger: {
     debug: (message, detail) => CW().debug(message, detail),
     warning: (message, detail) => CW().warning(message, detail),
@@ -272,17 +290,17 @@ const branchSearchDeps = {
 };
 const gitBranchAheadDeps = {
   getCurrentBranch: getCurrentGitBranch,
-  getDefaultRemoteBranch: k2,
+  getDefaultRemoteBranch: getDefaultGitRemoteBranch,
   getMergeBase: X2,
   getQueryMeta: () => _1,
-  getRemotes: j0,
-  getUpstreamBranch: P0,
+  getRemotes: getOrderedGitRemotes,
+  getUpstreamBranch: getGitUpstreamRef,
   queryKey: Q,
   runGit: $,
 };
 const gitBranchMetadataDeps = {
   getCurrentBranch: getCurrentGitBranch,
-  getDefaultRemoteBranch: k2,
+  getDefaultRemoteBranch: getDefaultGitRemoteBranch,
   normalizeBranch: Tz,
   normalizeCwd: xz,
   readBranchSnapshot: P2,
@@ -66752,7 +66770,6 @@ function g0(e) {
 var Dpe = 209715200,
   _0 = 33554432,
   kpe = 67108864,
-  v0 = `origin`,
   Ape = [
     `-c`,
     `diff.mnemonicPrefix=false`,
@@ -66776,37 +66793,6 @@ async function y0(e, t, n, r = {}) {
     ...s,
     configOverrides: [...o, ...Ape],
     maxOutputBytes: c,
-  });
-}
-async function Npe(e, t = v0) {
-  return (await k0(e, t)) || Ppe(e, t);
-}
-function k0(e, t = v0) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `locally-known-default-branch`, t),
-    meta: S1,
-    queryFn: async () => {
-      let n = await $(e.root, [`symbolic-ref`, `--quiet`, `refs/remotes/${t}/HEAD`], e.host, {
-        allowedNonZeroExitCodes: [1],
-      });
-      if (!n.success || !n.stdout) return null;
-      let r = `refs/remotes/${t}/`;
-      return n.stdout.startsWith(r) ? n.stdout.slice(r.length) : null;
-    },
-    staleTime: g1,
-  });
-}
-function Ppe(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `remote-default-branch`, t),
-    meta: S1,
-    queryFn: async () => {
-      let n = await $(e.root, [`remote`, `show`, t], e.host, { timeoutMs: 1e4 });
-      if (!n.success || !n.stdout) return null;
-      let r = /HEAD branch:\s*(.+)/.exec(n.stdout)?.[1].trim() ?? null;
-      return r === `(unknown)` ? null : r;
-    },
-    staleTime: g1,
   });
 }
 function A0(e, t, n, r) {
@@ -66843,41 +66829,6 @@ function Fpe(e) {
     i = Number.parseInt(n[1] ?? ``, 10);
   return !Number.isFinite(r) || !Number.isFinite(i) ? null : { leftAhead: r, rightAhead: i };
 }
-function j0(e) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `ordered-remotes`),
-    meta: y1,
-    queryFn: async () => {
-      let t = await $(e.root, [`remote`], e.host);
-      if (!t.success || !t.stdout) return [];
-      let n = t.stdout
-        .split(
-          `
-`,
-        )
-        .map((e) => e.trim())
-        .filter((e) => e.length > 0);
-      return n.includes(`origin`) && n.length > 1 ? [v0, ...n.filter((e) => e !== v0)] : n;
-    },
-    staleTime: g1,
-  });
-}
-function P0(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `upstream-ref`, t),
-    meta: y1,
-    queryFn: async () => {
-      let r = await $(
-        e.root,
-        [`rev-parse`, `--abbrev-ref`, `--symbolic-full-name`, `${t}@{u}`],
-        e.host,
-        { allowedNonZeroExitCodes: [128, 1], signal: n },
-      );
-      return r.success && r.stdout ? r.stdout : null;
-    },
-    staleTime: g1,
-  });
-}
 function F0(e) {
   return e.startsWith(`refs/`) ? e : `refs/heads/${e}`;
 }
@@ -66890,7 +66841,7 @@ async function Ipe(e, t, n, r, i, a) {
         if (i == null || t.branchName === `HEAD` || t.branchName === `@`) return t.branchName;
         let e = t.remoteRef;
         if (e == null) return (await I0(i, t.branchName, a))?.ref ?? t.branchName;
-        let n = (await j0(i))
+        let n = (await getOrderedGitRemotes(i))
           .filter((t) => e.startsWith(`refs/remotes/${t}/`))
           .sort((e, t) => t.length - e.length)[0];
         if (n == null) return e;
@@ -66901,7 +66852,7 @@ async function Ipe(e, t, n, r, i, a) {
         if (s == null) throw Error(`Failed to resolve latest ${n}/${r}`);
         return s;
       }
-      return i == null ? `HEAD` : ((await getCurrentGitBranch(i)) ?? (await k0(i)) ?? `HEAD`);
+      return i == null ? `HEAD` : ((await getCurrentGitBranch(i)) ?? (await getLocallyKnownDefaultBranch(i)) ?? `HEAD`);
     })(),
     (async () => {
       if (t.type !== `working-tree`) return null;
@@ -66923,14 +66874,14 @@ async function I0(e, t, n) {
   if (t === `HEAD` || t === `@`)
     return (await resolveGitRefSha(e, `${t}^{commit}`, n)) == null ? null : { ref: t };
   let r = Rpe(t),
-    i = await P0(e, t, n);
+    i = await getGitUpstreamRef(e, t, n);
   if (i != null) {
     let a = `refs/remotes/${i}`,
       o = (await resolveGitRefSha(e, `${a}^{commit}`, n)) == null ? F0(i) : a;
     return (await A0(e, r ?? t, o, n))?.state === `right-ahead` ? { ref: o } : { ref: r ?? t };
   }
   if (r != null && (await resolveGitRefSha(e, `${r}^{commit}`, n)) != null) return { ref: r };
-  let a = await j0(e);
+  let a = await getOrderedGitRemotes(e);
   if (t.startsWith(`refs/remotes/`) && (await resolveGitRefSha(e, `${t}^{commit}`, n)) != null)
     return { ref: t, remoteRef: t };
   let o = zpe(t, a);
@@ -68380,7 +68331,7 @@ async function Bme(e, t, n, r, i, a) {
 async function Vme(e, t, n) {
   if (!t.startsWith(`refs/remotes/`)) return null;
   let r = t.slice(13),
-    i = (await j0(e)).find((e) => r.startsWith(`${e}/`));
+    i = (await getOrderedGitRemotes(e)).find((e) => r.startsWith(`${e}/`));
   if (i == null) return null;
   let a = r.slice(i.length + 1);
   if (!a || a === `HEAD` || (await resolveGitRefSha(e, `refs/heads/${a}`, n)) != null) return null;
@@ -68443,36 +68394,6 @@ async function Wme(e, t, n, r, i, a) {
 async function O2(e, t, n, r) {
   let i = await $(e, [`show-ref`, `--verify`, `--quiet`, F0(t)], n, { signal: r });
   return i.success && i.code === 0;
-}
-async function k2(e) {
-  return Gme(e, await j0(e));
-}
-async function Gme(e, t) {
-  if (t.length === 0) return null;
-  for (let n of t) {
-    let t = await Npe(e, n);
-    if (t) return { remote: n, branch: t };
-    let r = await Kme(e, n);
-    if (r != null) return { remote: n, branch: r };
-  }
-  return null;
-}
-async function Kme(e, t) {
-  for (let n of [`main`, `master`]) if (await qme(e, t, n)) return n;
-  return null;
-}
-function qme(e, t, n) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `remote-branch`, t, n),
-    meta: S1,
-    queryFn: async () =>
-      (
-        await $(e.root, [`show-ref`, `--verify`, `--quiet`, `refs/remotes/${t}/${n}`], e.host, {
-          allowedNonZeroExitCodes: [1],
-        })
-      ).code === 0,
-    staleTime: g1,
-  });
 }
 function A2(e, t, n) {
   return e.queryClient.fetchQuery({
@@ -68600,7 +68521,7 @@ async function V2({
   let g = await t.getWorktreeRepository(xz(n), c);
   if (!g) return { success: !1, error: Error(`Not a git repository`) };
   if (l?.aborted) return { success: !1, error: Error(`Request canceled`) };
-  let _ = (await k2(g))?.branch ?? null,
+  let _ = (await getDefaultGitRemoteBranch(g))?.branch ?? null,
     v = m;
   if (!v?.trim() && !h) {
     let [e, t] = await Promise.all([c.codexHome(), c.platformPath()]);
@@ -68916,7 +68837,7 @@ async function che(e, t, n, r) {
   }
   if (!n.startsWith(`refs/remotes/`)) return null;
   let i = n.slice(13),
-    a = (await j0(e)).find((e) => i.startsWith(`${e}/`));
+    a = (await getOrderedGitRemotes(e)).find((e) => i.startsWith(`${e}/`));
   if (a == null) return null;
   let o = i.slice(a.length + 1);
   return !o || o === `HEAD` ? null : (await O2(e.root, o, e.host, r)) ? o : null;
@@ -69127,7 +69048,7 @@ async function vhe(e, t) {
       let t = e?.trim();
       t && !s.has(t) && (o.push(t), s.add(t));
     },
-    [l, u] = await Promise.all([yhe(e, n), j0(e)]);
+    [l, u] = await Promise.all([yhe(e, n), getOrderedGitRemotes(e)]);
   if (u.length > 0) {
     let e = new Set(u),
       t = n.indexOf(`/`),
@@ -71817,7 +71738,7 @@ var I6 = kW(`git`),
           getOrigins: (directories) => resolveOriginAndRoots(directories, originDiscoveryDeps),
           getShellEnvironment: ehe,
           getOwnerThreadId: p4,
-          getDefaultRemoteBranch: k2,
+          getDefaultRemoteBranch: getDefaultGitRemoteBranch,
           getMergeBase: X2,
           getCurrentBranch: (root, host) => this.getCurrentBranch(root, host),
           getCurrentBranchSnapshot: getCurrentGitBranchSnapshot,
@@ -71953,8 +71874,8 @@ var I6 = kW(`git`),
           host: o,
           signal: i.signal,
           normalizeRoot: xz,
-          getDefaultRemoteBranch: k2,
-          getRemotes: j0,
+          getDefaultRemoteBranch: getDefaultGitRemoteBranch,
+          getRemotes: getOrderedGitRemotes,
           runGit: (cwd, args, host, options) => $(cwd, args, host, options),
           formatCommand: KX,
           formatExecOutput: mR,
@@ -72562,7 +72483,7 @@ var I6 = kW(`git`),
     async handleUpstreamBranch(e, { host: t, signal: n }) {
       let r = this.gitManager.getWorktreeRepositoryForRoot(e, t),
         i = await getCurrentGitBranch(r),
-        a = await P0(r, i ?? `HEAD`, n);
+        a = await getGitUpstreamRef(r, i ?? `HEAD`, n);
       return a ? { branch: i, upstream: { branch: a } } : { branch: i, upstream: null };
     }
     async handleBranchAheadCount(e, { host: t, signal: n }) {
@@ -72570,7 +72491,7 @@ var I6 = kW(`git`),
     }
     async getDefaultBranch(e, t, n, { live: r = !1 } = {}) {
       let i = this.gitManager.getWorktreeRepositoryForRoot(e, t),
-        a = (await k2(i))?.branch ?? null;
+        a = (await getDefaultGitRemoteBranch(i))?.branch ?? null;
       return (
         (a ||=
           (await getGitRecentBranches(i, 10, n, { live: r }, gitRecentBranchesDeps)).find(
@@ -72580,7 +72501,7 @@ var I6 = kW(`git`),
       );
     }
     async getBaseBranch(e, t) {
-      let n = await k2(this.gitManager.getWorktreeRepositoryForRoot(e, t));
+      let n = await getDefaultGitRemoteBranch(this.gitManager.getWorktreeRepositoryForRoot(e, t));
       return { local: n?.branch ?? null, remote: n?.remote ?? null };
     }
     async getCurrentBranch(e, t) {

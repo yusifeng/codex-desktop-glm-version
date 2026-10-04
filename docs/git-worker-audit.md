@@ -519,6 +519,14 @@ head generation 防陈旧重试与精确 query invalidation 已迁移至
 `C0` 已删除，worker 中 watcher、handoff、branch metadata/ahead 与 request handler 消费者
 全部改用语义名称，由 26 项模块断言覆盖。
 
+### 增量抽取：Remote branch queries
+
+Remote branch 的 ordered remotes、local/remote default branch、main/master fallback、upstream ref
+与 remote tracking branch 查询已迁移至 `src/main/worker/git-remote-branches.ts`。原
+`Npe`/`k0`/`Ppe`/`j0`/`P0`/`k2`/`Gme`/`Kme`/`qme` 与专用 `v0` 常量已删除，
+default branch、starting ref、handoff、push 与 branch metadata/ahead 消费者全部改用语义名称，
+由 44 项模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
