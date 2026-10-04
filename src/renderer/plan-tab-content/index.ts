@@ -11,7 +11,8 @@ import {
 } from "@rchunk/app-shared";
 import { Dyt as hostIdSignal, byt as initializeHostState } from "@rchunk/app-initial";
 // @ts-expect-error The generated declaration is updated centrally after module registration.
-import { Ct as conversationDataAttributeImport, wt as initializeConversationSurfaceImport } from "@rchunk/app-primary";
+import { wt as initializeConversationSurfaceImport } from "@rchunk/app-primary";
+import { PLAN_SELECTION_SURFACE_ATTRIBUTE as conversationDataAttribute } from "../app-primary/runtime/plan-selection-surface";
 import { i as initializeMarkdownSurface, r as MarkdownSurface } from "@rchunk/surface";
 import type { JsxRuntime } from "@rchunk/app-shared";
 
@@ -29,7 +30,6 @@ type CallbackRef<Element> = (element: Element | null) => void | (() => void);
 type UseCallbackRef = <Element>(callback: CallbackRef<Element>) => CallbackRef<Element>;
 
 const useCallbackRef = useCallbackRefImport as unknown as UseCallbackRef;
-const conversationDataAttribute = conversationDataAttributeImport as unknown as PropertyKey;
 const initializeConversationSurface = initializeConversationSurfaceImport as unknown as () => void;
 let jsx: JsxRuntime;
 let initialized = false;

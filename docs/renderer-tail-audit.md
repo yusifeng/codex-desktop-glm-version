@@ -449,3 +449,10 @@ hub 的 UI 注册副作用。`conversation-followup-shelf` 新增可选的
 到语义导入，保留 `Bf` 初始化器所需的 hub 生命周期。由
 `scripts/test-app-primary-create-prefilled-plugin-prompt.mjs` 的 3 项断言覆盖
 插件 ID 空白、Markdown 转义与空 prompt 边界。
+
+本轮再将 app-primary 的 plan surface 数据属性常量 `V5`（公开别名 `Ct`）迁为
+`src/renderer/app-primary/runtime/plan-selection-surface.ts` 的
+`PLAN_SELECTION_SURFACE_ATTRIBUTE`。`plan-tab-content` 现在直接消费语义常量，仍
+保留 `H5`（公开别名 `wt`）初始化器以维持聚合 hub 的注册顺序；该边界不复制任何
+React 或 signal runtime。`scripts/test-app-primary-plan-selection-surface.mjs`
+覆盖语义导入边界和属性值契约共 2 项断言。
