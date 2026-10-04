@@ -165,14 +165,12 @@ Total scripts: 903.
 
 - [`test-app-initial-flatten-conversation-items.mjs`](./test-app-initial-flatten-conversation-items.mjs)
 
-- [`test-preload-annotation-motion.mjs`](./test-preload-annotation-motion.mjs)
 
 - [`test-worker-open-in-target-descriptors.mjs`](./test-worker-open-in-target-descriptors.mjs)
 
 - [`test-preload-annotation-class-names.mjs`](./test-preload-annotation-class-names.mjs)
 - [`test-preload-annotation-motion.mjs`](./test-preload-annotation-motion.mjs)
 
-- [`test-main-tray-readiness.mjs`](./test-main-tray-readiness.mjs)
 
 - [`test-main-renderer-recovery-policy.mjs`](./test-main-renderer-recovery-policy.mjs)
 
@@ -233,7 +231,6 @@ Total scripts: 903.
 - [`test-main-tray-readiness.mjs`](./test-main-tray-readiness.mjs)
 - [`test-preload-annotation-controls-registry.mjs`](./test-preload-annotation-controls-registry.mjs)
 - [`test-preload-annotation-control-handle.mjs`](./test-preload-annotation-control-handle.mjs)
-- [`test-preload-annotation-class-names.mjs`](./test-preload-annotation-class-names.mjs)
 - [`test-preload-annotation-surface-events.mjs`](./test-preload-annotation-surface-events.mjs)
 - [`test-preload-annotation-surface-policies.mjs`](./test-preload-annotation-surface-policies.mjs)
 - [`test-preload-annotation-editor-default-mode.mjs`](./test-preload-annotation-editor-default-mode.mjs)
@@ -324,7 +321,6 @@ Total scripts: 903.
 - [`test-worker-git-watch-subscription-policy.mjs`](./test-worker-git-watch-subscription-policy.mjs)
 - [`test-worker-git-watch-acquire.mjs`](./test-worker-git-watch-acquire.mjs)
 - [`test-worker-git-watch-lifecycle.mjs`](./test-worker-git-watch-lifecycle.mjs)
-- [`test-worker-git-watch-index-bucket.mjs`](./test-worker-git-watch-index-bucket.mjs)
 - [`test-worker-git-worktree-resolution.mjs`](./test-worker-git-worktree-resolution.mjs)
 - [`test-worker-git-worktree-request-handlers.mjs`](./test-worker-git-worktree-request-handlers.mjs)
 - [`test-worker-git-worktree-snapshot-read-dispatch.mjs`](./test-worker-git-worktree-snapshot-read-dispatch.mjs)
