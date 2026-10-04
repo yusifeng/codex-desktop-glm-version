@@ -93,6 +93,7 @@ const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite"
 const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchState: collectSyncedBranchState } = require("./worker/git-synced-branch-state");
 const { SYNCED_BRANCH_CONFIG_FILE, readSyncedBranchConfig: readSyncedBranchConfigQuery, resolveSyncedBranchConfigPath: resolveSyncedBranchConfigPathQuery, setSyncedBranchConfig: setSyncedBranchConfigQuery } = require("./worker/git-synced-branch-config");
 const { dispatchTurnDiffRequest } = require("./worker/git-turn-diff-request-dispatch");
+const { releaseGitRepoWatch } = require("./worker/git-watch-lifecycle");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
 const { completeTurnDiffCapture: performCompleteTurnDiffCapture, startTurnDiffCapture: performStartTurnDiffCapture } = require("./worker/git-turn-diff-capture");
@@ -71029,11 +71030,7 @@ var I6 = kW(`git`),
       t,
       { emitEvent: n = !0, watch: r = this.watchesByKey.get(this.getWatchKey(e, t)) } = {},
     ) {
-      if (r == null || r.refCount <= 0 || (--r.refCount, r.refCount > 0)) return;
-      let i = () => {
-        r.refCount > 0 || this.closeRepoWatch(r, t, n);
-      };
-      r.startPromise.then(i, i);
+      releaseGitRepoWatch(r, (watch) => this.closeRepoWatch(watch, t, n));
     }
     scheduleWatchSetup(e, t, n) {
       let r = h1(t),

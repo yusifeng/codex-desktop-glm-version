@@ -269,6 +269,7 @@ Total scripts: 830.
 - [`test-worker-git-turn-diff-snapshot.mjs`](./test-worker-git-turn-diff-snapshot.mjs)
 - [`test-worker-git-uncommitted-diff.mjs`](./test-worker-git-uncommitted-diff.mjs)
 - [`test-worker-git-watch-request-handlers.mjs`](./test-worker-git-watch-request-handlers.mjs)
+- [`test-worker-git-watch-lifecycle.mjs`](./test-worker-git-watch-lifecycle.mjs)
 - [`test-worker-git-worktree-resolution.mjs`](./test-worker-git-worktree-resolution.mjs)
 - [`test-worker-git-worktree-request-handlers.mjs`](./test-worker-git-worktree-request-handlers.mjs)
 - [`test-worker-git-worktree-snapshot-read-dispatch.mjs`](./test-worker-git-worktree-snapshot-read-dispatch.mjs)

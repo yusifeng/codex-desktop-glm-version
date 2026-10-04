@@ -892,3 +892,11 @@ handoff cleanup 的方法选择与 request-id 进度转发已迁移至
 继续返回原始结果，其余操作保持 `ok` 包装）；实际生命周期、去重、owner 更新和 host cache
 副作用仍由 `git-worktree-request-handlers.ts` 注入执行。`scripts/test-worker-git-worktree-mutation-dispatch.mjs`
 覆盖 restore/delete/move 成功路径及未知方法旁路，共 6 项断言。
+
+### 增量抽取：Git watcher reference release lifecycle
+
+GitRepoManager 的 watcher 引用释放边界已迁移至 `src/main/worker/git-watch-lifecycle.ts`。
+该模块保持 ref-count 递减、setup 成功或失败后的 close 调度，以及零引用/空 watcher 的早退；
+入口仍负责实际 watcher dispose 与 `git-repo-unwatched` 事件副作用。
+`scripts/test-worker-git-watch-lifecycle.mjs` 覆盖多引用保留、最终释放、setup reject 和零引用早退，
+共 5 项断言。
