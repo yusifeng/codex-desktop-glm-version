@@ -702,6 +702,9 @@ Annotation overflow 值判定（原 `tc/nc`）已抽取为
 Annotation theme variant 读取（原 `f_`）已抽取为
 `src/main/browser-page-preload/annotation-theme.ts`，入口注入 window.matchMedia；由 3 项断言覆盖
 dark/light 与缺失 matchMedia。
+Annotation viewport size 读取（原 `p_`）已抽取为
+`src/main/browser-page-preload/annotation-viewport.ts`，入口注入 window 尺寸；由 2 项断言覆盖
+正常与零尺寸。
 app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
 `src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
 导出暂保留以维持结构等价，已不再是无归属业务实现。

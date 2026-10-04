@@ -6380,6 +6380,7 @@ var { normalizeAnnotationWheelDelta } = require("./browser-page-preload/annotati
 var { canScrollAnnotationAxis } = require("./browser-page-preload/annotation-scroll-boundary");
 var { isClippingAnnotationOverflow, isScrollableAnnotationOverflow } = require("./browser-page-preload/annotation-overflow");
 var { resolveAnnotationThemeVariant } = require("./browser-page-preload/annotation-theme");
+var { readAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22836,7 +22837,7 @@ function f_() {
   return resolveAnnotationThemeVariant(window);
 }
 function p_() {
-  return { height: window.innerHeight, width: window.innerWidth };
+  return readAnnotationViewportSize(window);
 }
 function m_(e, t, n, r) {
   return M_(e, t, n, r)
