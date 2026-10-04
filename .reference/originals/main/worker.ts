@@ -113,6 +113,7 @@ const { buildWslCommand, decodeCommandOutput, findActiveDistro, orderEligibleDis
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
 const { listGitWorktrees } = require("./worker/git-worktree-list");
+const { resolveWorktreeList } = require("./worker/git-worktree-list-request-handler");
 const { disposeGitInitWatch, recoverGitLiveQueries, subscribeGitLiveQuery, unwatchGitRepository, watchGitRepository } = require("./worker/git-watch-request-handlers");
 const { GitWatcherPerformanceAggregator } = require("./worker/git-watcher-performance");
 const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./worker/git-watcher-metadata");
@@ -69824,7 +69825,10 @@ var I6 = kW(`git`),
           createWorktree: (params) => V2(params),
           listCodexWorktrees: (gitManager, host, worktreesRoot) =>
             listCodexWorktrees(gitManager, host, worktreesRoot, managedWorktreeDiscoveryDeps),
-          listWorktrees: (cwd, host, signal) => this.getWorktrees(cwd, host, signal),
+          listWorktrees: (cwd, host, signal) => resolveWorktreeList(cwd, host, signal, {
+            getWorktreeRepository: (root, executionHost) => this.gitManager.getWorktreeRepository(root, executionHost),
+            listWorktrees: (repository, requestSignal) => listGitWorktrees(repository, requestSignal, gitWorktreeListDeps),
+          }),
         },
         s = ube(e),
         c = s == null ? `unknown` : this.getGitPerformanceRepoIndexSizeBucket(s, o),
@@ -70379,12 +70383,6 @@ var I6 = kW(`git`),
       let n = await getCurrentGitBranchState(this.gitManager.getWorktreeRepositoryForRoot(e, t));
       return { branch: n.type === `branch` ? n.branch : null, isDetached: n.type === `detached` };
     }
-    async getWorktrees(e, t, n) {
-      let r = await this.gitManager.getWorktreeRepository(e, t);
-      return {
-        worktrees: r == null ? [] : await listGitWorktrees(r, n, gitWorktreeListDeps),
-      };
-    }
     async handleRecentBranches(e, { host: t, signal: n }) {
       let r = Math.max(1, Math.min(e.limit ?? 10, 100));
       return X({
@@ -70695,7 +70693,10 @@ var I6 = kW(`git`),
             },
           };
         case `list-worktrees`:
-          return { method: `list-worktrees`, result: await this.getWorktrees(e.params.cwd, n, r) };
+          return { method: `list-worktrees`, result: await resolveWorktreeList(e.params.cwd, n, r, {
+            getWorktreeRepository: (cwd, host) => this.gitManager.getWorktreeRepository(cwd, host),
+            listWorktrees: (repository, signal) => listGitWorktrees(repository, signal, gitWorktreeListDeps),
+          }) };
       }
     }
     getGitPerformanceRepoIndexSizeBucket(e, t) {

@@ -811,6 +811,11 @@ Git/session 工作目录权限错误与 Git 超时错误判定已迁移至
 `AbortController` 创建、性能事件和实际请求编排；`scripts/test-git-request-lifecycle.mjs`
 覆盖 queued/active/uncancelable 三类边界，共 11 项断言。
 
+`list-worktrees` 请求的 repository 可空解析与 worktree 列表委派已迁移至
+`src/main/worker/git-worktree-list-request-handler.ts`；入口仅保留 Git manager 与
+列表查询依赖注入，缺失 repository 仍稳定返回空数组。`scripts/test-git-worktree-list-request-handler.mjs`
+覆盖存在/缺失仓库两条路径，共 5 项断言。
+
 Git review read request 的状态摘要、branch diff stats、review summary、source line counts、
 review diff/search/patch 已统一接入 `src/main/worker/git-review-read-dispatch.ts`；入口继续
 负责 review I/O、性能结果和响应包装，`scripts/test-worker-git-review-read-dispatch.mjs`

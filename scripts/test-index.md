@@ -859,6 +859,7 @@ Total scripts: 827.
 - [`test-worker-git-executable.mjs`](./test-worker-git-executable.mjs)
 - [`test-worker-git-observability.mjs`](./test-worker-git-observability.mjs)
 - [`test-git-request-lifecycle.mjs`](./test-git-request-lifecycle.mjs)
+- [`test-git-worktree-list-request-handler.mjs`](./test-git-worktree-list-request-handler.mjs)
 - [`test-worker-git-query-utils.mjs`](./test-worker-git-query-utils.mjs)
 - [`test-worker-git-watch-paths.mjs`](./test-worker-git-watch-paths.mjs)
 - [`test-worker-platform-wsl.mjs`](./test-worker-platform-wsl.mjs)
