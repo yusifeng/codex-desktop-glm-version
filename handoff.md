@@ -644,6 +644,10 @@ main 的 app 协议 URL frame/protocol 判定（原 `nst/F9`）已迁移至
 `src/main/main-app/util/url-trust.ts`，由 URL trust focused suite 新增 5 项断言覆盖。
 main webview 入口文件路径计算（原 `tst`）已迁移至
 `src/main/bootstrap/protocol/app-protocol.ts`，由 3 项 focused 断言覆盖。
+桌面 open-path 的 stat-kind 分类现由入口委托
+`src/main/main-app/files/open-path-arguments.ts` 的 `classifyDesktopOpenPath`，保留真实 stat、
+warning 日志与后续窗口副作用；已有 17 项 focused 断言覆盖 directory、HTML browser-document、
+普通 file 与缺失路径边界。
 main 窗口错误页 HTML 模板（原 `Pot`）已迁移至
 `src/main/main-app/window/error-page-html.ts`，由 4 项 focused 断言覆盖。
 renderer 崩溃恢复的纯判定已迁移至

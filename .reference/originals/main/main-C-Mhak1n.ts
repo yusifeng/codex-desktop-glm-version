@@ -175401,7 +175401,7 @@ function Ist(options) {
 function Lst(e) {
   return createComputerUseRpcHandler(e);
 }
-var Rst = new Set([`.htm`, `.html`, `.xht`, `.xhtml`]);
+var Rst = openPathArguments.BROWSER_DOCUMENT_EXTENSIONS;
 function zst(e) {
   let i = t.r(e.isMacOS),
     a = [],
@@ -175491,13 +175491,7 @@ function zst(e) {
       let t = h.resolve(e);
       try {
         let e = await (0, b.stat)(t);
-        return e.isDirectory()
-          ? { kind: `directory`, path: t }
-          : e.isFile()
-            ? Rst.has(h.extname(t).toLowerCase())
-              ? { kind: `browser-document`, path: t }
-              : { kind: `file`, path: t }
-            : null;
+        return openPathArguments.classifyDesktopOpenPath(t, e);
       } catch (e) {
         return (
           r.n().warning(`Failed to stat desktop open path`, { safe: {}, sensitive: { error: e } }),
