@@ -22898,13 +22898,7 @@ function Q_(e, t, n = !1, r = null) {
 }
 function $_(e, t, n) {
   if (e.anchor.kind === `text` || t.kind === `text`) return e;
-  let r = [e.anchor, ...(e.additionalAnchors ?? [])].filter((e, t) => t !== n);
-  return {
-    ...e,
-    anchor: t,
-    additionalAnchors: r.length === 0 ? void 0 : r,
-    markerViewportPoint: n === 0 ? e.markerViewportPoint : void 0,
-  };
+  return replaceAnnotationSelection(e, t, n);
 }
 var ev = o(() => {
   (wd(), z_());
