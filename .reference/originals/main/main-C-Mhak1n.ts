@@ -12,6 +12,7 @@ const mainUrlTrust = require("./main-app/util/url-trust.js");
 const appshotShortcut = require("./main-app/hotkey/appshot-shortcut.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
 const windowAppearance = require("./main-app/window-appearance.js");
+const { buildWindowErrorPage } = require("./main-app/window/error-page-html.js");
 const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
@@ -172617,20 +172618,7 @@ var O9 = r.i(`window-manager`),
         ? `Open in Explorer`
         : `Open in File Manager`;
 function Pot() {
-  return `
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>${l.app.getName()}</title>
-  </head>
-  <body>
-    <main>
-      <h1>Something went wrong…</h1>
-    </main>
-  </body>
-</html>
-`.trim();
+  return buildWindowErrorPage(l.app.getName());
 }
 var k9 = `#00000000`,
   Fot = `#000000`,

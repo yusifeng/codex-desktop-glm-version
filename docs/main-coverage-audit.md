@@ -14,6 +14,10 @@ suite 新增 4 项对象形状断言。
 app 协议 URL 的内部 frame 与协议判定（原 `nst/F9`，173,804-173,817）已迁移至同一
 `main-app/util/url-trust.ts`，入口仅保留兼容委托；URL trust focused suite 新增 5 项断言。
 
+窗口错误页 HTML 模板（原 `Pot`，172,619-172,637）已迁移至
+`src/main/main-app/window/error-page-html.ts`，应用名通过参数注入；由
+`scripts/test-main-window-error-page.mjs` 覆盖 4 项模板断言。
+
 线程 metadata 的 emoji 校验和不可变更新（原 172,689-172,708）已迁移至
 `src/main/main-app/thread-metadata.ts`，入口通过 `Aot`/`jot` 兼容别名接回，
 由 `scripts/test-main-thread-metadata.mjs` 覆盖。

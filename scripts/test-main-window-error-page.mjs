@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { buildWindowErrorPage } = require("../app/.vite/build/main-app/window/error-page-html.js");
+const page = buildWindowErrorPage("Codex Test");
+assert.match(page, /^<!doctype html>/);
+assert.match(page, /<title>Codex Test<\/title>/);
+assert.match(page, /Something went wrong/);
+assert.match(page, /<main>/);
+console.log("4 main window error page assertions passed");
