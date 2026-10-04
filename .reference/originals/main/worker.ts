@@ -85,6 +85,7 @@ const { createWorktreeDelete } = require("./worker/git-worktree-delete");
 const { createLocalEnvironmentRuntime } = require("./worker/git-local-environment");
 const { WORKTREE_INCLUDE_FILE, copyAgentOverrideFiles, copyWorktreeFiles, findWorktreeIncludeFiles, resolveWorktreeLocalEnvironmentConfig } = require("./worker/git-worktree-copy-files");
 const { WORKTREE_NAME_MARKER, createWorktreePath: createGitWorktreePath, ensureWorktreesRoot, getRootRelativeCwd: getGitRootRelativeCwdQuery, reserveWorktreeNameDirectory } = require("./worker/git-worktree-path-allocation");
+const { readWorktreeShellEnvironment: readWorktreeShellEnvironmentQuery, removeWorktreeShellEnvironment: removeWorktreeShellEnvironmentQuery, writeWorktreeShellEnvironment: writeWorktreeShellEnvironmentQuery } = require("./worker/git-worktree-shell-environment");
 const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
@@ -518,6 +519,20 @@ const resolveSyncedBranchConfigPath = (repository, signal) =>
   resolveSyncedBranchConfigPathQuery(repository, signal, syncedBranchConfigDeps);
 const setSyncedBranchConfig = (repository, branch, treeRef, signal) =>
   setSyncedBranchConfigQuery(repository, branch, treeRef, signal, syncedBranchConfigDeps);
+const worktreeShellEnvironmentDeps = {
+  logger: {
+    warning: (message, detail) =>
+      kW(`worktreeShellEnvironmentConfig`)().warning(message, detail),
+  },
+  parseSchema: (value) => $me.safeParse(value),
+  resolveGitPath: (repository, fileName, signal) => resolveGitPath(repository, fileName, signal),
+};
+const readWorktreeShellEnvironment = (repository, signal) =>
+  readWorktreeShellEnvironmentQuery(repository, signal, worktreeShellEnvironmentDeps);
+const removeWorktreeShellEnvironment = (repository, signal) =>
+  removeWorktreeShellEnvironmentQuery(repository, signal, worktreeShellEnvironmentDeps);
+const writeWorktreeShellEnvironment = (repository, value, signal) =>
+  writeWorktreeShellEnvironmentQuery(repository, value, signal, worktreeShellEnvironmentDeps);
 const gitBranchMetadataDeps = {
   getCurrentBranch: getCurrentGitBranch,
   getDefaultRemoteBranch: getDefaultGitRemoteBranch,
@@ -67549,45 +67564,7 @@ function A2(e, t, n) {
   });
 }
 var Jme = K({ branch: H(), lastSyncedTreeRef: H() });
-var I2 = kW(`worktreeShellEnvironmentConfig`),
-  Qme = `codex-shell-environment.json`,
-  $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
-async function L2(e, t) {
-  return resolveGitPath(e, Qme, t);
-}
-async function ehe(e, t) {
-  let n = await L2(e, t);
-  if (n == null) return null;
-  try {
-    let t = await new Response(await e.host.readFile(n)).text(),
-      r = $me.safeParse(JSON.parse(t));
-    return r.success
-      ? r.data
-      : (I2().warning(`Invalid worktree shell environment config`, {
-          safe: {},
-          sensitive: { error: r.error.message },
-        }),
-        null);
-  } catch (e) {
-    return (
-      e.code === `ENOENT` ||
-        I2().warning(`Failed to read worktree shell environment config`, {
-          safe: {},
-          sensitive: { error: e },
-        }),
-      null
-    );
-  }
-}
-async function the(e, t, n) {
-  let r = await L2(e, n);
-  if (r == null) throw Error(`No git repository found for worktree shell env`);
-  await e.host.writeFile(r, `${JSON.stringify(t, null, 2)}\n`);
-}
-async function nhe(e, t) {
-  let n = await L2(e, t);
-  n != null && (await e.host.remove(n));
-}
+var $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
 var B2 = new TextEncoder();
 async function V2({
   name: e,
@@ -67779,7 +67756,9 @@ async function V2({
 `),
     );
   try {
-    te?.shellEnvironment == null ? await nhe(T, l) : await the(T, te.shellEnvironment, l);
+    te?.shellEnvironment == null
+      ? await removeWorktreeShellEnvironment(T, l)
+      : await writeWorktreeShellEnvironment(T, te.shellEnvironment, l);
   } catch (e) {
     d?.(`stderr`, B2.encode(`Failed to store worktree shell environment: ${String(e)}\n`));
   }
@@ -70507,7 +70486,7 @@ var I6 = kW(`git`),
           host: o,
           getOriginUrl: (repository) => repository.getOriginUrl(),
           getOrigins: (directories) => resolveOriginAndRoots(directories, originDiscoveryDeps),
-          getShellEnvironment: ehe,
+          getShellEnvironment: readWorktreeShellEnvironment,
           getOwnerThreadId: p4,
           getDefaultRemoteBranch: getDefaultGitRemoteBranch,
           getMergeBase: X2,

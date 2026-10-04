@@ -625,6 +625,13 @@ Worktree 的 root-relative cwd query、默认/显式 worktrees 根目录解析�
 `src/main/worker/git-worktree-path-allocation.ts`。原 `D2`/`Wme`/`lhe`/`L$`/`Afe`、`Ume` 日志和
 `Tfe` marker 常量已删除；create 与 resolve-worktree 消费者共用语义入口，由 34 项断言覆盖。
 
+### 增量抽取：Worktree shell environment config
+
+Worktree shell environment 配置的 Git path 解析、JSON/schema 读取、ENOENT 与其他读取错误分流、
+格式化写入和删除已迁移至 `src/main/worker/git-worktree-shell-environment.ts`。原 `I2`/`Qme`/
+`L2`/`ehe`/`the`/`nhe` 已删除；schema 由入口窄依赖注入，create 与只读请求消费者改用语义
+入口，由 25 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
