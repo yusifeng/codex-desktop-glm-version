@@ -99,7 +99,7 @@ const { createWorktreeCheckout: createWorktreeCheckoutQuery } = require("./worke
 const { createWorktree: createGitWorktreeQuery } = require("./worker/git-worktree-create");
 const { readWorktreeShellEnvironment: readWorktreeShellEnvironmentQuery, removeWorktreeShellEnvironment: removeWorktreeShellEnvironmentQuery, writeWorktreeShellEnvironment: writeWorktreeShellEnvironmentQuery } = require("./worker/git-worktree-shell-environment");
 const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
-const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
+const { buildWslCommand, decodeCommandOutput, findActiveDistro, orderEligibleDistros, selectFallbackDistro } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
 const { listGitWorktrees } = require("./worker/git-worktree-list");
@@ -972,6 +972,8 @@ const gitReviewCommitQueryDeps = {
 const tG = decodeCommandOutput;
 const nG = findActiveDistro;
 const rG = orderEligibleDistros;
+const gWslCommand = buildWslCommand;
+const qWslFallbackDistro = selectFallbackDistro;
 i = e.o(i);
 let a = require("module");
 a = e.o(a);
@@ -48216,9 +48218,6 @@ async function WW(e = !1) {
     FW === n && (FW = void 0);
   }
 }
-function GW(e) {
-  return [`-d`, e.distro, `--cd`, e.cwd ?? `.`, `--exec`, zW, `-lc`, e.command];
-}
 function KW() {
   if (LW !== void 0) return LW;
   if (Date.now() < RW) return;
@@ -48288,7 +48287,7 @@ function XW(e) {
       i = r == null ? $W(`wsl.exe`, [`--list`, `--quiet`], t) : ``;
     return (
       t.info(`[wsl] eligible distro list`, { safe: { listResult: n }, sensitive: {} }),
-      r ?? QW(``, i)
+      r ?? qWslFallbackDistro(``, i)
     );
   } catch (e) {
     return (
@@ -48310,7 +48309,7 @@ async function ZW(e) {
       i = r == null ? await eG(`wsl.exe`, [`--list`, `--quiet`], t) : ``;
     return (
       t.info(`[wsl] eligible distro list`, { safe: { listResult: n }, sensitive: {} }),
-      r ?? QW(``, i)
+      r ?? qWslFallbackDistro(``, i)
     );
   } catch (e) {
     return (
@@ -48321,19 +48320,6 @@ async function ZW(e) {
       null
     );
   }
-}
-function QW(e, t) {
-  return (
-    nG(e) ||
-    (t
-      .split(
-        `
-`,
-      )
-      .map((e) => e.trim())
-      .find((e) => e.toLowerCase().startsWith(`ubuntu`)) ??
-      null)
-  );
 }
 function $W(e, t, n) {
   return (
@@ -56637,7 +56623,7 @@ function fQ({
 function pQ(e, t, n, r, i, a, o, s, c = !0, l = !1) {
   let u = UW();
   if (u == null) throw Error(`WSL mode is enabled but no eligible distro is available`);
-  let d = GW({ distro: u, cwd: n ? UH(n) : `.`, command: _Q(e, r) }),
+  let d = gWslCommand({ distro: u, cwd: n ? UH(n) : `.`, command: _Q(e, r), bashPath: zW }),
     f = { env: MW(process.env), stdio: [l ? `pipe` : `ignore`, `pipe`, `pipe`] };
   return (
     $Z().debug(`Spawning process inside WSL`, {

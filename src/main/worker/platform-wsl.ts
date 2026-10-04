@@ -31,4 +31,39 @@ export function orderEligibleDistros(value: string): string[] {
   return active == null || !distros.includes(active) ? distros : [active, ...distros.filter((name) => name !== active)];
 }
 
-module.exports = { decodeCommandOutput, findActiveDistro, orderEligibleDistros };
+/** Build the argv used to launch a command inside the selected WSL distro. */
+export function buildWslCommand(options: {
+  distro: string;
+  cwd?: string;
+  command: string;
+  bashPath?: string;
+}): string[] {
+  return [
+    "-d",
+    options.distro,
+    "--cd",
+    options.cwd ?? ".",
+    "--exec",
+    options.bashPath ?? "/usr/bin/bash",
+    "-lc",
+    options.command,
+  ];
+}
+
+/** Select the active distro, falling back to the first Ubuntu entry. */
+export function selectFallbackDistro(activeOutput: string, quietOutput: string): string | null {
+  return findActiveDistro(activeOutput) ??
+    quietOutput
+      .split("\n")
+      .map((line) => line.trim())
+      .find((line) => line.toLowerCase().startsWith("ubuntu")) ??
+    null;
+}
+
+module.exports = {
+  buildWslCommand,
+  decodeCommandOutput,
+  findActiveDistro,
+  orderEligibleDistros,
+  selectFallbackDistro,
+};
