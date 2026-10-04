@@ -591,5 +591,17 @@
     "classification": "generated-local-browser-tab-mention-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer loads the generated browser-tab mention dependencies and UI hooks required by the adjacent favicon projection and candidate section. It is an import/registration side effect for the local composer route, not an independently consumed renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Ll", "sourceSymbol": "eLe", "startLine": 25644, "endLine": 25707,
+    "classification": "generated-local-fuzzy-file-search-projection",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The hook projects fuzzy-file-search responses into filtered, root-relative file entries and reports them through the local composer callback. Query loading and host controller state stay inside this route-local projection."
+  },
+  {
+    "hub": "app-primary", "alias": "Il", "sourceSymbol": "LH", "startLine": 25744, "endLine": 25820,
+    "classification": "generated-local-fuzzy-file-search-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer installs fuzzy-file-search dependencies, excluded-directory policy, and the controller-backed async search hook consumed by the adjacent file projection. This is generated composer wiring without an independent renderer lifecycle."
   }
 ]
