@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { mergeTargetPlatformDescriptor, createTargetDescriptor } = require(
+const { mergeTargetPlatformDescriptor, createTargetDescriptor, createEditorTargetDescriptor } = require(
   "../app/.vite/build/main-app/open-target/target-descriptor-policy.js",
 );
 
@@ -42,4 +42,26 @@ assert.deepEqual(fallback, {
   platforms: { darwin: undefined, win32: undefined, linux: undefined },
 });
 
-console.log("6 main target descriptor policy assertions passed");
+const defaultArgs = (path) => ["--file", path];
+const linuxOpen = () => "opened";
+const editor = createEditorTargetDescriptor({
+  id: "code",
+  label: "Code",
+  icon: "apps/code.png",
+  darwinDetect: () => "/usr/bin/open",
+  linuxDetect: () => "/usr/bin/code",
+  darwinEnv: { CODE_ENV: "1" },
+  defaultArgs,
+  linuxOpen,
+});
+assert.equal(editor.id, "code");
+assert.equal(editor.platforms.darwin?.kind, "editor");
+assert.deepEqual(editor.platforms.darwin?.env, { CODE_ENV: "1" });
+assert.equal(editor.platforms.darwin?.args, defaultArgs);
+assert.equal(editor.platforms.darwin?.supportsSsh, true);
+assert.equal(editor.platforms.win32, undefined);
+assert.equal(editor.platforms.linux?.detect instanceof Function, true);
+assert.equal(editor.platforms.linux?.args, defaultArgs);
+assert.equal(editor.platforms.linux?.open, linuxOpen);
+
+console.log("15 main target descriptor policy assertions passed");

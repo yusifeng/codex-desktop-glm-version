@@ -153,9 +153,10 @@ open-in target 的请求目标选择与 Windows file-manager fallback（原 `d4e
 ### A3 增量抽取：open-in target descriptor policy
 
 跨平台 open-in target descriptor 的元数据合并与平台描述符构造（原 `V1/H1`，
-138340-138361）已迁移至 `src/main/main-app/open-target/target-descriptor-policy.ts`。
-该模块只处理 label/icon/kind/hidden 及平台字段的纯对象组合，不触碰平台探测、文件系统
-或目标进程启动；入口保留压缩别名并继续提供具体 detect/args/open 回调。由
+138340-138403）已迁移至 `src/main/main-app/open-target/target-descriptor-policy.ts`。
+该模块只处理 label/icon/kind/hidden 及平台字段的纯对象组合，包括通用平台描述符和
+编辑器 target 的 args/open 注入，不触碰平台探测、文件系统或目标进程启动；入口保留
+压缩别名并继续提供具体 detect/args/open 回调。由
 `scripts/test-main-target-descriptor-policy.mjs` 覆盖字段回退、平台选择和空平台边界。
 
 ### 下一条低风险抽取建议（审计增量）

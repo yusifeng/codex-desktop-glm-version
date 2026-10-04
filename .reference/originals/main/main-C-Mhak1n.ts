@@ -138369,38 +138369,19 @@ function U1({
   darwinArgs: s,
   hidden: c,
 }) {
-  return {
+  return targetDescriptorPolicy.createEditorTargetDescriptor({
     id: e,
-    platforms: {
-      darwin: r
-        ? {
-            label: t,
-            icon: n,
-            kind: `editor`,
-            hidden: c,
-            detect: r,
-            env: o,
-            args: s ?? K1,
-            supportsSsh: !0,
-          }
-        : void 0,
-      win32: i
-        ? { label: t, icon: n, kind: `editor`, hidden: c, detect: i, args: K1, supportsSsh: !0 }
-        : void 0,
-      linux: a
-        ? {
-            label: t,
-            icon: n,
-            kind: `editor`,
-            hidden: c,
-            detect: a,
-            args: K1,
-            supportsSsh: !0,
-            open: (e) => G1(e, K1),
-          }
-        : void 0,
-    },
-  };
+    label: t,
+    icon: n,
+    darwinDetect: r,
+    win32Detect: i,
+    linuxDetect: a,
+    darwinEnv: o,
+    darwinArgs: s,
+    hidden: c,
+    defaultArgs: K1,
+    linuxOpen: (e) => G1(e, K1),
+  });
 }
 function W1(e, t) {
   for (let t of e) {
