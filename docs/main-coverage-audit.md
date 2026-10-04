@@ -159,6 +159,16 @@ open-in target 的请求目标选择与 Windows file-manager fallback（原 `d4e
 压缩别名并继续提供具体 detect/args/open 回调。由
 `scripts/test-main-target-descriptor-policy.mjs` 覆盖字段回退、平台选择和空平台边界。
 
+### A3 增量抽取：language-server protocol helpers
+
+language-server 的 LSP 能力摘要、Location URI/path 转换与 hover 内容归一化（原
+`j0e/M0e/v$/y$/N0e/P0e/b$`，135496-135620）已迁移至
+`src/main/main-app/language-server/protocol-helpers.ts`。模块通过显式注入 path/URI
+实现和 MarkupContent 判定，保留 POSIX、Windows、UNC 路径以及 fenced Markdown
+signature/documentation 的原语义；入口只保留压缩别名委托，不触碰 LSP session、进程
+生命周期或 host 解析。`scripts/test-main-language-server-protocol-helpers.mjs`
+覆盖 8 项能力、路径、Location 与 hover 归一化断言。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含

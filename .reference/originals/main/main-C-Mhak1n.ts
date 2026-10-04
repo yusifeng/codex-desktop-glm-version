@@ -36,6 +36,7 @@ const targetInputPolicy = require("./main-app/open-target/target-input-policy.js
 const targetSelectionPolicy = require("./main-app/open-target/target-selection-policy.js");
 const targetLaunchArgs = require("./main-app/open-target/target-launch-args.js");
 const targetDescriptorPolicy = require("./main-app/open-target/target-descriptor-policy.js");
+const languageServerProtocolHelpers = require("./main-app/language-server/protocol-helpers.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -135494,14 +135495,7 @@ var { URI: h$, Utils: k0e } = m$,
     p$.TypeDefinitionRequest.method,
   ];
 function j0e(e) {
-  let t = [];
-  return (
-    e.definitionProvider && t.push(`definition`),
-    e.implementationProvider && t.push(`implementation`),
-    e.referencesProvider && t.push(`references`),
-    e.typeDefinitionProvider && t.push(`typeDefinition`),
-    { hover: !!e.hoverProvider, locationKinds: t }
-  );
+  return languageServerProtocolHelpers.resolveCapabilities(e);
 }
 async function _$(e, t, n, r = !0) {
   let i = new p$.CancellationTokenSource(),
@@ -135526,80 +135520,16 @@ async function _$(e, t, n, r = !0) {
   }
 }
 function M0e(e, t) {
-  return e == null
-    ? []
-    : (Array.isArray(e) ? e : [e]).map((e) =>
-        `targetUri` in e
-          ? { path: y$(e.targetUri, t), range: e.targetSelectionRange }
-          : { path: y$(e.uri, t), range: e.range },
-      );
+  return languageServerProtocolHelpers.resolveLocations(e, t, h$);
 }
 function v$(e, t) {
-  let n = t.sep === `/` ? e : e.replaceAll(`\\`, `/`);
-  if (n.startsWith(`//`)) {
-    let e = n.indexOf(`/`, 2);
-    return h$
-      .from({
-        authority: e === -1 ? n.slice(2) : n.slice(2, e),
-        path: e === -1 ? `/` : n.slice(e),
-        scheme: `file`,
-      })
-      .toString();
-  }
-  return h$
-    .from({ path: t.sep === `/` || n.startsWith(`/`) ? n : `/${n}`, scheme: `file` })
-    .toString();
+  return languageServerProtocolHelpers.filePathToUri(e, t, h$);
 }
 function y$(e, t) {
-  let n = h$.parse(e);
-  if (t.sep === `/`) return n.authority === `` ? n.path : `//${n.authority}${n.path}`;
-  if (n.authority !== ``) return t.normalize(`\\\\${n.authority}${n.path.replaceAll(`/`, `\\`)}`);
-  let r = n.path.replaceAll(`/`, `\\`);
-  return t.normalize(/^\\[A-Za-z]:/.test(r) ? r.slice(1) : r);
+  return languageServerProtocolHelpers.uriToFilePath(e, t, h$);
 }
 function N0e(e, t) {
-  let { documentation: n, signature: r } = P0e(e.contents);
-  return { documentation: n, range: e.range ?? { end: t, start: t }, signature: r };
-}
-function P0e(e) {
-  if (Array.isArray(e)) {
-    let t = e.map((e) => (typeof e == `string` ? e : `\`\`\`${e.language}\n${e.value}\n\`\`\``)),
-      n = t.join(`
-
-`);
-    if (n.includes("```")) return b$(n);
-    let [r = ``, ...i] = t;
-    return {
-      documentation:
-        i.join(`
-
-`) || null,
-      signature: r,
-    };
-  }
-  return p$.MarkupContent.is(e)
-    ? b$(e.value)
-    : { documentation: null, signature: typeof e == `string` ? e : e.value };
-}
-function b$(e) {
-  let t = e.trim(),
-    n = Array.from(t.matchAll(/```[^\n]*\n([\s\S]*?)\n```/g)),
-    r = n[0];
-  for (let e of n.slice(1)) {
-    if (r == null || t.slice((r.index ?? 0) + r[0].length, e.index).trim() !== ``) break;
-    r = e;
-  }
-  return r == null
-    ? { documentation: null, signature: t }
-    : {
-        documentation:
-          t
-            .slice((r.index ?? 0) + r[0].length)
-            .trim()
-            .replace(/^---(?:\r?\n|$)/, ``)
-            .trim() || null,
-        signature: r[1].trim(),
-      };
+  return languageServerProtocolHelpers.normalizeHover(e.contents, t, p$.MarkupContent.is);
 }
 var F0e = class {
   dataRoot;
