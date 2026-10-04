@@ -567,5 +567,29 @@
     "classification": "generated-local-home-starter-surface",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The component composes home starter prompts, temporary-chat messaging and business-agent branches through adjacent generated route state. Its callbacks and child surfaces are owned by the home route and do not expose an independent renderer consumer or teardown boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Bl", "sourceSymbol": "EH", "startLine": 24797, "endLine": 24821,
+    "classification": "generated-local-agent-avatar-projection",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component deterministically maps an agent seed to the generated light/dark avatar asset table and renders the resulting image. It is a local mention-list projection with no independent renderer lifecycle or external consumer boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Vl", "sourceSymbol": "OH", "startLine": 24828, "endLine": 24898,
+    "classification": "generated-local-agent-avatar-asset-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires the generated avatar SVG asset loaders, theme selection table, and deterministic seed modulus used by the neighboring mention-list avatar component. All dependencies are route-local generated assets rather than a separately consumed renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "Rl", "sourceSymbol": "kH", "startLine": 24972, "endLine": 25126,
+    "classification": "generated-local-browser-tab-favicon-projection",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The image wrapper keeps the previous favicon while a replacement loads, displays a fallback, and suppresses failed sources. Its state and load/error callbacks are owned by browser-tab mention rendering and do not form a reusable lifecycle boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "zl", "sourceSymbol": "MH", "startLine": 25128, "endLine": 25132,
+    "classification": "generated-local-browser-tab-mention-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer loads the generated browser-tab mention dependencies and UI hooks required by the adjacent favicon projection and candidate section. It is an import/registration side effect for the local composer route, not an independently consumed renderer lifecycle."
   }
 ]
