@@ -708,6 +708,12 @@ GitHub pull request summary 的按账号批量去重、50ms debounce、最多 60
 `unavailable`，登录不一致、not-found、HEAD revision 竞争和最多 20 页检查项的既有语义保持不变。
 `scripts/test-github-pull-request-summary.mjs` 覆盖基本 not-found/批处理路径，共 2 项断言。
 
+### 增量抽取：Editor open arguments
+
+编辑器打开参数的远程 host 判定、普通 `--goto` 参数、VS Code remote URI 编码、folder/file URI
+及带行列号的远程参数已迁移至 `src/main/worker/editor-open-args.ts`。入口继续负责编辑器探测、
+进程启动和 remote-control 拒绝；纯参数构造由 9 项独立断言覆盖。
+
 GitHub exact-revision review 的 diff/file handlers（`eSe`/`tSe`）已迁移至
 `src/main/worker/github-pull-request-revision.ts`：SHA/path 校验、账号校验、diff API、
 base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的双并发 semaphore 均由
