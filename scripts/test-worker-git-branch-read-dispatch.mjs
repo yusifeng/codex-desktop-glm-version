@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-branch-read-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchBranchReadRequest } = module.exports; const deps = { signal: "signal", currentBranch: (r) => `current:${r}`, currentBranchSnapshot: (r,s) => `snapshot:${r}:${s}`, upstreamBranch: (r,s) => `upstream:${r}:${s}`, branchAheadCount: (r,s) => `ahead:${r}:${s}`, defaultBranch: (r,s) => `default:${r}:${s}`, baseBranch: (r) => `base:${r}` };
+assert.equal(await dispatchBranchReadRequest("current-branch", { root: "/r" }, deps), "current:/r");
+assert.equal(await dispatchBranchReadRequest("current-branch-snapshot", { root: "/r" }, deps), "snapshot:/r:signal");
+assert.equal(await dispatchBranchReadRequest("upstream-branch", { root: "/r" }, deps), "upstream:/r:signal");
+assert.equal(await dispatchBranchReadRequest("branch-ahead-count", { root: "/r" }, deps), "ahead:/r:signal");
+assert.equal(await dispatchBranchReadRequest("default-branch", { root: "/r" }, deps), "default:/r:signal");
+assert.equal(await dispatchBranchReadRequest("base-branch", { root: "/r" }, deps), "base:/r");
+assert.equal(await dispatchBranchReadRequest("unknown", {}, deps), undefined);
+console.log("worker Git branch read dispatch tests passed (7 assertions)");

@@ -125,6 +125,7 @@ const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
+const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69900,7 +69901,7 @@ var I6 = kW(`git`),
             p = X(await getGitCloneState(e.params.root, o, i.signal, gitCloneStateDeps));
             break;
           case `current-branch`:
-            p = X(await resolveCurrentBranch(e.params.root, readRequestDeps));
+            p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
             break;
           case `current-branch-snapshot`:
             p = X(await resolveCurrentBranchSnapshot(e.params.root, i.signal, readRequestDeps));
