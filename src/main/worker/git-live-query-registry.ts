@@ -14,6 +14,7 @@ import {
 } from "./git-live-query-subscription-lifecycle";
 import { refreshGitLiveQuery } from "./git-live-query-refresh";
 import { planGitLiveQueryRefresh } from "./git-live-query-refresh-plan";
+import { createGitLiveQueryUpdatedEvent } from "./git-live-query-events";
 import {
   selectGitLiveQueriesForRepoChange,
   selectGitLiveQueriesForRecovery,
@@ -192,15 +193,13 @@ class GitLiveQueryRegistry {
     result: any,
     trace: any,
   ) {
-    this.dependencies.emit({
-      type: `git-live-query-updated`,
-      emittedAtMs: this.dependencies.now(),
+    this.dependencies.emit(createGitLiveQueryUpdatedEvent(
+      state,
       generation,
-      requiresRecovery: state.requiresRecovery,
-      subscriptionId: state.subscriptionId,
-      ...(trace == null ? {} : { trace }),
-      ...result,
-    });
+      result,
+      this.dependencies.now(),
+      trace,
+    ));
   }
 }
 

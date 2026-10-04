@@ -1011,3 +1011,7 @@ Live-query fan-out 的 host/commonDir/root/change-type 与 recovery/repository �
 `src/main/worker/git-live-query-selection-policy.ts`。registry 只保留 refresh 编排和状态副作用，
 避免在订阅状态管理中重复内联筛选；`scripts/test-worker-git-live-query-selection-policy.mjs`
 覆盖 repo-change、recovery、repository 三类选择，共 6 项行为断言。
+
+Live-query 完成事件的 `git-live-query-updated` envelope（generation、recovery、subscription
+identity、result 与可选 trace）已迁移至 `src/main/worker/git-live-query-events.ts`；registry 只保留
+发布时机与 emit 副作用，由 `scripts/test-worker-git-live-query-events.mjs` 的 4 项断言覆盖。

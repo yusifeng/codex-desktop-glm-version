@@ -847,3 +847,7 @@ Annotation metadata tooltip 的稳定行投影（原 React `Nv` 组件内联的 
 字段读取）已迁移至 `src/main/browser-page-preload/annotation-metadata-tooltip.ts`；入口仅
 保留本地化 label、布局和 DOM/React 渲染，并由
 `scripts/test-preload-annotation-metadata-tooltip.mjs` 覆盖 5 项 focused assertions。
+
+Git live-query 完成事件的稳定 envelope（generation、recovery、subscription identity、result
+与可选 trace）已迁移至 `src/main/worker/git-live-query-events.ts`；registry 仅保留发布时机与
+emit 副作用，由 `scripts/test-worker-git-live-query-events.mjs` 覆盖 4 项断言。
