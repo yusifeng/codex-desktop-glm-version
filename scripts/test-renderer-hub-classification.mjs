@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 50, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 51, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -55,6 +55,7 @@ assert.ok(primary.unconsumed.includes("Bp"), "Bp remains coupled to generated ac
 assert.ok(primary.unconsumed.includes("Gh"), "Gh remains coupled to generated overlay state");
 assert.ok(primary.unconsumed.includes("Gm"), "Gm remains coupled to generated plan action status");
 assert.ok(primary.unconsumed.includes("Gs"), "Gs remains coupled to generated overlay listener lifecycle");
+assert.ok(primary.unconsumed.includes("Tc"), "Tc remains coupled to generated device-onboarding state");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);

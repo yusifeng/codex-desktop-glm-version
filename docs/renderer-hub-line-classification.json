@@ -253,5 +253,10 @@
     "hub": "app-primary", "alias": "Gs", "sourceSymbol": "YWe", "startLine": 36800, "endLine": 36806,
     "classification": "generated-local-overlay-listener-registration", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The registration helper tracks overlay listeners in a generated Set and returns a local removal closure. Its storage and teardown are coupled to the adjacent overlay runtime, so extraction without a named renderer owner would split lifecycle ownership."
+  },
+  {
+    "hub": "app-primary", "alias": "Tc", "sourceSymbol": "OVe", "startLine": 31465, "endLine": 31471,
+    "classification": "generated-local-device-onboarding-predicate", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The predicate decides whether the adjacent generated device-onboarding announcement should be shown from pending/idle state, prior detection, and detected/connected status. Its state vocabulary is owned by the neighboring EVe/DVe signal transitions and has no independent renderer consumer or teardown boundary."
   }
 ]
