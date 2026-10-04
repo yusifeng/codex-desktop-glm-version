@@ -1,4 +1,5 @@
-import { Dp as commandMenuGroupOrder, Ep as initializeCommandRegistry, Gp as isRealtimeVoiceCommand, Np as getCommand, kp as unifiedTabCommands, zp as hasRequiredCommandAccess } from "@rchunk/app-shared";
+import { Dp as commandMenuGroupOrder, Ep as initializeCommandRegistry, Np as getCommand, kp as unifiedTabCommands } from "@rchunk/app-shared";
+import { hasRequiredCommandAccess, isRealtimeVoiceCommand } from "../app-shared/runtime/command-visibility-predicates";
 import "@rchunk/rolldown-runtime";
 
 export interface CommandAccess { codexLocal: boolean; workLocal: boolean; }

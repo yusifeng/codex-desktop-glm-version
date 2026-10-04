@@ -366,6 +366,11 @@ helper，登记为 `vendor-generated-preserve`，保留原 hub 边以维持打�
 `void` 维持兼容依赖边。同组 `BI`/`RI`/`iW` 也仅为 preserve 引用。该面登记为
 `semantic-local-replacement`，不应把 void import 误计为待复制的业务 helper。
 
+在 `keyboard-shortcut-command-order` 簇，app-shared `Gp`/`lut` 与 `zp`/`sut` 已迁为
+`src/renderer/app-shared/runtime/command-visibility-predicates.ts`。二者分别是纯
+realtime voice command 识别与 required-access 判定；consumer 已切换语义导入，由
+`scripts/test-app-shared-command-visibility-predicates.mjs` 的 6 项断言覆盖。
+
 `tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
 command、query config、params/cache key 与 app-server `queryFn`、response priority
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
