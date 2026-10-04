@@ -28,7 +28,6 @@ import {
   $ln as createCommandQueryKey,
   $sn as initializeBrowserUseSettings,
   Bfn as initializeConfigurationState,
-  Jsn as configurationQueryKey,
   Kdn as getWritableConfigurationLayer,
   Nsn as parseNetworkPattern,
   Qln as invokeRendererCommand,
@@ -52,6 +51,7 @@ import {
   domainMatchesPattern,
   parseOriginPattern,
 } from "../app-initial/runtime/parse-origin-pattern";
+import { configurationQueryKey } from "../app-initial/runtime/configuration-query-key";
 
 type OriginDecision = "allow" | "deny" | null;
 type BrowserCapability =

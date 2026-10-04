@@ -304,3 +304,9 @@ state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初
 调用点先取 writable layer 的 `name` 再传入。该对象/字符串形状差异不能靠复制函数
 体安全消除，暂登记为 `config-layer-contract`，待配置层类型统一后再迁移并补路径
 映射契约测试。
+
+本轮另将 app-initial `Jsn`（内部 `Av`）的配置查询 key 常量迁为
+`src/renderer/app-initial/runtime/configuration-query-key.ts` 的语义导出
+`configurationQueryKey`。它仅提供稳定的 `['config', 'user']` 前缀，browser-use
+配置查询调用面已切换导入，并由 `scripts/test-app-initial-configuration-query-key.mjs`
+的 2 项断言覆盖；原 hub 导出保留兼容其他消费者。
