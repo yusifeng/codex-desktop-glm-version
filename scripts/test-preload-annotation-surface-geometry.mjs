@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag } = require("../app/.vite/build/browser-page-preload/annotation-surface-geometry.js");
+const { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, inferAnnotationMarkerViewportSize, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, resolveAnnotationCanvasSize, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag } = require("../app/.vite/build/browser-page-preload/annotation-surface-geometry.js");
 assert.deepEqual(clipAnnotationSurfaceRect({ x: 10, y: 10, width: 100, height: 100 }, { x: 0, y: 20, width: 40, height: 40 }, { width: 80, height: 80 }), { x: 10, y: 20, width: 30, height: 40 });
 assert.equal(clipAnnotationSurfaceRect({ x: 0, y: 0, width: 10, height: 10 }, { x: 20, y: 20, width: 5, height: 5 }, { width: 100, height: 100 }), null);
 assert.equal(clipAnnotationSurfaceRect({ x: 0, y: 0, width: 10, height: 10 }, { x: 5, y: 5, width: 20, height: 20 }, { width: 10, height: 10 }).width, 5);
@@ -28,5 +28,12 @@ const pendingDrag = { start: { x: 1, y: 1 }, current: { x: 1, y: 1 }, rect: null
 assert.deepEqual(updateAnnotationRegionDrag(pendingDrag, { x: 3, y: 3 }, 4), { ...pendingDrag, current: { x: 3, y: 3 } });
 assert.deepEqual(updateAnnotationRegionDrag(pendingDrag, { x: 5, y: 2 }, 4), { ...pendingDrag, current: { x: 5, y: 2 }, rect: { x: 1, y: 1, width: 4, height: 1 }, isDraggingRegion: true });
 assert.equal(updateAnnotationRegionDrag({ ...pendingDrag, isDraggingRegion: true }, { x: 2, y: 2 }, 4).isDraggingRegion, true);
+const anchor = { point: { xPercent: 25 }, rect: { x: 20, width: 120 } };
+assert.equal(inferAnnotationMarkerViewportSize(anchor, null, { width: 800, height: 600 }, 20), undefined);
+assert.deepEqual(inferAnnotationMarkerViewportSize(anchor, { x: 250, y: 700 }, { width: 800, height: 600 }, 20), { width: 1000, height: 720 });
+assert.deepEqual(inferAnnotationMarkerViewportSize({ point: { xPercent: 0 }, rect: { x: 900, width: 50 } }, { x: 10, y: 10 }, { width: 800, height: 600 }, 20), { width: 950, height: 600 });
+assert.equal(resolveAnnotationCanvasSize(null, undefined), undefined);
+assert.deepEqual(resolveAnnotationCanvasSize({ width: 900, height: 650 }, undefined), { width: 900, height: 650 });
+assert.deepEqual(resolveAnnotationCanvasSize({ width: 900, height: 650 }, { width: 1000, height: 620 }), { width: 1000, height: 650 });
 
-console.log("24 preload annotation surface geometry assertions passed");
+console.log("30 preload annotation surface geometry assertions passed");

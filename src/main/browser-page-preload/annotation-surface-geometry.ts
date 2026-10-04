@@ -1,4 +1,5 @@
 type Rect = { x: number; y: number; width: number; height: number };
+type Size = { width: number; height: number };
 
 function clipAnnotationSurfaceRect(
   elementRect: Rect,
@@ -63,5 +64,38 @@ function updateAnnotationRegionDrag(state: any, current: { x: number; y: number 
   return { ...state, current, rect: isDraggingRegion ? createAnnotationRectFromPoints(state.start, current) : null, isDraggingRegion };
 }
 
-export { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag };
-if (typeof module !== `undefined`) module.exports = { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag };
+function inferAnnotationMarkerViewportSize(
+  anchor: { point: { xPercent: number }; rect: Pick<Rect, `x` | `width`> },
+  markerViewportPoint: { x: number; y: number } | null | undefined,
+  viewport: Size,
+  markerInset: number,
+): Size | undefined {
+  if (markerViewportPoint == null) return undefined;
+  const inferredWidth = anchor.point.xPercent <= 0
+    ? 0
+    : markerViewportPoint.x / (anchor.point.xPercent / 100);
+  return {
+    height: Math.max(viewport.height, markerViewportPoint.y + markerInset),
+    width: Math.max(
+      viewport.width,
+      inferredWidth,
+      markerViewportPoint.x + markerInset,
+      anchor.rect.x + anchor.rect.width,
+    ),
+  };
+}
+
+function resolveAnnotationCanvasSize(
+  storedViewportSize: Size | null | undefined,
+  inferredViewportSize: Size | undefined,
+): Size | undefined {
+  if (storedViewportSize == null) return inferredViewportSize;
+  if (inferredViewportSize == null) return storedViewportSize;
+  return {
+    height: Math.max(storedViewportSize.height, inferredViewportSize.height),
+    width: Math.max(storedViewportSize.width, inferredViewportSize.width),
+  };
+}
+
+export { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, inferAnnotationMarkerViewportSize, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, resolveAnnotationCanvasSize, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag };
+if (typeof module !== `undefined`) module.exports = { clampAnnotationCoordinate, clipAnnotationSurfaceRect, createAnnotationRectFromPoints, hasAnnotationDragThreshold, inferAnnotationMarkerViewportSize, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, resolveAnnotationCanvasSize, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag };

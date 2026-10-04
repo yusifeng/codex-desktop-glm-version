@@ -6358,7 +6358,7 @@ var { installAnnotationSurfaceObserver } = require("./browser-page-preload/annot
 var { installAnnotationFramePointerGuard } = require("./browser-page-preload/annotation-frame-pointer-guard");
 var { createAnnotationSurfaceRegistry } = require("./browser-page-preload/annotation-surface-registry");
 var { createVirtualAnnotationTarget } = require("./browser-page-preload/annotation-virtual-target");
-var { clampAnnotationCoordinate, clipAnnotationSurfaceRect, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag } = require("./browser-page-preload/annotation-surface-geometry");
+var { clampAnnotationCoordinate, clipAnnotationSurfaceRect, inferAnnotationMarkerViewportSize, intersectAnnotationRect, isAnnotationPointInViewport, isLargeAnnotationRect, resolveAnnotationCanvasSize, scaleAnnotationRect, unionAnnotationRects, updateAnnotationRegionDrag } = require("./browser-page-preload/annotation-surface-geometry");
 var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation-keyboard");
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
@@ -22826,14 +22826,7 @@ function u_(e, t, { framePath: n = [], frameUrl: r = null } = {}) {
 }
 function d_(e) {
   let t = j_(e.anchor, e.markerViewportPoint);
-  return e.viewportSize == null
-    ? t
-    : t == null
-      ? e.viewportSize
-      : {
-          height: Math.max(e.viewportSize.height, t.height),
-          width: Math.max(e.viewportSize.width, t.width),
-        };
+  return resolveAnnotationCanvasSize(e.viewportSize, t);
 }
 function f_() {
   return resolveAnnotationThemeVariant(window);
@@ -22993,12 +22986,12 @@ function A_(e, t, n) {
   return intersectAnnotationRect(e, t, n);
 }
 function j_(e, t) {
-  if (t == null) return;
-  let n = e.point.xPercent <= 0 ? 0 : t.x / (e.point.xPercent / 100);
-  return {
-    height: Math.max(window.innerHeight, t.y + I_),
-    width: Math.max(window.innerWidth, n, t.x + I_, e.rect.x + e.rect.width),
-  };
+  return inferAnnotationMarkerViewportSize(
+    e,
+    t,
+    { width: window.innerWidth, height: window.innerHeight },
+    I_,
+  );
 }
 function M_(e, t, n, r) {
   return N_(e) && P_(t, n, r);

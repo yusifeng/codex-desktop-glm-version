@@ -69,7 +69,8 @@ Surface/viewport rect clipping（原 `Qg` 22525-22535）已迁移至
 `scripts/test-preload-annotation-surface-geometry.mjs` 覆盖，共 4 项断言。
 该模块同时承载 region rect union（原 `s_` 22838-22845），geometry 回归断言共 6 项。
 并继续承载共享的按轴 rect intersection、rect scale、coordinate clamp 与大区域判定
-（原 `A_`/`w_`/`F_`/`P_`），marker、scroll-container 和 frame 几何入口已接回，回归断言增至 14 项。
+（原 `A_`/`w_`/`F_`/`P_`），以及 marker 推导 viewport 和 canvas 尺寸合并
+（原 `j_`/`d_`）；marker、scroll-container 和 frame 几何入口已接回，回归断言增至 30 项。
 
 Annotation 空格键拦截策略（原 `i_` 22799-22824）已迁移至
 `src/main/browser-page-preload/annotation-keyboard.ts`，由键盘 listener 入口接回；
