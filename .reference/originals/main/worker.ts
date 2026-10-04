@@ -86,6 +86,7 @@ const { createLocalEnvironmentRuntime } = require("./worker/git-local-environmen
 const { WORKTREE_INCLUDE_FILE, copyAgentOverrideFiles, copyWorktreeFiles, findWorktreeIncludeFiles, resolveWorktreeLocalEnvironmentConfig } = require("./worker/git-worktree-copy-files");
 const { WORKTREE_NAME_MARKER, createWorktreePath: createGitWorktreePath, ensureWorktreesRoot, getRootRelativeCwd: getGitRootRelativeCwdQuery, reserveWorktreeNameDirectory } = require("./worker/git-worktree-path-allocation");
 const { createLocalTrackingBranch: createLocalTrackingBranchQuery, deleteLocalTrackingBranch: deleteLocalTrackingBranchQuery, resolveCreatedWorktreeBranchName: resolveCreatedWorktreeBranchNameQuery } = require("./worker/git-worktree-branch-tracking");
+const { createWorktreeCheckout: createWorktreeCheckoutQuery } = require("./worker/git-worktree-checkout");
 const { readWorktreeShellEnvironment: readWorktreeShellEnvironmentQuery, removeWorktreeShellEnvironment: removeWorktreeShellEnvironmentQuery, writeWorktreeShellEnvironment: writeWorktreeShellEnvironmentQuery } = require("./worker/git-worktree-shell-environment");
 const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
@@ -539,7 +540,7 @@ const worktreeBranchTrackingDeps = {
   getOrderedRemotes: (repository) => getOrderedGitRemotes(repository),
   localBranchExists: (root, branch, host, signal) => O2(root, branch, host, signal),
   logger: {
-    warning: (message, detail) => T2().warning(message, detail),
+    warning: (message, detail) => kW(`git`)().warning(message, detail),
   },
   resolveRef: (repository, ref, signal, options) =>
     resolveGitRefSha(repository, ref, signal, options),
@@ -561,6 +562,34 @@ const resolveCreatedWorktreeBranchName = (repository, startingState, startingRef
     startingRef,
     signal,
     worktreeBranchTrackingDeps,
+  );
+const worktreeCheckoutDeps = {
+  applyPatch: (params, gitManager, host, options) => S2(params, gitManager, host, options),
+  createLocalTrackingBranch,
+  deleteLocalTrackingBranch,
+  getSafeAttributeFilterOverrides: (repository, signal) =>
+    getSafeAttributeFilterOverrides(repository, signal, gitSafeAttributeFilterDeps),
+  getUntrackedPaths: (repository, includeIgnored, snapshot, signal) =>
+    f2(repository, includeIgnored, snapshot, signal),
+  logger: {
+    warning: (message, detail) => kW(`git`)().warning(message, detail),
+  },
+  normalizeRoot: (root) => bz(root),
+  refreshUpstream: (params) => refreshWorktreeUpstream(params),
+  removeWorktree: (root, host, force) => removeGitWorktree(root, host, force),
+  resolveStartingState: (root, state, gitManager, host, overrides, signal) =>
+    resolveGitWorktreeStartingState(root, state, gitManager, host, overrides, signal),
+  runGit: (root, args, host, options) => $(root, args, host, options),
+};
+const createWorktreeCheckout = (root, worktreeRoot, state, gitManager, host, options) =>
+  createWorktreeCheckoutQuery(
+    root,
+    worktreeRoot,
+    state,
+    gitManager,
+    host,
+    options,
+    worktreeCheckoutDeps,
   );
 const gitBranchMetadataDeps = {
   getCurrentBranch: getCurrentGitBranch,
@@ -67458,102 +67487,6 @@ async function Mme(e, { host: t, signal: n }) {
     return !1;
   }
 }
-var T2 = kW(`git`);
-async function zme(e, t, n, r, i, a) {
-  try {
-    let o = await Bme(e, t, n, r, i, a);
-    if (!o.success)
-      try {
-        await removeGitWorktree(t, i, !0);
-      } catch (e) {
-        T2().warning(`Failed to cleanup worktree`, { safe: {}, sensitive: { error: e } });
-      }
-    return o;
-  } catch (e) {
-    try {
-      await removeGitWorktree(t, i, !0);
-    } catch (e) {
-      T2().warning(`Failed to cleanup worktree`, { safe: {}, sensitive: { error: e } });
-    }
-    return { success: !1, error: Hme(e) };
-  }
-}
-async function Bme(e, t, n, r, i, a) {
-  let o = a?.onLog,
-    s = a?.signal;
-  if (s?.aborted) return { success: !1, error: Error(`Operation canceled`) };
-  let c = r.getWorktreeRepositoryForRoot(bz(e), i),
-    l = await getSafeAttributeFilterOverrides(c, s, gitSafeAttributeFilterDeps);
-  if (
-    (await refreshWorktreeUpstream({
-      worktreeRepo: c,
-      startingState: n,
-      mode: a?.upstreamRefreshMode ?? `never`,
-      onLog: o,
-      signal: s,
-      upstreamRefreshSignal: a?.upstreamRefreshSignal,
-    }),
-    s?.aborted)
-  )
-    return { success: !1, error: Error(`Operation canceled`) };
-  let [{ startingRef: u, startingDiff: d }, f] = await Promise.all([
-    resolveGitWorktreeStartingState(e, n, r, i, l, s),
-    n.type === `working-tree` ? f2(c, void 0, void 0, s) : Promise.resolve(null),
-  ]);
-  if (f != null && !f.success) throw Error(`Failed to collect untracked working tree files`);
-  if (s?.aborted) return { success: !1, error: Error(`Operation canceled`) };
-  let p = await $(e, [`worktree`, `add`, `--detach`, t, u], i, {
-    configOverrides: l,
-    onStdoutRaw: o ? (e) => o(`stdout`, e) : void 0,
-    onStderrRaw: o ? (e) => o(`stderr`, e) : void 0,
-    signal: s,
-  });
-  if (!p.success)
-    return { success: !1, error: Error(`git worktree add failed: ${p.stderr || p.stdout}`) };
-  if (s?.aborted) return { success: !1, error: Error(`Operation canceled`) };
-  if (d) {
-    o?.(
-      `info`,
-      new TextEncoder().encode(`[info] Applying working tree diff to new worktree
-`),
-    );
-    let e = await S2({ cwd: t, diff: d, revert: !1 }, r, i, { gitConfigOverrides: l, signal: s });
-    if (e.status !== `success`) {
-      let t = [
-        `git apply failed: applied:${e.appliedPaths.length} skipped:${e.skippedPaths.length} conflicted:${e.conflictedPaths.length}`,
-        e.execOutput?.output.trim(),
-      ].filter(Boolean).join(`
-`);
-      return (o?.(`info`, new TextEncoder().encode(`${t}\n`)), { success: !1, error: Error(t) });
-    }
-  }
-  if (f != null && f.paths.length > 0) {
-    o?.(
-      `info`,
-      new TextEncoder().encode(`[info] Copying untracked files to new worktree
-`),
-    );
-    let n = await i.platformPath();
-    for (let r of f.paths) {
-      if (s?.aborted) return { success: !1, error: Error(`Operation canceled`) };
-      let a = n.join(t, r);
-      (await i.createDirectory(n.dirname(a), { recursive: !0 }), await i.copy(n.join(e, r), a));
-    }
-  }
-  let m =
-    n.type === `branch` && n.remoteRef != null
-      ? null
-      : await createLocalTrackingBranch(c, u, s);
-  return s?.aborted
-    ? (
-        m != null && (await deleteLocalTrackingBranch(c, m)),
-        { success: !1, error: Error(`Operation canceled`) }
-      )
-    : { success: !0, startingRef: u };
-}
-function Hme(e) {
-  return e instanceof Error ? e : Error(String(e));
-}
 async function O2(e, t, n, r) {
   let i = await $(e, [`show-ref`, `--verify`, `--quiet`, formatLocalBranchRef(t)], n, { signal: r });
   return i.success && i.code === 0;
@@ -67643,7 +67576,7 @@ async function V2({
     }
   }
   f?.(b);
-  let w = await zme(g.root, b, r, t, c, {
+  let w = await createWorktreeCheckout(g.root, b, r, t, c, {
     onLog: d,
     signal: l,
     upstreamRefreshMode: i,

@@ -639,6 +639,13 @@ Worktree create 的远端起点自动 tracking branch 创建/强制清理、fres
 已删除；通用 `O2` branch-exists helper 仍由入口和 create-branch 请求共享，取消回滚与
 synced-branch 初始化消费者改用语义入口，由 31 项独立模块断言覆盖。
 
+### 增量抽取：Worktree checkout
+
+Worktree checkout 的 safe attribute filter、upstream refresh、starting state/untracked 并行读取、
+detached `worktree add`、working-tree diff 与 untracked 文件恢复、tracking branch 和失败 cleanup
+主编排已迁移至 `src/main/worker/git-worktree-checkout.ts`。原 `zme`/`Bme`/`Hme` 与 `T2` 专用
+日志状态已删除，上层 create 只保留路径分配和 setup/config 生命周期，由 44 项独立断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
