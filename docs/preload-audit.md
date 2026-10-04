@@ -319,6 +319,14 @@ annotation feature preview 的 CSS 圆角解析、半径缩放/约束和 SVG rou
 SVG DOM 节点创建与 backdrop 更新副作用，`scripts/test-preload-annotation-preview-geometry.mjs`
 覆盖百分比/像素圆角、双值半径、超界缩放和最终 path 语义，共 3 项断言。
 
+### 增量抽取：annotation preview visibility boundaries
+
+annotation feature preview 的 fullscreen、modal、popover 可见性边界选择已迁移至
+`src/main/browser-page-preload/annotation-preview-visibility.ts`。入口仅注入既有的
+composed-parent、element 与 frame/window 适配器；模块保留跨 shadow root/frame 的 ancestor
+判定、top-modal 选择及 popover 矩形遮挡语义，`scripts/test-preload-annotation-preview-visibility.mjs`
+覆盖 modal 内外目标与边界过滤，共 3 项断言。
+
 ### 增量抽取：annotation design-control preview sync
 
 design-control preview 的目标索引、当前/原始视图值切换、虚拟 target key、跨 frame/page

@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 805.
+Total scripts: 807.
 
 ## Recent semantic extraction suites
 
@@ -16,6 +16,7 @@ Total scripts: 805.
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)
 - [`test-preload-annotation-scroll-container.mjs`](./test-preload-annotation-scroll-container.mjs)
 - [`test-preload-annotation-preview-geometry.mjs`](./test-preload-annotation-preview-geometry.mjs)
+- [`test-preload-annotation-preview-visibility.mjs`](./test-preload-annotation-preview-visibility.mjs)
 - [`test-preload-annotation-visibility.mjs`](./test-preload-annotation-visibility.mjs)
 - [`test-renderer-conversation-ready.mjs`](./test-renderer-conversation-ready.mjs)
 - [`test-renderer-browser-url.mjs`](./test-renderer-browser-url.mjs)
@@ -192,6 +193,7 @@ Total scripts: 805.
 - [`test-worker-git-blame-file.mjs`](./test-worker-git-blame-file.mjs)
 - [`test-worker-git-branch-metadata.mjs`](./test-worker-git-branch-metadata.mjs)
 - [`test-worker-git-cache-request-handlers.mjs`](./test-worker-git-cache-request-handlers.mjs)
+- [`test-worker-git-stable-metadata-request-handler.mjs`](./test-worker-git-stable-metadata-request-handler.mjs)
 - [`test-worker-git-cat-file.mjs`](./test-worker-git-cat-file.mjs)
 - [`test-worker-git-checkout-request-handler.mjs`](./test-worker-git-checkout-request-handler.mjs)
 - [`test-worker-git-clone-state.mjs`](./test-worker-git-clone-state.mjs)
