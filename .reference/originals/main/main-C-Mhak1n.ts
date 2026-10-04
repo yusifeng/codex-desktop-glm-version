@@ -18,7 +18,7 @@ const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update
 const { createDelayedProgressWindow } = require("./main-app/startup/delayed-progress-window.js");
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
-const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
+const { isAllowedMainRpcMethod, isNonNullObject, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
 const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
@@ -174293,7 +174293,7 @@ var hst = class extends n.Uf {
   }
 };
 function V9(e) {
-  return typeof e == `object` && !!e;
+  return isNonNullObject(e);
 }
 function gst(e) {
   return isAllowedMainRpcMethod(e);

@@ -7,6 +7,10 @@
 `main-app/util/url-trust.ts`）。两者均保留原别名调用面并有行为断言；表中
 其余 `semantic/business` 区段仍表示待继续物理迁出或已由既有模块覆盖。
 
+worker-main session 的非空对象判定（原 `V9`，174,295）已迁移至
+`main-app/worker/rpc-message-predicates.ts`，入口保留兼容别名；RPC predicate focused
+suite 新增 4 项对象形状断言。
+
 app 协议 URL 的内部 frame 与协议判定（原 `nst/F9`，173,804-173,817）已迁移至同一
 `main-app/util/url-trust.ts`，入口仅保留兼容委托；URL trust focused suite 新增 5 项断言。
 
