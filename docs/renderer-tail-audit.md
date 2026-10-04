@@ -47,6 +47,13 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 保留为 generated icon surface。该证据也说明 A5 的 unconsumed 数量包含已语义化
 但暂无消费者的图标，不应仅按数量批量迁移。
 
+补充对 `app-primary` 的实现级抽样：公开别名 `d`（当前消费者统一命名为
+`appPrimaryInit`）并不是可安全拆出的业务 helper。它只在语义 chunk 中以副作用
+初始化器形式被引用（22 个消费者均为 `void appPrimaryInit`），对应发布 chunk 的
+内部实现跨越多个 UI、query 和 lazy-registration 初始化段，且没有独立输入/输出
+契约。因而本轮将其归类为 `aggregation-runtime`，保留原始 hub 依赖，不伪造一个
+只会执行部分注册的语义模块；后续只有在能从单一消费者证明完整初始化边界时才迁移。
+
 `use-imported-setup-opportunity` 同样是 74 导出的构建聚合边界，但当前仅消费
 `ft/pt`。消费侧已经分别命名为 `resolveImportedSetupLabel` 与
 `projectImportedSetupItems`，声明也固定为具体函数签名；审计禁止扩大该表面。
