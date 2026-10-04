@@ -38,6 +38,13 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 已完成语义化”。`scripts/test-renderer-hub-classification.mjs` 固定三座 hub
 均存在消费面且保留未消费缺口，防止以后通过删除审计来掩盖尾部。
 
+`app-primary` 的 panel visibility 入口已将纯策略部分迁移至
+`src/renderer/app-primary/runtime/panel-target-policy.ts`。该模块保留
+`bottom-panel` / `right-panel` 优先级、可用 tab 过滤和无候选时返回 `null` 的
+原始行为；入口只继续调用聚合 hub 的初始化器。`scripts/test-renderer-panel-target-policy.mjs`
+通过独立 bundle 对 fallback、preferred 组合做行为断言，避免把初始化副作用
+误当作可迁移策略。
+
 本轮对一个具体未消费导出做了实现级判定：`app-shared` 的 `qhe`（公开别名
 `U$`，原始定义行约 91,xxx）与其懒初始化器 `Jhe`（公开别名 `W$`）是
 `chat-bubble-rounded-rectangle-text-light-20` 图标资产，而不是业务 helper。
