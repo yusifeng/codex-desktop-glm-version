@@ -124,7 +124,7 @@ const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
-const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets } = require("./worker/git-review-search-utils");
+const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
@@ -68490,6 +68490,9 @@ function uve(e, t) {
   });
 }
 function dve(e) {
+  return createLineDecoder(e);
+}
+function dveLegacy(e) {
   let t = new TextDecoder(),
     n = ``;
   return (r) => {
