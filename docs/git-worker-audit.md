@@ -828,6 +828,14 @@ Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令�
 请求 dispatcher 只注入现有 create runtime、host、signal、emit 与 controller registry；24 项 focused
 断言覆盖默认/显式 synced-branch 选项、事件字段、失败映射和并发 controller 替换边界。
 
+### 增量抽取：Worktree create request dispatch
+
+`create-worktree` 方法选择与请求结果转发已迁移至
+`src/main/worker/git-worktree-create-dispatch.ts`。入口仅保留协议分支、依赖装配和后续性能/响应处理，
+实际 controller 生命周期、事件流和成功/失败 envelope 继续由
+`git-worktree-create-request.ts` 负责；`scripts/test-worker-git-worktree-create-dispatch.mjs`
+覆盖方法匹配、参数转发、结果 envelope 与未知方法旁路，共 5 项断言。
+
 ### 增量抽取：Worktree lifecycle scheduling
 
 Worktree 删除/恢复的 host+path 去重、删除 promise 清理，以及恢复操作的串行排队与失败后继续策略已迁移至

@@ -15,7 +15,7 @@ const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = 
 const { resolveWorktrees } = require("./worker/git-worktree-request-handlers");
 const { dispatchWorktreeMutationRequest } = require("./worker/git-worktree-mutation-dispatch");
 const { dispatchWorktreeOwnerRequest } = require("./worker/git-worktree-owner-dispatch");
-const { createWorktreeRequest } = require("./worker/git-worktree-create-request");
+const { dispatchWorktreeCreateRequest } = require("./worker/git-worktree-create-dispatch");
 const { dispatchCodexWorktreeRequest } = require("./worker/git-codex-worktree-dispatch");
 const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-dispatch");
 const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
@@ -70136,7 +70136,7 @@ var I6 = kW(`git`),
             break;
           }
           case `create-worktree`:
-            p = await createWorktreeRequest(e.params, worktreeRequestDeps);
+            p = (await dispatchWorktreeCreateRequest(e.method, e.params, worktreeRequestDeps)).result;
             break;
           case `cancel-worktree-upstream-refresh`: {
             let t = await dispatchWorktreeMutationRequest(e.method, e.params, e.id, worktreeRequestDeps);
