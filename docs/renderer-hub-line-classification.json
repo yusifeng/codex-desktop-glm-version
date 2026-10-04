@@ -495,5 +495,53 @@
     "classification": "generated-local-home-composer-runtime",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The component binds home-composer mode, diff source, prefill preview and recording markers into the generated composer surface. Its effects and child composition are route-local lifecycle glue."
+  },
+  {
+    "hub": "app-primary", "alias": "g", "sourceSymbol": "b9", "startLine": 115225, "endLine": 115283,
+    "classification": "generated-local-home-composer-shell",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component renders the generated home composer shell and binds route-local project and prompt state; its callbacks are owned by the adjacent route tree rather than a standalone renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "_", "sourceSymbol": "S9", "startLine": 115288, "endLine": 115305,
+    "classification": "generated-local-home-composer-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers generated home-composer dependencies and lazy resources. Its ordering is lifecycle glue for the neighboring route and has no independent renderer owner."
+  },
+  {
+    "hub": "app-primary", "alias": "m", "sourceSymbol": "C_t", "startLine": 115306, "endLine": 115443,
+    "classification": "generated-local-project-dropdown-controller",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The controller composes project dropdown state, menu callbacks and generated project rows. It is coupled to the local dropdown surface and is not independently consumed."
+  },
+  {
+    "hub": "app-primary", "alias": "h", "sourceSymbol": "T9", "startLine": 115445, "endLine": 115464,
+    "classification": "generated-local-project-dropdown-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer installs project dropdown query and UI registries before the adjacent generated controller mounts; this is route-local setup glue."
+  },
+  {
+    "hub": "app-primary", "alias": "p", "sourceSymbol": "k_t", "startLine": 115492, "endLine": 115918,
+    "classification": "generated-local-home-composer-controller",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The controller owns generated home-composer interactions, selection and submission callbacks. Its state and effects are local to the composer route with no separate renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "u", "sourceSymbol": "F_t", "startLine": 115977, "endLine": 115993,
+    "classification": "generated-local-composer-placeholder",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component provides the generated composer placeholder branch and is only mounted by the adjacent route lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "l", "sourceSymbol": "M9", "startLine": 116845, "endLine": 116884,
+    "classification": "generated-local-account-access-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires account-access dependencies for the neighboring composer route and has no independently consumed renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "s", "sourceSymbol": "F9", "startLine": 116886, "endLine": 116928,
+    "classification": "generated-local-account-access-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The runtime composes account-access state and generated UI for the neighboring route; ownership remains local to that surface."
   }
 ]
