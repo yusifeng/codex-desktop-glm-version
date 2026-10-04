@@ -569,6 +569,13 @@ WeakMap 缓存已迁移至 `src/main/worker/git-path-resolution.ts`。原 `u0`/`
 `Epe`/`h0` 与 `p0` 缓存已删除，diff、watcher、thread config、automation 与 index-info 消费者
 全部改用语义入口，由 36 项断言覆盖。
 
+### 增量抽取：Git path status
+
+Untracked/path-status 的 porcelain v1 NUL 解析、目录型 untracked 展开、嵌套仓库过滤，以及
+tracked/path-status 的 250ms query cache 已迁移至 `src/main/worker/git-path-status.ts`。原
+`t2`/`n2`/`mme`/`r2`/`hme`/`i2` 已删除，untracked cache、snapshot、watcher ignore discovery
+消费者改用语义入口，由 31 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

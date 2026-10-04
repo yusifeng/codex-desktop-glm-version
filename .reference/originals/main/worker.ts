@@ -33,6 +33,7 @@ const { getCurrentBranch: getCurrentGitBranchQuery, getCurrentBranchSnapshot: ge
 const { getGitIndexInfo } = require("./worker/git-index-info");
 const { findNearestAncestorBranch } = require("./worker/git-nearest-ancestor-branch");
 const { getGitDir: getGitDirQuery, getIndexContext: getGitIndexContextQuery, getIndexPath: getGitIndexPathQuery, resolveGitPath: resolveGitPathQuery } = require("./worker/git-path-resolution");
+const { expandUntrackedDirectories: expandGitUntrackedDirectoriesQuery, getPathStatus: getGitPathStatusQuery, getTrackedPaths: getGitTrackedPathsQuery, readPathStatus: readGitPathStatusQuery, readTrackedPaths: readGitTrackedPathsQuery, readUntrackedPaths: readGitUntrackedPathsQuery } = require("./worker/git-path-status");
 const { getRecentBranches: getGitRecentBranches } = require("./worker/git-recent-branches");
 const { getDefaultBranchForRemote: getDefaultBranchForRemoteQuery, getDefaultRemoteBranch: getDefaultGitRemoteBranchQuery, getLocallyKnownDefaultBranch: getLocallyKnownDefaultBranchQuery, getOrderedRemotes: getOrderedGitRemotesQuery, getUpstreamRef: getGitUpstreamRefQuery } = require("./worker/git-remote-branches");
 const { isGitObjectId, resolveGitRefSha: resolveGitRefShaQuery } = require("./worker/git-ref-resolution");
@@ -151,6 +152,25 @@ const getGitIndexPath = (repository) =>
   getGitIndexPathQuery(repository, gitPathResolutionDeps);
 const getGitIndexContext = (repository, signal) =>
   getGitIndexContextQuery(repository, signal, gitPathResolutionDeps);
+const gitPathStatusDeps = {
+  chunk: (...args) => kG.default(...args),
+  compact: (...args) => pme.default(...args),
+  getQueryMeta: () => _1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+};
+const expandGitUntrackedDirectories = (root, host, directories, signal) =>
+  expandGitUntrackedDirectoriesQuery(root, host, directories, signal, gitPathStatusDeps);
+const readGitUntrackedPaths = (root, host, options) =>
+  readGitUntrackedPathsQuery(root, host, options, gitPathStatusDeps);
+const getGitTrackedPaths = (repository, paths) =>
+  getGitTrackedPathsQuery(repository, paths, gitPathStatusDeps);
+const getGitPathStatus = (repository, paths) =>
+  getGitPathStatusQuery(repository, paths, gitPathStatusDeps);
+const readGitPathStatus = (repository, paths) =>
+  readGitPathStatusQuery(repository, paths, gitPathStatusDeps);
+const readGitTrackedPaths = (repository, paths) =>
+  readGitTrackedPathsQuery(repository, paths, gitPathStatusDeps);
 const gitIndexInfoDeps = {
   getGitDir: (...args) => getGitDir(...args),
   logger: { error: (message, detail) => kW(`git`)().error(message, detail) },
@@ -67298,136 +67318,6 @@ var fme = e.n((e, t) => {
     t.exports = n;
   }),
   pme = e.o(fme());
-async function t2(e, t, { configOverrides: n = [], onStatus: r, signal: i } = {}) {
-  let a = await $(
-    e,
-    [
-      `status`,
-      r == null ? `--no-renames` : `--renames`,
-      `--porcelain=v1`,
-      `-z`,
-      `--untracked-files=normal`,
-    ],
-    t,
-    { configOverrides: n, signal: i, trim: !1 },
-  );
-  if (!a.success) return { success: !1, paths: [], gitRoot: e };
-  r?.(a.stdout);
-  let o = [],
-    s = a.stdout.split(`\0`);
-  for (let e = 0; e < s.length; e += 1) {
-    let t = s[e];
-    t != null &&
-      (t.startsWith(`?? `) ? o.push(t.slice(3)) : /[RC]/.test(t.slice(0, 2)) && (e += 1));
-  }
-  let c = await n2(
-    e,
-    t,
-    o.filter((e) => e.endsWith(`/`)),
-    i,
-  );
-  return c.success
-    ? { success: !0, gitRoot: e, paths: [...o.filter((e) => !e.endsWith(`/`)), ...c.paths] }
-    : c;
-}
-async function n2(e, t, n, r) {
-  if (n.length === 0) return { success: !0, paths: [], gitRoot: e };
-  let i = await $(e, [`ls-files`, `--others`, `--exclude-standard`, `-z`, `--`, ...n], t, {
-    signal: r,
-    trim: !1,
-  });
-  if (!i.success) return { success: !1, paths: [], gitRoot: e };
-  let a = i.stdout.split(`\0`).filter((e) => e.length > 0),
-    o = a.filter((e) => e.endsWith(`/`));
-  if (o.length === 0) return { success: !0, paths: a, gitRoot: e };
-  let s = await t.platformPath(),
-    c = new Set();
-  for (let n of (0, kG.default)(o, 8)) {
-    if (r?.aborted) return { success: !1, paths: [], gitRoot: e };
-    let i = await Promise.all(
-      n.map(async (n) =>
-        (
-          await $(s.join(e, n), [`rev-parse`, `--verify`, `--quiet`, `HEAD^{commit}`], t, {
-            allowedNonZeroExitCodes: [1],
-            signal: r,
-          })
-        ).code === 1
-          ? n
-          : null,
-      ),
-    );
-    for (let e of (0, pme.default)(i)) c.add(e);
-  }
-  return r?.aborted
-    ? { success: !1, paths: [], gitRoot: e }
-    : {
-        success: !0,
-        gitRoot: e,
-        paths: a.flatMap((e) => (c.has(e) ? [] : e.endsWith(`/`) ? [e.slice(0, -1)] : [e])),
-      };
-}
-function mme(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `tracked-paths`, t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () => r2(e, t),
-    staleTime: 250,
-  });
-}
-async function r2(e, t) {
-  let n = await $(e.root, [`ls-files`, `--cached`, `-z`, `--`, ...t], e.host, { trim: !1 });
-  return n.success
-    ? { success: !0, paths: n.stdout.split(`\0`).filter((e) => e.length > 0), gitRoot: e.root }
-    : { success: !1, paths: [], gitRoot: e.root };
-}
-function hme(e, t) {
-  return e.queryClient.fetchQuery({
-    queryKey: Q(e.root, e.host, `path-status`, t),
-    gcTime: 250,
-    meta: _1,
-    queryFn: () => i2(e, t),
-    staleTime: 250,
-  });
-}
-async function i2(e, t) {
-  let n = await $(
-    e.root,
-    [
-      `status`,
-      `--no-renames`,
-      `--ignored=matching`,
-      `--untracked-files=all`,
-      `--porcelain=v1`,
-      `-z`,
-      `--`,
-      ...t,
-    ],
-    e.host,
-    { trim: !1 },
-  );
-  if (!n.success)
-    return { success: !1, trackedPaths: [], untrackedPaths: [], ignoredPaths: [], gitRoot: e.root };
-  let r = [],
-    i = [],
-    a = [];
-  return (
-    n.stdout.split(`\0`).forEach((e) => {
-      if (!(e.length < 4)) {
-        if (e.startsWith(`?? `)) {
-          i.push(e.slice(3));
-          return;
-        }
-        if (e.startsWith(`!! `)) {
-          a.push(e.slice(3));
-          return;
-        }
-        r.push(e.slice(3));
-      }
-    }),
-    { success: !0, trackedPaths: r, untrackedPaths: i, ignoredPaths: a, gitRoot: e.root }
-  );
-}
 function a2(e) {
   return e.split(/[/\\]+/).join(`/`);
 }
@@ -67461,7 +67351,7 @@ var vme = 1e4,
   d2 = new WeakMap();
 function f2(e, t, n, r) {
   return t != null && t.length > 0
-    ? b2(n, () => n2(e.root, e.host, t, n?.signal ?? r))
+    ? b2(n, () => expandGitUntrackedDirectories(e.root, e.host, t, n?.signal ?? r))
     : b2(n, () => _2(e, n != null, r));
 }
 function p2(e) {
@@ -67514,7 +67404,7 @@ async function Tme(e, t) {
   let f =
     d.size === l.length
       ? { success: !0, trackedPaths: [], untrackedPaths: [], ignoredPaths: [], gitRoot: e.root }
-      : await hme(e, l).catch(() => null);
+      : await getGitPathStatus(e, l).catch(() => null);
   if (f?.success !== !0) return (p2(e), { type: `unfiltered` });
   if (d2.get(e) !== u) return { type: `unfiltered` };
   let p = [
@@ -67527,7 +67417,7 @@ async function Tme(e, t) {
     h =
       m.length === 0
         ? { success: !0, paths: [], gitRoot: e.root }
-        : await mme(e, m).catch(() => null);
+        : await getGitTrackedPaths(e, m).catch(() => null);
   if (h?.success !== !0) return (p2(e), { type: `unfiltered` });
   if (d2.get(e) !== u) return { type: `unfiltered` };
   (h2(u, f.trackedPaths),
@@ -67621,7 +67511,7 @@ async function v2(e, t, n) {
           return { generation: r, result: { success: !1, paths: [], gitRoot: e.root } };
         }
         let a,
-          s = await t2(e.root, e.host, {
+          s = await readGitUntrackedPaths(e.root, e.host, {
             configOverrides: n,
             onStatus: (e) => {
               a = e;
@@ -69821,7 +69711,7 @@ async function Sge(e, t, n, r, i) {
       fresh: !0,
       signal: i,
       untrackedPathsPromise: getSafeAttributeFilterOverrides(o, i, gitSafeAttributeFilterDeps).then((e) =>
-        t2(o.root, n, { configOverrides: e, signal: i }),
+        readGitUntrackedPaths(o.root, n, { configOverrides: e, signal: i }),
       ),
     }),
     u = await resolveGitRefSha(o, `HEAD`, i),
@@ -70774,8 +70664,8 @@ var Jye = 1e3,
         if (this.disposed) return [];
         if (!i)
           return readGitWatcherIgnoredDirectories(this.options.worktreeRepo, {
-            readPathStatus: i2,
-            readTrackedPaths: r2,
+            readPathStatus: readGitPathStatus,
+            readTrackedPaths: readGitTrackedPaths,
           });
       }
       return [];
