@@ -473,3 +473,13 @@ controls 注册失败、main-world listener 安装、事件转发及 dispose 后
 单实例 dispose、替换挂载和对象/函数两种 teardown 形态；DOM overlay、observer、RAF
 调度与渲染副作用仍由既有 `Ty`/preview layer 负责。`scripts/test-preload-annotation-preview-controller.mjs`
 覆盖预览替换、空值清理、显式 dispose 与对象 teardown，共 4 项断言。
+
+### 增量抽取：annotation display selection projection
+
+批注 overlay 的 additional-selection 投影（原 `J_` 22849-22873）已迁移至
+`src/main/browser-page-preload/annotation-display-selections.ts`。模块只负责
+resolved anchor 的 live rect 选择、可见区域裁剪、class/page 标记、稳定 key 与
+selection index；DOM/frame 解析和 geometry 仍由入口注入，避免将 React render assembly
+提升到独立模块。`scripts/test-preload-annotation-display-selections.mjs` 覆盖 element、
+region、virtual 三类 selection、clip/no-clip、border radius、source index 与 page marker，
+共 7 项断言。

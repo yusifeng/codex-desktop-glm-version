@@ -806,3 +806,8 @@ Annotation preview controller 的单实例替换与 teardown 生命周期（原 
 `src/main/browser-page-preload/annotation-preview-controller.ts`；入口继续保留 `Ty` 的 DOM
 overlay、observer 与 RAF 副作用。由 `scripts/test-preload-annotation-preview-controller.mjs`
 覆盖函数/对象 teardown、替换和空值清理，共 4 项断言。
+
+Annotation display selection projection（原 `J_` 22849-22873）的 additional-selection
+rect/class/page/index 投影已迁移至 `src/main/browser-page-preload/annotation-display-selections.ts`；
+入口仅注入 anchor/frame resolver、visible clipping 与 geometry 适配，React render assembly
+仍保留在原边界。由 `scripts/test-preload-annotation-display-selections.mjs` 覆盖 7 项断言。

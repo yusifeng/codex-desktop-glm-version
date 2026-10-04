@@ -22814,6 +22814,7 @@ var {
   resolveAnnotationSelection: resolveAnnotationSelection,
   splitAnnotationAnchorState: splitAnnotationAnchorState,
 } = require("./browser-page-preload/annotation-anchor-state");
+var { projectAnnotationDisplaySelections } = require("./browser-page-preload/annotation-display-selections");
 function B_(e, t, n) {
   return createAnnotationAnchorState(e, t, {
     resolveThemeVariant: f_,
@@ -22851,24 +22852,13 @@ function J_(
   t,
   { clipToVisibleArea: n = !1, selectionIndexOffset: r = 0, viewportSize: i } = {},
 ) {
-  return e.flatMap((e, a) => {
-    let o = q_(e, i),
-      s = e.anchor.kind === `element` && e.liveElement != null ? nd(e.liveElement) : null,
-      c = s?.rect ?? dd(o),
-      l = c == null ? null : n ? c_(o, c, e.liveElement) : c;
-    return l == null
-      ? []
-      : [
-          {
-            borderRadius: s?.borderRadius,
-            className:
-              o.kind === `region` ? S_(o, c, t.width, t.height) : m_(o, c, t.width, t.height),
-            isPageAnnotation: rd(o),
-            key: `${e.anchor.kind}:${e.anchor.framePath.join(`>`)}:${e.anchor.selector ?? e.anchor.elementPath}:${e.anchor.rect.x}:${e.anchor.rect.y}:${a}`,
-            rect: l,
-            selectionIndex: r + a,
-          },
-        ];
+  return projectAnnotationDisplaySelections(e, t, { clipToVisibleArea: n, selectionIndexOffset: r, viewportSize: i }, {
+    resolveSelection: (selection, viewportSize) => q_(selection, viewportSize),
+    resolveLiveElementRect: (element) => nd(element),
+    getRect: (anchor) => dd(anchor),
+    clipRect: (anchor, rect, element) => c_(anchor, rect, element),
+    getClassName: (anchor, rect, width, height) => anchor.kind === `region` ? S_(anchor, rect, width, height) : m_(anchor, rect, width, height),
+    isPageAnnotation: (anchor) => rd(anchor),
   });
 }
 function Y_(e, t, n) {
