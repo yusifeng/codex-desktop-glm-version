@@ -437,3 +437,11 @@ gate、sync payload 和 editor queue 清理。
 `input/button/select/audio/video` 并委托 text-input 判定；入口保留 `By` 兼容包装，
 由 `scripts/test-preload-annotation-selection.mjs` 覆盖普通节点、文本输入、原生按钮和
 嵌套节点共 4 项断言。
+
+### 增量抽取：annotation page URL identity boundary
+
+批注 anchor、frame 路由与草稿 marker 共用的页面 URL 解析及同页判定已迁移至
+`src/main/browser-page-preload/annotation-url.ts`。模块保留 HTTP(S) 的 origin/path/query
+比较、file URL 的 pathname/query 比较、hash 忽略和无效/opaque URL 的精确回退；入口只保留
+`fd`/`md` 兼容委托。`scripts/test-preload-annotation-url.mjs` 覆盖协议、query、hash、file
+路径和 invalid URL 边界，共 8 项断言。

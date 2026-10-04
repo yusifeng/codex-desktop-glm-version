@@ -5975,7 +5975,7 @@ function dd(e) {
   };
 }
 function fd() {
-  return window.location.href;
+  return getCurrentAnnotationPageUrl(window);
 }
 function pd(e, t) {
   if (t == null || t.length === 0) return null;
@@ -5985,16 +5985,7 @@ function pd(e, t) {
   return ac(r) && r.src !== `` ? r.src : n;
 }
 function md(e, t) {
-  let n = yd(e),
-    r = yd(t);
-  return n == null || r == null
-    ? e === t
-    : (n.protocol === `http:` || n.protocol === `https:`) &&
-        (r.protocol === `http:` || r.protocol === `https:`)
-      ? n.origin === r.origin && n.pathname === r.pathname && n.search === r.search
-      : n.protocol === `file:` && r.protocol === `file:`
-        ? n.pathname === r.pathname && n.search === r.search
-        : e === t;
+  return areAnnotationUrlsEquivalent(e, t);
 }
 function hd(e, t, n, r) {
   let i = r?.x ?? (e.point.xPercent / 100) * (n?.width ?? window.innerWidth),
@@ -6264,6 +6255,7 @@ var { createAnnotationDesignControlSync } = require("./browser-page-preload/anno
 var { createAnnotationSiteRequests } = require("./browser-page-preload/annotation-site-requests");
 var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annotation-draft-runtime");
 var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
+var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
