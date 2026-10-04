@@ -16,5 +16,8 @@ assert.deepEqual(appearance.trafficLightPosition(1), { x: 16, y: 16 });
 assert.deepEqual(appearance.trafficLightPosition(2), { x: 16, y: 39 });
 assert.deepEqual(appearance.titleBarOverlay(1, true), { color: "#00000000", symbolColor: "#ffffff", height: 36 });
 assert.deepEqual(appearance.titleBarOverlay(1.5, false), { color: "#00000000", symbolColor: "#1f1f1f", height: 54 });
+assert.equal(appearance.resolveAppearanceTheme("system", true), "dark");
+assert.equal(appearance.resolveAppearanceTheme("system", false), "light");
+assert.equal(appearance.resolveAppearanceTheme("dark", false), "dark");
 
-console.log("12 main window appearance assertions passed");
+console.log("15 main window appearance assertions passed");

@@ -173767,7 +173767,7 @@ var Qot = class {
   }
 };
 function $ot(e) {
-  return e === `system` ? (l.nativeTheme.shouldUseDarkColors ? `dark` : `light`) : e;
+  return windowAppearance.resolveAppearanceTheme(e, l.nativeTheme.shouldUseDarkColors);
 }
 function M9() {
   return process.env.ELECTRON_RENDERER_URL || Mot;

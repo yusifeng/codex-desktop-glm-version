@@ -24,7 +24,7 @@ app 协议 URL 的内部 frame 与协议判定（原 `nst/F9`，173,804-173,817�
 
 窗口外观策略（原 173,919-174,081）中的 overlay 判定、平台/尺寸策略、背景材质、
 vibrancy、frameless options 已迁移至 `src/main/main-app/window-appearance.ts`；
-原入口通过 `I9/rst/ist/ast/ost/sst/L9/cst/R9` 兼容调用，几何相关的 `A9/j9`
+原入口通过 `I9/rst/ist/ast/ost/sst/L9/cst/R9` 兼容调用，system theme 归一化也已迁移；几何相关的 `A9/j9`
 仍保留在入口，另已迁出 `A9` traffic-light geometry 和 `j9` title-bar overlay，行为由
 `scripts/test-main-window-appearance.mjs` 覆盖。
 
