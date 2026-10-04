@@ -68,6 +68,7 @@ Total scripts: 881.
 - [`test-preload-annotation-draft-runtime.mjs`](./test-preload-annotation-draft-runtime.mjs)
 - [`test-preload-annotation-request-context.mjs`](./test-preload-annotation-request-context.mjs)
 - [`test-preload-annotation-visibility.mjs`](./test-preload-annotation-visibility.mjs)
+- [`test-preload-annotation-selector-token.mjs`](./test-preload-annotation-selector-token.mjs)
 - [`test-renderer-conversation-ready.mjs`](./test-renderer-conversation-ready.mjs)
 - [`test-renderer-browser-url.mjs`](./test-renderer-browser-url.mjs)
 
@@ -944,3 +945,4 @@ Total scripts: 881.
 - [`test-preload-annotation-overlay-class-policy.mjs`](./test-preload-annotation-overlay-class-policy.mjs)
 - [`test-worker-git-live-query-refresh-plan.mjs`](./test-worker-git-live-query-refresh-plan.mjs)
 - [`test-worker-git-watch-close.mjs`](./test-worker-git-watch-close.mjs)
+- [`test-worker-request-cancellation.mjs`](./test-worker-request-cancellation.mjs)

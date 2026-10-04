@@ -140,6 +140,7 @@ const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
 const { createGitRequestLifecycle } = require("./worker/git-request-lifecycle");
+const { createGitRequestCancellationTelemetry } = require("./worker/git-request-cancellation");
 const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
@@ -69818,20 +69819,21 @@ var I6 = kW(`git`),
         isGitRequestTracked(e.method);
       if (this.requestLifecycle.begin(e.id, f, i) === `canceled`) {
           (
-            this.emitGitPerformanceOperation({
+            this.emitGitPerformanceOperation(createGitRequestCancellationTelemetry({
               attribution: n,
               canceled: !0,
               durationMs: Date.now() - r,
               host: o,
               operation: t,
-              queueDurationMs: e.enqueuedAtMs == null ? null : Math.max(0, r - e.enqueuedAtMs),
+              enqueuedAtMs: e.enqueuedAtMs,
               repoIndexSizeBucket: c,
               result: l,
               resultDisposition: `canceled`,
               reviewSource: B6(e),
               source: e.params.operationSource,
               trigger: `request`,
-            }),
+              startedAtMs: r,
+            })),
             t ?? jH(`canceled`));
         return;
       }
@@ -70250,20 +70252,21 @@ var I6 = kW(`git`),
         this.requestLifecycle.finish(e.id, f);
       }
       if (f && i.signal.aborted) {
-        (this.emitGitPerformanceOperation({
+        (this.emitGitPerformanceOperation(createGitRequestCancellationTelemetry({
           attribution: n,
           canceled: !0,
           durationMs: Date.now() - r,
           host: o,
           operation: t,
-          queueDurationMs: e.enqueuedAtMs == null ? null : Math.max(0, r - e.enqueuedAtMs),
+          enqueuedAtMs: e.enqueuedAtMs,
           repoIndexSizeBucket: c,
           result: l,
           resultDisposition: `canceled`,
           reviewSource: B6(e),
           source: e.params.operationSource,
           trigger: `request`,
-        }),
+          startedAtMs: r,
+        })),
           t ?? jH(`canceled`));
         return;
       }

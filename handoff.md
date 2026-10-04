@@ -871,3 +871,13 @@ Live-query subscription setup 的 repository metadata 查询、pending trace 关
 Annotation interaction path policy 已迁移至 `src/main/browser-page-preload/annotation-interaction-policy.ts`；
 overlay root、interaction blocker 与 marker composed-path 的 DOM 判定由注入式策略承载，原 preload
 保留 `gl`/`Cl`/`xl` 兼容代理。`scripts/test-preload-annotation-interaction-policy.mjs` 覆盖 8 项断言。
+
+Annotation selector token escaping 已迁移至
+`src/main/browser-page-preload/annotation-selector-token.ts`；元素 selector path、shadow selector
+与 scroll-container selector 共用 CSS token 转义策略，入口保留 `qc` 兼容委托并注入 `CSS.escape`
+能力；由 `scripts/test-preload-annotation-selector-token.mjs` 覆盖 5 项 focused assertions。
+
+Git request cancellation telemetry envelope 已迁移至 `src/main/worker/git-request-cancellation.ts`；
+入口的 queued-cancel 与 in-flight abort 两条生命周期路径共用统一的 canceled/result-disposition/
+queue-duration 字段投影，避免重复的遥测组装逻辑。`scripts/test-worker-request-cancellation.mjs`
+覆盖 9 项 focused assertions；请求取消、性能追踪与 Git I/O 副作用仍由入口保留。
