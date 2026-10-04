@@ -1,5 +1,6 @@
 import "@rchunk/rolldown-runtime";
-import { hq as isWebMcpServer, wL as initializeUtilities } from "@rchunk/app-shared";
+import { wL as initializeUtilities } from "@rchunk/app-shared";
+import { isWebMcpServer } from "../app-shared/runtime/is-web-mcp-server";
 import { flattenConversationItems } from "../app-initial/runtime/flatten-conversation-items";
 import {
   n as initializeWebMcpToolCalls,

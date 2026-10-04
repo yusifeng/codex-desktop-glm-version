@@ -343,6 +343,11 @@ consumer 后再按 identity/query-key 契约迁移。
 无效 remote；2 个 creation-target 调用点已切换语义导入，由
 `scripts/test-app-shared-parse-git-remote-url.mjs` 的 4 项断言覆盖。
 
+在 `local-conversation-webmcp-tools-model` 簇，app-shared `hq`（内部 `YFe`）也已迁为
+`src/renderer/app-shared/runtime/is-web-mcp-server.ts`。它是独立纯 predicate，仅将
+`node_repl` 与 `cua_repl` 识别为 Web MCP server；consumer 已切换语义导入，并由
+`scripts/test-app-shared-is-web-mcp-server.mjs` 的 4 项断言覆盖。
+
 `tun`（内部 `a_`，`createCommandQueryFamily`）也完成实现级审计：其函数体把
 command、query config、params/cache key 与 app-server `queryFn`、response priority
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
