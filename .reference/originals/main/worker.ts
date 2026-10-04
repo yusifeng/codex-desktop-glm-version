@@ -12,7 +12,8 @@ const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenam
 const { applyGitChanges, applyGitPatch, applyGitReviewSectionChanges } = require("./worker/git-apply-request-handlers");
 const { applyGitChangesBetweenTrees } = require("./worker/git-apply-changes");
 const { applyPatch: applyGitPatchQuery, parsePatchPaths: parseGitPatchPaths } = require("./worker/git-apply-patch");
-const { cancelWorktreeUpstreamRefresh, cleanupHostHandoffTransfer, deleteWorktree, moveThreadToHostWorktree, moveThreadToLocal, moveThreadToWorktree, resolveWorktrees, restoreWorktree } = require("./worker/git-worktree-request-handlers");
+const { resolveWorktrees } = require("./worker/git-worktree-request-handlers");
+const { dispatchWorktreeMutationRequest } = require("./worker/git-worktree-mutation-dispatch");
 const { dispatchWorktreeOwnerRequest } = require("./worker/git-worktree-owner-dispatch");
 const { createWorktreeRequest } = require("./worker/git-worktree-create-request");
 const { dispatchCodexWorktreeRequest } = require("./worker/git-codex-worktree-dispatch");
@@ -70138,7 +70139,8 @@ var I6 = kW(`git`),
             p = await createWorktreeRequest(e.params, worktreeRequestDeps);
             break;
           case `cancel-worktree-upstream-refresh`: {
-            p = X(cancelWorktreeUpstreamRefresh(e.params, worktreeRequestDeps));
+            let t = await dispatchWorktreeMutationRequest(e.method, e.params, e.id, worktreeRequestDeps);
+            p = X(t.result);
             break;
           }
           case `codex-worktrees`:
@@ -70185,12 +70187,10 @@ var I6 = kW(`git`),
           case `managed-worktree-state`:
             p = X(await dispatchWorktreeSnapshotRead(e.method, e.params, { snapshotRef: (roots, path) => resolveWorktreeSnapshot(roots, path, worktreeSnapshotDeps), managedState: (roots, cwd, path) => resolveManagedWorktreeState(roots, cwd, path, worktreeSnapshotDeps) }));
             break;
-          case `restore-worktree`: {
-            p = X(await restoreWorktree(e.params, worktreeRequestDeps));
-            break;
-          }
+          case `restore-worktree`:
           case `delete-worktree`: {
-            p = X(await deleteWorktree(e.params, worktreeRequestDeps));
+            let t = await dispatchWorktreeMutationRequest(e.method, e.params, e.id, worktreeRequestDeps);
+            p = X(t.result);
             break;
           }
           case `set-worktree-owner-thread`:
@@ -70206,21 +70206,14 @@ var I6 = kW(`git`),
               p = EV(`Failed to set thread worktree owner`);
             }
             break;
-          case `move-thread-to-local`: {
-            p = await moveThreadToLocal(e.params, e.id, worktreeRequestDeps);
+          case `move-thread-to-local`:
+          case `move-thread-to-worktree`:
+          case `move-thread-to-host-worktree`:
+          case `cleanup-host-handoff-transfer`: {
+            let t = await dispatchWorktreeMutationRequest(e.method, e.params, e.id, worktreeRequestDeps);
+            p = t.wrapped ? X(t.result) : t.result;
             break;
           }
-          case `move-thread-to-worktree`: {
-            p = await moveThreadToWorktree(e.params, e.id, worktreeRequestDeps);
-            break;
-          }
-          case `move-thread-to-host-worktree`: {
-            p = await moveThreadToHostWorktree(e.params, e.id, worktreeRequestDeps);
-            break;
-          }
-          case `cleanup-host-handoff-transfer`:
-            p = X(await cleanupHostHandoffTransfer(e.params, worktreeRequestDeps));
-            break;
           case `apply-changes`: {
             let t = await dispatchGitApplyRequest(e.method, e.params, { applyChanges: (params) => applyGitChanges(params, applyRequestDeps), applyPatch: (params) => applyGitPatch(params, applyRequestDeps), applyReviewSectionChanges: (params) => applyGitReviewSectionChanges(params, applyRequestDeps) });
             (t.refreshRoot != null && (d = t.refreshRoot), (p = X(t.result)));

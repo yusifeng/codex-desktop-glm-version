@@ -865,3 +865,12 @@ managed-worktree discovery、thread config 与状态读取等窄依赖；语义�
 worktree request handler 仅保留兼容适配器，确保 restore/历史调用路径不变。
 `scripts/test-worker-git-worktree-owner-dispatch.mjs` 覆盖成功结果、manager/host/root/thread/signal
 参数保持、未知方法旁路及写入失败传播，共 6 项断言。
+
+### 增量抽取：Worktree mutation/lifecycle dispatch
+
+restore/delete、upstream refresh cancel、thread handoff（local/worktree/host-worktree）及 host
+handoff cleanup 的方法选择与 request-id 进度转发已迁移至
+`src/main/worker/git-worktree-mutation-dispatch.ts`。入口仅保留协议响应 envelope（move handoff
+继续返回原始结果，其余操作保持 `ok` 包装）；实际生命周期、去重、owner 更新和 host cache
+副作用仍由 `git-worktree-request-handlers.ts` 注入执行。`scripts/test-worker-git-worktree-mutation-dispatch.mjs`
+覆盖 restore/delete/move 成功路径及未知方法旁路，共 6 项断言。
