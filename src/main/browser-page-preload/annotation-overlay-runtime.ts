@@ -1,6 +1,7 @@
 import { collectAnnotationFlexGapOverlays } from "./annotation-flex-gap-overlays";
 import { observeAnnotationMutationsOutsideOverlay } from "./annotation-overlay-observer";
 import { shouldSuppressAnnotationRegionOverlay } from "./annotation-overlay-policies";
+import { resolveAnnotationSelectionRects } from "./annotation-selection-rects";
 
 type AnnotationOverlayRuntimeDependencies = {
   documentLike: any;
@@ -86,12 +87,6 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
     return observeAnnotationMutationsOutsideOverlay(documentLike, rootHost, onChange, deps);
   };
 
-  const resolveTextSelectionRects = (anchor: any) =>
-    anchor.selectionRects.flatMap((rect: any) => {
-      const viewportRect = deps.anchorToViewportRect({ ...anchor, rect });
-      return viewportRect == null ? [] : [viewportRect];
-    });
-
   const resolveMetadataTooltipRect = (
     rootHost: any,
     point: any,
@@ -120,7 +115,7 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
       collectAnnotationFlexGapOverlays(property, editor, annotation, cache, deps),
     getElementCache,
     observeMutationsOutsideOverlay,
-    resolveTextSelectionRects,
+    resolveTextSelectionRects: (anchor: any) => resolveAnnotationSelectionRects(anchor, { anchorToViewportRect: deps.anchorToViewportRect }),
     resolveMetadataTooltipRect,
     shouldSuppressRegionOverlay: (annotation: any, editor: any, activeAnnotation: any) =>
       shouldSuppressAnnotationRegionOverlay(annotation, editor, activeAnnotation, deps),

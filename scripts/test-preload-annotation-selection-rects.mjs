@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const { resolveAnnotationSelectionRects } = require('../app/.vite/build/browser-page-preload/annotation-selection-rects.js');
+const anchor = { selectionRects: [{ x: 1 }, { x: 2 }, { x: 3 }] };
+const result = resolveAnnotationSelectionRects(anchor, { anchorToViewportRect: ({ rect }) => rect.x === 2 ? null : { ...rect, y: 10 } });
+assert.deepEqual(result, [{ x: 1, y: 10 }, { x: 3, y: 10 }]);
+assert.deepEqual(resolveAnnotationSelectionRects({ selectionRects: [] }, { anchorToViewportRect: () => ({}) }), []);
+assert.equal(resolveAnnotationSelectionRects({ selectionRects: [{ x: 4 }] }, { anchorToViewportRect: () => undefined }).length, 0);
+console.log('test-preload-annotation-selection-rects: 3 assertions passed');
