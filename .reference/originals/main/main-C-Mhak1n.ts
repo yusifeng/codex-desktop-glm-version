@@ -28,6 +28,7 @@ const { resolveTrayIconCandidates } = require("./main-app/startup/tray-icon-path
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
+const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -173770,24 +173771,19 @@ function $ot(e) {
   return windowAppearance.resolveAppearanceTheme(e, l.nativeTheme.shouldUseDarkColors);
 }
 function M9() {
-  return process.env.ELECTRON_RENDERER_URL || Mot;
+  return rendererFrameTrust.resolveRendererEntryUrl(process.env.ELECTRON_RENDERER_URL, Mot);
 }
 function est({ sender: e, senderFrame: t, moduleDir: n }) {
-  return t != null && t !== e.mainFrame ? !1 : P9((t ?? e.mainFrame).url, n);
+  return rendererFrameTrust.isTrustedRendererSenderFrame(e, t, { rendererUrl: M9(), webviewEntryPath: tst(n) });
 }
 function N9() {
-  let e = M9();
-  return MH(e) ? new URL(e).origin : null;
+  return rendererFrameTrust.rendererOrigin(M9());
 }
 function tst(e) {
   return require("./bootstrap/protocol/app-protocol.js").getWebviewEntryPath(e);
 }
 function P9(e, t) {
-  if (e === `about:blank` || nst(e)) return !0;
-  let n = N9();
-  if (n && E9(e, n)) return !0;
-  let r = (0, c.pathToFileURL)(tst(t)).toString();
-  return !!e.startsWith(r);
+  return rendererFrameTrust.isTrustedRendererFrameUrl(e, { rendererUrl: M9(), webviewEntryPath: tst(t) });
 }
 function nst(e) {
   return mainUrlTrust.isAppFrameUrl(e);

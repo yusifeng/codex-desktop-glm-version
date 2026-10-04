@@ -6,6 +6,8 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-main-renderer-frame-trust.mjs`](./test-main-renderer-frame-trust.mjs)
+
 - [`test-app-shared-parse-git-remote-url.mjs`](./test-app-shared-parse-git-remote-url.mjs)
 
 - [`test-worker-git-worktree-read-dispatch.mjs`](./test-worker-git-worktree-read-dispatch.mjs)

@@ -23,6 +23,9 @@ webview 入口文件路径计算（原 `tst`，173,782）已迁移至
 renderer 崩溃恢复的纯判定（原窗口管理器方法内联，173,740-173,758）已迁移至
 `main-app/window/renderer-recovery-policy.ts`；reload、timer 和错误日志副作用仍保留在入口，
 由 6 项 focused 断言覆盖。
+renderer dev-origin、app/file webview entry 与 sender-frame trust 判定已迁移至
+`src/main/main-app/window/renderer-frame-trust.ts`；入口仅保留 Electron sender/moduleDir 适配，
+由 `scripts/test-main-renderer-frame-trust.mjs` 覆盖 11 项 URL、origin、frame identity 断言。
 
 线程 metadata 的 emoji 校验和不可变更新（原 172,689-172,708）已迁移至
 `src/main/main-app/thread-metadata.ts`，入口通过 `Aot`/`jot` 兼容别名接回，

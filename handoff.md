@@ -757,3 +757,6 @@ renderer 崩溃恢复的纯判定已迁移至
 `src/main/main-app/window/renderer-recovery-policy.ts`，reload/timer 副作用仍留在入口，新增 6 项断言。
 main worker session 的 `V9` 非空对象判定已并入
 `src/main/main-app/worker/rpc-message-predicates.ts`，RPC predicate suite 新增 4 项断言。
+main renderer 的 dev-origin、app/file webview entry 与 sender-frame trust 判定已迁移至
+`src/main/main-app/window/renderer-frame-trust.ts`；入口保留 Electron sender/moduleDir 适配，
+由 11 项 focused assertions 覆盖 URL、origin、frame identity 与 file entry 边界。
