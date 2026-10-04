@@ -1,12 +1,14 @@
 import {
   cancelWorktreeUpstreamRefresh,
-  cleanupHostHandoffTransfer,
   deleteWorktree,
+  restoreWorktree,
+} from "./git-worktree-request-handlers";
+import {
+  cleanupHostHandoffTransfer,
   moveThreadToHostWorktree,
   moveThreadToLocal,
   moveThreadToWorktree,
-  restoreWorktree,
-} from "./git-worktree-request-handlers";
+} from "./git-worktree-handoff-dispatch";
 
 type WorktreeMutationDispatchDependencies = Parameters<typeof restoreWorktree>[1];
 

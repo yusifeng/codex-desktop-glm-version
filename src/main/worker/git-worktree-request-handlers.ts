@@ -27,29 +27,6 @@ type WorktreeRequestDependencies = {
   listWorktrees: (cwd: string, host: any, signal: AbortSignal) => Promise<any>;
 };
 
-type HandoffDirection = `to-local` | `to-worktree` | `to-host-worktree`;
-
-function createHandoffProgressReporter(
-  requestId: string | number,
-  operationId: string | undefined,
-  direction: HandoffDirection,
-  emit: WorktreeRequestDependencies[`emit`],
-) {
-  const resolvedOperationId = operationId ?? String(requestId);
-  return (step: any, status: any) => {
-    emit({
-      type: `worker-event`,
-      event: {
-        type: `thread-handoff-progress`,
-        operationId: resolvedOperationId,
-        direction,
-        step,
-        status,
-      },
-    });
-  };
-}
-
 async function restoreWorktree(params: any, deps: WorktreeRequestDependencies) {
   const success = await deps.scheduleRestore(
     params.repoRoot,
@@ -106,70 +83,9 @@ async function setWorktreeOwnerThread(params: any, deps: WorktreeRequestDependen
   return (await dispatchWorktreeOwnerRequest(`set-worktree-owner-thread`, params, deps)).result;
 }
 
-async function moveThreadToLocal(
-  params: any,
-  requestId: string | number,
-  deps: WorktreeRequestDependencies,
-) {
-  return deps.moveToLocal(params, {
-    host: deps.host,
-    gitManager: deps.gitManager,
-    signal: deps.signal,
-    onProgress: createHandoffProgressReporter(requestId, params.operationId, `to-local`, deps.emit),
-  });
-}
-
-async function moveThreadToWorktree(
-  params: any,
-  requestId: string | number,
-  deps: WorktreeRequestDependencies,
-) {
-  return deps.moveToWorktree(params, {
-    host: deps.host,
-    gitManager: deps.gitManager,
-    signal: deps.signal,
-    onProgress: createHandoffProgressReporter(requestId, params.operationId, `to-worktree`, deps.emit),
-  });
-}
-
-async function moveThreadToHostWorktree(
-  params: any,
-  requestId: string | number,
-  deps: WorktreeRequestDependencies,
-) {
-  const destinationHost = deps.createExecutionHost(params.destinationHostConfig);
-  try {
-    return await deps.moveToHostWorktree(params, {
-      gitManager: deps.gitManager,
-      sourceHost: deps.host,
-      destinationHost,
-      signal: deps.signal,
-      onProgress: createHandoffProgressReporter(
-        requestId,
-        params.operationId,
-        `to-host-worktree`,
-        deps.emit,
-      ),
-    });
-  } finally {
-    deps.gitManager.invalidateUntrackedPathsCache(destinationHost);
-    deps.gitManager.invalidateShortLivedGitReadCaches(destinationHost);
-  }
-}
-
-async function cleanupHostHandoffTransfer(params: any, deps: WorktreeRequestDependencies) {
-  await deps.cleanupHostTransfer(params.rolloutPath, deps.host);
-  return { success: true };
-}
-
 export {
   cancelWorktreeUpstreamRefresh,
-  cleanupHostHandoffTransfer,
-  createHandoffProgressReporter,
   deleteWorktree,
-  moveThreadToHostWorktree,
-  moveThreadToLocal,
-  moveThreadToWorktree,
   resolveCodexWorktrees,
   resolveWorktrees,
   restoreWorktree,
@@ -177,12 +93,7 @@ export {
 };
 if (typeof module !== `undefined`) module.exports = {
   cancelWorktreeUpstreamRefresh,
-  cleanupHostHandoffTransfer,
-  createHandoffProgressReporter,
   deleteWorktree,
-  moveThreadToHostWorktree,
-  moveThreadToLocal,
-  moveThreadToWorktree,
   resolveCodexWorktrees,
   resolveWorktrees,
   restoreWorktree,

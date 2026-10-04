@@ -924,3 +924,11 @@ repository、watch 状态、Git 查询和中间结果回调；worker 入口仅�
 性能依赖注入和 `runLiveQuery` 生命周期边界，watch session、live-query registry 与实际 Git I/O
 仍保留在入口。`scripts/test-worker-git-live-query-handler.mjs` 覆盖 tracked/untracked 中间结果、
 stats 双阶段执行、watch-aware recent/default branch、未知方法旁路，共 5 项断言。
+
+### 增量抽取：Worktree handoff request boundary
+
+worktree handoff 的进度事件、local/worktree/host-worktree 转移参数装配，以及跨 host
+transfer cleanup 已迁移至 `src/main/worker/git-worktree-handoff-dispatch.ts`。该边界只负责
+handoff 语义与目标 host cache invalidation；restore/delete/cancel 生命周期仍由 request handler
+保留，实际迁移副作用继续通过窄依赖注入。`scripts/test-worker-git-worktree-handoff-dispatch.mjs`
+覆盖 progress operation id/direction、跨 host cleanup 与 cache invalidation，共 6 项断言。
