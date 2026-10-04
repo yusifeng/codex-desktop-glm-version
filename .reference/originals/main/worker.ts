@@ -72,6 +72,7 @@ const { resolveBranchDiffStats, resolveReviewDiff, resolveReviewPatch, resolveRe
 const { overwriteSyncedBranchRepository, resolveSyncedBranch, resolveSyncedBranchState } = require("./worker/git-synced-branch-request-handlers");
 const { overwriteSyncedBranch } = require("./worker/git-synced-branch-overwrite");
 const { resolveSyncedBranch: resolveSyncedBranchDetails, resolveSyncedBranchState: collectSyncedBranchState } = require("./worker/git-synced-branch-state");
+const { SYNCED_BRANCH_CONFIG_FILE, readSyncedBranchConfig: readSyncedBranchConfigQuery, resolveSyncedBranchConfigPath: resolveSyncedBranchConfigPathQuery, setSyncedBranchConfig: setSyncedBranchConfigQuery } = require("./worker/git-synced-branch-config");
 const { completeTurnDiffCapture, startTurnDiffCapture } = require("./worker/git-turn-diff-request-handlers");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -503,12 +504,26 @@ const gitBranchAheadDeps = {
   queryKey: Q,
   runGit: $,
 };
+const syncedBranchConfigDeps = {
+  getGitDir: (repository, signal) => getGitDir(repository, signal),
+  logger: {
+    warning: (message, detail) => kW(`syncedBranchConfig`)().warning(message, detail),
+  },
+  parseSchema: (value) => Jme.safeParse(value),
+  resolveGitPath: (repository, fileName, signal) => resolveGitPath(repository, fileName, signal),
+};
+const readSyncedBranchConfig = (repository, signal) =>
+  readSyncedBranchConfigQuery(repository, signal, syncedBranchConfigDeps);
+const resolveSyncedBranchConfigPath = (repository, signal) =>
+  resolveSyncedBranchConfigPathQuery(repository, signal, syncedBranchConfigDeps);
+const setSyncedBranchConfig = (repository, branch, treeRef, signal) =>
+  setSyncedBranchConfigQuery(repository, branch, treeRef, signal, syncedBranchConfigDeps);
 const gitBranchMetadataDeps = {
   getCurrentBranch: getCurrentGitBranch,
   getDefaultRemoteBranch: getDefaultGitRemoteBranch,
   normalizeBranch: Tz,
   normalizeCwd: xz,
-  readBranchSnapshot: P2,
+  readBranchSnapshot: readSyncedBranchConfig,
 };
 const managedWorktreeDiscoveryDeps = {
   normalizeComparisonPath: I$,
@@ -558,7 +573,7 @@ const gitCommitMessageDiffDeps = {
   normalizeCwd: xz,
 };
 const syncedBranchStateDeps = {
-  readConfig: P2,
+  readConfig: readSyncedBranchConfig,
   hasConflicts: (repository, signal) =>
     hasGitMergeConflicts(repository, signal, gitReviewComparisonDeps),
   normalizeBranch: (branch) => normalizeLocalBranchRef(branch, gitBranchMetadataDeps),
@@ -610,7 +625,7 @@ const turnDiffCaptureDeps = {
   sessionStartDiffTimeoutMs: 5e3,
 };
 const gitWatcherMetadataDeps = {
-  getSyncedBranchFileName: () => M2,
+  getSyncedBranchFileName: () => SYNCED_BRANCH_CONFIG_FILE,
   queryKey: (...args) => Q(...args),
   resolveGitPath: (...args) => resolveGitPath(...args),
   runGit: (...args) => $(...args),
@@ -67533,51 +67548,7 @@ function A2(e, t, n) {
     staleTime: 250,
   });
 }
-var j2 = kW(`syncedBranchConfig`),
-  M2 = `codex-synced-branch.json`,
-  Jme = K({ branch: H(), lastSyncedTreeRef: H() });
-async function N2(e, t) {
-  let n = await getGitDir(e, t);
-  return n ? (await e.host.platformPath()).join(n, M2) : null;
-}
-function Yme(e) {
-  try {
-    let t = Jme.safeParse(JSON.parse(e));
-    return t.success
-      ? t.data
-      : (j2().warning(`Invalid synced branch config`, {
-          safe: { parseErrorMessage: t.error.message ?? `unknown error` },
-          sensitive: {},
-        }),
-        null);
-  } catch (e) {
-    return (
-      j2().warning(`Failed to parse synced branch config`, { safe: {}, sensitive: { error: e } }),
-      null
-    );
-  }
-}
-async function P2(e, t) {
-  let n = await N2(e, t);
-  if (!n) return null;
-  try {
-    return Yme(await new Response(await e.host.readFile(n)).text());
-  } catch (e) {
-    return (e.code, null);
-  }
-}
-async function Xme(e, t, n) {
-  let r = await N2(e, n);
-  if (!r) throw Error(`No git repository found for synced branch config`);
-  let i = `${JSON.stringify(t, null, 2)}\n`;
-  await e.host.writeFile(r, i);
-}
-async function F2(e, t, n, r) {
-  await Xme(e, { branch: t, lastSyncedTreeRef: n }, r);
-}
-async function Zme(e, t) {
-  return resolveGitPath(e, M2, t);
-}
+var Jme = K({ branch: H(), lastSyncedTreeRef: H() });
 var I2 = kW(`worktreeShellEnvironmentConfig`),
   Qme = `codex-shell-environment.json`,
   $me = K({ version: J(1), set: cN(H(), H()), exclude: G(H()) });
@@ -67716,7 +67687,7 @@ async function V2({
   }
   if (D && E) {
     let e = formatLocalBranchRef(E);
-    await F2(T, e, await A2(g, e, l), l);
+    await setSyncedBranchConfig(T, e, await A2(g, e, l), l);
   }
   d?.(`info`, B2.encode(`Worktree created at ${x}\n`));
   let O =
@@ -68066,7 +68037,10 @@ async function Lhe({ cwd: e, branch: t, mode: n, failIfExists: r = !1, startPoin
         let n = await r4(t, u, o, r, i, s);
         if (!n.success) return { status: `error`, error: n.error, execOutput: n.execOutput };
         let l = n.branchRef;
-        return (await F2(e, l, await A2(e, l, s), s), { status: `success`, branch: u });
+        return (
+          await setSyncedBranchConfig(e, l, await A2(e, l, s), s),
+          { status: `success`, branch: u }
+        );
       }
       case `worktree`: {
         let e = await r4(c, u, o, r, i, s);
@@ -69715,7 +69689,7 @@ var Jye = 1e3,
                   gitWatcherMetadataDeps,
                 ),
                 getGitIndexPath(this.options.worktreeRepo),
-                Zme(this.options.worktreeRepo),
+                resolveSyncedBranchConfigPath(this.options.worktreeRepo),
                 getGitDir(this.options.worktreeRepo),
                 getCurrentGitBranchState(this.options.worktreeRepo),
               ])

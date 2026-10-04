@@ -195,6 +195,13 @@ ahead counts、双侧 numstat query 与最终响应组装已迁移至
 `src/main/worker/git-synced-branch-state.ts`；原 `Zve/a6/Qve/$ve/o6/eye/tye/rye` 和状态常量已删除。
 23 项断言覆盖 query cache、binary numstat、checked-out/unchecked 分支、SHA 校验与 warning 边界。
 
+### 增量抽取：Synced branch config
+
+Synced-branch config 的 Git-dir 路径、JSON/schema 解析、任意读取错误静默降级、格式化写入与
+watcher 路径解析已迁移至 `src/main/worker/git-synced-branch-config.ts`。原 `j2`/`M2`/`N2`/
+`Yme`/`P2`/`Xme`/`F2`/`Zme` 已删除；schema 由入口窄依赖注入，branch metadata、state、
+worktree/branch create 和 watcher 消费者改用语义入口，由 28 项独立模块断言覆盖。
+
 repository/file read 请求（`repository-identity`、`commit-message-diff`、`submodule-paths`、
 `cat-file`、`blame-file`、`index-info`、`config-value`）已迁移至
 `src/main/worker/git-repository-read-request-handlers.ts`。模块保留 repository unavailable、
