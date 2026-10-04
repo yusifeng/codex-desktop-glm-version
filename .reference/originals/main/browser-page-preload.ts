@@ -6249,6 +6249,7 @@ var { isAnnotationElementVisible } = require("./browser-page-preload/annotation-
 var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
 var { createAnnotationPreviewVisibilityPredicate } = require("./browser-page-preload/annotation-preview-visibility");
 var { createAnnotationPreviewScheduler } = require("./browser-page-preload/annotation-preview-scheduler");
+var { createAnnotationPreviewController } = require("./browser-page-preload/annotation-preview-controller");
 var { createAnnotationPreloadBridge } = require("./browser-page-preload/annotation-preload-bridge");
 var { createAnnotationRequestContext } = require("./browser-page-preload/annotation-request-context");
 var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
@@ -23560,16 +23561,7 @@ var Cy = o(() => {
   tl();
 });
 function wy(e) {
-  let t = null;
-  function n() {
-    (t?.(), (t = null));
-  }
-  return {
-    setPreview(r) {
-      (n(), r != null && (t = Ty(e, r)));
-    },
-    dispose: n,
-  };
+  return createAnnotationPreviewController({ mountPreview: (preview) => Ty(e, preview) });
 }
 function Ty({ shadowRoot: e, getControlTargets: t }, n) {
   let r = document.createElement(`div`);

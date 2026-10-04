@@ -465,3 +465,11 @@ controls 注册失败、main-world listener 安装、事件转发及 dispose 后
 命中、selection highlight、cursor/selection 样式、pointer-id 与 trusted-event 门控，入口
 继续注入既有 DOM/frame 适配器和副作用；`scripts/test-preload-annotation-pointer-selection.mjs`
 覆盖拖拽开始/移动/结束、selection 回传、highlight 清理及 blocked target，共 11 项断言。
+
+### 增量抽取：annotation preview controller boundary
+
+批注站点预览的替换与销毁生命周期（原 `wy` 23562-23571）已迁移至
+`src/main/browser-page-preload/annotation-preview-controller.ts`。模块仅负责当前预览的
+单实例 dispose、替换挂载和对象/函数两种 teardown 形态；DOM overlay、observer、RAF
+调度与渲染副作用仍由既有 `Ty`/preview layer 负责。`scripts/test-preload-annotation-preview-controller.mjs`
+覆盖预览替换、空值清理、显式 dispose 与对象 teardown，共 4 项断言。

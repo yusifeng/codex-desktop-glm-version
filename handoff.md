@@ -798,3 +798,8 @@ main renderer 的 dev-origin、app/file webview entry 与 sender-frame trust 判
 Annotation design draft target 收集与缓存（原 `Jv` 23394-23413）已迁移至
 `src/main/browser-page-preload/annotation-draft-runtime.ts`，入口保留 draft attribute
 写回和 DOM 清理副作用；由 4 项行为断言覆盖 target 聚合、frame/page 过滤和 cache 复用。
+
+Annotation preview controller 的单实例替换与 teardown 生命周期（原 `wy` 23562-23571）已迁移至
+`src/main/browser-page-preload/annotation-preview-controller.ts`；入口继续保留 `Ty` 的 DOM
+overlay、observer 与 RAF 副作用。由 `scripts/test-preload-annotation-preview-controller.mjs`
+覆盖函数/对象 teardown、替换和空值清理，共 4 项断言。
