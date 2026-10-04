@@ -17,7 +17,7 @@ The existing `docs/renderer-app-shared-analysis.md` and
 `docs/renderer-app-shared-export-map.json` provide the symbol-level inventory.
 The executable contract is `scripts/audit-app-shared-consumption.mjs`: every
 consumed export must have a declaration, no declaration may contain `any`, and
-namespace consumption is rejected. The current result is 343 consumed exports,
+namespace consumption is rejected. The current result is 340 consumed exports,
 0 missing, 0 `any`, and 0 direct namespace uses.
 
 The remaining internal ranges are classified as either shared runtime/UI

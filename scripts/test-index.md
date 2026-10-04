@@ -245,6 +245,7 @@ Total scripts: 786.
 - [`test-worker-git-worktree-files.mjs`](./test-worker-git-worktree-files.mjs)
 - [`test-worker-git-worktree-copy-files.mjs`](./test-worker-git-worktree-copy-files.mjs)
 - [`test-worker-git-worktree-create-request.mjs`](./test-worker-git-worktree-create-request.mjs)
+- [`test-worker-git-worktree-lifecycle.mjs`](./test-worker-git-worktree-lifecycle.mjs)
 - [`test-worker-git-worktree-delete.mjs`](./test-worker-git-worktree-delete.mjs)
 - [`test-worker-git-worktree-list.mjs`](./test-worker-git-worktree-list.mjs)
 - [`test-worker-git-worktree-path-allocation.mjs`](./test-worker-git-worktree-path-allocation.mjs)

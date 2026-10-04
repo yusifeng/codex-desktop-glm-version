@@ -64,6 +64,9 @@ Worktree create 请求生命周期已迁移至 `src/main/worker/git-worktree-cre
 upstream refresh controller 注册/清理、三类 stream event 与响应 envelope 映射，24 项 focused 断言
 覆盖取消抑制、成功/失败结果及并发 controller 身份保护；底层 checkout/setup runtime 继续由既有
 `git-worktree-create.ts` 承担。
+Worktree delete/restore 的 promise 生命周期调度已迁移至 `src/main/worker/git-worktree-lifecycle.ts`，覆盖
+同 host+path 去重、restore 串行化、失败后继续和状态清理；入口仅保留实际副作用回调，由 12 项 focused
+断言覆盖。
 worker `handleRequestWithContext` 的 origin/roots、shell environment、owner、default
 remote branch 与 merge-base 只读请求已迁移至 `src/main/worker/git-read-request-handlers.ts`，
 并扩展至 current/upstream/default/base branch、branch-ahead、recent-branches 与 branch-exists
@@ -466,7 +469,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计与消费契约审计 | 现有 343/343 仅证明消费面；全量分类门禁尚未实现，仍有未消费业务逻辑待物理迁出 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计与消费契约审计 | 现有 340 个语义消费声明仅证明消费面；全量分类门禁尚未实现，仍有未消费业务逻辑待物理迁出 |
 
 ### B. 工程可读性缺口（5 处）
 
@@ -532,7 +535,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    组件）语义化进 `src/renderer/app-shared/`（已有 runtime 六模块骨架，
    按分区扩展）；vendor/胶水登记。**注意**：语义化后
    `audit-app-shared-consumption.mjs` 的口径要从"消费驱动"升级为
-   "全量分类"，保持 343/343 不回退。
+   "全量分类"，保持现有语义消费声明不回退。
 2. **app-initial（14.3MB）**：先做构成审计（参照
    `docs/renderer-classification.md` 第二节：2,284 个引用中 683 lucide、
    65 locale、219 shiki…真正的 app 逻辑约 654 个引用/18.8MB）。对其中
