@@ -320,6 +320,11 @@ origin-state query 已切换到语义导入；该函数只组装稳定的 `vscod
 layer，对空/无匹配输入返回 `null`，browser-use mutation 已切换语义导入，并由
 `scripts/test-app-initial-select-writable-configuration-layer.mjs` 的 3 项断言覆盖。
 
+另审计 `ugn`（内部 `df`，`defaultHostId`）：表面值为 `"local"`，但它由
+`ff()` 初始化器与同一阶段的 `kit` 别名共同注册；renderer 使用的是初始化后的
+host identity，而非独立业务常量。为避免在不同 bootstrap 顺序下复制出脱离 runtime
+的字符串，登记为 `initialization-constant`，暂不迁移。
+
 本轮另将 app-initial `Jsn`（内部 `Av`）的配置查询 key 常量迁为
 `src/renderer/app-initial/runtime/configuration-query-key.ts` 的语义导出
 `configurationQueryKey`。它仅提供稳定的 `['config', 'user']` 前缀，browser-use
