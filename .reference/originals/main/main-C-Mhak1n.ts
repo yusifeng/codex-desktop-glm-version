@@ -14,6 +14,7 @@ const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-a
 const windowAppearance = require("./main-app/window-appearance.js");
 const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
+const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 let c = require("node:url"),
   l = require("electron"),
@@ -175512,17 +175513,13 @@ function $9(e, t) {
   }
   return null;
 }
-function Ist({
-  exitImmediately: e,
-  exitImmediatelyForUpdateInstall: t,
-  quitForUpdateInstall: n,
-  quitState: r,
-}) {
-  if (e) {
-    t();
-    return;
-  }
-  (r.allowQuitTemporarily(), n());
+function Ist(options) {
+  return applyQuitForUpdatePolicy({
+    exitImmediately: options.exitImmediately,
+    exitImmediatelyForUpdateInstall: options.exitImmediatelyForUpdateInstall,
+    quitForUpdateInstall: options.quitForUpdateInstall,
+    allowQuitTemporarily: () => options.quitState.allowQuitTemporarily(),
+  });
 }
 function Lst(e) {
   return async (t) => {

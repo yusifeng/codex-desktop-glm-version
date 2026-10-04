@@ -122,6 +122,13 @@ descriptor 已迁移至 `src/main/main-app/files/open-path-arguments.ts`（原
 负责窗口与 deep-link 副作用；`scripts/test-main-open-path-arguments.mjs` 覆盖 13 项
 平台、URL、扩展名、过滤与去重断言。
 
+### 增量抽取：更新退出策略
+
+启动更新分支的纯策略判定已迁移至
+`src/main/main-app/startup/quit-for-update-policy.ts`：立即退出路径只调用更新退出，
+普通路径严格先允许临时退出再触发更新退出；入口继续注入 `quitState` 与真实退出副作用。
+由 `scripts/test-main-quit-for-update-policy.mjs` 覆盖 2 项顺序断言。
+
 ```sh
 wc -l .reference/originals/main/main-C-Mhak1n.ts
 node scripts/verify-chunks.mjs
