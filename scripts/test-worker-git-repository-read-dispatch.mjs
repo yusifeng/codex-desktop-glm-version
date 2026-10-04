@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-repository-read-dispatch.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { dispatchRepositoryReadRequest } = module.exports;
+const deps = { cloneState: (root) => `clone:${root}`, branchMetadata: (cwd) => `meta:${cwd}`, branchExists: (root, branch) => `${root}:${branch}` };
+assert.equal(await dispatchRepositoryReadRequest("clone-state", { root: "/r" }, deps), "clone:/r");
+assert.equal(await dispatchRepositoryReadRequest("branch-metadata", { cwd: "/r" }, deps), "meta:/r");
+assert.equal(await dispatchRepositoryReadRequest("branch-exists", { root: "/r", branch: "main" }, deps), "/r:main");
+assert.equal(await dispatchRepositoryReadRequest("unknown", {}, deps), undefined);
+console.log("worker Git repository read dispatch tests passed (4 assertions)");

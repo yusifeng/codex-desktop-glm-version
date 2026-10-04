@@ -127,6 +127,7 @@ const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./wo
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
 const { dispatchReviewReadRequest } = require("./worker/git-review-read-dispatch");
+const { dispatchRepositoryReadRequest } = require("./worker/git-repository-read-dispatch");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -69899,7 +69900,7 @@ var I6 = kW(`git`),
             p = await this.handleResolveStableMetadata(e.params, { host: o });
             break;
           case `clone-state`:
-            p = X(await getGitCloneState(e.params.root, o, i.signal, gitCloneStateDeps));
+            p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
             break;
           case `current-branch`:
             p = X(await dispatchBranchReadRequest(e.method, e.params, { signal: i.signal, currentBranch: (root) => resolveCurrentBranch(root, readRequestDeps), currentBranchSnapshot: (root, signal) => resolveCurrentBranchSnapshot(root, signal, readRequestDeps), upstreamBranch: (root, signal) => resolveUpstreamBranch(root, signal, readRequestDeps), branchAheadCount: (root, signal) => resolveBranchAheadCount(root, signal, readRequestDeps), defaultBranch: (root, signal) => resolveDefaultBranch(root, signal, readRequestDeps), baseBranch: (root) => resolveBaseBranch(root, readRequestDeps) }));
@@ -69923,7 +69924,7 @@ var I6 = kW(`git`),
             p = await resolveRecentBranches(e.params, i.signal, readRequestDeps);
             break;
           case `branch-exists`:
-            p = X(await resolveBranchExists(e.params.root, e.params.branch, i.signal, readRequestDeps));
+            p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
             break;
           case `create-branch`: {
             p = X(await createGitBranch(e.params, i.signal, readRequestDeps));
@@ -69953,7 +69954,7 @@ var I6 = kW(`git`),
             });
             break;
           case `branch-metadata`:
-            p = X(await getBranchMetadata(this.gitManager, e.params.cwd, o, i.signal, gitBranchMetadataDeps));
+            p = X(await dispatchRepositoryReadRequest(e.method, e.params, { cloneState: (root) => getGitCloneState(root, o, i.signal, gitCloneStateDeps), branchMetadata: (cwd) => getBranchMetadata(this.gitManager, cwd, o, i.signal, gitBranchMetadataDeps), branchExists: (root, branch) => resolveBranchExists(root, branch, i.signal, readRequestDeps) }));
             break;
           case `status-summary`: {
             let t = await dispatchReviewReadRequest(e.method, e.params, { statusSummary: (params) => resolveStatusSummary(params, reviewRequestDeps), branchDiffStats: (params) => resolveBranchDiffStats(params, reviewRequestDeps), reviewSummary: (params) => resolveReviewSummary(params, reviewRequestDeps), reviewSourceLineCounts: (params) => resolveReviewSourceLineCounts(params, reviewRequestDeps), reviewDiff: (params) => resolveReviewDiff(params, reviewRequestDeps), reviewSearch: (params) => resolveReviewSearch(params, reviewRequestDeps), reviewPatch: (params) => resolveReviewPatch(params, reviewRequestDeps) });
