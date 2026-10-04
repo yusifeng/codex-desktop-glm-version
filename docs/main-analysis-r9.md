@@ -108,6 +108,12 @@
 
 ### 3.3 MCP app sandbox 簇（3 个模块）
 
+当前 guest preload 的 URL、initId 与 MessagePort 白名单校验已迁移到
+`src/main/sandbox-preload/sandbox-guest-policy.ts`；`sandbox-preload/index.ts` 仅保留
+window/message 生命周期与 IPC 所有权转交。该策略由
+`scripts/test-main-mcp-sandbox-guest-policy.mjs` 的 10 项断言覆盖，显式验证
+协议/端口/凭据拒绝、Skybridge 路径约束、initId 字符集及 required/optional port 集合。
+
 | 模块 | 行区间 | 主要定义 |
 |---|---|---|
 | **`mcp-app-sandbox-shell`** | 136,933-137,052（shell 预热） | `P$/F$/I$/o2e/s2e`→shell 常量、`L$`→prewarmState Map、`c2e/l2e/u2e/R$/z$/B$/V$`→skybridge 取数（web-sandbox.oaiusercontent.com、/mcp-app.html） |
