@@ -631,6 +631,9 @@ JetBrains 参数、Zed SSH URI 与行列位置追加，由 7 项 focused asserti
 worker Windows `PATH`/`Path` 环境键合并策略已迁移至
 `src/main/worker/windows-command-env.ts`，由 6 项 focused assertions 覆盖；入口继续负责
 命令执行与平台环境注入。
+Linux `.desktop` `[Desktop Entry]` 键值解析已迁移至
+`src/main/worker/linux-desktop-entry-parser.ts`，由 5 项 focused assertions 覆盖；入口继续负责
+文件发现、读取和进程启动副作用。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
