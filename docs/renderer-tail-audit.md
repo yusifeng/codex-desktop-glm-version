@@ -336,3 +336,9 @@ command、query config、params/cache key 与 app-server `queryFn`、response pr
 和 query runtime 绑定，并非可脱离上下文的 key/计算 helper。当前 consumer 依赖该
 factory 返回的 query family 生命周期，登记为 `query-runtime-factory`，待先定义
 typed query contract 后再迁移。
+
+切换到 `local-conversation-plan-model` 后，`sjt`（内部 `fN`，
+`normalizePlanTitle`）经实现级检查也不属于简单字符串清洗：它委托 `Gp` 的 markdown
+预处理、directive extensions 与 AST 渲染，再做空白归一化。plan consumer 依赖这些
+markdown 语义，故登记为 `markdown-runtime`，待先定义稳定的 title normalization
+contract 后再迁移。
