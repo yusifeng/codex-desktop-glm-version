@@ -651,5 +651,35 @@
     "classification": "generated-local-at-mention-search-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer installs shared query/highlight hooks used by the adjacent mention search projection. It is route-local generated setup rather than an independently consumed UI boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "u", "sourceSymbol": "mNe", "startLine": 18166, "endLine": 18285,
+    "classification": "generated-local-markdown-editor-controller",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The controller creates a ProseMirror view, serializes document changes, and owns transaction/DOM-event dispatch for the adjacent composer markdown surface. Its lifecycle is route-local editor wiring rather than a separately consumed renderer boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "s", "sourceSymbol": "IWe", "startLine": 36158, "endLine": 36176,
+    "classification": "generated-local-expandable-content-transition",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component gates expanded children and forwards height, inert, aria-hidden, and reduced-motion state into the local transition wrapper. It is presentation state owned by the generated route and has no independent renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Bo", "sourceSymbol": "pJ", "startLine": 40346, "endLine": 40449,
+    "classification": "generated-local-composer-footer-dropdown",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component projects category labels, selected value, icon and indicator props into the composer footer dropdown and preserves its accessibility id relationship. This is a route-local generated control composition, not a reusable renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "Ca", "sourceSymbol": "s4e", "startLine": 63656, "endLine": 63736,
+    "classification": "generated-local-response-loading-indicator",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component renders the accessible busy status and switches between conversation and Work-mode loading presentation while consulting the local temporary-chat state. Its state and impression callback are owned by the response surface route."
+  },
+  {
+    "hub": "app-primary", "alias": "$r", "sourceSymbol": "set", "startLine": 78993, "endLine": 79083,
+    "classification": "generated-local-thread-goal-summary-label",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The projection maps thread-goal lifecycle statuses to localized summary labels used above the composer. It is a closed route-local discriminant view with no independent renderer lifecycle or cross-route contract."
   }
 ]
