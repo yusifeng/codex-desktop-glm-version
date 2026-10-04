@@ -6376,6 +6376,7 @@ var { readAnnotationViewportState } = require("./browser-page-preload/annotation
 var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport-override");
 var { isAnnotationElementVisible } = require("./browser-page-preload/annotation-visibility");
 var { buildAnnotationRoundedRectPath, resolveAnnotationCornerRadii } = require("./browser-page-preload/annotation-preview-geometry");
+var { createAnnotationDesignControlSync } = require("./browser-page-preload/annotation-design-control-sync");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22092,109 +22093,16 @@ var Pg,
       (Ig = `codex:annotation-shadow-root-attached`));
   });
 function Rg() {
-  let e = new Map(),
-    t = null,
-    n = new Map(),
-    r = () => {
-      let r = n;
-      ((n = new Map()), e.clear(), (t = null));
-      for (let [e, t] of r)
-        for (let n of t.values())
-          zg(e, {
-            callback: n.callback,
-            value: n.resetValue,
-            action: `reset`,
-            virtualTarget: n.virtualTarget,
-          });
-    };
-  return {
-    rememberTarget(n, r) {
-      (e.has(n) || e.set(n, new WeakRef(r)), (t = n));
-    },
-    sync(i) {
-      if (
-        i.canUseSiteAnnotationApi !== !0 ||
-        i.canUseTweaks === !1 ||
-        i.isAgentControllingBrowser
-      ) {
-        r();
-        return;
-      }
-      let a = i.comments.flatMap((e) =>
-        e.designChange == null || e.designChange.id === i.activeDesignChange?.id
-          ? []
-          : [e.designChange],
-      );
-      i.activeDesignChange != null && a.push(i.activeDesignChange);
-      let o = i.isOriginalViewEnabled === !0 || i.interactionMode !== `comment`,
-        s = new Map(),
-        c = new Set(a.map((e) => e.id));
-      for (let n of e.keys()) n !== t && !c.has(n) && e.delete(n);
-      for (let t of a) {
-        let r = e.get(t.id)?.deref();
-        if (
-          r == null ||
-          !r.isConnected ||
-          !md(t.anchor.pageUrl, window.location.href) ||
-          Dc(t.anchor.framePath) !== r.ownerDocument ||
-          (t.anchor.frameUrl != null && !md(t.anchor.frameUrl, r.ownerDocument.location.href))
-        )
-          continue;
-        let i =
-          t.anchor.kind === `virtual`
-            ? { surfaceId: t.anchor.surfaceId, targetId: t.anchor.targetId }
-            : void 0;
-        for (let e of t.annotationControlChanges ?? []) {
-          let a = t.annotationControls?.controls.find((t) => t.callback === e.callback);
-          if (a == null) continue;
-          let c = e.previousValue ?? tf(a);
-          if (e.value === c) continue;
-          let l = s.get(r) ?? new Map(),
-            u = i == null ? e.callback : JSON.stringify([i.surfaceId, i.targetId, e.callback]),
-            d = n.get(r)?.get(u)?.resetValue ?? l.get(u)?.resetValue ?? c;
-          (l.set(u, {
-            callback: e.callback,
-            resetValue: d,
-            value: o ? d : e.value,
-            action: o ? `preview-original` : `preview`,
-            virtualTarget: i,
-          }),
-            s.set(r, l));
-        }
-      }
-      let l = n;
-      n = s;
-      for (let [e, t] of l)
-        for (let [n, r] of t)
-          s.get(e)?.has(n) ||
-            zg(e, {
-              callback: r.callback,
-              value: r.resetValue,
-              action: `reset`,
-              virtualTarget: r.virtualTarget,
-            });
-      for (let [e, t] of s)
-        for (let [n, r] of t) {
-          let t = l.get(e)?.get(n);
-          (t?.value !== r.value || t.action !== r.action) && zg(e, r);
-        }
-    },
-    clear: r,
-  };
-}
-function zg(e, { callback: t, value: n, action: r, virtualTarget: i }) {
-  (e.isConnected || r === `reset`) &&
-    e.dispatchEvent(
-      new CustomEvent(`oaiannotationcontrolchange`, {
-        bubbles: !0,
-        detail: {
-          callback: t,
-          value: n,
-          action: r,
-          ...(i == null ? {} : { virtualTarget: { ...i } }),
-        },
-      }),
-    );
+  return createAnnotationDesignControlSync({
+    currentPageUrl: fd,
+    isSamePageUrl: md,
+    resolveFrameDocument: Dc,
+    currentDocument: document,
+    getDocumentUrl: (e) => e?.location?.href ?? ``,
+    isConnected: (e) => e.isConnected,
+    getDefaultValue: tf,
+    dispatchChange: (e, t) => e.dispatchEvent(new CustomEvent(`oaiannotationcontrolchange`, { bubbles: !0, detail: t })),
+  });
 }
 var Bg = o(() => {
   (pf(), wd(), tl());

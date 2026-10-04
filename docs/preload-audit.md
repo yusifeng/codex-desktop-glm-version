@@ -318,3 +318,13 @@ annotation feature preview 的 CSS 圆角解析、半径缩放/约束和 SVG rou
 组装已迁移至 `src/main/browser-page-preload/annotation-preview-geometry.ts`。入口仅保留
 SVG DOM 节点创建与 backdrop 更新副作用，`scripts/test-preload-annotation-preview-geometry.mjs`
 覆盖百分比/像素圆角、双值半径、超界缩放和最终 path 语义，共 3 项断言。
+
+### 增量抽取：annotation design-control preview sync
+
+design-control preview 的目标索引、当前/原始视图值切换、虚拟 target key、跨 frame/page
+有效性校验和旧 preview 的 reset 差分已迁移至
+`src/main/browser-page-preload/annotation-design-control-sync.ts`。入口 `Rg` 仅注入页面 URL、
+frame document、默认 control 值和 `CustomEvent` dispatch 适配器；DOM 事件副作用与 React
+component assembly 仍保留在入口边界。`scripts/test-preload-annotation-design-control-sync.mjs`
+覆盖初次 preview、幂等同步、original-view 回退、stale/reset、断开 target、URL 失配、virtual
+target 和 agent-control 清理，共 8 项断言。

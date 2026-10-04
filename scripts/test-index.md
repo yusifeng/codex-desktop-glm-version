@@ -80,6 +80,7 @@ Total scripts: 798.
 - [`test-worker-platform-entry-order.mjs`](./test-worker-platform-entry-order.mjs)
 
 - [`test-preload-annotation-design-snapshot.mjs`](./test-preload-annotation-design-snapshot.mjs)
+- [`test-preload-annotation-design-control-sync.mjs`](./test-preload-annotation-design-control-sync.mjs)
 
 - [`test-app-initial-parse-origin-pattern.mjs`](./test-app-initial-parse-origin-pattern.mjs)
 - [`test-worker-linux-desktop-entry-parser.mjs`](./test-worker-linux-desktop-entry-parser.mjs)
