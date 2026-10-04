@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/windows-command-env.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { withWindowsCommandPath } = module.exports;
+assert.deepEqual(withWindowsCommandPath({ PATH: "C:\\Windows;C:\\Tools" }, "C:\\Tools"), { PATH: "C:\\Windows;C:\\Tools" });
+assert.deepEqual(withWindowsCommandPath({ PATH: "C:\\Windows" }, "C:\\Tools"), { PATH: "C:\\Tools;C:\\Windows" });
+assert.deepEqual(withWindowsCommandPath({ Path: "C:\\Windows" }, "C:\\Tools"), { Path: "C:\\Tools;C:\\Windows" });
+assert.deepEqual(withWindowsCommandPath({ path: "C:\\Windows" }, "C:\\Tools"), { path: "C:\\Windows", PATH: "C:\\Tools" });
+assert.deepEqual(withWindowsCommandPath({ PATH: "c:\\tools" }, "C:\\Tools"), { PATH: "c:\\tools" });
+assert.notStrictEqual(withWindowsCommandPath({}, "C:\\Tools"), {});
+console.log("worker Windows command env tests passed (6 assertions)");
