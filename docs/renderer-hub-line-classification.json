@@ -783,5 +783,23 @@
     "classification": "generated-local-annotation-preview-initializer",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer wires the generated annotation preview formatter dependencies and JSX runtime before the neighboring preview projection executes. It is side-effectful hub assembly rather than a separately consumed renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "$o", "sourceSymbol": "Jq", "startLine": 39837, "endLine": 39839,
+    "classification": "generated-local-capture-surface-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer installs the generated capture-surface dependencies and JSX runtime used by the adjacent capture projection. It is one-time hub assembly with no independently named renderer consumer or standalone lifecycle contract."
+  },
+  {
+    "hub": "app-primary", "alias": "$t", "sourceSymbol": "B8", "startLine": 100269, "endLine": 100271,
+    "classification": "generated-local-approval-surface-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers approval-surface runtime dependencies before the local approval component reads them. The registration is coupled to the generated route and does not form an independently consumed renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "Aa", "sourceSymbol": "vQ", "startLine": 58419, "endLine": 58421,
+    "classification": "generated-local-entity-autocomplete-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires the generated entity-autocomplete dependencies and JSX runtime for its neighboring autocomplete projection. Its side effects are hub-local setup rather than a separate renderer lifecycle boundary."
   }
 ]
