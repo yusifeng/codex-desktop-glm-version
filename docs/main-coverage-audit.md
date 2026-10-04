@@ -169,6 +169,17 @@ signature/documentation 的原语义；入口只保留压缩别名委托，不�
 生命周期或 host 解析。`scripts/test-main-language-server-protocol-helpers.mjs`
 覆盖 8 项能力、路径、Location 与 hover 归一化断言。
 
+### A3 增量抽取：language-server command trust policy
+
+语言服务器启动前的可执行文件信任边界与确定性命令参数策略（原
+`QQ/H1e/U1e`，128,444-128,557）已迁移至
+`src/main/main-app/language-server/command-trust.ts`。该模块保留原始的
+workspace 外路径准入、`node_modules` 拒绝、Unix lookup 哨兵解析、Windows
+`where.exe` 后缀筛选、远程 Unix `exec "$@"` wrapper，以及 Windows
+`.cmd/.bat` 的 node_modules 脚本路径组装；lookup/stat/spawn 等 I/O 和
+LSP session 生命周期仍由入口 provider 持有。`scripts/test-main-language-server-command-trust.mjs`
+覆盖 10 项路径安全、输出解析与命令构造断言。
+
 ### 下一条低风险抽取建议（审计增量）
 
 优先抽取 `175,802-175,889` 中 Ust 的启动形态判定和阶段计时器（不包含
