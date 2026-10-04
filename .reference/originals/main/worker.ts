@@ -111,6 +111,7 @@ const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell } = require("./worker/shell-config");
+const { parseShellEnvironmentOutput, getEnvironmentValue } = require("./worker/shell-environment-parser");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
@@ -44098,27 +44099,7 @@ var pH = `CODEX_SHELL`,
   _H =
     /(?:\u001B\][\s\S]*?(?:\u0007|\u001B\u005C|\u009C)|[\u001B\u009B][[\]()#;?]*(?:\d{1,4}(?:[;:]\d{0,4})*)?[\dA-PR-TZcf-nq-uy=><~])/g;
 function vH(e, t) {
-  let n = t === `\0` ? `\0${mH}\0` : mH,
-    [, r, i] = e.split(n);
-  if (r == null || i == null) throw Error(`Shell output did not contain env delimiters`);
-  let a = {},
-    o =
-      t ===
-      `
-`
-        ? r.replace(_H, ``)
-        : r;
-  for (let e of o.split(t)) {
-    let n =
-        t ===
-        `
-`
-          ? e.trimEnd()
-          : e,
-      r = n.indexOf(`=`);
-    r > 0 && (a[n.slice(0, r)] = n.slice(r + 1));
-  }
-  return a;
+  return parseShellEnvironmentOutput(e, mH, t);
 }
 (K({ threadIds: G(H()), sortKey: q([`created_at`, `updated_at`]).optional() }),
   cN(H(), zM()),
@@ -56199,11 +56180,11 @@ function WZ(e) {
   return n;
 }
 function GZ(e, t) {
-  return describeShell(e, KZ(t), qZ(t, `COMSPEC`) ?? `cmd.exe`);
+  return describeShell(e, KZ(t), getEnvironmentValue(t, `COMSPEC`) ?? `cmd.exe`);
   /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e !== `win32`)
     return { executable: `bash`, args: [], scriptExtension: `sh`, shellKind: `posix` };
-  let n = KZ(t) ?? qZ(t, `COMSPEC`) ?? `cmd.exe`,
+  let n = KZ(t) ?? getEnvironmentValue(t, `COMSPEC`) ?? `cmd.exe`,
     r = n.split(/[\\/]/).at(-1)?.toLowerCase();
   return r === `powershell` || r === `powershell.exe` || r === `pwsh` || r === `pwsh.exe`
     ? { executable: n, args: [`-File`], scriptExtension: `ps1`, shellKind: `powershell` }
@@ -56212,25 +56193,25 @@ function GZ(e, t) {
       : { executable: n, args: [`/c`], scriptExtension: `cmd`, shellKind: `cmd` };
 }
 function KZ(e) {
-  let t = qZ(e, `SHELL`);
+  let t = getEnvironmentValue(e, `SHELL`);
   if (t != null && /(?:^|[\\/])(?:pwsh|powershell)(?:\.exe)?$/i.test(t)) return t;
   let n = [
       [
-        qZ(e, `SystemRoot`) ?? qZ(e, `windir`) ?? `C:\\Windows`,
+        getEnvironmentValue(e, `SystemRoot`) ?? getEnvironmentValue(e, `windir`) ?? `C:\\Windows`,
         `System32`,
         `WindowsPowerShell`,
         `v1.0`,
       ],
       ...[`ProgramFiles`, `ProgramW6432`, `ProgramFiles(x86)`].flatMap((t) => {
-        let n = qZ(e, t);
+        let n = getEnvironmentValue(e, t);
         return n == null ? [] : [`7`, `7-preview`, `6`].map((e) => [n, `PowerShell`, e]);
       }),
     ],
     r = [
-      ...(qZ(e, `PATH`)?.split(`;`) ?? []),
+      ...(getEnvironmentValue(e, `PATH`)?.split(`;`) ?? []),
       ...n.flatMap((e) => [g.default.win32.join(...e), g.default.join(...e)]),
     ],
-    i = qZ(e, `LOCALAPPDATA`),
+    i = getEnvironmentValue(e, `LOCALAPPDATA`),
     a =
       i == null
         ? null
@@ -56249,11 +56230,6 @@ function KZ(e) {
         }
   }
   return null;
-}
-function qZ(e, t) {
-  return Object.entries(e).find(
-    ([e, n]) => e.toLowerCase() === t.toLowerCase() && n != null && n.length > 0,
-  )?.[1];
 }
 (`${mH}${mH}`, `${mH}${mH}`);
 function JZ(e) {
