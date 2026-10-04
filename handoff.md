@@ -633,3 +633,6 @@ Linux terminal 参数策略已抽取为 `src/main/worker/linux-terminal-args.ts`
 Annotation text input target 的 `HTMLInputElement` 类型白名单与 textarea 判定已抽取为
 `src/main/browser-page-preload/annotation-input-target.ts`，入口 `Ju` 保留兼容委托；由
 `scripts/test-preload-annotation-input-target.mjs` 覆盖 6 项行为断言。
+app-primary 的 capability 默认可用判定（原 `vm`/`vAe`）已迁移为
+`src/renderer/capability-default-availability/index.ts`，由 5 项行为断言覆盖；原 hub
+导出暂保留以维持结构等价，已不再是无归属业务实现。

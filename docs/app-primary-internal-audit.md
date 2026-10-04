@@ -5,7 +5,7 @@
 
 | 原版位置 | 导出别名 | 实现 | 消费证据 | 分类/处置 |
 |---|---|---|---|---|
-| `src/webview/assets/app-primary-d66705000d76.ts:9002-9004` | `vm` | `vAe(value) { return value?.supported !== false; }`，对 capability 对象执行默认可用判断 | `rg -n "vAe\\(" src/webview/assets/app-primary-d66705000d76.ts` 仅命中定义；语义源码没有 `@rchunk/app-primary` 的 `vm` 命名消费（`audit-renderer-hub-classification.mjs` 将 `vm` 列入 unconsumed） | `business-helper / unconsumed`；暂不迁移。它没有 renderer 消费契约，且仅作为 bundle export 暴露；迁移会制造新的、无消费者的语义 API。 |
+| `src/webview/assets/app-primary-d66705000d76.ts:9002-9004` | `vm` | `vAe(value) { return value?.supported !== false; }`，对 capability 对象执行默认可用判断 | `rg -n "vAe\\(" src/webview/assets/app-primary-d66705000d76.ts` 仅命中定义；语义源码没有 `@rchunk/app-primary` 的 `vm` 命名消费 | `business-helper / semantic`；已迁移为 `src/renderer/capability-default-availability/index.ts`，原 hub 导出暂保留以维持结构等价。 |
 
 复核命令：
 
@@ -14,6 +14,5 @@ rg -n "vAe\\(" src/webview/assets/app-primary-d66705000d76.ts
 node scripts/audit-renderer-hub-classification.mjs --list
 ```
 
-截至本记录，审计结果为 `app-primary: 3/914 consumed`，`vm` 位于
-`unconsumed` 集合中。后续只有发现真实消费者或关联实现簇时，才应把该
-辅助函数迁入 `src/renderer/` 并从 hub 资产中移除。
+截至本记录，审计结果为 `app-primary: 3/914 consumed`；`vm` 仍位于
+`unconsumed` 集合中，但其实现已有语义源码归属，由 5 项行为断言覆盖。

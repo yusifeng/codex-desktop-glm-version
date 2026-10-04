@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { build } from "esbuild";
+const result = await build({ entryPoints: ["src/renderer/capability-default-availability/index.ts"], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { isCapabilityAvailable } = await import(`data:text/javascript,${encodeURIComponent(result.outputFiles[0].text)}`);
+assert.equal(isCapabilityAvailable(undefined), true);
+assert.equal(isCapabilityAvailable(null), true);
+assert.equal(isCapabilityAvailable({}), true);
+assert.equal(isCapabilityAvailable({ supported: true }), true);
+assert.equal(isCapabilityAvailable({ supported: false }), false);
+console.log("renderer capability availability assertions passed: 5");
