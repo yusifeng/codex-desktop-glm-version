@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 893.
+Total scripts: 895.
 
 ## Recent semantic extraction suites
 
@@ -27,6 +27,7 @@ Total scripts: 893.
 - [`test-preload-annotation-overlay-policies.mjs`](./test-preload-annotation-overlay-policies.mjs)
 - [`test-worker-git-live-query-refresh.mjs`](./test-worker-git-live-query-refresh.mjs)
 - [`test-worker-git-live-query-run-coordinator.mjs`](./test-worker-git-live-query-run-coordinator.mjs)
+- [`test-worker-git-live-query-run.mjs`](./test-worker-git-live-query-run.mjs)
 - [`test-worker-git-live-query-branch-dependency.mjs`](./test-worker-git-live-query-branch-dependency.mjs)
 - [`test-worker-git-live-query-subscription-lifecycle.mjs`](./test-worker-git-live-query-subscription-lifecycle.mjs)
 - [`test-worker-git-live-query-selection-policy.mjs`](./test-worker-git-live-query-selection-policy.mjs)
@@ -956,3 +957,4 @@ Total scripts: 893.
 - [`test-worker-git-live-query-watch-options.mjs`](./test-worker-git-live-query-watch-options.mjs)
 - [`test-worker-git-live-query-recovery.mjs`](./test-worker-git-live-query-recovery.mjs)
 - [`test-preload-annotation-editor-view-state.mjs`](./test-preload-annotation-editor-view-state.mjs)
+- [`test-preload-annotation-marker-view-state.mjs`](./test-preload-annotation-marker-view-state.mjs)

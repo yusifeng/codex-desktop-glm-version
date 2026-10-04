@@ -22809,6 +22809,22 @@ var {
 } = require("./browser-page-preload/annotation-anchor-state");
 var { projectAnnotationDisplaySelections } = require("./browser-page-preload/annotation-display-selections");
 var { createAnnotationEditorAnchorState, normalizeAnnotationEditorPlacement } = require("./browser-page-preload/annotation-editor-view-state");
+var { projectAnnotationMarkerViewState, projectAnnotationDraftViewState, projectAnnotationCommentViewState } = require("./browser-page-preload/annotation-marker-view-state");
+function markerViewStateDeps() {
+  return {
+    readViewportSize: p_,
+    readViewportRect: dd,
+    resolveTextAnchor: lu,
+    resolveMarkerPoint: (anchor, zoomFactor) => y_(anchor, zoomFactor),
+    isElementConnected: (element) => element?.isConnected === true,
+    readElementRect: cd,
+    refreshElementAnchor: ad,
+    readThemeVariant: f_,
+    resolveLiveElement: (anchor, id) => sd(anchor, void 0, id),
+    readCardViewportRect: o_,
+    readCommentTheme: (comment) => comment?.themeVariant,
+  };
+}
 function B_(e, t, n) {
   return createAnnotationAnchorState(e, t, {
     resolveThemeVariant: f_,
@@ -22896,6 +22912,8 @@ function nv(e, t) {
   });
 }
 function rv(e, t, n) {
+  return projectAnnotationMarkerViewState(e, n, markerViewStateDeps(), t);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e.anchor.kind === `text`) return lu(e.anchor) ?? iv(e.anchor, n, e.themeVariant);
   if (e.anchor.kind === `region` || e.anchor.kind === `virtual`)
     return {
@@ -22915,6 +22933,8 @@ function rv(e, t, n) {
   };
 }
 function iv(e, t, n) {
+  return projectAnnotationMarkerViewState({ anchor: e, themeVariant: n }, t, markerViewStateDeps());
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let r = C_();
   return {
     anchor: e,
@@ -22925,6 +22945,8 @@ function iv(e, t, n) {
   };
 }
 function av(e, t, n) {
+  return projectAnnotationDraftViewState(e, t, n, markerViewStateDeps());
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e.anchor.type === `text`)
     return lu(e.anchor.value) ?? iv(e.anchor.value, t, e.anchor.themeVariant);
   if (e.anchor.type === `region` || e.anchor.type === `virtual`) {
@@ -22953,6 +22975,9 @@ function av(e, t, n) {
   };
 }
 function ov(e, t, n, r) {
+  if (e.target.mode !== `edit`) return null;
+  return projectAnnotationCommentViewState(e, t, n, r, markerViewStateDeps(), W_(e.anchor, n));
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let i = e.target;
   if (i.mode !== `edit`) return null;
   let a = t.find((e) => e.id === i.commentId) ?? null;

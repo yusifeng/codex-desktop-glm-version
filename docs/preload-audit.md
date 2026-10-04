@@ -584,3 +584,11 @@ blocker 与 marker 边界，共 8 项 focused assertions。
 viewport、DOM rect、anchor builder 和 clipping 适配器；原 preload 的 `tv`/`nv` 入口保留
 浏览器依赖注入。`scripts/test-preload-annotation-editor-view-state.mjs` 覆盖 fixed anchor、
 viewport/theme 投影、同页保留、异页回退和不可见时跳过 clipping，共 7 项断言。
+
+### 增量抽取：annotation marker view-state boundary
+
+批注 marker、草稿 anchor 与编辑 comment 的 viewport/theme/marker-point 投影已迁移至
+`src/main/browser-page-preload/annotation-marker-view-state.ts`。模块仅接收 viewport、DOM
+rect、live-element 和 anchor resolver 适配器；原 preload 的 `rv`/`iv`/`av`/`ov` 入口保留
+兼容代理及浏览器副作用。`scripts/test-preload-annotation-marker-view-state.mjs` 覆盖
+element、region、design draft、comment 缺失与主题回退，共 11 项 focused assertions。
