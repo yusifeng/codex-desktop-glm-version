@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 72, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 78, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -77,6 +77,12 @@ assert.ok(primary.unconsumed.includes("Nc"), "Nc remains coupled to generated co
 assert.ok(primary.unconsumed.includes("Ec"), "Ec remains coupled to generated ads initialization");
 assert.ok(primary.unconsumed.includes("Sc"), "Sc remains coupled to generated onboarding state initialization");
 assert.ok(primary.unconsumed.includes("kc"), "kc remains coupled to generated mention preview body");
+assert.ok(primary.unconsumed.includes("K"), "K remains coupled to generated account policy banner");
+assert.ok(primary.unconsumed.includes("G"), "G remains coupled to generated file-drop interaction");
+assert.ok(primary.unconsumed.includes("H"), "H remains coupled to generated file-drop surface");
+assert.ok(primary.unconsumed.includes("z"), "z remains coupled to generated project dropdown list");
+assert.ok(primary.unconsumed.includes("L"), "L remains coupled to generated project dropdown items");
+assert.ok(primary.unconsumed.includes("F"), "F remains coupled to generated file-drop initializer");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
