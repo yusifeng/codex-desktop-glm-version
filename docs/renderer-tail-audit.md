@@ -621,3 +621,6 @@ hub audit 校验，focused suite 已锁定 10 个 alias 仍属于 unconsumed sur
 `X7`（公开别名 `P`，113807--113830 行）注册 HomeComposerAnnouncements 的懒加载器。
 两者均由相邻 route/provider 生命周期独占，没有独立 renderer named consumer 或 teardown 契约，
 因此继续保留在聚合 hub；行范围、source symbol 与分类由 hub audit 机器校验。
+本轮再补充 app-primary 项目下拉初始化边界：`e9`（公开别名 `M`，114056--114073 行）
+注册项目下拉查询、JSX 与本地项目选项依赖，顺序由相邻 dropdown controller 生命周期持有，
+没有独立 renderer named consumer 或 teardown 契约，因此继续保留在聚合 hub。
