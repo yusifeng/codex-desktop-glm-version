@@ -30,6 +30,14 @@ presentation/workbook/spreadsheet 编辑器和纯 SVG/persona/icon 数据。该�
 固定原资产、导出数量和消费方式；若未来出现命名导入，该测试会立即失败，届时应
 只把实际消费的能力拆成语义源码并补充精确声明。
 
+`node scripts/audit-renderer-hub-classification.mjs` 对 `app-shared`、`app-initial`
+和 `app-primary` 的发布 export 表与 `src/renderer` 的实际命名消费做交叉分类：
+命名消费计入 `consumed`，仅副作用导入单独计数，剩余别名明确列为
+`unconsumed`。当前门禁报告三座 hub 仍有大量未消费业务表面（这正是 A5 的物理
+迁移缺口），因此 `--strict` 预期失败；不允许把“export 表已登记”误报成“hub
+已完成语义化”。`scripts/test-renderer-hub-classification.mjs` 固定三座 hub
+均存在消费面且保留未消费缺口，防止以后通过删除审计来掩盖尾部。
+
 `use-imported-setup-opportunity` 同样是 74 导出的构建聚合边界，但当前仅消费
 `ft/pt`。消费侧已经分别命名为 `resolveImportedSetupLabel` 与
 `projectImportedSetupItems`，声明也固定为具体函数签名；审计禁止扩大该表面。
