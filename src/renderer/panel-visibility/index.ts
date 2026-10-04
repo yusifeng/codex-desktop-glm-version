@@ -1,34 +1,6 @@
 import "@rchunk/rolldown-runtime";
 // @ts-expect-error The release app-initial surface is declared incrementally by the shared manifest owner.
-import {
-  Bgt as activateBrowserTab,
-  Ebt as initializePanelState,
-  Fgt as initializePanelRouting,
-  Ibt as panelLayout,
-  Jen as getBrowserTabId,
-  Ken as getActiveConversationId,
-  Vvt as bottomPanelTabs,
-  Wvt as initializeSidePanel,
-  Xen as isBrowserTab,
-  Yen as initializePanelTabs,
-  _bt as rightPanelOpen,
-  _gt as initializePanelActions,
-  _vt as initializePanelSelection,
-  dgt as getBrowserTabTarget,
-  fvt as showPanelTab,
-  ggt as browserUseState,
-  mbt as bottomPanelOpen,
-  mgt as initializeBrowserPanelTabs,
-  nlt as initializePanelLayout,
-  pvt as closePanel,
-  qbt as initializeRightPanel,
-  qvt as rightPanelTabs,
-  rlt as ensureBrowserPanelTab,
-  tlt as resolveBrowserTabId,
-  ugt as getLastFocusedBrowserTabId,
-  vbt as rightPanelEnabled,
-  ygt as clearBrowserTabTransfer,
-} from "@rchunk/app-initial";
+import { Bgt as activateBrowserTab, Ebt as initializePanelState, Fgt as initializePanelRouting, Ibt as panelLayout, Jen as getBrowserTabId, Ken as getActiveConversationId, Vvt as bottomPanelTabs, Wvt as initializeSidePanel, Xen as isBrowserTab, Yen as initializePanelTabs, _bt as rightPanelOpen, _gt as initializePanelActions, _vt as initializePanelSelection, dgt as getBrowserTabTarget, fvt as showPanelTab, ggt as browserUseState, mbt as bottomPanelOpen, mgt as initializeBrowserPanelTabs, nlt as initializePanelLayout, pvt as closePanel, qbt as initializeRightPanel, qvt as rightPanelTabs, rlt as ensureBrowserPanelTab, tlt as resolveBrowserTabId, ugt as getLastFocusedBrowserTabId, vbt as rightPanelEnabled, ygt as clearBrowserTabTransfer } from "@rchunk/app-initial";
 // @ts-expect-error The release app-primary surface is declared incrementally by the shared manifest owner.
 import { Af as initializePanelHelpers } from "@rchunk/app-primary";
 import {
