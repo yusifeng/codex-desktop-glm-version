@@ -652,6 +652,9 @@ Git sparse pathspec 不支持错误的 fallback 判定已迁移至
 Git/session 的工作目录权限错误与 Git 超时判定已迁移至
 `src/main/worker/git-session-error-policy.ts`，由 6 项 focused assertions 覆盖；入口继续负责
 session 生命周期和实际 Git 调用。
+Git review 搜索的路径标签、上下文片段与大小写不敏感匹配限额已迁移至
+`src/main/worker/git-review-search-utils.ts`，由 6 项 focused assertions 覆盖；入口继续负责
+Git 查询、文件读取与 review 编排。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
