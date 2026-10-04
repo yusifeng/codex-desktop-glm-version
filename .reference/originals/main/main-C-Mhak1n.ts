@@ -19,6 +19,7 @@ const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-pa
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
 const { isAllowedMainRpcMethod, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
+const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction } = require("./main-app/computer-use/history-scope-actions.js");
 let c = require("node:url"),
@@ -175009,39 +175010,18 @@ function Cst(e, t) {
 function wst(e, t) {
   return isWorkerNotificationType(e, t);
 }
-var U9 = {
-  title: {
-    messageId: `desktop.workspacePolicyRestart.title`,
-    defaultMessage: `Restart to apply workspace settings`,
-  },
-  detail: {
-    messageId: `desktop.workspacePolicyRestart.detail`,
-    defaultMessage: `Restart {appName} to apply your workspace settings. Active local chats will be interrupted`,
-  },
-  restart: { messageId: `desktop.workspacePolicyRestart.restart`, defaultMessage: `Restart` },
-};
 function Tst({ quitState: e, isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i }) {
   return createWorkspacePolicyChecker({ isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i, onRestartRequired: () => Est(e), onError: (error) => r.n().warning(`Failed to check workspace startup settings`, { safe: {}, sensitive: { error } }) });
 }
 function Est(e) {
-  try {
-    let e = a.hn();
-    l.dialog.showMessageBoxSync({
-      type: `info`,
-      message: e.formatMessage(U9.title),
-      detail: e.formatMessage({ ...U9.detail, values: { appName: l.app.getName() } }),
-      buttons: [e.formatMessage(U9.restart)],
-      defaultId: 0,
-      cancelId: 0,
-      noLink: !0,
-    });
-  } catch (e) {
-    r.n().warning(`Failed to show workspace policy restart dialog`, {
-      safe: {},
-      sensitive: { error: e },
-    });
-  }
-  (e.markQuitApproved(), a7());
+  showWorkspacePolicyRestartDialog({
+    getIntl: () => a.hn(),
+    getAppName: () => l.app.getName(),
+    showMessageBoxSync: (options) => l.dialog.showMessageBoxSync(options),
+    markQuitApproved: () => e.markQuitApproved(),
+    quit: () => a7(),
+    onError: (error) => r.n().warning(`Failed to show workspace policy restart dialog`, { safe: {}, sensitive: { error } }),
+  });
 }
 var Dst = HISTORY_SCOPE_ACTIONS,
   Ost = HISTORY_CLEAR_ACTIONS;

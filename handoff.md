@@ -362,6 +362,9 @@ workspace startup policy checker（原 `Tst`）已迁移至
 `src/main/main-app/startup/workspace-policy-checker.ts`，保留登录状态、generation
 竞态、app-quitting 守卫和一次性重启通知语义，由
 `scripts/test-main-workspace-policy-checker.mjs` 覆盖 7 项异步断言。
+workspace policy restart dialog（原 `Est`，175,026-175,046）已迁移至
+`src/main/main-app/startup/workspace-policy-restart-dialog.ts`，由
+`scripts/test-main-workspace-policy-restart-dialog.mjs` 覆盖同步展示、格式化文案、错误降级及始终执行 quit approval/退出顺序。
 computer-use worker RPC handler（原 `Lst`）已迁移至
 `src/main/main-app/worker/computer-use-rpc-handler.ts`，入口只保留服务 PID 管理副作用，
 由 `scripts/test-main-computer-use-rpc-handler.mjs` 覆盖 5 项断言。
