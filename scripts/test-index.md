@@ -6,6 +6,8 @@ Total scripts: 736.
 
 ## Recent semantic extraction suites
 
+- [`test-worker-open-target-path-policy.mjs`](./test-worker-open-target-path-policy.mjs)
+
 - [`test-preload-annotation-frame-stability.mjs`](./test-preload-annotation-frame-stability.mjs)
 
 - [`test-worker-terminal-open-policy.mjs`](./test-worker-terminal-open-policy.mjs)
