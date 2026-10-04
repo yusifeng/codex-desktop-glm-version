@@ -249,6 +249,10 @@ Annotation design snapshot 的字段投影（原 `cy` 23871-23888）已迁移至
 `src/main/browser-page-preload/annotation-design-snapshot.ts`；入口保留 live annotation 编排，
 由 `scripts/test-preload-annotation-design-snapshot.mjs` 覆盖稳定字段投影与纯函数重入。
 
+Annotation design target label 生成（原 `ly` 23889-23896）已迁移至
+`src/main/browser-page-preload/annotation-target-label.ts`；入口注入 accessible-label 解析，
+由 `scripts/test-preload-annotation-target-label.mjs` 覆盖 tag fallback、可访问名称与空标签。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）

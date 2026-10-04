@@ -6381,6 +6381,7 @@ var { isAnnotationContainedBy } = require("./browser-page-preload/annotation-con
 var { findLatestDraftTextChange } = require("./browser-page-preload/annotation-draft-text");
 var { parseAnnotationAttributeTokens } = require("./browser-page-preload/annotation-attribute-tokens");
 var { snapshotAnnotationDesign } = require("./browser-page-preload/annotation-design-snapshot");
+var { getAnnotationTargetLabel } = require("./browser-page-preload/annotation-target-label");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -23871,9 +23872,7 @@ function cy(e) {
   return snapshotAnnotationDesign(e);
 }
 function ly(e) {
-  let t = e.tagName.toLowerCase(),
-    n = ld(e);
-  return n == null ? t : `${t}: ${n}`;
+  return getAnnotationTargetLabel(e, { readAccessibleLabel: ld });
 }
 var uy = o(() => {
   (pf(), $s(), wd());
