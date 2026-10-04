@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 829.
+Total scripts: 830.
 
 ## Recent semantic extraction suites
 
@@ -22,6 +22,7 @@ Total scripts: 829.
 - [`test-preload-annotation-anchor-geometry.mjs`](./test-preload-annotation-anchor-geometry.mjs)
 - [`test-preload-annotation-preview-geometry.mjs`](./test-preload-annotation-preview-geometry.mjs)
 - [`test-preload-annotation-preview-scheduler.mjs`](./test-preload-annotation-preview-scheduler.mjs)
+- [`test-preload-annotation-runtime-mount.mjs`](./test-preload-annotation-runtime-mount.mjs)
 - [`test-preload-annotation-preview-layer.mjs`](./test-preload-annotation-preview-layer.mjs)
 - [`test-preload-annotation-preview-visibility.mjs`](./test-preload-annotation-preview-visibility.mjs)
 - [`test-preload-annotation-draft-runtime.mjs`](./test-preload-annotation-draft-runtime.mjs)

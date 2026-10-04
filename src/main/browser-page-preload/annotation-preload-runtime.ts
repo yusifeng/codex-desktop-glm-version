@@ -1,4 +1,5 @@
 import { createAnnotationPreloadBridge } from "./annotation-preload-bridge";
+import { createAnnotationRuntimeMount } from "./annotation-runtime-mount";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -26,11 +27,8 @@ type AnnotationPreloadRuntimeDependencies = {
 };
 
 function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependencies) {
-  let mountedRuntime: any = null;
-  let pendingPreview: any = null;
   let state = deps.createInitialState(deps.intlConfig);
   let siteAnnotationApiAvailable = false;
-  let mountStarted = false;
   let destroyed = false;
   let hasActiveEditor = false;
   let permissionGranted = false;
@@ -56,15 +54,16 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     invokeHost: (message: any) => deps.ipcRenderer.invoke(deps.channels.runtime, message),
   });
 
-  const setPreview = (preview: any) => {
-    if (mountedRuntime == null) pendingPreview = preview;
-    else mountedRuntime.setSiteAnnotationPreview(preview);
-  };
+  const runtimeMount = createAnnotationRuntimeMount({
+    loadCommentRuntime: deps.loadCommentRuntime,
+    prepareMount: preloadBridge.prepareMount,
+    bridge: preloadBridge.bridge,
+  });
 
   const disposeFeatures = () => {
     permissionController.reset();
     permissionGranted = false;
-    setPreview(null);
+    runtimeMount.setPreview(null);
     siteAnnotationApiAvailable = false;
     featureObserver?.dispose();
     featureObserver = null;
@@ -81,7 +80,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     if (message.canUseSiteAnnotationApi === false) disposeFeatures();
     if (message.isAgentControllingBrowser || message.siteAnnotationFeaturesEnabled === false) {
       siteAnnotationRequests?.clear();
-      setPreview(null);
+      runtimeMount.setPreview(null);
     }
     state = deps.resolveSyncState(message, siteAnnotationApiAvailable);
     const isActive = modeControllerDispose != null && deps.isCommentModeActive(state);
@@ -98,7 +97,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
         permissionController.handleResult(message.requestId, message.allowed);
         return;
       case `preview`:
-        setPreview(state.canUseSiteAnnotationApi && !state.isAgentControllingBrowser ? message.preview : null);
+        runtimeMount.setPreview(state.canUseSiteAnnotationApi && !state.isAgentControllingBrowser ? message.preview : null);
         return;
       case `sync`:
         applySync(message);
@@ -117,18 +116,6 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
         preloadBridge.bufferEditorMessage(message);
         return;
     }
-  };
-
-  const mount = () => {
-    if (mountStarted || destroyed) return;
-    mountStarted = true;
-    deps.loadCommentRuntime().then(({ mountBrowserCommentRuntime }) => {
-      if (destroyed) return;
-      preloadBridge.prepareMount();
-      mountedRuntime = mountBrowserCommentRuntime(preloadBridge.bridge);
-      mountedRuntime.setSiteAnnotationPreview(pendingPreview);
-      pendingPreview = null;
-    });
   };
 
   const initializeFeatures = (policy: any) => {
@@ -184,14 +171,14 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   };
 
   const onPageHide = (event: any) => {
-    setPreview(null);
+    runtimeMount.setPreview(null);
     if (event.isTrusted) permissionController.reset();
     if (!event.isTrusted || event.persisted) return;
     destroyed = true;
     disposeFeatures();
-    deps.windowLike.removeEventListener(`DOMContentLoaded`, mount);
+    deps.windowLike.removeEventListener(`DOMContentLoaded`, runtimeMount.mount);
     deps.ipcRenderer.removeListener(deps.channels.hostMessage, handleHostMessage);
-    mountedRuntime?.dispose();
+    runtimeMount.dispose();
   };
 
   const initialize = () => {
@@ -200,9 +187,9 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
       initializeFeatures(deps.ipcRenderer.sendSync(deps.channels.policy));
     }
     if (deps.documentLike.readyState === `loading`) {
-      deps.windowLike.addEventListener(`DOMContentLoaded`, mount, { once: true });
+      deps.windowLike.addEventListener(`DOMContentLoaded`, runtimeMount.mount, { once: true });
     } else {
-      mount();
+      runtimeMount.mount();
     }
     deps.windowLike.addEventListener(`pagehide`, onPageHide);
   };

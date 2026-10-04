@@ -101,6 +101,13 @@ SVG clip-path 重建、按 element 增量维护 clip/glow DOM、border-radius �
 corner-radius 适配器。`scripts/test-preload-annotation-preview-layer.mjs` 覆盖 style/mask
 装配、target 更新、圆角样式、viewport 尺寸、stale 节点清理与销毁，共 8 项断言。
 
+Annotation comment-runtime 的异步挂载生命周期（原 `annotation-preload-runtime` 内联
+mount/pending-preview/dispose 段）已迁移至
+`src/main/browser-page-preload/annotation-runtime-mount.ts`。该模块保留单次挂载、异步
+加载完成后的销毁竞态、pending site-preview 交接和 runtime dispose；入口只负责注入
+bridge 与调用点。`scripts/test-preload-annotation-runtime-mount.mjs` 覆盖重复 mount、
+preview 交接、销毁和异步竞态，共 7 项断言。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
