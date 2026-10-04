@@ -548,6 +548,13 @@ Worktree create 的 branch/default/working-tree 起始引用选择、remote-ref 
 `src/main/worker/git-worktree-starting-state.ts`。原 `Ipe` 已删除，入口只保留现有能力的显式依赖
 接线，由 27 项断言覆盖。
 
+### 增量抽取：Git config scope
+
+Git config 的 local/worktree scope 参数映射、query cache、缺失值与旧版 worktreeConfig 兼容，
+以及 worktree 删除使用的 `codex.localEnvironmentConfigPath` 直读已迁移至
+`src/main/worker/git-config-scope.ts`。原 `Bpe`/`Vpe`/`Hpe` 与专用键常量已删除，repository
+方法和 worktree cleanup 改用语义入口，由 23 项断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接

@@ -42,6 +42,7 @@ const { checkoutGitBranch } = require("./worker/git-checkout-request-handler");
 const { commitGitChanges, formatCommitAttribution, formatCommitMessage } = require("./worker/git-commit-request-handler");
 const { getCommitMessageDiff } = require("./worker/git-commit-message-diff");
 const { setGitConfigValue } = require("./worker/git-config-request-handler");
+const { getConfigValueForScope: getGitConfigValueForScopeQuery, getLocalEnvironmentConfigPath: getGitLocalEnvironmentConfigPathQuery } = require("./worker/git-config-scope");
 const { discoverGitIgnoreConfigurationFiles, readGitWatcherIgnoredDirectories } = require("./worker/git-ignore-discovery");
 const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
@@ -103,6 +104,17 @@ const gitBranchComparisonDeps = {
   runGit: (...args) => $(...args),
   staleTime: Infinity,
 };
+const gitConfigScopeDeps = {
+  fetchQueryWithSignal: (...args) => w1(...args),
+  getConfigQueryMeta: () => y1,
+  queryKey: (...args) => Q(...args),
+  runGit: (...args) => $(...args),
+  staleTime: Infinity,
+};
+const getGitConfigValueForScope = (repository, key, scope, signal) =>
+  getGitConfigValueForScopeQuery(repository, key, scope, signal, gitConfigScopeDeps);
+const getGitLocalEnvironmentConfigPath = (root, host, scope = `worktree`, signal) =>
+  getGitLocalEnvironmentConfigPathQuery(root, host, scope, signal, gitConfigScopeDeps);
 const compareGitBranches = (repository, left, right, signal) =>
   compareGitBranchesQuery(repository, left, right, signal, gitBranchComparisonDeps);
 const gitCurrentBranchDeps = {
@@ -42129,8 +42141,7 @@ function sB(e) {
         /\(os error (?:2|3)\)/.test(e.message)
     : !1;
 }
-var cB = `codex.localEnvironmentConfigPath`,
-  lB = `CODEX_SOURCE_TREE_PATH`,
+var lB = `CODEX_SOURCE_TREE_PATH`,
   uB = `CODEX_WORKTREE_PATH`,
   dB = K({
     name: H(),
@@ -66850,40 +66861,6 @@ async function y0(e, t, n, r = {}) {
     maxOutputBytes: c,
   });
 }
-async function Bpe(e, t, n, r, i) {
-  let a = await $(e, [`config`, n === `local` ? `--local` : `--worktree`, `--get`, t], r, {
-    signal: i,
-  });
-  return a.success && a.stdout ? a.stdout : null;
-}
-function Vpe(e, t, n, r) {
-  let i = n === `local` ? `--local` : `--worktree`,
-    a = [`config`, i, `--get`, t];
-  return w1(
-    e.queryClient,
-    {
-      queryKey: Q(e.root, e.host, `config-value-for-scope`, n, t),
-      meta: y1,
-      queryFn: async (o) => {
-        let s = await $(e.root, a, e.host, { signal: r == null ? void 0 : o });
-        if (s.success) return s.stdout || null;
-        if (
-          (s.code === 1 && s.stderr.trim() === ``) ||
-          (n === `worktree` && s.code === 128 && s.stderr.toLowerCase().includes(`worktreeconfig`))
-        )
-          return null;
-        throw Error(
-          `git config ${i} --get ${t} failed: ${s.stderr || s.stdout || `exit code ${s.code ?? `unknown`}`}`,
-        );
-      },
-      staleTime: g1,
-    },
-    r,
-  );
-}
-async function Hpe(e, t, n = `worktree`, r) {
-  return Bpe(e, cB, n, t, r);
-}
 var z0 = kW(`git`),
   Upe = { COLORTERM: `truecolor`, FORCE_COLOR: `1`, TERM: `xterm-256color` },
   Wpe = new Set([
@@ -67286,7 +67263,7 @@ async function $0(e, t, n = !1, r) {
   }
 }
 async function sme(e, t, n, r) {
-  let i = await Hpe(e, n, `worktree`, r);
+  let i = await getGitLocalEnvironmentConfigPath(e, n, `worktree`, r);
   if (i == null || i === `__none__`) return;
   let a = await A$(i, n);
   if (a.type === `error`) {
@@ -69320,7 +69297,7 @@ var Khe = class {
       return Uhe(this, [e], t);
     }
     async getConfigValueForScope(e, t, n) {
-      return Vpe(this, e, t, n);
+      return getGitConfigValueForScope(this, e, t, n);
     }
     async setConfigValueForScope(e, t, n, r) {
       return (await Ghe(this.root, e, t, n, this.host, r))
