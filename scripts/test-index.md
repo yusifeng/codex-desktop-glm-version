@@ -19,6 +19,7 @@ Total scripts: 823.
 - [`test-preload-annotation-anchor-state.mjs`](./test-preload-annotation-anchor-state.mjs)
 - [`test-preload-annotation-anchor-geometry.mjs`](./test-preload-annotation-anchor-geometry.mjs)
 - [`test-preload-annotation-preview-geometry.mjs`](./test-preload-annotation-preview-geometry.mjs)
+- [`test-preload-annotation-preview-layer.mjs`](./test-preload-annotation-preview-layer.mjs)
 - [`test-preload-annotation-preview-visibility.mjs`](./test-preload-annotation-preview-visibility.mjs)
 - [`test-preload-annotation-draft-runtime.mjs`](./test-preload-annotation-draft-runtime.mjs)
 - [`test-preload-annotation-request-context.mjs`](./test-preload-annotation-request-context.mjs)

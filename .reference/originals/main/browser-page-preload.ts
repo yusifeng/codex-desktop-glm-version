@@ -6230,6 +6230,7 @@ var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
+var { createAnnotationPreviewLayer } = require("./browser-page-preload/annotation-preview-layer");
 var { createAnnotationAnchorGeometry } = require("./browser-page-preload/annotation-anchor-geometry");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
@@ -23540,104 +23541,13 @@ function ly(e) {
 var uy = o(() => {
   (pf(), $s(), wd());
 });
-function dy() {
-  let e = `codex-site-annotation-preview-mask`,
-    t = py(`svg`, { width: `0`, height: `0`, "aria-hidden": `true` }),
-    n = py(`mask`, {
-      id: e,
-      maskUnits: `userSpaceOnUse`,
-      maskContentUnits: `userSpaceOnUse`,
-      "mask-type": `luminance`,
-      x: `0`,
-      y: `0`,
-    }),
-    r = py(`rect`, { fill: `white` });
-  (n.append(r), t.append(n));
-  let i = ``;
-  return {
-    element: t,
-    id: e,
-    update({ viewport: a, targets: o }) {
-      let s = o.map((e) => ({ path: buildAnnotationRoundedRectPath(e), clip: e.clipRect })),
-        c = JSON.stringify({ viewport: a, shapes: s });
-      if (c !== i) {
-        i = c;
-        for (let e of [n, r])
-          (e.setAttribute(`width`, String(a.width)), e.setAttribute(`height`, String(a.height)));
-        (n.replaceChildren(r),
-          t.replaceChildren(n),
-          s.forEach(({ path: r, clip: i }, a) => {
-            let o = `${e}-clip-${a}`,
-              s = py(`clipPath`, { id: o, clipPathUnits: `userSpaceOnUse` });
-            (s.append(py(`rect`, i)),
-              t.append(s),
-              n.append(py(`path`, { d: r, fill: `black`, "clip-path": `url(#${o})` })));
-          }));
-      }
-    },
-  };
-}
-function py(e, t) {
-  let n = document.createElementNS(`http://www.w3.org/2000/svg`, e);
-  for (let [e, r] of Object.entries(t)) n.setAttribute(e, String(r));
-  return n;
-}
 var gy = o(() => {});
 function _y({ layer: e, color: t }) {
-  let n = e.ownerDocument,
-    r = n.createElement(`style`);
-  ((r.textContent = vy), (e.style.color = t));
-  let i = dy(),
-    a = n.createElement(`div`);
-  ((a.className = `annotation-feature-backdrop`),
-    (a.style.maskImage = `url("#${i.id}")`),
-    e.append(r, i.element, a));
-  let o = new Map();
-  return {
-    update(t) {
-      let r = {
-          width: n.defaultView?.innerWidth ?? n.documentElement.clientWidth,
-          height: n.defaultView?.innerHeight ?? n.documentElement.clientHeight,
-        },
-        s = new Set(t.map(({ element: e }) => e));
-      for (let r of t) {
-        let { element: t, rect: i, clipRect: a } = r,
-          [s, c, l, u] = resolveAnnotationCornerRadii(r),
-          d = o.get(t);
-        if (d == null) {
-          let r = n.createElement(`div`);
-          r.className = `annotation-feature-clip`;
-          let i = n.createElement(`div`);
-          ((i.className = `annotation-feature-glow`),
-            r.append(i),
-            e.append(r),
-            (d = { clip: r, glow: i }),
-            o.set(t, d));
-        }
-        (Object.assign(d.clip.style, {
-          left: `${a.x}px`,
-          top: `${a.y}px`,
-          width: `${a.width}px`,
-          height: `${a.height}px`,
-        }),
-          Object.assign(d.glow.style, {
-            left: `${i.x - a.x}px`,
-            top: `${i.y - a.y}px`,
-            width: `${i.width}px`,
-            height: `${i.height}px`,
-            borderTopLeftRadius: `${s.x}px ${s.y}px`,
-            borderTopRightRadius: `${c.x}px ${c.y}px`,
-            borderBottomLeftRadius: `${u.x}px ${u.y}px`,
-            borderBottomRightRadius: `${l.x}px ${l.y}px`,
-          }));
-      }
-      for (let [e, t] of o) s.has(e) || (t.clip.remove(), o.delete(e));
-      ((a.hidden = t.length === 0), i.update({ viewport: r, targets: t }));
-    },
-    dispose() {
-      (e.replaceChildren(), o.clear());
-    },
-  };
+  return createAnnotationPreviewLayer({ layer: e, color: t }, {
+    cssText: vy,
+    buildRoundedRectPath: buildAnnotationRoundedRectPath,
+    resolveCornerRadii: resolveAnnotationCornerRadii,
+  });
 }
 var vy,
   yy = o(() => {

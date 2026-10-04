@@ -94,6 +94,13 @@ Annotation overlay 的非 React runtime 尾部（原 `Jy/Yy/Xy/Zy/Qy/$y/eb/tb/nb
 metadata tooltip 和 region 去重均由该模块持有；原入口只保留调用点兼容代理，React `Uy/Wy/Gy/Ky/qy`
 仍留在 UI 边界。`scripts/test-preload-annotation-overlay-runtime.mjs` 以 48 项行为断言覆盖该闭环。
 
+Annotation site-preview layer（原 `dy/py/_y`，23543-23648）已迁移至
+`src/main/browser-page-preload/annotation-preview-layer.ts`。该模块保留 preview mask 的
+SVG clip-path 重建、按 element 增量维护 clip/glow DOM、border-radius 投影、viewport
+尺寸缓存、stale target 清理和 dispose；入口 `_y` 仅注入原 CSS、rounded-rect path 与
+corner-radius 适配器。`scripts/test-preload-annotation-preview-layer.mjs` 覆盖 style/mask
+装配、target 更新、圆角样式、viewport 尺寸、stale 节点清理与销毁，共 8 项断言。
+
 审计对象：`.reference/originals/main/browser-page-preload.ts`（30,217 行）。
 
 审计日期：2026-10-03。
