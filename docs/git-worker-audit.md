@@ -752,6 +752,10 @@ Open-in target 的平台描述符合并、跨平台 target 构造与 editor SSH 
 `scripts/test-worker-open-in-target-descriptors.mjs` 以 12 项断言覆盖字段覆盖优先级、缺失平台、
 hidden 继承、SSH 标记、默认参数及 Linux open 回调绑定。
 
+Editor target 的 JetBrains 参数、Zed SSH URI 与行列位置追加策略已迁移至
+`src/main/worker/editor-target-args.ts`；入口继续负责编辑器发现和进程执行，
+`scripts/test-worker-editor-target-args.mjs` 覆盖 7 项参数/URI/行列断言。
+
 GitHub exact-revision review 的 diff/file handlers（`eSe`/`tSe`）已迁移至
 `src/main/worker/github-pull-request-revision.ts`：SHA/path 校验、账号校验、diff API、
 base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的双并发 semaphore 均由
