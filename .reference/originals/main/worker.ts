@@ -81,6 +81,7 @@ const { formatLocalBranchRef: formatLocalBranchRefQuery, resolveWorktreeStarting
 const { resolveWorktreeStartingState: resolveGitWorktreeStartingStateQuery } = require("./worker/git-worktree-starting-state");
 const { createWorktreeDelete } = require("./worker/git-worktree-delete");
 const { createLocalEnvironmentRuntime } = require("./worker/git-local-environment");
+const { createWorktreeUpstreamRefresh } = require("./worker/git-worktree-upstream-refresh");
 const { decodeCommandOutput, findActiveDistro, orderEligibleDistros } = require("./worker/platform-wsl");
 const { resolveHostDisplayName, resolveHostSshIdentity } = require("./worker/remote-host-config");
 const { deleteWorktreeWithSnapshot, resolveManagedWorktreeState, resolveWorktreeSnapshot } = require("./worker/git-worktree-snapshot");
@@ -273,6 +274,17 @@ const { runCleanupScript: runGitCleanupScript, runSetupScript: runGitSetupScript
     now: () => Date.now(),
     randomUUID: () => crypto.randomUUID(),
   });
+const refreshWorktreeUpstream = createWorktreeUpstreamRefresh({
+  classifyGitError: (stderr) => LX(stderr),
+  clearInterval: (timer) => clearInterval(timer),
+  getCurrentBranch: (...args) => getCurrentGitBranch(...args),
+  logger: {
+    warning: (message, detail) => kW(`git`)().warning(message, detail),
+  },
+  now: () => Date.now(),
+  runGit: (...args) => $(...args),
+  setInterval: (callback, delay) => setInterval(callback, delay),
+});
 const { removeWorktree: removeGitWorktree } = createWorktreeDelete({
   createSemaphore: (capacity) => new k$.Sema(capacity),
   getHostId: (...args) => h1(...args),
@@ -67373,209 +67385,6 @@ async function Mme(e, { host: t, signal: n }) {
     return !1;
   }
 }
-var Nme = kW(`git`),
-  C2 = 15e3,
-  Pme = 1024,
-  Fme =
-    /^(?:remote:\s*)?(Enumerating objects|Counting objects|Compressing objects|Receiving objects|Resolving deltas):\s+(?:(\d{1,3})%\s+\((\d+)\/(\d+)\)|(\d+))(?:,.*)?$/,
-  w2 = new TextEncoder();
-async function Ime({
-  worktreeRepo: e,
-  startingState: t,
-  mode: n,
-  onLog: r,
-  signal: i,
-  upstreamRefreshSignal: a,
-}) {
-  if (n === `never` || t.type !== `branch` || t.remoteRef != null) return;
-  let o = t.branchName === `HEAD` ? await getCurrentGitBranch(e) : t.branchName;
-  if (o == null) return;
-  let [s, c] = await Promise.all([
-    e.getConfigValue(`branch.${o}.remote`, i),
-    e.getConfigValue(`branch.${o}.merge`, i),
-  ]);
-  if (s == null || c == null || s === `.`) return;
-  let [l, u, d, f] = await Promise.all([
-    e.getConfigValue(`remote.${s}.url`, i),
-    $(e.root, [`for-each-ref`, `--format=%(upstream)`, `--count=1`, `refs/heads/${o}`], e.host, {
-      signal: i,
-    }),
-    e.host.platformFamily(),
-    Lme(e, i, a),
-  ]);
-  if (i?.aborted) return;
-  if (a?.aborted) {
-    r?.(
-      `info`,
-      w2.encode(`[info] Continuing without updating
-`),
-    );
-    return;
-  }
-  if (l == null || !u.success || !u.stdout) return;
-  r?.(`info`, w2.encode(`[info] Refreshing upstream before creating worktree`));
-  let p = Date.now(),
-    m = p,
-    h = r != null,
-    g = r
-      ? Rme((e) => {
-          ((h &&=
-            (r(
-              `info`,
-              w2.encode(`
-`),
-            ),
-            !1)),
-            (m = Date.now()),
-            r(`stderr`, e));
-        })
-      : void 0,
-    _ = r
-      ? setInterval(() => {
-          let e = Date.now();
-          i?.aborted ||
-            e - m < C2 ||
-            r(
-              `info`,
-              w2.encode(
-                `\r[info] Refreshing upstream before creating worktree (${Math.floor((e - p) / 1e3)}s elapsed)`,
-              ),
-            );
-        }, C2)
-      : void 0,
-    v = await $(
-      e.root,
-      [`fetch`, `--progress`, `--no-tags`, `--no-recurse-submodules`, `--`, l, `+${c}:${u.stdout}`],
-      e.host,
-      {
-        configOverrides: [...f, `-c`, `protocol.file.allow=always`],
-        env: {
-          GIT_CONFIG: d === `windows` ? `NUL` : `/dev/null`,
-          GIT_CONFIG_GLOBAL: d === `windows` ? `NUL` : `/dev/null`,
-          GIT_CONFIG_NOSYSTEM: `1`,
-          GIT_PROTOCOL_FROM_USER: `0`,
-        },
-        onStderrRaw: g?.write,
-        signal: i,
-        waitForExitOnAbortSignal: a,
-      },
-    ).finally(() => {
-      (_ != null && clearInterval(_),
-        g?.finish(),
-        h &&
-          r?.(
-            `info`,
-            w2.encode(`
-`),
-          ));
-    });
-  if (!i?.aborted) {
-    if (a?.aborted) {
-      r?.(
-        `info`,
-        w2.encode(`[info] Continuing without updating
-`),
-      );
-      return;
-    }
-    if (v.success) {
-      (e.invalidateGitReadCachesForRepoChange(`remote-refs`),
-        r?.(
-          `info`,
-          new TextEncoder().encode(`[info] Upstream refreshed
-`),
-        ));
-      return;
-    }
-    (Nme().warning(`[worktree-create] upstream-refresh-failed`, {
-      safe: { exitCode: v.code },
-      sensitive: { branchName: o, remote: s, stderr: v.stderr },
-    }),
-      r?.(
-        `stderr`,
-        new TextEncoder().encode(
-          (LX(v.stderr) === `authentication`
-            ? `[warning] Git authentication failed; sign in again before retrying
-`
-            : ``) +
-            `[warning] Could not refresh upstream; using cached Git state
-`,
-        ),
-      ));
-  }
-}
-async function Lme(e, t, n) {
-  let r = await Promise.all(
-      [`--system`, `--global`].map((r) =>
-        $(e.root, [`config`, r, `--includes`, `--null`, `--get-regexp`, `^credential\\.`], e.host, {
-          allowedNonZeroExitCodes: [1],
-          signal: t,
-          trim: !1,
-          waitForExitOnAbortSignal: n,
-        }),
-      ),
-    ),
-    i = [];
-  for (let e of r)
-    if (e.success)
-      for (let t of e.stdout.split(`\0`)) {
-        let e = t.indexOf(`
-`);
-        e <= 0 || i.push(`-c`, `${t.slice(0, e)}=${t.slice(e + 1)}`);
-      }
-  return i;
-}
-function Rme(e) {
-  let t = new TextDecoder(),
-    n = ``,
-    r = !1,
-    i = !1,
-    a = (t, n) => {
-      let r = Fme.exec(t);
-      if (r == null) return;
-      let [, a, o, s, c, l] = r,
-        u = o == null ? l : `${o}% (${s}/${c})`;
-      (e(w2.encode(`${a}: ${u}${n}`)), (i = n === `\r`));
-    },
-    o = (e) => {
-      let t = e.split(/(\r\n|\r|\n)/);
-      for (let e = 0; e < t.length; e += 2) {
-        r || ((n += t[e] ?? ``), n.length > Pme && ((n = ``), (r = !0)));
-        let i = t[e + 1];
-        i != null &&
-          (r ||
-            a(
-              n,
-              i === `\r`
-                ? `\r`
-                : `
-`,
-            ),
-          (n = ``),
-          (r = !1));
-      }
-    };
-  return {
-    write: (e) => {
-      o(t.decode(e, { stream: !0 }));
-    },
-    finish: () => {
-      (o(t.decode()),
-        !r &&
-          n.length > 0 &&
-          a(
-            n,
-            `
-`,
-          ),
-        i &&
-          e(
-            w2.encode(`
-`),
-          ));
-    },
-  };
-}
 var T2 = kW(`git`);
 async function zme(e, t, n, r, i, a) {
   try {
@@ -67603,7 +67412,7 @@ async function Bme(e, t, n, r, i, a) {
   let c = r.getWorktreeRepositoryForRoot(bz(e), i),
     l = await getSafeAttributeFilterOverrides(c, s, gitSafeAttributeFilterDeps);
   if (
-    (await Ime({
+    (await refreshWorktreeUpstream({
       worktreeRepo: c,
       startingState: n,
       mode: a?.upstreamRefreshMode ?? `never`,

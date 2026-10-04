@@ -590,6 +590,13 @@ Local environment setup/cleanup 的平台脚本选择、shell wrapper、环境�
 `Gpe`/`Kpe`/`B0`、环境解析与 wrapper helper，以及 `z0`/`Upe`/`Wpe` 专用状态已删除；
 worktree create 与 delete cleanup 消费者改用语义 runtime，并由 76 项独立模块断言覆盖。
 
+### 增量抽取：Worktree upstream refresh
+
+Worktree create 的 upstream refresh 前置检查、system/global credential config 透传、隔离 fetch
+环境、双 signal 取消、超时状态与 Git progress 流解码已迁移至
+`src/main/worker/git-worktree-upstream-refresh.ts`。原 `Ime`/`Lme`/`Rme`、`Nme` 日志与
+`C2`/`Pme`/`Fme`/`w2` 专用状态已删除，create 编排改用语义 runtime，并由 48 项独立模块断言覆盖。
+
 ### 增量抽取：Git operation marker paths
 
 `GitRepoWatcher.getGitOperationState` 只读取六个 Git 状态标记文件，路径拼接
