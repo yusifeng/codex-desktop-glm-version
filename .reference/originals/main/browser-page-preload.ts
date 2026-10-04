@@ -6230,6 +6230,7 @@ var { interceptAnnotationSpaceKey } = require("./browser-page-preload/annotation
 var { reducePendingEditorMessage } = require("./browser-page-preload/pending-editor-message");
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
+var { createAnnotationAnchorGeometry } = require("./browser-page-preload/annotation-anchor-geometry");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
@@ -22491,6 +22492,8 @@ function s_(e) {
   return unionAnnotationRects(e);
 }
 function c_(e, t = dd(e), n = null) {
+  return annotationAnchorGeometry.resolveAnchorClipRect(e, t, n);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (t == null) return null;
   let r = k_(t, { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight });
   if (r == null) return null;
@@ -22534,6 +22537,8 @@ function c_(e, t = dd(e), n = null) {
   return r;
 }
 function l_(e) {
+  return annotationAnchorGeometry.resolveElementFrameGeometry(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let t = e.ownerDocument.defaultView;
   if (t == null) return null;
   let n = e.getBoundingClientRect(),
@@ -22577,6 +22582,8 @@ function l_(e) {
   return null;
 }
 function u_(e, t, { framePath: n = [], frameUrl: r = null } = {}) {
+  return annotationAnchorGeometry.buildRegionAnchor(e, t, { framePath: n, frameUrl: r });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let i = wc(n) ?? window,
     a = Ic(i),
     o = { x: t.x - a.x, y: t.y - a.y },
@@ -22623,6 +22630,8 @@ function m_(e, t, n, r) {
     : `hover-box`;
 }
 function h_(e, t = C_(), { includeElementFrameScroll: n = !1, markerPointInset: r = I_ } = {}) {
+  return annotationAnchorGeometry.resolveMarkerPoint(e, t, { includeElementFrameScroll: n, markerPointInset: r });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let i = wc(e.framePath),
     a = Nc(e, i ?? window),
     o = a.x + _u(e, i ?? window);
@@ -22643,6 +22652,8 @@ function g_(e, t) {
   return overrideAnnotationViewportSize(e, t);
 }
 function __(e, t, { includeElementFrameScroll: n = !1, viewportSize: r, zoomFactor: i }) {
+  return annotationAnchorGeometry.resolveViewportPoint(e, r, { includeElementFrameScroll: n, zoomFactor: i });
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let a = h_(e, g_(t, r), { includeElementFrameScroll: n, markerPointInset: I_ / i });
   return { x: a.x * i, y: a.y * i };
 }
@@ -22675,6 +22686,8 @@ function b_(e, t, n, r) {
     : `posted-region-highlight`;
 }
 function x_(e, t, n) {
+  return annotationAnchorGeometry.buildBoxStyle(e, t, n);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   let r = w_(e, t);
   return { borderRadius: n, left: r.x, top: r.y, width: r.width, height: r.height };
 }
@@ -25953,6 +25966,7 @@ var G,
   yb,
   bb,
   xb,
+  annotationAnchorGeometry,
   Sb = o(() => {
     ($s(),
       (G = u(Bf(), 1)),
@@ -25987,6 +26001,48 @@ var G,
       (fb = { name: `oai-annotation-editor-default-mode`, values: [`advanced`] }),
       (pb = 4),
       (mb = 72),
+      (annotationAnchorGeometry = createAnnotationAnchorGeometry({
+        getDefaultWindow: () => window,
+        getDefaultDocument: () => document,
+        resolveFrameWindow: wc,
+        resolveFrameElement: Tc,
+        getScrollOffset: Ic,
+        getFrameWindow: sc,
+        getParentElement: ic,
+        getComputedStyle: (windowLike, element) => windowLike.getComputedStyle(element),
+        isClippingOverflow: isClippingAnnotationOverflow,
+        isElement: F,
+        getElementRect: (element) => element.getBoundingClientRect(),
+        getElementOffsetWidth: (element) => element.offsetWidth,
+        getElementOffsetHeight: (element) => element.offsetHeight,
+        getElementClientLeft: (element) => element.clientLeft,
+        getElementClientTop: (element) => element.clientTop,
+        getElementClientWidth: (element) => element.clientWidth,
+        getElementClientHeight: (element) => element.clientHeight,
+        getFrameElement: (windowLike) => windowLike.frameElement,
+        getInnerWidth: (windowLike) => windowLike.innerWidth,
+        getInnerHeight: (windowLike) => windowLike.innerHeight,
+        getDocumentBody: (documentLike) => documentLike.body,
+        getDocumentElement: (documentLike) => documentLike.documentElement,
+        getAnchorRect: dd,
+        getAnchorMarkerSize: j_,
+        getViewportState: C_,
+        getViewportOffset: (anchor, windowLike) => {
+          const scroll = Nc(anchor, windowLike);
+          return { x: scroll.x + _u(anchor, windowLike), y: scroll.y };
+        },
+        getFrameOffset: Ic,
+        getWindowScrollY: (windowLike) => windowLike.scrollY,
+        clamp: F_,
+        getMarkerInset: () => I_,
+        getViewportOverride: g_,
+        getScaleRect: w_,
+        getFramePath: (anchor) => anchor.framePath ?? [],
+        getDocumentContext: (pageUrl, options) => new Xl(pageUrl).getRegionDocumentContext(options),
+        getPageUrl: fd,
+        getCurrentDocumentTitle: () => document.title,
+        getScrollContainers: jc,
+      })),
       (annotationOverlayRuntime = createAnnotationOverlayRuntime({
         documentLike: document,
         windowLike: window,

@@ -380,3 +380,11 @@ viewport/text 校验，共 8 项断言。
 读取和 anchor refresh 适配；React marker/render 编排仍留在原边界。`scripts/test-preload-annotation-anchor-state.mjs`
 覆盖四类 anchor、additional selection、payload element、state merge、live-element fallback
 和 primary replacement，共 10 项断言。
+
+### 增量抽取：annotation anchor/frame geometry
+
+批注 overlay 使用的 frame/scroll-container clipping、跨 frame element geometry、region anchor
+构造、marker viewport point 与缩放后的 box style 已迁移至
+`src/main/browser-page-preload/annotation-anchor-geometry.ts`。入口仅保留既有 DOM/frame 依赖的
+注入和兼容函数名委托；跨 frame、scroll offset、viewport clamp 与 box style 语义由
+`scripts/test-preload-annotation-anchor-geometry.mjs` 覆盖，共 3 项断言。
