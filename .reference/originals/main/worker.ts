@@ -124,6 +124,7 @@ const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
 const { isWorkingDirectoryPermissionError, isGitProcessTimeout } = require("./worker/git-session-error-policy");
+const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
@@ -68578,27 +68579,13 @@ function fve(e) {
   }
 }
 function pve(e) {
-  return e.oldPath === e.newPath ? e.newPath : `${e.oldPath} -> ${e.newPath}`;
+  return formatReviewSearchPath(e);
 }
 function mve(e, t, n) {
-  let r = Math.max(0, t - I3),
-    i = Math.min(e.length, n + I3);
-  return { before: e.slice(r, t), match: e.slice(t, n), after: e.slice(n, i) };
+  return buildSearchSnippet(e, t, n, I3);
 }
 function hve(e, t, n) {
-  let r = t.toLowerCase(),
-    i = e.toLowerCase(),
-    a = [],
-    o = 0,
-    s = !1,
-    c = 0;
-  for (; c < i.length;) {
-    let e = i.indexOf(r, c);
-    if (e === -1) break;
-    let l = e + t.length;
-    ((o += 1), a.length < n ? a.push({ start: e, end: l }) : (s = !0), (c = l));
-  }
-  return { offsets: a, totalMatches: o, isCapped: s };
+  return findCaseInsensitiveOffsets(e, t, n);
 }
 var Jye = 1e3,
   Yye = 6e4,

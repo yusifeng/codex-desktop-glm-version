@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-review-search-utils.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets } = module.exports;
+assert.equal(formatReviewSearchPath({ oldPath: "a", newPath: "a" }), "a");
+assert.equal(formatReviewSearchPath({ oldPath: "a", newPath: "b" }), "a -> b");
+assert.deepEqual(buildSearchSnippet("0123456789", 4, 6, 2), { before: "23", match: "45", after: "67" });
+assert.deepEqual(findCaseInsensitiveOffsets("Abc abc ABC", "abc", 2), { offsets: [{ start: 0, end: 3 }, { start: 4, end: 7 }], totalMatches: 3, isCapped: true });
+assert.deepEqual(findCaseInsensitiveOffsets("abc", "z", 1), { offsets: [], totalMatches: 0, isCapped: false });
+assert.deepEqual(findCaseInsensitiveOffsets("abc", "abc", 0), { offsets: [], totalMatches: 1, isCapped: true });
+console.log("worker Git review search utils tests passed (6 assertions)");
