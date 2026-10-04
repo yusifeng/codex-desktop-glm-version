@@ -185,6 +185,15 @@ Google Docs/Sheets URL 识别、文档/表格 ID 与 tab 参数解析、标题/�
 兼容别名并委托 helper；9 项行为断言覆盖普通/发布 URL、query/hash tab、跨域拒绝、
 Sheets ID 和 context 文本规范化。
 
+### 增量抽取：annotation document context
+
+文档上下文运行时（原 `Xl`，5162-5184）已迁移至
+`src/main/browser-page-preload/annotation-document-context.ts`。该模块保留 Google Docs
+判定、跨 window selection 与 active input selection 回退、frame document 安全访问、
+可见文本 TreeWalker 过滤、viewport 相交判断和 2,000 字符上限；入口通过依赖注入保留
+原 `Xl` API 与 `isGoogleDocsAnchor` 静态判定。`scripts/test-preload-annotation-document-context.mjs`
+覆盖 element/region context、跨域拒绝、selection 回退和可见文本采样，共 14 项断言。
+
 ### 增量抽取：annotation surface element boundary
 
 annotation surface 注册与 MutationObserver 清理共用的顶层元素判定已迁移为

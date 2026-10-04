@@ -5111,7 +5111,15 @@ var R,
       (ql = 4),
       (Jl = 1),
       (Yl = 2),
-      (Xl = class {
+      (Xl = createAnnotationDocumentContext({
+        parseGoogleDocsUrl: hs,
+        createGoogleDocsContext: vs,
+        normalizeText: Vl,
+        getDocument: Ul,
+        isHTMLElement: I,
+        isVisibleElement: Wl,
+        rangeIntersectsRect: Kl,
+      }).AnnotationDocumentContext)); /*
         pageUrl;
         constructor(e) {
           this.pageUrl = e;
@@ -5179,7 +5187,7 @@ var R,
           }
           return Vl(i);
         }
-      }));
+      })); */
   });
 function Ql(e) {
   let t = e.commonAncestorContainer.getRootNode();
@@ -6393,6 +6401,7 @@ var { reducePendingEditorMessage } = require("./browser-page-preload/pending-edi
 var { isLocalHttpUrl } = require("./browser-page-preload/local-url");
 var { createAnnotationOverlayRuntime } = require("./browser-page-preload/annotation-overlay-runtime");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
+var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 Yo();
 var Ud = { type: `site_annotation_features_changed`, version: 1 };
 ja({
