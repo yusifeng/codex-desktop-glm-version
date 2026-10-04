@@ -447,5 +447,35 @@
     "classification": "generated-local-account-policy-runtime",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer wires account-policy banner state, identity queries and generated JSX before the neighboring acknowledgement component mounts. Its dependency setup is hub-local glue with no named renderer consumer or independent teardown boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "x", "sourceSymbol": "g9", "startLine": 115001, "endLine": 115021,
+    "classification": "generated-local-thread-shell-lazy-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers the lazy thread shell and its dependency graph for the neighboring home route. Its import ordering and loader ownership are route-local lifecycle glue rather than an independently consumed renderer contract."
+  },
+  {
+    "hub": "app-primary", "alias": "y", "sourceSymbol": "y9", "startLine": 115199, "endLine": 115223,
+    "classification": "generated-local-home-route-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer assembles the home route's signal, query and JSX runtime dependencies before the adjacent route component mounts. This setup is owned by the route lifecycle and has no separately named renderer consumer."
+  },
+  {
+    "hub": "app-primary", "alias": "a", "sourceSymbol": "mvt", "startLine": 117292, "endLine": 117298,
+    "classification": "generated-local-first-run-gate",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper reads the first-run experiment and authentication state to select the neighboring onboarding gate's redirect mode. Its policy is consumed only by the adjacent generated first-run wrapper and has no independent renderer owner."
+  },
+  {
+    "hub": "app-primary", "alias": "d", "sourceSymbol": "O9", "startLine": 115995, "endLine": 116016,
+    "classification": "generated-local-account-access-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer creates the account-access derived state used by the neighboring composer route. Query subscriptions and feature policy remain coupled to that route lifecycle, so the export has no independently consumed renderer boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "f", "sourceSymbol": "D9", "startLine": 115924, "endLine": 115993,
+    "classification": "generated-local-composer-route-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer wires the composer route's query, feature, account and UI registries before its generated controller mounts. This is route-local lifecycle glue with no separately named renderer consumer."
   }
 ]
