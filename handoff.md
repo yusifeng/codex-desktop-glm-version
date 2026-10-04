@@ -929,3 +929,7 @@ Git-init metadata watcher 失败后的 stat/recovery 判定已迁移至
 `src/main/worker/git-init-watcher-recovery.ts`；watcher 入口仅保留 session dispose、日志与
 重连副作用，由 `scripts/test-worker-git-init-watcher-recovery.mjs` 覆盖存在目录、非目录、
 缺失路径与权限错误四类边界。
+
+Worktree create 的本地环境 setup 生命周期（环境读取、setup failure policy、shell environment
+写回/清理与稳定日志）已迁移至 `src/main/worker/git-worktree-setup.ts`；create 入口仅保留
+路径/checkout 编排与兼容适配，由 `scripts/test-worker-git-worktree-setup.mjs` 覆盖 9 项断言。

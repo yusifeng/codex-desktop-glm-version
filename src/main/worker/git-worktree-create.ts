@@ -194,83 +194,19 @@ async function createWorktree(params: any, dependencies: WorktreeCreateDependenc
       `stderr`,
       encoder.encode(`Failed to store selected environment in git config\n`),
     );
-  if (environmentPath == null) {
-    onLog?.(`info`, encoder.encode(`No local environment selected\n`));
-    return {
-      success: true,
-      worktreeGitRoot,
-      worktreeWorkspaceRoot,
-      setupResult: null,
-      setupError: null,
-    };
-  }
-  onSetupStart?.();
-  const environment = await dependencies.readLocalEnvironmentConfig(environmentPath, host);
-  if (environment.type === `error`) {
-    const error = Error(environment.error.message);
-    onLog?.(`stderr`, encoder.encode(`${error.message}\n`));
-    return allowSetupFailure
-      ? {
-          success: true,
-          worktreeGitRoot,
-          worktreeWorkspaceRoot,
-          setupResult: null,
-          setupError: error,
-        }
-      : { success: false, error };
-  }
-  onLog?.(`info`, encoder.encode(`Running setup script ${environment.configPath}\n`));
-  const setup = await dependencies.runSetupScript(
-    worktreeGitRoot,
-    environment,
-    (kind: string, chunk: Uint8Array) => onLog?.(kind, chunk),
-    signal,
-    {
-      [dependencies.originalWorkspaceEnv]: workspaceRoot,
-      [dependencies.worktreeWorkspaceEnv]: worktreeWorkspaceRoot,
-    },
+  return runWorktreeSetup(environmentPath, {
+    allowSetupFailure,
     host,
-  );
-  if (signal?.aborted) return requestCanceled();
-  const setupResult = setup?.setupResult ?? null;
-  if (setupResult?.status === `failed`) {
-    const error = Error(setupResult.error ?? `Setup script failed`);
-    onLog?.(`stderr`, encoder.encode(`${setupResult.error ?? `Setup script failed`}\n`));
-    return allowSetupFailure
-      ? {
-          success: true,
-          worktreeGitRoot,
-          worktreeWorkspaceRoot,
-          setupResult,
-          setupError: error,
-        }
-      : { success: false, error };
-  }
-  if (setupResult?.status === `succeeded`)
-    onLog?.(`info`, encoder.encode(`Setup script completed\n`));
-  try {
-    if (setup?.shellEnvironment == null)
-      await dependencies.removeWorktreeShellEnvironment(worktreeRepository, signal);
-    else
-      await dependencies.writeWorktreeShellEnvironment(
-        worktreeRepository,
-        setup.shellEnvironment,
-        signal,
-      );
-  } catch (error) {
-    onLog?.(
-      `stderr`,
-      encoder.encode(`Failed to store worktree shell environment: ${String(error)}\n`),
-    );
-  }
-  return {
-    success: true,
+    signal,
+    workspaceRoot,
     worktreeGitRoot,
     worktreeWorkspaceRoot,
-    setupResult,
-    setupError: null,
-  };
+    worktreeRepository,
+    onLog,
+    onSetupStart,
+  }, dependencies);
 }
 
 export { createWorktree };
 if (typeof module !== `undefined`) module.exports = { createWorktree };
+import { runWorktreeSetup } from "./git-worktree-setup";

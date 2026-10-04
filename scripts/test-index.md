@@ -335,6 +335,7 @@ Total scripts: 896.
 - [`test-worker-git-stable-metadata-dispatch.mjs`](./test-worker-git-stable-metadata-dispatch.mjs)
 - [`test-worker-git-worktree-lifecycle.mjs`](./test-worker-git-worktree-lifecycle.mjs)
 - [`test-worker-git-worktree-delete.mjs`](./test-worker-git-worktree-delete.mjs)
+- [`test-worker-git-worktree-setup.mjs`](./test-worker-git-worktree-setup.mjs)
 - [`test-worker-git-worktree-list.mjs`](./test-worker-git-worktree-list.mjs)
 - [`test-worker-git-codex-worktree-dispatch.mjs`](./test-worker-git-codex-worktree-dispatch.mjs)
 - [`test-worker-git-worktree-list-dispatch.mjs`](./test-worker-git-worktree-list-dispatch.mjs)
