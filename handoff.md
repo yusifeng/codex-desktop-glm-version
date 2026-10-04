@@ -628,6 +628,9 @@ worker open-in target 的平台描述符合并、跨平台 target 构造与 edit
 由 12 项 focused assertions 覆盖字段覆盖、缺失平台、hidden、默认参数与 Linux open 绑定。
 worker editor target 参数构造已迁移至 `src/main/worker/editor-target-args.ts`，覆盖
 JetBrains 参数、Zed SSH URI 与行列位置追加，由 7 项 focused assertions 覆盖。
+worker Windows `PATH`/`Path` 环境键合并策略已迁移至
+`src/main/worker/windows-command-env.ts`，由 6 项 focused assertions 覆盖；入口继续负责
+命令执行与平台环境注入。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。

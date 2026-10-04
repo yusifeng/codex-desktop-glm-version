@@ -6,6 +6,9 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-app-initial-parse-http-url.mjs`](./test-app-initial-parse-http-url.mjs)
+- [`test-worker-windows-command-env.mjs`](./test-worker-windows-command-env.mjs)
+
 - [`test-preload-annotation-draft-text.mjs`](./test-preload-annotation-draft-text.mjs)
 
 - [`test-preload-annotation-containment.mjs`](./test-preload-annotation-containment.mjs)
