@@ -458,7 +458,7 @@ annotation serialization boundary（名称规范化、metadata descriptor/key/va
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 721 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引 726 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -630,3 +630,6 @@ GitHub pull-request board 的仓库候选、查询参数、open/merged 编排和
 
 - worker 协议 schema 的 elicitation/approval 归一化已迁至 `shared/elicitation-protocol.ts`，保留 `misc-runtime` 兼容导出并由 6 项行为断言覆盖。
 Linux terminal 参数策略已抽取为 `src/main/worker/linux-terminal-args.ts`，入口仅保留平台环境与路径适配；新增 6 项 focused 断言并同步测试索引。
+Annotation text input target 的 `HTMLInputElement` 类型白名单与 textarea 判定已抽取为
+`src/main/browser-page-preload/annotation-input-target.ts`，入口 `Ju` 保留兼容委托；由
+`scripts/test-preload-annotation-input-target.mjs` 覆盖 6 项行为断言。
