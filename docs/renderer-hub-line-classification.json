@@ -705,5 +705,65 @@
     "classification": "generated-local-empty-initializer",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The generated initializer is intentionally empty and exists only as a retained module registration point in the adjacent submission route. It has no semantic behavior or independently consumed renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Cp", "sourceSymbol": "WM", "startLine": 11043, "endLine": 11048,
+    "classification": "generated-local-auth-config-projection",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The projection validates the ChatGPT auth configuration and extracts the multi-agent concurrency limit for the adjacent account/runtime surface. It is a route-local generated policy read rather than an independently consumed renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "Dt", "sourceSymbol": "lpt", "startLine": 104509, "endLine": 104516,
+    "classification": "generated-local-artifact-followup-dispatch",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper dispatches the prefilled or blocked artifact follow-up action through the local submission channel. Its action selection is coupled to the surrounding artifact route and has no standalone renderer lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Ci", "sourceSymbol": "n9e", "startLine": 78097, "endLine": 78100,
+    "classification": "generated-local-dismiss-reason-state-write",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper records a dismissal reason and clears the pending local state atom. This is a narrow generated state transition owned by the adjacent conversation surface, not a reusable renderer boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Cg", "sourceSymbol": "rD", "startLine": 3727, "endLine": 3745,
+    "classification": "generated-local-focused-modal-guard",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component suppresses its children while the focused-modal policy is active and otherwise forwards the generated header content. It is presentation wiring local to the modal route."
+  },
+  {
+    "hub": "app-primary", "alias": "Ch", "sourceSymbol": "Rke", "startLine": 5080, "endLine": 5230,
+    "classification": "generated-local-modal-shell",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The modal shell owns generated open/close state, focus suppression, and accessibility projection for its nested content. Its lifecycle is route-local and is not an independently consumed renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "Ao", "sourceSymbol": "JJ", "startLine": 41795, "endLine": 41999,
+    "classification": "generated-local-composer-action-button",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component maps loading, disabled, label, and accessibility props into the generated composer action button. It is a local control composition coupled to the composer route."
+  },
+  {
+    "hub": "app-primary", "alias": "Di", "sourceSymbol": "P7e", "startLine": 76816, "endLine": 76977,
+    "classification": "generated-local-turn-retry-action",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component projects conversation, host, retry, and turn identifiers into the generated retry action. Its state and callbacks belong to the local response surface and have no independent lifecycle."
+  },
+  {
+    "hub": "app-primary", "alias": "Co", "sourceSymbol": "CY", "startLine": 43499, "endLine": 43996,
+    "classification": "generated-local-composer-input-surface",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component owns the generated composer input surface, dictation state, attachment affordances, and submission callbacks. This is route-local UI composition rather than a separately consumed renderer service."
+  },
+  {
+    "hub": "app-primary", "alias": "Dm", "sourceSymbol": "LA", "startLine": 7030, "endLine": 7280,
+    "classification": "generated-local-image-generation-limit-presentation",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The component presents image-generation limit state and dismissal behavior using neighboring conversation atoms. Its impression and presentation callbacks are owned by the generated route."
+  },
+  {
+    "hub": "app-primary", "alias": "Bn", "sourceSymbol": "Nat", "startLine": 90194, "endLine": 90202,
+    "classification": "generated-local-review-entrypoint-predicate",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The predicate narrows local operation entries to the pull-request-review entrypoint before the surrounding project action route handles them. It is an inline generated discriminant with no independent renderer contract."
   }
 ]

@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 120, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 139, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Zm"), "Zm remains coupled to the adjacent local-action URL projection");
 assert.ok(primary.unconsumed.includes("Ag"), "Ag remains coupled to the generated selection overlay renderer");
@@ -94,6 +94,14 @@ assert.ok(primary.unconsumed.includes("R"), "R remains coupled to generated foll
 assert.ok(primary.unconsumed.includes("P"), "P remains coupled to generated home-announcements lazy runtime");
 assert.ok(primary.unconsumed.includes("M"), "M remains coupled to generated project-dropdown initialization");
 assert.ok(primary.unconsumed.includes("E"), "E remains coupled to generated home starter surface");
+assert.ok(primary.unconsumed.includes("Cp"), "Cp remains coupled to generated auth config projection");
+assert.ok(primary.unconsumed.includes("Dt"), "Dt remains coupled to generated artifact follow-up dispatch");
+assert.ok(primary.unconsumed.includes("Cg"), "Cg remains coupled to generated focused-modal guard");
+assert.ok(primary.unconsumed.includes("Ch"), "Ch remains coupled to generated modal shell");
+assert.ok(primary.unconsumed.includes("Di"), "Di remains coupled to generated turn retry action");
+assert.ok(primary.unconsumed.includes("Co"), "Co remains coupled to generated composer input surface");
+assert.ok(primary.unconsumed.includes("Dm"), "Dm remains coupled to generated image-generation presentation");
+assert.ok(primary.unconsumed.includes("Bn"), "Bn remains coupled to generated review entrypoint predicate");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);
