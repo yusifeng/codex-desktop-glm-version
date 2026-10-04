@@ -23981,15 +23981,13 @@ function Wy({ rootHost: e, bridge: t }) {
       }),
     ),
     { comments: Ee, interactionMode: k } = n,
-    De = k === `comment` && n.isAnnotationSuspended === !0,
+    { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
-    A = n.canUseSiteAnnotationApi === !0,
     ke = A && k === `comment` && !De && x == null && fe,
     j = Pd(n.zoomPercent),
     Ae = xs(n.viewportScale),
     je = fd(),
     Me = qg(je),
-    Ne = n.canUseTweaks !== !1,
     Pe = new Map(Ee.map((e, t) => [e.id, t + 1])),
     Fe = Ee.filter(Qy),
     Ie = eb(e),
@@ -25909,6 +25907,8 @@ var {
   getMountedAnnotationMessageAction,
   getPreMountAnnotationMessageAction,
 } = require("./browser-page-preload/annotation-host-message-routing");
+var { deriveAnnotationUiModePolicy } = require("./browser-page-preload/annotation-ui-mode-policy"),
+  annotationUiModePolicy = deriveAnnotationUiModePolicy;
 var { createAnnotationPermissionController } = require("./browser-page-preload/annotation-permission-controller"),
   { createAnnotationPreloadRuntime } = require("./browser-page-preload/annotation-preload-runtime"),
   annotationPreloadRuntime = createAnnotationPreloadRuntime({
