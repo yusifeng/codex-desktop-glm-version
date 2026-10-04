@@ -953,3 +953,12 @@ Git watcher session 生命周期纯策略已进一步收敛至
 `src/main/worker/git-watch-session-policy.ts`：指数重连退避、retry timer 单例门控、session close
 稳定阈值、恢复后重试条件均由独立模块提供，`git-watch-paths.ts` 仅复用语义入口；新增 8 项
 focused assertions 覆盖 disposed、generation、session matching 与 delay cap 边界。
+
+### 增量抽取：live-query run coordinator
+
+共享 live-query 执行边界已迁移至 `src/main/worker/git-live-query-run-coordinator.ts`。
+该模块负责 repository queue 串接、shared-run 去重、tracked result fan-out、abort 驱动的
+consumer 清理、deferred completion 与 trace-link 包装；`git-live-query-registry.ts` 仅保留
+订阅状态、刷新调度和结果发布，并通过窄依赖委托 session/cache 执行边界。
+`scripts/test-worker-git-live-query-run-coordinator.mjs` 覆盖 shared 去重、tracked fan-out、
+完成清理与底层单次执行，共 6 项断言。
