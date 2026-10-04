@@ -43,4 +43,4 @@ assert.equal(defaults.areAnnotationMarkersVisible, true);
 assert.equal(defaults.viewportScale, 1);
 assert.equal(isAnnotationCommentModeActive({ interactionMode: "comment", canUseSiteAnnotationApi: false }), false);
 
-console.log("preload annotation context state assertions passed (20 assertions)");
+console.log("preload annotation context state assertions passed (19 assertions)");

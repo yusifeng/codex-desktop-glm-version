@@ -11,7 +11,7 @@
 
 ## 当前进度快照（2026-10-04）
 
-本轮 A2 增量补强 preload annotation context state：同步消息解析现在对空值/非对象输入安全降级，缺省交互模式与 agent 控制位保持明确默认值；新增 `scripts/test-preload-annotation-context-state.mjs` 的 20 项 focused assertions，覆盖初始状态、能力位同步、注释模式判定及空消息边界。
+本轮 A2 增量补强 preload annotation context state：同步消息解析现在对空值/非对象输入安全降级，缺省交互模式与 agent 控制位保持明确默认值；新增 `scripts/test-preload-annotation-context-state.mjs` 的 19 项 focused assertions，覆盖初始状态、能力位同步、注释模式判定及空消息边界。
 
 GitHub Pull Request summary 的身份 key 规范化、取消 reader 过滤、状态映射与 pending-check
 判定已迁移至 `src/main/worker/github-pull-request-summary-policy.ts`；batcher 仅保留 GraphQL
