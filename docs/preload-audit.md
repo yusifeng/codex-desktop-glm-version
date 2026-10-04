@@ -278,6 +278,10 @@ Annotation viewport state 读取（原 `C_` 22902-22913）已迁移至
 `src/main/browser-page-preload/annotation-viewport-state.ts`；入口仅注入 window/visualViewport，
 由 `scripts/test-preload-annotation-viewport-state.mjs` 覆盖基础、偏移与默认 visual viewport。
 
+Annotation viewport override 合并（原 `g_` 22858-22860）已迁移至
+`src/main/browser-page-preload/annotation-viewport-override.ts`；入口保留布局编排，
+由 `scripts/test-preload-annotation-viewport-override.mjs` 覆盖 null identity、尺寸覆盖与非变异。
+
 ### 增量抽取：annotation text input target
 
 Annotation 文本输入目标的 `HTMLInputElement` 类型白名单与 `HTMLTextAreaElement` 判定（原 `Ju`）

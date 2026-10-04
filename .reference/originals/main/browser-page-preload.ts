@@ -6382,6 +6382,7 @@ var { isClippingAnnotationOverflow, isScrollableAnnotationOverflow } = require("
 var { resolveAnnotationThemeVariant } = require("./browser-page-preload/annotation-theme");
 var { readAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport");
 var { readAnnotationViewportState } = require("./browser-page-preload/annotation-viewport-state");
+var { overrideAnnotationViewportSize } = require("./browser-page-preload/annotation-viewport-override");
 Yo();
 annotationSerialization = createAnnotationSerialization({
   getLimits: () => es,
@@ -22863,7 +22864,7 @@ function h_(e, t = C_(), { includeElementFrameScroll: n = !1, markerPointInset: 
   };
 }
 function g_(e, t) {
-  return t == null ? e : { ...e, height: t.height, width: t.width };
+  return overrideAnnotationViewportSize(e, t);
 }
 function __(e, t, { includeElementFrameScroll: n = !1, viewportSize: r, zoomFactor: i }) {
   let a = h_(e, g_(t, r), { includeElementFrameScroll: n, markerPointInset: I_ / i });
