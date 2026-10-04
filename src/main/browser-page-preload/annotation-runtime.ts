@@ -3,23 +3,7 @@ import { createAnnotationOpenRequestDetail, createAnnotationRangeDetail, readAnn
 import { isValidAnnotationSurfaceElement, shouldDisposeAnnotationRegistryOnPagehide, shouldRenderAnnotationSelection } from "./annotation-surface-policies";
 import { attachAnnotationControlTargets, collectAnnotationControlTargets, detachAnnotationControlTargets, getAnnotationControlsForTarget } from "./annotation-control-targets";
 import { normalizeAnnotationControlTargets } from "./annotation-control-target-validation";
-
-function createAnnotationControlHandle(id: string, serialize: (value: unknown) => string, normalizeTargets: (value: unknown) => unknown[], emit: (type: `update` | `dispose`, detail: Record<string, unknown>) => boolean): Readonly<{ update(value: { targets?: unknown }): void; dispose(): void }> {
-  let disposed = false;
-  return Object.freeze({
-    update(value: { targets?: unknown }) {
-      if (disposed) throw new TypeError(`Annotation controls have been disposed`);
-      const payload = serialize(value);
-      const targets = value.targets === undefined ? undefined : normalizeTargets(value.targets);
-      if (!emit(`update`, { id, payload, targets })) throw new TypeError(`Invalid annotation controls update`);
-    },
-    dispose() {
-      if (disposed) return;
-      disposed = true;
-      emit(`dispose`, { id });
-    },
-  });
-}
+import { createAnnotationControlHandle } from "./annotation-control-handle";
 
 function parseAnnotationControlsPayload(serialized: unknown, fullParse: (value: unknown) => { success: boolean; data?: unknown }, patchParse: (value: unknown) => { success: boolean; data?: unknown }, current?: Record<string, unknown>, maxLength = 16384): Record<string, unknown> | undefined {
   if (typeof serialized !== `string` || serialized.length > maxLength) return undefined;

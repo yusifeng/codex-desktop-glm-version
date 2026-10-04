@@ -229,6 +229,7 @@ Total scripts: 896.
 - [`test-main-history-scope-actions.mjs`](./test-main-history-scope-actions.mjs)
 - [`test-main-tray-readiness.mjs`](./test-main-tray-readiness.mjs)
 - [`test-preload-annotation-controls-registry.mjs`](./test-preload-annotation-controls-registry.mjs)
+- [`test-preload-annotation-control-handle.mjs`](./test-preload-annotation-control-handle.mjs)
 - [`test-preload-annotation-class-names.mjs`](./test-preload-annotation-class-names.mjs)
 - [`test-preload-annotation-surface-events.mjs`](./test-preload-annotation-surface-events.mjs)
 - [`test-preload-annotation-surface-policies.mjs`](./test-preload-annotation-surface-policies.mjs)
