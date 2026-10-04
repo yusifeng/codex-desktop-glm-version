@@ -520,3 +520,9 @@ React 或 signal runtime。`scripts/test-app-primary-plan-selection-surface.mjs`
 三态字符串。它没有独立 renderer named consumer，也不拥有 signal、DOM 或初始化副作用，
 因此归类为 `generated-local-helper` 并保留在聚合 hub；分类记录由
 `scripts/audit-renderer-hub-classification.mjs` 校验。
+
+本轮继续补齐 app-primary URL/action 小簇的逐行证据：`tA`（公开别名 `Zm`，5751--5753
+行）只判断 `open_local_url` 的 `/tasks` 特殊路径，并且仅被相邻的 `eAe` URL 投影调用。
+它没有独立 renderer named consumer；为避免制造无主 facade，归类为
+`generated-local-helper` 并保留在聚合 hub。该行范围、source symbol 与分类由
+`scripts/audit-renderer-hub-classification.mjs` 机器校验。

@@ -50,6 +50,11 @@
     "evidence": "The URL-scheme classifier is an implementation detail of rA/tAe in the generated hub and has no independent renderer call site; preserve the coupled scope until a named consumer establishes a stable contract."
   },
   {
+    "hub": "app-primary", "alias": "Zm", "sourceSymbol": "tA", "startLine": 5751, "endLine": 5753,
+    "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The /tasks local-action predicate is only called by the adjacent eAe URL projection; no renderer module imports the public alias, so extracting it would create an unowned action-surface facade."
+  },
+  {
     "hub": "app-primary", "alias": "Ad", "sourceSymbol": "YMe", "startLine": 17541, "endLine": 17550,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The recipient/cc/bcc display projection is coupled to the adjacent NI/MI validators and RI regex initialization; no renderer module names this aggregate export, so extracting it would create an unowned email-surface facade."
