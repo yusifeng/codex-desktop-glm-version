@@ -397,6 +397,15 @@ viewport/text 校验，共 8 项断言。
 覆盖四类 anchor、additional selection、payload element、state merge、live-element fallback
 和 primary replacement，共 10 项断言。
 
+### 增量抽取：annotation preload bridge IPC/context boundary
+
+preload 与挂载后的批注 runtime 之间的 bridge 已迁移至
+`src/main/browser-page-preload/annotation-preload-bridge.ts`。模块集中负责 host-message
+订阅/重放、pending editor/text-selection 缓冲、control target 查询，以及 editor 生命周期
+消息到 IPC 的转发；入口继续注入 state、registry 和 request queue，保持原有权限与销毁语义。
+`scripts/test-preload-annotation-preload-bridge.mjs` 覆盖缓冲重放、editor 状态转发、request
+清理和 capability gate，共 7 项断言。
+
 ### 增量抽取：annotation anchor/frame geometry
 
 批注 overlay 使用的 frame/scroll-container clipping、跨 frame element geometry、region anchor

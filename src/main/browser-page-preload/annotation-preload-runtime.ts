@@ -1,3 +1,5 @@
+import { createAnnotationPreloadBridge } from "./annotation-preload-bridge";
+
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
   windowLike: any;
@@ -27,10 +29,6 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   let mountedRuntime: any = null;
   let pendingPreview: any = null;
   let state = deps.createInitialState(deps.intlConfig);
-  let hasMountedSubscriber = false;
-  let bufferedSync: any = null;
-  let pendingEditorMessage: any = null;
-  let pendingTextSelection = false;
   let siteAnnotationApiAvailable = false;
   let mountStarted = false;
   let destroyed = false;
@@ -40,6 +38,17 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   let modeControllerDispose: any = null;
   let featureObserver: any = null;
   let controlsRegistry: any = null;
+
+  const preloadBridge = createAnnotationPreloadBridge({
+    ipcRenderer: deps.ipcRenderer,
+    channels: deps.channels,
+    getState: () => state,
+    getControlsRegistry: () => controlsRegistry,
+    getSiteAnnotationRequests: () => siteAnnotationRequests,
+    getMountedMessageAction: deps.getMountedMessageAction,
+    reducePendingEditorMessage: deps.reducePendingEditorMessage,
+    setActiveEditor: (active: boolean) => { hasActiveEditor = active; },
+  });
 
   const permissionController = deps.createPermissionController({
     isPermissionGranted: () => permissionGranted,
@@ -93,70 +102,21 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
         return;
       case `sync`:
         applySync(message);
-        if (!hasMountedSubscriber) bufferedSync = { ...message, canUseSiteAnnotationApi: state.canUseSiteAnnotationApi };
+        preloadBridge.bufferSync({ ...message, canUseSiteAnnotationApi: state.canUseSiteAnnotationApi });
         return;
       case `capture-text-selection`:
-        if (!hasMountedSubscriber) pendingTextSelection = true;
+        preloadBridge.bufferTextSelection();
         return;
       case `queue-editor-message`:
         siteAnnotationRequests?.clear();
-        if (!hasMountedSubscriber) {
-          pendingEditorMessage = deps.reducePendingEditorMessage(pendingEditorMessage, message);
-        }
+        preloadBridge.bufferEditorMessage(message);
         return;
       case `close-editor`:
         hasActiveEditor = false;
         siteAnnotationRequests?.clear();
-        pendingEditorMessage = deps.reducePendingEditorMessage(pendingEditorMessage, message);
+        preloadBridge.bufferEditorMessage(message);
         return;
     }
-  };
-
-  const createBridge = () => {
-    const initialState = state;
-    bufferedSync = null;
-    return {
-      initialState,
-      subscribeToSiteAnnotationRequests: siteAnnotationRequests?.subscribe,
-      getAnnotationControlTargets: () => controlsRegistry?.getTargets() ?? [],
-      getAnnotationControls(target: any) {
-        return state.canUseSiteAnnotationApi ? controlsRegistry?.getControls(target) : undefined;
-      },
-      sendMessageToHost(message: any) {
-        if (message.type === `browser-sidebar-runtime-open-editor` || message.type === `browser-sidebar-runtime-open-design-editor`) {
-          hasActiveEditor = true;
-        } else if (message.type === `browser-sidebar-runtime-cancel-editor` || message.type === `browser-sidebar-runtime-exit-comment-mode`) {
-          hasActiveEditor = false;
-          siteAnnotationRequests?.clear();
-        }
-        deps.ipcRenderer.invoke(deps.channels.runtime, message);
-      },
-      subscribeToHostMessages(listener: (message: any) => void) {
-        hasMountedSubscriber = true;
-        const mountedHandler = (_event: any, message: any) => {
-          const action = deps.getMountedMessageAction(message.type);
-          if (action === `sync`) listener({ ...message, canUseSiteAnnotationApi: state.canUseSiteAnnotationApi });
-          else if (action === `forward`) listener(message);
-        };
-        deps.ipcRenderer.on(deps.channels.hostMessage, mountedHandler);
-        if (bufferedSync != null) {
-          listener(bufferedSync);
-          bufferedSync = null;
-        }
-        if (pendingTextSelection) {
-          listener({ type: `browser-sidebar-runtime-capture-text-selection` });
-          pendingTextSelection = false;
-        }
-        if (pendingEditorMessage != null) {
-          listener(pendingEditorMessage);
-          pendingEditorMessage = null;
-        }
-        return () => {
-          hasMountedSubscriber = false;
-          deps.ipcRenderer.removeListener(deps.channels.hostMessage, mountedHandler);
-        };
-      },
-    };
   };
 
   const mount = () => {
@@ -164,7 +124,8 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     mountStarted = true;
     deps.loadCommentRuntime().then(({ mountBrowserCommentRuntime }) => {
       if (destroyed) return;
-      mountedRuntime = mountBrowserCommentRuntime(createBridge());
+      preloadBridge.prepareMount();
+      mountedRuntime = mountBrowserCommentRuntime(preloadBridge.bridge);
       mountedRuntime.setSiteAnnotationPreview(pendingPreview);
       pendingPreview = null;
     });
@@ -189,7 +150,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
         canUseSiteAnnotationApi: state.canUseSiteAnnotationApi === true,
         canUseTweaks: state.canUseTweaks === true,
         isAgentControllingBrowser: state.isAgentControllingBrowser,
-        hasActiveEditor: hasActiveEditor || pendingEditorMessage != null,
+        hasActiveEditor: hasActiveEditor || preloadBridge.hasPendingEditorMessage,
       }),
     });
     featureObserver = deps.createFeatureObserver((features) => {
@@ -231,8 +192,6 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     deps.windowLike.removeEventListener(`DOMContentLoaded`, mount);
     deps.ipcRenderer.removeListener(deps.channels.hostMessage, handleHostMessage);
     mountedRuntime?.dispose();
-    pendingEditorMessage = null;
-    bufferedSync = null;
   };
 
   const initialize = () => {
