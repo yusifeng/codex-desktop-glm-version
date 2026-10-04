@@ -6,6 +6,9 @@ Total scripts: 743.
 
 ## Recent semantic extraction suites
 
+- [`test-app-initial-configuration-query-key.mjs`](./test-app-initial-configuration-query-key.mjs)
+- [`test-worker-git-session-error-policy.mjs`](./test-worker-git-session-error-policy.mjs)
+
 - [`test-preload-annotation-viewport-state.mjs`](./test-preload-annotation-viewport-state.mjs)
 
 - [`test-preload-annotation-viewport.mjs`](./test-preload-annotation-viewport.mjs)

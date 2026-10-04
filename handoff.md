@@ -649,6 +649,9 @@ Git sparse pathspec 不支持错误的 fallback 判定已迁移至
 `git add` 重试编排与文件系统副作用。
 同一模块现同时负责 `git add` 失败结果的稳定构造，focused assertions 扩展至 5 项，
 覆盖错误分类及结果字段。
+Git/session 的工作目录权限错误与 Git 超时判定已迁移至
+`src/main/worker/git-session-error-policy.ts`，由 6 项 focused assertions 覆盖；入口继续负责
+session 生命周期和实际 Git 调用。
 worker 终端编辑器行列参数与 macOS Terminal/Kitty/Ghostty/iTerm2 启动命令生成已迁移至
 `src/main/worker/terminal-open-policy.ts`；入口保留 `$EDITOR` 探测、进程执行和 fallback，
 新增 11 项 focused assertions。
