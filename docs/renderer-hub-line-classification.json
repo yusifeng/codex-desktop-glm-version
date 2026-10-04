@@ -543,5 +543,17 @@
     "classification": "generated-local-account-access-runtime",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The runtime composes account-access state and generated UI for the neighboring route; ownership remains local to that surface."
+  },
+  {
+    "hub": "app-primary", "alias": "R", "sourceSymbol": "K7", "startLine": 113768, "endLine": 113771,
+    "classification": "generated-local-follow-up-portal-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers the follow-up suggestion portal context dependencies before the adjacent provider mounts. Its registration order is local lifecycle glue with no separately named renderer consumer or teardown contract."
+  },
+  {
+    "hub": "app-primary", "alias": "P", "sourceSymbol": "X7", "startLine": 113807, "endLine": 113830,
+    "classification": "generated-local-home-announcements-lazy-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer installs the lazy HomeComposerAnnouncements loader and its generated dependency map for the neighboring home-composer route. Loader ownership and error propagation are route-local and do not form an independent renderer contract."
   }
 ]

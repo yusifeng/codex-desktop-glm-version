@@ -616,3 +616,8 @@ unconsumed surface。
 renderer named consumer 或可安全转移的 teardown 边界；因此登记为 generated-local
 projection/state helpers 并保留在聚合 hub。分类记录、source symbol 和精确行范围由
 hub audit 校验，focused suite 已锁定 10 个 alias 仍属于 unconsumed surface。
+本轮补充 app-primary 的 follow-up portal 与 home announcements 生命周期证据：`K7`
+（公开别名 `R`，113768--113771 行）注册 follow-up suggestion portal provider 的局部依赖；
+`X7`（公开别名 `P`，113807--113830 行）注册 HomeComposerAnnouncements 的懒加载器。
+两者均由相邻 route/provider 生命周期独占，没有独立 renderer named consumer 或 teardown 契约，
+因此继续保留在聚合 hub；行范围、source symbol 与分类由 hub audit 机器校验。
