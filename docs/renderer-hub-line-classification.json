@@ -258,5 +258,15 @@
     "hub": "app-primary", "alias": "Tc", "sourceSymbol": "OVe", "startLine": 31465, "endLine": 31471,
     "classification": "generated-local-device-onboarding-predicate", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The predicate decides whether the adjacent generated device-onboarding announcement should be shown from pending/idle state, prior detection, and detected/connected status. Its state vocabulary is owned by the neighboring EVe/DVe signal transitions and has no independent renderer consumer or teardown boundary."
+  },
+  {
+    "hub": "app-primary", "alias": "Oc", "sourceSymbol": "CVe", "startLine": 31416, "endLine": 31426,
+    "classification": "generated-local-ads-lazy-loader", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The async adapter resolves the generated ChatGPT ads placement chunk through the bundler dependency map. It is a hub-local lazy-loading boundary with no named renderer consumer or independent ownership beyond the adjacent ads surface."
+  },
+  {
+    "hub": "app-primary", "alias": "Dc", "sourceSymbol": "wVe", "startLine": 31428, "endLine": 31438,
+    "classification": "generated-local-ads-lazy-loader", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The async adapter resolves the generated ChatGPT ads hydration module and returns its hydrate function. The bundler dependency list and adapter shape are coupled to the neighboring ads integration, so there is no independent renderer lifecycle to extract."
   }
 ]
