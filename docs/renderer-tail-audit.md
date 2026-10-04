@@ -395,3 +395,11 @@ suite 另增加 consumer import 边界断言。
 `newerBoundary.status === "exhausted"` 时返回完整岛屿；否则返回 `null`。真实的
 `artifact-originating-turn` consumer 已切换语义导入，focused suite 覆盖完整、加载中、
 空历史和空输入四种边界。
+
+本轮将 app-primary 的跨 realm DOM 元素判定 `Jc`（内部 `fW`）迁为
+`src/renderer/app-primary/runtime/is-element.ts` 的 `isElement`。实现优先使用元素所属
+window 的 `HTMLElement`/`Node` 构造器，并保留 nodeType、ownerDocument、tagName 与
+`getBoundingClientRect` 的 fallback 契约，因此 iframe/shadow document 中的元素不会因
+host realm 不同而误判。`tweaks-toolbar-view` 已切换到语义导入，原 hub 仍保留
+`Jc` 以兼容其他聚合边。`scripts/test-app-primary-is-element.mjs` 覆盖 null/空对象、
+跨 realm 形状、文本节点拒绝及 consumer import 边界共 4 项断言。

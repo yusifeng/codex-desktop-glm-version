@@ -19,7 +19,8 @@ import {
 // @ts-expect-error The compressed toolbar dependencies are registered centrally.
 import { Gg as Coachmark, Kg as initializeCoachmark, _p as DiscardIcon, vp as ExitIcon } from "@rchunk/app-initial";
 // @ts-expect-error The compressed toolbar dependencies are registered centrally.
-import { Jc as isElement, cs as AnnotationIcon, ls as ScreenshotIcon, qc as initializeElementPredicates } from "@rchunk/app-primary";
+import { cs as AnnotationIcon, ls as ScreenshotIcon, qc as initializeElementPredicates } from "@rchunk/app-primary";
+import { isElement } from "../app-primary/runtime/is-element";
 
 interface KeyboardLikeEvent {
   altKey: boolean;
