@@ -773,6 +773,10 @@ base/head 文件并行读取、1 MiB/UTF-8/NUL 安全限制，以及按 host 的
 `src/main/shared/elicitation-protocol.ts`；`misc-runtime` 仅保留兼容 re-export，
 URL 安全校验、browser auth、OpenAI form、tool suggestion 与 MCP tool call 形状由
 `scripts/test-worker-elicitation-protocol.mjs` 的 6 项断言覆盖。
+
+Git sparse pathspec 的不支持错误分类与 `git add` 失败结果构造已迁移至
+`src/main/worker/git-pathspec-policy.ts`；入口仍保留重试编排，
+`scripts/test-worker-git-pathspec-policy.mjs` 覆盖 5 项错误分类/结果字段断言。
 ### 增量抽取：Linux terminal 参数策略
 
 Linux 终端命令到工作目录参数的纯映射（含 shell fallback 命令拼接与安全 quoting）已迁移至
