@@ -154,6 +154,7 @@ const { dispatchWorktreeSnapshotRead } = require("./worker/git-worktree-snapshot
 const { dispatchWorktreeResolutionRequest } = require("./worker/git-worktree-resolution-dispatch");
 const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch");
 const { dispatchGitCoreRequest } = require("./worker/git-core-request-dispatch");
+const { getGitInitWatchKey: getSemanticGitInitWatchKey } = require("./worker/git-init-watcher-policy");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -70872,7 +70873,7 @@ var I6 = kW(`git`),
         : (this.unwatchRepo(r.root, t, { emitEvent: !1 }), !1);
     }
     getGitInitWatchKey(e, t) {
-      return `${h1(t)}|${e}`;
+      return getSemanticGitInitWatchKey(h1(t), e);
     }
     disposeGitInitWatcher(e, t) {
       (e == null || t == null || this.desiredGitInitWatchKey === this.getGitInitWatchKey(e, t)) &&

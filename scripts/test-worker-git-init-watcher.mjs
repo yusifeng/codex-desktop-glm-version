@@ -7,6 +7,8 @@ const { GitInitWatcher } = require(
   "../app/.vite/build/worker/git-init-watcher.js",
 );
 const {
+  getGitInitWatchKey,
+  getGitInitWatchTransition,
   isGitInitWatchSetReady,
   nextGitInitReconnectDelay,
   shouldReconnectGitInitWatch,
@@ -25,6 +27,10 @@ const deepEqual = (...args) => {
 equal(shouldReconnectGitInitWatch("connection-closed"), true);
 equal(shouldReconnectGitInitWatch("watch-error"), true);
 equal(shouldReconnectGitInitWatch("disposed"), false);
+equal(getGitInitWatchKey("local", "/repo"), "local|/repo");
+deepEqual(getGitInitWatchTransition(null, "local|/repo"), { changed: true, disposePrevious: false });
+deepEqual(getGitInitWatchTransition("local|/repo", "local|/repo"), { changed: false, disposePrevious: false });
+deepEqual(getGitInitWatchTransition("local|/repo", "ssh|/repo"), { changed: true, disposePrevious: true });
 equal(nextGitInitReconnectDelay(250, 1000), 500);
 equal(nextGitInitReconnectDelay(800, 1000), 1000);
 const rootSession = {};
