@@ -93,5 +93,10 @@
     "hub": "app-primary", "alias": "$g", "sourceSymbol": "tke", "startLine": 3443, "endLine": 3445,
     "classification": "generated-local-helper", "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The CSS capability predicate detects var() and color-mix() tokens for the adjacent generated color pipeline; it has no independent renderer import or lifecycle boundary, so preserving the coupled helper avoids creating an unowned styling facade."
+  },
+  {
+    "hub": "app-primary", "alias": "$a", "sourceSymbol": "mQe", "startLine": 51476, "endLine": 51518,
+    "classification": "generated-local-react-surface", "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The slash-command pin surface resolves localized title/description and registers a Pin chat command through the adjacent composer runtime; it is rendered only by the local chat-route branch and has no independent renderer named consumer or lifecycle boundary, so preserving the coupled generated React surface avoids an unowned facade."
   }
 ]

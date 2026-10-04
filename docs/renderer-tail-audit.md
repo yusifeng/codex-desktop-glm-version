@@ -569,3 +569,10 @@ default-branch RPC、live-query 与 cache runtime，明确拥有 hub 初始化�
 表达式。该 helper 没有独立 renderer named consumer 或 lifecycle 边界，因此登记为
 `generated-local-helper` 并保留聚合 hub，避免制造无主 styling facade。分类记录由
 `scripts/audit-renderer-hub-classification.mjs` 校验 source symbol 与精确行范围。
+
+本轮继续补齐 app-primary 的 slash-command pin React surface 逐行证据：`mQe`（公开别名 `$a`，
+51476--51518 行）解析本地化标题/描述并注册 Pin chat 命令，只由相邻 chat-route
+分支渲染，未形成独立 renderer named consumer 或生命周期边界。因此登记为
+`generated-local-react-surface` 并保留聚合 hub，避免复制 composer runtime 与 React
+初始化契约；分类记录由 `scripts/audit-renderer-hub-classification.mjs` 校验 source
+symbol 与精确行范围。
