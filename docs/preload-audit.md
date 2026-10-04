@@ -529,3 +529,11 @@ agent 控制清理，共 7 项行为断言。
 `annotation-runtime.ts` 仅保留兼容 re-export；该边界不改变事件副作用或 React/UI 编排，
 由 `scripts/test-preload-annotation-event-details.mjs` 覆盖 range/open-request 投影、
 own-property 防原型污染读取与空 detail 回退，共 6 项断言。
+
+### 增量抽取：annotation metadata tooltip projection
+
+annotation hover metadata tooltip 的 tag、size、color、font 行投影已迁移至
+`src/main/browser-page-preload/annotation-metadata-tooltip.ts`；React surface 仅保留
+本地化文案、布局与 DOM 渲染，`Nv` 组件通过语义模块消费稳定行模型。由
+`scripts/test-preload-annotation-metadata-tooltip.mjs` 覆盖空快照、行顺序、值保留与
+存在性判定，共 5 项断言。

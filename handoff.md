@@ -842,3 +842,8 @@ Annotation design-editor state projection（原 `sy/cy`）已迁移至
 declaration/text/provenance/target-label/viewport 投影由纯协调器负责，DOM snapshot、control
 读取与 React render assembly 仍由入口注入或保留。由
 `scripts/test-preload-annotation-design-editor-state.mjs` 覆盖 6 项 focused assertions。
+
+Annotation metadata tooltip 的稳定行投影（原 React `Nv` 组件内联的 tag/size/color/font
+字段读取）已迁移至 `src/main/browser-page-preload/annotation-metadata-tooltip.ts`；入口仅
+保留本地化 label、布局和 DOM/React 渲染，并由
+`scripts/test-preload-annotation-metadata-tooltip.mjs` 覆盖 5 项 focused assertions。

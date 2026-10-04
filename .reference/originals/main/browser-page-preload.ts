@@ -6235,6 +6235,7 @@ var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annot
 var { createAnnotationPointerSelection } = require("./browser-page-preload/annotation-pointer-selection");
 var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
 var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annotation-display-anchors");
+var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
 annotationSerialization = createAnnotationSerialization({
@@ -23244,17 +23245,22 @@ function Mv({ commentNumber: e, markerPoint: t, onFocusEditor: n }) {
   });
 }
 function Nv({ snapshot: e, viewportScale: t, zoomFactor: n }) {
+  let r = projectAnnotationMetadataTooltipRows(e),
+    i = r.find((e) => e.kind === `tag`)?.value,
+    a = r.find((e) => e.kind === `size`)?.value,
+    o = r.find((e) => e.kind === `color`)?.value,
+    s = r.find((e) => e.kind === `font`)?.value;
   return (0, Pv.jsxs)(`div`, {
     className: `element-metadata-tooltip`,
     style: _v(e.rect, { viewportScale: t, zoomFactor: n }),
     children: [
       (0, Pv.jsx)(`div`, {
         className: `element-metadata-cell element-metadata-tag`,
-        children: e.tagName,
+        children: i,
       }),
       (0, Pv.jsx)(`div`, {
         className: `element-metadata-cell element-metadata-value`,
-        children: e.size,
+        children: a,
       }),
       (0, Pv.jsx)(`div`, {
         className: `element-metadata-cell element-metadata-label`,
@@ -23266,7 +23272,7 @@ function Nv({ snapshot: e, viewportScale: t, zoomFactor: n }) {
       }),
       (0, Pv.jsx)(`div`, {
         className: `element-metadata-cell element-metadata-value`,
-        children: e.color,
+        children: o,
       }),
       (0, Pv.jsx)(`div`, {
         className: `element-metadata-cell element-metadata-label`,
@@ -23278,7 +23284,7 @@ function Nv({ snapshot: e, viewportScale: t, zoomFactor: n }) {
       }),
       (0, Pv.jsx)(`div`, {
         className: `element-metadata-cell element-metadata-value`,
-        children: e.font,
+        children: s,
       }),
     ],
   });
