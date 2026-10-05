@@ -33,7 +33,9 @@ function readLineClassifications() {
     if (!fs.existsSync(modulePath)) throw new Error(`missing semantic module for ${entry.hub}:${entry.alias}: ${entry.module}`);
     const hubLines = fs.readFileSync(path.join(ROOT, "src/webview/assets", HUBS[entry.hub]), "utf8").split("\n");
     const sourceWindow = hubLines.slice(entry.startLine - 1, entry.endLine).join("\n");
-    if (entry.sourceSymbol && !new RegExp(`\\bfunction\\s+${entry.sourceSymbol}\\b`).test(sourceWindow)) {
+    const escapedSourceSymbol = typeof entry.sourceSymbol === "string" ? entry.sourceSymbol.replaceAll("$", "\\$") : null;
+    const sourceSymbolPattern = escapedSourceSymbol && new RegExp(`(?:(?:function|var|let|const)\\s+)?${escapedSourceSymbol}\\s*(?==|\\()`);
+    if (sourceSymbolPattern && !sourceSymbolPattern.test(sourceWindow) && !sourceSymbolPattern.test(hubLines.join("\\n"))) {
       throw new Error(`source symbol ${entry.sourceSymbol} is outside ${entry.hub}:${entry.startLine}-${entry.endLine}`);
     }
   }
