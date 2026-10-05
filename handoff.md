@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation metadata 序列化后的 UTF-8 byte quota 判定纯策略已抽至
+`src/main/browser-page-preload/annotation-byte-quota-policy.ts`；control payload adapter 仅保留
+schema 清洗与 JSON 编排。新增 `scripts/test-preload-annotation-byte-quota-policy.mjs` 覆盖 3 项
+ASCII、中文边界与超额断言；原 annotation runtime 回归 45 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation hit name 的 trim 非空、长度与安全文本约束纯策略已抽至
 `src/main/browser-page-preload/annotation-name-policy.ts`；control payload adapter 仅保留 clone、
 schema 清洗与 response 编排。新增 `scripts/test-preload-annotation-name-policy.mjs` 覆盖 3 项合法、
@@ -1661,3 +1666,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：repository index stat 的 mtime 到稳定 `lastModified` 响应投影（有限数值保留、缺失/异常归零）已迁移至 `src/main/worker/git-index-info-policy.ts`；index info 入口保留 git-dir/stat 查询与异常日志副作用。新增 `scripts/test-worker-git-index-info-policy.mjs` 覆盖 5 项 focused assertions；原回归 10 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：Git process telemetry 的 exit code bucket（null、1/2/128/129 与 other）映射已迁移至 `src/main/worker/git-exit-code-policy.ts`；observability 保留命令计数与 telemetry 编排。新增 `scripts/test-worker-git-exit-code-policy.mjs` 覆盖 7 项 focused assertions；原 observability 回归 99 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：observability 的 mutating request kind/source 分类集合已迁移至 `src/main/worker/git-mutation-classification-policy.ts`；observability 保留 telemetry 聚合与命令统计编排。新增 `scripts/test-worker-git-mutation-classification-policy.mjs` 覆盖 5 项 focused assertions；原 observability 回归 99 项、build 与 typecheck 已通过。
