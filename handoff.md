@@ -5,6 +5,11 @@
 对 `bootstrap/protocol/app-protocol.js` 的历史路径 facade。已用临时独立 Electron profile 实测主窗口 frame
 加载与 app-server `initialize_handshake_result` 均成功；`npm run build`、`verify`、`typecheck` 通过。
 
+2026-10-06 A3 继续批次：IAB session boundary 补齐 `session_id` 请求别名归一化与空 session 拒绝；
+`IabSessionRoute` 显式声明可选 `session_id`，新增 `scripts/test-main-iab-api-boundary.mjs` 两项
+focused assertions（总计 7 项）。IAB 生命周期与真实 backend consumer 未扩张；build、focused test 与
+typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation metadata 序列化后的 UTF-8 byte quota 判定纯策略已抽至
 `src/main/browser-page-preload/annotation-byte-quota-policy.ts`；control payload adapter 仅保留
 schema 清洗与 JSON 编排。新增 `scripts/test-preload-annotation-byte-quota-policy.mjs` 覆盖 3 项
@@ -1810,4 +1815,4 @@ typecheck 均通过。
 2026-10-06 A5 逐段复核：app-shared 导出 `r`（source `POt`，122541-122545）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `t`（source `IOt`，122572-122576）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `_`（source `bOt`，122328-122332）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
-2026-10-06 A3 继续批次：IAB API 真实边界已补齐 constructor/options、`ping`、browser session route 校验、request safe fields 与 metadata，并由 `scripts/test-main-iab-api-boundary.mjs` 覆盖 5 项断言；完整 CDP/tab/session 生命周期仍保留在类边界内，未伪拆成 facade。
+2026-10-06 A3 继续批次：IAB API 真实边界已补齐 constructor/options、`ping`、browser session route 校验（含 `session_id` 兼容字段）、request safe fields 与 metadata，并由 `scripts/test-main-iab-api-boundary.mjs` 覆盖 7 项断言；完整 CDP/tab/session 生命周期仍保留在类边界内，未伪拆成 facade。
