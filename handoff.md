@@ -45,6 +45,11 @@ typecheck 与 focused test 已通过。
 `scripts/test-app-primary-has-query-param-value.mjs` 覆盖 3 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `yh`（内部 `jke`，源码 4509--4511）的 beacon/action
+复合 key 纯格式化策略已迁移至 `src/renderer/app-primary/runtime/format-beacon-action-key.ts`；新增
+`scripts/test-app-primary-format-beacon-action-key.mjs` 覆盖 2 项 focused assertions，typecheck 与
+focused test 已通过。
+
 2026-10-05 构建/启动回归修复：main-app transform-only 输出统一补齐 Node ESM 的 `.js` 相对导入，并将
 `@chunk/*` 改写为实际 chunk 相对路径；bootstrap vendor 兼容导出改用稳定局部绑定，补回 preserved main
 对 `bootstrap/protocol/app-protocol.js` 的历史路径 facade。已用临时独立 Electron profile 实测主窗口 frame
@@ -1879,6 +1884,8 @@ typecheck 均通过。
 2026-10-06 A1 T1 继续批次：Worktree 创建的 resolved/configured local-environment path 优先级与空值投影已迁移至 `src/main/worker/git-worktree-environment-policy.ts`；create runtime 仍保留异步解析、Git config 写入和 setup 副作用。新增 `scripts/test-worker-git-worktree-environment-policy.mjs` 覆盖 4 项 focused assertions。
 
 2026-10-06 A1 T1 继续批次：Worktree setup script 的 failed/error fallback 文案投影已迁移至 `src/main/worker/git-worktree-setup-policy.ts`；setup runtime 仍保留配置读取、脚本执行、日志与 shell-environment I/O。新增 `scripts/test-worker-git-worktree-setup-policy.mjs` 覆盖 5 项 focused assertions。
+
+2026-10-06 A1 T1 继续批次：Setup 输出的 shell-environment remove/write 分支判定已迁移至 `src/main/worker/git-worktree-shell-environment-policy.ts`；runtime 仅保留持久化 I/O。新增 `scripts/test-worker-git-worktree-shell-environment-policy.mjs` 覆盖 4 项 focused assertions。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
