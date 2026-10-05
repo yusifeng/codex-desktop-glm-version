@@ -7,19 +7,7 @@ function createAnnotationProtocol({ object, string, unknown, number, boolean, en
   enumValues: (values: string[]) => any;
   metadataLimits: unknown;
 }) {
-  const channels = {
-    requestEvent: `codex:annotation-surface-request`,
-    responseEvent: `codex:annotation-surface-response`,
-    removeEvent: `codex:annotation-surfaces-remove`,
-    availableEvent: `codex:annotation-surface-available`,
-    busySlot: `codex:annotation-surface-pending`,
-    deadlineMs: 250,
-    maxPayloadLength: 8192,
-    maxIdLength: 128,
-    maxRoleLength: 64,
-    rolePattern: `^[a-z][a-z0-9-]*(?![\\s\\S])`,
-    metadataLimits,
-  };
+  const channels = createAnnotationProtocolChannels(metadataLimits);
   const id = string().min(1).max(channels.maxIdLength);
   const role = string().max(channels.maxRoleLength).regex(new RegExp(channels.rolePattern));
   const hit = object({
@@ -43,3 +31,4 @@ function createAnnotationProtocol({ object, string, unknown, number, boolean, en
 
 export { createAnnotationProtocol };
 if (typeof module !== `undefined`) module.exports = { createAnnotationProtocol };
+import { createAnnotationProtocolChannels } from "./annotation-protocol-channels";
