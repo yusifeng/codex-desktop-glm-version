@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git path status 的 porcelain 输出分类（tracked/untracked/ignored）已迁移至 `src/main/worker/git-path-status-policy.ts`；path-status 运行时保留 Git I/O、query/cache 与 repository 编排。新增 `scripts/test-worker-git-path-status-policy.mjs` 覆盖 3 项 focused assertions；原 path-status 回归 31 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git origin discovery 的候选目录去重与本地平台/path API 资格判定已迁移至 `src/main/worker/git-origin-discovery-policy.ts`；origin discovery 运行时保留 stat、Git metadata、origin 查询与失败告警编排。新增 `scripts/test-worker-git-origin-discovery-policy.mjs` 覆盖 8 项 focused assertions；原 origin-discovery 回归 11 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Git current-branch 的 HEAD/symbolic-HEAD 响应到 branch/detached/unknown 状态投影已迁移至 `src/main/worker/git-current-branch-policy.ts`；运行时保留 generation 重试、缓存失效与 Git I/O，并保持有效 HEAD 时不触发 symbolic 查询。新增 `scripts/test-worker-git-current-branch-policy.mjs` 覆盖 5 项 focused assertions；原 current-branch 回归 26 项、build 与 typecheck 已通过。

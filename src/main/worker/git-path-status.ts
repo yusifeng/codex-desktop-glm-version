@@ -6,6 +6,8 @@ type PathStatusDependencies = {
   runGit: (root: string, args: string[], host: any, options?: any) => Promise<any>;
 };
 
+import { parsePathStatusOutput } from './git-path-status-policy';
+
 const PATH_QUERY_CACHE_MS = 250;
 const NESTED_DIRECTORY_BATCH_SIZE = 8;
 
@@ -165,15 +167,7 @@ async function readPathStatus(
       ignoredPaths: [],
       gitRoot: repository.root,
     };
-  const trackedPaths: string[] = [];
-  const untrackedPaths: string[] = [];
-  const ignoredPaths: string[] = [];
-  result.stdout.split(`\0`).forEach((entry: string) => {
-    if (entry.length < 4) return;
-    if (entry.startsWith(`?? `)) untrackedPaths.push(entry.slice(3));
-    else if (entry.startsWith(`!! `)) ignoredPaths.push(entry.slice(3));
-    else trackedPaths.push(entry.slice(3));
-  });
+  const { trackedPaths, untrackedPaths, ignoredPaths } = parsePathStatusOutput(result.stdout);
   return {
     success: true,
     trackedPaths,
