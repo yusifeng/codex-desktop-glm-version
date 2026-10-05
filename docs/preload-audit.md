@@ -4,7 +4,7 @@
 
 Annotation design color normalization（原 `ws` 及 `Os`/`ks`/`As`/`js`，3863-4050
 业务工具段）已迁移至 `src/main/browser-page-preload/annotation-color-policy.ts`。该模块
-保留短/长 hex、rgb/rgba（含百分比通道）解析、通道裁剪与大写 hex 输出；入口 `ws`
+保留短/长 hex、rgb/rgba（含 alpha 百分比）解析、通道裁剪与大写 hex 输出；入口 `ws`
 通过窄委托接回，未知文本仍原样返回。`scripts/test-preload-annotation-color-policy.mjs`
 覆盖 5 项 focused assertions，原 annotation runtime 回归与 build/typecheck 均通过。
 
