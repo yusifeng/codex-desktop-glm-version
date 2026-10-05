@@ -1,3 +1,5 @@
+import { shouldDeferAnnotationMount, shouldSyncAnnotationPolicy } from "./annotation-preload-startup-policy";
+
 type AnnotationPreloadLifecycleDependencies = {
   ipcRenderer: any;
   windowLike: any;
@@ -13,10 +15,10 @@ type AnnotationPreloadLifecycleDependencies = {
 /** Installs the annotation preload listeners and starts its page-bound runtime. */
 function initializeAnnotationPreload(deps: AnnotationPreloadLifecycleDependencies) {
   deps.ipcRenderer.on(deps.channels.hostMessage, deps.handleHostMessage);
-  if (deps.globalLike.isSecureContext === true && deps.windowLike === deps.windowLike.top) {
+  if (shouldSyncAnnotationPolicy(deps.globalLike, deps.windowLike)) {
     deps.initializeFeatures(deps.ipcRenderer.sendSync(deps.channels.policy));
   }
-  if (deps.documentLike.readyState === `loading`) {
+  if (shouldDeferAnnotationMount(deps.documentLike)) {
     deps.windowLike.addEventListener(`DOMContentLoaded`, deps.mount, { once: true });
   } else {
     deps.mount();
