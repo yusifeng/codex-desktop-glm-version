@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/filter-remote-control-hosts.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { filterRemoteControlHosts } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const hosts = [{ id: 1, source: "remote-control" }, { id: 2, source: "wsl" }];
+assert.deepEqual(filterRemoteControlHosts(hosts), [hosts[0]]);
+assert.deepEqual(filterRemoteControlHosts([]), []);
+assert.deepEqual(filterRemoteControlHosts(null), []);
+console.log("app-shared filter remote control hosts: 3 assertions passed");

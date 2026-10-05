@@ -1750,3 +1750,5 @@ typecheck 均通过。
 2026-10-06 A5 T5 继续批次：app-shared 的 SSH host kind predicate 已迁移至 `src/renderer/app-shared/runtime/is-ssh-host-kind.ts`；新增 `scripts/test-app-shared-is-ssh-host-kind.mjs` 覆盖 3 项 focused assertions，并登记 `UU/IBe` 源码 64905-64907 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
 2026-10-06 A5 T5 继续批次：app-shared 的 managed host source 过滤策略已迁移至 `src/renderer/app-shared/runtime/filter-managed-hosts-by-source.ts`；新增 `scripts/test-app-shared-filter-managed-hosts-by-source.mjs` 覆盖 3 项 focused assertions，并登记 `LU/jBe` 源码 64887-64890 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-06 A5 T5 继续批次：app-shared 的 remote-control host 过滤策略已迁移至 `src/renderer/app-shared/runtime/filter-remote-control-hosts.ts`；新增 `scripts/test-app-shared-filter-remote-control-hosts.mjs` 覆盖 3 项 focused assertions，并登记 `IU/MBe` 源码 64890-64892 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
