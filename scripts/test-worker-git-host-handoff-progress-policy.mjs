@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createHostHandoffProgress } = require("../app/.vite/build/worker/git-host-handoff-progress-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.deepEqual(...a)};
+const events=[]; const state=createHostHandoffProgress((...event)=>events.push(event));
+eq(state.activeStep, null); state.progress("prepare", "started"); eq(state.activeStep, "prepare");
+state.progress("other", "completed"); eq(state.activeStep, "prepare"); state.failActive();
+eq(events, [["prepare","started"],["other","completed"],["prepare","failed"]]); eq(state.activeStep, null);
+state.failActive(); eq(events.length, 3); console.log(`${n} worker host handoff progress policy assertions passed`);

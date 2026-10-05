@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation mode toggle 的 destroyed/capability/agent-control/user-activation
+资格门禁已抽至 `src/main/browser-page-preload/annotation-mode-toggle-eligibility.ts`；command policy
+仅保留 envelope 投影与 clear-request 判定。新增
+`scripts/test-preload-annotation-mode-toggle-eligibility.mjs` 覆盖 3 项允许/销毁/无用户激活断言；
+原 mode-controller 回归 5 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation host message 的 forwarded 类型集合与判定纯策略已抽至
 `src/main/browser-page-preload/annotation-forwarded-message-policy.ts`；routing adapter 仅保留
 mounted/pre-mount action 选择。新增 `scripts/test-preload-annotation-forwarded-message-policy.mjs`
@@ -1549,3 +1555,5 @@ typecheck 均通过。
 2026-10-05 A1 继续批次：ignore discovery 的 Git config path 输出校验与已排序路径的 lower-bound 插入位置策略已迁移至 `src/main/worker/git-ignore-discovery-policy.ts`；运行时保留 config 查询、origin 解析及文件路径投影。新增 `scripts/test-worker-git-ignore-discovery-policy.mjs` 覆盖 3 项 focused assertions；build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：worker RPC request lifecycle 的 tracked/uncancelable 状态、启动前取消排队、运行中 abort 与 finish 清理协议已迁移至 `src/main/worker/git-request-lifecycle-policy.ts`；原 lifecycle 入口仅保留兼容转出。新增 `scripts/test-worker-git-request-lifecycle-policy.mjs` 覆盖 8 项 focused assertions；原 `test-git-request-lifecycle.mjs` 回归 11 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：host handoff progress 的 active-step 状态与 started/completed/failed 终态清理协议已迁移至 `src/main/worker/git-host-handoff-progress-policy.ts`；handoff 入口仅保留兼容转出。新增 `scripts/test-worker-git-host-handoff-progress-policy.mjs` 覆盖 6 项 focused assertions；原回归 `test-worker-git-host-handoff-progress.mjs` 10 项、build 与 typecheck 已通过。
