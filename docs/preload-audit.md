@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation adopted stylesheet target policy
+
+adoptedStyleSheets 目标容器判定（原 `tu`，5120-7259 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-adopted-stylesheet-target.ts`；入口保留兼容委托，
+维持 Document 与带 host 的 DocumentFragment 资格边界。新增 3 项 focused assertions，build
+与 typecheck 已通过。
+
 ### 增量抽取：annotation CSS highlight capability policy
 
 CSS Highlights API 能力探测（原 `eu`，5120-7259 业务工具段）已迁移至

@@ -5128,11 +5128,14 @@ function eu(e) {
 */
 }
 function tu(e) {
+  return canUseAnnotationAdoptedStyleSheets(e);
+/*
   return (
     `adoptedStyleSheets` in e &&
     (e.nodeType === Node.DOCUMENT_NODE ||
       (e.nodeType === Node.DOCUMENT_FRAGMENT_NODE && `host` in e))
   );
+*/
 }
 var nu = o(() => {});
 function ru(e, t, n) {
@@ -6177,6 +6180,7 @@ var { areAnnotationAnchorsEqual } = require("./browser-page-preload/annotation-a
 var { getAnnotationInverseViewportScale } = require("./browser-page-preload/annotation-viewport-scale");
 var { hasAnnotationComments, getAnnotationCommentCount } = require("./browser-page-preload/annotation-comment-count");
 var { supportsAnnotationCssHighlights } = require("./browser-page-preload/annotation-highlight-capability");
+var { canUseAnnotationAdoptedStyleSheets } = require("./browser-page-preload/annotation-adopted-stylesheet-target");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

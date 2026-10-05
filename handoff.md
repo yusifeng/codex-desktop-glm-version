@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation adoptedStyleSheets target predicate 已迁移至
+`src/main/browser-page-preload/annotation-adopted-stylesheet-target.ts`；原 `tu` 入口保留
+兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation CSS Highlights API capability predicate 已迁移至
 `src/main/browser-page-preload/annotation-highlight-capability.ts`；原 `eu` 入口保留兼容委托，
 新增 2 项 focused assertions，build 与 typecheck 已通过。
