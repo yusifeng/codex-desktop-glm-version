@@ -847,3 +847,6 @@ dispose 后隔离，避免异步 host 消息在 runtime 销毁后重新注入。
 销毁后拒绝新的 pointer down/move/up/cancel 与 selection 更新，同时保留内部重启拖拽时的临时清理。
 由 `scripts/test-preload-annotation-pointer-selection.mjs` 覆盖销毁后的调用门禁及重复 dispose，
 共 18 项 focused assertions。
+### 增量抽取：annotation element visibility policy
+
+Annotation element visibility 的 ancestor display/visibility/opacity gate 与 optional `checkVisibility` 判定（原 `_d`，5120-7259 业务工具段）已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；DOM/style 读取通过依赖注入。新增 3 项 focused assertions，build 与 typecheck 已通过。
