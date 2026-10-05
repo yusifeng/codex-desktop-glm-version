@@ -3,18 +3,12 @@ type ReviewPatchSectionDependencies = {
   maxConcurrency?: number;
 };
 
-const defaultMaxBytes = 64 * 1024 * 1024;
-const defaultMaxConcurrency = 8;
-
-function collectNonEmptySections(...groups: Array<Array<string | null | undefined>>) {
-  const sections: string[] = [];
-  for (const group of groups)
-    for (const section of group) {
-      const trimmed = section?.trim();
-      if (trimmed) sections.push(trimmed);
-    }
-  return sections;
-}
+import {
+  collectNonEmptySections,
+  defaultMaxBytes,
+  defaultMaxConcurrency,
+  resolvePatchSectionLimits,
+} from './git-review-patch-sections-policy';
 
 async function collectUntrackedDiffSections(
   readDiff: (path: string, signal: AbortSignal) => Promise<any>,
@@ -25,8 +19,7 @@ async function collectUntrackedDiffSections(
   if (!untrackedPaths.success) return { success: false, error: { type: `unknown` } };
 
   const paths = untrackedPaths.paths ?? [];
-  const maxBytes = dependencies.maxBytes ?? defaultMaxBytes;
-  const maxConcurrency = dependencies.maxConcurrency ?? defaultMaxConcurrency;
+  const { maxBytes, maxConcurrency } = resolvePatchSectionLimits(dependencies);
   const sections: string[] = [];
   const pending = Array<string | null | undefined>(paths.length).fill(undefined);
   let nextPathIndex = 0;

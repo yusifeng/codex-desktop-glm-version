@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review patch sections 的默认 byte/concurrency limits、section 非空归一化与 limit 投影已迁移至 `src/main/worker/git-review-patch-sections-policy.ts`；patch sections runtime 保留并发读取、顺序 flush、大小限制与错误编排。新增 `scripts/test-worker-git-review-patch-sections-policy.mjs` 覆盖 5 项 focused assertions；原 patch-sections 回归 15 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review metadata 的 untracked path 选择、omitted-file 投影与 metadata merge 纯策略已迁移至 `src/main/worker/git-review-metadata-policy.ts`；metadata utils 保留 diff 解析、rename/revision 与异步 I/O 编排。新增 `scripts/test-worker-git-review-metadata-policy.mjs` 覆盖 5 项 focused assertions；原 metadata-utils 回归 37 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation preview controller 的 mounted-preview disposer 与 terminal
