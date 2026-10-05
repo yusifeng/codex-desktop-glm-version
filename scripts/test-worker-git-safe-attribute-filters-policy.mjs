@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { baseAttributeOverrides, createSafeAttributeFilterOverrides, filterConfigPattern, parseFilterDriverName } = require("../app/.vite/build/worker/git-safe-attribute-filters-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+equal(filterConfigPattern, "^filter\\..*\\.(clean|smudge|process|required)$");
+deepEqual(baseAttributeOverrides, ["-c", "attr.tree=", "-c", "core.attributesFile="]);
+equal(parseFilterDriverName("filter.lfs.clean"), "lfs");
+equal(parseFilterDriverName("core.editor"), null);
+deepEqual(createSafeAttributeFilterOverrides("filter.lfs.clean\nfilter.lfs.smudge\nfilter.foo.process"), ["-c", "attr.tree=", "-c", "core.attributesFile=", "-c", "filter.lfs.clean=", "-c", "filter.lfs.smudge=", "-c", "filter.lfs.process=", "-c", "filter.lfs.required=false", "-c", "filter.foo.clean=", "-c", "filter.foo.smudge=", "-c", "filter.foo.process=", "-c", "filter.foo.required=false"]);
+console.log(`${assertions} worker git safe attribute filters policy assertions passed`);

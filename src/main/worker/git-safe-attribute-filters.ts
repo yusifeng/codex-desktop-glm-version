@@ -15,33 +15,7 @@ type SafeAttributeFilterDependencies = {
   staleTime: number;
 };
 
-const filterConfigPattern = `^filter\\..*\\.(clean|smudge|process|required)$`;
-const baseAttributeOverrides = [`-c`, `attr.tree=`, `-c`, `core.attributesFile=`];
-
-function parseFilterDriverName(configKey: string) {
-  return /^filter\.(.+)\.(?:clean|smudge|process|required)$/.exec(configKey)?.[1] ?? null;
-}
-
-function createSafeAttributeFilterOverrides(configOutput: string) {
-  const driverNames = new Set<string>();
-  for (const line of configOutput.split(/\r?\n/)) {
-    const name = parseFilterDriverName(line.trim());
-    if (name != null) driverNames.add(name);
-  }
-  return [
-    ...baseAttributeOverrides,
-    ...[...driverNames].flatMap((name) => [
-      `-c`,
-      `filter.${name}.clean=`,
-      `-c`,
-      `filter.${name}.smudge=`,
-      `-c`,
-      `filter.${name}.process=`,
-      `-c`,
-      `filter.${name}.required=false`,
-    ]),
-  ];
-}
+import { baseAttributeOverrides, createSafeAttributeFilterOverrides, filterConfigPattern, parseFilterDriverName } from './git-safe-attribute-filters-policy';
 
 async function getSafeAttributeFilterOverrides(
   repository: any,

@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git safe attribute filter 的 filter driver 解析、基础 attribute overrides 与安全清理 override 构造已迁移至 `src/main/worker/git-safe-attribute-filters-policy.ts`；safe-filter runtime 保留 query/cache、Git config I/O、generation invalidation 与 signal 编排。新增 `scripts/test-worker-git-safe-attribute-filters-policy.mjs` 覆盖 5 项 focused assertions；原 safe-filter 回归 18 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation display selections 的稳定 selection-key 投影已抽至
+`src/main/browser-page-preload/annotation-selection-display-key.ts`；display projector 仅保留
+resolve/clip/class 与 source-index 编排。新增 `scripts/test-preload-annotation-selection-display-key.mjs`
+覆盖 2 项 element/region key 断言；原 display-selections 回归 7 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git stable metadata request 的 Git-init watcher ensure/dispose/none 动作判定已迁移至 `src/main/worker/git-stable-metadata-policy.ts`；request handler 保留 stable metadata I/O、watcher side effects 与 result encoding。新增 `scripts/test-worker-git-stable-metadata-policy.mjs` 覆盖 6 项 focused assertions；原 request-handler 回归 3 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation marker view 的共享非 element anchor 基础投影已抽至
