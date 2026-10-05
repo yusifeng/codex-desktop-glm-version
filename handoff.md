@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A5 继续批次：逐行核对 app-primary markdown 编辑器附近的三条生成边界：
+`oPe`（公开别名 `Cu`，21878--21892）magic-selection 文档切片与 marker offset、`sPe`
+（公开别名 `Su`，21898--21900）Markdown 文件 stem 归一化、`cPe`（公开别名 `bu`，
+21901--21912）浅层 heading 投影。三者均无独立 renderer named consumer 或 teardown owner，
+已登记 generated-local 分类；`docs/renderer-hub-line-classification.json` reviewedCount
+提升至 185，audit 与 focused hub classification 验证通过。
+
 2026-10-05 A1 继续批次：Git apply-patch 的纯解析边界（patch 输出结果路径分类与 diff
 路径提取）已迁移至 `src/main/worker/git-apply-patch-policy.ts`；apply 入口仅保留仓库、临时
 index、Git I/O 与清理副作用，兼容导出继续接回。新增
@@ -1098,3 +1105,8 @@ marker 与 selection 清理判定；`annotation-sync-state.ts` 接回该策略�
 `src/main/worker/git-worktree-list-request-handler.ts` 独立承载；入口继续负责请求 envelope、取消
 与 Git I/O 生命周期。新增 `scripts/test-worker-git-worktree-list-request-handler.mjs`，覆盖存在/缺失
 repository、参数与 signal 透传，共 5 项 focused assertions。
+
+2026-10-05 A2 继续批次：annotation overlay runtime 按 root host 的 element cache 与统一 dispose
+清理已迁移至 `src/main/browser-page-preload/annotation-element-cache.ts`；新增
+`scripts/test-preload-annotation-element-cache.mjs`，覆盖缓存复用/隔离、销毁清理及销毁后
+新缓存边界，共 9 项 focused assertions。

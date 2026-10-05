@@ -2,6 +2,7 @@ import { collectAnnotationFlexGapOverlays } from "./annotation-flex-gap-overlays
 import { observeAnnotationMutationsOutsideOverlay } from "./annotation-overlay-observer";
 import { shouldSuppressAnnotationRegionOverlay } from "./annotation-overlay-policies";
 import { resolveAnnotationSelectionRects } from "./annotation-selection-rects";
+import { createAnnotationElementCacheRegistry } from "./annotation-element-cache";
 
 type AnnotationOverlayRuntimeDependencies = {
   documentLike: any;
@@ -32,9 +33,7 @@ type AnnotationOverlayRuntimeDependencies = {
 };
 
 function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependencies) {
-  const elementCaches = new WeakMap<object, Map<any, any>>();
-  const cacheSets = new Set<Map<any, any>>();
-  let disposed = false;
+  const elementCacheRegistry = createAnnotationElementCacheRegistry();
 
   const ensureOverlayRoot = () => {
     const existing = deps.documentLike.getElementById(deps.rootId);
@@ -78,20 +77,11 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
     deps.samePageUrl(annotation.anchor.pageUrl, deps.windowLike.location.href);
 
   const getElementCache = (rootHost: object) => {
-    if (disposed) return new Map<any, any>();
-    const existing = elementCaches.get(rootHost);
-    if (existing != null) return existing;
-    const cache = new Map<any, any>();
-    elementCaches.set(rootHost, cache);
-    cacheSets.add(cache);
-    return cache;
+    return elementCacheRegistry.get(rootHost);
   };
 
   const dispose = () => {
-    if (disposed) return;
-    disposed = true;
-    for (const cache of cacheSets) cache.clear();
-    cacheSets.clear();
+    elementCacheRegistry.dispose();
   };
 
   const observeMutationsOutsideOverlay = (documentLike: any, rootHost: any, onChange: () => void) => {

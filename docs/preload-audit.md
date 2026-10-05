@@ -636,3 +636,11 @@ preload runtime 跨回调共享的 `destroyed`、permission、site feature capab
 状态并提供隔离 snapshot；runtime 继续负责 feature/runtime/DOM 副作用编排。由
 `scripts/test-preload-annotation-preload-state.mjs` 覆盖默认状态、状态更新、snapshot 隔离与
 销毁复位，共 12 项 focused assertions。
+
+### 增量抽取：annotation overlay element-cache lifecycle
+
+overlay runtime 按 root host 维护的 element cache 及其 dispose 清理边界已迁移至
+`src/main/browser-page-preload/annotation-element-cache.ts`。模块负责缓存复用、统一清空与
+销毁后隔离新缓存；overlay runtime 继续注入 DOM 解析和渲染副作用。由
+`scripts/test-preload-annotation-element-cache.mjs` 覆盖 host 复用、跨 host 隔离、dispose
+清理及销毁后访问，共 9 项 focused assertions。
