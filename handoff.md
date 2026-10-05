@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git status summary 的 porcelain `-z` 输出解析（staged/unstaged
+计数、rename/copy 前序路径与未跟踪过滤）已迁移至
+`src/main/worker/git-status-summary-policy.ts`；summary 运行时仅保留缓存、Git I/O 与
+query 生命周期编排。新增 `scripts/test-worker-git-status-summary-policy.mjs` 覆盖 4 项
+focused assertions；原 9 项 status-summary 回归继续验证完整生命周期。
+
 2026-10-05 A2 继续批次：annotation preview layer 的 teardown 终止边界已补齐；`dispose`
 现在幂等并将 layer 标记为终止态，迟到的 `update` 不再重建 clip/glow/mask 节点，避免
 pagehide 或异步 preview 回调在 runtime teardown 后重新挂载 DOM。`scripts/test-preload-annotation-preview-layer.mjs`

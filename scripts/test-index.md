@@ -8,6 +8,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-status-summary-policy.mjs`](./test-worker-git-status-summary-policy.mjs)
+
 - [`test-worker-git-review-working-tree-policy.mjs`](./test-worker-git-review-working-tree-policy.mjs)
 - [`test-worker-git-watch-acquire-policy.mjs`](./test-worker-git-watch-acquire-policy.mjs)
 - [`test-worker-git-review-section-policy.mjs`](./test-worker-git-review-section-policy.mjs)
