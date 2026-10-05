@@ -3975,19 +3975,6 @@ function Ts(e, t) {
 }
 function Es(e, t) {
   return annotationDesignStyles.buildAnnotationDesignStyleRule(e, t);
-/*
-  let n = e.declarations.filter((e) => e.value.trim() !== e.previousValue.trim());
-  return n.length === 0
-    ? []
-    : [
-        [
-          `[${t}~="${Ds(e.draftAttribute)}"] {`,
-          ...n.map((e) => `  ${e.property}: ${e.value} !important;`),
-          `}`,
-        ].join(`
-`),
-      ];
-*/
 }
 function Ds(e) {
   return annotationDesignStyles.escapeAnnotationDesignSelector(e);
