@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation comment-runtime 异步挂载失败后的生命周期边界已补齐；
+`annotation-runtime-mount` 在动态加载失败且页面未销毁时重置单次挂载闸门，允许后续重试，
+同时保持 pagehide/dispose 后的终态不可重挂载。`scripts/test-preload-annotation-runtime-mount.mjs`
+新增 transient-load-failure retry focused assertions；build check 与 focused test 已通过。
+
 2026-10-05 A1 继续批次：Git watcher acquire 的请求取消门禁与可复用 watcher
 选择判定已迁移至 `src/main/worker/git-watch-acquire-policy.ts`；acquire 入口仅保留
 watcher 引用计数、异步启动与 release 副作用，新增 `scripts/test-worker-git-watch-acquire-policy.mjs`

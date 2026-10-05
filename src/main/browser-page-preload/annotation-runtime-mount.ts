@@ -23,6 +23,11 @@ function createAnnotationRuntimeMount(deps: AnnotationRuntimeMountDependencies) 
       mountedRuntime = mountBrowserCommentRuntime(deps.bridge);
       mountedRuntime.setSiteAnnotationPreview(pendingPreview);
       pendingPreview = null;
+    }).catch(() => {
+      // A failed dynamic import must not permanently consume the one-shot
+      // guard.  Keep the mount retryable while the page is still alive;
+      // pagehide/dispose continues to make the lifecycle terminal.
+      if (!destroyed && mountedRuntime == null) mountStarted = false;
     });
   };
   const dispose = () => {

@@ -28,3 +28,27 @@ assert.equal(receivedPreview, null);
 controller.dispose();
 assert.equal(disposed, 1);
 console.log('test-preload-annotation-runtime-mount: 7 assertions passed');
+
+let attempts = 0;
+let retryMount;
+const retryController = createAnnotationRuntimeMount({
+  loadCommentRuntime: () => {
+    attempts++;
+    if (attempts === 1) return Promise.reject(new Error('transient load failure'));
+    return Promise.resolve({ mountBrowserCommentRuntime() {
+      retryMount = { setSiteAnnotationPreview() {}, dispose() {} };
+      return retryMount;
+    } });
+  },
+  prepareMount() {},
+  bridge: {},
+});
+retryController.mount();
+await Promise.resolve();
+await Promise.resolve();
+retryController.mount();
+await Promise.resolve();
+await Promise.resolve();
+assert.equal(attempts, 2);
+assert.ok(retryMount);
+console.log('test-preload-annotation-runtime-mount: transient failure retry assertions passed');
