@@ -1,5 +1,13 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation scroll-container equality policy
+
+Annotation anchor scroll-container 快照相等性判定（原 `Ns`，3863-5049 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-scroll-container-equality.ts`；入口保留兼容委托，
+对缺省列表、selector、scrollLeft/scrollTop 逐项比较。新增
+`scripts/test-preload-annotation-scroll-container-equality.mjs` 覆盖 3 项 focused assertions，
+build 已通过。
+
 ### 增量抽取：annotation tooltip position policy
 
 Annotation metadata tooltip 的 anchor/viewport 几何投影（原 `Ss`，3863-4050 业务工具段）已迁移至
