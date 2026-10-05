@@ -5,4 +5,7 @@ assert.match(output, /app-shared:/);
 assert.match(output, /app-initial:/);
 assert.match(output, /app-primary:/);
 assert.match(output, /UNREVIEWED: \d+/);
+const jsonOutput = execFileSync(process.execPath, ["scripts/audit-renderer-hub-manifest.mjs", "--json"], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }).trim().split("\n").at(-1);
+const manifest = JSON.parse(jsonOutput);
+for (const alias of ["Bg", "Pg"]) assert.equal(manifest.find((entry) => entry.hub === "app-primary" && entry.alias === alias)?.category, "preserved-coupled");
 console.log("renderer hub manifest: exhaustive category output verified");
