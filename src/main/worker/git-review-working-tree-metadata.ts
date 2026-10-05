@@ -6,6 +6,7 @@ import {
   parseBatchedUntrackedDiffMetadata,
   parseUntrackedDiffMetadata,
 } from './git-review-working-tree-metadata-policy';
+import { runBoundedWorkers } from './git-review-working-tree-worker-policy';
 
 const METADATA_WORKER_LIMIT = 8;
 const NO_INDEX_METADATA_WORKER_LIMIT = 8;
@@ -193,34 +194,12 @@ async function runMetadataWorkers(
   values: string[],
   callback: (value: string) => Promise<void>,
 ) {
-  let index = 0;
-  let failed = false;
-  let failure: Error | null = null;
-  const worker = async () => {
-    while (!failed) {
-      const value = values[index];
-      index += 1;
-      if (value == null) return;
-      try {
-        await callback(value);
-      } catch (error) {
-        if (!failed) {
-          failed = true;
-          failure =
-            error instanceof Error
-              ? error
-              : Error(`Review metadata worker failed`, { cause: error });
-        }
-      }
-    }
-  };
-  await Promise.all(
-    Array.from({ length: Math.min(METADATA_WORKER_LIMIT, values.length) }, () =>
-      worker(),
-    ),
+  return runBoundedWorkers(
+    values,
+    callback,
+    METADATA_WORKER_LIMIT,
+    `Review metadata worker failed`,
   );
-  if (failure != null)
-    throw Error(`Review metadata worker failed`, { cause: failure });
 }
 
 async function readUntrackedDiffMetadataBatch(
@@ -349,37 +328,12 @@ async function runNoIndexMetadataWorkers(
   values: string[],
   callback: (value: string) => Promise<void>,
 ) {
-  let index = 0;
-  let failed = false;
-  let failure: Error | null = null;
-  const worker = async () => {
-    while (!failed) {
-      const value = values[index];
-      index += 1;
-      if (value == null) return;
-      try {
-        await callback(value);
-      } catch (error) {
-        if (!failed) {
-          failed = true;
-          failure =
-            error instanceof Error
-              ? error
-              : Error(`Review no-index metadata worker failed`, {
-                  cause: error,
-                });
-        }
-      }
-    }
-  };
-  await Promise.all(
-    Array.from(
-      { length: Math.min(NO_INDEX_METADATA_WORKER_LIMIT, values.length) },
-      () => worker(),
-    ),
+  return runBoundedWorkers(
+    values,
+    callback,
+    NO_INDEX_METADATA_WORKER_LIMIT,
+    `Review no-index metadata worker failed`,
   );
-  if (failure != null)
-    throw Error(`Review no-index metadata worker failed`, { cause: failure });
 }
 
 async function getReviewWorkingTreeMetadata(

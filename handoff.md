@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：review working-tree metadata 的有界异步 worker 调度与首个失败
+传播已迁移至 `src/main/worker/git-review-working-tree-worker-policy.ts`；metadata runtime
+仅保留不同工作负载的并发上限与错误消息，新增 `scripts/test-worker-git-review-working-tree-worker-policy.mjs`
+覆盖顺序消费、并发上限与 cause 传播共 3 项 focused assertions。focused metadata 回归 55 项、build、verify 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：live-query worker 的 recent-branches 分页上限已迁移至
 `src/main/worker/git-live-query-limit-policy.ts`；handler 仅保留查询编排与 watcher 读取，
 新增 `scripts/test-worker-git-live-query-limit-policy.mjs` 覆盖默认值、上下界与正常值共 6 项
