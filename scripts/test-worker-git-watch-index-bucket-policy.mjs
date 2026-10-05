@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import * as esbuild from "esbuild";
+const source = await fs.readFile("src/main/worker/git-watch-index-bucket-policy.ts", "utf8");
+const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
+const module = { exports: {} }; new Function("module", "exports", code)(module, module.exports);
+const { getGitPerformanceRepoIndexSizeBucket } = module.exports;
+const pathModule = { sep: "/", relative(from, to) { if (from === "/repo" && to === "/repo") return ""; if (from === "/repo" && to === "/repo/packages/a") return "packages/a"; if (from === "/repo" && to === "/repo-other") return "../repo-other"; return "other"; } };
+const watches = [{ hostId: "remote", root: "/repo", repoIndexSizeBucket: "remote-bucket" }, { hostId: "local", root: "/repo", repoIndexSizeBucket: "local-bucket" }];
+assert.equal(getGitPerformanceRepoIndexSizeBucket(watches, "/repo", { id: "local", isLocal: true }, pathModule), "local-bucket");
+assert.equal(getGitPerformanceRepoIndexSizeBucket(watches, "/repo/packages/a", { id: "local", isLocal: true }, pathModule), "local-bucket");
+assert.equal(getGitPerformanceRepoIndexSizeBucket(watches, "/repo-other", { id: "local", isLocal: true }, pathModule), "unknown");
+assert.equal(getGitPerformanceRepoIndexSizeBucket(watches, "/repo", { id: "missing", isLocal: true }, pathModule), "unknown");
+console.log("worker Git watch index bucket policy tests passed (4 assertions)");

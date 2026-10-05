@@ -172,6 +172,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-language-server-command-trust.mjs`](./test-main-language-server-command-trust.mjs)
 - [`test-main-artifact-session-host-environment.mjs`](./test-main-artifact-session-host-environment.mjs)
 - [`test-worker-git-watch-index-bucket.mjs`](./test-worker-git-watch-index-bucket.mjs)
+- [`test-worker-git-watch-index-bucket-policy.mjs`](./test-worker-git-watch-index-bucket-policy.mjs)
 - [`test-app-initial-terminal-conversation-status.mjs`](./test-app-initial-terminal-conversation-status.mjs)
 - [`test-app-primary-format-annotation-summary.mjs`](./test-app-primary-format-annotation-summary.mjs)
 - [`test-preload-annotation-preview-controller.mjs`](./test-preload-annotation-preview-controller.mjs)

@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import * as esbuild from "esbuild";
 
-const source = await fs.readFile("src/main/worker/git-watch-index-bucket.ts", "utf8");
-const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
-const module = { exports: {} };
-new Function("module", "exports", code)(module, module.exports);
+const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-watch-index-"));
+const output = path.join(tempDir, "watch-index.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-watch-index-bucket.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { createRequire } = await import("node:module");
+const module = { exports: createRequire(import.meta.url)(output) };
 const { getGitPerformanceRepoIndexSizeBucket } = module.exports;
 const host = { id: "local", isLocal: true };
 const posix = { sep: "/", relative: (from, to) => {

@@ -931,6 +931,10 @@ watcher bucket，并对 host 不匹配或越界路径返回 `unknown`；入口�
 watcher 集合生命周期。`scripts/test-worker-git-watch-index-bucket.mjs` 覆盖同根、子路径、
 越界路径与 host 隔离，共 4 项断言。
 
+2026-10-06 增量：上述 host/root bucket 选择已物理迁移至
+`src/main/worker/git-watch-index-bucket-policy.ts`；兼容入口仅保留转出，新增 policy focused
+回归，watcher 集合与 telemetry 生命周期仍留在运行时。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至
