@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation controls registry 的记录表、弱引用 target 索引、总 target
+配额与终止态已抽至 `src/main/browser-page-preload/annotation-controls-registry-state.ts`；registry
+入口仅保留 DOM 事件、payload 解析与副作用适配，销毁后迟到的 register/update/remove 均被拒绝。
+新增 `scripts/test-preload-annotation-controls-registry-state.mjs` 覆盖 20 项 focused assertions；
+annotation registry 回归、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git synced-branch state 的 `--numstat` 输出解析与空 diff 统计
 已迁移至 `src/main/worker/git-synced-branch-state-policy.ts`；state runtime 仅保留 query、Git I/O、
 worktree 快照与 diff 编排。新增 `scripts/test-worker-git-synced-branch-state-policy.mjs` 覆盖 6 项

@@ -1,4 +1,7 @@
-type RegistryRecord = { controls: unknown; id: string; order: number; targets: WeakRef<object>[] };
+import {
+  createAnnotationControlsRegistryState,
+  type AnnotationControlsRegistryRecord as RegistryRecord,
+} from "./annotation-controls-registry-state";
 
 type RegistryDependencies = {
   documentRef: object;
@@ -23,17 +26,7 @@ type RegistryDependencies = {
 
 /** Owns the page-level annotation controls registry and its target index. */
 function createAnnotationControlsRegistry(deps: RegistryDependencies): { dispose(): void; getTargets(): object[]; getControls(target: object): unknown } {
-  const records = new Map<string, RegistryRecord>();
-  let targetIndex = new WeakMap<object, RegistryRecord[]>();
-  let totalTargets = 0;
-  let order = 0;
-
-  const attach = (record: RegistryRecord, targets: Set<object>) => {
-    totalTargets += deps.attachTargets(record, targets, targetIndex, record.order);
-  };
-  const detach = (record: RegistryRecord) => {
-    totalTargets -= deps.detachTargets(record, targetIndex);
-  };
+  const state = createAnnotationControlsRegistryState(deps);
   const register = (event: any) => {
     try {
       const detail = deps.readDetail(event);
@@ -41,14 +34,11 @@ function createAnnotationControlsRegistry(deps: RegistryDependencies): { dispose
       const id = deps.readField(detail, `id`);
       const payload = deps.readField(detail, `payload`);
       const rawTargets = deps.readField(detail, `targets`);
-      if (typeof id !== `string` || id.length === 0 || id.length > 80 || records.has(id) || records.size >= deps.maxControls) return;
+      if (typeof id !== `string` || id.length === 0 || id.length > 80) return;
       const controls = deps.parsePayload(payload);
       if (controls == null) return;
       const targets = deps.parseTargets(rawTargets);
-      if (targets == null || targets.size === 0 || records.has(id) || records.size >= deps.maxControls || totalTargets + targets.size > deps.maxTotalTargets) return;
-      const record: RegistryRecord = { controls, id, order: order++, targets: [] };
-      records.set(id, record);
-      attach(record, targets);
+      if (targets == null || !state.register(id, controls, targets)) return;
       event.preventDefault();
     } catch {}
   };
@@ -60,14 +50,12 @@ function createAnnotationControlsRegistry(deps: RegistryDependencies): { dispose
       const payload = deps.readField(detail, `payload`);
       const rawTargets = deps.readField(detail, `targets`);
       if (typeof id !== `string`) return;
-      const record = records.get(id);
+      const record = state.get(id);
       if (record == null) return;
       const targets = rawTargets === undefined ? undefined : deps.parseTargets(rawTargets);
       if (rawTargets !== undefined && targets == null) return;
       const controls = deps.parsePayload(payload, record.controls as Record<string, unknown>);
-      if (controls == null || (targets != null && totalTargets - record.targets.length + targets.size > deps.maxTotalTargets)) return;
-      record.controls = controls;
-      if (targets != null) { detach(record); attach(record, targets); }
+      if (controls == null || !state.update(id, controls, targets)) return;
       event.preventDefault();
     } catch {}
   };
@@ -77,17 +65,12 @@ function createAnnotationControlsRegistry(deps: RegistryDependencies): { dispose
       if (detail == null) return;
       const id = deps.readField(detail, `id`);
       if (typeof id !== `string`) return;
-      const record = records.get(id);
-      if (record == null) return;
-      records.delete(id);
-      detach(record);
+      if (!state.remove(id)) return;
       event.preventDefault();
     } catch {}
   };
   const dispose = () => {
-    records.clear();
-    targetIndex = new WeakMap();
-    totalTargets = 0;
+    if (!state.dispose()) return;
     deps.windowRef.removeEventListener(deps.registerEvent, register);
     deps.windowRef.removeEventListener(deps.updateEvent, update);
     deps.windowRef.removeEventListener(deps.disposeEvent, disposeRecord);
@@ -100,8 +83,8 @@ function createAnnotationControlsRegistry(deps: RegistryDependencies): { dispose
   deps.windowRef.addEventListener(deps.pagehideEvent, onPagehide);
   return {
     dispose,
-    getTargets: () => deps.collectTargets(records.values(), deps.isValidTarget),
-    getControls: (target) => deps.getControls(target, deps.documentRef, targetIndex),
+    getTargets: () => deps.collectTargets(state.values(), deps.isValidTarget),
+    getControls: (target) => deps.getControls(target, deps.documentRef, state.targetIndex),
   };
 }
 
