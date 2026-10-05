@@ -1681,3 +1681,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：turn diff snapshot 的 NUL 分隔 porcelain status 解析与 tracked/untracked 投影已迁移至 `src/main/worker/git-turn-diff-status-policy.ts`；snapshot 入口保留 status 查询、临时 index 与 stage 副作用。新增 `scripts/test-worker-git-turn-diff-status-policy.mjs` 覆盖 4 项 focused assertions；原回归 21 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：Git argv 中 `-c key=value` 前置项跳过、已知 Git subcommand 白名单与 unknown fallback 解析已迁移至 `src/main/worker/git-subcommand-policy.ts`；git-errors 保留错误分类正则。新增 `scripts/test-worker-git-subcommand-policy.mjs` 覆盖 5 项 focused assertions；原 git-errors 回归 5 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：cat-file 请求的全零 OID 不可查询、非零 OID 可查询判定已迁移至 `src/main/worker/git-cat-file-policy.ts`；cat-file 入口保留 batch 查询、大小限制与错误投影。新增 `scripts/test-worker-git-cat-file-policy.mjs` 覆盖 6 项 focused assertions；原 cat-file 回归 43 项、build 与 typecheck 已通过。

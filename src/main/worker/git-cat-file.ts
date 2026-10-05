@@ -5,6 +5,7 @@ const OUTPUT_OVERHEAD_BYTES = 64;
 const NO_LAZY_FETCH_ENV = { GIT_NO_LAZY_FETCH: `1` };
 const ZERO_OID = /^0+$/;
 const LINE_BOUNDARY = /(?<=\n)/;
+import { isQueryableOid } from "./git-cat-file-policy";
 
 type CatFileDependencies = {
   runGit: (root: string, args: string[], host: any, options: any) => Promise<any>;
@@ -19,10 +20,6 @@ function splitContentLines(content: string) {
   if (lines.length === 1 && lines[0] === ``) return [];
   if (lines.at(-1) === ``) lines.pop();
   return lines;
-}
-
-function isQueryableOid(oid: string | null | undefined) {
-  return oid ? !ZERO_OID.test(oid) : false;
 }
 
 function gitErrorType(result: any) {
