@@ -701,3 +701,10 @@ connector icon map。四者都由相邻生成 surface 独占，缺少独立 name
 portal/context bootstrap。三者均无独立 renderer named consumer 或 teardown owner，已登记为
 generated-local 分类并保留聚合 hub；逐行 source symbol、精确范围和证据写入
 `docs/renderer-hub-line-classification.json`，app-primary reviewedCount 由 179 提升至 182。
+
+本轮再核对 app-primary markdown 编辑器附近的三条真实生成边界：`oPe`（公开别名 `Cu`，
+21878--21892）负责 magic-selection 文档切片与 marker offset 计算，`sPe`（公开别名 `Su`，
+21898--21900）负责 Markdown 文件 stem 归一化，`cPe`（公开别名 `bu`，21901--21912）负责
+浅层 heading 投影。三者均由相邻编辑器 surface 独占，没有独立 renderer named consumer 或
+teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source symbol 与证据已登记于
+`docs/renderer-hub-line-classification.json`，app-primary reviewedCount 由 182 提升至 185。

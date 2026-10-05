@@ -1822,5 +1822,35 @@
     "classification": "generated-local-homepage-takeover-bootstrap",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer assembles the generated homepage takeover React/portal bindings and context; ownership remains with the neighboring surface rather than an independently named renderer consumer."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Cu",
+    "sourceSymbol": "oPe",
+    "startLine": 21878,
+    "endLine": 21892,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The markdown magic-selection serializer computes a local document slice, marker offsets, and block range for the adjacent editor surface; it has no named renderer consumer or independent lifecycle boundary, so the coupled generated helper remains in the hub."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Su",
+    "sourceSymbol": "sPe",
+    "startLine": 21898,
+    "endLine": 21900,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The markdown filename stem normalizer is consumed only by the neighboring generated editor flow and has no independently named renderer import or teardown owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "bu",
+    "sourceSymbol": "cPe",
+    "startLine": 21901,
+    "endLine": 21912,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The markdown heading projection parses the adjacent editor document and returns its first shallow heading; parser state and traversal are local to that generated surface with no standalone renderer lifecycle."
   }
 ]
