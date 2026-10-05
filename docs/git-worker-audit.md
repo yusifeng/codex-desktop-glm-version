@@ -935,6 +935,13 @@ watcher 集合生命周期。`scripts/test-worker-git-watch-index-bucket.mjs` �
 `src/main/worker/git-watch-index-bucket-policy.ts`；兼容入口仅保留转出，新增 policy focused
 回归，watcher 集合与 telemetry 生命周期仍留在运行时。
 
+### 增量抽取：Worktree synced-branch setup projection
+
+Worktree 创建时的 synced-branch 是否配置及 local branch ref 投影已由
+`src/main/worker/git-worktree-branch-setup-policy.ts` 的 `resolveSyncedBranchSetup`
+统一承载；create runtime 仅保留 commit-tree 查询和 config 写入副作用。新增 ref 投影与
+跳过条件断言，既有 worktree create 生命周期保持不变。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至

@@ -25,5 +25,14 @@ function shouldSetUpSyncedBranch({
   );
 }
 
-export { shouldSetUpSyncedBranch };
-if (typeof module !== `undefined`) module.exports = { shouldSetUpSyncedBranch };
+/** Return the exact config target when setup is required, otherwise null. */
+function resolveSyncedBranchSetup(
+  input: WorktreeBranchSetupInput,
+  formatLocalBranchRef: (branch: string) => string = (branch) => `refs/heads/${branch}`,
+): { branch: string; branchRef: string } | null {
+  if (!shouldSetUpSyncedBranch(input) || input.branch == null) return null;
+  return { branch: input.branch, branchRef: formatLocalBranchRef(input.branch) };
+}
+
+export { shouldSetUpSyncedBranch, resolveSyncedBranchSetup };
+if (typeof module !== `undefined`) module.exports = { shouldSetUpSyncedBranch, resolveSyncedBranchSetup };

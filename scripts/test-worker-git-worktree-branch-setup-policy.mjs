@@ -17,7 +17,7 @@ await esbuild.build({
   target: "esnext",
   logLevel: "silent",
 });
-const { shouldSetUpSyncedBranch } = createRequire(import.meta.url)(output);
+const { shouldSetUpSyncedBranch, resolveSyncedBranchSetup } = createRequire(import.meta.url)(output);
 
 const local = { type: "branch", remoteRef: null };
 assert.equal(shouldSetUpSyncedBranch({ branch: "feature", defaultBranch: "main", startingState: local }), true);
@@ -30,5 +30,7 @@ assert.equal(shouldSetUpSyncedBranch({ branch: "feature", defaultBranch: "main",
 assert.equal(shouldSetUpSyncedBranch({ branch: "feature", defaultBranch: "main", startingState: { type: "remote", remoteRef: "origin/feature" } }), true);
 assert.equal(shouldSetUpSyncedBranch({ branch: "feature", defaultBranch: "feature", startingState: { type: "commit" } }), false);
 assert.equal(shouldSetUpSyncedBranch({ branch: "release", defaultBranch: "main", startingState: { type: "commit" } }), true);
+assert.deepEqual(resolveSyncedBranchSetup({ branch: "feature/foo", defaultBranch: "main", startingState: local }, (branch) => `refs/heads/${branch}`), { branch: "feature/foo", branchRef: "refs/heads/feature/foo" });
+assert.equal(resolveSyncedBranchSetup({ branch: "main", defaultBranch: "main", startingState: local }, (branch) => `refs/heads/${branch}`), null);
 
-console.log("10 worker git worktree branch setup policy assertions passed");
+console.log("12 worker git worktree branch setup policy assertions passed");
