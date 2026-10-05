@@ -228,12 +228,6 @@ function reviewFileKey(path: string, previousPath: string | null | undefined) {
   return `${previousPath ?? ``}\0${path}`;
 }
 
-function parseNumstatValue(value: string) {
-  if (value === `-`) return null;
-  const parsed = Number.parseInt(value, 10);
-  return Number.isNaN(parsed) ? null : parsed;
-}
-
 async function getReviewFileRevisionFallback({
   fallback,
   host,
@@ -304,3 +298,4 @@ import {
   mergeReviewMetadata,
   selectUntrackedReviewPaths,
 } from './git-review-metadata-policy';
+import { parseNumstatValue } from "./git-review-numstat-policy";
