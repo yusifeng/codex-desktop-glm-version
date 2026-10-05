@@ -1500,3 +1500,5 @@ typecheck 均通过。
 2026-10-05 A1 继续批次：Git branch-ahead 的 remote upstream 归一化、远端 ancestor revision、默认分支 revision 与 ahead range 参数构造已迁移至 `src/main/worker/git-branch-ahead-policy.ts`；branch-ahead 运行时保留 repository/Git/query 编排。新增 `scripts/test-worker-git-branch-ahead-policy.mjs` 覆盖 12 项 focused assertions；原 branch-ahead 回归 41 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Git clone state 的配置行解析与 partial-clone 识别策略已迁移至 `src/main/worker/git-clone-state-policy.ts`；clone state 运行时保留 shallow/config 并行 Git 查询与状态投影。新增 `scripts/test-worker-git-clone-state-policy.mjs` 覆盖 17 项 focused assertions；原 clone-state 回归 29 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：automation writable roots 的 common-dir 路径解析与 index/.git fallback 已迁移至 `src/main/worker/git-automation-writable-roots-policy.ts`；运行时保留 worktree/source repository 查询及 writable-root 编排。新增 `scripts/test-worker-git-automation-writable-roots-policy.mjs` 覆盖 6 项 focused assertions；原回归 9 项、build 与 typecheck 已通过。

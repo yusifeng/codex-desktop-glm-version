@@ -1,3 +1,8 @@
+import {
+  resolveCommonDirRoot,
+  resolveIndexFallbackRoot,
+} from "./git-automation-writable-roots-policy";
+
 type AutomationWritableRootsDependencies = {
   gitManager: any;
   host: any;
@@ -42,19 +47,15 @@ async function resolveAutomationWritableRoots(
     )
   )?.getCommonDir();
   if (commonDir) {
-    roots.push(
-      deps.path.isAbsolute(commonDir)
-        ? commonDir
-        : deps.path.resolve(sourceRoot ?? params.sourceCwd, commonDir),
-    );
+    roots.push(resolveCommonDirRoot(commonDir, sourceRoot ?? params.sourceCwd, deps.path));
     return roots;
   }
 
   const repository = worktreeRepository ?? sourceRepository;
   const indexPath =
     repository == null ? null : await deps.getIndexPath(repository);
-  if (indexPath) roots.push(deps.path.dirname(indexPath));
-  else if (sourceRoot) roots.push(deps.path.join(sourceRoot, `.git`));
+  const fallbackRoot = resolveIndexFallbackRoot(indexPath, sourceRoot, deps.path);
+  if (fallbackRoot) roots.push(fallbackRoot);
   return roots;
 }
 
