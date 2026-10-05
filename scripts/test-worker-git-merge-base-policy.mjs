@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { buildMergeBaseCandidates } = require("../app/.vite/build/worker/git-merge-base-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.deepEqual(...a)};
+eq(buildMergeBaseCandidates("feature", ["origin"], null), ["origin/feature", "refs/remotes/origin/feature"]);
+eq(buildMergeBaseCandidates("origin/feature", ["origin", "upstream"], "refs/remotes/origin/feature"), ["refs/remotes/origin/feature", "upstream/origin/feature", "refs/remotes/upstream/origin/feature"]);
+eq(buildMergeBaseCandidates("feature", [], " upstream/feature "), ["upstream/feature"]);
+eq(buildMergeBaseCandidates("origin/", ["origin"], null), []);
+console.log(`${n} worker git merge-base policy assertions passed`);

@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation event detail 的 own data-property 读取策略已抽至
+`src/main/browser-page-preload/annotation-event-field-policy.ts`；event-details adapter 仅保留
+CustomEvent/detail 形状判定与 payload 构造。新增 `scripts/test-preload-annotation-event-field-policy.mjs`
+覆盖 2 项 own/inherited property 断言；原 event-details 回归 6 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation target label 的 tag/accessibility 文案投影已抽至
 `src/main/browser-page-preload/annotation-target-label-policy.ts`；label adapter 仅保留
 DOM 元素与 accessible-label 依赖编排。新增 `scripts/test-preload-annotation-target-label-policy.mjs`
@@ -1028,7 +1033,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1055 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1058 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -1110,7 +1115,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1055 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1058 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5，已完成）
@@ -1528,3 +1533,5 @@ typecheck 均通过。
 2026-10-05 A1 继续批次：Windows Git executable 的大小写不敏感环境读取、PATH 覆盖检测与进程环境合并策略已迁移至 `src/main/worker/git-executable-policy.ts`；executable resolver 保留 Windows where 查询、缓存与命令重写流程。新增 `scripts/test-worker-git-executable-policy.mjs` 覆盖 6 项 focused assertions；原 executable 回归 6 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：commit message 的 attribution 默认值、Co-authored-by trailer 识别/去重及 trailer block 拼接策略已迁移至 `src/main/worker/git-commit-message-policy.ts`；commit handler 保留 repository 查询、stage/commit Git I/O、失败回滚与缓存编排。新增 `scripts/test-worker-git-commit-message-policy.mjs` 覆盖 6 项 focused assertions；原 commit handler 回归 48 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：merge-base fallback 的 remote/upstream candidate ref 构造、remote-prefixed branch 特判与顺序去重已迁移至 `src/main/worker/git-merge-base-policy.ts`；merge-base 运行时保留 query、resolveRef 与 Git merge-base I/O 编排。新增 `scripts/test-worker-git-merge-base-policy.mjs` 覆盖 4 项 focused assertions；原 merge-base 回归 35 项、build 与 typecheck 已通过。
