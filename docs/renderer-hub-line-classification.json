@@ -2161,5 +2161,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/resolve-box-file-preview.ts",
     "evidence": "Box library file preview resolution validates the external-box identifier, provider, and note MIME/name policy before projecting preview/source URLs. It is a deterministic URL policy with no JSX, store, or lifecycle side effects and is covered by a focused runtime test."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "qg",
+    "sourceSymbol": "bE",
+    "startLine": 3376,
+    "endLine": 3382,
+    "classification": "generated-local-style-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper reads computed CSS variables to select an accent color fallback for adjacent generated style code. It has no independent renderer import, store ownership, or teardown contract, so it remains local aggregate wiring rather than a standalone renderer boundary."
   }
 ]

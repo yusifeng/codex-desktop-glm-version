@@ -21,7 +21,10 @@ async function runBoundedWorkers<T>(
       } catch (error) {
         if (!failed) {
           failed = true;
-          failure = error;
+          failure =
+            error instanceof Error
+              ? error
+              : Error(failureMessage, { cause: error });
         }
       }
     }
