@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation preload bridge 的 teardown 终止边界已补齐；新增幂等
+`dispose`，pagehide 时解除 mounted host subscriber、清空 sync/text/editor pending buffer，
+并拒绝销毁后的消息缓冲、订阅与 host invoke，避免异步回调在 preload runtime teardown 后继续
+驱动状态。`scripts/test-preload-annotation-preload-bridge.mjs` 扩展至 22 项 focused assertions；
+build、verify 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git status summary 的 porcelain `-z` 输出解析（staged/unstaged
 计数、rename/copy 前序路径与未跟踪过滤）已迁移至
 `src/main/worker/git-status-summary-policy.ts`；summary 运行时仅保留缓存、Git I/O 与

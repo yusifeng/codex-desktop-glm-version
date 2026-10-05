@@ -69,4 +69,15 @@ assert.equal(listeners.has("host"), false);
 bridgeState.bufferSync({ type: "sync", value: 6 });
 assert.equal(bridgeState.hasMountedSubscriber, false);
 
-console.log("test-preload-annotation-preload-bridge: 16 assertions passed");
+bridgeState.bufferEditorMessage({ type: "editor", value: 7 });
+bridgeState.dispose();
+assert.equal(bridgeState.hasMountedSubscriber, false);
+assert.equal(bridgeState.hasPendingEditorMessage, false);
+bridgeState.bufferSync({ type: "sync", value: 8 });
+bridgeState.bufferTextSelection();
+bridgeState.bufferEditorMessage({ type: "editor", value: 9 });
+bridgeState.bridge.sendMessageToHost({ type: "browser-sidebar-runtime-open-editor" });
+assert.equal(calls.some((entry) => Array.isArray(entry) && entry[0] === "invoke" && entry[2]?.value === 8), false);
+assert.equal(typeof bridgeState.bridge.subscribeToHostMessages(() => {}), "function");
+
+console.log("test-preload-annotation-preload-bridge: 22 assertions passed");

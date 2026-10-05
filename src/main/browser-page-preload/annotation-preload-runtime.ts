@@ -142,6 +142,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
       removeDOMContentLoaded: () => deps.windowLike.removeEventListener(`DOMContentLoaded`, runtimeMount.mount),
       removeHostMessageListener: () => deps.ipcRenderer.removeListener(deps.channels.hostMessage, handleHostMessage),
       disposeRuntimeMount: () => runtimeMount.dispose(),
+      disposePreloadBridge: () => preloadBridge.dispose(),
     });
   };
 

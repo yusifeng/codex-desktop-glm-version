@@ -11,17 +11,20 @@ type AnnotationPreloadBridgeOptions = {
 
 function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) {
   let hasMountedSubscriber = false;
+  let destroyed = false;
+  let mountedUnsubscribe: (() => void) | null = null;
   let bufferedSync: any = null;
   let pendingTextSelection = false;
   let pendingEditorMessage: any = null;
 
   const bufferSync = (message: any) => {
-    if (!hasMountedSubscriber) bufferedSync = message;
+    if (!destroyed && !hasMountedSubscriber) bufferedSync = message;
   };
   const bufferTextSelection = () => {
-    if (!hasMountedSubscriber) pendingTextSelection = true;
+    if (!destroyed && !hasMountedSubscriber) pendingTextSelection = true;
   };
   const bufferEditorMessage = (message: any) => {
+    if (destroyed) return;
     options.getSiteAnnotationRequests()?.clear();
     if (!hasMountedSubscriber) {
       pendingEditorMessage = options.reducePendingEditorMessage(pendingEditorMessage, message);
@@ -43,6 +46,7 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
         : undefined;
     },
     sendMessageToHost(message: any) {
+      if (destroyed) return;
       if (
         message.type === `browser-sidebar-runtime-open-editor` ||
         message.type === `browser-sidebar-runtime-open-design-editor`
@@ -58,6 +62,8 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
       options.ipcRenderer.invoke(options.channels.runtime, message);
     },
     subscribeToHostMessages(listener: (message: any) => void) {
+      if (destroyed) return () => {};
+      mountedUnsubscribe?.();
       hasMountedSubscriber = true;
       const mountedHandler = (_event: any, message: any) => {
         const action = options.getMountedMessageAction(message.type);
@@ -77,11 +83,25 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
         listener(pendingEditorMessage);
         pendingEditorMessage = null;
       }
-      return () => {
+      const unsubscribe = () => {
+        if (!hasMountedSubscriber) return;
         hasMountedSubscriber = false;
         options.ipcRenderer.removeListener(options.channels.hostMessage, mountedHandler);
+        if (mountedUnsubscribe === unsubscribe) mountedUnsubscribe = null;
       };
+      mountedUnsubscribe = unsubscribe;
+      return unsubscribe;
     },
+  };
+
+  const dispose = () => {
+    if (destroyed) return;
+    destroyed = true;
+    mountedUnsubscribe?.();
+    mountedUnsubscribe = null;
+    bufferedSync = null;
+    pendingTextSelection = false;
+    pendingEditorMessage = null;
   };
 
   return {
@@ -90,6 +110,7 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
     bufferTextSelection,
     bufferEditorMessage,
     prepareMount,
+    dispose,
     get hasMountedSubscriber() { return hasMountedSubscriber; },
     get hasPendingEditorMessage() { return pendingEditorMessage != null; },
   };

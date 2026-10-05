@@ -1001,6 +1001,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-normalize-recipient-fields.mjs`](./test-app-primary-normalize-recipient-fields.mjs)
 - [`test-preload-annotation-region-class-policy.mjs`](./test-preload-annotation-region-class-policy.mjs)
 - [`test-preload-annotation-preload-policy-state.mjs`](./test-preload-annotation-preload-policy-state.mjs)
+- [`test-preload-annotation-preload-bridge.mjs`](./test-preload-annotation-preload-bridge.mjs)
 - [`test-app-primary-extract-skill-kind.mjs`](./test-app-primary-extract-skill-kind.mjs)
 - [`test-app-primary-annotation-selection-style.mjs`](./test-app-primary-annotation-selection-style.mjs)
 - [`test-app-primary-format-composer-placeholder.mjs`](./test-app-primary-format-composer-placeholder.mjs)

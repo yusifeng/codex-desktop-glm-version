@@ -6,6 +6,7 @@ type AnnotationPagehideDependencies = {
   removeDOMContentLoaded: () => void;
   removeHostMessageListener: () => void;
   disposeRuntimeMount: () => void;
+  disposePreloadBridge?: () => void;
   markDestroyed: () => void;
 };
 
@@ -21,6 +22,7 @@ function handleAnnotationPagehide(
   deps.removeDOMContentLoaded();
   deps.removeHostMessageListener();
   deps.disposeRuntimeMount();
+  deps.disposePreloadBridge?.();
   return true;
 }
 
