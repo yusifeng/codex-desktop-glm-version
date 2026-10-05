@@ -1137,6 +1137,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-path-overlap-policy.mjs](test-worker-git-path-overlap-policy.mjs)
 [test-worker-git-fsmonitor-feature-policy.mjs](test-worker-git-fsmonitor-feature-policy.mjs)
 [test-worker-git-query-key-policy.mjs](test-worker-git-query-key-policy.mjs)
+[test-preload-annotation-role-policy.mjs](test-preload-annotation-role-policy.mjs)
 [test-preload-annotation-controls-serialization-policy.mjs](test-preload-annotation-controls-serialization-policy.mjs)
 [test-preload-annotation-control-metadata-policy.mjs](test-preload-annotation-control-metadata-policy.mjs)
 [test-preload-annotation-record-clone-policy.mjs](test-preload-annotation-record-clone-policy.mjs)
