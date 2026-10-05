@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation coordinate clamp reuse
+
+Annotation 几何的通用数值 clamp（原 `Ps`，3863-5049 业务工具段）已接回
+`annotation-surface-geometry.ts` 的 `clampAnnotationCoordinate`，消除 preload 重复实现；
+现有 geometry regression（30 项）、build 与 typecheck 已通过。
+
 ### 增量抽取：annotation rect scaling reuse
 
 Annotation tooltip/anchor 的 rect scaling helper（原 `Ms`，3863-5049 业务工具段）已接回

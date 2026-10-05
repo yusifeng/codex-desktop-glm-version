@@ -4000,7 +4000,7 @@ function Ns(e, t) {
   return areAnnotationScrollContainersEqual(e, t);
 }
 function Ps(e, t, n) {
-  return Math.min(Math.max(e, t), n);
+  return clampAnnotationCoordinate(e, t, n);
 }
 function Fs(e, t) {
   if (
