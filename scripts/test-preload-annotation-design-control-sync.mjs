@@ -63,4 +63,14 @@ assert.deepEqual(events.at(-1).detail.virtualTarget, { surfaceId: "surface", tar
 sync.sync(state({ isAgentControllingBrowser: true }));
 assert.equal(events.at(-1).detail.action, "reset", "agent control clears previews");
 
-console.log("test-preload-annotation-design-control-sync: 8 assertions passed");
+sync.rememberTarget("design-1", target);
+sync.sync(state({ comments: [{ designChange: createChange() }] }));
+const beforeDispose = events.length;
+sync.dispose();
+assert.equal(events.at(-1).detail.action, "reset", "dispose resets active previews");
+sync.dispose();
+sync.rememberTarget("design-1", target);
+sync.sync(state({ comments: [{ designChange: createChange() }] }));
+assert.equal(events.length, beforeDispose + 1, "disposed sync ignores later targets and updates");
+
+console.log("test-preload-annotation-design-control-sync: 11 assertions passed");

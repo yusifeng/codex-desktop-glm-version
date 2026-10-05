@@ -44,6 +44,7 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
   const targetByDesignId = new Map<string, WeakRef<object>>();
   let lastDesignId: string | null = null;
   let appliedByTarget = new Map<object, Map<string, ControlChangeDetail & { resetValue: unknown }>>();
+  let disposed = false;
 
   const dispatch = (target: object, detail: ControlChangeDetail) => {
     if (deps.isConnected(target) || detail.action === `reset`) deps.dispatchChange(target, detail);
@@ -65,10 +66,12 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
     }
   };
   const rememberTarget = (designId: string, target: object) => {
+    if (disposed) return;
     if (!targetByDesignId.has(designId)) targetByDesignId.set(designId, new WeakRef(target));
     lastDesignId = designId;
   };
   const sync = (state: AnnotationDesignSyncState) => {
+    if (disposed) return;
     if (state.canUseSiteAnnotationApi !== true || state.canUseTweaks === false || state.isAgentControllingBrowser) {
       clear();
       return;
@@ -134,7 +137,12 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
       }
     }
   };
-  return { rememberTarget, sync, clear };
+  const dispose = () => {
+    if (disposed) return;
+    clear();
+    disposed = true;
+  };
+  return { rememberTarget, sync, clear, dispose };
 }
 
 export { createAnnotationDesignControlSync };

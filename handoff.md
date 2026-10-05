@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation design-control sync 的 teardown 生命周期边界已补齐；新增幂等 `dispose`，在销毁时恢复已应用的 control preview，并拒绝后续 target 绑定与同步，避免 runtime teardown 后残留设计预览。`scripts/test-preload-annotation-design-control-sync.mjs` 扩展至 11 项 focused assertions；build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation comment-runtime 异步挂载失败后的生命周期边界已补齐；
 `annotation-runtime-mount` 在动态加载失败且页面未销毁时重置单次挂载闸门，允许后续重试，
 同时保持 pagehide/dispose 后的终态不可重挂载。`scripts/test-preload-annotation-runtime-mount.mjs`
