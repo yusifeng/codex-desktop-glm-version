@@ -1220,3 +1220,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-shared-filter-remote-control-hosts.mjs](test-app-shared-filter-remote-control-hosts.mjs)
 [test-app-primary-strip-beacon-query-params.mjs](test-app-primary-strip-beacon-query-params.mjs)
 [test-app-primary-normalize-recipient-contacts.mjs](test-app-primary-normalize-recipient-contacts.mjs)
+[test-app-primary-rank-projects-by-query.mjs](test-app-primary-rank-projects-by-query.mjs)
