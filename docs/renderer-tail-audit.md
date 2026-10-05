@@ -655,3 +655,10 @@ source symbol 与分类由 `scripts/audit-renderer-hub-classification.mjs` 校�
 前缀行为，不引入聚合 hub 的初始化副作用；`scripts/test-app-primary-normalize-recipient-fields.mjs`
 覆盖名称投影、非法地址、Bcc 前缀和空输入边界。逐行分类证据已登记，reviewedCount
 由 158 提升至 160。
+
+本轮继续从 app-primary 未消费区登记四个真实生成边界：`G$`（公开别名 `aa`）创建
+request-input activity context，`rK`（公开别名 `ac`）按固定顺序装配 editor/menu 样式依赖，
+`Oze`（公开别名 `al`）绑定 annotation editor UI runtime，`Mj`（公开别名 `am`）初始化
+connector icon map。四者都由相邻生成 surface 独占，缺少独立 named renderer consumer 或可安全
+转移的 teardown 契约，因此保留在聚合 hub；逐行 source symbol 与范围登记于
+`docs/renderer-hub-line-classification.json`，reviewedCount 由 160 提升至 164。

@@ -1593,5 +1593,44 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
     "evidence": "Pure recipient/cc/bcc normalization with contact-name projection and Bcc prefixing; extracted as a semantic payload helper without hub lifecycle or UI registration side effects."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "aa",
+    "startLine": 68080,
+    "endLine": 68084,
+    "classification": "generated-local-context-initializer",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer creates the local request-input activity context used by the adjacent generated surface; it has no independent named renderer consumer or transferable teardown boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "ac",
+    "sourceSymbol": "rK",
+    "startLine": 36121,
+    "endLine": 36144,
+    "classification": "generated-local-editor-style-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The bootstrap wires the generated menu/editor style dependencies and cached CSS tokens in a single coupled initialization sequence; no independent renderer consumer or teardown contract exists."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "al",
+    "sourceSymbol": "Oze",
+    "startLine": 28917,
+    "endLine": 28920,
+    "classification": "generated-local-annotation-ui-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer binds annotation editor UI dependencies before the adjacent generated React surface; extracting it would sever ordering and lifecycle ownership."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "am",
+    "sourceSymbol": "Mj",
+    "startLine": 10272,
+    "endLine": 10281,
+    "classification": "generated-local-connector-icon-map",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The generated connector icon map is initialized once for the neighboring provider surface and has no independent named renderer consumer or lifecycle boundary."
   }
 ]
