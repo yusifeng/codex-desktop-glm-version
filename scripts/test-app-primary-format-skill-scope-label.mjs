@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/format-skill-scope-label.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const intl = { formatMessage: (descriptor) => `msg:${descriptor}` };
+assert.equal(mod.formatSkillScopeLabel({ scope: "repo", intl, repoLabel: "Repo", messages: { repo: "r" }, fallback: () => "fallback" }), "Repo");
+assert.equal(mod.formatSkillScopeLabel({ scope: "admin", intl, messages: { admin: "a" }, fallback: () => "fallback" }), "msg:a");
+assert.equal(mod.formatSkillScopeLabel({ scope: "team", intl, messages: {}, fallback: (scope) => `fallback:${scope}` }), "fallback:team");
+console.log("app-primary format skill scope label: 3 assertions passed");
