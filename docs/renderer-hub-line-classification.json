@@ -1882,5 +1882,15 @@
     "classification": "generated-local-markdown-parser-bootstrap",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer constructs and freezes the markdown parser used by the neighboring generated editor heading projection; it has no independent renderer consumer or teardown contract."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Jm",
+    "sourceSymbol": "aAe",
+    "startLine": 5998,
+    "endLine": 6003,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/is-displayable-action.ts",
+    "evidence": "The predicate accepts only primary/secondary actions and excludes the questionnaire-feedback action; it is a pure projection with no JSX, store, or lifecycle side effects and is extracted as a typed runtime policy."
   }
 ]
