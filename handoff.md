@@ -131,6 +131,10 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `Tp`（内部 `VM`，源码 8072--8078）的 model
+reasoning-effort 选择纯策略已迁移至 `src/renderer/app-primary/runtime/select-model-reasoning-efforts.ts`；
+新增 focused test 2 项断言，typecheck 与 focused test 已通过。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `DJ`（内部 `GPe`，源码 45304--45306）的 queued
 design-change 纯判定已迁移至 `src/renderer/app-shared/runtime/has-queued-design-change.ts`；新增
 focused test 2 项断言，typecheck 与 focused test 已通过。
