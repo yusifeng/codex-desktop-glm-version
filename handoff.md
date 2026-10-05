@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation surface registry 的注册表、probe 去重、hit-test request
+计数、pending hit 与终止态已抽至 `src/main/browser-page-preload/annotation-surface-registry-state.ts`；
+registry 入口仅保留 DOM/MutationObserver、请求响应与几何副作用，销毁后迟到响应与新请求均被状态门禁。
+新增 `scripts/test-preload-annotation-surface-registry-state.mjs` 覆盖 16 项 focused assertions；
+surface registry 回归通过，typecheck 通过；build check 仍受现有 `git-branch-search.ts` 的
+`Unexpected "*"` 预存错误阻塞。
+
 2026-10-05 A1 继续批次：Git branch search 的纯策略边界已进一步拆至
 `src/main/worker/git-branch-search-policy.ts`；branch-search 兼容入口仅保留策略转出，runtime
 继续负责 Git I/O、流式扫描与 query 编排。新增 `scripts/test-worker-git-branch-search-policy.mjs`
