@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationPermissionRequestState } = require("../app/.vite/build/browser-page-preload/annotation-permission-request-state.js");
+const state = createAnnotationPermissionRequestState();
+const pending = { requestId: "r1" };
+state.setPending(pending);
+assert.equal(state.pending, pending);
+assert.equal(state.clearPending(), pending);
+assert.equal(state.pending, null);
+assert.equal(state.dispose(), true);
+assert.equal(state.disposed, true);
+assert.equal(state.dispose(), false);
+assert.equal(state.clearPending(), null);
+console.log("test-preload-annotation-permission-request-state: 8 assertions passed");

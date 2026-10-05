@@ -5,39 +5,36 @@ type AnnotationPermissionControllerDependencies = {
 };
 
 function createAnnotationPermissionController(deps: AnnotationPermissionControllerDependencies) {
-  let pending: { requestId: string; promise: Promise<boolean>; resolve: (allowed: boolean) => void } | null = null;
-  let disposed = false;
+  const state = createAnnotationPermissionRequestState();
 
   const reset = () => {
-    pending?.resolve(false);
-    pending = null;
+    state.clearPending()?.resolve(false);
   };
 
   const handleResult = (requestId: string, allowed: boolean) => {
-    if (disposed) return false;
-    if (pending?.requestId !== requestId) return false;
-    pending.resolve(allowed);
-    pending = null;
+    if (state.disposed) return false;
+    if (state.pending?.requestId !== requestId) return false;
+    state.clearPending()?.resolve(allowed);
     return true;
   };
 
   const requestPermission = () => {
-    if (disposed) return false;
+    if (state.disposed) return false;
     if (deps.isPermissionGranted()) return true;
-    if (pending != null) return pending.promise;
+    if (state.pending != null) return state.pending.promise;
 
     let resolve!: (allowed: boolean) => void;
     const promise = new Promise<boolean>((complete) => {
       resolve = complete;
     });
     const request = { requestId: deps.createRequestId(), promise, resolve };
-    pending = request;
+    state.setPending(request);
     deps.invokeHost({
       type: `browser-sidebar-runtime-request-annotation-permission`,
       requestId: request.requestId,
     }).catch(() => {
-      if (pending === request) {
-        pending = null;
+      if (state.pending === request) {
+        state.clearPending();
         request.resolve(false);
       }
     });
@@ -45,13 +42,14 @@ function createAnnotationPermissionController(deps: AnnotationPermissionControll
   };
 
   const dispose = () => {
-    if (disposed) return;
-    disposed = true;
+    if (state.disposed) return;
     reset();
+    state.dispose();
   };
 
-  return { handleResult, requestPermission, reset, dispose, get disposed() { return disposed; } };
+  return { handleResult, requestPermission, reset, dispose, get disposed() { return state.disposed; } };
 }
 
 export { createAnnotationPermissionController };
 if (typeof module !== `undefined`) module.exports = { createAnnotationPermissionController };
+import { createAnnotationPermissionRequestState } from "./annotation-permission-request-state";
