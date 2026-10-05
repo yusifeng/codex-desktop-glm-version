@@ -1742,3 +1742,5 @@ typecheck 均通过。
 2026-10-06 A1 T1 继续批次：review metadata 的文件 key 生成与 Git status→change kind 分类已迁移至 `src/main/worker/git-review-file-classification-policy.ts`；metadata utils 保留 revision、diff 与 rename 编排。新增 `scripts/test-worker-git-review-file-classification-policy.mjs` 覆盖 6 项 focused assertions；build 与 typecheck 已通过。
 
 2026-10-06 A5 T5 继续批次：app-shared 的 remote-control host source predicate 已迁移至 `src/renderer/app-shared/runtime/is-remote-control-host-source.ts`；新增 `scripts/test-app-shared-is-remote-control-host-source.mjs` 覆盖 3 项 focused assertions，并登记 `BU/fV` 源码 64899-64901 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-06 A5 T5 继续批次：app-primary 的 displayable action predicate 已迁移至 `src/renderer/app-primary/runtime/has-displayable-action.ts`；新增 `scripts/test-app-primary-has-displayable-action.mjs` 覆盖 4 项 focused assertions，并登记 `qm/iAe` 源码 5995-5998 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
