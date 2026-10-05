@@ -694,3 +694,10 @@ connector icon map。四者都由相邻生成 surface 独占，缺少独立 name
 `src/renderer/app-shared/runtime/merge-conflict-state.ts` 承载，新增
 `scripts/test-renderer-merge-conflict-state.mjs` 覆盖大小写、冲突优先级、未知值与空输入共 6
 项断言；聚合导出保留兼容边，逐行分类证据登记；app-primary reviewedCount 保持 175。
+
+本轮继续核对 app-primary 未消费区的三条真实生成边界：`r9e`（公开别名 `Ei`，78101--78113）
+为模板 journey runtime 的局部状态/telemetry 编排，`yF`（公开别名 `Cf`，15649--15654）
+为 composer runtime 的 lazy bootstrap，`fk`（公开别名 `Dh`，5019--5025）为 homepage takeover
+portal/context bootstrap。三者均无独立 renderer named consumer 或 teardown owner，已登记为
+generated-local 分类并保留聚合 hub；逐行 source symbol、精确范围和证据写入
+`docs/renderer-hub-line-classification.json`，app-primary reviewedCount 由 179 提升至 182。

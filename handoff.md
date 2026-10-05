@@ -1,5 +1,17 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review comparison 的 source→diff 参数判定、merge-base/default
+branch 回退、commit parent 与 HEAD SHA 校验已迁移至
+`src/main/worker/git-review-comparison-policy.ts`；入口保留仓库查询与 Git I/O 编排，新增
+`scripts/test-worker-git-review-comparison-policy.mjs` 覆盖 8 项 focused assertions；build、verify、typecheck 已通过。
+
+2026-10-05 A5 继续批次：逐行核对 app-primary 未消费区的三条生成边界：`r9e`（公开别名
+`Ei`，78101--78113）模板 journey runtime，`yF`（公开别名 `Cf`，15649--15654）composer
+lazy bootstrap，以及 `fk`（公开别名 `Dh`，5019--5025）homepage takeover portal/context
+bootstrap。三者均无独立 renderer named consumer 或 teardown owner，已登记 generated-local
+分类；`docs/renderer-hub-line-classification.json` reviewedCount 提升至 182，audit 与 focused
+hub classification 验证通过。
+
 2026-10-05 A2 继续批次：annotation design-control sync 的 teardown 生命周期边界已补齐；新增幂等 `dispose`，在销毁时恢复已应用的 control preview，并拒绝后续 target 绑定与同步，避免 runtime teardown 后残留设计预览。`scripts/test-preload-annotation-design-control-sync.mjs` 扩展至 11 项 focused assertions；build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation comment-runtime 异步挂载失败后的生命周期边界已补齐；

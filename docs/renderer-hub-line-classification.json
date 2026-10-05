@@ -1792,5 +1792,35 @@
     "classification": "generated-local-plugin-context-bootstrap",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The lazy initializer creates the generated plugin marketplace context and metadata map for its adjacent surface; it has no independently named renderer consumer or lifecycle owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ei",
+    "sourceSymbol": "r9e",
+    "startLine": 78101,
+    "endLine": 78113,
+    "classification": "generated-local-template-journey-runtime",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The template journey helpers write adjacent atom state and telemetry envelopes as one generated local runtime; there is no independently named renderer consumer or teardown owner for this aggregate export."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Cf",
+    "sourceSymbol": "yF",
+    "startLine": 15649,
+    "endLine": 15654,
+    "classification": "generated-local-composer-runtime-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer wires the adjacent composer runtime modules and cached bindings; it is a generated bootstrap side effect with no standalone named renderer consumer or independent teardown boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Dh",
+    "sourceSymbol": "fk",
+    "startLine": 5019,
+    "endLine": 5025,
+    "classification": "generated-local-homepage-takeover-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer assembles the generated homepage takeover React/portal bindings and context; ownership remains with the neighboring surface rather than an independently named renderer consumer."
   }
 ]
