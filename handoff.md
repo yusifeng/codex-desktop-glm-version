@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git local-environment 的环境解析/差异策略、shell wrapper 生成、平台脚本选择与标签判定已迁移至 `src/main/worker/git-local-environment-policy.ts`；运行时仅保留平台探测、文件/进程 I/O 与日志生命周期。新增 `scripts/test-worker-git-local-environment-policy.mjs` 覆盖 8 项 focused assertions；原 76 项 local-environment 回归继续通过，build 与 typecheck 已通过。
+
+2026-10-05 A5 继续批次：app-primary 未消费导出 `aAe`/`Jm` 的 action displayability
+纯策略已迁移至 `src/renderer/app-primary/runtime/is-displayable-action.ts`；新增
+`scripts/test-app-primary-is-displayable-action.mjs` 覆盖 primary/secondary、问卷反馈排除、
+缺省 action 与未知类型边界，共 5 项断言。逐行分类证据登记后 reviewedCount 提升至 189。
+
 2026-10-05 A5 继续批次：逐行核对 app-primary markdown 编辑器相邻的三条生成边界：
 `nPe`（公开别名 `wu`，21837--21842）selection 到 DOM Range 的投影、`EB`（公开别名
 `Eu`，21893--21897）编辑器依赖 lazy bootstrap，以及 `OB`（公开别名 `xu`，21914--21918）
