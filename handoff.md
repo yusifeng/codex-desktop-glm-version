@@ -1557,3 +1557,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：worker RPC request lifecycle 的 tracked/uncancelable 状态、启动前取消排队、运行中 abort 与 finish 清理协议已迁移至 `src/main/worker/git-request-lifecycle-policy.ts`；原 lifecycle 入口仅保留兼容转出。新增 `scripts/test-worker-git-request-lifecycle-policy.mjs` 覆盖 8 项 focused assertions；原 `test-git-request-lifecycle.mjs` 回归 11 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：host handoff progress 的 active-step 状态与 started/completed/failed 终态清理协议已迁移至 `src/main/worker/git-host-handoff-progress-policy.ts`；handoff 入口仅保留兼容转出。新增 `scripts/test-worker-git-host-handoff-progress-policy.mjs` 覆盖 6 项 focused assertions；原回归 `test-worker-git-host-handoff-progress.mjs` 10 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：Git worker response envelope 的 trace 可选投影与 emittedAtMs 默认/显式时间戳协议已迁移至 `src/main/worker/git-response-envelope-policy.ts`；原 envelope 入口仅保留兼容转出。新增 `scripts/test-worker-git-response-envelope-policy.mjs` 覆盖 3 项 focused assertions；原回归 `test-worker-git-response-envelope.mjs` 6 项、build 与 typecheck 已通过。
