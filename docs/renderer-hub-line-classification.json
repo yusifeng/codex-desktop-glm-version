@@ -2351,5 +2351,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/parse-codex-delegation.ts",
     "evidence": "The pure delegation-envelope parser validates the complete codex_delegation wrapper, extracts trimmed source-thread/input fields, and rejects incomplete payloads without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "AY",
+    "sourceSymbol": "RNe",
+    "startLine": 60619,
+    "endLine": 60621,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/extract-text-content.ts",
+    "evidence": "The pure content projection keeps only text blocks, joins them with spaces, and delegates normalization without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
   }
 ]
