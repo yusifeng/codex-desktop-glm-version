@@ -126,6 +126,8 @@ function shouldRefreshLiveQuery(query: any, changeType: string) {
 function shouldAttachSharedTrace(trace: any, sharedTrace: any, traceLinks: any[]): boolean {
   return trace != null && !(sharedTrace?.traceparent === trace.traceparent && traceLinks.length === 0);
 }
+/** A shared run is abortable once its final consumer detaches. */
+function shouldAbortSharedRun(consumerCount: number): boolean { return consumerCount <= 0; }
 
 export {
   appendTraceLink,
@@ -133,6 +135,7 @@ export {
   mergeLiveQueryTrace,
   shouldRefreshLiveQuery,
   shouldAttachSharedTrace,
+  shouldAbortSharedRun,
 };
 if (typeof module !== `undefined`)
   module.exports = {
@@ -141,4 +144,5 @@ if (typeof module !== `undefined`)
     mergeLiveQueryTrace,
     shouldRefreshLiveQuery,
     shouldAttachSharedTrace,
+    shouldAbortSharedRun,
   };

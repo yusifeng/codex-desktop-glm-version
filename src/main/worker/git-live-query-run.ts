@@ -1,4 +1,4 @@
-import { appendTraceLink, shouldAttachSharedTrace } from "./git-live-query-policy";
+import { appendTraceLink, shouldAbortSharedRun, shouldAttachSharedTrace } from "./git-live-query-policy";
 import {
   getGitLiveQueryRepositoryKey,
   getGitLiveQuerySharedKey,
@@ -100,7 +100,7 @@ function runGitLiveQuery(
   if (shared.trackedResult != null) onTracked(shared.trackedResult);
   const abort = () => {
     shared.consumers.delete(onTracked);
-    if (shared.consumers.size === 0) shared.abortController.abort(signal.reason);
+    if (shouldAbortSharedRun(shared.consumers.size)) shared.abortController.abort(signal.reason);
   };
   signal.addEventListener(`abort`, abort, { once: true });
   if (signal.aborted) abort();

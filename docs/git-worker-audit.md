@@ -978,6 +978,9 @@ Live-query shared wait 的 trace span/link 附加门禁已迁移至 `shouldAttac
 runtime 仅保留 trace link 组装与异步执行，由 4 项 focused assertions 覆盖 null、同 trace、跨
 trace 与已有 link 边界。
 
+Live-query shared run 的最终 consumer abort 门禁已迁移至 `shouldAbortSharedRun`；runtime 仅
+负责 AbortController 副作用，由 4 项 focused assertions 覆盖零/负数与有消费者边界。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至
