@@ -20,7 +20,7 @@ function createAnnotationProtocol({ object, string, unknown, number, boolean, en
     }).optional(),
   });
   const response = object({
-    type: enumValues([`registered`, `invalidated`, `disposed`, `rendering-failed`, `result`]),
+    type: enumValues(annotationSurfaceResponseTypes()),
     registrationId: id,
     requestId: string().max(channels.maxIdLength).optional(),
     customRendering: boolean().optional(),
@@ -32,3 +32,4 @@ function createAnnotationProtocol({ object, string, unknown, number, boolean, en
 export { createAnnotationProtocol };
 if (typeof module !== `undefined`) module.exports = { createAnnotationProtocol };
 import { createAnnotationProtocolChannels } from "./annotation-protocol-channels";
+import { annotationSurfaceResponseTypes } from "./annotation-protocol-response-policy";
