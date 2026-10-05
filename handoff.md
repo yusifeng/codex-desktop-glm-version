@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：GitHub pull-request revision 的 contents 路径编码与 bounded base64/UTF-8
+文本判定已迁移至 `src/main/worker/github-pull-request-revision-policy.ts`；revision handler
+仅保留 GitHub 请求、账户校验与并发副作用，由 `scripts/test-worker-github-pull-request-revision-policy.mjs`
+覆盖 7 项 focused assertions。
+
 最新增量：annotation permission controller 的请求去重、request-id 配对、host invoke
 失败与 reset 取消 pending 生命周期补齐独立 focused 回归，由
 `scripts/test-preload-annotation-permission-controller.mjs` 覆盖 14 项状态边界断言。

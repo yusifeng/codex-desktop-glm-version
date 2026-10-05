@@ -5,6 +5,8 @@ type RevisionDependencies = {
   requestApi: (request: any, host: any, path: string, args: string[], signal?: AbortSignal) => Promise<string>;
 };
 
+import { decodeGithubFileContent, encodeGithubContentPath } from "./github-pull-request-revision-policy";
+
 const MAX_FILE_BYTES = 1048576;
 
 class Semaphore {
@@ -32,13 +34,9 @@ function createGithubPullRequestRevisionHandlers(deps: RevisionDependencies) {
   };
   const readFile = async (request: any, host: any, path: string | null, revision: string, signal?: AbortSignal) => {
     if (path == null) return ``;
-    const encodedPath = path.split(`/`).map(encodeURIComponent).join(`/`);
+    const encodedPath = encodeGithubContentPath(path);
     const parsed = JSON.parse(await deps.requestApi(request, host, `contents/${encodedPath}?ref=${revision}`, [`-H`, `Accept: application/vnd.github.object+json`], signal));
-    const size = Number(parsed?.size);
-    if (size > MAX_FILE_BYTES || parsed?.encoding !== `base64`) return null;
-    const bytes = Buffer.from(parsed.content, `base64`);
-    if (bytes.byteLength > MAX_FILE_BYTES || bytes.includes(0) || !isUtf8(bytes)) return null;
-    return bytes.toString(`utf8`);
+    return decodeGithubFileContent(parsed);
   };
   return {
     diff: async (request: any, host: any, signal?: AbortSignal) => {
@@ -71,4 +69,3 @@ function createGithubPullRequestRevisionHandlers(deps: RevisionDependencies) {
 
 export { MAX_FILE_BYTES, createGithubPullRequestRevisionHandlers };
 if (typeof module !== `undefined`) module.exports = { MAX_FILE_BYTES, createGithubPullRequestRevisionHandlers };
-import { isUtf8 } from "node:buffer";
