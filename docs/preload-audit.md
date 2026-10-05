@@ -120,7 +120,8 @@ Annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 Annotation site-preview layer（原 `dy/py/_y`，23543-23648）已迁移至
 `src/main/browser-page-preload/annotation-preview-layer.ts`。该模块保留 preview mask 的
 SVG clip-path 重建、按 element 增量维护 clip/glow DOM、border-radius 投影、viewport
-尺寸缓存、stale target 清理和 dispose；入口 `_y` 仅注入原 CSS、rounded-rect path 与
+尺寸缓存、stale target 清理和 dispose；dispose 进入终止态并拒绝迟到的 `update`，防止
+teardown 后重新挂载 preview DOM；入口 `_y` 仅注入原 CSS、rounded-rect path 与
 corner-radius 适配器。`scripts/test-preload-annotation-preview-layer.mjs` 覆盖 style/mask
 装配、target 更新、圆角样式、viewport 尺寸、stale 节点清理与销毁，共 8 项断言。
 

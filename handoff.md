@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation preview layer 的 teardown 终止边界已补齐；`dispose`
+现在幂等并将 layer 标记为终止态，迟到的 `update` 不再重建 clip/glow/mask 节点，避免
+pagehide 或异步 preview 回调在 runtime teardown 后重新挂载 DOM。`scripts/test-preload-annotation-preview-layer.mjs`
+扩展至 10 项 focused assertions；build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git local-environment 的环境解析/差异策略、shell wrapper 生成、平台脚本选择与标签判定已迁移至 `src/main/worker/git-local-environment-policy.ts`；运行时仅保留平台探测、文件/进程 I/O 与日志生命周期。新增 `scripts/test-worker-git-local-environment-policy.mjs` 覆盖 8 项 focused assertions；原 76 项 local-environment 回归继续通过，build 与 typecheck 已通过。
 
 2026-10-05 A5 继续批次：app-primary 未消费导出 `aAe`/`Jm` 的 action displayability

@@ -36,8 +36,10 @@ function createAnnotationPreviewLayer({ layer, color }: { layer: any; color: str
   layer.append(style, svg, backdrop);
   const nodes = new Map<any, { clip: any; glow: any }>();
   let previous = ``;
+  let disposed = false;
   return {
     update(targets: PreviewLayerTarget[]) {
+      if (disposed) return;
       const viewport = {
         width: documentLike.defaultView?.innerWidth ?? documentLike.documentElement.clientWidth,
         height: documentLike.defaultView?.innerHeight ?? documentLike.documentElement.clientHeight,
@@ -77,7 +79,13 @@ function createAnnotationPreviewLayer({ layer, color }: { layer: any; color: str
       }
       backdrop.hidden = targets.length === 0;
     },
-    dispose() { layer.replaceChildren(); nodes.clear(); },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      layer.replaceChildren();
+      nodes.clear();
+      previous = ``;
+    },
   };
 }
 
