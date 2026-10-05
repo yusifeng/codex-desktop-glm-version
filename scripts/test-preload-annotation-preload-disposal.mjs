@@ -10,10 +10,10 @@ const disposal = createAnnotationPreloadDisposal({
   setFeatureApiAvailable: (value) => calls.push(["capability", value]),
 });
 assert.equal(disposal.disposed, false);
-disposal.dispose();
+assert.equal(disposal.dispose(), true);
 assert.deepEqual(calls, ["features", "preview", ["capability", false]]);
 assert.equal(disposal.disposed, true);
-disposal.dispose();
-assert.deepEqual(calls, ["features", "preview", ["capability", false], "features", "preview", ["capability", false]]);
+assert.equal(disposal.dispose(), false);
+assert.deepEqual(calls, ["features", "preview", ["capability", false]]);
 assert.equal(disposal.disposed, true);
-console.log("test-preload-annotation-preload-disposal: 6 assertions passed");
+console.log("test-preload-annotation-preload-disposal: 7 assertions passed");

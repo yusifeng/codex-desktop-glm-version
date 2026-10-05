@@ -1,3 +1,5 @@
+import { createAnnotationPreloadDisposalState } from "./annotation-preload-disposal-state";
+
 type AnnotationPreloadDisposalDependencies = {
   disposeFeatures: () => void;
   clearPreview: () => void;
@@ -14,18 +16,19 @@ type AnnotationPreloadDisposalDependencies = {
  * disabled state while the old graph is still being torn down.
  */
 function createAnnotationPreloadDisposal(deps: AnnotationPreloadDisposalDependencies) {
-  let disposed = false;
+  const state = createAnnotationPreloadDisposalState();
 
   const dispose = () => {
+    if (!state.beginDispose()) return false;
     deps.disposeFeatures();
     deps.clearPreview();
     deps.setFeatureApiAvailable(false);
-    disposed = true;
+    return true;
   };
 
   return {
     dispose,
-    get disposed() { return disposed; },
+    get disposed() { return state.disposed; },
   };
 }
 
