@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { validateHostHandoffParams } = require("../app/.vite/build/worker/git-host-handoff-validation-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.deepEqual(...a)};
+eq(validateHostHandoffParams({}), {status:"error",error:"invalid-params",message:"Missing source rollout path"});
+eq(validateHostHandoffParams({sourceRolloutPath:"/r"}), {status:"error",error:"invalid-params",message:"Missing source branch"});
+eq(validateHostHandoffParams({sourceRolloutPath:"/r",sourceBranch:"main",destinationWorktreeGitRoot:"/g"}), {status:"error",error:"invalid-params",message:"Destination worktree roots must be provided together"});
+eq(validateHostHandoffParams({sourceRolloutPath:"/r",sourceBranch:"main"}), null);
+eq(validateHostHandoffParams({sourceRolloutPath:"/r",sourceBranch:"main",destinationWorktreeGitRoot:"/g",destinationWorktreeWorkspaceRoot:"/w"}), null);
+console.log(`${n} worker host handoff validation policy assertions passed`);

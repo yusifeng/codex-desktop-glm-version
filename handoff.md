@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation surface protocol 的 response discriminant 列表已抽至
+`src/main/browser-page-preload/annotation-protocol-response-policy.ts`；protocol builder 仅保留
+schema shape 组装。新增 `scripts/test-preload-annotation-protocol-response-policy.mjs` 覆盖 1 项
+稳定 response-type 列表断言；原 protocol 回归 6 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation surface protocol 的 IPC channel、deadline、payload/ID
 limits 与 role pattern 常量已抽至 `src/main/browser-page-preload/annotation-protocol-channels.ts`；
 protocol builder 仅保留 schema shape 构造。新增 `scripts/test-preload-annotation-protocol-channels.mjs`
@@ -1564,3 +1569,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：host handoff progress 的 active-step 状态与 started/completed/failed 终态清理协议已迁移至 `src/main/worker/git-host-handoff-progress-policy.ts`；handoff 入口仅保留兼容转出。新增 `scripts/test-worker-git-host-handoff-progress-policy.mjs` 覆盖 6 项 focused assertions；原回归 `test-worker-git-host-handoff-progress.mjs` 10 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：Git worker response envelope 的 trace 可选投影与 emittedAtMs 默认/显式时间戳协议已迁移至 `src/main/worker/git-response-envelope-policy.ts`；原 envelope 入口仅保留兼容转出。新增 `scripts/test-worker-git-response-envelope-policy.mjs` 覆盖 3 项 focused assertions；原回归 `test-worker-git-response-envelope.mjs` 6 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：host handoff RPC 的 source rollout/branch 必填约束与 destination worktree roots 成对协议已迁移至 `src/main/worker/git-host-handoff-validation-policy.ts`；原 validation 入口仅保留兼容转出。新增 `scripts/test-worker-git-host-handoff-validation-policy.mjs` 覆盖 5 项 focused assertions；原回归 8 项、build 与 typecheck 已通过。
