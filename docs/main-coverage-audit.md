@@ -42,7 +42,7 @@ BrowserWindow appearance options 的纯策略（原 `z9`）也已迁移到同一
 
 ## 结论摘要
 
-- 审计时 `wc -l` 为 **176,978 行**；下表覆盖 `1-176,978`，区间首尾连续、无重叠、无空洞。
+- 初始审计基线 `wc -l` 为 **176,978 行**；截至 2026-10-06 当前原始入口为 **176,438 行**（已物理删除 540 行语义实现）。下表区间沿用基线行号作为证据索引；继续抽取时必须以当前符号/行为重新定位，不能把历史末行号当作当前文件行号。
 - `semantic` 表示已有可读实现位于 `src/main/main-app/` 或 `src/main/shared/`，原始行只作为对照证据；`business-preserved` 表示已确认是业务代码但仍由 transform-only 原入口承载，需后续抽取；`vendor-preserved` 表示第三方库或其必要粘合层，保留原始实现；`generated` 表示 rolldown/CJS 包装器、导出表或不可单独赋予业务含义的生成代码。
 - R1-R12 的逐段证据仍是本报告的依据：`docs/main-analysis-r1-r2.md`、`docs/main-analysis-r3.md` … `docs/main-analysis-r11-r12.md`。本报告把这些报告的局部表提升为全文件覆盖索引。
 - 当前 `scripts/chunk-manifest.mjs` 仍将 `main` 标为 PRESERVED。因而表中 `semantic` 是“语义模块覆盖/对应关系”，不等于 main 原文件已经从构建中移除。
@@ -307,6 +307,13 @@ display 与 render-process 监听；173,700-174,330 的 `bst/H9` worker manager 
 结论：本区间没有新的可证实独立纯策略边界。继续拆分会把 WorkerManager/window lifecycle
 副作用伪装成 facade，故维持 `business-preserved`，并要求后续以 worker spawn/dispose 顺序
 harness 为前置证据。
+
+### T4 当前快照校准
+
+`wc -l .reference/originals/main/main-C-Mhak1n.ts` 当前结果为 176,438；仓库没有独立
+`audit-main-coverage` 命令，覆盖证据由本报告的基线表、逐段审计记录和 focused tests 共同维护。
+因此本轮未把历史 `176,978` 末端区间误报为当前未审计代码；后续增量应先更新符号定位，再补
+对应区间证据。
 
 桌面 open-path 的 stat-kind 分类现由入口委托 `src/main/main-app/files/open-path-arguments.ts` 的
 `classifyDesktopOpenPath`，保留真实 stat、warning 日志与后续窗口副作用；已有 17 项 focused
