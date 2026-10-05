@@ -34,12 +34,10 @@ function createAnnotationPreviewLayer({ layer, color }: { layer: any; color: str
   backdrop.className = `annotation-feature-backdrop`;
   backdrop.style.maskImage = `url("#${maskId}")`;
   layer.append(style, svg, backdrop);
-  const nodes = new Map<any, { clip: any; glow: any }>();
-  let previous = ``;
-  let disposed = false;
+  const state = createAnnotationPreviewLayerState();
   return {
     update(targets: PreviewLayerTarget[]) {
-      if (disposed) return;
+      if (state.disposed) return;
       const viewport = {
         width: documentLike.defaultView?.innerWidth ?? documentLike.documentElement.clientWidth,
         height: documentLike.defaultView?.innerHeight ?? documentLike.documentElement.clientHeight,
@@ -48,14 +46,14 @@ function createAnnotationPreviewLayer({ layer, color }: { layer: any; color: str
       for (const target of targets) {
         const { element, rect, clipRect } = target;
         const [topLeft, topRight, bottomRight, bottomLeft] = deps.resolveCornerRadii(target);
-        let node = nodes.get(element);
+        let node = state.nodes.get(element);
         if (node == null) {
           const clip = documentLike.createElement(`div`);
           clip.className = `annotation-feature-clip`;
           const glow = documentLike.createElement(`div`);
           glow.className = `annotation-feature-glow`;
           clip.append(glow); layer.append(clip);
-          node = { clip, glow }; nodes.set(element, node);
+          node = { clip, glow }; state.nodes.set(element, node);
         }
         Object.assign(node.clip.style, { left: `${clipRect.x}px`, top: `${clipRect.y}px`, width: `${clipRect.width}px`, height: `${clipRect.height}px` });
         Object.assign(node.glow.style, {
@@ -64,11 +62,11 @@ function createAnnotationPreviewLayer({ layer, color }: { layer: any; color: str
           borderBottomLeftRadius: `${bottomLeft.x}px ${bottomLeft.y}px`, borderBottomRightRadius: `${bottomRight.x}px ${bottomRight.y}px`,
         });
       }
-      for (const [element, node] of nodes) if (!active.has(element)) { node.clip.remove(); nodes.delete(element); }
+      for (const [element, node] of state.nodes) if (!active.has(element)) { node.clip.remove(); state.nodes.delete(element); }
       const shapes = targets.map((target) => ({ path: deps.buildRoundedRectPath(target), clip: target.clipRect }));
       const serialized = JSON.stringify({ viewport, shapes });
-      if (serialized !== previous) {
-        previous = serialized;
+      if (serialized !== state.previous) {
+        state.setPrevious(serialized);
         for (const node of [mask, whiteRect]) { node.setAttribute(`width`, String(viewport.width)); node.setAttribute(`height`, String(viewport.height)); }
         mask.replaceChildren(whiteRect); svg.replaceChildren(mask);
         shapes.forEach(({ path, clip }, index) => {
@@ -80,14 +78,12 @@ function createAnnotationPreviewLayer({ layer, color }: { layer: any; color: str
       backdrop.hidden = targets.length === 0;
     },
     dispose() {
-      if (disposed) return;
-      disposed = true;
+      if (!state.dispose()) return;
       layer.replaceChildren();
-      nodes.clear();
-      previous = ``;
     },
   };
 }
 
 export { createAnnotationPreviewLayer };
 if (typeof module !== `undefined`) module.exports = { createAnnotationPreviewLayer };
+import { createAnnotationPreviewLayerState } from "./annotation-preview-layer-state";

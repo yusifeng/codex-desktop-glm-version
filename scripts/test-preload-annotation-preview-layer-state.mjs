@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationPreviewLayerState } = require("../app/.vite/build/browser-page-preload/annotation-preview-layer-state.js");
+const state = createAnnotationPreviewLayerState();
+const element = {};
+state.nodes.set(element, {});
+state.setPrevious("snapshot");
+assert.equal(state.previous, "snapshot");
+assert.equal(state.nodes.has(element), true);
+assert.equal(state.dispose(), true);
+assert.equal(state.disposed, true);
+assert.equal(state.previous, "");
+assert.equal(state.nodes.size, 0);
+assert.equal(state.dispose(), false);
+console.log("test-preload-annotation-preview-layer-state: 7 assertions passed");
