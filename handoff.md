@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation payload 的 metadata key 格式约束纯策略已抽至
+`src/main/browser-page-preload/annotation-metadata-key-policy.ts`；control payload adapter 仅保留
+schema 清洗与 response 编排。新增 `scripts/test-preload-annotation-metadata-key-policy.mjs` 覆盖 3 项
+合法 key、带空格 key 与非法标点断言；原 annotation runtime 回归 45 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation payload 的控制字符/格式字符安全文本判定纯策略已抽至
 `src/main/browser-page-preload/annotation-safe-text-policy.ts`；control payload adapter 仅保留
 schema 清洗与 response 编排。新增 `scripts/test-preload-annotation-safe-text-policy.mjs` 覆盖 3 项

@@ -1,5 +1,3 @@
-const metadataKey = /^[A-Za-z][A-Za-z0-9_-]*(?: [A-Za-z0-9_-]+)*$/;
-
 const cloneRecord = cloneAnnotationRecord;
 
 function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; maxRoleLength: number; rolePattern: string; metadataLimits: { maxKeys: number; maxKeyLength: number; maxStringValueLength: number; maxSerializedBytes: number } }): Record<string, unknown> | null | undefined {
@@ -16,7 +14,7 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
       result.rect = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
     }
     const metadata = cloneRecord(raw.metadata, limits.metadataLimits.maxKeys);
-    if (metadata != null && Object.entries(metadata).every(([key, item]) => key.length <= limits.metadataLimits.maxKeyLength && metadataKey.test(key) && (item === null || typeof item === `boolean` || (typeof item === `number` && Number.isFinite(item)) || (typeof item === `string` && item.length <= limits.metadataLimits.maxStringValueLength && isSafeAnnotationText(item))))) {
+    if (metadata != null && Object.entries(metadata).every(([key, item]) => key.length <= limits.metadataLimits.maxKeyLength && isSafeAnnotationMetadataKey(key) && (item === null || typeof item === `boolean` || (typeof item === `number` && Number.isFinite(item)) || (typeof item === `string` && item.length <= limits.metadataLimits.maxStringValueLength && isSafeAnnotationText(item))))) {
       const serialized = JSON.stringify(metadata);
       if (new TextEncoder().encode(serialized).byteLength <= limits.metadataLimits.maxSerializedBytes) result.metadata = JSON.parse(serialized);
     }
@@ -41,3 +39,4 @@ if (typeof module !== `undefined`) module.exports = { cloneRecord, isValidAnnota
 import { isValidAnnotationHitTestRequest } from "./annotation-hit-test-request-policy";
 import { cloneAnnotationRecord } from "./annotation-record-clone-policy";
 import { isSafeAnnotationText } from "./annotation-safe-text-policy";
+import { isSafeAnnotationMetadataKey } from "./annotation-metadata-key-policy";
