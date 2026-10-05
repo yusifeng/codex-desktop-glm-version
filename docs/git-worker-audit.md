@@ -1089,3 +1089,11 @@ cache、Git I/O 与异步短路编排。`scripts/test-worker-git-remote-branches
 signal 与列表查询依赖；缺失 repository 稳定返回空数组，入口继续持有请求 envelope、取消
 与 Git I/O 生命周期。`scripts/test-worker-git-worktree-list-request-handler.mjs` 覆盖存在与
 缺失 repository、参数和 signal 透传，共 5 项 focused assertions。
+
+### 增量抽取：Worktree file enumeration policy
+
+Worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 状态投影、literal pathspec
+字节分批、index fingerprint 与缺失文件判定已迁移至
+`src/main/worker/git-worktree-files-policy.ts`。`git-worktree-files.ts` 继续持有 Git 命令、stat、
+稳定性重试和 fallback 生命周期，并复用这些纯策略；
+`scripts/test-worker-git-worktree-files-policy.mjs` 覆盖 11 项 focused assertions。
