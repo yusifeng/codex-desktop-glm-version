@@ -8,6 +8,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-blame-file-policy.mjs`](./test-worker-git-blame-file-policy.mjs)
 - [`test-worker-git-status-summary-policy.mjs`](./test-worker-git-status-summary-policy.mjs)
 
 - [`test-worker-git-review-working-tree-policy.mjs`](./test-worker-git-review-working-tree-policy.mjs)
@@ -981,6 +982,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-range-validation.mjs`](./test-preload-annotation-range-validation.mjs)
 - [`test-preload-annotation-feature-lifecycle.mjs`](./test-preload-annotation-feature-lifecycle.mjs)
 - [`test-preload-annotation-element-cache.mjs`](./test-preload-annotation-element-cache.mjs)
+- [`test-preload-annotation-preload-disposal.mjs`](./test-preload-annotation-preload-disposal.mjs)
 - [`test-worker-git-request-invalidation-policy.mjs`](./test-worker-git-request-invalidation-policy.mjs)
 - [`test-worker-git-request-context-policy.mjs`](./test-worker-git-request-context-policy.mjs)
 - [`test-worker-computer-use-capture-policy.mjs`](./test-worker-computer-use-capture-policy.mjs)

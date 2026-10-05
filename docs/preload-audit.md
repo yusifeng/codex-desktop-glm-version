@@ -646,3 +646,11 @@ overlay runtime 按 root host 维护的 element cache 及其 dispose 清理边�
 销毁后隔离新缓存；overlay runtime 继续注入 DOM 解析和渲染副作用。由
 `scripts/test-preload-annotation-element-cache.mjs` 覆盖 host 复用、跨 host 隔离、dispose
 清理及销毁后访问，共 9 项 focused assertions。
+
+### 增量抽取：annotation preload disposal lifecycle
+
+preload runtime 的 feature graph、preview overlay 与 capability flag 的统一销毁顺序已迁移至
+`src/main/browser-page-preload/annotation-preload-disposal.ts`。模块保留可重复 teardown
+语义，并保证 feature dispose → preview clear → capability reset 的状态边界；pagehide 与
+host-sync/重初始化仍由 runtime 编排。`scripts/test-preload-annotation-preload-disposal.mjs`
+覆盖顺序、终止标记与重复销毁，共 6 项 focused assertions。

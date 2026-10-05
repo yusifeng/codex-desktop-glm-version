@@ -8,6 +8,7 @@ import { handleAnnotationPagehide } from "./annotation-pagehide";
 import { initializeAnnotationPreload } from "./annotation-preload-lifecycle";
 import { applyAnnotationPreloadPolicyState } from "./annotation-preload-policy-state";
 import { createAnnotationPreloadState } from "./annotation-preload-state";
+import { createAnnotationPreloadDisposal } from "./annotation-preload-disposal";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -88,11 +89,12 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     isCommentModeActive: () => deps.isCommentModeActive(state),
   });
 
-  const disposeFeatures = () => {
-    featureLifecycle.dispose();
-    runtimeMount.setPreview(null);
-    lifecycleState.setSiteAnnotationApiAvailable(false);
-  };
+  const disposal = createAnnotationPreloadDisposal({
+    disposeFeatures: () => featureLifecycle.dispose(),
+    clearPreview: () => runtimeMount.setPreview(null),
+    setFeatureApiAvailable: (available) => lifecycleState.setSiteAnnotationApiAvailable(available),
+  });
+  const disposeFeatures = disposal.dispose;
 
   const applySync = (message: any) => {
     const result = applyAnnotationSyncState({
