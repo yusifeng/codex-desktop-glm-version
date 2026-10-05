@@ -282,6 +282,19 @@ node scripts/audit-shared-consumption.mjs
 
 本报告只新增审计证据，不改变源码、构建路径或 chunk manifest；它是 T4 的覆盖基线，后续每次抽取应在表中把对应区间的 `business-preserved`/`generated` 更新为具体语义模块，并保留原始行号引用。
 
+### T4 覆盖复核：175,890-176,978 启动装配暂不迁移
+
+本轮对 `Ust` 后半段启动装配进行了逐段复核。该区间同时交织 Electron app/window 生命周期、tray
+初始化（`Pst/Ge`）、computer-use/browser-use service 构造、app-server connection registry
+订阅、插件 reconcile、focus/quit 事件监听与 disposable 注册；例如 175,900-176,050 在同一
+异步路径中创建 tray、注册 `will-quit`、安装菜单 action，并在失败时执行 `he()` fallback，
+176,100-176,500 又继续注册多个服务和 browser/IAB activity callbacks。上述逻辑共享 startup
+flags、`I` disposable 栈和窗口 manager，抽出任一局部函数都会改变副作用顺序或 cleanup ownership。
+
+结论：该区间当前没有可独立闭合且不改变副作用顺序的纯策略边界；保留为
+`business-preserved`，并以本节作为 coverage audit 证据。下一次抽取前必须先建立针对单一服务
+构造/注册顺序的 focused harness，不得以 facade 或无消费 policy 减少覆盖区间。
+
 桌面 open-path 的 stat-kind 分类现由入口委托 `src/main/main-app/files/open-path-arguments.ts` 的
 `classifyDesktopOpenPath`，保留真实 stat、warning 日志与后续窗口副作用；已有 17 项 focused
 断言覆盖 directory、HTML browser-document、普通 file 与缺失路径边界。
