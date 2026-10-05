@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { matchesGitQuery } = require("../app/.vite/build/worker/git-query-match-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+eq(matchesGitQuery(["git","local","/repo","status"]), true);
+eq(matchesGitQuery(["git","local","/repo","status"], {id:"local"}), true);
+eq(matchesGitQuery(["git","local","/repo","status"], {id:"remote"}), false);
+eq(matchesGitQuery(["git","local"], null), true);
+eq(matchesGitQuery(["query","local"], {id:"local"}), false);
+eq(matchesGitQuery("git", {id:"local"}), false);
+console.log(`${n} worker query match policy assertions passed`);

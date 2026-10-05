@@ -4,10 +4,6 @@ function utf8ByteLength(value: string): number {
   return encoder.encode(value).byteLength;
 }
 
-function matchesGitQuery(queryKey: unknown, host?: { id: string } | null): boolean {
-  return Array.isArray(queryKey) && queryKey[0] === `git` && (host == null || queryKey[1] === hostId(host));
-}
-
 function shouldCheckGitAvailability(method: string, isLocal: boolean, isMutation: boolean): boolean {
   return isLocal && !isMutation && isCancelableGitRequest(method);
 }
@@ -20,3 +16,4 @@ import { isCacheableGitCommand } from "./git-cache-command-policy";
 import { normalizeGitPath, pathsOverlap } from "./git-path-overlap-policy";
 import { hasFsmonitorDaemonFeature } from "./git-fsmonitor-feature-policy";
 import { fsmonitorCacheKey, gitQueryKey, hostId } from "./git-query-key-policy";
+import { matchesGitQuery } from "./git-query-match-policy";
