@@ -2331,5 +2331,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-initial/runtime/parse-conversation-route.ts",
     "evidence": "The route parser validates a location, delegates URL and route-template matching through injected policies, and returns a stable conversationId/path projection without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-initial",
+    "alias": "hn",
+    "sourceSymbol": "jzc",
+    "startLine": 6542,
+    "endLine": 6542,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-initial/runtime/build-rate-limit-buckets.ts",
+    "evidence": "The usage-view policy filters and stably sorts primary/secondary rate-limit buckets, disambiguates duplicate keys, and preserves limit ownership without JSX, store, network, or lifecycle effects. It is covered by a focused three-assertion runtime test."
   }
 ]
