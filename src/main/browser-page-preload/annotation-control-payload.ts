@@ -14,7 +14,7 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
       result.rect = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
     }
     const metadata = cloneRecord(raw.metadata, limits.metadataLimits.maxKeys);
-    if (metadata != null && Object.entries(metadata).every(([key, item]) => key.length <= limits.metadataLimits.maxKeyLength && isSafeAnnotationMetadataKey(key) && (item === null || typeof item === `boolean` || (typeof item === `number` && Number.isFinite(item)) || (typeof item === `string` && item.length <= limits.metadataLimits.maxStringValueLength && isSafeAnnotationText(item))))) {
+    if (metadata != null && Object.entries(metadata).every(([key, item]) => key.length <= limits.metadataLimits.maxKeyLength && isSafeAnnotationMetadataKey(key) && isSafeAnnotationMetadataValue(item, limits.metadataLimits.maxStringValueLength))) {
       const serialized = JSON.stringify(metadata);
       if (new TextEncoder().encode(serialized).byteLength <= limits.metadataLimits.maxSerializedBytes) result.metadata = JSON.parse(serialized);
     }
@@ -42,3 +42,4 @@ import { isSafeAnnotationText } from "./annotation-safe-text-policy";
 import { isSafeAnnotationMetadataKey } from "./annotation-metadata-key-policy";
 import { isSafeAnnotationRole } from "./annotation-role-policy";
 import { isValidAnnotationRect } from "./annotation-rect-policy";
+import { isSafeAnnotationMetadataValue } from "./annotation-metadata-value-policy";
