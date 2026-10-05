@@ -5,6 +5,7 @@ const calls = [];
 const deps = Object.fromEntries([
   ["clearPreview", () => calls.push("preview")],
   ["resetPermission", () => calls.push("permission")],
+  ["disposePermission", () => calls.push("dispose-permission")],
   ["disposeFeatures", () => calls.push("features")],
   ["removeDOMContentLoaded", () => calls.push("dom")],
   ["removeHostMessageListener", () => calls.push("host")],
@@ -19,9 +20,9 @@ assert.equal(handleAnnotationPagehide({ isTrusted: true, persisted: true }, deps
 assert.deepEqual(calls, ["preview", "permission"]);
 calls.length = 0;
 assert.equal(handleAnnotationPagehide({ isTrusted: true, persisted: false }, deps), true);
-assert.deepEqual(calls, ["preview", "permission", "destroyed", "features", "dom", "host", "mount"]);
+assert.deepEqual(calls, ["preview", "permission", "destroyed", "dispose-permission", "features", "dom", "host", "mount"]);
 calls.length = 0;
 assert.equal(handleAnnotationPagehide(null, deps), false);
 assert.deepEqual(calls, ["preview"]);
 
-console.log(`test-preload-annotation-pagehide: 8 assertions passed`);
+console.log(`test-preload-annotation-pagehide: 9 assertions passed`);
