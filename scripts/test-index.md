@@ -1173,8 +1173,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-review-numstat-policy.mjs](test-worker-git-review-numstat-policy.mjs)
 [test-app-shared-is-wsl-host-source.mjs](test-app-shared-is-wsl-host-source.mjs)
 [test-app-shared-is-managed-host-source.mjs](test-app-shared-is-managed-host-source.mjs)
-[test-worker-git-review-numstat-policy.mjs](test-worker-git-review-numstat-policy.mjs)
-[test-app-shared-is-wsl-host-source.mjs](test-app-shared-is-wsl-host-source.mjs)
 [test-app-shared-format-scheduled-task-key.mjs](test-app-shared-format-scheduled-task-key.mjs)
 [test-app-shared-format-error-message.mjs](test-app-shared-format-error-message.mjs)
 [test-app-shared-create-chat-slug.mjs](test-app-shared-create-chat-slug.mjs)
