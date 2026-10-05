@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 942.
+Total scripts: 944.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -1001,10 +1001,10 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-normalize-recipient-fields.mjs`](./test-app-primary-normalize-recipient-fields.mjs)
 - [`test-preload-annotation-region-class-policy.mjs`](./test-preload-annotation-region-class-policy.mjs)
 - [`test-preload-annotation-preload-policy-state.mjs`](./test-preload-annotation-preload-policy-state.mjs)
-- [`test-preload-annotation-preload-bridge.mjs`](./test-preload-annotation-preload-bridge.mjs)
 - [`test-app-primary-extract-skill-kind.mjs`](./test-app-primary-extract-skill-kind.mjs)
 - [`test-app-primary-annotation-selection-style.mjs`](./test-app-primary-annotation-selection-style.mjs)
 - [`test-app-primary-format-composer-placeholder.mjs`](./test-app-primary-format-composer-placeholder.mjs)
 - [`test-renderer-merge-conflict-state.mjs`](./test-renderer-merge-conflict-state.mjs)
 - [`test-app-primary-is-displayable-action.mjs`](./test-app-primary-is-displayable-action.mjs)
+- [`test-app-primary-create-editor-selection-range.mjs`](./test-app-primary-create-editor-selection-range.mjs)
 - [`test-worker-git-worktree-list-request-handler.mjs`](./test-worker-git-worktree-list-request-handler.mjs)
