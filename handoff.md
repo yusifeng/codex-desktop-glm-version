@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation design CSS helper（变更声明筛选、design-group
+selector 转义、`!important` 规则生成与多规则拼接）已迁移至
+`src/main/browser-page-preload/annotation-design-styles.ts`；原 `Cs`/`Es`/`Ds` 入口保留
+兼容委托。新增 `scripts/test-preload-annotation-design-css.mjs` 覆盖 4 项断言；annotation
+runtime 45 项、build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation design color normalization（hex/rgb/rgba 解析、
 alpha 百分比、通道裁剪与大写输出）已从 preload business helper 抽取至
 `src/main/browser-page-preload/annotation-color-policy.ts`；原 `ws` 入口保留兼容委托，
@@ -11,6 +17,12 @@ recipient/cc/bcc 规范化纯策略已迁移至 `src/renderer/app-primary/runtim
 结构化联系人校验与 legacy 分隔字段回退解析均无 JSX、store 或生命周期副作用。新增
 `scripts/test-app-primary-normalize-recipient-contacts.mjs` 覆盖 3 项 focused assertions；manifest
 unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过。
+
+2026-10-06 A5 继续批次：app-primary 导出 `$`（内部 `ogt`，源码 66291--66300）的项目搜索排序纯策略
+已迁移至 `src/renderer/app-primary/runtime/rank-projects-by-query.ts`；该策略负责 query trim、最佳匹配
+分数、零分过滤与稳定降序排序，通过注入 scorer 避免携带 hub 依赖。新增
+`scripts/test-app-primary-rank-projects-by-query.mjs` 覆盖 3 项 focused assertions；build/typecheck
+与 focused test 已通过。
 
 2026-10-05 构建/启动回归修复：main-app transform-only 输出统一补齐 Node ESM 的 `.js` 相对导入，并将
 `@chunk/*` 改写为实际 chunk 相对路径；bootstrap vendor 兼容导出改用稳定局部绑定，补回 preserved main
@@ -1840,6 +1852,8 @@ typecheck 均通过。
 2026-10-06 A3 继续批次：native pipe server 补齐原始回调契约：`onWebMcpToolInvoked`、CDP event、CDP detach、page event 与 download change，并统一使用 IAB download listener Symbol；`scripts/test-main-native-pipe-server.mjs` 覆盖 WebMCP 回调、帧上限、四路发送、超大帧忽略、普通错误传播与两次 dispose 清理共 13 项断言。
 
 2026-10-06 A1 T1 继续批次：Git watcher telemetry 的 host/root index-size bucket 选择已物理迁移至 `src/main/worker/git-watch-index-bucket-policy.ts`；兼容入口仅保留转出，watcher 集合与 telemetry 生命周期仍由运行时编排。新增 `scripts/test-worker-git-watch-index-bucket-policy.mjs` 覆盖 4 项 focused assertions。
+
+2026-10-06 A1 T1 继续批次：Worktree 创建的 synced-branch setup 条件与 local branch ref 投影已统一迁移到 `resolveSyncedBranchSetup`；create runtime 仅保留 commit-tree 查询和 config 写入副作用。`scripts/test-worker-git-worktree-branch-setup-policy.mjs` 增加 2 项投影/跳过断言，原 10 项回归继续通过。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。

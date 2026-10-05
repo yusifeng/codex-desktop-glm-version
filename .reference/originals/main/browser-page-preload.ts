@@ -3942,9 +3942,7 @@ function Ss(e, { viewport: t, viewportScale: n, zoomFactor: r = 1 }) {
   return { x: d, y: f >= c ? f : Ps(p, c, s - l - c), width: u, height: l };
 }
 function Cs(e, t = Js) {
-  return e.flatMap((e) => Es(e, t)).join(`
-
-`);
+  return annotationDesignStyles.buildAnnotationDesignStyles(e, t);
 }
 function ws(e) {
   return normalizeAnnotationColorPolicy(e);
@@ -3976,6 +3974,8 @@ function Ts(e, t) {
   return a;
 }
 function Es(e, t) {
+  return annotationDesignStyles.buildAnnotationDesignStyleRule(e, t);
+/*
   let n = e.declarations.filter((e) => e.value.trim() !== e.previousValue.trim());
   return n.length === 0
     ? []
@@ -3987,9 +3987,10 @@ function Es(e, t) {
         ].join(`
 `),
       ];
+*/
 }
 function Ds(e) {
-  return e.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
+  return annotationDesignStyles.escapeAnnotationDesignSelector(e);
 }
 /* migrated color parser */
 /* function Os(e) {

@@ -3,6 +3,14 @@ export type AnnotationStyleDeclaration = {
   value?: string;
   previousValue?: string;
 };
+type AnnotationDesignStyle = { draftAttribute: string; declarations: readonly AnnotationStyleDeclaration[] };
+function escapeAnnotationDesignSelector(value: string): string { return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`); }
+function buildAnnotationDesignStyleRule(style: AnnotationDesignStyle, attribute = `data-codex-browser-design-group`): string[] {
+  const changed = style.declarations.filter((declaration) => (declaration.value ?? ``).trim() !== (declaration.previousValue ?? ``).trim());
+  if (changed.length === 0) return [];
+  return [[`[${attribute}~="${escapeAnnotationDesignSelector(style.draftAttribute)}"] {`, ...changed.map((declaration) => `  ${declaration.property}: ${declaration.value} !important;`), `}`].join(`\n`)];
+}
+function buildAnnotationDesignStyles(styles: readonly AnnotationDesignStyle[], attribute = `data-codex-browser-design-group`): string { return styles.flatMap((style) => buildAnnotationDesignStyleRule(style, attribute)).join(`\n\n`); }
 
 function collectAnnotationStyleDeclarations(
   computedStyle: { getPropertyValue(property: string): string },
@@ -62,5 +70,5 @@ function isAnnotationInteractionTargetMatch(
   }
 }
 
-export { collectAnnotationStyleDeclarations, mergeAnnotationStyleDeclarations, readAnnotationDirectText, createAnnotationTextDraft, projectAnnotationStyleProvenance, isAnnotationInteractionTargetMatch };
-if (typeof module !== "undefined") module.exports = { collectAnnotationStyleDeclarations, mergeAnnotationStyleDeclarations, readAnnotationDirectText, createAnnotationTextDraft, projectAnnotationStyleProvenance, isAnnotationInteractionTargetMatch };
+export { collectAnnotationStyleDeclarations, mergeAnnotationStyleDeclarations, readAnnotationDirectText, createAnnotationTextDraft, projectAnnotationStyleProvenance, isAnnotationInteractionTargetMatch, escapeAnnotationDesignSelector, buildAnnotationDesignStyleRule, buildAnnotationDesignStyles };
+if (typeof module !== "undefined") module.exports = { collectAnnotationStyleDeclarations, mergeAnnotationStyleDeclarations, readAnnotationDirectText, createAnnotationTextDraft, projectAnnotationStyleProvenance, isAnnotationInteractionTargetMatch, escapeAnnotationDesignSelector, buildAnnotationDesignStyleRule, buildAnnotationDesignStyles };

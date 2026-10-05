@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation design CSS rule policy
+
+Annotation design CSS 规则生成（原 `Cs`/`Es`/`Ds`，3863-4050 业务工具段）已迁移至
+`annotation-design-styles.ts`：变更声明筛选、`!important` 规则序列化、design-group
+selector 转义及多规则拼接均为纯策略；入口保留兼容委托。`scripts/test-preload-annotation-design-css.mjs`
+覆盖 4 项 focused assertions，annotation runtime、build 与 typecheck 均通过。
+
 ### 增量抽取：annotation color normalization policy
 
 Annotation design color normalization（原 `ws` 及 `Os`/`ks`/`As`/`js`，3863-4050
