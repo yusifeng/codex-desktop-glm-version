@@ -50,6 +50,11 @@ node scripts/audit-app-shared-consumption.mjs
 node scripts/verify-renderer.mjs
 ```
 
+The exhaustive export-category gate is `scripts/audit-renderer-hub-manifest.mjs`.
+It reports `consumed`, `semantic`, `preserved-coupled`, and `unreviewed` for
+every published export. `--strict` intentionally fails while any export lacks
+source-line evidence; no unreviewed export is silently promoted to preserved.
+
 These checks are the acceptance gates for extending any hub. A new semantic
 module must first add its declaration and then reduce the preserved inventory;
 identity stubs or fabricated exports are not accepted.
