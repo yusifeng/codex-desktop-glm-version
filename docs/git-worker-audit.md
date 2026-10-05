@@ -1075,3 +1075,11 @@ Linux `.desktop` 应用条目的 Hidden/Type/DBus、OnlyShowIn/NotShowIn、TryEx
 投影策略已迁移至 `src/main/worker/linux-desktop-entry-policy.ts`；入口仍负责目录遍历、文件
 读取、可执行文件探测与进程启动副作用。`scripts/test-worker-linux-desktop-entry-policy.mjs`
 覆盖 5 项可见性、DBus、TryExec 与默认名称断言。
+
+### 增量抽取：Worktree list request boundary
+
+`list-worktrees` 请求的 repository 可空解析与列表委派已迁移至
+`src/main/worker/git-worktree-list-request-handler.ts`。helper 只接收 Git manager、host、
+signal 与列表查询依赖；缺失 repository 稳定返回空数组，入口继续持有请求 envelope、取消
+与 Git I/O 生命周期。`scripts/test-worker-git-worktree-list-request-handler.mjs` 覆盖存在与
+缺失 repository、参数和 signal 透传，共 5 项 focused assertions。

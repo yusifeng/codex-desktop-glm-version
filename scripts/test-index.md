@@ -996,3 +996,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-extract-skill-kind.mjs`](./test-app-primary-extract-skill-kind.mjs)
 - [`test-app-primary-annotation-selection-style.mjs`](./test-app-primary-annotation-selection-style.mjs)
 - [`test-app-primary-format-composer-placeholder.mjs`](./test-app-primary-format-composer-placeholder.mjs)
+- [`test-worker-git-worktree-list-request-handler.mjs`](./test-worker-git-worktree-list-request-handler.mjs)
