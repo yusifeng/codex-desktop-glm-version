@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git apply-patch 的纯解析边界（patch 输出结果路径分类与 diff
+路径提取）已迁移至 `src/main/worker/git-apply-patch-policy.ts`；apply 入口仅保留仓库、临时
+index、Git I/O 与清理副作用，兼容导出继续接回。新增
+`scripts/test-worker-git-apply-patch-policy.mjs` 覆盖 4 项 focused assertions；build 与
+typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review comparison 的 source→diff 参数判定、merge-base/default
 branch 回退、commit parent 与 HEAD SHA 校验已迁移至
 `src/main/worker/git-review-comparison-policy.ts`；入口保留仓库查询与 Git I/O 编排，新增
