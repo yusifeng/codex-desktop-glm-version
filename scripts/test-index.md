@@ -37,7 +37,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-shared-is-remote-control-event.mjs`](./test-app-shared-is-remote-control-event.mjs)
 - [`test-preload-annotation-preload-message-queue-state.mjs`](./test-preload-annotation-preload-message-queue-state.mjs)
 - [`test-preload-annotation-pointer-selection-state.mjs`](./test-preload-annotation-pointer-selection-state.mjs)
-- [`test-preload-annotation-modal-boundary-policy.mjs`](./test-preload-annotation-modal-boundary-policy.mjs)
 - [`test-app-shared-normalize-workspace-path.mjs`](./test-app-shared-normalize-workspace-path.mjs)
 - [`test-app-shared-is-path-within-roots.mjs`](./test-app-shared-is-path-within-roots.mjs)
 - [`test-app-shared-format-workspace-relative-path.mjs`](./test-app-shared-format-workspace-relative-path.mjs)
