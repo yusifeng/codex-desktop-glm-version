@@ -4,7 +4,7 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
   if (value === null) return null;
   try {
     const raw = cloneRecord(value, 5);
-    if (raw == null || typeof raw.id !== `string` || raw.id.length === 0 || raw.id.length > limits.maxIdLength || !isSafeAnnotationText(raw.id)) return undefined;
+    if (raw == null || !isSafeAnnotationId(raw.id, limits.maxIdLength)) return undefined;
     const result: Record<string, unknown> = { id: raw.id };
     if (typeof raw.name === `string` && raw.name.trim().length > 0 && raw.name.length <= 128 && isSafeAnnotationText(raw.name)) result.name = raw.name;
     if (typeof raw.role === `string` && isSafeAnnotationRole(raw.role, limits.maxRoleLength, limits.rolePattern)) result.role = raw.role;
@@ -43,3 +43,4 @@ import { isSafeAnnotationMetadataKey } from "./annotation-metadata-key-policy";
 import { isSafeAnnotationRole } from "./annotation-role-policy";
 import { isValidAnnotationRect } from "./annotation-rect-policy";
 import { isSafeAnnotationMetadataValue } from "./annotation-metadata-value-policy";
+import { isSafeAnnotationId } from "./annotation-id-policy";

@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation hit id 的非空、长度与安全文本约束纯策略已抽至
+`src/main/browser-page-preload/annotation-id-policy.ts`；control payload adapter 仅保留 clone、
+schema 清洗与 response 编排。新增 `scripts/test-preload-annotation-id-policy.mjs` 覆盖 4 项合法、
+空值、超长与控制字符断言；原 annotation runtime 回归 45 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation metadata value 的 null/boolean/finite-number/safe-string
 约束纯策略已抽至 `src/main/browser-page-preload/annotation-metadata-value-policy.ts`；control payload
 adapter 仅保留 clone、key/schema 清洗与 response 编排。新增
@@ -1645,3 +1650,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：Git query key 的 `git` namespace 与 host-scoped 匹配协议已迁移至 `src/main/worker/git-query-match-policy.ts`；query utils 保留 key 构造、cacheability、路径与环境策略。新增 `scripts/test-worker-git-query-match-policy.mjs` 覆盖 6 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：Git 输出 UTF-8 字节长度计算策略已迁移至 `src/main/worker/git-output-size-policy.ts`，确保多字节文本按字节计量；query utils 保留查询与路径协议。新增 `scripts/test-worker-git-output-size-policy.mjs` 覆盖 4 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：local/mutation/request-cancelability 组合得到 availability-check 的策略已迁移至 `src/main/worker/git-availability-policy.ts`；query utils 保留 request classification 与查询键/缓存策略。新增 `scripts/test-worker-git-availability-policy.mjs` 覆盖 4 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
