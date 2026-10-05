@@ -30,8 +30,9 @@ function collectAnnotationVisibleText(
   while (node != null) {
     const value = dependencies.normalizeText(node.textContent);
     if (value != null && dependencies.rangeIntersectsRect(documentObject, node, viewportRect)) {
-      text = text.length === 0 ? value : `${text} ${value}`;
-      if (text.length >= MAX_VISIBLE_TEXT_LENGTH) break;
+      const appended = appendAnnotationVisibleText(text, value, MAX_VISIBLE_TEXT_LENGTH);
+      text = appended.text;
+      if (appended.complete) break;
     }
     node = walker.nextNode();
   }
@@ -40,3 +41,4 @@ function collectAnnotationVisibleText(
 
 export { collectAnnotationVisibleText, MAX_VISIBLE_TEXT_LENGTH };
 if (typeof module !== `undefined`) module.exports = { collectAnnotationVisibleText, MAX_VISIBLE_TEXT_LENGTH };
+import { appendAnnotationVisibleText } from "./annotation-visible-text-policy";
