@@ -2341,5 +2341,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-initial/runtime/build-rate-limit-buckets.ts",
     "evidence": "The usage-view policy filters and stably sorts primary/secondary rate-limit buckets, disambiguates duplicate keys, and preserves limit ownership without JSX, store, network, or lifecycle effects. It is covered by a focused three-assertion runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "AX",
+    "sourceSymbol": "xMe",
+    "startLine": 60009,
+    "endLine": 60015,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/parse-codex-delegation.ts",
+    "evidence": "The pure delegation-envelope parser validates the complete codex_delegation wrapper, extracts trimmed source-thread/input fields, and rejects incomplete payloads without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
   }
 ]
