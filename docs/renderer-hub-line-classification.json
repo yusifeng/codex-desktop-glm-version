@@ -1932,5 +1932,65 @@
     "classification": "generated-local-plugin-bootstrap",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The lazy initializer wires adjacent plugin/thread-reference helpers and a static unavailable-state token; setup is owned by the surrounding generated route with no standalone renderer consumer or teardown boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Rd",
+    "sourceSymbol": "RMe",
+    "startLine": 17397,
+    "endLine": 17402,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper projects an email-thread subject from metadata variants and fallback title fields; it is a pure local projection coupled to the adjacent mail composer surface with no independently named renderer consumer or teardown owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "zd",
+    "sourceSymbol": "zMe",
+    "startLine": 17403,
+    "endLine": 17407,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper merges an email subject and writing-block metadata update for the neighboring generated mail surface; the deterministic projection has no standalone renderer import or lifecycle boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Md",
+    "sourceSymbol": "VMe",
+    "startLine": 17452,
+    "endLine": 17466,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper normalizes contact records by trimming email/name/photo fields and dropping empty addresses; it is a local data projection owned by the adjacent generated mail runtime with no independent renderer consumer."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Nd",
+    "sourceSymbol": "HMe",
+    "startLine": 17467,
+    "endLine": 17471,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper resolves a contact id by case-insensitive owner-email matching; its pure lookup is consumed only within the neighboring generated mail flow and has no independent lifecycle owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ld",
+    "sourceSymbol": "WMe",
+    "startLine": 17492,
+    "endLine": 17501,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper formats normalized contact emails or legacy string fields for display; it is a deterministic local projection without JSX, store ownership, or teardown semantics."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ud",
+    "sourceSymbol": "qMe",
+    "startLine": 17525,
+    "endLine": 17529,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper joins known recipient emails with an unfinished input token for the adjacent generated recipient editor; no separately named renderer consumer or lifecycle boundary owns this formatting helper."
   }
 ]

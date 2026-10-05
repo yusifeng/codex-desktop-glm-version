@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 193, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 199, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("yg"), "yg remains coupled to generated skill mention projection");
 assert.ok(primary.unconsumed.includes("Ed"), "Ed remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");

@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A5 继续批次：app-primary 邮件撰写生成区未消费导出 `Rd`/`zd`/`Md`/`Nd`/`Ld`/`Ud`
+（`RMe`/`zMe`/`VMe`/`HMe`/`WMe`/`qMe`，17397--17529）完成逐行分类；这些纯投影/格式化辅助函数
+均无独立 renderer named consumer 或 teardown owner，登记为 generated-local-helper。`docs/renderer-hub-line-classification.json`
+记录数提升至 200（app-primary reviewedCount 199）；hub audit 与 focused classification test 已通过。
+
 2026-10-05 A1 继续批次：Git blame porcelain 的作者登录名提取、提交元数据缓存与行记录投影
 纯策略已迁移至 `src/main/worker/git-blame-file-policy.ts`；blame 运行时保留仓库路径、Git
 查询、origin URL 与错误生命周期编排，并继续兼容导出解析 helper。新增
