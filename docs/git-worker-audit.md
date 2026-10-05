@@ -1058,3 +1058,10 @@ Git worker 请求的 telemetry/context 投影已迁移至
 source，并统一识别 error/success=false/command-error 结果。该边界保持纯函数，不触碰
 worker I/O 或请求生命周期；`scripts/test-worker-git-request-context-policy.mjs` 覆盖
 12 项 root/source/cwd/failure 断言。
+
+### 增量抽取：Worker host path policy
+
+Windows/WSL 主机路径判定与转换（WSL mounted path、Windows/UNC、WSL UNC distro、盘符与
+extended UNC 归一化）已迁移至 `src/main/worker/host-path-policy.ts`。入口仅保留兼容别名并
+继续负责调用方的平台副作用；`scripts/test-worker-host-path-policy.mjs` 覆盖 12 项路径
+边界断言。

@@ -128,6 +128,7 @@ const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
+const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
 const { parseShellEnvironmentOutput, getEnvironmentValue } = require("./worker/shell-environment-parser");
 const { isPathWithinRoot } = require("./worker/git-path-containment");
 const { formatAppContext, joinInstructionSections } = require("./worker/prompt-context-format");
@@ -44883,7 +44884,8 @@ var LH = H()
     /^(?![0-9a-f]{4,}$)(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$)[a-z0-9]+(?:-[a-z0-9]+)*$/,
     `Use lowercase letters, numbers, and single hyphens; hexadecimal IDs and Windows device names are reserved.`,
   );
-function RH(e) {
+/*
+function legacyRH(e) {
   return /^\/mnt\/[a-zA-Z](?:\/|$)/.test(e) ? !0 : /^\\{1,2}[Mm][Nn][Tt]\\[a-zA-Z](?:\\|$)/.test(e);
 }
 function zH(e) {
@@ -44924,9 +44926,10 @@ function UH(e) {
   let r = e.match(/^([a-zA-Z]):[\\/](.*)$/);
   return r ? `/mnt/${r[1].toLowerCase()}/${r[2].replace(/\\/g, `/`)}` : e.replace(/\\/g, `/`);
 }
-function WH(e) {
+function legacyWH(e) {
   return e.replace(/\//g, `\\`);
 }
+*/
 var GH = Symbol(`workers-module`);
 (Symbol.dispose || (Symbol.dispose = Symbol.for(`dispose`)),
   Symbol.asyncDispose || (Symbol.asyncDispose = Symbol.for(`asyncDispose`)),

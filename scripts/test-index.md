@@ -286,6 +286,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-handoff-rollback.mjs`](./test-worker-git-handoff-rollback.mjs)
 - [`test-worker-git-handoff-shared-base.mjs`](./test-worker-git-handoff-shared-base.mjs)
 - [`test-worker-git-handoff-transfer.mjs`](./test-worker-git-handoff-transfer.mjs)
+- [`test-worker-host-path-policy.mjs`](./test-worker-host-path-policy.mjs)
 - [`test-worker-git-ignore-policy.mjs`](./test-worker-git-ignore-policy.mjs)
 - [`test-worker-git-index-info.mjs`](./test-worker-git-index-info.mjs)
 - [`test-worker-git-init-request-handler.mjs`](./test-worker-git-init-request-handler.mjs)

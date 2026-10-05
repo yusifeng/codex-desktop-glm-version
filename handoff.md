@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：worker 的 Windows/WSL 主机路径判定与转换已迁移至
+`src/main/worker/host-path-policy.ts`；入口仅保留兼容别名接回，覆盖 WSL mounted path、Windows/UNC、
+WSL UNC distro、盘符与 extended UNC 归一化，新增 `scripts/test-worker-host-path-policy.mjs`
+提供 12 项 focused assertions。
+
 最新增量：annotation preload bridge 的挂载前消息缓冲、挂载后重放、host listener
 订阅/解除订阅及 editor active 状态副作用已迁移并补齐 focused 回归；桥接层仍保留
 IPC 与 registry/request 依赖适配，由 `scripts/test-preload-annotation-preload-bridge.mjs`
