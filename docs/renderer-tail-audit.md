@@ -669,3 +669,9 @@ connector icon map。四者都由相邻生成 surface 独占，缺少独立 name
 已迁至 `src/renderer/app-primary/runtime/extract-skill-kind.ts`，由
 `scripts/test-app-primary-extract-skill-kind.mjs` 覆盖 5 项路径、未知 kind 与 mention 投影断言；
 逐行分类记录同步写入 `docs/renderer-hub-line-classification.json`，reviewedCount 提升至 169。
+
+本轮从 app-primary 未消费区迁出 annotation selection/hover 样式纯投影：`JE`（公开别名
+`Ag`，3686--3712 行）按 appearance、fill、border、zoom 与 shadow 选项生成 inline style，
+不触碰 JSX、store 或生命周期。逻辑现由 `src/renderer/app-primary/runtime/annotation-selection-style.ts`
+承载，并由 `scripts/test-app-primary-annotation-selection-style.mjs` 覆盖 hover、fill-only
+与缩放边界；聚合导出保留兼容，逐行分类证据登记后 reviewedCount 提升至 170。

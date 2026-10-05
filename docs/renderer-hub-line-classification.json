@@ -1682,5 +1682,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/extract-skill-kind.ts",
     "evidence": "The skill mention projection walks only skill/plugin mention nodes and maps normalized plugin:// or skills/*/skill.md paths to stable product kinds. It is a deterministic policy with no JSX, store, or lifecycle side effects; the aggregate alias remains unconsumed until a named renderer boundary adopts it."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ag",
+    "sourceSymbol": "JE",
+    "startLine": 3686,
+    "endLine": 3715,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/annotation-selection-style.ts",
+    "evidence": "The annotation selection/hover helper deterministically projects appearance, fill, border, zoom, and shadow options into an inline style object. It has no JSX, store, registration, or teardown side effects; the generated hub keeps the compatibility export until an independent renderer consumer adopts the typed module."
   }
 ]
