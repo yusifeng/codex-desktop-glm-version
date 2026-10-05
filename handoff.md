@@ -1138,7 +1138,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁 | 当前 manifest 仍报告 10940 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁 | 当前 manifest 仍报告 10939 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
 
 ### B. 工程可读性缺口（5 处）
 
@@ -1825,4 +1825,5 @@ typecheck 均通过。
 2026-10-06 A3 继续批次：IAB API 真实边界已补齐 constructor/options、`ping`、browser session route 校验（含 `session_id` 兼容字段）、request safe fields、metadata、host lookup、turn 记录/清理、tab lookup 与 route cleanup，并由 `scripts/test-main-iab-api-boundary.mjs` 覆盖 12 项断言；完整 CDP/tab/session 生命周期仍保留在类边界内，未伪拆成 facade。
 2026-10-06 A5 逐段复核：app-shared 导出 `u`（source `OOt`，122452-122456）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A3 继续批次：browser-session-registry 已补齐 route capture/resolve/dispose、按 conversationId 的 route lookup、backend ensure 幂等/迁移/销毁与 page record snapshot/torn-down/released cleanup 状态边界；`scripts/test-main-browser-session-registry.mjs` 覆盖 17 项断言。IAB/CDP/native-pipe 的完整生命周期仍保留在原类边界。
-2026-10-06 A3 继续批次：native pipe server 补齐原始四路转发契约：CDP event、CDP detach、page event 与 download change，并统一使用 IAB download listener Symbol；`scripts/test-main-native-pipe-server.mjs` 覆盖帧上限、四路发送、超大帧忽略、普通错误传播与两次 dispose 清理共 12 项断言。
+2026-10-06 A3 继续批次：native pipe server 补齐原始回调契约：`onWebMcpToolInvoked`、CDP event、CDP detach、page event 与 download change，并统一使用 IAB download listener Symbol；`scripts/test-main-native-pipe-server.mjs` 覆盖 WebMCP 回调、帧上限、四路发送、超大帧忽略、普通错误传播与两次 dispose 清理共 13 项断言。
+2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
