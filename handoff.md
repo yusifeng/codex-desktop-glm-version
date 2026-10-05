@@ -1698,6 +1698,8 @@ typecheck 均通过。
 
 2026-10-05 A5 T5 继续批次：app-primary 的文件扩展名许可策略（无配置时放行、按点后缀大小写不敏感匹配）已迁移至 `src/renderer/app-primary/runtime/has-allowed-file-extension.ts`；新增 `scripts/test-app-primary-has-allowed-file-extension.mjs` 覆盖 4 项 focused assertions，并登记 `bt/mmt` 源码 106735-106737 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
+2026-10-05 A5 T5 继续批次：app-primary 的 capability 支持 predicate（缺省视为支持、仅显式 `false` 禁用）已迁移至 `src/renderer/app-primary/runtime/is-capability-supported.ts`；新增 `scripts/test-app-primary-is-capability-supported.mjs` 覆盖 4 项 focused assertions，并登记 `vm/vAe` 源码 9002-9004 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
 2026-10-05 A1 T1 继续批次：git diff hunk 中新增/删除行计数与 binary patch null 投影已迁移至 `src/main/worker/git-diff-line-count-policy.ts`；diff text 入口保留路径解析、rename 重写与文本编排。新增 `scripts/test-worker-git-diff-line-count-policy.mjs` 覆盖 4 项 focused assertions；原 diff-text 回归 33 项、build 与 typecheck 已通过。
 
 2026-10-05 A5 T5 继续批次：app-primary 的终端命令 token 清理策略（移除空白与固定 shell 特殊字符集合）已迁移至 `src/renderer/app-primary/runtime/strip-terminal-command-token.ts`；新增 `scripts/test-app-primary-strip-terminal-command-token.mjs` 覆盖 3 项 focused assertions，并登记 `cp/fN` 源码 11809-11813 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
