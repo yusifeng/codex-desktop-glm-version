@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1047.
+Total scripts: 1049.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -45,6 +45,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-handoff-transfer-policy.mjs`](./test-worker-git-handoff-transfer-policy.mjs)
 - [`test-app-shared-build-extension-channel-path.mjs`](./test-app-shared-build-extension-channel-path.mjs)
 - [`test-preload-annotation-containment-frame-policy.mjs`](./test-preload-annotation-containment-frame-policy.mjs)
+- [`test-preload-annotation-visible-text-policy.mjs`](./test-preload-annotation-visible-text-policy.mjs)
 - [`test-app-shared-encode-prefixed-path.mjs`](./test-app-shared-encode-prefixed-path.mjs)
 - [`test-app-shared-stable-json-stringify.mjs`](./test-app-shared-stable-json-stringify.mjs)
 - [`test-preload-annotation-frame-chain-policy.mjs`](./test-preload-annotation-frame-chain-policy.mjs)
@@ -1111,3 +1112,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-surface-registry-state.mjs`](./test-preload-annotation-surface-registry-state.mjs)
 - [`test-app-primary-derive-cloud-unavailable-reason.mjs`](./test-app-primary-derive-cloud-unavailable-reason.mjs)
 - [`test-app-primary-resolve-box-file-preview.mjs`](./test-app-primary-resolve-box-file-preview.mjs)
+[test-worker-git-clone-state-policy.mjs](test-worker-git-clone-state-policy.mjs)

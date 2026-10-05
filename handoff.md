@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation visible-text 的片段拼接与长度截断纯策略已抽至
+`src/main/browser-page-preload/annotation-visible-text-policy.ts`；collector 仅保留 TreeWalker、
+可见性与 range 相交副作用。新增 `scripts/test-preload-annotation-visible-text-policy.mjs`
+覆盖 2 项首片段/拼接截断断言；原 visible-text 回归 3 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git host handoff transfer 的 copied rollout path 安全边界校验已迁移至 `src/main/worker/git-handoff-transfer-policy.ts`；transfer runtime 保留 host path/codexHome、read/write 与 cleanup I/O 编排。新增 `scripts/test-worker-git-handoff-transfer-policy.mjs` 覆盖 4 项 focused assertions；原 transfer 回归 19 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation containment 的跨 frame ancestor 解析纯策略已抽至
@@ -1493,3 +1498,5 @@ typecheck 均通过。
 2026-10-05 A5 继续批次：app-primary Box library 文件预览导出 `Jd`（`FMe`，17195--17208）已抽取为 `resolve-box-file-preview.ts`，保留 external-box ID/provider/MIME 校验及 Box Notes/普通文件 URL 投影；新增 `scripts/test-app-primary-resolve-box-file-preview.mjs` 覆盖 5 项 focused assertions。逐行分类证据登记后 reviewedCount 提升至 216；hub audit 与 focused classification test 已通过。
 2026-10-05 A2 继续批次：annotation preload 启动阶段的 secure-context/top-frame policy sync 与 DOMContentLoaded mount gate 已抽至 `annotation-preload-startup-policy.ts`；`annotation-preload-lifecycle.ts` 仅保留 listener 注册、IPC policy 读取与 mount/pagehide 编排。新增 `scripts/test-preload-annotation-preload-startup-policy.mjs`，覆盖安全上下文、top-frame、loading/complete 与空输入边界，共 9 项 focused assertions；已通过 build、preload lifecycle 回归、verify 与 typecheck。
 2026-10-05 A1 继续批次：Git branch-ahead 的 remote upstream 归一化、远端 ancestor revision、默认分支 revision 与 ahead range 参数构造已迁移至 `src/main/worker/git-branch-ahead-policy.ts`；branch-ahead 运行时保留 repository/Git/query 编排。新增 `scripts/test-worker-git-branch-ahead-policy.mjs` 覆盖 12 项 focused assertions；原 branch-ahead 回归 41 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：Git clone state 的配置行解析与 partial-clone 识别策略已迁移至 `src/main/worker/git-clone-state-policy.ts`；clone state 运行时保留 shallow/config 并行 Git 查询与状态投影。新增 `scripts/test-worker-git-clone-state-policy.mjs` 覆盖 17 项 focused assertions；原 clone-state 回归 29 项、build 与 typecheck 已通过。
