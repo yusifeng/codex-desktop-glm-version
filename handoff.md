@@ -99,6 +99,11 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `zG`（内部 `FLe`，源码 46598--46601）的 link
+display-title 纯投影已迁移至 `src/renderer/app-shared/runtime/derive-link-display-title.ts`；新增
+`scripts/test-app-shared-derive-link-display-title.mjs` 覆盖 2 项 focused assertions，typecheck 与
+focused test 已通过。
+
 2026-10-06 A5 继续批次：app-primary 未消费导出 `ot`（内部 `b7`，源码 66215--66223）的 layout-motion
 variant 纯投影已迁移至 `src/renderer/app-primary/runtime/derive-layout-motion-variant.ts`；新增 focused
 test 2 项断言，typecheck 与 focused test 已通过。
