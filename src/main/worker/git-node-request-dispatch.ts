@@ -13,6 +13,7 @@ async function dispatchGitNodeRequest(
   params: any,
   deps: NodeRequestDispatchDependencies,
 ) {
+  if (!isGitNodeRequestMethod(method)) return { handled: false, result: undefined };
   switch (method) {
     case `github-request`:
       if (deps.requestGitHub == null)
@@ -52,3 +53,4 @@ async function dispatchGitNodeRequest(
 export { dispatchGitNodeRequest };
 if (typeof module !== `undefined`)
   module.exports = { dispatchGitNodeRequest };
+import { isGitNodeRequestMethod } from "./git-node-request-policy";

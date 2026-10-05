@@ -1912,6 +1912,8 @@ typecheck 均通过。
 2026-10-06 A1 T1 继续批次：Setup script 的 original/worktree workspace 环境变量覆盖构造已迁移至 `src/main/worker/git-worktree-setup-environment-policy.ts`；runtime 仅保留执行副作用。新增 `scripts/test-worker-git-worktree-setup-environment-policy.mjs` 覆盖 3 项 focused assertions。
 
 2026-10-06 A1 T1 继续批次：Core Git RPC method 的 availability/create-branch/git-origins 白名单已迁移至 `src/main/worker/git-core-request-policy.ts`；dispatcher 仅保留参数编排与 Git I/O。新增 `scripts/test-worker-git-core-request-policy.mjs` 覆盖 4 项 focused classification assertions。
+
+2026-10-06 A1 T1 继续批次：Node-only Git RPC method 白名单已迁移至 `src/main/worker/git-node-request-policy.ts`；dispatcher 仅保留 host、signal 与依赖注入。新增 `scripts/test-worker-git-node-request-policy.mjs` 覆盖 5 项 focused classification assertions。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
