@@ -5348,7 +5348,7 @@ function mu(e) {
   );
 }
 function hu(e, t) {
-  return e == null || t.location.href === e;
+  return matchesAnnotationFrameUrl(e, t);
 }
 function gu() {
   for (let e of uc())
@@ -6181,6 +6181,7 @@ var { getAnnotationInverseViewportScale } = require("./browser-page-preload/anno
 var { hasAnnotationComments, getAnnotationCommentCount } = require("./browser-page-preload/annotation-comment-count");
 var { supportsAnnotationCssHighlights } = require("./browser-page-preload/annotation-highlight-capability");
 var { canUseAnnotationAdoptedStyleSheets } = require("./browser-page-preload/annotation-adopted-stylesheet-target");
+var { matchesAnnotationFrameUrl } = require("./browser-page-preload/annotation-frame-url-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

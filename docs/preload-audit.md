@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation frame URL policy
+
+Annotation frame URL 匹配（原 `hu`，5120-7259 业务工具段）的 optional-expected 与 exact href
+判定已迁移至 `src/main/browser-page-preload/annotation-frame-url-policy.ts`；入口保留兼容委托。
+新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation adopted stylesheet target policy
 
 adoptedStyleSheets 目标容器判定（原 `tu`，5120-7259 业务工具段）已迁移至
