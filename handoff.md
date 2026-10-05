@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git config scope 的 local/worktree flag 映射、缺失值兼容判定与错误消息格式化纯策略已迁移至 `src/main/worker/git-config-scope-policy.ts`；`git-config-scope.ts` 仅保留 Git/query 编排与 worktreeConfig 自动启用重试。新增 `scripts/test-worker-git-config-scope-policy.mjs` 覆盖 6 项 focused assertions；原 49 项 config-scope 回归、build 与 typecheck 已通过。
+
 2026-10-05 A5 继续批次：app-primary selection overlay 未消费导出 `Pr`/`r`（`Z3`/`$3`，91668--91680）完成逐行分类；`Z3` 为相邻 overlay 的 DOMRect 交集纯辅助，`$3` 为 overflow-style 依赖与允许集合初始化，均无独立 renderer named consumer 或 teardown owner，登记为 generated-local。`docs/renderer-hub-line-classification.json` app-primary reviewedCount 提升至 201（总记录 202）；hub audit 与 focused classification test 已通过。
 
 2026-10-05 A2 继续批次：annotation mode controller 的终止生命周期边界已补齐；dispose 现在

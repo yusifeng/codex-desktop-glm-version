@@ -1,4 +1,9 @@
 const LOCAL_ENVIRONMENT_CONFIG_PATH_KEY = `codex.localEnvironmentConfigPath`;
+import {
+  formatConfigScopeError,
+  getConfigScopeFlag,
+  isMissingConfigValue,
+} from "./git-config-scope-policy";
 
 type ConfigScope = `local` | `worktree`;
 
@@ -18,10 +23,6 @@ type ConfigScopeDependencies = {
   ) => Promise<any>;
   staleTime: number;
 };
-
-function scopeFlag(scope: ConfigScope) {
-  return scope === `local` ? `--local` : `--worktree`;
-}
 
 async function readConfigValue(
   root: string,
@@ -66,7 +67,7 @@ async function readConfigValueForScope(
 ) {
   const result = await dependencies.runGit(
     root,
-    [`config`, scopeFlag(scope), `--get`, key],
+    [`config`, getConfigScopeFlag(scope), `--get`, key],
     host,
     { signal },
   );
@@ -80,7 +81,7 @@ function getConfigValueForScope(
   signal: AbortSignal | undefined,
   dependencies: ConfigScopeDependencies,
 ) {
-  const flag = scopeFlag(scope);
+  const flag = getConfigScopeFlag(scope);
   return dependencies.fetchQueryWithSignal(
     repository.queryClient,
     {
@@ -100,18 +101,9 @@ function getConfigValueForScope(
           { signal: signal == null ? undefined : querySignal },
         );
         if (result.success) return result.stdout || null;
-        if (
-          (result.code === 1 && result.stderr.trim() === ``) ||
-          (scope === `worktree` &&
-            result.code === 128 &&
-            result.stderr.toLowerCase().includes(`worktreeconfig`))
-        )
+        if (isMissingConfigValue(result, scope))
           return null;
-        throw Error(
-          `git config ${flag} --get ${key} failed: ${
-            result.stderr || result.stdout || `exit code ${result.code ?? `unknown`}`
-          }`,
-        );
+        throw Error(formatConfigScopeError(scope, key, result));
       },
       staleTime: dependencies.staleTime,
     },
@@ -145,7 +137,7 @@ async function setConfigValueForScope(
   signal: AbortSignal | undefined,
   dependencies: Pick<ConfigScopeDependencies, `runGit`>,
 ) {
-  const args = [`config`, scopeFlag(scope), key, value];
+  const args = [`config`, getConfigScopeFlag(scope), key, value];
   const result = await dependencies.runGit(root, args, host, { signal });
   if (result.success || scope !== `worktree`) return result.success;
   if (!result.stderr.toLowerCase().includes(`worktreeconfig`)) return false;
