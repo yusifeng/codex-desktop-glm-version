@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：managed worktree discovery 的 legacy/named parent-child 命名模式与 marker 常量已迁移至 `src/main/worker/git-managed-worktree-discovery-policy.ts`；discovery runtime 保留 filesystem stat/readDirectory、path normalization 与 Git metadata 编排。新增 `scripts/test-worker-git-managed-worktree-discovery-policy.mjs` 覆盖 8 项 focused assertions；原 discovery 回归 52 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation frame stability 的 parent-frame chain 纯判定已抽至
 `src/main/browser-page-preload/annotation-frame-chain-policy.ts`；frame stability 仅保留首层
 annotation-element 解析与 chain policy 编排。新增 `scripts/test-preload-annotation-frame-chain-policy.mjs`

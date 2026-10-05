@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isLegacyWorktreeChildName, isLegacyWorktreeParentName, isNamedWorktreeParentName, worktreeNameMarker } = require("../app/.vite/build/worker/git-managed-worktree-discovery-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+equal(worktreeNameMarker, ".codex-worktree-name");
+equal(isLegacyWorktreeParentName("a1b2"), true);
+equal(isLegacyWorktreeParentName("zzzz"), false);
+equal(isLegacyWorktreeChildName("240101-1234-abcdef12"), true);
+equal(isLegacyWorktreeChildName("2401-1234-abcdef12"), false);
+equal(isNamedWorktreeParentName("feature-work"), true);
+equal(isNamedWorktreeParentName("con"), false);
+equal(isNamedWorktreeParentName("a".repeat(65)), false);
+console.log(`${assertions} worker git managed worktree discovery policy assertions passed`);

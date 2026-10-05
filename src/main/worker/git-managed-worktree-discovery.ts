@@ -5,29 +5,14 @@ type ManagedWorktreeDiscoveryDependencies = {
   getGitDir: (repository: any) => Promise<string | null> | string | null;
 };
 
+import { isLegacyWorktreeChildName, isLegacyWorktreeParentName, isNamedWorktreeParentName, worktreeNameMarker } from './git-managed-worktree-discovery-policy';
+
 type ManagedWorktreeLocation = {
   path: string;
   boundary: string;
   legacy: boolean;
 };
 
-const worktreeNameMarker = `.codex-worktree-name`;
-const legacyParentPattern = /^[0-9a-f]{4}$/i;
-const legacyChildPattern = /^\d{6}-\d{4}-[0-9a-f]{8}$/i;
-const namedParentPattern =
-  /^(?![0-9a-f]{4,}$)(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$)[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-function isLegacyWorktreeParentName(name: string) {
-  return legacyParentPattern.test(name);
-}
-
-function isLegacyWorktreeChildName(name: string) {
-  return legacyChildPattern.test(name);
-}
-
-function isNamedWorktreeParentName(name: string) {
-  return name.length >= 1 && name.length <= 64 && namedParentPattern.test(name);
-}
 
 async function getManagedWorktreeLocations(
   host: any,
