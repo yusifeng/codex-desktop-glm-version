@@ -1828,3 +1828,4 @@ typecheck 均通过。
 2026-10-06 A3 继续批次：native pipe server 补齐原始回调契约：`onWebMcpToolInvoked`、CDP event、CDP detach、page event 与 download change，并统一使用 IAB download listener Symbol；`scripts/test-main-native-pipe-server.mjs` 覆盖 WebMCP 回调、帧上限、四路发送、超大帧忽略、普通错误传播与两次 dispose 清理共 13 项断言。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
+2026-10-06 A5 逐段复核：app-primary 导出 `yb`（source `e4`，82694-82698）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
