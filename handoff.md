@@ -1579,3 +1579,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：host handoff RPC 的 source rollout/branch 必填约束与 destination worktree roots 成对协议已迁移至 `src/main/worker/git-host-handoff-validation-policy.ts`；原 validation 入口仅保留兼容转出。新增 `scripts/test-worker-git-host-handoff-validation-policy.mjs` 覆盖 5 项 focused assertions；原回归 8 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：Git request cancellation telemetry 的 queue duration 裁剪、取消 disposition 与稳定字段 envelope 已迁移至 `src/main/worker/git-request-cancellation-policy.ts`；取消入口仅保留兼容转出。新增 `scripts/test-worker-git-request-cancellation-policy.mjs` 覆盖 3 项 focused assertions；原回归 `test-worker-request-cancellation.mjs` 9 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：worker RPC 方法的 cancelability 与 telemetry tracking 分类白名单已迁移至 `src/main/worker/git-request-classification-policy.ts`；query utils 保留 availability 判定及查询/路径策略。新增 `scripts/test-worker-git-request-classification-policy.mjs` 覆盖 8 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。

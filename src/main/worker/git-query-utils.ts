@@ -67,35 +67,10 @@ function isFsmonitorPlatformSupported({ isLocal, platformFamily, platformOs }: {
   return isLocal ? platformFamily === `windows` || platformOs === `macos` : platformOs === `linux`;
 }
 
-function isCancelableGitRequest(method: string): boolean {
-  switch (method) {
-    case `availability`:
-    case `managed-worktree-state`:
-    case `github-request`:
-    case `origin-url`:
-    case `origin-and-roots`:
-    case `worktree-shell-environment`:
-    case `worktree-owner`:
-    case `default-remote-branch`:
-    case `automation-writable-roots`:
-    case `merge-base`:
-    case `read-git-file-binary`:
-    case `prepare-worktree-snapshot`:
-    case `push`:
-    case `checkout-branch`:
-      return false;
-    default:
-      return true;
-  }
-}
-
 function shouldCheckGitAvailability(method: string, isLocal: boolean, isMutation: boolean): boolean {
   return isLocal && !isMutation && isCancelableGitRequest(method);
 }
 
-function isGitRequestTracked(method: string): boolean {
-  return ![`delete-worktree`, `dispose-git-init-watch`, `invalidate-stable-metadata`, `invalidate-git-read-caches`, `git-init-repo`, `cleanup-host-handoff-transfer`, `cancel-worktree-upstream-refresh`, `watch-repo`, `unwatch-repo`].includes(method);
-}
-
 export { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
 if (typeof module !== `undefined`) module.exports = { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
+import { isCancelableGitRequest, isGitRequestTracked } from "./git-request-classification-policy";

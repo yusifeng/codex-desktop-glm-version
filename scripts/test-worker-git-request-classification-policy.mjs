@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isCancelableGitRequest, isGitRequestTracked } = require("../app/.vite/build/worker/git-request-classification-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+for (const method of ["merge-base","push","checkout-branch"]) eq(isCancelableGitRequest(method), false);
+eq(isCancelableGitRequest("status-summary"), true);
+for (const method of ["watch-repo","git-init-repo","unwatch-repo"]) eq(isGitRequestTracked(method), false);
+eq(isGitRequestTracked("status-summary"), true);
+console.log(`${n} worker request classification policy assertions passed`);
