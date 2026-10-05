@@ -1,12 +1,7 @@
-const REPOSITORY_OPERATION_MARKERS = [
-  `MERGE_HEAD`,
-  `CHERRY_PICK_HEAD`,
-  `REVERT_HEAD`,
-  `REBASE_HEAD`,
-  `rebase-merge`,
-  `rebase-apply`,
-  `sequencer`,
-];
+import {
+  buildRepositoryOperationPaths,
+  REPOSITORY_OPERATION_MARKERS,
+} from './git-review-branch-stats-policy';
 
 type GitReviewBranchStatsDependencies = {
   getDiffMetadata: (params: any) => Promise<any>;
@@ -41,12 +36,7 @@ async function hasRepositoryOperationInProgress(
     dependencies.getGitDir(repository, signal),
     repository.host.platformPath(),
   ]);
-  const paths: string[] = [];
-  if (gitDir != null) {
-    paths.push(platformPath.join(gitDir, `index.lock`));
-    for (const marker of REPOSITORY_OPERATION_MARKERS)
-      paths.push(platformPath.join(gitDir, marker));
-  }
+  const paths = buildRepositoryOperationPaths(gitDir, platformPath);
   for (const status of await Promise.all(
     paths.map((path) => readRepositoryOperationPathStatus(path, repository.host, dependencies)),
   ))

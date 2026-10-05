@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 992.
+Total scripts: 994.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -22,8 +22,11 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-current-branch-policy.mjs`](./test-worker-git-current-branch-policy.mjs)
 - [`test-worker-git-origin-discovery-policy.mjs`](./test-worker-git-origin-discovery-policy.mjs)
 - [`test-worker-git-path-status-policy.mjs`](./test-worker-git-path-status-policy.mjs)
+- [`test-worker-git-review-branch-stats-policy.mjs`](./test-worker-git-review-branch-stats-policy.mjs)
+- [`test-preload-annotation-preview-layer-state.mjs`](./test-preload-annotation-preview-layer-state.mjs)
 - [`test-app-primary-has-tab-state.mjs`](./test-app-primary-has-tab-state.mjs)
 - [`test-preload-annotation-preview-scheduler-state.mjs`](./test-preload-annotation-preview-scheduler-state.mjs)
+- [`test-preload-annotation-preview-layer-state.mjs`](./test-preload-annotation-preview-layer-state.mjs)
 - [`test-app-primary-read-tab-state.mjs`](./test-app-primary-read-tab-state.mjs)
 - [`test-preload-annotation-shadow-root-observer-state.mjs`](./test-preload-annotation-shadow-root-observer-state.mjs)
 - [`test-app-primary-is-active-entity.mjs`](./test-app-primary-is-active-entity.mjs)

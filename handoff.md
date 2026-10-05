@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review branch stats 的 repository operation marker 与 git-dir 路径构造策略已迁移至 `src/main/worker/git-review-branch-stats-policy.ts`；review stats 运行时保留 stat/Git metadata、diff 与 rename reconcile 编排。新增 `scripts/test-worker-git-review-branch-stats-policy.mjs` 覆盖 4 项 focused assertions；原 branch-stats 回归 33 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git path status 的 porcelain 输出分类（tracked/untracked/ignored）已迁移至 `src/main/worker/git-path-status-policy.ts`；path-status 运行时保留 Git I/O、query/cache 与 repository 编排。新增 `scripts/test-worker-git-path-status-policy.mjs` 覆盖 3 项 focused assertions；原 path-status 回归 31 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Git origin discovery 的候选目录去重与本地平台/path API 资格判定已迁移至 `src/main/worker/git-origin-discovery-policy.ts`；origin discovery 运行时保留 stat、Git metadata、origin 查询与失败告警编排。新增 `scripts/test-worker-git-origin-discovery-policy.mjs` 覆盖 8 项 focused assertions；原 origin-discovery 回归 11 项、build 与 typecheck 已通过。
@@ -54,6 +56,11 @@ terminal dispose 状态已抽至 `src/main/browser-page-preload/annotation-previ
 scheduler 仅保留 Resize/IntersectionObserver 与 RAF 副作用，销毁时仍取消在途 frame。新增
 `scripts/test-preload-annotation-preview-scheduler-state.mjs` 覆盖 8 项状态断言；原 scheduler
 回归 5 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation preview layer 的节点缓存、serialized snapshot 与 terminal
+dispose 状态已抽至 `src/main/browser-page-preload/annotation-preview-layer-state.ts`；layer 仅保留
+SVG/DOM 节点创建、几何投影与副作用清理。新增 `scripts/test-preload-annotation-preview-layer-state.mjs`
+覆盖 7 项状态断言；原 layer 回归 10 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：live-query performance operation 的方法白名单与结果映射已迁移至
 `src/main/worker/git-performance-operation-policy.ts`；observability runtime 仅保留性能结果字段、
