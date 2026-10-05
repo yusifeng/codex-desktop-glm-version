@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/find-model-by-slug.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { findModelBySlug } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const models = [{ model: "alpha", label: "A" }, { model: "beta", label: "B" }];
+assert.deepEqual(findModelBySlug(models, "beta"), models[1]);
+assert.equal(findModelBySlug(models, "missing"), null);
+assert.equal(findModelBySlug(models, undefined), null);
+console.log("app-shared find model by slug: 3 assertions passed");

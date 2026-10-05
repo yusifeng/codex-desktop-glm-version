@@ -1711,3 +1711,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：cat-file batch failure 的单请求 output-limit `too-large`、多请求/普通 Git code 错误 envelope 分类已迁移至 `src/main/worker/git-cat-file-batch-error-policy.ts`；cat-file 入口保留 batch framing、retry 与 I/O 编排。新增 `scripts/test-worker-git-cat-file-batch-error-policy.mjs` 覆盖 4 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
 
 2026-10-05 A5 T5 继续批次：app-primary 的终端命令 token 清理策略（移除空白与固定 shell 特殊字符集合）已迁移至 `src/renderer/app-primary/runtime/strip-terminal-command-token.ts`；新增 `scripts/test-app-primary-strip-terminal-command-token.mjs` 覆盖 3 项 focused assertions，并登记 `cp/fN` 源码 11809-11813 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-05 A5 T5 继续批次：app-shared 的 model slug 查找策略已迁移至 `src/renderer/app-shared/runtime/find-model-by-slug.ts`；新增 `scripts/test-app-shared-find-model-by-slug.mjs` 覆盖 3 项 focused assertions，并登记 `FY/QL` 源码 60531-60533 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
