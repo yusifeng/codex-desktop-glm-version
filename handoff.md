@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation preload message queue 的 mounted/destroyed 生命周期与
+sync/text/editor 缓冲状态已抽至 `src/main/browser-page-preload/annotation-preload-message-queue-state.ts`；
+queue 仅保留消息合并、消费顺序与重放副作用。新增
+`scripts/test-preload-annotation-preload-message-queue-state.mjs` 覆盖 10 项状态断言；原 queue
+回归 8 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review patch 的 unknown/error/success response projection 已迁移至 `src/main/worker/git-review-patch-policy.ts`；patch runtime 保留 comparison、query/cache、untracked collection 与 snapshot 编排。新增 `scripts/test-worker-git-review-patch-policy.mjs` 覆盖 3 项 focused assertions；原 patch 回归 33 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Git review file diff 的未跟踪 symlink/submodule unified-diff 格式化已迁移至 `src/main/worker/git-review-file-diff-policy.ts`；file-diff runtime 保留 stat/process/Git I/O、snapshot 与 query 编排。新增 `scripts/test-worker-git-review-file-diff-policy.mjs` 覆盖 5 项 focused assertions；原 file-diff 回归 33 项、build 与 typecheck 已通过。
@@ -904,7 +910,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1007 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1010 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -986,7 +992,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1007 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1010 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5，已完成）
