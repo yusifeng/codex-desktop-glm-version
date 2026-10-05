@@ -1992,5 +1992,24 @@
     "classification": "generated-local-helper",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The helper joins known recipient emails with an unfinished input token for the adjacent generated recipient editor; no separately named renderer consumer or lifecycle boundary owns this formatting helper."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Pr",
+    "sourceSymbol": "Z3",
+    "startLine": 91668,
+    "endLine": 91674,
+    "classification": "generated-local-geometry-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper computes the intersection rectangle for two DOMRect-like bounds and returns null for empty overlap; it is consumed only by the adjacent generated selection overlay traversal and has no independent renderer owner or teardown boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "r",
+    "startLine": 91676,
+    "endLine": 91680,
+    "classification": "generated-local-selection-overlay-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer registers overflow-style dependencies and a static allowed-overflow set for the neighboring selection overlay runtime; setup order is route-local generated glue with no separately named renderer consumer or teardown owner."
   }
 ]
