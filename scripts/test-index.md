@@ -345,6 +345,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-synced-branch-config.mjs`](./test-worker-git-synced-branch-config.mjs)
 - [`test-worker-git-synced-branch-request-handlers.mjs`](./test-worker-git-synced-branch-request-handlers.mjs)
 - [`test-worker-git-synced-branch-overwrite.mjs`](./test-worker-git-synced-branch-overwrite.mjs)
+- [`test-worker-git-synced-branch-state-policy.mjs`](./test-worker-git-synced-branch-state-policy.mjs)
 - [`test-worker-git-synced-branch-state.mjs`](./test-worker-git-synced-branch-state.mjs)
 - [`test-worker-git-submodule-paths.mjs`](./test-worker-git-submodule-paths.mjs)
 - [`test-worker-git-thread-config.mjs`](./test-worker-git-thread-config.mjs)
