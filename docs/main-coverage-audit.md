@@ -358,3 +358,12 @@ Artifact Session 宿主启动过程中的 daemon 路径、socket/ready 文件、
 对应 policy/dispatch 或生命周期测试覆盖；`shell-quoting.ts` 与 `open-target-path-policy.ts`
 是已接回原 worker 的窄策略入口。复核未发现新的未消费 business helper，也未新增 facade；剩余
 main/worker 生命周期仍按原始入口边界保留。
+
+### T4 纯函数候选复核：WindowManager predicates
+
+当前入口仍包含 `isHotkeyWindowThread`、`isAvatarOverlayWindow` 与
+`shouldSyncPersistedAtom`（现行源码约 172,540-172,610）。它们表面上是纯判定，但实际读取
+WindowManager 私有 `windowAppearances`/`BrowserWindow.fromWebContents` 状态，并由同一类的
+message fan-out 与 Electron window lifecycle 消费；仓库没有可接回该类的可读 WindowManager
+owner。按“真实 consumer 才迁移”规则，本轮不新建 policy facade；待 WindowManager owner
+物理迁出后再以注入 map/window lookup 建立 focused harness。

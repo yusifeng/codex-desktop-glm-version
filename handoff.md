@@ -2074,3 +2074,5 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 与 focused test 已通过。
 
 2026-10-06 manifest 复核：逐项核对 `src/main/worker` 中未在审计表逐名出现的入口；均已有对应 policy/dispatch 或生命周期测试，`shell-quoting`/`open-target-path` 为已接回原 worker 的窄入口。未发现新的未消费 business helper，本轮不新增 facade。
+
+2026-10-06 T4 复核：WindowManager 的 `isHotkeyWindowThread`/`isAvatarOverlayWindow`/`shouldSyncPersistedAtom` 虽为候选纯判定，但依赖私有 appearance map、BrowserWindow lookup 与同类 message fan-out；当前无可接回的可读 WindowManager owner。已在 main coverage audit 登记，暂不制造 facade。
