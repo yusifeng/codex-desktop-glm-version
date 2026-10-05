@@ -35,19 +35,6 @@ function pathsOverlap(root: string, watchedPaths: unknown, changedPaths: unknown
   });
 }
 
-function isCacheableGitCommand(args: string[]): boolean {
-  switch (args[0]) {
-    case `check-ignore`: case `for-each-ref`: case `merge-base`: case `rev-list`:
-    case `rev-parse`: case `show-ref`: case `status`: return true;
-    case `cat-file`: return args.includes(`-e`);
-    case `ls-files`: return args.includes(`--others`) && !args.includes(`--cached`) && !args.includes(`--ignored`);
-    case `config`: return args.some((arg) => [`--get`, `--get-all`, `--get-regexp`, `--list`].includes(arg));
-    case `remote`: return args[1] === `get-url`;
-    case `worktree`: return args[1] === `list`;
-    default: return false;
-  }
-}
-
 function fsmonitorCacheKey(cwd: string, host: { id: string }, env: Record<string, string>): string {
   return JSON.stringify([host.id, cwd, Object.entries(env).filter(([key]) => key !== `GIT_INDEX_FILE`).sort(([a], [b]) => a.localeCompare(b))]);
 }
@@ -64,3 +51,4 @@ export { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCa
 if (typeof module !== `undefined`) module.exports = { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
 import { isCancelableGitRequest, isGitRequestTracked } from "./git-request-classification-policy";
 import { isFsmonitorPlatformSupported, parseFsmonitorConfigValue } from "./git-fsmonitor-policy";
+import { isCacheableGitCommand } from "./git-cache-command-policy";

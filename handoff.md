@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation control metadata 的 own-descriptor、key/类型/长度限制
+纯策略已抽至 `src/main/browser-page-preload/annotation-control-metadata-policy.ts`；control payload
+adapter 仅保留 hit/response/serialization 编排。新增
+`scripts/test-preload-annotation-control-metadata-policy.mjs` 覆盖 3 项有效/长度/undefined 值断言；
+原 annotation runtime 回归 45 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation payload 的 plain own-data record clone 与 prototype/key
 安全门禁已抽至 `src/main/browser-page-preload/annotation-record-clone-policy.ts`；control payload
 adapter 仅保留 hit/metadata schema 清洗与 serialization。新增
@@ -1595,3 +1601,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：worker RPC 方法的 cancelability 与 telemetry tracking 分类白名单已迁移至 `src/main/worker/git-request-classification-policy.ts`；query utils 保留 availability 判定及查询/路径策略。新增 `scripts/test-worker-git-request-classification-policy.mjs` 覆盖 8 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：fsmonitor 配置值 true/false/unknown 解析与 local/remote host 平台支持判定已迁移至 `src/main/worker/git-fsmonitor-policy.ts`；query utils 保留 daemon feature 检测及查询缓存策略。新增 `scripts/test-worker-git-fsmonitor-policy.mjs` 覆盖 11 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：Git command cacheability 的命令/参数白名单（status、refs、config、remote/worktree 查询及受限 cat-file/ls-files）已迁移至 `src/main/worker/git-cache-command-policy.ts`；query utils 保留 query key、fsmonitor 与路径 overlap 策略。新增 `scripts/test-worker-git-cache-command-policy.mjs` 覆盖 12 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。

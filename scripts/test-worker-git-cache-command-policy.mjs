@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isCacheableGitCommand } = require("../app/.vite/build/worker/git-cache-command-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+for (const command of ["status","rev-parse","merge-base","show-ref"]) eq(isCacheableGitCommand([command]), true);
+eq(isCacheableGitCommand(["cat-file","-e"]), true); eq(isCacheableGitCommand(["cat-file","--batch"]), false);
+eq(isCacheableGitCommand(["ls-files","--others"]), true); eq(isCacheableGitCommand(["ls-files","--others","--cached"]), false);
+eq(isCacheableGitCommand(["config","--get-regexp","x"]), true); eq(isCacheableGitCommand(["remote","get-url"]), true); eq(isCacheableGitCommand(["worktree","list"]), true); eq(isCacheableGitCommand(["commit"]), false);
+console.log(`${n} worker cache command policy assertions passed`);
