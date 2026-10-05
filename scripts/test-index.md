@@ -35,7 +35,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-branch-metadata-policy.mjs`](./test-worker-git-branch-metadata-policy.mjs)
 - [`test-preload-annotation-document-kind-policy.mjs`](./test-preload-annotation-document-kind-policy.mjs)
 - [`test-preload-annotation-ancestor-policy.mjs`](./test-preload-annotation-ancestor-policy.mjs)
-- [`test-preload-annotation-document-kind-policy.mjs`](./test-preload-annotation-document-kind-policy.mjs)
 - [`test-app-initial-parse-conversation-route.mjs`](./test-app-initial-parse-conversation-route.mjs)
 - [`test-app-initial-build-rate-limit-buckets.mjs`](./test-app-initial-build-rate-limit-buckets.mjs)
 - [`test-preload-annotation-modal-boundary-policy.mjs`](./test-preload-annotation-modal-boundary-policy.mjs)
