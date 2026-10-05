@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createGitRequestLifecycle } = require("../app/.vite/build/worker/git-request-lifecycle-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+const lifecycle = createGitRequestLifecycle();
+const controller = new AbortController();
+eq(lifecycle.cancel("queued"), "queued");
+eq(lifecycle.begin("queued", true, controller), "canceled");
+eq(controller.signal.aborted, true);
+const uncancelable = new AbortController();
+eq(lifecycle.begin("side-effect", false, uncancelable), "started");
+eq(lifecycle.cancel("side-effect"), "ignored");
+eq(lifecycle.begin("active", true, new AbortController()), "started");
+eq(lifecycle.cancel("active"), "aborted");
+lifecycle.finish("side-effect", false);
+assert.deepEqual(lifecycle.snapshot(), { inFlight: 0, canceledBeforeStart: 0, uncancelable: 0 }); n++;
+console.log(`${n} worker request lifecycle policy assertions passed`);
