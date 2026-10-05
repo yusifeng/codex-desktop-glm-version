@@ -3,10 +3,6 @@ type AnnotationAnchorLike = {
   documentContext?: { kind?: unknown } | null;
 };
 
-function isGoogleDocsAnnotationAnchor(anchor: AnnotationAnchorLike | null | undefined, parsePageUrl: (value: unknown) => unknown): boolean {
-  return anchor?.documentContext?.kind === `google-docs` || parsePageUrl(anchor?.pageUrl) != null;
-}
-
 function isAnnotationAnchorOnCurrentPage(
   anchor: AnnotationAnchorLike | null | undefined,
   currentPageUrl: unknown,
@@ -32,3 +28,4 @@ function isAnnotationRectLargeEnough(
 
 export { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough, isGoogleDocsAnnotationAnchor };
 if (typeof module !== `undefined`) module.exports = { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough, isGoogleDocsAnnotationAnchor };
+import { isGoogleDocsAnnotationAnchor } from "./annotation-document-kind-policy";
