@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { validateLocalBranchName } = require("../app/.vite/build/worker/git-branch-create-policy.js");
+let assertions = 0;
+const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+deepEqual(validateLocalBranchName("  feature/demo  "), { ok: true, branch: "feature/demo" });
+deepEqual(validateLocalBranchName("refs/heads/main"), { ok: true, branch: "main" });
+deepEqual(validateLocalBranchName("   "), { ok: false, error: "Branch name is required" });
+deepEqual(validateLocalBranchName("refs/remotes/origin/main"), { ok: false, error: "Only local branches can be created" });
+deepEqual(validateLocalBranchName("refs/tags/v1"), { ok: false, error: "Only local branches can be created" });
+console.log(`${assertions} worker git branch create policy assertions passed`);

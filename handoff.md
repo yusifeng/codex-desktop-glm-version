@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git branch create 的 local branch 名称归一化与 ref namespace 校验已迁移至 `src/main/worker/git-branch-create-policy.ts`；branch-create runtime 保留 branchExists、Git branch/switch、synced config 与错误编排。新增 `scripts/test-worker-git-branch-create-policy.mjs` 覆盖 5 项 focused assertions；原 branch-create 回归 62 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review commit queries 的 commit/numstat 输出解析与 commits/output size limits 已迁移至 `src/main/worker/git-review-commit-queries-policy.ts`；query runtime 保留 comparison、query/cache、Git I/O 与 signal 编排，并兼容既有 parser dependency 形态。新增 `scripts/test-worker-git-review-commit-queries-policy.mjs` 覆盖 6 项 focused assertions；原 commit-query 回归 36 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation pointer selection 的 active drag 与 terminal 状态已抽至

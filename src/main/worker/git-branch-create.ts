@@ -13,6 +13,8 @@ type BranchCreateDependencies = {
   ) => Promise<void>;
 };
 
+import { validateLocalBranchName } from './git-branch-create-policy';
+
 const COMMIT_TREE_CACHE_MS = 250;
 
 async function branchExists(
@@ -147,17 +149,9 @@ async function createBranch(
   const trimmedCwd = cwd.trim();
   if (!trimmedCwd)
     return { status: `error`, error: `No workspace available for branch creation` };
-  const trimmedBranch = branch.trim();
-  const localBranch = trimmedBranch.startsWith(`refs/heads/`)
-    ? trimmedBranch.slice(11)
-    : trimmedBranch;
-  if (!localBranch) return { status: `error`, error: `Branch name is required` };
-  if (
-    localBranch.startsWith(`refs/heads/`) ||
-    localBranch.startsWith(`refs/remotes/`) ||
-    localBranch.startsWith(`refs/tags/`)
-  )
-    return { status: `error`, error: `Only local branches can be created` };
+  const branchValidation = validateLocalBranchName(branch);
+  if (!branchValidation.ok) return { status: `error`, error: branchValidation.error };
+  const localBranch = branchValidation.branch;
   try {
     switch (mode) {
       case `synced`: {
