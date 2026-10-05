@@ -24,7 +24,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-normalize-system-hints.mjs`](./test-app-primary-normalize-system-hints.mjs)
 - [`test-preload-annotation-preload-disposal-state.mjs`](./test-preload-annotation-preload-disposal-state.mjs)
 - [`test-preload-annotation-runtime-mount-state.mjs`](./test-preload-annotation-runtime-mount-state.mjs)
-- [`test-preload-annotation-feature-graph-state.mjs`](./test-preload-annotation-feature-graph-state.mjs)
 
 - [`test-worker-git-review-working-tree-policy.mjs`](./test-worker-git-review-working-tree-policy.mjs)
 - [`test-worker-git-watch-acquire-policy.mjs`](./test-worker-git-watch-acquire-policy.mjs)
