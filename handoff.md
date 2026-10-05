@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git thread config 的 JSON/schema 解析与失败分类已迁移至 `src/main/worker/git-thread-config-policy.ts`；thread-config runtime 保留 config file discovery、host 文件 I/O、schema warning 与写入编排。新增 `scripts/test-worker-git-thread-config-policy.mjs` 覆盖 3 项 focused assertions；原 thread-config 回归 11 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git safe attribute filter 的 filter driver 解析、基础 attribute overrides 与安全清理 override 构造已迁移至 `src/main/worker/git-safe-attribute-filters-policy.ts`；safe-filter runtime 保留 query/cache、Git config I/O、generation invalidation 与 signal 编排。新增 `scripts/test-worker-git-safe-attribute-filters-policy.mjs` 覆盖 5 项 focused assertions；原 safe-filter 回归 18 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation display selections 的稳定 selection-key 投影已抽至

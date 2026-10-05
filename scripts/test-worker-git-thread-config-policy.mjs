@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { parseThreadConfigValue } = require("../app/.vite/build/worker/git-thread-config-policy.js");
+let assertions = 0;
+const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+const schema = (value) => value?.ok ? { success: true, data: value } : { success: false, error: { message: "invalid" } };
+deepEqual(parseThreadConfigValue('{"ok":true,"ownerThreadId":"t"}', schema), { success: true, data: { ok: true, ownerThreadId: "t" } });
+deepEqual(parseThreadConfigValue('{"ok":false}', schema), { success: false, error: "invalid" });
+deepEqual(parseThreadConfigValue("not-json", schema).success, false);
+console.log(`${assertions} worker git thread config policy assertions passed`);

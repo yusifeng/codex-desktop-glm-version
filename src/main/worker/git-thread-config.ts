@@ -6,20 +6,25 @@ type ThreadConfigDependencies = {
   warn: (message: string, error: unknown) => void;
 };
 
+import { parseThreadConfigValue } from './git-thread-config-policy';
+
 async function findThreadConfig(repository: any, signal: AbortSignal | undefined, deps: ThreadConfigDependencies) {
   return deps.findConfigFile(repository, deps.configFileName, signal);
 }
 
 function parseThreadConfig(value: string, deps: ThreadConfigDependencies) {
-  try {
-    const parsed = deps.parseSchema(JSON.parse(value));
-    if (parsed.success) return parsed.data;
-    deps.warn(`Invalid thread config}`, parsed.error?.message);
-    return null;
-  } catch (error) {
-    deps.warn(`Failed to parse thread config`, error);
+  const parsed = parseThreadConfigValue(value, deps.parseSchema);
+  if (parsed.success) return parsed.data;
+  if (parsed.error instanceof Error) {
+    deps.warn(`Failed to parse thread config`, parsed.error);
     return null;
   }
+  if (parsed.error != null) {
+    deps.warn(`Invalid thread config}`, parsed.error);
+    return null;
+  }
+  deps.warn(`Invalid thread config}`, parsed.error);
+  return null;
 }
 
 async function readThreadConfig(repository: any, signal: AbortSignal | undefined, deps: ThreadConfigDependencies) {
