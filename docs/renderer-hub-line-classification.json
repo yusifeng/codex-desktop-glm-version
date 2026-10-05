@@ -2141,5 +2141,15 @@
     "classification": "generated-local-runtime-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The helper only forces the adjacent plan/runtime initializer and returns null; it is a generated lazy-bootstrap boundary with no independent renderer named consumer, store ownership, or teardown contract, so it remains in the aggregate hub."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "_g",
+    "sourceSymbol": "HD",
+    "startLine": 4125,
+    "endLine": 4130,
+    "classification": "generated-local-signal-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer creates the adjacent generated plan capability signals and has no independent renderer named consumer, store ownership, or teardown boundary; it remains local aggregate wiring."
   }
 ]

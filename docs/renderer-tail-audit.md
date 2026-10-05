@@ -719,3 +719,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-05 A5 继续批次：app-primary 未消费导出 `ND`（公开别名 `vg`，4079--4089）补齐文档级物理迁移。该边界只遍历 ProseMirror-like 文档中的 `skillMention`/`pluginMention` 节点，并复用既有 skill-kind 路径策略选择最新或显式偏好 kind；逻辑现由 `extractSkillKindFromDocument` 承载于 `src/renderer/app-primary/runtime/extract-skill-kind.ts`，新增 `scripts/test-app-primary-extract-skill-kind-document.mjs` 覆盖最新 mention、显式偏好、空文档和未知插件回退共 4 项断言。逐行分类证据登记后 app-primary reviewedCount 由 211 提升至 212。
 
 2026-10-05 A5 继续批次：app-primary 未消费导出 `GD`（公开别名 `ug`，4136--4138）完成逐行分类。该 helper 仅触发相邻 plan/runtime 初始化并返回 `null`，属于生成式 lazy-bootstrap 局部边界，没有独立 renderer named consumer、store 所有权或 teardown 契约，继续保留聚合 hub。逐行分类证据登记后 app-primary reviewedCount 提升至 214。
+同批补充 `HD`（公开别名 `_g`，4125--4130）：它仅创建相邻 plan capability signals，属于生成式 signal 初始化，同样没有独立 renderer consumer、store 所有权或 teardown 契约。逐行分类证据登记后 reviewedCount 提升至 215。

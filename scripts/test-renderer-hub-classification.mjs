@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 214, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 215, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("yg"), "yg remains coupled to generated skill mention projection");
 assert.ok(primary.unconsumed.includes("Ed"), "Ed remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
@@ -79,6 +79,7 @@ assert.ok(primary.unconsumed.includes("Mc"), "Mc remains coupled to generated co
 assert.ok(primary.unconsumed.includes("Nc"), "Nc remains coupled to generated composer effect initialization");
 assert.ok(primary.unconsumed.includes("Ec"), "Ec remains coupled to generated ads initialization");
 assert.ok(primary.unconsumed.includes("ug"), "ug remains coupled to generated plan/runtime bootstrap");
+assert.ok(primary.unconsumed.includes("_g"), "_g remains coupled to generated plan capability signals");
 assert.ok(primary.unconsumed.includes("Sc"), "Sc remains coupled to generated onboarding state initialization");
 assert.ok(primary.unconsumed.includes("kc"), "kc remains coupled to generated mention preview body");
 assert.ok(primary.unconsumed.includes("K"), "K remains coupled to generated account policy banner");
