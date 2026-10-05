@@ -2181,5 +2181,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/is-valid-recipient-email.ts",
     "evidence": "The pure recipient-token validator applies the composer email grammar without JSX, store, network, or lifecycle effects. Its extracted renderer helper is independently covered by a focused four-case runtime test while the generated MI export remains line-audited for exact source provenance."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "iu",
+    "sourceSymbol": "ZB",
+    "startLine": 22437,
+    "endLine": 22439,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/normalize-system-hints.ts",
+    "evidence": "The pure image-hint policy removes the unsupported sketch hint, deduplicates server values, and preserves caller defaults without JSX, store, network, or lifecycle effects. The extracted helper is covered by a focused three-case runtime test."
   }
 ]
