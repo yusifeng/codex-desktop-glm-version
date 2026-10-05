@@ -1793,3 +1793,4 @@ typecheck 均通过。
 2026-10-06 A5 逐段复核：app-shared 导出 `H`（source `XDt`，121968-121972）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `B`（source `QDt`，121995-121999）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `R`（source `eOt`，122022-122026）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
+2026-10-06 A5 逐段复核：app-shared 导出 `I`（source `nOt`，122053-122057）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
