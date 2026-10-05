@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：annotation preload bridge 的挂载前消息缓冲、挂载后重放、host listener
+订阅/解除订阅及 editor active 状态副作用已迁移并补齐 focused 回归；桥接层仍保留
+IPC 与 registry/request 依赖适配，由 `scripts/test-preload-annotation-preload-bridge.mjs`
+覆盖 16 项生命周期/状态边界断言。
+
 最新增量：annotation preload 的初始化生命周期（host-message IPC listener、secure-context
 policy 同步、DOMContentLoaded 一次性 runtime mount 与 pagehide listener 注册）已迁移至
 `src/main/browser-page-preload/annotation-preload-lifecycle.ts`；入口仅保留依赖组装和状态副作用，
