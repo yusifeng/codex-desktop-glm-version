@@ -1696,4 +1696,6 @@ typecheck 均通过。
 
 2026-10-05 A1 T1 继续批次：cat-file 批量内容按换行边界拆分（保留换行、去除末尾空段）已迁移至 `src/main/worker/git-cat-file-content-policy.ts`；cat-file 入口保留 batch framing、大小限制与错误编排。新增 `scripts/test-worker-git-cat-file-content-policy.mjs` 覆盖 4 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
 
+2026-10-05 A1 T1 继续批次：git diff hunk 中新增/删除行计数与 binary patch null 投影已迁移至 `src/main/worker/git-diff-line-count-policy.ts`；diff text 入口保留路径解析、rename 重写与文本编排。新增 `scripts/test-worker-git-diff-line-count-policy.mjs` 覆盖 4 项 focused assertions；原 diff-text 回归 33 项、build 与 typecheck 已通过。
+
 2026-10-05 A5 T5 继续批次：app-primary 的终端命令 token 清理策略（移除空白与固定 shell 特殊字符集合）已迁移至 `src/renderer/app-primary/runtime/strip-terminal-command-token.ts`；新增 `scripts/test-app-primary-strip-terminal-command-token.mjs` 覆盖 3 项 focused assertions，并登记 `cp/fN` 源码 11809-11813 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。

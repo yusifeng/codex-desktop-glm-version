@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { countGitDiffLines } = require("../app/.vite/build/worker/git-diff-line-count-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.deepEqual(...a)};
+eq(countGitDiffLines("diff --git a/x b/x\n@@ -1 +1 @@\n-old\n+new\n"), {additions:1,deletions:1});
+eq(countGitDiffLines("diff --git a/x b/x\n-old\n+new\n"), {additions:0,deletions:0});
+eq(countGitDiffLines("Binary files a/x and b/x differ"), null);
+eq(countGitDiffLines(""), {additions:0,deletions:0});
+console.log(`${n} worker diff line count policy assertions passed`);
