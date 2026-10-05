@@ -29,6 +29,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-shared-parse-browser-target-id.mjs`](./test-app-shared-parse-browser-target-id.mjs)
 - [`test-preload-annotation-preview-controller-state.mjs`](./test-preload-annotation-preview-controller-state.mjs)
 - [`test-preload-annotation-permission-request-state.mjs`](./test-preload-annotation-permission-request-state.mjs)
+- [`test-preload-annotation-permission-request-state.mjs`](./test-preload-annotation-permission-request-state.mjs)
 - [`test-app-primary-has-tab-state.mjs`](./test-app-primary-has-tab-state.mjs)
 - [`test-app-shared-clamp-within-range.mjs`](./test-app-shared-clamp-within-range.mjs)
 - [`test-preload-annotation-preview-scheduler-state.mjs`](./test-preload-annotation-preview-scheduler-state.mjs)
