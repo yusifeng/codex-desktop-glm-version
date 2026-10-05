@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：live-query performance operation 的方法白名单与结果映射已迁移至
+`src/main/worker/git-performance-operation-policy.ts`；observability runtime 仅保留性能结果字段、
+失败原因与采样编排。新增 `scripts/test-worker-git-performance-operation-policy.mjs` 覆盖 6 项
+focused assertions；build、typecheck 与现有 observability 回归 99 项已通过。
+
 2026-10-05 A1 继续批次：review working-tree metadata 的有界异步 worker 调度与首个失败
 传播已迁移至 `src/main/worker/git-review-working-tree-worker-policy.ts`；metadata runtime
 仅保留不同工作负载的并发上限与错误消息，新增 `scripts/test-worker-git-review-working-tree-worker-policy.mjs`

@@ -5,6 +5,10 @@ import {
   createGitProcessTelemetry,
   createProcessTelemetryEvent,
 } from "./git-process-observability-policy";
+import {
+  mapLiveQueryPerformanceResult,
+  resolveGitPerformanceOperation,
+} from "./git-performance-operation-policy";
 
 const operationSources = new Set([
   `async_task_starting_state_dropdown`, `commit_modal`, `composer_branch_switcher`,
@@ -52,41 +56,6 @@ function recordUntrackedCacheOutcome(attribution: { closed?: boolean; untrackedC
   if (outcome === `coalesced`) attribution.untrackedCacheCoalescedCount += 1;
   else if (outcome === `hit`) attribution.untrackedCacheHitCount += 1;
   else if (outcome === `miss`) attribution.untrackedCacheMissCount += 1;
-}
-
-/** Classifies a subprocess executable for process telemetry. */
-function resolveGitPerformanceOperation(method: string) {
-  return [
-    `branch-diff-stats`,
-    `review-diff`,
-    `review-patch`,
-    `review-search`,
-    `review-source-line-counts`,
-    `review-summary`,
-    `status-summary`,
-  ].includes(method)
-    ? method
-    : null;
-}
-
-function mapLiveQueryPerformanceResult(response: any) {
-  switch (response.method) {
-    case `branch-diff-stats`:
-      return { operation: `branch-diff-stats`, result: response.result };
-    case `review-summary`:
-      return { operation: `review-summary`, result: response.result };
-    case `status-summary`:
-      return { operation: `status-summary`, result: response.result };
-    case `base-branch`:
-    case `branch-ahead-count`:
-    case `branch-commits`:
-    case `current-branch`:
-    case `default-branch`:
-    case `list-worktrees`:
-    case `recent-branches`:
-    case `upstream-branch`:
-      return;
-  }
 }
 
 function emptyGitPerformanceResultFields() {

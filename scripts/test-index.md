@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 968.
+Total scripts: 970.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -11,6 +11,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-review-working-tree-worker-policy.mjs`](./test-worker-git-review-working-tree-worker-policy.mjs)
 - [`test-worker-git-blame-file-policy.mjs`](./test-worker-git-blame-file-policy.mjs)
 - [`test-worker-git-ignore-source-watch-policy.mjs`](./test-worker-git-ignore-source-watch-policy.mjs)
+- [`test-worker-git-performance-operation-policy.mjs`](./test-worker-git-performance-operation-policy.mjs)
 - [`test-worker-git-status-summary-policy.mjs`](./test-worker-git-status-summary-policy.mjs)
 - [`test-worker-git-repository-size-policy.mjs`](./test-worker-git-repository-size-policy.mjs)
 - [`test-worker-git-config-scope-policy.mjs`](./test-worker-git-config-scope-policy.mjs)
@@ -1018,6 +1019,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-normalize-recipient-fields.mjs`](./test-app-primary-normalize-recipient-fields.mjs)
 - [`test-preload-annotation-region-class-policy.mjs`](./test-preload-annotation-region-class-policy.mjs)
 - [`test-preload-annotation-preload-policy-state.mjs`](./test-preload-annotation-preload-policy-state.mjs)
+- [`test-preload-annotation-preload-startup-policy.mjs`](./test-preload-annotation-preload-startup-policy.mjs)
 - [`test-app-primary-extract-skill-kind.mjs`](./test-app-primary-extract-skill-kind.mjs)
 - [`test-app-primary-annotation-selection-style.mjs`](./test-app-primary-annotation-selection-style.mjs)
 - [`test-app-primary-format-composer-placeholder.mjs`](./test-app-primary-format-composer-placeholder.mjs)
