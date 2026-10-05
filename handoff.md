@@ -1535,3 +1535,5 @@ typecheck 均通过。
 2026-10-05 A1 继续批次：commit message 的 attribution 默认值、Co-authored-by trailer 识别/去重及 trailer block 拼接策略已迁移至 `src/main/worker/git-commit-message-policy.ts`；commit handler 保留 repository 查询、stage/commit Git I/O、失败回滚与缓存编排。新增 `scripts/test-worker-git-commit-message-policy.mjs` 覆盖 6 项 focused assertions；原 commit handler 回归 48 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：merge-base fallback 的 remote/upstream candidate ref 构造、remote-prefixed branch 特判与顺序去重已迁移至 `src/main/worker/git-merge-base-policy.ts`；merge-base 运行时保留 query、resolveRef 与 Git merge-base I/O 编排。新增 `scripts/test-worker-git-merge-base-policy.mjs` 覆盖 4 项 focused assertions；原 merge-base 回归 35 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：ignore discovery 的 Git config path 输出校验与已排序路径的 lower-bound 插入位置策略已迁移至 `src/main/worker/git-ignore-discovery-policy.ts`；运行时保留 config 查询、origin 解析及文件路径投影。新增 `scripts/test-worker-git-ignore-discovery-policy.mjs` 覆盖 3 项 focused assertions；build 与 typecheck 已通过。

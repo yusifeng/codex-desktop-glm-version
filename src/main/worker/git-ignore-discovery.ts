@@ -43,13 +43,6 @@ type TrackedPathsResult = {
   paths: string[];
 };
 
-function parseGitConfigurationPathOutput(output: string): string {
-  if (!output.endsWith(`\n`) || output.length === 1) {
-    throw Error(`Invalid Git configuration path output`);
-  }
-  return output.slice(0, -1);
-}
-
 async function discoverGitIgnoreConfigurationFiles(
   repository: GitRepository,
   { defaultExcludesFile, globalConfigFiles }: GitIgnoreEnvironment,
@@ -158,17 +151,6 @@ async function discoverGitIgnoreConfigurationFiles(
   return { ignoreFile, configFiles: [...configFiles].sort() };
 }
 
-function sortedIndex(values: string[], target: string): number {
-  let low = 0;
-  let high = values.length;
-  while (low < high) {
-    const middle = (low + high) >>> 1;
-    if (values[middle] < target) low = middle + 1;
-    else high = middle;
-  }
-  return high;
-}
-
 async function readGitWatcherIgnoredDirectories(
   repository: GitRepository,
   {
@@ -220,3 +202,4 @@ if (typeof module !== `undefined`) {
     readGitWatcherIgnoredDirectories,
   };
 }
+import { parseGitConfigurationPathOutput, sortedIndex } from "./git-ignore-discovery-policy";
