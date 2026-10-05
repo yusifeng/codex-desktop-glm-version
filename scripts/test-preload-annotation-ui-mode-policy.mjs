@@ -17,4 +17,16 @@ assert.deepEqual(deriveAnnotationUiModePolicy({ interactionMode: "browse", isAnn
   canUseSiteAnnotationApi: true,
   canUseTweaks: false,
 });
-console.log("test-preload-annotation-ui-mode-policy: 3 assertions passed");
+assert.deepEqual(deriveAnnotationUiModePolicy(null), {
+  isCommentMode: false,
+  isSuspended: false,
+  canUseSiteAnnotationApi: false,
+  canUseTweaks: true,
+});
+assert.deepEqual(deriveAnnotationUiModePolicy({ interactionMode: "comment", isAnnotationSuspended: 1, canUseSiteAnnotationApi: 1, canUseTweaks: 0 }), {
+  isCommentMode: true,
+  isSuspended: false,
+  canUseSiteAnnotationApi: false,
+  canUseTweaks: true,
+});
+console.log("test-preload-annotation-ui-mode-policy: 5 assertions passed");

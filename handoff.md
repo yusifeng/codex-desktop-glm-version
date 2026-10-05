@@ -962,4 +962,11 @@ Annotation document context 的 viewport visible-text 收集已迁移至
 range 相交与 2,000 字符上限不再与 Google Docs context class 混杂，document-context 入口仅
 保留页面判定与依赖适配，由 `scripts/test-preload-annotation-visible-text.mjs` 覆盖 3 项
 focused assertions，原 `annotation-document-context` 回归测试继续通过。
+
+Annotation UI mode state boundary（原 React `annotationUiModePolicy`）已登记至
+`src/main/browser-page-preload/annotation-ui-mode-policy.ts`；comment/suspended 门控与
+site-annotation/tweaks capability 的严格布尔归一化集中在纯状态投影中，非 comment 模式不会
+泄漏 suspended 状态，入口继续保留 React/render 副作用。由
+`scripts/test-preload-annotation-ui-mode-policy.mjs` 覆盖 comment/browse、null 与 malformed
+输入，共 5 项 focused assertions。
 2026-10-05 A5 继续批次：app-primary 新增 `A`/`i9`、`Af`/`pF`、`Al`/`ZH`、`Au`/`CB` 四条逐行分类证据，均判定为生成局部 bootstrap/initializer（无独立 named consumer 或 teardown 边界），登记于 `docs/renderer-hub-line-classification.json`。`scripts/test-renderer-hub-classification.mjs` 期望 reviewedCount 从 145 同步至 149；审计脚本保持 74/914 consumed、840 unconsumed。

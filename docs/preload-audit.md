@@ -600,3 +600,12 @@ viewport/theme 投影、同页保留、异页回退和不可见时跳过 clippin
 rect、live-element 和 anchor resolver 适配器；原 preload 的 `rv`/`iv`/`av`/`ov` 入口保留
 兼容代理及浏览器副作用。`scripts/test-preload-annotation-marker-view-state.mjs` 覆盖
 element、region、design draft、additional-anchor projection、comment 缺失与主题回退，共 12 项 focused assertions。
+
+### 增量抽取：annotation UI mode state boundary
+
+React annotation surface 使用的 `annotationUiModePolicy` 状态投影已集中至
+`src/main/browser-page-preload/annotation-ui-mode-policy.ts`。模块只负责 interaction mode、
+suspended 与 capability flag 的稳定归一化：suspended 仅在 comment mode 生效，capability
+字段只接受严格布尔值并对 null/malformed state 安全回退；React/render 与事件副作用仍留在
+原 preload 边界。`scripts/test-preload-annotation-ui-mode-policy.mjs` 覆盖 comment/browse、
+null、malformed 输入，共 5 项 focused assertions。

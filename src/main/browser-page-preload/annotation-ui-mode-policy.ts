@@ -6,13 +6,13 @@ type AnnotationUiModeState = {
 };
 
 /** Derives the stable UI gates shared by the annotation React runtime. */
-function deriveAnnotationUiModePolicy(state: AnnotationUiModeState) {
-  const isCommentMode = state.interactionMode === `comment`;
+function deriveAnnotationUiModePolicy(state: AnnotationUiModeState | null | undefined) {
+  const isCommentMode = state?.interactionMode === `comment`;
   return {
     isCommentMode,
-    isSuspended: isCommentMode && state.isAnnotationSuspended === true,
-    canUseSiteAnnotationApi: state.canUseSiteAnnotationApi === true,
-    canUseTweaks: state.canUseTweaks !== false,
+    isSuspended: isCommentMode && state?.isAnnotationSuspended === true,
+    canUseSiteAnnotationApi: state?.canUseSiteAnnotationApi === true,
+    canUseTweaks: state?.canUseTweaks !== false,
   };
 }
 
