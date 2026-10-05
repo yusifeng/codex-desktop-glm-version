@@ -1153,6 +1153,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-cat-file-error-envelope-policy.mjs](test-worker-git-cat-file-error-envelope-policy.mjs)
 [test-worker-git-cat-file-content-policy.mjs](test-worker-git-cat-file-content-policy.mjs)
 [test-worker-git-diff-line-count-policy.mjs](test-worker-git-diff-line-count-policy.mjs)
+[test-worker-git-diff-octal-policy.mjs](test-worker-git-diff-octal-policy.mjs)
 [test-app-primary-has-allowed-file-extension.mjs](test-app-primary-has-allowed-file-extension.mjs)
 [test-worker-git-diff-octal-policy.mjs](test-worker-git-diff-octal-policy.mjs)
 [test-app-primary-is-capability-supported.mjs](test-app-primary-is-capability-supported.mjs)

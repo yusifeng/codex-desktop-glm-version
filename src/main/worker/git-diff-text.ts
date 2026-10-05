@@ -79,25 +79,6 @@ function parseGitPathEscape(input: string, startIndex: number) {
   };
 }
 
-function isThreeDigitOctal(value: string) {
-  const first = value[0];
-  const second = value[1];
-  const third = value[2];
-  return (
-    value.length === 3 &&
-    first != null &&
-    second != null &&
-    third != null &&
-    isOctalDigit(first) &&
-    isOctalDigit(second) &&
-    isOctalDigit(third)
-  );
-}
-
-function isOctalDigit(value: string) {
-  return value >= `0` && value <= `7`;
-}
-
 function parseGitDiffHeader(header: string) {
   if (header.startsWith(`diff --cc `))
     return parseCombinedGitDiffPath(header.slice(10));
@@ -184,3 +165,4 @@ if (typeof module !== `undefined`)
     stripGitDiffPrefixes,
   };
 import { countGitDiffLines } from "./git-diff-line-count-policy";
+import { isOctalDigit, isThreeDigitOctal } from "./git-diff-octal-policy";
