@@ -7,6 +7,7 @@ import { createAnnotationModeToggleCommand, shouldClearAnnotationRequestsForTogg
 import { handleAnnotationPagehide } from "./annotation-pagehide";
 import { initializeAnnotationPreload } from "./annotation-preload-lifecycle";
 import { applyAnnotationPreloadPolicyState } from "./annotation-preload-policy-state";
+import { createAnnotationPreloadState } from "./annotation-preload-state";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -35,10 +36,7 @@ type AnnotationPreloadRuntimeDependencies = {
 
 function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependencies) {
   let state = deps.createInitialState(deps.intlConfig);
-  let siteAnnotationApiAvailable = false;
-  let destroyed = false;
-  let hasActiveEditor = false;
-  let permissionGranted = false;
+  const lifecycleState = createAnnotationPreloadState();
   let featureLifecycle: any;
 
   const preloadBridge = createAnnotationPreloadBridge({
@@ -49,11 +47,11 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     getSiteAnnotationRequests: () => featureLifecycle?.siteAnnotationRequests,
     getMountedMessageAction: deps.getMountedMessageAction,
     reducePendingEditorMessage: deps.reducePendingEditorMessage,
-    setActiveEditor: (active: boolean) => { hasActiveEditor = active; },
+    setActiveEditor: (active: boolean) => { lifecycleState.setActiveEditor(active); },
   });
 
   const permissionController = deps.createPermissionController({
-    isPermissionGranted: () => permissionGranted,
+    isPermissionGranted: () => lifecycleState.permissionGranted,
     createRequestId: deps.createRequestId,
     invokeHost: (message: any) => deps.ipcRenderer.invoke(deps.channels.runtime, message),
   });
@@ -66,9 +64,9 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
 
   featureLifecycle = createAnnotationFeatureLifecycle({
     permissionController,
-    getState: () => ({ ...state, hasActiveEditor: hasActiveEditor || preloadBridge.hasPendingEditorMessage }),
-    setPermissionGranted: (granted) => { permissionGranted = granted; },
-    setFeatureApiAvailable: (available) => { siteAnnotationApiAvailable = available; },
+    getState: () => ({ ...state, hasActiveEditor: lifecycleState.hasActiveEditor || preloadBridge.hasPendingEditorMessage }),
+    setPermissionGranted: (granted) => { lifecycleState.setPermissionGranted(granted); },
+    setFeatureApiAvailable: (available) => { lifecycleState.setSiteAnnotationApiAvailable(available); },
     createControlsRegistry: deps.createControlsRegistry,
     createSiteAnnotationRequests: deps.createSiteAnnotationRequests,
     createFeatureObserver: deps.createFeatureObserver,
@@ -76,7 +74,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     sendPageEvent: (features) => deps.ipcRenderer.send(deps.channels.pageEvent, { ...deps.featureEvent, payload: { features } }),
     toggleAnnotationMode: (force) => {
       const command = createAnnotationModeToggleCommand({
-        destroyed,
+      destroyed: lifecycleState.destroyed,
         canUseSiteAnnotationApi: state.canUseSiteAnnotationApi === true,
         isAgentControllingBrowser: state.isAgentControllingBrowser === true,
         userActivationActive: deps.navigatorLike.userActivation?.isActive === true,
@@ -93,14 +91,14 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   const disposeFeatures = () => {
     featureLifecycle.dispose();
     runtimeMount.setPreview(null);
-    siteAnnotationApiAvailable = false;
+    lifecycleState.setSiteAnnotationApiAvailable(false);
   };
 
   const applySync = (message: any) => {
     const result = applyAnnotationSyncState({
       state,
       message,
-      siteAnnotationApiAvailable,
+      siteAnnotationApiAvailable: lifecycleState.siteAnnotationApiAvailable,
       modeControllerMounted: featureLifecycle.modeControllerDispose != null,
       resolveSyncState: deps.resolveSyncState,
       isCommentModeActive: deps.isCommentModeActive,
@@ -125,7 +123,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
       runtimeMount,
       preloadBridge,
       siteAnnotationRequests: featureLifecycle.siteAnnotationRequests,
-      setActiveEditor: (active) => { hasActiveEditor = active; },
+      setActiveEditor: (active) => { lifecycleState.setActiveEditor(active); },
       applySync,
     });
   };
@@ -140,7 +138,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
       clearPreview: () => runtimeMount.setPreview(null),
       resetPermission: () => permissionController.reset(),
       disposeFeatures,
-      markDestroyed: () => { destroyed = true; },
+      markDestroyed: () => { lifecycleState.setDestroyed(); },
       removeDOMContentLoaded: () => deps.windowLike.removeEventListener(`DOMContentLoaded`, runtimeMount.mount),
       removeHostMessageListener: () => deps.ipcRenderer.removeListener(deps.channels.hostMessage, handleHostMessage),
       disposeRuntimeMount: () => runtimeMount.dispose(),

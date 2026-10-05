@@ -628,3 +628,11 @@ host sync 对 capability 关闭、agent 控制、comment/suspended 退出，以�
 `annotation-sync-state.ts` 仅负责调用该策略并执行注入的 dispose/clear 副作用；由
 `scripts/test-preload-annotation-sync-transition.mjs` 覆盖正常、能力关闭、暂停、browse 与空消息边界，
 共 19 项 focused assertions。
+
+### 增量抽取：annotation preload lifecycle state boundary
+
+preload runtime 跨回调共享的 `destroyed`、permission、site feature capability 与 active-editor
+标志已迁移至 `src/main/browser-page-preload/annotation-preload-state.ts`。模块严格归一化布尔
+状态并提供隔离 snapshot；runtime 继续负责 feature/runtime/DOM 副作用编排。由
+`scripts/test-preload-annotation-preload-state.mjs` 覆盖默认状态、状态更新、snapshot 隔离与
+销毁复位，共 12 项 focused assertions。
