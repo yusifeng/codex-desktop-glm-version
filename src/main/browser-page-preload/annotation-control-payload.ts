@@ -43,12 +43,6 @@ function createAnnotationResponseDetail(input: { type: string; registrationId: s
   return { type: input.type, registrationId: input.registrationId, customRendering: input.customRendering, requestId: input.requestId, hit: input.hit };
 }
 
-function isValidAnnotationHitTestRequest(value: unknown, maxRequestIdLength: number): value is { type: `hit-test`; requestId: string; x: number; y: number } {
-  if (typeof value !== `object` || !value) return false;
-  const request = value as Record<string, unknown>;
-  return request.type === `hit-test` && typeof request.requestId === `string` && request.requestId.length > 0 && request.requestId.length <= maxRequestIdLength && typeof request.x === `number` && Number.isFinite(request.x) && typeof request.y === `number` && Number.isFinite(request.y);
-}
-
 function serializeAnnotationControls(value: unknown, maxBytes: number): string {
   if (typeof value !== `object` || !value) throw new TypeError(`Invalid annotation controls`);
   const serialized = JSON.stringify({ controls: (value as Record<string, unknown>).controls, controlsHeading: (value as Record<string, unknown>).controlsHeading, controlsMode: (value as Record<string, unknown>).controlsMode }, (_key, item) => {
@@ -84,3 +78,4 @@ function sanitizeAnnotationControlMetadata(value: unknown, limits: { maxKeys: nu
 
 export { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, createAnnotationResponseDetail };
 if (typeof module !== `undefined`) module.exports = { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, createAnnotationResponseDetail };
+import { isValidAnnotationHitTestRequest } from "./annotation-hit-test-request-policy";
