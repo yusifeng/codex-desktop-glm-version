@@ -1746,3 +1746,5 @@ typecheck 均通过。
 2026-10-06 A5 T5 继续批次：app-primary 的 displayable action predicate 已迁移至 `src/renderer/app-primary/runtime/has-displayable-action.ts`；新增 `scripts/test-app-primary-has-displayable-action.mjs` 覆盖 4 项 focused assertions，并登记 `qm/iAe` 源码 5995-5998 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
 2026-10-06 A5 T5 继续批次：app-primary 的 composer enter-behavior formatter 已迁移至 `src/renderer/app-primary/runtime/format-composer-enter-behavior.ts`；新增 `scripts/test-app-primary-format-composer-enter-behavior.mjs` 覆盖 3 项 focused assertions，并登记 `jt/Fft` 源码 103478-103484 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-06 A5 T5 继续批次：app-shared 的 SSH host kind predicate 已迁移至 `src/renderer/app-shared/runtime/is-ssh-host-kind.ts`；新增 `scripts/test-app-shared-is-ssh-host-kind.mjs` 覆盖 3 项 focused assertions，并登记 `UU/IBe` 源码 64905-64907 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
