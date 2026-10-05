@@ -1,5 +1,5 @@
 import { pathToFileURL } from "node:url";
-import { isAppFrameUrl, sameOrigin } from "../util/url-trust";
+import { isAppFrameUrl, sameOrigin } from "../util/url-trust.js";
 
 export function resolveRendererEntryUrl(
   environmentUrl: string | undefined,

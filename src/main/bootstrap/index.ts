@@ -364,4 +364,15 @@ export { loadWindowsUpdaterAddon as "ft" } from "./updater/windows-msix-updater"
 export { classifyUpdateFailure as "c" } from "./updater/update-errors";
 
 // vendored 符号（main chunk 直接消费的库内部符号）
-export { it as "sn", et as "pn", W as "tn", tC as "en" } from "./vendor";
+// Keep these vendor compatibility exports on unique local bindings.  The
+// published main chunk calls `bootstrap.pn()` during module initialization;
+// exporting the compressed name directly can collide with an unrelated
+// vendor-internal `pn` binding after bundling.
+import { it as vendorSn, et as vendorPn, W as vendorTn, tC as vendorEn } from "./vendor";
+const vendorPnCompat = () => vendorPn;
+export {
+  vendorSn as "sn",
+  vendorPnCompat as "pn",
+  vendorTn as "tn",
+  vendorEn as "en",
+};

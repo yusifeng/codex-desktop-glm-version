@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 构建/启动回归修复：main-app transform-only 输出统一补齐 Node ESM 的 `.js` 相对导入，并将
+`@chunk/*` 改写为实际 chunk 相对路径；bootstrap vendor 兼容导出改用稳定局部绑定，补回 preserved main
+对 `bootstrap/protocol/app-protocol.js` 的历史路径 facade。已用临时独立 Electron profile 实测主窗口 frame
+加载与 app-server `initialize_handshake_result` 均成功；`npm run build`、`verify`、`typecheck` 通过。
+
 2026-10-05 T2/A2 继续批次：annotation metadata 序列化后的 UTF-8 byte quota 判定纯策略已抽至
 `src/main/browser-page-preload/annotation-byte-quota-policy.ts`；control payload adapter 仅保留
 schema 清洗与 JSON 编排。新增 `scripts/test-preload-annotation-byte-quota-policy.mjs` 覆盖 3 项

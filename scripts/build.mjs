@@ -26,6 +26,41 @@ const check = process.argv.includes("--check");
 const tsconfigRaw = { compilerOptions: { verbatimModuleSyntax: true } };
 const common = { target: "esnext", charset: "utf8", legalComments: "inline" };
 
+// main-app modules are emitted as ESM files and loaded from the CommonJS main
+// chunk through Node's native module loader. Node's ESM resolver does not add
+// file extensions to relative specifiers, while TypeScript source imports are
+// intentionally extensionless. Normalize only relative JavaScript imports in
+// this emitted tree; bare packages and @chunk/* aliases retain their contract.
+function rewriteChunkImports(code, dst) {
+  const rewrite = (specifier) => {
+    const output = CHUNKS[specifier.slice("@chunk/".length)];
+    if (output == null) return specifier;
+    let relative = path.relative(path.dirname(dst), path.join(ROOT, "app/.vite/build", output));
+    relative = relative.split(path.sep).join("/");
+    return relative.startsWith(".") ? relative : `./${relative}`;
+  };
+  return code
+    .replace(/(from\s+["'])@chunk\/([^"']+)(["'])/g, (_m, prefix, name, suffix) =>
+      `${prefix}${rewrite(`@chunk/${name}`)}${suffix}`,
+    )
+    .replace(/(import\(\s*["'])@chunk\/([^"']+)(["']\s*\))/g, (_m, prefix, name, suffix) =>
+      `${prefix}${rewrite(`@chunk/${name}`)}${suffix}`,
+    )
+    .replace(/(require\(\s*["'])@chunk\/([^"']+)(["']\s*\))/g, (_m, prefix, name, suffix) =>
+      `${prefix}${rewrite(`@chunk/${name}`)}${suffix}`,
+    );
+}
+
+function withJsExtensions(code) {
+  return code
+    .replace(/(from\s+["'])(\.{1,2}\/[^"']+)(["'])/g, (_m, prefix, specifier, suffix) =>
+      `${prefix}${/\.(?:js|json|node)$/.test(specifier) ? specifier : `${specifier}.js`}${suffix}`,
+    )
+    .replace(/(import\(\s*["'])(\.{1,2}\/[^"']+)(["']\s*\))/g, (_m, prefix, specifier, suffix) =>
+      `${prefix}${/\.(?:js|json|node)$/.test(specifier) ? specifier : `${specifier}.js`}${suffix}`,
+    );
+}
+
 // 已重写 chunk 的输出文件名集合，用于跳过对应的旧格式 .ts（正常情况下已被删除）。
 const rewrittenOutputs = new Set([...REWRITTEN].map((name) => CHUNKS[name]));
 
@@ -110,7 +145,10 @@ async function worker() {
         if (js.code !== ts.code) mismatches.push(src);
       }
       await fs.mkdir(path.dirname(dst), { recursive: true });
-      await fs.writeFile(dst, ts.code);
+      const emitted = /[\\/]src[\\/]main[\\/]main-app[\\/]/.test(src)
+        ? withJsExtensions(rewriteChunkImports(ts.code, dst))
+        : ts.code;
+      await fs.writeFile(dst, emitted);
     } catch (err) {
       const detail = err.errors?.[0]?.text ?? err.message.split("\n")[0];
       errors.push(`${path.relative(ROOT, src)}: ${detail}`);
@@ -164,3 +202,13 @@ console.log(
 for (const b of bundleSummaries)
   console.log(`  ${b.file} <- src/main/${b.name}/ (exports: ${b.exports.join(", ") || "none"})`);
 if (errors.length || mismatches.length) process.exit(1);
+
+// The preserved main chunk still has one historical direct require for this
+// helper path.  The module is now bundled into bootstrap, so retain a tiny
+// compatibility facade at the published path instead of shipping a second
+// copy of the protocol implementation.
+await fs.mkdir(path.join(ROOT, "app/.vite/build/bootstrap/protocol"), { recursive: true });
+await fs.writeFile(
+  path.join(ROOT, "app/.vite/build/bootstrap/protocol/app-protocol.js"),
+  'const bootstrap = require("../../bootstrap-C4dRql4x.js");\nmodule.exports = { getWebviewEntryPath: bootstrap.ln };\n',
+);
