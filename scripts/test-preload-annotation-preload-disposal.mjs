@@ -12,8 +12,12 @@ const disposal = createAnnotationPreloadDisposal({
 assert.equal(disposal.disposed, false);
 assert.equal(disposal.dispose(), true);
 assert.deepEqual(calls, ["features", "preview", ["capability", false]]);
+assert.equal(disposal.disposed, false);
+assert.equal(disposal.dispose(), true);
+assert.deepEqual(calls, ["features", "preview", ["capability", false], "features", "preview", ["capability", false]]);
+assert.equal(disposal.disposeTerminal(), true);
 assert.equal(disposal.disposed, true);
+assert.equal(disposal.disposeTerminal(), false);
 assert.equal(disposal.dispose(), false);
-assert.deepEqual(calls, ["features", "preview", ["capability", false]]);
-assert.equal(disposal.disposed, true);
-console.log("test-preload-annotation-preload-disposal: 7 assertions passed");
+assert.equal(calls.length, 9);
+console.log("test-preload-annotation-preload-disposal: 10 assertions passed");

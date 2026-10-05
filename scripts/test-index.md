@@ -1003,7 +1003,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-feature-lifecycle-state.mjs`](./test-preload-annotation-feature-lifecycle-state.mjs)
 - [`test-preload-annotation-element-cache.mjs`](./test-preload-annotation-element-cache.mjs)
 - [`test-preload-annotation-preload-disposal.mjs`](./test-preload-annotation-preload-disposal.mjs)
-- [`test-preload-annotation-preload-disposal-state.mjs`](./test-preload-annotation-preload-disposal-state.mjs)
 - [`test-worker-git-request-invalidation-policy.mjs`](./test-worker-git-request-invalidation-policy.mjs)
 - [`test-worker-git-request-context-policy.mjs`](./test-worker-git-request-context-policy.mjs)
 - [`test-worker-computer-use-capture-policy.mjs`](./test-worker-computer-use-capture-policy.mjs)

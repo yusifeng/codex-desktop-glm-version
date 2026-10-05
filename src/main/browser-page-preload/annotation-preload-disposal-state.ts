@@ -9,9 +9,9 @@ function createAnnotationPreloadDisposalState() {
   let disposed = false;
   return {
     get disposed() { return disposed; },
-    beginDispose() {
+    beginDispose(terminal = false) {
       if (disposed) return false;
-      disposed = true;
+      if (terminal) disposed = true;
       return true;
     },
   };

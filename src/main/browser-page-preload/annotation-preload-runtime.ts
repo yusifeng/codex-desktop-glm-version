@@ -104,7 +104,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
       modeControllerMounted: featureLifecycle.modeControllerDispose != null,
       resolveSyncState: deps.resolveSyncState,
       isCommentModeActive: deps.isCommentModeActive,
-      disposeFeatures,
+      disposeFeatures: disposal.disposeTerminal,
       clearSiteAnnotationRequests: () => featureLifecycle.siteAnnotationRequests?.clear(),
       clearPreview: () => runtimeMount.setPreview(null),
     });

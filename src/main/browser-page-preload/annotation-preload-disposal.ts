@@ -18,8 +18,8 @@ type AnnotationPreloadDisposalDependencies = {
 function createAnnotationPreloadDisposal(deps: AnnotationPreloadDisposalDependencies) {
   const state = createAnnotationPreloadDisposalState();
 
-  const dispose = () => {
-    if (!state.beginDispose()) return false;
+  const runDispose = (terminal: boolean) => {
+    if (!state.beginDispose(terminal)) return false;
     deps.disposeFeatures();
     deps.clearPreview();
     deps.setFeatureApiAvailable(false);
@@ -27,7 +27,8 @@ function createAnnotationPreloadDisposal(deps: AnnotationPreloadDisposalDependen
   };
 
   return {
-    dispose,
+    dispose: () => runDispose(false),
+    disposeTerminal: () => runDispose(true),
     get disposed() { return state.disposed; },
   };
 }
