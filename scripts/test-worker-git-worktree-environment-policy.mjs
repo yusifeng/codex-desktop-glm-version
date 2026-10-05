@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-worktree-environment-policy-"));
+const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-worktree-environment-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { selectWorktreeEnvironmentPath } = createRequire(import.meta.url)(output);
+assert.equal(selectWorktreeEnvironmentPath("/resolved", "/configured"), "/resolved");
+assert.equal(selectWorktreeEnvironmentPath(null, "/configured"), "/configured");
+assert.equal(selectWorktreeEnvironmentPath(undefined, null), null);
+assert.equal(selectWorktreeEnvironmentPath("", "/configured"), "");
+console.log("worker Git worktree environment policy tests passed (4 assertions)");

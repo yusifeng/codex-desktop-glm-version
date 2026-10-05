@@ -942,6 +942,11 @@ Worktree 创建时的 synced-branch 是否配置及 local branch ref 投影已�
 统一承载；create runtime 仅保留 commit-tree 查询和 config 写入副作用。新增 ref 投影与
 跳过条件断言，既有 worktree create 生命周期保持不变。
 
+Worktree 创建时 resolved/configured local-environment path 的优先级与空值投影已迁移至
+`src/main/worker/git-worktree-environment-policy.ts`；create runtime 仍负责异步解析、Git
+config 写入与 setup 副作用，由 4 项 focused assertions 覆盖 resolved、fallback、empty 与
+null 边界。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至

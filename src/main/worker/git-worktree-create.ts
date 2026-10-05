@@ -1,5 +1,6 @@
 import { runWorktreeSetup } from "./git-worktree-setup";
 import { resolveSyncedBranchSetup } from "./git-worktree-branch-setup-policy";
+import { selectWorktreeEnvironmentPath } from "./git-worktree-environment-policy";
 
 type WorktreeCreateDependencies = {
   copyAgentOverrideFiles: (sourceRoot: string, targetRoot: string, host: any) => Promise<void>;
@@ -184,7 +185,8 @@ async function createWorktree(params: any, dependencies: WorktreeCreateDependenc
             signal,
           })
           .catch(() => localEnvironmentConfigPath);
-  const storedEnvironmentPath = environmentPath ?? `__none__`;
+  const selectedEnvironmentPath = selectWorktreeEnvironmentPath(environmentPath, localEnvironmentConfigPath);
+  const storedEnvironmentPath = selectedEnvironmentPath ?? `__none__`;
   if (
     !(await worktreeRepository.setConfigValueForScope(
       `codex.localEnvironmentConfigPath`,
@@ -197,7 +199,7 @@ async function createWorktree(params: any, dependencies: WorktreeCreateDependenc
       `stderr`,
       encoder.encode(`Failed to store selected environment in git config\n`),
     );
-  return runWorktreeSetup(environmentPath, {
+  return runWorktreeSetup(selectedEnvironmentPath, {
     allowSetupFailure,
     host,
     signal,
