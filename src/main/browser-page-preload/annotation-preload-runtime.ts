@@ -6,6 +6,7 @@ import { applyAnnotationSyncState } from "./annotation-sync-state";
 import { createAnnotationModeToggleCommand, shouldClearAnnotationRequestsForToggle } from "./annotation-mode-command-policy";
 import { handleAnnotationPagehide } from "./annotation-pagehide";
 import { initializeAnnotationPreload } from "./annotation-preload-lifecycle";
+import { applyAnnotationPreloadPolicyState } from "./annotation-preload-policy-state";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -131,13 +132,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
 
   const initializeFeatures = (policy: any) => {
     featureLifecycle.initialize(policy);
-    state = {
-      ...state,
-      canUseSiteAnnotationApi: policy.enabled && policy.siteAnnotationFeaturesEnabled,
-      canUseTweaks: policy.canUseTweaks,
-      isAgentControllingBrowser: policy.isAgentControllingBrowser,
-      interactionMode: policy.isAnnotationModeActive ? `comment` : `browse`,
-    };
+    state = applyAnnotationPreloadPolicyState(state, policy);
   };
 
   const onPageHide = (event: any) => {

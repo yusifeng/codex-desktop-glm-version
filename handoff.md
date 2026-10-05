@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation preload policy 初始化的能力/控制/交互模式状态投影已抽至
+`src/main/browser-page-preload/annotation-preload-policy-state.ts`；runtime 仅保留 feature
+lifecycle 初始化与状态写回。新增 `scripts/test-preload-annotation-preload-policy-state.mjs`
+覆盖 enabled/site-feature 能力门控、布尔归一化、comment/browse 模式及空输入边界。
+
 最新增量：worker review section changes 的错误响应、gitlink SHA 提取与相对路径归一化判定已迁移至
 `src/main/worker/git-review-section-policy.ts`；入口仅保留 Git I/O 与 patch 副作用编排，新增
 `scripts/test-worker-git-review-section-policy.mjs` 覆盖 7 项 focused assertions。
