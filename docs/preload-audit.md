@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation anchor clamp reuse
+
+Annotation anchor point 投影使用的 `bd` clamp helper（5120-7259 业务工具段）已复用
+`annotation-surface-geometry.clampAnnotationCoordinate`，删除重复实现；geometry regression、
+build 与 typecheck 已通过。
+
 ### 增量抽取：annotation anchor point projection policy
 
 Annotation anchor point 到目标 rect 的比例投影（原 `hd`，5120-7259 业务工具段）已迁移至

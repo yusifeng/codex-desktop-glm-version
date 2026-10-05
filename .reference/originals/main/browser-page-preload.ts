@@ -5986,7 +5986,7 @@ function yd(e) {
   }
 }
 function bd(e, t, n) {
-  return Math.min(Math.max(e, t), n);
+  return clampAnnotationCoordinate(e, t, n);
 }
 var xd,
   Sd,
