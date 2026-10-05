@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review commit queries 的 commit/numstat 输出解析与 commits/output size limits 已迁移至 `src/main/worker/git-review-commit-queries-policy.ts`；query runtime 保留 comparison、query/cache、Git I/O 与 signal 编排，并兼容既有 parser dependency 形态。新增 `scripts/test-worker-git-review-commit-queries-policy.mjs` 覆盖 6 项 focused assertions；原 commit-query 回归 36 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation pointer selection 的 active drag 与 terminal 状态已抽至
+`src/main/browser-page-preload/annotation-pointer-selection-state.ts`；pointer coordinator 仅保留
+命中/选择和高亮副作用，dispose 后迟到 pointer 事件继续被拒绝。新增
+`scripts/test-preload-annotation-pointer-selection-state.mjs` 覆盖 6 项状态断言；原 pointer
+selection 回归 18 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation preload message queue 的 mounted/destroyed 生命周期与
 sync/text/editor 缓冲状态已抽至 `src/main/browser-page-preload/annotation-preload-message-queue-state.ts`；
 queue 仅保留消息合并、消费顺序与重放副作用。新增

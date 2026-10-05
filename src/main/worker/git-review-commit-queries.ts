@@ -1,5 +1,9 @@
-const MAX_REVIEW_COMMITS = 100;
-const MAX_REVIEW_COMMIT_OUTPUT_BYTES = 2_097_152;
+import {
+  MAX_REVIEW_COMMITS,
+  MAX_REVIEW_COMMIT_OUTPUT_BYTES,
+  parseBranchCommits,
+  parseReviewCommitLineCounts,
+} from './git-review-commit-queries-policy';
 
 type GitReviewCommitQueryDependencies = {
   fetchQueryWithSignal: (
@@ -20,71 +24,6 @@ type GitReviewCommitQueryDependencies = {
   staleTime: number;
 };
 
-function parseReviewCommitLineCounts(
-  output: string,
-  dependencies: GitReviewCommitQueryDependencies,
-) {
-  return output.split(`\x1e`).flatMap((record) => {
-    const [sha, ...lines] = record.trim().split(/\r?\n/);
-    if (!sha) return [];
-    let additions: number | null = 0;
-    let deletions: number | null = 0;
-    for (const line of lines) {
-      if (line.length === 0) continue;
-      const [added, deleted, path] = line.split(`\t`);
-      if (
-        added == null ||
-        deleted == null ||
-        path == null ||
-        added === `-` ||
-        deleted === `-`
-      ) {
-        additions = null;
-        deletions = null;
-        break;
-      }
-      const addedCount = Number(added);
-      const deletedCount = Number(deleted);
-      if (
-        !Number.isSafeInteger(addedCount) ||
-        !Number.isSafeInteger(deletedCount)
-      ) {
-        additions = null;
-        deletions = null;
-        break;
-      }
-      additions += addedCount;
-      deletions += deletedCount;
-    }
-    return [
-      {
-        additions,
-        deletions,
-        sha: dependencies.normalizeCommitSha(sha),
-      },
-    ];
-  });
-}
-
-function parseBranchCommits(
-  output: string,
-  dependencies: GitReviewCommitQueryDependencies,
-) {
-  return output
-    .split(`\x1e`)
-    .map((record) => {
-      const [sha, committedAt, subject, message] = record.trim().split(`\0`);
-      return !sha || !committedAt || subject == null || message == null
-        ? null
-        : {
-            committedAt,
-            message,
-            sha: dependencies.normalizeCommitSha(sha),
-            subject,
-          };
-    })
-    .filter((commit) => commit != null);
-}
 
 async function getBranchCommits(
   repository: any,
@@ -148,7 +87,7 @@ function getReviewCommitLineCounts(
         );
         return !result.success || !result.stdout
           ? []
-          : parseReviewCommitLineCounts(result.stdout, dependencies);
+          : parseReviewCommitLineCounts(result.stdout, dependencies.normalizeCommitSha);
       },
     },
     signal,
@@ -187,7 +126,7 @@ function readBranchCommits(
       );
       return !result.success || !result.stdout
         ? []
-        : parseBranchCommits(result.stdout, dependencies);
+        : parseBranchCommits(result.stdout, dependencies.normalizeCommitSha);
     },
     staleTime: 250,
   });
