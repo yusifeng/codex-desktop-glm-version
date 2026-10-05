@@ -94,7 +94,10 @@ export async function createBrowserUseNativePipeServer({
   createProtocol(
     pipe: { dispose(): void; pipePath: string },
     api: NativePipeApiImpl,
-    callbacks: { onMoveMouseError(error: unknown, context: { tabId: string }): void },
+    callbacks: {
+      onMoveMouseError(error: unknown, context: { tabId: string }): void;
+      onWebMcpToolInvoked(invocation: WebMcpToolInvocation): void;
+    },
   ): NativePipeProtocol;
   apiImpl: NativePipeApiImpl;
   pipePath?: string;
@@ -109,6 +112,9 @@ export async function createBrowserUseNativePipeServer({
       void error;
       void context.tabId;
       // 原文：IAB_LIFECYCLE failed to move browser use cursor（warning）
+    },
+    onWebMcpToolInvoked(invocation) {
+      apiImpl.notifyWebMcpToolInvoked(invocation);
     },
   });
   const unsubscribes: Array<() => void> = [];

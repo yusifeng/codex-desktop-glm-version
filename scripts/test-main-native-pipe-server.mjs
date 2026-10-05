@@ -12,6 +12,8 @@ const api = {
   notifyWebMcpToolInvoked() {},
 };
 const sent = [];
+let protocolCallbacks;
+const invocations = [];
 let throwOnCdp = false;
 let pipeDisposed = false;
 let protocolDisposed = false;
@@ -22,7 +24,9 @@ const server = await createBrowserUseNativePipeServer({
     assert.equal(options.maxOutgoingFrameBytes, MAX_OUTGOING_FRAME_BYTES);
     return { pipePath: "test-pipe", dispose: () => { pipeDisposed = true; } };
   },
-  createProtocol: () => ({
+  createProtocol: (_pipe, _api, callbacks) => {
+    protocolCallbacks = callbacks;
+    return {
     sendCdpEvent: (event) => {
       if (throwOnCdp) throw new NativePipeFrameTooLargeError(10, 11);
       sent.push(["cdp", event]);
@@ -30,9 +34,13 @@ const server = await createBrowserUseNativePipeServer({
     sendCdpDetach: (event) => sent.push(["detach", event]),
     sendPageEvent: (event) => sent.push(["page", event]),
     sendDownloadChange: (change) => sent.push(["download", change]),
-    dispose: () => { protocolDisposed = true; },
-  }),
+      dispose: () => { protocolDisposed = true; },
+    };
+  },
 });
+api.notifyWebMcpToolInvoked = (invocation) => invocations.push(invocation);
+protocolCallbacks.onWebMcpToolInvoked({ session_id: "s1", tabId: "tab-1", toolName: "tool", turn_id: "turn-1" });
+assert.equal(invocations.length, 1);
 listeners.cdp({ method: "Runtime.executionContextCreated" });
 listeners.detach({ tabId: "tab-1" });
 listeners.page({ type: "navigation" });
