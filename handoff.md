@@ -1774,3 +1774,4 @@ typecheck 均通过。
 2026-10-06 A5 逐段复核：app-shared 导出 `Et`（source `fDt`，121403-121407）确认是 shared icon registry 的 memoized circle-info asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `Ct`（source `mDt`，121430-121434）确认是 shared icon registry 的 memoized plus-sm asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `St`（source `gDt`，121457-121461）确认是 shared icon registry 的 memoized chat-bubble-plus asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
+2026-10-06 A5 逐段复核：app-shared 导出 `yt`（source `vDt`，121484-121488）确认是 shared icon registry 的 memoized arrow-up-open asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
