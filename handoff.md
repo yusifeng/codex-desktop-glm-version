@@ -1685,3 +1685,5 @@ typecheck 均通过。
 2026-10-05 B5 回归补强：`scripts/smoke-test.sh` 默认改用每次运行独立临时 Electron profile，仍支持 `CODEX_SMOKE_USER_DATA_PATH` 覆盖；实测 build/pack 后主窗口 frame、app-server handshake 与 renderer fatal 过滤均通过，避免历史单实例锁导致误报超时。
 
 2026-10-05 A1 T1 继续批次：cat-file 请求的全零 OID 不可查询、非零 OID 可查询判定已迁移至 `src/main/worker/git-cat-file-policy.ts`；cat-file 入口保留 batch 查询、大小限制与错误投影。新增 `scripts/test-worker-git-cat-file-policy.mjs` 覆盖 6 项 focused assertions；原 cat-file 回归 43 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：cat-file 命令结果 code=128 的 not-found 与其他 code 的 unknown 错误分类已迁移至 `src/main/worker/git-cat-file-error-policy.ts`；cat-file 入口保留 batch 查询与大小限制编排。新增 `scripts/test-worker-git-cat-file-error-policy.mjs` 覆盖 4 项 focused assertions；build 与 typecheck 已通过。

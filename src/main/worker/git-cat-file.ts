@@ -22,10 +22,6 @@ function splitContentLines(content: string) {
   return lines;
 }
 
-function gitErrorType(result: any) {
-  return result.code === 128 ? `not-found` : `unknown`;
-}
-
 function defaultBatchError(requestCount: number, result: any, limitBytes: number) {
   return result.outputLimitExceeded != null && requestCount === 1
     ? { type: `error`, error: { type: `too-large`, limitBytes } }
@@ -263,3 +259,4 @@ if (typeof module !== `undefined`)
     readStreamPrefix,
     splitContentLines,
   };
+import { gitErrorType } from "./git-cat-file-error-policy";
