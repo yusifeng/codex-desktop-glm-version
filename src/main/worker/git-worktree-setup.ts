@@ -8,6 +8,7 @@ type WorktreeSetupDependencies = {
 };
 import { getWorktreeSetupFailure } from "./git-worktree-setup-policy";
 import { getWorktreeShellEnvironmentAction } from "./git-worktree-shell-environment-policy";
+import { buildWorktreeSetupEnvironment } from "./git-worktree-setup-environment-policy";
 
 /** Persists the selected environment and runs its optional worktree setup lifecycle. */
 async function runWorktreeSetup(
@@ -51,10 +52,7 @@ async function runWorktreeSetup(
     environment,
     (kind: string, chunk: Uint8Array) => params.onLog?.(kind, chunk),
     params.signal,
-    {
-      [dependencies.originalWorkspaceEnv]: params.workspaceRoot,
-      [dependencies.worktreeWorkspaceEnv]: params.worktreeWorkspaceRoot,
-    },
+    buildWorktreeSetupEnvironment(dependencies.originalWorkspaceEnv, dependencies.worktreeWorkspaceEnv, params.workspaceRoot, params.worktreeWorkspaceRoot),
     params.host,
   );
   if (params.signal?.aborted) return { success: false, error: Error(`Request canceled`) };
