@@ -171,7 +171,7 @@ export class IabBrowserUseApi {
   private tabIdsByRouteTabKey = new Map<string, string>();
   private debuggerListeners = new Map<number, Array<(event: unknown) => void>>();
   private pageStateListeners = new Map<string, Set<PageStateEventListener>>();
-  private debuggerTargetSessionsByTabId = new Map<string, Set<string>>();
+  private debuggerTargetSessionsByTabId = new Map<string, Map<string, string>>();
   private debuggerTargetIdsBySessionId = new Map<string, string>();
   private pageCapturePaintLeaseWebContentsByTabId = new Map<string, number>();
   private cachedCdpExpressions = new Map<string, unknown>();
@@ -303,6 +303,37 @@ export class IabBrowserUseApi {
       if (entry.tabIds != null && (tabId == null || !entry.tabIds.has(tabId))) continue;
       entry.listener(event);
     }
+  }
+
+  /** CDP target/session 双向映射（原 debuggerSessionIdForTarget 等）。 */
+  debuggerSessionIdForTarget(tabId: string, targetId: string): string | null {
+    return this.debuggerTargetSessionsByTabId.get(tabId)?.get(targetId) ?? null;
+  }
+
+  rememberDebuggerTargetSession(tabId: string, targetId: string, sessionId: string): void {
+    const targets = this.debuggerTargetSessionsByTabId.get(tabId) ?? new Map<string, string>();
+    targets.set(targetId, sessionId);
+    this.debuggerTargetSessionsByTabId.set(tabId, targets);
+    this.debuggerTargetIdsBySessionId.set(sessionId, targetId);
+  }
+
+  getDebuggerTargetIdForSession(sessionId: string): string | null {
+    return this.debuggerTargetIdsBySessionId.get(sessionId) ?? null;
+  }
+
+  forgetDebuggerTargetSession(sessionId: string): void {
+    this.debuggerTargetIdsBySessionId.delete(sessionId);
+    for (const [tabId, targets] of this.debuggerTargetSessionsByTabId) {
+      for (const [targetId, mappedSessionId] of targets) if (mappedSessionId === sessionId) targets.delete(targetId);
+      if (targets.size === 0) this.debuggerTargetSessionsByTabId.delete(tabId);
+    }
+  }
+
+  forgetDebuggerTargetSessionsForTab(tabId: string): void {
+    const targets = this.debuggerTargetSessionsByTabId.get(tabId);
+    if (targets == null) return;
+    for (const sessionId of targets.values()) this.debuggerTargetIdsBySessionId.delete(sessionId);
+    this.debuggerTargetSessionsByTabId.delete(tabId);
   }
 
   /** 页面事件监听（原 `addPageEventListener`）。 */
