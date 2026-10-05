@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation accessible label policy
+
+Annotation target label 的 aria-label、文本 fallback 与 tagName 投影（原 `yc`，3863-5049
+业务工具段）已迁移至 `src/main/browser-page-preload/annotation-accessible-label-policy.ts`；
+读取器通过依赖注入保留。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation element label policy
 
 Annotation element label 的 root tag fallback、文本规范化与 80 字符截断（原 `bc`，5120-7259
