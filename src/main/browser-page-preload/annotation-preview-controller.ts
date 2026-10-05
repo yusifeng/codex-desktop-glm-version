@@ -4,27 +4,25 @@ type AnnotationPreviewControllerDependencies<TPreview> = {
 
 /** Owns replacement and teardown of the currently mounted annotation preview. */
 function createAnnotationPreviewController<TPreview>(deps: AnnotationPreviewControllerDependencies<TPreview>) {
-  let disposeCurrent: (() => void) | null = null;
-  let disposed = false;
+  const state = createAnnotationPreviewControllerState();
 
   const clearCurrent = () => {
-    disposeCurrent?.();
-    disposeCurrent = null;
+    state.disposeCurrent?.();
+    state.setDisposeCurrent(null);
   };
   const dispose = () => {
-    if (disposed) return;
-    disposed = true;
     clearCurrent();
+    state.dispose();
   };
 
   return {
     setPreview(preview: TPreview | null | undefined) {
-      if (disposed) return;
+      if (state.disposed) return;
       clearCurrent();
       if (preview == null) return;
       const mounted = deps.mountPreview(preview);
-      if (typeof mounted === `function`) disposeCurrent = mounted;
-      else if (mounted?.dispose != null) disposeCurrent = mounted.dispose;
+      if (typeof mounted === `function`) state.setDisposeCurrent(mounted);
+      else if (mounted?.dispose != null) state.setDisposeCurrent(mounted.dispose);
     },
     dispose,
   };
@@ -32,3 +30,4 @@ function createAnnotationPreviewController<TPreview>(deps: AnnotationPreviewCont
 
 export { createAnnotationPreviewController };
 if (typeof module !== `undefined`) module.exports = { createAnnotationPreviewController };
+import { createAnnotationPreviewControllerState } from "./annotation-preview-controller-state";

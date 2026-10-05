@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationPreviewControllerState } = require("../app/.vite/build/browser-page-preload/annotation-preview-controller-state.js");
+const state = createAnnotationPreviewControllerState();
+const dispose = () => {};
+state.setDisposeCurrent(dispose);
+assert.equal(state.disposeCurrent, dispose);
+assert.equal(state.disposed, false);
+assert.equal(state.dispose(), true);
+assert.equal(state.disposed, true);
+assert.equal(state.disposeCurrent, null);
+assert.equal(state.dispose(), false);
+console.log("test-preload-annotation-preview-controller-state: 6 assertions passed");
