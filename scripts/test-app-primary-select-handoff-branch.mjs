@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/select-handoff-branch.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { selectHandoffBranch } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const record = { sourceConversationId: "source", targetConversationId: "target", sourceBranch: "main", localBranch: "feature", worktreeBranch: "wt", direction: "to-worktree" };
+assert.equal(selectHandoffBranch(record, "source"), "main");
+assert.equal(selectHandoffBranch(record, "target"), "wt");
+assert.equal(selectHandoffBranch({ ...record, direction: "to-local" }, "target"), "feature");
+assert.equal(selectHandoffBranch(record, "other"), null);
+console.log("app-primary select handoff branch: 4 assertions passed");
