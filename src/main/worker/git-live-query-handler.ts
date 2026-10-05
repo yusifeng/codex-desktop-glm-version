@@ -1,3 +1,5 @@
+import { normalizeRecentBranchesLimit } from "./git-live-query-limit-policy";
+
 type GitLiveQueryHandlerDependencies = {
   gitManager: any;
   getWorktreeRepositoryForRoot: (root: string, host: any) => any;
@@ -61,7 +63,7 @@ async function handleGitLiveQuery(
         : { method: `branch-diff-stats`, result: await run(query.params.includeUntrackedFiles) };
     }
     case `recent-branches`: {
-      const limit = Math.max(1, Math.min(query.params.limit ?? 10, 100));
+      const limit = normalizeRecentBranchesLimit(query.params.limit);
       const repository = deps.getWorktreeRepositoryForRoot(root, host);
       const watch = deps.getWatch(root, host);
       return { method: `recent-branches`, result: { branches: await deps.getRecentBranches(repository, limit, signal, getLiveQueryWatchOptions(watch)) } };

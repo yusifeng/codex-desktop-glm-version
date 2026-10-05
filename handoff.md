@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：live-query worker 的 recent-branches 分页上限已迁移至
+`src/main/worker/git-live-query-limit-policy.ts`；handler 仅保留查询编排与 watcher 读取，
+新增 `scripts/test-worker-git-live-query-limit-policy.mjs` 覆盖默认值、上下界与正常值共 6 项
+focused assertions。focused handler/policy tests、verify 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git ignore-source watch 的路径集合相等判定与变更后重启门禁已迁移至
 `src/main/worker/git-ignore-source-watch-policy.ts`；runtime 仅保留 watcher 注册、会话销毁/启动
 与异步副作用编排。新增 `scripts/test-worker-git-ignore-source-watch-policy.mjs` 覆盖 6 项 focused
