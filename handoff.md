@@ -35,6 +35,11 @@ accept-pattern 展开纯策略已迁移至 `src/renderer/app-primary/runtime/res
 `scripts/test-app-primary-resolve-accepted-file-extensions.mjs` 覆盖 3 项 focused assertions，
 typecheck 与 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `oh`（内部 `qke`，源码 116452--116454）的 query
+参数判定纯策略已迁移至 `src/renderer/app-primary/runtime/has-query-param-value.ts`；新增
+`scripts/test-app-primary-has-query-param-value.mjs` 覆盖 3 项 focused assertions，typecheck 与
+focused test 已通过。
+
 2026-10-05 构建/启动回归修复：main-app transform-only 输出统一补齐 Node ESM 的 `.js` 相对导入，并将
 `@chunk/*` 改写为实际 chunk 相对路径；bootstrap vendor 兼容导出改用稳定局部绑定，补回 preserved main
 对 `bootstrap/protocol/app-protocol.js` 的历史路径 facade。已用临时独立 Electron profile 实测主窗口 frame
