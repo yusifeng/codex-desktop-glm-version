@@ -713,3 +713,5 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 本轮继续核对 app-primary 远程引用投影边界：`RP`（公开别名 `Ff`，14873--14875）仅委托相邻生成式 URL/reference normalizer，未形成独立 renderer named consumer、store 所有权或 teardown 契约；因此登记为 generated-local-helper 并保留聚合 hub。逐行 source symbol、精确范围与证据已写入 `docs/renderer-hub-line-classification.json`，reviewedCount 提升至 191。
 
 2026-10-05 A5 继续批次：app-primary selection overlay 未消费导出 `Pr`/`r`（`Z3`/`$3`，91668--91680）完成逐行分类。`Z3` 计算两个 DOMRect-like bounds 的交集，`$3` 注册 overlay 的 overflow-style 依赖与允许集合；二者均为相邻生成 runtime 的局部边界，无独立 renderer named consumer 或 teardown owner，继续保留聚合 hub。分类证据登记后 app-primary reviewedCount 提升至 201。
+
+2026-10-05 A5 继续批次：从 app-primary 未消费区补充五条真实生成边界逐行证据。`Ep`（`HM`，11020--11027）校验 reasoning effort 并按支持列表回退；`Lg`（`HE`，3643--3645）是 annotation marker 邻接的空 lazy 初始化；`Fg`（`KE`，3647--3651）建立 marker 缩放/颜色常量；`Km`（`uA`，6023--6038）装配 beacon action 依赖与状态符号；`Dp`（`UM`，11038--11042）装配 model/reasoning selector 依赖。它们均无独立 renderer named consumer、store 所有权或 teardown 边界，继续保留聚合 hub。逐行分类证据已写入 `docs/renderer-hub-line-classification.json`，app-primary reviewedCount 由 201 提升至 206。

@@ -2011,5 +2011,55 @@
     "classification": "generated-local-selection-overlay-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The lazy initializer registers overflow-style dependencies and a static allowed-overflow set for the neighboring selection overlay runtime; setup order is route-local generated glue with no separately named renderer consumer or teardown owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ep",
+    "sourceSymbol": "HM",
+    "startLine": 11020,
+    "endLine": 11027,
+    "classification": "generated-local-reasoning-policy",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper validates a requested reasoning effort against the supported model list and falls back through the adjacent generated selector policy; it has no independent renderer consumer, JSX, store ownership, or teardown boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Lg",
+    "sourceSymbol": "HE",
+    "startLine": 3643,
+    "endLine": 3645,
+    "classification": "generated-local-noop-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer is an intentionally empty lazy registration boundary adjacent to annotation marker rendering; it exposes no standalone renderer behavior or lifecycle owner and remains generated glue."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Fg",
+    "sourceSymbol": "KE",
+    "startLine": 3647,
+    "endLine": 3651,
+    "classification": "generated-local-constant-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper lazily initializes three annotation marker constants (scale values and a color) for the neighboring generated surface; no named renderer consumer or independently owned teardown contract exists."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Km",
+    "sourceSymbol": "uA",
+    "startLine": 6023,
+    "endLine": 6038,
+    "classification": "generated-local-beacon-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer wires beacon action dependencies and creates pending/unavailable symbols for the adjacent beacon action runtime; setup ordering is route-local generated glue without a separately named renderer owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Dp",
+    "sourceSymbol": "UM",
+    "startLine": 11038,
+    "endLine": 11042,
+    "classification": "generated-local-model-selector-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer loads model/reasoning selector dependencies for the adjacent generated settings surface; it has no independent named renderer consumer or teardown boundary and remains in the aggregate hub."
   }
 ]
