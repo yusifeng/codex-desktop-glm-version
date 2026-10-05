@@ -224,10 +224,6 @@ async function attachReviewFileRevisions({
   );
 }
 
-function reviewFileKey(path: string, previousPath: string | null | undefined) {
-  return `${previousPath ?? ``}\0${path}`;
-}
-
 async function getReviewFileRevisionFallback({
   fallback,
   host,
@@ -243,22 +239,6 @@ async function getReviewFileRevisionFallback({
   } catch {
     return fallback;
   }
-}
-
-function gitStatusToReviewChangeKind(status: string) {
-  return status === `A`
-    ? `added`
-    : status === `D`
-      ? `deleted`
-      : status === `R`
-        ? `renamed`
-        : status === `C`
-          ? `copied`
-          : status === `T`
-            ? `type-changed`
-            : status === `U`
-              ? `unmerged`
-              : `modified`;
 }
 
 export {
@@ -299,3 +279,4 @@ import {
   selectUntrackedReviewPaths,
 } from './git-review-metadata-policy';
 import { parseNumstatValue } from "./git-review-numstat-policy";
+import { gitStatusToReviewChangeKind, reviewFileKey } from "./git-review-file-classification-policy";

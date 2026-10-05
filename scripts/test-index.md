@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1140.
+Total scripts: 1142.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -30,6 +30,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-review-patch-policy.mjs`](./test-worker-git-review-patch-policy.mjs)
 - [`test-worker-git-review-commit-queries-policy.mjs`](./test-worker-git-review-commit-queries-policy.mjs)
 - [`test-worker-git-review-numstat-policy.mjs`](./test-worker-git-review-numstat-policy.mjs)
+- [`test-worker-git-review-file-classification-policy.mjs`](./test-worker-git-review-file-classification-policy.mjs)
 - [`test-worker-git-branch-create-policy.mjs`](./test-worker-git-branch-create-policy.mjs)
 - [`test-worker-git-push-policy.mjs`](./test-worker-git-push-policy.mjs)
 - [`test-worker-git-config-request-policy.mjs`](./test-worker-git-config-request-policy.mjs)
@@ -46,6 +47,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-handoff-transfer-policy.mjs`](./test-worker-git-handoff-transfer-policy.mjs)
 - [`test-app-shared-build-extension-channel-path.mjs`](./test-app-shared-build-extension-channel-path.mjs)
 - [`test-app-shared-is-wsl-host-source.mjs`](./test-app-shared-is-wsl-host-source.mjs)
+- [`test-app-shared-is-remote-control-host-source.mjs`](./test-app-shared-is-remote-control-host-source.mjs)
 - [`test-preload-annotation-containment-frame-policy.mjs`](./test-preload-annotation-containment-frame-policy.mjs)
 - [`test-preload-annotation-visible-text-policy.mjs`](./test-preload-annotation-visible-text-policy.mjs)
 - [`test-app-shared-select-mode-descriptor.mjs`](./test-app-shared-select-mode-descriptor.mjs)
