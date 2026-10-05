@@ -4174,19 +4174,12 @@ function rc(e) {
   return isAnnotationDocumentRoot(e, document);
 }
 function F(e) {
-  if (typeof e != `object` || !e) return !1;
-  let t = e,
-    n = t.ownerDocument?.defaultView,
-    r = n?.HTMLElement ?? (typeof HTMLElement > `u` ? null : HTMLElement);
-  if (r != null && e instanceof r) return !0;
-  let i = n?.Node ?? (typeof Node > `u` ? null : Node);
-  return (
-    i != null &&
-    t.nodeType === i.ELEMENT_NODE &&
-    t.ownerDocument != null &&
-    typeof t.getBoundingClientRect == `function` &&
-    typeof t.tagName == `string`
-  );
+  return isAnnotationElementLike(e, {
+    getOwnerWindow: (value) => value.ownerDocument?.defaultView,
+    getFallbackHTMLElement: () => (typeof HTMLElement > `u` ? null : HTMLElement),
+    getFallbackNode: () => (typeof Node > `u` ? null : Node),
+    getElementNodeType: () => Node.ELEMENT_NODE,
+  });
 }
 function ic(e) {
   if (e.assignedSlot != null) return e.assignedSlot;
@@ -6132,6 +6125,7 @@ var { projectAnnotationElementMetadata } = require("./browser-page-preload/annot
 var { projectAnnotationElementMetadataAttributes } = require("./browser-page-preload/annotation-element-metadata-attributes");
 var { isAnnotationElementVisibleByPolicy } = require("./browser-page-preload/annotation-element-visibility-policy");
 var { getAnnotationFrameOffset } = require("./browser-page-preload/annotation-frame-offset-policy");
+var { isAnnotationElementLike } = require("./browser-page-preload/annotation-element-like-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");

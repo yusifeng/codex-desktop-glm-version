@@ -862,3 +862,7 @@ Annotation element 的 top-frame/document-root/HTML eligibility 与 `oai-annotat
 ### 增量抽取：annotation frame offset policy
 
 跨 iframe 的 frame offset 递归累积（原 `Ic`）已迁移至 `src/main/browser-page-preload/annotation-frame-offset-policy.ts`；入口仅注入 frame element、owner window 与 rect 读取，保留顶层/无效 frame 的零偏移语义。新增 3 项 focused assertions。
+
+### 增量抽取：annotation element-like policy
+
+批注 DOM 元素兼容判定（原 `F`）已迁移至 `src/main/browser-page-preload/annotation-element-like-policy.ts`；入口仅注入 owner-window constructors 与 element node type，保留跨 realm HTMLElement/Node fallback 语义。新增 4 项 focused assertions。
