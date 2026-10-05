@@ -1122,4 +1122,3 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-checkout-conflict-policy.mjs](test-worker-git-checkout-conflict-policy.mjs)
 [test-worker-git-executable-policy.mjs](test-worker-git-executable-policy.mjs)
 [test-worker-git-commit-message-policy.mjs](test-worker-git-commit-message-policy.mjs)
-[test-preload-annotation-target-label-policy.mjs](test-preload-annotation-target-label-policy.mjs)

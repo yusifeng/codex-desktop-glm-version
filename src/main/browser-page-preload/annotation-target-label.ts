@@ -1,10 +1,10 @@
+import { projectAnnotationTargetLabel } from "./annotation-target-label-policy";
+
 type LabelElement = { tagName: string };
 type LabelDependencies = { readAccessibleLabel: (element: LabelElement) => string | null };
 
 function getAnnotationTargetLabel(element: LabelElement, dependencies: LabelDependencies): string {
-  const tagName = element.tagName.toLowerCase();
-  const label = dependencies.readAccessibleLabel(element);
-  return label == null ? tagName : `${tagName}: ${label}`;
+  return projectAnnotationTargetLabel(element, dependencies.readAccessibleLabel);
 }
 
 export { getAnnotationTargetLabel };
