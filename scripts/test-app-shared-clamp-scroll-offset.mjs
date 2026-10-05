@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/clamp-scroll-offset.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { clampScrollOffset } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+assert.equal(clampScrollOffset(1000, 100, 200, 600), 300);
+assert.equal(clampScrollOffset(1000, 1000, 200, 600), 400);
+assert.equal(clampScrollOffset(1000, -1000, 200, 600), 0);
+assert.equal(clampScrollOffset(300, 50, 10, 600), 0);
+console.log("app-shared clamp scroll offset: 4 assertions passed");
