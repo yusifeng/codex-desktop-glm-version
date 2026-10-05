@@ -1,5 +1,11 @@
-const MAX_RECENT_BRANCHES = 100;
 const SHORT_LIVED_CACHE_MS = 250;
+
+import {
+  buildRecentBranchArgs,
+  MAX_RECENT_BRANCHES,
+  normalizeRecentBranchLimit,
+  parseRecentBranchOutput,
+} from './git-recent-branches-policy';
 
 class RecentBranchesQueryError extends Error {}
 
@@ -19,7 +25,7 @@ async function getRecentBranches(
   { live = false } = {},
   dependencies: RecentBranchesDependencies,
 ) {
-  const effectiveLimit = Math.max(1, Math.min(limit, MAX_RECENT_BRANCHES));
+  const effectiveLimit = normalizeRecentBranchLimit(limit);
   const generation = repository.watchScopedGitReadGeneration;
   const queryKey = dependencies.queryKey(
     repository.root,
@@ -40,21 +46,12 @@ async function getRecentBranches(
         queryFn: async (querySignal: AbortSignal) => {
           const { success, stdout } = await dependencies.runGit(
             repository.root,
-            [
-              `for-each-ref`,
-              `--count=${MAX_RECENT_BRANCHES}`,
-              `--sort=-committerdate`,
-              `refs/heads`,
-              `--format=%(refname:short)`,
-            ],
+            buildRecentBranchArgs(),
             repository.host,
             { signal: querySignal },
           );
           if (!success) throw new RecentBranchesQueryError();
-          return stdout
-            .split(`\n`)
-            .map((branch: string) => branch.trim())
-            .filter((branch: string) => branch.length > 0);
+          return parseRecentBranchOutput(stdout);
         },
         staleTime: live ? dependencies.staleTime : SHORT_LIVED_CACHE_MS,
       },

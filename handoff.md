@@ -1,11 +1,18 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
-2026-10-05 A2 继续批次：annotation preload disposal 的单向终止状态已抽至
-`src/main/browser-page-preload/annotation-preload-disposal-state.ts`；disposal coordinator
-现在只在首次 `beginDispose` 成功时执行 feature dispose → preview clear → capability reset，
-并安全忽略 pagehide/能力切换的重复 teardown。新增
-`scripts/test-preload-annotation-preload-disposal-state.mjs` 覆盖终态闸门与幂等行为共 5 项
-断言；原 disposal focused test 扩展至 7 项，build 与 typecheck 已通过。
+2026-10-05 A1 继续批次：Git recent branches 的 limit 归一化、Git 输出分支名投影与查询参数构造已迁移至 `src/main/worker/git-recent-branches-policy.ts`；运行时保留 query/cache/Git I/O 与 live-generation 清理编排。新增 `scripts/test-worker-git-recent-branches-policy.mjs` 覆盖 8 项 focused assertions；原 recent-branches 回归 26 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation preload disposal 的 transient/terminal 生命周期状态已抽至
+`src/main/browser-page-preload/annotation-preload-disposal-state.ts`；普通能力切换仍可重复执行
+feature dispose → preview clear → capability reset，而 pagehide 使用 terminal dispose 单向终止并
+忽略迟到 teardown。新增 `scripts/test-preload-annotation-preload-disposal-state.mjs` 覆盖 7 项
+状态断言；原 disposal focused test 扩展至 10 项，build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation comment-runtime 异步挂载的 `mountStarted`、pending preview、
+mounted runtime 与 destroyed 终态已抽至 `src/main/browser-page-preload/annotation-runtime-mount-state.ts`；
+mount coordinator 仅保留动态加载、preview 交接和 runtime dispose 副作用，加载失败仍可重试而
+pagehide 后不可重挂载。新增 `scripts/test-preload-annotation-runtime-mount-state.mjs` 覆盖 10 项
+状态断言；原 runtime-mount 回归 9 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：live-query performance operation 的方法白名单与结果映射已迁移至
 `src/main/worker/git-performance-operation-policy.ts`；observability runtime 仅保留性能结果字段、
