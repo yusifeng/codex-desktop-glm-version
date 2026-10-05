@@ -1065,3 +1065,8 @@ Windows/WSL 主机路径判定与转换（WSL mounted path、Windows/UNC、WSL U
 extended UNC 归一化）已迁移至 `src/main/worker/host-path-policy.ts`。入口仅保留兼容别名并
 继续负责调用方的平台副作用；`scripts/test-worker-host-path-policy.mjs` 覆盖 12 项路径
 边界断言。
+
+Linux `.desktop` 应用条目的 Hidden/Type/DBus、OnlyShowIn/NotShowIn、TryExec 与元数据
+投影策略已迁移至 `src/main/worker/linux-desktop-entry-policy.ts`；入口仍负责目录遍历、文件
+读取、可执行文件探测与进程启动副作用。`scripts/test-worker-linux-desktop-entry-policy.mjs`
+覆盖 5 项可见性、DBus、TryExec 与默认名称断言。

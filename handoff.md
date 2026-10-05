@@ -5,6 +5,11 @@
 WSL UNC distro、盘符与 extended UNC 归一化，新增 `scripts/test-worker-host-path-policy.mjs`
 提供 12 项 focused assertions。
 
+最新增量：worker Linux `.desktop` 应用发现的条目可见性、DBus/Exec 要求、TryExec 门控与
+元数据投影已迁移至 `src/main/worker/linux-desktop-entry-policy.ts`；入口继续负责目录遍历、
+文件读取、可执行探测和进程启动副作用，新增 `scripts/test-worker-linux-desktop-entry-policy.mjs`
+提供 5 项 focused assertions。
+
 最新增量：worker review working-tree diff metadata 的 batched/no-index Git 输出解析与
 路径归属校验已迁移至 `src/main/worker/git-review-working-tree-metadata-policy.ts`；入口仅保留
 异步批处理与 Git I/O 编排，新增 `scripts/test-worker-git-review-working-tree-metadata-policy.mjs`

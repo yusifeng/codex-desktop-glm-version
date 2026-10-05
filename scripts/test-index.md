@@ -163,6 +163,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 - [`test-app-initial-parse-origin-pattern.mjs`](./test-app-initial-parse-origin-pattern.mjs)
 - [`test-worker-linux-desktop-entry-parser.mjs`](./test-worker-linux-desktop-entry-parser.mjs)
+- [`test-worker-linux-desktop-entry-policy.mjs`](./test-worker-linux-desktop-entry-policy.mjs)
 
 - [`test-preload-annotation-attribute-tokens.mjs`](./test-preload-annotation-attribute-tokens.mjs)
 

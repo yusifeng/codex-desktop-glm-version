@@ -167,6 +167,7 @@ const { getGitInitWatchKey: getSemanticGitInitWatchKey } = require("./worker/git
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
+const { resolveDesktopEntryMetadata } = require("./worker/linux-desktop-entry-policy");
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
 const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation, buildTextMateOpenArgs } = require("./worker/editor-target-args");
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
@@ -80038,37 +80039,23 @@ function TTe(e, t, n) {
     return null;
   }
   let i = parseDesktopEntryFields(r);
-  let o = i.get(`Exec`);
-  if (
-    i.get(`Hidden`) === `true` ||
-    i.get(`Type`) !== `Application` ||
-    (!o && i.get(`DBusActivatable`) !== `true`)
-  )
-    return null;
-  let s = i.get(`OnlyShowIn`)?.split(`;`).filter(Boolean),
-    c = i.get(`NotShowIn`)?.split(`;`).filter(Boolean),
-    l = s == null;
-  for (let e of n) {
-    if (s?.includes(e)) {
-      l = !0;
-      break;
-    }
-    if (c?.includes(e)) {
-      l = !1;
-      break;
-    }
-  }
-  if (!l) return null;
-  let u = i.get(`TryExec`);
-  return u && !ETe(u)
-    ? null
-    : {
-        desktopId: t,
-        desktopPath: e,
-        displayName: i.get(`Name`) ?? t.slice(0, -8),
-        executableIdentity: o ?? null,
-        icon: i.get(`Icon`) ?? null,
-      };
+  return resolveDesktopEntryMetadata({
+    desktopId: t,
+    desktopPath: e,
+    fields: {
+      exec: i.get(`Exec`),
+      hidden: i.get(`Hidden`),
+      type: i.get(`Type`),
+      dbusActivatable: i.get(`DBusActivatable`),
+      onlyShowIn: i.get(`OnlyShowIn`),
+      notShowIn: i.get(`NotShowIn`),
+      tryExec: i.get(`TryExec`),
+      name: i.get(`Name`),
+      icon: i.get(`Icon`),
+    },
+    currentDesktops: n,
+    isExecutable: ETe,
+  });
 }
 function ETe(e) {
   if (!(0, g.isAbsolute)(e)) return S7(e) != null;
