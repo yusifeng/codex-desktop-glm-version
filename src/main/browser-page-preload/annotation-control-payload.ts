@@ -29,18 +29,11 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
 
 import { createAnnotationResponseEnvelope } from "./annotation-response-envelope-policy";
 import { sanitizeAnnotationControlMetadata as sanitizeControlMetadata } from "./annotation-control-metadata-policy";
+import { serializeAnnotationControlsPayload } from "./annotation-controls-serialization-policy";
 
 const createAnnotationResponseDetail = createAnnotationResponseEnvelope;
 
-function serializeAnnotationControls(value: unknown, maxBytes: number): string {
-  if (typeof value !== `object` || !value) throw new TypeError(`Invalid annotation controls`);
-  const serialized = JSON.stringify({ controls: (value as Record<string, unknown>).controls, controlsHeading: (value as Record<string, unknown>).controlsHeading, controlsMode: (value as Record<string, unknown>).controlsMode }, (_key, item) => {
-    if (typeof item === `function` || typeof item === `symbol` || typeof item === `bigint`) throw new TypeError(`Annotation controls must contain only data`);
-    return item;
-  });
-  if (new TextEncoder().encode(serialized).byteLength > maxBytes) throw new RangeError(`Annotation controls exceed the maximum size`);
-  return serialized;
-}
+const serializeAnnotationControls = serializeAnnotationControlsPayload;
 
 const sanitizeAnnotationControlMetadata = sanitizeControlMetadata;
 
