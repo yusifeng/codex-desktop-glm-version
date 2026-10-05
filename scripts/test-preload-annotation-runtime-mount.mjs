@@ -27,8 +27,6 @@ controller.setPreview(null);
 assert.equal(receivedPreview, null);
 controller.dispose();
 assert.equal(disposed, 1);
-console.log('test-preload-annotation-runtime-mount: 7 assertions passed');
-
 let attempts = 0;
 let retryMount;
 const retryController = createAnnotationRuntimeMount({
@@ -51,4 +49,4 @@ await Promise.resolve();
 await Promise.resolve();
 assert.equal(attempts, 2);
 assert.ok(retryMount);
-console.log('test-preload-annotation-runtime-mount: transient failure retry assertions passed');
+console.log('test-preload-annotation-runtime-mount: 9 assertions passed');
