@@ -2,13 +2,14 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 927.
+Total scripts: 928.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
 ## Recent semantic extraction suites
 
 - [`test-worker-git-review-working-tree-policy.mjs`](./test-worker-git-review-working-tree-policy.mjs)
+- [`test-worker-git-review-section-policy.mjs`](./test-worker-git-review-section-policy.mjs)
 - [`test-worker-git-review-working-tree-metadata-policy.mjs`](./test-worker-git-review-working-tree-metadata-policy.mjs)
 - [`test-worker-github-pull-request-summary-policy.mjs`](./test-worker-github-pull-request-summary-policy.mjs)
 - [`test-worker-github-pull-request-revision-policy.mjs`](./test-worker-github-pull-request-revision-policy.mjs)
@@ -988,5 +989,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-renderer-message-status.mjs`](./test-renderer-message-status.mjs)
 - [`test-app-primary-normalize-recipient-fields.mjs`](./test-app-primary-normalize-recipient-fields.mjs)
 - [`test-preload-annotation-region-class-policy.mjs`](./test-preload-annotation-region-class-policy.mjs)
+- [`test-preload-annotation-preload-policy-state.mjs`](./test-preload-annotation-preload-policy-state.mjs)
 - [`test-app-primary-extract-skill-kind.mjs`](./test-app-primary-extract-skill-kind.mjs)
 - [`test-app-primary-annotation-selection-style.mjs`](./test-app-primary-annotation-selection-style.mjs)

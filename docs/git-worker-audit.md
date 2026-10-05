@@ -1,5 +1,10 @@
 # Git worker 逐段审计
 
+Review section changes 的纯策略（错误响应 envelope、gitlink SHA 解析及 cwd/repository 路径归一化）
+位于 `src/main/worker/git-review-section-policy.ts`，由
+`scripts/test-worker-git-review-section-policy.mjs` 覆盖；入口模块仅负责 repository、Git diff
+与 patch 删除等副作用。
+
 > 下方 1-90,836 的覆盖区间以初始审计提交 `423b40b1` 中的
 > `.reference/originals/main/worker.ts` 为基线。后续语义模块持续从该文件物理迁出，
 > 当前行号会前移；历史区间用于证明原始代码归属，继续提取时必须按符号/行为重新定位，

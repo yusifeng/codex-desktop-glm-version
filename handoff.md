@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：worker review section changes 的错误响应、gitlink SHA 提取与相对路径归一化判定已迁移至
+`src/main/worker/git-review-section-policy.ts`；入口仅保留 Git I/O 与 patch 副作用编排，新增
+`scripts/test-worker-git-review-section-policy.mjs` 覆盖 7 项 focused assertions。
+
 最新增量：GitHub pull-request revision 的 contents 路径编码与 bounded base64/UTF-8
 文本判定已迁移至 `src/main/worker/github-pull-request-revision-policy.ts`；revision handler
 仅保留 GitHub 请求、账户校验与并发副作用，由 `scripts/test-worker-github-pull-request-revision-policy.mjs`

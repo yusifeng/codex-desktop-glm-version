@@ -27,22 +27,11 @@ type GitReviewSectionChangesDependencies = {
     options: any,
   ) => Promise<any>;
 };
-
-function reviewSectionChangeError(errorCode?: string) {
-  return {
-    status: `error`,
-    appliedPaths: [],
-    skippedPaths: [],
-    conflictedPaths: [],
-    ...(errorCode == null ? {} : { errorCode }),
-  };
-}
-
-function extractGitlinkSha(diff: string) {
-  return /^new file mode 160000$/m.test(diff)
-    ? (/^\+Subproject commit ([0-9a-f]{40,64})$/m.exec(diff)?.[1] ?? null)
-    : null;
-}
+import {
+  extractGitlinkSha,
+  resolveReviewActionPath as resolveReviewActionPathPolicy,
+  reviewSectionChangeError,
+} from './git-review-section-policy';
 
 async function findCleanGitlinkPaths(
   { gitlinks, host, path, repoRoot, signal }: any,
@@ -87,22 +76,13 @@ function resolveReviewActionPath(
   filePath: string,
   dependencies: GitReviewSectionChangesDependencies,
 ) {
-  return filePath.startsWith(`./`) ||
-    filePath.startsWith(`../`) ||
-    filePath.startsWith(`.\\`) ||
-    filePath.startsWith(`..\\`)
-    ? dependencies.normalizePathFromRoot(
-        platformPath,
-        repoRoot,
-        cwd,
-        filePath,
-      )
-    : dependencies.normalizePathFromRoot(
-        platformPath,
-        repoRoot,
-        repoRoot,
-        filePath,
-      );
+  return resolveReviewActionPathPolicy(
+    platformPath,
+    repoRoot,
+    cwd,
+    filePath,
+    dependencies.normalizePathFromRoot,
+  );
 }
 
 function applyReviewPatch(
