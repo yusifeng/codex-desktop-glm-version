@@ -2261,5 +2261,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/clamp-within-range.ts",
     "evidence": "The pure range policy clamps a numeric value to the generated shared minimum and maximum bounds without JSX, store, network, or lifecycle effects. The extracted generic helper is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "$q",
+    "sourceSymbol": "hFe",
+    "startLine": 61629,
+    "endLine": 61631,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/parse-browser-target-id.ts",
+    "evidence": "The pure browser-target parser validates the shared browser prefix and strips it from the target id, returning null for other values without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
   }
 ]
