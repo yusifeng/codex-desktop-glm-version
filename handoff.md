@@ -433,6 +433,11 @@ app-primary reviewedCount 提升至 213；hub audit 与 typecheck 已通过。
 `scripts/test-preload-annotation-pointer-selection.mjs` 扩展至 18 项 focused assertions；build check、
 focused test 与 typecheck 已通过。
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `og`（内部 `yke`，源码 3939--3941）的 cloud/local
+execution target 判定纯策略已迁移至 `src/renderer/app-primary/runtime/is-local-execution-target.ts`；
+新增 `scripts/test-app-primary-is-local-execution-target.mjs` 覆盖 3 项 focused assertions，typecheck
+与 focused test 已通过。
+
 2026-10-05 A2 继续批次：annotation surface registry 的注册表、probe 去重、hit-test request
 计数、pending hit 与终止态已抽至 `src/main/browser-page-preload/annotation-surface-registry-state.ts`；
 registry 入口仅保留 DOM/MutationObserver、请求响应与几何副作用，销毁后迟到响应与新请求均被状态门禁。
@@ -1901,6 +1906,8 @@ typecheck 均通过。
 2026-10-06 A1 T1 继续批次：Setup 输出的 shell-environment remove/write 分支判定已迁移至 `src/main/worker/git-worktree-shell-environment-policy.ts`；runtime 仅保留持久化 I/O。新增 `scripts/test-worker-git-worktree-shell-environment-policy.mjs` 覆盖 4 项 focused assertions。
 
 2026-10-06 A1 T1 继续批次：Setup script 的 original/worktree workspace 环境变量覆盖构造已迁移至 `src/main/worker/git-worktree-setup-environment-policy.ts`；runtime 仅保留执行副作用。新增 `scripts/test-worker-git-worktree-setup-environment-policy.mjs` 覆盖 3 项 focused assertions。
+
+2026-10-06 A1 T1 继续批次：Core Git RPC method 的 availability/create-branch/git-origins 白名单已迁移至 `src/main/worker/git-core-request-policy.ts`；dispatcher 仅保留参数编排与 Git I/O。新增 `scripts/test-worker-git-core-request-policy.mjs` 覆盖 4 项 focused classification assertions。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
