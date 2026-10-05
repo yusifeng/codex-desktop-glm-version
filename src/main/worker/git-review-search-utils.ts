@@ -1,6 +1,3 @@
-export function formatReviewSearchPath(change: { oldPath: string; newPath: string }): string {
-  return change.oldPath === change.newPath ? change.newPath : `${change.oldPath} -> ${change.newPath}`;
-}
 export function createLineDecoder(onLine: (line: string) => void) {
   const decoder = new TextDecoder(); let pending = ``;
   return (chunk: Uint8Array) => {
@@ -11,3 +8,4 @@ export function createLineDecoder(onLine: (line: string) => void) {
 if (typeof module !== `undefined`) module.exports = { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder };
 import { findCaseInsensitiveOffsets } from "./git-review-search-policy";
 import { buildSearchSnippet } from "./git-review-snippet-policy";
+import { formatReviewSearchPath } from "./git-review-search-path-policy";
