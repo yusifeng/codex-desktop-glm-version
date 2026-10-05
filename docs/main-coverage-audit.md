@@ -367,3 +367,11 @@ WindowManager 私有 `windowAppearances`/`BrowserWindow.fromWebContents` 状态�
 message fan-out 与 Electron window lifecycle 消费；仓库没有可接回该类的可读 WindowManager
 owner。按“真实 consumer 才迁移”规则，本轮不新建 policy facade；待 WindowManager owner
 物理迁出后再以注入 map/window lookup 建立 focused harness。
+
+### Worker/main consumer 接回证据（2026-10-06）
+
+当前 bundle 的 `worker.ts:8` 接回 `entry-dispatcher`，`worker.ts:162` 接回
+`git-worktree-snapshot-read-dispatch`，`worker.ts:164-165` 接回 node/core request dispatch，
+`worker.ts:58` 接回 shell quoting，`worker.ts:173` 接回 open-target path policy。live-query run
+由 live-query coordinator 直接消费；host-handoff progress 由 handoff runtime 接回。上述入口均
+已有 focused regression，没有未消费的可读 helper 可安全迁移；该证据支持维持当前 preserve 边界。
