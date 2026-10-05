@@ -1772,3 +1772,4 @@ typecheck 均通过。
 2026-10-06 A5 逐段复核：app-shared 导出 `e4`（source `Ug`，28948-28973）确认是 shared intl runtime bootstrap，初始化 provider 依赖并 memoize locale/message formatter state；其 setup/cache 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `Ku`（source `Ugt`，112340-112343）确认是 shared icon bootstrap 的 memoized pin asset initializer；registry ownership 与 lazy asset lifecycle 由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `Et`（source `fDt`，121403-121407）确认是 shared icon registry 的 memoized circle-info asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
+2026-10-06 A5 逐段复核：app-shared 导出 `Ct`（source `mDt`，121430-121434）确认是 shared icon registry 的 memoized plus-sm asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
