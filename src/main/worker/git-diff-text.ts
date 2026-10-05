@@ -107,12 +107,6 @@ function parseCombinedGitDiffPath(value: string) {
     : { oldPath: path.path, newPath: path.path };
 }
 
-function stripGitDiffPrefixes(oldPath: string, newPath: string) {
-  return !oldPath.startsWith(`a/`) || !newPath.startsWith(`b/`)
-    ? null
-    : { oldPath: oldPath.slice(2), newPath: newPath.slice(2) };
-}
-
 function quoteGitDiffPath(path: string) {
   return /[\\"\n\r\t]/.test(path)
     ? `"${path
@@ -168,3 +162,4 @@ if (typeof module !== `undefined`)
 import { countGitDiffLines } from "./git-diff-line-count-policy";
 import { isOctalDigit, isThreeDigitOctal } from "./git-diff-octal-policy";
 import { classifyGitDiffHeader } from "./git-diff-header-policy";
+import { stripGitDiffPrefixes } from "./git-diff-prefix-policy";
