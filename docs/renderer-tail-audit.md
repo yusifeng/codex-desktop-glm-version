@@ -688,3 +688,9 @@ connector icon map。四者都由相邻生成 surface 独占，缺少独立 name
 `src/renderer/app-primary/runtime/create-prefilled-plugin-prompt.ts` 承载，属于无 JSX、store
 或生命周期副作用的纯格式化策略；聚合导出保留兼容边，逐行证据登记后 reviewedCount 由
 173 提升至 174。
+
+本轮从 app-shared 未消费区迁出合并冲突状态纯策略：`hBe`（公开别名 `$U`，64725--64730
+行）规范化 `mergeable`/`mergeStateStatus`，投影 `conflicts`、`unknown` 或空状态。逻辑现由
+`src/renderer/app-shared/runtime/merge-conflict-state.ts` 承载，新增
+`scripts/test-renderer-merge-conflict-state.mjs` 覆盖大小写、冲突优先级、未知值与空输入共 6
+项断言；聚合导出保留兼容边，逐行分类证据登记；app-primary reviewedCount 保持 175。

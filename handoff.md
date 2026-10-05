@@ -1058,6 +1058,11 @@ marker 与 selection 清理判定；`annotation-sync-state.ts` 接回该策略�
 
 2026-10-05 A5 继续批次：app-primary 未消费导出 `Eo`/`hY` 的模式化 composer placeholder formatter 已迁移至 `src/renderer/app-primary/runtime/format-composer-placeholder.ts`；逻辑仅通过注入的 locale formatter 投影 chat/Codex/Work 文案，无 JSX、store 或生命周期副作用。新增 `scripts/test-app-primary-format-composer-placeholder.mjs` 覆盖 chat agent、Codex、Work、未知模式与空 agent 边界，共 5 项断言；兼容导出仍保留在 hub，逐行分类证据登记后 reviewedCount 从 174 提升至 175。
 
-2026-10-05 A5 继续批次：app-shared 未消费导出 `hBe`/`$U` 的合并冲突状态纯策略已迁移至 `src/renderer/app-shared/runtime/merge-conflict-state.ts`；逻辑仅规范化 `mergeable` 与 `mergeStateStatus` 并投影冲突 banner 状态，无 JSX、store 或生命周期副作用。新增 `scripts/test-renderer-merge-conflict-state.mjs` 覆盖大小写、冲突优先级、未知值与空输入共 6 项断言；兼容导出仍保留在 hub，逐行分类证据登记后 reviewedCount 从 175 提升至 176。
+2026-10-05 A5 继续批次：app-shared 未消费导出 `hBe`/`$U` 的合并冲突状态纯策略已迁移至 `src/renderer/app-shared/runtime/merge-conflict-state.ts`；逻辑仅规范化 `mergeable` 与 `mergeStateStatus` 并投影冲突 banner 状态，无 JSX、store 或生命周期副作用。新增 `scripts/test-renderer-merge-conflict-state.mjs` 覆盖大小写、冲突优先级、未知值与空输入共 6 项断言；兼容导出仍保留在 hub，逐行分类证据登记；app-primary reviewedCount 保持 175。
 
 2026-10-05 A1 增量：Git worker 请求 context 投影（root/cwd、review source 与 failure 结果判定）抽至 `src/main/worker/git-request-context-policy.ts`，由 `scripts/test-worker-git-request-context-policy.mjs` 覆盖 12 项断言；已通过 build、verify-chunks 与 typecheck。
+
+2026-10-05 A1 增量：`list-worktrees` 请求的 repository 可空解析与列表委派边界已由
+`src/main/worker/git-worktree-list-request-handler.ts` 独立承载；入口继续负责请求 envelope、取消
+与 Git I/O 生命周期。新增 `scripts/test-worker-git-worktree-list-request-handler.mjs`，覆盖存在/缺失
+repository、参数与 signal 透传，共 5 项 focused assertions。

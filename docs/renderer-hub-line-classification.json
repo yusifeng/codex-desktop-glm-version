@@ -1742,5 +1742,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/format-composer-placeholder.ts",
     "evidence": "The mode-specific composer placeholder formatter projects chat, Codex, and Work labels through the supplied locale formatter; it has no JSX, store, or lifecycle side effects and remains coupled only as a compatibility export."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "$U",
+    "sourceSymbol": "hBe",
+    "startLine": 64725,
+    "endLine": 64730,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/merge-conflict-state.ts",
+    "evidence": "The helper normalizes mergeable and merge-state metadata into conflicts/unknown banner states. It is deterministic policy logic with no JSX, store, registration, or teardown side effects; the aggregate alias remains as a compatibility export."
   }
 ]
