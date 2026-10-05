@@ -1126,7 +1126,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁 | 当前 manifest 仍报告 11078 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁 | 当前 manifest 仍报告 11077 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
 
 ### B. 工程可读性缺口（5 处）
 
@@ -1135,7 +1135,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1124 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1126 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -1710,7 +1710,7 @@ typecheck 均通过。
 
 2026-10-05 A1 T1 继续批次：cat-file batch failure 的单请求 output-limit `too-large`、多请求/普通 Git code 错误 envelope 分类已迁移至 `src/main/worker/git-cat-file-batch-error-policy.ts`；cat-file 入口保留 batch framing、retry 与 I/O 编排。新增 `scripts/test-worker-git-cat-file-batch-error-policy.mjs` 覆盖 4 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
 
-2026-10-05 A1 T1 继续批次：cat-file disk fallback 的 ENOENT、No such file、cannot open 与 not found 文本 classifier 已迁移至 `src/main/worker/git-cat-file-disk-error-policy.ts`；cat-file 入口保留磁盘读取与 fallback envelope 编排。新增 `scripts/test-worker-git-cat-file-disk-error-policy.mjs` 覆盖 6 项 focused assertions；cat-file policy 回归 6 项、build 通过；typecheck 受并行 renderer `create-chat-slug.ts` 当前 TS 错误阻塞。
+2026-10-05 A1 T1 继续批次：cat-file disk fallback 的 ENOENT、No such file、cannot open 与 not found 文本 classifier 已迁移至 `src/main/worker/git-cat-file-disk-error-policy.ts`；cat-file 入口保留磁盘读取与 fallback envelope 编排。新增 `scripts/test-worker-git-cat-file-disk-error-policy.mjs` 覆盖 6 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
 
 2026-10-05 A5 T5 继续批次：app-primary 的终端命令 token 清理策略（移除空白与固定 shell 特殊字符集合）已迁移至 `src/renderer/app-primary/runtime/strip-terminal-command-token.ts`；新增 `scripts/test-app-primary-strip-terminal-command-token.mjs` 覆盖 3 项 focused assertions，并登记 `cp/fN` 源码 11809-11813 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
