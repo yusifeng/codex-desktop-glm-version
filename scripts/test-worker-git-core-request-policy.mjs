@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-git-core-policy-"));
+const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-core-request-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { isGitCoreRequestMethod } = createRequire(import.meta.url)(output);
+assert.equal(isGitCoreRequestMethod("availability"), true);
+assert.equal(isGitCoreRequestMethod("create-branch"), true);
+assert.equal(isGitCoreRequestMethod("git-origins"), true);
+assert.equal(isGitCoreRequestMethod("status-summary"), false);
+console.log("worker Git core request policy tests passed (4 assertions)");

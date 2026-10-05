@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation coordinate clamp helper `Ps` 已复用
+`annotation-surface-geometry.clampAnnotationCoordinate`，删除 preload 重复 inline 实现；
+geometry regression、build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation rect scaling helper `Ms` 已接回既有
 `annotation-surface-geometry.ts` 的 `scaleAnnotationRect` 纯策略，删除 preload 重复内联实现；
 geometry focused regression、build 与 typecheck 已通过。

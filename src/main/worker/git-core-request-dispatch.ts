@@ -10,6 +10,7 @@ async function dispatchGitCoreRequest(
   params: any,
   deps: CoreRequestDispatchDependencies,
 ) {
+  if (!isGitCoreRequestMethod(method)) return { handled: false, result: undefined };
   switch (method) {
     case `availability`:
       return { handled: true, result: { available: await deps.checkAvailability(deps.signal) } };
@@ -17,11 +18,11 @@ async function dispatchGitCoreRequest(
       return { handled: true, result: await deps.createBranch(params, deps.signal) };
     case `git-origins`:
       return { handled: true, result: await deps.discoverOrigins(params.dirs) };
-    default:
-      return { handled: false, result: undefined };
+    default: return { handled: false, result: undefined };
   }
 }
 
 export { dispatchGitCoreRequest };
 if (typeof module !== `undefined`)
   module.exports = { dispatchGitCoreRequest };
+import { isGitCoreRequestMethod } from "./git-core-request-policy";
