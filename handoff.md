@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git branch metadata 的 `refs/heads/` 本地分支引用剥离与 branch normalizer 接口已迁移至 `src/main/worker/git-branch-metadata-policy.ts`；metadata runtime 保留 repository、snapshot 与 default-remote 查询编排。新增 `scripts/test-worker-git-branch-metadata-policy.mjs` 覆盖 3 项 focused assertions；原 branch-metadata 回归 27 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation anchor 的 document-kind/page-url 识别纯策略已抽至
+`src/main/browser-page-preload/annotation-document-kind-policy.ts`；anchor viewport policy 仅保留
+当前页面与尺寸门禁编排。新增 `scripts/test-preload-annotation-document-kind-policy.mjs`
+覆盖 3 项 Google Docs/URL/无效输入断言；原 anchor viewport policy 回归 7 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation preview visibility 的 ancestor walk 纯投影已抽至
 `src/main/browser-page-preload/annotation-ancestor-policy.ts`；visibility predicate 仅保留
 document/frame 与 popover 边界编排。新增 `scripts/test-preload-annotation-ancestor-policy.mjs`

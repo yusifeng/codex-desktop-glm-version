@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { normalizeLocalBranchRef } = require("../app/.vite/build/worker/git-branch-metadata-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+const normalize = (value) => value.toLowerCase();
+equal(normalizeLocalBranchRef("refs/heads/Main", normalize), "main");
+equal(normalizeLocalBranchRef("feature/demo", normalize), "feature/demo");
+equal(normalizeLocalBranchRef("refs/heads/feature/demo", normalize), "feature/demo");
+console.log(`${assertions} worker git branch metadata policy assertions passed`);

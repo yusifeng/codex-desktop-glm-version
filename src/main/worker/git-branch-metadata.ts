@@ -15,13 +15,10 @@ type GitBranchMetadataDependencies = {
   ) => Promise<{ branch: string } | null | undefined>;
 };
 
-function normalizeLocalBranchRef(
-  branch: string,
-  dependencies: Pick<GitBranchMetadataDependencies, `normalizeBranch`>,
-) {
-  return dependencies.normalizeBranch(
-    branch.startsWith(`refs/heads/`) ? branch.slice(11) : branch,
-  );
+import { normalizeLocalBranchRef as normalizeLocalBranchRefPolicy } from './git-branch-metadata-policy';
+
+function normalizeLocalBranchRef(branch: string, dependencies: Pick<GitBranchMetadataDependencies, `normalizeBranch`>) {
+  return normalizeLocalBranchRefPolicy(branch, dependencies.normalizeBranch);
 }
 
 async function getBranchMetadata(
