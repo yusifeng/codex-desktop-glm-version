@@ -975,3 +975,5 @@ site-annotation/tweaks capability 的严格布尔归一化集中在纯状态投�
 `scripts/test-preload-annotation-ui-mode-policy.mjs` 覆盖 comment/browse、null 与 malformed
 输入，共 5 项 focused assertions。
 2026-10-05 A5 继续批次：app-primary 新增 `A`/`i9`、`Af`/`pF`、`Al`/`ZH`、`Au`/`CB` 四条逐行分类证据，均判定为生成局部 bootstrap/initializer（无独立 named consumer 或 teardown 边界），登记于 `docs/renderer-hub-line-classification.json`。`scripts/test-renderer-hub-classification.mjs` 期望 reviewedCount 从 145 同步至 149；审计脚本保持 74/914 consumed、840 unconsumed。
+
+2026-10-05 A1 增量：Git worker 请求 context 投影（root/cwd、review source 与 failure 结果判定）抽至 `src/main/worker/git-request-context-policy.ts`，由 `scripts/test-worker-git-request-context-policy.mjs` 覆盖 12 项断言；已通过 build、verify-chunks 与 typecheck。

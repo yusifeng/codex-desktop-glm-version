@@ -1050,3 +1050,11 @@ deduplication、active trace 与 refresh trigger contract；registry 仅保留 s
 subscription 与 run coordinator 所有权。`scripts/test-worker-git-live-query-registry-refresh.mjs`
 覆盖 repo-change fan-out、recovery state transition、跨 subscription recovery 去重及
 repository refresh，共 12 项断言。
+
+### 增量抽取：Git request context policy
+
+Git worker 请求的 telemetry/context 投影已迁移至
+`src/main/worker/git-request-context-policy.ts`：按请求方法选择 cwd/root、提取 review
+source，并统一识别 error/success=false/command-error 结果。该边界保持纯函数，不触碰
+worker I/O 或请求生命周期；`scripts/test-worker-git-request-context-policy.mjs` 覆盖
+12 项 root/source/cwd/failure 断言。
