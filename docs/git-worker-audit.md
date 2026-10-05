@@ -966,6 +966,10 @@ focused classification assertions。
 Node-only Git RPC method 白名单已迁移至 `src/main/worker/git-node-request-policy.ts`；dispatcher
 仅保留 host、signal 与依赖注入，新增 5 项 focused classification assertions。
 
+Worktree snapshot read RPC 的 `worktree-snapshot-ref`/`managed-worktree-state` 方法白名单已迁移至
+`src/main/worker/git-worktree-snapshot-read-policy.ts`；dispatcher 仅保留 snapshot 查询依赖，
+新增 3 项 focused classification assertions。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至

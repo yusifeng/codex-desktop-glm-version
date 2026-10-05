@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-snapshot-read-policy-"));
+const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-worktree-snapshot-read-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { isWorktreeSnapshotReadMethod } = createRequire(import.meta.url)(output);
+assert.equal(isWorktreeSnapshotReadMethod("worktree-snapshot-ref"), true);
+assert.equal(isWorktreeSnapshotReadMethod("managed-worktree-state"), true);
+assert.equal(isWorktreeSnapshotReadMethod("status-summary"), false);
+console.log("worker worktree snapshot read policy tests passed (3 assertions)");
