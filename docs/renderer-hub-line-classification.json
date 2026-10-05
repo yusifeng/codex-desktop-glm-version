@@ -2381,5 +2381,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/is-layout-element.ts",
     "evidence": "The pure layout-node predicate requires offsetHeight and excludes SVG-owned nodes, avoiding DOM shape confusion without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "AZ",
+    "sourceSymbol": "UP",
+    "startLine": 55455,
+    "endLine": 55463,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/stable-json-stringify.ts",
+    "evidence": "The pure cache-key serialization policy recursively sorts plain object keys before JSON encoding, yielding deterministic query hashes without JSX, store, network, or lifecycle effects. It is covered by a focused two-case runtime test."
   }
 ]
