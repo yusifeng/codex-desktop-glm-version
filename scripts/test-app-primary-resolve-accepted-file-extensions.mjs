@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/resolve-accepted-file-extensions.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const mime = { "image/png": ["png"], "image/jpeg": ["jpg", "jpeg"], "text/": ["txt"] };
+assert.deepEqual(mod.resolveAcceptedFileExtensions([".PDF", "image/*"], mime), ["pdf", "png", "jpg", "jpeg"]);
+assert.equal(mod.resolveAcceptedFileExtensions(["*/*"], mime), undefined);
+assert.equal(mod.resolveAcceptedFileExtensions(["application/unknown"], mime), undefined);
+console.log("app-primary resolve accepted file extensions: 3 assertions passed");
