@@ -2411,5 +2411,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/build-extension-channel-path.ts",
     "evidence": "The pure extension-channel path policy combines the canonical base with an encoded channel identifier, keeping URL delimiters stable without JSX, store, network, or lifecycle effects. It is covered by a focused two-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "$B",
+    "sourceSymbol": "iWe",
+    "startLine": 67439,
+    "endLine": 67441,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/select-mode-descriptor.ts",
+    "evidence": "The pure view-state selector chooses the enabled or disabled mode descriptor from one boolean flag without JSX, store, network, or lifecycle effects. It is covered by a focused two-case runtime test."
   }
 ]
