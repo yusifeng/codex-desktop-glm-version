@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-worktree-shell-policy-"));
+const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-worktree-shell-environment-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { getWorktreeShellEnvironmentAction } = createRequire(import.meta.url)(output);
+assert.deepEqual(getWorktreeShellEnvironmentAction(null), { kind: "remove" });
+assert.deepEqual(getWorktreeShellEnvironmentAction({ shellEnvironment: null }), { kind: "remove" });
+assert.deepEqual(getWorktreeShellEnvironmentAction({ shellEnvironment: { version: 1 } }), { kind: "write", value: { version: 1 } });
+assert.deepEqual(getWorktreeShellEnvironmentAction({}), { kind: "remove" });
+console.log("worker Git worktree shell environment policy tests passed (4 assertions)");

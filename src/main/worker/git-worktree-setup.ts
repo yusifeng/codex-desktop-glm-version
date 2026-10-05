@@ -7,6 +7,7 @@ type WorktreeSetupDependencies = {
   writeWorktreeShellEnvironment: (repository: any, value: any, signal?: AbortSignal) => Promise<void>;
 };
 import { getWorktreeSetupFailure } from "./git-worktree-setup-policy";
+import { getWorktreeShellEnvironmentAction } from "./git-worktree-shell-environment-policy";
 
 /** Persists the selected environment and runs its optional worktree setup lifecycle. */
 async function runWorktreeSetup(
@@ -66,10 +67,11 @@ async function runWorktreeSetup(
   }
   if (setupResult?.status === `succeeded`) log(`info`, `Setup script completed`);
   try {
-    if (setup?.shellEnvironment == null)
+    const shellEnvironmentAction = getWorktreeShellEnvironmentAction(setup);
+    if (shellEnvironmentAction.kind === `remove`)
       await dependencies.removeWorktreeShellEnvironment(params.worktreeRepository, params.signal);
     else
-      await dependencies.writeWorktreeShellEnvironment(params.worktreeRepository, setup.shellEnvironment, params.signal);
+      await dependencies.writeWorktreeShellEnvironment(params.worktreeRepository, shellEnvironmentAction.value, params.signal);
   } catch (error) {
     log(`stderr`, `Failed to store worktree shell environment: ${String(error)}`);
   }
