@@ -6,12 +6,9 @@ function normalizeAnnotationWheelDelta(
   viewport: { innerWidth: number; innerHeight: number },
   dependencies: WheelDeltaDependencies,
 ) {
-  if (event.deltaMode === dependencies.lineMode)
-    return { x: event.deltaX * dependencies.lineScale, y: event.deltaY * dependencies.lineScale };
-  if (event.deltaMode === dependencies.pageMode)
-    return { x: event.deltaX * viewport.innerWidth, y: event.deltaY * viewport.innerHeight };
-  return { x: event.deltaX, y: event.deltaY };
+  return projectAnnotationWheelDelta(event, viewport, dependencies);
 }
 
 export { normalizeAnnotationWheelDelta };
 if (typeof module !== `undefined`) module.exports = { normalizeAnnotationWheelDelta };
+import { projectAnnotationWheelDelta } from "./annotation-wheel-delta-policy";
