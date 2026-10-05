@@ -4,26 +4,26 @@ type HandoffRollbackDependencies = {
   removeWorktree: (worktreeRoot: string, host: any, force: boolean) => Promise<any>;
 };
 
+import { collectRestoreBranchStashErrors } from './git-handoff-rollback-policy';
+
 async function restoreHandoffBranchAndStash(params: any, deps: HandoffRollbackDependencies) {
-  const errors = [];
   if (params.branch == null) {
-    errors.push(params.restoreBranchError);
-    return errors;
+    return collectRestoreBranchStashErrors(params.branch, params.restoreBranchError, params.stashRef, params.restoreStashError, null, null);
   }
   const checkout = await deps.checkoutBranch(
     { cwd: params.cwd, branch: params.branch, stashUncommitted: false },
     params.gitManager,
     params.host,
   );
-  if (checkout.status === `error`) errors.push(params.restoreBranchError);
+  let stashStatus: string | null = null;
   if (params.stashRef != null) {
     const stash = await deps.applyStash(
       { cwd: params.cwd, stashRef: params.stashRef, mode: `pop` },
       params.host,
     );
-    if (stash.status === `error`) errors.push(params.restoreStashError);
+    stashStatus = stash.status;
   }
-  return errors;
+  return collectRestoreBranchStashErrors(params.branch, params.restoreBranchError, params.stashRef, params.restoreStashError, checkout.status, stashStatus);
 }
 
 async function restoreHandoffSource(params: any, deps: HandoffRollbackDependencies) {

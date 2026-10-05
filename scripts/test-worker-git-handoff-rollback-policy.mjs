@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { collectRestoreBranchStashErrors } = require("../app/.vite/build/worker/git-handoff-rollback-policy.js");
+let assertions = 0;
+const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+deepEqual(collectRestoreBranchStashErrors(null, "branch", "stash", "stash", null, null), ["branch"]);
+deepEqual(collectRestoreBranchStashErrors("main", "branch", null, "stash", "success", null), []);
+deepEqual(collectRestoreBranchStashErrors("main", "branch", "stash", "stash", "error", "error"), ["branch", "stash"]);
+deepEqual(collectRestoreBranchStashErrors("main", "branch", "stash", "stash", "success", "error"), ["stash"]);
+console.log(`${assertions} worker git handoff rollback policy assertions passed`);

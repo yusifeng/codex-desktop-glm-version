@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation viewport 的 visualViewport offset/scale 纯投影已抽至
+`src/main/browser-page-preload/annotation-visual-viewport-policy.ts`；viewport state 仅保留窗口
+尺寸/scroll 编排与可选投影。新增 `scripts/test-preload-annotation-visual-viewport-policy.mjs`
+覆盖 3 项默认/非默认输入断言；原 viewport-state 回归 3 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：Git handoff rollback 的 branch/stash restore 错误聚合策略已迁移至 `src/main/worker/git-handoff-rollback-policy.ts`；rollback runtime 保留 checkout/stash/remove worktree 副作用与异常吞吐。新增 `scripts/test-worker-git-handoff-rollback-policy.mjs` 覆盖 4 项 focused assertions；原 rollback 回归 19 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git handoff destination 的当前分支/default branch/可 detach clean commit 到 checkout target 的纯策略已迁移至 `src/main/worker/git-handoff-destination-policy.ts`；destination runtime 保留 repository cache invalidation、status/head 查询与 checkout I/O 编排。新增 `scripts/test-worker-git-handoff-destination-policy.mjs` 覆盖 4 项 focused assertions；原 destination 回归 19 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation page identity 的 throwing-safe URL parser 已抽至
