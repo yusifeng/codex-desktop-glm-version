@@ -63,6 +63,11 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `gp`（内部 `ije`，源码 8230--8234）的 handoff
+direction 选择纯策略已迁移至 `src/renderer/app-primary/runtime/select-handoff-direction.ts`；新增
+`scripts/test-app-primary-select-handoff-direction.mjs` 覆盖 3 项 focused assertions，typecheck 与
+focused test 已通过。
+
 2026-10-06 A5 继续批次：app-primary 未消费导出 `bp`（内部 `oje`，源码 8242--8244）的 handoff branch
 资格纯策略已迁移至 `src/renderer/app-primary/runtime/should-use-handoff-branch.ts`；新增
 `scripts/test-app-primary-should-use-handoff-branch.mjs` 覆盖 3 项 focused assertions，typecheck 与
