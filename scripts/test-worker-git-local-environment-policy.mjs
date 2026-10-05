@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const policy = require("../app/.vite/build/worker/git-local-environment-policy.js");
+let assertions = 0;
+const deepEqual = (a, b) => { assertions += 1; assert.deepEqual(a, b); };
+const equal = (a, b) => { assertions += 1; assert.equal(a, b); };
+deepEqual(policy.parseEnvironment("\uFEFFA=1\r\nINVALID\nB=x=y\n"), { A: "1", B: "x=y" });
+deepEqual(policy.diffEnvironment({ Z: "old", REMOVE: "x" }, { Z: "new" }, "linux", new Set()), { version: 1, set: { Z: "new" }, exclude: ["REMOVE"] });
+deepEqual(policy.diffEnvironment({ Path: "old" }, { PATH: "new" }, "win32", new Set()), { version: 1, set: { PATH: "new" }, exclude: [] });
+equal(policy.diffEnvironment({ SECRET: "old" }, { SECRET: "new" }, "linux", new Set(["SECRET"])), null);
+equal(policy.quotePosix("a'b"), "'a'\\''b'");
+equal(policy.createWrapperScript("cmd", "s", "a", "b"), policy.createCmdWrapper("s", "a", "b"));
+equal(policy.selectPlatformScript({ script: "fallback", darwin: { script: "mac" } }, "darwin"), "mac");
+equal(policy.scriptLabel("cleanup"), "Cleanup script");
+console.log(`git-local-environment-policy: ${assertions} assertions passed`);

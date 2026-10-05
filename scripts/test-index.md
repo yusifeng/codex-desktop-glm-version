@@ -229,6 +229,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-live-query-registry.mjs`](./test-worker-git-live-query-registry.mjs)
 - [`test-worker-git-merge-base.mjs`](./test-worker-git-merge-base.mjs)
 - [`test-worker-git-local-environment.mjs`](./test-worker-git-local-environment.mjs)
+- [`test-worker-git-local-environment-policy.mjs`](./test-worker-git-local-environment-policy.mjs)
 - [`test-worker-git-managed-worktree-discovery.mjs`](./test-worker-git-managed-worktree-discovery.mjs)
 - [`test-worker-git-watcher-performance.mjs`](./test-worker-git-watcher-performance.mjs)
 - [`test-worker-git-watcher-metadata.mjs`](./test-worker-git-watcher-metadata.mjs)
