@@ -8,6 +8,8 @@ type SubmodulePathsDependencies = {
   staleTime: number;
 };
 
+import { parseSubmodulePathOutput } from './git-submodule-paths-policy';
+
 function getSubmodulePaths(
   repository: any,
   signal: AbortSignal | undefined,
@@ -37,16 +39,7 @@ function getSubmodulePaths(
         { allowedNonZeroExitCodes: [1], signal },
       );
       if (!result.success || !result.stdout) return [];
-      const paths = result.stdout
-        .split(`\n`)
-        .map((line: string) => line.trim())
-        .filter((line: string) => line.length > 0)
-        .map((line: string) => {
-          const fields = line.split(/\s+/);
-          return dependencies.normalizeGitPath(fields[fields.length - 1] ?? ``);
-        })
-        .filter((path: string) => path.length > 0);
-      return Array.from(new Set(paths));
+      return parseSubmodulePathOutput(result.stdout, dependencies.normalizeGitPath);
     },
     staleTime: dependencies.staleTime,
   });

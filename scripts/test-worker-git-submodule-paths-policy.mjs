@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { parseSubmodulePathOutput } = require("../app/.vite/build/worker/git-submodule-paths-policy.js");
+let assertions = 0;
+const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+deepEqual(parseSubmodulePathOutput("submodule.foo.path libs/foo\nsubmodule.bar.path libs/bar\nsubmodule.foo.path libs/foo\n", (value) => value.replaceAll("\\", "/")), ["libs/foo", "libs/bar"]);
+deepEqual(parseSubmodulePathOutput("\n", (value) => value), []);
+deepEqual(parseSubmodulePathOutput("submodule.x.path nested\\x\n", (value) => value.replaceAll("\\", "/")), ["nested/x"]);
+console.log(`${assertions} worker git submodule paths policy assertions passed`);

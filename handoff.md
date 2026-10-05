@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git submodule path discovery 的 `.gitmodules` config 输出解析、路径归一化与去重已迁移至 `src/main/worker/git-submodule-paths-policy.ts`；submodule runtime 保留 stat/abort、Git config I/O、query/cache 编排。新增 `scripts/test-worker-git-submodule-paths-policy.mjs` 覆盖 3 项 focused assertions；原 submodule 回归 15 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git repository identity 的 remote URL port 归一化与 repository full-name 投影已迁移至 `src/main/worker/git-repository-identity-policy.ts`；identity runtime 保留 origin query/cache、remote parsing 与 worktree ID I/O 编排。新增 `scripts/test-worker-git-repository-identity-policy.mjs` 覆盖 4 项 focused assertions；原 identity 回归 28 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation frame pointer guard 的 saved pointer-style 快照与 observed
