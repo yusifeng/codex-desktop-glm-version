@@ -2291,5 +2291,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/format-workspace-relative-path.ts",
     "evidence": "The pure workspace path formatter optionally prefixes a normalized relative path with the workspace-root label, preserving empty-path behavior without JSX, store, network, or lifecycle effects. It is covered by a focused two-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "AR",
+    "sourceSymbol": "HKe",
+    "startLine": 69128,
+    "endLine": 69131,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/normalize-workspace-path.ts",
+    "evidence": "The pure workspace path normalizer trims input, canonicalizes separators, preserves the root slash, and removes trailing separators without JSX, store, network, or lifecycle effects. It is covered by a focused two-case runtime test."
   }
 ]
