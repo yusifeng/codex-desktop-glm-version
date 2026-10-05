@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationModeControllerState } = require("../app/.vite/build/browser-page-preload/annotation-mode-controller-state.js");
+const state = createAnnotationModeControllerState();
+assert.equal(state.active, true);
+assert.equal(state.disposed, false);
+state.setActive(false);
+assert.equal(state.active, false);
+assert.equal(state.dispose(), true);
+assert.equal(state.active, false);
+assert.equal(state.disposed, true);
+assert.equal(state.dispose(), false);
+console.log("test-preload-annotation-mode-controller-state: 7 assertions passed");
