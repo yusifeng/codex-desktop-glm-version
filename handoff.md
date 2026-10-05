@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git host handoff transfer 的 copied rollout path 安全边界校验已迁移至 `src/main/worker/git-handoff-transfer-policy.ts`；transfer runtime 保留 host path/codexHome、read/write 与 cleanup I/O 编排。新增 `scripts/test-worker-git-handoff-transfer-policy.mjs` 覆盖 4 项 focused assertions；原 transfer 回归 19 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation containment 的跨 frame ancestor 解析纯策略已抽至
+`src/main/browser-page-preload/annotation-containment-frame-policy.ts`；containment policy 仅保留
+parent/position/containment 门禁编排。新增 `scripts/test-preload-annotation-containment-frame-policy.mjs`
+覆盖 2 项有效/缺失 frame 断言；原 containment 回归 5 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：managed worktree discovery 的 legacy/named parent-child 命名模式与 marker 常量已迁移至 `src/main/worker/git-managed-worktree-discovery-policy.ts`；discovery runtime 保留 filesystem stat/readDirectory、path normalization 与 Git metadata 编排。新增 `scripts/test-worker-git-managed-worktree-discovery-policy.mjs` 覆盖 8 项 focused assertions；原 discovery 回归 52 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation frame stability 的 parent-frame chain 纯判定已抽至

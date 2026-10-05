@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isValidCopiedRolloutPath } = require("../app/.vite/build/worker/git-handoff-transfer-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+const root = "/home/user/.codex/handoffs";
+equal(isValidCopiedRolloutPath(`${root}/t1/rollout.jsonl`, root, path.posix), true);
+equal(isValidCopiedRolloutPath(`${root}/t1/other.jsonl`, root, path.posix), false);
+equal(isValidCopiedRolloutPath(`${root}/t1/nested/rollout.jsonl`, root, path.posix), false);
+equal(isValidCopiedRolloutPath("/tmp/rollout.jsonl", root, path.posix), false);
+console.log(`${assertions} worker git handoff transfer policy assertions passed`);

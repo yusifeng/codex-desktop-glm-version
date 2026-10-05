@@ -18,18 +18,9 @@ async function transferHostFile(
 async function cleanupHostHandoffTransfer(rolloutPath: string, host: any) {
   const path = await host.platformPath();
   const transferDirectory = path.dirname(rolloutPath);
-  const relativeDirectory = path.relative(
-    path.join(await host.codexHome(), `handoffs`),
-    transferDirectory,
-  );
-  if (
-    path.basename(rolloutPath) !== `rollout.jsonl` ||
-    relativeDirectory.length === 0 ||
-    relativeDirectory === `..` ||
-    relativeDirectory.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relativeDirectory) ||
-    relativeDirectory.includes(path.sep)
-  ) {
+  if (!isValidCopiedRolloutPath(
+    rolloutPath, path.join(await host.codexHome(), `handoffs`), path,
+  )) {
     throw Error(`Host handoff cleanup requires a copied rollout path`);
   }
   await host.remove(transferDirectory, { recursive: true, force: true });
@@ -41,3 +32,4 @@ if (typeof module !== `undefined`) module.exports = {
   getHostHandoffDirectory,
   transferHostFile,
 };
+import { isValidCopiedRolloutPath } from './git-handoff-transfer-policy';
