@@ -1,3 +1,5 @@
+import { selectReusableGitWatch, shouldAcquireGitWatch } from "./git-watch-acquire-policy";
+
 type GitWatchAcquireDependencies = {
   metadata: { root: string; commonDir: string };
   host: any;
@@ -10,11 +12,12 @@ type GitWatchAcquireDependencies = {
 
 /** Acquire one reference to a repository watch and return its idempotent release callback. */
 async function acquireGitWatch(deps: GitWatchAcquireDependencies): Promise<() => void> {
-  if (deps.signal?.aborted) return () => {};
+  if (!shouldAcquireGitWatch(deps.signal?.aborted)) return () => {};
   const key = deps.getWatchKey(deps.metadata.root, deps.host);
   const existing = deps.getWatch(key);
-  const watch = existing != null && watchIsOpen(existing)
-    ? existing
+  const reusable = selectReusableGitWatch(existing);
+  const watch = reusable != null
+    ? reusable
     : deps.createWatch(deps.metadata, deps.host, existing?.closingPromise);
   watch.refCount += 1;
   let released = false;
@@ -34,9 +37,7 @@ async function acquireGitWatch(deps: GitWatchAcquireDependencies): Promise<() =>
   }
 }
 
-function watchIsOpen(watch: any): boolean {
-  return watch.closingPromise == null;
-}
+const watchIsOpen = (watch: { closingPromise?: unknown } | null | undefined): boolean => selectReusableGitWatch(watch) != null;
 
 export { acquireGitWatch, watchIsOpen };
 if (typeof module !== `undefined`) module.exports = { acquireGitWatch, watchIsOpen };

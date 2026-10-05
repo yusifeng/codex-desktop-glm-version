@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git watcher acquire 的请求取消门禁与可复用 watcher
+选择判定已迁移至 `src/main/worker/git-watch-acquire-policy.ts`；acquire 入口仅保留
+watcher 引用计数、异步启动与 release 副作用，新增 `scripts/test-worker-git-watch-acquire-policy.mjs`
+覆盖 6 项 focused assertions；typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation overlay runtime 的 element-cache 生命周期边界已补齐；
 新增幂等 `dispose` 清理所有 per-root cache，销毁后拒绝复用旧缓存，避免 mounted overlay
 runtime teardown 后残留元素引用。`scripts/test-preload-annotation-overlay-runtime.mjs`
