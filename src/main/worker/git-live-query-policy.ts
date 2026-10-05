@@ -122,11 +122,17 @@ function shouldRefreshLiveQuery(query: any, changeType: string) {
   }
 }
 
+/** Whether a shared-query wait needs an extra trace span/link projection. */
+function shouldAttachSharedTrace(trace: any, sharedTrace: any, traceLinks: any[]): boolean {
+  return trace != null && !(sharedTrace?.traceparent === trace.traceparent && traceLinks.length === 0);
+}
+
 export {
   appendTraceLink,
   isSampledTrace,
   mergeLiveQueryTrace,
   shouldRefreshLiveQuery,
+  shouldAttachSharedTrace,
 };
 if (typeof module !== `undefined`)
   module.exports = {
@@ -134,4 +140,5 @@ if (typeof module !== `undefined`)
     isSampledTrace,
     mergeLiveQueryTrace,
     shouldRefreshLiveQuery,
+    shouldAttachSharedTrace,
   };

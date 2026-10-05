@@ -1,4 +1,4 @@
-import { appendTraceLink } from "./git-live-query-policy";
+import { appendTraceLink, shouldAttachSharedTrace } from "./git-live-query-policy";
 import {
   getGitLiveQueryRepositoryKey,
   getGitLiveQuerySharedKey,
@@ -108,10 +108,7 @@ function runGitLiveQuery(
     signal.removeEventListener(`abort`, abort);
     shared.consumers.delete(onTracked);
   });
-  if (
-    trace == null ||
-    (shared.trace?.traceparent === trace.traceparent && traceLinks.length === 0)
-  ) return result;
+  if (!shouldAttachSharedTrace(trace, shared.trace, traceLinks)) return result;
   const links: any[] = [];
   if (shared.trace != null && shared.trace.traceparent !== trace.traceparent)
     appendTraceLink(links, shared.trace);

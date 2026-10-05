@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-live-trace-policy-"));
+const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-live-query-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { shouldAttachSharedTrace } = createRequire(import.meta.url)(output);
+assert.equal(shouldAttachSharedTrace(null, null, []), false);
+assert.equal(shouldAttachSharedTrace({ traceparent: "a" }, { traceparent: "a" }, []), false);
+assert.equal(shouldAttachSharedTrace({ traceparent: "a" }, { traceparent: "b" }, []), true);
+assert.equal(shouldAttachSharedTrace({ traceparent: "a" }, { traceparent: "a" }, [{ traceparent: "b" }]), true);
+console.log("worker Git live query trace policy tests passed (4 assertions)");

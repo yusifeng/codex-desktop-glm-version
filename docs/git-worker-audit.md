@@ -974,6 +974,10 @@ Worker entry control-message 分类（RPC、生命周期通知、request/cancel�
 `src/main/worker/entry-message-policy.ts`；entry dispatcher 仍负责 parentPort 回调副作用，
 新增 5 项 focused assertions。
 
+Live-query shared wait 的 trace span/link 附加门禁已迁移至 `shouldAttachSharedTrace`；run
+runtime 仅保留 trace link 组装与异步执行，由 4 项 focused assertions 覆盖 null、同 trace、跨
+trace 与已有 link 边界。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至
