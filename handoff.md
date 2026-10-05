@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation payload 的控制字符/格式字符安全文本判定纯策略已抽至
+`src/main/browser-page-preload/annotation-safe-text-policy.ts`；control payload adapter 仅保留
+schema 清洗与 response 编排。新增 `scripts/test-preload-annotation-safe-text-policy.mjs` 覆盖 3 项
+普通文本、Unicode 文本与控制字符断言；原 annotation runtime 回归 45 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation controls 的 JSON serialization、function/symbol/bigint
 拒绝与 UTF-8 byte quota 纯策略已抽至 `src/main/browser-page-preload/annotation-controls-serialization-policy.ts`；
 control payload adapter 仅保留 schema 清洗与 response 编排。新增

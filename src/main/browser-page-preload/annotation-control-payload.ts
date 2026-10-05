@@ -1,4 +1,3 @@
-const unsafeText = /^[^\p{Cc}\p{Cf}\p{Cs}\u2028\u2029]*$/u;
 const metadataKey = /^[A-Za-z][A-Za-z0-9_-]*(?: [A-Za-z0-9_-]+)*$/;
 
 const cloneRecord = cloneAnnotationRecord;
@@ -7,9 +6,9 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
   if (value === null) return null;
   try {
     const raw = cloneRecord(value, 5);
-    if (raw == null || typeof raw.id !== `string` || raw.id.length === 0 || raw.id.length > limits.maxIdLength || !unsafeText.test(raw.id)) return undefined;
+    if (raw == null || typeof raw.id !== `string` || raw.id.length === 0 || raw.id.length > limits.maxIdLength || !isSafeAnnotationText(raw.id)) return undefined;
     const result: Record<string, unknown> = { id: raw.id };
-    if (typeof raw.name === `string` && raw.name.trim().length > 0 && raw.name.length <= 128 && unsafeText.test(raw.name)) result.name = raw.name;
+    if (typeof raw.name === `string` && raw.name.trim().length > 0 && raw.name.length <= 128 && isSafeAnnotationText(raw.name)) result.name = raw.name;
     if (typeof raw.role === `string` && raw.role.length <= limits.maxRoleLength && new RegExp(limits.rolePattern).test(raw.role)) result.role = raw.role;
     if (raw.rect !== undefined) {
       const rect = cloneRecord(raw.rect, 4);
@@ -17,7 +16,7 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
       result.rect = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
     }
     const metadata = cloneRecord(raw.metadata, limits.metadataLimits.maxKeys);
-    if (metadata != null && Object.entries(metadata).every(([key, item]) => key.length <= limits.metadataLimits.maxKeyLength && metadataKey.test(key) && (item === null || typeof item === `boolean` || (typeof item === `number` && Number.isFinite(item)) || (typeof item === `string` && item.length <= limits.metadataLimits.maxStringValueLength && unsafeText.test(item))))) {
+    if (metadata != null && Object.entries(metadata).every(([key, item]) => key.length <= limits.metadataLimits.maxKeyLength && metadataKey.test(key) && (item === null || typeof item === `boolean` || (typeof item === `number` && Number.isFinite(item)) || (typeof item === `string` && item.length <= limits.metadataLimits.maxStringValueLength && isSafeAnnotationText(item))))) {
       const serialized = JSON.stringify(metadata);
       if (new TextEncoder().encode(serialized).byteLength <= limits.metadataLimits.maxSerializedBytes) result.metadata = JSON.parse(serialized);
     }
@@ -41,3 +40,4 @@ export { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControl
 if (typeof module !== `undefined`) module.exports = { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, createAnnotationResponseDetail };
 import { isValidAnnotationHitTestRequest } from "./annotation-hit-test-request-policy";
 import { cloneAnnotationRecord } from "./annotation-record-clone-policy";
+import { isSafeAnnotationText } from "./annotation-safe-text-policy";
