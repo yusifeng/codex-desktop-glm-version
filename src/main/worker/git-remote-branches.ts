@@ -1,4 +1,10 @@
 const DEFAULT_REMOTE = `origin`;
+import {
+  parseRemoteHeadBranch,
+  parseRemoteShowDefaultBranch,
+  parseRemoteNames,
+  selectConventionalBranch,
+} from "./git-remote-branches-policy";
 
 type RemoteBranchDependencies = {
   getConfigQueryMeta: () => any;
@@ -29,8 +35,7 @@ function getLocallyKnownDefaultBranch(
         { allowedNonZeroExitCodes: [1] },
       );
       if (!result.success || !result.stdout) return null;
-      const prefix = `refs/remotes/${remote}/`;
-      return result.stdout.startsWith(prefix) ? result.stdout.slice(prefix.length) : null;
+      return parseRemoteHeadBranch(result.stdout, remote);
     },
     staleTime: dependencies.staleTime,
   });
@@ -52,8 +57,7 @@ function fetchRemoteDefaultBranch(
         { timeoutMs: 10_000 },
       );
       if (!result.success || !result.stdout) return null;
-      const branch = /HEAD branch:\s*(.+)/.exec(result.stdout)?.[1].trim() ?? null;
-      return branch === `(unknown)` ? null : branch;
+      return parseRemoteShowDefaultBranch(result.stdout);
     },
     staleTime: dependencies.staleTime,
   });
@@ -77,13 +81,7 @@ function getOrderedRemotes(repository: any, dependencies: RemoteBranchDependenci
     queryFn: async () => {
       const result = await dependencies.runGit(repository.root, [`remote`], repository.host);
       if (!result.success || !result.stdout) return [];
-      const remotes = result.stdout
-        .split(`\n`)
-        .map((remote: string) => remote.trim())
-        .filter((remote: string) => remote.length > 0);
-      return remotes.includes(DEFAULT_REMOTE) && remotes.length > 1
-        ? [DEFAULT_REMOTE, ...remotes.filter((remote: string) => remote !== DEFAULT_REMOTE)]
-        : remotes;
+      return parseRemoteNames(result.stdout, DEFAULT_REMOTE);
     },
     staleTime: dependencies.staleTime,
   });
@@ -138,9 +136,11 @@ async function getConventionalDefaultBranch(
   remote: string,
   dependencies: RemoteBranchDependencies,
 ) {
-  for (const branch of [`main`, `master`])
-    if (await hasRemoteTrackingBranch(repository, remote, branch, dependencies)) return branch;
-  return null;
+  const mainAvailable = await hasRemoteTrackingBranch(repository, remote, `main`, dependencies);
+  const masterAvailable = mainAvailable
+    ? false
+    : await hasRemoteTrackingBranch(repository, remote, `master`, dependencies);
+  return selectConventionalBranch(mainAvailable, masterAvailable);
 }
 
 async function selectDefaultRemoteBranch(

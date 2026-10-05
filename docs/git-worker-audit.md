@@ -1078,6 +1078,12 @@ Linux `.desktop` 应用条目的 Hidden/Type/DBus、OnlyShowIn/NotShowIn、TryEx
 
 ### 增量抽取：Worktree list request boundary
 
+Git remote branch discovery 的纯解析与排序边界已迁移至
+`src/main/worker/git-remote-branches-policy.ts`：remote HEAD ref、`remote show` 默认分支、
+remote 名称排序及 main/master conventional fallback 均由纯策略承载；运行时仍保留 query
+cache、Git I/O 与异步短路编排。`scripts/test-worker-git-remote-branches-policy.mjs`
+覆盖 10 项 focused assertions，原 44 项 remote-branches 回归继续通过。
+
 `list-worktrees` 请求的 repository 可空解析与列表委派已迁移至
 `src/main/worker/git-worktree-list-request-handler.ts`。helper 只接收 Git manager、host、
 signal 与列表查询依赖；缺失 repository 稳定返回空数组，入口继续持有请求 envelope、取消

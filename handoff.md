@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git remote branch discovery 的 remote HEAD/default branch 解析、remote
+名称排序与 conventional fallback 纯策略已迁移至 `src/main/worker/git-remote-branches-policy.ts`；
+运行时保留 query/Git I/O 与异步短路编排。新增 `scripts/test-worker-git-remote-branches-policy.mjs`
+覆盖 10 项 focused assertions；原 44 项 remote-branches 回归、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation permission controller 的终止生命周期边界已补齐；新增幂等
 `dispose`，终态拒绝后续权限请求/结果回调并解析 pending 为 `false`，pagehide 终止路径接入
 该 dispose，避免 preload runtime teardown 后异步权限请求再次驱动状态。`scripts/test-preload-annotation-permission-controller.mjs`
