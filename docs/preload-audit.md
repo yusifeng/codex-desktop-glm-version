@@ -71,6 +71,9 @@ Annotation surface registry（原 `Yg` 22359-22510）已迁移至
 `src/main/browser-page-preload/annotation-surface-registry.ts`，由 `t_` 接回；surface
 registration、hit-test response 校验、render/cancel/clear、invalidated/disposed 和 dispose
 由 `scripts/test-preload-annotation-surface-registry.mjs` 覆盖，共 9 项断言。
+其 registrations、probe 去重、request counter、pending hit 与 terminal disposal 状态边界
+已集中至 `annotation-surface-registry-state.ts`，并由
+`scripts/test-preload-annotation-surface-registry-state.mjs` 覆盖 16 项 focused assertions。
 
 Virtual annotation target payload（原 `n_` 22777-22800）已迁移至
 `src/main/browser-page-preload/annotation-virtual-target.ts`，由设计 overlay selection
