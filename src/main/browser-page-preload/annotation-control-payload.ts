@@ -39,9 +39,9 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
   }
 }
 
-function createAnnotationResponseDetail(input: { type: string; registrationId: string; customRendering: boolean; requestId?: string; hit?: Record<string, unknown> | null }): Record<string, unknown> {
-  return { type: input.type, registrationId: input.registrationId, customRendering: input.customRendering, requestId: input.requestId, hit: input.hit };
-}
+import { createAnnotationResponseEnvelope } from "./annotation-response-envelope-policy";
+
+const createAnnotationResponseDetail = createAnnotationResponseEnvelope;
 
 function serializeAnnotationControls(value: unknown, maxBytes: number): string {
   if (typeof value !== `object` || !value) throw new TypeError(`Invalid annotation controls`);
