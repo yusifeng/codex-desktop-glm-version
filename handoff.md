@@ -1724,3 +1724,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：Git diff path 的特殊字符引用与反斜杠/引号/换行/回车/Tab 转义协议已迁移至 `src/main/worker/git-diff-quote-policy.ts`；diff text 入口保留 header、rename 与 parser 编排。新增 `scripts/test-worker-git-diff-quote-policy.mjs` 覆盖 5 项 focused assertions；原 diff-text 回归 33 项、build 与 typecheck 已通过。
 
 2026-10-05 A5 T5 继续批次：app-shared 的 scroll offset clamp 策略已迁移至 `src/renderer/app-shared/runtime/clamp-scroll-offset.ts`；新增 `scripts/test-app-shared-clamp-scroll-offset.mjs` 覆盖 4 项 focused assertions，并登记 `Bq/AFe` 源码 61745-61748 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-05 A5 T5 继续批次：app-shared 的 unknown error message formatter 已迁移至 `src/renderer/app-shared/runtime/format-error-message.ts`；新增 `scripts/test-app-shared-format-error-message.mjs` 覆盖 4 项 focused assertions，并登记 `IH/RVe` 源码 65652-65662 行语义证据。该导出已由 manifest 识别为 consumed，保留现有 renderer 消费语义。

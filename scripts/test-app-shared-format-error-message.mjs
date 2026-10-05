@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/format-error-message.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { formatErrorMessage } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+assert.equal(formatErrorMessage(new Error("failed")), "failed");
+assert.equal(formatErrorMessage("plain"), "plain");
+assert.equal(formatErrorMessage({ message: "structured" }), "structured");
+assert.equal(formatErrorMessage({ code: 7 }), '{"code":7}');
+console.log("app-shared format error message: 4 assertions passed");
