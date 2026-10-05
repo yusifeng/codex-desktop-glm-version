@@ -131,6 +131,10 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `DJ`（内部 `GPe`，源码 45304--45306）的 queued
+design-change 纯判定已迁移至 `src/renderer/app-shared/runtime/has-queued-design-change.ts`；新增
+focused test 2 项断言，typecheck 与 focused test 已通过。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `EY`（内部 `BNe`，源码 44783--44790）的 automation
 update output envelope 纯识别策略已迁移至 `src/renderer/app-shared/runtime/is-automation-update-output.ts`；
 新增 focused test 2 项断言，typecheck 与 focused test 已通过。
@@ -2121,3 +2125,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation frame offset 递归 projection 已迁移至 `src/main/browser-page-preload/annotation-frame-offset-policy.ts`；原 `Ic` 入口保留 frame/rect 适配，新增 3 项 focused assertions。
