@@ -13,17 +13,6 @@ const isDescendant = (ancestor: any, value: any, getParent: (value: any) => any)
   return false;
 };
 
-const findTopModal = (doc: any, modals: any[], getParent: (value: any) => any) => {
-  if (modals.length < 2) return modals[0];
-  for (let current of [doc.activeElement, doc.elementFromPoint?.(0, 0)]) {
-    for (; current?.shadowRoot?.activeElement != null; ) current = current.shadowRoot.activeElement;
-    for (; current != null && current !== doc; ) {
-      if (modals.includes(current)) return current;
-      current = getParent(current);
-    }
-  }
-  return undefined;
-};
 
 /**
  * Builds the visibility predicate used by the annotation preview overlay.
@@ -54,7 +43,7 @@ const createAnnotationPreviewVisibilityPredicate = (
     }
   }
   for (const [doc, state] of byDocument) {
-    const modal = findTopModal(doc, state.modals, getParent);
+    const modal = findAnnotationTopModal(doc, state.modals, getParent);
     state.boundaries.push(...(modal == null ? state.modals : [modal]));
   }
 
@@ -85,3 +74,4 @@ const createAnnotationPreviewVisibilityPredicate = (
 
 export { createAnnotationPreviewVisibilityPredicate };
 if (typeof module !== `undefined`) module.exports = { createAnnotationPreviewVisibilityPredicate };
+import { findAnnotationTopModal } from "./annotation-modal-boundary-policy";

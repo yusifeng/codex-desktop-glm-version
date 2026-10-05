@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { findAnnotationTopModal } = require("../app/.vite/build/browser-page-preload/annotation-modal-boundary-policy.js");
+const parent = new Map();
+const modalA = {}, modalB = {}, child = {};
+parent.set(child, modalB); parent.set(modalB, null);
+const doc = { activeElement: child, elementFromPoint: () => null };
+assert.equal(findAnnotationTopModal(doc, [modalA, modalB], (value) => parent.get(value) ?? null), modalB);
+assert.equal(findAnnotationTopModal(doc, [modalA], () => null), modalA);
+assert.equal(findAnnotationTopModal({ activeElement: null, elementFromPoint: () => null }, [], () => null), undefined);
+console.log("test-preload-annotation-modal-boundary-policy: 3 assertions passed");
