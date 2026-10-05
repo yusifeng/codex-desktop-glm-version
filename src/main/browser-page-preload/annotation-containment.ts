@@ -27,10 +27,7 @@ function isAnnotationContainedBy(
     while (candidate != null) {
       if (parent === candidate) return true;
       const ancestor = dependencies.getParent(candidate);
-      candidate = ancestor ?? (() => {
-        const frame = dependencies.getFrameElement(dependencies.getOwnerWindow(candidate!));
-        return dependencies.isElement(frame) ? frame : null;
-      })();
+      candidate = ancestor ?? resolveAnnotationContainmentFrameAncestor(candidate, dependencies);
     }
     const parentStyle = dependencies.getComputedStyle(windowLike, parent);
     if ((parentStyle.contain ?? ``).split(/\s+/).some((value) => value === `size` || value === `strict`))
@@ -42,3 +39,4 @@ function isAnnotationContainedBy(
 
 export { isAnnotationContainedBy };
 if (typeof module !== `undefined`) module.exports = { isAnnotationContainedBy };
+import { resolveAnnotationContainmentFrameAncestor } from "./annotation-containment-frame-policy";
