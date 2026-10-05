@@ -1,4 +1,5 @@
 export {};
+import { classifyWorkerControlMessage } from "./entry-message-policy";
 
 interface WorkerEntryDispatcherOptions {
   workerId: string;
@@ -19,35 +20,34 @@ interface WorkerEntryDispatcherOptions {
  */
 function createWorkerMessageDispatcher(options: WorkerEntryDispatcherOptions) {
   return (message: any): void => {
-    if (options.rpcClient.handleMessage(message)) return;
+    const kind = classifyWorkerControlMessage(message, options.workerId, options.rpcClient.handleMessage(message));
 
-    switch (message?.type) {
-      case "worker-sentry-user-update":
+    switch (kind) {
+      case "sentry":
         options.onSentryUserUpdate(message);
         return;
-      case "worker-app-event":
+      case "app":
         options.onAppEvent(message);
         return;
-      case "worker-flush-and-exit":
+      case "flush":
         options.onFlushAndExit();
         return;
-      case "worker-git-turn-complete":
+      case "turn":
         options.onGitTurnComplete(message);
         return;
-      case "worker-tracing-sample-rate-update":
+      case "sample":
         options.onTracingSampleRateUpdate(message);
         return;
-      case "worker-analytics-enabled-update":
+      case "analytics":
         options.onAnalyticsEnabledUpdate(message);
         return;
     }
 
-    if (message?.workerId !== options.workerId) return;
-    if (message.type === "worker-request") {
+    if (kind === "request") {
       options.onRequest(message.request);
       return;
     }
-    if (message.type === "worker-request-cancel") {
+    if (kind === "cancel") {
       options.onCancel(message.id);
     }
   };

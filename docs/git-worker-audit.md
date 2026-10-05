@@ -970,6 +970,10 @@ Worktree snapshot read RPC 的 `worktree-snapshot-ref`/`managed-worktree-state` 
 `src/main/worker/git-worktree-snapshot-read-policy.ts`；dispatcher 仅保留 snapshot 查询依赖，
 新增 3 项 focused classification assertions。
 
+Worker entry control-message 分类（RPC、生命周期通知、request/cancel）已迁移至
+`src/main/worker/entry-message-policy.ts`；entry dispatcher 仍负责 parentPort 回调副作用，
+新增 5 项 focused assertions。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至

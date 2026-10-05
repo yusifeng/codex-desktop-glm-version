@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-entry-policy-"));
+const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/entry-message-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { classifyWorkerControlMessage } = createRequire(import.meta.url)(output);
+assert.equal(classifyWorkerControlMessage({ type: "worker-request", workerId: "git" }, "git"), "request");
+assert.equal(classifyWorkerControlMessage({ type: "worker-request", workerId: "other" }, "git"), "unknown");
+assert.equal(classifyWorkerControlMessage({ type: "worker-flush-and-exit" }, "git"), "flush");
+assert.equal(classifyWorkerControlMessage({ type: "worker-main-rpc-response" }, "git", true), "rpc");
+assert.equal(classifyWorkerControlMessage({ type: "unknown" }, "git"), "unknown");
+console.log("worker entry message policy tests passed (5 assertions)");
