@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-initial/runtime/parse-conversation-route.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const deps = { parseUrl: (value) => ({ pathname: new URL(value, "https://example.test").pathname, search: new URL(value, "https://example.test").search }), matchRoute: ({ pathname }) => pathname.startsWith("/conversation/") ? pathname.slice(13) : null };
+assert.deepEqual(mod.parseConversationRoute("/conversation/c-1?x=1", deps), { conversationId: "/c-1", path: "/conversation/c-1?x=1" });
+assert.equal(mod.parseConversationRoute("/settings", deps), null);
+assert.equal(mod.parseConversationRoute(null, deps), null);
+console.log("app-initial parse conversation route: 3 assertions passed");

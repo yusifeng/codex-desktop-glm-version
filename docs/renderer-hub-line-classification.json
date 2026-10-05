@@ -2321,5 +2321,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/normalize-execution-location.ts",
     "evidence": "The pure execution-location policy accepts only local/worktree values and applies a caller-provided fallback for unknown inputs without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-initial",
+    "alias": "_n",
+    "sourceSymbol": "mzc",
+    "startLine": 6542,
+    "endLine": 6542,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-initial/runtime/parse-conversation-route.ts",
+    "evidence": "The route parser validates a location, delegates URL and route-template matching through injected policies, and returns a stable conversationId/path projection without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
   }
 ]
