@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation direct-text preview policy
+
+Annotation direct text preview 的文本节点筛选、空白规范化与 80 字符截断（原 `vd`，5120-7259
+业务工具段）已迁移至 `src/main/browser-page-preload/annotation-direct-text-preview.ts`；root
+element 判定由入口注入。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation URL parser reuse
 
 Annotation frame/document URL 的 throwing-safe parser（原 `yd`，5120-7259 业务工具段）已复用

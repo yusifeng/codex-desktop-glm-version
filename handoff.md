@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation direct-text preview 的文本节点筛选、规范化与长度上限
+已迁移至 `src/main/browser-page-preload/annotation-direct-text-preview.ts`；原 `vd` 入口保留兼容
+委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation URL parser `yd` 已复用
 `annotation-url-parser-policy.parseAnnotationUrl`，删除 preload 重复实现；既有 parser regression、
 build 与 typecheck 已通过。

@@ -5969,14 +5969,7 @@ function _d(e) {
   );
 }
 function vd(e) {
-  if (rc(e)) return null;
-  let t = Array.from(e.childNodes)
-    .filter((e) => e.nodeType === Node.TEXT_NODE)
-    .map((e) => e.textContent?.replace(/\s+/g, ` `).trim() ?? ``)
-    .join(` `)
-    .replace(/\s+/g, ` `)
-    .trim();
-  return t.length === 0 ? null : t.slice(0, 80);
+  return projectAnnotationDirectTextPreview(e, rc);
 }
 function yd(e) {
   return parseAnnotationUrl(e);
@@ -6182,6 +6175,7 @@ var { hasAnnotationComments, getAnnotationCommentCount } = require("./browser-pa
 var { supportsAnnotationCssHighlights } = require("./browser-page-preload/annotation-highlight-capability");
 var { canUseAnnotationAdoptedStyleSheets } = require("./browser-page-preload/annotation-adopted-stylesheet-target");
 var { matchesAnnotationFrameUrl } = require("./browser-page-preload/annotation-frame-url-policy");
+var { projectAnnotationDirectTextPreview } = require("./browser-page-preload/annotation-direct-text-preview");
 var { projectAnnotationAnchorPoint } = require("./browser-page-preload/annotation-anchor-point-projection");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
