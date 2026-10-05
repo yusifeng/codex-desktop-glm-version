@@ -4534,8 +4534,7 @@ function Ic(e) {
   });
 }
 function Lc(e, t) {
-  let n = Ic(e);
-  return { x: t.x + n.x, y: t.y + n.y };
+  return projectAnnotationFramePoint(t, Ic(e));
 }
 function Rc(e) {
   return kc(e);
@@ -6126,6 +6125,7 @@ var { isAnnotationElementVisibleByPolicy } = require("./browser-page-preload/ann
 var { getAnnotationFrameOffset } = require("./browser-page-preload/annotation-frame-offset-policy");
 var { isAnnotationElementLike } = require("./browser-page-preload/annotation-element-like-policy");
 var { getAnnotationScrollContainerOffset } = require("./browser-page-preload/annotation-scroll-container-offset");
+var { projectAnnotationFramePoint } = require("./browser-page-preload/annotation-frame-point-projection");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
