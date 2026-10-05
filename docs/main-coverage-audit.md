@@ -295,6 +295,19 @@ flags、`I` disposable 栈和窗口 manager，抽出任一局部函数都会改�
 `business-preserved`，并以本节作为 coverage audit 证据。下一次抽取前必须先建立针对单一服务
 构造/注册顺序的 focused harness，不得以 facade 或无消费 policy 减少覆盖区间。
 
+### T4 覆盖复核：172,420-175,889 worker/window 装配边界
+
+该前半段已复核：172,420-173,700 的窗口管理包含 BrowserWindow/WebContents 的 navigate、focus、
+display 与 render-process 监听；173,700-174,330 的 `bst/H9` worker manager 同时创建
+`Worker`/`MessageChannel`、登记 sentry/main RPC session、处理 message/error/exit，并在 dispose
+时发送 `worker-flush-and-exit` 后等待退出。174,330-175,889 继续混合 worker bus、tray/window
+事件与启动阶段 wiring。已有 URL-trust、window-appearance、RPC/event predicates 等窄策略已单独
+覆盖；除此之外，剩余逻辑都依赖 Electron 对象、跨 worker listener 集合或共享 disposable 顺序。
+
+结论：本区间没有新的可证实独立纯策略边界。继续拆分会把 WorkerManager/window lifecycle
+副作用伪装成 facade，故维持 `business-preserved`，并要求后续以 worker spawn/dispose 顺序
+harness 为前置证据。
+
 桌面 open-path 的 stat-kind 分类现由入口委托 `src/main/main-app/files/open-path-arguments.ts` 的
 `classifyDesktopOpenPath`，保留真实 stat、warning 日志与后续窗口副作用；已有 17 项 focused
 断言覆盖 directory、HTML browser-document、普通 file 与缺失路径边界。

@@ -1989,6 +1989,8 @@ typecheck 均通过。
 
 2026-10-06 T4 coverage audit：复核 `main-C-Mhak1n.ts` 175,890-176,978 启动装配区间；tray、computer-use/browser-use、app-server registry、plugin reconcile、窗口事件监听与 disposable ownership 交织，当前无可独立迁移且能证明副作用顺序不变的纯策略边界。已将证据与 `business-preserved` 结论写入 `docs/main-coverage-audit.md`，下一步需先建立单一服务构造/注册顺序 harness。
 
+2026-10-06 T4 coverage audit：复核 `main-C-Mhak1n.ts` 172,420-175,889 worker/window 装配区间；窗口 Electron listeners 与 `bst/H9` Worker/MessageChannel、RPC session、error/exit、flush/dispose 生命周期交织。已有窄 predicates 已覆盖，其余无新的可证实纯策略边界；证据与 `business-preserved` 结论已写入 `docs/main-coverage-audit.md`，后续需先建立 worker spawn/dispose 顺序 harness。
+
 2026-10-06 A1 T1 继续批次：Setup script 的 original/worktree workspace 环境变量覆盖构造已迁移至 `src/main/worker/git-worktree-setup-environment-policy.ts`；runtime 仅保留执行副作用。新增 `scripts/test-worker-git-worktree-setup-environment-policy.mjs` 覆盖 3 项 focused assertions。
 
 2026-10-06 A1 T1 继续批次：Core Git RPC method 的 availability/create-branch/git-origins 白名单已迁移至 `src/main/worker/git-core-request-policy.ts`；dispatcher 仅保留参数编排与 Git I/O。新增 `scripts/test-worker-git-core-request-policy.mjs` 覆盖 4 项 focused classification assertions。
