@@ -2061,5 +2061,15 @@
     "classification": "generated-local-model-selector-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer loads model/reasoning selector dependencies for the adjacent generated settings surface; it has no independent named renderer consumer or teardown boundary and remains in the aggregate hub."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Pm",
+    "sourceSymbol": "CA",
+    "startLine": 6490,
+    "endLine": 6498,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/account-spend-key.ts",
+    "evidence": "The account spend-limit key is a deterministic projection of account id, limit, and reset timestamp with explicit null handling; it has no renderer lifecycle, JSX, store, or teardown side effects and is independently covered by a focused policy test."
   }
 ]

@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A5 继续批次：app-primary 账户额度提示区未消费导出 `Pm`（`CA`，6490--6498）已抽取为 `account-spend-key.ts`，明确账户/额度/重置时间投影及空值边界；新增 `scripts/test-app-primary-account-spend-key.mjs` 覆盖 4 项 focused assertions。逐行分类证据登记后 reviewedCount 提升至 207；hub audit、focused classification 与策略测试已通过。
+
 2026-10-05 A2 继续批次：annotation site-request 的 pending/page-hidden/disposed 状态边界已抽至
 `src/main/browser-page-preload/annotation-site-request-state.ts`；`annotation-site-requests` 仅保留
 事件、权限与 subscriber 编排，并明确销毁后 `subscribe` 的 no-op unsubscribe 与迟到回调门禁。
