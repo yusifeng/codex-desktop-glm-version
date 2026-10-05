@@ -2439,5 +2439,41 @@
     "classification": "generated-local-style-helper",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The exported UE/WE/GE declarations are generated annotation marker scale/color constants initialized by adjacent KE bootstrap and retained as local aggregate wiring without a standalone renderer boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ct",
+    "startLine": 105683,
+    "endLine": 105686,
+    "classification": "generated-local-style-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported V5 value is a generated data-plan-selection-surface marker initialized by adjacent H5 bootstrap; it is a local DOM/test identifier with no standalone renderer consumer or lifecycle owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Hp",
+    "startLine": 10576,
+    "endLine": 10580,
+    "classification": "generated-local-style-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported oM value is a generated composer suggestion utility-class string initialized by sM; it is local styling glue without an independent renderer boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Lf",
+    "startLine": 14867,
+    "endLine": 14871,
+    "classification": "generated-local-runtime-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported IP value is a generated deep-research work capability string assigned by LP bootstrap and consumed only by adjacent generated feature registration."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Fs",
+    "startLine": 36861,
+    "endLine": 36868,
+    "classification": "generated-local-registry-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported DK/eGe declarations are initialized by OK alongside registry maps for the adjacent generated browser surface; no independent renderer consumer or teardown owner exists."
   }
 ]
