@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git nearest-ancestor branch 的候选分支归一化与最短 ancestor 选择策略已迁移至 `src/main/worker/git-nearest-ancestor-branch-policy.ts`；运行时仅保留 compare-ahead 并发查询与 I/O 编排。新增 `scripts/test-worker-git-nearest-ancestor-branch-policy.mjs` 覆盖 5 项 focused assertions；原 nearest-ancestor 回归 10 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git recent branches 的 limit 归一化、Git 输出分支名投影与查询参数构造已迁移至 `src/main/worker/git-recent-branches-policy.ts`；运行时保留 query/cache/Git I/O 与 live-generation 清理编排。新增 `scripts/test-worker-git-recent-branches-policy.mjs` 覆盖 8 项 focused assertions；原 recent-branches 回归 26 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation preload disposal 的 transient/terminal 生命周期状态已抽至
@@ -13,6 +15,13 @@ mounted runtime 与 destroyed 终态已抽至 `src/main/browser-page-preload/ann
 mount coordinator 仅保留动态加载、preview 交接和 runtime dispose 副作用，加载失败仍可重试而
 pagehide 后不可重挂载。新增 `scripts/test-preload-annotation-runtime-mount-state.mjs` 覆盖 10 项
 状态断言；原 runtime-mount 回归 9 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation feature graph 的 controls registry、site request queue、
+feature observer 与 mode-controller disposer 引用状态已抽至
+`src/main/browser-page-preload/annotation-feature-graph-state.ts`；feature lifecycle 仅保留
+generation 初始化、刷新销毁顺序与副作用编排。新增
+`scripts/test-preload-annotation-feature-graph-state.mjs` 覆盖引用写入、读取与 clear 共 9 项
+断言；原 feature-lifecycle 回归 15 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：live-query performance operation 的方法白名单与结果映射已迁移至
 `src/main/worker/git-performance-operation-policy.ts`；observability runtime 仅保留性能结果字段、
