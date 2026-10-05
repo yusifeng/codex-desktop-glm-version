@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation element metadata payload projection 已迁移至
+`src/main/browser-page-preload/annotation-element-metadata-projection.ts`；原 `nd` 入口保留兼容委托，
+新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation element ancestor path projection 已迁移至
 `src/main/browser-page-preload/annotation-element-path-policy.ts`；原 `Sc` 入口保留兼容委托，
 新增 3 项 focused assertions，build 与 typecheck 已通过。

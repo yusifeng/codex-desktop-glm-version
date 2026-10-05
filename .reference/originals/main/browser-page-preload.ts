@@ -5745,18 +5745,7 @@ var Yu,
       (ed = `data-browser-comment-text-selection-mirror`));
   });
 function nd(e) {
-  let t = cd(e);
-  if (t == null) return null;
-  let n = Fc(e).getComputedStyle(e);
-  return {
-    borderRadius: n.borderRadius.length === 0 ? `0px` : n.borderRadius,
-    color: ws(n.color),
-    font: `${n.fontSize} ${n.fontFamily}`.trim(),
-    styles: ls(n, n.display === `flex` || n.display === `inline-flex` ? [...xd, ...Sd] : xd),
-    rect: t,
-    size: `${Math.round(t.width)}x${Math.round(t.height)}`,
-    tagName: e.tagName.toLowerCase(),
-  };
+  return projectAnnotationElementMetadata(e, { getRect: cd, getComputedStyle: (element) => Fc(element).getComputedStyle(element), normalizeColor: ws, collectStyles: ls, flexProperties: Sd, baseProperties: xd });
 }
 function rd(e) {
   return isTopLevelAnnotationRoot(e);
@@ -6154,6 +6143,7 @@ var { projectAnnotationElementLabel } = require("./browser-page-preload/annotati
 var { projectAnnotationAccessibleLabel } = require("./browser-page-preload/annotation-accessible-label-policy");
 var { projectAnnotationNearbyText } = require("./browser-page-preload/annotation-nearby-text-policy");
 var { projectAnnotationElementPath } = require("./browser-page-preload/annotation-element-path-policy");
+var { projectAnnotationElementMetadata } = require("./browser-page-preload/annotation-element-metadata-projection");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

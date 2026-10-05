@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation element metadata projection
+
+Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
+列表、尺寸与 tag 投影已迁移至 `src/main/browser-page-preload/annotation-element-metadata-projection.ts`；
+DOM/style 读取通过依赖注入。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation element path policy
 
 Annotation element ancestor tag path（原 `Sc`，3863-5049 业务工具段）的深度上限、html/body
