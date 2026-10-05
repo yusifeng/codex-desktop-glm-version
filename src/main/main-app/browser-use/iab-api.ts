@@ -122,6 +122,12 @@ export interface WebMcpToolInvocation {
 /** 下载变更监听器。 */
 export type BrowserUseDownloadChangeListener = (change: { path: string; tabId: string }) => void;
 
+export interface BrowserUseDownloadGrant {
+  expiresAtMs: number;
+  url?: string;
+  sessionId?: string;
+}
+
 export interface IabBrowserUseOptions {
   ensureSessionRoute?: (session: { conversationId: string }) => boolean;
   buildFlavor?: string;
@@ -173,7 +179,7 @@ export class IabBrowserUseApi {
   private cdpDetachListeners = new Set<() => void>();
   private downloadChangeListeners = new Set<BrowserUseDownloadChangeListener>();
   private pageEventListeners = new Set<PageStateEventListener>();
-  private allowedDownloadGrantsByWebContentsId = new Map<number, { expiresAtMs: number }>();
+  private allowedDownloadGrantsByWebContentsId = new Map<number, BrowserUseDownloadGrant>();
   private cursorArrivalWaitersByMoveSequence = new Map<number, { resolve: () => void; reject: (error: Error) => void }>();
   private selectedTabIdsByRouteKey = new Map<string, string>();
   private hostsByRouteKey = new Map<string, unknown>();
@@ -355,16 +361,30 @@ export class IabBrowserUseApi {
   }
 
   /** 允许下载（原 `allowDownload`：按 webContentsId 授权 + 过期）。 */
-  allowDownload(webContentsId: number, ttlMs: number): void {
-    this.allowedDownloadGrantsByWebContentsId.set(webContentsId, { expiresAtMs: Date.now() + ttlMs });
+  allowDownload(webContentsId: number, ttlMs: number, grant: { url?: string; sessionId?: string } = {}): void {
+    this.allowedDownloadGrantsByWebContentsId.set(webContentsId, {
+      ...grant,
+      expiresAtMs: Date.now() + ttlMs,
+    });
   }
 
   /** 消费允许的下载（原 `[zY]`）。 */
-  [CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD](webContentsId: number): boolean {
+  [CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD](webContentsId: number): boolean;
+  [CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD](request: { url: string; urlChain?: string[]; webContentsId: number }): { sessionId?: string; url: string } | null;
+  [CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD](input: number | { url: string; urlChain?: string[]; webContentsId: number }): boolean | { sessionId?: string; url: string } | null {
+    const webContentsId = typeof input === "number" ? input : input.webContentsId;
     const grant = this.allowedDownloadGrantsByWebContentsId.get(webContentsId);
-    if (grant == null) return false;
+    if (grant == null || Date.now() >= grant.expiresAtMs) {
+      this.allowedDownloadGrantsByWebContentsId.delete(webContentsId);
+      return typeof input === "number" ? false : null;
+    }
+    if (typeof input !== "number") {
+      if (grant.url == null || grant.url !== input.url) return null;
+      this.allowedDownloadGrantsByWebContentsId.delete(webContentsId);
+      return { sessionId: grant.sessionId, url: grant.url };
+    }
     this.allowedDownloadGrantsByWebContentsId.delete(webContentsId);
-    return Date.now() < grant.expiresAtMs;
+    return true;
   }
 
   /** 过期授权清理（原 `pruneExpiredAllowedDownloadGrants`）。 */

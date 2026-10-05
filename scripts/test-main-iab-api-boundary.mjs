@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { IabBrowserUseApi } from "../app/.vite/build/main-app/browser-use/iab-api.js";
+import { CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, IabBrowserUseApi } from "../app/.vite/build/main-app/browser-use/iab-api.js";
 
 const api = new IabBrowserUseApi(() => null, undefined, {
   ensureSessionRoute: ({ conversationId }) => conversationId === "c-1",
@@ -34,6 +34,12 @@ assert.deepEqual(api.getRequestSafeFields({ conversationId: "c-1" }, { turn_id: 
 assert.equal(routedApi.getRequiredBrowserHost({ conversationId: "c-1", routeKey: "r-1" }), host);
 routedApi.rememberBrowserHost({ routeKey: "r-1" }, host);
 assert.equal(routedApi.getBrowserHostsForSession({ routeKey: "r-1" }), host);
+routedApi.allowDownload(7, 5000, { url: "https://example.test/file", sessionId: "c-1" });
+assert.equal(routedApi[CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD]({ url: "https://other.test/file", webContentsId: 7 }), null);
+assert.deepEqual(routedApi[CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD]({ url: "https://example.test/file", webContentsId: 7 }), { sessionId: "c-1", url: "https://example.test/file" });
+routedApi.allowDownload(8, 5000, { url: "https://example.test/once" });
+assert.equal(routedApi[CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD]({ url: "https://example.test/once", webContentsId: 8 })?.url, "https://example.test/once");
+assert.equal(routedApi[CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD]({ url: "https://example.test/once", webContentsId: 8 }), null);
 routedApi.recordBrowserUseTurn({ conversationId: "c-1" }, { turn_id: "t-1" });
 routedApi.clearRecordedBrowserUseTurn({ conversationId: "c-1" }, "t-1");
 assert.equal(routedApi.getTab("missing"), null);
@@ -57,4 +63,4 @@ unsubscribePage();
 assert.deepEqual(pageEvents[2], ["page", { type: "page-load", url: "https://example.test", session_id: "c-1", tabId: "tab-1" }]);
 routedApi.notifyPageEvent("c-1", 42, { type: "after-unsubscribe" });
 assert.equal(pageEvents.length, 3);
-console.log("main IAB API boundary: 17 assertions passed");
+console.log("main IAB API boundary: 21 assertions passed");
