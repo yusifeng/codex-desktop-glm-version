@@ -1720,3 +1720,5 @@ typecheck 均通过。
 
 2026-10-05 A5 T5 继续批次：app-shared 的 remote-control key formatter 已迁移至 `src/renderer/app-shared/runtime/format-remote-control-key.ts`；新增 `scripts/test-app-shared-format-remote-control-key.mjs` 覆盖 2 项 focused assertions，并登记 `FU/kBe` 源码 64878-64880 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 2026-10-05 A1 T1 继续批次：Git diff `a/`/`b/` header 前缀剥离与非法前缀 null 判定已迁移至 `src/main/worker/git-diff-prefix-policy.ts`；diff text 入口保留 quoted path/header/rename 编排。新增 `scripts/test-worker-git-diff-prefix-policy.mjs` 覆盖 4 项 focused assertions；原 diff-text 回归 33 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：Git diff path 的特殊字符引用与反斜杠/引号/换行/回车/Tab 转义协议已迁移至 `src/main/worker/git-diff-quote-policy.ts`；diff text 入口保留 header、rename 与 parser 编排。新增 `scripts/test-worker-git-diff-quote-policy.mjs` 覆盖 5 项 focused assertions；原 diff-text 回归 33 项、build 与 typecheck 已通过。
