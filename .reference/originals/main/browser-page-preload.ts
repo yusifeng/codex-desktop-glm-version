@@ -5359,7 +5359,7 @@ function gu() {
     } catch {}
 }
 function _u(e, t) {
-  return e.kind === `text` && !e.isFixed ? t.scrollX : 0;
+  return getAnnotationScrollOffset(e, t);
 }
 function vu(e) {
   let t = e.getSelection();
@@ -6176,6 +6176,7 @@ var { supportsAnnotationCssHighlights } = require("./browser-page-preload/annota
 var { canUseAnnotationAdoptedStyleSheets } = require("./browser-page-preload/annotation-adopted-stylesheet-target");
 var { matchesAnnotationFrameUrl } = require("./browser-page-preload/annotation-frame-url-policy");
 var { projectAnnotationDirectTextPreview } = require("./browser-page-preload/annotation-direct-text-preview");
+var { getAnnotationScrollOffset } = require("./browser-page-preload/annotation-scroll-offset");
 var { projectAnnotationAnchorPoint } = require("./browser-page-preload/annotation-anchor-point-projection");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");

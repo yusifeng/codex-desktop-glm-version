@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation scroll offset policy
+
+Text anchor 的 scrollX 偏移判定（原 `_u`，5120-7259 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-scroll-offset.ts`；仅非 fixed text anchor 返回窗口
+scrollX，其余返回 0。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation direct-text preview policy
 
 Annotation direct text preview 的文本节点筛选、空白规范化与 80 字符截断（原 `vd`，5120-7259
