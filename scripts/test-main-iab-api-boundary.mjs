@@ -9,6 +9,8 @@ const api = new IabBrowserUseApi(() => null, undefined, {
 
 assert.equal(api.ping(), "pong");
 assert.deepEqual(api.requireBrowserUseSession({ conversationId: "c-1", routeKey: "r-1" }), { conversationId: "c-1" });
+assert.deepEqual(api.getBrowserUseSession({ conversationId: "fallback", session_id: "c-1", routeKey: "r-1" }), { conversationId: "c-1" });
+assert.throws(() => api.getBrowserUseSession({ conversationId: "", routeKey: "r-3" }), /Missing required browser session_id/);
 assert.throws(() => api.requireBrowserUseSession({ conversationId: "c-2", routeKey: "r-2" }), /No ChatGPT browser route/);
 assert.deepEqual(api.getMetadata({ conversationId: "c-1" }), {
   codexAppBuildFlavor: "test",
@@ -20,4 +22,4 @@ assert.deepEqual(api.getRequestSafeFields({ conversationId: "c-1" }, { turn_id: 
   request: "getTabs",
   turnId: "t-1",
 });
-console.log("main IAB API boundary: 5 assertions passed");
+console.log("main IAB API boundary: 7 assertions passed");

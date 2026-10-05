@@ -95,6 +95,7 @@ export interface IabTabSnapshot {
 /** browser-use 会话路由键。 */
 export interface IabSessionRoute {
   conversationId: string;
+  session_id?: string;
   routeKey: string;
 }
 
