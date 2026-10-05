@@ -1764,6 +1764,8 @@ typecheck 均通过。
 2026-10-06 A5 T5 分类批次：app-primary `of/PF`（源码 16075-16087）已登记为 `preserved-coupled`。该 helper 通过 `window.dispatchEvent` 发出带 submission kind 与 onSubmitAvailability callback capture 的 `CustomEvent` 并返回捕获状态，事件总线副作用与 callback ownership 和生成 surface 耦合，未伪造 semantic 抽取。Manifest app-primary unreviewed 由 601 降至 600。
 
 2026-10-06 A5 T5 分类批次：app-primary `lf/FF`（源码 16092-16100）已登记为 `preserved-coupled`。该 helper 注册按 conversationId/availabilityChanged 过滤的 window listener，并返回 removeEventListener teardown，注册与清理生命周期和生成 event surface 耦合，未伪造 semantic 抽取。Manifest app-primary unreviewed 由 600 降至 599。
+
+2026-10-06 A5 T5 分类批次：app-primary `gi/H0`（源码 78323-78330）已登记为 `preserved-coupled`。该 helper 解析 DOM 节点并调用 scrollIntoView/focus，依赖生成的 w9e locator 与浏览器焦点生命周期，未伪造 semantic 抽取。Manifest app-primary unreviewed 由 599 降至 598。
 2026-10-06 A5 逐段复核：app-shared 导出 `$0`（source `$b`，32365-32367）确认是生成 motion-value runtime 构造器；其对象构造、dependents/listeners 与相邻动画 bootstrap 共用生命周期，登记为 `preserved-coupled`，不抽取独立 facade。
 2026-10-06 A5 逐段复核：app-shared 导出 `$1`（source `$S`，81015-81018）确认是生成 icon registry 的 document-badge lazy initializer；其共享注册、memoized bootstrap 与资产生命周期均由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `$2`（source `Hg`，28961-28975）确认由共享 intl bootstrap 初始化，组合 locale/message cache、rich-text normalization 与 formatter context；其 provider/cache 生命周期耦合 generated surface，登记为 `preserved-coupled`。
