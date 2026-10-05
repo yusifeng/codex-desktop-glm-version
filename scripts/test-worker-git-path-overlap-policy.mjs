@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { normalizeGitPath, pathsOverlap } = require("../app/.vite/build/worker/git-path-overlap-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+eq(normalizeGitPath("C:\\repo\\"), "C:/repo");
+eq(pathsOverlap("/repo", ["src"], ["/repo/src/a.ts"]), true);
+eq(pathsOverlap("/repo", ["src/app"], ["/repo/src/a.ts"]), false);
+eq(pathsOverlap("/repo", ["src"], ["/repo/src"]), true);
+eq(pathsOverlap("/repo", ["src"], null), true);
+eq(pathsOverlap("/repo", "src", ["/repo/a"]), true);
+console.log(`${n} worker path overlap policy assertions passed`);
