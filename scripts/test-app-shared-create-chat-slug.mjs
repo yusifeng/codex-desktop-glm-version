@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/create-chat-slug.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { createChatSlug } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+assert.equal(createChatSlug("Fix the broken renderer build"), "fix-the-broken-renderer-build");
+assert.equal(createChatSlug({ prompt: "one two three four five six seven" }), "one-two-three-four-five-six");
+assert.equal(createChatSlug({ directoryName: "My Project/2026" }), "my-project-2026");
+assert.equal(createChatSlug("!!!"), "new-chat");
+console.log("app-shared create chat slug: 4 assertions passed");

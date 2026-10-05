@@ -1713,3 +1713,5 @@ typecheck 均通过。
 2026-10-05 A5 T5 继续批次：app-primary 的终端命令 token 清理策略（移除空白与固定 shell 特殊字符集合）已迁移至 `src/renderer/app-primary/runtime/strip-terminal-command-token.ts`；新增 `scripts/test-app-primary-strip-terminal-command-token.mjs` 覆盖 3 项 focused assertions，并登记 `cp/fN` 源码 11809-11813 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
 2026-10-05 A5 T5 继续批次：app-shared 的 model slug 查找策略已迁移至 `src/renderer/app-shared/runtime/find-model-by-slug.ts`；新增 `scripts/test-app-shared-find-model-by-slug.mjs` 覆盖 3 项 focused assertions，并登记 `FY/QL` 源码 60531-60533 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-05 A5 T5 继续批次：app-shared 的新会话 slug formatter 已迁移至 `src/renderer/app-shared/runtime/create-chat-slug.ts`；新增 `scripts/test-app-shared-create-chat-slug.mjs` 覆盖 4 项 focused assertions，并登记 `AV/cUe` 源码 66886-66894 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
