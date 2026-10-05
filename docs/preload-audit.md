@@ -665,3 +665,11 @@ listener 注册与挂载订阅，但队列独立维护 mounted/disposed 状态�
 dispose 后隔离，避免异步 host 消息在 runtime 销毁后重新注入。由
 `scripts/test-preload-annotation-preload-message-queue.mjs` 覆盖覆盖写入、editor 合并、
 一次性重放、prepareMount 与销毁后抑制，共 8 项 focused assertions。
+
+### 增量抽取：annotation pointer-selection teardown lifecycle
+
+批注指针选区控制器的拖拽状态与页面销毁边界已补齐至
+`src/main/browser-page-preload/annotation-pointer-selection.ts`：公开 `dispose` 现为幂等终态，
+销毁后拒绝新的 pointer down/move/up/cancel 与 selection 更新，同时保留内部重启拖拽时的临时清理。
+由 `scripts/test-preload-annotation-pointer-selection.mjs` 覆盖销毁后的调用门禁及重复 dispose，
+共 18 项 focused assertions。

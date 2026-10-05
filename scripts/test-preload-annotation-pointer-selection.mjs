@@ -46,4 +46,12 @@ const blocked = createAnnotationPointerSelection(rootHost, { onPointerModeChange
 });
 assert.equal(blocked.handlePointerDown({}, { pointerId: 4 }, { x: 0, y: 0 }, true), true);
 assert.equal(blocked.isDragging, false);
-console.log('test-preload-annotation-pointer-selection: 11 assertions passed');
+assert.equal(blocked.updatePointer({ x: 0, y: 0 }, true), false);
+blocked.dispose();
+blocked.dispose();
+assert.equal(blocked.updatePointer({ x: 0, y: 0 }, true), false);
+assert.equal(blocked.handlePointerDown({}, { pointerId: 5 }, { x: 0, y: 0 }, true), false);
+assert.equal(blocked.handlePointerMove({}, { pointerId: 5, buttons: 1, clientX: 0, clientY: 0 }), false);
+assert.equal(blocked.handlePointerUp({ isTrusted: true, pointerId: 5 }, () => { throw new Error('disposed selection callback'); }), false);
+assert.equal(blocked.handlePointerCancel({ pointerId: 5 }), false);
+console.log('test-preload-annotation-pointer-selection: 18 assertions passed');

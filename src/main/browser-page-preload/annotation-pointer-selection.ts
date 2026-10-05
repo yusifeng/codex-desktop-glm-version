@@ -14,17 +14,25 @@ type AnnotationPointerSelectionDependencies = {
 /** Coordinates pointer-driven text selection without owning React or DOM listeners. */
 function createAnnotationPointerSelection(rootHost: any, callbacks: { onPointerModeChange: (active: boolean) => void; onPointerChange: (point: any) => void; onClearHover: () => void }, deps: AnnotationPointerSelectionDependencies) {
   let drag: { pointerId: number; frameWindow: any; disposeHighlight: () => void } | null = null;
-  const dispose = () => {
+  let disposed = false;
+  const clearDrag = () => {
     drag?.disposeHighlight();
     drag = null;
   };
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    clearDrag();
+  };
   const cancel = () => {
+    if (disposed) return false;
     if (drag == null) return false;
-    dispose();
+    clearDrag();
     deps.clearSelection();
     return true;
   };
   const updatePointer = (point: any, enabled: boolean) => {
+    if (disposed) return false;
     const range = enabled && point != null ? deps.resolvePoint(point.x, point.y, rootHost, `text`) : null;
     const active = enabled && (drag != null || (range != null && deps.canStartSelection(point.x, point.y, rootHost) && !deps.isSelectionBlocked(range)));
     callbacks.onPointerModeChange(active);
@@ -43,6 +51,7 @@ function createAnnotationPointerSelection(rootHost: any, callbacks: { onPointerM
     cancel,
     disposeFrame(frameWindow: any) { if (drag?.frameWindow === frameWindow) dispose(); },
     handlePointerDown(frameWindow: any, event: any, point: any, allowSelection: boolean) {
+      if (disposed) return false;
       const range = deps.resolvePoint(point.x, point.y, rootHost, `text`);
       if (!deps.canStartSelection(point.x, point.y, rootHost)) return false;
       if (!allowSelection || deps.isSelectionBlocked(range)) {
@@ -50,13 +59,14 @@ function createAnnotationPointerSelection(rootHost: any, callbacks: { onPointerM
         return true;
       }
       deps.clearSelection();
-      dispose();
+      clearDrag();
       drag = { pointerId: event.pointerId, frameWindow, disposeHighlight: deps.createHighlight(frameWindow) ?? (() => {}) };
       updatePointer(point, true);
       deps.stopEvent(event, { preventDefault: false });
       return true;
     },
     handlePointerMove(frameWindow: any, event: any) {
+      if (disposed) return false;
       if (drag?.pointerId !== event.pointerId) return false;
       if (!(event.buttons & 1)) return cancel();
       callbacks.onPointerChange(deps.toViewportPoint(frameWindow, { x: event.clientX, y: event.clientY }));
@@ -64,14 +74,15 @@ function createAnnotationPointerSelection(rootHost: any, callbacks: { onPointerM
       return true;
     },
     handlePointerUp(event: any, onSelection: (selection: any) => void) {
+      if (disposed) return false;
       if (!event.isTrusted || drag?.pointerId !== event.pointerId) return false;
       const frameWindow = drag.frameWindow;
-      dispose();
+      clearDrag();
       deps.stopEvent(event, { preventDefault: false });
       onSelection(deps.readSelection(frameWindow));
       return true;
     },
-    handlePointerCancel(event: any) { return drag?.pointerId === event.pointerId && cancel(); },
+    handlePointerCancel(event: any) { return !disposed && drag?.pointerId === event.pointerId && cancel(); },
   };
 }
 
