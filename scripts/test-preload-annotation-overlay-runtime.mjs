@@ -198,6 +198,9 @@ hostACache.set("id", ordinaryElement);
 assert.equal(runtime.getElementCache(cacheHostA), hostACache);
 assert.equal(runtime.getElementCache(cacheHostA).get("id"), ordinaryElement);
 assert.notEqual(runtime.getElementCache(cacheHostB), hostACache);
+runtime.dispose();
+assert.equal(hostACache.size, 0);
+assert.notEqual(runtime.getElementCache(cacheHostA), hostACache);
 
 const contained = new FakeNode();
 const outside = new FakeNode();

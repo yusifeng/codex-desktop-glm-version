@@ -33,6 +33,8 @@ type AnnotationOverlayRuntimeDependencies = {
 
 function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependencies) {
   const elementCaches = new WeakMap<object, Map<any, any>>();
+  const cacheSets = new Set<Map<any, any>>();
+  let disposed = false;
 
   const ensureOverlayRoot = () => {
     const existing = deps.documentLike.getElementById(deps.rootId);
@@ -76,11 +78,20 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
     deps.samePageUrl(annotation.anchor.pageUrl, deps.windowLike.location.href);
 
   const getElementCache = (rootHost: object) => {
+    if (disposed) return new Map<any, any>();
     const existing = elementCaches.get(rootHost);
     if (existing != null) return existing;
     const cache = new Map<any, any>();
     elementCaches.set(rootHost, cache);
+    cacheSets.add(cache);
     return cache;
+  };
+
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    for (const cache of cacheSets) cache.clear();
+    cacheSets.clear();
   };
 
   const observeMutationsOutsideOverlay = (documentLike: any, rootHost: any, onChange: () => void) => {
@@ -114,6 +125,7 @@ function createAnnotationOverlayRuntime(deps: AnnotationOverlayRuntimeDependenci
     collectFlexGapOverlays: (property: string | null, editor: any, annotation: any, cache: Map<any, any>) =>
       collectAnnotationFlexGapOverlays(property, editor, annotation, cache, deps),
     getElementCache,
+    dispose,
     observeMutationsOutsideOverlay,
     resolveTextSelectionRects: (anchor: any) => resolveAnnotationSelectionRects(anchor, { anchorToViewportRect: deps.anchorToViewportRect }),
     resolveMetadataTooltipRect,

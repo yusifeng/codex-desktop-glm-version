@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation overlay runtime 的 element-cache 生命周期边界已补齐；
+新增幂等 `dispose` 清理所有 per-root cache，销毁后拒绝复用旧缓存，避免 mounted overlay
+runtime teardown 后残留元素引用。`scripts/test-preload-annotation-overlay-runtime.mjs`
+新增 dispose/reuse 回归，现覆盖 48 项 focused assertions；build check 与 focused test 已通过。
+
 2026-10-05 A2 继续批次：annotation feature lifecycle 的 policy refresh 重入边界已补齐；
 `initialize` 在同一 preload 生命周期内接收新 policy 时先完整 dispose 旧 controls registry、
 site-annotation request queue、feature observer 与 mode controller，再创建新 generation，避免
@@ -1052,5 +1057,7 @@ marker 与 selection 清理判定；`annotation-sync-state.ts` 接回该策略�
 2026-10-05 A5 继续批次：app-primary 新增 `Ah`/`ok`、`Bm`/`pA`、`Bf`/`LP`、`Bd`/`RI` 四条逐行分类证据，均判定为生成局部 bootstrap/initializer（无独立 named consumer 或 teardown 边界），登记于 `docs/renderer-hub-line-classification.json`。`scripts/test-renderer-hub-classification.mjs` reviewedCount 从 164 同步至 168；审计脚本保持 74/914 consumed、840 unconsumed。
 
 2026-10-05 A5 继续批次：app-primary 未消费导出 `Eo`/`hY` 的模式化 composer placeholder formatter 已迁移至 `src/renderer/app-primary/runtime/format-composer-placeholder.ts`；逻辑仅通过注入的 locale formatter 投影 chat/Codex/Work 文案，无 JSX、store 或生命周期副作用。新增 `scripts/test-app-primary-format-composer-placeholder.mjs` 覆盖 chat agent、Codex、Work、未知模式与空 agent 边界，共 5 项断言；兼容导出仍保留在 hub，逐行分类证据登记后 reviewedCount 从 174 提升至 175。
+
+2026-10-05 A5 继续批次：app-shared 未消费导出 `hBe`/`$U` 的合并冲突状态纯策略已迁移至 `src/renderer/app-shared/runtime/merge-conflict-state.ts`；逻辑仅规范化 `mergeable` 与 `mergeStateStatus` 并投影冲突 banner 状态，无 JSX、store 或生命周期副作用。新增 `scripts/test-renderer-merge-conflict-state.mjs` 覆盖大小写、冲突优先级、未知值与空输入共 6 项断言；兼容导出仍保留在 hub，逐行分类证据登记后 reviewedCount 从 175 提升至 176。
 
 2026-10-05 A1 增量：Git worker 请求 context 投影（root/cwd、review source 与 failure 结果判定）抽至 `src/main/worker/git-request-context-policy.ts`，由 `scripts/test-worker-git-request-context-policy.mjs` 覆盖 12 项断言；已通过 build、verify-chunks 与 typecheck。
