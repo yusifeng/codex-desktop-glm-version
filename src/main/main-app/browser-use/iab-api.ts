@@ -106,7 +106,7 @@ export interface IabSessionRoute {
 }
 
 /** CDP 事件监听器。 */
-export type CdpEventListener = (event: { method: string; params?: unknown; sessionId?: string }) => void;
+export type CdpEventListener = (event: { method: string; params?: unknown; sessionId?: string; source?: { tabId?: string; sessionId?: string; targetId?: string } }) => void;
 
 /** 页面状态监听器。 */
 export type PageStateEventListener = (event: { type: string; [key: string]: unknown }) => void;
@@ -294,6 +294,15 @@ export class IabBrowserUseApi {
   addCdpDetachListener(listener: () => void): () => void {
     this.cdpDetachListeners.add(listener);
     return () => this.cdpDetachListeners.delete(listener);
+  }
+
+  /** CDP 事件分发（原 `emitCdpEvent`，支持按 tab 过滤）。 */
+  emitCdpEvent(event: Parameters<CdpEventListener>[0]): void {
+    const tabId = event.source?.tabId;
+    for (const entry of this.cdpEventListeners) {
+      if (entry.tabIds != null && (tabId == null || !entry.tabIds.has(tabId))) continue;
+      entry.listener(event);
+    }
   }
 
   /** 页面事件监听（原 `addPageEventListener`）。 */
