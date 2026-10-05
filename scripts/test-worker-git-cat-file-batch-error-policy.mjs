@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { classifyCatFileBatchError } = require("../app/.vite/build/worker/git-cat-file-batch-error-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.deepEqual(...a)};
+eq(classifyCatFileBatchError(1,{outputLimitExceeded:true},100), {type:"error",error:{type:"too-large",limitBytes:100}});
+eq(classifyCatFileBatchError(2,{outputLimitExceeded:true,code:128},100), {type:"error",error:{type:"not-found"}});
+eq(classifyCatFileBatchError(1,{code:128},100), {type:"error",error:{type:"not-found"}});
+eq(classifyCatFileBatchError(1,{code:1},100), {type:"error",error:{type:"unknown"}});
+console.log(`${n} worker cat-file batch error policy assertions passed`);

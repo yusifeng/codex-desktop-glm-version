@@ -13,11 +13,7 @@ type CatFileDependencies = {
 
 function unknownResult() { return unknownCatFileResult(); }
 
-function defaultBatchError(requestCount: number, result: any, limitBytes: number) {
-  return result.outputLimitExceeded != null && requestCount === 1
-    ? { type: `error`, error: { type: `too-large`, limitBytes } }
-    : { type: `error`, error: { type: gitErrorType(result) } };
-}
+function defaultBatchError(requestCount: number, result: any, limitBytes: number) { return classifyCatFileBatchError(requestCount, result, limitBytes); }
 
 function parseCatFileBatch(requestCount: number, result: any, limitBytes: number) {
   const fallback = defaultBatchError(requestCount, result, limitBytes);
@@ -253,3 +249,4 @@ if (typeof module !== `undefined`)
 import { gitErrorType } from "./git-cat-file-error-policy";
 import { unknownCatFileResult } from "./git-cat-file-error-envelope-policy";
 import { splitContentLines } from "./git-cat-file-content-policy";
+import { classifyCatFileBatchError } from "./git-cat-file-batch-error-policy";

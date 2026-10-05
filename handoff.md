@@ -1708,4 +1708,6 @@ typecheck 均通过。
 
 2026-10-05 A1 T1 继续批次：Git diff header 的 combined (`diff --cc`/`diff --combined`) 与普通 `diff --git` 分流判定已迁移至 `src/main/worker/git-diff-header-policy.ts`；diff text 入口保留各类路径解析与 rename 重写。新增 `scripts/test-worker-git-diff-header-policy.mjs` 覆盖 5 项 focused assertions；原 diff-text 回归 33 项、build 与 typecheck 已通过。
 
+2026-10-05 A1 T1 继续批次：cat-file batch failure 的单请求 output-limit `too-large`、多请求/普通 Git code 错误 envelope 分类已迁移至 `src/main/worker/git-cat-file-batch-error-policy.ts`；cat-file 入口保留 batch framing、retry 与 I/O 编排。新增 `scripts/test-worker-git-cat-file-batch-error-policy.mjs` 覆盖 4 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
+
 2026-10-05 A5 T5 继续批次：app-primary 的终端命令 token 清理策略（移除空白与固定 shell 特殊字符集合）已迁移至 `src/renderer/app-primary/runtime/strip-terminal-command-token.ts`；新增 `scripts/test-app-primary-strip-terminal-command-token.mjs` 覆盖 3 项 focused assertions，并登记 `cp/fN` 源码 11809-11813 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
