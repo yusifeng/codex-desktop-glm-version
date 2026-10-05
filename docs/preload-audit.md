@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation viewport scale policy
+
+Annotation viewport scale 的 inverse-scale fallback（原 `xs`，3863-5049 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-viewport-scale.ts`；入口兼容委托保留 `null`/非正值回退
+为 1 的语义。focused test 覆盖缺省、零值与正常 scale，共 3 项；build 与 typecheck 已通过。
+
 ### 增量抽取：annotation anchor equality policy
 
 Annotation anchor 判等（原 `Fs`，3863-5049 业务工具段）的公共字段、scroll-container、

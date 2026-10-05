@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation viewport inverse-scale fallback 已迁移至
+`src/main/browser-page-preload/annotation-viewport-scale.ts`；原 `xs` 入口保留兼容委托，
+新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation anchor equality 的公共字段与 virtual/element/region/text
 判别联合比较已迁移至 `src/main/browser-page-preload/annotation-anchor-equality.ts`；原 `Fs` 入口保留
 兼容委托。新增 focused test 3 项，build 与 typecheck 已通过。

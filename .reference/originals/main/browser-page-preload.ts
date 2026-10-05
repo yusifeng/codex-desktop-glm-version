@@ -3926,7 +3926,7 @@ function bs(e) {
   return normalizeGoogleDocsText(e);
 }
 function xs(e) {
-  return e == null || e <= 0 ? 1 : 1 / e;
+  return getAnnotationInverseViewportScale(e);
 }
 function Ss(e, { viewport: t, viewportScale: n, zoomFactor: r = 1 }) {
   return projectAnnotationTooltipPosition(e, { viewport: t, viewportScale: n, zoomFactor: r });
@@ -6171,6 +6171,7 @@ var { spreadAnnotationMarkerPoints } = require("./browser-page-preload/annotatio
 var { projectAnnotationTooltipPosition } = require("./browser-page-preload/annotation-tooltip-position");
 var { areAnnotationScrollContainersEqual } = require("./browser-page-preload/annotation-scroll-container-equality");
 var { areAnnotationAnchorsEqual } = require("./browser-page-preload/annotation-anchor-equality");
+var { getAnnotationInverseViewportScale } = require("./browser-page-preload/annotation-viewport-scale");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
