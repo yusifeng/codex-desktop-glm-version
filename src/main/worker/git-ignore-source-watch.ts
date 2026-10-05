@@ -5,6 +5,8 @@
  * owns the business rules for removing stale sources, updating path sets and
  * restarting sessions when an observed ignore file changed.
  */
+import { haveSameGitIgnorePaths, shouldRestartGitIgnoreSourceWatch } from "./git-ignore-source-watch-policy";
+
 async function reconcileGitIgnoreSourceWatches(context: any, discovered: Map<string, Set<string>>) {
   const changedPaths = [...context.changedIgnoreSourcePaths];
   context.changedIgnoreSourcePaths.clear();
@@ -27,18 +29,14 @@ async function reconcileGitIgnoreSourceWatches(context: any, discovered: Map<str
   for (const [sourcePath, paths] of discovered) {
     const existing = context.ignoreSourceWatches.get(sourcePath);
     if (existing != null) {
-      const pathsChanged = existing.paths.size !== paths.size || [...paths].some((path) => !existing.paths.has(path));
+      const pathsChanged = !haveSameGitIgnorePaths(existing.paths, paths);
       if (pathsChanged) {
         changed = true;
         existing.paths.clear();
         paths.forEach((path) => existing.paths.add(path));
       }
       const pathApi = context.pathApi;
-      if (
-        pathApi != null &&
-        existing.target.retryTimer == null &&
-        changedPaths.some((path) => context.isWithinPath(pathApi, path, sourcePath))
-      ) {
+      if (shouldRestartGitIgnoreSourceWatch({ pathApi, retryTimer: existing.target.retryTimer, sourcePath, changedPaths, isWithinPath: context.isWithinPath })) {
         changed = true;
         pending.push(context.disposeSession(existing.target).then(() => context.tryStartWatchSession(existing.target, false)));
       }

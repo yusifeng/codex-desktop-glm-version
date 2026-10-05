@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git ignore-source watch 的路径集合相等判定与变更后重启门禁已迁移至
+`src/main/worker/git-ignore-source-watch-policy.ts`；runtime 仅保留 watcher 注册、会话销毁/启动
+与异步副作用编排。新增 `scripts/test-worker-git-ignore-source-watch-policy.mjs` 覆盖 6 项 focused
+assertions；focused test、verify 与 typecheck 已通过。
+
 2026-10-05 A5 继续批次：app-primary 未消费导出 `ig`（`tO`，4279--4288）的云执行不可用原因
 纯策略已迁移至 `src/renderer/app-primary/runtime/derive-cloud-unavailable-reason.ts`，hotkey
 home-page 语义源码改为直接消费；新增 `scripts/test-app-primary-derive-cloud-unavailable-reason.mjs`
