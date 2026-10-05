@@ -850,3 +850,7 @@ dispose 后隔离，避免异步 host 消息在 runtime 销毁后重新注入。
 ### 增量抽取：annotation element visibility policy
 
 Annotation element visibility 的 ancestor display/visibility/opacity gate 与 optional `checkVisibility` 判定（原 `_d`，5120-7259 业务工具段）已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；DOM/style 读取通过依赖注入。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
+### 增量抽取：annotation fixed-position policy
+
+Annotation element 的 fixed/sticky ancestor 判定（原 `Ac`）已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；owner window、body 边界、parent traversal 与 computed `position` 均通过依赖注入，`id` 入口保留兼容委托。新增 4 项 focused assertions。
