@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationOverlayObserverState } = require("../app/.vite/build/browser-page-preload/annotation-overlay-observer-state.js");
+const state = createAnnotationOverlayObserverState();
+assert.equal(state.disposed, false);
+assert.equal(state.dispose(), true);
+assert.equal(state.disposed, true);
+assert.equal(state.dispose(), false);
+console.log("test-preload-annotation-overlay-observer-state: 4 assertions passed");

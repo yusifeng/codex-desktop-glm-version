@@ -13,17 +13,18 @@ function observeAnnotationMutationsOutsideOverlay(
   onChange: () => void,
   deps: AnnotationOverlayObserverDependencies,
 ): () => void {
-  let disposed = false;
+  const lifecycle = createAnnotationOverlayObserverState();
   const observer = new deps.mutationObserverConstructor((records) => {
-    if (disposed) return;
+    if (lifecycle.disposed) return;
     const onlyOverlayMutations = records.length > 0 && records.every(
       (record) => record.target instanceof deps.nodeConstructor && overlayRoot.contains(record.target),
     );
     if (!onlyOverlayMutations) onChange();
   });
   observer.observe(documentLike.documentElement, deps.mutationObserverOptions);
-  return () => { if (!disposed) { disposed = true; observer.disconnect(); } };
+  return () => { if (lifecycle.dispose()) observer.disconnect(); };
 }
 
 export { observeAnnotationMutationsOutsideOverlay };
 if (typeof module !== `undefined`) module.exports = { observeAnnotationMutationsOutsideOverlay };
+import { createAnnotationOverlayObserverState } from "./annotation-overlay-observer-state";
