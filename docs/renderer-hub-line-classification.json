@@ -2475,5 +2475,41 @@
     "classification": "generated-local-registry-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The exported DK/eGe declarations are initialized by OK alongside registry maps for the adjacent generated browser surface; no independent renderer consumer or teardown owner exists."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Mu",
+    "startLine": 21700,
+    "endLine": 21708,
+    "classification": "generated-local-registry-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported yB declaration is initialized by adjacent bB bootstrap together with browser/library registry dependencies and remains local generated wiring without an independent renderer consumer."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ql",
+    "startLine": 23252,
+    "endLine": 23258,
+    "classification": "generated-local-signal-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported dV signal declaration is initialized by fV as a generated nullable state atom for the adjacent panel surface; no standalone renderer owner or teardown contract exists."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Cn",
+    "startLine": 94182,
+    "endLine": 94188,
+    "classification": "generated-local-registry-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported F6/I6 declarations are populated by L6 bootstrap for adjacent review-pane registries and are not independently consumed by renderer modules."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Fa",
+    "startLine": 57320,
+    "endLine": 57328,
+    "classification": "generated-local-style-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported tQ declaration is a generated theme CSS variable map initialized by nQ and retained as local style glue for the adjacent surface."
   }
 ]
