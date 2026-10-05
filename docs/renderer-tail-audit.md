@@ -648,3 +648,10 @@ source symbol 与分类由 `scripts/audit-renderer-hub-classification.mjs` 校�
 或生命周期副作用。该边界已迁移至 `src/renderer/app-primary/runtime/message-status.ts`，
 由 `scripts/test-renderer-message-status.mjs` 覆盖 6 项输入断言；由于当前 renderer
 尚无独立 named consumer，`Ed` 仍登记为未消费导出，避免伪造消费边。
+
+本轮从 app-primary 未消费区迁出收件人字段归一化 helper：`YMe`（公开别名 `Ad`，
+17541--17551 行）现由 `src/renderer/app-primary/runtime/normalize-recipient-fields.ts`
+承载。该语义模块保留 recipient/cc/bcc 拆分、联系人名称投影、非法地址标记及首个 Bcc
+前缀行为，不引入聚合 hub 的初始化副作用；`scripts/test-app-primary-normalize-recipient-fields.mjs`
+覆盖名称投影、非法地址、Bcc 前缀和空输入边界。逐行分类证据已登记，reviewedCount
+由 158 提升至 159。

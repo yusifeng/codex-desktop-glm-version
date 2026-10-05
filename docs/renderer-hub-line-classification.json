@@ -1583,5 +1583,15 @@
     "classification": "generated-local-slash-menu-bootstrap",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer wires slash-menu state, placeholder markers, and selection predicates for the local editor route, preserving its coupled lifecycle in the hub."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ad",
+    "sourceSymbol": "YMe",
+    "startLine": 17541,
+    "endLine": 17551,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "Pure recipient/cc/bcc normalization with contact-name projection and Bcc prefixing; extracted as a semantic payload helper without hub lifecycle or UI registration side effects."
   }
 ]
