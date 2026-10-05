@@ -2241,5 +2241,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/read-tab-state.ts",
     "evidence": "The tab-state lookup safely avoids registry reads until both tab and browser identities are present, then performs one deterministic keyed read without JSX, mutation, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Us",
+    "sourceSymbol": "qWe",
+    "startLine": 36793,
+    "endLine": 36795,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/has-tab-state.ts",
+    "evidence": "The pure tab-state presence predicate converts the adjacent lookup result into a boolean without exposing registry internals or introducing JSX, mutation, network, or lifecycle effects. It is covered by a focused two-case runtime test."
   }
 ]
