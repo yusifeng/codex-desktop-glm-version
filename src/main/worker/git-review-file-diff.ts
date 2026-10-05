@@ -11,6 +11,11 @@ type ReviewFileDiffDependencies = {
   ) => Promise<any>;
 };
 
+import {
+  buildUntrackedSubmoduleDiff,
+  buildUntrackedSymlinkDiff,
+} from './git-review-file-diff-policy';
+
 function getGitBlobDiff(
   reviewSnapshot: any,
   oldRef: string,
@@ -125,12 +130,9 @@ function getUntrackedWorkingTreeDiff(
             path,
             dependencies,
           );
-          const oldPath = dependencies.quoteGitDiffPath(`a/${path}`);
-          const newPath = dependencies.quoteGitDiffPath(`b/${path}`);
-          const noNewline = target.endsWith(`\n`)
-            ? ``
-            : `\\ No newline at end of file\n`;
-          const unifiedDiff = `diff --git ${oldPath} ${newPath}\nnew file mode 120000\nindex 0000000..${oid.slice(0, 7)}\n--- /dev/null\n+++ ${newPath}\n@@ -0,0 +1 @@\n+${target}${target.endsWith(`\n`) ? `` : `\n`}${noNewline}`;
+          const unifiedDiff = buildUntrackedSymlinkDiff(
+            path, target, oid, dependencies.quoteGitDiffPath,
+          );
           return {
             type: `success`,
             unifiedDiff,
@@ -147,9 +149,9 @@ function getUntrackedWorkingTreeDiff(
           if (!result.success)
             return { type: `error`, error: { type: `unknown` } };
           const sha = result.stdout.trim();
-          const oldPath = dependencies.quoteGitDiffPath(`a/${path}`);
-          const newPath = dependencies.quoteGitDiffPath(`b/${path}`);
-          const unifiedDiff = `diff --git ${oldPath} ${newPath}\nnew file mode 160000\nindex 0000000..${sha.slice(0, 7)}\n--- /dev/null\n+++ ${newPath}\n@@ -0,0 +1 @@\n+Subproject commit ${sha}\n`;
+          const unifiedDiff = buildUntrackedSubmoduleDiff(
+            path, sha, dependencies.quoteGitDiffPath,
+          );
           return {
             type: `success`,
             unifiedDiff,

@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review file diff 的未跟踪 symlink/submodule unified-diff 格式化已迁移至 `src/main/worker/git-review-file-diff-policy.ts`；file-diff runtime 保留 stat/process/Git I/O、snapshot 与 query 编排。新增 `scripts/test-worker-git-review-file-diff-policy.mjs` 覆盖 5 项 focused assertions；原 file-diff 回归 33 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation control handle 的 terminal disposed 状态已抽至
+`src/main/browser-page-preload/annotation-control-handle-state.ts`；handle 仅保留 payload
+校验/emit 副作用，重复 dispose 与销毁后 update 均受状态门禁。新增
+`scripts/test-preload-annotation-control-handle-state.mjs` 覆盖 4 项状态断言；原 handle 回归
+8 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review metadata finalize 的 untracked file/raw entry/stat projection 已迁移至 `src/main/worker/git-review-metadata-finalize-policy.ts`；finalize runtime 保留 working-tree metadata 查询、dedupe、revision attach 与排序编排。新增 `scripts/test-worker-git-review-metadata-finalize-policy.mjs` 覆盖 2 项 focused assertions；原 finalize 回归 25 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation mode controller 的 active/disposed 状态已抽至
