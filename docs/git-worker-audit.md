@@ -446,10 +446,10 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
 |---|---|---|---|
 | 1-34,560 | `vendored` | OpenTelemetry API/SDK、instrumentation 和 Sentry 实现；可见 `@opentelemetry/api` 版本 `1.9.0`（约 159 行）、`@sentry/opentelemetry`（约 14,148 行）及多个 `PACKAGE_NAME` instrumentation 模块 | 保留 vendor；不要将 telemetry SDK 重命名成 git 业务模块 |
 | 34,561-38,229 | `vendored` | Zod 实现及 JSON Schema 生成器；导出集合包含 `ZodType`、`ZodObject`、`ZodUnion` 等（约 38,000 行） | 保留第三方 schema runtime；业务 schema 仅在后续区间抽取 |
-| 38,230-43,985 | `business` | Codex worker 使用的浏览器、host、设置和消息 schema；包含 browser family 配置、`runCodexInWindowsSubsystemForLinux`、git 设置键以及 `worker` 请求数据约束 | 这是首个明确业务段，应拆为 `worker/config`、`worker/protocol` 或等价模块；保留对 Zod runtime 的窄依赖 |
+| 38,230-43,985 | `preserved-coupled` | 38,230 起仍与前置 Zod runtime 的 schema builder 紧邻；约 43,300-43,985 的 deep-link/auth/browser-tab/runtime-bundle manifest schema 只有原 worker 内声明，当前 `src/main/worker` 没有对应消费入口。 | 暂不抽取，避免制造未接回的 facade；待真实 request handler 消费点出现后按 schema 子组迁移，并保留对 Zod runtime 的窄依赖。 |
 | 43,986-46,600 | `generated-infra` | `globalThis[Symbol(\`workers-module\`)]`、`RpcTarget`、session/stub、Readable/WritableStream RPC hook；职责是跨线程对象序列化和取消，不包含 git 操作 | 作为 RPC 基础设施登记保留或单独迁移；不可把 `RpcTarget` 等空实现替换为 identity |
 | 46,601-47,121 | `vendored` | `ipaddr.js` 原文特征：`ipaddr: cannot match CIDR`、`IPv4`/`IPv6`、`subnetMatch`、CIDR 解析 | 保留 vendor，行 46,643-47,111 是完整 ipaddr 实现 |
-| 47,122-47,584 | `business` | WSL/Codex home 解析和 Windows 命令执行；明确调用 `wslpath`、`wsl.exe --status/--list`，日志含 `[execWindowsCommand]` 与 `[wsl]` | 可抽为 `worker/platform/wsl.ts`；保留 Windows/WSL 错误和日志语义 |
+| 47,122-47,584 | `preserved-coupled` | WSL/Codex home 解析与 Windows 命令执行混合，明确调用 `wslpath`、`wsl.exe --status/--list`，并共享 `[execWindowsCommand]`/`[wsl]` 日志与错误路径。 | 暂不抽取；现有 `src/main/worker/host-path-policy.ts` 仅覆盖路径 predicate，不能替代 exec、错误和日志生命周期。待 platform command owner 明确后再迁移。 |
 | 47,585-48,151 | `vendored` | TOML lexer/parser：`Invalid TOML document`、转义、数组/表、控制字符和嵌套深度检查 | 保留 parser runtime；业务配置读取只能依赖其公开入口 |
 | 48,152-49,999 | `business` | SQLite migration 与 host/automation 数据模型；包含 `automations` 表、`rrule` 默认值、`host_kind IN ('local','ssh','wsl','remote-control','chatgpt')` 等领域值 | 应抽为 `worker/state` 或复用现有 shared SQL 模块；迁移 SQL 必须逐条保留 |
 | 50,000-52,899 | `vendored` | RFC 5545 recurrence 实现：`RRule`、`rruleset`、`DTSTART`、`FREQ`、`BYDAY`、`UNTIL` 等完整库符号 | 保留 recurrence vendor；上一区间的 automation 代码只调用适配层 |
@@ -506,14 +506,19 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
 本地 Git 可用性和 in-flight 跟踪策略表；`rbe` 入口保留生成实现作为对照，行为由 worker query utility
 接管并由 27 项断言覆盖。Git manager/watch/session
 主路由仍待继续拆分。
-完成 T1 后应改成分段登记：
+`scripts/chunk-manifest.mjs` 当前只支持整 chunk 的 `PRESERVED` Map，不支持按行号登记；因此以下
+区间先在本审计中登记为 `preserved-coupled`，不能伪装成 chunk manifest 的独立分段：
+
+- `preserved-coupled`: 38,230-43,985（Zod/跨入口 schema、无当前消费入口）、47,122-47,584（WSL exec/logging coupling）；
+
+完成 T1 后应改成分段登记（若 chunk manifest 增加分段机制）：
 
 - `vendor`: 1-34,560、34,561-38,229、46,601-47,121、47,585-48,151、
   50,000-52,899、52,900-53,199、54,101-55,350、56,421-61,150、
   85,966-86,130；
 - `generated-infra`: 43,986-46,600；
 - `worker-entry`: 90,661-90,836；
-- 其余区间必须由语义模块覆盖，不能继续以整文件 preserve 规避审计。
+- 其余已确认 business 区间必须由语义模块覆盖，不能继续以整文件 preserve 规避审计；上述两段只有在消费入口与 owner 明确后再转 semantic。
 
 本报告只做审计和边界确定，不宣称 T1 语义化已完成。下一步应以第一个
 `xDe`/入口协议闭环为基线，迁移后运行 `verify-chunks`、`typecheck`，再根据
