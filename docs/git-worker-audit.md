@@ -984,6 +984,9 @@ Live-query shared run 的最终 consumer abort 门禁已迁移至 `shouldAbortSh
 Live-query shared run 的 aborted/reuse 判定已迁移至 `canReuseSharedRun`；runtime 仅负责 map
 生命周期与异步执行，由 4 项 focused assertions 覆盖缺失、默认、活跃与已 abort 状态。
 
+Shell argument 的安全 token 判定已迁移为 `isShellSafeToken`，quote/join runtime 仅保留编码
+与拼接；新增 4 项 focused assertions 覆盖合法、空值、空格和 quote 兼容边界。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至

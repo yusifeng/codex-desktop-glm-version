@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation anchor `bd` clamp helper 已复用
+`annotation-surface-geometry.clampAnnotationCoordinate`，删除 preload 重复实现；geometry
+regression、build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation anchor point projection（比例、零尺寸中心回退、clamp）
 已迁移至 `src/main/browser-page-preload/annotation-anchor-point-projection.ts`；原 `hd` 入口保留
 兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
@@ -86,6 +90,11 @@ schema parse 通过注入隔离，新增 focused test 3 项断言，typecheck �
 2026-10-06 A5 继续批次：app-primary 未消费导出 `rm`（内部 `kj`，源码 7502--7504）的 connector ID
 映射查找纯策略已迁移至 `src/renderer/app-primary/runtime/lookup-connector-id.ts`；新增 focused test
 2 项断言，typecheck 与 focused test 已通过。
+
+2026-10-06 A5 继续批次：app-primary 未消费导出 `um`（内部 `aj`，源码 6847--6855）的 keyboard
+shortcut 文案纯策略已迁移至 `src/renderer/app-primary/runtime/format-keyboard-shortcut.ts`；新增
+`scripts/test-app-primary-format-keyboard-shortcut.mjs` 覆盖 3 项 focused assertions，typecheck 与
+focused test 已通过。
 
 2026-10-06 A5 继续批次：app-primary 未消费导出 `Sd`（内部 `nNe`，源码 11981--11983）的消息发送
 完成判定纯策略已迁移至 `src/renderer/app-primary/runtime/is-sent-message.ts`；新增
@@ -1985,6 +1994,8 @@ typecheck 均通过。
 2026-10-06 A1 T1 继续批次：Live-query shared run 的最终 consumer abort 门禁已迁移至 `shouldAbortSharedRun`；runtime 仅负责 AbortController 副作用。新增 `scripts/test-worker-git-live-query-abort-policy.mjs` 覆盖 4 项 focused assertions。
 
 2026-10-06 A1 T1 继续批次：Live-query shared run 的 aborted/reuse 判定已迁移至 `canReuseSharedRun`；runtime 仅负责 map 生命周期与异步执行。新增 `scripts/test-worker-git-live-query-reuse-policy.mjs` 覆盖 4 项 focused assertions。
+
+2026-10-06 A1 T1 继续批次：Shell argument 的安全 token 判定已迁移为 `isShellSafeToken`；quote/join runtime 仅保留编码与拼接。新增 `scripts/test-worker-shell-safe-token.mjs` 覆盖 4 项 focused assertions。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。

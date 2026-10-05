@@ -1,7 +1,10 @@
+export function isShellSafeToken(value: string): boolean {
+  return value !== `` && /^[\w@%\-+=:,./]+$/.test(value);
+}
 export function quoteShellArg(value: string): string {
   return value === ``
     ? `''`
-    : /[^\w@%\-+=:,./]/.test(value)
+    : !isShellSafeToken(value)
       ? (`'${value.replace(/('+)/g, `\"$1\"`)}'`).replace(/^''|''$/g, ``)
       : value;
 }
@@ -11,4 +14,4 @@ export function joinShellArgs(args: string[]): string {
   return args.map(quoteShellArg).join(` `);
 }
 
-if (typeof module !== `undefined`) module.exports = { quoteShellArg, joinShellArgs };
+if (typeof module !== `undefined`) module.exports = { isShellSafeToken, quoteShellArg, joinShellArgs };
