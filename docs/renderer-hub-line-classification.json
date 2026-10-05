@@ -2511,5 +2511,32 @@
     "classification": "generated-local-style-helper",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The exported tQ declaration is a generated theme CSS variable map initialized by nQ and retained as local style glue for the adjacent surface."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ka",
+    "startLine": 52681,
+    "endLine": 52690,
+    "classification": "generated-local-registry-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported WX/GX/KX declarations are assigned by qX bootstrap to the adjacent generated command registry and remain aggregate-local state without an independent renderer consumer."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "N",
+    "startLine": 113806,
+    "endLine": 113814,
+    "classification": "generated-local-registry-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported Y7 declaration is populated by X7 bootstrap with generated async registry state for the adjacent surface; no standalone renderer owner or teardown boundary exists."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Hu",
+    "startLine": 18965,
+    "endLine": 18974,
+    "classification": "generated-local-registry-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The exported UR/WR/GR/KR/qR/JR/YR/XR declarations are populated by ZR bootstrap for adjacent browser state registries and remain generated local wiring."
   }
 ]
