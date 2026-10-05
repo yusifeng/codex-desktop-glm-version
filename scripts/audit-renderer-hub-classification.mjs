@@ -54,7 +54,9 @@ function readExports(hub) {
   const source = fs.readFileSync(path.join(ROOT, "src/webview/assets", HUBS[hub]), "utf8");
   const start = Math.max(source.lastIndexOf("export{"), source.lastIndexOf("export {"));
   const aliases = new Set();
-  for (const match of source.slice(start).matchAll(/\b([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)\b/g)) {
+  // `$` is a valid first character for generated ESM aliases; `\b` cannot
+  // start a word at `$`, so use an identifier-aware left boundary instead.
+  for (const match of source.slice(start).matchAll(/(?<![A-Za-z0-9_$])([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)(?![A-Za-z0-9_$])/g)) {
     // The right-hand token is the public ESM export alias consumed by renderer.
     aliases.add(match[2]);
   }
