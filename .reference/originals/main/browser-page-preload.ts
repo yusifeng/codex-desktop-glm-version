@@ -3994,7 +3994,7 @@ function js(e) {
     .toUpperCase();
 } */
 function Ms(e, t) {
-  return { x: e.x * t, y: e.y * t, width: e.width * t, height: e.height * t };
+  return scaleAnnotationRect(e, t);
 }
 function Ns(e, t) {
   return areAnnotationScrollContainersEqual(e, t);

@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation rect scaling reuse
+
+Annotation tooltip/anchor 的 rect scaling helper（原 `Ms`，3863-5049 业务工具段）已接回
+既有 `annotation-surface-geometry.ts` 的 `scaleAnnotationRect` 纯策略；preload 入口仅保留
+兼容委托，避免重复实现。现有 geometry focused regression 覆盖 scale 的坐标与尺寸投影，
+build 与 typecheck 已通过。
+
 ### 增量抽取：annotation scroll-container equality policy
 
 Annotation anchor scroll-container 快照相等性判定（原 `Ns`，3863-5049 业务工具段）已迁移至
