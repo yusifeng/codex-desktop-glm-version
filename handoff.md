@@ -1,5 +1,17 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation design color normalization（hex/rgb/rgba 解析、
+百分比通道、通道裁剪与大写输出）已从 preload business helper 抽取至
+`src/main/browser-page-preload/annotation-color-policy.ts`；原 `ws` 入口保留兼容委托，
+未知颜色文本仍原样返回。新增 `scripts/test-preload-annotation-color-policy.mjs` 覆盖 5 项
+focused assertions；annotation runtime 45 项、build 与 typecheck 已通过。
+
+2026-10-06 A5 继续批次：app-primary 未消费导出 `Pd`（内部 `jI`，源码 11830--11841）的联系人
+recipient/cc/bcc 规范化纯策略已迁移至 `src/renderer/app-primary/runtime/normalize-recipient-contacts.ts`；
+结构化联系人校验与 legacy 分隔字段回退解析均无 JSX、store 或生命周期副作用。新增
+`scripts/test-app-primary-normalize-recipient-contacts.mjs` 覆盖 3 项 focused assertions；manifest
+unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过。
+
 2026-10-05 构建/启动回归修复：main-app transform-only 输出统一补齐 Node ESM 的 `.js` 相对导入，并将
 `@chunk/*` 改写为实际 chunk 相对路径；bootstrap vendor 兼容导出改用稳定局部绑定，补回 preserved main
 对 `bootstrap/protocol/app-protocol.js` 的历史路径 facade。已用临时独立 Electron profile 实测主窗口 frame
