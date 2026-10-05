@@ -34,6 +34,12 @@ function createAnnotationFeatureLifecycle(deps: AnnotationFeatureLifecycleDepend
   };
 
   const initialize = (policy: any) => {
+    // Host policy can be refreshed while the preload remains mounted. Tear
+    // down the previous feature graph first so listeners/registries from the
+    // old capability set cannot leak into the new generation.
+    if (controlsRegistry != null || siteAnnotationRequests != null || featureObserver != null || modeControllerDispose != null) {
+      dispose();
+    }
     deps.setFeatureApiAvailable(policy.enabled);
     deps.setPermissionGranted(policy.siteAnnotationPermissionGranted);
     if (!policy.enabled) return;

@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation feature lifecycle 的 policy refresh 重入边界已补齐；
+`initialize` 在同一 preload 生命周期内接收新 policy 时先完整 dispose 旧 controls registry、
+site-annotation request queue、feature observer 与 mode controller，再创建新 generation，避免
+跨 policy 的 listener/状态泄漏。`scripts/test-preload-annotation-feature-lifecycle.mjs`
+新增 refresh/reinitialization 回归，共 15 项 focused assertions；已通过 build 与 typecheck。
+
 2026-10-05 A1 继续批次：Git file content 的仓库越界判定与 `git show` object ref
 构造已迁移至 `src/main/worker/git-file-content-policy.ts`；读取入口仅保留仓库、Git
 与 MIME I/O 编排，新增 `scripts/test-worker-git-file-content-policy.mjs` 覆盖 8 项
