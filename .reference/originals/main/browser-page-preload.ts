@@ -5794,23 +5794,17 @@ function ad(e, t, n, r) {
       };
 }
 function od(e, t, n, r) {
-  let i =
-      n &&
-      window.top === window &&
-      e.ownerDocument === document &&
-      e.namespaceURI === `http://www.w3.org/1999/xhtml` &&
-      !rc(e) &&
-      cd(e) != null,
-    a,
-    o;
-  return (
-    i &&
-      ((a = r),
-      e.hasAttribute(`oai-annotatable`) &&
-        ((o = Xo(e.getAttribute(`oai-annotatable`))),
-        (a ??= Qo(e.getAttribute(`oai-annotation-metadata`))))),
-    { ...t, elementMetadata: a, elementName: o }
-  );
+  return projectAnnotationElementMetadataAttributes(e, t, n, r, {
+    isTopWindow: () => window.top === window,
+    isDocumentRoot: (element) => element.ownerDocument === document,
+    isHtmlElement: (element) => element.namespaceURI === `http://www.w3.org/1999/xhtml`,
+    isExcluded: (element) => rc(element),
+    hasVisibleRect: (element) => cd(element) != null,
+    hasAttribute: (element, name) => element.hasAttribute(name),
+    getAttribute: (element, name) => element.getAttribute(name),
+    parseMetadata: (value) => Qo(value),
+    parseName: (value) => Xo(value),
+  });
 }
 function sd(e, t, n) {
   if (e.kind !== `element`) return null;
@@ -6135,6 +6129,7 @@ var { projectAnnotationAccessibleLabel } = require("./browser-page-preload/annot
 var { projectAnnotationNearbyText } = require("./browser-page-preload/annotation-nearby-text-policy");
 var { projectAnnotationElementPath } = require("./browser-page-preload/annotation-element-path-policy");
 var { projectAnnotationElementMetadata } = require("./browser-page-preload/annotation-element-metadata-projection");
+var { projectAnnotationElementMetadataAttributes } = require("./browser-page-preload/annotation-element-metadata-attributes");
 var { isAnnotationElementVisibleByPolicy } = require("./browser-page-preload/annotation-element-visibility-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");

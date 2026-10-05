@@ -854,3 +854,7 @@ Annotation element visibility 的 ancestor display/visibility/opacity gate 与 o
 ### 增量抽取：annotation fixed-position policy
 
 Annotation element 的 fixed/sticky ancestor 判定（原 `Ac`）已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；owner window、body 边界、parent traversal 与 computed `position` 均通过依赖注入，`id` 入口保留兼容委托。新增 4 项 focused assertions。
+
+### 增量抽取：annotation element metadata attributes
+
+Annotation element 的 top-frame/document-root/HTML eligibility 与 `oai-annotatable`、`oai-annotation-metadata` 属性 projection（原 `od`）已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；入口仅注入 DOM eligibility、rect 与 attribute parsers。新增 3 项 focused assertions。

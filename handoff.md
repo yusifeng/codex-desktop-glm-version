@@ -2120,3 +2120,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 worker/main consumer 复核：确认当前 bundle 的 entry-dispatcher、snapshot-read、core/node request dispatch、shell quoting 与 open-target policy 均有真实 `worker.ts` require 接回；live-query run 与 host-handoff progress 由对应 runtime 消费且有回归。未发现未消费 helper，本轮无新增 facade。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。
