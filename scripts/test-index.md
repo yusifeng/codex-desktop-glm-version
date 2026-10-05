@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 929.
+Total scripts: 930.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -12,6 +12,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-review-section-policy.mjs`](./test-worker-git-review-section-policy.mjs)
 - [`test-worker-git-review-working-tree-metadata-policy.mjs`](./test-worker-git-review-working-tree-metadata-policy.mjs)
 - [`test-worker-github-pull-request-summary-policy.mjs`](./test-worker-github-pull-request-summary-policy.mjs)
+- [`test-worker-github-pull-request-summary-query.mjs`](./test-worker-github-pull-request-summary-query.mjs)
 - [`test-worker-github-pull-request-revision-policy.mjs`](./test-worker-github-pull-request-revision-policy.mjs)
 - [`test-worker-github-pull-request-board-policy.mjs`](./test-worker-github-pull-request-board-policy.mjs)
 
@@ -19,6 +20,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-sync-transition.mjs`](./test-preload-annotation-sync-transition.mjs)
 - [`test-preload-annotation-pagehide.mjs`](./test-preload-annotation-pagehide.mjs)
 - [`test-preload-annotation-preload-lifecycle.mjs`](./test-preload-annotation-preload-lifecycle.mjs)
+- [`test-preload-annotation-preload-state.mjs`](./test-preload-annotation-preload-state.mjs)
 - [`test-preload-annotation-permission-controller.mjs`](./test-preload-annotation-permission-controller.mjs)
 
 - [`test-worker-git-host-handoff-progress.mjs`](./test-worker-git-host-handoff-progress.mjs)

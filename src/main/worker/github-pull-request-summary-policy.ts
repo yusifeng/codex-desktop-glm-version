@@ -2,6 +2,18 @@ type PullRequestIdentity = { owner: string; repository: string; number: number }
 
 type PullRequestReader = { host: any; signal?: AbortSignal };
 
+/** Builds the paginated GraphQL query used by the summary batcher. */
+function buildPullRequestSummaryQuery(
+  pages: Array<{ pullRequest: PullRequestIdentity; index: number; cursor: string | null }>,
+): string {
+  return `query { viewer { login } ${pages
+    .map(
+      ({ pullRequest, index, cursor }) =>
+        `p${index}: repository(owner:${JSON.stringify(pullRequest.owner)},name:${JSON.stringify(pullRequest.repository)}) { pullRequest(number:${pullRequest.number}) { number url title baseRefName headRefName state isDraft mergeable mergeStateStatus headRefOid headRepository { url } commits(last:1) { nodes { commit { oid statusCheckRollup { contexts(first:100,after:${JSON.stringify(cursor)}) { nodes { __typename ... on CheckRun { name status conclusion startedAt completedAt detailsUrl checkSuite { workflowRun { event workflow { name } } } } ... on StatusContext { context state createdAt description targetUrl } } pageInfo { hasNextPage endCursor } } } } } } } }`,
+    )
+    .join(` `)} }`;
+}
+
 function getPullRequestSummaryKey(pullRequest: PullRequestIdentity): string {
   return JSON.stringify([
     pullRequest.owner.toLowerCase(),
@@ -29,6 +41,7 @@ function hasPendingPullRequestChecks(summary: { ciStatus: string; checks: Array<
 }
 
 export {
+  buildPullRequestSummaryQuery,
   getActivePullRequestReaders,
   getPullRequestSummaryKey,
   getPullRequestSummaryState,
@@ -37,6 +50,7 @@ export {
 
 if (typeof module !== `undefined`)
   module.exports = {
+    buildPullRequestSummaryQuery,
     getActivePullRequestReaders,
     getPullRequestSummaryKey,
     getPullRequestSummaryState,

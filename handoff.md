@@ -1,5 +1,16 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：GitHub pull-request summary 的分页 GraphQL 查询构造已迁移至
+`src/main/worker/github-pull-request-summary-policy.ts`；summary batcher 仅保留请求/分页编排，
+新增 `scripts/test-worker-github-pull-request-summary-query.mjs` 覆盖多仓库、游标与 JSON 编码边界，
+共 8 项 focused assertions；已通过 build、verify-chunks 与 typecheck。
+
+2026-10-05 A2 继续批次：annotation preload runtime 的跨回调生命周期状态（destroyed、
+permission、site-feature capability、active editor）已抽至
+`src/main/browser-page-preload/annotation-preload-state.ts`；runtime 仅保留状态 wiring 与
+feature/DOM 副作用。新增 `scripts/test-preload-annotation-preload-state.mjs` 覆盖默认值、
+严格布尔归一化、snapshot 隔离和销毁复位，共 12 项 focused assertions。
+
 2026-10-05 A2 继续批次：annotation preload policy 初始化的能力/控制/交互模式状态投影已抽至
 `src/main/browser-page-preload/annotation-preload-policy-state.ts`；runtime 仅保留 feature
 lifecycle 初始化与状态写回。新增 `scripts/test-preload-annotation-preload-policy-state.mjs`

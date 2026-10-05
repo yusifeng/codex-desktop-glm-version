@@ -1,5 +1,6 @@
 type PullRequest = { owner: string; repository: string; number: number };
 import {
+  buildPullRequestSummaryQuery,
   getActivePullRequestReaders,
   getPullRequestSummaryKey,
   getPullRequestSummaryState,
@@ -79,7 +80,7 @@ class PullRequestSummaryBatcher {
     const output: any[] = requests.map(() => ({ status: `unavailable` }));
     let pages = requests.map((pullRequest, index) => ({ pullRequest, index, cursor: null as string | null, headRevision: null as string | null, checks: [] as any[] }));
     for (let page = 0; pages.length > 0 && page < MAX_CHECK_PAGES && shouldContinue(); page++) {
-      const query = `query { viewer { login } ${pages.map(({ pullRequest, index, cursor }) => `p${index}: repository(owner:${JSON.stringify(pullRequest.owner)},name:${JSON.stringify(pullRequest.repository)}) { pullRequest(number:${pullRequest.number}) { number url title baseRefName headRefName state isDraft mergeable mergeStateStatus headRefOid headRepository { url } commits(last:1) { nodes { commit { oid statusCheckRollup { contexts(first:100,after:${JSON.stringify(cursor)}) { nodes { __typename ... on CheckRun { name status conclusion startedAt completedAt detailsUrl checkSuite { workflowRun { event workflow { name } } } } ... on StatusContext { context state createdAt description targetUrl } } pageInfo { hasNextPage endCursor } } } } } } } }`).join(` `)} }`;
+      const query = buildPullRequestSummaryQuery(pages);
       const response = await this.deps.runGraphql([`api`, `graphql`, `--hostname`, host.hostname, `-f`, `query=${query}`], { appServerClient: host, timeoutMs: GRAPHQL_TIMEOUT_MS });
       let parsed: any;
       try { parsed = this.deps.parseResponse(response.stdout || `{}`); } catch { return output; }
