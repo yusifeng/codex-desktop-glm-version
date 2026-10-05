@@ -2201,5 +2201,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/get-rectangle-bottom-right.ts",
     "evidence": "The pure rectangle geometry helper projects the horizontal edge point used by annotation positioning; it has no JSX, store, network, or lifecycle effects and is covered by a focused two-case runtime test."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "go",
+    "sourceSymbol": "HJe",
+    "startLine": 44277,
+    "endLine": 44282,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/resolve-skill-repo-label.ts",
+    "evidence": "The pure skill-root label policy chooses the deepest matching root and derives a basename fallback without JSX, store, network, or lifecycle effects. It is independently covered by a focused three-case runtime test."
   }
 ]
