@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
+import * as esbuild from "esbuild";
+const result = await esbuild.build({ entryPoints: ["src/renderer/app-primary/runtime/derive-cloud-unavailable-reason.ts"], bundle: true, format: "esm", platform: "node", write: false, logLevel: "silent" });
+const { deriveCloudUnavailableReason } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`);
+const base = { cloudAccess: "enabled", supportsCloud: true, isPrimaryReviewComposer: false, isRemoteProject: false };
+assert.equal(deriveCloudUnavailableReason(base), null);
+assert.equal(deriveCloudUnavailableReason({ ...base, isRemoteProject: true }), "remote-project");
+assert.equal(deriveCloudUnavailableReason({ ...base, isPrimaryReviewComposer: true }), "pull-request");
+assert.equal(deriveCloudUnavailableReason({ ...base, supportsCloud: false }), "context");
+assert.equal(deriveCloudUnavailableReason({ ...base, cloudAccess: "disabled" }), "account");
+console.log("derive-cloud-unavailable-reason: 5 assertions passed");

@@ -2121,5 +2121,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/extract-skill-kind.ts",
     "evidence": "The document adapter walks only skillMention/pluginMention descendants, normalizes their paths through the existing skill-kind policy, and prefers an explicitly matching kind. It has no JSX, store, or lifecycle side effects and is independently covered by a focused runtime test."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "ig",
+    "sourceSymbol": "tO",
+    "startLine": 4279,
+    "endLine": 4288,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/derive-cloud-unavailable-reason.ts",
+    "evidence": "The composer/cloud availability reason is a deterministic precedence policy over remote-project, pull-request, cloud capability, and account access state. It has no JSX, store, or lifecycle side effects and is now consumed directly by the hotkey home-page semantic source."
   }
 ]

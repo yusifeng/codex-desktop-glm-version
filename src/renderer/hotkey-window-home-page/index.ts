@@ -9,6 +9,7 @@ import * as floatingPointerChunk from "@rchunk/use-floating-window-pointer-inter
 import * as hotkeyDismissChunk from "@rchunk/use-hotkey-window-dismiss-on-escape";
 import * as environmentDropdownChunk from "@rchunk/worktree-environment-dropdown";
 import "@rchunk/rolldown-runtime";
+import { deriveCloudUnavailableReason } from "../app-primary/runtime/derive-cloud-unavailable-reason";
 
 type ComposerMode = "cloud" | "local" | "worktree";
 type ProjectSelection =
@@ -174,7 +175,7 @@ function deriveWorkspaceContext(parameter: { authMethod?: string | null; project
   const availability: ModeAvailability = {
     fallbackMode: "local",
     isAvailabilityLoading: !blocksRemoteModes && ((remoteProject == null && activeRoots == null) || gitQuery.isLoading === true || helpers.get(initial.vfn) === true),
-    cloudUnavailableReason: primary.ig({ cloudAccess: helpers.get(primary.dg, parameter.authMethod), supportsCloud: !blocksRemoteModes, isPrimaryReviewComposer: helpers.get(primary.lg), isRemoteProject: remoteProject != null || routeProject?.type === "remote" }),
+    cloudUnavailableReason: deriveCloudUnavailableReason({ cloudAccess: helpers.get(primary.dg, parameter.authMethod), supportsCloud: !blocksRemoteModes, isPrimaryReviewComposer: helpers.get(primary.lg) === true, isRemoteProject: remoteProject != null || routeProject?.type === "remote" }),
     isLocalAvailable: true,
     isWorktreeAvailable: projectRoot != null && gitRoot != null && worktreesEnabled && !pathWithinRoot(projectRoot, codexHome),
   };

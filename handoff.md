@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A5 继续批次：app-primary 未消费导出 `ig`（`tO`，4279--4288）的云执行不可用原因
+纯策略已迁移至 `src/renderer/app-primary/runtime/derive-cloud-unavailable-reason.ts`，hotkey
+home-page 语义源码改为直接消费；新增 `scripts/test-app-primary-derive-cloud-unavailable-reason.mjs`
+覆盖 remote project、pull request、context、account 与可用云共 5 项断言。逐行分类证据登记后
+app-primary reviewedCount 提升至 213；hub audit 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation pointer-selection 的拖拽终止生命周期已补齐；公开
 `dispose` 现为幂等终态，销毁后拒绝 pointer down/move/up/cancel 与 selection 更新，内部重启拖拽仍使用临时清理。
 `scripts/test-preload-annotation-pointer-selection.mjs` 扩展至 18 项 focused assertions；build check、
