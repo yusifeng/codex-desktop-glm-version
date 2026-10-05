@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git file content 的仓库越界判定与 `git show` object ref
+构造已迁移至 `src/main/worker/git-file-content-policy.ts`；读取入口仅保留仓库、Git
+与 MIME I/O 编排，新增 `scripts/test-worker-git-file-content-policy.mjs` 覆盖 8 项
+POSIX/Windows 路径与 HEAD/index 边界断言。
+
 2026-10-05 A1 继续批次：GitHub pull-request summary 的分页 GraphQL 查询构造已迁移至
 `src/main/worker/github-pull-request-summary-policy.ts`；summary batcher 仅保留请求/分页编排，
 新增 `scripts/test-worker-github-pull-request-summary-query.mjs` 覆盖多仓库、游标与 JSON 编码边界，
@@ -1039,5 +1044,7 @@ marker 与 selection 清理判定；`annotation-sync-state.ts` 接回该策略�
 新增 `scripts/test-preload-annotation-region-class-policy.mjs`，覆盖 overlay/highlight 的 Google Docs
 大矩形门控与普通回退，共 4 项 focused assertions。
 2026-10-05 A5 继续批次：app-primary 新增 `Ah`/`ok`、`Bm`/`pA`、`Bf`/`LP`、`Bd`/`RI` 四条逐行分类证据，均判定为生成局部 bootstrap/initializer（无独立 named consumer 或 teardown 边界），登记于 `docs/renderer-hub-line-classification.json`。`scripts/test-renderer-hub-classification.mjs` reviewedCount 从 164 同步至 168；审计脚本保持 74/914 consumed、840 unconsumed。
+
+2026-10-05 A5 继续批次：app-primary 未消费导出 `Eo`/`hY` 的模式化 composer placeholder formatter 已迁移至 `src/renderer/app-primary/runtime/format-composer-placeholder.ts`；逻辑仅通过注入的 locale formatter 投影 chat/Codex/Work 文案，无 JSX、store 或生命周期副作用。新增 `scripts/test-app-primary-format-composer-placeholder.mjs` 覆盖 chat agent、Codex、Work、未知模式与空 agent 边界，共 5 项断言；兼容导出仍保留在 hub，逐行分类证据登记后 reviewedCount 从 174 提升至 175。
 
 2026-10-05 A1 增量：Git worker 请求 context 投影（root/cwd、review source 与 failure 结果判定）抽至 `src/main/worker/git-request-context-policy.ts`，由 `scripts/test-worker-git-request-context-policy.mjs` 覆盖 12 项断言；已通过 build、verify-chunks 与 typecheck。

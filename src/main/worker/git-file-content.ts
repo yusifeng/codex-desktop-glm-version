@@ -1,4 +1,6 @@
 /** Read a repository file from HEAD or the index without exposing paths outside the worktree. */
+import { isGitFilePathOutsideRepository, resolveGitFileObjectRef } from './git-file-content-policy';
+
 export type GitFileContentDependencies = {
   getWorktreeRepository: (cwd: string, host: any) => Promise<{ root?: string } | null | undefined>;
   platformPath: () => Promise<{
@@ -10,11 +12,6 @@ export type GitFileContentDependencies = {
   runGit: (root: string, args: string[], host: any, options: Record<string, unknown>) => Promise<any>;
   detectMimeType?: (bytes: Uint8Array) => Promise<string | null> | string | null;
 };
-
-function outsideRepository(relativePath: string, platformPath: { isAbsolute(path: string): boolean }) {
-  const normalized = relativePath.replaceAll(`\\`, `/`);
-  return platformPath.isAbsolute(relativePath) || normalized === `..` || normalized.startsWith(`../`);
-}
 
 export async function readGitFileContent(
   params: { cwd: string; path: string; ref?: string },
@@ -31,10 +28,9 @@ export async function readGitFileContent(
       ? params.cwd
       : platformPath.join(root, params.cwd);
     const relativePath = platformPath.relative(root, platformPath.join(cwd, params.path));
-    if (outsideRepository(relativePath, platformPath)) return { contentsBase64: null };
-    const gitPath = relativePath.split(platformPath.sep).join(`/`);
-    if (gitPath === `` || gitPath === `.`) return { contentsBase64: null };
-    const objectRef = params.ref === `head` ? `HEAD:${gitPath}` : `:${gitPath}`;
+    if (isGitFilePathOutsideRepository(relativePath, platformPath)) return { contentsBase64: null };
+    const objectRef = resolveGitFileObjectRef(relativePath, platformPath.sep, params.ref);
+    if (objectRef == null) return { contentsBase64: null };
     const result = await dependencies.runGit(root, [`show`, objectRef], host, {
       collectStdoutBuffer: true,
       trim: false,
