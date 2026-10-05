@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation display anchors 的 text-anchor 展示投影已抽至
+`src/main/browser-page-preload/annotation-text-display-projection.ts`；display resolver 仅保留
+element/region anchor 解析与 cache/viewport 编排。新增
+`scripts/test-preload-annotation-text-display-projection.mjs` 覆盖 2 项默认/替换 anchor 断言；
+原 display-anchors 回归 5 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：Git handoff shared-base 的 destination fetch target 选择已迁移至 `src/main/worker/git-handoff-shared-base-policy.ts`；shared-base runtime 保留 commit existence、merge-base、fetch Git I/O 与日志编排。新增 `scripts/test-worker-git-handoff-shared-base-policy.mjs` 覆盖 3 项 focused assertions；原 shared-base 回归 27 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation viewport 的 visualViewport offset/scale 纯投影已抽至
 `src/main/browser-page-preload/annotation-visual-viewport-policy.ts`；viewport state 仅保留窗口
 尺寸/scroll 编排与可选投影。新增 `scripts/test-preload-annotation-visual-viewport-policy.mjs`

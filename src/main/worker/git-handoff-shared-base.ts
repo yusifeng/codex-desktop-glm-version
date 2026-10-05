@@ -6,6 +6,8 @@ type HandoffSharedBaseDependencies = {
   logger: { debug: (message: string, detail: any) => void; warning: (message: string, detail: any) => void };
 };
 
+import { buildHandoffFetchTargets } from './git-handoff-shared-base-policy';
+
 async function resolveHandoffRepositoryMetadata(gitManager: any, cwd: string, host: any) {
   try {
     return await gitManager.getStableMetadata(cwd, host);
@@ -87,12 +89,11 @@ async function findHandoffSharedBase(params: any, deps: HandoffSharedBaseDepende
   if (destinationHasMergeBase) return mergeBaseSha;
 
   const destinationDefault = await deps.getDefaultRemoteBranch(destinationRepository);
-  const fetchTargets = destinationDefault == null
-    ? (await deps.getRemotes(destinationRepository)).map((remote) => ({
-        remote,
-        branch: sourceDefault.branch,
-      }))
-    : [destinationDefault];
+  const fetchTargets = buildHandoffFetchTargets(
+    destinationDefault,
+    destinationDefault == null ? await deps.getRemotes(destinationRepository) : [],
+    sourceDefault.branch,
+  );
   deps.logger.debug(`[host-handoff] destination-fetch-targets`, {
     safe: {
       count: fetchTargets.length,

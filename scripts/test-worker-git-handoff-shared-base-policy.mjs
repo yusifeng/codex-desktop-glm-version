@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { buildHandoffFetchTargets } = require("../app/.vite/build/worker/git-handoff-shared-base-policy.js");
+let assertions = 0;
+const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+deepEqual(buildHandoffFetchTargets({ remote: "upstream", branch: "main" }, ["origin"], "main"), [{ remote: "upstream", branch: "main" }]);
+deepEqual(buildHandoffFetchTargets(null, ["origin", "upstream"], "main"), [{ remote: "origin", branch: "main" }, { remote: "upstream", branch: "main" }]);
+deepEqual(buildHandoffFetchTargets(undefined, [], "main"), []);
+console.log(`${assertions} worker git handoff shared base policy assertions passed`);
