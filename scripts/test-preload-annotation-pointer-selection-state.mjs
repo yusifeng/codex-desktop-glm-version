@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationPointerSelectionState } = require("../app/.vite/build/browser-page-preload/annotation-pointer-selection-state.js");
+const state = createAnnotationPointerSelectionState();
+assert.equal(state.disposed, false);
+state.setDrag({ pointerId: 1 });
+assert.equal(state.drag.pointerId, 1);
+assert.equal(state.dispose(), true);
+assert.equal(state.disposed, true);
+assert.equal(state.drag, null);
+assert.equal(state.dispose(), false);
+console.log("test-preload-annotation-pointer-selection-state: 6 assertions passed");
