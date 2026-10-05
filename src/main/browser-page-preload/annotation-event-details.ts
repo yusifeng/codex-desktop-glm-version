@@ -41,8 +41,7 @@ function readAnnotationEventDetail(event: unknown): Record<string, unknown> | un
 }
 
 function readAnnotationEventField(detail: Record<string, unknown>, key: string): unknown {
-  const descriptor = Object.getOwnPropertyDescriptor(detail, key);
-  return descriptor != null && `value` in descriptor ? descriptor.value : undefined;
+  return readAnnotationEventFieldValue(detail, key);
 }
 
 export {
@@ -57,3 +56,4 @@ if (typeof module !== `undefined`) module.exports = {
   readAnnotationEventDetail,
   readAnnotationEventField,
 };
+import { readAnnotationEventFieldValue } from "./annotation-event-field-policy";
