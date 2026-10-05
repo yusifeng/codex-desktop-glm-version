@@ -25,28 +25,29 @@ function observeAnnotationShadowRoots(
   onChange: () => void,
   deps: AnnotationShadowRootObserverDependencies,
 ): () => void {
-  const roots = new Set<any>([root]);
+  const state = createAnnotationShadowRootObserverState(root);
   const observer = new deps.mutationObserverConstructor((records) => {
-    const before = roots.size;
+    if (state.disposed) return;
+    const before = state.roots.size;
     for (const record of records) {
       for (const node of record.addedNodes ?? []) {
         if (deps.isElement(node)) inspect(node);
       }
     }
     let changed = false;
-    for (const shadowRoot of roots) {
+    for (const shadowRoot of state.roots) {
       if (shadowRoot !== root && (!shadowRoot.host?.isConnected || shadowRoot.host?.ownerDocument !== root.ownerDocument)) {
-        roots.delete(shadowRoot);
+        state.remove(shadowRoot);
         changed = true;
       }
     }
     if (changed) {
       observer.disconnect();
-      for (const observedRoot of roots) observer.observe(observedRoot, deps.observerOptions);
+      for (const observedRoot of state.roots) observer.observe(observedRoot, deps.observerOptions);
     }
     if (
       changed ||
-      roots.size !== before ||
+      state.roots.size !== before ||
       records.some((record) =>
         record.type === `attributes` ||
         [...(record.addedNodes ?? []), ...(record.removedNodes ?? [])].some(
@@ -59,14 +60,15 @@ function observeAnnotationShadowRoots(
   function inspect(element: ElementLike) {
     const descendants = [...element.querySelectorAll(`*`)];
     for (const candidate of deps.isElement(element) ? [element, ...descendants] : descendants) {
-      if (!deps.isElement(candidate) || deps.isIgnored(candidate) || candidate.shadowRoot == null || roots.has(candidate.shadowRoot)) continue;
-      roots.add(candidate.shadowRoot);
+      if (!deps.isElement(candidate) || deps.isIgnored(candidate) || candidate.shadowRoot == null || state.roots.has(candidate.shadowRoot)) continue;
+      state.add(candidate.shadowRoot);
       observer.observe(candidate.shadowRoot, deps.observerOptions);
       inspect(candidate.shadowRoot);
     }
   }
 
   const onShadowAttached = (event: any) => {
+    if (state.disposed) return;
     const target = event.composedPath?.()[0];
     if (deps.isElement(target) && !deps.isIgnored(target)) {
       inspect(target);
@@ -77,6 +79,7 @@ function observeAnnotationShadowRoots(
   inspect(root);
   root.addEventListener(deps.shadowEvent, onShadowAttached);
   return () => {
+    if (!state.dispose()) return;
     observer.disconnect();
     root.removeEventListener(deps.shadowEvent, onShadowAttached);
   };
@@ -84,3 +87,4 @@ function observeAnnotationShadowRoots(
 
 export { observeAnnotationShadowRoots };
 if (typeof module !== `undefined`) module.exports = { observeAnnotationShadowRoots };
+import { createAnnotationShadowRootObserverState } from "./annotation-shadow-root-observer-state";

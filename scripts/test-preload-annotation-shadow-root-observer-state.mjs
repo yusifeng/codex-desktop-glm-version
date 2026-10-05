@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationShadowRootObserverState } = require("../app/.vite/build/browser-page-preload/annotation-shadow-root-observer-state.js");
+const root = {};
+const state = createAnnotationShadowRootObserverState(root);
+assert.equal(state.roots.has(root), true);
+const nested = {};
+assert.equal(state.add(nested), true);
+assert.equal(state.add(nested), false);
+assert.equal(state.roots.size, 2);
+assert.equal(state.remove(nested), true);
+assert.equal(state.remove(nested), false);
+assert.equal(state.dispose(), true);
+assert.equal(state.disposed, true);
+assert.equal(state.dispose(), false);
+assert.equal(state.add({}), false);
+console.log("test-preload-annotation-shadow-root-observer-state: 10 assertions passed");
