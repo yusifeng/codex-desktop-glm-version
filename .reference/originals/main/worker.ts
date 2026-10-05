@@ -145,6 +145,7 @@ const { createGitRequestCancellationTelemetry } = require("./worker/git-request-
 const { createGitWorkerResponse } = require("./worker/git-response-envelope");
 const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
+const { isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
@@ -70912,6 +70913,8 @@ function z6(e) {
   return e === `review_model` || e === `review_search` ? 256 : void 0;
 }
 function obe(e) {
+  return resolveRequestRoot(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   switch (e.method) {
     case `status-summary`:
     case `review-summary`:
@@ -71065,6 +71068,8 @@ function lbe(e) {
   }
 }
 function B6(e) {
+  return resolveReviewSource(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e.method === `review-diff` ||
     e.method === `review-patch` ||
     e.method === `review-search` ||
@@ -71073,6 +71078,8 @@ function B6(e) {
     : null;
 }
 function ube(e) {
+  return resolveReviewCwd(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e.method === `branch-diff-stats` ||
     e.method === `review-diff` ||
     e.method === `review-patch` ||
@@ -71094,6 +71101,8 @@ function U6(e, t) {
   return e.method === `review-summary` ? { ...e, result: H6(e.result, t) } : e;
 }
 function dbe(e) {
+  return isGitRequestFailure(e);
+  /* istanbul ignore next -- retained generated implementation for source parity reference */
   if (e.type === `error`) return !0;
   let t = e.value;
   return (

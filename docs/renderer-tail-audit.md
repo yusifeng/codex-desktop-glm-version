@@ -654,4 +654,4 @@ source symbol 与分类由 `scripts/audit-renderer-hub-classification.mjs` 校�
 承载。该语义模块保留 recipient/cc/bcc 拆分、联系人名称投影、非法地址标记及首个 Bcc
 前缀行为，不引入聚合 hub 的初始化副作用；`scripts/test-app-primary-normalize-recipient-fields.mjs`
 覆盖名称投影、非法地址、Bcc 前缀和空输入边界。逐行分类证据已登记，reviewedCount
-由 158 提升至 159。
+由 158 提升至 160。
