@@ -722,3 +722,5 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 同批补充 `HD`（公开别名 `_g`，4125--4130）：它仅创建相邻 plan capability signals，属于生成式 signal 初始化，同样没有独立 renderer consumer、store 所有权或 teardown 契约。逐行分类证据登记后 reviewedCount 提升至 215。
 
 2026-10-05 T5 manifest gate：新增 `scripts/audit-renderer-hub-manifest.mjs`，对 app-shared、app-initial、app-primary 的每个 published export 逐项输出 `consumed`、`semantic`、`preserved-coupled` 或 `unreviewed`。manifest 仅将已有源码行号证据登记为 semantic/preserved-coupled，未审计导出保持 `unreviewed`；`--strict` 在存在未审计项时失败，禁止把缺证据项目静默标绿。
+
+2026-10-06 A5 T5 分类批次：app-primary 未消费导出 `kg`（源码符号 `ake`，3652--3659）登记为 `preserved-coupled`。该 helper 通过 `ownerDocument.defaultView.getComputedStyle` 读取 live DOM 元素的 CSS custom property，并依赖生成式 `bE` fallback；document/window 与样式生命周期耦合于生成 surface，无法在不改变所有权边界的情况下安全抽取。Manifest app-primary unreviewed 由 598 降至 597。
