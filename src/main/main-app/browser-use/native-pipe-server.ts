@@ -35,6 +35,7 @@ export interface WebMcpToolInvocation {
   tabId: string;
   toolName: string;
   turn_id: string;
+  parentCallId?: string;
 }
 
 /** CDP 事件形态。 */

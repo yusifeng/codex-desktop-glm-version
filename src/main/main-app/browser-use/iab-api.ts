@@ -87,6 +87,12 @@ export const NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE = Symbol("notifyBrowserUseDownlo
 export interface IabTabSnapshot {
   browser_id: string;
   id: string;
+  /** Electron webContents id used to route native page events back to a tab. */
+  webContentsId?: number;
+  /** Original browser-use provider tab id, when it differs from the local id. */
+  browserTabId?: string;
+  routeKey?: string;
+  pageKey?: string;
   title?: string;
   url?: string;
   [key: string]: unknown;
@@ -104,6 +110,14 @@ export type CdpEventListener = (event: { method: string; params?: unknown; sessi
 
 /** 页面状态监听器。 */
 export type PageStateEventListener = (event: { type: string; [key: string]: unknown }) => void;
+
+export interface WebMcpToolInvocation {
+  session_id: string;
+  tabId: string;
+  toolName: string;
+  turn_id: string;
+  parentCallId?: string;
+}
 
 /** 下载变更监听器。 */
 export type BrowserUseDownloadChangeListener = (change: { path: string; tabId: string }) => void;
@@ -158,7 +172,7 @@ export class IabBrowserUseApi {
   private cdpEventListeners = new Set<{ listener: CdpEventListener; tabIds?: Set<string> }>();
   private cdpDetachListeners = new Set<() => void>();
   private downloadChangeListeners = new Set<BrowserUseDownloadChangeListener>();
-  private pageEventListeners = new Set<(event: { type: string }) => void>();
+  private pageEventListeners = new Set<PageStateEventListener>();
   private allowedDownloadGrantsByWebContentsId = new Map<number, { expiresAtMs: number }>();
   private cursorArrivalWaitersByMoveSequence = new Map<number, { resolve: () => void; reject: (error: Error) => void }>();
   private selectedTabIdsByRouteKey = new Map<string, string>();
@@ -280,6 +294,53 @@ export class IabBrowserUseApi {
   addPageEventListener(listener: (event: { type: string }) => void): () => void {
     this.pageEventListeners.add(listener);
     return () => this.pageEventListeners.delete(listener);
+  }
+
+  /** WebMCP 调用通知（原 `notifyWebMcpToolInvoked`）。 */
+  notifyWebMcpToolInvoked(invocation: WebMcpToolInvocation): void {
+    const session = { conversationId: invocation.session_id };
+    const host = this.getBrowserHost(session) as {
+      routeKey?: string;
+      setWebMcpToolActivity?: (toolName: string, browserTabId: string, parentCallId?: string) => void;
+    } | null;
+    const tab = this.tabsById.get(invocation.tabId);
+    if (host == null || tab == null || tab.routeKey !== host.routeKey) return;
+
+    this.recordBrowserUseTurn(session, invocation);
+    this.markBrowserUseCommandForTab(session, tab);
+    host.setWebMcpToolActivity?.(
+      invocation.toolName,
+      tab.browserTabId ?? tab.browser_id ?? tab.id,
+      invocation.parentCallId,
+    );
+  }
+
+  /** 将 native page 事件按 webContents id 映射到 tab 并广播。 */
+  notifyPageEvent(sessionId: string, webContentsId: number, event: { type: string; [key: string]: unknown }): void {
+    const tabId = this.getTabIdForWebContentsId(webContentsId);
+    if (tabId == null) return;
+    for (const listener of this.pageEventListeners) listener({ ...event, session_id: sessionId, tabId });
+  }
+
+  private getTabIdForWebContentsId(webContentsId: number): string | null {
+    for (const [tabId, tab] of this.tabsById) if (tab.webContentsId === webContentsId) return tabId;
+    return null;
+  }
+
+  private markBrowserUseCommandForTab(
+    session: { conversationId: string },
+    tab: IabTabSnapshot,
+  ): void {
+    const host = this.getBrowserHost(session) as {
+      routeKey?: string;
+      activateBrowserUseNavigationRestriction?: (pageKey: string) => void;
+      setBrowserUseActive?: (active: boolean, browserTabId: string) => void;
+    } | null;
+    if (host == null) return;
+    const tabId = tab.browserTabId ?? tab.browser_id ?? tab.id;
+    if (tab.sessionControlled !== true) this.tabsById.set(tab.id, { ...tab, sessionControlled: true });
+    host.activateBrowserUseNavigationRestriction?.(tab.pageKey ?? tab.id);
+    host.setBrowserUseActive?.(true, tabId);
   }
 
   /** 下载变更监听（原 `[RY]` Symbol 协议）。 */

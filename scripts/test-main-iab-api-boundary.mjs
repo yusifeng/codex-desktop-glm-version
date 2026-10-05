@@ -7,6 +7,11 @@ const api = new IabBrowserUseApi(() => null, undefined, {
   appSessionId: "app-1",
 });
 const host = { routeKey: "r-1" };
+const activity = [];
+const pageEvents = [];
+host.setWebMcpToolActivity = (...args) => activity.push(args);
+host.activateBrowserUseNavigationRestriction = (pageKey) => pageEvents.push(["restrict", pageKey]);
+host.setBrowserUseActive = (...args) => pageEvents.push(["active", ...args]);
 const routedApi = new IabBrowserUseApi(() => host, undefined, {
   ensureSessionRoute: () => true,
 });
@@ -33,4 +38,18 @@ routedApi.recordBrowserUseTurn({ conversationId: "c-1" }, { turn_id: "t-1" });
 routedApi.clearRecordedBrowserUseTurn({ conversationId: "c-1" }, "t-1");
 assert.equal(routedApi.getTab("missing"), null);
 assert.throws(() => routedApi.requireLiveTab("missing"), /Unknown tab/);
-console.log("main IAB API boundary: 12 assertions passed");
+
+// Native IAB notifications must preserve route ownership and enrich page events
+// with the browser session/tab identity before broadcasting to listeners.
+routedApi.tabsById.set("tab-1", {
+  browser_id: "browser-1", browserTabId: "provider-1", id: "tab-1", routeKey: "r-1", webContentsId: 42,
+});
+routedApi.notifyWebMcpToolInvoked({ session_id: "c-1", tabId: "tab-1", toolName: "click", turn_id: "t-2", parentCallId: "p-1" });
+assert.deepEqual(activity, [["click", "provider-1", "p-1"]]);
+assert.deepEqual(pageEvents, [["restrict", "tab-1"], ["active", true, "provider-1"]]);
+const unsubscribePage = routedApi.addPageEventListener((event) => pageEvents.push(["page", event]));
+routedApi.notifyPageEvent("c-1", 42, { type: "page-load", url: "https://example.test" });
+routedApi.notifyPageEvent("c-1", 404, { type: "ignored" });
+unsubscribePage();
+assert.deepEqual(pageEvents[2], ["page", { type: "page-load", url: "https://example.test", session_id: "c-1", tabId: "tab-1" }]);
+console.log("main IAB API boundary: 17 assertions passed");
