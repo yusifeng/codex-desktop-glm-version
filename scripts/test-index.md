@@ -46,6 +46,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-shared-build-extension-channel-path.mjs`](./test-app-shared-build-extension-channel-path.mjs)
 - [`test-preload-annotation-containment-frame-policy.mjs`](./test-preload-annotation-containment-frame-policy.mjs)
 - [`test-preload-annotation-visible-text-policy.mjs`](./test-preload-annotation-visible-text-policy.mjs)
+- [`test-app-shared-select-mode-descriptor.mjs`](./test-app-shared-select-mode-descriptor.mjs)
+- [`test-preload-annotation-wheel-delta-policy.mjs`](./test-preload-annotation-wheel-delta-policy.mjs)
 - [`test-app-shared-encode-prefixed-path.mjs`](./test-app-shared-encode-prefixed-path.mjs)
 - [`test-app-shared-stable-json-stringify.mjs`](./test-app-shared-stable-json-stringify.mjs)
 - [`test-preload-annotation-frame-chain-policy.mjs`](./test-preload-annotation-frame-chain-policy.mjs)
