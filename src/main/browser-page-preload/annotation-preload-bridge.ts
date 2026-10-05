@@ -1,3 +1,4 @@
+import { createAnnotationPreloadMessageQueue } from "./annotation-preload-message-queue";
 type AnnotationPreloadBridgeOptions = {
   ipcRenderer: any;
   channels: { hostMessage: string; runtime: string };
@@ -13,24 +14,20 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
   let hasMountedSubscriber = false;
   let destroyed = false;
   let mountedUnsubscribe: (() => void) | null = null;
-  let bufferedSync: any = null;
-  let pendingTextSelection = false;
-  let pendingEditorMessage: any = null;
+  const messageQueue = createAnnotationPreloadMessageQueue({ reducePendingEditorMessage: options.reducePendingEditorMessage });
 
   const bufferSync = (message: any) => {
-    if (!destroyed && !hasMountedSubscriber) bufferedSync = message;
+    messageQueue.bufferSync(message);
   };
   const bufferTextSelection = () => {
-    if (!destroyed && !hasMountedSubscriber) pendingTextSelection = true;
+    messageQueue.bufferTextSelection();
   };
   const bufferEditorMessage = (message: any) => {
     if (destroyed) return;
     options.getSiteAnnotationRequests()?.clear();
-    if (!hasMountedSubscriber) {
-      pendingEditorMessage = options.reducePendingEditorMessage(pendingEditorMessage, message);
-    }
+    messageQueue.bufferEditorMessage(message);
   };
-  const prepareMount = () => { bufferedSync = null; };
+  const prepareMount = () => { messageQueue.prepareMount(); };
 
   const bridge = {
     get initialState() {
@@ -65,27 +62,18 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
       if (destroyed) return () => {};
       mountedUnsubscribe?.();
       hasMountedSubscriber = true;
+      messageQueue.markMounted();
       const mountedHandler = (_event: any, message: any) => {
         const action = options.getMountedMessageAction(message.type);
         if (action === `sync`) listener({ ...message, canUseSiteAnnotationApi: options.getState().canUseSiteAnnotationApi });
         else if (action === `forward`) listener(message);
       };
       options.ipcRenderer.on(options.channels.hostMessage, mountedHandler);
-      if (bufferedSync != null) {
-        listener(bufferedSync);
-        bufferedSync = null;
-      }
-      if (pendingTextSelection) {
-        listener({ type: `browser-sidebar-runtime-capture-text-selection` });
-        pendingTextSelection = false;
-      }
-      if (pendingEditorMessage != null) {
-        listener(pendingEditorMessage);
-        pendingEditorMessage = null;
-      }
+      messageQueue.consume(listener);
       const unsubscribe = () => {
         if (!hasMountedSubscriber) return;
         hasMountedSubscriber = false;
+        messageQueue.markUnmounted();
         options.ipcRenderer.removeListener(options.channels.hostMessage, mountedHandler);
         if (mountedUnsubscribe === unsubscribe) mountedUnsubscribe = null;
       };
@@ -99,9 +87,7 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
     destroyed = true;
     mountedUnsubscribe?.();
     mountedUnsubscribe = null;
-    bufferedSync = null;
-    pendingTextSelection = false;
-    pendingEditorMessage = null;
+    messageQueue.dispose();
   };
 
   return {
@@ -112,7 +98,7 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
     prepareMount,
     dispose,
     get hasMountedSubscriber() { return hasMountedSubscriber; },
-    get hasPendingEditorMessage() { return pendingEditorMessage != null; },
+    get hasPendingEditorMessage() { return messageQueue.hasPendingEditorMessage; },
   };
 }
 

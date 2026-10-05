@@ -654,3 +654,11 @@ preload runtime 的 feature graph、preview overlay 与 capability flag 的统�
 语义，并保证 feature dispose → preview clear → capability reset 的状态边界；pagehide 与
 host-sync/重初始化仍由 runtime 编排。`scripts/test-preload-annotation-preload-disposal.mjs`
 覆盖顺序、终止标记与重复销毁，共 6 项 focused assertions。
+### 增量抽取：annotation preload message queue lifecycle
+
+挂载前 host sync、文本选区与 editor 消息的缓冲、合并及一次性重放边界已迁移至
+`src/main/browser-page-preload/annotation-preload-message-queue.ts`。bridge 继续负责 IPC
+listener 注册与挂载订阅，但队列独立维护 mounted/disposed 状态、prepareMount 清理和
+dispose 后隔离，避免异步 host 消息在 runtime 销毁后重新注入。由
+`scripts/test-preload-annotation-preload-message-queue.mjs` 覆盖覆盖写入、editor 合并、
+一次性重放、prepareMount 与销毁后抑制，共 8 项 focused assertions。
