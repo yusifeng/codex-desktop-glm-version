@@ -616,3 +616,11 @@ suspended 与 capability flag 的稳定归一化：suspended 仅在 comment mode
 字段只接受严格布尔值并对 null/malformed state 安全回退；React/render 与事件副作用仍留在
 原 preload 边界。`scripts/test-preload-annotation-ui-mode-policy.mjs` 覆盖 comment/browse、
 null、malformed 输入，共 5 项 focused assertions。
+
+### 增量抽取：annotation sync transition lifecycle
+
+host sync 对 capability 关闭、agent 控制、comment/suspended 退出，以及 marker/selection 清理的
+生命周期门控已迁移至 `src/main/browser-page-preload/annotation-sync-transition.ts`。现有
+`annotation-sync-state.ts` 仅负责调用该策略并执行注入的 dispose/clear 副作用；由
+`scripts/test-preload-annotation-sync-transition.mjs` 覆盖正常、能力关闭、暂停、browse 与空消息边界，
+共 19 项 focused assertions。
