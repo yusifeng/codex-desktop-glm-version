@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation frame document URL policy
+
+Frame document URL 的空路径、当前页与 frame `src` 回退选择（原 `pd`，5120-7259 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-frame-document-url.ts`；页面 URL 与 frame 元素判定通过
+依赖注入保留。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation scroll offset policy
 
 Text anchor 的 scrollX 偏移判定（原 `_u`，5120-7259 业务工具段）已迁移至

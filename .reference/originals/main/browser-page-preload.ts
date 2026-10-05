@@ -5923,11 +5923,7 @@ function fd() {
   return getCurrentAnnotationPageUrl(window);
 }
 function pd(e, t) {
-  if (t == null || t.length === 0) return null;
-  let n = e.location.href;
-  if (n !== fd()) return n;
-  let r = e.frameElement;
-  return ac(r) && r.src !== `` ? r.src : n;
+  return resolveAnnotationFrameDocumentUrl(e, t, fd(), ac);
 }
 function md(e, t) {
   return areAnnotationUrlsEquivalent(e, t);
@@ -6177,6 +6173,7 @@ var { canUseAnnotationAdoptedStyleSheets } = require("./browser-page-preload/ann
 var { matchesAnnotationFrameUrl } = require("./browser-page-preload/annotation-frame-url-policy");
 var { projectAnnotationDirectTextPreview } = require("./browser-page-preload/annotation-direct-text-preview");
 var { getAnnotationScrollOffset } = require("./browser-page-preload/annotation-scroll-offset");
+var { resolveAnnotationFrameDocumentUrl } = require("./browser-page-preload/annotation-frame-document-url");
 var { projectAnnotationAnchorPoint } = require("./browser-page-preload/annotation-anchor-point-projection");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
