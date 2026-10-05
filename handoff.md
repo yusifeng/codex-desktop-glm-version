@@ -1289,4 +1289,5 @@ target 判定、preview diff 与 dispatch 副作用。新增
 `scripts/test-preload-annotation-design-control-sync.mjs` 11 项回归、build check、verify 与
 typecheck 均通过。
 2026-10-05 A2 继续批次：annotation feature lifecycle 的刷新判定已抽至 `annotation-feature-lifecycle-state.ts`，将 controls/request/observer/mode 四类资源是否存在的真实 teardown 边界变为可复用纯策略；新增 `scripts/test-preload-annotation-feature-lifecycle-state.mjs` 覆盖空图与各资源单独存在的 6 项断言。feature lifecycle 入口现消费该策略，focused lifecycle/state 测试与后续 verify/typecheck 待本批次完成后复核。
+2026-10-05 A2 继续批次：annotation preload bridge 的 mounted subscriber 与 terminal dispose 状态已抽至 `annotation-preload-bridge-state.ts`；bridge 仅保留 IPC listener、消息队列及订阅副作用。新增 `scripts/test-preload-annotation-preload-bridge-state.mjs` 覆盖挂载、清理、终态幂等与终态拒绝重挂载，共 11 项 focused assertions。
 2026-10-05 A5 继续批次：app-primary Box library 文件预览导出 `Jd`（`FMe`，17195--17208）已抽取为 `resolve-box-file-preview.ts`，保留 external-box ID/provider/MIME 校验及 Box Notes/普通文件 URL 投影；新增 `scripts/test-app-primary-resolve-box-file-preview.mjs` 覆盖 5 项 focused assertions。逐行分类证据登记后 reviewedCount 提升至 216；hub audit 与 focused classification test 已通过。

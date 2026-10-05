@@ -1,0 +1,27 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationPreloadBridgeState } = require("../app/.vite/build/browser-page-preload/annotation-preload-bridge-state.js");
+
+const state = createAnnotationPreloadBridgeState();
+assert.equal(state.destroyed, false);
+assert.equal(state.hasMountedSubscriber, false);
+let unsubscribeCalls = 0;
+const unsubscribe = () => { unsubscribeCalls++; };
+state.markMounted();
+state.setMountedUnsubscribe(unsubscribe);
+assert.equal(state.hasMountedSubscriber, true);
+assert.equal(state.mountedUnsubscribe, unsubscribe);
+state.clearMountedSubscriber();
+assert.equal(state.hasMountedSubscriber, false);
+assert.equal(state.mountedUnsubscribe, null);
+state.markMounted();
+state.setMountedUnsubscribe(unsubscribe);
+assert.equal(state.dispose(), true);
+assert.equal(state.destroyed, true);
+assert.equal(state.hasMountedSubscriber, false);
+assert.equal(state.dispose(), false);
+assert.equal(unsubscribeCalls, 0, `state only tracks teardown; caller owns invocation`);
+state.markMounted();
+assert.equal(state.hasMountedSubscriber, false);
+console.log(`test-preload-annotation-preload-bridge-state: 11 assertions passed`);

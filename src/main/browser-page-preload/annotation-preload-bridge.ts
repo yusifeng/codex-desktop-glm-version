@@ -1,4 +1,5 @@
 import { createAnnotationPreloadMessageQueue } from "./annotation-preload-message-queue";
+import { createAnnotationPreloadBridgeState } from "./annotation-preload-bridge-state";
 type AnnotationPreloadBridgeOptions = {
   ipcRenderer: any;
   channels: { hostMessage: string; runtime: string };
@@ -11,9 +12,7 @@ type AnnotationPreloadBridgeOptions = {
 };
 
 function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) {
-  let hasMountedSubscriber = false;
-  let destroyed = false;
-  let mountedUnsubscribe: (() => void) | null = null;
+  const lifecycle = createAnnotationPreloadBridgeState();
   const messageQueue = createAnnotationPreloadMessageQueue({ reducePendingEditorMessage: options.reducePendingEditorMessage });
 
   const bufferSync = (message: any) => {
@@ -23,7 +22,7 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
     messageQueue.bufferTextSelection();
   };
   const bufferEditorMessage = (message: any) => {
-    if (destroyed) return;
+    if (lifecycle.destroyed) return;
     options.getSiteAnnotationRequests()?.clear();
     messageQueue.bufferEditorMessage(message);
   };
@@ -43,7 +42,7 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
         : undefined;
     },
     sendMessageToHost(message: any) {
-      if (destroyed) return;
+      if (lifecycle.destroyed) return;
       if (
         message.type === `browser-sidebar-runtime-open-editor` ||
         message.type === `browser-sidebar-runtime-open-design-editor`
@@ -59,9 +58,9 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
       options.ipcRenderer.invoke(options.channels.runtime, message);
     },
     subscribeToHostMessages(listener: (message: any) => void) {
-      if (destroyed) return () => {};
-      mountedUnsubscribe?.();
-      hasMountedSubscriber = true;
+      if (lifecycle.destroyed) return () => {};
+      lifecycle.mountedUnsubscribe?.();
+      lifecycle.markMounted();
       messageQueue.markMounted();
       const mountedHandler = (_event: any, message: any) => {
         const action = options.getMountedMessageAction(message.type);
@@ -71,22 +70,22 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
       options.ipcRenderer.on(options.channels.hostMessage, mountedHandler);
       messageQueue.consume(listener);
       const unsubscribe = () => {
-        if (!hasMountedSubscriber) return;
-        hasMountedSubscriber = false;
+        if (!lifecycle.hasMountedSubscriber) return;
+        const currentUnsubscribe = lifecycle.mountedUnsubscribe;
+        lifecycle.clearMountedSubscriber();
         messageQueue.markUnmounted();
         options.ipcRenderer.removeListener(options.channels.hostMessage, mountedHandler);
-        if (mountedUnsubscribe === unsubscribe) mountedUnsubscribe = null;
+        if (currentUnsubscribe === unsubscribe) lifecycle.setMountedUnsubscribe(null);
       };
-      mountedUnsubscribe = unsubscribe;
+      lifecycle.setMountedUnsubscribe(unsubscribe);
       return unsubscribe;
     },
   };
 
   const dispose = () => {
-    if (destroyed) return;
-    destroyed = true;
-    mountedUnsubscribe?.();
-    mountedUnsubscribe = null;
+    const unsubscribe = lifecycle.mountedUnsubscribe;
+    unsubscribe?.();
+    if (!lifecycle.dispose()) return;
     messageQueue.dispose();
   };
 
@@ -97,7 +96,7 @@ function createAnnotationPreloadBridge(options: AnnotationPreloadBridgeOptions) 
     bufferEditorMessage,
     prepareMount,
     dispose,
-    get hasMountedSubscriber() { return hasMountedSubscriber; },
+    get hasMountedSubscriber() { return lifecycle.hasMountedSubscriber; },
     get hasPendingEditorMessage() { return messageQueue.hasPendingEditorMessage; },
   };
 }
