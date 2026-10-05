@@ -1726,3 +1726,4 @@ typecheck 均通过。
 2026-10-05 A5 T5 继续批次：app-shared 的 scroll offset clamp 策略已迁移至 `src/renderer/app-shared/runtime/clamp-scroll-offset.ts`；新增 `scripts/test-app-shared-clamp-scroll-offset.mjs` 覆盖 4 项 focused assertions，并登记 `Bq/AFe` 源码 61745-61748 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
 2026-10-05 A5 T5 继续批次：app-shared 的 unknown error message formatter 已迁移至 `src/renderer/app-shared/runtime/format-error-message.ts`；新增 `scripts/test-app-shared-format-error-message.mjs` 覆盖 4 项 focused assertions，并登记 `IH/RVe` 源码 65652-65662 行语义证据。该导出已由 manifest 识别为 consumed，保留现有 renderer 消费语义。
+2026-10-05 A1 T1 继续批次：review search 的大小写不敏感 offset 收集、limit cap 与 totalMatches/isCapped 投影已迁移至 `src/main/worker/git-review-search-policy.ts`；review search utils 保留 path/snippet 与 streaming decoder 策略。新增 `scripts/test-worker-git-review-search-policy.mjs` 覆盖 3 项 focused assertions；build 与 typecheck 已通过。
