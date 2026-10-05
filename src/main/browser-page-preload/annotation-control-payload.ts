@@ -38,7 +38,6 @@ export { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControl
 if (typeof module !== `undefined`) module.exports = { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, createAnnotationResponseDetail };
 import { isValidAnnotationHitTestRequest } from "./annotation-hit-test-request-policy";
 import { cloneAnnotationRecord } from "./annotation-record-clone-policy";
-import { isSafeAnnotationText } from "./annotation-safe-text-policy";
 import { isSafeAnnotationMetadataKey } from "./annotation-metadata-key-policy";
 import { isSafeAnnotationRole } from "./annotation-role-policy";
 import { isValidAnnotationRect } from "./annotation-rect-policy";
