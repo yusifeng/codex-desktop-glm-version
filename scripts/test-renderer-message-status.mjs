@@ -1,0 +1,29 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { build } from "esbuild";
+
+const root = path.resolve(new URL("..", import.meta.url).pathname);
+const temp = fs.mkdtempSync(path.join(os.tmpdir(), "renderer-message-status-"));
+const output = path.join(temp, "message-status.mjs");
+try {
+  await build({
+    absWorkingDir: root,
+    entryPoints: ["src/renderer/app-primary/runtime/message-status.ts"],
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    outfile: output,
+  });
+  const { isMessageSendingOrPolling } = await import(`${output}?test=${Date.now()}`);
+  assert.equal(isMessageSendingOrPolling({ kind: "sending_in_progress" }), true);
+  assert.equal(isMessageSendingOrPolling({ kind: "polling_final" }), true);
+  assert.equal(isMessageSendingOrPolling({ kind: "success_sent" }), false);
+  assert.equal(isMessageSendingOrPolling({}), false);
+  assert.equal(isMessageSendingOrPolling(null), false);
+  assert.equal(isMessageSendingOrPolling(undefined), false);
+  console.log("renderer message-status: 6 assertions passed");
+} finally {
+  fs.rmSync(temp, { recursive: true, force: true });
+}

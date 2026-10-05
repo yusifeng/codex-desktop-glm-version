@@ -11,6 +11,16 @@
   },
   {
     "hub": "app-primary",
+    "alias": "Ed",
+    "sourceSymbol": "HI",
+    "startLine": 17663,
+    "endLine": 17665,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/message-status.ts",
+    "evidence": "The message transport predicate only recognizes sending_in_progress and polling_final kinds; it has no renderer lifecycle, JSX, or store side effects and is extracted as a typed pure function."
+  },
+  {
+    "hub": "app-primary",
     "alias": "Jc",
     "sourceSymbol": "fW",
     "startLine": 30853,

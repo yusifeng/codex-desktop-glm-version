@@ -642,3 +642,9 @@ bootstrap，`Br`（`ltt`）负责 message/answer kind state projection。它们�
 renderer consumer 或可安全迁移的 teardown/lifecycle 契约，继续保留在聚合 hub；逐行范围、
 source symbol 与分类由 `scripts/audit-renderer-hub-classification.mjs` 校验，focused suite
 将 reviewedCount 从 149 提升至 158。
+
+本轮再补充 app-primary 消息传输状态纯策略：`HI`（公开别名 `Ed`，17663--17665
+行）仅识别 `sending_in_progress` 与 `polling_final` 两个进行中状态，不触碰 JSX、store
+或生命周期副作用。该边界已迁移至 `src/renderer/app-primary/runtime/message-status.ts`，
+由 `scripts/test-renderer-message-status.mjs` 覆盖 6 项输入断言；由于当前 renderer
+尚无独立 named consumer，`Ed` 仍登记为未消费导出，避免伪造消费边。
