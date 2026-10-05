@@ -14,7 +14,7 @@ type AnnotationModeToggleCommand = {
 
 /** Returns the host command when the page is allowed to request a mode change. */
 function createAnnotationModeToggleCommand(input: AnnotationModeTogglePolicyInput): AnnotationModeToggleCommand | null {
-  if (input.destroyed || input.canUseSiteAnnotationApi !== true || input.isAgentControllingBrowser || input.userActivationActive !== true) return null;
+  if (!canToggleAnnotationMode(input)) return null;
   return { type: `browser-sidebar-runtime-toggle-annotation-mode`, force: input.force };
 }
 
@@ -25,3 +25,4 @@ function shouldClearAnnotationRequestsForToggle(force?: boolean): boolean {
 
 export { createAnnotationModeToggleCommand, shouldClearAnnotationRequestsForToggle };
 if (typeof module !== `undefined`) module.exports = { createAnnotationModeToggleCommand, shouldClearAnnotationRequestsForToggle };
+import { canToggleAnnotationMode } from "./annotation-mode-toggle-eligibility";
