@@ -107,6 +107,10 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `FK`（内部 `wIe`，源码 46069--46075）的 http(s)
+URL 与 hostname allowlist 纯策略已迁移至 `src/renderer/app-shared/runtime/is-http-url.ts`；新增 focused
+test 3 项断言，typecheck 与 focused test 已通过。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `xU`（内部 `KBe`，源码 48497--48500）的 document
 preview path 纯判定已迁移至 `src/renderer/app-shared/runtime/is-document-preview-path.ts`；新增
 focused test 3 项断言，typecheck 与 focused test 已通过。
