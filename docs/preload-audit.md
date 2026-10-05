@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation element label policy
+
+Annotation element label 的 root tag fallback、文本规范化与 80 字符截断（原 `bc`，5120-7259
+业务工具段）已迁移至 `src/main/browser-page-preload/annotation-element-label-policy.ts`；root
+判定通过入口注入。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation document-root policy
 
 `documentElement/body` 根节点身份判定（原 `rc`，5120-7259 业务工具段）已迁移至

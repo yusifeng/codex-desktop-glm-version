@@ -4395,9 +4395,7 @@ function yc(e) {
   return e.getAttribute(`aria-label`) || bc(e) || e.tagName.toLowerCase();
 }
 function bc(e) {
-  if (rc(e)) return e.tagName.toLowerCase();
-  let t = (e.innerText || e.textContent || ``).replace(/\s+/g, ` `).trim();
-  return t.length === 0 ? null : t.slice(0, 80);
+  return projectAnnotationElementLabel(e, rc);
 }
 function xc(e) {
   let t = bc(e);
@@ -6166,6 +6164,7 @@ var { projectAnnotationAnchorPoint } = require("./browser-page-preload/annotatio
 var { scoreAnnotationAnchorCandidate } = require("./browser-page-preload/annotation-anchor-candidate-score");
 var { isTopLevelAnnotationRoot } = require("./browser-page-preload/annotation-anchor-root-policy");
 var { isAnnotationDocumentRoot } = require("./browser-page-preload/annotation-document-root-policy");
+var { projectAnnotationElementLabel } = require("./browser-page-preload/annotation-element-label-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
