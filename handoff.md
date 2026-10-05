@@ -1770,3 +1770,4 @@ typecheck 均通过。
 2026-10-06 A5 逐段复核：app-shared 导出 `$1`（source `$S`，81015-81018）确认是生成 icon registry 的 document-badge lazy initializer；其共享注册、memoized bootstrap 与资产生命周期均由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `$2`（source `Hg`，28961-28975）确认由共享 intl bootstrap 初始化，组合 locale/message cache、rich-text normalization 与 formatter context；其 provider/cache 生命周期耦合 generated surface，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-shared 导出 `e4`（source `Ug`，28948-28973）确认是 shared intl runtime bootstrap，初始化 provider 依赖并 memoize locale/message formatter state；其 setup/cache 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
+2026-10-06 A5 逐段复核：app-shared 导出 `Ku`（source `Ugt`，112340-112343）确认是 shared icon bootstrap 的 memoized pin asset initializer；registry ownership 与 lazy asset lifecycle 由 generated surface 持有，登记为 `preserved-coupled`。
