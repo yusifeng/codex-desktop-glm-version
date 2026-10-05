@@ -1,3 +1,9 @@
+import {
+  getEnvironmentValue,
+  hasPathOverride,
+  mergeProcessEnvironment,
+} from "./git-executable-policy";
+
 /** Windows Git executable resolution and command-line adaptation. */
 
 export type GitExecutableDependencies = {
@@ -10,26 +16,6 @@ export type GitExecutableDependencies = {
 };
 
 const GIT_EXECUTABLE_NAMES = [`git.exe`, `git`];
-
-export function getEnvironmentValue(environment: Record<string, string | undefined>, key: string): string | undefined {
-  const actualKey = Object.keys(environment).reverse().find((candidate) => candidate.toLowerCase() === key.toLowerCase());
-  return actualKey == null ? undefined : environment[actualKey]?.trim() || undefined;
-}
-
-export function hasPathOverride(environment: Record<string, string | undefined> | undefined): boolean {
-  return environment != null && Object.keys(environment).some((key) => key.toLowerCase() === `path`);
-}
-
-export function mergeProcessEnvironment(
-  environment: Record<string, string | undefined> | undefined,
-  processEnvironment: Record<string, string | undefined> = process.env,
-): Record<string, string | undefined> {
-  const base = { ...processEnvironment };
-  if (hasPathOverride(environment)) {
-    for (const key of Object.keys(base)) if (key.toLowerCase() === `path`) delete base[key];
-  }
-  return { ...base, ...environment };
-}
 
 function resolveGitCandidate(name: string, environment: Record<string, string | undefined>, deps: Required<GitExecutableDependencies>): string | null {
   const result = deps.spawnSync(deps.whereCommand, [`$PATH:${name}`], {

@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation viewport override 的尺寸合并纯策略已抽至
+`src/main/browser-page-preload/annotation-viewport-merge-policy.ts`；override adapter 仅保留
+泛型输入与可选 viewport 编排。新增 `scripts/test-preload-annotation-viewport-merge-policy.mjs`
+覆盖 2 项空 override/覆盖尺寸断言；原 viewport-override 回归 3 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation wheel delta 的 line/page/default 单位换算纯策略已抽至
 `src/main/browser-page-preload/annotation-wheel-delta-policy.ts`；wheel adapter 仅保留事件输入
 与 viewport 依赖编排。新增 `scripts/test-preload-annotation-wheel-delta-policy.mjs` 覆盖 2 项
@@ -1509,3 +1514,5 @@ typecheck 均通过。
 2026-10-05 A1 继续批次：automation writable roots 的 common-dir 路径解析与 index/.git fallback 已迁移至 `src/main/worker/git-automation-writable-roots-policy.ts`；运行时保留 worktree/source repository 查询及 writable-root 编排。新增 `scripts/test-worker-git-automation-writable-roots-policy.mjs` 覆盖 6 项 focused assertions；原回归 9 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：checkout failure 的 overwrite-conflict 输出解析、去重路径收集与错误分类已迁移至 `src/main/worker/git-checkout-conflict-policy.ts`；checkout handler 保留 ref 解析、stash/rollback、Git checkout 与缓存失效副作用。新增 `scripts/test-worker-git-checkout-conflict-policy.mjs` 覆盖 5 项 focused assertions；原 checkout handler 回归 16 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：Windows Git executable 的大小写不敏感环境读取、PATH 覆盖检测与进程环境合并策略已迁移至 `src/main/worker/git-executable-policy.ts`；executable resolver 保留 Windows where 查询、缓存与命令重写流程。新增 `scripts/test-worker-git-executable-policy.mjs` 覆盖 6 项 focused assertions；原 executable 回归 6 项、build 与 typecheck 已通过。

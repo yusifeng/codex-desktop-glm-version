@@ -2,11 +2,16 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import * as esbuild from "esbuild";
+import { createRequire } from "node:module";
 
 const source = await fs.readFile("src/main/worker/git-executable.ts", "utf8");
 const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
 const module = { exports: {} };
-new Function("module", "exports", code)(module, module.exports);
+new Function("module", "exports", "require", code)(
+  module,
+  module.exports,
+  createRequire(new URL("../app/.vite/build/worker/git-executable-policy.js", import.meta.url)),
+);
 const { getEnvironmentValue, hasPathOverride, mergeProcessEnvironment, rewriteGitCommandForWindows } = module.exports;
 
 assert.equal(getEnvironmentValue({ Path: "x", PATH: "y", ComSpec: " cmd.exe " }, "path"), "y");

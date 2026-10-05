@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1051.
+Total scripts: 1055.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -48,6 +48,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-visible-text-policy.mjs`](./test-preload-annotation-visible-text-policy.mjs)
 - [`test-app-shared-select-mode-descriptor.mjs`](./test-app-shared-select-mode-descriptor.mjs)
 - [`test-preload-annotation-wheel-delta-policy.mjs`](./test-preload-annotation-wheel-delta-policy.mjs)
+- [`test-preload-annotation-viewport-merge-policy.mjs`](./test-preload-annotation-viewport-merge-policy.mjs)
 - [`test-app-shared-encode-prefixed-path.mjs`](./test-app-shared-encode-prefixed-path.mjs)
 - [`test-app-shared-stable-json-stringify.mjs`](./test-app-shared-stable-json-stringify.mjs)
 - [`test-preload-annotation-frame-chain-policy.mjs`](./test-preload-annotation-frame-chain-policy.mjs)
@@ -1117,3 +1118,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-clone-state-policy.mjs](test-worker-git-clone-state-policy.mjs)
 [test-worker-git-automation-writable-roots-policy.mjs](test-worker-git-automation-writable-roots-policy.mjs)
 [test-worker-git-checkout-conflict-policy.mjs](test-worker-git-checkout-conflict-policy.mjs)
+[test-worker-git-executable-policy.mjs](test-worker-git-executable-policy.mjs)
