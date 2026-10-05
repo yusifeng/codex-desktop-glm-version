@@ -162,7 +162,7 @@ export class IabBrowserUseApi {
   private allowedDownloadGrantsByWebContentsId = new Map<number, { expiresAtMs: number }>();
   private cursorArrivalWaitersByMoveSequence = new Map<number, { resolve: () => void; reject: (error: Error) => void }>();
   private selectedTabIdsByRouteKey = new Map<string, string>();
-  private hostsByRouteKey = new Map<string, string>();
+  private hostsByRouteKey = new Map<string, unknown>();
   private pendingVisibilityRouteKeys = new Set<string>();
   private pendingViewportSizesByRouteKey = new Map<string, { height: number; width: number }>();
   private usedTurnIdsByConversationId = new Map<string, Set<string>>();
@@ -199,6 +199,56 @@ export class IabBrowserUseApi {
       ...(this.appSessionId == null ? {} : { codexAppSessionId: this.appSessionId }),
       codexSessionId: session.conversationId,
     };
+  }
+
+  getRequiredBrowserHost(session: { conversationId: string; routeKey?: string }): unknown {
+    const host = this.getBrowserHost(session);
+    if (host == null) throw new Error(`No in-app Browser host is available for browser session ${session.conversationId}`);
+    return host;
+  }
+
+  rememberBrowserHost(route: { routeKey: string; conversationId?: string }, host?: unknown): void {
+    if (host == null && route.conversationId != null) host = this.getBrowserHost({ conversationId: route.conversationId, routeKey: route.routeKey });
+    if (host != null) this.hostsByRouteKey.set(route.routeKey, host);
+  }
+
+  getBrowserHostsForSession(route: { routeKey: string }): unknown {
+    return this.hostsByRouteKey.get(route.routeKey) ?? null;
+  }
+
+  releaseSessionControl(route: { routeKey: string }): void {
+    this.selectedTabIdsByRouteKey.delete(route.routeKey);
+    this.pendingVisibilityRouteKeys.delete(route.routeKey);
+    this.pendingViewportSizesByRouteKey.delete(route.routeKey);
+  }
+
+  recordBrowserUseTurn(session: { conversationId: string }, request: { turn_id?: unknown }): void {
+    if (typeof request.turn_id !== "string" || request.turn_id.length === 0) return;
+    const turns = this.usedTurnIdsByConversationId.get(session.conversationId) ?? new Set<string>();
+    turns.add(request.turn_id);
+    this.usedTurnIdsByConversationId.set(session.conversationId, turns);
+  }
+
+  clearRecordedBrowserUseTurn(session: { conversationId: string }, turnId: string): void {
+    const turns = this.usedTurnIdsByConversationId.get(session.conversationId);
+    if (turns == null) return;
+    turns.delete(turnId);
+    if (turns.size === 0) this.usedTurnIdsByConversationId.delete(session.conversationId);
+  }
+
+  getTab(tabId: string): IabTabSnapshot | null {
+    return this.tabsById.get(tabId) ?? null;
+  }
+
+  requireLiveTab(tabId: string): IabTabSnapshot {
+    const tab = this.getTab(tabId);
+    if (tab == null) throw new Error(`Unknown tab: ${tabId}`);
+    return tab;
+  }
+
+  forgetRouteTabId(route: { routeKey: string }, tabId?: string): void {
+    const selected = this.selectedTabIdsByRouteKey.get(route.routeKey);
+    if (tabId == null || selected === tabId) this.selectedTabIdsByRouteKey.delete(route.routeKey);
   }
 
   /** tab 列表（原 `getTabs`/`getTabsForBrowserUse`）。 */

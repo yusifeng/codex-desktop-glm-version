@@ -6,6 +6,10 @@ const api = new IabBrowserUseApi(() => null, undefined, {
   buildFlavor: "test",
   appSessionId: "app-1",
 });
+const host = { routeKey: "r-1" };
+const routedApi = new IabBrowserUseApi(() => host, undefined, {
+  ensureSessionRoute: () => true,
+});
 
 assert.equal(api.ping(), "pong");
 assert.deepEqual(api.requireBrowserUseSession({ conversationId: "c-1", routeKey: "r-1" }), { conversationId: "c-1" });
@@ -22,4 +26,11 @@ assert.deepEqual(api.getRequestSafeFields({ conversationId: "c-1" }, { turn_id: 
   request: "getTabs",
   turnId: "t-1",
 });
-console.log("main IAB API boundary: 7 assertions passed");
+assert.equal(routedApi.getRequiredBrowserHost({ conversationId: "c-1", routeKey: "r-1" }), host);
+routedApi.rememberBrowserHost({ routeKey: "r-1" }, host);
+assert.equal(routedApi.getBrowserHostsForSession({ routeKey: "r-1" }), host);
+routedApi.recordBrowserUseTurn({ conversationId: "c-1" }, { turn_id: "t-1" });
+routedApi.clearRecordedBrowserUseTurn({ conversationId: "c-1" }, "t-1");
+assert.equal(routedApi.getTab("missing"), null);
+assert.throws(() => routedApi.requireLiveTab("missing"), /Unknown tab/);
+console.log("main IAB API boundary: 12 assertions passed");
