@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation comment count 的非空判定与数量投影已迁移至
+`src/main/browser-page-preload/annotation-comment-count.ts`；原 `ss/cs` 入口保留兼容委托，
+新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation viewport inverse-scale fallback 已迁移至
 `src/main/browser-page-preload/annotation-viewport-scale.ts`；原 `xs` 入口保留兼容委托，
 新增 3 项 focused assertions，build 与 typecheck 已通过。

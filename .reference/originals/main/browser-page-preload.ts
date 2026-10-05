@@ -3884,10 +3884,10 @@ var es,
       (as = ts.max(128).refine((e) => e.trim().length > 0)));
   });
 function ss(e) {
-  return e.length > 0;
+  return hasAnnotationComments(e);
 }
 function cs(e) {
-  return e.length;
+  return getAnnotationCommentCount(e);
 }
 function ls(e, t) {
   return annotationDesignStyles.collectAnnotationStyleDeclarations(e, t);
@@ -6172,6 +6172,7 @@ var { projectAnnotationTooltipPosition } = require("./browser-page-preload/annot
 var { areAnnotationScrollContainersEqual } = require("./browser-page-preload/annotation-scroll-container-equality");
 var { areAnnotationAnchorsEqual } = require("./browser-page-preload/annotation-anchor-equality");
 var { getAnnotationInverseViewportScale } = require("./browser-page-preload/annotation-viewport-scale");
+var { hasAnnotationComments, getAnnotationCommentCount } = require("./browser-page-preload/annotation-comment-count");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

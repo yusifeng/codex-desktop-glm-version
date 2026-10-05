@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation comment count policy
+
+Annotation comments 的非空判定与数量投影（原 `ss/cs`，3863-5049 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-comment-count.ts`；入口保留兼容委托。新增 focused
+test 覆盖空/非空列表与数量，共 3 项断言；build 与 typecheck 已通过。
+
 ### 增量抽取：annotation viewport scale policy
 
 Annotation viewport scale 的 inverse-scale fallback（原 `xs`，3863-5049 业务工具段）已迁移至
