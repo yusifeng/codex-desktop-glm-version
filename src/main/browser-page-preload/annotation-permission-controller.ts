@@ -6,6 +6,7 @@ type AnnotationPermissionControllerDependencies = {
 
 function createAnnotationPermissionController(deps: AnnotationPermissionControllerDependencies) {
   let pending: { requestId: string; promise: Promise<boolean>; resolve: (allowed: boolean) => void } | null = null;
+  let disposed = false;
 
   const reset = () => {
     pending?.resolve(false);
@@ -13,6 +14,7 @@ function createAnnotationPermissionController(deps: AnnotationPermissionControll
   };
 
   const handleResult = (requestId: string, allowed: boolean) => {
+    if (disposed) return false;
     if (pending?.requestId !== requestId) return false;
     pending.resolve(allowed);
     pending = null;
@@ -20,6 +22,7 @@ function createAnnotationPermissionController(deps: AnnotationPermissionControll
   };
 
   const requestPermission = () => {
+    if (disposed) return false;
     if (deps.isPermissionGranted()) return true;
     if (pending != null) return pending.promise;
 
@@ -41,7 +44,13 @@ function createAnnotationPermissionController(deps: AnnotationPermissionControll
     return promise;
   };
 
-  return { handleResult, requestPermission, reset };
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    reset();
+  };
+
+  return { handleResult, requestPermission, reset, dispose, get disposed() { return disposed; } };
 }
 
 export { createAnnotationPermissionController };

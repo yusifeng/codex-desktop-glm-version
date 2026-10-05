@@ -1,5 +1,5 @@
 type AnnotationFeatureLifecycleDependencies = {
-  permissionController: { reset: () => void; requestPermission: () => boolean | Promise<boolean> };
+  permissionController: { reset: () => void; requestPermission: () => boolean | Promise<boolean>; dispose?: () => void };
   getState: () => any;
   setPermissionGranted: (granted: boolean) => void;
   setFeatureApiAvailable: (available: boolean) => void;

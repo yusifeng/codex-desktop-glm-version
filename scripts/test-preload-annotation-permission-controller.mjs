@@ -44,4 +44,10 @@ const failed = controller.requestPermission();
 assert.equal(await failed, false);
 assert.equal(controller.handleResult("request-4", true), false);
 
-console.log("preload annotation permission controller assertions passed (14 assertions)");
+controller.dispose();
+assert.equal(controller.disposed, true);
+assert.equal(controller.requestPermission(), false);
+assert.equal(controller.handleResult("request-5", true), false);
+controller.dispose();
+
+console.log("preload annotation permission controller assertions passed (18 assertions)");

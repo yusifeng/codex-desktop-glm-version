@@ -2,6 +2,7 @@
 type AnnotationPagehideDependencies = {
   clearPreview: () => void;
   resetPermission: () => void;
+  disposePermission?: () => void;
   disposeFeatures: () => void;
   removeDOMContentLoaded: () => void;
   removeHostMessageListener: () => void;
@@ -18,6 +19,7 @@ function handleAnnotationPagehide(
   if (event?.isTrusted) deps.resetPermission();
   if (!event?.isTrusted || event.persisted) return false;
   deps.markDestroyed();
+  deps.disposePermission?.();
   deps.disposeFeatures();
   deps.removeDOMContentLoaded();
   deps.removeHostMessageListener();

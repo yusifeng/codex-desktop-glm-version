@@ -137,6 +137,7 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
     handleAnnotationPagehide(event, {
       clearPreview: () => runtimeMount.setPreview(null),
       resetPermission: () => permissionController.reset(),
+      disposePermission: () => permissionController.dispose?.(),
       disposeFeatures,
       markDestroyed: () => { lifecycleState.setDestroyed(); },
       removeDOMContentLoaded: () => deps.windowLike.removeEventListener(`DOMContentLoaded`, runtimeMount.mount),
