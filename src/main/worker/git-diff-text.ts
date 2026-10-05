@@ -80,11 +80,12 @@ function parseGitPathEscape(input: string, startIndex: number) {
 }
 
 function parseGitDiffHeader(header: string) {
-  if (header.startsWith(`diff --cc `))
+  const headerKind = classifyGitDiffHeader(header);
+  if (headerKind === `combined` && header.startsWith(`diff --cc `))
     return parseCombinedGitDiffPath(header.slice(10));
-  if (header.startsWith(`diff --combined `))
+  if (headerKind === `combined`)
     return parseCombinedGitDiffPath(header.slice(16));
-  if (!header.startsWith(`diff --git `)) return null;
+  if (headerKind !== `git`) return null;
   const paths = header.slice(11);
   if (paths.startsWith(`"`)) {
     const oldPath = parseGitQuotedPath(paths, 0);
@@ -166,3 +167,4 @@ if (typeof module !== `undefined`)
   };
 import { countGitDiffLines } from "./git-diff-line-count-policy";
 import { isOctalDigit, isThreeDigitOctal } from "./git-diff-octal-policy";
+import { classifyGitDiffHeader } from "./git-diff-header-policy";
