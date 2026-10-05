@@ -15,8 +15,13 @@ esac
 ./scripts/pack.sh
 
 export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-# 冒烟测试用独立 profile：避免与正在运行的官方版/开发版实例争单实例锁。
-export CODEX_ELECTRON_USER_DATA_PATH="$HOME/Library/Application Support/Codex (smoke-test)"
+# 冒烟测试默认使用一次性 profile：避免旧 smoke 进程或单实例锁把新包的
+# 启动请求转发到历史实例。调试时可显式传入固定路径保留 profile。
+if [[ -n "${CODEX_SMOKE_USER_DATA_PATH:-}" ]]; then
+  export CODEX_ELECTRON_USER_DATA_PATH="$CODEX_SMOKE_USER_DATA_PATH"
+else
+  export CODEX_ELECTRON_USER_DATA_PATH="$(mktemp -d "${TMPDIR:-/tmp}/codex-smoke.XXXXXX")"
+fi
 
 APP=shell/ChatGPT.app/Contents/MacOS/ChatGPT
 LOG="$CODEX_ELECTRON_USER_DATA_PATH/smoke-test.log"
