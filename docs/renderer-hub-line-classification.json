@@ -2221,5 +2221,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/format-skill-scope-label.ts",
     "evidence": "The pure scope-label policy honors explicit repo/admin overrides, formats known localized messages, and delegates unknown scopes to the existing fallback without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "po",
+    "sourceSymbol": "VY",
+    "startLine": 45394,
+    "endLine": 45396,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/is-active-entity.ts",
+    "evidence": "The pure registry-state predicate projects only the active flag and safely treats missing state as inactive; it has no JSX, store mutation, network, or lifecycle effects and is covered by a focused three-case runtime test."
   }
 ]

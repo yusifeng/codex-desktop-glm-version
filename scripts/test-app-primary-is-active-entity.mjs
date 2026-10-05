@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/is-active-entity.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const registry = { getState: (key) => key === "open" ? { active: true } : key === "closed" ? { active: false } : undefined };
+assert.equal(mod.isActiveEntity(registry, "open"), true);
+assert.equal(mod.isActiveEntity(registry, "closed"), false);
+assert.equal(mod.isActiveEntity(registry, "missing"), false);
+console.log("app-primary is-active entity: 3 assertions passed");
