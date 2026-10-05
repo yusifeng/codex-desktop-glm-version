@@ -34,7 +34,7 @@ export function projectAnnotationDisplaySelections(
       borderRadius: live?.borderRadius,
       className: deps.getClassName(anchor, rect, viewport.width, viewport.height),
       isPageAnnotation: deps.isPageAnnotation(anchor),
-      key: `${selection.anchor.kind}:${selection.anchor.framePath.join(`>`)}:${selection.anchor.selector ?? selection.anchor.elementPath}:${selection.anchor.rect.x}:${selection.anchor.rect.y}:${sourceIndex}`,
+      key: createAnnotationSelectionDisplayKey(selection, sourceIndex),
       rect: clipped,
       selectionIndex: selectionIndexOffset + sourceIndex,
     }];
@@ -42,3 +42,4 @@ export function projectAnnotationDisplaySelections(
 }
 
 if (typeof module !== `undefined`) module.exports = { projectAnnotationDisplaySelections };
+import { createAnnotationSelectionDisplayKey } from "./annotation-selection-display-key";
