@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git turn-diff capture 的 checkpoint/capture ref 命名、时间戳解析、TTL
+过期判定与最新 checkpoint 选择已迁移至 `src/main/worker/git-turn-diff-capture-policy.ts`；capture
+运行时保留 Git ref、diff 与 checkpoint 队列编排。新增
+`scripts/test-worker-git-turn-diff-capture-policy.mjs` 覆盖 9 项 focused assertions；原 19 项
+turn-diff capture 回归与 build、typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation surface observer 的异步 teardown 边界已补齐；
 `dispose` 后迟到的 MutationObserver、Shadow DOM attach 与 pageshow 回调现在均受终态门禁，
 不会重新扫描 DOM 或广播 feature 状态。`scripts/test-preload-annotation-surface-observer.mjs`

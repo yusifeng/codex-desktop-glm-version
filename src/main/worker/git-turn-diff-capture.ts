@@ -1,3 +1,13 @@
+import {
+  buildCaptureRefPrefix,
+  buildCheckpointRefPrefix,
+  buildCheckpointScopeRefPrefix,
+  captureRefPrefix,
+  checkpointRefPrefix,
+  isRefStale,
+  selectLatestCheckpoint,
+} from './git-turn-diff-capture-policy';
+
 type TurnDiffCaptureDependencies = {
   captureSnapshotTree: (repository: any) => Promise<string>;
   getHeadCommit: (
@@ -29,8 +39,6 @@ type TurnDiffCaptureDependencies = {
   sessionStartDiffTimeoutMs: number;
 };
 
-const captureRefPrefix = `refs/codex/turn-diffs/captures`;
-const checkpointRefPrefix = `refs/codex/turn-diffs/checkpoints`;
 const checkpointQueues = new Map<string, Promise<void>>();
 
 const queueKey = (root: string, prefix: string) => `${root}\0${prefix}`;
@@ -94,22 +102,13 @@ async function findRecentCheckpoint(
     params.host,
   );
   if (!result.success) return null;
-  let found = null;
-  let latest = -Infinity;
-  for (const line of result.stdout.split(`\n`)) {
-    const [ref, sha] = line.split(` `);
-    const createdAt = Number(ref?.split(`/`).at(-2));
-    if (
-      sha != null &&
-      Number.isSafeInteger(createdAt) &&
-      createdAt > latest &&
-      params.nowMs - createdAt <= deps.checkpointTtlMs
-    ) {
-      found = deps.normalizeTreeSha(sha);
-      latest = createdAt;
-    }
-  }
-  return found;
+  return selectLatestCheckpoint({
+    output: result.stdout,
+    refPrefix: params.refPrefix,
+    nowMs: params.nowMs,
+    ttlMs: deps.checkpointTtlMs,
+    normalizeTreeSha: deps.normalizeTreeSha,
+  });
 }
 
 async function pruneRefs(params: any, deps: TurnDiffCaptureDependencies) {
@@ -123,15 +122,12 @@ async function pruneRefs(params: any, deps: TurnDiffCaptureDependencies) {
     result.stdout
       .split(`\n`)
       .filter((ref: string) => {
-        const createdAt = Number(
-          ref.slice(params.refPrefix.length + 1).split(`/`)[
-            params.createdAtPathIndex
-          ],
-        );
-        return (
-          Number.isSafeInteger(createdAt) &&
-          params.nowMs - createdAt > params.ttlMs
-        );
+        return isRefStale({
+          ref,
+          refPrefix: params.refPrefix,
+          nowMs: params.nowMs,
+          ttlMs: params.ttlMs,
+        });
       })
       .map((ref: string) =>
         releaseTree({ host: params.host, ref, root: params.root }, deps),
@@ -242,9 +238,13 @@ async function startTurnDiffCapture(
         ),
   ]);
   const nowMs = deps.now();
-  const refPrefix = `${captureRefPrefix}/${nowMs}/${deps.randomUUID()}`;
-  const checkpointScopeRefPrefix = `${checkpointRefPrefix}/${await hashKey(params.checkpointKey, deps)}`;
-  const checkpointRefPrefixForTurn = `${checkpointScopeRefPrefix}/${await hashKey(params.turnId, deps)}`;
+  const refPrefix = buildCaptureRefPrefix(nowMs, deps.randomUUID());
+  const checkpointScopeHash = await hashKey(params.checkpointKey, deps);
+  const checkpointScopeRefPrefix = buildCheckpointScopeRefPrefix(checkpointScopeHash);
+  const checkpointRefPrefixForTurn = buildCheckpointRefPrefix(
+    checkpointScopeHash,
+    await hashKey(params.turnId, deps),
+  );
   await retainTree(
     {
       host: params.host,
