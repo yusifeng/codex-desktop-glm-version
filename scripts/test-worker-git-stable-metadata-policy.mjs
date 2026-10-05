@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { resolveStableMetadataWatcherAction } = require("../app/.vite/build/worker/git-stable-metadata-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+equal(resolveStableMetadataWatcherAction(false, true), "ensure");
+equal(resolveStableMetadataWatcherAction(false, false), "dispose");
+equal(resolveStableMetadataWatcherAction(false, undefined), "none");
+equal(resolveStableMetadataWatcherAction(true, true), "dispose");
+equal(resolveStableMetadataWatcherAction(true, false), "dispose");
+equal(resolveStableMetadataWatcherAction(true, undefined), "none");
+console.log(`${assertions} worker git stable metadata policy assertions passed`);

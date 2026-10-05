@@ -6,15 +6,18 @@ type StableMetadataDependencies = {
   encodeResult: (value: unknown) => unknown;
 };
 
+import { resolveStableMetadataWatcherAction } from './git-stable-metadata-policy';
+
 /** Resolve repository metadata while preserving the Git-init watcher protocol. */
 async function resolveStableMetadata(params: { cwd: unknown; watchForGitInit?: boolean }, deps: StableMetadataDependencies) {
   const metadata = await deps.gitManager.getStableMetadata(params.cwd, deps.host);
+  const action = resolveStableMetadataWatcherAction(metadata != null, params.watchForGitInit);
   if (metadata == null) {
-    if (params.watchForGitInit === true) await deps.ensureWatchingForGitInit(params.cwd, deps.host);
-    else if (params.watchForGitInit === false) deps.disposeGitInitWatcher(params.cwd, deps.host);
+    if (action === `ensure`) await deps.ensureWatchingForGitInit(params.cwd, deps.host);
+    else if (action === `dispose`) deps.disposeGitInitWatcher(params.cwd, deps.host);
     return deps.encodeResult(null);
   }
-  if (params.watchForGitInit != null) deps.disposeGitInitWatcher(params.cwd, deps.host);
+  if (action === `dispose`) deps.disposeGitInitWatcher(params.cwd, deps.host);
   return deps.encodeResult({ commonDir: metadata.commonDir, root: metadata.root });
 }
 

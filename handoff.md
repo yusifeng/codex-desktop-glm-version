@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git stable metadata request 的 Git-init watcher ensure/dispose/none 动作判定已迁移至 `src/main/worker/git-stable-metadata-policy.ts`；request handler 保留 stable metadata I/O、watcher side effects 与 result encoding。新增 `scripts/test-worker-git-stable-metadata-policy.mjs` 覆盖 6 项 focused assertions；原 request-handler 回归 3 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation marker view 的共享非 element anchor 基础投影已抽至
+`src/main/browser-page-preload/annotation-marker-base-projection.ts`；marker view-state 仅保留
+text/region/virtual 分支与 element 刷新编排。新增 `scripts/test-preload-annotation-marker-base-projection.mjs`
+覆盖 3 项 theme/viewport/additional-anchor 断言；原 marker view-state 回归 12 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation display anchors 的 text-anchor 展示投影已抽至
 `src/main/browser-page-preload/annotation-text-display-projection.ts`；display resolver 仅保留
 element/region anchor 解析与 cache/viewport 编排。新增
