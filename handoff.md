@@ -2009,6 +2009,8 @@ typecheck 均通过。
 
 2026-10-06 T4 coverage audit 校准：当前 `.reference/originals/main/main-C-Mhak1n.ts` 为 176,438 行（初始基线 176,978，已删除 540 行语义实现）；审计文档已明确历史区间仅作证据索引，后续必须按当前符号重新定位。仓库无独立 `audit-main-coverage` 命令，本轮不宣称额外覆盖完成。
 
+2026-10-06 T4 回归证据：`test-main-startup-policy.mjs` 17 项、`test-main-immediate-update-exit.mjs` 4 项、`test-main-delayed-progress-window.mjs` 5 项通过；仅证明已迁出策略/时序模块，不改变剩余启动装配 business-preserved 结论。
+
 2026-10-06 A1 T1 继续批次：Setup script 的 original/worktree workspace 环境变量覆盖构造已迁移至 `src/main/worker/git-worktree-setup-environment-policy.ts`；runtime 仅保留执行副作用。新增 `scripts/test-worker-git-worktree-setup-environment-policy.mjs` 覆盖 3 项 focused assertions。
 
 2026-10-06 A1 T1 继续批次：Core Git RPC method 的 availability/create-branch/git-origins 白名单已迁移至 `src/main/worker/git-core-request-policy.ts`；dispatcher 仅保留参数编排与 Git I/O。新增 `scripts/test-worker-git-core-request-policy.mjs` 覆盖 4 项 focused classification assertions。

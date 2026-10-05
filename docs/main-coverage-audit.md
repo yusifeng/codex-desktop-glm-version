@@ -315,6 +315,10 @@ harness 为前置证据。
 因此本轮未把历史 `176,978` 末端区间误报为当前未审计代码；后续增量应先更新符号定位，再补
 对应区间证据。
 
+本轮可迁移边界回归证据：`test-main-startup-policy.mjs` 17 项、
+`test-main-immediate-update-exit.mjs` 4 项、`test-main-delayed-progress-window.mjs` 5 项均通过；
+这些测试验证已迁出的策略/时序模块，不改变对剩余启动装配区间 `business-preserved` 的结论。
+
 桌面 open-path 的 stat-kind 分类现由入口委托 `src/main/main-app/files/open-path-arguments.ts` 的
 `classifyDesktopOpenPath`，保留真实 stat、warning 日志与后续窗口副作用；已有 17 项 focused
 断言覆盖 directory、HTML browser-document、普通 file 与缺失路径边界。
