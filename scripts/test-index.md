@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 971.
+Total scripts: 974.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -15,6 +15,9 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-status-summary-policy.mjs`](./test-worker-git-status-summary-policy.mjs)
 - [`test-worker-git-repository-size-policy.mjs`](./test-worker-git-repository-size-policy.mjs)
 - [`test-worker-git-config-scope-policy.mjs`](./test-worker-git-config-scope-policy.mjs)
+- [`test-worker-git-branch-ahead-policy.mjs`](./test-worker-git-branch-ahead-policy.mjs)
+- [`test-app-primary-normalize-system-hints.mjs`](./test-app-primary-normalize-system-hints.mjs)
+- [`test-preload-annotation-preload-disposal-state.mjs`](./test-preload-annotation-preload-disposal-state.mjs)
 
 - [`test-worker-git-review-working-tree-policy.mjs`](./test-worker-git-review-working-tree-policy.mjs)
 - [`test-worker-git-watch-acquire-policy.mjs`](./test-worker-git-watch-acquire-policy.mjs)
@@ -1000,6 +1003,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-feature-lifecycle-state.mjs`](./test-preload-annotation-feature-lifecycle-state.mjs)
 - [`test-preload-annotation-element-cache.mjs`](./test-preload-annotation-element-cache.mjs)
 - [`test-preload-annotation-preload-disposal.mjs`](./test-preload-annotation-preload-disposal.mjs)
+- [`test-preload-annotation-preload-disposal-state.mjs`](./test-preload-annotation-preload-disposal-state.mjs)
 - [`test-worker-git-request-invalidation-policy.mjs`](./test-worker-git-request-invalidation-policy.mjs)
 - [`test-worker-git-request-context-policy.mjs`](./test-worker-git-request-context-policy.mjs)
 - [`test-worker-computer-use-capture-policy.mjs`](./test-worker-computer-use-capture-policy.mjs)

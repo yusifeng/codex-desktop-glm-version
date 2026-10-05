@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation preload disposal 的单向终止状态已抽至
+`src/main/browser-page-preload/annotation-preload-disposal-state.ts`；disposal coordinator
+现在只在首次 `beginDispose` 成功时执行 feature dispose → preview clear → capability reset，
+并安全忽略 pagehide/能力切换的重复 teardown。新增
+`scripts/test-preload-annotation-preload-disposal-state.mjs` 覆盖终态闸门与幂等行为共 5 项
+断言；原 disposal focused test 扩展至 7 项，build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：live-query performance operation 的方法白名单与结果映射已迁移至
 `src/main/worker/git-performance-operation-policy.ts`；observability runtime 仅保留性能结果字段、
 失败原因与采样编排。新增 `scripts/test-worker-git-performance-operation-policy.mjs` 覆盖 6 项
@@ -1297,3 +1304,4 @@ typecheck 均通过。
 2026-10-05 A2 继续批次：annotation preload bridge 的 mounted subscriber 与 terminal dispose 状态已抽至 `annotation-preload-bridge-state.ts`；bridge 仅保留 IPC listener、消息队列及订阅副作用。新增 `scripts/test-preload-annotation-preload-bridge-state.mjs` 覆盖挂载、清理、终态幂等与终态拒绝重挂载，共 11 项 focused assertions。
 2026-10-05 A5 继续批次：app-primary Box library 文件预览导出 `Jd`（`FMe`，17195--17208）已抽取为 `resolve-box-file-preview.ts`，保留 external-box ID/provider/MIME 校验及 Box Notes/普通文件 URL 投影；新增 `scripts/test-app-primary-resolve-box-file-preview.mjs` 覆盖 5 项 focused assertions。逐行分类证据登记后 reviewedCount 提升至 216；hub audit 与 focused classification test 已通过。
 2026-10-05 A2 继续批次：annotation preload 启动阶段的 secure-context/top-frame policy sync 与 DOMContentLoaded mount gate 已抽至 `annotation-preload-startup-policy.ts`；`annotation-preload-lifecycle.ts` 仅保留 listener 注册、IPC policy 读取与 mount/pagehide 编排。新增 `scripts/test-preload-annotation-preload-startup-policy.mjs`，覆盖安全上下文、top-frame、loading/complete 与空输入边界，共 9 项 focused assertions；已通过 build、preload lifecycle 回归、verify 与 typecheck。
+2026-10-05 A1 继续批次：Git branch-ahead 的 remote upstream 归一化、远端 ancestor revision、默认分支 revision 与 ahead range 参数构造已迁移至 `src/main/worker/git-branch-ahead-policy.ts`；branch-ahead 运行时保留 repository/Git/query 编排。新增 `scripts/test-worker-git-branch-ahead-policy.mjs` 覆盖 12 项 focused assertions；原 branch-ahead 回归 41 项、build 与 typecheck 已通过。

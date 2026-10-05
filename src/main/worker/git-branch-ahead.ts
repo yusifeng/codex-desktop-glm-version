@@ -27,6 +27,12 @@ type GitBranchAheadDependencies = {
   ) => Promise<any>;
 };
 
+import {
+  buildAheadRevisionArgs,
+  buildRemoteAncestorRevision,
+  resolveDefaultBranchRevision,
+} from './git-branch-ahead-policy';
+
 function countCommits(
   repository: any,
   revisionArgs: string[],
@@ -80,13 +86,9 @@ async function getBranchAheadCount(
     (await dependencies.getCurrentBranch(repository)) ?? `HEAD`,
     signal,
   );
-  const remoteUpstream =
-    remote != null && upstream?.startsWith(`remotes/${remote}/`)
-      ? upstream.slice(8)
-      : upstream;
+  const remoteAncestorRevision = buildRemoteAncestorRevision(upstream, remote);
   if (
-    remote != null &&
-    remoteUpstream?.startsWith(`${remote}/`) &&
+    remoteAncestorRevision != null &&
     (
       await dependencies.runGit(
         repository.root,
@@ -94,7 +96,7 @@ async function getBranchAheadCount(
           `merge-base`,
           `--is-ancestor`,
           `HEAD`,
-          `refs/remotes/${remoteUpstream}`,
+          remoteAncestorRevision,
         ],
         host,
         {
@@ -118,9 +120,9 @@ async function getBranchAheadCount(
   if (upstream != null)
     return {
       commitsAhead:
-        (await countCommits(
+          (await countCommits(
           repository,
-          [`${upstream}..HEAD`],
+          buildAheadRevisionArgs(upstream),
           signal,
           dependencies,
         )) ?? 0,
@@ -129,9 +131,7 @@ async function getBranchAheadCount(
 
   const mergeBase = await dependencies.getMergeBase(
     repository,
-    defaultBranch.includes(`/`) || remote == null
-      ? defaultBranch
-      : `${remote}/${defaultBranch}`,
+      resolveDefaultBranchRevision(defaultBranch, remote),
   );
   return mergeBase == null
     ? { commitsAhead: 0 }
@@ -139,7 +139,7 @@ async function getBranchAheadCount(
         commitsAhead:
           (await countCommits(
             repository,
-            [`${mergeBase}..HEAD`],
+            buildAheadRevisionArgs(mergeBase),
             signal,
             dependencies,
           )) ?? 0,
