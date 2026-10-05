@@ -1823,3 +1823,4 @@ typecheck 均通过。
 2026-10-06 A3 继续批次：IAB API 真实边界已补齐 constructor/options、`ping`、browser session route 校验（含 `session_id` 兼容字段）、request safe fields、metadata、host lookup、turn 记录/清理、tab lookup 与 route cleanup，并由 `scripts/test-main-iab-api-boundary.mjs` 覆盖 12 项断言；完整 CDP/tab/session 生命周期仍保留在类边界内，未伪拆成 facade。
 2026-10-06 A5 逐段复核：app-shared 导出 `u`（source `OOt`，122452-122456）确认是 shared icon registry 的 memoized asset initializer；生成 SVG metadata 注册与 lazy asset 生命周期由 generated surface 持有，登记为 `preserved-coupled`。
 2026-10-06 A3 继续批次：browser-session-registry 已补齐 route capture/resolve/dispose、backend ensure 幂等/迁移/销毁与 page record snapshot/cleanup 状态边界；`scripts/test-main-browser-session-registry.mjs` 覆盖 11 项断言。IAB/CDP/native-pipe 的完整生命周期仍保留在原类边界。
+2026-10-06 A3 继续批次：native pipe server 补齐原始四路转发契约：CDP event、CDP detach、page event 与 download change，并统一使用 IAB download listener Symbol；`scripts/test-main-native-pipe-server.mjs` 覆盖帧上限、四路发送与 dispose 清理共 8 项断言。

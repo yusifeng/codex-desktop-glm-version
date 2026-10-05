@@ -17,6 +17,8 @@
 //       ④ [RY] addBrowserUseDownloadChangeListener → sendDownloadChange
 //     → 返回 { pipePath, dispose }（销毁时协议实例 + 管道 + 四路监听清理）
 
+import { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER } from "./iab-api.js";
+
 // ---------------------------------------------------------------------------
 // 常量与类型
 // ---------------------------------------------------------------------------
@@ -71,9 +73,6 @@ export interface NativePipeProtocol {
   dispose(): void;
 }
 
-/** 下载监听 Symbol 协议（与 iab-api.ts 对齐）。 */
-export const ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER = Symbol("addBrowserUseDownloadChangeListener");
-
 // ---------------------------------------------------------------------------
 // 工厂（原 `JYe`）
 // ---------------------------------------------------------------------------
@@ -125,6 +124,15 @@ export async function createBrowserUseNativePipeServer({
     }),
   );
   unsubscribes.push(apiImpl.addCdpDetachListener((event) => protocol.sendCdpDetach(event)));
+  unsubscribes.push(apiImpl.addPageEventListener((event) => protocol.sendPageEvent(event)));
+  const addDownloadListener = apiImpl[ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER];
+  if (typeof addDownloadListener === "function") {
+    unsubscribes.push(
+      (addDownloadListener as (listener: (change: { path: string; tabId: string }) => void) => () => void)((change) =>
+        protocol.sendDownloadChange(change),
+      ),
+    );
+  }
   return {
     dispose() {
       for (const unsubscribe of unsubscribes) unsubscribe();
