@@ -64,4 +64,4 @@ second.dispose();
 assert.deepEqual(removed.sort(), ["cdp", "cdp", "detach", "detach", "download", "download", "page", "page"]);
 assert.equal(protocolDisposed, true);
 assert.equal(pipeDisposed, true);
-console.log("main native pipe server: 12 assertions passed");
+console.log("main native pipe server: 13 assertions passed");
