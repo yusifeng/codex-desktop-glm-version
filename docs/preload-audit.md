@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation anchor point projection policy
+
+Annotation anchor point 到目标 rect 的比例投影（原 `hd`，5120-7259 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-anchor-point-projection.ts`；保留零尺寸中心回退、
+显式 x 与比例 clamp 语义。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation frame URL policy
 
 Annotation frame URL 匹配（原 `hu`，5120-7259 业务工具段）的 optional-expected 与 exact href

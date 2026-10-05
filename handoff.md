@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation anchor point projection（比例、零尺寸中心回退、clamp）
+已迁移至 `src/main/browser-page-preload/annotation-anchor-point-projection.ts`；原 `hd` 入口保留
+兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation frame URL optional/exact href policy 已迁移至
 `src/main/browser-page-preload/annotation-frame-url-policy.ts`；原 `hu` 入口保留兼容委托，
 新增 3 项 focused assertions，build 与 typecheck 已通过。
