@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git config mutation 的 refresh-root 判定已迁移至 `src/main/worker/git-config-request-policy.ts`；config request handler 保留 repository/config I/O 与 mutation 编排。新增 `scripts/test-worker-git-config-request-policy.mjs` 覆盖 4 项 focused assertions；原 config handler 回归 5 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git push 的 porcelain status line 解析与 failure 分类已迁移至 `src/main/worker/git-push-policy.ts`；push request handler 保留 remote discovery、参数拼装、Git I/O 与 exec output 编排。新增 `scripts/test-worker-git-push-policy.mjs` 覆盖 9 项 focused assertions；原 push handler 回归 17 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation preview visibility 的 top-modal 边界投影已抽至

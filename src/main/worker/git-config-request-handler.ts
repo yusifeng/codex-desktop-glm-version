@@ -4,12 +4,12 @@ type ConfigDependencies = {
   signal: AbortSignal;
 };
 
+import { resolveConfigRefreshRoot } from './git-config-request-policy';
+
 async function setGitConfigValue(params: any, deps: ConfigDependencies) {
   const repository = deps.gitManager.getWorktreeRepositoryForRoot(params.root, deps.host);
   const success = await repository.setConfigValueForScope(params.key, params.value, params.scope, deps.signal);
-  const refreshRoot = success && (params.scope !== `worktree` || params.key !== `codex.localEnvironmentConfigPath`)
-    ? params.root
-    : null;
+  const refreshRoot = resolveConfigRefreshRoot(params.root, success, params.scope, params.key);
   return { result: { success }, refreshRoot };
 }
 

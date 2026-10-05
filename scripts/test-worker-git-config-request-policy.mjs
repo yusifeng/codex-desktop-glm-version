@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { resolveConfigRefreshRoot } = require("../app/.vite/build/worker/git-config-request-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+equal(resolveConfigRefreshRoot("/repo", true, "global", "user.name"), "/repo");
+equal(resolveConfigRefreshRoot("/repo", true, "worktree", "core.editor"), "/repo");
+equal(resolveConfigRefreshRoot("/repo", true, "worktree", "codex.localEnvironmentConfigPath"), null);
+equal(resolveConfigRefreshRoot("/repo", false, "global", "user.name"), null);
+console.log(`${assertions} worker git config request policy assertions passed`);
