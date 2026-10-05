@@ -9,15 +9,9 @@ type FrameStabilityDependencies = {
 
 function isStableAnnotationFrame(element: unknown, dependencies: FrameStabilityDependencies): boolean {
   if (dependencies.resolveAnnotationElement(element) !== element) return false;
-  let currentWindow = (element as FrameElement | null)?.ownerDocument?.defaultView;
-  while (currentWindow != null && currentWindow !== dependencies.rootWindow) {
-    const frame = dependencies.getFrameElement(currentWindow);
-    if (!dependencies.isFrameElement(frame) || dependencies.resolveAnnotationElement(frame) !== undefined)
-      return false;
-    currentWindow = dependencies.getOwnerWindow(frame);
-  }
-  return currentWindow === dependencies.rootWindow;
+  return isStableAnnotationFrameChain(element, dependencies);
 }
 
 export { isStableAnnotationFrame };
 if (typeof module !== `undefined`) module.exports = { isStableAnnotationFrame };
+import { isStableAnnotationFrameChain } from "./annotation-frame-chain-policy";
