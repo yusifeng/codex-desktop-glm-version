@@ -5979,11 +5979,7 @@ function vd(e) {
   return t.length === 0 ? null : t.slice(0, 80);
 }
 function yd(e) {
-  try {
-    return new URL(e);
-  } catch {
-    return null;
-  }
+  return parseAnnotationUrl(e);
 }
 function bd(e, t, n) {
   return clampAnnotationCoordinate(e, t, n);
@@ -6174,6 +6170,7 @@ var { createAnnotationPreviewLayer } = require("./browser-page-preload/annotatio
 var { createAnnotationAnchorGeometry } = require("./browser-page-preload/annotation-anchor-geometry");
 var { escapeAnnotationSelectorToken } = require("./browser-page-preload/annotation-selector-token");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
+var { parseAnnotationUrl } = require("./browser-page-preload/annotation-url-parser-policy");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 var { normalizeAnnotationColor: normalizeAnnotationColorPolicy } = require("./browser-page-preload/annotation-color-policy");
 var { spreadAnnotationMarkerPoints } = require("./browser-page-preload/annotation-marker-position");

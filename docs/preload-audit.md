@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation URL parser reuse
+
+Annotation frame/document URL 的 throwing-safe parser（原 `yd`，5120-7259 业务工具段）已复用
+`annotation-url-parser-policy.parseAnnotationUrl`，删除 preload 重复 try/catch 实现；既有 URL
+parser focused regression、build 与 typecheck 已通过。
+
 ### 增量抽取：annotation anchor clamp reuse
 
 Annotation anchor point 投影使用的 `bd` clamp helper（5120-7259 业务工具段）已复用

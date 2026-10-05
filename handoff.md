@@ -1987,6 +1987,8 @@ typecheck 均通过。
 
 2026-10-06 A1 T1 继续批次：Setup 输出的 shell-environment remove/write 分支判定已迁移至 `src/main/worker/git-worktree-shell-environment-policy.ts`；runtime 仅保留持久化 I/O。新增 `scripts/test-worker-git-worktree-shell-environment-policy.mjs` 覆盖 4 项 focused assertions。
 
+2026-10-06 T4 coverage audit：复核 `main-C-Mhak1n.ts` 175,890-176,978 启动装配区间；tray、computer-use/browser-use、app-server registry、plugin reconcile、窗口事件监听与 disposable ownership 交织，当前无可独立迁移且能证明副作用顺序不变的纯策略边界。已将证据与 `business-preserved` 结论写入 `docs/main-coverage-audit.md`，下一步需先建立单一服务构造/注册顺序 harness。
+
 2026-10-06 A1 T1 继续批次：Setup script 的 original/worktree workspace 环境变量覆盖构造已迁移至 `src/main/worker/git-worktree-setup-environment-policy.ts`；runtime 仅保留执行副作用。新增 `scripts/test-worker-git-worktree-setup-environment-policy.mjs` 覆盖 3 项 focused assertions。
 
 2026-10-06 A1 T1 继续批次：Core Git RPC method 的 availability/create-branch/git-origins 白名单已迁移至 `src/main/worker/git-core-request-policy.ts`；dispatcher 仅保留参数编排与 Git I/O。新增 `scripts/test-worker-git-core-request-policy.mjs` 覆盖 4 项 focused classification assertions。
