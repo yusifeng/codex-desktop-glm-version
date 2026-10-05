@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationFeatureGraphState } = require("../app/.vite/build/browser-page-preload/annotation-feature-graph-state.js");
+
+const state = createAnnotationFeatureGraphState();
+assert.equal(state.controlsRegistry, null);
+const controls = {};
+const requests = {};
+const observer = {};
+const dispose = () => {};
+state.setControlsRegistry(controls);
+state.setSiteAnnotationRequests(requests);
+state.setFeatureObserver(observer);
+state.setModeControllerDispose(dispose);
+assert.equal(state.controlsRegistry, controls);
+assert.equal(state.siteAnnotationRequests, requests);
+assert.equal(state.featureObserver, observer);
+assert.equal(state.modeControllerDispose, dispose);
+state.clear();
+assert.equal(state.controlsRegistry, null);
+assert.equal(state.siteAnnotationRequests, null);
+assert.equal(state.featureObserver, null);
+assert.equal(state.modeControllerDispose, null);
+console.log("test-preload-annotation-feature-graph-state: 9 assertions passed");
