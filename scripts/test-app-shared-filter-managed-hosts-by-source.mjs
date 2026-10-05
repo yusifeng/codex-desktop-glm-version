@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/filter-managed-hosts-by-source.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { filterManagedHostsBySource } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const hosts = [{ id: 1, source: "codex-managed" }, { id: 2, source: "discovered" }, { id: 3, source: "remote-control" }];
+assert.deepEqual(filterManagedHostsBySource(hosts, "discovered"), [hosts[1]]);
+assert.deepEqual(filterManagedHostsBySource(hosts, "remote-control"), []);
+assert.deepEqual(filterManagedHostsBySource(null, "discovered"), []);
+console.log("app-shared filter managed hosts by source: 3 assertions passed");
