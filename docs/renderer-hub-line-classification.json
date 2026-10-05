@@ -1632,5 +1632,45 @@
     "classification": "generated-local-connector-icon-map",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The generated connector icon map is initialized once for the neighboring provider surface and has no independent named renderer consumer or lifecycle boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ah",
+    "sourceSymbol": "ok",
+    "startLine": 5009,
+    "endLine": 5012,
+    "classification": "generated-local-ui-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer wires the generated homepage takeover context and UI dependencies in one local bootstrap sequence; no independently named renderer consumer or teardown boundary owns this export."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Bm",
+    "sourceSymbol": "pA",
+    "startLine": 6049,
+    "endLine": 6059,
+    "classification": "generated-local-banner-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer composes generated banner dependencies and a static entry-point constant for the adjacent presentation route; it has no independent renderer lifecycle or named consumer."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Bf",
+    "sourceSymbol": "LP",
+    "startLine": 14868,
+    "endLine": 14872,
+    "classification": "generated-local-plugin-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy bootstrap registers plugin markdown helpers and a generated deep-research identifier used by the surrounding route; no separate renderer module owns this setup or teardown."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Bd",
+    "sourceSymbol": "RI",
+    "startLine": 17586,
+    "endLine": 17592,
+    "classification": "generated-local-recipient-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer creates the generated recipient-field regex and key list for the adjacent composer surface, retaining ordering and dependency setup without an independent named renderer consumer."
   }
 ]
