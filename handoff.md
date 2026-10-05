@@ -59,6 +59,11 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `bp`（内部 `oje`，源码 8242--8244）的 handoff branch
+资格纯策略已迁移至 `src/renderer/app-primary/runtime/should-use-handoff-branch.ts`；新增
+`scripts/test-app-primary-should-use-handoff-branch.mjs` 覆盖 3 项 focused assertions，typecheck 与
+focused test 已通过。
+
 2026-10-06 A5 继续批次：app-primary 未消费导出 `ff`（内部 `lMe`，源码 10801--10805）的 chatgpt/local
 thread route identity 纯判定已迁移至 `src/renderer/app-primary/runtime/matches-thread-route.ts`；新增
 `scripts/test-app-primary-matches-thread-route.mjs` 覆盖 3 项 focused assertions，typecheck 与 focused
