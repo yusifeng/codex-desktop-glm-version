@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation anchor equality policy
+
+Annotation anchor 判等（原 `Fs`，3863-5049 业务工具段）的公共字段、scroll-container、
+virtual/element/region/text 判别联合比较已迁移至 `src/main/browser-page-preload/annotation-anchor-equality.ts`；
+入口保留兼容委托。`scripts/test-preload-annotation-anchor-equality.mjs` 覆盖 element 相等/运行时 ID
+差异与 region 语义，共 3 项断言；build 与 typecheck 已通过。
+
 ### 增量抽取：annotation coordinate clamp reuse
 
 Annotation 几何的通用数值 clamp（原 `Ps`，3863-5049 业务工具段）已接回

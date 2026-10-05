@@ -4003,6 +4003,8 @@ function Ps(e, t, n) {
   return clampAnnotationCoordinate(e, t, n);
 }
 function Fs(e, t) {
+  return areAnnotationAnchorsEqual(e, t);
+/*
   if (
     e.kind !== t.kind ||
     !(
@@ -4056,6 +4058,7 @@ function Fs(e, t) {
         })
       );
   }
+*/
 }
 var zs,
   Bs,
@@ -6167,6 +6170,7 @@ var { normalizeAnnotationColor: normalizeAnnotationColorPolicy } = require("./br
 var { spreadAnnotationMarkerPoints } = require("./browser-page-preload/annotation-marker-position");
 var { projectAnnotationTooltipPosition } = require("./browser-page-preload/annotation-tooltip-position");
 var { areAnnotationScrollContainersEqual } = require("./browser-page-preload/annotation-scroll-container-equality");
+var { areAnnotationAnchorsEqual } = require("./browser-page-preload/annotation-anchor-equality");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
