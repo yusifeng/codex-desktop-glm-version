@@ -10,13 +10,6 @@ import {
   resolveGitPerformanceOperation,
 } from "./git-performance-operation-policy";
 
-const operationSources = new Set([
-  `async_task_starting_state_dropdown`, `commit_modal`, `composer_branch_switcher`,
-  `composer_worktree_source`, `create_pull_request_modal`, `local_conversation_git_actions`,
-]);
-const mutatingRequestKinds = new Set([
-  `checkout-branch`, `create-branch`, `git-checkout-branch`, `git-create-branch`, `git-init-repo`,
-]);
 
 function createGitCommandStats(concurrentOperationCount: number) {
   return {
@@ -27,10 +20,6 @@ function createGitCommandStats(concurrentOperationCount: number) {
     timedOutCommandCount: 0, untrackedCacheCoalescedCount: 0, untrackedCacheHitCount: 0,
     untrackedCacheMissCount: 0, untrackedListCommandCount: 0, untrackedStatusCommandCount: 0,
   };
-}
-
-function isGitMutationRequest({ requestKind, source }: { requestKind?: string | null; source?: string | null }): boolean {
-  return mutatingRequestKinds.has(requestKind ?? ``) || operationSources.has(source ?? ``);
 }
 
 function buildGitHostCacheKey(host: Record<string, unknown>): string {
@@ -431,3 +420,4 @@ function bucketGitIndexSize(size: number | null | undefined) {
 export { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceExpectedReason, getGitPerformanceFailureReason, getGitPerformanceOutcome, getGitPerformanceReason, getGitPerformanceResultFields, getUntrackedCacheStatus, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample };
 if (typeof module !== `undefined`) module.exports = { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceExpectedReason, getGitPerformanceFailureReason, getGitPerformanceOutcome, getGitPerformanceReason, getGitPerformanceResultFields, getUntrackedCacheStatus, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample };
 import { exitCodeBucket } from "./git-exit-code-policy";
+import { isGitMutationRequest } from "./git-mutation-classification-policy";

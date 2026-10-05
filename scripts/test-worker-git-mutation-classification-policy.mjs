@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isGitMutationRequest } = require("../app/.vite/build/worker/git-mutation-classification-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+eq(isGitMutationRequest({requestKind:"checkout-branch"}), true);
+eq(isGitMutationRequest({requestKind:"git-init-repo"}), true);
+eq(isGitMutationRequest({source:"commit_modal"}), true);
+eq(isGitMutationRequest({requestKind:"status-summary",source:"review"}), false);
+eq(isGitMutationRequest({}), false);
+console.log(`${n} worker mutation classification policy assertions passed`);
