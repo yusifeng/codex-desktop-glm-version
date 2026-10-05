@@ -4401,18 +4401,7 @@ function xc(e) {
   return projectAnnotationNearbyText(e, bc, (element) => element.closest(`section,article,main,form,nav,aside,header,footer`), F);
 }
 function Sc(e) {
-  let t = [],
-    n = e,
-    r = 0;
-  for (; n && r < 4;) {
-    let e = n.tagName.toLowerCase();
-    if (e === `html` || e === `body`) {
-      t.length === 0 && t.unshift(e);
-      break;
-    }
-    (t.unshift(e), (n = ic(n)), (r += 1));
-  }
-  return t.join(` > `);
+  return projectAnnotationElementPath(e, ic);
 }
 function Cc(e) {
   return ec(e.ownerDocument.defaultView);
@@ -6164,6 +6153,7 @@ var { isAnnotationDocumentRoot } = require("./browser-page-preload/annotation-do
 var { projectAnnotationElementLabel } = require("./browser-page-preload/annotation-element-label-policy");
 var { projectAnnotationAccessibleLabel } = require("./browser-page-preload/annotation-accessible-label-policy");
 var { projectAnnotationNearbyText } = require("./browser-page-preload/annotation-nearby-text-policy");
+var { projectAnnotationElementPath } = require("./browser-page-preload/annotation-element-path-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

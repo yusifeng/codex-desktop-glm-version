@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation element path policy
+
+Annotation element ancestor tag path（原 `Sc`，3863-5049 业务工具段）的深度上限、html/body
+终止与字符串拼接已迁移至 `src/main/browser-page-preload/annotation-element-path-policy.ts`；
+父节点读取通过依赖注入。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation nearby-text policy
 
 Annotation nearby text 的直接 label、语义容器回退与元素资格判定（原 `xc`，3863-5049 业务工具段）已迁移至
