@@ -1760,3 +1760,4 @@ typecheck 均通过。
 2026-10-06 A5 T5 分类批次：app-primary `Na/fQ`（源码 57945-57954）已登记为 `preserved-coupled`。该 helper 直接注册 `document.body` 的 `MutationObserver` 并返回 disconnect teardown closure，DOM lifecycle 所有权与生成 surface 耦合，未伪造 semantic 抽取。Manifest app-primary unreviewed 由 603 降至 602。
 
 2026-10-06 A5 T5 分类批次：app-primary `cf/dMe`（源码 16059-16071）已登记为 `preserved-coupled`。该 helper 通过 `window.dispatchEvent` 发出带 callback capture 的 `CustomEvent` 并返回异步结果，事件总线副作用与 callback ownership 和生成 surface 耦合，未伪造 semantic 抽取。Manifest app-primary unreviewed 由 602 降至 601。
+2026-10-06 A5 逐段复核：app-shared 导出 `$0`（source `$b`，32365-32367）确认是生成 motion-value runtime 构造器；其对象构造、dependents/listeners 与相邻动画 bootstrap 共用生命周期，登记为 `preserved-coupled`，不抽取独立 facade。
