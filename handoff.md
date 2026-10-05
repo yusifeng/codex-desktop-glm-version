@@ -1754,3 +1754,5 @@ typecheck 均通过。
 2026-10-06 A5 T5 继续批次：app-shared 的 remote-control host 过滤策略已迁移至 `src/renderer/app-shared/runtime/filter-remote-control-hosts.ts`；新增 `scripts/test-app-shared-filter-remote-control-hosts.mjs` 覆盖 3 项 focused assertions，并登记 `IU/MBe` 源码 64890-64892 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
 2026-10-06 A5 T5 继续批次：app-primary 的 beacon query 清理策略已迁移至 `src/renderer/app-primary/runtime/strip-beacon-query-params.ts`；新增 `scripts/test-app-primary-strip-beacon-query-params.mjs` 覆盖 3 项 focused assertions，并登记 `dh/Kke` 源码 5467-5473 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-06 A5 T5 分类批次：app-primary `vn/Bct`（源码 96922-96930）已登记为 `preserved-coupled`。该 mapper 仅将 fast/ultrafast 映射到相邻生成 bootstrap 初始化的 `HG/Rct` runtime 函数，null 返回 undefined；由于依赖无独立模块边界，保留在 generated hub，未伪造 semantic 抽取。Manifest app-primary unreviewed 由 604 降至 603。
