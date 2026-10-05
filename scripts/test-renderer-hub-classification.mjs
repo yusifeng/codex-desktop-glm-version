@@ -21,7 +21,7 @@ assert.ok(primary.consumedCount >= 70, "app-primary cast consumers must be count
 // an unreferenced export merely because no `chunk.Sm` member expression exists.
 assert.ok(primary.consumedCount >= 10, "namespace destructuring consumers must be counted");
 assert.ok(primary.unconsumed.length > 0, "A5 gate must expose the remaining app-primary surface");
-assert.equal(primary.reviewedCount, 191, "line-level A5 classifications must be registered");
+assert.equal(primary.reviewedCount, 193, "line-level A5 classifications must be registered");
 assert.ok(primary.unconsumed.includes("yg"), "yg remains coupled to generated skill mention projection");
 assert.ok(primary.unconsumed.includes("Ed"), "Ed remains unconsumed until a real named consumer exists");
 assert.ok(primary.unconsumed.includes("Ur"), "Ur remains unconsumed until a real named consumer exists");
@@ -113,6 +113,8 @@ assert.ok(primary.unconsumed.includes("Df"), "Df remains coupled to generated pa
 assert.ok(primary.unconsumed.includes("Hd"), "Hd remains coupled to generated recipient parsing");
 assert.ok(primary.unconsumed.includes("Id"), "Id remains coupled to generated recipient projection");
 assert.ok(primary.unconsumed.includes("Rf"), "Rf remains coupled to generated plugin prompt formatting");
+assert.ok(primary.unconsumed.includes("zf"), "zf remains coupled to generated prompt-list helper");
+assert.ok(primary.unconsumed.includes("If"), "If remains coupled to generated plugin bootstrap");
 const audit = fs.readFileSync(new URL("../docs/renderer-tail-audit.md", import.meta.url), "utf8");
 assert.match(audit, /`rA`\/`nA`[\s\S]*URL predicate/);
 assert.match(audit, /aggregation-runtime/);

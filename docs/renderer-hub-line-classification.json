@@ -1912,5 +1912,25 @@
     "classification": "generated-local-helper",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The remote-reference projection delegates to adjacent generated URL/reference normalizers and has no independent renderer named consumer, JSX, store ownership, or teardown contract; preserve the coupled helper in the hub until a stable semantic consumer exists."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "zf",
+    "sourceSymbol": "PP",
+    "startLine": 14861,
+    "endLine": 14863,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper trims an adjacent generated prompt list and selects its first non-empty entry, returning null for empty input; it has no independently named renderer consumer or lifecycle boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "If",
+    "sourceSymbol": "BP",
+    "startLine": 14877,
+    "endLine": 14880,
+    "classification": "generated-local-plugin-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer wires adjacent plugin/thread-reference helpers and a static unavailable-state token; setup is owned by the surrounding generated route with no standalone renderer consumer or teardown boundary."
   }
 ]
