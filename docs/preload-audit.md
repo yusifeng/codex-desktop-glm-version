@@ -858,3 +858,7 @@ Annotation element 的 fixed/sticky ancestor 判定（原 `Ac`）已迁移至 `s
 ### 增量抽取：annotation element metadata attributes
 
 Annotation element 的 top-frame/document-root/HTML eligibility 与 `oai-annotatable`、`oai-annotation-metadata` 属性 projection（原 `od`）已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；入口仅注入 DOM eligibility、rect 与 attribute parsers。新增 3 项 focused assertions。
+
+### 增量抽取：annotation frame offset policy
+
+跨 iframe 的 frame offset 递归累积（原 `Ic`）已迁移至 `src/main/browser-page-preload/annotation-frame-offset-policy.ts`；入口仅注入 frame element、owner window 与 rect 读取，保留顶层/无效 frame 的零偏移语义。新增 3 项 focused assertions。
