@@ -1158,6 +1158,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-primary-is-capability-supported.mjs](test-app-primary-is-capability-supported.mjs)
 [test-worker-git-diff-header-policy.mjs](test-worker-git-diff-header-policy.mjs)
 [test-worker-git-cat-file-batch-error-policy.mjs](test-worker-git-cat-file-batch-error-policy.mjs)
+[test-worker-git-cat-file-disk-error-policy.mjs](test-worker-git-cat-file-disk-error-policy.mjs)
+[test-app-shared-create-chat-slug.mjs](test-app-shared-create-chat-slug.mjs)
 [test-app-shared-find-model-by-slug.mjs](test-app-shared-find-model-by-slug.mjs)
 [test-worker-git-cat-file-disk-error-policy.mjs](test-worker-git-cat-file-disk-error-policy.mjs)
 [test-app-shared-create-chat-slug.mjs](test-app-shared-create-chat-slug.mjs)

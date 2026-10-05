@@ -159,14 +159,6 @@ async function readDiskFile(path: string, host: any, limitBytes: number) {
       };
 }
 
-function isDiskNotFoundError(error: unknown) {
-  return error instanceof Error &&
-    ((`code` in error && error.code === `ENOENT`) ||
-      error.message.includes(`No such file`) ||
-      error.message.includes(`cannot open`) ||
-      error.message.includes(`not found`));
-}
-
 function diskErrorResult(error: unknown) {
   return {
     type: `error`,
@@ -250,3 +242,4 @@ import { gitErrorType } from "./git-cat-file-error-policy";
 import { unknownCatFileResult } from "./git-cat-file-error-envelope-policy";
 import { splitContentLines } from "./git-cat-file-content-policy";
 import { classifyCatFileBatchError } from "./git-cat-file-batch-error-policy";
+import { isDiskNotFoundError } from "./git-cat-file-disk-error-policy";
