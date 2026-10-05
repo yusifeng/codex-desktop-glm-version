@@ -131,6 +131,10 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `EX`（内部 `EMe`，源码 44304--44316）的 activity
+status-to-color 纯映射已迁移至 `src/renderer/app-shared/runtime/status-to-color.ts`；新增 focused
+test 3 项断言，typecheck 与 focused test 已通过。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `wJ`（内部 `rFe`，源码 45373--45386）的 annotation
 item projection 纯策略已迁移至 `src/renderer/app-shared/runtime/project-annotation-items.ts`；新增
 focused test 2 项断言，typecheck 与 focused test 已通过。
