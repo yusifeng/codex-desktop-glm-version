@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/is-managed-host-source.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { isManagedHostSource } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+assert.equal(isManagedHostSource({ source: "codex-managed" }), true);
+assert.equal(isManagedHostSource({ source: "discovered" }), true);
+assert.equal(isManagedHostSource({ source: "remote-control" }), false);
+assert.equal(isManagedHostSource(null), false);
+console.log("app-shared is managed host source: 4 assertions passed");
