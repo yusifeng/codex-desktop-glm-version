@@ -11,9 +11,7 @@ type CatFileDependencies = {
   runGit: (root: string, args: string[], host: any, options: any) => Promise<any>;
 };
 
-function unknownResult() {
-  return { type: `error`, error: { type: `unknown` } };
-}
+function unknownResult() { return unknownCatFileResult(); }
 
 function splitContentLines(content: string) {
   const lines = content.split(LINE_BOUNDARY);
@@ -260,3 +258,4 @@ if (typeof module !== `undefined`)
     splitContentLines,
   };
 import { gitErrorType } from "./git-cat-file-error-policy";
+import { unknownCatFileResult } from "./git-cat-file-error-envelope-policy";

@@ -635,7 +635,7 @@ live-query refresh generation 的 dirty/trigger/retry 重置、generation 分配
 Git watcher setup 的 per-host 串行排队、index size bucket 采样、ready/close 竞态与 origin-query 清理已迁移至 `src/main/worker/git-watch-setup.ts`；入口仅保留 host/path、watcher 启动、repository cache 与 close 副作用，由 `scripts/test-worker-git-watch-setup.mjs` 覆盖 11 项生命周期断言。
 
 本轮已完成 worker/preload/main 逐段审计、shared 692 导出全量分类、renderer
-三大 hub 内部审计、tsconfig 排除、测试索引、README 更新，以及 smoke/e2e
+三大 hub 的消费契约审计与全量 manifest 门禁、tsconfig 排除、测试索引、README 更新，以及 smoke/e2e
 验证说明。worker 的 main-RPC 边界已提取为 `src/main/worker/rpc-client.ts`
 并接回入口，静态门禁全绿；smoke 已实际验证主窗口加载、renderer 致命错误
 过滤和 app-server 初始化握手，且对慢启动增加了 15 秒宽限轮询。
@@ -1126,7 +1126,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计与消费契约审计 | 现有 340 个语义消费声明仅证明消费面；全量分类门禁尚未实现，仍有未消费业务逻辑待物理迁出 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁 | 当前 manifest 仍报告 11084 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
 
 ### B. 工程可读性缺口（5 处）
 
@@ -1135,7 +1135,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1109 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1112 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -1217,7 +1217,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1109 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1112 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5，已完成）
@@ -1684,8 +1684,12 @@ typecheck 均通过。
 
 2026-10-05 A5 T5 继续批次：app-primary 的前景图片 URL 选择策略（功能开关、深色变体优先与 URL 校验）已迁移至 `src/renderer/app-primary/runtime/select-foreground-image-url.ts`；新增 `scripts/test-app-primary-select-foreground-image-url.mjs` 覆盖 4 项 focused assertions，并登记 `Ym` 源码 5765-5769 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
+2026-10-05 A5 T5 继续批次：app-primary 的 recency 排序策略（复制输入后按 `recencyAtMs` 降序、缺失值按零处理）已迁移至 `src/renderer/app-primary/runtime/sort-by-recency.ts`；新增 `scripts/test-app-primary-sort-by-recency.mjs` 覆盖 3 项 focused assertions，并登记 `_n/Kct` 源码 97179-97181 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
 2026-10-05 B5 回归补强：`scripts/smoke-test.sh` 默认改用每次运行独立临时 Electron profile，仍支持 `CODEX_SMOKE_USER_DATA_PATH` 覆盖；实测 build/pack 后主窗口 frame、app-server handshake 与 renderer fatal 过滤均通过，避免历史单实例锁导致误报超时。
 
 2026-10-05 A1 T1 继续批次：cat-file 请求的全零 OID 不可查询、非零 OID 可查询判定已迁移至 `src/main/worker/git-cat-file-policy.ts`；cat-file 入口保留 batch 查询、大小限制与错误投影。新增 `scripts/test-worker-git-cat-file-policy.mjs` 覆盖 6 项 focused assertions；原 cat-file 回归 43 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：cat-file 命令结果 code=128 的 not-found 与其他 code 的 unknown 错误分类已迁移至 `src/main/worker/git-cat-file-error-policy.ts`；cat-file 入口保留 batch 查询与大小限制编排。新增 `scripts/test-worker-git-cat-file-error-policy.mjs` 覆盖 4 项 focused assertions；build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：cat-file unknown error envelope 的稳定 `{type:error,error.type:unknown}` 构造已迁移至 `src/main/worker/git-cat-file-error-envelope-policy.ts`；cat-file 入口保留 batch parser 与错误重试编排。新增 `scripts/test-worker-git-cat-file-error-envelope-policy.mjs` 覆盖 2 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
