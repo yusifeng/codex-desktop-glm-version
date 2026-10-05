@@ -1,5 +1,13 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation color normalization policy
+
+Annotation design color normalization（原 `ws` 及 `Os`/`ks`/`As`/`js`，3863-4050
+业务工具段）已迁移至 `src/main/browser-page-preload/annotation-color-policy.ts`。该模块
+保留短/长 hex、rgb/rgba（含百分比通道）解析、通道裁剪与大写 hex 输出；入口 `ws`
+通过窄委托接回，未知文本仍原样返回。`scripts/test-preload-annotation-color-policy.mjs`
+覆盖 5 项 focused assertions，原 annotation runtime 回归与 build/typecheck 均通过。
+
 ### 增量抽取：annotation preload initialization lifecycle
 
 批注 preload 的 host-message listener、secure-context policy 初始化、DOMContentLoaded 一次性

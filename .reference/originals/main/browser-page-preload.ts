@@ -3947,13 +3947,7 @@ function Cs(e, t = Js) {
 `);
 }
 function ws(e) {
-  let t = e.trim(),
-    n = Os(t);
-  if (n != null) return n;
-  let r = ks(t);
-  return r == null
-    ? t
-    : `#${js(r.red)}${js(r.green)}${js(r.blue)}${r.alpha == null ? `` : js(r.alpha)}`;
+  return normalizeAnnotationColorPolicy(e);
 }
 function Ts(e, t) {
   if (e.length < 2) return e;
@@ -3997,7 +3991,8 @@ function Es(e, t) {
 function Ds(e) {
   return e.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
 }
-function Os(e) {
+/* migrated color parser */
+/* function Os(e) {
   let t = e.match(/^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i)?.[1];
   return t == null
     ? null
@@ -4029,7 +4024,7 @@ function js(e) {
     .toString(16)
     .padStart(2, `0`)
     .toUpperCase();
-}
+} */
 function Ms(e, t) {
   return { x: e.x * t, y: e.y * t, width: e.width * t, height: e.height * t };
 }
@@ -6213,6 +6208,7 @@ var { createAnnotationAnchorGeometry } = require("./browser-page-preload/annotat
 var { escapeAnnotationSelectorToken } = require("./browser-page-preload/annotation-selector-token");
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
+var { normalizeAnnotationColor: normalizeAnnotationColorPolicy } = require("./browser-page-preload/annotation-color-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
