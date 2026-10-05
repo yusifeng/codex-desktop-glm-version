@@ -1269,3 +1269,12 @@ clear → capability reset 顺序及重复销毁，共 6 项 focused assertions�
 literal pathspec 字节分批、index fingerprint 与 ENOENT 判定已抽至
 `src/main/worker/git-worktree-files-policy.ts`；`git-worktree-files.ts` 保留 Git I/O、稳定性重试和
 fallback 生命周期。新增 `scripts/test-worker-git-worktree-files-policy.mjs`，覆盖 11 项 focused assertions。
+
+2026-10-05 A2 继续批次：annotation design-control sync 的 target 弱引用、当前 design 生成、
+已应用 preview 映射与 disposed 终态已抽至
+`src/main/browser-page-preload/annotation-design-control-sync-state.ts`；同步器仅保留页面
+target 判定、preview diff 与 dispatch 副作用。新增
+`scripts/test-preload-annotation-design-control-sync-state.mjs` 覆盖 target 保留/裁剪、applied
+替换、clear 与幂等 dispose，共 12 项 focused assertions；原
+`scripts/test-preload-annotation-design-control-sync.mjs` 11 项回归、build check、verify 与
+typecheck 均通过。

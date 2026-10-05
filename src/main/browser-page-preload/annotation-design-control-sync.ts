@@ -1,4 +1,5 @@
 type AnnotationControl = { callback: string; [key: string]: unknown };
+import { createAnnotationDesignControlSyncState } from "./annotation-design-control-sync-state";
 type AnnotationControlChange = { callback: string; value: unknown; previousValue?: unknown };
 type AnnotationDesignChange = {
   id: string;
@@ -41,19 +42,13 @@ type AnnotationDesignControlSyncDependencies = {
 
 /** Applies design-control previews to live annotation targets and restores stale previews. */
 function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDependencies) {
-  const targetByDesignId = new Map<string, WeakRef<object>>();
-  let lastDesignId: string | null = null;
-  let appliedByTarget = new Map<object, Map<string, ControlChangeDetail & { resetValue: unknown }>>();
-  let disposed = false;
+  const lifecycle = createAnnotationDesignControlSyncState();
 
   const dispatch = (target: object, detail: ControlChangeDetail) => {
     if (deps.isConnected(target) || detail.action === `reset`) deps.dispatchChange(target, detail);
   };
   const clear = () => {
-    const stale = appliedByTarget;
-    appliedByTarget = new Map();
-    targetByDesignId.clear();
-    lastDesignId = null;
+    const stale = lifecycle.clear();
     for (const [target, changes] of stale) {
       for (const change of changes.values()) {
         dispatch(target, {
@@ -66,12 +61,10 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
     }
   };
   const rememberTarget = (designId: string, target: object) => {
-    if (disposed) return;
-    if (!targetByDesignId.has(designId)) targetByDesignId.set(designId, new WeakRef(target));
-    lastDesignId = designId;
+    lifecycle.rememberTarget(designId, target);
   };
   const sync = (state: AnnotationDesignSyncState) => {
-    if (disposed) return;
+    if (lifecycle.disposed) return;
     if (state.canUseSiteAnnotationApi !== true || state.canUseTweaks === false || state.isAgentControllingBrowser) {
       clear();
       return;
@@ -85,9 +78,9 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
     const showOriginal = state.isOriginalViewEnabled === true || state.interactionMode !== `comment`;
     const next = new Map<object, Map<string, ControlChangeDetail & { resetValue: unknown }>>();
     const validIds = new Set(changes.map((change) => change.id));
-    for (const id of targetByDesignId.keys()) if (id !== lastDesignId && !validIds.has(id)) targetByDesignId.delete(id);
+    lifecycle.pruneTargets(validIds);
     for (const designChange of changes) {
-      const target = targetByDesignId.get(designChange.id)?.deref();
+      const target = lifecycle.getTarget(designChange.id);
       const anchor = designChange.anchor;
       const targetDocument = target == null ? null : deps.resolveFrameDocument(anchor.framePath);
       if (
@@ -105,7 +98,7 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
         if (change.value === fallback) continue;
         const byCallback = next.get(target) ?? new Map();
         const key = virtualTarget == null ? change.callback : JSON.stringify([virtualTarget.surfaceId, virtualTarget.targetId, change.callback]);
-        const resetValue = appliedByTarget.get(target)?.get(key)?.resetValue ?? byCallback.get(key)?.resetValue ?? fallback;
+        const resetValue = lifecycle.appliedByTarget.get(target)?.get(key)?.resetValue ?? byCallback.get(key)?.resetValue ?? fallback;
         byCallback.set(key, {
           callback: change.callback,
           resetValue,
@@ -116,8 +109,7 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
         next.set(target, byCallback);
       }
     }
-    const previous = appliedByTarget;
-    appliedByTarget = next;
+    const previous = lifecycle.replaceApplied(next);
     for (const [target, byCallback] of previous) {
       for (const [key, change] of byCallback) {
         if (!next.get(target)?.has(key))
@@ -138,9 +130,9 @@ function createAnnotationDesignControlSync(deps: AnnotationDesignControlSyncDepe
     }
   };
   const dispose = () => {
-    if (disposed) return;
+    if (lifecycle.disposed) return;
     clear();
-    disposed = true;
+    lifecycle.dispose();
   };
   return { rememberTarget, sync, clear, dispose };
 }

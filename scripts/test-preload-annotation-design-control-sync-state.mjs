@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationDesignControlSyncState } = require("../app/.vite/build/browser-page-preload/annotation-design-control-sync-state.js");
+
+const state = createAnnotationDesignControlSyncState();
+const target = {};
+assert.equal(state.disposed, false);
+assert.equal(state.rememberTarget("design-a", target), true);
+assert.equal(state.getTarget("design-a"), target);
+assert.equal(state.rememberTarget("design-a", {}), true, "existing target identity is stable");
+state.pruneTargets(new Set());
+assert.equal(state.getTarget("design-a"), target, "most recently remembered design is retained");
+const applied = new Map([[target, new Map([["setColor", { value: "red" }]])]]);
+assert.equal(state.replaceApplied(applied).size, 0);
+assert.equal(state.appliedByTarget.get(target).get("setColor").value, "red");
+const stale = state.clear();
+assert.equal(stale, applied);
+assert.equal(state.appliedByTarget.size, 0);
+assert.equal(state.getTarget("design-a"), undefined);
+assert.equal(state.dispose(), true);
+assert.equal(state.dispose(), false, "dispose is idempotent");
+assert.equal(state.rememberTarget("design-b", {}), false, "disposed state rejects new targets");
+assert.equal(state.getTarget("design-a"), undefined);
+console.log("test-preload-annotation-design-control-sync-state: 12 assertions passed");
