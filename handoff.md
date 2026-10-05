@@ -46,6 +46,11 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-rank-projects-by-query.mjs` 覆盖 3 项 focused assertions；build/typecheck
 与 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `mp`（内部 `rje`，源码 8227--8229）的 compact-window
+布局分支纯判定已迁移至 `src/renderer/app-primary/runtime/is-compact-window-enabled.ts`；新增
+`scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
+focused test 已通过。
+
 2026-10-06 A5 继续批次：app-primary 未消费导出 `vt`（内部 `pmt`，源码 62417--62425）的文件输入
 accept-pattern 展开纯策略已迁移至 `src/renderer/app-primary/runtime/resolve-accepted-file-extensions.ts`；
 支持 dotted extension、MIME wildcard、exact MIME 与 `*/*` unrestricted 边界。新增
