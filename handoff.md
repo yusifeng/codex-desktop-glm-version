@@ -1693,3 +1693,7 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：cat-file 命令结果 code=128 的 not-found 与其他 code 的 unknown 错误分类已迁移至 `src/main/worker/git-cat-file-error-policy.ts`；cat-file 入口保留 batch 查询与大小限制编排。新增 `scripts/test-worker-git-cat-file-error-policy.mjs` 覆盖 4 项 focused assertions；build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：cat-file unknown error envelope 的稳定 `{type:error,error.type:unknown}` 构造已迁移至 `src/main/worker/git-cat-file-error-envelope-policy.ts`；cat-file 入口保留 batch parser 与错误重试编排。新增 `scripts/test-worker-git-cat-file-error-envelope-policy.mjs` 覆盖 2 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：cat-file 批量内容按换行边界拆分（保留换行、去除末尾空段）已迁移至 `src/main/worker/git-cat-file-content-policy.ts`；cat-file 入口保留 batch framing、大小限制与错误编排。新增 `scripts/test-worker-git-cat-file-content-policy.mjs` 覆盖 4 项 focused assertions；cat-file policy 回归 6 项、build 与 typecheck 已通过。
+
+2026-10-05 A5 T5 继续批次：app-primary 的终端命令 token 清理策略（移除空白与固定 shell 特殊字符集合）已迁移至 `src/renderer/app-primary/runtime/strip-terminal-command-token.ts`；新增 `scripts/test-app-primary-strip-terminal-command-token.mjs` 覆盖 3 项 focused assertions，并登记 `cp/fN` 源码 11809-11813 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。

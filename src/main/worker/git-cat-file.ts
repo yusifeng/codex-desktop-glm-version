@@ -13,13 +13,6 @@ type CatFileDependencies = {
 
 function unknownResult() { return unknownCatFileResult(); }
 
-function splitContentLines(content: string) {
-  const lines = content.split(LINE_BOUNDARY);
-  if (lines.length === 1 && lines[0] === ``) return [];
-  if (lines.at(-1) === ``) lines.pop();
-  return lines;
-}
-
 function defaultBatchError(requestCount: number, result: any, limitBytes: number) {
   return result.outputLimitExceeded != null && requestCount === 1
     ? { type: `error`, error: { type: `too-large`, limitBytes } }
@@ -259,3 +252,4 @@ if (typeof module !== `undefined`)
   };
 import { gitErrorType } from "./git-cat-file-error-policy";
 import { unknownCatFileResult } from "./git-cat-file-error-envelope-policy";
+import { splitContentLines } from "./git-cat-file-content-policy";
