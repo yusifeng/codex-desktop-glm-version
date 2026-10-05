@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1177.
+Total scripts: 1178.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -478,6 +478,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-core-request-policy.mjs`](./test-worker-git-core-request-policy.mjs)
 - [`test-worker-git-node-request-policy.mjs`](./test-worker-git-node-request-policy.mjs)
 - [`test-worker-git-worktree-snapshot-read-policy.mjs`](./test-worker-git-worktree-snapshot-read-policy.mjs)
+- [`test-worker-entry-message-policy.mjs`](./test-worker-entry-message-policy.mjs)
 - [`test-worker-git-worktree-files.mjs`](./test-worker-git-worktree-files.mjs)
 - [`test-worker-git-worktree-files-policy.mjs`](./test-worker-git-worktree-files-policy.mjs)
 - [`test-worker-git-worktree-copy-files.mjs`](./test-worker-git-worktree-copy-files.mjs)
@@ -1242,3 +1243,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-preload-annotation-viewport-scale.mjs](test-preload-annotation-viewport-scale.mjs)
 [test-app-primary-should-use-handoff-branch.mjs](test-app-primary-should-use-handoff-branch.mjs)
 [test-preload-annotation-comment-count.mjs](test-preload-annotation-comment-count.mjs)
+[test-app-primary-select-handoff-direction.mjs](test-app-primary-select-handoff-direction.mjs)
