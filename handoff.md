@@ -1181,3 +1181,8 @@ repository、参数与 signal 透传，共 5 项 focused assertions。
 清理已迁移至 `src/main/browser-page-preload/annotation-element-cache.ts`；新增
 `scripts/test-preload-annotation-element-cache.mjs`，覆盖缓存复用/隔离、销毁清理及销毁后
 新缓存边界，共 9 项 focused assertions。
+
+2026-10-05 A2 继续批次：annotation preload 的 feature graph、preview overlay 与 capability
+flag 统一销毁顺序已迁移至 `src/main/browser-page-preload/annotation-preload-disposal.ts`；
+新增 `scripts/test-preload-annotation-preload-disposal.mjs`，覆盖 feature dispose → preview
+clear → capability reset 顺序及重复销毁，共 6 项 focused assertions；已通过 typecheck、verify。
