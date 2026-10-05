@@ -3948,30 +3948,7 @@ function ws(e) {
   return normalizeAnnotationColorPolicy(e);
 }
 function Ts(e, t) {
-  if (e.length < 2) return e;
-  let n = 28.5,
-    r = t - 16 - Ks / 2,
-    i = new Map();
-  e.forEach((e, t) => {
-    let n = `${Math.round(e.x)}:${Math.round(e.y)}`,
-      r = i.get(n);
-    if (r == null) {
-      i.set(n, [t]);
-      return;
-    }
-    r.push(t);
-  });
-  let a = e.map((e) => ({ ...e }));
-  for (let t of i.values()) {
-    if (t.length < 2) continue;
-    let i = t.reduce((t, n) => t + e[n].x, 0) / t.length - ((t.length - 1) * qs) / 2,
-      o = i + (t.length - 1) * qs,
-      s = i < n ? n - i : o > r ? r - o : 0;
-    t.forEach((t, o) => {
-      a[t] = { x: Ps(i + o * qs + s, n, r), y: e[t].y };
-    });
-  }
-  return a;
+  return spreadAnnotationMarkerPoints(e, t, Ks, qs);
 }
 function Es(e, t) {
   return annotationDesignStyles.buildAnnotationDesignStyleRule(e, t);
@@ -6197,6 +6174,7 @@ var { escapeAnnotationSelectorToken } = require("./browser-page-preload/annotati
 var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrSheetsUrl: isGoogleDocsOrSheetsUrlHelper, parseGoogleDocsUrl: parseGoogleDocsUrlHelper, parseGoogleSheetsId: parseGoogleSheetsIdHelper, readTabId: readTabIdHelper, normalizeText: normalizeGoogleDocsText } = require("./browser-page-preload/google-docs-context");
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 var { normalizeAnnotationColor: normalizeAnnotationColorPolicy } = require("./browser-page-preload/annotation-color-policy");
+var { spreadAnnotationMarkerPoints } = require("./browser-page-preload/annotation-marker-position");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

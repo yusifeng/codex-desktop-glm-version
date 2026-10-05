@@ -1,5 +1,13 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation marker position policy
+
+Annotation marker 同点横向分散策略（原 `Ts`，3863-4050 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-marker-position.ts`。该纯策略按四舍五入坐标
+分组、按固定间距展开并限制在 viewport 横向边界内；入口保留常量注入与兼容委托。
+`scripts/test-preload-annotation-marker-position.mjs` 覆盖单点、普通重复点与左边界聚集
+共 3 项断言，build 已通过。
+
 ### 增量抽取：annotation design CSS rule policy
 
 Annotation design CSS 规则生成（原 `Cs`/`Es`/`Ds`，3863-4050 业务工具段）已迁移至

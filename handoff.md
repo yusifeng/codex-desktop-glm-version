@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation marker position 的重复点分组、固定间距横向展开
+与 viewport 边界 clamp 已迁移至 `src/main/browser-page-preload/annotation-marker-position.ts`；
+原 `Ts` 入口保留兼容委托。新增 `scripts/test-preload-annotation-marker-position.mjs` 覆盖
+3 项 focused assertions；build 与 marker focused test 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation design CSS helper（变更声明筛选、design-group
 selector 转义、`!important` 规则生成与多规则拼接）已迁移至
 `src/main/browser-page-preload/annotation-design-styles.ts`；原 `Cs`/`Es`/`Ds` 入口保留
