@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/resolve-manual-approval-threshold.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const parse = (value) => typeof value === "number" && value >= 0 ? value : undefined;
+assert.equal(mod.resolveManualApprovalThreshold(2, parse, 3), 2);
+assert.equal(mod.resolveManualApprovalThreshold(-1, parse, 3), 3);
+assert.equal(mod.resolveManualApprovalThreshold(null, parse, 3), 3);
+console.log("app-primary resolve manual approval threshold: 3 assertions passed");
