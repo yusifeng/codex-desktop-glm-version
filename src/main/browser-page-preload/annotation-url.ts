@@ -1,9 +1,4 @@
 /** Shared page identity rules for browser annotation anchors and frames. */
-function parseAnnotationUrl(value: unknown): URL | null {
-  if (typeof value !== `string`) return null;
-  try { return new URL(value); } catch { return null; }
-}
-
 function areAnnotationUrlsEquivalent(left: unknown, right: unknown): boolean {
   const leftUrl = parseAnnotationUrl(left);
   const rightUrl = parseAnnotationUrl(right);
@@ -22,3 +17,4 @@ function getCurrentAnnotationPageUrl(windowLike: { location: { href: string } })
 
 export { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl, parseAnnotationUrl };
 if (typeof module !== `undefined`) module.exports = { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl, parseAnnotationUrl };
+import { parseAnnotationUrl } from "./annotation-url-parser-policy";
