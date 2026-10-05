@@ -107,6 +107,16 @@ export type PageStateEventListener = (event: { type: string; [key: string]: unkn
 /** 下载变更监听器。 */
 export type BrowserUseDownloadChangeListener = (change: { path: string; tabId: string }) => void;
 
+export interface IabBrowserUseOptions {
+  ensureSessionRoute?: (session: { conversationId: string }) => boolean;
+  buildFlavor?: string;
+  appSessionId?: string;
+  cdpCommandTimeoutMs?: number;
+  cursorArrivalTimeoutMs?: number;
+  initialPageUrl?: string;
+  pageReadyTimeoutMs?: number;
+}
+
 // ---------------------------------------------------------------------------
 // IAB API（原 `DYe`）
 // ---------------------------------------------------------------------------
@@ -117,6 +127,22 @@ export type BrowserUseDownloadChangeListener = (change: { path: string; tabId: s
  * 状态容器 + 会话/tab/CDP/监听器四组核心，其余分组按方法清单回填）。
  */
 export class IabBrowserUseApi {
+  private readonly ensureSessionRouteCallback?: IabBrowserUseOptions["ensureSessionRoute"];
+  private readonly buildFlavor?: string;
+  private readonly appSessionId?: string;
+  private readonly cursorArrivalTimeoutMs: number;
+
+  constructor(
+    private readonly getBrowserHost: (session: { conversationId: string; routeKey?: string }) => unknown = () => null,
+    disposeNavigationBlockedListener?: (listener: (event: unknown) => void) => () => void,
+    options: IabBrowserUseOptions = {},
+  ) {
+    this.ensureSessionRouteCallback = options.ensureSessionRoute;
+    this.buildFlavor = options.buildFlavor;
+    this.appSessionId = options.appSessionId;
+    this.cursorArrivalTimeoutMs = options.cursorArrivalTimeoutMs ?? IAB_TIMEOUTS.cursorArrivalPollMs;
+    disposeNavigationBlockedListener?.(() => undefined);
+  }
   // ---- 状态容器（原 21 字段）----
   private tabsById = new Map<string, IabTabSnapshot>();
   private tabRuntimesById = new Map<string, unknown>();
@@ -141,15 +167,37 @@ export class IabBrowserUseApi {
   private usedTurnIdsByConversationId = new Map<string, Set<string>>();
 
   /** ping（原 L111477）。 */
-  async ping(): Promise<{ ok: true }> {
-    return { ok: true };
+  ping(): string {
+    return "pong";
   }
 
   /** 会话要求（原 `requireBrowserUseSession`）。 */
-  requireBrowserUseSession(route: IabSessionRoute): unknown {
-    void route;
-    void this.hostsByRouteKey;
-    throw new Error("browser use session not initialized");
+  requireBrowserUseSession(route: IabSessionRoute): { conversationId: string } {
+    const session = this.getBrowserUseSession(route);
+    if (this.ensureSessionRouteCallback?.(session) !== true) {
+      throw new Error(`No ChatGPT browser route is available for browser session ${session.conversationId}`);
+    }
+    return session;
+  }
+
+  getBrowserUseSession(route: IabSessionRoute): { conversationId: string } {
+    const conversationId = (route as { session_id?: unknown; conversationId?: unknown }).session_id ?? route.conversationId;
+    if (typeof conversationId !== "string" || conversationId.length === 0) {
+      throw new Error("Missing required browser session_id");
+    }
+    return { conversationId };
+  }
+
+  getRequestSafeFields(session: { conversationId: string }, request: { turn_id?: unknown }, name: string): Record<string, unknown> {
+    return { conversationId: session.conversationId, request: name, turnId: request.turn_id ?? null };
+  }
+
+  getMetadata(session: { conversationId: string }): Record<string, string> {
+    return {
+      ...(this.buildFlavor == null ? {} : { codexAppBuildFlavor: this.buildFlavor }),
+      ...(this.appSessionId == null ? {} : { codexAppSessionId: this.appSessionId }),
+      codexSessionId: session.conversationId,
+    };
   }
 
   /** tab 列表（原 `getTabs`/`getTabsForBrowserUse`）。 */
