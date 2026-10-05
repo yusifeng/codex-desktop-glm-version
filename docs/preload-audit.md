@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation anchor root policy
+
+顶层 `html/body` element anchor 判定（原 `rd`，5120-7259 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-anchor-root-policy.ts`；新增 3 项 focused assertions，
+build 与 typecheck 已通过。
+
 ### 增量抽取：annotation anchor candidate score policy
 
 Annotation anchor 候选评分（原 `gd`，5120-7259 业务工具段）的名称/附近文本/标题/路径权重与

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：顶层 annotation anchor root（html/body）判定已迁移至
+`src/main/browser-page-preload/annotation-anchor-root-policy.ts`；原 `rd` 入口保留兼容委托，
+新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation anchor candidate score 的字段权重与距离惩罚已迁移至
 `src/main/browser-page-preload/annotation-anchor-candidate-score.ts`；原 `gd` 入口保留兼容委托，
 新增 3 项 focused assertions，build 与 typecheck 已通过。
@@ -102,6 +106,10 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 布局分支纯判定已迁移至 `src/renderer/app-primary/runtime/is-compact-window-enabled.ts`；新增
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
+
+2026-10-06 A5 继续批次：app-shared 未消费导出 `xU`（内部 `KBe`，源码 48497--48500）的 document
+preview path 纯判定已迁移至 `src/renderer/app-shared/runtime/is-document-preview-path.ts`；新增
+focused test 3 项断言，typecheck 与 focused test 已通过。
 
 2026-10-06 A5 继续批次：app-shared 未消费导出 `zG`（内部 `FLe`，源码 46598--46601）的 link
 display-title 纯投影已迁移至 `src/renderer/app-shared/runtime/derive-link-display-title.ts`；新增

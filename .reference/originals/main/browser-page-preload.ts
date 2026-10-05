@@ -5775,11 +5775,7 @@ function nd(e) {
   };
 }
 function rd(e) {
-  return (
-    e.kind === `element` &&
-    e.framePath.length === 0 &&
-    (e.elementPath === `html` || e.elementPath === `body`)
-  );
+  return isTopLevelAnnotationRoot(e);
 }
 function id(e, t, n, r, i = window.innerWidth) {
   let a = Cd.get(e.ownerDocument);
@@ -6168,6 +6164,7 @@ var { getAnnotationScrollOffset } = require("./browser-page-preload/annotation-s
 var { resolveAnnotationFrameDocumentUrl } = require("./browser-page-preload/annotation-frame-document-url");
 var { projectAnnotationAnchorPoint } = require("./browser-page-preload/annotation-anchor-point-projection");
 var { scoreAnnotationAnchorCandidate } = require("./browser-page-preload/annotation-anchor-candidate-score");
+var { isTopLevelAnnotationRoot } = require("./browser-page-preload/annotation-anchor-root-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
