@@ -10,6 +10,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 - [`test-worker-git-blame-file-policy.mjs`](./test-worker-git-blame-file-policy.mjs)
 - [`test-worker-git-status-summary-policy.mjs`](./test-worker-git-status-summary-policy.mjs)
+- [`test-worker-git-repository-size-policy.mjs`](./test-worker-git-repository-size-policy.mjs)
 
 - [`test-worker-git-review-working-tree-policy.mjs`](./test-worker-git-review-working-tree-policy.mjs)
 - [`test-worker-git-watch-acquire-policy.mjs`](./test-worker-git-watch-acquire-policy.mjs)

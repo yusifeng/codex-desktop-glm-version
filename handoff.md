@@ -1,5 +1,15 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation mode controller 的终止生命周期边界已补齐；dispose 现在
+幂等，首次销毁后会关闭主世界 listener 与 controls，迟到事件以及重复 dispose 均不会再次驱动
+状态或释放副作用。`scripts/test-preload-annotation-mode-controller.mjs` 新增重复 dispose
+focused assertion；build、verify 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：Git repository size 的 `count-objects` 解析、字节数计算、可读格式化与
+超限错误消息纯策略已迁移至 `src/main/worker/git-repository-size-policy.ts`；运行时保留缓存、Git
+I/O 与仓库读取编排。新增 `scripts/test-worker-git-repository-size-policy.mjs` 覆盖 6 项 focused
+assertions；原 25 项 repository-size 回归、build 与 typecheck 已通过。
+
 2026-10-05 A5 继续批次：app-primary 邮件撰写生成区未消费导出 `Rd`/`zd`/`Md`/`Nd`/`Ld`/`Ud`
 （`RMe`/`zMe`/`VMe`/`HMe`/`WMe`/`qMe`，17397--17529）完成逐行分类；这些纯投影/格式化辅助函数
 均无独立 renderer named consumer 或 teardown owner，登记为 generated-local-helper。`docs/renderer-hub-line-classification.json`
