@@ -5938,15 +5938,7 @@ function hd(e, t, n, r) {
 */
 }
 function gd(e, t) {
-  let n = 0,
-    r = ld(t);
-  (e.name != null && r === e.name && (n += 1e3),
-    e.nearbyText != null && xc(t) === e.nearbyText && (n += 500),
-    e.title === yc(t) && (n += 250),
-    e.elementPath === Sc(t) && (n += 25));
-  let i = cd(t),
-    a = dd(e);
-  return i == null || a == null ? n : n - Math.abs(i.x - a.x) - Math.abs(i.y - a.y);
+  return scoreAnnotationAnchorCandidate(e, t, { getName: ld, getNearbyText: xc, getTitle: yc, getElementPath: Sc, getRect: cd, getAnchorPoint: dd });
 }
 function _d(e) {
   for (let t = e; t != null; t = t.parentElement) {
@@ -6175,6 +6167,7 @@ var { projectAnnotationDirectTextPreview } = require("./browser-page-preload/ann
 var { getAnnotationScrollOffset } = require("./browser-page-preload/annotation-scroll-offset");
 var { resolveAnnotationFrameDocumentUrl } = require("./browser-page-preload/annotation-frame-document-url");
 var { projectAnnotationAnchorPoint } = require("./browser-page-preload/annotation-anchor-point-projection");
+var { scoreAnnotationAnchorCandidate } = require("./browser-page-preload/annotation-anchor-candidate-score");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
