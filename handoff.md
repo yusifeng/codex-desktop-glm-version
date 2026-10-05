@@ -1,5 +1,15 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation target label 的 tag/accessibility 文案投影已抽至
+`src/main/browser-page-preload/annotation-target-label-policy.ts`；label adapter 仅保留
+DOM 元素与 accessible-label 依赖编排。新增 `scripts/test-preload-annotation-target-label-policy.mjs`
+覆盖 2 项有/无 accessible label 断言；原 target-label 回归 3 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation theme 的 prefers-color-scheme 纯投影已抽至
+`src/main/browser-page-preload/annotation-theme-policy.ts`；theme adapter 仅保留窗口媒体查询
+依赖编排。新增 `scripts/test-preload-annotation-theme-policy.mjs` 覆盖 3 项 dark/light/fallback
+断言；原 theme 回归 3 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation viewport override 的尺寸合并纯策略已抽至
 `src/main/browser-page-preload/annotation-viewport-merge-policy.ts`；override adapter 仅保留
 泛型输入与可选 viewport 编排。新增 `scripts/test-preload-annotation-viewport-merge-policy.mjs`
@@ -1516,3 +1526,5 @@ typecheck 均通过。
 2026-10-05 A1 继续批次：checkout failure 的 overwrite-conflict 输出解析、去重路径收集与错误分类已迁移至 `src/main/worker/git-checkout-conflict-policy.ts`；checkout handler 保留 ref 解析、stash/rollback、Git checkout 与缓存失效副作用。新增 `scripts/test-worker-git-checkout-conflict-policy.mjs` 覆盖 5 项 focused assertions；原 checkout handler 回归 16 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Windows Git executable 的大小写不敏感环境读取、PATH 覆盖检测与进程环境合并策略已迁移至 `src/main/worker/git-executable-policy.ts`；executable resolver 保留 Windows where 查询、缓存与命令重写流程。新增 `scripts/test-worker-git-executable-policy.mjs` 覆盖 6 项 focused assertions；原 executable 回归 6 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：commit message 的 attribution 默认值、Co-authored-by trailer 识别/去重及 trailer block 拼接策略已迁移至 `src/main/worker/git-commit-message-policy.ts`；commit handler 保留 repository 查询、stage/commit Git I/O、失败回滚与缓存编排。新增 `scripts/test-worker-git-commit-message-policy.mjs` 覆盖 6 项 focused assertions；原 commit handler 回归 48 项、build 与 typecheck 已通过。
