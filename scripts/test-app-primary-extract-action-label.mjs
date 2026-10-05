@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/extract-action-label.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+assert.equal(mod.extractActionLabel({ text: " Copy " }), " Copy ");
+assert.equal(mod.extractActionLabel({ action_v2: { action_enum: "copy_to_clipboard", text: "copied" } }), "copied");
+assert.equal(mod.extractActionLabel({ id: "fallback" }), "fallback");
+assert.equal(mod.extractActionLabel({ text: "  " }), null);
+console.log("app-primary extract action label: 4 assertions passed");
