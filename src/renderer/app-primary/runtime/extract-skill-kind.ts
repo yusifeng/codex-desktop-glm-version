@@ -26,6 +26,10 @@ export interface SkillMentionNode {
   attrs?: { path?: unknown };
 }
 
+export interface SkillMentionDocument {
+  descendants(callback: (node: SkillMentionNode) => boolean): unknown;
+}
+
 /** Selects the most recent mention kind, while preferring an explicitly requested kind. */
 export function extractSkillKindFromMentions(
   mentions: readonly SkillMentionNode[],
@@ -38,4 +42,17 @@ export function extractSkillKindFromMentions(
     if (kind != null) latest = kind;
   }
   return preferred != null && latest === preferred ? preferred : latest ?? preferred;
+}
+
+/** Projects the latest skill/plugin mention kind from a ProseMirror-like document. */
+export function extractSkillKindFromDocument(
+  document: SkillMentionDocument,
+  preferred: string | null = null,
+): string | null {
+  const mentions: SkillMentionNode[] = [];
+  document.descendants((node) => {
+    if (node.type === "skillMention" || node.type === "pluginMention") mentions.push(node);
+    return true;
+  });
+  return extractSkillKindFromMentions(mentions, preferred);
 }
