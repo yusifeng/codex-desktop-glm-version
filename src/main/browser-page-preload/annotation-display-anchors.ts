@@ -14,11 +14,7 @@ export function resolveAnnotationDisplayAnchors(
   deps: AnnotationDisplayAnchorDependencies,
 ) {
   if (annotation.anchor.kind === `text`) {
-    return {
-      ...annotation,
-      ...(textAnchor == null ? {} : { anchor: textAnchor }),
-      selectionSourceIndexes: [0],
-    };
+    return projectAnnotationTextDisplay(annotation, textAnchor);
   }
   const viewportSize = deps.getViewportSize(annotation);
   const resolved = [annotation.anchor, ...(annotation.additionalAnchors ?? [])].flatMap((anchor: any, sourceIndex: number) => {
@@ -53,3 +49,4 @@ export function resolveAnnotationDisplayAnchors(
 }
 
 if (typeof module !== `undefined`) module.exports = { resolveAnnotationDisplayAnchors };
+import { projectAnnotationTextDisplay } from "./annotation-text-display-projection";
