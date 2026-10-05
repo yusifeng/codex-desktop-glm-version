@@ -22,13 +22,6 @@ function createGitCommandStats(concurrentOperationCount: number) {
   };
 }
 
-function buildGitHostCacheKey(host: Record<string, unknown>): string {
-  const config = host.hostConfig as Record<string, unknown>;
-  return JSON.stringify([host.id, config.kind, config.codex_cli_command, config.terminal_command,
-    config.websocket_url, config.env_id, config.host_name, config.environment_kind, config.os,
-    config.arch, config.app_server_version, config.online, config.distro]);
-}
-
 function recordUntrackedCacheOutcome(attribution: { closed?: boolean; untrackedCacheCoalescedCount: number; untrackedCacheHitCount: number; untrackedCacheMissCount: number } | null | undefined, outcome: string): void {
   if (attribution == null || attribution.closed) return;
   if (outcome === `coalesced`) attribution.untrackedCacheCoalescedCount += 1;
@@ -421,3 +414,4 @@ export { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, clas
 if (typeof module !== `undefined`) module.exports = { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceExpectedReason, getGitPerformanceFailureReason, getGitPerformanceOutcome, getGitPerformanceReason, getGitPerformanceResultFields, getUntrackedCacheStatus, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample };
 import { exitCodeBucket } from "./git-exit-code-policy";
 import { isGitMutationRequest } from "./git-mutation-classification-policy";
+import { buildGitHostCacheKey } from "./git-host-cache-key-policy";

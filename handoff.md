@@ -1668,3 +1668,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：Git process telemetry 的 exit code bucket（null、1/2/128/129 与 other）映射已迁移至 `src/main/worker/git-exit-code-policy.ts`；observability 保留命令计数与 telemetry 编排。新增 `scripts/test-worker-git-exit-code-policy.mjs` 覆盖 7 项 focused assertions；原 observability 回归 99 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：observability 的 mutating request kind/source 分类集合已迁移至 `src/main/worker/git-mutation-classification-policy.ts`；observability 保留 telemetry 聚合与命令统计编排。新增 `scripts/test-worker-git-mutation-classification-policy.mjs` 覆盖 5 项 focused assertions；原 observability 回归 99 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：observability host cache identity 的稳定字段投影已迁移至 `src/main/worker/git-host-cache-key-policy.ts`，排除无关 hostConfig 字段并保留 host/config 关键字段顺序；observability 保留 telemetry 聚合编排。新增 `scripts/test-worker-git-host-cache-key-policy.mjs` 覆盖 3 项 focused assertions；原 observability 回归 99 项、build 与 typecheck 已通过。

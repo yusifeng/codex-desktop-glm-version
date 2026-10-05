@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { buildGitHostCacheKey } = require("../app/.vite/build/worker/git-host-cache-key-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+const host={id:"local",hostConfig:{kind:"local",os:"macos",online:true,irrelevant:"x"}};
+eq(buildGitHostCacheKey(host), JSON.stringify(["local","local",undefined,undefined,undefined,undefined,undefined,undefined,"macos",undefined,undefined,true,undefined]));
+const changed={...host,hostConfig:{...host.hostConfig,irrelevant:"y"}}; eq(buildGitHostCacheKey(changed), buildGitHostCacheKey(host));
+eq(buildGitHostCacheKey({...host,id:"remote"}), JSON.stringify(["remote","local",undefined,undefined,undefined,undefined,undefined,undefined,"macos",undefined,undefined,true,undefined]));
+console.log(`${n} worker host cache key policy assertions passed`);
