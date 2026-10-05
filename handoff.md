@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git current-branch 的 HEAD/symbolic-HEAD 响应到 branch/detached/unknown 状态投影已迁移至 `src/main/worker/git-current-branch-policy.ts`；运行时保留 generation 重试、缓存失效与 Git I/O，并保持有效 HEAD 时不触发 symbolic 查询。新增 `scripts/test-worker-git-current-branch-policy.mjs` 覆盖 5 项 focused assertions；原 current-branch 回归 26 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git ref resolution 的 object-id 校验与 stdout 归一化已迁移至 `src/main/worker/git-ref-resolution-policy.ts`；ref query 入口保留缓存、Git I/O 与 SHA normalizer 编排。新增 `scripts/test-worker-git-ref-resolution-policy.mjs` 覆盖 11 项 focused assertions；原 ref-resolution 回归 20 项与 build 已通过。typecheck 受并行 annotation-surface-observer 未提交改动中的 `disposed` 标识错误阻塞，已告知主代理。
 
 2026-10-05 A1 继续批次：Git nearest-ancestor branch 的候选分支归一化与最短 ancestor 选择策略已迁移至 `src/main/worker/git-nearest-ancestor-branch-policy.ts`；运行时仅保留 compare-ahead 并发查询与 I/O 编排。新增 `scripts/test-worker-git-nearest-ancestor-branch-policy.mjs` 覆盖 5 项 focused assertions；原 nearest-ancestor 回归 10 项、build 与 typecheck 已通过。
@@ -30,6 +32,12 @@ generation 初始化、刷新销毁顺序与副作用编排。新增
 DOM/ShadowRoot 扫描、feature reconciliation 与 listener 副作用，重复 metadata 请求与迟到
 pagehide 回调均受状态门禁。新增 `scripts/test-preload-annotation-surface-observer-state.mjs`
 覆盖 9 项状态断言；原 observer 回归 14 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation overlay mutation observer 的 terminal dispose gate 已抽至
+`src/main/browser-page-preload/annotation-overlay-observer-state.ts`；observer 仅保留 mutation
+过滤与 disconnect 副作用，重复 teardown 与迟到 mutation callback 均被终态拒绝。新增
+`scripts/test-preload-annotation-overlay-observer-state.mjs` 覆盖 4 项状态断言；原 observer
+回归 9 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：live-query performance operation 的方法白名单与结果映射已迁移至
 `src/main/worker/git-performance-operation-policy.ts`；observability runtime 仅保留性能结果字段、

@@ -1,5 +1,7 @@
 const CURRENT_BRANCH_SNAPSHOT_STALE_MS = 15_000;
 
+import { projectCurrentBranchState } from './git-current-branch-policy';
+
 type CurrentBranchDependencies = {
   fetchQueryWithSignal: (queryClient: any, options: any, signal?: AbortSignal) => Promise<any>;
   getQueryMeta: () => any;
@@ -83,11 +85,9 @@ async function readSymbolicHeadBranchName(
 async function getCurrentBranchState(repository: any, dependencies: CurrentBranchDependencies) {
   const head = await readHeadBranchName(repository, undefined, dependencies);
   if (head.success && head.stdout && head.stdout !== `HEAD`)
-    return { type: `branch`, branch: head.stdout };
+    return projectCurrentBranchState(head, undefined);
   const symbolicHead = await readSymbolicHeadBranchName(repository, undefined, dependencies);
-  if (symbolicHead.success && symbolicHead.stdout)
-    return { type: `branch`, branch: symbolicHead.stdout };
-  return symbolicHead.code === 1 ? { type: `detached` } : { type: `unknown` };
+  return projectCurrentBranchState(head, symbolicHead);
 }
 
 async function getCurrentBranch(repository: any, dependencies: CurrentBranchDependencies) {
