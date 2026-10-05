@@ -2053,3 +2053,10 @@ typecheck 均通过。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `xm`（source `ej`，8972-8976）确认是 generated lazy SVG icon initializer，经 Ni 初始化并捕获 Q2 React runtime 后渲染图标组件；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
+2026-10-06 A5 继续批次：app-shared 未消费导出 `xU`（内部 `KBe`，源码 48497--48500）的 document
+preview path 纯判定已迁移至 `src/renderer/app-shared/runtime/is-document-preview-path.ts`；新增
+focused test 3 项断言，typecheck 与 focused test 已通过。manifest unreviewed 导出当前为 10965。
+
+2026-10-06 A2 继续批次：preload 未消费导出 `rd` 的顶层 `html/body` annotation anchor root 判定已迁移至
+`src/main/browser-page-preload/annotation-anchor-root-policy.ts`；新增 focused test 3 项断言，build/typecheck
+与 focused test 已通过。
