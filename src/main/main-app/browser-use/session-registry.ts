@@ -217,7 +217,10 @@ export class BrowserSessionRegistry {
   }
 
   getBrowserRouteForSession(sessionId: string): BrowserSessionRoute | null {
-    return this.sessionRoutes.get(sessionId) ?? null;
+    for (const route of this.sessionRoutes.values()) {
+      if (route.conversationId === sessionId) return route;
+    }
+    return null;
   }
 
   isSubagentBrowserUseRoute(routeKey: string): boolean {

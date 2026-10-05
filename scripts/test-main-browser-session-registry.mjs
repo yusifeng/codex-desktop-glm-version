@@ -16,6 +16,14 @@ assert.equal(registry.canServeSession("conversation-2"), true);
 
 registry.recordPageCreated({ browserTabId: "tab-1", conversationId: "conversation-2", createdAtMs: 1, pageKey: "page-1", windowId: 7 });
 assert.equal(registry.getPageRecordForConversation("conversation-2")?.pageKey, "page-1");
+registry.recordPageSnapshot({ browserTabId: "tab-1", conversationId: "conversation-2", createdAtMs: 1, pageKey: "page-1", windowId: 7, snapshot: { url: "https://example.test" } });
+assert.equal(registry.getPageRecordForConversation("conversation-2")?.snapshot?.url, "https://example.test");
+registry.recordPageTornDown({ pageKey: "page-1", guestWebContentsId: 42 });
+assert.equal(registry.getPageRecordForConversation("conversation-2")?.snapshot?.guestWebContentsId, null);
+registry.recordPageReleased({ pageKey: "page-1" });
+assert.equal(registry.getPageRecordForConversation("conversation-2"), null);
+assert.deepEqual(registry.getBrowserRouteForSession("conversation-1"), route);
+assert.equal(registry.isSubagentBrowserUseRoute("local-chatgpt:conversation-1"), false);
 registry.forgetPageRecord("page-1");
 assert.equal(registry.getPageRecordForConversation("conversation-2"), null);
 await registry.disposeBackendForSession("conversation-2");
@@ -23,4 +31,4 @@ assert.equal(registry.canServeSession("conversation-2"), false);
 await registry.disposeConversation("conversation-1");
 assert.equal(registry.resolveBrowserRoute("route-1"), null);
 
-console.log("main browser session registry: 11 assertions passed");
+console.log("main browser session registry: 17 assertions passed");
