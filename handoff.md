@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation surface observer 的异步 teardown 边界已补齐；
+`dispose` 后迟到的 MutationObserver、Shadow DOM attach 与 pageshow 回调现在均受终态门禁，
+不会重新扫描 DOM 或广播 feature 状态。`scripts/test-preload-annotation-surface-observer.mjs`
+扩展至 14 项 focused assertions；build、typecheck 与 focused test 已通过。
+
 2026-10-05 A1 继续批次：Git remote branch discovery 的 remote HEAD/default branch 解析、remote
 名称排序与 conventional fallback 纯策略已迁移至 `src/main/worker/git-remote-branches-policy.ts`；
 运行时保留 query/Git I/O 与异步短路编排。新增 `scripts/test-worker-git-remote-branches-policy.mjs`

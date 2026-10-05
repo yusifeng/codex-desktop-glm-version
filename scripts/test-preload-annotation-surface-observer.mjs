@@ -33,6 +33,7 @@ class FakeMutationObserver {
   observe(target, options) { this.target = target; this.options = options; }
   disconnect() { this.disconnected = true; }
   emit(records) { if (!this.disconnected) this.callback(records); }
+  emitQueued(records) { this.callback(records); }
 }
 
 const documentRef = new FakeDocument();
@@ -84,5 +85,9 @@ observer.recordUse("metadata");
 windowRef.emit("pageshow");
 assert.equal(featureEvents.length, eventCountAfterDispose);
 assert.deepEqual(featureEvents.at(-1), []);
+const lateElement = new FakeTarget(documentRef, { "oai-annotation-container": "" });
+FakeMutationObserver.all[0].emitQueued([{ type: "childList", target: documentRef, addedNodes: [lateElement] }]);
+documentRef.emit("shadow-attached");
+assert.equal(featureEvents.length, eventCountAfterDispose);
 
-console.log("13 preload annotation surface observer assertions passed");
+console.log("14 preload annotation surface observer assertions passed");

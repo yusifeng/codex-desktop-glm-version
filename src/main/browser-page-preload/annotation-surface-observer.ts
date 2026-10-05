@@ -31,6 +31,7 @@ function installAnnotationSurfaceObserver(deps: AnnotationSurfaceObserverDepende
   let metadataRequested = false;
   const emitFeatures = () => deps.onFeaturesChanged([...features]);
   const refresh = () => {
+    if (disposed) return;
     for (const element of containers) {
       if (!element.isConnected || element.ownerDocument !== deps.documentRef ||
         (!element.hasAttribute(deps.containersAttribute) && !element.hasAttribute(deps.containerTextAttribute))) containers.delete(element);
@@ -70,6 +71,7 @@ function installAnnotationSurfaceObserver(deps: AnnotationSurfaceObserverDepende
     if (element.isConnected && element.ownerDocument === deps.documentRef) { inspect(element); element.querySelectorAll(`*`).forEach(inspect); }
   };
   function handleMutations(records: Array<any>) {
+    if (disposed) return;
     for (const record of records) {
       if (record.type === `attributes` && record.target instanceof deps.elementConstructor) inspect(record.target);
       else for (const node of record.addedNodes) if (node instanceof deps.elementConstructor) inspectTree(node);
@@ -77,6 +79,7 @@ function installAnnotationSurfaceObserver(deps: AnnotationSurfaceObserverDepende
     refresh();
   }
   const onShadowAttached = (event: any) => {
+    if (disposed) return;
     const target = event.composedPath()[0];
     if (target instanceof deps.elementConstructor) { inspectTree(target); refresh(); }
   };
@@ -86,7 +89,7 @@ function installAnnotationSurfaceObserver(deps: AnnotationSurfaceObserverDepende
   const restoreAttachShadow = deps.executeInMainWorld({ func: installAttachShadowObserver, args: [deps.shadowEvent] });
   deps.documentRef.querySelectorAll(`*`).forEach(inspect);
   refresh();
-  const onPageShow = () => emitFeatures();
+  const onPageShow = () => { if (!disposed) emitFeatures(); };
   deps.windowRef.addEventListener(`pageshow`, onPageShow);
   return {
     recordUse(feature) {
