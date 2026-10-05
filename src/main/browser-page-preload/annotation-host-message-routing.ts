@@ -1,22 +1,8 @@
-const forwardedAnnotationMessageTypes = new Set([
-  `browser-sidebar-runtime-prepare-comment-screenshot`,
-  `browser-sidebar-runtime-clear-comment-screenshot`,
-  `browser-sidebar-runtime-capture-text-selection`,
-  `browser-sidebar-runtime-select-comment`,
-  `browser-sidebar-runtime-close-editor`,
-  `browser-sidebar-runtime-design-scrub-changed`,
-  `browser-sidebar-runtime-create-comment-at-point`,
-  `browser-sidebar-runtime-create-comment-from-selection`,
-  `browser-sidebar-runtime-open-design-editor-at-point`,
-  `browser-sidebar-runtime-annotation-selection-hover-state`,
-  `browser-sidebar-runtime-annotation-selection-modifier-state`,
-  `browser-sidebar-runtime-remove-annotation-selection`,
-  `browser-sidebar-runtime-restore-editor`,
-]);
+import { isForwardedAnnotationMessage } from "./annotation-forwarded-message-policy";
 
 function getMountedAnnotationMessageAction(type: string) {
   if (type === `browser-sidebar-runtime-sync`) return `sync`;
-  return forwardedAnnotationMessageTypes.has(type) ? `forward` : `ignore`;
+  return isForwardedAnnotationMessage(type) ? `forward` : `ignore`;
 }
 
 function getPreMountAnnotationMessageAction(type: string) {
