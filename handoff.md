@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git ref resolution 的 object-id 校验与 stdout 归一化已迁移至 `src/main/worker/git-ref-resolution-policy.ts`；ref query 入口保留缓存、Git I/O 与 SHA normalizer 编排。新增 `scripts/test-worker-git-ref-resolution-policy.mjs` 覆盖 11 项 focused assertions；原 ref-resolution 回归 20 项与 build 已通过。typecheck 受并行 annotation-surface-observer 未提交改动中的 `disposed` 标识错误阻塞，已告知主代理。
+
 2026-10-05 A1 继续批次：Git nearest-ancestor branch 的候选分支归一化与最短 ancestor 选择策略已迁移至 `src/main/worker/git-nearest-ancestor-branch-policy.ts`；运行时仅保留 compare-ahead 并发查询与 I/O 编排。新增 `scripts/test-worker-git-nearest-ancestor-branch-policy.mjs` 覆盖 5 项 focused assertions；原 nearest-ancestor 回归 10 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Git recent branches 的 limit 归一化、Git 输出分支名投影与查询参数构造已迁移至 `src/main/worker/git-recent-branches-policy.ts`；运行时保留 query/cache/Git I/O 与 live-generation 清理编排。新增 `scripts/test-worker-git-recent-branches-policy.mjs` 覆盖 8 项 focused assertions；原 recent-branches 回归 26 项、build 与 typecheck 已通过。

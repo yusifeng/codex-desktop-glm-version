@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 980.
+Total scripts: 983.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -18,6 +18,9 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-branch-ahead-policy.mjs`](./test-worker-git-branch-ahead-policy.mjs)
 - [`test-worker-git-recent-branches-policy.mjs`](./test-worker-git-recent-branches-policy.mjs)
 - [`test-worker-git-nearest-ancestor-branch-policy.mjs`](./test-worker-git-nearest-ancestor-branch-policy.mjs)
+- [`test-worker-git-ref-resolution-policy.mjs`](./test-worker-git-ref-resolution-policy.mjs)
+- [`test-app-primary-format-skill-scope-label.mjs`](./test-app-primary-format-skill-scope-label.mjs)
+- [`test-preload-annotation-surface-observer-state.mjs`](./test-preload-annotation-surface-observer-state.mjs)
 - [`test-app-primary-resolve-skill-repo-label.mjs`](./test-app-primary-resolve-skill-repo-label.mjs)
 - [`test-preload-annotation-feature-graph-state.mjs`](./test-preload-annotation-feature-graph-state.mjs)
 - [`test-app-primary-get-rectangle-bottom-right.mjs`](./test-app-primary-get-rectangle-bottom-right.mjs)

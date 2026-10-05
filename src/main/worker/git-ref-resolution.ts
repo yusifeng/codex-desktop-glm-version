@@ -6,9 +6,10 @@ type RefResolutionDependencies = {
   staleTime: number;
 };
 
-function isGitObjectId(value: string) {
-  return /^[0-9a-f]{7,40}$/i.test(value);
-}
+import {
+  isGitObjectId,
+  normalizeGitObjectIdOutput,
+} from './git-ref-resolution-policy';
 
 async function resolveGitRefSha(
   repository: any,
@@ -35,8 +36,8 @@ async function resolveGitRefSha(
         { allowedNonZeroExitCodes: [1], signal },
       );
       if (!result.success) throw Error(`Git ref lookup failed`);
-      const sha = result.stdout.trim();
-      if (sha && !isGitObjectId(sha))
+      const sha = normalizeGitObjectIdOutput(result.stdout);
+      if (sha === undefined)
         throw Error(`Git ref lookup returned an invalid object ID`);
       return sha ? dependencies.normalizeSha(sha) : null;
     },
