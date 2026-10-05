@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER } from "../app/.vite/build/main-app/browser-use/iab-api.js";
-import { createBrowserUseNativePipeServer, MAX_INCOMING_FRAME_BYTES, MAX_OUTGOING_FRAME_BYTES } from "../app/.vite/build/main-app/browser-use/native-pipe-server.js";
+import { createBrowserUseNativePipeServer, MAX_INCOMING_FRAME_BYTES, MAX_OUTGOING_FRAME_BYTES, NativePipeFrameTooLargeError } from "../app/.vite/build/main-app/browser-use/native-pipe-server.js";
 
 const listeners = {};
 const removed = [];
@@ -12,6 +12,7 @@ const api = {
   notifyWebMcpToolInvoked() {},
 };
 const sent = [];
+let throwOnCdp = false;
 let pipeDisposed = false;
 let protocolDisposed = false;
 const server = await createBrowserUseNativePipeServer({
@@ -22,7 +23,10 @@ const server = await createBrowserUseNativePipeServer({
     return { pipePath: "test-pipe", dispose: () => { pipeDisposed = true; } };
   },
   createProtocol: () => ({
-    sendCdpEvent: (event) => sent.push(["cdp", event]),
+    sendCdpEvent: (event) => {
+      if (throwOnCdp) throw new NativePipeFrameTooLargeError(10, 11);
+      sent.push(["cdp", event]);
+    },
     sendCdpDetach: (event) => sent.push(["detach", event]),
     sendPageEvent: (event) => sent.push(["page", event]),
     sendDownloadChange: (change) => sent.push(["download", change]),
@@ -34,8 +38,22 @@ listeners.detach({ tabId: "tab-1" });
 listeners.page({ type: "navigation" });
 listeners.download({ path: "/tmp/a", tabId: "tab-1" });
 assert.deepEqual(sent.map(([kind]) => kind), ["cdp", "detach", "page", "download"]);
+throwOnCdp = true;
+listeners.cdp({ method: "Network.dataReceived" });
+assert.equal(sent.length, 4);
 server.dispose();
-assert.deepEqual(removed.sort(), ["cdp", "detach", "download", "page"]);
+throwOnCdp = false;
+const second = await createBrowserUseNativePipeServer({
+  apiImpl: api,
+  createPipe: async () => ({ pipePath: "test-pipe-2", dispose() {} }),
+  createProtocol: () => ({
+    sendCdpEvent: () => { throw new Error("unexpected protocol failure"); },
+    sendCdpDetach() {}, sendPageEvent() {}, sendDownloadChange() {}, dispose() {},
+  }),
+});
+assert.throws(() => listeners.cdp({ method: "Runtime.exceptionThrown" }), /unexpected protocol failure/);
+second.dispose();
+assert.deepEqual(removed.sort(), ["cdp", "cdp", "detach", "detach", "download", "download", "page", "page"]);
 assert.equal(protocolDisposed, true);
 assert.equal(pipeDisposed, true);
-console.log("main native pipe server: 8 assertions passed");
+console.log("main native pipe server: 12 assertions passed");
