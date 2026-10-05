@@ -12,16 +12,17 @@ async function getGitIndexInfo(
   if (!gitDir) return { lastModified: 0 };
   const indexPath = (await repository.host.platformPath()).join(gitDir, `index`);
   try {
-    return { lastModified: (await repository.host.stat(indexPath)).mtimeMs };
+    return projectGitIndexLastModified((await repository.host.stat(indexPath)).mtimeMs);
   } catch (error: any) {
     if (error.code !== `ENOENT`)
       dependencies.logger.error(`Failed to read index info`, {
         safe: { indexPath },
         sensitive: { error },
       });
-    return { lastModified: 0 };
+    return projectGitIndexLastModified(null);
   }
 }
 
 export { getGitIndexInfo };
 if (typeof module !== `undefined`) module.exports = { getGitIndexInfo };
+import { projectGitIndexLastModified } from "./git-index-info-policy";

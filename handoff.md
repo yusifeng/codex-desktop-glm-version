@@ -1652,3 +1652,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：Git 输出 UTF-8 字节长度计算策略已迁移至 `src/main/worker/git-output-size-policy.ts`，确保多字节文本按字节计量；query utils 保留查询与路径协议。新增 `scripts/test-worker-git-output-size-policy.mjs` 覆盖 4 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：local/mutation/request-cancelability 组合得到 availability-check 的策略已迁移至 `src/main/worker/git-availability-policy.ts`；query utils 保留 request classification 与查询键/缓存策略。新增 `scripts/test-worker-git-availability-policy.mjs` 覆盖 4 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：repository index stat 的 mtime 到稳定 `lastModified` 响应投影（有限数值保留、缺失/异常归零）已迁移至 `src/main/worker/git-index-info-policy.ts`；index info 入口保留 git-dir/stat 查询与异常日志副作用。新增 `scripts/test-worker-git-index-info-policy.mjs` 覆盖 5 项 focused assertions；原回归 10 项、build 与 typecheck 已通过。

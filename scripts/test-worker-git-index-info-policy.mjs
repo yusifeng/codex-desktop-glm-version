@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { projectGitIndexLastModified } = require("../app/.vite/build/worker/git-index-info-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.deepEqual(...a)};
+eq(projectGitIndexLastModified(123.5), {lastModified:123.5});
+eq(projectGitIndexLastModified(0), {lastModified:0});
+eq(projectGitIndexLastModified(undefined), {lastModified:0});
+eq(projectGitIndexLastModified("123"), {lastModified:0});
+eq(projectGitIndexLastModified(Number.NaN), {lastModified:0});
+console.log(`${n} worker index info policy assertions passed`);
