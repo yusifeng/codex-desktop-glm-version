@@ -2311,5 +2311,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/is-remote-control-event.ts",
     "evidence": "The pure event-source predicate identifies remote-control transport events and safely treats absent events as false without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "BY",
+    "sourceSymbol": "ENe",
+    "startLine": 60528,
+    "endLine": 60530,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/normalize-execution-location.ts",
+    "evidence": "The pure execution-location policy accepts only local/worktree values and applies a caller-provided fallback for unknown inputs without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
   }
 ]
