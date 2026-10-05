@@ -1,19 +1,7 @@
 const unsafeText = /^[^\p{Cc}\p{Cf}\p{Cs}\u2028\u2029]*$/u;
 const metadataKey = /^[A-Za-z][A-Za-z0-9_-]*(?: [A-Za-z0-9_-]+)*$/;
 
-function cloneRecord(value: unknown, maxKeys: number): Record<string, unknown> | null {
-  if (typeof value !== `object` || !value) return null;
-  const prototype = Object.getPrototypeOf(value);
-  if (prototype !== Object.prototype && prototype != null) return null;
-  const descriptors = Object.getOwnPropertyDescriptors(value);
-  if (Reflect.ownKeys(descriptors).length > maxKeys || Reflect.ownKeys(descriptors).some((key) => typeof key !== `string`)) return null;
-  const result = Object.create(null) as Record<string, unknown>;
-  for (const [key, descriptor] of Object.entries(descriptors)) {
-    if (!descriptor.enumerable || !Object.hasOwn(descriptor, `value`) || [`__proto__`, `constructor`, `prototype`].includes(key)) return null;
-    result[key] = descriptor.value;
-  }
-  return result;
-}
+const cloneRecord = cloneAnnotationRecord;
 
 function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; maxRoleLength: number; rolePattern: string; metadataLimits: { maxKeys: number; maxKeyLength: number; maxStringValueLength: number; maxSerializedBytes: number } }): Record<string, unknown> | null | undefined {
   if (value === null) return null;
@@ -79,3 +67,4 @@ function sanitizeAnnotationControlMetadata(value: unknown, limits: { maxKeys: nu
 export { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, createAnnotationResponseDetail };
 if (typeof module !== `undefined`) module.exports = { cloneRecord, isValidAnnotationHitTestRequest, sanitizeAnnotationControlMetadata, sanitizeAnnotationHit, serializeAnnotationControls, createAnnotationResponseDetail };
 import { isValidAnnotationHitTestRequest } from "./annotation-hit-test-request-policy";
+import { cloneAnnotationRecord } from "./annotation-record-clone-policy";
