@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/format-keyboard-shortcut.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const key = (event) => event.key ?? null;
+assert.equal(mod.formatKeyboardShortcut({ key: "k", ctrlKey: true, shiftKey: true }, key), "Ctrl+Shift+k");
+assert.equal(mod.formatKeyboardShortcut({ key: "Enter", metaKey: true }, key), "Command+Enter");
+assert.equal(mod.formatKeyboardShortcut({}, key), null);
+console.log("app-primary format keyboard shortcut: 3 assertions passed");
