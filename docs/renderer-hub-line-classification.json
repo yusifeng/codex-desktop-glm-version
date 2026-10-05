@@ -1672,5 +1672,15 @@
     "classification": "generated-local-recipient-bootstrap",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer creates the generated recipient-field regex and key list for the adjacent composer surface, retaining ordering and dependency setup without an independent named renderer consumer."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "yg",
+    "sourceSymbol": "PD",
+    "startLine": 4091,
+    "endLine": 4097,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/extract-skill-kind.ts",
+    "evidence": "The skill mention projection walks only skill/plugin mention nodes and maps normalized plugin:// or skills/*/skill.md paths to stable product kinds. It is a deterministic policy with no JSX, store, or lifecycle side effects; the aggregate alias remains unconsumed until a named renderer boundary adopts it."
   }
 ]

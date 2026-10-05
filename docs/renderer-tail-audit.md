@@ -662,3 +662,10 @@ request-input activity context，`rK`（公开别名 `ac`）按固定顺序装�
 connector icon map。四者都由相邻生成 surface 独占，缺少独立 named renderer consumer 或可安全
 转移的 teardown 契约，因此保留在聚合 hub；逐行 source symbol 与范围登记于
 `docs/renderer-hub-line-classification.json`，reviewedCount 由 160 提升至 164。
+
+本轮再抽取 app-primary 技能 mention 的纯 kind policy：`PD`（公开别名 `yg`，4091--4097
+行）只遍历 skill/plugin mention 节点，将 `plugin://` 与 `skills/*/skill.md` 路径规范化为
+稳定产品 kind，并在显式偏好命中时保持该结果。该逻辑没有 JSX、store 或生命周期副作用，
+已迁至 `src/renderer/app-primary/runtime/extract-skill-kind.ts`，由
+`scripts/test-app-primary-extract-skill-kind.mjs` 覆盖 5 项路径、未知 kind 与 mention 投影断言；
+逐行分类记录同步写入 `docs/renderer-hub-line-classification.json`，reviewedCount 提升至 169。
