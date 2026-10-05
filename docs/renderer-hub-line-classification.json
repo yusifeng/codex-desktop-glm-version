@@ -2271,5 +2271,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/parse-browser-target-id.ts",
     "evidence": "The pure browser-target parser validates the shared browser prefix and strips it from the target id, returning null for other values without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "$z",
+    "sourceSymbol": "OGe",
+    "startLine": 67901,
+    "endLine": 67908,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/is-path-within-roots.ts",
+    "evidence": "The pure path containment policy normalizes a candidate path and accepts only exact-root or slash-delimited descendants, preventing prefix collisions without JSX, store, network, or lifecycle effects. It is covered by a focused three-case runtime test."
   }
 ]
