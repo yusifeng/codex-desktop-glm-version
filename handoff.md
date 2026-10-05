@@ -1278,3 +1278,4 @@ target 判定、preview diff 与 dispatch 副作用。新增
 替换、clear 与幂等 dispose，共 12 项 focused assertions；原
 `scripts/test-preload-annotation-design-control-sync.mjs` 11 项回归、build check、verify 与
 typecheck 均通过。
+2026-10-05 A2 继续批次：annotation feature lifecycle 的刷新判定已抽至 `annotation-feature-lifecycle-state.ts`，将 controls/request/observer/mode 四类资源是否存在的真实 teardown 边界变为可复用纯策略；新增 `scripts/test-preload-annotation-feature-lifecycle-state.mjs` 覆盖空图与各资源单独存在的 6 项断言。feature lifecycle 入口现消费该策略，focused lifecycle/state 测试与后续 verify/typecheck 待本批次完成后复核。

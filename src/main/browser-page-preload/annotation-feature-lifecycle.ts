@@ -1,3 +1,5 @@
+import { shouldResetAnnotationFeatureGraph } from "./annotation-feature-lifecycle-state";
+
 type AnnotationFeatureLifecycleDependencies = {
   permissionController: { reset: () => void; requestPermission: () => boolean | Promise<boolean>; dispose?: () => void };
   getState: () => any;
@@ -37,7 +39,7 @@ function createAnnotationFeatureLifecycle(deps: AnnotationFeatureLifecycleDepend
     // Host policy can be refreshed while the preload remains mounted. Tear
     // down the previous feature graph first so listeners/registries from the
     // old capability set cannot leak into the new generation.
-    if (controlsRegistry != null || siteAnnotationRequests != null || featureObserver != null || modeControllerDispose != null) {
+    if (shouldResetAnnotationFeatureGraph({ controlsRegistry, siteAnnotationRequests, featureObserver, modeControllerDispose })) {
       dispose();
     }
     deps.setFeatureApiAvailable(policy.enabled);
