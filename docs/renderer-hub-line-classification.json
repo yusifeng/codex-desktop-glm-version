@@ -1,6 +1,16 @@
 [
   {
     "hub": "app-primary",
+    "alias": "Tu",
+    "sourceSymbol": "TB",
+    "startLine": 21849,
+    "endLine": 21856,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/insert-selection-marker.ts",
+    "evidence": "Selection-marker insertion resolves a safe document position, serializes the marked document, and returns the marker offset with explicit failure boundaries; the typed helper has no JSX, store, or lifecycle side effects."
+  },
+  {
+    "hub": "app-primary",
     "alias": "Ur",
     "sourceSymbol": "w2",
     "startLine": 80576,
