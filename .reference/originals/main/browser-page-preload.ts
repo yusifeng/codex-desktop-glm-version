@@ -5112,6 +5112,8 @@ function $l({ color: e, name: t, ownerWindow: n, range: r, styleRoot: i }) {
   );
 }
 function eu(e) {
+  return supportsAnnotationCssHighlights(e);
+/*
   return (
     `CSS` in e &&
     typeof e.CSS == `object` &&
@@ -5123,6 +5125,7 @@ function eu(e) {
     typeof e.CSSStyleSheet == `function` &&
     typeof e.CSSStyleSheet.prototype.replaceSync == `function`
   );
+*/
 }
 function tu(e) {
   return (
@@ -6173,6 +6176,7 @@ var { areAnnotationScrollContainersEqual } = require("./browser-page-preload/ann
 var { areAnnotationAnchorsEqual } = require("./browser-page-preload/annotation-anchor-equality");
 var { getAnnotationInverseViewportScale } = require("./browser-page-preload/annotation-viewport-scale");
 var { hasAnnotationComments, getAnnotationCommentCount } = require("./browser-page-preload/annotation-comment-count");
+var { supportsAnnotationCssHighlights } = require("./browser-page-preload/annotation-highlight-capability");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

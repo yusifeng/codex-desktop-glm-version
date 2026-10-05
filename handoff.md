@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation CSS Highlights API capability predicate 已迁移至
+`src/main/browser-page-preload/annotation-highlight-capability.ts`；原 `eu` 入口保留兼容委托，
+新增 2 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation comment count 的非空判定与数量投影已迁移至
 `src/main/browser-page-preload/annotation-comment-count.ts`；原 `ss/cs` 入口保留兼容委托，
 新增 3 项 focused assertions，build 与 typecheck 已通过。
@@ -1948,6 +1952,8 @@ typecheck 均通过。
 2026-10-06 A1 T1 继续批次：Node-only Git RPC method 白名单已迁移至 `src/main/worker/git-node-request-policy.ts`；dispatcher 仅保留 host、signal 与依赖注入。新增 `scripts/test-worker-git-node-request-policy.mjs` 覆盖 5 项 focused classification assertions。
 
 2026-10-06 A1 T1 继续批次：Worktree snapshot read RPC 的 `worktree-snapshot-ref`/`managed-worktree-state` 方法白名单已迁移至 `src/main/worker/git-worktree-snapshot-read-policy.ts`；dispatcher 仅保留 snapshot 查询依赖。新增 `scripts/test-worker-git-worktree-snapshot-read-policy.mjs` 覆盖 3 项 focused classification assertions。
+
+2026-10-06 A1 T1 继续批次：Worker entry control-message 分类（RPC、生命周期通知、request/cancel）已迁移至 `src/main/worker/entry-message-policy.ts`；entry dispatcher 仍负责 parentPort 回调副作用。新增 `scripts/test-worker-entry-message-policy.mjs` 覆盖 5 项 focused assertions。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。

@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation CSS highlight capability policy
+
+CSS Highlights API 能力探测（原 `eu`，5120-7259 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-highlight-capability.ts`；入口保留兼容委托，
+严格检查 CSS highlights、Highlight 构造器及 CSSStyleSheet.replaceSync。新增 focused test
+覆盖完整能力与缺失能力，共 2 项断言；build 与 typecheck 已通过。
+
 ### 增量抽取：annotation comment count policy
 
 Annotation comments 的非空判定与数量投影（原 `ss/cs`，3863-5049 业务工具段）已迁移至
