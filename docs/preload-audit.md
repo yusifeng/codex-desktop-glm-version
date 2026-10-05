@@ -619,6 +619,10 @@ null、malformed 输入，共 5 项 focused assertions。
 
 ### 增量抽取：annotation sync transition lifecycle
 
+Region overlay/highlight class policy 已迁移至 `src/main/browser-page-preload/annotation-region-class-policy.ts`；
+Google Docs 当前页与大矩形门控通过注入式依赖复用，入口保留渲染副作用。由
+`scripts/test-preload-annotation-region-class-policy.mjs` 覆盖 overlay/highlight 正常与回退边界。
+
 host sync 对 capability 关闭、agent 控制、comment/suspended 退出，以及 marker/selection 清理的
 生命周期门控已迁移至 `src/main/browser-page-preload/annotation-sync-transition.ts`。现有
 `annotation-sync-state.ts` 仅负责调用该策略并执行注入的 dispose/clear 副作用；由

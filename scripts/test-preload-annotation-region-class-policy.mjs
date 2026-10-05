@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { getAnnotationRegionOverlayClassName, getAnnotationRegionHighlightClassName } = require("../app/.vite/build/browser-page-preload/annotation-region-class-policy.js");
+const deps = { isAnchorOnCurrentPage: (a) => a?.page === "current", isRectLargeEnough: (r) => r?.large === true };
+assert.equal(getAnnotationRegionOverlayClassName({ page: "current" }, { large: true }, 800, 600, deps), "hover-box region-box google-docs-annotation-box google-docs-region-box");
+assert.equal(getAnnotationRegionOverlayClassName({ page: "other" }, { large: true }, 800, 600, deps), "hover-box region-box");
+assert.equal(getAnnotationRegionHighlightClassName({ page: "current" }, { large: true }, 800, 600, deps), "posted-region-highlight google-docs-annotation-box google-docs-region-box");
+assert.equal(getAnnotationRegionHighlightClassName({ page: "current" }, { large: false }, 800, 600, deps), "posted-region-highlight");
+console.log("annotation region class policy assertions: 4 passed");
