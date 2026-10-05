@@ -6,6 +6,7 @@ type WorktreeSetupDependencies = {
   removeWorktreeShellEnvironment: (repository: any, signal?: AbortSignal) => Promise<void>;
   writeWorktreeShellEnvironment: (repository: any, value: any, signal?: AbortSignal) => Promise<void>;
 };
+import { getWorktreeSetupFailure } from "./git-worktree-setup-policy";
 
 /** Persists the selected environment and runs its optional worktree setup lifecycle. */
 async function runWorktreeSetup(
@@ -57,9 +58,10 @@ async function runWorktreeSetup(
   );
   if (params.signal?.aborted) return { success: false, error: Error(`Request canceled`) };
   const setupResult = setup?.setupResult ?? null;
-  if (setupResult?.status === `failed`) {
-    const error = Error(setupResult.error ?? `Setup script failed`);
-    log(`stderr`, setupResult.error ?? `Setup script failed`);
+  const setupFailure = getWorktreeSetupFailure(setupResult);
+  if (setupFailure != null) {
+    const error = Error(setupFailure);
+    log(`stderr`, setupFailure);
     return params.allowSetupFailure ? success(setupResult, error) : { success: false, error };
   }
   if (setupResult?.status === `succeeded`) log(`info`, `Setup script completed`);

@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-worktree-setup-policy-"));
+const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-worktree-setup-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { getWorktreeSetupFailure } = createRequire(import.meta.url)(output);
+assert.equal(getWorktreeSetupFailure(null), null);
+assert.equal(getWorktreeSetupFailure({ status: "succeeded" }), null);
+assert.equal(getWorktreeSetupFailure({ status: "failed", error: "bad config" }), "bad config");
+assert.equal(getWorktreeSetupFailure({ status: "failed", error: null }), "Setup script failed");
+assert.equal(getWorktreeSetupFailure({ status: "failed" }), "Setup script failed");
+console.log("worker Git worktree setup policy tests passed (5 assertions)");

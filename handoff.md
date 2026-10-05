@@ -1872,6 +1872,8 @@ typecheck 均通过。
 2026-10-06 A1 T1 继续批次：Worktree 创建的 synced-branch setup 条件与 local branch ref 投影已统一迁移到 `resolveSyncedBranchSetup`；create runtime 仅保留 commit-tree 查询和 config 写入副作用。`scripts/test-worker-git-worktree-branch-setup-policy.mjs` 增加 2 项投影/跳过断言，原 10 项回归继续通过。
 
 2026-10-06 A1 T1 继续批次：Worktree 创建的 resolved/configured local-environment path 优先级与空值投影已迁移至 `src/main/worker/git-worktree-environment-policy.ts`；create runtime 仍保留异步解析、Git config 写入和 setup 副作用。新增 `scripts/test-worker-git-worktree-environment-policy.mjs` 覆盖 4 项 focused assertions。
+
+2026-10-06 A1 T1 继续批次：Worktree setup script 的 failed/error fallback 文案投影已迁移至 `src/main/worker/git-worktree-setup-policy.ts`；setup runtime 仍保留配置读取、脚本执行、日志与 shell-environment I/O。新增 `scripts/test-worker-git-worktree-setup-policy.mjs` 覆盖 5 项 focused assertions。
 2026-10-06 A5 逐段复核：app-primary 导出 `yd`（source `F3`，90189-90193）确认是生成 runtime lazy bootstrap，调用 O_e 初始化相邻依赖；bootstrap 顺序与 ownership 与 app-primary 生命周期耦合，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary 导出 `Cm`（source `ZA`，8966-8970）确认是 generated renderer lazy bootstrap，按顺序初始化 YA、renderer/style/routing/context 依赖并捕获 React runtime；注册顺序与 renderer ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。
 2026-10-06 A5 逐段复核：app-primary public 导出 `Dr`（source `e4`，82694-82698；bundle 内部局部名 `yb`）确认是 generated lazy SVG component initializer，调用 Ni 并捕获 Q2 React runtime 后渲染 icon surface；renderer bootstrap 与 component ownership 耦合 app-primary 生命周期，登记为 `preserved-coupled`。

@@ -947,6 +947,10 @@ Worktree 创建时 resolved/configured local-environment path 的优先级与空
 config 写入与 setup 副作用，由 4 项 focused assertions 覆盖 resolved、fallback、empty 与
 null 边界。
 
+Worktree setup script 的 failed/error fallback 文案投影已迁移至
+`src/main/worker/git-worktree-setup-policy.ts`；setup runtime 仍负责读取配置、执行脚本、日志
+与 shell-environment I/O，由 5 项 focused assertions 覆盖成功、显式错误和默认错误文案。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至
