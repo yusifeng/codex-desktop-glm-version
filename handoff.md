@@ -1717,3 +1717,5 @@ typecheck 均通过。
 2026-10-05 A5 T5 继续批次：app-shared 的 model slug 查找策略已迁移至 `src/renderer/app-shared/runtime/find-model-by-slug.ts`；新增 `scripts/test-app-shared-find-model-by-slug.mjs` 覆盖 3 项 focused assertions，并登记 `FY/QL` 源码 60531-60533 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
 
 2026-10-05 A5 T5 继续批次：app-shared 的新会话 slug formatter 已迁移至 `src/renderer/app-shared/runtime/create-chat-slug.ts`；新增 `scripts/test-app-shared-create-chat-slug.mjs` 覆盖 4 项 focused assertions，并登记 `AV/cUe` 源码 66886-66894 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
+
+2026-10-05 A5 T5 继续批次：app-shared 的 remote-control key formatter 已迁移至 `src/renderer/app-shared/runtime/format-remote-control-key.ts`；新增 `scripts/test-app-shared-format-remote-control-key.mjs` 覆盖 2 项 focused assertions，并登记 `FU/kBe` 源码 64878-64880 行语义证据。Renderer hub manifest 审计显示该导出由 `unreviewed` 降为 `semantic`。
