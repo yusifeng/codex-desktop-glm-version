@@ -1502,3 +1502,5 @@ typecheck 均通过。
 2026-10-05 A1 继续批次：Git clone state 的配置行解析与 partial-clone 识别策略已迁移至 `src/main/worker/git-clone-state-policy.ts`；clone state 运行时保留 shallow/config 并行 Git 查询与状态投影。新增 `scripts/test-worker-git-clone-state-policy.mjs` 覆盖 17 项 focused assertions；原 clone-state 回归 29 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：automation writable roots 的 common-dir 路径解析与 index/.git fallback 已迁移至 `src/main/worker/git-automation-writable-roots-policy.ts`；运行时保留 worktree/source repository 查询及 writable-root 编排。新增 `scripts/test-worker-git-automation-writable-roots-policy.mjs` 覆盖 6 项 focused assertions；原回归 9 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 继续批次：checkout failure 的 overwrite-conflict 输出解析、去重路径收集与错误分类已迁移至 `src/main/worker/git-checkout-conflict-policy.ts`；checkout handler 保留 ref 解析、stash/rollback、Git checkout 与缓存失效副作用。新增 `scripts/test-worker-git-checkout-conflict-policy.mjs` 覆盖 5 项 focused assertions；原 checkout handler 回归 16 项、build 与 typecheck 已通过。
