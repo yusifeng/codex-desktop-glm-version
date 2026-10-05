@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation scroll-container 快照相等性纯策略已迁移至
+`src/main/browser-page-preload/annotation-scroll-container-equality.ts`；原 `Ns` 入口保留
+兼容委托。新增 focused test 覆盖缺省、相等和滚动偏移差异，build 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation metadata tooltip 的 anchor/viewport 几何投影、上方优先
 与下方回退已迁移至 `src/main/browser-page-preload/annotation-tooltip-position.ts`；原 `Ss` 入口
 保留兼容委托。新增 `scripts/test-preload-annotation-tooltip-position.mjs` 覆盖 3 项 focused
@@ -1188,7 +1192,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁（现已纳入 `$` 生成别名） | 当前 manifest 报告 10980 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁（现已纳入 `$` 生成别名） | 当前 manifest 报告 10979 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
 
 ### B. 工程可读性缺口（5 处）
 
