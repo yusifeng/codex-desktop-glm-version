@@ -10,6 +10,8 @@ type RepositoryIdentityDependencies = {
   staleTime: number;
 };
 
+import { buildRepositoryFullName } from './git-repository-identity-policy';
+
 async function getRepositoryIdentity(
   repository: any,
   { isRepoWatched = false, signal }: { isRepoWatched?: boolean; signal?: AbortSignal } = {},
@@ -47,23 +49,7 @@ async function getRepositoryIdentity(
   const parsed = origin == null
     ? null
     : dependencies.parseRemoteUrl(origin.replace(/\/+$/, ``));
-  const hostname = parsed?.host.toLowerCase();
-  const url = parsed != null && origin?.includes(`://`) ? new URL(origin) : null;
-  const port =
-    (url?.port === `22` &&
-      (url.protocol === `ssh:` || url.protocol === `git+ssh:` || url.protocol === `ssh+git:`)) ||
-    (url?.protocol === `git:` && url.port === `9418`)
-      ? ``
-      : url?.port;
-  let repositoryFullName = null;
-  if (parsed != null) {
-    const path = hostname === `github.com`
-      ? `${parsed.owner}/${parsed.repo}`.toLowerCase()
-      : `${parsed.owner}/${parsed.repo}`;
-    repositoryFullName = hostname === `github.com` && !port
-      ? path
-      : `${hostname}${port ? `:${port}` : ``}/${path}`;
-  }
+  const repositoryFullName = buildRepositoryFullName(parsed, origin);
   return {
     repositoryFullName,
     worktreeId: await dependencies.getWorktreeId(repository.root),

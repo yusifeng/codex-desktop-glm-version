@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { buildRepositoryFullName } = require("../app/.vite/build/worker/git-repository-identity-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+const parsed = { host: "GitHub.com", owner: "Org", repo: "Repo" };
+equal(buildRepositoryFullName(parsed, "ssh://git@github.com:22/Org/Repo"), "org/repo");
+equal(buildRepositoryFullName(parsed, "https://github.com:8443/Org/Repo"), "github.com:8443/org/repo");
+equal(buildRepositoryFullName({ host: "git.example.com", owner: "Org", repo: "Repo" }, "ssh://git@git.example.com/Org/Repo"), "git.example.com/Org/Repo");
+equal(buildRepositoryFullName(null, null), null);
+console.log(`${assertions} worker git repository identity policy assertions passed`);

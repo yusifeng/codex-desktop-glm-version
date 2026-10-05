@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1036.
+Total scripts: 1039.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -39,10 +39,13 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-stable-metadata-policy.mjs`](./test-worker-git-stable-metadata-policy.mjs)
 - [`test-worker-git-safe-attribute-filters-policy.mjs`](./test-worker-git-safe-attribute-filters-policy.mjs)
 - [`test-worker-git-thread-config-policy.mjs`](./test-worker-git-thread-config-policy.mjs)
+- [`test-worker-git-repository-identity-policy.mjs`](./test-worker-git-repository-identity-policy.mjs)
+- [`test-app-shared-is-layout-element.mjs`](./test-app-shared-is-layout-element.mjs)
 - [`test-app-shared-normalize-reasoning-speed.mjs`](./test-app-shared-normalize-reasoning-speed.mjs)
 - [`test-app-shared-extract-text-content.mjs`](./test-app-shared-extract-text-content.mjs)
 - [`test-preload-annotation-marker-base-projection.mjs`](./test-preload-annotation-marker-base-projection.mjs)
 - [`test-preload-annotation-selection-display-key.mjs`](./test-preload-annotation-selection-display-key.mjs)
+- [`test-preload-annotation-frame-pointer-guard-state.mjs`](./test-preload-annotation-frame-pointer-guard-state.mjs)
 - [`test-app-shared-parse-codex-delegation.mjs`](./test-app-shared-parse-codex-delegation.mjs)
 - [`test-preload-annotation-text-display-projection.mjs`](./test-preload-annotation-text-display-projection.mjs)
 - [`test-preload-annotation-visual-viewport-policy.mjs`](./test-preload-annotation-visual-viewport-policy.mjs)

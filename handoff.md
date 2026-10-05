@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git repository identity 的 remote URL port 归一化与 repository full-name 投影已迁移至 `src/main/worker/git-repository-identity-policy.ts`；identity runtime 保留 origin query/cache、remote parsing 与 worktree ID I/O 编排。新增 `scripts/test-worker-git-repository-identity-policy.mjs` 覆盖 4 项 focused assertions；原 identity 回归 28 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation frame pointer guard 的 saved pointer-style 快照与 observed
+root 集合已抽至 `src/main/browser-page-preload/annotation-frame-pointer-guard-state.ts`；guard 仅
+保留跨 frame 安装、样式副作用与 MutationObserver 编排。新增
+`scripts/test-preload-annotation-frame-pointer-guard-state.mjs` 覆盖 5 项状态断言；原 guard
+回归 13 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git thread config 的 JSON/schema 解析与失败分类已迁移至 `src/main/worker/git-thread-config-policy.ts`；thread-config runtime 保留 config file discovery、host 文件 I/O、schema warning 与写入编排。新增 `scripts/test-worker-git-thread-config-policy.mjs` 覆盖 3 项 focused assertions；原 thread-config 回归 11 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Git safe attribute filter 的 filter driver 解析、基础 attribute overrides 与安全清理 override 构造已迁移至 `src/main/worker/git-safe-attribute-filters-policy.ts`；safe-filter runtime 保留 query/cache、Git config I/O、generation invalidation 与 signal 编排。新增 `scripts/test-worker-git-safe-attribute-filters-policy.mjs` 覆盖 5 项 focused assertions；原 safe-filter 回归 18 项、build 与 typecheck 已通过。
