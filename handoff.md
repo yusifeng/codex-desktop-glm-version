@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review diff 的 fallback error、rename header 判定与多文件
+diff 切片纯策略已迁移至 `src/main/worker/git-review-diff-policy.ts`；review diff 入口仅保留
+Git 查询与文件编排，新增 `scripts/test-worker-git-review-diff-policy.mjs` 覆盖 4 项 focused
+assertions；build 与 typecheck 已通过。
+
 2026-10-05 A5 继续批次：逐行核对 app-primary markdown 编辑器附近的三条生成边界：
 `oPe`（公开别名 `Cu`，21878--21892）magic-selection 文档切片与 marker offset、`sPe`
 （公开别名 `Su`，21898--21900）Markdown 文件 stem 归一化、`cPe`（公开别名 `bu`，
@@ -969,9 +974,10 @@ Annotation design draft target 收集与缓存（原 `Jv` 23394-23413）已迁�
 写回和 DOM 清理副作用；由 4 项行为断言覆盖 target 聚合、frame/page 过滤和 cache 复用。
 
 Annotation preview controller 的单实例替换与 teardown 生命周期（原 `wy` 23562-23571）已迁移至
-`src/main/browser-page-preload/annotation-preview-controller.ts`；入口继续保留 `Ty` 的 DOM
-overlay、observer 与 RAF 副作用。由 `scripts/test-preload-annotation-preview-controller.mjs`
-覆盖函数/对象 teardown、替换和空值清理，共 4 项断言。
+`src/main/browser-page-preload/annotation-preview-controller.ts`；dispose 后进入终止态并拒绝
+后续预览挂载，入口继续保留 `Ty` 的 DOM overlay、observer 与 RAF 副作用。由
+`scripts/test-preload-annotation-preview-controller.mjs` 覆盖函数/对象 teardown、替换、空值清理
+与终止态，共 6 项断言。
 
 Annotation display selection projection（原 `J_` 22849-22873）的 additional-selection
 rect/class/page/index 投影已迁移至 `src/main/browser-page-preload/annotation-display-selections.ts`；

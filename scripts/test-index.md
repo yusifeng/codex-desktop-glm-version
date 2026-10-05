@@ -322,6 +322,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-review-commit-queries.mjs`](./test-worker-git-review-commit-queries.mjs)
 - [`test-worker-git-review-comparison.mjs`](./test-worker-git-review-comparison.mjs)
 - [`test-worker-git-review-comparison-policy.mjs`](./test-worker-git-review-comparison-policy.mjs)
+- [`test-worker-git-review-diff-policy.mjs`](./test-worker-git-review-diff-policy.mjs)
 - [`test-worker-git-review-diffs.mjs`](./test-worker-git-review-diffs.mjs)
 - [`test-worker-git-review-file-diff.mjs`](./test-worker-git-review-file-diff.mjs)
 - [`test-worker-git-review-metadata-diff.mjs`](./test-worker-git-review-metadata-diff.mjs)

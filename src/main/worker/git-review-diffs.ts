@@ -28,6 +28,13 @@ type GitReviewDiffDependencies = {
   ) => string;
 };
 
+import {
+  createReviewDiffFallback,
+  diffMatchesRename,
+  reviewDiffError,
+  splitReviewDiffs,
+} from "./git-review-diff-policy";
+
 async function getReviewDiff(
   reviewSnapshot: any,
   source: string,
@@ -131,7 +138,7 @@ async function getReviewDiff(
               existing.diff,
               file.previousPath,
               file.path,
-              dependencies,
+              dependencies.parseDiffHeader,
             )
           )
             return;
@@ -208,18 +215,6 @@ async function getUntrackedReviewDiffs(
   return diffs;
 }
 
-function diffMatchesRename(
-  diff: string,
-  previousPath: string,
-  path: string,
-  dependencies: GitReviewDiffDependencies,
-) {
-  const header = /^diff --(?:git|cc|combined) .*$/m.exec(diff)?.[0];
-  const parsed =
-    header == null ? null : dependencies.parseDiffHeader(header);
-  return parsed?.oldPath === previousPath && parsed.newPath === path;
-}
-
 async function getTrackedReviewDiffs(
   { binary, diffArgs, hideWhitespace, paths, reviewSnapshot }: any,
   dependencies: GitReviewDiffDependencies,
@@ -237,7 +232,11 @@ async function getTrackedReviewDiffs(
     const error = reviewDiffError(dependencies.parseGitError(result));
     return new Map(paths.map((path: string) => [path, error]));
   }
-  const diffs = splitReviewDiffs(result.stdout, dependencies);
+  const diffs = splitReviewDiffs(
+    result.stdout,
+    dependencies.parseDiffHeader,
+    dependencies.byteLength,
+  );
   if (!hideWhitespace) return diffs;
   for (const path of paths)
     if (!diffs.has(path))
@@ -278,46 +277,6 @@ function fetchTrackedReviewDiff(
   });
 }
 
-function createReviewDiffFallback(source: string, files: any[]) {
-  return {
-    source,
-    diffs: Object.fromEntries(
-      files.map((file) => [file.path, reviewDiffError({ type: `unknown` })]),
-    ),
-  };
-}
-
-function splitReviewDiffs(
-  output: string,
-  dependencies: GitReviewDiffDependencies,
-) {
-  const diffs = new Map<string, any>();
-  const headers = Array.from(
-    output.matchAll(/^diff --(?:git|cc|combined) .*$/gm),
-  );
-  for (const [index, header] of headers.entries()) {
-    const paths = dependencies.parseDiffHeader(header[0]);
-    if (paths == null) continue;
-    const start = header.index ?? 0;
-    const end =
-      index + 1 < headers.length
-        ? (headers[index + 1]?.index ?? output.length)
-        : output.length;
-    const diff = output.slice(start, end);
-    const result = {
-      type: `success`,
-      diff,
-      diffBytes: dependencies.byteLength(diff),
-    };
-    diffs.set(paths.oldPath, result);
-    diffs.set(paths.newPath, result);
-  }
-  return diffs;
-}
-
-function reviewDiffError(error: any) {
-  return { type: `error`, error };
-}
 
 export {
   createReviewDiffFallback,
