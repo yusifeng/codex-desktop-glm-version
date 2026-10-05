@@ -2127,3 +2127,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation frame offset 递归 projection 已迁移至 `src/main/browser-page-preload/annotation-frame-offset-policy.ts`；原 `Ic` 入口保留 frame/rect 适配，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation element-like 跨 realm DOM 判定已迁移至 `src/main/browser-page-preload/annotation-element-like-policy.ts`；原 `F` 入口保留 constructor/node type 注入，新增 4 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。

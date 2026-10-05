@@ -4500,13 +4500,12 @@ function Mc(e, { includeElement: t = !1 } = {}) {
   return r;
 }
 function Nc(e, t) {
-  let n = 0,
-    r = 0;
-  for (let i of e.scrollContainers ?? []) {
-    let e = Ec(t.document, i.selector);
-    F(e) && ((n += e.scrollLeft - i.scrollLeft), (r += e.scrollTop - i.scrollTop));
-  }
-  return { x: n, y: r };
+  return getAnnotationScrollContainerOffset(e, t.document, {
+    resolveSelector: (documentLike, selector) => Ec(documentLike, selector),
+    isElement: (value) => F(value),
+    getScrollLeft: (element) => element.scrollLeft,
+    getScrollTop: (element) => element.scrollTop,
+  });
 }
 function Pc(e, t, n) {
   let r = new Set();
@@ -6126,6 +6125,7 @@ var { projectAnnotationElementMetadataAttributes } = require("./browser-page-pre
 var { isAnnotationElementVisibleByPolicy } = require("./browser-page-preload/annotation-element-visibility-policy");
 var { getAnnotationFrameOffset } = require("./browser-page-preload/annotation-frame-offset-policy");
 var { isAnnotationElementLike } = require("./browser-page-preload/annotation-element-like-policy");
+var { getAnnotationScrollContainerOffset } = require("./browser-page-preload/annotation-scroll-container-offset");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");

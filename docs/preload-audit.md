@@ -866,3 +866,7 @@ Annotation element 的 top-frame/document-root/HTML eligibility 与 `oai-annotat
 ### 增量抽取：annotation element-like policy
 
 批注 DOM 元素兼容判定（原 `F`）已迁移至 `src/main/browser-page-preload/annotation-element-like-policy.ts`；入口仅注入 owner-window constructors 与 element node type，保留跨 realm HTMLElement/Node fallback 语义。新增 4 项 focused assertions。
+
+### 增量抽取：annotation scroll-container offset
+
+按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。
