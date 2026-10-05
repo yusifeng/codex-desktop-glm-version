@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 T2/A2 继续批次：annotation payload 的 plain own-data record clone 与 prototype/key
+安全门禁已抽至 `src/main/browser-page-preload/annotation-record-clone-policy.ts`；control payload
+adapter 仅保留 hit/metadata schema 清洗与 serialization。新增
+`scripts/test-preload-annotation-record-clone-policy.mjs` 覆盖 3 项复制、key quota 与危险 key
+断言；原 annotation runtime 回归 45 项、build 与 typecheck 已通过。
+
 2026-10-05 T2/A2 继续批次：annotation surface response envelope 的 type/registration/custom-rendering
 投影已抽至 `src/main/browser-page-preload/annotation-response-envelope-policy.ts`；control payload
 adapter 仅保留 hit/metadata 清洗与 serialization。新增
@@ -1587,3 +1593,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：Git request cancellation telemetry 的 queue duration 裁剪、取消 disposition 与稳定字段 envelope 已迁移至 `src/main/worker/git-request-cancellation-policy.ts`；取消入口仅保留兼容转出。新增 `scripts/test-worker-git-request-cancellation-policy.mjs` 覆盖 3 项 focused assertions；原回归 `test-worker-request-cancellation.mjs` 9 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：worker RPC 方法的 cancelability 与 telemetry tracking 分类白名单已迁移至 `src/main/worker/git-request-classification-policy.ts`；query utils 保留 availability 判定及查询/路径策略。新增 `scripts/test-worker-git-request-classification-policy.mjs` 覆盖 8 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：fsmonitor 配置值 true/false/unknown 解析与 local/remote host 平台支持判定已迁移至 `src/main/worker/git-fsmonitor-policy.ts`；query utils 保留 daemon feature 检测及查询缓存策略。新增 `scripts/test-worker-git-fsmonitor-policy.mjs` 覆盖 11 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。

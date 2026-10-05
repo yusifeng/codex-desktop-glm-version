@@ -52,19 +52,8 @@ function fsmonitorCacheKey(cwd: string, host: { id: string }, env: Record<string
   return JSON.stringify([host.id, cwd, Object.entries(env).filter(([key]) => key !== `GIT_INDEX_FILE`).sort(([a], [b]) => a.localeCompare(b))]);
 }
 
-function parseFsmonitorConfigValue(value: string): boolean | null {
-  const normalized = value.toLowerCase();
-  if ([`true`, `yes`, `on`].includes(normalized)) return true;
-  if ([`false`, `no`, `off`].includes(normalized)) return false;
-  return null;
-}
-
 function hasFsmonitorDaemonFeature(output: string): boolean {
   return output.split(`\n`).some((line) => line.trim() === `feature: fsmonitor--daemon`);
-}
-
-function isFsmonitorPlatformSupported({ isLocal, platformFamily, platformOs }: { isLocal: boolean; platformFamily: string; platformOs: string }): boolean {
-  return isLocal ? platformFamily === `windows` || platformOs === `macos` : platformOs === `linux`;
 }
 
 function shouldCheckGitAvailability(method: string, isLocal: boolean, isMutation: boolean): boolean {
@@ -74,3 +63,4 @@ function shouldCheckGitAvailability(method: string, isLocal: boolean, isMutation
 export { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
 if (typeof module !== `undefined`) module.exports = { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength };
 import { isCancelableGitRequest, isGitRequestTracked } from "./git-request-classification-policy";
+import { isFsmonitorPlatformSupported, parseFsmonitorConfigValue } from "./git-fsmonitor-policy";

@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isFsmonitorPlatformSupported, parseFsmonitorConfigValue } = require("../app/.vite/build/worker/git-fsmonitor-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+for (const value of ["true","YES","on"]) eq(parseFsmonitorConfigValue(value), true);
+for (const value of ["false","NO","off"]) eq(parseFsmonitorConfigValue(value), false);
+eq(parseFsmonitorConfigValue("auto"), null);
+eq(isFsmonitorPlatformSupported({isLocal:true,platformFamily:"windows",platformOs:"linux"}), true);
+eq(isFsmonitorPlatformSupported({isLocal:true,platformFamily:"unix",platformOs:"macos"}), true);
+eq(isFsmonitorPlatformSupported({isLocal:false,platformFamily:"unix",platformOs:"linux"}), true);
+eq(isFsmonitorPlatformSupported({isLocal:false,platformFamily:"unix",platformOs:"macos"}), false);
+console.log(`${n} worker fsmonitor policy assertions passed`);
