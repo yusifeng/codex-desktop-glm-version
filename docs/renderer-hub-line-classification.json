@@ -2231,5 +2231,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/is-active-entity.ts",
     "evidence": "The pure registry-state predicate projects only the active flag and safely treats missing state as inactive; it has no JSX, store mutation, network, or lifecycle effects and is covered by a focused three-case runtime test."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Rs",
+    "sourceSymbol": "wK",
+    "startLine": 36849,
+    "endLine": 36851,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/read-tab-state.ts",
+    "evidence": "The tab-state lookup safely avoids registry reads until both tab and browser identities are present, then performs one deterministic keyed read without JSX, mutation, network, or lifecycle effects. It is covered by a focused three-case runtime test."
   }
 ]
