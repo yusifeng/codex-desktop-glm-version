@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { parseTurnDiffStatus } = require("../app/.vite/build/worker/git-turn-diff-status-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.deepEqual(...a)};
+eq(parseTurnDiffStatus("?? new.txt\0 M tracked.txt\0"), {hasTrackedChanges:true,untrackedPaths:["new.txt"]});
+eq(parseTurnDiffStatus("?? one\0?? two\0"), {hasTrackedChanges:false,untrackedPaths:["one","two"]});
+eq(parseTurnDiffStatus(""), {hasTrackedChanges:false,untrackedPaths:[]});
+assert.throws(()=>parseTurnDiffStatus("?? broken"), /Malformed/); n++;
+console.log(`${n} worker turn diff status policy assertions passed`);
