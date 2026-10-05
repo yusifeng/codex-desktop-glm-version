@@ -1,0 +1,78 @@
+/** Pure subprocess classification and telemetry envelope policy for Git observability. */
+
+const gitHubOperations = new Set([
+  `auth.status`, `auth.token`, `pr.checks`, `pr.close`, `pr.comment`, `pr.create`, `pr.diff`,
+  `pr.edit`, `pr.list`, `pr.merge`, `pr.ready`, `pr.reopen`, `pr.review`, `pr.view`,
+]);
+const sshOptionsWithArguments = new Set([`-B`, `-b`, `-c`, `-D`, `-E`, `-e`, `-F`, `-I`, `-i`, `-J`, `-L`, `-l`, `-m`, `-O`, `-o`, `-p`, `-P`, `-Q`, `-R`, `-S`, `-W`, `-w`]);
+
+export function classifyProcessExecutable(command: string | null | undefined): string {
+  if (command == null) return `other`;
+  const posixBasename = command.split(`/`).at(-1)?.toLowerCase() ?? ``;
+  const windowsBasename = command.split(`\\`).at(-1)?.toLowerCase() ?? ``;
+  const basename = posixBasename.length <= windowsBasename.length ? posixBasename : windowsBasename;
+  const name = basename.replace(/\.(?:bat|cmd|com|exe)$/u, ``);
+  if (/^python(?:3(?:\.\d+)*)?$/u.test(name)) return `python`;
+  switch (name) {
+    case `bash`: case `cmd`: case `powershell`: case `pwsh`: case `sh`: case `zsh`: return `shell`;
+    case `codex`: case `gh`: case `node`: case `rg`: case `ssh`: case `tar`: case `tectonic`: case `wsl`: return name;
+    default: return `other`;
+  }
+}
+
+export function classifyGitHubOperation(args: string[], processKind: string): string | undefined {
+  let command: string | undefined;
+  let subcommand: string | undefined;
+  if (processKind === `gh`) [command, subcommand] = args.slice(1, 3);
+  else if (processKind === `shell` && (args[1] === `-c` || args[1] === `-lc`)) {
+    const match = /^gh(?:\s+([a-z-]+))?(?:\s+([a-z-]+))?(?:\s|$)/u.exec(args[2] ?? ``);
+    if (match == null) return undefined;
+    [, command, subcommand] = match;
+  } else return undefined;
+  if (command === `--version` || command === `version`) return `version`;
+  if (command === `api`) return subcommand === `graphql` ? `api.graphql` : `api.rest`;
+  const operation = `${command}.${subcommand}`;
+  return gitHubOperations.has(operation) ? operation : `other`;
+}
+
+export function classifySshOperation(args: string[]): `config` | `control` | `port_forward` | `remote_command` | `connection` {
+  const options = args.slice(1);
+  let config = false;
+  let control = false;
+  let portForward = false;
+  let positionalCount = 0;
+  for (let index = 0; index < options.length; index += 1) {
+    const option = options[index];
+    if (option == null) continue;
+    if (option === `--`) { positionalCount += options.length - index - 1; break; }
+    if (option === `-G`) config = true;
+    if (/^-O(?:.|$)/u.test(option)) control = true;
+    if (/^-(?:D|L|R|W)(?:.|$)/u.test(option) || /^-o(?:DynamicForward|LocalForward|RemoteForward)=/iu.test(option) || (option === `-o` && /^(?:DynamicForward|LocalForward|RemoteForward)(?:=|\s)/iu.test(options[index + 1] ?? ``))) portForward = true;
+    if (sshOptionsWithArguments.has(option)) { index += 1; continue; }
+    if (!option.startsWith(`-`)) { positionalCount += 1; if (positionalCount > 1) break; }
+  }
+  return config ? `config` : control ? `control` : portForward ? `port_forward` : positionalCount > 1 ? `remote_command` : `connection`;
+}
+
+export function createProcessTelemetryEvent(processKind: string, operation?: string, operationIsGitHub = false): { attributes: Record<string, string>; op: `process.exec`; name: `subprocess` } {
+  return { attributes: { [`process.kind`]: operationIsGitHub ? `gh` : processKind, ...(operation == null ? {} : { [`process.operation`]: operation }) }, op: `process.exec`, name: `subprocess` };
+}
+
+export function createGitProcessTelemetry(args: string[], getGitSubcommand: (args: string[], startIndex: number) => string): { op: `git.exec`; name: `git.subprocess`; attributes: { [`git.subcommand`]: string } } | null {
+  const basename = (value: string | undefined): string => {
+    if (value == null) return ``;
+    const posix = value.split(`/`).at(-1)?.toLowerCase() ?? ``;
+    const windows = value.split(`\\`).at(-1)?.toLowerCase() ?? ``;
+    return posix.length <= windows.length ? posix : windows;
+  };
+  const isGit = (value: string | undefined): boolean => [`git`, `git.exe`, `git.cmd`, `git.bat`, `git.com`].includes(basename(value));
+  const isCmd = (value: string | undefined): boolean => [`cmd`, `cmd.exe`].includes(basename(value));
+  if (isGit(args[0])) return { op: `git.exec`, name: `git.subprocess`, attributes: { [`git.subcommand`]: getGitSubcommand(args, 1) } };
+  if (!isCmd(args[0])) return null;
+  const wrapper = args.slice(1, 4).map((value) => value.toLowerCase());
+  return wrapper.length === 3 && wrapper[0] === `/d` && wrapper[1] === `/s` && wrapper[2] === `/c` && isGit(args[4])
+    ? { op: `git.exec`, name: `git.subprocess`, attributes: { [`git.subcommand`]: getGitSubcommand(args, 5) } }
+    : null;
+}
+
+if (typeof module !== `undefined`) module.exports = { classifyProcessExecutable, classifyGitHubOperation, classifySshOperation, createProcessTelemetryEvent, createGitProcessTelemetry };

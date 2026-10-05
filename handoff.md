@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation pointer-selection 的拖拽终止生命周期已补齐；公开
+`dispose` 现为幂等终态，销毁后拒绝 pointer down/move/up/cancel 与 selection 更新，内部重启拖拽仍使用临时清理。
+`scripts/test-preload-annotation-pointer-selection.mjs` 扩展至 18 项 focused assertions；build check、
+focused test 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation surface registry 的注册表、probe 去重、hit-test request
 计数、pending hit 与终止态已抽至 `src/main/browser-page-preload/annotation-surface-registry-state.ts`；
 registry 入口仅保留 DOM/MutationObserver、请求响应与几何副作用，销毁后迟到响应与新请求均被状态门禁。
@@ -1209,6 +1214,12 @@ site-annotation/tweaks capability 的严格布尔归一化集中在纯状态投�
 泄漏 suspended 状态，入口继续保留 React/render 副作用。由
 `scripts/test-preload-annotation-ui-mode-policy.mjs` 覆盖 comment/browse、null 与 malformed
 输入，共 5 项 focused assertions。
+
+2026-10-05 A1 增量：Git worker 子进程观测的 executable/GitHub/SSH 意图分类及 Git/process
+telemetry envelope 已迁移至 `src/main/worker/git-process-observability-policy.ts`；
+`git-observability.ts` 保留观测编排与兼容导出。新增
+`scripts/test-worker-git-process-observability-policy.mjs`，覆盖 11 项 focused assertions；
+已通过 build 与 typecheck。
 2026-10-05 A2 增量：annotation host sync 的 capability/agent/comment-suspended 生命周期门控已抽至
 `src/main/browser-page-preload/annotation-sync-transition.ts`，统一 dispose、request/preview 清理、
 marker 与 selection 清理判定；`annotation-sync-state.ts` 接回该策略并保留既有副作用顺序。

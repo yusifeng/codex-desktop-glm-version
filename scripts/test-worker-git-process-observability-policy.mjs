@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const policy = require("../app/.vite/build/worker/git-process-observability-policy.js");
+assert.equal(policy.classifyProcessExecutable("python3.11"), "python");
+assert.equal(policy.classifyProcessExecutable("C:\\Windows\\System32\\cmd.exe"), "shell");
+assert.equal(policy.classifyProcessExecutable("git.exe"), "other");
+assert.equal(policy.classifyGitHubOperation(["gh", "pr", "view"], "gh"), "pr.view");
+assert.equal(policy.classifyGitHubOperation(["sh", "-lc", "gh pr checks"], "shell"), "pr.checks");
+assert.equal(policy.classifyGitHubOperation(["gh", "unknown"], "gh"), "other");
+assert.equal(policy.classifySshOperation(["ssh", "-G", "host"]), "config");
+assert.equal(policy.classifySshOperation(["ssh", "-L", "8080:localhost:80", "host"]), "port_forward");
+assert.equal(policy.classifySshOperation(["ssh", "host", "uname", "-a"]), "remote_command");
+assert.deepEqual(policy.createProcessTelemetryEvent("gh", "pr.view", true), { attributes: { "process.kind": "gh", "process.operation": "pr.view" }, op: "process.exec", name: "subprocess" });
+const subcommand = (args, start) => args.slice(start).join(" ");
+assert.deepEqual(policy.createGitProcessTelemetry(["cmd.exe", "/d", "/s", "/c", "git.exe", "status"], subcommand), { op: "git.exec", name: "git.subprocess", attributes: { "git.subcommand": "status" } });
+assert.equal(policy.createGitProcessTelemetry(["bash", "-c", "git status"], subcommand), null);
+console.log("git-process-observability-policy: 11 assertions passed");

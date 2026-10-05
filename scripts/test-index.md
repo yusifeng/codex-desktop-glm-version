@@ -957,6 +957,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-errors.mjs`](./test-worker-git-errors.mjs)
 - [`test-worker-git-executable.mjs`](./test-worker-git-executable.mjs)
 - [`test-worker-git-observability.mjs`](./test-worker-git-observability.mjs)
+- [`test-worker-git-process-observability-policy.mjs`](./test-worker-git-process-observability-policy.mjs)
 - [`test-git-request-lifecycle.mjs`](./test-git-request-lifecycle.mjs)
 - [`test-git-worktree-list-request-handler.mjs`](./test-git-worktree-list-request-handler.mjs)
 - [`test-worker-git-query-utils.mjs`](./test-worker-git-query-utils.mjs)
