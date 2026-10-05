@@ -128,6 +128,10 @@ function shouldAttachSharedTrace(trace: any, sharedTrace: any, traceLinks: any[]
 }
 /** A shared run is abortable once its final consumer detaches. */
 function shouldAbortSharedRun(consumerCount: number): boolean { return consumerCount <= 0; }
+/** Reuse an in-flight shared run only while it has not been aborted. */
+function canReuseSharedRun(shared: { abortController?: { signal?: { aborted?: boolean } } } | null | undefined): boolean {
+  return shared != null && shared.abortController?.signal?.aborted !== true;
+}
 
 export {
   appendTraceLink,
@@ -136,6 +140,7 @@ export {
   shouldRefreshLiveQuery,
   shouldAttachSharedTrace,
   shouldAbortSharedRun,
+  canReuseSharedRun,
 };
 if (typeof module !== `undefined`)
   module.exports = {
@@ -145,4 +150,5 @@ if (typeof module !== `undefined`)
     shouldRefreshLiveQuery,
     shouldAttachSharedTrace,
     shouldAbortSharedRun,
+    canReuseSharedRun,
   };

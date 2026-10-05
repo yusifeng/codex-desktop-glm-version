@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import path from "node:path";
+import { createRequire } from "node:module";
+import * as esbuild from "esbuild";
+import os from "node:os";
+import fs from "node:fs/promises";
+const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-live-reuse-policy-")); const output = path.join(dir, "policy.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/git-live-query-policy.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", target: "esnext", logLevel: "silent" });
+const { canReuseSharedRun } = createRequire(import.meta.url)(output);
+assert.equal(canReuseSharedRun(null), false); assert.equal(canReuseSharedRun({}), true); assert.equal(canReuseSharedRun({ abortController: { signal: { aborted: false } } }), true); assert.equal(canReuseSharedRun({ abortController: { signal: { aborted: true } } }), false);
+console.log("worker Git live query reuse policy tests passed (4 assertions)");

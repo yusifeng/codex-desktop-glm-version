@@ -1,4 +1,4 @@
-import { appendTraceLink, shouldAbortSharedRun, shouldAttachSharedTrace } from "./git-live-query-policy";
+import { appendTraceLink, canReuseSharedRun, shouldAbortSharedRun, shouldAttachSharedTrace } from "./git-live-query-policy";
 import {
   getGitLiveQueryRepositoryKey,
   getGitLiveQuerySharedKey,
@@ -31,7 +31,7 @@ function runGitLiveQuery(
   const repositoryKey = getGitLiveQueryRepositoryKey(state);
   const sharedKey = getGitLiveQuerySharedKey(state);
   let shared = sharedRuns.get(sharedKey);
-  if (shared == null || shared.abortController.signal.aborted) {
+  if (!canReuseSharedRun(shared)) {
     shared = {
       abortController: new AbortController(),
       consumers: new Set(),

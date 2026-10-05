@@ -981,6 +981,9 @@ trace 与已有 link 边界。
 Live-query shared run 的最终 consumer abort 门禁已迁移至 `shouldAbortSharedRun`；runtime 仅
 负责 AbortController 副作用，由 4 项 focused assertions 覆盖零/负数与有消费者边界。
 
+Live-query shared run 的 aborted/reuse 判定已迁移至 `canReuseSharedRun`；runtime 仅负责 map
+生命周期与异步执行，由 4 项 focused assertions 覆盖缺失、默认、活跃与已 abort 状态。
+
 ### 增量抽取：Git watcher acquire lifecycle
 
 `GitRepoManager.ensureWatching` 的 watch session 复用、引用计数、abort 释放和 start 失败清理已迁移至
