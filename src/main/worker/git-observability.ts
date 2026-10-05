@@ -40,17 +40,6 @@ function buildGitHostCacheKey(host: Record<string, unknown>): string {
     config.arch, config.app_server_version, config.online, config.distro]);
 }
 
-function exitCodeBucket(exitCode: number | null): string | null {
-  switch (exitCode) {
-    case null: return null;
-    case 1: return `1`;
-    case 2: return `2`;
-    case 128: return `128`;
-    case 129: return `129`;
-    default: return `other`;
-  }
-}
-
 function recordUntrackedCacheOutcome(attribution: { closed?: boolean; untrackedCacheCoalescedCount: number; untrackedCacheHitCount: number; untrackedCacheMissCount: number } | null | undefined, outcome: string): void {
   if (attribution == null || attribution.closed) return;
   if (outcome === `coalesced`) attribution.untrackedCacheCoalescedCount += 1;
@@ -441,3 +430,4 @@ function bucketGitIndexSize(size: number | null | undefined) {
 
 export { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceExpectedReason, getGitPerformanceFailureReason, getGitPerformanceOutcome, getGitPerformanceReason, getGitPerformanceResultFields, getUntrackedCacheStatus, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample };
 if (typeof module !== `undefined`) module.exports = { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceExpectedReason, getGitPerformanceFailureReason, getGitPerformanceOutcome, getGitPerformanceReason, getGitPerformanceResultFields, getUntrackedCacheStatus, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample };
+import { exitCodeBucket } from "./git-exit-code-policy";
