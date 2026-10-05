@@ -10,7 +10,7 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
     if (typeof raw.role === `string` && isSafeAnnotationRole(raw.role, limits.maxRoleLength, limits.rolePattern)) result.role = raw.role;
     if (raw.rect !== undefined) {
       const rect = cloneRecord(raw.rect, 4);
-      if (rect == null || typeof rect.x !== `number` || !Number.isFinite(rect.x) || typeof rect.y !== `number` || !Number.isFinite(rect.y) || typeof rect.width !== `number` || !Number.isFinite(rect.width) || rect.width <= 0 || typeof rect.height !== `number` || !Number.isFinite(rect.height) || rect.height <= 0) return undefined;
+      if (!isValidAnnotationRect(rect)) return undefined;
       result.rect = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
     }
     const metadata = cloneRecord(raw.metadata, limits.metadataLimits.maxKeys);
@@ -41,3 +41,4 @@ import { cloneAnnotationRecord } from "./annotation-record-clone-policy";
 import { isSafeAnnotationText } from "./annotation-safe-text-policy";
 import { isSafeAnnotationMetadataKey } from "./annotation-metadata-key-policy";
 import { isSafeAnnotationRole } from "./annotation-role-policy";
+import { isValidAnnotationRect } from "./annotation-rect-policy";
