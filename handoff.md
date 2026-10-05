@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：annotation permission controller 的请求去重、request-id 配对、host invoke
+失败与 reset 取消 pending 生命周期补齐独立 focused 回归，由
+`scripts/test-preload-annotation-permission-controller.mjs` 覆盖 14 项状态边界断言。
+
 最新增量：worker 的 Windows/WSL 主机路径判定与转换已迁移至
 `src/main/worker/host-path-policy.ts`；入口仅保留兼容别名接回，覆盖 WSL mounted path、Windows/UNC、
 WSL UNC distro、盘符与 extended UNC 归一化，新增 `scripts/test-worker-host-path-policy.mjs`
