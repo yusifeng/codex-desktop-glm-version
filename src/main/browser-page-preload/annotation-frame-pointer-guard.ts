@@ -9,13 +9,12 @@ type GuardDependencies = {
 
 function installAnnotationFramePointerGuard(deps: GuardDependencies) {
   return deps.installAcrossFrames((root, _frameWindow, refresh) => {
-    const savedStyles = new Map<any, { value: string; priority: string }>();
-    const observedRoots = new Set<any>();
+    const state = createAnnotationFramePointerGuardState();
 
     const restoreFrame = (frame: any) => {
-      const saved = savedStyles.get(frame);
+      const saved = state.savedStyles.get(frame);
       if (saved == null) return;
-      savedStyles.delete(frame);
+      state.forget(frame);
       if (frame.style.getPropertyValue(`pointer-events`) === `none` && frame.style.getPropertyPriority(`pointer-events`) === `important`) {
         frame.style.setProperty(`pointer-events`, saved.value, saved.priority);
       }
@@ -26,8 +25,8 @@ function installAnnotationFramePointerGuard(deps: GuardDependencies) {
         restoreFrame(frame);
         return;
       }
-      if (savedStyles.has(frame)) return;
-      savedStyles.set(frame, {
+      if (state.has(frame)) return;
+      state.remember(frame, {
         value: frame.style.getPropertyValue(`pointer-events`),
         priority: frame.style.getPropertyPriority(`pointer-events`),
       });
@@ -44,8 +43,7 @@ function installAnnotationFramePointerGuard(deps: GuardDependencies) {
     const scan = (candidate: any): boolean => {
       if (deps.isElement(candidate) && deps.isOverlayElement(candidate)) return false;
       let changed = false;
-      if (!deps.isElement(candidate) && !observedRoots.has(candidate)) {
-        observedRoots.add(candidate);
+      if (!deps.isElement(candidate) && state.observe(candidate)) {
         observer.observe(candidate, { childList: true, subtree: true });
         candidate.addEventListener(`load`, onLoad, true);
       }
@@ -58,7 +56,7 @@ function installAnnotationFramePointerGuard(deps: GuardDependencies) {
           updateFrame(element);
           changed = true;
         }
-        if (element.shadowRoot != null && !observedRoots.has(element.shadowRoot)) {
+        if (element.shadowRoot != null && !state.observedRoots.has(element.shadowRoot)) {
           changed = scan(element.shadowRoot) || changed;
         }
       }
@@ -78,11 +76,12 @@ function installAnnotationFramePointerGuard(deps: GuardDependencies) {
 
     return () => {
       observer.disconnect();
-      for (const observedRoot of observedRoots) observedRoot.removeEventListener(`load`, onLoad, true);
-      for (const frame of savedStyles.keys()) restoreFrame(frame);
+      for (const observedRoot of state.observedRoots) observedRoot.removeEventListener(`load`, onLoad, true);
+      for (const frame of state.savedStyles.keys()) restoreFrame(frame);
     };
   });
 }
 
 export { installAnnotationFramePointerGuard };
 if (typeof module !== `undefined`) module.exports = { installAnnotationFramePointerGuard };
+import { createAnnotationFramePointerGuardState } from "./annotation-frame-pointer-guard-state";

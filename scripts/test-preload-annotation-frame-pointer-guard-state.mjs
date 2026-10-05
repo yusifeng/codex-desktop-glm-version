@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationFramePointerGuardState } = require("../app/.vite/build/browser-page-preload/annotation-frame-pointer-guard-state.js");
+const state = createAnnotationFramePointerGuardState();
+const root = {}; const frame = {};
+assert.equal(state.observe(root), true);
+assert.equal(state.observe(root), false);
+state.remember(frame, { value: "auto", priority: "" });
+assert.equal(state.has(frame), true);
+assert.deepEqual(state.savedStyles.get(frame), { value: "auto", priority: "" });
+state.forget(frame);
+assert.equal(state.has(frame), false);
+console.log("test-preload-annotation-frame-pointer-guard-state: 5 assertions passed");
