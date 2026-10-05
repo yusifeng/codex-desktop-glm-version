@@ -115,6 +115,10 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `wp`（内部 `jut`，源码 98909--98911）的 whitespace
+token normalizer 已迁移至 `src/renderer/app-shared/runtime/split-whitespace-tokens.ts`；新增 focused
+test 2 项断言，typecheck 与 focused test 已通过。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `BL`（内部 `Eqe`，源码 51896--51898）的 strict
 semantic-version validator 已迁移至 `src/renderer/app-shared/runtime/is-semver.ts`；新增 focused test
 3 项断言，typecheck 与 focused test 已通过。
