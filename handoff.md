@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git branch search 的纯策略边界已进一步拆至
+`src/main/worker/git-branch-search-policy.ts`；branch-search 兼容入口仅保留策略转出，runtime
+继续负责 Git I/O、流式扫描与 query 编排。新增 `scripts/test-worker-git-branch-search-policy.mjs`
+覆盖 15 项 focused assertions；build 与 typecheck 已通过。
+
 2026-10-05 A5 继续批次：app-primary 生成运行时初始化边界 `Ds`/`Ea`/`Bi`/`Dn`
 （`ZK`/`OQ`/`G1`/`j6`，37715--37738、58890--58898、74300--74307、93984--93996）完成逐行分类；
 均为相邻 voice-command、composer style、browser-mode 与 review runtime 的 lazy bootstrap，
