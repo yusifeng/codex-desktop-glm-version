@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A5 继续批次：app-primary 生成运行时初始化边界 `Ds`/`Ea`/`Bi`/`Dn`
+（`ZK`/`OQ`/`G1`/`j6`，37715--37738、58890--58898、74300--74307、93984--93996）完成逐行分类；
+均为相邻 voice-command、composer style、browser-mode 与 review runtime 的 lazy bootstrap，
+无独立 renderer named consumer 或 teardown owner，登记为 generated-local。`docs/renderer-hub-line-classification.json`
+app-primary reviewedCount 提升至 211；hub audit 与 focused classification test 已通过。
+
 2026-10-05 A2 继续批次：annotation controls registry 的记录表、弱引用 target 索引、总 target
 配额与终止态已抽至 `src/main/browser-page-preload/annotation-controls-registry-state.ts`；registry
 入口仅保留 DOM 事件、payload 解析与副作用适配，销毁后迟到的 register/update/remove 均被拒绝。

@@ -2071,5 +2071,45 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/account-spend-key.ts",
     "evidence": "The account spend-limit key is a deterministic projection of account id, limit, and reset timestamp with explicit null handling; it has no renderer lifecycle, JSX, store, or teardown side effects and is independently covered by a focused policy test."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ds",
+    "sourceSymbol": "ZK",
+    "startLine": 37715,
+    "endLine": 37738,
+    "classification": "generated-local-runtime-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer wires image-upload and conversation-scope dependencies for the adjacent generated voice-command runtime; setup is route-local glue with no separately named renderer consumer or teardown owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ea",
+    "sourceSymbol": "OQ",
+    "startLine": 58890,
+    "endLine": 58898,
+    "classification": "generated-local-style-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer materializes composer CSS module class names for the neighboring generated composer surface; constants are consumed only by adjacent generated code and have no independent renderer owner or teardown boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Bi",
+    "sourceSymbol": "G1",
+    "startLine": 74300,
+    "endLine": 74307,
+    "classification": "generated-local-browser-mode-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer loads browser annotation dependencies and defines browse/comment mode constants for the adjacent generated controller; it has no independent named renderer consumer or teardown ownership."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Dn",
+    "sourceSymbol": "j6",
+    "startLine": 93984,
+    "endLine": 93996,
+    "classification": "generated-local-review-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer wires review command, project and host dependencies for the adjacent generated review runtime; initialization order is local generated glue with no standalone renderer consumer or teardown owner."
   }
 ]
