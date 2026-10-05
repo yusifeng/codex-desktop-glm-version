@@ -17,9 +17,11 @@ type GitReviewPatchDependencies = {
   utf8ByteLength: (value: string) => number;
 };
 
-function unknownReviewPatchDiff() {
-  return { type: `error`, error: { type: `unknown` } };
-}
+import {
+  buildReviewPatchError,
+  buildReviewPatchSuccess,
+  unknownReviewPatchDiff,
+} from './git-review-patch-policy';
 
 function getCachedTrackedReviewDiff(
   diffArgs: string[],
@@ -82,26 +84,19 @@ async function getReviewPatch(
   ]);
   if (trackedDiff.outputLimitExceeded || !trackedDiff.success)
     return {
-      source,
-      diff: { type: `error`, error: dependencies.parseGitError(trackedDiff) },
+      ...buildReviewPatchError(source, dependencies.parseGitError(trackedDiff)),
     };
   if (!untrackedDiff.success)
     return {
-      source,
-      diff: { type: `error`, error: untrackedDiff.error },
+      ...buildReviewPatchError(source, untrackedDiff.error),
     };
 
   const unifiedDiff = dependencies
     .collectNonEmptySections([trackedDiff.stdout], untrackedDiff.sections)
     .join(`\n`);
-  return comparison.reviewSnapshot.read(async () => ({
-    source,
-    diff: {
-      type: `success`,
-      unifiedDiff,
-      unifiedDiffBytes: dependencies.utf8ByteLength(unifiedDiff),
-    },
-  }));
+  return comparison.reviewSnapshot.read(async () => buildReviewPatchSuccess(
+    source, unifiedDiff, dependencies.utf8ByteLength(unifiedDiff),
+  ));
 }
 
 export {

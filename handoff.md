@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review patch 的 unknown/error/success response projection 已迁移至 `src/main/worker/git-review-patch-policy.ts`；patch runtime 保留 comparison、query/cache、untracked collection 与 snapshot 编排。新增 `scripts/test-worker-git-review-patch-policy.mjs` 覆盖 3 项 focused assertions；原 patch 回归 33 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review file diff 的未跟踪 symlink/submodule unified-diff 格式化已迁移至 `src/main/worker/git-review-file-diff-policy.ts`；file-diff runtime 保留 stat/process/Git I/O、snapshot 与 query 编排。新增 `scripts/test-worker-git-review-file-diff-policy.mjs` 覆盖 5 项 focused assertions；原 file-diff 回归 33 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation control handle 的 terminal disposed 状态已抽至
