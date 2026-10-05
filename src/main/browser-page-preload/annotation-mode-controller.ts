@@ -11,6 +11,7 @@ type AnnotationModeControllerDependencies = {
 /** Coordinates the page-facing annotation mode API and its main-world listener. */
 function createAnnotationModeController(deps: AnnotationModeControllerDependencies) {
   let active = true;
+  let disposed = false;
   const disposeControls = deps.registerControls(() => active);
   if (disposeControls == null) return null;
 
@@ -19,6 +20,8 @@ function createAnnotationModeController(deps: AnnotationModeControllerDependenci
   });
 
   return () => {
+    if (disposed) return;
+    disposed = true;
     active = false;
     if (installed) deps.removeMainWorldListener();
     disposeControls();

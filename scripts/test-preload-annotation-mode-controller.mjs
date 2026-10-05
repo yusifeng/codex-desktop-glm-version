@@ -26,6 +26,9 @@ dispose();
 notify("late");
 assert.deepEqual(calls, [["register", true], ["record", "first"], ["remove-main-world"]]);
 assert.equal(disposeCount, 1);
+dispose();
+assert.deepEqual(calls, [["register", true], ["record", "first"], ["remove-main-world"]]);
+assert.equal(disposeCount, 1);
 
 const unavailable = createAnnotationModeController({
   isAvailable: () => false,
