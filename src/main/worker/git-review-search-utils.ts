@@ -1,9 +1,6 @@
 export function formatReviewSearchPath(change: { oldPath: string; newPath: string }): string {
   return change.oldPath === change.newPath ? change.newPath : `${change.oldPath} -> ${change.newPath}`;
 }
-export function buildSearchSnippet(text: string, start: number, end: number, context = 30) {
-  return { before: text.slice(Math.max(0, start - context), start), match: text.slice(start, end), after: text.slice(end, Math.min(text.length, end + context)) };
-}
 export function createLineDecoder(onLine: (line: string) => void) {
   const decoder = new TextDecoder(); let pending = ``;
   return (chunk: Uint8Array) => {
@@ -13,3 +10,4 @@ export function createLineDecoder(onLine: (line: string) => void) {
 }
 if (typeof module !== `undefined`) module.exports = { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder };
 import { findCaseInsensitiveOffsets } from "./git-review-search-policy";
+import { buildSearchSnippet } from "./git-review-snippet-policy";
