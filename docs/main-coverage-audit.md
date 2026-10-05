@@ -349,3 +349,12 @@ Artifact Session 宿主启动过程中的 daemon 路径、socket/ready 文件、
 生命周期类仍负责 runtime pinning、临时目录清理和进程副作用，仅将确定性的环境/连接描述构造抽出；由
 `scripts/test-main-artifact-session-host-environment.mjs` 覆盖路径、环境键、transaction key 与 viewer token
 等 6 项断言。
+
+### Worker manifest 复核（2026-10-06）
+
+当前 `src/main/worker` 中未在本表逐名出现的入口均已核对其消费边界：
+`git-host-handoff-progress.ts`、`git-worktree-snapshot-read-dispatch.ts`、`entry-dispatcher.ts`、
+`git-core-request-dispatch.ts`、`git-node-request-dispatch.ts` 与 `git-live-query-run.ts` 均由
+对应 policy/dispatch 或生命周期测试覆盖；`shell-quoting.ts` 与 `open-target-path-policy.ts`
+是已接回原 worker 的窄策略入口。复核未发现新的未消费 business helper，也未新增 facade；剩余
+main/worker 生命周期仍按原始入口边界保留。

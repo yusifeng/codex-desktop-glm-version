@@ -2064,3 +2064,5 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A2 继续批次：preload 未消费导出 `rd` 的顶层 `html/body` annotation anchor root 判定已迁移至
 `src/main/browser-page-preload/annotation-anchor-root-policy.ts`；新增 focused test 3 项断言，build/typecheck
 与 focused test 已通过。
+
+2026-10-06 manifest 复核：逐项核对 `src/main/worker` 中未在审计表逐名出现的入口；均已有对应 policy/dispatch 或生命周期测试，`shell-quoting`/`open-target-path` 为已接回原 worker 的窄入口。未发现新的未消费 business helper，本轮不新增 facade。
