@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { hasFsmonitorDaemonFeature } = require("../app/.vite/build/worker/git-fsmonitor-feature-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+eq(hasFsmonitorDaemonFeature("feature: fsmonitor--daemon\n"), true);
+eq(hasFsmonitorDaemonFeature("feature: object-format\nfeature: fsmonitor--daemon"), true);
+eq(hasFsmonitorDaemonFeature(" feature: fsmonitor--daemon \n"), true);
+eq(hasFsmonitorDaemonFeature("feature: fsmonitor-daemon\n"), false);
+eq(hasFsmonitorDaemonFeature(""), false);
+console.log(`${n} worker fsmonitor feature policy assertions passed`);

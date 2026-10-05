@@ -20,10 +20,6 @@ function fsmonitorCacheKey(cwd: string, host: { id: string }, env: Record<string
   return JSON.stringify([host.id, cwd, Object.entries(env).filter(([key]) => key !== `GIT_INDEX_FILE`).sort(([a], [b]) => a.localeCompare(b))]);
 }
 
-function hasFsmonitorDaemonFeature(output: string): boolean {
-  return output.split(`\n`).some((line) => line.trim() === `feature: fsmonitor--daemon`);
-}
-
 function shouldCheckGitAvailability(method: string, isLocal: boolean, isMutation: boolean): boolean {
   return isLocal && !isMutation && isCancelableGitRequest(method);
 }
@@ -34,3 +30,4 @@ import { isCancelableGitRequest, isGitRequestTracked } from "./git-request-class
 import { isFsmonitorPlatformSupported, parseFsmonitorConfigValue } from "./git-fsmonitor-policy";
 import { isCacheableGitCommand } from "./git-cache-command-policy";
 import { normalizeGitPath, pathsOverlap } from "./git-path-overlap-policy";
+import { hasFsmonitorDaemonFeature } from "./git-fsmonitor-feature-policy";
