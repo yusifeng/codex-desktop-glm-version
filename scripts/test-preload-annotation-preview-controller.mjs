@@ -16,9 +16,13 @@ assert.deepEqual(events, ['mount:controls', 'dispose:controls', 'mount:metadata'
 controller.dispose();
 assert.deepEqual(events, ['mount:controls', 'dispose:controls', 'mount:metadata', 'dispose:metadata']);
 controller.setPreview(null);
+controller.setPreview('late');
+controller.dispose();
 assert.equal(events.length, 4);
+assert.equal(events.includes('mount:late'), false);
+assert.equal(events.at(-1), 'dispose:metadata');
 const disposable = createAnnotationPreviewController({ mountPreview: () => ({ dispose: () => events.push('object-dispose') }) });
 disposable.setPreview('x');
 disposable.setPreview(undefined);
 assert.equal(events.at(-1), 'object-dispose');
-console.log('test-preload-annotation-preview-controller: 4 assertions passed');
+console.log('test-preload-annotation-preview-controller: 6 assertions passed');

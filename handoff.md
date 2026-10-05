@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation preview controller 的 teardown 终止边界已补齐；`dispose`
+现在幂等并将 controller 标记为终止态，后续 `setPreview` 不再重新挂载，避免 pagehide/异步回调
+在 runtime teardown 后残留预览。`scripts/test-preload-annotation-preview-controller.mjs` 扩展至
+6 项 focused assertions；build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review diff 的 fallback error、rename header 判定与多文件
 diff 切片纯策略已迁移至 `src/main/worker/git-review-diff-policy.ts`；review diff 入口仅保留
 Git 查询与文件编排，新增 `scripts/test-worker-git-review-diff-policy.mjs` 覆盖 4 项 focused

@@ -492,9 +492,10 @@ controls 注册失败、main-world listener 安装、事件转发及 dispose 后
 
 批注站点预览的替换与销毁生命周期（原 `wy` 23562-23571）已迁移至
 `src/main/browser-page-preload/annotation-preview-controller.ts`。模块仅负责当前预览的
-单实例 dispose、替换挂载和对象/函数两种 teardown 形态；DOM overlay、observer、RAF
-调度与渲染副作用仍由既有 `Ty`/preview layer 负责。`scripts/test-preload-annotation-preview-controller.mjs`
-覆盖预览替换、空值清理、显式 dispose 与对象 teardown，共 4 项断言。
+单实例 dispose、替换挂载和对象/函数两种 teardown 形态；dispose 后控制器进入终止态，拒绝
+后续预览挂载，避免 pagehide 后异步回调重新创建 overlay。DOM overlay、observer、RAF 调度与
+渲染副作用仍由既有 `Ty`/preview layer 负责。`scripts/test-preload-annotation-preview-controller.mjs`
+覆盖预览替换、空值清理、显式 dispose、对象 teardown 与终止态，共 6 项断言。
 
 ### 增量抽取：annotation display selection projection
 
