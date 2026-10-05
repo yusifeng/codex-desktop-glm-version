@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：worker review working-tree metadata 的未跟踪路径批处理上限与 Git
+兼容性降级判定已迁移至 `src/main/worker/git-review-working-tree-policy.ts`；入口仅保留异步
+批处理编排，新增 `scripts/test-worker-git-review-working-tree-policy.mjs` 覆盖 7 项 focused
+断言，原 55 项 metadata 回归继续通过。
+
 最新增量：GitHub pull-request board 的列表参数、远端仓库候选归一化与 CI/merge 状态判定已迁移至 `src/main/worker/github-pull-request-board-policy.ts`；board handler 仅保留 GitHub 请求与仓库副作用编排，并由 `scripts/test-worker-github-pull-request-board-policy.mjs` 覆盖 13 项 focused assertions。
 
 > 本文档是最终 handoff。前一阶段（消费驱动的语义化）已按 DoD 验收完成：
