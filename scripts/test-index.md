@@ -974,7 +974,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-computer-use-capture-policy.mjs`](./test-worker-computer-use-capture-policy.mjs)
 - [`test-preload-annotation-anchor-viewport-policy.mjs`](./test-preload-annotation-anchor-viewport-policy.mjs)
 - [`test-preload-annotation-overlay-class-policy.mjs`](./test-preload-annotation-overlay-class-policy.mjs)
-- [`test-preload-annotation-region-class-policy.mjs`](./test-preload-annotation-region-class-policy.mjs)
 - [`test-preload-annotation-anchor-clip-policy.mjs`](./test-preload-annotation-anchor-clip-policy.mjs)
 - [`test-worker-git-live-query-refresh-plan.mjs`](./test-worker-git-live-query-refresh-plan.mjs)
 - [`test-worker-git-watch-close.mjs`](./test-worker-git-watch-close.mjs)
@@ -990,3 +989,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-normalize-recipient-fields.mjs`](./test-app-primary-normalize-recipient-fields.mjs)
 - [`test-preload-annotation-region-class-policy.mjs`](./test-preload-annotation-region-class-policy.mjs)
 - [`test-app-primary-extract-skill-kind.mjs`](./test-app-primary-extract-skill-kind.mjs)
+- [`test-app-primary-annotation-selection-style.mjs`](./test-app-primary-annotation-selection-style.mjs)
