@@ -1,9 +1,3 @@
-const encoder = new TextEncoder();
-
-function utf8ByteLength(value: string): number {
-  return encoder.encode(value).byteLength;
-}
-
 function shouldCheckGitAvailability(method: string, isLocal: boolean, isMutation: boolean): boolean {
   return isLocal && !isMutation && isCancelableGitRequest(method);
 }
@@ -17,3 +11,4 @@ import { normalizeGitPath, pathsOverlap } from "./git-path-overlap-policy";
 import { hasFsmonitorDaemonFeature } from "./git-fsmonitor-feature-policy";
 import { fsmonitorCacheKey, gitQueryKey, hostId } from "./git-query-key-policy";
 import { matchesGitQuery } from "./git-query-match-policy";
+import { utf8ByteLength } from "./git-output-size-policy";

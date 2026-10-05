@@ -1643,3 +1643,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：Git query key 与 fsmonitor cache key 的 host/root/operation 组合、环境字段排序及 GIT_INDEX_FILE 排除协议已迁移至 `src/main/worker/git-query-key-policy.ts`；query utils 保留 cacheability、路径与环境判定策略。新增 `scripts/test-worker-git-query-key-policy.mjs` 覆盖 3 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：Git query key 的 `git` namespace 与 host-scoped 匹配协议已迁移至 `src/main/worker/git-query-match-policy.ts`；query utils 保留 key 构造、cacheability、路径与环境策略。新增 `scripts/test-worker-git-query-match-policy.mjs` 覆盖 6 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：Git 输出 UTF-8 字节长度计算策略已迁移至 `src/main/worker/git-output-size-policy.ts`，确保多字节文本按字节计量；query utils 保留查询与路径协议。新增 `scripts/test-worker-git-output-size-policy.mjs` 覆盖 4 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
