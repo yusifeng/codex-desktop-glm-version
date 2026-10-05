@@ -2538,5 +2538,10 @@
     "classification": "generated-local-registry-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The exported UR/WR/GR/KR/qR/JR/YR/XR declarations are populated by ZR bootstrap for adjacent browser state registries and remain generated local wiring."
-  }
+  },
+  { "hub": "app-primary", "alias": "Qp", "startLine": 10343, "endLine": 10349, "classification": "generated-local-registry-init", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "The exported Ij declaration is populated by Lj bootstrap as adjacent generated signal state; no standalone renderer consumer or teardown owner is present." },
+  { "hub": "app-primary", "alias": "Ro", "startLine": 40672, "endLine": 40678, "classification": "generated-local-registry-init", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "The exported xJ declaration is initialized by SJ bootstrap for a generated registry surface and remains aggregate-local wiring." },
+  { "hub": "app-primary", "alias": "St", "startLine": 105689, "endLine": 105696, "classification": "generated-local-runtime-init", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "The exported U5 declaration is assigned within W5 generated runtime initialization and has no independent renderer boundary." },
+  { "hub": "app-primary", "alias": "Tg", "startLine": 8869, "endLine": 8876, "classification": "generated-local-registry-init", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "The exported E declaration is a generated local registry binding initialized by the adjacent bootstrap sequence." },
+  { "hub": "app-primary", "alias": "Ua", "startLine": 52731, "endLine": 52738, "classification": "generated-local-registry-init", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "The exported JX declaration is initialized by YX bootstrap for adjacent generated state and is not independently consumed." }
 ]
