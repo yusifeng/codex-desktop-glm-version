@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A2 继续批次：annotation site-request 的 pending/page-hidden/disposed 状态边界已抽至
+`src/main/browser-page-preload/annotation-site-request-state.ts`；`annotation-site-requests` 仅保留
+事件、权限与 subscriber 编排，并明确销毁后 `subscribe` 的 no-op unsubscribe 与迟到回调门禁。
+新增 `scripts/test-preload-annotation-site-request-state.mjs` 覆盖 23 项 focused assertions；build、
+focused tests 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git config scope 的 local/worktree flag 映射、缺失值兼容判定与错误消息格式化纯策略已迁移至 `src/main/worker/git-config-scope-policy.ts`；`git-config-scope.ts` 仅保留 Git/query 编排与 worktreeConfig 自动启用重试。新增 `scripts/test-worker-git-config-scope-policy.mjs` 覆盖 6 项 focused assertions；原 49 项 config-scope 回归、build 与 typecheck 已通过。
 
 2026-10-05 A5 继续批次：app-primary selection overlay 未消费导出 `Pr`/`r`（`Z3`/`$3`，91668--91680）完成逐行分类；`Z3` 为相邻 overlay 的 DOMRect 交集纯辅助，`$3` 为 overflow-style 依赖与允许集合初始化，均无独立 renderer named consumer 或 teardown owner，登记为 generated-local。`docs/renderer-hub-line-classification.json` app-primary reviewedCount 提升至 201（总记录 202）；hub audit 与 focused classification test 已通过。
@@ -1205,3 +1211,8 @@ repository、参数与 signal 透传，共 5 项 focused assertions。
 flag 统一销毁顺序已迁移至 `src/main/browser-page-preload/annotation-preload-disposal.ts`；
 新增 `scripts/test-preload-annotation-preload-disposal.mjs`，覆盖 feature dispose → preview
 clear → capability reset 顺序及重复销毁，共 6 项 focused assertions；已通过 typecheck、verify。
+
+2026-10-05 A1 增量：worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 投影、
+literal pathspec 字节分批、index fingerprint 与 ENOENT 判定已抽至
+`src/main/worker/git-worktree-files-policy.ts`；`git-worktree-files.ts` 保留 Git I/O、稳定性重试和
+fallback 生命周期。新增 `scripts/test-worker-git-worktree-files-policy.mjs`，覆盖 11 项 focused assertions。

@@ -172,6 +172,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-design-snapshot.mjs`](./test-preload-annotation-design-snapshot.mjs)
 - [`test-preload-annotation-design-control-sync.mjs`](./test-preload-annotation-design-control-sync.mjs)
 - [`test-preload-annotation-site-requests.mjs`](./test-preload-annotation-site-requests.mjs)
+- [`test-preload-annotation-site-request-state.mjs`](./test-preload-annotation-site-request-state.mjs)
 - [`test-preload-annotation-url.mjs`](./test-preload-annotation-url.mjs)
 
 - [`test-app-initial-parse-origin-pattern.mjs`](./test-app-initial-parse-origin-pattern.mjs)
@@ -365,6 +366,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-worktree-create.mjs`](./test-worker-git-worktree-create.mjs)
 - [`test-worker-git-worktree-branch-setup-policy.mjs`](./test-worker-git-worktree-branch-setup-policy.mjs)
 - [`test-worker-git-worktree-files.mjs`](./test-worker-git-worktree-files.mjs)
+- [`test-worker-git-worktree-files-policy.mjs`](./test-worker-git-worktree-files-policy.mjs)
 - [`test-worker-git-worktree-copy-files.mjs`](./test-worker-git-worktree-copy-files.mjs)
 - [`test-worker-git-worktree-create-request.mjs`](./test-worker-git-worktree-create-request.mjs)
 - [`test-worker-git-worktree-create-dispatch.mjs`](./test-worker-git-worktree-create-dispatch.mjs)

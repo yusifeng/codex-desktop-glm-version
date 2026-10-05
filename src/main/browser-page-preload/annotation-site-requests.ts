@@ -21,17 +21,15 @@ type AnnotationSiteRequestListener =
 /** Coordinates open-annotation events, permission races, and teardown-safe subscriptions. */
 function createAnnotationSiteRequests(deps: AnnotationSiteRequestsDependencies) {
   let subscriber: AnnotationSiteRequestListener | null = null;
-  let pending: any = null;
   let dispatching = false;
-  let pageHidden = false;
-  let disposed = false;
+  const lifecycle = createAnnotationSiteRequestState();
 
   const clear = () => {
-    pending = null;
+    lifecycle.clear();
   };
 
   const dispatch = (candidate: AnnotationOpenRequestCandidate) => {
-    if (subscriber == null || pageHidden || disposed) return false;
+    if (subscriber == null || lifecycle.pageHidden || lifecycle.disposed) return false;
     const resolved = deps.resolveRequest == null
       ? { resolvedTarget: candidate.resolvedTarget, metadata: candidate.metadata }
       : deps.resolveRequest(candidate, deps.getState());
@@ -51,15 +49,14 @@ function createAnnotationSiteRequests(deps: AnnotationSiteRequestsDependencies) 
 
   const onOpen = (event: any) => {
     if (
-      disposed ||
-      pageHidden ||
-      pending != null ||
-      dispatching ||
-      deps.navigatorRef.userActivation?.isActive !== true
+      !lifecycle.canBegin(
+        deps.navigatorRef.userActivation?.isActive === true,
+        dispatching,
+      )
     ) return;
     const candidate = deps.prepareRequest(event, deps.getState());
     if (candidate == null) return;
-    pending = candidate;
+    if (!lifecycle.begin(candidate)) return;
     const permission = deps.requestPermission();
     if (typeof permission === `boolean`) {
       candidate.request.permissionGranted = permission;
@@ -74,7 +71,7 @@ function createAnnotationSiteRequests(deps: AnnotationSiteRequestsDependencies) 
     event.preventDefault();
     permission.then(
       (allowed) => {
-        if (pending !== candidate || disposed || pageHidden) return;
+        if (!lifecycle.isCurrent(candidate)) return;
         if (!allowed) {
           clear();
           return;
@@ -86,27 +83,24 @@ function createAnnotationSiteRequests(deps: AnnotationSiteRequestsDependencies) 
         }
       },
       () => {
-        if (pending === candidate) clear();
+        lifecycle.clear(candidate);
       },
     );
   };
 
   const onPageHide = (event: any) => {
     if (!event.isTrusted) return;
-    pageHidden = true;
-    clear();
+    lifecycle.hide();
     if (!event.persisted) dispose();
   };
   const onPageShow = (event: any) => {
-    if (event.isTrusted) pageHidden = false;
+    if (event.isTrusted) lifecycle.show();
   };
   const onKeyDown = (event: any) => {
     if (event.isTrusted && event.key === `Escape`) clear();
   };
   const dispose = () => {
-    if (disposed) return;
-    disposed = true;
-    clear();
+    if (!lifecycle.dispose()) return;
     subscriber = null;
     deps.documentRef.removeEventListener(`codex:open-annotation`, onOpen);
     deps.windowRef.removeEventListener(`pagehide`, onPageHide);
@@ -121,17 +115,16 @@ function createAnnotationSiteRequests(deps: AnnotationSiteRequestsDependencies) 
 
   return {
     subscribe(listener: AnnotationSiteRequestListener) {
-      if (!disposed) {
-        subscriber = listener;
-        const candidate = pending;
-        if (candidate?.request?.permissionGranted) {
-          queueMicrotask(() => {
-            if (subscriber === listener && pending === candidate && !disposed) {
-              clear();
-              dispatch(candidate);
-            }
-          });
-        }
+      if (lifecycle.disposed) return () => {};
+      subscriber = listener;
+      const candidate = lifecycle.pending;
+      if (candidate?.request?.permissionGranted) {
+        queueMicrotask(() => {
+          if (subscriber === listener && lifecycle.isCurrent(candidate)) {
+            clear();
+            dispatch(candidate);
+          }
+        });
       }
       return () => {
         if (subscriber === listener) {
@@ -147,3 +140,4 @@ function createAnnotationSiteRequests(deps: AnnotationSiteRequestsDependencies) 
 
 export { createAnnotationSiteRequests };
 if (typeof module !== `undefined`) module.exports = { createAnnotationSiteRequests };
+import { createAnnotationSiteRequestState } from './annotation-site-request-state';
