@@ -7,7 +7,7 @@ function sanitizeAnnotationHit(value: unknown, limits: { maxIdLength: number; ma
     if (raw == null || typeof raw.id !== `string` || raw.id.length === 0 || raw.id.length > limits.maxIdLength || !isSafeAnnotationText(raw.id)) return undefined;
     const result: Record<string, unknown> = { id: raw.id };
     if (typeof raw.name === `string` && raw.name.trim().length > 0 && raw.name.length <= 128 && isSafeAnnotationText(raw.name)) result.name = raw.name;
-    if (typeof raw.role === `string` && raw.role.length <= limits.maxRoleLength && new RegExp(limits.rolePattern).test(raw.role)) result.role = raw.role;
+    if (typeof raw.role === `string` && isSafeAnnotationRole(raw.role, limits.maxRoleLength, limits.rolePattern)) result.role = raw.role;
     if (raw.rect !== undefined) {
       const rect = cloneRecord(raw.rect, 4);
       if (rect == null || typeof rect.x !== `number` || !Number.isFinite(rect.x) || typeof rect.y !== `number` || !Number.isFinite(rect.y) || typeof rect.width !== `number` || !Number.isFinite(rect.width) || rect.width <= 0 || typeof rect.height !== `number` || !Number.isFinite(rect.height) || rect.height <= 0) return undefined;
@@ -40,3 +40,4 @@ import { isValidAnnotationHitTestRequest } from "./annotation-hit-test-request-p
 import { cloneAnnotationRecord } from "./annotation-record-clone-policy";
 import { isSafeAnnotationText } from "./annotation-safe-text-policy";
 import { isSafeAnnotationMetadataKey } from "./annotation-metadata-key-policy";
+import { isSafeAnnotationRole } from "./annotation-role-policy";
