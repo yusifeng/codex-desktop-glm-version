@@ -7,6 +7,8 @@ type HandoffDestinationDependencies = {
   checkoutBranch: (params: any, gitManager: any, host: any) => Promise<any>;
 };
 
+import { resolveDestinationCheckoutTarget } from './git-handoff-destination-policy';
+
 async function resolveCleanWorktreeCommit(
   repository: any,
   signal: AbortSignal,
@@ -37,25 +39,23 @@ async function prepareHandoffDestinationCheckout(
   repository.invalidateGitReadCachesForRepoChange(`head`);
   const currentBranch = await deps.getCurrentBranch(repository);
   if (currentBranch !== params.branch) return { previousBranch: null, error: null };
-
   const defaultBranch = (await deps.getDefaultRemoteBranch(repository))?.branch ?? null;
-  let checkoutTarget = defaultBranch;
-  if (defaultBranch === params.branch) {
-    const cleanCommit = params.canDetachDefaultBranch
-      ? await resolveCleanWorktreeCommit(repository, params.signal, deps)
-      : null;
-    checkoutTarget = cleanCommit === params.sourceHeadSha ? cleanCommit : null;
-  }
-  if (checkoutTarget == null) {
+  const cleanCommit = defaultBranch === params.branch && params.canDetachDefaultBranch
+    ? await resolveCleanWorktreeCommit(repository, params.signal, deps)
+    : null;
+  const target = resolveDestinationCheckoutTarget(
+    currentBranch, params.branch, defaultBranch, params.canDetachDefaultBranch,
+    cleanCommit, params.sourceHeadSha,
+  );
+  if (target.error != null) {
     return {
       previousBranch: null,
-      error: {
-        message: `Destination checkout is already using the handoff branch, and Codex could not switch it to a default branch`,
-      },
+      error: { message: target.error },
     };
   }
+  if (target.checkoutTarget == null) return { previousBranch: null, error: null };
   const checkout = await deps.checkoutBranch(
-    { cwd: params.cwd, branch: checkoutTarget, stashUncommitted: false },
+    { cwd: params.cwd, branch: target.checkoutTarget, stashUncommitted: false },
     params.gitManager,
     params.host,
   );

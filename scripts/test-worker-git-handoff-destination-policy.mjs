@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { resolveDestinationCheckoutTarget } = require("../app/.vite/build/worker/git-handoff-destination-policy.js");
+let assertions = 0;
+const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+deepEqual(resolveDestinationCheckoutTarget("feature", "handoff", "main", false, null, "sha"), { checkoutTarget: null, error: null });
+deepEqual(resolveDestinationCheckoutTarget("handoff", "handoff", "main", false, null, "sha"), { checkoutTarget: "main", error: null });
+deepEqual(resolveDestinationCheckoutTarget("handoff", "handoff", "handoff", true, "sha", "sha"), { checkoutTarget: "sha", error: null });
+deepEqual(resolveDestinationCheckoutTarget("handoff", "handoff", "handoff", true, "other", "sha").error != null, true);
+console.log(`${assertions} worker git handoff destination policy assertions passed`);

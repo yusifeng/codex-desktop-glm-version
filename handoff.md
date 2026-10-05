@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git handoff destination 的当前分支/default branch/可 detach clean commit 到 checkout target 的纯策略已迁移至 `src/main/worker/git-handoff-destination-policy.ts`；destination runtime 保留 repository cache invalidation、status/head 查询与 checkout I/O 编排。新增 `scripts/test-worker-git-handoff-destination-policy.mjs` 覆盖 4 项 focused assertions；原 destination 回归 19 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation page identity 的 throwing-safe URL parser 已抽至
+`src/main/browser-page-preload/annotation-url-parser-policy.ts`；URL equivalence policy 仅保留
+协议/路径/查询投影。新增 `scripts/test-preload-annotation-url-parser-policy.mjs` 覆盖 3 项有效、
+无效与非字符串输入断言；原 URL 回归 8 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git branch metadata 的 `refs/heads/` 本地分支引用剥离与 branch normalizer 接口已迁移至 `src/main/worker/git-branch-metadata-policy.ts`；metadata runtime 保留 repository、snapshot 与 default-remote 查询编排。新增 `scripts/test-worker-git-branch-metadata-policy.mjs` 覆盖 3 项 focused assertions；原 branch-metadata 回归 27 项、build 与 typecheck 已通过。
 
 2026-10-05 A2 继续批次：annotation anchor 的 document-kind/page-url 识别纯策略已抽至
