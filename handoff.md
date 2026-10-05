@@ -1070,6 +1070,8 @@ marker 与 selection 清理判定；`annotation-sync-state.ts` 接回该策略�
 
 2026-10-05 A5 继续批次：app-shared 未消费导出 `hBe`/`$U` 的合并冲突状态纯策略已迁移至 `src/renderer/app-shared/runtime/merge-conflict-state.ts`；逻辑仅规范化 `mergeable` 与 `mergeStateStatus` 并投影冲突 banner 状态，无 JSX、store 或生命周期副作用。新增 `scripts/test-renderer-merge-conflict-state.mjs` 覆盖大小写、冲突优先级、未知值与空输入共 6 项断言；兼容导出仍保留在 hub，逐行分类证据登记；app-primary reviewedCount 保持 175。
 
+2026-10-05 A5 继续批次：app-primary 未消费区新增 `rO`/`ng`、`aO`/`rg`、`lO`/`eg`、`mO`/`Yh` 四条逐行分类证据，分别判定为生成局部 composer mode policy、默认快照 bootstrap、查询 bootstrap 与 plugin context bootstrap；均无独立 named consumer 或 teardown 边界，登记于 `docs/renderer-hub-line-classification.json`。`scripts/test-renderer-hub-classification.mjs` reviewedCount 从 175 提升至 179；审计脚本消费计数保持 74/914，未消费区继续显式保留。
+
 2026-10-05 A1 增量：Git worker 请求 context 投影（root/cwd、review source 与 failure 结果判定）抽至 `src/main/worker/git-request-context-policy.ts`，由 `scripts/test-worker-git-request-context-policy.mjs` 覆盖 12 项断言；已通过 build、verify-chunks 与 typecheck。
 
 2026-10-05 A1 增量：`list-worktrees` 请求的 repository 可空解析与列表委派边界已由

@@ -1752,5 +1752,45 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/merge-conflict-state.ts",
     "evidence": "The helper normalizes mergeable and merge-state metadata into conflicts/unknown banner states. It is deterministic policy logic with no JSX, store, registration, or teardown side effects; the aggregate alias remains as a compatibility export."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "ng",
+    "sourceSymbol": "rO",
+    "startLine": 4335,
+    "endLine": 4362,
+    "classification": "generated-local-composer-mode-policy",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The composer mode fallback selector is a generated local policy consumed only by the adjacent availability bootstrap; it has no independently named renderer consumer or teardown boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "rg",
+    "sourceSymbol": "aO",
+    "startLine": 4356,
+    "endLine": 4366,
+    "classification": "generated-local-composer-default-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer seeds the generated composer availability default snapshot and is coupled to neighboring bootstrap state; no independent renderer consumer owns this export."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "eg",
+    "sourceSymbol": "lO",
+    "startLine": 4368,
+    "endLine": 4399,
+    "classification": "generated-local-composer-query-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer registers generated composer Git/query atoms and operation-source mapping as one local bootstrap sequence; no standalone named consumer or teardown boundary exists."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Yh",
+    "sourceSymbol": "mO",
+    "startLine": 4433,
+    "endLine": 4438,
+    "classification": "generated-local-plugin-context-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer creates the generated plugin marketplace context and metadata map for its adjacent surface; it has no independently named renderer consumer or lifecycle owner."
   }
 ]
