@@ -5,17 +5,16 @@ function createAnnotationControlHandle(
   normalizeTargets: (value: unknown) => unknown[],
   emit: (type: `update` | `dispose`, detail: Record<string, unknown>) => boolean,
 ): Readonly<{ update(value: { targets?: unknown }): void; dispose(): void }> {
-  let disposed = false;
+  const state = createAnnotationControlHandleState();
   return Object.freeze({
     update(value: { targets?: unknown }) {
-      if (disposed) throw new TypeError(`Annotation controls have been disposed`);
+      if (state.disposed) throw new TypeError(`Annotation controls have been disposed`);
       const payload = serialize(value);
       const targets = value.targets === undefined ? undefined : normalizeTargets(value.targets);
       if (!emit(`update`, { id, payload, targets })) throw new TypeError(`Invalid annotation controls update`);
     },
     dispose() {
-      if (disposed) return;
-      disposed = true;
+      if (!state.dispose()) return;
       emit(`dispose`, { id });
     },
   });
@@ -23,3 +22,4 @@ function createAnnotationControlHandle(
 
 export { createAnnotationControlHandle };
 if (typeof module !== `undefined`) module.exports = { createAnnotationControlHandle };
+import { createAnnotationControlHandleState } from "./annotation-control-handle-state";
