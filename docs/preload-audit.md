@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation document-root policy
+
+`documentElement/body` 根节点身份判定（原 `rc`，5120-7259 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-document-root-policy.ts`；入口注入当前 document
+保留语义。新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation anchor root policy
 
 顶层 `html/body` element anchor 判定（原 `rd`，5120-7259 业务工具段）已迁移至

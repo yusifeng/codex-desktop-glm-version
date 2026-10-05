@@ -4171,7 +4171,7 @@ function ec(e) {
   return t;
 }
 function rc(e) {
-  return e === document.documentElement || e === document.body;
+  return isAnnotationDocumentRoot(e, document);
 }
 function F(e) {
   if (typeof e != `object` || !e) return !1;
@@ -6165,6 +6165,7 @@ var { resolveAnnotationFrameDocumentUrl } = require("./browser-page-preload/anno
 var { projectAnnotationAnchorPoint } = require("./browser-page-preload/annotation-anchor-point-projection");
 var { scoreAnnotationAnchorCandidate } = require("./browser-page-preload/annotation-anchor-candidate-score");
 var { isTopLevelAnnotationRoot } = require("./browser-page-preload/annotation-anchor-root-policy");
+var { isAnnotationDocumentRoot } = require("./browser-page-preload/annotation-document-root-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
