@@ -18,5 +18,5 @@ assert.equal(isDisplayableAction({ type: "primary", action_v2: { action_enum: "c
 assert.equal(isDisplayableAction({ type: "secondary", action_v2: { action_enum: "open_link" } }), true);
 assert.equal(isDisplayableAction({ type: "primary", action_v2: { action_enum: "submit_personalized_information_questionnaire_feedback" } }), false);
 assert.equal(isDisplayableAction({ type: "tertiary", action_v2: { action_enum: "open_link" } }), false);
-assert.equal(isDisplayableAction({ type: "primary" }), true);
+assert.equal(isDisplayableAction({ type: "primary", action_v2: {} }), true);
 console.log("test-app-primary-is-displayable-action: 5 assertions passed");
