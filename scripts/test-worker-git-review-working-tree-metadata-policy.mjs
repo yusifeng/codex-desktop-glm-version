@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { parseUntrackedDiffMetadata, parseBatchedUntrackedDiffMetadata } = require("../app/.vite/build/worker/git-review-working-tree-metadata-policy.js");
+let assertions = 0;
+const equal = (a,b)=>{ assertions++; assert.deepEqual(a,b); };
+equal(parseUntrackedDiffMetadata(":000000 100644 0000000 abcdef0 A\0-\t-\t\0foo\0"), { additions:null, deletions:null, mode:"100644" });
+const platformPath = { sep:"/", normalize:v=>v.replaceAll("//","/"), isAbsolute:v=>v.startsWith("/"), resolve:(r,v)=>v.startsWith("/")?v:`${r}/${v}`, join:(r,v)=>`${r}/${v}` };
+equal(parseBatchedUntrackedDiffMetadata(":000000 100644 0000000000000000000000000000000000000000 abcdef0123456789012345678901234567890123 A\0/root/a\0" + "0\t2\t\0/dev/null\0/root/a\0", "/root", ["a"], platformPath, { normalizePathFromRoot:()=>"a" }), new Map([["a", { additions:0, deletions:2, mode:"100644" }]]));
+assert.throws(()=>parseUntrackedDiffMetadata("bad"), /Failed to parse/); assertions++;
+assert.throws(()=>parseBatchedUntrackedDiffMetadata(":000000 100644 0 1 A\0/root/other\0", "/root", ["a"], platformPath, { normalizePathFromRoot:()=>"other" }), /Unexpected/); assertions++;
+console.log(`git-review-working-tree-metadata-policy focused assertions: ${assertions}`);

@@ -5,6 +5,11 @@
 WSL UNC distro、盘符与 extended UNC 归一化，新增 `scripts/test-worker-host-path-policy.mjs`
 提供 12 项 focused assertions。
 
+最新增量：worker review working-tree diff metadata 的 batched/no-index Git 输出解析与
+路径归属校验已迁移至 `src/main/worker/git-review-working-tree-metadata-policy.ts`；入口仅保留
+异步批处理与 Git I/O 编排，新增 `scripts/test-worker-git-review-working-tree-metadata-policy.mjs`
+覆盖 4 项 focused assertions。
+
 最新增量：annotation preload bridge 的挂载前消息缓冲、挂载后重放、host listener
 订阅/解除订阅及 editor active 状态副作用已迁移并补齐 focused 回归；桥接层仍保留
 IPC 与 registry/request 依赖适配，由 `scripts/test-preload-annotation-preload-bridge.mjs`
@@ -990,6 +995,11 @@ site-annotation/tweaks capability 的严格布尔归一化集中在纯状态投�
 泄漏 suspended 状态，入口继续保留 React/render 副作用。由
 `scripts/test-preload-annotation-ui-mode-policy.mjs` 覆盖 comment/browse、null 与 malformed
 输入，共 5 项 focused assertions。
+2026-10-05 A2 增量：annotation host sync 的 capability/agent/comment-suspended 生命周期门控已抽至
+`src/main/browser-page-preload/annotation-sync-transition.ts`，统一 dispose、request/preview 清理、
+marker 与 selection 清理判定；`annotation-sync-state.ts` 接回该策略并保留既有副作用顺序。
+新增 `scripts/test-preload-annotation-sync-transition.mjs`，覆盖正常、能力关闭、暂停、browse 与空消息边界，
+共 19 项 focused assertions。
 2026-10-05 A5 继续批次：app-primary 新增 `A`/`i9`、`Af`/`pF`、`Al`/`ZH`、`Au`/`CB` 四条逐行分类证据，均判定为生成局部 bootstrap/initializer（无独立 named consumer 或 teardown 边界），登记于 `docs/renderer-hub-line-classification.json`。`scripts/test-renderer-hub-classification.mjs` 期望 reviewedCount 从 145 同步至 149；审计脚本保持 74/914 consumed、840 unconsumed。
 
 2026-10-05 A1 增量：Git worker 请求 context 投影（root/cwd、review source 与 failure 结果判定）抽至 `src/main/worker/git-request-context-policy.ts`，由 `scripts/test-worker-git-request-context-policy.mjs` 覆盖 12 项断言；已通过 build、verify-chunks 与 typecheck。
