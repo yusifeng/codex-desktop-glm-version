@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation URL parser `yd` 已复用
+`annotation-url-parser-policy.parseAnnotationUrl`，删除 preload 重复实现；既有 parser regression、
+build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation anchor `bd` clamp helper 已复用
 `annotation-surface-geometry.clampAnnotationCoordinate`，删除 preload 重复实现；geometry
 regression、build 与 typecheck 已通过。
@@ -82,6 +86,10 @@ unreviewed 导出由 10928 降至 10927，focused test 与 typecheck 已通过�
 布局分支纯判定已迁移至 `src/renderer/app-primary/runtime/is-compact-window-enabled.ts`；新增
 `scripts/test-app-primary-is-compact-window-enabled.mjs` 覆盖 2 项 focused assertions，typecheck 与
 focused test 已通过。
+
+2026-10-06 A5 继续批次：app-primary 未消费导出 `ah`（内部 `Xke`，源码 4831--4833）的 handoff
+return-target 选择纯策略已迁移至 `src/renderer/app-primary/runtime/select-handoff-return-target.ts`；
+新增 focused test 2 项断言，typecheck 与 focused test 已通过。
 
 2026-10-06 A5 继续批次：app-primary 未消费导出 `br`（内部 `Nnt`，源码 49108--49110）的 manual
 approval threshold fallback 纯策略已迁移至 `src/renderer/app-primary/runtime/resolve-manual-approval-threshold.ts`；
