@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation nearby-text direct/context fallback 已迁移至
+`src/main/browser-page-preload/annotation-nearby-text-policy.ts`；原 `xc` 入口保留兼容委托，
+新增 3 项 focused assertions，build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation accessible label 的 aria/text/tag 投影已迁移至
 `src/main/browser-page-preload/annotation-accessible-label-policy.ts`；原 `yc` 入口保留兼容委托，
 新增 3 项 focused assertions，build 与 typecheck 已通过。

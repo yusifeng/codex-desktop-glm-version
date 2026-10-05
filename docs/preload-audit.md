@@ -1,5 +1,11 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation nearby-text policy
+
+Annotation nearby text 的直接 label、语义容器回退与元素资格判定（原 `xc`，3863-5049 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-nearby-text-policy.ts`；DOM 查询通过依赖注入保留。新增 3 项
+focused assertions，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation accessible label policy
 
 Annotation target label 的 aria-label、文本 fallback 与 tagName 投影（原 `yc`，3863-5049
