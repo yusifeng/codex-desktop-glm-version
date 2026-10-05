@@ -2151,5 +2151,15 @@
     "classification": "generated-local-signal-init",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The initializer creates the adjacent generated plan capability signals and has no independent renderer named consumer, store ownership, or teardown boundary; it remains local aggregate wiring."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Jd",
+    "sourceSymbol": "FMe",
+    "startLine": 17195,
+    "endLine": 17208,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/resolve-box-file-preview.ts",
+    "evidence": "Box library file preview resolution validates the external-box identifier, provider, and note MIME/name policy before projecting preview/source URLs. It is a deterministic URL policy with no JSX, store, or lifecycle side effects and is covered by a focused runtime test."
   }
 ]

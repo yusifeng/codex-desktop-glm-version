@@ -1029,3 +1029,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-extract-skill-kind-document.mjs`](./test-app-primary-extract-skill-kind-document.mjs)
 - [`test-preload-annotation-surface-registry-state.mjs`](./test-preload-annotation-surface-registry-state.mjs)
 - [`test-app-primary-derive-cloud-unavailable-reason.mjs`](./test-app-primary-derive-cloud-unavailable-reason.mjs)
+- [`test-app-primary-resolve-box-file-preview.mjs`](./test-app-primary-resolve-box-file-preview.mjs)
