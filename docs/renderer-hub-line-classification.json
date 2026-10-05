@@ -1852,5 +1852,35 @@
     "classification": "generated-local-helper",
     "module": "src/webview/assets/app-primary-d66705000d76.ts",
     "evidence": "The markdown heading projection parses the adjacent editor document and returns its first shallow heading; parser state and traversal are local to that generated surface with no standalone renderer lifecycle."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "wu",
+    "sourceSymbol": "nPe",
+    "startLine": 21837,
+    "endLine": 21842,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper projects an editor document selection into a native DOM Range for the neighboring generated markdown surface; it has no independently named renderer consumer or teardown owner."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Eu",
+    "sourceSymbol": "EB",
+    "startLine": 21893,
+    "endLine": 21897,
+    "classification": "generated-local-editor-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The lazy initializer wires the generated editor serializer/parser dependencies immediately around the markdown selection helpers; ordering and ownership remain local to the adjacent editor surface with no standalone lifecycle boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "xu",
+    "sourceSymbol": "OB",
+    "startLine": 21914,
+    "endLine": 21918,
+    "classification": "generated-local-markdown-parser-bootstrap",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The initializer constructs and freezes the markdown parser used by the neighboring generated editor heading projection; it has no independent renderer consumer or teardown contract."
   }
 ]
