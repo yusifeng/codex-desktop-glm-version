@@ -9,17 +9,13 @@ type OriginDiscoveryDependencies = {
   warnOriginFailure: (error: unknown) => void;
 };
 
-function uniqueDiscoveryDirectories(directories: string[], normalizePath: (path: string) => string) {
-  const unique = new Map<string, string>();
-  for (const directory of directories) {
-    const normalized = normalizePath(directory);
-    if (!unique.has(normalized)) unique.set(normalized, directory);
-  }
-  return Array.from(unique.values());
-}
+import {
+  canUseDiscoveryPathApi,
+  uniqueDiscoveryDirectories,
+} from './git-origin-discovery-policy';
 
 async function resolveDiscoveryPathApi(deps: OriginDiscoveryDependencies) {
-  if (!deps.host.isLocal || (deps.platform !== `darwin` && deps.platform !== `linux`) || deps.environment.GIT_DIR !== undefined || deps.environment.GIT_WORK_TREE !== undefined) return null;
+  if (!canUseDiscoveryPathApi(deps.host.isLocal, deps.platform, deps.environment)) return null;
   try {
     const expectedOs = deps.platform === `darwin` ? `macos` : deps.platform;
     const [hostOs, pathApi] = await Promise.all([deps.host.platformOs(), deps.host.platformPath()]);
