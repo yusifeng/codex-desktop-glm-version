@@ -70,6 +70,11 @@ export interface BrowserBackendState {
   sessionId: string;
 }
 
+export interface BrowserBackendFactoryResult {
+  api: unknown;
+  pipeDispose?: () => void;
+}
+
 /** delegate 面（ZYe 转发目标——IAB manager）。 */
 export interface BrowserSessionDelegate {
   closePageForBrowserUse(request: Record<string, unknown>): Promise<void>;
@@ -94,6 +99,8 @@ export class BrowserSessionRegistry {
   private debugEvents: BrowserSessionDebugEvent[] = [];
   private pageRecords = new Map<string, BrowserPageRecord>();
   private delegate: BrowserSessionDelegate | null = null;
+
+  constructor(private readonly createBackend?: (sessionId: string) => Promise<BrowserBackendFactoryResult> | BrowserBackendFactoryResult) {}
 
   /** delegate 装配（原 `setDelegate`）。 */
   setDelegate(delegate: BrowserSessionDelegate): void {
@@ -138,7 +145,8 @@ export class BrowserSessionRegistry {
   async ensureBackendForSession(sessionId: string): Promise<BrowserBackendState> {
     const existing = this.backendStatesBySessionId.get(sessionId);
     if (existing != null) return existing;
-    const state: BrowserBackendState = { api: null, createdAtMs: Date.now(), sessionId };
+    const created = this.createBackend == null ? { api: null } : await this.createBackend(sessionId);
+    const state: BrowserBackendState = { ...created, createdAtMs: Date.now(), sessionId };
     this.backendStatesBySessionId.set(sessionId, state);
     this.recordDebugEvent(sessionId, "ensure-backend");
     return state;

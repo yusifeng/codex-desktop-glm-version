@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { BrowserSessionRegistry } from "../app/.vite/build/main-app/browser-use/session-registry.js";
 
-const registry = new BrowserSessionRegistry();
+const createdSessions = [];
+let pipeDisposals = 0;
+const registry = new BrowserSessionRegistry(async (sessionId) => {
+  createdSessions.push(sessionId);
+  return { api: { sessionId }, pipeDispose: () => { pipeDisposals += 1; } };
+});
 const route = { conversationId: "conversation-1", routeKey: "route-1", windowId: 7 };
 registry.captureSessionRoute(route);
 assert.deepEqual(registry.resolveBrowserRoute("route-1"), route);
@@ -9,6 +14,8 @@ assert.equal(registry.resolveBrowserRoute("missing"), null);
 
 const first = await registry.ensureBackendForSession("conversation-1");
 assert.equal((await registry.ensureBackendForSession("conversation-1")), first);
+assert.deepEqual(createdSessions, ["conversation-1"]);
+assert.deepEqual(first.api, { sessionId: "conversation-1" });
 assert.equal(registry.canServeSession("conversation-1"), true);
 await registry.moveBackendSession("conversation-1", "conversation-2");
 assert.equal(registry.canServeSession("conversation-1"), false);
@@ -28,6 +35,7 @@ registry.forgetPageRecord("page-1");
 assert.equal(registry.getPageRecordForConversation("conversation-2"), null);
 await registry.disposeBackendForSession("conversation-2");
 assert.equal(registry.canServeSession("conversation-2"), false);
+assert.equal(pipeDisposals, 1);
 await registry.disposeConversation("conversation-1");
 assert.equal(registry.resolveBrowserRoute("route-1"), null);
 
