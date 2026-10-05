@@ -1,0 +1,4 @@
+const GIT_COMMANDS = new Set("--version.add.apply.archive.blame.branch.cat-file.check-attr.check-ignore.check-ref-format.checkout.cherry-pick.clean.clone.commit.config.count-objects.diff.fetch.for-each-ref.fsck.gc.grep.hash-object.init.log.ls-files.ls-remote.merge.merge-base.mv.pull.push.rebase.remote.reset.restore.rev-list.rev-parse.rm.show.show-ref.sparse-checkout.stash.status.submodule.switch.tag.update-index.version.worktree".split("."));
+function gitSubcommand(args: unknown, startIndex: number): string { if (!Array.isArray(args)) return "other"; let index=startIndex; while(args[index]==="-c"&&args[index+1]!=null) index+=2; const command=args[index]; return typeof command === "string" && GIT_COMMANDS.has(command) ? command : "other"; }
+export { gitSubcommand };
+if (typeof module !== `undefined`) module.exports = { gitSubcommand };

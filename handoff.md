@@ -1135,7 +1135,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | B1 | tsconfig 吞 586 万行 transform-only 文件 | **已完成**：`exclude: ["src/webview/assets"]` 已生效，语义源码继续纳入 typecheck |
 | B2 | 原版对照文件已迁出 | 10 个主进程原始 chunk 位于 `.reference/originals/main/`，`scripts/build.mjs` 映射回历史输出名并已通过 build/verify/smoke |
 | B3 | README 过时 | **已完成**：README 记录 11 个主进程重写 chunk、1874 个 renderer chunks、双轨构建和验证入口 |
-| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1103 个 `scripts/test-*.mjs` 脚本 |
+| B4 | 测试脚本无索引 | **已完成**：`scripts/test-index.md` 当前索引全部 1109 个 `scripts/test-*.mjs` 脚本 |
 | B5 | 端到端验证深度浅 | **已完成**：smoke 验证主窗口 HTML 加载、app-server 握手，并过滤 renderer 致命错误；关键日志采用宽限轮询 |
 
 ---
@@ -1217,7 +1217,7 @@ runtime/vendor 保留登记。参考已重写的 `preload/`、`sandbox-preload/`
    目录导览、验证命令、架构图一页：主进程模型/renderer 入口链/
    chunk 拓扑）。读者定位：第一次打开仓库的工程师，10 分钟内知道
    "这是什么、怎么构建、去哪里改"。
-4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1103 个脚本已登记至
+4. **测试索引（已完成）**：`scripts/test-*.mjs` 全部 1109 个脚本已登记至
    `scripts/test-index.md`，并按近期语义提取套件和现有套件分组。
 
 ### T7 · 端到端验证升级（B5，已完成）
@@ -1679,3 +1679,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：branch comparison 的 `rev-list --left-right --count` 两列解析与 equal/left-ahead/right-ahead/diverged 状态协议已迁移至 `src/main/worker/git-branch-comparison-policy.ts`；comparison 入口保留 query/Git I/O 编排。新增 `scripts/test-worker-git-branch-comparison-policy.mjs` 覆盖 7 项 focused assertions；原回归 21 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：turn diff snapshot 的 NUL 分隔 porcelain status 解析与 tracked/untracked 投影已迁移至 `src/main/worker/git-turn-diff-status-policy.ts`；snapshot 入口保留 status 查询、临时 index 与 stage 副作用。新增 `scripts/test-worker-git-turn-diff-status-policy.mjs` 覆盖 4 项 focused assertions；原回归 21 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：Git argv 中 `-c key=value` 前置项跳过、已知 Git subcommand 白名单与 unknown fallback 解析已迁移至 `src/main/worker/git-subcommand-policy.ts`；git-errors 保留错误分类正则。新增 `scripts/test-worker-git-subcommand-policy.mjs` 覆盖 5 项 focused assertions；原 git-errors 回归 5 项、build 与 typecheck 已通过。

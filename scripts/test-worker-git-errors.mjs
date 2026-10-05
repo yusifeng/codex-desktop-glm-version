@@ -2,11 +2,12 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import * as esbuild from "esbuild";
+import { createRequire } from "node:module";
 
 const source = await fs.readFile("src/main/worker/git-errors.ts", "utf8");
 const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
 const module = { exports: {} };
-new Function("module", "exports", code)(module, module.exports);
+new Function("module", "exports", "require", code)(module, module.exports, createRequire(new URL("../app/.vite/build/worker/git-subcommand-policy.js", import.meta.url)));
 const { classifyGitError, gitSubcommand } = module.exports;
 assert.equal(classifyGitError("fatal: not a git repository"), "repository_missing");
 assert.equal(classifyGitError("fatal: Authentication failed for origin"), "authentication");
