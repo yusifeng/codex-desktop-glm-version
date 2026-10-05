@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+最新增量：annotation preload 的初始化生命周期（host-message IPC listener、secure-context
+policy 同步、DOMContentLoaded 一次性 runtime mount 与 pagehide listener 注册）已迁移至
+`src/main/browser-page-preload/annotation-preload-lifecycle.ts`；入口仅保留依赖组装和状态副作用，
+由 `scripts/test-preload-annotation-preload-lifecycle.mjs` 覆盖 loading/complete、同源安全上下文
+与 listener 注册，共 8 项 focused assertions。
+
 最新增量：worker review working-tree metadata 的未跟踪路径批处理上限与 Git
 兼容性降级判定已迁移至 `src/main/worker/git-review-working-tree-policy.ts`；入口仅保留异步
 批处理编排，新增 `scripts/test-worker-git-review-working-tree-policy.mjs` 覆盖 7 项 focused

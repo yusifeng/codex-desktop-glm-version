@@ -5,6 +5,7 @@ import { createAnnotationFeatureLifecycle } from "./annotation-feature-lifecycle
 import { applyAnnotationSyncState } from "./annotation-sync-state";
 import { createAnnotationModeToggleCommand, shouldClearAnnotationRequestsForToggle } from "./annotation-mode-command-policy";
 import { handleAnnotationPagehide } from "./annotation-pagehide";
+import { initializeAnnotationPreload } from "./annotation-preload-lifecycle";
 
 type AnnotationPreloadRuntimeDependencies = {
   ipcRenderer: any;
@@ -152,16 +153,17 @@ function createAnnotationPreloadRuntime(deps: AnnotationPreloadRuntimeDependenci
   };
 
   const initialize = () => {
-    deps.ipcRenderer.on(deps.channels.hostMessage, handleHostMessage);
-    if (deps.globalLike.isSecureContext === true && deps.windowLike === deps.windowLike.top) {
-      initializeFeatures(deps.ipcRenderer.sendSync(deps.channels.policy));
-    }
-    if (deps.documentLike.readyState === `loading`) {
-      deps.windowLike.addEventListener(`DOMContentLoaded`, runtimeMount.mount, { once: true });
-    } else {
-      runtimeMount.mount();
-    }
-    deps.windowLike.addEventListener(`pagehide`, onPageHide);
+    initializeAnnotationPreload({
+      ipcRenderer: deps.ipcRenderer,
+      windowLike: deps.windowLike,
+      documentLike: deps.documentLike,
+      globalLike: deps.globalLike,
+      channels: deps.channels,
+      initializeFeatures,
+      handleHostMessage,
+      mount: runtimeMount.mount,
+      onPageHide,
+    });
   };
 
   return { initialize };

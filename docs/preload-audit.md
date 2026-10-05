@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation preload initialization lifecycle
+
+批注 preload 的 host-message listener、secure-context policy 初始化、DOMContentLoaded 一次性
+挂载与 pagehide listener 注册已迁移至 `src/main/browser-page-preload/annotation-preload-lifecycle.ts`。
+入口继续负责状态和副作用依赖组装；`scripts/test-preload-annotation-preload-lifecycle.mjs` 覆盖
+loading/complete 文档、同源安全上下文与 listener 注册，共 8 项 focused assertions。
+
 ## 已抽取边界
 
 WebMCP 协议闭环（原 30,084-30,216 行）已迁移至
