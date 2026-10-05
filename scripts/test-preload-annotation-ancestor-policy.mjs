@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { isAnnotationDescendant } = require("../app/.vite/build/browser-page-preload/annotation-ancestor-policy.js");
+const parent = new Map(); const root = {}; const child = {}; const leaf = {};
+parent.set(leaf, child); parent.set(child, root); parent.set(root, null);
+const getParent = (value) => parent.get(value) ?? null;
+assert.equal(isAnnotationDescendant(root, leaf, getParent), true);
+assert.equal(isAnnotationDescendant(child, root, getParent), false);
+assert.equal(isAnnotationDescendant(leaf, leaf, getParent), true);
+console.log("test-preload-annotation-ancestor-policy: 3 assertions passed");

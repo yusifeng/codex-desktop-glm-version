@@ -1,3 +1,5 @@
+import { isAnnotationDescendant } from "./annotation-ancestor-policy";
+
 type AnnotationPreviewVisibilityDependencies = {
   getDocument?: (value: any) => any;
   getParent?: (value: any) => any;
@@ -5,14 +7,6 @@ type AnnotationPreviewVisibilityDependencies = {
   getFrameElement?: (view: any) => any;
   getOwnerWindow?: (element: any) => any;
 };
-
-const isDescendant = (ancestor: any, value: any, getParent: (value: any) => any) => {
-  for (let current = value; current != null; current = getParent(current)) {
-    if (current === ancestor) return true;
-  }
-  return false;
-};
-
 
 /**
  * Builds the visibility predicate used by the annotation preview overlay.
@@ -51,11 +45,11 @@ const createAnnotationPreviewVisibilityPredicate = (
     for (let current = value; current != null; ) {
       const state = byDocument.get(current.ownerDocument);
       if (state != null) {
-        for (const boundary of state.boundaries) if (!isDescendant(boundary, current, getParent)) return false;
+        for (const boundary of state.boundaries) if (!isAnnotationDescendant(boundary, current, getParent)) return false;
         let rect: any;
         for (const popover of state.popovers) {
           if (
-            !isDescendant(popover.element, current, getParent) &&
+            !isAnnotationDescendant(popover.element, current, getParent) &&
             ((rect ??= current.getBoundingClientRect()),
               rect.left < popover.rect.right &&
                 rect.right > popover.rect.left &&
