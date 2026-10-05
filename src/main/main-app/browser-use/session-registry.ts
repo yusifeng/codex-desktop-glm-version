@@ -179,6 +179,25 @@ export class BrowserSessionRegistry {
     this.pageRecords.set(record.pageKey, record);
   }
 
+  recordPageSnapshot(record: BrowserPageRecord): void {
+    const previous = this.pageRecords.get(record.pageKey);
+    this.pageRecords.set(record.pageKey, { ...previous, ...record });
+  }
+
+  recordPageClosed(record: Pick<BrowserPageRecord, "pageKey">): void {
+    this.forgetPageRecord(record.pageKey);
+  }
+
+  recordPageReleased(record: Pick<BrowserPageRecord, "pageKey">): void {
+    this.forgetPageRecord(record.pageKey);
+  }
+
+  recordPageTornDown(record: { pageKey: string; guestWebContentsId?: number }): void {
+    const previous = this.pageRecords.get(record.pageKey);
+    if (previous == null) return;
+    this.pageRecords.set(record.pageKey, { ...previous, snapshot: { ...(previous.snapshot ?? {}), guestWebContentsId: null } });
+  }
+
   /** 页面记录遗忘（原 `forgetPageRecord`）。 */
   forgetPageRecord(pageKey: string): void {
     this.pageRecords.delete(pageKey);
@@ -195,5 +214,13 @@ export class BrowserSessionRegistry {
   /** browser 路由解析（原 `resolveBrowserRoute`）。 */
   resolveBrowserRoute(routeKey: string): BrowserSessionRoute | null {
     return this.sessionRoutes.get(routeKey) ?? null;
+  }
+
+  getBrowserRouteForSession(sessionId: string): BrowserSessionRoute | null {
+    return this.sessionRoutes.get(sessionId) ?? null;
+  }
+
+  isSubagentBrowserUseRoute(routeKey: string): boolean {
+    return routeKey.startsWith("local-chatgpt:") && this.sessionRoutes.has(routeKey);
   }
 }
