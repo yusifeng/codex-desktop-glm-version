@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git blame porcelain 的作者登录名提取、提交元数据缓存与行记录投影
+纯策略已迁移至 `src/main/worker/git-blame-file-policy.ts`；blame 运行时保留仓库路径、Git
+查询、origin URL 与错误生命周期编排，并继续兼容导出解析 helper。新增
+`scripts/test-worker-git-blame-file-policy.mjs` 覆盖 5 项 focused assertions；原 29 项
+blame-file 回归、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git turn-diff capture 的 checkpoint/capture ref 命名、时间戳解析、TTL
 过期判定与最新 checkpoint 选择已迁移至 `src/main/worker/git-turn-diff-capture-policy.ts`；capture
 运行时保留 Git ref、diff 与 checkpoint 队列编排。新增
