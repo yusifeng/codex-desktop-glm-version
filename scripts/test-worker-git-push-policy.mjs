@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { classifyGitPushFailure, extractPushStatus, isPushStatusLine } = require("../app/.vite/build/worker/git-push-policy.js");
+let assertions = 0;
+const equal = (...args) => { assertions += 1; assert.equal(...args); };
+equal(extractPushStatus("! [rejected] (non-fast-forward)"), "rejected non-fast-forward");
+equal(extractPushStatus("error: remote rejected"), "remote rejected");
+equal(extractPushStatus("notice"), null);
+equal(isPushStatusLine("! refs/heads/main"), true);
+equal(isPushStatusLine("notice"), false);
+equal(classifyGitPushFailure("! [rejected] (non-fast-forward)\n", ""), "remote-updated");
+equal(classifyGitPushFailure("remote: error: remote rejected\n", ""), "unknown");
+equal(classifyGitPushFailure("", "Authentication failed for remote"), "auth");
+equal(classifyGitPushFailure("", "has no upstream branch"), "no-upstream");
+console.log(`${assertions} worker git push policy assertions passed`);
