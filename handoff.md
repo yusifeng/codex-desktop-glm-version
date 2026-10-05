@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review metadata finalize 的 untracked file/raw entry/stat projection 已迁移至 `src/main/worker/git-review-metadata-finalize-policy.ts`；finalize runtime 保留 working-tree metadata 查询、dedupe、revision attach 与排序编排。新增 `scripts/test-worker-git-review-metadata-finalize-policy.mjs` 覆盖 2 项 focused assertions；原 finalize 回归 25 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation mode controller 的 active/disposed 状态已抽至
+`src/main/browser-page-preload/annotation-mode-controller-state.ts`；controller 仅保留主世界
+listener、controls 注册与记录副作用，dispose 后迟到事件和重复 dispose 均被状态门禁。新增
+`scripts/test-preload-annotation-mode-controller-state.mjs` 覆盖 7 项状态断言；原 mode-controller
+回归 5 项、build 与 typecheck 已通过。
+
 2026-10-05 A2 继续批次：annotation permission controller 的单飞 pending request 与 terminal
 状态已抽至 `src/main/browser-page-preload/annotation-permission-request-state.ts`；controller 仅保留
 权限请求/结果副作用，reset/dispose 仍会解析在途请求为 false 并拒绝迟到结果。新增
