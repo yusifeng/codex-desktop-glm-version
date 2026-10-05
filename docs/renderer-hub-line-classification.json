@@ -2391,5 +2391,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-shared/runtime/stable-json-stringify.ts",
     "evidence": "The pure cache-key serialization policy recursively sorts plain object keys before JSON encoding, yielding deterministic query hashes without JSX, store, network, or lifecycle effects. It is covered by a focused two-case runtime test."
+  },
+  {
+    "hub": "app-shared",
+    "alias": "$L",
+    "sourceSymbol": "pqe",
+    "startLine": 69360,
+    "endLine": 69362,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-shared/runtime/encode-prefixed-path.ts",
+    "evidence": "The pure path protocol policy preserves a fixed prefix and URI-encodes the dynamic segment, preventing delimiter collisions without JSX, store, network, or lifecycle effects. It is covered by a focused two-case runtime test."
   }
 ]
