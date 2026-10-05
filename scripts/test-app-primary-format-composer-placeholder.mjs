@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
+import * as esbuild from "esbuild";
+const result = await esbuild.build({ entryPoints: ["src/renderer/app-primary/runtime/format-composer-placeholder.ts"], bundle: true, format: "esm", platform: "node", write: false, logLevel: "silent" });
+const { formatComposerPlaceholder } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`);
+const seen = [];
+const formatter = { formatMessage(message, values) { seen.push({ message, values }); return values ? `${message.id}:${values.agentName}` : message.defaultMessage; } };
+assert.equal(formatComposerPlaceholder(formatter, "chat"), "Ask ChatGPT");
+assert.equal(formatComposerPlaceholder(formatter, "chat", "Ada"), "workspaceAgents.detail.composerPlaceholder:Ada");
+assert.equal(formatComposerPlaceholder(formatter, "codex"), "Do anything");
+assert.equal(formatComposerPlaceholder(formatter, "work"), "Work with ChatGPT");
+assert.equal(formatComposerPlaceholder(formatter, "other"), undefined);
+assert.equal(seen.length, 4);
+console.log("test-app-primary-format-composer-placeholder: 5 assertions passed");

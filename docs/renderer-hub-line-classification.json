@@ -1732,5 +1732,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/create-prefilled-plugin-prompt.ts",
     "evidence": "The helper builds a prefilled plugin mention prompt with stable Markdown escaping and optional prompt trimming. It is deterministic formatting logic with no JSX, store, or lifecycle side effects; the hub export remains as compatibility surface."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Eo",
+    "sourceSymbol": "hY",
+    "startLine": 42822,
+    "endLine": 42851,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/format-composer-placeholder.ts",
+    "evidence": "The mode-specific composer placeholder formatter projects chat, Codex, and Work labels through the supplied locale formatter; it has no JSX, store, or lifecycle side effects and remains coupled only as a compatibility export."
   }
 ]
