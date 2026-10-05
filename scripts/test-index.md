@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1138.
+Total scripts: 1140.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -1168,7 +1168,11 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-review-search-path-policy.mjs](test-worker-git-review-search-path-policy.mjs)
 [test-app-shared-derive-notification-status.mjs](test-app-shared-derive-notification-status.mjs)
 [test-worker-git-review-line-decoder-policy.mjs](test-worker-git-review-line-decoder-policy.mjs)
+[test-worker-git-review-numstat-policy.mjs](test-worker-git-review-numstat-policy.mjs)
+[test-app-shared-is-wsl-host-source.mjs](test-app-shared-is-wsl-host-source.mjs)
 [test-app-shared-is-managed-host-source.mjs](test-app-shared-is-managed-host-source.mjs)
+[test-worker-git-review-numstat-policy.mjs](test-worker-git-review-numstat-policy.mjs)
+[test-app-shared-is-wsl-host-source.mjs](test-app-shared-is-wsl-host-source.mjs)
 [test-app-shared-format-scheduled-task-key.mjs](test-app-shared-format-scheduled-task-key.mjs)
 [test-app-shared-format-error-message.mjs](test-app-shared-format-error-message.mjs)
 [test-app-shared-create-chat-slug.mjs](test-app-shared-create-chat-slug.mjs)
