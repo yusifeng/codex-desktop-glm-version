@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationPreviewSchedulerState } = require("../app/.vite/build/browser-page-preload/annotation-preview-scheduler-state.js");
+const state = createAnnotationPreviewSchedulerState();
+const candidate = {};
+state.candidates.add(candidate);
+state.visibleCandidates.add(candidate);
+state.setFrame(4);
+assert.equal(state.frame, 4);
+assert.equal(state.candidates.has(candidate), true);
+assert.equal(state.dispose(), true);
+assert.equal(state.disposed, true);
+assert.equal(state.frame, null);
+assert.equal(state.candidates.size, 0);
+assert.equal(state.visibleCandidates.size, 0);
+assert.equal(state.dispose(), false);
+console.log("test-preload-annotation-preview-scheduler-state: 8 assertions passed");
