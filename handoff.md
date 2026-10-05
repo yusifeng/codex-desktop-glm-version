@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-05 A1 继续批次：Git review metadata 的 untracked path 选择、omitted-file 投影与 metadata merge 纯策略已迁移至 `src/main/worker/git-review-metadata-policy.ts`；metadata utils 保留 diff 解析、rename/revision 与异步 I/O 编排。新增 `scripts/test-worker-git-review-metadata-policy.mjs` 覆盖 5 项 focused assertions；原 metadata-utils 回归 37 项、build 与 typecheck 已通过。
+
+2026-10-05 A2 继续批次：annotation preview controller 的 mounted-preview disposer 与 terminal
+状态已抽至 `src/main/browser-page-preload/annotation-preview-controller-state.ts`；controller 仅保留
+预览替换和 disposer 副作用，销毁时仍先释放当前 preview 并拒绝后续挂载。新增
+`scripts/test-preload-annotation-preview-controller-state.mjs` 覆盖 6 项状态断言；原 controller
+回归 6 项、build 与 typecheck 已通过。
+
 2026-10-05 A1 继续批次：Git review branch stats 的 repository operation marker 与 git-dir 路径构造策略已迁移至 `src/main/worker/git-review-branch-stats-policy.ts`；review stats 运行时保留 stat/Git metadata、diff 与 rename reconcile 编排。新增 `scripts/test-worker-git-review-branch-stats-policy.mjs` 覆盖 4 项 focused assertions；原 branch-stats 回归 33 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 继续批次：Git path status 的 porcelain 输出分类（tracked/untracked/ignored）已迁移至 `src/main/worker/git-path-status-policy.ts`；path-status 运行时保留 Git I/O、query/cache 与 repository 编排。新增 `scripts/test-worker-git-path-status-policy.mjs` 覆盖 3 项 focused assertions；原 path-status 回归 31 项、build 与 typecheck 已通过。

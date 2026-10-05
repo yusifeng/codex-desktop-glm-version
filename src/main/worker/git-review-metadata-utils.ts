@@ -125,31 +125,6 @@ function createUnmergedReviewFiles(paths: Set<string>) {
   }));
 }
 
-function selectUntrackedReviewPaths(
-  requestedPaths: string[] | undefined,
-  untrackedPathSet: Set<string>,
-) {
-  return requestedPaths == null || requestedPaths.length === 0
-    ? [...untrackedPathSet]
-    : requestedPaths.filter((path) => untrackedPathSet.has(path));
-}
-
-function getOmittedUntrackedFiles(
-  count: number | undefined,
-  limit: number | undefined,
-) {
-  if (!(count == null || limit == null || count <= limit))
-    return { count, limit };
-}
-
-function mergeReviewMetadata(left: any, right: any) {
-  return {
-    files: [...left.files, ...right.files],
-    rawEntries: [...left.rawEntries, ...right.rawEntries],
-    stats: [...left.stats, ...right.stats],
-  };
-}
-
 function parseReviewMetadataDiff(output: string) {
   const fields = output.split(`\0`).filter((field) => field.length > 0);
   const rawEntries: any[] = [];
@@ -324,3 +299,8 @@ if (typeof module !== `undefined`)
     reviewFileKey,
     selectUntrackedReviewPaths,
   };
+import {
+  getOmittedUntrackedFiles,
+  mergeReviewMetadata,
+  selectUntrackedReviewPaths,
+} from './git-review-metadata-policy';
