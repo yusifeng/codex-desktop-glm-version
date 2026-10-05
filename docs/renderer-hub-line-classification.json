@@ -1902,5 +1902,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/is-displayable-action.ts",
     "evidence": "The predicate accepts only primary/secondary actions and excludes the questionnaire-feedback action; it is a pure projection with no JSX, store, or lifecycle side effects and is extracted as a typed runtime policy."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Ff",
+    "sourceSymbol": "RP",
+    "startLine": 14873,
+    "endLine": 14875,
+    "classification": "generated-local-helper",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The remote-reference projection delegates to adjacent generated URL/reference normalizers and has no independent renderer named consumer, JSX, store ownership, or teardown contract; preserve the coupled helper in the hub until a stable semantic consumer exists."
   }
 ]

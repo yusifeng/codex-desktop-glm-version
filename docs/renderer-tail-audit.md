@@ -710,3 +710,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 `docs/renderer-hub-line-classification.json`，app-primary reviewedCount 由 182 提升至 185。
 
 2026-10-05 A5 继续批次：app-primary markdown 编辑器未消费导出 `Tu`（`TB`，21849--21856）已抽取为 `insert-selection-marker.ts`，明确安全位置解析、marker 序列化与失败边界；新增 `scripts/test-app-primary-create-editor-selection-range.mjs` 覆盖 ownerDocument 回退及 Range 投影。逐行分类证据登记后 reviewedCount 提升至 190。
+本轮继续核对 app-primary 远程引用投影边界：`RP`（公开别名 `Ff`，14873--14875）仅委托相邻生成式 URL/reference normalizer，未形成独立 renderer named consumer、store 所有权或 teardown 契约；因此登记为 generated-local-helper 并保留聚合 hub。逐行 source symbol、精确范围与证据已写入 `docs/renderer-hub-line-classification.json`，reviewedCount 提升至 191。
