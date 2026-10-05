@@ -3929,6 +3929,8 @@ function xs(e) {
   return e == null || e <= 0 ? 1 : 1 / e;
 }
 function Ss(e, { viewport: t, viewportScale: n, zoomFactor: r = 1 }) {
+  return projectAnnotationTooltipPosition(e, { viewport: t, viewportScale: n, zoomFactor: r });
+/*
   let i = xs(n),
     a = Ms(e, r),
     o = t.width * r,
@@ -3940,6 +3942,7 @@ function Ss(e, { viewport: t, viewportScale: n, zoomFactor: r = 1 }) {
     f = a.y - l - Gs * i,
     p = a.y + a.height + Gs * i;
   return { x: d, y: f >= c ? f : Ps(p, c, s - l - c), width: u, height: l };
+*/
 }
 function Cs(e, t = Js) {
   return annotationDesignStyles.buildAnnotationDesignStyles(e, t);
@@ -6175,6 +6178,7 @@ var { createGoogleDocsContext: createGoogleDocsContextHelper, isGoogleDocsOrShee
 var { createAnnotationDocumentContext } = require("./browser-page-preload/annotation-document-context");
 var { normalizeAnnotationColor: normalizeAnnotationColorPolicy } = require("./browser-page-preload/annotation-color-policy");
 var { spreadAnnotationMarkerPoints } = require("./browser-page-preload/annotation-marker-position");
+var { projectAnnotationTooltipPosition } = require("./browser-page-preload/annotation-tooltip-position");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");

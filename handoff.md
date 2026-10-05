@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 T2/A2 继续批次：annotation metadata tooltip 的 anchor/viewport 几何投影、上方优先
+与下方回退已迁移至 `src/main/browser-page-preload/annotation-tooltip-position.ts`；原 `Ss` 入口
+保留兼容委托。新增 `scripts/test-preload-annotation-tooltip-position.mjs` 覆盖 3 项 focused
+assertions；build 与 typecheck 已通过。
+
 2026-10-06 T2/A2 继续批次：annotation marker position 的重复点分组、固定间距横向展开
 与 viewport 边界 clamp 已迁移至 `src/main/browser-page-preload/annotation-marker-position.ts`；
 原 `Ts` 入口保留兼容委托。新增 `scripts/test-preload-annotation-marker-position.mjs` 覆盖

@@ -1,5 +1,12 @@
 # `browser-page-preload.ts` 逐段审计
 
+### 增量抽取：annotation tooltip position policy
+
+Annotation metadata tooltip 的 anchor/viewport 几何投影（原 `Ss`，3863-4050 业务工具段）已迁移至
+`src/main/browser-page-preload/annotation-tooltip-position.ts`。该纯策略保留 viewport scale、zoom
+缩放、上方优先/下方回退和水平边界 clamp；入口仅保留兼容委托。`scripts/test-preload-annotation-tooltip-position.mjs`
+覆盖正常、上方空间不足和右边界三项断言，build 与 typecheck 已通过。
+
 ### 增量抽取：annotation marker position policy
 
 Annotation marker 同点横向分散策略（原 `Ts`，3863-4050 业务工具段）已迁移至
