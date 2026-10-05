@@ -47,9 +47,14 @@ routedApi.tabsById.set("tab-1", {
 routedApi.notifyWebMcpToolInvoked({ session_id: "c-1", tabId: "tab-1", toolName: "click", turn_id: "t-2", parentCallId: "p-1" });
 assert.deepEqual(activity, [["click", "provider-1", "p-1"]]);
 assert.deepEqual(pageEvents, [["restrict", "tab-1"], ["active", true, "provider-1"]]);
+routedApi.tabsById.set("tab-other-route", { browser_id: "browser-2", id: "tab-other-route", routeKey: "r-2" });
+routedApi.notifyWebMcpToolInvoked({ session_id: "c-1", tabId: "tab-other-route", toolName: "ignored", turn_id: "t-3" });
+assert.equal(activity.length, 1);
 const unsubscribePage = routedApi.addPageEventListener((event) => pageEvents.push(["page", event]));
 routedApi.notifyPageEvent("c-1", 42, { type: "page-load", url: "https://example.test" });
 routedApi.notifyPageEvent("c-1", 404, { type: "ignored" });
 unsubscribePage();
 assert.deepEqual(pageEvents[2], ["page", { type: "page-load", url: "https://example.test", session_id: "c-1", tabId: "tab-1" }]);
+routedApi.notifyPageEvent("c-1", 42, { type: "after-unsubscribe" });
+assert.equal(pageEvents.length, 3);
 console.log("main IAB API boundary: 17 assertions passed");
