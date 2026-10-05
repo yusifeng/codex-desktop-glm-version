@@ -682,3 +682,9 @@ connector icon map。四者都由相邻生成 surface 独占，缺少独立 name
 稳定对象。三者都只服务相邻生成式 panel/composer surface，没有独立 renderer named consumer
 或 teardown 契约，继续保留聚合 hub；逐行 source symbol、精确范围和语义模块归属已登记于
 `docs/renderer-hub-line-classification.json`，reviewedCount 由 170 提升至 173。
+
+本轮再补齐 app-primary 插件预填提示格式化边界：`FP`（公开别名 `Rf`，14864--14866 行）
+仅构造 plugin mention Markdown、执行稳定转义并裁剪可选 prompt。其逻辑已由
+`src/renderer/app-primary/runtime/create-prefilled-plugin-prompt.ts` 承载，属于无 JSX、store
+或生命周期副作用的纯格式化策略；聚合导出保留兼容边，逐行证据登记后 reviewedCount 由
+173 提升至 174。

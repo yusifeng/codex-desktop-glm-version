@@ -1722,5 +1722,15 @@
     "classification": "generated-local-recipient-projection",
     "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
     "evidence": "The helper projects non-empty recipient buckets into a stable object for the neighboring generated composer state; no standalone named renderer consumer owns this projection."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Rf",
+    "sourceSymbol": "FP",
+    "startLine": 14864,
+    "endLine": 14866,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/create-prefilled-plugin-prompt.ts",
+    "evidence": "The helper builds a prefilled plugin mention prompt with stable Markdown escaping and optional prompt trimming. It is deterministic formatting logic with no JSX, store, or lifecycle side effects; the hub export remains as compatibility surface."
   }
 ]
