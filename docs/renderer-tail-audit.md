@@ -675,3 +675,10 @@ connector icon map。四者都由相邻生成 surface 独占，缺少独立 name
 不触碰 JSX、store 或生命周期。逻辑现由 `src/renderer/app-primary/runtime/annotation-selection-style.ts`
 承载，并由 `scripts/test-app-primary-annotation-selection-style.mjs` 覆盖 hover、fill-only
 与缩放边界；聚合导出保留兼容，逐行分类证据登记后 reviewedCount 提升至 170。
+
+本轮继续从 app-primary 未消费区补齐三条逐行边界证据：`dF`（公开别名 `Df`，15592--15598
+行）按 panel edge 可用性选择 bottom/right 目标；`KMe`（公开别名 `Hd`，17508--17525 行）
+解析逗号分隔收件人并投影联系人；`GMe`（公开别名 `Id`，17502 行）将非空收件人桶投影为
+稳定对象。三者都只服务相邻生成式 panel/composer surface，没有独立 renderer named consumer
+或 teardown 契约，继续保留聚合 hub；逐行 source symbol、精确范围和语义模块归属已登记于
+`docs/renderer-hub-line-classification.json`，reviewedCount 由 170 提升至 173。

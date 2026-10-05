@@ -1692,5 +1692,35 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/annotation-selection-style.ts",
     "evidence": "The annotation selection/hover helper deterministically projects appearance, fill, border, zoom, and shadow options into an inline style object. It has no JSX, store, registration, or teardown side effects; the generated hub keeps the compatibility export until an independent renderer consumer adopts the typed module."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Df",
+    "sourceSymbol": "dF",
+    "startLine": 15592,
+    "endLine": 15598,
+    "classification": "generated-local-panel-position-policy",
+    "module": "src/renderer/app-primary/runtime/panel-target-policy.ts",
+    "evidence": "The helper normalizes panel edge availability and selects the bottom/right target for the adjacent generated panel surface; it has no independent renderer consumer or lifecycle boundary."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Hd",
+    "sourceSymbol": "KMe",
+    "startLine": 17508,
+    "endLine": 17525,
+    "classification": "generated-local-recipient-parser",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "The helper parses comma-separated recipient tokens, validates addresses, and projects matching contact metadata for the adjacent generated composer surface; ownership remains local to that surface."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "Id",
+    "sourceSymbol": "GMe",
+    "startLine": 17502,
+    "endLine": 17502,
+    "classification": "generated-local-recipient-projection",
+    "module": "src/renderer/app-primary/runtime/normalize-recipient-fields.ts",
+    "evidence": "The helper projects non-empty recipient buckets into a stable object for the neighboring generated composer state; no standalone named renderer consumer owns this projection."
   }
 ]
