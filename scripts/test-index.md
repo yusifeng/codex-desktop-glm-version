@@ -344,6 +344,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-delayed-progress-window.mjs`](./test-main-delayed-progress-window.mjs)
 - [`test-main-immediate-update-exit.mjs`](./test-main-immediate-update-exit.mjs)
 - [`test-renderer-hub-classification.mjs`](./test-renderer-hub-classification.mjs)
+- [`test-renderer-hub-manifest.mjs`](./test-renderer-hub-manifest.mjs)
 - [`test-app-primary-is-valid-recipient-email.mjs`](./test-app-primary-is-valid-recipient-email.mjs)
 - [`test-main-worker-event-predicates.mjs`](./test-main-worker-event-predicates.mjs)
 - [`test-main-worker-rpc-message-predicates.mjs`](./test-main-worker-rpc-message-predicates.mjs)
