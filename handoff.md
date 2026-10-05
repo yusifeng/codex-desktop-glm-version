@@ -1623,3 +1623,5 @@ typecheck 均通过。
 2026-10-05 A1 T1 继续批次：Git watcher 路径规范化与 watched/changed 前缀 overlap 判定已迁移至 `src/main/worker/git-path-overlap-policy.ts`；query utils 保留 query key、cacheability 与 fsmonitor 策略。新增 `scripts/test-worker-git-path-overlap-policy.mjs` 覆盖 6 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
 
 2026-10-05 A1 T1 继续批次：Git fsmonitor daemon capability 输出的严格 feature 行识别已迁移至 `src/main/worker/git-fsmonitor-feature-policy.ts`；query utils 保留 query key、cacheability、路径与环境策略。新增 `scripts/test-worker-git-fsmonitor-feature-policy.mjs` 覆盖 5 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
+
+2026-10-05 A1 T1 继续批次：Git query key 与 fsmonitor cache key 的 host/root/operation 组合、环境字段排序及 GIT_INDEX_FILE 排除协议已迁移至 `src/main/worker/git-query-key-policy.ts`；query utils 保留 cacheability、路径与环境判定策略。新增 `scripts/test-worker-git-query-key-policy.mjs` 覆盖 3 项 focused assertions；原 query utility 回归 27 项、build 与 typecheck 已通过。
