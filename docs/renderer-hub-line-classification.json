@@ -2131,5 +2131,15 @@
     "classification": "semantic-business-logic",
     "module": "src/renderer/app-primary/runtime/derive-cloud-unavailable-reason.ts",
     "evidence": "The composer/cloud availability reason is a deterministic precedence policy over remote-project, pull-request, cloud capability, and account access state. It has no JSX, store, or lifecycle side effects and is now consumed directly by the hotkey home-page semantic source."
+  },
+  {
+    "hub": "app-primary",
+    "alias": "ug",
+    "sourceSymbol": "GD",
+    "startLine": 4136,
+    "endLine": 4138,
+    "classification": "generated-local-runtime-init",
+    "module": "src/webview/assets/app-primary-d66705000d76.ts",
+    "evidence": "The helper only forces the adjacent plan/runtime initializer and returns null; it is a generated lazy-bootstrap boundary with no independent renderer named consumer, store ownership, or teardown contract, so it remains in the aggregate hub."
   }
 ]

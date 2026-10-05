@@ -717,3 +717,5 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-05 A5 继续批次：从 app-primary 未消费区补充五条真实生成边界逐行证据。`Ep`（`HM`，11020--11027）校验 reasoning effort 并按支持列表回退；`Lg`（`HE`，3643--3645）是 annotation marker 邻接的空 lazy 初始化；`Fg`（`KE`，3647--3651）建立 marker 缩放/颜色常量；`Km`（`uA`，6023--6038）装配 beacon action 依赖与状态符号；`Dp`（`UM`，11038--11042）装配 model/reasoning selector 依赖。它们均无独立 renderer named consumer、store 所有权或 teardown 边界，继续保留聚合 hub。逐行分类证据已写入 `docs/renderer-hub-line-classification.json`，app-primary reviewedCount 由 201 提升至 206。
 
 2026-10-05 A5 继续批次：app-primary 未消费导出 `ND`（公开别名 `vg`，4079--4089）补齐文档级物理迁移。该边界只遍历 ProseMirror-like 文档中的 `skillMention`/`pluginMention` 节点，并复用既有 skill-kind 路径策略选择最新或显式偏好 kind；逻辑现由 `extractSkillKindFromDocument` 承载于 `src/renderer/app-primary/runtime/extract-skill-kind.ts`，新增 `scripts/test-app-primary-extract-skill-kind-document.mjs` 覆盖最新 mention、显式偏好、空文档和未知插件回退共 4 项断言。逐行分类证据登记后 app-primary reviewedCount 由 211 提升至 212。
+
+2026-10-05 A5 继续批次：app-primary 未消费导出 `GD`（公开别名 `ug`，4136--4138）完成逐行分类。该 helper 仅触发相邻 plan/runtime 初始化并返回 `null`，属于生成式 lazy-bootstrap 局部边界，没有独立 renderer named consumer、store 所有权或 teardown 契约，继续保留聚合 hub。逐行分类证据登记后 app-primary reviewedCount 提升至 214。
