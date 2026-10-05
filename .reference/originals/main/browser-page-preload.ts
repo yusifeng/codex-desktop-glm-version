@@ -3997,20 +3997,7 @@ function Ms(e, t) {
   return { x: e.x * t, y: e.y * t, width: e.width * t, height: e.height * t };
 }
 function Ns(e, t) {
-  let n = e ?? [],
-    r = t ?? [];
-  return (
-    n.length === r.length &&
-    n.every((e, t) => {
-      let n = r[t];
-      return (
-        n != null &&
-        e.selector === n.selector &&
-        e.scrollLeft === n.scrollLeft &&
-        e.scrollTop === n.scrollTop
-      );
-    })
-  );
+  return areAnnotationScrollContainersEqual(e, t);
 }
 function Ps(e, t, n) {
   return Math.min(Math.max(e, t), n);
@@ -6179,6 +6166,7 @@ var { createAnnotationDocumentContext } = require("./browser-page-preload/annota
 var { normalizeAnnotationColor: normalizeAnnotationColorPolicy } = require("./browser-page-preload/annotation-color-policy");
 var { spreadAnnotationMarkerPoints } = require("./browser-page-preload/annotation-marker-position");
 var { projectAnnotationTooltipPosition } = require("./browser-page-preload/annotation-tooltip-position");
+var { areAnnotationScrollContainersEqual } = require("./browser-page-preload/annotation-scroll-container-equality");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
