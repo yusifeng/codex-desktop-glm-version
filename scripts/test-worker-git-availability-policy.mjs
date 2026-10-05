@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { shouldCheckGitAvailability } = require("../app/.vite/build/worker/git-availability-policy.js");
+let n=0; const eq=(...a)=>{n++;assert.equal(...a)};
+eq(shouldCheckGitAvailability("status-summary", true, false), true);
+eq(shouldCheckGitAvailability("merge-base", true, false), false);
+eq(shouldCheckGitAvailability("status-summary", false, false), false);
+eq(shouldCheckGitAvailability("status-summary", true, true), false);
+console.log(`${n} worker availability policy assertions passed`);
