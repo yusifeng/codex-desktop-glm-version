@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-primary/runtime/rank-projects-by-query.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const score = (value, query) => value.toLowerCase().startsWith(query.toLowerCase()) ? (value.length === 5 ? 10 : 5) : 0;
+assert.deepEqual(mod.rankProjectsByQuery([{ name: "alpha" }, { name: "beta" }, { name: "alphabet" }], "alp", (p) => [p.name], score), [{ name: "alpha" }, { name: "alphabet" }]);
+assert.deepEqual(mod.rankProjectsByQuery(["a", "b"], "  ", () => [1], () => 1), ["a", "b"]);
+assert.deepEqual(mod.rankProjectsByQuery(["a", "b"], "x", () => [null], () => 1), []);
+console.log("app-primary rank projects by query: 3 assertions passed");
