@@ -4201,13 +4201,7 @@ function oc(e) {
   }
 }
 function sc(e) {
-  if (!ac(e)) return null;
-  try {
-    let t = e.contentWindow;
-    return t?.document == null ? null : t;
-  } catch {
-    return null;
-  }
+  return resolveAnnotationIframeWindow(e, { isIframe: (value) => ac(value) });
 }
 function cc(e, t, n) {
   let r = lc(window, e, t, n);
@@ -6123,6 +6117,7 @@ var { isAnnotationElementLike } = require("./browser-page-preload/annotation-ele
 var { getAnnotationScrollContainerOffset } = require("./browser-page-preload/annotation-scroll-container-offset");
 var { projectAnnotationFramePoint } = require("./browser-page-preload/annotation-frame-point-projection");
 var { isAnnotationIframeElement } = require("./browser-page-preload/annotation-iframe-element-policy");
+var { resolveAnnotationIframeWindow } = require("./browser-page-preload/annotation-iframe-window-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
