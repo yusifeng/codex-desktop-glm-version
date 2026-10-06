@@ -941,6 +941,10 @@ visible-text TreeWalker 的跨 realm HTMLElement 判定（原 `I`）已迁移至
 
 Range 内容到 end boundary 的安全 text length projection（原 `ru`）已迁移至 `src/main/browser-page-preload/annotation-range-text-length.ts`；保留 Range 异常返回 null。新增 2 项 focused assertions。
 
+### 增量抽取：annotation text offset projection
+
+文本 offset 到 TreeWalker text node/offset 的定位（原 `iu`）已迁移至 `src/main/browser-page-preload/annotation-text-offset-projection.ts`；保留负 offset 与超出文本返回 null。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。

@@ -5093,16 +5093,10 @@ function ru(e, t, n) {
   return getAnnotationRangeTextLength(e, t, n, { createRange: (element) => element.ownerDocument.createRange() });
 }
 function iu(e, t) {
-  if (t < 0) return null;
-  let n = e.ownerDocument.createTreeWalker(e, 4),
-    r = 0,
-    i = n.nextNode();
-  for (; i != null;) {
-    let e = i.textContent ?? ``;
-    if (r + e.length >= t) return { node: i, offset: t - r };
-    ((r += e.length), (i = n.nextNode()));
-  }
-  return null;
+  return projectAnnotationTextOffset(e, t, {
+    createTextWalker: (root) => root.ownerDocument.createTreeWalker(root, 4),
+    nextNode: (walker) => walker.nextNode(),
+  });
 }
 var au = o(() => {});
 function ou(e) {
@@ -6110,6 +6104,7 @@ var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-ow
 var { intersectsAnnotationRect } = require("./browser-page-preload/annotation-rect-intersection-policy");
 var { isAnnotationHtmlElement } = require("./browser-page-preload/annotation-html-element-policy");
 var { getAnnotationRangeTextLength } = require("./browser-page-preload/annotation-range-text-length");
+var { projectAnnotationTextOffset } = require("./browser-page-preload/annotation-text-offset-projection");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
