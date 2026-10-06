@@ -1433,3 +1433,6 @@ fallback，focused policy assertions 增加 3 项。
 Git config scope runtime 的 missing-value detection、scope fallback 与 worktree-config enable retry
 共享 query signal、Git command errors、scope cache metadata 与 retry ordering；现有 config policies
 已覆盖 scope/argument projection，剩余 config I/O 不形成独立纯策略。
+Review branch stats 的 operation-marker status、tracked/untracked metadata、rename reconciliation
+与 review snapshot 共享 Git dir resolution、host stat、missing-error semantics、concurrency 与
+response ordering；现有 branch-stats policy 已覆盖 marker path projection，剩余 runtime 不拆 facade。
