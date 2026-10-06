@@ -949,6 +949,10 @@ Range 内容到 end boundary 的安全 text length projection（原 `ru`）已�
 
 CSS highlight range 的 style root/owner window/capability context 解析（原 `Ql`）已迁移至 `src/main/browser-page-preload/annotation-highlight-context-policy.ts`；保留非 style root 与 capability 不支持时返回 null。新增 2 项 focused assertions。
 
+### 增量抽取：annotation client rect projection
+
+client rect 的数量上限、零尺寸过滤与 `{x,y,width,height}` projection（原 `Vu`）已迁移至 `src/main/browser-page-preload/annotation-client-rect-projection.ts`；默认保留 1000 rect cap。新增 2 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。

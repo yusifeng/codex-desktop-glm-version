@@ -5588,13 +5588,7 @@ function Bu(e, t) {
   return n.length > 0 && n !== `none`;
 }
 function Vu(e) {
-  if (typeof e.getClientRects != `function`) return [];
-  let t = e.getClientRects();
-  return t.length > 1e3
-    ? []
-    : Array.from(t)
-        .filter((e) => e.width > 0 && e.height > 0)
-        .map((e) => ({ x: e.left, y: e.top, width: e.width, height: e.height }));
+  return projectAnnotationClientRects(e, { getClientRects: (value) => value.getClientRects() });
 }
 function Hu(e, t, n) {
   let r = e.getBoundingClientRect();
@@ -6108,6 +6102,7 @@ var { isAnnotationHtmlElement } = require("./browser-page-preload/annotation-htm
 var { getAnnotationRangeTextLength } = require("./browser-page-preload/annotation-range-text-length");
 var { projectAnnotationTextOffset } = require("./browser-page-preload/annotation-text-offset-projection");
 var { resolveAnnotationHighlightContext } = require("./browser-page-preload/annotation-highlight-context-policy");
+var { projectAnnotationClientRects } = require("./browser-page-preload/annotation-client-rect-projection");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
