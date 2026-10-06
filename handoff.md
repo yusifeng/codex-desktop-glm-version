@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `FL`（内部 `kqe`，源码 69498）的 change-entry 路径投影已迁移至 `src/renderer/app-shared/runtime/get-change-path.ts`；新增 focused test 覆盖 move update、无目标回退与非 update。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `FJ`（内部 `NR`，源码 61258--61263）的 annotation origin 规范化策略已迁移至 `src/renderer/app-shared/runtime/normalize-annotation-origin.ts`；新增 focused test 覆盖支持 origin 与未知值回退。
 
 2026-10-06 A5 继续批次：app-shared 未消费导出 `Gp`（内部 `lut`，源码 103020--103024）的 realtime voice command 识别策略已迁移至 `src/renderer/app-shared/runtime/is-realtime-voice-command.ts`；新增 focused test 覆盖入口命令、命名空间命令和普通命令。
@@ -2145,5 +2147,6 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation element-like 跨 realm DOM 判定已迁移至 `src/main/browser-page-preload/annotation-element-like-policy.ts`；原 `F` 入口保留 constructor/node type 注入，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation iframe element 跨 realm 判定已迁移至 `src/main/browser-page-preload/annotation-iframe-element-policy.ts`；原 `ac` 入口保留 constructor/fallback 语义，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation iframe contentWindow/document boundary 已迁移至 `src/main/browser-page-preload/annotation-iframe-window-policy.ts`；原 `sc` 入口保留异常与空 document 拒绝，新增 4 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation clipping overflow boundary 已迁移至 `src/main/browser-page-preload/annotation-clipping-boundary-policy.ts`；原 `Kc` 入口保留 computed style/overflow 注入，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation frame point projection 已迁移至 `src/main/browser-page-preload/annotation-frame-point-projection.ts`；原 `Lc` 入口保留 frame offset 读取，新增 2 项 focused assertions。
