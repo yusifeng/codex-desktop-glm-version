@@ -4922,11 +4922,7 @@ function Vl(e) {
   return normalizeAnnotationText(e, R);
 }
 function Hl(e) {
-  if (!I(e)) return !1;
-  let t = e.ownerDocument.defaultView,
-    n = t?.HTMLInputElement,
-    r = t?.HTMLTextAreaElement;
-  return (n != null && e instanceof n) || (r != null && e instanceof r);
+  return isAnnotationTextInput(e, e?.ownerDocument?.defaultView, new Set([`email`, `search`, `tel`, `text`, `url`]));
 }
 function Ul(e) {
   try {

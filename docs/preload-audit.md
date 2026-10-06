@@ -919,6 +919,10 @@ Range 内容 client rect 与 viewport rect 的相交判定（原 `Kl`）已迁�
 
 visible text candidate 的 excluded ancestor 与 computed style gate（原 `Wl`）已迁移至 `src/main/browser-page-preload/annotation-visible-text-element-policy.ts`；保留 script/style/template/hidden/aria-hidden 过滤与 display/visibility/opacity 判定。新增 3 项 focused assertions。
 
+### 增量抽取：annotation active text input policy
+
+activeElement 的 input type/textarea eligibility（原 `Hl`）现真实委托至既有 `annotation-input-target.ts`；入口仅注入 owner window 与允许的 text input types，新增 3 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
