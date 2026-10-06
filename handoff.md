@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `A4`（内部 `Qp`，源码 24183）确认为 generated schema callback wrapper，属 validation infrastructure、无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Hn`（内部 `lJ`，源码 40182）确认为 category selector React component，JSX/store-bound、无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Em`（内部 `RA`，源码 8532）确认为 model settings React component，读取 generated signals/stores/lifecycle state、无 standalone pure policy boundary，登记 `preserved-coupled`。
