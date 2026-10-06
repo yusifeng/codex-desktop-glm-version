@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `C4`（内部 `jp`，源码 24017）确认为 generated schema accessor，依赖内部 validation registry，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `C2`（内部 `rv`，源码 30055--30057）确认为 generated runtime identity passthrough，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `D3`（内部 `lt`，源码 2172--2177）确认为 generated renderer bookkeeping cleanup helper，无独立业务归属，登记 `preserved-coupled`。
