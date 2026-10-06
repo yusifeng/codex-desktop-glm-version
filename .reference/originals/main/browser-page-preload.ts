@@ -5042,10 +5042,12 @@ var R,
       })); */
   });
 function Ql(e) {
-  let t = e.commonAncestorContainer.getRootNode();
-  if (!tu(t)) return null;
-  let n = `defaultView` in t ? t.defaultView : t.ownerDocument.defaultView;
-  return n != null && eu(n) ? { ownerWindow: n, range: e, styleRoot: t } : null;
+  return resolveAnnotationHighlightContext(e, {
+    getRoot: (range) => range.commonAncestorContainer.getRootNode(),
+    isStyleRoot: (root) => tu(root),
+    getOwnerWindow: (root) => `defaultView` in root ? root.defaultView : root.ownerDocument.defaultView,
+    supportsHighlights: (windowLike) => eu(windowLike),
+  });
 }
 function $l({ color: e, name: t, ownerWindow: n, range: r, styleRoot: i }) {
   let a = new n.Highlight(r),
@@ -6105,6 +6107,7 @@ var { intersectsAnnotationRect } = require("./browser-page-preload/annotation-re
 var { isAnnotationHtmlElement } = require("./browser-page-preload/annotation-html-element-policy");
 var { getAnnotationRangeTextLength } = require("./browser-page-preload/annotation-range-text-length");
 var { projectAnnotationTextOffset } = require("./browser-page-preload/annotation-text-offset-projection");
+var { resolveAnnotationHighlightContext } = require("./browser-page-preload/annotation-highlight-context-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
