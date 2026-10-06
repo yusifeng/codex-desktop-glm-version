@@ -5090,12 +5090,7 @@ function tu(e) {
 }
 var nu = o(() => {});
 function ru(e, t, n) {
-  let r = e.ownerDocument.createRange();
-  try {
-    return (r.selectNodeContents(e), r.setEnd(t, n), r.toString().length);
-  } catch {
-    return null;
-  }
+  return getAnnotationRangeTextLength(e, t, n, { createRange: (element) => element.ownerDocument.createRange() });
 }
 function iu(e, t) {
   if (t < 0) return null;
@@ -6114,6 +6109,7 @@ var { readAnnotationDocumentSafely } = require("./browser-page-preload/annotatio
 var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window-policy");
 var { intersectsAnnotationRect } = require("./browser-page-preload/annotation-rect-intersection-policy");
 var { isAnnotationHtmlElement } = require("./browser-page-preload/annotation-html-element-policy");
+var { getAnnotationRangeTextLength } = require("./browser-page-preload/annotation-range-text-length");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
