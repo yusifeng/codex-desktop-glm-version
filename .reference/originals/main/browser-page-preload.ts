@@ -6091,6 +6091,7 @@ var { isAnnotationMirrorMutation } = require("./browser-page-preload/annotation-
 var { hasAnnotationInputSelection } = require("./browser-page-preload/annotation-input-selection-policy");
 var { getAnnotationVisibleElementRect } = require("./browser-page-preload/annotation-visible-element-rect");
 var { getAnnotationControlDefaultValue } = require("./browser-page-preload/annotation-control-default-value");
+var { isAnnotationSidebarTarget } = require("./browser-page-preload/annotation-sidebar-target-policy");
 var { reduceAnnotationSidebarEditorTransition } = require("./browser-page-preload/annotation-sidebar-editor-transition");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
@@ -6921,8 +6922,7 @@ function Df(e, t) {
   return parseAnnotationControlTargetList(t, e, Element, (t) => Of(e, t), hf);
 }
 function Of(e, t) {
-  let n = e.getElementById?.(xf);
-  return n != null && (n === t || n.contains(t) || n.shadowRoot?.contains(t) === !0);
+  return isAnnotationSidebarTarget(t, { getRoot: () => e.getElementById?.(xf) });
 }
 $s();
 var kf = `oai-annotation-container`,
