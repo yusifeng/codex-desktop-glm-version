@@ -5648,11 +5648,7 @@ function qu(e, t) {
   return projectAnnotationRectPoint(e, t);
 }
 function Ju(e) {
-  if (e == null) return !1;
-  let t = e.ownerDocument.defaultView,
-    n = t?.HTMLInputElement,
-    r = t?.HTMLTextAreaElement;
-  return isAnnotationTextInput(e, t, Yu);
+  return hasAnnotationInputSelection(e, { isTextInput: (value) => isAnnotationTextInput(value, value?.ownerDocument?.defaultView, Yu) });
 }
 var Yu,
   Xu,
@@ -6092,6 +6088,7 @@ var { intersectAnnotationRects } = require("./browser-page-preload/annotation-re
 var { projectAnnotationRectBounds } = require("./browser-page-preload/annotation-rect-bounds-projection");
 var { projectAnnotationRectPoint } = require("./browser-page-preload/annotation-rect-point-projection");
 var { isAnnotationMirrorMutation } = require("./browser-page-preload/annotation-mirror-mutation-policy");
+var { hasAnnotationInputSelection } = require("./browser-page-preload/annotation-input-selection-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");

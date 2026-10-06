@@ -985,6 +985,10 @@ selection rect 集合首/末端 anchor point projection（原 `qu`）已迁移�
 
 mirror DOM MutationRecord 的 childList/marker 过滤（原 `Uu`）已迁移至 `src/main/browser-page-preload/annotation-mirror-mutation-policy.ts`；入口仅注入 element 与 marker attribute 判定。新增 3 项 focused assertions。
 
+### 增量抽取：annotation input selection policy
+
+active text input 的 selectionStart/selectionEnd 有效区间判定（原 `Ju`）已迁移至 `src/main/browser-page-preload/annotation-input-selection-policy.ts`；入口复用 text-input policy。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
