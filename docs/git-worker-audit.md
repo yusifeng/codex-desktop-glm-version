@@ -1205,6 +1205,13 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### WSL command owner recheck (2026-10-06)
+
+47,122-47,584 中的纯输出/argv 边界已经由 `src/main/worker/platform-wsl.ts` 覆盖：UTF-16/UTF-8
+解码、active distro 识别、eligible distro 排序、fallback 选择和 `wsl.exe` argv 构造均有
+focused regression。剩余 `wslpath`/`wsl.exe --status|--list` 执行仍共享 Windows command
+spawn、日志和错误处理；当前没有可脱离 exec owner 的新策略，继续保持 preserved-coupled。
+
 ### Worker GitHub/review owner recheck (2026-10-06)
 
 81,000-83,323 的 GitHub/review 区段当前已由真实 request consumers 接回：
