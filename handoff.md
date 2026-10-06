@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Og`（内部 `qE`，源码 3660--3664）确认为 appearance-dependent SVG icon JSX component，无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Ha`（内部 `oZ`，源码 53338--53342）确认为 localized-content React renderer，含 JSX 分支且无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Gi`（内部 `T1`，源码 70859）确认为 React/store-bound comment-action UI component，无 standalone pure policy boundary，登记 `preserved-coupled`。
