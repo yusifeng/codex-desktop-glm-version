@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Gu` 反解为内部 `xR`（源码 18605），确认为 generated store/runtime callback，无 standalone renderer policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Go` 反解为内部 `sJ`（源码 40154），确认为 generated composer runtime initializer，耦合 stores/hooks、无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Gg` 反解为内部 `NE`（源码 78091），确认为 generated runtime helper，无独立 renderer 业务归属，登记 `preserved-coupled`。
