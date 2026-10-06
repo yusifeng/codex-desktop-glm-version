@@ -973,6 +973,10 @@ selection/mirror geometry 的 ancestor transform/rotate 判定（原 `Wu`）已�
 
 selection/mirror geometry 的 client rect 交集 projection（原 `Gu`）已迁移至 `src/main/browser-page-preload/annotation-rect-clip-intersection.ts`；保留边界接触返回 null。新增 2 项 focused assertions。
 
+### 增量抽取：annotation control default value
+
+annotation design control 的 default/current fallback 与 color/select/range/toggle 默认值 projection（原 `tf`）已迁移至 `src/main/browser-page-preload/annotation-control-default-value.ts`。新增 5 项 focused assertions。
+
 ### 增量抽取：annotation rect bounds projection
 
 selection rect 集合的 bounding box 聚合（原 `Ku`）已迁移至 `src/main/browser-page-preload/annotation-rect-bounds-projection.ts`。新增 1 项 focused assertion。

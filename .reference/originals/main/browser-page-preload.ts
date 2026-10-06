@@ -6090,6 +6090,7 @@ var { projectAnnotationRectPoint } = require("./browser-page-preload/annotation-
 var { isAnnotationMirrorMutation } = require("./browser-page-preload/annotation-mirror-mutation-policy");
 var { hasAnnotationInputSelection } = require("./browser-page-preload/annotation-input-selection-policy");
 var { getAnnotationVisibleElementRect } = require("./browser-page-preload/annotation-visible-element-rect");
+var { getAnnotationControlDefaultValue } = require("./browser-page-preload/annotation-control-default-value");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
@@ -6749,18 +6750,7 @@ function ef(e, t, n, r, i) {
   });
 }
 function tf(e) {
-  let t = e.defaultValue ?? e.currentValue;
-  if (t != null) return t;
-  switch (e.type) {
-    case `color`:
-      return `#ffffff`;
-    case `select`:
-      return e.options[0].value;
-    case `range`:
-      return e.min;
-    case `toggle`:
-      return !1;
-  }
+  return getAnnotationControlDefaultValue(e);
 }
 var nf,
   rf,
