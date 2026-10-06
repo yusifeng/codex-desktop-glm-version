@@ -29,4 +29,9 @@ export function oppositeBrowserUseRuleKind(kind: string): string {
   return kind === "allowed" ? "denied" : "allowed";
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind };
+export function browserUseConfigPath(home: string, filename = "config.toml"): string {
+  return join(home, filename);
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath };
+import { join } from "node:path";

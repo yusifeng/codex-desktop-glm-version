@@ -413,6 +413,7 @@ browser-use rule update 的 origin 规范化（缺省 https、仅允许 http/htt
 非法 scheme 与空值断言。
 规则集合输入的 trim/类型过滤/稳定去重也已迁移至同一 policy，新增 1 项去重边界断言。
 allowed/denied rule kind 互换也已迁移至该 policy，规则更新副作用仍由 origin-state 持有，新增 2 项映射断言。
+browser-use config path 的 home/filename 组合也已迁移至该 policy，origin-state 继续负责文件存在、读取、解析与写回副作用，新增 1 项路径断言。
 
 ### T4 候选复核：browser-sidebar error pages
 

@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { dedupeBrowserUseStrings, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
+import { browserUseConfigPath, dedupeBrowserUseStrings, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -90,7 +90,7 @@ function normalizeOrigin(value: string): string | null {
 // ---------------------------------------------------------------------------
 
 function browserConfigPath(home: string): string {
-  return join(home, BROWSER_CONFIG_FILENAME);
+  return browserUseConfigPath(home, BROWSER_CONFIG_FILENAME);
 }
 
 async function readBrowserConfig(home: string): Promise<Record<string, any>> {
