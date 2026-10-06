@@ -1386,6 +1386,9 @@ signal、telemetry 与 response completion 共享同一生命周期顺序，当�
 Branch search runtime 的 ref scan 绑定 query cache、Git host、abort signal 与异步扫描结果；
 cache request handlers 还需执行 stable-metadata/read-cache invalidation 副作用，当前没有不复制
 cache/lifecycle owner 的安全纯策略边界。
+Repository/review request handlers 的剩余逻辑绑定 repository availability、read cache、review
+snapshot、abort/performance envelope 与 response wrapping；已有 request policy 覆盖方法分类，
+不再拆出重复 request-lifecycle facade。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
