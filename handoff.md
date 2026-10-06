@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `Gp`（内部 `lut`，源码 103020--103024）的 realtime voice command 识别策略已迁移至 `src/renderer/app-shared/runtime/is-realtime-voice-command.ts`；新增 focused test 覆盖入口命令、命名空间命令和普通命令。
+
 2026-10-06 A5 继续批次：app-primary 未消费导出 `wd`（内部 `VI`，源码 17617--17619）的邮件收件人组非空判定已迁移至 `src/renderer/app-primary/runtime/has-recipient-contacts.ts`；新增 `scripts/test-app-primary-has-recipient-contacts.mjs` 覆盖 3 项 focused assertions，纯策略无 JSX/store/network/lifecycle 副作用。
 
 2026-10-06 T2/A2 继续批次：annotation element metadata payload projection 已迁移至
