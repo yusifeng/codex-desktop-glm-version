@@ -11,4 +11,18 @@ export function normalizeBrowserUseOrigin(value: string): string | null {
   }
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin };
+export function dedupeBrowserUseStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const entry of value) {
+    if (typeof entry !== "string") continue;
+    const trimmed = entry.trim();
+    if (trimmed === "" || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    result.push(trimmed);
+  }
+  return result;
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings };

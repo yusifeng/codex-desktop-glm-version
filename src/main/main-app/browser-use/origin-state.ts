@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { normalizeBrowserUseOrigin } from "./origin-policy";
+import { dedupeBrowserUseStrings, normalizeBrowserUseOrigin } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -77,17 +77,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 /** 字符串数组去重保序（原 `xD`）。 */
 function dedupeStrings(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  const seen = new Set<string>();
-  const result: string[] = [];
-  for (const entry of value) {
-    if (typeof entry != "string") continue;
-    const trimmed = entry.trim();
-    if (trimmed === "" || seen.has(trimmed)) continue;
-    seen.add(trimmed);
-    result.push(trimmed);
-  }
-  return result;
+  return dedupeBrowserUseStrings(value);
 }
 
 /** origin 规范化（原 `lke`）：缺协议补 https://，仅 http/https，取 origin。 */

@@ -411,6 +411,7 @@ browser-use rule update 的 origin 规范化（缺省 https、仅允许 http/htt
 `src/main/main-app/browser-use/origin-policy.ts`。`origin-state.ts` 继续持有 config.toml 读写、
 规则集合更新与日志副作用；`scripts/test-main-browser-use-origin-policy.mjs` 覆盖 4 项协议、端口、
 非法 scheme 与空值断言。
+规则集合输入的 trim/类型过滤/稳定去重也已迁移至同一 policy，新增 1 项去重边界断言。
 
 ### T4 候选复核：browser-sidebar error pages
 
