@@ -1357,6 +1357,9 @@ Blame repository web URL 的 GitHub host gate 已迁移至现有 `git-blame-file
 Git diff text 的 quoting/escape、header path projection 与 rename rewrite 目前仍由同一 parser owner
 共享 UTF-8/octal 解码、header classification、path prefix 与 diff text rewrite 顺序；拆出任一局部
 helper 会复制 parser 状态或改变 rename/header 组合语义，当前没有不制造 facade 的独立 business policy。
+Git path resolution 的 git-dir/git-path/shared-index 查询继续绑定 query cache、Git rev-parse、
+host path API、index fingerprint 与 shared-index fallback；这些步骤共享 repository/cache/I-O 顺序，
+当前没有可独立接回而不复制 path-resolution owner 的纯策略边界。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
