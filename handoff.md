@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `$4`（内部 `ote`，源码 23900）确认为 generated context accessor，依赖内部 schema/runtime state、无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `$3`（内部 `c`，源码 1523--1530）确认为 React reconciler dehydrated-fiber inspector，属内部 runtime infrastructure、无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `H4`（内部 `G`，源码 24042）确认为 generated validation object constructor，无独立 renderer 业务归属，登记 `preserved-coupled`。
@@ -2311,6 +2313,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker residual owner 复核：review file diff 的 blob/working-tree/symlink/untracked 分支共享 repository snapshot、host stat、binary/text detection、abort signal 与 response envelope，fallback 顺序影响最终 diff kind，继续由 file-diff owner 持有。
 2026-10-06 A1 worker residual owner 复核：review comparison 的 merge-base/merge-conflict、empty-untracked 与 snapshot comparison 共享 repository root、Git host、query cache、failure envelope 与 ordering；path projection 已由 comparison policy 覆盖，剩余查询编排继续由 owner 持有。
 2026-10-06 A1 worker residual owner 复核：review patch 的 tracked diff cache、rename fallback、snapshot generation 与 worktree file enumeration 共享 Git I/O、stability retry、stat/cache invalidation 与 response completion 顺序，现有 patch policy 已覆盖 projection，剩余 fetch/list 保持原 owner。
+2026-10-06 A1 worker residual owner 复核：review commit queries 的 branch commit listing 与 line-count 共享 repository query client、Git command result、review snapshot、abort signal 与 response projection；字段投影已有 request consumer 覆盖，剩余 query orchestration 不形成独立纯策略。
 2026-10-06 A1 worker residual owner 复核：working-tree metadata 的 mergeMetadataMaps 虽为 Map 合并，但覆盖顺序由 tracked/untracked 批次、并发 worker 与 rename reconciliation 决定，继续由 metadata owner 持有。
 2026-10-06 A1 worker residual owner 复核：git-worktree-files runtime 已将 NUL/status/pathspec/index fingerprint/missing-file 判定交给 policy；剩余 Git 命令、stat、stability retry、fallback 仍是单一 runtime owner，无新增 policy。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
