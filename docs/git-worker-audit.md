@@ -1457,3 +1457,6 @@ attribution semantics，现有 performance policy 已覆盖 bucket/operation pro
 RPC client 的 method allowlist、response shape guard、request id registry、abort propagation 与
 parentPort message transport 共同定义跨线程协议；拆出 guard 会复制协议 identity/registry state，
 继续由 rpc-client owner 持有并由现有 transport regressions 覆盖。
+Remote host config 的 SSH 字段 shape/type normalization 已迁移至
+`remote-host-config-policy.ts`；display-name/SSH identity consumer 继续负责 terminal command
+解析与 host formatting，新增 3 项 focused policy assertions。

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import * as esbuild from "esbuild";
 
-const source = await fs.readFile("src/main/worker/remote-host-config.ts", "utf8");
-const { code } = await esbuild.transform(source, { loader: "ts", format: "cjs" });
-const module = { exports: {} };
-new Function("module", "exports", code)(module, module.exports);
-const { parseRemoteHostConfig, resolveHostDisplayName, resolveHostSshIdentity } = module.exports;
+const output = path.join(await fs.mkdtemp(path.join(os.tmpdir(), "codex-remote-host-config-")), "remote-host-config.cjs");
+await esbuild.build({ entryPoints: ["src/main/worker/remote-host-config.ts"], outfile: output, bundle: true, format: "cjs", platform: "node", logLevel: "silent" });
+const { parseRemoteHostConfig, resolveHostDisplayName, resolveHostSshIdentity } = await import(`file://${output}`);
 
 assert.deepEqual(parseRemoteHostConfig({ sshAlias: "prod", sshHost: "host", sshPort: 22, identity: null }), {
   sshAlias: "prod", sshHost: "host", sshPort: 22, identity: null,
