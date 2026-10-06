@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `B1`（内部 `uC`，源码 34525--34527）确认为 generated gesture runtime initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `A1`（内部 `bC`，源码 34942）确认为 generated gesture runtime event-listener helper，耦合 lifecycle/options、无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `A4`（内部 `Qp`，源码 24183）确认为 generated schema callback wrapper，属 validation infrastructure、无独立 renderer 业务归属，登记 `preserved-coupled`。
