@@ -1169,6 +1169,15 @@ Worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 状�
 稳定性重试和 fallback 生命周期，并复用这些纯策略；
 `scripts/test-worker-git-worktree-files-policy.mjs` 覆盖 11 项 focused assertions。
 
+### Worker host assembly owner recheck (2026-10-06)
+
+83,636-84,079 的 host factory/worker API assembly 目前没有可独立接回的纯构造 owner：
+`git-worktree-request-handlers.ts`、`git-worktree-handoff-dispatch.ts` 等消费者直接注入
+`createExecutionHost`，并同时持有 host、Git manager、main RPC 与 handoff/ignore-source
+watch 生命周期。`git-ignore-source-watch.ts` 已抽出可验证 reconciliation policy，但 factory
+本身仍是组合根；继续拆分会重复 host identity 或改变 RPC/watch 初始化顺序，本轮保留 assembly
+边界。
+
 ### Worker command registry owner recheck (2026-10-06)
 
 61,151-63,050 的 command/shortcut/browser command 定义当前实际 owner 是
