@@ -1482,3 +1482,6 @@ waiter resolution 共享 generation/abort state、watcher coverage、timer lifec
 Live-query subscription lifecycle 的 cancellation、retry timer、refresh waiters 与 dispose handling
 共享 subscription identity、AbortController、watcher recovery 与 registry ownership；单独拆出任一
 transition 会改变 cancellation/flush 顺序，继续由 lifecycle owner 持有。
+Submodule path runtime 的 `.gitmodules` missing fast path、abortable stat、Git config query、path
+normalization 与 stable dedup 共享 repository query cache、host I/O、abort semantics 和 config
+failure fallback；现有 submodule path policy 已覆盖 output projection，剩余 runtime 不拆 facade。
