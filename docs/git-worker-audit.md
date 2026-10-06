@@ -1215,6 +1215,9 @@ session、dispose 与注册副作用；`scripts/test-worker-git-watch-path-parti
 Worktree copy 的 NUL-separated path 投影已迁移至 `src/main/worker/git-worktree-copy-path-policy.ts`；
 `git-worktree-copy-files.ts` 继续持有 stat、symlink guard、copy 与 cleanup 副作用，
 `scripts/test-worker-git-worktree-copy-path-policy.mjs` 覆盖 1 项解析断言。
+Agent override path 的 Git `ls-files -z` 过滤已迁移至 `src/main/worker/git-worktree-copy-policy.ts`；
+入口继续负责 Git I/O、失败处理与 copy 生命周期，`scripts/test-worker-git-worktree-copy-policy.mjs`
+覆盖 1 项稳定去重/后缀匹配断言。
 
 ### Worker read/working-tree residual owner review (2026-10-06)
 

@@ -6,6 +6,7 @@ type WorktreeCopyDependencies = {
   runGit: (root: string, args: string[], host: any, options?: any) => Promise<any>;
 };
 import { splitGitWorktreeNullSeparatedPaths } from "./git-worktree-copy-path-policy";
+import { filterAgentOverridePaths } from "./git-worktree-copy-policy";
 
 const AGENTS_OVERRIDE_FILE = `AGENTS.override.md`;
 const WORKTREE_INCLUDE_FILE = `.worktreeinclude`;
@@ -130,10 +131,7 @@ async function findAgentOverrideFiles(
     { trim: false },
   );
   if (!result.success) throw Error(`git ls-files failed while locating ${AGENTS_OVERRIDE_FILE}`);
-  const paths = new Set<string>();
-  for (const path of result.stdout.split(`\0`))
-    if (path === AGENTS_OVERRIDE_FILE || path.endsWith(`/${AGENTS_OVERRIDE_FILE}`)) paths.add(path);
-  return [...paths];
+  return filterAgentOverridePaths(result.stdout, AGENTS_OVERRIDE_FILE);
 }
 
 async function copyAgentOverrideFiles(

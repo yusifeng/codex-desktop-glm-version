@@ -2237,6 +2237,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 worker read/working-tree residual owner 复核：git-read-request-handlers 仅注入 cwd/root、Git manager、host、abort signal；working-tree metadata 剩余实现共享 review snapshot、临时目录、Git diff、并发 worker 与 merge 顺序，已有 policy 覆盖纯投影，本轮无新 policy。
 2026-10-06 A1 worker 增量：watcher discovered path stale/new 集合分区已迁移至 `src/main/worker/git-watch-path-partition-policy.ts`；`git-watch-paths.ts` 继续持有 session/dispose/注册副作用，新增 2 项 focused assertions，build/typecheck 通过。
 2026-10-06 A1 worker 增量：worktree copy 的 NUL-separated path 投影已迁移至 `git-worktree-copy-path-policy.ts`；copy-files 继续持有 stat、symlink guard、copy 与 cleanup 副作用，新增 1 项 focused assertion，build/typecheck 通过。
+2026-10-06 A1 worker 增量：agent override path 的 Git `ls-files -z` 过滤已迁移至 `git-worktree-copy-policy.ts`；入口继续负责 Git I/O、失败处理与 copy 生命周期，新增 1 项 focused assertion，build/typecheck 通过。
 2026-10-06 WSL command owner 复核：47,122-47,584 的纯输出/argv 已由 `platform-wsl.ts` 覆盖并有 focused regression；剩余 `wslpath`/`wsl.exe --status|--list` 仍绑定 Windows command spawn、日志和错误处理，没有可脱离 exec owner 的新策略。
 2026-10-06 worker entry protocol 复核：90,661-90,836 的 workerData/parentPort 校验、main-RPC 初始化及 worker-request/request-cancel/flush-and-exit message loop 仍由入口持有；entry-dispatcher 与 core/node/snapshot/live-query dispatch 已有回归，移出入口会改变线程启动或 flush/exit 顺序，本轮不拆分。
 2026-10-06 Git manager/watch/request owner 复核：65,200-80,999 已由 repository model、git-watch/live-query lifecycle 与 request handlers/dispatch 分担真实 owner；剩余 memoization、timer、abort、trace 状态跨越多个 consumer，没有新的单一纯策略边界，不重复制造 manager facade。
