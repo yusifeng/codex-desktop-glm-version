@@ -4947,7 +4947,7 @@ function Kl(e, t, n) {
   });
 }
 function L(e, t) {
-  return e.right >= t.x && e.left <= t.x + t.width && e.bottom >= t.y && e.top <= t.y + t.height;
+  return intersectsAnnotationRect(e, t);
 }
 var R,
   ql,
@@ -6109,6 +6109,7 @@ var { isAnnotationUniqueSelectorMatch } = require("./browser-page-preload/annota
 var { isAnnotationQueryableRoot } = require("./browser-page-preload/annotation-queryable-root-policy");
 var { readAnnotationDocumentSafely } = require("./browser-page-preload/annotation-document-access-policy");
 var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window-policy");
+var { intersectsAnnotationRect } = require("./browser-page-preload/annotation-rect-intersection-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");

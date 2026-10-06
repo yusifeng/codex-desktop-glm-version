@@ -929,6 +929,10 @@ visible-text document 读取（原 `Ul`）现真实复用 `annotation-document-a
 
 元素 ownerDocument.defaultView 与 fallback window 选择（原 `Gl`）已迁移至 `src/main/browser-page-preload/annotation-owner-window-policy.ts`；入口保留 owner-window fallback。新增 2 项 focused assertions。
 
+### 增量抽取：annotation rect intersection policy
+
+Range/client rect 与 viewport rect 的边界相交 predicate（原 `L`）已迁移至 `src/main/browser-page-preload/annotation-rect-intersection-policy.ts`；新增 2 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
