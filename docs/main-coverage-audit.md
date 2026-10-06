@@ -404,3 +404,10 @@ owner。按“真实 consumer 才迁移”规则，本轮不新建 policy facade
 `worker.ts:58` 接回 shell quoting，`worker.ts:173` 接回 open-target path policy。live-query run
 由 live-query coordinator 直接消费；host-handoff progress 由 handoff runtime 接回。上述入口均
 已有 focused regression，没有未消费的可读 helper 可安全迁移；该证据支持维持当前 preserve 边界。
+
+### T4 候选复核：browser-sidebar error pages
+
+`browser-sidebar/error-pages.ts` 同时持有图片附件 WeakMap 的 suspend/resume、WebContents
+session.fetch/abort 生命周期、annotation snapshot 模式切换、国际化错误内容和 interstitial
+HTML 模板。错误抑制、URL 归一与文案判定虽为纯函数，但由同一模块的附件与窗口事件 consumer
+直接组合；当前没有可独立接回且不复制模板/状态 owner 的窄边界，暂不拆分。
