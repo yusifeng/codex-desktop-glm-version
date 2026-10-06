@@ -1334,3 +1334,5 @@ abort/performance envelope 与 response wrapping。当前没有可脱离 request
 Review metadata utils/diff/commit queries 已分别承载 rename/untracked reconciliation、metadata
 diff parsing 与 commit line-count/branch query；剩余 fetch/query 函数绑定 review snapshot、Git
 命令、并发与 abort signal，现有 utility/policy consumer 已覆盖纯投影，不再新增 facade。
+Review comparison 的 merge-conflict path 与 empty-untracked 查询仍绑定 repository root、Git host、
+snapshot/query cache 及失败包装；它们不是独立路径 predicate，继续由 comparison owner 保留。
