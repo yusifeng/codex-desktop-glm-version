@@ -4576,7 +4576,7 @@ function qc(e) {
   return escapeAnnotationSelectorToken(e, typeof CSS < `u` && typeof CSS.escape == `function` ? CSS.escape.bind(CSS) : undefined);
 }
 function Jc(e, { preventDefault: t = !0 } = {}) {
-  (t && e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation?.());
+  stopAnnotationEventPropagation(e, { preventDefault: t });
 }
 var Yc,
   Xc,
@@ -6117,6 +6117,7 @@ var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotati
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
 var { getAnnotationComposedParent } = require("./browser-page-preload/annotation-composed-parent-policy");
+var { stopAnnotationEventPropagation } = require("./browser-page-preload/annotation-event-propagation-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");

@@ -911,6 +911,10 @@ frame path 到 document 的解析（原 `Dc`）已迁移至 `src/main/browser-pa
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
 
+### 增量抽取：annotation event propagation policy
+
+annotation event 的 preventDefault/stopPropagation/stopImmediatePropagation 边界（原 `Jc`）已迁移至 `src/main/browser-page-preload/annotation-event-propagation-policy.ts`；入口保留 preventDefault 开关。新增 2 项 focused assertions。
+
 ### 增量抽取：annotation scroll-container offset
 
 按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。

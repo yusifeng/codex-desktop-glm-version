@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { stopAnnotationEventPropagation } from "../app/.vite/build/browser-page-preload/annotation-event-propagation-policy.js";
+const calls = [];
+const event = { preventDefault: () => calls.push(`prevent`), stopPropagation: () => calls.push(`stop`), stopImmediatePropagation: () => calls.push(`immediate`) };
+stopAnnotationEventPropagation(event);
+assert.deepEqual(calls, [`prevent`, `stop`, `immediate`]);
+calls.length = 0;
+stopAnnotationEventPropagation(event, { preventDefault: false });
+assert.deepEqual(calls, [`stop`, `immediate`]);
+console.log(`test-preload-annotation-event-propagation-policy: 2 assertions passed`);
