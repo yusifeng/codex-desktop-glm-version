@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `Fz`（内部 `UGe`，源码 68071）确认为 generated feature wiring 的 constant-false predicate，无独立 renderer 语义归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `G2`（内部 `oae`，源码 29102）确认为 generic identity infrastructure，无 renderer 业务语义或独立 consumer，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `CJ`（内部 `UPe`，源码 61319）确认为 generated annotation batch enum lookup/fallback，无独立 renderer 业务归属，登记 `preserved-coupled`。
