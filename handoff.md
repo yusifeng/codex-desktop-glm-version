@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Fh` 反解为内部 `qO`（源码 4774），确认为 generated constant-false capability callback，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Fi` 反解为内部 `A5e`（源码 75492），确认为读取多组 generated atoms/signals 的 React hook，无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Eg` 反解为内部 `eD`（源码 3723），确认为 generated cursor CSS configuration constant，无独立 renderer 业务归属，登记 `preserved-coupled`。
@@ -2433,6 +2435,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A2 annotation UI owner evidence：22291-26794 区段对应的 overlay/surface/pointer/preview/draft/design modules 均已有 `scripts/test-index.md` focused entries（含 observer/runtime/state/policy）；26795-26881 frame/anchor prerequisites 已由 `annotation-anchor-geometry.ts`、`annotation-preload-runtime.ts` 消费，剩余部分绑定 RAF/MutationObserver/DOM style 生命周期，无未覆盖可独立纯策略。
 2026-10-06 A2 protocol owner evidence：30084-30217 WebMCP descriptor/startup 区段已由 `webmcp-descriptor.ts`/`webmcp-protocol.ts` 与 preload startup owner 消费，并有 descriptor/registry/protocol regression；`contextBridge`、secure-context、pagehide 与 zoom/startup 顺序均是不可脱离生命周期边界。
 2026-10-06 A2 coverage verification：重新运行 `test-preload-extension-distribution.mjs`（5 assertions）、`test-preload-deployment-channel.mjs`（8 assertions）与 `test-preload-webmcp-descriptor.mjs`（5 assertions）均通过；对应未完成 audit 区段已有可核验 consumer/test 覆盖。
+2026-10-06 A2 coverage verification follow-up：重新运行 `test-preload-webmcp-registry.mjs`（9 assertions）与 `test-preload-webmcp-descriptor.mjs`（5 assertions），并复跑 extension-distribution（5）/deployment-channel（8）回归均通过；27295-27470/30084-30217 已有真实 consumer 与 focused test，剩余逻辑绑定 secure-context、contextBridge、AbortSignal、pagehide 与 startup 顺序，无新增可安全脱离 owner 的纯策略。
 2026-10-06 A2 runtime coverage verification：重新运行 `test-preload-annotation-overlay-runtime.mjs`（48 assertions）、`test-preload-annotation-surface-observer.mjs`（14 assertions）与 `test-preload-annotation-pointer-selection.mjs`（18 assertions）均通过；对应 runtime owner 区段已有 focused coverage，无新增可脱离纯 policy。
 2026-10-06 A2 controls coverage verification：重新运行 `test-preload-annotation-controls-registry.mjs`（10 assertions）与 `test-preload-pending-editor-message.mjs`（6 assertions）均通过；7260-7553 controls registry/pending reducer 区段已有真实 consumer 与 focused coverage。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
