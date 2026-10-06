@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Fi` 反解为内部 `A5e`（源码 75492），确认为读取多组 generated atoms/signals 的 React hook，无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Eg` 反解为内部 `eD`（源码 3723），确认为 generated cursor CSS configuration constant，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Es` 反解为内部 `nq`（源码 37812），确认为 generated signal/store selector，无独立 renderer 业务归属，登记 `preserved-coupled`。
