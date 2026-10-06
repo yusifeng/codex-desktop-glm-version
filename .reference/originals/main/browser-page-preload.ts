@@ -4925,11 +4925,7 @@ function Hl(e) {
   return isAnnotationTextInput(e, e?.ownerDocument?.defaultView, new Set([`email`, `search`, `tel`, `text`, `url`]));
 }
 function Ul(e) {
-  try {
-    return e.document;
-  } catch {
-    return null;
-  }
+  return readAnnotationDocumentSafely(e);
 }
 function Wl(e) {
   return isAnnotationVisibleTextElement(e, {
