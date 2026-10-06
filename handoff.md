@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$R` 反解为内部 `UU`（源码 68857），确认为 generated protocol/runtime descriptor，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$Q` 反解为内部 `KA`（源码 43912），确认为 generated runtime initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Hm` 反解为内部 `lA`（源码 6036），确认为 generated beacon-action symbol/feature-state wiring，无 standalone pure policy boundary，登记 `preserved-coupled`。
@@ -2460,6 +2462,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A2 serialization/request coverage：重新运行 `test-preload-local-url.mjs`（9 assertions）、`test-preload-annotation-serialization.mjs`（11）、`test-preload-annotation-request-context.mjs`（8）、`test-preload-annotation-site-requests.mjs`（12）与 `test-preload-annotation-anchor-geometry.mjs`（3）均通过；3863-5049/5120-7259 的 URL、safe serialization、request context、permission site-request 与 anchor geometry 已有真实接回及 focused coverage，无新增可脱离 owner 的纯策略。
 2026-10-06 A2 annotation UI runtime coverage：重新运行 `test-preload-annotation-overlay-runtime.mjs`（48 assertions）、`test-preload-annotation-surface-observer.mjs`（14）、`test-preload-annotation-pointer-selection.mjs`（18）、`test-preload-annotation-draft-runtime.mjs`（4）与 `test-preload-annotation-design-control-sync.mjs`（11）均通过；22291-26794 overlay/surface/pointer/draft/design owner 已有 focused regression，剩余 MutationObserver、RAF、DOM/style 与 React assembly 继续保留在生命周期 owner。
 2026-10-06 A2 annotation lifecycle coverage：重新运行 `test-preload-annotation-controls-registry.mjs`（10 assertions）、`test-preload-pending-editor-message.mjs`（6）、`test-preload-annotation-preload-lifecycle.mjs`（8）、`test-preload-annotation-permission-controller.mjs`（18）与 `test-preload-annotation-mode-controller.mjs`（5）均通过；7260-7553/26882-27185 的 registry、pending、permission、mode 与 page lifecycle 已有真实 consumer/focused regression，无新增可脱离 owner 的纯策略。
+2026-10-06 A2 selection/interaction coverage：重新运行 annotation selection（4 assertions）、display selections（7）、keyboard（5）、interaction policy（8）、frame-chain policy（2）与 containment（5）回归均通过；DOM selection/frame/interaction 区段已有真实 consumer 与 focused coverage，剩余 range/selection orchestration 绑定 DOM 与 lifecycle owner，不拆 facade。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
