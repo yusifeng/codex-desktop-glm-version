@@ -5558,10 +5558,10 @@ function Fu(e, t) {
   return n;
 }
 function Iu(e) {
-  return Lu(e) ? e.host : null;
+  return getAnnotationShadowHost(e, { isShadowRoot: (value) => Lu(value) });
 }
 function Lu(e) {
-  return e.nodeType === Node.DOCUMENT_FRAGMENT_NODE && `host` in e && F(e.host);
+  return isAnnotationShadowHostRoot(e, { fragmentNodeType: Node.DOCUMENT_FRAGMENT_NODE, isElement: (value) => F(value) });
 }
 function Ru(e, t) {
   let n = F(e) ? e : Iu(e);
@@ -6103,6 +6103,7 @@ var { projectAnnotationTextOffset } = require("./browser-page-preload/annotation
 var { resolveAnnotationHighlightContext } = require("./browser-page-preload/annotation-highlight-context-policy");
 var { projectAnnotationClientRects } = require("./browser-page-preload/annotation-client-rect-projection");
 var { isAnnotationTextSecurityEnabled } = require("./browser-page-preload/annotation-text-security-policy");
+var { isAnnotationShadowHostRoot, getAnnotationShadowHost } = require("./browser-page-preload/annotation-shadow-host-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
