@@ -1169,6 +1169,15 @@ Worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 状�
 稳定性重试和 fallback 生命周期，并复用这些纯策略；
 `scripts/test-worker-git-worktree-files-policy.mjs` 覆盖 11 项 focused assertions。
 
+### Worker command registry owner recheck (2026-10-06)
+
+61,151-63,050 的 command/shortcut/browser command 定义当前实际 owner 是
+`src/main/shared/command-registry.ts`，其 policy 子边界由
+`command-registry-policy.ts` 与 `command-capability-policy.ts` 消费；renderer/menu/keyboard
+调用方直接依赖 shared registry，`src/main/worker` 没有对应 command request handler。将完整
+registry 复制到 worker 会破坏 shared command identity，故仅保留已迁移的 shared policy，暂不
+新增 worker facade。
+
 ### Worker platform boundary recheck (2026-10-06)
 
 当前 worker 的平台相关窄入口已有真实 consumer：`worker.ts:110` 接回
