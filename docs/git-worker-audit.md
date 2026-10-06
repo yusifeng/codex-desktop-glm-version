@@ -1401,6 +1401,9 @@ Execution/computer-use adapter 仍绑定 execution host、service identity、cap
 Worker entry protocol 的 workerData/parentPort 校验、main-RPC 初始化与 request/cancel/flush
 message loop 共享线程启动、request registry、response emission 及 flush/exit 顺序；dispatcher
 仅负责分类，当前不再拆入口生命周期 owner。
+Worker platform boundary 的 local-environment、shell-config 与 platform-env policy 已由真实
+consumer 接回；剩余 Windows shell、Git Bash/GitHub Desktop discovery 与 workspace watcher
+生命周期仍耦合 process/host I/O，本轮不新增 platform facade。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
