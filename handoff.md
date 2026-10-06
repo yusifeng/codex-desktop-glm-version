@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `G1`（内部 `sC`，源码 34466--34468）确认为 generated CSS motion-property list initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `D1`（内部 `wC`，源码 35058--35060）确认为 generated resize-animation bookkeeping initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `A0`（内部 `sS`，源码 33308--33310）确认为 generated gesture runtime 的 pointer-event primary-button initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
