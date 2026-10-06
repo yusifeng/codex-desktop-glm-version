@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1230.
+Total scripts: 1232.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -1297,3 +1297,5 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-shared-normalize-annotation-origin.mjs](test-app-shared-normalize-annotation-origin.mjs)
 [test-app-shared-get-change-path.mjs](test-app-shared-get-change-path.mjs)
 [test-preload-annotation-clipping-boundary-policy.mjs](test-preload-annotation-clipping-boundary-policy.mjs)
+[test-app-shared-is-absolute-path.mjs](test-app-shared-is-absolute-path.mjs)
+[test-preload-annotation-shadow-root-policy.mjs](test-preload-annotation-shadow-root-policy.mjs)
