@@ -1442,3 +1442,6 @@ numstat records；cursor advancement、malformed-record stop semantics 与 downs
 Review commit query runtime 的 branch comparison resolution、bounded log output、snapshot/query cache
 与 abort-aware line-count parsing 共享 commit ordering、normalization 与 response envelope；现有
 commit-query policy 已覆盖 parser/field projection，剩余 query I/O 不形成独立纯策略。
+Branch-create runtime 的 branch existence probe、commit-tree resolution、Git branch/switch 与
+synced-config update 共享 query cache、ref namespace、fail-if-exists semantics 与 error envelope；
+现有 branch-name/ref policy 已覆盖纯 validation，剩余 create orchestration 继续由 owner 持有。
