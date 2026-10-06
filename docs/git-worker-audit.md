@@ -1430,3 +1430,6 @@ fallback 共享 Git command exit semantics（1/128）、abort/query metadata 和
 Branch-ahead 的 `rev-list --count` stdout 数值/null 判定已迁移至现有
 `git-branch-ahead-policy.ts`；runtime 继续负责 query cache、Git exit handling 与 remote/merge-base
 fallback，focused policy assertions 增加 3 项。
+Git config scope runtime 的 missing-value detection、scope fallback 与 worktree-config enable retry
+共享 query signal、Git command errors、scope cache metadata 与 retry ordering；现有 config policies
+已覆盖 scope/argument projection，剩余 config I/O 不形成独立纯策略。
