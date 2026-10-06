@@ -1488,3 +1488,6 @@ failure fallback；现有 submodule path policy 已覆盖 output projection，�
 Git index-info runtime 的 git-dir resolution、platform path join、index stat 与 ENOENT/non-ENOENT
 logging 共享 host/cache I/O、error telemetry 与 lastModified response projection；现有 index-info
 policy 已覆盖 finite-mtime/zero fallback，剩余 runtime 不拆新边界。
+Git diff text 的 line-count 已由 diff-line-count policy 接回；剩余 quoted path parser、combined
+header handling、rename rewrite 与 diff text transport 共享 parser state 和 response ordering，
+当前无新增独立纯策略。
