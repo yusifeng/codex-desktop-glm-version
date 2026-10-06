@@ -1363,6 +1363,9 @@ host path API、index fingerprint 与 shared-index fallback；这些步骤共享
 Review section changes 的 gitlink cleanliness、repository lookup、review diff/apply-patch、cache
 invalidation 与 partial-apply error contract 共享 target host、Git 状态查询及副作用顺序；现有
 `git-review-section-policy.ts` 已覆盖路径/error projection，剩余 orchestration 不再拆分新 facade。
+Review metadata utils 的 rename reconciliation 同时更新 raw entries、files 与 stats，并依赖
+deleted-entry OID 唯一匹配、untracked path set 和 rename 覆盖顺序；拆分其中单一投影会失去跨批次
+一致性，继续由 metadata utility owner 持有。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file

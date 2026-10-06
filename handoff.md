@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `H4`（内部 `G`，源码 24042）确认为 generated validation object constructor，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `H3`（内部 `ce`，源码 1721）确认为 generated reconciler fiber hook，触及内部 renderer state、无独立业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `H1`（内部 `lC`，源码 34502--34504）确认为 generated SVG/DOM runtime tag predicate，无独立 renderer 业务归属，登记 `preserved-coupled`。
@@ -2302,6 +2304,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker residual owner 复核：git-diff-text 的 quoting/escape、header path projection 与 rename rewrite 共享 UTF-8/octal 解码、header classification、path prefix 与 rewrite 顺序，未发现不制造 facade 的独立 business policy，继续由 parser owner 持有。
 2026-10-06 A1 worker residual owner 复核：git-path-resolution 的 git-dir/git-path/shared-index 查询绑定 query cache、Git rev-parse、host path API、index fingerprint 与 fallback 顺序，未发现可脱离 path-resolution owner 的纯策略边界。
 2026-10-06 A1 worker residual owner 复核：review section changes 的 gitlink cleanliness、repository lookup、review diff/apply-patch、cache invalidation 与 partial-apply error contract 共享 target host、Git 状态查询及副作用顺序；现有 section policy 已覆盖路径/error projection，剩余 orchestration 继续由 owner 持有。
+2026-10-06 A1 worker residual owner 复核：review metadata utils 的 rename reconciliation 同时更新 raw entries/files/stats，依赖 deleted-entry OID 唯一匹配、untracked path set 与 rename 覆盖顺序，继续由 metadata utility owner 持有。
 2026-10-06 A1 worker residual owner 复核：working-tree metadata 的 mergeMetadataMaps 虽为 Map 合并，但覆盖顺序由 tracked/untracked 批次、并发 worker 与 rename reconciliation 决定，继续由 metadata owner 持有。
 2026-10-06 A1 worker residual owner 复核：git-worktree-files runtime 已将 NUL/status/pathspec/index fingerprint/missing-file 判定交给 policy；剩余 Git 命令、stat、stability retry、fallback 仍是单一 runtime owner，无新增 policy。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
