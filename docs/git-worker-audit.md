@@ -1330,3 +1330,7 @@ invalidation 副作用。当前未发现不复制 cache/lifecycle owner 的新�
 `git-repository-read-request-handlers.ts` 与 `git-review-request-handlers.ts` 已是窄 request
 consumer；两者剩余逻辑分别绑定 repository availability、Git read cache、review snapshot、
 abort/performance envelope 与 response wrapping。当前没有可脱离 request lifecycle 的新纯 policy。
+
+Review metadata utils/diff/commit queries 已分别承载 rename/untracked reconciliation、metadata
+diff parsing 与 commit line-count/branch query；剩余 fetch/query 函数绑定 review snapshot、Git
+命令、并发与 abort signal，现有 utility/policy consumer 已覆盖纯投影，不再新增 facade。
