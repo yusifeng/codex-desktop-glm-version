@@ -1407,6 +1407,9 @@ consumer 接回；剩余 Windows shell、Git Bash/GitHub Desktop discovery 与 w
 Worker command registry boundary 的 command/shortcut/browser command 定义实际 owner 仍是
 shared command-registry；renderer/menu/keyboard 直接依赖 shared identity，worker 无对应 request
 consumer，复制 registry 会破坏 identity，继续保留 shared owner。
+Worker host factory/assembly 仍由 worktree/handoff handlers 组合 createExecutionHost、Git manager、
+main RPC 与 ignore-source watcher 生命周期；该组合根没有独立纯构造 owner，拆分会重复 host
+identity 或改变 watcher/RPC 初始化顺序，继续保留 assembly owner。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
