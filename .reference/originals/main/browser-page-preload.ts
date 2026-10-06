@@ -4579,8 +4579,10 @@ function Gc(e) {
   );
 }
 function Kc(e, t) {
-  let n = t.getComputedStyle(e);
-  return [n.overflow, n.overflowX, n.overflowY].some(nc);
+  return isAnnotationClippingBoundary(e, {
+    getStyle: (element) => t.getComputedStyle(element),
+    isClippingOverflow: (value) => nc(value),
+  });
 }
 function qc(e) {
   return escapeAnnotationSelectorToken(e, typeof CSS < `u` && typeof CSS.escape == `function` ? CSS.escape.bind(CSS) : undefined);
@@ -6118,6 +6120,7 @@ var { getAnnotationScrollContainerOffset } = require("./browser-page-preload/ann
 var { projectAnnotationFramePoint } = require("./browser-page-preload/annotation-frame-point-projection");
 var { isAnnotationIframeElement } = require("./browser-page-preload/annotation-iframe-element-policy");
 var { resolveAnnotationIframeWindow } = require("./browser-page-preload/annotation-iframe-window-policy");
+var { isAnnotationClippingBoundary } = require("./browser-page-preload/annotation-clipping-boundary-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");

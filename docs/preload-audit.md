@@ -875,6 +875,10 @@ Annotation element 的 top-frame/document-root/HTML eligibility 与 `oai-annotat
 
 iframe contentWindow 的可用 document boundary（原 `sc`）已迁移至 `src/main/browser-page-preload/annotation-iframe-window-policy.ts`；保留非 iframe、空 document 与跨源异常的 null 语义。新增 4 项 focused assertions。
 
+### 增量抽取：annotation clipping boundary policy
+
+元素 overflow/overflowX/overflowY 的 clipping boundary 判定（原 `Kc`）已迁移至 `src/main/browser-page-preload/annotation-clipping-boundary-policy.ts`；入口仅注入 computed style 与既有 overflow policy。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation scroll-container offset
 
 按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。
