@@ -953,6 +953,10 @@ CSS highlight range 的 style root/owner window/capability context 解析（原 
 
 client rect 的数量上限、零尺寸过滤与 `{x,y,width,height}` projection（原 `Vu`）已迁移至 `src/main/browser-page-preload/annotation-client-rect-projection.ts`；默认保留 1000 rect cap。新增 2 项 focused assertions。
 
+### 增量抽取：annotation text security policy
+
+`-webkit-text-security` 的 masked-text 判定（原 `Bu`）已迁移至 `src/main/browser-page-preload/annotation-text-security-policy.ts`；入口仅注入 computed style property 读取。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。

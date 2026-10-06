@@ -5584,8 +5584,7 @@ function zu(e, t) {
   return !1;
 }
 function Bu(e, t) {
-  let n = t.getComputedStyle(e).getPropertyValue(`-webkit-text-security`);
-  return n.length > 0 && n !== `none`;
+  return isAnnotationTextSecurityEnabled(e, { getTextSecurity: (element) => t.getComputedStyle(element).getPropertyValue(`-webkit-text-security`) });
 }
 function Vu(e) {
   return projectAnnotationClientRects(e, { getClientRects: (value) => value.getClientRects() });
@@ -6103,6 +6102,7 @@ var { getAnnotationRangeTextLength } = require("./browser-page-preload/annotatio
 var { projectAnnotationTextOffset } = require("./browser-page-preload/annotation-text-offset-projection");
 var { resolveAnnotationHighlightContext } = require("./browser-page-preload/annotation-highlight-context-policy");
 var { projectAnnotationClientRects } = require("./browser-page-preload/annotation-client-rect-projection");
+var { isAnnotationTextSecurityEnabled } = require("./browser-page-preload/annotation-text-security-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
