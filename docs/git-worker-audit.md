@@ -1461,3 +1461,6 @@ Remote host config 的 SSH 字段 shape/type normalization 已迁移至
 `remote-host-config-policy.ts`；display-name/SSH identity consumer 继续负责 terminal command
 解析与 host formatting，command tail/port/identity 与 IPv6 bracket projection 也已归入 policy，
 focused policy assertions 增至 7 项。
+Synced-branch config parsing 的 JSON decode、schema validation、warning/error fallback 与 config
+file read/write 共享 schema owner、Git-dir/path resolution、host file I/O 和 warning lifecycle；
+当前没有不复制这些 owner 的独立纯 parser 边界。
