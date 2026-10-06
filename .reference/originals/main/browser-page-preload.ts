@@ -5626,9 +5626,10 @@ function Hu(e, t, n) {
   return (c.remove(), d);
 }
 function Uu(e) {
-  if (e.type !== `childList`) return !1;
-  let t = [...Array.from(e.addedNodes), ...Array.from(e.removedNodes)];
-  return t.length > 0 && t.every((e) => F(e) && e.hasAttribute(ed));
+  return isAnnotationMirrorMutation(e, {
+    isElement: (value) => F(value),
+    hasMarker: (value) => value.hasAttribute(ed),
+  });
 }
 function Wu(e, t) {
   return hasAnnotationAncestorTransform(e, {
@@ -6090,6 +6091,7 @@ var { hasAnnotationAncestorTransform } = require("./browser-page-preload/annotat
 var { intersectAnnotationRects } = require("./browser-page-preload/annotation-rect-clip-intersection");
 var { projectAnnotationRectBounds } = require("./browser-page-preload/annotation-rect-bounds-projection");
 var { projectAnnotationRectPoint } = require("./browser-page-preload/annotation-rect-point-projection");
+var { isAnnotationMirrorMutation } = require("./browser-page-preload/annotation-mirror-mutation-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
