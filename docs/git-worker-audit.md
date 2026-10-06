@@ -1451,3 +1451,6 @@ policy assertions 增加 3 项。
 Branch search runtime 的 ref scan 同时依赖 Git `for-each-ref` 输出、case-folded query matching、
 branch deduplication、abort-aware batching 与 query cache；现有 search policy 已覆盖 text/ref
 projection，剩余 scan/runtime 编排保持 owner。
+Git observability runtime 的 performance outcome/reason/failure projection 共享 operation attribution、
+cache hit/miss counters、logger tags 与 telemetry flush lifecycle；拆出局部 reason helper 会复制
+attribution semantics，现有 performance policy 已覆盖 bucket/operation projection，继续保留 owner。
