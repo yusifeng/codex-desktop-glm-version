@@ -1479,3 +1479,6 @@ Cat-file batch parser 的 request framing、stream prefix handling、byte limits
 Live-query registry refresh 的 repo-changed event handling、recovery flag、refresh scheduling 与
 waiter resolution 共享 generation/abort state、watcher coverage、timer lifecycle 与 event ordering；
 现有 live-query state/watch policies 已覆盖 key/option projection，剩余 registry mutation 不拆分。
+Live-query subscription lifecycle 的 cancellation、retry timer、refresh waiters 与 dispose handling
+共享 subscription identity、AbortController、watcher recovery 与 registry ownership；单独拆出任一
+transition 会改变 cancellation/flush 顺序，继续由 lifecycle owner 持有。
