@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Gg` 反解为内部 `NE`（源码 78091），确认为 generated runtime helper，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Gf` 反解为内部 `vP`（源码 13897），确认为 generated store atom/constant-false selector，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Ga` 反解为内部 `KX`（源码 52728），确认为 generated protobuf analytics descriptor `ChatgptModelPickerEvent`，无独立 renderer 业务归属，登记 `preserved-coupled`。
