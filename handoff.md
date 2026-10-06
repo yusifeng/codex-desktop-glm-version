@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Gi`（内部 `T1`，源码 70859）确认为 React/store-bound comment-action UI component，无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Gp`（内部 `rM`，源码 10539--10549）确认为 generated query-state patch/rollback orchestration，缺少独立 consumer boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Gd`（内部 `TI`，源码 17375）确认为 mutating generated query/cache flush helper，无 standalone renderer 业务语义，登记 `preserved-coupled`。
