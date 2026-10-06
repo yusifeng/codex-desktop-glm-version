@@ -1178,6 +1178,15 @@ Worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 状�
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### Worker protocol-schema owner recheck (2026-10-06)
+
+对 38,230-43,985 与 53,200-53,477 的协议 schema 做了 consumer 复核：当前
+`src/main/worker` 没有 deep-link/browser-tab/runtime-bundle 或 connector/MCP schema 的
+request handler；`browser_auth_challenge_id` 的实际 owner 是
+`src/main/shared/elicitation-protocol.ts`，由 shared elicitation/approval normalization
+消费，而非 worker。将这些声明复制到 worker 会产生未接回 facade，故继续保留原始 schema
+边界，待真实 worker request consumer 出现后再按子组迁移。
+
 ### Worker lifecycle/transport boundary recheck (2026-10-06)
 
 原 84,080-85,965 的 lifecycle/transport 边界已对照当前入口复核：`entry-dispatcher.ts` 仅
