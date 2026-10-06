@@ -5631,21 +5631,11 @@ function Uu(e) {
   return t.length > 0 && t.every((e) => F(e) && e.hasAttribute(ed));
 }
 function Wu(e, t) {
-  let n = e;
-  for (; n != null;) {
-    let e = t.getComputedStyle(n),
-      r = e.transform;
-    if (r !== `` && r !== `none`) {
-      let e = /^matrix\(([^)]+)\)$/.exec(r);
-      if (e == null) return !0;
-      let t = e[1]?.split(`,`).map(Number);
-      if (t?.length !== 6 || Math.abs(t[1] ?? 0) > 1e-6 || Math.abs(t[2] ?? 0) > 1e-6) return !0;
-    }
-    let i = e.getPropertyValue(`rotate`);
-    if (i !== `` && i !== `none` && i !== `0deg`) return !0;
-    n = n.parentElement ?? Iu(n.getRootNode());
-  }
-  return !1;
+  return hasAnnotationAncestorTransform(e, {
+    getStyle: (element) => t.getComputedStyle(element),
+    getParent: (element) => element.parentElement,
+    getShadowHost: (element) => Iu(element.getRootNode()),
+  });
 }
 function Gu(e, t) {
   let n = Math.max(e.left, t.left),
@@ -6105,6 +6095,7 @@ var { projectAnnotationClientRects } = require("./browser-page-preload/annotatio
 var { isAnnotationTextSecurityEnabled } = require("./browser-page-preload/annotation-text-security-policy");
 var { isAnnotationShadowHostRoot, getAnnotationShadowHost } = require("./browser-page-preload/annotation-shadow-host-policy");
 var { isAnnotationRangeFixedPosition } = require("./browser-page-preload/annotation-range-fixed-position-policy");
+var { hasAnnotationAncestorTransform } = require("./browser-page-preload/annotation-transform-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
