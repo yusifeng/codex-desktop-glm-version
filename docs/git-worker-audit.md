@@ -1205,6 +1205,13 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### Worker read/working-tree residual owner review (2026-10-06)
+
+`git-read-request-handlers.ts` 当前只负责将 cwd/root、Git manager、host 与 abort signal 注入
+已有语义模块；缺失 repository 的 null/empty contract 属于 request lifecycle。`git-review-working-
+tree-metadata.ts` 的剩余实现共享 review snapshot、临时目录、Git diff、并发 worker 与 metadata
+merge 顺序，已有 working-tree policy 覆盖纯投影；本轮未发现可独立接回的新 policy。
+
 ### Worker git-cat-file residual owner review (2026-10-06)
 
 `git-cat-file.ts` 的 OID 可查询、content/error envelope、disk error 与 batch-error 判定已由
