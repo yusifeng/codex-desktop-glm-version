@@ -977,6 +977,10 @@ selection/mirror geometry 的 client rect 交集 projection（原 `Gu`）已迁�
 
 annotation design control 的 default/current fallback 与 color/select/range/toggle 默认值 projection（原 `tf`）已迁移至 `src/main/browser-page-preload/annotation-control-default-value.ts`。新增 5 项 focused assertions。
 
+### 增量抽取：annotation sidebar editor transition
+
+sidebar runtime editor message 的 select/create/restore/close/sync 状态 transition（原 `Lf`）已迁移至 `src/main/browser-page-preload/annotation-sidebar-editor-transition.ts`；入口保留状态 reducer 接回。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation rect bounds projection
 
 selection rect 集合的 bounding box 聚合（原 `Ku`）已迁移至 `src/main/browser-page-preload/annotation-rect-bounds-projection.ts`。新增 1 项 focused assertion。

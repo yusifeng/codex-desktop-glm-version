@@ -6091,6 +6091,7 @@ var { isAnnotationMirrorMutation } = require("./browser-page-preload/annotation-
 var { hasAnnotationInputSelection } = require("./browser-page-preload/annotation-input-selection-policy");
 var { getAnnotationVisibleElementRect } = require("./browser-page-preload/annotation-visible-element-rect");
 var { getAnnotationControlDefaultValue } = require("./browser-page-preload/annotation-control-default-value");
+var { reduceAnnotationSidebarEditorTransition } = require("./browser-page-preload/annotation-sidebar-editor-transition");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
@@ -7056,26 +7057,7 @@ function If(e) {
     : null;
 }
 function Lf(e, t) {
-  switch (t.type) {
-    case `browser-sidebar-runtime-select-comment`:
-    case `browser-sidebar-runtime-create-comment-at-point`:
-    case `browser-sidebar-runtime-create-comment-from-selection`:
-    case `browser-sidebar-runtime-open-design-editor-at-point`:
-      return t;
-    case `browser-sidebar-runtime-restore-editor`:
-      return e?.type === `browser-sidebar-runtime-select-comment` ||
-        e?.type === `browser-sidebar-runtime-create-comment-at-point` ||
-        e?.type === `browser-sidebar-runtime-create-comment-from-selection` ||
-        e?.type === `browser-sidebar-runtime-open-design-editor-at-point`
-        ? e
-        : t;
-    case `browser-sidebar-runtime-close-editor`:
-      return null;
-    case `browser-sidebar-runtime-sync`:
-    case `browser-sidebar-runtime-prepare-comment-screenshot`:
-    case `browser-sidebar-runtime-clear-comment-screenshot`:
-      return e;
-  }
+  return reduceAnnotationSidebarEditorTransition(e, t);
 }
 var Rf = function (e, t, n) {
     let r = Promise.resolve();
