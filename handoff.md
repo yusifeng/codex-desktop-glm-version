@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Gr`（内部 `Zet`，源码 80588）确认为 hotkey-window navigation handler，协调 generated stores/routing/副作用、无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Et`（内部 `cpt`，源码 104505--104509）确认为 artifact follow-up action builder，依赖 generated analytics/event constructors、无 standalone pure renderer policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Hf`（内部 `NP`，源码 14825）确认为 app bootstrap initializer，耦合 generated services/stores、无 standalone renderer 业务语义，登记 `preserved-coupled`。
