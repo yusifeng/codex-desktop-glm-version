@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Ga` 反解为内部 `KX`（源码 52728），确认为 generated protobuf analytics descriptor `ChatgptModelPickerEvent`，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Fh` 反解为内部 `qO`（源码 4774），确认为 generated constant-false capability callback，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Fi` 反解为内部 `A5e`（源码 75492），确认为读取多组 generated atoms/signals 的 React hook，无 standalone pure policy boundary，登记 `preserved-coupled`。
@@ -2452,3 +2454,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker 增量：branch-ahead 的 `rev-list --count` stdout 数值/null 判定已迁移至现有 `git-branch-ahead-policy.ts`；runtime 继续负责 query cache、Git exit handling 与 remote/merge-base fallback，focused assertions 增加 3 项，build/typecheck 通过。
 2026-10-06 A1 worker 增量：remote branch upstream ref 的 stdout trim/empty-to-null 投影已迁移至现有 `git-remote-branches-policy.ts`；runtime 继续负责 query cache、Git exit/abort handling，focused assertions 增加 3 项，build/typecheck 通过。
 2026-10-06 A1 worker 增量：remote host config 的 SSH 字段 shape/type normalization 已迁移至 `remote-host-config-policy.ts`；display-name/SSH identity consumer 继续负责 terminal command 解析与 host formatting，新增 3 项 focused policy assertions，build/typecheck 通过。
+2026-10-06 A1 worker 增量：remote host config 的 command tail/port/identity 与 IPv6 bracket projection 已并入 `remote-host-config-policy.ts`；consumer 继续负责 display-name/SSH identity 组装，focused policy assertions 增至 7 项，build/typecheck 通过。
