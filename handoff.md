@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `$K`（内部 `Oz`，源码 62136）确认为 generated computer-history route constant/protocol contract，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `$J`（内部 `SR`，源码 61065）确认为 generated app-server version initializer/protocol constants，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `$I`（内部 `hJe`，源码 70024）确认为 generated path/runtime initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
