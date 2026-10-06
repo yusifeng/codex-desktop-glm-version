@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Cs` 反解为内部 `oq`（源码 37925），确认为 generated runtime initializer，无 standalone renderer policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Bh` 反解为内部 `wO`（源码 4505），确认为 generated runtime configuration object，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$P` 反解为内部 `nJ`（源码 75188），确认为 generated enum/protocol schema surface，无独立 renderer 业务归属，登记 `preserved-coupled`。
