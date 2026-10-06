@@ -2251,6 +2251,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker 增量：`.worktreeinclude` ignored/included path 交集与稳定去重已接入 `git-worktree-copy-policy.ts`；入口继续负责双 Git 查询、存在性检查与 copy 生命周期，focused assertions 增至 2 项，build/typecheck 通过。
 2026-10-06 A1 worker 增量：watcher optional repository-state 的 tri-state boolean aggregation 已迁移至 `git-watch-boolean-policy.ts`；入口继续持有 watcher 状态、timer 与 recovery 副作用，新增 3 项 focused assertions，build/typecheck 通过。
 2026-10-06 A1 worker residual owner 复核：`createGitOperationState` 还组合 rebase head/merge/apply 三类 marker，并与 watch refresh action 共用 tri-state 结果，不是独立字段投影，继续由 `git-watch-paths.ts` 持有。
+2026-10-06 A1 worker residual owner 复核：watch path 的 operation marker、affected working-tree path 与 metadata refresh selection 依赖 platform path API、Git dir topology 和 watcher handler state，暂无不复制生命周期的更窄边界。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
 2026-10-06 WSL command owner 复核：47,122-47,584 的纯输出/argv 已由 `platform-wsl.ts` 覆盖并有 focused regression；剩余 `wslpath`/`wsl.exe --status|--list` 仍绑定 Windows command spawn、日志和错误处理，没有可脱离 exec owner 的新策略。
 2026-10-06 worker entry protocol 复核：90,661-90,836 的 workerData/parentPort 校验、main-RPC 初始化及 worker-request/request-cancel/flush-and-exit message loop 仍由入口持有；entry-dispatcher 与 core/node/snapshot/live-query dispatch 已有回归，移出入口会改变线程启动或 flush/exit 顺序，本轮不拆分。
@@ -2318,6 +2319,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation sidebar editor transition 已迁移至 `annotation-sidebar-editor-transition.ts`；原 `Lf` 入口保留 editor message reducer 语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation sidebar target containment 已迁移至 `annotation-sidebar-target-policy.ts`；原 `Of` 入口保留 root/shadow root 判定，新增 3 项 focused assertions。
 2026-10-06 A2 runtime owner 复核：`annotation-runtime.ts` 仅聚合既有策略/target/parser 导出；`annotation-preload-runtime.ts`、surface/overlay/pointer-selection runtime 均绑定 DOM listener、observer、IPC 或 dispose 生命周期。未发现可脱离 owner 的新纯 policy，本轮不重复制造 facade。
+2026-10-06 A2 runtime owner 复核补充：`annotation-surface-geometry.ts`、`annotation-selection-display-key.ts` 等 geometry/display policy 已是独立模块并由 surface/selection runtime 消费；runtime owner 剩余部分均为副作用编排，未发现新增可读纯边界。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
