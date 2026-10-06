@@ -1424,3 +1424,6 @@ Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖�
 Git root resolution 的 non-repository stderr 分类已迁移至 `git-root-resolution-policy.ts`；runtime
 继续负责 local stat、rev-parse、Git unavailable/error logging 与 common-dir resolution，
 `scripts/test-worker-git-root-resolution-policy.mjs` 覆盖 3 项分类断言。
+Merge-base runtime 的 upstream/default-remote 查询、query cache、ref resolution 与 merge-base
+fallback 共享 Git command exit semantics（1/128）、abort/query metadata 和 remote ordering；
+现有 ref/branch policies 已覆盖参数投影，剩余异步 fallback 不形成独立纯策略。
