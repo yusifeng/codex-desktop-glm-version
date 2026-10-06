@@ -5638,11 +5638,7 @@ function Wu(e, t) {
   });
 }
 function Gu(e, t) {
-  let n = Math.max(e.left, t.left),
-    r = Math.max(e.top, t.top),
-    i = Math.min(e.right, t.right),
-    a = Math.min(e.bottom, t.bottom);
-  return i <= n || a <= r ? null : { x: n, y: r, width: i - n, height: a - r };
+  return intersectAnnotationRects(e, t);
 }
 function Ku(e) {
   let t = Math.min(...e.map((e) => e.x)),
@@ -6096,6 +6092,7 @@ var { isAnnotationTextSecurityEnabled } = require("./browser-page-preload/annota
 var { isAnnotationShadowHostRoot, getAnnotationShadowHost } = require("./browser-page-preload/annotation-shadow-host-policy");
 var { isAnnotationRangeFixedPosition } = require("./browser-page-preload/annotation-range-fixed-position-policy");
 var { hasAnnotationAncestorTransform } = require("./browser-page-preload/annotation-transform-policy");
+var { intersectAnnotationRects } = require("./browser-page-preload/annotation-rect-clip-intersection");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
