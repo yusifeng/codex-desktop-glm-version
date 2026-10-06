@@ -1221,6 +1221,10 @@ Agent override path 的 Git `ls-files -z` 过滤已迁移至 `src/main/worker/gi
 `.worktreeinclude` 的 ignored/included path 交集与稳定去重也已迁移至同一 policy；入口继续
 负责双 Git 查询、存在性检查与 copy 生命周期，focused assertions 增至 2 项。
 
+Watcher optional repository-state 的 tri-state boolean aggregation 已迁移至
+`src/main/worker/git-watch-boolean-policy.ts`；`git-watch-paths.ts` 继续持有 watcher 状态、
+timer 与 recovery 副作用，`scripts/test-worker-git-watch-boolean-policy.mjs` 覆盖 3 项 true/null/false 断言。
+
 `resolveWorktreeLocalEnvironmentConfig` 仍跨 source/target host stat、Git tracking/ignore 查询、
 symlink guard、copy 与 fallback 顺序；该请求边界共享本地/远程 host 语义和文件副作用，当前
 没有不改变 I/O 顺序的独立纯 policy。

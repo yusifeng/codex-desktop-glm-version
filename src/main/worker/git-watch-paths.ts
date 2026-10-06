@@ -11,6 +11,7 @@ import {
   shouldScheduleGitWatchSessionRetry,
 } from "./git-watch-session-policy";
 import { partitionGitWorktreeWatchPaths } from "./git-watch-path-partition-policy";
+import { combineGitWatchOptionalBooleans } from "./git-watch-boolean-policy";
 
 /** Returns whether `candidate` is inside `root` (or is root itself). */
 function isWithinPath(pathApi: PathApi, root: string, candidate: string): boolean {
@@ -33,9 +34,7 @@ function isWorktreeTopologyPath(pathApi: PathApi, root: string, candidate: strin
 }
 
 /** Combines optional repository-state probes, preserving unknown (`null`) state. */
-function combineOptionalBooleans(values: Array<boolean | null | undefined>): boolean | null {
-  return values.some((value) => value === true) ? true : values.some((value) => value == null) ? null : false;
-}
+const combineOptionalBooleans = combineGitWatchOptionalBooleans;
 
 function isMissingPathError(error: unknown): boolean {
   return typeof error === `object` && error !== null && `code` in error &&
