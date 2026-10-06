@@ -1205,6 +1205,13 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### Execution/computer-use adapter owner recheck (2026-10-06)
+
+84,549-85,965 的 execution host 与 computer-use adapter 目前只作为 runtime glue 被入口和
+对应 service 消费：execution host 由 worktree/handoff handlers 注入，capture continuation
+则已由 `computer-use-capture-policy.ts` 提供纯判断，入口仍持有 service、日志、事件发射和
+递归副作用。该区段没有独立于 host/service identity 的新策略边界，继续保留 adapter owner。
+
 ### Worker telemetry owner recheck (2026-10-06)
 
 63,051-65,199 的 Git command telemetry/error normalization 已由

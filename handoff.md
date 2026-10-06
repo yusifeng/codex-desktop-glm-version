@@ -2171,6 +2171,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 worker entry protocol 复核：90,661-90,836 的 workerData/parentPort 校验、main-RPC 初始化及 worker-request/request-cancel/flush-and-exit message loop 仍由入口持有；entry-dispatcher 与 core/node/snapshot/live-query dispatch 已有回归，移出入口会改变线程启动或 flush/exit 顺序，本轮不拆分。
 2026-10-06 Git manager/watch/request owner 复核：65,200-80,999 已由 repository model、git-watch/live-query lifecycle 与 request handlers/dispatch 分担真实 owner；剩余 memoization、timer、abort、trace 状态跨越多个 consumer，没有新的单一纯策略边界，不重复制造 manager facade。
 2026-10-06 worker telemetry owner 复核：63,051-65,199 的 Git command telemetry/error normalization 已由 `git-observability.ts` 接回；OpenTelemetry/Sentry/Datadog SDK 仍由基础设施与 lifecycle owner 管理，新增 worker policy 会重复 SDK 生命周期，本轮不拆。
+2026-10-06 execution/computer-use adapter owner 复核：84,549-85,965 的 execution host 由 worktree/handoff handlers 注入，capture continuation 纯判断已在 `computer-use-capture-policy.ts`；入口仍持有 service、日志、事件与递归副作用，暂无独立新策略边界。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。
@@ -2187,6 +2188,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation frame document resolver 已迁移至 `src/main/browser-page-preload/annotation-frame-document-resolver.ts`；原 `Dc` 入口保留 window path 注入，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation frame path projection 已迁移至 `src/main/browser-page-preload/annotation-frame-path-projection.ts`；原 `ec` 入口保留 iframe/selector/owner window 语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation text normalization projection 已迁移至 `src/main/browser-page-preload/annotation-text-normalization.ts`；原 `Vl` 入口保留 whitespace/trim/2000 cap，新增 3 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation range viewport intersection 已迁移至 `src/main/browser-page-preload/annotation-range-viewport-intersection.ts`；原 `Kl` 入口保留 Range/rect 适配，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation composed parent traversal 已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；原 `ic` 入口保留 slot/parent/shadow host 顺序，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation event propagation boundary 已迁移至 `src/main/browser-page-preload/annotation-event-propagation-policy.ts`；原 `Jc` 入口保留 preventDefault 开关及停止顺序，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。
