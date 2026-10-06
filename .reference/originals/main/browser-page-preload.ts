@@ -4947,8 +4947,11 @@ function I(e) {
   return e != null && e instanceof (e.ownerDocument.defaultView?.HTMLElement ?? HTMLElement);
 }
 function Kl(e, t, n) {
-  let r = e.createRange();
-  return (r.selectNodeContents(t), Array.from(r.getClientRects()).some((e) => L(e, n)));
+  return isAnnotationRangeIntersectingRect(t, n, {
+    createRange: () => e.createRange(),
+    getClientRects: (range) => Array.from(range.getClientRects()),
+    intersects: (candidate, rect) => L(candidate, rect),
+  });
 }
 function L(e, t) {
   return e.right >= t.x && e.left <= t.x + t.width && e.bottom >= t.y && e.top <= t.y + t.height;
@@ -6118,6 +6121,7 @@ var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-
 var { getAnnotationComposedParent } = require("./browser-page-preload/annotation-composed-parent-policy");
 var { stopAnnotationEventPropagation } = require("./browser-page-preload/annotation-event-propagation-policy");
 var { normalizeAnnotationText } = require("./browser-page-preload/annotation-text-normalization");
+var { isAnnotationRangeIntersectingRect } = require("./browser-page-preload/annotation-range-viewport-intersection");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
