@@ -903,6 +903,10 @@ frame path selector 到 iframe element 的解析与类型校验（原 `Tc`）已
 
 frame path 到 document 的解析（原 `Dc`）已迁移至 `src/main/browser-page-preload/annotation-frame-document-resolver.ts`；入口仅注入 window path resolver，保留失败返回 null 语义。新增 2 项 focused assertions。
 
+### 增量抽取：annotation frame path projection
+
+嵌套 window 到 frame selector path 的反向 projection（原 `ec`）已迁移至 `src/main/browser-page-preload/annotation-frame-path-projection.ts`；保留缺失 iframe/selector/owner window 时返回 null。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation scroll-container offset
 
 按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。

@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { projectAnnotationFramePath } from "../app/.vite/build/browser-page-preload/annotation-frame-path-projection.js";
+const root = {};
+const parent = { frameElement: { selector: `outer`, ownerDocument: { defaultView: root } } };
+const child = { frameElement: { selector: `inner`, ownerDocument: { defaultView: parent } } };
+const deps = { rootWindow: root, getFrameElement: (windowLike) => windowLike.frameElement, isIframe: (value) => value?.selector != null, getSelector: (element) => element.selector, getOwnerWindow: (element) => element.ownerDocument.defaultView };
+assert.deepEqual(projectAnnotationFramePath(child, deps), [`outer`, `inner`]);
+assert.deepEqual(projectAnnotationFramePath(root, deps), []);
+assert.equal(projectAnnotationFramePath({ frameElement: {} }, deps), null);
+console.log(`test-preload-annotation-frame-path-projection: 3 assertions passed`);

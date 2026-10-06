@@ -4155,20 +4155,13 @@ var zs,
       (Qs = { defaultLocale: `en-US`, locale: `en-US`, messages: {} }));
   });
 function ec(e) {
-  if (e == null) return null;
-  let t = [],
-    n = e;
-  for (; n !== window;) {
-    let e = n.frameElement;
-    if (!ac(e)) return null;
-    let r = Rc(e);
-    if (r == null) return null;
-    t.unshift(r);
-    let i = e.ownerDocument.defaultView;
-    if (i == null) return null;
-    n = i;
-  }
-  return t;
+  return e == null ? null : projectAnnotationFramePath(e, {
+    rootWindow: window,
+    getFrameElement: (windowLike) => windowLike.frameElement,
+    isIframe: (value) => ac(value),
+    getSelector: (element) => Rc(element),
+    getOwnerWindow: (element) => element.ownerDocument.defaultView,
+  });
 }
 function rc(e) {
   return isAnnotationDocumentRoot(e, document);
@@ -6120,6 +6113,7 @@ var { isAnnotationQueryableRoot } = require("./browser-page-preload/annotation-q
 var { readAnnotationDocumentSafely } = require("./browser-page-preload/annotation-document-access-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
+var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
