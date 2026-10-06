@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `Im`（内部 `Zct`，源码 100305）确认为委托 generated normalization 的 nullable collection helper，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `Hp`（内部 `mut`，源码 103043）确认为读取 generated command metadata 的 shortcut-scope predicate，无独立 renderer consumer，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `I_`（内部 `H4`，源码 89448）确认为 generic SVG data-URI encoder，无独立 renderer 业务归属，登记 `preserved-coupled`。
