@@ -1187,6 +1187,14 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### Worker GitHub/review owner recheck (2026-10-06)
+
+81,000-83,323 的 GitHub/review 区段当前已由真实 request consumers 接回：
+`git-node-request-dispatch.ts` 处理 `github-request`，`git-review-read-dispatch.ts` 处理
+review/status/branch-diff/read 家族，`github-pull-request-board.ts` 与 revision/summary
+模块分别持有 GitHub API、CLI 与批处理副作用。剩余逻辑依赖 host、Git manager、性能结果和
+响应包装，未发现可脱离这些 owner 的新纯策略边界；继续保持现有窄 policy/handler 拆分。
+
 ### Worker protocol-schema owner recheck (2026-10-06)
 
 对 38,230-43,985 与 53,200-53,477 的协议 schema 做了 consumer 复核：当前
