@@ -883,6 +883,10 @@ iframe contentWindow 的可用 document boundary（原 `sc`）已迁移至 `src/
 
 shadow root boundary 的 DocumentFragment/host/shadowRoot 一致性判定（原 `Uc`）已迁移至 `src/main/browser-page-preload/annotation-shadow-root-policy.ts`；入口仅注入 node type 与 element 判定。新增 4 项 focused assertions。
 
+### 增量抽取：annotation unique selector policy
+
+元素 root 内 selector 唯一匹配判定（原 `Wc`）已迁移至 `src/main/browser-page-preload/annotation-unique-selector-policy.ts`；入口仅注入 root 查询、queryAll 与唯一性判断。新增 4 项 focused assertions。
+
 ### 增量抽取：annotation scroll-container offset
 
 按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。
