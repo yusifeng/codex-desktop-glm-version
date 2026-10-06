@@ -1169,6 +1169,15 @@ Worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 状�
 稳定性重试和 fallback 生命周期，并复用这些纯策略；
 `scripts/test-worker-git-worktree-files-policy.mjs` 覆盖 11 项 focused assertions。
 
+### Worker state/schema owner recheck (2026-10-06)
+
+48,152-49,999 的 SQLite host/automation schema 仍没有 worker state consumer。host registry
+的 `local_thread_catalog_hosts` INSERT/SELECT/DELETE 由
+`src/main/main-app/thread-catalog/store.ts` 持有；automation 的 `rrule` 默认值与调度投影
+由 `src/main/shared/automation-settings.ts`、`automation-registry.ts` 及 main automations
+运行时消费。worker 内另建 state facade 会重复迁移 owner 并分裂 schema/migration 版本，故该
+区段继续标记为 preserved-coupled，等待明确 worker request boundary。
+
 ### Worker host assembly owner recheck (2026-10-06)
 
 83,636-84,079 的 host factory/worker API assembly 目前没有可独立接回的纯构造 owner：
