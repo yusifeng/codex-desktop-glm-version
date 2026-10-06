@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Hc` 反解为内部 `oVe`（源码 31072），确认为 generated JSX component/UI composition，无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Gu` 反解为内部 `xR`（源码 18605），确认为 generated store/runtime callback，无 standalone renderer policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Go` 反解为内部 `sJ`（源码 40154），确认为 generated composer runtime initializer，耦合 stores/hooks、无 standalone pure policy boundary，登记 `preserved-coupled`。
@@ -2451,6 +2453,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A2 controls coverage verification：重新运行 `test-preload-annotation-controls-registry.mjs`（10 assertions）与 `test-preload-pending-editor-message.mjs`（6 assertions）均通过；7260-7553 controls registry/pending reducer 区段已有真实 consumer 与 focused coverage。
 2026-10-06 A2 browser input owner coverage：重新运行 `test-browser-page-preload-browser-input-bridge.mjs`（22 assertions）通过；26882-27185 的 trusted mouse-navigation/image-drag bridge 已由 `browser-input-bridge.ts` 真实接回，事件监听与 host IPC 顺序仍绑定 preload lifecycle，无新增可脱离 owner 的纯 policy。
 2026-10-06 A2 document/context owner coverage：重新运行 `test-preload-annotation-document-context.mjs`（14 assertions）、`test-preload-google-docs-context.mjs`（9）、`test-preload-annotation-protocol.mjs`（6）与 `test-preload-annotation-control-payload.mjs`（20）均通过；5120-7259 的 document/Google Docs/schema/payload 边界已有真实 consumer 与 focused regression，剩余跨 frame/DOM/IPC 语义继续由原 owner 持有，未发现新可脱离纯 policy。
+2026-10-06 A2 serialization/request coverage：重新运行 `test-preload-local-url.mjs`（9 assertions）、`test-preload-annotation-serialization.mjs`（11）、`test-preload-annotation-request-context.mjs`（8）、`test-preload-annotation-site-requests.mjs`（12）与 `test-preload-annotation-anchor-geometry.mjs`（3）均通过；3863-5049/5120-7259 的 URL、safe serialization、request context、permission site-request 与 anchor geometry 已有真实接回及 focused coverage，无新增可脱离 owner 的纯策略。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
