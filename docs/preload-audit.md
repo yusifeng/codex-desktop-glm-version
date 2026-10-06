@@ -907,6 +907,10 @@ frame path 到 document 的解析（原 `Dc`）已迁移至 `src/main/browser-pa
 
 嵌套 window 到 frame selector path 的反向 projection（原 `ec`）已迁移至 `src/main/browser-page-preload/annotation-frame-path-projection.ts`；保留缺失 iframe/selector/owner window 时返回 null。新增 3 项 focused assertions。
 
+### 增量抽取：annotation composed parent policy
+
+assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
+
 ### 增量抽取：annotation scroll-container offset
 
 按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。
