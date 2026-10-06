@@ -2212,6 +2212,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：visible-text document access 已真实复用 `annotation-document-access-policy.ts`；原 `Ul` 入口保留跨源异常 null 语义，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation owner-window policy 已迁移至 `annotation-owner-window-policy.ts`；原 `Gl` 入口保留 ownerDocument/fallback 选择，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation rect intersection policy 已迁移至 `annotation-rect-intersection-policy.ts`；原 `L` 入口保留边界相交语义，新增 2 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation HTML element policy 已迁移至 `annotation-html-element-policy.ts`；原 `I` 入口保留跨 realm HTMLElement 判定，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation composed parent traversal 已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；原 `ic` 入口保留 slot/parent/shadow host 顺序，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation event propagation boundary 已迁移至 `src/main/browser-page-preload/annotation-event-propagation-policy.ts`；原 `Jc` 入口保留 preventDefault 开关及停止顺序，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。
