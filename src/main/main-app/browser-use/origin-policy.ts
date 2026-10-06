@@ -80,5 +80,9 @@ export function resolveBrowserUseOriginForAdd(
   return normalized;
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule, browserUseRuleDecision, resolveBrowserUseOriginForAdd };
+export function browserUseResourceSectionKey(resource: "origin" | "download" | "upload" | "fullCdp"): string {
+  return resource === "origin" ? "origins" : resource === "download" ? "downloads" : resource === "upload" ? "uploads" : "full_cdp";
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule, browserUseRuleDecision, resolveBrowserUseOriginForAdd, browserUseResourceSectionKey };
 import { join } from "node:path";

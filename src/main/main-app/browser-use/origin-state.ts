@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind, resolveBrowserUseOriginForAdd } from "./origin-policy";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseResourceSectionKey, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind, resolveBrowserUseOriginForAdd } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -55,12 +55,6 @@ const WEBMCP_KEY = "webmcp_enabled";
 
 type OriginResource = "origin" | "download" | "upload" | "fullCdp";
 
-const RESOURCE_KINDS: Record<OriginResource, string> = {
-  origin: "origins",
-  download: "downloads",
-  upload: "uploads",
-  fullCdp: "full_cdp",
-};
 
 const originRuleUpdateSchema = arraySchema(
   objectSchema({
@@ -140,7 +134,7 @@ function oppositeKind(kind: string): string {
 /** 单条规则的矩阵更新（原 `rke`）：add 互斥写入，remove 仅本 kind。 */
 function applyRuleUpdate(config: Record<string, any>, update: { action: string; kind: string; origin: string; resource: OriginResource }): boolean {
   const { action, kind, origin } = update;
-  const sectionKey = RESOURCE_KINDS[update.resource];
+  const sectionKey = browserUseResourceSectionKey(update.resource);
   if (action === "add") {
     const section = rulesSectionFor(config, sectionKey);
     const current = dedupeStrings(section[kind]);
@@ -157,7 +151,7 @@ function applyRuleUpdate(config: Record<string, any>, update: { action: string; 
 
 /** 当前规则决策（原 `hD`）：denied 优先。 */
 function ruleDecisionFor(config: Record<string, any>, resource: OriginResource, origin: string): "allow" | "deny" | null {
-  const section = config[RESOURCE_KINDS[resource]];
+  const section = config[browserUseResourceSectionKey(resource)];
   return browserUseRuleDecision(section, origin);
 }
 
@@ -167,7 +161,7 @@ function stringSetHas(section: unknown, kind: string, origin: string): boolean {
 
 /** add 前的 origin 规范化（原 `ike`）：已有精确匹配优先，否则规范化。 */
 function resolveOriginForAdd(config: Record<string, any>, resource: OriginResource, origin: string): string {
-  const section = config[RESOURCE_KINDS[resource]];
+  const section = config[browserUseResourceSectionKey(resource)];
   return resolveBrowserUseOriginForAdd(section, origin, normalizeOrigin);
 }
 

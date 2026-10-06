@@ -425,6 +425,8 @@ denied-over-allowed 的 rule decision 组合也已迁移至该 policy，origin-s
 section 选择与批量更新副作用，新增 2 项优先级断言。
 add 前 origin 的精确匹配优先/规范化/非法输入拒绝也已迁移至该 policy，origin-state 继续负责
 resource section 选择与规则写回，新增 2 项解析断言。
+origin resource 到 TOML section key 的映射也已迁移至该 policy，origin-state 继续负责 config
+访问和规则更新，新增 1 项 full_cdp 映射断言。
 
 ### T4 候选复核：browser-sidebar error pages
 
