@@ -1168,3 +1168,12 @@ Worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 状�
 `src/main/worker/git-worktree-files-policy.ts`。`git-worktree-files.ts` 继续持有 Git 命令、stat、
 稳定性重试和 fallback 生命周期，并复用这些纯策略；
 `scripts/test-worker-git-worktree-files-policy.mjs` 覆盖 11 项 focused assertions。
+
+### Worker platform boundary recheck (2026-10-06)
+
+当前 worker 的平台相关窄入口已有真实 consumer：`worker.ts:110` 接回
+`git-local-environment`，`worker.ts:130` 接回 `shell-config`，`worker.ts:136` 接回
+`platform-env`；三者均有 focused regression，并由入口继续持有 platform/process I/O。
+复核原始 55,351-56,420 与 86,131-90,660 区段后，剩余逻辑仍分别耦合 Windows shell/runtime
+副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
+接回纯策略边界；本轮不重复制造 facade。
