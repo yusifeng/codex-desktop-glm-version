@@ -1324,3 +1324,9 @@ snapshot generation、Git diff、abort signal、telemetry 与 response completio
 Branch search 的 request handler/runtime 已分离，剩余 `queryGitBranchRefs` 绑定 query cache、
 Git host、abort signal 与异步 ref 扫描；cache request handlers 直接执行 stable-metadata/read-cache
 invalidation 副作用。当前未发现不复制 cache/lifecycle owner 的新纯策略边界。
+
+### Worker repository/review request owner review (2026-10-06)
+
+`git-repository-read-request-handlers.ts` 与 `git-review-request-handlers.ts` 已是窄 request
+consumer；两者剩余逻辑分别绑定 repository availability、Git read cache、review snapshot、
+abort/performance envelope 与 response wrapping。当前没有可脱离 request lifecycle 的新纯 policy。
