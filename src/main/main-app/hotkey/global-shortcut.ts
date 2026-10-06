@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, validateGlobalShortcut } from "./global-shortcut-policy";
+import { isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, splitGlobalAccelerator, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -477,10 +477,7 @@ function ensureGlobalDictationPermissions(accelerator: string): void {
 }
 
 function splitAccelerator(accelerator: string): string[] {
-  return accelerator
-    .split("+")
-    .map((part) => part.trim())
-    .filter((part) => part.length > 0);
+  return splitGlobalAccelerator(accelerator);
 }
 
 /** 注册用 accelerator（原 `Pze`）：mac 布局重映射。 */

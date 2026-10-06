@@ -7,6 +7,10 @@ export function normalizeGlobalAccelerator(accelerator: string): string {
   return accelerator.replace(/[\s_-]/g, "").toLowerCase();
 }
 
+export function splitGlobalAccelerator(accelerator: string): string[] {
+  return accelerator.split("+").map((part) => part.trim()).filter((part) => part.length > 0);
+}
+
 /** Pure global shortcut validation; registration and permission effects remain in global-shortcut.ts. */
 export function validateGlobalShortcut(
   accelerator: string,
@@ -107,4 +111,4 @@ export function resolveWin32ModifierGroups(accelerator: string, platform: string
   return groups.length === 0 ? null : groups;
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeGlobalAccelerator, validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };
+if (typeof module !== "undefined") module.exports = { normalizeGlobalAccelerator, splitGlobalAccelerator, validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };

@@ -342,6 +342,7 @@ mac modifier helper-name projection 也已迁移至该 policy；release watcher 
 win32 modifier VK 分组投影也已迁移至该 policy；PowerShell spawn、输出解析和 release/dispose
 仍由入口负责，新增 2 项 platform/empty-group 边界断言。
 accelerator 的空白、连字符、下划线与大小写规范化也已迁移至该 policy，新增 1 项规范化断言。
+accelerator token 分割（空段过滤与 trim）也已迁移至该 policy，新增 1 项分割边界断言。
 
 ### 增量抽取：workspace policy restart dialog
 
