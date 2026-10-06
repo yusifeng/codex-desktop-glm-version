@@ -1381,6 +1381,8 @@ enumeration 共享 Git I/O、stability retry、stat/cache invalidation 和 respo
 Review commit queries 的 branch commit listing 与 line-count 共享 repository query client、Git
 command result、review snapshot、abort signal 与 response field projection；字段投影已有 request
 consumer 覆盖，剩余 query orchestration 不形成独立纯策略。
+Turn diff capture 的 status/abort/error policy 已抽出；剩余 snapshot generation、Git diff、abort
+signal、telemetry 与 response completion 共享同一生命周期顺序，当前无新的独立纯策略边界。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
