@@ -30,6 +30,7 @@ type GitBranchAheadDependencies = {
 import {
   buildAheadRevisionArgs,
   buildRemoteAncestorRevision,
+  parseCommitCount,
   resolveDefaultBranchRevision,
 } from './git-branch-ahead-policy';
 
@@ -58,9 +59,7 @@ function countCommits(
           signal,
         },
       );
-      if (!result.success || !result.stdout) return null;
-      const count = Number.parseInt(result.stdout, 10);
-      return Number.isNaN(count) ? null : count;
+      return result.success ? parseCommitCount(result.stdout) : null;
     },
     staleTime: 250,
   });

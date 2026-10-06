@@ -1427,3 +1427,6 @@ Git root resolution 的 non-repository stderr 分类已迁移至 `git-root-resol
 Merge-base runtime 的 upstream/default-remote 查询、query cache、ref resolution 与 merge-base
 fallback 共享 Git command exit semantics（1/128）、abort/query metadata 和 remote ordering；
 现有 ref/branch policies 已覆盖参数投影，剩余异步 fallback 不形成独立纯策略。
+Branch-ahead 的 `rev-list --count` stdout 数值/null 判定已迁移至现有
+`git-branch-ahead-policy.ts`；runtime 继续负责 query cache、Git exit handling 与 remote/merge-base
+fallback，focused policy assertions 增加 3 项。

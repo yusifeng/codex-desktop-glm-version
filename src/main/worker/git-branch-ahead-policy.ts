@@ -33,10 +33,17 @@ export function buildAheadRevisionArgs(revision: string) {
   return [`${revision}..HEAD`];
 }
 
+export function parseCommitCount(output: unknown): number | null {
+  if (typeof output !== `string` || output.length === 0) return null;
+  const count = Number.parseInt(output, 10);
+  return Number.isNaN(count) ? null : count;
+}
+
 if (typeof module !== `undefined`)
   module.exports = {
     buildAheadRevisionArgs,
     buildRemoteAncestorRevision,
     normalizeRemoteUpstream,
+    parseCommitCount,
     resolveDefaultBranchRevision,
   };

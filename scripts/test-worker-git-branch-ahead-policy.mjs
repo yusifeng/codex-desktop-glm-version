@@ -6,12 +6,17 @@ const {
   buildAheadRevisionArgs,
   buildRemoteAncestorRevision,
   normalizeRemoteUpstream,
+  parseCommitCount,
   resolveDefaultBranchRevision,
 } = require("../app/.vite/build/worker/git-branch-ahead-policy.js");
 
 let assertions = 0;
 const equal = (...args) => { assertions += 1; assert.equal(...args); };
 const deepEqual = (...args) => { assertions += 1; assert.deepEqual(...args); };
+
+equal(parseCommitCount("12\n"), 12);
+equal(parseCommitCount(""), null);
+equal(parseCommitCount("unknown"), null);
 
 equal(normalizeRemoteUpstream("remotes/origin/main", "origin"), "origin/main");
 equal(normalizeRemoteUpstream("origin/main", "origin"), "origin/main");
