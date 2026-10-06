@@ -57,5 +57,9 @@ export function browserUseKindSet(section: unknown, kind: string): string[] {
   return isBrowserUsePlainObject(section) ? dedupeBrowserUseStrings(section[kind]) : [];
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet };
+export function browserUseHasRule(section: unknown, kind: string, origin: string): boolean {
+  return browserUseKindSet(section, kind).includes(origin);
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule };
 import { join } from "node:path";

@@ -419,6 +419,8 @@ approval/history mode 的 config↔desktop/TOML 映射也已迁移至该 policy�
 配置加载、更新与持久化副作用，新增 5 项默认/disabled/反向映射断言。
 规则 section 的 kind-set 读取与稳定去重也已迁移至该 policy，origin-state 继续持有 rule
 decision 与写回副作用，新增 1 项投影断言。
+rule membership 判定也已迁移至该 policy，origin-state 继续负责 denied 优先的 decision
+组合，新增 2 项命中/缺失断言。
 
 ### T4 候选复核：browser-sidebar error pages
 

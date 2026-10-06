@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -162,7 +162,7 @@ function ruleDecisionFor(config: Record<string, any>, resource: OriginResource, 
 }
 
 function stringSetHas(section: unknown, kind: string, origin: string): boolean {
-  return isPlainObject(section) && dedupeStrings(section[kind]).includes(origin);
+  return browserUseHasRule(section, kind, origin);
 }
 
 /** add 前的 origin 规范化（原 `ike`）：已有精确匹配优先，否则规范化。 */
