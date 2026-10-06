@@ -1473,3 +1473,6 @@ failure wrapping，focused policy assertions 增加 1 项。
 Git diff header parser 的 combined/git classification、quoted-path escape decoding、prefix stripping
 与 rename rewrite 共享 parser cursor、UTF-8/octal fallback 和 downstream diff envelope；现有 header/
 quote/octal policies 已覆盖局部投影，剩余 parser 组合不安全拆分。
+Cat-file batch parser 的 request framing、stream prefix handling、byte limits、truncated-tail retry
+与 disk fallback 共享 batch cursor、snapshot consistency、host I/O 与 recursive retry ordering；
+现有 cat-file error/content/batch-error policies 已覆盖错误投影，剩余 parser 不拆分。
