@@ -5,6 +5,7 @@ type WorktreeCopyDependencies = {
   };
   runGit: (root: string, args: string[], host: any, options?: any) => Promise<any>;
 };
+import { splitGitWorktreeNullSeparatedPaths } from "./git-worktree-copy-path-policy";
 
 const AGENTS_OVERRIDE_FILE = `AGENTS.override.md`;
 const WORKTREE_INCLUDE_FILE = `.worktreeinclude`;
@@ -15,9 +16,7 @@ function hasErrorCode(error: unknown, code: string) {
   return typeof error === `object` && error != null && `code` in error && error.code === code;
 }
 
-function splitNullSeparatedPaths(output: string) {
-  return output.split(`\0`).filter((path) => path.length > 0);
-}
+const splitNullSeparatedPaths = splitGitWorktreeNullSeparatedPaths;
 
 async function ensureCopyTargetPath(
   worktreeRoot: string,

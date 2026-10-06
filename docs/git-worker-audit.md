@@ -1212,6 +1212,10 @@ watcher discovered path 的 stale/new 集合分区已迁移至
 session、dispose 与注册副作用；`scripts/test-worker-git-watch-path-partition-policy.mjs`
 覆盖 2 项稳定分区断言。
 
+Worktree copy 的 NUL-separated path 投影已迁移至 `src/main/worker/git-worktree-copy-path-policy.ts`；
+`git-worktree-copy-files.ts` 继续持有 stat、symlink guard、copy 与 cleanup 副作用，
+`scripts/test-worker-git-worktree-copy-path-policy.mjs` 覆盖 1 项解析断言。
+
 ### Worker read/working-tree residual owner review (2026-10-06)
 
 `git-read-request-handlers.ts` 当前只负责将 cwd/root、Git manager、host 与 abort signal 注入
