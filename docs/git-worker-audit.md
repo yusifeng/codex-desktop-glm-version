@@ -1448,3 +1448,6 @@ synced-config update 共享 query cache、ref namespace、fail-if-exists semanti
 Remote branch upstream ref 的 stdout trim/empty-to-null 投影已迁移至现有
 `git-remote-branches-policy.ts`；runtime 继续负责 query cache、Git exit/abort handling，focused
 policy assertions 增加 3 项。
+Branch search runtime 的 ref scan 同时依赖 Git `for-each-ref` 输出、case-folded query matching、
+branch deduplication、abort-aware batching 与 query cache；现有 search policy 已覆盖 text/ref
+projection，剩余 scan/runtime 编排保持 owner。
