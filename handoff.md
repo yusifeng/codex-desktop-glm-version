@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$` 反解为内部 `LDt`/`RDt`（源码 121786 起始），确认为 generated `book-open-moon-star-light-20` SVG icon initializer，依赖共享 icon registry/lazy asset lifecycle，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$R` 反解为内部 `UU`（源码 68857），确认为 generated protocol/runtime descriptor，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$Q` 反解为内部 `KA`（源码 43912），确认为 generated runtime initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
