@@ -511,6 +511,16 @@ Codex/git-worker 协议、配置、状态或业务错误处理，`vendored` 表�
 
 - `preserved-coupled`: 38,230-43,985（Zod/跨入口 schema、无当前消费入口）、47,122-47,584（WSL exec/logging coupling）；
 
+### Worker business-preserved blocker evidence（2026-10-06）
+
+复核两个最早未闭合候选：原 worker 约 48,152-49,999 的 SQLite migration/schema 在当前源码由
+`src/main/main-app/thread-catalog/store.ts` 真实消费（`local_thread_catalog_hosts` 的 INSERT/SELECT/DELETE），
+因此在 worker 中另建 `state` facade 会造成重复 owner；应继续由 main thread-catalog store 负责。
+约 53,200-53,477 的 connector/browser-auth/MCP schema 则只有原 worker 内 Zod 声明，当前 `src/main/worker`
+没有对应 request consumer；`browser_auth_challenge_id` 的现有消费位于 shared elicitation protocol，不能把
+worker schema 单独迁出而不改变 Zod dependency boundary。两段均无可安全闭合的 worker 纯策略边界，保留
+`preserved-coupled`，待真实 owner/request handler 明确后再迁移。
+
 完成 T1 后应改成分段登记（若 chunk manifest 增加分段机制）：
 
 - `vendor`: 1-34,560、34,561-38,229、46,601-47,121、47,585-48,151、
