@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { isGlobalDictationWatchable, remapGlobalShortcutForLayout, validateGlobalShortcut } from "./global-shortcut-policy";
+import { isGlobalDictationWatchable, remapGlobalShortcutForLayout, resolveMacModifierNames, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -592,17 +592,6 @@ while ($true) {
 `;
 
 /** mac 修饰键 → helper 名（原 `Lze`）。 */
-const MAC_MODIFIER_NAMES = new Map<string, string>([
-  ["cmdorctrl", "command"],
-  ["command", "command"],
-  ["cmd", "command"],
-  ["control", "control"],
-  ["ctrl", "control"],
-  ["alt", "alternate"],
-  ["option", "alternate"],
-  ["shift", "shift"],
-]);
-
 /** win32 修饰键 → VK 码（原 `Rze`）。 */
 const WIN32_MODIFIER_VK = new Map<string, number[]>([
   ["cmdorctrl", [17]],
@@ -659,12 +648,7 @@ function watchGlobalDictationRelease(accelerator: string, onRelease: () => void)
 
 /** mac 修饰键名列表（原 `eH`）。 */
 function macModifierNames(accelerator: string): string[] {
-  const names: string[] = [];
-  for (const part of accelerator.split("+")) {
-    const name = MAC_MODIFIER_NAMES.get(part.trim().toLowerCase());
-    if (name != null && !names.includes(name)) names.push(name);
-  }
-  return names;
+  return resolveMacModifierNames(accelerator);
 }
 
 /** PowerShell 脚本实例化（原 `zze`/`Hze`：单引号转义）。 */

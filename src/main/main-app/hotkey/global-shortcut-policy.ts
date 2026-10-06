@@ -75,4 +75,18 @@ export function isGlobalDictationWatchable(
     : dependencies.win32KeyGroups(accelerator, platform) != null;
 }
 
-if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable };
+const MAC_MODIFIER_NAMES: Record<string, string> = {
+  cmdorctrl: "command", command: "command", cmd: "command", control: "control", ctrl: "control",
+  alt: "alternate", option: "alternate", shift: "shift",
+};
+
+export function resolveMacModifierNames(accelerator: string): string[] {
+  const names: string[] = [];
+  for (const part of accelerator.split("+")) {
+    const name = MAC_MODIFIER_NAMES[part.trim().toLowerCase()];
+    if (name != null && !names.includes(name)) names.push(name);
+  }
+  return names;
+}
+
+if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames };

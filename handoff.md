@@ -2187,6 +2187,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A3 main 增量：global shortcut validation 已迁移至 `src/main/main-app/hotkey/global-shortcut-policy.ts`；原 `global-shortcut.ts` 保留 Electron globalShortcut/native helper/权限与挂起恢复副作用，新增 6 项 focused assertions，build/typecheck 通过。
 2026-10-06 A3 main 增量：global shortcut mac layout remap 已接入同一 `global-shortcut-policy.ts`；`updateMacKeyboardLayout` 保留布局状态、全量重注册与失败回滚副作用，新增 3 项 focused assertions，build/typecheck 通过。
 2026-10-06 A3 main 增量：dictation release-watch 平台可用性判定已接入 `global-shortcut-policy.ts`；入口仍保留 native helper/PowerShell spawn、release callback 与 dispose 副作用，policy focused assertions 增至 12 项，build/typecheck 通过。
+2026-10-06 A3 main 增量：mac modifier helper-name projection 已接入 `global-shortcut-policy.ts`；release watcher 仍保留 helper 进程创建/释放副作用，policy focused assertions 增至 14 项，build/typecheck 通过。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。

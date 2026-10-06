@@ -337,6 +337,8 @@ bare-modifier predicates，继续持有 Electron `globalShortcut` 注册、nativ
 仍负责更新布局状态、触发全量重注册及失败回滚，新增 3 项映射/保留边界断言。
 该 policy 还承载 dictation release-watch 的平台可用性判定；实际 native helper/PowerShell
 spawn、release callback 与 dispose 仍留在入口，新增 3 项 platform boundary assertions。
+mac modifier helper-name projection 也已迁移至该 policy；release watcher 仍保留 helper
+进程创建与释放副作用，新增 2 项去重/未知 token 边界断言。
 
 ### 增量抽取：workspace policy restart dialog
 
