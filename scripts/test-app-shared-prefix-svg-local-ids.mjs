@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import esbuild from "esbuild";
+const sourcePath = new URL("../src/renderer/app-shared/runtime/prefix-svg-local-ids.ts", import.meta.url).pathname;
+const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
+const { prefixSvgLocalIds } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
+const svg = `<path id="shape" fill="url(#shape)" href="#shape"/>`;
+assert.equal(prefixSvgLocalIds(svg, "icon-a"), `<path id="icon-a-shape" fill="url(#icon-a-shape)" href="#icon-a-shape"/>`);
+assert.equal(prefixSvgLocalIds(`<path fill="red"/>`), `<path fill="red"/>`);
+assert.throws(() => prefixSvgLocalIds(`<path id="shape"/>`), /idPrefix is required/);
+assert.throws(() => prefixSvgLocalIds(svg, "1bad"), /idPrefix/);
+console.log("app-shared prefix SVG local ids: 4 assertions passed");

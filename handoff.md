@@ -2,6 +2,8 @@
 
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$` 反解为内部 `LDt`/`RDt`（源码 121786 起始），确认为 generated `book-open-moon-star-light-20` SVG icon initializer，依赖共享 icon registry/lazy asset lifecycle，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `$$`（内部 `OT`，源码 38506--38526）的 SVG local-id/reference prefix policy 已迁移至 `src/renderer/app-shared/runtime/prefix-svg-local-ids.ts`；新增 `scripts/test-app-shared-prefix-svg-local-ids.mjs` 覆盖 4 项 focused assertions，纯策略无 React/store/lifecycle 副作用。
+
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$R` 反解为内部 `UU`（源码 68857），确认为 generated protocol/runtime descriptor，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$Q` 反解为内部 `KA`（源码 43912），确认为 generated runtime initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。

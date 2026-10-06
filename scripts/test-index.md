@@ -1206,6 +1206,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-app-shared-format-error-message.mjs](test-app-shared-format-error-message.mjs)
 [test-app-shared-create-chat-slug.mjs](test-app-shared-create-chat-slug.mjs)
 [test-app-shared-format-remote-control-key.mjs](test-app-shared-format-remote-control-key.mjs)
+[test-app-shared-prefix-svg-local-ids.mjs](test-app-shared-prefix-svg-local-ids.mjs)
 [test-app-primary-select-handoff-branch.mjs](test-app-primary-select-handoff-branch.mjs)
 [test-app-primary-strip-terminal-command-token.mjs](test-app-primary-strip-terminal-command-token.mjs)
 [test-app-primary-sort-by-recency.mjs](test-app-primary-sort-by-recency.mjs)
