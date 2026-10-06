@@ -1485,3 +1485,6 @@ transition 会改变 cancellation/flush 顺序，继续由 lifecycle owner 持�
 Submodule path runtime 的 `.gitmodules` missing fast path、abortable stat、Git config query、path
 normalization 与 stable dedup 共享 repository query cache、host I/O、abort semantics 和 config
 failure fallback；现有 submodule path policy 已覆盖 output projection，剩余 runtime 不拆 facade。
+Git index-info runtime 的 git-dir resolution、platform path join、index stat 与 ENOENT/non-ENOENT
+logging 共享 host/cache I/O、error telemetry 与 lastModified response projection；现有 index-info
+policy 已覆盖 finite-mtime/zero fallback，剩余 runtime 不拆新边界。
