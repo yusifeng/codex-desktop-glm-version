@@ -2186,6 +2186,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation frame element resolver 已迁移至 `src/main/browser-page-preload/annotation-frame-element-resolver.ts`；原 `Tc` 入口保留 selector/iframe 校验，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation frame document resolver 已迁移至 `src/main/browser-page-preload/annotation-frame-document-resolver.ts`；原 `Dc` 入口保留 window path 注入，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation frame path projection 已迁移至 `src/main/browser-page-preload/annotation-frame-path-projection.ts`；原 `ec` 入口保留 iframe/selector/owner window 语义，新增 3 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation text normalization projection 已迁移至 `src/main/browser-page-preload/annotation-text-normalization.ts`；原 `Vl` 入口保留 whitespace/trim/2000 cap，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation composed parent traversal 已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；原 `ic` 入口保留 slot/parent/shadow host 顺序，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation event propagation boundary 已迁移至 `src/main/browser-page-preload/annotation-event-propagation-policy.ts`；原 `Jc` 入口保留 preventDefault 开关及停止顺序，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。

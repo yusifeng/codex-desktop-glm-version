@@ -907,6 +907,10 @@ frame path 到 document 的解析（原 `Dc`）已迁移至 `src/main/browser-pa
 
 嵌套 window 到 frame selector path 的反向 projection（原 `ec`）已迁移至 `src/main/browser-page-preload/annotation-frame-path-projection.ts`；保留缺失 iframe/selector/owner window 时返回 null。新增 3 项 focused assertions。
 
+### 增量抽取：annotation text normalization
+
+批注文本的 whitespace collapse、trim 与长度上限 projection（原 `Vl`）已迁移至 `src/main/browser-page-preload/annotation-text-normalization.ts`；入口保留 2000 字符 cap。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。

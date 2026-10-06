@@ -4919,8 +4919,7 @@ var zl = o(() => {
     (Al(), Pl(), zl());
   });
 function Vl(e) {
-  let t = (e ?? ``).replace(/\s+/g, ` `).trim();
-  return t.length === 0 ? null : t.slice(0, R);
+  return normalizeAnnotationText(e, R);
 }
 function Hl(e) {
   if (!I(e)) return !1;
@@ -6118,6 +6117,7 @@ var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotat
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
 var { getAnnotationComposedParent } = require("./browser-page-preload/annotation-composed-parent-policy");
 var { stopAnnotationEventPropagation } = require("./browser-page-preload/annotation-event-propagation-policy");
+var { normalizeAnnotationText } = require("./browser-page-preload/annotation-text-normalization");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
