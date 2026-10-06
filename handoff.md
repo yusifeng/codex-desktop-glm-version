@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `E3`（内部 `ft`，源码 2198--2202）确认为 generated renderer fiber host-instance extractor，依赖 reconciler tags/error contract，无独立业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `Hq`（内部 `DFe`，源码 61728）确认为依赖 generated layout offset table 的 notification offset helper，无独立 renderer consumer，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `C0`（内部 `OS`，源码 33618）确认为 generated geometry-default initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
@@ -2262,6 +2264,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation input selection policy 已迁移至 `annotation-input-selection-policy.ts`；原 `Ju` 入口复用 text-input policy，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation composed parent traversal 已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；原 `ic` 入口保留 slot/parent/shadow host 顺序，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation event propagation boundary 已迁移至 `src/main/browser-page-preload/annotation-event-propagation-policy.ts`；原 `Jc` 入口保留 preventDefault 开关及停止顺序，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。
