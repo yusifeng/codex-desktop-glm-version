@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `HJ`（内部 `wPe`，源码 61129）确认为依赖 generated version constants/semantic-version helpers 的 app-server compatibility predicate，无独立 renderer consumer，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `GJ`（内部 `vPe`，源码 61097--61099）确认为 generated app-server version status wrapper，依赖相邻 parser/comparator 且无独立 renderer consumer，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `BI`（内部 `wJe`，源码 70096）确认为委托 generated path normalization 的 lowercased path-key wrapper，无独立 renderer 业务归属，登记 `preserved-coupled`。
