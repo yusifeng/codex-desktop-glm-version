@@ -4,4 +4,8 @@ export function filterAgentOverridePaths(output: string, filename = "AGENTS.over
   for (const path of output.split("\0")) if (path === filename || path.endsWith(`/${filename}`)) paths.add(path);
   return [...paths];
 }
-if (typeof module !== "undefined") module.exports = { filterAgentOverridePaths };
+export function intersectWorktreeIncludePaths(ignoredPaths: string[], includedPaths: string[]): string[] {
+  const ignored = new Set(ignoredPaths);
+  return [...new Set(includedPaths.filter((path) => ignored.has(path)))];
+}
+if (typeof module !== "undefined") module.exports = { filterAgentOverridePaths, intersectWorktreeIncludePaths };

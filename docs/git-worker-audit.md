@@ -1218,6 +1218,8 @@ Worktree copy 的 NUL-separated path 投影已迁移至 `src/main/worker/git-wor
 Agent override path 的 Git `ls-files -z` 过滤已迁移至 `src/main/worker/git-worktree-copy-policy.ts`；
 入口继续负责 Git I/O、失败处理与 copy 生命周期，`scripts/test-worker-git-worktree-copy-policy.mjs`
 覆盖 1 项稳定去重/后缀匹配断言。
+`.worktreeinclude` 的 ignored/included path 交集与稳定去重也已迁移至同一 policy；入口继续
+负责双 Git 查询、存在性检查与 copy 生命周期，focused assertions 增至 2 项。
 
 ### Worker read/working-tree residual owner review (2026-10-06)
 

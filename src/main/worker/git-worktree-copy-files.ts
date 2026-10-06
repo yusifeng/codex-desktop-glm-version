@@ -6,7 +6,7 @@ type WorktreeCopyDependencies = {
   runGit: (root: string, args: string[], host: any, options?: any) => Promise<any>;
 };
 import { splitGitWorktreeNullSeparatedPaths } from "./git-worktree-copy-path-policy";
-import { filterAgentOverridePaths } from "./git-worktree-copy-policy";
+import { filterAgentOverridePaths, intersectWorktreeIncludePaths } from "./git-worktree-copy-policy";
 
 const AGENTS_OVERRIDE_FILE = `AGENTS.override.md`;
 const WORKTREE_INCLUDE_FILE = `.worktreeinclude`;
@@ -181,8 +181,7 @@ async function findWorktreeIncludeFiles(
   ]);
   if (!ignored.success || !included.success)
     throw Error(`git ls-files failed while locating ${WORKTREE_INCLUDE_FILE} files`);
-  const ignoredPaths = new Set(splitNullSeparatedPaths(ignored.stdout));
-  return [...new Set(splitNullSeparatedPaths(included.stdout).filter((path) => ignoredPaths.has(path)))];
+  return intersectWorktreeIncludePaths(splitNullSeparatedPaths(ignored.stdout), splitNullSeparatedPaths(included.stdout));
 }
 
 async function resolveWorktreeLocalEnvironmentConfig(
