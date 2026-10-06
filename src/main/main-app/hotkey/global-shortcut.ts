@@ -17,6 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
+import { validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -459,33 +460,7 @@ function updateMacKeyboardLayout(layoutMap: Record<string, string>): void {
 
 /** 校验（原 `JV`）：5 种错误文案。 */
 function validateHotkey(accelerator: string, platform = process.platform): string | null {
-  const parts = splitAccelerator(accelerator);
-  if (isBareModifierAccelerator(accelerator, platform)) return null;
-  if (parts.some((part) => isBareOrUnsupported(part)))
-    return parts.length === 1
-      ? platform === "darwin"
-        ? isBareModifierAccelerator(accelerator, platform)
-          ? null
-          : "This shortcut key is not supported."
-        : "Choose a shortcut with Ctrl or Alt plus another key."
-      : "Use Ctrl, Alt, or Command when combining with another key.";
-  if (parts.length === 0) return "Shortcut cannot be empty.";
-  let hasCmdOrCtrlOrAlt = false;
-  let nonModifier: string | null = null;
-  for (const part of parts) {
-    const lowered = part.toLowerCase();
-    if (MODIFIER_OR_SHIFT_TOKENS.has(lowered)) {
-      if (MODIFIER_TOKENS.has(lowered)) hasCmdOrCtrlOrAlt = true;
-      continue;
-    }
-    if (nonModifier != null) return "Shortcut must include exactly one non-modifier key.";
-    nonModifier = part;
-  }
-  return nonModifier == null
-    ? "Shortcut must include a non-modifier key."
-    : hasCmdOrCtrlOrAlt
-      ? null
-      : "Shortcut must include Cmd/Ctrl or Alt.";
+  return validateGlobalShortcut(accelerator, platform, { isBareModifierAccelerator, isBareOrUnsupported });
 }
 
 /** 触发权限/请求（原 `YV`/`XV`）。 */

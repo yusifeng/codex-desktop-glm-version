@@ -327,6 +327,13 @@ harness 为前置证据。
 `src/main/main-app/startup/tray-icon-paths.ts`；平台/flavor、打包 resources 与开发仓库路径组合由
 `scripts/test-main-tray-icon-paths.mjs` 覆盖，nativeImage 读取与 Electron fallback 仍留在入口。
 
+### 增量抽取：global shortcut validation policy
+
+全局快捷键注册前的纯校验（修饰键/非修饰键约束、平台错误文案与 bare-modifier 分流）已迁移至
+`src/main/main-app/hotkey/global-shortcut-policy.ts`。原 `global-shortcut.ts` 仅注入已有
+bare-modifier predicates，继续持有 Electron `globalShortcut` 注册、native helper、权限请求和
+挂起/恢复副作用；`scripts/test-main-global-shortcut-policy.mjs` 覆盖 6 项 focused assertions。
+
 ### 增量抽取：workspace policy restart dialog
 
 原 `Est`（175,026-175,046）的 workspace policy 重启提示已迁移至

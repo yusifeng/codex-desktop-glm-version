@@ -1313,3 +1313,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-preload-annotation-visible-text-element-policy.mjs](test-preload-annotation-visible-text-element-policy.mjs)
 [test-app-shared-is-absolute-path.mjs](test-app-shared-is-absolute-path.mjs)
 [test-preload-annotation-shadow-root-policy.mjs](test-preload-annotation-shadow-root-policy.mjs)
+[test-main-global-shortcut-policy.mjs](test-main-global-shortcut-policy.mjs)
