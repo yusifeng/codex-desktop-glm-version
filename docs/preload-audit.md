@@ -891,6 +891,10 @@ shadow root boundary 的 DocumentFragment/host/shadowRoot 一致性判定（原 
 
 Document/DocumentFragment queryable root 结构判定（原 `Gc`）已迁移至 `src/main/browser-page-preload/annotation-queryable-root-policy.ts`。新增 4 项 focused assertions。
 
+### 增量抽取：annotation document access policy
+
+frame window 的安全 document 读取（原 `oc`）已迁移至 `src/main/browser-page-preload/annotation-document-access-policy.ts`；保留跨源异常返回 null 的边界。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation scroll-container offset
 
 按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。

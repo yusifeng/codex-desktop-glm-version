@@ -4194,11 +4194,7 @@ function ac(e) {
   });
 }
 function oc(e) {
-  try {
-    return e.document;
-  } catch {
-    return null;
-  }
+  return readAnnotationDocumentSafely(e);
 }
 function sc(e) {
   return resolveAnnotationIframeWindow(e, { isIframe: (value) => ac(value) });
@@ -6120,6 +6116,7 @@ var { isAnnotationClippingBoundary } = require("./browser-page-preload/annotatio
 var { isAnnotationShadowRoot } = require("./browser-page-preload/annotation-shadow-root-policy");
 var { isAnnotationUniqueSelectorMatch } = require("./browser-page-preload/annotation-unique-selector-policy");
 var { isAnnotationQueryableRoot } = require("./browser-page-preload/annotation-queryable-root-policy");
+var { readAnnotationDocumentSafely } = require("./browser-page-preload/annotation-document-access-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
