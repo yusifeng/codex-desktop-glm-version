@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Jt`（内部 `qX`，源码 52682）确认为 generated enum initializer，无 standalone renderer 业务语义，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Oi`（内部 `O0`，源码 77307）确认为 generated conversation UI initializer，无 standalone renderer 业务语义，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Og`（内部 `qE`，源码 3660--3664）确认为 appearance-dependent SVG icon JSX component，无 standalone pure policy boundary，登记 `preserved-coupled`。
