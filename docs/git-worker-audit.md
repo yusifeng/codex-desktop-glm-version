@@ -1395,6 +1395,9 @@ exec owner 不再拆分。
 Worker telemetry/error normalization 仍由 command observability、performance envelope、logger
 与 worker lifecycle 共同持有；独立拆分会重复 operation identity 或改变 flush/dispose 顺序，当前
 无新的安全纯策略边界。
+Execution/computer-use adapter 仍绑定 execution host、service identity、capture continuation、
+日志与事件发射；现有 capture policy 已覆盖纯判断，剩余递归 continuation 与 service 生命周期
+不适合再拆独立 worker policy。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
