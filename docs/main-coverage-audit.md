@@ -421,6 +421,8 @@ approval/history mode 的 config↔desktop/TOML 映射也已迁移至该 policy�
 decision 与写回副作用，新增 1 项投影断言。
 rule membership 判定也已迁移至该 policy，origin-state 继续负责 denied 优先的 decision
 组合，新增 2 项命中/缺失断言。
+denied-over-allowed 的 rule decision 组合也已迁移至该 policy，origin-state 继续负责 resource
+section 选择与批量更新副作用，新增 2 项优先级断言。
 
 ### T4 候选复核：browser-sidebar error pages
 

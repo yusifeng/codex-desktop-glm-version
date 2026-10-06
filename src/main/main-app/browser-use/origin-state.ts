@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -158,7 +158,7 @@ function applyRuleUpdate(config: Record<string, any>, update: { action: string; 
 /** 当前规则决策（原 `hD`）：denied 优先。 */
 function ruleDecisionFor(config: Record<string, any>, resource: OriginResource, origin: string): "allow" | "deny" | null {
   const section = config[RESOURCE_KINDS[resource]];
-  return stringSetHas(section, "denied", origin) ? "deny" : stringSetHas(section, "allowed", origin) ? "allow" : null;
+  return browserUseRuleDecision(section, origin);
 }
 
 function stringSetHas(section: unknown, kind: string, origin: string): boolean {

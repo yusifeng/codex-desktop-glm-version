@@ -61,5 +61,13 @@ export function browserUseHasRule(section: unknown, kind: string, origin: string
   return browserUseKindSet(section, kind).includes(origin);
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule };
+export function browserUseRuleDecision(section: unknown, origin: string): "allow" | "deny" | null {
+  return browserUseHasRule(section, "denied", origin)
+    ? "deny"
+    : browserUseHasRule(section, "allowed", origin)
+      ? "allow"
+      : null;
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule, browserUseRuleDecision };
 import { join } from "node:path";

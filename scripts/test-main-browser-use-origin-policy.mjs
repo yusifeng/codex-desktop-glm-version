@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
 
 let assertions = 0;
 const check = (actual, expected) => { assert.equal(actual, expected); assertions += 1; };
@@ -21,4 +21,6 @@ check(browserUseHistoryApprovalModeToToml("disabled"), "disabled");
 assert.deepEqual(browserUseKindSet({ allowed: [" a ", "a"] }, "allowed"), ["a"]); assertions += 1;
 check(browserUseHasRule({ denied: ["https://example.com"] }, "denied", "https://example.com"), true);
 check(browserUseHasRule({}, "allowed", "https://example.com"), false);
+check(browserUseRuleDecision({ denied: ["x"], allowed: ["x"] }, "x"), "deny");
+check(browserUseRuleDecision({ allowed: ["x"] }, "x"), "allow");
 console.log(`main browser-use origin policy assertions passed (${assertions})`);
