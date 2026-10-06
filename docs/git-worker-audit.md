@@ -1459,4 +1459,5 @@ parentPort message transport 共同定义跨线程协议；拆出 guard 会复�
 继续由 rpc-client owner 持有并由现有 transport regressions 覆盖。
 Remote host config 的 SSH 字段 shape/type normalization 已迁移至
 `remote-host-config-policy.ts`；display-name/SSH identity consumer 继续负责 terminal command
-解析与 host formatting，新增 3 项 focused policy assertions。
+解析与 host formatting，command tail/port/identity 与 IPv6 bracket projection 也已归入 policy，
+focused policy assertions 增至 7 项。

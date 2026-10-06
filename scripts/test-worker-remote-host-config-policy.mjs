@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
-import { parseRemoteHostConfig } from "../app/.vite/build/worker/remote-host-config-policy.js";
+import { bracketHost, commandPort, commandTail, hasIdentityFlag, parseRemoteHostConfig } from "../app/.vite/build/worker/remote-host-config-policy.js";
 assert.deepEqual(parseRemoteHostConfig({ sshHost: "host", sshAlias: null, sshPort: 22, identity: null }), { sshHost: "host", sshAlias: null, sshPort: 22, identity: null });
 assert.equal(parseRemoteHostConfig({ sshHost: 22 }), null);
 assert.equal(parseRemoteHostConfig(null), null);
-console.log("worker remote host config policy assertions passed (3)");
+assert.equal(commandTail(["ssh", "user@example.com"]), "user@example.com");
+assert.equal(commandPort(["ssh", "-p2222"]), 2222);
+assert.equal(hasIdentityFlag(["ssh", "-i", "/tmp/key"]), true);
+assert.equal(bracketHost("user@2001:db8::1", 22), "user@[2001:db8::1]:22");
+console.log("worker remote host config policy assertions passed (7)");
