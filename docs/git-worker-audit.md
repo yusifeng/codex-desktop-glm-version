@@ -1342,3 +1342,5 @@ enumeration 已有对应 policy/utility；剩余 fetch/list 函数共享 Git I/O
 Review commit queries 的 branch commit listing 与 line-count 仍依赖 repository query client、Git
 command result、review snapshot 与 abort signal；其字段 projection 已由上层 request consumer
 覆盖，当前不再拆分 query owner。
+Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
+批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
