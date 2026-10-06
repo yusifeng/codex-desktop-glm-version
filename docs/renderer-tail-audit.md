@@ -788,3 +788,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-06 A5 继续批次：app-shared `A3/AA/AB/AC/AD/AE/AF/AH/AJ/AK` 已完成 export-table 反解并登记 `preserved-coupled`；对应 generated runtime constant、telemetry/protocol schema、route/schema surface、icon registry 与 annotation/plugin lifecycle，无独立 renderer business owner。Manifest 未归类减少 10 项。
 2026-10-06 A5 继续批次：app-shared `AL/AM/AN/AO/AP/AQ/AT/AU/AW/Aa/Ab/Ac/Ad/Af/Ag` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime bootstrap、telemetry/protocol schema、image/icon registry 与 shared lifecycle helper。Manifest 未归类减少 15 项。
 2026-10-06 A5 继续批次：app-shared `Ai/Aj/Ak/Al/An/Ao/Ap/Ar/As/Au/Av/Aw/Ax/Ay/B$` 已完成源码反解并登记 `preserved-coupled`；覆盖 icon registry、schema/runtime、routing filter 与 shared lifecycle helper。Manifest 未归类减少 15 项。
+2026-10-06 A5 继续批次：app-shared `B2/B3/BA/BB/BC/BD/BE/BF/BG/BH/BJ/BM/BN/BO/BP` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime registry、keyboard/path/protocol、schema、icon registry 与 telemetry surface。Manifest 未归类减少 15 项。
