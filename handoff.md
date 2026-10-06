@@ -2494,3 +2494,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A5 继续批次：app-shared `$j/$k/$l/$m/$n` 已完成 export-table 反解并登记为 `preserved-coupled`，分别属于 telemetry schema、generated runtime/registry、icon registry 与 plugin lifecycle surface。
 2026-10-06 A5 继续批次：app-shared `$o/$p/$s/$t/$u/$v/$w/$x/$y/A$` 已完成 export-table 反解并登记 `preserved-coupled`；其中 icon initializer、bootstrap 与 schema/runtime 均没有独立 renderer business owner。
 2026-10-06 A5 继续批次：app-shared `A3/AA/AB/AC/AD/AE/AF/AH/AJ/AK` 已完成源码反解并登记为 `preserved-coupled`，分别属于 generated runtime/protocol/schema/icon/annotation lifecycle surface。
+2026-10-06 A5 继续批次：app-shared `AL/AM/AN/AO/AP/AQ/AT/AU/AW/Aa/Ab/Ac/Ad/Af/Ag` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
