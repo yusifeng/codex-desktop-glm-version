@@ -985,6 +985,10 @@ sidebar runtime editor message 的 select/create/restore/close/sync 状态 trans
 
 annotation control target 是否位于 sidebar comments root（含 shadow root）的 containment 判定（原 `Of`）已迁移至 `src/main/browser-page-preload/annotation-sidebar-target-policy.ts`。新增 3 项 focused assertions。
 
+### Runtime owner 复核
+
+`annotation-runtime.ts` 仅聚合既有策略/target/parser；`annotation-preload-runtime.ts`、surface/overlay/pointer-selection runtime 均绑定 listener、observer、IPC 或 dispose 生命周期，当前没有可安全脱离 owner 的新增纯策略边界。
+
 ### 增量抽取：annotation rect bounds projection
 
 selection rect 集合的 bounding box 聚合（原 `Ku`）已迁移至 `src/main/browser-page-preload/annotation-rect-bounds-projection.ts`。新增 1 项 focused assertion。

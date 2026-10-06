@@ -2297,6 +2297,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation control default value projection 已迁移至 `annotation-control-default-value.ts`；原 `tf` 入口保留类型默认值语义，新增 5 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation sidebar editor transition 已迁移至 `annotation-sidebar-editor-transition.ts`；原 `Lf` 入口保留 editor message reducer 语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation sidebar target containment 已迁移至 `annotation-sidebar-target-policy.ts`；原 `Of` 入口保留 root/shadow root 判定，新增 3 项 focused assertions。
+2026-10-06 A2 runtime owner 复核：`annotation-runtime.ts` 仅聚合既有策略/target/parser 导出；`annotation-preload-runtime.ts`、surface/overlay/pointer-selection runtime 均绑定 DOM listener、observer、IPC 或 dispose 生命周期。未发现可脱离 owner 的新纯 policy，本轮不重复制造 facade。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
