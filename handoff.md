@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `$A`（内部 `oK`，源码 73954）确认为 generated `CodexDictationEndReason` protocol enum，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `$D`（内部 `t1`，源码 79044）确认为 generated runtime initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `$4`（内部 `ote`，源码 23900）确认为 generated context accessor，依赖内部 schema/runtime state、无独立 renderer 业务归属，登记 `preserved-coupled`。
