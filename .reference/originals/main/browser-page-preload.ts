@@ -5753,12 +5753,12 @@ function sd(e, t, n) {
   }
 }
 function cd(e) {
-  if (!e.isConnected || !_d(e)) return null;
-  let t = Fc(e),
-    n = e.getBoundingClientRect();
-  if (n.width <= 0 || n.height <= 0) return null;
-  let r = Ic(t);
-  return { x: n.left + r.x, y: n.top + r.y, width: n.width, height: n.height };
+  return getAnnotationVisibleElementRect(e, {
+    isConnected: (element) => element.isConnected,
+    isVisible: (element) => _d(element),
+    getRect: (element) => element.getBoundingClientRect(),
+    getFrameOffset: (element) => Ic(Fc(element)),
+  });
 }
 function ld(e) {
   return e.getAttribute(`aria-label`) ?? bc(e);
@@ -6089,6 +6089,7 @@ var { projectAnnotationRectBounds } = require("./browser-page-preload/annotation
 var { projectAnnotationRectPoint } = require("./browser-page-preload/annotation-rect-point-projection");
 var { isAnnotationMirrorMutation } = require("./browser-page-preload/annotation-mirror-mutation-policy");
 var { hasAnnotationInputSelection } = require("./browser-page-preload/annotation-input-selection-policy");
+var { getAnnotationVisibleElementRect } = require("./browser-page-preload/annotation-visible-element-rect");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");

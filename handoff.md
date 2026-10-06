@@ -2268,6 +2268,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation input selection policy 已迁移至 `annotation-input-selection-policy.ts`；原 `Ju` 入口复用 text-input policy，新增 3 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation visible element rect projection 已迁移至 `annotation-visible-element-rect.ts`；原 `cd` 入口保留 visibility/rect/frame 适配，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation composed parent traversal 已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；原 `ic` 入口保留 slot/parent/shadow host 顺序，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation event propagation boundary 已迁移至 `src/main/browser-page-preload/annotation-event-propagation-policy.ts`；原 `Jc` 入口保留 preventDefault 开关及停止顺序，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。
