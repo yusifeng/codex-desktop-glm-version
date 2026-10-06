@@ -4415,8 +4415,7 @@ function Ec(e, t) {
   return null;
 }
 function Dc(e) {
-  let t = wc(e);
-  return t == null ? null : t.document;
+  return resolveAnnotationFrameDocument(e, { resolveWindow: (framePath) => wc(framePath) });
 }
 function Oc(e, { requireUnique: t = !1 } = {}) {
   let n = [],
@@ -6120,6 +6119,7 @@ var { isAnnotationUniqueSelectorMatch } = require("./browser-page-preload/annota
 var { isAnnotationQueryableRoot } = require("./browser-page-preload/annotation-queryable-root-policy");
 var { readAnnotationDocumentSafely } = require("./browser-page-preload/annotation-document-access-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
+var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
