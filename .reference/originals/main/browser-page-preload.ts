@@ -5641,11 +5641,7 @@ function Gu(e, t) {
   return intersectAnnotationRects(e, t);
 }
 function Ku(e) {
-  let t = Math.min(...e.map((e) => e.x)),
-    n = Math.min(...e.map((e) => e.y)),
-    r = Math.max(...e.map((e) => e.x + e.width)),
-    i = Math.max(...e.map((e) => e.y + e.height));
-  return { x: t, y: n, width: r - t, height: i - n };
+  return projectAnnotationRectBounds(e);
 }
 function qu(e, t) {
   let n = t ? e.at(-1) : e[0];
@@ -6093,6 +6089,7 @@ var { isAnnotationShadowHostRoot, getAnnotationShadowHost } = require("./browser
 var { isAnnotationRangeFixedPosition } = require("./browser-page-preload/annotation-range-fixed-position-policy");
 var { hasAnnotationAncestorTransform } = require("./browser-page-preload/annotation-transform-policy");
 var { intersectAnnotationRects } = require("./browser-page-preload/annotation-rect-clip-intersection");
+var { projectAnnotationRectBounds } = require("./browser-page-preload/annotation-rect-bounds-projection");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");

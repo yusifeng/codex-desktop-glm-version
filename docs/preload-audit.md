@@ -973,6 +973,10 @@ selection/mirror geometry 的 ancestor transform/rotate 判定（原 `Wu`）已�
 
 selection/mirror geometry 的 client rect 交集 projection（原 `Gu`）已迁移至 `src/main/browser-page-preload/annotation-rect-clip-intersection.ts`；保留边界接触返回 null。新增 2 项 focused assertions。
 
+### 增量抽取：annotation rect bounds projection
+
+selection rect 集合的 bounding box 聚合（原 `Ku`）已迁移至 `src/main/browser-page-preload/annotation-rect-bounds-projection.ts`。新增 1 项 focused assertion。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
