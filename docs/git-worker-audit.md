@@ -1413,6 +1413,9 @@ identity 或改变 watcher/RPC 初始化顺序，继续保留 assembly owner。
 Worker protocol schema 中 deep-link/browser-tab/runtime-bundle、connector/MCP 与 elicitation
 字段的实际 owner 分别在 shared protocol/elicitation consumers；当前 worker 没有对应 request
 handler，复制 schema 会产生未接回 facade，继续保留 shared schema owner。
+Worker lifecycle/transport boundary 的 sentry-user-update、flush、analytics 与 RPC request/cancel
+分类虽可由 dispatcher 投影，真实 consumer 仍串接 Sentry、analytics flush、request registry 与
+parentPort response；这些动作共享 dispose/flush 顺序，继续保留 transport owner。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
