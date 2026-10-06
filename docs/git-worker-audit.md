@@ -1205,6 +1205,14 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### Worker entry protocol boundary recheck (2026-10-06)
+
+90,661-90,836 继续作为精确保留边界：`workerData`/`parentPort` 校验、main-RPC client
+初始化及 `worker-request`、`worker-request-cancel`、`worker-flush-and-exit` message loop
+仍由入口持有；`entry-dispatcher` 只负责控制消息分类，request dispatch 则接回现有
+core/node/snapshot/live-query handlers。该边界已有 entry-dispatcher 与 request-dispatch
+focused regressions，移出入口会改变线程启动或 flush/exit 顺序，当前不再拆分。
+
 ### WSL command owner recheck (2026-10-06)
 
 47,122-47,584 中的纯输出/argv 边界已经由 `src/main/worker/platform-wsl.ts` 覆盖：UTF-16/UTF-8
