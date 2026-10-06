@@ -1205,6 +1205,14 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### Worker telemetry owner recheck (2026-10-06)
+
+63,051-65,199 的 Git command telemetry/error normalization 已由
+`src/main/worker/git-observability.ts` 接回，并由 request/read handlers 注入 operation、
+host cache key、exit bucket 与 failure classification。OpenTelemetry/Sentry/Datadog SDK
+仍由基础设施与 worker lifecycle owner 管理；当前没有可在不重复 SDK 生命周期的情况下新增
+worker policy 边界。
+
 ### Git manager/watch/request owner recheck (2026-10-06)
 
 65,200-80,999 的主区段已形成可核验的三类 owner：`git-repository-models.ts` 持有
