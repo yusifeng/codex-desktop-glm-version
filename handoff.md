@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `F4`（内部 `Rp`，源码 24061）确认为 generated intersection-schema constructor，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Gt`（内部 `e5`，源码 101126）确认为 generated runtime initializer，无 standalone renderer 业务语义，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `G1`（内部 `sC`，源码 34466--34468）确认为 generated CSS motion-property list initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
