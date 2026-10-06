@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `II`（内部 `DJe`，源码 70115--70118）的路径 basename 投影已迁移至 `src/renderer/app-shared/runtime/get-path-basename.ts`；新增 focused test 覆盖尾部分隔符、单段路径与全分隔符。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `Gf`（内部 `Odt`，源码 103765--103768）的 dropdown overlay side 规范化已迁移至 `src/renderer/app-shared/runtime/normalize-dropdown-overlay-side.ts`；DOM 查找保留边界，新增 focused test 覆盖 top、bottom 与非法值。
 
 2026-10-06 A5 继续批次：app-shared 未消费导出 `EG`（内部 `sRe`，源码 63491）的搜索查询优先级策略已迁移至 `src/renderer/app-shared/runtime/get-query-priority.ts`；新增 focused test 覆盖空白与实质查询。
@@ -2161,5 +2163,6 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation shadow-root boundary 判定已迁移至 `src/main/browser-page-preload/annotation-shadow-root-policy.ts`；原 `Uc` 入口保留 node type/element 注入，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation unique selector match 已迁移至 `src/main/browser-page-preload/annotation-unique-selector-policy.ts`；原 `Wc` 入口保留 root/query 注入，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation queryable root 判定已迁移至 `src/main/browser-page-preload/annotation-queryable-root-policy.ts`；原 `Gc` 入口保留 node type 语义，新增 4 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation document access boundary 已迁移至 `src/main/browser-page-preload/annotation-document-access-policy.ts`；原 `oc` 入口保留异常返回 null，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation frame point projection 已迁移至 `src/main/browser-page-preload/annotation-frame-point-projection.ts`；原 `Lc` 入口保留 frame offset 读取，新增 2 项 focused assertions。
