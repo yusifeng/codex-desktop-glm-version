@@ -21,14 +21,13 @@ type TurnDiffSnapshotDependencies = {
   normalizeTreeSha: (value: string) => string;
 };
 import { parseTurnDiffStatus } from "./git-turn-diff-status-policy";
+import { normalizeTurnDiffTreeOutput } from "./git-turn-diff-snapshot-policy";
 
 function normalizeTreeOutput(
   output: string,
   deps: TurnDiffSnapshotDependencies,
 ) {
-  const treeSha = output.trim();
-  if (!deps.isObjectId(treeSha)) throw Error(`Unexpected tree SHA: ${treeSha}`);
-  return deps.normalizeTreeSha(treeSha);
+  return normalizeTurnDiffTreeOutput(output, deps.isObjectId, deps.normalizeTreeSha);
 }
 
 async function readTurnDiffStatus(

@@ -1464,3 +1464,6 @@ focused policy assertions 增至 7 项。
 Synced-branch config parsing 的 JSON decode、schema validation、warning/error fallback 与 config
 file read/write 共享 schema owner、Git-dir/path resolution、host file I/O 和 warning lifecycle；
 当前没有不复制这些 owner 的独立纯 parser 边界。
+Turn-diff snapshot 的 tree SHA trim/validation/normalization 已迁移至
+`git-turn-diff-snapshot-policy.ts`；runtime 继续负责 status、Git tree resolution、temporary index
+与 staging 生命周期，新增 2 项 focused assertions。
