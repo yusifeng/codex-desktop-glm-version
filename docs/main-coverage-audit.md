@@ -349,6 +349,13 @@ bare-modifier platform gate 也已迁移至该 policy，入口继续负责 helpe
 注册 accelerator 的 platform/layout gate 也已迁移至该 policy，入口继续负责 Electron 注册与
 失败回滚，新增 2 项 darwin/win32 映射边界断言。
 
+### T4 下一候选复核：main-app 几何/窗口模块
+
+global shortcut 相邻的 `avatar-overlay/geometry.ts`、tray 与窗口辅助模块已是独立 consumer
+模块；剩余函数依赖 Electron `screen`、BrowserWindow、display/work-area 状态或共享窗口
+生命周期。复核未发现比现有 geometry/policy 模块更小且能保留副作用顺序的新纯边界，本轮不再
+制造 facade。
+
 ### 增量抽取：workspace policy restart dialog
 
 原 `Est`（175,026-175,046）的 workspace policy 重启提示已迁移至

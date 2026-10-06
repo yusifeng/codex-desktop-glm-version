@@ -2208,6 +2208,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A3 main 增量：bare/unsupported accelerator 分流判定已接入 `global-shortcut-policy.ts`；入口仍负责注册分支与 helper 生命周期，policy focused assertions 增至 20 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：bare-modifier platform gate 已接入 `global-shortcut-policy.ts`；入口继续负责 helper 注册与权限请求，policy focused assertions 增至 22 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：registration accelerator 的 platform/layout gate 已接入 `global-shortcut-policy.ts`；入口继续负责 Electron 注册与失败回滚，policy focused assertions 增至 24 项，build/typecheck 通过。
+2026-10-06 A3 main coverage 复核：global shortcut 相邻 avatar-overlay/geometry、tray 与窗口辅助模块已是独立 consumer；剩余函数依赖 Electron screen/BrowserWindow/display 状态或共享生命周期，未发现更小且安全的新纯边界，本轮不制造 facade。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。
@@ -2236,6 +2237,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation highlight context policy 已迁移至 `annotation-highlight-context-policy.ts`；原 `Ql` 入口保留 style root/owner window/capability gate，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation client rect projection 已迁移至 `annotation-client-rect-projection.ts`；原 `Vu` 入口保留 1000 rect cap/零尺寸过滤，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation text security policy 已迁移至 `annotation-text-security-policy.ts`；原 `Bu` 入口保留 masked-text 判定，新增 3 项 focused assertions。
+2026-10-06 T2/A2 继续批次：annotation shadow-host policy 已迁移至 `annotation-shadow-host-policy.ts`；原 `Lu`/`Iu` 入口保留宽松 host eligibility/projection，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation composed parent traversal 已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；原 `ic` 入口保留 slot/parent/shadow host 顺序，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation event propagation boundary 已迁移至 `src/main/browser-page-preload/annotation-event-propagation-policy.ts`；原 `Jc` 入口保留 preventDefault 开关及停止顺序，新增 2 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation scroll-container offset projection 已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；原 `Nc` 入口保留 selector/scroll 适配，新增 3 项 focused assertions。
