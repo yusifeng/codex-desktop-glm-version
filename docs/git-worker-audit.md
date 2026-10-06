@@ -1476,3 +1476,6 @@ quote/octal policies 已覆盖局部投影，剩余 parser 组合不安全拆分
 Cat-file batch parser 的 request framing、stream prefix handling、byte limits、truncated-tail retry
 与 disk fallback 共享 batch cursor、snapshot consistency、host I/O 与 recursive retry ordering；
 现有 cat-file error/content/batch-error policies 已覆盖错误投影，剩余 parser 不拆分。
+Live-query registry refresh 的 repo-changed event handling、recovery flag、refresh scheduling 与
+waiter resolution 共享 generation/abort state、watcher coverage、timer lifecycle 与 event ordering；
+现有 live-query state/watch policies 已覆盖 key/option projection，剩余 registry mutation 不拆分。
