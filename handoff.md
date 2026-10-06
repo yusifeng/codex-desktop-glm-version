@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `Bz`（内部 `Bz`，源码 70120）确认为 generated platform-specific path normalization adapter，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Ft`（内部 `T5`，源码 103473）确认为 generated command React context initializer，无 standalone pure renderer policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Nf`（内部 `XP`，源码 15020）确认为 generated localization/error-message resolver，缺少独立 consumer boundary，登记 `preserved-coupled`。
