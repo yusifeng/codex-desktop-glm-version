@@ -4936,9 +4936,10 @@ function Ul(e) {
   }
 }
 function Wl(e) {
-  if (e.closest(`script,style,noscript,template,[hidden],[aria-hidden='true']`) != null) return !1;
-  let t = Gl(e).getComputedStyle(e);
-  return t.display !== `none` && t.visibility !== `hidden` && t.opacity !== `0`;
+  return isAnnotationVisibleTextElement(e, {
+    hasExcludedAncestor: (element) => element.closest(`script,style,noscript,template,[hidden],[aria-hidden='true']`) != null,
+    getStyle: (element) => Gl(element).getComputedStyle(element),
+  });
 }
 function Gl(e) {
   return e.ownerDocument.defaultView ?? window;
@@ -6122,6 +6123,7 @@ var { getAnnotationComposedParent } = require("./browser-page-preload/annotation
 var { stopAnnotationEventPropagation } = require("./browser-page-preload/annotation-event-propagation-policy");
 var { normalizeAnnotationText } = require("./browser-page-preload/annotation-text-normalization");
 var { isAnnotationRangeIntersectingRect } = require("./browser-page-preload/annotation-range-viewport-intersection");
+var { isAnnotationVisibleTextElement } = require("./browser-page-preload/annotation-visible-text-element-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
