@@ -4934,7 +4934,7 @@ function Wl(e) {
   });
 }
 function Gl(e) {
-  return e.ownerDocument.defaultView ?? window;
+  return getAnnotationOwnerWindow(e, window);
 }
 function I(e) {
   return e != null && e instanceof (e.ownerDocument.defaultView?.HTMLElement ?? HTMLElement);
@@ -6108,6 +6108,7 @@ var { isAnnotationShadowRoot } = require("./browser-page-preload/annotation-shad
 var { isAnnotationUniqueSelectorMatch } = require("./browser-page-preload/annotation-unique-selector-policy");
 var { isAnnotationQueryableRoot } = require("./browser-page-preload/annotation-queryable-root-policy");
 var { readAnnotationDocumentSafely } = require("./browser-page-preload/annotation-document-access-policy");
+var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");

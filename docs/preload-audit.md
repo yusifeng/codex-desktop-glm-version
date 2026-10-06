@@ -925,6 +925,10 @@ activeElement 的 input type/textarea eligibility（原 `Hl`）现真实委托�
 
 visible-text document 读取（原 `Ul`）现真实复用 `annotation-document-access-policy.ts`；保留跨源异常返回 null，新增 2 项 focused assertions。
 
+### 增量抽取：annotation owner-window policy
+
+元素 ownerDocument.defaultView 与 fallback window 选择（原 `Gl`）已迁移至 `src/main/browser-page-preload/annotation-owner-window-policy.ts`；入口保留 owner-window fallback。新增 2 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
