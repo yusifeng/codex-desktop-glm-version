@@ -1383,6 +1383,9 @@ command result、review snapshot、abort signal 与 response field projection；
 consumer 覆盖，剩余 query orchestration 不形成独立纯策略。
 Turn diff capture 的 status/abort/error policy 已抽出；剩余 snapshot generation、Git diff、abort
 signal、telemetry 与 response completion 共享同一生命周期顺序，当前无新的独立纯策略边界。
+Branch search runtime 的 ref scan 绑定 query cache、Git host、abort signal 与异步扫描结果；
+cache request handlers 还需执行 stable-metadata/read-cache invalidation 副作用，当前没有不复制
+cache/lifecycle owner 的安全纯策略边界。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
