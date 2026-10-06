@@ -37,5 +37,21 @@ export function isBrowserUsePlainObject(value: unknown): value is Record<string,
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject };
+export function browserUseApprovalMode(value: unknown): "neverAsk" | "alwaysAsk" {
+  return value === "never_ask" ? "neverAsk" : "alwaysAsk";
+}
+
+export function browserUseHistoryApprovalMode(value: unknown): "disabled" | "neverAsk" | "alwaysAsk" {
+  return value === "disabled" ? "disabled" : browserUseApprovalMode(value);
+}
+
+export function browserUseApprovalModeToToml(value: string): "never_ask" | "always_ask" {
+  return value === "neverAsk" ? "never_ask" : "always_ask";
+}
+
+export function browserUseHistoryApprovalModeToToml(value: string): "disabled" | "never_ask" | "always_ask" {
+  return value === "disabled" ? "disabled" : browserUseApprovalModeToToml(value);
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml };
 import { join } from "node:path";

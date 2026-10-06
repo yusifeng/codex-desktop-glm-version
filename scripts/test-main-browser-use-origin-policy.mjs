@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { browserUseConfigPath, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
 
 let assertions = 0;
 const check = (actual, expected) => { assert.equal(actual, expected); assertions += 1; };
@@ -13,4 +13,9 @@ check(oppositeBrowserUseRuleKind("denied"), "allowed");
 check(browserUseConfigPath("/tmp/home"), "/tmp/home/config.toml");
 assert.equal(isBrowserUsePlainObject({}), true); assertions += 1;
 assert.equal(isBrowserUsePlainObject([]), false); assertions += 1;
+check(browserUseApprovalMode("never_ask"), "neverAsk");
+check(browserUseApprovalMode("unknown"), "alwaysAsk");
+check(browserUseHistoryApprovalMode("disabled"), "disabled");
+check(browserUseApprovalModeToToml("neverAsk"), "never_ask");
+check(browserUseHistoryApprovalModeToToml("disabled"), "disabled");
 console.log(`main browser-use origin policy assertions passed (${assertions})`);

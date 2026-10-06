@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseConfigPath, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -199,28 +199,19 @@ function computeRuleUpdates(config: Record<string, any>, updates: Array<{ action
 // ---------------------------------------------------------------------------
 
 function approvalModeOf(value: unknown): "neverAsk" | "alwaysAsk" {
-  return value === "never_ask" ? "neverAsk" : "alwaysAsk";
+  return browserUseApprovalMode(value);
 }
 
 function historyApprovalModeOf(value: unknown): "disabled" | "neverAsk" | "alwaysAsk" {
-  switch (value) {
-    case "disabled":
-      return "disabled";
-    case "never_ask":
-      return "neverAsk";
-    case "always_ask":
-      return "alwaysAsk";
-    default:
-      return "alwaysAsk";
-  }
+  return browserUseHistoryApprovalMode(value);
 }
 
 function approvalModeToToml(value: string): "never_ask" | "always_ask" {
-  return value === "neverAsk" ? "never_ask" : "always_ask";
+  return browserUseApprovalModeToToml(value);
 }
 
 function historyApprovalModeToToml(value: string): "disabled" | "never_ask" | "always_ask" {
-  return value === "disabled" ? "disabled" : approvalModeToToml(value);
+  return browserUseHistoryApprovalModeToToml(value);
 }
 
 function kindSetOf(section: unknown, kind: string): string[] {

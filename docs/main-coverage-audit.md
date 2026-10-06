@@ -415,6 +415,8 @@ browser-use rule update 的 origin 规范化（缺省 https、仅允许 http/htt
 allowed/denied rule kind 互换也已迁移至该 policy，规则更新副作用仍由 origin-state 持有，新增 2 项映射断言。
 browser-use config path 的 home/filename 组合也已迁移至该 policy，origin-state 继续负责文件存在、读取、解析与写回副作用，新增 1 项路径断言。
 TOML 解析结果的 plain-object 形状判定也已迁移至该 policy，origin-state 继续负责解析失败日志与状态写回，新增 2 项形状断言。
+approval/history mode 的 config↔desktop/TOML 映射也已迁移至该 policy，origin-state 继续持有
+配置加载、更新与持久化副作用，新增 5 项默认/disabled/反向映射断言。
 
 ### T4 候选复核：browser-sidebar error pages
 
