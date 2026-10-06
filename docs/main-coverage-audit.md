@@ -405,6 +405,13 @@ owner。按“真实 consumer 才迁移”规则，本轮不新建 policy facade
 由 live-query coordinator 直接消费；host-handoff progress 由 handoff runtime 接回。上述入口均
 已有 focused regression，没有未消费的可读 helper 可安全迁移；该证据支持维持当前 preserve 边界。
 
+### 增量抽取：browser-use origin policy
+
+browser-use rule update 的 origin 规范化（缺省 https、仅允许 http/https、投影 URL origin）已迁移至
+`src/main/main-app/browser-use/origin-policy.ts`。`origin-state.ts` 继续持有 config.toml 读写、
+规则集合更新与日志副作用；`scripts/test-main-browser-use-origin-policy.mjs` 覆盖 4 项协议、端口、
+非法 scheme 与空值断言。
+
 ### T4 候选复核：browser-sidebar error pages
 
 `browser-sidebar/error-pages.ts` 同时持有图片附件 WeakMap 的 suspend/resume、WebContents
