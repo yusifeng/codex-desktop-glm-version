@@ -1205,6 +1205,14 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### Git manager/watch/request owner recheck (2026-10-06)
+
+65,200-80,999 的主区段已形成可核验的三类 owner：`git-repository-models.ts` 持有
+repository identity/cache model，`git-watch-*` 与 `git-live-query-*` 持有 watcher/session
+生命周期，request handlers/dispatch 则持有方法与取消协议。现有 policy 已通过窄依赖注入
+接回这些 owner；剩余 manager 状态（memoization、timer、abort、trace）跨越多个 consumer，
+没有新的单一纯策略边界可安全拆出，本轮不制造重复 manager facade。
+
 ### Worker entry protocol boundary recheck (2026-10-06)
 
 90,661-90,836 继续作为精确保留边界：`workerData`/`parentPort` 校验、main-RPC client
