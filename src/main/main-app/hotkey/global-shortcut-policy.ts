@@ -20,6 +20,14 @@ export function isGlobalBareOrUnsupported(
   return bareModifierName(accelerator) != null || unsupported.has(normalized);
 }
 
+export function isGlobalBareModifierAccelerator(
+  accelerator: string,
+  platform: string,
+  bareModifierName: (value: string) => string | null,
+): boolean {
+  return platform === "darwin" && bareModifierName(accelerator) != null;
+}
+
 /** Pure global shortcut validation; registration and permission effects remain in global-shortcut.ts. */
 export function validateGlobalShortcut(
   accelerator: string,
@@ -120,4 +128,4 @@ export function resolveWin32ModifierGroups(accelerator: string, platform: string
   return groups.length === 0 ? null : groups;
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeGlobalAccelerator, splitGlobalAccelerator, isGlobalBareOrUnsupported, validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };
+if (typeof module !== "undefined") module.exports = { normalizeGlobalAccelerator, splitGlobalAccelerator, isGlobalBareOrUnsupported, isGlobalBareModifierAccelerator, validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };

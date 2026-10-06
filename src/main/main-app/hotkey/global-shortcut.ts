@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { isGlobalBareOrUnsupported, isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, splitGlobalAccelerator, validateGlobalShortcut } from "./global-shortcut-policy";
+import { isGlobalBareModifierAccelerator, isGlobalBareOrUnsupported, isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, splitGlobalAccelerator, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -330,7 +330,7 @@ function watchReleaseProcess(child: ReturnType<typeof spawn>, onRelease: () => v
 
 /** 是否 bare 修饰键形态（原 `IV`）。 */
 function isBareModifierAccelerator(accelerator: string, platform = process.platform): boolean {
-  return platform === "darwin" && bareModifierName(accelerator) != null;
+  return isGlobalBareModifierAccelerator(accelerator, platform, bareModifierName);
 }
 
 /** 是否走 bare/不支持路径（原 `LV`）。 */

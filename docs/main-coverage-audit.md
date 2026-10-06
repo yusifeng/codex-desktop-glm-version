@@ -345,6 +345,7 @@ accelerator 的空白、连字符、下划线与大小写规范化也已迁移�
 accelerator token 分割（空段过滤与 trim）也已迁移至该 policy，新增 1 项分割边界断言。
 bare/unsupported accelerator 分流判定也已迁移至该 policy，入口继续负责注册分支与 helper
 生命周期，新增 2 项 unsupported/bare 边界断言。
+bare-modifier platform gate 也已迁移至该 policy，入口继续负责 helper 注册与权限请求，新增 2 项平台边界断言。
 
 ### 增量抽取：workspace policy restart dialog
 
