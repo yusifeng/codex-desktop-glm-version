@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Ii`（内部 `a0`，源码 75570）确认为 app state generated initializer，耦合 stores/hooks/lifecycle registrations、无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `In`（内部 `n6`，源码 91898）确认为 voice/composer generated runtime initializer，耦合 stores/hooks/lifecycle state、无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Gr`（内部 `Zet`，源码 80588）确认为 hotkey-window navigation handler，协调 generated stores/routing/副作用、无 standalone pure policy boundary，登记 `preserved-coupled`。
