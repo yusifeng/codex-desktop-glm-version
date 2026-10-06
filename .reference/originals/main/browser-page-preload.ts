@@ -5564,13 +5564,13 @@ function Lu(e) {
   return isAnnotationShadowHostRoot(e, { fragmentNodeType: Node.DOCUMENT_FRAGMENT_NODE, isElement: (value) => F(value) });
 }
 function Ru(e, t) {
-  let n = F(e) ? e : Iu(e);
-  for (; n != null && n !== t.document.body;) {
-    let e = t.getComputedStyle(n).position;
-    if (e === `fixed` || e === `sticky`) return !0;
-    n = n.parentElement ?? Iu(n.getRootNode());
-  }
-  return !1;
+  return isAnnotationRangeFixedPosition(e, {
+    isElement: (value) => F(value),
+    getShadowHost: (value) => Iu(value),
+    getParent: (value) => value.parentElement ?? Iu(value.getRootNode()),
+    getStylePosition: (value) => t.getComputedStyle(value).position,
+    getBody: () => t.document.body,
+  });
 }
 function zu(e, t) {
   let n = e.commonAncestorContainer;
@@ -6104,6 +6104,7 @@ var { resolveAnnotationHighlightContext } = require("./browser-page-preload/anno
 var { projectAnnotationClientRects } = require("./browser-page-preload/annotation-client-rect-projection");
 var { isAnnotationTextSecurityEnabled } = require("./browser-page-preload/annotation-text-security-policy");
 var { isAnnotationShadowHostRoot, getAnnotationShadowHost } = require("./browser-page-preload/annotation-shadow-host-policy");
+var { isAnnotationRangeFixedPosition } = require("./browser-page-preload/annotation-range-fixed-position-policy");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");

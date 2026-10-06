@@ -961,6 +961,10 @@ client rect 的数量上限、零尺寸过滤与 `{x,y,width,height}` projection
 
 shadow host root 的 DocumentFragment/host eligibility 与 host projection（原 `Lu`/`Iu`）已迁移至 `src/main/browser-page-preload/annotation-shadow-host-policy.ts`；保留宽松 host 语义，与严格 `Uc` policy 区分。新增 3 项 focused assertions。
 
+### 增量抽取：annotation range fixed-position policy
+
+Range/element 的 fixed/sticky ancestor 判定（原 `Ru`）已迁移至 `src/main/browser-page-preload/annotation-range-fixed-position-policy.ts`；入口仅注入 element/shadow host/parent/style/body adapters。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
