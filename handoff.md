@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `D1`（内部 `wC`，源码 35058--35060）确认为 generated resize-animation bookkeeping initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `A0`（内部 `sS`，源码 33308--33310）确认为 generated gesture runtime 的 pointer-event primary-button initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `E3`（内部 `ft`，源码 2198--2202）确认为 generated renderer fiber host-instance extractor，依赖 reconciler tags/error contract，无独立业务归属，登记 `preserved-coupled`。
@@ -2231,6 +2233,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A3 main 增量：browser-use config path 的 home/filename 组合已接入 `origin-policy.ts`；origin-state 继续持有文件 I/O、TOML 解析与写回副作用，focused assertions 增至 8 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：TOML 解析结果的 plain-object 形状判定已接入 `origin-policy.ts`；origin-state 继续持有解析失败日志与状态写回，focused assertions 增至 10 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：browser-use approval/history mode 的 config↔desktop/TOML 映射已接入 `origin-policy.ts`；origin-state 继续持有配置加载、更新与持久化副作用，focused assertions 增至 15 项，build/typecheck 通过。
+2026-10-06 A3 main 增量：browser-use rule section 的 kind-set 读取与稳定去重已接入 `origin-policy.ts`；origin-state 继续持有 rule decision 与写回副作用，focused assertions 增至 16 项，build/typecheck 通过。
 2026-10-06 A3 main coverage 复核：global shortcut 相邻 avatar-overlay/geometry、tray 与窗口辅助模块已是独立 consumer；剩余函数依赖 Electron screen/BrowserWindow/display 状态或共享生命周期，未发现更小且安全的新纯边界，本轮不制造 facade。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。

@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -215,7 +215,7 @@ function historyApprovalModeToToml(value: string): "disabled" | "never_ask" | "a
 }
 
 function kindSetOf(section: unknown, kind: string): string[] {
-  return isPlainObject(section) ? dedupeStrings(section[kind]) : [];
+  return browserUseKindSet(section, kind);
 }
 
 /** config → 桌面模型投影（原 `mD`）。 */

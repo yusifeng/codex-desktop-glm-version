@@ -53,5 +53,9 @@ export function browserUseHistoryApprovalModeToToml(value: string): "disabled" |
   return value === "disabled" ? "disabled" : browserUseApprovalModeToToml(value);
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml };
+export function browserUseKindSet(section: unknown, kind: string): string[] {
+  return isBrowserUsePlainObject(section) ? dedupeBrowserUseStrings(section[kind]) : [];
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet };
 import { join } from "node:path";
