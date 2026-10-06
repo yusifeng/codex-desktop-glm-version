@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `CJ`（内部 `UPe`，源码 61319）确认为 generated annotation batch enum lookup/fallback，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `EJ`（内部 `KPe`，源码 61332）确认为通用 generated-schema/collection 非空 helper，无独立 renderer 业务归属，登记 `preserved-coupled`，不伪造 facade。
 
 2026-10-06 A5 继续批次：app-shared 未消费导出 `II`（内部 `DJe`，源码 70115--70118）的路径 basename 投影已迁移至 `src/renderer/app-shared/runtime/get-path-basename.ts`；新增 focused test 覆盖尾部分隔符、单段路径与全分隔符。
