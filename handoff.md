@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Gn`（内部 `o3`，源码 86955）确认为仅调用邻接 generated setup routines 的 initializer，无 standalone renderer 业务策略，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Fu`（内部 `hB`，源码 21587）确认为仅负责邻接 generated modules/global runtime wiring 的 initializer，无 standalone renderer 业务语义，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Fl`（内部 `zH`，源码 25982）确认为 generated feature wiring 的 constant-false capability stub，无独立 renderer 业务归属，登记 `preserved-coupled`。
