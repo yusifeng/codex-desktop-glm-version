@@ -1436,3 +1436,6 @@ Git config scope runtime 的 missing-value detection、scope fallback 与 worktr
 Review branch stats 的 operation-marker status、tracked/untracked metadata、rename reconciliation
 与 review snapshot 共享 Git dir resolution、host stat、missing-error semantics、concurrency 与
 response ordering；现有 branch-stats policy 已覆盖 marker path projection，剩余 runtime 不拆 facade。
+Review metadata diff parser 的 NUL field cursor 同时消费 raw status entries、rename path pairs 与
+numstat records；cursor advancement、malformed-record stop semantics 与 downstream rename reconciliation
+共享同一 output ordering，当前不拆出局部 parser facade。
