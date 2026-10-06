@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 继续批次：app-primary 未消费导出 `wd`（内部 `VI`，源码 17617--17619）的邮件收件人组非空判定已迁移至 `src/renderer/app-primary/runtime/has-recipient-contacts.ts`；新增 `scripts/test-app-primary-has-recipient-contacts.mjs` 覆盖 3 项 focused assertions，纯策略无 JSX/store/network/lifecycle 副作用。
+
 2026-10-06 T2/A2 继续批次：annotation element metadata payload projection 已迁移至
 `src/main/browser-page-preload/annotation-element-metadata-projection.ts`；原 `nd` 入口保留兼容委托，
 新增 3 项 focused assertions，build 与 typecheck 已通过。
