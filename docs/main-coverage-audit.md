@@ -346,6 +346,8 @@ accelerator token 分割（空段过滤与 trim）也已迁移至该 policy，�
 bare/unsupported accelerator 分流判定也已迁移至该 policy，入口继续负责注册分支与 helper
 生命周期，新增 2 项 unsupported/bare 边界断言。
 bare-modifier platform gate 也已迁移至该 policy，入口继续负责 helper 注册与权限请求，新增 2 项平台边界断言。
+注册 accelerator 的 platform/layout gate 也已迁移至该 policy，入口继续负责 Electron 注册与
+失败回滚，新增 2 项 darwin/win32 映射边界断言。
 
 ### 增量抽取：workspace policy restart dialog
 

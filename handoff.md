@@ -2205,6 +2205,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A3 main 增量：accelerator token 分割（trim 与空段过滤）已接入 `global-shortcut-policy.ts`；入口继续复用分割结果做快捷键校验，policy focused assertions 增至 18 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：bare/unsupported accelerator 分流判定已接入 `global-shortcut-policy.ts`；入口仍负责注册分支与 helper 生命周期，policy focused assertions 增至 20 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：bare-modifier platform gate 已接入 `global-shortcut-policy.ts`；入口继续负责 helper 注册与权限请求，policy focused assertions 增至 22 项，build/typecheck 通过。
+2026-10-06 A3 main 增量：registration accelerator 的 platform/layout gate 已接入 `global-shortcut-policy.ts`；入口继续负责 Electron 注册与失败回滚，policy focused assertions 增至 24 项，build/typecheck 通过。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。

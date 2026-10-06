@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { isGlobalBareModifierAccelerator, isGlobalBareOrUnsupported, isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, splitGlobalAccelerator, validateGlobalShortcut } from "./global-shortcut-policy";
+import { isGlobalBareModifierAccelerator, isGlobalBareOrUnsupported, isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveGlobalRegistrationAccelerator, resolveMacModifierNames, resolveWin32ModifierGroups, splitGlobalAccelerator, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -480,7 +480,7 @@ function splitAccelerator(accelerator: string): string[] {
 
 /** 注册用 accelerator（原 `Pze`）：mac 布局重映射。 */
 function registrationAcceleratorFor(accelerator: string): string {
-  return process.platform !== "darwin" || macLayoutMap == null ? accelerator : remapForLayout(accelerator, macLayoutMap);
+  return resolveGlobalRegistrationAccelerator(accelerator, process.platform, macLayoutMap);
 }
 
 /** 单键注册（原 `ZV`）：generation 防陈旧回调。 */
