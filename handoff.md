@@ -2143,6 +2143,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 
 2026-10-06 worker audit blocker evidence：复核原 worker 48,152-49,999 SQLite schema（当前真实 owner 为 `main-app/thread-catalog/store.ts`）与 53,200-53,477 connector/browser-auth/MCP Zod schema（当前无 worker request consumer）；两段均不能安全另建 worker facade，已在 `docs/git-worker-audit.md` 登记 `preserved-coupled` 理由。
 2026-10-06 worker platform boundary 复核：确认 `worker.ts:110` git-local-environment、`:130` shell-config、`:136` platform-env 均为真实窄入口且有 focused regression；55,351-56,420 与 86,131-90,660 仍耦合平台副作用和 watcher 生命周期，未发现新的可独立纯策略边界，本轮不重复拆 facade。
+2026-10-06 worker lifecycle/transport 复核：84,080-85,965 的 entry-dispatcher 仅投影 sentry-user-update、flush、analytics 与 request/cancel 分类；Sentry/analytics flush、request registry 和 parentPort 响应仍共享 dispose/flush 顺序与线程生命周期。entry-dispatcher focused 8 项通过，暂无安全独立 policy 边界。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation element metadata attribute projection 已迁移至 `src/main/browser-page-preload/annotation-element-metadata-attributes.ts`；原 `od` 入口保留 eligibility/attribute parser 注入，新增 3 项 focused assertions。

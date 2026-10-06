@@ -1177,3 +1177,12 @@ Worktree snapshot 文件枚举中的 NUL 路径解析、porcelain untracked 状�
 复核原始 55,351-56,420 与 86,131-90,660 区段后，剩余逻辑仍分别耦合 Windows shell/runtime
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
+
+### Worker lifecycle/transport boundary recheck (2026-10-06)
+
+原 84,080-85,965 的 lifecycle/transport 边界已对照当前入口复核：`entry-dispatcher.ts` 仅
+投影 `sentry-user-update`、`flush`、`analytics` 与 RPC request/cancel 分类，真实 consumer
+仍在 worker entry 中串接 Sentry、analytics flush、request registry 和 `parentPort` 响应。
+这些动作共享 dispose/flush 顺序与线程生命周期；现有 `scripts/test-worker-entry-dispatcher.mjs`
+覆盖 8 项 dispatch 断言。因此该区段当前没有可在不重排副作用的情况下独立接回的纯策略，保留
+现有窄 dispatcher 边界。
