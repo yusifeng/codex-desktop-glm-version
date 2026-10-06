@@ -1,5 +1,9 @@
 const EMPTY_GIT_TREE_SHA = `4b825dc642cb6eb9a060e54bf8d69288fbee4904`;
 
+export function createEmptyUntrackedPaths(root: string) {
+  return { success: true, gitRoot: root, paths: [] };
+}
+
 type ReviewComparisonPolicyDependencies = {
   findMergeBase: (repository: any, branch: string) => Promise<any>;
   getDefaultBranch: (repository: any) => Promise<any>;
@@ -58,4 +62,4 @@ async function readCurrentHeadSnapshot(repository: any, signal: AbortSignal, dep
 }
 
 export { EMPTY_GIT_TREE_SHA, getCommitParentSha, normalizeOptionalHeadSha, readCurrentHeadSnapshot, resolveReviewComparisonArgs };
-if (typeof module !== `undefined`) module.exports = { EMPTY_GIT_TREE_SHA, getCommitParentSha, normalizeOptionalHeadSha, readCurrentHeadSnapshot, resolveReviewComparisonArgs };
+if (typeof module !== `undefined`) module.exports = { EMPTY_GIT_TREE_SHA, createEmptyUntrackedPaths, getCommitParentSha, normalizeOptionalHeadSha, readCurrentHeadSnapshot, resolveReviewComparisonArgs };

@@ -1467,3 +1467,6 @@ file read/write 共享 schema owner、Git-dir/path resolution、host file I/O �
 Turn-diff snapshot 的 tree SHA trim/validation/normalization 已迁移至
 `git-turn-diff-snapshot-policy.ts`；runtime 继续负责 status、Git tree resolution、temporary index
 与 staging 生命周期，新增 2 项 focused assertions。
+Review comparison 的 empty-untracked response projection 已迁移至现有
+`git-review-comparison-policy.ts`；comparison runtime 继续负责 repository/query/snapshot I/O 与
+failure wrapping，focused policy assertions 增加 1 项。

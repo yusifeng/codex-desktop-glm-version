@@ -1,4 +1,5 @@
 import {
+  createEmptyUntrackedPaths,
   EMPTY_GIT_TREE_SHA,
   getCommitParentSha,
   normalizeOptionalHeadSha,
@@ -187,9 +188,7 @@ async function prepareReviewComparison(
   };
 }
 
-function emptyUntrackedPaths(root: string) {
-  return { success: true, gitRoot: root, paths: [] };
-}
+const emptyUntrackedPaths = createEmptyUntrackedPaths;
 
 export {
   EMPTY_GIT_TREE_SHA,

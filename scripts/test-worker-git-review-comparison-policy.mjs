@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const policy = require("../app/.vite/build/worker/git-review-comparison-policy.js");
+assert.deepEqual(policy.createEmptyUntrackedPaths("/repo"), { success: true, gitRoot: "/repo", paths: [] });
 const base = {
   findMergeBase: async (_repo, branch) => branch === "origin/main" ? "base-sha" : null,
   getDefaultBranch: async () => ({ remote: "origin", branch: "main" }),
@@ -19,4 +20,4 @@ assert.deepEqual(await policy.resolveReviewComparisonArgs({ source: "commit", co
 assert.deepEqual(await policy.resolveReviewComparisonArgs({ source: "uncommitted", worktreeRepo: repo, signal: undefined }, base), { type: "success", args: ["HEAD"] });
 assert.deepEqual(await policy.resolveReviewComparisonArgs({ source: "branch" }, base), { type: "error", failureReason: "review_comparison" });
 assert.equal(policy.normalizeOptionalHeadSha(null, base), null);
-console.log("8 worker Git review comparison policy assertions passed");
+console.log("9 worker Git review comparison policy assertions passed");
