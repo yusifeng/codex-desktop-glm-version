@@ -5,6 +5,10 @@ function parseGitHubAuthorLogin(authorMail: string) {
   return /^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/i.exec(email)?.[1] ?? null;
 }
 
+export function isGitHubHost(host: string) {
+  return host === `github.com` || host.endsWith(`.github.com`);
+}
+
 function createBlameLine(header: string, metadataByCommit: Map<string, any>) {
   const [commitSha = ``, , finalLine = ``] = header.split(` `);
   const lineNumber = Number.parseInt(finalLine, 10);
@@ -57,4 +61,4 @@ function parseBlamePorcelain(output: string) {
 
 export { createBlameLine, parseBlamePorcelain, parseGitHubAuthorLogin };
 if (typeof module !== `undefined`)
-  module.exports = { createBlameLine, parseBlamePorcelain, parseGitHubAuthorLogin };
+  module.exports = { createBlameLine, isGitHubHost, parseBlamePorcelain, parseGitHubAuthorLogin };

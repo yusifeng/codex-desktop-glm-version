@@ -2292,6 +2292,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker 增量：worktree starting-ref 的 local ref 规范化与 remote candidate 枚举已迁移至 `git-worktree-starting-ref-policy.ts`；runtime 继续负责 upstream/remote 查询、fetch、compare、resolve 副作用，新增 3 项 focused assertions，build/typecheck 通过。
 2026-10-06 A1 worker 增量：worktree porcelain list 记录解析已迁移至 `git-worktree-list-policy.ts`；runtime 继续负责 Git 命令、query cache、错误处理，新增 3 项 focused assertions，build/typecheck 通过。
 2026-10-06 A1 worker 增量：worktree resolution 的 comparison-root 规范化与 managed-root containment 判定已迁移至 `git-worktree-resolution-policy.ts`；runtime 继续负责 metadata、owner fallback、排序与 dirty-state 查询，新增 4 项 focused assertions，build/typecheck 通过。
+2026-10-06 A1 worker 增量：blame repository web URL 的 GitHub host gate 已迁移至现有 `git-blame-file-policy.ts`；runtime 继续负责 origin 查询、remote parsing 与 URL 组装，focused assertions 增加 3 项 host 断言，build/typecheck 通过。
 2026-10-06 A1 worker residual owner 复核：working-tree metadata 的 mergeMetadataMaps 虽为 Map 合并，但覆盖顺序由 tracked/untracked 批次、并发 worker 与 rename reconciliation 决定，继续由 metadata owner 持有。
 2026-10-06 A1 worker residual owner 复核：git-worktree-files runtime 已将 NUL/status/pathspec/index fingerprint/missing-file 判定交给 policy；剩余 Git 命令、stat、stability retry、fallback 仍是单一 runtime owner，无新增 policy。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。

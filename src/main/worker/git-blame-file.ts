@@ -4,6 +4,7 @@ const BLAME_CACHE_MS = 250;
 const NO_LAZY_FETCH_ENV = { GIT_NO_LAZY_FETCH: `1` };
 
 import {
+  isGitHubHost,
   parseBlamePorcelain,
   parseGitHubAuthorLogin,
 } from "./git-blame-file-policy";
@@ -40,10 +41,6 @@ function queryBlameFile(
     ),
     staleTime: BLAME_CACHE_MS,
   });
-}
-
-function isGitHubHost(host: string) {
-  return host === `github.com` || host.endsWith(`.github.com`);
 }
 
 async function getRepositoryWebUrl(

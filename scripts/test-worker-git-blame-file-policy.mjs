@@ -3,9 +3,14 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const {
+  isGitHubHost,
   parseBlamePorcelain,
   parseGitHubAuthorLogin,
 } = require("../app/.vite/build/worker/git-blame-file-policy.js");
+
+assert.equal(isGitHubHost("github.com"), true);
+assert.equal(isGitHubHost("enterprise.github.com"), true);
+assert.equal(isGitHubHost("github.example.com"), false);
 
 let assertions = 0;
 const equal = (actual, expected) => { assertions += 1; assert.equal(actual, expected); };
