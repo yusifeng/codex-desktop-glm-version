@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { dedupeBrowserUseStrings, normalizeBrowserUseOrigin } from "./origin-policy";
+import { dedupeBrowserUseStrings, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -134,7 +134,7 @@ function rulesSectionFor(config: Record<string, any>, sectionKey: string): Recor
 }
 
 function oppositeKind(kind: string): string {
-  return kind === "allowed" ? "denied" : "allowed";
+  return oppositeBrowserUseRuleKind(kind);
 }
 
 /** 单条规则的矩阵更新（原 `rke`）：add 互斥写入，remove 仅本 kind。 */

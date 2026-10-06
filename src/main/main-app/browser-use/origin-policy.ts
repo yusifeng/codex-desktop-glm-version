@@ -25,4 +25,8 @@ export function dedupeBrowserUseStrings(value: unknown): string[] {
   return result;
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings };
+export function oppositeBrowserUseRuleKind(kind: string): string {
+  return kind === "allowed" ? "denied" : "allowed";
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind };
