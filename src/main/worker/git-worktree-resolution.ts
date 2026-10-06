@@ -1,3 +1,5 @@
+import { isPathWithinManagedRoot, normalizeComparisonRoot } from "./git-worktree-resolution-policy";
+
 type WorktreeResolutionDependencies = {
   gitManager: any;
   host: any;
@@ -24,18 +26,6 @@ const emptyResolution = () => ({
   worktreeWorkspaceRoot: null,
   hasUncommittedChanges: false,
 });
-
-function normalizeComparisonRoot(path: string, normalize: (path: string) => string) {
-  return normalize(path).replace(/\/+$/, ``);
-}
-
-function isPathWithinManagedRoot(candidate: string, root: string, normalize: (path: string) => string) {
-  const normalizedCandidate = normalizeComparisonRoot(candidate, normalize);
-  const normalizedRoot = normalizeComparisonRoot(root, normalize);
-  return normalizedRoot === `/`
-    ? normalizedCandidate === `/`
-    : normalizedCandidate === normalizedRoot || normalizedCandidate.startsWith(`${normalizedRoot}/`);
-}
 
 async function getWorktreeSortTimestamp(root: string, host: any) {
   try {

@@ -1349,6 +1349,9 @@ fetch、compare 与 resolve 副作用，`scripts/test-worker-git-worktree-starti
 Worktree porcelain list 的记录解析已迁移至 `src/main/worker/git-worktree-list-policy.ts`；runtime
 继续负责 Git 命令、query cache 与错误处理，`scripts/test-worker-git-worktree-list-policy.mjs`
 覆盖 branch/detached、locked/prunable、空记录三项解析断言。
+Worktree resolution 的 comparison-root 规范化与 managed-root containment 判定已迁移至
+`src/main/worker/git-worktree-resolution-policy.ts`；runtime 继续负责 metadata、owner fallback、
+排序与 dirty-state 查询，`scripts/test-worker-git-worktree-resolution-policy.mjs` 覆盖 4 项路径断言。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
