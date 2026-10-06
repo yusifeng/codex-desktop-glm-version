@@ -879,6 +879,10 @@ iframe contentWindow 的可用 document boundary（原 `sc`）已迁移至 `src/
 
 元素 overflow/overflowX/overflowY 的 clipping boundary 判定（原 `Kc`）已迁移至 `src/main/browser-page-preload/annotation-clipping-boundary-policy.ts`；入口仅注入 computed style 与既有 overflow policy。新增 3 项 focused assertions。
 
+### 增量抽取：annotation shadow-root policy
+
+shadow root boundary 的 DocumentFragment/host/shadowRoot 一致性判定（原 `Uc`）已迁移至 `src/main/browser-page-preload/annotation-shadow-root-policy.ts`；入口仅注入 node type 与 element 判定。新增 4 项 focused assertions。
+
 ### 增量抽取：annotation scroll-container offset
 
 按 anchor 保存的 scroll container selector 计算当前滚动偏移差（原 `Nc`）已迁移至 `src/main/browser-page-preload/annotation-scroll-container-offset.ts`；入口仅注入 selector resolver、元素判定与 scroll 读取。新增 3 项 focused assertions。

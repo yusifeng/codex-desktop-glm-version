@@ -4559,12 +4559,10 @@ function Hc(e) {
     } catch {}
 }
 function Uc(e) {
-  return (
-    e.nodeType === Node.DOCUMENT_FRAGMENT_NODE &&
-    `host` in e &&
-    F(e.host) &&
-    e.host.shadowRoot === e
-  );
+  return isAnnotationShadowRoot(e, {
+    documentFragmentNodeType: Node.DOCUMENT_FRAGMENT_NODE,
+    isElement: (value) => F(value),
+  });
 }
 function Wc(e, t) {
   let n = e.getRootNode();
@@ -6121,6 +6119,7 @@ var { projectAnnotationFramePoint } = require("./browser-page-preload/annotation
 var { isAnnotationIframeElement } = require("./browser-page-preload/annotation-iframe-element-policy");
 var { resolveAnnotationIframeWindow } = require("./browser-page-preload/annotation-iframe-window-policy");
 var { isAnnotationClippingBoundary } = require("./browser-page-preload/annotation-clipping-boundary-policy");
+var { isAnnotationShadowRoot } = require("./browser-page-preload/annotation-shadow-root-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
