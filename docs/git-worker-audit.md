@@ -1205,6 +1205,13 @@ registry 复制到 worker 会破坏 shared command identity，故仅保留已迁
 副作用及 Git Bash/GitHub Desktop discovery、workspace watcher 生命周期，未发现新的可独立
 接回纯策略边界；本轮不重复制造 facade。
 
+### 增量抽取：Git watcher path partition policy
+
+watcher discovered path 的 stale/new 集合分区已迁移至
+`src/main/worker/git-watch-path-partition-policy.ts`。`git-watch-paths.ts` 继续持有 watcher
+session、dispose 与注册副作用；`scripts/test-worker-git-watch-path-partition-policy.mjs`
+覆盖 2 项稳定分区断言。
+
 ### Worker read/working-tree residual owner review (2026-10-06)
 
 `git-read-request-handlers.ts` 当前只负责将 cwd/root、Git manager、host 与 abort signal 注入

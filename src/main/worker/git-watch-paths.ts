@@ -10,6 +10,7 @@ import {
   shouldRetryGitWatchTargetAfterStart,
   shouldScheduleGitWatchSessionRetry,
 } from "./git-watch-session-policy";
+import { partitionGitWorktreeWatchPaths } from "./git-watch-path-partition-policy";
 
 /** Returns whether `candidate` is inside `root` (or is root itself). */
 function isWithinPath(pathApi: PathApi, root: string, candidate: string): boolean {
@@ -175,15 +176,6 @@ function selectGitMetadataRefreshPaths(
 }
 
 /** Computes stale and newly discovered worktree watch paths without session side effects. */
-function partitionGitWorktreeWatchPaths(existingPaths: string[], discoveredPaths: string[]): { stalePaths: string[]; newPaths: string[] } {
-  const existing = new Set(existingPaths);
-  const discovered = new Set(discoveredPaths);
-  return {
-    stalePaths: existingPaths.filter((path) => !discovered.has(path)),
-    newPaths: discoveredPaths.filter((path) => !existing.has(path)),
-  };
-}
-
 /** Filters changed paths for one watcher handler and normalizes working-tree Git metadata paths. */
 function collectGitWatchHandlerPaths(pathApi: (PathApi & { join(...parts: string[]): string }) | null, root: string, handler: { changeType: string; shouldHandleChangedPath: (path: string, cache: Map<string, boolean>) => boolean }, changedPaths: string[], cache: Map<string, boolean>): string[] {
   const workingTree = handler.changeType === `working-tree`;
