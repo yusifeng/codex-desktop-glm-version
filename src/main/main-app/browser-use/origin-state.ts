@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind, resolveBrowserUseOriginForAdd } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -168,11 +168,7 @@ function stringSetHas(section: unknown, kind: string, origin: string): boolean {
 /** add 前的 origin 规范化（原 `ike`）：已有精确匹配优先，否则规范化。 */
 function resolveOriginForAdd(config: Record<string, any>, resource: OriginResource, origin: string): string {
   const section = config[RESOURCE_KINDS[resource]];
-  if (isPlainObject(section) && (dedupeStrings(section.allowed).includes(origin) || dedupeStrings(section.denied).includes(origin)))
-    return origin;
-  const normalized = normalizeOrigin(origin);
-  if (normalized == null) throw new Error("Invalid Browser Use origin");
-  return normalized;
+  return resolveBrowserUseOriginForAdd(section, origin, normalizeOrigin);
 }
 
 /** 批量规则更新（原 `uD`）：返回远端 rule_updates（决策变化）或 null。 */

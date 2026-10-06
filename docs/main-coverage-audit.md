@@ -423,6 +423,8 @@ rule membership 判定也已迁移至该 policy，origin-state 继续负责 deni
 组合，新增 2 项命中/缺失断言。
 denied-over-allowed 的 rule decision 组合也已迁移至该 policy，origin-state 继续负责 resource
 section 选择与批量更新副作用，新增 2 项优先级断言。
+add 前 origin 的精确匹配优先/规范化/非法输入拒绝也已迁移至该 policy，origin-state 继续负责
+resource section 选择与规则写回，新增 2 项解析断言。
 
 ### T4 候选复核：browser-sidebar error pages
 

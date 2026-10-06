@@ -69,5 +69,16 @@ export function browserUseRuleDecision(section: unknown, origin: string): "allow
       : null;
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule, browserUseRuleDecision };
+export function resolveBrowserUseOriginForAdd(
+  section: unknown,
+  origin: string,
+  normalize: (value: string) => string | null,
+): string {
+  if (browserUseHasRule(section, "allowed", origin) || browserUseHasRule(section, "denied", origin)) return origin;
+  const normalized = normalize(origin);
+  if (normalized == null) throw new Error("Invalid Browser Use origin");
+  return normalized;
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule, browserUseRuleDecision, resolveBrowserUseOriginForAdd };
 import { join } from "node:path";
