@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `I4`（内部 `tm`，源码 24215）确认为 generated validation composed-schema helper，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `J4`（内部 `Yp`，源码 24163）确认为 generated validation template-literal schema constructor，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `G4`（内部 `Bp`，源码 24068）确认为 generated validation schema-record constructor，无独立 renderer 业务归属，登记 `preserved-coupled`。
