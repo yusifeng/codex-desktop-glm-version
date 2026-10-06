@@ -4188,14 +4188,10 @@ function ic(e) {
   return Uc(t) ? t.host : null;
 }
 function ac(e) {
-  if (typeof e != `object` || !e) return !1;
-  let t = e,
-    n =
-      t.ownerDocument?.defaultView?.HTMLIFrameElement ??
-      (typeof HTMLIFrameElement > `u` ? null : HTMLIFrameElement);
-  return (
-    (n != null && e instanceof n) || (t.tagName?.toLowerCase() === `iframe` && `contentWindow` in t)
-  );
+  return isAnnotationIframeElement(e, {
+    getOwnerWindow: (value) => value.ownerDocument?.defaultView,
+    getFallbackIframe: () => (typeof HTMLIFrameElement > `u` ? null : HTMLIFrameElement),
+  });
 }
 function oc(e) {
   try {
@@ -6126,6 +6122,7 @@ var { getAnnotationFrameOffset } = require("./browser-page-preload/annotation-fr
 var { isAnnotationElementLike } = require("./browser-page-preload/annotation-element-like-policy");
 var { getAnnotationScrollContainerOffset } = require("./browser-page-preload/annotation-scroll-container-offset");
 var { projectAnnotationFramePoint } = require("./browser-page-preload/annotation-frame-point-projection");
+var { isAnnotationIframeElement } = require("./browser-page-preload/annotation-iframe-element-policy");
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
