@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `D0`（内部 `kle`，源码 33364）确认为 generated gesture configuration helper，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `J1`（内部 `iC`，源码 34351--34353）确认为 generated gesture runtime initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `J3`（内部 `I`，源码 722）确认为 generated runtime registry initializer，持有 WeakMap/internal constants、无独立 renderer 业务归属，登记 `preserved-coupled`。
