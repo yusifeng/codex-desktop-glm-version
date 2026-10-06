@@ -84,5 +84,13 @@ export function browserUseResourceSectionKey(resource: "origin" | "download" | "
   return resource === "origin" ? "origins" : resource === "download" ? "downloads" : resource === "upload" ? "uploads" : "full_cdp";
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule, browserUseRuleDecision, resolveBrowserUseOriginForAdd, browserUseResourceSectionKey };
+export function browserUseTransferApprovalKey(resource: "download" | "upload"): string {
+  return resource === "download" ? "download_approval_mode" : "upload_approval_mode";
+}
+
+export function browserUseGlobalPersistentApprovalAllowed(requirements: unknown): boolean {
+  return (requirements as { allowGlobalPersistentApproval?: boolean } | undefined)?.allowGlobalPersistentApproval !== false;
+}
+
+if (typeof module !== "undefined") module.exports = { normalizeBrowserUseOrigin, dedupeBrowserUseStrings, oppositeBrowserUseRuleKind, browserUseConfigPath, isBrowserUsePlainObject, browserUseApprovalMode, browserUseHistoryApprovalMode, browserUseApprovalModeToToml, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseHasRule, browserUseRuleDecision, resolveBrowserUseOriginForAdd, browserUseResourceSectionKey, browserUseTransferApprovalKey, browserUseGlobalPersistentApprovalAllowed };
 import { join } from "node:path";

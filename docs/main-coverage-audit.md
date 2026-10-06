@@ -427,6 +427,8 @@ add 前 origin 的精确匹配优先/规范化/非法输入拒绝也已迁移至
 resource section 选择与规则写回，新增 2 项解析断言。
 origin resource 到 TOML section key 的映射也已迁移至该 policy，origin-state 继续负责 config
 访问和规则更新，新增 1 项 full_cdp 映射断言。
+transfer approval key 映射与 global persistent approval enterprise gate 也已迁移至该 policy，
+origin-state 继续持有异步配置/策略检查副作用，新增 2 项断言。
 
 ### T4 候选复核：browser-sidebar error pages
 

@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseResourceSectionKey, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind, resolveBrowserUseOriginForAdd } from "./origin-policy";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseGlobalPersistentApprovalAllowed, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseResourceSectionKey, browserUseRuleDecision, browserUseTransferApprovalKey, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind, resolveBrowserUseOriginForAdd } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -265,7 +265,7 @@ async function setIabHistoryApprovalMode(mode: string, home = codexHome(), syncS
 }
 
 function transferApprovalModeKey(resource: "download" | "upload"): string {
-  return resource === "download" ? "download_approval_mode" : "upload_approval_mode";
+  return browserUseTransferApprovalKey(resource);
 }
 
 async function setTransferApprovalMode(resource: "download" | "upload", mode: string, home = codexHome(), syncSettings?: SyncSettingsCallback, extra?: unknown) {
@@ -288,7 +288,7 @@ const originStateLogger = createTaggedLogger("BrowserUseOriginState");
 
 /** 全局持久审批的企业策略判定（原 `KOe`/`sD`）。 */
 function isGlobalPersistentApprovalAllowed(requirements: unknown): boolean {
-  return (requirements as { allowGlobalPersistentApproval?: boolean } | undefined)?.allowGlobalPersistentApproval !== false;
+  return browserUseGlobalPersistentApprovalAllowed(requirements);
 }
 
 async function assertIabModeAllowedByPolicy(mode: string, getConfigRequirements: () => Promise<{ requirements: unknown }>) {

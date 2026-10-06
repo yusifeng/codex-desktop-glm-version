@@ -2246,6 +2246,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A3 main 增量：browser-use denied-over-allowed rule decision 组合已接入 `origin-policy.ts`；origin-state 继续负责 resource section 选择与批量更新副作用，focused assertions 增至 20 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：browser-use add 前 origin 的精确匹配优先/规范化/非法输入拒绝已接入 `origin-policy.ts`；origin-state 继续负责 resource section 选择与规则写回，focused assertions 增至 22 项，build/typecheck 通过。
 2026-10-06 A3 main 增量：browser-use origin resource→TOML section key 映射已接入 `origin-policy.ts`；origin-state 继续负责 config 访问与规则更新，focused assertions 增至 23 项，build/typecheck 通过。
+2026-10-06 A3 main 增量：browser-use transfer approval key 映射与 global persistent approval enterprise gate 已接入 `origin-policy.ts`；origin-state 继续持有异步配置/策略检查副作用，focused assertions 增至 25 项，build/typecheck 通过。
 2026-10-06 A3 main coverage 复核：global shortcut 相邻 avatar-overlay/geometry、tray 与窗口辅助模块已是独立 consumer；剩余函数依赖 Electron screen/BrowserWindow/display 状态或共享生命周期，未发现更小且安全的新纯边界，本轮不制造 facade。
 2026-10-06 T2/A2 继续批次：annotation element visibility 的 ancestor style gate 与 optional `checkVisibility` 已迁移至 `src/main/browser-page-preload/annotation-element-visibility-policy.ts`；原 `_d` 入口保留兼容委托，新增 3 项 focused assertions，build 与 typecheck 已通过。
 2026-10-06 T2/A2 继续批次：annotation fixed/sticky ancestor 判定已迁移至 `src/main/browser-page-preload/annotation-fixed-position-policy.ts`；原 `Ac` 入口保留兼容委托，新增 4 项 focused assertions。

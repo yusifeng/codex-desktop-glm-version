@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseResourceSectionKey, browserUseRuleDecision, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind, resolveBrowserUseOriginForAdd } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
+import { browserUseApprovalMode, browserUseApprovalModeToToml, browserUseConfigPath, browserUseGlobalPersistentApprovalAllowed, browserUseHasRule, browserUseHistoryApprovalMode, browserUseHistoryApprovalModeToToml, browserUseKindSet, browserUseResourceSectionKey, browserUseRuleDecision, browserUseTransferApprovalKey, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind, resolveBrowserUseOriginForAdd } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
 
 let assertions = 0;
 const check = (actual, expected) => { assert.equal(actual, expected); assertions += 1; };
@@ -26,4 +26,6 @@ check(browserUseRuleDecision({ allowed: ["x"] }, "x"), "allow");
 check(resolveBrowserUseOriginForAdd({ allowed: ["x"] }, "x", normalizeBrowserUseOrigin), "x");
 check(resolveBrowserUseOriginForAdd({}, "example.com", normalizeBrowserUseOrigin), "https://example.com");
 check(browserUseResourceSectionKey("fullCdp"), "full_cdp");
+check(browserUseTransferApprovalKey("upload"), "upload_approval_mode");
+check(browserUseGlobalPersistentApprovalAllowed({ allowGlobalPersistentApproval: false }), false);
 console.log(`main browser-use origin policy assertions passed (${assertions})`);
