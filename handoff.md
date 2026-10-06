@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Hf`（内部 `NP`，源码 14825）确认为 app bootstrap initializer，耦合 generated services/stores、无 standalone renderer 业务语义，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Fo`（内部 `FJ`，源码 41548）确认为 composer setup initializer，耦合 generated hooks/context、无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `Fq`（内部 `LFe`，源码 61850）确认为 pet-control React UI component，无 standalone pure policy boundary，登记 `preserved-coupled`。
