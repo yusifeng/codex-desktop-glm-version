@@ -1410,6 +1410,9 @@ consumer，复制 registry 会破坏 identity，继续保留 shared owner。
 Worker host factory/assembly 仍由 worktree/handoff handlers 组合 createExecutionHost、Git manager、
 main RPC 与 ignore-source watcher 生命周期；该组合根没有独立纯构造 owner，拆分会重复 host
 identity 或改变 watcher/RPC 初始化顺序，继续保留 assembly owner。
+Worker protocol schema 中 deep-link/browser-tab/runtime-bundle、connector/MCP 与 elicitation
+字段的实际 owner 分别在 shared protocol/elicitation consumers；当前 worker 没有对应 request
+handler，复制 schema 会产生未接回 facade，继续保留 shared schema owner。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
