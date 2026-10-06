@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { isGlobalDictationWatchable, remapGlobalShortcutForLayout, resolveMacModifierNames, validateGlobalShortcut } from "./global-shortcut-policy";
+import { isGlobalDictationWatchable, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -593,17 +593,6 @@ while ($true) {
 
 /** mac 修饰键 → helper 名（原 `Lze`）。 */
 /** win32 修饰键 → VK 码（原 `Rze`）。 */
-const WIN32_MODIFIER_VK = new Map<string, number[]>([
-  ["cmdorctrl", [17]],
-  ["command", [91, 92]],
-  ["cmd", [91, 92]],
-  ["control", [17]],
-  ["ctrl", [17]],
-  ["alt", [18]],
-  ["option", [18]],
-  ["shift", [16]],
-]);
-
 /** 听写快捷键校验（原 `QV`）。 */
 function validateGlobalDictationHotkey(accelerator: string): string | null {
   return (
@@ -658,24 +647,7 @@ function buildPowerShellScript(keyGroupSpec: string): string {
 
 /** win32 的 VK 码分组（原 `tH`/`Vze`）。 */
 function win32KeyGroups(accelerator: string, platform: string): number[][] | null {
-  const groups: number[][] = [];
-  for (const part of accelerator.split("+")) {
-    const codes = win32VkForModifier(part, platform);
-    if (codes != null) groups.push(codes);
-  }
-  return groups.length === 0 ? null : groups;
-}
-
-function win32VkForModifier(part: string, platform: string): number[] | null {
-  const lowered = part.trim().toLowerCase();
-  switch (platform) {
-    case "darwin":
-      return null;
-    case "win32":
-      return WIN32_MODIFIER_VK.get(lowered) ?? null;
-    default:
-      return null;
-  }
+  return resolveWin32ModifierGroups(accelerator, platform);
 }
 
 /** PowerShell 释放监视（原 `Bze`）：up 行回调 + error/exit 兜底。 */

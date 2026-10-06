@@ -89,4 +89,18 @@ export function resolveMacModifierNames(accelerator: string): string[] {
   return names;
 }
 
-if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames };
+const WIN32_MODIFIER_VK: Record<string, number[]> = {
+  cmdorctrl: [17], command: [91, 92], cmd: [91, 92], control: [17], ctrl: [17], alt: [18], option: [18], shift: [16],
+};
+
+export function resolveWin32ModifierGroups(accelerator: string, platform: string): number[][] | null {
+  if (platform !== "win32") return null;
+  const groups: number[][] = [];
+  for (const part of accelerator.split("+")) {
+    const codes = WIN32_MODIFIER_VK[part.trim().toLowerCase()];
+    if (codes != null) groups.push(codes);
+  }
+  return groups.length === 0 ? null : groups;
+}
+
+if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };

@@ -339,6 +339,8 @@ bare-modifier predicates，继续持有 Electron `globalShortcut` 注册、nativ
 spawn、release callback 与 dispose 仍留在入口，新增 3 项 platform boundary assertions。
 mac modifier helper-name projection 也已迁移至该 policy；release watcher 仍保留 helper
 进程创建与释放副作用，新增 2 项去重/未知 token 边界断言。
+win32 modifier VK 分组投影也已迁移至该 policy；PowerShell spawn、输出解析和 release/dispose
+仍由入口负责，新增 2 项 platform/empty-group 边界断言。
 
 ### 增量抽取：workspace policy restart dialog
 
