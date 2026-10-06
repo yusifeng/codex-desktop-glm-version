@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Gd`（内部 `TI`，源码 17375）确认为 mutating generated query/cache flush helper，无 standalone renderer 业务语义，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `E4`（内部 `Pp`，源码 24035）确认为 generated schema object constructor，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `F4`（内部 `Rp`，源码 24061）确认为 generated intersection-schema constructor，无独立 renderer 业务归属，登记 `preserved-coupled`。
