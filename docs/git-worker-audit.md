@@ -1439,3 +1439,6 @@ response ordering；现有 branch-stats policy 已覆盖 marker path projection�
 Review metadata diff parser 的 NUL field cursor 同时消费 raw status entries、rename path pairs 与
 numstat records；cursor advancement、malformed-record stop semantics 与 downstream rename reconciliation
 共享同一 output ordering，当前不拆出局部 parser facade。
+Review commit query runtime 的 branch comparison resolution、bounded log output、snapshot/query cache
+与 abort-aware line-count parsing 共享 commit ordering、normalization 与 response envelope；现有
+commit-query policy 已覆盖 parser/field projection，剩余 query I/O 不形成独立纯策略。
