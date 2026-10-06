@@ -135,6 +135,10 @@ focused test 已通过。
 reasoning-effort 选择纯策略已迁移至 `src/renderer/app-primary/runtime/select-model-reasoning-efforts.ts`；
 新增 focused test 2 项断言，typecheck 与 focused test 已通过。
 
+2026-10-06 A5 审计登记：app-initial 零消费导出 `A0/M0/T0`（内部 `lTa/uTa/dTa`，源码 4916）
+确认是订阅套餐状态转换的纯 mapper/predicate，但当前没有真实 renderer consumer，且契约由相邻
+subscription/payment generated surface 持有；三项登记为 `preserved-coupled`，不伪造无消费 semantic facade。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `DJ`（内部 `GPe`，源码 45304--45306）的 queued
 design-change 纯判定已迁移至 `src/renderer/app-shared/runtime/has-queued-design-change.ts`；新增
 focused test 2 项断言，typecheck 与 focused test 已通过。
