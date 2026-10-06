@@ -3,6 +3,7 @@ import {
   parseRemoteHeadBranch,
   parseRemoteShowDefaultBranch,
   parseRemoteNames,
+  parseUpstreamRef,
   selectConventionalBranch,
 } from "./git-remote-branches-policy";
 
@@ -103,7 +104,7 @@ function getUpstreamRef(
         repository.host,
         { allowedNonZeroExitCodes: [128, 1], signal },
       );
-      return result.success && result.stdout ? result.stdout : null;
+      return result.success ? parseUpstreamRef(result.stdout) : null;
     },
     staleTime: dependencies.staleTime,
   });

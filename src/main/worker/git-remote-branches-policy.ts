@@ -29,10 +29,17 @@ export function selectConventionalBranch(mainAvailable: boolean, masterAvailable
   return null;
 }
 
+export function parseUpstreamRef(stdout: unknown): string | null {
+  if (typeof stdout !== `string`) return null;
+  const value = stdout.trim();
+  return value.length > 0 ? value : null;
+}
+
 if (typeof module !== `undefined`)
   module.exports = {
     parseRemoteHeadBranch,
     parseRemoteShowDefaultBranch,
     parseRemoteNames,
+    parseUpstreamRef,
     selectConventionalBranch,
   };

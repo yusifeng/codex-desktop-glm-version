@@ -1445,3 +1445,6 @@ commit-query policy 已覆盖 parser/field projection，剩余 query I/O 不形�
 Branch-create runtime 的 branch existence probe、commit-tree resolution、Git branch/switch 与
 synced-config update 共享 query cache、ref namespace、fail-if-exists semantics 与 error envelope；
 现有 branch-name/ref policy 已覆盖纯 validation，剩余 create orchestration 继续由 owner 持有。
+Remote branch upstream ref 的 stdout trim/empty-to-null 投影已迁移至现有
+`git-remote-branches-policy.ts`；runtime 继续负责 query cache、Git exit/abort handling，focused
+policy assertions 增加 3 项。
