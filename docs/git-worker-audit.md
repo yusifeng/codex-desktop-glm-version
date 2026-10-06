@@ -1404,6 +1404,9 @@ message loop 共享线程启动、request registry、response emission 及 flush
 Worker platform boundary 的 local-environment、shell-config 与 platform-env policy 已由真实
 consumer 接回；剩余 Windows shell、Git Bash/GitHub Desktop discovery 与 workspace watcher
 生命周期仍耦合 process/host I/O，本轮不新增 platform facade。
+Worker command registry boundary 的 command/shortcut/browser command 定义实际 owner 仍是
+shared command-registry；renderer/menu/keyboard 直接依赖 shared identity，worker 无对应 request
+consumer，复制 registry 会破坏 identity，继续保留 shared owner。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
