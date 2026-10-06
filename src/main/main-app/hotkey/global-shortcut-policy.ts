@@ -11,6 +11,15 @@ export function splitGlobalAccelerator(accelerator: string): string[] {
   return accelerator.split("+").map((part) => part.trim()).filter((part) => part.length > 0);
 }
 
+export function isGlobalBareOrUnsupported(
+  accelerator: string,
+  bareModifierName: (value: string) => string | null,
+): boolean {
+  const unsupported = new Set(["rightcontrol", "rightctrl", "leftshift", "rightshift"]);
+  const normalized = normalizeGlobalAccelerator(accelerator);
+  return bareModifierName(accelerator) != null || unsupported.has(normalized);
+}
+
 /** Pure global shortcut validation; registration and permission effects remain in global-shortcut.ts. */
 export function validateGlobalShortcut(
   accelerator: string,
@@ -111,4 +120,4 @@ export function resolveWin32ModifierGroups(accelerator: string, platform: string
   return groups.length === 0 ? null : groups;
 }
 
-if (typeof module !== "undefined") module.exports = { normalizeGlobalAccelerator, splitGlobalAccelerator, validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };
+if (typeof module !== "undefined") module.exports = { normalizeGlobalAccelerator, splitGlobalAccelerator, isGlobalBareOrUnsupported, validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };

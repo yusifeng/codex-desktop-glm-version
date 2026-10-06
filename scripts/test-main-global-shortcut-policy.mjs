@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, splitGlobalAccelerator, validateGlobalShortcut } from "../app/.vite/build/main-app/hotkey/global-shortcut-policy.js";
+import { isGlobalBareOrUnsupported, isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, splitGlobalAccelerator, validateGlobalShortcut } from "../app/.vite/build/main-app/hotkey/global-shortcut-policy.js";
 
 const isBareModifierAccelerator = (value, platform) => platform === "darwin" && value.toLowerCase() === "fn";
 const isBareOrUnsupported = (value) => value.toLowerCase() === "shift";
@@ -24,4 +24,6 @@ assert.deepEqual(resolveWin32ModifierGroups("Ctrl+Alt", "win32"), [[17], [18]]);
 assert.equal(resolveWin32ModifierGroups("Ctrl", "linux"), null); assertions += 1;
 assert.equal(normalizeGlobalAccelerator(" Ctrl-Shift_A "), "ctrlshifta"); assertions += 1;
 assert.deepEqual(splitGlobalAccelerator(" Ctrl + + K "), ["Ctrl", "K"]); assertions += 1;
+assert.equal(isGlobalBareOrUnsupported("left_shift", () => null), true); assertions += 1;
+assert.equal(isGlobalBareOrUnsupported("Ctrl", () => "Ctrl"), true); assertions += 1;
 console.log(`main global shortcut policy assertions passed (${assertions})`);
