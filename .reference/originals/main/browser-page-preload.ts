@@ -5644,8 +5644,7 @@ function Ku(e) {
   return projectAnnotationRectBounds(e);
 }
 function qu(e, t) {
-  let n = t ? e.at(-1) : e[0];
-  return n == null ? { x: 0, y: 0 } : { x: t ? n.x + n.width : n.x, y: n.y + n.height / 2 };
+  return projectAnnotationRectPoint(e, t);
 }
 function Ju(e) {
   if (e == null) return !1;
@@ -6090,6 +6089,7 @@ var { isAnnotationRangeFixedPosition } = require("./browser-page-preload/annotat
 var { hasAnnotationAncestorTransform } = require("./browser-page-preload/annotation-transform-policy");
 var { intersectAnnotationRects } = require("./browser-page-preload/annotation-rect-clip-intersection");
 var { projectAnnotationRectBounds } = require("./browser-page-preload/annotation-rect-bounds-projection");
+var { projectAnnotationRectPoint } = require("./browser-page-preload/annotation-rect-point-projection");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");

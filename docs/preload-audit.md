@@ -977,6 +977,10 @@ selection/mirror geometry 的 client rect 交集 projection（原 `Gu`）已迁�
 
 selection rect 集合的 bounding box 聚合（原 `Ku`）已迁移至 `src/main/browser-page-preload/annotation-rect-bounds-projection.ts`。新增 1 项 focused assertion。
 
+### 增量抽取：annotation rect point projection
+
+selection rect 集合首/末端 anchor point projection（原 `qu`）已迁移至 `src/main/browser-page-preload/annotation-rect-point-projection.ts`；保留空集合零点语义。新增 3 项 focused assertions。
+
 ### 增量抽取：annotation composed parent policy
 
 assigned slot、parent element 与 shadow-root host 的 composed parent traversal（原 `ic`）已迁移至 `src/main/browser-page-preload/annotation-composed-parent-policy.ts`；入口仅注入 DOM parent/root 适配。新增 4 项 focused assertions。
