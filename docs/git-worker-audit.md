@@ -1494,3 +1494,5 @@ header handling、rename rewrite 与 diff text transport 共享 parser state 和
 Live-query branch dependency extraction 与 reference-count update 共享 query method/source gating、
 refs/heads normalization、dependency key identity 与 registry mutation；已有 state/key policy 覆盖
 branch dependency key projection，剩余 update lifecycle 不拆分。
+Live-query updated event envelope 已由 `git-live-query-events.ts` 负责稳定字段投影；registry 仍
+持有 generation completion、trace propagation、emit timing 与 recovery state，继续保持事件 owner。
