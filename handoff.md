@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$M` 反解为内部 `LZ`（源码 75915），确认为 generated protobuf analytics descriptor `CodexPdfPreviewViewed`，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$N` 反解为内部 `_J`（源码 75398），确认为 generated analytics/protocol enum initializer，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 实现级交叉审计：app-primary 未复核导出 `Da`（内部 `TQ`，源码 58873--58876）确认为 generated React context；唯一 consumer 为同 hub 内部 `useContext(TQ)`（60350），无独立 pure policy boundary，登记 `preserved-coupled`。
