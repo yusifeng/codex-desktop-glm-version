@@ -1369,6 +1369,9 @@ deleted-entry OID 唯一匹配、untracked path set 和 rename 覆盖顺序；�
 Review metadata diff 的 rename inference、raw numstat/status 解析与 metadata finalization 共享
 Git diff 输出、path quoting、rename threshold 与 snapshot ordering；其跨阶段字段契约要求保持同一
 diff owner，当前没有可独立接回而不复制解析状态的纯策略。
+Review file diff 的 blob/working-tree/symlink/untracked 分支共享 repository snapshot、host stat、
+binary/text detection、abort signal 与 diff response envelope；各分支的 fallback 顺序会影响
+最终 diff kind，当前继续由 file-diff owner 保持，不新增 facade。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
