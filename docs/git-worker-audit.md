@@ -1470,3 +1470,6 @@ Turn-diff snapshot 的 tree SHA trim/validation/normalization 已迁移至
 Review comparison 的 empty-untracked response projection 已迁移至现有
 `git-review-comparison-policy.ts`；comparison runtime 继续负责 repository/query/snapshot I/O 与
 failure wrapping，focused policy assertions 增加 1 项。
+Git diff header parser 的 combined/git classification、quoted-path escape decoding、prefix stripping
+与 rename rewrite 共享 parser cursor、UTF-8/octal fallback 和 downstream diff envelope；现有 header/
+quote/octal policies 已覆盖局部投影，剩余 parser 组合不安全拆分。
