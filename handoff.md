@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Eg` 反解为内部 `eD`（源码 3723），确认为 generated cursor CSS configuration constant，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Es` 反解为内部 `nq`（源码 37812），确认为 generated signal/store selector，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Er` 反解为内部 `$2`（源码 82698），确认为 generated callback constant/internal orchestration，无独立 renderer 业务归属，登记 `preserved-coupled`。
@@ -1573,7 +1575,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁（现已纳入 `$` 生成别名） | 当前 manifest 报告 10933 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁（现已纳入 `$` 生成别名） | 当前 manifest 报告 10874 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
 
 ### B. 工程可读性缺口（5 处）
 
@@ -2430,6 +2432,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A2 protocol owner evidence：30084-30217 WebMCP descriptor/startup 区段已由 `webmcp-descriptor.ts`/`webmcp-protocol.ts` 与 preload startup owner 消费，并有 descriptor/registry/protocol regression；`contextBridge`、secure-context、pagehide 与 zoom/startup 顺序均是不可脱离生命周期边界。
 2026-10-06 A2 coverage verification：重新运行 `test-preload-extension-distribution.mjs`（5 assertions）、`test-preload-deployment-channel.mjs`（8 assertions）与 `test-preload-webmcp-descriptor.mjs`（5 assertions）均通过；对应未完成 audit 区段已有可核验 consumer/test 覆盖。
 2026-10-06 A2 runtime coverage verification：重新运行 `test-preload-annotation-overlay-runtime.mjs`（48 assertions）、`test-preload-annotation-surface-observer.mjs`（14 assertions）与 `test-preload-annotation-pointer-selection.mjs`（18 assertions）均通过；对应 runtime owner 区段已有 focused coverage，无新增可脱离纯 policy。
+2026-10-06 A2 controls coverage verification：重新运行 `test-preload-annotation-controls-registry.mjs`（10 assertions）与 `test-preload-pending-editor-message.mjs`（6 assertions）均通过；7260-7553 controls registry/pending reducer 区段已有真实 consumer 与 focused coverage。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
