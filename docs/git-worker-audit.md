@@ -1336,3 +1336,6 @@ diff parsing 与 commit line-count/branch query；剩余 fetch/query 函数绑�
 命令、并发与 abort signal，现有 utility/policy consumer 已覆盖纯投影，不再新增 facade。
 Review comparison 的 merge-conflict path 与 empty-untracked 查询仍绑定 repository root、Git host、
 snapshot/query cache 及失败包装；它们不是独立路径 predicate，继续由 comparison owner 保留。
+Review patch/diffs 的 tracked diff cache、rename fallback、snapshot generation 与 worktree file
+enumeration 已有对应 policy/utility；剩余 fetch/list 函数共享 Git I/O、stability retry、stat
+与 query cache，当前无新的独立纯边界。
