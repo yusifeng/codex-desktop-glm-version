@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Hn`（内部 `lJ`，源码 40182）确认为 category selector React component，JSX/store-bound、无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Em`（内部 `RA`，源码 8532）确认为 model settings React component，读取 generated signals/stores/lifecycle state、无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Ii`（内部 `a0`，源码 75570）确认为 app state generated initializer，耦合 stores/hooks/lifecycle registrations、无 standalone pure policy boundary，登记 `preserved-coupled`。
@@ -2260,6 +2262,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker residual owner 复核：watch path 的 operation marker、affected working-tree path 与 metadata refresh selection 依赖 platform path API、Git dir topology 和 watcher handler state，暂无不复制生命周期的更窄边界。
 2026-10-06 A1 worker residual owner 复核：git-turn-diff-capture 的 status/abort/error 与 envelope 判定已有 capture/status policy；剩余实现共享 review snapshot generation、Git diff、abort signal、telemetry 与 response completion 顺序，无新独立纯边界。
 2026-10-06 A1 worker residual owner 复核：branch search runtime 的 queryGitBranchRefs 绑定 query cache、Git host、abort signal 与异步 ref 扫描；cache handlers 直接执行 metadata/read-cache invalidation 副作用，无新纯策略边界。
+2026-10-06 A1 worker residual owner 复核：repository-read/review request handlers 已是窄 consumer；剩余分别绑定 repository availability、read cache、review snapshot、abort/performance envelope 与 response wrapping，无可脱离 request lifecycle 的新 policy。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
 2026-10-06 WSL command owner 复核：47,122-47,584 的纯输出/argv 已由 `platform-wsl.ts` 覆盖并有 focused regression；剩余 `wslpath`/`wsl.exe --status|--list` 仍绑定 Windows command spawn、日志和错误处理，没有可脱离 exec owner 的新策略。
 2026-10-06 worker entry protocol 复核：90,661-90,836 的 workerData/parentPort 校验、main-RPC 初始化及 worker-request/request-cancel/flush-and-exit message loop 仍由入口持有；entry-dispatcher 与 core/node/snapshot/live-query dispatch 已有回归，移出入口会改变线程启动或 flush/exit 顺序，本轮不拆分。
