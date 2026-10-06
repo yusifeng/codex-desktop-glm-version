@@ -927,6 +927,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-extension-distribution.mjs`](./test-preload-extension-distribution.mjs)
 - [`test-preload-webmcp-registry.mjs`](./test-preload-webmcp-registry.mjs)
 - [`test-preload-webmcp-descriptor.mjs`](./test-preload-webmcp-descriptor.mjs)
+- [`test-preload-webmcp-protocol.mjs`](./test-preload-webmcp-protocol.mjs)
 - [`test-preview-interaction-surfaces-cluster.mjs`](./test-preview-interaction-surfaces-cluster.mjs)
 - [`test-pricing-payment-foundation-cluster.mjs`](./test-pricing-payment-foundation-cluster.mjs)
 - [`test-pricing-plan-page.mjs`](./test-pricing-plan-page.mjs)
