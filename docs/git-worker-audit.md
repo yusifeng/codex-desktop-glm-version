@@ -1496,3 +1496,6 @@ refs/heads normalization、dependency key identity 与 registry mutation；已�
 branch dependency key projection，剩余 update lifecycle 不拆分。
 Live-query updated event envelope 已由 `git-live-query-events.ts` 负责稳定字段投影；registry 仍
 持有 generation completion、trace propagation、emit timing 与 recovery state，继续保持事件 owner。
+Git observability 的 performance result fields 由 operation-specific result shape、stale/error
+mapping、diff byte/file aggregation 与 truncation semantics 共同决定；现有 observability policy
+已覆盖 operation classification/bucketing，剩余 fields aggregation 共享 telemetry envelope，暂不拆。
