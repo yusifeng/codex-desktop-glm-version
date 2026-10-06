@@ -1,3 +1,4 @@
+import { isNonRepositoryError } from "./git-root-resolution-policy";
 class GitMetadataResolutionError extends Error {}
 
 type RootResolutionDependencies = {
@@ -8,17 +9,6 @@ type RootResolutionDependencies = {
   normalizeRoot: (path: string) => string;
   runGit: (root: string, args: string[], host: any, options: any) => Promise<any>;
 };
-
-function isNonRepositoryError(stderr: string) {
-  const message = stderr.toLowerCase();
-  return (
-    message.includes(`not a git repository`) ||
-    message.includes(`cannot use bare repository`) ||
-    message.includes(`invalid gitfile format`) ||
-    message.includes(`no path in gitfile`) ||
-    message.includes(`invalid gitdir`)
-  );
-}
 
 async function checkLocalPath(cwd: string, host: any, dependencies: RootResolutionDependencies) {
   if (!host.isLocal) return true;

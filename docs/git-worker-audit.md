@@ -1421,3 +1421,6 @@ Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖�
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
 判定交给 `git-worktree-files-policy.ts`；剩余 Git 命令、stat、stability retry 与 fallback 仍是
 单一 runtime owner，本轮无新增 policy。
+Git root resolution 的 non-repository stderr 分类已迁移至 `git-root-resolution-policy.ts`；runtime
+继续负责 local stat、rev-parse、Git unavailable/error logging 与 common-dir resolution，
+`scripts/test-worker-git-root-resolution-policy.mjs` 覆盖 3 项分类断言。
