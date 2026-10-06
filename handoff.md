@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 继续批次：app-shared 未消费导出 `EG`（内部 `sRe`，源码 63491）的搜索查询优先级策略已迁移至 `src/renderer/app-shared/runtime/get-query-priority.ts`；新增 focused test 覆盖空白与实质查询。
+
 2026-10-06 A5 继续批次：app-shared 未消费导出 `EL`（内部 `zqe`，源码 69565）的 Windows drive-letter/UNC 绝对路径判定已迁移至 `src/renderer/app-shared/runtime/is-absolute-path.ts`；新增 focused test 覆盖 drive-letter、UNC 与相对路径。
 
 2026-10-06 A5 继续批次：app-shared 未消费导出 `FL`（内部 `kqe`，源码 69498）的 change-entry 路径投影已迁移至 `src/renderer/app-shared/runtime/get-change-path.ts`；新增 focused test 覆盖 move update、无目标回退与非 update。
