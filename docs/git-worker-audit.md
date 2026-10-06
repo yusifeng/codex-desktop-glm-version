@@ -1372,6 +1372,9 @@ diff owner，当前没有可独立接回而不复制解析状态的纯策略。
 Review file diff 的 blob/working-tree/symlink/untracked 分支共享 repository snapshot、host stat、
 binary/text detection、abort signal 与 diff response envelope；各分支的 fallback 顺序会影响
 最终 diff kind，当前继续由 file-diff owner 保持，不新增 facade。
+Review comparison 的 merge-base/merge-conflict、empty-untracked 与 snapshot comparison 共享
+repository root、Git host、query cache、failure envelope 与 comparison ordering；path projection
+已有 comparison policy 覆盖，剩余查询编排不形成独立纯策略。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file

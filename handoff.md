@@ -2307,6 +2307,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker residual owner 复核：review metadata utils 的 rename reconciliation 同时更新 raw entries/files/stats，依赖 deleted-entry OID 唯一匹配、untracked path set 与 rename 覆盖顺序，继续由 metadata utility owner 持有。
 2026-10-06 A1 worker residual owner 复核：review metadata diff 的 rename inference、raw numstat/status 解析与 metadata finalization 共享 Git diff 输出、path quoting、rename threshold 与 snapshot ordering，继续由同一 diff owner 持有。
 2026-10-06 A1 worker residual owner 复核：review file diff 的 blob/working-tree/symlink/untracked 分支共享 repository snapshot、host stat、binary/text detection、abort signal 与 response envelope，fallback 顺序影响最终 diff kind，继续由 file-diff owner 持有。
+2026-10-06 A1 worker residual owner 复核：review comparison 的 merge-base/merge-conflict、empty-untracked 与 snapshot comparison 共享 repository root、Git host、query cache、failure envelope 与 ordering；path projection 已由 comparison policy 覆盖，剩余查询编排继续由 owner 持有。
 2026-10-06 A1 worker residual owner 复核：working-tree metadata 的 mergeMetadataMaps 虽为 Map 合并，但覆盖顺序由 tracked/untracked 批次、并发 worker 与 rename reconciliation 决定，继续由 metadata owner 持有。
 2026-10-06 A1 worker residual owner 复核：git-worktree-files runtime 已将 NUL/status/pathspec/index fingerprint/missing-file 判定交给 policy；剩余 Git 命令、stat、stability retry、fallback 仍是单一 runtime owner，无新增 policy。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
