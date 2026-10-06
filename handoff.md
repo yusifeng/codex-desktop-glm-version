@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 交叉审计：app-shared 未复核导出 `$L`（内部 `pqe`，源码 69360）确认为依赖 generated prefix `mqe` 的 route URL formatter；无独立 renderer consumer/稳定 owner，补充 `preserved-coupled` 证据。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `$K`（内部 `Oz`，源码 62136）确认为 generated computer-history route constant/protocol contract，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `$J`（内部 `SR`，源码 61065）确认为 generated app-server version initializer/protocol constants，无独立 renderer 业务归属，登记 `preserved-coupled`。
@@ -2402,6 +2404,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 T2/A2 继续批次：annotation sidebar target containment 已迁移至 `annotation-sidebar-target-policy.ts`；原 `Of` 入口保留 root/shadow root 判定，新增 3 项 focused assertions。
 2026-10-06 A2 runtime owner 复核：`annotation-runtime.ts` 仅聚合既有策略/target/parser 导出；`annotation-preload-runtime.ts`、surface/overlay/pointer-selection runtime 均绑定 DOM listener、observer、IPC 或 dispose 生命周期。未发现可脱离 owner 的新纯 policy，本轮不重复制造 facade。
 2026-10-06 A2 runtime owner 复核补充：`annotation-surface-geometry.ts`、`annotation-selection-display-key.ts` 等 geometry/display policy 已是独立模块并由 surface/selection runtime 消费；runtime owner 剩余部分均为副作用编排，未发现新增可读纯边界。
+2026-10-06 A2 audit owner evidence：preload audit 27187-27503 的 extension distribution 与 deployment channel 已分别由 `extension-distribution.ts`、`deployment-channel.ts` 真实 require 接回；剩余 22291-26794/26795-26881 UI/overlay 与 frame prerequisites 由 overlay/runtime owners 消费并绑定 observer/RAF/DOM 副作用，未新增可脱离 owner 的纯 policy。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
