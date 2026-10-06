@@ -1311,3 +1311,10 @@ request handler；`browser_auth_challenge_id` 的实际 owner 是
 这些动作共享 dispose/flush 顺序与线程生命周期；现有 `scripts/test-worker-entry-dispatcher.mjs`
 覆盖 8 项 dispatch 断言。因此该区段当前没有可在不重排副作用的情况下独立接回的纯策略，保留
 现有窄 dispatcher 边界。
+
+### Worker turn-diff residual owner review (2026-10-06)
+
+`git-turn-diff-capture.ts` 的 status/abort/error 与 request envelope 判定已由
+`git-turn-diff-capture-policy.ts`、`git-turn-diff-status-policy.ts` 接回；剩余实现共享 review
+snapshot generation、Git diff、abort signal、telemetry 与 response completion 顺序，当前无新的
+独立纯策略边界。

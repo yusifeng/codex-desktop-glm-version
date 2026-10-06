@@ -2254,6 +2254,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker 增量：watcher optional repository-state 的 tri-state boolean aggregation 已迁移至 `git-watch-boolean-policy.ts`；入口继续持有 watcher 状态、timer 与 recovery 副作用，新增 3 项 focused assertions，build/typecheck 通过。
 2026-10-06 A1 worker residual owner 复核：`createGitOperationState` 还组合 rebase head/merge/apply 三类 marker，并与 watch refresh action 共用 tri-state 结果，不是独立字段投影，继续由 `git-watch-paths.ts` 持有。
 2026-10-06 A1 worker residual owner 复核：watch path 的 operation marker、affected working-tree path 与 metadata refresh selection 依赖 platform path API、Git dir topology 和 watcher handler state，暂无不复制生命周期的更窄边界。
+2026-10-06 A1 worker residual owner 复核：git-turn-diff-capture 的 status/abort/error 与 envelope 判定已有 capture/status policy；剩余实现共享 review snapshot generation、Git diff、abort signal、telemetry 与 response completion 顺序，无新独立纯边界。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
 2026-10-06 WSL command owner 复核：47,122-47,584 的纯输出/argv 已由 `platform-wsl.ts` 覆盖并有 focused regression；剩余 `wslpath`/`wsl.exe --status|--list` 仍绑定 Windows command spawn、日志和错误处理，没有可脱离 exec owner 的新策略。
 2026-10-06 worker entry protocol 复核：90,661-90,836 的 workerData/parentPort 校验、main-RPC 初始化及 worker-request/request-cancel/flush-and-exit message loop 仍由入口持有；entry-dispatcher 与 core/node/snapshot/live-query dispatch 已有回归，移出入口会改变线程启动或 flush/exit 顺序，本轮不拆分。
