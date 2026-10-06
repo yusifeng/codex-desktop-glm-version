@@ -1221,6 +1221,10 @@ Agent override path 的 Git `ls-files -z` 过滤已迁移至 `src/main/worker/gi
 `.worktreeinclude` 的 ignored/included path 交集与稳定去重也已迁移至同一 policy；入口继续
 负责双 Git 查询、存在性检查与 copy 生命周期，focused assertions 增至 2 项。
 
+`resolveWorktreeLocalEnvironmentConfig` 仍跨 source/target host stat、Git tracking/ignore 查询、
+symlink guard、copy 与 fallback 顺序；该请求边界共享本地/远程 host 语义和文件副作用，当前
+没有不改变 I/O 顺序的独立纯 policy。
+
 ### Worker read/working-tree residual owner review (2026-10-06)
 
 `git-read-request-handlers.ts` 当前只负责将 cwd/root、Git manager、host 与 abort signal 注入
