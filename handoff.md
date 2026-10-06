@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-shared 未消费导出 `I_`（内部 `H4`，源码 89448）确认为 generic SVG data-URI encoder，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `Gq`（内部 `TFe`，源码 61728--61739）确认为 artifact-annotation comment builder，与 generated annotation constructor/origin/content schema 强耦合，无独立 renderer consumer，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-shared 未消费导出 `HJ`（内部 `wPe`，源码 61129）确认为依赖 generated version constants/semantic-version helpers 的 app-server compatibility predicate，无独立 renderer consumer，登记 `preserved-coupled`。
