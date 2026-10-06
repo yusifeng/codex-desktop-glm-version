@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { isGlobalDictationWatchable, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, validateGlobalShortcut } from "./global-shortcut-policy";
+import { isGlobalDictationWatchable, normalizeGlobalAccelerator, remapGlobalShortcutForLayout, resolveMacModifierNames, resolveWin32ModifierGroups, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -76,7 +76,7 @@ const DOUBLE_MODIFIERS = new Set(["DoubleOption", "DoubleCommand", "DoubleShift"
 
 /** 去空白/大小写归一（原 `zV`）。 */
 function normalizeAccelerator(accelerator: string): string {
-  return accelerator.replace(/[\s_-]/g, "").toLowerCase();
+  return normalizeGlobalAccelerator(accelerator);
 }
 
 /** bare 修饰键的规范化名（原 `RV`）：复合表优先，其次按 Ctrl/Command/Alt/Shift/Fn 顺序组合。 */

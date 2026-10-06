@@ -3,6 +3,10 @@ export type HotkeyPolicyDependencies = {
   isBareOrUnsupported: (accelerator: string) => boolean;
 };
 
+export function normalizeGlobalAccelerator(accelerator: string): string {
+  return accelerator.replace(/[\s_-]/g, "").toLowerCase();
+}
+
 /** Pure global shortcut validation; registration and permission effects remain in global-shortcut.ts. */
 export function validateGlobalShortcut(
   accelerator: string,
@@ -103,4 +107,4 @@ export function resolveWin32ModifierGroups(accelerator: string, platform: string
   return groups.length === 0 ? null : groups;
 }
 
-if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };
+if (typeof module !== "undefined") module.exports = { normalizeGlobalAccelerator, validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable, resolveMacModifierNames, resolveWin32ModifierGroups };
