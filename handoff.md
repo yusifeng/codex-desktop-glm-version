@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Er` 反解为内部 `$2`（源码 82698），确认为 generated callback constant/internal orchestration，无独立 renderer 业务归属，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Dg` 反解为内部 `tD`（源码 3724），确认为 generated numeric configuration constant，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Cs` 反解为内部 `oq`（源码 37925），确认为 generated runtime initializer，无 standalone renderer policy boundary，登记 `preserved-coupled`。
@@ -2424,6 +2426,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A2 extension owner evidence：`scripts/test-preload-extension-distribution.mjs`、`test-preload-deployment-channel.mjs` 已登记于 `scripts/test-index.md`，并直接 require `extension-distribution.ts`/`deployment-channel.ts`；该区段已有真实 consumer 与 focused regression，无未覆盖纯策略。
 2026-10-06 A2 annotation UI owner evidence：22291-26794 区段对应的 overlay/surface/pointer/preview/draft/design modules 均已有 `scripts/test-index.md` focused entries（含 observer/runtime/state/policy）；26795-26881 frame/anchor prerequisites 已由 `annotation-anchor-geometry.ts`、`annotation-preload-runtime.ts` 消费，剩余部分绑定 RAF/MutationObserver/DOM style 生命周期，无未覆盖可独立纯策略。
 2026-10-06 A2 protocol owner evidence：30084-30217 WebMCP descriptor/startup 区段已由 `webmcp-descriptor.ts`/`webmcp-protocol.ts` 与 preload startup owner 消费，并有 descriptor/registry/protocol regression；`contextBridge`、secure-context、pagehide 与 zoom/startup 顺序均是不可脱离生命周期边界。
+2026-10-06 A2 coverage verification：重新运行 `test-preload-extension-distribution.mjs`（5 assertions）、`test-preload-deployment-channel.mjs`（8 assertions）与 `test-preload-webmcp-descriptor.mjs`（5 assertions）均通过；对应未完成 audit 区段已有可核验 consumer/test 覆盖。
 2026-10-06 T2/A2 继续批次：annotation rect bounds projection 已迁移至 `annotation-rect-bounds-projection.ts`；原 `Ku` 入口保留 rect 集合聚合，新增 1 项 focused assertion。
 2026-10-06 T2/A2 继续批次：annotation rect point projection 已迁移至 `annotation-rect-point-projection.ts`；原 `qu` 入口保留首/末端与空集合语义，新增 3 项 focused assertions。
 2026-10-06 T2/A2 继续批次：annotation mirror mutation policy 已迁移至 `annotation-mirror-mutation-policy.ts`；原 `Uu` 入口保留 childList/marker 过滤，新增 3 项 focused assertions。
