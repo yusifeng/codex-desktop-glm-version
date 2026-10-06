@@ -333,6 +333,8 @@ harness 为前置证据。
 `src/main/main-app/hotkey/global-shortcut-policy.ts`。原 `global-shortcut.ts` 仅注入已有
 bare-modifier predicates，继续持有 Electron `globalShortcut` 注册、native helper、权限请求和
 挂起/恢复副作用；`scripts/test-main-global-shortcut-policy.mjs` 覆盖 6 项 focused assertions。
+该 policy 同时承载 mac keyboard layout 的单键 accelerator remap；`updateMacKeyboardLayout`
+仍负责更新布局状态、触发全量重注册及失败回滚，新增 3 项映射/保留边界断言。
 
 ### 增量抽取：workspace policy restart dialog
 

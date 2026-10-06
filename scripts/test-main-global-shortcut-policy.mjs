@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { validateGlobalShortcut } from "../app/.vite/build/main-app/hotkey/global-shortcut-policy.js";
+import { remapGlobalShortcutForLayout, validateGlobalShortcut } from "../app/.vite/build/main-app/hotkey/global-shortcut-policy.js";
 
 const isBareModifierAccelerator = (value, platform) => platform === "darwin" && value.toLowerCase() === "fn";
 const isBareOrUnsupported = (value) => value.toLowerCase() === "shift";
@@ -12,4 +12,7 @@ check(validateGlobalShortcut("K", "win32", deps), "Shortcut must include Cmd/Ctr
 check(validateGlobalShortcut("Ctrl+K+L", "win32", deps), "Shortcut must include exactly one non-modifier key.");
 check(validateGlobalShortcut("Shift", "win32", deps), "Choose a shortcut with Ctrl or Alt plus another key.");
 check(validateGlobalShortcut("Fn", "darwin", deps), null);
+check(remapGlobalShortcutForLayout("CmdOrCtrl+Q", { KeyQ: "a" }), "CmdOrCtrl+Q");
+check(remapGlobalShortcutForLayout("CmdOrCtrl+A", { KeyQ: "a" }), "CmdOrCtrl+Q");
+check(remapGlobalShortcutForLayout("Ctrl+1", { Digit2: "1" }), "Ctrl+2");
 console.log(`main global shortcut policy assertions passed (${assertions})`);

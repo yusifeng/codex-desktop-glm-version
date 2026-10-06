@@ -43,4 +43,23 @@ export function validateGlobalShortcut(
       : "Shortcut must include Cmd/Ctrl or Alt.";
 }
 
-if (typeof module !== "undefined") module.exports = { validateGlobalShortcut };
+/** Purely remap a single accelerator key through a mac keyboard layout map. */
+export function remapGlobalShortcutForLayout(
+  accelerator: string,
+  layoutMap: Record<string, string>,
+): string {
+  const parts = accelerator.split("+").filter(Boolean);
+  const index = parts.findIndex((part) => /^[A-Z0-9]$/i.test(part));
+  if (index === -1) return accelerator;
+  const single = parts[index];
+  if (single == null) return accelerator;
+  const lowered = single.toLowerCase();
+  for (const [code, label] of Object.entries(layoutMap)) {
+    if (label.toLowerCase() !== lowered) continue;
+    const mapped = /^Key[A-Z]$/.test(code) ? code.slice(3) : /^Digit[0-9]$/.test(code) ? code.slice(5) : null;
+    if (mapped != null) return parts.map((part, partIndex) => (partIndex === index ? mapped : part)).join("+");
+  }
+  return accelerator;
+}
+
+if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout };

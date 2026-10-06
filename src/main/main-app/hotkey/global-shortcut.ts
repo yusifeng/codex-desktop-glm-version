@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { validateGlobalShortcut } from "./global-shortcut-policy";
+import { remapGlobalShortcutForLayout, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -499,23 +499,7 @@ function registerHotkeyEntry(entry: { registrationHotkey: string; generation: nu
 
 /** 布局重映射（原 `OV`/`gze`/`_ze`）：单字符键按 layout 表换算。 */
 function remapForLayout(accelerator: string, layoutMap: Record<string, string>): string {
-  const parts = accelerator.split("+").filter(Boolean);
-  const index = parts.findIndex((part) => /^[A-Z0-9]$/i.test(part));
-  if (index === -1) return accelerator;
-  const single = parts[index];
-  if (single == null) return accelerator;
-  const mapped = mapSingleKey(single, layoutMap);
-  return mapped == null ? accelerator : parts.map((part, i) => (i === index ? mapped : part)).join("+");
-}
-
-function mapSingleKey(key: string, layoutMap: Record<string, string>): string | null {
-  const lowered = key.toLowerCase();
-  for (const [code, label] of Object.entries(layoutMap))
-    if (label.toLowerCase() === lowered) {
-      if (/^Key[A-Z]$/.test(code)) return code.slice(3);
-      if (/^Digit[0-9]$/.test(code)) return code.slice(5);
-    }
-  return null;
+  return remapGlobalShortcutForLayout(accelerator, layoutMap);
 }
 
 /** 布局变化后的全部重注册（原 `Fze`）：失败回滚到旧 accelerator。 */
