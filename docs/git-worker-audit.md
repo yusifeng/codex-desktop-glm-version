@@ -1339,3 +1339,6 @@ snapshot/query cache 及失败包装；它们不是独立路径 predicate，继�
 Review patch/diffs 的 tracked diff cache、rename fallback、snapshot generation 与 worktree file
 enumeration 已有对应 policy/utility；剩余 fetch/list 函数共享 Git I/O、stability retry、stat
 与 query cache，当前无新的独立纯边界。
+Review commit queries 的 branch commit listing 与 line-count 仍依赖 repository query client、Git
+command result、review snapshot 与 abort signal；其字段 projection 已由上层 request consumer
+覆盖，当前不再拆分 query owner。
