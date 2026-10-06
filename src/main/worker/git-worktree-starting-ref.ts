@@ -5,39 +5,12 @@ type StartingRefDependencies = {
   resolveRef: (repository: any, ref: string, signal?: AbortSignal, options?: any) => Promise<string | null>;
   runGit: (root: string, args: string[], host: any, options: any) => Promise<any>;
 };
+import { createRemoteCandidate, formatLocalBranchRef, getRemoteStartingRefCandidates, normalizeLocalBranchCandidate } from "./git-worktree-starting-ref-policy";
 
 class StartingRefValidationError extends Error {
   constructor() {
     super(`Failed to validate the worktree starting ref`);
   }
-}
-
-function formatLocalBranchRef(ref: string) {
-  return ref.startsWith(`refs/`) ? ref : `refs/heads/${ref}`;
-}
-
-function normalizeLocalBranchCandidate(ref: string) {
-  return ref.startsWith(`refs/heads/`)
-    ? ref
-    : ref.startsWith(`refs/`)
-      ? null
-      : formatLocalBranchRef(ref);
-}
-
-function createRemoteCandidate(remote: string, branchName: string) {
-  return { remote, branchName, ref: `refs/remotes/${remote}/${branchName}` };
-}
-
-function getRemoteStartingRefCandidates(ref: string, remotes: string[]) {
-  const prefix = `refs/remotes/`;
-  const value = ref.startsWith(prefix) ? ref.slice(prefix.length) : ref;
-  if (ref.startsWith(`refs/`) && !ref.startsWith(prefix)) return [];
-  const remote = remotes.find((candidate) => value.startsWith(`${candidate}/`));
-  return remote == null
-    ? ref.startsWith(prefix)
-      ? []
-      : remotes.map((candidate) => createRemoteCandidate(candidate, ref))
-    : [createRemoteCandidate(remote, value.slice(remote.length + 1))];
 }
 
 async function fetchRemoteStartingRef(

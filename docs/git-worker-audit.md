@@ -1342,6 +1342,10 @@ enumeration 已有对应 policy/utility；剩余 fetch/list 函数共享 Git I/O
 Review commit queries 的 branch commit listing 与 line-count 仍依赖 repository query client、Git
 command result、review snapshot 与 abort signal；其字段 projection 已由上层 request consumer
 覆盖，当前不再拆分 query owner。
+Worktree starting-ref 的 local ref 规范化与 remote candidate 枚举已迁移至
+`src/main/worker/git-worktree-starting-ref-policy.ts`；runtime 继续负责 upstream/remote 查询、
+fetch、compare 与 resolve 副作用，`scripts/test-worker-git-worktree-starting-ref-policy.mjs`
+覆盖 3 项 ref/candidate 断言。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
