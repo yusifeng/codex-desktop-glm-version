@@ -37,7 +37,7 @@ import {
   qa as tabMentionSearchSchema,
   Uf as EventEmitterBase,
 } from "@chunk/shared";
-import { browserUseConfigPath, dedupeBrowserUseStrings, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
+import { browserUseConfigPath, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "./origin-policy";
 import { createTaggedLogger, type Logger } from "@chunk/logger";
 import { stringifyToml } from "../misc/env-toml-stringifier";
 import { AuthenticatedDesktopFetchError } from "../api/desktop-fetch";
@@ -72,7 +72,7 @@ const originRuleUpdateSchema = arraySchema(
 );
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value == "object" && !!value && !Array.isArray(value);
+  return isBrowserUsePlainObject(value);
 }
 
 /** 字符串数组去重保序（原 `xD`）。 */

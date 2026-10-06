@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { browserUseConfigPath, dedupeBrowserUseStrings, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
+import { browserUseConfigPath, dedupeBrowserUseStrings, isBrowserUsePlainObject, normalizeBrowserUseOrigin, oppositeBrowserUseRuleKind } from "../app/.vite/build/main-app/browser-use/origin-policy.js";
 
 let assertions = 0;
 const check = (actual, expected) => { assert.equal(actual, expected); assertions += 1; };
@@ -11,4 +11,6 @@ assert.deepEqual(dedupeBrowserUseStrings([" a ", "a", "", 2, "b"]), ["a", "b"]);
 check(oppositeBrowserUseRuleKind("allowed"), "denied");
 check(oppositeBrowserUseRuleKind("denied"), "allowed");
 check(browserUseConfigPath("/tmp/home"), "/tmp/home/config.toml");
+assert.equal(isBrowserUsePlainObject({}), true); assertions += 1;
+assert.equal(isBrowserUsePlainObject([]), false); assertions += 1;
 console.log(`main browser-use origin policy assertions passed (${assertions})`);
