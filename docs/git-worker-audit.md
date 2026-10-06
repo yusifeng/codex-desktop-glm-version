@@ -1454,3 +1454,6 @@ projection，剩余 scan/runtime 编排保持 owner。
 Git observability runtime 的 performance outcome/reason/failure projection 共享 operation attribution、
 cache hit/miss counters、logger tags 与 telemetry flush lifecycle；拆出局部 reason helper 会复制
 attribution semantics，现有 performance policy 已覆盖 bucket/operation projection，继续保留 owner。
+RPC client 的 method allowlist、response shape guard、request id registry、abort propagation 与
+parentPort message transport 共同定义跨线程协议；拆出 guard 会复制协议 identity/registry state，
+继续由 rpc-client owner 持有并由现有 transport regressions 覆盖。
