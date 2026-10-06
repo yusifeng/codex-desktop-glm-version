@@ -1344,3 +1344,6 @@ command result、review snapshot 与 abort signal；其字段 projection 已由�
 覆盖，当前不再拆分 query owner。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
+`git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
+判定交给 `git-worktree-files-policy.ts`；剩余 Git 命令、stat、stability retry 与 fallback 仍是
+单一 runtime owner，本轮无新增 policy。

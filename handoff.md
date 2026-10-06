@@ -2282,6 +2282,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker residual owner 复核：review patch/diffs 的 tracked diff cache、rename fallback、snapshot generation 与 worktree file enumeration 已有 policy/utility；剩余 fetch/list 共享 Git I/O、stability retry、stat 与 query cache，无新独立纯边界。
 2026-10-06 A1 worker residual owner 复核：review commit queries 的 branch commit listing/line-count 依赖 repository query client、Git result、review snapshot、abort signal；字段 projection 已由 request consumer 覆盖，不拆 query owner。
 2026-10-06 A1 worker residual owner 复核：working-tree metadata 的 mergeMetadataMaps 虽为 Map 合并，但覆盖顺序由 tracked/untracked 批次、并发 worker 与 rename reconciliation 决定，继续由 metadata owner 持有。
+2026-10-06 A1 worker residual owner 复核：git-worktree-files runtime 已将 NUL/status/pathspec/index fingerprint/missing-file 判定交给 policy；剩余 Git 命令、stat、stability retry、fallback 仍是单一 runtime owner，无新增 policy。
 2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
 2026-10-06 WSL command owner 复核：47,122-47,584 的纯输出/argv 已由 `platform-wsl.ts` 覆盖并有 focused regression；剩余 `wslpath`/`wsl.exe --status|--list` 仍绑定 Windows command spawn、日志和错误处理，没有可脱离 exec owner 的新策略。
 2026-10-06 worker entry protocol 复核：90,661-90,836 的 workerData/parentPort 校验、main-RPC 初始化及 worker-request/request-cancel/flush-and-exit message loop 仍由入口持有；entry-dispatcher 与 core/node/snapshot/live-query dispatch 已有回归，移出入口会改变线程启动或 flush/exit 顺序，本轮不拆分。
