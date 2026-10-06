@@ -430,6 +430,13 @@ origin resource 到 TOML section key 的映射也已迁移至该 policy，origin
 transfer approval key 映射与 global persistent approval enterprise gate 也已迁移至该 policy，
 origin-state 继续持有异步配置/策略检查副作用，新增 2 项断言。
 
+### T4 origin-state 剩余边界复核
+
+`applyRuleUpdate`/`computeRuleUpdates` 直接 mutate config，并依赖 denied/allowed decision、
+remote update 顺序与 resource section 选择；`projectOriginState` 又组合多 section、approval
+mode 与 enterprise settings。两者当前没有可独立接回且不改变 mutation/批量更新顺序的窄纯边界，
+继续保留在 origin-state owner。
+
 ### T4 候选复核：browser-sidebar error pages
 
 `browser-sidebar/error-pages.ts` 同时持有图片附件 WeakMap 的 suspend/resume、WebContents
