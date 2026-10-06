@@ -1389,6 +1389,9 @@ cache/lifecycle owner 的安全纯策略边界。
 Repository/review request handlers 的剩余逻辑绑定 repository availability、read cache、review
 snapshot、abort/performance envelope 与 response wrapping；已有 request policy 覆盖方法分类，
 不再拆出重复 request-lifecycle facade。
+WSL command runtime 的 wslpath 与 wsl.exe status/list 执行仍共享 Windows command spawn、日志、
+错误分类与 fallback 顺序；纯输出解码、distro 选择与 argv 构造已有 platform policy 覆盖，剩余
+exec owner 不再拆分。
 Working-tree metadata 的 `mergeMetadataMaps` 虽为 Map 合并，但其覆盖顺序由 tracked/untracked
 批次、并发 worker 与 rename reconciliation 共同决定；继续由 metadata owner 持有以保持结果顺序。
 `git-worktree-files.ts` 的 list runtime 已将 NUL/status/pathspec/index fingerprint 与 missing-file
