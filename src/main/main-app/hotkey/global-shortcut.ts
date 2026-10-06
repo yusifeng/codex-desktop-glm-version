@@ -17,7 +17,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import { globalShortcut, app } from "electron";
 import { getLogger, memoizedTaggedLogger } from "@chunk/logger";
-import { remapGlobalShortcutForLayout, validateGlobalShortcut } from "./global-shortcut-policy";
+import { isGlobalDictationWatchable, remapGlobalShortcutForLayout, validateGlobalShortcut } from "./global-shortcut-policy";
 
 const hotkeyLogger = memoizedTaggedLogger("global-hotkey");
 
@@ -732,7 +732,7 @@ function watchPowerShellRelease(child: ReturnType<typeof spawn>, onRelease: () =
 
 /** 是否可释放监视（原 `Uze`）。 */
 function isDictationWatchable(accelerator: string, platform: string): boolean {
-  return platform === "darwin" ? macModifierNames(accelerator).length > 0 : win32KeyGroups(accelerator, platform) != null;
+  return isGlobalDictationWatchable(accelerator, platform, { macModifierNames, win32KeyGroups });
 }
 
 export {

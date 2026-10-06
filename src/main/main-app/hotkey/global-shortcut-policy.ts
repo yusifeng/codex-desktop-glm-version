@@ -62,4 +62,17 @@ export function remapGlobalShortcutForLayout(
   return accelerator;
 }
 
-if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout };
+export function isGlobalDictationWatchable(
+  accelerator: string,
+  platform: string,
+  dependencies: {
+    macModifierNames: (value: string) => string[];
+    win32KeyGroups: (value: string, platform: string) => number[][] | null;
+  },
+): boolean {
+  return platform === "darwin"
+    ? dependencies.macModifierNames(accelerator).length > 0
+    : dependencies.win32KeyGroups(accelerator, platform) != null;
+}
+
+if (typeof module !== "undefined") module.exports = { validateGlobalShortcut, remapGlobalShortcutForLayout, isGlobalDictationWatchable };

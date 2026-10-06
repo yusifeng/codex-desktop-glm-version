@@ -335,6 +335,8 @@ bare-modifier predicates，继续持有 Electron `globalShortcut` 注册、nativ
 挂起/恢复副作用；`scripts/test-main-global-shortcut-policy.mjs` 覆盖 6 项 focused assertions。
 该 policy 同时承载 mac keyboard layout 的单键 accelerator remap；`updateMacKeyboardLayout`
 仍负责更新布局状态、触发全量重注册及失败回滚，新增 3 项映射/保留边界断言。
+该 policy 还承载 dictation release-watch 的平台可用性判定；实际 native helper/PowerShell
+spawn、release callback 与 dispose 仍留在入口，新增 3 项 platform boundary assertions。
 
 ### 增量抽取：workspace policy restart dialog
 
