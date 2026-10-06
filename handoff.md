@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Hm` 反解为内部 `lA`（源码 6036），确认为 generated beacon-action symbol/feature-state wiring，无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Hc` 反解为内部 `oVe`（源码 31072），确认为 generated JSX component/UI composition，无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 export-table 交叉审计：app-primary 未复核导出 `Gu` 反解为内部 `xR`（源码 18605），确认为 generated store/runtime callback，无 standalone renderer policy boundary，登记 `preserved-coupled`。
