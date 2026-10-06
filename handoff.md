@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+2026-10-06 A5 审计登记：app-primary 未消费导出 `Fo`（内部 `FJ`，源码 41548）确认为 composer setup initializer，耦合 generated hooks/context、无 standalone pure policy boundary，登记 `preserved-coupled`。
+
 2026-10-06 A5 审计登记：app-shared 未消费导出 `Fq`（内部 `LFe`，源码 61850）确认为 pet-control React UI component，无 standalone pure policy boundary，登记 `preserved-coupled`。
 
 2026-10-06 A5 审计登记：app-primary 未消费导出 `Jt`（内部 `qX`，源码 52682）确认为 generated enum initializer，无 standalone renderer 业务语义，登记 `preserved-coupled`。
@@ -2241,6 +2243,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker 增量：worktree copy 的 NUL-separated path 投影已迁移至 `git-worktree-copy-path-policy.ts`；copy-files 继续持有 stat、symlink guard、copy 与 cleanup 副作用，新增 1 项 focused assertion，build/typecheck 通过。
 2026-10-06 A1 worker 增量：agent override path 的 Git `ls-files -z` 过滤已迁移至 `git-worktree-copy-policy.ts`；入口继续负责 Git I/O、失败处理与 copy 生命周期，新增 1 项 focused assertion，build/typecheck 通过。
 2026-10-06 A1 worker 增量：`.worktreeinclude` ignored/included path 交集与稳定去重已接入 `git-worktree-copy-policy.ts`；入口继续负责双 Git 查询、存在性检查与 copy 生命周期，focused assertions 增至 2 项，build/typecheck 通过。
+2026-10-06 A1 worker residual owner 复核：`resolveWorktreeLocalEnvironmentConfig` 跨 source/target host stat、Git tracking/ignore、symlink guard、copy 与 fallback 顺序，继续保留为 I/O owner，暂无可安全独立 policy。
 2026-10-06 WSL command owner 复核：47,122-47,584 的纯输出/argv 已由 `platform-wsl.ts` 覆盖并有 focused regression；剩余 `wslpath`/`wsl.exe --status|--list` 仍绑定 Windows command spawn、日志和错误处理，没有可脱离 exec owner 的新策略。
 2026-10-06 worker entry protocol 复核：90,661-90,836 的 workerData/parentPort 校验、main-RPC 初始化及 worker-request/request-cancel/flush-and-exit message loop 仍由入口持有；entry-dispatcher 与 core/node/snapshot/live-query dispatch 已有回归，移出入口会改变线程启动或 flush/exit 顺序，本轮不拆分。
 2026-10-06 Git manager/watch/request owner 复核：65,200-80,999 已由 repository model、git-watch/live-query lifecycle 与 request handlers/dispatch 分担真实 owner；剩余 memoization、timer、abort、trace 状态跨越多个 consumer，没有新的单一纯策略边界，不重复制造 manager facade。
