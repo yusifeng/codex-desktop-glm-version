@@ -2491,3 +2491,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-06 A1 worker 增量：turn-diff snapshot 的 tree SHA trim/validation/normalization 已迁移至 `git-turn-diff-snapshot-policy.ts`；runtime 继续负责 status、Git tree resolution、temporary index 与 staging 生命周期，新增 2 项 focused assertions，build/typecheck 通过。
 2026-10-06 A1 worker 增量：review comparison 的 empty-untracked response projection 已迁移至现有 `git-review-comparison-policy.ts`；runtime 继续负责 repository/query/snapshot I/O 与 failure wrapping，focused policy assertions 增加 1 项，build/typecheck 通过。
 2026-10-06 A5 继续批次：app-shared `$X/$Y/$Z/$_/$a/$b/$c/$f/$g/$i` 已完成 export-table 反解并登记为 `preserved-coupled`；对应 shared bootstrap、sandbox/plugin runtime、schema/style configuration 与 icon registry 生成面，均无独立 renderer business owner。
+2026-10-06 A5 继续批次：app-shared `$j/$k/$l/$m/$n` 已完成 export-table 反解并登记为 `preserved-coupled`，分别属于 telemetry schema、generated runtime/registry、icon registry 与 plugin lifecycle surface。
