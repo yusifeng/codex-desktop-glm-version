@@ -2514,3 +2514,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-10 A5 继续批次：app-shared `Fa/Fb/Fc/Fd/Ff/Fg/Fh/Fi/Fj/Fk/Fl/Fm/Fn/Fo/Fp` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `Fr/Fs/Ft/Fu/Fv/Fw/Fx/Fy/G$/G0/GA/GB/GC/GD/GE/GF/GG/GH/GI/GK` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `GL/GM/GN/GO/GP/GQ/GR/GS/GT/GU/GV/GW/GX/GY/GZ` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-10 A5 继续批次：app-shared `G_/Ga/Gb/Gc/Gd/Gg/Gh/Gi/Gj/Gk/Gl/Gm/Gn/Go/Gr` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
