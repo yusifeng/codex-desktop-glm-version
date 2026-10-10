@@ -2523,3 +2523,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-10 A5 继续批次：app-shared `Ia/Ic/Id/Ig/Ii/Ij/Ik/Il/In/Io/Iq/Ir/Is/It/Iu` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `Iv/Iw/Ix/Iy/Iz/J/J$/J0/J2/JA/JB/JC/JD/JE/JF` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `JG/JH/JI/JJ/JK/JL/JM/JN/JO/JP/JR/JS/JT/JU/JV` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-10 A5 继续批次：app-shared `JW/JX/JY/JZ/J_/Ja/Jb/Jc/Jd/Jf/Jg/Jh/Ji/Jj/Jk` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
