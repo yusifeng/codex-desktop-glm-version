@@ -2547,3 +2547,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-10 A5 扩大批次：app-shared `Rc/Rd/Rg/Ri/Rj/Rk/Rl/Rm/Rn/Rp/Rq/Rr/Rs/Rt/Ru/Rv/Rw/Rx/Ry/Rz/S/S$/S0/S1/S2/S3/SA/SB/SC/SD/SE/SF/SG/SH/SI/SJ/SK/SM/SN/SO` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 扩大批次：app-shared `SP/SQ/SR/SS/ST/SV/SW/SY/SZ/Sa/Sb/Sc/Sd/Sf/Sg/Sh/Sj/Sk/Sl/Sm/Sn/So/Sp/Sq/Sr/Ss/Su/Sv/Sw/Sx/Sy/Sz/T/T$/T0/T1/T2/T3/T4/TA` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 扩大批次：app-shared `TB/TC/TD/TE/TF/TG/TH/TI/TJ/TK/TL/TM/TN/TO/TP/TQ/TR/TS/TT/TV/TW/TY/TZ/T_/Ta/Tb/Td/Tg/Th/Ti/Tj/Tk/Tl/Tm/Tn/To/Tp/Tq/Tr/Ts` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-10 A5 扩大批次：app-shared `Tt/Tu/Tv/Tw/Tx/Ty/Tz/U$/U0/U1/U2/U3/U4/UA/UB/UC/UD/UE/UG/UH/UJ/UK/UL/UM/UN/UO/UP/UQ/UR/US/UT/UV/UW/UX/UY/UZ/U_/Ua/Ub/Uc` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
