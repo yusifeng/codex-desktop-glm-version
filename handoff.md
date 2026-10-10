@@ -2549,3 +2549,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-10 A5 扩大批次：app-shared `TB/TC/TD/TE/TF/TG/TH/TI/TJ/TK/TL/TM/TN/TO/TP/TQ/TR/TS/TT/TV/TW/TY/TZ/T_/Ta/Tb/Td/Tg/Th/Ti/Tj/Tk/Tl/Tm/Tn/To/Tp/Tq/Tr/Ts` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 扩大批次：app-shared `Tt/Tu/Tv/Tw/Tx/Ty/Tz/U$/U0/U1/U2/U3/U4/UA/UB/UC/UD/UE/UG/UH/UJ/UK/UL/UM/UN/UO/UP/UQ/UR/US/UT/UV/UW/UX/UY/UZ/U_/Ua/Ub/Uc` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 扩大批次：app-shared `Ud/Uf/Ug/Uh/Ui/Uj/Uk/Ul/Um/Un/Uo/Up/Uq/Ur/Us/Uu/Uv/Uw/Ux/Uy/Uz/V/V$/V0/V1/V2/VA/VB/VC/VD/VE/VF/VG/VH/VJ/VK/VL/VM/VN/VO` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-10 A5 扩大批次：app-shared `VP/VQ/VR/VS/VT/VU/VV/VW/VX/VY/VZ/Va/Vb/Vc/Vd/Vf/Vg/Vh/Vi/Vj/Vk/Vl/Vm/Vn/Vo/Vp/Vq/Vr/Vs/Vu/Vv/Vw/Vx/Vy/Vz/W/W$/W0/W1/W4` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
