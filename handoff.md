@@ -2554,3 +2554,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-11 A5 扩大批次：app-shared `Wq/Wr/Ws/Wt/Wu/Wv/Ww/Wx/Wy/Wz/X$/X0/X1/X2/X3/X4/XA/XB/XC/XD/XE/XF/XG/XH/XI/XJ/XK/XL/XM/XN/XO/XP/XQ/XR/XS/XT/XU/XV/XW/XY` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `XZ/X_/Xa/Xb/Xc/Xd/Xf/Xg/Xh/Xj/Xk/Xl/Xn/Xo/Xq/Xr/Xs/Xt/Xu/Xv/Xw/Xx/Xy/Xz/Y/Y$/Y0/Y1/Y3/Y4/YA/YB/YC/YD/YE/YG/YH/YI/YJ/YK` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `YL/YM/YN/YO/YP/YQ/YR/YS/YT/YU/YV/YW/YY/YZ/Y_/Ya/Yb/Yc/Yd/Yf/Yg/Yj/Yk/Yl/Yn/Yo/Yp/Yq/Yr/Ys/Yt/Yu/Yv/Yw/Yx/Yy/Yz/Z/Z$/Z0` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-11 A5 扩大批次：app-shared `Z1/Z2/ZA/ZB/ZC/ZD/ZE/ZF/ZG/ZH/ZJ/ZK/ZL/ZM/ZN/ZO/ZP/ZQ/ZR/ZS/ZT/ZU/ZV/ZW/ZX/ZY/ZZ/Z_/Za/Zb/Zd/Zf/Zg/Zi/Zj/Zk/Zl/Zm/Zn/Zo` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
