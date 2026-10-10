@@ -799,3 +799,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-09 A5 继续批次：app-shared `DY/DZ/D_/Da/Db/Dc/Dd/Df/Dg/Dh/Di/Dj/Dk/Dl` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/bootstrap、schema、icon、style 与 telemetry surface。Manifest 未归类减少 14 项。
 2026-10-09 A5 继续批次：app-shared `Dm/Dn/Do/Dq/Dr/Ds/Du/Dv/Dw/Dx/Dy/Dz/E$/E0/E1` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/bootstrap、schema、icon、gesture 与 telemetry/protocol surface。Manifest 未归类减少 15 项。
 2026-10-09 A5 继续批次：app-shared `E2/EA/EB/EC/ED/EE/EF/EH/EI/EK/EM/EN/EO/EP/EQ` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime callbacks、route/schema、icon、telemetry 与 lifecycle surface。Manifest 未归类减少 15 项。
+2026-10-10 A5 继续批次：app-shared `ER/ES/ET/EV/EW/EX/EY/EZ/E_/Ea/Eb/Ec/Ed/Ef` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、schema、icon、SVG/color 与 shared lifecycle surface。Manifest 未归类减少 14 项。
