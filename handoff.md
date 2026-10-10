@@ -2551,3 +2551,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-10 A5 扩大批次：app-shared `Ud/Uf/Ug/Uh/Ui/Uj/Uk/Ul/Um/Un/Uo/Up/Uq/Ur/Us/Uu/Uv/Uw/Ux/Uy/Uz/V/V$/V0/V1/V2/VA/VB/VC/VD/VE/VF/VG/VH/VJ/VK/VL/VM/VN/VO` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 扩大批次：app-shared `VP/VQ/VR/VS/VT/VU/VV/VW/VX/VY/VZ/Va/Vb/Vc/Vd/Vf/Vg/Vh/Vi/Vj/Vk/Vl/Vm/Vn/Vo/Vp/Vq/Vr/Vs/Vu/Vv/Vw/Vx/Vy/Vz/W/W$/W0/W1/W4` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `WA/WB/WC/WD/WE/WF/WG/WH/WI/WJ/WL/WM/WN/WO/WP/WQ/WR/WS/WT/WV/WW/WX/WY/WZ/W_/Wa/Wb/Wc/Wd/Wf/Wg/Wh/Wi/Wj/Wk/Wl/Wm/Wn/Wo/Wp` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-11 A5 扩大批次：app-shared `Wq/Wr/Ws/Wt/Wu/Wv/Ww/Wx/Wy/Wz/X$/X0/X1/X2/X3/X4/XA/XB/XC/XD/XE/XF/XG/XH/XI/XJ/XK/XL/XM/XN/XO/XP/XQ/XR/XS/XT/XU/XV/XW/XY` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
