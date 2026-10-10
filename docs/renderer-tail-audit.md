@@ -824,3 +824,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `M3/M4/MA/MB/MC/MD/ME/MF/MG/MH/MI/MJ/MK/ML/MM/MN/MO/MP/MQ/MR` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、telemetry、protocol、schema、icon、plugin route 与 bootstrap surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `MS/MT/MU/MV/MW/MX/MY/MZ/M_/Ma/Mb/Mc/Md/Mf/Mg/Mh/Mi/Mj/Mk/Ml` 已完成源码反解并登记 `preserved-coupled`；覆盖 schema、icon、environment/runtime、React、shortcut、DOM 与 telemetry surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `Mm/Mn/Mo/Mp/Mq/Mr/Ms/Mu/Mv/Mw/Mx/My/Mz/N/N$/N0/N1/N2/N4` 已完成源码反解并登记 `preserved-coupled`；覆盖 browser/DOM runtime、icon、schema、settings、React 与 validation surface。Manifest 未归类减少 19 项。
+2026-10-10 A5 继续批次：app-shared `NA/NB/NC/ND/NE/NF/NG/NH/NI/NJ/NL/NM/NN/NO/NP/NQ/NR/NS/NT/NV` 已完成源码反解并登记 `preserved-coupled`；覆盖 telemetry、plugin/runtime、schema、icon、React、state 与 project projection surface。Manifest 未归类减少 20 项。
