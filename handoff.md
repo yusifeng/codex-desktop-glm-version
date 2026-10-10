@@ -2538,3 +2538,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-10 A5 继续批次：app-shared `OG/OH/OI/OJ/OL/OM/ON/OO/OP/OQ/OR/OS/OT/OU/OV/OW/OX/OY/OZ/O_` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `Oa/Ob/Oc/Od/Og/Oi/Oj/Ok/Ol/Om/On/Oo/Op/Oq/Or/Os/Ou/Ov/Ow/Ox` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `Oy/Oz/P$/P0/P1/P2/P4/PA/PB/PC/PD/PE/PF/PG/PH/PI/PJ/PL/PM/PN` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-10 A5 继续批次：app-shared `PO/PP/PQ/PR/PS/PT/PU/PV/PW/PX/PY/PZ/P_/Pa/Pb/Pc/Pd/Pf/Pg/Pi` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。

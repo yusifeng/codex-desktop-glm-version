@@ -830,3 +830,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `OG/OH/OI/OJ/OL/OM/ON/OO/OP/OQ/OR/OS/OT/OU/OV/OW/OX/OY/OZ/O_` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/state、telemetry、protocol、schema、icon、React 与 browser lifecycle surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `Oa/Ob/Oc/Od/Og/Oi/Oj/Ok/Ol/Om/On/Oo/Op/Oq/Or/Os/Ou/Ov/Ow/Ox` 已完成源码反解并登记 `preserved-coupled`；覆盖 icon、schema、bootstrap/runtime、telemetry、shortcut、browser 与 validation surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `Oy/Oz/P$/P0/P1/P2/P4/PA/PB/PC/PD/PE/PF/PG/PH/PI/PJ/PL/PM/PN` 已完成源码反解并登记 `preserved-coupled`；覆盖 schema、config、icon、React/runtime、protocol、plugin route、state 与 telemetry surface。Manifest 未归类减少 20 项。
+2026-10-10 A5 继续批次：app-shared `PO/PP/PQ/PR/PS/PT/PU/PV/PW/PX/PY/PZ/P_/Pa/Pb/Pc/Pd/Pf/Pg/Pi` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/bootstrap、schema、icon、React、project state、shortcut 与 validation surface。Manifest 未归类减少 20 项。
