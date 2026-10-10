@@ -836,3 +836,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `QU/QV/QW/QY/QZ/Q_/Qa/Qb/Qd/Qf/Qg/Qi/Qj/Qk/Ql/Qm/Qn/Qo/Qp/Qq` 已完成源码反解并登记 `preserved-coupled`；覆盖 host/permission、runtime/bootstrap、schema、icon、motion、protocol、telemetry 与 browser surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `Qr/Qs/Qt/Qu/Qv/Qw/Qx/Qy/Qz/R$/R0/R1/R2/R3/RA/RB/RC/RD/RE/RF` 已完成源码反解并登记 `preserved-coupled`；覆盖 icon、schema、runtime/bootstrap、React、plugin route 与 protocol surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `RG/RJ/RK/RL/RM/RN/RO/RP/RQ/RR/RS/RT/RU/RV/RW/RX/RY/RZ/Ra/Rb` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、protocol、telemetry、schema、icon、browser/React/state surface。Manifest 未归类减少 20 项。
+2026-10-10 A5 扩大批次：app-shared `Rc/Rd/Rg/Ri/Rj/Rk/Rl/Rm/Rn/Rp/Rq/Rr/Rs/Rt/Ru/Rv/Rw/Rx/Ry/Rz/S/S$/S0/S1/S2/S3/SA/SB/SC/SD/SE/SF/SG/SH/SI/SJ/SK/SM/SN/SO` 已完成源码反解并登记 `preserved-coupled`；覆盖 shared runtime/module surface。Manifest 未归类减少 40 项。
