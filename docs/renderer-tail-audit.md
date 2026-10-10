@@ -804,3 +804,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `Ev/Ew/Ex/Ey/Ez/F/F$/F0/F1/F2/F3/FA/FB/FC/FD` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、schema、icon、gesture 与 protocol surface。Manifest 未归类减少 15 项。
 2026-10-10 A5 继续批次：app-shared `FE/FF/FG/FH/FI/FM/FN/FO/FP/FR/FS/FT/FV/FW/F_` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、schema、icon、gesture、protocol 与 telemetry surface。Manifest 未归类减少 15 项。
 2026-10-10 A5 继续批次：app-shared `Fa/Fb/Fc/Fd/Ff/Fg/Fh/Fi/Fj/Fk/Fl/Fm/Fn/Fo/Fp` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、schema、icon、CSS、shortcut 与 telemetry surface。Manifest 未归类减少 15 项。
+2026-10-10 A5 继续批次：app-shared `Fr/Fs/Ft/Fu/Fv/Fw/Fx/Fy/G$/G0/GA/GB/GC/GD/GE/GF/GG/GH/GI/GK` 已完成源码反解并登记 `preserved-coupled`；覆盖 icon、schema、runtime、platform/path 与 telemetry surface。Manifest 未归类减少 20 项。
