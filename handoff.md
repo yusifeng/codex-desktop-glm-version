@@ -2519,3 +2519,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-10 A5 继续批次：app-shared `HH/HL/HM/HN/HO/HP/HQ/HR/HS/HT/HW/HY/HZ/H_/Ha` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `Hb/Hc/Hd/Hf/Hg/Hh/Hi/Hj/Hk/Hl/Hm/Hn/Ho/Hr/Hs` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-10 A5 继续批次：app-shared `Hu/Hv/Hw/Hx/Hz/I$/I0/I1/I2/IA/IB/IC/ID/IE/IF` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-10 A5 继续批次：app-shared `IG/IJ/IL/IM/IN/IO/IP/IR/IS/IT/IV/IW/IX/IY/IZ` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。

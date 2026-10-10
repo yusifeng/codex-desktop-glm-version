@@ -811,3 +811,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `HH/HL/HM/HN/HO/HP/HQ/HR/HS/HT/HW/HY/HZ/H_/Ha` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/bootstrap、telemetry、schema、icon、migration 与 lifecycle surface。Manifest 未归类减少 15 项。
 2026-10-10 A5 继续批次：app-shared `Hb/Hc/Hd/Hf/Hg/Hh/Hi/Hj/Hk/Hl/Hm/Hn/Ho/Hr/Hs` 已完成源码反解并登记 `preserved-coupled`；覆盖 schema、icon、shortcut/query/runtime、React SVG 与 lifecycle surface。Manifest 未归类减少 15 项。
 2026-10-10 A5 继续批次：app-shared `Hu/Hv/Hw/Hx/Hz/I$/I0/I1/I2/IA/IB/IC/ID/IE/IF` 已完成源码反解并登记 `preserved-coupled`；覆盖 icon、schema、DOM/React runtime、plugin route 与 telemetry surface。Manifest 未归类减少 15 项。
+2026-10-10 A5 继续批次：app-shared `IG/IJ/IL/IM/IN/IO/IP/IR/IS/IT/IV/IW/IX/IY/IZ` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/bootstrap、telemetry、schema、protocol、React projection 与 lifecycle surface。Manifest 未归类减少 15 项。
