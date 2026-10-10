@@ -832,3 +832,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `Oy/Oz/P$/P0/P1/P2/P4/PA/PB/PC/PD/PE/PF/PG/PH/PI/PJ/PL/PM/PN` 已完成源码反解并登记 `preserved-coupled`；覆盖 schema、config、icon、React/runtime、protocol、plugin route、state 与 telemetry surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `PO/PP/PQ/PR/PS/PT/PU/PV/PW/PX/PY/PZ/P_/Pa/Pb/Pc/Pd/Pf/Pg/Pi` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/bootstrap、schema、icon、React、project state、shortcut 与 validation surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `Pj/Pk/Pl/Pm/Pn/Po/Pp/Pq/Pr/Ps/Pt/Pv/Pw/Px/Py/Pz/Q$/Q0/Q1/Q2` 已完成源码反解并登记 `preserved-coupled`；覆盖 telemetry、icon、schema、shortcut/browser runtime、React 与 settings surface。Manifest 未归类减少 20 项。
+2026-10-10 A5 继续批次：app-shared `Q4/QA/QB/QC/QD/QE/QF/QG/QH/QJ/QK/QL/QM/QN/QO/QP/QQ/QR/QS/QT` 已完成源码反解并登记 `preserved-coupled`；覆盖 validation、protocol、schema、icon、telemetry、plugin route、URL 与 state lifecycle surface。Manifest 未归类减少 20 项。
