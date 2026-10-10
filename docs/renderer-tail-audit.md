@@ -838,3 +838,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `RG/RJ/RK/RL/RM/RN/RO/RP/RQ/RR/RS/RT/RU/RV/RW/RX/RY/RZ/Ra/Rb` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、protocol、telemetry、schema、icon、browser/React/state surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 扩大批次：app-shared `Rc/Rd/Rg/Ri/Rj/Rk/Rl/Rm/Rn/Rp/Rq/Rr/Rs/Rt/Ru/Rv/Rw/Rx/Ry/Rz/S/S$/S0/S1/S2/S3/SA/SB/SC/SD/SE/SF/SG/SH/SI/SJ/SK/SM/SN/SO` 已完成源码反解并登记 `preserved-coupled`；覆盖 shared runtime/module surface。Manifest 未归类减少 40 项。
 2026-10-10 A5 扩大批次：app-shared `SP/SQ/SR/SS/ST/SV/SW/SY/SZ/Sa/Sb/Sc/Sd/Sf/Sg/Sh/Sj/Sk/Sl/Sm/Sn/So/Sp/Sq/Sr/Ss/Su/Sv/Sw/Sx/Sy/Sz/T/T$/T0/T1/T2/T3/T4/TA` 已完成源码反解并登记 `preserved-coupled`；覆盖 shared runtime/module surface。Manifest 未归类减少 40 项。
+2026-10-10 A5 扩大批次：app-shared `TB/TC/TD/TE/TF/TG/TH/TI/TJ/TK/TL/TM/TN/TO/TP/TQ/TR/TS/TT/TV/TW/TY/TZ/T_/Ta/Tb/Td/Tg/Th/Ti/Tj/Tk/Tl/Tm/Tn/To/Tp/Tq/Tr/Ts` 已完成源码反解并登记 `preserved-coupled`；覆盖 shared runtime/module surface。Manifest 未归类减少 40 项。
