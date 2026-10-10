@@ -822,3 +822,4 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-10 A5 继续批次：app-shared `LL/LM/LN/LO/LP/LQ/LR/LS/LT/LV/LW/LY/LZ/L_/La/Lb/Lc/Ld/Lg/Li` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/state、protocol、schema、icon、React/thread projection、plugin lifecycle 与 bootstrap surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `Lj/Lk/Ll/Lm/Ln/Lp/Lq/Lr/Ls/Lt/Lu/Lv/Lw/Lx/Ly/Lz/M$/M0/M1/M2` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime/state、telemetry、icon、schema、shortcut、browser registry、style 与 React runtime surface。Manifest 未归类减少 20 项。
 2026-10-10 A5 继续批次：app-shared `M3/M4/MA/MB/MC/MD/ME/MF/MG/MH/MI/MJ/MK/ML/MM/MN/MO/MP/MQ/MR` 已完成源码反解并登记 `preserved-coupled`；覆盖 runtime、telemetry、protocol、schema、icon、plugin route 与 bootstrap surface。Manifest 未归类减少 20 项。
+2026-10-10 A5 继续批次：app-shared `MS/MT/MU/MV/MW/MX/MY/MZ/M_/Ma/Mb/Mc/Md/Mf/Mg/Mh/Mi/Mj/Mk/Ml` 已完成源码反解并登记 `preserved-coupled`；覆盖 schema、icon、environment/runtime、React、shortcut、DOM 与 telemetry surface。Manifest 未归类减少 20 项。
