@@ -1569,3 +1569,7 @@ Git worktree/root identity 的 SHA-1 投影 `X0/Y0` 已迁移至
 `src/main/worker/git-worktree-identity-policy.ts`，snapshot、restore、delete 以及 manager
 host/worktree consumers 直接接回；crypto digest 仍由 helper 调用，manager 保留 repository/lifecycle owner。
 `scripts/test-worker-git-worktree-identity-policy.mjs` 覆盖空值、POSIX 和 Windows 路径的稳定 identity 断言。
+Git manager/watch/session 的 host-scoped key projection 已迁移至
+`src/main/worker/git-manager-key-policy.ts`，repo、worktree、stable-metadata 和 watcher
+registry 的真实 key consumers 直接接回；manager 继续持有 Map、cache 与 watcher lifecycle。
+`scripts/test-worker-git-manager-key-policy.mjs` 覆盖 local/remote host、空路径和稳定重复性。

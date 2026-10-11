@@ -173,6 +173,7 @@ const { dispatchWorktreeResolutionRequest } = require("./worker/git-worktree-res
 const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch");
 const { dispatchGitCoreRequest } = require("./worker/git-core-request-dispatch");
 const { getGitInitWatchKey: getSemanticGitInitWatchKey } = require("./worker/git-init-watcher-policy");
+const { createGitManagerKey } = require("./worker/git-manager-key-policy");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -67388,7 +67389,7 @@ var {
       return this.getOrCreateWorktree(e, t);
     }
     getRepoKey(e, t) {
-      return `${h1(t)}|${e}`;
+      return createGitManagerKey(h1(t), e);
     }
     getOrCreateRepo(e, t) {
       let n = this.getRepoKey(e, t),
@@ -67398,7 +67399,7 @@ var {
       return (this.reposByKey.set(n, i), i);
     }
     getWorktreeKey(e, t) {
-      return `${h1(t)}|${e}`;
+      return createGitManagerKey(h1(t), e);
     }
     getOrCreateWorktree(e, t) {
       let n = t.isLocal ? bz(NZ(e)) : e,
@@ -67537,7 +67538,7 @@ var {
       );
     }
     getStableMetadataKey(e, t) {
-      return `${h1(t)}|${e}`;
+      return createGitManagerKey(h1(t), e);
     }
     cacheStableRoot(e, t, n, r) {
       if (r !== this.stableMetadataGeneration) return;
@@ -70299,7 +70300,7 @@ var I6 = kW(`git`),
       }));
     }
     getWatchKey(e, t) {
-      return `${h1(t)}|${e}`;
+      return createGitManagerKey(h1(t), e);
     }
     async runLiveQueryWithAttribution(e, t, n, r, i, a, o, s, c, l) {
       return OH(
