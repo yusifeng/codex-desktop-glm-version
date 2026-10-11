@@ -2748,6 +2748,11 @@ host IPC callback 仍由 React owner 持有。
 `scripts/test-preload-annotation-text-highlight-controller.mjs` 的 8 项 focused assertions，typecheck/build/
 verify-chunks 通过。A2 早期“pointer/frame-anchor lifecycle 未完成”记录为历史快照；当前 listener/observer/
 RAF/CSS Highlight teardown 已覆盖，剩余为业务 callback 的 state/DOM/IPC owner。
+2026-10-11 A2 preload 增量：`Wy` host close-editor 分支的 interaction/ref/state cleanup 顺序与
+target-matched editor reset 已迁移至 `src/main/browser-page-preload/annotation-editor-close-controller.ts`；
+入口继续注入 `flushSync`、React setters、DOM interaction registry 与 IPC-adjacent cleanup，新增
+`scripts/test-preload-annotation-editor-close-controller.mjs` 的 16 项 focused assertions，typecheck/build/
+verify-chunks 通过。
 2026-10-11 A2 preload 增量：`Wy` 跨 frame pointer/keyboard/click/wheel/blur 事件注册与注销集合已迁移至
 `src/main/browser-page-preload/annotation-pointer-event-lifecycle.ts`；入口继续持有 handler closure、
 `Te.disposeFrame` 与 `dc` frame lifecycle，新增 `scripts/test-preload-annotation-pointer-event-lifecycle.mjs`
@@ -2820,3 +2825,10 @@ Git operation state、event payload、telemetry 和 emit。`scripts/test-worker-
 `scripts/test-worker-git-watch-retry-controller.mjs` 覆盖 exponential backoff、duplicate suppression、
 session/disposed race、cancel 与 cleanup。A1 剩余 session close/recovery 仍与 watcher coverage、
 Git host watcher dispose、telemetry 和 event ordering 绑定，尚无安全独立边界。
+
+2026-10-11 A1 worker 增量：Git watch session close lifecycle 已物理迁移至
+`src/main/worker/git-watch-session-close-controller.ts`（commit `05baf39a`）；active-session race、
+watch-error callback、session 清理、稳定阈值 retry reset、recovery update 与 retry scheduling 顺序
+由 controller 持有，worker 继续注入 target/session/logger/recovery/retry callbacks。由
+`scripts/test-worker-git-watch-session-close-controller.mjs` 覆盖 5 项 active/error/stable/stale race
+断言。剩余 metadata refresh generation/waiter 仍与 promise、Map、Git I/O 和 dispose ordering 绑定。
