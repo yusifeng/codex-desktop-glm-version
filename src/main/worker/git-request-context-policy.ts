@@ -48,5 +48,16 @@ function classifyGitRequestException(error: unknown, gitUnavailableError: unknow
   return `exception`;
 }
 
-export { classifyGitRequestException, isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
-if (typeof module !== `undefined`) module.exports = { classifyGitRequestException, isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+/** Projects review-summary live-query results when the comparison command failed. */
+function projectGitReviewSummaryResult(response: { method: string; result: any }, stats: { failedCommandCount: number } | null): { method: string; result: any } {
+  if (response.method !== `review-summary`) return response;
+  const result = response.result;
+  if (result?.type !== `expected` || stats == null || stats.failedCommandCount === 0) return { ...response, result };
+  return {
+    ...response,
+    result: { type: `error`, source: result.source, failureReason: `review_comparison` },
+  };
+}
+
+export { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+if (typeof module !== `undefined`) module.exports = { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };

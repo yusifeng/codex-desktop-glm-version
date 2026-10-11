@@ -152,7 +152,7 @@ const { createGitRequestCancellationTelemetry } = require("./worker/git-request-
 const { createGitWorkerResponse } = require("./worker/git-response-envelope");
 const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
-const { classifyGitRequestException, isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
+const { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
@@ -70368,9 +70368,9 @@ var I6 = kW(`git`),
                 requestKind: e.method,
               },
               async () => {
-                let a = U6(
+                  let a = projectGitReviewSummaryResult(
                   await this.runLiveQuery(e, t, n, r, (e) => {
-                    ((d ??= Date.now() - u), i(U6(e, c)));
+                    ((d ??= Date.now() - u), i(projectGitReviewSummaryResult(e, c)));
                   }),
                   c,
                 );
@@ -71040,14 +71040,6 @@ function ube(e) {
     e.method === `status-summary`
     ? e.params.cwd
     : null;
-}
-function H6(e, t) {
-  return e.type !== `expected` || t == null || t.failedCommandCount === 0
-    ? e
-    : { type: `error`, source: e.source, failureReason: `review_comparison` };
-}
-function U6(e, t) {
-  return e.method === `review-summary` ? { ...e, result: H6(e.result, t) } : e;
 }
 function dbe(e) {
   return isGitRequestFailure(e);

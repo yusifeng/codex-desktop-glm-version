@@ -1532,3 +1532,8 @@ Git request catch 中的异常 disposition 投影 `V6` 已迁移至现有
 `src/main/worker/git-request-context-policy.ts` 的 `classifyGitRequestException`；入口仍
 注入 Git-unavailable sentinel、stale-snapshot identity 并负责 response/telemetry 副作用。
 `scripts/test-worker-git-request-context-policy.mjs` 覆盖 3 项断言。
+
+Review live-query response 的 `H6/U6` failure projection 已迁移至同一 request context 模块的
+`projectGitReviewSummaryResult`；review-summary 在 comparison command failure 时仍映射为
+`review_comparison`，入口继续负责 live-query、performance 与 response 生命周期。
+`scripts/test-worker-git-review-summary-projection.mjs` 覆盖 4 项断言。
