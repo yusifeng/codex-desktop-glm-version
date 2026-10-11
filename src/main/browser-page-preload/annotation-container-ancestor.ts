@@ -1,0 +1,3 @@
+function resolveAnnotationContainerAncestor(element: any, deps: { getOwnerDocument: (element: any) => any; getParent: (element: any) => any; hasAttribute: (element: any, name: string) => boolean }): any { const ownerDocument = deps.getOwnerDocument(element); let current = element; while (current != null && current.ownerDocument === ownerDocument) { if (deps.hasAttribute(current, `oai-annotation-container-text`)) return current; if (deps.hasAttribute(current, `oai-annotation-container`)) return null; current = deps.getParent(current); } return null; }
+export { resolveAnnotationContainerAncestor };
+if (typeof module !== `undefined`) module.exports = { resolveAnnotationContainerAncestor };

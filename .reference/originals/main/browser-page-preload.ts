@@ -4570,14 +4570,7 @@ function nl(e, t) {
   return n === void 0 ? sl(e) : n;
 }
 function rl(e) {
-  let t = e?.ownerDocument,
-    n = e;
-  for (; n != null && n.ownerDocument === t;) {
-    if (n.hasAttribute(`oai-annotation-container-text`)) return n;
-    if (n.hasAttribute(`oai-annotation-container`)) return null;
-    n = ic(n);
-  }
-  return null;
+  return resolveAnnotationContainerAncestor(e, { getOwnerDocument: (element) => element?.ownerDocument, getParent: (element) => ic(element), hasAttribute: (element, name) => element.hasAttribute(name) });
 }
 function il(e, t) {
   return resolveAnnotationHitTarget(e, t, {
@@ -6039,6 +6032,7 @@ var { resolveAnnotationHitTarget } = require("./browser-page-preload/annotation-
 var { resolveAnnotationFrameHit } = require("./browser-page-preload/annotation-frame-hit-test");
 var { collectAnnotationFrameElements, collectAnnotationFrameWindows } = require("./browser-page-preload/annotation-frame-tree");
 var { resolveAnnotationShadowSelector } = require("./browser-page-preload/annotation-shadow-selector-resolver");
+var { resolveAnnotationContainerAncestor } = require("./browser-page-preload/annotation-container-ancestor");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");

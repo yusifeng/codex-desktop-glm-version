@@ -580,6 +580,13 @@ Annotation iframe/shadow-root 元素递归与窗口去重遍历（原 `zc/uc`，
 兼容、逐级 shadowRoot 校验和最终 element 类型边界。focused test 覆盖 shadow 链、普通
 selector 与缺失终点三项行为。
 
+### 增量抽取：annotation container ancestor resolution
+
+Annotation text/container ancestor 查找（原 `rl`，4572-4581）已迁移至
+`src/main/browser-page-preload/annotation-container-ancestor.ts`；入口通过 composed parent
+适配器接回，保留 text-container 元素、普通 container/未命中 `null` 协议。focused test
+覆盖三项行为。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate
