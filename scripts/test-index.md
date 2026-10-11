@@ -1343,6 +1343,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-preload-annotation-screenshot-payload-projection.mjs](test-preload-annotation-screenshot-payload-projection.mjs)
 [test-preload-annotation-region-record-projection.mjs](test-preload-annotation-region-record-projection.mjs)
 [test-preload-annotation-overlay-style-projection.mjs](test-preload-annotation-overlay-style-projection.mjs)
+[test-preload-annotation-draft-marker-state.mjs](test-preload-annotation-draft-marker-state.mjs)
 [test-preload-annotation-frame-offset-policy.mjs](test-preload-annotation-frame-offset-policy.mjs)
 [test-preload-annotation-iframe-element-policy.mjs](test-preload-annotation-iframe-element-policy.mjs)
 [test-preload-annotation-iframe-window-policy.mjs](test-preload-annotation-iframe-window-policy.mjs)

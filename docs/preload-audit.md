@@ -1308,3 +1308,10 @@ React annotation runtime 的 zoom/viewport overlay CSS style map（原 `Wy` 内 
 `src/main/browser-page-preload/annotation-overlay-style-projection.ts`；模块负责 zoom transform、
 viewport scale 与 marker/metadata CSS variables，入口继续负责 comment-mode 的 cursor/pointerEvents
 后缀与 React render 生命周期。focused test 覆盖 zoom=1、zoomed 与 scaled variable/size cases。
+
+### 增量抽取：annotation draft marker state
+
+React annotation runtime 的 create-anchor draft marker point/number 派生（原 `Wy` 内 `dn/pn`）已迁移至
+`src/main/browser-page-preload/annotation-draft-marker-state.ts`；模块负责 active/original/virtual gate、
+marker point adapter 与新 comment number/匹配 comment number 选择，入口继续持有 DOM marker resolver 与
+React render 生命周期。focused test 覆盖新 comment、matched comment、active-selection 与 virtual anchor。

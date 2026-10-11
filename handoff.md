@@ -2696,6 +2696,11 @@ frame anchor 生命周期仍未完成。
 负责 comment-mode cursor/pointerEvents 后缀与 React render 生命周期，新增
 `scripts/test-preload-annotation-overlay-style-projection.mjs` 的 9 项 focused assertions，
 typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 frame anchor 生命周期仍未完成。
+2026-10-11 A2 preload 增量：React annotation runtime create-anchor draft marker point/number 派生（原
+`Wy` 内 `dn/pn`）已迁移至 `src/main/browser-page-preload/annotation-draft-marker-state.ts`；入口继续
+持有 DOM marker resolver 与 React render 生命周期，新增 `scripts/test-preload-annotation-draft-marker-state.mjs`
+的 8 项 focused assertions，typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 frame
+anchor 生命周期仍未完成。
 2026-10-11 A2 preload 增量：React annotation runtime selected-id active view 派生（原 `Wy` 内
 `wt/Tt/M/Et/Dt/Ot`）已迁移至 `src/main/browser-page-preload/annotation-active-view-projection.ts`；入口
 继续持有 anchor resolution、React effects 与 render 生命周期，新增

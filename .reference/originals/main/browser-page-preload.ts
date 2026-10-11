@@ -5966,6 +5966,7 @@ var { projectAnnotationTextPreviewState } = require("./browser-page-preload/anno
 var { projectAnnotationScreenshotPayload } = require("./browser-page-preload/annotation-screenshot-payload-projection");
 var { projectAnnotationRegionRecords } = require("./browser-page-preload/annotation-region-record-projection");
 var { projectAnnotationOverlayStyle } = require("./browser-page-preload/annotation-overlay-style-projection");
+var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/annotation-draft-marker-state");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25187,17 +25188,25 @@ function Wy({ rootHost: e, bridge: t }) {
     ln = p ? `add` : `comment`;
   ke && (ln = `text`);
   let un = W.hotspotByMode[ln === `add` ? `add` : `comment`],
-    dn =
-      !Ot && kt != null && kt.kind !== `virtual` && (!It || Ft == null)
-        ? v_(kt, se, {
-            includeElementFrameScroll: !0,
-            liveElement: jt[0]?.liveElement ?? null,
-            viewportSize: Mt,
-            zoomFactor: j,
-          })
-        : null,
-    fn = cs(Ee),
-    pn = dn == null ? null : Ft == null ? (fn === 0 ? null : fn + 1) : (Pe.get(Ft.id) ?? null),
+    draftMarkerState = projectAnnotationDraftMarkerState(
+      {
+        hasActiveSelection: Ot,
+        anchor: kt,
+        matchedAnnotation: Ft,
+        isOriginalPage: It,
+        additionalSelections: jt,
+        viewportSize: Mt,
+        viewport: se,
+        zoomFactor: j,
+      },
+      {
+        resolveMarkerPoint: (anchor, viewport, options) => v_(anchor, viewport, options),
+        countComments: () => cs(Ee),
+        getCommentNumber: (annotation) => Pe.get(annotation.id),
+      },
+    ),
+    dn = draftMarkerState.markerPoint,
+    pn = draftMarkerState.commentNumber,
     hn = projectAnnotationOverlayStyle({
       baseStyle: Cv,
       zoomFactor: j,
