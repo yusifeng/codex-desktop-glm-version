@@ -108,6 +108,7 @@ const { startGitInitWatcher: startGitInitWatcherController } = require("./worker
 const { handleGitRepoWatchEvent } = require("./worker/git-repo-watch-event-controller");
 const { deleteGitWorktreeLifecycle } = require("./worker/git-worktree-delete-lifecycle-controller");
 const { runGitLiveQueryWithAttribution } = require("./worker/git-live-query-attribution-controller");
+const { emitGitPerformanceOperation: emitGitPerformanceOperationController } = require("./worker/git-performance-operation-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70171,7 +70172,7 @@ var I6 = kW(`git`),
         metadataCommonDir: o, links: c, traceContext: s, trigger: a, source: e.params.operationSource,
         getRepoIndexSizeBucket: (root, host) => getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), root, host, host.isLocal ? g.default : g.default.posix) });
     }
-    emitGitPerformanceOperation({
+    emitGitPerformanceOperationLegacy({
       attribution: e,
       canceled: t,
       durationMs: n,
@@ -70242,6 +70243,11 @@ var I6 = kW(`git`),
         type: `worker-event`,
         event: { type: `git-performance-operation`, ...h, ...v, ...y },
       });
+    }
+    emitGitPerformanceOperation(input) {
+      return emitGitPerformanceOperationController({ ...input, endAttribution: G1, getResultFields: getGitPerformanceResultFields,
+        createPerformanceFields: createGitPerformanceFields, recordOutcome: (outcome) => jH(outcome), recordAttributes: (attributes) => MH(attributes),
+        selectSample: selectGitPerformanceSample, getTelemetryContext: kH, emit: (event) => this.emit(event), random: Math.random });
     }
     async runLiveQuery(e, t, n, r, i) {
       return handleGitLiveQuery(e, t, n, r, i, {
