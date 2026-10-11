@@ -1683,3 +1683,9 @@ performance owner。focused test 覆盖 operation 结果、首结果计时和 fi
 telemetry emission 已迁移至 `src/main/worker/git-performance-operation-controller.ts`；consumer 继续注入
 manager attribution、telemetry helper 与 event emitter。focused test 覆盖成功结果的 attribution end、attributes
 记录和 sampled emit。
+### 增量抽取：Git request finalization controller
+
+`GitManager.handleRequestWithContext` 的 request finally cleanup 已迁移至
+`src/main/worker/git-request-finalization-controller.ts`；controller 保留 untracked/read-cache invalidation、mutation
+cache refresh、repository/live-query refresh 与 `requestLifecycle.finish` 顺序，consumer 继续注入 manager
+request/host/cache owners。focused test 覆盖 exact invalidation、mutation refresh、repository refresh 与 finish。

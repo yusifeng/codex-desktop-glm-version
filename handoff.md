@@ -3061,3 +3061,7 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 
 - `GitManager.runLiveQueryWithAttribution` 的 outer trace、request attribution、首结果计时、结果映射、异常 disposition、performance finally 与 attribution cleanup 已迁移至 `src/main/worker/git-live-query-attribution-controller.ts`。
 - active 路径已移除旧的 `runLiveQueryWithAttributionLegacy` 死代码；focused test、typecheck、build、chunk/shared audit 均通过。
+# 本轮新增：git-request-finalization-controller
+
+- `GitManager.handleRequestWithContext` 的 request finally cleanup 已迁移至 `src/main/worker/git-request-finalization-controller.ts`，保留 untracked/read-cache invalidation、mutation cache refresh、repository/live-query refresh 与 `requestLifecycle.finish` 顺序。
+- exact invalidation 异常时跳过后续 finish 的原始语义保持不变；focused test、typecheck、build、chunk/shared audit 均通过。

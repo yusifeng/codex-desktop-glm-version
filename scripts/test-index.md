@@ -1461,4 +1461,5 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-worktree-delete-lifecycle-controller.mjs](test-worker-git-worktree-delete-lifecycle-controller.mjs)
 [test-worker-git-live-query-attribution-controller.mjs](test-worker-git-live-query-attribution-controller.mjs)
 [test-worker-git-performance-operation-controller.mjs](test-worker-git-performance-operation-controller.mjs)
+[test-worker-git-request-finalization-controller.mjs](test-worker-git-request-finalization-controller.mjs)
 [test-worker-git-working-tree-watch-policy-refresh-controller.mjs](test-worker-git-working-tree-watch-policy-refresh-controller.mjs)
