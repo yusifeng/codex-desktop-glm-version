@@ -2960,3 +2960,9 @@ metadata controller dispose、watch target 与 ignore map 清空，以及 pendin
 captured point freshness/select/fallback、interaction registry select、DOM hit-test、anchor projection 与
 `qe` open 顺序，入口继续注入当前 context 和 editor IPC/state owner。由
 `scripts/test-preload-annotation-point-selection-controller.mjs` 覆盖各优先级、fallback 与 dispose gate。
+2026-10-11 A2 preload 增量：`Wy` 的 `openDesignEditorAtPoint` callback（`st`）已物理迁移至
+`src/main/browser-page-preload/annotation-design-point-selection-controller.ts`；controller 保留 editor
+focus、captured design element/anchorState 分支、design-mode DOM hit-test、anchor projection 与 `Ze`
+open 顺序，入口继续注入当前 context 和 design editor owner。由
+`scripts/test-preload-annotation-design-point-selection-controller.mjs` 覆盖各优先级、mode 透传与
+dispose gate。

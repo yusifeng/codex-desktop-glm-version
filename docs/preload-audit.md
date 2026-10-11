@@ -1537,3 +1537,10 @@ watch target 与 ignore map 清空，以及 pending metadata promise 的幂等�
 captured point freshness/select/fallback、interaction registry select、DOM hit-test、anchor projection 与
 `qe` open 顺序，入口继续注入当前 context 和 editor IPC/state owner。focused test 覆盖各优先级、fallback
 与 dispose gate。
+### 增量抽取：annotation design-point selection controller
+
+`Wy` 的 `openDesignEditorAtPoint` callback（`st`）已迁移至
+`src/main/browser-page-preload/annotation-design-point-selection-controller.ts`；controller 保留 editor
+focus、captured design element/anchorState 分支、design-mode DOM hit-test、anchor projection 与 `Ze`
+open 顺序，入口继续注入当前 context 和 design editor owner。focused test 覆盖各优先级、mode 透传与
+dispose gate。

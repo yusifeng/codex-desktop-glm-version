@@ -5991,6 +5991,7 @@ var { createAnnotationSelectionModifierController } = require("./browser-page-pr
 var { createAnnotationRemoveSelectionController } = require("./browser-page-preload/annotation-remove-selection-controller");
 var { createAnnotationPointRetryController } = require("./browser-page-preload/annotation-point-retry-controller");
 var { createAnnotationPointSelectionController } = require("./browser-page-preload/annotation-point-selection-controller");
+var { createAnnotationDesignPointSelectionController } = require("./browser-page-preload/annotation-design-point-selection-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23849,6 +23850,21 @@ function Wy({ rootHost: e, bridge: t }) {
         openAt: (element, anchorState) => qe(element, anchorState),
       }),
     ),
+    [designPointSelectionController] = (0, G.useState)(() =>
+      createAnnotationDesignPointSelectionController({
+        focusEditor: () => t.sendMessageToHost({ type: `browser-sidebar-runtime-focus-editor` }),
+        getCapturedPoint: () => ce.current,
+        clearCapturedPoint: () => {
+          ce.current = null;
+        },
+        now: () => Date.now(),
+        captureMaxAge: yb,
+        resolveElement: (point, canUseSiteAnnotationApi, mode) =>
+          pl(point.x, point.y, canUseSiteAnnotationApi, e, mode),
+        projectAnchor: (element, point) => tv(element, point.x, point.y),
+        openDesignEditor: (element, anchorState) => Ze(element, anchorState),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24179,23 +24195,12 @@ function Wy({ rootHost: e, bridge: t }) {
       le.current = ou(e);
     }, []),
     st = (0, G.useCallback)(
-      (n, r = `design`) => {
-        if (x != null)
-          return (t.sendMessageToHost({ type: `browser-sidebar-runtime-focus-editor` }), !0);
-        let i = ce.current;
-        if (
-          ((ce.current = null),
-          i != null && Date.now() - i.capturedAt <= yb && i.designElement != null)
-        ) {
-          let e = i.designElement;
-          return Ze(e, e === i.element ? i.anchorState : tv(e, n.x, n.y));
-        }
-        let a = pl(n.x, n.y, A, e, r);
-        if (a == null) return !1;
-        let o = tv(a, n.x, n.y);
-        return Ze(a, o);
-      },
-      [x, t, A, Ze, e],
+      (point, mode = `design`) =>
+        designPointSelectionController.open(point, mode, {
+          isEditorOpen: x != null,
+          canUseSiteAnnotationApi: A,
+        }),
+      [designPointSelectionController, x, A],
     ),
     ct = (0, G.useCallback)((e) => pointRetryController.retry(e, (point) => st(point)), [st, pointRetryController]),
     lt = (0, G.useCallback)(() => viewportRefreshScheduler.schedule(), [viewportRefreshScheduler]),
@@ -24364,6 +24369,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => removeSelectionController.dispose(), [removeSelectionController]),
     (0, G.useEffect)(() => () => pointRetryController.dispose(), [pointRetryController]),
     (0, G.useEffect)(() => () => pointSelectionController.dispose(), [pointSelectionController]),
+    (0, G.useEffect)(() => () => designPointSelectionController.dispose(), [designPointSelectionController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {
