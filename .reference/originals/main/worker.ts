@@ -104,6 +104,7 @@ const { handleGitInitRecovery } = require("./worker/git-init-recovery-controller
 const { refreshGitInitMetadata: refreshGitInitMetadataSingleFlight } = require("./worker/git-init-metadata-refresh-controller");
 const { applyGitInitMetadata } = require("./worker/git-init-metadata-apply-controller");
 const { ensureGitInitWatchDesired } = require("./worker/git-init-watch-desire-controller");
+const { startGitInitWatcher: startGitInitWatcherController } = require("./worker/git-init-watcher-start-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70529,35 +70530,14 @@ var I6 = kW(`git`),
     }
     async startGitInitWatcher(e, t, n) {
       let r = this.getGitInitWatchKey(e, t);
-      this.disposeActiveGitInitWatcher();
-      let i = new GitInitWatcher(
-        {
-          cwd: e,
-          host: t,
-          onGitInit: () => {
-            this.handleGitInit(e, t, i).catch((t) => {
-              I6().warning(`Failed to refresh git metadata after git init`, {
-                safe: {},
-                sensitive: { cwd: e, error: t },
-              });
-            });
-          },
-          watchMode: n,
+      return startGitInitWatcherController({ key: r, disposeActiveWatcher: () => this.disposeActiveGitInitWatcher(),
+        createWatcher: () => {
+          let watcher = new GitInitWatcher({ cwd: e, host: t, onGitInit: () => { this.handleGitInit(e, t, watcher).catch((error) => { I6().warning(`Failed to refresh git metadata after git init`, { safe: {}, sensitive: { cwd: e, error } }); }); }, watchMode: n },
+            { createLogger: OW, debounce: _R, isMissingPathError: sB, randomUUID: () => crypto.randomUUID(), setTimeout, clearTimeout, initialReconnectDelayMs: 250, maxReconnectDelayMs: 5e3 });
+          return watcher;
         },
-        {
-          createLogger: OW,
-          debounce: _R,
-          isMissingPathError: sB,
-          randomUUID: () => crypto.randomUUID(),
-          setTimeout,
-          clearTimeout,
-          initialReconnectDelayMs: 250,
-          maxReconnectDelayMs: 5e3,
-        },
-      );
-      if (((this.gitInitWatch = { key: r, watcher: i }), await i.start())) return `started`;
-      let a = this.gitInitWatch?.watcher === i ? `failed` : `superseded`;
-      return (a === `failed` && (this.gitInitWatch = null), i.dispose(), a);
+        setActiveWatcher: (value) => { this.gitInitWatch = value; }, getActiveWatcher: () => this.gitInitWatch,
+        clearActiveWatcher: () => { this.gitInitWatch = null; } });
     }
     async handleGitInit(e, t, n) {
       return handleGitInitRecovery({ cwd: e, host: t, watcher: n, getWatchKey: (cwd, host) => this.getGitInitWatchKey(cwd, host),
