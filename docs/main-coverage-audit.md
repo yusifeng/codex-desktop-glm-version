@@ -511,6 +511,12 @@ macOS `Mst.refreshMenu` 的菜单状态 JSON projection 已迁移至
 负责 native addon 的 `updateStatusItemMenuState` 副作用、i18n label 获取和状态生命周期；
 `scripts/test-main-native-status-item-menu.mjs` 覆盖完整 payload 与线程快照隔离断言。
 
+`Qot.createWindow` 的 BrowserWindow constructor options projection 已迁移至
+`src/main/main-app/startup/browser-window-options.ts`，保留 bounds/title/icon/background、
+platform menu-bar、appearance options、minimum size 与 webPreferences 字段语义；窗口创建后
+的 Electron event/listener、navigation、registration 与 cleanup 生命周期仍由 `Qot` 持有。
+`scripts/test-main-browser-window-options.mjs` 覆盖完整字段与可选 x/y/icon/menu-bar 边界。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

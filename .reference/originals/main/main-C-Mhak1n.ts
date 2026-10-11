@@ -27,6 +27,7 @@ const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeou
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource } = require("./main-app/startup/icon-flavor-policy.js");
 const { projectNativeStatusItemMenuState } = require("./main-app/startup/native-status-item-menu.js");
+const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window-options.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
 const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transport.js");
@@ -172784,27 +172785,26 @@ var Qot = class {
         opaqueWindowSurfaceEnabled: O,
         prefersDarkColors: l.nativeTheme.shouldUseDarkColors,
       }),
-      F = {
+      F = buildBrowserWindowOptions({
         width: S,
         height: C,
-        ...(w === void 0 || T === void 0 ? {} : { x: w, y: T }),
+        x: w,
+        y: T,
         title: r ?? l.app.getName(),
-        ...(this.options.windowIconPath == null ? {} : { icon: this.options.windowIconPath }),
+        icon: this.options.windowIconPath,
         backgroundColor: N,
         show: c,
         parent: f,
-        ...(p === void 0 ? {} : { focusable: p }),
-        ...(process.platform === `win32` || process.platform === `linux`
-          ? { autoHideMenuBar: !0 }
-          : {}),
-        backgroundMaterial: P ?? void 0,
+        focusable: p,
+        autoHideMenuBar: process.platform === `win32` || process.platform === `linux`,
+        backgroundMaterial: P,
         hasNativeGlass: process.platform === `darwin` && s === `avatarOverlay`,
         supportsWindowTiling: g,
-        ...k,
+        appearanceOptions: k,
         minWidth: D?.width,
         minHeight: D?.height,
         webPreferences: M,
-      },
+      }),
       I = new l.BrowserWindow(F);
     this.applyWindowBackdrop(I, s, !0);
     let L = I.webContents;

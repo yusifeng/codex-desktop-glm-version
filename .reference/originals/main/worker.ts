@@ -67525,7 +67525,7 @@ var {
         isProcessTimeout: i,
         isGitUnavailable: a,
         generationMatches: r === this.stableMetadataGeneration,
-        hasCachedRoot: this.getCachedStableRoot(e, t) !== void 0,
+        hasCachedRoot: i && r === this.stableMetadataGeneration && this.getCachedStableRoot(e, t) !== void 0,
       });
       if (!o.accepted) throw n;
       let s = n instanceof Error ? n : Error(String(n));
