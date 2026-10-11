@@ -1504,6 +1504,11 @@ environment marker 解析、CODEX_SHELL 清理与 per-host cache 已迁移至 `g
 worker entry 继续持有 process/host I/O、warning 与 Git local-environment runtime wiring，新增
 5 项 focused assertions，typecheck/build/verify-chunks 通过。
 
+2026-10-11 A1 worker 增量：workspace parcel watcher 的 ignore glob/backend 配置已迁移至
+`src/main/worker/parcel-watcher-options.ts`；`fDe.getWatcherOptions` 仅负责调用 helper，订阅、
+事件和 close 生命周期仍由 watcher owner 持有。`scripts/test-worker-parcel-watcher-options.mjs`
+覆盖普通路径、glob 转义/相对化及空列表，共 5 项断言。
+
 2026-10-11 A1 worker 增量：worker IPC performance counter 的 message category 已迁移至
 `src/main/worker/message-category.ts`；request/response/broadcast、thread-stream change 与
 follower coordination 分类由 8 项 focused assertions 覆盖，连接计数与 close 生命周期仍由
