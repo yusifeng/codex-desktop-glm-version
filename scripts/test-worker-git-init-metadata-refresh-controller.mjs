@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { refreshGitInitMetadata } = require("../app/.vite/build/worker/git-init-metadata-refresh-controller.js");
+const refreshes = new Map(); const calls = []; let resolveRefresh;
+const pending = refreshGitInitMetadata({ key: "repo", refreshes, invalidateStableMetadata: () => calls.push("invalidate"), refreshOnce: () => new Promise((resolve) => { resolveRefresh = resolve; }) });
+const reused = refreshGitInitMetadata({ key: "repo", refreshes, invalidateStableMetadata: () => calls.push("invalidate-duplicate"), refreshOnce: async () => { throw new Error("duplicate"); } });
+assert.deepEqual(calls, ["invalidate"]); resolveRefresh(true); assert.equal(await pending, true); assert.equal(await reused, true); assert.equal(refreshes.size, 0);
+const failed = refreshGitInitMetadata({ key: "repo", refreshes, invalidateStableMetadata: () => calls.push("invalidate-failed"), refreshOnce: async () => { throw new Error("failed"); } }); await assert.rejects(failed, /failed/); assert.equal(refreshes.size, 0); assert.equal(calls.at(-1), "invalidate-failed");
+console.log("6 worker Git init metadata-refresh controller assertions passed");

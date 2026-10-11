@@ -101,6 +101,7 @@ const { scheduleGitWatchSetup } = require("./worker/git-watch-setup");
 const { handleGitWatchChange } = require("./worker/git-watch-change-controller");
 const { processGitMetadataRefreshBatch } = require("./worker/git-metadata-refresh-batch-controller");
 const { handleGitInitRecovery } = require("./worker/git-init-recovery-controller");
+const { refreshGitInitMetadata: refreshGitInitMetadataSingleFlight } = require("./worker/git-init-metadata-refresh-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70567,17 +70568,9 @@ var I6 = kW(`git`),
         startWatcher: (cwd, host, mode) => this.startGitInitWatcher(cwd, host, mode) });
     }
     async refreshGitInitMetadata(e, t) {
-      let n = this.getGitInitWatchKey(e, t),
-        r = this.gitInitMetadataRefreshes.get(n);
-      if (r != null) return r;
-      this.gitManager.invalidateStableMetadata();
-      let i = this.refreshGitInitMetadataOnce(e, t);
-      this.gitInitMetadataRefreshes.set(n, i);
-      try {
-        return await i;
-      } finally {
-        this.gitInitMetadataRefreshes.get(n) === i && this.gitInitMetadataRefreshes.delete(n);
-      }
+      let n = this.getGitInitWatchKey(e, t);
+      return refreshGitInitMetadataSingleFlight({ key: n, refreshes: this.gitInitMetadataRefreshes,
+        invalidateStableMetadata: () => this.gitManager.invalidateStableMetadata(), refreshOnce: () => this.refreshGitInitMetadataOnce(e, t) });
     }
     async refreshGitInitMetadataOnce(e, t) {
       let n = this.getGitInitWatchKey(e, t),
