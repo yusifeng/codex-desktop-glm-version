@@ -22,6 +22,8 @@
 
 另新增 `annotation-element-editor-open-controller.ts`，真实接回 Wy 的 `qe` create-from-element editor lifecycle，保留 DOM clear、anchor normalize、preview close、design/target、IPC 与 editor cleanup 顺序。
 
+新增 `src/main/preload/pip-video-decoder-controller.ts`，真实接回 PIP WebCodecs registry lifecycle：关键帧建 decoder、配置 rollover、decode、error/stop/layout cleanup；`pip-video-decoder.ts` 继续持有 IPC/window bridge owner。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
@@ -1673,3 +1675,9 @@ path filtering/full invalidation、Git cache invalidation、live-query fanout、
 disposition、performance finally 与 attribution cleanup 已迁移至
 `src/main/worker/git-live-query-attribution-controller.ts`；consumer 继续注入 live-query、request context 与
 performance owner。focused test 覆盖 operation 结果、首结果计时和 finally cleanup。
+### 增量抽取：Git performance-operation controller
+
+`GitManager.emitGitPerformanceOperation` 的 result fields、outcome/reason attributes、sampling 与 worker-event
+telemetry emission 已迁移至 `src/main/worker/git-performance-operation-controller.ts`；consumer 继续注入
+manager attribution、telemetry helper 与 event emitter。focused test 覆盖成功结果的 attribution end、attributes
+记录和 sampled emit。
