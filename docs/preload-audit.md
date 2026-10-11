@@ -1261,3 +1261,11 @@ React annotation runtime 顶层 comments/page/design 派生集合（原 `Wy` 内
 comment index、当前页过滤、active design change 替换、original-view/tweaks gate 与 design-mode
 判定，入口继续持有 DOM anchor resolution、React effects 与 watcher 生命周期。focused test 覆盖
 active change replacement、original-view、tweaks disabled、design-mode 与 empty collection。
+
+### 增量抽取：annotation marker record projection
+
+React annotation runtime 的 marker record 列表构建（原 `Wy` 内 `Rt`）已迁移至
+`src/main/browser-page-preload/annotation-marker-record-projection.ts`；模块负责 comment number
+映射、primary/additional anchor 展开、virtual 过滤、selection source index、live element 注入、
+marker point 投影与稳定 key，入口继续负责 marker point 聚合及 React render/UI 生命周期。focused
+test 覆盖 virtual/missing-point 过滤、primary live-id、selection index 与 key 生成。

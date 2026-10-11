@@ -5960,6 +5960,7 @@ var { createAnnotationPointerSelection } = require("./browser-page-preload/annot
 var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
 var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annotation-display-anchors");
 var { projectAnnotationRuntimeCollections } = require("./browser-page-preload/annotation-runtime-collection-projection");
+var { projectAnnotationMarkerRecords } = require("./browser-page-preload/annotation-marker-record-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25050,31 +25051,9 @@ function Wy({ rootHost: e, bridge: t }) {
     : It || Ot
       ? (Lt = [])
       : Ft != null && (Lt = Le.filter((e) => e.id !== Ft.id));
-  let Rt = Lt.flatMap((e) => {
-      let t = Pe.get(e.id);
-      return t == null
-        ? []
-        : (e.anchor.kind === `text`
-            ? [e.anchor]
-            : [e.anchor, ...(e.additionalAnchors ?? [])]
-          ).flatMap((n, r) => {
-            if (n.kind === `virtual`) return [];
-            let i = e.selectionSourceIndexes[r] ?? r,
-              a = n.kind === `element` ? sd(n, i === 0 ? e.id : void 0, Ie) : null,
-              o = v_(n, se, { liveElement: a, viewportSize: e.markerViewportSize, zoomFactor: j });
-            return o == null
-              ? []
-              : [
-                  {
-                    anchor: n,
-                    comment: e,
-                    commentNumber: t,
-                    key: `${e.id}:${n.framePath.join(`>`)}:${n.selector ?? n.elementPath}:${r}`,
-                    markerPoint: o,
-                    savedSelectionIndex: i,
-                  },
-                ];
-          });
+  let Rt = projectAnnotationMarkerRecords(Lt, Pe, se, j, {
+      resolveLiveElement: (anchor, id) => sd(anchor, id, Ie),
+      resolveMarkerPoint: (anchor, viewport, options) => v_(anchor, viewport, options),
     }),
     zt = Ts(
       Rt.map(({ markerPoint: e }) => e),
