@@ -28,9 +28,8 @@ import {
   wf as objectSchema,
   Of as stringSchema,
   df as enumSchema,
-  Ef as recordSchema,
-  Ac as createDeferred,
   Ec as dynamicAppToolResultSchema,
+  Ef as recordSchema,
   $u as threadIdOf,
   ed as requestIdOf,
   ls as isNotificationMethod,
@@ -64,64 +63,11 @@ import { getDesktopFeatureAvailability } from "../misc/availability";
 import { J as PERSISTED_ATOM_STATE_KEY } from "@chunk/bootstrap";
 import { isSameAuthIdentity } from "../api/desktop-fetch";
 import { createHostThreadReadState as createHostThreadReadStateController } from "../conversation/thread-read-state-controller";
+import { DynamicAppToolPendingResponses } from "./dynamic-app-tool-pending-responses";
 import { runAppServerRequestLifecycle } from "../conversation/app-server-request-lifecycle-controller";
 
 const createHostThreadReadState = (dependencies: Parameters<typeof createHostThreadReadStateController>[0]) =>
   createHostThreadReadStateController({ ...dependencies, isSameAuthIdentity });
-
-// ---------------------------------------------------------------------------
-// DynamicAppToolPendingResponses（原 `IT`）
-// ---------------------------------------------------------------------------
-
-/** 动态 app 工具的 pending 响应登记（原 `IT`）。 */
-class DynamicAppToolPendingResponses {
-  pending = new Map<string, ReturnType<typeof createDeferred>>();
-
-  wait(id: string | number): Promise<unknown> {
-    const key = pendingKey(id);
-    if (this.pending.has(key)) throw new Error(`Dynamic app tool call ${String(id)} is pending`);
-    const deferred = createDeferred();
-    this.pending.set(key, deferred);
-    return deferred.promise;
-  }
-
-  discard(id: string | number) {
-    this.pending.delete(pendingKey(id));
-  }
-
-  cancel(id: string | number) {
-    const key = pendingKey(id);
-    const deferred = this.pending.get(key);
-    if (deferred != null) {
-      this.pending.delete(key);
-      deferred.reject(new Error("Dynamic app tool call cancelled"));
-    }
-  }
-
-  route(response: { id: string | number; error?: { message: string } | null; result?: unknown }): boolean {
-    const deferred = this.pending.get(pendingKey(response.id));
-    if (deferred == null) return false;
-    this.pending.delete(pendingKey(response.id));
-    if (response.error != null) {
-      deferred.reject(new Error(response.error.message));
-      return true;
-    }
-    const parsed = (dynamicAppToolResultSchema as { safeParse(input: unknown): { success: boolean; data?: unknown; error?: unknown } }).safeParse(response.result);
-    return parsed.success
-      ? ((deferred.resolve(parsed.data), true))
-      : (deferred.reject(new Error("Dynamic app tool returned an invalid response", { cause: parsed.error })), true);
-  }
-
-  dispose() {
-    for (const deferred of this.pending.values())
-      deferred.reject(new Error("Dynamic app tool response router disposed"));
-    this.pending.clear();
-  }
-}
-
-function pendingKey(id: string | number): string {
-  return `${typeof id}:${String(id)}`;
-}
 
 // ---------------------------------------------------------------------------
 // HostRequestRouter（原 `xEe`）
@@ -154,7 +100,7 @@ class HostRequestRouter {
   assertCurrent: () => void;
   assertLifetimeCurrent: () => void;
   requests = new Map<string, { method: string; origin: "server" | "native"; threadId: string | null }>();
-  nativeResponses = new DynamicAppToolPendingResponses();
+  nativeResponses = new DynamicAppToolPendingResponses(dynamicAppToolResultSchema);
   cleanup: Array<() => void> = [];
   disposed = false;
   manager: RouterManagerTarget | null = null;
