@@ -894,6 +894,7 @@ teardown/lifecycle 契约，继续保留在聚合 hub；精确范围、source sy
 2026-10-11 A5 app-initial 批量推进 B6：本批 1000 个 alias 已完成 export-table 反解并登记 `preserved-coupled`。Manifest 未归类减少 1000 项。
 2026-10-11 A5 app-initial 批量推进 B7：本批 1000 个 alias 已完成 export-table 反解并登记 `preserved-coupled`。Manifest 未归类减少 1000 项。
 2026-10-11 A5 app-initial 批量推进 B8：本批 1000 个 alias 已完成 export-table 反解并登记 `preserved-coupled`。Manifest 未归类减少 1000 项。
+2026-10-11 A5 app-initial 收尾批次：本批 490 个 alias 已完成 export-table 反解并登记 `preserved-coupled`。Manifest 未归类减少 490 项。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记 `preserved-coupled`。Manifest 未归类减少 1000 项。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记 `preserved-coupled`。Manifest 未归类减少 1000 项。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记 `preserved-coupled`。Manifest 未归类减少 1000 项。
