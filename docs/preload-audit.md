@@ -24,6 +24,8 @@
 
 新增 `src/main/preload/pip-video-decoder-controller.ts`，真实接回 PIP WebCodecs registry lifecycle：关键帧建 decoder、配置 rollover、decode、error/stop/layout cleanup；`pip-video-decoder.ts` 继续持有 IPC/window bridge owner。
 
+新增 `src/main/preload/system-theme-variant-controller.ts`，真实接回 preload 初始主题注入、document readiness observer、系统主题 IPC 更新、订阅 fan-out 与 cleanup；`index.ts` 继续持有 Electron IPC/contextBridge owner。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style

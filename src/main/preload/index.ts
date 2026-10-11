@@ -21,6 +21,7 @@ import {
 } from "./ipc-channels";
 import { initSharedObjectSnapshot, setSharedObjectValue } from "./shared-object-snapshot";
 import { registerPipVideoFrameHandler, disposeDecodersForRemovedPresentations } from "./pip-video-decoder";
+import { createSystemThemeVariantController } from "./system-theme-variant-controller";
 import {
   createElectronBridge,
   WINDOW_TYPE,
@@ -34,41 +35,24 @@ const sentryInitOptions = ipcRenderer.sendSync(GET_SENTRY_INIT_OPTIONS) as Sentr
 const buildFlavor = ipcRenderer.sendSync(GET_BUILD_FLAVOR);
 initSharedObjectSnapshot();
 let systemThemeVariant = ipcRenderer.sendSync(GET_SYSTEM_THEME_VARIANT) as string;
-
-// document.documentElement 可能尚未就绪，就绪后立即写入，避免主题闪烁。
-const documentElement = document.documentElement;
-if (documentElement != null) {
-  documentElement.dataset.theme = systemThemeVariant;
-} else {
-  const observer = new MutationObserver(() => {
-    const element = document.documentElement;
-    if (element != null) {
-      element.dataset.theme = systemThemeVariant;
-      observer.disconnect();
-    }
-  });
-  observer.observe(document, { childList: true });
-}
-
-const systemThemeVariantListeners = new Set<() => void>();
+const systemThemeVariantController = createSystemThemeVariantController(systemThemeVariant, {
+  getDocumentElement: () => document.documentElement,
+  observeDocument: (onReady) => {
+    const observer = new MutationObserver(onReady);
+    observer.observe(document, { childList: true });
+    return () => observer.disconnect();
+  },
+});
 ipcRenderer.on(SYSTEM_THEME_VARIANT_UPDATED, (_event, variant: string) => {
-  systemThemeVariant = variant;
-  systemThemeVariantListeners.forEach((listener) => {
-    listener();
-  });
+  systemThemeVariantController.update(variant);
 });
 
 const electronBridge = createElectronBridge({
   sentryInitOptions,
   preloadStartedAtMs,
   buildFlavor,
-  getSystemThemeVariant: () => systemThemeVariant,
-  subscribeToSystemThemeVariant: (callback) => (
-    systemThemeVariantListeners.add(callback),
-    () => {
-      systemThemeVariantListeners.delete(callback);
-    }
-  ),
+  getSystemThemeVariant: () => systemThemeVariantController.get(),
+  subscribeToSystemThemeVariant: (callback) => systemThemeVariantController.subscribe(callback),
 });
 
 // 主进程 → 页面的普通消息：非「宿主分块消息」时同步本地共享对象快照 /

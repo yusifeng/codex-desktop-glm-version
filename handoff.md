@@ -4,6 +4,8 @@
 
 本轮新增 `pip-video-decoder-controller.ts`，真实接回 preload PIP WebCodecs registry lifecycle；focused test 为 `scripts/test-preload-pip-video-decoder-controller.mjs`。
 
+本轮新增 `system-theme-variant-controller.ts`，真实接回 preload 主题注入/observer/订阅生命周期；focused test 为 `scripts/test-preload-system-theme-variant-controller.mjs`。
+
 本轮新增 `annotation-edit-editor-controller.ts`，真实接回 Wy 的 `Ye` edit-editor callback。controller 注入 target map、comment/anchor/design projection 与 host/React side effects，保持 `close preview -> open editor IPC -> viewport refresh -> editor state -> clear preview` 顺序；focused test 为 `scripts/test-preload-annotation-edit-editor-controller.mjs`。
 
 同轮新增 `annotation-comment-preview-controller.ts`，真实接回 Wy 的 `Xe` comment-preview callback；focused test 为 `scripts/test-preload-annotation-comment-preview-controller.mjs`。
