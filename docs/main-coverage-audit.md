@@ -557,3 +557,11 @@ SourceKit-LSP 的固定 Swift Package Manager initialization payload 已迁移�
 `src/main/main-app/language-server/sourcekit-options.ts`，`findSessionOptions` 继续负责
 workspace directory 创建、platform/codexHome 路径解析与 process discovery；consumer 保留
 原对象复用语义。`scripts/test-main-sourcekit-options.mjs` 覆盖完整 options shape。
+
+### A3 startup residual owner 复核（2026-10-11）
+
+继续审计 `dst`（172,420-176,978）后，`D/O/k` 将打包/开发资源路径与 `existsSync` fallback
+绑定，`L/R` 将 nativeTheme、nativeImage、Dock 更新和异步资源下载绑定，`oe/se` 将
+BrowserWindow 延迟显示与 timer/show/closed cleanup 绑定；`B/Hle/Eat/Pit` 则是窗口、热键、
+dictation 与 appshot native manager 的组装入口。上述边界均为资源或窗口生命周期编排，未发现
+可独立接回且不复制副作用顺序的窄纯 projection，本轮不制造 facade。

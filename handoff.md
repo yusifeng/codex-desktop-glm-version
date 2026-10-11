@@ -2738,3 +2738,7 @@ payload 已迁移至 `src/main/main-app/language-server/typescript-server-option
 initialization payload 已迁移至 `src/main/main-app/language-server/sourcekit-options.ts`；
 workspace directory/path 与 process discovery 仍由 provider 持有，新增
 `scripts/test-main-sourcekit-options.mjs` 的 2 项 focused assertions。
+2026-10-11 A3 main startup owner 复核：`dst` 内 `D/O/k` 绑定打包/开发资源 `existsSync` fallback，
+`L/R` 绑定 nativeTheme/nativeImage/Dock 与异步资源下载，`oe/se` 绑定 BrowserWindow 延迟显示
+timer/show/closed cleanup，`B/Hle/Eat/Pit` 为窗口/热键/dictation/appshot manager 组装入口；
+未发现不复制副作用顺序的独立 registration/config projection，本轮保留 owner。
