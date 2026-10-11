@@ -5980,6 +5980,7 @@ var { createAnnotationTextHighlightController } = require("./browser-page-preloa
 var { closeAnnotationEditor } = require("./browser-page-preload/annotation-editor-close-controller");
 var { createAnnotationSuspensionNotifier } = require("./browser-page-preload/annotation-suspension-notifier");
 var { createAnnotationDesignModifierNotifier } = require("./browser-page-preload/annotation-design-modifier-notifier");
+var { createAnnotationSelectionModifierNotifier } = require("./browser-page-preload/annotation-selection-modifier-notifier");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23713,6 +23714,11 @@ function Wy({ rootHost: e, bridge: t }) {
         send: (pressed) => t.sendMessageToHost({ type: `browser-sidebar-runtime-design-modifier-state`, pressed }),
       }),
     ),
+    [selectionModifierNotifier] = (0, G.useState)(() =>
+      createAnnotationSelectionModifierNotifier({
+        send: (pressed) => t.sendMessageToHost({ type: `browser-sidebar-runtime-annotation-selection-modifier-state`, pressed }),
+      }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -24368,10 +24374,7 @@ function Wy({ rootHost: e, bridge: t }) {
           (yt(n),
             x?.target.mode === `create` &&
               x.anchor.type !== `text` &&
-              t.sendMessageToHost({
-                type: `browser-sidebar-runtime-annotation-selection-modifier-state`,
-                pressed: n,
-              }));
+              selectionModifierNotifier.notify(n));
         },
         a = (t, a) => {
           g(a.altKey);
@@ -24462,10 +24465,7 @@ function Wy({ rootHost: e, bridge: t }) {
                   wantsScreenshot: !0,
                 }),
                 be.current &&
-                  t.sendMessageToHost({
-                    type: `browser-sidebar-runtime-annotation-selection-modifier-state`,
-                    pressed: !0,
-                  }),
+                  selectionModifierNotifier.notify(!0),
                 T(C_()),
                 S({
                   target: { mode: `create` },
@@ -24590,10 +24590,7 @@ function Wy({ rootHost: e, bridge: t }) {
               n.shiftKey &&
               ((be.current = !0),
               m(!0),
-              t.sendMessageToHost({
-                type: `browser-sidebar-runtime-annotation-selection-modifier-state`,
-                pressed: !0,
-              }));
+              selectionModifierNotifier.notify(!0));
           }
         },
         v = (e) => {
@@ -24690,10 +24687,7 @@ function Wy({ rootHost: e, bridge: t }) {
             a.shiftKey &&
             ((be.current = !0),
             m(!0),
-            t.sendMessageToHost({
-              type: `browser-sidebar-runtime-annotation-selection-modifier-state`,
-              pressed: !0,
-            }));
+            selectionModifierNotifier.notify(!0));
         },
         te = (t, n) => {
           if (
@@ -25056,6 +25050,7 @@ function Wy({ rootHost: e, bridge: t }) {
   (0, G.useEffect)(() => () => textHighlightController.dispose(), [textHighlightController]);
   (0, G.useEffect)(() => () => suspensionNotifier.dispose(), [suspensionNotifier]);
   (0, G.useEffect)(() => () => designModifierNotifier.dispose(), [designModifierNotifier]);
+  (0, G.useEffect)(() => () => selectionModifierNotifier.dispose(), [selectionModifierNotifier]);
   let Jt = textPreviewState.anchor,
     Xt = textPreviewState.selectionRects,
     Zt = Xt,

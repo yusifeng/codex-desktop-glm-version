@@ -188,6 +188,7 @@ const { shouldInvalidateGitWorktreeForTurn } = require("./worker/git-turn-cache-
 const { createGitRepoChangeController } = require("./worker/git-repo-change-controller");
 const { createGitWatchRetryController } = require("./worker/git-watch-retry-controller");
 const { createGitWatchSessionCloseController } = require("./worker/git-watch-session-close-controller");
+const { createGitMetadataRefreshController } = require("./worker/git-metadata-refresh-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68714,6 +68715,10 @@ var Jye = 1e3,
       updateRecovery: () => this.updateRequiresRecovery(),
       scheduleRetry: (target) => this.scheduleWatchSessionRetry(target),
     });
+    metadataRefreshController = createGitMetadataRefreshController({
+      isDisposed: () => this.disposed,
+      processBatch: (paths, recovering) => this.processMetadataRefreshBatch(paths, recovering),
+    });
     pathApi = null;
     gitDir = null;
     currentHeadRefPath = null;
@@ -68722,8 +68727,6 @@ var Jye = 1e3,
     disposed = !1;
     disposePromise = null;
     pendingWorkingTreePaths = new Set();
-    changedMetadataDirectories = new Set();
-    metadataRefreshPromise = null;
     ignorePolicy;
     workingTreeIgnoredDirectories = [];
     ignoreSourceWatches = new Map();
@@ -68950,47 +68953,37 @@ var Jye = 1e3,
         (this.watchTargets.length = 0),
         this.repoChangeController.dispose(),
         this.watchRetryController.dispose(),
-        this.changedMetadataDirectories.clear(),
+        this.metadataRefreshController.dispose(),
         this.ignoreSourceWatches.clear(),
         this.changedIgnoreSourcePaths.clear(),
-        (this.disposePromise = Promise.all([...t, this.metadataRefreshPromise, e]).then(() => {})),
+        (this.disposePromise = Promise.all([...t, this.metadataRefreshController.pendingPromise(), e]).then(() => {})),
         this.disposePromise
       );
     }
     refreshMetadataDirectories(e, t = !0) {
       let n = this.pathApi;
       if (this.disposed || n == null) return Promise.resolve();
-      let r = n.join(this.options.commonDir, `refs`),
-        i = n.join(this.options.commonDir, `worktrees`),
-        a = selectGitMetadataRefreshPaths(n, this.options.commonDir, e);
+      let a = selectGitMetadataRefreshPaths(n, this.options.commonDir, e);
       if (a.length === 0) return Promise.resolve();
-      for (let e of a) this.changedMetadataDirectories.add(e);
-      if (this.metadataRefreshPromise != null) return this.metadataRefreshPromise;
-      let o = t,
-        s = (async () => {
-          for (; !this.disposed && this.changedMetadataDirectories.size > 0;) {
-            let e = [...this.changedMetadataDirectories];
-            this.changedMetadataDirectories.clear();
-            let t = selectGitWatchTargetsForMetadataRefresh(this.watchTargets, e, (e, t) => M6(n, e, t));
-            (await Promise.all(
-              t.map(async (e) => {
-                e.retryTimer ??
-                  (o && (await this.disposeSession(e)),
-                  !this.disposed && e.session == null && (await this.tryStartWatchSession(e, o)));
-              }),
-            ),
-              await Promise.all(
-                t
-                  .filter((e) => e.metadataDirectory?.missing)
-                  .map((e) => this.tryStartWatchSession(e, o)),
-              ),
-              await this.refreshWorktreeDirectories(n, i, o),
-              (o = !0));
-          }
-        })().finally(() => {
-          this.metadataRefreshPromise === s && (this.metadataRefreshPromise = null);
-        });
-      return ((this.metadataRefreshPromise = s), s);
+      return this.metadataRefreshController.enqueue(a, t);
+    }
+    async processMetadataRefreshBatch(e, t) {
+      let n = this.pathApi;
+      if (this.disposed || n == null) return;
+      let r = selectGitWatchTargetsForMetadataRefresh(this.watchTargets, e, (e, t) => M6(n, e, t));
+      (await Promise.all(
+        r.map(async (e) => {
+          e.retryTimer ??
+            (t && (await this.disposeSession(e)),
+            !this.disposed && e.session == null && (await this.tryStartWatchSession(e, t)));
+        }),
+      ),
+        await Promise.all(
+          r
+            .filter((e) => e.metadataDirectory?.missing)
+            .map((e) => this.tryStartWatchSession(e, t)),
+        ),
+        await this.refreshWorktreeDirectories(n, n.join(this.options.commonDir, `worktrees`), t));
     }
     async refreshWorktreeDirectories(e, t, n) {
       let r = this.watchTargets.find((e) => e.watchPath === t);
@@ -69195,7 +69188,7 @@ var Jye = 1e3,
             }),
             !r &&
               !e.recursive &&
-              this.metadataRefreshPromise == null &&
+              !this.metadataRefreshController.hasPending() &&
               this.refreshMetadataDirectories([], !1)));
       } catch (t) {
         if (this.disposed || n !== e.generation) return;

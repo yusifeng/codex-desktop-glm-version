@@ -1609,6 +1609,11 @@ Watch session close 的 active-session race、watch-error logging、session 清�
 recovery update 与 retry scheduling 顺序已迁移至 `git-watch-session-close-controller.ts`；worker 仍注入
 target/session owner、logger、recovery 与 retry callbacks。`scripts/test-worker-git-watch-session-close-controller.mjs`
 覆盖 active/error/stable 顺序及 stale-session race。
+Metadata refresh 的 changed-path batch、single-flight waiter、首批 recovering/后续批次状态推进与
+dispose 清空已迁移至 `git-metadata-refresh-controller.ts`；worker 仍注入 metadata target 筛选、
+session dispose/start、worktree directory I/O 与 generation 检查。由
+`scripts/test-worker-git-metadata-refresh-controller.mjs` 覆盖批次去重、single-flight、状态推进和
+disposed gate。
 ### A1 最终复核：metadata refresh generation/waiter
 
 `GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、
