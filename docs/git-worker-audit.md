@@ -1665,3 +1665,6 @@ GitHub CLI secondary-rate-limit 的 per-host backoff gate 已迁移至
 cleanup，`Y6/X6/Mbe` 仍由 worker 持有命令执行、重试策略与结果 owner。由
 `scripts/test-worker-github-cli-rate-limit-gate.mjs` 覆盖空 gate、backoff release、abort release 与
 replacement cleanup。
+w1/C1 query fetch coordinator 与 `$1` fsmonitor cache 本轮保留：前者被 8 个 query handler 注入并绑定
+QueryClient、fetchQuery/removeQueries、metadata 与多 consumer abort fan-out；后者绑定 Cpe/t0、host
+environment、expiry timer 和 query execution，均不具备不复制 owner 状态的窄边界。

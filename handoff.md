@@ -3167,3 +3167,8 @@ XDG/platform 环境、同步 filesystem scan 和 parse/discovery owner，当前�
 - Git command per-key process lock 的等待、lease `track/close`、deadline/AbortSignal gate 与 identity cleanup
   已迁移至 `src/main/worker/git-process-lock-registry.ts`；worker 仍负责 spawn、timeout 与进程 owner。
 - `scripts/test-worker-git-process-lock-registry.mjs` 覆盖 7 项 release、tracked wait、abort 和 timeout 断言。
+
+### A1 扫描结论：query fetch/fsmonitor caches preserve-coupled
+
+w1/C1 被多个 query handler 注入并绑定 QueryClient 与 abort fan-out；`$1` fsmonitor cache 绑定 Cpe/t0、
+host environment、expiry timer 和 query execution。本轮均保留，未抽 facade。
