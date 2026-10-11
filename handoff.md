@@ -1520,6 +1520,9 @@ main startup/window icon 的 build-flavor 到 icon base-name 映射（原 `ST`�
 main worker manager 的 `ces-telemetry` HTTP request/response projection（原 `mst`）已迁移至
 `src/main/main-app/worker/telemetry-request.ts`；入口继续持有 analytics gate、cancel map 与
 worker 生命周期，由 `scripts/test-main-telemetry-request.mjs` 覆盖 4 项网络投影断言。
+Sentry worker RPC transport 的 enabled/client/transport fallback（原 `hst.sendEnvelope`）已迁移至
+`src/main/main-app/worker/sentry-envelope-transport.ts`；class 适配层和 worker 生命周期仍由入口
+持有，由 `scripts/test-main-sentry-envelope-transport.mjs` 覆盖 4 项断言。
 worker-main RPC 的方法白名单、取消消息和请求消息校验已迁移至
 `src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托，
 由 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言；RPC 调度与

@@ -297,6 +297,11 @@ AbortSignal 保留 POST headers/body、成功 body cancel 和失败 response tex
 analytics gate 与 worker 生命周期仍由原 owner 持有。`scripts/test-main-telemetry-request.mjs`
 覆盖成功/失败状态、body cancel、header 与 URL 传递共 4 项断言。
 
+Sentry worker RPC transport 的 enabled/client/transport fallback（原 `hst.sendEnvelope`）已迁移至
+`src/main/main-app/worker/sentry-envelope-transport.ts`；class 适配层仍由入口持有，focused
+`scripts/test-main-sentry-envelope-transport.mjs` 覆盖 disabled、missing transport、successful
+send 与 403 fallback 共 4 项断言。
+
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至

@@ -28,6 +28,7 @@ const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsI
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName } = require("./main-app/startup/icon-flavor-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
+const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transport.js");
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
@@ -173940,10 +173941,7 @@ function B9(e, t) {
 }
 var hst = class extends n.Uf {
   async sendEnvelope(e) {
-    let t = a.tn();
-    return t == null || t.getOptions().enabled === !1
-      ? { statusCode: 403 }
-      : ((await t.getTransport()?.send(e)) ?? { statusCode: 403 });
+    return sendSentryEnvelope(() => a.tn(), e);
   }
 };
 function V9(e) {
