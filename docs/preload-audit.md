@@ -1105,3 +1105,8 @@ cleanup callback 异常。focused test 覆盖正常执行与异常隔离。
 Popover connected/open/show/hide 状态转换（原 `_c/vc`，4331-4350）已迁移至
 `src/main/browser-page-preload/annotation-popover-policy.ts`；入口仅注入 DOM 方法读取器，
 保留 hide-first、异常隔离和 close no-op 语义。focused test 覆盖 open/close 行为。
+### 增量抽取：annotation cursor style cleanup
+
+Cursor style cleanup（原 `pc`，4292-4297）已迁移至
+`src/main/browser-page-preload/annotation-cursor-style-cleanup.ts`；入口保留 cursor restore、
+按 attribute 查询和逐个 style remove 语义。focused test 覆盖 restore 与多 style cleanup。
