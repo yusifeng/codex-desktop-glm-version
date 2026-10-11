@@ -5986,6 +5986,7 @@ var { createAnnotationHoverSyncController } = require("./browser-page-preload/an
 var { createAnnotationPointerModeSyncController } = require("./browser-page-preload/annotation-pointer-mode-sync-controller");
 var { createAnnotationCommentInteractionDisposalController } = require("./browser-page-preload/annotation-comment-interaction-disposal-controller");
 var { createAnnotationPreparedScreenshotController } = require("./browser-page-preload/annotation-prepared-screenshot-controller");
+var { createAnnotationUnavailableSiteInteractionController } = require("./browser-page-preload/annotation-unavailable-site-interaction-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23783,6 +23784,15 @@ function Wy({ rootHost: e, bridge: t }) {
         },
       }),
     ),
+    [unavailableSiteInteractionController] = (0, G.useState)(() =>
+      createAnnotationUnavailableSiteInteractionController({
+        cancelInteraction: () => Te.cancel(),
+        markViewportSelection: () => {
+          xe.current = !0;
+        },
+        disablePointerMode: () => pe(!1),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24271,7 +24281,7 @@ function Wy({ rootHost: e, bridge: t }) {
         syncContext: (message) => i.sync(message),
         syncPointerMode: (message) => nt(message),
         syncHover: (message) => _t(message),
-        cancelUnavailableSiteInteraction: () => { Te.cancel() && (xe.current = !0); pe(!1); },
+        cancelUnavailableSiteInteraction: () => unavailableSiteInteractionController.cancel(),
         clearModifierOnModeChange: () => { ve.current = !1; },
         clearPreparedScreenshot: () => ft(),
         disposeCommentInteraction: () => commentInteractionDisposalController.dispose(),
@@ -24338,6 +24348,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => hoverSyncController.dispose(), [hoverSyncController]),
     (0, G.useEffect)(() => () => pointerModeSyncController.dispose(), [pointerModeSyncController]),
     (0, G.useEffect)(() => () => preparedScreenshotController.dispose(), [preparedScreenshotController]),
+    (0, G.useEffect)(() => () => unavailableSiteInteractionController.dispose(), [unavailableSiteInteractionController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {

@@ -1451,6 +1451,13 @@ transient、generation 与 drag 清理顺序已迁移至
 setter，host clear-preview IPC（`ft`）仍保持独立语义。focused test 覆盖保留、过期清理、主动清理与
 dispose gate。
 
+### 增量抽取：annotation unavailable-site interaction controller
+
+`Wy` host sync 的 `cancelUnavailableSiteInteraction` 分支已迁移至
+`src/main/browser-page-preload/annotation-unavailable-site-interaction-controller.ts`；controller 保留
+`Te.cancel()` 条件性标记 viewport selection、随后关闭 pointer mode 的顺序，并由入口注入 interaction
+registry/ref/state owner。focused test 覆盖 cancel 返回 true/false、顺序与 dispose gate。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover
@@ -1465,3 +1472,10 @@ refs/setters 与 `H_` restore adapter，保持 host restore message 的原始副
 继续注入 BrowserWindow 与 zoom/overlay 计算，保持原始窗口生命周期顺序。由
 `scripts/test-main-window-titlebar-overlay-sync.mjs` 覆盖 gate、initial update、theme update、destroyed window
 与 cleanup。
+
+### 增量抽取：main display-change geometry refresh
+
+`Qot.installDisplayChangeGeometryRefresh` 的 macOS display-added/removed/metrics-changed 订阅集合与 cleanup
+已迁移至 `src/main/main-app/startup/display-change-geometry-refresh.ts`；window manager 继续注入现有窗口几何
+刷新业务回调。由 `scripts/test-main-display-change-geometry-refresh.mjs` 覆盖三类事件、刷新转发、非 macOS gate
+与注销顺序。

@@ -2908,3 +2908,14 @@ React/ref/DOM 清理 owner。由 `scripts/test-preload-annotation-comment-intera
 入口继续注入 React state setter，host clear-preview IPC（`ft`）保持独立。由
 `scripts/test-preload-annotation-prepared-screenshot-controller.mjs` 覆盖保留、过期清理、主动清理与
 dispose gate。
+
+2026-10-11 A3 main 增量：`Qot.installDisplayChangeGeometryRefresh` 的 macOS display-added/removed/
+display-metrics-changed 订阅集合与 cleanup 已物理迁移至
+`src/main/main-app/startup/display-change-geometry-refresh.ts`；`Qot` 继续注入现有窗口几何刷新回调，保持
+display 事件与窗口关闭时的注销顺序。由 `scripts/test-main-display-change-geometry-refresh.mjs` 覆盖 5 项
+focused assertions。
+2026-10-11 A2 preload 增量：`Wy` host sync 的 `cancelUnavailableSiteInteraction` 分支已物理迁移至
+`src/main/browser-page-preload/annotation-unavailable-site-interaction-controller.ts`；controller 保留
+`Te.cancel()` 条件性标记 viewport selection、随后关闭 pointer mode 的顺序，入口继续注入 interaction
+registry/ref/state owner。由 `scripts/test-preload-annotation-unavailable-site-interaction-controller.mjs`
+覆盖 true/false cancel、顺序与 dispose gate。
