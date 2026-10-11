@@ -1400,3 +1400,10 @@ null cleanup、重复 dispose 与 disposed update gate。
 `src/main/browser-page-preload/annotation-editor-close-controller.ts`；入口继续注入 `flushSync`、React
 setters、DOM interaction registry 与 IPC-adjacent cleanup。focused test 覆盖 callback 顺序、flush 边界与
 target mismatch 保留 editor state。
+
+### 增量抽取：annotation suspension notifier
+
+`Wy` 的 annotation suspension host-IPC 去重与 comment-mode guard（原 `bt` effect event）已迁移至
+`src/main/browser-page-preload/annotation-suspension-notifier.ts`；入口继续注入 host bridge sender，并保留
+keyboard event handler 对 `ve.current` 的同步语义。focused test 覆盖 browse/comment guard、重复值、reset
+与 dispose。

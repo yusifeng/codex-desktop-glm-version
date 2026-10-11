@@ -2753,6 +2753,11 @@ target-matched editor reset 已迁移至 `src/main/browser-page-preload/annotati
 入口继续注入 `flushSync`、React setters、DOM interaction registry 与 IPC-adjacent cleanup，新增
 `scripts/test-preload-annotation-editor-close-controller.mjs` 的 16 项 focused assertions，typecheck/build/
 verify-chunks 通过。
+2026-10-11 A2 preload 增量：`Wy` annotation suspension host-IPC 去重与 comment-mode guard（原 `bt`
+effect event）已迁移至 `src/main/browser-page-preload/annotation-suspension-notifier.ts`；入口继续注入 host
+bridge sender，并保留 keyboard handler 对 `ve.current` 的同步语义，新增
+`scripts/test-preload-annotation-suspension-notifier.mjs` 的 8 项 focused assertions，typecheck/build/
+verify-chunks 通过。selection modifier state effect 仍与 pointer/keyboard handler closure 绑定。
 2026-10-11 A2 preload 增量：`Wy` host close-editor 分支的 interaction/ref/state cleanup 顺序与
 target-matched editor reset 已迁移至 `src/main/browser-page-preload/annotation-editor-close-controller.ts`；
 入口继续注入 `flushSync`、React setters、DOM interaction registry 与 IPC-adjacent cleanup，新增

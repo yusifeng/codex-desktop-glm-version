@@ -5978,6 +5978,7 @@ var { dispatchAnnotationWyHostMessage } = require("./browser-page-preload/annota
 var { createAnnotationScreenshotReadyController } = require("./browser-page-preload/annotation-screenshot-ready-controller");
 var { createAnnotationTextHighlightController } = require("./browser-page-preload/annotation-text-highlight-controller");
 var { closeAnnotationEditor } = require("./browser-page-preload/annotation-editor-close-controller");
+var { createAnnotationSuspensionNotifier } = require("./browser-page-preload/annotation-suspension-notifier");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23702,6 +23703,11 @@ function Wy({ rootHost: e, bridge: t }) {
     [textHighlightController] = (0, G.useState)(() =>
       createAnnotationTextHighlightController({ apply: (anchor) => pu(anchor) }),
     ),
+    [suspensionNotifier] = (0, G.useState)(() =>
+      createAnnotationSuspensionNotifier({
+        send: (suspended) => t.sendMessageToHost({ type: `browser-sidebar-runtime-annotation-suspension`, suspended }),
+      }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -24311,13 +24317,7 @@ function Wy({ rootHost: e, bridge: t }) {
       e != null && ht(e);
     }, [Ee, y]));
   let bt = (0, G.useEffectEvent)((e) => {
-      k !== `comment` ||
-        (De === e && ve.current === e) ||
-        ((ve.current = e),
-        t.sendMessageToHost({
-          type: `browser-sidebar-runtime-annotation-suspension`,
-          suspended: e,
-        }));
+      if (suspensionNotifier.update(k, e)) ve.current = e;
     }),
     xt = (0, G.useEffectEvent)((e) => {
       e.isTrusted && e.code === `Space` && e.type === `keydown` && !e.repeat && (ye.current = !1);
@@ -25051,6 +25051,7 @@ function Wy({ rootHost: e, bridge: t }) {
     return () => textHighlightController.update(null);
   }, [Yt, textHighlightController]);
   (0, G.useEffect)(() => () => textHighlightController.dispose(), [textHighlightController]);
+  (0, G.useEffect)(() => () => suspensionNotifier.dispose(), [suspensionNotifier]);
   let Jt = textPreviewState.anchor,
     Xt = textPreviewState.selectionRects,
     Zt = Xt,
