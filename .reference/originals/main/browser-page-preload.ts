@@ -5969,6 +5969,7 @@ var { projectAnnotationOverlayStyle } = require("./browser-page-preload/annotati
 var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/annotation-draft-marker-state");
 var { projectAnnotationRenderState } = require("./browser-page-preload/annotation-render-state-projection");
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
+var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25096,72 +25097,36 @@ function Wy({ rootHost: e, bridge: t }) {
   let Jt = textPreviewState.anchor,
     Xt = textPreviewState.selectionRects,
     Zt = Xt,
-    Qt = null,
-    $t = !1,
-    en = `hover-box`,
-    tn,
-    nn = [];
-  if (Ot && M?.annotation.anchor.kind === `element`) {
-    let e = Ut == null ? null : nd(Ut),
-      t = e?.rect ?? dd(M.annotation.anchor);
-    ((tn = e?.borderRadius),
-      (en = m_(M.annotation.anchor, t, se.width, se.height)),
-      (Qt = c_(M.annotation.anchor, t, Ut)),
-      ($t = M.kind === `comment` && rd(M.annotation.anchor)),
-      (nn = J_(Wt, se, {
-        clipToVisibleArea: !0,
-        selectionIndexOffset: 1,
-        viewportSize: M.annotation.viewportSize,
-      })));
-  } else if (Ot && M?.kind === `comment` && M.annotation.anchor.kind === `region`) {
-    let e = dd(M.annotation.anchor);
-    ((en = S_(M.annotation.anchor, e, se.width, se.height)),
-      (Qt = c_(M.annotation.anchor, e)),
-      (nn = J_(Wt, se, {
-        clipToVisibleArea: !0,
-        selectionIndexOffset: 1,
-        viewportSize: M.annotation.viewportSize,
-      })));
-  } else if (!Ot) {
-    if (((Qt = ae?.rect ?? null), Qt != null)) {
-      if (
-        ((en = S_(null, Qt, se.width, se.height)),
-        x?.target.mode === `create` && x.anchor.type !== `text`)
-      ) {
-        let e = G_(x.anchor);
-        nn = J_([e.primary, ...e.additional], se, {
-          clipToVisibleArea: !0,
-          viewportSize: x.anchor.viewportSize,
-        });
-      }
-    } else if (x?.anchor.type === `element`) {
-      let e = U_(x.anchor),
-        t = x.anchor.element == null ? null : nd(x.anchor.element),
-        n = t?.rect ?? dd(e);
-      ((tn = t?.borderRadius),
-        (en = x.target.mode === `design` ? `hover-box` : m_(e, n, se.width, se.height)),
-        (Qt = x.target.mode === `design` ? n : c_(e, n, x.anchor.element)),
-        ($t = x.target.mode !== `design` && rd(e)),
-        (nn = J_(x.anchor.additionalSelections, se, {
-          clipToVisibleArea: x.target.mode !== `design`,
-          selectionIndexOffset: 1,
-          viewportSize: x.anchor.viewportSize,
-        })));
-    } else if (x?.anchor.type === `region` && x.target.mode !== `design`) {
-      let e = dd(x.anchor.value);
-      ((en = S_(x.anchor.value, e, se.width, se.height)),
-        (Qt = c_(x.anchor.value, e)),
-        (nn = J_(x.anchor.additionalSelections, se, {
-          clipToVisibleArea: !0,
-          selectionIndexOffset: 1,
-          viewportSize: x.anchor.viewportSize,
-        })));
-    } else
-      x?.anchor.type === `virtual` || ee != null
-        ? (Qt = ee?.rect ?? null)
-        : a != null &&
-          ((Qt = a.rect), (tn = a.borderRadius), (en = m_(null, Qt, se.width, se.height)));
-  }
+    highlightState = projectAnnotationHighlightState(
+      {
+        hasActiveSelection: Ot,
+        active: M,
+        activeElement: Ut,
+        activeAdditionalAnchors: Wt,
+        editor: x,
+        activeHighlightRect: ae,
+        hoveredSnapshot: a,
+        metadataSnapshot: ee,
+        viewport: se,
+        viewportSize: se,
+      },
+      {
+        readLiveElementRect: (element) => nd(element),
+        readAnchorRect: (anchor) => dd(anchor),
+        styleElementHighlight: (anchor, rect, width, height) => m_(anchor, rect, width, height),
+        styleRegionHighlight: (anchor, rect, width, height) => S_(anchor, rect, width, height),
+        clipHighlightRect: (anchor, rect, element) => c_(anchor, rect, element),
+        projectAdditionalHighlights: (selections, viewport, options) => J_(selections, viewport, options),
+        resolveEditorAnchor: (anchor) => U_(anchor),
+        splitEditorAnchor: (anchor) => G_(anchor),
+        isPageAnnotation: (anchor) => rd(anchor),
+      },
+    ),
+    Qt = highlightState.highlightRect,
+    $t = highlightState.isRemoveHover,
+    en = highlightState.highlightClassName,
+    tn = highlightState.highlightBorderRadius,
+    nn = highlightState.additionalHighlights;
   let screenshotPayload = projectAnnotationScreenshotPayload(
       {
         active: M,

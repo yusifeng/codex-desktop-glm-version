@@ -1330,3 +1330,10 @@ React annotation runtime 的 active primary/additional anchor payload 与 screen
 `Ut/Wt/Gt`）已迁移至 `src/main/browser-page-preload/annotation-active-geometry-projection.ts`；入口继续
 注入 live element/frame resolver 与 page predicate，保留 DOM geometry、React render 与 screenshot effect
 生命周期。focused test 覆盖 comment/design/text 分支、缺失 primary、additional live element 与 original page。
+
+### 增量抽取：annotation highlight state projection
+
+React annotation runtime 的 active/editor/hover highlight 分支与 linked additional highlights（原 `Wy` 内
+`Qt/nn/$t/en/tn`）已迁移至 `src/main/browser-page-preload/annotation-highlight-state-projection.ts`；模块
+只组合注入的 `nd/dd/c_/J_` geometry adapters，入口继续持有 DOM 读取与 React render 生命周期。focused test
+覆盖 active element/region、create element、hover snapshot、virtual/metadata fallback 与 remove-hover gate。
