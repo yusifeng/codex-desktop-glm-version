@@ -1691,3 +1691,9 @@ manager attribution、telemetry helper 与 event emitter。focused test 覆盖�
 `src/main/worker/git-request-finalization-controller.ts`；controller 保留 untracked/read-cache invalidation、mutation
 cache refresh、repository/live-query refresh 与 `requestLifecycle.finish` 顺序，consumer 继续注入 manager
 request/host/cache owners。focused test 覆盖 exact invalidation、mutation refresh、repository refresh 与 finish。
+### 增量抽取：Git request completion controller
+
+`GitManager.handleRequestWithContext` 的 post-finalization cancellation/failure/response completion 已迁移至
+`src/main/worker/git-request-completion-controller.ts`；controller 保留 cancellation telemetry、failure outcome、
+response envelope、performance emission 与 worker-response emit 顺序。focused test 覆盖正常 response 与 tracked
+abort completion。

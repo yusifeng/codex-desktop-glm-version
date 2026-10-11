@@ -3068,3 +3068,7 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 
 - `GitManager.handleRequestWithContext` 的 request finally cleanup 已迁移至 `src/main/worker/git-request-finalization-controller.ts`，保留 untracked/read-cache invalidation、mutation cache refresh、repository/live-query refresh 与 `requestLifecycle.finish` 顺序。
 - exact invalidation 异常时跳过后续 finish 的原始语义保持不变；focused test、typecheck、build、chunk/shared audit 均通过。
+# 本轮新增：git-request-completion-controller
+
+- `GitManager.handleRequestWithContext` 的 post-finalization cancellation/failure/response completion 已迁移至 `src/main/worker/git-request-completion-controller.ts`，保留 cancellation telemetry、failure outcome、response envelope、performance emission 与 worker-response emit 顺序。
+- focused test、typecheck、build、chunk/shared audit 均通过。
