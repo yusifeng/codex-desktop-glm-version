@@ -67520,12 +67520,13 @@ var {
     throwStableMetadataReadError(e, t, n, r) {
       let i = l4(n),
         a = n instanceof I1;
+      let hasCachedRoot = i && r === this.stableMetadataGeneration && this.getCachedStableRoot(e, t) !== void 0;
       let o = classifyStableMetadataFailure({
         isPermissionError: Xhe(n),
         isProcessTimeout: i,
         isGitUnavailable: a,
         generationMatches: r === this.stableMetadataGeneration,
-        hasCachedRoot: i && r === this.stableMetadataGeneration && this.getCachedStableRoot(e, t) !== void 0,
+        hasCachedRoot,
       });
       if (!o.accepted) throw n;
       let s = n instanceof Error ? n : Error(String(n));
