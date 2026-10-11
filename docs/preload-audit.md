@@ -1612,3 +1612,9 @@ host/session/logger owner。focused test 覆盖正常双 watcher、metadata 缺�
 `GitInitWatcher.startWatch` 的 host watch 创建、disposed race、session 注册、closed error/reconnect 生命周期已迁移至
 `src/main/worker/git-init-watch-session-controller.ts`；consumer 保留原始 watch options、logger、session set 与
 reconnect owner。focused test 覆盖正常注册、watch-error 清理/reconnect 与 disposed race。
+### 增量抽取：Git metadata refresh batch controller
+
+`GitRepoWatcher.processMetadataRefreshBatch` 的 metadata 目标筛选、recovery dispose/restart、missing target
+补启动与 worktree topology refresh 已迁移至 `src/main/worker/git-metadata-refresh-batch-controller.ts`；consumer
+保留原始两段 `Promise.all` 顺序与 watcher owner 注入。focused test 覆盖 recovery restart、retry target 跳过与
+disposed gate。
