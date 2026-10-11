@@ -232,6 +232,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-mcp-sandbox-guest-policy.mjs`](./test-main-mcp-sandbox-guest-policy.mjs)
 - [`test-preload-annotation-ui-mode-policy.mjs`](./test-preload-annotation-ui-mode-policy.mjs)
 - [`test-worker-git-ignore-source-watch.mjs`](./test-worker-git-ignore-source-watch.mjs)
+- [`test-worker-git-ignore-source-targets.mjs`](./test-worker-git-ignore-source-targets.mjs)
 - [`test-worker-git-init-watcher-path-policy.mjs`](./test-worker-git-init-watcher-path-policy.mjs)
 - [`test-preload-annotation-design-styles.mjs`](./test-preload-annotation-design-styles.mjs)
 - [`test-app-initial-canonical-history.mjs`](./test-app-initial-canonical-history.mjs)

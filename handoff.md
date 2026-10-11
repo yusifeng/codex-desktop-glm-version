@@ -2,6 +2,8 @@
 
 本轮将已有的 `git-file-content.ts` 真正接回 worker `fCe` 的 `readGitFileBinary` consumer，删除原 worker 内无 consumer 的 `dCe` 实现；保留 repository lookup、platform path、Git 执行、MIME 检测与异常降级顺序。focused test 为 `scripts/test-worker-git-file-content.mjs`（4 项），typecheck/build/verify-chunks 通过。
 
+本轮继续将 Linux ignore-source watcher 的绝对路径/目录遍历、symlink 跟随、ELOOP 防护和缺失路径降级迁移至 `git-ignore-source-targets.ts`，真实接回 `watchIgnoreSources.getWatchTargets`，删除原 worker `mCe` 实现。focused test 为 `scripts/test-worker-git-ignore-source-targets.mjs`（5 项）。
+
 本轮新增 `dynamic-app-tool-pending-responses.ts`，真实接回 `HostRequestRouter` 的动态 app-tool response registry；保留 duplicate identity、success/error/invalid route、cancel/discard 与 dispose rejection，focused test 为 `scripts/test-dynamic-app-tool-pending-responses.mjs`。
 
 本轮新增 `parcel-watcher-runtime.ts`，真实接回 worker Parcel watcher 的 root/supplemental subscription、directory-check queue、串行 subscription operation、close/closed deferred 与 error/root-deleted lifecycle；focused test 为 `scripts/test-worker-parcel-watcher-runtime.mjs`。

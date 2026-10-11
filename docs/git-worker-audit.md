@@ -1647,6 +1647,10 @@ GitHub PR body 中 user-attachment URL 的 asset-id cache 已迁移至
 Linux desktop-entry discovery 的 `W7/CTe`（`G7` 唯一 consumer）以及 JetBrains Toolbox discovery 的
 `y9/OEe`（`AEe` consumer）本轮保留：cache key/TTL 或 memoization 绑定 XDG/platform 环境、同步
 filesystem scan 与 parse owner，单独抽 registry 会复制 invalidation 状态，未形成安全独立边界。
+Linux ignore-source watcher 的绝对路径/目录遍历、symlink 跟随、ELOOP 防护和缺失路径降级已迁移至
+`src/main/worker/git-ignore-source-targets.ts`，并真实接回 `watchIgnoreSources.getWatchTargets`；原
+`mCe` 实现已删除，filesystem/path API 通过窄依赖注入。`scripts/test-worker-git-ignore-source-targets.mjs`
+覆盖普通路径、重复输入、symlink 跟随和相对路径拒绝，共 5 项断言。
 ### A1 最终复核：metadata refresh generation/waiter
 
 `GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、

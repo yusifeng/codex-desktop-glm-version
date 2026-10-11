@@ -7,6 +7,7 @@ let t = require("node:worker_threads"),
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { readGitFileContent } = require("./worker/git-file-content");
+const { getIgnoreSourceWatchTargets } = require("./worker/git-ignore-source-targets");
 const { resolveAutomationWritableRoots } = require("./worker/git-automation-writable-roots");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenameDiff } = require("./worker/git-diff-text");
@@ -74524,52 +74525,6 @@ function fCe({
     startWorkingTreeWatch: a,
   });
 }
-var pCe = 40;
-async function mCe(e) {
-  let t = new Map();
-  return (
-    await Promise.all(
-      [...new Set(e)].map(async (e) => {
-        if (!g.default.isAbsolute(e)) throw TypeError(`Ignore-source watch paths must be absolute`);
-        let n = g.default.parse(e).root,
-          r = e.slice(n.length).split(g.default.sep),
-          i = new Set(),
-          a = 0;
-        for (; r.length > 0;) {
-          let e = r.shift();
-          if (e == null || e === `` || e === `.`) continue;
-          if (e === `..`) {
-            n = g.default.dirname(n);
-            continue;
-          }
-          let o = g.default.join(n, e),
-            s = t.get(n);
-          (s ?? ((s = new Set()), t.set(n, s)), s.add(o));
-          try {
-            let e = await (0, D.lstat)(o);
-            if (e.isSymbolicLink()) {
-              let e = `${o}\0${r.join(g.default.sep)}`;
-              if (((a += 1), i.has(e) || a > pCe))
-                throw Object.assign(
-                  Error(`Cannot follow cyclic or excessive ignore-source symlinks`),
-                  { code: `ELOOP` },
-                );
-              i.add(e);
-              let t = await (0, D.readlink)(o),
-                s = g.default.parse(t).root;
-              (s !== `` && (n = s), r.unshift(...t.slice(s.length).split(g.default.sep)));
-            } else if (e.isDirectory()) n = o;
-            else return;
-          } catch (e) {
-            if (sB(e)) return;
-            throw e;
-          }
-        }
-      }),
-    ),
-    t
-  );
-}
 K({ error: K({ type: H().nullish(), code: H().nullish(), message: H().nullish() }) });
 var hCe = () => {
   let e = process.cwd(),
@@ -81001,7 +80956,12 @@ function mDe(e, t, n) {
                     if (n == null) throw Error(`Git hosts require a main RPC connection`);
                     return n.getLocalGitIgnoreEnvironment();
                   },
-                  getWatchTargets: mCe,
+                  getWatchTargets: (paths) => getIgnoreSourceWatchTargets(paths, {
+                    pathApi: g.default,
+                    lstat: D.lstat,
+                    readlink: D.readlink,
+                    isMissingPathError: sB,
+                  }),
                 }
               : void 0,
           createExecutionHost: (e) => {
