@@ -1667,3 +1667,9 @@ path filtering/full invalidation、Git cache invalidation、live-query fanout、
 `GitManager.deleteWorktreeWithLimit` 的 worktree identity、snapshot/delete operation、成功/失败日志与错误传播已迁移至
 `src/main/worker/git-worktree-delete-lifecycle-controller.ts`；consumer 继续注入 snapshot/delete implementation
 与 manager host owner。focused test 覆盖成功返回 identity 与失败日志/传播。
+### 增量抽取：Git live-query attribution controller
+
+`GitManager.runLiveQueryWithAttribution` 的 outer trace、request attribution、首结果计时、结果映射、异常
+disposition、performance finally 与 attribution cleanup 已迁移至
+`src/main/worker/git-live-query-attribution-controller.ts`；consumer 继续注入 live-query、request context 与
+performance owner。focused test 覆盖 operation 结果、首结果计时和 finally cleanup。

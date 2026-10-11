@@ -3053,3 +3053,7 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 
 - `GitManager.deleteWorktreeWithLimit` 的 worktree identity、snapshot/delete operation、成功/失败日志与错误传播已迁移至 `src/main/worker/git-worktree-delete-lifecycle-controller.ts`。
 - consumer 继续注入 snapshot/delete implementation 与 manager host owner；focused test、typecheck、build、chunk/shared audit 均通过。
+# 本轮新增：git-live-query-attribution-controller
+
+- `GitManager.runLiveQueryWithAttribution` 的 outer trace、request attribution、首结果计时、结果映射、异常 disposition、performance finally 与 attribution cleanup 已迁移至 `src/main/worker/git-live-query-attribution-controller.ts`。
+- active 路径已移除旧的 `runLiveQueryWithAttributionLegacy` 死代码；focused test、typecheck、build、chunk/shared audit 均通过。
