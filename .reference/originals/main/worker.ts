@@ -191,6 +191,7 @@ const { createGitWatchSessionCloseController } = require("./worker/git-watch-ses
 const { createGitMetadataRefreshController } = require("./worker/git-metadata-refresh-controller");
 const { createGitWorktreeWatchRefreshController } = require("./worker/git-worktree-watch-refresh-controller");
 const { disposeGitRepoWatcher } = require("./worker/git-repo-watcher-dispose-controller");
+const { disposeGitWatchSession } = require("./worker/git-watch-session-dispose-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -69314,28 +69315,14 @@ var Jye = 1e3,
         : e.join(this.options.root, ...n.slice(0, r));
     }
     disposeSession(e) {
-      let t = e.session,
-        n = e.sessionStartPromise,
-        r = e.sessionDisposePromise;
-      ((e.generation += 1),
-        this.watchRetryController.cancel(e),
-        (e.session = null),
-        (e.sessionStartPromise = null));
-      let i = Promise.all([
-        n,
-        r,
-        t?.dispose().catch((e) => {
-          this.logger.warning(`Failed to dispose git repo watcher`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        }),
-      ])
-        .then(() => {})
-        .finally(() => {
-          e.sessionDisposePromise === i && (e.sessionDisposePromise = null);
-        });
-      return ((e.sessionDisposePromise = i), this.disposed || this.updateRequiresRecovery(), i);
+      return disposeGitWatchSession({
+        target: e,
+        cancelRetry: (target) => this.watchRetryController.cancel(target),
+        disposeSession: (session) => session.dispose(),
+        onDisposeError: (error) => this.logger.warning(`Failed to dispose git repo watcher`, { safe: {}, sensitive: { error } }),
+        updateRecovery: () => this.updateRequiresRecovery(),
+        isDisposed: () => this.disposed,
+      });
     }
   };
 function M6(e, t, n) {
