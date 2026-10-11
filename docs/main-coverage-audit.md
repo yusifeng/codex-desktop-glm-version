@@ -575,6 +575,14 @@ dictation 与 appshot native manager 的组装入口。上述边界均为资源�
 connection pending 状态；`dat` 的 dictation force-lock 依赖 global state/native pet webContents；
 `Pit` 的 appshot hotkey assembly 依赖 Windows/native bridge、settings、window manager 与 query
 invalidation。上述 manager options 不能脱离 owner 而不改变生命周期/副作用顺序，本轮不制造 facade。
+### 增量抽取：preload connect-app-host MessagePort 生命周期
+
+`preload/index.ts` 的 `connect-app-host` message listener 已迁移至
+`src/main/preload/connect-app-host-controller.ts`，真实接回 source/type guard、
+`ipcRenderer.postMessage` 的 MessagePort ownership transfer 与幂等 listener cleanup。
+focused test 为 `scripts/test-connect-app-host-controller.mjs`，运行命令为
+`node --experimental-strip-types scripts/test-connect-app-host-controller.mjs`。
+
 ### 增量抽取：Windows 窗口透明度 workaround 判定
 
 启动编排 `Be2` 的首次显示分支中，`isWindows && !window.isVisible() &&

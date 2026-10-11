@@ -23,6 +23,7 @@ import { initSharedObjectSnapshot, setSharedObjectValue } from "./shared-object-
 import { registerPipVideoFrameHandler, disposeDecodersForRemovedPresentations } from "./pip-video-decoder";
 import { createSystemThemeVariantController } from "./system-theme-variant-controller";
 import { createViewMessageRouterController } from "./view-message-router-controller";
+import { createConnectAppHostController } from "./connect-app-host-controller";
 import {
   createElectronBridge,
   WINDOW_TYPE,
@@ -81,8 +82,10 @@ contextBridge.exposeInMainWorld("codexWindowType", WINDOW_TYPE);
 contextBridge.exposeInMainWorld("electronBridge", electronBridge);
 
 // 页面请求连接 app host：把 port 所有权转交主进程。
-window.addEventListener("message", (event: MessageEvent) => {
-  if (event.source !== window || event.data?.type !== "connect-app-host") return;
-  const { port } = event.data as { port: MessagePort };
-  ipcRenderer.postMessage(CONNECT_APP_HOST, void 0, [port]);
+createConnectAppHostController({
+  addMessageListener: (listener) => window.addEventListener("message", listener as EventListener),
+  removeMessageListener: (listener) => window.removeEventListener("message", listener as EventListener),
+  postMessage: (channel, message, transfer) => ipcRenderer.postMessage(channel, message, transfer),
+  channel: CONNECT_APP_HOST,
+  windowSource: window,
 });

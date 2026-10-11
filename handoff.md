@@ -13,6 +13,8 @@
 
 A3 main 新增 `turn-start-inflight-registry.ts`，真实接回 `createExecuteTurnStart` 的 per-conversation promise dedup/settle cleanup；focused test 为 `scripts/test-main-turn-start-inflight-registry.mjs`。
 
+本轮新增 `connect-app-host-controller.ts`，真实接回 preload `connect-app-host` MessagePort transfer listener；controller 管理 source/type guard、IPC transfer 与幂等 dispose，focused test 为 `scripts/test-connect-app-host-controller.mjs`（运行：`node --experimental-strip-types scripts/test-connect-app-host-controller.mjs`）。
+
 本轮新增 `annotation-edit-editor-controller.ts`，真实接回 Wy 的 `Ye` edit-editor callback。controller 注入 target map、comment/anchor/design projection 与 host/React side effects，保持 `close preview -> open editor IPC -> viewport refresh -> editor state -> clear preview` 顺序；focused test 为 `scripts/test-preload-annotation-edit-editor-controller.mjs`。
 
 同轮新增 `annotation-comment-preview-controller.ts`，真实接回 Wy 的 `Xe` comment-preview callback；focused test 为 `scripts/test-preload-annotation-comment-preview-controller.mjs`。
