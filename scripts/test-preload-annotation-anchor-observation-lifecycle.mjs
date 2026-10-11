@@ -10,6 +10,7 @@ const viewport = {
 };
 let frameDisposed = 0;
 let textDisposed = 0;
+let rootDisposed = 0;
 let refreshes = 0;
 const lifecycle = createAnnotationAnchorObservationLifecycle({
   visualViewport: viewport,
@@ -24,14 +25,14 @@ const lifecycle = createAnnotationAnchorObservationLifecycle({
     return () => { events.push("text:remove"); textDisposed += 1; };
   },
   anchors: [{ id: "anchor" }],
+  installRootResources: () => {
+    events.push("root:add");
+    return () => { events.push("root:remove"); rootDisposed += 1; };
+  },
   installFrameResources: () => () => events.push("frame-resources:remove"),
   onViewportResize: () => events.push("resize"),
   onViewportScroll: () => events.push("scroll"),
   onTextAnchorChange: () => { refreshes += 1; },
-  installRootResources: () => {
-    events.push("root:add");
-    return () => events.push("root:remove");
-  },
 });
 lifecycle.install();
 assert.equal(refreshes, 2);
@@ -40,6 +41,7 @@ lifecycle.dispose();
 lifecycle.dispose();
 assert.equal(frameDisposed, 1);
 assert.equal(textDisposed, 1);
+assert.equal(rootDisposed, 1);
 assert.ok(events.includes("frame-resources:remove"));
 assert.ok(events.includes("root:remove"));
 assert.equal(refreshes, 2);
