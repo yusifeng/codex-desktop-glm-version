@@ -285,6 +285,10 @@ main chunk 的 `ST` flavor 到 icon base-name 映射已迁移至
 副作用；`scripts/test-main-icon-flavor-policy.mjs` 覆盖 Agent/Nightly/Alpha/Beta/Dev 与未知
 flavor 共 6 项断言。
 
+同一 startup icon policy 还接管了原 `CT` 的 flavor-specific dark/light Codex asset filename
+后缀，metadata 与 window-services consumers 已改用 `resolveFlavorIconAssetNames`；路径读取与
+nativeImage 仍留在原 owner。上述 focused suite 现覆盖 9 项 base-name/asset-name 断言。
+
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至

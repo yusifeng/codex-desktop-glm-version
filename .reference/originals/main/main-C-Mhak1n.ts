@@ -25,7 +25,7 @@ const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-p
 const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
-const { resolveFlavorIconBaseName } = require("./main-app/startup/icon-flavor-policy.js");
+const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName } = require("./main-app/startup/icon-flavor-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
@@ -63160,25 +63160,7 @@ var aEe = class extends n.Uf {
   }
 };
 const iconBaseName = (e) => resolveFlavorIconBaseName(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
-function CT(e) {
-  let t;
-  switch (e) {
-    case a.in.Dev:
-    case a.in.Prod:
-    case a.in.Agent:
-      t = ``;
-      break;
-    case a.in.Nightly:
-      t = `-nightly`;
-      break;
-    case a.in.InternalAlpha:
-      t = `-alpha`;
-      break;
-    case a.in.PublicBeta:
-      t = `-beta`;
-  }
-  return { dark: `icon-codex-dark-color${t}.png`, light: `icon-codex-light${t}.png` };
-}
+const iconAssetNames = (e) => resolveFlavorIconAssetNames(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 function wT(e, t = (0, h.join)(l.app.getAppPath(), `src`, `icons`)) {
   let n = `${iconBaseName(e)}.png`;
   if (l.app.isPackaged) {
@@ -63221,7 +63203,7 @@ var oEe = class extends n.Uf {
 };
 function sEe(e) {
   if (process.platform !== `darwin`) return null;
-  let t = CT(e),
+  let t = iconAssetNames(e),
     n = ET(`${iconBaseName(e)}.png`),
     r = ET(t.dark),
     i = ET(t.light);
@@ -173757,7 +173739,7 @@ function dst({
         l.nativeTheme.off(`updated`, e);
       }));
   }
-  let P = CT(r),
+  let P = iconAssetNames(r),
     F = y ? process.env.CODEX_ELECTRON_DEV_DOCK_ICONS_PATH : void 0,
     I = () => (l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI ? P.dark : P.light),
     L = (e) => {

@@ -16,4 +16,16 @@ export function resolveFlavorIconBaseName(flavor: string, policy: IconFlavorPoli
   return undefined;
 }
 
-if (typeof module !== `undefined`) module.exports = { resolveFlavorIconBaseName };
+export function resolveFlavorIconAssetNames(flavor: string, policy: IconFlavorPolicy) {
+  let suffix: string | undefined;
+  if (flavor === policy.dev || flavor === policy.prod || flavor === policy.agent) suffix = ``;
+  else if (flavor === policy.nightly) suffix = `-nightly`;
+  else if (flavor === policy.internalAlpha) suffix = `-alpha`;
+  else if (flavor === policy.publicBeta) suffix = `-beta`;
+  return {
+    dark: `icon-codex-dark-color${suffix}.png`,
+    light: `icon-codex-light${suffix}.png`,
+  };
+}
+
+if (typeof module !== `undefined`) module.exports = { resolveFlavorIconAssetNames, resolveFlavorIconBaseName };
