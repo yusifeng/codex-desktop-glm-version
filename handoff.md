@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮新增 `dynamic-app-tool-pending-responses.ts`，真实接回 `HostRequestRouter` 的动态 app-tool response registry；保留 duplicate identity、success/error/invalid route、cancel/discard 与 dispose rejection，focused test 为 `scripts/test-dynamic-app-tool-pending-responses.mjs`。
+
+本轮新增 `parcel-watcher-runtime.ts`，真实接回 worker Parcel watcher 的 root/supplemental subscription、directory-check queue、串行 subscription operation、close/closed deferred 与 error/root-deleted lifecycle；focused test 为 `scripts/test-worker-parcel-watcher-runtime.mjs`。
+
 本轮新增 `app-server-request-lifecycle-controller.ts`，真实接回 `AppServerRequestSender.send` 的 prewarm/normal dispatch、timeout abandon、failure notification 与 cleanup lifecycle；focused test 为 `scripts/test-app-server-request-lifecycle-controller.mjs`。
 
 本轮新增 `thread-goal-hydration-registry.ts`，真实接回 `AppServerConversationManager` 的 per-conversation goal hydration generation、stale-token gate、archive cancel 与 dispose clear；focused test 为 `scripts/test-thread-goal-hydration-registry.mjs`。
@@ -1695,7 +1699,7 @@ annotation display anchor resolution（原 `Q_` 22881-22905）已迁移至
 | A2 | `.reference/originals/main/browser-page-preload.ts` | **29,270 行** | 整体 PRESERVED，已完成逐段审计并抽取 WebMCP 与多段 annotation runtime | React render/hook assembly 等业务区段仍待迁移 |
 | A3 | main chunk 未消费区域 | 原版 177K 行 vs 语义 133K | 已完成全量覆盖审计 | 仍需继续物理迁移 business-preserved 区段 |
 | A4 | shared 导出全量分类 | **692 个** | 已完成全量分类 | `docs/shared-full-classification.md` 为每个导出登记 semantic 或 preserved vendor/generated/legacy 归属；`audit-shared-consumption` 当前 `TOTAL: 0` |
-| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁（现已纳入 `$` 生成别名） | 当前 manifest 报告 10874 个 unreviewed 导出；已迁移的纯策略逐批减少，剩余未消费业务逻辑仍待物理迁出 |
+| A5 | renderer 三大 hub 内部 | app-shared 4.8MB / app-initial 14.3MB / app-primary 3.1MB | 已完成构成审计、消费契约审计与 manifest 门禁（现已纳入 `$` 生成别名） | 当前 `audit-renderer-hub-classification.mjs --strict` 为 0 unreviewed；未消费导出均已逐项分类，剩余语义化仍需按 owner 物理迁移 |
 
 ### B. 工程可读性缺口（5 处）
 
@@ -3105,3 +3109,16 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
   与 disposer 顺序。
 - `scripts/test-main-native-context-menu.mjs` 覆盖非图片旁路、file URL reveal、copy/save callback、跨 frame
   save gate 与幂等 cleanup，共 10 项 focused assertions；build、verify、typecheck、diff-check 均通过。
+
+# 本轮新增：dynamic-app-tool-pending-responses registry
+
+- `HostRequestRouter` 的动态 app-tool pending response identity、success/error/invalid route、cancel/discard
+  与 dispose rejection 已迁移至 `src/main/main-app/app-server/dynamic-app-tool-pending-responses.ts`。
+- `scripts/test-dynamic-app-tool-pending-responses.mjs` 覆盖 7 项 duplicate identity、路由与清理断言；build、verify、shared audit、diff-check 均通过。
+
+# 本轮新增：parcel-watcher-runtime
+
+- worker Parcel watcher 的 root/supplemental subscription、directory-check queue、串行 subscription operation、
+  close/closed deferred 与 error/root-deleted lifecycle 已迁移至 `src/main/worker/parcel-watcher-runtime.ts`，
+  `j9` 已真实接回 `startParcelWatcher`。
+- `scripts/test-worker-parcel-watcher-runtime.mjs` 覆盖 8 项生命周期断言；focused、typecheck、build、verify、shared audit、diff-check 均通过。

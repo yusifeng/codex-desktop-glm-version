@@ -1528,6 +1528,12 @@ parcel watcher 的 ENOENT/ENOTDIR 错误码投影 `F9` 已迁移至
 `src/main/worker/parcel-watcher-errors.ts`；directory existence checks 仍保留 lstat/opendir
 I/O 与 watcher session 生命周期。`scripts/test-worker-parcel-watcher-errors.mjs` 覆盖 5 项断言。
 
+Parcel watcher runtime 的 root/supplemental subscription registry、directory-check queue、串行
+subscription operation、close/closed deferred、root deletion 与 error cleanup 已迁移至
+`src/main/worker/parcel-watcher-runtime.ts`；worker entry 的 `j9` 真实接回 `startParcelWatcher`，
+`GitRepoWatcher` 继续持有 host/path owner 与 change consumer。`scripts/test-worker-parcel-watcher-runtime.mjs`
+覆盖 8 项 start、event、close/dispose 与 subscription cleanup 断言。
+
 Git request catch 中的异常 disposition 投影 `V6` 已迁移至现有
 `src/main/worker/git-request-context-policy.ts` 的 `classifyGitRequestException`；入口仍
 注入 Git-unavailable sentinel、stale-snapshot identity 并负责 response/telemetry 副作用。

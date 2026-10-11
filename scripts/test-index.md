@@ -1447,6 +1447,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-preload-annotation-editor-restore-controller.mjs](test-preload-annotation-editor-restore-controller.mjs)
 [test-main-window-titlebar-overlay-sync.mjs](test-main-window-titlebar-overlay-sync.mjs)
 [test-main-native-context-menu.mjs](test-main-native-context-menu.mjs)
+[test-dynamic-app-tool-pending-responses.mjs](test-dynamic-app-tool-pending-responses.mjs)
+[test-worker-parcel-watcher-runtime.mjs](test-worker-parcel-watcher-runtime.mjs)
 [test-main-display-change-geometry-refresh.mjs](test-main-display-change-geometry-refresh.mjs)
 [test-main-primary-window-tracking.mjs](test-main-primary-window-tracking.mjs)
 [test-main-web-contents-diagnostics.mjs](test-main-web-contents-diagnostics.mjs)

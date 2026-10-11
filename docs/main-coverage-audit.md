@@ -616,6 +616,13 @@ focused test 为 `scripts/test-connect-app-host-controller.mjs`，运行命令�
 focused test 为 `scripts/test-thread-goal-hydration-registry.mjs`，运行命令为
 `node scripts/test-thread-goal-hydration-registry.mjs`（需先完成构建）。
 
+### 增量抽取：main dynamic app-tool response registry 生命周期
+
+`HostRequestRouter` 的动态 app-tool pending response identity、success/error/invalid route、cancel/discard
+与 dispose rejection 已迁移至 `src/main/main-app/app-server/dynamic-app-tool-pending-responses.ts`；router
+继续持有请求编排与 IPC side effects。focused test 为 `scripts/test-dynamic-app-tool-pending-responses.mjs`，
+覆盖 7 项 duplicate identity、路由与清理断言。
+
 ### 增量抽取：preload PIP 视频帧 IPC listener 生命周期
 
 `pip-video-decoder.ts` 的远程 PIP 视频帧 listener 已迁移至
