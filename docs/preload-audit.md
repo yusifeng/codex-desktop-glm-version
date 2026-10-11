@@ -18,6 +18,8 @@
 
 另新增 `annotation-comment-preview-close-controller.ts`，真实接回 Wy 的 `$e`/`ft` preview close lifecycle，保留 host close IPC 与本地 preview state 清理顺序。
 
+另新增 `annotation-editor-anchor-restore-controller.ts`，真实接回 Wy 的 `vt` restore-editor anchor lifecycle，保留当前 frame target map 解析与 editor state 写入。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
@@ -1647,3 +1649,8 @@ consumer 继续注入 manager 的 watcher、unwatch 与 event/trace owner。focu
 `GitManager.ensureWatchingForGitInit` 的 desired watch key 切换、旧 watcher dispose、start 结果与 failed key
 回收已迁移至 `src/main/worker/git-init-watch-desire-controller.ts`；consumer 保留 manager 的 key、watcher
 startup 与 disposal owner。focused test 覆盖 key 复用、正常切换和 failed cleanup。
+### 增量抽取：Git init watcher-start controller
+
+`GitManager.startGitInitWatcher` 的 watcher 构造、active ownership 注册、started/failed/superseded 结果分类与
+dispose 清理已迁移至 `src/main/worker/git-init-watcher-start-controller.ts`；consumer 继续注入 GitInitWatcher
+与 manager callback/logger dependencies。focused test 覆盖正常启动、failed cleanup 与 superseded 处理。

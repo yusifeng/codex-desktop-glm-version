@@ -3037,3 +3037,5 @@ editor state setter。由 `scripts/test-preload-annotation-editor-comment-reconc
 失败重排与 dispose 清理已物理迁移至 `src/main/worker/git-init-reconnect-controller.ts`；watcher 继续注入
 session 启动与日志 owner。由 `scripts/test-worker-git-init-reconnect-controller.mjs` 覆盖 8 项 focused
 assertions。
+
+本轮新增 `annotation-editor-anchor-restore-controller.ts`，真实接回 Wy 的 `vt` restore-editor anchor lifecycle；focused test 为 `scripts/test-preload-annotation-editor-anchor-restore-controller.mjs`。

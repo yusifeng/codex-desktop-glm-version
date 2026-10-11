@@ -24048,6 +24048,13 @@ function Wy({ rootHost: e, bridge: t }) {
         clearPreview: () => v(null),
       }),
     ),
+    [editorAnchorRestoreController] = (0, G.useState)(() =>
+      createAnnotationEditorAnchorRestoreController({
+        createTargetMap: (rootHost) => eb(rootHost),
+        buildAnchorPayload: (editorState, targets) => H_(editorState, targets),
+        setEditorState: (state) => S(state),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24271,7 +24278,7 @@ function Wy({ rootHost: e, bridge: t }) {
       hoverSyncController.sync(t, { modeAllowsHover: k !== `comment` || De, hasOpenEditor: x != null }),
     ),
     vt = (0, G.useEffectEvent)((t) => {
-      S(H_(t, eb(e)));
+      editorAnchorRestoreController.restore(t, e);
     }),
     yt = (0, G.useEffectEvent)((t) =>
       selectionModifierController.sync(t && Oe, {
@@ -24370,6 +24377,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => hoverFallbackController.dispose(), [hoverFallbackController]),
     (0, G.useEffect)(() => () => siteRequestDispatchController.dispose(), [siteRequestDispatchController]),
     (0, G.useEffect)(() => () => commentPreviewCloseController.dispose(), [commentPreviewCloseController]),
+    (0, G.useEffect)(() => () => editorAnchorRestoreController.dispose(), [editorAnchorRestoreController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
