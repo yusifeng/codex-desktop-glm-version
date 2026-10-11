@@ -4644,10 +4644,7 @@ function xl(e) {
   });
 }
 function Sl(e, t, n, r) {
-  if (gl(e)) return null;
-  if (rc(e)) return n === `annotation` && r && rl(e) != null ? null : e;
-  let i = n === `design` || !r ? sl(e) : nl(e, t);
-  return i == null || gl(i) ? null : i;
+  return projectAnnotationTarget(e, t, n, r, { isOverlay: (element) => gl(element), isRoot: (element) => rc(element), getContainerAncestor: (element) => rl(element), resolveFallback: (element) => sl(element), resolveAnnotation: (element, point) => nl(element, point) });
 }
 function Cl(e) {
   return isAnnotationInteractionBlocked(e, Tl, {
@@ -5950,6 +5947,7 @@ var { escapeAnnotationSelectorTokenForPage } = require("./browser-page-preload/a
 var { applyAnnotationCursorStyle, restoreAnnotationCursorStyle } = require("./browser-page-preload/annotation-cursor-style-state");
 var { withAnnotationMarkerPointerEventsDisabled } = require("./browser-page-preload/annotation-marker-pointer-events");
 var { resolveAnnotationPointerTarget } = require("./browser-page-preload/annotation-pointer-target-mode");
+var { projectAnnotationTarget } = require("./browser-page-preload/annotation-target-projection-policy");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");

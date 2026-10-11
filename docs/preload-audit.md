@@ -1215,3 +1215,9 @@ CSS selector token 的 page-level `CSS.escape` 能力探测与 fallback（原 `q
 pointer event 在 marker 命中与普通坐标命中之间的分派（原 `vl`，4600-4602）已迁移至
 `src/main/browser-page-preload/annotation-pointer-target-mode.ts`；入口仅注入 marker predicate、
 marker resolver 与 point resolver，保留 marker 与普通 point 两条调用路径。focused test 覆盖两种分支。
+
+### 增量抽取：annotation target projection policy
+
+overlay 排除、root/container 特殊处理及 design/annotation fallback 的最终 target projection（原 `Sl`，4648-4653）
+已迁移至 `src/main/browser-page-preload/annotation-target-projection-policy.ts`；入口仅注入既有 overlay、root、
+container 与 hit-target policies，保留 null、design fallback 和 annotation gating 语义。focused test 覆盖四项分支。
