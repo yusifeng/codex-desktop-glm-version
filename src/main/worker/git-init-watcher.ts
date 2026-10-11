@@ -1,6 +1,7 @@
 const { shouldCheckGitInitPath } = require("./git-init-watcher-path-policy");
 const { isGitMetadataDirectoryUnavailable } = require("./git-init-watcher-recovery");
 const { createGitInitReconnectController } = require("./git-init-reconnect-controller");
+const { startGitInitSessions } = require("./git-init-session-start-controller");
 
 type GitInitWatcherDependencies = {
   createLogger: (tag: string) => any;
@@ -75,69 +76,22 @@ class GitInitWatcher {
     gitDirectoryPath,
     pathSeparator,
   }: any) {
-    if (this.disposed) return false;
-    let rootSession;
-    try {
-      rootSession = await this.startWatch(
-        this.options.cwd,
-        ({ changedPaths }: any) => {
-          if (shouldCheckGitInitPath(changedPaths, gitDirectoryPath, pathSeparator))
-            this.checkForGitDebounced(gitDirectoryPath);
-        },
-        gitDirectoryPath,
-        pathSeparator,
-      );
-    } catch (error) {
-      this.logWatchFailure(error);
-      return false;
-    }
-    if (rootSession == null) return false;
-
-    let gitSession = null;
-    if (this.options.watchMode === `watch-git-metadata`) {
-      try {
-        gitSession = await this.startWatch(
-          gitDirectoryPath,
-          () => this.checkForGitDebounced(gitDirectoryPath),
-          gitDirectoryPath,
-          pathSeparator,
-        );
-      } catch (error) {
-        const gitDirectoryMissing = await isGitMetadataDirectoryUnavailable(
-          gitDirectoryPath,
-          {
-            stat: this.options.host.stat,
-            isMissingPathError: this.dependencies.isMissingPathError,
-          },
-        );
-        if (gitDirectoryMissing) {
-          this.logger.warning(
-            `Failed to watch git path; keeping workspace root watch`,
-            {
-              safe: {},
-              sensitive: { cwd: this.options.cwd, error },
-            },
-          );
-          return this.sessions.has(rootSession);
-        }
-        this.disposeSessions();
-        this.logWatchFailure(error);
-        return false;
-      }
-      if (
-        gitSession == null ||
-        !isGitInitWatchSetReady(this.sessions, rootSession, gitSession)
-      ) {
-        this.disposeSessions();
-        return false;
-      }
-    }
-
-    if (checkExistingGitDirectory)
-      await this.checkForGitDirectory(gitDirectoryPath);
-    return (
-      !this.disposed && isGitInitWatchSetReady(this.sessions, rootSession, gitSession)
-    );
+    return startGitInitSessions({
+      isDisposed: () => this.disposed,
+      watchMode: this.options.watchMode,
+      checkExistingGitDirectory,
+      gitDirectoryPath,
+      pathSeparator,
+      cwd: this.options.cwd,
+      startWatch: (watchedPath: string, onChange: (event: any) => void) => this.startWatch(watchedPath, onChange, gitDirectoryPath, pathSeparator),
+      checkForGitDirectory: (path: string) => this.checkForGitDirectory(path),
+      isMetadataDirectoryUnavailable: (path: string, error: unknown) => isGitMetadataDirectoryUnavailable(path, { stat: this.options.host.stat, isMissingPathError: this.dependencies.isMissingPathError }),
+      logger: this.logger,
+      sessions: this.sessions,
+      disposeSessions: () => this.disposeSessions(),
+      checkForGitDebounced: (path: string) => this.checkForGitDebounced(path),
+      shouldCheckGitInitPath,
+    });
   }
 
   async startWatch(
@@ -208,7 +162,6 @@ class GitInitWatcher {
 export { GitInitWatcher };
 if (typeof module !== `undefined`) module.exports = { GitInitWatcher };
 import {
-  isGitInitWatchSetReady,
   nextGitInitReconnectDelay,
   shouldReconnectGitInitWatch,
 } from "./git-init-watcher-policy";

@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { startGitInitSessions } = require("../app/.vite/build/worker/git-init-session-start-controller.js");
+const sessions = new Set(); const calls = [];
+const base = { isDisposed: () => false, watchMode: "watch-git-metadata", checkExistingGitDirectory: true, gitDirectoryPath: "/repo/.git", pathSeparator: "/", cwd: "/repo", checkForGitDirectory: async () => calls.push("check"), isMetadataDirectoryUnavailable: async () => false, logger: { warning: (message) => calls.push(message) }, sessions, disposeSessions: () => { calls.push("dispose"); sessions.clear(); }, checkForGitDebounced: () => calls.push("debounced"), shouldCheckGitInitPath: () => true };
+const result = await startGitInitSessions({ ...base, startWatch: async (path) => { const session = { path }; sessions.add(session); calls.push(path); return session; } });
+assert.equal(result, true); assert.deepEqual(calls.slice(0, 3), ["/repo", "/repo/.git", "check"]); assert.equal(sessions.size, 2);
+const missingSessions = new Set(); const missingResult = await startGitInitSessions({ ...base, sessions: missingSessions, startWatch: async (path) => { const session = { path }; if (path.endsWith(".git")) throw new Error("missing"); missingSessions.add(session); return session; }, isMetadataDirectoryUnavailable: async () => true });
+assert.equal(missingResult, true); assert.equal(missingSessions.size, 1);
+const failedSessions = new Set(); const failedResult = await startGitInitSessions({ ...base, sessions: failedSessions, startWatch: async (path) => { const session = { path }; if (path.endsWith(".git")) throw new Error("failed"); failedSessions.add(session); return session; } });
+assert.equal(failedResult, false); assert.ok(calls.includes("dispose")); console.log("7 worker Git init session-start controller assertions passed");
