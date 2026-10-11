@@ -1110,3 +1110,9 @@ Popover connected/open/show/hide 状态转换（原 `_c/vc`，4331-4350）已迁
 Cursor style cleanup（原 `pc`，4292-4297）已迁移至
 `src/main/browser-page-preload/annotation-cursor-style-cleanup.ts`；入口保留 cursor restore、
 按 attribute 查询和逐个 style remove 语义。focused test 覆盖 restore 与多 style cleanup。
+### 增量抽取：annotation cursor tree cleanup
+
+跨 frame 的 cursor style 清理遍历（原 `mc`，4295-4301）已迁移至
+`src/main/browser-page-preload/annotation-cursor-tree-cleanup.ts`；入口仅注入窗口收集、
+安全 document 读取和单 document cleanup，保留跨域 document 跳过语义。focused test 覆盖
+多窗口清理与缺失 document。

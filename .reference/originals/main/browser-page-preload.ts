@@ -4293,10 +4293,7 @@ function pc(e) {
   return removeAnnotationCursorStyles(e, { restoreCursor: (documentLike) => Vc(documentLike), queryAllStyles: (documentLike, attribute) => documentLike.querySelectorAll(`style[${attribute}]`), attribute: Qc });
 }
 function mc() {
-  for (let e of uc()) {
-    let t = oc(e);
-    t != null && pc(t);
-  }
+  cleanupAnnotationCursorStylesAcrossFrames(window, { collectWindows: (rootWindow) => uc(rootWindow), getDocument: (windowLike) => oc(windowLike), cleanupDocument: (documentLike) => pc(documentLike) });
 }
 function hc(e, t, n) {
   let r = new MutationObserver((i) => {
@@ -6000,6 +5997,7 @@ var { installAnnotationScrollListeners } = require("./browser-page-preload/annot
 var { runAnnotationCleanup } = require("./browser-page-preload/annotation-cleanup");
 var { setAnnotationPopoverOpen, closeAnnotationPopover } = require("./browser-page-preload/annotation-popover-policy");
 var { removeAnnotationCursorStyles } = require("./browser-page-preload/annotation-cursor-style-cleanup");
+var { cleanupAnnotationCursorStylesAcrossFrames } = require("./browser-page-preload/annotation-cursor-tree-cleanup");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
