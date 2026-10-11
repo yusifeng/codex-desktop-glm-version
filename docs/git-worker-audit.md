@@ -1651,6 +1651,10 @@ Linux ignore-source watcher 的绝对路径/目录遍历、symlink 跟随、ELOO
 `src/main/worker/git-ignore-source-targets.ts`，并真实接回 `watchIgnoreSources.getWatchTargets`；原
 `mCe` 实现已删除，filesystem/path API 通过窄依赖注入。`scripts/test-worker-git-ignore-source-targets.mjs`
 覆盖普通路径、重复输入、symlink 跟随和相对路径拒绝，共 5 项断言。
+Computer-use capture worker 的 update polling/terminal continuation、失败降级与 emit 顺序已迁移至
+`src/main/worker/computer-use-capture-update-loop.ts`，并真实接回 `sCe.readCaptureUpdates`；原循环实现
+已删除，日志和 capture service 通过窄依赖注入。`scripts/test-worker-computer-use-capture-update-loop.mjs`
+覆盖 terminal sequence 与 polling failure fallback，共 2 项断言。
 ### A1 最终复核：metadata refresh generation/waiter
 
 `GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、
@@ -1672,3 +1676,6 @@ replacement cleanup。
 w1/C1 query fetch coordinator 与 `$1` fsmonitor cache 本轮保留：前者被 8 个 query handler 注入并绑定
 QueryClient、fetchQuery/removeQueries、metadata 与多 consumer abort fan-out；后者绑定 Cpe/t0、host
 environment、expiry timer 和 query execution，均不具备不复制 owner 状态的窄边界。
+Computer-use `sCe` dispatcher 本轮保留：`requestPermissions/start/watchUpdates` 与 skysight/messages
+控制共享 worker-response envelope、logger、service dependencies、递归 update polling 和 error emission；
+continuation 判断已由 `computer-use-capture-policy.ts` 提供，剩余部分没有不复制 service 生命周期的独立边界。

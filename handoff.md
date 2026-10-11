@@ -4,6 +4,8 @@
 
 本轮继续将 Linux ignore-source watcher 的绝对路径/目录遍历、symlink 跟随、ELOOP 防护和缺失路径降级迁移至 `git-ignore-source-targets.ts`，真实接回 `watchIgnoreSources.getWatchTargets`，删除原 worker `mCe` 实现。focused test 为 `scripts/test-worker-git-ignore-source-targets.mjs`（5 项）。
 
+本轮继续将 computer-use capture worker 的异步 update polling、terminal continuation、失败降级与 update emit 顺序迁移至 `computer-use-capture-update-loop.ts`，真实接回 `sCe.readCaptureUpdates`；focused test 为 `scripts/test-worker-computer-use-capture-update-loop.mjs`（2 项）。
+
 本轮新增 `dynamic-app-tool-pending-responses.ts`，真实接回 `HostRequestRouter` 的动态 app-tool response registry；保留 duplicate identity、success/error/invalid route、cancel/discard 与 dispose rejection，focused test 为 `scripts/test-dynamic-app-tool-pending-responses.mjs`。
 
 本轮新增 `parcel-watcher-runtime.ts`，真实接回 worker Parcel watcher 的 root/supplemental subscription、directory-check queue、串行 subscription operation、close/closed deferred 与 error/root-deleted lifecycle；focused test 为 `scripts/test-worker-parcel-watcher-runtime.mjs`。
@@ -3176,3 +3178,8 @@ XDG/platform 环境、同步 filesystem scan 和 parse/discovery owner，当前�
 
 w1/C1 被多个 query handler 注入并绑定 QueryClient 与 abort fan-out；`$1` fsmonitor cache 绑定 Cpe/t0、
 host environment、expiry timer 和 query execution。本轮均保留，未抽 facade。
+
+### A1 扫描结论：computer-use dispatcher preserve-coupled
+
+`sCe` 的 capture/service RPC、response envelope、logger、service dependencies、递归 update polling 与
+error emission 交织；continuation policy 已抽出，剩余 owner 生命周期本轮保留。
