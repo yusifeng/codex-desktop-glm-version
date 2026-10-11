@@ -29,6 +29,7 @@ const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIco
 const { projectNativeStatusItemMenuState } = require("./main-app/startup/native-status-item-menu.js");
 const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window-options.js");
 const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-titlebar-overlay-sync.js");
+const { installDisplayChangeGeometryRefresh } = require("./main-app/startup/display-change-geometry-refresh.js");
 const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
@@ -172605,20 +172606,11 @@ var Qot = class {
       !(e.isMinimized() || e.isMaximized() || e.isFullScreen()) && e.setBounds(e.getBounds(), !1));
   }
   installDisplayChangeGeometryRefresh(e) {
-    if (process.platform !== `darwin`) return null;
-    let t = () => {
-      this.refreshWindowGeometryAfterDisplayChange(e);
-    };
-    return (
-      l.screen.on(`display-added`, t),
-      l.screen.on(`display-removed`, t),
-      l.screen.on(`display-metrics-changed`, t),
-      () => {
-        (l.screen.off(`display-added`, t),
-          l.screen.off(`display-removed`, t),
-          l.screen.off(`display-metrics-changed`, t));
-      }
-    );
+    return installDisplayChangeGeometryRefresh({
+      platform: process.platform,
+      screen: l.screen,
+      refresh: () => this.refreshWindowGeometryAfterDisplayChange(e),
+    });
   }
   hasRegisteredWebContents(e) {
     return this.registeredWebContentsIds.has(e.id);
