@@ -1121,3 +1121,8 @@ Cursor style cleanup（原 `pc`，4292-4297）已迁移至
 元素 owner document 的 window 解析（原 `Fc`，4424-4426）已迁移至
 `src/main/browser-page-preload/annotation-owner-window.ts`；入口保留 owner-window 缺失时的
 当前 window fallback。focused test 覆盖 owner window 与 fallback 两项行为。
+### 增量抽取：annotation element frame path
+
+元素 owner window 到 annotation frame path 的 projection（原 `Cc`，4343-4345）已迁移至
+`src/main/browser-page-preload/annotation-element-frame-path.ts`；入口仅注入 owner-window 与
+既有 frame-path policy，保持跨 frame path 结果。focused test 覆盖 owner window projection。

@@ -4341,7 +4341,7 @@ function Sc(e) {
   return projectAnnotationElementPath(e, ic);
 }
 function Cc(e) {
-  return ec(e.ownerDocument.defaultView);
+  return getAnnotationElementFramePath(e, { getOwnerWindow: (element) => element.ownerDocument.defaultView, resolveFramePath: (windowLike) => ec(windowLike) });
 }
 function wc(e) {
   let t = window,
@@ -5999,6 +5999,7 @@ var { setAnnotationPopoverOpen, closeAnnotationPopover } = require("./browser-pa
 var { removeAnnotationCursorStyles } = require("./browser-page-preload/annotation-cursor-style-cleanup");
 var { cleanupAnnotationCursorStylesAcrossFrames } = require("./browser-page-preload/annotation-cursor-tree-cleanup");
 var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window");
+var { getAnnotationElementFramePath } = require("./browser-page-preload/annotation-element-frame-path");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
