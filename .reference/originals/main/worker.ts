@@ -190,6 +190,7 @@ const { createGitWatchRetryController } = require("./worker/git-watch-retry-cont
 const { createGitWatchSessionCloseController } = require("./worker/git-watch-session-close-controller");
 const { createGitMetadataRefreshController } = require("./worker/git-metadata-refresh-controller");
 const { createGitWorktreeWatchRefreshController } = require("./worker/git-worktree-watch-refresh-controller");
+const { disposeGitRepoWatcher } = require("./worker/git-repo-watcher-dispose-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68968,20 +68969,22 @@ var Jye = 1e3,
       }
     }
     dispose() {
-      if (this.disposePromise != null) return this.disposePromise;
-      this.disposed = !0;
-      let e = this.ignorePolicy?.dispose(),
-        t = this.watchTargets.map((e) => this.disposeSession(e));
-      return (
-        (this.watchTargets.length = 0),
-        this.repoChangeController.dispose(),
-        this.watchRetryController.dispose(),
-        this.metadataRefreshController.dispose(),
-        this.ignoreSourceWatches.clear(),
-        this.changedIgnoreSourcePaths.clear(),
-        (this.disposePromise = Promise.all([...t, this.metadataRefreshController.pendingPromise(), e]).then(() => {})),
-        this.disposePromise
-      );
+      return disposeGitRepoWatcher({
+        getDisposePromise: () => this.disposePromise,
+        setDisposePromise: (promise) => { this.disposePromise = promise; },
+        markDisposed: () => { this.disposed = !0; },
+        disposeIgnorePolicy: () => this.ignorePolicy?.dispose(),
+        disposeSessions: () => this.watchTargets.map((target) => this.disposeSession(target)),
+        clearWatchTargets: () => { this.watchTargets.length = 0; },
+        disposeControllers: () => {
+          this.repoChangeController.dispose();
+          this.watchRetryController.dispose();
+          this.metadataRefreshController.dispose();
+        },
+        clearIgnoreSourceWatches: () => this.ignoreSourceWatches.clear(),
+        clearChangedIgnoreSourcePaths: () => this.changedIgnoreSourcePaths.clear(),
+        pendingMetadataRefresh: () => this.metadataRefreshController.pendingPromise(),
+      });
     }
     refreshMetadataDirectories(e, t = !0) {
       let n = this.pathApi;
