@@ -103,6 +103,7 @@ const { processGitMetadataRefreshBatch } = require("./worker/git-metadata-refres
 const { handleGitInitRecovery } = require("./worker/git-init-recovery-controller");
 const { refreshGitInitMetadata: refreshGitInitMetadataSingleFlight } = require("./worker/git-init-metadata-refresh-controller");
 const { applyGitInitMetadata } = require("./worker/git-init-metadata-apply-controller");
+const { ensureGitInitWatchDesired } = require("./worker/git-init-watch-desire-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70522,12 +70523,9 @@ var I6 = kW(`git`),
     }
     async ensureWatchingForGitInit(e, t, n = `detect-git-path`) {
       let r = this.getGitInitWatchKey(e, t);
-      this.desiredGitInitWatchKey !== r &&
-        (this.disposeGitInitWatcher(),
-        (this.desiredGitInitWatchKey = r),
-        (await this.startGitInitWatcher(e, t, n)) === `failed` &&
-          this.desiredGitInitWatchKey === r &&
-          (this.desiredGitInitWatchKey = null));
+      return ensureGitInitWatchDesired({ key: r, getDesiredWatchKey: () => this.desiredGitInitWatchKey,
+        setDesiredWatchKey: (key) => { this.desiredGitInitWatchKey = key; }, disposeWatcher: () => this.disposeGitInitWatcher(),
+        startWatcher: () => this.startGitInitWatcher(e, t, n) });
     }
     async startGitInitWatcher(e, t, n) {
       let r = this.getGitInitWatchKey(e, t);
