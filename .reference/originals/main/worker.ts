@@ -102,6 +102,7 @@ const { handleGitWatchChange } = require("./worker/git-watch-change-controller")
 const { processGitMetadataRefreshBatch } = require("./worker/git-metadata-refresh-batch-controller");
 const { handleGitInitRecovery } = require("./worker/git-init-recovery-controller");
 const { refreshGitInitMetadata: refreshGitInitMetadataSingleFlight } = require("./worker/git-init-metadata-refresh-controller");
+const { applyGitInitMetadata } = require("./worker/git-init-metadata-apply-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70573,48 +70574,15 @@ var I6 = kW(`git`),
         invalidateStableMetadata: () => this.gitManager.invalidateStableMetadata(), refreshOnce: () => this.refreshGitInitMetadataOnce(e, t) });
     }
     async refreshGitInitMetadataOnce(e, t) {
-      let n = this.getGitInitWatchKey(e, t),
-        r = await this.gitManager.getStableMetadata(e, t);
-      if (!r || this.desiredGitInitWatchKey !== n) return !1;
-      this.disposeActiveGitInitWatcher();
-      try {
-        await this.ensureWatching({ commonDir: r.commonDir, root: r.root }, t);
-      } catch (e) {
-        throw (this.desiredGitInitWatchKey === n && (this.desiredGitInitWatchKey = null), e);
-      }
-      return this.desiredGitInitWatchKey === n
-        ? (this.disposeGitInitWatcher(e, t),
-          OH(
-            {
-              attributes: {
-                "git.change_type": `head`,
-                "git.changed_path_count": 0,
-                "git.full_invalidation": !1,
-                "worker.id": `git`,
-              },
-              name: `desktop.git_invalidation`,
-              op: `codex.git.invalidation`,
-              root: !0,
-            },
-            () => {
-              let n = AH();
-              this.emit({
-                type: `worker-event`,
-                event: {
-                  type: `git-repo-changed`,
-                  changeType: `head`,
-                  commonDir: r.commonDir,
-                  cwd: e,
-                  hostId: t.id,
-                  rebaseInProgress: null,
-                  root: r.root,
-                  ...(n == null ? {} : { emittedAtMs: Date.now(), trace: n }),
-                },
-              });
-            },
-          ),
-          !0)
-        : (this.unwatchRepo(r.root, t, { emitEvent: !1 }), !1);
+      let n = this.getGitInitWatchKey(e, t);
+      return applyGitInitMetadata({ cwd: e, host: t, key: n, getDesiredWatchKey: () => this.desiredGitInitWatchKey, setDesiredWatchKey: (key) => { this.desiredGitInitWatchKey = key; },
+        getStableMetadata: (cwd, host) => this.gitManager.getStableMetadata(cwd, host), disposeActiveWatcher: () => this.disposeActiveGitInitWatcher(),
+        ensureWatching: (metadata, host) => this.ensureWatching(metadata, host), disposeGitInitWatcher: (cwd, host) => this.disposeGitInitWatcher(cwd, host),
+        unwatchRepo: (root, host, options) => this.unwatchRepo(root, host, options), emitHeadChange: (metadata, cwd, host) => {
+          OH({ attributes: { "git.change_type": `head`, "git.changed_path_count": 0, "git.full_invalidation": !1, "worker.id": `git` }, name: `desktop.git_invalidation`, op: `codex.git.invalidation`, root: !0 }, () => {
+            let trace = AH(); this.emit({ type: `worker-event`, event: { type: `git-repo-changed`, changeType: `head`, commonDir: metadata.commonDir, cwd, hostId: host.id, rebaseInProgress: null, root: metadata.root, ...(trace == null ? {} : { emittedAtMs: Date.now(), trace }) } });
+          });
+        } });
     }
     getGitInitWatchKey(e, t) {
       return getSemanticGitInitWatchKey(h1(t), e);
