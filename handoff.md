@@ -3039,3 +3039,7 @@ session 启动与日志 owner。由 `scripts/test-worker-git-init-reconnect-cont
 assertions。
 
 本轮新增 `annotation-editor-anchor-restore-controller.ts`，真实接回 Wy 的 `vt` restore-editor anchor lifecycle；focused test 为 `scripts/test-preload-annotation-editor-anchor-restore-controller.mjs`。
+
+本轮新增 `git-init-watcher-start-controller.ts`，真实接回 `GitManager.startGitInitWatcher`；controller 保留
+watcher 构造、active ownership 注册、started/failed/superseded 分类与 dispose 清理；focused test 为
+`scripts/test-worker-git-init-watcher-start-controller.mjs`。
