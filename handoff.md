@@ -4,6 +4,8 @@
 
 本轮新增 `parcel-watcher-runtime.ts`，真实接回 worker Parcel watcher 的 root/supplemental subscription、directory-check queue、串行 subscription operation、close/closed deferred 与 error/root-deleted lifecycle；focused test 为 `scripts/test-worker-parcel-watcher-runtime.mjs`。
 
+2026-10-12 A5 consumer recheck：classification manifest `UNREVIEWED: 0`，113 条 semantic entry 对应 112 个 runtime module，代表性 helper 已确认真实 consumer；`format-annotation-summary`、`merge-conflict-state`、`select-mode-descriptor`、`parse-browser-target-id`、`is-path-within-roots` 等仅保留 focused contract 与 semantic module，不制造伪 consumer。
+
 本轮新增 `app-server-request-lifecycle-controller.ts`，真实接回 `AppServerRequestSender.send` 的 prewarm/normal dispatch、timeout abandon、failure notification 与 cleanup lifecycle；focused test 为 `scripts/test-app-server-request-lifecycle-controller.mjs`。
 
 本轮新增 `thread-goal-hydration-registry.ts`，真实接回 `AppServerConversationManager` 的 per-conversation goal hydration generation、stale-token gate、archive cancel 与 dispose clear；focused test 为 `scripts/test-thread-goal-hydration-registry.mjs`。

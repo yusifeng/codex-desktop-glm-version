@@ -58,3 +58,16 @@ source-line evidence; no unreviewed export is silently promoted to preserved.
 These checks are the acceptance gates for extending any hub. A new semantic
 module must first add its declaration and then reduce the preserved inventory;
 identity stubs or fabricated exports are not accepted.
+
+## 2026-10-12 Consumer Recheck
+
+The classification manifest reports `UNREVIEWED: 0`; all 113 semantic entries
+map to existing runtime modules (112 unique files). Representative modules such
+as `normalize-suggested-followups`, `is-site-url-match`, and
+`create-prefilled-plugin-prompt` have confirmed consumers in the split renderer
+surface. A small remainder, including `format-annotation-summary`,
+`merge-conflict-state`, `select-mode-descriptor`, `parse-browser-target-id`, and
+`is-path-within-roots`, has focused contract coverage but no confirmed consumer
+in the current split surface. They remain extracted semantic helpers; adding
+synthetic imports would create a false consumer and risk changing UI or
+internationalization behavior.
