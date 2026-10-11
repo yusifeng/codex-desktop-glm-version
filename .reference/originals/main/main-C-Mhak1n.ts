@@ -31,6 +31,7 @@ const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window
 const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-titlebar-overlay-sync.js");
 const { installDisplayChangeGeometryRefresh } = require("./main-app/startup/display-change-geometry-refresh.js");
 const { installPrimaryWindowTracking } = require("./main-app/window/primary-window-tracking.js");
+const { installWebContentsDiagnostics } = require("./main-app/window/web-contents-diagnostics.js");
 const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
@@ -173330,51 +173331,22 @@ var Qot = class {
     });
   }
   installWebContentsDiagnostics(e, t) {
-    let n = e.webContents,
-      r = e.id,
-      i = n.id,
-      a = this.options.errorReporter;
-    (n.on(`render-process-gone`, (n, o) => {
-      if (o.reason === `clean-exit` || this.isAppQuitting) return;
-      let s = o.reason !== `launch-failed` && o.reason !== `killed`;
-      s &&
-        a.reportFatal(Error(`Renderer process gone (${o.reason})`), {
-          groupingFingerprint: [`renderer-process-gone`, o.reason],
-          tags: { errorType: `renderer-process-gone`, reason: o.reason },
-          extra: { windowId: r, webContentsId: i, exitCode: o.exitCode },
-        });
-      let c = this.maybeRecoverFromRendererCrash(e, o.reason);
-      t === `primary` &&
-        s &&
-        c &&
-        (this.readyWebContentsIds.delete(i),
-        this.sendMessageToWindow(e, { type: `codex-ui-render-process-gone` }));
-    }),
-      n.on(`did-finish-load`, () => {
-        this.rendererRecoveryAttempts.delete(i);
-      }),
-      n.on(`unresponsive`, () => {
-        a.reportFatal(Error(`Renderer unresponsive`), {
-          tags: { errorType: `renderer-unresponsive` },
-          extra: { windowId: r, webContentsId: i, url: fT(n.getURL()) },
-        });
-      }),
-      n.on(`did-fail-load`, (e, t, n, o, s, c, l) => {
-        s &&
-          t !== -3 &&
-          a.reportFatal(Error(`Renderer did-fail-load`), {
-            tags: { errorType: `renderer-did-fail-load` },
-            extra: {
-              windowId: r,
-              webContentsId: i,
-              errorCode: t,
-              errorDescription: n,
-              validatedURL: fT(o),
-              frameProcessId: c,
-              frameRoutingId: l,
-            },
-          });
-      }));
+    const webContents = e.webContents;
+    installWebContentsDiagnostics({
+      webContents,
+      windowId: e.id,
+      webContentsId: webContents.id,
+      appearance: t,
+      errorReporter: this.options.errorReporter,
+      isAppQuitting: () => this.isAppQuitting,
+      maybeRecoverFromRendererCrash: (reason) => this.maybeRecoverFromRendererCrash(e, reason),
+      clearRecoveryAttempt: () => this.rendererRecoveryAttempts.delete(webContents.id),
+      onPrimaryRendererGone: () => {
+        this.readyWebContentsIds.delete(webContents.id);
+        this.sendMessageToWindow(e, { type: `codex-ui-render-process-gone` });
+      },
+      formatUrl: (url) => fT(url),
+    });
   }
   maybeRecoverFromRendererCrash(e, t) {
     let n = e.webContents;
