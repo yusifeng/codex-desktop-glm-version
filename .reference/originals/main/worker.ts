@@ -185,6 +185,7 @@ const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./work
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, selectGitWatchTargetsForMetadataRefresh, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const { classifyStableMetadataFailure } = require("./worker/git-stable-metadata-failure-policy");
 const { shouldInvalidateGitWorktreeForTurn } = require("./worker/git-turn-cache-invalidation-policy");
+const { createGitRepoChangeController } = require("./worker/git-repo-change-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68689,18 +68690,12 @@ var Jye = 1e3,
     options;
     logger = OW(`git-repo-watcher`);
     watchTargets = [];
-    pendingChangeCounts = {
-      config: 0,
-      head: 0,
-      index: 0,
-      "local-refs": 0,
-      "remote-refs": 0,
-      "synced-branch": 0,
-      "worktree-topology": 0,
-      "working-tree": 0,
-    };
-    changeTimers = new Map();
-    activeChangeEmissions = new Set();
+    repoChangeController = createGitRepoChangeController({
+      delayMs: Zye,
+      isDisposed: () => this.disposed,
+      emit: (changeType) => this.emitRepoChanged(changeType),
+      onError: (changeType, error) => this.logger.warning(`Failed to emit git repo change`, { safe: { changeType }, sensitive: { error } }),
+    });
     pathApi = null;
     gitDir = null;
     currentHeadRefPath = null;
@@ -68935,10 +68930,7 @@ var Jye = 1e3,
         t = this.watchTargets.map((e) => this.disposeSession(e));
       return (
         (this.watchTargets.length = 0),
-        this.changeTimers.forEach((e) => {
-          clearTimeout(e);
-        }),
-        this.changeTimers.clear(),
+        this.repoChangeController.dispose(),
         this.changedMetadataDirectories.clear(),
         this.ignoreSourceWatches.clear(),
         this.changedIgnoreSourcePaths.clear(),
@@ -69228,7 +69220,7 @@ var Jye = 1e3,
         ((this.lastRequiresRecovery = e), this.options.onRequiresRecoveryChanged?.(e));
     }
     handleFileWatchEvent(e, t) {
-      if (((this.pendingChangeCounts[e] += 1), e === `working-tree`)) {
+      if ((this.repoChangeController.record(e), e === `working-tree`)) {
         if (t == null) this.pendingWorkingTreePaths = null;
         else if (this.pendingWorkingTreePaths != null) {
           for (let e of t)
@@ -69273,24 +69265,10 @@ var Jye = 1e3,
       this.pendingWorkingTreePaths = r;
     }
     scheduleRepoChanged(e) {
-      shouldScheduleGitRepoChange(this.disposed, e, this.activeChangeEmissions, this.changeTimers) &&
-        this.changeTimers.set(
-          e,
-          setTimeout(() => {
-            (this.changeTimers.delete(e),
-              this.emitRepoChanged(e).catch((t) => {
-                this.logger.warning(`Failed to emit git repo change`, {
-                  safe: { changeType: e },
-                  sensitive: { error: t },
-                });
-              }));
-          }, Zye),
-        );
+      this.repoChangeController.schedule(e);
     }
     async emitRepoChanged(e) {
-      this.activeChangeEmissions.add(e);
-      let t = this.pendingChangeCounts[e];
-      this.pendingChangeCounts[e] = 0;
+      let t = this.repoChangeController.consume(e);
       let n =
         e === `working-tree` && this.pendingWorkingTreePaths != null
           ? [...this.pendingWorkingTreePaths]
@@ -69326,8 +69304,7 @@ var Jye = 1e3,
         }
         this.logRepoChanged(e, t, r);
       } finally {
-        (this.activeChangeEmissions.delete(e),
-          this.pendingChangeCounts[e] > 0 && this.scheduleRepoChanged(e));
+        this.repoChangeController.complete(e);
       }
     }
     logRepoChanged(e, t, n) {

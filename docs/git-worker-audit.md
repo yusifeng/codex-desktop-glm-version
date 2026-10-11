@@ -1598,3 +1598,7 @@ Turn-complete cache invalidation 中按 selected worktree、未知 commonDir 和
 传播的 decision 已迁移至 `git-turn-cache-invalidation-policy.ts`；manager 仍负责 worktree/commonDir
 Map 查询及 `clearShortLivedGitReadCaches` 副作用。由 `scripts/test-worker-git-turn-cache-invalidation-policy.mjs`
 覆盖 5 项传播/回退断言。
+Repo-changed debounce/emit 的 pending count、active emission、timer 去重、完成后重排和 dispose
+生命周期已迁移至 `git-repo-change-controller.ts`；watcher 仍注入 Git operation state、event payload、
+telemetry 与实际 emit。`scripts/test-worker-git-repo-change-controller.mjs` 覆盖计数消费、timer 去重和
+dispose 路径。

@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const { createGitRepoChangeController } = require("../app/.vite/build/worker/git-repo-change-controller.js");
+const timers = [];
+const controller = createGitRepoChangeController({ delayMs: 10, isDisposed: () => false, emit: async (type) => { timers.push(type); }, onError: () => {}, setTimeout: (fn) => { timers.push(fn); return fn; }, clearTimeout: () => {} });
+controller.record("head");
+controller.schedule("head");
+controller.schedule("head");
+assert.equal(controller.consume("head"), 1);
+controller.record("head");
+controller.complete("head");
+controller.dispose();
+assert.deepEqual(timers.filter((value) => typeof value === "string"), []);
+console.log("4 worker repo change controller assertions passed");
