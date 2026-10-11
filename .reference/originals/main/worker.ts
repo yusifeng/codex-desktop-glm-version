@@ -68984,7 +68984,7 @@ var Jye = 1e3,
             .map((n) => e.join(t, n.name));
         } catch (e) {
           if (this.disposed || i !== r.generation) return;
-          if (!F6(e)) {
+          if (!isMissingPathError(e)) {
             (this.logger.warning(`Failed to discover git worktree watches`, {
               safe: {},
               sensitive: { error: e, path: t },
@@ -69082,7 +69082,7 @@ var Jye = 1e3,
           try {
             r = (await this.options.host.stat(e.watchPath, { bypassCache: !0 })).isDirectory();
           } catch (e) {
-            if (!F6(e)) throw e;
+            if (!isMissingPathError(e)) throw e;
             r = !1;
           }
           if (this.disposed || n !== e.generation) return;
@@ -69341,7 +69341,7 @@ var Jye = 1e3,
       try {
         return (await this.options.host.stat(e), !0);
       } catch (e) {
-        return !F6(e) && null;
+        return !isMissingPathError(e) && null;
       }
     }
     isGitInternalPath(e, t) {
@@ -69409,13 +69409,6 @@ function nbe(e) {
   return combineOptionalBooleans(e);
   /* istanbul ignore next -- retained generated implementation for source parity reference */
   return e.some((e) => e === !0) ? !0 : e.some((e) => e == null) ? null : !1;
-}
-function F6(e) {
-  return isMissingPathError(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return (
-    typeof e == `object` && !!e && `code` in e && (e.code === `ENOENT` || e.code === `ENOTDIR`)
-  );
 }
 function rbe(e) {
   return isCancelableGitRequest(e);
