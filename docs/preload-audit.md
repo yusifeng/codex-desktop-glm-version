@@ -1094,3 +1094,8 @@ annotation event 的 preventDefault/stopPropagation/stopImmediatePropagation 边
 ### 增量抽取：annotation frame point projection
 
 跨 frame 坐标点加法 projection（原 `Lc`）已迁移至 `src/main/browser-page-preload/annotation-frame-point-projection.ts`；入口保留 frame offset 读取，仅委托点坐标合成。新增 2 项 focused assertions。
+### 增量抽取：annotation cleanup guard
+
+Annotation runtime 的安全 cleanup guard（原 `Hc`，4485-4489）已迁移至
+`src/main/browser-page-preload/annotation-cleanup.ts`；入口保留兼容调用面，继续吞掉
+cleanup callback 异常。focused test 覆盖正常执行与异常隔离。

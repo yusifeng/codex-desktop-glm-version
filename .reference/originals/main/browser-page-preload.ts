@@ -4483,10 +4483,7 @@ function Vc(e) {
       t.element.style.setProperty(`cursor`, t.cursor, t.priority));
 }
 function Hc(e) {
-  if (e != null)
-    try {
-      e();
-    } catch {}
+  runAnnotationCleanup(e);
 }
 function Uc(e) {
   return isAnnotationShadowRoot(e, {
@@ -6015,6 +6012,7 @@ var { resolveAnnotationShadowSelector } = require("./browser-page-preload/annota
 var { resolveAnnotationContainerAncestor } = require("./browser-page-preload/annotation-container-ancestor");
 var { discoverAnnotationScrollContainers } = require("./browser-page-preload/annotation-scroll-container-discovery");
 var { installAnnotationScrollListeners } = require("./browser-page-preload/annotation-scroll-listener");
+var { runAnnotationCleanup } = require("./browser-page-preload/annotation-cleanup");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
