@@ -4318,10 +4318,7 @@ function hc(e, t, n) {
     () => r.disconnect()
   );
 }
-function gc(e, t) {
-  let n = e.shadowRoot?.querySelector(`[${t}]`);
-  return n != null && _c(n, !0);
-}
+function gc(e, t) { return openAnnotationPopoverTarget(e, t, { getShadowRoot: (root) => root.shadowRoot, query: (shadowRoot, selector) => shadowRoot.querySelector(selector), setOpen: (element, hideFirst) => _c(element, hideFirst) }); }
 function _c(e, t) {
   return setAnnotationPopoverOpen(e, t, { isConnected: (element) => element.isConnected, hasMethod: (element, name) => typeof element[name] === `function`, isOpen: (element) => element.matches(`:popover-open`), show: (element) => element.showPopover(), hide: (element) => element.hidePopover() });
 }
@@ -5999,6 +5996,7 @@ var { cleanupAnnotationCursorStylesAcrossFrames } = require("./browser-page-prel
 var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window");
 var { getAnnotationElementFramePath } = require("./browser-page-preload/annotation-element-frame-path");
 var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation-anchor-selector");
+var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");

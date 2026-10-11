@@ -1131,3 +1131,8 @@ Cursor style cleanup（原 `pc`，4292-4297）已迁移至
 元素到稳定 annotation anchor selector 的 projection（原 `Rc`，4440-4442）已迁移至
 `src/main/browser-page-preload/annotation-anchor-selector.ts`；入口固定使用 unique selector
 模式并复用 selector generator。focused test 覆盖 selector consumer 与 options 传递。
+### 增量抽取：annotation popover target lookup
+
+从 annotation root shadowRoot 查找 popover target 并调用既有 open policy（原 `gc`，4320-4323）
+已迁移至 `src/main/browser-page-preload/annotation-popover-target.ts`；入口保留 attribute
+selector 和缺失 shadowRoot 的 false 语义。focused test 覆盖成功、selector 传递与空 root。
