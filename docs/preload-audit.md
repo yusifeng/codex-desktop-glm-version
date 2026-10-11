@@ -1371,3 +1371,10 @@ viewport listener、frame/text observer registration、dispose idempotence 与 c
 `src/main/browser-page-preload/annotation-wy-host-message-dispatcher.ts`；state/ref/IPC 副作用均由入口注入，
 保留 sync、screenshot、editor、design、selection、restore 分支语义。focused test 覆盖 sync 顺序、design
 capability guard、multi-select guard 与 unknown message。
+
+### 增量抽取：annotation screenshot-ready controller
+
+`Wy` screenshot-ready effect 的 active-id 去重、RAF 调度/取消与 unmount dispose 已迁移至
+`src/main/browser-page-preload/annotation-screenshot-ready-controller.ts`；入口每次 effect update 注入
+当前 `gn`，避免 stale screenshot payload，host IPC payload 仍由 React effect callback 组装。focused test
+覆盖 null reset、重复 ID、cleanup cancellation 与 dispose race。

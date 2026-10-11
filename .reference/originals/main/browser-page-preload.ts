@@ -5975,6 +5975,7 @@ var { createAnnotationViewportRefreshScheduler } = require("./browser-page-prelo
 var { createAnnotationAnchorObservationLifecycle } = require("./browser-page-preload/annotation-anchor-observation-lifecycle");
 var { installAnnotationPointerEventLifecycle } = require("./browser-page-preload/annotation-pointer-event-lifecycle");
 var { dispatchAnnotationWyHostMessage } = require("./browser-page-preload/annotation-wy-host-message-dispatcher");
+var { createAnnotationScreenshotReadyController } = require("./browser-page-preload/annotation-screenshot-ready-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23674,7 +23675,6 @@ function Wy({ rootHost: e, bridge: t }) {
     O = (0, G.useRef)(null),
     [fe, pe] = (0, G.useState)(!1),
     me = (0, G.useRef)(0),
-    he = (0, G.useRef)(null),
     ge = (0, G.useRef)(null),
     _e = (0, G.useRef)(!1),
     ve = (0, G.useRef)(!1),
@@ -23689,6 +23689,12 @@ function Wy({ rootHost: e, bridge: t }) {
         requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
         cancelAnimationFrame: (handle) => window.cancelAnimationFrame(handle),
         refresh: () => T(C_()),
+      }),
+    ),
+    [screenshotReadyController] = (0, G.useState)(() =>
+      createAnnotationScreenshotReadyController({
+        requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+        cancelAnimationFrame: (handle) => window.cancelAnimationFrame(handle),
       }),
     ),
     [Te] = (0, G.useState)(() =>
@@ -25135,19 +25141,10 @@ function Wy({ rootHost: e, bridge: t }) {
     });
   });
   (0, G.useEffect)(() => {
-    if (Et == null || te == null) {
-      he.current = null;
-      return;
-    }
-    if (he.current === Et) return;
-    he.current = Et;
-    let e = window.requestAnimationFrame(() => {
-      gn(Et);
-    });
-    return () => {
-      window.cancelAnimationFrame(e);
-    };
-  }, [te, Et]);
+    return screenshotReadyController.update(Et, te != null, gn);
+  }, [te, Et, gn, screenshotReadyController]);
+  (0, G.useEffect)(() => () => screenshotReadyController.dispose(), [screenshotReadyController]);
+  (0, G.useEffect)(() => () => screenshotReadyController.dispose(), [screenshotReadyController]);
   let _n = (0, db.jsxs)(db.Fragment, {
     children: [
       Ct ? (0, db.jsx)(qy, {}) : null,

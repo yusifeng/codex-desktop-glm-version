@@ -2737,6 +2737,11 @@ verify-chunks 通过。pointer event handlers 与 host IPC effects 仍由 React 
 保留 sync、screenshot、editor、design、selection、restore 分支语义，新增
 `scripts/test-preload-annotation-wy-host-message-dispatcher.mjs` 的 20 项 focused assertions，typecheck/
 build/verify-chunks 通过。pointer/frame-anchor lifecycle 已拆分，剩余业务 callback 仍由 React owner 提供。
+2026-10-11 A2 preload 增量：`Wy` screenshot-ready effect 的 active-id 去重、RAF 调度/取消与 unmount dispose
+已迁移至 `src/main/browser-page-preload/annotation-screenshot-ready-controller.ts`；入口每次 effect update 注入
+当前 `gn`，保持 screenshot payload 与 host IPC 时序，新增 `scripts/test-preload-annotation-screenshot-ready-controller.mjs`
+的 9 项 focused assertions，typecheck/build/verify-chunks 通过。text-preview CSS Highlight effect 与其他
+host IPC callback 仍由 React owner 持有。
 2026-10-11 A2 preload 增量：`Wy` 跨 frame pointer/keyboard/click/wheel/blur 事件注册与注销集合已迁移至
 `src/main/browser-page-preload/annotation-pointer-event-lifecycle.ts`；入口继续持有 handler closure、
 `Te.disposeFrame` 与 `dc` frame lifecycle，新增 `scripts/test-preload-annotation-pointer-event-lifecycle.mjs`
