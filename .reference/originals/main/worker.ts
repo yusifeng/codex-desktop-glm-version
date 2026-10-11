@@ -69731,7 +69731,7 @@ var I6 = kW(`git`),
             listWorktrees: (repository, requestSignal) => listGitWorktrees(repository, requestSignal, gitWorktreeListDeps),
           }),
         },
-        s = ube(e),
+        s = resolveReviewCwd(e),
         c = s == null ? `unknown` : getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), s, o, o.isLocal ? g.default : g.default.posix),
         l,
         u = null,
@@ -69748,7 +69748,7 @@ var I6 = kW(`git`),
               enqueuedAtMs: e.enqueuedAtMs,
               repoIndexSizeBucket: c,
               result: l,
-              reviewSource: B6(e),
+              reviewSource: resolveReviewSource(e),
               source: e.params.operationSource,
               startedAtMs: r,
             })),
@@ -70147,14 +70147,14 @@ var I6 = kW(`git`),
                 ? X({ origins: [] })
                 : EV(t)));
       } finally {
-        let t = cbe(e);
+        let t = resolveGitInvalidationTarget(e, xz, bz);
         if (
           (t?.type === `exact`
             ? await this.gitManager.invalidateUntrackedPathsCacheForCwd(t.cwd, o)
             : t?.type === `host` && this.gitManager.invalidateUntrackedPathsCache(o),
-          lbe(e.method))
+          isGitMutationMethod(e.method))
         ) {
-          let t = sbe(e);
+          let t = resolveMutationRoot(e, xz, bz);
           if (t != null)
             try {
               await this.gitManager.invalidateGitReadCachesForMutation(t, o);
@@ -70178,7 +70178,7 @@ var I6 = kW(`git`),
           enqueuedAtMs: e.enqueuedAtMs,
           repoIndexSizeBucket: c,
           result: l,
-          reviewSource: B6(e),
+          reviewSource: resolveReviewSource(e),
           source: e.params.operationSource,
           startedAtMs: r,
         })),
@@ -70198,7 +70198,7 @@ var I6 = kW(`git`),
         repoIndexSizeBucket: c,
         result: l,
         resultDisposition: u ?? void 0,
-        reviewSource: B6(e),
+        reviewSource: resolveReviewSource(e),
         source: e.params.operationSource,
         trigger: `request`,
       }),

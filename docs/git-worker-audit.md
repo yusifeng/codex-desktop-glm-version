@@ -1542,6 +1542,11 @@ Open-target registry 的 `A9` lookup 已迁移至 `src/main/worker/open-target-r
 入口继续构造平台 descriptor registry，并负责 detect/icon/open 的平台 I/O。由
 `scripts/test-worker-open-target-registry.mjs` 覆盖 3 项 lookup/error 断言。
 
+Git request dispatcher 的真实 consumers 已直接接回 request-context/invalidation policy：
+review cwd/source、mutation root、invalidation target 与 mutation-method 判定不再经过
+`ube`/`B6`/`sbe`/`cbe`/`lbe` generated 转发层；既有对应 policy focused suites 继续覆盖这些
+投影，generated wrapper 仅保留作 source-parity 对照。
+
 worker 中残留的 `F6` missing-path generated wrapper 已删除，watcher metadata、git path
 existence 与 worktree directory checks 三处 consumer 直接使用既有
 `isMissingPathError` 语义 helper；本次为 wrapper 消除，不改变错误分类或 I/O 顺序。
