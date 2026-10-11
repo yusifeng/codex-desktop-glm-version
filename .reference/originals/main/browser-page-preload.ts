@@ -5976,6 +5976,7 @@ var { createAnnotationAnchorObservationLifecycle } = require("./browser-page-pre
 var { installAnnotationPointerEventLifecycle } = require("./browser-page-preload/annotation-pointer-event-lifecycle");
 var { dispatchAnnotationWyHostMessage } = require("./browser-page-preload/annotation-wy-host-message-dispatcher");
 var { createAnnotationScreenshotReadyController } = require("./browser-page-preload/annotation-screenshot-ready-controller");
+var { createAnnotationTextHighlightController } = require("./browser-page-preload/annotation-text-highlight-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23697,6 +23698,9 @@ function Wy({ rootHost: e, bridge: t }) {
         cancelAnimationFrame: (handle) => window.cancelAnimationFrame(handle),
       }),
     ),
+    [textHighlightController] = (0, G.useState)(() =>
+      createAnnotationTextHighlightController({ apply: (anchor) => pu(anchor) }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -25029,7 +25033,11 @@ function Wy({ rootHost: e, bridge: t }) {
       { resolveTextAnchor: (anchor) => fu(anchor), resolveSelectionRects: (anchor) => nb(anchor) },
     );
   let Yt = textPreviewState.resolvedAnchor;
-  (0, G.useLayoutEffect)(() => (Yt == null ? void 0 : pu(Yt)), [Yt]);
+  (0, G.useLayoutEffect)(() => {
+    textHighlightController.update(Yt);
+    return () => textHighlightController.update(null);
+  }, [Yt, textHighlightController]);
+  (0, G.useEffect)(() => () => textHighlightController.dispose(), [textHighlightController]);
   let Jt = textPreviewState.anchor,
     Xt = textPreviewState.selectionRects,
     Zt = Xt,

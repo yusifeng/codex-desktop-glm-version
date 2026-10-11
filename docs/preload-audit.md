@@ -1378,3 +1378,18 @@ capability guard、multi-select guard 与 unknown message。
 `src/main/browser-page-preload/annotation-screenshot-ready-controller.ts`；入口每次 effect update 注入
 当前 `gn`，避免 stale screenshot payload，host IPC payload 仍由 React effect callback 组装。focused test
 覆盖 null reset、重复 ID、cleanup cancellation 与 dispose race。
+
+### 增量抽取：annotation text-highlight controller
+
+`Wy` CSS Highlight `Yt` 的 apply/replace/cleanup 生命周期已迁移至
+`src/main/browser-page-preload/annotation-text-highlight-controller.ts`；入口继续注入 `pu` adapter，
+保留 `useLayoutEffect` 时序与 CSS Highlight/stylesheet DOM owner。focused test 覆盖 anchor replacement、
+null cleanup、重复 dispose 与 disposed update gate。
+
+### A2 scope correction
+
+早期条目中的“pointer/frame-anchor lifecycle 未完成”是当时的阶段性快照；当前已由
+`annotation-anchor-observation-lifecycle.ts`、`annotation-pointer-event-lifecycle.ts`、
+`annotation-wy-host-message-dispatcher.ts`、`annotation-screenshot-ready-controller.ts` 与本次
+`annotation-text-highlight-controller.ts` 覆盖。剩余范围是各 callback 的业务 state/DOM/IPC 副作用 owner，
+不是 listener 注册/注销或 RAF/CSS Highlight teardown 机制。

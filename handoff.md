@@ -2742,6 +2742,12 @@ build/verify-chunks 通过。pointer/frame-anchor lifecycle 已拆分，剩余�
 当前 `gn`，保持 screenshot payload 与 host IPC 时序，新增 `scripts/test-preload-annotation-screenshot-ready-controller.mjs`
 的 9 项 focused assertions，typecheck/build/verify-chunks 通过。text-preview CSS Highlight effect 与其他
 host IPC callback 仍由 React owner 持有。
+2026-10-11 A2 preload 增量：`Wy` CSS Highlight `Yt` 的 apply/replace/cleanup 生命周期已迁移至
+`src/main/browser-page-preload/annotation-text-highlight-controller.ts`；入口继续注入 `pu` adapter，保留
+`useLayoutEffect` 时序与 CSS Highlight/stylesheet DOM owner，新增
+`scripts/test-preload-annotation-text-highlight-controller.mjs` 的 8 项 focused assertions，typecheck/build/
+verify-chunks 通过。A2 早期“pointer/frame-anchor lifecycle 未完成”记录为历史快照；当前 listener/observer/
+RAF/CSS Highlight teardown 已覆盖，剩余为业务 callback 的 state/DOM/IPC owner。
 2026-10-11 A2 preload 增量：`Wy` 跨 frame pointer/keyboard/click/wheel/blur 事件注册与注销集合已迁移至
 `src/main/browser-page-preload/annotation-pointer-event-lifecycle.ts`；入口继续持有 handler closure、
 `Te.disposeFrame` 与 `dc` frame lifecycle，新增 `scripts/test-preload-annotation-pointer-event-lifecycle.mjs`
