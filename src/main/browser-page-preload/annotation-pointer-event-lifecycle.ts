@@ -22,6 +22,7 @@ type AnnotationPointerEventLifecycleDependencies = {
 /** Installs and removes the annotation pointer/event surface in deterministic order. */
 function installAnnotationPointerEventLifecycle(dependencies: AnnotationPointerEventLifecycleDependencies) {
   const { documentLike, windowLike, auxiliaryEvents, handlers } = dependencies;
+  let disposed = false;
   const listener = (type: string, callback: (event: any) => void, capture?: boolean) =>
     documentLike.addEventListener(type, callback, capture);
   listener(`pointerdown`, handlers.pointerDown, true);
@@ -38,6 +39,8 @@ function installAnnotationPointerEventLifecycle(dependencies: AnnotationPointerE
   listener(`wheel`, handlers.wheel, true);
   windowLike.addEventListener(`blur`, handlers.blur);
   return () => {
+    if (disposed) return;
+    disposed = true;
     documentLike.removeEventListener(`pointerdown`, handlers.pointerDown, true);
     documentLike.removeEventListener(`pointermove`, handlers.pointerMove, true);
     documentLike.removeEventListener(`pointerup`, handlers.pointerUp, true);

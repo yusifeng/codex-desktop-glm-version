@@ -22,6 +22,7 @@ assert.equal(added.length, 14);
 assert.deepEqual(added.slice(0, 4).map(([type]) => type), ["pointerdown", "pointermove", "pointerup", "dragstart"]);
 assert.equal(added.at(-1)[0], "blur");
 dispose();
+dispose();
 assert.equal(removed.length, 14);
 assert.deepEqual(removed.slice(0, 4).map(([type]) => type), ["pointerdown", "pointermove", "pointerup", "dragstart"]);
 console.log("15 preload annotation pointer-event-lifecycle assertions passed");
