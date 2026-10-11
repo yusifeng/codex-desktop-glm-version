@@ -24994,6 +24994,10 @@ function Wy({ rootHost: e, bridge: t }) {
         onViewportResize: i,
         onViewportScroll: s,
         onTextAnchorChange: n,
+        cancelPendingFrame: () => {
+          r != null && window.cancelAnimationFrame(r);
+          r = null;
+        },
       });
       return lifecycle.install();
     }, [x, te, Ee, Ge, Ke, k, lt, e, Fe.length]));

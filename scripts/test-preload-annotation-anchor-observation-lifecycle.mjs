@@ -11,6 +11,7 @@ const viewport = {
 let frameDisposed = 0;
 let textDisposed = 0;
 let rootDisposed = 0;
+let pendingFramesCancelled = 0;
 let refreshes = 0;
 const lifecycle = createAnnotationAnchorObservationLifecycle({
   visualViewport: viewport,
@@ -33,6 +34,7 @@ const lifecycle = createAnnotationAnchorObservationLifecycle({
   onViewportResize: () => events.push("resize"),
   onViewportScroll: () => events.push("scroll"),
   onTextAnchorChange: () => { refreshes += 1; },
+  cancelPendingFrame: () => { pendingFramesCancelled += 1; },
 });
 lifecycle.install();
 assert.equal(refreshes, 2);
@@ -42,6 +44,7 @@ lifecycle.dispose();
 assert.equal(frameDisposed, 1);
 assert.equal(textDisposed, 1);
 assert.equal(rootDisposed, 1);
+assert.equal(pendingFramesCancelled, 1);
 assert.ok(events.includes("frame-resources:remove"));
 assert.ok(events.includes("root:remove"));
 assert.equal(refreshes, 2);

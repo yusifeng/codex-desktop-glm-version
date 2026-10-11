@@ -8,6 +8,7 @@ type AnnotationAnchorObservationLifecycleDependencies = {
   onViewportResize: () => void;
   onViewportScroll: () => void;
   onTextAnchorChange: () => void;
+  cancelPendingFrame: () => void;
 };
 
 /** Owns registration order for the cross-frame anchor observation effect. */
@@ -36,6 +37,7 @@ function createAnnotationAnchorObservationLifecycle(dependencies: AnnotationAnch
     rootCleanup?.();
     frameCleanup?.();
     textCleanup?.();
+    dependencies.cancelPendingFrame();
     rootCleanup = null;
     frameCleanup = null;
     textCleanup = null;
