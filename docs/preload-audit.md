@@ -1221,3 +1221,9 @@ marker resolver 与 point resolver，保留 marker 与普通 point 两条调用�
 overlay 排除、root/container 特殊处理及 design/annotation fallback 的最终 target projection（原 `Sl`，4648-4653）
 已迁移至 `src/main/browser-page-preload/annotation-target-projection-policy.ts`；入口仅注入既有 overlay、root、
 container 与 hit-target policies，保留 null、design fallback 和 annotation gating 语义。focused test 覆盖四项分支。
+
+### 增量抽取：annotation marker event policy
+
+页面 marker event 的 composed-path adapter（原 `xl`，4634-4643）已迁移至
+`src/main/browser-page-preload/annotation-marker-event-policy.ts`；入口仅注入 marker attribute
+与既有 `isAnnotationMarkerEvent` policy，保留 marker 命中与未命中语义。focused test 覆盖两种结果。

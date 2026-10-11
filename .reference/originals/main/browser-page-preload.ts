@@ -4633,15 +4633,7 @@ function bl(e, t) {
   return isAnnotationEventTarget(e, t, { getComposedPath: (event) => event.composedPath(), isBlocked: (event) => Cl(event) });
 }
 function xl(e) {
-  return isAnnotationMarkerEvent(e, `data-browser-comment-marker`, {
-    isElement: (value) => value instanceof HTMLElement,
-    closest: (element, selector) => element.closest(selector),
-    getRootNode: (element) => element.getRootNode(),
-    isShadowRoot: (value) => value instanceof ShadowRoot,
-    getShadowHost: (root) => root.host,
-    getComposedPath: (event) => event.composedPath(),
-    hasAttribute: (element, attribute) => element.hasAttribute(attribute),
-  });
+  return isPageAnnotationMarkerEvent(e, { markerAttribute: `data-browser-comment-marker`, isMarkerEvent: isAnnotationMarkerEvent, policy: { isElement: (value) => value instanceof HTMLElement, closest: (element, selector) => element.closest(selector), getRootNode: (element) => element.getRootNode(), isShadowRoot: (value) => value instanceof ShadowRoot, getShadowHost: (root) => root.host, getComposedPath: (event) => event.composedPath(), hasAttribute: (element, attribute) => element.hasAttribute(attribute) } });
 }
 function Sl(e, t, n, r) {
   return projectAnnotationTarget(e, t, n, r, { isOverlay: (element) => gl(element), isRoot: (element) => rc(element), getContainerAncestor: (element) => rl(element), resolveFallback: (element) => sl(element), resolveAnnotation: (element, point) => nl(element, point) });
@@ -5948,6 +5940,7 @@ var { applyAnnotationCursorStyle, restoreAnnotationCursorStyle } = require("./br
 var { withAnnotationMarkerPointerEventsDisabled } = require("./browser-page-preload/annotation-marker-pointer-events");
 var { resolveAnnotationPointerTarget } = require("./browser-page-preload/annotation-pointer-target-mode");
 var { projectAnnotationTarget } = require("./browser-page-preload/annotation-target-projection-policy");
+var { isPageAnnotationMarkerEvent } = require("./browser-page-preload/annotation-marker-event-policy");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");
