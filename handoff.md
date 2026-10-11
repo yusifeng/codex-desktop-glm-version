@@ -2853,3 +2853,16 @@ watch-error callback、session 清理、稳定阈值 retry reset、recovery upda
 由 controller 持有，worker 继续注入 target/session/logger/recovery/retry callbacks。由
 `scripts/test-worker-git-watch-session-close-controller.mjs` 覆盖 5 项 active/error/stable/stale race
 断言。剩余 metadata refresh generation/waiter 仍与 promise、Map、Git I/O 和 dispose ordering 绑定。
+2026-10-11 A1 worker 增量：metadata refresh 的 changed-path batch、single-flight waiter、首批
+recovering/后续批次状态推进与 dispose 清理已物理迁移至
+`src/main/worker/git-metadata-refresh-controller.ts`，真实接回 `GitRepoWatcher`；worker 仍持有
+metadata target/session、worktree directory I/O、generation 与 recovery 副作用顺序。由
+`scripts/test-worker-git-metadata-refresh-controller.mjs` 覆盖去重、single-flight、批次推进与
+disposed gate。剩余 `refreshWorktreeDirectories` 的 readDirectory/generation/target mutation 仍为
+watcher owner。
+
+2026-10-11 A2 preload 增量：`Wy` 四个 pointer/drag/click 回调中重复的
+`browser-sidebar-runtime-annotation-selection-modifier-state` host message 构造已迁移至
+`src/main/browser-page-preload/annotation-selection-modifier-notifier.ts`；入口继续持有
+`be.current`/`Oe`/anchor/shift-key 业务判定，notifier 保留原始每次发送语义并在 dispose 后抑制。
+由 `scripts/test-preload-annotation-selection-modifier-notifier.mjs` 覆盖 6 项 focused assertions。

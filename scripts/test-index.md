@@ -154,6 +154,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-editor-close-controller.mjs`](./test-preload-annotation-editor-close-controller.mjs)
 - [`test-preload-annotation-suspension-notifier.mjs`](./test-preload-annotation-suspension-notifier.mjs)
 - [`test-preload-annotation-design-modifier-notifier.mjs`](./test-preload-annotation-design-modifier-notifier.mjs)
+- [`test-preload-annotation-selection-modifier-notifier.mjs`](./test-preload-annotation-selection-modifier-notifier.mjs)
 - [`test-preload-annotation-design-editor-state.mjs`](./test-preload-annotation-design-editor-state.mjs)
 - [`test-preload-annotation-event-details.mjs`](./test-preload-annotation-event-details.mjs)
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)
@@ -1408,3 +1409,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-preload-annotation-transform-policy.mjs](test-preload-annotation-transform-policy.mjs)
 [test-main-browser-use-origin-policy.mjs](test-main-browser-use-origin-policy.mjs)
 [test-main-global-shortcut-policy.mjs](test-main-global-shortcut-policy.mjs)
+[test-worker-git-metadata-refresh-controller.mjs](test-worker-git-metadata-refresh-controller.mjs)
