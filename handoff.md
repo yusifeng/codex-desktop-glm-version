@@ -2919,6 +2919,11 @@ focused assertions。
 更新与 change emission 已物理迁移至 `src/main/main-app/window/primary-window-tracking.ts`；`Qot` 继续注入
 primary 状态容器与窗口事件回调，保持原始 focus/blur 顺序。由
 `scripts/test-main-primary-window-tracking.mjs` 覆盖 7 项 focused assertions。
+
+2026-10-11 A3 main 增量：`Qot.installWebContentsDiagnostics` 的 renderer crash/unresponsive/did-fail-load
+事件订阅、fatal report、recovery attempt reset 与 primary-window gone 通知已物理迁移至
+`src/main/main-app/window/web-contents-diagnostics.ts`；`Qot` 继续注入 recovery、ready-set 和 IPC owner，保持
+原始事件分支顺序。由 `scripts/test-main-web-contents-diagnostics.mjs` 覆盖 10 项 focused assertions。
 2026-10-11 A2 preload 增量：`Wy` host sync 的 `cancelUnavailableSiteInteraction` 分支已物理迁移至
 `src/main/browser-page-preload/annotation-unavailable-site-interaction-controller.ts`；controller 保留
 `Te.cancel()` 条件性标记 viewport selection、随后关闭 pointer mode 的顺序，入口继续注入 interaction
@@ -2930,3 +2935,8 @@ active/clear、create-element/text guard、pointer/Ce guard、DOM live-element h
 anchor/hover projection 与失败清理顺序，入口继续注入 React/ref/DOM owner。由
 `scripts/test-preload-annotation-selection-modifier-controller.mjs` 覆盖 disable 清理、成功命中、失败
 命中与 dispose gate。
+2026-10-11 A2 preload 增量：`Wy` 的 `removeAnnotationSelection` callback（`dt`）已物理迁移至
+`src/main/browser-page-preload/annotation-remove-selection-controller.ts`；controller 保留 multi-select
+与 create-element guard、primary/additional anchor 索引解析、`al` 投影及 `ut` 更新顺序，入口继续注入
+editor state 与 anchor update owner。由 `scripts/test-preload-annotation-remove-selection-controller.mjs`
+覆盖有效/无效索引、能力与 target guard、dispose gate。

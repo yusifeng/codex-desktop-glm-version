@@ -1466,6 +1466,13 @@ active/clear、create-element/text guard、pointer/Ce guard、DOM live-element h
 anchor/hover projection 与失败清理顺序，入口继续注入 React/ref/DOM owner。focused test 覆盖 disable
 清理、成功命中、失败命中与 dispose gate。
 
+### 增量抽取：annotation remove-selection controller
+
+`Wy` 的 `removeAnnotationSelection` callback（`dt`）已迁移至
+`src/main/browser-page-preload/annotation-remove-selection-controller.ts`；controller 保留 multi-select
+与 create-element guard、primary/additional anchor 索引解析、`al` 投影及 `ut` 更新顺序，入口继续
+注入 editor state 与 anchor update owner。focused test 覆盖有效/无效索引、能力与 target guard、dispose gate。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover
@@ -1487,6 +1494,14 @@ refs/setters 与 `H_` restore adapter，保持 host restore message 的原始副
 已迁移至 `src/main/main-app/startup/display-change-geometry-refresh.ts`；window manager 继续注入现有窗口几何
 刷新业务回调。由 `scripts/test-main-display-change-geometry-refresh.mjs` 覆盖三类事件、刷新转发、非 macOS gate
 与注销顺序。
+
+### 增量抽取：main web-contents diagnostics
+
+`Qot.installWebContentsDiagnostics` 的 renderer crash/unresponsive/did-fail-load 事件订阅、fatal report、recovery
+attempt reset 与 primary-window gone 通知已迁移至 `src/main/main-app/window/web-contents-diagnostics.ts`；Qot
+继续注入 recovery、ready-set 和 IPC owner，保持原始事件分支顺序。由
+`scripts/test-main-web-contents-diagnostics.mjs` 覆盖 crash recovery、load reset、unresponsive、failed-load
+过滤与 primary 通知。
 
 ### 增量抽取：main primary-window tracking
 

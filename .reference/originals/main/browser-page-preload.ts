@@ -5988,6 +5988,7 @@ var { createAnnotationCommentInteractionDisposalController } = require("./browse
 var { createAnnotationPreparedScreenshotController } = require("./browser-page-preload/annotation-prepared-screenshot-controller");
 var { createAnnotationUnavailableSiteInteractionController } = require("./browser-page-preload/annotation-unavailable-site-interaction-controller");
 var { createAnnotationSelectionModifierController } = require("./browser-page-preload/annotation-selection-modifier-controller");
+var { createAnnotationRemoveSelectionController } = require("./browser-page-preload/annotation-remove-selection-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23816,6 +23817,13 @@ function Wy({ rootHost: e, bridge: t }) {
         setPointer: (pointer) => f(pointer),
       }),
     ),
+    [removeSelectionController] = (0, G.useState)(() =>
+      createAnnotationRemoveSelectionController({
+        getAnchorSelections: (editorState) => G_(editorState.anchor),
+        projectSelection: (selections, selection) => al(selections, selection, !0),
+        applyAnchorUpdate: (editorState, anchorState) => ut(editorState, anchorState),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24222,12 +24230,9 @@ function Wy({ rootHost: e, bridge: t }) {
       },
       [t, Oe, n.viewportScale, j],
     ),
-    dt = (0, G.useEffectEvent)((e) => {
-      if (!Oe || x?.target.mode !== `create` || x.anchor.type === `text`) return;
-      let t = G_(x.anchor),
-        n = [t.primary, ...t.additional][e];
-      n != null && ut(x, al(t, n, !0));
-    }),
+    dt = (0, G.useEffectEvent)((e) =>
+      removeSelectionController.remove(e, { multiSelectEnabled: Oe, editorState: x }),
+    ),
     ft = (0, G.useEffectEvent)((e = _) => {
       e != null &&
         (t.sendMessageToHost({
@@ -24360,6 +24365,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => preparedScreenshotController.dispose(), [preparedScreenshotController]),
     (0, G.useEffect)(() => () => unavailableSiteInteractionController.dispose(), [unavailableSiteInteractionController]),
     (0, G.useEffect)(() => () => selectionModifierController.dispose(), [selectionModifierController]),
+    (0, G.useEffect)(() => () => removeSelectionController.dispose(), [removeSelectionController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {
