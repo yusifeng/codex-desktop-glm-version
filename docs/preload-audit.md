@@ -1209,3 +1209,9 @@ CSS selector token 的 page-level `CSS.escape` 能力探测与 fallback（原 `q
 命中 marker 时临时禁用其 pointer-events，并在 `pl` 成功或异常后恢复（原 `yl`，4629-4642）
 已迁移至 `src/main/browser-page-preload/annotation-marker-pointer-events.ts`；入口保留 marker
 查询、逐元素样式保存与 try/finally 恢复语义。focused test 覆盖正常执行与异常恢复。
+
+### 增量抽取：annotation pointer target mode
+
+pointer event 在 marker 命中与普通坐标命中之间的分派（原 `vl`，4600-4602）已迁移至
+`src/main/browser-page-preload/annotation-pointer-target-mode.ts`；入口仅注入 marker predicate、
+marker resolver 与 point resolver，保留 marker 与普通 point 两条调用路径。focused test 覆盖两种分支。

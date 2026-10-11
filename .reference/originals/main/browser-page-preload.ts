@@ -4622,7 +4622,7 @@ function _l(e, t) {
   n == null || gl(n) || gc(t, El);
 }
 function vl(e, t, n, r) {
-  return xl(n) ? yl(e, t, r) : pl(e.x, e.y, r, t);
+  return resolveAnnotationPointerTarget(e, t, n, r, { isMarker: (event) => xl(event), resolveMarker: (point, target, options) => yl(point, target, options), resolvePoint: (x, y, options, target) => pl(x, y, options, target) });
 }
 function yl(e, t, n) {
   let r = t.shadowRoot?.querySelectorAll(`[data-browser-comment-marker]`);
@@ -5949,6 +5949,7 @@ var { resolveAnnotationHitTargetWithFallback } = require("./browser-page-preload
 var { escapeAnnotationSelectorTokenForPage } = require("./browser-page-preload/annotation-selector-token-policy");
 var { applyAnnotationCursorStyle, restoreAnnotationCursorStyle } = require("./browser-page-preload/annotation-cursor-style-state");
 var { withAnnotationMarkerPointerEventsDisabled } = require("./browser-page-preload/annotation-marker-pointer-events");
+var { resolveAnnotationPointerTarget } = require("./browser-page-preload/annotation-pointer-target-mode");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");
