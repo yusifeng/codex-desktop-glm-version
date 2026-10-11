@@ -2600,4 +2600,5 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-11 A5 app-initial 批量推进：本批 500 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `dD/dE/dF/dG/dH/dI/dJ/dK/dL/dM/dN/dO/dP/dQ/dR/dS/dT/dU/dV/dW/dX/dY/d_/da/dc/dd/df/dh/dj/dk/dl/dm/dn/do/dp/dq/dr/ds/du/dv` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
