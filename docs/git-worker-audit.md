@@ -1565,3 +1565,7 @@ Git performance request context 的 root/review cwd/source 聚合已迁移至
 `resolveGitRequestPerformanceContext`，并接回 request telemetry 的三个真实 consumer；
 request lifecycle、cache 和 performance emission 仍由 manager 持有。由
 `scripts/test-worker-git-request-performance-context.mjs` 覆盖 2 项 projection 断言。
+Git worktree/root identity 的 SHA-1 投影 `X0/Y0` 已迁移至
+`src/main/worker/git-worktree-identity-policy.ts`，snapshot、restore、delete 以及 manager
+host/worktree consumers 直接接回；crypto digest 仍由 helper 调用，manager 保留 repository/lifecycle owner。
+`scripts/test-worker-git-worktree-identity-policy.mjs` 覆盖空值、POSIX 和 Windows 路径的稳定 identity 断言。

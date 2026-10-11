@@ -145,6 +145,7 @@ const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/te
 const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
 const { resolveOpenTarget } = require("./worker/open-target-registry");
 const { createWorktreeSnapshotCommitMessage, createWorktreeSnapshotRef, parsePushedRemoteBranches } = require("./worker/git-worktree-snapshot-policy");
+const { createGitWorktreeIdentity } = require("./worker/git-worktree-identity-policy");
 const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
@@ -421,7 +422,7 @@ const { removeWorktree: removeGitWorktree } = createWorktreeDelete({
   getHostId: (...args) => h1(...args),
   getLocalEnvironmentConfigPath: (worktree, host, signal) =>
     getGitLocalEnvironmentConfigPath(worktree, host, `worktree`, signal),
-  getWorktreeId: (worktree) => X0(bz(worktree)),
+  getWorktreeId: (worktree) => createGitWorktreeIdentity(bz(worktree)),
   logger: {
     debug: (message, detail) => kW(`git`)().debug(message, detail),
     info: (message, detail) => kW(`git`)().info(message, detail),
@@ -458,7 +459,7 @@ const resolveGitCommonDir = (cwd, host, signal) =>
 const gitRepositoryIdentityDeps = {
   fetchQueryWithSignal: (...args) => w1(...args),
   getConfigQueryMeta: () => y1,
-  getWorktreeId: (...args) => X0(...args),
+  getWorktreeId: (...args) => createGitWorktreeIdentity(...args),
   isCancelledError: (error) => error instanceof c1,
   originTimeoutMs: 5000,
   parseRemoteUrl: (...args) => wB(...args),
@@ -67927,7 +67928,7 @@ async function Sge(e, t, n, r, i) {
       Error(`Not in a git repository: ${t}`)
     );
   let o = e.getWorktreeRepositoryForRoot(a.root, n),
-    s = await X0(a.root),
+    s = await createGitWorktreeIdentity(a.root),
     c = createWorktreeSnapshotRef(s);
   O4().info(`[worktree-snapshot] start`, {
     safe: { worktreeId: s, reason: r, hasHostConfig: n != null },
@@ -67975,7 +67976,7 @@ async function Sge(e, t, n, r, i) {
   );
 }
 async function Cge(e, t, n, r, i) {
-  let a = await X0(bz(t)),
+  let a = await createGitWorktreeIdentity(bz(t)),
     o = createWorktreeSnapshotRef(a);
   if (
     (O4().info(`[worktree-restore] start`, {
@@ -70206,7 +70207,7 @@ var I6 = kW(`git`),
         this.emit({ type: `worker-response`, response: h }));
     }
     async deleteWorktreeWithLimit(e, t) {
-      let n = await X0(e.worktree);
+      let n = await createGitWorktreeIdentity(e.worktree);
       I6().info(`[worktree-delete] worker-start`, {
         safe: { worktreeId: n },
         sensitive: { reason: e.reason, force: e.force ?? !1, hasHostConfig: e.hostConfig != null },
