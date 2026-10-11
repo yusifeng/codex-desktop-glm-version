@@ -19,6 +19,7 @@ const { dispatchWorktreeCreateRequest } = require("./worker/git-worktree-create-
 const { dispatchCodexWorktreeRequest } = require("./worker/git-codex-worktree-dispatch");
 const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-dispatch");
 const { createGithubCliRateLimitGate } = require("./worker/github-cli-rate-limit-gate");
+const { createWindowsNativeAppIconCache } = require("./worker/windows-native-app-icon-cache");
 const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
@@ -76119,7 +76120,7 @@ var Hwe = K({ iconSmallForAppPath: aP((e) => typeof e == `function`) }),
   Uwe = 100,
   Wwe = 1e4,
   Gwe = `computer-use-app-icons.node`,
-  v7 = new Map(),
+  v7 = createWindowsNativeAppIconCache((e) => Jwe(e), 100),
   Kwe = (0, y.createRequire)(__filename),
   y7 = OW(`windows-native-app-icon`);
 async function qwe(
@@ -76132,18 +76133,7 @@ async function qwe(
 ) {
   let i = Ywe(e);
   if (i === ``) return null;
-  let a = i.toLowerCase(),
-    o = v7.get(a);
-  if (o != null) return (v7.delete(a), v7.set(a, o), o);
-  let s = Jwe(i, { addon: t, electronAppPath: n, resourcesPath: r }).then(
-    (e) => (e ?? v7.delete(a), e),
-  );
-  for (v7.set(a, s); v7.size > Uwe;) {
-    let e = v7.keys().next().value;
-    if (e == null) break;
-    v7.delete(e);
-  }
-  return s;
+  return v7.get(i.toLowerCase(), () => Jwe(i, { addon: t, electronAppPath: n, resourcesPath: r }));
 }
 async function Jwe(e, { addon: t, electronAppPath: n, resourcesPath: r }) {
   let i;

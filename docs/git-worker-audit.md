@@ -1632,6 +1632,11 @@ Worktree directory reconciliation 已迁移至 `git-worktree-watch-refresh-contr
 及 discovery failure recovery/retry 顺序，`GitRepoWatcher` 仅注入 target/session/host owner。由
 `scripts/test-worker-git-worktree-watch-refresh-controller.mjs` 覆盖 stale/new reconciliation 与
 non-missing discovery failure 顺序。
+Windows native app icon 的 bounded LRU/single-flight cache 已迁移至
+`windows-native-app-icon-cache.ts`；worker 仍持有 process-path normalization、native addon loader、timeout
+与 telemetry，cache 保留 100 项 LRU、同 key promise 复用、空结果淘汰及 identity-safe cleanup。由
+`scripts/test-worker-windows-native-app-icon-cache.mjs` 覆盖 key single-flight、淘汰后重建、失败重试与
+LRU 顺序。
 ### A1 最终复核：metadata refresh generation/waiter
 
 `GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、

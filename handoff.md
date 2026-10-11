@@ -3132,6 +3132,14 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 - `scripts/test-worker-open-in-target-command-registry.mjs` 覆盖 7 项 key、single-flight、custom command
   隔离和失败重试断言。
 
+# 本轮新增：Windows native app icon cache
+
+- `qwe` 的 native app icon bounded LRU/single-flight registry 已迁移至
+  `src/main/worker/windows-native-app-icon-cache.ts`；worker 继续持有 path normalization、addon loader、
+  timeout 与 telemetry，保留 100 项上限、空结果/失败清理和淘汰后同 key 重建语义。
+- `scripts/test-worker-windows-native-app-icon-cache.mjs` 覆盖 8 项 single-flight、identity cleanup、失败
+  retry 与 LRU 断言。
+
 # 本轮新增：GitHub CLI rate-limit gate
 
 - GitHub CLI secondary-rate-limit 的 per-host backoff、single-flight 等待、AbortSignal 竞态与 promise
