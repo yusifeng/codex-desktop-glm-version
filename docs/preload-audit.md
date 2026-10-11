@@ -565,6 +565,14 @@ Annotation 点命中在 shadow root 与 iframe 间递归解析（原 `lc/cc`，4
 命中优先级；入口仅注入 DOM/frame 读取器。`scripts/test-preload-annotation-frame-hit-test.mjs`
 覆盖 iframe 递归、policy deny 和 shadow-root 三项行为断言。
 
+### 增量抽取：annotation frame tree traversal
+
+Annotation iframe/shadow-root 元素递归与窗口去重遍历（原 `zc/uc`，4524-4540）已迁移至
+`src/main/browser-page-preload/annotation-frame-tree.ts`。该 helper 保留 shadow-root 深度
+遍历、iframe 顺序、窗口 Set 去重和缺失 document/window 的跳过语义；入口仅注入 DOM/frame
+读取器。`scripts/test-preload-annotation-frame-tree.mjs` 覆盖嵌套 frame、shadow frame 和
+循环窗口三项行为断言。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate

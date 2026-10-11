@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { collectAnnotationFrameElements, collectAnnotationFrameWindows } = require("../app/.vite/build/browser-page-preload/annotation-frame-tree.js");
+const nestedFrame = { kind: "frame" }, shadowFrame = { kind: "shadow-frame" }, shadowHost = { shadowRoot: { nodes: [shadowFrame] } }, root = { nodes: [nestedFrame, shadowHost] };
+const frameDeps = { queryAll: (value) => value.nodes ?? [], isFrameElement: (value) => value?.kind?.includes("frame") ?? false, getShadowRoot: (value) => value.shadowRoot ?? null };
+assert.deepEqual(collectAnnotationFrameElements(root, frameDeps), [nestedFrame, shadowFrame]);
+const rootWindow = { id: "root" }, childWindow = { id: "child" }, documents = new Map([[rootWindow, { frames: [nestedFrame] }], [childWindow, { frames: [nestedFrame] }]]);
+assert.deepEqual(collectAnnotationFrameWindows(rootWindow, { getDocument: (windowLike) => documents.get(windowLike), getFrameElements: (documentLike) => documentLike.frames, getFrameWindow: () => childWindow }), [rootWindow, childWindow]);
+assert.deepEqual(collectAnnotationFrameWindows(rootWindow, { getDocument: () => null, getFrameElements: () => [], getFrameWindow: () => null }), [rootWindow]);
+console.log("3 preload annotation frame tree assertions passed");

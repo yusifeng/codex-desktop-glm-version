@@ -4210,21 +4210,11 @@ function lc(e, t, n, r) {
   });
 }
 function uc(e = window) {
-  let t = [],
-    n = [e],
-    r = new Set();
-  for (; n.length > 0;) {
-    let e = n.pop();
-    if (e == null || r.has(e)) continue;
-    (r.add(e), t.push(e));
-    let i = oc(e);
-    if (i != null)
-      for (let e of zc(i)) {
-        let t = sc(e);
-        t != null && n.push(t);
-      }
-  }
-  return t;
+  return collectAnnotationFrameWindows(e, {
+    getDocument: (windowLike) => oc(windowLike),
+    getFrameElements: (documentLike) => zc(documentLike),
+    getFrameWindow: (frame) => sc(frame),
+  });
 }
 function dc(e) {
   let t = new Map(),
@@ -4497,10 +4487,11 @@ function Rc(e) {
   return kc(e);
 }
 function zc(e) {
-  let t = [];
-  for (let n of e.querySelectorAll(`*`))
-    (ac(n) && t.push(n), F(n) && n.shadowRoot != null && t.push(...zc(n.shadowRoot)));
-  return t;
+  return collectAnnotationFrameElements(e, {
+    queryAll: (root) => Array.from(root.querySelectorAll(`*`)),
+    isFrameElement: (value) => ac(value),
+    getShadowRoot: (value) => F(value) ? value.shadowRoot : null,
+  });
 }
 function Bc(e) {
   let t = e.ownerDocument;
@@ -6054,6 +6045,7 @@ var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation
 var { generateAnnotationSelector } = require("./browser-page-preload/annotation-selector-generator");
 var { resolveAnnotationHitTarget } = require("./browser-page-preload/annotation-hit-target-resolver");
 var { resolveAnnotationFrameHit } = require("./browser-page-preload/annotation-frame-hit-test");
+var { collectAnnotationFrameElements, collectAnnotationFrameWindows } = require("./browser-page-preload/annotation-frame-tree");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
