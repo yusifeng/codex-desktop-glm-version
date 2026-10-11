@@ -599,6 +599,14 @@ focused test 为 `scripts/test-connect-app-host-controller.mjs`，运行命令�
 `scripts/test-thread-settings-update-registry.mjs`，运行命令为
 `node --experimental-strip-types scripts/test-thread-settings-update-registry.mjs`。
 
+### 增量抽取：preload PIP 视频帧 IPC listener 生命周期
+
+`pip-video-decoder.ts` 的远程 PIP 视频帧 listener 已迁移至
+`src/main/preload/pip-video-frame-subscription-controller.ts`，真实接回 stopped/frame
+分流与 IPC listener teardown；decoder state 与 frame side effects 仍由既有 controller/owner
+持有。focused test 为 `scripts/test-pip-video-frame-subscription-controller.mjs`，运行命令为
+`node --experimental-strip-types scripts/test-pip-video-frame-subscription-controller.mjs`。
+
 ### 增量抽取：Windows 窗口透明度 workaround 判定
 
 启动编排 `Be2` 的首次显示分支中，`isWindows && !window.isVisible() &&

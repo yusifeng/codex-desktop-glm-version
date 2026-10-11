@@ -21,6 +21,8 @@ A3 main 新增 `turn-start-inflight-registry.ts`，真实接回 `createExecuteTu
 
 本轮新增 `thread-settings-update-registry.ts`，真实接回 `AppServerConversationManager.runThreadSettingsUpdate` 的 per-conversation 串行队列、前序失败吞并、identity-safe cleanup、wait 与 dispose clear；focused test 为 `scripts/test-thread-settings-update-registry.mjs`（运行：`node --experimental-strip-types scripts/test-thread-settings-update-registry.mjs`）。
 
+本轮新增 `pip-video-frame-subscription-controller.ts`，真实接回 preload PIP 视频帧 IPC listener；保持 stopped/frame 分流顺序并提供幂等 removeListener dispose，focused test 为 `scripts/test-pip-video-frame-subscription-controller.mjs`（运行：`node --experimental-strip-types scripts/test-pip-video-frame-subscription-controller.mjs`）。
+
 本轮新增 `annotation-edit-editor-controller.ts`，真实接回 Wy 的 `Ye` edit-editor callback。controller 注入 target map、comment/anchor/design projection 与 host/React side effects，保持 `close preview -> open editor IPC -> viewport refresh -> editor state -> clear preview` 顺序；focused test 为 `scripts/test-preload-annotation-edit-editor-controller.mjs`。
 
 同轮新增 `annotation-comment-preview-controller.ts`，真实接回 Wy 的 `Xe` comment-preview callback；focused test 为 `scripts/test-preload-annotation-comment-preview-controller.mjs`。

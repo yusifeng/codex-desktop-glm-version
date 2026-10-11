@@ -6,6 +6,7 @@
 import { ipcRenderer } from "electron";
 import { REMOTE_HOSTED_PIP_VIDEO_FRAME } from "./ipc-channels";
 import { createPipVideoDecoderController } from "./pip-video-decoder-controller";
+import { createPipVideoFrameSubscriptionController } from "./pip-video-frame-subscription-controller";
 
 const controller = createPipVideoDecoderController({
   createDecoder: (callbacks) => new VideoDecoder(callbacks),
@@ -21,11 +22,11 @@ export function disposeDecodersForRemovedPresentations(state: { activeThreadID: 
 function handleVideoChunk(message: any) { controller.handle(message); }
 
 export function registerPipVideoFrameHandler() {
-  ipcRenderer.on(REMOTE_HOSTED_PIP_VIDEO_FRAME, (_event, message: any) => {
-    if ("stopped" in message) {
-      controller.stopThread(message.threadID);
-      return;
-    }
-    handleVideoChunk(message);
+  return createPipVideoFrameSubscriptionController({
+    addListener: (channel, handler) => ipcRenderer.on(channel, handler as never),
+    removeListener: (channel, handler) => ipcRenderer.removeListener(channel, handler as never),
+    channel: REMOTE_HOSTED_PIP_VIDEO_FRAME,
+    onStopped: (threadID) => controller.stopThread(threadID),
+    onFrame: handleVideoChunk,
   });
 }

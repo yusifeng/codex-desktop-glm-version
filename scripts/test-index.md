@@ -1471,4 +1471,5 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-request-admission-controller.mjs](test-worker-git-request-admission-controller.mjs)
 [test-worker-git-working-tree-watch-policy-refresh-controller.mjs](test-worker-git-working-tree-watch-policy-refresh-controller.mjs)
 [test-thread-settings-update-registry.mjs](test-thread-settings-update-registry.mjs)（运行：`node --experimental-strip-types scripts/test-thread-settings-update-registry.mjs`）
+[test-pip-video-frame-subscription-controller.mjs](test-pip-video-frame-subscription-controller.mjs)（运行：`node --experimental-strip-types scripts/test-pip-video-frame-subscription-controller.mjs`）
 [test-connect-app-host-controller.mjs](test-connect-app-host-controller.mjs)（运行：`node --experimental-strip-types scripts/test-connect-app-host-controller.mjs`）
