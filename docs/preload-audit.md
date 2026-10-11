@@ -1444,6 +1444,13 @@ transient、generation 与 drag 清理顺序已迁移至
 `src/main/browser-page-preload/annotation-comment-interaction-disposal-controller.ts`；入口继续注入
 各 React/ref/DOM 清理 owner。focused test 覆盖完整顺序与重复 dispose 行为。
 
+### 增量抽取：annotation prepared-screenshot controller
+
+`Wy` prepared screenshot comment 的 prepare、active-comment reconcile、clear 与 dispose 生命周期已迁移至
+`src/main/browser-page-preload/annotation-prepared-screenshot-controller.ts`；入口继续注入 React state
+setter，host clear-preview IPC（`ft`）仍保持独立语义。focused test 覆盖保留、过期清理、主动清理与
+dispose gate。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover

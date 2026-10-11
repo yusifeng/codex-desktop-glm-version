@@ -5985,6 +5985,7 @@ var { createAnnotationSelectionModifierNotifier } = require("./browser-page-prel
 var { createAnnotationHoverSyncController } = require("./browser-page-preload/annotation-hover-sync-controller");
 var { createAnnotationPointerModeSyncController } = require("./browser-page-preload/annotation-pointer-mode-sync-controller");
 var { createAnnotationCommentInteractionDisposalController } = require("./browser-page-preload/annotation-comment-interaction-disposal-controller");
+var { createAnnotationPreparedScreenshotController } = require("./browser-page-preload/annotation-prepared-screenshot-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23769,6 +23770,9 @@ function Wy({ rootHost: e, bridge: t }) {
         },
       }),
     ),
+    [preparedScreenshotController] = (0, G.useState)(() =>
+      createAnnotationPreparedScreenshotController({ setPreparedComment: (commentId) => ne(commentId) }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -24279,8 +24283,8 @@ function Wy({ rootHost: e, bridge: t }) {
         refreshViewport: () => T(C_()),
         syncDesignModifier: (message) => g(message.interactionMode === `comment` && message.isDesignModifierPressed === !0),
         clearDesignScrub: () => ie(null),
-        reconcilePreparedScreenshot: (message) => ne((previous) => (previous != null && !message.comments.some((comment) => comment.id === previous) ? null : previous)),
-        prepareScreenshot: (commentId) => ne(commentId),
+        reconcilePreparedScreenshot: (message) => preparedScreenshotController.reconcile(message.comments),
+        prepareScreenshot: (commentId) => preparedScreenshotController.prepare(commentId),
         captureTextSelection: () => ot(),
         selectComment: (commentId) => b(commentId),
         closeEditor: (message) => {
@@ -24292,7 +24296,7 @@ function Wy({ rootHost: e, bridge: t }) {
             clearPointerState: () => f(null),
             clearViewportSelection: () => { xe.current = !1; Se.current = !1; },
             clearDesignScrub: () => ie(null),
-            clearPreparedScreenshot: () => ne(null),
+            clearPreparedScreenshot: () => preparedScreenshotController.clear(),
             clearHover: () => { o(null); c(null); },
             clearSelectionHover: () => u(null),
             clearDragState: () => { O.current = null; oe(null); },
@@ -24333,6 +24337,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => viewportRefreshScheduler.dispose(), [viewportRefreshScheduler]),
     (0, G.useEffect)(() => () => hoverSyncController.dispose(), [hoverSyncController]),
     (0, G.useEffect)(() => () => pointerModeSyncController.dispose(), [pointerModeSyncController]),
+    (0, G.useEffect)(() => () => preparedScreenshotController.dispose(), [preparedScreenshotController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {

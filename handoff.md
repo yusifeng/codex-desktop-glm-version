@@ -2897,3 +2897,8 @@ pointer、hover、selection、transient、generation 与 drag 清理顺序已物
 `src/main/browser-page-preload/annotation-comment-interaction-disposal-controller.ts`；入口继续注入各
 React/ref/DOM 清理 owner。由 `scripts/test-preload-annotation-comment-interaction-disposal-controller.mjs`
 覆盖完整顺序与重复 dispose 行为。
+2026-10-11 A2 preload 增量：`Wy` prepared screenshot comment 的 prepare、active-comment reconcile、clear
+与 dispose 生命周期已物理迁移至 `src/main/browser-page-preload/annotation-prepared-screenshot-controller.ts`；
+入口继续注入 React state setter，host clear-preview IPC（`ft`）保持独立。由
+`scripts/test-preload-annotation-prepared-screenshot-controller.mjs` 覆盖保留、过期清理、主动清理与
+dispose gate。
