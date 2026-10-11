@@ -1364,3 +1364,10 @@ viewport listener、frame/text observer registration、dispose idempotence 与 c
 `Wy` 跨 frame pointer/keyboard/click/wheel/blur 事件的注册与注销集合已迁移至
 `src/main/browser-page-preload/annotation-pointer-event-lifecycle.ts`；入口继续持有事件 handler closure、
 `Te.disposeFrame` 与 `dc` frame lifecycle。focused test 覆盖 15 个 listener 的顺序、capture 参数与对称清理。
+
+### 增量抽取：Wy host message dispatcher
+
+`Wy` 的 host message type 分发、capability guard 与 callback 顺序已迁移至
+`src/main/browser-page-preload/annotation-wy-host-message-dispatcher.ts`；state/ref/IPC 副作用均由入口注入，
+保留 sync、screenshot、editor、design、selection、restore 分支语义。focused test 覆盖 sync 顺序、design
+capability guard、multi-select guard 与 unknown message。

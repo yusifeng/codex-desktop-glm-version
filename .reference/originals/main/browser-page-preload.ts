@@ -5974,6 +5974,7 @@ var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/anno
 var { createAnnotationViewportRefreshScheduler } = require("./browser-page-preload/annotation-viewport-refresh-scheduler");
 var { createAnnotationAnchorObservationLifecycle } = require("./browser-page-preload/annotation-anchor-observation-lifecycle");
 var { installAnnotationPointerEventLifecycle } = require("./browser-page-preload/annotation-pointer-event-lifecycle");
+var { dispatchAnnotationWyHostMessage } = require("./browser-page-preload/annotation-wy-host-message-dispatcher");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -24212,6 +24213,51 @@ function Wy({ rootHost: e, bridge: t }) {
     });
   ((0, G.useEffect)(() => {
     let e = t.subscribeToHostMessages((e) => {
+      if (dispatchAnnotationWyHostMessage(e, { canUseTweaks: Ne, canUseMultiSelect: Oe }, {
+        syncContext: (message) => i.sync(message),
+        syncPointerMode: (message) => nt(message),
+        syncHover: (message) => _t(message),
+        cancelUnavailableSiteInteraction: () => { Te.cancel() && (xe.current = !0); pe(!1); },
+        clearModifierOnModeChange: () => { ve.current = !1; },
+        clearPreparedScreenshot: () => ft(),
+        disposeCommentInteraction: () => {
+          (Te.dispose(), pe(!1), (be.current = !1), m(!1), f(null), o(null), c(null), u(null), mc(),
+            (xe.current = !1), (Se.current = !1), (me.current += 1), (O.current = null), oe(null));
+        },
+        clearSelectionModifier: () => u(null),
+        applySyncState: (message, scheduleRefresh) => r((previous) => {
+          message.zoomPercent !== previous.zoomPercent && scheduleRefresh();
+          return projectAnnotationRuntimeSyncState(message);
+        }),
+        refreshViewport: () => T(C_()),
+        syncDesignModifier: (message) => g(message.interactionMode === `comment` && message.isDesignModifierPressed === !0),
+        clearDesignScrub: () => ie(null),
+        reconcilePreparedScreenshot: (message) => ne((previous) => (previous != null && !message.comments.some((comment) => comment.id === previous) ? null : previous)),
+        prepareScreenshot: (commentId) => ne(commentId),
+        captureTextSelection: () => ot(),
+        selectComment: (commentId) => b(commentId),
+        closeEditor: (message) => {
+          (w.current?.clear(), mc(), (0, lb.flushSync)(() => {
+            ((be.current = !1), m(!1), f(null), (me.current += 1), (xe.current = !1), (Se.current = !1),
+              ie(null), ne(null), o(null), c(null), u(null), (O.current = null), oe(null),
+              S((state) => (state == null || message.target == null || ms(state.target, message.target) ? null : state)));
+          }));
+        },
+        setDesignScrub: (property) => ie(property),
+        clearSelectionHover: () => u(null),
+        createCommentAtPoint: (point) => rt(point),
+        retryCreateCommentAtPoint: (point) => it(point),
+        createCommentFromSelection: (message) => at(message),
+        openDesignEditorAtPoint: (point) => st(point),
+        retryOpenDesignEditorAtPoint: (point) => ct(point),
+        setSelectionModifier: (pressed) => yt(pressed),
+        setSelectionHover: (selectionIndex) => u(selectionIndex),
+        removeAnnotationSelection: (selectionIndex) => dt(selectionIndex),
+        restoreEditor: (message) => {
+          (w.current?.clear(), (be.current = !1), m(!1), (E.current = null), f(null), mc(), o(null), c(null),
+            u(null), vt(message));
+        },
+      }, () => lt())) return;
       switch (e.type) {
         case `browser-sidebar-runtime-sync`:
           (i.sync(e),
