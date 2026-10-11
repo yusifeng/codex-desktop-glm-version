@@ -110,6 +110,7 @@ const { deleteGitWorktreeLifecycle } = require("./worker/git-worktree-delete-lif
 const { runGitLiveQueryWithAttribution } = require("./worker/git-live-query-attribution-controller");
 const { emitGitPerformanceOperation: emitGitPerformanceOperationController } = require("./worker/git-performance-operation-controller");
 const { finalizeGitRequest } = require("./worker/git-request-finalization-controller");
+const { completeGitRequest } = require("./worker/git-request-completion-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70052,40 +70053,11 @@ var I6 = kW(`git`),
           refreshRepository: (hostId, root) => this.liveQueryRegistry.refreshRepository(hostId, root), getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
           finishRequest: (id, tracked) => this.requestLifecycle.finish(id, tracked) });
       }
-      if (f && i.signal.aborted) {
-        (this.emitGitPerformanceOperation(createGitRequestCancellationTelemetry({
-          attribution: n,
-          durationMs: Date.now() - r,
-          host: o,
-          operation: t,
-          enqueuedAtMs: e.enqueuedAtMs,
-          repoIndexSizeBucket: c,
-          result: l,
-          reviewSource: resolveGitRequestPerformanceContext(e).reviewSource,
-          source: e.params.operationSource,
-          startedAtMs: r,
-        })),
-          t ?? jH(`canceled`));
-        return;
-      }
-      t == null && isGitRequestFailure(p) && jH(`failure`);
-      let m = AH() ?? e.trace,
-        h = createGitWorkerResponse({ id: e.id, method: e.method, result: p, trace: m });
-      (this.emitGitPerformanceOperation({
-        attribution: n,
-        canceled: !1,
-        durationMs: Date.now() - r,
-        host: o,
-        operation: t,
-        queueDurationMs: e.enqueuedAtMs == null ? null : Math.max(0, r - e.enqueuedAtMs),
-        repoIndexSizeBucket: c,
-        result: l,
-        resultDisposition: u ?? void 0,
-        reviewSource: resolveGitRequestPerformanceContext(e).reviewSource,
-        source: e.params.operationSource,
-        trigger: `request`,
-      }),
-        this.emit({ type: `worker-response`, response: h }));
+      if (completeGitRequest({ request: e, tracked: f, signal: i.signal, operation: t, startedAt: r, host: o, enqueuedAtMs: e.enqueuedAtMs,
+        repoIndexSizeBucket: c, result: l, responseResult: p, resultDisposition: u, attribution: n,
+        isRequestFailure: isGitRequestFailure, recordOutcome: (outcome) => jH(outcome), createCancellationTelemetry: createGitRequestCancellationTelemetry,
+        emitPerformance: (input) => this.emitGitPerformanceOperation(input), resolveReviewSource: (request) => resolveGitRequestPerformanceContext(request).reviewSource,
+        getTrace: () => AH() ?? e.trace, createResponse: createGitWorkerResponse, emit: (event) => this.emit(event), now: () => Date.now() })) return;
     }
     async deleteWorktreeWithLimit(e, t) {
       return deleteGitWorktreeLifecycle({ worktree: e.worktree, host: t, reason: e.reason, force: e.force ?? !1,

@@ -1,0 +1,6 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { completeGitRequest } = require("../app/.vite/build/worker/git-request-completion-controller.js");
+const calls = []; const base = { request: { id: "r", method: "status", params: { operationSource: "ui" } }, tracked: true, signal: { aborted: false }, operation: "status", startedAt: 10, host: { isLocal: true }, repoIndexSizeBucket: "small", result: {}, responseResult: { ok: true }, resultDisposition: null, attribution: "a", isRequestFailure: () => false, recordOutcome: (value) => calls.push(["outcome", value]), createCancellationTelemetry: () => ({ canceled: true }), emitPerformance: (value) => calls.push(["perf", value.canceled]), resolveReviewSource: () => null, getTrace: () => null, createResponse: (value) => value, emit: (value) => calls.push(["emit", value.type]), now: () => 20 };
+assert.equal(completeGitRequest(base), false); assert.deepEqual(calls, [["perf", false], ["emit", "worker-response"]]); calls.length = 0; assert.equal(completeGitRequest({ ...base, signal: { aborted: true } }), true); assert.deepEqual(calls, [["perf", true]]); console.log("6 worker Git request-completion controller assertions passed");
