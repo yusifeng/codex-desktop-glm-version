@@ -26,7 +26,13 @@ function createAnnotationViewportRefreshScheduler(
       frame = null;
     }
   };
-  return { schedule, dispose };
+  const cancel = () => {
+    if (frame != null) {
+      dependencies.cancelAnimationFrame(frame);
+      frame = null;
+    }
+  };
+  return { schedule, cancel, dispose };
 }
 
 export { createAnnotationViewportRefreshScheduler };

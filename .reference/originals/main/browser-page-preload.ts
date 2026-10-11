@@ -24318,9 +24318,10 @@ function Wy({ rootHost: e, bridge: t }) {
       }
     });
     return () => {
-      (viewportRefreshScheduler.dispose(), e());
+      (viewportRefreshScheduler.cancel(), e());
     };
   }, [i, t, Oe, Ne, ot, st, lt, it, ct, Te, e, rt, at]),
+    (0, G.useEffect)(() => () => viewportRefreshScheduler.dispose(), [viewportRefreshScheduler]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {

@@ -33,4 +33,25 @@ assert.deepEqual(cancelled, [1, 3]);
 assert.doesNotThrow(() => scheduler.schedule());
 assert.equal(refreshes, 1);
 
-console.log("7 preload annotation viewport-refresh-scheduler assertions passed");
+const reusable = createAnnotationViewportRefreshScheduler({
+  requestAnimationFrame: (callback) => {
+    const handle = ++nextFrame;
+    callbacks.set(handle, callback);
+    return handle;
+  },
+  cancelAnimationFrame: (handle) => {
+    cancelled.push(handle);
+    callbacks.delete(handle);
+  },
+  refresh: () => {
+    refreshes += 1;
+  },
+});
+reusable.schedule();
+reusable.cancel();
+reusable.schedule();
+callbacks.get(5)();
+assert.equal(refreshes, 2);
+reusable.dispose();
+
+console.log("10 preload annotation viewport-refresh-scheduler assertions passed");
