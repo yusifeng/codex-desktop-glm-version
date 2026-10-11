@@ -105,6 +105,7 @@ const { refreshGitInitMetadata: refreshGitInitMetadataSingleFlight } = require("
 const { applyGitInitMetadata } = require("./worker/git-init-metadata-apply-controller");
 const { ensureGitInitWatchDesired } = require("./worker/git-init-watch-desire-controller");
 const { startGitInitWatcher: startGitInitWatcherController } = require("./worker/git-init-watcher-start-controller");
+const { handleGitRepoWatchEvent } = require("./worker/git-repo-watch-event-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70371,7 +70372,7 @@ var I6 = kW(`git`),
       let r = this.getWatchKey(e.root, t),
         i = new Map(),
         a = !1,
-        o = async (n) => {
+        legacyRepoWatchEvent = async (n) => {
           if (!(h.refCount <= 0 || h.closingPromise != null || this.watchesByKey.get(r) !== h)) {
             if (n.type === `worker-event` && n.event.type === `git-repo-changed`) {
               let o = n.event,
@@ -70462,6 +70463,16 @@ var I6 = kW(`git`),
             this.emit(n);
           }
         },
+        o = (n) => handleGitRepoWatchEvent({ event: n, root: e.root, host: t,
+          isActive: () => h.refCount > 0 && h.closingPromise == null && this.watchesByKey.get(r) === h,
+          getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
+          filterWorkingTreePaths: (repository, paths) => Tme(repository, paths), getTrace: () => AH(), trace: OH,
+          invalidateAll: (repository) => p2(repository), invalidateChange: (repository, changeType, paths) => repository.invalidateGitReadCachesForRepoChange(changeType, paths),
+          handleRepoChanged: (event, onFanout) => this.liveQueryRegistry.handleRepoChanged(event, onFanout),
+          getRawEventCount: (changeType) => i.get(changeType) ?? 1, clearRawEventCount: (changeType) => i.delete(changeType),
+          recordPerformance: (input) => this.watcherPerformance.record(input),
+          getIndexSizeBucket: (_root, host, result) => getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), e.root, host, host.isLocal ? result?.default : result?.default?.posix),
+          requiresRecovery: () => a, emit: (value) => this.emit(value) }),
         s = this.gitManager.getWorktreeRepositoryForRoot(e.root, t),
         c = () => {
           s.queryClient.removeQueries({
