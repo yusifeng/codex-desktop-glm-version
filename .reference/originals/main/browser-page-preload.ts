@@ -5961,6 +5961,7 @@ var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotatio
 var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annotation-display-anchors");
 var { projectAnnotationRuntimeCollections } = require("./browser-page-preload/annotation-runtime-collection-projection");
 var { projectAnnotationMarkerRecords } = require("./browser-page-preload/annotation-marker-record-projection");
+var { projectAnnotationActiveView } = require("./browser-page-preload/annotation-active-view-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25010,17 +25011,11 @@ function Wy({ rootHost: e, bridge: t }) {
           }
         );
     }, [e, Ct]));
-  let wt = te == null ? null : (Le.find((e) => e.id === te) ?? null),
-    Tt = te == null ? null : (We.find((e) => e.id === te) ?? null),
-    M =
-      wt == null
-        ? Tt == null
-          ? null
-          : { kind: `design`, annotation: Tt }
-        : { kind: `comment`, annotation: wt },
-    Et = M?.annotation.id ?? null,
-    Dt = M?.kind === `comment` ? [M.annotation] : Le,
-    Ot = M != null && te != null,
+  let activeView = projectAnnotationActiveView(te, Le, We),
+    M = activeView.active,
+    Et = activeView.activeId,
+    Dt = activeView.displayAnnotations,
+    Ot = activeView.hasActiveSelection,
     kt = x?.target.mode === `create` ? U_(x.anchor) : null,
     At = x?.target.mode === `create` && x.anchor.type === `text` ? x.anchor.value : null,
     jt =

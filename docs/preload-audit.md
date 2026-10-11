@@ -1269,3 +1269,11 @@ React annotation runtime 的 marker record 列表构建（原 `Wy` 内 `Rt`）�
 映射、primary/additional anchor 展开、virtual 过滤、selection source index、live element 注入、
 marker point 投影与稳定 key，入口继续负责 marker point 聚合及 React render/UI 生命周期。focused
 test 覆盖 virtual/missing-point 过滤、primary live-id、selection index 与 key 生成。
+
+### 增量抽取：annotation active-view projection
+
+React annotation runtime 的 selected-id 到 comment/design active view 派生（原 `Wy` 内
+`wt/Tt/M/Et/Dt/Ot`）已迁移至 `src/main/browser-page-preload/annotation-active-view-projection.ts`；
+模块保留 comment 优先、design fallback、display annotation 列表与 active-selection gate，入口
+继续持有 anchor resolution、effects 与 render 生命周期。focused test 覆盖 comment/design/missing/null
+selection 分支。
