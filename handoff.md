@@ -2994,3 +2994,8 @@ payload/state 与 dispose gate。
 null state、design target、无 `commentId` target 与 stale comment 清理 predicate，入口继续注入 React
 editor state setter。由 `scripts/test-preload-annotation-editor-comment-reconciliation-controller.mjs`
 覆盖保留/清理各 target 分支与 dispose gate。
+
+2026-10-11 A1 worker 增量：`GitInitWatcher.scheduleReconnect` 的 timer 去重、指数退避、startSessions 成功复位、
+失败重排与 dispose 清理已物理迁移至 `src/main/worker/git-init-reconnect-controller.ts`；watcher 继续注入
+session 启动与日志 owner。由 `scripts/test-worker-git-init-reconnect-controller.mjs` 覆盖 8 项 focused
+assertions。

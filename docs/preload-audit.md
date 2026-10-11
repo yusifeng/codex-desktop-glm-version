@@ -1532,6 +1532,12 @@ attempt reset 与 primary-window gone 通知已迁移至 `src/main/main-app/wind
 `scripts/test-main-web-contents-diagnostics.mjs` 覆盖 crash recovery、load reset、unresponsive、failed-load
 过滤与 primary 通知。
 
+### 增量抽取：worker Git init reconnect controller
+
+`GitInitWatcher.scheduleReconnect` 的 timer 去重、指数退避、startSessions 成功复位、失败重排与 dispose 清理已
+迁移至 `src/main/worker/git-init-reconnect-controller.ts`；watcher 继续注入 session 启动与日志 owner。由
+`scripts/test-worker-git-init-reconnect-controller.mjs` 覆盖退避、成功复位、去重与 dispose gate。
+
 ### 增量抽取：main primary-window tracking
 
 `Qot.trackPrimaryWindow` 的 primary set 注册、初始 active 选择、focus/blur 时间戳更新与 change emission
