@@ -4606,35 +4606,16 @@ function rl(e) {
   return null;
 }
 function il(e, t) {
-  let n = e.ownerDocument,
-    r = n.defaultView,
-    i = e,
-    a = null;
-  for (; i?.ownerDocument === n;) {
-    if (i.hasAttribute(`oai-annotation-container-text`)) return null;
-    let e = i === n.body || i === n.documentElement,
-      o = i.hasAttribute(`oai-annotation-container`);
-    if (!e && !o && a == null && i.hasAttribute(`oai-annotatable`)) {
-      let e = i.getBoundingClientRect();
-      r != null &&
-        Number.isFinite(e.left) &&
-        Number.isFinite(e.top) &&
-        Number.isFinite(e.right) &&
-        Number.isFinite(e.bottom) &&
-        e.width > 0 &&
-        e.height > 0 &&
-        e.left < r.innerWidth &&
-        e.right > 0 &&
-        e.top < r.innerHeight &&
-        e.bottom > 0 &&
-        (t == null || (t.x >= e.left && t.x <= e.right && t.y >= e.top && t.y <= e.bottom)) &&
-        (typeof i.checkVisibility != `function` ||
-          i.checkVisibility({ checkOpacity: !0, checkVisibilityCSS: !0 })) &&
-        (a = i);
-    }
-    if (o) return a ?? document.documentElement;
-    i = ic(i);
-  }
+  return resolveAnnotationHitTarget(e, t, {
+    getOwnerDocument: (element) => element.ownerDocument,
+    getDefaultView: (documentLike) => documentLike.defaultView,
+    getParent: (element) => ic(element),
+    hasAttribute: (element, name) => element.hasAttribute(name),
+    getRect: (element) => element.getBoundingClientRect(),
+    checkVisibility: (element) => typeof element.checkVisibility !== `function` || element.checkVisibility({ checkOpacity: !0, checkVisibilityCSS: !0 }),
+    getDocumentBody: (documentLike) => documentLike.body,
+    getDocumentElement: (documentLike) => documentLike.documentElement,
+  });
 }
 function al(e, t, n) {
   if (e.primary.anchor.kind === `virtual` || t.anchor.kind === `virtual`)
@@ -6080,6 +6061,7 @@ var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annot
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { generateAnnotationSelector } = require("./browser-page-preload/annotation-selector-generator");
+var { resolveAnnotationHitTarget } = require("./browser-page-preload/annotation-hit-target-resolver");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");

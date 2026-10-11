@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { resolveAnnotationHitTarget } = require("../app/.vite/build/browser-page-preload/annotation-hit-target-resolver.js");
+const documentLike = { body: {}, documentElement: {} };
+const container = { ownerDocument: documentLike, parentElement: documentLike.body, attrs: ["oai-annotation-container"], getBoundingClientRect: () => ({ left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 }) };
+const target = { ownerDocument: documentLike, parentElement: container, attrs: ["oai-annotatable"], getBoundingClientRect: () => ({ left: 10, top: 10, right: 50, bottom: 50, width: 40, height: 40 }) };
+const deps = { getOwnerDocument: (e) => e.ownerDocument, getDefaultView: () => ({ innerWidth: 200, innerHeight: 200 }), getParent: (e) => e.parentElement, hasAttribute: (e, name) => e.attrs?.includes(name) ?? false, getRect: (e) => e.getBoundingClientRect(), checkVisibility: () => true, getDocumentBody: (d) => d.body, getDocumentElement: (d) => d.documentElement };
+assert.equal(resolveAnnotationHitTarget(target, { x: 20, y: 20 }, deps), target);
+assert.equal(resolveAnnotationHitTarget(target, { x: 150, y: 150 }, deps), documentLike.documentElement);
+const textContainer = { ...target, attrs: ["oai-annotation-container-text"], parentElement: documentLike.body };
+assert.equal(resolveAnnotationHitTarget(textContainer, undefined, deps), null);
+console.log("3 preload annotation hit target resolver assertions passed");

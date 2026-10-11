@@ -548,6 +548,15 @@ DOM 读取器、CSS token escape 与既有 unique-selector predicate。由
 `scripts/test-preload-annotation-selector-generator.mjs` 覆盖 id、unique 和 class fallback
 三项行为断言。
 
+### 增量抽取：annotation hit target resolution
+
+Annotation frame/DOM 命中目标的 ancestor 解析（原 `il`，4620-4655）已迁移至
+`src/main/browser-page-preload/annotation-hit-target-resolver.ts`。该 helper 保留
+`oai-annotatable` 的 viewport/point/checkVisibility 过滤、text-container 的 `null`、
+普通 container 的 documentElement fallback，以及未命中时的 `undefined` 三态协议；入口
+仅注入 DOM/frame 读取器。`scripts/test-preload-annotation-hit-target-resolver.mjs`
+覆盖命中、点位越界 fallback 和 text-container 三项行为断言。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate
