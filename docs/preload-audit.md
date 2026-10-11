@@ -594,6 +594,13 @@ Annotation text/container ancestor 查找（原 `rl`，4572-4581）已迁移至
 selector 生成和 clipping policy 注入，`Pc` 的事件监听副作用仍留在 preload；focused test
 覆盖 includeElement、selector/offset 收集和无 clipping 三项行为。
 
+### 增量抽取：annotation scroll listener lifecycle
+
+Annotation scroll-container listener 注册与 cleanup（原 `Pc`，4457-4468）已迁移至
+`src/main/browser-page-preload/annotation-scroll-listener.ts`。该模块保留 frame-path 过滤、
+descriptor selector 解析、Set 去重和成对移除 listener；入口只注入 frame/DOM 查询与事件
+适配器。focused test 覆盖去重注册与 cleanup。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate
