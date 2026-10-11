@@ -30,6 +30,7 @@ const { projectNativeStatusItemMenuState } = require("./main-app/startup/native-
 const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window-options.js");
 const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-titlebar-overlay-sync.js");
 const { installDisplayChangeGeometryRefresh } = require("./main-app/startup/display-change-geometry-refresh.js");
+const { installPrimaryWindowTracking } = require("./main-app/window/primary-window-tracking.js");
 const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
@@ -173118,19 +173119,16 @@ var Qot = class {
       i === `register` && this.options.onWindowRegistered?.(e));
   }
   trackPrimaryWindow(e) {
-    (this.primaryWindows.add(e),
-      e.isFocused()
-        ? ((this.lastActivePrimaryWindow = e), this.primaryWindowLastActiveAtMs.set(e, Date.now()))
-        : (this.lastActivePrimaryWindow ??= e),
-      this.emitPrimaryWindowChangeIfNeeded(),
-      e.on(`focus`, () => {
-        ((this.lastActivePrimaryWindow = e),
-          this.primaryWindowLastActiveAtMs.set(e, Date.now()),
-          this.emitPrimaryWindowChangeIfNeeded());
-      }),
-      e.on(`blur`, () => {
-        this.primaryWindowLastActiveAtMs.set(e, Date.now());
-      }));
+    installPrimaryWindowTracking({
+      isFocused: () => e.isFocused(),
+      now: () => Date.now(),
+      addPrimaryWindow: () => this.primaryWindows.add(e),
+      setLastActiveWindow: () => { this.lastActivePrimaryWindow = e; },
+      setLastActiveAt: (timestamp) => this.primaryWindowLastActiveAtMs.set(e, timestamp),
+      hasLastActiveWindow: () => this.lastActivePrimaryWindow != null,
+      emitChange: () => this.emitPrimaryWindowChangeIfNeeded(),
+      on: (event, listener) => e.on(event, listener),
+    });
   }
   emitPrimaryWindowChangeIfNeeded() {
     let e = this.getPrimaryWindow();
