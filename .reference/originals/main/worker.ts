@@ -107,6 +107,7 @@ const { ensureGitInitWatchDesired } = require("./worker/git-init-watch-desire-co
 const { startGitInitWatcher: startGitInitWatcherController } = require("./worker/git-init-watcher-start-controller");
 const { handleGitRepoWatchEvent } = require("./worker/git-repo-watch-event-controller");
 const { deleteGitWorktreeLifecycle } = require("./worker/git-worktree-delete-lifecycle-controller");
+const { runGitLiveQueryWithAttribution } = require("./worker/git-live-query-attribution-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70160,7 +70161,7 @@ var I6 = kW(`git`),
     getWatchKey(e, t) {
       return createGitManagerKey(h1(t), e);
     }
-    async runLiveQueryWithAttribution(e, t, n, r, i, a, o, s, c, l) {
+    async runLiveQueryWithAttributionLegacy(e, t, n, r, i, a, o, s, c, l) {
       return OH(
         {
           attributes: {
@@ -70228,6 +70229,16 @@ var I6 = kW(`git`),
           }
         },
       );
+    }
+    async runLiveQueryWithAttribution(e, t, n, r, i, a, o, s, c, l) {
+      return runGitLiveQueryWithAttribution({ request: e, root: t, host: n, signal: r,
+        runLiveQuery: (request, root, host, signal, onFirstResult) => this.runLiveQuery(request, root, host, signal, onFirstResult),
+        trace: OH, resolveOperation: resolveGitPerformanceOperation,
+        requestWithContext: q1, createAttribution: W1, now: () => Date.now(),
+        projectResult: projectGitReviewSummaryResult, mapResult: mapLiveQueryPerformanceResult, classifyError: V6,
+        emitPerformance: (input) => this.emitGitPerformanceOperation(input), endAttribution: G1,
+        metadataCommonDir: o, links: c, traceContext: s, trigger: a, source: e.params.operationSource,
+        getRepoIndexSizeBucket: (root, host) => getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), root, host, host.isLocal ? g.default : g.default.posix) });
     }
     emitGitPerformanceOperation({
       attribution: e,

@@ -1,0 +1,7 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { runGitLiveQueryWithAttribution } = require("../app/.vite/build/worker/git-live-query-attribution-controller.js");
+const calls = []; const signal = { aborted: false }; const result = await runGitLiveQueryWithAttribution({ request: { method: "review-summary", params: { source: "head" } }, root: "/repo", host: { isLocal: true }, signal, runLiveQuery: async (_request, _root, _host, _signal, onFirstResult) => { onFirstResult({}); return { files: [] }; }, trace: async (_options, operation) => operation(), resolveOperation: () => "review-summary", requestWithContext: async (_options, operation) => operation(), createAttribution: () => "attr", now: (() => { let value = 100; return () => ++value; })(), projectResult: (value) => value, mapResult: (value) => value, classifyError: () => "failure", emitPerformance: (value) => calls.push(["perf", value.operation, value.firstResultMs != null]), endAttribution: (value) => calls.push(["end", value]), metadataCommonDir: null, links: [], traceContext: null, trigger: "subscription", source: "ui", getRepoIndexSizeBucket: () => "small" });
+assert.deepEqual(result, { files: [] }); assert.deepEqual(calls, [["perf", "review-summary", true], ["end", "attr"]]);
+console.log("6 worker Git live-query attribution controller assertions passed");
