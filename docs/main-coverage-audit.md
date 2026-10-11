@@ -289,6 +289,14 @@ flavor 共 6 项断言。
 后缀，metadata 与 window-services consumers 已改用 `resolveFlavorIconAssetNames`；路径读取与
 nativeImage 仍留在原 owner。上述 focused suite 现覆盖 9 项 base-name/asset-name 断言。
 
+### 增量抽取：worker telemetry request projection
+
+worker manager 的 `ces-telemetry` HTTP 请求与响应投影（原 `mst`，173,937-173,947）已迁移至
+`src/main/main-app/worker/telemetry-request.ts`。模块通过注入 network、request URL builder 与
+AbortSignal 保留 POST headers/body、成功 body cancel 和失败 response text 语义；RPC cancel map、
+analytics gate 与 worker 生命周期仍由原 owner 持有。`scripts/test-main-telemetry-request.mjs`
+覆盖成功/失败状态、body cancel、header 与 URL 传递共 4 项断言。
+
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至

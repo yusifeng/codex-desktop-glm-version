@@ -27,6 +27,7 @@ const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeou
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName } = require("./main-app/startup/icon-flavor-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
+const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
@@ -173934,17 +173935,6 @@ var fst = 3e4,
       super((options) => new jt(options), fst);
     }
   };
-async function mst(e, { payload: t, requestId: r }, i) {
-  let a = await e.fetch(n.mt(r), {
-    method: `POST`,
-    headers: { "content-type": `text/plain`, "x-request-id": r },
-    body: t,
-    signal: i,
-  });
-  return a.ok
-    ? (await a.body?.cancel().catch(() => {}), { status: a.status, body: null })
-    : { status: a.status, body: await a.text() };
-}
 function B9(e, t) {
   return n.Wf(e, t);
 }
@@ -174153,13 +174143,13 @@ var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
       if (
         (t.method === `ces-telemetry`
           ? (o = async () => {
-              let n = this.startupConfig.getResolved();
-              if (n == null || n.analytics?.enabled === !1) return { status: 204, body: null };
+              let startup = this.startupConfig.getResolved();
+              if (startup == null || startup.analytics?.enabled === !1) return { status: 204, body: null };
               let r = new AbortController(),
                 i = this.cesRequests.get(e);
               i?.set(t.requestId, r);
               try {
-                return await mst(this.applicationNetwork, yst.parse(t.params), r.signal);
+                return await sendTelemetryRequest(this.applicationNetwork, yst.parse(t.params), r.signal, n.mt);
               } finally {
                 i?.delete(t.requestId);
               }

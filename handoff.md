@@ -1517,6 +1517,9 @@ main startup/window icon 的 build-flavor 到 icon base-name 映射（原 `ST`�
 `scripts/test-main-icon-flavor-policy.mjs` 覆盖 6 项断言。
 同一模块进一步接管原 `CT` 的 flavor-specific dark/light Codex asset filename 后缀，metadata
 与 window-services consumer 使用 `resolveFlavorIconAssetNames`，focused suite 增至 9 项断言。
+main worker manager 的 `ces-telemetry` HTTP request/response projection（原 `mst`）已迁移至
+`src/main/main-app/worker/telemetry-request.ts`；入口继续持有 analytics gate、cancel map 与
+worker 生命周期，由 `scripts/test-main-telemetry-request.mjs` 覆盖 4 项网络投影断言。
 worker-main RPC 的方法白名单、取消消息和请求消息校验已迁移至
 `src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托，
 由 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言；RPC 调度与
