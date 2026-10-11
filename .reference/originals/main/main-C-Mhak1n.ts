@@ -46,6 +46,7 @@ const targetDescriptorPolicy = require("./main-app/open-target/target-descriptor
 const languageServerProtocolHelpers = require("./main-app/language-server/protocol-helpers.js");
 const { buildKotlinWorkspaceConfig } = require("./main-app/language-server/kotlin-workspace-config.js");
 const { buildRustAnalyzerOptions } = require("./main-app/language-server/rust-analyzer-options.js");
+const { buildPyrightSessionOptions } = require("./main-app/language-server/pyright-session-options.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -135980,15 +135981,7 @@ var U0e = {
         let e = await t.findTrustedCommand(`cmd.exe`);
         e != null && a.add(i.dirname(e));
       }
-      return {
-        env: {
-          PATH: [...a].join(n === `windows` ? `;` : `:`),
-          PYTHONHOME: ``,
-          PYTHONPATH: ``,
-          VIRTUAL_ENV: ``,
-        },
-        workspaceConfiguration: r == null ? void 0 : { python: { pythonPath: r } },
-      };
+      return buildPyrightSessionOptions({ platform: n, pathEntries: [...a], pythonCommand: r });
     }
     async findWorkingDirectory(e) {
       let t = (await e.host.platformPath()).join(

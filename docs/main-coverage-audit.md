@@ -537,3 +537,8 @@ Rust Analyzer 的纯初始化 options projection 已迁移至
 tool discovery、PATH/env 组装、sysroot spawn/stat 探测与 session lifecycle，helper 仅接收
 探测后的 sysroot 并构造 initialization/workspace configuration。`scripts/test-main-rust-analyzer-options.mjs`
 覆盖 sysroot 与 null fallback。
+
+Pyright `findSessionOptions` 的 PATH/PYTHON 环境与可选 `pythonPath` workspace configuration
+projection 已迁移至 `src/main/main-app/language-server/pyright-session-options.ts`；原 provider
+继续负责 trusted command、platform path 与 runtime directory 探测。`scripts/test-main-pyright-session-options.mjs`
+覆盖 Windows 分号、POSIX 冒号及缺失 Python command。
