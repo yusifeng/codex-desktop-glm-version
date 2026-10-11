@@ -48,6 +48,7 @@ const { buildKotlinWorkspaceConfig } = require("./main-app/language-server/kotli
 const { buildRustAnalyzerOptions } = require("./main-app/language-server/rust-analyzer-options.js");
 const { buildPyrightSessionOptions } = require("./main-app/language-server/pyright-session-options.js");
 const { buildTypeScriptServerInitializationOptions } = require("./main-app/language-server/typescript-server-options.js");
+const { buildJavaSessionOptions } = require("./main-app/language-server/java-session-options.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -128590,9 +128591,7 @@ var QQ = class {
         let e = await t.findTrustedCommand(`cmd.exe`);
         e != null && o.add(a.dirname(e));
       } else (o.add(`/usr/bin`), o.add(`/bin`));
-      return {
-        env: { JAVA_HOME: ``, JDK_HOME: ``, PATH: [...o].join(n === `windows` ? `;` : `:`) },
-      };
+      return buildJavaSessionOptions({ platform: n, pathEntries: [...o] });
     }
     async findWorkingDirectory(e) {
       let { root: t } = await this.getDataPaths(e);

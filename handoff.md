@@ -2701,6 +2701,11 @@ typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 fram
 持有 CSS Highlight `useLayoutEffect` 生命周期，新增 `scripts/test-preload-annotation-text-preview-state.mjs`
 的 12 项 focused assertions，typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨
 frame anchor 生命周期仍未完成。
+2026-10-11 A2 preload 增量：React annotation runtime screenshot-ready payload 派生（原 `Wy` 内
+`rn/Bt/Vt/Ht`）已迁移至 `src/main/browser-page-preload/annotation-screenshot-payload-projection.ts`；
+入口继续持有 requestAnimationFrame、host IPC 与 screenshot effect 生命周期，新增
+`scripts/test-preload-annotation-screenshot-payload-projection.mjs` 的 7 项 focused assertions，
+typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 frame anchor 生命周期仍未完成。
 2026-10-11 A3 main owner 复核：`Ust` 的 `Be`/`Ve`/`He`/`Ue` 绑定 BrowserWindow 可见性、
 opacity、hotkey hide、window creation、deep-link navigation、notification dismissal 与 focus
 顺序；worker `H9.handleMessage`/`handleWorkerMessage` 绑定 pending/WebContents 生命周期及
@@ -2719,3 +2724,8 @@ command/platform path/runtime 探测，新增 `scripts/test-main-pyright-session
 payload 已迁移至 `src/main/main-app/language-server/typescript-server-options.ts`；探测与文件
 存在性检查仍由 `findInitializationOptions` 持有，新增
 `scripts/test-main-typescript-server-options.mjs` 的 2 项 focused assertions。
+2026-10-11 A3 main/language-server 增量：Java/JDTLS `findSessionOptions` 的
+`JAVA_HOME`/`JDK_HOME`/PATH 环境 projection 已迁移至
+`src/main/main-app/language-server/java-session-options.ts`；trusted command、platform path
+与 runtime/workspace 探测仍由 provider 持有，新增 `scripts/test-main-java-session-options.mjs`
+的 2 项 focused assertions。

@@ -547,3 +547,8 @@ TypeScript language server 的 `tsserver` initialization payload 已迁移至
 `src/main/main-app/language-server/typescript-server-options.ts`；`findInitializationOptions`
 继续负责 bundled/trusted command 探测与文件存在性检查，两个发现分支共享同一纯 projection。
 `scripts/test-main-typescript-server-options.mjs` 覆盖路径与 payload 隔离。
+
+Java/JDTLS `findSessionOptions` 的 `JAVA_HOME`/`JDK_HOME`/PATH 环境 projection 已迁移至
+`src/main/main-app/language-server/java-session-options.ts`；provider 继续负责 trusted
+command、platform path 与 runtime/workspace 探测。`scripts/test-main-java-session-options.mjs`
+覆盖 Windows/POSIX PATH 分隔符。
