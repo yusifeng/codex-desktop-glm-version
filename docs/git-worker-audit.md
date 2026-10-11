@@ -1602,3 +1602,6 @@ Repo-changed debounce/emit 的 pending count、active emission、timer 去重、
 生命周期已迁移至 `git-repo-change-controller.ts`；watcher 仍注入 Git operation state、event payload、
 telemetry 与实际 emit。`scripts/test-worker-git-repo-change-controller.mjs` 覆盖计数消费、timer 去重和
 dispose 路径。
+Watch session retry 的 timer/backoff、duplicate suppression、session/disposed race check 与 cleanup
+已迁移至 `git-watch-retry-controller.ts`；worker 仍注入 target registration、session start 和
+recovery state。`scripts/test-worker-git-watch-retry-controller.mjs` 覆盖 backoff、去重、触发和 cancel。

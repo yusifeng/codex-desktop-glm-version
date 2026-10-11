@@ -1,0 +1,20 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const { createGitWatchRetryController } = require("../app/.vite/build/worker/git-watch-retry-controller.js");
+const target = { retryTimer: null, retryDelayMs: 1000, session: null };
+const timers = [];
+const retries = [];
+const controller = createGitWatchRetryController({ maxDelayMs: 60000, isDisposed: () => false, isRegistered: () => true, retry: (value) => retries.push(value), setTimeout: (fn) => { timers.push(fn); return fn; }, clearTimeout: () => {} });
+controller.schedule(target);
+assert.equal(target.retryDelayMs, 2000);
+controller.schedule(target);
+assert.equal(timers.length, 1);
+timers.shift()();
+assert.deepEqual(retries, [target]);
+controller.schedule(target);
+controller.cancel(target);
+assert.equal(target.retryTimer, null);
+controller.dispose();
+console.log("4 worker git watch retry controller assertions passed");

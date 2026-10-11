@@ -186,6 +186,7 @@ const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalB
 const { classifyStableMetadataFailure } = require("./worker/git-stable-metadata-failure-policy");
 const { shouldInvalidateGitWorktreeForTurn } = require("./worker/git-turn-cache-invalidation-policy");
 const { createGitRepoChangeController } = require("./worker/git-repo-change-controller");
+const { createGitWatchRetryController } = require("./worker/git-watch-retry-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68696,6 +68697,12 @@ var Jye = 1e3,
       emit: (changeType) => this.emitRepoChanged(changeType),
       onError: (changeType, error) => this.logger.warning(`Failed to emit git repo change`, { safe: { changeType }, sensitive: { error } }),
     });
+    watchRetryController = createGitWatchRetryController({
+      maxDelayMs: Qye,
+      isDisposed: () => this.disposed,
+      isRegistered: (target) => this.watchTargets.includes(target),
+      retry: (target) => this.tryStartWatchSession(target, !0),
+    });
     pathApi = null;
     gitDir = null;
     currentHeadRefPath = null;
@@ -68931,6 +68938,7 @@ var Jye = 1e3,
       return (
         (this.watchTargets.length = 0),
         this.repoChangeController.dispose(),
+        this.watchRetryController.dispose(),
         this.changedMetadataDirectories.clear(),
         this.ignoreSourceWatches.clear(),
         this.changedIgnoreSourcePaths.clear(),
@@ -69206,13 +69214,7 @@ var Jye = 1e3,
       }
     }
     scheduleWatchSessionRetry(e) {
-      if (!shouldScheduleGitWatchSessionRetry({ disposed: this.disposed, targetRegistered: this.watchTargets.includes(e), hasRetryTimer: e.retryTimer != null })) return;
-      let t = e.retryDelayMs;
-      ((e.retryDelayMs = nextGitWatcherRetryDelay(e.retryDelayMs, Qye)),
-        (e.retryTimer = setTimeout(() => {
-          ((e.retryTimer = null),
-            !this.disposed && e.session == null && this.tryStartWatchSession(e, !0));
-        }, t)));
+      this.watchRetryController.schedule(e);
     }
     updateRequiresRecovery() {
       let e = this.requiresRecovery;
@@ -69351,7 +69353,7 @@ var Jye = 1e3,
         n = e.sessionStartPromise,
         r = e.sessionDisposePromise;
       ((e.generation += 1),
-        e.retryTimer != null && (clearTimeout(e.retryTimer), (e.retryTimer = null)),
+        this.watchRetryController.cancel(e),
         (e.session = null),
         (e.sessionStartPromise = null));
       let i = Promise.all([
