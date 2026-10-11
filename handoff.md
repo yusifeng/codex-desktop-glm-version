@@ -2914,8 +2914,19 @@ display-metrics-changed 订阅集合与 cleanup 已物理迁移至
 `src/main/main-app/startup/display-change-geometry-refresh.ts`；`Qot` 继续注入现有窗口几何刷新回调，保持
 display 事件与窗口关闭时的注销顺序。由 `scripts/test-main-display-change-geometry-refresh.mjs` 覆盖 5 项
 focused assertions。
+
+2026-10-11 A3 main 增量：`Qot.trackPrimaryWindow` 的 primary set 注册、初始 active 选择、focus/blur 时间戳
+更新与 change emission 已物理迁移至 `src/main/main-app/window/primary-window-tracking.ts`；`Qot` 继续注入
+primary 状态容器与窗口事件回调，保持原始 focus/blur 顺序。由
+`scripts/test-main-primary-window-tracking.mjs` 覆盖 7 项 focused assertions。
 2026-10-11 A2 preload 增量：`Wy` host sync 的 `cancelUnavailableSiteInteraction` 分支已物理迁移至
 `src/main/browser-page-preload/annotation-unavailable-site-interaction-controller.ts`；controller 保留
 `Te.cancel()` 条件性标记 viewport selection、随后关闭 pointer mode 的顺序，入口继续注入 interaction
 registry/ref/state owner。由 `scripts/test-preload-annotation-unavailable-site-interaction-controller.mjs`
 覆盖 true/false cancel、顺序与 dispose gate。
+2026-10-11 A2 preload 增量：`Wy` 的 `setSelectionModifier` callback（`yt`）已物理迁移至
+`src/main/browser-page-preload/annotation-selection-modifier-controller.ts`；controller 保留 modifier
+active/clear、create-element/text guard、pointer/Ce guard、DOM live-element hit-test、document focus、
+anchor/hover projection 与失败清理顺序，入口继续注入 React/ref/DOM owner。由
+`scripts/test-preload-annotation-selection-modifier-controller.mjs` 覆盖 disable 清理、成功命中、失败
+命中与 dispose gate。

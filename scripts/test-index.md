@@ -160,6 +160,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-comment-interaction-disposal-controller.mjs`](./test-preload-annotation-comment-interaction-disposal-controller.mjs)
 - [`test-preload-annotation-prepared-screenshot-controller.mjs`](./test-preload-annotation-prepared-screenshot-controller.mjs)
 - [`test-preload-annotation-unavailable-site-interaction-controller.mjs`](./test-preload-annotation-unavailable-site-interaction-controller.mjs)
+- [`test-preload-annotation-selection-modifier-controller.mjs`](./test-preload-annotation-selection-modifier-controller.mjs)
 - [`test-preload-annotation-design-editor-state.mjs`](./test-preload-annotation-design-editor-state.mjs)
 - [`test-preload-annotation-event-details.mjs`](./test-preload-annotation-event-details.mjs)
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)
@@ -1421,3 +1422,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-preload-annotation-editor-restore-controller.mjs](test-preload-annotation-editor-restore-controller.mjs)
 [test-main-window-titlebar-overlay-sync.mjs](test-main-window-titlebar-overlay-sync.mjs)
 [test-main-display-change-geometry-refresh.mjs](test-main-display-change-geometry-refresh.mjs)
+[test-main-primary-window-tracking.mjs](test-main-primary-window-tracking.mjs)

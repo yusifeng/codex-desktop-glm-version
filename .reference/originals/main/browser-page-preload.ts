@@ -5987,6 +5987,7 @@ var { createAnnotationPointerModeSyncController } = require("./browser-page-prel
 var { createAnnotationCommentInteractionDisposalController } = require("./browser-page-preload/annotation-comment-interaction-disposal-controller");
 var { createAnnotationPreparedScreenshotController } = require("./browser-page-preload/annotation-prepared-screenshot-controller");
 var { createAnnotationUnavailableSiteInteractionController } = require("./browser-page-preload/annotation-unavailable-site-interaction-controller");
+var { createAnnotationSelectionModifierController } = require("./browser-page-preload/annotation-selection-modifier-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23793,6 +23794,28 @@ function Wy({ rootHost: e, bridge: t }) {
         disablePointerMode: () => pe(!1),
       }),
     ),
+    [selectionModifierController] = (0, G.useState)(() =>
+      createAnnotationSelectionModifierController({
+        setModifierActive: (active) => {
+          (be.current = active), m(active);
+        },
+        clearPointer: () => f(null),
+        clearHover: () => {
+          (o(null), c(null));
+        },
+        clearTransient: () => mc(),
+        isSelectionSuppressed: () => Ce.current,
+        getPointer: () => E.current,
+        preparePointer: (pointer, rootHost) => _l(pointer, rootHost),
+        resolveElement: (pointer, rootHost, canUseSiteAnnotationApi) =>
+          yl(pointer, rootHost, canUseSiteAnnotationApi),
+        focusDocument: (document) => fc(document, wl),
+        projectAnchor: (element, pointer) => ({ anchor: tv(element, pointer.x, pointer.y).anchor, liveElement: element }),
+        setSelectionHover: (value) => c(value),
+        resolveHover: (element) => Yy(element),
+        setPointer: (pointer) => f(pointer),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24255,26 +24278,13 @@ function Wy({ rootHost: e, bridge: t }) {
     vt = (0, G.useEffectEvent)((t) => {
       S(H_(t, eb(e)));
     }),
-    yt = (0, G.useEffectEvent)((t) => {
-      let n = Oe && t;
-      if (((be.current = n), m(n), !n)) {
-        (f(null), o(null), c(null), mc());
-        return;
-      }
-      if (x?.target.mode !== `create` || x.anchor.type === `text`) return;
-      let r = E.current;
-      if (r == null || Ce.current) return;
-      _l(r, e);
-      let i = yl(r, e, A);
-      if (i == null) {
-        (f(null), o(null), c(null), mc());
-        return;
-      }
-      (fc(i.ownerDocument, wl),
-        f(r),
-        c({ anchor: tv(i, r.x, r.y).anchor, liveElement: i }),
-        o(Yy(i)));
-    });
+    yt = (0, G.useEffectEvent)((t) =>
+      selectionModifierController.sync(t && Oe, {
+        rootHost: e,
+        isCreateElementTarget: x?.target.mode === `create` && x.anchor.type !== `text`,
+        canUseSiteAnnotationApi: A,
+      }),
+    );
   ((0, G.useEffect)(() => {
     let e = t.subscribeToHostMessages((e) => {
       if (dispatchAnnotationWyHostMessage(e, { canUseTweaks: Ne, canUseMultiSelect: Oe }, {
@@ -24349,6 +24359,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => pointerModeSyncController.dispose(), [pointerModeSyncController]),
     (0, G.useEffect)(() => () => preparedScreenshotController.dispose(), [preparedScreenshotController]),
     (0, G.useEffect)(() => () => unavailableSiteInteractionController.dispose(), [unavailableSiteInteractionController]),
+    (0, G.useEffect)(() => () => selectionModifierController.dispose(), [selectionModifierController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {

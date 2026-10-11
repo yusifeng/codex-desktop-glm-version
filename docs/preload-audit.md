@@ -1458,6 +1458,14 @@ dispose gate。
 `Te.cancel()` 条件性标记 viewport selection、随后关闭 pointer mode 的顺序，并由入口注入 interaction
 registry/ref/state owner。focused test 覆盖 cancel 返回 true/false、顺序与 dispose gate。
 
+### 增量抽取：annotation selection-modifier controller
+
+`Wy` 的 `setSelectionModifier` callback（`yt`）已迁移至
+`src/main/browser-page-preload/annotation-selection-modifier-controller.ts`；controller 保留 modifier
+active/clear、create-element/text guard、pointer/Ce guard、DOM live-element hit-test、document focus、
+anchor/hover projection 与失败清理顺序，入口继续注入 React/ref/DOM owner。focused test 覆盖 disable
+清理、成功命中、失败命中与 dispose gate。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover
@@ -1479,3 +1487,10 @@ refs/setters 与 `H_` restore adapter，保持 host restore message 的原始副
 已迁移至 `src/main/main-app/startup/display-change-geometry-refresh.ts`；window manager 继续注入现有窗口几何
 刷新业务回调。由 `scripts/test-main-display-change-geometry-refresh.mjs` 覆盖三类事件、刷新转发、非 macOS gate
 与注销顺序。
+
+### 增量抽取：main primary-window tracking
+
+`Qot.trackPrimaryWindow` 的 primary set 注册、初始 active 选择、focus/blur 时间戳更新与 change emission
+已迁移至 `src/main/main-app/window/primary-window-tracking.ts`；window manager 继续注入 primary 状态容器与
+事件回调，保持原有 focus/blur 顺序。由 `scripts/test-main-primary-window-tracking.mjs` 覆盖 focused/unfocused
+初始状态、focus、blur 与 emission 顺序。
