@@ -557,6 +557,14 @@ Annotation frame/DOM 命中目标的 ancestor 解析（原 `il`，4620-4655）�
 仅注入 DOM/frame 读取器。`scripts/test-preload-annotation-hit-target-resolver.mjs`
 覆盖命中、点位越界 fallback 和 text-container 三项行为断言。
 
+### 增量抽取：annotation frame hit testing
+
+Annotation 点命中在 shadow root 与 iframe 间递归解析（原 `lc/cc`，4197-4220）已迁移至
+`src/main/browser-page-preload/annotation-frame-hit-test.ts`。该 helper 保留 frame policy
+回调的 `undefined` 继续递归、`null` denied sentinel、iframe rect 坐标换算和 shadow-root
+命中优先级；入口仅注入 DOM/frame 读取器。`scripts/test-preload-annotation-frame-hit-test.mjs`
+覆盖 iframe 递归、policy deny 和 shadow-root 三项行为断言。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate

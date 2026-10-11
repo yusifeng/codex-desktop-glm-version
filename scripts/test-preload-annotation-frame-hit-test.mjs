@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { resolveAnnotationFrameHit } = require("../app/.vite/build/browser-page-preload/annotation-frame-hit-test.js");
+const denied = Symbol("denied");
+const leaf = { kind: "leaf", shadowRoot: null };
+const frame = { kind: "frame", shadowRoot: null, rect: { left: 10, top: 20 } };
+const nestedLeaf = { kind: "nested", shadowRoot: null };
+const childWindow = { document: { elementFromPoint: (x, y) => (x === 2 && y === 3 ? nestedLeaf : null) } };
+const rootWindow = { document: { elementFromPoint: () => frame } };
+const deps = { getElementFromPoint: (w, x, y) => w.document.elementFromPoint(x, y), getShadowRoot: (e) => e.shadowRoot, getShadowElementFromPoint: () => null, isElement: (e) => e != null, isFrameElement: (e) => e?.kind === "frame", resolveFrameWindow: () => childWindow, getFrameRect: (e) => e.rect };
+assert.equal(resolveAnnotationFrameHit(rootWindow, 12, 23, undefined, denied, deps), nestedLeaf);
+assert.equal(resolveAnnotationFrameHit(rootWindow, 12, 23, () => null, denied, deps), denied);
+const shadowHost = { kind: "host", shadowRoot: { elementFromPoint: () => leaf } };
+assert.equal(resolveAnnotationFrameHit({ document: { elementFromPoint: () => shadowHost } }, 1, 1, undefined, denied, { ...deps, getShadowElementFromPoint: (root) => root.elementFromPoint(1, 1) }), leaf);
+console.log("3 preload annotation frame hit-test assertions passed");

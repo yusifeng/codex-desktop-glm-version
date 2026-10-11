@@ -4199,24 +4199,15 @@ function cc(e, t, n) {
   return r === el ? null : r;
 }
 function lc(e, t, n, r) {
-  let i = e.document.elementFromPoint(t, n);
-  if (i == null) return null;
-  for (; i.shadowRoot != null;) {
-    let e = i.shadowRoot.elementFromPoint(t, n);
-    if (!F(e) || e === i) break;
-    i = e;
-  }
-  if (ac(i)) {
-    let e = r?.(i, { x: t, y: n });
-    if (e !== void 0) return e ?? el;
-    let a = sc(i);
-    if (a != null) {
-      let e = i.getBoundingClientRect(),
-        o = lc(a, t - e.left, n - e.top, r);
-      if (o != null) return o;
-    }
-  }
-  return i;
+  return resolveAnnotationFrameHit(e, t, n, r, el, {
+    getElementFromPoint: (windowLike, x, y) => windowLike.document.elementFromPoint(x, y),
+    getShadowRoot: (element) => element.shadowRoot,
+    getShadowElementFromPoint: (shadowRoot, x, y) => shadowRoot.elementFromPoint(x, y),
+    isElement: (value) => F(value),
+    isFrameElement: (value) => ac(value),
+    resolveFrameWindow: (frame) => sc(frame),
+    getFrameRect: (frame) => frame.getBoundingClientRect(),
+  });
 }
 function uc(e = window) {
   let t = [],
@@ -6062,6 +6053,7 @@ var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
 var { generateAnnotationSelector } = require("./browser-page-preload/annotation-selector-generator");
 var { resolveAnnotationHitTarget } = require("./browser-page-preload/annotation-hit-target-resolver");
+var { resolveAnnotationFrameHit } = require("./browser-page-preload/annotation-frame-hit-test");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
