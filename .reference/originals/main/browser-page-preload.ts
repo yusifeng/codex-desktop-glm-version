@@ -5963,6 +5963,7 @@ var { projectAnnotationRuntimeCollections } = require("./browser-page-preload/an
 var { projectAnnotationMarkerRecords } = require("./browser-page-preload/annotation-marker-record-projection");
 var { projectAnnotationActiveView } = require("./browser-page-preload/annotation-active-view-projection");
 var { projectAnnotationTextPreviewState } = require("./browser-page-preload/annotation-text-preview-state");
+var { projectAnnotationScreenshotPayload } = require("./browser-page-preload/annotation-screenshot-payload-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25055,9 +25056,6 @@ function Wy({ rootHost: e, bridge: t }) {
       Rt.map(({ markerPoint: e }) => e),
       se.width * j,
     ),
-    Bt = M?.kind === `comment` ? Rt.findIndex(({ comment: e }) => e.id === M.annotation.id) : -1,
-    Vt = Bt === -1 ? void 0 : zt[Bt],
-    Ht = Vt == null ? void 0 : { x: Vt.x / j, y: Vt.y / j },
     Ut =
       M?.annotation.anchor.kind === `element`
         ? M.kind === `comment`
@@ -25174,8 +25172,20 @@ function Wy({ rootHost: e, bridge: t }) {
         : a != null &&
           ((Qt = a.rect), (tn = a.borderRadius), (en = m_(null, Qt, se.width, se.height)));
   }
-  let rn =
-      M == null ? null : s_([...Xt, ...(Qt == null ? [] : [Qt]), ...nn.map(({ rect: e }) => e)]),
+  let screenshotPayload = projectAnnotationScreenshotPayload(
+      {
+        active: M,
+        selectionRects: Xt,
+        highlightRect: Qt,
+        additionalHighlights: nn,
+        markerRecords: Rt,
+        markerPoints: zt,
+        zoomFactor: j,
+      },
+      { unionRects: (rects) => s_(rects) },
+    ),
+    rn = screenshotPayload.annotationViewportRect,
+    Ht = screenshotPayload.markerViewportPoint,
     an = Ot ? [] : $y(re, x, Re, Ie),
     on = Me && !Ot && x == null && ae == null && Kt == null ? a : null,
     sn = !Ot && x?.target.mode === `create` && x.anchor.type !== `text` ? a : null,

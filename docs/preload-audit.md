@@ -1285,3 +1285,11 @@ React annotation runtime 的文本 selection preview 分支（原 `Wy` 内 `Jt/Y
 text anchor 优先级、suspended/marker-visible gate、resolved anchor 与 selection-rect fallback，
 入口继续持有 CSS Highlight 的 `useLayoutEffect` 生命周期。focused test 覆盖 active、draft、selected、
 hidden、suspended 与 unresolved fallback。
+
+### 增量抽取：annotation screenshot payload projection
+
+React annotation runtime 的 screenshot-ready payload 派生（原 `Wy` 内 `rn/Bt/Vt/Ht`）已迁移至
+`src/main/browser-page-preload/annotation-screenshot-payload-projection.ts`；模块负责 selection、
+active highlight 与 additional highlight rect union，以及 comment marker index 的 zoom-normalized
+point，入口继续持有 requestAnimationFrame、host IPC 与 screenshot effect 生命周期。focused test
+覆盖 active/null、union rect 输入、comment marker index 与 zoom 投影。
