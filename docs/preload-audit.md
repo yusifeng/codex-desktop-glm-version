@@ -1233,3 +1233,9 @@ container 与 hit-target policies，保留 null、design fallback 和 annotation
 页面 overlay element 的 composed/shadow-root 判定 adapter（原 `gl`，4608-4620）已迁移至
 `src/main/browser-page-preload/annotation-overlay-element-policy.ts`；入口仅注入 root id 与既有
 overlay policy，保留 overlay 命中与普通元素未命中语义。focused test 覆盖两种结果。
+
+### 增量抽取：annotation interaction blocker policy
+
+页面 interaction-blocker 的 composed-path adapter（原 `Cl`，4668-4677）已迁移至
+`src/main/browser-page-preload/annotation-interaction-blocker-policy.ts`；入口仅注入 blocker
+attribute 与既有 interaction policy，保留 blocked/unblocked 结果。focused test 覆盖两种结果。
