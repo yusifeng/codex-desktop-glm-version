@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { processGitMetadataRefreshBatch } = require("../app/.vite/build/worker/git-metadata-refresh-batch-controller.js");
+const calls = []; const targets = [{ watchPath: "/repo/.git/HEAD", recursive: false, retryTimer: null, session: null, metadataDirectory: { missing: false } }, { watchPath: "/repo/.git/config", recursive: false, retryTimer: {}, session: {}, metadataDirectory: { missing: true } }];
+const pathApi = { join: (a, b) => `${a}/${b}` };
+await processGitMetadataRefreshBatch({ pathApi, commonDir: "/repo/.git", paths: ["/repo/.git/HEAD"], recovering: true, targets, isDisposed: () => false, disposeSession: async (target) => calls.push(["dispose", target.watchPath]), startSession: async (target, recovering) => { calls.push(["start", target.watchPath, recovering]); target.session = {}; }, refreshWorktreeDirectories: async (...args) => calls.push(["worktrees", ...args.slice(1)]), isWithinPath: (_api, value, parent) => value.startsWith(parent) });
+assert.deepEqual(calls, [["dispose", "/repo/.git/HEAD"], ["start", "/repo/.git/HEAD", true], ["worktrees", "/repo/.git/worktrees", true]]);
+assert.equal(targets[1].session != null, true);
+let disposed = false; await processGitMetadataRefreshBatch({ pathApi, commonDir: "/repo/.git", paths: [], recovering: false, targets, isDisposed: () => true, disposeSession: async () => { throw new Error("unexpected"); }, startSession: async () => { throw new Error("unexpected"); }, refreshWorktreeDirectories: async () => { throw new Error("unexpected"); }, isWithinPath: () => true }); assert.equal(disposed, false);
+console.log("6 worker Git metadata-refresh-batch controller assertions passed");

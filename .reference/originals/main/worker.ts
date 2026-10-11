@@ -99,6 +99,7 @@ const { releaseGitRepoWatch } = require("./worker/git-watch-lifecycle");
 const { closeGitRepoWatch } = require("./worker/git-watch-close");
 const { scheduleGitWatchSetup } = require("./worker/git-watch-setup");
 const { handleGitWatchChange } = require("./worker/git-watch-change-controller");
+const { processGitMetadataRefreshBatch } = require("./worker/git-metadata-refresh-batch-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -68991,21 +68992,11 @@ var Jye = 1e3,
     }
     async processMetadataRefreshBatch(e, t) {
       let n = this.pathApi;
-      if (this.disposed || n == null) return;
-      let r = selectGitWatchTargetsForMetadataRefresh(this.watchTargets, e, (e, t) => M6(n, e, t));
-      (await Promise.all(
-        r.map(async (e) => {
-          e.retryTimer ??
-            (t && (await this.disposeSession(e)),
-            !this.disposed && e.session == null && (await this.tryStartWatchSession(e, t)));
-        }),
-      ),
-        await Promise.all(
-          r
-            .filter((e) => e.metadataDirectory?.missing)
-            .map((e) => this.tryStartWatchSession(e, t)),
-        ),
-        await this.refreshWorktreeDirectories(n, n.join(this.options.commonDir, `worktrees`), t));
+      return processGitMetadataRefreshBatch({ pathApi: n, commonDir: this.options.commonDir, paths: e, recovering: t,
+        targets: this.watchTargets, isDisposed: () => this.disposed, disposeSession: (target) => this.disposeSession(target),
+        startSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
+        refreshWorktreeDirectories: (api, worktreesPath, recovering) => this.refreshWorktreeDirectories(api, worktreesPath, recovering),
+        isWithinPath: (api, value, parent) => M6(api, value, parent) });
     }
     async refreshWorktreeDirectories(e, t, n) {
       await this.worktreeWatchRefreshController.refresh(t, n);
