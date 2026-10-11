@@ -20,6 +20,8 @@
 
 另新增 `annotation-editor-anchor-restore-controller.ts`，真实接回 Wy 的 `vt` restore-editor anchor lifecycle，保留当前 frame target map 解析与 editor state 写入。
 
+另新增 `annotation-element-editor-open-controller.ts`，真实接回 Wy 的 `qe` create-from-element editor lifecycle，保留 DOM clear、anchor normalize、preview close、design/target、IPC 与 editor cleanup 顺序。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style

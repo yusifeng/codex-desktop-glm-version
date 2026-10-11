@@ -24055,6 +24055,23 @@ function Wy({ rootHost: e, bridge: t }) {
         setEditorState: (state) => S(state),
       }),
     ),
+    [elementEditorOpenController] = (0, G.useState)(() =>
+      createAnnotationElementEditorOpenController({
+        clearDomInteraction: () => w.current?.clear(),
+        normalizeAnchor: (element, anchor, canUseSiteAnnotationApi, extra) => od(element, anchor, canUseSiteAnnotationApi, extra),
+        closePreview: (commentId) => { t.sendMessageToHost({ type: `browser-sidebar-runtime-close-comment-preview`, commentId }); v(null); },
+        projectDesign: (element, anchorState, controls) => sy(element, anchorState, controls),
+        rememberTarget: (id, element) => i.rememberTarget(id, element),
+        createTargetMap: (rootHost) => eb(rootHost),
+        openEditor: (payload) => t.sendMessageToHost(payload),
+        resetModifier: () => { (be.current = !1), m(!1); },
+        clearPointer: () => f(null),
+        refreshViewport: () => T(C_()),
+        setEditorState: (state) => S(state),
+        clearHover: () => { (o(null), c(null)); },
+        clearSelectionHover: () => gu(),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24103,49 +24120,13 @@ function Wy({ rootHost: e, bridge: t }) {
       ),
     ),
     qe = (0, G.useCallback)(
-      (n, r, a, s) => {
-        w.current?.clear();
-        let l = { ...r, anchor: od(n, r.anchor, A, s) };
-        _ != null &&
-          (t.sendMessageToHost({
-            type: `browser-sidebar-runtime-close-comment-preview`,
-            commentId: _,
-          }),
-          v(null));
-        let u = sy(n, l, A ? t.getAnnotationControls?.(n) : void 0);
-        return (
-          A && i.rememberTarget(u.id, n),
-          eb(e).set(u.id, n),
-          t.sendMessageToHost({
-            type: `browser-sidebar-runtime-open-editor`,
-            target: { mode: `create` },
-            anchorState: l,
-            annotationEditorDefault: Iy(document, fb),
-            designEditorState: u,
-            ...a,
-          }),
-          (be.current = !1),
-          m(!1),
-          f(null),
-          T(C_()),
-          S({
-            target: { mode: `create` },
-            anchor: {
-              type: `element`,
-              additionalSelections: [],
-              element: n,
-              themeVariant: l.themeVariant,
-              value: l.anchor,
-              viewportSize: l.viewportSize,
-            },
-          }),
-          o(null),
-          c(null),
-          gu(),
-          !0
-        );
-      },
-      [i, t, A, _, e],
+      (n, r, a, s) => elementEditorOpenController.open(n, r, { annotationEditorDefault: Iy(document, fb), ...a }, {
+        canUseSiteAnnotationApi: A,
+        previewCommentId: _,
+        rootHost: e,
+        getAnnotationControls: t.getAnnotationControls,
+      }),
+      [elementEditorOpenController, A, _, e, t],
     ),
     Je = (0, G.useCallback)(
       (anchorState, extras) => textAnchorEditorController.open(anchorState, extras, _),
@@ -24378,6 +24359,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => siteRequestDispatchController.dispose(), [siteRequestDispatchController]),
     (0, G.useEffect)(() => () => commentPreviewCloseController.dispose(), [commentPreviewCloseController]),
     (0, G.useEffect)(() => () => editorAnchorRestoreController.dispose(), [editorAnchorRestoreController]),
+    (0, G.useEffect)(() => () => elementEditorOpenController.dispose(), [elementEditorOpenController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
