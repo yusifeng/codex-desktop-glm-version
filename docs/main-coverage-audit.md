@@ -510,3 +510,12 @@ macOS `Mst.refreshMenu` 的菜单状态 JSON projection 已迁移至
 `projectNativeStatusItemMenuState` 统一保留 app/feature/label/thread 字段与顺序。原入口仅
 负责 native addon 的 `updateStatusItemMenuState` 副作用、i18n label 获取和状态生命周期；
 `scripts/test-main-native-status-item-menu.mjs` 覆盖完整 payload 与线程快照隔离断言。
+
+### A3 main 剩余 owner 复核（2026-10-11）
+
+重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的
+visible/minimized/destroyed 状态以及 Windows opacity workaround；`Ve`/`He`/`Ue` 组合
+hotkey hide、window creation、deep-link navigation、notification dismissal 与 focus 顺序。
+worker `H9.handleMessage`/`handleWorkerMessage` 则同时维护 pending map、WebContents destroyed
+cleanup、worker-id 校验、response resolution 与 postMessage/broadcast 顺序。上述函数均为
+生命周期编排而非可脱离 owner 的纯策略；本轮未制造 facade。

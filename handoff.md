@@ -2665,3 +2665,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 `src/main/main-app/startup/native-status-item-menu.ts`；`Mst` 入口继续持有 native addon 更新、
 i18n label 获取与状态生命周期，新增 `scripts/test-main-native-status-item-menu.mjs` 的 2 项
 focused assertions，build/typecheck/verify-chunks 通过。
+2026-10-11 A3 main owner 复核：`Ust` 的 `Be`/`Ve`/`He`/`Ue` 绑定 BrowserWindow 可见性、
+opacity、hotkey hide、window creation、deep-link navigation、notification dismissal 与 focus
+顺序；worker `H9.handleMessage`/`handleWorkerMessage` 绑定 pending/WebContents 生命周期及
+postMessage/broadcast 顺序，未发现不改变副作用顺序的独立纯策略，本轮保留 owner。
