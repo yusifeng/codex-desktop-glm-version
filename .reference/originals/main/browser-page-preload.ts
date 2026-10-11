@@ -4397,9 +4397,11 @@ function Ac(e) {
   });
 }
 function jc(e, t) {
-  if (typeof e.document.elementFromPoint != `function`) return [];
-  let n = e.document.elementFromPoint(t.x, t.y);
-  return F(n) ? Mc(n, { includeElement: !0 }) : [];
+  return collectAnnotationPointScrollContainers(e, t, {
+    getElementFromPoint: (windowLike, point) => typeof windowLike.document.elementFromPoint === `function` ? windowLike.document.elementFromPoint(point.x, point.y) : null,
+    isElement: (value) => F(value),
+    discover: (element, options) => Mc(element, options),
+  });
 }
 function Mc(e, { includeElement: t = !1 } = {}) {
   return discoverAnnotationScrollContainers(e, { includeElement: t }, { getOwnerWindow: (element) => Fc(element), getParent: (element) => ic(element), getBody: (windowLike) => windowLike.document.body, getDocumentElement: (windowLike) => windowLike.document.documentElement, isClippingBoundary: (element, windowLike) => Kc(element, windowLike), getSelector: (element) => kc(element), getScrollLeft: (element) => element.scrollLeft, getScrollTop: (element) => element.scrollTop });
@@ -5984,6 +5986,7 @@ var { collectAnnotationFrameElements, collectAnnotationFrameWindows } = require(
 var { resolveAnnotationShadowSelector } = require("./browser-page-preload/annotation-shadow-selector-resolver");
 var { resolveAnnotationContainerAncestor } = require("./browser-page-preload/annotation-container-ancestor");
 var { discoverAnnotationScrollContainers } = require("./browser-page-preload/annotation-scroll-container-discovery");
+var { collectAnnotationPointScrollContainers } = require("./browser-page-preload/annotation-point-scroll-containers");
 var { installAnnotationScrollListeners } = require("./browser-page-preload/annotation-scroll-listener");
 var { runAnnotationCleanup } = require("./browser-page-preload/annotation-cleanup");
 var { setAnnotationPopoverOpen, closeAnnotationPopover } = require("./browser-page-preload/annotation-popover-policy");

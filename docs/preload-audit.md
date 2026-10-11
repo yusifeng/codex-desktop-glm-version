@@ -1159,3 +1159,10 @@ offset 和 `Sl` target policy 注入。focused test 覆盖 offset projection 与
 `src/main/browser-page-preload/annotation-anchor-path.ts`；入口仅注入 selector generator、
 root 判定与 shadow separator，保留单 selector、嵌套 `shadow:...>>>...` 及失败返回 `null` 语义。
 focused test 覆盖 document root、shadow path 与 selector 失败。
+
+### 增量抽取：annotation point scroll-container projection
+
+按 frame window 坐标点命中元素并收集 scroll-container（原 `jc`，4399-4403）已迁移至
+`src/main/browser-page-preload/annotation-point-scroll-containers.ts`；入口注入
+`elementFromPoint`、元素判定和既有 scroll-container discovery，保留能力缺失、非元素命中时的空数组语义。
+focused test 覆盖命中、空命中与非元素结果。
