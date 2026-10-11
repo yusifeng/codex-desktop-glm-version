@@ -4627,17 +4627,7 @@ function vl(e, t, n, r) {
 function yl(e, t, n) {
   let r = t.shadowRoot?.querySelectorAll(`[data-browser-comment-marker]`);
   if (r == null || r.length === 0) return pl(e.x, e.y, n, t);
-  let i = Array.from(r, (e) => {
-    let t = e.style.pointerEvents;
-    return ((e.style.pointerEvents = `none`), t);
-  });
-  try {
-    return pl(e.x, e.y, n, t);
-  } finally {
-    r.forEach((e, t) => {
-      e.style.pointerEvents = i[t] ?? ``;
-    });
-  }
+  return withAnnotationMarkerPointerEventsDisabled(Array.from(r), () => pl(e.x, e.y, n, t), { getPointerEvents: (element) => element.style.pointerEvents, setPointerEvents: (element, value) => { element.style.pointerEvents = value; } });
 }
 function bl(e, t) {
   return isAnnotationEventTarget(e, t, { getComposedPath: (event) => event.composedPath(), isBlocked: (event) => Cl(event) });
@@ -5958,6 +5948,7 @@ var { mergeAnnotationAnchorSelection } = require("./browser-page-preload/annotat
 var { resolveAnnotationHitTargetWithFallback } = require("./browser-page-preload/annotation-hit-target-fallback");
 var { escapeAnnotationSelectorTokenForPage } = require("./browser-page-preload/annotation-selector-token-policy");
 var { applyAnnotationCursorStyle, restoreAnnotationCursorStyle } = require("./browser-page-preload/annotation-cursor-style-state");
+var { withAnnotationMarkerPointerEventsDisabled } = require("./browser-page-preload/annotation-marker-pointer-events");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");

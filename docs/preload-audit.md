@@ -1203,3 +1203,9 @@ CSS selector token 的 page-level `CSS.escape` 能力探测与 fallback（原 `q
 按 document 保存 cursor 原值、隐藏 cursor 并在状态未被外部改写时恢复（原 `Bc/Vc`，4440-4456）
 已迁移至 `src/main/browser-page-preload/annotation-cursor-style-state.ts`；入口保留 WeakMap 生命周期、
 跨元素切换时先恢复旧状态及外部样式改写保护。focused test 覆盖 apply/restore 与外部改写。
+
+### 增量抽取：annotation marker pointer-events lifecycle
+
+命中 marker 时临时禁用其 pointer-events，并在 `pl` 成功或异常后恢复（原 `yl`，4629-4642）
+已迁移至 `src/main/browser-page-preload/annotation-marker-pointer-events.ts`；入口保留 marker
+查询、逐元素样式保存与 try/finally 恢复语义。focused test 覆盖正常执行与异常恢复。
