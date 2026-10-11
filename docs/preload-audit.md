@@ -1544,3 +1544,10 @@ captured point freshness/select/fallback、interaction registry select、DOM hit
 focus、captured design element/anchorState 分支、design-mode DOM hit-test、anchor projection 与 `Ze`
 open 顺序，入口继续注入当前 context 和 design editor owner。focused test 覆盖各优先级、mode 透传与
 dispose gate。
+### 增量抽取：annotation selection-comment controller
+
+`Wy` 的 `createCommentFromSelection` callback（`at`）selection/fallback orchestration 已迁移至
+`src/main/browser-page-preload/annotation-selection-comment-controller.ts`；controller 保留 editor focus、
+prepared text selection 优先级、selection ref 清理、`ou()` 回退、`gu()` 清理和 `rt`/`Je` 分支顺序，入口
+继续注入当前 editor、selection 与 point retry owner。focused test 覆盖 focus、selection open、fallback retry
+与 dispose gate。

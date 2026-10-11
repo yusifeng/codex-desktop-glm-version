@@ -2966,3 +2966,9 @@ focus、captured design element/anchorState 分支、design-mode DOM hit-test、
 open 顺序，入口继续注入当前 context 和 design editor owner。由
 `scripts/test-preload-annotation-design-point-selection-controller.mjs` 覆盖各优先级、mode 透传与
 dispose gate。
+2026-10-11 A2 preload 增量：`Wy` 的 `createCommentFromSelection` callback（`at`）selection/fallback
+orchestration 已物理迁移至 `src/main/browser-page-preload/annotation-selection-comment-controller.ts`；controller
+保留 editor focus、prepared text selection 优先级、selection ref 清理、`ou()` 回退、`gu()` 清理和
+`rt`/`Je` 分支顺序，入口继续注入当前 editor、selection 与 point retry owner。由
+`scripts/test-preload-annotation-selection-comment-controller.mjs` 覆盖 focus、selection open、fallback retry
+与 dispose gate。

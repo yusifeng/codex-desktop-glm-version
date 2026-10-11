@@ -5992,6 +5992,7 @@ var { createAnnotationRemoveSelectionController } = require("./browser-page-prel
 var { createAnnotationPointRetryController } = require("./browser-page-preload/annotation-point-retry-controller");
 var { createAnnotationPointSelectionController } = require("./browser-page-preload/annotation-point-selection-controller");
 var { createAnnotationDesignPointSelectionController } = require("./browser-page-preload/annotation-design-point-selection-controller");
+var { createAnnotationSelectionCommentController } = require("./browser-page-preload/annotation-selection-comment-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23865,6 +23866,19 @@ function Wy({ rootHost: e, bridge: t }) {
         openDesignEditor: (element, anchorState) => Ze(element, anchorState),
       }),
     ),
+    [selectionCommentController] = (0, G.useState)(() =>
+      createAnnotationSelectionCommentController({
+        focusEditor: () => t.sendMessageToHost({ type: `browser-sidebar-runtime-focus-editor` }),
+        getPreparedSelection: () => le.current,
+        clearPreparedSelection: () => {
+          le.current = null;
+        },
+        getCurrentSelection: () => ou(),
+        clearSelection: () => gu(),
+        retryAtPoint: (point) => rt(point),
+        openFromSelection: (selection) => Je(selection),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24178,18 +24192,8 @@ function Wy({ rootHost: e, bridge: t }) {
     ),
     it = (0, G.useCallback)((e) => pointRetryController.retry(e, (point) => rt(point)), [rt, pointRetryController]),
     at = (0, G.useCallback)(
-      (e) => {
-        if (x != null)
-          return (t.sendMessageToHost({ type: `browser-sidebar-runtime-focus-editor` }), !0);
-        ce.current = null;
-        let n = le.current;
-        le.current = null;
-        let r = (n?.anchor.kind === `text` ? n : null) ?? ou();
-        return r == null
-          ? (gu(), e.fallbackViewportPoint != null && rt(e.fallbackViewportPoint))
-          : Je(r);
-      },
-      [x, t, Je, rt],
+      (message) => selectionCommentController.create(message, x != null),
+      [selectionCommentController, x],
     ),
     ot = (0, G.useCallback)((e) => {
       le.current = ou(e);
@@ -24370,6 +24374,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => pointRetryController.dispose(), [pointRetryController]),
     (0, G.useEffect)(() => () => pointSelectionController.dispose(), [pointSelectionController]),
     (0, G.useEffect)(() => () => designPointSelectionController.dispose(), [designPointSelectionController]),
+    (0, G.useEffect)(() => () => selectionCommentController.dispose(), [selectionCommentController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {
