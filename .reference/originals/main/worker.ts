@@ -111,6 +111,7 @@ const { runGitLiveQueryWithAttribution } = require("./worker/git-live-query-attr
 const { emitGitPerformanceOperation: emitGitPerformanceOperationController } = require("./worker/git-performance-operation-controller");
 const { finalizeGitRequest } = require("./worker/git-request-finalization-controller");
 const { completeGitRequest } = require("./worker/git-request-completion-controller");
+const { admitGitRequest } = require("./worker/git-request-admission-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -69637,23 +69638,8 @@ var I6 = kW(`git`),
         d = null,
         f =
         isGitRequestTracked(e.method);
-      if (this.requestLifecycle.begin(e.id, f, i) === `canceled`) {
-          (
-            this.emitGitPerformanceOperation(createGitRequestCancellationTelemetry({
-              attribution: n,
-              durationMs: Date.now() - r,
-              host: o,
-              operation: t,
-              enqueuedAtMs: e.enqueuedAtMs,
-              repoIndexSizeBucket: c,
-              result: l,
-              reviewSource: resolveGitRequestPerformanceContext(e).reviewSource,
-              source: e.params.operationSource,
-              startedAtMs: r,
-            })),
-            t ?? jH(`canceled`));
-        return;
-      }
+      if (!admitGitRequest({ requestId: e.id, tracked: f, signal: i.signal, beginRequest: (id, tracked, signal) => this.requestLifecycle.begin(id, tracked, signal),
+        emitCancellation: (input) => this.emitGitPerformanceOperation(input), cancellationInput: createGitRequestCancellationTelemetry({ attribution: n, durationMs: Date.now() - r, host: o, operation: t, enqueuedAtMs: e.enqueuedAtMs, repoIndexSizeBucket: c, result: l, reviewSource: resolveGitRequestPerformanceContext(e).reviewSource, source: e.params.operationSource, startedAtMs: r }), operation: t, recordOutcome: (outcome) => jH(outcome) })) return;
       let p;
       try {
         if (
