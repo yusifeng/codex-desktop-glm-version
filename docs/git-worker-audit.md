@@ -1509,6 +1509,11 @@ worker entry 继续持有 process/host I/O、warning 与 Git local-environment r
 事件和 close 生命周期仍由 watcher owner 持有。`scripts/test-worker-parcel-watcher-options.mjs`
 覆盖普通路径、glob 转义/相对化及空列表，共 5 项断言。
 
+同一 watcher 的 parcel event projection（changed paths、rename parent、root deletion 与
+supplemental path checks）已迁移至 `src/main/worker/parcel-watcher-events.ts`；
+`fDe.onWatcherEvents` 仍负责 emit、close 和 subscription 副作用。由
+`scripts/test-worker-parcel-watcher-events.mjs` 覆盖 6 项断言。
+
 2026-10-11 A1 worker 增量：worker IPC performance counter 的 message category 已迁移至
 `src/main/worker/message-category.ts`；request/response/broadcast、thread-stream change 与
 follower coordination 分类由 8 项 focused assertions 覆盖，连接计数与 close 生命周期仍由

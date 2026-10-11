@@ -129,6 +129,7 @@ const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, class
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { classifyWorkerMessageCategory } = require("./worker/message-category");
 const { buildParcelWatcherOptions } = require("./worker/parcel-watcher-options");
+const { projectParcelWatcherEvents } = require("./worker/parcel-watcher-events");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
 const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
@@ -81347,26 +81348,15 @@ var fDe = class {
       return;
     }
     if (t.length === 0) return;
-    let n = t.map(({ path: e, type: t }) => ({ path: e, type: t })),
-      r = new Set(n.map((e) => e.path));
-    if (
-      (this.params.renameEventHandling === `changed-path-with-parent-directory` &&
-        n.forEach((e) => {
-          e.type !== `update` && r.add(g.posix.dirname(e.path));
-        }),
-      this.emitChange({ changedPaths: [...r], pathChanges: n }),
-      t.some((e) => e.type === `delete` && e.path === this.params.path))
-    ) {
+    const projection = projectParcelWatcherEvents(g.posix, this.params.path, t, this.params.renameEventHandling);
+    this.emitChange({ changedPaths: projection.changedPaths, pathChanges: projection.pathChanges });
+    if (projection.rootDeleted) {
       this.close({ reason: `watch-error`, error: Error(`File watch root was deleted`) }).catch(
         () => {},
       );
       return;
     }
-    let i = new Set(
-      t
-        .filter((e) => e.type === `delete` || (e.type === `update` && e.path !== this.params.path))
-        .map((e) => e.path),
-    );
+    let i = new Set(projection.pathsToCheck);
     (this.removeSupplementalSubscriptionsAtOrBelowPaths(i),
       t.forEach((e) => {
         e.type !== `delete` && e.path !== this.params.path && this.queueDirectoryPathCheck(e.path);
