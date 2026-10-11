@@ -127,6 +127,7 @@ const { prefetchGitWatcherMetadata, resolveGitWatcherHeadPath } = require("./wor
 const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
+const { classifyWorkerMessageCategory } = require("./worker/message-category");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
 const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
@@ -74665,7 +74666,7 @@ new (class {
         complete: (e) => {
           if (n.closed) return;
           i();
-          let t = rCe(e);
+          let t = classifyWorkerMessageCategory(e);
           ((this.totals[`${r}${t}_frames_total`] += 1),
             (this.totals[`${r}${t}_bytes_total`] += n.announcedBytes),
             (this.totals[`${r}${t}_bytes_max`] = Math.max(
@@ -74752,19 +74753,6 @@ new (class {
     return e;
   }
 })();
-function rCe(e) {
-  if (e?.type === `request`) return `other_request`;
-  if (e?.type === `response`) return `other_response`;
-  if (e?.type !== `broadcast`) return `unknown`;
-  if (e.method === `thread-stream-state-changed`) {
-    let t = e.params?.change?.type;
-    return t === `snapshot` || t === `patches` ? t : `unknown`;
-  }
-  return e.method === `thread-stream-following-changed` ||
-    e.method === `thread-stream-following-status-requested`
-    ? `follower_coordination`
-    : `other_broadcast`;
-}
 K({ canHandle: W() });
 var i5 = { error: 0, warning: 1, info: 2, debug: 3, trace: 4 };
 function iCe(e, t) {
