@@ -5973,6 +5973,7 @@ var { projectAnnotationHighlightState } = require("./browser-page-preload/annota
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
 var { createAnnotationViewportRefreshScheduler } = require("./browser-page-preload/annotation-viewport-refresh-scheduler");
 var { createAnnotationAnchorObservationLifecycle } = require("./browser-page-preload/annotation-anchor-observation-lifecycle");
+var { installAnnotationPointerEventLifecycle } = require("./browser-page-preload/annotation-pointer-event-lifecycle");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -24763,43 +24764,35 @@ function Wy({ rootHost: e, bridge: t }) {
           y = (e) => {
             te(t, e);
           };
-        (e.addEventListener(`pointerdown`, n, !0),
-          e.addEventListener(`pointermove`, r, !0),
-          e.addEventListener(`pointerup`, o, !0));
-        for (let t of _b) e.addEventListener(t, ee, !0);
-        (e.addEventListener(`pointercancel`, v, !0),
-          e.addEventListener(`mousemove`, c, !0),
-          e.addEventListener(`mouseout`, u, !0));
         let x = (e) => {
             (e.key === `Alt` && g(!1), !e.shiftKey && be.current && i(!1));
           },
           S = (e) => {
             (e.key === `Alt` && g(!0), b(e));
           };
-        return (
-          e.addEventListener(`keydown`, S, !0),
-          e.addEventListener(`keyup`, x, !0),
-          e.addEventListener(`click`, f, !0),
-          e.addEventListener(`contextmenu`, m, !0),
-          e.addEventListener(`wheel`, y, !0),
-          t.addEventListener(`blur`, l),
-          () => {
-            (Te.disposeFrame(t),
-              e.removeEventListener(`pointerdown`, n, !0),
-              e.removeEventListener(`pointermove`, r, !0),
-              e.removeEventListener(`pointerup`, o, !0));
-            for (let t of _b) e.removeEventListener(t, ee, !0);
-            (e.removeEventListener(`pointercancel`, v, !0),
-              e.removeEventListener(`mousemove`, c, !0),
-              e.removeEventListener(`mouseout`, u, !0),
-              e.removeEventListener(`keydown`, S, !0),
-              e.removeEventListener(`keyup`, x, !0),
-              e.removeEventListener(`click`, f, !0),
-              e.removeEventListener(`contextmenu`, m, !0),
-              e.removeEventListener(`wheel`, y, !0),
-              t.removeEventListener(`blur`, l));
-          }
-        );
+        let cleanupEvents = installAnnotationPointerEventLifecycle({
+          documentLike: e,
+          windowLike: t,
+          auxiliaryEvents: _b,
+          handlers: {
+            pointerDown: n,
+            pointerMove: r,
+            pointerUp: o,
+            pointerCancel: v,
+            mouseMove: c,
+            mouseOut: u,
+            keyDown: S,
+            keyUp: x,
+            click: f,
+            contextMenu: m,
+            wheel: y,
+            blur: l,
+            auxiliary: ee,
+          },
+        });
+        return () => {
+          (Te.disposeFrame(t), cleanupEvents());
+        };
       });
     }, [x, t, Oe, A, Ne, ut, ot, k, De, Ue, Te, e, st, Ze, Je, n.viewportScale, Me, rt, j]),
     (0, G.useEffect)(() => {

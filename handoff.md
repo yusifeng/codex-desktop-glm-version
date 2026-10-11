@@ -2732,6 +2732,10 @@ verify-chunks 通过。剩余 pointer/frame-anchor listeners 与 IPC effects 仍
 入口继续注入 `dc/Pc/tb/du` 与 geometry callbacks，保留 React effect 依赖与 frame DOM owner，新增
 `scripts/test-preload-annotation-anchor-observation-lifecycle.mjs` 的 10 项 focused assertions，typecheck/build/
 verify-chunks 通过。pointer event handlers 与 host IPC effects 仍由 React owner 持有。
+2026-10-11 A2 preload 增量：`Wy` 跨 frame pointer/keyboard/click/wheel/blur 事件注册与注销集合已迁移至
+`src/main/browser-page-preload/annotation-pointer-event-lifecycle.ts`；入口继续持有 handler closure、
+`Te.disposeFrame` 与 `dc` frame lifecycle，新增 `scripts/test-preload-annotation-pointer-event-lifecycle.mjs`
+的 15 项 focused assertions，typecheck/build/verify-chunks 通过。host IPC effects 仍由 React owner 持有。
 2026-10-11 A2 preload 增量：React annotation runtime selected-id active view 派生（原 `Wy` 内
 `wt/Tt/M/Et/Dt/Ot`）已迁移至 `src/main/browser-page-preload/annotation-active-view-projection.ts`；入口
 继续持有 anchor resolution、React effects 与 render 生命周期，新增

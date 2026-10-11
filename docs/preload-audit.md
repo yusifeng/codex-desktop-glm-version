@@ -1358,3 +1358,9 @@ no-op。
 注册/清理顺序已迁移至 `src/main/browser-page-preload/annotation-anchor-observation-lifecycle.ts`；入口继续
 注入 `dc/Pc/tb/du` 与 geometry callbacks，保留 React effect 依赖与 frame DOM owner。focused test 覆盖
 viewport listener、frame/text observer registration、dispose idempotence 与 cleanup 顺序。
+
+### 增量抽取：annotation pointer event lifecycle
+
+`Wy` 跨 frame pointer/keyboard/click/wheel/blur 事件的注册与注销集合已迁移至
+`src/main/browser-page-preload/annotation-pointer-event-lifecycle.ts`；入口继续持有事件 handler closure、
+`Te.disposeFrame` 与 `dc` frame lifecycle。focused test 覆盖 15 个 listener 的顺序、capture 参数与对称清理。
