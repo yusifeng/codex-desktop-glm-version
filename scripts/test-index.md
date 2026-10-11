@@ -185,6 +185,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-view-message-router-controller.mjs`](./test-preload-view-message-router-controller.mjs)（运行：`node --experimental-strip-types scripts/test-preload-view-message-router-controller.mjs`）
 - [`test-main-turn-start-inflight-registry.mjs`](./test-main-turn-start-inflight-registry.mjs)（运行：`node --experimental-strip-types scripts/test-main-turn-start-inflight-registry.mjs`）
 - [`test-thread-read-state-controller.mjs`](./test-thread-read-state-controller.mjs)（运行：`node scripts/test-thread-read-state-controller.mjs`）
+- [`test-app-server-request-lifecycle-controller.mjs`](./test-app-server-request-lifecycle-controller.mjs)
 - [`test-preload-annotation-design-editor-state.mjs`](./test-preload-annotation-design-editor-state.mjs)
 - [`test-preload-annotation-event-details.mjs`](./test-preload-annotation-event-details.mjs)
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)

@@ -349,6 +349,10 @@ node scripts/audit-shared-consumption.mjs
 reconcile、异步 set 与 dispose lifecycle 已迁移至 `src/main/main-app/conversation/thread-read-state-controller.ts`；
 `host-assembly.ts` 删除旧的内嵌实现，仅保留 assembly consumer。focused test：`scripts/test-thread-read-state-controller.mjs`。
 
+`AppServerRequestSender.send` 的 prewarm/normal dispatch、timeout abandon、failure notification 与 cleanup lifecycle
+已迁移至 `src/main/main-app/conversation/app-server-request-lifecycle-controller.ts`；sender 仅保留 host/connection
+依赖注入和 listener fan-out。focused test：`scripts/test-app-server-request-lifecycle-controller.mjs`。
+
 本轮对 `Ust` 后半段启动装配进行了逐段复核。该区间同时交织 Electron app/window 生命周期、tray
 初始化（`Pst/Ge`）、computer-use/browser-use service 构造、app-server connection registry
 订阅、插件 reconcile、focus/quit 事件监听与 disposable 注册；例如 175,900-176,050 在同一
