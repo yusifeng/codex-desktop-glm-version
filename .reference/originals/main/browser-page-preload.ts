@@ -23924,6 +23924,18 @@ function Wy({ rootHost: e, bridge: t }) {
         rememberTarget: (id, target) => i.rememberTarget(id, target),
       }),
     ),
+    [commentPreviewController] = (0, G.useState)(() =>
+      createAnnotationCommentPreviewController({
+        createTargetMap: (rootHost) => eb(rootHost),
+        findComment: (comments, request) => comments.find((comment) => comment.id === request.id),
+        resolveTarget: (anchor, preferredId, targets) => sd(anchor, preferredId, targets),
+        projectComment: (comment, anchor, selectionIndex) => $_(comment, anchor, selectionIndex),
+        projectAnchor: (commentState, target, zoom) => rv(commentState, target, zoom),
+        setPreviewComment: (commentId) => v(commentId),
+        refreshViewport: () => T(C_()),
+        openPreview: (payload) => t.sendMessageToHost(payload),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24033,20 +24045,9 @@ function Wy({ rootHost: e, bridge: t }) {
       [editEditorController, Ee, e, _, A, j, t],
     ),
     Xe = (0, G.useCallback)(
-      (n, r, i) => {
-        let a = eb(e),
-          o = Ee.find((e) => e.id === n.id) ?? n,
-          s = i === 0,
-          c = sd(r, s ? o.id : void 0, a) ?? null;
-        (c != null && s && a.set(o.id, c), v(o.id), T(C_()));
-        let l = rv($_(o, r, i), c, j);
-        t.sendMessageToHost({
-          type: `browser-sidebar-runtime-open-comment-preview`,
-          commentId: o.id,
-          anchorState: l,
-        });
-      },
-      [t, Ee, e, j],
+      (n, r, i) =>
+        commentPreviewController.open(n, r, i, { comments: Ee, rootHost: e, zoom: j }),
+      [commentPreviewController, Ee, e, j],
     ),
     Ze = (0, G.useCallback)(
       (r, a) => {
@@ -24359,6 +24360,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => selectionCommentController.dispose(), [selectionCommentController]),
     (0, G.useEffect)(() => () => textAnchorEditorController.dispose(), [textAnchorEditorController]),
     (0, G.useEffect)(() => () => editEditorController.dispose(), [editEditorController]),
+    (0, G.useEffect)(() => () => commentPreviewController.dispose(), [commentPreviewController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);

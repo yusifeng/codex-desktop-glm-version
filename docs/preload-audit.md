@@ -2,6 +2,8 @@
 
 本轮新增 `annotation-edit-editor-controller.ts`：真实接回 Wy 的 `Ye` edit-editor lifecycle，保留 runtime target/map、design projection、preview close、host IPC、viewport refresh 与 React editor state 的原始副作用顺序。focused test：`scripts/test-preload-annotation-edit-editor-controller.mjs`。
 
+另新增 `annotation-comment-preview-controller.ts`，真实接回 Wy 的 `Xe` comment-preview lifecycle，保留 target resolution、preview state、viewport refresh 与 host IPC 顺序。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
