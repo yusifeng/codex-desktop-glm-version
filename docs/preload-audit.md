@@ -1337,3 +1337,10 @@ React annotation runtime 的 active/editor/hover highlight 分支与 linked addi
 `Qt/nn/$t/en/tn`）已迁移至 `src/main/browser-page-preload/annotation-highlight-state-projection.ts`；模块
 只组合注入的 `nd/dd/c_/J_` geometry adapters，入口继续持有 DOM 读取与 React render 生命周期。focused test
 覆盖 active element/region、create element、hover snapshot、virtual/metadata fallback 与 remove-hover gate。
+
+### 增量抽取：annotation runtime sync state
+
+`Wy` host sync handler 中 React context state 的字段归一化（原 `r(...)` updater）已迁移至
+`src/main/browser-page-preload/annotation-runtime-sync-state.ts`；zoom-change RAF、host subscription、
+cleanup 与后续 state side effects 仍由入口持有。focused test 覆盖 boolean gates、默认 mode/scale 与
+comments/intl payload 保留。

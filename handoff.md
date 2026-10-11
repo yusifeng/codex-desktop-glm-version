@@ -2717,6 +2717,11 @@ additional highlights（原 `Wy` 内 `Qt/nn/$t/en/tn`）已迁移至
 `nd/dd/c_/J_` geometry adapters，入口继续持有 DOM 读取与 React render 生命周期，新增
 `scripts/test-preload-annotation-highlight-state-projection.mjs` 的 10 项 focused assertions，typecheck/
 build/verify-chunks 通过。effects/RAF/host IPC 仍保留在 React owner。
+2026-10-11 A2 preload 增量：`Wy` host sync handler 的 React context state 字段归一化（原 `r(...)` updater）
+已迁移至 `src/main/browser-page-preload/annotation-runtime-sync-state.ts`；入口继续持有 host subscription、
+zoom-change RAF、cleanup 与 state side effects，新增 `scripts/test-preload-annotation-runtime-sync-state.mjs`
+的 18 项 focused assertions，typecheck/build/verify-chunks 通过。剩余 frame-anchor observer 与 effects/IPC
+生命周期仍未完成。
 2026-10-11 A2 preload 增量：React annotation runtime selected-id active view 派生（原 `Wy` 内
 `wt/Tt/M/Et/Dt/Ot`）已迁移至 `src/main/browser-page-preload/annotation-active-view-projection.ts`；入口
 继续持有 anchor resolution、React effects 与 render 生命周期，新增

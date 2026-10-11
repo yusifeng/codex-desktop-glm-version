@@ -5970,6 +5970,7 @@ var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/anno
 var { projectAnnotationRenderState } = require("./browser-page-preload/annotation-render-state-projection");
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
+var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -24233,24 +24234,7 @@ function Wy({ rootHost: e, bridge: t }) {
             r(
               (t) => (
                 t.zoomPercent !== e.zoomPercent && lt(),
-                {
-                  activeDesignChange: e.activeDesignChange,
-                  comments: e.comments,
-                  intlConfig: e.intlConfig,
-                  interactionMode: e.interactionMode,
-                  annotationEditorMode: e.annotationEditorMode ?? `comment`,
-                  isAgentControllingBrowser: e.isAgentControllingBrowser,
-                  canUseAnnotationMultiSelect: e.canUseAnnotationMultiSelect === !0,
-                  canUseSiteAnnotationApi: e.canUseSiteAnnotationApi === !0,
-                  canUseTweaks: e.canUseTweaks !== !1,
-                  isDesignModifierPressed: e.isDesignModifierPressed === !0,
-                  isOriginalViewEnabled: e.isOriginalViewEnabled === !0,
-                  areAnnotationMarkersVisible: e.areAnnotationMarkersVisible !== !1,
-                  isAnnotationSuspended: e.isAnnotationSuspended === !0,
-                  isTweaksEditorOpen: e.isTweaksEditorOpen === !0,
-                  viewportScale: e.viewportScale ?? 1,
-                  zoomPercent: e.zoomPercent,
-                }
+                projectAnnotationRuntimeSyncState(e)
               ),
             ),
             T(C_()),
