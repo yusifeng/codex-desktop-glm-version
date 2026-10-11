@@ -805,6 +805,12 @@ Open-in target 的平台描述符合并、跨平台 target 构造与 editor SSH 
 `scripts/test-worker-open-in-target-descriptors.mjs` 以 12 项断言覆盖字段覆盖优先级、缺失平台、
 hidden 继承、SSH 标记、默认参数及 Linux open 回调绑定。
 
+Open-in target command detection 的 JSON key 投影、同 key single-flight 与 rejected probe 清理已迁移至
+`src/main/worker/open-in-target-command-registry.ts`。`lCe` 继续持有 icon semaphore、target detection
+consumer 与 worker response envelope；registry 仅负责复用 pending promise，并允许失败后重试。
+`scripts/test-worker-open-in-target-command-registry.mjs` 覆盖 key 组成、同 key 去重、custom command 隔离
+及 reject cleanup/retry，共 7 项 focused assertions。
+
 Editor target 的 JetBrains 参数、Zed SSH URI 与行列位置追加策略已迁移至
 `src/main/worker/editor-target-args.ts`；入口继续负责编辑器发现和进程执行，
 `scripts/test-worker-editor-target-args.mjs` 覆盖 9 项参数/URI/行列断言（含 TextMate txmt URI）。

@@ -3122,3 +3122,12 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
   close/closed deferred 与 error/root-deleted lifecycle 已迁移至 `src/main/worker/parcel-watcher-runtime.ts`，
   `j9` 已真实接回 `startParcelWatcher`。
 - `scripts/test-worker-parcel-watcher-runtime.mjs` 覆盖 8 项生命周期断言；focused、typecheck、build、verify、shared audit、diff-check 均通过。
+
+# 本轮新增：open-in-target-command-registry
+
+- `lCe` 的 open-in target command detection 单飞缓存已迁移至
+  `src/main/worker/open-in-target-command-registry.ts`，保留
+  `JSON.stringify([target, customTarget.command])` key、同 key promise 复用及 rejected probe 清理/retry；
+  icon semaphore、target detection 与 worker response owner 仍由 `lCe` 持有。
+- `scripts/test-worker-open-in-target-command-registry.mjs` 覆盖 7 项 key、single-flight、custom command
+  隔离和失败重试断言。

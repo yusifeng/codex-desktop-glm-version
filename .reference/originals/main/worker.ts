@@ -156,6 +156,7 @@ const { formatAppContext, joinInstructionSections } = require("./worker/prompt-c
 const { rewriteGitCommandForWindows } = require("./worker/git-executable");
 const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
+const { createOpenInTargetCommandRegistry } = require("./worker/open-in-target-command-registry");
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
 const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
 const { resolveOpenTarget } = require("./worker/open-target-registry");
@@ -74486,7 +74487,7 @@ var c5 = kW(`computer-use-worker`),
 var lCe = class extends IH {
   dependencies;
   iconSemaphore = new k$.Sema(1);
-  commandPromises = new Map();
+  targetCommandRegistry = createOpenInTargetCommandRegistry((params) => this.dependencies.detectTarget(params));
   constructor(e, t) {
     (super(e), (this.dependencies = t));
   }
@@ -74532,11 +74533,7 @@ var lCe = class extends IH {
   }
   handleCancel() {}
   getTargetCommand(e) {
-    let t = JSON.stringify([e.target, e.customTarget?.command]),
-      n = this.commandPromises.get(t);
-    if (n != null) return n;
-    let r = this.dependencies.detectTarget(e);
-    return (this.commandPromises.set(t, r), r.catch(() => this.commandPromises.delete(t)), r);
+    return this.targetCommandRegistry.getTargetCommand(e);
   }
 };
 function uCe(e, t, n = {}) {
