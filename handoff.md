@@ -2801,3 +2801,16 @@ timer/show/closed cleanup，`B/Hle/Eat/Pit` 为窗口/热键/dictation/appshot m
 `Eat` 依赖 startup phase/powerMonitor/connection pending，`dat` 依赖 global state/native pet
 webContents，`Pit` 依赖 Windows/native bridge/settings/window manager/query invalidation；
 未发现可安全独立迁移的 config/payload projection，本轮保留 manager owner。
+
+2026-10-11 A1 worker 增量：Git repo-changed debounce/emit lifecycle 已物理迁移至
+`src/main/worker/git-repo-change-controller.ts`（commit `7ebe836a`），真实接回 worker watcher；
+controller 持有 pending count、active emission、timer 去重、完成后重排与 dispose，入口继续注入
+Git operation state、event payload、telemetry 和 emit。`scripts/test-worker-git-repo-change-controller.mjs`
+覆盖计数、timer/emit 和 dispose。
+
+2026-10-11 A1 worker 增量：Git watch session retry lifecycle 已物理迁移至
+`src/main/worker/git-watch-retry-controller.ts`（commit `3babe952`），并在 `0c610f08` 修正 dispose
+时 target retryTimer 清理；入口继续注入 target registration 与 session start。由
+`scripts/test-worker-git-watch-retry-controller.mjs` 覆盖 exponential backoff、duplicate suppression、
+session/disposed race、cancel 与 cleanup。A1 剩余 session close/recovery 仍与 watcher coverage、
+Git host watcher dispose、telemetry 和 event ordering 绑定，尚无安全独立边界。
