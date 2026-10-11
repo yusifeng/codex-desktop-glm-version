@@ -565,3 +565,11 @@ workspace directory 创建、platform/codexHome 路径解析与 process discover
 BrowserWindow 延迟显示与 timer/show/closed cleanup 绑定；`B/Hle/Eat/Pit` 则是窗口、热键、
 dictation 与 appshot native manager 的组装入口。上述边界均为资源或窗口生命周期编排，未发现
 可独立接回且不复制副作用顺序的窄纯 projection，本轮不制造 facade。
+
+### A3 app-shell/hotkey owner 复核（2026-10-11）
+
+`L9/cst/R9/z9` 的窗口外观与 frameless options 已由 `window-appearance` 模块真实消费；
+`Eat` 的 hotkey-window idle predicate 依赖 startup phase、powerMonitor 与各 app-server
+connection pending 状态；`dat` 的 dictation force-lock 依赖 global state/native pet webContents；
+`Pit` 的 appshot hotkey assembly 依赖 Windows/native bridge、settings、window manager 与 query
+invalidation。上述 manager options 不能脱离 owner 而不改变生命周期/副作用顺序，本轮不制造 facade。

@@ -2752,3 +2752,7 @@ workspace directory/path 与 process discovery 仍由 provider 持有，新增
 `L/R` 绑定 nativeTheme/nativeImage/Dock 与异步资源下载，`oe/se` 绑定 BrowserWindow 延迟显示
 timer/show/closed cleanup，`B/Hle/Eat/Pit` 为窗口/热键/dictation/appshot manager 组装入口；
 未发现不复制副作用顺序的独立 registration/config projection，本轮保留 owner。
+2026-10-11 A3 app-shell/hotkey owner 复核：`L9/cst/R9/z9` 已由 window-appearance 消费；
+`Eat` 依赖 startup phase/powerMonitor/connection pending，`dat` 依赖 global state/native pet
+webContents，`Pit` 依赖 Windows/native bridge/settings/window manager/query invalidation；
+未发现可安全独立迁移的 config/payload projection，本轮保留 manager owner。
