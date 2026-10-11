@@ -4610,8 +4610,7 @@ function gl(e) {
   return isPageAnnotationOverlayElement(e, { rootId: wl, isOverlay: isAnnotationOverlayElement, policy: { isElement: (value) => value instanceof HTMLElement, closest: (element, selector) => element.closest(selector), getRootNode: (element) => element.getRootNode(), isShadowRoot: (value) => value instanceof ShadowRoot, getShadowHost: (root) => root.host, getComposedPath: (event) => event.composedPath(), hasAttribute: (element, attribute) => element.hasAttribute(attribute) } });
 }
 function _l(e, t) {
-  let n = cc(e.x, e.y);
-  n == null || gl(n) || gc(t, El);
+  triggerAnnotationPopoverAtPoint(e, t, { hitTest: (x, y) => cc(x, y), isOverlay: (element) => gl(element), open: (root, attribute) => gc(root, attribute), attribute: El });
 }
 function vl(e, t, n, r) {
   return resolveAnnotationPointerTarget(e, t, n, r, { isMarker: (event) => xl(event), resolveMarker: (point, target, options) => yl(point, target, options), resolvePoint: (x, y, options, target) => pl(x, y, options, target) });
@@ -5927,6 +5926,7 @@ var { projectAnnotationTarget } = require("./browser-page-preload/annotation-tar
 var { isPageAnnotationMarkerEvent } = require("./browser-page-preload/annotation-marker-event-policy");
 var { isPageAnnotationOverlayElement } = require("./browser-page-preload/annotation-overlay-element-policy");
 var { isPageAnnotationInteractionBlocked } = require("./browser-page-preload/annotation-interaction-blocker-policy");
+var { triggerAnnotationPopoverAtPoint } = require("./browser-page-preload/annotation-popover-trigger-policy");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");

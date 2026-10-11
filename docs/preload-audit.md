@@ -1239,3 +1239,9 @@ overlay policy，保留 overlay 命中与普通元素未命中语义。focused t
 页面 interaction-blocker 的 composed-path adapter（原 `Cl`，4668-4677）已迁移至
 `src/main/browser-page-preload/annotation-interaction-blocker-policy.ts`；入口仅注入 blocker
 attribute 与既有 interaction policy，保留 blocked/unblocked 结果。focused test 覆盖两种结果。
+
+### 增量抽取：annotation popover trigger policy
+
+坐标命中后排除 overlay 并触发 annotation popover（原 `_l`，4619-4622）已迁移至
+`src/main/browser-page-preload/annotation-popover-trigger-policy.ts`；入口注入 point hit-test、
+overlay predicate 与 popover opener，保留空命中/overlay 跳过语义。focused test 覆盖三种结果。
