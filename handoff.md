@@ -2558,3 +2558,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-11 A5 扩大批次：app-shared `Zp/Zq/Zr/Zs/Zt/Zu/Zv/Zw/Zx/Zy/Zz/_$/_0/_1/_2/_3/_4/_A/_B/_C/_D/_E/_F/_G/_H/_I/_J/_K/_M/_N/_O/_P/_Q/_R/_S/_T/_U/_V/_W/_X` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `_Y/_Z/_a/_b/_c/_d/_f/_g/_h/_i/_j/_k/_l/_m/_n/_o/_p/_q/_r/_s/_t/_u/_v/_w/_x/_y/_z/a$/a0/a1/a2/a3/a4/aA/aB/aC/aD/aE/aF/aG` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `aH/aI/aJ/aK/aL/aM/aN/aO/aP/aQ/aR/aS/aT/aU/aV/aW/aX/aY/aZ/a_/aa/ab/ac/ad/af/ag/ah/ai/aj/ak/am/ao/ap/aq/ar/as/au/av/aw/ax` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-11 A5 扩大批次：app-shared `ay/az/b$/b0/b1/b2/b3/b4/bA/bB/bC/bE/bF/bG/bH/bI/bJ/bK/bL/bM/bN/bO/bP/bQ/bR/bT/bU/bV/bW/bX/bY/bZ/ba/bb/bc/bd/bf/bg/bh/bi` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
