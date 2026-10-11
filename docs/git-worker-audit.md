@@ -1605,6 +1605,10 @@ dispose 路径。
 Watch session retry 的 timer/backoff、duplicate suppression、session/disposed race check 与 cleanup
 已迁移至 `git-watch-retry-controller.ts`；worker 仍注入 target registration、session start 和
 recovery state。`scripts/test-worker-git-watch-retry-controller.mjs` 覆盖 backoff、去重、触发和 cancel。
+Watch session close 的 active-session race、watch-error logging、session 清理、稳定阈值 retry reset、
+recovery update 与 retry scheduling 顺序已迁移至 `git-watch-session-close-controller.ts`；worker 仍注入
+target/session owner、logger、recovery 与 retry callbacks。`scripts/test-worker-git-watch-session-close-controller.mjs`
+覆盖 active/error/stable 顺序及 stale-session race。
 Repo-changed debounce/emit controller 已在 commit `7ebe836a` 物理接回；watch retry controller 已在
 `3babe952` 接回，dispose target cleanup 修正在 `0c610f08`。focused tests 覆盖 timer/emit、retry
 backoff/race/cancel 与 cleanup；剩余 session close/recovery 仍绑定 watcher coverage、Git host watcher

@@ -187,6 +187,7 @@ const { classifyStableMetadataFailure } = require("./worker/git-stable-metadata-
 const { shouldInvalidateGitWorktreeForTurn } = require("./worker/git-turn-cache-invalidation-policy");
 const { createGitRepoChangeController } = require("./worker/git-repo-change-controller");
 const { createGitWatchRetryController } = require("./worker/git-watch-retry-controller");
+const { createGitWatchSessionCloseController } = require("./worker/git-watch-session-close-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68703,6 +68704,16 @@ var Jye = 1e3,
       isRegistered: (target) => this.watchTargets.includes(target),
       retry: (target) => this.tryStartWatchSession(target, !0),
     });
+    watchSessionCloseController = createGitWatchSessionCloseController({
+      stableThresholdMs: $ye,
+      isDisposed: () => this.disposed,
+      getCurrentSession: (target) => target.session,
+      clearSession: (target) => { target.session = null; },
+      resetRetryDelay: (target) => { target.retryDelayMs = j6; },
+      onWatchError: (target, close) => this.logger.warning(`Git repo watcher failed`, { safe: {}, sensitive: { error: close.error, path: target.watchPath } }),
+      updateRecovery: () => this.updateRequiresRecovery(),
+      scheduleRetry: (target) => this.scheduleWatchSessionRetry(target),
+    });
     pathApi = null;
     gitDir = null;
     currentHeadRefPath = null;
@@ -69174,24 +69185,7 @@ var Jye = 1e3,
         let s = i != null && this.ignorePolicy?.didApply(i),
           c = Date.now();
         (this.updateRequiresRecovery(),
-          o.closed.then((t) => {
-            let n = getGitWatchSessionClosePolicy({
-              disposed: this.disposed,
-              sessionMatches: e.session === o,
-              elapsedMs: Date.now() - c,
-              stableThresholdMs: $ye,
-            });
-            n.active &&
-              (t.reason === `watch-error` &&
-                this.logger.warning(`Git repo watcher failed`, {
-                  safe: {},
-                  sensitive: { error: t.error, path: e.watchPath },
-                }),
-              (e.session = null),
-              n.resetRetryDelay && (e.retryDelayMs = j6),
-              this.updateRequiresRecovery(),
-              this.scheduleWatchSessionRetry(e));
-          }),
+          o.closed.then((t) => this.watchSessionCloseController.handleClose(e, o, c, t)),
           (t || s) &&
             (t &&
               this.ignoreSourceWatches.get(e.watchPath)?.target === e &&
