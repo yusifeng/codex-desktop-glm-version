@@ -5965,6 +5965,7 @@ var { projectAnnotationActiveView } = require("./browser-page-preload/annotation
 var { projectAnnotationTextPreviewState } = require("./browser-page-preload/annotation-text-preview-state");
 var { projectAnnotationScreenshotPayload } = require("./browser-page-preload/annotation-screenshot-payload-projection");
 var { projectAnnotationRegionRecords } = require("./browser-page-preload/annotation-region-record-projection");
+var { projectAnnotationOverlayStyle } = require("./browser-page-preload/annotation-overlay-style-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25197,31 +25198,14 @@ function Wy({ rootHost: e, bridge: t }) {
         : null,
     fn = cs(Ee),
     pn = dn == null ? null : Ft == null ? (fn === 0 ? null : fn + 1) : (Pe.get(Ft.id) ?? null),
-    mn =
-      j === 1
-        ? {}
-        : {
-            height: `${j * 100}vh`,
-            transform: `scale(${1 / j})`,
-            transformOrigin: `top left`,
-            width: `${j * 100}vw`,
-          },
-    hn = {
-      ...Cv,
-      ...mn,
-      [gb]: String(Ae),
-      "--browser-sidebar-draft-marker-size": `${Zs * Ae}px`,
-      "--browser-sidebar-marker-label-font-size": `${10 * Ae}px`,
-      "--browser-sidebar-marker-label-offset": `${-0.5 * Ae}px`,
-      "--browser-sidebar-metadata-column-gap": `${12 * Ae}px`,
-      "--browser-sidebar-metadata-height": `${mb * Ae}px`,
-      "--browser-sidebar-metadata-padding-x": `${10 * Ae}px`,
-      "--browser-sidebar-metadata-padding-y": `${8 * Ae}px`,
-      "--browser-sidebar-metadata-radius": `${12 * Ae}px`,
-      "--browser-sidebar-metadata-row-gap": `${3 * Ae}px`,
-      "--browser-sidebar-overlay-font-size": `${13 * Ae}px`,
-      "--browser-sidebar-saved-marker-size": `${Zs * Ae}px`,
-    };
+    hn = projectAnnotationOverlayStyle({
+      baseStyle: Cv,
+      zoomFactor: j,
+      viewportScale: Ae,
+      markerSize: Zs,
+      metadataHeight: mb,
+      scaleVariable: gb,
+    });
   k === `comment` && !De && x == null && ((hn.cursor = `none`), ke || (hn.pointerEvents = `auto`));
   let gn = (0, G.useEffectEvent)((e) => {
     t.sendMessageToHost({

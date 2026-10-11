@@ -1301,3 +1301,10 @@ React annotation runtime 的 region overlay records（原 `Wy` 内 `qt`）已迁
 active-comment gate、suppression 判定、region-only anchor 展开与稳定 key，入口继续持有 DOM
 geometry、React render 与 overlay 生命周期。focused test 覆盖 enabled/disabled、suppressed、
 非 region 过滤及多 region key。
+
+### 增量抽取：annotation overlay style projection
+
+React annotation runtime 的 zoom/viewport overlay CSS style map（原 `Wy` 内 `mn/hn`）已迁移至
+`src/main/browser-page-preload/annotation-overlay-style-projection.ts`；模块负责 zoom transform、
+viewport scale 与 marker/metadata CSS variables，入口继续负责 comment-mode 的 cursor/pointerEvents
+后缀与 React render 生命周期。focused test 覆盖 zoom=1、zoomed 与 scaled variable/size cases。
