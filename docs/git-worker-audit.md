@@ -1499,3 +1499,7 @@ Live-query updated event envelope 已由 `git-live-query-events.ts` 负责稳定
 Git observability 的 performance result fields 由 operation-specific result shape、stale/error
 mapping、diff byte/file aggregation 与 truncation semantics 共同决定；现有 observability policy
 已覆盖 operation classification/bucketing，剩余 fields aggregation 共享 telemetry envelope，暂不拆。
+2026-10-11 A1 worker 增量：local shell environment 的登录 shell 探测、候选 shell fallback、NUL
+environment marker 解析、CODEX_SHELL 清理与 per-host cache 已迁移至 `git-shell-environment.ts`；
+worker entry 继续持有 process/host I/O、warning 与 Git local-environment runtime wiring，新增
+5 项 focused assertions，typecheck/build/verify-chunks 通过。

@@ -510,6 +510,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-worker-git-worktree-path-allocation.mjs`](./test-worker-git-worktree-path-allocation.mjs)
 - [`test-worker-git-worktree-snapshot.mjs`](./test-worker-git-worktree-snapshot.mjs)
 - [`test-worker-git-worktree-shell-environment.mjs`](./test-worker-git-worktree-shell-environment.mjs)
+- [`test-worker-git-shell-environment.mjs`](./test-worker-git-shell-environment.mjs)
 - [`test-worker-git-worktree-starting-ref.mjs`](./test-worker-git-worktree-starting-ref.mjs)
 - [`test-worker-git-worktree-starting-state.mjs`](./test-worker-git-worktree-starting-state.mjs)
 - [`test-worker-git-worktree-upstream-refresh.mjs`](./test-worker-git-worktree-upstream-refresh.mjs)

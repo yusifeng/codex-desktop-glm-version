@@ -128,6 +128,7 @@ const { listGitWorktreeFiles } = require("./worker/git-worktree-files");
 const { bucketGitIndexSize, buildGitHostCacheKey, classifyGitHubOperation, classifyProcessExecutable, classifySshOperation, createGitCommandStats, createGitPerformanceFields, createGitProcessTelemetry, createProcessTelemetryEvent, exitCodeBucket, getGitPerformanceResultFields, isGitMutationRequest, mapLiveQueryPerformanceResult, recordUntrackedCacheOutcome, resolveGitPerformanceOperation, selectGitPerformanceSample } = require("./worker/git-observability");
 const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCacheableGitCommand, isCancelableGitRequest, isFsmonitorPlatformSupported, isGitRequestTracked, matchesGitQuery, normalizeGitPath, parseFsmonitorConfigValue, pathsOverlap, shouldCheckGitAvailability, utf8ByteLength } = require("./worker/git-query-utils");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
+const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
 const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
 const { parseShellEnvironmentOutput, getEnvironmentValue } = require("./worker/shell-environment-parser");
 const { isPathWithinRoot } = require("./worker/git-path-containment");
@@ -348,6 +349,10 @@ const resolveGitWorktreeStartingState = (
     signal,
     gitWorktreeStartingStateDeps,
   );
+const resolveLocalShellEnvironment = createShellEnvironmentResolver({
+  runProcess: (process) => TR(process),
+  logger: { warning: (message, detail) => kW(`git`)().warning(message, detail) },
+});
 const { runCleanupScript: runGitCleanupScript, runSetupScript: runGitSetupScript } =
   createLocalEnvironmentRuntime({
     getExcludedEnvironmentVariables: () =>
@@ -365,7 +370,7 @@ const { runCleanupScript: runGitCleanupScript, runSetupScript: runGitSetupScript
     getProcessCwd: () => process.cwd(),
     getProcessEnvironment: () => process.env,
     getShellDescriptor: (...args) => GZ(...args),
-    getShellEnvironment: (...args) => VZ(...args),
+    getShellEnvironment: (...args) => resolveLocalShellEnvironment(...args),
     logger: {
       error: (message) => kW(`git`)().error(message),
       info: (message) => kW(`git`)().info(message),
@@ -44150,15 +44155,7 @@ function fH(e) {
       return;
   }
 }
-var pH = `CODEX_SHELL`,
-  mH = `_SHELL_ENV_DELIMITER_`,
-  hH = `printf '\\0%s\\0' '${mH}'; command env -0 || exit; printf '\\0%s\\0' '${mH}'; exit`,
-  gH = { DISABLE_AUTO_UPDATE: `true`, ZSH_TMUX_AUTOSTARTED: `true`, ZSH_TMUX_AUTOSTART: `false` },
-  _H =
-    /(?:\u001B\][\s\S]*?(?:\u0007|\u001B\u005C|\u009C)|[\u001B\u009B][[\]()#;?]*(?:\d{1,4}(?:[;:]\d{0,4})*)?[\dA-PR-TZcf-nq-uy=><~])/g;
-function vH(e, t) {
-  return parseShellEnvironmentOutput(e, mH, t);
-}
+const pH = `CODEX_SHELL`;
 (K({ threadIds: G(H()), sortKey: q([`created_at`, `updated_at`]).optional() }),
   cN(H(), zM()),
   Object.values({
@@ -56184,59 +56181,6 @@ function PZ(e) {
 function FZ(e, t, n) {
   return isPathWithinRoot(e, t, n, { local: g.default, posix: g.default.posix });
 }
-var IZ = [
-    `entry=$(getent passwd "$(id -u)" 2>/dev/null) || entry=$(id -P 2>/dev/null) || exit 1`,
-    "shell=${entry##*:}",
-    `test -n "$shell" || exit 1`,
-    `printf "%s\\n" "$shell"`,
-  ].join(`; `),
-  LZ = { ...gH, [pH]: `1` },
-  RZ = [`/bin/zsh`, `/bin/bash`],
-  zZ = new Map(),
-  BZ = kW(`git`);
-function VZ(e, t, n, r) {
-  if (t === `win32`) return Promise.resolve({ ...n });
-  let i = zZ.get(e.id);
-  if (i != null) return i;
-  let a = HZ(e, n, r);
-  return (zZ.set(e.id, a), a);
-}
-async function HZ(e, t, n) {
-  let r = await UZ(e, n).catch(() => null),
-    i = [r ?? `/bin/sh`, ...RZ.filter((e) => e !== r)],
-    a = null;
-  for (let r of i)
-    try {
-      let i = await TR(await e.spawn({ args: [r, `-ilc`, hH], cwd: n, env: LZ, timeoutMs: 1e4 }));
-      if (i.code !== 0) {
-        a = Error(`Login shell exited unsuccessfully`);
-        continue;
-      }
-      return WZ({ ...t, ...vH(i.stdout, `\0`) });
-    } catch (e) {
-      a = e instanceof Error ? e : Error(`Shell env loading failed`);
-    }
-  return (
-    BZ().warning(`[local-environment] failed to load shell env`, {
-      safe: {},
-      sensitive: { error: a },
-    }),
-    WZ({ ...t })
-  );
-}
-async function UZ(e, t) {
-  let n = await TR(await e.spawn({ args: [`sh`, `-c`, IZ], cwd: t, timeoutMs: 5e3 }));
-  return n.code === 0
-    ? (n.stdout
-        .split(/\r?\n/)
-        .map((e) => e.trim())
-        .find((e) => e.length > 0) ?? null)
-    : null;
-}
-function WZ(e) {
-  let { [pH]: t, ...n } = e;
-  return n;
-}
 function GZ(e, t) {
   return describeShell(
     e,
@@ -56258,7 +56202,6 @@ function GZ(e, t) {
       ? { executable: n, args: [], scriptExtension: `sh`, shellKind: `posix` }
       : { executable: n, args: [`/c`], scriptExtension: `cmd`, shellKind: `cmd` };
 }
-(`${mH}${mH}`, `${mH}${mH}`);
 function JZ(e) {
   return e[XZ(e)];
 }
