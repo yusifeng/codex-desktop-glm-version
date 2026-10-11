@@ -1126,3 +1126,8 @@ Cursor style cleanup（原 `pc`，4292-4297）已迁移至
 元素 owner window 到 annotation frame path 的 projection（原 `Cc`，4343-4345）已迁移至
 `src/main/browser-page-preload/annotation-element-frame-path.ts`；入口仅注入 owner-window 与
 既有 frame-path policy，保持跨 frame path 结果。focused test 覆盖 owner window projection。
+### 增量抽取：annotation anchor selector projection
+
+元素到稳定 annotation anchor selector 的 projection（原 `Rc`，4440-4442）已迁移至
+`src/main/browser-page-preload/annotation-anchor-selector.ts`；入口固定使用 unique selector
+模式并复用 selector generator。focused test 覆盖 selector consumer 与 options 传递。

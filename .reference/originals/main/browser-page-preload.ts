@@ -4437,9 +4437,7 @@ function Ic(e) {
 function Lc(e, t) {
   return projectAnnotationFramePoint(t, Ic(e));
 }
-function Rc(e) {
-  return kc(e);
-}
+function Rc(e) { return getAnnotationAnchorSelector(e, { resolveSelector: (element, options) => kc(element, options) }); }
 function zc(e) {
   return collectAnnotationFrameElements(e, {
     queryAll: (root) => Array.from(root.querySelectorAll(`*`)),
@@ -6000,6 +5998,7 @@ var { removeAnnotationCursorStyles } = require("./browser-page-preload/annotatio
 var { cleanupAnnotationCursorStylesAcrossFrames } = require("./browser-page-preload/annotation-cursor-tree-cleanup");
 var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window");
 var { getAnnotationElementFramePath } = require("./browser-page-preload/annotation-element-frame-path");
+var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation-anchor-selector");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
