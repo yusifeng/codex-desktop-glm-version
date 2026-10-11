@@ -573,6 +573,13 @@ Annotation iframe/shadow-root 元素递归与窗口去重遍历（原 `zc/uc`，
 读取器。`scripts/test-preload-annotation-frame-tree.mjs` 覆盖嵌套 frame、shadow frame 和
 循环窗口三项行为断言。
 
+### 增量抽取：annotation shadow selector resolution
+
+跨 shadow-root 的 `shadow:selector>>>selector` 解析（原 `Ec`，4382-4392）已迁移至
+`src/main/browser-page-preload/annotation-shadow-selector-resolver.ts`；入口保留普通 selector
+兼容、逐级 shadowRoot 校验和最终 element 类型边界。focused test 覆盖 shadow 链、普通
+selector 与缺失终点三项行为。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate

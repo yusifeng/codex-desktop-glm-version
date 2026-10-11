@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { resolveAnnotationShadowSelector } = require("../app/.vite/build/browser-page-preload/annotation-shadow-selector-resolver.js");
+const leaf = { kind: "leaf" }, host = { kind: "host", shadowRoot: { nodes: { "#leaf": leaf } } }, root = { nodes: { "#host": host } };
+const deps = { shadowPrefix: "shadow:", shadowSeparator: ">>>", querySelector: (value, selector) => value.nodes?.[selector] ?? null, isElement: (value) => value?.kind != null, getShadowRoot: (value) => value.shadowRoot ?? null };
+assert.equal(resolveAnnotationShadowSelector(root, "shadow:#host>>>#leaf", deps), leaf);
+assert.equal(resolveAnnotationShadowSelector(root, "#host", deps), host);
+assert.equal(resolveAnnotationShadowSelector(root, "shadow:#host>>>#missing", deps), null);
+console.log("3 preload annotation shadow selector assertions passed");

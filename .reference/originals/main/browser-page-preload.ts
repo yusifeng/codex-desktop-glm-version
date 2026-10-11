@@ -4380,15 +4380,7 @@ function Tc(e, t) {
   });
 }
 function Ec(e, t) {
-  let n = t.startsWith(Xc) ? t.slice(7).split(Zc) : [t],
-    r = e;
-  for (let [e, t] of n.entries()) {
-    let i = r.querySelector(t);
-    if (e === n.length - 1) return F(i) ? i : null;
-    if (!F(i) || i.shadowRoot == null) return null;
-    r = i.shadowRoot;
-  }
-  return null;
+  return resolveAnnotationShadowSelector(e, t, { shadowPrefix: Xc, shadowSeparator: Zc, querySelector: (root, selector) => root.querySelector(selector), isElement: (value) => F(value), getShadowRoot: (element) => element.shadowRoot });
 }
 function Dc(e) {
   return resolveAnnotationFrameDocument(e, { resolveWindow: (framePath) => wc(framePath) });
@@ -6046,6 +6038,7 @@ var { generateAnnotationSelector } = require("./browser-page-preload/annotation-
 var { resolveAnnotationHitTarget } = require("./browser-page-preload/annotation-hit-target-resolver");
 var { resolveAnnotationFrameHit } = require("./browser-page-preload/annotation-frame-hit-test");
 var { collectAnnotationFrameElements, collectAnnotationFrameWindows } = require("./browser-page-preload/annotation-frame-tree");
+var { resolveAnnotationShadowSelector } = require("./browser-page-preload/annotation-shadow-selector-resolver");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
