@@ -599,6 +599,14 @@ focused test 为 `scripts/test-connect-app-host-controller.mjs`，运行命令�
 `scripts/test-thread-settings-update-registry.mjs`，运行命令为
 `node --experimental-strip-types scripts/test-thread-settings-update-registry.mjs`。
 
+### 增量抽取：main thread goal hydration generation 生命周期
+
+`AppServerConversationManager` 的 per-conversation goal hydration token registry 已迁移至
+`src/main/main-app/conversation/thread-goal-hydration-registry.ts`，保留新 generation
+淘汰旧 token、disposed gate、archive cancel、current identity end 与 manager dispose clear。
+focused test 为 `scripts/test-thread-goal-hydration-registry.mjs`，运行命令为
+`node scripts/test-thread-goal-hydration-registry.mjs`（需先完成构建）。
+
 ### 增量抽取：preload PIP 视频帧 IPC listener 生命周期
 
 `pip-video-decoder.ts` 的远程 PIP 视频帧 listener 已迁移至

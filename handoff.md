@@ -2,6 +2,8 @@
 
 本轮新增 `app-server-request-lifecycle-controller.ts`，真实接回 `AppServerRequestSender.send` 的 prewarm/normal dispatch、timeout abandon、failure notification 与 cleanup lifecycle；focused test 为 `scripts/test-app-server-request-lifecycle-controller.mjs`。
 
+本轮新增 `thread-goal-hydration-registry.ts`，真实接回 `AppServerConversationManager` 的 per-conversation goal hydration generation、stale-token gate、archive cancel 与 dispose clear；focused test 为 `scripts/test-thread-goal-hydration-registry.mjs`。
+
 本轮新增 `thread-read-state-controller.ts`，真实接回 `createHostThreadReadState` 的 unread-thread subscription、retired retry、identity guard、pending event reconcile、异步 set 与 dispose lifecycle；focused test 为 `scripts/test-thread-read-state-controller.mjs`。
 
 本轮新增 `annotation-element-editor-open-controller.ts`，真实接回 Wy 的 `qe` create-from-element editor lifecycle；focused test 为 `scripts/test-preload-annotation-element-editor-open-controller.mjs`。
