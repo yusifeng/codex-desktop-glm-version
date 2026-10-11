@@ -4535,14 +4535,7 @@ function il(e, t) {
   });
 }
 function al(e, t, n) {
-  if (e.primary.anchor.kind === `virtual` || t.anchor.kind === `virtual`)
-    return n ? e : { additional: [], primary: t };
-  if (!n) return { additional: [], primary: t };
-  let r = [e.primary, ...e.additional],
-    i = r.findIndex((e) => ol(e, t));
-  if (i === -1) return { additional: [...e.additional, t], primary: e.primary };
-  let [a, ...o] = r.filter((e, t) => t !== i);
-  return a == null ? null : { additional: o, primary: a };
+  return mergeAnnotationAnchorSelection(e, t, n, { areEqual: (left, right) => ol(left, right) });
 }
 function ol(e, t) {
   return areAnnotationLiveAnchorsEqual(e, t);
@@ -5973,6 +5966,7 @@ var { getAnnotationElementFramePath } = require("./browser-page-preload/annotati
 var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation-anchor-selector");
 var { getAnnotationAnchorPath } = require("./browser-page-preload/annotation-anchor-path");
 var { areAnnotationLiveAnchorsEqual } = require("./browser-page-preload/annotation-live-anchor-equality");
+var { mergeAnnotationAnchorSelection } = require("./browser-page-preload/annotation-anchor-selection-merge");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");

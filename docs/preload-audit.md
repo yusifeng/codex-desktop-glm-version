@@ -1179,3 +1179,9 @@ focused test 覆盖空路径、单级成功与缺失 frame。
 运行中 annotation record 的 live element/virtual/element/region anchor equality（原 `ol`，4547-4571）
 已迁移至 `src/main/browser-page-preload/annotation-live-anchor-equality.ts`；入口保留 live element
 优先判等及 frame path、selector、region rect 字段比较。focused test 覆盖 virtual、live element 与 selector mismatch。
+
+### 增量抽取：annotation anchor selection merge
+
+active annotation 的 primary/additional anchor 合并与重复 anchor 删除策略（原 `al`，4537-4545）
+已迁移至 `src/main/browser-page-preload/annotation-anchor-selection-merge.ts`；入口仅注入既有
+live-anchor equality，保留 virtual anchor、include 开关、追加与删除 primary 的状态语义。focused test 覆盖追加、virtual 重置与重复删除。
