@@ -1662,3 +1662,8 @@ dispose 清理已迁移至 `src/main/worker/git-init-watcher-start-controller.ts
 `src/main/worker/git-repo-watch-event-controller.ts`；controller 保留 active watch identity guard、working-tree
 path filtering/full invalidation、Git cache invalidation、live-query fanout、performance/raw-event accounting、trace
 与 emit 顺序，consumer 继续注入 repository/watch owner。focused test 覆盖 filtered working-tree 与非 repo event。
+### 增量抽取：Git worktree-delete lifecycle controller
+
+`GitManager.deleteWorktreeWithLimit` 的 worktree identity、snapshot/delete operation、成功/失败日志与错误传播已迁移至
+`src/main/worker/git-worktree-delete-lifecycle-controller.ts`；consumer 继续注入 snapshot/delete implementation
+与 manager host owner。focused test 覆盖成功返回 identity 与失败日志/传播。

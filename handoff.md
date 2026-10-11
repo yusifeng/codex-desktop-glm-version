@@ -3049,3 +3049,7 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 
 - `GitManager.createRepoWatch` 的 repo-change event consumer 已迁移至 `src/main/worker/git-repo-watch-event-controller.ts`，并移除旧的未使用 `legacyRepoWatchEvent` 死代码。
 - controller 保留 active watch identity guard、working-tree path filtering/full invalidation、Git cache invalidation、live-query fanout、performance/raw-event accounting、trace 与 emit 顺序；focused test、typecheck、build、chunk/shared audit 均通过。
+# 本轮新增：git-worktree-delete-lifecycle-controller
+
+- `GitManager.deleteWorktreeWithLimit` 的 worktree identity、snapshot/delete operation、成功/失败日志与错误传播已迁移至 `src/main/worker/git-worktree-delete-lifecycle-controller.ts`。
+- consumer 继续注入 snapshot/delete implementation 与 manager host owner；focused test、typecheck、build、chunk/shared audit 均通过。
