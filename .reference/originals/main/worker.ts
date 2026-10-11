@@ -18,6 +18,7 @@ const { dispatchWorktreeOwnerRequest } = require("./worker/git-worktree-owner-di
 const { dispatchWorktreeCreateRequest } = require("./worker/git-worktree-create-dispatch");
 const { dispatchCodexWorktreeRequest } = require("./worker/git-codex-worktree-dispatch");
 const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-dispatch");
+const { createGithubCliRateLimitGate } = require("./worker/github-cli-rate-limit-gate");
 const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
@@ -70991,7 +70992,7 @@ function kbe(e) {
   });
 }
 var Abe = [1e3, 2e3],
-  J6 = new Map(),
+  githubCliRateLimitGate = createGithubCliRateLimitGate((e) => (0, ee.setTimeout)(e)),
   jbe = { GIT_TERMINAL_PROMPT: `0`, GH_PROMPT_DISABLED: `1` };
 async function Y6(e, t) {
   return X6(e, t, { attempt: 0, retryDelaysMs: Abe });
@@ -71073,26 +71074,10 @@ function Nbe(e) {
   return t.includes(`secondary rate limit`) || t.includes(`abuse detection mechanism`);
 }
 async function Pbe(e, t) {
-  let n = J6.get(e);
-  if (n != null && t?.aborted !== !0) {
-    if (t == null) {
-      await n;
-      return;
-    }
-    await new Promise((e) => {
-      let r = () => {
-        (t.removeEventListener(`abort`, r), e());
-      };
-      (t.addEventListener(`abort`, r, { once: !0 }), n.then(r));
-    });
-  }
+  return githubCliRateLimitGate.waitForGate(e, t);
 }
 function Fbe(e, t) {
-  let n = (0, ee.setTimeout)(t);
-  (J6.set(e, n),
-    n.finally(() => {
-      J6.get(e) === n && J6.delete(e);
-    }));
+  githubCliRateLimitGate.block(e, t);
 }
 function Z6(e, t) {
   let n = Q6(e, t);

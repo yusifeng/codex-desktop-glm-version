@@ -1644,3 +1644,9 @@ Repo-changed debounce/emit controller 已在 commit `7ebe836a` 物理接回；wa
 `3babe952` 接回，dispose target cleanup 修正在 `0c610f08`。focused tests 覆盖 timer/emit、retry
 backoff/race/cancel 与 cleanup；剩余 session close/recovery 仍绑定 watcher coverage、Git host watcher
 dispose、telemetry 与 event ordering，不再重复抽 facade。
+
+GitHub CLI secondary-rate-limit 的 per-host backoff gate 已迁移至
+`github-cli-rate-limit-gate.ts`；模块保留 host key、single-flight 等待、abort 竞态与 identity-safe
+cleanup，`Y6/X6/Mbe` 仍由 worker 持有命令执行、重试策略与结果 owner。由
+`scripts/test-worker-github-cli-rate-limit-gate.mjs` 覆盖空 gate、backoff release、abort release 与
+replacement cleanup。

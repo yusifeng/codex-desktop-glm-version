@@ -3131,3 +3131,11 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
   icon semaphore、target detection 与 worker response owner 仍由 `lCe` 持有。
 - `scripts/test-worker-open-in-target-command-registry.mjs` 覆盖 7 项 key、single-flight、custom command
   隔离和失败重试断言。
+
+# 本轮新增：GitHub CLI rate-limit gate
+
+- GitHub CLI secondary-rate-limit 的 per-host backoff、single-flight 等待、AbortSignal 竞态与 promise
+  identity cleanup 已迁移至 `src/main/worker/github-cli-rate-limit-gate.ts`；worker 的 `Y6/X6/Mbe`
+  仍持有命令执行、重试策略和结果 owner。
+- `scripts/test-worker-github-cli-rate-limit-gate.mjs` 覆盖 6 项空 gate、release、abort 与 replacement
+  cleanup 断言。
