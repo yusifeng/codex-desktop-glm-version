@@ -23973,6 +23973,26 @@ function Wy({ rootHost: e, bridge: t }) {
         openEditor: (payload) => t.sendMessageToHost(payload),
       }),
     ),
+    [createAnchorUpdateController] = (0, G.useState)(() =>
+      createAnnotationCreateAnchorUpdateController({
+        cancelEditor: (target) => t.sendMessageToHost({ type: `browser-sidebar-runtime-cancel-editor`, target }),
+        resetModifier: () => {
+          (be.current = !1), m(!1);
+        },
+        clearPointer: () => f(null),
+        clearTransient: () => mc(),
+        clearHover: () => {
+          (o(null), c(null));
+        },
+        clearSelectionHover: () => u(null),
+        mergeAnchor: (anchor, selection, index) => K_(anchor, selection, index),
+        serializeAnchorState: (state, zoom, viewportScale) => av(state, zoom, viewportScale),
+        updateAnchor: (target, anchorState) => t.sendMessageToHost({ type: `browser-sidebar-runtime-update-anchor`, target, anchorState }),
+        refreshViewport: () => T(C_()),
+        setSelectionHover: (value) => u(value),
+        setEditorState: (state) => S(state),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24182,31 +24202,8 @@ function Wy({ rootHost: e, bridge: t }) {
     ct = (0, G.useCallback)((e) => pointRetryController.retry(e, (point) => st(point)), [st, pointRetryController]),
     lt = (0, G.useCallback)(() => viewportRefreshScheduler.schedule(), [viewportRefreshScheduler]),
     ut = (0, G.useCallback)(
-      (e, r, i) => {
-        if (e.target.mode !== `create` || e.anchor.type === `text`) return;
-        if (r == null) {
-          (t.sendMessageToHost({ type: `browser-sidebar-runtime-cancel-editor`, target: e.target }),
-            (be.current = !1),
-            m(!1),
-            f(null),
-            mc(),
-            o(null),
-            c(null),
-            u(null));
-          return;
-        }
-        if (!Oe && r.additional.length > 0) return;
-        let a = { ...e, anchor: K_(e.anchor, r, i) };
-        (t.sendMessageToHost({
-          type: `browser-sidebar-runtime-update-anchor`,
-          target: a.target,
-          anchorState: av(a, j, n.viewportScale),
-        }),
-          T(C_()),
-          u(null),
-          S(a));
-      },
-      [t, Oe, n.viewportScale, j],
+      (e, r, i) => createAnchorUpdateController.update(e, r, i, { multiSelectEnabled: Oe, zoom: j, viewportScale: n.viewportScale }),
+      [createAnchorUpdateController, Oe, j, n.viewportScale],
     ),
     dt = (0, G.useEffectEvent)((e) =>
       removeSelectionController.remove(e, { multiSelectEnabled: Oe, editorState: x }),
@@ -24347,6 +24344,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => commentPreviewController.dispose(), [commentPreviewController]),
     (0, G.useEffect)(() => () => designEditorOpenController.dispose(), [designEditorOpenController]),
     (0, G.useEffect)(() => () => virtualSelectionEditorController.dispose(), [virtualSelectionEditorController]),
+    (0, G.useEffect)(() => () => createAnchorUpdateController.dispose(), [createAnchorUpdateController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);

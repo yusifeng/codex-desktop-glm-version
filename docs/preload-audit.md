@@ -8,6 +8,8 @@
 
 另新增 `annotation-virtual-selection-editor-controller.ts`，真实接回 Wy 的 `et` virtual-selection editor lifecycle，保留 editor-open gate、preview close、design controls、modifier/hover cleanup 与 create-editor IPC/state 顺序。
 
+另新增 `annotation-create-anchor-update-controller.ts`，真实接回 Wy 的 `ut` create-editor anchor update/cancel lifecycle，保留 cancel cleanup、multi-select gate、anchor serialization、IPC、viewport 与 editor state 顺序。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
