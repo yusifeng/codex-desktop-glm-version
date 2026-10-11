@@ -4686,7 +4686,7 @@ function yl(e, t, n) {
   }
 }
 function bl(e, t) {
-  return e.composedPath().includes(t) && !Cl(e);
+  return isAnnotationEventTarget(e, t, { getComposedPath: (event) => event.composedPath(), isBlocked: (event) => Cl(event) });
 }
 function xl(e) {
   return isAnnotationMarkerEvent(e, `data-browser-comment-marker`, {
@@ -5997,6 +5997,7 @@ var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-ow
 var { getAnnotationElementFramePath } = require("./browser-page-preload/annotation-element-frame-path");
 var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation-anchor-selector");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
+var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");

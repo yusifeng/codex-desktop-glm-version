@@ -1133,6 +1133,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-element-frame-path.mjs`](./test-preload-annotation-element-frame-path.mjs)
 - [`test-preload-annotation-anchor-selector.mjs`](./test-preload-annotation-anchor-selector.mjs)
 - [`test-preload-annotation-popover-target.mjs`](./test-preload-annotation-popover-target.mjs)
+- [`test-preload-annotation-event-target-policy.mjs`](./test-preload-annotation-event-target-policy.mjs)
 - [`test-preload-annotation-feature-lifecycle.mjs`](./test-preload-annotation-feature-lifecycle.mjs)
 - [`test-preload-annotation-feature-lifecycle-state.mjs`](./test-preload-annotation-feature-lifecycle-state.mjs)
 - [`test-preload-annotation-element-cache.mjs`](./test-preload-annotation-element-cache.mjs)

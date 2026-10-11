@@ -1136,3 +1136,8 @@ Cursor style cleanup（原 `pc`，4292-4297）已迁移至
 从 annotation root shadowRoot 查找 popover target 并调用既有 open policy（原 `gc`，4320-4323）
 已迁移至 `src/main/browser-page-preload/annotation-popover-target.ts`；入口保留 attribute
 selector 和缺失 shadowRoot 的 false 语义。focused test 覆盖成功、selector 传递与空 root。
+### 增量抽取：annotation event target policy
+
+事件 composedPath target 命中与 interaction-blocked gate（原 `bl`，4688-4691）已迁移至
+`src/main/browser-page-preload/annotation-event-target-policy.ts`；入口复用既有 blocked
+policy，保留 target 缺失与 blocked 两态。focused test 覆盖命中和阻断。
