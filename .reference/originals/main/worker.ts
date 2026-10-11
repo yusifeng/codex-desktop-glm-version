@@ -174,6 +174,7 @@ const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch")
 const { dispatchGitCoreRequest } = require("./worker/git-core-request-dispatch");
 const { getGitInitWatchKey: getSemanticGitInitWatchKey } = require("./worker/git-init-watcher-policy");
 const { createGitManagerGenerationKey, createGitManagerKey, isGitManagerKeyForHost } = require("./worker/git-manager-key-policy");
+const { selectGitCachedWorktrees } = require("./worker/git-worktree-cache-selection");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -67446,11 +67447,8 @@ var {
     }
     getCachedWorktreesForCwds(e, t) {
       let n = Array.from(this.worktreesByKey.values()).filter((e) => e.host.id === t);
-      if (e == null) return n;
-      if (e.length === 0) return [];
-      let r = n[0]?.host.isLocal === !0 ? e.map((e) => NZ(e)) : e,
-        i = n.filter((e) => r.some((t) => FZ(e.root, t, e.host) || FZ(t, e.root, e.host)));
-      return i.length === 0 ? n : i;
+      let r = n[0]?.host.isLocal === !0 ? (e ?? []).map((e) => NZ(e)) : (e ?? []);
+      return selectGitCachedWorktrees(n, e, r, (e, t) => FZ(e.root, t, e.host) || FZ(t, e.root, e.host));
     }
     async invalidateGitReadCachesForMutation(e, t) {
       let n = h1(t),

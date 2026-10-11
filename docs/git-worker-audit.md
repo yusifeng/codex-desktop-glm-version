@@ -1574,3 +1574,6 @@ memoized-query key 已迁移至
 `src/main/worker/git-manager-key-policy.ts`，repo、worktree、stable-metadata 和 watcher
 registry 的真实 key consumers 直接接回；manager 继续持有 Map、cache 与 watcher lifecycle。
 `scripts/test-worker-git-manager-key-policy.mjs` 覆盖 local/remote host、空路径和稳定重复性。
+Git manager 的 cached-worktree cwd selection 与无交集回退规则已迁移至
+`src/main/worker/git-worktree-cache-selection.ts`；入口仍负责 Map snapshot、本地路径归一化和
+path containment predicate。`scripts/test-worker-git-worktree-cache-selection.mjs` 覆盖 null/empty、命中与回退。
