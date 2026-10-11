@@ -4698,26 +4698,6 @@ function sl(e) {
     getRole: (element) => element.getAttribute(`role`),
     hasDirectText: (element) => bc(element) != null,
   });
-/*
-  let t = e.ownerDocument,
-    n = e,
-    r = null;
-  for (; n?.ownerDocument === t && n !== t.body && n !== t.documentElement;) {
-    let e = n.getBoundingClientRect();
-    if (e.width > 0 && e.height > 0) {
-      if (((r ??= n), cl(n, e))) return n;
-      e.width >= ll.width && e.height >= ll.height && (r = n);
-    }
-    n = n.parentElement;
-  }
-  return r;*/
-}
-function cl(e, t) {
-  let n = e.tagName.toLowerCase();
-  return [`a`, `button`, `input`, `textarea`, `select`, `label`, `img`].includes(n) ||
-    e.getAttribute(`role`) != null
-    ? !0
-    : bc(e) != null && t.width >= ul.width && t.height >= ul.height;
 }
 var ll,
   ul,
