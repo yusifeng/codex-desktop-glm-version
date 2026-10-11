@@ -23936,6 +23936,22 @@ function Wy({ rootHost: e, bridge: t }) {
         openPreview: (payload) => t.sendMessageToHost(payload),
       }),
     ),
+    [designEditorOpenController] = (0, G.useState)(() =>
+      createAnnotationDesignEditorOpenController({
+        resolveCard: (element) => nd(element),
+        normalizeAnchor: (element, anchor, canUseSiteAnnotationApi) => od(element, anchor, canUseSiteAnnotationApi),
+        projectCardRect: (rootHost, rect, options) => rb(rootHost, rect, options),
+        projectDesign: (element, anchorState, controls, designChange, card) => sy(element, anchorState, controls, designChange, card),
+        rememberTarget: (id, element) => i.rememberTarget(id, element),
+        createTargetMap: (rootHost) => eb(rootHost),
+        applyDesignChange: (element, id) => qv(element, id),
+        openEditor: (payload) => t.sendMessageToHost(payload),
+        refreshViewport: () => T(C_()),
+        setEditorState: (state) => S(state),
+        setCard: (card) => o(card),
+        closePopover: () => g(!1),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24050,43 +24066,15 @@ function Wy({ rootHost: e, bridge: t }) {
       [commentPreviewController, Ee, e, j],
     ),
     Ze = (0, G.useCallback)(
-      (r, a) => {
-        let s = nd(r);
-        if (s == null) return !1;
-        let c = {
-            ...a,
-            anchor: od(r, a.anchor, A),
-            cardViewportRect: rb(e, s.rect, { viewportScale: n.viewportScale, zoomFactor: j }),
-          },
-          l = sy(r, c, A ? t.getAnnotationControls?.(r) : void 0, void 0, s);
-        return (
-          A && i.rememberTarget(l.id, r),
-          eb(e).set(l.id, r),
-          qv(r, l.id),
-          t.sendMessageToHost({
-            type: `browser-sidebar-runtime-open-design-editor`,
-            anchorState: c,
-            designEditorState: l,
-          }),
-          T(C_()),
-          S({
-            target: { mode: `design`, groupId: l.id },
-            anchor: {
-              type: `element`,
-              additionalSelections: [],
-              cardViewportRect: c.cardViewportRect,
-              element: r,
-              themeVariant: c.themeVariant,
-              value: c.anchor,
-              viewportSize: c.viewportSize,
-            },
-          }),
-          o(s),
-          g(!1),
-          !0
-        );
-      },
-      [i, t, A, e, n.viewportScale, j],
+      (r, a) =>
+        designEditorOpenController.open(r, a, {
+          rootHost: e,
+          canUseSiteAnnotationApi: A,
+          viewportScale: n.viewportScale,
+          zoom: j,
+          getAnnotationControls: t.getAnnotationControls,
+        }),
+      [designEditorOpenController, e, A, n.viewportScale, j, t],
     ),
     Qe = (0, G.useEffectEvent)((e, t, n, r) => {
       if (x != null) return !1;
@@ -24361,6 +24349,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => textAnchorEditorController.dispose(), [textAnchorEditorController]),
     (0, G.useEffect)(() => () => editEditorController.dispose(), [editEditorController]),
     (0, G.useEffect)(() => () => commentPreviewController.dispose(), [commentPreviewController]),
+    (0, G.useEffect)(() => () => designEditorOpenController.dispose(), [designEditorOpenController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
