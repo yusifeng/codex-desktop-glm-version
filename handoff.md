@@ -10,6 +10,8 @@
 
 同轮新增 `annotation-create-anchor-update-controller.ts`，真实接回 Wy 的 `ut` create-editor anchor update/cancel callback；focused test 为 `scripts/test-preload-annotation-create-anchor-update-controller.mjs`。
 
+同轮新增 `annotation-interaction-reset-controller.ts`，真实接回 Wy 的 `mt` 全量 interaction reset callback；focused test 为 `scripts/test-preload-annotation-interaction-reset-controller.mjs`。
+
 同轮新增 `git-metadata-refresh-batch-controller.ts`，真实接回 `GitRepoWatcher.processMetadataRefreshBatch`；
 controller 保留 metadata target 筛选、recovery dispose/restart、missing target 补启动与 worktree refresh 的
 原始 Promise.all 顺序；focused test 为 `scripts/test-worker-git-metadata-refresh-batch-controller.mjs`。

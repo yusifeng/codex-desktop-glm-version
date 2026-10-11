@@ -23993,6 +23993,38 @@ function Wy({ rootHost: e, bridge: t }) {
         setEditorState: (state) => S(state),
       }),
     ),
+    [interactionResetController] = (0, G.useState)(() =>
+      createAnnotationInteractionResetController({
+        closePreview: (commentId) => t.sendMessageToHost({ type: `browser-sidebar-runtime-close-comment-preview`, commentId }),
+        resetModifier: () => {
+          (be.current = !1), m(!1);
+        },
+        clearPointer: () => f(null),
+        clearTransient: () => mc(),
+        clearPreparedSelection: () => {
+          le.current = null;
+        },
+        clearHover: () => {
+          (o(null), c(null));
+        },
+        clearSelectionHover: () => u(null),
+        clearPreview: () => v(null),
+        clearSelectionSuppression: () => {
+          Ce.current = !1;
+        },
+        clearCapturedPoint: () => b(null),
+        clearEditorState: () => S(null),
+        nextInteractionGeneration: () => {
+          me.current += 1;
+        },
+        clearViewportSelection: () => {
+          (xe.current = !1), (Se.current = !1);
+        },
+        clearDragState: () => {
+          (O.current = null), oe(null);
+        },
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24220,28 +24252,7 @@ function Wy({ rootHost: e, bridge: t }) {
       editorCommentReconciliationController.reconcile(comments),
     ),
     mt = (0, G.useEffectEvent)((e) => {
-      (e != null &&
-        t.sendMessageToHost({
-          type: `browser-sidebar-runtime-close-comment-preview`,
-          commentId: e,
-        }),
-        (be.current = !1),
-        m(!1),
-        f(null),
-        mc(),
-        (le.current = null),
-        o(null),
-        c(null),
-        u(null),
-        v(null),
-        (Ce.current = !1),
-        b(null),
-        S(null),
-        (me.current += 1),
-        (xe.current = !1),
-        (Se.current = !1),
-        (O.current = null),
-        oe(null));
+      interactionResetController.reset(e);
     }),
     ht = (0, G.useEffectEvent)((e) => {
       (Ye(e), b(null));
@@ -24345,6 +24356,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => designEditorOpenController.dispose(), [designEditorOpenController]),
     (0, G.useEffect)(() => () => virtualSelectionEditorController.dispose(), [virtualSelectionEditorController]),
     (0, G.useEffect)(() => () => createAnchorUpdateController.dispose(), [createAnchorUpdateController]),
+    (0, G.useEffect)(() => () => interactionResetController.dispose(), [interactionResetController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);

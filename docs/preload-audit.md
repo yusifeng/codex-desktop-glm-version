@@ -10,6 +10,8 @@
 
 另新增 `annotation-create-anchor-update-controller.ts`，真实接回 Wy 的 `ut` create-editor anchor update/cancel lifecycle，保留 cancel cleanup、multi-select gate、anchor serialization、IPC、viewport 与 editor state 顺序。
 
+另新增 `annotation-interaction-reset-controller.ts`，真实接回 Wy 的 `mt` 全量 interaction reset lifecycle，保留 preview、modifier、pointer、selection、editor、generation、viewport 与 drag cleanup 顺序。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
