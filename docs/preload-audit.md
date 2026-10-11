@@ -1197,3 +1197,9 @@ live-anchor equality，保留 virtual anchor、include 开关、追加与删除 
 CSS selector token 的 page-level `CSS.escape` 能力探测与 fallback（原 `qc`，4483-4484）已迁移至
 `src/main/browser-page-preload/annotation-selector-token-policy.ts`；入口注入 CSS escape getter
 与既有 token escaping，保留 CSS API 可用与缺失时的结果。focused test 覆盖两种环境。
+
+### 增量抽取：annotation cursor style state
+
+按 document 保存 cursor 原值、隐藏 cursor 并在状态未被外部改写时恢复（原 `Bc/Vc`，4440-4456）
+已迁移至 `src/main/browser-page-preload/annotation-cursor-style-state.ts`；入口保留 WeakMap 生命周期、
+跨元素切换时先恢复旧状态及外部样式改写保护。focused test 覆盖 apply/restore 与外部改写。

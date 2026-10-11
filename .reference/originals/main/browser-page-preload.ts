@@ -4439,21 +4439,10 @@ function zc(e) {
   });
 }
 function Bc(e) {
-  let t = e.ownerDocument;
-  $c.get(t)?.element !== e && Vc(t);
-  let n = e.style.getPropertyValue(`cursor`),
-    r = e.style.getPropertyPriority(`cursor`);
-  (n !== `none` || r !== `important`) &&
-    ($c.set(t, { element: e, cursor: n, priority: r }),
-    e.style.setProperty(`cursor`, `none`, `important`));
+  applyAnnotationCursorStyle(e, $c, (documentLike) => Vc(documentLike));
 }
 function Vc(e) {
-  let t = $c.get(e);
-  t != null &&
-    ($c.delete(e),
-    t.element.style.getPropertyValue(`cursor`) === `none` &&
-      t.element.style.getPropertyPriority(`cursor`) === `important` &&
-      t.element.style.setProperty(`cursor`, t.cursor, t.priority));
+  restoreAnnotationCursorStyle(e, $c);
 }
 function Hc(e) {
   runAnnotationCleanup(e);
@@ -5968,6 +5957,7 @@ var { areAnnotationLiveAnchorsEqual } = require("./browser-page-preload/annotati
 var { mergeAnnotationAnchorSelection } = require("./browser-page-preload/annotation-anchor-selection-merge");
 var { resolveAnnotationHitTargetWithFallback } = require("./browser-page-preload/annotation-hit-target-fallback");
 var { escapeAnnotationSelectorTokenForPage } = require("./browser-page-preload/annotation-selector-token-policy");
+var { applyAnnotationCursorStyle, restoreAnnotationCursorStyle } = require("./browser-page-preload/annotation-cursor-style-state");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");
