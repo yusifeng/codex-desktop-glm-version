@@ -4413,6 +4413,17 @@ function Dc(e) {
   return resolveAnnotationFrameDocument(e, { resolveWindow: (framePath) => wc(framePath) });
 }
 function Oc(e, { requireUnique: t = !1 } = {}) {
+  return generateAnnotationSelector(e, { requireUnique: t }, {
+    getTagName: (element) => element.tagName,
+    getId: (element) => element.id || null,
+    getClassNames: (element) => element.classList,
+    getParentElement: (element) => element.parentElement,
+    getChildren: (element) => element.children,
+    isElement: (value) => F(value),
+    escapeToken: (value) => qc(value),
+    isUnique: (element, selector) => Wc(element, selector),
+  });
+/*
   let n = [],
     r = e,
     i = 0;
@@ -4438,7 +4449,7 @@ function Oc(e, { requireUnique: t = !1 } = {}) {
     if (t && Wc(e, l)) return l;
     ((r = c), (i += 1));
   }
-  return t || n.length === 0 ? null : n.join(` > `);
+  return t || n.length === 0 ? null : n.join(` > `);*/
 }
 function kc(e, { requireUnique: t = !0 } = {}) {
   let n = [],
@@ -6095,6 +6106,7 @@ var { isAnnotationVisibleTextElement } = require("./browser-page-preload/annotat
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
+var { generateAnnotationSelector } = require("./browser-page-preload/annotation-selector-generator");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");

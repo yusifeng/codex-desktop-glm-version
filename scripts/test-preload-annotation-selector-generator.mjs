@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { generateAnnotationSelector } = require("../app/.vite/build/browser-page-preload/annotation-selector-generator.js");
+const body = { tagName: "BODY", children: [] };
+const first = { tagName: "DIV", id: "hero", classList: ["card"], parentElement: body, children: [] };
+body.children.push(first);
+const deps = { getTagName: (e) => e.tagName, getId: (e) => e.id || null, getClassNames: (e) => e.classList || [], getParentElement: (e) => e.parentElement, getChildren: (e) => e.children || [], isElement: (e) => e?.tagName != null, escapeToken: (e) => e.replace(/[^a-zA-Z0-9_-]/g, "\\$&"), isUnique: (_e, selector) => selector === "div#hero" };
+assert.equal(generateAnnotationSelector(first, {}, deps), "div#hero");
+assert.equal(generateAnnotationSelector(first, { requireUnique: true }, deps), "div#hero");
+const noId = { tagName: "SPAN", classList: ["bad class", "ok"], parentElement: body, children: [] };
+assert.equal(generateAnnotationSelector(noId, {}, deps), "body > span.ok");
+console.log("3 preload annotation selector generator assertions passed");

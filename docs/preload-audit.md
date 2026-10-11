@@ -539,6 +539,15 @@ owner document、DOM parent/rect、tag/role 和既有文本标签读取器；目
 和 48x24/24x16 阈值保持不变。`scripts/test-preload-annotation-target-element-resolver.mjs`
 覆盖小尺寸按钮、文本容器 fallback 和无目标三项行为断言。
 
+### 增量抽取：annotation selector generation
+
+Annotation 元素 selector 生成（原 `Oc`，4415-4441）已迁移至
+`src/main/browser-page-preload/annotation-selector-generator.ts`。该 helper 保留 id、
+class、同标签 `nth-of-type`、shadow-root 唯一性检查和四层普通路径限制；入口只注入
+DOM 读取器、CSS token escape 与既有 unique-selector predicate。由
+`scripts/test-preload-annotation-selector-generator.mjs` 覆盖 id、unique 和 class fallback
+三项行为断言。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate
