@@ -531,3 +531,9 @@ hotkey hide、window creation、deep-link navigation、notification dismissal �
 worker `H9.handleMessage`/`handleWorkerMessage` 则同时维护 pending map、WebContents destroyed
 cleanup、worker-id 校验、response resolution 与 postMessage/broadcast 顺序。上述函数均为
 生命周期编排而非可脱离 owner 的纯策略；本轮未制造 facade。
+
+Rust Analyzer 的纯初始化 options projection 已迁移至
+`src/main/main-app/language-server/rust-analyzer-options.ts`；`findSessionOptions` 继续负责
+tool discovery、PATH/env 组装、sysroot spawn/stat 探测与 session lifecycle，helper 仅接收
+探测后的 sysroot 并构造 initialization/workspace configuration。`scripts/test-main-rust-analyzer-options.mjs`
+覆盖 sysroot 与 null fallback。

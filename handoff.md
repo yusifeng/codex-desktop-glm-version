@@ -2700,3 +2700,8 @@ typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 fram
 opacity、hotkey hide、window creation、deep-link navigation、notification dismissal 与 focus
 顺序；worker `H9.handleMessage`/`handleWorkerMessage` 绑定 pending/WebContents 生命周期及
 postMessage/broadcast 顺序，未发现不改变副作用顺序的独立纯策略，本轮保留 owner。
+2026-10-11 A3 main/language-server 增量：Rust Analyzer 初始化 options projection 已迁移至
+`src/main/main-app/language-server/rust-analyzer-options.ts`；`findSessionOptions` 继续持有
+tool discovery、PATH/env、sysroot spawn/stat 与 session lifecycle，新增
+`scripts/test-main-rust-analyzer-options.mjs` 的 2 项 focused assertions，typecheck 通过。
+本轮 build 被并行 browser-page-preload.ts 的重复符号 `Jt` 阻塞，需 owner 修复后复跑。

@@ -45,6 +45,7 @@ const targetLaunchArgs = require("./main-app/open-target/target-launch-args.js")
 const targetDescriptorPolicy = require("./main-app/open-target/target-descriptor-policy.js");
 const languageServerProtocolHelpers = require("./main-app/language-server/protocol-helpers.js");
 const { buildKotlinWorkspaceConfig } = require("./main-app/language-server/kotlin-workspace-config.js");
+const { buildRustAnalyzerOptions } = require("./main-app/language-server/rust-analyzer-options.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -135998,12 +135999,6 @@ var U0e = {
       return (await e.host.createDirectory(t, { recursive: !0 }), t);
     }
   },
-  S$ = {
-    cargo: { buildScripts: { enable: !1, rebuildOnSave: !1 }, noDeps: !0 },
-    checkOnSave: !1,
-    files: { exclude: [`rust-analyzer.toml`] },
-    procMacro: { enable: !1 },
-  },
   K0e = 1e4,
   q0e = class {
     id = `rust-analyzer`;
@@ -136036,7 +136031,7 @@ var U0e = {
           RUSTC_WORKSPACE_WRAPPER: ``,
           RUSTUP_AUTO_INSTALL: `0`,
         },
-        c = { ...S$, cargo: { ...S$.cargo, sysroot: await J0e(e, r, a, s) } };
+        c = buildRustAnalyzerOptions(await J0e(e, r, a, s));
       return { env: s, initializationOptions: c, workspaceConfiguration: { "rust-analyzer": c } };
     }
   };
