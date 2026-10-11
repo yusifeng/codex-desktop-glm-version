@@ -345,6 +345,10 @@ node scripts/audit-shared-consumption.mjs
 
 `createExecuteTurnStart` 的 per-conversation in-flight promise 去重与 identity-safe settle cleanup 已迁移至 `src/main/main-app/conversation/turn-start-inflight-registry.ts`；turn 核心观察、状态更新与 rollback 仍由 `turn-dispatch.ts` 持有。focused test：`scripts/test-main-turn-start-inflight-registry.mjs`。
 
+`createHostThreadReadState` 的 unread-thread subscription、retired retry、identity/host-key guard、pending event
+reconcile、异步 set 与 dispose lifecycle 已迁移至 `src/main/main-app/conversation/thread-read-state-controller.ts`；
+`host-assembly.ts` 删除旧的内嵌实现，仅保留 assembly consumer。focused test：`scripts/test-thread-read-state-controller.mjs`。
+
 本轮对 `Ust` 后半段启动装配进行了逐段复核。该区间同时交织 Electron app/window 生命周期、tray
 初始化（`Pst/Ge`）、computer-use/browser-use service 构造、app-server connection registry
 订阅、插件 reconcile、focus/quit 事件监听与 disposable 注册；例如 175,900-176,050 在同一

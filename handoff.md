@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮新增 `thread-read-state-controller.ts`，真实接回 `createHostThreadReadState` 的 unread-thread subscription、retired retry、identity guard、pending event reconcile、异步 set 与 dispose lifecycle；focused test 为 `scripts/test-thread-read-state-controller.mjs`。
+
 本轮新增 `annotation-element-editor-open-controller.ts`，真实接回 Wy 的 `qe` create-from-element editor lifecycle；focused test 为 `scripts/test-preload-annotation-element-editor-open-controller.mjs`。
 
 本轮新增 `pip-video-decoder-controller.ts`，真实接回 preload PIP WebCodecs registry lifecycle；focused test 为 `scripts/test-preload-pip-video-decoder-controller.mjs`。
@@ -3082,3 +3084,7 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 
 - `GitManager.handleRequestWithContext` 的 request admission、tracked lifecycle begin 与 pre-cancelled cancellation telemetry/early return 已迁移至 `src/main/worker/git-request-admission-controller.ts`。
 - 保留 `operation == null` 时的 canceled outcome 语义；focused test、typecheck、build、chunk/shared audit 均通过。
+# 本轮新增：thread-read-state-controller
+
+- `createHostThreadReadState` 的 host unread-thread subscription、open generation、retired retry、identity/host-key guard、pending event reconcile、异步 set 与 dispose lifecycle 已迁移至 `src/main/main-app/conversation/thread-read-state-controller.ts`。
+- `host-assembly.ts` 删除旧的 156 行内嵌实现，仅保留 controller consumer/import；focused test、typecheck、build、chunk/shared audit 均通过。
