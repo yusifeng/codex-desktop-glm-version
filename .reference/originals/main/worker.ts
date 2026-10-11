@@ -154,7 +154,7 @@ const { createGitRequestCancellationTelemetry } = require("./worker/git-request-
 const { createGitWorkerResponse } = require("./worker/git-response-envelope");
 const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
-const { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
+const { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
@@ -69732,7 +69732,7 @@ var I6 = kW(`git`),
             listWorktrees: (repository, requestSignal) => listGitWorktrees(repository, requestSignal, gitWorktreeListDeps),
           }),
         },
-        s = resolveReviewCwd(e),
+        s = resolveGitRequestPerformanceContext(e).reviewCwd,
         c = s == null ? `unknown` : getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), s, o, o.isLocal ? g.default : g.default.posix),
         l,
         u = null,
@@ -69749,7 +69749,7 @@ var I6 = kW(`git`),
               enqueuedAtMs: e.enqueuedAtMs,
               repoIndexSizeBucket: c,
               result: l,
-              reviewSource: resolveReviewSource(e),
+              reviewSource: resolveGitRequestPerformanceContext(e).reviewSource,
               source: e.params.operationSource,
               startedAtMs: r,
             })),
@@ -70179,7 +70179,7 @@ var I6 = kW(`git`),
           enqueuedAtMs: e.enqueuedAtMs,
           repoIndexSizeBucket: c,
           result: l,
-          reviewSource: resolveReviewSource(e),
+          reviewSource: resolveGitRequestPerformanceContext(e).reviewSource,
           source: e.params.operationSource,
           startedAtMs: r,
         })),
@@ -70199,7 +70199,7 @@ var I6 = kW(`git`),
         repoIndexSizeBucket: c,
         result: l,
         resultDisposition: u ?? void 0,
-        reviewSource: resolveReviewSource(e),
+        reviewSource: resolveGitRequestPerformanceContext(e).reviewSource,
         source: e.params.operationSource,
         trigger: `request`,
       }),

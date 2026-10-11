@@ -59,5 +59,14 @@ function projectGitReviewSummaryResult(response: { method: string; result: any }
   };
 }
 
-export { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
-if (typeof module !== `undefined`) module.exports = { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+/** Collects stable request context fields used by Git performance envelopes. */
+function resolveGitRequestPerformanceContext(request: GitRequest): { root?: string; reviewCwd: string | null; reviewSource: unknown } {
+  return {
+    root: resolveRequestRoot(request),
+    reviewCwd: resolveReviewCwd(request),
+    reviewSource: resolveReviewSource(request),
+  };
+}
+
+export { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+if (typeof module !== `undefined`) module.exports = { classifyGitRequestException, isGitRequestFailure, projectGitReviewSummaryResult, resolveGitRequestPerformanceContext, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };

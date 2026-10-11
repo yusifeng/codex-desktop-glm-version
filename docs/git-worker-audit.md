@@ -1560,3 +1560,8 @@ Worktree snapshot/ref 与 remote branch projection 已迁移至
 `remote -v` push branch 输出解析均由语义 helper 承载；snapshot/restore 与 repository
 query owner 仍负责 Git I/O、cache 和 lifecycle。`scripts/test-worker-git-worktree-snapshot-policy.mjs`
 覆盖 4 项断言。
+
+Git performance request context 的 root/review cwd/source 聚合已迁移至
+`resolveGitRequestPerformanceContext`，并接回 request telemetry 的三个真实 consumer；
+request lifecycle、cache 和 performance emission 仍由 manager 持有。由
+`scripts/test-worker-git-request-performance-context.mjs` 覆盖 2 项 projection 断言。
