@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { startGitInitWatchSession } = require("../app/.vite/build/worker/git-init-watch-session-controller.js");
+const sessions = new Set(); const calls = []; let resolveClosed;
+const session = { closed: new Promise((resolve) => { resolveClosed = resolve; }) };
+const started = await startGitInitWatchSession({ startFileWatch: async (options) => { calls.push(options); return session; }, watchedPath: "/repo", onChange: () => {}, watchId: "git-init-1", isDisposed: () => false, disposeSession: async () => calls.push("dispose"), sessions, logger: { warning: (...args) => calls.push(args[0]) }, cwd: "/repo", shouldReconnect: (reason) => reason === "watch-error", disposeSessions: () => calls.push("dispose-all"), scheduleReconnect: () => calls.push("reconnect") });
+assert.equal(started, session); assert.equal(sessions.has(session), true); assert.equal(calls[0].watchId, "git-init-1");
+resolveClosed({ reason: "watch-error", error: new Error("closed") }); await Promise.resolve(); await Promise.resolve(); assert.equal(sessions.has(session), false); assert.ok(calls.includes("dispose-all")); assert.ok(calls.includes("reconnect"));
+const disposedSessions = new Set(); const disposed = await startGitInitWatchSession({ startFileWatch: async () => ({ closed: Promise.resolve() }), watchedPath: "/repo", onChange: () => {}, watchId: "git-init-2", isDisposed: () => true, disposeSession: async () => calls.push("dispose-race"), sessions: disposedSessions, logger: { warning: () => {} }, cwd: "/repo", shouldReconnect: () => false, disposeSessions: () => {}, scheduleReconnect: () => {} });
+assert.equal(disposed, null); assert.ok(calls.includes("dispose-race")); assert.equal(disposedSessions.size, 0); console.log("7 worker Git init watch-session controller assertions passed");

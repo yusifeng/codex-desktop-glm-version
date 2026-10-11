@@ -2,6 +2,7 @@ const { shouldCheckGitInitPath } = require("./git-init-watcher-path-policy");
 const { isGitMetadataDirectoryUnavailable } = require("./git-init-watcher-recovery");
 const { createGitInitReconnectController } = require("./git-init-reconnect-controller");
 const { startGitInitSessions } = require("./git-init-session-start-controller");
+const { startGitInitWatchSession } = require("./git-init-watch-session-controller");
 
 type GitInitWatcherDependencies = {
   createLogger: (tag: string) => any;
@@ -100,32 +101,20 @@ class GitInitWatcher {
     gitDirectoryPath: string,
     pathSeparator: string,
   ) {
-    const session = await this.options.host.startFileWatch({
-      path: watchedPath,
-      recursive: false,
-      renameEventHandling: `changed-path`,
-      watchId: `git-init-${this.dependencies.randomUUID()}`,
+    return startGitInitWatchSession({
+      startFileWatch: (options: any) => this.options.host.startFileWatch(options),
+      watchedPath,
       onChange,
+      watchId: `git-init-${this.dependencies.randomUUID()}`,
+      isDisposed: () => this.disposed,
+      disposeSession: (session: any) => session.dispose(),
+      sessions: this.sessions,
+      logger: this.logger,
+      cwd: this.options.cwd,
+      shouldReconnect: shouldReconnectGitInitWatch,
+      disposeSessions: () => this.disposeSessions(),
+      scheduleReconnect: () => this.scheduleReconnect(gitDirectoryPath, pathSeparator),
     });
-    if (this.disposed) {
-      await session.dispose();
-      return null;
-    }
-    this.sessions.add(session);
-    session.closed.then((result: any) => {
-      if (this.sessions.delete(session)) {
-        if (result.reason === `watch-error`)
-          this.logger.warning(`Git init watcher failed`, {
-            safe: {},
-            sensitive: { cwd: this.options.cwd, error: result.error },
-          });
-        if (shouldReconnectGitInitWatch(result.reason)) {
-          this.disposeSessions();
-          this.scheduleReconnect(gitDirectoryPath, pathSeparator);
-        }
-      }
-    });
-    return session;
   }
 
   scheduleReconnect(gitDirectoryPath: string, pathSeparator: string) {
