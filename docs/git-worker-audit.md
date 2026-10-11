@@ -1078,9 +1078,9 @@ map、generation/retry 状态和实际 refresh 编排；新模块只接收 timer
 
 Git 文件内容读取的 repository-relative path 校验、HEAD/index ref 选择、二进制 Git 输出
 读取、空结果降级与 MIME 投影已迁移至 `src/main/worker/git-file-content.ts`。模块通过窄依赖
-接收 repository lookup、platform path、Git 执行与 MIME 检测；调用方仍负责 Node worker
-host 绑定和响应 envelope。`scripts/test-worker-git-file-content.mjs` 覆盖 HEAD ref、路径越界、
-空内容及 MIME 结果，共 4 项断言。
+接收 repository lookup、platform path、Git 执行与 MIME 检测；worker `fCe` 已真实接回该模块，
+并删除原 `dCe` 实现，调用方仍负责 Node worker host 绑定和响应 envelope。
+`scripts/test-worker-git-file-content.mjs` 覆盖 HEAD ref、路径越界、空内容及 MIME 结果，共 4 项断言。
 
 Live-query 单次 generation 的 abort、tracked/complete 发布、错误重试与 waiter 清理已迁移至
 `src/main/worker/git-live-query-refresh.ts`。registry 仅负责状态映射、依赖注入和调度；新模块

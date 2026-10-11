@@ -6,6 +6,7 @@ let t = require("node:worker_threads"),
   i = require("path");
 const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
+const { readGitFileContent } = require("./worker/git-file-content");
 const { resolveAutomationWritableRoots } = require("./worker/git-automation-writable-roots");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenameDiff } = require("./worker/git-diff-text");
@@ -74493,30 +74494,6 @@ function uCe(e, t, n = {}) {
       return new lCe(t, n.openIn);
   }
 }
-async function dCe({ cwd: e, path: t, ref: n }, r, i, a) {
-  try {
-    let o = (await r.getWorktreeRepository(e, i))?.root;
-    if (!o) return { contentsBase64: null };
-    let s = await i.platformPath(),
-      c = o2(s, o, e, t);
-    if (s.isAbsolute(c) || c.startsWith(`..`)) return { contentsBase64: null };
-    let l = await $(o, [`show`, n === `head` ? `HEAD:${c}` : `:${c}`], i, {
-      collectStdoutBuffer: !0,
-      trim: !1,
-      signal: a,
-    });
-    if (l.code !== 0) return { contentsBase64: null };
-    let u = l.stdoutBuffer;
-    if (u == null || u.length === 0) return { contentsBase64: null };
-    let d = await dz(u);
-    return {
-      contentsBase64: Buffer.from(u).toString(`base64`),
-      ...(d == null ? {} : { mimeType: d }),
-    };
-  } catch {
-    return { contentsBase64: null };
-  }
-}
 function fCe({
   createExecutionHost: e,
   emit: t,
@@ -74535,7 +74512,12 @@ function fCe({
         if (i == null) throw Error(`Execution host ${r} not found`);
         return e(i);
       })(t.request.method, t.request.params, t.operationSource, r),
-    readGitFileBinary: (e, t, r) => dCe(e, n, t, r),
+    readGitFileBinary: (e, t, r) => readGitFileContent(e, t, r, {
+      getWorktreeRepository: (cwd, host) => n.getWorktreeRepository(cwd, host),
+      platformPath: () => t.platformPath(),
+      runGit: (root, args, host, options) => $(root, args, host, options),
+      detectMimeType: (bytes) => dz(bytes),
+    }),
     prepareWorktreeSnapshot: Obe,
     watchIgnoreSources: r,
     startMetadataWatch: i,
