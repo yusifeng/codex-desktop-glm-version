@@ -2882,3 +2882,8 @@ transient、hover 与 selection-hover 清理顺序已物理迁移至
 `src/main/browser-page-preload/annotation-editor-restore-controller.ts`；入口继续注入 React refs/setters 与
 `H_` restore adapter，保持原始 host message 副作用顺序。由
 `scripts/test-preload-annotation-editor-restore-controller.mjs` 覆盖 12 项 focused assertions。
+2026-10-11 A2 preload 增量：`Wy` 的 `syncHover` 指针模式更新、DOM hover 命中优先级、pointer/hover
+React state 与 fallback overlay 派生已物理迁移至 `src/main/browser-page-preload/annotation-hover-sync-controller.ts`；
+入口通过注入 `Te.updatePointer`、DOM hover registry、`pl`/`Yy`/`ss` 与 React setters 保留原始
+host-sync 条件和副作用顺序。由 `scripts/test-preload-annotation-hover-sync-controller.mjs` 覆盖
+browse guard、fallback、DOM-hover 优先级、pointer cleanup 与 dispose gate。

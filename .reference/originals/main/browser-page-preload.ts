@@ -5982,6 +5982,7 @@ var { restoreAnnotationEditor } = require("./browser-page-preload/annotation-edi
 var { createAnnotationSuspensionNotifier } = require("./browser-page-preload/annotation-suspension-notifier");
 var { createAnnotationDesignModifierNotifier } = require("./browser-page-preload/annotation-design-modifier-notifier");
 var { createAnnotationSelectionModifierNotifier } = require("./browser-page-preload/annotation-selection-modifier-notifier");
+var { createAnnotationHoverSyncController } = require("./browser-page-preload/annotation-hover-sync-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23720,6 +23721,23 @@ function Wy({ rootHost: e, bridge: t }) {
         send: (pressed) => t.sendMessageToHost({ type: `browser-sidebar-runtime-annotation-selection-modifier-state`, pressed }),
       }),
     ),
+    [hoverSyncController] = (0, G.useState)(() =>
+      createAnnotationHoverSyncController({
+        getPointer: () => E.current,
+        updatePointer: (pointer, enabled) => Te.updatePointer(pointer, enabled),
+        clearDomHover: () => w.current?.clearHover(),
+        isDomHover: (pointer) => w.current?.hover(pointer) === true,
+        setPointer: (pointer) => f(pointer),
+        clearHoverState: () => {
+          (o(null), c(null));
+        },
+        setHoverState: (value) => o(value),
+        resolveElement: (pointer, canUseSiteAnnotationApi) =>
+          pl(pointer.x, pointer.y, canUseSiteAnnotationApi, e),
+        resolveHover: (element, canUseTweaks) => Yy(element, canUseTweaks),
+        hasDesignComments: (comments) => ss(comments),
+      }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -24192,31 +24210,9 @@ function Wy({ rootHost: e, bridge: t }) {
     ht = (0, G.useEffectEvent)((e) => {
       (Ye(e), b(null));
     }),
-    gt = (0, G.useEffectEvent)((e, t) => {
-      let n = Te.updatePointer(e, t);
-      return (n && w.current?.clearHover(), n);
-    }),
-    _t = (0, G.useEffectEvent)((t) => {
-      if (
-        t.interactionMode === `comment` &&
-        t.isAnnotationSuspended !== !0 &&
-        (k !== `comment` || De) &&
-        x == null
-      ) {
-        let n = E.current;
-        if (gt(n, t.canUseSiteAnnotationApi === !0)) return;
-        if (n != null && t.isDesignModifierPressed !== !0 && w.current?.hover(n)) {
-          (f(n), o(null), c(null));
-          return;
-        }
-        let r =
-            t.canUseTweaks !== !1 &&
-            (t.isDesignModifierPressed === !0 ||
-              (ss(t.comments) && t.annotationEditorMode === `design`)),
-          i = n == null ? null : pl(n.x, n.y, t.canUseSiteAnnotationApi === !0, e);
-        (f(n), o(Yy(i, r)));
-      }
-    }),
+    _t = (0, G.useEffectEvent)((t) =>
+      hoverSyncController.sync(t, { modeAllowsHover: k !== `comment` || De, hasOpenEditor: x != null }),
+    ),
     vt = (0, G.useEffectEvent)((t) => {
       S(H_(t, eb(e)));
     }),
@@ -24313,6 +24309,7 @@ function Wy({ rootHost: e, bridge: t }) {
     };
   }, [i, t, Oe, Ne, ot, st, lt, it, ct, Te, e, rt, at]),
     (0, G.useEffect)(() => () => viewportRefreshScheduler.dispose(), [viewportRefreshScheduler]),
+    (0, G.useEffect)(() => () => hoverSyncController.dispose(), [hoverSyncController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {

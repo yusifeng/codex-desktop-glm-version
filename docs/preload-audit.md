@@ -1422,6 +1422,14 @@ focused test 覆盖初始 false、true/false 变化、重复值与 dispose 后�
 `be.current`/`Oe`/anchor 与 shift-key 业务判定，notifier 保留原始每次发送语义，仅在 runtime dispose 后抑制。
 `scripts/test-preload-annotation-selection-modifier-notifier.mjs` 覆盖重复值仍发送、值切换与 dispose gate。
 
+### 增量抽取：annotation hover-sync controller
+
+`Wy` 的 `syncHover` 指针模式更新、DOM hover 优先级、React pointer/hover state 与 fallback overlay
+派生已物理迁移至 `src/main/browser-page-preload/annotation-hover-sync-controller.ts`；入口继续注入
+`Te`、DOM interaction registry、React setters 以及 `pl`/`Yy`/`ss` 业务解析函数，保留 host sync 的
+条件与副作用顺序。focused test 覆盖 browse guard、fallback hover、DOM hover 优先级、pointer mode
+清理与 dispose gate。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover
