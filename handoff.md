@@ -2701,6 +2701,11 @@ typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 fram
 持有 DOM marker resolver 与 React render 生命周期，新增 `scripts/test-preload-annotation-draft-marker-state.mjs`
 的 8 项 focused assertions，typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 frame
 anchor 生命周期仍未完成。
+2026-10-11 A2 preload 增量：React annotation runtime flex-gap/metadata/draft hover 与 cursor mode 派生（原
+`Wy` 内 `an/on/sn/cn/ln/un`）已迁移至 `src/main/browser-page-preload/annotation-render-state-projection.ts`；
+入口继续注入 overlay runtime、DOM snapshot/geometry 输入并持有 React render 生命周期，新增
+`scripts/test-preload-annotation-render-state-projection.mjs` 的 12 项 focused assertions，typecheck/build/
+verify-chunks 通过。React render/hook 其余组合与跨 frame anchor 生命周期仍未完成。
 2026-10-11 A2 preload 增量：React annotation runtime selected-id active view 派生（原 `Wy` 内
 `wt/Tt/M/Et/Dt/Ot`）已迁移至 `src/main/browser-page-preload/annotation-active-view-projection.ts`；入口
 继续持有 anchor resolution、React effects 与 render 生命周期，新增

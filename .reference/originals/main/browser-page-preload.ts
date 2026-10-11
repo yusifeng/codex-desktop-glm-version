@@ -5967,6 +5967,7 @@ var { projectAnnotationScreenshotPayload } = require("./browser-page-preload/ann
 var { projectAnnotationRegionRecords } = require("./browser-page-preload/annotation-region-record-projection");
 var { projectAnnotationOverlayStyle } = require("./browser-page-preload/annotation-overlay-style-projection");
 var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/annotation-draft-marker-state");
+var { projectAnnotationRenderState } = require("./browser-page-preload/annotation-render-state-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25181,13 +25182,32 @@ function Wy({ rootHost: e, bridge: t }) {
     ),
     rn = screenshotPayload.annotationViewportRect,
     Ht = screenshotPayload.markerViewportPoint,
-    an = Ot ? [] : $y(re, x, Re, Ie),
-    on = Me && !Ot && x == null && ae == null && Kt == null ? a : null,
-    sn = !Ot && x?.target.mode === `create` && x.anchor.type !== `text` ? a : null,
-    cn = p && sn != null && s != null && jt.some((e) => ol(e, s)),
-    ln = p ? `add` : `comment`;
-  ke && (ln = `text`);
-  let un = W.hotspotByMode[ln === `add` ? `add` : `comment`],
+    renderState = projectAnnotationRenderState(
+      {
+        hasActiveSelection: Ot,
+        flexGapProperty: re,
+        editor: x,
+        activeAnnotation: Re,
+        elementCache: Ie,
+        showMetadata: Me,
+        hoverSnapshot: a,
+        highlightRect: ae,
+        selectedComment: Kt,
+        modifierActive: p,
+        selectedPoint: s,
+        hasLinkedDraftSelection:
+          !Ot && x?.target.mode === `create` && x.anchor.type !== `text` && p && s != null && jt.some((e) => ol(e, s)),
+        nativeTextSelection: ke,
+        hotspots: W.hotspotByMode,
+      },
+      { collectFlexGapOverlays: (property, editor, annotation, cache) => $y(property, editor, annotation, cache) },
+    ),
+    an = renderState.flexItemOverlays,
+    on = renderState.metadataSnapshot,
+    sn = renderState.draftHoverSnapshot,
+    cn = renderState.isRemoveHover,
+    ln = renderState.mode,
+    un = renderState.hotspot,
     draftMarkerState = projectAnnotationDraftMarkerState(
       {
         hasActiveSelection: Ot,

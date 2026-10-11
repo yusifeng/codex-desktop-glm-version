@@ -1315,3 +1315,11 @@ React annotation runtime 的 create-anchor draft marker point/number 派生（�
 `src/main/browser-page-preload/annotation-draft-marker-state.ts`；模块负责 active/original/virtual gate、
 marker point adapter 与新 comment number/匹配 comment number 选择，入口继续持有 DOM marker resolver 与
 React render 生命周期。focused test 覆盖新 comment、matched comment、active-selection 与 virtual anchor。
+
+### 增量抽取：annotation render-state projection
+
+React annotation runtime 中 flex-gap overlays、metadata/draft hover、remove-hover、cursor mode 与 hotspot
+的无副作用分支（原 `Wy` 内 `an/on/sn/cn/ln/un`）已迁移至
+`src/main/browser-page-preload/annotation-render-state-projection.ts`；入口继续注入 overlay runtime、DOM
+snapshot 与 geometry 输入，保留 React render 生命周期。focused test 覆盖 active gate、metadata 条件、
+remove-hover、text/add/comment mode 与 hotspot 选择。
