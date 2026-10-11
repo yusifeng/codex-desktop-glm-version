@@ -106,6 +106,7 @@ const { applyGitInitMetadata } = require("./worker/git-init-metadata-apply-contr
 const { ensureGitInitWatchDesired } = require("./worker/git-init-watch-desire-controller");
 const { startGitInitWatcher: startGitInitWatcherController } = require("./worker/git-init-watcher-start-controller");
 const { handleGitRepoWatchEvent } = require("./worker/git-repo-watch-event-controller");
+const { deleteGitWorktreeLifecycle } = require("./worker/git-worktree-delete-lifecycle-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70099,47 +70100,13 @@ var I6 = kW(`git`),
         this.emit({ type: `worker-response`, response: h }));
     }
     async deleteWorktreeWithLimit(e, t) {
-      let n = await createGitWorktreeIdentity(e.worktree);
-      I6().info(`[worktree-delete] worker-start`, {
-        safe: { worktreeId: n },
-        sensitive: { reason: e.reason, force: e.force ?? !1, hasHostConfig: e.hostConfig != null },
-      });
-      try {
-        await deleteWorktreeWithSnapshot(
-          this.gitManager,
-          e.worktree,
-          t,
-          e.reason,
-          e.force ?? !1,
-          {
-            captureWorktreeSnapshot: (gitManager, worktree, host, reason) =>
-              Sge(gitManager, worktree, host, reason),
-            deleteWorktree: (worktree, host, force) =>
-              removeGitWorktree(worktree, host, force),
-            getWorktreeId: X0,
-            logSnapshotFailure: ({ error, reason, worktreeId }) =>
-              B_e().warning(`[worktree-snapshot] failed to snapshot worktree`, {
-                safe: { worktreeId, reason },
-                sensitive: { error },
-              }),
-          },
-        );
-      } catch (e) {
-        throw (
-          I6().warning(`[worktree-delete] worker-failed`, {
-            safe: { worktreeId: n },
-            sensitive: { error: e },
-          }),
-          e
-        );
-      }
-      return (
-        I6().info(`[worktree-delete] worker-success`, {
-          safe: { worktreeId: n },
-          sensitive: { reason: e.reason, force: e.force ?? !1 },
-        }),
-        n
-      );
+      return deleteGitWorktreeLifecycle({ worktree: e.worktree, host: t, reason: e.reason, force: e.force ?? !1,
+        getWorktreeId: (worktree) => createGitWorktreeIdentity(worktree), logInfo: (message, details) => I6().info(message, details),
+        logWarning: (message, details) => I6().warning(message, details), deleteWithSnapshot: (worktree, host, reason, force) => deleteWorktreeWithSnapshot(this.gitManager, worktree, host, reason, force, {
+          captureWorktreeSnapshot: (gitManager, target, executionHost, snapshotReason) => Sge(gitManager, target, executionHost, snapshotReason),
+          deleteWorktree: (target, executionHost, deleteForce) => removeGitWorktree(target, executionHost, deleteForce), getWorktreeId: X0,
+          logSnapshotFailure: ({ error, reason: snapshotReason, worktreeId }) => B_e().warning(`[worktree-snapshot] failed to snapshot worktree`, { safe: { worktreeId, reason: snapshotReason }, sensitive: { error } }),
+        }) });
     }
     async handleUpstreamBranch(e, { host: t, signal: n }) {
       return resolveBranchRequestUpstreamBranch(e, t, n, {
