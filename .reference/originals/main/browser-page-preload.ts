@@ -5989,6 +5989,7 @@ var { createAnnotationPreparedScreenshotController } = require("./browser-page-p
 var { createAnnotationUnavailableSiteInteractionController } = require("./browser-page-preload/annotation-unavailable-site-interaction-controller");
 var { createAnnotationSelectionModifierController } = require("./browser-page-preload/annotation-selection-modifier-controller");
 var { createAnnotationRemoveSelectionController } = require("./browser-page-preload/annotation-remove-selection-controller");
+var { createAnnotationPointRetryController } = require("./browser-page-preload/annotation-point-retry-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23824,6 +23825,12 @@ function Wy({ rootHost: e, bridge: t }) {
         applyAnchorUpdate: (editorState, anchorState) => ut(editorState, anchorState),
       }),
     ),
+    [pointRetryController] = (0, G.useState)(() =>
+      createAnnotationPointRetryController({
+        requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+        cancelAnimationFrame: (handle) => window.cancelAnimationFrame(handle),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24146,16 +24153,7 @@ function Wy({ rootHost: e, bridge: t }) {
       },
       [x, t, A, qe, e],
     ),
-    it = (0, G.useCallback)(
-      (e) => {
-        let t = 2,
-          n = () => {
-            rt(e) || t === 0 || (--t, window.requestAnimationFrame(n));
-          };
-        window.requestAnimationFrame(n);
-      },
-      [rt],
-    ),
+    it = (0, G.useCallback)((e) => pointRetryController.retry(e, (point) => rt(point)), [rt, pointRetryController]),
     at = (0, G.useCallback)(
       (e) => {
         if (x != null)
@@ -24366,6 +24364,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => unavailableSiteInteractionController.dispose(), [unavailableSiteInteractionController]),
     (0, G.useEffect)(() => () => selectionModifierController.dispose(), [selectionModifierController]),
     (0, G.useEffect)(() => () => removeSelectionController.dispose(), [removeSelectionController]),
+    (0, G.useEffect)(() => () => pointRetryController.dispose(), [pointRetryController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {

@@ -1473,6 +1473,13 @@ anchor/hover projection 与失败清理顺序，入口继续注入 React/ref/DOM
 与 create-element guard、primary/additional anchor 索引解析、`al` 投影及 `ut` 更新顺序，入口继续
 注入 editor state 与 anchor update owner。focused test 覆盖有效/无效索引、能力与 target guard、dispose gate。
 
+### 增量抽取：annotation point-retry controller
+
+`Wy` 的 `retryCreateCommentAtPoint` callback（`it`）的 RAF retry 生命周期已迁移至
+`src/main/browser-page-preload/annotation-point-retry-controller.ts`；controller 保留初始调度、最多两次
+重试、成功短路和 dispose 时取消 pending frame，入口继续注入 `rt` point action。focused test 覆盖三次
+尝试、成功短路、pending cancel 与 dispose gate。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover
@@ -1509,3 +1516,10 @@ attempt reset 与 primary-window gone 通知已迁移至 `src/main/main-app/wind
 已迁移至 `src/main/main-app/window/primary-window-tracking.ts`；window manager 继续注入 primary 状态容器与
 事件回调，保持原有 focus/blur 顺序。由 `scripts/test-main-primary-window-tracking.mjs` 覆盖 focused/unfocused
 初始状态、focus、blur 与 emission 顺序。
+
+### 增量抽取：worker GitRepoWatcher dispose controller
+
+`GitRepoWatcher.dispose()` 的 disposed gate、ignore policy/session 清理、repo/retry/metadata controller dispose、
+watch target 与 ignore map 清空，以及 pending metadata promise 的幂等汇合已迁移至
+`src/main/worker/git-repo-watcher-dispose-controller.ts`；worker 继续注入具体 session/I/O owner。由
+`scripts/test-worker-git-repo-watcher-dispose-controller.mjs` 覆盖 cleanup 顺序与重复 dispose promise identity。

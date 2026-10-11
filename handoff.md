@@ -2940,3 +2940,13 @@ anchor/hover projection 与失败清理顺序，入口继续注入 React/ref/DOM
 与 create-element guard、primary/additional anchor 索引解析、`al` 投影及 `ut` 更新顺序，入口继续注入
 editor state 与 anchor update owner。由 `scripts/test-preload-annotation-remove-selection-controller.mjs`
 覆盖有效/无效索引、能力与 target guard、dispose gate。
+2026-10-11 A2 preload 增量：`Wy` 的 `retryCreateCommentAtPoint` callback（`it`）RAF retry 生命周期已物理
+迁移至 `src/main/browser-page-preload/annotation-point-retry-controller.ts`；controller 保留初始调度、最多
+两次重试、成功短路和 dispose 时取消 pending frame，入口继续注入 `rt` point action。由
+`scripts/test-preload-annotation-point-retry-controller.mjs` 覆盖三次尝试、成功短路、pending cancel 与
+dispose gate。
+
+2026-10-11 A1 worker 增量：`GitRepoWatcher.dispose()` 的 disposed gate、ignore policy/session 清理、repo/retry/
+metadata controller dispose、watch target 与 ignore map 清空，以及 pending metadata promise 的幂等汇合已物理
+迁移至 `src/main/worker/git-repo-watcher-dispose-controller.ts`；worker 继续注入具体 session/I/O owner。由
+`scripts/test-worker-git-repo-watcher-dispose-controller.mjs` 覆盖 10 项 focused assertions。
