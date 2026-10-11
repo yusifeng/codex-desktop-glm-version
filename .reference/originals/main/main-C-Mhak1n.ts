@@ -49,6 +49,7 @@ const { buildRustAnalyzerOptions } = require("./main-app/language-server/rust-an
 const { buildPyrightSessionOptions } = require("./main-app/language-server/pyright-session-options.js");
 const { buildTypeScriptServerInitializationOptions } = require("./main-app/language-server/typescript-server-options.js");
 const { buildJavaSessionOptions } = require("./main-app/language-server/java-session-options.js");
+const { SOURCEKIT_INITIALIZATION_OPTIONS } = require("./main-app/language-server/sourcekit-options.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -136056,8 +136057,7 @@ async function J0e(e, t, r, i) {
     return null;
   }
 }
-var Y0e = { backgroundIndexing: !1, swiftPM: { forceResolvedVersions: !0, skipPlugins: !0 } },
-  X0e = class {
+var X0e = class {
     id = `sourcekit-lsp`;
     languageIds = [`swift`];
     async findCommand(e) {
@@ -136077,7 +136077,7 @@ var Y0e = { backgroundIndexing: !1, swiftPM: { forceResolvedVersions: !0, skipPl
       );
       return (
         await e.host.createDirectory(t, { recursive: !0 }),
-        { initializationOptions: Y0e, languageServerWorkspaceRoot: t }
+        { initializationOptions: SOURCEKIT_INITIALIZATION_OPTIONS, languageServerWorkspaceRoot: t }
       );
     }
   },

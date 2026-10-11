@@ -552,3 +552,8 @@ Java/JDTLS `findSessionOptions` 的 `JAVA_HOME`/`JDK_HOME`/PATH 环境 projectio
 `src/main/main-app/language-server/java-session-options.ts`；provider 继续负责 trusted
 command、platform path 与 runtime/workspace 探测。`scripts/test-main-java-session-options.mjs`
 覆盖 Windows/POSIX PATH 分隔符。
+
+SourceKit-LSP 的固定 Swift Package Manager initialization payload 已迁移至
+`src/main/main-app/language-server/sourcekit-options.ts`，`findSessionOptions` 继续负责
+workspace directory 创建、platform/codexHome 路径解析与 process discovery；consumer 保留
+原对象复用语义。`scripts/test-main-sourcekit-options.mjs` 覆盖完整 options shape。
