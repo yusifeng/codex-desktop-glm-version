@@ -64,6 +64,7 @@ import { getDesktopFeatureAvailability } from "../misc/availability";
 import { J as PERSISTED_ATOM_STATE_KEY } from "@chunk/bootstrap";
 import { isSameAuthIdentity } from "../api/desktop-fetch";
 import { createHostThreadReadState as createHostThreadReadStateController } from "../conversation/thread-read-state-controller";
+import { runAppServerRequestLifecycle } from "../conversation/app-server-request-lifecycle-controller";
 
 const createHostThreadReadState = (dependencies: Parameters<typeof createHostThreadReadStateController>[0]) =>
   createHostThreadReadStateController({ ...dependencies, isSameAuthIdentity });
@@ -495,41 +496,13 @@ class AppServerRequestSender {
     isPrewarm: boolean,
     skipCurrentAssert: boolean,
   ) {
-    this.assertCurrent();
     const timeoutMs = request.method === "plugin/list" && options?.timeoutMs == null ? PLUGIN_LIST_TIMEOUT_MS : options?.timeoutMs;
-    const sendOptions =
-      options == null && timeoutMs == null
-        ? undefined
-        : { priority: options?.priority, source: options?.source, timeoutMs, widget: options?.widget };
-    const onOutcomeUnknown = skipCurrentAssert
-      ? (error: unknown) => {
-          options?.onOutcomeUnknown?.(error);
-          for (const listener of this.requestLifecycleListeners)
-            listener({ type: "outcome-unknown", hostId: this.hostId, error });
-        }
-      : undefined;
-    const pending =
-      isPrewarm && request.method === "thread/start"
-        ? this.connection.handleHostPrewarmThreadStart(request, sendOptions, undefined, onOutcomeUnknown, this.assertCurrent, options?.savedEnvironmentConfig)
-        : this.connection.handleHostRequest(request, sendOptions, undefined, onOutcomeUnknown, this.assertCurrent, options?.savedEnvironmentConfig);
-    const abandonTimer =
-      timeoutMs == null || timeoutMs <= 0
-        ? null
-        : setTimeout(() => {
-            pending.abandon();
-          }, timeoutMs);
-    try {
-      const response = await pending.promise;
-      if ((response as { error?: unknown }).error != null)
-        throw requestErrorOf(String(request.id), (response as { error: unknown }).error);
-      return (skipCurrentAssert || this.assertCurrent(), (response as { result?: unknown }).result);
-    } catch (error) {
-      for (const listener of this.requestLifecycleListeners)
-        listener({ type: "failed", hostId: this.hostId, error });
-      throw error;
-    } finally {
-      if (abandonTimer != null) clearTimeout(abandonTimer);
-    }
+    return runAppServerRequestLifecycle({ request, options, isPrewarm, skipCurrentAssert, hostId: this.hostId, timeoutMs,
+      assertCurrent: this.assertCurrent,
+      handleRequest: (input, sendOptions, outcomeUnknown) => this.connection.handleHostRequest(input, sendOptions, undefined, outcomeUnknown, this.assertCurrent, options?.savedEnvironmentConfig),
+      handlePrewarm: (input, sendOptions, outcomeUnknown) => this.connection.handleHostPrewarmThreadStart(input, sendOptions, undefined, outcomeUnknown, this.assertCurrent, options?.savedEnvironmentConfig),
+      requestError: (id, error) => requestErrorOf(String(id), error), onOutcomeUnknown: options?.onOutcomeUnknown,
+      emitLifecycle: (event) => { for (const listener of this.requestLifecycleListeners) listener(event); } });
   }
 }
 

@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { runAppServerRequestLifecycle } = require("../app/.vite/build/main-app/conversation/app-server-request-lifecycle-controller.js");
+const events = [];
+const base = { request: { id: "r1", method: "thread/read" }, options: {}, isPrewarm: false, skipCurrentAssert: false, hostId: "local", assertCurrent() {}, requestError: (_id, error) => error, onOutcomeUnknown: undefined, emitLifecycle: (event) => events.push(event) };
+let abandoned = false;
+const result = await runAppServerRequestLifecycle({ ...base, handleRequest: () => ({ promise: Promise.resolve({ result: "ok" }), abandon() { abandoned = true; } }), handlePrewarm: () => { throw new Error("unexpected prewarm"); } });
+assert.equal(result, "ok"); assert.equal(abandoned, false); assert.deepEqual(events, []);
+await assert.rejects(() => runAppServerRequestLifecycle({ ...base, handleRequest: () => ({ promise: Promise.resolve({ error: "bad" }), abandon() {} }), handlePrewarm: () => { throw new Error("unexpected prewarm"); } }), /bad/);
+assert.equal(events.at(-1).type, "failed");
+console.log("5 app-server request lifecycle controller assertions passed");
