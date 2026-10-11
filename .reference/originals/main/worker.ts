@@ -193,6 +193,7 @@ const { createGitWorktreeWatchRefreshController } = require("./worker/git-worktr
 const { disposeGitRepoWatcher } = require("./worker/git-repo-watcher-dispose-controller");
 const { disposeGitWatchSession } = require("./worker/git-watch-session-dispose-controller");
 const { startGitWatchSession } = require("./worker/git-watch-session-start-controller");
+const { refreshGitWorkingTreeWatchPolicy } = require("./worker/git-working-tree-watch-policy-refresh-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68944,31 +68945,23 @@ var Jye = 1e3,
       return reconcileGitIgnoreSourceWatches(this, e);
     }
     async refreshWorkingTreeWatchPolicy() {
-      let e = this.ignorePolicy,
-        t = this.watchTargets.find((e) => e.handlers.some((e) => e.changeType === `working-tree`));
-      if (
-        e == null ||
-        t == null ||
-        (await t.sessionStartPromise, this.disposed || t.retryTimer != null)
-      )
-        return;
-      let n = await e.read({ refresh: !0 });
-      if ((await t.sessionStartPromise, !this.disposed && e.isCurrent(n) && t.retryTimer == null)) {
-        let r = getGitWorkingTreeWatchRefreshAction({
-          disposed: this.disposed,
-          retryScheduled: t.retryTimer != null,
-          policyCurrent: e.isCurrent(n),
-          sessionActive: t.session != null,
-          nextDirectories: n.directories,
-          previousDirectories: this.workingTreeIgnoredDirectories,
-        });
-        if (r === `apply`) {
-          e.didApply(n) && this.handleFileWatchEvent(`working-tree`);
-          return;
-        }
-        if (r === `skip`) return;
-        (await this.disposeSession(t), this.disposed || (await this.tryStartWatchSession(t, !0)));
-      }
+      return refreshGitWorkingTreeWatchPolicy({
+        getPolicy: () => this.ignorePolicy,
+        getTarget: () => this.watchTargets.find((target) => target.handlers.some((handler) => handler.changeType === `working-tree`)),
+        awaitSessionStart: (target) => target.sessionStartPromise ?? Promise.resolve(),
+        isDisposed: () => this.disposed,
+        hasRetryTimer: (target) => target.retryTimer != null,
+        readPolicy: (policy) => policy.read({ refresh: !0 }),
+        isCurrent: (policy, snapshot) => policy.isCurrent(snapshot),
+        getAction: getGitWorkingTreeWatchRefreshAction,
+        applyPolicy: (policy, snapshot) => policy.didApply(snapshot),
+        onApplied: () => this.handleFileWatchEvent(`working-tree`),
+        disposeSession: (target) => this.disposeSession(target),
+        startSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
+        getPreviousDirectories: () => this.workingTreeIgnoredDirectories,
+        setPreviousDirectories: (directories) => { this.workingTreeIgnoredDirectories = directories; },
+        hasSession: (target) => target.session != null,
+      });
     }
     dispose() {
       return disposeGitRepoWatcher({
