@@ -1191,3 +1191,9 @@ live-anchor equality，保留 virtual anchor、include 开关、追加与删除 
 命中目标解析在主策略返回 `undefined` 时回退到普通 target（原 `nl`，4518-4521）已迁移至
 `src/main/browser-page-preload/annotation-hit-target-fallback.ts`；入口注入既有 `il` 主解析与
 `sl` fallback，保留 `undefined` fallback、显式 `null` 直返语义。focused test 覆盖两种分支。
+
+### 增量抽取：annotation selector token environment policy
+
+CSS selector token 的 page-level `CSS.escape` 能力探测与 fallback（原 `qc`，4483-4484）已迁移至
+`src/main/browser-page-preload/annotation-selector-token-policy.ts`；入口注入 CSS escape getter
+与既有 token escaping，保留 CSS API 可用与缺失时的结果。focused test 覆盖两种环境。

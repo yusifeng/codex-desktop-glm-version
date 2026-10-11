@@ -4481,7 +4481,7 @@ function Kc(e, t) {
   });
 }
 function qc(e) {
-  return escapeAnnotationSelectorToken(e, typeof CSS < `u` && typeof CSS.escape == `function` ? CSS.escape.bind(CSS) : undefined);
+  return escapeAnnotationSelectorTokenForPage(e, { getCssEscape: () => typeof CSS < `u` && typeof CSS.escape == `function` ? CSS.escape.bind(CSS) : undefined, escape: (value, cssEscape) => escapeAnnotationSelectorToken(value, cssEscape) });
 }
 function Jc(e, { preventDefault: t = !0 } = {}) {
   stopAnnotationEventPropagation(e, { preventDefault: t });
@@ -5967,6 +5967,7 @@ var { getAnnotationAnchorPath } = require("./browser-page-preload/annotation-anc
 var { areAnnotationLiveAnchorsEqual } = require("./browser-page-preload/annotation-live-anchor-equality");
 var { mergeAnnotationAnchorSelection } = require("./browser-page-preload/annotation-anchor-selection-merge");
 var { resolveAnnotationHitTargetWithFallback } = require("./browser-page-preload/annotation-hit-target-fallback");
+var { escapeAnnotationSelectorTokenForPage } = require("./browser-page-preload/annotation-selector-token-policy");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");
