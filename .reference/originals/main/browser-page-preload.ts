@@ -4516,8 +4516,7 @@ var Yc,
       (el = Symbol(`denied-browser-frame-target`)));
   });
 function nl(e, t) {
-  let n = il(e, t);
-  return n === void 0 ? sl(e) : n;
+  return resolveAnnotationHitTargetWithFallback(e, t, { resolve: (element, point) => il(element, point), fallback: (element) => sl(element) });
 }
 function rl(e) {
   return resolveAnnotationContainerAncestor(e, { getOwnerDocument: (element) => element?.ownerDocument, getParent: (element) => ic(element), hasAttribute: (element, name) => element.hasAttribute(name) });
@@ -5967,6 +5966,7 @@ var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation
 var { getAnnotationAnchorPath } = require("./browser-page-preload/annotation-anchor-path");
 var { areAnnotationLiveAnchorsEqual } = require("./browser-page-preload/annotation-live-anchor-equality");
 var { mergeAnnotationAnchorSelection } = require("./browser-page-preload/annotation-anchor-selection-merge");
+var { resolveAnnotationHitTargetWithFallback } = require("./browser-page-preload/annotation-hit-target-fallback");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");

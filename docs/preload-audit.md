@@ -1185,3 +1185,9 @@ focused test 覆盖空路径、单级成功与缺失 frame。
 active annotation 的 primary/additional anchor 合并与重复 anchor 删除策略（原 `al`，4537-4545）
 已迁移至 `src/main/browser-page-preload/annotation-anchor-selection-merge.ts`；入口仅注入既有
 live-anchor equality，保留 virtual anchor、include 开关、追加与删除 primary 的状态语义。focused test 覆盖追加、virtual 重置与重复删除。
+
+### 增量抽取：annotation hit-target fallback
+
+命中目标解析在主策略返回 `undefined` 时回退到普通 target（原 `nl`，4518-4521）已迁移至
+`src/main/browser-page-preload/annotation-hit-target-fallback.ts`；入口注入既有 `il` 主解析与
+`sl` fallback，保留 `undefined` fallback、显式 `null` 直返语义。focused test 覆盖两种分支。
