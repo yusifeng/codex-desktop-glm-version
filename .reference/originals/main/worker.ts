@@ -173,7 +173,7 @@ const { dispatchWorktreeResolutionRequest } = require("./worker/git-worktree-res
 const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch");
 const { dispatchGitCoreRequest } = require("./worker/git-core-request-dispatch");
 const { getGitInitWatchKey: getSemanticGitInitWatchKey } = require("./worker/git-init-watcher-policy");
-const { createGitManagerKey } = require("./worker/git-manager-key-policy");
+const { createGitManagerKey, isGitManagerKeyForHost } = require("./worker/git-manager-key-policy");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -67420,7 +67420,7 @@ var {
     }
     invalidateUntrackedPathsCache(e) {
       let t = e == null ? null : h1(e);
-      for (let [e, n] of this.worktreesByKey) (t == null || e.startsWith(`${t}|`)) && p2(n);
+      for (let [e, n] of this.worktreesByKey) (t == null || isGitManagerKeyForHost(e, t)) && p2(n);
     }
     async invalidateUntrackedPathsCacheForCwd(e, t) {
       try {
@@ -67429,7 +67429,7 @@ var {
           let e = t.isLocal ? bz(NZ(n)) : n,
             r = h1(t);
           for (let [t, n] of this.worktreesByKey)
-            t.startsWith(`${r}|`) && FZ(n.root, e, n.host) && p2(n);
+            isGitManagerKeyForHost(t, r) && FZ(n.root, e, n.host) && p2(n);
           return;
         }
       } catch {}
@@ -67442,7 +67442,7 @@ var {
       }
       let t = h1(e);
       for (let [e, n] of this.worktreesByKey)
-        e.startsWith(`${t}|`) && n.clearShortLivedGitReadCaches();
+        isGitManagerKeyForHost(e, t) && n.clearShortLivedGitReadCaches();
     }
     getCachedWorktreesForCwds(e, t) {
       let n = Array.from(this.worktreesByKey.values()).filter((e) => e.host.id === t);
@@ -67454,7 +67454,7 @@ var {
     }
     async invalidateGitReadCachesForMutation(e, t) {
       let n = h1(t),
-        r = this.worktreesByKey.get(`${n}|${e}`);
+        r = this.worktreesByKey.get(createGitManagerKey(n, e));
       if (r == null)
         try {
           r = (await this.getWorktreeRepository(xz(e), t)) ?? void 0;
@@ -67464,12 +67464,12 @@ var {
         return;
       }
       for (let [e, t] of this.worktreesByKey)
-        e.startsWith(`${n}|`) && t.invalidateGitReadCachesForMutation();
+        isGitManagerKeyForHost(e, n) && t.invalidateGitReadCachesForMutation();
     }
     invalidateGitReadCachesForRepoChange(e, t) {
       let n = t == null ? null : h1(t);
       for (let [t, r] of this.worktreesByKey)
-        (n == null || t.startsWith(`${n}|`)) && r.invalidateGitReadCachesForRepoChange(e);
+        (n == null || isGitManagerKeyForHost(t, n)) && r.invalidateGitReadCachesForRepoChange(e);
     }
     getStableMetadata = async (e, t) => {
       this.throwStableMetadataRetry(e, t);
