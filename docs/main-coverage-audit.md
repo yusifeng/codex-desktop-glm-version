@@ -587,6 +587,14 @@ invalidation。上述 manager options 不能脱离 owner 而不改变生命周�
 focused test 为 `scripts/test-connect-app-host-controller.mjs`，运行命令为
 `node --experimental-strip-types scripts/test-connect-app-host-controller.mjs`。
 
+### 增量抽取：main thread settings update 串行生命周期
+
+`AppServerConversationManager.runThreadSettingsUpdate` 的 per-conversation pending promise
+队列已迁移至 `src/main/main-app/conversation/thread-settings-update-registry.ts`，保留前序
+失败吞并、current identity cleanup、wait 与 manager dispose clear。focused test 为
+`scripts/test-thread-settings-update-registry.mjs`，运行命令为
+`node --experimental-strip-types scripts/test-thread-settings-update-registry.mjs`。
+
 ### 增量抽取：Windows 窗口透明度 workaround 判定
 
 启动编排 `Be2` 的首次显示分支中，`isWindows && !window.isVisible() &&

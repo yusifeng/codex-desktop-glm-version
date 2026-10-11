@@ -63,6 +63,7 @@ import { Wye as maybeResumeConversation } from "../threads/maybe-resume";
 import { xye as buildResumeProduct, wye as buildDefaultTurnConfig } from "../threads/start-config";
 import { ry as activeTurnId, iy as hasInProgressLocalTurn, ove as readThreadExecutionState } from "../files/open-file-watches";
 import { TurnStartObservations } from "./stream-recovery";
+import { createThreadSettingsUpdateRegistry } from "./thread-settings-update-registry";
 // R3 threads/operations（42,479-43,548 fork/resume/projectless 操作群）。
 import {
   Eye as editLastUserTurn,
@@ -227,7 +228,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
   turnStartObservations: any;
   executeTurnStart: any;
   pendingThreadGoalHydrations = new Map<string, symbol>();
-  pendingThreadSettingsUpdates = new Map<string, Promise<unknown>>();
+  pendingThreadSettingsUpdates = createThreadSettingsUpdateRegistry();
   defaultTurnConfig: any;
   inFlightConversationResumes = new Map<string, { promise: Promise<any>; cancel: () => void; source: string }>();
   streamRecovery: StreamRecovery;
@@ -278,6 +279,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     manager.streamRecovery.dispose();
     manager.threadStore.clearActiveConversationInterests();
     manager.pendingThreadGoalHydrations.clear();
+    manager.pendingThreadSettingsUpdates.clear();
     for (let cleanup of manager.cleanup.splice(0)) cleanup();
     manager.realtimeThreadState.dispose();
     manager.inactiveThreadUnsubscriber.dispose();
@@ -2393,18 +2395,11 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
 
   /** settings 更新串行化（按会话一条链）。 */
   async runThreadSettingsUpdate(conversationId: string, operation: () => Promise<unknown>) {
-    let previous = this.pendingThreadSettingsUpdates.get(conversationId);
-    let current = (async () => (previous != null && (await previous.catch(() => void 0)), operation()))();
-    this.pendingThreadSettingsUpdates.set(conversationId, current);
-    try {
-      return await current;
-    } finally {
-      this.pendingThreadSettingsUpdates.get(conversationId) === current && this.pendingThreadSettingsUpdates.delete(conversationId);
-    }
+    return this.pendingThreadSettingsUpdates.run(conversationId, operation);
   }
 
   async waitForPendingThreadSettingsUpdate(conversationId: string) {
-    await this.pendingThreadSettingsUpdates.get(conversationId);
+    await this.pendingThreadSettingsUpdates.wait(conversationId);
   }
 
   getForkCapabilities() {
