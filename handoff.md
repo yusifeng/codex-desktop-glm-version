@@ -2560,3 +2560,4 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-11 A5 扩大批次：app-shared `aH/aI/aJ/aK/aL/aM/aN/aO/aP/aQ/aR/aS/aT/aU/aV/aW/aX/aY/aZ/a_/aa/ab/ac/ad/af/ag/ah/ai/aj/ak/am/ao/ap/aq/ar/as/au/av/aw/ax` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `ay/az/b$/b0/b1/b2/b3/b4/bA/bB/bC/bE/bF/bG/bH/bI/bJ/bK/bL/bM/bN/bO/bP/bQ/bR/bT/bU/bV/bW/bX/bY/bZ/ba/bb/bc/bd/bf/bg/bh/bi` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 扩大批次：app-shared `bj/bk/bl/bm/bn/bo/bp/bq/br/bs/bt/bu/bv/bw/bx/by/bz/c$/c0/c1/c2/c3/c4/cA/cB/cC/cD/cE/cF/cG/cH/cI/cJ/cK/cL/cM/cN/cO/cP/cQ` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-11 A5 扩大批次：app-shared `cR/cS/cT/cU/cV/cW/cX/cY/cZ/ca/cb/cc/cd/cf/cg/ch/ci/cj/cl/cm/cn/co/cp/cq/cr/cs/cu/cv/cw/cx/cy/cz/d$/d1/d2/d3/d4/dA/dB/dC` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
