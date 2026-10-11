@@ -130,6 +130,7 @@ const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCac
 const { classifyWorkerMessageCategory } = require("./worker/message-category");
 const { buildParcelWatcherOptions } = require("./worker/parcel-watcher-options");
 const { projectParcelWatcherEvents } = require("./worker/parcel-watcher-events");
+const { isPathAtOrBelowAnyRoot } = require("./worker/parcel-watcher-paths");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
 const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
@@ -81530,7 +81531,7 @@ var fDe = class {
     let t = [];
     return (
       this.supplementalSubscriptions.forEach((n, r) => {
-        P9(r, e) &&
+        isPathAtOrBelowAnyRoot(g.posix, r, e) &&
           ((n.active = !1),
           this.supplementalSubscriptions.delete(r),
           n.subscription != null && t.push(n.subscription));
@@ -81540,7 +81541,7 @@ var fDe = class {
   }
   deactivateDirectoryPathChecksAtOrBelowPaths(e) {
     this.activeDirectoryPathChecks.forEach((t) => {
-      P9(t.path, e) &&
+      isPathAtOrBelowAnyRoot(g.posix, t.path, e) &&
         ((t.active = !1),
         this.activeDirectoryPathChecks.delete(t.path),
         this.queuedDirectoryPathChecks.get(t.path) === t &&
@@ -81577,19 +81578,6 @@ async function M9(e) {
     if (F9(e, `ENOENT`) || F9(e, `ENOTDIR`)) return !1;
     throw e;
   }
-}
-function N9(e, t) {
-  let n = g.posix.dirname(t);
-  for (; n !== t;) {
-    if (e.has(n)) return !0;
-    let t = g.posix.dirname(n);
-    if (t === n) return !1;
-    n = t;
-  }
-  return !1;
-}
-function P9(e, t) {
-  return t.has(e) || N9(t, e);
 }
 function F9(e, t) {
   return typeof e == `object` && !!e && `code` in e && e.code === t;
