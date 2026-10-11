@@ -26,6 +26,7 @@ const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspa
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource } = require("./main-app/startup/icon-flavor-policy.js");
+const { projectNativeStatusItemMenuState } = require("./main-app/startup/native-status-item-menu.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
 const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transport.js");
@@ -174849,32 +174850,23 @@ var jst = n.vf(`type`, [
     refreshMenu() {
       this.destroyed ||
         this.addon.updateStatusItemMenuState(
-          JSON.stringify({
-            appName: this.appName,
-            computerHistoryAvailable: this.state.computerHistoryAvailable,
-            computerHistoryEnabled: this.state.computerHistoryEnabled,
-            computerHistoryIndicatorEnabled: this.state.computerHistoryIndicatorEnabled,
-            computerUseAvailable: this.state.computerUseAvailable,
-            featureState: this.state.menuState,
-            pinnedThreads: this.trayMenuThreads.pinnedThreads.map(({ path: e, title: t }) => ({
-              path: e,
-              title: t,
-            })),
-            unreadThreads: this.trayMenuThreads.unreadThreads.map(({ path: e, title: t }) => ({
-              path: e,
-              title: t,
-            })),
-            runningThreads: this.trayMenuThreads.runningThreads.map(({ path: e, title: t }) => ({
-              path: e,
-              title: t,
-            })),
-            labels: {
-              pinned: this.nativeIntl.formatMessage({ messageId: Tl, defaultMessage: El }),
-              unread: this.nativeIntl.formatMessage({ messageId: jl, defaultMessage: Ml }),
-              running: this.nativeIntl.formatMessage({ messageId: Dl, defaultMessage: Ol }),
-              quit: e7(this.appName),
-            },
-          }),
+          JSON.stringify(
+            projectNativeStatusItemMenuState({
+              appName: this.appName,
+              computerHistoryAvailable: this.state.computerHistoryAvailable,
+              computerHistoryEnabled: this.state.computerHistoryEnabled,
+              computerHistoryIndicatorEnabled: this.state.computerHistoryIndicatorEnabled,
+              computerUseAvailable: this.state.computerUseAvailable,
+              menuState: this.state.menuState,
+              trayMenuThreads: this.trayMenuThreads,
+              labels: {
+                pinned: this.nativeIntl.formatMessage({ messageId: Tl, defaultMessage: El }),
+                unread: this.nativeIntl.formatMessage({ messageId: jl, defaultMessage: Ml }),
+                running: this.nativeIntl.formatMessage({ messageId: Dl, defaultMessage: Ol }),
+                quit: e7(this.appName),
+              },
+            }),
+          ),
         );
     }
     handleNativeEvent(e) {

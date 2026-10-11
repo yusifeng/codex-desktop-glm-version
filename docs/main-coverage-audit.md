@@ -502,3 +502,11 @@ mode 与 enterprise settings。两者当前没有可独立接回且不改变 mut
 session.fetch/abort 生命周期、annotation snapshot 模式切换、国际化错误内容和 interstitial
 HTML 模板。错误抑制、URL 归一与文案判定虽为纯函数，但由同一模块的附件与窗口事件 consumer
 直接组合；当前没有可独立接回且不复制模板/状态 owner 的窄边界，暂不拆分。
+
+### 增量抽取：native status item menu projection
+
+macOS `Mst.refreshMenu` 的菜单状态 JSON projection 已迁移至
+`src/main/main-app/startup/native-status-item-menu.ts`，由
+`projectNativeStatusItemMenuState` 统一保留 app/feature/label/thread 字段与顺序。原入口仅
+负责 native addon 的 `updateStatusItemMenuState` 副作用、i18n label 获取和状态生命周期；
+`scripts/test-main-native-status-item-menu.mjs` 覆盖完整 payload 与线程快照隔离断言。

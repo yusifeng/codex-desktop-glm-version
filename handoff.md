@@ -2661,3 +2661,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-11 A1 worker 增量：parcel/git watcher 生成的 `F6` missing-path wrapper 已删除，watcher metadata、Git path existence 与 worktree directory 三处 consumer 直接复用既有 `isMissingPathError`，保持错误分类与 I/O 顺序，typecheck/build/verify-chunks 通过。
 2026-10-11 A1 worker 增量：未再引用的 generated `nbe/rbe/dbe` request policy wrappers 已删除，failure telemetry consumer 直接调用 `isGitRequestFailure`；request/cancel/telemetry lifecycle 不变，typecheck/build/verify-chunks 通过。
 2026-10-11 A2 preload 增量：annotation cleanup guard 已迁移至 `src/main/browser-page-preload/annotation-cleanup.ts`；入口保留空值安全与 cleanup exception swallowing 语义，新增 2 项 focused assertions，typecheck/build/verify-chunks 通过。
+2026-10-11 A3 main 增量：macOS native status item 的菜单 JSON projection 已迁移至
+`src/main/main-app/startup/native-status-item-menu.ts`；`Mst` 入口继续持有 native addon 更新、
+i18n label 获取与状态生命周期，新增 `scripts/test-main-native-status-item-menu.mjs` 的 2 项
+focused assertions，build/typecheck/verify-chunks 通过。
