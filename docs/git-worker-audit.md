@@ -1527,3 +1527,8 @@ follower coordination 分类由 8 项 focused assertions 覆盖，连接计数�
 parcel watcher 的 ENOENT/ENOTDIR 错误码投影 `F9` 已迁移至
 `src/main/worker/parcel-watcher-errors.ts`；directory existence checks 仍保留 lstat/opendir
 I/O 与 watcher session 生命周期。`scripts/test-worker-parcel-watcher-errors.mjs` 覆盖 5 项断言。
+
+Git request catch 中的异常 disposition 投影 `V6` 已迁移至现有
+`src/main/worker/git-request-context-policy.ts` 的 `classifyGitRequestException`；入口仍
+注入 Git-unavailable sentinel、stale-snapshot identity 并负责 response/telemetry 副作用。
+`scripts/test-worker-git-request-context-policy.mjs` 覆盖 3 项断言。

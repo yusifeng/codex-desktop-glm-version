@@ -152,7 +152,7 @@ const { createGitRequestCancellationTelemetry } = require("./worker/git-request-
 const { createGitWorkerResponse } = require("./worker/git-response-envelope");
 const { shouldContinueComputerUseCaptureUpdates } = require("./worker/computer-use-capture-policy");
 const { isGitMutationMethod, resolveGitInvalidationTarget, resolveMutationRoot } = require("./worker/git-request-invalidation-policy");
-const { isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
+const { classifyGitRequestException, isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource } = require("./worker/git-request-context-policy");
 const { handleGitLiveQuery } = require("./worker/git-live-query-handler");
 const { dispatchReadOnlyGitRequest } = require("./worker/git-read-request-dispatch");
 const { dispatchBranchReadRequest } = require("./worker/git-branch-read-dispatch");
@@ -70173,7 +70173,7 @@ var I6 = kW(`git`),
           }
         }
       } catch (t) {
-        ((u = V6(t)),
+        ((u = classifyGitRequestException(t, L6, (value) => value instanceof s4)),
           (p =
             t === L6 && e.method === `stable-metadata`
               ? X(null)
@@ -71040,9 +71040,6 @@ function ube(e) {
     e.method === `status-summary`
     ? e.params.cwd
     : null;
-}
-function V6(e) {
-  return e === L6 ? `git_unavailable` : e instanceof s4 ? `stale_snapshot` : `exception`;
 }
 function H6(e, t) {
   return e.type !== `expected` || t == null || t.failedCommandCount === 0

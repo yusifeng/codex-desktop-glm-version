@@ -41,5 +41,12 @@ function isGitRequestFailure(result: unknown): boolean {
   return value.type === `error` || value.success === false || value.status === `error` || value.status === `command-error`;
 }
 
-export { isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
-if (typeof module !== `undefined`) module.exports = { isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+/** Maps worker request exceptions to the stable telemetry disposition names. */
+function classifyGitRequestException(error: unknown, gitUnavailableError: unknown, isStaleSnapshot: (value: unknown) => boolean): string {
+  if (error === gitUnavailableError) return `git_unavailable`;
+  if (isStaleSnapshot(error)) return `stale_snapshot`;
+  return `exception`;
+}
+
+export { classifyGitRequestException, isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
+if (typeof module !== `undefined`) module.exports = { classifyGitRequestException, isGitRequestFailure, resolveRequestRoot, resolveReviewCwd, resolveReviewSource };
