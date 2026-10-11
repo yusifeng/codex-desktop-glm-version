@@ -14,7 +14,7 @@ const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-a
 const windowAppearance = require("./main-app/window-appearance.js");
 const { buildWindowErrorPage } = require("./main-app/window/error-page-html.js");
 const { shouldRecoverRendererCrash } = require("./main-app/window/renderer-recovery-policy.js");
-const { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
+const { collectStartupPathExtensions, createStartupPhaseTracker, resolveDockIconPreference, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages } = require("./main-app/startup/startup-policy.js");
 const openPathArguments = require("./main-app/files/open-path-arguments.js");
 const { applyQuitForUpdatePolicy } = require("./main-app/startup/quit-for-update-policy.js");
 const { createDelayedProgressWindow } = require("./main-app/startup/delayed-progress-window.js");
@@ -173738,18 +173738,12 @@ function dst({
       return (0, v.existsSync)(t) ? t : null;
     },
     k = (e) => D(e) ?? O(e),
-    A = () => {
-      switch (r) {
-        case a.in.Dev:
-        case a.in.Nightly:
-        case a.in.InternalAlpha:
-        case a.in.PublicBeta:
-        case a.in.Prod:
-          return d.get(n.iu.DOCK_ICON_PREFERENCE) ?? `app-default`;
-        case a.in.Agent:
-          return `app-default`;
-      }
-    },
+    A = () => resolveDockIconPreference({
+      buildFlavor: r,
+      getPreference: () => d.get(n.iu.DOCK_ICON_PREFERENCE),
+      eligibleFlavors: [a.in.Dev, a.in.Nightly, a.in.InternalAlpha, a.in.PublicBeta, a.in.Prod],
+      agentFlavor: a.in.Agent,
+    }),
     j = () => {
       switch (r) {
         case a.in.Dev:

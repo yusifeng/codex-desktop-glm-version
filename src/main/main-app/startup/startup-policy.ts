@@ -65,5 +65,22 @@ function resolveRemoteHostedPipProcessIdentifier(isUnpackaged: boolean, value: s
     : null;
 }
 
-export { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages };
-if (typeof module !== `undefined`) module.exports = { collectStartupPathExtensions, createStartupPhaseTracker, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages };
+function resolveDockIconPreference({
+  buildFlavor,
+  getPreference,
+  eligibleFlavors,
+  agentFlavor,
+  defaultPreference = `app-default`,
+}: {
+  buildFlavor: string;
+  getPreference: () => string | undefined;
+  eligibleFlavors: readonly string[];
+  agentFlavor: string;
+  defaultPreference?: string;
+}) {
+  if (buildFlavor === agentFlavor) return defaultPreference;
+  return eligibleFlavors.includes(buildFlavor) ? (getPreference() ?? defaultPreference) : undefined;
+}
+
+export { collectStartupPathExtensions, createStartupPhaseTracker, resolveDockIconPreference, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages };
+if (typeof module !== `undefined`) module.exports = { collectStartupPathExtensions, createStartupPhaseTracker, resolveDockIconPreference, resolveRemoteHostedPipProcessIdentifier, resolveStartupFlavorFlags, shouldEnableDebugChromePages };

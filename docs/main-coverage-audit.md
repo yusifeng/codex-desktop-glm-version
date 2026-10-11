@@ -254,6 +254,14 @@ worker bus 装配附近的 `Sst/Cst/wst` 纯谓词（原 175,015-175,023）已�
 仍由原 owner 持有，由 `scripts/test-main-worker-invocation-sampler.mjs` 覆盖空快照、连续记录、
 时间戳传递和计数结果共 4 项断言。
 
+### 增量抽取：Dock icon preference policy
+
+`dst` 窗口服务工厂中的 build-flavor Dock icon preference 选择已迁移至
+`src/main/main-app/startup/startup-policy.ts` 的 `resolveDockIconPreference`。该策略只读取
+flavor、允许的 flavor 集合和注入的设置 getter；nativeTheme、dock、nativeImage 与窗口图标
+更新仍由窗口服务 owner 负责。`scripts/test-main-dock-icon-policy.mjs` 覆盖已配置、缺省、Agent
+固定默认值、未知 flavor 与空允许集合共 5 项断言。
+
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至
