@@ -23903,6 +23903,27 @@ function Wy({ rootHost: e, bridge: t }) {
         clearSelectionHover: () => gu(),
       }),
     ),
+    [editEditorController] = (0, G.useState)(() =>
+      createAnnotationEditEditorController({
+        createTargetMap: (rootHost) => eb(rootHost),
+        findComment: (comments, request) => comments.find((comment) => comment.id === request.id),
+        projectComment: (comment, anchor, selectionIndex) => $_(comment, anchor, selectionIndex),
+        resolveTarget: (anchor, preferredId, targets) => sd(anchor, preferredId, targets),
+        applyDesignChange: (target, designId) => qv(target, designId),
+        projectAnchor: (commentState, target, zoom) => nv(rv(commentState, target, zoom), target),
+        projectDraftDesign: (designChange) => cy(designChange),
+        projectElementDesign: (target, anchorState, controls, designChange) =>
+          sy(target, anchorState, controls, designChange),
+        buildEditorAnchor: (commentState, target, targets) => B_(commentState, target, targets),
+        closePreview: (commentId) =>
+          t.sendMessageToHost({ type: `browser-sidebar-runtime-close-comment-preview`, commentId }),
+        openEditor: (payload) => t.sendMessageToHost(payload),
+        refreshViewport: () => T(C_()),
+        setEditorState: (state) => S(state),
+        clearPreview: () => v(null),
+        rememberTarget: (id, target) => i.rememberTarget(id, target),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24000,50 +24021,16 @@ function Wy({ rootHost: e, bridge: t }) {
       [textAnchorEditorController, _],
     ),
     Ye = (0, G.useCallback)(
-      (n, r, a = 0) => {
-        let o = r ?? n.anchor,
-          s = eb(e),
-          c = Ee.find((e) => e.id === n.id) ?? n,
-          l = $_(c, o, a),
-          u = a === 0,
-          d = sd(o, u ? c.id : void 0, s) ?? null;
-        (d != null && (u && s.set(c.id, d), l.designChange != null && qv(d, l.designChange.id)),
-          _ != null &&
-            t.sendMessageToHost({
-              type: `browser-sidebar-runtime-close-comment-preview`,
-              commentId: _,
-            }));
-        let f = nv(rv(l, d, j), d),
-          p =
-            l.designChange != null && d == null
-              ? cy(l.designChange)
-              : d == null || f.anchor.kind !== `element`
-                ? void 0
-                : sy(d, f, A ? t.getAnnotationControls?.(d) : void 0, l.designChange);
-        (p != null &&
-          d != null &&
-          (A &&
-            (l.designChange == null ||
-              (l.designChange.anchor.kind === `element` &&
-                f.anchor.kind === `element` &&
-                l.designChange.anchor.runtimeElementId != null &&
-                l.designChange.anchor.runtimeElementId === f.anchor.runtimeElementId)) &&
-            i.rememberTarget(p.id, d),
-          s.set(p.id, d)),
-          t.sendMessageToHost({
-            type: `browser-sidebar-runtime-open-editor`,
-            target: { mode: `edit`, commentId: c.id },
-            anchorState: f,
-            designEditorState: p,
-          }),
-          T(C_()),
-          S({
-            target: { mode: `edit`, commentId: c.id },
-            anchor: B_({ ...l, anchor: f.anchor }, d, s),
-          }),
-          v(null));
-      },
-      [i, t, A, Ee, _, e, j],
+      (n, r, a = 0) =>
+        editEditorController.open(n, r, a, {
+          comments: Ee,
+          rootHost: e,
+          previewCommentId: _,
+          canUseSiteAnnotationApi: A,
+          zoom: j,
+          getAnnotationControls: t.getAnnotationControls,
+        }),
+      [editEditorController, Ee, e, _, A, j, t],
     ),
     Xe = (0, G.useCallback)(
       (n, r, i) => {
@@ -24371,6 +24358,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => designPointSelectionController.dispose(), [designPointSelectionController]),
     (0, G.useEffect)(() => () => selectionCommentController.dispose(), [selectionCommentController]),
     (0, G.useEffect)(() => () => textAnchorEditorController.dispose(), [textAnchorEditorController]),
+    (0, G.useEffect)(() => () => editEditorController.dispose(), [editEditorController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);

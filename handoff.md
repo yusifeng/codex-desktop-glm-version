@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮新增 `annotation-edit-editor-controller.ts`，真实接回 Wy 的 `Ye` edit-editor callback。controller 注入 target map、comment/anchor/design projection 与 host/React side effects，保持 `close preview -> open editor IPC -> viewport refresh -> editor state -> clear preview` 顺序；focused test 为 `scripts/test-preload-annotation-edit-editor-controller.mjs`。
+
 2026-10-06 A5 export-table 交叉审计：app-shared 未复核导出 `$` 反解为内部 `LDt`/`RDt`（源码 121786 起始），确认为 generated `book-open-moon-star-light-20` SVG icon initializer，依赖共享 icon registry/lazy asset lifecycle，无独立 renderer 业务归属，登记 `preserved-coupled`。
 
 2026-10-06 A5 继续批次：app-shared 未消费导出 `$$`（内部 `OT`，源码 38506--38526）的 SVG local-id/reference prefix policy 已迁移至 `src/renderer/app-shared/runtime/prefix-svg-local-ids.ts`；新增 `scripts/test-app-shared-prefix-svg-local-ids.mjs` 覆盖 4 项 focused assertions，纯策略无 React/store/lifecycle 副作用。

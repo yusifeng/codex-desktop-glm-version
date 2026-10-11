@@ -1,5 +1,7 @@
 # `browser-page-preload.ts` 逐段审计
 
+本轮新增 `annotation-edit-editor-controller.ts`：真实接回 Wy 的 `Ye` edit-editor lifecycle，保留 runtime target/map、design projection、preview close、host IPC、viewport refresh 与 React editor state 的原始副作用顺序。focused test：`scripts/test-preload-annotation-edit-editor-controller.mjs`。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
@@ -1585,3 +1587,9 @@ dispose gate。
 `src/main/browser-page-preload/annotation-editor-comment-reconciliation-controller.ts`；controller 保留
 null state、design target、无 `commentId` target 与 stale comment 清理 predicate，入口继续注入 React
 editor state setter。focused test 覆盖保留/清理各 target 分支与 dispose gate。
+### 增量抽取：Git watcher change controller
+
+`GitRepoWatcher.startWatchSession` 的 parcel watcher `onChange` callback 已迁移至
+`src/main/worker/git-watch-change-controller.ts`；controller 保留 ignore-source 记录、metadata refresh、ignore
+目录判定、handler 路径过滤、HEAD 状态清除和 repo event 分发顺序，consumer 继续注入原始 watcher 状态。
+focused test 覆盖 ignore-source、working-tree/head 分发、空变更恢复事件与刷新条件。
