@@ -1116,3 +1116,8 @@ Cursor style cleanup（原 `pc`，4292-4297）已迁移至
 `src/main/browser-page-preload/annotation-cursor-tree-cleanup.ts`；入口仅注入窗口收集、
 安全 document 读取和单 document cleanup，保留跨域 document 跳过语义。focused test 覆盖
 多窗口清理与缺失 document。
+### 增量抽取：annotation owner window resolution
+
+元素 owner document 的 window 解析（原 `Fc`，4424-4426）已迁移至
+`src/main/browser-page-preload/annotation-owner-window.ts`；入口保留 owner-window 缺失时的
+当前 window fallback。focused test 覆盖 owner window 与 fallback 两项行为。

@@ -4422,7 +4422,7 @@ function Pc(e, t, n) {
   return installAnnotationScrollListeners(e, t, n, { getFrameWindow: (framePath) => wc(framePath), resolveElement: (documentLike, selector) => Ec(documentLike, selector), addListener: (element, type, listener) => element.addEventListener(type, listener), removeListener: (element, type, listener) => element.removeEventListener(type, listener) });
 }
 function Fc(e) {
-  return e.ownerDocument.defaultView ?? window;
+  return getAnnotationOwnerWindow(e, window);
 }
 function Ic(e) {
   return getAnnotationFrameOffset(e, {
@@ -5998,6 +5998,7 @@ var { runAnnotationCleanup } = require("./browser-page-preload/annotation-cleanu
 var { setAnnotationPopoverOpen, closeAnnotationPopover } = require("./browser-page-preload/annotation-popover-policy");
 var { removeAnnotationCursorStyles } = require("./browser-page-preload/annotation-cursor-style-cleanup");
 var { cleanupAnnotationCursorStylesAcrossFrames } = require("./browser-page-preload/annotation-cursor-tree-cleanup");
+var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
