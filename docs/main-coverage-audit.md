@@ -343,6 +343,8 @@ node scripts/audit-shared-consumption.mjs
 
 ### T4 覆盖复核：175,890-176,978 启动装配暂不迁移
 
+`createExecuteTurnStart` 的 per-conversation in-flight promise 去重与 identity-safe settle cleanup 已迁移至 `src/main/main-app/conversation/turn-start-inflight-registry.ts`；turn 核心观察、状态更新与 rollback 仍由 `turn-dispatch.ts` 持有。focused test：`scripts/test-main-turn-start-inflight-registry.mjs`。
+
 本轮对 `Ust` 后半段启动装配进行了逐段复核。该区间同时交织 Electron app/window 生命周期、tray
 初始化（`Pst/Ge`）、computer-use/browser-use service 构造、app-server connection registry
 订阅、插件 reconcile、focus/quit 事件监听与 disposable 注册；例如 175,900-176,050 在同一

@@ -36,6 +36,7 @@ import {
   _l as normalizePath,
   gl as isSamePath,
 } from "@chunk/shared";
+import { createTurnStartInflightRegistry } from "./turn-start-inflight-registry";
 // R3 canonical-history（turn 视图与追加/定位/修改）。
 import {
   mergedConversationTurns,
@@ -836,7 +837,7 @@ export function createExecuteTurnStart(
   createId: () => string,
   onInitialTitleRequested: (request: unknown) => void,
 ) {
-  let turnStarts = new Map<string, Promise<any>>();
+  const turnStarts = createTurnStartInflightRegistry<any>();
   return (conversationId: string, operation: any, origin = `nested`, onOutcomeUnknown: any, onMessageAdded: any) => {
     assertActive();
     let clientUserMessageId = operation.request.clientUserMessageId ?? createId();
@@ -891,14 +892,9 @@ export function createExecuteTurnStart(
       return inFlight;
     }
     let promise = runTurnStartWithObservation(context, () => {
-      turnStarts.delete(conversationId);
-    });
-    turnStarts.set(conversationId, promise);
-    let cleanup = () => {
-      if (turnStarts.get(conversationId) === promise) turnStarts.delete(conversationId);
-    };
-    promise.then(cleanup, cleanup);
-    return promise;
+        turnStarts.deleteIfCurrent(conversationId, promise);
+      });
+    return turnStarts.register(conversationId, promise);
   };
 }
 

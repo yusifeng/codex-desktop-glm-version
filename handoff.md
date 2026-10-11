@@ -11,6 +11,8 @@
 
 本轮新增 `view-message-router-controller.ts`，真实接回 preload `MESSAGE_FOR_VIEW` event routing；focused test 为 `scripts/test-preload-view-message-router-controller.mjs`，运行同样使用 `node --experimental-strip-types`。
 
+A3 main 新增 `turn-start-inflight-registry.ts`，真实接回 `createExecuteTurnStart` 的 per-conversation promise dedup/settle cleanup；focused test 为 `scripts/test-main-turn-start-inflight-registry.mjs`。
+
 本轮新增 `annotation-edit-editor-controller.ts`，真实接回 Wy 的 `Ye` edit-editor callback。controller 注入 target map、comment/anchor/design projection 与 host/React side effects，保持 `close preview -> open editor IPC -> viewport refresh -> editor state -> clear preview` 顺序；focused test 为 `scripts/test-preload-annotation-edit-editor-controller.mjs`。
 
 同轮新增 `annotation-comment-preview-controller.ts`，真实接回 Wy 的 `Xe` comment-preview callback；focused test 为 `scripts/test-preload-annotation-comment-preview-controller.mjs`。

@@ -1,0 +1,17 @@
+import assert from "node:assert/strict";
+const { createTurnStartInflightRegistry } = await import("../src/main/main-app/conversation/turn-start-inflight-registry.ts");
+const registry = createTurnStartInflightRegistry();
+let resolveA;
+const promiseA = new Promise((resolve) => { resolveA = resolve; });
+registry.register(`conversation-1`, promiseA);
+assert.equal(registry.get(`conversation-1`), promiseA);
+let resolveB;
+const promiseB = new Promise((resolve) => { resolveB = resolve; });
+registry.register(`conversation-1`, promiseB);
+resolveA();
+await Promise.resolve();
+assert.equal(registry.get(`conversation-1`), promiseB);
+resolveB();
+await Promise.resolve();
+assert.equal(registry.get(`conversation-1`), undefined);
+console.log("6 main turn-start-inflight-registry assertions passed");
