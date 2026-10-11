@@ -4341,16 +4341,13 @@ function Cc(e) {
   return getAnnotationElementFramePath(e, { getOwnerWindow: (element) => element.ownerDocument.defaultView, resolveFramePath: (windowLike) => ec(windowLike) });
 }
 function wc(e) {
-  let t = window,
-    n = document;
-  for (let r of e) {
-    let e = Tc(n, r);
-    if (e == null) return null;
-    let i = sc(e);
-    if (i == null) return null;
-    ((t = i), (n = i.document));
-  }
-  return t;
+  return resolveAnnotationFrameWindow(e, {
+    getRootWindow: () => window,
+    getRootDocument: () => document,
+    resolveFrameElement: (documentLike, selector) => Tc(documentLike, selector),
+    getFrameWindow: (frame) => sc(frame),
+    getDocument: (windowLike) => windowLike.document,
+  });
 }
 function Tc(e, t) {
   return resolveAnnotationFrameElement(e, t, {
@@ -5970,6 +5967,7 @@ var { isAnnotationSidebarTarget } = require("./browser-page-preload/annotation-s
 var { reduceAnnotationSidebarEditorTransition } = require("./browser-page-preload/annotation-sidebar-editor-transition");
 var { resolveAnnotationFrameElement } = require("./browser-page-preload/annotation-frame-element-resolver");
 var { resolveAnnotationFrameDocument } = require("./browser-page-preload/annotation-frame-document-resolver");
+var { resolveAnnotationFrameWindow } = require("./browser-page-preload/annotation-frame-window-resolver");
 var { projectAnnotationFramePath } = require("./browser-page-preload/annotation-frame-path-projection");
 var { getAnnotationComposedParent } = require("./browser-page-preload/annotation-composed-parent-policy");
 var { stopAnnotationEventPropagation } = require("./browser-page-preload/annotation-event-propagation-policy");

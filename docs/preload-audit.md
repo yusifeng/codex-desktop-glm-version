@@ -1166,3 +1166,10 @@ focused test 覆盖 document root、shadow path 与 selector 失败。
 `src/main/browser-page-preload/annotation-point-scroll-containers.ts`；入口注入
 `elementFromPoint`、元素判定和既有 scroll-container discovery，保留能力缺失、非元素命中时的空数组语义。
 focused test 覆盖命中、空命中与非元素结果。
+
+### 增量抽取：annotation frame window resolver
+
+按 frame selector path 解析嵌套 iframe window（原 `wc`，4343-4353）已迁移至
+`src/main/browser-page-preload/annotation-frame-window-resolver.ts`；入口仅注入根 window/document、
+frame element resolver 与安全 window/document 读取，保留空路径返回根 window、路径失败返回 `null` 语义。
+focused test 覆盖空路径、单级成功与缺失 frame。
