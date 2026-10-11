@@ -4329,22 +4329,10 @@ function gc(e, t) {
   return n != null && _c(n, !0);
 }
 function _c(e, t) {
-  if (!e.isConnected || typeof e.showPopover != `function`) return !1;
-  try {
-    if (t && e.matches(`:popover-open`)) {
-      if (typeof e.hidePopover != `function`) return !1;
-      e.hidePopover();
-    }
-    return (e.matches(`:popover-open`) || e.showPopover(), e.matches(`:popover-open`));
-  } catch {
-    return !1;
-  }
+  return setAnnotationPopoverOpen(e, t, { isConnected: (element) => element.isConnected, hasMethod: (element, name) => typeof element[name] === `function`, isOpen: (element) => element.matches(`:popover-open`), show: (element) => element.showPopover(), hide: (element) => element.hidePopover() });
 }
 function vc(e) {
-  if (typeof e.hidePopover == `function`)
-    try {
-      e.matches(`:popover-open`) && e.hidePopover();
-    } catch {}
+  closeAnnotationPopover(e, { hasMethod: (element, name) => typeof element[name] === `function`, isOpen: (element) => element.matches(`:popover-open`), hide: (element) => element.hidePopover() });
 }
 function yc(e) {
   return projectAnnotationAccessibleLabel(e, (element) => element.getAttribute(`aria-label`), bc);
@@ -6013,6 +6001,7 @@ var { resolveAnnotationContainerAncestor } = require("./browser-page-preload/ann
 var { discoverAnnotationScrollContainers } = require("./browser-page-preload/annotation-scroll-container-discovery");
 var { installAnnotationScrollListeners } = require("./browser-page-preload/annotation-scroll-listener");
 var { runAnnotationCleanup } = require("./browser-page-preload/annotation-cleanup");
+var { setAnnotationPopoverOpen, closeAnnotationPopover } = require("./browser-page-preload/annotation-popover-policy");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
