@@ -1545,3 +1545,7 @@ Open-target registry 的 `A9` lookup 已迁移至 `src/main/worker/open-target-r
 worker 中残留的 `F6` missing-path generated wrapper 已删除，watcher metadata、git path
 existence 与 worktree directory checks 三处 consumer 直接使用既有
 `isMissingPathError` 语义 helper；本次为 wrapper 消除，不改变错误分类或 I/O 顺序。
+
+同理删除未再被引用的 `nbe` tri-state、`rbe` cancelability 与 `dbe` request-failure
+generated wrappers；请求完成 failure telemetry 直接调用既有 `isGitRequestFailure`，而
+watch/query consumers 已直接接入各自语义 policy。此次仅消除转发层，不改变请求生命周期。

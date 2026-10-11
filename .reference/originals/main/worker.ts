@@ -69405,34 +69405,6 @@ function P6(e, t, n) {
   let i = r.split(e.sep);
   return i.length === 1 || (i.length === 2 && ebe.has(i[1]));
 }
-function nbe(e) {
-  return combineOptionalBooleans(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  return e.some((e) => e === !0) ? !0 : e.some((e) => e == null) ? null : !1;
-}
-function rbe(e) {
-  return isCancelableGitRequest(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  switch (e) {
-    case `availability`:
-    case `managed-worktree-state`:
-    case `github-request`:
-    case `origin-url`:
-    case `origin-and-roots`:
-    case `worktree-shell-environment`:
-    case `worktree-owner`:
-    case `default-remote-branch`:
-    case `automation-writable-roots`:
-    case `merge-base`:
-    case `read-git-file-binary`:
-    case `prepare-worktree-snapshot`:
-    case `push`:
-    case `checkout-branch`:
-      return !1;
-    default:
-      return !0;
-  }
-}
 var I6 = kW(`git`),
   L6 = Error(j1),
   ibe = class extends IH {
@@ -70213,7 +70185,7 @@ var I6 = kW(`git`),
           t ?? jH(`canceled`));
         return;
       }
-      t == null && dbe(p) && jH(`failure`);
+      t == null && isGitRequestFailure(p) && jH(`failure`);
       let m = AH() ?? e.trace,
         h = createGitWorkerResponse({ id: e.id, method: e.method, result: p, trace: m });
       (this.emitGitPerformanceOperation({
@@ -71034,19 +71006,6 @@ function ube(e) {
     e.method === `status-summary`
     ? e.params.cwd
     : null;
-}
-function dbe(e) {
-  return isGitRequestFailure(e);
-  /* istanbul ignore next -- retained generated implementation for source parity reference */
-  if (e.type === `error`) return !0;
-  let t = e.value;
-  return (
-    typeof t == `object` &&
-    !!t &&
-    ((`type` in t && t.type === `error`) ||
-      (`success` in t && t.success === !1) ||
-      (`status` in t && (t.status === `error` || t.status === `command-error`)))
-  );
 }
 function fbe(e) {
   return e.aborted
