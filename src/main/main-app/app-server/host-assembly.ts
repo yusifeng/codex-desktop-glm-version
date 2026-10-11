@@ -62,7 +62,11 @@ import {
 import { createTaggedLogger, memoizedTaggedLogger } from "@chunk/logger";
 import { getDesktopFeatureAvailability } from "../misc/availability";
 import { J as PERSISTED_ATOM_STATE_KEY } from "@chunk/bootstrap";
-import { createHostThreadReadState } from "../conversation/thread-read-state-controller";
+import { isSameAuthIdentity } from "../api/desktop-fetch";
+import { createHostThreadReadState as createHostThreadReadStateController } from "../conversation/thread-read-state-controller";
+
+const createHostThreadReadState = (dependencies: Parameters<typeof createHostThreadReadStateController>[0]) =>
+  createHostThreadReadStateController({ ...dependencies, isSameAuthIdentity });
 
 // ---------------------------------------------------------------------------
 // DynamicAppToolPendingResponses（原 `IT`）
