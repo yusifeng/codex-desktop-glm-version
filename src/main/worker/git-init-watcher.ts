@@ -1,5 +1,6 @@
 const { shouldCheckGitInitPath } = require("./git-init-watcher-path-policy");
 const { isGitMetadataDirectoryUnavailable } = require("./git-init-watcher-recovery");
+const { createGitInitReconnectController } = require("./git-init-reconnect-controller");
 
 type GitInitWatcherDependencies = {
   createLogger: (tag: string) => any;
@@ -19,14 +20,21 @@ class GitInitWatcher {
   checkForGitDebounced: any;
   sessions = new Set<any>();
   disposed = false;
-  reconnectDelayMs: number;
-  reconnectTimer: any = null;
+  reconnectController: any;
 
   constructor(options: any, dependencies: GitInitWatcherDependencies) {
     this.options = options;
     this.dependencies = dependencies;
     this.logger = dependencies.createLogger(`git-init-watcher`);
-    this.reconnectDelayMs = dependencies.initialReconnectDelayMs;
+    this.reconnectController = createGitInitReconnectController({
+      isDisposed: () => this.disposed,
+      initialDelayMs: dependencies.initialReconnectDelayMs,
+      maxDelayMs: dependencies.maxReconnectDelayMs,
+      nextDelay: nextGitInitReconnectDelay,
+      setTimeout: dependencies.setTimeout,
+      clearTimeout: dependencies.clearTimeout,
+      startSessions: (gitDirectoryPath: string, pathSeparator: string) => this.startSessions({ checkExistingGitDirectory: true, gitDirectoryPath, pathSeparator }),
+    });
     this.checkForGitDebounced = dependencies.debounce((gitDirectoryPath) => {
       this.checkForGitDirectory(gitDirectoryPath);
     }, 250);
@@ -58,10 +66,7 @@ class GitInitWatcher {
   dispose() {
     this.disposed = true;
     this.checkForGitDebounced.cancel();
-    if (this.reconnectTimer != null) {
-      this.dependencies.clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
+    this.reconnectController.dispose();
     this.disposeSessions();
   }
 
@@ -170,25 +175,7 @@ class GitInitWatcher {
   }
 
   scheduleReconnect(gitDirectoryPath: string, pathSeparator: string) {
-    if (this.disposed || this.reconnectTimer != null) return;
-    const delayMs = this.reconnectDelayMs;
-    this.reconnectDelayMs = nextGitInitReconnectDelay(
-      this.reconnectDelayMs,
-      this.dependencies.maxReconnectDelayMs,
-    );
-    this.reconnectTimer = this.dependencies.setTimeout(() => {
-      this.reconnectTimer = null;
-      this.startSessions({
-        checkExistingGitDirectory: true,
-        gitDirectoryPath,
-        pathSeparator,
-      }).then((started) => {
-        if (started)
-          this.reconnectDelayMs =
-            this.dependencies.initialReconnectDelayMs;
-        else this.scheduleReconnect(gitDirectoryPath, pathSeparator);
-      });
-    }, delayMs);
+    this.reconnectController.schedule(gitDirectoryPath, pathSeparator);
   }
 
   disposeSessions() {
