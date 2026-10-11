@@ -98,6 +98,7 @@ const { dispatchTurnDiffRequest } = require("./worker/git-turn-diff-request-disp
 const { releaseGitRepoWatch } = require("./worker/git-watch-lifecycle");
 const { closeGitRepoWatch } = require("./worker/git-watch-close");
 const { scheduleGitWatchSetup } = require("./worker/git-watch-setup");
+const { handleGitWatchChange } = require("./worker/git-watch-change-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -69074,36 +69075,12 @@ var Jye = 1e3,
             watchId: `git-repo-${crypto.randomUUID()}`,
             onChange: ({ changedPaths: t, pathChanges: a }) => {
               if (this.disposed || n !== e.generation) return;
-              let o = this.ignoreSourceWatches.get(e.watchPath);
-              if (o?.target === e) {
-                if (t.length === 0) this.changedIgnoreSourcePaths.add(e.watchPath);
-                else for (let e of t) o.paths.has(e) && this.changedIgnoreSourcePaths.add(e);
-              }
-              !r && !e.recursive && this.refreshMetadataDirectories(t);
-              let s =
-                  i != null &&
-                  a?.some(({ path: e }) =>
-                    i.directories.some((t) => this.pathApi != null && M6(this.pathApi, e, t)),
-                  ),
-                c = new Map();
-              e.handlers.forEach((e) => {
-                let n = e.changeType === `working-tree`,
-                  r = collectGitWatchHandlerPaths(this.pathApi, this.options.root, e, t, c);
-                if (t.length > 0 && r.length === 0) return;
-                ((e.changeType === `index` ||
-                  e.changeType === `config` ||
-                  e.changeType === `head` ||
-                  (n &&
-                    (t.length === 0 ||
-                      s ||
-                      r.some((e) => this.pathApi?.basename(e) === `.gitignore`)))) &&
-                  this.ignorePolicy?.requestRefresh(),
-                  e.changeType === `head` &&
-                    (t.length === 0 || r.some((e) => this.pathApi?.basename(e) === `HEAD`)) &&
-                    (this.currentHeadRefKnown = !1));
-                let i = n && r.includes(this.options.root);
-                this.handleFileWatchEvent(e.changeType, t.length === 0 || i ? void 0 : r);
-              });
+              handleGitWatchChange({ target: e, changedPaths: t, pathChanges: a, pathApi: this.pathApi, root: this.options.root,
+                ignoreSourceWatch: this.ignoreSourceWatches.get(e.watchPath), changedIgnoreSourcePaths: this.changedIgnoreSourcePaths, ignoreDirectories: i?.directories,
+                refreshMetadataDirectories: (paths) => this.refreshMetadataDirectories(paths), ignorePolicy: this.ignorePolicy,
+                collectHandlerPaths: (handler, paths, cache) => collectGitWatchHandlerPaths(this.pathApi, this.options.root, handler, paths, cache),
+                handleFileWatchEvent: (changeType, paths) => this.handleFileWatchEvent(changeType, paths),
+                setCurrentHeadRefKnown: (known) => { this.currentHeadRefKnown = known; } });
             },
           },
           o = await OH(

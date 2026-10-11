@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { handleGitWatchChange } = require("../app/.vite/build/worker/git-watch-change-controller.js");
+const pathApi = { sep: "/", basename: (value) => value.split("/").at(-1), relative: (from, to) => to.startsWith(from) ? to.slice(from.length).replace(/^\//, "") : `../${to}`, isAbsolute: (value) => value.startsWith("/") };
+const events = []; const changedIgnore = new Set(); const refreshes = []; let headKnown = true; let refreshCount = 0;
+const target = { watchPath: "/repo", recursive: false, handlers: [{ changeType: "working-tree" }, { changeType: "head" }] };
+handleGitWatchChange({ target, changedPaths: ["/repo/file", "/repo/.git/HEAD"], pathChanges: [{ path: "/repo/.git/HEAD" }], pathApi, root: "/repo", ignoreDirectories: ["/repo/.git"], ignoreSourceWatch: { target, paths: new Set(["/repo/file"]) }, changedIgnoreSourcePaths: changedIgnore, refreshMetadataDirectories: (paths) => { refreshes.push(paths); }, ignorePolicy: { requestRefresh: () => { refreshCount++; } }, collectHandlerPaths: (handler, paths) => handler.changeType === "working-tree" ? paths.filter((path) => path.includes("file")) : ["/repo/.git/HEAD"], handleFileWatchEvent: (type, paths) => events.push([type, paths]), setCurrentHeadRefKnown: (value) => { headKnown = value; } });
+assert.deepEqual([...changedIgnore], ["/repo/file"]); assert.equal(refreshes.length, 0); assert.equal(refreshCount, 2); assert.equal(headKnown, false); assert.deepEqual(events, [["working-tree", ["/repo/file"]], ["head", ["/repo/.git/HEAD"]]]);
+handleGitWatchChange({ target, changedPaths: [], pathChanges: [], pathApi, root: "/repo", changedIgnoreSourcePaths: changedIgnore, refreshMetadataDirectories: () => { refreshCount++; }, collectHandlerPaths: () => [], handleFileWatchEvent: (type, paths) => events.push([type, paths]), setCurrentHeadRefKnown: () => {} });
+assert.equal(events.at(-1)[1], undefined); assert.equal(refreshCount, 2); console.log("6 worker Git watch change-controller assertions passed");
