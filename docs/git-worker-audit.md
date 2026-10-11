@@ -1637,6 +1637,10 @@ Windows native app icon 的 bounded LRU/single-flight cache 已迁移至
 与 telemetry，cache 保留 100 项 LRU、同 key promise 复用、空结果淘汰及 identity-safe cleanup。由
 `scripts/test-worker-windows-native-app-icon-cache.mjs` 覆盖 key single-flight、淘汰后重建、失败重试与
 LRU 顺序。
+GitHub PR body 中 user-attachment URL 的 asset-id cache 已迁移至
+`github-user-attachment-url-cache.ts`；worker 仍负责 JWT expiry 解析和 body rewrite，cache 保留 60 秒
+提前失效阈值、同 asset 命中与过期 URL overwrite。由 `scripts/test-worker-github-user-attachment-url-cache.mjs`
+覆盖命中、提前失效和独立 key 断言。
 ### A1 最终复核：metadata refresh generation/waiter
 
 `GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、

@@ -20,6 +20,7 @@ const { dispatchCodexWorktreeRequest } = require("./worker/git-codex-worktree-di
 const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-dispatch");
 const { createGithubCliRateLimitGate } = require("./worker/github-cli-rate-limit-gate");
 const { createWindowsNativeAppIconCache } = require("./worker/windows-native-app-icon-cache");
+const { createGithubUserAttachmentUrlCache } = require("./worker/github-user-attachment-url-cache");
 const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
@@ -71801,7 +71802,7 @@ var uxe = K({
   pxe = /^\/\d+\/\d+-(?<assetId>[0-9a-f-]{36})\.[^/]+$/,
   mxe = 6e4,
   hxe = K({ exp: U() }),
-  x8 = new Map(),
+  x8 = createGithubUserAttachmentUrlCache(),
   gxe = `
   query($owner: String!, $repo: String!, $number: Int!) {
     viewer { login }
@@ -71857,10 +71858,7 @@ function S8(e, t) {
   return e.replace(dxe, (e, t) => n.get(t) ?? e);
 }
 function vxe(e, t) {
-  let n = x8.get(e);
-  return n != null && n.expiresAtMs - mxe > Date.now()
-    ? n.src
-    : (x8.set(e, { expiresAtMs: yxe(t), src: t }), t);
+  return x8.getOrSet(e, t, yxe(t));
 }
 function yxe(e) {
   let t = new URL(e).searchParams.get(`jwt`)?.split(`.`)[1];

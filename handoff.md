@@ -3140,6 +3140,12 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 - `scripts/test-worker-windows-native-app-icon-cache.mjs` 覆盖 8 项 single-flight、identity cleanup、失败
   retry 与 LRU 断言。
 
+# 本轮新增：GitHub user-attachment URL cache
+
+- PR body user-attachment asset-id URL cache 已迁移至 `src/main/worker/github-user-attachment-url-cache.ts`；
+  worker 保留 JWT expiry 解析与 body rewrite，cache 保留 60 秒提前失效阈值和过期 URL overwrite。
+- `scripts/test-worker-github-user-attachment-url-cache.mjs` 覆盖 5 项命中、提前失效和 key 隔离断言。
+
 # 本轮新增：GitHub CLI rate-limit gate
 
 - GitHub CLI secondary-rate-limit 的 per-host backoff、single-flight 等待、AbortSignal 竞态与 promise
