@@ -146,6 +146,7 @@ const { buildParcelWatcherOptions } = require("./worker/parcel-watcher-options")
 const { projectParcelWatcherEvents } = require("./worker/parcel-watcher-events");
 const { isPathAtOrBelowAnyRoot, isPathBelowAnyRoot } = require("./worker/parcel-watcher-paths");
 const { isParcelWatcherMissingPathError } = require("./worker/parcel-watcher-errors");
+const { startParcelWatcher } = require("./worker/parcel-watcher-runtime");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
 const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
@@ -80755,7 +80756,7 @@ function dDe(e) {
   };
 }
 async function j9(e, t) {
-  return new fDe(await import(`@parcel/watcher`), e, t).start();
+  return startParcelWatcher(e, t);
 }
 var fDe = class {
   parcelWatcher;
