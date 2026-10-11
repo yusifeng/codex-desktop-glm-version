@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { handleGitInitRecovery } = require("../app/.vite/build/worker/git-init-recovery-controller.js");
+const watcher = {}; const handled = new WeakSet(); let desired = "repo"; let active = { watcher }; const calls = [];
+const deps = { cwd: "/repo", host: { id: "local" }, watcher, getWatchKey: () => "repo", getDesiredWatchKey: () => desired, setDesiredWatchKey: (value) => { desired = value; calls.push(["desired", value]); }, getActiveWatch: () => active, clearActiveWatch: () => { active = null; calls.push("clear"); }, handledWatchers: handled, refreshMetadata: async () => { calls.push("refresh"); return false; }, startWatcher: async (_cwd, _host, mode) => { calls.push(["start", mode]); return "failed"; } };
+await handleGitInitRecovery(deps); assert.deepEqual(calls, ["clear", "refresh", ["start", "watch-git-metadata"], "refresh", ["desired", null]]); assert.equal(desired, null);
+const watcher2 = {}; desired = "repo"; active = { watcher: watcher2 }; calls.length = 0; await handleGitInitRecovery({ ...deps, watcher: watcher2, refreshMetadata: async () => { calls.push("refresh"); return true; } }); assert.deepEqual(calls, ["clear", "refresh"]);
+let thrown = false; const watcher3 = {}; desired = "repo"; active = { watcher: watcher3 }; await assert.rejects(() => handleGitInitRecovery({ ...deps, watcher: watcher3, refreshMetadata: async () => { throw new Error("boom"); } }), /boom/); thrown = true; assert.equal(thrown, true); assert.equal(desired, null);
+console.log("8 worker Git init recovery controller assertions passed");
