@@ -35,4 +35,14 @@ export function resolveTrayIconCandidates({
   return packaged ? [join(resourcesPath, icon), join(sourceIcons, icon)] : [join(sourceIcons, icon)];
 }
 
-if (typeof module !== `undefined`) module.exports = { resolveTrayIconCandidates };
+export function resolveTrayWindowsIconNames(flavor: string, agentFlavor: string) {
+  return flavor === agentFlavor
+    ? { dark: `icon-agent.ico`, light: `icon-agent.ico` }
+    : { dark: `chatgpt-tray-dark.ico`, light: `chatgpt-tray-light.ico` };
+}
+
+export function resolveTrayTemplateNames() {
+  return [`chatgptTemplate.png`, `chatgptTemplate@2x.png`];
+}
+
+if (typeof module !== `undefined`) module.exports = { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames };
