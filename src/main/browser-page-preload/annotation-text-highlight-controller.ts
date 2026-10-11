@@ -10,7 +10,8 @@ function createAnnotationTextHighlightController(dependencies: AnnotationTextHig
     cleanup?.();
     cleanup = null;
     if (disposed || anchor == null) return;
-    cleanup = dependencies.apply(anchor) ?? null;
+    const nextCleanup = dependencies.apply(anchor);
+    cleanup = typeof nextCleanup === `function` ? nextCleanup : null;
   };
   const dispose = () => {
     if (disposed) return;
