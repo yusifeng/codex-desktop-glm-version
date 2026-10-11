@@ -1277,3 +1277,11 @@ React annotation runtime 的 selected-id 到 comment/design active view 派生�
 模块保留 comment 优先、design fallback、display annotation 列表与 active-selection gate，入口
 继续持有 anchor resolution、effects 与 render 生命周期。focused test 覆盖 comment/design/missing/null
 selection 分支。
+
+### 增量抽取：annotation text preview state
+
+React annotation runtime 的文本 selection preview 分支（原 `Wy` 内 `Jt/Yt/Xt/Zt`）已迁移至
+`src/main/browser-page-preload/annotation-text-preview-state.ts`；模块负责 active/draft/selected
+text anchor 优先级、suspended/marker-visible gate、resolved anchor 与 selection-rect fallback，
+入口继续持有 CSS Highlight 的 `useLayoutEffect` 生命周期。focused test 覆盖 active、draft、selected、
+hidden、suspended 与 unresolved fallback。

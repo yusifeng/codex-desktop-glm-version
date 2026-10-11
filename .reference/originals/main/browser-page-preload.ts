@@ -5962,6 +5962,7 @@ var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annota
 var { projectAnnotationRuntimeCollections } = require("./browser-page-preload/annotation-runtime-collection-projection");
 var { projectAnnotationMarkerRecords } = require("./browser-page-preload/annotation-marker-record-projection");
 var { projectAnnotationActiveView } = require("./browser-page-preload/annotation-active-view-projection");
+var { projectAnnotationTextPreviewState } = require("./browser-page-preload/annotation-text-preview-state");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25091,20 +25092,22 @@ function Wy({ rootHost: e, bridge: t }) {
                 ),
           )
         : [],
-    Jt = null;
-  Ot && M?.annotation.anchor.kind === `text`
-    ? (Jt = M.annotation.anchor)
-    : !Ot && !De && x?.anchor.type === `text`
-      ? (Jt = x.anchor.value)
-      : !Ot &&
-        !De &&
-        n.areAnnotationMarkersVisible !== !1 &&
-        Kt?.anchor.kind === `text` &&
-        (Jt = Kt.anchor);
-  let Yt = Jt == null ? null : fu(Jt);
+    textPreviewState = projectAnnotationTextPreviewState(
+      {
+        active: M,
+        hasActiveSelection: Ot,
+        draft: x,
+        isSuspended: De,
+        areMarkersVisible: n.areAnnotationMarkersVisible !== !1,
+        selectedComment: Kt,
+      },
+      { resolveTextAnchor: (anchor) => fu(anchor), resolveSelectionRects: (anchor) => nb(anchor) },
+    );
+  let Yt = textPreviewState.resolvedAnchor;
   (0, G.useLayoutEffect)(() => (Yt == null ? void 0 : pu(Yt)), [Yt]);
-  let Xt = Jt == null ? [] : nb(Jt),
-    Zt = Yt == null ? Xt : [],
+  let Jt = textPreviewState.anchor,
+    Xt = textPreviewState.selectionRects,
+    Zt = Xt,
     Qt = null,
     $t = !1,
     en = `hover-box`,
