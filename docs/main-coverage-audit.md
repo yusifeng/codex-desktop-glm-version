@@ -277,6 +277,14 @@ flavor、允许的 flavor 集合和注入的设置 getter；nativeTheme、dock�
 纯函数，路径拼接与 nativeImage 读取仍由入口负责。`scripts/test-main-tray-icon-names.mjs`
 覆盖 template、Agent 和普通 flavor 三项断言。
 
+### 增量抽取：flavor icon base-name policy
+
+main chunk 的 `ST` flavor 到 icon base-name 映射已迁移至
+`src/main/main-app/startup/icon-flavor-policy.ts`，并接回窗口图标、托盘图标、app metadata
+与系统 icon preview 的消费者。模块只接受 flavor policy 注入，不包含路径探测或 nativeImage
+副作用；`scripts/test-main-icon-flavor-policy.mjs` 覆盖 Agent/Nightly/Alpha/Beta/Dev 与未知
+flavor 共 6 项断言。
+
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至

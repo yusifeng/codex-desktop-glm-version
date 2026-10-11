@@ -1511,6 +1511,10 @@ main `xst` worker assembly 的 open-in `read-shortcut-link` 按路径缓存与�
 main tray startup 的 Windows dark/light icon 名称与 macOS template 名称策略（原 `bT/xT`）已迁移至
 `src/main/main-app/startup/tray-icon-paths.ts`；入口继续持有路径探测、nativeImage 与 tray 生命周期，
 由 `scripts/test-main-tray-icon-names.mjs` 覆盖 3 项断言。
+main startup/window icon 的 build-flavor 到 icon base-name 映射（原 `ST`）已迁移至
+`src/main/main-app/startup/icon-flavor-policy.ts`，窗口、托盘、metadata 与 icon preview 消费者
+均已接回；路径探测和 nativeImage 副作用仍由入口持有，由
+`scripts/test-main-icon-flavor-policy.mjs` 覆盖 6 项断言。
 worker-main RPC 的方法白名单、取消消息和请求消息校验已迁移至
 `src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托，
 由 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言；RPC 调度与

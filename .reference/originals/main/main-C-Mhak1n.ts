@@ -25,6 +25,7 @@ const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-p
 const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
+const { resolveFlavorIconBaseName } = require("./main-app/startup/icon-flavor-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
@@ -63158,21 +63159,7 @@ var aEe = class extends n.Uf {
     (super(), (this.#e = { ...t, browserAuthOperations: iEe(e) }));
   }
 };
-function ST(e) {
-  switch (e) {
-    case a.in.Agent:
-      return `icon-agent`;
-    case a.in.Nightly:
-      return `icon-chatgpt-nightly`;
-    case a.in.InternalAlpha:
-      return `icon-chatgpt-alpha`;
-    case a.in.PublicBeta:
-      return `icon-chatgpt-beta`;
-    case a.in.Dev:
-    case a.in.Prod:
-      return `icon-chatgpt`;
-  }
-}
+const iconBaseName = (e) => resolveFlavorIconBaseName(e, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
 function CT(e) {
   let t;
   switch (e) {
@@ -63193,7 +63180,7 @@ function CT(e) {
   return { dark: `icon-codex-dark-color${t}.png`, light: `icon-codex-light${t}.png` };
 }
 function wT(e, t = (0, h.join)(l.app.getAppPath(), `src`, `icons`)) {
-  let n = `${ST(e)}.png`;
+  let n = `${iconBaseName(e)}.png`;
   if (l.app.isPackaged) {
     let e = (0, h.join)(process.resourcesPath, n);
     if ((0, v.existsSync)(e)) return e;
@@ -63235,7 +63222,7 @@ var oEe = class extends n.Uf {
 function sEe(e) {
   if (process.platform !== `darwin`) return null;
   let t = CT(e),
-    n = ET(`${ST(e)}.png`),
+    n = ET(`${iconBaseName(e)}.png`),
     r = ET(t.dark),
     i = ET(t.light);
   return n == null || r == null || i == null
@@ -63272,7 +63259,7 @@ async function cEe(e) {
     case `sunos`:
       t = wT(e);
   }
-  return t == null ? ET(`${ST(e)}.png`) : DT(t);
+  return t == null ? ET(`${iconBaseName(e)}.png`) : DT(t);
 }
 function DT(e) {
   let t = l.nativeImage.createFromPath(e);
@@ -162156,7 +162143,7 @@ async function nit(e) {
             l.app.isPackaged
               ? process.resourcesPath
               : (0, h.join)(l.app.getAppPath(), `src`, `icons`),
-            `${ST(e)}.ico`,
+            `${iconBaseName(e)}.ico`,
           ))
       : r && (i = wT(e) ?? ``);
   let [o, s] = await Promise.all([
@@ -173747,7 +173734,7 @@ function dst({
         case a.in.InternalAlpha:
         case a.in.PublicBeta:
         case a.in.Prod:
-          return k(`${ST(r)}.png`);
+          return k(`${iconBaseName(r)}.png`);
       }
     },
     M = () =>
@@ -175068,7 +175055,7 @@ function Q9() {
 }
 async function Fst(e, t) {
   if (process.platform === `darwin`) {
-    let n = resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: resolveTrayTemplateNames(), iconBaseName: ST, windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) });
+    let n = resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: resolveTrayTemplateNames(), iconBaseName: (flavor) => iconBaseName(flavor), windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) });
     for (let e of n) {
       let t = l.nativeImage.createFromPath(e);
       if (!t.isEmpty()) return (t.setTemplateImage(!0), { defaultIcon: t });
@@ -175076,7 +175063,7 @@ async function Fst(e, t) {
     return { defaultIcon: await l.app.getFileIcon(process.execPath, { size: `normal` }) };
   }
   if (process.platform === `linux`) {
-    let r = l.nativeImage.createFromPath(resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: resolveTrayTemplateNames(), iconBaseName: ST, windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) })[0]);
+    let r = l.nativeImage.createFromPath(resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: resolveTrayTemplateNames(), iconBaseName: (flavor) => iconBaseName(flavor), windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) })[0]);
     if (r.isEmpty()) throw Error(`Linux tray application icon is unavailable`);
     return { defaultIcon: r.resize({ width: W9, height: W9, quality: `best` }) };
   }
@@ -175086,7 +175073,7 @@ async function Fst(e, t) {
     : { defaultIcon: n };
 }
 function $9(e, t) {
-  let i = resolveTrayIconCandidates({ platform: `win32`, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, dark: l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI, templateNames: resolveTrayTemplateNames(), iconBaseName: ST, windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) });
+  let i = resolveTrayIconCandidates({ platform: `win32`, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, dark: l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI, templateNames: resolveTrayTemplateNames(), iconBaseName: (flavor) => iconBaseName(flavor), windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) });
   for (let e of i) {
     let t = l.nativeImage.createFromPath(e);
     if (!t.isEmpty()) return t;
