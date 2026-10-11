@@ -1351,3 +1351,10 @@ comments/intl payload 保留。
 帧）已迁移至 `src/main/browser-page-preload/annotation-viewport-refresh-scheduler.ts`；入口继续持有 React
 state setter 与 host subscription 生命周期。focused test 覆盖 coalescing、dispose cancellation 与 post-dispose
 no-op。
+
+### 增量抽取：annotation anchor observation lifecycle
+
+`Wy` 的 visualViewport、跨 frame resize/scroll、scroll-container、overlay mutation 与 text-anchor observer
+注册/清理顺序已迁移至 `src/main/browser-page-preload/annotation-anchor-observation-lifecycle.ts`；入口继续
+注入 `dc/Pc/tb/du` 与 geometry callbacks，保留 React effect 依赖与 frame DOM owner。focused test 覆盖
+viewport listener、frame/text observer registration、dispose idempotence 与 cleanup 顺序。

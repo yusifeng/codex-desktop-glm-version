@@ -5972,6 +5972,7 @@ var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annota
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
 var { createAnnotationViewportRefreshScheduler } = require("./browser-page-preload/annotation-viewport-refresh-scheduler");
+var { createAnnotationAnchorObservationLifecycle } = require("./browser-page-preload/annotation-anchor-observation-lifecycle");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -24958,39 +24959,43 @@ function Wy({ rootHost: e, bridge: t }) {
         },
         s = () => o(),
         c = Ee.flatMap((e) => (Qy(e) ? [e.anchor, ...(e.additionalAnchors ?? [])] : []));
-      (window.addEventListener(`resize`, a), Ge && document.addEventListener(`scroll`, s, !0));
-      let l = Ke ? tb(document, e, lt) : null,
-        u = Pc(window, c, s),
-        d = dc((t, n) => {
-          if (n === window) return () => {};
-          let r = () => o();
-          (n.addEventListener(`resize`, a),
-            n.addEventListener(`scroll`, r),
-            Ge && t.addEventListener(`scroll`, r, !0));
-          let i = Pc(n, c, r),
-            s = Ke ? tb(t, e, lt) : null;
+      let lifecycle = createAnnotationAnchorObservationLifecycle({
+        visualViewport: window.visualViewport,
+        observeFrames: (installFrameResources) => dc(installFrameResources),
+        observeTextAnchors: (anchors, onChange) => (anchors.length > 0 ? du(anchors, onChange) : () => {}),
+        anchors: t.flatMap((e) => (e.anchor.kind === `text` ? [e.anchor] : [])),
+        installRootResources: () => {
+          (window.addEventListener(`resize`, a), Ge && document.addEventListener(`scroll`, s, !0));
+          let cleanupOverlay = Ke ? tb(document, e, lt) : null;
+          let cleanupScrollContainers = Pc(window, c, s);
           return () => {
-            (n.removeEventListener(`resize`, a),
-              n.removeEventListener(`scroll`, r),
-              Ge && t.removeEventListener(`scroll`, r, !0),
-              i(),
-              s?.());
+            (window.removeEventListener(`resize`, a),
+              Ge && document.removeEventListener(`scroll`, s, !0),
+              cleanupOverlay?.(),
+              cleanupScrollContainers());
           };
-        });
-      i();
-      let f = du(
-        t.flatMap((e) => (e.anchor.kind === `text` ? [e.anchor] : [])),
-        n,
-      );
-      return () => {
-        (window.removeEventListener(`resize`, a),
-          Ge && document.removeEventListener(`scroll`, s, !0),
-          l?.(),
-          u(),
-          d(),
-          r != null && window.cancelAnimationFrame(r),
-          f());
-      };
+        },
+        installFrameResources: (frameDocument, frameWindow) => {
+          if (frameWindow === window) return () => {};
+          let onFrameChange = () => o();
+          (frameWindow.addEventListener(`resize`, a),
+            frameWindow.addEventListener(`scroll`, onFrameChange),
+            Ge && frameDocument.addEventListener(`scroll`, onFrameChange, !0));
+          let cleanupScrollContainers = Pc(frameWindow, c, onFrameChange);
+          let cleanupOverlay = Ke ? tb(frameDocument, e, lt) : null;
+          return () => {
+            (frameWindow.removeEventListener(`resize`, a),
+              frameWindow.removeEventListener(`scroll`, onFrameChange),
+              Ge && frameDocument.removeEventListener(`scroll`, onFrameChange, !0),
+              cleanupScrollContainers(),
+              cleanupOverlay?.());
+          };
+        },
+        onViewportResize: i,
+        onViewportScroll: s,
+        onTextAnchorChange: n,
+      });
+      return lifecycle.install();
     }, [x, te, Ee, Ge, Ke, k, lt, e, Fe.length]));
   let St = k === `comment` && !De && n.isOriginalViewEnabled !== !0,
     Ct = k === `comment` && !De && !ke && (x == null || x.target.mode === `create`);
