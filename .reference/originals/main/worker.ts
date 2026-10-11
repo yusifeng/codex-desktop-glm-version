@@ -183,6 +183,7 @@ const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
 const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation, buildTextMateOpenArgs } = require("./worker/editor-target-args");
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, selectGitWatchTargetsForMetadataRefresh, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
+const { classifyStableMetadataFailure } = require("./worker/git-stable-metadata-failure-policy");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -67519,21 +67520,28 @@ var {
     throwStableMetadataReadError(e, t, n, r) {
       let i = l4(n),
         a = n instanceof I1;
-      if (!Xhe(n) && !i && !a) throw n;
-      let o = n instanceof Error ? n : Error(String(n));
-      throw (
-        r === this.stableMetadataGeneration &&
-          (a && ppe(t),
-          this.stableMetadataRetryByKey.set(this.getStableMetadataKey(e, t), {
-            error: o,
-            retryAfterMs: Date.now() + qhe,
-          }),
-          (!i || this.getCachedStableRoot(e, t) === void 0) &&
-            (this.deleteCachedStableRoot(this.getStableMetadataKey(e, t)),
-            this.getStableRootMemoized.delete(e, t, this.stableMetadataGeneration)),
-          this.getStableMetadataMemoized.delete(e, t, this.stableMetadataGeneration)),
-        o
-      );
+      let o = classifyStableMetadataFailure({
+        isPermissionError: Xhe(n),
+        isProcessTimeout: i,
+        isGitUnavailable: a,
+        generationMatches: r === this.stableMetadataGeneration,
+        hasCachedRoot: this.getCachedStableRoot(e, t) !== void 0,
+      });
+      if (!o.accepted) throw n;
+      let s = n instanceof Error ? n : Error(String(n));
+      if (o.retry) {
+        o.refreshHostConfig && ppe(t);
+        this.stableMetadataRetryByKey.set(this.getStableMetadataKey(e, t), {
+          error: s,
+          retryAfterMs: Date.now() + qhe,
+        });
+        if (o.invalidateCachedRoot) {
+          this.deleteCachedStableRoot(this.getStableMetadataKey(e, t));
+          this.getStableRootMemoized.delete(e, t, this.stableMetadataGeneration);
+        }
+        this.getStableMetadataMemoized.delete(e, t, this.stableMetadataGeneration);
+      }
+      throw s;
     }
     getStableMetadataKey(e, t) {
       return createGitManagerKey(h1(t), e);

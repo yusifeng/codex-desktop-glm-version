@@ -1590,3 +1590,7 @@ watcher 与 close path 还绑定 telemetry、Git I/O、parent event 与 cancella
 Metadata refresh 中受影响 watcher target 的筛选已迁移至 `selectGitWatchTargetsForMetadataRefresh`；
 worker 仍持有 path API、target session、dispose/restart 与 refresh ordering。由
 `scripts/test-worker-git-watch-target-selection.mjs` 覆盖 metadata guard、命中和多目录选择。
+Stable metadata 读取失败的 timeout/permission/unavailable 分类、generation 有效性、cached-root
+保留与 retry/invalidation 计划已迁移至 `git-stable-metadata-failure-policy.ts`；manager 仍负责
+error object、retry Map、memoized cache 删除、host refresh 与副作用顺序。由
+`scripts/test-worker-git-stable-metadata-failure-policy.mjs` 覆盖 4 项 decision assertions。
