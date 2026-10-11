@@ -3161,3 +3161,9 @@ XDG/platform 环境、同步 filesystem scan 和 parse/discovery owner，当前�
   仍持有命令执行、重试策略和结果 owner。
 - `scripts/test-worker-github-cli-rate-limit-gate.mjs` 覆盖 6 项空 gate、release、abort 与 replacement
   cleanup 断言。
+
+# 本轮新增：Git process lock registry
+
+- Git command per-key process lock 的等待、lease `track/close`、deadline/AbortSignal gate 与 identity cleanup
+  已迁移至 `src/main/worker/git-process-lock-registry.ts`；worker 仍负责 spawn、timeout 与进程 owner。
+- `scripts/test-worker-git-process-lock-registry.mjs` 覆盖 6 项 release、tracked wait、abort 和 timeout 断言。

@@ -21,6 +21,7 @@ const { dispatchWorktreeListRequest } = require("./worker/git-worktree-list-disp
 const { createGithubCliRateLimitGate } = require("./worker/github-cli-rate-limit-gate");
 const { createWindowsNativeAppIconCache } = require("./worker/windows-native-app-icon-cache");
 const { createGithubUserAttachmentUrlCache } = require("./worker/github-user-attachment-url-cache");
+const { createGitProcessLockRegistry } = require("./worker/git-process-lock-registry");
 const { createWorktreeLifecycle } = require("./worker/git-worktree-lifecycle");
 const { cleanupHostHandoffTransfer: cleanupHostHandoffTransferFiles, getHostHandoffDirectory, transferHostFile } = require("./worker/git-handoff-transfer");
 const { applyHandoffStash, ensureHandoffBranch, forceHandoffBranch, inspectHandoffBranch } = require("./worker/git-handoff-branch");
@@ -66472,7 +66473,7 @@ var J1 = kW(`git`),
   Y1 = 1e3,
   X1 = 6e4,
   Z1 = `safe.bareRepository=explicit`,
-  Q1 = new Map(),
+  Q1 = createGitProcessLockRegistry(),
   $1 = new Map(),
   xpe = (0, DX.default)(t0, { promise: !0, maxAge: Y1, normalizer: ([e, t, n]) => e0(e, t, n) });
 async function $(e, t, n, r = {}) {
@@ -67001,44 +67002,7 @@ async function i0(e, t, n, r) {
   }
 }
 async function a0(e, t, n) {
-  for (;;) {
-    if (n?.aborted || Date.now() >= t) return null;
-    let r = Q1.get(e);
-    if (r == null) {
-      let t = vR();
-      Q1.set(e, t);
-      let n = 0,
-        r = !1,
-        i = () => {
-          !r || n > 0 || (Q1.get(e) === t && Q1.delete(e), t.resolve(void 0));
-        };
-      return {
-        close() {
-          ((r = !0), i());
-        },
-        track(e) {
-          n += 1;
-          let t = () => {
-            (--n, i());
-          };
-          e.then(t, t);
-        },
-      };
-    }
-    let i = null,
-      a = () => {},
-      o = await Promise.race([
-        r.promise.then(() => !0),
-        new Promise((e) => {
-          if (((i = setTimeout(() => e(!1), t - Date.now())), n != null)) {
-            let t = () => e(!1);
-            (n.addEventListener(`abort`, t, { once: !0 }),
-              (a = () => n.removeEventListener(`abort`, t)));
-          }
-        }),
-      ]);
-    if ((i != null && clearTimeout(i), a(), !o)) return null;
-  }
+  return Q1.acquire(e, t, n);
 }
 function o0(e, t) {
   return e ? `${e}\n${t}` : t;

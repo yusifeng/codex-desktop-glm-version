@@ -1637,6 +1637,9 @@ Windows native app icon 的 bounded LRU/single-flight cache 已迁移至
 与 telemetry，cache 保留 100 项 LRU、同 key promise 复用、空结果淘汰及 identity-safe cleanup。由
 `scripts/test-worker-windows-native-app-icon-cache.mjs` 覆盖 key single-flight、淘汰后重建、失败重试与
 LRU 顺序。
+Git command 的 per-key process lock registry 已迁移至 `git-process-lock-registry.ts`；worker 仍持有命令
+spawn/timeout owner，registry 保留同 key 互斥、lease `track/close`、deadline/AbortSignal 等待与 identity
+cleanup。由 `scripts/test-worker-git-process-lock-registry.mjs` 覆盖 release、tracked wait、abort 和 timeout。
 GitHub PR body 中 user-attachment URL 的 asset-id cache 已迁移至
 `github-user-attachment-url-cache.ts`；worker 仍负责 JWT expiry 解析和 body rewrite，cache 保留 60 秒
 提前失效阈值、同 asset 命中与过期 URL overwrite。由 `scripts/test-worker-github-user-attachment-url-cache.mjs`
