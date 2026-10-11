@@ -2973,7 +2973,19 @@ orchestration 已物理迁移至 `src/main/browser-page-preload/annotation-selec
 `scripts/test-preload-annotation-selection-comment-controller.mjs` 覆盖 focus、selection open、fallback retry
 与 dispose gate。
 
+2026-10-11 A1 worker 增量：`GitRepoWatcher.refreshWorkingTreeWatchPolicy` 的 session barrier、ignore policy
+freshness/retry gate、apply/skip 决策与 watcher dispose/restart recovery 已物理迁移至
+`src/main/worker/git-working-tree-watch-policy-refresh-controller.ts`；worker 继续注入 ignore policy、Git
+session 和 file-event owner。由 `scripts/test-worker-git-working-tree-watch-policy-refresh-controller.mjs` 覆盖
+10 项 focused assertions。
+
 2026-10-11 A1 worker 增量：`GitRepoWatcher.tryStartWatchSession` 的 disposed/registered gate、session dispose 等待、
 start promise 去重、generation race、retry scheduling 与 promise cleanup 已物理迁移至
 `src/main/worker/git-watch-session-start-controller.ts`；worker 继续注入 `startWatchSession` Git I/O owner。由
 `scripts/test-worker-git-watch-session-start-controller.mjs` 覆盖 9 项 focused assertions。
+2026-10-11 A2 preload 增量：`Wy` 的 text-anchor `Je` editor-open lifecycle 已物理迁移至
+`src/main/browser-page-preload/annotation-text-anchor-editor-controller.ts`；controller 保留 interaction
+clear、comment preview close、open-editor IPC、viewport refresh、editor state、hover/selection cleanup
+顺序，入口继续注入 React/ref/host owners。由
+`scripts/test-preload-annotation-text-anchor-editor-controller.mjs` 覆盖 text guard、preview 分支、
+payload/state 与 dispose gate。

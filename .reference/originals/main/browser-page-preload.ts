@@ -5993,6 +5993,7 @@ var { createAnnotationPointRetryController } = require("./browser-page-preload/a
 var { createAnnotationPointSelectionController } = require("./browser-page-preload/annotation-point-selection-controller");
 var { createAnnotationDesignPointSelectionController } = require("./browser-page-preload/annotation-design-point-selection-controller");
 var { createAnnotationSelectionCommentController } = require("./browser-page-preload/annotation-selection-comment-controller");
+var { createAnnotationTextAnchorEditorController } = require("./browser-page-preload/annotation-text-anchor-editor-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23879,6 +23880,28 @@ function Wy({ rootHost: e, bridge: t }) {
         openFromSelection: (selection) => Je(selection),
       }),
     ),
+    [textAnchorEditorController] = (0, G.useState)(() =>
+      createAnnotationTextAnchorEditorController({
+        clearInteraction: () => w.current?.clear(),
+        closePreview: (commentId) => {
+          (t.sendMessageToHost({ type: `browser-sidebar-runtime-close-comment-preview`, commentId }), v(null));
+        },
+        openEditor: (anchorState, extras) =>
+          t.sendMessageToHost({
+            type: `browser-sidebar-runtime-open-editor`,
+            target: { mode: `create` },
+            anchorState,
+            wantsScreenshot: !0,
+            ...extras,
+          }),
+        refreshViewport: () => T(C_()),
+        setEditorState: (state) => S(state),
+        clearHover: () => {
+          (o(null), c(null));
+        },
+        clearSelectionHover: () => gu(),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -23967,36 +23990,8 @@ function Wy({ rootHost: e, bridge: t }) {
       [i, t, A, _, e],
     ),
     Je = (0, G.useCallback)(
-      (e, n) =>
-        e.anchor.kind === `text` &&
-        (w.current?.clear(),
-        _ != null &&
-          (t.sendMessageToHost({
-            type: `browser-sidebar-runtime-close-comment-preview`,
-            commentId: _,
-          }),
-          v(null)),
-        t.sendMessageToHost({
-          type: `browser-sidebar-runtime-open-editor`,
-          target: { mode: `create` },
-          anchorState: e,
-          wantsScreenshot: !0,
-          ...n,
-        }),
-        T(C_()),
-        S({
-          target: { mode: `create` },
-          anchor: {
-            type: `text`,
-            ...(e.themeVariant == null ? {} : { themeVariant: e.themeVariant }),
-            value: e.anchor,
-          },
-        }),
-        o(null),
-        c(null),
-        gu(),
-        !0),
-      [t, _],
+      (anchorState, extras) => textAnchorEditorController.open(anchorState, extras, _),
+      [textAnchorEditorController, _],
     ),
     Ye = (0, G.useCallback)(
       (n, r, a = 0) => {
@@ -24375,6 +24370,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => pointSelectionController.dispose(), [pointSelectionController]),
     (0, G.useEffect)(() => () => designPointSelectionController.dispose(), [designPointSelectionController]),
     (0, G.useEffect)(() => () => selectionCommentController.dispose(), [selectionCommentController]),
+    (0, G.useEffect)(() => () => textAnchorEditorController.dispose(), [textAnchorEditorController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {

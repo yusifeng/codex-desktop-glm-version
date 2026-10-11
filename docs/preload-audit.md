@@ -1516,6 +1516,14 @@ refs/setters 与 `H_` restore adapter，保持 host restore message 的原始副
 刷新业务回调。由 `scripts/test-main-display-change-geometry-refresh.mjs` 覆盖三类事件、刷新转发、非 macOS gate
 与注销顺序。
 
+### 增量抽取：worker working-tree watch policy refresh
+
+`GitRepoWatcher.refreshWorkingTreeWatchPolicy` 的 session barrier、ignore policy freshness/retry gate、apply/skip
+决策与 watcher dispose/restart recovery 已迁移至
+`src/main/worker/git-working-tree-watch-policy-refresh-controller.ts`；worker 继续注入 ignore policy、Git session
+和 file-event owner。由 `scripts/test-worker-git-working-tree-watch-policy-refresh-controller.mjs` 覆盖 apply、skip、
+restart 与 retry gate。
+
 ### 增量抽取：main web-contents diagnostics
 
 `Qot.installWebContentsDiagnostics` 的 renderer crash/unresponsive/did-fail-load 事件订阅、fatal report、recovery
@@ -1558,3 +1566,10 @@ dispose gate。
 prepared text selection 优先级、selection ref 清理、`ou()` 回退、`gu()` 清理和 `rt`/`Je` 分支顺序，入口
 继续注入当前 editor、selection 与 point retry owner。focused test 覆盖 focus、selection open、fallback retry
 与 dispose gate。
+### 增量抽取：annotation text-anchor editor controller
+
+`Wy` 的 text-anchor `Je` editor-open lifecycle 已迁移至
+`src/main/browser-page-preload/annotation-text-anchor-editor-controller.ts`；controller 保留 interaction
+clear、comment preview close、open-editor IPC、viewport refresh、editor state、hover/selection cleanup
+顺序，入口继续注入 React/ref/host owners。focused test 覆盖 text guard、preview 分支、payload/state 与
+dispose gate。
