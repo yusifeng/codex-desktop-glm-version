@@ -1656,3 +1656,9 @@ startup 与 disposal owner。focused test 覆盖 key 复用、正常切换和 fa
 `GitManager.startGitInitWatcher` 的 watcher 构造、active ownership 注册、started/failed/superseded 结果分类与
 dispose 清理已迁移至 `src/main/worker/git-init-watcher-start-controller.ts`；consumer 继续注入 GitInitWatcher
 与 manager callback/logger dependencies。focused test 覆盖正常启动、failed cleanup 与 superseded 处理。
+### 增量抽取：Git repo-watch event controller
+
+`GitManager.createRepoWatch` 的 repo-change event consumer 已迁移至
+`src/main/worker/git-repo-watch-event-controller.ts`；controller 保留 active watch identity guard、working-tree
+path filtering/full invalidation、Git cache invalidation、live-query fanout、performance/raw-event accounting、trace
+与 emit 顺序，consumer 继续注入 repository/watch owner。focused test 覆盖 filtered working-tree 与非 repo event。

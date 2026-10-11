@@ -1455,4 +1455,5 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-init-metadata-apply-controller.mjs](test-worker-git-init-metadata-apply-controller.mjs)
 [test-worker-git-init-watch-desire-controller.mjs](test-worker-git-init-watch-desire-controller.mjs)
 [test-worker-git-init-watcher-start-controller.mjs](test-worker-git-init-watcher-start-controller.mjs)
+[test-worker-git-repo-watch-event-controller.mjs](test-worker-git-repo-watch-event-controller.mjs)
 [test-worker-git-working-tree-watch-policy-refresh-controller.mjs](test-worker-git-working-tree-watch-policy-refresh-controller.mjs)
