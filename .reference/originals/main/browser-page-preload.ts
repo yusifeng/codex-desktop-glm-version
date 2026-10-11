@@ -5984,6 +5984,7 @@ var { createAnnotationDesignModifierNotifier } = require("./browser-page-preload
 var { createAnnotationSelectionModifierNotifier } = require("./browser-page-preload/annotation-selection-modifier-notifier");
 var { createAnnotationHoverSyncController } = require("./browser-page-preload/annotation-hover-sync-controller");
 var { createAnnotationPointerModeSyncController } = require("./browser-page-preload/annotation-pointer-mode-sync-controller");
+var { createAnnotationCommentInteractionDisposalController } = require("./browser-page-preload/annotation-comment-interaction-disposal-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23745,6 +23746,29 @@ function Wy({ rootHost: e, bridge: t }) {
         invalidate: () => w.current?.invalidate(),
       }),
     ),
+    [commentInteractionDisposalController] = (0, G.useState)(() =>
+      createAnnotationCommentInteractionDisposalController({
+        disposeInteraction: () => Te.dispose(),
+        resetModifier: () => {
+          (pe(!1), (be.current = !1), m(!1));
+        },
+        clearPointer: () => f(null),
+        clearHover: () => {
+          (o(null), c(null));
+        },
+        clearSelectionHover: () => u(null),
+        clearTransientState: () => mc(),
+        clearViewportSelection: () => {
+          (xe.current = !1), (Se.current = !1);
+        },
+        nextInteractionGeneration: () => {
+          me.current += 1;
+        },
+        clearDragState: () => {
+          (O.current = null), oe(null);
+        },
+      }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -24246,10 +24270,7 @@ function Wy({ rootHost: e, bridge: t }) {
         cancelUnavailableSiteInteraction: () => { Te.cancel() && (xe.current = !0); pe(!1); },
         clearModifierOnModeChange: () => { ve.current = !1; },
         clearPreparedScreenshot: () => ft(),
-        disposeCommentInteraction: () => {
-          (Te.dispose(), pe(!1), (be.current = !1), m(!1), f(null), o(null), c(null), u(null), mc(),
-            (xe.current = !1), (Se.current = !1), (me.current += 1), (O.current = null), oe(null));
-        },
+        disposeCommentInteraction: () => commentInteractionDisposalController.dispose(),
         clearSelectionModifier: () => u(null),
         applySyncState: (message, scheduleRefresh) => r((previous) => {
           message.zoomPercent !== previous.zoomPercent && scheduleRefresh();

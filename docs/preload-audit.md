@@ -1437,6 +1437,13 @@ focused test 覆盖初始 false、true/false 变化、重复值与 dispose 后�
 interaction registry 的 `setEnabled`/`invalidate`，保留 annotation API、comment、suspension、agent
 控制和 zoom 变化判定。focused test 覆盖启用/禁用、zoom invalidate、agent gate 与 dispose gate。
 
+### 增量抽取：annotation comment-interaction disposal controller
+
+`Wy` host sync 的 `disposeCommentInteraction` 分支固定的 interaction、modifier、pointer、hover、selection、
+transient、generation 与 drag 清理顺序已迁移至
+`src/main/browser-page-preload/annotation-comment-interaction-disposal-controller.ts`；入口继续注入
+各 React/ref/DOM 清理 owner。focused test 覆盖完整顺序与重复 dispose 行为。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover
