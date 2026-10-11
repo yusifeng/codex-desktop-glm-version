@@ -4545,29 +4545,7 @@ function al(e, t, n) {
   return a == null ? null : { additional: o, primary: a };
 }
 function ol(e, t) {
-  return e.anchor.kind === `element` &&
-    t.anchor.kind === `element` &&
-    e.liveElement?.isConnected &&
-    t.liveElement?.isConnected
-    ? e.liveElement === t.liveElement
-    : e.anchor.kind === t.anchor.kind
-      ? e.anchor.kind === `virtual`
-        ? t.anchor.kind === `virtual` &&
-          e.anchor.pageUrl === t.anchor.pageUrl &&
-          e.anchor.surfaceId === t.anchor.surfaceId &&
-          e.anchor.targetId === t.anchor.targetId
-        : e.anchor.pageUrl === t.anchor.pageUrl &&
-          e.anchor.frameUrl === t.anchor.frameUrl &&
-          (e.anchor.kind === `element`
-            ? e.anchor.selector === t.anchor.selector &&
-              e.anchor.elementPath === t.anchor.elementPath
-            : e.anchor.rect.x === t.anchor.rect.x &&
-              e.anchor.rect.y === t.anchor.rect.y &&
-              e.anchor.rect.width === t.anchor.rect.width &&
-              e.anchor.rect.height === t.anchor.rect.height) &&
-          e.anchor.framePath.length === t.anchor.framePath.length &&
-          e.anchor.framePath.every((e, n) => e === t.anchor.framePath[n])
-      : !1;
+  return areAnnotationLiveAnchorsEqual(e, t);
 }
 function sl(e) {
   return resolveAnnotationTargetElement(e, {
@@ -5994,6 +5972,7 @@ var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-ow
 var { getAnnotationElementFramePath } = require("./browser-page-preload/annotation-element-frame-path");
 var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation-anchor-selector");
 var { getAnnotationAnchorPath } = require("./browser-page-preload/annotation-anchor-path");
+var { areAnnotationLiveAnchorsEqual } = require("./browser-page-preload/annotation-live-anchor-equality");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");

@@ -1173,3 +1173,9 @@ focused test 覆盖命中、空命中与非元素结果。
 `src/main/browser-page-preload/annotation-frame-window-resolver.ts`；入口仅注入根 window/document、
 frame element resolver 与安全 window/document 读取，保留空路径返回根 window、路径失败返回 `null` 语义。
 focused test 覆盖空路径、单级成功与缺失 frame。
+
+### 增量抽取：annotation live-anchor equality
+
+运行中 annotation record 的 live element/virtual/element/region anchor equality（原 `ol`，4547-4571）
+已迁移至 `src/main/browser-page-preload/annotation-live-anchor-equality.ts`；入口保留 live element
+优先判等及 frame path、selector、region rect 字段比较。focused test 覆盖 virtual、live element 与 selector mismatch。
