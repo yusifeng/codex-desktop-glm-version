@@ -1410,3 +1410,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-main-browser-use-origin-policy.mjs](test-main-browser-use-origin-policy.mjs)
 [test-main-global-shortcut-policy.mjs](test-main-global-shortcut-policy.mjs)
 [test-worker-git-metadata-refresh-controller.mjs](test-worker-git-metadata-refresh-controller.mjs)
+[test-main-window-presentation-policy.mjs](test-main-window-presentation-policy.mjs)

@@ -573,3 +573,11 @@ dictation 与 appshot native manager 的组装入口。上述边界均为资源�
 connection pending 状态；`dat` 的 dictation force-lock 依赖 global state/native pet webContents；
 `Pit` 的 appshot hotkey assembly 依赖 Windows/native bridge、settings、window manager 与 query
 invalidation。上述 manager options 不能脱离 owner 而不改变生命周期/副作用顺序，本轮不制造 facade。
+### 增量抽取：Windows 窗口透明度 workaround 判定
+
+启动编排 `Be2` 的首次显示分支中，`isWindows && !window.isVisible() &&
+!window.isMinimized()` 只负责判定是否需要在 `show()` 前暂时设置 opacity。该三值判定已迁移至
+`src/main/main-app/startup/window-presentation-policy.ts`，原入口仍持有
+`BrowserWindow` 状态读取、`setOpacity(0)`、`show/focus` 和 `setImmediate` 恢复顺序。
+由 `scripts/test-main-window-presentation-policy.mjs` 覆盖 Windows/visible/minimized 四项矩阵，
+不改变窗口生命周期或副作用 owner。

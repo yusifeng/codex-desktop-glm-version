@@ -2866,3 +2866,7 @@ watcher owner。
 `src/main/browser-page-preload/annotation-selection-modifier-notifier.ts`；入口继续持有
 `be.current`/`Oe`/anchor/shift-key 业务判定，notifier 保留原始每次发送语义并在 dispose 后抑制。
 由 `scripts/test-preload-annotation-selection-modifier-notifier.mjs` 覆盖 6 项 focused assertions。
+2026-10-11 A3 main startup 增量：窗口首次显示时 Windows opacity workaround 的纯判定已迁移至
+`src/main/main-app/startup/window-presentation-policy.ts`，真实接回原 `Be2` consumer；入口继续持有
+BrowserWindow 状态读取、`setOpacity(0)`、show/focus 与 `setImmediate` 恢复顺序。由
+`scripts/test-main-window-presentation-policy.mjs` 覆盖 4 项 focused assertions。

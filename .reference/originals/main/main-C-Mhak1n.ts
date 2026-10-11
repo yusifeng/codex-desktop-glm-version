@@ -28,6 +28,7 @@ const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsI
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource } = require("./main-app/startup/icon-flavor-policy.js");
 const { projectNativeStatusItemMenuState } = require("./main-app/startup/native-status-item-menu.js");
 const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window-options.js");
+const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
 const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transport.js");
@@ -175634,7 +175635,11 @@ async function Ust() {
         e.showInactive();
         return;
       }
-      let n = P && !e.isVisible() && !e.isMinimized();
+    let n = shouldApplyWindowsOpacityWorkaround({
+      isWindows: P,
+      isVisible: e.isVisible(),
+      isMinimized: e.isMinimized(),
+    });
       (n && e.setOpacity(0),
         e.isMinimized() && e.restore(),
         e.show(),
