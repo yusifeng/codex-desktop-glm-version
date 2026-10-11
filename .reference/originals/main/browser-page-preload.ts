@@ -4423,33 +4423,6 @@ function Oc(e, { requireUnique: t = !1 } = {}) {
     escapeToken: (value) => qc(value),
     isUnique: (element, selector) => Wc(element, selector),
   });
-/*
-  let n = [],
-    r = e,
-    i = 0;
-  for (; r != null && (t || i < 4);) {
-    let a = r.tagName.toLowerCase(),
-      o = r.tagName;
-    if (r.id) {
-      a += `#${qc(r.id)}`;
-      let i = [a, ...n].join(` > `);
-      if (!t || Wc(e, i)) return i;
-    }
-    let s = Array.from(r.classList)
-      .filter((e) => /^[a-zA-Z0-9_-]+$/.test(e))
-      .slice(0, 2);
-    s.length > 0 && (a += `.${s.map(qc).join(`.`)}`);
-    let c = r.parentElement;
-    if (c != null) {
-      let e = Array.from(c.children).filter((e) => F(e) && e.tagName === o);
-      e.length > 1 && (a += `:nth-of-type(${e.indexOf(r) + 1})`);
-    }
-    n.unshift(a);
-    let l = n.join(` > `);
-    if (t && Wc(e, l)) return l;
-    ((r = c), (i += 1));
-  }
-  return t || n.length === 0 ? null : n.join(` > `);*/
 }
 function kc(e, { requireUnique: t = !0 } = {}) {
   let n = [],
