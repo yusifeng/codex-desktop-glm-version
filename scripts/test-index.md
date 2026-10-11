@@ -171,6 +171,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-edit-editor-controller.mjs`](./test-preload-annotation-edit-editor-controller.mjs)
 - [`test-preload-annotation-comment-preview-controller.mjs`](./test-preload-annotation-comment-preview-controller.mjs)
 - [`test-preload-annotation-design-editor-open-controller.mjs`](./test-preload-annotation-design-editor-open-controller.mjs)
+- [`test-preload-annotation-virtual-selection-editor-controller.mjs`](./test-preload-annotation-virtual-selection-editor-controller.mjs)
 - [`test-preload-annotation-design-editor-state.mjs`](./test-preload-annotation-design-editor-state.mjs)
 - [`test-preload-annotation-event-details.mjs`](./test-preload-annotation-event-details.mjs)
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)
@@ -1440,4 +1441,5 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-watch-session-start-controller.mjs](test-worker-git-watch-session-start-controller.mjs)
 [test-worker-git-watch-change-controller.mjs](test-worker-git-watch-change-controller.mjs)
 [test-worker-git-init-session-start-controller.mjs](test-worker-git-init-session-start-controller.mjs)
+[test-worker-git-init-watch-session-controller.mjs](test-worker-git-init-watch-session-controller.mjs)
 [test-worker-git-working-tree-watch-policy-refresh-controller.mjs](test-worker-git-working-tree-watch-policy-refresh-controller.mjs)

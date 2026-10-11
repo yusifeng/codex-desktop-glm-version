@@ -23952,6 +23952,27 @@ function Wy({ rootHost: e, bridge: t }) {
         closePopover: () => g(!1),
       }),
     ),
+    [virtualSelectionEditorController] = (0, G.useState)(() =>
+      createAnnotationVirtualSelectionEditorController({
+        clearDomInteraction: () => w.current?.clear(),
+        closePreview: (commentId) => {
+          (t.sendMessageToHost({ type: `browser-sidebar-runtime-close-comment-preview`, commentId }), v(null));
+        },
+        projectAnchor: (text, zoom) => iv(text, zoom),
+        projectDesign: (element, anchorState, controls) => sy(element, anchorState, controls),
+        rememberTarget: (id, element) => i.rememberTarget(id, element),
+        resetModifier: () => {
+          (be.current = !1), m(!1);
+        },
+        clearPointer: () => f(null),
+        clearHover: () => {
+          (o(null), c(null));
+        },
+        clearSelectionHover: () => gu(),
+        setEditorState: (state) => S(state),
+        openEditor: (payload) => t.sendMessageToHost(payload),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24099,38 +24120,13 @@ function Wy({ rootHost: e, bridge: t }) {
       [t],
     ),
     et = (0, G.useEffectEvent)((e, n) => {
-      if (x != null) {
-        w.current?.clear();
-        return;
-      }
-      _ != null && $e(_);
-      let r = iv(e, j),
-        a = Ne ? t.getAnnotationControls?.(n) : void 0,
-        s = a?.controls.length ? sy(n, r, a) : void 0;
-      (s != null && i.rememberTarget(s.id, n),
-        (be.current = !1),
-        m(!1),
-        f(null),
-        o(null),
-        c(null),
-        gu(),
-        S({
-          target: { mode: `create` },
-          anchor: {
-            type: `virtual`,
-            additionalSelections: [],
-            value: e,
-            themeVariant: r.themeVariant,
-            viewportSize: r.viewportSize,
-          },
-        }),
-        t.sendMessageToHost({
-          type: `browser-sidebar-runtime-open-editor`,
-          target: { mode: `create` },
-          anchorState: r,
-          designEditorState: s,
-          wantsScreenshot: !0,
-        }));
+      virtualSelectionEditorController.open(e, n, {
+        editorOpen: x != null,
+        previewCommentId: _,
+        zoom: j,
+        canUseTweaks: Ne,
+        getAnnotationControls: t.getAnnotationControls,
+      });
     }),
     tt = (0, G.useEffectEvent)((t, n) => {
       if (x != null || k !== `comment`) return;
@@ -24350,6 +24346,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => editEditorController.dispose(), [editEditorController]),
     (0, G.useEffect)(() => () => commentPreviewController.dispose(), [commentPreviewController]),
     (0, G.useEffect)(() => () => designEditorOpenController.dispose(), [designEditorOpenController]),
+    (0, G.useEffect)(() => () => virtualSelectionEditorController.dispose(), [virtualSelectionEditorController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);

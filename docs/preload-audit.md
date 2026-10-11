@@ -6,6 +6,8 @@
 
 另新增 `annotation-design-editor-open-controller.ts`，真实接回 Wy 的 `Ze` design-editor lifecycle，保留 DOM anchor normalization、card viewport projection、target registry、IPC 与 editor state 顺序。
 
+另新增 `annotation-virtual-selection-editor-controller.ts`，真实接回 Wy 的 `et` virtual-selection editor lifecycle，保留 editor-open gate、preview close、design controls、modifier/hover cleanup 与 create-editor IPC/state 顺序。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
@@ -1603,3 +1605,8 @@ focused test 覆盖 ignore-source、working-tree/head 分发、空变更恢复�
 `src/main/worker/git-init-session-start-controller.ts`；controller 保留 root watcher 优先、metadata watcher
 降级、失败时 sessions dispose、existing Git directory 检查与最终 readiness gate 顺序，consumer 继续注入
 host/session/logger owner。focused test 覆盖正常双 watcher、metadata 缺失降级和失败清理。
+### 增量抽取：Git init watch-session controller
+
+`GitInitWatcher.startWatch` 的 host watch 创建、disposed race、session 注册、closed error/reconnect 生命周期已迁移至
+`src/main/worker/git-init-watch-session-controller.ts`；consumer 保留原始 watch options、logger、session set 与
+reconnect owner。focused test 覆盖正常注册、watch-error 清理/reconnect 与 disposed race。
