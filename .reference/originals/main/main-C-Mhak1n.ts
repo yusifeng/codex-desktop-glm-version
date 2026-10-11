@@ -28,6 +28,7 @@ const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsI
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource } = require("./main-app/startup/icon-flavor-policy.js");
 const { projectNativeStatusItemMenuState } = require("./main-app/startup/native-status-item-menu.js");
 const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window-options.js");
+const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-titlebar-overlay-sync.js");
 const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
@@ -173221,21 +173222,15 @@ var Qot = class {
     });
   }
   installApplicationMenuTitleBarOverlaySync(e, t) {
-    if (
-      (process.platform !== `win32` && process.platform !== `linux`) ||
-      (t !== `primary` && t !== `quickChat` && t !== `detached`)
-    )
-      return;
-    let n = () => {
-      e.isDestroyed() || e.setTitleBarOverlay(j9(this.windowZooms.get(e.id)));
-    };
-    return (
-      l.nativeTheme.on(`updated`, n),
-      n(),
-      () => {
-        l.nativeTheme.off(`updated`, n);
-      }
-    );
+    return installWindowTitlebarOverlaySync({
+      platform: process.platform,
+      appearance: t,
+      eligibleAppearances: new Set([`primary`, `quickChat`, `detached`]),
+      nativeTheme: l.nativeTheme,
+      isDestroyed: () => e.isDestroyed(),
+      setTitleBarOverlay: (options) => e.setTitleBarOverlay(options),
+      getOverlay: () => j9(this.windowZooms.get(e.id)),
+    });
   }
   isOpaqueWindowsEnabled() {
     return (

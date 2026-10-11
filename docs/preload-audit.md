@@ -1457,3 +1457,11 @@ dispose gate。
 清理顺序已迁移至 `src/main/browser-page-preload/annotation-editor-restore-controller.ts`；入口继续注入 React
 refs/setters 与 `H_` restore adapter，保持 host restore message 的原始副作用顺序。由
 `scripts/test-preload-annotation-editor-restore-controller.mjs` 覆盖顺序、message 透传与 null restore。
+
+### 增量抽取：main window titlebar overlay sync
+
+`Qot.installApplicationMenuTitleBarOverlaySync` 的 platform/appearance gate、nativeTheme `updated` 订阅、
+初次 overlay 应用与 cleanup 已迁移至 `src/main/main-app/startup/window-titlebar-overlay-sync.ts`；window manager
+继续注入 BrowserWindow 与 zoom/overlay 计算，保持原始窗口生命周期顺序。由
+`scripts/test-main-window-titlebar-overlay-sync.mjs` 覆盖 gate、initial update、theme update、destroyed window
+与 cleanup。

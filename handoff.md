@@ -2882,6 +2882,12 @@ transient、hover 与 selection-hover 清理顺序已物理迁移至
 `src/main/browser-page-preload/annotation-editor-restore-controller.ts`；入口继续注入 React refs/setters 与
 `H_` restore adapter，保持原始 host message 副作用顺序。由
 `scripts/test-preload-annotation-editor-restore-controller.mjs` 覆盖 12 项 focused assertions。
+
+2026-10-11 A3 main 增量：`Qot.installApplicationMenuTitleBarOverlaySync` 的 platform/appearance gate、
+nativeTheme `updated` 订阅、初次 overlay 应用与 cleanup 已物理迁移至
+`src/main/main-app/startup/window-titlebar-overlay-sync.ts`；`Qot` 继续注入 BrowserWindow 与 zoom/overlay
+计算，保持原始窗口生命周期顺序。由 `scripts/test-main-window-titlebar-overlay-sync.mjs` 覆盖 6 项 focused
+assertions，typecheck/build/verify-chunks 通过。
 2026-10-11 A2 preload 增量：`Wy` 的 `syncHover` 指针模式更新、DOM hover 命中优先级、pointer/hover
 React state 与 fallback overlay 派生已物理迁移至 `src/main/browser-page-preload/annotation-hover-sync-controller.ts`；
 入口通过注入 `Te.updatePointer`、DOM hover registry、`pl`/`Yy`/`ss` 与 React setters 保留原始
