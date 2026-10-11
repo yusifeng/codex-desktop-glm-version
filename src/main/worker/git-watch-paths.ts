@@ -174,6 +174,17 @@ function selectGitMetadataRefreshPaths(
   );
 }
 
+/** Selects active watcher targets affected by changed metadata directories. */
+function selectGitWatchTargetsForMetadataRefresh<T extends { metadataDirectory?: unknown; watchPath: string }>(
+  targets: T[],
+  changedPaths: string[],
+  isWithin: (root: string, candidate: string) => boolean,
+): T[] {
+  return targets.filter((target) =>
+    target.metadataDirectory != null && changedPaths.some((path) => isWithin(path, target.watchPath)),
+  );
+}
+
 /** Computes stale and newly discovered worktree watch paths without session side effects. */
 /** Filters changed paths for one watcher handler and normalizes working-tree Git metadata paths. */
 function collectGitWatchHandlerPaths(pathApi: (PathApi & { join(...parts: string[]): string }) | null, root: string, handler: { changeType: string; shouldHandleChangedPath: (path: string, cache: Map<string, boolean>) => boolean }, changedPaths: string[], cache: Map<string, boolean>): string[] {
@@ -186,5 +197,5 @@ function collectGitWatchHandlerPaths(pathApi: (PathApi & { join(...parts: string
   });
 }
 
-export { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry };
-if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry };
+export { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, selectGitWatchTargetsForMetadataRefresh, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry };
+if (typeof module !== `undefined`) module.exports = { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, selectGitWatchTargetsForMetadataRefresh, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry };

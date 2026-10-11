@@ -1587,3 +1587,6 @@ dispose promise、metadata refresh promise 和 event ordering。session 的 live
 watcher 与 close path 还绑定 telemetry、Git I/O、parent event 与 cancellation owner。
 现有 `git-watch-paths`、watch lifecycle、close/setup/request handlers 已覆盖可脱离的纯 projection；
 其余拆分会复制状态 owner 或改变 cleanup/emit 顺序，本轮保持 business-preserved，不新增 facade。
+Metadata refresh 中受影响 watcher target 的筛选已迁移至 `selectGitWatchTargetsForMetadataRefresh`；
+worker 仍持有 path API、target session、dispose/restart 与 refresh ordering。由
+`scripts/test-worker-git-watch-target-selection.mjs` 覆盖 metadata guard、命中和多目录选择。

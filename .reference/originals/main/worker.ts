@@ -182,7 +182,7 @@ const { resolveDesktopEntryMetadata } = require("./worker/linux-desktop-entry-po
 const { sortPlatformEntryNames } = require("./worker/platform-entry-order");
 const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation, buildTextMateOpenArgs } = require("./worker/editor-target-args");
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
-const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
+const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, selectGitWatchTargetsForMetadataRefresh, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68950,9 +68950,7 @@ var Jye = 1e3,
           for (; !this.disposed && this.changedMetadataDirectories.size > 0;) {
             let e = [...this.changedMetadataDirectories];
             this.changedMetadataDirectories.clear();
-            let t = this.watchTargets.filter(
-              (t) => t.metadataDirectory != null && e.some((e) => M6(n, e, t.watchPath)),
-            );
+            let t = selectGitWatchTargetsForMetadataRefresh(this.watchTargets, e, (e, t) => M6(n, e, t));
             (await Promise.all(
               t.map(async (e) => {
                 e.retryTimer ??
