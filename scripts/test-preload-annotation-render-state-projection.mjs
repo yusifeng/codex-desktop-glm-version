@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { projectAnnotationRenderState } from "../app/.vite/build/browser-page-preload/annotation-render-state-projection.js";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { projectAnnotationRenderState } = require("../app/.vite/build/browser-page-preload/annotation-render-state-projection.js");
 
 const cache = new Map();
 const overlays = [{ key: "overlay" }];
