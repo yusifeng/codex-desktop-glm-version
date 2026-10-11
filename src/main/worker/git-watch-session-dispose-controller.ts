@@ -12,8 +12,6 @@ function disposeGitWatchSession(dependencies: GitWatchSessionDisposeDependencies
   const target = dependencies.target;
   const session = target.session;
   const startPromise = target.sessionStartPromise;
-  const existing = target.sessionDisposePromise;
-  if (existing != null) return existing;
   target.generation += 1;
   dependencies.cancelRetry(target);
   target.session = null;
