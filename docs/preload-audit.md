@@ -1620,3 +1620,8 @@ reconnect owner。focused test 覆盖正常注册、watch-error 清理/reconnect
 补启动与 worktree topology refresh 已迁移至 `src/main/worker/git-metadata-refresh-batch-controller.ts`；consumer
 保留原始两段 `Promise.all` 顺序与 watcher owner 注入。focused test 覆盖 recovery restart、retry target 跳过与
 disposed gate。
+### 增量抽取：Git init recovery controller
+
+`GitManager.handleGitInit` 的 metadata refresh、watch-git-metadata 重启、desired-key 竞态 guard 与失败回收已迁移至
+`src/main/worker/git-init-recovery-controller.ts`；consumer 继续注入 manager 的 watcher/metadata owner，保留
+原始 handled-set、refresh 顺序和 finally/catch 清理语义。focused test 覆盖成功重启、已刷新短路与异常回收。
