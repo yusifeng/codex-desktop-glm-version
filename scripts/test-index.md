@@ -182,6 +182,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-pip-video-decoder-controller.mjs`](./test-preload-pip-video-decoder-controller.mjs)
 - [`test-preload-system-theme-variant-controller.mjs`](./test-preload-system-theme-variant-controller.mjs)
 - [`test-preload-worker-message-subscription-controller.mjs`](./test-preload-worker-message-subscription-controller.mjs)（运行：`node --experimental-strip-types scripts/test-preload-worker-message-subscription-controller.mjs`）
+- [`test-preload-view-message-router-controller.mjs`](./test-preload-view-message-router-controller.mjs)（运行：`node --experimental-strip-types scripts/test-preload-view-message-router-controller.mjs`）
 - [`test-preload-annotation-design-editor-state.mjs`](./test-preload-annotation-design-editor-state.mjs)
 - [`test-preload-annotation-event-details.mjs`](./test-preload-annotation-event-details.mjs)
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)
@@ -1464,4 +1465,5 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-performance-operation-controller.mjs](test-worker-git-performance-operation-controller.mjs)
 [test-worker-git-request-finalization-controller.mjs](test-worker-git-request-finalization-controller.mjs)
 [test-worker-git-request-completion-controller.mjs](test-worker-git-request-completion-controller.mjs)
+[test-worker-git-request-admission-controller.mjs](test-worker-git-request-admission-controller.mjs)
 [test-worker-git-working-tree-watch-policy-refresh-controller.mjs](test-worker-git-working-tree-watch-policy-refresh-controller.mjs)

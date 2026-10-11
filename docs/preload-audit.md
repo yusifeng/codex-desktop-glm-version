@@ -28,6 +28,8 @@
 
 新增 `src/main/preload/worker-message-subscription-controller.ts`，真实接回 `electron-bridge.ts` worker IPC subscription registry：按 worker 懒注册、消息 fan-out、最后订阅者 removeListener 与 dispose。
 
+新增 `src/main/preload/view-message-router-controller.ts`，真实接回 `preload/index.ts` 的 `MESSAGE_FOR_VIEW` 路由：shared-object 更新、PIP layout cleanup 与 DOM MessageEvent dispatch 顺序保持不变。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
@@ -1697,3 +1699,8 @@ request/host/cache owners。focused test 覆盖 exact invalidation、mutation re
 `src/main/worker/git-request-completion-controller.ts`；controller 保留 cancellation telemetry、failure outcome、
 response envelope、performance emission 与 worker-response emit 顺序。focused test 覆盖正常 response 与 tracked
 abort completion。
+### 增量抽取：Git request admission controller
+
+`GitManager.handleRequestWithContext` 的 request lifecycle begin、tracked admission 与 pre-cancelled cancellation
+telemetry/early return 已迁移至 `src/main/worker/git-request-admission-controller.ts`；consumer 继续注入 request
+lifecycle、performance 与 outcome owner。focused test 覆盖 started 与 pre-cancelled 分支。

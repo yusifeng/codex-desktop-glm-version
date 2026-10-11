@@ -9,6 +9,8 @@
 本轮新增 `worker-message-subscription-controller.ts`，真实接回 preload worker IPC subscription registry；focused test 为 `scripts/test-preload-worker-message-subscription-controller.mjs`。
 该 focused test 直接导入 TS controller，运行命令为 `node --experimental-strip-types scripts/test-preload-worker-message-subscription-controller.mjs`。
 
+本轮新增 `view-message-router-controller.ts`，真实接回 preload `MESSAGE_FOR_VIEW` event routing；focused test 为 `scripts/test-preload-view-message-router-controller.mjs`，运行同样使用 `node --experimental-strip-types`。
+
 本轮新增 `annotation-edit-editor-controller.ts`，真实接回 Wy 的 `Ye` edit-editor callback。controller 注入 target map、comment/anchor/design projection 与 host/React side effects，保持 `close preview -> open editor IPC -> viewport refresh -> editor state -> clear preview` 顺序；focused test 为 `scripts/test-preload-annotation-edit-editor-controller.mjs`。
 
 同轮新增 `annotation-comment-preview-controller.ts`，真实接回 Wy 的 `Xe` comment-preview callback；focused test 为 `scripts/test-preload-annotation-comment-preview-controller.mjs`。
@@ -3072,3 +3074,7 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 
 - `GitManager.handleRequestWithContext` 的 post-finalization cancellation/failure/response completion 已迁移至 `src/main/worker/git-request-completion-controller.ts`，保留 cancellation telemetry、failure outcome、response envelope、performance emission 与 worker-response emit 顺序。
 - focused test、typecheck、build、chunk/shared audit 均通过。
+# 本轮新增：git-request-admission-controller
+
+- `GitManager.handleRequestWithContext` 的 request admission、tracked lifecycle begin 与 pre-cancelled cancellation telemetry/early return 已迁移至 `src/main/worker/git-request-admission-controller.ts`。
+- 保留 `operation == null` 时的 canceled outcome 语义；focused test、typecheck、build、chunk/shared audit 均通过。
