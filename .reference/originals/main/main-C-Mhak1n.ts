@@ -27,6 +27,7 @@ const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeou
 const { resolveTrayIconCandidates } = require("./main-app/startup/tray-icon-paths.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
+const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
 const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
@@ -174479,14 +174480,11 @@ function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicati
       },
     }),
     u = new H9(`open-in`, { startupConfig: n, applicationNetwork: r }),
-    d = new Map();
+    shortcutLinkReader = createShortcutLinkReader((e) => l.shell.readShortcutLink(e));
   u.setMainRpcHandler(async (e) => {
     switch (e.method) {
       case `read-shortcut-link`: {
-        let t = d.get(e.params.path);
-        t ?? ((t = l.shell.readShortcutLink(e.params.path)), d.set(e.params.path, t));
-        let { icon: n, target: r } = t;
-        return { icon: n, target: r };
+        return shortcutLinkReader(e.params.path);
       }
       case `ces-telemetry`:
         throw Error(`Unsupported open-in worker request`);

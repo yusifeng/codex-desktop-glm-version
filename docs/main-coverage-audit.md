@@ -262,6 +262,14 @@ flavor、允许的 flavor 集合和注入的设置 getter；nativeTheme、dock�
 更新仍由窗口服务 owner 负责。`scripts/test-main-dock-icon-policy.mjs` 覆盖已配置、缺省、Agent
 固定默认值、未知 flavor 与空允许集合共 5 项断言。
 
+### 增量抽取：open-in shortcut-link cache
+
+`xst` worker assembly 中 `read-shortcut-link` 的按路径缓存与 `{ icon, target }` 投影已迁移至
+`src/main/main-app/worker/shortcut-link-cache.ts`。模块通过注入 `shell.readShortcutLink`
+保持平台 I/O 在入口，open-in RPC handler 仍负责方法分派与错误语义；由
+`scripts/test-main-shortcut-link-cache.mjs` 覆盖同路径命中缓存、不同路径重新读取和字段投影共
+4 项断言。
+
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至

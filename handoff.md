@@ -1505,6 +1505,9 @@ main window-services assembly 的 Dock icon preference flavor 策略已迁移至
 `src/main/main-app/startup/startup-policy.ts` 的 `resolveDockIconPreference`；入口继续持有
 nativeTheme、dock/nativeImage 与窗口图标更新副作用，由
 `scripts/test-main-dock-icon-policy.mjs` 覆盖 5 项 flavor/default/fallback 断言。
+main `xst` worker assembly 的 open-in `read-shortcut-link` 按路径缓存与结果投影已迁移至
+`src/main/main-app/worker/shortcut-link-cache.ts`；入口继续注入 `shell.readShortcutLink` 并
+持有 RPC 方法分派/生命周期，由 `scripts/test-main-shortcut-link-cache.mjs` 覆盖 4 项断言。
 worker-main RPC 的方法白名单、取消消息和请求消息校验已迁移至
 `src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托，
 由 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言；RPC 调度与
