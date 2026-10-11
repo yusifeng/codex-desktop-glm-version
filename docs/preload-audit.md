@@ -1573,3 +1573,9 @@ prepared text selection 优先级、selection ref 清理、`ou()` 回退、`gu()
 clear、comment preview close、open-editor IPC、viewport refresh、editor state、hover/selection cleanup
 顺序，入口继续注入 React/ref/host owners。focused test 覆盖 text guard、preview 分支、payload/state 与
 dispose gate。
+### 增量抽取：annotation editor-comment reconciliation controller
+
+`Wy` 的 `pt` editor/comment reconciliation callback 已迁移至
+`src/main/browser-page-preload/annotation-editor-comment-reconciliation-controller.ts`；controller 保留
+null state、design target、无 `commentId` target 与 stale comment 清理 predicate，入口继续注入 React
+editor state setter。focused test 覆盖保留/清理各 target 分支与 dispose gate。

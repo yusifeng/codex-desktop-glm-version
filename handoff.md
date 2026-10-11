@@ -2989,3 +2989,8 @@ clear、comment preview close、open-editor IPC、viewport refresh、editor stat
 顺序，入口继续注入 React/ref/host owners。由
 `scripts/test-preload-annotation-text-anchor-editor-controller.mjs` 覆盖 text guard、preview 分支、
 payload/state 与 dispose gate。
+2026-10-11 A2 preload 增量：`Wy` 的 `pt` editor/comment reconciliation callback 已物理迁移至
+`src/main/browser-page-preload/annotation-editor-comment-reconciliation-controller.ts`；controller 保留
+null state、design target、无 `commentId` target 与 stale comment 清理 predicate，入口继续注入 React
+editor state setter。由 `scripts/test-preload-annotation-editor-comment-reconciliation-controller.mjs`
+覆盖保留/清理各 target 分支与 dispose gate。

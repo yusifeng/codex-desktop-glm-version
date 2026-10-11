@@ -5994,6 +5994,7 @@ var { createAnnotationPointSelectionController } = require("./browser-page-prelo
 var { createAnnotationDesignPointSelectionController } = require("./browser-page-preload/annotation-design-point-selection-controller");
 var { createAnnotationSelectionCommentController } = require("./browser-page-preload/annotation-selection-comment-controller");
 var { createAnnotationTextAnchorEditorController } = require("./browser-page-preload/annotation-text-anchor-editor-controller");
+var { createAnnotationEditorCommentReconciliationController } = require("./browser-page-preload/annotation-editor-comment-reconciliation-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23902,6 +23903,11 @@ function Wy({ rootHost: e, bridge: t }) {
         clearSelectionHover: () => gu(),
       }),
     ),
+    [editorCommentReconciliationController] = (0, G.useState)(() =>
+      createAnnotationEditorCommentReconciliationController({
+        updateEditorState: (update) => S(update),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24241,15 +24247,9 @@ function Wy({ rootHost: e, bridge: t }) {
         }),
         v(null));
     }),
-    pt = (0, G.useEffectEvent)((e) => {
-      S((t) => {
-        if (t == null) return t;
-        let n = t.target;
-        return n.mode === `design` || !(`commentId` in n) || e.some((e) => e.id === n.commentId)
-          ? t
-          : null;
-      });
-    }),
+    pt = (0, G.useEffectEvent)((comments) =>
+      editorCommentReconciliationController.reconcile(comments),
+    ),
     mt = (0, G.useEffectEvent)((e) => {
       (e != null &&
         t.sendMessageToHost({
@@ -24371,6 +24371,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => designPointSelectionController.dispose(), [designPointSelectionController]),
     (0, G.useEffect)(() => () => selectionCommentController.dispose(), [selectionCommentController]),
     (0, G.useEffect)(() => () => textAnchorEditorController.dispose(), [textAnchorEditorController]),
+    (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {
