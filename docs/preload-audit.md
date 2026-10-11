@@ -1451,6 +1451,13 @@ transient、generation 与 drag 清理顺序已迁移至
 setter，host clear-preview IPC（`ft`）仍保持独立语义。focused test 覆盖保留、过期清理、主动清理与
 dispose gate。
 
+### 增量抽取：worker Git watch session dispose controller
+
+`GitRepoWatcher.disposeSession` 的 generation bump、retry cancel、session/start promise 清理、session dispose
+错误降级、幂等 dispose promise 与 recovery 更新已迁移至
+`src/main/worker/git-watch-session-dispose-controller.ts`；worker 继续注入具体 watcher session 与日志 owner。
+由 `scripts/test-worker-git-watch-session-dispose-controller.mjs` 覆盖取消、清理、错误和 promise identity。
+
 ### 增量抽取：annotation unavailable-site interaction controller
 
 `Wy` host sync 的 `cancelUnavailableSiteInteraction` 分支已迁移至
@@ -1523,3 +1530,10 @@ attempt reset 与 primary-window gone 通知已迁移至 `src/main/main-app/wind
 watch target 与 ignore map 清空，以及 pending metadata promise 的幂等汇合已迁移至
 `src/main/worker/git-repo-watcher-dispose-controller.ts`；worker 继续注入具体 session/I/O owner。由
 `scripts/test-worker-git-repo-watcher-dispose-controller.mjs` 覆盖 cleanup 顺序与重复 dispose promise identity。
+### 增量抽取：annotation point-selection controller
+
+`Wy` 的 `createCommentAtPoint` callback（`rt`）点选优先级已迁移至
+`src/main/browser-page-preload/annotation-point-selection-controller.ts`；controller 保留 editor focus、
+captured point freshness/select/fallback、interaction registry select、DOM hit-test、anchor projection 与
+`qe` open 顺序，入口继续注入当前 context 和 editor IPC/state owner。focused test 覆盖各优先级、fallback
+与 dispose gate。

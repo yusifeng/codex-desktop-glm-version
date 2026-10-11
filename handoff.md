@@ -2950,3 +2950,13 @@ dispose gate。
 metadata controller dispose、watch target 与 ignore map 清空，以及 pending metadata promise 的幂等汇合已物理
 迁移至 `src/main/worker/git-repo-watcher-dispose-controller.ts`；worker 继续注入具体 session/I/O owner。由
 `scripts/test-worker-git-repo-watcher-dispose-controller.mjs` 覆盖 10 项 focused assertions。
+
+2026-10-11 A1 worker 增量：`GitRepoWatcher.disposeSession` 的 generation bump、retry cancel、session/start promise
+清理、session dispose 错误降级、幂等 dispose promise 与 recovery 更新已物理迁移至
+`src/main/worker/git-watch-session-dispose-controller.ts`；worker 继续注入具体 watcher session 与日志 owner。
+由 `scripts/test-worker-git-watch-session-dispose-controller.mjs` 覆盖 8 项 focused assertions。
+2026-10-11 A2 preload 增量：`Wy` 的 `createCommentAtPoint` callback（`rt`）点选优先级已物理迁移至
+`src/main/browser-page-preload/annotation-point-selection-controller.ts`；controller 保留 editor focus、
+captured point freshness/select/fallback、interaction registry select、DOM hit-test、anchor projection 与
+`qe` open 顺序，入口继续注入当前 context 和 editor IPC/state owner。由
+`scripts/test-preload-annotation-point-selection-controller.mjs` 覆盖各优先级、fallback 与 dispose gate。
