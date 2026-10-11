@@ -145,6 +145,7 @@ import {
 import { createExecuteTurnStart } from "./turn-dispatch";
 import { steerTurn, stopConversation } from "./turn-steer";
 import { StreamRecovery, ResumeNotificationBuffer } from "./stream-recovery";
+import { ThreadGoalHydrationRegistry } from "./thread-goal-hydration-registry";
 import { RealtimeThreadState, resumeRealtimeThreadGoal, setThreadGoalStatus, updateApprovalsReviewerForTurn } from "./realtime-thread-state";
 import { SubagentTopology } from "./subagent-topology";
 import {
@@ -227,7 +228,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
   streamState: AppServerManagerStreamState;
   turnStartObservations: any;
   executeTurnStart: any;
-  pendingThreadGoalHydrations = new Map<string, symbol>();
+  pendingThreadGoalHydrations = new ThreadGoalHydrationRegistry(() => this.disposed);
   pendingThreadSettingsUpdates = createThreadSettingsUpdateRegistry();
   defaultTurnConfig: any;
   inFlightConversationResumes = new Map<string, { promise: Promise<any>; cancel: () => void; source: string }>();
@@ -593,7 +594,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
         this.pagination.cancelItemLoads(conversationId);
         this.inFlightConversationResumes.get(conversationId)?.cancel();
         this.inFlightConversationResumes.delete(conversationId);
-        this.pendingThreadGoalHydrations.delete(conversationId);
+        this.pendingThreadGoalHydrations.cancel(conversationId);
       },
       inactiveThreadUnsubscriber: this.inactiveThreadUnsubscriber,
       itemStreamState: this.itemStreamState,
@@ -781,19 +782,15 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
   }
 
   beginThreadGoalHydration(conversationId: string) {
-    let symbol = Symbol();
-    this.pendingThreadGoalHydrations.set(conversationId, symbol);
-    return symbol;
+    return this.pendingThreadGoalHydrations.begin(conversationId);
   }
 
   isCurrentThreadGoalHydration(conversationId: string, symbol: symbol) {
-    return !this.disposed && this.pendingThreadGoalHydrations.get(conversationId) === symbol;
+    return this.pendingThreadGoalHydrations.isCurrent(conversationId, symbol);
   }
 
   endThreadGoalHydration(conversationId: string, symbol: symbol) {
-    return this.isCurrentThreadGoalHydration(conversationId, symbol)
-      ? (this.pendingThreadGoalHydrations.delete(conversationId), true)
-      : false;
+    return this.pendingThreadGoalHydrations.end(conversationId, symbol);
   }
 
   get conversations() {

@@ -1,0 +1,17 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { ThreadGoalHydrationRegistry } = require("../app/.vite/build/main-app/conversation/thread-goal-hydration-registry.js");
+let disposed = false;
+const registry = new ThreadGoalHydrationRegistry(() => disposed);
+const first = registry.begin("c1");
+assert.equal(registry.isCurrent("c1", first), true);
+const second = registry.begin("c1");
+assert.equal(registry.isCurrent("c1", first), false);
+assert.equal(registry.end("c1", first), false);
+assert.equal(registry.end("c1", second), true);
+const third = registry.begin("c2");
+disposed = true;
+assert.equal(registry.isCurrent("c2", third), false);
+registry.clear();
+console.log("7 thread-goal hydration registry assertions passed");
