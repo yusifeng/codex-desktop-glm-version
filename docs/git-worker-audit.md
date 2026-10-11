@@ -1609,6 +1609,14 @@ Watch session close 的 active-session race、watch-error logging、session 清�
 recovery update 与 retry scheduling 顺序已迁移至 `git-watch-session-close-controller.ts`；worker 仍注入
 target/session owner、logger、recovery 与 retry callbacks。`scripts/test-worker-git-watch-session-close-controller.mjs`
 覆盖 active/error/stable 顺序及 stale-session race。
+### A1 最终复核：metadata refresh generation/waiter
+
+`GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、
+单飞 `metadataRefreshPromise`、dispose gate、retry flag 与循环 waiter；每批还会触发 target session
+dispose/start 和 `refreshWorktreeDirectories`。`refreshWorktreeDirectories`（约 68995）同时依赖 host
+`readDirectory`、target generation 检查、missing metadata、stale/new path partition、`watchTargets`
+mutation、session cleanup/retry。任一 generation/waiter controller 若脱离这些状态会复制 promise/Map
+owner 或改变 dispose/restart 顺序，因此本轮不新增 facade。
 Repo-changed debounce/emit controller 已在 commit `7ebe836a` 物理接回；watch retry controller 已在
 `3babe952` 接回，dispose target cleanup 修正在 `0c610f08`。focused tests 覆盖 timer/emit、retry
 backoff/race/cancel 与 cleanup；剩余 session close/recovery 仍绑定 watcher coverage、Git host watcher

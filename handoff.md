@@ -2831,6 +2831,12 @@ Git operation state、event payload、telemetry 和 emit。`scripts/test-worker-
 session/disposed race、cancel 与 cleanup。A1 剩余 session close/recovery 仍与 watcher coverage、
 Git host watcher dispose、telemetry 和 event ordering 绑定，尚无安全独立边界。
 
+2026-10-11 A1 最终 owner 复核：`GitRepoWatcher.refreshMetadataDirectories`（约 68960）绑定
+`changedMetadataDirectories` 批次、单飞 `metadataRefreshPromise`、dispose/retry waiter 与 target
+session dispose/start；`refreshWorktreeDirectories`（约 68995）绑定 host `readDirectory`、generation
+检查、missing/stale/new target partition、`watchTargets` mutation、session cleanup/retry。generation/
+waiter 单独抽取会复制 promise/Map owner 或改变 dispose/restart 顺序，本轮不新增 facade。
+
 2026-10-11 A1 worker 增量：Git watch session close lifecycle 已物理迁移至
 `src/main/worker/git-watch-session-close-controller.ts`（commit `05baf39a`）；active-session race、
 watch-error callback、session 清理、稳定阈值 retry reset、recovery update 与 retry scheduling 顺序
