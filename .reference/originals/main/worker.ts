@@ -109,6 +109,7 @@ const { handleGitRepoWatchEvent } = require("./worker/git-repo-watch-event-contr
 const { deleteGitWorktreeLifecycle } = require("./worker/git-worktree-delete-lifecycle-controller");
 const { runGitLiveQueryWithAttribution } = require("./worker/git-live-query-attribution-controller");
 const { emitGitPerformanceOperation: emitGitPerformanceOperationController } = require("./worker/git-performance-operation-controller");
+const { finalizeGitRequest } = require("./worker/git-request-finalization-controller");
 const { getGitPerformanceRepoIndexSizeBucket } = require("./worker/git-watch-index-bucket");
 const { collectTrackedUncommittedDiff } = require("./worker/git-uncommitted-diff");
 const { captureTurnDiffSnapshotTree } = require("./worker/git-turn-diff-snapshot");
@@ -70044,27 +70045,12 @@ var I6 = kW(`git`),
                 ? X({ origins: [] })
                 : EV(t)));
       } finally {
-        let t = resolveGitInvalidationTarget(e, xz, bz);
-        if (
-          (t?.type === `exact`
-            ? await this.gitManager.invalidateUntrackedPathsCacheForCwd(t.cwd, o)
-            : t?.type === `host` && this.gitManager.invalidateUntrackedPathsCache(o),
-          isGitMutationMethod(e.method))
-        ) {
-          let t = resolveMutationRoot(e, xz, bz);
-          if (t != null)
-            try {
-              await this.gitManager.invalidateGitReadCachesForMutation(t, o);
-            } catch {}
-        }
-        if (d != null)
-          try {
-            let e = await this.gitManager.getStableMetadata(d, o);
-            e != null &&
-              (p2(this.gitManager.getWorktreeRepositoryForRoot(e.root, o)),
-              await this.liveQueryRegistry.refreshRepository(o.id, e.root));
-          } catch {}
-        this.requestLifecycle.finish(e.id, f);
+        await finalizeGitRequest({ request: e, tracked: f, host: o, refreshRoot: d, resolveInvalidationTarget: (request) => resolveGitInvalidationTarget(request, xz, bz),
+          invalidateUntrackedPaths: (cwd, host) => this.gitManager.invalidateUntrackedPathsCacheForCwd(cwd, host), invalidateUntrackedHost: (host) => this.gitManager.invalidateUntrackedPathsCache(host),
+          isMutation: isGitMutationMethod, resolveMutationRoot: (request) => resolveMutationRoot(request, xz, bz), invalidateMutationCaches: (root, host) => this.gitManager.invalidateGitReadCachesForMutation(root, host),
+          getStableMetadata: (cwd, host) => this.gitManager.getStableMetadata(cwd, host), invalidateRepositoryCaches: (repository) => p2(repository),
+          refreshRepository: (hostId, root) => this.liveQueryRegistry.refreshRepository(hostId, root), getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
+          finishRequest: (id, tracked) => this.requestLifecycle.finish(id, tracked) });
       }
       if (f && i.signal.aborted) {
         (this.emitGitPerformanceOperation(createGitRequestCancellationTelemetry({
