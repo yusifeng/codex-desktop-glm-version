@@ -1614,6 +1614,12 @@ dispose 清空已迁移至 `git-metadata-refresh-controller.ts`；worker 仍注�
 session dispose/start、worktree directory I/O 与 generation 检查。由
 `scripts/test-worker-git-metadata-refresh-controller.mjs` 覆盖批次去重、single-flight、状态推进和
 disposed gate。
+
+Worktree directory reconciliation 已迁移至 `git-worktree-watch-refresh-controller.ts`；controller 保留
+`readDirectory`、generation/missing gate、stale target dispose/removal、new target creation/session start
+及 discovery failure recovery/retry 顺序，`GitRepoWatcher` 仅注入 target/session/host owner。由
+`scripts/test-worker-git-worktree-watch-refresh-controller.mjs` 覆盖 stale/new reconciliation 与
+non-missing discovery failure 顺序。
 ### A1 最终复核：metadata refresh generation/waiter
 
 `GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、

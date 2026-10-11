@@ -189,6 +189,7 @@ const { createGitRepoChangeController } = require("./worker/git-repo-change-cont
 const { createGitWatchRetryController } = require("./worker/git-watch-retry-controller");
 const { createGitWatchSessionCloseController } = require("./worker/git-watch-session-close-controller");
 const { createGitMetadataRefreshController } = require("./worker/git-metadata-refresh-controller");
+const { createGitWorktreeWatchRefreshController } = require("./worker/git-worktree-watch-refresh-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68719,6 +68720,28 @@ var Jye = 1e3,
       isDisposed: () => this.disposed,
       processBatch: (paths, recovering) => this.processMetadataRefreshBatch(paths, recovering),
     });
+    worktreeWatchRefreshController = createGitWorktreeWatchRefreshController({
+      isDisposed: () => this.disposed,
+      getRootTarget: (path) => this.watchTargets.find((target) => target.watchPath === path),
+      getGeneration: (target) => target.generation,
+      isMissing: (target) => target.metadataDirectory?.missing === true,
+      readDirectory: (path) => this.options.host.readDirectory(path),
+      join: (root, name) => this.pathApi.join(root, name),
+      isMissingPathError,
+      onDiscoveryFailure: (error, path) => this.logger.warning(`Failed to discover git worktree watches`, { safe: {}, sensitive: { error, path } }),
+      scheduleRetry: (target) => this.scheduleWatchSessionRetry(target),
+      disposeSession: (target) => this.disposeSession(target),
+      markMissing: (target) => { if (target.metadataDirectory != null) target.metadataDirectory.missing = true; },
+      getTargets: () => this.watchTargets,
+      partition: partitionGitWorktreeWatchPaths,
+      getGitDir: () => this.gitDir,
+      removeTarget: (target) => this.watchTargets.splice(this.watchTargets.indexOf(target), 1),
+      findTarget: (path) => this.watchTargets.find((target) => target.watchPath === path),
+      addTarget: (path, parentPath) => this.addDirectoryWatchTarget(path, `worktree-topology`, (candidate) => P6(this.pathApi, parentPath, candidate), !1, parentPath),
+      hasTopologyHandler: (target) => target?.handlers.some((handler) => handler.changeType === `worktree-topology`) === true,
+      startSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
+      updateRecovery: () => this.updateRequiresRecovery(),
+    });
     pathApi = null;
     gitDir = null;
     currentHeadRefPath = null;
@@ -68986,55 +69009,7 @@ var Jye = 1e3,
         await this.refreshWorktreeDirectories(n, n.join(this.options.commonDir, `worktrees`), t));
     }
     async refreshWorktreeDirectories(e, t, n) {
-      let r = this.watchTargets.find((e) => e.watchPath === t);
-      if (this.disposed || r == null) return;
-      let i = r.generation,
-        a = [];
-      if (!r.metadataDirectory?.missing)
-        try {
-          a = (await this.options.host.readDirectory(t))
-            .filter((e) => e.isDirectory())
-            .map((n) => e.join(t, n.name));
-        } catch (e) {
-          if (this.disposed || i !== r.generation) return;
-          if (!isMissingPathError(e)) {
-            (this.logger.warning(`Failed to discover git worktree watches`, {
-              safe: {},
-              sensitive: { error: e, path: t },
-            }),
-              await this.disposeSession(r),
-              this.updateRequiresRecovery(),
-              this.scheduleWatchSessionRetry(r));
-            return;
-          }
-          (r.metadataDirectory != null && (r.metadataDirectory.missing = !0),
-            await this.disposeSession(r));
-        }
-      if (this.disposed || (i !== r.generation && !r.metadataDirectory?.missing)) return;
-      let s = this.watchTargets.filter((e) => e.metadataDirectory?.parentPath === t),
-        { stalePaths } = partitionGitWorktreeWatchPaths(s.map((e) => e.watchPath), a);
-      s = s.filter((e) => stalePaths.includes(e.watchPath));
-      if (
-        (await Promise.all(
-          s.map(async (e) => {
-            let t = this.disposeSession(e);
-            (e.watchPath === this.gitDir
-              ? e.metadataDirectory != null && (e.metadataDirectory.missing = !0)
-              : this.watchTargets.splice(this.watchTargets.indexOf(e), 1),
-              await t);
-          }),
-        ),
-        this.disposed)
-      )
-        return;
-      let c = a.map((r) => {
-        let i = this.watchTargets.find((e) => e.watchPath === r),
-          a = i?.handlers.some((e) => e.changeType === `worktree-topology`)
-            ? i
-            : this.addDirectoryWatchTarget(r, `worktree-topology`, (n) => P6(e, t, n), !1, t);
-        return a.session == null ? this.tryStartWatchSession(a, n) : Promise.resolve();
-      });
-      (await Promise.all(c), this.updateRequiresRecovery());
+      await this.worktreeWatchRefreshController.refresh(t, n);
     }
     isHeadRefPath(e, t, n, r) {
       let i = r.get(n);

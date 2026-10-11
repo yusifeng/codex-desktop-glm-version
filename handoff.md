@@ -2870,3 +2870,9 @@ watcher owner。
 `src/main/main-app/startup/window-presentation-policy.ts`，真实接回原 `Be2` consumer；入口继续持有
 BrowserWindow 状态读取、`setOpacity(0)`、show/focus 与 `setImmediate` 恢复顺序。由
 `scripts/test-main-window-presentation-policy.mjs` 覆盖 4 项 focused assertions。
+
+2026-10-11 A1 worker 增量：`refreshWorktreeDirectories` 的完整 worktree target reconciliation 已迁移至
+`src/main/worker/git-worktree-watch-refresh-controller.ts`，真实接回 `GitRepoWatcher`；controller 保留
+host `readDirectory`、generation/missing gate、stale target dispose/removal、new target creation/session
+start，以及 discovery failure 的 recovery/retry 顺序。由
+`scripts/test-worker-git-worktree-watch-refresh-controller.mjs` 覆盖 9 项 focused assertions。
