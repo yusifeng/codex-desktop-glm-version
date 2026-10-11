@@ -1634,3 +1634,9 @@ disposed gate。
 `GitManager.refreshGitInitMetadata` 的 stable metadata invalidation、按 watch key single-flight 复用与 promise
 cleanup 已迁移至 `src/main/worker/git-init-metadata-refresh-controller.ts`；consumer 保留原始 refresh-once
 owner 与当前 promise identity 清理语义。focused test 覆盖复用、成功清理与失败清理。
+### 增量抽取：Git init metadata-apply controller
+
+`GitManager.refreshGitInitMetadataOnce` 的 stable metadata 应用、旧 watcher 释放、repository watch 建立、
+desired-key superseded 回退与 HEAD invalidation event 已迁移至 `src/main/worker/git-init-metadata-apply-controller.ts`；
+consumer 继续注入 manager 的 watcher、unwatch 与 event/trace owner。focused test 覆盖成功应用、metadata race
+短路和 superseded unwatch。
