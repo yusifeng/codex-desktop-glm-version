@@ -1577,3 +1577,13 @@ registry 的真实 key consumers 直接接回；manager 继续持有 Map、cache
 Git manager 的 cached-worktree cwd selection 与无交集回退规则已迁移至
 `src/main/worker/git-worktree-cache-selection.ts`；入口仍负责 Map snapshot、本地路径归一化和
 path containment predicate。`scripts/test-worker-git-worktree-cache-selection.mjs` 覆盖 null/empty、命中与回退。
+
+### A1 owner 复核：Git manager/watch/session（2026-10-11）
+
+剩余 manager 区段的 `getStableMetadata`/`getStableRoot` 同时依赖 generation、retry maps、
+pending trace、memoized query 以及 Git root/common-dir I/O；`invalidate*` 直接协调多类 Map/cache。
+watcher 的 `start`、metadata refresh、dispose 与 session retry 共享 watch target、session/retry timer、
+dispose promise、metadata refresh promise 和 event ordering。session 的 live-query、repo watch、Git-init
+watcher 与 close path 还绑定 telemetry、Git I/O、parent event 与 cancellation owner。
+现有 `git-watch-paths`、watch lifecycle、close/setup/request handlers 已覆盖可脱离的纯 projection；
+其余拆分会复制状态 owner 或改变 cleanup/emit 顺序，本轮保持 business-preserved，不新增 facade。
