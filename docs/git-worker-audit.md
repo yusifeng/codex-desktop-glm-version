@@ -1515,9 +1515,9 @@ supplemental path checks）已迁移至 `src/main/worker/parcel-watcher-events.t
 `scripts/test-worker-parcel-watcher-events.mjs` 覆盖 6 项断言。
 
 parcel watcher 的路径层级判定 `P9/N9` 已迁移至
-`src/main/worker/parcel-watcher-paths.ts` 的 `isPathAtOrBelowAnyRoot`；supplemental
-subscription 与 active directory-check 的状态更新仍由 watcher owner 负责。由
-`scripts/test-worker-parcel-watcher-paths.mjs` 覆盖 5 项断言。
+`src/main/worker/parcel-watcher-paths.ts` 的 `isPathAtOrBelowAnyRoot` 与严格祖先版
+`isPathBelowAnyRoot`；supplemental subscription 与 active directory-check 的状态更新仍由
+watcher owner 负责。由 `scripts/test-worker-parcel-watcher-paths.mjs` 覆盖 7 项断言。
 
 2026-10-11 A1 worker 增量：worker IPC performance counter 的 message category 已迁移至
 `src/main/worker/message-category.ts`；request/response/broadcast、thread-stream change 与

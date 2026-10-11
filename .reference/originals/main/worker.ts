@@ -130,7 +130,7 @@ const { fsmonitorCacheKey, gitQueryKey, hasFsmonitorDaemonFeature, hostId, isCac
 const { classifyWorkerMessageCategory } = require("./worker/message-category");
 const { buildParcelWatcherOptions } = require("./worker/parcel-watcher-options");
 const { projectParcelWatcherEvents } = require("./worker/parcel-watcher-events");
-const { isPathAtOrBelowAnyRoot } = require("./worker/parcel-watcher-paths");
+const { isPathAtOrBelowAnyRoot, isPathBelowAnyRoot } = require("./worker/parcel-watcher-paths");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
 const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
@@ -81394,7 +81394,7 @@ var fDe = class {
                 )
               ).filter((e) => e != null),
               n = new Set(t.map((e) => e.path)),
-              r = t.filter((e) => !N9(n, e.path)),
+              r = t.filter((e) => !isPathBelowAnyRoot(g.posix, e.path, n)),
               i = new Set(
                 r.filter((e) => !this.supplementalSubscriptions.has(e.path)).map((e) => e.path),
               );

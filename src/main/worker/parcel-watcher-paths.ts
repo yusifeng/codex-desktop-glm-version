@@ -13,5 +13,17 @@ function isPathAtOrBelowAnyRoot(pathApi: PosixPathApi, path: string, roots: Set<
   return false;
 }
 
-export { isPathAtOrBelowAnyRoot };
-if (typeof module !== `undefined`) module.exports = { isPathAtOrBelowAnyRoot };
+/** Returns whether a path is strictly nested below one of the roots. */
+function isPathBelowAnyRoot(pathApi: PosixPathApi, path: string, roots: Set<string>): boolean {
+  let current = pathApi.dirname(path);
+  while (current !== path) {
+    if (roots.has(current)) return true;
+    const parent = pathApi.dirname(current);
+    if (parent === current) return false;
+    current = parent;
+  }
+  return false;
+}
+
+export { isPathAtOrBelowAnyRoot, isPathBelowAnyRoot };
+if (typeof module !== `undefined`) module.exports = { isPathAtOrBelowAnyRoot, isPathBelowAnyRoot };
