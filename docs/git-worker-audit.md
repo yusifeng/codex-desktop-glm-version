@@ -1641,6 +1641,9 @@ GitHub PR body 中 user-attachment URL 的 asset-id cache 已迁移至
 `github-user-attachment-url-cache.ts`；worker 仍负责 JWT expiry 解析和 body rewrite，cache 保留 60 秒
 提前失效阈值、同 asset 命中与过期 URL overwrite。由 `scripts/test-worker-github-user-attachment-url-cache.mjs`
 覆盖命中、提前失效和独立 key 断言。
+Linux desktop-entry discovery 的 `W7/CTe`（`G7` 唯一 consumer）以及 JetBrains Toolbox discovery 的
+`y9/OEe`（`AEe` consumer）本轮保留：cache key/TTL 或 memoization 绑定 XDG/platform 环境、同步
+filesystem scan 与 parse owner，单独抽 registry 会复制 invalidation 状态，未形成安全独立边界。
 ### A1 最终复核：metadata refresh generation/waiter
 
 `GitRepoWatcher.refreshMetadataDirectories`（当前约 68960）同时管理 `changedMetadataDirectories` 批次、

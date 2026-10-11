@@ -3146,6 +3146,12 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
   worker 保留 JWT expiry 解析与 body rewrite，cache 保留 60 秒提前失效阈值和过期 URL overwrite。
 - `scripts/test-worker-github-user-attachment-url-cache.mjs` 覆盖 5 项命中、提前失效和 key 隔离断言。
 
+### A1 扫描结论：filesystem discovery caches preserve-coupled
+
+Linux desktop-entry `W7/CTe` 与 JetBrains Toolbox `y9/OEe` 均保留：cache key/TTL 或 memoization 绑定
+XDG/platform 环境、同步 filesystem scan 和 parse/discovery owner，当前没有不复制 invalidation 状态的
+独立 lifecycle 边界。
+
 # 本轮新增：GitHub CLI rate-limit gate
 
 - GitHub CLI secondary-rate-limit 的 per-host backoff、single-flight 等待、AbortSignal 竞态与 promise
