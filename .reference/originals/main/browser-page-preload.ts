@@ -5979,6 +5979,7 @@ var { createAnnotationScreenshotReadyController } = require("./browser-page-prel
 var { createAnnotationTextHighlightController } = require("./browser-page-preload/annotation-text-highlight-controller");
 var { closeAnnotationEditor } = require("./browser-page-preload/annotation-editor-close-controller");
 var { createAnnotationSuspensionNotifier } = require("./browser-page-preload/annotation-suspension-notifier");
+var { createAnnotationDesignModifierNotifier } = require("./browser-page-preload/annotation-design-modifier-notifier");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23679,7 +23680,6 @@ function Wy({ rootHost: e, bridge: t }) {
     [fe, pe] = (0, G.useState)(!1),
     me = (0, G.useRef)(0),
     ge = (0, G.useRef)(null),
-    _e = (0, G.useRef)(!1),
     ve = (0, G.useRef)(!1),
     ye = (0, G.useRef)(!1),
     be = (0, G.useRef)(!1),
@@ -23706,6 +23706,11 @@ function Wy({ rootHost: e, bridge: t }) {
     [suspensionNotifier] = (0, G.useState)(() =>
       createAnnotationSuspensionNotifier({
         send: (suspended) => t.sendMessageToHost({ type: `browser-sidebar-runtime-annotation-suspension`, suspended }),
+      }),
+    ),
+    [designModifierNotifier] = (0, G.useState)(() =>
+      createAnnotationDesignModifierNotifier({
+        send: (pressed) => t.sendMessageToHost({ type: `browser-sidebar-runtime-design-modifier-state`, pressed }),
       }),
     ),
     [Te] = (0, G.useState)(() =>
@@ -24886,10 +24891,8 @@ function Wy({ rootHost: e, bridge: t }) {
     }, [x, t, Ee, _, e, n.viewportScale, j]),
     (0, G.useEffect)(() => {
       let e = k === `comment` && x == null && Ne && h;
-      _e.current !== e &&
-        ((_e.current = e),
-        t.sendMessageToHost({ type: `browser-sidebar-runtime-design-modifier-state`, pressed: e }));
-    }, [x, t, Ne, k, h]),
+      designModifierNotifier.update(e);
+    }, [x, Ne, k, h, designModifierNotifier]),
     (0, G.useEffect)(() => () => i.clear(), [i]),
     (0, G.useEffect)(() => Kv(k === `comment` ? Ve : xb, Ie), [k, Ie, Ve]),
     (0, G.useLayoutEffect)(() => {
@@ -25052,6 +25055,7 @@ function Wy({ rootHost: e, bridge: t }) {
   }, [Yt, textHighlightController]);
   (0, G.useEffect)(() => () => textHighlightController.dispose(), [textHighlightController]);
   (0, G.useEffect)(() => () => suspensionNotifier.dispose(), [suspensionNotifier]);
+  (0, G.useEffect)(() => () => designModifierNotifier.dispose(), [designModifierNotifier]);
   let Jt = textPreviewState.anchor,
     Xt = textPreviewState.selectionRects,
     Zt = Xt,

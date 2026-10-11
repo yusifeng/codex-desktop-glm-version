@@ -1407,3 +1407,10 @@ target mismatch 保留 editor state。
 `src/main/browser-page-preload/annotation-suspension-notifier.ts`；入口继续注入 host bridge sender，并保留
 keyboard event handler 对 `ve.current` 的同步语义。focused test 覆盖 browse/comment guard、重复值、reset
 与 dispose。
+
+### 增量抽取：annotation design-modifier notifier
+
+`Wy` 24891 design-modifier host-IPC effect 的 derived pressed 去重与 dispose gate 已迁移至
+`src/main/browser-page-preload/annotation-design-modifier-notifier.ts`；入口继续计算 comment mode、空编辑器、
+`canUseTweaks` 与 modifier state，notifier 仅负责保持原始 `false` 初值、状态变化通知和 unmount 后抑制。
+focused test 覆盖初始 false、true/false 变化、重复值与 dispose 后更新。

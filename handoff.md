@@ -2758,6 +2758,11 @@ effect event）已迁移至 `src/main/browser-page-preload/annotation-suspension
 bridge sender，并保留 keyboard handler 对 `ve.current` 的同步语义，新增
 `scripts/test-preload-annotation-suspension-notifier.mjs` 的 8 项 focused assertions，typecheck/build/
 verify-chunks 通过。selection modifier state effect 仍与 pointer/keyboard handler closure 绑定。
+2026-10-11 A2 preload 增量：`Wy` 24891 design-modifier host-IPC effect 的 derived pressed 去重与 dispose gate
+已迁移至 `src/main/browser-page-preload/annotation-design-modifier-notifier.ts`；入口继续计算 comment mode、
+空编辑器、`canUseTweaks` 与 modifier state，并保持原始 `false` 初值（首次 false 不发送）。新增
+`scripts/test-preload-annotation-design-modifier-notifier.mjs` 的 8 项 focused assertions，selection modifier
+state effect 仍与 pointer/keyboard handler closure 绑定。
 2026-10-11 A2 preload 增量：`Wy` host close-editor 分支的 interaction/ref/state cleanup 顺序与
 target-matched editor reset 已迁移至 `src/main/browser-page-preload/annotation-editor-close-controller.ts`；
 入口继续注入 `flushSync`、React setters、DOM interaction registry 与 IPC-adjacent cleanup，新增
