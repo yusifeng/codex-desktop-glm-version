@@ -5968,6 +5968,7 @@ var { projectAnnotationRegionRecords } = require("./browser-page-preload/annotat
 var { projectAnnotationOverlayStyle } = require("./browser-page-preload/annotation-overlay-style-projection");
 var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/annotation-draft-marker-state");
 var { projectAnnotationRenderState } = require("./browser-page-preload/annotation-render-state-projection");
+var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25060,22 +25061,15 @@ function Wy({ rootHost: e, bridge: t }) {
       Rt.map(({ markerPoint: e }) => e),
       se.width * j,
     ),
-    Ut =
-      M?.annotation.anchor.kind === `element`
-        ? M.kind === `comment`
-          ? (Z_(M.annotation, Ie) ?? null)
-          : (sd(M.annotation.anchor, M.annotation.id, Ie) ?? null)
-        : null,
-    Wt =
-      M?.kind === `comment` && M.annotation.anchor.kind !== `text`
-        ? (M.annotation.additionalAnchors ?? []).map((e) => V_(e, Ie))
-        : [],
-    Gt =
-      M?.kind === `comment` &&
-      M.annotation.anchor.kind === `element` &&
-      Ut == null &&
-      Wt.every((e) => e.anchor.kind === `element` && e.liveElement == null) &&
-      !gs(M.annotation.anchor.pageUrl),
+    activeGeometry = projectAnnotationActiveGeometry(M, Ie, {
+      resolveCommentElement: (annotation, cache) => Z_(annotation, cache),
+      resolveDesignElement: (anchor, annotationId, cache) => sd(anchor, annotationId, cache),
+      resolveAdditionalAnchor: (anchor, cache) => V_(anchor, cache),
+      isOriginalPage: (pageUrl) => gs(pageUrl),
+    }),
+    Ut = activeGeometry.activeElement,
+    Wt = activeGeometry.additionalAnchors,
+    Gt = activeGeometry.skipScreenshotCapture,
     Kt = _ == null ? null : (Le.find((e) => e.id === _) ?? null),
     qt = projectAnnotationRegionRecords(
       {

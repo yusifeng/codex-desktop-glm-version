@@ -2706,6 +2706,11 @@ anchor 生命周期仍未完成。
 入口继续注入 overlay runtime、DOM snapshot/geometry 输入并持有 React render 生命周期，新增
 `scripts/test-preload-annotation-render-state-projection.mjs` 的 12 项 focused assertions，typecheck/build/
 verify-chunks 通过。React render/hook 其余组合与跨 frame anchor 生命周期仍未完成。
+2026-10-11 A2 preload 增量：React annotation runtime active primary/additional geometry 与 screenshot-skip
+gate（原 `Wy` 内 `Ut/Wt/Gt`）已迁移至 `src/main/browser-page-preload/annotation-active-geometry-projection.ts`；
+入口继续注入 live element/frame resolver 与 page predicate，保留 DOM geometry、React render 与 screenshot
+effect 生命周期，新增 `scripts/test-preload-annotation-active-geometry-projection.mjs` 的 8 项 focused
+assertions，typecheck/build/verify-chunks 通过。`Qt/nn` 仍直接依赖当前 DOM geometry，暂由 owner 持有。
 2026-10-11 A2 preload 增量：React annotation runtime selected-id active view 派生（原 `Wy` 内
 `wt/Tt/M/Et/Dt/Ot`）已迁移至 `src/main/browser-page-preload/annotation-active-view-projection.ts`；入口
 继续持有 anchor resolution、React effects 与 render 生命周期，新增

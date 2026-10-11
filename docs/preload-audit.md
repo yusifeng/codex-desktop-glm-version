@@ -1323,3 +1323,10 @@ React annotation runtime 中 flex-gap overlays、metadata/draft hover、remove-h
 `src/main/browser-page-preload/annotation-render-state-projection.ts`；入口继续注入 overlay runtime、DOM
 snapshot 与 geometry 输入，保留 React render 生命周期。focused test 覆盖 active gate、metadata 条件、
 remove-hover、text/add/comment mode 与 hotspot 选择。
+
+### 增量抽取：annotation active geometry projection
+
+React annotation runtime 的 active primary/additional anchor payload 与 screenshot-skip gate（原 `Wy` 内
+`Ut/Wt/Gt`）已迁移至 `src/main/browser-page-preload/annotation-active-geometry-projection.ts`；入口继续
+注入 live element/frame resolver 与 page predicate，保留 DOM geometry、React render 与 screenshot effect
+生命周期。focused test 覆盖 comment/design/text 分支、缺失 primary、additional live element 与 original page。
