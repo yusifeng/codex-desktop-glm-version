@@ -1430,6 +1430,13 @@ focused test 覆盖初始 false、true/false 变化、重复值与 dispose 后�
 条件与副作用顺序。focused test 覆盖 browse guard、fallback hover、DOM hover 优先级、pointer mode
 清理与 dispose gate。
 
+### 增量抽取：annotation pointer-mode sync controller
+
+`Wy` 的 host `syncPointerMode` callback（`nt`）已迁移至
+`src/main/browser-page-preload/annotation-pointer-mode-sync-controller.ts`；入口继续注入 DOM
+interaction registry 的 `setEnabled`/`invalidate`，保留 annotation API、comment、suspension、agent
+控制和 zoom 变化判定。focused test 覆盖启用/禁用、zoom invalidate、agent gate 与 dispose gate。
+
 ### 增量抽取：annotation editor-restore controller
 
 `Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover

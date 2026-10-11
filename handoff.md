@@ -2887,3 +2887,8 @@ React state 与 fallback overlay 派生已物理迁移至 `src/main/browser-page
 入口通过注入 `Te.updatePointer`、DOM hover registry、`pl`/`Yy`/`ss` 与 React setters 保留原始
 host-sync 条件和副作用顺序。由 `scripts/test-preload-annotation-hover-sync-controller.mjs` 覆盖
 browse guard、fallback、DOM-hover 优先级、pointer cleanup 与 dispose gate。
+2026-10-11 A2 preload 增量：`Wy` host `syncPointerMode` callback（`nt`）已物理迁移至
+`src/main/browser-page-preload/annotation-pointer-mode-sync-controller.ts`；入口继续注入 DOM
+interaction registry 的 `setEnabled`/`invalidate`，保留 annotation API、comment、suspension、agent
+控制与 zoom 变化判定。由 `scripts/test-preload-annotation-pointer-mode-sync-controller.mjs` 覆盖
+启用/禁用、zoom invalidate、agent gate 与 dispose gate。

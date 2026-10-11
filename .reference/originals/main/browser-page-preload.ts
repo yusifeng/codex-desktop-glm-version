@@ -5983,6 +5983,7 @@ var { createAnnotationSuspensionNotifier } = require("./browser-page-preload/ann
 var { createAnnotationDesignModifierNotifier } = require("./browser-page-preload/annotation-design-modifier-notifier");
 var { createAnnotationSelectionModifierNotifier } = require("./browser-page-preload/annotation-selection-modifier-notifier");
 var { createAnnotationHoverSyncController } = require("./browser-page-preload/annotation-hover-sync-controller");
+var { createAnnotationPointerModeSyncController } = require("./browser-page-preload/annotation-pointer-mode-sync-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23738,6 +23739,12 @@ function Wy({ rootHost: e, bridge: t }) {
         hasDesignComments: (comments) => ss(comments),
       }),
     ),
+    [pointerModeSyncController] = (0, G.useState)(() =>
+      createAnnotationPointerModeSyncController({
+        setEnabled: (enabled) => w.current?.setEnabled(enabled),
+        invalidate: () => w.current?.invalidate(),
+      }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -24052,15 +24059,9 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => {
       x?.anchor.type !== `virtual` && w.current?.clear();
     }, [x]));
-  let nt = (0, G.useEffectEvent)((e) => {
-      (w.current?.setEnabled(
-        e.canUseSiteAnnotationApi === !0 &&
-          e.interactionMode === `comment` &&
-          e.isAnnotationSuspended !== !0 &&
-          !e.isAgentControllingBrowser,
-      ),
-        n.zoomPercent !== e.zoomPercent && w.current?.invalidate());
-    }),
+  let nt = (0, G.useEffectEvent)((e) =>
+      pointerModeSyncController.sync(e, n.zoomPercent, n.isAgentControllingBrowser),
+    ),
     rt = (0, G.useCallback)(
       (n) => {
         if (x != null)
@@ -24310,6 +24311,7 @@ function Wy({ rootHost: e, bridge: t }) {
   }, [i, t, Oe, Ne, ot, st, lt, it, ct, Te, e, rt, at]),
     (0, G.useEffect)(() => () => viewportRefreshScheduler.dispose(), [viewportRefreshScheduler]),
     (0, G.useEffect)(() => () => hoverSyncController.dispose(), [hoverSyncController]),
+    (0, G.useEffect)(() => () => pointerModeSyncController.dispose(), [pointerModeSyncController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
       (t.forEach((e, n) => {
