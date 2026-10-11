@@ -26,6 +26,8 @@
 
 新增 `src/main/preload/system-theme-variant-controller.ts`，真实接回 preload 初始主题注入、document readiness observer、系统主题 IPC 更新、订阅 fan-out 与 cleanup；`index.ts` 继续持有 Electron IPC/contextBridge owner。
 
+新增 `src/main/preload/worker-message-subscription-controller.ts`，真实接回 `electron-bridge.ts` worker IPC subscription registry：按 worker 懒注册、消息 fan-out、最后订阅者 removeListener 与 dispose。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style

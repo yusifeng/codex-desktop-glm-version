@@ -6,6 +6,9 @@
 
 本轮新增 `system-theme-variant-controller.ts`，真实接回 preload 主题注入/observer/订阅生命周期；focused test 为 `scripts/test-preload-system-theme-variant-controller.mjs`。
 
+本轮新增 `worker-message-subscription-controller.ts`，真实接回 preload worker IPC subscription registry；focused test 为 `scripts/test-preload-worker-message-subscription-controller.mjs`。
+该 focused test 直接导入 TS controller，运行命令为 `node --experimental-strip-types scripts/test-preload-worker-message-subscription-controller.mjs`。
+
 本轮新增 `annotation-edit-editor-controller.ts`，真实接回 Wy 的 `Ye` edit-editor callback。controller 注入 target map、comment/anchor/design projection 与 host/React side effects，保持 `close preview -> open editor IPC -> viewport refresh -> editor state -> clear preview` 顺序；focused test 为 `scripts/test-preload-annotation-edit-editor-controller.mjs`。
 
 同轮新增 `annotation-comment-preview-controller.ts`，真实接回 Wy 的 `Xe` comment-preview callback；focused test 为 `scripts/test-preload-annotation-comment-preview-controller.mjs`。

@@ -17,6 +17,7 @@ import {
 } from "./ipc-channels";
 import { getSharedObjectSnapshotValue, setSharedObjectValue } from "./shared-object-snapshot";
 import { buildDesktopUserAgent } from "./user-agent";
+import { createWorkerMessageSubscriptionController } from "./worker-message-subscription-controller";
 
 /** 窗口类型标识，页面据此区分运行环境。 */
 export const WINDOW_TYPE = "electron";
@@ -52,41 +53,11 @@ export interface ElectronBridge {
   isIntelMacBuild(): boolean;
 }
 
-// 每个 worker 名一组订阅回调；ipcRenderer 监听器按 worker 名懒注册、最后一个
-// 订阅者离开时注销。
-const workerMessageListeners = new Map<string, Set<(message: unknown) => void>>();
-const workerIpcHandlers = new Map<string, (_event: unknown, message: unknown) => void>();
-
-function subscribeToWorkerMessages(
-  workerName: string,
-  callback: (message: unknown) => void,
-): () => void {
-  let listeners = workerMessageListeners.get(workerName);
-  if (!listeners) {
-    listeners = new Set();
-    workerMessageListeners.set(workerName, listeners);
-  }
-  let ipcHandler = workerIpcHandlers.get(workerName);
-  if (!ipcHandler) {
-    ipcHandler = (_event: unknown, message: unknown) => {
-      const current = workerMessageListeners.get(workerName);
-      current?.forEach((listener) => {
-        listener(message);
-      });
-    };
-    workerIpcHandlers.set(workerName, ipcHandler);
-    ipcRenderer.on(workerForViewChannel(workerName), ipcHandler as never);
-  }
-  listeners.add(callback);
-  return () => {
-    const current = workerMessageListeners.get(workerName);
-    if (!current || (current.delete(callback), current.size > 0)) return;
-    workerMessageListeners.delete(workerName);
-    const handler = workerIpcHandlers.get(workerName);
-    if (handler) ipcRenderer.removeListener(workerForViewChannel(workerName), handler as never);
-    workerIpcHandlers.delete(workerName);
-  };
-}
+const workerMessageSubscriptionController = createWorkerMessageSubscriptionController({
+  channel: workerForViewChannel,
+  addListener: (channel, handler) => ipcRenderer.on(channel, handler as never),
+  removeListener: (channel, handler) => ipcRenderer.removeListener(channel, handler as never),
+});
 
 export function createElectronBridge(options: {
   sentryInitOptions: SentryInitOptions;
@@ -118,7 +89,7 @@ export function createElectronBridge(options: {
     sendWorkerMessageFromView: async (workerName, message) => {
       await ipcRenderer.invoke(workerFromViewChannel(workerName), message);
     },
-    subscribeToWorkerMessages,
+    subscribeToWorkerMessages: workerMessageSubscriptionController.subscribe,
     showContextMenu: async (menuOptions) => ipcRenderer.invoke(SHOW_CONTEXT_MENU, menuOptions),
     getFastModeRolloutMetrics: async (request) =>
       ipcRenderer.invoke(GET_FAST_MODE_ROLLOUT_METRICS, request),
