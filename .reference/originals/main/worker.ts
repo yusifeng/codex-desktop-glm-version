@@ -184,6 +184,7 @@ const { buildJetBrainsOpenArgs, buildZedRemoteUri, appendEditorLocation, buildTe
 const { resolveOpenTargetDirectory, buildWindowsTerminalArgs } = require("./worker/open-target-path-policy");
 const { addPendingWorkingTreePath, collectGitWatchHandlerPaths, combineOptionalBooleans, createGitOperationMarkerPaths, createGitOperationState, createGitRepoChangedEvent, createGitWatchTarget, getAffectedWorkingTreePath, getGitWatchSessionClosePolicy, getGitWorkingTreeWatchRefreshAction, isGitInternalPath, isMissingPathError, isWithinPath, isWatchedRefPath, isWorktreeTopologyPath, nextGitWatcherRetryDelay, partitionGitWorktreeWatchPaths, requiresGitWatcherRecovery, selectGitMetadataRefreshPaths, selectGitWatchTargetsForMetadataRefresh, shouldRetryGitWatchTargetAfterStart, shouldScheduleGitRepoChange, shouldScheduleGitWatchSessionRetry } = require("./worker/git-watch-paths");
 const { classifyStableMetadataFailure } = require("./worker/git-stable-metadata-failure-policy");
+const { shouldInvalidateGitWorktreeForTurn } = require("./worker/git-turn-cache-invalidation-policy");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -67675,7 +67676,7 @@ var {
       for (let e of this.worktreesByKey.values()) {
         if (e.host.id !== t) continue;
         let n = this.commonDirByWorktreeKey.get(this.getWorktreeKey(e.root, e.host));
-        (a.has(e) || i || n == null || r.has(n)) && e.clearShortLivedGitReadCaches();
+        shouldInvalidateGitWorktreeForTurn({ isSelected: a.has(e), hasUnknownSelectedCommonDir: i, commonDir: n, selectedCommonDirs: r }) && e.clearShortLivedGitReadCaches();
       }
     }
   };

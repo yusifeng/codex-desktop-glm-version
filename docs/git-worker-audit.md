@@ -1594,3 +1594,7 @@ Stable metadata 读取失败的 timeout/permission/unavailable 分类、generati
 保留与 retry/invalidation 计划已迁移至 `git-stable-metadata-failure-policy.ts`；manager 仍负责
 error object、retry Map、memoized cache 删除、host refresh 与副作用顺序。由
 `scripts/test-worker-git-stable-metadata-failure-policy.mjs` 覆盖 4 项 decision assertions。
+Turn-complete cache invalidation 中按 selected worktree、未知 commonDir 和同仓库 commonDir
+传播的 decision 已迁移至 `git-turn-cache-invalidation-policy.ts`；manager 仍负责 worktree/commonDir
+Map 查询及 `clearShortLivedGitReadCaches` 副作用。由 `scripts/test-worker-git-turn-cache-invalidation-policy.mjs`
+覆盖 5 项传播/回退断言。
