@@ -568,6 +568,15 @@ SourceKit-LSP 的固定 Swift Package Manager initialization payload 已迁移�
 workspace directory 创建、platform/codexHome 路径解析与 process discovery；consumer 保留
 原对象复用语义。`scripts/test-main-sourcekit-options.mjs` 覆盖完整 options shape。
 
+### 增量抽取：Native context-menu lifecycle
+
+`Qot.installNativeContextMenu` 的图片右键菜单项投影、file URL reveal、copy/save visual-content
+telemetry 与 window-close cleanup 已迁移至 `src/main/main-app/window/native-context-menu.ts`。
+窗口 manager 继续注入 Electron context-menu factory、shell/window side effects 与 inspect 开关，
+保持 cut/copy/paste accelerator、image/main-frame 判断及 disposer 顺序；由
+`scripts/test-main-native-context-menu.mjs` 覆盖非图片旁路、file URL reveal、copy/save callbacks、
+跨 frame save gate 与幂等 cleanup，共 10 项 focused assertions。
+
 ### A3 startup residual owner 复核（2026-10-11）
 
 继续审计 `dst`（172,420-176,978）后，`D/O/k` 将打包/开发资源路径与 `existsSync` fallback

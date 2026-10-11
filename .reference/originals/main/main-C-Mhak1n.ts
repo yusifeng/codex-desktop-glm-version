@@ -32,6 +32,7 @@ const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-
 const { installDisplayChangeGeometryRefresh } = require("./main-app/startup/display-change-geometry-refresh.js");
 const { installPrimaryWindowTracking } = require("./main-app/window/primary-window-tracking.js");
 const { installWebContentsDiagnostics } = require("./main-app/window/web-contents-diagnostics.js");
+const { installNativeContextMenu } = require("./main-app/window/native-context-menu.js");
 const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
@@ -173274,60 +173275,18 @@ var Qot = class {
       }));
   }
   installNativeContextMenu(e) {
-    let t = bot({
+    return installNativeContextMenu({
       window: e,
-      prepend: (t, n) => {
-        if (
-          ((t.cut({}).accelerator = `CmdOrCtrl+X`),
-          (t.copy({}).accelerator = `CmdOrCtrl+C`),
-          (t.paste({}).accelerator = `CmdOrCtrl+V`),
-          n.mediaType !== `image`)
-        )
-          return [];
-        let r = [],
-          i = a.un(n.srcURL);
-        i != null &&
-          r.push({
-            label: Not,
-            click: () => {
-              l.shell.showItemInFolder(i);
-            },
-          });
-        let o = t.copyImage({});
-        if (
-          (r.push({
-            ...o,
-            click: (t, n, r) => {
-              (o.click?.(t, n, r),
-                this.sendMessageToWindow(e, {
-                  type: `visual-content-action-clicked`,
-                  action: `copy-image`,
-                  surface: `native-image-context-menu`,
-                }));
-            },
-          }),
-          n.frame == null || n.frame === e.webContents.mainFrame)
-        ) {
-          let n = t.saveImageAs({});
-          r.push({
-            ...n,
-            click: (t, r, i) => {
-              (n.click?.(t, r, i),
-                this.sendMessageToWindow(e, {
-                  type: `visual-content-action-clicked`,
-                  action: `save-image`,
-                  surface: `native-image-context-menu`,
-                }));
-            },
-          });
-        }
-        return r;
-      },
-      showCopyImage: !1,
-      showInspectElement: this.options.allowInspectElement,
-    });
-    e.on(`closed`, () => {
-      t();
+      createContextMenu: bot,
+      revealLabel: Not,
+      showItemInFolder: (path) => l.shell.showItemInFolder(path),
+      sendVisualContentAction: (action) =>
+        this.sendMessageToWindow(e, {
+          type: `visual-content-action-clicked`,
+          action,
+          surface: `native-image-context-menu`,
+        }),
+      allowInspectElement: this.options.allowInspectElement,
     });
   }
   installWebContentsDiagnostics(e, t) {

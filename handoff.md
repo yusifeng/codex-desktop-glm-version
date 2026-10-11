@@ -3096,3 +3096,12 @@ watcher 构造、active ownership 注册、started/failed/superseded 分类与 d
 
 - `createHostThreadReadState` 的 host unread-thread subscription、open generation、retired retry、identity/host-key guard、pending event reconcile、异步 set 与 dispose lifecycle 已迁移至 `src/main/main-app/conversation/thread-read-state-controller.ts`。
 - `host-assembly.ts` 删除旧的 156 行内嵌实现，仅保留 controller consumer/import；focused test、typecheck、build、chunk/shared audit 均通过。
+
+# 本轮新增：native-context-menu lifecycle
+
+- `Qot.installNativeContextMenu` 的图片右键菜单构造、file URL reveal、copy/save visual-content telemetry
+  与 window-close cleanup 已迁移至 `src/main/main-app/window/native-context-menu.ts`；窗口 manager 继续注入
+  Electron context-menu factory、shell/window side effects 与 inspect 开关，保持原菜单顺序、main-frame save gate
+  与 disposer 顺序。
+- `scripts/test-main-native-context-menu.mjs` 覆盖非图片旁路、file URL reveal、copy/save callback、跨 frame
+  save gate 与幂等 cleanup，共 10 项 focused assertions；build、verify、typecheck、diff-check 均通过。
