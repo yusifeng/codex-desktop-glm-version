@@ -18,6 +18,10 @@
 metadata refresh、watch-git-metadata 重启、desired-key 竞态与 finally/catch 回收顺序；focused test 为
 `scripts/test-worker-git-init-recovery-controller.mjs`。
 
+同轮新增 `git-init-metadata-refresh-controller.ts`，真实接回 `GitManager.refreshGitInitMetadata`；controller 保留
+stable metadata invalidation、按 watch key single-flight 复用与 promise identity cleanup；focused test 为
+`scripts/test-worker-git-init-metadata-refresh-controller.mjs`。
+
 同轮新增 `git-metadata-refresh-batch-controller.ts`，真实接回 `GitRepoWatcher.processMetadataRefreshBatch`；
 controller 保留 metadata target 筛选、recovery dispose/restart、missing target 补启动与 worktree refresh 的
 原始 Promise.all 顺序；focused test 为 `scripts/test-worker-git-metadata-refresh-batch-controller.mjs`。

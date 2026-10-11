@@ -1627,3 +1627,8 @@ disposed gate。
 `GitManager.handleGitInit` 的 metadata refresh、watch-git-metadata 重启、desired-key 竞态 guard 与失败回收已迁移至
 `src/main/worker/git-init-recovery-controller.ts`；consumer 继续注入 manager 的 watcher/metadata owner，保留
 原始 handled-set、refresh 顺序和 finally/catch 清理语义。focused test 覆盖成功重启、已刷新短路与异常回收。
+### 增量抽取：Git init metadata-refresh controller
+
+`GitManager.refreshGitInitMetadata` 的 stable metadata invalidation、按 watch key single-flight 复用与 promise
+cleanup 已迁移至 `src/main/worker/git-init-metadata-refresh-controller.ts`；consumer 保留原始 refresh-once
+owner 与当前 promise identity 清理语义。focused test 覆盖复用、成功清理与失败清理。
