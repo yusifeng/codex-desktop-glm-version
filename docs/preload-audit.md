@@ -1141,3 +1141,8 @@ selector 和缺失 shadowRoot 的 false 语义。focused test 覆盖成功、sel
 事件 composedPath target 命中与 interaction-blocked gate（原 `bl`，4688-4691）已迁移至
 `src/main/browser-page-preload/annotation-event-target-policy.ts`；入口复用既有 blocked
 policy，保留 target 缺失与 blocked 两态。focused test 覆盖命中和阻断。
+### 增量抽取：annotation point target projection
+
+页面坐标到 frame-local point 并解析 annotation target 的 projection（原 `pl`，4600-4606）
+已迁移至 `src/main/browser-page-preload/annotation-point-target.ts`；入口保留 hit-test、frame
+offset 和 `Sl` target policy 注入。focused test 覆盖 offset projection 与 target consumer。
