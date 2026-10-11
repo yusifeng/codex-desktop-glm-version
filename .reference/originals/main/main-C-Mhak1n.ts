@@ -26,6 +26,7 @@ const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspa
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates } = require("./main-app/startup/tray-icon-paths.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
+const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
 const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
@@ -173972,15 +173973,9 @@ function dst({
   };
 }
 var fst = 3e4,
-  pst = class {
-    totalInvocations = 0;
-    rollingWindowCounter = new jt({ windowMs: fst });
-    recordInvocation(e = Date.now()) {
-      ((this.totalInvocations += 1), this.rollingWindowCounter.record(1, e));
-    }
-    getSnapshot(e = Date.now()) {
-      let t = this.rollingWindowCounter.getSnapshot(e);
-      return { totalInvocations: this.totalInvocations, invocationsLast30s: t.count };
+  pst = class extends WorkerInvocationSampler {
+    constructor() {
+      super((options) => new jt(options), fst);
     }
   };
 async function mst(e, { payload: t, requestId: r }, i) {

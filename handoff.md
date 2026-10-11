@@ -1497,6 +1497,10 @@ main worker bus 的启动结果与事件类型纯谓词已迁移至
 `src/main/main-app/worker/worker-event-predicates.ts`，入口保留 `Sst/Cst/wst` 兼容委托，
 由 `scripts/test-main-worker-event-predicates.mjs` 覆盖 8 项断言；worker 启动与 IPC
 副作用仍保留在原入口。
+main worker assembly 的 invocation sampler（原 `pst`，173,975-173,985）已迁移至
+`src/main/main-app/worker/invocation-sampler.ts`；入口通过注入既有 rolling-window counter
+实现保持 30 秒窗口、总调用数与显式时间戳语义，worker bus/telemetry 生命周期仍由入口持有，
+由 `scripts/test-main-worker-invocation-sampler.mjs` 覆盖 4 项断言。
 worker-main RPC 的方法白名单、取消消息和请求消息校验已迁移至
 `src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托，
 由 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言；RPC 调度与

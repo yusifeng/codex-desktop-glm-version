@@ -246,6 +246,14 @@ worker bus 装配附近的 `Sst/Cst/wst` 纯谓词（原 175,015-175,023）已�
 不触碰 worker 启动、IPC 或 Electron 副作用，由
 `scripts/test-main-worker-event-predicates.mjs` 覆盖 8 项结果/事件类型断言。
 
+### 增量抽取：worker invocation sampler
+
+原 `pst`（173,975-173,985）的 Git worker invocation 总数与 30 秒滚动窗口快照已迁移至
+`src/main/main-app/worker/invocation-sampler.ts`。模块通过注入 rolling-window counter 保留
+原始计数/时间参数语义，入口仅负责传入既有 `jt` 实现；worker bus、telemetry 与退出生命周期
+仍由原 owner 持有，由 `scripts/test-main-worker-invocation-sampler.mjs` 覆盖空快照、连续记录、
+时间戳传递和计数结果共 4 项断言。
+
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至
