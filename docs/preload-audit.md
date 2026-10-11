@@ -1393,3 +1393,10 @@ null cleanup、重复 dispose 与 disposed update gate。
 `annotation-wy-host-message-dispatcher.ts`、`annotation-screenshot-ready-controller.ts` 与本次
 `annotation-text-highlight-controller.ts` 覆盖。剩余范围是各 callback 的业务 state/DOM/IPC 副作用 owner，
 不是 listener 注册/注销或 RAF/CSS Highlight teardown 机制。
+
+### 增量抽取：annotation editor-close controller
+
+`Wy` host close-editor 分支的 interaction/ref/state cleanup 顺序与 target-matched editor reset 已迁移至
+`src/main/browser-page-preload/annotation-editor-close-controller.ts`；入口继续注入 `flushSync`、React
+setters、DOM interaction registry 与 IPC-adjacent cleanup。focused test 覆盖 callback 顺序、flush 边界与
+target mismatch 保留 editor state。

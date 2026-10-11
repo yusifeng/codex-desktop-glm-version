@@ -5977,6 +5977,7 @@ var { installAnnotationPointerEventLifecycle } = require("./browser-page-preload
 var { dispatchAnnotationWyHostMessage } = require("./browser-page-preload/annotation-wy-host-message-dispatcher");
 var { createAnnotationScreenshotReadyController } = require("./browser-page-preload/annotation-screenshot-ready-controller");
 var { createAnnotationTextHighlightController } = require("./browser-page-preload/annotation-text-highlight-controller");
+var { closeAnnotationEditor } = require("./browser-page-preload/annotation-editor-close-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -24247,11 +24248,23 @@ function Wy({ rootHost: e, bridge: t }) {
         captureTextSelection: () => ot(),
         selectComment: (commentId) => b(commentId),
         closeEditor: (message) => {
-          (w.current?.clear(), mc(), (0, lb.flushSync)(() => {
-            ((be.current = !1), m(!1), f(null), (me.current += 1), (xe.current = !1), (Se.current = !1),
-              ie(null), ne(null), o(null), c(null), u(null), (O.current = null), oe(null),
-              S((state) => (state == null || message.target == null || ms(state.target, message.target) ? null : state)));
-          }));
+          closeAnnotationEditor(message.target, {
+            clearInteraction: () => w.current?.clear(),
+            clearTransientState: () => mc(),
+            flushSync: (callback) => (0, lb.flushSync)(callback),
+            resetModifierState: () => { be.current = !1; m(!1); },
+            clearPointerState: () => f(null),
+            clearViewportSelection: () => { xe.current = !1; Se.current = !1; },
+            clearDesignScrub: () => ie(null),
+            clearPreparedScreenshot: () => ne(null),
+            clearHover: () => { o(null); c(null); },
+            clearSelectionHover: () => u(null),
+            clearDragState: () => { O.current = null; oe(null); },
+            clearEditorRef: () => {},
+            nextInteractionGeneration: () => { me.current += 1; },
+            setEditorState: (update) => S(update),
+            matchesTarget: (state, target) => ms(state.target, target),
+          });
         },
         setDesignScrub: (property) => ie(property),
         clearSelectionHover: () => u(null),
