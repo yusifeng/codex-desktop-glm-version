@@ -587,6 +587,13 @@ Annotation text/container ancestor 查找（原 `rl`，4572-4581）已迁移至
 适配器接回，保留 text-container 元素、普通 container/未命中 `null` 协议。focused test
 覆盖三项行为。
 
+### 增量抽取：annotation scroll-container discovery
+
+从命中元素向 composed parent 链收集 scroll-container descriptor（原 `Mc`，4428-4441）
+已迁移至 `src/main/browser-page-preload/annotation-scroll-container-discovery.ts`。入口保留
+selector 生成和 clipping policy 注入，`Pc` 的事件监听副作用仍留在 preload；focused test
+覆盖 includeElement、selector/offset 收集和无 clipping 三项行为。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate

@@ -4426,17 +4426,7 @@ function jc(e, t) {
   return F(n) ? Mc(n, { includeElement: !0 }) : [];
 }
 function Mc(e, { includeElement: t = !1 } = {}) {
-  let n = Fc(e),
-    r = [],
-    i = t ? e : ic(e);
-  for (; i != null && i !== n.document.body && i !== n.document.documentElement;) {
-    if (Kc(i, n)) {
-      let e = kc(i);
-      e != null && r.push({ selector: e, scrollLeft: i.scrollLeft, scrollTop: i.scrollTop });
-    }
-    i = ic(i);
-  }
-  return r;
+  return discoverAnnotationScrollContainers(e, { includeElement: t }, { getOwnerWindow: (element) => Fc(element), getParent: (element) => ic(element), getBody: (windowLike) => windowLike.document.body, getDocumentElement: (windowLike) => windowLike.document.documentElement, isClippingBoundary: (element, windowLike) => Kc(element, windowLike), getSelector: (element) => kc(element), getScrollLeft: (element) => element.scrollLeft, getScrollTop: (element) => element.scrollTop });
 }
 function Nc(e, t) {
   return getAnnotationScrollContainerOffset(e, t.document, {
@@ -6033,6 +6023,7 @@ var { resolveAnnotationFrameHit } = require("./browser-page-preload/annotation-f
 var { collectAnnotationFrameElements, collectAnnotationFrameWindows } = require("./browser-page-preload/annotation-frame-tree");
 var { resolveAnnotationShadowSelector } = require("./browser-page-preload/annotation-shadow-selector-resolver");
 var { resolveAnnotationContainerAncestor } = require("./browser-page-preload/annotation-container-ancestor");
+var { discoverAnnotationScrollContainers } = require("./browser-page-preload/annotation-scroll-container-discovery");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
