@@ -4377,18 +4377,15 @@ function Oc(e, { requireUnique: t = !1 } = {}) {
   });
 }
 function kc(e, { requireUnique: t = !0 } = {}) {
-  let n = [],
-    r = e;
-  for (;;) {
-    let e = Oc(r, { requireUnique: t });
-    if (e == null) return null;
-    n.unshift(e);
-    let i = r.getRootNode();
-    if (i.nodeType === Node.DOCUMENT_NODE) break;
-    if (!Uc(i)) return null;
-    r = i.host;
-  }
-  return n.length === 1 ? n[0] : `${Xc}${n.join(Zc)}`;
+  return getAnnotationAnchorPath(e, { requireUnique: t }, {
+    generateSelector: (element, options) => Oc(element, options),
+    getRootNode: (element) => element.getRootNode(),
+    isDocumentRoot: (root) => root.nodeType === Node.DOCUMENT_NODE,
+    isShadowRoot: (root) => Uc(root),
+    getHost: (root) => root.host,
+    shadowPrefix: Xc,
+    shadowSeparator: Zc,
+  });
 }
 function Ac(e) {
   return isAnnotationElementFixedOrSticky(e, {
@@ -5995,6 +5992,7 @@ var { cleanupAnnotationCursorStylesAcrossFrames } = require("./browser-page-prel
 var { getAnnotationOwnerWindow } = require("./browser-page-preload/annotation-owner-window");
 var { getAnnotationElementFramePath } = require("./browser-page-preload/annotation-element-frame-path");
 var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation-anchor-selector");
+var { getAnnotationAnchorPath } = require("./browser-page-preload/annotation-anchor-path");
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");

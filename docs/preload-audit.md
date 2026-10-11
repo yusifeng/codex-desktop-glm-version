@@ -1152,3 +1152,10 @@ offset 和 `Sl` target policy 注入。focused test 覆盖 offset projection 与
 文本模式 point hit-test 与 container ancestor 解析（原 `fl`，4593-4595）已迁移至
 `src/main/browser-page-preload/annotation-text-target.ts`；入口仅注入 `hl` hit-test 和
 `rl` container policy，保留空命中返回 `null` 语义。focused test 覆盖命中 target 与空结果。
+
+### 增量抽取：annotation anchor path projection
+
+跨 document/shadow-root 组装稳定 anchor selector path（原 `kc`，4379-4392）已迁移至
+`src/main/browser-page-preload/annotation-anchor-path.ts`；入口仅注入 selector generator、
+root 判定与 shadow separator，保留单 selector、嵌套 `shadow:...>>>...` 及失败返回 `null` 语义。
+focused test 覆盖 document root、shadow path 与 selector 失败。
