@@ -4591,7 +4591,10 @@ var ll,
     (tl(), (ll = { width: 48, height: 24 }), (ul = { width: 24, height: 16 }));
   });
 function fl(e, t, n) {
-  return rl(hl(e, t, n, `text`));
+  return resolveAnnotationTextTarget(e, t, n, {
+    hitTest: (x, y, root) => hl(x, y, root, `text`),
+    getContainerAncestor: (element) => rl(element),
+  });
 }
 function pl(e, t, n, r, i = `annotation`) {
   return resolveAnnotationPointTarget(e, t, window, r, i, n, { hitTest: (x, y, frameElement, mode, useAnnotatable) => frameElement == null ? cc(x, y, mode === `annotation` && useAnnotatable ? il : void 0) : hl(x, y, frameElement, mode, useAnnotatable), getOwnerWindow: (element) => element.ownerDocument.defaultView, getFrameOffset: (windowLike) => Lc(windowLike, { x: 0, y: 0 }), resolveTarget: (element, point, mode, useAnnotatable) => Sl(element, point, mode, useAnnotatable) });
@@ -5995,6 +5998,7 @@ var { getAnnotationAnchorSelector } = require("./browser-page-preload/annotation
 var { openAnnotationPopoverTarget } = require("./browser-page-preload/annotation-popover-target");
 var { isAnnotationEventTarget } = require("./browser-page-preload/annotation-event-target-policy");
 var { resolveAnnotationPointTarget } = require("./browser-page-preload/annotation-point-target");
+var { resolveAnnotationTextTarget } = require("./browser-page-preload/annotation-text-target");
 var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");

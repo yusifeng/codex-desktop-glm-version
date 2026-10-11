@@ -1146,3 +1146,9 @@ policy，保留 target 缺失与 blocked 两态。focused test 覆盖命中和�
 页面坐标到 frame-local point 并解析 annotation target 的 projection（原 `pl`，4600-4606）
 已迁移至 `src/main/browser-page-preload/annotation-point-target.ts`；入口保留 hit-test、frame
 offset 和 `Sl` target policy 注入。focused test 覆盖 offset projection 与 target consumer。
+
+### 增量抽取：annotation text target projection
+
+文本模式 point hit-test 与 container ancestor 解析（原 `fl`，4593-4595）已迁移至
+`src/main/browser-page-preload/annotation-text-target.ts`；入口仅注入 `hl` hit-test 和
+`rl` container policy，保留空命中返回 `null` 语义。focused test 覆盖命中 target 与空结果。
