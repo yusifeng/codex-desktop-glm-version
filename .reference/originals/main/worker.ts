@@ -173,7 +173,7 @@ const { dispatchWorktreeResolutionRequest } = require("./worker/git-worktree-res
 const { dispatchGitNodeRequest } = require("./worker/git-node-request-dispatch");
 const { dispatchGitCoreRequest } = require("./worker/git-core-request-dispatch");
 const { getGitInitWatchKey: getSemanticGitInitWatchKey } = require("./worker/git-init-watcher-policy");
-const { createGitManagerKey, isGitManagerKeyForHost } = require("./worker/git-manager-key-policy");
+const { createGitManagerGenerationKey, createGitManagerKey, isGitManagerKeyForHost } = require("./worker/git-manager-key-policy");
 const { formatReviewSearchPath, buildSearchSnippet, findCaseInsensitiveOffsets, createLineDecoder } = require("./worker/git-review-search-utils");
 const { withWindowsCommandPath } = require("./worker/windows-command-env");
 const { parseDesktopEntryFields } = require("./worker/linux-desktop-entry-parser");
@@ -67589,7 +67589,7 @@ var {
       {
         promise: !0,
         maxAge: i4,
-        normalizer: ([e, t, n]) => `${this.getStableMetadataKey(e, t)}|${n}`,
+        normalizer: ([e, t, n]) => createGitManagerGenerationKey(h1(t), e, n),
       },
     );
     getStableMetadataMemoized = (0, DX.default)(
@@ -67637,7 +67637,7 @@ var {
       {
         promise: !0,
         maxAge: i4,
-        normalizer: ([e, t, n]) => `${this.getStableMetadataKey(e, t)}|${n}`,
+        normalizer: ([e, t, n]) => createGitManagerGenerationKey(h1(t), e, n),
       },
     );
     handleAppEvent(e) {

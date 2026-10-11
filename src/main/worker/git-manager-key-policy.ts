@@ -5,6 +5,9 @@ function createGitManagerKey(hostId: string, path: string): string {
 function isGitManagerKeyForHost(key: string, hostId: string): boolean {
   return key.startsWith(`${hostId}|`);
 }
+function createGitManagerGenerationKey(hostId: string, path: string, generation: number): string {
+  return `${createGitManagerKey(hostId, path)}|${generation}`;
+}
 
-export { createGitManagerKey, isGitManagerKeyForHost };
-if (typeof module !== `undefined`) module.exports = { createGitManagerKey, isGitManagerKeyForHost };
+export { createGitManagerGenerationKey, createGitManagerKey, isGitManagerKeyForHost };
+if (typeof module !== `undefined`) module.exports = { createGitManagerGenerationKey, createGitManagerKey, isGitManagerKeyForHost };
