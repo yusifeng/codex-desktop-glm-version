@@ -1344,3 +1344,10 @@ React annotation runtime 的 active/editor/hover highlight 分支与 linked addi
 `src/main/browser-page-preload/annotation-runtime-sync-state.ts`；zoom-change RAF、host subscription、
 cleanup 与后续 state side effects 仍由入口持有。focused test 覆盖 boolean gates、默认 mode/scale 与
 comments/intl payload 保留。
+
+### 增量抽取：annotation viewport refresh scheduler
+
+`Wy` 的 `lt` 单帧 viewport refresh 控制器（取消前一 RAF、排队 `T(C_())`、subscription cleanup 取消未执行
+帧）已迁移至 `src/main/browser-page-preload/annotation-viewport-refresh-scheduler.ts`；入口继续持有 React
+state setter 与 host subscription 生命周期。focused test 覆盖 coalescing、dispose cancellation 与 post-dispose
+no-op。

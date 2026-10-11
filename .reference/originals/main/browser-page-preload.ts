@@ -5971,6 +5971,7 @@ var { projectAnnotationRenderState } = require("./browser-page-preload/annotatio
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
+var { createAnnotationViewportRefreshScheduler } = require("./browser-page-preload/annotation-viewport-refresh-scheduler");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23680,6 +23681,13 @@ function Wy({ rootHost: e, bridge: t }) {
     Se = (0, G.useRef)(!1),
     Ce = (0, G.useRef)(!1),
     we = (0, G.useRef)(null),
+    [viewportRefreshScheduler] = (0, G.useState)(() =>
+      createAnnotationViewportRefreshScheduler({
+        requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+        cancelAnimationFrame: (handle) => window.cancelAnimationFrame(handle),
+        refresh: () => T(C_()),
+      }),
+    ),
     [Te] = (0, G.useState)(() =>
       Ry({
         rootHost: e,
@@ -24074,12 +24082,7 @@ function Wy({ rootHost: e, bridge: t }) {
       },
       [st],
     ),
-    lt = (0, G.useCallback)(() => {
-      (ge.current != null && window.cancelAnimationFrame(ge.current),
-        (ge.current = window.requestAnimationFrame(() => {
-          ((ge.current = null), T(C_()));
-        })));
-    }, []),
+    lt = (0, G.useCallback)(() => viewportRefreshScheduler.schedule(), [viewportRefreshScheduler]),
     ut = (0, G.useCallback)(
       (e, r, i) => {
         if (e.target.mode !== `create` || e.anchor.type === `text`) return;
@@ -24315,7 +24318,7 @@ function Wy({ rootHost: e, bridge: t }) {
       }
     });
     return () => {
-      (ge.current != null && (window.cancelAnimationFrame(ge.current), (ge.current = null)), e());
+      (viewportRefreshScheduler.dispose(), e());
     };
   }, [i, t, Oe, Ne, ot, st, lt, it, ct, Te, e, rt, at]),
     (0, G.useEffect)(() => {

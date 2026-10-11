@@ -2722,6 +2722,11 @@ build/verify-chunks 通过。effects/RAF/host IPC 仍保留在 React owner。
 zoom-change RAF、cleanup 与 state side effects，新增 `scripts/test-preload-annotation-runtime-sync-state.mjs`
 的 18 项 focused assertions，typecheck/build/verify-chunks 通过。剩余 frame-anchor observer 与 effects/IPC
 生命周期仍未完成。
+2026-10-11 A2 preload 增量：`Wy` 的 `lt` 单帧 viewport refresh 控制器已迁移至
+`src/main/browser-page-preload/annotation-viewport-refresh-scheduler.ts`；模块负责 RAF coalescing、取消与
+dispose gate，入口继续持有 React state setter、host subscription 与 observer 生命周期，新增
+`scripts/test-preload-annotation-viewport-refresh-scheduler.mjs` 的 7 项 focused assertions，typecheck/build/
+verify-chunks 通过。剩余 pointer/frame-anchor listeners 与 IPC effects 仍由 React owner 持有。
 2026-10-11 A2 preload 增量：React annotation runtime selected-id active view 派生（原 `Wy` 内
 `wt/Tt/M/Et/Dt/Ot`）已迁移至 `src/main/browser-page-preload/annotation-active-view-projection.ts`；入口
 继续持有 anchor resolution、React effects 与 render 生命周期，新增
