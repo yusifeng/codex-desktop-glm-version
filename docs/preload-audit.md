@@ -1475,7 +1475,7 @@ anchor/hover projection 与失败清理顺序，入口继续注入 React/ref/DOM
 
 ### 增量抽取：annotation point-retry controller
 
-`Wy` 的 `retryCreateCommentAtPoint` callback（`it`）的 RAF retry 生命周期已迁移至
+`Wy` 的 `retryCreateCommentAtPoint`/`retryOpenDesignEditorAtPoint` callbacks（`it`/`ct`）的 RAF retry 生命周期已迁移至
 `src/main/browser-page-preload/annotation-point-retry-controller.ts`；controller 保留初始调度、最多两次
 重试、成功短路和 dispose 时取消 pending frame，入口继续注入 `rt` point action。focused test 覆盖三次
 尝试、成功短路、pending cancel 与 dispose gate。

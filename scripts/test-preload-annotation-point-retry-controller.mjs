@@ -31,8 +31,15 @@ controller.retry("success", (value) => {
 });
 frames.shift().callback();
 assert.deepEqual(successful, ["success"]);
+const designAttempts = [];
+controller.retry("design", (value) => {
+  designAttempts.push(value);
+  return false;
+});
+frames.shift().callback();
+assert.deepEqual(designAttempts, ["design"]);
 controller.retry("stale", () => false);
 controller.dispose();
-assert.deepEqual(cancelled, [4]);
+assert.deepEqual(cancelled, [5, 6]);
 assert.equal(controller.retry("disposed", () => false), false);
 console.log("10 preload annotation point-retry-controller assertions passed");

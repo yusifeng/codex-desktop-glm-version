@@ -24190,16 +24190,7 @@ function Wy({ rootHost: e, bridge: t }) {
       },
       [x, t, A, Ze, e],
     ),
-    ct = (0, G.useCallback)(
-      (e) => {
-        let t = 2,
-          n = () => {
-            st(e) || t === 0 || (--t, window.requestAnimationFrame(n));
-          };
-        window.requestAnimationFrame(n);
-      },
-      [st],
-    ),
+    ct = (0, G.useCallback)((e) => pointRetryController.retry(e, (point) => st(point)), [st, pointRetryController]),
     lt = (0, G.useCallback)(() => viewportRefreshScheduler.schedule(), [viewportRefreshScheduler]),
     ut = (0, G.useCallback)(
       (e, r, i) => {
