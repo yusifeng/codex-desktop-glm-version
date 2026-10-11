@@ -542,3 +542,8 @@ Pyright `findSessionOptions` 的 PATH/PYTHON 环境与可选 `pythonPath` worksp
 projection 已迁移至 `src/main/main-app/language-server/pyright-session-options.ts`；原 provider
 继续负责 trusted command、platform path 与 runtime directory 探测。`scripts/test-main-pyright-session-options.mjs`
 覆盖 Windows 分号、POSIX 冒号及缺失 Python command。
+
+TypeScript language server 的 `tsserver` initialization payload 已迁移至
+`src/main/main-app/language-server/typescript-server-options.ts`；`findInitializationOptions`
+继续负责 bundled/trusted command 探测与文件存在性检查，两个发现分支共享同一纯 projection。
+`scripts/test-main-typescript-server-options.mjs` 覆盖路径与 payload 隔离。

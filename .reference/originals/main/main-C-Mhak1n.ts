@@ -47,6 +47,7 @@ const languageServerProtocolHelpers = require("./main-app/language-server/protoc
 const { buildKotlinWorkspaceConfig } = require("./main-app/language-server/kotlin-workspace-config.js");
 const { buildRustAnalyzerOptions } = require("./main-app/language-server/rust-analyzer-options.js");
 const { buildPyrightSessionOptions } = require("./main-app/language-server/pyright-session-options.js");
+const { buildTypeScriptServerInitializationOptions } = require("./main-app/language-server/typescript-server-options.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -136100,12 +136101,12 @@ var Y0e = { backgroundIndexing: !1, swiftPM: { forceResolvedVersions: !0, skipPl
     }
     async findInitializationOptions(e) {
       let t = await C$(e);
-      if (t != null) return { tsserver: { path: t.tsserverPath, useSyntaxServer: `never` } };
+      if (t != null) return buildTypeScriptServerInitializationOptions(t.tsserverPath);
       let n = await ZQ(e),
         r = await n.findTrustedCommand(`tsserver`);
       if (r == null) return null;
       let i = await n.getTypeScriptServerPath(r);
-      return i == null ? null : { tsserver: { path: i, useSyntaxServer: `never` } };
+      return i == null ? null : buildTypeScriptServerInitializationOptions(i);
     }
   };
 async function C$(e) {

@@ -2715,3 +2715,7 @@ tool discovery、PATH/env、sysroot spawn/stat 与 session lifecycle，新增
 `src/main/main-app/language-server/pyright-session-options.ts`；provider 继续持有 trusted
 command/platform path/runtime 探测，新增 `scripts/test-main-pyright-session-options.mjs` 的
 2 项 focused assertions，typecheck 通过。
+2026-10-11 A3 main/language-server 增量：TypeScript language server 的 `tsserver` initialization
+payload 已迁移至 `src/main/main-app/language-server/typescript-server-options.ts`；探测与文件
+存在性检查仍由 `findInitializationOptions` 持有，新增
+`scripts/test-main-typescript-server-options.mjs` 的 2 项 focused assertions。
