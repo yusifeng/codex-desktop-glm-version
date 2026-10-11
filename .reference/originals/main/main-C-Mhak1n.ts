@@ -44,6 +44,7 @@ const targetSelectionPolicy = require("./main-app/open-target/target-selection-p
 const targetLaunchArgs = require("./main-app/open-target/target-launch-args.js");
 const targetDescriptorPolicy = require("./main-app/open-target/target-descriptor-policy.js");
 const languageServerProtocolHelpers = require("./main-app/language-server/protocol-helpers.js");
+const { buildKotlinWorkspaceConfig } = require("./main-app/language-server/kotlin-workspace-config.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -135535,7 +135536,7 @@ var F0e = class {
       await e.host.createDirectory(n, { recursive: !0 }),
       await e.host.writeFile(
         t.join(n, `workspace.json`),
-        `${JSON.stringify(I0e(e.workspaceRoot))}\n`,
+        `${JSON.stringify(buildKotlinWorkspaceConfig(e.workspaceRoot))}\n`,
       ),
       {
         initializationOptions: { buildTools: { [v$(n, t)]: `json` } },
@@ -135565,47 +135566,6 @@ var F0e = class {
     );
   }
 };
-function I0e(e) {
-  return {
-    kotlinSettings: [
-      {
-        additionalArguments: null,
-        additionalVisibleModuleNames: [],
-        compilerArguments: null,
-        configFileItems: [],
-        copyJsLibraryFiles: !1,
-        dependsOnModuleNames: [],
-        externalProjectId: `workspace`,
-        externalSystemRunTasks: [],
-        flushNeeded: !1,
-        implementedModuleNames: [],
-        isHmppEnabled: !1,
-        isTestModule: !1,
-        kind: `default`,
-        module: `workspace`,
-        name: `Kotlin`,
-        outputDirectoryForJsLibraryFiles: null,
-        productionOutputPath: null,
-        pureKotlinSourceFolders: [e],
-        scriptTemplates: null,
-        scriptTemplatesClasspath: null,
-        sourceRoots: [e],
-        sourceSetNames: [],
-        targetPlatform: null,
-        testOutputPath: null,
-        useProjectSettings: !0,
-        version: 5,
-      },
-    ],
-    modules: [
-      {
-        contentRoots: [{ path: e, sourceRoots: [{ path: e, type: `java-source` }] }],
-        dependencies: [{ type: `moduleSource` }, { type: `inheritedSdk` }],
-        name: `workspace`,
-      },
-    ],
-  };
-}
 var x$ = l$(),
   L0e = 12e4,
   R0e = 1e3,

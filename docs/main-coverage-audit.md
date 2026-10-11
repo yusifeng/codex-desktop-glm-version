@@ -517,6 +517,12 @@ platform menu-bar、appearance options、minimum size 与 webPreferences 字段�
 的 Electron event/listener、navigation、registration 与 cleanup 生命周期仍由 `Qot` 持有。
 `scripts/test-main-browser-window-options.mjs` 覆盖完整字段与可选 x/y/icon/menu-bar 边界。
 
+language-server Kotlin runtime 的 `workspace.json` 配置 projection 已迁移至
+`src/main/main-app/language-server/kotlin-workspace-config.ts`，由 Kotlin session setup 的
+文件写入 consumer 真实调用；host path、runtime discovery、directory/file I/O 与 process
+生命周期仍由 language-server owner 持有。`scripts/test-main-kotlin-workspace-config.mjs`
+覆盖完整配置字段和不同 workspace root 的实例隔离。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

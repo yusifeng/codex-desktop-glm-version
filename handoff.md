@@ -2671,6 +2671,11 @@ title/icon、background、platform menu-bar、appearance options、minimum size 
 语义；窗口事件、navigation、registration 与 cleanup 仍由 window manager 持有。新增
 `scripts/test-main-browser-window-options.mjs` 的 2 项 focused assertions，typecheck 通过；
 本轮 build 受并行 worker.ts 重复符号 `o` 阻塞，需由 owner 修复后复跑全量门禁。
+2026-10-11 A3 main/language-server 增量：Kotlin runtime 的 `workspace.json` 配置 projection
+已迁移至 `src/main/main-app/language-server/kotlin-workspace-config.ts`，`findSessionOptions`
+继续持有 host path、runtime discovery、文件 I/O 与 process 生命周期；新增
+`scripts/test-main-kotlin-workspace-config.mjs` 的 2 项 focused assertions，build/typecheck/
+verify-chunks 通过。
 2026-10-11 A2 preload 增量：React annotation runtime 文本 anchor 观察目标规划（原 `du`）已迁移至
 `src/main/browser-page-preload/annotation-text-anchor-observation-targets.ts`；入口继续持有
 MutationObserver、input/scroll/frame 监听、RAF 调度与 dispose 生命周期，新增
