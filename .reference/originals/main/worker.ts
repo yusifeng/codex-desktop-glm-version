@@ -143,6 +143,7 @@ const { sanitizeChildProcessEnv } = require("./worker/platform-env");
 const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open-in-target-descriptors");
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
 const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
+const { resolveOpenTarget } = require("./worker/open-target-registry");
 const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
@@ -81278,10 +81279,10 @@ var uDe = new Map(
 function dDe(e) {
   return {
     detectTarget: async ({ target: t, customTarget: n }) =>
-      n == null ? A9(t).detect(e) : uTe(n.command, process.platform),
+      n == null ? resolveOpenTarget(uDe, t).detect(e) : uTe(n.command, process.platform),
     getTargetIcon: async ({ target: t, command: n, customTarget: r }) => {
       if (r != null) return b7(aTe(r.icon, process.platform));
-      let i = A9(t);
+      let i = resolveOpenTarget(uDe, t);
       if (process.platform !== `win32` || n == null) return b7(i.icon);
       let a = i.iconPath ? i.iconPath(n) : n;
       return (
@@ -81290,11 +81291,6 @@ function dDe(e) {
       );
     },
   };
-}
-function A9(e) {
-  let t = uDe.get(e);
-  if (t == null) throw Error(`Unknown open target "${e}"`);
-  return t;
 }
 async function j9(e, t) {
   return new fDe(await import(`@parcel/watcher`), e, t).start();

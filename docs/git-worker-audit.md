@@ -1537,3 +1537,7 @@ Review live-query response 的 `H6/U6` failure projection 已迁移至同一 req
 `projectGitReviewSummaryResult`；review-summary 在 comparison command failure 时仍映射为
 `review_comparison`，入口继续负责 live-query、performance 与 response 生命周期。
 `scripts/test-worker-git-review-summary-projection.mjs` 覆盖 4 项断言。
+
+Open-target registry 的 `A9` lookup 已迁移至 `src/main/worker/open-target-registry.ts`；
+入口继续构造平台 descriptor registry，并负责 detect/icon/open 的平台 I/O。由
+`scripts/test-worker-open-target-registry.mjs` 覆盖 3 项 lookup/error 断言。
