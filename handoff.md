@@ -2599,6 +2599,7 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 2026-10-11 A5 app-initial 批次：`$AHt/$AI/$AIt/$AJ/$AJt/$AK/$AL/$ALt/$AM/$AMt/$AN/$ANt/$AO/$AOt/$AP/$APt/$AQ/$AQt/$AR/$ARt/$AS/$ASn/$ASt/$AT/$ATt/$AU/$AV/$AVt/$AW/$AWt/$AX/$AY/$AYt/$AZ/$AZt/$A_n/$A_t/$Aa/$Aan/$Aat` 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 app-initial 批量推进：本批 500 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
+2026-10-11 A5 app-initial 批量推进 B6：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
 2026-10-11 A5 app-initial 批量推进：本批 1000 个 alias 已完成 export-table 反解并登记为 `preserved-coupled`，无独立 renderer business owner。
