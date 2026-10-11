@@ -1554,3 +1554,9 @@ existence 与 worktree directory checks 三处 consumer 直接使用既有
 同理删除未再被引用的 `nbe` tri-state、`rbe` cancelability 与 `dbe` request-failure
 generated wrappers；请求完成 failure telemetry 直接调用既有 `isGitRequestFailure`，而
 watch/query consumers 已直接接入各自语义 policy。此次仅消除转发层，不改变请求生命周期。
+
+Worktree snapshot/ref 与 remote branch projection 已迁移至
+`src/main/worker/git-worktree-snapshot-policy.ts`：snapshot ref/message 构造和
+`remote -v` push branch 输出解析均由语义 helper 承载；snapshot/restore 与 repository
+query owner 仍负责 Git I/O、cache 和 lifecycle。`scripts/test-worker-git-worktree-snapshot-policy.mjs`
+覆盖 4 项断言。

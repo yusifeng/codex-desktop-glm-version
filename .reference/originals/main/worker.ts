@@ -144,6 +144,7 @@ const { createCrossPlatformTarget, createEditorTarget } = require("./worker/open
 const { buildTerminalEditorArgs, buildMacTerminalLaunch } = require("./worker/terminal-open-policy");
 const { buildWslOpenTargetArgs } = require("./worker/wsl-open-target-args");
 const { resolveOpenTarget } = require("./worker/open-target-registry");
+const { createWorktreeSnapshotCommitMessage, createWorktreeSnapshotRef, parsePushedRemoteBranches } = require("./worker/git-worktree-snapshot-policy");
 const { extractMacAppBundlePath } = require("./worker/mac-app-path");
 const { resolveExecutableCandidate } = require("./worker/executable-candidate");
 const { isSparsePathspecUnsupported, createGitAddFailure } = require("./worker/git-pathspec-policy");
@@ -67927,7 +67928,7 @@ async function Sge(e, t, n, r, i) {
     );
   let o = e.getWorktreeRepositoryForRoot(a.root, n),
     s = await X0(a.root),
-    c = M4(s);
+    c = createWorktreeSnapshotRef(s);
   O4().info(`[worktree-snapshot] start`, {
     safe: { worktreeId: s, reason: r, hasHostConfig: n != null },
     sensitive: {},
@@ -67943,12 +67944,12 @@ async function Sge(e, t, n, r, i) {
     d = u;
   if (u) {
     if ((await getGitCommitTree(o, u, i)).trim() !== l) {
-      let e = await _4(a.root, l, n, { parentSha: u, message: N4(r), signal: i });
+      let e = await _4(a.root, l, n, { parentSha: u, message: createWorktreeSnapshotCommitMessage(r), signal: i });
       if (!e.success) throw Error(`Failed to create synthetic commit`);
       d = e.commitSha.trim();
     }
   } else {
-    let e = await _4(a.root, l, n, { message: N4(r), signal: i });
+    let e = await _4(a.root, l, n, { message: createWorktreeSnapshotCommitMessage(r), signal: i });
     if (!e.success) throw Error(`Failed to create synthetic commit`);
     d = e.commitSha.trim();
   }
@@ -67975,7 +67976,7 @@ async function Sge(e, t, n, r, i) {
 }
 async function Cge(e, t, n, r, i) {
   let a = await X0(bz(t)),
-    o = M4(a);
+    o = createWorktreeSnapshotRef(a);
   if (
     (O4().info(`[worktree-restore] start`, {
       safe: { worktreeId: a, snapshotRef: o, hasHostConfig: r != null },
@@ -71473,7 +71474,7 @@ function kbe(e) {
         let e = t.stderr || t.stdout;
         throw Error(`git remote -v failed${e ? `: ${e}` : ``}`);
       }
-      return Mge(t.stdout);
+      return parsePushedRemoteBranches(t.stdout);
     },
     staleTime: 250,
   });
