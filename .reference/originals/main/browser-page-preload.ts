@@ -5959,6 +5959,7 @@ var { collectAnnotationDraftAttributes } = require("./browser-page-preload/annot
 var { createAnnotationPointerSelection } = require("./browser-page-preload/annotation-pointer-selection");
 var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
 var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annotation-display-anchors");
+var { projectAnnotationRuntimeCollections } = require("./browser-page-preload/annotation-runtime-collection-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -23686,8 +23687,18 @@ function Wy({ rootHost: e, bridge: t }) {
     Ae = xs(n.viewportScale),
     je = fd(),
     Me = qg(je),
-    Pe = new Map(Ee.map((e, t) => [e.id, t + 1])),
-    Fe = Ee.filter(Qy),
+    collectionState = projectAnnotationRuntimeCollections(
+      Ee,
+      {
+        activeDesignChange: n.activeDesignChange,
+        canUseTweaks: Ne,
+        isOriginalViewEnabled: n.isOriginalViewEnabled === !0,
+        annotationEditorMode: n.annotationEditorMode,
+      },
+      { isCurrentPage: Qy, hasComments: ss, emptyCollection: xb },
+    ),
+    Pe = collectionState.commentIndex,
+    Fe = collectionState.pageComments,
     Ie = eb(e),
     Le = Fe.flatMap((e) => {
       let t = ue.get(e.id),
@@ -23695,11 +23706,11 @@ function Wy({ rootHost: e, bridge: t }) {
       return n == null ? [] : [n];
     }),
     Re = n.activeDesignChange,
-    ze = Ee.flatMap((e) => (e.designChange == null ? [] : [e.designChange])),
-    Be = Ne ? (Re == null ? ze : [...ze.filter((e) => e.id !== Re.id), Re]) : xb,
-    Ve = n.isOriginalViewEnabled === !0 ? xb : Be,
-    He = ss(Ee),
-    Ue = Ne && He && n.annotationEditorMode === `design`,
+    ze = collectionState.designChanges,
+    Be = collectionState.mergedDesignChanges,
+    Ve = collectionState.visibleDesignChanges,
+    He = collectionState.hasComments,
+    Ue = collectionState.isDesignMode,
     We = Ve.flatMap((e) => {
       let t = Zy(e, Ie);
       return t == null ? [] : [t];

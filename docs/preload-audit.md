@@ -1253,3 +1253,11 @@ React annotation runtime 的文本 anchor 观察目标规划（原 `du`，4959-5
 frame path、text locator、shadow-root/ancestor 关系构造 mutation、input、scroll 与 frame
 目标集合，并保留 unresolved 标记。入口继续持有 MutationObserver、事件监听、RAF 调度与
 dispose 生命周期。focused test 覆盖已解析 target、缺失 frame 与 shadow fallback。
+
+### 增量抽取：annotation runtime collection projection
+
+React annotation runtime 顶层 comments/page/design 派生集合（原 `Wy` 内 `Pe/Fe/ze/Be/Ve/He/Ue`）
+已迁移至 `src/main/browser-page-preload/annotation-runtime-collection-projection.ts`；模块负责
+comment index、当前页过滤、active design change 替换、original-view/tweaks gate 与 design-mode
+判定，入口继续持有 DOM anchor resolution、React effects 与 watcher 生命周期。focused test 覆盖
+active change replacement、original-view、tweaks disabled、design-mode 与 empty collection。
