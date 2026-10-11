@@ -1421,3 +1421,10 @@ focused test 覆盖初始 false、true/false 变化、重复值与 dispose 后�
 消息构造已迁移至 `src/main/browser-page-preload/annotation-selection-modifier-notifier.ts`；回调继续拥有
 `be.current`/`Oe`/anchor 与 shift-key 业务判定，notifier 保留原始每次发送语义，仅在 runtime dispose 后抑制。
 `scripts/test-preload-annotation-selection-modifier-notifier.mjs` 覆盖重复值仍发送、值切换与 dispose gate。
+
+### 增量抽取：annotation editor-restore controller
+
+`Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、transient、hover 与 selection-hover
+清理顺序已迁移至 `src/main/browser-page-preload/annotation-editor-restore-controller.ts`；入口继续注入 React
+refs/setters 与 `H_` restore adapter，保持 host restore message 的原始副作用顺序。由
+`scripts/test-preload-annotation-editor-restore-controller.mjs` 覆盖顺序、message 透传与 null restore。

@@ -2876,3 +2876,9 @@ BrowserWindow 状态读取、`setOpacity(0)`、show/focus 与 `setImmediate` 恢
 host `readDirectory`、generation/missing gate、stale target dispose/removal、new target creation/session
 start，以及 discovery failure 的 recovery/retry 顺序。由
 `scripts/test-worker-git-worktree-watch-refresh-controller.mjs` 覆盖 9 项 focused assertions。
+
+2026-10-11 A2 preload 增量：`Wy` host restore-editor 分支的 interaction、modifier、anchor point、pointer、
+transient、hover 与 selection-hover 清理顺序已物理迁移至
+`src/main/browser-page-preload/annotation-editor-restore-controller.ts`；入口继续注入 React refs/setters 与
+`H_` restore adapter，保持原始 host message 副作用顺序。由
+`scripts/test-preload-annotation-editor-restore-controller.mjs` 覆盖 12 项 focused assertions。

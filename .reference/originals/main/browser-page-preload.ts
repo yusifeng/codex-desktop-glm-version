@@ -5978,6 +5978,7 @@ var { dispatchAnnotationWyHostMessage } = require("./browser-page-preload/annota
 var { createAnnotationScreenshotReadyController } = require("./browser-page-preload/annotation-screenshot-ready-controller");
 var { createAnnotationTextHighlightController } = require("./browser-page-preload/annotation-text-highlight-controller");
 var { closeAnnotationEditor } = require("./browser-page-preload/annotation-editor-close-controller");
+var { restoreAnnotationEditor } = require("./browser-page-preload/annotation-editor-restore-controller");
 var { createAnnotationSuspensionNotifier } = require("./browser-page-preload/annotation-suspension-notifier");
 var { createAnnotationDesignModifierNotifier } = require("./browser-page-preload/annotation-design-modifier-notifier");
 var { createAnnotationSelectionModifierNotifier } = require("./browser-page-preload/annotation-selection-modifier-notifier");
@@ -24294,8 +24295,16 @@ function Wy({ rootHost: e, bridge: t }) {
         setSelectionHover: (selectionIndex) => u(selectionIndex),
         removeAnnotationSelection: (selectionIndex) => dt(selectionIndex),
         restoreEditor: (message) => {
-          (w.current?.clear(), (be.current = !1), m(!1), (E.current = null), f(null), mc(), o(null), c(null),
-            u(null), vt(message));
+          restoreAnnotationEditor(message, {
+            clearInteraction: () => w.current?.clear(),
+            resetModifierState: () => { be.current = !1; m(!1); },
+            clearAnchorPoint: () => { E.current = null; },
+            clearPointerState: () => f(null),
+            clearTransientState: () => mc(),
+            clearHover: () => { o(null); c(null); },
+            clearSelectionHover: () => u(null),
+            restoreEditor: (restoreMessage) => vt(restoreMessage),
+          });
         },
       }, () => lt())) return;
     });

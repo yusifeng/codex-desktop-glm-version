@@ -1413,3 +1413,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 [test-worker-git-worktree-watch-refresh-controller.mjs](test-worker-git-worktree-watch-refresh-controller.mjs)
 [test-main-window-presentation-policy.mjs](test-main-window-presentation-policy.mjs)
+[test-preload-annotation-editor-restore-controller.mjs](test-preload-annotation-editor-restore-controller.mjs)
