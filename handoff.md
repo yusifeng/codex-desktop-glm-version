@@ -12,6 +12,8 @@
 
 同轮新增 `annotation-interaction-reset-controller.ts`，真实接回 Wy 的 `mt` 全量 interaction reset callback；focused test 为 `scripts/test-preload-annotation-interaction-reset-controller.mjs`。
 
+同轮新增 `annotation-hover-fallback-controller.ts`，真实接回 Wy 的 `tt` DOM hover/click fallback callback；focused test 为 `scripts/test-preload-annotation-hover-fallback-controller.mjs`。
+
 同轮新增 `git-init-recovery-controller.ts`，真实接回 `GitManager.handleGitInit`；controller 保留 handled-set、
 metadata refresh、watch-git-metadata 重启、desired-key 竞态与 finally/catch 回收顺序；focused test 为
 `scripts/test-worker-git-init-recovery-controller.mjs`。

@@ -174,6 +174,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-preload-annotation-virtual-selection-editor-controller.mjs`](./test-preload-annotation-virtual-selection-editor-controller.mjs)
 - [`test-preload-annotation-create-anchor-update-controller.mjs`](./test-preload-annotation-create-anchor-update-controller.mjs)
 - [`test-preload-annotation-interaction-reset-controller.mjs`](./test-preload-annotation-interaction-reset-controller.mjs)
+- [`test-preload-annotation-hover-fallback-controller.mjs`](./test-preload-annotation-hover-fallback-controller.mjs)
 - [`test-preload-annotation-design-editor-state.mjs`](./test-preload-annotation-design-editor-state.mjs)
 - [`test-preload-annotation-event-details.mjs`](./test-preload-annotation-event-details.mjs)
 - [`test-preload-annotation-host-message-dispatcher.mjs`](./test-preload-annotation-host-message-dispatcher.mjs)

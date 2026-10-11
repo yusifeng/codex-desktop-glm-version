@@ -12,6 +12,8 @@
 
 另新增 `annotation-interaction-reset-controller.ts`，真实接回 Wy 的 `mt` 全量 interaction reset lifecycle，保留 preview、modifier、pointer、selection、editor、generation、viewport 与 drag cleanup 顺序。
 
+另新增 `annotation-hover-fallback-controller.ts`，真实接回 Wy 的 `tt` DOM hover/click fallback lifecycle，保留 editor/mode gate、跨 frame hit-test、anchor projection 与 hover/open 分支。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style

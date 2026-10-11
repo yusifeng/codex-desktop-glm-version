@@ -24025,6 +24025,15 @@ function Wy({ rootHost: e, bridge: t }) {
         },
       }),
     ),
+    [hoverFallbackController] = (0, G.useState)(() =>
+      createAnnotationHoverFallbackController({
+        resolveElement: (x, y, canUseSiteAnnotationApi, rootHost) => pl(x, y, canUseSiteAnnotationApi, rootHost),
+        projectAnchor: (element, x, y) => tv(element, x, y),
+        openAt: (element, anchorState) => qe(element, anchorState),
+        resolveHover: (element) => Yy(element),
+        setHover: (hover) => o(hover),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24181,9 +24190,12 @@ function Wy({ rootHost: e, bridge: t }) {
       });
     }),
     tt = (0, G.useEffectEvent)((t, n) => {
-      if (x != null || k !== `comment`) return;
-      let r = pl(t.x, t.y, A, e);
-      r != null && (n ? qe(r, tv(r, t.x, t.y)) : o(Yy(r)));
+      hoverFallbackController.handle(t, n, {
+        editorOpen: x != null,
+        interactionMode: k,
+        canUseSiteAnnotationApi: A,
+        rootHost: e,
+      });
     });
   ((0, G.useEffect)(() => {
     let t = t_({
@@ -24357,6 +24369,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => virtualSelectionEditorController.dispose(), [virtualSelectionEditorController]),
     (0, G.useEffect)(() => () => createAnchorUpdateController.dispose(), [createAnchorUpdateController]),
     (0, G.useEffect)(() => () => interactionResetController.dispose(), [interactionResetController]),
+    (0, G.useEffect)(() => () => hoverFallbackController.dispose(), [hoverFallbackController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
