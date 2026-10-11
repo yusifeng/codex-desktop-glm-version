@@ -22,6 +22,7 @@ import {
 import { initSharedObjectSnapshot, setSharedObjectValue } from "./shared-object-snapshot";
 import { registerPipVideoFrameHandler, disposeDecodersForRemovedPresentations } from "./pip-video-decoder";
 import { createSystemThemeVariantController } from "./system-theme-variant-controller";
+import { createViewMessageRouterController } from "./view-message-router-controller";
 import {
   createElectronBridge,
   WINDOW_TYPE,
@@ -55,21 +56,17 @@ const electronBridge = createElectronBridge({
   subscribeToSystemThemeVariant: (callback) => systemThemeVariantController.subscribe(callback),
 });
 
+const viewMessageRouterController = createViewMessageRouterController({
+  isChunkedHostMessage,
+  setSharedObjectValue,
+  disposePipLayout: disposeDecodersForRemovedPresentations,
+  dispatchMessage: (message) => window.dispatchEvent(new MessageEvent("message", { data: message })),
+});
+
 // 主进程 → 页面的普通消息：非「宿主分块消息」时同步本地共享对象快照 /
 // 清理 PIP 解码器，然后以 DOM message 事件派发给页面代码。
 ipcRenderer.on(MESSAGE_FOR_VIEW, (_event, message: unknown) => {
-  if (!isChunkedHostMessage(message)) {
-    const record = message as { type?: string; key?: string; value?: unknown; state?: never };
-    if (record.type === "shared-object-updated") {
-      setSharedObjectValue(record.key as string, record.value);
-    } else if (record.type === "remote-hosted-pip-content-layout-state-changed") {
-      disposeDecodersForRemovedPresentations(
-        (record as unknown as { state: { activeThreadID: string; orderedPresentationIDs: string[] } })
-          .state,
-      );
-    }
-  }
-  window.dispatchEvent(new MessageEvent("message", { data: message }));
+  viewMessageRouterController.route(message);
 });
 
 // MCP 沙箱宿主消息：连同 MessagePort 一起转发进页面（origin 非空时）。
