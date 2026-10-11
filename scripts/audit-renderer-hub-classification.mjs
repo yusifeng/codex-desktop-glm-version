@@ -16,6 +16,24 @@ const HUBS = {
   "app-primary": "app-primary-d66705000d76.ts",
 };
 const LINE_CLASSIFICATIONS_PATH = path.join(ROOT, "docs/renderer-hub-line-classification.json");
+const hubSymbolSets = new Map();
+const hubLineCache = new Map();
+
+function getHubLines(hub) {
+  if (!hubLineCache.has(hub)) {
+    hubLineCache.set(hub, fs.readFileSync(path.join(ROOT, "src/webview/assets", HUBS[hub]), "utf8").split("\n"));
+  }
+  return hubLineCache.get(hub);
+}
+
+function getHubSymbols(hub, lines) {
+  if (!hubSymbolSets.has(hub)) {
+    const symbols = new Set();
+    for (const match of lines.join("\n").matchAll(/[A-Za-z_$][\w$]*/g)) symbols.add(match[0]);
+    hubSymbolSets.set(hub, symbols);
+  }
+  return hubSymbolSets.get(hub);
+}
 
 function readLineClassifications() {
   const entries = JSON.parse(fs.readFileSync(LINE_CLASSIFICATIONS_PATH, "utf8"));
@@ -31,11 +49,12 @@ function readLineClassifications() {
     }
     const modulePath = path.join(ROOT, entry.module);
     if (!fs.existsSync(modulePath)) throw new Error(`missing semantic module for ${entry.hub}:${entry.alias}: ${entry.module}`);
-    const hubLines = fs.readFileSync(path.join(ROOT, "src/webview/assets", HUBS[entry.hub]), "utf8").split("\n");
+    const hubLines = getHubLines(entry.hub);
+    const hubSymbols = getHubSymbols(entry.hub, hubLines);
     const sourceWindow = hubLines.slice(entry.startLine - 1, entry.endLine).join("\n");
     const escapedSourceSymbol = typeof entry.sourceSymbol === "string" ? entry.sourceSymbol.replaceAll("$", "\\$") : null;
-    const sourceSymbolPattern = escapedSourceSymbol && new RegExp(`(?:(?:function|var|let|const)\\s+)?${escapedSourceSymbol}\\s*(?==|\\()`);
-    if (sourceSymbolPattern && !sourceSymbolPattern.test(sourceWindow) && !sourceSymbolPattern.test(hubLines.join("\\n"))) {
+    const sourceSymbolPattern = escapedSourceSymbol && new RegExp(`(?<![A-Za-z0-9_$])${escapedSourceSymbol}(?![A-Za-z0-9_$])`);
+    if (sourceSymbolPattern && !sourceSymbolPattern.test(sourceWindow) && !hubSymbols.has(entry.sourceSymbol)) {
       throw new Error(`source symbol ${entry.sourceSymbol} is outside ${entry.hub}:${entry.startLine}-${entry.endLine}`);
     }
   }
@@ -164,16 +183,18 @@ export function classifyHub(hub) {
   const consumed = new Set([...consumption.named, ...consumption.namespaceMembers].filter((name) => exports.has(name)));
   const unconsumed = [...exports].filter((name) => !consumed.has(name)).sort();
   const reviewed = readLineClassifications().filter((entry) => entry.hub === hub);
+  const reviewedAliases = new Set(reviewed.map((entry) => entry.alias));
+  const unreviewed = unconsumed.filter((alias) => !reviewedAliases.has(alias));
   for (const entry of reviewed) {
     if (!exports.has(entry.alias)) throw new Error(`line classification references missing export ${hub}:${entry.alias}`);
   }
-  return { hub, exportCount: exports.size, consumedCount: consumed.size, sideEffectImports: consumption.sideEffectImports, unconsumed, reviewedCount: reviewed.length };
+  return { hub, exportCount: exports.size, consumedCount: consumed.size, sideEffectImports: consumption.sideEffectImports, unconsumed, unreviewed, reviewedCount: reviewed.length };
 }
 
 const strict = process.argv.includes("--strict");
 const hubs = Object.keys(HUBS).map(classifyHub);
 for (const result of hubs) {
-  console.log(`${result.hub}: ${result.consumedCount}/${result.exportCount} consumed; ${result.sideEffectImports} side-effect imports; ${result.unconsumed.length} unconsumed`);
-  if (result.unconsumed.length > 0 && process.argv.includes("--list")) console.log(`  ${result.unconsumed.join(", ")}`);
+  console.log(`${result.hub}: ${result.consumedCount}/${result.exportCount} consumed; ${result.sideEffectImports} side-effect imports; ${result.unconsumed.length} unconsumed; ${result.unreviewed.length} unreviewed`);
+  if (result.unreviewed.length > 0 && process.argv.includes("--list")) console.log(`  ${result.unreviewed.join(", ")}`);
 }
-if (strict && hubs.some((result) => result.unconsumed.length > 0)) process.exit(1);
+if (strict && hubs.some((result) => result.unreviewed.length > 0)) process.exit(1);
