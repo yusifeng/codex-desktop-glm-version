@@ -131,6 +131,7 @@ const { classifyWorkerMessageCategory } = require("./worker/message-category");
 const { buildParcelWatcherOptions } = require("./worker/parcel-watcher-options");
 const { projectParcelWatcherEvents } = require("./worker/parcel-watcher-events");
 const { isPathAtOrBelowAnyRoot, isPathBelowAnyRoot } = require("./worker/parcel-watcher-paths");
+const { isParcelWatcherMissingPathError } = require("./worker/parcel-watcher-errors");
 const { describeShell, resolvePowerShellExecutable } = require("./worker/shell-config");
 const { createShellEnvironmentResolver } = require("./worker/git-shell-environment");
 const { isWslMountedPath: RH, isWindowsPath: zH, isWslUncPath: BH, wslUncDistro: VH, mountedPathToWindows: HH, windowsPathToWsl: UH, toBackslashes: WH } = require("./worker/host-path-policy");
@@ -81567,7 +81568,7 @@ async function pDe(e) {
       await t.close();
     }
   } catch (e) {
-    if (F9(e, `ENOENT`) || F9(e, `ENOTDIR`)) return !1;
+    if (isParcelWatcherMissingPathError(e, `ENOENT`) || isParcelWatcherMissingPathError(e, `ENOTDIR`)) return !1;
     throw e;
   }
 }
@@ -81575,12 +81576,9 @@ async function M9(e) {
   try {
     return (await (0, D.lstat)(e)).isDirectory();
   } catch (e) {
-    if (F9(e, `ENOENT`) || F9(e, `ENOTDIR`)) return !1;
+    if (isParcelWatcherMissingPathError(e, `ENOENT`) || isParcelWatcherMissingPathError(e, `ENOTDIR`)) return !1;
     throw e;
   }
-}
-function F9(e, t) {
-  return typeof e == `object` && !!e && `code` in e && e.code === t;
 }
 function mDe(e, t, n) {
   switch (e) {

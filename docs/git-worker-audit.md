@@ -1523,3 +1523,7 @@ watcher owner 负责。由 `scripts/test-worker-parcel-watcher-paths.mjs` 覆盖
 `src/main/worker/message-category.ts`；request/response/broadcast、thread-stream change 与
 follower coordination 分类由 8 项 focused assertions 覆盖，连接计数与 close 生命周期仍由
 原 owner 持有。
+
+parcel watcher 的 ENOENT/ENOTDIR 错误码投影 `F9` 已迁移至
+`src/main/worker/parcel-watcher-errors.ts`；directory existence checks 仍保留 lstat/opendir
+I/O 与 watcher session 生命周期。`scripts/test-worker-parcel-watcher-errors.mjs` 覆盖 5 项断言。
