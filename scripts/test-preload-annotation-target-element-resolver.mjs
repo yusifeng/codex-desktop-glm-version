@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { resolveAnnotationTargetElement } = require("../app/.vite/build/browser-page-preload/annotation-target-element-resolver.js");
+const documentLike = { body: {}, documentElement: {} };
+const parent = { ownerDocument: documentLike, tagName: "main", parentElement: documentLike.body, getBoundingClientRect: () => ({ width: 60, height: 30 }), getAttribute: () => null };
+const child = { ownerDocument: documentLike, tagName: "div", parentElement: parent, getBoundingClientRect: () => ({ width: 8, height: 8 }), getAttribute: () => null };
+const deps = { getOwnerDocument: (value) => value.ownerDocument, getBody: (value) => value.body, getDocumentElement: (value) => value.documentElement, getParentElement: (value) => value.parentElement, getRect: (value) => value.getBoundingClientRect(), getTagName: (value) => value.tagName, getRole: (value) => value.getAttribute("role"), hasDirectText: (value) => value === parent };
+assert.equal(resolveAnnotationTargetElement(child, deps), parent);
+const button = { ...child, tagName: "button", getBoundingClientRect: () => ({ width: 4, height: 4 }) };
+assert.equal(resolveAnnotationTargetElement(button, deps), button);
+const empty = { ...child, parentElement: documentLike.body, getBoundingClientRect: () => ({ width: 0, height: 0 }) };
+assert.equal(resolveAnnotationTargetElement(empty, deps), null);
+console.log("3 preload annotation target element resolver assertions passed");

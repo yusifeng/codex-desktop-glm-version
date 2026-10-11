@@ -4688,6 +4688,17 @@ function ol(e, t) {
       : !1;
 }
 function sl(e) {
+  return resolveAnnotationTargetElement(e, {
+    getOwnerDocument: (element) => element.ownerDocument,
+    getBody: (documentLike) => documentLike.body,
+    getDocumentElement: (documentLike) => documentLike.documentElement,
+    getParentElement: (element) => element.parentElement,
+    getRect: (element) => element.getBoundingClientRect(),
+    getTagName: (element) => element.tagName,
+    getRole: (element) => element.getAttribute(`role`),
+    hasDirectText: (element) => bc(element) != null,
+  });
+/*
   let t = e.ownerDocument,
     n = e,
     r = null;
@@ -4699,7 +4710,7 @@ function sl(e) {
     }
     n = n.parentElement;
   }
-  return r;
+  return r;*/
 }
 function cl(e, t) {
   let n = e.tagName.toLowerCase();
@@ -6104,6 +6115,7 @@ var { isAnnotationVisibleTextElement } = require("./browser-page-preload/annotat
 var { isAnnotationElementFixedOrSticky } = require("./browser-page-preload/annotation-fixed-position-policy");
 var { isAnnotationAnchorOnCurrentPage, isAnnotationRectLargeEnough } = require("./browser-page-preload/annotation-anchor-viewport-policy");
 var { isAnnotationRangeSelectable } = require("./browser-page-preload/annotation-range-validation");
+var { resolveAnnotationTargetElement } = require("./browser-page-preload/annotation-target-element-resolver");
 var { observeAnnotationShadowRoots } = require("./browser-page-preload/annotation-shadow-root-observer");
 var { dispatchAnnotationSurfaceRequest, isAnnotationSurfaceResponseEvent } = require("./browser-page-preload/annotation-surface-events");
 var { readAnnotationEditorDefaultMode } = require("./browser-page-preload/annotation-editor-default-mode");

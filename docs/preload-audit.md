@@ -531,6 +531,14 @@ DOM Range 的文本节点遍历、selection offset 边界、`assignedSlot`/paren
 range 根为文本节点三项行为断言。该边界不包含 React/vendor runtime，也不移动选择状态机
 或 DOM 副作用。
 
+### 增量抽取：annotation target element resolution
+
+Annotation 命中目标元素的 parent 链解析与可交互/文本区域阈值判断（原 `sl/cl`，4690-4714）
+已迁移至 `src/main/browser-page-preload/annotation-target-element-resolver.ts`。入口仅注入
+owner document、DOM parent/rect、tag/role 和既有文本标签读取器；目标选择、副本 fallback
+和 48x24/24x16 阈值保持不变。`scripts/test-preload-annotation-target-element-resolver.mjs`
+覆盖小尺寸按钮、文本容器 fallback 和无目标三项行为断言。
+
 ### 增量抽取：annotation visibility predicate
 
 批注 selection 使用的 visibility/display/content-visibility/opacity ancestor predicate

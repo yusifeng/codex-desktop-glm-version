@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1282.
+Total scripts: 1283.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -17,6 +17,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-app-primary-has-recipient-contacts.mjs`](./test-app-primary-has-recipient-contacts.mjs)
 
 - [`test-worker-git-review-working-tree-worker-policy.mjs`](./test-worker-git-review-working-tree-worker-policy.mjs)
+- [`test-worker-message-category.mjs`](./test-worker-message-category.mjs)
 - [`test-worker-git-blame-file-policy.mjs`](./test-worker-git-blame-file-policy.mjs)
 - [`test-worker-git-ignore-source-watch-policy.mjs`](./test-worker-git-ignore-source-watch-policy.mjs)
 - [`test-worker-git-performance-operation-policy.mjs`](./test-worker-git-performance-operation-policy.mjs)
@@ -1115,6 +1116,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-writing-block-floating-slash-menu.mjs`](./test-writing-block-floating-slash-menu.mjs)
 - [`test-xterm-output-panel.mjs`](./test-xterm-output-panel.mjs)
 - [`test-preload-annotation-range-validation.mjs`](./test-preload-annotation-range-validation.mjs)
+- [`test-preload-annotation-target-element-resolver.mjs`](./test-preload-annotation-target-element-resolver.mjs)
 - [`test-preload-annotation-feature-lifecycle.mjs`](./test-preload-annotation-feature-lifecycle.mjs)
 - [`test-preload-annotation-feature-lifecycle-state.mjs`](./test-preload-annotation-feature-lifecycle-state.mjs)
 - [`test-preload-annotation-element-cache.mjs`](./test-preload-annotation-element-cache.mjs)
