@@ -1431,3 +1431,4 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-main-web-contents-diagnostics.mjs](test-main-web-contents-diagnostics.mjs)
 [test-worker-git-repo-watcher-dispose-controller.mjs](test-worker-git-repo-watcher-dispose-controller.mjs)
 [test-worker-git-watch-session-dispose-controller.mjs](test-worker-git-watch-session-dispose-controller.mjs)
+[test-worker-git-watch-session-start-controller.mjs](test-worker-git-watch-session-start-controller.mjs)

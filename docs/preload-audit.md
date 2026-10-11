@@ -1451,6 +1451,13 @@ transient、generation 与 drag 清理顺序已迁移至
 setter，host clear-preview IPC（`ft`）仍保持独立语义。focused test 覆盖保留、过期清理、主动清理与
 dispose gate。
 
+### 增量抽取：worker Git watch session start controller
+
+`GitRepoWatcher.tryStartWatchSession` 的 disposed/registered gate、session dispose 等待、start promise 去重、
+generation race、retry scheduling 与 promise cleanup 已迁移至
+`src/main/worker/git-watch-session-start-controller.ts`；worker 继续注入 `startWatchSession` Git I/O owner。
+由 `scripts/test-worker-git-watch-session-start-controller.mjs` 覆盖初次启动、dispose 等待与 retry 分支。
+
 ### 增量抽取：worker Git watch session dispose controller
 
 `GitRepoWatcher.disposeSession` 的 generation bump、retry cancel、session/start promise 清理、session dispose

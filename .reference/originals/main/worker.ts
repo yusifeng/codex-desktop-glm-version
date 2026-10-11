@@ -192,6 +192,7 @@ const { createGitMetadataRefreshController } = require("./worker/git-metadata-re
 const { createGitWorktreeWatchRefreshController } = require("./worker/git-worktree-watch-refresh-controller");
 const { disposeGitRepoWatcher } = require("./worker/git-repo-watcher-dispose-controller");
 const { disposeGitWatchSession } = require("./worker/git-watch-session-dispose-controller");
+const { startGitWatchSession } = require("./worker/git-watch-session-start-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -69041,30 +69042,16 @@ var Jye = 1e3,
       return (this.watchTargets.push(a), a);
     }
     async tryStartWatchSession(e, t) {
-      if (this.disposed || !this.watchTargets.includes(e)) return;
-      if (e.sessionDisposePromise != null)
-        return (await e.sessionDisposePromise, this.tryStartWatchSession(e, t));
-      if (e.session != null || e.retryTimer != null) return;
-      if (e.sessionStartPromise != null) {
-        let n = e.generation;
-        (await e.sessionStartPromise,
-          shouldRetryGitWatchTargetAfterStart({
-            recovering: t,
-            disposed: this.disposed,
-            generationUnchanged: n === e.generation,
-            hasSession: e.session != null,
-            metadataMissing: e.metadataDirectory?.missing === true,
-          }) && this.scheduleWatchSessionRetry(e));
-        return;
-      }
-      this.updateRequiresRecovery();
-      let n = this.startWatchSession(e, t);
-      e.sessionStartPromise = n;
-      try {
-        await n;
-      } finally {
-        e.sessionStartPromise === n && (e.sessionStartPromise = null);
-      }
+      return startGitWatchSession({
+        target: e,
+        recovering: t,
+        isDisposed: () => this.disposed,
+        isRegistered: (target) => this.watchTargets.includes(target),
+        start: (target, recovering) => this.startWatchSession(target, recovering),
+        shouldRetryAfterStart: shouldRetryGitWatchTargetAfterStart,
+        scheduleRetry: (target) => this.scheduleWatchSessionRetry(target),
+        updateRecovery: () => this.updateRequiresRecovery(),
+      });
     }
     async startWatchSession(e, t) {
       let n = e.generation;

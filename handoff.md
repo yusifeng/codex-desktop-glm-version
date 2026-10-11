@@ -2972,3 +2972,8 @@ orchestration 已物理迁移至 `src/main/browser-page-preload/annotation-selec
 `rt`/`Je` 分支顺序，入口继续注入当前 editor、selection 与 point retry owner。由
 `scripts/test-preload-annotation-selection-comment-controller.mjs` 覆盖 focus、selection open、fallback retry
 与 dispose gate。
+
+2026-10-11 A1 worker 增量：`GitRepoWatcher.tryStartWatchSession` 的 disposed/registered gate、session dispose 等待、
+start promise 去重、generation race、retry scheduling 与 promise cleanup 已物理迁移至
+`src/main/worker/git-watch-session-start-controller.ts`；worker 继续注入 `startWatchSession` Git I/O owner。由
+`scripts/test-worker-git-watch-session-start-controller.mjs` 覆盖 9 项 focused assertions。
