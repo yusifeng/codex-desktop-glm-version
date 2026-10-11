@@ -14,6 +14,8 @@
 
 另新增 `annotation-hover-fallback-controller.ts`，真实接回 Wy 的 `tt` DOM hover/click fallback lifecycle，保留 editor/mode gate、跨 frame hit-test、anchor projection 与 hover/open 分支。
 
+另新增 `annotation-site-request-dispatch-controller.ts`，真实接回 Wy 的 `Qe` site-annotation request dispatcher，保留 editor gate、Range text anchor 与 element anchor 两条跨 frame 路由。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style

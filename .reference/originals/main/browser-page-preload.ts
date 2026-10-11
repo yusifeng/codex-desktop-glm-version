@@ -24034,6 +24034,14 @@ function Wy({ rootHost: e, bridge: t }) {
         setHover: (hover) => o(hover),
       }),
     ),
+    [siteRequestDispatchController] = (0, G.useState)(() =>
+      createAnnotationSiteRequestDispatchController({
+        resolveTextAnchor: (range) => su(range),
+        openFromText: (anchorState, selectionIndex) => Je(anchorState, selectionIndex),
+        projectElementAnchor: (element, x, y) => tv(element, x, y),
+        openFromElement: (element, anchorState, selectionIndex, extra) => qe(element, anchorState, selectionIndex, extra),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24159,12 +24167,7 @@ function Wy({ rootHost: e, bridge: t }) {
       [designEditorOpenController, e, A, n.viewportScale, j, t],
     ),
     Qe = (0, G.useEffectEvent)((e, t, n, r) => {
-      if (x != null) return !1;
-      if (e instanceof Range) {
-        let t = su(e);
-        return t != null && Je(t, n);
-      }
-      return qe(e, tv(e, t.x, t.y), n, r);
+      return siteRequestDispatchController.dispatch(e, t, n, r, { editorOpen: x != null });
     });
   (0, G.useEffect)(
     () => t.subscribeToSiteAnnotationRequests?.((e, t, n, r) => Qe(e, t, n, r)),
@@ -24370,6 +24373,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => createAnchorUpdateController.dispose(), [createAnchorUpdateController]),
     (0, G.useEffect)(() => () => interactionResetController.dispose(), [interactionResetController]),
     (0, G.useEffect)(() => () => hoverFallbackController.dispose(), [hoverFallbackController]),
+    (0, G.useEffect)(() => () => siteRequestDispatchController.dispose(), [siteRequestDispatchController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
