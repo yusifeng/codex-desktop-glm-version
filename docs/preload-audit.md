@@ -1245,3 +1245,11 @@ attribute 与既有 interaction policy，保留 blocked/unblocked 结果。focus
 坐标命中后排除 overlay 并触发 annotation popover（原 `_l`，4619-4622）已迁移至
 `src/main/browser-page-preload/annotation-popover-trigger-policy.ts`；入口注入 point hit-test、
 overlay predicate 与 popover opener，保留空命中/overlay 跳过语义。focused test 覆盖三种结果。
+
+### 增量抽取：annotation text-anchor observation targets
+
+React annotation runtime 的文本 anchor 观察目标规划（原 `du`，4959-5031）已迁移至
+`src/main/browser-page-preload/annotation-text-anchor-observation-targets.ts`；模块仅根据
+frame path、text locator、shadow-root/ancestor 关系构造 mutation、input、scroll 与 frame
+目标集合，并保留 unresolved 标记。入口继续持有 MutationObserver、事件监听、RAF 调度与
+dispose 生命周期。focused test 覆盖已解析 target、缺失 frame 与 shadow fallback。

@@ -2665,6 +2665,11 @@ focused test 3 项断言，typecheck 与 focused test 已通过。manifest unrev
 `src/main/main-app/startup/native-status-item-menu.ts`；`Mst` 入口继续持有 native addon 更新、
 i18n label 获取与状态生命周期，新增 `scripts/test-main-native-status-item-menu.mjs` 的 2 项
 focused assertions，build/typecheck/verify-chunks 通过。
+2026-10-11 A2 preload 增量：React annotation runtime 文本 anchor 观察目标规划（原 `du`）已迁移至
+`src/main/browser-page-preload/annotation-text-anchor-observation-targets.ts`；入口继续持有
+MutationObserver、input/scroll/frame 监听、RAF 调度与 dispose 生命周期，新增
+`scripts/test-preload-annotation-text-anchor-observation-targets.mjs` 的 11 项 focused assertions，
+typecheck/build/verify-chunks 通过。React render/hook 其余组合与跨 frame anchor 生命周期仍未完成。
 2026-10-11 A3 main owner 复核：`Ust` 的 `Be`/`Ve`/`He`/`Ue` 绑定 BrowserWindow 可见性、
 opacity、hotkey hide、window creation、deep-link navigation、notification dismissal 与 focus
 顺序；worker `H9.handleMessage`/`handleWorkerMessage` 绑定 pending/WebContents 生命周期及

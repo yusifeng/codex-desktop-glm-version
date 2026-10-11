@@ -4990,31 +4990,23 @@ function du(e, t) {
       for (let e of r) e.removeEventListener(`scroll`, c);
       for (let e of i) for (let t of z) e.removeEventListener(t, u, !0);
       ((n = new Set()), (r = new Set()), (i = new Set()), (a = !1));
-      let t = new Set(),
-        o = new Set();
-      for (let s of e) {
-        for (let e of Pu(s.framePath)) (i.add(e), t.add(e.documentElement));
-        let e = wc(s.framePath);
-        if (e == null) {
-          a = !0;
-          continue;
-        }
-        let c = Nu(e, s.textLocator);
-        if (c == null) {
-          a = !0;
-          let n = Fu(e, s.textLocator);
-          (t.add(n), Lu(n) && i.add(n));
-          continue;
-        }
-        (n.add(c), t.add(c), Lu(c) && i.add(c));
-        let l = c.parentNode ?? Iu(c);
-        for (; l != null;) (Lu(l) ? (t.add(l), i.add(l)) : o.add(l), (l = l.parentNode ?? Iu(l)));
-        let u = F(c) ? c : Iu(c);
-        for (; u != null;) (r.add(u), (u = u.parentElement ?? Iu(u.getRootNode())));
-      }
-      for (let e of t) d.observe(e, $u);
-      for (let e of o)
-        t.has(e) || d.observe(e, { ...(F(e) ? { attributes: !0 } : {}), childList: !0 });
+      let s = collectAnnotationTextAnchorObservationTargets(e, {
+        collectFrameWindows: (e) => Pu(e),
+        resolveFrameWindow: (e) => wc(e),
+        resolveTextTarget: (e, t) => Nu(e, t),
+        resolveFallbackRoot: (e, t) => Fu(e, t),
+        isShadowRoot: (e) => Lu(e),
+        getShadowHost: (e) => Iu(e),
+        getParentNode: (e) => e.parentNode,
+        getParentElement: (e) => e.parentElement,
+        getRootNode: (e) => e.getRootNode(),
+        isElement: (e) => F(e),
+        getDocumentElement: (e) => e.documentElement,
+      });
+      ((n = s.inputTargets), (r = s.scrollTargets), (i = s.frameWindows), (a = s.hasUnresolved));
+      for (let e of s.mutationTargets) d.observe(e, $u);
+      for (let e of s.mutationAncestors)
+        s.mutationTargets.has(e) || d.observe(e, { ...(F(e) ? { attributes: !0 } : {}), childList: !0 });
       for (let e of n) e.addEventListener(`input`, l);
       for (let e of r) e.addEventListener(`scroll`, c);
       for (let e of i) for (let t of z) e.addEventListener(t, u, !0);
@@ -5907,6 +5899,7 @@ var { resolveAnnotationContainerAncestor } = require("./browser-page-preload/ann
 var { discoverAnnotationScrollContainers } = require("./browser-page-preload/annotation-scroll-container-discovery");
 var { collectAnnotationPointScrollContainers } = require("./browser-page-preload/annotation-point-scroll-containers");
 var { installAnnotationScrollListeners } = require("./browser-page-preload/annotation-scroll-listener");
+var { collectAnnotationTextAnchorObservationTargets } = require("./browser-page-preload/annotation-text-anchor-observation-targets");
 var { runAnnotationCleanup } = require("./browser-page-preload/annotation-cleanup");
 var { setAnnotationPopoverOpen, closeAnnotationPopover } = require("./browser-page-preload/annotation-popover-policy");
 var { removeAnnotationCursorStyles } = require("./browser-page-preload/annotation-cursor-style-cleanup");
