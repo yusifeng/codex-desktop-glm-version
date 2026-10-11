@@ -16,6 +16,8 @@
 
 同轮新增 `annotation-site-request-dispatch-controller.ts`，真实接回 Wy 的 `Qe` site-annotation request dispatcher；focused test 为 `scripts/test-preload-annotation-site-request-dispatch-controller.mjs`。
 
+同轮新增 `annotation-comment-preview-close-controller.ts`，真实接回 Wy 的 `$e`/`ft` preview close lifecycle；focused test 为 `scripts/test-preload-annotation-comment-preview-close-controller.mjs`。
+
 同轮新增 `git-init-recovery-controller.ts`，真实接回 `GitManager.handleGitInit`；controller 保留 handled-set、
 metadata refresh、watch-git-metadata 重启、desired-key 竞态与 finally/catch 回收顺序；focused test 为
 `scripts/test-worker-git-init-recovery-controller.mjs`。

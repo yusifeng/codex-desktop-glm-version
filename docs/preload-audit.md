@@ -16,6 +16,8 @@
 
 另新增 `annotation-site-request-dispatch-controller.ts`，真实接回 Wy 的 `Qe` site-annotation request dispatcher，保留 editor gate、Range text anchor 与 element anchor 两条跨 frame 路由。
 
+另新增 `annotation-comment-preview-close-controller.ts`，真实接回 Wy 的 `$e`/`ft` preview close lifecycle，保留 host close IPC 与本地 preview state 清理顺序。
+
 ### 增量抽取：annotation element metadata projection
 
 Annotation element metadata payload（原 `nd`，5120-7259 业务工具段）的 rect、颜色、字体、style
@@ -1640,3 +1642,8 @@ owner 与当前 promise identity 清理语义。focused test 覆盖复用、成�
 desired-key superseded 回退与 HEAD invalidation event 已迁移至 `src/main/worker/git-init-metadata-apply-controller.ts`；
 consumer 继续注入 manager 的 watcher、unwatch 与 event/trace owner。focused test 覆盖成功应用、metadata race
 短路和 superseded unwatch。
+### 增量抽取：Git init watch-desire controller
+
+`GitManager.ensureWatchingForGitInit` 的 desired watch key 切换、旧 watcher dispose、start 结果与 failed key
+回收已迁移至 `src/main/worker/git-init-watch-desire-controller.ts`；consumer 保留 manager 的 key、watcher
+startup 与 disposal owner。focused test 覆盖 key 复用、正常切换和 failed cleanup。

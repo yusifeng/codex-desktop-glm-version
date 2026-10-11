@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { createAnnotationCommentPreviewCloseController } = require("../app/.vite/build/browser-page-preload/annotation-comment-preview-close-controller.js");
+const calls = [];
+const controller = createAnnotationCommentPreviewCloseController({ closePreview: (id) => calls.push(`close:${id}`), clearPreview: () => calls.push(`clear`) });
+assert.equal(controller.close(`comment-1`), true);
+assert.deepEqual(calls, [`close:comment-1`, `clear`]);
+assert.equal(controller.close(null), false);
+controller.dispose();
+assert.equal(controller.close(`comment-2`), false);
+console.log("5 preload annotation comment-preview-close-controller assertions passed");

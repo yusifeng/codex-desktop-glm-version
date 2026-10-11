@@ -24042,6 +24042,12 @@ function Wy({ rootHost: e, bridge: t }) {
         openFromElement: (element, anchorState, selectionIndex, extra) => qe(element, anchorState, selectionIndex, extra),
       }),
     ),
+    [commentPreviewCloseController] = (0, G.useState)(() =>
+      createAnnotationCommentPreviewCloseController({
+        closePreview: (commentId) => t.sendMessageToHost({ type: `browser-sidebar-runtime-close-comment-preview`, commentId }),
+        clearPreview: () => v(null),
+      }),
+    ),
     [editorCommentReconciliationController] = (0, G.useState)(() =>
       createAnnotationEditorCommentReconciliationController({
         updateEditorState: (update) => S(update),
@@ -24174,14 +24180,8 @@ function Wy({ rootHost: e, bridge: t }) {
     [t],
   );
   let $e = (0, G.useCallback)(
-      (e) => {
-        (v((t) => (t === e ? null : t)),
-          t.sendMessageToHost({
-            type: `browser-sidebar-runtime-close-comment-preview`,
-            commentId: e,
-          }));
-      },
-      [t],
+      (e) => commentPreviewCloseController.close(e),
+      [commentPreviewCloseController],
     ),
     et = (0, G.useEffectEvent)((e, n) => {
       virtualSelectionEditorController.open(e, n, {
@@ -24256,12 +24256,7 @@ function Wy({ rootHost: e, bridge: t }) {
       removeSelectionController.remove(e, { multiSelectEnabled: Oe, editorState: x }),
     ),
     ft = (0, G.useEffectEvent)((e = _) => {
-      e != null &&
-        (t.sendMessageToHost({
-          type: `browser-sidebar-runtime-close-comment-preview`,
-          commentId: e,
-        }),
-        v(null));
+      commentPreviewCloseController.close(e);
     }),
     pt = (0, G.useEffectEvent)((comments) =>
       editorCommentReconciliationController.reconcile(comments),
@@ -24374,6 +24369,7 @@ function Wy({ rootHost: e, bridge: t }) {
     (0, G.useEffect)(() => () => interactionResetController.dispose(), [interactionResetController]),
     (0, G.useEffect)(() => () => hoverFallbackController.dispose(), [hoverFallbackController]),
     (0, G.useEffect)(() => () => siteRequestDispatchController.dispose(), [siteRequestDispatchController]),
+    (0, G.useEffect)(() => () => commentPreviewCloseController.dispose(), [commentPreviewCloseController]),
     (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
     (0, G.useEffect)(() => {
       let t = eb(e);
