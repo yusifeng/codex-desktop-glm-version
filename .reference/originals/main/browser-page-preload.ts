@@ -5964,6 +5964,7 @@ var { projectAnnotationMarkerRecords } = require("./browser-page-preload/annotat
 var { projectAnnotationActiveView } = require("./browser-page-preload/annotation-active-view-projection");
 var { projectAnnotationTextPreviewState } = require("./browser-page-preload/annotation-text-preview-state");
 var { projectAnnotationScreenshotPayload } = require("./browser-page-preload/annotation-screenshot-payload-projection");
+var { projectAnnotationRegionRecords } = require("./browser-page-preload/annotation-region-record-projection");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -25073,23 +25074,15 @@ function Wy({ rootHost: e, bridge: t }) {
       Wt.every((e) => e.anchor.kind === `element` && e.liveElement == null) &&
       !gs(M.annotation.anchor.pageUrl),
     Kt = _ == null ? null : (Le.find((e) => e.id === _) ?? null),
-    qt =
-      (St && n.areAnnotationMarkersVisible !== !1) || (Ot && M?.kind === `comment`)
-        ? Dt.flatMap((e) =>
-            ib(e, x, M?.kind === `comment` ? M.annotation : null)
-              ? []
-              : [e.anchor, ...(e.additionalAnchors ?? [])].flatMap((t, n) =>
-                  t.kind === `region`
-                    ? [
-                        {
-                          anchor: t,
-                          key: `${e.id}:region:${t.framePath.join(`>`)}:${t.rect.x}:${t.rect.y}:${n}`,
-                        },
-                      ]
-                    : [],
-                ),
-          )
-        : [],
+    qt = projectAnnotationRegionRecords(
+      {
+        enabled: (St && n.areAnnotationMarkersVisible !== !1) || (Ot && M?.kind === `comment`),
+        annotations: Dt,
+        editor: x,
+        activeAnnotation: M?.kind === `comment` ? M.annotation : null,
+      },
+      { shouldSuppress: (annotation, editor, activeAnnotation) => ib(annotation, editor, activeAnnotation) },
+    ),
     textPreviewState = projectAnnotationTextPreviewState(
       {
         active: M,

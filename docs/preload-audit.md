@@ -1293,3 +1293,11 @@ React annotation runtime 的 screenshot-ready payload 派生（原 `Wy` 内 `rn/
 active highlight 与 additional highlight rect union，以及 comment marker index 的 zoom-normalized
 point，入口继续持有 requestAnimationFrame、host IPC 与 screenshot effect 生命周期。focused test
 覆盖 active/null、union rect 输入、comment marker index 与 zoom 投影。
+
+### 增量抽取：annotation region record projection
+
+React annotation runtime 的 region overlay records（原 `Wy` 内 `qt`）已迁移至
+`src/main/browser-page-preload/annotation-region-record-projection.ts`；模块负责 marker-visible/
+active-comment gate、suppression 判定、region-only anchor 展开与稳定 key，入口继续持有 DOM
+geometry、React render 与 overlay 生命周期。focused test 覆盖 enabled/disabled、suppressed、
+非 region 过滤及多 region key。
