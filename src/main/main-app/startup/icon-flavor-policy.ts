@@ -28,4 +28,10 @@ export function resolveFlavorIconAssetNames(flavor: string, policy: IconFlavorPo
   };
 }
 
-if (typeof module !== `undefined`) module.exports = { resolveFlavorIconAssetNames, resolveFlavorIconBaseName };
+export function resolveWindowIconResource(flavor: string, policy: IconFlavorPolicy) {
+  if (flavor === policy.dev) return { fileName: `icon-dev-outline.png`, allowPackaged: false };
+  const baseName = resolveFlavorIconBaseName(flavor, policy);
+  return baseName == null ? undefined : { fileName: `${baseName}.png`, allowPackaged: true };
+}
+
+if (typeof module !== `undefined`) module.exports = { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource };

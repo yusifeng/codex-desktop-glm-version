@@ -288,6 +288,9 @@ flavor 共 6 项断言。
 同一 startup icon policy 还接管了原 `CT` 的 flavor-specific dark/light Codex asset filename
 后缀，metadata 与 window-services consumers 已改用 `resolveFlavorIconAssetNames`；路径读取与
 nativeImage 仍留在原 owner。上述 focused suite 现覆盖 9 项 base-name/asset-name 断言。
+窗口服务中 Dev local-only outline 与其他 flavor packaged/local fallback 的候选 projection 也已
+接入 `resolveWindowIconResource`，路径存在性和 Electron icon 更新仍由 `dst` 持有；上述 focused
+suite 现覆盖 12 项 icon policy assertions。
 
 ### 增量抽取：worker telemetry request projection
 

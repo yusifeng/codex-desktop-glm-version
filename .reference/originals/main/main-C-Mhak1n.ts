@@ -25,7 +25,7 @@ const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-p
 const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
-const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName } = require("./main-app/startup/icon-flavor-policy.js");
+const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource } = require("./main-app/startup/icon-flavor-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
 const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transport.js");
@@ -173709,17 +173709,8 @@ function dst({
       agentFlavor: a.in.Agent,
     }),
     j = () => {
-      switch (r) {
-        case a.in.Dev:
-          return O(`icon-dev-outline.png`);
-        case a.in.Agent:
-          return k(`icon-agent.png`);
-        case a.in.Nightly:
-        case a.in.InternalAlpha:
-        case a.in.PublicBeta:
-        case a.in.Prod:
-          return k(`${iconBaseName(r)}.png`);
-      }
+      let e = resolveWindowIconResource(r, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
+      return e == null ? null : e.allowPackaged ? k(e.fileName) : O(e.fileName);
     },
     M = () =>
       _

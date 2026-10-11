@@ -1517,6 +1517,9 @@ main startup/window icon 的 build-flavor 到 icon base-name 映射（原 `ST`�
 `scripts/test-main-icon-flavor-policy.mjs` 覆盖 6 项断言。
 同一模块进一步接管原 `CT` 的 flavor-specific dark/light Codex asset filename 后缀，metadata
 与 window-services consumer 使用 `resolveFlavorIconAssetNames`，focused suite 增至 9 项断言。
+窗口服务中 Dev local-only outline 与其他 flavor packaged/local fallback 的候选 projection 已
+接入 `resolveWindowIconResource`，路径存在性和 Electron icon 更新仍由 `dst` 持有，icon focused
+suite 增至 12 项断言。
 main worker manager 的 `ces-telemetry` HTTP request/response projection（原 `mst`）已迁移至
 `src/main/main-app/worker/telemetry-request.ts`；入口继续持有 analytics gate、cancel map 与
 worker 生命周期，由 `scripts/test-main-telemetry-request.mjs` 覆盖 4 项网络投影断言。
