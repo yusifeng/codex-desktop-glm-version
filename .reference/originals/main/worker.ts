@@ -8,6 +8,7 @@ const { WorkerMainRpcClient } = require("./worker/rpc-client");
 const { createWorkerMessageDispatcher } = require("./worker/entry-dispatcher");
 const { readGitFileContent } = require("./worker/git-file-content");
 const { getIgnoreSourceWatchTargets } = require("./worker/git-ignore-source-targets");
+const { readComputerUseCaptureUpdates } = require("./worker/computer-use-capture-update-loop");
 const { resolveAutomationWritableRoots } = require("./worker/git-automation-writable-roots");
 const { classifyGitError, gitSubcommand } = require("./worker/git-errors");
 const { countGitDiffLines, parseGitDiffHeader, quoteGitDiffPath, rewriteGitRenameDiff } = require("./worker/git-diff-text");
@@ -74379,26 +74380,14 @@ var c5 = kW(`computer-use-worker`),
     }
     handleCancel() {}
     async readCaptureUpdates(e) {
-      try {
-        let t = Date.now();
-        c5().debug(`Computer Use capture worker waiting for update`, {
-          safe: { requestId: e },
-          sensitive: {},
-        });
-        let n = await this.getNextCaptureUpdate({ requestId: e });
-        (c5().debug(`Computer Use capture worker received update`, {
-          safe: { requestId: e, updateType: n.type, elapsedMs: Date.now() - t },
-          sensitive: {},
-        }),
-          this.emitCaptureUpdate(e, n),
-          shouldContinueComputerUseCaptureUpdates(n) && (await this.readCaptureUpdates(e)));
-      } catch (t) {
-        (c5().warning(`Computer Use capture worker update poll failed`, {
-          safe: { requestId: e },
-          sensitive: { error: t },
-        }),
-          this.emitCaptureUpdate(e, { type: `failed`, failureReason: `update_poll_failed` }));
-      }
+      return readComputerUseCaptureUpdates(e, {
+        getNextCaptureUpdate: (params) => this.getNextCaptureUpdate(params),
+        emitCaptureUpdate: (requestId, update) => this.emitCaptureUpdate(requestId, update),
+        shouldContinue: shouldContinueComputerUseCaptureUpdates,
+        onWaiting: (requestId) => c5().debug(`Computer Use capture worker waiting for update`, { safe: { requestId }, sensitive: {} }),
+        onReceived: (requestId, update, elapsedMs) => c5().debug(`Computer Use capture worker received update`, { safe: { requestId, updateType: update.type, elapsedMs }, sensitive: {} }),
+        onFailure: (requestId, error) => c5().warning(`Computer Use capture worker update poll failed`, { safe: { requestId }, sensitive: { error } }),
+      });
     }
     async startCapture(e) {
       let t = this.dependencies.startCapture;
