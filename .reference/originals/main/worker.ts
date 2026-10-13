@@ -217,6 +217,7 @@ const { disposeGitRepoWatcher } = require("./worker/git-repo-watcher-dispose-con
 const { disposeGitWatchSession } = require("./worker/git-watch-session-dispose-controller");
 const { startGitWatchSession } = require("./worker/git-watch-session-start-controller");
 const { refreshGitWorkingTreeWatchPolicy } = require("./worker/git-working-tree-watch-policy-refresh-controller");
+const { startGitRepoWatcher } = require("./worker/git-repo-watcher-start-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68767,132 +68768,34 @@ var Jye = 1e3,
       );
     }
     async start() {
-      if (this.disposed) return;
-      if ((this.logger.info(`Starting git repo watcher`), this.watchTargets.length > 0)) {
-        await this.retryInactiveWatchTargets();
-        return;
-      }
-      let e = await this.options.host.platformPath();
-      this.pathApi = e;
-      let [t, n, r, i, a] = await OH(
-        {
-          attributes: { "git.host_kind": this.options.host.isLocal ? `local` : `remote` },
-          name: `git.watcher_metadata`,
-          op: `codex.git.watcher_metadata`,
-        },
-        async () => {
-          let e = await prefetchGitWatcherMetadata(
-            this.options.worktreeRepo,
-            void 0,
-            gitWatcherMetadataDeps,
-          );
-          return e == null
-            ? Promise.all([
-                resolveGitWatcherHeadPath(
-                  this.options.worktreeRepo,
-                  gitWatcherMetadataDeps,
-                ),
-                getGitIndexPath(this.options.worktreeRepo),
-                resolveSyncedBranchConfigPath(this.options.worktreeRepo),
-                getGitDir(this.options.worktreeRepo),
-                getCurrentGitBranchState(this.options.worktreeRepo),
-              ])
-            : [
-                e.headPath,
-                e.indexPath,
-                e.syncedBranchPath,
-                e.gitDir,
-                e.headRef == null
-                  ? { type: `detached` }
-                  : { type: `branch`, branch: e.headRef.slice(11) },
-              ];
-        },
-      );
-      if (this.disposed) return;
-      ((this.gitDir = i),
-        (this.currentHeadRefPath =
-          a.type === `branch`
-            ? e.join(this.options.commonDir, `refs`, `heads`, ...a.branch.split(`/`))
-            : null),
-        (this.currentHeadRefKnown = a.type !== `unknown`),
-        this.addWatchTarget(e, t, `head`));
-      let o = e.join(this.options.commonDir, `HEAD`);
-      (o !== t && this.addWatchTarget(e, o, `head`),
-        this.addWatchTarget(e, n, `index`),
-        this.addWatchTarget(e, e.join(this.options.commonDir, `FETCH_HEAD`), `remote-refs`),
-        this.addWatchTarget(e, e.join(this.options.commonDir, `packed-refs`), `remote-refs`));
-      let s = e.join(this.options.commonDir, `refs`, `heads`),
-        c = e.join(this.options.commonDir, `refs`);
-      (this.addDirectoryWatchTarget(c, `head`, (e) => e === s, !1, this.options.commonDir),
-        this.addDirectoryWatchTarget(c, `local-refs`, (e) => e === s, !1, this.options.commonDir),
-        this.addDirectoryWatchTarget(
-          s,
-          `head`,
-          (t, n) => N6(e, s, t) && this.isHeadRefPath(e, s, t, n),
-          !0,
-          c,
-        ),
-        this.addDirectoryWatchTarget(
-          s,
-          `local-refs`,
-          (t, n) => N6(e, s, t) && !this.isHeadRefPath(e, s, t, n),
-          !0,
-          c,
-        ));
-      let l = e.join(c, `remotes`);
-      (this.addDirectoryWatchTarget(c, `remote-refs`, (e) => e === l, !1, this.options.commonDir),
-        this.addDirectoryWatchTarget(l, `remote-refs`, (t) => N6(e, l, t), !0, c),
-        this.addWatchTarget(e, e.join(this.options.commonDir, `config`), `config`),
-        this.addWatchTarget(e, e.join(this.options.commonDir, `shallow`), `config`));
-      let u = e.join(this.options.commonDir, `info`),
-        d = e.join(u, `exclude`),
-        f = e.join(u, `attributes`);
-      (this.addDirectoryWatchTarget(
-        u,
-        `config`,
-        (e) => e === d || e === f,
-        !1,
-        this.options.commonDir,
-      ),
-        i != null && this.addWatchTarget(e, e.join(i, `config.worktree`), `config`),
-        this.addWatchTarget(e, r, `synced-branch`));
-      let p = e.join(this.options.commonDir, `worktrees`);
-      if (
-        (this.addDirectoryWatchTarget(
-          this.options.commonDir,
-          `worktree-topology`,
-          (e) => e === p,
-          !1,
-        ),
-        this.addDirectoryWatchTarget(
-          p,
-          `worktree-topology`,
-          (t) => P6(e, p, t),
-          !1,
-          this.options.commonDir,
-        ),
-        this.addDirectoryWatchTarget(
-          this.options.root,
-          `working-tree`,
-          (t) => !this.isGitInternalPath(e, t),
-        ),
-        i != null && e.dirname(i) === p)
-      ) {
-        let e = this.watchTargets.find((e) => e.watchPath === i);
-        e != null && (e.metadataDirectory = { parentPath: p, missing: !1 });
-      }
-      (await OH(
-        {
-          attributes: {
-            "git.host_kind": this.options.host.isLocal ? `local` : `remote`,
-            "git.watcher_target_count": this.watchTargets.length,
-          },
-          name: `git.watcher_targets`,
-          op: `codex.git.watcher_targets`,
-        },
-        () => Promise.all(this.watchTargets.map((e) => this.tryStartWatchSession(e, !1))),
-      ),
-        await this.refreshMetadataDirectories([], !1));
+      return startGitRepoWatcher({
+        isDisposed: () => this.disposed,
+        logStart: () => this.logger.info(`Starting git repo watcher`),
+        getTargets: () => this.watchTargets,
+        retryInactiveTargets: () => this.retryInactiveWatchTargets(),
+        getPlatformPath: () => this.options.host.platformPath(),
+        setPathApi: (pathApi) => { this.pathApi = pathApi; },
+        trace: (span, operation) => OH(span, operation),
+        hostKind: this.options.host.isLocal ? `local` : `remote`,
+        prefetchMetadata: () => prefetchGitWatcherMetadata(this.options.worktreeRepo, void 0, gitWatcherMetadataDeps),
+        loadFallbackMetadata: () => Promise.all([
+          resolveGitWatcherHeadPath(this.options.worktreeRepo, gitWatcherMetadataDeps),
+          getGitIndexPath(this.options.worktreeRepo),
+          resolveSyncedBranchConfigPath(this.options.worktreeRepo),
+          getGitDir(this.options.worktreeRepo),
+          getCurrentGitBranchState(this.options.worktreeRepo),
+        ]),
+        commonDir: this.options.commonDir,
+        root: this.options.root,
+        setGitDir: (gitDir) => { this.gitDir = gitDir; },
+        setHeadRefState: (path, known) => { this.currentHeadRefPath = path; this.currentHeadRefKnown = known; },
+        addWatchTarget: (pathApi, path, changeType) => this.addWatchTarget(pathApi, path, changeType),
+        addDirectoryWatchTarget: (path, changeType, predicate, recursive, parentPath) =>
+          this.addDirectoryWatchTarget(path, changeType, predicate, recursive, parentPath),
+        isHeadRefPath: (pathApi, headsPath, path, cache) => this.isHeadRefPath(pathApi, headsPath, path, cache),
+        startSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
+        refreshMetadata: (paths, recovering) => this.refreshMetadataDirectories(paths, recovering),
+      });
     }
     async retryInactiveWatchTargets() {
       await Promise.all(

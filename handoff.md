@@ -1,5 +1,23 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将右侧 Library 文件预览的状态解析与主体分派整体迁移至
+`src/renderer/library-cloud-file-preview/preview-state.ts`，真实接回
+`LibraryCloudFilePreview` 的 route/page consumer；覆盖图片 40 MiB 上限、未知大小、
+pending/error/hidden，以及 artifact/PDF、HTML/Markdown/Text、unsupported 分支，删除原四态
+内联占位实现。`scripts/test-library-cloud-file-preview-state.mjs` 覆盖 19 项 focused assertions。
+
+本轮将 annotation editor/comment-preview 的 anchor 投影、host update、text/element state 回写，以及
+visual viewport、跨 frame、scroll-container 与 text-anchor observer 生命周期整体迁移至
+`annotation-editor-anchor-sync-controller.ts`，真实接回 `Wy`；focused test 为
+`scripts/test-preload-annotation-editor-anchor-sync-controller.mjs`。
+
+本轮新增 `browser-permission-prompt-registry.ts`，真实接回 browser sidebar manager 的权限提示
+registry；完整迁移 pending prompt、renderer subscription、presentation generation/跨窗口 transfer、
+response/system-settings validation 与 closed/destroyed/RPC-broken cleanup 生命周期，并删除 main chunk
+内原 `qZe` 实现。focused test 为 `scripts/test-main-browser-permission-prompt-registry.mjs`（25 项）。
+
+本轮将 `GitRepoWatcher.start()` 的完整启动生命周期迁移至 `git-repo-watcher-start-controller.ts`，真实接回 worker consumer，并删除原 125 行内嵌实现；controller 保留重复启动恢复、metadata prefetch/fallback、watch target 拓扑装配、disposed race、session 并发启动和首次 metadata reconcile 顺序。focused test 为 `scripts/test-worker-git-repo-watcher-start-controller.mjs`（25 项），typecheck/build/verify-chunks 通过。
+
 本轮将已有的 `git-file-content.ts` 真正接回 worker `fCe` 的 `readGitFileBinary` consumer，删除原 worker 内无 consumer 的 `dCe` 实现；保留 repository lookup、platform path、Git 执行、MIME 检测与异常降级顺序。focused test 为 `scripts/test-worker-git-file-content.mjs`（4 项），typecheck/build/verify-chunks 通过。
 
 本轮继续将 Linux ignore-source watcher 的绝对路径/目录遍历、symlink 跟随、ELOOP 防护和缺失路径降级迁移至 `git-ignore-source-targets.ts`，真实接回 `watchIgnoreSources.getWatchTargets`，删除原 worker `mCe` 实现。focused test 为 `scripts/test-worker-git-ignore-source-targets.mjs`（5 项）。

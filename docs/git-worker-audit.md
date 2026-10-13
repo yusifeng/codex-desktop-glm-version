@@ -1679,3 +1679,14 @@ environment、expiry timer 和 query execution，均不具备不复制 owner 状
 Computer-use `sCe` dispatcher 本轮保留：`requestPermissions/start/watchUpdates` 与 skysight/messages
 控制共享 worker-response envelope、logger、service dependencies、递归 update polling 和 error emission；
 continuation 判断已由 `computer-use-capture-policy.ts` 提供，剩余部分没有不复制 service 生命周期的独立边界。
+
+### GitRepoWatcher start lifecycle
+
+`GitRepoWatcher.start()` 的完整启动生命周期已迁移至
+`src/main/worker/git-repo-watcher-start-controller.ts` 并真实接回 worker。controller 统一持有重复启动时的
+inactive-target recovery、platform path 初始化、metadata prefetch/fallback trace、HEAD/index/config/ref/
+worktree/working-tree target 拓扑装配、linked-worktree metadata 标记、全部 session 并发启动和首次 metadata
+reconcile；worker 仅注入 host/Git metadata I/O、watch target owner 与 session/refresh side effects，原 125 行
+内嵌实现已删除。`scripts/test-worker-git-repo-watcher-start-controller.mjs` 覆盖 disposed/重复启动、
+prefetch/fallback、ref/topology/internal-path predicates、linked-worktree 标记及 start-before-refresh 顺序，
+共 25 项 focused assertions。
