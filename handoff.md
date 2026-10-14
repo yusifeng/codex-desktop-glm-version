@@ -2,6 +2,12 @@
 
 本轮将 Wy 的 active view/draft matching/marker/region/text-preview 投影迁移至 `annotation-active-runtime-state.ts` 并真实接回；保留 multi-select link、原页面 marker 策略、active geometry 与 text preview，删除原约 90 行内联投影。focused test 为 `scripts/test-preload-annotation-active-runtime-state.mjs`（12 项）。
 
+本轮将原 `ttt` startup renderer coordinator 的完整 phase 生命周期迁移至
+`src/main/main-app/startup/startup-renderer-coordinator.ts`，真实接回 startup RPC service 唯一 consumer，
+并删除旧实现；保留 content-ready/primary replacement race、host-ready 前有序 buffering、startup/window
+双订阅及 origin-destroy cleanup。focused test 为
+`scripts/test-main-startup-renderer-coordinator.mjs`（46 项）。
+
 本轮将原 `Dtt` tab-drag session 的完整 RPC/presentation 生命周期迁移至
 `src/main/main-app/window/tab-drag-session.ts`，真实接回 `Ett.prepare()` consumer，并删除旧实现；保留
 nullable cue schema、single-load gate、owner bounds/grab-offset 校验、freeze 坐标投影、异步 dispose race

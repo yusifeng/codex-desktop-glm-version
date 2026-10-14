@@ -610,6 +610,19 @@ cue 与字段范围语义未复制；presentation 由上批迁移的 `TabDragPre
 `Dtt` 实现已删除。`scripts/test-main-tab-drag-session.mjs` 使用 esbuild 临时 bundle，覆盖 51 项 focused
 assertions，包括 bounds 边界、invalid payload、一次性 load、异步销毁竞态和 freeze 坐标投影。
 
+### 增量抽取：startup renderer coordinator 生命周期
+
+R10/startup 原 `ttt`（153,538-153,642）的完整 renderer startup phase coordinator 已迁移至
+`src/main/main-app/startup/startup-renderer-coordinator.ts`。模块拥有 content-ready 状态、严格有序的
+renderer phase buffer、startup-phase subscription 与 primary-window subscription，保留 `whenReady()` 对
+primary renderer replacement/origin destroyed 的 AbortError race，以及最终 primary identity 复核。
+
+原 startup RPC service 唯一 consumer 注入现有 `primaryWindowContentReady.promise`、startup phase tracker、
+WindowManager、origin WebContents 与 Sentry gate；main chunk 内旧 `ttt` 实现已删除。buffer 继续要求
+`renderer_ready -> first_content_visible -> background_ready`，并在 startup-ready 与 host-ready 同时满足后
+flush；切换 primary 或销毁 origin 会取消两组订阅并永久停用 coordinator。
+`scripts/test-main-startup-renderer-coordinator.mjs` 覆盖 46 项 focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

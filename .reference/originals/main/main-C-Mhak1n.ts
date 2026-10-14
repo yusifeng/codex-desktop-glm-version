@@ -62,6 +62,7 @@ const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
+const { StartupRendererCoordinator } = require("./main-app/startup/startup-renderer-coordinator.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -153535,117 +153536,7 @@ var Jet = (0, d.promisify)(P.execFile),
       );
     }
   },
-  ttt = class extends n.Uf {
-    origin;
-    windowManager;
-    startupPhases;
-    startupReady;
-    includeStartupTiming;
-    bufferedPhases = [];
-    unsubscribeFromStartupPhases;
-    unsubscribeFromPrimaryWindow;
-    isStartupReady;
-    isDisposed = !1;
-    constructor(e, t, n, r, i = !1) {
-      (super(),
-        (this.origin = e),
-        (this.windowManager = t),
-        (this.startupPhases = n),
-        (this.startupReady = r),
-        (this.includeStartupTiming = i),
-        (this.isStartupReady = r == null),
-        r?.then(() => {
-          this.isDisposed || ((this.isStartupReady = !0), this.flushBufferedPhases());
-        }));
-    }
-    async whenReady() {
-      let e;
-      if (this.startupReady != null) {
-        let t = Promise.withResolvers(),
-          n = () => {
-            t.reject(new DOMException(`Primary renderer was replaced`, `AbortError`));
-          },
-          r = this.windowManager.subscribePrimaryWindowChanges((e) => {
-            e?.webContents.id !== this.origin.id && n();
-          });
-        this.origin.once(`destroyed`, n);
-        try {
-          e = await Promise.race([this.startupReady, t.promise]);
-        } finally {
-          (r(), this.origin.off(`destroyed`, n));
-        }
-      }
-      if (
-        this.isDisposed ||
-        this.windowManager.getPrimaryWindow()?.webContents.id !== this.origin.id
-      )
-        throw new DOMException(`Primary renderer was replaced`, `AbortError`);
-      return this.includeStartupTiming ? e : void 0;
-    }
-    isSentryEnabled() {
-      return a.Qt;
-    }
-    reach(e) {
-      if (!(
-        (e !== `renderer_ready` && e !== `first_content_visible` && e !== `background_ready`) ||
-        this.isDisposed ||
-        this.windowManager.getPrimaryWindow()?.webContents.id !== this.origin.id
-      )) {
-        if (!this.isStartupReady || !this.startupPhases.hasReached(`host_ready`)) {
-          this.bufferPhase(e);
-          return;
-        }
-        if (e === `renderer_ready`) this.startupPhases.reach(`window_created`);
-        else if (
-          !this.startupPhases.hasReached(
-            e === `first_content_visible` ? `renderer_ready` : `first_content_visible`,
-          )
-        )
-          return;
-        this.startupPhases.reach(e);
-      }
-    }
-    bufferPhase(e) {
-      let t = this.bufferedPhases.at(-1);
-      e === t ||
-        (e === `renderer_ready` && t != null) ||
-        (e === `first_content_visible` && t !== `renderer_ready`) ||
-        (e === `background_ready` && t !== `first_content_visible`) ||
-        (this.bufferedPhases.push(e),
-        this.unsubscribeFromStartupPhases ??
-          ((this.unsubscribeFromStartupPhases = this.startupPhases.subscribe(
-            this.flushBufferedPhases,
-          )),
-          (this.unsubscribeFromPrimaryWindow = this.windowManager.subscribePrimaryWindowChanges(
-            (e) => {
-              e?.webContents.id !== this.origin.id && this.disposeBufferedPhases();
-            },
-          )),
-          this.origin.once(`destroyed`, this.disposeBufferedPhases)));
-    }
-    flushBufferedPhases = () => {
-      if (
-        !this.isStartupReady ||
-        !this.startupPhases.hasReached(`host_ready`) ||
-        this.bufferedPhases.length === 0
-      )
-        return;
-      let e = this.bufferedPhases.splice(0, this.bufferedPhases.length);
-      this.clearBufferedPhases();
-      for (let t of e) this.reach(t);
-    };
-    clearBufferedPhases() {
-      ((this.bufferedPhases.length = 0),
-        this.unsubscribeFromStartupPhases?.(),
-        (this.unsubscribeFromStartupPhases = void 0),
-        this.unsubscribeFromPrimaryWindow?.(),
-        (this.unsubscribeFromPrimaryWindow = void 0),
-        this.origin.off(`destroyed`, this.disposeBufferedPhases));
-    }
-    disposeBufferedPhases = () => {
-      ((this.isDisposed = !0), this.clearBufferedPhases());
-    };
-  },
+  ttt = StartupRendererCoordinator,
   c5;
 function ntt(e) {
   if (process.platform !== `darwin`) return;
@@ -159131,13 +159022,14 @@ var G5 = r.r(`WindowContext`),
               : void 0,
           remoteControlEnvironments: this.remoteControlEnvironmentService,
           remoteHostedPIP: f,
-          startup: new ttt(
-            e,
-            this.options.windowManager,
-            this.options.startupPhases,
-            this.primaryWindowContentReady.promise,
-            t,
-          ),
+          startup: new ttt({
+            includeStartupTiming: t,
+            isSentryEnabled: () => a.Qt,
+            origin: e,
+            startupPhases: this.options.startupPhases,
+            startupReady: this.primaryWindowContentReady.promise,
+            windowManager: this.options.windowManager,
+          }),
           notificationPermissionsSupported:
             process.platform === `darwin` || process.platform === `win32`,
           systemPermissions:
