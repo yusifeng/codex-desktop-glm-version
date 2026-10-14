@@ -77,6 +77,8 @@ const { ArtifactSessionHostService } = require("./main-app/remote-artifact/artif
 const { createTerminalSessionManagerClass } = require("./main-app/terminal/terminal-session-manager.js");
 const { createBrowserWindowManagerClass } = require("./main-app/window/browser-window-manager.js");
 const { createBrowserPageCommandControllerClass } = require("./main-app/browser-sidebar/browser-page-command-controller.js");
+const { createBrowserUseRouteControllerClass } = require("./main-app/browser-sidebar/browser-use-route-controller.js");
+const { createBrowserCommentModeControllerClass } = require("./main-app/browser-sidebar/browser-comment-mode-controller.js");
 const { createBrowserAnnotationInteractionControllerClass } = require("./main-app/browser-sidebar/browser-annotation-interaction-controller.js");
 const { createBrowserPagePersistenceControllerClass } = require("./main-app/browser-sidebar/browser-page-persistence-controller.js");
 const { createBrowserPresentationSyncControllerClass } = require("./main-app/browser-sidebar/browser-presentation-sync-controller.js");
@@ -116473,6 +116475,8 @@ var $Ze = class {
     defaultBrowserUseViewportSize;
     logger = r.i(`browser-sidebar-manager`);
     pageCommandController;
+    browserUseRouteController;
+    commentModeController;
     annotationInteractionController;
     presentationSyncController;
     downloadStore;
@@ -116537,6 +116541,8 @@ var $Ze = class {
         (this.browserSessionRegistry = a),
         (this.defaultBrowserUseViewportSize = o),
         (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX }))(this)),
+        (this.browserUseRouteController = new (createBrowserUseRouteControllerClass({ hX, n, qU, oX, QU, iW, wU, aW, mX, mXe, lW, OX, hXe, dZ, WU, fq, gX, logger: r.i(`browser-sidebar-manager`) }))(this)),
+        (this.commentModeController = new (createBrowserCommentModeControllerClass({ EU, cW, yVe, tq, n }))(this)),
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
@@ -116648,7 +116654,7 @@ var $Ze = class {
           waitForPageReady: (e, t) => this.waitForPageReadyForRoute(e, t),
           setBrowserUseActive: (e, t, n) => this.setBrowserUseActiveForRoute(e, t, n),
           setWebMcpToolActivity: (e, t, n, r) =>
-            pXe(this.getBrowserUseRouteActionHelpers(), e, t, n, r),
+            this.browserUseRouteController.setWebMcpToolActivity(e, t, n, r),
           setBrowserUseCursor: (e, t, n) => this.setBrowserUseCursorForRoute(e, t, n),
           trackPendingBrowserUseNavigation: (e, t) =>
             qXe(this.findPageStateForPageKey(e)?.page ?? null, t),
@@ -116788,117 +116794,22 @@ var $Ze = class {
         windowManager: this.windowManager,
       });
     }
-    getBrowserUseRouteActionHelpers() {
-      return {
-        browserSessionRegistry: this.browserSessionRegistry,
-        browserUseOpenRequests: this.browserUseOpenRequests,
-        comments: this.comments,
-        createThreadPageState: (e, t, n) =>
-          this.materializeThreadPageState(e, t, { kind: `fresh`, page: n }),
-        defaultBrowserUseViewportSize: this.defaultBrowserUseViewportSize,
-        ensureThreadStateForWindow: this.ensureThreadStateForWindow.bind(this),
-        enforceDetachedPageBudget: this.tabBudget.enforceDetachedPageBudget.bind(this.tabBudget),
-        getLiveWindowState: this.getLiveWindowState.bind(this),
-        getDetachedWindowStates: this.getDetachedWindowStates.bind(this),
-        getPageWindowState: this.getPageWindowState.bind(this),
-        getPageHandleForConversation: gX,
-        getThreadStateForWindow: hX,
-        navigatePageToUrl: this.navigatePageToUrl.bind(this),
-        queuePageDeviceMetricsSync: this.queuePageDeviceMetricsSync.bind(this),
-        requestThreadTeardown: this.browserPageHostLifecycle.requestThreadTeardown.bind(
-          this.browserPageHostLifecycle,
-        ),
-        syncThreadState: this.syncThreadState.bind(this),
-        updateThreadSessionState: this.browserPageHostLifecycle.updateThreadSessionState.bind(
-          this.browserPageHostLifecycle,
-        ),
-        windowManager: this.windowManager,
-      };
-    }
-    getPageForBrowserUseForRoute(e, t) {
-      return cXe(this.getBrowserUseRouteActionHelpers(), e, t);
-    }
-    getTabsForBrowserUseForRoute(e) {
-      return bX(this.getBrowserUseRouteActionHelpers(), e);
-    }
-    async openPageForBrowserUseForRoute({
-      browserTabId: e,
-      conversationId: t,
-      createPanelTab: n,
-      startingUrl: r,
-      windowId: i,
-    }) {
-      if (!this.inAppBrowserFeatureEnabled) throw Error(DZ);
-      return lXe(this.getBrowserUseRouteActionHelpers(), {
-        browserTabId: e,
-        conversationId: t,
-        createPanelTab: n,
-        startingUrl: r,
-        windowId: i,
-      });
-    }
-    closePageForBrowserUseForRoute(e, t) {
-      uXe(this.getBrowserUseRouteActionHelpers(), e, t);
-    }
-    releasePageForBrowserUseForRoute(e, t) {
-      xX(this.getBrowserUseRouteActionHelpers(), e, t);
-    }
-    disposeBrowserUseRouteForRoute(e, t) {
-      SX(this.getBrowserUseRouteActionHelpers(), e, t);
-    }
-    setBrowserVisibleForBrowserUseForRoute(e, t, n) {
-      dXe(this.getBrowserUseRouteActionHelpers(), e, t, n);
-    }
-    isBrowserVisibleForBrowserUseForRoute(e, t) {
-      return fXe(this.getBrowserUseRouteActionHelpers(), e, t);
-    }
-    setViewportForBrowserUseForRoute(e, t, n) {
-      CX(this.getBrowserUseRouteActionHelpers(), e, t, n);
-    }
-    setCaptureSurfaceForBrowserUseForRoute(e, t, n) {
-      wX(this.getBrowserUseRouteActionHelpers(), e, t, n);
-    }
-    async waitForPendingDebuggerSyncForRoute(e, t) {
-      let n = this.getPageWindowState(e, t);
-      if (n == null || t == null) return;
-      let r = (hX(n, e.conversationId, t) ?? null)?.page ?? null;
-      r != null && (await r.debuggerSync.catch(() => void 0));
-    }
-    async waitForPageReadyForRoute(e, t) {
-      if (t == null) return;
-      let n = this.getPageWindowState(e, t);
-      await (n == null ? null : (hX(n, e.conversationId, t)?.page ?? null))?.initialNavigationSync;
-    }
-    openBrowserPanelWithoutAnimation(e, t, n) {
-      TX(this.getBrowserUseRouteActionHelpers(), e, t, n);
-    }
-    setBrowserUseActiveForRoute(e, t, n) {
-      let r = this.getPageWindowState(e, n),
-        i = r == null ? [] : [r, ...(n == null ? this.getDetachedWindowStates(e.windowId) : [])],
-        a = new Set(
-          i.flatMap((t) =>
-            Array.from(t.threads.values()).filter(
-              (t) => t.conversationId === e.conversationId && t.isBrowserUseActive,
-            ),
-          ),
-        );
-      EX(this.getBrowserUseRouteActionHelpers(), e, t, n);
-      for (let t of i) {
-        let n = !1;
-        for (let r of t.threads.values())
-          r.conversationId === e.conversationId &&
-            a.has(r) !== r.isBrowserUseActive &&
-            (!r.isBrowserUseActive &&
-              r.page?.lastWebMcpToolCall != null &&
-              ((r.page.lastWebMcpToolCall = null),
-              r.page.webMcpParentCallIds?.clear(),
-              this.syncThreadState(t, e.conversationId, r)),
-            dZ(t, r),
-            (n = !0),
-            r.isBrowserUseActive && this.tabBudget.markTabActivity(r));
-        n && this.tabBudget.enforceDetachedPageBudget(t);
-      }
-    }
+    getBrowserUseRouteActionHelpers(...args) { return this.browserUseRouteController.getBrowserUseRouteActionHelpers(...args); }
+    getPageForBrowserUseForRoute(...args) { return this.browserUseRouteController.getPageForBrowserUseForRoute(...args); }
+    getTabsForBrowserUseForRoute(...args) { return this.browserUseRouteController.getTabsForBrowserUseForRoute(...args); }
+    async openPageForBrowserUseForRoute(...args) { return this.browserUseRouteController.openPageForBrowserUseForRoute(...args); }
+    closePageForBrowserUseForRoute(...args) { return this.browserUseRouteController.closePageForBrowserUseForRoute(...args); }
+    releasePageForBrowserUseForRoute(...args) { return this.browserUseRouteController.releasePageForBrowserUseForRoute(...args); }
+    disposeBrowserUseRouteForRoute(...args) { return this.browserUseRouteController.disposeBrowserUseRouteForRoute(...args); }
+    setBrowserVisibleForBrowserUseForRoute(...args) { return this.browserUseRouteController.setBrowserVisibleForBrowserUseForRoute(...args); }
+    isBrowserVisibleForBrowserUseForRoute(...args) { return this.browserUseRouteController.isBrowserVisibleForBrowserUseForRoute(...args); }
+    setViewportForBrowserUseForRoute(...args) { return this.browserUseRouteController.setViewportForBrowserUseForRoute(...args); }
+    setCaptureSurfaceForBrowserUseForRoute(...args) { return this.browserUseRouteController.setCaptureSurfaceForBrowserUseForRoute(...args); }
+    async waitForPendingDebuggerSyncForRoute(...args) { return this.browserUseRouteController.waitForPendingDebuggerSyncForRoute(...args); }
+    async waitForPageReadyForRoute(...args) { return this.browserUseRouteController.waitForPageReadyForRoute(...args); }
+    openBrowserPanelWithoutAnimation(...args) { return this.browserUseRouteController.openBrowserPanelWithoutAnimation(...args); }
+    setBrowserUseActiveForRoute(...args) { return this.browserUseRouteController.setBrowserUseActiveForRoute(...args); }
+    setWebMcpToolActivity(...args) { return this.browserUseRouteController.setWebMcpToolActivity(...args); }
     onMcpToolCallCompleted(e, t) {
       let n = this.browserSessionRegistry.getBrowserRouteForSession(e);
       if (n != null) {
@@ -116913,14 +116824,8 @@ var $Ze = class {
             }
       }
     }
-    setBrowserUseCursorForRoute(e, t, n) {
-      return DX(this.getBrowserUseRouteActionHelpers(), e, t, n);
-    }
-    setBrowserUseActiveForConversation(e, t) {
-      let n = this.getPreferredWindowStateForConversation(e);
-      n != null &&
-        this.setBrowserUseActiveForRoute({ conversationId: e, windowId: oX(n.window.id) }, t);
-    }
+    setBrowserUseCursorForRoute(...args) { return this.browserUseRouteController.setBrowserUseCursorForRoute(...args); }
+    setBrowserUseActiveForConversation(...args) { return this.browserUseRouteController.setBrowserUseActiveForConversation(...args); }
     activateBrowserUseNavigationRestriction(e) {
       this.browserUseNavigationRestriction.activate(e);
     }
@@ -116992,97 +116897,10 @@ var $Ze = class {
     queuePageDebuggerSync(...args) { return this.pageCommandController.queuePageDebuggerSync(...args); }
     queuePageColorSchemeSync(...args) { return this.pageCommandController.queuePageColorSchemeSync(...args); }
 
-    setInteractionMode(e, t, r, i, a) {
-      let o = this.ensureThreadCommandContext(e, t, i);
-      if (o == null) return;
-      let { threadState: s, windowState: c } = o;
-      if (s.pendingWindowTransfer !== !0 && (r !== `comment` || s.isAnnotationModeEnabled)) {
-        if (r !== `comment`) {
-          if (s.snapshot.interactionMode === r && s.pendingCommentModeActivation == null) return;
-          ((s.pendingCommentModeActivation = null),
-            (s.snapshot = EU(s.snapshot, r)),
-            this.comments.dismiss(e, t, s.browserTabId, s),
-            this.syncThreadState(c, t, s),
-            s.page != null && this.syncRuntimeStateToPage(s.page, s),
-            this.comments.prepare(e, t, s.browserTabId, s));
-          return;
-        }
-        this.requestCommentMode(
-          c,
-          t,
-          s,
-          n.gu.BATCH,
-          a ?? null,
-          a === `keyboard-shortcut` ? { kind: `text` } : void 0,
-        );
-      }
-    }
-    startCommentAtPoint(e, t, r, i, a, o) {
-      let s = this.getThreadState(e, t.conversationId, t.browserTabId);
-      if (s == null) return;
-      let c = this.ensureCurrentWindowState(e);
-      if (c == null) return;
-      let l =
-        n.Du(i).persistent &&
-        this.isTweaksFeatureEnabled &&
-        s.snapshot.annotationEditorMode === `design` &&
-        n.Au(s.snapshot.comments);
-      this.requestCommentMode(
-        c,
-        t.conversationId,
-        s,
-        i,
-        a,
-        o
-          ? { kind: `text`, fallbackViewportPoint: r }
-          : { kind: l ? `design` : `comment`, viewportPoint: r },
-      );
-    }
-    startDesignEditAtPoint(e, t, r) {
-      if (!this.isTweaksFeatureEnabled) return;
-      let i = this.getThreadState(e, t.conversationId, t.browserTabId);
-      if (i == null) return;
-      let a = this.ensureCurrentWindowState(e);
-      a != null &&
-        this.requestCommentMode(a, t.conversationId, i, n.gu.BATCH, null, {
-          kind: `design`,
-          viewportPoint: r,
-        });
-    }
-    requestCommentMode(e, t, r, i, a, o) {
-      if (!r.isAnnotationModeEnabled || r.pendingWindowTransfer === !0) return;
-      let s = cW(r);
-      if (s.length === 0) return;
-      let c = n.Du(i),
-        l = this.commentModeBlocklistLookup.cachedCommentModeBlocked(s);
-      if (l === !0) {
-        this.refreshCommentModeBlockStatus(e, r);
-        return;
-      }
-      if (l === !1) {
-        ((r.pendingCommentModeActivation = null),
-          (r.snapshot.interactionMode !== `comment` || r.snapshot.annotationFlow !== i) &&
-            ((r.snapshot = {
-              ...EU(r.snapshot, `comment`),
-              annotationFlow: i,
-              annotationModeEntrySource: a ?? null,
-              isTweaksEditorOpen: c.persistent && yVe(r.snapshot, this.isTweaksFeatureEnabled),
-            }),
-            this.syncThreadState(e, t, r),
-            r.page != null && this.syncRuntimeStateToPage(r.page, r),
-            this.comments.prepare(e.owner, t, r.browserTabId, r)),
-          o != null && r.page != null && tq(r.page, o));
-        return;
-      }
-      ((r.pendingCommentModeActivation = {
-        annotationFlow: i,
-        annotationModeEntrySource: a ?? null,
-        url: s,
-        navigationVersion: r.page?.navigationVersion ?? null,
-        request: o ?? null,
-      }),
-        this.refreshCommentModeBlockStatus(e, r));
-    }
+    setInteractionMode(...args) { return this.commentModeController.setInteractionMode(...args); }
+    startCommentAtPoint(...args) { return this.commentModeController.startCommentAtPoint(...args); }
+    startDesignEditAtPoint(...args) { return this.commentModeController.startDesignEditAtPoint(...args); }
+    requestCommentMode(...args) { return this.commentModeController.requestCommentMode(...args); }
     clearComments(...args) { return this.annotationInteractionController.clearComments(...args); }
     discardPendingAnnotations(...args) { return this.annotationInteractionController.discardPendingAnnotations(...args); }
     clearAnnotations(...args) { return this.annotationInteractionController.clearAnnotations(...args); }

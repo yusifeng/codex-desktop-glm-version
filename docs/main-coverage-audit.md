@@ -816,6 +816,16 @@ helper 已迁移至 `browser-page-persistence-controller.ts`，删除旧 `yZe/bZ
 `tQe` 的 view/route presentation sync、owner sync、annotation mode sync 与 presented-state lookup
 已迁移至 `browser-presentation-sync-controller.ts`，原方法仅保留委托；focused test 为
 `scripts/test-main-browser-presentation-sync-controller.mjs`。
+
+### 增量抽取：IAB browser-use route 与 comment-mode controllers
+
+browser-use route action owner（page/tab 查询、open/close/release/dispose、visibility、viewport/capture、
+wait、panel、active、WebMCP、cursor）已迁移至 `browser-use-route-controller.ts`，原 tQe 方法仅保留委托；
+focused test 为 `scripts/test-main-browser-use-route-controller.mjs`。
+
+comment-mode entry owner（interaction mode、point comment/design entry、blocklist tri-state 与 pending
+activation）已迁移至 `browser-comment-mode-controller.ts`，focused test 为
+`scripts/test-main-browser-comment-mode-controller.mjs`。
 `scripts/test-main-browser-page-command-controller.mjs` 覆盖 11 项历史、焦点、缩放、快照、挂载与路由断言。
 
 ### A3 main 剩余大 owner（2026-10-15）

@@ -11,6 +11,11 @@ page-command controller 的 history clone 依赖，将 `rW/WX/GX` 显式注入�
 `browser-presentation-sync-controller.ts`，均保留 focused tests；tQe 剩余主要为窗口/thread materialization
 与 runtime/disposal 编排。
 
+本轮继续完成 tQe 两个完整 owner：browser-use route actions 已迁入
+`browser-use-route-controller.ts`，comment-mode entry orchestration 已迁入
+`browser-comment-mode-controller.ts`；两者均删除原 tQe inline owner 并保留 focused tests。共享的
+`mXe/hXe/OX` 等仍被其他生命周期路径使用的顶层 helper 保留，不计为 route owner 残留。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger
