@@ -66,6 +66,7 @@ const { StartupRendererCoordinator } = require("./main-app/startup/startup-rende
 const { SystemPermissionsService } = require("./main-app/startup/system-permissions-service.js");
 const { ExternalDocumentBindingRegistry } = require("./main-app/remote-artifact/external-document-binding-registry.js");
 const { NativeArtifactFileService } = require("./main-app/remote-artifact/native-artifact-file-service.js");
+const { BrowserPageHostLifecycle } = require("./main-app/browser-sidebar/browser-page-host-lifecycle.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -117306,317 +117307,7 @@ async function gZe(e, t, n, { content: r, receiver: i, signal: a }, o, s) {
       delete n.pendingWindowTransfer);
   }
 }
-var _Ze = 5e3,
-  vZe = class {
-    options;
-    attachedWebviewHosts = new WeakMap();
-    logger = r.i(`browser-sidebar-manager`);
-    lifecycleSequence = 0;
-    constructor(e) {
-      this.options = e;
-    }
-    transferToWindow(e, t, n) {
-      return gZe(this.options, e, t, n, this.attachedWebviewHosts, (e, t) => {
-        (this.requestThreadTeardown(e, t.conversationId, t, `closed`),
-          t.pendingTeardown != null &&
-            this.finalizeThreadTeardown(e, t.conversationId, t, t.pendingTeardown.teardownId));
-      });
-    }
-    registerRendererSession(e, t) {
-      if (e.rendererInstanceId === t) return !0;
-      (e.rendererInstanceId != null && this.cancelPendingWebviewAttaches(e),
-        (e.rendererInstanceId = t));
-      for (let t of e.threads.values()) t.hostGeneration = null;
-      return !0;
-    }
-    registerHost(e, t, n, r, i, a) {
-      if (e.rendererInstanceId !== a) return !1;
-      let o = this.options.browserPersistence.getPagePersistence(e.window, i),
-        s = hX(e, n, t) ?? this.options.ensureThreadStateForWindow(e, n, t);
-      return (s.hostGeneration != null && s.hostGeneration > r) ||
-        !this.options.browserPersistence.reconcileBrowserStorageId(e, s, o) ||
-        this.options.browserPersistence.preparePage(e, s, o).kind === `missing`
-        ? !1
-        : ((s.hostGeneration = r),
-          this.options.browserPersistence.registerWebviewHost(e, s, o),
-          !0);
-    }
-    attachWebview(e, t, n) {
-      let { hostGeneration: r, rendererInstanceId: i, route: a } = n,
-        o = e.threads.get(qU(a)) ?? null;
-      if (o?.page == null) {
-        (TXe(this.options.browserSessionRegistry, e, a, t.id), t.isDestroyed() || t.close());
-        return;
-      }
-      if (e.rendererInstanceId !== i || o.hostGeneration !== r) {
-        (this.options.browserSessionRegistry.recordDebugEvent({
-          browserTabId: a.browserTabId,
-          conversationId: a.conversationId,
-          details: [
-            { label: `hostGeneration`, value: String(r) },
-            { label: `threadHostGeneration`, value: String(o.hostGeneration) },
-          ],
-          guestWebContentsId: t.id,
-          kind: `browser-runtime-attach-stale`,
-          message: `Rejected stale Browser sidebar attach`,
-          ownerWebContentsId: e.owner.id,
-          pageKey: null,
-          windowId: e.window.id,
-        }),
-          this.logger().warning(`IAB_LIFECYCLE rejected stale browser sidebar attach`, {
-            safe: {
-              browserTabId: a.browserTabId,
-              conversationId: a.conversationId,
-              guestWebContentsId: t.id,
-              hostGeneration: r,
-              ownerWebContentsId: e.owner.id,
-              threadHostGeneration: o.hostGeneration,
-              windowId: e.window.id,
-            },
-            sensitive: {},
-          }),
-          t.isDestroyed() || t.close());
-        return;
-      }
-      let s = this.findPageStateForWebContentsId(t.id);
-      if (
-        s != null &&
-        (s.conversationId !== a.conversationId || s.threadState.browserTabId !== a.browserTabId)
-      ) {
-        (this.options.browserSessionRegistry.recordDebugEvent({
-          browserTabId: a.browserTabId,
-          conversationId: a.conversationId,
-          details: [
-            { label: `previousBrowserTabId`, value: s.threadState.browserTabId },
-            { label: `previousConversationId`, value: s.conversationId },
-          ],
-          guestWebContentsId: t.id,
-          kind: `browser-runtime-attach-route-rebind-rejected`,
-          message: `Rejected Browser sidebar route rebind`,
-          ownerWebContentsId: e.owner.id,
-          pageKey: null,
-          windowId: e.window.id,
-        }),
-          this.logger().warning(`IAB_LIFECYCLE rejected browser sidebar route rebind`, {
-            safe: {
-              browserTabId: a.browserTabId,
-              conversationId: a.conversationId,
-              guestWebContentsId: t.id,
-              ownerWebContentsId: e.owner.id,
-              previousBrowserTabId: s.threadState.browserTabId,
-              previousConversationId: s.conversationId,
-              windowId: e.window.id,
-            },
-            sensitive: {},
-          }),
-          t.isDestroyed() || t.close());
-        return;
-      }
-      (this.options.browserSessionRegistry.recordDebugEvent({
-        browserTabId: a.browserTabId,
-        conversationId: a.conversationId,
-        guestWebContentsId: t.id,
-        kind: `browser-runtime-attached`,
-        message: `Runtime attached Browser sidebar webview`,
-        ownerWebContentsId: e.owner.id,
-        pageKey: KU(e.owner.id, a.conversationId, a.browserTabId),
-        windowId: e.window.id,
-      }),
-        this.logger().info(`IAB_LIFECYCLE runtime attached browser sidebar webview`, {
-          safe: {
-            browserTabId: a.browserTabId,
-            conversationId: a.conversationId,
-            guestWebContentsId: t.id,
-            ownerWebContentsId: e.owner.id,
-            windowId: e.window.id,
-          },
-          sensitive: {},
-        }));
-      let c = o.page.view.webContents;
-      (this.attachedWebviewHosts.set(t, n),
-        uZ(
-          this.options.getPageLifecycleHelpers(),
-          e,
-          o.page,
-          t,
-          o.themeVariant,
-          n.initialNavigationOwner,
-        ),
-        c != null && c !== t && !c.isDestroyed() && c.close());
-    }
-    updateThreadSessionState(e) {
-      e.sessionState;
-      let t = this.lifecycleSequence + 1;
-      if (
-        ((this.lifecycleSequence = t),
-        (e.lastLifecycleSequence = t),
-        e.presented && (e.lastPresentedSequence = t),
-        e.page == null)
-      )
-        e.sessionState = e.snapshot.isSuspended ? `suspended` : `cold`;
-      else if (e.pendingTeardown != null) return;
-      else
-        e.sessionState = e.page.isSuspended
-          ? `suspended`
-          : e.page.view.webContents == null || e.page.view.webContents.isDestroyed()
-            ? `cold`
-            : e.presented
-              ? `live-attached`
-              : `live-detached`;
-      e.sessionState;
-    }
-    suspendDetachedThread(e, t) {
-      if (
-        !(
-          t.presented ||
-          this.options.tabBudget.isTabProtectedFromSuspension(e, t) ||
-          t.page == null ||
-          t.page.isSuspended
-        ) &&
-        this.suspendPage(t, crypto.randomUUID()) &&
-        t.page.pendingSuspensionId != null
-      ) {
-        if (this.options.tabBudget.isTabProtectedFromSuspension(e, t)) {
-          ((t.page.pendingSuspensionId = null),
-            this.options.tabBudget.enforceDetachedPageBudget(e));
-          return;
-        }
-        this.requestThreadTeardown(e, t.conversationId, t, `suspended`);
-      }
-    }
-    suspendPage(e, t) {
-      let n = e.page,
-        r = n?.view.webContents;
-      return n == null || r == null || r.isDestroyed() || e.isBrowserUseActive
-        ? !1
-        : (this.options.browserPageSnapshots.persistCurrentAndFlush(n),
-          (n.pendingSuspensionId = t),
-          !0);
-    }
-    requestThreadTeardown(e, t, n, r) {
-      if (n.pendingTeardown?.reason === r) return;
-      let i = n.page;
-      if (
-        (r === `closed` &&
-          (i != null && this.reportIncompleteNavigationOnClose(i, `tab-closed`),
-          this.options.browserPageSnapshots.deleteClosedPageAndFlush(n)),
-        this.cancelPendingWebviewAttaches(e, n),
-        i == null && r === `suspended`)
-      )
-        return;
-      let a = crypto.randomUUID();
-      ((n.pendingTeardown = { mountGeneration: n.mountGeneration, reason: r, teardownId: a }),
-        this.options.iabTabMentions.notifyInvalidated(),
-        i == null &&
-          this.isBrowserUseManagedBrowserTab(t, n.browserTabId) &&
-          this.options.browserSessionRegistry.recordPageClosed({
-            conversationId: t,
-            browserTabId: n.browserTabId,
-            windowId: oX((e.tabSourceWindow ?? e).window.id),
-          }),
-        this.options.windowManager.sendMessageToWebContents(e.owner, {
-          type: `browser-sidebar-destroy-webview`,
-          browserTabId: n.browserTabId,
-          conversationId: t,
-          mountGeneration: n.mountGeneration,
-          reason: r,
-          teardownId: a,
-        }));
-    }
-    finalizeThreadTeardown(e, t, n, r) {
-      let i = n.pendingTeardown;
-      if (i?.teardownId !== r) return;
-      let a = i.reason;
-      if (
-        a === `suspended` &&
-        (n.presented ||
-          this.options.tabBudget.isTabProtectedFromSuspension(e, n) ||
-          i.mountGeneration !== n.mountGeneration)
-      ) {
-        ((n.pendingTeardown = null),
-          n.page != null && (n.page.pendingSuspensionId = null),
-          this.updateThreadSessionState(n),
-          this.options.syncThreadState(e, t, n),
-          this.options.tabBudget.enforceDetachedPageBudget(e));
-        return;
-      }
-      let o = n.page,
-        s = o?.view.webContents ?? null;
-      if (
-        (o != null &&
-          ((o.pendingSuspensionId = null),
-          (o.isRestoring = !1),
-          (o.isSuspended = a === `suspended`),
-          this.disposePage(o),
-          this.isBrowserUseManagedBrowserTab(t, n.browserTabId) &&
-            (a === `closed`
-              ? this.options.browserSessionRegistry.recordPageClosed({
-                  conversationId: t,
-                  browserTabId: n.browserTabId,
-                  windowId: oX((e.tabSourceWindow ?? e).window.id),
-                })
-              : s != null &&
-                this.options.browserSessionRegistry.recordPageTornDown({
-                  conversationId: t,
-                  browserTabId: n.browserTabId,
-                  guestWebContentsId: s.id,
-                  windowId: oX((e.tabSourceWindow ?? e).window.id),
-                }))),
-        (n.pendingTeardown = null),
-        a === `closed`)
-      ) {
-        (this.removeClosedThreadState(e, n), this.options.tabBudget.enforceDetachedPageBudget(e));
-        return;
-      }
-      (this.updateThreadSessionState(n),
-        this.options.syncThreadState(e, t, n),
-        this.options.tabBudget.recordTabSuspended(e, n),
-        this.options.tabBudget.enforceDetachedPageBudget(e));
-    }
-    disposePage(e) {
-      let t = e.view.webContents;
-      (e.dispose(), (e.dispose = () => void 0), t != null && !t.isDestroyed() && t.close());
-    }
-    removeClosedThreadState(e, t) {
-      (this.options.browserPersistence.unregisterWebviewHost(e, t),
-        nXe(this.options.windowManager, this.options.windows, e, t));
-    }
-    findThreadStateForPendingTeardown(e, t) {
-      for (let n of e.threads.values()) if (n.pendingTeardown?.teardownId === t) return n;
-      return null;
-    }
-    findPageStateForWebContentsId(e) {
-      for (let t of this.options.windows.values())
-        for (let n of t.threads.values()) {
-          let r = n.page;
-          if (r?.view.webContents?.id === e)
-            return { conversationId: n.conversationId, page: r, threadState: n, windowState: t };
-        }
-      return null;
-    }
-    isBrowserUseManagedBrowserTab(e, t) {
-      for (let n of this.options.windows.values())
-        if ((hX(n, e, t) ?? null)?.isBrowserUsePage === !0) return !0;
-      return !1;
-    }
-    cancelPendingWebviewAttaches(e, t) {
-      for (let n of e.pendingAdoptedWebviewsByWebContentsId.values())
-        (t == null ||
-          (n.route.browserTabId === t.browserTabId &&
-            n.route.conversationId === t.conversationId)) &&
-          (n.stopTracking(), n.webContents.isDestroyed() || n.webContents.destroy());
-      for (let [n, r] of e.pendingWebviewRoutesByInstanceId)
-        (t == null ||
-          (r.route.browserTabId === t.browserTabId &&
-            r.route.conversationId === t.conversationId)) &&
-          e.pendingWebviewRoutesByInstanceId.delete(n);
-    }
-    reportIncompleteNavigationOnClose(e, t) {
-      let n = e.takeIncompleteNavigationObservation(_Ze);
-      n != null && RX({ observation: n, trigger: t });
-    }
-  },
-  yZe = class {
+var yZe = class {
     browserPageSnapshots;
     browserSessionRegistry;
     windowManager;
@@ -118863,15 +118554,25 @@ var $Ze = class {
           },
           windows: this.windows,
         })),
-        (this.browserPageHostLifecycle = new vZe({
+        (this.browserPageHostLifecycle = new BrowserPageHostLifecycle({
+          bindPageToWebview: uZ,
           browserPageSnapshots: this.browserPageSnapshots,
           browserPersistence: this.browserPersistence,
           browserSessionRegistry: this.browserSessionRegistry,
           ensureThreadStateForWindow: this.ensureThreadStateForWindow.bind(this),
+          findThreadState: hX,
           getPageLifecycleHelpers: this.getPageLifecycleHelpers.bind(this),
           iabTabMentions: this.iabTabMentions,
+          logger: r.i(`browser-sidebar-manager`),
+          normalizeWindowId: oX,
+          pageKey: KU,
+          recordMissingPageAttach: TXe,
+          removeClosedThread: nXe,
+          reportIncompleteNavigation: RX,
+          routeKey: qU,
           syncThreadState: this.syncThreadState.bind(this),
           tabBudget: this.tabBudget,
+          transferPageToWindow: gZe,
           windowManager: this.windowManager,
           windows: this.windows,
         })),

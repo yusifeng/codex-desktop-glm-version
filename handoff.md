@@ -1,5 +1,17 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 顶层 32 个长生命 controller 的构造与依赖适配迁入
+`src/main/browser-page-preload/annotation-controller-registry.ts`，真实接回唯一 consumer，
+并删除原约 440 行内联 registry 主体；保留 hook/构造顺序、host message、RAF 注入
+与后置 callback 的延迟闭包语义。focused test 为
+`scripts/test-preload-annotation-controller-registry.mjs`（12 项）。
+
+本轮将原 `vZe` browser page host lifecycle 整体迁移至
+`src/main/main-app/browser-sidebar/browser-page-host-lifecycle.ts`，真实接回 IAB manager 唯一 consumer，
+并删除旧约 309 行 owner；保留 renderer/host generation、webview attach/rebind、session-state、suspension、
+teardown/finalize race 与 pending attach cleanup。focused test 为
+`scripts/test-main-browser-page-host-lifecycle.mjs`（65 项）。
+
 本轮将原 `Fet` native artifact file service 的完整生命周期迁移至
 `src/main/main-app/remote-artifact/native-artifact-file-service.ts`，真实接回 `Vet` 唯一 consumer，
 并删除旧 class 与专用 target helpers；保留 target discovery/projection、临时文件权限与清理、

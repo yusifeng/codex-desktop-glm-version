@@ -663,6 +663,27 @@ helpers 已删除。snapshot 读取继续校验普通文件、声明长度、最
 `scripts/test-main-native-artifact-file-service.mjs` 使用 esbuild 临时 bundle，覆盖 40 项 discovery、projection、
 temporary-file ownership、action routing、cleanup 与 snapshot validation focused assertions。
 
+### 增量抽取：browser page host lifecycle
+
+R8/IAB 原 `vZe`（117,310-117,619）的完整 browser page host lifecycle 已迁移至
+`src/main/main-app/browser-sidebar/browser-page-host-lifecycle.ts`。模块拥有 renderer instance 与 host generation
+交接、attached webview host identity、全局 lifecycle sequence、pending attach cleanup、页面 suspend 请求和
+teardown/finalize 状态机；stale attach、跨 route rebind 与 transfer-close 均保留原拒绝或收尾顺序。
+
+原 IAB/browser-sidebar manager `tQe` 唯一 consumer 注入现有 persistence/session registry、page binding、
+window/thread lookup、transfer helper、tab budget 与 telemetry adapters；main chunk 内旧 `vZe` 和专用 5 秒
+incomplete-navigation constant 已删除。`scripts/test-main-browser-page-host-lifecycle.mjs` 使用 esbuild 临时
+bundle，覆盖 65 项 renderer replacement、host registration、attach/rebind、session projection、suspension、
+teardown race、page disposal 与 transfer focused assertions。
+
+### A3 main 剩余大 owner（2026-10-15）
+
+`vZe` 已在本批移出。仍明确存在的完整大 owner 为：`DYe` browser-use tab/runtime registry、`xZe` IAB tab
+working-set/activity lifecycle、`tQe` IAB/browser-sidebar manager、`Vet` artifact-session host service、`ztt`
+terminal session manager、`Pit` appshot/native capture RPC owner、`Eat` hotkey-window lifecycle，以及 `Qot`
+BrowserWindow manager。`xZe` 是下一段最清晰的独立 manager；`Vet/ztt` 可按完整 subscription/session 子-owner
+继续迁移，`DYe/tQe/Pit/Eat/Qot` 则需先按内部生命周期边界拆分，避免复制巨型 assembly。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的
