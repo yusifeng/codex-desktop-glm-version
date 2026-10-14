@@ -1649,6 +1649,11 @@ Watch session close 的 active-session race、watch-error logging、session 清�
 recovery update 与 retry scheduling 顺序已迁移至 `git-watch-session-close-controller.ts`；worker 仍注入
 target/session owner、logger、recovery 与 retry callbacks。`scripts/test-worker-git-watch-session-close-controller.mjs`
 覆盖 active/error/stable 顺序及 stale-session race。
+GitRepoWatcher 的 residual state/event owner 已整体迁移至 `git-repo-watcher-state-controller.ts` 并真实接回。
+新 owner 持有 watch targets、ignore-source registrations/changed paths、ignored directories、pending working-tree
+paths、head-ref cache 与 git-dir/path API，统一执行 target registration、inactive retry、ignore discovery/reconcile、
+working-tree policy refresh、path batching、head-ref decision、repo-change emission 和 Git operation marker projection；
+原 watcher 删除 157 行旧状态与实现。focused test 以 41 项断言覆盖上述生命周期、clear 与 source integration。
 Metadata refresh 的 changed-path batch、single-flight waiter、首批 recovering/后续批次状态推进与
 dispose 清空已迁移至 `git-metadata-refresh-controller.ts`；worker 仍注入 metadata target 筛选、
 session dispose/start、worktree directory I/O 与 generation 检查。由

@@ -84,6 +84,7 @@ const { GitStableMetadataResolver } = require("./worker/git-stable-metadata-reso
 const { GitManagerCacheLifecycle } = require("./worker/git-manager-cache-lifecycle");
 const { GitRepositoryRegistry } = require("./worker/git-repository-registry");
 const { GitWatchRegistryController } = require("./worker/git-watch-registry-controller");
+const { GitRepoWatcherStateController } = require("./worker/git-repo-watcher-state-controller");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -68493,7 +68494,16 @@ var Zye = 1e3,
   tbe = class {
     options;
     logger = OW(`git-repo-watcher`);
-    watchTargets = [];
+    stateController = new GitRepoWatcherStateController({
+      addPendingPath: addPendingWorkingTreePath,
+      createTarget: createGitWatchTarget,
+      emitChange: emitGitRepoChange,
+      isWithinPath: M6,
+      maxPendingPaths: A6,
+      reconcileIgnoreSources: reconcileGitIgnoreSourceWatches,
+      requiresRecovery: requiresGitWatcherRecovery,
+      retryDelayMs: j6,
+    });
     repoChangeController = createGitRepoChangeController({
       delayMs: Zye,
       isDisposed: () => this.disposed,
@@ -68503,7 +68513,7 @@ var Zye = 1e3,
     watchRetryController = createGitWatchRetryController({
       maxDelayMs: Qye,
       isDisposed: () => this.disposed,
-      isRegistered: (target) => this.watchTargets.includes(target),
+      isRegistered: (target) => this.stateController.watchTargets.includes(target),
       retry: (target) => this.tryStartWatchSession(target, !0),
     });
     watchSessionCloseController = createGitWatchSessionCloseController({
@@ -68522,7 +68532,7 @@ var Zye = 1e3,
     });
     worktreeWatchRefreshController = createGitWorktreeWatchRefreshController({
       isDisposed: () => this.disposed,
-      getRootTarget: (path) => this.watchTargets.find((target) => target.watchPath === path),
+      getRootTarget: (path) => this.stateController.watchTargets.find((target) => target.watchPath === path),
       getGeneration: (target) => target.generation,
       isMissing: (target) => target.metadataDirectory?.missing === true,
       readDirectory: (path) => this.options.host.readDirectory(path),
@@ -68532,11 +68542,11 @@ var Zye = 1e3,
       scheduleRetry: (target) => this.scheduleWatchSessionRetry(target),
       disposeSession: (target) => this.disposeSession(target),
       markMissing: (target) => { if (target.metadataDirectory != null) target.metadataDirectory.missing = true; },
-      getTargets: () => this.watchTargets,
+      getTargets: () => this.stateController.watchTargets,
       partition: partitionGitWorktreeWatchPaths,
       getGitDir: () => this.gitDir,
-      removeTarget: (target) => this.watchTargets.splice(this.watchTargets.indexOf(target), 1),
-      findTarget: (path) => this.watchTargets.find((target) => target.watchPath === path),
+      removeTarget: (target) => this.stateController.watchTargets.splice(this.stateController.watchTargets.indexOf(target), 1),
+      findTarget: (path) => this.stateController.watchTargets.find((target) => target.watchPath === path),
       addTarget: (path, parentPath) => this.addDirectoryWatchTarget(path, `worktree-topology`, (candidate) => P6(this.pathApi, parentPath, candidate), !1, parentPath),
       hasTopologyHandler: (target) => target?.handlers.some((handler) => handler.changeType === `worktree-topology`) === true,
       startSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
@@ -68544,18 +68554,18 @@ var Zye = 1e3,
     });
     pathApi = null;
     gitDir = null;
-    currentHeadRefPath = null;
-    currentHeadRefKnown = !1;
     lastRequiresRecovery = null;
     disposed = !1;
     disposePromise = null;
-    pendingWorkingTreePaths = new Set();
     ignorePolicy;
-    workingTreeIgnoredDirectories = [];
-    ignoreSourceWatches = new Map();
-    changedIgnoreSourcePaths = new Set();
     constructor(e) {
       ((this.options = e),
+        this.stateController.configure({
+          disposeSession: (target) => this.disposeSession(target),
+          pathApi: null,
+          root: e.root,
+          tryStartWatchSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
+        }),
         (this.ignorePolicy = e.watchIgnoreSources
           ? new GitIgnorePolicy({
               readIgnoredDirectories: () => this.readIgnoredDirectories(),
@@ -68565,25 +68575,16 @@ var Zye = 1e3,
           : null));
     }
     get requiresRecovery() {
-      return requiresGitWatcherRecovery(this.watchTargets, this.ignorePolicy?.requiresRecovery === !0);
-      /* istanbul ignore next -- retained generated implementation for source parity reference */
-      return (
-        this.ignorePolicy?.requiresRecovery === !0 ||
-        this.watchTargets.some(
-          (e) =>
-            !e.metadataDirectory?.missing &&
-            (e.session == null || (e.recursive && !e.session.coverage.recursive)),
-        )
-      );
+      return this.stateController.requiresRecovery(this.ignorePolicy?.requiresRecovery === !0);
     }
     async start() {
       return startGitRepoWatcher({
         isDisposed: () => this.disposed,
         logStart: () => this.logger.info(`Starting git repo watcher`),
-        getTargets: () => this.watchTargets,
+        getTargets: () => this.stateController.watchTargets,
         retryInactiveTargets: () => this.retryInactiveWatchTargets(),
         getPlatformPath: () => this.options.host.platformPath(),
-        setPathApi: (pathApi) => { this.pathApi = pathApi; },
+        setPathApi: (pathApi) => { this.pathApi = pathApi; this.stateController.setPathApi(pathApi); },
         trace: (span, operation) => OH(span, operation),
         hostKind: this.options.host.isLocal ? `local` : `remote`,
         prefetchMetadata: () => prefetchGitWatcherMetadata(this.options.worktreeRepo, void 0, gitWatcherMetadataDeps),
@@ -68596,8 +68597,8 @@ var Zye = 1e3,
         ]),
         commonDir: this.options.commonDir,
         root: this.options.root,
-        setGitDir: (gitDir) => { this.gitDir = gitDir; },
-        setHeadRefState: (path, known) => { this.currentHeadRefPath = path; this.currentHeadRefKnown = known; },
+        setGitDir: (gitDir) => { this.gitDir = gitDir; this.stateController.setGitDir(gitDir); },
+        setHeadRefState: (path, known) => this.stateController.setHeadRefState(path, known),
         addWatchTarget: (pathApi, path, changeType) => this.addWatchTarget(pathApi, path, changeType),
         addDirectoryWatchTarget: (path, changeType, predicate, recursive, parentPath) =>
           this.addDirectoryWatchTarget(path, changeType, predicate, recursive, parentPath),
@@ -68607,58 +68608,38 @@ var Zye = 1e3,
       });
     }
     async retryInactiveWatchTargets() {
-      await Promise.all(
-        this.watchTargets.map(async (e) => {
-          e.session == null &&
-            !e.metadataDirectory?.missing &&
-            (await this.tryStartWatchSession(e, !0));
-        }),
+      await this.stateController.retryInactive((target, recovering) =>
+        this.tryStartWatchSession(target, recovering),
       );
     }
     async readIgnoredDirectories() {
       let e = this.options.watchIgnoreSources;
       if (e == null) return [];
-      let t = await e.getEnvironment();
-      for (; !this.disposed;) {
-        let n = await discoverGitIgnoreConfigurationFiles(this.options.worktreeRepo, t, { runGit: $ }),
-          r = await e.getWatchTargets([
-            ...n.configFiles,
-            ...(n.ignoreFile == null ? [] : [n.ignoreFile]),
-          ]);
-        if (this.disposed) return [];
-        let i = await this.updateIgnoreSourceWatches(r);
-        if (this.disposed) return [];
-        if (!i)
-          return readGitWatcherIgnoredDirectories(this.options.worktreeRepo, {
+      return this.stateController.readIgnoredDirectories({
+        getEnvironment: () => e.getEnvironment(),
+        discover: (environment) => discoverGitIgnoreConfigurationFiles(this.options.worktreeRepo, environment, { runGit: $ }),
+        getWatchTargets: (paths) => e.getWatchTargets(paths),
+        isDisposed: () => this.disposed,
+        readDirectories: () => readGitWatcherIgnoredDirectories(this.options.worktreeRepo, {
             readPathStatus: readGitPathStatus,
             readTrackedPaths: readGitTrackedPaths,
-          });
-      }
-      return [];
+          }),
+      });
     }
     isWithinPath(e, t, n) {
       return M6(e, t, n);
     }
     async updateIgnoreSourceWatches(e) {
-      return reconcileGitIgnoreSourceWatches(this, e);
+      return this.stateController.reconcileIgnoreSources(e);
     }
     async refreshWorkingTreeWatchPolicy() {
-      return refreshGitWorkingTreeWatchPolicy({
+      return this.stateController.refreshWorkingTreePolicy({
+        refresh: refreshGitWorkingTreeWatchPolicy,
         getPolicy: () => this.ignorePolicy,
-        getTarget: () => this.watchTargets.find((target) => target.handlers.some((handler) => handler.changeType === `working-tree`)),
-        awaitSessionStart: (target) => target.sessionStartPromise ?? Promise.resolve(),
         isDisposed: () => this.disposed,
-        hasRetryTimer: (target) => target.retryTimer != null,
-        readPolicy: (policy) => policy.read({ refresh: !0 }),
-        isCurrent: (policy, snapshot) => policy.isCurrent(snapshot),
-        getAction: getGitWorkingTreeWatchRefreshAction,
-        applyPolicy: (policy, snapshot) => policy.didApply(snapshot),
         onApplied: () => this.handleFileWatchEvent(`working-tree`),
-        disposeSession: (target) => this.disposeSession(target),
         startSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
-        getPreviousDirectories: () => this.workingTreeIgnoredDirectories,
-        setPreviousDirectories: (directories) => { this.workingTreeIgnoredDirectories = directories; },
-        hasSession: (target) => target.session != null,
+        getAction: getGitWorkingTreeWatchRefreshAction,
       });
     }
     dispose() {
@@ -68667,15 +68648,15 @@ var Zye = 1e3,
         setDisposePromise: (promise) => { this.disposePromise = promise; },
         markDisposed: () => { this.disposed = !0; },
         disposeIgnorePolicy: () => this.ignorePolicy?.dispose(),
-        disposeSessions: () => this.watchTargets.map((target) => this.disposeSession(target)),
-        clearWatchTargets: () => { this.watchTargets.length = 0; },
+        disposeSessions: () => this.stateController.watchTargets.map((target) => this.disposeSession(target)),
+        clearWatchTargets: () => this.stateController.clear(),
         disposeControllers: () => {
           this.repoChangeController.dispose();
           this.watchRetryController.dispose();
           this.metadataRefreshController.dispose();
         },
-        clearIgnoreSourceWatches: () => this.ignoreSourceWatches.clear(),
-        clearChangedIgnoreSourcePaths: () => this.changedIgnoreSourcePaths.clear(),
+        clearIgnoreSourceWatches: () => this.stateController.ignoreSourceWatches.clear(),
+        clearChangedIgnoreSourcePaths: () => this.stateController.changedIgnoreSourcePaths.clear(),
         pendingMetadataRefresh: () => this.metadataRefreshController.pendingPromise(),
       });
     }
@@ -68689,7 +68670,7 @@ var Zye = 1e3,
     async processMetadataRefreshBatch(e, t) {
       let n = this.pathApi;
       return processGitMetadataRefreshBatch({ pathApi: n, commonDir: this.options.commonDir, paths: e, recovering: t,
-        targets: this.watchTargets, isDisposed: () => this.disposed, disposeSession: (target) => this.disposeSession(target),
+        targets: this.stateController.watchTargets, isDisposed: () => this.disposed, disposeSession: (target) => this.disposeSession(target),
         startSession: (target, recovering) => this.tryStartWatchSession(target, recovering),
         refreshWorktreeDirectories: (api, worktreesPath, recovering) => this.refreshWorktreeDirectories(api, worktreesPath, recovering),
         isWithinPath: (api, value, parent) => M6(api, value, parent) });
@@ -68698,36 +68679,23 @@ var Zye = 1e3,
       await this.worktreeWatchRefreshController.refresh(t, n);
     }
     isHeadRefPath(e, t, n, r) {
-      let i = r.get(n);
-      if (i != null) return i;
-      let a =
-        !this.currentHeadRefKnown ||
-        n === this.currentHeadRefPath ||
-        (this.options.isLocalBranchDependency?.(e.relative(t, n).split(e.sep).join(`/`)) ?? !1);
-      return (r.set(n, a), a);
+      return this.stateController.isHeadRefPath(e, t, n, r, this.options.isLocalBranchDependency);
     }
     addWatchTarget(e, t, n) {
-      if (!t) return;
-      let r = e.dirname(t),
-        i = { changeType: n, shouldHandleChangedPath: (e) => e === t };
-      this.addWatchHandler(r, !1, i, null);
+      return this.stateController.addWatchTarget(e, t, n);
     }
     addDirectoryWatchTarget(e, t, n, r = !0, i) {
-      let a = { changeType: t, shouldHandleChangedPath: n };
-      return this.addWatchHandler(e, r, a, i == null ? null : { parentPath: i, missing: !1 });
+      return this.stateController.addDirectoryWatchTarget(e, t, n, r, i);
     }
     addWatchHandler(e, t, n, r) {
-      let i = this.watchTargets.find((n) => n.recursive === t && n.watchPath === e);
-      if (i != null) return (i.handlers.push(n), i);
-      let a = createGitWatchTarget({ watchPath: e, recursive: t, handler: n, metadataDirectory: r, retryDelayMs: j6 });
-      return (this.watchTargets.push(a), a);
+      return this.stateController.addWatchHandler(e, t, n, r);
     }
     async tryStartWatchSession(e, t) {
       return startGitWatchSession({
         target: e,
         recovering: t,
         isDisposed: () => this.disposed,
-        isRegistered: (target) => this.watchTargets.includes(target),
+        isRegistered: (target) => this.stateController.watchTargets.includes(target),
         start: (target, recovering) => this.startWatchSession(target, recovering),
         shouldRetryAfterStart: shouldRetryGitWatchTargetAfterStart,
         scheduleRetry: (target) => this.scheduleWatchSessionRetry(target),
@@ -68754,21 +68722,21 @@ var Zye = 1e3,
         startMetadataWatch: this.options.startMetadataWatch,
         startFileWatch: (options) => this.options.host.startFileWatch(options),
         handleWatchChange: ({ changedPaths, pathChanges, ignoreDirectories }) => handleGitWatchChange({ target: e, changedPaths, pathChanges, pathApi: this.pathApi, root: this.options.root,
-          ignoreSourceWatch: this.ignoreSourceWatches.get(e.watchPath), changedIgnoreSourcePaths: this.changedIgnoreSourcePaths, ignoreDirectories,
+          ignoreSourceWatch: this.stateController.ignoreSourceWatches.get(e.watchPath), changedIgnoreSourcePaths: this.stateController.changedIgnoreSourcePaths, ignoreDirectories,
           refreshMetadataDirectories: (paths) => this.refreshMetadataDirectories(paths), ignorePolicy: this.ignorePolicy,
           collectHandlerPaths: (handler, paths, cache) => collectGitWatchHandlerPaths(this.pathApi, this.options.root, handler, paths, cache),
           handleFileWatchEvent: (changeType, paths) => this.handleFileWatchEvent(changeType, paths),
-          setCurrentHeadRefKnown: (known) => { this.currentHeadRefKnown = known; } }),
-        ignoreSourceWatch: () => this.ignoreSourceWatches.get(e.watchPath),
-        changedIgnoreSourcePaths: this.changedIgnoreSourcePaths,
+          setCurrentHeadRefKnown: (known) => this.stateController.setHeadRefKnown(known) }),
+        ignoreSourceWatch: () => this.stateController.ignoreSourceWatches.get(e.watchPath),
+        changedIgnoreSourcePaths: this.stateController.changedIgnoreSourcePaths,
         ignoreDirectories: [],
         refreshMetadataDirectories: (paths) => this.refreshMetadataDirectories(paths, !1),
         ignorePolicy: this.ignorePolicy,
         collectHandlerPaths: (handler, paths, cache) => collectGitWatchHandlerPaths(this.pathApi, this.options.root, handler, paths, cache),
         handleFileWatchEvent: (changeType, paths) => this.handleFileWatchEvent(changeType, paths),
-        isRegistered: () => this.watchTargets.includes(e),
+        isRegistered: () => this.stateController.watchTargets.includes(e),
         attachSession: (session) => { e.session = session; },
-        setWorkingTreeIgnoredDirectories: (directories) => { this.workingTreeIgnoredDirectories = directories; },
+        setWorkingTreeIgnoredDirectories: (directories) => this.stateController.setIgnoredDirectories(directories),
         updateRecovery: () => this.updateRequiresRecovery(),
         attachClosed: (session, startedAt) => { session.closed.then((close) => this.watchSessionCloseController.handleClose(e, session, startedAt, close)); },
         hasPendingMetadataRefresh: () => this.metadataRefreshController.hasPending(),
@@ -68785,60 +68753,22 @@ var Zye = 1e3,
         ((this.lastRequiresRecovery = e), this.options.onRequiresRecoveryChanged?.(e));
     }
     handleFileWatchEvent(e, t) {
-      if ((this.repoChangeController.record(e), e === `working-tree`)) {
-        if (t == null) this.pendingWorkingTreePaths = null;
-        else if (this.pendingWorkingTreePaths != null) {
-          for (let e of t)
-            if ((this.addPendingWorkingTreePath(e), this.pendingWorkingTreePaths == null)) break;
-        }
-      }
+      this.stateController.recordFileEvent(e, t, (changeType) => this.repoChangeController.record(changeType));
       this.scheduleRepoChanged(e);
-    }
-    addPendingWorkingTreePath(e) {
-      this.pendingWorkingTreePaths = addPendingWorkingTreePath(this.pathApi, this.options.root, this.pendingWorkingTreePaths, e, A6);
-      return;
-      /* istanbul ignore next -- retained generated implementation for source parity reference */
-      let t = this.pendingWorkingTreePaths,
-        n = this.pathApi;
-      if (
-        t == null ||
-        (n != null && [...t].some((t) => M6(n, t, e))) ||
-        (n != null &&
-          t.forEach((r) => {
-            M6(n, e, r) && t.delete(r);
-          }),
-        t.add(e),
-        t.size <= A6)
-      )
-        return;
-      if (n == null) {
-        this.pendingWorkingTreePaths = null;
-        return;
-      }
-      let r = new Set();
-      for (let e of t) {
-        let t = n.relative(this.options.root, e);
-        if (t === `` || t === `..` || t.startsWith(`..${n.sep}`) || n.isAbsolute(t)) {
-          this.pendingWorkingTreePaths = null;
-          return;
-        }
-        if ((r.add(n.join(this.options.root, t.split(n.sep, 1)[0])), r.size > A6)) {
-          this.pendingWorkingTreePaths = null;
-          return;
-        }
-      }
-      this.pendingWorkingTreePaths = r;
     }
     scheduleRepoChanged(e) {
       this.repoChangeController.schedule(e);
     }
     async emitRepoChanged(e) {
-      return emitGitRepoChange({
+      return this.stateController.emitRepoChanged({
         changeType: e,
         consumeRawEventCount: (changeType) => this.repoChangeController.consume(changeType),
-        getPendingWorkingTreePaths: () => this.pendingWorkingTreePaths,
-        resetPendingWorkingTreePaths: () => { this.pendingWorkingTreePaths = new Set(); },
-        getOperationState: () => this.getGitOperationState(),
+        getOperationState: () => this.stateController.getGitOperationState({
+          createMarkerPaths: createGitOperationMarkerPaths,
+          createState: createGitOperationState,
+          isMissingPathError,
+          stat: (path) => this.options.host.stat(path),
+        }),
         isDisposed: () => this.disposed,
         createEvent: createGitRepoChangedEvent,
         commonDir: this.options.commonDir,
@@ -68846,36 +68776,14 @@ var Zye = 1e3,
         root: this.options.root,
         onCoalescedChange: this.options.onCoalescedChange,
         emit: (event) => this.options.emit(event),
-        isHeadRefKnown: () => this.currentHeadRefKnown,
         getCurrentBranchState: () => getCurrentGitBranchState(this.options.worktreeRepo),
         resolveHeadRefPath: (branch) => this.pathApi?.join(this.options.commonDir, `refs`, `heads`, ...branch.split(`/`)) ?? null,
-        setHeadRefState: (path, known) => { this.currentHeadRefPath = path; this.currentHeadRefKnown = known; },
         logRepoChanged: (changeType, rawEventCount, operationState) => this.logRepoChanged(changeType, rawEventCount, operationState),
         complete: (changeType) => this.repoChangeController.complete(changeType),
       });
     }
     logRepoChanged(e, t, n) {
       this.logger.debug(`Git repo changed`, { safe: { changeType: e, rawEventCount: t, ...n } });
-    }
-    async getGitOperationState() {
-      let e = this.pathApi,
-        t = this.gitDir;
-      if (e == null || t == null)
-        return {
-          cherryPickInProgress: null,
-          mergeInProgress: null,
-          rebaseInProgress: null,
-          revertInProgress: null,
-        };
-      let [n, r, i, a, o, s] = await Promise.all(createGitOperationMarkerPaths(e, t).map((e) => this.gitPathExists(e)));
-      return createGitOperationState({ cherryPickInProgress: n, mergeInProgress: r, rebaseHead: i, rebaseMerge: a, rebaseApply: o, revertInProgress: s });
-    }
-    async gitPathExists(e) {
-      try {
-        return (await this.options.host.stat(e), !0);
-      } catch (e) {
-        return !isMissingPathError(e) && null;
-      }
     }
     isGitInternalPath(e, t) {
       return isGitInternalPath(e, this.options.commonDir, this.options.root, t);

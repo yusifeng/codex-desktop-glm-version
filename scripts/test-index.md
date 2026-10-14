@@ -12,6 +12,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-repo-watcher-state-controller.mjs`](./test-worker-git-repo-watcher-state-controller.mjs)
+
 - [`test-preload-annotation-interaction-command-facade.mjs`](./test-preload-annotation-interaction-command-facade.mjs)
 
 - [`test-worker-git-watch-registry-controller.mjs`](./test-worker-git-watch-registry-controller.mjs)

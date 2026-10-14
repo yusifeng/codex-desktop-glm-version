@@ -3353,3 +3353,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker Git watch registry/setup/git-init coordination 已整体迁移至 `git-watch-registry-controller.ts` 并真实接回：
   新 owner 持有 watch/setup Map、active/desired init watch、handled watcher 与 refresh single-flight 状态，统一
   current-watch/setup/init recovery/dispose 竞态；manager 删除六个旧字段和内联协调，focused coverage 为 55 项。
+- worker GitRepoWatcher residual state/event owner 已迁移至 `git-repo-watcher-state-controller.ts` 并真实接回：
+  新 owner 持有 targets、ignore-source、pending paths、head-ref/git-dir 状态，统一 discovery/reconcile、policy
+  refresh、batching、repo-change emission 与 clear；旧 watcher 删除 157 行，focused coverage 为 41 项。
