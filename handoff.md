@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 R9 `W0e` language-server manager 的完整 session 生命周期迁移至
+`src/main/main-app/language-server/language-server-manager.ts`，真实接回 `Q0e` consumer 并删除
+原 172 行内嵌实现；保留 host/provider/workspace single-flight、request routing、失败回收、
+expired managed runtime 标记/重试和 manager dispose。focused test 为
+`scripts/test-main-language-server-manager.mjs`（39 项）。
+
 本轮将右侧 Library 文件预览的状态解析与主体分派整体迁移至
 `src/renderer/library-cloud-file-preview/preview-state.ts`，真实接回
 `LibraryCloudFilePreview` 的 route/page consumer；覆盖图片 40 MiB 上限、未知大小、

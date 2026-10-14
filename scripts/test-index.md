@@ -12,6 +12,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-main-language-server-manager.mjs`](./test-main-language-server-manager.mjs)
+
 - [`test-main-browser-permission-prompt-registry.mjs`](./test-main-browser-permission-prompt-registry.mjs)
 
 - [`test-app-shared-is-realtime-voice-command.mjs`](./test-app-shared-is-realtime-voice-command.mjs)

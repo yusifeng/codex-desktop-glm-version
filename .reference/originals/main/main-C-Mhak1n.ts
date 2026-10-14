@@ -57,6 +57,7 @@ const { buildTypeScriptServerInitializationOptions } = require("./main-app/langu
 const { buildJavaSessionOptions } = require("./main-app/language-server/java-session-options.js");
 const { SOURCEKIT_INITIALIZATION_OPTIONS } = require("./main-app/language-server/sourcekit-options.js");
 const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
+const { LanguageServerManager } = require("./main-app/language-server/language-server-manager.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -135630,178 +135631,7 @@ var U0e = {
     references: p$.ReferencesRequest.method,
     typeDefinition: p$.TypeDefinitionRequest.method,
   },
-  W0e = class {
-    providers;
-    options;
-    expiredLocalRuntimes = new Set();
-    logger = r.i(`language-server-manager`);
-    sessions = new Map();
-    constructor(e, t) {
-      ((this.providers = e), (this.options = t));
-    }
-    async capabilities(e) {
-      let t = this.getProviderId(e.languageId);
-      try {
-        let n = await this.getSession(e);
-        return (
-          n == null &&
-            t != null &&
-            this.logger().debug(`language_server_session_unavailable`, {
-              safe: { operation: `capabilities`, providerId: t },
-              sensitive: {},
-            }),
-          n?.capabilities ?? null
-        );
-      } catch (t) {
-        return (this.logRequestFailure(`capabilities`, e.languageId, t), null);
-      }
-    }
-    async hover(e) {
-      let t = this.getProviderId(e.languageId),
-        n = null;
-      try {
-        if (((n = await this.getSession(e)), n == null))
-          return (
-            t != null &&
-              this.logger().debug(`language_server_session_unavailable`, {
-                safe: { operation: `hover`, providerId: t },
-                sensitive: {},
-              }),
-            null
-          );
-        if (!n.capabilities.hover)
-          return (
-            this.logger().debug(`language_server_hover_unsupported`, {
-              safe: { providerId: t },
-              sensitive: {},
-            }),
-            null
-          );
-        let r = await n.requestForDocument(e, p$.HoverRequest.method, {
-          position: e.position,
-          textDocument: { uri: n.fileUri(e.path) },
-        });
-        return (
-          r ??
-            this.logger().debug(`language_server_hover_empty`, {
-              safe: { providerId: t },
-              sensitive: {},
-            }),
-          r == null ? null : N0e(r, e.position)
-        );
-      } catch (t) {
-        return (this.logRequestFailure(`hover`, e.languageId, t), n?.dispose(), null);
-      }
-    }
-    async locations(e) {
-      let t = null;
-      try {
-        if (
-          ((t = await this.getSession(e)),
-          t == null || !t.capabilities.locationKinds.includes(e.kind))
-        )
-          return [];
-        let n = { position: e.position, textDocument: { uri: t.fileUri(e.path) } },
-          r = await t.requestForDocument(
-            e,
-            U0e[e.kind],
-            e.kind === `references` ? { ...n, context: { includeDeclaration: !0 } } : n,
-          );
-        return t.getLocations(r);
-      } catch (n) {
-        return (this.logRequestFailure(`locations`, e.languageId, n), t?.dispose(), []);
-      }
-    }
-    dispose() {
-      for (let e of this.sessions.values()) e.then((e) => e?.dispose());
-      this.sessions.clear();
-    }
-    async getSession(e) {
-      let t = this.providers.find(({ languageIds: t }) => t.includes(e.languageId));
-      if (t == null) return null;
-      let n = await e.host.platformPath(),
-        r = n.normalize(e.workspaceRoot ?? n.dirname(e.path)),
-        i = `${e.host.id}\0${t.id}\0${r}`,
-        a = this.sessions.get(i);
-      if (a != null) return a;
-      this.logger().info(`language_server_session_starting`, {
-        safe: { providerId: t.id },
-        sensitive: {},
-      });
-      let o = this.startSession(t.id, () =>
-        B0e(e, t, r, n, n.basename(r), this.options.getLocalRuntimeRoot, (e) => {
-          (this.sessions.delete(i),
-            this.logger().info(`language_server_session_stopped`, {
-              safe: { providerId: t.id, ...e },
-              sensitive: {},
-            }));
-        }),
-      ).then(
-        (e) => (
-          e == null
-            ? this.logger().debug(`language_server_session_start_skipped`, {
-                safe: { providerId: t.id },
-                sensitive: {},
-              })
-            : this.logger().info(`language_server_session_initialized`, {
-                safe: {
-                  hover: e.capabilities.hover,
-                  locationKinds: e.capabilities.locationKinds,
-                  providerId: t.id,
-                },
-                sensitive: {},
-              }),
-          e
-        ),
-        (e) => (
-          this.logger().warning(`language_server_session_start_failed`, {
-            safe: { providerId: t.id },
-            sensitive: { error: e },
-          }),
-          null
-        ),
-      );
-      return (
-        this.sessions.set(i, o),
-        o.then((e) => {
-          e == null && this.sessions.get(i) === o && this.sessions.delete(i);
-        }),
-        o
-      );
-    }
-    async startSession(e, t) {
-      let n = await t();
-      return n.status === `started`
-        ? n.session
-        : n.status !== `expired-build` ||
-            (this.logExpiredBuild(e, n.localRuntimeId != null), n.localRuntimeId == null)
-          ? null
-          : (this.expiredLocalRuntimes.has(n.localRuntimeId) ||
-              (this.expiredLocalRuntimes.add(n.localRuntimeId),
-              this.options.markLocalRuntimeExpired(n.localRuntimeId),
-              this.options.onLocalRuntimeExpired?.(n.localRuntimeId)),
-            (n = await t()),
-            n.status === `started`
-              ? n.session
-              : (n.status === `expired-build` && this.logExpiredBuild(e, n.localRuntimeId != null),
-                null));
-    }
-    logExpiredBuild(e, t) {
-      this.logger().info(`language_server_expired_build`, {
-        safe: { managed: t, providerId: e },
-        sensitive: {},
-      });
-    }
-    getProviderId(e) {
-      return this.providers.find((t) => t.languageIds.includes(e))?.id ?? null;
-    }
-    logRequestFailure(e, t, n) {
-      this.logger().warning(`language_server_request_failed`, {
-        safe: { operation: e, providerId: this.getProviderId(t) },
-        sensitive: { error: n },
-      });
-    }
-  },
+  W0e = LanguageServerManager,
   G0e = class {
     id = `pyright`;
     languageIds = [`python`];
@@ -135999,8 +135829,21 @@ var Q0e = class extends n.Uf {
             new X0e(),
           ],
           {
+            createLogger: r.i(`language-server-manager`),
+            createSession: ({
+              document: e,
+              provider: t,
+              workspaceRoot: n,
+              pathApi: r,
+              workspaceName: i,
+              getLocalRuntimeRoot: a,
+              onDispose: o,
+            }) => B0e(e, t, n, r, i, a, o),
             getLocalRuntimeRoot: n.getRoot,
+            getLocationMethod: (e) => U0e[e],
+            hoverMethod: p$.HoverRequest.method,
             markLocalRuntimeExpired: n.markExpired,
+            normalizeHover: N0e,
             onLocalRuntimeExpired: r,
           },
         )));

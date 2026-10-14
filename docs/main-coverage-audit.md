@@ -546,6 +546,20 @@ language-server Kotlin runtime 的 `workspace.json` 配置 projection 已迁移�
 生命周期仍由 language-server owner 持有。`scripts/test-main-kotlin-workspace-config.mjs`
 覆盖完整配置字段和不同 workspace root 的实例隔离。
 
+### 增量抽取：language-server manager 生命周期
+
+R9 原 `W0e`（135,633-135,804）的完整 language-server manager 已迁移至
+`src/main/main-app/language-server/language-server-manager.ts`。模块持有按
+`hostId + providerId + normalized workspace root` 建立的 pending/session promise registry，保留
+capabilities/hover/locations 路由、unsupported/empty 日志、请求失败后的 session dispose、空结果的
+identity-safe cache cleanup、session stop 后 key 回收，以及 manager dispose 对 pending session 的异步清理。
+
+managed runtime 的 `expired-build` 分支继续保持首次 runtime id 单次 mark/notification、随后重新启动，
+以及二次 expired 日志；原 `Q0e` consumer 注入 providers、`B0e` process/LSP transport、协议 method、
+hover normalization 与 logger，main chunk 内旧 `W0e` 实现已删除。`B0e` 仍拥有 spawn 与 JSON-RPC
+initialize，`z0e` 仍拥有单 session 文档同步/idle timeout，owner 边界没有复制。
+`scripts/test-main-language-server-manager.mjs` 覆盖 39 项 focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的
