@@ -77,6 +77,7 @@ const { ArtifactSessionHostService } = require("./main-app/remote-artifact/artif
 const { createTerminalSessionManagerClass } = require("./main-app/terminal/terminal-session-manager.js");
 const { createBrowserWindowManagerClass } = require("./main-app/window/browser-window-manager.js");
 const { createBrowserPageCommandControllerClass } = require("./main-app/browser-sidebar/browser-page-command-controller.js");
+const { createBrowserAnnotationInteractionControllerClass } = require("./main-app/browser-sidebar/browser-annotation-interaction-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
 let c = require("node:url"),
@@ -116701,6 +116702,7 @@ var $Ze = class {
     defaultBrowserUseViewportSize;
     logger = r.i(`browser-sidebar-manager`);
     pageCommandController;
+    annotationInteractionController;
     downloadStore;
     windows = new Map();
     inAppBrowserFeatureEnabled = !0;
@@ -116710,7 +116712,6 @@ var $Ze = class {
     tabBudget;
     browserUseOpenRequests;
     browserUseNavigationBlockedListeners = new Set();
-    annotationInteractionController;
     onBrowserStateChanged = () => {};
     lastSyncedWindowId = null;
     ownerCommandAccelerators;
@@ -116758,13 +116759,13 @@ var $Ze = class {
       },
     });
     constructor(e, t, r = J, i = QBe(), a = new cX(), o = NHe(), s = {}) {
-      this.annotationInteractionController = new BrowserAnnotationInteractionController(this);
       ((this.windowManager = e),
         (this.errorReporter = t),
         (this.commentModeBlocklistLookup = i),
         (this.browserSessionRegistry = a),
         (this.defaultBrowserUseViewportSize = o),
-        (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU }))(this)),
+        (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX }))(this)),
+        (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
         (this.getCommandKeymapState = s.getCommandKeymapState ?? n.Ct),
         (this.ownerCommandAccelerators = mq(this.getCommandKeymapState())),
@@ -117541,33 +117542,42 @@ var $Ze = class {
       }),
         this.refreshCommentModeBlockStatus(e, r));
     }
-    clearComments(e, t, n) {
-      this.clearAnnotations(e, t, n, !0);
-    }
-    discardPendingAnnotations(e, t, n) {
-      this.clearAnnotations(e, t, n, !1);
-    }
-    clearAnnotations(e, t, n, r) {
-      let i =
-        this.getCurrentPageCommandContext(e, t, n) ?? this.ensureThreadCommandContext(e, t, n);
-      if (i == null) return;
-      let { threadState: a, windowState: o } = i;
-      ((a.snapshot = EU(a.snapshot, r ? `browse` : void 0, [])),
-        r && this.comments.dismiss(o.owner, t, a.browserTabId, a),
-        this.syncThreadState(o, t, a),
-        a.page != null && this.syncRuntimeStateToPage(a.page, a));
-    }
-    addAnnotationsToComposer(e, t, n) {
-      let r = this.ensureThreadCommandContext(e, t, n);
-      if (r == null) return;
-      let { threadState: i, windowState: a } = r;
-      ((i.pendingCommentModeActivation = null),
-        (i.snapshot = EU(i.snapshot, `browse`)),
-        this.comments.dismiss(e, t, i.browserTabId, i),
-        this.syncThreadState(a, t, i),
-        i.page != null && this.syncRuntimeStateToPage(i.page, i),
-        this.comments.prepare(e, t, i.browserTabId, i));
-    }
+    clearComments(...args) { return this.annotationInteractionController.clearComments(...args); }
+    discardPendingAnnotations(...args) { return this.annotationInteractionController.discardPendingAnnotations(...args); }
+    clearAnnotations(...args) { return this.annotationInteractionController.clearAnnotations(...args); }
+    addAnnotationsToComposer(...args) { return this.annotationInteractionController.addAnnotationsToComposer(...args); }
+    selectComment(...args) { return this.annotationInteractionController.selectComment(...args); }
+    deleteComment(...args) { return this.annotationInteractionController.deleteComment(...args); }
+    async handleRuntimeOpenEditor(...args) { return this.annotationInteractionController.handleRuntimeOpenEditor(...args); }
+    async handleRuntimeOpenDesignEditor(...args) { return this.annotationInteractionController.handleRuntimeOpenDesignEditor(...args); }
+    async handleRuntimeOpenCommentPreview(...args) { return this.annotationInteractionController.handleRuntimeOpenCommentPreview(...args); }
+    handleRuntimeCloseCommentPreview(...args) { return this.annotationInteractionController.handleRuntimeCloseCommentPreview(...args); }
+    handleAnnotationEditorMessage(...args) { return this.annotationInteractionController.handleAnnotationEditorMessage(...args); }
+    handleRuntimeUpdateAnchor(...args) { return this.annotationInteractionController.handleRuntimeUpdateAnchor(...args); }
+    handleRuntimeFocusEditor(...args) { return this.annotationInteractionController.handleRuntimeFocusEditor(...args); }
+    setFloatingComposerRevealTracking(...args) { return this.annotationInteractionController.setFloatingComposerRevealTracking(...args); }
+    handlePageEvent(...args) { return this.annotationInteractionController.handlePageEvent(...args); }
+    handleRuntimeToggleAnnotationMode(...args) { return this.annotationInteractionController.handleRuntimeToggleAnnotationMode(...args); }
+    handleRuntimeExitCommentMode(...args) { return this.annotationInteractionController.handleRuntimeExitCommentMode(...args); }
+    handleRuntimeDesignModifierState(...args) { return this.annotationInteractionController.handleRuntimeDesignModifierState(...args); }
+    setDesignModifierPressed(...args) { return this.annotationInteractionController.setDesignModifierPressed(...args); }
+    handleRuntimeAnnotationSuspension(...args) { return this.annotationInteractionController.handleRuntimeAnnotationSuspension(...args); }
+    setAnnotationPresentation(...args) { return this.annotationInteractionController.setAnnotationPresentation(...args); }
+    setOriginalViewEnabled(...args) { return this.annotationInteractionController.setOriginalViewEnabled(...args); }
+    handleRuntimeImageDragStarted(...args) { return this.annotationInteractionController.handleRuntimeImageDragStarted(...args); }
+    handleRuntimeImageDragEnded(...args) { return this.annotationInteractionController.handleRuntimeImageDragEnded(...args); }
+    suspendImageAttachments(...args) { return this.annotationInteractionController.suspendImageAttachments(...args); }
+    async attachDraggedImageToThread(...args) { return this.annotationInteractionController.attachDraggedImageToThread(...args); }
+    handleCommentOverlaySubmit(...args) { return this.annotationInteractionController.handleCommentOverlaySubmit(...args); }
+    handleDesignOverlayUpdate(...args) { return this.annotationInteractionController.handleDesignOverlayUpdate(...args); }
+    async handleDesignOverlayAdd(...args) { return this.annotationInteractionController.handleDesignOverlayAdd(...args); }
+    handleDesignOverlayDelete(...args) { return this.annotationInteractionController.handleDesignOverlayDelete(...args); }
+    handleCommentOverlayDelete(...args) { return this.annotationInteractionController.handleCommentOverlayDelete(...args); }
+    handleCommentOverlayClose(...args) { return this.annotationInteractionController.handleCommentOverlayClose(...args); }
+    handleCommentOverlayFocus(...args) { return this.annotationInteractionController.handleCommentOverlayFocus(...args); }
+    handleCommentOverlayTweaksOpenChanged(...args) { return this.annotationInteractionController.handleCommentOverlayTweaksOpenChanged(...args); }
+    handleCommentOverlayDesignScrubChanged(...args) { return this.annotationInteractionController.handleCommentOverlayDesignScrubChanged(...args); }
+
     closePage(e, t, n, r) {
       let i = this.getCurrentWindowState(e);
       if (i == null) return;
@@ -117639,195 +117649,6 @@ var $Ze = class {
           e.activeBrowserTabId === a.browserTabId &&
           this.tabBudget.markTabSelected(e, a)),
         this.iabTabMentions.notifyInvalidated());
-    }
-    selectComment(e, t, n, r) {
-      let i = this.getThreadState(e, t, r);
-      return i == null ? `missing` : this.comments.openSavedComment(e, t, i.browserTabId, n);
-    }
-    deleteComment(e, t, n, r) {
-      return this.comments.deleteSavedComment(e, t, r, n);
-    }
-    async handleRuntimeOpenEditor(e, t) {
-      await this.comments.handleRuntimeOpenEditor(e, t);
-    }
-    async handleRuntimeOpenDesignEditor(e, t) {
-      this.isTweaksFeatureEnabled && (await this.comments.handleRuntimeOpenDesignEditor(e, t));
-    }
-    async handleRuntimeOpenCommentPreview(e, t) {
-      await this.comments.handleRuntimeOpenCommentPreview(e, t);
-    }
-    handleRuntimeCloseCommentPreview(e, t) {
-      this.comments.handleRuntimeCloseCommentPreview(e, t);
-    }
-    handleAnnotationEditorMessage(e, t) {
-      this.comments.handleAnnotationEditorMessage(e, t);
-    }
-    handleRuntimeUpdateAnchor(e, t) {
-      this.comments.handleRuntimeUpdateAnchor(e, t);
-    }
-    handleRuntimeFocusEditor(e) {
-      this.comments.handleRuntimeFocusEditor(e);
-    }
-    setFloatingComposerRevealTracking(e, t, n, r, i) {
-      let a = this.getCurrentWindowState(e);
-      if (a == null) return;
-      let o = hX(a, t, n);
-      o != null &&
-        (r && (a.contentBounds = a.window.getContentBounds()),
-        (o.floatingComposerRevealTracking = r
-          ? { activationHeightPx: i, isPointerNearBottom: null }
-          : void 0));
-    }
-    handlePageEvent(e, t) {
-      IZe(
-        e,
-        this.findPageStateForRuntimeSender(e),
-        t,
-        this.siteAnnotationFeatures,
-        this.browserSessionRegistry,
-        this.syncThreadState.bind(this),
-      );
-    }
-    handleRuntimeToggleAnnotationMode(e, t) {
-      LZe(
-        this,
-        e,
-        this.findPageStateForRuntimeSender(e),
-        this.siteAnnotationFeatures,
-        this.commentModeBlocklistLookup,
-        t,
-      );
-    }
-    handleRuntimeExitCommentMode(e) {
-      let t = this.findPageStateForRuntimeSender(e);
-      t &&
-        !t.owner.isDestroyed() &&
-        this.addAnnotationsToComposer(t.owner, t.page.conversationId, t.page.browserTabId);
-    }
-    handleRuntimeDesignModifierState(e, t) {
-      let n = this.findPageStateForRuntimeSender(e);
-      n &&
-        !n.owner.isDestroyed() &&
-        this.setDesignModifierPressed(
-          n.owner,
-          n.page.conversationId,
-          t.pressed,
-          n.page.browserTabId,
-        );
-    }
-    setDesignModifierPressed(e, t, n, r) {
-      let i = this.getThreadState(e, t, r),
-        a = this.getCurrentWindowState(e);
-      if (i == null || a == null) return;
-      let o = this.isTweaksFeatureEnabled && i.snapshot.interactionMode === `comment` && n;
-      (i.snapshot.isDesignModifierPressed ?? !1) !== o &&
-        ((i.snapshot = { ...i.snapshot, isDesignModifierPressed: o }),
-        this.syncThreadState(a, t, i),
-        i.page != null && this.syncRuntimeStateToPage(i.page, i));
-    }
-    handleRuntimeAnnotationSuspension(e, t) {
-      let n = this.findPageStateForRuntimeSender(e);
-      n == null ||
-        n.owner.isDestroyed() ||
-        this.setAnnotationPresentation(n.owner, {
-          browserTabId: n.page.browserTabId,
-          conversationId: n.page.conversationId,
-          suspended: t,
-        });
-    }
-    setAnnotationPresentation(e, t) {
-      let { conversationId: n, browserTabId: r } = t,
-        i = this.getThreadState(e, n, r),
-        a = this.getCurrentWindowState(e);
-      if (i == null || a == null) return;
-      let o = t.markersVisible ?? i.snapshot.areAnnotationMarkersVisible ?? !0,
-        s =
-          i.snapshot.interactionMode === `comment` &&
-          (t.suspended ?? i.snapshot.isAnnotationSuspended ?? !1);
-      ((i.snapshot.areAnnotationMarkersVisible ?? !0) !== o ||
-        (i.snapshot.isAnnotationSuspended ?? !1) !== s) &&
-        ((i.snapshot = { ...i.snapshot, areAnnotationMarkersVisible: o, isAnnotationSuspended: s }),
-        this.syncThreadState(a, n, i),
-        i.page != null && this.syncRuntimeStateToPage(i.page, i));
-    }
-    setOriginalViewEnabled(e, t, r, i) {
-      let a = this.getThreadState(e, t, i),
-        o = this.getCurrentWindowState(e);
-      if (a == null || o == null) return;
-      let s = a.snapshot.interactionMode === `comment` && n.ju(a.snapshot.comments) && r;
-      (a.snapshot.isOriginalViewEnabled ?? !1) !== s &&
-        ((a.snapshot = { ...a.snapshot, isOriginalViewEnabled: s }),
-        this.syncThreadState(o, t, a),
-        a.page != null && this.syncRuntimeStateToPage(a.page, a));
-    }
-    handleRuntimeImageDragStarted(e, t) {
-      let n = this.findPageStateForRuntimeSender(e);
-      n == null ||
-        n.owner.isDestroyed() ||
-        (this.activeDraggedImagesByOwnerWebContentsId.set(n.owner.id, {
-          browserTabId: n.page.browserTabId,
-          conversationId: n.page.conversationId,
-          sourceUrl: t.sourceUrl,
-        }),
-        this.windowManager.sendMessageToWebContents(n.owner, {
-          type: `browser-sidebar-image-drag-state`,
-          browserTabId: n.page.browserTabId,
-          conversationId: n.page.conversationId,
-          isActive: !0,
-        }));
-    }
-    handleRuntimeImageDragEnded(e) {
-      let t = this.findPageStateForRuntimeSender(e);
-      t == null ||
-        t.owner.isDestroyed() ||
-        SU(
-          this.activeDraggedImagesByOwnerWebContentsId,
-          t.page.browserTabId,
-          t.page.conversationId,
-          t.owner,
-          this.windowManager,
-        );
-    }
-    suspendImageAttachments(e, t, n) {
-      let r = this.getPageState(e, t, n)?.view.webContents;
-      return r == null ? null : mVe(r);
-    }
-    async attachDraggedImageToThread(e, t, n) {
-      await gVe(
-        this.activeDraggedImagesByOwnerWebContentsId,
-        e,
-        t,
-        n,
-        () => this.getPageState(e, t, n),
-        this.windowManager,
-      );
-    }
-    handleCommentOverlaySubmit(e, t) {
-      return this.comments.handleOverlaySubmit(e, t);
-    }
-    handleDesignOverlayUpdate(e, t) {
-      this.comments.handleDesignOverlayUpdate(e, t);
-    }
-    async handleDesignOverlayAdd(e, t) {
-      await this.comments.handleDesignOverlayAdd(e, t);
-    }
-    handleDesignOverlayDelete(e, t) {
-      this.comments.handleDesignOverlayDelete(e, t);
-    }
-    handleCommentOverlayDelete(e, t) {
-      this.comments.handleOverlayDelete(e, t);
-    }
-    handleCommentOverlayClose(e, t, n, r) {
-      this.comments.handleOverlayClose(e, t, n, r);
-    }
-    handleCommentOverlayFocus(e, t, n, r) {
-      this.comments.handleOverlayFocus(e, t, n, r);
-    }
-    handleCommentOverlayTweaksOpenChanged(e, t) {
-      this.comments.handleOverlayTweaksOpenChanged(e, t);
-    }
-    handleCommentOverlayDesignScrubChanged(e, t) {
-      this.isTweaksFeatureEnabled && this.comments.handleOverlayDesignScrubChanged(e, t);
     }
     ensureWindowState(e, t) {
       let n = e.id,

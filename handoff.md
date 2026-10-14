@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮继续收口 tQe annotation interaction：annotation ingress、comment/design mode、presentation
+suspension、dragged-image state 与 overlay actions 已迁入
+`src/main/main-app/browser-sidebar/browser-annotation-interaction-controller.ts`，删除原内联实现约 218 行，
+focused test 为 `scripts/test-main-browser-annotation-interaction-controller.mjs`（21 项）。同时修正
+page-command controller 的 history clone 依赖，将 `rW/WX/GX` 显式注入，避免运行时依赖原文件作用域。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger

@@ -798,6 +798,14 @@ R8/IAB 原 `tQe` 的 page command/host orchestration 已迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`。新 controller 真实持有 history clone/back/forward、
 focused command routing、reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host registration/transfer、
 zoom/navigate/screenshot/debugger metrics 控制流，tQe 仅保留适配与委托。原连续业务区段删除 464 行。
+
+### 增量抽取：IAB annotation interaction controller
+
+R8/IAB 原 `tQe` 的 annotation ingress、comment/design mode、presentation suspension、dragged-image
+状态和 comment/design overlay action 已迁移至
+`src/main/main-app/browser-sidebar/browser-annotation-interaction-controller.ts`，tQe 仅保留委托与
+依赖注入。focused test 为 `scripts/test-main-browser-annotation-interaction-controller.mjs`（21 项）。
+page command controller 的 history clone 依赖 `rW/WX/GX` 已通过显式依赖适配接回，避免抽取后引用原文件作用域。
 `scripts/test-main-browser-page-command-controller.mjs` 覆盖 11 项历史、焦点、缩放、快照、挂载与路由断言。
 
 ### A3 main 剩余大 owner（2026-10-15）

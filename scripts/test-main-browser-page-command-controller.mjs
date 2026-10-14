@@ -48,6 +48,7 @@ const deps = {
   sW: () => undefined, HZe: async () => null, OZe: () => false, XZe: async () => undefined,
   GXe: () => false, iK: () => false, pX: () => ({}), DU: () => undefined, oX: (value) => value,
   PHe: async () => undefined, GU: async () => undefined,
+  rW: (value) => value, WX: () => true, GX: () => "adoption-lease",
 };
 const Controller = createBrowserPageCommandControllerClass(deps);
 const controller = new Controller(host);

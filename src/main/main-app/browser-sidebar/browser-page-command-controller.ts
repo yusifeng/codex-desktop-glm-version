@@ -2,7 +2,7 @@
 
 /** Owns browser page command routing and host/page lifecycle orchestration. */
 export function createBrowserPageCommandControllerClass(dependencies: Record<string, any>) {
-  const { a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU } = dependencies;
+  const { a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX } = dependencies;
   return class BrowserPageCommandController {
     constructor(host: any) { this.host = host; }
     host: any;
