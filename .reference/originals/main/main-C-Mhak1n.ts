@@ -83,8 +83,10 @@ const { createBrowserAnnotationInteractionControllerClass } = require("./main-ap
 const { createBrowserPagePersistenceControllerClass } = require("./main-app/browser-sidebar/browser-page-persistence-controller.js");
 const { createBrowserPageMaterializationControllerClass } = require("./main-app/browser-sidebar/browser-page-materialization-controller.js");
 const { createBrowserRuntimeSyncControllerClass } = require("./main-app/browser-sidebar/browser-runtime-sync-controller.js");
+const { createBrowserPageWebviewBindingControllerClass } = require("./main-app/browser-sidebar/browser-page-webview-binding-controller.js");
 const { createBrowserPresentationSyncControllerClass } = require("./main-app/browser-sidebar/browser-presentation-sync-controller.js");
 const { createBrowserWindowThreadStateControllerClass } = require("./main-app/browser-sidebar/browser-window-thread-state-controller.js");
+const { createBrowserNavigationContextControllerClass } = require("./main-app/browser-sidebar/browser-navigation-context-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
 let c = require("node:url"),
@@ -116513,6 +116515,8 @@ var $Ze = class {
     browserPersistence;
     pageMaterializationController;
     runtimeSyncController;
+    navigationContextController;
+    pageWebviewBindingController;
     onAppEntrySource;
     isDefaultBrowser;
     isAnnotationMultiSelectFeatureEnabled = !1;
@@ -116552,6 +116556,8 @@ var $Ze = class {
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ uZe, hX, fq, kZe, tq, KU, EZ }))(this)),
+        (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW }))(this)),
+        (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ bindPageToWebview: uZ }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, AX, vXe, yXe, bXe, xXe, SXe, aXe, gX, qU, oXe, vX, tq, KU, l }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
@@ -116597,7 +116603,7 @@ var $Ze = class {
           windows: this.windows,
         })),
         (this.browserPageHostLifecycle = new BrowserPageHostLifecycle({
-          bindPageToWebview: uZ,
+          bindPageToWebview: this.pageWebviewBindingController.bindPageToWebview.bind(this.pageWebviewBindingController),
           browserPageSnapshots: this.browserPageSnapshots,
           browserPersistence: this.browserPersistence,
           browserSessionRegistry: this.browserSessionRegistry,
@@ -116864,6 +116870,14 @@ var $Ze = class {
     syncRuntimeStateToPage(...args) { return this.runtimeSyncController.syncRuntimeStateToPage(...args); }
     syncCommentSnapshot(...args) { return this.runtimeSyncController.syncCommentSnapshot(...args); }
     materializeThreadPageState(...args) { return this.pageMaterializationController.materializeThreadPageState(...args); }
+    getPageState(...args) { return this.navigationContextController.getPageState(...args); }
+    getCurrentPageCommandContext(...args) { return this.navigationContextController.getCurrentPageCommandContext(...args); }
+    ensureThreadCommandContext(...args) { return this.navigationContextController.ensureThreadCommandContext(...args); }
+    ensureThreadPageForCommand(...args) { return this.navigationContextController.ensureThreadPageForCommand(...args); }
+    navigateCurrentPageHistory(...args) { return this.navigationContextController.navigateCurrentPageHistory(...args); }
+    navigatePageToUrl(...args) { return this.navigationContextController.navigatePageToUrl(...args); }
+    loadBrowserErrorPage(...args) { return this.navigationContextController.loadBrowserErrorPage(...args); }
+    isRestrictedBrowserNavigation(...args) { return this.navigationContextController.isRestrictedBrowserNavigation(...args); }
     goBack(...args) { return this.pageCommandController.goBack(...args); }
     cloneTab(...args) { return this.pageCommandController.cloneTab(...args); }
     goForward(...args) { return this.pageCommandController.goForward(...args); }
