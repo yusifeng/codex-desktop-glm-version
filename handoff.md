@@ -26,6 +26,10 @@ thread/runtime snapshot 同步与 comment snapshot 已分别迁入 `browser-page
 `browser-runtime-sync-controller.ts`，并保留 focused tests。runtime controller 对尚未迁出的导航/WebContents
 绑定 helper 使用显式 adapter fallback；这些 helper 的完整语义仍属于下一批导航/绑定 owner，不计入本批已完成。
 
+随后完成导航/command context 与 WebContents/page binding owner：页面 command context、历史导航、受限导航与
+browser error page 已迁入 `browser-navigation-context-controller.ts`，`bindPageToWebview` 已迁入
+`browser-page-webview-binding-controller.ts`；两批均保留 focused tests，并在 main-C 中真实接回。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger

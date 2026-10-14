@@ -844,6 +844,11 @@ activation）已迁移至 `browser-comment-mode-controller.ts`，focused test �
 断言。runtime projection 中尚未独立迁出的导航/WebContents binding helper 通过显式 adapter fallback 保持构造安全，
 其完整行为继续由后续 navigation/binding owner 收口。
 
+随后导航/command context 与 WebContents/page binding owner 已完成：`browser-navigation-context-controller.ts`
+接管页面 command context、历史导航、受限导航和 browser error page；`browser-page-webview-binding-controller.ts`
+接管 `bindPageToWebview` 生命周期。新增两组 focused tests，navigation batch 的完整 webview 导航事件绑定仍由
+binding controller 保持职责边界。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
 `vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit/Sat` 均已移出，cross-platform capture-request owner 也已真实接回。

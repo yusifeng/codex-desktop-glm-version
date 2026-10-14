@@ -32,8 +32,9 @@ export function createBrowserNavigationContextControllerClass(dependencies: Reco
       const context = this.ensureThreadCommandContext(owner, conversationId, browserTabId);
       if (context == null) return null;
       if (context.threadState.page != null) return context.threadState.page;
-      const request = persistence?.serializedPageState
-        ? { kind: `cold-restore`, snapshot: structuredClone(persistence.serializedPageState) }
+      const restoreSnapshot = persistence?.snapshot ?? (persistence?.navigation ? persistence : null);
+      const request = restoreSnapshot
+        ? { kind: `cold-restore`, snapshot: structuredClone(restoreSnapshot) }
         : { kind: `fresh`, page: initialPage };
       return this.host.materializeThreadPageState(context.windowState, context.threadState, request);
     }
