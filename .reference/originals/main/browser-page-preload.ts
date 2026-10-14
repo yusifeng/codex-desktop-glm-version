@@ -5960,6 +5960,7 @@ var { createAnnotationPointerSelection } = require("./browser-page-preload/annot
 var { isAnnotationSelectionBlocked } = require("./browser-page-preload/annotation-selection");
 var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annotation-display-anchors");
 var { projectAnnotationRuntimeCollections } = require("./browser-page-preload/annotation-runtime-collection-projection");
+var { projectAnnotationCurrentPageTargets } = require("./browser-page-preload/annotation-current-page-target-projection");
 var { projectAnnotationMarkerRecords } = require("./browser-page-preload/annotation-marker-record-projection");
 var { projectAnnotationActiveView } = require("./browser-page-preload/annotation-active-view-projection");
 var { projectAnnotationActiveRuntimeState } = require("./browser-page-preload/annotation-active-runtime-state");
@@ -23760,40 +23761,27 @@ function Wy({ rootHost: e, bridge: t }) {
     Ae = xs(n.viewportScale),
     je = fd(),
     Me = qg(je),
-    collectionState = projectAnnotationRuntimeCollections(
-      Ee,
-      {
-        activeDesignChange: n.activeDesignChange,
-        canUseTweaks: Ne,
-        isOriginalViewEnabled: n.isOriginalViewEnabled === !0,
-        annotationEditorMode: n.annotationEditorMode,
-      },
-      { isCurrentPage: Qy, hasComments: ss, emptyCollection: xb },
-    ),
-    Pe = collectionState.commentIndex,
-    Fe = collectionState.pageComments,
-    Ie = eb(e),
-    Le = Fe.flatMap((e) => {
-      let t = ue.get(e.id),
-        n = Q_(e, Ie, e.id === te, t?.sourceAnchor === e.anchor ? t.value : null);
-      return n == null ? [] : [n];
+    currentPageTargets = projectAnnotationCurrentPageTargets(Ee, {
+      activeDesignChange: n.activeDesignChange, canUseTweaks: Ne,
+      isOriginalViewEnabled: n.isOriginalViewEnabled === !0, annotationEditorMode: n.annotationEditorMode,
+      rootHost: e, previewCommentId: te, observedTextAnchors: ue,
+    }, {
+      projectCollections: projectAnnotationRuntimeCollections, isCurrentPage: Qy, hasComments: ss,
+      emptyCollection: xb, getElementCache: eb, projectCommentTarget: Q_, refreshDesignTarget: Zy,
     }),
+    Pe = currentPageTargets.commentIndex,
+    Fe = currentPageTargets.pageComments,
+    Ie = currentPageTargets.elementCache,
+    Le = currentPageTargets.visiblePageComments,
     Re = n.activeDesignChange,
-    ze = collectionState.designChanges,
-    Be = collectionState.mergedDesignChanges,
-    Ve = collectionState.visibleDesignChanges,
-    He = collectionState.hasComments,
-    Ue = collectionState.isDesignMode,
-    We = Ve.flatMap((e) => {
-      let t = Zy(e, Ie);
-      return t == null ? [] : [t];
-    }),
-    Ge = Le.some((e) => [e.anchor, ...(e.additionalAnchors ?? [])].some((e) => !e.isFixed)),
-    Ke = Fe.some((e) =>
-      [e.anchor, ...(e.additionalAnchors ?? [])].some(
-        (e) => e.kind === `element` && e.selector != null,
-      ),
-    ),
+    ze = currentPageTargets.designChanges,
+    Be = currentPageTargets.mergedDesignChanges,
+    Ve = currentPageTargets.visibleDesignChanges,
+    He = currentPageTargets.hasComments,
+    Ue = currentPageTargets.isDesignMode,
+    We = currentPageTargets.visibleDesignTargets,
+    Ge = currentPageTargets.observeDocumentScroll,
+    Ke = currentPageTargets.observeMutations,
     qe = (0, G.useCallback)(
       (n, r, a, s) => elementEditorOpenController.open(n, r, { annotationEditorDefault: Iy(document, fb), ...a }, {
         canUseSiteAnnotationApi: A,

@@ -1,5 +1,7 @@
 # `browser-page-preload.ts` 逐段审计
 
+本轮新增 `annotation-current-page-target-projection.ts`，真实接回 Wy 的 runtime collections/current-page target projection；集中处理 page comment 过滤、text-anchor observation 复用、live comment/design target、element cache 与 scroll/mutation observation 策略，删除原内联组合主体。focused test：`scripts/test-preload-annotation-current-page-target-projection.mjs`（14 项）。
+
 本轮新增 `annotation-controller-registry.ts`，将 Wy 顶层 32 个长生命 controller 的构造、依赖适配与稳定持有迁入单一 registry owner；保留原 `useState` hook/构造顺序、host message 路由、RAF 注入与后置 callback 的延迟闭包语义，并从 `Wy` 删除约 440 行内联 registry 主体。focused test：`scripts/test-preload-annotation-controller-registry.mjs`（12 项）。
 
 本轮新增 `annotation-highlight-render-owner.ts`，真实接回 Wy 的 highlight projection 与最终 root composition；迁移 text-preview projection bridge、highlight geometry/style、suspension gate、interaction layer 与根属性渲染。focused test：`scripts/test-preload-annotation-highlight-render-owner.mjs`（12 项）。

@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 的 runtime collections/current-page target projection 迁入
+`src/main/browser-page-preload/annotation-current-page-target-projection.ts`并真实接回；
+集中 page comment 过滤、text-anchor observation 复用、live comment/design target、element cache
+及 scroll/mutation observation 策略。focused test 为
+`scripts/test-preload-annotation-current-page-target-projection.mjs`（14 项）。
+
 本轮将 Wy 顶层 32 个长生命 controller 的构造与依赖适配迁入
 `src/main/browser-page-preload/annotation-controller-registry.ts`，真实接回唯一 consumer，
 并删除原约 440 行内联 registry 主体；保留 hook/构造顺序、host message、RAF 注入
