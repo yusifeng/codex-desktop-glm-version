@@ -12,6 +12,7 @@
     "verify-renderer": "node scripts/verify-renderer.mjs",
     "verify-renderer-cluster": "node scripts/verify-renderer-cluster.mjs",
     "verify": "node scripts/verify-chunks.mjs",
+    "audit-test-index": "node scripts/audit-test-index.mjs",
     "pack": "./scripts/pack.sh",
     "setup": "./scripts/setup-shell.sh",
     "start": "npm run build && npm run pack && ./scripts/run.sh"

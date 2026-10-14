@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1289.
+Total scripts: 1452.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -11,6 +11,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-main-native-pipe-server.mjs`](./test-main-native-pipe-server.mjs)
 
 ## Recent semantic extraction suites
+
+- [`test-main-browser-permission-prompt-registry.mjs`](./test-main-browser-permission-prompt-registry.mjs)
 
 - [`test-app-shared-is-realtime-voice-command.mjs`](./test-app-shared-is-realtime-voice-command.mjs)
 
@@ -660,6 +662,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-artifact-feedback-ui-cluster.mjs`](./test-artifact-feedback-ui-cluster.mjs)
 - [`test-artifact-image-preview.mjs`](./test-artifact-image-preview.mjs)
 - [`test-artifact-preview-application-flow-cluster.mjs`](./test-artifact-preview-application-flow-cluster.mjs)
+- [`test-library-cloud-file-preview-state.mjs`](./test-library-cloud-file-preview-state.mjs)
 - [`test-artifact-preview-entries.mjs`](./test-artifact-preview-entries.mjs)
 - [`test-artifact-preview-panels-cluster.mjs`](./test-artifact-preview-panels-cluster.mjs)
 - [`test-artifact-preview-primitives-cluster.mjs`](./test-artifact-preview-primitives-cluster.mjs)
@@ -1461,6 +1464,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-main-web-contents-diagnostics.mjs](test-main-web-contents-diagnostics.mjs)
 [test-worker-git-init-reconnect-controller.mjs](test-worker-git-init-reconnect-controller.mjs)
 [test-worker-git-repo-watcher-dispose-controller.mjs](test-worker-git-repo-watcher-dispose-controller.mjs)
+[test-worker-git-repo-watcher-start-controller.mjs](test-worker-git-repo-watcher-start-controller.mjs)
 [test-worker-git-watch-session-dispose-controller.mjs](test-worker-git-watch-session-dispose-controller.mjs)
 [test-worker-git-watch-session-start-controller.mjs](test-worker-git-watch-session-start-controller.mjs)
 [test-worker-git-watch-change-controller.mjs](test-worker-git-watch-change-controller.mjs)
@@ -1484,3 +1488,39 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-thread-goal-hydration-registry.mjs](test-thread-goal-hydration-registry.mjs)（运行：`node scripts/test-thread-goal-hydration-registry.mjs`，需先完成构建）
 [test-pip-video-frame-subscription-controller.mjs](test-pip-video-frame-subscription-controller.mjs)（运行：`node --experimental-strip-types scripts/test-pip-video-frame-subscription-controller.mjs`）
 [test-connect-app-host-controller.mjs](test-connect-app-host-controller.mjs)（运行：`node --experimental-strip-types scripts/test-connect-app-host-controller.mjs`）
+[test-preload-annotation-editor-anchor-sync-controller.mjs](test-preload-annotation-editor-anchor-sync-controller.mjs)
+
+## Reconciled lifecycle and platform suites
+
+[test-main-browser-window-options.mjs](test-main-browser-window-options.mjs)
+[test-main-dock-icon-policy.mjs](test-main-dock-icon-policy.mjs)
+[test-main-icon-flavor-policy.mjs](test-main-icon-flavor-policy.mjs)
+[test-main-java-session-options.mjs](test-main-java-session-options.mjs)
+[test-main-kotlin-workspace-config.mjs](test-main-kotlin-workspace-config.mjs)
+[test-main-native-status-item-menu.mjs](test-main-native-status-item-menu.mjs)
+[test-main-pyright-session-options.mjs](test-main-pyright-session-options.mjs)
+[test-main-rust-analyzer-options.mjs](test-main-rust-analyzer-options.mjs)
+[test-main-sentry-envelope-transport.mjs](test-main-sentry-envelope-transport.mjs)
+[test-main-shortcut-link-cache.mjs](test-main-shortcut-link-cache.mjs)
+[test-main-sourcekit-options.mjs](test-main-sourcekit-options.mjs)
+[test-main-telemetry-request.mjs](test-main-telemetry-request.mjs)
+[test-main-tray-icon-names.mjs](test-main-tray-icon-names.mjs)
+[test-main-typescript-server-options.mjs](test-main-typescript-server-options.mjs)
+[test-main-worker-invocation-sampler.mjs](test-main-worker-invocation-sampler.mjs)
+[test-worker-git-manager-key-policy.mjs](test-worker-git-manager-key-policy.mjs)
+[test-worker-git-repo-change-controller.mjs](test-worker-git-repo-change-controller.mjs)
+[test-worker-git-request-performance-context.mjs](test-worker-git-request-performance-context.mjs)
+[test-worker-git-review-summary-projection.mjs](test-worker-git-review-summary-projection.mjs)
+[test-worker-git-stable-metadata-failure-policy.mjs](test-worker-git-stable-metadata-failure-policy.mjs)
+[test-worker-git-turn-cache-invalidation-policy.mjs](test-worker-git-turn-cache-invalidation-policy.mjs)
+[test-worker-git-watch-retry-controller.mjs](test-worker-git-watch-retry-controller.mjs)
+[test-worker-git-watch-session-close-controller.mjs](test-worker-git-watch-session-close-controller.mjs)
+[test-worker-git-watch-target-selection.mjs](test-worker-git-watch-target-selection.mjs)
+[test-worker-git-worktree-cache-selection.mjs](test-worker-git-worktree-cache-selection.mjs)
+[test-worker-git-worktree-identity-policy.mjs](test-worker-git-worktree-identity-policy.mjs)
+[test-worker-git-worktree-snapshot-policy.mjs](test-worker-git-worktree-snapshot-policy.mjs)
+[test-worker-open-target-registry.mjs](test-worker-open-target-registry.mjs)
+[test-worker-parcel-watcher-errors.mjs](test-worker-parcel-watcher-errors.mjs)
+[test-worker-parcel-watcher-events.mjs](test-worker-parcel-watcher-events.mjs)
+[test-worker-parcel-watcher-options.mjs](test-worker-parcel-watcher-options.mjs)
+[test-worker-parcel-watcher-paths.mjs](test-worker-parcel-watcher-paths.mjs)

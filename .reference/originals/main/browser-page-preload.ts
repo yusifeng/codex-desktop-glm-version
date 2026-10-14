@@ -5995,6 +5995,7 @@ var { createAnnotationDesignPointSelectionController } = require("./browser-page
 var { createAnnotationSelectionCommentController } = require("./browser-page-preload/annotation-selection-comment-controller");
 var { createAnnotationTextAnchorEditorController } = require("./browser-page-preload/annotation-text-anchor-editor-controller");
 var { createAnnotationEditorCommentReconciliationController } = require("./browser-page-preload/annotation-editor-comment-reconciliation-controller");
+var { createAnnotationEditorAnchorSyncController } = require("./browser-page-preload/annotation-editor-anchor-sync-controller");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -24077,6 +24078,31 @@ function Wy({ rootHost: e, bridge: t }) {
         updateEditorState: (update) => S(update),
       }),
     ),
+    [editorAnchorSyncController] = (0, G.useState)(() =>
+      createAnnotationEditorAnchorSyncController({
+        windowLike: window,
+        createTargetMap: (rootHost) => eb(rootHost),
+        findComment: (comments, commentId) => comments.find((comment) => comment.id === commentId) ?? null,
+        resolveCommentElement: (comment, targets) => Z_(comment, targets) ?? null,
+        projectCommentAnchor: (comment, element, zoom) => rv(comment, element, zoom),
+        serializeEditorAnchor: (editor, zoom, viewportScale) => av(editor, zoom, viewportScale),
+        projectEditAnchor: (editor, comments, targets, zoom) => ov(editor, comments, targets, zoom),
+        normalizeEditAnchor: (anchorState, targets) => nv(anchorState, sd(anchorState.anchor, void 0, targets)),
+        resolveEditorElement: (anchor, targets) => W_(anchor, targets),
+        targetsEqual: (left, right) => ms(left, right),
+        textAnchorsEqual: (left, right) => Fs(left, right),
+        sendAnchorUpdate: (target, anchorState) =>
+          t.sendMessageToHost({ type: `browser-sidebar-runtime-update-anchor`, target, anchorState }),
+        refreshViewport: () => T(C_()),
+        updateEditorState: (update) => S(update),
+        clearCreateHover: () => {
+          (E.current = null), o(null), c(null);
+        },
+        observeFrames: (install) => dc(install),
+        observeScrollContainers: (windowLike, anchors, onChange) => Pc(windowLike, anchors, onChange),
+        observeTextAnchors: (anchors, onChange) => du(anchors, onChange),
+      }),
+    ),
     { comments: Ee, interactionMode: k } = n,
     { isSuspended: De, canUseSiteAnnotationApi: A, canUseTweaks: Ne } = annotationUiModePolicy(n),
     Oe = n.canUseAnnotationMultiSelect === !0 && x?.anchor.type !== `virtual`,
@@ -24848,98 +24874,18 @@ function Wy({ rootHost: e, bridge: t }) {
           we.current != null && (window.clearTimeout(we.current), (we.current = null)));
       };
     }, [x, A, k, De, e, Me]),
-    (0, G.useEffect)(() => {
-      if ((x == null && _ == null) || x?.anchor.type === `virtual`) return;
-      let r = () => {
-          let r = _ == null ? null : { mode: `edit`, commentId: _ },
-            i = x?.target ?? r;
-          if (i == null) return;
-          let a,
-            o = eb(e);
-          if (x == null) {
-            let e = Ee.find((e) => e.id === _) ?? null;
-            if (e == null) return;
-            let t = Z_(e, o) ?? null;
-            (t != null && o.set(e.id, t), (a = rv(e, t, j)));
-          } else
-            x.target.mode === `create` || x.target.mode === `design`
-              ? (a = av(x, j, n.viewportScale))
-              : ((a = ov(x, Ee, o, j)), a != null && (a = nv(a, sd(a.anchor, void 0, o))));
-          if (a == null && x == null) return;
-          if (
-            (t.sendMessageToHost({
-              type: `browser-sidebar-runtime-update-anchor`,
-              target: i,
-              anchorState: a,
-            }),
-            T(C_()),
-            x?.anchor.type === `text` && a?.anchor.kind === `text`)
-          ) {
-            let e = a.anchor;
-            S((t) =>
-              t?.anchor.type !== `text` || Fs(t.anchor.value, e)
-                ? t
-                : { ...t, anchor: { ...t.anchor, value: e } },
-            );
-          }
-          if (a == null || x == null) {
-            if (x == null) return;
-            S((e) =>
-              e == null ||
-              !ms(e.target, x.target) ||
-              e.anchor.type !== `element` ||
-              e.anchor.element == null
-                ? e
-                : { ...e, anchor: { ...e.anchor, element: null } },
-            );
-            return;
-          }
-          let s = x.target;
-          if (s.mode !== `edit`) return;
-          let c = W_(x.anchor, o);
-          S((e) =>
-            e == null || !ms(e.target, s) || e.anchor.type !== `element` || e.anchor.element === c
-              ? e
-              : { ...e, anchor: { ...e.anchor, element: c } },
-          );
-        },
-        i = () => {
-          r();
-        },
-        a = () => {
-          (x?.target.mode === `create` &&
-            x.anchor.type !== `text` &&
-            ((E.current = null), o(null), c(null)),
-            r());
-        },
-        s =
-          x == null
-            ? []
-            : x.anchor.type === `text`
-              ? [x.anchor.value]
-              : [x.anchor.value, ...x.anchor.additionalSelections.map((e) => e.anchor)],
-        l = window.visualViewport;
-      (l?.addEventListener(`resize`, i), l?.addEventListener(`scroll`, a));
-      let u = dc((e, t) => {
-          (t.addEventListener(`resize`, i),
-            t.addEventListener(`scroll`, a),
-            e.addEventListener(`scroll`, a, !0));
-          let n = Pc(t, s, a);
-          return () => {
-            (t.removeEventListener(`resize`, i),
-              t.removeEventListener(`scroll`, a),
-              e.removeEventListener(`scroll`, a, !0),
-              n());
-          };
+    (0, G.useEffect)(
+      () =>
+        editorAnchorSyncController.install({
+          editor: x,
+          previewCommentId: _,
+          comments: Ee,
+          rootHost: e,
+          zoom: j,
+          viewportScale: n.viewportScale,
         }),
-        d = x?.anchor.type === `text` ? du([x.anchor.value], r) : null;
-      return (
-        r(),
-        () => {
-          (l?.removeEventListener(`resize`, i), l?.removeEventListener(`scroll`, a), u(), d?.());
-        }
-      );
-    }, [x, t, Ee, _, e, n.viewportScale, j]),
+      [editorAnchorSyncController, x, Ee, _, e, n.viewportScale, j],
+    ),
     (0, G.useEffect)(() => {
       let e = k === `comment` && x == null && Ne && h;
       designModifierNotifier.update(e);

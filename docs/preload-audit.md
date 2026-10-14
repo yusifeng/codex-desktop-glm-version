@@ -1704,3 +1704,11 @@ abort completion。
 `GitManager.handleRequestWithContext` 的 request lifecycle begin、tracked admission 与 pre-cancelled cancellation
 telemetry/early return 已迁移至 `src/main/worker/git-request-admission-controller.ts`；consumer 继续注入 request
 lifecycle、performance 与 outcome owner。focused test 覆盖 started 与 pre-cancelled 分支。
+
+### 增量抽取：annotation editor anchor sync controller
+
+`Wy` 中 editor/comment-preview anchor 的 create/design/edit 投影、host update、text/element state 回写，以及
+visual viewport、跨 frame scroll/resize、scroll-container 与 text-anchor observer 生命周期已整体迁移至
+`src/main/browser-page-preload/annotation-editor-anchor-sync-controller.ts`。入口仅注入 DOM/React/IPC adapter，
+由 `scripts/test-preload-annotation-editor-anchor-sync-controller.mjs` 覆盖三类 target、null-anchor 清理、
+listener/observer 安装和幂等 cleanup。
