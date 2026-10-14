@@ -79,6 +79,7 @@ const { reconcileGitIgnoreSourceWatches } = require("./worker/git-ignore-source-
 const { GitInitWatcher } = require("./worker/git-init-watcher");
 const { dispatchStableMetadataRequest } = require("./worker/git-stable-metadata-dispatch");
 const { GitStableRootCache } = require("./worker/git-stable-root-cache");
+const { GitStableMetadataRetryController } = require("./worker/git-stable-metadata-retry-controller");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -67370,7 +67371,6 @@ var {
     reposByKey = new Map();
     worktreesByKey = new Map();
     commonDirByWorktreeKey = new Map();
-    stableMetadataRetryByKey = new Map();
     pendingStableMetadataTraceByKey = new Map();
     stableMetadataGeneration = 0;
     stableRootCache = new GitStableRootCache({
@@ -67380,6 +67380,14 @@ var {
       maxEntries: Jhe,
       now: () => Date.now(),
       setTimeout,
+    });
+    stableMetadataRetryController = new GitStableMetadataRetryController({
+      classifyFailure: classifyStableMetadataFailure,
+      isGitUnavailable: (error) => error instanceof I1,
+      isPermissionError: Xhe,
+      isProcessTimeout: l4,
+      now: () => Date.now(),
+      retryDelayMs: qhe,
     });
     hasBackgroundedSinceLastForeground = !1;
     constructor(e) {
@@ -67425,7 +67433,7 @@ var {
         this.getStableMetadataMemoized.clear(),
         this.commonDirByWorktreeKey.clear(),
         this.stableRootCache.clear(),
-        this.stableMetadataRetryByKey.clear(),
+        this.stableMetadataRetryController.clear(),
         this.pendingStableMetadataTraceByKey.clear());
     }
     invalidateUntrackedPathsCache(e) {
@@ -67479,19 +67487,20 @@ var {
         (n == null || isGitManagerKeyForHost(t, n)) && r.invalidateGitReadCachesForRepoChange(e);
     }
     getStableMetadata = async (e, t) => {
-      this.throwStableMetadataRetry(e, t);
+      let key = this.getStableMetadataKey(e, t);
+      this.stableMetadataRetryController.throwIfBlocked(key);
       let n = this.stableMetadataGeneration;
       try {
         let r = await this.getStableMetadataMemoized(e, t, n);
         return (
           n === this.stableMetadataGeneration &&
-            (this.stableMetadataRetryByKey.delete(this.getStableMetadataKey(e, t)),
+            (this.stableMetadataRetryController.delete(key),
             r != null &&
               this.commonDirByWorktreeKey.set(this.getWorktreeKey(r.root, t), r.commonDir)),
           r
         );
       } catch (r) {
-        this.throwStableMetadataReadError(e, t, r, n);
+        this.handleStableMetadataReadError(e, t, r, n);
       }
     };
     getPendingStableMetadataTrace(e, t) {
@@ -67499,10 +67508,10 @@ var {
     }
     getStableRoot = async (e, t) => {
       let n = this.getCachedStableRoot(e, t),
-        r = this.stableMetadataRetryByKey.get(this.getStableMetadataKey(e, t));
+        key = this.getStableMetadataKey(e, t);
       if (
-        (n !== void 0 && r != null && l4(r.error)) ||
-        (this.throwStableMetadataRetry(e, t), n !== void 0)
+        (n !== void 0 && this.stableMetadataRetryController.hasProcessTimeoutRetry(key)) ||
+        (this.stableMetadataRetryController.throwIfBlocked(key), n !== void 0)
       )
         return n;
       let i = this.stableMetadataGeneration;
@@ -67510,47 +67519,30 @@ var {
         let n = await this.getStableRootMemoized(e, t, i);
         return (
           i === this.stableMetadataGeneration &&
-            this.stableMetadataRetryByKey.delete(this.getStableMetadataKey(e, t)),
+            this.stableMetadataRetryController.delete(key),
           n
         );
       } catch (n) {
-        this.throwStableMetadataReadError(e, t, n, i);
+        this.handleStableMetadataReadError(e, t, n, i);
       }
     };
-    throwStableMetadataRetry(e, t) {
-      let n = this.getStableMetadataKey(e, t),
-        r = this.stableMetadataRetryByKey.get(n);
-      if (r != null) {
-        if (Date.now() < r.retryAfterMs) throw r.error;
-        this.stableMetadataRetryByKey.delete(n);
-      }
-    }
-    throwStableMetadataReadError(e, t, n, r) {
-      let i = l4(n),
-        a = n instanceof I1;
-      let hasCachedRoot = i && r === this.stableMetadataGeneration && this.getCachedStableRoot(e, t) !== void 0;
-      let o = classifyStableMetadataFailure({
-        isPermissionError: Xhe(n),
-        isProcessTimeout: i,
-        isGitUnavailable: a,
-        generationMatches: r === this.stableMetadataGeneration,
+    handleStableMetadataReadError(e, t, n, r) {
+      let key = this.getStableMetadataKey(e, t),
+        generationMatches = r === this.stableMetadataGeneration,
+        hasCachedRoot = l4(n) && generationMatches && this.getCachedStableRoot(e, t) !== void 0;
+      this.stableMetadataRetryController.handleFailure({
+        error: n,
+        generationMatches,
         hasCachedRoot,
-      });
-      if (!o.accepted) throw n;
-      let s = n instanceof Error ? n : Error(String(n));
-      if (o.retry) {
-        o.refreshHostConfig && ppe(t);
-        this.stableMetadataRetryByKey.set(this.getStableMetadataKey(e, t), {
-          error: s,
-          retryAfterMs: Date.now() + qhe,
-        });
-        if (o.invalidateCachedRoot) {
-          this.stableRootCache.delete(this.getStableMetadataKey(e, t));
+        key,
+        refreshHostConfig: () => ppe(t),
+        invalidateCachedRoot: () => {
+          this.stableRootCache.delete(key);
           this.getStableRootMemoized.delete(e, t, this.stableMetadataGeneration);
-        }
-        this.getStableMetadataMemoized.delete(e, t, this.stableMetadataGeneration);
-      }
-      throw s;
+        },
+        invalidateMetadata: () =>
+          this.getStableMetadataMemoized.delete(e, t, this.stableMetadataGeneration),
+      });
     }
     getStableMetadataKey(e, t) {
       return createGitManagerKey(h1(t), e);

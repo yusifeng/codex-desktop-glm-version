@@ -12,6 +12,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-stable-metadata-retry-controller.mjs`](./test-worker-git-stable-metadata-retry-controller.mjs)
+
 - [`test-preload-annotation-overlay-content-renderer.mjs`](./test-preload-annotation-overlay-content-renderer.mjs)
 
 - [`test-preload-annotation-active-runtime-state.mjs`](./test-preload-annotation-active-runtime-state.mjs)
