@@ -116517,6 +116517,7 @@ var $Ze = class {
     runtimeSyncController;
     navigationContextController;
     pageWebviewBindingController;
+    hostPolicyController;
     onAppEntrySource;
     isDefaultBrowser;
     isAnnotationMultiSelectFeatureEnabled = !1;
@@ -116558,6 +116559,7 @@ var $Ze = class {
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ uZe, hX, fq, kZe, tq, KU, EZ }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW }))(this)),
         (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ bindPageToWebview: uZ }))(this)),
+        (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, AX, vXe, yXe, bXe, xXe, SXe, aXe, gX, qU, oXe, vX, tq, KU, l }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
@@ -116718,53 +116720,15 @@ var $Ze = class {
           source: s.appServerNotificationSource,
         }));
     }
-    setOnBrowserStateChanged(e) {
-      this.onBrowserStateChanged = e;
-    }
-    cancelSiteBootstraps() {
-      (this.siteBootstrapController.abort(),
-        (this.siteBootstrapController = new AbortController()));
-    }
-    async setInAppBrowserFeatureEnabled(e, t) {
-      if (((this.inAppBrowserFeatureEnabled = !1), !e)) return;
-      let n = this.browserSessionService.configure();
-      (Yc(n, t),
-        await Xc(n).catch((e) => {
-          this.logger().warning(`Failed to clear Sites authentication cookies`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        }),
-        (this.inAppBrowserFeatureEnabled = !0));
-    }
-    getBrowserSession() {
-      return this.inAppBrowserFeatureEnabled ? this.browserSessionService.configure() : null;
-    }
-    admitBrowserTab(e) {
-      return this.inAppBrowserFeatureEnabled
-        ? !0
-        : (this.reportedBrowserAdmissionDenials.has(e) ||
-            (this.reportedBrowserAdmissionDenials.add(e),
-            this.errorReporter.reportNonFatal(Error(DZ), {
-              groupingFingerprint: [`in-app-browser-availability-backstop`],
-              tags: { stage: e },
-            })),
-          !1);
-    }
-    refreshOwnerCommandAccelerators() {
-      this.ownerCommandAccelerators = mq(this.getCommandKeymapState());
-    }
-    browserSettingsWebviewMounted(e, t, n = `light`) {
-      let r = this.ensureCurrentWindowState(e);
-      r != null && (r.browserSettingsWebviewMountIds.add(t), VG(r, n));
-    }
-    browserSettingsWebviewThemeChanged(e, t) {
-      let n = this.ensureCurrentWindowState(e);
-      n != null && VG(n, t);
-    }
-    browserSettingsWebviewUnmounted(e, t) {
-      this.getCurrentWindowState(e)?.browserSettingsWebviewMountIds.delete(t);
-    }
+    setOnBrowserStateChanged(...args) { return this.hostPolicyController.setOnBrowserStateChanged(...args); }
+    cancelSiteBootstraps(...args) { return this.hostPolicyController.cancelSiteBootstraps(...args); }
+    async setInAppBrowserFeatureEnabled(...args) { return this.hostPolicyController.setInAppBrowserFeatureEnabled(...args); }
+    getBrowserSession(...args) { return this.hostPolicyController.getBrowserSession(...args); }
+    admitBrowserTab(...args) { return this.hostPolicyController.admitBrowserTab(...args); }
+    refreshOwnerCommandAccelerators(...args) { return this.hostPolicyController.refreshOwnerCommandAccelerators(...args); }
+    browserSettingsWebviewMounted(...args) { return this.hostPolicyController.browserSettingsWebviewMounted(...args); }
+    browserSettingsWebviewThemeChanged(...args) { return this.hostPolicyController.browserSettingsWebviewThemeChanged(...args); }
+    browserSettingsWebviewUnmounted(...args) { return this.hostPolicyController.browserSettingsWebviewUnmounted(...args); }
     syncView(e, t) {
       return this.presentationSyncController.syncView(e, t);
     }
@@ -116780,35 +116744,15 @@ var $Ze = class {
     isBrowserPresentedForConversation(e, t) {
       return this.presentationSyncController.isBrowserPresentedForConversation(e, t);
     }
-    getDebugSnapshot() {
-      return DXe({
-        browserSessionRegistry: this.browserSessionRegistry,
-        browserUseOpenRequests: this.browserUseOpenRequests,
-        getPersistedPageMetadata: this.browserPageSnapshots.getDebugMetadata.bind(
-          this.browserPageSnapshots,
-        ),
-        getThreadStateForWindow: hX,
-        windows: this.windows.values(),
-      });
-    }
-    getFeedbackDiagnostics() {
-      return OXe(this.getDebugSnapshot());
-    }
+    getDebugSnapshot(...args) { return this.hostPolicyController.getDebugSnapshot(...args); }
+    getFeedbackDiagnostics(...args) { return this.hostPolicyController.getFeedbackDiagnostics(...args); }
     isBrowserPageWebContents(e) {
       return (
         this.browserPageHostLifecycle.findPageStateForWebContentsId(e.id)?.page.view.webContents ===
         e
       );
     }
-    openDebugTabOwner(e) {
-      return kXe({
-        browserSessionRegistry: this.browserSessionRegistry,
-        getLiveWindowState: this.getLiveWindowState.bind(this),
-        getThreadStateForWindow: hX,
-        options: e,
-        windowManager: this.windowManager,
-      });
-    }
+    openDebugTabOwner(...args) { return this.hostPolicyController.openDebugTabOwner(...args); }
     getBrowserUseRouteActionHelpers(...args) { return this.browserUseRouteController.getBrowserUseRouteActionHelpers(...args); }
     getPageForBrowserUseForRoute(...args) { return this.browserUseRouteController.getPageForBrowserUseForRoute(...args); }
     getTabsForBrowserUseForRoute(...args) { return this.browserUseRouteController.getTabsForBrowserUseForRoute(...args); }
@@ -116825,45 +116769,15 @@ var $Ze = class {
     openBrowserPanelWithoutAnimation(...args) { return this.browserUseRouteController.openBrowserPanelWithoutAnimation(...args); }
     setBrowserUseActiveForRoute(...args) { return this.browserUseRouteController.setBrowserUseActiveForRoute(...args); }
     setWebMcpToolActivity(...args) { return this.browserUseRouteController.setWebMcpToolActivity(...args); }
-    onMcpToolCallCompleted(e, t) {
-      let n = this.browserSessionRegistry.getBrowserRouteForSession(e);
-      if (n != null) {
-        for (let e of this.windows.values())
-          if (e.window.id === n.windowId || e.tabSourceWindow?.window.id === n.windowId)
-            for (let r of e.threads.values()) {
-              let i = r.page;
-              r.conversationId !== n.conversationId ||
-                !i?.webMcpParentCallIds?.delete(t) ||
-                i.webMcpParentCallIds.size > 0 ||
-                ((i.lastWebMcpToolCall = null), this.syncThreadState(e, n.conversationId, r));
-            }
-      }
-    }
+    onMcpToolCallCompleted(...args) { return this.hostPolicyController.onMcpToolCallCompleted(...args); }
     setBrowserUseCursorForRoute(...args) { return this.browserUseRouteController.setBrowserUseCursorForRoute(...args); }
     setBrowserUseActiveForConversation(...args) { return this.browserUseRouteController.setBrowserUseActiveForConversation(...args); }
-    activateBrowserUseNavigationRestriction(e) {
-      this.browserUseNavigationRestriction.activate(e);
-    }
-    addBrowserUseNavigationBlockedListener(e) {
-      return (
-        this.browserUseNavigationBlockedListeners.add(e),
-        () => {
-          this.browserUseNavigationBlockedListeners.delete(e);
-        }
-      );
-    }
-    assertBrowserUseNavigationAllowed(e, t) {
-      this.browserUseNavigationRestriction.assertAllowed(e, t);
-    }
-    getBrowserPageRestoreResults(e, t) {
-      return this.browserPersistence.getPageRestoreResults(this.getCurrentWindow(e), t);
-    }
-    deletePersistedBrowserConversation(e, t) {
-      return this.browserPersistence.deleteConversation(this.getCurrentWindow(e), t);
-    }
-    isPrimaryWindowPersistenceOwner(e) {
-      this.comments.handleRuntimeCommentScreenshotReady(e, t);
-    }
+    activateBrowserUseNavigationRestriction(...args) { return this.hostPolicyController.activateBrowserUseNavigationRestriction(...args); }
+    addBrowserUseNavigationBlockedListener(...args) { return this.hostPolicyController.addBrowserUseNavigationBlockedListener(...args); }
+    assertBrowserUseNavigationAllowed(...args) { return this.hostPolicyController.assertBrowserUseNavigationAllowed(...args); }
+    getBrowserPageRestoreResults(...args) { return this.hostPolicyController.getBrowserPageRestoreResults(...args); }
+    deletePersistedBrowserConversation(...args) { return this.hostPolicyController.deletePersistedBrowserConversation(...args); }
+    isPrimaryWindowPersistenceOwner(...args) { return this.hostPolicyController.isPrimaryWindowPersistenceOwner(...args); }
     getPageLifecycleHelpers(...args) { return this.runtimeSyncController.getPageLifecycleHelpers(...args); }
     syncThreadState(...args) { return this.runtimeSyncController.syncThreadState(...args); }
     syncThreadStateFromOrigin(...args) { return this.runtimeSyncController.syncThreadStateFromOrigin(...args); }

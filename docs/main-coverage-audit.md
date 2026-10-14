@@ -849,6 +849,15 @@ activation）已迁移至 `browser-comment-mode-controller.ts`，focused test �
 接管 `bindPageToWebview` 生命周期。新增两组 focused tests，navigation batch 的完整 webview 导航事件绑定仍由
 binding controller 保持职责边界。
 
+### 增量抽取：IAB host policy/diagnostics controller
+
+`tQe` 的 in-app browser admission/session、settings webview theme/mount、owner command accelerator refresh、
+debug snapshot/feedback/debug-tab、MCP completion cleanup、browser-use navigation restriction wrappers、site
+bootstrap cancellation 与 persistence-owner wrappers 已迁入
+`src/main/main-app/browser-sidebar/browser-host-policy-controller.ts`。`isPrimaryWindowPersistenceOwner` 现基于
+`browserPersistence.isPersistenceOwner(getCurrentWindowState(owner))`，修复原残缺实现。focused test 为
+`scripts/test-main-browser-host-policy-controller.mjs`（17 项）。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
 `vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit/Sat` 均已移出，cross-platform capture-request owner 也已真实接回。

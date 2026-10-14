@@ -30,6 +30,12 @@ thread/runtime snapshot 同步与 comment snapshot 已分别迁入 `browser-page
 browser error page 已迁入 `browser-navigation-context-controller.ts`，`bindPageToWebview` 已迁入
 `browser-page-webview-binding-controller.ts`；两批均保留 focused tests，并在 main-C 中真实接回。
 
+本轮继续收口 tQe host policy/diagnostics：in-app browser admission/session、settings webview mount/theme、owner
+accelerator refresh、debug snapshot/feedback/debug-tab、MCP completion cleanup、browser-use navigation restriction
+与 site bootstrap/persistence wrappers 已迁入 `browser-host-policy-controller.ts`，并在 main-C 中真实接回。
+同时修复 `isPrimaryWindowPersistenceOwner` 的错误残实现，改为基于 page persistence controller 的 primary-owner 判断；
+focused test 为 `scripts/test-main-browser-host-policy-controller.mjs`（17 项）。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger
