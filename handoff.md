@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `ytt` system permissions service 整体迁移至
+`src/main/main-app/startup/system-permissions-service.ts`，真实接回 startup RPC service 唯一 consumer，
+并删除旧实现及专用 URL constants；保留通知状态映射、macOS 麦克风授权、通知请求等待、三类系统设置
+跳转、Finder 定位与错误降级。focused test 为
+`scripts/test-main-system-permissions-service.mjs`（55 项）。
+
 本轮将 Wy 的 overlay render composition 迁移至 `annotation-overlay-content-renderer.ts` 并真实接回；保留 region、highlight、selection cursor、text selection、flex/metadata、draft/saved marker 与交互回调，删除原约 110 行内联 JSX-runtime 主体。focused test 为 `scripts/test-preload-annotation-overlay-content-renderer.mjs`（12 项）。
 
 本轮将 Wy 的 active view/draft matching/marker/region/text-preview 投影迁移至 `annotation-active-runtime-state.ts` 并真实接回；保留 multi-select link、原页面 marker 策略、active geometry 与 text preview，删除原约 90 行内联投影。focused test 为 `scripts/test-preload-annotation-active-runtime-state.mjs`（12 项）。

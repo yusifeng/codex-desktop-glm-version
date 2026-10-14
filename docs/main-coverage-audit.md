@@ -623,6 +623,20 @@ WindowManager、origin WebContents 与 Sentry gate；main chunk 内旧 `ttt` 实
 flush；切换 primary 或销毁 origin 会取消两组订阅并永久停用 coordinator。
 `scripts/test-main-startup-renderer-coordinator.mjs` 覆盖 46 项 focused assertions。
 
+### 增量抽取：system permissions service
+
+R10/startup 原 `ytt`（153,684-153,787）的完整 renderer-facing system permissions service 已迁移至
+`src/main/main-app/startup/system-permissions-service.ts`。模块保留 Electron notification permission 到
+enabled/disabled/not-determined 的映射、macOS microphone pre/post 状态与 request result、Windows/macOS
+设置 URL 分流、未知通知权限时触发 native request 后等待 2 秒，以及 screen-recording/accessibility/Finder
+操作的 platform gate 与逐方法错误日志。
+
+原 startup RPC service 唯一 consumer 注入现有 Objective-C notification request helper、Electron
+Notification/systemPreferences/shell、permission app path、build-flavor availability gate 与 logger；native
+RunLoop helper 仍由原 owner 持有。main chunk 内旧 `ytt` 和仅由其消费的 URL constants 已删除。
+`scripts/test-main-system-permissions-service.mjs` 使用 esbuild 临时 bundle，覆盖 55 项平台矩阵、授权结果、
+URL/等待顺序与异常降级 focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

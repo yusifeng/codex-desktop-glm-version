@@ -63,6 +63,7 @@ const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
 const { StartupRendererCoordinator } = require("./main-app/startup/startup-renderer-coordinator.js");
+const { SystemPermissionsService } = require("./main-app/startup/system-permissions-service.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -153673,117 +153674,7 @@ async function dtt() {
   }
   return u5;
 }
-var p5 = r.i(`system-permissions-service`),
-  ftt = `x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture`,
-  ptt = `x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone`,
-  mtt = `x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility`,
-  htt = `x-apple.systempreferences:com.apple.Notifications-Settings.extension`,
-  gtt = 2e3,
-  _tt = `ms-settings:notifications`,
-  vtt = `ms-settings:privacy-microphone`,
-  ytt = class extends n.Uf {
-    notificationSettingsAppBundleIdentifier;
-    notificationAuthorizationUnavailable;
-    constructor(e, t) {
-      (super(),
-        (this.notificationSettingsAppBundleIdentifier = t),
-        (this.notificationAuthorizationUnavailable =
-          process.platform === `darwin` && e === a.in.Prod && !l.app.isPackaged));
-    }
-    async getNotificationPermissionStatus() {
-      if (this.notificationAuthorizationUnavailable) return null;
-      switch (await l.Notification.getPermissionStatus()) {
-        case `granted`:
-          return `enabled`;
-        case `denied`:
-          return `disabled`;
-        case `not-determined`:
-          return `not-determined`;
-        default:
-          return null;
-      }
-    }
-    async requestMicrophoneAccess() {
-      if (process.platform !== `darwin`)
-        return { statusBefore: `unknown`, statusAfter: `unknown`, requestResult: `not_requested` };
-      let e = l.systemPreferences.getMediaAccessStatus(`microphone`),
-        t = `unknown`,
-        n = `error`;
-      try {
-        return e === `granted`
-          ? { statusBefore: e, statusAfter: e, requestResult: `not_requested` }
-          : ((n = (await l.systemPreferences.askForMediaAccess(`microphone`))
-              ? `granted`
-              : `denied`),
-            (t = l.systemPreferences.getMediaAccessStatus(`microphone`)),
-            { statusBefore: e, statusAfter: t, requestResult: n });
-      } catch (r) {
-        return (
-          p5().error(`Microphone permission request failed`, { safe: {}, sensitive: { error: r } }),
-          { statusBefore: e, statusAfter: t, requestResult: n }
-        );
-      }
-    }
-    async openMicrophoneSettings() {
-      try {
-        process.platform === `darwin`
-          ? await l.shell.openExternal(ptt)
-          : process.platform === `win32` && (await l.shell.openExternal(vtt));
-      } catch (e) {
-        p5().error(`Open microphone settings failed`, { safe: {}, sensitive: { error: e } });
-      }
-    }
-    async openNotificationSettings() {
-      try {
-        if (process.platform === `win32`) {
-          await l.shell.openExternal(_tt);
-          return;
-        }
-        if (this.notificationAuthorizationUnavailable) return;
-        let e = await this.getNotificationPermissionStatus();
-        ((e == null || e === `not-determined`) &&
-          (ctt(),
-          await new Promise((e) => {
-            setTimeout(e, gtt);
-          })),
-          await l.shell.openExternal(
-            `${htt}?id=${encodeURIComponent(this.notificationSettingsAppBundleIdentifier)}`,
-          ));
-      } catch (e) {
-        p5().error(`Open notification settings failed`, { safe: {}, sensitive: { error: e } });
-      }
-    }
-    async openScreenRecordingSettings() {
-      if (process.platform === `darwin`)
-        try {
-          await l.shell.openExternal(ftt);
-        } catch (e) {
-          p5().error(`Open screen recording settings failed`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        }
-    }
-    async openAccessibilitySettings() {
-      if (process.platform === `darwin`)
-        try {
-          await l.shell.openExternal(mtt);
-        } catch (e) {
-          p5().error(`Open accessibility settings failed`, { safe: {}, sensitive: { error: e } });
-        }
-    }
-    async showPermissionSettingsAppInFinder() {
-      if (process.platform === `darwin`)
-        try {
-          l.shell.showItemInFolder(a.m());
-        } catch (e) {
-          p5().error(`Show permission settings app in Finder failed`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        }
-    }
-  },
+var ytt = SystemPermissionsService,
   Ctt = TabDragPresentationWindow,
   m5 = n.wf({ x: n.Cf(), y: n.Cf() }),
   wtt = n.wf({
@@ -159034,7 +158925,25 @@ var G5 = r.r(`WindowContext`),
             process.platform === `darwin` || process.platform === `win32`,
           systemPermissions:
             process.platform === `darwin` || process.platform === `win32`
-              ? new ytt(this.options.buildFlavor, a.rn(this.options.buildFlavor))
+              ? new ytt({
+                  askForMicrophoneAccess: () =>
+                    l.systemPreferences.askForMediaAccess(`microphone`),
+                  delay: (e) => new Promise((t) => setTimeout(t, e)),
+                  getMicrophoneAccessStatus: () =>
+                    l.systemPreferences.getMediaAccessStatus(`microphone`),
+                  getNotificationPermissionStatus: () => l.Notification.getPermissionStatus(),
+                  logger: r.i(`system-permissions-service`),
+                  notificationAuthorizationUnavailable:
+                    process.platform === `darwin` &&
+                    this.options.buildFlavor === a.in.Prod &&
+                    !l.app.isPackaged,
+                  notificationSettingsAppBundleIdentifier: a.rn(this.options.buildFlavor),
+                  openExternal: (e) => l.shell.openExternal(e),
+                  permissionSettingsAppPath: a.m(),
+                  platform: process.platform,
+                  requestNotificationAuthorization: () => ctt(),
+                  showItemInFolder: (e) => l.shell.showItemInFolder(e),
+                })
               : null,
           systemFonts: new att(),
           terminal: new Mtt(this.terminalManager, e),
