@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 的 DOM interaction setup 与 command facade 迁入
+`src/main/browser-page-preload/annotation-interaction-command-facade.ts`，以单一自定义 hook
+真实接回；保留 30 个 callback/effect-event/effect 的 hook 顺序、site request subscription、
+DOM interaction enable/clear/dispose 与 23 个 command 出口，删除 Wy 约 148 行内联主体。
+focused test 为 `scripts/test-preload-annotation-interaction-command-facade.mjs`（15 项）。
+
 本轮将原 `xZe` browser tab working-set/activity manager 整体迁移至
 `src/main/main-app/browser-sidebar/browser-tab-working-set-manager.ts`，真实接回 IAB manager 唯一 consumer，
 并删除旧 owner 与专用候选排序/筛选 helper；保留单调 activity 序列、per-window selection、30 分钟保护、

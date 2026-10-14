@@ -5974,6 +5974,7 @@ var { projectAnnotationOverlayRuntimeState } = require("./browser-page-preload/a
 var { renderAnnotationOverlayContent } = require("./browser-page-preload/annotation-overlay-content-renderer");
 var { projectAnnotationHighlightRuntimeState, renderAnnotationRoot } = require("./browser-page-preload/annotation-highlight-render-owner");
 var { useAnnotationControllerRegistry } = require("./browser-page-preload/annotation-controller-registry");
+var { useAnnotationInteractionCommandFacade } = require("./browser-page-preload/annotation-interaction-command-facade");
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
@@ -23782,155 +23783,21 @@ function Wy({ rootHost: e, bridge: t }) {
     We = currentPageTargets.visibleDesignTargets,
     Ge = currentPageTargets.observeDocumentScroll,
     Ke = currentPageTargets.observeMutations,
-    qe = (0, G.useCallback)(
-      (n, r, a, s) => elementEditorOpenController.open(n, r, { annotationEditorDefault: Iy(document, fb), ...a }, {
-        canUseSiteAnnotationApi: A,
-        previewCommentId: _,
-        rootHost: e,
-        getAnnotationControls: t.getAnnotationControls,
-      }),
-      [elementEditorOpenController, A, _, e, t],
-    ),
-    Je = (0, G.useCallback)(
-      (anchorState, extras) => textAnchorEditorController.open(anchorState, extras, _),
-      [textAnchorEditorController, _],
-    ),
-    Ye = (0, G.useCallback)(
-      (n, r, a = 0) =>
-        editEditorController.open(n, r, a, {
-          comments: Ee,
-          rootHost: e,
-          previewCommentId: _,
-          canUseSiteAnnotationApi: A,
-          zoom: j,
-          getAnnotationControls: t.getAnnotationControls,
-        }),
-      [editEditorController, Ee, e, _, A, j, t],
-    ),
-    Xe = (0, G.useCallback)(
-      (n, r, i) =>
-        commentPreviewController.open(n, r, i, { comments: Ee, rootHost: e, zoom: j }),
-      [commentPreviewController, Ee, e, j],
-    ),
-    Ze = (0, G.useCallback)(
-      (r, a) =>
-        designEditorOpenController.open(r, a, {
-          rootHost: e,
-          canUseSiteAnnotationApi: A,
-          viewportScale: n.viewportScale,
-          zoom: j,
-          getAnnotationControls: t.getAnnotationControls,
-        }),
-      [designEditorOpenController, e, A, n.viewportScale, j, t],
-    ),
-    Qe = (0, G.useEffectEvent)((e, t, n, r) => {
-      return siteRequestDispatchController.dispatch(e, t, n, r, { editorOpen: x != null });
-    });
-  (0, G.useEffect)(
-    () => t.subscribeToSiteAnnotationRequests?.((e, t, n, r) => Qe(e, t, n, r)),
-    [t],
-  );
-  let $e = (0, G.useCallback)(
-      (e) => commentPreviewCloseController.close(e),
-      [commentPreviewCloseController],
-    ),
-    et = (0, G.useEffectEvent)((e, n) => {
-      virtualSelectionEditorController.open(e, n, {
-        editorOpen: x != null,
-        previewCommentId: _,
-        zoom: j,
-        canUseTweaks: Ne,
-        getAnnotationControls: t.getAnnotationControls,
-      });
+    interactionCommands = useAnnotationInteractionCommandFacade({
+      useCallback: G.useCallback, useEffect: G.useEffect, useEffectEvent: G.useEffectEvent,
+      rootHost: e, bridge: t, runtimeState: n, canUseSiteAnnotationApi: A, previewCommentId: _, comments: Ee,
+      zoom: j, editor: x, interactionMode: k, isSuspended: De, canUseTweaks: Ne, multiSelectEnabled: Oe,
+      setSelectedCommentId: b, setDomHover: o, setSelectionHover: c, setFeedback: C,
+      interactionRef: w, preparedSelectionRef: le, getCurrentSelection: ou,
+      getAnnotationEditorDefault: Iy, document, annotationEditorDefaultKey: fb, createDomInteraction: t_,
+      elementEditorOpenController, textAnchorEditorController, editEditorController, commentPreviewController,
+      designEditorOpenController, siteRequestDispatchController, virtualSelectionEditorController,
+      hoverFallbackController, commentPreviewCloseController, pointerModeSyncController, pointSelectionController,
+      designPointSelectionController, pointRetryController, selectionCommentController, viewportRefreshScheduler, createAnchorUpdateController,
+      removeSelectionController, editorCommentReconciliationController, interactionResetController,
+      hoverSyncController, editorAnchorRestoreController, selectionModifierController,
     }),
-    tt = (0, G.useEffectEvent)((t, n) => {
-      hoverFallbackController.handle(t, n, {
-        editorOpen: x != null,
-        interactionMode: k,
-        canUseSiteAnnotationApi: A,
-        rootHost: e,
-      });
-    });
-  ((0, G.useEffect)(() => {
-    let t = t_({
-      rootHost: e,
-      onClearDomHover: () => {
-        (o(null), c(null));
-      },
-      onFeedback: C,
-      onSelected: et,
-      onFallback: tt,
-    });
-    return (
-      (w.current = t),
-      () => {
-        (t.dispose(), (w.current = null));
-      }
-    );
-  }, [e]),
-    (0, G.useEffect)(() => {
-      w.current?.setEnabled(A && k === `comment` && !De && !n.isAgentControllingBrowser);
-    }, [A, k, De, n.isAgentControllingBrowser]),
-    (0, G.useEffect)(() => {
-      x?.anchor.type !== `virtual` && w.current?.clear();
-    }, [x]));
-  let nt = (0, G.useEffectEvent)((e) =>
-      pointerModeSyncController.sync(e, n.zoomPercent, n.isAgentControllingBrowser),
-    ),
-    rt = (0, G.useCallback)(
-      (point) => pointSelectionController.select(point, { isEditorOpen: x != null, canUseSiteAnnotationApi: A }),
-      [pointSelectionController, x, A],
-    ),
-    it = (0, G.useCallback)((e) => pointRetryController.retry(e, (point) => rt(point)), [rt, pointRetryController]),
-    at = (0, G.useCallback)(
-      (message) => selectionCommentController.create(message, x != null),
-      [selectionCommentController, x],
-    ),
-    ot = (0, G.useCallback)((e) => {
-      le.current = ou(e);
-    }, []),
-    st = (0, G.useCallback)(
-      (point, mode = `design`) =>
-        designPointSelectionController.open(point, mode, {
-          isEditorOpen: x != null,
-          canUseSiteAnnotationApi: A,
-        }),
-      [designPointSelectionController, x, A],
-    ),
-    ct = (0, G.useCallback)((e) => pointRetryController.retry(e, (point) => st(point)), [st, pointRetryController]),
-    lt = (0, G.useCallback)(() => viewportRefreshScheduler.schedule(), [viewportRefreshScheduler]),
-    ut = (0, G.useCallback)(
-      (e, r, i) => createAnchorUpdateController.update(e, r, i, { multiSelectEnabled: Oe, zoom: j, viewportScale: n.viewportScale }),
-      [createAnchorUpdateController, Oe, j, n.viewportScale],
-    ),
-    dt = (0, G.useEffectEvent)((e) =>
-      removeSelectionController.remove(e, { multiSelectEnabled: Oe, editorState: x }),
-    ),
-    ft = (0, G.useEffectEvent)((e = _) => {
-      commentPreviewCloseController.close(e);
-    }),
-    pt = (0, G.useEffectEvent)((comments) =>
-      editorCommentReconciliationController.reconcile(comments),
-    ),
-    mt = (0, G.useEffectEvent)((e) => {
-      interactionResetController.reset(e);
-    }),
-    ht = (0, G.useEffectEvent)((e) => {
-      (Ye(e), b(null));
-    }),
-    _t = (0, G.useEffectEvent)((t) =>
-      hoverSyncController.sync(t, { modeAllowsHover: k !== `comment` || De, hasOpenEditor: x != null }),
-    ),
-    vt = (0, G.useEffectEvent)((t) => {
-      editorAnchorRestoreController.restore(t, e);
-    }),
-    yt = (0, G.useEffectEvent)((t) =>
-      selectionModifierController.sync(t && Oe, {
-        rootHost: e,
-        isCreateElementTarget: x?.target.mode === `create` && x.anchor.type !== `text`,
-        canUseSiteAnnotationApi: A,
-      }),
-    );
+    { qe, Je, Ye, Xe, Ze, $e, nt, rt, it, at, ot, st, ct, lt, ut, dt, ft, pt, mt, ht, _t, vt, yt } = interactionCommands;
   ((0, G.useEffect)(() => installAnnotationHostMessageController({
     t, dispatchAnnotationWyHostMessage, Ne, Oe, i, nt, _t, unavailableSiteInteractionController, ve, ft,
     commentInteractionDisposalController, u, r, projectAnnotationRuntimeSyncState, T, C_, g, ie,

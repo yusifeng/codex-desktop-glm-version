@@ -1,5 +1,7 @@
 # `browser-page-preload.ts` 逐段审计
 
+本轮新增 `annotation-interaction-command-facade.ts`，以单一自定义 hook 真实接回 Wy 的 DOM interaction setup 与 command facade；保留 30 个 React callback/effect-event/effect 的原 hook 顺序、site request subscription、DOM interaction enable/clear/dispose 与 23 个 command 出口，从 Wy 删除约 148 行内联主体。focused test：`scripts/test-preload-annotation-interaction-command-facade.mjs`（15 项）。
+
 本轮新增 `annotation-current-page-target-projection.ts`，真实接回 Wy 的 runtime collections/current-page target projection；集中处理 page comment 过滤、text-anchor observation 复用、live comment/design target、element cache 与 scroll/mutation observation 策略，删除原内联组合主体。focused test：`scripts/test-preload-annotation-current-page-target-projection.mjs`（14 项）。
 
 本轮新增 `annotation-controller-registry.ts`，将 Wy 顶层 32 个长生命 controller 的构造、依赖适配与稳定持有迁入单一 registry owner；保留原 `useState` hook/构造顺序、host message 路由、RAF 注入与后置 callback 的延迟闭包语义，并从 `Wy` 删除约 440 行内联 registry 主体。focused test：`scripts/test-preload-annotation-controller-registry.mjs`（12 项）。
