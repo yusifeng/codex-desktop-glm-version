@@ -11,6 +11,7 @@ const mainBusiness = require("./main-app/util/main-business.js");
 const mainUrlTrust = require("./main-app/util/url-trust.js");
 const { AppshotHotkeyManager } = require("./main-app/hotkey/appshot-hotkey-manager.js");
 const { createHotkeyWindowLifecycleManagerClass } = require("./main-app/hotkey/hotkey-window-lifecycle-manager.js");
+const { BrowserAnnotationInteractionController } = require("./main-app/browser-sidebar/browser-annotation-interaction-controller.js");
 const { createHotkeyWindowControllerClass } = require("./main-app/hotkey/hotkey-window-controller.js");
 const { requestFinalCaptureUpdate, startMacCapture, startWindowsCapture } = require("./main-app/computer-use/capture-requests.js");
 const { validateThreadMetadataUpdate, updateThreadMetadata } = require("./main-app/thread-metadata.js");
@@ -75,6 +76,7 @@ const { ArtifactSubscriptionManager } = require("./main-app/remote-artifact/arti
 const { ArtifactSessionHostService } = require("./main-app/remote-artifact/artifact-session-host-service.js");
 const { createTerminalSessionManagerClass } = require("./main-app/terminal/terminal-session-manager.js");
 const { createBrowserWindowManagerClass } = require("./main-app/window/browser-window-manager.js");
+const { createBrowserPageCommandControllerClass } = require("./main-app/browser-sidebar/browser-page-command-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
 let c = require("node:url"),
@@ -116698,6 +116700,7 @@ var $Ze = class {
     browserSessionRegistry;
     defaultBrowserUseViewportSize;
     logger = r.i(`browser-sidebar-manager`);
+    pageCommandController;
     downloadStore;
     windows = new Map();
     inAppBrowserFeatureEnabled = !0;
@@ -116707,7 +116710,7 @@ var $Ze = class {
     tabBudget;
     browserUseOpenRequests;
     browserUseNavigationBlockedListeners = new Set();
-    activeDraggedImagesByOwnerWebContentsId = new Map();
+    annotationInteractionController;
     onBrowserStateChanged = () => {};
     lastSyncedWindowId = null;
     ownerCommandAccelerators;
@@ -116755,11 +116758,13 @@ var $Ze = class {
       },
     });
     constructor(e, t, r = J, i = QBe(), a = new cX(), o = NHe(), s = {}) {
+      this.annotationInteractionController = new BrowserAnnotationInteractionController(this);
       ((this.windowManager = e),
         (this.errorReporter = t),
         (this.commentModeBlocklistLookup = i),
         (this.browserSessionRegistry = a),
         (this.defaultBrowserUseViewportSize = o),
+        (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
         (this.getCommandKeymapState = s.getCommandKeymapState ?? n.Ct),
         (this.ownerCommandAccelerators = mq(this.getCommandKeymapState())),
@@ -117395,539 +117400,56 @@ var $Ze = class {
       return this.browserPersistence.deleteConversation(this.getCurrentWindow(e), t);
     }
     isPrimaryWindowPersistenceOwner(e) {
-      return this.browserPersistence.isPersistenceOwner(this.getCurrentWindow(e));
-    }
-    setTweaksFeatureEnabled(e) {
-      if (this.isTweaksFeatureEnabled !== e) {
-        this.isTweaksFeatureEnabled = e;
-        for (let t of this.windows.values())
-          for (let r of t.threads.values()) {
-            if (!e) {
-              let e = n.Ou(r.snapshot.comments, !1, !0),
-                i = {
-                  ...r.snapshot,
-                  annotationEditorMode: `comment`,
-                  isDesignModifierPressed: !1,
-                  isOriginalViewEnabled: !1,
-                  isTweaksEditorOpen: !1,
-                  comments: e,
-                };
-              (r.snapshot.annotationEditorMode !== i.annotationEditorMode ||
-                r.snapshot.isDesignModifierPressed !== i.isDesignModifierPressed ||
-                r.snapshot.isOriginalViewEnabled !== i.isOriginalViewEnabled ||
-                r.snapshot.isTweaksEditorOpen !== i.isTweaksEditorOpen ||
-                r.snapshot.comments.some((e) => e.designChange != null)) &&
-                ((r.snapshot = i), this.syncThreadState(t, r.conversationId, r));
-            }
-            r.page != null && this.syncRuntimeStateToPage(r.page, r);
-          }
-      }
-    }
-    setAnnotationMultiSelectFeatureEnabled(e) {
-      if (this.isAnnotationMultiSelectFeatureEnabled !== e) {
-        this.isAnnotationMultiSelectFeatureEnabled = e;
-        for (let e of this.windows.values())
-          for (let t of e.threads.values())
-            t.page != null && this.syncRuntimeStateToPage(t.page, t);
-      }
-    }
-    setSiteAnnotationApiFeatureEnabled(e, t) {
-      (this.siteAnnotationFeatures.setApiEnabled(e), this.siteAnnotationPermissions.setRequired(t));
-    }
-    requestSiteAnnotationPermission(e, t = `comment`) {
-      return this.siteAnnotationPermissions.request(this.findPageStateForRuntimeSender(e), t);
-    }
-    respondToSiteAnnotationPermission(e, t) {
-      return this.siteAnnotationPermissions.respond(
-        this.getCurrentPageWebContents(e, t.conversationId, t.browserTabId),
-        t,
-      );
-    }
-    setSiteAnnotationFeaturesEnabled(e, t) {
-      return this.siteAnnotationFeatures.setEnabled(
-        this.getCurrentPageWebContents(e, t.conversationId, t.browserTabId),
-        t,
-      );
-    }
-    refreshSiteAnnotationFeatures() {
-      (this.siteAnnotationFeatures.refresh(), this.siteAnnotationPermissions.refresh());
-    }
-    notifyBrowserUseNavigationBlocked(e) {
-      for (let t of this.browserUseNavigationBlockedListeners) t(e);
-    }
-    handleCommentOverlayMounted(e, t, n, r, i, a, o, s) {
-      this.comments.handleOverlayMounted(e, t, n, r, i, a, o, s);
-    }
-    handleCommentOverlayPreviewOpenChanged(e, t) {
-      this.comments.handleOverlayPreviewOpenChanged(e, t);
-    }
-    handleRuntimeCommentScreenshotReady(e, t) {
       this.comments.handleRuntimeCommentScreenshotReady(e, t);
     }
-    goBack(e, t, n) {
-      this.navigateCurrentPageHistory(e, t, `back`, n);
-    }
-    cloneTab(
-      e,
-      {
-        active: t,
-        browserHostDisplayName: n,
-        browserTabId: r,
-        conversationId: i,
-        cwd: o,
-        navigation: s,
-      },
-    ) {
-      let c = this.getCurrentPageCommandContext(e, i, r);
-      if (c == null) return;
-      let { page: l, windowState: u } = c;
-      if (u.owner !== e) return;
-      let d = l.view.webContents;
-      if (
-        d?.isDestroyed() ||
-        (d == null && s !== `reload`) ||
-        (s === `back` && !d?.canGoBack()) ||
-        (s === `forward` && !d?.canGoForward()) ||
-        !this.admitBrowserTab(`history-clone`)
-      )
-        return;
-      let f = u.tabSourceWindow ?? u,
-        p = a.bn(crypto.randomUUID()),
-        m,
-        h;
-      if (d == null) {
-        let e = this.ensureThreadStateForCommand(f.owner, i, p);
-        if (e == null) return;
-        let t = rW(l.serializedPageState),
-          n = this.materializeThreadPageState(
-            f,
-            e,
-            t == null
-              ? { kind: `fresh`, page: { title: l.title, url: l.pendingUrl || l.url } }
-              : { kind: `cold-restore`, snapshot: structuredClone(t) },
-          );
-        n.errorPagesByUrl = new Map(l.errorPagesByUrl);
-      } else {
-        if (((h = d.clone()), h.isDestroyed())) return;
-        if (!WX(h)) throw (h.close(), Error(`Owl history clone cannot be adopted by a webview`));
-        m = GX(
-          f,
-          h,
-          { browserTabId: p, conversationId: i },
-          { navigation: s, errorPagesByUrl: new Map(l.errorPagesByUrl) },
-        );
-      }
-      this.windowManager.sendMessageToWebContents(f.owner, {
-        type: `open-browser-tab`,
-        active: t,
-        browserHostDisplayName: n,
-        browserTabId: p,
-        conversationId: i,
-        cwd: o,
-        initialUrl: h == null ? void 0 : l.url,
-        adoptionLease: m,
-        adoptedWebContentsId: h?.id,
-        insertToRightOfTabId: r,
-        source: `manual`,
-      });
-    }
-    goForward(e, t, n) {
-      this.navigateCurrentPageHistory(e, t, `forward`, n);
-    }
-    getActiveVisiblePageForWindow(e) {
-      if (e.isDestroyed()) return null;
-      let t = this.windows.get(e.id) ?? null,
-        n = t?.activeConversationId ?? null,
-        r = t?.activeBrowserTabId ?? null;
-      if (t == null || n == null || r == null) return null;
-      let i = hX(t, n, r),
-        a = i?.page ?? null;
-      return i == null || !i.visible || i.bounds == null || a?.view.webContents == null
-        ? null
-        : { conversationId: n, page: a, threadState: i, windowState: t };
-    }
-    getVisiblePageForWebContents(e, t) {
-      let n = this.browserPageHostLifecycle.findPageStateForWebContentsId(t.id);
-      return n == null ||
-        n.windowState.window !== e ||
-        !n.threadState.presented ||
-        !n.threadState.visible ||
-        n.threadState.bounds == null
-        ? null
-        : n;
-    }
-    getReloadTargetForWindow(e, t) {
-      return (
-        (t == null ? null : this.getVisiblePageForWebContents(e, t)) ??
-        this.getActiveVisiblePageForWindow(e)
-      );
-    }
-    canReloadActiveVisiblePage(e, t = null) {
-      return this.getReloadTargetForWindow(e, t) != null;
-    }
-    getFocusedVisibleBrowserTabPanel(e, t) {
-      if (t == null) return null;
-      let n = this.getVisiblePageForWebContents(e, t);
-      return n == null
-        ? null
-        : mU(
-            this.windowManager.getAppShellShortcutState(n.windowState.owner.id),
-            n.conversationId,
-            n.threadState.browserTabId,
-            hU(n.threadState.hostKind),
-          );
-    }
-    runFocusedVisiblePageCommand(e, t, n) {
-      let r = t == null ? null : this.getVisiblePageForWebContents(e, t),
-        i = r == null ? null : hU(r.threadState.hostKind),
-        a =
-          r == null
-            ? null
-            : this.windowManager.getAppShellShortcutState(r.windowState.owner.id)?.focusArea,
-        o = r;
-      if (
-        (a != null &&
-          !((i === `bottom` && a === `bottom-panel`) || (i === `right` && a === `right-panel`)) &&
-          (o = null),
-        o == null)
-      )
-        return !1;
-      let {
-        conversationId: s,
-        page: c,
-        threadState: { browserTabId: u },
-        windowState: { owner: d },
-      } = o;
-      switch (n.type) {
-        case `copy-url`:
-          (l.clipboard.writeText(QU(c)),
-            this.windowManager.sendMessageToWebContents(d, {
-              type: `browser-sidebar-url-copied`,
-              conversationId: s,
-              browserTabId: u,
-            }));
-          break;
-        case `find-next`:
-          this.findNext(d, s, u);
-          break;
-        case `find-previous`:
-          this.findPrevious(d, s, u);
-          break;
-        case `go-back`:
-          this.goBack(d, s, u);
-          break;
-        case `go-forward`:
-          this.goForward(d, s, u);
-          break;
-        case `open-find`:
-          (d.focus(), this.openFind(d, s, u));
-          break;
-        case `reset-zoom`:
-          this.resetZoom(d, s, u);
-          break;
-        case `step-zoom`:
-          this.stepZoom(d, s, n.delta, u);
-      }
-      return !0;
-    }
-    closeFocusedVisibleBrowserTab(e, t) {
-      if (t == null) return !1;
-      let n = this.getVisiblePageForWebContents(e, t);
-      if (n == null) return !1;
-      let r = pU(
-        this.windowManager.getAppShellShortcutState(n.windowState.owner.id),
-        n.conversationId,
-        n.threadState.browserTabId,
-        hU(n.threadState.hostKind),
-      );
-      return r != null && (this.windowManager.sendMessageToWebContents(n.windowState.owner, r), !0);
-    }
-    reloadActiveVisiblePage(e, t = null) {
-      this.reloadActiveVisiblePageWithOptions(e, {}, t);
-    }
-    reloadActiveVisiblePageWithOptions(e, t = {}, n = null) {
-      let r = this.getReloadTargetForWindow(e, n);
-      r != null &&
-        this.reload(r.windowState.owner, r.conversationId, t, r.threadState.browserTabId);
-    }
-    reloadOpenPages() {
-      for (let { owner: e, threads: t } of this.windows.values())
-        for (let { browserTabId: n, conversationId: r, page: i } of t.values())
-          i?.view.webContents != null && this.reload(e, r, void 0, n);
-    }
-    async clearBrowsingData(e) {
-      let t = this.getBrowserSession();
-      if (t == null) throw Error(DZ);
-      await Zc(t, e);
-    }
-    scroll(e, t, r, i) {
-      let a = this.getPageState(e, t, i)?.view.webContents ?? null;
-      a != null &&
-        ZZe(a, r).catch((e) => {
-          (this.logger().warning(`failed to scroll browser sidebar page`, {
-            safe: { conversationId: t },
-            sensitive: { error: e },
-          }),
-            this.errorReporter.reportNonFatal(e instanceof Error ? e : n.Zo(e), {
-              kind: `browser-sidebar-scroll`,
-            }));
-        });
-    }
-    runPageCommand(e, t, n) {
-      return RZe(
-        this.windowManager,
-        this,
-        e,
-        () => this.getCurrentPageCommandContext(e, t.conversationId, t.browserTabId),
-        t,
-        n,
-      );
-    }
-    openFind(e, t, n) {
-      let r = this.ensureThreadCommandContext(e, t, n);
-      r != null && sq(this.windowManager, r.windowState.owner, t, r.threadState);
-    }
-    openSiteInfo(e, t, n, r, i) {
-      let a = this.getPageState(e, t, n)?.view.webContents;
-      return zZe({ anchorBounds: r, origin: e, siteUrl: i, webContents: a });
-    }
-    setFindQuery(e, t, n, r) {
-      let i = this.ensureThreadCommandContext(e, t, r);
-      i != null && cq(this.windowManager, i.windowState.owner, t, i.threadState, n);
-    }
-    findNext(e, t, n) {
-      let r = this.ensureThreadStateForCommand(e, t, n);
-      r != null && lq(r);
-    }
-    findPrevious(e, t, n) {
-      let r = this.ensureThreadStateForCommand(e, t, n);
-      r != null && uq(r);
-    }
-    closeFind(e, t, n) {
-      let r = this.getCurrentWindowState(e);
-      if (r == null) return;
-      let i = hX(r, t, n);
-      i != null && fq(this.windowManager, r.owner, t, i);
-    }
-    reload(e, t, { ignoreCache: n = !1 } = {}, r) {
-      let i = this.getCurrentPageCommandContext(e, t, r);
-      if (i == null) return;
-      let { page: a, threadState: o, windowState: s } = i;
-      if ((fq(this.windowManager, s.owner, t, o), a.loadError != null)) {
-        this.navigatePageToUrl(a, a.loadError.failedUrl);
-        return;
-      }
-      if (a.url.length === 0 && a.pendingUrl.length > 0) {
-        if ((this.navigatePageToUrl(a, a.pendingUrl), a.view.webContents == null)) {
-          let n = this.getThreadState(e, t, r);
-          n != null && this.syncThreadStateFromOrigin(e, t, n);
-        }
-        return;
-      }
-      if ((sW(a), n)) {
-        a.view.webContents?.reloadIgnoringCache();
-        return;
-      }
-      a.view.webContents?.reload();
-    }
-    reset(e, t, n) {
-      let r = this.ensureThreadStateForCommand(e, t, n);
-      if (r == null) return;
-      let i = this.ensureCurrentWindowState(e);
-      if (i == null) return;
-      (this.comments.close(e, t, r.browserTabId),
-        (r.pendingBrowserUsePanelOpen = !1),
-        (r.pendingCommentModeActivation = null),
-        (r.commentModeBlockCheckUrl = null),
-        (r.commentModeBlockCheckRequestId += 1),
-        this.browserPageSnapshots.deleteAndFlush(r),
-        fq(this.windowManager, i.owner, t, r));
-      let a = this.browserPageHostLifecycle.isBrowserUseManagedBrowserTab(t, r.browserTabId);
-      (r.page != null && this.browserPageHostLifecycle.disposePage(r.page),
-        this.browserPageHostLifecycle.cancelPendingWebviewAttaches(i, r),
-        (r.page = null),
-        (r.isBrowserUsePage = !1),
-        (r.browserUseTabLifetime = `persistent`),
-        (r.isBrowserUseNavigationRestrictionActive = !1),
-        (r.snapshot = {
-          ...pX(),
-          areAnnotationMarkersVisible: r.snapshot.areAnnotationMarkersVisible,
-        }),
-        a &&
-          this.setBrowserUseActiveForRoute(
-            { conversationId: t, windowId: oX(i.window.id) },
-            !1,
-            r.browserTabId,
-          ),
-        this.syncThreadState(i, t, r));
-    }
-    stop(e, t, n) {
-      let r = this.getPageState(e, t, n);
-      r && (sW(r), (r.pendingNavigationUsage = null), r.view.webContents?.stop());
-    }
-    getCurrentPageWebContents(e, t, n) {
-      return this.getCurrentPageCommandContext(e, t, n)?.page.view.webContents;
-    }
-    getExtensionActionMenuTarget(e, t, n) {
-      let r = this.getCurrentPageCommandContext(e, t, n),
-        i = r?.page.view.webContents;
-      return {
-        webContents: i,
-        allowHiddenBlankTab: OZe(
-          this.getCurrentWindowState(e),
-          r,
-          i == null ? void 0 : this.browserPageHostLifecycle.attachedWebviewHosts.get(i),
-        ),
-      };
-    }
-    async captureTabThumbnail(e, t, n) {
-      let r = () => this.getCurrentPageCommandContext(e, t, n),
-        i = r();
-      if (i == null) return null;
-      let { threadState: a, windowState: o } = i,
-        s = o.rendererInstanceId;
-      return HZe(a, () => {
-        let e = r();
-        return e?.threadState === a && e.windowState === o && o.rendererInstanceId === s;
-      });
-    }
-    getWebMcpInspectorData(e, t, n) {
-      let r = this.getPageState(e, t, n);
-      return r == null ? null : { tools: r.webMcpTools };
-    }
-    setAudioMuted(e, t, n, r) {
-      let i = this.getCurrentPageCommandContext(e, t, n),
-        a = i?.page.view.webContents;
-      i == null ||
-        a == null ||
-        a.isDestroyed() ||
-        (a.setAudioMuted(r), this.syncThreadState(i.windowState, t, i.threadState));
-    }
-    print(e, t, n) {
-      let r = this.getCurrentPageCommandContext(e, t, n);
-      if (r == null) return;
-      let i = r.page.view.webContents;
-      i == null || i.isDestroyed() || i.print();
-    }
-    suspend(e, t, n, r) {
-      let i = this.getCurrentPageCommandContext(e, t, r);
-      return i != null && this.browserPageHostLifecycle.suspendPage(i.threadState, n);
-    }
-    browserWebviewDestroyed(e, t, n, r) {
-      let i = this.getCurrentWindowState(e);
-      if (i == null) return;
-      let a = hX(i, t, n) ?? this.browserPageHostLifecycle.findThreadStateForPendingTeardown(i, r);
-      a != null && this.browserPageHostLifecycle.finalizeThreadTeardown(i, a.conversationId, a, r);
-    }
-    registerWebviewHostSession(e, t) {
-      let n = this.ensureCurrentWindowState(e);
-      return n != null && this.browserPageHostLifecycle.registerRendererSession(n, t);
-    }
-    registerWebviewHost(e, t, n, r, i, a) {
-      let o = this.ensureCurrentWindowState(e);
-      return o != null && this.browserPageHostLifecycle.registerHost(o, t, n, r, i, a);
-    }
-    async moveTabToWindow(e) {
-      let t = this.ensureCurrentWindowState(e.sourceWindow.webContents),
-        n = this.ensureCurrentWindowState(e.destinationWindow.webContents);
-      if (
-        (t != null &&
-          n != null &&
-          this.siteAnnotationPermissions.cancel(
-            hX(t, e.content.conversationId, e.content.browserTabId)?.page?.view.webContents,
-          ),
-        t == null || n == null)
-      )
-        return `not-moved`;
-      let r = await this.browserPageHostLifecycle.transferToWindow(t, n, e);
-      return (r === `moved` && this.permissionPrompts.transferPresentation(t, n, e.content), r);
-    }
-    setZoomPercent(e, t, r, i) {
-      let a = this.ensureThreadStateForCommand(e, t, i);
-      a != null && this.setThreadZoomPercent(e, t, a, n.Yc(r));
-    }
-    stepZoom(e, t, r, i) {
-      let a = this.ensureThreadStateForCommand(e, t, i);
-      a != null && this.setThreadZoomPercent(e, t, a, n.Zc(a.snapshot.zoomPercent, r));
-    }
-    resetZoom(e, t, n) {
-      let r = this.ensureThreadStateForCommand(e, t, n);
-      r != null && this.setThreadZoomPercent(e, t, r, 100);
-    }
-    navigate(e, t, n, r, i, a, o) {
-      let s = this.ensureThreadCommandContext(e, t, a);
-      if (s == null) return;
-      let { threadState: c, windowState: l } = s,
-        u = this.browserPersistence.getPagePersistence(l.window, o);
-      if (
-        GXe(this.windowManager, l, c, n, this.isRestrictedBrowserNavigation.bind(this)) ||
-        !this.browserPersistence.reconcileBrowserStorageId(l, c, u)
-      )
-        return;
-      r === `browser_use` && (c.isBrowserUsePage = !0);
-      let d =
-        c.page ??
-        this.ensureThreadPageForCommand(
-          l.owner,
-          t,
-          a,
-          { title: c.snapshot.title, url: c.snapshot.url },
-          u,
-        );
-      d &&
-        (fq(this.windowManager, l.owner, t, c),
-        iK(QU(d), n) || this.comments.dismiss(l.owner, t, c.browserTabId, c),
-        this.navigatePageToUrl(d, n, r, i),
-        d.view.webContents ?? this.syncThreadStateFromOrigin(l.owner, t, c));
-    }
-    async captureScreenshotToClipboard(e, t, n) {
-      this.getThreadState(e, t, n)?.isAnnotationModeEnabled !== !1 &&
-        (await XZe({
-          browserTabId: n,
-          conversationId: t,
-          errorReporter: this.errorReporter,
-          origin: e,
-          pageState: this.getPageState(e, t, n),
-          windowManager: this.windowManager,
-        }));
-    }
-    refreshCursor(e, t, n) {
-      let r = this.getCurrentPageCommandContext(e, t, n);
-      r != null && LHe(r.windowState.window, r.threadState.bounds, r.page.view.webContents);
-    }
-    setThreadZoomPercent(e, t, n, r) {
-      let i = n.snapshot.zoomPercent !== r;
-      if (
-        (i && (n.snapshot = { ...n.snapshot, zoomPercent: r }),
-        n.page != null &&
-          (this.syncPageZoomPercent(n.page, r), this.syncRuntimeStateToPage(n.page, n)),
-        !i)
-      )
-        return;
-      let a = l.BrowserWindow.fromWebContents(e);
-      if (a == null || a.isDestroyed()) return;
-      let o = this.ensureWindowState(a, e);
-      this.syncThreadState(o, t, n);
-    }
-    syncPageZoomPercent(e, t) {
-      let r = e.view.webContents;
-      r == null || r.isDestroyed() || r.setZoomFactor(n.Xc(t));
-    }
-    queuePageDeviceMetricsSync(e, t) {
-      e.deviceMetricsSyncVersion += 1;
-      let n = e.deviceMetricsSyncVersion;
-      this.queuePageDebuggerSync(e, async () => {
-        n === e.deviceMetricsSyncVersion && (await PHe(e, t));
-      });
-    }
-    queuePageDebuggerSync(e, t) {
-      return ((e.debuggerSync = e.debuggerSync.catch(() => void 0).then(t)), e.debuggerSync);
-    }
-    queuePageColorSchemeSync(e, t, n) {
-      return this.queuePageDebuggerSync(e, async () => {
-        await GU(t, n);
-      });
-    }
+    goBack(...args) { return this.pageCommandController.goBack(...args); }
+    cloneTab(...args) { return this.pageCommandController.cloneTab(...args); }
+    goForward(...args) { return this.pageCommandController.goForward(...args); }
+    getActiveVisiblePageForWindow(...args) { return this.pageCommandController.getActiveVisiblePageForWindow(...args); }
+    getVisiblePageForWebContents(...args) { return this.pageCommandController.getVisiblePageForWebContents(...args); }
+    getReloadTargetForWindow(...args) { return this.pageCommandController.getReloadTargetForWindow(...args); }
+    canReloadActiveVisiblePage(...args) { return this.pageCommandController.canReloadActiveVisiblePage(...args); }
+    getFocusedVisibleBrowserTabPanel(...args) { return this.pageCommandController.getFocusedVisibleBrowserTabPanel(...args); }
+    runFocusedVisiblePageCommand(...args) { return this.pageCommandController.runFocusedVisiblePageCommand(...args); }
+    closeFocusedVisibleBrowserTab(...args) { return this.pageCommandController.closeFocusedVisibleBrowserTab(...args); }
+    reloadActiveVisiblePage(...args) { return this.pageCommandController.reloadActiveVisiblePage(...args); }
+    reloadActiveVisiblePageWithOptions(...args) { return this.pageCommandController.reloadActiveVisiblePageWithOptions(...args); }
+    reloadOpenPages(...args) { return this.pageCommandController.reloadOpenPages(...args); }
+    clearBrowsingData(...args) { return this.pageCommandController.clearBrowsingData(...args); }
+    scroll(...args) { return this.pageCommandController.scroll(...args); }
+    runPageCommand(...args) { return this.pageCommandController.runPageCommand(...args); }
+    openFind(...args) { return this.pageCommandController.openFind(...args); }
+    openSiteInfo(...args) { return this.pageCommandController.openSiteInfo(...args); }
+    setFindQuery(...args) { return this.pageCommandController.setFindQuery(...args); }
+    findNext(...args) { return this.pageCommandController.findNext(...args); }
+    findPrevious(...args) { return this.pageCommandController.findPrevious(...args); }
+    closeFind(...args) { return this.pageCommandController.closeFind(...args); }
+    reload(...args) { return this.pageCommandController.reload(...args); }
+    reset(...args) { return this.pageCommandController.reset(...args); }
+    stop(...args) { return this.pageCommandController.stop(...args); }
+    getCurrentPageWebContents(...args) { return this.pageCommandController.getCurrentPageWebContents(...args); }
+    getExtensionActionMenuTarget(...args) { return this.pageCommandController.getExtensionActionMenuTarget(...args); }
+    captureTabThumbnail(...args) { return this.pageCommandController.captureTabThumbnail(...args); }
+    getWebMcpInspectorData(...args) { return this.pageCommandController.getWebMcpInspectorData(...args); }
+    setAudioMuted(...args) { return this.pageCommandController.setAudioMuted(...args); }
+    print(...args) { return this.pageCommandController.print(...args); }
+    suspend(...args) { return this.pageCommandController.suspend(...args); }
+    browserWebviewDestroyed(...args) { return this.pageCommandController.browserWebviewDestroyed(...args); }
+    registerWebviewHostSession(...args) { return this.pageCommandController.registerWebviewHostSession(...args); }
+    registerWebviewHost(...args) { return this.pageCommandController.registerWebviewHost(...args); }
+    async moveTabToWindow(...args) { return this.pageCommandController.moveTabToWindow(...args); }
+    setZoomPercent(...args) { return this.pageCommandController.setZoomPercent(...args); }
+    stepZoom(...args) { return this.pageCommandController.stepZoom(...args); }
+    resetZoom(...args) { return this.pageCommandController.resetZoom(...args); }
+    navigate(...args) { return this.pageCommandController.navigate(...args); }
+    async captureScreenshotToClipboard(...args) { return this.pageCommandController.captureScreenshotToClipboard(...args); }
+    refreshCursor(...args) { return this.pageCommandController.refreshCursor(...args); }
+    setThreadZoomPercent(...args) { return this.pageCommandController.setThreadZoomPercent(...args); }
+    syncPageZoomPercent(...args) { return this.pageCommandController.syncPageZoomPercent(...args); }
+    queuePageDeviceMetricsSync(...args) { return this.pageCommandController.queuePageDeviceMetricsSync(...args); }
+    queuePageDebuggerSync(...args) { return this.pageCommandController.queuePageDebuggerSync(...args); }
+    queuePageColorSchemeSync(...args) { return this.pageCommandController.queuePageColorSchemeSync(...args); }
+
     setInteractionMode(e, t, r, i, a) {
       let o = this.ensureThreadCommandContext(e, t, i);
       if (o == null) return;
@@ -118409,385 +117931,6 @@ var $Ze = class {
               initiator: `window_open`,
             });
           },
-          owner: t,
-          prepareWebviewAttach: (e, t, n) =>
-            this.browserPersistence.prepareWebviewAttach(i, e, t, n),
-          preloadPath: EZ,
-          recordDebugEvent: (e) => {
-            this.browserSessionRegistry.recordDebugEvent(e);
-          },
-          state: i,
-          windowId: n,
-        })),
-        this.windows.set(n, i),
-        this.browserSessionRegistry.registerWindow({ ownerWebContentsId: t.id, windowId: n }),
-        this.browserPageSnapshots.registerWindowShutdown(
-          i,
-          () => {
-            for (let e of i.threads.values())
-              e.page != null &&
-                this.browserPageHostLifecycle.reportIncompleteNavigationOnClose(
-                  e.page,
-                  `window-closed`,
-                );
-          },
-          () => {
-            this.disposeWindowState(n);
-          },
-        ),
-        i
-      );
-    }
-    ensureThreadState(e, t, n) {
-      let r = { browserTabId: n, conversationId: t.conversationId },
-        i = qU(r),
-        a = e.threads.get(i);
-      if (a) return a;
-      let o = vX({
-        annotationModeEnabled: t.annotationModeEnabled ?? !0,
-        browserStorageId: PG(r),
-        browserTabId: n,
-        conversationId: t.conversationId,
-        hostKind: t.hostKind ?? null,
-        emulatedViewportSize: t.emulatedViewportSize ?? null,
-        cwd: t.cwd ?? null,
-        isBrowserUsePage: !1,
-        ownerRoutePath: _X(e, t.conversationId),
-        runtimeIntlConfig: t.runtimeIntlConfig,
-      });
-      return (
-        this.tabBudget.markTabActivity(o),
-        e.threads.set(i, o),
-        fX(this.browserSessionRegistry, this.windowManager, this.windows, e, o),
-        o
-      );
-    }
-    getPageLifecycleHelpers() {
-      return {
-        admitBrowserTab: () => this.admitBrowserTab(`window-open`),
-        areSiteAnnotationFeaturesEnabled: this.siteAnnotationFeatures.isEnabled.bind(
-          this.siteAnnotationFeatures,
-        ),
-        browserPagePreloadPath: EZ,
-        getSiteBootstrapToken: this.getSiteBootstrapToken,
-        siteBootstrapSignal: this.siteBootstrapController.signal,
-        browserSessionRegistry: this.browserSessionRegistry,
-        comments: this.comments,
-        dismissCommentEditorForCommittedNavigation:
-          this.dismissCommentEditorForCommittedNavigation.bind(this),
-        enforceDetachedPageBudget: this.tabBudget.enforceDetachedPageBudget.bind(this.tabBudget),
-        errorReporter: this.errorReporter,
-        finalizeThreadTeardown: this.browserPageHostLifecycle.finalizeThreadTeardown.bind(
-          this.browserPageHostLifecycle,
-        ),
-        finishPageAttach: this.finishPageAttach.bind(this),
-        findPageForRuntimeSender: this.findPageStateForRuntimeSender.bind(this),
-        getThreadStateForWindow: hX,
-        goBack: this.goBack.bind(this),
-        goForward: this.goForward.bind(this),
-        isBrowserUseManagedBrowserTab:
-          this.browserPageHostLifecycle.isBrowserUseManagedBrowserTab.bind(
-            this.browserPageHostLifecycle,
-          ),
-        isDefaultBrowser: this.isDefaultBrowser,
-        isRestrictedBrowserNavigation: this.isRestrictedBrowserNavigation.bind(this),
-        loadBrowserErrorPage: this.loadBrowserErrorPage.bind(this),
-        navigatePageToUrl: this.navigatePageToUrl.bind(this),
-        notifyBrowserNavigationUsage: kZe.bind(
-          null,
-          this.windowManager,
-          this.getPreferredWindowStateForConversation.bind(this),
-          this.getPageWindowState.bind(this),
-        ),
-        onBrowserStateChanged: () => {
-          (this.onBrowserStateChanged(), this.iabTabMentions.notifyInvalidated());
-        },
-        deletePersistedPageState: this.browserPageSnapshots.deleteAndFlush.bind(
-          this.browserPageSnapshots,
-        ),
-        openBrowserExternalUrl: this.openBrowserExternalUrl.bind(this),
-        openBrowserUrlExternally: this.openBrowserUrlExternally.bind(this),
-        getOwnerCommandAccelerators: (e) => this.ownerCommandAccelerators[e] ?? [],
-        queuePageDeviceMetricsSync: this.queuePageDeviceMetricsSync.bind(this),
-        reload: (e, t, n, r) => {
-          this.reload(e, t, n == null ? void 0 : { ignoreCache: n }, r);
-        },
-        setDesignModifierPressed: this.setDesignModifierPressed.bind(this),
-        setAnnotationPresentation: this.setAnnotationPresentation.bind(this),
-        setInteractionMode: this.setInteractionMode.bind(this),
-        startCommentAtPoint: this.startCommentAtPoint.bind(this),
-        startDesignEditAtPoint: this.startDesignEditAtPoint.bind(this),
-        syncPageZoomPercent: this.syncPageZoomPercent.bind(this),
-        syncRuntimeStateToPage: this.syncRuntimeStateToPage.bind(this),
-        syncThreadState: this.syncThreadState.bind(this),
-        updateThreadSessionState: this.browserPageHostLifecycle.updateThreadSessionState.bind(
-          this.browserPageHostLifecycle,
-        ),
-        windowManager: this.windowManager,
-      };
-    }
-    materializeThreadPageState(e, t, n) {
-      return cZe(this.getPageLifecycleHelpers(), e, t, n);
-    }
-    async finishPageAttach(e, t, n, r) {
-      (await this.queuePageColorSchemeSync(t, n, r),
-        !(t.view.webContents?.id !== n.id || n.isDestroyed()) &&
-          this.resolveBrowserUseOpenRequests(e));
-    }
-    isRestrictedBrowserNavigation(e, t, n = `mainFrame`) {
-      let r = e == null ? null : this.browserPageHostLifecycle.findPageStateForWebContentsId(e);
-      return (
-        (r == null || $U(r.page, TU(t)) == null) &&
-        this.browserUseNavigationRestriction.isRestrictedForWebContentsId(e, t, { resourceType: n })
-      );
-    }
-    navigatePageToUrl(e, t, n, r) {
-      if (lZe(this.getPageLifecycleHelpers(), e, t, n, r)) return !0;
-      let i = e.view.webContents;
-      if (i == null) return !1;
-      let a = this.browserPageHostLifecycle.findPageStateForWebContentsId(i.id);
-      return (
-        a != null && this.syncThreadState(a.windowState, a.conversationId, a.threadState),
-        !1
-      );
-    }
-    syncThreadState(e, t, n, r, i) {
-      this.iabTabMentions.trackSnapshotUpdate(n, () => {
-        (this.refreshCommentModeBlockStatus(e, n),
-          uZe(this.getPageLifecycleHelpers(), e, t, n, r, i));
-      });
-    }
-    syncThreadStateFromOrigin(e, t, n) {
-      if (n.page == null) return;
-      let r = this.getCurrentWindowState(e);
-      r != null && this.syncThreadState(r, t, n);
-    }
-    dismissCommentEditor(e, t, n) {
-      let r = this.getThreadState(e, t, n);
-      r != null && this.comments.dismiss(e, t, n, r);
-    }
-    dismissCommentEditorForCommittedNavigation(e, t, n) {
-      let r = hX(e, t.conversationId, t.browserTabId);
-      r?.snapshot.interactionMode !== `comment` ||
-        iK(t.url, n) ||
-        this.comments.dismissForCommittedNavigation(e.owner, t.conversationId, t.browserTabId, r);
-    }
-    syncRuntimeStateToPage(e, t) {
-      let n = e.view.webContents;
-      n == null ||
-        n.isDestroyed() ||
-        this.comments.syncRuntimeStateToPage(
-          this.browserPageHostLifecycle.findPageStateForWebContentsId(n.id)?.windowState.owner ?? n,
-          e.conversationId,
-          n,
-          t,
-        );
-    }
-    syncCommentSnapshot(e, t, n) {
-      let r = this.getCurrentWindowState(e);
-      (r != null && this.syncThreadState(r, t, n),
-        n.page != null && this.syncRuntimeStateToPage(n.page, n));
-    }
-    loadBrowserErrorPage(e, t, n, { failedUrl: r, kind: i, loadError: a }) {
-      fZe(this.getPageLifecycleHelpers(), e, t, n, { failedUrl: r, kind: i, loadError: a });
-    }
-    openBrowserExternalUrl({ initiatorUrl: e, pageState: t, url: n, webContents: r }) {
-      if (!FU(t.loadError, r.getURL()) || e !== t.loadError?.pageUrl) return !1;
-      let i = DHe(n);
-      return i == null || !Ge(i) ? !1 : (this.openBrowserUrlExternally(t.conversationId, i), !0);
-    }
-    openBrowserUrlExternally(e, t) {
-      IH({
-        request: {
-          conversationId: e,
-          url: t,
-          initiator: `open_in_browser_bridge`,
-          openTarget: `external-browser`,
-        },
-      });
-    }
-    handleRuntimeMouseNavigation(e, t) {
-      let n = this.findPageStateForRuntimeSender(e);
-      if (!(n == null || n.owner.isDestroyed()))
-        switch (t.direction) {
-          case `back`:
-            this.goBack(n.owner, n.page.conversationId, n.page.browserTabId);
-            break;
-          case `forward`:
-            this.goForward(n.owner, n.page.conversationId, n.page.browserTabId);
-        }
-    }
-    findPageStateForRuntimeSender(e) {
-      for (let t of this.windows.values())
-        for (let n of t.threads.values()) {
-          let r = n.page;
-          if (r?.view.webContents?.id === e.id)
-            return { owner: t.owner, page: r, threadState: n, windowState: t };
-        }
-      return null;
-    }
-    findPageStateForPageKey(e) {
-      for (let t of this.windows.values())
-        for (let n of t.threads.values()) {
-          let r = n.page;
-          if (
-            r != null &&
-            KU((t.tabSourceWindow ?? t).owner.id, n.conversationId, n.browserTabId) === e
-          )
-            return { conversationId: n.conversationId, page: r, threadState: n, windowState: t };
-        }
-      return null;
-    }
-    onWebNotificationClicked(e) {
-      if (e.isDestroyed()) return;
-      let t = this.browserPageHostLifecycle.findPageStateForWebContentsId(e.id);
-      t != null &&
-        t.page.view.webContents === e &&
-        jX({
-          stealFocus: !0,
-          threadState: t.threadState,
-          windowManager: this.windowManager,
-          windowState: t.windowState,
-        }) &&
-        this.onAppEntrySource?.(
-          { channel: `push_notification`, source: `embedded_browser_notification` },
-          t.windowState.owner,
-        );
-    }
-    navigateCurrentPageHistory(e, t, n, r) {
-      let i = this.getCurrentPageCommandContext(e, t, r);
-      if (i == null) return;
-      let { page: a, threadState: o, windowState: s } = i,
-        c = a.view.webContents;
-      if (c != null && (n !== `back` || c.canGoBack()) && (n !== `forward` || c.canGoForward())) {
-        if ((fq(this.windowManager, s.owner, t, o), sW(a), n === `back`)) {
-          c.goBack();
-          return;
-        }
-        c.goForward();
-      }
-    }
-    getCurrentPageCommandContext(e, t, n) {
-      return rXe(this.getCurrentWindowState(e), t, n, this.getPageWindowState.bind(this));
-    }
-    closeActiveExtensionActionMenu(e) {
-      if (e.activeConversationId == null || e.activeBrowserTabId == null) return;
-      let t = this.getCurrentPageCommandContext(
-        e.owner,
-        e.activeConversationId,
-        e.activeBrowserTabId,
-      )?.page.view.webContents;
-      t != null && !t.isDestroyed() && t.closeExtensionActionContextMenu();
-    }
-    ensureThreadCommandContext(e, t, n) {
-      return iXe(
-        this.ensureCurrentWindowState(e),
-        t,
-        n,
-        this.getPageWindowState.bind(this),
-        this.ensureThreadStateForWindow.bind(this),
-        this.tabBudget.markTabSelected.bind(this.tabBudget),
-      );
-    }
-    ensureCurrentWindowState(e) {
-      let t = this.getCurrentWindow(e);
-      return t == null ? null : this.ensureWindowState(t, e);
-    }
-    getCurrentWindowState(e) {
-      let t = this.getCurrentWindow(e);
-      return t == null ? null : (this.windows.get(t.id) ?? null);
-    }
-    getCurrentWindow(e) {
-      let t = l.BrowserWindow.fromWebContents(e);
-      return t == null || t.isDestroyed() ? null : t;
-    }
-    getPageState(e, t, n) {
-      return this.getThreadState(e, t, n)?.page ?? null;
-    }
-    getCurrentPageUrl(e, t, n) {
-      let r = this.getThreadState(e, t, n);
-      return r?.page == null ? null : r.snapshot.url;
-    }
-    getThreadState(e, t, n) {
-      let r = this.getCurrentWindowState(e);
-      return r == null ? null : hX(r, t, n);
-    }
-    ensureThreadStateForCommand(e, t, n) {
-      return this.ensureThreadCommandContext(e, t, n)?.threadState ?? null;
-    }
-    ensureThreadStateForWindow(e, t, n, r = {}) {
-      return oXe({
-        browserSessionRegistry: this.browserSessionRegistry,
-        browserTabId: n,
-        conversationId: t,
-        options: r,
-        tabBudget: this.tabBudget,
-        windowManager: this.windowManager,
-        windows: this.windows,
-        windowState: e,
-      });
-    }
-    refreshCommentModeBlockStatus(e, t) {
-      PGe({
-        blocklistLookup: this.commentModeBlocklistLookup,
-        comments: this.comments,
-        sendPendingCommentModeRequestToRuntime: tq,
-        syncRuntimeStateToPage: (e, t) => {
-          this.syncRuntimeStateToPage(e, t);
-        },
-        syncThreadState: (e, t, n) => {
-          this.syncThreadState(e, t, n);
-        },
-        windowState: e,
-        threadState: t,
-      });
-    }
-    ensureThreadPageForCommand(e, t, n, r, i) {
-      let a = this.getPageState(e, t, n);
-      if (a != null) return a;
-      let o = this.ensureThreadStateForCommand(e, t, n);
-      if (o == null) return null;
-      let s = this.ensureCurrentWindowState(e);
-      return s == null || i?.restore === `required`
-        ? null
-        : (o.page ?? this.materializeThreadPageState(s, o, { kind: `fresh`, page: r }), o.page);
-    }
-    disposeThreadState(e, t, n) {
-      this.comments.close(e.owner, t, n.browserTabId);
-      let r = n.page;
-      (this.browserPageHostLifecycle.cancelPendingWebviewAttaches(e, n),
-        r != null &&
-          (this.browserPageHostLifecycle.disposePage(r),
-          this.browserPageHostLifecycle.isBrowserUseManagedBrowserTab(t, n.browserTabId) &&
-            this.browserSessionRegistry.recordPageClosed({
-              conversationId: t,
-              browserTabId: n.browserTabId,
-              windowId: oX((e.tabSourceWindow ?? e).window.id),
-            })),
-        n.isBrowserUseActive &&
-          this.setBrowserUseActiveForRoute(
-            { conversationId: t, windowId: oX((e.tabSourceWindow ?? e).window.id) },
-            !1,
-            n.browserTabId,
-          ));
-    }
-    disposeWindowState(e) {
-      let t = this.windows.get(e);
-      if (t) {
-        (t.isClosing || this.browserPageSnapshots.persistWindowBeforeShutdown(t),
-          (t.isClosing = !0),
-          this.browserUseOpenRequests.rejectForOwner(
-            t.owner,
-            Error(`The ChatGPT window closed while waiting for a Browser webview to attach`),
-          ));
-        for (let e of t.threads.values()) this.disposeThreadState(t, e.conversationId, e);
-        (t.disposeWindowListeners(),
-          t.disposeWebviewListeners(),
-          t.threads.clear(),
-          this.windows.delete(e),
-          this.tabBudget.handleWindowClosed(e),
-          this.lastSyncedWindowId === e && (this.lastSyncedWindowId = null),
-          this.browserSessionRegistry.handleWindowClosed(e));
       }
     }
     getDetachedWindowStates(e) {

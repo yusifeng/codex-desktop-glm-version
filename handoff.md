@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 tQe 的 page command/host orchestration 迁移至
+`src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
+reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger
+控制流，删除原 464 行；focused test 为 `scripts/test-main-browser-page-command-controller.mjs`（11 项）。
+
 本轮将 `Sat` hotkey-window presentation controller 及独占 support 带整体迁移至
 `src/main/main-app/hotkey/hotkey-window-controller.ts`，保留 home/thread 双窗、transition/generation、
 placement/bounds、drag/snap/haptic、mouse passthrough、route 与 dispose 生命周期，原 main 删除 993 行。

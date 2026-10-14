@@ -792,6 +792,14 @@ transition ack/timeout、placement/bounds、drag/snap/haptic、mouse passthrough
 `scripts/test-main-hotkey-window-controller.mjs` 覆盖 20 项 prewarm/open/toggle/route/pointer/dispose assertions，
 typecheck/build/verify 均通过。
 
+### 增量抽取：IAB page command/host controller
+
+R8/IAB 原 `tQe` 的 page command/host orchestration 已迁移至
+`src/main/main-app/browser-sidebar/browser-page-command-controller.ts`。新 controller 真实持有 history clone/back/forward、
+focused command routing、reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host registration/transfer、
+zoom/navigate/screenshot/debugger metrics 控制流，tQe 仅保留适配与委托。原连续业务区段删除 464 行。
+`scripts/test-main-browser-page-command-controller.mjs` 覆盖 11 项历史、焦点、缩放、快照、挂载与路由断言。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
 `vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit/Sat` 均已移出，cross-platform capture-request owner 也已真实接回。
