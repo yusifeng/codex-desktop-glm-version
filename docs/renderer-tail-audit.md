@@ -1,5 +1,7 @@
 # Renderer 尾部资产审计
 
+2026-10-15 A5 右侧文件预览终局复核：真实 route 为 `connected-file-preview-tab -> LibraryCloudFilePreview -> LibraryFilePreviewBody`。新增 `preview-render-model.ts`、`binary-preview-url.ts` 与 `provider-preview-policy.ts`，将发布 chunk `Gn/Kn/qn/ar` 中仍未物理迁出的显示分支接回：image 使用实际 URL 渲染，PDF bytes 生成并回收 object URL，HTML 使用 sandboxed `srcDoc` iframe，Markdown 接入 `MarkdownSurface`，JSON 使用 `LibraryJsonPreview`，text 使用可聚焦文本面，artifact 继续交给已有 `ArtifactTabContent`，Google Workspace provider-owned 预览使用 no-referrer sandbox iframe。loading/error/unsupported/40 MiB/missing-size/download 状态、AbortController、generation guard 与 stale completion suppression 均有真实 consumer。focused renderer 22、state 24、loader 15、artifact flow 86 项通过。至此右侧文件的“显示预览”专属 owner 可核验清零；原 chunk 剩余边界属于通用 composer/attachment materialization、favorite/breadcrumb 和共享 header 基础设施，不再是文件内容 renderer。
+
 2026-10-14 A5 文件预览内容批次：`library-cloud-file-preview` 已接入真实内容加载器。
 artifact/PDF 等二进制预览通过既有 `library-file-download` bytes reader，HTML/Markdown/Text
 通过 text reader，统一保留 AbortController、generation guard、过期请求抑制和错误状态；

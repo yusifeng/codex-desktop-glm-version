@@ -10,7 +10,7 @@ import "@rchunk/app-primary";
 import { a as ArtifactTabContent } from "@rchunk/artifact-tab-content-electron";
 import "@rchunk/editor-header";
 import "@rchunk/header-content-fade";
-import "@rchunk/surface";
+import * as SurfaceRuntime from "@rchunk/surface";
 import "@rchunk/lazy-version-history";
 import "@rchunk/use-chatgpt-composer-controller";
 import "@rchunk/right-panel-composer-overlay";
@@ -38,6 +38,9 @@ import {
   libraryPreviewContentKey,
   type LibraryPreviewContentState,
 } from "./preview-content-loader";
+import { createBinaryPreviewUrlController } from "./binary-preview-url";
+import { projectLibraryPreviewRenderModel } from "./preview-render-model";
+import { resolveProviderPreviewUrl } from "./provider-preview-policy";
 
 interface CloudFile {
   category?: string | null;
@@ -47,6 +50,7 @@ interface CloudFile {
   fileName: string;
   kind?: string | null;
   mimeType?: string | null;
+  provider?: string | null;
   requestHeaders?: Record<string, string>;
   sizeBytes?: number | null;
   sourceUrl?: string | null;
@@ -57,6 +61,7 @@ interface RouteCloudFile extends Record<string, unknown> {
   id: string;
   libraryArtifactType?: string | null;
   mimeType?: string | null;
+  provider?: string | null;
   name: string;
   requestHeaders?: Record<string, string>;
   sizeBytes?: number | null;
@@ -67,6 +72,7 @@ interface CloudFilePreviewProps {
   file?: CloudFile;
   imagePreviewIsError?: boolean;
   imagePreviewIsPending?: boolean;
+  googleWorkspaceIframePreviewEnabled?: boolean;
   isLoading?: boolean;
   item?: { cloudFile: RouteCloudFile };
   maxLocalTaskBytes?: number;
@@ -83,6 +89,7 @@ interface CloudFilePreviewProps {
 }
 let runtime: JsxRuntime | undefined;
 let reactRuntime: ReactRuntime | undefined;
+const MarkdownSurface = (SurfaceRuntime as unknown as { r?: (props: Record<string, unknown>) => unknown }).r ?? "pre";
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
 function react(): ReactRuntime { reactRuntime ??= getReactRuntime(); return reactRuntime; }
 
@@ -97,6 +104,7 @@ function normalizeFile(props: CloudFilePreviewProps): CloudFile {
     fileName: file.name,
     kind: file.libraryArtifactType,
     mimeType: file.mimeType,
+    provider: file.provider,
     requestHeaders: file.requestHeaders,
     sizeBytes: file.sizeBytes,
   };
@@ -104,6 +112,18 @@ function normalizeFile(props: CloudFilePreviewProps): CloudFile {
 
 function isLoadableKind(kind: LibraryPreviewKind): boolean {
   return kind === "artifact" || kind === "pdf" || kind === "html" || kind === "markdown" || kind === "text";
+}
+
+function useBinaryPreviewUrl(content: unknown, kind: LibraryPreviewKind): string | null {
+  const hooks = react();
+  const [url, setUrl] = hooks.useState<string | null>(null);
+  const [controller] = hooks.useState(() => createBinaryPreviewUrlController({
+    createObjectUrl: (bytes, mimeType) => URL.createObjectURL(new Blob([bytes as BlobPart], { type: mimeType })),
+    revokeObjectUrl: (value) => URL.revokeObjectURL(value),
+  }));
+  hooks.useEffect(() => controller.update(content, kind === "pdf" ? "application/pdf" : "application/octet-stream", setUrl),
+    [content, controller, kind]);
+  return url;
 }
 
 function useLoadedPreview(
@@ -193,10 +213,12 @@ function PreviewMessage(props: {
 
 function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
   const file = normalizeFile(props);
-  const providedPreview = props.preview ?? props.providerPreview?.content;
   const kind = props.previewKind ?? inferLibraryPreviewKind(file);
+  const providerPreviewUrl = resolveProviderPreviewUrl(file, props.googleWorkspaceIframePreviewEnabled === true);
+  const providedPreview = props.preview ?? props.providerPreview?.content ?? (kind === "image" ? file.downloadUrl : undefined);
   const loaded = useLoadedPreview(file, kind, providedPreview);
   const preview = loaded.status === "ready" ? loaded.content : undefined;
+  const binaryUrl = useBinaryPreviewUrl(preview, kind);
   const decision = resolveLibraryPreviewDecision({
     error: props.error ?? (loaded.status === "error" ? loaded.error : null),
     hasPreview: preview != null,
@@ -211,6 +233,15 @@ function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
   const download = handleDownload == null ? null : jsx().jsx("button", {
     onClick: handleDownload, type: "button", children: "Download file",
   });
+
+  if (providerPreviewUrl != null && props.providerPreview?.content == null && props.preview == null) {
+    return jsx().jsx("iframe", {
+      className: "library-file-preview-provider", "data-preview-renderer": "provider",
+      referrerPolicy: "no-referrer",
+      sandbox: "allow-downloads allow-forms allow-modals allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation",
+      src: providerPreviewUrl, title: file.fileName,
+    });
+  }
 
   if (decision.state === "hidden") return null;
   if (decision.state === "loading") {
@@ -249,11 +280,14 @@ function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
       title: "Preview not available",
     });
   }
-  if (decision.renderer === "artifact") {
+  const renderModel = projectLibraryPreviewRenderModel({
+    binaryUrl, content: preview, downloadUrl: file.downloadUrl, fileName: file.fileName, kind, renderer: decision.renderer,
+  });
+  if (renderModel.kind === "artifact") {
     return jsx().jsx("div", {
       "data-preview-renderer": "artifact",
       children: jsx().jsx(ArtifactTabContent, {
-        content: preview,
+        content: renderModel.content,
         kind: artifactKind(file.fileName),
         status: "ready",
         title: file.fileName,
@@ -262,17 +296,38 @@ function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
       }),
     });
   }
-  if (decision.renderer === "text-document") {
-    const content = typeof preview === "string" ? preview : String(preview ?? "");
-    const normalizedMime = file.mimeType?.split(";", 1)[0]?.trim().toLowerCase();
-    const isJson = file.fileName.toLowerCase().endsWith(".json") || normalizedMime === "application/json" || normalizedMime === "application/ld+json";
-    if (isJson) return jsx().jsx(LibraryJsonPreview, { content, fileName: file.fileName });
+  if (renderModel.kind === "pdf") {
+    return renderModel.source == null
+      ? jsx().jsx("div", { role: "status", children: "Loading PDF preview" })
+      : jsx().jsx("iframe", {
+          className: "library-file-preview-pdf", "data-preview-kind": "pdf",
+          "data-preview-renderer": renderModel.renderer, src: renderModel.source,
+          title: file.fileName,
+        });
+  }
+  if (renderModel.kind === "image") {
+    return jsx().jsx("div", { className: "library-file-preview-image", "data-preview-kind": "image", "data-preview-renderer": renderModel.renderer, children:
+      jsx().jsx("img", { alt: file.fileName, src: renderModel.source }) });
+  }
+  if (renderModel.kind === "html") {
+    return jsx().jsx("iframe", {
+      className: "library-file-preview-html", "data-preview-kind": "html", "data-preview-renderer": renderModel.renderer,
+      sandbox: "allow-forms allow-modals allow-popups allow-same-origin allow-scripts", srcDoc: renderModel.content,
+      title: file.fileName,
+    });
+  }
+  if (renderModel.kind === "markdown") {
+    return jsx().jsx("div", { className: "library-file-preview-markdown", "data-preview-kind": "markdown", "data-preview-renderer": renderModel.renderer,
+      children: jsx().jsx(MarkdownSurface, { enableMetadataPreview: true, markdown: renderModel.content }) });
+  }
+  if (renderModel.kind === "json") return jsx().jsx(LibraryJsonPreview, { content: renderModel.content, fileName: file.fileName });
+  if (renderModel.kind === "text") {
     return jsx().jsx("pre", {
       className: "library-file-preview-text",
       "data-preview-renderer": "text-document",
       dir: "ltr",
       tabIndex: 0,
-      children: content,
+      children: renderModel.content,
     });
   }
   return jsx().jsx("div", {
@@ -284,8 +339,9 @@ function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
 
 function LibraryCloudFilePreview(props: CloudFilePreviewProps): unknown {
   const file = normalizeFile(props);
-  const preview = props.preview ?? props.providerPreview?.content;
   const kind = props.previewKind ?? inferLibraryPreviewKind(file);
+  const providerPreviewUrl = resolveProviderPreviewUrl(file, props.googleWorkspaceIframePreviewEnabled === true);
+  const preview = props.preview ?? props.providerPreview?.content ?? providerPreviewUrl ?? (kind === "image" ? file.downloadUrl : undefined);
   const decision = resolveLibraryPreviewDecision({
     error: props.error,
     hasPreview: preview != null,

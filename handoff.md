@@ -1,5 +1,14 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+右侧文件预览终局复核已从 `connected-file-preview-tab` 真实 route 追到
+`LibraryCloudFilePreview` 及内容 consumer。本轮补齐 image、PDF/blob、sandboxed HTML、
+MarkdownSurface、text、JSON 与 Google Workspace provider iframe 的真实渲染，
+并为 PDF object URL 保留 generation/revoke/dispose；artifact 路由继续接入
+`ArtifactTabContent`。loading/error/unsupported/40 MiB/missing-size/download、取消和 stale completion
+均有可执行证据。focused renderer 22、state 24、loader 15、artifact flow 86 项通过。
+至此右侧文件“显示预览”专属 owner 已清零；剩余为通用 composer/attachment、
+favorite/breadcrumb 与共享 header 基础设施。
+
 本轮将 `Vet` 剩余 artifact session host owner 整体迁移至
 `src/main/main-app/remote-artifact/artifact-session-host-service.ts` 并真实接回；connection single-flight、
 reconciliation、external-document routing、native snapshot/kind/capability 和最终 child/client disposal 均由新
