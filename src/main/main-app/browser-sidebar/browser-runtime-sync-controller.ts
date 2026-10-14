@@ -2,23 +2,33 @@
 
 /** Owns Browser sidebar thread snapshots and runtime-page state projection. */
 export function createBrowserRuntimeSyncControllerClass(dependencies: Record<string, any>) {
-  const { uZe, hX, fq, kZe, tq, KU, EZ } = dependencies;
+  const { uZe, hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass } = dependencies;
 
   return class BrowserRuntimeSyncController {
     host: any;
 
     constructor(host: any) {
       this.host = host;
+      this.lifecycleHelpers = lifecycleHelpersClass == null ? null : new lifecycleHelpersClass(host);
     }
+
+    lifecycleHelpers: any;
 
     getPageLifecycleHelpers() {
       const host = this.host;
+      const helper = this.lifecycleHelpers;
       const bind = (name: string, fallback: any = () => {}) =>
-        typeof host[name] === `function` ? host[name].bind(host) : fallback;
+        typeof helper?.[name] === `function`
+          ? helper[name].bind(helper)
+          : typeof host[name] === `function`
+            ? host[name].bind(host)
+            : fallback;
       const lifecycleBind = (name: string, fallback: any = () => {}) =>
-        typeof host.browserPageHostLifecycle?.[name] === `function`
-          ? host.browserPageHostLifecycle[name].bind(host.browserPageHostLifecycle)
-          : fallback;
+        typeof helper?.[name] === `function`
+          ? helper[name].bind(helper)
+          : typeof host.browserPageHostLifecycle?.[name] === `function`
+            ? host.browserPageHostLifecycle[name].bind(host.browserPageHostLifecycle)
+            : fallback;
       const tabBudgetBind = (name: string, fallback: any = () => {}) =>
         typeof host.tabBudget?.[name] === `function`
           ? host.tabBudget[name].bind(host.tabBudget)
