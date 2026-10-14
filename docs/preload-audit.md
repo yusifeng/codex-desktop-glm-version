@@ -1,5 +1,7 @@
 # `browser-page-preload.ts` 逐段审计
 
+本轮新增 `annotation-active-runtime-state.ts`，真实接回 Wy 的 active view/draft matching/marker/region/text-preview 投影边界；迁移 multi-select link、原页面 marker 策略、active geometry 与 text preview，删除原约 90 行内联投影。focused test：`scripts/test-preload-annotation-active-runtime-state.mjs`（12 项）。
+
 本轮新增 `annotation-overlay-runtime-state.ts`，真实接回 Wy 的 screenshot/render/draft-marker/overlay-style 投影边界；迁移 linked draft selection、截图 geometry、metadata/flex-gap、draft marker 与 comment cursor policy，删除原约 100 行内联投影。focused test：`scripts/test-preload-annotation-overlay-runtime-state.mjs`（10 项）。
 
 本轮新增 `annotation-anchor-observation-controller.ts`，真实接回 Wy 的 text-anchor observation layout effect；迁移当前页筛选、RAF 合并、viewport/frame resize/scroll、scroll-container 与 mutation observation cleanup，删除原约 66 行内联编排。focused test：`scripts/test-preload-annotation-anchor-observation-controller.mjs`（9 项）。

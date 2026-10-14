@@ -5962,6 +5962,7 @@ var { resolveAnnotationDisplayAnchors } = require("./browser-page-preload/annota
 var { projectAnnotationRuntimeCollections } = require("./browser-page-preload/annotation-runtime-collection-projection");
 var { projectAnnotationMarkerRecords } = require("./browser-page-preload/annotation-marker-record-projection");
 var { projectAnnotationActiveView } = require("./browser-page-preload/annotation-active-view-projection");
+var { projectAnnotationActiveRuntimeState } = require("./browser-page-preload/annotation-active-runtime-state");
 var { projectAnnotationTextPreviewState } = require("./browser-page-preload/annotation-text-preview-state");
 var { projectAnnotationScreenshotPayload } = require("./browser-page-preload/annotation-screenshot-payload-projection");
 var { projectAnnotationRegionRecords } = require("./browser-page-preload/annotation-region-record-projection");
@@ -24527,80 +24528,35 @@ function Wy({ rootHost: e, bridge: t }) {
           }
         );
     }, [e, Ct]));
-  let activeView = projectAnnotationActiveView(te, Le, We),
-    M = activeView.active,
-    Et = activeView.activeId,
-    Dt = activeView.displayAnnotations,
-    Ot = activeView.hasActiveSelection,
-    kt = x?.target.mode === `create` ? U_(x.anchor) : null,
-    At = x?.target.mode === `create` && x.anchor.type === `text` ? x.anchor.value : null,
-    jt =
-      x?.target.mode === `create` && x.anchor.type !== `text`
-        ? [G_(x.anchor).primary, ...x.anchor.additionalSelections]
-        : [],
-    Mt = x?.target.mode === `create` && x.anchor.type !== `text` ? x.anchor.viewportSize : void 0,
-    Nt =
-      Oe &&
-      !Ot &&
-      ae == null &&
-      x?.target.mode === `create` &&
-      x.anchor.type !== `text` &&
-      l != null &&
-      l >= 0 &&
-      l < jt.length
-        ? l
-        : null,
-    Pt = (e) =>
-      [e.anchor, ...(e.additionalAnchors ?? [])].some((e) =>
-        At == null ? e.kind !== `text` && jt.some((t) => ol(V_(e, Ie), t)) : Fs(e, At),
-      ),
-    Ft = At == null && jt.length === 0 ? null : (Le.find(Pt) ?? Fe.find(Pt) ?? null),
-    It = gs(je),
-    Lt = Le;
-  M?.kind === `comment`
-    ? (Lt = It ? [M.annotation] : Le)
-    : It || Ot
-      ? (Lt = [])
-      : Ft != null && (Lt = Le.filter((e) => e.id !== Ft.id));
-  let Rt = projectAnnotationMarkerRecords(Lt, Pe, se, j, {
+  let activeRuntimeState = projectAnnotationActiveRuntimeState({
+      previewCommentId: te, visibleComments: Le, selectedCommentId: We, editor: x, multiSelectEnabled: Oe,
+      activeHighlightRect: ae, linkedSelectionIndex: l, elementCache: Ie, allComments: Fe, pageUrl: je, numbering: Pe,
+      viewport: se, zoomFactor: j, markersEnabled: St, markersVisible: n.areAnnotationMarkersVisible !== !1, suspended: De,
+    }, {
+      projectActiveView: projectAnnotationActiveView, resolveEditorAnchor: (anchor) => U_(anchor),
+      splitEditorAnchor: (anchor) => G_(anchor), resolveAdditionalAnchor: (anchor, cache) => V_(anchor, cache),
+      selectionsEqual: (left, right) => ol(left, right), textAnchorsEqual: (left, right) => Fs(left, right),
+      isOriginalPage: (pageUrl) => gs(pageUrl), projectMarkerRecords: projectAnnotationMarkerRecords,
       resolveLiveElement: (anchor, id) => sd(anchor, id, Ie),
       resolveMarkerPoint: (anchor, viewport, options) => v_(anchor, viewport, options),
-    }),
-    zt = Ts(
-      Rt.map(({ markerPoint: e }) => e),
-      se.width * j,
-    ),
-    activeGeometry = projectAnnotationActiveGeometry(M, Ie, {
+      clusterMarkerPoints: (points, width) => Ts(points, width),
+      projectActiveGeometry: projectAnnotationActiveGeometry,
       resolveCommentElement: (annotation, cache) => Z_(annotation, cache),
       resolveDesignElement: (anchor, annotationId, cache) => sd(anchor, annotationId, cache),
-      resolveAdditionalAnchor: (anchor, cache) => V_(anchor, cache),
-      isOriginalPage: (pageUrl) => gs(pageUrl),
+      projectRegionRecords: projectAnnotationRegionRecords,
+      shouldSuppressRegion: (annotation, editor, activeAnnotation) => ib(annotation, editor, activeAnnotation),
+      projectTextPreviewState: projectAnnotationTextPreviewState, resolveTextAnchor: (anchor) => fu(anchor),
+      resolveSelectionRects: (anchor) => nb(anchor),
     }),
-    Ut = activeGeometry.activeElement,
-    Wt = activeGeometry.additionalAnchors,
-    Gt = activeGeometry.skipScreenshotCapture,
-    Kt = _ == null ? null : (Le.find((e) => e.id === _) ?? null),
-    qt = projectAnnotationRegionRecords(
-      {
-        enabled: (St && n.areAnnotationMarkersVisible !== !1) || (Ot && M?.kind === `comment`),
-        annotations: Dt,
-        editor: x,
-        activeAnnotation: M?.kind === `comment` ? M.annotation : null,
-      },
-      { shouldSuppress: (annotation, editor, activeAnnotation) => ib(annotation, editor, activeAnnotation) },
-    ),
-    textPreviewState = projectAnnotationTextPreviewState(
-      {
-        active: M,
-        hasActiveSelection: Ot,
-        draft: x,
-        isSuspended: De,
-        areMarkersVisible: n.areAnnotationMarkersVisible !== !1,
-        selectedComment: Kt,
-      },
-      { resolveTextAnchor: (anchor) => fu(anchor), resolveSelectionRects: (anchor) => nb(anchor) },
-    );
-  let Yt = textPreviewState.resolvedAnchor;
+    M = activeRuntimeState.active, Et = activeRuntimeState.activeId, Dt = activeRuntimeState.displayAnnotations,
+    Ot = activeRuntimeState.hasActiveSelection, kt = activeRuntimeState.draftAnchor, At = activeRuntimeState.draftTextAnchor,
+    jt = activeRuntimeState.additionalSelections, Mt = activeRuntimeState.editorViewportSize,
+    Nt = activeRuntimeState.linkedSelectionIndex, Ft = activeRuntimeState.matchedAnnotation, It = activeRuntimeState.originalPage,
+    Rt = activeRuntimeState.markerRecords, zt = activeRuntimeState.markerPoints,
+    Ut = activeRuntimeState.activeGeometry.activeElement, Wt = activeRuntimeState.activeGeometry.additionalAnchors,
+    Gt = activeRuntimeState.activeGeometry.skipScreenshotCapture, Kt = activeRuntimeState.selectedComment,
+    qt = activeRuntimeState.regionRecords, textPreviewState = activeRuntimeState.textPreviewState,
+    Yt = textPreviewState.resolvedAnchor;
   (0, G.useLayoutEffect)(() => {
     textHighlightController.update(Yt);
     return () => textHighlightController.update(null);
