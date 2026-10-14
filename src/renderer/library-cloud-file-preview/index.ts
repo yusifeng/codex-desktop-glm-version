@@ -1,8 +1,13 @@
 import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import {
+  I3 as getJsxRuntime,
+  e6 as getReactRuntime,
+  type JsxRuntime,
+  type ReactRuntime,
+} from "@rchunk/app-shared";
 import "@rchunk/app-initial";
 import "@rchunk/app-primary";
-import "@rchunk/artifact-tab-content-electron";
+import { a as ArtifactTabContent } from "@rchunk/artifact-tab-content-electron";
 import "@rchunk/editor-header";
 import "@rchunk/header-content-fade";
 import "@rchunk/surface";
@@ -15,24 +20,36 @@ import "@rchunk/editor-header-controls";
 import "@rchunk/loading-controls";
 import "@rchunk/library-file-preview-kind";
 import "@rchunk/preview-layout";
-import "@rchunk/library-file-download";
+import {
+  i as readLibraryFileText,
+  r as readLibraryFileBytes,
+  t as downloadLibraryFile,
+} from "@rchunk/library-file-download";
 import "@rchunk/library-file-preview-loading";
 import "@rchunk/docx-preview-panel";
-import "@rchunk/library-json-preview";
+import { LibraryJsonPreview } from "@rchunk/library-json-preview";
 import {
   inferLibraryPreviewKind,
   resolveLibraryPreviewDecision,
   type LibraryPreviewKind,
 } from "./preview-state";
+import {
+  createLibraryPreviewContentLoader,
+  libraryPreviewContentKey,
+  type LibraryPreviewContentState,
+} from "./preview-content-loader";
 
 interface CloudFile {
   category?: string | null;
+  downloadUrl?: string;
   favorite?: boolean;
   fileId: string;
   fileName: string;
   kind?: string | null;
   mimeType?: string | null;
+  requestHeaders?: Record<string, string>;
   sizeBytes?: number | null;
+  sourceUrl?: string | null;
 }
 interface RouteCloudFile extends Record<string, unknown> {
   category?: string | null;
@@ -41,7 +58,9 @@ interface RouteCloudFile extends Record<string, unknown> {
   libraryArtifactType?: string | null;
   mimeType?: string | null;
   name: string;
+  requestHeaders?: Record<string, string>;
   sizeBytes?: number | null;
+  sourceUrl?: string | null;
 }
 interface CloudFilePreviewProps {
   error?: string | null;
@@ -63,7 +82,9 @@ interface CloudFilePreviewProps {
   providerPreview?: { content?: unknown } | null;
 }
 let runtime: JsxRuntime | undefined;
+let reactRuntime: ReactRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+function react(): ReactRuntime { reactRuntime ??= getReactRuntime(); return reactRuntime; }
 
 function normalizeFile(props: CloudFilePreviewProps): CloudFile {
   if (props.file != null) return props.file;
@@ -71,12 +92,84 @@ function normalizeFile(props: CloudFilePreviewProps): CloudFile {
   if (file == null) throw new TypeError("LibraryCloudFilePreview requires file or item.cloudFile");
   return {
     category: file.category,
+    downloadUrl: file.sourceUrl ?? undefined,
     fileId: file.fileId,
     fileName: file.name,
     kind: file.libraryArtifactType,
     mimeType: file.mimeType,
+    requestHeaders: file.requestHeaders,
     sizeBytes: file.sizeBytes,
   };
+}
+
+function isLoadableKind(kind: LibraryPreviewKind): boolean {
+  return kind === "artifact" || kind === "pdf" || kind === "html" || kind === "markdown" || kind === "text";
+}
+
+function useLoadedPreview(
+  file: CloudFile,
+  kind: LibraryPreviewKind,
+  providedPreview: unknown,
+): LibraryPreviewContentState {
+  const hooks = react();
+  const key = libraryPreviewContentKey(file, kind);
+  const [state, setState] = hooks.useState<LibraryPreviewContentState>(() =>
+    providedPreview != null
+      ? { content: providedPreview, key, status: "ready" }
+      : isLoadableKind(kind)
+        ? { key, status: "loading" }
+        : { content: undefined, key, status: "ready" },
+  );
+  const [loader] = hooks.useState(() =>
+    createLibraryPreviewContentLoader({
+      readBytes: (input, signal) => readLibraryFileBytes({
+        downloadUrl: input.downloadUrl,
+        file_name: input.fileName,
+        requestHeaders: input.requestHeaders,
+      }, signal),
+      readText: (input, signal) => readLibraryFileText({
+        downloadUrl: input.downloadUrl,
+        file_name: input.fileName,
+        requestHeaders: input.requestHeaders,
+      }, signal),
+    }),
+  );
+  hooks.useEffect(() => {
+    if (providedPreview != null) {
+      setState({ content: providedPreview, key, status: "ready" });
+      return;
+    }
+    if (!isLoadableKind(kind)) {
+      setState({ content: undefined, key, status: "ready" });
+      return;
+    }
+    return loader.load(file, kind, setState);
+  }, [file, key, kind, loader, providedPreview]);
+  if (providedPreview != null) return { content: providedPreview, key, status: "ready" };
+  if (state.key === key) return state;
+  return isLoadableKind(kind)
+    ? { key, status: "loading" }
+    : { content: undefined, key, status: "ready" };
+}
+
+function downloadHandler(props: CloudFilePreviewProps, file: CloudFile): (() => void) | undefined {
+  if (props.onDownload != null) return () => { void props.onDownload?.(file); };
+  if (file.downloadUrl == null) return undefined;
+  return () => {
+    void downloadLibraryFile({
+      downloadUrl: file.downloadUrl,
+      file_name: file.fileName,
+      requestHeaders: file.requestHeaders,
+    });
+  };
+}
+
+function artifactKind(fileName: string): "document" | "presentation" | "spreadsheet" | "text" {
+  const extension = fileName.toLowerCase().split(".").at(-1);
+  if (extension === "ppt" || extension === "pptx") return "presentation";
+  if (extension === "csv" || extension === "tsv" || extension === "xls" || extension === "xlsx") return "spreadsheet";
+  if (extension === "doc" || extension === "docx" || extension === "pdf") return "document";
+  return "text";
 }
 
 function PreviewMessage(props: {
@@ -100,22 +193,23 @@ function PreviewMessage(props: {
 
 function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
   const file = normalizeFile(props);
-  const preview = props.preview ?? props.providerPreview?.content;
+  const providedPreview = props.preview ?? props.providerPreview?.content;
   const kind = props.previewKind ?? inferLibraryPreviewKind(file);
+  const loaded = useLoadedPreview(file, kind, providedPreview);
+  const preview = loaded.status === "ready" ? loaded.content : undefined;
   const decision = resolveLibraryPreviewDecision({
-    error: props.error,
+    error: props.error ?? (loaded.status === "error" ? loaded.error : null),
     hasPreview: preview != null,
     imagePreviewIsError: props.imagePreviewIsError,
     imagePreviewIsPending: props.imagePreviewIsPending,
-    isLoading: props.isLoading,
+    isLoading: props.isLoading || loaded.status === "loading",
     kind,
     sizeBytes: file.sizeBytes,
   });
   const retry = props.onRetryImagePreview ?? props.onRetry;
-  const download = jsx().jsx("button", {
-    onClick: () => props.onDownload?.(file),
-    type: "button",
-    children: "Download file",
+  const handleDownload = downloadHandler(props, file);
+  const download = handleDownload == null ? null : jsx().jsx("button", {
+    onClick: handleDownload, type: "button", children: "Download file",
   });
 
   if (decision.state === "hidden") return null;
@@ -126,7 +220,7 @@ function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
     return jsx().jsxs("div", {
       role: "alert",
       children: [
-        props.error ?? "Unable to load preview",
+        props.error ?? (loaded.status === "error" ? loaded.error : "Unable to load preview"),
         jsx().jsx("button", { onClick: retry, type: "button", children: "Retry preview" }),
       ],
     });
@@ -155,6 +249,32 @@ function LibraryFilePreviewBody(props: CloudFilePreviewProps): unknown {
       title: "Preview not available",
     });
   }
+  if (decision.renderer === "artifact") {
+    return jsx().jsx("div", {
+      "data-preview-renderer": "artifact",
+      children: jsx().jsx(ArtifactTabContent, {
+        content: preview,
+        kind: artifactKind(file.fileName),
+        status: "ready",
+        title: file.fileName,
+        onClose: props.onClose,
+        onDownload: handleDownload,
+      }),
+    });
+  }
+  if (decision.renderer === "text-document") {
+    const content = typeof preview === "string" ? preview : String(preview ?? "");
+    const normalizedMime = file.mimeType?.split(";", 1)[0]?.trim().toLowerCase();
+    const isJson = file.fileName.toLowerCase().endsWith(".json") || normalizedMime === "application/json" || normalizedMime === "application/ld+json";
+    if (isJson) return jsx().jsx(LibraryJsonPreview, { content, fileName: file.fileName });
+    return jsx().jsx("pre", {
+      className: "library-file-preview-text",
+      "data-preview-renderer": "text-document",
+      dir: "ltr",
+      tabIndex: 0,
+      children: content,
+    });
+  }
   return jsx().jsx("div", {
     className: "library-file-preview-content",
     "data-preview-renderer": decision.renderer,
@@ -175,6 +295,7 @@ function LibraryCloudFilePreview(props: CloudFilePreviewProps): unknown {
     kind,
     sizeBytes: file.sizeBytes,
   });
+  const handleDownload = downloadHandler(props, file);
   return jsx().jsxs("section", {
     "aria-label": file.fileName,
     "data-preview-kind": kind,
@@ -195,7 +316,7 @@ function LibraryCloudFilePreview(props: CloudFilePreviewProps): unknown {
       decision.canAsk && props.onAsk != null
         ? jsx().jsx("button", { onClick: () => props.onAsk?.(file), type: "button", children: "Ask about this file" })
         : null,
-      props.onDownload == null ? null : jsx().jsx("button", { onClick: () => props.onDownload?.(file), type: "button", children: "Download file" }),
+      handleDownload == null ? null : jsx().jsx("button", { onClick: handleDownload, type: "button", children: "Download file" }),
       props.onShare == null ? null : jsx().jsx("button", { onClick: () => props.onShare?.(file), type: "button", children: "Share file" }),
       props.maxLocalTaskBytes != null && file.sizeBytes != null && file.sizeBytes > props.maxLocalTaskBytes
         ? jsx().jsx("p", { role: "note", children: "File too large for a local task" })

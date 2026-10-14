@@ -41,6 +41,10 @@ globalThis.__libraryCloudPreviewTest = {
     jsx(type, props) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {} }; },
     jsxs(type, props) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {} }; },
   },
+  react: {
+    useEffect(effect) { return effect(); },
+    useState(initial) { return [typeof initial === "function" ? initial() : initial, () => {}]; },
+  },
 };
 const previewEntry = new URL("../src/renderer/library-cloud-file-preview/index.ts", import.meta.url).pathname;
 const entryBuild = await esbuild.build({
@@ -55,8 +59,14 @@ const entryBuild = await esbuild.build({
       build.onResolve({ filter: /^@rchunk\// }, ({ path }) => ({ namespace: "mock", path }));
       build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path }) => ({
         contents: path === "@rchunk/app-shared"
-          ? "export const I3=()=>globalThis.__libraryCloudPreviewTest.jsx;"
-          : "export {};",
+          ? "export const I3=()=>globalThis.__libraryCloudPreviewTest.jsx;export const e6=()=>globalThis.__libraryCloudPreviewTest.react;"
+          : path === "@rchunk/library-file-download"
+            ? "export const i=async()=>\"text\";export const r=async()=>new Uint8Array();export const t=async()=>{};"
+            : path === "@rchunk/artifact-tab-content-electron"
+              ? "export const a=props=>({type:'artifact',props});"
+              : path === "@rchunk/library-json-preview"
+                ? "export const LibraryJsonPreview=props=>({type:'json',props});"
+                : "export {};",
         loader: "js",
       }));
     },
@@ -65,15 +75,22 @@ const entryBuild = await esbuild.build({
   write: false,
 });
 const entry = await import(`data:text/javascript;base64,${Buffer.from(entryBuild.outputFiles[0].text).toString("base64")}#entry`);
+function find(node, predicate) {
+  if (node == null || typeof node !== "object") return null;
+  if (predicate(node)) return node;
+  const children = node.props?.children;
+  if (Array.isArray(children)) for (const child of children.flat(Infinity)) { const found = find(child, predicate); if (found != null) return found; }
+  return find(children, predicate);
+}
 const routeFile = (overrides = {}) => ({
   cloudFile: { fileId: "file-1", id: "library-1", name: "report.pdf", sizeBytes: 100, ...overrides },
 });
 const pdfPreview = entry.n({ item: routeFile(), preview: "PDF content" });
 assert.equal(pdfPreview.props["data-preview-kind"], "pdf");
 assert.equal(pdfPreview.props["data-preview-state"], "ready");
-assert.equal(pdfPreview.props.children[1].props["data-preview-renderer"], "artifact");
+assert.equal(find(pdfPreview, node => node.props?.["data-preview-renderer"] === "artifact")?.props["data-preview-renderer"], "artifact");
 const textPreview = entry.n({ item: routeFile({ name: "notes.md" }), preview: "Markdown" });
-assert.equal(textPreview.props.children[1].props["data-preview-renderer"], "text-document");
+assert.equal(find(textPreview, node => node.props?.["data-preview-renderer"] === "text-document")?.props["data-preview-renderer"], "text-document");
 const imageError = entry.n({ item: routeFile({ mimeType: "image/png", name: "photo.png" }), imagePreviewIsError: true });
 assert.equal(imageError.props["data-preview-state"], "image-error");
 

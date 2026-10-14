@@ -1,5 +1,12 @@
 # Renderer 尾部资产审计
 
+2026-10-14 A5 文件预览内容批次：`library-cloud-file-preview` 已接入真实内容加载器。
+artifact/PDF 等二进制预览通过既有 `library-file-download` bytes reader，HTML/Markdown/Text
+通过 text reader，统一保留 AbortController、generation guard、过期请求抑制和错误状态；
+artifact 交给 `ArtifactTabContent`，JSON 交给 `LibraryJsonPreview`，普通文本使用可聚焦的
+`pre`，并为没有显式回调但有 URL 的文件提供默认下载。新增 loader 15 项断言，预览状态
+24 项和 artifact 应用流 86 项回归均通过。
+
 2026-10-13 A5 文件预览批次：`library-cloud-file-preview` 的主体分派不再使用四态占位实现。
 发布资产 `Gn` 中的 40 MiB 图片上限、未知大小、pending/error/hidden、artifact/PDF、
 HTML/Markdown/Text 与 unsupported 决策已迁移至

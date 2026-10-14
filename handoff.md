@@ -6,6 +6,14 @@
 expired managed runtime 标记/重试和 manager dispose。focused test 为
 `scripts/test-main-language-server-manager.mjs`（39 项）。
 
+本轮将 `GitRepoWatcher.startWatchSession()` 的完整单 target session runtime 迁移至
+`src/main/worker/git-repo-watch-session-runtime.ts`，真实接回 worker consumer，并删除原 93 行内嵌实现；
+controller 保留 metadata stat/missing gate、ignore snapshot 捕获、working-tree/metadata backend 选择、
+watch event 闭包、generation/dispose/registration race、session attach/close、恢复事件、metadata refresh
+与失败 retry 顺序。focused test 为 `scripts/test-worker-git-repo-watch-session-runtime.mjs`（18 项），
+build 与相邻 session start/close 测试通过；typecheck 仍受并行 preload 改动的既有
+`getViewportSelection` 类型错误阻断。
+
 本轮将右侧 Library 文件预览的状态解析与主体分派整体迁移至
 `src/renderer/library-cloud-file-preview/preview-state.ts`，真实接回
 `LibraryCloudFilePreview` 的 route/page consumer；覆盖图片 40 MiB 上限、未知大小、
@@ -3208,3 +3216,8 @@ host environment、expiry timer 和 query execution。本轮均保留，未抽 f
 
 `sCe` 的 capture/service RPC、response envelope、logger、service dependencies、递归 update polling 与
 error emission 交织；continuation policy 已抽出，剩余 owner 生命周期本轮保留。
+# 2026-10-14 继续实现记录
+
+- renderer `library-cloud-file-preview` 已从仅状态分派推进到真实内容消费：新增可取消、带 generation guard 的 preview content loader，接入既有下载读取器、ArtifactTabContent、LibraryJsonPreview 和默认下载回调；focused loader 15、preview state 24、artifact flow 86，typecheck 通过。
+- worker `GitRepoWatcher.startWatchSession` 已迁移到 `git-repo-watch-session-runtime.ts` 并真实接回，保留 metadata recovery、ignore snapshot、session close/retry 和 stale generation 语义；focused 18 项。
+- preload pointer interaction controller 目前仍是未接回的草稿，不能计入完成度；下一步需要把 Wy 的 394 行 effect 精确替换并补消费端回归。

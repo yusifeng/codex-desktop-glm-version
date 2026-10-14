@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1452.
+Total scripts: 1455.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -665,6 +665,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 - [`test-artifact-image-preview.mjs`](./test-artifact-image-preview.mjs)
 - [`test-artifact-preview-application-flow-cluster.mjs`](./test-artifact-preview-application-flow-cluster.mjs)
 - [`test-library-cloud-file-preview-state.mjs`](./test-library-cloud-file-preview-state.mjs)
+- [`test-library-cloud-file-preview-content-loader.mjs`](./test-library-cloud-file-preview-content-loader.mjs)
 - [`test-artifact-preview-entries.mjs`](./test-artifact-preview-entries.mjs)
 - [`test-artifact-preview-panels-cluster.mjs`](./test-artifact-preview-panels-cluster.mjs)
 - [`test-artifact-preview-primitives-cluster.mjs`](./test-artifact-preview-primitives-cluster.mjs)
@@ -1467,8 +1468,10 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-init-reconnect-controller.mjs](test-worker-git-init-reconnect-controller.mjs)
 [test-worker-git-repo-watcher-dispose-controller.mjs](test-worker-git-repo-watcher-dispose-controller.mjs)
 [test-worker-git-repo-watcher-start-controller.mjs](test-worker-git-repo-watcher-start-controller.mjs)
+[test-worker-git-repo-watch-session-runtime.mjs](test-worker-git-repo-watch-session-runtime.mjs)
 [test-worker-git-watch-session-dispose-controller.mjs](test-worker-git-watch-session-dispose-controller.mjs)
 [test-worker-git-watch-session-start-controller.mjs](test-worker-git-watch-session-start-controller.mjs)
+[test-worker-git-repo-watch-session-runtime.mjs](test-worker-git-repo-watch-session-runtime.mjs)
 [test-worker-git-watch-change-controller.mjs](test-worker-git-watch-change-controller.mjs)
 [test-worker-git-init-session-start-controller.mjs](test-worker-git-init-session-start-controller.mjs)
 [test-worker-git-init-watch-session-controller.mjs](test-worker-git-init-watch-session-controller.mjs)
