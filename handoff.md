@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮新增 `annotation-hover-refresh-controller.ts`，真实接回 Wy 的 comment hover/viewport refresh lifecycle；保留 resize flushSync、capture-phase scroll、debounce 与 cleanup 顺序，删除原独立 effect 内联实现。focused test 为 `scripts/test-preload-annotation-hover-refresh-controller.mjs`（6 项）。
+
 本轮将 R9 `W0e` language-server manager 的完整 session 生命周期迁移至
 `src/main/main-app/language-server/language-server-manager.ts`，真实接回 `Q0e` consumer 并删除
 原 172 行内嵌实现；保留 host/provider/workspace single-flight、request routing、失败回收、

@@ -5974,6 +5974,7 @@ var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/anno
 var { createAnnotationViewportRefreshScheduler } = require("./browser-page-preload/annotation-viewport-refresh-scheduler");
 var { createAnnotationAnchorObservationLifecycle } = require("./browser-page-preload/annotation-anchor-observation-lifecycle");
 var { installAnnotationPointerEventLifecycle } = require("./browser-page-preload/annotation-pointer-event-lifecycle");
+var { createAnnotationHoverRefreshController } = require("./browser-page-preload/annotation-hover-refresh-controller");
 var { dispatchAnnotationWyHostMessage } = require("./browser-page-preload/annotation-wy-host-message-dispatcher");
 var { createAnnotationScreenshotReadyController } = require("./browser-page-preload/annotation-screenshot-ready-controller");
 var { createAnnotationTextHighlightController } = require("./browser-page-preload/annotation-text-highlight-controller");
@@ -24834,36 +24835,24 @@ function Wy({ rootHost: e, bridge: t }) {
     }, [x, t, Oe, A, Ne, ut, ot, k, De, Ue, Te, e, st, Ze, Je, n.viewportScale, Me, rt, j]),
     (0, G.useEffect)(() => {
       if (k !== `comment` || De || x != null) return;
-      let t = () => {
-          if (gt(E.current, A)) return;
-          if (E.current != null && w.current?.hover(E.current)) {
-            (o(null), c(null));
-            return;
-          }
-          let t = Xy(E.current, e, A);
-          (o(Yy(t)), c(null), t != null && T(C_()));
-        },
-        n = () => {
-          (we.current != null && window.clearTimeout(we.current),
-            (Ce.current = !0),
-            o(null),
-            c(null),
-            T(C_()),
-            (we.current = window.setTimeout(() => {
-              ((we.current = null), (Ce.current = !1), t());
-            }, vb)));
-        },
-        r = dc((e, r) => {
-          (r.addEventListener(`resize`, t), e.addEventListener(`scroll`, n, !0));
-          let i = A ? Ng(e, () => (0, lb.flushSync)(t)) : void 0;
-          return () => {
-            (i?.(), r.removeEventListener(`resize`, t), e.removeEventListener(`scroll`, n, !0));
-          };
-        });
+      const hoverRefreshController = createAnnotationHoverRefreshController({
+        enabled: () => k === `comment` && !De && x == null,
+        getPointer: () => E.current,
+        isSurfaceAtPointer: (point) => point != null && Boolean(w.current?.hover(point)),
+        resolveHover: (point) => point == null ? null : Yy(Xy(point, e, A)),
+        setHover: o,
+        clearSelectionHover: () => c(null),
+        refreshViewport: () => T(C_()),
+        installFrames: (install) => dc(install),
+        flushResize: (refresh) => (0, lb.flushSync)(refresh),
+        debounceMs: vb,
+        setTimeout: (callback, delay) => window.setTimeout(callback, delay),
+        clearTimeout: (handle) => window.clearTimeout(handle),
+      });
+      const cleanupHoverRefresh = hoverRefreshController.install();
       return () => {
-        (r(),
-          (Ce.current = !1),
-          we.current != null && (window.clearTimeout(we.current), (we.current = null)));
+        cleanupHoverRefresh();
+        hoverRefreshController.dispose();
       };
     }, [x, A, k, De, e, Me]),
     (0, G.useEffect)(
