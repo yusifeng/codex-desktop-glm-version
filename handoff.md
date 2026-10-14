@@ -1290,8 +1290,10 @@ state initialization、change emission deduplication、操作标记路径表、�
 生命周期仍在继续拆分。本轮新增 `getGitWorkingTreeWatchRefreshAction`，覆盖
 ignore policy 刷新后的 skip/apply/restart 纯决策，回归断言增至 51 项；异步
 dispose/restart 与 session timer 副作用仍保留在入口。
-Git ignore policy 的 generation/read/refresh/recovery 状态机已抽取为
-`src/main/worker/git-ignore-policy.ts`，由 10 项行为断言覆盖；watcher 的 session
+Git ignore policy 的 generation/read/refresh/recovery/dispose 状态机已抽取为
+`src/main/worker/git-ignore-policy.ts` 并由 watcher 真实消费；旧 `Xye` 完整实现及专用 retry delay
+常量已删除。37 项 lifecycle 断言覆盖并发 read、stale generation、失败退避、恢复通知与 dispose
+barrier；watcher 的 session
 创建与 dispose 副作用仍保留在入口。
 Git watcher ignore-source 的 config discovery、旧 Git fallback、include/excludes 路径解析和
 tracked-path-aware ignored directory 筛选已迁移至
@@ -3252,3 +3254,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker `GitRepoWatcher.startWatchSession` 已迁移到 `git-repo-watch-session-runtime.ts` 并真实接回，保留 metadata recovery、ignore snapshot、session close/retry 和 stale generation 语义；focused 18 项。
 - preload pointer interaction controller 目前仍是未接回的草稿，不能计入完成度；下一步需要把 Wy 的 394 行 effect 精确替换并补消费端回归。
 - preload global input tracking 已单独完成真实接回：Wy 的跨 frame key/mouse/blur 生命周期迁移至 `annotation-global-input-tracking.ts`，focused 8 项和 typecheck 通过；pointer selection/hover/region-drag 主 effect 仍未迁移。
+- worker `GitIgnorePolicy` lifecycle 替换已收尾：`GitRepoWatcher` 继续真实实例化语义模块，旧 `Xye`
+  generation/read/refresh/retry/dispose 实现及专用常量已删除；focused lifecycle coverage 扩至 37 项，
+  覆盖 single-flight read、stale generation、initial/recovery backoff、recovery 通知与 dispose barrier。

@@ -74,8 +74,9 @@ watch retry backoff、Git operation state mapping、watch target state initializ
 
 Git ignore policy（原 `Xye`，约 76,500-76,620）已迁移至
 `src/main/worker/git-ignore-policy.ts`，入口通过 `GitIgnorePolicy` 接回；generation
-快照、read 去重、refresh timer、recovery 状态和 dispose 等行为由
-`scripts/test-worker-git-ignore-policy.mjs` 覆盖，共 10 项断言。GitRepoWatcher
+快照、并发 read 去重、stale generation、refresh/recovery retry timer 和 dispose barrier 等行为由
+`scripts/test-worker-git-ignore-policy.mjs` 覆盖，共 37 项 lifecycle 断言。旧 `Xye` 及其专用
+retry delay 常量已从 worker 删除，入口只保留语义实现。GitRepoWatcher
 仍保留 session 创建、重启和文件事件副作用。
 
 Git watcher ignore-source discovery 已迁移至 `src/main/worker/git-ignore-discovery.ts`：
