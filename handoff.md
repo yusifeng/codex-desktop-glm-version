@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 的完整 pointer interaction effect 迁移至 `annotation-pointer-interaction-controller.ts` 并真实接回；保留跨 frame listener、hover、pointer selection、region drag、click/contextmenu/wheel、Escape/修饰键与 cleanup 顺序，删除原 394 行内联主体。focused integration test 为 `scripts/test-preload-annotation-pointer-interaction-controller.mjs`（13 项）。
+
 本轮将原 `SQe` sampler manager 的完整 startup/window health 生命周期迁移至
 `src/main/main-app/startup/sampler-manager.ts`，真实接回 main app 唯一 consumer，并删除原约 140 行
 内嵌实现；模块保留 app-state heartbeat/trigger gate、request/WebContents identity、host/browser/stdio/jank

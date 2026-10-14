@@ -1,5 +1,7 @@
 # `browser-page-preload.ts` 逐段审计
 
+本轮新增 `annotation-pointer-interaction-controller.ts`，真实接回 Wy 的完整 pointer interaction effect；整体迁移 hover、pointer down/move/up/cancel、click、contextmenu、wheel、Escape/修饰键与 region-drag orchestration，并删除原 394 行内联主体。focused integration test：`scripts/test-preload-annotation-pointer-interaction-controller.mjs`（13 项）。
+
 本轮新增 `annotation-hover-refresh-controller.ts`，真实接回 Wy 的 comment hover/viewport refresh lifecycle；迁移 resize、capture-phase scroll、debounced hover 重算与 cleanup，删除原独立 effect 内联实现。focused test：`scripts/test-preload-annotation-hover-refresh-controller.mjs`（6 项）。
 
 本轮新增 `annotation-edit-editor-controller.ts`：真实接回 Wy 的 `Ye` edit-editor lifecycle，保留 runtime target/map、design projection、preview close、host IPC、viewport refresh 与 React editor state 的原始副作用顺序。focused test：`scripts/test-preload-annotation-edit-editor-controller.mjs`。
