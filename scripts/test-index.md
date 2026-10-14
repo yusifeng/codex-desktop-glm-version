@@ -14,6 +14,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 - [`test-preload-annotation-active-runtime-state.mjs`](./test-preload-annotation-active-runtime-state.mjs)
 
+- [`test-worker-git-stable-root-cache.mjs`](./test-worker-git-stable-root-cache.mjs)
+
 - [`test-main-tab-drag-session.mjs`](./test-main-tab-drag-session.mjs)
 
 - [`test-preload-annotation-overlay-runtime-state.mjs`](./test-preload-annotation-overlay-runtime-state.mjs)

@@ -78,6 +78,7 @@ const { GitIgnorePolicy } = require("./worker/git-ignore-policy");
 const { reconcileGitIgnoreSourceWatches } = require("./worker/git-ignore-source-watch");
 const { GitInitWatcher } = require("./worker/git-init-watcher");
 const { dispatchStableMetadataRequest } = require("./worker/git-stable-metadata-dispatch");
+const { GitStableRootCache } = require("./worker/git-stable-root-cache");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -67369,10 +67370,17 @@ var {
     reposByKey = new Map();
     worktreesByKey = new Map();
     commonDirByWorktreeKey = new Map();
-    stableRootByKey = new Map();
     stableMetadataRetryByKey = new Map();
     pendingStableMetadataTraceByKey = new Map();
     stableMetadataGeneration = 0;
+    stableRootCache = new GitStableRootCache({
+      clearTimeout,
+      getGeneration: () => this.stableMetadataGeneration,
+      maxAgeMs: i4,
+      maxEntries: Jhe,
+      now: () => Date.now(),
+      setTimeout,
+    });
     hasBackgroundedSinceLastForeground = !1;
     constructor(e) {
       e.subscribe((e) => {
@@ -67416,7 +67424,7 @@ var {
         this.getStableRootMemoized.clear(),
         this.getStableMetadataMemoized.clear(),
         this.commonDirByWorktreeKey.clear(),
-        this.clearStableRootCache(),
+        this.stableRootCache.clear(),
         this.stableMetadataRetryByKey.clear(),
         this.pendingStableMetadataTraceByKey.clear());
     }
@@ -67537,7 +67545,7 @@ var {
           retryAfterMs: Date.now() + qhe,
         });
         if (o.invalidateCachedRoot) {
-          this.deleteCachedStableRoot(this.getStableMetadataKey(e, t));
+          this.stableRootCache.delete(this.getStableMetadataKey(e, t));
           this.getStableRootMemoized.delete(e, t, this.stableMetadataGeneration);
         }
         this.getStableMetadataMemoized.delete(e, t, this.stableMetadataGeneration);
@@ -67548,45 +67556,10 @@ var {
       return createGitManagerKey(h1(t), e);
     }
     cacheStableRoot(e, t, n, r) {
-      if (r !== this.stableMetadataGeneration) return;
-      let i = this.getStableMetadataKey(e, t);
-      this.deleteCachedStableRoot(i);
-      let a = {},
-        o = setTimeout(() => {
-          this.stableRootByKey.get(i)?.token === a && this.deleteCachedStableRoot(i);
-        }, i4);
-      for (
-        o.unref?.(),
-          this.stableRootByKey.set(i, {
-            expiresAtMs: Date.now() + i4,
-            expiryTimer: o,
-            root: n,
-            token: a,
-          });
-        this.stableRootByKey.size > Jhe;
-      ) {
-        let e = this.stableRootByKey.keys().next().value;
-        if (e == null) break;
-        this.deleteCachedStableRoot(e);
-      }
+      this.stableRootCache.set(this.getStableMetadataKey(e, t), n, r);
     }
     getCachedStableRoot(e, t) {
-      let n = this.getStableMetadataKey(e, t),
-        r = this.stableRootByKey.get(n);
-      if (r != null) {
-        if (Date.now() >= r.expiresAtMs) {
-          this.deleteCachedStableRoot(n);
-          return;
-        }
-        return (this.stableRootByKey.delete(n), this.stableRootByKey.set(n, r), r.root);
-      }
-    }
-    deleteCachedStableRoot(e) {
-      let t = this.stableRootByKey.get(e);
-      t != null && (clearTimeout(t.expiryTimer), this.stableRootByKey.delete(e));
-    }
-    clearStableRootCache() {
-      for (let e of this.stableRootByKey.keys()) this.deleteCachedStableRoot(e);
+      return this.stableRootCache.get(this.getStableMetadataKey(e, t));
     }
     getStableRootMemoized = (0, DX.default)(
       async (e, t, n) => {

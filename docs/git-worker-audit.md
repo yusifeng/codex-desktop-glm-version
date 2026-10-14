@@ -1594,6 +1594,11 @@ path containment predicate。`scripts/test-worker-git-worktree-cache-selection.m
 
 ### A1 owner 复核：Git manager/watch/session（2026-10-11）
 
+Git manager stable-root cache 的 generation guard、TTL timer、replacement token、LRU touch、容量淘汰与
+clear/delete 生命周期已迁移至 `src/main/worker/git-stable-root-cache.ts`；manager 真实持有该 cache，原
+`stableRootByKey` 及四个内联 cache 方法已删除。`scripts/test-worker-git-stable-root-cache.mjs` 覆盖
+25 项 lifecycle 断言。
+
 剩余 manager 区段的 `getStableMetadata`/`getStableRoot` 同时依赖 generation、retry maps、
 pending trace、memoized query 以及 Git root/common-dir I/O；`invalidate*` 直接协调多类 Map/cache。
 watcher 的 `start`、metadata refresh、dispose 与 session retry 共享 watch target、session/retry timer、

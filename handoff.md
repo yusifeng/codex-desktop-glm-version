@@ -3275,3 +3275,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker Git manager request classification boundary 已完成替换：live-query `resolveQueryRoot` 最后一个 consumer
   直接接回 `resolveRequestRoot`，删除 `obe`/`ube`/`B6`/`sbe`/`cbe`/`lbe` 六个 generated wrapper 及约
   170 行不可达旧 classification owner；context/invalidation focused coverage 扩至 42/50 项。
+- worker Git manager stable-root cache lifecycle 已迁移至 `git-stable-root-cache.ts` 并真实接回：新 owner
+  统一持有 generation gate、TTL timer、replacement token、LRU touch、容量淘汰与 clear/delete；Yhe 的
+  `stableRootByKey` 和四个内联 cache 方法已删除，focused lifecycle coverage 为 25 项。
