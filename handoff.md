@@ -1,5 +1,14 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮继续并行清理 A3 hotkey/Appshot 链路：
+
+- cross-platform capture-request owner 已真实接回 `capture-requests.ts`，删除原 199 行
+  pending/retry/timeout/abort/update 实现；focused 49 项。
+- `Eat` hotkey-window lifecycle 迁入 `hotkey-window-lifecycle-manager.ts`，删除原 329 行，
+  保留 keymap/gate/registration/lock/retry/controller/delegation/attribution 完整状态机；focused 57 项。
+- `Wit` Windows native capture bridge 与独占 helper 迁入 `windows-native-capture-bridge.ts`，
+  删除原 526 行，保留 transport/hotkey/capture/handshake/file-safety/dispose 生命周期；focused 28 项。
+
 本轮将 A3 三个完整 owner 并行迁出并真实接回：
 
 - `DYe` browser-use API runtime 迁入 `src/main/main-app/browser-use/iab-api.ts`，替换未接回 skeleton，

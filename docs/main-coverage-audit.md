@@ -756,12 +756,38 @@ renderer priority lease/timer 与 dispose cleanup。原 236 行 class 已删除�
 `scripts/test-main-appshot-hotkey-manager.mjs` 覆盖 47 项 focused assertions。
 复核同时确认 `Wit` 才是 Windows native capture bridge，与 `Pit` 的 hotkey 状态所有权独立。
 
+### 增量接回：cross-platform capture request lifecycle
+
+R5/computer-use 原 `uM/pM/mM/hM/gM/_M/vM/yM` pending capture owner 已切换到现有
+`src/main/main-app/computer-use/capture-requests.ts` 的真实生产 consumer。Windows/mac capture 和 final-update
+三个路由分别接入 `startWindowsCapture`、`startMacCapture` 和 `requestFinalCaptureUpdate`，
+原 199 行 Map/timer/retry/abort/update 实现已删除。
+`scripts/test-main-computer-use-capture-requests.mjs` 覆盖 49 项 duplicate/timeout/retry/final-update/
+origin-destroyed/external-abort/late-result ordering assertions。
+
+### 增量抽取：hotkey-window lifecycle manager
+
+R12/hotkey 原 `Eat` 完整 class 已迁移至
+`src/main/main-app/hotkey/hotkey-window-lifecycle-manager.ts`。新 factory 拥有 legacy/command keymap、
+feature/dev gate、registration rollback、cross-instance lock/onLost、1 秒 idle retry、controller prewarm/stop/dispose、
+renderer/home/drag/layout/pointer delegation 和 hotkey attribution。原 `Tat/Eat` 329 行已删除，
+并注入原内联 `qV/JV/YV/jN` 以保持唯一 shortcut/lock registry。
+`scripts/test-main-hotkey-window-lifecycle-manager.mjs` 覆盖 57 项 focused assertions，
+并锁定实际 38 methods/15 fields 的完整 owner。
+
+### 增量抽取：Windows native capture bridge
+
+R12/computer-use 原 `w7..F7`/`Wit` 独占 helper 与 bridge owner 已整体迁移至
+`src/main/main-app/computer-use/windows-native-capture-bridge.ts`。新 module 持有 transport single-flight/exit recovery、
+target decoration、native hotkey flight、capture source/update/finally、prepare/begin/cancel handshake、
+file/schema/25 MiB safety 与 release/dispose drain；main 保留原 `Git(m)` 生产 consumer。
+原 526 行实现已删除，`scripts/test-main-windows-native-capture-bridge.mjs` 覆盖 28 项 focused assertions。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
-`vZe/xZe/Vet/Wtt/DYe/Pit/Qot` 均已移出；artifact、terminal、browser-use、Appshot hotkey
-与 BrowserWindow owner 已清零。仍明确存在的大 owner 为 `tQe` IAB/browser-sidebar manager
-与 `Eat` hotkey-window lifecycle；Appshot 链路另有 `Wit` Windows native capture bridge 及尚未真实接回的
-cross-platform capture-request owner。`ztt` 是保留的 node-pty I/O adapter。
+`vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit` 均已移出，cross-platform capture-request owner 也已真实接回。
+当前明确剩余的大 owner 为 `tQe` IAB/browser-sidebar manager，以及 `Sat` hotkey-window
+presentation/controller 与其独占 layout/drag/snap/haptic support 带。`ztt` 是保留的 node-pty I/O adapter。
 
 ### A3 main 剩余 owner 复核（2026-10-11）
 
