@@ -1712,3 +1712,11 @@ visual viewport、跨 frame scroll/resize、scroll-container 与 text-anchor obs
 `src/main/browser-page-preload/annotation-editor-anchor-sync-controller.ts`。入口仅注入 DOM/React/IPC adapter，
 由 `scripts/test-preload-annotation-editor-anchor-sync-controller.mjs` 覆盖三类 target、null-anchor 清理、
 listener/observer 安装和幂等 cleanup。
+
+### 增量抽取：annotation global input tracking
+
+Wy 的跨 frame 全局键盘、鼠标位置和 blur/focus 清理监听已迁移至
+`src/main/browser-page-preload/annotation-global-input-tracking.ts` 并真实接回。controller 保留 trusted
+mousemove 过滤、`Lc` viewport 投影、keydown/keyup capture、失焦清理 modifier state 以及 `dc` frame
+observer 的安装/卸载顺序；pointer selection、hover 和 region drag 仍由原 effect 持有。focused test
+`scripts/test-preload-annotation-global-input-tracking.mjs` 覆盖 8 项事件、过滤和幂等清理断言。

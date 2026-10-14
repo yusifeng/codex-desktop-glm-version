@@ -2,7 +2,7 @@
 
 Generated from `scripts/test-*.mjs`. Scripts named `*-cluster.mjs` are reusable regression clusters; the remaining scripts are focused leaf or historical checks.
 
-Total scripts: 1455.
+Total scripts: 1456.
 
 Renderer hub A5 classification gate remains covered by `test-renderer-hub-classification.mjs`; the 2026-10-05 batch adds four app-primary line-level evidence records (reviewed count 149).
 
@@ -1468,6 +1468,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-init-reconnect-controller.mjs](test-worker-git-init-reconnect-controller.mjs)
 [test-worker-git-repo-watcher-dispose-controller.mjs](test-worker-git-repo-watcher-dispose-controller.mjs)
 [test-worker-git-repo-watcher-start-controller.mjs](test-worker-git-repo-watcher-start-controller.mjs)
+[test-worker-git-repo-watch-session-runtime.mjs](test-worker-git-repo-watch-session-runtime.mjs)
 [test-worker-git-watch-session-dispose-controller.mjs](test-worker-git-watch-session-dispose-controller.mjs)
 [test-worker-git-watch-session-start-controller.mjs](test-worker-git-watch-session-start-controller.mjs)
 [test-worker-git-watch-change-controller.mjs](test-worker-git-watch-change-controller.mjs)
@@ -1492,6 +1493,7 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-pip-video-frame-subscription-controller.mjs](test-pip-video-frame-subscription-controller.mjs)（运行：`node --experimental-strip-types scripts/test-pip-video-frame-subscription-controller.mjs`）
 [test-connect-app-host-controller.mjs](test-connect-app-host-controller.mjs)（运行：`node --experimental-strip-types scripts/test-connect-app-host-controller.mjs`）
 [test-preload-annotation-editor-anchor-sync-controller.mjs](test-preload-annotation-editor-anchor-sync-controller.mjs)
+[test-preload-annotation-global-input-tracking.mjs](test-preload-annotation-global-input-tracking.mjs)
 
 ## Reconciled lifecycle and platform suites
 

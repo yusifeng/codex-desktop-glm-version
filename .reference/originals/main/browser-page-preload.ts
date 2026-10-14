@@ -5996,6 +5996,7 @@ var { createAnnotationSelectionCommentController } = require("./browser-page-pre
 var { createAnnotationTextAnchorEditorController } = require("./browser-page-preload/annotation-text-anchor-editor-controller");
 var { createAnnotationEditorCommentReconciliationController } = require("./browser-page-preload/annotation-editor-comment-reconciliation-controller");
 var { createAnnotationEditorAnchorSyncController } = require("./browser-page-preload/annotation-editor-anchor-sync-controller");
+var { createAnnotationGlobalInputTracking } = require("./browser-page-preload/annotation-global-input-tracking");
 var { projectAnnotationMetadataTooltipRows } = require("./browser-page-preload/annotation-metadata-tooltip");
 var { areAnnotationUrlsEquivalent, getCurrentAnnotationPageUrl } = require("./browser-page-preload/annotation-url");
 Yo();
@@ -24424,26 +24425,17 @@ function Wy({ rootHost: e, bridge: t }) {
     });
   ((0, G.useEffect)(
     () =>
-      dc((e, t) => {
-        let n = (e) => {
-            e.isTrusted && (E.current = Lc(t, { x: e.clientX, y: e.clientY }));
-          },
-          r = () => {
-            ((E.current = null), document.hasFocus() || ((ve.current = !1), (ye.current = !1)));
-          };
-        return (
-          t.addEventListener(`keydown`, xt, !0),
-          t.addEventListener(`keyup`, xt, !0),
-          t.addEventListener(`mousemove`, n, !0),
-          t.addEventListener(`blur`, r),
-          () => {
-            (t.removeEventListener(`keydown`, xt, !0),
-              t.removeEventListener(`keyup`, xt, !0),
-              t.removeEventListener(`mousemove`, n, !0),
-              t.removeEventListener(`blur`, r));
-          }
-        );
-      }),
+      createAnnotationGlobalInputTracking({
+        observeFrames: (install) => dc(install),
+        isTrusted: (event) => event.isTrusted,
+        toViewportPoint: (windowLike, point) => Lc(windowLike, point),
+        onKeyDown: xt,
+        onKeyUp: xt,
+        onPointerMove: (point) => { E.current = point; },
+        onBlur: () => { E.current = null; },
+        hasFocus: () => document.hasFocus(),
+        clearTransientModifierState: () => { ve.current = !1; ye.current = !1; },
+      }).install(),
     [],
   ),
     (0, G.useEffect)(() => {

@@ -3221,3 +3221,4 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - renderer `library-cloud-file-preview` 已从仅状态分派推进到真实内容消费：新增可取消、带 generation guard 的 preview content loader，接入既有下载读取器、ArtifactTabContent、LibraryJsonPreview 和默认下载回调；focused loader 15、preview state 24、artifact flow 86，typecheck 通过。
 - worker `GitRepoWatcher.startWatchSession` 已迁移到 `git-repo-watch-session-runtime.ts` 并真实接回，保留 metadata recovery、ignore snapshot、session close/retry 和 stale generation 语义；focused 18 项。
 - preload pointer interaction controller 目前仍是未接回的草稿，不能计入完成度；下一步需要把 Wy 的 394 行 effect 精确替换并补消费端回归。
+- preload global input tracking 已单独完成真实接回：Wy 的跨 frame key/mouse/blur 生命周期迁移至 `annotation-global-input-tracking.ts`，focused 8 项和 typecheck 通过；pointer selection/hover/region-drag 主 effect 仍未迁移。
