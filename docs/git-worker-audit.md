@@ -1690,3 +1690,14 @@ reconcile；worker 仅注入 host/Git metadata I/O、watch target owner 与 sess
 内嵌实现已删除。`scripts/test-worker-git-repo-watcher-start-controller.mjs` 覆盖 disposed/重复启动、
 prefetch/fallback、ref/topology/internal-path predicates、linked-worktree 标记及 start-before-refresh 顺序，
 共 25 项 focused assertions。
+
+### GitRepoWatcher target session runtime
+
+`GitRepoWatcher.startWatchSession()` 的单 target session runtime 已迁移至
+`src/main/worker/git-repo-watch-session-runtime.ts` 并真实接回 worker。controller 保留 metadata directory
+stat/missing 与 recovering event、ignore snapshot/currentness、working-tree/metadata backend 选择、watch
+option 的 generation/dispose event guard、session dispose race、attach/closed hook、ignore policy apply、
+恢复事件与非递归 metadata refresh，以及 warning/retry failure path；worker 继续注入 target/state、Git host
+与 ignore/event/close owners，原 93 行内嵌实现已删除。`scripts/test-worker-git-repo-watch-session-runtime.mjs`
+覆盖 success/ignore-directory capture、stale generation、metadata backend、dispose race、backend failure 和
+missing metadata，共 18 项 focused assertions。
