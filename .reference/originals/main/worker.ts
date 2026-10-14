@@ -80,6 +80,7 @@ const { GitInitWatcher } = require("./worker/git-init-watcher");
 const { dispatchStableMetadataRequest } = require("./worker/git-stable-metadata-dispatch");
 const { GitStableRootCache } = require("./worker/git-stable-root-cache");
 const { GitStableMetadataRetryController } = require("./worker/git-stable-metadata-retry-controller");
+const { GitStableMetadataResolver } = require("./worker/git-stable-metadata-resolver");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -67371,7 +67372,6 @@ var {
     reposByKey = new Map();
     worktreesByKey = new Map();
     commonDirByWorktreeKey = new Map();
-    pendingStableMetadataTraceByKey = new Map();
     stableMetadataGeneration = 0;
     stableRootCache = new GitStableRootCache({
       clearTimeout,
@@ -67388,6 +67388,18 @@ var {
       isProcessTimeout: l4,
       now: () => Date.now(),
       retryDelayMs: qhe,
+    });
+    stableMetadataResolver = new GitStableMetadataResolver({
+      cacheRoot: (cwd, host, root, generation) =>
+        this.cacheStableRoot(cwd, host, root, generation),
+      getActiveTrace: () => AH(),
+      getKey: (cwd, host) => this.getStableMetadataKey(cwd, host),
+      isResolutionError: (error) => error instanceof GitMetadataResolutionError,
+      resolveCommonDir: (root, host) => resolveGitCommonDir(root, host),
+      resolveRoot: (cwd, host, generation) =>
+        this.getStableRootMemoized(cwd, host, generation),
+      resolveRootAndCommonDir: (cwd, host) => resolveGitRootAndCommonDir(cwd, host),
+      trace: OH,
     });
     hasBackgroundedSinceLastForeground = !1;
     constructor(e) {
@@ -67434,7 +67446,7 @@ var {
         this.commonDirByWorktreeKey.clear(),
         this.stableRootCache.clear(),
         this.stableMetadataRetryController.clear(),
-        this.pendingStableMetadataTraceByKey.clear());
+        this.stableMetadataResolver.clearPendingTraces());
     }
     invalidateUntrackedPathsCache(e) {
       let t = e == null ? null : h1(e);
@@ -67504,7 +67516,7 @@ var {
       }
     };
     getPendingStableMetadataTrace(e, t) {
-      return this.pendingStableMetadataTraceByKey.get(this.getStableMetadataKey(e, t)) ?? null;
+      return this.stableMetadataResolver.getPendingTrace(e, t);
     }
     getStableRoot = async (e, t) => {
       let n = this.getCachedStableRoot(e, t),
@@ -67565,47 +67577,7 @@ var {
       },
     );
     getStableMetadataMemoized = (0, DX.default)(
-      async (e, t, n) => {
-        let r = this.getStableMetadataKey(e, t),
-          i = AH();
-        i != null && this.pendingStableMetadataTraceByKey.set(r, i);
-        try {
-          try {
-            let r = await OH(
-              {
-                attributes: { "git.host_kind": t.isLocal ? `local` : `remote` },
-                name: `git.metadata_root`,
-                op: `codex.git.metadata_root`,
-              },
-              () => resolveGitRootAndCommonDir(e, t),
-            );
-            return (this.cacheStableRoot(e, t, r?.root ?? null, n), r);
-          } catch (e) {
-            if (!(e instanceof GitMetadataResolutionError)) throw e;
-          }
-          let r = await OH(
-            {
-              attributes: { "git.host_kind": t.isLocal ? `local` : `remote` },
-              name: `git.metadata_root`,
-              op: `codex.git.metadata_root`,
-            },
-            () => this.getStableRootMemoized(e, t, n),
-          );
-          if (!r) return null;
-          let i = await OH(
-            {
-              attributes: { "git.host_kind": t.isLocal ? `local` : `remote` },
-              name: `git.metadata_common_dir`,
-              op: `codex.git.metadata_common_dir`,
-            },
-            () => resolveGitCommonDir(r, t),
-          );
-          return i ? { root: r, commonDir: i } : null;
-        } finally {
-          this.pendingStableMetadataTraceByKey.get(r) === i &&
-            this.pendingStableMetadataTraceByKey.delete(r);
-        }
-      },
+      (e, t, n) => this.stableMetadataResolver.resolve(e, t, n),
       {
         promise: !0,
         maxAge: i4,

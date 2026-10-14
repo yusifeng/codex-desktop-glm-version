@@ -3297,3 +3297,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker Git stable-metadata retry lifecycle 已迁移至 `git-stable-metadata-retry-controller.ts` 并接回
   manager：新 owner 持有 retry Map、cooldown/expiry、timeout cached-root fallback、error normalization 与
   refresh/invalidation 计划执行；原 Map 和两个内联 throw handler 已删除，focused coverage 为 29 项。
+- worker Git stable-metadata resolver lifecycle 已迁移至 `git-stable-metadata-resolver.ts` 并真实接回：新 owner
+  持有 pending trace identity、combined resolve/fallback、分步 trace、generation-aware cache write 与 overlap
+  cleanup；manager 删除原 pending trace Map 和内联 async workflow，focused coverage 为 20 项。

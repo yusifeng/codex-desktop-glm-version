@@ -1616,6 +1616,10 @@ host refresh 与 cache invalidation 执行生命周期进一步迁移至
 `git-stable-metadata-retry-controller.ts` 并真实接回，原 Map 和两个内联 throw handler 已删除；
 `scripts/test-worker-git-stable-metadata-failure-policy.mjs` 与
 `scripts/test-worker-git-stable-metadata-retry-controller.mjs` 分别覆盖 4 项 decision 和 29 项 lifecycle 断言。
+Stable metadata 的 pending trace identity、combined root/common-dir fast path、特定 resolution error fallback、
+分步 root/common-dir trace 与 generation-aware root cache write 已迁移至
+`git-stable-metadata-resolver.ts`；manager 真实持有 resolver，删除原 pending trace Map 和内联 async workflow。
+`scripts/test-worker-git-stable-metadata-resolver.mjs` 覆盖 20 项 primary/fallback/cleanup/overlap 断言。
 Turn-complete cache invalidation 中按 selected worktree、未知 commonDir 和同仓库 commonDir
 传播的 decision 已迁移至 `git-turn-cache-invalidation-policy.ts`；manager 仍负责 worktree/commonDir
 Map 查询及 `clearShortLivedGitReadCaches` 副作用。由 `scripts/test-worker-git-turn-cache-invalidation-policy.mjs`
