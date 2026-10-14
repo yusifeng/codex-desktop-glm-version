@@ -24838,10 +24838,12 @@ function Wy({ rootHost: e, bridge: t }) {
       const hoverRefreshController = createAnnotationHoverRefreshController({
         enabled: () => k === `comment` && !De && x == null,
         getPointer: () => E.current,
+        shouldSkipPointer: (point) => gt(point, A),
         isSurfaceAtPointer: (point) => point != null && Boolean(w.current?.hover(point)),
         resolveHover: (point) => point == null ? null : Yy(Xy(point, e, A)),
         setHover: o,
         clearSelectionHover: () => c(null),
+        setScrollSuppressed: (value) => { Ce.current = value; },
         refreshViewport: () => T(C_()),
         installFrames: (install) => dc(install),
         flushResize: (refresh) => (0, lb.flushSync)(refresh),

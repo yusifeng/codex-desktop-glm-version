@@ -1,10 +1,12 @@
 type HoverRefreshDependencies = {
   enabled: () => boolean;
   getPointer: () => any;
+  shouldSkipPointer?: (pointer: any) => boolean;
   isSurfaceAtPointer: (pointer: any) => boolean;
   resolveHover: (pointer: any) => any;
   setHover: (value: any) => void;
   clearSelectionHover: () => void;
+  setScrollSuppressed?: (value: boolean) => void;
   refreshViewport: () => void;
   installFrames: (install: (documentLike: any, windowLike: any) => () => void) => () => void;
   flushResize?: (refresh: () => void) => void;
@@ -21,6 +23,7 @@ function createAnnotationHoverRefreshController(dependencies: HoverRefreshDepend
   const refreshHover = () => {
     if (disposed || !dependencies.enabled()) return;
     const pointer = dependencies.getPointer();
+    if (dependencies.shouldSkipPointer?.(pointer)) return;
     if (dependencies.isSurfaceAtPointer(pointer)) {
       dependencies.setHover(null);
       dependencies.clearSelectionHover();
@@ -37,9 +40,11 @@ function createAnnotationHoverRefreshController(dependencies: HoverRefreshDepend
     if (timer != null) dependencies.clearTimeout(timer);
     dependencies.setHover(null);
     dependencies.clearSelectionHover();
+    dependencies.setScrollSuppressed?.(true);
     dependencies.refreshViewport();
     timer = dependencies.setTimeout(() => {
       timer = null;
+      dependencies.setScrollSuppressed?.(false);
       refreshHover();
     }, dependencies.debounceMs);
   };
@@ -61,6 +66,7 @@ function createAnnotationHoverRefreshController(dependencies: HoverRefreshDepend
     return () => {
       cleanupFrames();
       if (timer != null) dependencies.clearTimeout(timer);
+      dependencies.setScrollSuppressed?.(false);
       timer = null;
     };
   };

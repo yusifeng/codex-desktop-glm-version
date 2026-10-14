@@ -10,6 +10,7 @@ let pointer = { x: 10, y: 20 };
 let hover = null;
 let refreshes = 0;
 let timerCallback = null;
+let suppressed = false;
 const controller = createAnnotationHoverRefreshController({
   enabled: () => true,
   getPointer: () => pointer,
@@ -17,6 +18,7 @@ const controller = createAnnotationHoverRefreshController({
   resolveHover: (value) => ({ point: value }),
   setHover: (value) => { hover = value; },
   clearSelectionHover: () => {},
+  setScrollSuppressed: (value) => { suppressed = value; },
   refreshViewport: () => { refreshes += 1; },
   installFrames: (install) => { const cleanup = install(documentLike, windowLike); return () => cleanup(); },
   debounceMs: 25,
@@ -28,8 +30,10 @@ listeners.get("window:resize")();
 assert.deepEqual(hover, { point: pointer });
 listeners.get("document:scroll")();
 assert.equal(refreshes, 2);
+assert.equal(suppressed, true);
 timerCallback();
 assert.equal(refreshes, 3);
+assert.equal(suppressed, false);
 dispose();
 controller.dispose();
 console.log("6 preload annotation hover-refresh-controller assertions passed");
