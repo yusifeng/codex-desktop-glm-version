@@ -15,4 +15,7 @@ controller.bindPageToWebview(helpers, windowState, page, webContents, "dark", "a
 
 assert.equal(calls.length, 1);
 assert.deepEqual(calls[0], [helpers, windowState, page, webContents, "dark", "app"]);
+assert.deepEqual(controller.getBinding(webContents), { helpers, windowState, page });
+controller.disposeBinding(webContents);
+assert.equal(controller.getBinding(webContents), null);
 console.log("browser page webview binding controller tests passed");

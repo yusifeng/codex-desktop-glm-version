@@ -2,10 +2,11 @@
 
 /** Owns the page-to-WebContents binding boundary for Browser sidebar pages. */
 export function createBrowserPageWebviewBindingControllerClass(dependencies: Record<string, any>) {
-  const { bindPageToWebview } = dependencies;
+  const { bindPageToWebview: generatedBindPageToWebview } = dependencies;
 
   return class BrowserPageWebviewBindingController {
     private readonly host: any;
+    private readonly bindings = new WeakMap<object, any>();
 
     constructor(host: any) {
       this.host = host;
@@ -19,9 +20,10 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
       themeVariant: unknown,
       initialNavigationOwner: unknown,
     ): void {
-      // Keep the generated attachment implementation behind a stable owner boundary.
-      // The lifecycle helper facade remains the first argument expected by the binding code.
-      bindPageToWebview(
+      // The generated implementation owns the full listener graph (navigation, media, input,
+      // context-menu, crash, teardown and restore). This controller owns the attachment registry
+      // so host lifecycle code can inspect and explicitly release the binding it created.
+      generatedBindPageToWebview(
         helpers,
         windowState,
         page,
@@ -29,6 +31,15 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
         themeVariant,
         initialNavigationOwner,
       );
+      this.bindings.set(webContents, { helpers, windowState, page });
+    }
+
+    getBinding(webContents: object): any {
+      return this.bindings.get(webContents) ?? null;
+    }
+
+    disposeBinding(webContents: object): void {
+      this.bindings.delete(webContents);
     }
   };
 }
