@@ -3370,3 +3370,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker GitRepoWatcher residual state/event owner 已迁移至 `git-repo-watcher-state-controller.ts` 并真实接回：
   新 owner 持有 targets、ignore-source、pending paths、head-ref/git-dir 状态，统一 discovery/reconcile、policy
   refresh、batching、repo-change emission 与 clear；旧 watcher 删除 157 行，focused coverage 为 41 项。
+- worker `ibe.handleRequestWithContext` 的 77-case request dispatch 已整体迁移至
+  `git-worker-request-dispatcher.ts` 并真实接回：原 376 行 switch 已删除，case 顺序及 await/response/performance/
+  refresh/error 语义保持不变；consumer 剩余 context/admission/finalize/completion wiring，focused coverage 为 22 项。

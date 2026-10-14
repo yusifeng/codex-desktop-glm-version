@@ -1755,3 +1755,14 @@ working-tree pending path snapshot/reset、Git operation state、disposed gate�
 ref branch state 恢复、debug log 与 finally completion；worker 仅注入 watcher state 与 Git/event owners，
 原 40 行内嵌实现已删除。`scripts/test-worker-git-repo-change-emission-controller.mjs` 覆盖 working-tree、
 head/unknown、disposed、emit/state failure 与所有 finally completion 分支，共 19 项 focused assertions。
+
+### Git worker request dispatcher
+
+`ibe.handleRequestWithContext()` 的完整 77-case request switch 已迁移至
+`src/main/worker/git-worker-request-dispatcher.ts` 并真实接回 worker。新 dispatcher 保留原 case 顺序、
+逐分支 await/return、response envelope、performance result、refresh root、live-query void result、worktree
+raw/wrapped response 与局部 error fallback；consumer 仅装配 request context/dependencies，并继续负责 admission、
+exception classification、finalization 与 completion。worker 原 376 行 switch 已删除。
+`scripts/test-worker-git-worker-request-dispatcher.mjs` 锁定全部 77 个 case key/顺序，并覆盖 read、mutation、
+review performance、live query、synced branch、worktree raw/wrapped、Codex fallback、availability cache、未知
+method 及真实 consumer 接回，共 22 项 focused assertions。
