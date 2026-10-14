@@ -560,6 +560,19 @@ hover normalization 与 logger，main chunk 内旧 `W0e` 实现已删除。`B0e`
 initialize，`z0e` 仍拥有单 session 文档同步/idle timeout，owner 边界没有复制。
 `scripts/test-main-language-server-manager.mjs` 覆盖 39 项 focused assertions。
 
+### 增量抽取：sampler manager 生命周期
+
+R8/startup 原 `SQe`（121,519-121,626）的完整 app-state 与 performance sampling manager 已迁移至
+`src/main/main-app/startup/sampler-manager.ts`。模块拥有 heartbeat timer、pending snapshot request
+registry 和 performance-span sampling map，保留 non-heartbeat throttle、primary window focus/readiness
+检查、renderer request/WebContents identity gate、host/browser/stdio/jank 字段富化、main-thread jank
+attention 日志、Sentry breadcrumb，以及 WebContents destroyed 与 manager dispose 的清理顺序。
+
+原 main app 唯一 consumer 注入既有 Electron sampler、`n.Sc` TTL registry、`ct` interval gate、
+`vQe` jank sampler、app-server stdio stats、BrowserWindow attention projection 和 window manager；main chunk
+内旧 `SQe` 实现已删除。`scripts/test-main-sampler-manager.mjs` 使用 esbuild 临时 bundle，覆盖 38 项
+heartbeat/trigger/response/enrichment/performance-sampling/dispose focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

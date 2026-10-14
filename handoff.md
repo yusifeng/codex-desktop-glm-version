@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `SQe` sampler manager 的完整 startup/window health 生命周期迁移至
+`src/main/main-app/startup/sampler-manager.ts`，真实接回 main app 唯一 consumer，并删除原约 140 行
+内嵌实现；模块保留 app-state heartbeat/trigger gate、request/WebContents identity、host/browser/stdio/jank
+快照富化、jank 日志与 Sentry breadcrumb、performance-span CPU sampling 和 dispose 清理。
+focused test 为 `scripts/test-main-sampler-manager.mjs`（38 项）。
+
 本轮将 `GitManager.createRepoWatch()` 的完整 watch factory 生命周期迁移至
 `src/main/worker/git-repo-watch-factory.ts`，真实接回 worker consumer，并删除原 78 行内嵌实现；factory
 保留 repository 单 owner、watch identity/raw-event/recovery 状态、cache/live-query callbacks、local-only

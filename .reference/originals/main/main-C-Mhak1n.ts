@@ -58,6 +58,7 @@ const { buildJavaSessionOptions } = require("./main-app/language-server/java-ses
 const { SOURCEKIT_INITIALIZATION_OPTIONS } = require("./main-app/language-server/sourcekit-options.js");
 const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
 const { LanguageServerManager } = require("./main-app/language-server/language-server-manager.js");
+const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -121516,150 +121517,7 @@ var NZ = 100,
   yQe = 3e4,
   bQe = 5e3,
   xQe = 6e4,
-  SQe = class {
-    hostId;
-    windowManager;
-    desktopSentry;
-    electronSampler;
-    browserSessionRegistry;
-    appServerConnectionRegistry;
-    logger = r.i(`sampler-manager`);
-    mainThreadJankSampler = new vQe();
-    appStateHeartbeat;
-    appStateSnapshotRequestById = new n.Sc({ ttlMs: xQe });
-    appStateTriggerMinIntervalGate = new ct({ minIntervalMs: bQe });
-    performanceCpuSamplingById = new Map();
-    constructor(e, t, n, r, i, a) {
-      ((this.hostId = e),
-        (this.windowManager = t),
-        (this.desktopSentry = n),
-        (this.electronSampler = r),
-        (this.browserSessionRegistry = i),
-        (this.appServerConnectionRegistry = a),
-        (this.appStateHeartbeat = setInterval(() => {
-          this.requestAppStateSnapshot(`heartbeat`);
-        }, yQe)),
-        this.appStateHeartbeat.unref(),
-        this.mainThreadJankSampler.start());
-    }
-    dispose() {
-      (clearInterval(this.appStateHeartbeat), this.mainThreadJankSampler.stop());
-      for (let e of this.performanceCpuSamplingById.keys())
-        this.cancelPerformanceSpanCpuSampling(e);
-    }
-    startPerformanceSpanCpuSampling(e, t) {
-      this.cancelPerformanceSpanCpuSampling(t);
-      let n = () => {
-        this.cancelPerformanceSpanCpuSampling(t);
-      };
-      (e.once(`destroyed`, n),
-        this.performanceCpuSamplingById.set(t, {
-          initialSnapshot: this.electronSampler.collectPerformanceSpanCpuSnapshot(e),
-          onDestroyed: n,
-          webContents: e,
-        }));
-    }
-    cancelPerformanceSpanCpuSampling(e) {
-      let t = this.performanceCpuSamplingById.get(e);
-      t != null &&
-        (this.performanceCpuSamplingById.delete(e),
-        t.webContents.removeListener(`destroyed`, t.onDestroyed));
-    }
-    finishPerformanceSpanCpuSampling(e) {
-      let t = this.performanceCpuSamplingById.get(e);
-      return t == null || (this.cancelPerformanceSpanCpuSampling(e), t.webContents.isDestroyed())
-        ? null
-        : dQe(
-            t.initialSnapshot,
-            this.electronSampler.collectPerformanceSpanCpuSnapshot(t.webContents, `final`),
-          );
-    }
-    handleRendererReady(e) {
-      this.requestAppStateSnapshot(`heartbeat`, e);
-    }
-    async handleMessage(e, t) {
-      switch (t.type) {
-        case `electron-app-state-snapshot-trigger`:
-          this.requestAppStateSnapshot(t.reason, e);
-          break;
-        case `electron-app-state-snapshot-response`:
-          await this.handleAppStateSnapshotResponse(e, t);
-      }
-    }
-    async enrichWithHostSnapshotFields(e, t) {
-      let n = await this.electronSampler.collectSnapshotFields(e);
-      return {
-        ...this.addHostSnapshotFields(t, n),
-        ...this.mainThreadJankSampler.takeSnapshotFields(),
-      };
-    }
-    addHostSnapshotFields(e, t) {
-      let n = this.appServerConnectionRegistry.getConnection(this.hostId).getStdioIoStatsSnapshot(),
-        r = { ...e, ...t, ...this.browserSessionRegistry.getSnapshotFields() };
-      return (
-        n != null &&
-          Object.assign(r, {
-            app_server_stdio_bytes_read_total: n.bytesReadTotal,
-            app_server_stdio_bytes_written_total: n.bytesWrittenTotal,
-            app_server_stdio_bytes_read_last_30s: n.bytesReadLast30s,
-            app_server_stdio_bytes_written_last_30s: n.bytesWrittenLast30s,
-          }),
-        r
-      );
-    }
-    async handleAppStateSnapshotResponse(e, t) {
-      let n = R.performance.now(),
-        r = this.appStateSnapshotRequestById.get(t.requestId, n);
-      if (!r || r.webContentsId !== e.id) return;
-      this.appStateSnapshotRequestById.delete(t.requestId);
-      let i = await this.enrichWithHostSnapshotFields(e, t.fields);
-      r.memoryDiagnosticsSnapshotFields != null &&
-        Object.assign(i, await r.memoryDiagnosticsSnapshotFields);
-      let a = i.main_thread_jank_count_since_last_snapshot;
-      (a > 0 &&
-        this.logger().info(`main_thread_jank_snapshot`, {
-          safe: {
-            mainThreadJankCountSinceLastSnapshot: a,
-            snapshotReason: i.snapshot_reason,
-            ...mQe(l.BrowserWindow.getAllWindows()),
-          },
-          sensitive: {},
-        }),
-        this.logger().debug(`app_state_snapshot`, { safe: i, sensitive: {} }),
-        this.desktopSentry.addBreadcrumb({
-          category: `app_state`,
-          level: `info`,
-          message: `app_state_snapshot`,
-          data: i,
-        }));
-    }
-    requestAppStateSnapshot(e, t) {
-      let n = R.performance.now();
-      if (e !== `heartbeat` && !this.appStateTriggerMinIntervalGate.canPass(n)) return;
-      let r = t == null ? this.windowManager.getPrimaryWindow() : null,
-        i = t ?? r?.webContents;
-      if (
-        !i ||
-        i.isDestroyed() ||
-        !this.windowManager.isWebContentsReady(i.id) ||
-        (e === `heartbeat` && t == null && r != null && !r.isFocused())
-      )
-        return;
-      this.appStateTriggerMinIntervalGate.mark(n);
-      let a = (0, _.randomUUID)();
-      (this.appStateSnapshotRequestById.set(
-        a,
-        { memoryDiagnosticsSnapshotFields: void 0, webContentsId: i.id },
-        n,
-      ),
-        this.windowManager.sendMessageToWebContents(i, {
-          type: `electron-app-state-snapshot-request`,
-          hostId: this.hostId,
-          requestId: a,
-          reason: e,
-        }));
-    }
-  },
+  SQe = SamplerManager,
   CQe = r.i(`content-tracing`);
 async function wQe(e) {
   let t = l.app
@@ -123087,14 +122945,29 @@ var r$e = class {
         n.Ba.disabledSiteAnnotationHostnames.key,
         () => this.browserHostManager.refreshSiteAnnotationFeatures(),
       )),
-      (this.samplerManager = new SQe(
-        this.hostId,
-        this.windowManager,
-        this.desktopSentry,
-        w,
-        this.browserSessionRegistry,
-        this.appServerConnectionRegistry,
-      )),
+      (this.samplerManager = new SQe({
+        browserSessionRegistry: this.browserSessionRegistry,
+        clearInterval: (e) => clearInterval(e),
+        combineCpuSnapshots: dQe,
+        createId: () => (0, _.randomUUID)(),
+        desktopSentry: this.desktopSentry,
+        electronSampler: w,
+        getAllWindows: () => l.BrowserWindow.getAllWindows(),
+        getStdioIoStatsSnapshot: () =>
+          this.appServerConnectionRegistry
+            .getConnection(this.hostId)
+            .getStdioIoStatsSnapshot(),
+        heartbeatIntervalMs: yQe,
+        hostId: this.hostId,
+        jankSampler: new vQe(),
+        logger: r.i(`sampler-manager`),
+        now: () => R.performance.now(),
+        requestRegistry: new n.Sc({ ttlMs: xQe }),
+        setInterval: (e, t) => setInterval(e, t),
+        summarizeWindowAttention: mQe,
+        triggerGate: new ct({ minIntervalMs: bQe }),
+        windowManager: this.windowManager,
+      })),
       this.ensureWorktreeService(this.hostId));
   }
   getWorktreeService(e = this.hostId) {
