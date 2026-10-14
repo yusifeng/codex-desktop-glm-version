@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 的 host-message subscription lifecycle 迁移至 `annotation-host-message-controller.ts` 并真实接回；保留 dispatcher action wiring、sync state、editor close/restore 与 viewport scheduler cleanup 顺序，删除原约 68 行内联 effect。focused test 为 `scripts/test-preload-annotation-host-message-controller.mjs`（12 项）。
+
 本轮将原 `ytt` system permissions service 整体迁移至
 `src/main/main-app/startup/system-permissions-service.ts`，真实接回 startup RPC service 唯一 consumer，
 并删除旧实现及专用 URL constants；保留通知状态映射、macOS 麦克风授权、通知请求等待、三类系统设置
