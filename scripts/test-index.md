@@ -1468,7 +1468,6 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 [test-worker-git-init-reconnect-controller.mjs](test-worker-git-init-reconnect-controller.mjs)
 [test-worker-git-repo-watcher-dispose-controller.mjs](test-worker-git-repo-watcher-dispose-controller.mjs)
 [test-worker-git-repo-watcher-start-controller.mjs](test-worker-git-repo-watcher-start-controller.mjs)
-[test-worker-git-repo-watch-session-runtime.mjs](test-worker-git-repo-watch-session-runtime.mjs)
 [test-worker-git-watch-session-dispose-controller.mjs](test-worker-git-watch-session-dispose-controller.mjs)
 [test-worker-git-watch-session-start-controller.mjs](test-worker-git-watch-session-start-controller.mjs)
 [test-worker-git-repo-watch-session-runtime.mjs](test-worker-git-repo-watch-session-runtime.mjs)
