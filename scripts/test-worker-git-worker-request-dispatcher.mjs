@@ -108,8 +108,9 @@ result = await run("unsupported", {});
 deepEqual(result, { performance: undefined, refreshRoot: null, responseResult: undefined });
 
 const workerSource = fs.readFileSync(path.join(root, ".reference/originals/main/worker.ts"), "utf8");
-equal(workerSource.includes('require("./worker/git-worker-request-dispatcher")'), true);
-equal(workerSource.includes("await dispatchGitWorkerRequest(e"), true);
+const runtimeSource = fs.readFileSync(path.join(root, "src/main/worker/git-worker-request-runtime.ts"), "utf8");
+equal(runtimeSource.includes('from "./git-worker-request-dispatcher"'), true);
+equal(runtimeSource.includes("await dispatchGitWorkerRequest(e"), true);
 equal(workerSource.slice(workerSource.indexOf("async handleRequestWithContext"), workerSource.indexOf("async deleteWorktreeWithLimit")).includes("switch (e.method)"), false);
 
 console.log(`${assertions} worker git request dispatcher assertions passed`);

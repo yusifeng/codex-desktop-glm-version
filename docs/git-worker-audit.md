@@ -1766,3 +1766,18 @@ exception classification、finalization 与 completion。worker 原 376 行 swit
 `scripts/test-worker-git-worker-request-dispatcher.mjs` 锁定全部 77 个 case key/顺序，并覆盖 read、mutation、
 review performance、live query、synced branch、worktree raw/wrapped、Codex fallback、availability cache、未知
 method 及真实 consumer 接回，共 22 项 focused assertions。
+
+### Git worker request runtime and A1 closure
+
+`ibe.handleRequestWithContext()` 剩余的 context/dependency assembly 与 admission/catch/finalize/completion
+orchestration 已整体迁移至 `src/main/worker/git-worker-request-runtime.ts`。runtime 直接复用既有 admission、
+dispatcher、finalization、completion 模块，保持 AbortController/host 建立、performance context、pre-cancel
+短路、availability sentinel、exception disposition、finally cache invalidation、request finish、telemetry 与
+worker response 的顺序；manager method 现仅为 3 行稳定委托，原 293 行 owner 已删除。
+`scripts/test-worker-git-worker-request-runtime.mjs` 覆盖成功顺序、pre-cancel、dispatch failure、Git unavailable
+special fallback 与真实 consumer 接回，共 17 项 focused assertions；dispatcher 22 项回归同步验证新消费链。
+
+A1 全局 owner 复核后，Git manager/watch/session 的明确大型 lifecycle/controller 待迁清单可清零。保留项均为
+已登记的组合根或单一 I/O runtime：host assembly、worker transport、query fetch/fsmonitor cache、Git command/
+filesystem query owner 与 computer-use service dispatcher；这些边界绑定 shared identity、QueryClient/abort fan-out、
+process/host I/O 或 service lifecycle，继续迁移会复制状态或形成 facade，不计为未完成 A1 owner。
