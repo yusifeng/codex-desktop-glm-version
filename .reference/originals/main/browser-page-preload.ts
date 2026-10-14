@@ -5973,6 +5973,7 @@ var { projectAnnotationHighlightState } = require("./browser-page-preload/annota
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
 var { createAnnotationViewportRefreshScheduler } = require("./browser-page-preload/annotation-viewport-refresh-scheduler");
 var { createAnnotationAnchorObservationLifecycle } = require("./browser-page-preload/annotation-anchor-observation-lifecycle");
+var { createAnnotationAnchorObservationController } = require("./browser-page-preload/annotation-anchor-observation-controller");
 var { installAnnotationPointerEventLifecycle } = require("./browser-page-preload/annotation-pointer-event-lifecycle");
 var { createAnnotationPointerInteractionController } = require("./browser-page-preload/annotation-pointer-interaction-controller");
 var { createAnnotationHoverRefreshController } = require("./browser-page-preload/annotation-hover-refresh-controller");
@@ -24485,71 +24486,31 @@ function Wy({ rootHost: e, bridge: t }) {
     }, [x, Ne, k, h, designModifierNotifier]),
     (0, G.useEffect)(() => () => i.clear(), [i]),
     (0, G.useEffect)(() => Kv(k === `comment` ? Ve : xb, Ie), [k, Ie, Ve]),
-    (0, G.useLayoutEffect)(() => {
-      if (x != null || Fe.length === 0 || (k !== `comment` && te == null)) return;
-      let t = Ee.filter((e) => e.anchor.kind === `text` && Qy(e)),
-        n = () => {
-          de((e) => uu(t, e));
-        },
-        r = null,
-        i = () => {
-          r ??= window.requestAnimationFrame(() => {
-            ((r = null), n());
-          });
-        },
-        a = () => {
-          (n(),
-            (0, lb.flushSync)(() => {
-              T(C_());
-            }));
-        },
-        o = () => {
-          (i(), T(C_()));
-        },
-        s = () => o(),
-        c = Ee.flatMap((e) => (Qy(e) ? [e.anchor, ...(e.additionalAnchors ?? [])] : []));
-      let lifecycle = createAnnotationAnchorObservationLifecycle({
-        visualViewport: window.visualViewport,
-        observeFrames: (installFrameResources) => dc(installFrameResources),
-        observeTextAnchors: (anchors, onChange) => (anchors.length > 0 ? du(anchors, onChange) : () => {}),
-        anchors: t.flatMap((e) => (e.anchor.kind === `text` ? [e.anchor] : [])),
-        installRootResources: () => {
-          (window.addEventListener(`resize`, a), Ge && document.addEventListener(`scroll`, s, !0));
-          let cleanupOverlay = Ke ? tb(document, e, lt) : null;
-          let cleanupScrollContainers = Pc(window, c, s);
-          return () => {
-            (window.removeEventListener(`resize`, a),
-              Ge && document.removeEventListener(`scroll`, s, !0),
-              cleanupOverlay?.(),
-              cleanupScrollContainers());
-          };
-        },
-        installFrameResources: (frameDocument, frameWindow) => {
-          if (frameWindow === window) return () => {};
-          let onFrameChange = () => o();
-          (frameWindow.addEventListener(`resize`, a),
-            frameWindow.addEventListener(`scroll`, onFrameChange),
-            Ge && frameDocument.addEventListener(`scroll`, onFrameChange, !0));
-          let cleanupScrollContainers = Pc(frameWindow, c, onFrameChange);
-          let cleanupOverlay = Ke ? tb(frameDocument, e, lt) : null;
-          return () => {
-            (frameWindow.removeEventListener(`resize`, a),
-              frameWindow.removeEventListener(`scroll`, onFrameChange),
-              Ge && frameDocument.removeEventListener(`scroll`, onFrameChange, !0),
-              cleanupScrollContainers(),
-              cleanupOverlay?.());
-          };
-        },
-        onViewportResize: i,
-        onViewportScroll: s,
-        onTextAnchorChange: n,
-        cancelPendingFrame: () => {
-          r != null && window.cancelAnimationFrame(r);
-          r = null;
-        },
-      });
-      return lifecycle.install();
-    }, [x, te, Ee, Ge, Ke, k, lt, e, Fe.length]));
+    (0, G.useLayoutEffect)(() =>
+      createAnnotationAnchorObservationController({
+        windowLike: window,
+        documentLike: document,
+        isCurrentPage: (annotation) => Qy(annotation),
+        mergeTextAnnotations: (annotations, previous) => uu(annotations, previous),
+        updateTextAnnotations: de,
+        refreshViewport: () => T(C_()),
+        observeFrames: (install) => dc(install),
+        observeTextAnchors: (anchors, onChange) => anchors.length > 0 ? du(anchors, onChange) : () => {},
+        observeMutationsOutsideOverlay: (documentLike, rootHost, interactionLayer) => tb(documentLike, rootHost, interactionLayer),
+        observeScrollContainers: (windowLike, anchors, onChange) => Pc(windowLike, anchors, onChange),
+        flushSync: (callback) => (0, lb.flushSync)(callback),
+      }).install({
+        editor: x,
+        previewCommentId: te,
+        annotations: Ee,
+        hasDisplayAnnotations: Fe.length > 0,
+        interactionMode: k,
+        observeDocumentScroll: Ge,
+        observeMutations: Ke,
+        interactionLayer: lt,
+        rootHost: e,
+      }),
+    [x, te, Ee, Ge, Ke, k, lt, e, Fe.length]));
   let St = k === `comment` && !De && n.isOriginalViewEnabled !== !0,
     Ct = k === `comment` && !De && !ke && (x == null || x.target.mode === `create`);
   ((0, G.useLayoutEffect)(() => {
