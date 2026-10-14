@@ -3317,3 +3317,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker Git manager app/turn cache lifecycle 已迁移至 `git-manager-cache-lifecycle.ts` 并真实接回：新 owner
   持有 background/foreground 状态、turnComplete invalidation、selected worktree/commonDir fan-out 与 unknown
   commonDir fallback；manager 删除 background flag 和两个内联 workflow，focused coverage 为 16 项。
+- worker Git repository/worktree registry 已整体迁移至 `git-repository-registry.ts` 并真实接回：新 owner
+  持有三个 registry Map、local root normalization、get/create identity、commonDir mapping/clear，以及
+  host/cwd/mutation/repo-change cache invalidation；manager 删除 93 行旧 owner，focused coverage 为 43 项。

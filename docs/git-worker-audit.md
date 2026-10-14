@@ -1625,6 +1625,13 @@ Turn-complete cache invalidation 中按 selected worktree、未知 commonDir 和
 selected worktree untracked invalidation、commonDir fan-out、unknown commonDir fallback 与 host isolation 的完整
 执行生命周期进一步迁移至 `git-manager-cache-lifecycle.ts` 并真实接回。manager 删除 background flag 和两个
 内联 workflow，继续提供 repository registry/cache 副作用；policy 5 项及 lifecycle 16 项断言覆盖该边界。
+Git manager 的 repository/worktree registry 已整体迁移至
+`src/main/worker/git-repository-registry.ts` 并真实接回。新 owner 持有 repository、worktree 与
+worktree-common-dir 三个 Map，统一执行 local root normalization、get-or-create identity、host/cwd
+selection，以及 untracked、short-lived、mutation 和 repo-change cache invalidation；原 manager 的三个 Map
+和 93 行 registry 实现已删除。common-dir clear 随 stable metadata generation invalidation 接回；该 registry
+不持有 watcher、timer 或订阅句柄，因此没有额外 dispose 副作用。focused test 以 43 项断言覆盖 create/reuse、
+mapping/clear、host/cwd selection、resolution failure fallback 与所有 invalidation 分支。
 Repo-changed debounce/emit 的 pending count、active emission、timer 去重、完成后重排和 dispose
 生命周期已迁移至 `git-repo-change-controller.ts`；watcher 仍注入 Git operation state、event payload、
 telemetry 与实际 emit。`scripts/test-worker-git-repo-change-controller.mjs` 覆盖计数消费、timer 去重和

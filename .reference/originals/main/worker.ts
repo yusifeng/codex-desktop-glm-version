@@ -82,6 +82,7 @@ const { GitStableRootCache } = require("./worker/git-stable-root-cache");
 const { GitStableMetadataRetryController } = require("./worker/git-stable-metadata-retry-controller");
 const { GitStableMetadataResolver } = require("./worker/git-stable-metadata-resolver");
 const { GitManagerCacheLifecycle } = require("./worker/git-manager-cache-lifecycle");
+const { GitRepositoryRegistry } = require("./worker/git-repository-registry");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -67370,9 +67371,17 @@ var {
   qhe = 1e3,
   Jhe = 1024,
   Yhe = class {
-    reposByKey = new Map();
-    worktreesByKey = new Map();
-    commonDirByWorktreeKey = new Map();
+    repositoryRegistry = new GitRepositoryRegistry({
+      createKey: createGitManagerKey,
+      createRepository: (root, host) => new Whe(root, host),
+      createWorktree: (root, host) => new Khe(root, host),
+      getHostKey: h1,
+      invalidateUntracked: (worktree) => p2(worktree),
+      isKeyForHost: isGitManagerKeyForHost,
+      normalizeLocalRoot: (root) => bz(NZ(root)),
+      pathsOverlap: FZ,
+      selectWorktrees: selectGitCachedWorktrees,
+    });
     stableMetadataGeneration = 0;
     stableRootCache = new GitStableRootCache({
       clearTimeout,
@@ -67404,9 +67413,8 @@ var {
     });
     cacheLifecycle = new GitManagerCacheLifecycle({
       clearShortLived: (worktree) => worktree.clearShortLivedGitReadCaches(),
-      getAllWorktrees: () => this.worktreesByKey.values(),
-      getCommonDir: (worktree) =>
-        this.commonDirByWorktreeKey.get(this.getWorktreeKey(worktree.root, worktree.host)),
+      getAllWorktrees: () => this.repositoryRegistry.getWorktrees(),
+      getCommonDir: (worktree) => this.repositoryRegistry.getCommonDir(worktree),
       getHostId: (worktree) => worktree.host.id,
       invalidateAllShortLived: () => this.invalidateShortLivedGitReadCaches(),
       invalidateAllUntracked: () => this.invalidateUntrackedPathsCache(),
@@ -67430,85 +67438,44 @@ var {
     getWorktreeRepositoryForRoot(e, t) {
       return this.getOrCreateWorktree(e, t);
     }
-    getRepoKey(e, t) {
-      return createGitManagerKey(h1(t), e);
-    }
     getOrCreateRepo(e, t) {
-      let n = this.getRepoKey(e, t),
-        r = this.reposByKey.get(n);
-      if (r) return r;
-      let i = new Whe(e, t);
-      return (this.reposByKey.set(n, i), i);
-    }
-    getWorktreeKey(e, t) {
-      return createGitManagerKey(h1(t), e);
+      return this.repositoryRegistry.getOrCreateRepository(e, t);
     }
     getOrCreateWorktree(e, t) {
-      let n = t.isLocal ? bz(NZ(e)) : e,
-        r = this.getWorktreeKey(n, t),
-        i = this.worktreesByKey.get(r);
-      if (i) return i;
-      let a = new Khe(n, t);
-      return (this.worktreesByKey.set(r, a), a);
+      return this.repositoryRegistry.getOrCreateWorktree(e, t);
     }
     invalidateStableMetadata() {
       ((this.stableMetadataGeneration += 1),
         this.getStableRootMemoized.clear(),
         this.getStableMetadataMemoized.clear(),
-        this.commonDirByWorktreeKey.clear(),
+        this.repositoryRegistry.clearCommonDirs(),
         this.stableRootCache.clear(),
         this.stableMetadataRetryController.clear(),
         this.stableMetadataResolver.clearPendingTraces());
     }
     invalidateUntrackedPathsCache(e) {
-      let t = e == null ? null : h1(e);
-      for (let [e, n] of this.worktreesByKey) (t == null || isGitManagerKeyForHost(e, t)) && p2(n);
+      this.repositoryRegistry.invalidateUntracked(e);
     }
     async invalidateUntrackedPathsCacheForCwd(e, t) {
-      try {
-        let n = await this.getStableRoot(e, t);
-        if (n != null) {
-          let e = t.isLocal ? bz(NZ(n)) : n,
-            r = h1(t);
-          for (let [t, n] of this.worktreesByKey)
-            isGitManagerKeyForHost(t, r) && FZ(n.root, e, n.host) && p2(n);
-          return;
-        }
-      } catch {}
-      this.invalidateUntrackedPathsCache(t);
+      return this.repositoryRegistry.invalidateUntrackedForCwd(
+        e,
+        t,
+        (cwd, host) => this.getStableRoot(cwd, host),
+      );
     }
     invalidateShortLivedGitReadCaches(e) {
-      if (e == null) {
-        for (let e of this.worktreesByKey.values()) e.clearShortLivedGitReadCaches();
-        return;
-      }
-      let t = h1(e);
-      for (let [e, n] of this.worktreesByKey)
-        isGitManagerKeyForHost(e, t) && n.clearShortLivedGitReadCaches();
+      this.repositoryRegistry.invalidateShortLived(e);
     }
     getCachedWorktreesForCwds(e, t) {
-      let n = Array.from(this.worktreesByKey.values()).filter((e) => e.host.id === t);
-      let r = n[0]?.host.isLocal === !0 ? (e ?? []).map((e) => NZ(e)) : (e ?? []);
-      return selectGitCachedWorktrees(n, e, r, (e, t) => FZ(e.root, t, e.host) || FZ(t, e.root, e.host));
+      return this.repositoryRegistry.selectForCwds(e, t);
     }
     async invalidateGitReadCachesForMutation(e, t) {
-      let n = h1(t),
-        r = this.worktreesByKey.get(createGitManagerKey(n, e));
-      if (r == null)
-        try {
-          r = (await this.getWorktreeRepository(xz(e), t)) ?? void 0;
-        } catch {}
-      if (r != null) {
-        r.invalidateGitReadCachesForMutation();
-        return;
-      }
-      for (let [e, t] of this.worktreesByKey)
-        isGitManagerKeyForHost(e, n) && t.invalidateGitReadCachesForMutation();
+      return this.repositoryRegistry.invalidateMutation(e, t, (root, host) =>
+        this.getWorktreeRepository(xz(root), host),
+      );
     }
     invalidateGitReadCachesForRepoChange(e, t) {
-      let n = t == null ? null : h1(t);
-      for (let [t, r] of this.worktreesByKey)
-        (n == null || isGitManagerKeyForHost(t, n)) && r.invalidateGitReadCachesForRepoChange(e);
+      this.repositoryRegistry.invalidateRepoChange(e, t);
     }
     getStableMetadata = async (e, t) => {
       let key = this.getStableMetadataKey(e, t);
@@ -67520,7 +67487,7 @@ var {
           n === this.stableMetadataGeneration &&
             (this.stableMetadataRetryController.delete(key),
             r != null &&
-              this.commonDirByWorktreeKey.set(this.getWorktreeKey(r.root, t), r.commonDir)),
+              this.repositoryRegistry.rememberCommonDir(r.root, t, r.commonDir)),
           r
         );
       } catch (r) {
