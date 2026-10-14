@@ -598,6 +598,18 @@ owner bounds 与 RPC schema 校验；main chunk 内旧 `Ctt`、data URL 和 time
 load/show 的 3 秒 timeout、load/execute/capture 异常降级、closed 事件与显式 dispose 均释放 interval 和窗口。
 `scripts/test-main-tab-drag-presentation-window.mjs` 使用 esbuild 临时 bundle，覆盖 47 项 focused assertions。
 
+### 增量抽取：tab-drag session 生命周期
+
+R10/window 原 `Dtt`（154,119-154,230）的完整 tab-drag RPC session 已迁移至
+`src/main/main-app/window/tab-drag-session.ts`。模块拥有 presentation lifetime 与 single-load 状态，保留
+ready/updateCue/load/show/freeze/dispose 调用面、load 前 ready gate、load 中 dispose race、presentation
+false/rejection 清理，以及 owner content bounds 对 snapshot size/grab offset 的约束。
+
+原 `Ett.prepare()` consumer 继续使用既有 `Ttt/wtt/m5` schemas，并以 parse adapters 注入，因此 nullable
+cue 与字段范围语义未复制；presentation 由上批迁移的 `TabDragPresentationWindow` 提供。main chunk 内旧
+`Dtt` 实现已删除。`scripts/test-main-tab-drag-session.mjs` 使用 esbuild 临时 bundle，覆盖 51 项 focused
+assertions，包括 bounds 边界、invalid payload、一次性 load、异步销毁竞态和 freeze 坐标投影。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

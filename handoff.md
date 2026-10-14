@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `Dtt` tab-drag session 的完整 RPC/presentation 生命周期迁移至
+`src/main/main-app/window/tab-drag-session.ts`，真实接回 `Ett.prepare()` consumer，并删除旧实现；保留
+nullable cue schema、single-load gate、owner bounds/grab-offset 校验、freeze 坐标投影、异步 dispose race
+与 presentation 失败清理。focused test 为 `scripts/test-main-tab-drag-session.mjs`（51 项）。
+
 本轮将 Wy 的 screenshot/render/draft-marker/overlay-style 投影迁移至 `annotation-overlay-runtime-state.ts` 并真实接回；保留 linked draft selection、截图 geometry、metadata/flex-gap、draft marker 与 comment cursor policy，删除原约 100 行内联投影。focused test 为 `scripts/test-preload-annotation-overlay-runtime-state.mjs`（10 项）。
 
 本轮将原 `Ctt` tab-drag presentation window 的完整 Electron 窗口生命周期迁移至

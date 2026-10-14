@@ -61,6 +61,7 @@ const { LanguageServerManager } = require("./main-app/language-server/language-s
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
+const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -153947,60 +153948,28 @@ var p5 = r.i(`system-permissions-service`),
       )
         return null;
       try {
-        return new Dtt(e, this.createPresentation());
+        return new Dtt({
+          owner: e,
+          parseCue: (e) => {
+            let t = Ttt.safeParse(e);
+            return t.success ? t.data : void 0;
+          },
+          parseLoad: (e) => {
+            let t = wtt.safeParse(e);
+            return t.success ? t.data : void 0;
+          },
+          parsePoint: (e) => {
+            let t = m5.safeParse(e);
+            return t.success ? t.data : void 0;
+          },
+          presentation: this.createPresentation(),
+        });
       } catch {
         return null;
       }
     }
   },
-  Dtt = class extends n.Uf {
-    owner;
-    presentation;
-    #e = !1;
-    #t = !1;
-    constructor(e, t) {
-      (super(), (this.owner = e), (this.presentation = t));
-    }
-    async ready() {
-      return (await this.presentation.ready()) && !this.#e;
-    }
-    async updateCue(e) {
-      if (this.#e) return !1;
-      let t = Ttt.safeParse(e);
-      return t.success ? this.presentation.updateCue(t.data) : (this[Symbol.dispose](), !1);
-    }
-    async load(e) {
-      if (this.#e || this.#t || ((this.#t = !0), !(await this.presentation.ready()) || this.#e))
-        return !1;
-      let t = this.#n(e);
-      if (t == null) return (this[Symbol.dispose](), !1);
-      try {
-        return !(await this.presentation.load(t)) || this.#e ? (this[Symbol.dispose](), !1) : !0;
-      } catch {
-        return (this[Symbol.dispose](), !1);
-      }
-    }
-    async show() {
-      return !this.#e && this.presentation.show();
-    }
-    freeze(e) {
-      if (this.#e) return !1;
-      let t = m5.safeParse(e);
-      if (!t.success || this.owner.isDestroyed()) return (this[Symbol.dispose](), !1);
-      let n = this.owner.getContentBounds();
-      return this.presentation.freeze({ x: n.x + t.data.x, y: n.y + t.data.y });
-    }
-    [Symbol.dispose]() {
-      this.#e || ((this.#e = !0), this.presentation[Symbol.dispose]());
-    }
-    #n(e) {
-      let t = wtt.safeParse(e);
-      if (!t.success) return null;
-      let [n, r] = this.owner.getContentSize(),
-        { size: i, grabOffset: a } = t.data;
-      return i.width > n || i.height > r || Math.abs(a.x) > n || Math.abs(a.y) > r ? null : t.data;
-    }
-  },
+  Dtt = TabDragSession,
   Ott = [`powershell`, `commandPrompt`],
   ktt = [`--login`, `-i`];
 function Att() {
