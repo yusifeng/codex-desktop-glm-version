@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 `Sat` hotkey-window presentation controller 及独占 support 带整体迁移至
+`src/main/main-app/hotkey/hotkey-window-controller.ts`，保留 home/thread 双窗、transition/generation、
+placement/bounds、drag/snap/haptic、mouse passthrough、route 与 dispose 生命周期，原 main 删除 993 行。
+`Eat` 继续通过三参契约真实注入该 controller；focused test 为 `scripts/test-main-hotkey-window-controller.mjs`
+（20 项）。A3 当前剩余主 owner 为 `tQe` IAB/browser-sidebar manager。
+
 本轮继续并行清理 A3 hotkey/Appshot 链路：
 
 - cross-platform capture-request owner 已真实接回 `capture-requests.ts`，删除原 199 行

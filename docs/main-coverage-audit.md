@@ -783,11 +783,20 @@ target decoration、native hotkey flight、capture source/update/finally、prepa
 file/schema/25 MiB safety 与 release/dispose drain；main 保留原 `Git(m)` 生产 consumer。
 原 526 行实现已删除，`scripts/test-main-windows-native-capture-bridge.mjs` 覆盖 28 项 focused assertions。
 
+### 增量抽取：hotkey-window presentation controller
+
+R12/hotkey 原 `Sat` 及其独占 layout/snap/haptic/drag support 带已整体迁移至
+`src/main/main-app/hotkey/hotkey-window-controller.ts`。新 factory 拥有 home/thread 双窗创建与 generation guard、
+transition ack/timeout、placement/bounds、drag/snap/haptic、mouse passthrough、route navigation 与 dispose
+状态机，并保留 Eat 的三参构造契约。原 presentation subsystem 物理删除 993 行。
+`scripts/test-main-hotkey-window-controller.mjs` 覆盖 20 项 prewarm/open/toggle/route/pointer/dispose assertions，
+typecheck/build/verify 均通过。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
-`vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit` 均已移出，cross-platform capture-request owner 也已真实接回。
-当前明确剩余的大 owner 为 `tQe` IAB/browser-sidebar manager，以及 `Sat` hotkey-window
-presentation/controller 与其独占 layout/drag/snap/haptic support 带。`ztt` 是保留的 node-pty I/O adapter。
+`vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit/Sat` 均已移出，cross-platform capture-request owner 也已真实接回。
+当前明确剩余的大 owner 为 `tQe` IAB/browser-sidebar manager，以及其内部尚未迁出的
+presentation/page/materialization 子 owner。`ztt` 是保留的 node-pty I/O adapter。
 
 ### A3 main 剩余 owner 复核（2026-10-11）
 
