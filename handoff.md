@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `xZe` browser tab working-set/activity manager 整体迁移至
+`src/main/main-app/browser-sidebar/browser-tab-working-set-manager.ts`，真实接回 IAB manager 唯一 consumer，
+并删除旧 owner 与专用候选排序/筛选 helper；保留单调 activity 序列、per-window selection、30 分钟保护、
+32-tab budget、expiry timer 与 suspension telemetry。focused test 为
+`scripts/test-main-browser-tab-working-set-manager.mjs`（41 项）。
+
 本轮将 Wy 的 runtime collections/current-page target projection 迁入
 `src/main/browser-page-preload/annotation-current-page-target-projection.ts`并真实接回；
 集中 page comment 过滤、text-anchor observation 复用、live comment/design target、element cache
@@ -3338,3 +3344,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker Git repository/worktree registry 已整体迁移至 `git-repository-registry.ts` 并真实接回：新 owner
   持有三个 registry Map、local root normalization、get/create identity、commonDir mapping/clear，以及
   host/cwd/mutation/repo-change cache invalidation；manager 删除 93 行旧 owner，focused coverage 为 43 项。
+- worker Git watch registry/setup/git-init coordination 已整体迁移至 `git-watch-registry-controller.ts` 并真实接回：
+  新 owner 持有 watch/setup Map、active/desired init watch、handled watcher 与 refresh single-flight 状态，统一
+  current-watch/setup/init recovery/dispose 竞态；manager 删除六个旧字段和内联协调，focused coverage 为 55 项。

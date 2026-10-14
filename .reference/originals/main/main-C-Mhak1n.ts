@@ -67,6 +67,7 @@ const { SystemPermissionsService } = require("./main-app/startup/system-permissi
 const { ExternalDocumentBindingRegistry } = require("./main-app/remote-artifact/external-document-binding-registry.js");
 const { NativeArtifactFileService } = require("./main-app/remote-artifact/native-artifact-file-service.js");
 const { BrowserPageHostLifecycle } = require("./main-app/browser-sidebar/browser-page-host-lifecycle.js");
+const { BrowserTabWorkingSetManager } = require("./main-app/browser-sidebar/browser-tab-working-set-manager.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -117538,196 +117539,6 @@ function bZe({
       NX(t, a, i, `browser-restore-page-materialized`, `Materialized persisted Browser page`),
       { kind: `ready` });
 }
-var hZ = 32,
-  gZ = 18e5,
-  xZe = class {
-    options;
-    tabActivitySequence = 0;
-    lastTabActivityTime = 0;
-    activeConversationByWindow = new Map();
-    selectedTabsByWindow = new Map();
-    workingSetExpiryTimersByWindow = new Map();
-    constructor(e) {
-      this.options = e;
-    }
-    markTabActivity(e) {
-      (this.updateTabActivity(e), this.options.onTabActivity());
-    }
-    markTabSelected(e, t) {
-      this.updateTabActivity(t);
-      let n = e.window.id,
-        r = this.now(),
-        i = this.selectedTabsByWindow.get(n);
-      i ?? ((i = new Map()), this.selectedTabsByWindow.set(n, i));
-      let a = this.activeConversationByWindow.get(n),
-        o = a == null ? null : i.get(a);
-      (o != null && (o.selectedAt = r),
-        i.set(t.conversationId, { browserTabId: t.browserTabId, selectedAt: r }),
-        this.activeConversationByWindow.set(n, t.conversationId),
-        this.options.onTabActivity());
-    }
-    isTabProtectedFromSuspension(e, t) {
-      return this.getProtection(e, t, this.now()).protected;
-    }
-    enforceDetachedPageBudgets() {
-      for (let e of this.options.windows.values()) this.enforceDetachedPageBudget(e);
-    }
-    enforceDetachedPageBudget(e) {
-      let t = e.window.id;
-      this.clearWorkingSetExpiryTimer(t);
-      let n = SZe(e);
-      if (
-        n.length <= hZ ||
-        Array.from(e.threads.values()).some(
-          (e) => e.page?.isRestoring === !0 || e.pendingTeardown?.reason === `suspended`,
-        )
-      )
-        return;
-      let r = this.now(),
-        i = n
-          .filter((t) => t.pendingTeardown == null && !this.getProtection(e, t, r).protected)
-          .sort(
-            (t, n) =>
-              _Z(this.getCandidateRank(e, t)) - _Z(this.getCandidateRank(e, n)) ||
-              t.lastTabActivitySequence - n.lastTabActivitySequence ||
-              t.browserTabId.localeCompare(n.browserTabId),
-          )[0];
-      if (i == null) {
-        this.scheduleWorkingSetExpiry(e, n, r);
-        return;
-      }
-      let a = this.getCandidateRank(e, i),
-        o = this.getProtectionCounts(e, n, r);
-      (this.recordTabBudgetEvent(
-        e,
-        i,
-        `browser-tab-budget-suspension-selected`,
-        `Selected Browser tab for budget suspension`,
-        {
-          budget: hZ,
-          candidateRank: a,
-          activeTabProtectedCount: o.activeTab,
-          liveDetachedRendererCount: n.length,
-          pressureReason: `count`,
-          workingSetSelectedProtectedCount: o.workingSetSelected,
-        },
-      ),
-        this.options.suspendDetachedThread(e, i));
-    }
-    recordTabSuspended(e, t) {
-      this.recordTabBudgetEvent(
-        e,
-        t,
-        `browser-tab-budget-tab-suspended`,
-        `Suspended Browser tab selected by the tab budget`,
-        { pressureReason: `count` },
-      );
-    }
-    handleWindowClosed(e) {
-      (this.clearWorkingSetExpiryTimer(e),
-        this.activeConversationByWindow.delete(e),
-        this.selectedTabsByWindow.delete(e));
-    }
-    getCandidateRank(e, t) {
-      return e.activeBrowserTabId != null && e.activeConversationId === t.conversationId
-        ? `current-thread-secondary`
-        : this.getSelectedTab(e, t)?.browserTabId === t.browserTabId
-          ? `inactive-selected`
-          : `inactive-secondary`;
-    }
-    getProtection(e, t, n) {
-      let r =
-          e.activeConversationId === t.conversationId && e.activeBrowserTabId === t.browserTabId,
-        i = this.getSelectedTab(e, t),
-        a = !r && i?.browserTabId === t.browserTabId && n - i.selectedAt < gZ;
-      return {
-        activeTab: r,
-        workingSetSelected: a,
-        protected:
-          r ||
-          a ||
-          t.presented ||
-          t.isBrowserUseActive ||
-          t.isTabCaptureActive === !0 ||
-          t.page?.isAudible === !0 ||
-          t.page?.isCapturingUserMedia === !0 ||
-          t.page?.isLoading === !0 ||
-          t.page?.isRestoring === !0 ||
-          this.options.hasActiveDownload(t),
-      };
-    }
-    getSelectedTab(e, t) {
-      return this.selectedTabsByWindow.get(e.window.id)?.get(t.conversationId);
-    }
-    getProtectionCounts(e, t, n) {
-      let r = { activeTab: 0, workingSetSelected: 0 };
-      for (let i of t) {
-        let t = this.getProtection(e, i, n);
-        ((r.activeTab += +!!t.activeTab), (r.workingSetSelected += +!!t.workingSetSelected));
-      }
-      return r;
-    }
-    scheduleWorkingSetExpiry(e, t, n) {
-      let r = 1 / 0;
-      for (let i of t) {
-        if (!this.getProtection(e, i, n).workingSetSelected) continue;
-        let t = this.getSelectedTab(e, i);
-        t != null && (r = Math.min(r, t.selectedAt + gZ));
-      }
-      if (!Number.isFinite(r)) return;
-      let i = e.window.id,
-        a = setTimeout(() => {
-          this.workingSetExpiryTimersByWindow.delete(i);
-          let e = this.options.windows.get(i);
-          e != null && this.enforceDetachedPageBudget(e);
-        }, r - n);
-      (a.unref(), this.workingSetExpiryTimersByWindow.set(i, a));
-    }
-    clearWorkingSetExpiryTimer(e) {
-      let t = this.workingSetExpiryTimersByWindow.get(e);
-      t != null && (clearTimeout(t), this.workingSetExpiryTimersByWindow.delete(e));
-    }
-    recordTabBudgetEvent(e, t, n, r, i) {
-      this.options.browserSessionRegistry.recordDebugEvent({
-        browserTabId: t.browserTabId,
-        conversationId: t.conversationId,
-        details: Object.entries(i).map(([e, t]) => ({ label: e, value: String(t) })),
-        guestWebContentsId: t.page?.view.webContents?.id ?? null,
-        kind: n,
-        message: r,
-        ownerWebContentsId: e.owner.id,
-        pageKey: null,
-        windowId: e.window.id,
-      });
-    }
-    updateTabActivity(e) {
-      ((this.tabActivitySequence += 1),
-        (this.lastTabActivityTime = Math.max(this.now(), this.lastTabActivityTime + 1)),
-        (e.lastTabActivitySequence = this.tabActivitySequence),
-        (e.lastTabActivityTime = this.lastTabActivityTime));
-    }
-    now() {
-      return this.options.now?.() ?? Date.now();
-    }
-  };
-function _Z(e) {
-  switch (e) {
-    case `inactive-secondary`:
-      return 0;
-    case `inactive-selected`:
-      return 1;
-    case `current-thread-secondary`:
-      return 2;
-  }
-}
-function SZe(e) {
-  return Array.from(e.threads.values()).filter(
-    (e) =>
-      e.sessionState === `live-detached` &&
-      e.page?.view.webContents != null &&
-      !e.page.view.webContents.isDestroyed(),
-  );
-}
 var CZe = n.wf({ threadId: n.Of(), item: n.wf({ type: n.bf(`mcpToolCall`), id: n.Of() }) });
 function wZe({ browserSessionRegistry: e, onMcpToolCallCompleted: t, source: n }) {
   n?.registerInternalNotificationHandler((n) => {
@@ -118545,7 +118356,7 @@ var $Ze = class {
         (this.browserUseOpenRequests = new UWe((e) => {
           this.browserSessionRegistry.recordDebugEvent(e);
         })),
-        (this.tabBudget = new xZe({
+        (this.tabBudget = new BrowserTabWorkingSetManager({
           browserSessionRegistry: this.browserSessionRegistry,
           hasActiveDownload: (e) => this.downloadStore.hasActiveDownloadForRoute(e),
           onTabActivity: () => this.iabTabMentions.notifyInvalidated(),
