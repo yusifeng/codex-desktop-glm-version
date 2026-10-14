@@ -171,20 +171,20 @@ function createHarness({ thread = createThread(), windowState, overrides = {} } 
 
 {
   const harness = createHarness();
-  equal(harness.lifecycle.registerHost(harness.windowState, "tab-1", "conversation-1", 3, "persist", "bad"), false);
+  equal(harness.lifecycle.registerHost(harness.windowState, "conversation-1", "tab-1", 3, "persist", "bad"), false);
   equal(harness.calls.length, 0);
-  equal(harness.lifecycle.registerHost(harness.windowState, "tab-1", "conversation-1", 1, "persist", "renderer-1"), false);
+  equal(harness.lifecycle.registerHost(harness.windowState, "conversation-1", "tab-1", 1, "persist", "renderer-1"), false);
   equal(harness.calls.find(([name]) => name === "find").slice(1), ["conversation-1", "tab-1"]);
   harness.calls.length = 0;
   harness.options.browserPersistence.reconcileBrowserStorageId = () => false;
-  equal(harness.lifecycle.registerHost(harness.windowState, "tab-1", "conversation-1", 3, "persist", "renderer-1"), false);
+  equal(harness.lifecycle.registerHost(harness.windowState, "conversation-1", "tab-1", 3, "persist", "renderer-1"), false);
   equal(harness.calls.some(([name]) => name === "prepare"), false);
 }
 
 {
   const harness = createHarness();
   harness.thread.hostGeneration = null;
-  equal(harness.lifecycle.registerHost(harness.windowState, "tab-1", "conversation-1", 3, "persist", "renderer-1"), true);
+  equal(harness.lifecycle.registerHost(harness.windowState, "conversation-1", "tab-1", 3, "persist", "renderer-1"), true);
   equal(harness.thread.hostGeneration, 3);
   equal(harness.calls.filter(([name]) => name === "register").length, 1);
 }

@@ -97,8 +97,8 @@ export class BrowserPageHostLifecycle {
       persistenceKey,
     );
     const threadState =
-      this.options.findThreadState(windowState, browserTabId, conversationId) ??
-      this.options.ensureThreadStateForWindow(windowState, browserTabId, conversationId);
+      this.options.findThreadState(windowState, conversationId, browserTabId) ??
+      this.options.ensureThreadStateForWindow(windowState, conversationId, browserTabId);
     if (
       (threadState.hostGeneration != null && threadState.hostGeneration > hostGeneration) ||
       !this.options.browserPersistence.reconcileBrowserStorageId(

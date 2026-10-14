@@ -826,6 +826,13 @@ focused test 为 `scripts/test-main-browser-use-route-controller.mjs`。
 comment-mode entry owner（interaction mode、point comment/design entry、blocklist tri-state 与 pending
 activation）已迁移至 `browser-comment-mode-controller.ts`，focused test 为
 `scripts/test-main-browser-comment-mode-controller.mjs`。
+
+### 增量抽取：IAB window/thread state controller
+
+窗口状态、thread state 创建/销毁、close/transfer、页面状态 lookup、当前窗口与 detached-window
+选择已迁移至 `browser-window-thread-state-controller.ts`，删除 tQe 原 inline owner；同时修正
+`registerHost` 的 conversation/tab 参数契约。focused test 为
+`scripts/test-main-browser-window-thread-state-controller.mjs`，既有 host lifecycle test 更新后保持 65 项通过。
 `scripts/test-main-browser-page-command-controller.mjs` 覆盖 11 项历史、焦点、缩放、快照、挂载与路由断言。
 
 ### A3 main 剩余大 owner（2026-10-15）

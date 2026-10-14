@@ -16,6 +16,11 @@ page-command controller 的 history clone 依赖，将 `rW/WX/GX` 显式注入�
 `browser-comment-mode-controller.ts`；两者均删除原 tQe inline owner 并保留 focused tests。共享的
 `mXe/hXe/OX` 等仍被其他生命周期路径使用的顶层 helper 保留，不计为 route owner 残留。
 
+随后完成 tQe window/thread state owner：close/transfer、window state、thread state 创建/销毁、页面 lookup
+与 detached-window 选择已迁入 `browser-window-thread-state-controller.ts`，旧 inline 实现已物理删除；并修正
+page host lifecycle 中 registerHost 的 conversation/tab 参数顺序。focused test 为
+`scripts/test-main-browser-window-thread-state-controller.mjs`（6 项）。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger

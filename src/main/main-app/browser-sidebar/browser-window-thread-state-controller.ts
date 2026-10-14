@@ -1,0 +1,194 @@
+// @ts-nocheck
+
+/** Owns Browser sidebar window and thread-state lookup/materialization. */
+export function createBrowserWindowThreadStateControllerClass(dependencies: Record<string, any>) {
+  const { hX, fq, gXe, oX, SWe, AX, vXe, yXe, bXe, xXe, SXe, aXe, gX, qU, oXe, vX, tq, KU, l } = dependencies;
+
+  return class BrowserWindowThreadStateController {
+    host: any;
+
+    constructor(host: any) {
+      this.host = host;
+    }
+
+    closePage(ownerWebContents: any, conversationId: any, browserTabId: any, browserStorageId: any) {
+      const windowState = this.host.getCurrentWindowState(ownerWebContents);
+      if (windowState == null) return;
+      const threadState = hX(windowState, conversationId, browserTabId);
+      if (threadState == null || (browserStorageId != null && threadState.browserStorageId !== browserStorageId)) {
+        if (threadState == null && browserTabId != null)
+          this.host.browserPageHostLifecycle.cancelPendingWebviewAttaches(windowState, { browserTabId, conversationId });
+        if (browserTabId != null && browserStorageId != null && !this.host.browserPersistence.hasBrowserStorageOwner(browserStorageId))
+          this.host.browserPageSnapshots.deleteClosedPageAndFlush({ browserStorageId, browserTabId, conversationId });
+        return;
+      }
+      fq(this.host.windowManager, windowState.owner, conversationId, threadState);
+      if (windowState.activeConversationId === conversationId && windowState.activeBrowserTabId === threadState.browserTabId)
+        windowState.activeBrowserTabId = null;
+      if (threadState.isBrowserUseActive)
+        this.host.setBrowserUseActiveForRoute({ conversationId, windowId: oX(windowState.window.id) }, false, threadState.browserTabId);
+      this.host.browserUseOpenRequests.rejectForRoute({ browserTabId: threadState.browserTabId, conversationId, error: Error(`ChatGPT browser tab was closed by the user`), owner: windowState.owner });
+      this.host.browserPageHostLifecycle.requestThreadTeardown(windowState, conversationId, threadState, `closed`);
+    }
+
+    transferConversation(ownerWebContents, sourceConversationId, sourceBrowserTabId, targetConversationId, targetBrowserTabId) {
+      const windowState = this.host.ensureCurrentWindowState(ownerWebContents);
+      if (windowState != null) this.transferConversationState(windowState, sourceConversationId, sourceBrowserTabId, targetConversationId, targetBrowserTabId);
+    }
+
+    transferConversationState(windowState: any, sourceConversationId: any, sourceBrowserTabId: any, targetConversationId: any, targetBrowserTabId: any) {
+      this.host.siteAnnotationPermissions.cancel(hX(windowState, sourceConversationId, sourceBrowserTabId)?.page?.view.webContents);
+      gXe({
+        browserSessionRegistry: this.host.browserSessionRegistry,
+        comments: this.host.comments,
+        downloadStore: this.host.downloadStore,
+        disposeThreadState: this.host.disposeThreadState.bind(this.host),
+        isBrowserUseManagedBrowserTab: this.host.browserPageHostLifecycle.isBrowserUseManagedBrowserTab.bind(this.host.browserPageHostLifecycle),
+        getThreadStateForWindow: hX,
+        setBrowserUseActiveForRoute: this.host.setBrowserUseActiveForRoute.bind(this.host),
+        sourceBrowserTabId,
+        sourceConversationId,
+        syncRuntimeStateToPage: this.host.syncRuntimeStateToPage.bind(this.host),
+        syncThreadState: this.host.syncThreadState.bind(this.host),
+        targetBrowserTabId,
+        targetConversationId,
+        windowState,
+      });
+      const target = hX(windowState, targetConversationId, targetBrowserTabId);
+      if (target != null) {
+        this.host.browserPageSnapshots.reassociateAndFlush(target);
+        if (windowState.activeConversationId === targetConversationId && windowState.activeBrowserTabId === target.browserTabId)
+          this.host.tabBudget.markTabSelected(windowState, target);
+      }
+      this.host.iabTabMentions.notifyInvalidated();
+    }
+
+    ensureWindowState(window: any, owner: any) {
+      const windowId = window.id;
+      const existing = this.host.windows.get(windowId);
+      if (existing) {
+        existing.owner = owner;
+        this.host.browserSessionRegistry.registerWindow({ ownerWebContentsId: owner.id, windowId });
+        return existing;
+      }
+      const state: any = {
+        owner, isClosing: false, window, contentBounds: null, threads: new Map(), activeConversationId: null,
+        activeBrowserTabId: null, ignoredConversationIds: new Set(), rendererInstanceId: null,
+        registeredWebviewHostsByRoutePartition: new Map(), browserSettingsWebviewMountIds: new Set(),
+        browserSettingsWebviewThemeVariant: `light`, pendingBrowserSettingsWebviewsByInstanceId: new Map(),
+        browserSettingsWebviewAllowedNavigationUrlsByWebContentsId: new Map(), browserSettingsWebContentsByWebContentsId: new Map(),
+        browserSettingsWebviewNavigationDisposersByWebContentsId: new Map(), pendingAdoptedWebviewsByWebContentsId: new Map(),
+        pendingWebviewRoutesByInstanceId: new Map(), transferredConversationStateKeys: new Set(),
+        disposeWindowListeners: () => void 0, disposeWebviewListeners: () => void 0,
+      };
+      const updateBounds = () => { if (state.contentBounds != null) state.contentBounds = window.getContentBounds(); };
+      const restoreAnnotationPresentation = () => {
+        for (const thread of state.threads.values()) if (thread.snapshot.isAnnotationSuspended)
+          this.host.setAnnotationPresentation(state.owner, { browserTabId: thread.browserTabId, conversationId: thread.conversationId, suspended: false });
+      };
+      window.on(`blur`, restoreAnnotationPresentation);
+      window.on(`move`, updateBounds); window.on(`resize`, updateBounds); window.on(`enter-full-screen`, updateBounds);
+      window.on(`leave-full-screen`, updateBounds); window.on(`maximize`, updateBounds); window.on(`unmaximize`, updateBounds); window.on(`restore`, updateBounds);
+      state.disposeWindowListeners = () => {
+        if (window.isDestroyed()) return;
+        window.removeListener(`blur`, restoreAnnotationPresentation); window.removeListener(`move`, updateBounds); window.removeListener(`resize`, updateBounds);
+        window.removeListener(`enter-full-screen`, updateBounds); window.removeListener(`leave-full-screen`, updateBounds); window.removeListener(`maximize`, updateBounds);
+        window.removeListener(`unmaximize`, updateBounds); window.removeListener(`restore`, updateBounds);
+      };
+      state.disposeWebviewListeners = SWe({
+        admitBrowserTab: () => this.host.admitBrowserTab(`webview-attach`),
+        cancelPendingWebviewAttaches: () => this.host.browserPageHostLifecycle.cancelPendingWebviewAttaches(state),
+        reconcileBrowserStorageId: (thread, persistence) => this.host.browserPersistence.reconcileBrowserStorageId(state, thread, persistence),
+        attachWebview: (thread, persistence) => this.host.browserPageHostLifecycle.attachWebview(state, thread, persistence),
+        attachedWebviewHosts: this.host.browserPageHostLifecycle.attachedWebviewHosts,
+        configureBrowserSession: () => this.host.getBrowserSession(),
+        getAnnotationApiPolicy: (webContents, route) => this.host.siteAnnotationFeatures.getPolicy(this.host.findPageStateForRuntimeSender(webContents), route, this.host.isTweaksFeatureEnabled),
+        subscribeAnnotationApiAvailability: (listener) => this.host.siteAnnotationFeatures.subscribeAvailability(listener),
+        ensureThreadStateForWindow: (route, input) => this.host.ensureThreadStateForWindow(state, route, input),
+        handleWebviewDestroyedBeforeAttach: (route) => this.host.browserUseOpenRequests.rejectForRoute({ error: Error(`Browser webview was destroyed before page attachment completed`), owner, ...route }),
+        isPagePersistenceAllowed: () => this.host.browserPersistence.isPersistenceOwner(state.window),
+        openBrowserSettingsUrlInTab: (url) => this.host.windowManager.sendMessageToWebContents(owner, { type: `toggle-browser-panel`, open: true, returnToSettingsOrigin: true, url, source: `manual`, initiator: `window_open` }),
+      });
+      this.host.windows.set(windowId, state);
+      return state;
+    }
+
+    ensureCurrentWindowState(ownerWebContents: any) {
+      const window = this.getCurrentWindow(ownerWebContents);
+      return window == null ? null : this.ensureWindowState(window, ownerWebContents);
+    }
+
+    getCurrentWindowState(ownerWebContents: any) {
+      const window = this.getCurrentWindow(ownerWebContents);
+      return window == null ? null : this.host.windows.get(window.id) ?? null;
+    }
+
+    getCurrentWindow(ownerWebContents: any) {
+      const window = l?.BrowserWindow?.fromWebContents?.(ownerWebContents);
+      return window == null || window.isDestroyed() ? null : window;
+    }
+
+    getThreadState(ownerWebContents: any, conversationId: any, browserTabId: any) {
+      const windowState = this.getCurrentWindowState(ownerWebContents);
+      return windowState == null ? null : hX(windowState, conversationId, browserTabId);
+    }
+
+    ensureThreadStateForWindow(windowState: any, conversationId: any, browserTabId: any, options: any = {}) {
+      return oXe({
+        browserSessionRegistry: this.host.browserSessionRegistry,
+        browserTabId,
+        conversationId,
+        options,
+        tabBudget: this.host.tabBudget,
+        windowManager: this.host.windowManager,
+        windows: this.host.windows,
+        windowState,
+      });
+    }
+
+    disposeThreadState(windowState: any, conversationId: any, threadState: any) {
+      this.host.comments.close(windowState.owner, conversationId, threadState.browserTabId);
+      const page = threadState.page;
+      this.host.browserPageHostLifecycle.cancelPendingWebviewAttaches(windowState, threadState);
+      if (page != null) {
+        this.host.browserPageHostLifecycle.disposePage(page);
+        if (this.host.browserPageHostLifecycle.isBrowserUseManagedBrowserTab(conversationId, threadState.browserTabId))
+          this.host.browserSessionRegistry.recordPageClosed({ conversationId, browserTabId: threadState.browserTabId, windowId: oX((windowState.tabSourceWindow ?? windowState).window.id) });
+      }
+      if (threadState.isBrowserUseActive)
+        this.host.setBrowserUseActiveForRoute({ conversationId, windowId: oX((windowState.tabSourceWindow ?? windowState).window.id) }, false, threadState.browserTabId);
+    }
+
+    findPageStateForRuntimeSender(webContents: any) {
+      for (const windowState of this.host.windows.values()) for (const threadState of windowState.threads.values()) {
+        const page = threadState.page;
+        if (page?.view.webContents?.id === webContents.id) return { owner: windowState.owner, page, threadState, windowState };
+      }
+      return null;
+    }
+
+    findPageStateForPageKey(pageKey: any) {
+      for (const windowState of this.host.windows.values()) for (const threadState of windowState.threads.values()) {
+        const page = threadState.page;
+        if (page != null && KU((windowState.tabSourceWindow ?? windowState).owner.id, threadState.conversationId, threadState.browserTabId) === pageKey)
+          return { conversationId: threadState.conversationId, page, threadState, windowState };
+      }
+      return null;
+    }
+
+    getThreadStateForWindow(windowState: any, conversationId: any, browserTabId: any) {
+      return hX(windowState, conversationId, browserTabId);
+    }
+
+    getDetachedWindowStates(windowId: any) { return AX(this.host.windows.values(), windowId); }
+    getPageWindowState(route: any, browserTabId: any) { return vXe(route, browserTabId, this.host.windows.values(), this.host.getLiveWindowState.bind(this.host)); }
+    getLiveWindowState(windowId: any) { return yXe({ ensureWindowState: this.host.ensureWindowState.bind(this.host), windowId, windows: this.host.windows }); }
+    getFocusedOwnerWebContents() { return bXe({ getLiveWindowState: this.host.getLiveWindowState.bind(this.host), lastSyncedWindowId: this.host.lastSyncedWindowId, windows: this.host.windows.values() }); }
+    getFocusedWindowState() { return xXe({ getLiveWindowState: this.host.getLiveWindowState.bind(this.host), windows: this.host.windows }); }
+    getPreferredWindowStateForConversation(conversationId: any) {
+      const state = SXe({ conversationId, getFocusedWindowState: this.host.getFocusedWindowState.bind(this.host), hasThreadForConversation: aXe, lastSyncedWindowId: this.host.lastSyncedWindowId, windows: this.host.windows });
+      return state?.tabSourceWindow ?? state;
+    }
+    resolveBrowserUseOpenRequests(windowState: any) { this.host.browserUseOpenRequests.resolveForWindow(windowState, (request: any) => gX(windowState, request.conversationId, request.browserTabId)); }
+  };
+}
