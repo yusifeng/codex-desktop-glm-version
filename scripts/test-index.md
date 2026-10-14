@@ -12,6 +12,8 @@ Renderer hub A5 classification gate remains covered by `test-renderer-hub-classi
 
 ## Recent semantic extraction suites
 
+- [`test-worker-git-manager-cache-lifecycle.mjs`](./test-worker-git-manager-cache-lifecycle.mjs)
+
 - [`test-preload-annotation-highlight-render-owner.mjs`](./test-preload-annotation-highlight-render-owner.mjs)
 
 - [`test-main-external-document-binding-registry.mjs`](./test-main-external-document-binding-registry.mjs)

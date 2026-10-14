@@ -1621,9 +1621,10 @@ Stable metadata 的 pending trace identity、combined root/common-dir fast path�
 `git-stable-metadata-resolver.ts`；manager 真实持有 resolver，删除原 pending trace Map 和内联 async workflow。
 `scripts/test-worker-git-stable-metadata-resolver.mjs` 覆盖 20 项 primary/fallback/cleanup/overlap 断言。
 Turn-complete cache invalidation 中按 selected worktree、未知 commonDir 和同仓库 commonDir
-传播的 decision 已迁移至 `git-turn-cache-invalidation-policy.ts`；manager 仍负责 worktree/commonDir
-Map 查询及 `clearShortLivedGitReadCaches` 副作用。由 `scripts/test-worker-git-turn-cache-invalidation-policy.mjs`
-覆盖 5 项传播/回退断言。
+传播的 decision 已迁移至 `git-turn-cache-invalidation-policy.ts`；background/foreground/turnComplete 状态、
+selected worktree untracked invalidation、commonDir fan-out、unknown commonDir fallback 与 host isolation 的完整
+执行生命周期进一步迁移至 `git-manager-cache-lifecycle.ts` 并真实接回。manager 删除 background flag 和两个
+内联 workflow，继续提供 repository registry/cache 副作用；policy 5 项及 lifecycle 16 项断言覆盖该边界。
 Repo-changed debounce/emit 的 pending count、active emission、timer 去重、完成后重排和 dispose
 生命周期已迁移至 `git-repo-change-controller.ts`；watcher 仍注入 Git operation state、event payload、
 telemetry 与实际 emit。`scripts/test-worker-git-repo-change-controller.mjs` 覆盖计数消费、timer 去重和

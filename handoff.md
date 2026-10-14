@@ -3308,3 +3308,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker Git stable-metadata resolver lifecycle 已迁移至 `git-stable-metadata-resolver.ts` 并真实接回：新 owner
   持有 pending trace identity、combined resolve/fallback、分步 trace、generation-aware cache write 与 overlap
   cleanup；manager 删除原 pending trace Map 和内联 async workflow，focused coverage 为 20 项。
+- worker Git manager app/turn cache lifecycle 已迁移至 `git-manager-cache-lifecycle.ts` 并真实接回：新 owner
+  持有 background/foreground 状态、turnComplete invalidation、selected worktree/commonDir fan-out 与 unknown
+  commonDir fallback；manager 删除 background flag 和两个内联 workflow，focused coverage 为 16 项。

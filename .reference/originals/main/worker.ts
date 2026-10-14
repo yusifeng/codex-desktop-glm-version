@@ -81,6 +81,7 @@ const { dispatchStableMetadataRequest } = require("./worker/git-stable-metadata-
 const { GitStableRootCache } = require("./worker/git-stable-root-cache");
 const { GitStableMetadataRetryController } = require("./worker/git-stable-metadata-retry-controller");
 const { GitStableMetadataResolver } = require("./worker/git-stable-metadata-resolver");
+const { GitManagerCacheLifecycle } = require("./worker/git-manager-cache-lifecycle");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -67401,7 +67402,18 @@ var {
       resolveRootAndCommonDir: (cwd, host) => resolveGitRootAndCommonDir(cwd, host),
       trace: OH,
     });
-    hasBackgroundedSinceLastForeground = !1;
+    cacheLifecycle = new GitManagerCacheLifecycle({
+      clearShortLived: (worktree) => worktree.clearShortLivedGitReadCaches(),
+      getAllWorktrees: () => this.worktreesByKey.values(),
+      getCommonDir: (worktree) =>
+        this.commonDirByWorktreeKey.get(this.getWorktreeKey(worktree.root, worktree.host)),
+      getHostId: (worktree) => worktree.host.id,
+      invalidateAllShortLived: () => this.invalidateShortLivedGitReadCaches(),
+      invalidateAllUntracked: () => this.invalidateUntrackedPathsCache(),
+      invalidateUntracked: (worktree) => p2(worktree),
+      selectWorktrees: (cwds, hostId) => this.getCachedWorktreesForCwds(cwds, hostId),
+      shouldInvalidate: shouldInvalidateGitWorktreeForTurn,
+    });
     constructor(e) {
       e.subscribe((e) => {
         this.handleAppEvent(e);
@@ -67585,35 +67597,10 @@ var {
       },
     );
     handleAppEvent(e) {
-      switch (e.type) {
-        case `background`:
-          this.hasBackgroundedSinceLastForeground = !0;
-          break;
-        case `foreground`:
-          (this.hasBackgroundedSinceLastForeground &&
-            (this.invalidateUntrackedPathsCache(), this.invalidateShortLivedGitReadCaches()),
-            (this.hasBackgroundedSinceLastForeground = !1));
-          break;
-        case `turnComplete`:
-          (this.invalidateUntrackedPathsCache(), this.invalidateShortLivedGitReadCaches());
-      }
+      this.cacheLifecycle.handleAppEvent(e);
     }
     invalidateGitReadCachesForTurn(e, t) {
-      let n = this.getCachedWorktreesForCwds(e, t);
-      if (n.length === 0) return;
-      let r = new Set(),
-        i = !1;
-      for (let e of n) {
-        p2(e);
-        let t = this.commonDirByWorktreeKey.get(this.getWorktreeKey(e.root, e.host));
-        t == null ? (i = !0) : r.add(t);
-      }
-      let a = new Set(n);
-      for (let e of this.worktreesByKey.values()) {
-        if (e.host.id !== t) continue;
-        let n = this.commonDirByWorktreeKey.get(this.getWorktreeKey(e.root, e.host));
-        shouldInvalidateGitWorktreeForTurn({ isSelected: a.has(e), hasUnknownSelectedCommonDir: i, commonDir: n, selectedCommonDirs: r }) && e.clearShortLivedGitReadCaches();
-      }
+      this.cacheLifecycle.invalidateTurn(e, t);
     }
   };
 function Xhe(e) {
