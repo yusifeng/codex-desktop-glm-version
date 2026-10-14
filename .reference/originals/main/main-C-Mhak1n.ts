@@ -64,6 +64,7 @@ const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presen
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
 const { StartupRendererCoordinator } = require("./main-app/startup/startup-renderer-coordinator.js");
 const { SystemPermissionsService } = require("./main-app/startup/system-permissions-service.js");
+const { ExternalDocumentBindingRegistry } = require("./main-app/remote-artifact/external-document-binding-registry.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -152276,122 +152277,7 @@ var X8 = n.wf({ bindingId: n.Of().min(1) }),
     updateId: n.Of().min(1),
     crdtUpdateBase64: n.Of(),
   }),
-  jet = class {
-    connect;
-    #e = new Map();
-    #t = !1;
-    constructor(e) {
-      this.connect = e;
-    }
-    async bind(e, t, n) {
-      let r, i, a;
-      try {
-        ((r = t.dup?.() ?? t), (i = n.dup?.() ?? n));
-        let o = await this.connect(e.kind);
-        if (o == null)
-          return (r[Symbol.dispose]?.(), i[Symbol.dispose]?.(), { status: `unsupported` });
-        if (this.#t) throw Error(`Artifact Session connection is closed.`);
-        a = {
-          artifactRef: `artifact_external_${(0, _.randomUUID)()}`,
-          bindingId: (0, _.randomUUID)(),
-          request: e,
-          capture: r,
-          apply: i,
-          callHost: o,
-          closed: !1,
-        };
-        let s = a;
-        return (
-          this.#e.set(s.bindingId, s),
-          r.onRpcBroken?.(() => void this.#r(s)),
-          i.onRpcBroken?.(() => void this.#r(s)),
-          {
-            status: `bound`,
-            artifactRef: s.artifactRef,
-            binding: new Met(
-              (e) => this.#n(s, e),
-              () => this.#r(s),
-            ),
-          }
-        );
-      } catch (e) {
-        throw (
-          a == null ? (r?.[Symbol.dispose]?.(), i?.[Symbol.dispose]?.()) : await this.#r(a),
-          e
-        );
-      }
-    }
-    async handleCall(e, t, n) {
-      n.throwIfAborted();
-      let { bindingId: r } = X8.parse(t),
-        i = this.#e.get(r);
-      if (i == null || i.closed || i.threadId == null)
-        throw Error(`Artifact Session document binding is unavailable.`);
-      if (e === `externalDocument.capture`) {
-        let e = await i.capture();
-        try {
-          if ((n.throwIfAborted(), i.closed))
-            throw Error(`Artifact Session document binding closed.`);
-          return { ...e };
-        } finally {
-          e[Symbol.dispose]?.();
-        }
-      }
-      if (e === `externalDocument.apply`) {
-        let { bindingId: e, ...n } = Aet.parse(t),
-          r = await i.apply(n);
-        try {
-          return { ...r };
-        } finally {
-          r[Symbol.dispose]?.();
-        }
-      }
-      throw Error(`Unsupported Artifact Session document callback.`);
-    }
-    dispose() {
-      this.#t = !0;
-      for (let e of this.#e.values()) this.#r(e);
-    }
-    async #n(e, t) {
-      if (e.closed || t.length === 0)
-        throw Error(`Artifact Session document binding is unavailable.`);
-      if (e.threadId != null && e.threadId !== t)
-        throw Error(`Artifact Session document binding belongs to another task.`);
-      ((e.threadId = t),
-        (e.activation ??= e
-          .callHost(`documents.bindExternal`, {
-            artifactRef: e.artifactRef,
-            bindingId: e.bindingId,
-            threadId: t,
-            documentId: e.request.documentId,
-            artifactType: e.request.kind,
-            externalTarget: { uri: e.request.targetUri },
-            ...(e.request.title == null ? {} : { title: e.request.title }),
-          })
-          .then(async () => {
-            if (e.closed)
-              throw (
-                await e.callHost(`documents.unbindExternal`, { bindingId: e.bindingId }),
-                Error(`Artifact Session document binding closed while activating.`)
-              );
-          })
-          .catch((t) => {
-            throw ((e.activation = void 0), t);
-          })),
-        await e.activation);
-    }
-    async #r(e) {
-      e.closed ||
-        ((e.closed = !0),
-        this.#e.delete(e.bindingId),
-        e.capture[Symbol.dispose]?.(),
-        e.apply[Symbol.dispose]?.(),
-        e.threadId != null &&
-          (await e
-            .callHost(`documents.unbindExternal`, { bindingId: e.bindingId })
-            .catch(() => void 0)));
-    }
-  },
+  jet = ExternalDocumentBindingRegistry,
   Met = class extends n.Uf {
     activateDocument;
     unbindDocument;
@@ -152612,31 +152498,37 @@ var Z8 = Object.freeze({
         (this.getViewerConnectionInfo = e),
         (this.#e = t.createClient ?? Uet),
         (this.#t = t.createSubscriptionId ?? (() => (0, _.randomUUID)())),
-        (this.#n = new jet(async (e) => {
-          let t = this.getViewerConnectionInfo();
-          if (t == null) return null;
-          let n = await this.#x(t);
-          await n.connect();
-          let r = $8(await n.call(Z8.ping)).capabilities;
-          if (
-            !Array.isArray(r) ||
-            !r.includes(`external-documents-v1`) ||
-            (e === `whiteboard` && !r.includes(`external-whiteboards-v1`))
-          )
-            return null;
-          let i = n.connectionEpoch;
-          return async (e, t) => {
-            if (this.#d || this.#c || this.#o !== n || n.connectionEpoch !== i)
-              return Promise.reject(Error(`Artifact Session host connection changed.`));
-            try {
-              return await n.call(e, t);
-            } catch (e) {
-              throw (
-                this.#I(`external_document_host_request_failed`, e),
-                Error(`Artifact Session document host request failed.`)
-              );
-            }
-          };
+        (this.#n = new jet({
+          connect: async (e) => {
+            let t = this.getViewerConnectionInfo();
+            if (t == null) return null;
+            let n = await this.#x(t);
+            await n.connect();
+            let r = $8(await n.call(Z8.ping)).capabilities;
+            if (
+              !Array.isArray(r) ||
+              !r.includes(`external-documents-v1`) ||
+              (e === `whiteboard` && !r.includes(`external-whiteboards-v1`))
+            )
+              return null;
+            let i = n.connectionEpoch;
+            return async (e, t) => {
+              if (this.#d || this.#c || this.#o !== n || n.connectionEpoch !== i)
+                return Promise.reject(Error(`Artifact Session host connection changed.`));
+              try {
+                return await n.call(e, t);
+              } catch (e) {
+                throw (
+                  this.#I(`external_document_host_request_failed`, e),
+                  Error(`Artifact Session document host request failed.`)
+                );
+              }
+            };
+          },
+          createBinding: (e, t) => new Met(e, t),
+          createId: () => (0, _.randomUUID)(),
+          parseApplyRequest: (e) => Aet.parse(e),
+          parseBindingRequest: (e) => X8.parse(e),
         })),
         (this.#r = new Fet({
           downloadCopy: t.downloadCopy,

@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `jet` external document binding registry 的完整生命周期迁移至
+`src/main/main-app/remote-artifact/external-document-binding-registry.ts`，真实接回 artifact session
+manager 的唯一 consumer，并删除旧实现；保留 RPC endpoint ownership、capability connect、单线程 activation、
+capture/apply callback routing、broken-RPC cleanup、host unbind 与 registry dispose。focused test 为
+`scripts/test-main-external-document-binding-registry.mjs`（43 项）。
+
 本轮将 Wy 的 host-message subscription lifecycle 迁移至 `annotation-host-message-controller.ts` 并真实接回；保留 dispatcher action wiring、sync state、editor close/restore 与 viewport scheduler cleanup 顺序，删除原约 68 行内联 effect。focused test 为 `scripts/test-preload-annotation-host-message-controller.mjs`（12 项）。
 
 本轮将原 `ytt` system permissions service 整体迁移至

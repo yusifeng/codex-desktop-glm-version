@@ -637,6 +637,19 @@ RunLoop helper 仍由原 owner 持有。main chunk 内旧 `ytt` 和仅由其消�
 `scripts/test-main-system-permissions-service.mjs` 使用 esbuild 临时 bundle，覆盖 55 项平台矩阵、授权结果、
 URL/等待顺序与异常降级 focused assertions。
 
+### 增量抽取：external document binding registry 生命周期
+
+R10/remote-artifact 原 `jet`（152,279-152,389）的完整 external document binding registry 已迁移至
+`src/main/main-app/remote-artifact/external-document-binding-registry.ts`。模块拥有 binding map 与 RPC endpoint
+副本，保留 capability-specific host connect、artifact/binding id 创建、RPC broken cleanup、单 thread identity
+约束、activation single-flight/失败重试，以及 capture/apply callback 的 schema、abort 与结果释放顺序。
+
+原 artifact session manager `Vet` consumer 注入现有 `Met` binding wrapper、`X8/Aet` schemas、
+`crypto.randomUUID` 与带 connection epoch 校验的 host caller；main chunk 内旧 `jet` 实现已删除。显式 unbind、
+activation 中关闭、host unbind 失败和 registry dispose 继续幂等释放两端 RPC endpoint。
+`scripts/test-main-external-document-binding-registry.mjs` 使用 esbuild 临时 bundle，覆盖 43 项 bind、activation、
+callback routing、retry、broken-RPC 与 dispose focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的
