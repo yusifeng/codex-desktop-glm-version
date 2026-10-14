@@ -6,6 +6,11 @@ suspension、dragged-image state 与 overlay actions 已迁入
 focused test 为 `scripts/test-main-browser-annotation-interaction-controller.mjs`（21 项）。同时修正
 page-command controller 的 history clone 依赖，将 `rW/WX/GX` 显式注入，避免运行时依赖原文件作用域。
 
+随后完成 tQe 两个完整子系统迁移：browser persistence/冷恢复（删除旧 `yZe/bZe`）迁入
+`browser-page-persistence-controller.ts`，presentation/owner sync 与 presented-state lookup 迁入
+`browser-presentation-sync-controller.ts`，均保留 focused tests；tQe 剩余主要为窗口/thread materialization
+与 runtime/disposal 编排。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger

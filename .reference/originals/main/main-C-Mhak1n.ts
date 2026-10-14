@@ -78,6 +78,8 @@ const { createTerminalSessionManagerClass } = require("./main-app/terminal/termi
 const { createBrowserWindowManagerClass } = require("./main-app/window/browser-window-manager.js");
 const { createBrowserPageCommandControllerClass } = require("./main-app/browser-sidebar/browser-page-command-controller.js");
 const { createBrowserAnnotationInteractionControllerClass } = require("./main-app/browser-sidebar/browser-annotation-interaction-controller.js");
+const { createBrowserPagePersistenceControllerClass } = require("./main-app/browser-sidebar/browser-page-persistence-controller.js");
+const { createBrowserPresentationSyncControllerClass } = require("./main-app/browser-sidebar/browser-presentation-sync-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
 let c = require("node:url"),
@@ -115748,237 +115750,6 @@ async function gZe(e, t, n, { content: r, receiver: i, signal: a }, o, s) {
       delete n.pendingWindowTransfer);
   }
 }
-var yZe = class {
-    browserPageSnapshots;
-    browserSessionRegistry;
-    windowManager;
-    windows;
-    lifecycle;
-    ownerWindowId = null;
-    constructor(e, t, n, r, i) {
-      ((this.browserPageSnapshots = e),
-        (this.browserSessionRegistry = t),
-        (this.windowManager = n),
-        (this.windows = r),
-        (this.lifecycle = i));
-    }
-    getPageRestoreResults(e, t) {
-      return e == null || !this.isInitialPrimaryWindow(e)
-        ? t.map(() => ({ status: `owned-by-another-window` }))
-        : t.map((t) => {
-            let r = this.getLiveBrowserStorageOwners(t.browserStorageId);
-            if (r.some(({ windowState: t }) => t.window.id !== e.id))
-              return { status: `owned-by-another-window` };
-            let i = r.find(
-              ({ threadState: n, windowState: r }) =>
-                r.window.id === e.id &&
-                n.browserTabId === t.browserTabId &&
-                n.conversationId === t.conversationId,
-            );
-            if (i != null)
-              return {
-                browserStorageId: i.threadState.browserStorageId,
-                snapshot: i.threadState.snapshot,
-                status: `already-live`,
-              };
-            if (r.length > 0 || !this.browserPageSnapshots.isDurableStorageIdentityOwnedBy(t))
-              return { status: `missing` };
-            this.browserPageSnapshots.enablePersistence(t);
-            let a = this.browserPageSnapshots.get(t);
-            if (a == null) return { status: `missing` };
-            let o = a.navigation.currentIndex;
-            return {
-              snapshot: {
-                ...pX(),
-                canGoBack: o > 0,
-                canGoForward: o < a.navigation.entries.length - 1,
-                committedUrl: a.navigation.entries[o]?.url ?? ``,
-                faviconUrl: a.faviconUrl,
-                isSuspended: !0,
-                tabType: n.lu.WEB,
-                title: a.title,
-                url: a.url,
-              },
-              status: `snapshot-ready`,
-            };
-          });
-    }
-    deleteConversation(e, t) {
-      if (!this.isCleanupAllowed(e)) return !1;
-      let n = [];
-      for (let e of this.windows.values())
-        for (let r of e.threads.values()) r.conversationId === t && n.push(r);
-      return (this.browserPageSnapshots.deleteConversationAndFlush(t, n), !0);
-    }
-    isPersistenceOwner(e) {
-      return e != null && this.isInitialPrimaryWindow(e);
-    }
-    getPagePersistence(e, t) {
-      if (t != null) return this.isPersistenceOwner(e) ? t : void 0;
-    }
-    hasBrowserStorageOwner(e, t) {
-      for (let n of this.windows.values()) {
-        for (let r of n.threads.values()) if (r !== t && r.browserStorageId === e) return !0;
-        for (let r of n.registeredWebviewHostsByRoutePartition.values())
-          if (
-            r.pagePersistence.browserStorageId === e &&
-            (t == null ||
-              r.browserTabId !== t.browserTabId ||
-              r.conversationId !== t.conversationId)
-          )
-            return !0;
-      }
-      return !1;
-    }
-    getLiveBrowserStorageOwners(e) {
-      let t = [];
-      for (let n of this.windows.values())
-        for (let r of n.threads.values())
-          r.browserStorageId === e &&
-            r.page != null &&
-            r.pendingTeardown?.reason !== `closed` &&
-            t.push({ threadState: r, windowState: n });
-      return t;
-    }
-    reconcileBrowserStorageId(e, t, n) {
-      if (n == null) return !0;
-      if (n.browserStorageId === t.browserStorageId)
-        return n.restore !== `required` || !this.hasBrowserStorageOwner(n.browserStorageId, t);
-      if (
-        t.pendingTeardown != null ||
-        t.sessionState !== `cold` ||
-        t.browserStorageId !==
-          PG({ browserTabId: t.browserTabId, conversationId: t.conversationId }) ||
-        this.browserPageSnapshots.hasDurableStorageIdentity(t.browserStorageId) ||
-        e.registeredWebviewHostsByRoutePartition.has(it(t.conversationId, t.browserTabId))
-      )
-        return !1;
-      let r = t.page;
-      return n.restore === `required`
-        ? r != null || t.isBrowserUsePage || this.hasBrowserStorageOwner(n.browserStorageId, t)
-          ? !1
-          : ((t.browserStorageId = n.browserStorageId), !0)
-        : (this.browserPageSnapshots.hasDurableStorageIdentity(n.browserStorageId) &&
-              !this.browserPageSnapshots.isDurableStorageIdentityOwnedBy({
-                browserStorageId: n.browserStorageId,
-                browserTabId: t.browserTabId,
-                conversationId: t.conversationId,
-              })) ||
-            this.hasBrowserStorageOwner(n.browserStorageId, t)
-          ? !1
-          : r == null
-            ? !t.isBrowserUsePage && ((t.browserStorageId = n.browserStorageId), !0)
-            : !t.isBrowserUsePage ||
-                t.browserUseTabLifetime !== `temporary` ||
-                r.browserStorageId !== t.browserStorageId ||
-                r.view.webContents != null ||
-                r.isColdRestore ||
-                r.isRestoring ||
-                r.isSuspended ||
-                r.pendingSuspensionId != null
-              ? !1
-              : ((t.browserStorageId = n.browserStorageId),
-                (r.browserStorageId = n.browserStorageId),
-                !0);
-    }
-    prepareWebviewAttach(e, t, n, r) {
-      if (r != null) {
-        if (r.restore === `required` && this.preparePage(e, t, r).kind === `missing`) return null;
-        this.registerWebviewHost(e, t, r);
-      }
-      return t.page ?? this.lifecycle.materializePageState(e, t, { kind: `fresh`, page: n });
-    }
-    preparePage(e, t, n) {
-      n != null && this.browserPageSnapshots.enablePersistence(t);
-      let r = bZe({
-        browserPageSnapshots: this.browserPageSnapshots,
-        browserSessionRegistry: this.browserSessionRegistry,
-        materializeColdRestoredPage: (n) =>
-          this.lifecycle.materializePageState(e, t, { kind: `cold-restore`, snapshot: n }),
-        pagePersistence: n,
-        threadState: t,
-        windowState: e,
-      });
-      if (r.kind === `missing`) {
-        let n = { browserTabId: t.browserTabId, conversationId: t.conversationId };
-        (this.lifecycle.removeClosedPage(e, t),
-          e.ignoredConversationIds.add(qU(n)),
-          this.windowManager.sendMessageToWebContents(e.owner, {
-            type: `close-browser-tab`,
-            ...n,
-          }));
-      }
-      return r;
-    }
-    registerWebviewHost(e, t, n) {
-      let r = it(t.conversationId, t.browserTabId);
-      n == null
-        ? e.registeredWebviewHostsByRoutePartition.delete(r)
-        : (this.browserPageSnapshots.enablePersistence(t),
-          e.registeredWebviewHostsByRoutePartition.set(r, {
-            browserTabId: t.browserTabId,
-            conversationId: t.conversationId,
-            pagePersistence: n,
-          }),
-          t.page?.isColdRestore === !0 &&
-            NX(
-              this.browserSessionRegistry,
-              e,
-              t,
-              `browser-restore-host-registered`,
-              `Registered persisted Browser webview host`,
-            ));
-    }
-    unregisterWebviewHost(e, t) {
-      let n = it(t.conversationId, t.browserTabId),
-        r = e.registeredWebviewHostsByRoutePartition.get(n) ?? null;
-      r?.pagePersistence.browserStorageId === t.browserStorageId &&
-        r.browserTabId === t.browserTabId &&
-        r.conversationId === t.conversationId &&
-        e.registeredWebviewHostsByRoutePartition.delete(n);
-    }
-    isCleanupAllowed(e) {
-      return e != null && this.windowManager.getPrimaryWindows().some((t) => t.id === e.id);
-    }
-    isInitialPrimaryWindow(e) {
-      return (
-        (this.ownerWindowId ??= this.windowManager.getPrimaryWindows()[0]?.id ?? null),
-        this.ownerWindowId === e.id
-      );
-    }
-  };
-function bZe({
-  browserPageSnapshots: e,
-  browserSessionRegistry: t,
-  materializeColdRestoredPage: n,
-  pagePersistence: r,
-  threadState: i,
-  windowState: a,
-}) {
-  if (r?.restore !== `required`) return { kind: `not-requested` };
-  let o = i.page,
-    s = o?.view.webContents;
-  if (o?.isColdRestore === !0 || (s != null && !s.isDestroyed())) return { kind: `ready` };
-  NX(t, a, i, `browser-restore-shell-synced`, `Persisted Browser shell synced`);
-  let c = e.get(i);
-  return c == null
-    ? (NX(
-        t,
-        a,
-        i,
-        `browser-restore-snapshot-missing`,
-        `Persisted Browser shell had no page snapshot`,
-      ),
-      e.deleteClosedPageAndFlush(i),
-      { kind: `missing` })
-    : (NX(t, a, i, `browser-restore-snapshot-found`, `Found persisted Browser page snapshot`, [
-        { label: `historyEntryCount`, value: String(c.navigation.entries.length) },
-      ]),
-      o != null && (o.dispose(), (i.page = null)),
-      n(c),
-      NX(t, a, i, `browser-restore-page-materialized`, `Materialized persisted Browser page`),
-      { kind: `ready` });
-}
 var CZe = n.wf({ threadId: n.Of(), item: n.wf({ type: n.bf(`mcpToolCall`), id: n.Of() }) });
 function wZe({ browserSessionRegistry: e, onMcpToolCallCompleted: t, source: n }) {
   n?.registerInternalNotificationHandler((n) => {
@@ -116703,6 +116474,7 @@ var $Ze = class {
     logger = r.i(`browser-sidebar-manager`);
     pageCommandController;
     annotationInteractionController;
+    presentationSyncController;
     downloadStore;
     windows = new Map();
     inAppBrowserFeatureEnabled = !0;
@@ -116766,6 +116538,7 @@ var $Ze = class {
         (this.defaultBrowserUseViewportSize = o),
         (this.pageCommandController = new (createBrowserPageCommandControllerClass({ a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, OZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX }))(this)),
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
+        (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
         (this.getCommandKeymapState = s.getCommandKeymapState ?? n.Ct),
         (this.ownerCommandAccelerators = mq(this.getCommandKeymapState())),
@@ -116784,7 +116557,7 @@ var $Ze = class {
           onWebNotificationClicked: this.onWebNotificationClicked.bind(this),
           onPermissionPrompt: (e) => this.permissionPrompts.show(e),
         })),
-        (this.browserPersistence = new yZe(
+        (this.browserPersistence = new (createBrowserPagePersistenceControllerClass({ pX, n, PG, qU, it, NX }))(
           this.browserPageSnapshots,
           this.browserSessionRegistry,
           this.windowManager,
@@ -116972,251 +116745,19 @@ var $Ze = class {
       this.getCurrentWindowState(e)?.browserSettingsWebviewMountIds.delete(t);
     }
     syncView(e, t) {
-      let n = this.getCurrentWindowState(e);
-      if (n == null) return;
-      let r = hX(n, t.conversationId, t.browserTabId);
-      if (r == null) return;
-      n.activeConversationId === t.conversationId &&
-        n.activeBrowserTabId === t.browserTabId &&
-        ((r.presented && !t.presented) || (r.visible && !t.visible)) &&
-        this.closeActiveExtensionActionMenu(n);
-      let i = sXe(r, t);
-      ((!r.visible || !r.presented) &&
-        this.siteAnnotationPermissions.cancel(r.page?.view.webContents),
-        r.page?.view.webContents != null &&
-          (i && this.queuePageDeviceMetricsSync(r.page, r.emulatedViewportSize),
-          this.browserPageHostLifecycle.updateThreadSessionState(r),
-          this.syncThreadState(n, t.conversationId, r, void 0, r.snapshot),
-          this.syncRuntimeStateToPage(r.page, r)));
+      return this.presentationSyncController.syncView(e, t);
     }
     sync(e, t) {
-      let n = this.ensureCurrentWindowState(e);
-      if (n == null) return;
-      this.lastSyncedWindowId = n.window.id;
-      let r = n.activeConversationId,
-        i = n.activeBrowserTabId,
-        a = t.mountGeneration ?? 0,
-        o = t.presented ?? (t.visible && t.bounds != null),
-        s = t.browserTabId,
-        c = { browserTabId: s, conversationId: t.conversationId },
-        l = this.browserPersistence.getPagePersistence(n.window, t.pagePersistence);
-      t.transferSourceConversationId != null &&
-        t.transferSourceBrowserTabId != null &&
-        this.transferConversationState(
-          n,
-          t.transferSourceConversationId,
-          t.transferSourceBrowserTabId,
-          t.conversationId,
-          s,
-        );
-      let u = qU(c);
-      if (this.getDetachedWindowStates(n.window.id).some((e) => e.threads.has(u))) {
-        let r = n.threads.get(u);
-        r?.hostGeneration != null &&
-          r.page?.view.webContents == null &&
-          (DU(r, t.annotationModeEnabled ?? !0),
-          this.syncView(e, {
-            ...c,
-            hostKind: t.hostKind ?? `right-panel`,
-            mountGeneration: a,
-            presented: o,
-            visible: t.visible,
-            bounds: t.bounds,
-            viewportScale: t.viewportScale ?? 1,
-          }));
-        return;
-      }
-      if (n.ignoredConversationIds.delete(u)) return;
-      ((o || n.activeConversationId == null) &&
-        (r !== t.conversationId || i !== s) &&
-        this.closeActiveExtensionActionMenu(n),
-        n.activeConversationId === t.conversationId &&
-          n.activeBrowserTabId === s &&
-          (!o || !t.visible) &&
-          this.closeActiveExtensionActionMenu(n),
-        (o || n.activeConversationId == null) &&
-          ((n.activeConversationId = t.conversationId), (n.activeBrowserTabId = s)));
-      let d = n.threads.has(u),
-        f = this.ensureThreadState(n, t, s),
-        p = f.presented,
-        m = f.mountGeneration,
-        h =
-          d &&
-          p &&
-          o &&
-          f.visible &&
-          t.visible &&
-          m === a &&
-          t.transferSourceConversationId == null &&
-          t.transferSourceBrowserTabId == null
-            ? f.snapshot
-            : void 0;
-      if (
-        ((f.presented = o),
-        o && !p && this.tabBudget.markTabSelected(n, f),
-        (!d ||
-          f.mountGeneration !== a ||
-          f.presented !== o ||
-          f.visible !== t.visible ||
-          t.transferSourceConversationId != null) &&
-          this.browserSessionRegistry.recordDebugEvent({
-            ...c,
-            details: [
-              { label: `mountGeneration`, value: String(a) },
-              { label: `presented`, value: String(o) },
-              { label: `visible`, value: String(t.visible) },
-              ...(t.transferSourceConversationId == null
-                ? []
-                : [
-                    {
-                      label: `transferSourceConversationId`,
-                      value: t.transferSourceConversationId,
-                    },
-                  ]),
-            ],
-            guestWebContentsId: null,
-            kind: `browser-sidebar-sync`,
-            message: `Synced Browser sidebar route`,
-            ownerWebContentsId: e.id,
-            pageKey: null,
-            windowId: n.window.id,
-          }),
-        !this.browserPersistence.reconcileBrowserStorageId(n, f, l) ||
-          (this.setThreadAnnotationModeEnabled(e, n, f, t.annotationModeEnabled ?? !0),
-          this.browserPersistence.preparePage(n, f, l).kind === `missing`))
-      )
-        return;
-      ((f.cwd = t.cwd ?? null),
-        (f.hostKind = t.hostKind ?? null),
-        (f.visible = t.visible),
-        (f.mountGeneration = a),
-        o &&
-          f.pendingTeardown?.reason === `suspended` &&
-          ((f.pendingTeardown = null), f.page != null && (f.page.pendingSuspensionId = null)),
-        (f.hasPendingBrowserUseVisibilityRequest = !1),
-        (f.isAgentControllingBrowser = t.isAgentControllingBrowser),
-        (!f.visible || !f.presented || f.isAgentControllingBrowser) &&
-          this.siteAnnotationPermissions.cancel(f.page?.view.webContents),
-        t.isAgentControllingBrowser || (f.isBrowserUseNavigationRestrictionActive = !1),
-        (f.runtimeIntlConfig = t.runtimeIntlConfig));
-      let g = f.themeVariant;
-      ((f.themeVariant = t.themeVariant ?? f.themeVariant),
-        (f.bounds = t.bounds
-          ? {
-              x: Math.round(t.bounds.x),
-              y: Math.round(t.bounds.y),
-              width: Math.round(t.bounds.width),
-              height: Math.round(t.bounds.height),
-            }
-          : null));
-      let _ = t.emulatedViewportSize ?? null,
-        v =
-          f.emulatedViewportSize?.width !== _?.width ||
-          f.emulatedViewportSize?.height !== _?.height;
-      ((f.emulatedViewportSize = _),
-        (f.viewportScale = t.viewportScale ?? 1),
-        this.browserPageHostLifecycle.updateThreadSessionState(f),
-        this.syncThreadState(n, t.conversationId, f, void 0, h));
-      let y = f.page?.view.webContents,
-        b = y == null ? null : (this.browserPageHostLifecycle.attachedWebviewHosts.get(y) ?? null);
-      if (
-        (o &&
-          m !== a &&
-          y != null &&
-          !y.isDestroyed() &&
-          b != null &&
-          b.hostGeneration === f.hostGeneration &&
-          b.rendererInstanceId === n.rendererInstanceId &&
-          this.windowManager.sendMessageToWebContents(e, {
-            type: `browser-sidebar-webview-attached`,
-            browserTabId: s,
-            conversationId: t.conversationId,
-            mountGeneration: a,
-          }),
-        f.page != null)
-      ) {
-        if (
-          (o && (f.page.pendingSuspensionId = null),
-          v && this.queuePageDeviceMetricsSync(f.page, f.emulatedViewportSize),
-          g !== f.themeVariant)
-        ) {
-          let e = f.page.view.webContents;
-          e != null && !e.isDestroyed() && this.queuePageColorSchemeSync(f.page, e, f.themeVariant);
-        }
-        this.syncRuntimeStateToPage(f.page, f);
-      }
-      if (
-        (this.permissionPrompts.syncPresentation(f),
-        this.comments[f.isAnnotationModeEnabled ? `prepare` : `dismiss`](e, t.conversationId, s, f),
-        o && r != null && i != null && (r !== t.conversationId || i !== s))
-      ) {
-        let t = hX(n, r, i) ?? null;
-        (t != null && (t.hasPendingBrowserUseVisibilityRequest = !1),
-          this.comments.dismiss(e, r, i, t),
-          this.comments.close(e, r, i));
-      }
-      ((!f.presented || f.bounds == null) &&
-        this.comments.dismiss(e, t.conversationId, s, f, !p || (f.presented && f.visible)),
-        this.tabBudget.enforceDetachedPageBudget(n),
-        this.resolveBrowserUseOpenRequests(n));
+      return this.presentationSyncController.sync(e, t);
     }
     setThreadAnnotationModeEnabled(e, t, n, r) {
-      if (DU(n, r)) {
-        let { browserTabId: r, conversationId: i, page: a } = n;
-        (this.comments.dismiss(e, i, r, n),
-          this.syncThreadState(t, i, n),
-          a != null && this.syncRuntimeStateToPage(a, n));
-      }
+      return this.presentationSyncController.setThreadAnnotationModeEnabled(e, t, n, r);
     }
     syncOwner(e, t, n, r, i = !0, a, o) {
-      let s = this.ensureCurrentWindowState(e);
-      if (s == null) return;
-      ((this.lastSyncedWindowId = s.window.id),
-        o != null && this.presentedBrowserTabIdsByOwner.set(e, o));
-      let c = n ?? (s.activeConversationId === t ? s.activeBrowserTabId : null);
-      ((s.activeConversationId !== t || s.activeBrowserTabId !== c) &&
-        this.closeActiveExtensionActionMenu(s),
-        (s.activeConversationId = t),
-        (s.activeBrowserTabId = c),
-        this.browserSessionRegistry.bindSessionRouteOwner({
-          browserConversationId: t,
-          owner: e,
-          sessionId: a ?? t,
-        }));
-      let l =
-          this.getPageWindowState({ conversationId: t, windowId: oX(s.window.id) }, c ?? void 0) ??
-          s,
-        u = c == null ? null : this.ensureThreadStateForWindow(l, t, c);
-      u != null && (l.ignoredConversationIds.delete(qU(u)), this.tabBudget.markTabSelected(l, u));
-      for (let n of s.threads.values())
-        n.conversationId === t &&
-          ((n.ownerRoutePath = r ?? null), this.setThreadAnnotationModeEnabled(e, s, n, i));
-      (this.browserSessionRegistry.recordDebugEvent({
-        browserTabId: c,
-        conversationId: t,
-        details: [{ label: `ownerRoutePath`, value: r ?? `missing` }],
-        guestWebContentsId: u?.page?.view.webContents?.id ?? null,
-        kind: `browser-owner-synced`,
-        message: u == null ? `Synced Browser owner before tab mount` : `Synced exact Browser owner`,
-        ownerWebContentsId: e.id,
-        pageKey: u?.page == null ? null : KU(e.id, t, u.browserTabId),
-        windowId: s.window.id,
-      }),
-        u?.pendingBrowserUsePanelOpen === !0 &&
-          ((u.pendingBrowserUsePanelOpen = !1),
-          this.openBrowserPanelWithoutAnimation(s, t, u.browserTabId)));
+      return this.presentationSyncController.syncOwner(e, t, n, r, i, a, o);
     }
     isBrowserPresentedForConversation(e, t) {
-      let n = this.browserSessionRegistry.getBrowserRouteForSession(t),
-        r = n?.conversationId ?? t,
-        i = this.windows.get(e.id);
-      if ((n != null && n.windowId !== oX(e.id)) || i?.activeConversationId !== r) return !1;
-      let a = this.presentedBrowserTabIdsByOwner.get(i.owner);
-      if (a != null) return a.some((e) => hX(i, r, e)?.pendingTeardown?.reason !== `closed`);
-      for (let e of i.threads.values())
-        if (e.conversationId === r && e.presented && e.pendingTeardown?.reason !== `closed`)
-          return !0;
-      return !1;
+      return this.presentationSyncController.isBrowserPresentedForConversation(e, t);
     }
     getDebugSnapshot() {
       return DXe({
@@ -117752,7 +117293,10 @@ var $Ze = class {
               initiator: `window_open`,
             });
           },
-      }
+        })),
+        this.windows.set(n, i),
+        i
+      );
     }
     getDetachedWindowStates(e) {
       return AX(this.windows.values(), e);

@@ -806,6 +806,16 @@ R8/IAB 原 `tQe` 的 annotation ingress、comment/design mode、presentation sus
 `src/main/main-app/browser-sidebar/browser-annotation-interaction-controller.ts`，tQe 仅保留委托与
 依赖注入。focused test 为 `scripts/test-main-browser-annotation-interaction-controller.mjs`（21 项）。
 page command controller 的 history clone 依赖 `rW/WX/GX` 已通过显式依赖适配接回，避免抽取后引用原文件作用域。
+
+### 增量抽取：IAB page persistence 与 presentation sync controllers
+
+`tQe` 的 browser persistence owner（restore/ownership/reconcile/host registration/delete）及冷恢复
+helper 已迁移至 `browser-page-persistence-controller.ts`，删除旧 `yZe/bZe` 实现；focused test
+为 `scripts/test-main-browser-page-persistence-controller.mjs`。
+
+`tQe` 的 view/route presentation sync、owner sync、annotation mode sync 与 presented-state lookup
+已迁移至 `browser-presentation-sync-controller.ts`，原方法仅保留委托；focused test 为
+`scripts/test-main-browser-presentation-sync-controller.mjs`。
 `scripts/test-main-browser-page-command-controller.mjs` 覆盖 11 项历史、焦点、缩放、快照、挂载与路由断言。
 
 ### A3 main 剩余大 owner（2026-10-15）
