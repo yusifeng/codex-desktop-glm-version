@@ -17,7 +17,10 @@ for (const value of ["Alt", "DoubleCtrl", "LeftAlt+LeftAlt", "LeftShift+RightAlt
   assert.equal(shortcut.isDoubleModifierShortcut(value), false, value);
 }
 
-const main = await fs.readFile(".reference/originals/main/main-C-Mhak1n.ts", "utf8");
-assert.match(main, /require\("\.\/main-app\/hotkey\/appshot-shortcut\.js"\)/);
-assert.match(main, /return appshotShortcut\.isDoubleModifierShortcut\(e\)/);
+const manager = await fs.readFile(
+  "src/main/main-app/hotkey/appshot-hotkey-manager.ts",
+  "utf8",
+);
+assert.match(manager, /import \{ isDoubleModifierShortcut \} from "\.\/appshot-shortcut"/);
+assert.match(manager, /isDoubleModifierShortcut\(this\.configuredHotkey\)/);
 console.log("12 appshot shortcut assertions passed");

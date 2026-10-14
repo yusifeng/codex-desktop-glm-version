@@ -729,13 +729,39 @@ local/remote/durable backend routing 与 dispose cleanup 状态机。
 `scripts/test-main-terminal-session-manager.mjs` 覆盖 33 项 owner、create/attach、resize、transfer、
 pending abort、restart blocker 与 dispose focused assertions。
 
+### 增量抽取：browser-use API runtime
+
+R8/browser-use 原 `DYe` 完整 class 已迁移至 `src/main/main-app/browser-use/iab-api.ts`，
+替换旧的未接回 skeleton。新 factory 真实拥有 109 个方法、21 个 Map/Set 状态容器，
+保留 tab/route/session/turn、debugger/CDP target、page event、paint lease、clipboard cleanup、cursor waiter
+与 one-shot download grant 的完整生命周期。原 1,371 行 class 已删除，唯一生产构造点
+通过 `createIabBrowserUseApiClass` 真实接回，三个 Symbol API 与 native pipe consumer 共享同一 identity。
+`scripts/test-main-iab-api-boundary.mjs` 已改为生产 owner 回归，覆盖 40 项 lifecycle assertions。
+
+### 增量抽取：BrowserWindow manager
+
+R12/window 原 `Qot` 完整 class 已迁移至
+`src/main/main-app/window/browser-window-manager.ts`。新 factory 持有 window/webContents registry、
+ready message queue、primary selection/bounds、create/register/close、appearance/backdrop/zoom/swipe、
+popup/auxiliary focus 与 renderer recovery 生命周期，并复用已迁的 options/titlebar/display/
+primary/diagnostics/context-menu/recovery 语义模块。原 1,022 行 class 已删除，唯一构造点
+改为 dependency factory 适配。`scripts/test-main-browser-window-manager.mjs` 覆盖 33 项 owner 与接线断言。
+
+### 增量抽取：Appshot hotkey manager
+
+R12/hotkey 原 `Pit` 完整 class 已迁移至
+`src/main/main-app/hotkey/appshot-hotkey-manager.ts`。新 manager 拥有 persisted/default hotkey、
+feature/support reconciliation、macOS/native registration、Windows down/up flight、destination routing、
+renderer priority lease/timer 与 dispose cleanup。原 236 行 class 已删除，startup 唯一构造点真实接回。
+`scripts/test-main-appshot-hotkey-manager.mjs` 覆盖 47 项 focused assertions。
+复核同时确认 `Wit` 才是 Windows native capture bridge，与 `Pit` 的 hotkey 状态所有权独立。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
-`vZe/xZe/Vet/Wtt` 均已移出；artifact session host 与 terminal session owner 已清零。
-仍明确存在的完整大 owner 为：`DYe` browser-use tab/runtime registry、`tQe`
-IAB/browser-sidebar manager、`Pit`
-appshot/native capture RPC owner、`Eat` hotkey-window lifecycle，以及 `Qot` BrowserWindow manager。
-`ztt` 是保留的 node-pty I/O adapter；`DYe/tQe/Pit/Eat/Qot` 仍需按内部完整生命周期迁移。
+`vZe/xZe/Vet/Wtt/DYe/Pit/Qot` 均已移出；artifact、terminal、browser-use、Appshot hotkey
+与 BrowserWindow owner 已清零。仍明确存在的大 owner 为 `tQe` IAB/browser-sidebar manager
+与 `Eat` hotkey-window lifecycle；Appshot 链路另有 `Wit` Windows native capture bridge 及尚未真实接回的
+cross-platform capture-request owner。`ztt` 是保留的 node-pty I/O adapter。
 
 ### A3 main 剩余 owner 复核（2026-10-11）
 

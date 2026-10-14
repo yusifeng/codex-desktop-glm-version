@@ -1,5 +1,16 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 A3 三个完整 owner 并行迁出并真实接回：
+
+- `DYe` browser-use API runtime 迁入 `src/main/main-app/browser-use/iab-api.ts`，替换未接回 skeleton，
+  保留 109 方法、21 个状态容器和 Symbol API，删除原 class 1,371 行；focused 40 项。
+- `Qot` BrowserWindow manager 迁入 `src/main/main-app/window/browser-window-manager.ts`，
+  保留 window/webContents/message/primary/create/register/appearance/focus/recovery 全生命周期，
+  删除原 class 1,022 行；focused 33 项。
+- `Pit` Appshot hotkey manager 迁入 `src/main/main-app/hotkey/appshot-hotkey-manager.ts`，
+  保留 registration、Windows flight、destination route、priority lease 与 dispose，删除原 class 236 行；
+  focused 47 项。
+
 本轮将原 `Wtt` terminal session manager 整体迁移至
 `src/main/main-app/terminal/terminal-session-manager.ts` 并真实接回；session/conversation registry、
 pending create/abort、owner listener、action restart、buffer snapshot、create/attach/transfer/write/resize/close、
