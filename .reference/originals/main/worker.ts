@@ -218,6 +218,7 @@ const { disposeGitWatchSession } = require("./worker/git-watch-session-dispose-c
 const { startGitWatchSession } = require("./worker/git-watch-session-start-controller");
 const { refreshGitWorkingTreeWatchPolicy } = require("./worker/git-working-tree-watch-policy-refresh-controller");
 const { startGitRepoWatcher } = require("./worker/git-repo-watcher-start-controller");
+const { startGitRepoWatchSession } = require("./worker/git-repo-watch-session-runtime");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -68926,93 +68927,46 @@ var Jye = 1e3,
       });
     }
     async startWatchSession(e, t) {
-      let n = e.generation;
-      try {
-        if (e.metadataDirectory != null) {
-          let r;
-          try {
-            r = (await this.options.host.stat(e.watchPath, { bypassCache: !0 })).isDirectory();
-          } catch (e) {
-            if (!isMissingPathError(e)) throw e;
-            r = !1;
-          }
-          if (this.disposed || n !== e.generation) return;
-          if (((e.metadataDirectory.missing = !r), this.updateRequiresRecovery(), !r)) {
-            t && e.handlers.forEach((e) => this.handleFileWatchEvent(e.changeType));
-            return;
-          }
-        }
-        let r = e.handlers.some((e) => e.changeType === `working-tree`),
-          i = r ? await this.ignorePolicy?.read() : void 0;
-        if (this.disposed || n !== e.generation || (i != null && !this.ignorePolicy?.isCurrent(i)))
-          return;
-        let a = {
-            path: e.watchPath,
-            recursive: e.recursive,
-            renameEventHandling: r ? `changed-path-with-parent-directory` : `changed-path`,
-            watchId: `git-repo-${crypto.randomUUID()}`,
-            onChange: ({ changedPaths: t, pathChanges: a }) => {
-              if (this.disposed || n !== e.generation) return;
-              handleGitWatchChange({ target: e, changedPaths: t, pathChanges: a, pathApi: this.pathApi, root: this.options.root,
-                ignoreSourceWatch: this.ignoreSourceWatches.get(e.watchPath), changedIgnoreSourcePaths: this.changedIgnoreSourcePaths, ignoreDirectories: i?.directories,
-                refreshMetadataDirectories: (paths) => this.refreshMetadataDirectories(paths), ignorePolicy: this.ignorePolicy,
-                collectHandlerPaths: (handler, paths, cache) => collectGitWatchHandlerPaths(this.pathApi, this.options.root, handler, paths, cache),
-                handleFileWatchEvent: (changeType, paths) => this.handleFileWatchEvent(changeType, paths),
-                setCurrentHeadRefKnown: (known) => { this.currentHeadRefKnown = known; } });
-            },
-          },
-          o = await OH(
-            {
-              attributes: {
-                "git.host_kind": this.options.host.isLocal ? `local` : `remote`,
-                "git.watch_target": r ? `working-tree` : `git-metadata`,
-                "git.watcher_recovering": t,
-                "git.watcher_recursive": e.recursive,
-              },
-              name: `git.watcher_target_start`,
-              op: `codex.git.watcher_target_start`,
-            },
-            () =>
-              r && this.options.startWorkingTreeWatch != null
-                ? this.options.startWorkingTreeWatch(a, i?.directories ?? [])
-                : !r && this.options.startMetadataWatch != null
-                  ? this.options.startMetadataWatch(a)
-                  : this.options.host.startFileWatch(a),
-          );
-        if (
-          this.disposed ||
-          n !== e.generation ||
-          !this.watchTargets.includes(e) ||
-          (i != null && !this.ignorePolicy?.isCurrent(i))
-        ) {
-          await o.dispose();
-          return;
-        }
-        ((e.session = o), r && (this.workingTreeIgnoredDirectories = i?.directories ?? []));
-        let s = i != null && this.ignorePolicy?.didApply(i),
-          c = Date.now();
-        (this.updateRequiresRecovery(),
-          o.closed.then((t) => this.watchSessionCloseController.handleClose(e, o, c, t)),
-          (t || s) &&
-            (t &&
-              this.ignoreSourceWatches.get(e.watchPath)?.target === e &&
-              this.ignorePolicy?.requestRefresh(),
-            e.handlers.forEach((e) => {
-              this.handleFileWatchEvent(e.changeType);
-            }),
-            !r &&
-              !e.recursive &&
-              !this.metadataRefreshController.hasPending() &&
-              this.refreshMetadataDirectories([], !1)));
-      } catch (t) {
-        if (this.disposed || n !== e.generation) return;
-        (this.logger.warning(`Failed to watch git path`, {
-          safe: {},
-          sensitive: { error: t, path: e.watchPath },
-        }),
-          this.updateRequiresRecovery(),
-          this.scheduleWatchSessionRetry(e));
-      }
+      const generation = e.generation;
+      return startGitRepoWatchSession({
+        target: e,
+        recovering: t,
+        generation,
+        isDisposed: () => this.disposed,
+        isCurrentGeneration: () => generation === e.generation,
+        stat: (path, options) => this.options.host.stat(path, options),
+        isMissingPathError,
+        hasWorkingTreeHandler: e.handlers.some((handler) => handler.changeType === `working-tree`),
+        readIgnorePolicy: async () => this.ignorePolicy?.read(),
+        isIgnorePolicyCurrent: (snapshot) => this.ignorePolicy?.isCurrent(snapshot) === true,
+        createWatchId: () => `git-repo-${crypto.randomUUID()}`,
+        trace: (span, operation) => OH(span, operation),
+        hostKind: this.options.host.isLocal ? `local` : `remote`,
+        startWorkingTreeWatch: this.options.startWorkingTreeWatch,
+        startMetadataWatch: this.options.startMetadataWatch,
+        startFileWatch: (options) => this.options.host.startFileWatch(options),
+        handleWatchChange: ({ changedPaths, pathChanges, ignoreDirectories }) => handleGitWatchChange({ target: e, changedPaths, pathChanges, pathApi: this.pathApi, root: this.options.root,
+          ignoreSourceWatch: this.ignoreSourceWatches.get(e.watchPath), changedIgnoreSourcePaths: this.changedIgnoreSourcePaths, ignoreDirectories,
+          refreshMetadataDirectories: (paths) => this.refreshMetadataDirectories(paths), ignorePolicy: this.ignorePolicy,
+          collectHandlerPaths: (handler, paths, cache) => collectGitWatchHandlerPaths(this.pathApi, this.options.root, handler, paths, cache),
+          handleFileWatchEvent: (changeType, paths) => this.handleFileWatchEvent(changeType, paths),
+          setCurrentHeadRefKnown: (known) => { this.currentHeadRefKnown = known; } }),
+        ignoreSourceWatch: () => this.ignoreSourceWatches.get(e.watchPath),
+        changedIgnoreSourcePaths: this.changedIgnoreSourcePaths,
+        ignoreDirectories: [],
+        refreshMetadataDirectories: (paths) => this.refreshMetadataDirectories(paths, !1),
+        ignorePolicy: this.ignorePolicy,
+        collectHandlerPaths: (handler, paths, cache) => collectGitWatchHandlerPaths(this.pathApi, this.options.root, handler, paths, cache),
+        handleFileWatchEvent: (changeType, paths) => this.handleFileWatchEvent(changeType, paths),
+        isRegistered: () => this.watchTargets.includes(e),
+        attachSession: (session) => { e.session = session; },
+        setWorkingTreeIgnoredDirectories: (directories) => { this.workingTreeIgnoredDirectories = directories; },
+        updateRecovery: () => this.updateRequiresRecovery(),
+        attachClosed: (session, startedAt) => { session.closed.then((close) => this.watchSessionCloseController.handleClose(e, session, startedAt, close)); },
+        hasPendingMetadataRefresh: () => this.metadataRefreshController.hasPending(),
+        loggerWarning: (error, path) => this.logger.warning(`Failed to watch git path`, { safe: {}, sensitive: { error, path } }),
+        scheduleRetry: () => this.scheduleWatchSessionRetry(e),
+      });
     }
     scheduleWatchSessionRetry(e) {
       this.watchRetryController.schedule(e);
