@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 的 screenshot/render/draft-marker/overlay-style 投影迁移至 `annotation-overlay-runtime-state.ts` 并真实接回；保留 linked draft selection、截图 geometry、metadata/flex-gap、draft marker 与 comment cursor policy，删除原约 100 行内联投影。focused test 为 `scripts/test-preload-annotation-overlay-runtime-state.mjs`（10 项）。
+
 本轮将原 `Ctt` tab-drag presentation window 的完整 Electron 窗口生命周期迁移至
 `src/main/main-app/window/tab-drag-presentation-window.ts`，真实接回 `Ett.create()` factory，并删除原约
 180 行内嵌实现；保留 isolated document/snapshot 注入、cue 串行更新、capture readiness、pointer-follow、

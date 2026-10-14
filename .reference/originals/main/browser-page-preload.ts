@@ -5968,6 +5968,7 @@ var { projectAnnotationRegionRecords } = require("./browser-page-preload/annotat
 var { projectAnnotationOverlayStyle } = require("./browser-page-preload/annotation-overlay-style-projection");
 var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/annotation-draft-marker-state");
 var { projectAnnotationRenderState } = require("./browser-page-preload/annotation-render-state-projection");
+var { projectAnnotationOverlayRuntimeState } = require("./browser-page-preload/annotation-overlay-runtime-state");
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
@@ -24641,74 +24642,30 @@ function Wy({ rootHost: e, bridge: t }) {
     en = highlightState.highlightClassName,
     tn = highlightState.highlightBorderRadius,
     nn = highlightState.additionalHighlights;
-  let screenshotPayload = projectAnnotationScreenshotPayload(
-      {
-        active: M,
-        selectionRects: Xt,
-        highlightRect: Qt,
-        additionalHighlights: nn,
-        markerRecords: Rt,
-        markerPoints: zt,
-        zoomFactor: j,
-      },
-      { unionRects: (rects) => s_(rects) },
-    ),
+  let overlayRuntimeState = projectAnnotationOverlayRuntimeState({
+      active: M, selectionRects: Xt, highlightRect: Qt, additionalHighlights: nn, markerRecords: Rt, markerPoints: zt,
+      zoomFactor: j, hasActiveSelection: Ot, flexGapProperty: re, editor: x, activeAnnotation: Re, elementCache: Ie,
+      showMetadata: Me, hoverSnapshot: a, activeHighlightRect: ae, selectedComment: Kt, modifierActive: p, selectedPoint: s,
+      additionalSelections: jt, nativeTextSelection: ke, hotspots: W.hotspotByMode, draftAnchor: kt, matchedAnnotation: Ft,
+      isOriginalPage: It, editorViewportSize: Mt, viewport: se, baseStyle: Cv, viewportScale: Ae, markerSize: Zs,
+      metadataHeight: mb, scaleVariable: gb, interactionMode: k, suspended: De,
+    }, {
+      projectScreenshotPayload: projectAnnotationScreenshotPayload, unionRects: (rects) => s_(rects),
+      projectRenderState: projectAnnotationRenderState,
+      collectFlexGapOverlays: (property, editor, annotation, cache) => $y(property, editor, annotation, cache),
+      projectDraftMarkerState: projectAnnotationDraftMarkerState,
+      resolveMarkerPoint: (anchor, viewport, options) => v_(anchor, viewport, options),
+      countComments: () => cs(Ee), getCommentNumber: (annotation) => Pe.get(annotation.id),
+      projectOverlayStyle: projectAnnotationOverlayStyle, selectionsEqual: (left, right) => ol(left, right),
+    }),
+    screenshotPayload = overlayRuntimeState.screenshotPayload,
     rn = screenshotPayload.annotationViewportRect,
     Ht = screenshotPayload.markerViewportPoint,
-    renderState = projectAnnotationRenderState(
-      {
-        hasActiveSelection: Ot,
-        flexGapProperty: re,
-        editor: x,
-        activeAnnotation: Re,
-        elementCache: Ie,
-        showMetadata: Me,
-        hoverSnapshot: a,
-        highlightRect: ae,
-        selectedComment: Kt,
-        modifierActive: p,
-        selectedPoint: s,
-        hasLinkedDraftSelection:
-          !Ot && x?.target.mode === `create` && x.anchor.type !== `text` && p && s != null && jt.some((e) => ol(e, s)),
-        nativeTextSelection: ke,
-        hotspots: W.hotspotByMode,
-      },
-      { collectFlexGapOverlays: (property, editor, annotation, cache) => $y(property, editor, annotation, cache) },
-    ),
-    an = renderState.flexItemOverlays,
-    on = renderState.metadataSnapshot,
-    sn = renderState.draftHoverSnapshot,
-    cn = renderState.isRemoveHover,
-    ln = renderState.mode,
-    un = renderState.hotspot,
-    draftMarkerState = projectAnnotationDraftMarkerState(
-      {
-        hasActiveSelection: Ot,
-        anchor: kt,
-        matchedAnnotation: Ft,
-        isOriginalPage: It,
-        additionalSelections: jt,
-        viewportSize: Mt,
-        viewport: se,
-        zoomFactor: j,
-      },
-      {
-        resolveMarkerPoint: (anchor, viewport, options) => v_(anchor, viewport, options),
-        countComments: () => cs(Ee),
-        getCommentNumber: (annotation) => Pe.get(annotation.id),
-      },
-    ),
-    dn = draftMarkerState.markerPoint,
-    pn = draftMarkerState.commentNumber,
-    hn = projectAnnotationOverlayStyle({
-      baseStyle: Cv,
-      zoomFactor: j,
-      viewportScale: Ae,
-      markerSize: Zs,
-      metadataHeight: mb,
-      scaleVariable: gb,
-    });
-  k === `comment` && !De && x == null && ((hn.cursor = `none`), ke || (hn.pointerEvents = `auto`));
+    renderState = overlayRuntimeState.renderState,
+    an = renderState.flexItemOverlays, on = renderState.metadataSnapshot, sn = renderState.draftHoverSnapshot,
+    cn = renderState.isRemoveHover, ln = renderState.mode, un = renderState.hotspot,
+    draftMarkerState = overlayRuntimeState.draftMarkerState,
+    dn = draftMarkerState.markerPoint, pn = draftMarkerState.commentNumber, hn = overlayRuntimeState.overlayStyle;
   let gn = (0, G.useEffectEvent)((e) => {
     t.sendMessageToHost({
       type: `browser-sidebar-runtime-comment-screenshot-ready`,
