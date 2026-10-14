@@ -3265,3 +3265,6 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - worker `GitIgnorePolicy` lifecycle 替换已收尾：`GitRepoWatcher` 继续真实实例化语义模块，旧 `Xye`
   generation/read/refresh/retry/dispose 实现及专用常量已删除；focused lifecycle coverage 扩至 37 项，
   覆盖 single-flight read、stale generation、initial/recovery backoff、recovery 通知与 dispose barrier。
+- worker Git manager request classification boundary 已完成替换：live-query `resolveQueryRoot` 最后一个 consumer
+  直接接回 `resolveRequestRoot`，删除 `obe`/`ube`/`B6`/`sbe`/`cbe`/`lbe` 六个 generated wrapper 及约
+  170 行不可达旧 classification owner；context/invalidation focused coverage 扩至 42/50 项。

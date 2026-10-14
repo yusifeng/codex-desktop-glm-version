@@ -1046,7 +1046,7 @@ worker 请求完成后的仓库缓存失效策略已迁移至
 `src/main/worker/git-request-invalidation-policy.ts`。该模块集中处理 mutation method
 判定、exact/host 失效目标与 cwd/root 优先级解析；入口仍负责实际缓存失效、Git manager
 和 host 生命周期副作用。`scripts/test-worker-git-request-invalidation-policy.mjs`
-覆盖 mutation/readonly、cwd/root 优先级、exact/host 目标与 commit 条件，共 7 项断言。
+覆盖全部 mutation method、cwd/root 优先级、exact/host 目标与 commit 条件，共 50 项断言。
 Git watcher session 生命周期纯策略已进一步收敛至
 `src/main/worker/git-watch-session-policy.ts`：指数重连退避、retry timer 单例门控、session close
 稳定阈值、恢复后重试条件均由独立模块提供，`git-watch-paths.ts` 仅复用语义入口；新增 8 项
@@ -1140,7 +1140,7 @@ Git worker 请求的 telemetry/context 投影已迁移至
 `src/main/worker/git-request-context-policy.ts`：按请求方法选择 cwd/root、提取 review
 source，并统一识别 error/success=false/command-error 结果。该边界保持纯函数，不触碰
 worker I/O 或请求生命周期；`scripts/test-worker-git-request-context-policy.mjs` 覆盖
-12 项 root/source/cwd/failure 断言。
+42 项 root/source/cwd/failure/performance-context 断言。
 
 ### 增量抽取：Worker host path policy
 
@@ -1558,7 +1558,8 @@ Open-target registry 的 `A9` lookup 已迁移至 `src/main/worker/open-target-r
 Git request dispatcher 的真实 consumers 已直接接回 request-context/invalidation policy：
 review cwd/source、mutation root、invalidation target 与 mutation-method 判定不再经过
 `ube`/`B6`/`sbe`/`cbe`/`lbe` generated 转发层；既有对应 policy focused suites 继续覆盖这些
-投影，generated wrapper 仅保留作 source-parity 对照。
+投影。本轮进一步将 live-query 的最后一个 `obe` consumer 直接接回 `resolveRequestRoot`，并删除
+`obe`/`ube`/`B6`/`sbe`/`cbe`/`lbe` 六个 wrapper 及约 170 行不可达 generated classification owner。
 
 worker 中残留的 `F6` missing-path generated wrapper 已删除，watcher metadata、git path
 existence 与 worktree directory checks 三处 consumer 直接使用既有
