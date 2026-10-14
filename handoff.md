@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `Wtt` terminal session manager 整体迁移至
+`src/main/main-app/terminal/terminal-session-manager.ts` 并真实接回；session/conversation registry、
+pending create/abort、owner listener、action restart、buffer snapshot、create/attach/transfer/write/resize/close、
+local/remote/durable backend 与 dispose 全部由新 owner 持有，原 class 删除 618 行。
+`ztt` 经复核是 node-pty I/O adapter 而非 session manager，继续作为依赖注入保留。
+focused test 为 `scripts/test-main-terminal-session-manager.mjs`（33 项）。
+
 右侧文件预览终局复核已从 `connected-file-preview-tab` 真实 route 追到
 `LibraryCloudFilePreview` 及内容 consumer。本轮补齐 image、PDF/blob、sandboxed HTML、
 MarkdownSurface、text、JSON 与 Google Workspace provider iframe 的真实渲染，

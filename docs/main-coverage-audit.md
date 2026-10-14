@@ -716,12 +716,26 @@ host subscription close、listener detach 与 client close 的最终清理顺序
 使用 esbuild 临时 bundle，覆盖 37 项 single-flight、routing、native error mapping、epoch/disconnect、dispose
 和 create/dispose race focused assertions。
 
+### 增量抽取：terminal session manager 生命周期
+
+R10/terminal 原 `Wtt` 的完整 session manager 已迁移至
+`src/main/main-app/terminal/terminal-session-manager.ts`。新 manager 拥有 session/conversation mapping、
+pending create/abort、owner listener、action restart queue、buffer snapshot、create/attach/transfer/write/resize/close、
+local/remote/durable backend routing 与 dispose cleanup 状态机。
+
+原 main consumer 只保留 platform/path/environment/host/process adapter 及 `ztt` node-pty backend 注入；
+`Wtt` class 原 618 行主体已删除。`ztt` 本身是约 54 行的本地 PTY backend wrapper，
+不是 session manager，作为平台 I/O adapter 保留。
+`scripts/test-main-terminal-session-manager.mjs` 覆盖 33 项 owner、create/attach、resize、transfer、
+pending abort、restart blocker 与 dispose focused assertions。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
-`vZe/xZe/Vet` 均已移出；artifact session host owner 已清零。仍明确存在的完整大 owner 为：`DYe`
-browser-use tab/runtime registry、`tQe` IAB/browser-sidebar manager、`ztt` terminal session manager、`Pit`
+`vZe/xZe/Vet/Wtt` 均已移出；artifact session host 与 terminal session owner 已清零。
+仍明确存在的完整大 owner 为：`DYe` browser-use tab/runtime registry、`tQe`
+IAB/browser-sidebar manager、`Pit`
 appshot/native capture RPC owner、`Eat` hotkey-window lifecycle，以及 `Qot` BrowserWindow manager。
-下一最大可迁边界为 `ztt` terminal session manager；`DYe/tQe/Pit/Eat/Qot` 仍需先按内部完整生命周期拆分。
+`ztt` 是保留的 node-pty I/O adapter；`DYe/tQe/Pit/Eat/Qot` 仍需按内部完整生命周期迁移。
 
 ### A3 main 剩余 owner 复核（2026-10-11）
 
