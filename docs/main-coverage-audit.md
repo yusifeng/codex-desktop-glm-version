@@ -586,6 +586,18 @@ origin identity 替换、renderer conversation identity handshake、ready timeou
 窗口仍按 owner content bounds 将 popover 右下角投影到匹配 display，并保持最小 400 px 与 work-area clamp。
 `scripts/test-main-quick-chat-window-manager.mjs` 使用 esbuild 临时 bundle，覆盖 40 项 focused assertions。
 
+### 增量抽取：tab-drag presentation window 生命周期
+
+R10/window 原 `Ctt`（153,897-154,082）的完整 tab-drag presentation owner 已迁移至
+`src/main/main-app/window/tab-drag-presentation-window.ts`。模块创建并拥有透明、不可交互的 Electron
+BrowserWindow，保留 isolated data document 加载、snapshot markup/image decode、最新 cue generation
+串行应用、非空 capture readiness、cursor-relative 定位去重、16ms pointer-follow 与一次性 freeze。
+
+原 `Ett.create()` consumer 注入真实 BrowserWindow、screen cursor 和 timer adapters，`Dtt` 继续负责
+owner bounds 与 RPC schema 校验；main chunk 内旧 `Ctt`、data URL 和 timeout constants 已删除。
+load/show 的 3 秒 timeout、load/execute/capture 异常降级、closed 事件与显式 dispose 均释放 interval 和窗口。
+`scripts/test-main-tab-drag-presentation-window.mjs` 使用 esbuild 临时 bundle，覆盖 47 项 focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

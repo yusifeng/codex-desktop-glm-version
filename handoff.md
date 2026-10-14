@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `Ctt` tab-drag presentation window 的完整 Electron 窗口生命周期迁移至
+`src/main/main-app/window/tab-drag-presentation-window.ts`，真实接回 `Ett.create()` factory，并删除原约
+180 行内嵌实现；保留 isolated document/snapshot 注入、cue 串行更新、capture readiness、pointer-follow、
+freeze、3 秒 operation timeout 与 closed/dispose 清理。focused test 为
+`scripts/test-main-tab-drag-presentation-window.mjs`（47 项）。
+
 本轮将 Wy 的 text-anchor observation layout effect 迁移至 `annotation-anchor-observation-controller.ts` 并真实接回；保留当前页筛选、RAF 合并、viewport/frame resize/scroll、scroll-container、mutation observer 与 cleanup 顺序，删除原约 66 行内联编排。focused test 为 `scripts/test-preload-annotation-anchor-observation-controller.mjs`（9 项）。
 
 本轮将原 `kat` Quick Chat window manager 的完整窗口预热/打开生命周期迁移至

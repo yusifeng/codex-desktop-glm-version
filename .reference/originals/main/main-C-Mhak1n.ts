@@ -60,6 +60,7 @@ const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/
 const { LanguageServerManager } = require("./main-app/language-server/language-server-manager.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
+const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -153891,185 +153892,7 @@ var p5 = r.i(`system-permissions-service`),
         }
     }
   },
-  btt = `data:text/html;charset=utf-8,%3C!doctype%20html%3E%3Cmeta%20charset%3D%22utf-8%22%3E%3Cmeta%20http-equiv%3D%22Content-Security-Policy%22%20content%3D%22default-src%20'none'%3B%20img-src%20data%3A%20https%3A%20http%3A%3B%20style-src%20'unsafe-inline'%22%3E%3Cstyle%3Ehtml%2Cbody%7Bmargin%3A0%3Bwidth%3A100%25%3Bheight%3A100%25%3Boverflow%3Ahidden%3Bbackground%3Atransparent%7D%23card%7Bposition%3Arelative%3Bwidth%3A100%25%3Bheight%3A100%25%3Boverflow%3Ahidden%7D%23snapshot%7Btransform-origin%3Atop%20left%7D%3C%2Fstyle%3E%3Cdiv%20id%3D%22card%22%3E%3Cdiv%20id%3D%22snapshot%22%3E%3C%2Fdiv%3E%3C%2Fdiv%3E`,
-  xtt = 1001,
-  Stt = 3e3,
-  Ctt = class {
-    #e;
-    #t = !1;
-    #n = null;
-    #r;
-    #i = null;
-    #a = Promise.resolve(!0);
-    #o = 0;
-    #s = null;
-    #c = !1;
-    #l = null;
-    #u = null;
-    #d = null;
-    constructor() {
-      ((this.#e = new l.BrowserWindow({
-        title: ``,
-        width: 1,
-        height: 1,
-        frame: !1,
-        transparent: !0,
-        backgroundColor: `#00000000`,
-        alwaysOnTop: !0,
-        enableLargerThanScreen: process.platform === `darwin`,
-        focusable: !1,
-        show: !1,
-        skipTaskbar: !0,
-        resizable: !1,
-        minimizable: !1,
-        maximizable: !1,
-        hasShadow: !0,
-        webPreferences: { sandbox: !0, contextIsolation: !0, nodeIntegration: !1, javascript: !1 },
-      })),
-        this.#e.setOpacity(0),
-        process.platform === `darwin` && this.#e.setVisibleOnAllWorkspaces(!0),
-        this.#e.setIgnoreMouseEvents(!0),
-        this.#e.on(`closed`, this.#y),
-        (this.#r = this.#h(btt)));
-    }
-    async ready() {
-      return (await this.#r) && !this.#t;
-    }
-    updateCue(e) {
-      this.#s = e;
-      let t = ++this.#o;
-      return (
-        (this.#a = this.#a
-          .then(async () =>
-            this.#t
-              ? !1
-              : t === this.#o
-                ? (await this.ready())
-                  ? (this.#c && (await this.#m()), !this.#t)
-                  : !1
-                : !0,
-          )
-          .catch(() => (this[Symbol.dispose](), !1))),
-        this.#a
-      );
-    }
-    load(e) {
-      return this.#t || this.#i != null
-        ? Promise.resolve(!1)
-        : ((this.#i = this.#p(() => this.#f(e))), this.#i);
-    }
-    show() {
-      return this.#p(async () => {
-        if (this.#i == null || !(await this.#i)) return !1;
-        let e;
-        do {
-          if (((e = this.#o), !(await this.#a) || this.#t)) return !1;
-          let t = await this.#e.webContents.capturePage();
-          if (this.#t || t.isEmpty()) return !1;
-        } while (e !== this.#o);
-        return this.#v() ? (this.#e.setOpacity(1), !0) : !1;
-      });
-    }
-    async #f(e) {
-      if (!(await this.ready()) || this.#t) return !1;
-      ((this.#l = e.grabOffset), this.#e.setSize(e.size.width, e.size.height));
-      let t = Math.min(e.borderRadius, e.size.width / 2, e.size.height / 2);
-      return (
-        await this.#g(`(async () => {
-        const root = document.getElementById("snapshot");
-        document.getElementById("card").style.borderRadius = ${JSON.stringify(`${t}px`)};
-        root.style.transform = ${JSON.stringify(`scale(${e.zoom})`)};
-        root.innerHTML = ${JSON.stringify(e.markup)};
-        // The page screenshot is inline. A legacy remote favicon may never
-        // resolve in this isolated window and must not block detachment.
-        await Promise.allSettled(Array.from(root.querySelectorAll("img"))
-          .filter(image => image.src.startsWith("data:"))
-          .map(image => image.decode())
-        );
-      })()`),
-        this.#t ||
-        ((this.#c = !0), !(await this.#a) || this.#t) ||
-        (await this.#m(), this.#t || !this.#v())
-          ? !1
-          : (this.#_(), this.#v())
-      );
-    }
-    #p(e) {
-      let t;
-      return Promise.race([
-        e(),
-        new Promise((e) => {
-          t = setTimeout(() => e(!1), Stt);
-        }),
-      ])
-        .then((e) => (e || this[Symbol.dispose](), e))
-        .catch(() => (this[Symbol.dispose](), !1))
-        .finally(() => clearTimeout(t));
-    }
-    async #m() {
-      await this.#g(`(() => {
-      const region = document.querySelector("[data-app-shell-tab-drag-cue-region]");
-      if (region) {
-        const destination = ${JSON.stringify(this.#s?.destination ?? null)};
-        if (destination == null) {
-          region.removeAttribute("data-drop-cue");
-        } else {
-          region.dataset.dropCue = destination;
-        }
-      }
-    })()`);
-    }
-    freeze(e) {
-      return (
-        !this.#t &&
-        ((this.#n = this.#n ?? { ...e }),
-        this.#d != null && (clearInterval(this.#d), (this.#d = null)),
-        this.#l != null && this.#v(),
-        !0)
-      );
-    }
-    [Symbol.dispose]() {
-      this.#t ||
-        ((this.#t = !0),
-        this.#d != null && (clearInterval(this.#d), (this.#d = null)),
-        this.#e.off(`closed`, this.#y),
-        this.#e.isDestroyed() || this.#e.destroy());
-    }
-    async #h(e) {
-      try {
-        return (await this.#e.loadURL(e), !this.#t);
-      } catch {
-        return (this[Symbol.dispose](), !1);
-      }
-    }
-    async #g(e) {
-      await this.#e.webContents.executeJavaScriptInIsolatedWorld(xtt, [{ code: e }]);
-    }
-    #_() {
-      (this.#e.isVisible() || this.#e.showInactive(),
-        this.#n == null &&
-          this.#d == null &&
-          (this.#d = setInterval(() => {
-            try {
-              this.#v();
-            } catch {
-              this[Symbol.dispose]();
-            }
-          }, 16)));
-    }
-    #v() {
-      if (this.#t || this.#l == null) return !1;
-      let e = this.#n ?? l.screen.getCursorScreenPoint(),
-        t = Math.round(e.x - this.#l.x),
-        n = Math.round(e.y - this.#l.y);
-      return (
-        (this.#u?.x !== t || this.#u?.y !== n) &&
-          (this.#e.setPosition(t, n), (this.#u = { x: t, y: n })),
-        !0
-      );
-    }
-    #y = () => this[Symbol.dispose]();
-  },
+  Ctt = TabDragPresentationWindow,
   m5 = n.wf({ x: n.Cf(), y: n.Cf() }),
   wtt = n.wf({
     size: n.wf({ width: n.Cf().int().positive(), height: n.Cf().int().positive() }),
@@ -154089,7 +153912,20 @@ var p5 = r.i(`system-permissions-service`),
     }
     static create(t) {
       if (process.platform === `darwin` || process.platform === `win32`)
-        return new e(t, () => new Ctt());
+        return new e(
+          t,
+          () =>
+            new Ctt({
+              clearInterval: (e) => clearInterval(e),
+              clearTimeout: (e) => clearTimeout(e),
+              createWindow: (e) => new l.BrowserWindow(e),
+              getCursorScreenPoint: () => l.screen.getCursorScreenPoint(),
+              isDarwin: process.platform === `darwin`,
+              operationTimeoutMs: 3e3,
+              setInterval: (e, t) => setInterval(e, t),
+              setTimeout: (e, t) => setTimeout(e, t),
+            }),
+        );
     }
     getPointerPosition() {
       if (this.origin.isDestroyed()) return null;
