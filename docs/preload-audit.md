@@ -1,5 +1,7 @@
 # `browser-page-preload.ts` 逐段审计
 
+本轮新增 `annotation-controller-registry.ts`，将 Wy 顶层 32 个长生命 controller 的构造、依赖适配与稳定持有迁入单一 registry owner；保留原 `useState` hook/构造顺序、host message 路由、RAF 注入与后置 callback 的延迟闭包语义，并从 `Wy` 删除约 440 行内联 registry 主体。focused test：`scripts/test-preload-annotation-controller-registry.mjs`（12 项）。
+
 本轮新增 `annotation-highlight-render-owner.ts`，真实接回 Wy 的 highlight projection 与最终 root composition；迁移 text-preview projection bridge、highlight geometry/style、suspension gate、interaction layer 与根属性渲染。focused test：`scripts/test-preload-annotation-highlight-render-owner.mjs`（12 项）。
 
 本轮新增 `annotation-host-message-controller.ts`，真实接回 Wy 的 host-message subscription lifecycle；整体迁移 dispatcher action wiring、sync state、editor close/restore 与 viewport scheduler cleanup，删除原约 68 行内联 effect。focused test：`scripts/test-preload-annotation-host-message-controller.mjs`（12 项）。
