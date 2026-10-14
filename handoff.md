@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 的 overlay render composition 迁移至 `annotation-overlay-content-renderer.ts` 并真实接回；保留 region、highlight、selection cursor、text selection、flex/metadata、draft/saved marker 与交互回调，删除原约 110 行内联 JSX-runtime 主体。focused test 为 `scripts/test-preload-annotation-overlay-content-renderer.mjs`（12 项）。
+
 本轮将 Wy 的 active view/draft matching/marker/region/text-preview 投影迁移至 `annotation-active-runtime-state.ts` 并真实接回；保留 multi-select link、原页面 marker 策略、active geometry 与 text preview，删除原约 90 行内联投影。focused test 为 `scripts/test-preload-annotation-active-runtime-state.mjs`（12 项）。
 
 本轮将原 `ttt` startup renderer coordinator 的完整 phase 生命周期迁移至

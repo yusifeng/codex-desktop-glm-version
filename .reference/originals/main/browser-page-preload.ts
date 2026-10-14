@@ -5970,6 +5970,7 @@ var { projectAnnotationOverlayStyle } = require("./browser-page-preload/annotati
 var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/annotation-draft-marker-state");
 var { projectAnnotationRenderState } = require("./browser-page-preload/annotation-render-state-projection");
 var { projectAnnotationOverlayRuntimeState } = require("./browser-page-preload/annotation-overlay-runtime-state");
+var { renderAnnotationOverlayContent } = require("./browser-page-preload/annotation-overlay-content-renderer");
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
@@ -24636,118 +24637,21 @@ function Wy({ rootHost: e, bridge: t }) {
   }, [te, Et, gn, screenshotReadyController]);
   (0, G.useEffect)(() => () => screenshotReadyController.dispose(), [screenshotReadyController]);
   (0, G.useEffect)(() => () => screenshotReadyController.dispose(), [screenshotReadyController]);
-  let _n = (0, db.jsxs)(db.Fragment, {
-    children: [
-      Ct ? (0, db.jsx)(qy, {}) : null,
-      qt.map(({ anchor: e, key: t }) => {
-        let n = dd(e);
-        if (n == null) return null;
-        let r = c_(e, n);
-        return r == null
-          ? null
-          : (0, db.jsx)(`div`, { className: b_(e, n, se.width, se.height), style: x_(r, j) }, t);
-      }),
-      (0, db.jsx)(Av, {
-        additionalHighlights: nn.filter((e) => !e.isPageAnnotation),
-        highlightBorderRadius: tn,
-        highlightClassName: en,
-        highlightRect: $t ? null : Qt,
-        hoverSnapshot: sn,
-        isRemoveHover: cn,
-        linkedSelectionIndex: Nt,
-        viewportHeight: se.height,
-        viewportWidth: se.width,
-        zoomFactor: j,
-      }),
-      !Ot && d != null && (x == null || (x.target.mode === `create` && x.anchor.type !== `text`))
-        ? (0, db.jsx)(kv, {
-            className: `annotation-selection-cursor`,
-            "data-browser-comment-annotation-selection-cursor": !0,
-            "data-browser-comment-native-text-selection": ke || void 0,
-            mode: ln,
-            pointerEvents: `none`,
-            style: {
-              height: W.height * Ae,
-              left: d.x * j - un.x * Ae,
-              top: d.y * j - un.y * Ae,
-              width: W.width * Ae,
-            },
-          })
-        : null,
-      Zt.map((e, t) =>
-        (0, db.jsx)(
-          `div`,
-          { className: `text-selection-highlight`, style: x_(e, j) },
-          `${e.x}:${e.y}:${e.width}:${e.height}:${t}`,
-        ),
-      ),
-      an.map((e) =>
-        (0, db.jsx)(
-          `div`,
-          {
-            className: `flex-item-overlay`,
-            "data-browser-comment-flex-item-overlay": !0,
-            style: x_(e.rect, j, e.borderRadius),
-          },
-          e.key,
-        ),
-      ),
-      on == null
-        ? null
-        : (0, db.jsx)(Nv, { snapshot: on, viewportScale: n.viewportScale, zoomFactor: j }),
-      St || Ot
-        ? (0, db.jsxs)(`div`, {
-            className: `markers-layer`,
-            children: [
-              ee?.selected === !0
-                ? (0, db.jsx)(Mv, {
-                    commentNumber: null,
-                    markerPoint: { x: ee.point.x * j, y: ee.point.y * j },
-                    onFocusEditor: () => {
-                      t.sendMessageToHost({ type: `browser-sidebar-runtime-focus-editor` });
-                    },
-                  })
-                : null,
-              dn == null
-                ? null
-                : (0, db.jsx)(Mv, {
-                    commentNumber: pn,
-                    markerPoint: dn,
-                    onFocusEditor: () => {
-                      t.sendMessageToHost({ type: `browser-sidebar-runtime-focus-editor` });
-                    },
-                  }),
-              (n.areAnnotationMarkersVisible !== !1 || Ot ? Rt : []).map(
-                ({ anchor: e, comment: n, commentNumber: r, key: i, savedSelectionIndex: a }, o) =>
-                  (0, db.jsx)(
-                    jv,
-                    {
-                      commentNumber: r,
-                      isSelected: x?.target.mode === `edit` && x.target.commentId === n.id,
-                      markerPoint: zt[o],
-                      onMouseEnter: () => {
-                        Ot || x != null || Xe(n, e, a);
-                      },
-                      onMouseLeave: () => {
-                        $e(n.id);
-                      },
-                      onClick: (r) => {
-                        if (r.isTrusted) {
-                          if ((r.preventDefault(), r.stopPropagation(), x != null)) {
-                            t.sendMessageToHost({ type: `browser-sidebar-runtime-focus-editor` });
-                            return;
-                          }
-                          Ye(n, e, a);
-                        }
-                      },
-                    },
-                    i,
-                  ),
-              ),
-            ],
-          })
-        : null,
-    ],
+  let _n = renderAnnotationOverlayContent({
+    interactionEnabled: Ct, regionRecords: qt, viewport: se, zoomFactor: j, additionalHighlights: nn,
+    highlightBorderRadius: tn, highlightClassName: en, removeHighlight: $t, highlightRect: Qt, draftHoverSnapshot: sn,
+    removeHover: cn, linkedSelectionIndex: Nt, hasActiveSelection: Ot, pointer: d, editor: x,
+    nativeTextSelection: ke, cursorMode: ln, hotspotSize: W, hotspot: un, viewportScale: Ae,
+    textSelectionRects: Zt, flexItemOverlays: an, metadataSnapshot: on, runtimeViewportScale: n.viewportScale,
+    markersEnabled: St, metadataSelection: ee, draftMarkerPoint: dn, draftCommentNumber: pn,
+    markersVisible: n.areAnnotationMarkersVisible !== !1, markerRecords: Rt, markerPoints: zt,
+    sendToHost: (message) => t.sendMessageToHost(message), openPreview: Xe, closePreview: $e, openEditor: Ye,
+  }, {
+    jsx: db.jsx, jsxs: db.jsxs, Fragment: db.Fragment, InteractionBlocker: qy, HighlightLayer: Av,
+    SelectionCursor: kv, MetadataOverlay: Nv, Marker: Mv, SavedMarker: jv, readAnchorRect: (anchor) => dd(anchor),
+    clipAnchorRect: (anchor, rect) => c_(anchor, rect),
+    regionClassName: (anchor, rect, width, height) => b_(anchor, rect, width, height),
+    rectStyle: (rect, zoom, borderRadius) => x_(rect, zoom, borderRadius),
   });
   return (0, db.jsx)(Gy, {
     config: n.intlConfig,
