@@ -5971,6 +5971,7 @@ var { projectAnnotationDraftMarkerState } = require("./browser-page-preload/anno
 var { projectAnnotationRenderState } = require("./browser-page-preload/annotation-render-state-projection");
 var { projectAnnotationOverlayRuntimeState } = require("./browser-page-preload/annotation-overlay-runtime-state");
 var { renderAnnotationOverlayContent } = require("./browser-page-preload/annotation-overlay-content-renderer");
+var { projectAnnotationHighlightRuntimeState, renderAnnotationRoot } = require("./browser-page-preload/annotation-highlight-render-owner");
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
@@ -24504,39 +24505,23 @@ function Wy({ rootHost: e, bridge: t }) {
   (0, G.useEffect)(() => () => suspensionNotifier.dispose(), [suspensionNotifier]);
   (0, G.useEffect)(() => () => designModifierNotifier.dispose(), [designModifierNotifier]);
   (0, G.useEffect)(() => () => selectionModifierNotifier.dispose(), [selectionModifierNotifier]);
-  let Jt = textPreviewState.anchor,
-    Xt = textPreviewState.selectionRects,
-    Zt = Xt,
-    highlightState = projectAnnotationHighlightState(
-      {
-        hasActiveSelection: Ot,
-        active: M,
-        activeElement: Ut,
-        activeAdditionalAnchors: Wt,
-        editor: x,
-        activeHighlightRect: ae,
-        hoveredSnapshot: a,
-        metadataSnapshot: ee,
-        viewport: se,
-        viewportSize: se,
-      },
-      {
-        readLiveElementRect: (element) => nd(element),
-        readAnchorRect: (anchor) => dd(anchor),
-        styleElementHighlight: (anchor, rect, width, height) => m_(anchor, rect, width, height),
-        styleRegionHighlight: (anchor, rect, width, height) => S_(anchor, rect, width, height),
-        clipHighlightRect: (anchor, rect, element) => c_(anchor, rect, element),
-        projectAdditionalHighlights: (selections, viewport, options) => J_(selections, viewport, options),
-        resolveEditorAnchor: (anchor) => U_(anchor),
-        splitEditorAnchor: (anchor) => G_(anchor),
-        isPageAnnotation: (anchor) => rd(anchor),
-      },
-    ),
-    Qt = highlightState.highlightRect,
-    $t = highlightState.isRemoveHover,
-    en = highlightState.highlightClassName,
-    tn = highlightState.highlightBorderRadius,
-    nn = highlightState.additionalHighlights;
+  let highlightRuntimeState = projectAnnotationHighlightRuntimeState({
+      textPreviewState, hasActiveSelection: Ot, active: M, activeElement: Ut, activeAdditionalAnchors: Wt,
+      editor: x, activeHighlightRect: ae, hoveredSnapshot: a, metadataSnapshot: ee, viewport: se,
+    }, {
+      projectHighlightState: projectAnnotationHighlightState, readLiveElementRect: (element) => nd(element),
+      readAnchorRect: (anchor) => dd(anchor),
+      styleElementHighlight: (anchor, rect, width, height) => m_(anchor, rect, width, height),
+      styleRegionHighlight: (anchor, rect, width, height) => S_(anchor, rect, width, height),
+      clipHighlightRect: (anchor, rect, element) => c_(anchor, rect, element),
+      projectAdditionalHighlights: (selections, viewport, options) => J_(selections, viewport, options),
+      resolveEditorAnchor: (anchor) => U_(anchor), splitEditorAnchor: (anchor) => G_(anchor),
+      isPageAnnotation: (anchor) => rd(anchor),
+    }),
+    Jt = highlightRuntimeState.anchor, Xt = highlightRuntimeState.selectionRects, Zt = Xt,
+    Qt = highlightRuntimeState.highlightRect, removeHighlight = highlightRuntimeState.isRemoveHover,
+    en = highlightRuntimeState.highlightClassName, tn = highlightRuntimeState.highlightBorderRadius,
+    nn = highlightRuntimeState.additionalHighlights;
   let overlayRuntimeState = projectAnnotationOverlayRuntimeState({
       active: M, selectionRects: Xt, highlightRect: Qt, additionalHighlights: nn, markerRecords: Rt, markerPoints: zt,
       zoomFactor: j, hasActiveSelection: Ot, flexGapProperty: re, editor: x, activeAnnotation: Re, elementCache: Ie,
@@ -24577,7 +24562,7 @@ function Wy({ rootHost: e, bridge: t }) {
   (0, G.useEffect)(() => () => screenshotReadyController.dispose(), [screenshotReadyController]);
   let _n = renderAnnotationOverlayContent({
     interactionEnabled: Ct, regionRecords: qt, viewport: se, zoomFactor: j, additionalHighlights: nn,
-    highlightBorderRadius: tn, highlightClassName: en, removeHighlight: $t, highlightRect: Qt, draftHoverSnapshot: sn,
+    highlightBorderRadius: tn, highlightClassName: en, removeHighlight, highlightRect: Qt, draftHoverSnapshot: sn,
     removeHover: cn, linkedSelectionIndex: Nt, hasActiveSelection: Ot, pointer: d, editor: x,
     nativeTextSelection: ke, cursorMode: ln, hotspotSize: W, hotspot: un, viewportScale: Ae,
     textSelectionRects: Zt, flexItemOverlays: an, metadataSnapshot: on, runtimeViewportScale: n.viewportScale,
@@ -24591,27 +24576,19 @@ function Wy({ rootHost: e, bridge: t }) {
     regionClassName: (anchor, rect, width, height) => b_(anchor, rect, width, height),
     rectStyle: (rect, zoom, borderRadius) => x_(rect, zoom, borderRadius),
   });
-  return (0, db.jsx)(Gy, {
-    config: n.intlConfig,
-    children: (0, db.jsxs)(`div`, {
-      "data-browser-comment-annotation-selection-modifier-active": (p && d != null) || void 0,
-      "data-browser-comment-root": !0,
-      style: hn,
-      children: [
-        (0, db.jsx)(`style`, { children: wv }),
-        (!De || Ot) && (Ct || ke ? (0, db.jsx)(Ky, { style: mn, children: _n }) : _n),
-      ],
-    }),
-  });
-}
-function Gy({ children: e, config: t }) {
-  return (0, db.jsx)(Og, {
-    defaultLocale: t.defaultLocale,
-    locale: t.locale,
-    messages: t.messages,
-    onError: bb,
-    children: e,
-  });
+  return renderAnnotationRoot({
+    intlConfig: n.intlConfig,
+    suspended: De,
+    hasActiveSelection: Ot,
+    interactionEnabled: Ct,
+    nativeTextSelection: ke,
+    interactionStyle: mn,
+    content: _n,
+    modifierActive: p,
+    pointer: d,
+    overlayStyle: hn,
+    stylesheet: wv,
+  }, { jsx: db.jsx, jsxs: db.jsxs, IntlProvider: Og, onIntlError: bb, InteractionLayer: Ky });
 }
 function Ky({ children: e, style: t }) {
   let n = (0, G.useRef)(null),

@@ -1,5 +1,7 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 的 highlight projection 与最终 root composition 迁移至 `annotation-highlight-render-owner.ts` 并真实接回；保留 text-preview bridge、highlight geometry/style、suspension gate、interaction layer 与根属性渲染。focused test 为 `scripts/test-preload-annotation-highlight-render-owner.mjs`（12 项）。
+
 本轮将原 `jet` external document binding registry 的完整生命周期迁移至
 `src/main/main-app/remote-artifact/external-document-binding-registry.ts`，真实接回 artifact session
 manager 的唯一 consumer，并删除旧实现；保留 RPC endpoint ownership、capability connect、单线程 activation、

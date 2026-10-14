@@ -1,5 +1,7 @@
 # `browser-page-preload.ts` 逐段审计
 
+本轮新增 `annotation-highlight-render-owner.ts`，真实接回 Wy 的 highlight projection 与最终 root composition；迁移 text-preview projection bridge、highlight geometry/style、suspension gate、interaction layer 与根属性渲染。focused test：`scripts/test-preload-annotation-highlight-render-owner.mjs`（12 项）。
+
 本轮新增 `annotation-host-message-controller.ts`，真实接回 Wy 的 host-message subscription lifecycle；整体迁移 dispatcher action wiring、sync state、editor close/restore 与 viewport scheduler cleanup，删除原约 68 行内联 effect。focused test：`scripts/test-preload-annotation-host-message-controller.mjs`（12 项）。
 
 本轮新增 `annotation-overlay-content-renderer.ts`，真实接回 Wy 的 overlay render composition；整体迁移 region、highlight、selection cursor、text selection、flex/metadata、draft/saved marker 与交互回调，删除原约 110 行内联 JSX-runtime 主体。focused test：`scripts/test-preload-annotation-overlay-content-renderer.mjs`（12 项）。
