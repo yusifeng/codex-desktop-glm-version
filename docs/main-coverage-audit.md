@@ -689,13 +689,26 @@ pending-suspension barrier、debug event payload 与 window-close timer cleanup 
 实例化新 manager，main chunk 内旧 `xZe`、`hZ/gZ` 和专用 `_Z/SZe` 已删除。
 `scripts/test-main-browser-tab-working-set-manager.mjs` 使用 esbuild 临时 bundle，覆盖 41 项 focused assertions。
 
+### 增量抽取：artifact subscription manager 生命周期
+
+R10/remote-artifact `Vet` 内完整 subscription/session 子 owner 已迁移至
+`src/main/main-app/remote-artifact/artifact-subscription-manager.ts`。新 manager 拥有 subscription id/map、
+update/flush RPC endpoint 副本、host open/close identity、append/read-asset/mark-dirty 路由、event delivery、
+flush context 与 connection epoch 校验，以及 RPC broken、unsubscribe 和 service drain 的清理顺序。
+
+原 `Vet` consumer 注入现有 host client connection、`Het` wrapper、document/update/asset parsers、base64 codec、
+error-code 与 logger adapters；host callback/event 注册直接路由到新 manager。main chunk 已删除约 250 行旧
+subscription 实现及专用 RPC method constants，dispose 继续先 drain subscriptions、关闭 host subscription，
+再关闭 client。`scripts/test-main-artifact-subscription-manager.mjs` 使用 esbuild 临时 bundle，覆盖 50 项
+open/collision、append/read/dirty、event/flush、connection identity、RPC broken 与 drain focused assertions。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
 `vZe/xZe` 均已移出。仍明确存在的完整大 owner 为：`DYe` browser-use tab/runtime registry、`tQe`
-IAB/browser-sidebar manager、`Vet` artifact-session host service、`ztt` terminal session manager、`Pit`
+IAB/browser-sidebar manager、`Vet` 剩余 artifact host connection/native service、`ztt` terminal session manager、`Pit`
 appshot/native capture RPC owner、`Eat` hotkey-window lifecycle，以及 `Qot` BrowserWindow manager。
-`Vet/ztt` 可按完整 subscription/session 子-owner 继续迁移；`DYe/tQe/Pit/Eat/Qot` 需先按内部生命周期边界
-拆分，避免复制巨型 assembly。
+`Vet` 的 subscription owner 已迁出，剩余 connection single-flight/reconciliation 仍可作为下一完整子 owner；
+`ztt` 可按 terminal session 子-owner 迁移，`DYe/tQe/Pit/Eat/Qot` 需先按内部生命周期边界拆分。
 
 ### A3 main 剩余 owner 复核（2026-10-11）
 

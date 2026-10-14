@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 `Vet` 的完整 artifact subscription/session 子 owner 迁移至
+`src/main/main-app/remote-artifact/artifact-subscription-manager.ts` 并真实接回；删除原约 250 行
+subscription map、host open/close、append/read/dirty、event/flush、RPC broken 与 drain 实现，`Vet` 仅保留
+host connection/native/external-document 编排。focused test 为
+`scripts/test-main-artifact-subscription-manager.mjs`（50 项）。
+
 本轮将 Wy 的 DOM interaction setup 与 command facade 迁入
 `src/main/browser-page-preload/annotation-interaction-command-facade.ts`，以单一自定义 hook
 真实接回；保留 30 个 callback/effect-event/effect 的 hook 顺序、site request subscription、

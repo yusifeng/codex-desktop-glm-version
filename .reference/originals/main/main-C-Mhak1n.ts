@@ -68,6 +68,7 @@ const { ExternalDocumentBindingRegistry } = require("./main-app/remote-artifact/
 const { NativeArtifactFileService } = require("./main-app/remote-artifact/native-artifact-file-service.js");
 const { BrowserPageHostLifecycle } = require("./main-app/browser-sidebar/browser-page-host-lifecycle.js");
 const { BrowserTabWorkingSetManager } = require("./main-app/browser-sidebar/browser-tab-working-set-manager.js");
+const { ArtifactSubscriptionManager } = require("./main-app/remote-artifact/artifact-subscription-manager.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -151853,26 +151854,19 @@ function Iet(e, t) {
   };
 }
 var Z8 = Object.freeze({
-    appendUpdate: `documents.appendUpdate`,
-    closeSubscription: `subscriptions.close`,
     ping: `host.ping`,
-    markViewerDirty: `viewer.markDirty`,
-    openSubscription: `subscriptions.open`,
     publishNativeSnapshot: `outputs.publishNativeSnapshot`,
-    readDocumentAsset: `assets.read`,
     resolveArtifactRef: `documents.resolveArtifactRef`,
   }),
-  zet = Object.freeze({ flushViewer: `viewer.flush` }),
   Bet = `native-snapshot-v1`,
   Vet = class extends n.Uf {
     getViewerConnectionInfo;
     logger = r.i(`artifact-session-host-service`);
     #e;
-    #t;
     #n;
     #r;
     #i;
-    #a = new Map();
+    #a;
     #o;
     #s;
     #c = !1;
@@ -151881,10 +151875,9 @@ var Z8 = Object.freeze({
     #d = !1;
     #f;
     constructor(e, t) {
-      (super(),
+        (super(),
         (this.getViewerConnectionInfo = e),
         (this.#e = t.createClient ?? Uet),
-        (this.#t = t.createSubscriptionId ?? (() => (0, _.randomUUID)())),
         (this.#n = new jet({
           connect: async (e) => {
             let t = this.getViewerConnectionInfo();
@@ -151917,6 +151910,43 @@ var Z8 = Object.freeze({
           parseApplyRequest: (e) => Aet.parse(e),
           parseBindingRequest: (e) => X8.parse(e),
         })),
+        (this.#a = new ArtifactSubscriptionManager({
+          connect: async () => {
+            if (this.#d || this.#c) throw Error(`Artifact Session viewer is unavailable.`);
+            let e = this.getViewerConnectionInfo();
+            if (e == null) throw Error(`Artifact Session viewer is unavailable.`);
+            let t = await this.#x(e);
+            if ((await t.connect(), this.#d || this.#c || this.#o !== t))
+              throw Error(`Artifact Session viewer is unavailable.`);
+            return t;
+          },
+          createId: t.createSubscriptionId ?? (() => (0, _.randomUUID)()),
+          createSubscription: (e) => new Het(e),
+          disposeValue: i5,
+          getActiveClient: () => this.#o,
+          isClientActive: (e) => !this.#c && this.#o === e,
+          isErrorCode: o5,
+          logFailure: (e, t) => this.#I(e, t),
+          parseAppendResult: (e) => {
+            let t = $8(e);
+            return { applied: Ket(t, `applied`), stateVersion: n5(t, `stateVersion`) };
+          },
+          parseAssetResult: (e, t) => {
+            let n = $8(e);
+            if (e5(n, `sha256`) !== t)
+              throw Error(`Artifact Session host returned the wrong asset.`);
+            return r5(e5(n, `dataBase64`));
+          },
+          parseEvent: Get,
+          parseFlushSubscriptionId: (e) => e5($8(e), `subscriptionId`),
+          parseOpenResult: (e, t, n) => {
+            let r = $8(e);
+            if (e5(r, `subscriptionId`) !== n)
+              throw Error(`Artifact Session host returned the wrong subscription.`);
+            return Wet(t, r.document);
+          },
+          serializeBytes: qet,
+        })),
         (this.#r = new NativeArtifactFileService({
           downloadCopy: t.downloadCopy,
           getTargets: t.getOpenInTargets,
@@ -151947,57 +151977,7 @@ var Z8 = Object.freeze({
         : { status: `failed`, reason: `session-unavailable` };
     }
     async open(e, t, n) {
-      if (this.#d || this.#c) throw Error(`Artifact Session viewer is unavailable.`);
-      let r, i, a;
-      try {
-        let o = this.getViewerConnectionInfo();
-        if (o == null) throw Error(`Artifact Session viewer is unavailable.`);
-        ((r = t.dup?.() ?? t), (i = n.dup?.() ?? n));
-        let s = await this.#x(o);
-        if ((await s.connect(), this.#d || this.#c || this.#o !== s))
-          throw Error(`Artifact Session viewer is unavailable.`);
-        let c = this.#t();
-        if (this.#a.has(c)) throw Error(`Artifact Session subscription id collision.`);
-        ((a = {
-          artifactRef: e.artifactRef,
-          closed: !1,
-          hostOpened: !1,
-          onFlush: i,
-          onUpdate: r,
-          subscriptionId: c,
-          threadId: e.threadId,
-        }),
-          this.#a.set(c, a));
-        let l = a;
-        if (
-          (r.onRpcBroken?.(() => this.#D(l)),
-          i.onRpcBroken?.(() => this.#D(l)),
-          a.closed || this.#a.get(c) !== a)
-        )
-          throw Error(`Artifact Session subscription closed while opening.`);
-        let u = await this.#b(a, s);
-        if (a.closed || this.#a.get(c) !== a)
-          throw (
-            !this.#c && this.#o === s && (await this.#O(s, c)),
-            Error(`Artifact Session subscription closed while opening.`)
-          );
-        let d = a;
-        return {
-          record: u,
-          subscription: new Het({
-            append: (e) => this.#p(d, e),
-            markDirty: () => this.#g(d),
-            readAsset: (e) => this.#_(d, e),
-            unsubscribe: () => this.#D(d),
-          }),
-        };
-      } catch (e) {
-        throw (
-          a == null ? (this.#L(r), this.#L(i)) : this.#D(a),
-          this.#I(`open_failed`, e),
-          Error(`Artifact Session could not be opened.`)
-        );
-      }
+      return this.#a.open(e, t, n);
     }
     async performNativeFileAction(e) {
       return (await this.supportsNativeOpen())
@@ -152025,28 +152005,6 @@ var Z8 = Object.freeze({
       }
     }
     dispose = () => ((this.#u ??= this.#j()), this.#u);
-    async #p(e, t) {
-      this.#A(e);
-      try {
-        let n = $8(
-          await this.#y(e).call(Z8.appendUpdate, {
-            artifactRef: e.artifactRef,
-            threadId: e.threadId,
-            update: {
-              baseStateVersion: t.baseStateVersion,
-              crdtUpdateBase64: qet(t.bytes),
-              originId: t.originId,
-              source: `user`,
-              ...(t.summary === void 0 ? {} : { summary: t.summary }),
-              updateId: t.updateId,
-            },
-          }),
-        );
-        return { applied: Ket(n, `applied`), stateVersion: n5(n, `stateVersion`) };
-      } catch (e) {
-        throw (this.#I(`append_failed`, e), Error(`Artifact Session update could not be saved.`));
-      }
-    }
     async #m(e) {
       if (this.#d || this.#c) return { status: `failed`, reason: `session-unavailable` };
       let t = this.getViewerConnectionInfo();
@@ -152107,36 +152065,6 @@ var Z8 = Object.freeze({
         );
       }
     }
-    #g(e) {
-      if (this.#k(e))
-        try {
-          this.#y(e)
-            .call(Z8.markViewerDirty, { subscriptionId: e.subscriptionId })
-            .catch((e) => {
-              this.#I(`mark_dirty_failed`, e);
-            });
-        } catch (e) {
-          this.#I(`mark_dirty_failed`, e);
-        }
-    }
-    async #_(e, t) {
-      this.#A(e);
-      try {
-        let n = $8(
-          await this.#y(e).call(Z8.readDocumentAsset, {
-            artifactRef: e.artifactRef,
-            sha256: t.sha256,
-            threadId: e.threadId,
-          }),
-        );
-        if (e5(n, `sha256`) !== t.sha256)
-          throw Error(`Artifact Session host returned the wrong asset.`);
-        return r5(e5(n, `dataBase64`));
-      } catch (e) {
-        if (o5(e, `ASSET_NOT_FOUND`)) return null;
-        throw (this.#I(`read_asset_failed`, e), Error(`Artifact Session asset could not be read.`));
-      }
-    }
     [Symbol.dispose]() {
       this.dispose();
     }
@@ -152157,57 +152085,6 @@ var Z8 = Object.freeze({
       )
         throw Error(`Artifact Session viewer is unavailable.`);
     }
-    #y(e) {
-      this.#A(e);
-      let t = this.#o,
-        n = e.hostFlushContexts;
-      if (n != null && n.size > 0) {
-        if (
-          t != null &&
-          [...n].some(({ client: e, connectionEpoch: n }) => e === t && n === t.connectionEpoch)
-        )
-          return t;
-        throw Error(`Artifact Session viewer connection changed while flushing.`);
-      }
-      if (
-        t == null ||
-        e.hostClient !== t ||
-        e.hostConnectionEpoch !== t.connectionEpoch ||
-        !e.hostOpened
-      )
-        throw Error(`Artifact Session viewer is unavailable.`);
-      return (this.#A(e), t);
-    }
-    async #b(e, t, n = t.connectionEpoch) {
-      let r = !1;
-      try {
-        let i = $8(
-          await t.call(Z8.openSubscription, {
-            artifactRef: e.artifactRef,
-            subscriptionId: e.subscriptionId,
-            threadId: e.threadId,
-          }),
-        );
-        if (((r = !0), e5(i, `subscriptionId`) !== e.subscriptionId))
-          throw Error(`Artifact Session host returned the wrong subscription.`);
-        let a = Wet(e.artifactRef, i.document);
-        if (!this.#k(e) || this.#o !== t || t.connectionEpoch !== n)
-          throw Error(`Artifact Session subscription closed while opening.`);
-        return ((e.hostClient = t), (e.hostConnectionEpoch = n), (e.hostOpened = !0), a);
-      } catch (i) {
-        throw (
-          e.hostClient === t &&
-            e.hostConnectionEpoch === n &&
-            ((e.hostClient = void 0), (e.hostConnectionEpoch = void 0), (e.hostOpened = !1)),
-          r &&
-            !this.#c &&
-            this.#o === t &&
-            t.connectionEpoch === n &&
-            (await this.#O(t, e.subscriptionId)),
-          i
-        );
-      }
-    }
     async #x(e) {
       if (this.#d || this.#c) throw Error(`Artifact Session viewer is unavailable.`);
       if (this.#l != null && !a5(this.#l, e))
@@ -152219,7 +152096,7 @@ var Z8 = Object.freeze({
         if (this.#d || this.#c || this.#s !== t || !a5(this.#l, e))
           throw (n.close().catch(() => void 0), Error(`Artifact Session viewer is unavailable.`));
         return (
-          n.onEvent((e) => this.#S(e)),
+          n.onEvent((e) => this.#a.handleEvent(e)),
           n.onHostCall((e, t, r) => this.#T(n, e, t, r)),
           n.onDisconnect((e) => this.#C(n, e)),
           (this.#o = n),
@@ -152233,20 +152110,8 @@ var Z8 = Object.freeze({
         throw (this.#s === t && ((this.#s = void 0), (this.#l = void 0)), e);
       }
     }
-    #S(e) {
-      try {
-        let t = this.#a.get(e.subscriptionId);
-        if (t == null || t.closed) return;
-        this.#w(t, Get(e.event));
-      } catch (e) {
-        this.#I(`event_delivery_failed`, e);
-      }
-    }
     #C(e, t) {
       this.#d || this.#o !== e || e.connectionEpoch !== t || (this.#M(), this.#i?.());
-    }
-    #w(e, t) {
-      i5(e.onUpdate(t));
     }
     async #T(e, t, n, r) {
       if (t === `externalDocument.capture` || t === `externalDocument.apply`) {
@@ -152254,61 +152119,15 @@ var Z8 = Object.freeze({
           throw Error(`Artifact Session host connection is unavailable.`);
         return this.#n.handleCall(t, n, r);
       }
-      if (t !== zet.flushViewer) throw Error(`Unsupported Artifact Session viewer callback.`);
-      let i = e5(n, `subscriptionId`),
-        a = this.#a.get(i);
-      if (a == null || a.closed)
-        throw Error(`Artifact Session viewer subscription is unavailable.`);
-      if ((r.throwIfAborted(), e !== this.#o))
-        throw Error(`Artifact Session viewer connection is unavailable.`);
-      return (await this.#E(a, e, e.connectionEpoch, r), { flushed: !0 });
-    }
-    async #E(e, t, n, r) {
-      r?.throwIfAborted();
-      let i = { client: t, connectionEpoch: n },
-        a = e.hostFlushContexts ?? new Set();
-      ((e.hostFlushContexts = a), a.add(i));
-      let o;
-      try {
-        ((o = e.onFlush()), await o, r?.throwIfAborted());
-      } finally {
-        (a.delete(i),
-          a.size === 0 && e.hostFlushContexts === a && (e.hostFlushContexts = void 0),
-          i5(o));
-      }
-    }
-    #D(e) {
-      if (e.closed) return;
-      let t = e.hostOpened ? e.hostClient : void 0;
-      ((e.closed = !0),
-        (e.hostClient = void 0),
-        (e.hostConnectionEpoch = void 0),
-        (e.hostFlushContexts = void 0),
-        (e.hostOpened = !1),
-        this.#a.get(e.subscriptionId) === e && this.#a.delete(e.subscriptionId),
-        this.#L(e.onUpdate),
-        this.#L(e.onFlush),
-        !(t == null || this.#d) && this.#O(t, e.subscriptionId));
-    }
-    async #O(e, t) {
-      await e
-        .call(Z8.closeSubscription, { subscriptionId: t })
-        .then(() => void 0)
-        .catch((e) => {
-          this.#I(`close_subscription_failed`, e);
-        });
-    }
-    #k(e) {
-      return !this.#d && !e.closed && this.#a.get(e.subscriptionId) === e;
-    }
-    #A(e) {
-      if (!this.#k(e)) throw Error(`Artifact Session subscription is closed.`);
+      return this.#a.handleHostCall(e, t, n, r);
     }
     async #j() {
       ((this.#d = !0), this.#f?.(), (this.#f = void 0));
       let e = this.#N(),
         t = this.#P();
-      (await Promise.allSettled(e.map(({ client: e, subscriptionId: t }) => this.#O(e, t))),
+      (await Promise.allSettled(
+        e.map(({ client: e, subscriptionId: t }) => this.#a.closeHostSubscription(e, t)),
+      ),
         t != null && (await this.#F(t)));
     }
     #M() {
@@ -152318,22 +152137,7 @@ var Z8 = Object.freeze({
     }
     #N() {
       this.#n.dispose();
-      let e = [...this.#a.values()];
-      this.#a.clear();
-      let t = e.flatMap((e) =>
-        e.hostOpened && e.hostClient != null
-          ? [{ client: e.hostClient, subscriptionId: e.subscriptionId }]
-          : [],
-      );
-      for (let t of e)
-        ((t.closed = !0),
-          (t.hostOpened = !1),
-          (t.hostClient = void 0),
-          (t.hostConnectionEpoch = void 0),
-          (t.hostFlushContexts = void 0),
-          this.#L(t.onUpdate),
-          this.#L(t.onFlush));
-      return t;
+      return this.#a.drain();
     }
     #P() {
       let e = this.#o;
@@ -152347,13 +152151,6 @@ var Z8 = Object.freeze({
     }
     #I(e, t) {
       this.logger().warning(e, { safe: {}, sensitive: { error: t } });
-    }
-    #L(e) {
-      try {
-        e?.[Symbol.dispose]?.();
-      } catch (e) {
-        this.#I(`callback_dispose_failed`, e);
-      }
     }
   },
   Het = class extends n.Uf {
