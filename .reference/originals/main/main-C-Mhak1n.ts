@@ -59,6 +59,7 @@ const { SOURCEKIT_INITIALIZATION_OPTIONS } = require("./main-app/language-server
 const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
 const { LanguageServerManager } = require("./main-app/language-server/language-server-manager.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
+const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -166890,195 +166891,7 @@ var r9 = 1280,
   i9 = 700,
   Oat = 5e3,
   a9 = 560,
-  kat = class {
-    windowManager;
-    claimedPrewarms = new Set();
-    disposed = !1;
-    pendingWindows = new Map();
-    prewarmedRendererReadyIds = new Set();
-    prewarms = new Map();
-    constructor(e) {
-      this.windowManager = e;
-    }
-    addToComposer(e) {
-      let t = this.windowManager.getPrimaryWindow();
-      if (t == null) throw Error(`No primary app window is available`);
-      return (
-        this.windowManager.sendMessageToWindow(t, { type: `add-quick-chat-to-codex`, ...e }),
-        Promise.resolve()
-      );
-    }
-    prewarm(e) {
-      this.disposed ||
-        this.getPrewarm(e)
-          ?.prewarmedWindow.prewarm()
-          .catch((e) => {
-            r.n().warning(`Failed to prewarm Quick Chat window`, {
-              safe: {},
-              sensitive: { error: e },
-            });
-          });
-    }
-    clearPrewarm(e) {
-      let t = this.prewarms.get(e.id);
-      t?.origin === e && this.disposePrewarm(t);
-    }
-    async open(e, t, r, i) {
-      let a = this.getPrewarm(e);
-      if (a == null) return;
-      (this.prewarms.delete(e.id), this.claimedPrewarms.add(a));
-      let o = !1;
-      try {
-        let s = await a.prewarmedWindow.take();
-        if (s == null) return;
-        ((a.claimedWindow = s),
-          this.prewarmedRendererReadyIds.delete(s.webContents.id),
-          this.positionWindow(s, e, i));
-        let c = this.waitForRoute(s, t, Oat);
-        if (
-          (this.windowManager.sendMessageToWindow(s, {
-            type: `navigate-to-route`,
-            path: n.lo(t, r),
-            persistForReload: !0,
-          }),
-          !(await c) || s.isDestroyed())
-        )
-          return;
-        (s.isMinimized() && s.restore(), s.show(), s.focus(), (o = !0));
-      } finally {
-        o ? this.completePrewarmClaim(a) : this.disposePrewarm(a);
-      }
-    }
-    handleRendererReady(e, t) {
-      if (!this.disposed) {
-        if (this.pendingWindows.get(e.id)?.conversationId === t) {
-          this.finishPendingWindow(e.id, !0);
-          return;
-        }
-        t == null
-          ? this.prewarmedRendererReadyIds.add(e.id)
-          : this.prewarmedRendererReadyIds.delete(e.id);
-      }
-    }
-    dispose() {
-      if (!this.disposed) {
-        this.disposed = !0;
-        for (let e of this.prewarms.values()) this.disposePrewarm(e);
-        for (let e of this.claimedPrewarms) this.disposePrewarm(e);
-        for (let [e, t] of this.pendingWindows)
-          (this.finishPendingWindow(e, !1), t.window.isDestroyed() || t.window.close());
-        this.prewarmedRendererReadyIds.clear();
-      }
-    }
-    getPrewarm(e) {
-      if (this.disposed) return null;
-      let t = this.prewarms.get(e.id);
-      if (t?.origin === e) return t;
-      if ((t != null && this.disposePrewarm(t), e.isDestroyed())) return null;
-      let r,
-        i = () => {
-          this.disposePrewarm(r);
-        };
-      return (
-        (r = {
-          claimedWindow: null,
-          handleOriginDestroyed: i,
-          loadingWindow: null,
-          origin: e,
-          prewarmedWindow: new GN(async () => {
-            let e = await this.windowManager.createWindow({
-              title: `ChatGPT`,
-              width: a9,
-              height: i9,
-              appearance: `quickChat`,
-              show: !1,
-              initialRoute: n.ao,
-              lockTitle: !0,
-            });
-            if (r.released)
-              return (
-                this.prewarmedRendererReadyIds.delete(e.webContents.id),
-                e.isDestroyed() || e.close(),
-                null
-              );
-            r.loadingWindow = e;
-            let t = await this.waitForRoute(e, null, Dat);
-            return ((r.loadingWindow = null), t ? e : null);
-          }),
-          released: !1,
-        }),
-        this.prewarms.set(e.id, r),
-        e.once(`destroyed`, i),
-        r
-      );
-    }
-    disposePrewarm(e) {
-      this.prewarms.get(e.origin.id) === e && this.prewarms.delete(e.origin.id);
-      let t = e.claimedWindow ?? e.loadingWindow ?? e.prewarmedWindow.peek();
-      (this.completePrewarmClaim(e),
-        t != null &&
-          (this.finishPendingWindow(t.webContents.id, !1), t.isDestroyed() || t.close()));
-    }
-    completePrewarmClaim(e) {
-      (this.claimedPrewarms.delete(e),
-        (e.released = !0),
-        e.origin.removeListener(`destroyed`, e.handleOriginDestroyed),
-        e.prewarmedWindow.dispose(),
-        (e.claimedWindow = null),
-        (e.loadingWindow = null));
-    }
-    waitForRoute(e, t, n) {
-      let r = e.webContents.id;
-      return t == null && this.prewarmedRendererReadyIds.delete(r)
-        ? Promise.resolve(!0)
-        : new Promise((i) => {
-            let a = () => {
-                this.finishPendingWindow(r, !1);
-              },
-              o = setTimeout(() => {
-                let e = this.finishPendingWindow(r, !1);
-                e != null && !e.window.isDestroyed() && e.window.close();
-              }, n);
-            (o.unref(),
-              e.once(`closed`, a),
-              this.pendingWindows.set(r, {
-                conversationId: t,
-                handleClosed: a,
-                readyTimeout: o,
-                resolve: i,
-                window: e,
-              }));
-          });
-    }
-    finishPendingWindow(e, t) {
-      this.prewarmedRendererReadyIds.delete(e);
-      let n = this.pendingWindows.get(e);
-      return n == null
-        ? null
-        : (this.pendingWindows.delete(e),
-          clearTimeout(n.readyTimeout),
-          n.window.isDestroyed() || n.window.removeListener(`closed`, n.handleClosed),
-          n.resolve(t),
-          n);
-    }
-    positionWindow(e, t, n) {
-      let r = l.BrowserWindow.fromWebContents(t);
-      if (r == null || r.isDestroyed()) return;
-      let i = r.getContentBounds(),
-        a = { height: n.height, width: n.width, x: i.x + n.x, y: i.y + n.y },
-        o = l.screen.getDisplayMatching(a).workArea,
-        s = Math.max(400, Math.min(a9, o.width)),
-        c = Math.max(400, Math.min(i9, o.height));
-      (s !== a9 || c !== i9) && e.setSize(s, c, !1);
-      let u = Math.round(a.x + a.width - s),
-        d = Math.round(a.y + a.height - c);
-      e.setPosition(
-        Math.max(o.x, Math.min(u, o.x + o.width - s)),
-        Math.max(o.y, Math.min(d, o.y + o.height - c)),
-        !1,
-      );
-    }
-  },
+  kat = QuickChatWindowManager,
   Aat = 250;
 function jat({ requestRealtimeToggle: e, subscribeRealtimeVoiceSessionReservation: t }) {
   let n = cH(`realtimeVoice`).hotkey,
@@ -173253,7 +173066,21 @@ function dst({
       },
       S,
     ),
-    ne = new kat(B),
+    ne = new kat({
+      clearTimeout: (e) => clearTimeout(e),
+      createLazyWindow: (e) => new GN(e),
+      createRoute: (e, t) => n.lo(e, t),
+      getMatchingWorkArea: (e) => l.screen.getDisplayMatching(e).workArea,
+      getOwnerWindow: (e) => l.BrowserWindow.fromWebContents(e),
+      initialRoute: n.ao,
+      logger: () => r.n(),
+      prewarmReadyTimeoutMs: Dat,
+      quickChatHeight: i9,
+      quickChatWidth: a9,
+      routeReadyTimeoutMs: Oat,
+      setTimeout: (e, t) => setTimeout(e, t),
+      windowManager: B,
+    }),
     H = new dat({
       canForceGlobalDictationLock: y,
       forceGlobalDictationLock: y && u.get(n.iu.GLOBAL_DICTATION_FORCE_LOCK_DEBUG_ENABLED) === !0,

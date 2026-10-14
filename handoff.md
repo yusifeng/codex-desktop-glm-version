@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `kat` Quick Chat window manager 的完整窗口预热/打开生命周期迁移至
+`src/main/main-app/startup/quick-chat-window-manager.ts`，真实接回 startup 唯一 consumer，并删除原约
+190 行内嵌实现；保留 per-origin prewarm、lazy window claim/release、renderer route-ready handshake、
+超时/closed/origin-destroyed 清理、display work-area 定位裁剪和 manager dispose。
+focused test 为 `scripts/test-main-quick-chat-window-manager.mjs`（40 项）。
+
 本轮将 Wy 的完整 pointer interaction effect 迁移至 `annotation-pointer-interaction-controller.ts` 并真实接回；保留跨 frame listener、hover、pointer selection、region drag、click/contextmenu/wheel、Escape/修饰键与 cleanup 顺序，删除原 394 行内联主体。focused integration test 为 `scripts/test-preload-annotation-pointer-interaction-controller.mjs`（13 项）。
 
 本轮将原 `SQe` sampler manager 的完整 startup/window health 生命周期迁移至

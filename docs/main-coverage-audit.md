@@ -573,6 +573,19 @@ attention 日志、Sentry breadcrumb，以及 WebContents destroyed 与 manager 
 内旧 `SQe` 实现已删除。`scripts/test-main-sampler-manager.mjs` 使用 esbuild 临时 bundle，覆盖 38 项
 heartbeat/trigger/response/enrichment/performance-sampling/dispose focused assertions。
 
+### 增量抽取：Quick Chat window manager 生命周期
+
+R10/window 原 `kat`（166,893-167,087）的完整 Quick Chat window manager 已迁移至
+`src/main/main-app/startup/quick-chat-window-manager.ts`。模块拥有 per-origin prewarm registry、claimed
+prewarm set、pending route-ready window registry 与提前 ready id set，保留 lazy window create/take、
+origin identity 替换、renderer conversation identity handshake、ready timeout/closed 清理、打开失败回收，
+以及 manager dispose 对 prewarm/claimed/pending window 的完整释放。
+
+原 startup 唯一 consumer 注入既有 `GN` lazy holder、`WindowManager.createWindow`、route builder、
+`BrowserWindow.fromWebContents`、display work-area、logger 与真实 timer；main chunk 内旧 `kat` 实现已删除。
+窗口仍按 owner content bounds 将 popover 右下角投影到匹配 display，并保持最小 400 px 与 work-area clamp。
+`scripts/test-main-quick-chat-window-manager.mjs` 使用 esbuild 临时 bundle，覆盖 40 项 focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的
