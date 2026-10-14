@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 `GitManager.createRepoWatch()` 的完整 watch factory 生命周期迁移至
+`src/main/worker/git-repo-watch-factory.ts`，真实接回 worker consumer，并删除原 78 行内嵌实现；factory
+保留 repository 单 owner、watch identity/raw-event/recovery 状态、cache/live-query callbacks、local-only
+ignore source、backend host binding、watcher options、初始 watch record 与 origin-query cleanup。focused test
+为 `scripts/test-worker-git-repo-watch-factory.mjs`（31 项）。
+
 本轮新增 `annotation-hover-refresh-controller.ts`，真实接回 Wy 的 comment hover/viewport refresh lifecycle；保留 resize flushSync、capture-phase scroll、debounce 与 cleanup 顺序，删除原独立 effect 内联实现。focused test 为 `scripts/test-preload-annotation-hover-refresh-controller.mjs`（6 项）。
 
 本轮将 R9 `W0e` language-server manager 的完整 session 生命周期迁移至

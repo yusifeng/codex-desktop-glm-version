@@ -219,6 +219,7 @@ const { startGitWatchSession } = require("./worker/git-watch-session-start-contr
 const { refreshGitWorkingTreeWatchPolicy } = require("./worker/git-working-tree-watch-policy-refresh-controller");
 const { startGitRepoWatcher } = require("./worker/git-repo-watcher-start-controller");
 const { startGitRepoWatchSession } = require("./worker/git-repo-watch-session-runtime");
+const { createGitRepoWatch } = require("./worker/git-repo-watch-factory");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -69985,78 +69986,36 @@ var I6 = kW(`git`),
       });
     }
     createRepoWatch(e, t, n) {
-      let r = this.getWatchKey(e.root, t),
-        i = new Map(),
-        a = !1,
-        o = (n) => handleGitRepoWatchEvent({ event: n, root: e.root, host: t,
-          isActive: () => h.refCount > 0 && h.closingPromise == null && this.watchesByKey.get(r) === h,
-          getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
-          filterWorkingTreePaths: (repository, paths) => Tme(repository, paths), getTrace: () => AH(), trace: OH,
-          invalidateAll: (repository) => p2(repository), invalidateChange: (repository, changeType, paths) => repository.invalidateGitReadCachesForRepoChange(changeType, paths),
-          handleRepoChanged: (event, onFanout) => this.liveQueryRegistry.handleRepoChanged(event, onFanout),
-          getRawEventCount: (changeType) => i.get(changeType) ?? 1, clearRawEventCount: (changeType) => i.delete(changeType),
-          recordPerformance: (input) => this.watcherPerformance.record(input),
-          getIndexSizeBucket: (_root, host, result) => getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), e.root, host, host.isLocal ? result?.default : result?.default?.posix),
-          requiresRecovery: () => a, emit: (value) => this.emit(value) }),
-        s = this.gitManager.getWorktreeRepositoryForRoot(e.root, t),
-        c = () => {
-          s.queryClient.removeQueries({
-            queryKey: Q(e.root, t, `effective-origin-url`),
-            exact: !0,
-          });
-        },
-        l = (n) => {
-          h.refCount <= 0 ||
-            h.closingPromise != null ||
-            this.watchesByKey.get(r) !== h ||
-            ((a = n),
-            s.invalidateWatchScopedGitReadCaches(),
-            c(),
-            this.liveQueryRegistry.setRequiresRecovery(t.id, e.root, n));
-        },
-        u = ({ changeType: e, rawEventCount: t }) => {
-          i.set(e, t);
-        },
-        d = this.dependencies.startWorkingTreeWatch,
-        f = this.dependencies.startMetadataWatch,
-        p = {
-          commonDir: e.commonDir,
-          root: e.root,
-          host: t,
-          watchIgnoreSources: t.isLocal ? this.dependencies.watchIgnoreSources : void 0,
-          isLocalBranchDependency: (n) =>
-            this.liveQueryRegistry.hasLocalBranchDependency({
-              branch: n,
-              commonDir: e.commonDir,
-              hostId: t.id,
-              root: e.root,
-            }),
-          worktreeRepo: s,
-          onRequiresRecoveryChanged: l,
-          onCoalescedChange: u,
-          emit: o,
-          startMetadataWatch: f == null ? void 0 : (e) => f(t, e),
-          startWorkingTreeWatch: d == null ? void 0 : (e, n) => d(t, e, n),
-        },
-        m = this.dependencies.createGitRepoWatcher?.(p) ?? new tbe(p),
-        h = {
-          commonDir: e.commonDir,
-          closingPromise: null,
-          hostId: t.id,
-          isReady: !1,
-          repoIndexSizeBucket: `unknown`,
-          refCount: 0,
-          root: e.root,
-          startPromise: Promise.resolve(),
-          startTrace: void 0,
-          watcher: m,
-        };
-      return (
-        c(),
-        this.watchesByKey.set(r, h),
-        (h.startPromise = this.scheduleWatchSetup(h, t, n)),
-        h
-      );
+      const created = createGitRepoWatch({
+        metadata: e,
+        host: t,
+        closingPromise: n,
+        getWatchKey: (root, host) => this.getWatchKey(root, host),
+        isCurrentWatch: (key, watch) => this.watchesByKey.get(key) === watch,
+        getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
+        removeOriginQueries: (repository) => repository.queryClient.removeQueries({ queryKey: Q(e.root, t, `effective-origin-url`), exact: !0 }),
+        invalidateWatchScopedCaches: (repository) => repository.invalidateWatchScopedGitReadCaches(),
+        setLiveQueryRecovery: (hostId, root, required) => this.liveQueryRegistry.setRequiresRecovery(hostId, root, required),
+        handleRepoWatchEvent: (event, dependencies) => handleGitRepoWatchEvent({ event, ...dependencies }),
+        filterWorkingTreePaths: (repository, paths) => Tme(repository, paths),
+        getTrace: () => AH(),
+        trace: OH,
+        invalidateAll: (repository) => p2(repository),
+        invalidateChange: (repository, changeType, paths) => repository.invalidateGitReadCachesForRepoChange(changeType, paths),
+        handleRepoChanged: (event, onFanout) => this.liveQueryRegistry.handleRepoChanged(event, onFanout),
+        recordPerformance: (input) => this.watcherPerformance.record(input),
+        getIndexSizeBucket: (_root, host, result) => getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), e.root, host, host.isLocal ? result?.default : result?.default?.posix),
+        emit: (value) => this.emit(value),
+        createWatcher: (options) => this.dependencies.createGitRepoWatcher?.(options) ?? new tbe(options),
+        watchIgnoreSources: t.isLocal ? this.dependencies.watchIgnoreSources : undefined,
+        hasLocalBranchDependency: (input) => this.liveQueryRegistry.hasLocalBranchDependency(input),
+        startMetadataWatch: this.dependencies.startMetadataWatch,
+        startWorkingTreeWatch: this.dependencies.startWorkingTreeWatch,
+      });
+      const watch = created.watch;
+      this.watchesByKey.set(created.key, watch);
+      watch.startPromise = this.scheduleWatchSetup(watch, t, n);
+      return watch;
     }
     async ensureWatchingForGitInit(e, t, n = `detect-git-path`) {
       let r = this.getGitInitWatchKey(e, t);

@@ -1701,3 +1701,14 @@ option 的 generation/dispose event guard、session dispose race、attach/closed
 与 ignore/event/close owners，原 93 行内嵌实现已删除。`scripts/test-worker-git-repo-watch-session-runtime.mjs`
 覆盖 success/ignore-directory capture、stale generation、metadata backend、dispose race、backend failure 和
 missing metadata，共 18 项 focused assertions。
+
+### Git manager repo-watch factory
+
+`GitManager.createRepoWatch()` 的完整 watch factory 生命周期已迁移至
+`src/main/worker/git-repo-watch-factory.ts` 并真实接回 worker。factory 单次解析并闭包持有 repository，
+组装 active-watch identity guard、raw event count、requires-recovery 状态、repository cache/live-query
+副作用、local-only ignore source、branch dependency、metadata/working-tree backend host binding、watcher
+options 与初始 watch record；worker 仅注入 manager maps、repository/event/performance owners，并在 factory
+返回后登记 watch 和启动既有 setup lifecycle。原 78 行内嵌实现已删除。
+`scripts/test-worker-git-repo-watch-factory.mjs` 覆盖 record/options、repository identity、local/remote、
+backend/branch 参数、stale/closing watch guard、raw-event/recovery state，共 31 项 focused assertions。
