@@ -69,6 +69,7 @@ const { NativeArtifactFileService } = require("./main-app/remote-artifact/native
 const { BrowserPageHostLifecycle } = require("./main-app/browser-sidebar/browser-page-host-lifecycle.js");
 const { BrowserTabWorkingSetManager } = require("./main-app/browser-sidebar/browser-tab-working-set-manager.js");
 const { ArtifactSubscriptionManager } = require("./main-app/remote-artifact/artifact-subscription-manager.js");
+const { ArtifactSessionHostService } = require("./main-app/remote-artifact/artifact-session-host-service.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -151853,306 +151854,7 @@ function Iet(e, t) {
     path: n.data.value.path,
   };
 }
-var Z8 = Object.freeze({
-    ping: `host.ping`,
-    publishNativeSnapshot: `outputs.publishNativeSnapshot`,
-    resolveArtifactRef: `documents.resolveArtifactRef`,
-  }),
-  Bet = `native-snapshot-v1`,
-  Vet = class extends n.Uf {
-    getViewerConnectionInfo;
-    logger = r.i(`artifact-session-host-service`);
-    #e;
-    #n;
-    #r;
-    #i;
-    #a;
-    #o;
-    #s;
-    #c = !1;
-    #l;
-    #u;
-    #d = !1;
-    #f;
-    constructor(e, t) {
-        (super(),
-        (this.getViewerConnectionInfo = e),
-        (this.#e = t.createClient ?? Uet),
-        (this.#n = new jet({
-          connect: async (e) => {
-            let t = this.getViewerConnectionInfo();
-            if (t == null) return null;
-            let n = await this.#x(t);
-            await n.connect();
-            let r = $8(await n.call(Z8.ping)).capabilities;
-            if (
-              !Array.isArray(r) ||
-              !r.includes(`external-documents-v1`) ||
-              (e === `whiteboard` && !r.includes(`external-whiteboards-v1`))
-            )
-              return null;
-            let i = n.connectionEpoch;
-            return async (e, t) => {
-              if (this.#d || this.#c || this.#o !== n || n.connectionEpoch !== i)
-                return Promise.reject(Error(`Artifact Session host connection changed.`));
-              try {
-                return await n.call(e, t);
-              } catch (e) {
-                throw (
-                  this.#I(`external_document_host_request_failed`, e),
-                  Error(`Artifact Session document host request failed.`)
-                );
-              }
-            };
-          },
-          createBinding: (e, t) => new Met(e, t),
-          createId: () => (0, _.randomUUID)(),
-          parseApplyRequest: (e) => Aet.parse(e),
-          parseBindingRequest: (e) => X8.parse(e),
-        })),
-        (this.#a = new ArtifactSubscriptionManager({
-          connect: async () => {
-            if (this.#d || this.#c) throw Error(`Artifact Session viewer is unavailable.`);
-            let e = this.getViewerConnectionInfo();
-            if (e == null) throw Error(`Artifact Session viewer is unavailable.`);
-            let t = await this.#x(e);
-            if ((await t.connect(), this.#d || this.#c || this.#o !== t))
-              throw Error(`Artifact Session viewer is unavailable.`);
-            return t;
-          },
-          createId: t.createSubscriptionId ?? (() => (0, _.randomUUID)()),
-          createSubscription: (e) => new Het(e),
-          disposeValue: i5,
-          getActiveClient: () => this.#o,
-          isClientActive: (e) => !this.#c && this.#o === e,
-          isErrorCode: o5,
-          logFailure: (e, t) => this.#I(e, t),
-          parseAppendResult: (e) => {
-            let t = $8(e);
-            return { applied: Ket(t, `applied`), stateVersion: n5(t, `stateVersion`) };
-          },
-          parseAssetResult: (e, t) => {
-            let n = $8(e);
-            if (e5(n, `sha256`) !== t)
-              throw Error(`Artifact Session host returned the wrong asset.`);
-            return r5(e5(n, `dataBase64`));
-          },
-          parseEvent: Get,
-          parseFlushSubscriptionId: (e) => e5($8(e), `subscriptionId`),
-          parseOpenResult: (e, t, n) => {
-            let r = $8(e);
-            if (e5(r, `subscriptionId`) !== n)
-              throw Error(`Artifact Session host returned the wrong subscription.`);
-            return Wet(t, r.document);
-          },
-          serializeBytes: qet,
-        })),
-        (this.#r = new NativeArtifactFileService({
-          downloadCopy: t.downloadCopy,
-          getTargets: t.getOpenInTargets,
-          hostId: J,
-          maxBytes: Ae,
-          open: t.openPath,
-          publishNativeSnapshot: (e) => this.#m(e),
-          resolveArtifactKind: (e) => this.#h(e),
-        })),
-        (this.#i = t.requestConnectionReconciliation),
-        (this.#f = t.subscribeToConnectionInfo?.((e) => this.#v(e))));
-    }
-    async bindExternalDocument(e, t, n) {
-      try {
-        return await this.#n.bind(e, t, n);
-      } catch (e) {
-        throw (
-          this.#I(`external_document_binding_failed`, e),
-          Error(
-            `Artifact Session document binding could not be opened. Check that the installed runtime supports externally owned documents.`,
-          )
-        );
-      }
-    }
-    async getNativeOpenTargets(e) {
-      return (await this.supportsNativeOpen())
-        ? this.#r.getTargets(e)
-        : { status: `failed`, reason: `session-unavailable` };
-    }
-    async open(e, t, n) {
-      return this.#a.open(e, t, n);
-    }
-    async performNativeFileAction(e) {
-      return (await this.supportsNativeOpen())
-        ? this.#r.performFileAction(e)
-        : { status: `failed`, reason: `session-unavailable` };
-    }
-    async readNativeSnapshot(e) {
-      return (await this.supportsNativeOpen())
-        ? this.#r.readSnapshot(e)
-        : { status: `failed`, reason: `session-unavailable` };
-    }
-    async supportsNativeOpen() {
-      if (this.#d || this.#c) return !1;
-      let e = this.getViewerConnectionInfo();
-      if (e == null) return !1;
-      try {
-        let t = await this.#x(e);
-        if ((await t.connect(), this.#d || this.#c || this.#o !== t)) return !1;
-        let n = await t.call(Z8.ping);
-        if (this.#d || this.#c || this.#o !== t) return !1;
-        let r = $8(n).capabilities;
-        return Array.isArray(r) && r.includes(Bet);
-      } catch {
-        return !1;
-      }
-    }
-    dispose = () => ((this.#u ??= this.#j()), this.#u);
-    async #m(e) {
-      if (this.#d || this.#c) return { status: `failed`, reason: `session-unavailable` };
-      let t = this.getViewerConnectionInfo();
-      if (t == null) return { status: `failed`, reason: `session-unavailable` };
-      let n;
-      try {
-        let r = await this.#x(t);
-        if ((await r.connect(), this.#d || this.#c || this.#o !== r))
-          return { status: `failed`, reason: `session-unavailable` };
-        n = await r.call(Z8.publishNativeSnapshot, {
-          artifactRef: e.artifactRef,
-          threadId: e.threadId,
-        });
-      } catch (e) {
-        return o5(e, `VIEWER_FLUSH_FAILED`) || o5(e, `VIEWER_FLUSH_TIMEOUT`)
-          ? { status: `failed`, reason: `sync-failed` }
-          : o5(e, `INTERNAL`)
-            ? { status: `failed`, reason: `materialization-failed` }
-            : (!o5(e, `METHOD_NOT_ALLOWED`) &&
-                !o5(e, `UNAVAILABLE`) &&
-                this.#I(`native_snapshot_failed`, e),
-              { status: `failed`, reason: `session-unavailable` });
-      }
-      try {
-        return { status: `ready`, ...Iet(n, e.artifactRef) };
-      } catch (e) {
-        return (
-          this.#I(`native_snapshot_invalid`, e),
-          { status: `failed`, reason: `materialization-failed` }
-        );
-      }
-    }
-    async #h(e) {
-      if (this.#d || this.#c) return { status: `failed`, reason: `session-unavailable` };
-      let t = this.getViewerConnectionInfo();
-      if (t == null) return { status: `failed`, reason: `session-unavailable` };
-      let n;
-      try {
-        let r = await this.#x(t);
-        if ((await r.connect(), this.#d || this.#c || this.#o !== r))
-          return { status: `failed`, reason: `session-unavailable` };
-        n = await r.call(Z8.resolveArtifactRef, {
-          artifactRef: e.artifactRef,
-          threadId: e.threadId,
-        });
-      } catch {
-        return { status: `failed`, reason: `session-unavailable` };
-      }
-      try {
-        let e = e5($8(n), `kind`);
-        if (e !== `presentation` && e !== `spreadsheet`)
-          throw Error(`Artifact Session host returned an invalid kind.`);
-        return { status: `ready`, kind: e };
-      } catch (e) {
-        return (
-          this.#I(`artifact_kind_invalid`, e),
-          { status: `failed`, reason: `target-discovery-failed` }
-        );
-      }
-    }
-    [Symbol.dispose]() {
-      this.dispose();
-    }
-    async #v(e) {
-      if (this.#d) return;
-      if (e == null) {
-        this.#M();
-        return;
-      }
-      if (this.#c) throw Error(`Artifact Session viewer is unavailable.`);
-      let t = await this.#x(e);
-      if (
-        (await t.connect(),
-        this.#d ||
-          this.#c ||
-          this.#o !== t ||
-          (await t.call(Z8.ping), this.#d || this.#c || this.#o !== t))
-      )
-        throw Error(`Artifact Session viewer is unavailable.`);
-    }
-    async #x(e) {
-      if (this.#d || this.#c) throw Error(`Artifact Session viewer is unavailable.`);
-      if (this.#l != null && !a5(this.#l, e))
-        throw Error(`Artifact Session viewer connection changed.`);
-      if (this.#o != null) return this.#o;
-      if (this.#s != null) return this.#s;
-      this.#l = e;
-      let t = this.#e(e).then(async (n) => {
-        if (this.#d || this.#c || this.#s !== t || !a5(this.#l, e))
-          throw (n.close().catch(() => void 0), Error(`Artifact Session viewer is unavailable.`));
-        return (
-          n.onEvent((e) => this.#a.handleEvent(e)),
-          n.onHostCall((e, t, r) => this.#T(n, e, t, r)),
-          n.onDisconnect((e) => this.#C(n, e)),
-          (this.#o = n),
-          n
-        );
-      });
-      this.#s = t;
-      try {
-        return await t;
-      } catch (e) {
-        throw (this.#s === t && ((this.#s = void 0), (this.#l = void 0)), e);
-      }
-    }
-    #C(e, t) {
-      this.#d || this.#o !== e || e.connectionEpoch !== t || (this.#M(), this.#i?.());
-    }
-    async #T(e, t, n, r) {
-      if (t === `externalDocument.capture` || t === `externalDocument.apply`) {
-        if (e !== this.#o || this.#c || this.#d)
-          throw Error(`Artifact Session host connection is unavailable.`);
-        return this.#n.handleCall(t, n, r);
-      }
-      return this.#a.handleHostCall(e, t, n, r);
-    }
-    async #j() {
-      ((this.#d = !0), this.#f?.(), (this.#f = void 0));
-      let e = this.#N(),
-        t = this.#P();
-      (await Promise.allSettled(
-        e.map(({ client: e, subscriptionId: t }) => this.#a.closeHostSubscription(e, t)),
-      ),
-        t != null && (await this.#F(t)));
-    }
-    #M() {
-      ((this.#c = !0), this.#N());
-      let e = this.#P();
-      e != null && this.#F(e);
-    }
-    #N() {
-      this.#n.dispose();
-      return this.#a.drain();
-    }
-    #P() {
-      let e = this.#o;
-      if (((this.#o = void 0), (this.#s = void 0), (this.#l = void 0), e != null))
-        return (e.onDisconnect(void 0), e.onEvent(void 0), e.onHostCall(void 0), e);
-    }
-    async #F(e) {
-      await e.close().catch((e) => {
-        this.#I(`client_close_failed`, e);
-      });
-    }
-    #I(e, t) {
-      this.logger().warning(e, { safe: {}, sensitive: { error: t } });
-    }
-  },
+var Vet = ArtifactSessionHostService,
   Het = class extends n.Uf {
     operations;
     constructor(e) {
@@ -157772,14 +157474,78 @@ var G5 = r.r(`WindowContext`),
         x =
           b == null
             ? void 0
-            : new Vet(() => this.getArtifactSessionHostViewerConnectionInfo(), {
-                downloadCopy: async (e) => {
-                  if (this.workspaceFiles.downloadCopy == null)
-                    throw Error(`Downloading workspace files is unavailable`);
-                  await this.workspaceFiles.downloadCopy({ hostId: J, path: e });
+            : new Vet({
+                compareConnectionInfo: a5,
+                createClient: Uet,
+                createExternalDocuments: (e) =>
+                  new jet({
+                    connect: e,
+                    createBinding: (e, t) => new Met(e, t),
+                    createId: () => (0, _.randomUUID)(),
+                    parseApplyRequest: (e) => Aet.parse(e),
+                    parseBindingRequest: (e) => X8.parse(e),
+                  }),
+                createNativeFiles: (e) =>
+                  new NativeArtifactFileService({
+                    downloadCopy: async (e) => {
+                      if (this.workspaceFiles.downloadCopy == null)
+                        throw Error(`Downloading workspace files is unavailable`);
+                      await this.workspaceFiles.downloadCopy({ hostId: J, path: e });
+                    },
+                    getTargets: y.getTargets.bind(y),
+                    hostId: J,
+                    maxBytes: Ae,
+                    open: y.open.bind(y),
+                    publishNativeSnapshot: e.publishNativeSnapshot,
+                    resolveArtifactKind: e.resolveArtifactKind,
+                  }),
+                createSubscriptions: (e) =>
+                  new ArtifactSubscriptionManager({
+                    ...e,
+                    createId: () => (0, _.randomUUID)(),
+                    createSubscription: (e) => new Het(e),
+                    disposeValue: i5,
+                    isErrorCode: o5,
+                    logFailure: (e, t) =>
+                      r.i(`artifact-session-host-service`)().warning(e, {
+                        safe: {},
+                        sensitive: { error: t },
+                      }),
+                    parseAppendResult: (e) => {
+                      let t = $8(e);
+                      return { applied: Ket(t, `applied`), stateVersion: n5(t, `stateVersion`) };
+                    },
+                    parseAssetResult: (e, t) => {
+                      let n = $8(e);
+                      if (e5(n, `sha256`) !== t)
+                        throw Error(`Artifact Session host returned the wrong asset.`);
+                      return r5(e5(n, `dataBase64`));
+                    },
+                    parseEvent: Get,
+                    parseFlushSubscriptionId: (e) => e5($8(e), `subscriptionId`),
+                    parseOpenResult: (e, t, n) => {
+                      let r = $8(e);
+                      if (e5(r, `subscriptionId`) !== n)
+                        throw Error(`Artifact Session host returned the wrong subscription.`);
+                      return Wet(t, r.document);
+                    },
+                    serializeBytes: qet,
+                  }),
+                getViewerConnectionInfo: () => this.getArtifactSessionHostViewerConnectionInfo(),
+                isErrorCode: o5,
+                logFailure: (e, t) =>
+                  r.i(`artifact-session-host-service`)().warning(e, {
+                    safe: {},
+                    sensitive: { error: t },
+                  }),
+                parseArtifactKind: (e) => {
+                  let t = e5($8(e), `kind`);
+                  if (t !== `presentation` && t !== `spreadsheet`)
+                    throw Error(`Artifact Session host returned an invalid kind.`);
+                  return t;
                 },
-                getOpenInTargets: y.getTargets.bind(y),
-                openPath: y.open.bind(y),
+                parseCapabilities: (e) => $8(e).capabilities,
+                parseNativeSnapshot: Iet,
                 requestConnectionReconciliation: () => b.requestViewerReconciliation(),
                 subscribeToConnectionInfo: (e) => b.onViewerConnectionInfoChanged(e),
               });

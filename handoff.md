@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 `Vet` 剩余 artifact session host owner 整体迁移至
+`src/main/main-app/remote-artifact/artifact-session-host-service.ts` 并真实接回；connection single-flight、
+reconciliation、external-document routing、native snapshot/kind/capability 和最终 child/client disposal 均由新
+service 持有，原 `Vet` class 已整体删除，仅保留构建别名与依赖适配。focused test 为
+`scripts/test-main-artifact-session-host-service.mjs`（37 项）。至此 `Vet` 语义 owner 已清零；A3 下一最大
+可迁边界为 `ztt` terminal session manager。
+
 本轮将 Wy 剩余的 controller disposal、reconciliation、global input、hover refresh、
 editor/anchor observation、interaction visibility、highlight/screenshot-ready 生命周期迁入
 `annotation-controller-lifecycle.ts` 与 `annotation-runtime-effect-lifecycle.ts`，并将 Ky popover/RAF owner
