@@ -56,6 +56,7 @@ const { buildPyrightSessionOptions } = require("./main-app/language-server/pyrig
 const { buildTypeScriptServerInitializationOptions } = require("./main-app/language-server/typescript-server-options.js");
 const { buildJavaSessionOptions } = require("./main-app/language-server/java-session-options.js");
 const { SOURCEKIT_INITIALIZATION_OPTIONS } = require("./main-app/language-server/sourcekit-options.js");
+const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -118425,166 +118426,6 @@ var wZ = n.wf({ browserTabId: n.Of(), conversationId: n.Of() }),
       .strict(),
     n.wf({ action: n.df([`deny`, `dismiss`]) }).strict(),
   ]),
-  qZe = class {
-    findPage;
-    pending = new Map();
-    listeners = new Set();
-    constructor(e) {
-      this.findPage = e;
-    }
-    show(e) {
-      let t = this.findPage(e.webContents.id);
-      if (e.closed) return;
-      if (t == null || t.windowState.isClosing) {
-        e.respond({ action: `dismiss` });
-        return;
-      }
-      let n = {
-        prompt: e,
-        entry: t,
-        hostGeneration: t.threadState.hostGeneration,
-        rendererInstanceId: t.windowState.rendererInstanceId,
-        navigationVersion: t.page.navigationVersion,
-        snapshot: {
-          id: e.id,
-          browserTabId: t.page.browserTabId,
-          conversationId: t.conversationId,
-          mountGeneration: t.threadState.mountGeneration,
-          requestingOrigin: e.requestingOrigin,
-          embeddingOrigin: e.embeddingOrigin,
-          permissions: e.permissions.map((e) => ({ ...e })),
-          presentation: e.presentation,
-          variant: e.variant,
-          availableActions: [...e.availableActions],
-          geolocation:
-            e.geolocation == null
-              ? void 0
-              : {
-                  availableAccuracies: [...e.geolocation.availableAccuracies],
-                  initialAccuracy: e.geolocation.initialAccuracy,
-                },
-        },
-      };
-      (this.pending.set(e.id, n),
-        e.once(`closed`, () => {
-          (this.pending.delete(n.snapshot.id), this.publish());
-        }),
-        this.publish());
-    }
-    syncPresentation(e) {
-      for (let t of this.pending.values())
-        t.entry.threadState === e &&
-          t.snapshot.mountGeneration !== e.mountGeneration &&
-          (t.snapshot = { ...t.snapshot, mountGeneration: e.mountGeneration });
-      this.publish();
-    }
-    transferPresentation(e, t, n) {
-      for (let r of [...this.pending.values()]) {
-        let i = this.findPage(r.prompt.webContents.id);
-        r.entry.windowState !== e ||
-          r.snapshot.browserTabId !== n.browserTabId ||
-          r.snapshot.conversationId !== n.conversationId ||
-          r.prompt.closed ||
-          i?.windowState !== t ||
-          i.threadState !== r.entry.threadState ||
-          i.page !== r.entry.page ||
-          i.page.navigationVersion !== r.navigationVersion ||
-          (this.pending.delete(r.snapshot.id),
-          (r.entry = i),
-          (r.hostGeneration = i.threadState.hostGeneration),
-          (r.rendererInstanceId = t.rendererInstanceId),
-          (r.snapshot = {
-            ...r.snapshot,
-            id: crypto.randomUUID(),
-            mountGeneration: i.threadState.mountGeneration,
-          }),
-          this.pending.set(r.snapshot.id, r));
-      }
-      this.publish();
-    }
-    subscribe(e, t, n) {
-      let r = wZ.safeParse(t);
-      if (!r.success) return new TZ(() => {});
-      let i = n.dup(),
-        a = !0,
-        o,
-        s = () => {
-          let t = [...this.pending.values()]
-            .filter((t) => this.matches(t, e, r.data))
-            .map(({ snapshot: e }) => e);
-          (o?.length === t.length && t.every((e, t) => e === o?.[t])) ||
-            ((o = t), Promise.resolve(i(t)).catch(c));
-        },
-        c = () => {
-          a &&
-            ((a = !1),
-            this.listeners.delete(s),
-            e.removeListener(`destroyed`, c),
-            i[Symbol.dispose]());
-        };
-      return (
-        this.listeners.add(s),
-        e.once(`destroyed`, c),
-        i.onRpcBroken(c),
-        e.isDestroyed() ? c() : s(),
-        new TZ(c)
-      );
-    }
-    respond(e, t, n) {
-      let r = this.getCurrent(e, t),
-        i = KZe.safeParse(n);
-      if (r == null || !i.success) return !1;
-      let { prompt: a } = r;
-      return !a.availableActions.includes(i.data.action) ||
-        (`geolocationAccuracy` in i.data &&
-          i.data.geolocationAccuracy != null &&
-          !a.geolocation?.availableAccuracies.includes(i.data.geolocationAccuracy))
-        ? !1
-        : a.respond(i.data);
-    }
-    openSystemSettings(e, t) {
-      let n = this.getCurrent(e, t);
-      return n?.prompt.variant === `os-system-settings` && n.prompt.openSystemSettings();
-    }
-    getCurrent(e, t) {
-      let n = GZe.safeParse(t);
-      if (!n.success) return null;
-      let r = this.pending.get(n.data.id);
-      return r == null ||
-        r.prompt.closed ||
-        n.data.mountGeneration !== r.snapshot.mountGeneration ||
-        !this.matches(r, e, n.data)
-        ? null
-        : r;
-    }
-    matches(e, t, n) {
-      let { entry: r, prompt: i, snapshot: a } = e,
-        o = this.findPage(i.webContents.id);
-      return (
-        !i.closed &&
-        !t.isDestroyed() &&
-        !i.webContents.isDestroyed() &&
-        r.windowState.owner === t &&
-        !r.windowState.isClosing &&
-        n.browserTabId === a.browserTabId &&
-        n.conversationId === a.conversationId &&
-        o?.windowState === r.windowState &&
-        o.threadState === r.threadState &&
-        o.page === r.page &&
-        o.page.browserTabId === a.browserTabId &&
-        o.conversationId === a.conversationId &&
-        o.threadState.presented &&
-        o.threadState.pendingTeardown == null &&
-        o.threadState.mountGeneration === a.mountGeneration &&
-        o.threadState.hostGeneration === e.hostGeneration &&
-        o.windowState.rendererInstanceId === e.rendererInstanceId &&
-        o.page.navigationVersion === e.navigationVersion
-      );
-    }
-    publish() {
-      for (let e of this.listeners) e();
-    }
-  },
   TZ = class extends n.Uf {
     disposeSubscription;
     constructor(e) {
@@ -118927,9 +118768,14 @@ var $Ze = class {
     browserPageSnapshots;
     browserPageHostLifecycle;
     browserSessionService;
-    permissionPrompts = new qZe((e) =>
-      this.browserPageHostLifecycle.findPageStateForWebContentsId(e),
-    );
+    permissionPrompts = new BrowserPermissionPromptRegistry({
+      createId: () => crypto.randomUUID(),
+      createSubscription: (e) => new TZ(e),
+      findPage: (e) => this.browserPageHostLifecycle.findPageStateForWebContentsId(e),
+      identityParser: GZe,
+      responseParser: KZe,
+      scopeParser: wZ,
+    });
     siteBootstrapController = new AbortController();
     getSiteBootstrapToken;
     browserPersistence;

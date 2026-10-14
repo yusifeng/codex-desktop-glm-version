@@ -483,6 +483,7 @@ browser-use rule update 的 origin 规范化（缺省 https、仅允许 http/htt
 规则集合输入的 trim/类型过滤/稳定去重也已迁移至同一 policy，新增 1 项去重边界断言。
 allowed/denied rule kind 互换也已迁移至该 policy，规则更新副作用仍由 origin-state 持有，新增 2 项映射断言。
 browser-use config path 的 home/filename 组合也已迁移至该 policy，origin-state 继续负责文件存在、读取、解析与写回副作用，新增 1 项路径断言。
+
 TOML 解析结果的 plain-object 形状判定也已迁移至该 policy，origin-state 继续负责解析失败日志与状态写回，新增 2 项形状断言。
 approval/history mode 的 config↔desktop/TOML 映射也已迁移至该 policy，origin-state 继续持有
 配置加载、更新与持久化副作用，新增 5 项默认/disabled/反向映射断言。
@@ -498,6 +499,18 @@ origin resource 到 TOML section key 的映射也已迁移至该 policy，origin
 访问和规则更新，新增 1 项 full_cdp 映射断言。
 transfer approval key 映射与 global persistent approval enterprise gate 也已迁移至该 policy，
 origin-state 继续持有异步配置/策略检查副作用，新增 2 项断言。
+
+### 增量抽取：browser permission prompt registry 生命周期
+
+R8 browser sidebar manager 中原 `qZe`（118,428-118,590）的完整权限提示 registry 已迁移至
+`src/main/main-app/browser-sidebar/browser-permission-prompt-registry.ts`。模块持有 pending prompt 与
+renderer subscription 两组状态，保留 orphan 自动 dismiss、snapshot 数组/记录复制、mount generation
+同步、跨窗口 transfer 时 UUID 轮换、page/host/renderer/navigation identity gate、response action 与
+geolocation accuracy 校验，以及 prompt closed、owner destroyed、RPC broken 和显式 dispose 的清理顺序。
+
+原 main consumer 继续注入既有 `wZ/GZe/KZe` schemas、`crypto.randomUUID`、`n.Uf` RPC target adapter
+与 `browserPageHostLifecycle.findPageStateForWebContentsId`，main chunk 内旧 `qZe` 实现已删除。
+`scripts/test-main-browser-permission-prompt-registry.mjs` 覆盖 25 项 registry 生命周期断言。
 
 ### T4 origin-state 剩余边界复核
 

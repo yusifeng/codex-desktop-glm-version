@@ -1,5 +1,13 @@
 # Renderer 尾部资产审计
 
+2026-10-13 A5 文件预览批次：`library-cloud-file-preview` 的主体分派不再使用四态占位实现。
+发布资产 `Gn` 中的 40 MiB 图片上限、未知大小、pending/error/hidden、artifact/PDF、
+HTML/Markdown/Text 与 unsupported 决策已迁移至
+`src/renderer/library-cloud-file-preview/preview-state.ts`，并由真实
+`LibraryCloudFilePreview` route/page consumer 使用。主入口同时接受发布契约的
+`item.cloudFile` 和既有直接 `file` 契约；focused suite 覆盖 24 项状态、类型推断与入口断言，
+原内联 `previewState` 已删除。
+
 最后一轮 renderer 清扫不再把 `CHUNKS - REWRITTEN` 直接解释为待手写源码。
 `scripts/renderer-chunk-manifest.mjs` 现在维护两条互斥轨道：
 
