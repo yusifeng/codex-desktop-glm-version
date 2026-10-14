@@ -83,6 +83,7 @@ const { GitStableMetadataRetryController } = require("./worker/git-stable-metada
 const { GitStableMetadataResolver } = require("./worker/git-stable-metadata-resolver");
 const { GitManagerCacheLifecycle } = require("./worker/git-manager-cache-lifecycle");
 const { GitRepositoryRegistry } = require("./worker/git-repository-registry");
+const { GitWatchRegistryController } = require("./worker/git-watch-registry-controller");
 const { GitLiveQueryRegistry } = require("./worker/git-live-query-registry");
 const { initializeGitRepository } = require("./worker/git-init-request-handler");
 const { discoverGitOrigins, resolveOriginAndRoots } = require("./worker/git-origin-discovery");
@@ -68930,12 +68931,17 @@ var I6 = kW(`git`),
     dependencies;
     liveQueryRegistry;
     watcherPerformance;
-    watchesByKey = new Map();
-    watchSetupByHost = new Map();
-    gitInitWatch = null;
-    desiredGitInitWatchKey = null;
-    handledGitInitWatchers = new WeakSet();
-    gitInitMetadataRefreshes = new Map();
+    watchRegistry = new GitWatchRegistryController({
+      applyInitMetadata: applyGitInitMetadata,
+      ensureInitDesired: ensureGitInitWatchDesired,
+      getHostKey: h1,
+      getInitWatchKey: getSemanticGitInitWatchKey,
+      getWatchKey: createGitManagerKey,
+      handleInitRecovery: handleGitInitRecovery,
+      refreshInitMetadata: refreshGitInitMetadataSingleFlight,
+      scheduleSetup: scheduleGitWatchSetup,
+      startInitWatcher: startGitInitWatcherController,
+    });
     worktreeUpstreamRefreshAbortControllers = new Map();
     requestLifecycle = createGitRequestLifecycle();
     localGitAvailable = null;
@@ -68969,7 +68975,7 @@ var I6 = kW(`git`),
           prepareRecovery: (e, t) => {
             let n = this.gitManager.getWorktreeRepositoryForRoot(e, t);
             (p2(n), n.invalidateGitReadCachesForRepoRecovery());
-            let r = this.watchesByKey.get(this.getWatchKey(e, t));
+            let r = this.watchRegistry.getWatch(e, t);
             r != null &&
               this.emit({
                 type: `worker-event`,
@@ -69119,7 +69125,7 @@ var I6 = kW(`git`),
           host: o,
           signal: i.signal,
           isRepoWatched: (root) => {
-            let watch = this.watchesByKey.get(this.getWatchKey(root, o));
+            let watch = this.watchRegistry.getWatch(root, o);
             return watch?.isReady === !0 && !watch.watcher.requiresRecovery;
           },
           startCapture: (params) => performStartTurnDiffCapture(params, turnDiffCaptureDeps),
@@ -69154,7 +69160,7 @@ var I6 = kW(`git`),
           signal: i.signal,
           liveQueryRegistry: this.liveQueryRegistry,
           disposeGitInitWatcher: (cwd, host) => this.disposeGitInitWatcher(cwd, host),
-          getExistingWatch: (root) => this.watchesByKey.get(this.getWatchKey(root, o)),
+          getExistingWatch: (root) => this.watchRegistry.getWatch(root, o),
           ensureWatching: (metadata, host, signal) => this.ensureWatching(metadata, host, signal),
           resolveQueryRoot: resolveRequestRoot,
           trace: OH,
@@ -69250,7 +69256,7 @@ var I6 = kW(`git`),
           }),
         },
         s = resolveGitRequestPerformanceContext(e).reviewCwd,
-        c = s == null ? `unknown` : getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), s, o, o.isLocal ? g.default : g.default.posix),
+        c = s == null ? `unknown` : getGitPerformanceRepoIndexSizeBucket(this.watchRegistry.getWatches(), s, o, o.isLocal ? g.default : g.default.posix),
         l,
         u = null,
         d = null,
@@ -69721,9 +69727,6 @@ var I6 = kW(`git`),
         searchBranches: (params) => searchGitBranches(params, branchSearchDeps),
       }));
     }
-    getWatchKey(e, t) {
-      return createGitManagerKey(h1(t), e);
-    }
     async runLiveQueryWithAttribution(e, t, n, r, i, a, o, s, c, l) {
       return runGitLiveQueryWithAttribution({ request: e, root: t, host: n, signal: r,
         runLiveQuery: (request, root, host, signal, onFirstResult) => this.runLiveQuery(request, root, host, signal, onFirstResult),
@@ -69732,7 +69735,7 @@ var I6 = kW(`git`),
         projectResult: projectGitReviewSummaryResult, mapResult: mapLiveQueryPerformanceResult, classifyError: V6,
         emitPerformance: (input) => this.emitGitPerformanceOperation(input), endAttribution: G1,
         metadataCommonDir: o, links: c, traceContext: s, trigger: a, source: e.params.operationSource,
-        getRepoIndexSizeBucket: (root, host) => getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), root, host, host.isLocal ? g.default : g.default.posix) });
+        getRepoIndexSizeBucket: (root, host) => getGitPerformanceRepoIndexSizeBucket(this.watchRegistry.getWatches(), root, host, host.isLocal ? g.default : g.default.posix) });
     }
     emitGitPerformanceOperation(input) {
       return emitGitPerformanceOperationController({ ...input, endAttribution: G1, getResultFields: getGitPerformanceResultFields,
@@ -69743,7 +69746,7 @@ var I6 = kW(`git`),
       return handleGitLiveQuery(e, t, n, r, i, {
         gitManager: this.gitManager,
         getWorktreeRepositoryForRoot: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
-        getWatch: (root, host) => this.watchesByKey.get(this.getWatchKey(root, host)),
+        getWatch: (root, host) => this.watchRegistry.getWatch(root, host),
         getStatusSummary: J2,
         getReviewSummary: (params) => c3(params),
         getBranchDiffStats: (...args) => getGitBranchDiffStats(...args, gitReviewBranchStatsDeps),
@@ -69767,8 +69770,8 @@ var I6 = kW(`git`),
         metadata: e,
         host: t,
         signal: n,
-        getWatchKey: (root, host) => this.getWatchKey(root, host),
-        getWatch: (key) => this.watchesByKey.get(key),
+        getWatchKey: (root, host) => this.watchRegistry.getWatchKey(root, host),
+        getWatch: (key) => this.watchRegistry.getWatchByKey(key),
         createWatch: (metadata, host, closingPromise) => this.createRepoWatch(metadata, host, closingPromise),
         releaseWatch: (root, host, options) => this.unwatchRepo(root, host, options),
       });
@@ -69778,8 +69781,8 @@ var I6 = kW(`git`),
         metadata: e,
         host: t,
         closingPromise: n,
-        getWatchKey: (root, host) => this.getWatchKey(root, host),
-        isCurrentWatch: (key, watch) => this.watchesByKey.get(key) === watch,
+        getWatchKey: (root, host) => this.watchRegistry.getWatchKey(root, host),
+        isCurrentWatch: (key, watch) => this.watchRegistry.isCurrentWatch(key, watch),
         getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
         removeOriginQueries: (repository) => repository.queryClient.removeQueries({ queryKey: Q(e.root, t, `effective-origin-url`), exact: !0 }),
         invalidateWatchScopedCaches: (repository) => repository.invalidateWatchScopedGitReadCaches(),
@@ -69792,7 +69795,7 @@ var I6 = kW(`git`),
         invalidateChange: (repository, changeType, paths) => repository.invalidateGitReadCachesForRepoChange(changeType, paths),
         handleRepoChanged: (event, onFanout) => this.liveQueryRegistry.handleRepoChanged(event, onFanout),
         recordPerformance: (input) => this.watcherPerformance.record(input),
-        getIndexSizeBucket: (_root, host, result) => getGitPerformanceRepoIndexSizeBucket(this.watchesByKey.values(), e.root, host, host.isLocal ? result?.default : result?.default?.posix),
+        getIndexSizeBucket: (_root, host, result) => getGitPerformanceRepoIndexSizeBucket(this.watchRegistry.getWatches(), e.root, host, host.isLocal ? result?.default : result?.default?.posix),
         emit: (value) => this.emit(value),
         createWatcher: (options) => this.dependencies.createGitRepoWatcher?.(options) ?? new tbe(options),
         watchIgnoreSources: t.isLocal ? this.dependencies.watchIgnoreSources : undefined,
@@ -69801,43 +69804,35 @@ var I6 = kW(`git`),
         startWorkingTreeWatch: this.dependencies.startWorkingTreeWatch,
       });
       const watch = created.watch;
-      this.watchesByKey.set(created.key, watch);
+      this.watchRegistry.registerWatch(created.key, watch);
       watch.startPromise = this.scheduleWatchSetup(watch, t, n);
       return watch;
     }
     async ensureWatchingForGitInit(e, t, n = `detect-git-path`) {
-      let r = this.getGitInitWatchKey(e, t);
-      return ensureGitInitWatchDesired({ key: r, getDesiredWatchKey: () => this.desiredGitInitWatchKey,
-        setDesiredWatchKey: (key) => { this.desiredGitInitWatchKey = key; }, disposeWatcher: () => this.disposeGitInitWatcher(),
-        startWatcher: () => this.startGitInitWatcher(e, t, n) });
+      return this.watchRegistry.ensureGitInitWatch(e, t, () =>
+        this.startGitInitWatcher(e, t, n),
+      );
     }
     async startGitInitWatcher(e, t, n) {
-      let r = this.getGitInitWatchKey(e, t);
-      return startGitInitWatcherController({ key: r, disposeActiveWatcher: () => this.disposeActiveGitInitWatcher(),
+      return this.watchRegistry.startGitInitWatch({ cwd: e, host: t,
         createWatcher: () => {
           let watcher = new GitInitWatcher({ cwd: e, host: t, onGitInit: () => { this.handleGitInit(e, t, watcher).catch((error) => { I6().warning(`Failed to refresh git metadata after git init`, { safe: {}, sensitive: { cwd: e, error } }); }); }, watchMode: n },
             { createLogger: OW, debounce: _R, isMissingPathError: sB, randomUUID: () => crypto.randomUUID(), setTimeout, clearTimeout, initialReconnectDelayMs: 250, maxReconnectDelayMs: 5e3 });
           return watcher;
-        },
-        setActiveWatcher: (value) => { this.gitInitWatch = value; }, getActiveWatcher: () => this.gitInitWatch,
-        clearActiveWatcher: () => { this.gitInitWatch = null; } });
+        } });
     }
     async handleGitInit(e, t, n) {
-      return handleGitInitRecovery({ cwd: e, host: t, watcher: n, getWatchKey: (cwd, host) => this.getGitInitWatchKey(cwd, host),
-        getDesiredWatchKey: () => this.desiredGitInitWatchKey, setDesiredWatchKey: (key) => { this.desiredGitInitWatchKey = key; },
-        getActiveWatch: () => this.gitInitWatch, clearActiveWatch: () => { this.gitInitWatch = null; },
-        handledWatchers: this.handledGitInitWatchers, refreshMetadata: (cwd, host) => this.refreshGitInitMetadata(cwd, host),
+      return this.watchRegistry.handleGitInit({ cwd: e, host: t, watcher: n,
+        refreshMetadata: (cwd, host) => this.refreshGitInitMetadata(cwd, host),
         startWatcher: (cwd, host, mode) => this.startGitInitWatcher(cwd, host, mode) });
     }
     async refreshGitInitMetadata(e, t) {
-      let n = this.getGitInitWatchKey(e, t);
-      return refreshGitInitMetadataSingleFlight({ key: n, refreshes: this.gitInitMetadataRefreshes,
+      return this.watchRegistry.refreshGitInitMetadata({ cwd: e, host: t,
         invalidateStableMetadata: () => this.gitManager.invalidateStableMetadata(), refreshOnce: () => this.refreshGitInitMetadataOnce(e, t) });
     }
     async refreshGitInitMetadataOnce(e, t) {
-      let n = this.getGitInitWatchKey(e, t);
-      return applyGitInitMetadata({ cwd: e, host: t, key: n, getDesiredWatchKey: () => this.desiredGitInitWatchKey, setDesiredWatchKey: (key) => { this.desiredGitInitWatchKey = key; },
-        getStableMetadata: (cwd, host) => this.gitManager.getStableMetadata(cwd, host), disposeActiveWatcher: () => this.disposeActiveGitInitWatcher(),
+      return this.watchRegistry.applyGitInitMetadata({ cwd: e, host: t,
+        getStableMetadata: (cwd, host) => this.gitManager.getStableMetadata(cwd, host),
         ensureWatching: (metadata, host) => this.ensureWatching(metadata, host), disposeGitInitWatcher: (cwd, host) => this.disposeGitInitWatcher(cwd, host),
         unwatchRepo: (root, host, options) => this.unwatchRepo(root, host, options), emitHeadChange: (metadata, cwd, host) => {
           OH({ attributes: { "git.change_type": `head`, "git.changed_path_count": 0, "git.full_invalidation": !1, "worker.id": `git` }, name: `desktop.git_invalidation`, op: `codex.git.invalidation`, root: !0 }, () => {
@@ -69845,55 +69840,40 @@ var I6 = kW(`git`),
           });
         } });
     }
-    getGitInitWatchKey(e, t) {
-      return getSemanticGitInitWatchKey(h1(t), e);
-    }
     disposeGitInitWatcher(e, t) {
-      (e == null || t == null || this.desiredGitInitWatchKey === this.getGitInitWatchKey(e, t)) &&
-        (this.disposeActiveGitInitWatcher(), (this.desiredGitInitWatchKey = null));
-    }
-    disposeActiveGitInitWatcher() {
-      (this.gitInitWatch?.watcher.dispose(), (this.gitInitWatch = null));
+      this.watchRegistry.disposeGitInitWatcher(e, t);
     }
     unwatchRepo(
       e,
       t,
-      { emitEvent: n = !0, watch: r = this.watchesByKey.get(this.getWatchKey(e, t)) } = {},
+      { emitEvent: n = !0, watch: r = this.watchRegistry.getWatch(e, t) } = {},
     ) {
       releaseGitRepoWatch(r, (watch) => this.closeRepoWatch(watch, t, n));
     }
     scheduleWatchSetup(e, t, n) {
-      let r = h1(t),
-        i = this.getWatchKey(e.root, t),
-        a = this.watchSetupByHost.get(r);
-      return scheduleGitWatchSetup(a, {
-        hostKey: r,
-        watchKey: i,
-        hostIsLocal: t.isLocal,
+      return this.watchRegistry.scheduleWatchSetup({
+        watch: e,
+        host: t,
         commonDir: e.commonDir,
         indexPath: (commonDir, hostIsLocal) => (hostIsLocal ? g.default : g.default.posix).join(commonDir, `index`),
         statIndex: (indexPath) => t.stat(indexPath),
-        bucketIndexSize: (size) => { if (this.watchesByKey.get(i) === e) e.repoIndexSizeBucket = bucketGitIndexSize(size); },
-        isCurrent: () => e.refCount > 0 && this.watchesByKey.get(i) === e,
+        bucketIndexSize: (size) => { e.repoIndexSizeBucket = bucketGitIndexSize(size); },
         startWatcher: () => e.watcher.start(),
         clearOriginQueries: () => this.gitManager.getWorktreeRepositoryForRoot(e.root, t).queryClient.removeQueries({ queryKey: Q(e.root, t, `effective-origin-url`), exact: !0 }),
         markReady: () => { e.isReady = !0; },
         closeWatch: () => this.closeRepoWatch(e, t),
-        getActiveSetup: () => this.watchSetupByHost.get(r),
-        setActiveSetup: (setup) => this.watchSetupByHost.set(r, setup),
-        clearActiveSetup: (setup) => { if (this.watchSetupByHost.get(r) === setup) this.watchSetupByHost.delete(r); },
         setStartTrace: (trace) => { e.startTrace = trace; },
         getTrace: () => AH() ?? void 0,
       });
     }
     closeRepoWatch(e, t, n = !0) {
       return closeGitRepoWatch(e, t, n, {
-        getWatchKey: (root, host) => this.getWatchKey(root, host),
-        getCurrentWatch: (key) => this.watchesByKey.get(key),
+        getWatchKey: (root, host) => this.watchRegistry.getWatchKey(root, host),
+        getCurrentWatch: (key) => this.watchRegistry.getWatchByKey(key),
         getRepository: (root, host) => this.gitManager.getWorktreeRepositoryForRoot(root, host),
         invalidateRepository: (repository) => p2(repository),
         clearRepositoryCaches: (repository) => repository.clearGitReadCaches(),
-        removeWatch: (key) => this.watchesByKey.delete(key),
+        removeWatch: (key) => this.watchRegistry.removeWatch(key),
         emit: (event) => this.emit(event),
         logger: I6(),
       });
