@@ -835,6 +835,15 @@ activation）已迁移至 `browser-comment-mode-controller.ts`，focused test �
 `scripts/test-main-browser-window-thread-state-controller.mjs`，既有 host lifecycle test 更新后保持 65 项通过。
 `scripts/test-main-browser-page-command-controller.mjs` 覆盖 11 项历史、焦点、缩放、快照、挂载与路由断言。
 
+### 增量抽取：browser page materialization 与 runtime sync
+
+`tQe` 的 cold-restore/page object materialization、页面生命周期更新与 thread/runtime snapshot projection 已迁移至
+`src/main/main-app/browser-sidebar/browser-page-materialization-controller.ts` 和
+`src/main/main-app/browser-sidebar/browser-runtime-sync-controller.ts`；原入口保留委托与宿主依赖注入，新增
+`test-main-browser-page-materialization-controller.mjs`、`test-main-browser-runtime-sync-controller.mjs` 两组 focused
+断言。runtime projection 中尚未独立迁出的导航/WebContents binding helper 通过显式 adapter fallback 保持构造安全，
+其完整行为继续由后续 navigation/binding owner 收口。
+
 ### A3 main 剩余大 owner（2026-10-15）
 
 `vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit/Sat` 均已移出，cross-platform capture-request owner 也已真实接回。

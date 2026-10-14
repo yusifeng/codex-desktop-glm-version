@@ -81,6 +81,8 @@ const { createBrowserUseRouteControllerClass } = require("./main-app/browser-sid
 const { createBrowserCommentModeControllerClass } = require("./main-app/browser-sidebar/browser-comment-mode-controller.js");
 const { createBrowserAnnotationInteractionControllerClass } = require("./main-app/browser-sidebar/browser-annotation-interaction-controller.js");
 const { createBrowserPagePersistenceControllerClass } = require("./main-app/browser-sidebar/browser-page-persistence-controller.js");
+const { createBrowserPageMaterializationControllerClass } = require("./main-app/browser-sidebar/browser-page-materialization-controller.js");
+const { createBrowserRuntimeSyncControllerClass } = require("./main-app/browser-sidebar/browser-runtime-sync-controller.js");
 const { createBrowserPresentationSyncControllerClass } = require("./main-app/browser-sidebar/browser-presentation-sync-controller.js");
 const { createBrowserWindowThreadStateControllerClass } = require("./main-app/browser-sidebar/browser-window-thread-state-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
@@ -116509,6 +116511,8 @@ var $Ze = class {
     siteBootstrapController = new AbortController();
     getSiteBootstrapToken;
     browserPersistence;
+    pageMaterializationController;
+    runtimeSyncController;
     onAppEntrySource;
     isDefaultBrowser;
     isAnnotationMultiSelectFeatureEnabled = !1;
@@ -116546,6 +116550,8 @@ var $Ze = class {
         (this.browserUseRouteController = new (createBrowserUseRouteControllerClass({ hX, n, qU, oX, QU, iW, wU, aW, mX, mXe, lW, OX, hXe, dZ, WU, fq, gX, logger: r.i(`browser-sidebar-manager`) }))(this)),
         (this.commentModeController = new (createBrowserCommentModeControllerClass({ EU, cW, yVe, tq, n }))(this)),
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
+        (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
+        (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ uZe, hX, fq, kZe, tq, KU, EZ }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, AX, vXe, yXe, bXe, xXe, SXe, aXe, gX, qU, oXe, vX, tq, KU, l }))(this)),
         (this.getSiteBootstrapToken = s.getSiteBootstrapToken),
@@ -116572,7 +116578,7 @@ var $Ze = class {
           this.windowManager,
           this.windows,
           {
-            materializePageState: this.materializeThreadPageState.bind(this),
+            materializePageState: this.pageMaterializationController.materializeThreadPageState.bind(this.pageMaterializationController),
             removeClosedPage: (e, t) => {
               this.browserPageHostLifecycle.removeClosedThreadState(e, t);
             },
@@ -116852,6 +116858,12 @@ var $Ze = class {
     isPrimaryWindowPersistenceOwner(e) {
       this.comments.handleRuntimeCommentScreenshotReady(e, t);
     }
+    getPageLifecycleHelpers(...args) { return this.runtimeSyncController.getPageLifecycleHelpers(...args); }
+    syncThreadState(...args) { return this.runtimeSyncController.syncThreadState(...args); }
+    syncThreadStateFromOrigin(...args) { return this.runtimeSyncController.syncThreadStateFromOrigin(...args); }
+    syncRuntimeStateToPage(...args) { return this.runtimeSyncController.syncRuntimeStateToPage(...args); }
+    syncCommentSnapshot(...args) { return this.runtimeSyncController.syncCommentSnapshot(...args); }
+    materializeThreadPageState(...args) { return this.pageMaterializationController.materializeThreadPageState(...args); }
     goBack(...args) { return this.pageCommandController.goBack(...args); }
     cloneTab(...args) { return this.pageCommandController.cloneTab(...args); }
     goForward(...args) { return this.pageCommandController.goForward(...args); }

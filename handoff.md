@@ -21,6 +21,11 @@ page-command controller 的 history clone 依赖，将 `rW/WX/GX` 显式注入�
 page host lifecycle 中 registerHost 的 conversation/tab 参数顺序。focused test 为
 `scripts/test-main-browser-window-thread-state-controller.mjs`（6 项）。
 
+随后完成 tQe 的 page materialization 与 runtime projection owner：冷恢复、页面对象构造、生命周期更新、
+thread/runtime snapshot 同步与 comment snapshot 已分别迁入 `browser-page-materialization-controller.ts` 和
+`browser-runtime-sync-controller.ts`，并保留 focused tests。runtime controller 对尚未迁出的导航/WebContents
+绑定 helper 使用显式 adapter fallback；这些 helper 的完整语义仍属于下一批导航/绑定 owner，不计入本批已完成。
+
 本轮将 tQe 的 page command/host orchestration 迁移至
 `src/main/main-app/browser-sidebar/browser-page-command-controller.ts`，真实接回 history、focused command、
 reload/clear/scroll/find/site-info、reset/stop/audio/print/suspend、host transfer、zoom/navigate/screenshot/debugger
