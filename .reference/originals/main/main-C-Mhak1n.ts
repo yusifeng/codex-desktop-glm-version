@@ -65,6 +65,7 @@ const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
 const { StartupRendererCoordinator } = require("./main-app/startup/startup-renderer-coordinator.js");
 const { SystemPermissionsService } = require("./main-app/startup/system-permissions-service.js");
 const { ExternalDocumentBindingRegistry } = require("./main-app/remote-artifact/external-document-binding-registry.js");
+const { NativeArtifactFileService } = require("./main-app/remote-artifact/native-artifact-file-service.js");
 let c = require("node:url"),
   l = require("electron"),
   u = e.a(l, 1);
@@ -152294,7 +152295,6 @@ var X8 = n.wf({ bindingId: n.Of().min(1) }),
       this.unbind();
     }
   },
-  Net = /^native-app:[a-f0-9]{64}$/,
   Pet = n.vf(`artifactType`, [
     n.wf({
       artifactRef: n.Of().min(1),
@@ -152326,105 +152326,7 @@ var X8 = n.wf({ bindingId: n.Of().min(1) }),
           .refine((e) => (0, h.isAbsolute)(e) && (0, h.extname)(e).toLowerCase() === `.pptx`),
       }),
     }),
-  ]),
-  Fet = class {
-    dependencies;
-    constructor(e) {
-      this.dependencies = e;
-    }
-    async getTargets(e) {
-      let t = await this.#e(e);
-      return t.status === `failed`
-        ? t
-        : {
-            fileManagerIcon: t.fileManagerIcon,
-            status: `ready`,
-            targets: t.targets.map(({ exposed: e }) => e),
-          };
-    }
-    async performFileAction(e) {
-      let { action: t } = e,
-        n;
-      if (t?.type === `open`) {
-        if (!Ret(t.targetId)) return { status: `failed`, reason: `target-unavailable` };
-        let r = await this.#e(e);
-        if (r.status === `failed`)
-          return r.reason === `session-unavailable`
-            ? { status: `failed`, reason: `session-unavailable` }
-            : { status: `failed`, reason: `target-unavailable` };
-        if (((n = r.targets.find(({ exposed: e }) => e.id === t.targetId)), n == null))
-          return { status: `failed`, reason: `target-unavailable` };
-      } else if (t?.type !== `show-in-folder` && t?.type !== `download-copy`)
-        return { status: `failed`, reason: `action-failed` };
-      let r = await this.dependencies.publishNativeSnapshot(e);
-      if (r.status === `failed`) return r;
-      if (t.type === `download-copy`)
-        try {
-          return (await this.dependencies.downloadCopy(r.path), { status: `completed` });
-        } catch {
-          return { status: `failed`, reason: `action-failed` };
-        }
-      let i;
-      try {
-        i = await v.promises.mkdtemp((0, h.join)((0, p.tmpdir)(), `codex-artifact-native-open-`));
-        let e = (0, h.join)(i, r.fileName);
-        (await v.promises.copyFile(r.path, e), await v.promises.chmod(e, 384));
-        let { success: a } = await this.dependencies.open({
-          appPath: n?.appPath,
-          cwd: null,
-          hostId: J,
-          path: e,
-          target: t.type === `show-in-folder` ? `fileManager` : `systemDefault`,
-        });
-        if (a) return { status: `completed` };
-      } catch {}
-      return (
-        i != null && (await v.promises.rm(i, { force: !0, recursive: !0 }).catch(() => void 0)),
-        { status: `failed`, reason: `action-failed` }
-      );
-    }
-    async readSnapshot(e) {
-      let t = await this.dependencies.publishNativeSnapshot(e);
-      if (t.status === `failed`) return t;
-      try {
-        let e = await v.promises.stat(t.path);
-        if (!e.isFile() || e.size !== t.byteLength || K(e.size))
-          return { status: `failed`, reason: `materialization-failed` };
-        let n = await v.promises.readFile(t.path);
-        return n.byteLength === t.byteLength
-          ? {
-              bytes: new Uint8Array(n),
-              contentType: t.contentType,
-              fileName: t.fileName,
-              status: `ready`,
-            }
-          : { status: `failed`, reason: `materialization-failed` };
-      } catch {
-        return { status: `failed`, reason: `materialization-failed` };
-      }
-    }
-    async #e(e) {
-      let t = await this.dependencies.resolveArtifactKind(e);
-      if (t.status === `failed`) return t;
-      let n;
-      try {
-        n = await v.promises.mkdtemp((0, h.join)((0, p.tmpdir)(), `codex-artifact-open-in-`));
-        let e = (0, h.join)(n, t.kind === `presentation` ? `presentation.pptx` : `workbook.xlsx`);
-        await v.promises.writeFile(e, ``);
-        let { targets: r } = await this.dependencies.getTargets({ cwd: null, hostId: J, path: e });
-        return {
-          fileManagerIcon:
-            r.find((e) => e.available !== !1 && e.target === `fileManager`)?.icon ?? null,
-          status: `ready`,
-          targets: Let(r),
-        };
-      } catch {
-        return { status: `failed`, reason: `target-discovery-failed` };
-      } finally {
-        n != null && (await v.promises.rm(n, { force: !0, recursive: !0 }).catch(() => void 0));
-      }
-    }
-  };
+  ]);
 function Iet(e, t) {
   let n = Pet.safeParse(e);
   if (!n.success) throw Error(`Artifact Session host returned an invalid native snapshot.`);
@@ -152437,33 +152339,6 @@ function Iet(e, t) {
     fileName: n.data.binding.fileName,
     path: n.data.value.path,
   };
-}
-function Let(e) {
-  let t = new Map();
-  for (let n of e) {
-    if (n.available === !1 || n.target !== `systemDefault`) continue;
-    let e, r;
-    if (n.id === `systemDefault`) e = `system-default`;
-    else if (
-      n.kind === `native` &&
-      n.bundleId != null &&
-      n.bundleId.length > 0 &&
-      n.appPath != null &&
-      n.appPath.length > 0
-    )
-      ((e = `native-app:${(0, _.createHash)(`sha256`).update(n.bundleId).update(`\0`).update(n.id).digest(`hex`)}`),
-        (r = n.appPath));
-    else continue;
-    t.has(e) ||
-      t.set(e, {
-        appPath: r,
-        exposed: { default: n.default, icon: n.icon, id: e, label: n.label },
-      });
-  }
-  return [...t.values()];
-}
-function Ret(e) {
-  return e === `system-default` || (typeof e == `string` && Net.test(e));
 }
 var Z8 = Object.freeze({
     appendUpdate: `documents.appendUpdate`,
@@ -152530,9 +152405,11 @@ var Z8 = Object.freeze({
           parseApplyRequest: (e) => Aet.parse(e),
           parseBindingRequest: (e) => X8.parse(e),
         })),
-        (this.#r = new Fet({
+        (this.#r = new NativeArtifactFileService({
           downloadCopy: t.downloadCopy,
           getTargets: t.getOpenInTargets,
+          hostId: J,
+          maxBytes: Ae,
           open: t.openPath,
           publishNativeSnapshot: (e) => this.#m(e),
           resolveArtifactKind: (e) => this.#h(e),

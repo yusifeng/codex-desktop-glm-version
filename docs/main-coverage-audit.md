@@ -650,6 +650,19 @@ activation 中关闭、host unbind 失败和 registry dispose 继续幂等释放
 `scripts/test-main-external-document-binding-registry.mjs` 使用 esbuild 临时 bundle，覆盖 43 项 bind、activation、
 callback routing、retry、broken-RPC 与 dispose focused assertions。
 
+### 增量抽取：native artifact file service 生命周期
+
+R10/remote-artifact 原 `Fet`（152,330-152,438）的完整 native artifact file service 已迁移至
+`src/main/main-app/remote-artifact/native-artifact-file-service.ts`。模块拥有 artifact kind 对应的临时探测文件、
+native/system-default target 投影与稳定 SHA-256 id、snapshot 临时副本权限，以及 open/show/download action
+路由；成功 open 保留外部应用所需文件，失败路径和 target discovery 均清理临时目录。
+
+原 artifact session manager `Vet` consumer 注入现有 native snapshot publisher、artifact kind resolver、
+open-target/download services、local host id 与 256 MiB 上限；main chunk 内旧 `Fet` 及专用 `Net/Let/Ret`
+helpers 已删除。snapshot 读取继续校验普通文件、声明长度、最大大小与实际读取长度。
+`scripts/test-main-native-artifact-file-service.mjs` 使用 esbuild 临时 bundle，覆盖 40 项 discovery、projection、
+temporary-file ownership、action routing、cleanup 与 snapshot validation focused assertions。
+
 ### A3 main 剩余 owner 复核（2026-10-11）
 
 重新审计 main startup/window/worker assembly 后，`Ust` 内 `Be` 直接依赖 BrowserWindow 的

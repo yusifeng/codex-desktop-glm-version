@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将原 `Fet` native artifact file service 的完整生命周期迁移至
+`src/main/main-app/remote-artifact/native-artifact-file-service.ts`，真实接回 `Vet` 唯一 consumer，
+并删除旧 class 与专用 target helpers；保留 target discovery/projection、临时文件权限与清理、
+download/open/show-in-folder 路由及 snapshot 文件一致性/大小校验。focused test 为
+`scripts/test-main-native-artifact-file-service.mjs`（40 项）。
+
 本轮将 Wy 的 highlight projection 与最终 root composition 迁移至 `annotation-highlight-render-owner.ts` 并真实接回；保留 text-preview bridge、highlight geometry/style、suspension gate、interaction layer 与根属性渲染。focused test 为 `scripts/test-preload-annotation-highlight-render-owner.mjs`（12 项）。
 
 本轮将原 `jet` external document binding registry 的完整生命周期迁移至
