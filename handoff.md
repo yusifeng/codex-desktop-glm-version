@@ -6,6 +6,12 @@
 快照富化、jank 日志与 Sentry breadcrumb、performance-span CPU sampling 和 dispose 清理。
 focused test 为 `scripts/test-main-sampler-manager.mjs`（38 项）。
 
+本轮将 `GitRepoWatcher.emitRepoChanged()` 的完整 coalesced emission 生命周期迁移至
+`src/main/worker/git-repo-change-emission-controller.ts`，真实接回 worker consumer，并删除原 40 行内嵌
+实现；controller 保留 raw-event count 消费、working-tree path snapshot/reset、operation state、disposed
+gate、worker event emit、未知 HEAD ref 恢复、日志与 finally completion。focused test 为
+`scripts/test-worker-git-repo-change-emission-controller.mjs`（19 项）。
+
 本轮将 `GitManager.createRepoWatch()` 的完整 watch factory 生命周期迁移至
 `src/main/worker/git-repo-watch-factory.ts`，真实接回 worker consumer，并删除原 78 行内嵌实现；factory
 保留 repository 单 owner、watch identity/raw-event/recovery 状态、cache/live-query callbacks、local-only

@@ -220,6 +220,7 @@ const { refreshGitWorkingTreeWatchPolicy } = require("./worker/git-working-tree-
 const { startGitRepoWatcher } = require("./worker/git-repo-watcher-start-controller");
 const { startGitRepoWatchSession } = require("./worker/git-repo-watch-session-runtime");
 const { createGitRepoWatch } = require("./worker/git-repo-watch-factory");
+const { emitGitRepoChange } = require("./worker/git-repo-change-emission-controller");
 const LX = classifyGitError;
 const zX = gitSubcommand;
 const gitBlameFileDeps = {
@@ -69026,44 +69027,26 @@ var Jye = 1e3,
       this.repoChangeController.schedule(e);
     }
     async emitRepoChanged(e) {
-      let t = this.repoChangeController.consume(e);
-      let n =
-        e === `working-tree` && this.pendingWorkingTreePaths != null
-          ? [...this.pendingWorkingTreePaths]
-          : null;
-      e === `working-tree` && (this.pendingWorkingTreePaths = new Set());
-      try {
-        let r = await this.getGitOperationState();
-        if (this.disposed) return;
-        let i = createGitRepoChangedEvent({
-          changeType: e,
-          commonDir: this.options.commonDir,
-          hostId: this.options.host.id,
-          rebaseInProgress: r.rebaseInProgress,
-          root: this.options.root,
-          changedPaths: n,
-        });
-        if (
-          (this.options.onCoalescedChange?.({ changeType: e, rawEventCount: t }),
-          await this.options.emit({ type: `worker-event`, event: i }),
-          e === `head` && !this.currentHeadRefKnown)
-        ) {
-          let e = await getCurrentGitBranchState(this.options.worktreeRepo);
-          ((this.currentHeadRefPath =
-            e.type === `branch`
-              ? (this.pathApi?.join(
-                  this.options.commonDir,
-                  `refs`,
-                  `heads`,
-                  ...e.branch.split(`/`),
-                ) ?? null)
-              : null),
-            (this.currentHeadRefKnown = e.type !== `unknown`));
-        }
-        this.logRepoChanged(e, t, r);
-      } finally {
-        this.repoChangeController.complete(e);
-      }
+      return emitGitRepoChange({
+        changeType: e,
+        consumeRawEventCount: (changeType) => this.repoChangeController.consume(changeType),
+        getPendingWorkingTreePaths: () => this.pendingWorkingTreePaths,
+        resetPendingWorkingTreePaths: () => { this.pendingWorkingTreePaths = new Set(); },
+        getOperationState: () => this.getGitOperationState(),
+        isDisposed: () => this.disposed,
+        createEvent: createGitRepoChangedEvent,
+        commonDir: this.options.commonDir,
+        hostId: this.options.host.id,
+        root: this.options.root,
+        onCoalescedChange: this.options.onCoalescedChange,
+        emit: (event) => this.options.emit(event),
+        isHeadRefKnown: () => this.currentHeadRefKnown,
+        getCurrentBranchState: () => getCurrentGitBranchState(this.options.worktreeRepo),
+        resolveHeadRefPath: (branch) => this.pathApi?.join(this.options.commonDir, `refs`, `heads`, ...branch.split(`/`)) ?? null,
+        setHeadRefState: (path, known) => { this.currentHeadRefPath = path; this.currentHeadRefKnown = known; },
+        logRepoChanged: (changeType, rawEventCount, operationState) => this.logRepoChanged(changeType, rawEventCount, operationState),
+        complete: (changeType) => this.repoChangeController.complete(changeType),
+      });
     }
     logRepoChanged(e, t, n) {
       this.logger.debug(`Git repo changed`, { safe: { changeType: e, rawEventCount: t, ...n } });

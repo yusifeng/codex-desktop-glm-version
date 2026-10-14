@@ -1712,3 +1712,13 @@ options 与初始 watch record；worker 仅注入 manager maps、repository/even
 返回后登记 watch 和启动既有 setup lifecycle。原 78 行内嵌实现已删除。
 `scripts/test-worker-git-repo-watch-factory.mjs` 覆盖 record/options、repository identity、local/remote、
 backend/branch 参数、stale/closing watch guard、raw-event/recovery state，共 31 项 focused assertions。
+
+### GitRepoWatcher coalesced change emission
+
+`GitRepoWatcher.emitRepoChanged()` 的完整 emission lifecycle 已迁移至
+`src/main/worker/git-repo-change-emission-controller.ts` 并真实接回 worker。既有
+`git-repo-change-controller.ts` 继续负责 debounce/count timer，新 controller 负责 consume count、
+working-tree pending path snapshot/reset、Git operation state、disposed gate、event payload/emit、未知 HEAD
+ref branch state 恢复、debug log 与 finally completion；worker 仅注入 watcher state 与 Git/event owners，
+原 40 行内嵌实现已删除。`scripts/test-worker-git-repo-change-emission-controller.mjs` 覆盖 working-tree、
+head/unknown、disposed、emit/state failure 与所有 finally completion 分支，共 19 项 focused assertions。
