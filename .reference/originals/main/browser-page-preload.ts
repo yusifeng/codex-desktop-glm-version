@@ -5975,6 +5975,9 @@ var { renderAnnotationOverlayContent } = require("./browser-page-preload/annotat
 var { projectAnnotationHighlightRuntimeState, renderAnnotationRoot } = require("./browser-page-preload/annotation-highlight-render-owner");
 var { useAnnotationControllerRegistry } = require("./browser-page-preload/annotation-controller-registry");
 var { useAnnotationInteractionCommandFacade } = require("./browser-page-preload/annotation-interaction-command-facade");
+var { useAnnotationControllerDisposalLifecycle, useAnnotationHighlightControllerLifecycle, useAnnotationScreenshotReadyLifecycle, useAnnotationInteractionVisibilityLifecycle } = require("./browser-page-preload/annotation-controller-lifecycle");
+var { useAnnotationReconciliationLifecycle, useAnnotationGlobalInputLifecycle, useAnnotationHoverRefreshLifecycle, useAnnotationAnchorRuntimeLifecycle } = require("./browser-page-preload/annotation-runtime-effect-lifecycle");
+var { createAnnotationInteractionLayerComponent } = require("./browser-page-preload/annotation-interaction-layer-component");
 var { projectAnnotationActiveGeometry } = require("./browser-page-preload/annotation-active-geometry-projection");
 var { projectAnnotationHighlightState } = require("./browser-page-preload/annotation-highlight-state-projection");
 var { projectAnnotationRuntimeSyncState } = require("./browser-page-preload/annotation-runtime-sync-state");
@@ -23804,165 +23807,73 @@ function Wy({ rootHost: e, bridge: t }) {
     preparedScreenshotController, ot, b, closeAnnotationEditor, w, mc, lb, be, m, f, xe, Se, o, c, O, oe, me,
     S, ms, rt, it, at, st, ct, yt, dt, restoreAnnotationEditor, E, vt, lt, viewportRefreshScheduler,
   }), [i, t, Oe, Ne, ot, st, lt, it, ct, Te, e, rt, at]),
-    (0, G.useEffect)(() => () => viewportRefreshScheduler.dispose(), [viewportRefreshScheduler]),
-    (0, G.useEffect)(() => () => hoverSyncController.dispose(), [hoverSyncController]),
-    (0, G.useEffect)(() => () => pointerModeSyncController.dispose(), [pointerModeSyncController]),
-    (0, G.useEffect)(() => () => preparedScreenshotController.dispose(), [preparedScreenshotController]),
-    (0, G.useEffect)(() => () => unavailableSiteInteractionController.dispose(), [unavailableSiteInteractionController]),
-    (0, G.useEffect)(() => () => selectionModifierController.dispose(), [selectionModifierController]),
-    (0, G.useEffect)(() => () => removeSelectionController.dispose(), [removeSelectionController]),
-    (0, G.useEffect)(() => () => pointRetryController.dispose(), [pointRetryController]),
-    (0, G.useEffect)(() => () => pointSelectionController.dispose(), [pointSelectionController]),
-    (0, G.useEffect)(() => () => designPointSelectionController.dispose(), [designPointSelectionController]),
-    (0, G.useEffect)(() => () => selectionCommentController.dispose(), [selectionCommentController]),
-    (0, G.useEffect)(() => () => textAnchorEditorController.dispose(), [textAnchorEditorController]),
-    (0, G.useEffect)(() => () => editEditorController.dispose(), [editEditorController]),
-    (0, G.useEffect)(() => () => commentPreviewController.dispose(), [commentPreviewController]),
-    (0, G.useEffect)(() => () => designEditorOpenController.dispose(), [designEditorOpenController]),
-    (0, G.useEffect)(() => () => virtualSelectionEditorController.dispose(), [virtualSelectionEditorController]),
-    (0, G.useEffect)(() => () => createAnchorUpdateController.dispose(), [createAnchorUpdateController]),
-    (0, G.useEffect)(() => () => interactionResetController.dispose(), [interactionResetController]),
-    (0, G.useEffect)(() => () => hoverFallbackController.dispose(), [hoverFallbackController]),
-    (0, G.useEffect)(() => () => siteRequestDispatchController.dispose(), [siteRequestDispatchController]),
-    (0, G.useEffect)(() => () => commentPreviewCloseController.dispose(), [commentPreviewCloseController]),
-    (0, G.useEffect)(() => () => editorAnchorRestoreController.dispose(), [editorAnchorRestoreController]),
-    (0, G.useEffect)(() => () => elementEditorOpenController.dispose(), [elementEditorOpenController]),
-    (0, G.useEffect)(() => () => editorCommentReconciliationController.dispose(), [editorCommentReconciliationController]),
-    (0, G.useEffect)(() => {
-      let t = eb(e);
-      (t.forEach((e, n) => {
-        ((!Ee.some((e) => e.id === n) &&
-          n !== Re?.id &&
-          (x?.anchor.type !== `element` || x.anchor.element !== e)) ||
-          !e.isConnected) &&
-          t.delete(n);
-      }),
-        _ != null && !Fe.some((e) => e.id === _) && ft(_),
-        pt(Fe));
-    }, [Re, x, Ee, _, e, Fe]),
-    (0, G.useEffect)(() => {
-      k === `browse` && mt(_);
-    }, [_, k]),
-    (0, G.useLayoutEffect)(() => {
-      if (!(k !== `comment` || De || x != null)) return zy(e, E.current, ke);
-    }, [x, k, De, e, ke]),
-    (0, G.useEffect)(() => {
-      if (y == null) return;
-      let e = Ee.find((e) => e.id === y) ?? null;
-      e != null && ht(e);
-    }, [Ee, y]));
-  let bt = (0, G.useEffectEvent)((e) => {
-      if (suspensionNotifier.update(k, e)) ve.current = e;
+    useAnnotationControllerDisposalLifecycle(G.useEffect, [
+      viewportRefreshScheduler, hoverSyncController, pointerModeSyncController, preparedScreenshotController,
+      unavailableSiteInteractionController, selectionModifierController, removeSelectionController,
+      pointRetryController, pointSelectionController, designPointSelectionController, selectionCommentController,
+      textAnchorEditorController, editEditorController, commentPreviewController, designEditorOpenController,
+      virtualSelectionEditorController, createAnchorUpdateController, interactionResetController,
+      hoverFallbackController, siteRequestDispatchController, commentPreviewCloseController,
+      editorAnchorRestoreController, elementEditorOpenController, editorCommentReconciliationController,
+    ]),
+    useAnnotationReconciliationLifecycle({
+      useEffect: G.useEffect, useLayoutEffect: G.useLayoutEffect, rootHost: e, getElementCache: eb,
+      comments: Ee, activeDesignChange: Re, editor: x, previewCommentId: _, pageComments: Fe,
+      closePreview: ft, reconcileComments: pt, interactionMode: k, resetInteraction: mt,
+      isSuspended: De, pointerRef: E, nativeTextSelection: ke, installNativeSelection: zy,
+      selectedCommentId: y, openComment: ht,
     }),
-    xt = (0, G.useEffectEvent)((e) => {
-      e.isTrusted && e.code === `Space` && e.type === `keydown` && !e.repeat && (ye.current = !1);
-      let t = ye.current && e.code === `Space`;
-      if (k !== `comment` && !t) return;
-      let n = i_(e, t || De || ve.current, {
-        preserveTyping: e.composedPath().some((e) => F(e) && gl(e)),
-      });
-      n != null && ((ye.current = n), bt(n));
-    });
-  ((0, G.useEffect)(
-    () =>
-      createAnnotationGlobalInputTracking({
-        observeFrames: (install) => dc(install),
-        isTrusted: (event) => event.isTrusted,
-        toViewportPoint: (windowLike, point) => Lc(windowLike, point),
-        onKeyDown: xt,
-        onKeyUp: xt,
-        onPointerMove: (point) => { E.current = point; },
-        onBlur: () => { E.current = null; },
-        hasFocus: () => document.hasFocus(),
-        clearTransientModifierState: () => { ve.current = !1; ye.current = !1; },
-      }).install(),
-    [],
-  ),
+    useAnnotationGlobalInputLifecycle({
+      useEffectEvent: G.useEffectEvent, useEffect: G.useEffect, suspensionNotifier,
+      interactionMode: k, isSuspended: De, suspensionRef: ve, spaceKeyRef: ye,
+      normalizeKeyboardModifier: i_, isEditableElement: F, preservesTyping: gl,
+      createGlobalInputTracking: createAnnotationGlobalInputTracking,
+      observeFrames: (install) => dc(install),
+      toViewportPoint: (windowLike, point) => Lc(windowLike, point), pointerRef: E, document,
+    }),
     (0, G.useEffect)(() => createAnnotationPointerInteractionController({
       De, gt, w, E, f, o, c, Ne, Ue, yt, Oe, x, selectionModifierNotifier, g, xl, bl, e, t, Lc, k, D, mc, Jc, A, fc, wl, Ce, pl, vl, tv, Yy, ac, isAnnotationPointInViewport, Te, document, me, xe, Se, u_, oe, ut, al, G_, iv, j, window, T, C_, S, be, m, pe, updateAnnotationRegionDrag, pb, gu, ec, pd, rt, st, Ze, Je, le, ce, ot, ml, dc, P_, hl, Lv, Iv, O, _l, od, _b, installAnnotationPointerEventLifecycle,
     }), [x, t, Oe, A, Ne, ut, ot, k, De, Ue, Te, e, st, Ze, Je, n.viewportScale, Me, rt, j]),
-    (0, G.useEffect)(() => {
-      if (k !== `comment` || De || x != null) return;
-      const hoverRefreshController = createAnnotationHoverRefreshController({
-        enabled: () => k === `comment` && !De && x == null,
-        getPointer: () => E.current,
+    useAnnotationHoverRefreshLifecycle({
+      useEffect: G.useEffect, interactionMode: k, isSuspended: De, editor: x,
+      canUseSiteAnnotationApi: A, rootHost: e, showMetadata: Me,
+      createHoverRefreshController: () => createAnnotationHoverRefreshController({
+        enabled: () => k === `comment` && !De && x == null, getPointer: () => E.current,
         shouldSkipPointer: (point) => gt(point, A),
         isSurfaceAtPointer: (point) => point != null && Boolean(w.current?.hover(point)),
-        resolveHover: (point) => point == null ? null : Yy(Xy(point, e, A)),
-        setHover: o,
-        clearSelectionHover: () => c(null),
-        setScrollSuppressed: (value) => { Ce.current = value; },
-        refreshViewport: () => T(C_()),
-        installFrames: (install) => dc(install),
-        flushResize: (refresh) => (0, lb.flushSync)(refresh),
-        debounceMs: vb,
+        resolveHover: (point) => point == null ? null : Yy(Xy(point, e, A)), setHover: o,
+        clearSelectionHover: () => c(null), setScrollSuppressed: (value) => { Ce.current = value; },
+        refreshViewport: () => T(C_()), installFrames: (install) => dc(install),
+        flushResize: (refresh) => (0, lb.flushSync)(refresh), debounceMs: vb,
         setTimeout: (callback, delay) => window.setTimeout(callback, delay),
         clearTimeout: (handle) => window.clearTimeout(handle),
-      });
-      const cleanupHoverRefresh = hoverRefreshController.install();
-      return () => {
-        cleanupHoverRefresh();
-        hoverRefreshController.dispose();
-      };
-    }, [x, A, k, De, e, Me]),
-    (0, G.useEffect)(
-      () =>
-        editorAnchorSyncController.install({
-          editor: x,
-          previewCommentId: _,
-          comments: Ee,
-          rootHost: e,
-          zoom: j,
-          viewportScale: n.viewportScale,
-        }),
-      [editorAnchorSyncController, x, Ee, _, e, n.viewportScale, j],
-    ),
-    (0, G.useEffect)(() => {
-      let e = k === `comment` && x == null && Ne && h;
-      designModifierNotifier.update(e);
-    }, [x, Ne, k, h, designModifierNotifier]),
-    (0, G.useEffect)(() => () => i.clear(), [i]),
-    (0, G.useEffect)(() => Kv(k === `comment` ? Ve : xb, Ie), [k, Ie, Ve]),
-    (0, G.useLayoutEffect)(() =>
-      createAnnotationAnchorObservationController({
-        windowLike: window,
-        documentLike: document,
-        isCurrentPage: (annotation) => Qy(annotation),
-        mergeTextAnnotations: (annotations, previous) => uu(annotations, previous),
-        updateTextAnnotations: de,
-        refreshViewport: () => T(C_()),
-        observeFrames: (install) => dc(install),
+      }),
+    }),
+    useAnnotationAnchorRuntimeLifecycle({
+      useEffect: G.useEffect, useLayoutEffect: G.useLayoutEffect, editorAnchorSyncController,
+      editor: x, previewCommentId: _, comments: Ee, rootHost: e, zoom: j, viewportScale: n.viewportScale,
+      interactionMode: k, canUseTweaks: Ne, designModifierPressed: h, designModifierNotifier,
+      targetRegistry: i, syncDesignChanges: Kv, visibleDesignChanges: Ve, emptyCollection: xb, elementCache: Ie,
+      createAnchorObservationController: () => createAnnotationAnchorObservationController({
+        windowLike: window, documentLike: document, isCurrentPage: (annotation) => Qy(annotation),
+        mergeTextAnnotations: (annotations, previous) => uu(annotations, previous), updateTextAnnotations: de,
+        refreshViewport: () => T(C_()), observeFrames: (install) => dc(install),
         observeTextAnchors: (anchors, onChange) => anchors.length > 0 ? du(anchors, onChange) : () => {},
         observeMutationsOutsideOverlay: (documentLike, rootHost, interactionLayer) => tb(documentLike, rootHost, interactionLayer),
         observeScrollContainers: (windowLike, anchors, onChange) => Pc(windowLike, anchors, onChange),
         flushSync: (callback) => (0, lb.flushSync)(callback),
-      }).install({
-        editor: x,
-        previewCommentId: te,
-        annotations: Ee,
-        hasDisplayAnnotations: Fe.length > 0,
-        interactionMode: k,
-        observeDocumentScroll: Ge,
-        observeMutations: Ke,
-        interactionLayer: lt,
-        rootHost: e,
       }),
-    [x, te, Ee, Ge, Ke, k, lt, e, Fe.length]));
+      anchorObservationState: {
+        editor: x, previewCommentId: te, annotations: Ee, hasDisplayAnnotations: Fe.length > 0,
+        interactionMode: k, observeDocumentScroll: Ge, observeMutations: Ke, interactionLayer: lt, rootHost: e,
+      },
+    }));
   let St = k === `comment` && !De && n.isOriginalViewEnabled !== !0,
     Ct = k === `comment` && !De && !ke && (x == null || x.target.mode === `create`);
-  ((0, G.useLayoutEffect)(() => {
-    if (ke) return Vg();
-  }, [ke]),
-    (0, G.useLayoutEffect)(() => {
-      let e = document.getElementById(wl);
-      if (e instanceof HTMLDivElement)
-        return (
-          (e.style.pointerEvents = Ct ? `auto` : `none`),
-          () => {
-            e.style.pointerEvents = `none`;
-          }
-        );
-    }, [e, Ct]));
+  useAnnotationInteractionVisibilityLifecycle({
+    useLayoutEffect: G.useLayoutEffect, nativeTextSelection: ke, clearNativeTextSelection: Vg,
+    document, interactionLayerId: wl, interactionEnabled: Ct, HTMLDivElement, rootHost: e,
+  });
   let activeRuntimeState = projectAnnotationActiveRuntimeState({
       previewCommentId: te, visibleComments: Le, selectedCommentId: We, editor: x, multiSelectEnabled: Oe,
       activeHighlightRect: ae, linkedSelectionIndex: l, elementCache: Ie, allComments: Fe, pageUrl: je, numbering: Pe,
@@ -23992,14 +23903,10 @@ function Wy({ rootHost: e, bridge: t }) {
     Gt = activeRuntimeState.activeGeometry.skipScreenshotCapture, Kt = activeRuntimeState.selectedComment,
     qt = activeRuntimeState.regionRecords, textPreviewState = activeRuntimeState.textPreviewState,
     Yt = textPreviewState.resolvedAnchor;
-  (0, G.useLayoutEffect)(() => {
-    textHighlightController.update(Yt);
-    return () => textHighlightController.update(null);
-  }, [Yt, textHighlightController]);
-  (0, G.useEffect)(() => () => textHighlightController.dispose(), [textHighlightController]);
-  (0, G.useEffect)(() => () => suspensionNotifier.dispose(), [suspensionNotifier]);
-  (0, G.useEffect)(() => () => designModifierNotifier.dispose(), [designModifierNotifier]);
-  (0, G.useEffect)(() => () => selectionModifierNotifier.dispose(), [selectionModifierNotifier]);
+  useAnnotationHighlightControllerLifecycle({
+    useLayoutEffect: G.useLayoutEffect, useEffect: G.useEffect, resolvedAnchor: Yt,
+    textHighlightController, suspensionNotifier, designModifierNotifier, selectionModifierNotifier,
+  });
   let highlightRuntimeState = projectAnnotationHighlightRuntimeState({
       textPreviewState, hasActiveSelection: Ot, active: M, activeElement: Ut, activeAdditionalAnchors: Wt,
       editor: x, activeHighlightRect: ae, hoveredSnapshot: a, metadataSnapshot: ee, viewport: se,
@@ -24041,20 +23948,11 @@ function Wy({ rootHost: e, bridge: t }) {
     cn = renderState.isRemoveHover, ln = renderState.mode, un = renderState.hotspot,
     draftMarkerState = overlayRuntimeState.draftMarkerState,
     dn = draftMarkerState.markerPoint, pn = draftMarkerState.commentNumber, hn = overlayRuntimeState.overlayStyle;
-  let gn = (0, G.useEffectEvent)((e) => {
-    t.sendMessageToHost({
-      type: `browser-sidebar-runtime-comment-screenshot-ready`,
-      commentId: e,
-      annotationViewportRect: rn,
-      markerViewportPoint: Ht,
-      ...(Gt ? { skipScreenshotCapture: !0 } : {}),
-    });
+  useAnnotationScreenshotReadyLifecycle({
+    useEffectEvent: G.useEffectEvent, useEffect: G.useEffect, bridge: t, annotationId: Et,
+    hasPreview: te != null, annotationViewportRect: rn, markerViewportPoint: Ht,
+    skipScreenshotCapture: Gt, screenshotReadyController,
   });
-  (0, G.useEffect)(() => {
-    return screenshotReadyController.update(Et, te != null, gn);
-  }, [te, Et, gn, screenshotReadyController]);
-  (0, G.useEffect)(() => () => screenshotReadyController.dispose(), [screenshotReadyController]);
-  (0, G.useEffect)(() => () => screenshotReadyController.dispose(), [screenshotReadyController]);
   let _n = renderAnnotationOverlayContent({
     interactionEnabled: Ct, regionRecords: qt, viewport: se, zoomFactor: j, additionalHighlights: nn,
     highlightBorderRadius: tn, highlightClassName: en, removeHighlight, highlightRect: Qt, draftHoverSnapshot: sn,
@@ -24085,35 +23983,10 @@ function Wy({ rootHost: e, bridge: t }) {
     stylesheet: wv,
   }, { jsx: db.jsx, jsxs: db.jsxs, IntlProvider: Og, onIntlError: bb, InteractionLayer: Ky });
 }
-function Ky({ children: e, style: t }) {
-  let n = (0, G.useRef)(null),
-    [r, i] = (0, G.useState)(!1);
-  return (
-    (0, G.useLayoutEffect)(() => {
-      let e = n.current;
-      if (e == null) return;
-      let t = null,
-        r = () => {
-          let t = _c(e, !1);
-          return (i(t), t);
-        };
-      return (
-        r() || (t = window.requestAnimationFrame(r)),
-        () => {
-          (t != null && window.cancelAnimationFrame(t), vc(e));
-        }
-      );
-    }, []),
-    (0, db.jsx)(`div`, {
-      ref: n,
-      popover: `manual`,
-      className: `interaction-layer`,
-      style: r ? t : void 0,
-      "data-browser-comment-interaction-layer": !0,
-      children: e,
-    })
-  );
-}
+var Ky = createAnnotationInteractionLayerComponent({
+  useRef: G.useRef, useState: G.useState, useLayoutEffect: G.useLayoutEffect, jsx: db.jsx,
+  windowLike: window, showPopover: _c, cleanupPopover: vc,
+});
 function qy() {
   return (0, db.jsx)(`div`, {
     className: `interaction-blocker`,

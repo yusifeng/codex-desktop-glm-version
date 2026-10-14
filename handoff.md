@@ -1,5 +1,13 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮将 Wy 剩余的 controller disposal、reconciliation、global input、hover refresh、
+editor/anchor observation、interaction visibility、highlight/screenshot-ready 生命周期迁入
+`annotation-controller-lifecycle.ts` 与 `annotation-runtime-effect-lifecycle.ts`，并将 Ky popover/RAF owner
+迁入 `annotation-interaction-layer-component.ts`；保留 hook 顺序、重复 screenshot cleanup、
+RAF retry/cancel 与 popover cleanup，从原文件删除约 194 行。focused test 为
+`scripts/test-preload-annotation-runtime-lifecycle.mjs`（20 项）。至此 A2 annotation React owner
+已无未迁出的大型业务/生命周期主体，Wy 剩余为状态声明、依赖 adapter 与语义 owner 组合。
+
 本轮将 `Vet` 的完整 artifact subscription/session 子 owner 迁移至
 `src/main/main-app/remote-artifact/artifact-subscription-manager.ts` 并真实接回；删除原约 250 行
 subscription map、host open/close、append/read/dirty、event/flush、RPC broken 与 drain 实现，`Vet` 仅保留
