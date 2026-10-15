@@ -40,6 +40,7 @@ export function createBrowserRuntimeSyncControllerClass(dependencies: Record<str
         getSiteBootstrapToken: host.getSiteBootstrapToken,
         siteBootstrapSignal: host.siteBootstrapController.signal,
         browserSessionRegistry: host.browserSessionRegistry,
+        bindPageToWebview: host.pageWebviewBindingController?.bindPageToWebview?.bind(host.pageWebviewBindingController),
         comments: host.comments,
         dismissCommentEditorForCommittedNavigation: bind(`dismissCommentEditorForCommittedNavigation`),
         enforceDetachedPageBudget: tabBudgetBind(`enforceDetachedPageBudget`),

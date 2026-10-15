@@ -846,8 +846,10 @@ activation）已迁移至 `browser-comment-mode-controller.ts`，focused test �
 
 随后导航/command context 与 WebContents/page binding owner 已完成：`browser-navigation-context-controller.ts`
 接管页面 command context、历史导航、受限导航和 browser error page；`browser-page-webview-binding-controller.ts`
-接管 `bindPageToWebview` 生命周期。新增两组 focused tests，navigation batch 的完整 webview 导航事件绑定仍由
-binding controller 保持职责边界。
+已静态接管原 generated `uZ` 的完整 `bindPageToWebview` 生命周期，包含 attach、navigation/media/input/context-menu、
+window-open、restore、crash/unresponsive、destroy/dispose；main-C 原约 1000 行实现已删除，新增 focused structural
+assertions。runtime lifecycle helper 的 attach 完成、comment dismiss、error/navigation、reload、zoom/device metrics
+与交互适配由 `browser-page-lifecycle-helpers-controller.ts` 持有，新增 5 项 focused assertions。
 
 ### 增量抽取：IAB host policy/diagnostics controller
 
@@ -861,8 +863,9 @@ bootstrap cancellation 与 persistence-owner wrappers 已迁入
 ### A3 main 剩余大 owner（2026-10-15）
 
 `vZe/xZe/Vet/Wtt/DYe/Pit/Qot/Eat/Wit/Sat` 均已移出，cross-platform capture-request owner 也已真实接回。
-当前明确剩余的大 owner 为 `tQe` IAB/browser-sidebar manager，以及其内部尚未迁出的
-presentation/page/materialization 子 owner。`ztt` 是保留的 node-pty I/O adapter。
+当前 tQe 只剩少量 manager-level glue（例如 `isBrowserPageWebContents`）与构造时的依赖组合；页面、导航、
+WebContents binding、runtime projection、policy/diagnostics、window/thread state 等大 owner 均已迁出。`ztt` 是
+保留的 node-pty I/O adapter。
 
 ### A3 main 剩余 owner 复核（2026-10-11）
 

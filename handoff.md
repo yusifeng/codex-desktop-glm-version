@@ -30,6 +30,12 @@ thread/runtime snapshot 同步与 comment snapshot 已分别迁入 `browser-page
 browser error page 已迁入 `browser-navigation-context-controller.ts`，`bindPageToWebview` 已迁入
 `browser-page-webview-binding-controller.ts`；两批均保留 focused tests，并在 main-C 中真实接回。
 
+本轮进一步完成 binding owner 的静态迁移：原 generated `uZ` 的 WebContents attach、navigation/media/input/
+context-menu、window-open、restore、crash/unresponsive、destroy/dispose 事件图已整体迁入
+`browser-page-webview-binding-controller.ts`，并从 main-C 删除原约 1000 行实现；不再通过 generated facade 或动态执行。
+同时将 runtime lifecycle helper 的 attach、comment dismiss、error/navigation、reload、zoom/device metrics 与交互适配
+迁入 `browser-page-lifecycle-helpers-controller.ts`。focused tests 分别覆盖 binding lifecycle 结构断言与 5 项 helper assertions。
+
 本轮继续收口 tQe host policy/diagnostics：in-app browser admission/session、settings webview mount/theme、owner
 accelerator refresh、debug snapshot/feedback/debug-tab、MCP completion cleanup、browser-use navigation restriction
 与 site bootstrap/persistence wrappers 已迁入 `browser-host-policy-controller.ts`，并在 main-C 中真实接回。
