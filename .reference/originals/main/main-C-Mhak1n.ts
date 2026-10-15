@@ -88,6 +88,7 @@ const { createBrowserPageWebviewBindingControllerClass } = require("./main-app/b
 const { createBrowserPresentationSyncControllerClass } = require("./main-app/browser-sidebar/browser-presentation-sync-controller.js");
 const { createBrowserWindowThreadStateControllerClass } = require("./main-app/browser-sidebar/browser-window-thread-state-controller.js");
 const { createBrowserNavigationContextControllerClass } = require("./main-app/browser-sidebar/browser-navigation-context-controller.js");
+const { createBrowserPageLookupControllerClass } = require("./main-app/browser-sidebar/browser-page-lookup-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
 let c = require("node:url"),
@@ -115500,6 +115501,7 @@ var $Ze = class {
     runtimeSyncController;
     navigationContextController;
     pageWebviewBindingController;
+    pageLookupController;
     hostPolicyController;
     onAppEntrySource;
     isDefaultBrowser;
@@ -115541,6 +115543,7 @@ var $Ze = class {
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ uZe, hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW }))(this)),
+        (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
 (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, id, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, EHe, wHe, JU, xu, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
@@ -115730,10 +115733,7 @@ var $Ze = class {
     getDebugSnapshot(...args) { return this.hostPolicyController.getDebugSnapshot(...args); }
     getFeedbackDiagnostics(...args) { return this.hostPolicyController.getFeedbackDiagnostics(...args); }
     isBrowserPageWebContents(e) {
-      return (
-        this.browserPageHostLifecycle.findPageStateForWebContentsId(e.id)?.page.view.webContents ===
-        e
-      );
+      return this.pageLookupController.isBrowserPageWebContents(e);
     }
     openDebugTabOwner(...args) { return this.hostPolicyController.openDebugTabOwner(...args); }
     getBrowserUseRouteActionHelpers(...args) { return this.browserUseRouteController.getBrowserUseRouteActionHelpers(...args); }

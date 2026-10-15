@@ -895,7 +895,6 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
         e.finishPageAttach(t, r, i, o),
         e.enforceDetachedPageBudget(t));
     }
-  }
 
   return class BrowserPageWebviewBindingController {
     private readonly bindings = new WeakMap<object, any>();
