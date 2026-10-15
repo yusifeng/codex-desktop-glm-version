@@ -841,8 +841,8 @@ activation）已迁移至 `browser-comment-mode-controller.ts`，focused test �
 `src/main/main-app/browser-sidebar/browser-page-materialization-controller.ts` 和
 `src/main/main-app/browser-sidebar/browser-runtime-sync-controller.ts`；原入口保留委托与宿主依赖注入，新增
 `test-main-browser-page-materialization-controller.mjs`、`test-main-browser-runtime-sync-controller.mjs` 两组 focused
-断言。runtime projection 中尚未独立迁出的导航/WebContents binding helper 通过显式 adapter fallback 保持构造安全，
-其完整行为继续由后续 navigation/binding owner 收口。
+断言；其 page lifecycle helper 已由 `browser-page-lifecycle-helpers-controller.ts` 接管，WebContents binding
+由后续静态 binding owner 完整接回。
 
 随后导航/command context 与 WebContents/page binding owner 已完成：`browser-navigation-context-controller.ts`
 接管页面 command context、历史导航、受限导航和 browser error page；`browser-page-webview-binding-controller.ts`
@@ -850,6 +850,7 @@ activation）已迁移至 `browser-comment-mode-controller.ts`，focused test �
 window-open、restore、crash/unresponsive、destroy/dispose；main-C 原约 1000 行实现已删除，新增 focused structural
 assertions。runtime lifecycle helper 的 attach 完成、comment dismiss、error/navigation、reload、zoom/device metrics
 与交互适配由 `browser-page-lifecycle-helpers-controller.ts` 持有，新增 5 项 focused assertions。
+page WebContents identity lookup 另迁入 `browser-page-lookup-controller.ts`，tQe 仅保留委托。
 
 ### 增量抽取：IAB host policy/diagnostics controller
 

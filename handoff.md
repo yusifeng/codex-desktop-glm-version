@@ -23,8 +23,8 @@ page host lifecycle 中 registerHost 的 conversation/tab 参数顺序。focused
 
 随后完成 tQe 的 page materialization 与 runtime projection owner：冷恢复、页面对象构造、生命周期更新、
 thread/runtime snapshot 同步与 comment snapshot 已分别迁入 `browser-page-materialization-controller.ts` 和
-`browser-runtime-sync-controller.ts`，并保留 focused tests。runtime controller 对尚未迁出的导航/WebContents
-绑定 helper 使用显式 adapter fallback；这些 helper 的完整语义仍属于下一批导航/绑定 owner，不计入本批已完成。
+`browser-runtime-sync-controller.ts`，并保留 focused tests；其 page lifecycle helper 已由
+`browser-page-lifecycle-helpers-controller.ts` 接管，后续 binding owner 已完成静态接回。
 
 随后完成导航/command context 与 WebContents/page binding owner：页面 command context、历史导航、受限导航与
 browser error page 已迁入 `browser-navigation-context-controller.ts`，`bindPageToWebview` 已迁入
@@ -35,6 +35,9 @@ context-menu、window-open、restore、crash/unresponsive、destroy/dispose 事�
 `browser-page-webview-binding-controller.ts`，并从 main-C 删除原约 1000 行实现；不再通过 generated facade 或动态执行。
 同时将 runtime lifecycle helper 的 attach、comment dismiss、error/navigation、reload、zoom/device metrics 与交互适配
 迁入 `browser-page-lifecycle-helpers-controller.ts`。focused tests 分别覆盖 binding lifecycle 结构断言与 5 项 helper assertions。
+
+最后将 tQe 的 page WebContents identity lookup 迁入 `browser-page-lookup-controller.ts`，tQe 仅保留委托；focused
+test 覆盖 live page identity 与 missing page 两种结果。
 
 本轮继续收口 tQe host policy/diagnostics：in-app browser admission/session、settings webview mount/theme、owner
 accelerator refresh、debug snapshot/feedback/debug-tab、MCP completion cleanup、browser-use navigation restriction
