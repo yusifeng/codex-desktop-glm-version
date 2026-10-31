@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 user-verification RPC services
+
+原 `znt/Bnt` 已迁入 `src/main/main-app/user-verification/rpc-services.ts`。新 adapters 保留 per-host connection lookup、
+conversation/request verification begin、wait/accept/cancel forwarding 与 dispose 时取消 attempt；条件式 runtime
+consumer 已接回，旧 classes 已删除。
+
 ## 2026-10-31 trigger subscription reader
 
 原 `Int/Lnt/Rnt` 已整簇迁入 `src/main/main-app/triggers/trigger-subscription-reader.ts`。新 owner 保留 strict

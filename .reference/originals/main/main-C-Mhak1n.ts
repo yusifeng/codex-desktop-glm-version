@@ -118,6 +118,7 @@ const { createThreadReadStateRpcServices } = require("./main-app/thread-read-sta
 const { createThreadTurnSummaryServiceClass } = require("./main-app/threads/thread-turn-summary-service.js");
 const { createTracingRpcServiceClass } = require("./main-app/tracing/tracing-rpc-service.js");
 const { createTriggerSubscriptionReaderClass } = require("./main-app/triggers/trigger-subscription-reader.js");
+const { createUserVerificationRpcServices } = require("./main-app/user-verification/rpc-services.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140576,33 +140577,8 @@ var Fnt = createTracingRpcServiceClass({
     RpcHandlerBase: n.Uf,
     chunkArray: dp.default,
   }),
-  znt = class extends n.Uf {
-    getConnection;
-    constructor(e) {
-      (super(), (this.getConnection = e));
-    }
-    async begin({ hostId: e, conversationId: t, requestId: n }) {
-      return new Bnt(this.getConnection(e).userVerification.begin(t, n));
-    }
-  },
-  Bnt = class extends n.Uf {
-    attempt;
-    constructor(e) {
-      (super(), (this.attempt = e));
-    }
-    wait() {
-      return this.attempt.wait();
-    }
-    accept() {
-      return this.attempt.accept();
-    }
-    cancel() {
-      this.attempt.cancel();
-    }
-    [Symbol.dispose]() {
-      this.attempt.cancel();
-    }
-  },
+  { UserVerificationService: znt, UserVerificationAttempt: Bnt } =
+    createUserVerificationRpcServices({ RpcHandlerBase: n.Uf }),
   Vnt = 5e6,
   Hnt = n.Of().regex(/^visualization-[0-9a-f]{16}$/),
   Unt = n

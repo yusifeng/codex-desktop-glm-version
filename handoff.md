@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `znt/Bnt` user-verification RPC facade/attempt 迁入 `user-verification/rpc-services.ts`；host connection lookup、
+verification begin、wait/accept/cancel forwarding 与 dispose-cancel 均由新 adapters 持有。条件式 runtime consumer 已
+接回，旧 classes 已删除。focused test 覆盖 15 项。
+
 随后将 `Int/Lnt/Rnt` trigger subscription reader 迁入 `triggers/trigger-subscription-reader.ts`；strict response
 schema、thread-id dedupe、100-item batching、request 前后 principal identity recheck、AbortController rollover 与 per-thread
 projection 均由新 owner 持有。唯一 runtime construction/cancellation 已接回，旧 cluster 已删除。focused test 覆盖 22 项。
