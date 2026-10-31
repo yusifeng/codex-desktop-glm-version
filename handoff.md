@@ -4686,3 +4686,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   cmd environment 与 WSL path/distro；Git Bash/GitHub Desktop 的共享 directory consumer 也接回新 owner。
 - main 旧实现删除 331 行，新生产模块 449 行；focused coverage 61 项，no-unwired gate 扩至 120 项。
   下一批继续成组迁移 VS Code/Cursor/Windsurf/Antigravity/Devin family 与其 platform detection adapters。
+
+# 2026-11-01 VS Code-derived open-target owner
+
+- `src/main/main-app/open-target/vscode-family-targets.ts` 已接管 Antigravity、Cursor、Devin Desktop、VS Code、
+  VS Code Insiders、Windsurf 六个 descriptors，以及 VS Code remote args、Cursor macOS Electron/CLI runtime、
+  Cursor environment、Windows PATH/install/Electron resolution 和 Linux desktop fallback；factory 输出直接进入
+  既有 registry，不新增第二份状态。
+- main 旧 declarations/helpers 删除 158 行，新生产模块 235 行；focused coverage 45 项，no-unwired gate 扩至
+  129 项。下一批继续成组审计 Zed/Sublime Text/Visual Studio/Xcode 等剩余 editor/document targets，保持
+  专用 platform adapter 与 descriptor 同批迁移。

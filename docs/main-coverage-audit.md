@@ -2678,3 +2678,14 @@ WSL distro/path args 已整体迁移至 `src/main/main-app/open-target/terminal-
 e0/H4e/U4e/W4e/t0/G4e/K4e/J4e/p0/Z3e/Q3e` 实现已物理删除。focused test
 `scripts/test-main-terminal-targets-owner.mjs` 覆盖 61 项 editor、shell、macOS/Linux/Windows/WSL detection、
 args、fallback、environment、descriptor 和 launch 行为。
+
+### 增量抽取：VS Code-derived open-target owner
+
+Antigravity、Cursor、Devin Desktop、VS Code、VS Code Insiders 与 Windsurf 六个 descriptors，以及共用的
+local/SSH remote args 分派、Cursor macOS Electron/CLI 双入口探测和 Node 环境变量映射、Cursor/Antigravity
+Windows PATH/install fallback、VS Code/Insiders Electron app resolution 与各平台 application/desktop-entry
+候选已整体迁移至 `src/main/main-app/open-target/vscode-family-targets.ts`。main 通过
+`createVscodeFamilyTargetRuntime` 将六个 descriptors 直接交给同一 open-target registry；旧
+`M4e/X4e/n0/Z4e/G3e/q3e` helpers 和六组内联 declarations 已物理删除，没有复制 target state。
+focused test `scripts/test-main-vscode-family-targets-owner.mjs` 覆盖 45 项 descriptor surface、remote args、
+macOS runtime、Windows resolution、Linux fallback 与 Cursor environment 行为。

@@ -223,6 +223,7 @@ const { createOpenTargetFoundation } = require("./main-app/open-target/open-targ
 const { createOpenTargetRegistryRuntime } = require("./main-app/open-target/open-target-registry-runtime.js");
 const { createJetBrainsTargetRuntime } = require("./main-app/open-target/jetbrains-targets.js");
 const { createTerminalTargetRuntime } = require("./main-app/open-target/terminal-targets.js");
+const { createVscodeFamilyTargetRuntime } = require("./main-app/open-target/vscode-family-targets.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -71084,28 +71085,31 @@ var {
   targetLaunchArgs,
   targetDescriptors: targetDescriptorPolicy,
 });
-var j4e = U1({
-    id: `antigravity`,
-    label: `Antigravity`,
-    icon: `apps/antigravity.png`,
-    darwinDetect: () =>
-      F1([`/Applications/Antigravity.app/Contents/Resources/app/bin/antigravity`]),
-    win32Detect: M4e,
-    linuxDetect: () => W1([`antigravity-ide`], [`antigravity-ide.desktop`]),
-  });
-function M4e() {
-  let e = Yi(`antigravity.exe`) ?? Yi(`antigravity.cmd`) ?? Yi(`antigravity`);
-  return e
-    ? na(e)
-    : ta([
-        [`Antigravity`, `Antigravity.exe`],
-        [`antigravity`, `Antigravity.exe`],
-        [`Antigravity`, `bin`, `antigravity.cmd`],
-        [`antigravity`, `bin`, `antigravity.cmd`],
-        [`Antigravity`, `resources`, `app`, `bin`, `antigravity.cmd`],
-        [`antigravity`, `resources`, `app`, `bin`, `antigravity.cmd`],
-      ]);
-}
+var {
+  antigravity: j4e,
+  cursor: Y4e,
+  devin: Q4e,
+  vscode: W3e,
+  vscodeInsiders: K3e,
+  windsurf: Y3e,
+} = createVscodeFamilyTargetRuntime({
+  platform: process.platform,
+  path: h,
+  fs: v,
+  env: process.env,
+  createEditorTargetDescriptor: U1,
+  buildEditorArgs: R1,
+  buildVscodeRemoteArgs: z1,
+  isHostConfig: n.Es,
+  findExistingMacApplication: F1,
+  findMacApplicationBundle: L1,
+  macApplicationCandidates: P1,
+  findCommandOrDesktopEntry: W1,
+  findExecutable: Yi,
+  resolveExecutableLink: na,
+  findWindowsInstall: ta,
+  resolveWindowsElectronApp: oa,
+});
 var N4e = {
   id: `bbedit`,
   platforms: {
@@ -71147,79 +71151,7 @@ var {
   getWslInfo: () => n.Ni(),
   spawn: Zi,
 });
-var Y4e = U1({
-    id: `cursor`,
-    label: `Cursor`,
-    icon: `apps/cursor.png`,
-    darwinDetect: () => n0()?.electronBin ?? null,
-    win32Detect: Z4e,
-    linuxDetect: () => W1([`cursor`], [`cursor.desktop`]),
-    darwinEnv: () => {
-      let e = { ...process.env };
-      return (
-        (e.VSCODE_NODE_OPTIONS = e.NODE_OPTIONS),
-        (e.VSCODE_NODE_REPL_EXTERNAL_MODULE = e.NODE_REPL_EXTERNAL_MODULE),
-        delete e.NODE_OPTIONS,
-        delete e.NODE_REPL_EXTERNAL_MODULE,
-        (e.ELECTRON_RUN_AS_NODE = `1`),
-        e
-      );
-    },
-    darwinArgs: (...e) => {
-      let t = n0();
-      if (!t) throw Error(`Cursor CLI entrypoint not available`);
-      return [t.cliJs, ...X4e(...e)];
-    },
-  }),
-  X4e = (e, t, r, i, a) =>
-    r != null && n.Es(r) && (i != null || a != null)
-      ? z1({ hostConfig: r, location: t, remotePath: a, remoteWorkspaceRoot: i })
-      : R1(e, t);
-function n0() {
-  if (process.platform !== `darwin`) return null;
-  let e = [
-      `/Applications/Cursor.app`,
-      `/Applications/Cursor Preview.app`,
-      `/Applications/Cursor Nightly.app`,
-    ],
-    t = L1(`Cursor`);
-  t && e.push(t);
-  for (let t of e)
-    for (let e of P1(t)) {
-      let t = (0, h.join)(e, `Contents`, `MacOS`, `Cursor`),
-        n = (0, h.join)(e, `Contents`, `Resources`, `app`, `out`, `cli.js`);
-      if ((0, v.existsSync)(t) && (0, v.existsSync)(n)) return { electronBin: t, cliJs: n };
-    }
-  return null;
-}
-function Z4e() {
-  let e = Yi(`cursor`);
-  if (e) {
-    let t = na(e);
-    if (t) {
-      if ((0, h.basename)(t).toLowerCase() === `cursor.exe`) return t;
-      let e = (0, h.dirname)(t);
-      if ((0, h.basename)(e).toLowerCase() === `bin`) {
-        let t = (0, h.dirname)(e);
-        if ((0, h.basename)(t).toLowerCase() === `app`) {
-          let e = (0, h.dirname)(t);
-          if ((0, h.basename)(e).toLowerCase() === `resources`) {
-            let t = (0, h.join)((0, h.dirname)(e), `Cursor.exe`);
-            if ((0, v.existsSync)(t)) return t;
-          }
-        }
-      }
-    }
-  }
-  return ta([[`Cursor`, `Cursor.exe`]]);
-}
-var Q4e = U1({
-    id: `devin`,
-    label: `Devin Desktop`,
-    icon: `apps/devin.svg`,
-    darwinDetect: () => F1([`/Applications/Devin.app/Contents/Resources/app/bin/devin-desktop`]),
-  }),
-  r0 = (e, t) => (t == null ? [e] : [`+${t.line}:${t.column}`, e]),
+var r0 = (e, t) => (t == null ? [e] : [`+${t.line}:${t.column}`, e]),
   $4e = {
     id: `emacs`,
     platforms: {
@@ -71512,69 +71444,6 @@ function U3e() {
         ),
       ) || Ine(`**\\Common7\\IDE\\devenv.exe`);
 }
-var W3e = U1({
-  id: `vscode`,
-  label: `VS Code`,
-  icon: `apps/vscode.png`,
-  darwinDetect: () =>
-    F1([
-      `/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code`,
-      `/Applications/Code.app/Contents/Resources/app/bin/code`,
-    ]),
-  win32Detect: G3e,
-  linuxDetect: () =>
-    W1(
-      [`code`, `code-oss`],
-      [
-        `code.desktop`,
-        `code-oss.desktop`,
-        `com.visualstudio.code.desktop`,
-        `com.visualstudio.code-oss.desktop`,
-        `code_code.desktop`,
-      ],
-    ),
-});
-function G3e() {
-  return oa({
-    pathCommand: Yi(`code`),
-    executableName: `Code.exe`,
-    installDirName: `Microsoft VS Code`,
-  });
-}
-var K3e = U1({
-  id: `vscodeInsiders`,
-  label: `VS Code Insiders`,
-  icon: `apps/vscode-insiders.png`,
-  darwinDetect: () =>
-    F1([
-      `/Applications/Visual Studio Code - Insiders.app/Contents/Resources/app/bin/code`,
-      `/Applications/Code - Insiders.app/Contents/Resources/app/bin/code`,
-    ]),
-  win32Detect: q3e,
-  linuxDetect: () =>
-    W1(
-      [`code-insiders`],
-      [
-        `code-insiders.desktop`,
-        `com.visualstudio.code.insiders.desktop`,
-        `code-insiders_code-insiders.desktop`,
-      ],
-    ),
-});
-function q3e() {
-  return oa({
-    pathCommand: Yi(`code-insiders`),
-    executableName: `Code - Insiders.exe`,
-    installDirName: `Microsoft VS Code Insiders`,
-  });
-}
-var Y3e = U1({
-    id: `windsurf`,
-    label: `Windsurf`,
-    icon: `apps/windsurf.png`,
-    darwinDetect: () => F1([`/Applications/Windsurf.app/Contents/Resources/app/bin/windsurf`]),
-    linuxDetect: () => W1([`windsurf`], [`windsurf.desktop`]),
-  });
 var $3e = {
     id: `xcode`,
     platforms: {

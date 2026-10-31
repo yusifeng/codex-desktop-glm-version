@@ -24,6 +24,7 @@ const realOwners = [
   ["src/main/main-app/open-target/open-target-registry-runtime.ts", "createOpenTargetRegistryRuntime"],
   ["src/main/main-app/open-target/jetbrains-targets.ts", "createJetBrainsTargetRuntime"],
   ["src/main/main-app/open-target/terminal-targets.ts", "createTerminalTargetRuntime"],
+  ["src/main/main-app/open-target/vscode-family-targets.ts", "createVscodeFamilyTargetRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -123,6 +124,13 @@ assert.equal(main.includes("async function L4e("), false, "generated Linux termi
 assert.equal(main.includes("async function K4e("), false, "generated macOS editor-terminal bridge must be removed");
 assert.equal(main.includes("async function J4e("), false, "generated Cmder detector must be removed");
 assert.equal(main.includes("function p0("), false, "generated WSL argument builder must be removed");
+assert.equal(main.includes("createVscodeFamilyTargetRuntime({"), true, "real VS Code family target owner is wired");
+assert.equal(main.includes("function M4e("), false, "generated Antigravity Windows detector must be removed");
+assert.equal(main.includes("X4e = ("), false, "generated VS Code family argument builder must be removed");
+assert.equal(main.includes("function n0("), false, "generated Cursor macOS runtime detector must be removed");
+assert.equal(main.includes("function Z4e("), false, "generated Cursor Windows detector must be removed");
+assert.equal(main.includes("function G3e("), false, "generated VS Code Windows detector must be removed");
+assert.equal(main.includes("function q3e("), false, "generated VS Code Insiders Windows detector must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("120 main unwired-owner skeleton assertions passed");
+console.log("129 main unwired-owner skeleton assertions passed");
