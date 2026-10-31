@@ -32,7 +32,22 @@ export class sve {
   dispose(): void { this.openFilesByConversationId.clear(); this.pendingIgnoreChangesUntilMsByKey.clear(); this.sync(); }
   setOpenReviewFileSourceFiles(id: string, files: WatchFile[]): void { const source = this.openFilesByConversationId.get(id) ?? emptySources(); source.reviewFiles = files; this.setSources(id, source); }
   setOpenFileTabFiles(id: string, files: WatchFile[]): void { const source = this.openFilesByConversationId.get(id) ?? emptySources(); source.openFiles = files; this.setSources(id, source); }
-  async setOpenMcpResources(id: string, appId: string, files: WatchFile[]): Promise<void> { const source = this.openFilesByConversationId.get(id) ?? emptySources(); files.length === 0 ? source.mcpResourcesByMcpAppId.delete(appId) : source.mcpResourcesByMcpAppId.set(appId, files); this.setSources(id, source); await Promise.all(files.map((file) => this.getStartPromise(id, file))); }
+  async setOpenMcpResources(id: string, appId: string, files: WatchFile[]): Promise<void> {
+    const source = this.openFilesByConversationId.get(id) ?? emptySources();
+    const previous = source.mcpResourcesByMcpAppId.get(appId);
+    files.length === 0 ? source.mcpResourcesByMcpAppId.delete(appId) : source.mcpResourcesByMcpAppId.set(appId, files);
+    this.setSources(id, source);
+    try {
+      await Promise.all(files.map((file) => this.getStartPromise(id, file)));
+    } catch (error) {
+      const current = this.openFilesByConversationId.get(id);
+      if (current?.mcpResourcesByMcpAppId.get(appId) === files) {
+        previous == null ? current.mcpResourcesByMcpAppId.delete(appId) : current.mcpResourcesByMcpAppId.set(appId, previous);
+        this.setSources(id, current);
+      }
+      throw error;
+    }
+  }
   removeConversation(id: string): void { this.openFilesByConversationId.delete(id); this.sync(); }
   getFileChangeMessages(watchId: string): UnknownRecord[] {
     if (this.isFileChangeIgnored(watchId)) return []; const target = this.watchesByWatchId.get(watchId)?.target; if (target == null) return [];
@@ -40,7 +55,7 @@ export class sve {
     target.openFiles.forEach((file) => paths.add(file.path));
     return [...messages, ...Array.from(paths, (path) => ({ type: `open-file-changed`, hostId: target.hostId, path })), ...Array.from(target.mcpResources.values(), (file) => ({ type: `mcp-resource-updated`, hostId: file.hostId, notification: { method: `notifications/resources/updated`, params: { uri: file.uri } }, server: file.server, threadId: file.threadId }))];
   }
-  ignoreFileChangeEvents(id: string, file: { hostId: string; path: string } | boolean): void { if (typeof file === `boolean`) { if (!file) return; for (const watch of this.watchesByKey.values()) watch.ignoreChangesUntilMs = Date.now() + 5000; return; } const path = this.params.getWatchPath(id, file.path); if (path == null) return; const entry = this.watchesByKey.get(key(file.hostId, path)); const until = Date.now() + 5000; if (entry != null) entry.ignoreChangesUntilMs = Math.max(entry.ignoreChangesUntilMs, until); else this.pendingIgnoreChangesUntilMsByKey.set(key(file.hostId, path), until); }
+  ignoreFileChangeEvents(id: string, file: { hostId: string; path: string } | boolean): void { if (typeof file === `boolean`) { if (!file) return; for (const watch of this.watchesByKey.values()) watch.ignoreChangesUntilMs = Date.now() + 5000; return; } const path = this.params.getWatchPath(id, file.path); if (path == null) return; const watchKey = key(file.hostId, path); const entry = this.watchesByKey.get(watchKey); const until = Date.now() + 5000; if (entry != null) entry.ignoreChangesUntilMs = Math.max(entry.ignoreChangesUntilMs, until); else { const expiry = Math.max(this.pendingIgnoreChangesUntilMsByKey.get(watchKey) ?? 0, until); this.pendingIgnoreChangesUntilMsByKey.set(watchKey, expiry); this.params.schedule(() => { if ((this.pendingIgnoreChangesUntilMsByKey.get(watchKey) ?? 0) <= expiry) this.pendingIgnoreChangesUntilMsByKey.delete(watchKey); }, 5000); } }
   private isFileChangeIgnored(id: string): boolean { const watch = this.watchesByWatchId.get(id); if (watch == null || watch.ignoreChangesUntilMs <= 0) return false; if (Date.now() < watch.ignoreChangesUntilMs) return true; watch.ignoreChangesUntilMs = 0; return false; }
   private setSources(id: string, source: OpenSources): void { source.reviewFiles.length === 0 && source.openFiles.length === 0 && source.mcpResourcesByMcpAppId.size === 0 ? this.openFilesByConversationId.delete(id) : this.openFilesByConversationId.set(id, source); this.sync(); }
   private target(next: Map<string, WatchTarget>, id: string, file: WatchFile): WatchTarget | null { const path = this.params.getWatchPath(id, file.path); if (path == null) return null; const watchKey = key(file.hostId, path); const current = next.get(watchKey) ?? { hostId: file.hostId, path, reviewFiles: [], openFiles: [], mcpResources: new Map() }; next.set(watchKey, current); return current; }
@@ -49,7 +64,7 @@ export class sve {
     for (const [watchKey, watch] of this.watchesByKey) { const target = next.get(watchKey); if (target == null) this.stop(watchKey, watch); else watch.target = target; }
     for (const [watchKey, target] of next) if (!this.watchesByKey.has(watchKey)) this.start(watchKey, target);
   }
-  private start(watchKey: string, target: WatchTarget): void { const watchId = `open-file-${this.params.createId()}`; const watch: Watch = { watchId, target, ignoreChangesUntilMs: this.pendingIgnoreChangesUntilMsByKey.get(watchKey) ?? 0, isStarted: false, shouldUnwatchOnStart: false, startPromise: Promise.resolve() }; this.pendingIgnoreChangesUntilMsByKey.delete(watchKey); this.watchesByKey.set(watchKey, watch); this.watchesByWatchId.set(watchId, watch); watch.startPromise = this.params.requestClient.sendRequest(`fs/watch`, { path: target.path, watchId }).then(() => { watch.isStarted = true; if (watch.shouldUnwatchOnStart) this.stopRequest(watchId); }).catch((error: unknown) => { this.watchesByKey.delete(watchKey); this.watchesByWatchId.delete(watchId); this.params.logger.warning(`Failed to watch open file`, { safe: {}, sensitive: { error, hostId: target.hostId, path: target.path } }); throw error; }); watch.startPromise.catch(() => undefined); }
+  private start(watchKey: string, target: WatchTarget): void { const watchId = `open-file-${this.params.createId()}`; const pendingIgnore = this.pendingIgnoreChangesUntilMsByKey.get(watchKey) ?? 0; const watch: Watch = { watchId, target, ignoreChangesUntilMs: pendingIgnore > Date.now() ? pendingIgnore : 0, isStarted: false, shouldUnwatchOnStart: false, startPromise: Promise.resolve() }; this.pendingIgnoreChangesUntilMsByKey.delete(watchKey); this.watchesByKey.set(watchKey, watch); this.watchesByWatchId.set(watchId, watch); watch.startPromise = this.params.requestClient.sendRequest(`fs/watch`, { path: target.path, watchId }).then(() => { watch.isStarted = true; if (watch.shouldUnwatchOnStart) this.stopRequest(watchId); }).catch((error: unknown) => { if (this.watchesByKey.get(watchKey) === watch) { this.watchesByKey.delete(watchKey); this.watchesByWatchId.delete(watchId); this.params.logger.warning(`Failed to watch open file`, { safe: {}, sensitive: { error, hostId: target.hostId, path: target.path } }); } throw error; }); watch.startPromise.catch(() => undefined); }
   private stop(watchKey: string, watch: Watch): void { this.watchesByKey.delete(watchKey); this.watchesByWatchId.delete(watch.watchId); if (!watch.isStarted) watch.shouldUnwatchOnStart = true; else this.stopRequest(watch.watchId); }
   private stopRequest(watchId: string): void { this.params.requestClient.sendRequest(`fs/unwatch`, { watchId }).catch((error: unknown) => this.params.logger.warning(`Failed to unwatch open file`, { safe: {}, sensitive: { error } })); }
   private getStartPromise(id: string, file: WatchFile): Promise<unknown> { const path = this.params.getWatchPath(id, file.path); if (path == null) return Promise.reject(Error(`MCP resource path is not watchable`)); return this.watchesByKey.get(key(file.hostId, path))?.startPromise ?? Promise.reject(Error(`MCP resource watch was not registered`)); }

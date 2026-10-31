@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 open-file watch registry repair
+
+语义 `OpenFileWatchRegistry` 原先在 MCP watch start 失败后保留错误资源状态，pending ignore 永不清理，且异步失败可能删除已替换 watch。
+本轮恢复旧 rollback/scheduling/identity guard，保持 AppServer manager 真实 consumer 并删除 main `sve/cve/oy/sy` 重复簇；focused suite
+覆盖 watch/unwatch、change messages、ignore window 与回滚 wiring。
+
 ## 2026-10-31 thread execution state projection repair
 
 语义 `ove/ry/iy` 原先只看 legacy turns，且遗漏 misalignment policy violation 和 turn configuration。本轮改用 canonical-history owners，

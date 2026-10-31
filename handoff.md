@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并收敛 open-file watch registry：`files/open-file-watches.ts` 现恢复 MCP resource watch 启动失败回滚、pending ignore 5 秒清理、
+过期 ignore 归零与异步 watch 失败的 identity-safe map cleanup；watch/unwatch、review/open-file/MCP message consumers 仍由 AppServer
+manager 使用。主 chunk 旧 `sve/cve/oy/sy` 簇删除，focused suite 扩至 28 条断言。
+
 修复并接回 thread execution state projection：`files/open-file-watches.ts` 的 `ove/ry/iy` 现使用 canonical/legacy merged turns，恢复
 unconfirmed/resume/runtime-status 判定、最后 active turn、misalignment violation 与 per-turn model/effort/service-tier projection；AppServer
 manager 和 main consumers 共用该 owner，旧三函数删除，focused suite 扩至 18 条断言。

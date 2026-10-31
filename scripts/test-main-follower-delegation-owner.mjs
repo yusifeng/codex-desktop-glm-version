@@ -104,6 +104,30 @@ equal(executionState.inProgress, true);
 equal(executionState.hasMisalignmentPolicyViolation, true);
 equal(executionState.turnConfiguration, { model: "collab-model", reasoningEffort: "xhigh", serviceTier: "fast" });
 
+const watchCalls = [];
+let watchCounter = 0;
+const registry = new owner.OpenFileWatchRegistry({
+  logger: { warning() {} },
+  createId: () => String(++watchCounter),
+  getWatchPath: (_id, path) => path,
+  requestClient: { sendRequest: async (...args) => (watchCalls.push(args), {}) },
+  schedule() {},
+});
+registry.setOpenReviewFileSourceFiles("thread-6", [{ hostId: "host-1", path: "/work/file.ts", refreshMode: "auto" }]);
+await Promise.resolve();
+equal(watchCalls[0], ["fs/watch", { path: "/work/file.ts", watchId: "open-file-1" }]);
+equal(registry.getFileChangeMessages("open-file-1"), [
+  { type: "refetch-review-file-source", hostId: "host-1", path: "/work/file.ts" },
+  { type: "open-file-changed", hostId: "host-1", path: "/work/file.ts" },
+]);
+registry.ignoreFileChangeEvents("thread-6", true);
+equal(registry.getFileChangeMessages("open-file-1"), []);
+registry.removeConversation("thread-6");
+await Promise.resolve();
+equal(watchCalls.some(([method]) => method === "fs/unwatch"), true);
+equal(source.includes("previous == null ? current.mcpResourcesByMcpAppId.delete(appId)"), true);
+equal(source.includes("this.params.schedule(() =>"), true);
+
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes('const { ny, ove, ry, iy } = require("./main-app/files/open-file-watches.js")'), true);
 equal(main.includes("async function ny({"), false);
@@ -111,5 +135,8 @@ equal(main.includes("async function ave("), false);
 equal(main.includes("function ove("), false);
 equal(main.includes("function ry("), false);
 equal(main.includes("function iy("), false);
+equal(main.includes("sve = class"), false);
+for (const name of ["cve", "oy", "sy"])
+  equal(main.includes(`function ${name}(`), false);
 
 console.log(`${assertions} main follower delegation owner assertions passed`);
