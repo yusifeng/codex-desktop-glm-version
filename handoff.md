@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Published Statsig owner：既有 `account/statsig-adapter.ts` 的 `PublishedStatsig` 现已替代主 chunk 旧 `STe` 与专属 user
+schema/identity matching helpers。repository/identity subscriptions、publication replacement、离线 client lifecycle、默认 assignments 与
+dispose cleanup 由完整 19-member owner 持有；`WindowContext` 真实 consumer 继续通过 `STe` 兼容别名构造。
+
 接回 Browser Settings Sync owner：既有 `browser-use/origin-state.ts` 的 `BrowserSettingsSync` 现已替代主 chunk 旧 `_ke`
 及其专属 diff/merge/principal helpers。60s refresh、config watcher、串行 update、账号 generation guard、409 重读与本地变更合并
 由完整 34-member owner 持有；`WindowContext` 真实 consumer 继续通过 `_ke` 兼容别名构造。

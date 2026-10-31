@@ -142,6 +142,7 @@ const { SkysightServiceManager } = require("./main-app/skysight/service-manager.
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { BrowserSettingsSync } = require("./main-app/browser-use/origin-state.js");
+const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -48053,24 +48054,7 @@ function hTe() {
     configs: (0, up.default)(Xw.configs, () => ({})),
   });
 }
-var Qw = n.jf([n.Of(), n.Cf(), n.gf(), n.hf(n.Of()), n.mf()]),
-  gTe = n
-    .wf({
-      userID: n.Of().optional(),
-      customIDs: n.Ef(n.Of(), n.Of().optional()).optional(),
-      email: n.Of().optional(),
-      ip: n.Of().optional(),
-      userAgent: n.Of().optional(),
-      country: n.Of().optional(),
-      locale: n.Of().optional(),
-      appVersion: n.Of().optional(),
-      custom: n.Ef(n.Of(), Qw).optional(),
-      privateAttributes: n.Ef(n.Of(), Qw).nullable().optional(),
-      analyticsOnlyMetadata: n.Ef(n.Of(), n.jf([n.Of(), n.Cf(), n.gf()])).optional(),
-    })
-    .loose(),
-  _Te = n.wf({ user: gTe }).loose(),
-  $w = {
+var $w = {
     apiKeyModelDiscovery: `codex_rollout_api_key_model_discovery`,
     localThreadStoreCompression: `codex-app-local-thread-store-compression`,
     mcp20260728: `codex_rollout_mcp_2026_07_28`,
@@ -48153,193 +48137,7 @@ function xTe(e) {
 function tT(e, t) {
   return e === t || (0, Yw._DJB2)(t) === e || (0, Yw._DJB2)(e) === t;
 }
-var STe = class extends n.Uf {
-  repository;
-  getIdentity;
-  disposables = new n.Wr();
-  publications = [];
-  publication;
-  client = null;
-  disposed = !1;
-  identityEpoch = 0;
-  listeners = new Set();
-  constructor(e, t, n) {
-    (super(),
-      (this.repository = e),
-      (this.getIdentity = t),
-      this.#e(),
-      this.disposables.add(
-        e.addSubscriber((e) => {
-          e === `statsig_evaluations` && (this.#e(), this.listeners.forEach((e) => e()));
-        }),
-      ),
-      this.disposables.add(
-        n(() => {
-          (this.identityEpoch++, this.#t(), this.listeners.forEach((e) => e()));
-        }),
-      ));
-  }
-  onDidChange = (e) => (
-    this.listeners.add(e),
-    () => {
-      this.listeners.delete(e);
-    }
-  );
-  async readExecutionAssignments(e) {
-    let t = this.identityEpoch,
-      n;
-    try {
-      n = await this.getClient();
-    } catch {
-      return null;
-    }
-    return this.disposed || t !== this.identityEpoch || n !== this.client
-      ? null
-      : this.readReadyExecutionAssignments(e);
-  }
-  async hasReadyExecutionAssignments() {
-    return this.readReadyExecutionAssignments() != null;
-  }
-  readReadyExecutionAssignments(e) {
-    if (this.disposed) return null;
-    let t = this.getReadyClient(),
-      r = this.publication;
-    if (r != null && r.payload == null)
-      return {
-        identity: {
-          userId: r.userId,
-          accountId: r.accountId,
-          authMethod: r.authMethod,
-          stableId: r.stableId,
-        },
-        values: {
-          experimentalFeatureGates: {
-            mcp20260728: !1,
-            codexAppsMcp20260728: !1,
-            curatedRemoteMarketplace: !1,
-            backgroundPaginatedRolloutMigration: !1,
-            localThreadStoreCompression: !1,
-            apiKeyModelDiscovery: !1,
-          },
-          toolCatalog: hTe(),
-          permissionRefresh: !1,
-          personality: {},
-          instructions: {},
-        },
-        defaultEnableFeatures: {},
-      };
-    if (t == null || r?.payload == null) return null;
-    let { user: i } = t.getContext();
-    return {
-      identity: {
-        userId: i.userID ?? null,
-        accountId: i.customIDs?.account_id ?? null,
-        stableId: i.customIDs?.stableID ?? null,
-        authMethod: typeof i.custom?.auth_method == `string` ? i.custom.auth_method : null,
-      },
-      values: r.executionValues,
-      defaultEnableFeatures: n.rc(
-        r.defaultEnableFeatures,
-        r.executionValues.guardianV2Experiment,
-        e,
-      ),
-    };
-  }
-  getReadyClient = () => (this.disposed ? null : this.client);
-  getClient = async () => {
-    if (this.disposed) return null;
-    let e = this.identityEpoch,
-      t = await this.getIdentity();
-    if (this.disposed || e !== this.identityEpoch) return null;
-    let n = this.publications.find((e) => rT(e, t));
-    if (n?.payload === void 0) return (this.#t(), null);
-    if (n === this.publication && this.client != null && nT(n, this.client.getContext().user, t))
-      return this.client;
-    if ((this.#t(), n.payload == null))
-      return (
-        nT(
-          n,
-          {
-            userID: n.userId ?? void 0,
-            customIDs: { account_id: n.accountId ?? void 0, stableID: n.stableId ?? void 0 },
-            custom: { auth_method: n.authMethod ?? void 0 },
-          },
-          t,
-        ) && (this.publication = n),
-        null
-      );
-    let r, i;
-    try {
-      (({ user: r } = _Te.parse(JSON.parse(n.payload))), (i = xTe(n.executionValues)));
-    } catch {
-      return null;
-    }
-    if (!nT(n, r, t)) return null;
-    let a = new Yw.StatsigClient(n.sdkKey, r, {
-      overrideAdapter: i,
-      disableStorage: !0,
-      loggingEnabled: `disabled`,
-      networkConfig: { preventAllNetworkTraffic: !0 },
-    });
-    return (
-      a.dataAdapter.setData(n.payload),
-      !a.initializeSync({ disableBackgroundCacheRefresh: !0 }).success ||
-      a.getContext().values == null
-        ? (a.shutdown(), null)
-        : ((this.publication = n), (this.client = a), a)
-    );
-  };
-  dispose = () => {
-    ((this.disposed = !0),
-      this.disposables.dispose(),
-      this.listeners.clear(),
-      (this.publications = []),
-      this.#t());
-  };
-  #e() {
-    let e = this.repository.get(`statsig_evaluations`);
-    if (e == null) {
-      ((this.publications = []), this.#t());
-      return;
-    }
-    let t = this.publications.findIndex(
-      (t) =>
-        t.userId === e.userId &&
-        t.accountId === e.accountId &&
-        t.authMethod === e.authMethod &&
-        t.stableId === e.stableId,
-    );
-    (t !== -1 &&
-      (this.publications[t] === this.publication && this.#t(), this.publications.splice(t, 1)),
-      this.publications.unshift(e));
-  }
-  #t() {
-    let e = this.client;
-    ((this.client = null), (this.publication = void 0), e?.shutdown());
-  }
-};
-function nT(e, t, n) {
-  return (t.userID ?? null) !== e.userId ||
-    (t.customIDs?.account_id ?? null) !== e.accountId ||
-    (t.custom?.auth_method ?? null) !== e.authMethod ||
-    (t.customIDs?.stableID ?? null) !== e.stableId
-    ? !1
-    : rT(e, n);
-}
-function rT(e, t) {
-  return t.principal == null
-    ? t.authMethod == null
-      ? t.unauthenticatedStableId != null &&
-        e.userId == null &&
-        e.accountId == null &&
-        e.authMethod == null &&
-        e.stableId === t.unauthenticatedStableId
-      : t.authMethod !== `chatgpt` &&
-        t.authMethod !== `chatgptAuthTokens` &&
-        e.accountId == null &&
-        e.authMethod === t.authMethod
-    : e.userId === t.principal.userId && e.accountId === t.principal.accountId;
-}
+var STe = PublishedStatsig;
 var iT = n.Of().min(1).max(256),
   CTe = class extends n.Uf {
     storage;

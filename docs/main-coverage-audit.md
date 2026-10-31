@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Published Statsig owner wiring
+
+既有 `src/main/main-app/account/statsig-adapter.ts` 已完整实现原 `STe` 的 19-member publication owner，但 bootstrap 仍导出旧类。
+本轮接回 `WindowContext` 的真实 consumer，删除旧 class 与专属 `Qw/gTe/_Te/nT/rT`；focused suite 覆盖空 payload 默认值、
+repository publication replacement、identity epoch invalidation、listener unsubscribe、client shutdown 与 disposable cleanup。
+
 ## 2026-10-31 Browser Settings Sync owner wiring
 
 既有 `src/main/main-app/browser-use/origin-state.ts` 已完整实现原 `_ke` 的 34-member 双向同步 owner，但 bootstrap 仍导出旧类。
