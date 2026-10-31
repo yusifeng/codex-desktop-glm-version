@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `XQe` WorktreeService 整体迁入 `workspace/worktree-service.ts`；pending creation 状态机、
+worker path/setup/stream 订阅、新生 worktree 保护、archive owner 转移、managed worktree、自动清理规划、
+失败通知与 restart blockers 继续由同一个语义 owner 持有。main 的 per-host registry 已真实构造新 class，
+原 31 个方法、4 组状态容器及输出/取消/operation-source helpers 已物理删除；focused test 覆盖 34 项。
+
 随后将 `NQ` command-session backend 整体迁入 `terminal/command-session-backend.ts`；session acquisition、
 UTF-8 streaming decoder、write coalescing/serialization、resize/terminate、exit/error projection 与 dispose
 竞态均由新 owner 持有，cloud terminal 唯一 consumer 已真实接回并删除旧 class。focused test 覆盖 19 项。

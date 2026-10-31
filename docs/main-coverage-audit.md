@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 WorktreeService owner
+
+原 `XQe` 已整体迁入 `src/main/main-app/workspace/worktree-service.ts`。新 owner 保留 pending worktree
+状态机、worker event subscriptions、stream output routing、newborn/cancelled root 保护、archive cleanup 与
+owner transfer、managed create/delete、自动清理 planning/recheck、notification 和 restart blocker 语义；
+main 的 per-host service registry 直接实例化 factory，旧 31 个方法和独占 helpers 已物理删除。
+
 ## 2026-10-31 command session backend
 
 原 `NQ` command-session owner 已迁入 `src/main/main-app/terminal/command-session-backend.ts`；异步 session、
