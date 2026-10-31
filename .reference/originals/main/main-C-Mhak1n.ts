@@ -16,6 +16,19 @@ const { AvatarOverlayWindowManager } = require("./main-app/avatar-overlay/compos
 const { getVoiceController } = require("./main-app/avatar-overlay/realtime.js");
 const { createRemoteHostedPipManager } = require("./main-app/avatar-overlay/pip.js");
 const { createProjectLocalDataMigrationRuntime } = require("./main-app/projects/local-data-migrations.js");
+const {
+  isRemoteControlEnabled,
+  setRemoteControlEnabled,
+  isRemoteControlSessionActive,
+  setRemoteControlSessionActive,
+  createRemoteControlInstallSnapshot,
+} = require("./main-app/misc/remote-control-state.js");
+const { loadReactDevToolsExtension } = require("./main-app/startup/react-devtools-extension.js");
+const { removeLegacyRemoteControlConfig } = require("./main-app/startup/legacy-remote-control-config.js");
+const { createSqliteRecoveryConfirmationQueue } = require("./main-app/app-server/sqlite-recovery.js");
+const { reconcileAppServerSqliteState } = require("./main-app/app-server/sqlite-state-reconciliation.js");
+const { ChildProcessGoneDiagnostics } = require("./main-app/startup/child-process-gone-diagnostics.js");
+const { configureBundledGitEnvironment } = require("./main-app/startup/bundled-git-environment.js");
 const { DesktopFetchService } = require("./main-app/api/desktop-fetch.js");
 const { AppServerTransportSshWebsocket } = require("./main-app/app-server/transports.js");
 const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-follow-ups.js");
@@ -5220,529 +5233,6 @@ var {
   createLogger: r.i,
   readSelectedProject: Nr,
 });
-var Ou = new Set(),
-  ku = new Set(),
-  Au = new Map();
-function Lce() {
-  return Ou.size > 0;
-}
-function ju(e, t = `default`) {
-  e ? Ou.add(t) : Ou.delete(t);
-}
-function Rce() {
-  return ku.size > 0;
-}
-function Mu(e, t = `default`, n = null) {
-  (e ? ku.add(t) : ku.delete(t),
-    e && n != null && n.threadIds.length > 0 ? Au.set(t, n) : Au.delete(t));
-}
-function zce() {
-  let e = [...Au.values()],
-    t = e[0];
-  return t == null || e.some(({ accountId: e, userId: n }) => e !== t.accountId || n !== t.userId)
-    ? null
-    : {
-        ...t,
-        expiresAtMs: Date.now() + nee,
-        threadIds: [...new Set(e.flatMap(({ threadIds: e }) => e))],
-      };
-}
-function Bce(e) {
-  let t = !1;
-  return {
-    saveForInstall: (n) => {
-      let r = zce();
-      return (e(r), (t = r != null && n?.quitImmediately === !1), r);
-    },
-    clearAfterAbort: () => (t ? ((t = !1), e(null), !0) : !1),
-  };
-}
-var Fu = r.i(`react-devtools-extension`),
-  Iu = `fmkadmapgofadopljbjfkapdkoienihi`;
-async function Gce(e = {}) {
-  let t = Kce(e),
-    n = e.loadExtension ?? ((e, t) => l.session.defaultSession.loadExtension(e, t));
-  if (t == null)
-    return (
-      Fu().trace(`React DevTools extension not found`, {
-        safe: { extensionId: Iu, platform: process.platform },
-      }),
-      !1
-    );
-  try {
-    let e = await n(t);
-    return (
-      Fu().info(`Loaded React DevTools extension`, {
-        safe: { extensionId: e.id, name: e.name, version: e.version },
-      }),
-      !0
-    );
-  } catch (e) {
-    return (
-      Fu().error(`Failed to load React DevTools extension`, {
-        safe: {},
-        sensitive: { error: String(e) },
-      }),
-      !1
-    );
-  }
-}
-function Kce(e = {}) {
-  let {
-    platform: t = process.platform,
-    homeDirectory: n = (0, p.homedir)(),
-    localAppData: r = process.env.LOCALAPPDATA,
-    userDataDirectory: i = l.app.getPath(`userData`),
-  } = e;
-  for (let e of qce({ platform: t, homeDirectory: n, localAppData: r, userDataDirectory: i })) {
-    let t = Xce((0, h.join)(e, Iu));
-    if (t != null) return t;
-  }
-  return null;
-}
-function qce({ platform: e, homeDirectory: t, localAppData: n, userDataDirectory: r }) {
-  return [
-    (0, h.join)(r, `extensions`),
-    ...Jce({ platform: e, homeDirectory: t, localAppData: n }).flatMap(Yce),
-  ];
-}
-function Jce({ platform: e, homeDirectory: t, localAppData: n }) {
-  return e === `darwin`
-    ? [(0, h.join)(t, `Library`, `Application Support`, `Google`, `Chrome`)]
-    : e === `win32`
-      ? n == null
-        ? []
-        : [(0, h.join)(n, `Google`, `Chrome`, `User Data`)]
-      : e === `linux`
-        ? [
-            (0, h.join)(t, `.config`, `google-chrome`),
-            (0, h.join)(t, `.config`, `google-chrome-beta`),
-            (0, h.join)(t, `.config`, `google-chrome-canary`),
-            (0, h.join)(t, `.config`, `chromium`),
-          ]
-        : [];
-}
-function Yce(e) {
-  return (0, v.existsSync)(e)
-    ? (0, v.readdirSync)(e, { withFileTypes: !0 })
-        .filter((e) => e.isDirectory())
-        .map((t) => (0, h.join)(e, t.name, `Extensions`))
-    : [];
-}
-function Xce(e) {
-  if (!(0, v.existsSync)(e)) return null;
-  let t = (0, v.readdirSync)(e, { withFileTypes: !0 })
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort((e, t) => e.localeCompare(t, void 0, { numeric: !0, sensitivity: `base` }))
-    .at(-1);
-  return t == null ? null : (0, h.join)(e, t);
-}
-async function Zce({ appServerConnection: e, globalState: t, logger: n = r.n() }) {
-  if (t.getStored(`electron-remote-control-config-migration-completed`) !== !0)
-    try {
-      (await e.sendAppServerRequest(`config/batchWrite`, {
-        edits: [
-          { keyPath: `remote_control`, mergeStrategy: `replace`, value: null },
-          { keyPath: `features.remote_control`, mergeStrategy: `replace`, value: null },
-        ],
-        expectedVersion: null,
-        filePath: null,
-        reloadUserConfig: !0,
-      }),
-        t.set(a.X, !0),
-        n.info(`Completed legacy remote_control config migration`));
-    } catch (e) {
-      n.warning(`Failed to remove legacy remote_control config`, {
-        safe: {},
-        sensitive: { error: e },
-      });
-    }
-}
-function due({ ensureWindow: e, showPrimaryWindow: t }) {
-  let n = [],
-    i = new Set(),
-    a = !1,
-    o = null,
-    s = () => {
-      if (!a) return Promise.resolve();
-      if (o != null) return o;
-      let r = n.splice(0);
-      return (
-        (o = (async () => {
-          for (let n of r) await fue(n, { ensureWindow: e, showPrimaryWindow: t });
-        })().finally(() => {
-          ((o = null), n.length > 0 && s());
-        })),
-        o
-      );
-    };
-  return {
-    onRecovery: (e) => {
-      let t = `${e.databasePath}\0${e.backupFolder}`;
-      i.has(t) ||
-        (i.add(t),
-        n.push(e),
-        r
-          .n()
-          .info(`Queued app-server SQLite recovery confirmation`, {
-            safe: { pendingNotifications: n.length },
-            sensitive: { backupFolder: e.backupFolder, databasePath: e.databasePath },
-          }),
-        s());
-    },
-    enable: async () => {
-      ((a = !0), await s());
-    },
-  };
-}
-async function fue(e, { ensureWindow: t, showPrimaryWindow: n }) {
-  r.n().info(`Showing app-server SQLite recovery confirmation`, {
-    safe: {},
-    sensitive: { backupFolder: e.backupFolder, databasePath: e.databasePath },
-  });
-  let i = await t();
-  (n({ stealFocus: !0 }),
-    await a.f(e.databasePath, e.backupFolder, i).catch((e) => {
-      r.n().warning(`Failed to show app-server SQLite recovery confirmation`, {
-        safe: {},
-        sensitive: { error: e },
-      });
-    }));
-}
-var Pd = `state_5.sqlite`,
-  pue = `sqlite`,
-  mue = `.app-server-state-reconciled-v1`,
-  hue = 200,
-  gue = n.wf({
-    type: n.bf(`session_meta`),
-    payload: n.wf({ id: n.Of(), cwd: n.Of().refine((e) => e.trim().length > 0) }),
-  });
-async function _ue(e) {
-  if (!(process.env.CODEX_SQLITE_HOME != null || n.Ri())) {
-    try {
-      let t = await xue(e);
-      t != null && r.n().info(`Reconciled temporary app-server state`, { safe: t });
-    } catch (e) {
-      r.n().warning(`Failed to reconcile temporary app-server state`, {
-        safe: { errorName: e instanceof Error ? e.name : `UnknownError` },
-      });
-    }
-    try {
-      let t = await vue(e);
-      t > 0 && r.n().info(`Repaired missing thread cwd metadata`, { safe: { repaired: t } });
-    } catch (e) {
-      r.n().warning(`Failed to repair missing thread cwd metadata`, {
-        safe: { errorName: e instanceof Error ? e.name : `UnknownError` },
-      });
-    }
-  }
-}
-async function vue(e) {
-  let t = (0, h.join)(e, Pd);
-  if (!(await Bd(t))) return 0;
-  let n = new (Vd())(t, { fileMustExist: !0 });
-  try {
-    return await yue(n);
-  } finally {
-    n.close();
-  }
-}
-async function yue(e, t = bue) {
-  let n = Id(e, `threads`).includes(`updated_at_ms`) ? `updated_at_ms` : `updated_at`,
-    r = e
-      .prepare(
-        `SELECT id, rollout_path FROM threads
-       WHERE (cwd = '' OR cwd IS NULL)
-         AND rollout_path IS NOT NULL
-         AND rollout_path <> ''
-       ORDER BY ${zd(n)} DESC
-       LIMIT ?`,
-      )
-      .all(hue),
-    i = (
-      await Promise.all(
-        r.map(async (e) => {
-          let n = e.id,
-            r = e.rollout_path;
-          if (typeof n != `string` || typeof r != `string`) return null;
-          let i = await t(r, n);
-          return i == null || i.trim().length === 0 ? null : { cwd: i, id: n };
-        }),
-      )
-    ).filter((e) => e != null);
-  if (i.length === 0) return 0;
-  let a = e.prepare(`UPDATE threads SET cwd = ? WHERE id = ? AND (cwd = '' OR cwd IS NULL)`),
-    o = 0;
-  e.exec(`BEGIN IMMEDIATE`);
-  try {
-    for (let e of i) o += Number(a.run(e.cwd, e.id).changes);
-    e.exec(`COMMIT`);
-  } catch (t) {
-    throw (e.exec(`ROLLBACK`), t);
-  }
-  return o;
-}
-async function bue(e, t) {
-  let n = (0, v.createReadStream)(e, { encoding: `utf8` }),
-    r = (0, L.createInterface)({ crlfDelay: 1 / 0, input: n });
-  try {
-    for await (let e of r) {
-      let n;
-      try {
-        n = JSON.parse(e);
-      } catch {
-        return null;
-      }
-      let r = gue.safeParse(n);
-      return !r.success || r.data.payload.id !== t ? null : r.data.payload.cwd;
-    }
-    return null;
-  } catch {
-    return null;
-  } finally {
-    (r.close(), n.destroy());
-  }
-}
-async function xue(e) {
-  let t = (0, h.join)(e, pue, Pd),
-    n = (0, h.join)(e, Pd),
-    r = (0, h.join)(e, mue);
-  if ((await Bd(r)) || !(await Bd(t))) return null;
-  let i = Vd();
-  if (!(await Bd(n))) {
-    let e = new i(t, { fileMustExist: !0, readonly: !0 });
-    try {
-      return (
-        await e.backup(n),
-        await (0, b.writeFile)(r, ``),
-        { dynamicToolsInserted: 0, inserted: 0, repaired: 0, spawnEdgesInserted: 0 }
-      );
-    } finally {
-      e.close();
-    }
-  }
-  let a = new i(n, { fileMustExist: !0 }),
-    o = new i(t, { fileMustExist: !0, readonly: !0 });
-  try {
-    let e = Sue(a, o);
-    return (await (0, b.writeFile)(r, ``), e);
-  } finally {
-    (o.close(), a.close());
-  }
-}
-function Sue(e, t) {
-  let n = Fd(e, t, `threads`),
-    r = n.includes(`updated_at_ms`) ? `updated_at_ms` : `updated_at`,
-    i = n.map(zd).join(`, `),
-    a = n.map(() => `?`).join(`, `),
-    o = e.prepare(`SELECT ${i} FROM threads WHERE id = ?`),
-    s = e.prepare(`INSERT INTO threads (${i}) VALUES (${a})`),
-    c = 0,
-    l = 0,
-    u = new Set();
-  e.exec(`BEGIN IMMEDIATE`);
-  try {
-    for (let a of t.prepare(`SELECT ${i} FROM threads`).all()) {
-      let t = a.id;
-      if (typeof t != `string`) continue;
-      let i = o.get(t);
-      if (i == null) {
-        (s.run(...n.map((e) => a[e] ?? null)), (c += 1), u.add(t));
-        continue;
-      }
-      let d = Rd(a[r]) > Rd(i[r]),
-        f = n.filter((e) => e !== `id` && !Ld(a[e]) && (Ld(i[e]) || (d && a[e] !== i[e])));
-      f.length !== 0 &&
-        (e
-          .prepare(`UPDATE threads SET ${f.map((e) => `${zd(e)} = ?`).join(`, `)} WHERE id = ?`)
-          .run(...f.map((e) => a[e] ?? null), t),
-        (l += 1),
-        u.add(t));
-    }
-    let a = Fd(e, t, `thread_spawn_edges`),
-      d = 0;
-    if (a.length > 0) {
-      let n = a.map(zd).join(`, `),
-        r = e.prepare(
-          `INSERT OR IGNORE INTO thread_spawn_edges (${n}) VALUES (${a.map(() => `?`).join(`, `)})`,
-        );
-      for (let e of t.prepare(`SELECT ${n} FROM thread_spawn_edges`).all())
-        d += Number(r.run(...a.map((t) => e[t] ?? null)).changes);
-    }
-    let f = Fd(e, t, `thread_dynamic_tools`),
-      p = 0;
-    if (f.length > 0) {
-      let n = f.map(zd).join(`, `),
-        r = t.prepare(`SELECT ${n} FROM thread_dynamic_tools WHERE thread_id = ?`),
-        i = e.prepare(
-          `INSERT OR IGNORE INTO thread_dynamic_tools (${n}) VALUES (${f.map(() => `?`).join(`, `)})`,
-        );
-      for (let e of u)
-        for (let t of r.all(e)) p += Number(i.run(...f.map((e) => t[e] ?? null)).changes);
-    }
-    return (
-      e.exec(`COMMIT`),
-      { dynamicToolsInserted: p, inserted: c, repaired: l, spawnEdgesInserted: d }
-    );
-  } catch (t) {
-    throw (e.exec(`ROLLBACK`), t);
-  }
-}
-function Fd(e, t, n) {
-  let r = new Set(Id(t, n));
-  return Id(e, n).filter((e) => r.has(e));
-}
-function Id(e, t) {
-  return e
-    .prepare(`PRAGMA table_info(${zd(t)})`)
-    .all()
-    .flatMap((e) => (typeof e.name == `string` ? [e.name] : []));
-}
-function Ld(e) {
-  return e == null || e === ``;
-}
-function Rd(e) {
-  return typeof e == `bigint` || typeof e == `number` ? e : -1;
-}
-function zd(e) {
-  return `"${e.replaceAll(`"`, `""`)}"`;
-}
-async function Bd(e) {
-  try {
-    return (await (0, b.access)(e), !0);
-  } catch {
-    return !1;
-  }
-}
-function Vd() {
-  try {
-    return require("better-sqlite3");
-  } catch {
-    throw Error(`better-sqlite3 is only bundled with the Electron app`);
-  }
-}
-var Hd = 6e4,
-  Cue = class {
-    app;
-    errorReporter;
-    logger;
-    lastRecoverableLogByKey = new Map();
-    recoverableLogCleanupTimer = null;
-    constructor(e, t, n) {
-      ((this.app = e), (this.errorReporter = t), (this.logger = n));
-    }
-    register() {
-      this.app.on(`child-process-gone`, this.onChildProcessGone);
-    }
-    onChildProcessGone = (e, t) => {
-      if (t.reason !== `clean-exit`) {
-        if (wue(t)) {
-          this.logRecoverableChildProcessGone(t);
-          return;
-        }
-        this.errorReporter.reportFatal(Error(`Child process gone (${t.type})`), {
-          tags: { errorType: `child-process-gone`, processType: t.type, reason: t.reason },
-          extra: { exitCode: t.exitCode, name: t.name, serviceName: t.serviceName },
-        });
-      }
-    };
-    logRecoverableChildProcessGone(e) {
-      let t = `${e.type}:${e.serviceName ?? e.name ?? ``}:${e.reason}:${e.exitCode}`,
-        n = Date.now(),
-        r = this.lastRecoverableLogByKey.get(t);
-      (r != null && n - r < Hd) ||
-        (this.lastRecoverableLogByKey.set(t, n),
-        this.scheduleRecoverableLogCleanup(),
-        e.type === `GPU` &&
-          this.errorReporter.reportNonFatal(Error(`GPU process gone`), {
-            tags: { errorType: `gpu-process-gone`, processType: e.type, reason: e.reason },
-            extra: { exitCode: e.exitCode, name: e.name, serviceName: e.serviceName },
-          }),
-        this.logger.warning(`Recoverable Chromium child process gone`, {
-          safe: {
-            exitCode: e.exitCode,
-            name: e.name ?? null,
-            processType: e.type,
-            reason: e.reason,
-            serviceName: e.serviceName ?? null,
-          },
-        }));
-    }
-    scheduleRecoverableLogCleanup() {
-      this.recoverableLogCleanupTimer ??
-        ((this.recoverableLogCleanupTimer = setTimeout(() => {
-          this.recoverableLogCleanupTimer = null;
-          let e = Date.now();
-          for (let [t, n] of this.lastRecoverableLogByKey)
-            e - n >= Hd && this.lastRecoverableLogByKey.delete(t);
-          this.lastRecoverableLogByKey.size > 0 && this.scheduleRecoverableLogCleanup();
-        }, Hd)),
-        this.recoverableLogCleanupTimer.unref());
-    }
-  };
-function wue(e) {
-  return (
-    e.reason === `launch-failed` ||
-    e.type === `GPU` ||
-    (e.type === `Utility` && e.serviceName === `audio.mojom.AudioService`)
-  );
-}
-var Tue = (0, d.promisify)(P.execFile),
-  Eue = 500,
-  Due = new Set([`darwin-arm64`, `darwin-x64`]);
-async function Oue({
-  arch: e = process.arch,
-  env: t,
-  platform: r = process.platform,
-  resourcesPath: i,
-}) {
-  let a = `${r}-${e}`;
-  if (!Due.has(a)) throw Error(`Bundled Git does not support '${a}'.`);
-  if (i == null) throw Error(`Bundled Git resources are unavailable for '${a}'.`);
-  let o = h.default.join(i, `git`),
-    s = h.default.join(o, `bin`, `git`),
-    c = [
-      s,
-      h.default.join(o, `etc`, `gitconfig`),
-      h.default.join(o, `libexec`, `git-core`),
-      h.default.join(o, `share`, `git-core`, `templates`),
-    ].find((e) => !(0, v.existsSync)(e));
-  if (c != null)
-    throw Error(`Bundled Git is incomplete for '${a}': missing '${h.default.relative(o, c)}'.`);
-  let l = n.Yn(t) ?? ``,
-    u = h.default.join(o, `bin`),
-    d = l === `` ? null : n.qn.resolve(`git`, { env: t }),
-    f = null;
-  if (d != null && d !== s)
-    try {
-      let { stdout: e } = await Tue(d, [`--version`], {
-        encoding: `utf8`,
-        env: t,
-        killSignal: `SIGKILL`,
-        maxBuffer: 4096,
-        timeout: Eue,
-        windowsHide: !0,
-      });
-      /^git version [^\r\n]*[.-]openai(?:[.-][^\r\n]+)?$/i.test(e.trim()) && (f = d);
-    } catch {}
-  let p = f == null ? null : h.default.dirname(f);
-  return (
-    delete t.CODEX_PREFERRED_GIT_EXECUTABLE,
-    n.Xn(
-      t,
-      [...(p == null ? [] : [p]), u, ...l.split(`:`).filter((e) => e !== u && e !== p)]
-        .filter((e) => e !== ``)
-        .join(`:`),
-    ),
-    f == null
-      ? ((t.GIT_CONFIG_SYSTEM ||= h.default.join(o, `etc`, `gitconfig`)),
-        (t.GIT_EXEC_PATH ||= h.default.join(o, `libexec`, `git-core`)),
-        (t.GIT_TEMPLATE_DIR ||= h.default.join(o, `share`, `git-core`, `templates`)),
-        s)
-      : ((t.CODEX_PREFERRED_GIT_EXECUTABLE = f), s)
-  );
-}
 function Ud(e, t) {
   let n = String(e);
   if (typeof t != `string`) throw TypeError(`Expected character`);
@@ -31261,7 +30751,7 @@ var QDe = class {
       return n.success ? n.data : null;
     }
     async installUpdate() {
-      if (process.platform === `darwin` && Rce()) {
+      if (process.platform === `darwin` && isRemoteControlSessionActive()) {
         let e =
             l.BrowserWindow.fromWebContents(this.origin) ?? this.windowManager.getPrimaryWindow(),
           t = a.hn(),
@@ -71589,8 +71079,12 @@ var r$e = class {
         );
         break;
       case `local-thread-activity-changed`:
-        (ju(t.hasInProgressLocalConversation, e.id),
-          Mu(t.hasInProgressRegularLocalConversation, e.id, t.updateResumeState));
+        (setRemoteControlEnabled(t.hasInProgressLocalConversation, e.id),
+          setRemoteControlSessionActive(
+            t.hasInProgressRegularLocalConversation,
+            e.id,
+            t.updateResumeState,
+          ));
         break;
       case `electron-set-window-mode`:
         this.setPrimaryWindowMode(e, { mode: t.mode, onboardingVariant: t.onboardingVariant });
@@ -93998,7 +93492,7 @@ var G5 = r.r(`WindowContext`),
     MO,
     Met,
     Mtt,
-    Mu,
+    Mu: setRemoteControlSessionActive,
     N,
     N0,
     N2e,
@@ -94107,7 +93601,7 @@ var G5 = r.r(`WindowContext`),
     j,
     jet,
     jnt,
-    ju,
+    ju: setRemoteControlEnabled,
     k,
     k$e,
     kN,
@@ -101126,7 +100620,16 @@ async function Ust() {
   let L = Date.now();
   (await l.app.whenReady(),
     M(`main app.whenReady resolved`, L),
-    F && ((L = Date.now()), M(`react devtools extension loaded=${await Gce()}`, L)),
+    F &&
+      ((L = Date.now()),
+      M(
+        `react devtools extension loaded=${await loadReactDevToolsExtension({
+          loadExtension: (extensionPath) => l.session.defaultSession.loadExtension(extensionPath),
+          logger: r.i(`react-devtools-extension`),
+          userDataDirectory: l.app.getPath(`userData`),
+        })}`,
+        L,
+      )),
     (L = Date.now()),
     a.fn(a.ln(__dirname), i),
     M(`registered app protocol`, L));
@@ -101140,9 +100643,12 @@ async function Ust() {
     let e = await z;
     (a.in.isInternal(s) &&
       process.platform === `darwin` &&
-      (await Oue({
+      (await configureBundledGitEnvironment({
         env: process.env,
+        getPath: n.Yn,
+        resolveExecutable: (command, env) => n.qn.resolve(command, { env }),
         resourcesPath: o.t({ env: process.env, resourcesPath: process.resourcesPath }),
+        setPath: n.Xn,
       })),
       B(e));
   }
@@ -101157,7 +100663,11 @@ async function Ust() {
   (l.app.setDebugChromePagesEnabled(te),
     tl(te),
     M(`local data migrations completed`, L),
-    await _ue(V.codexHome),
+    await reconcileAppServerSqliteState({
+      codexHome: V.codexHome,
+      isTestMode: n.Ri,
+      logger: r.n,
+    }),
     kr(Ar({}, { buildFlavor: s })));
   let ne = V.settingsStore.getEffective(n.Fa.localeOverride.key);
   await a.mn(V.repoRoot, ne ?? void 0);
@@ -101322,8 +100832,11 @@ async function Ust() {
     we = null,
     Te = null,
     Ee = (e) => !1,
-    De = due({
+    De = createSqliteRecoveryConfirmationQueue({
       ensureWindow: he,
+      logger: r.n,
+      showRecoveryConfirmation: (databasePath, backupFolder, window) =>
+        a.f(databasePath, backupFolder, window),
       showPrimaryWindow: (e) => me && W.windowManager.showPrimaryWindow(e),
     });
   delete process.env[as];
@@ -101424,7 +100937,7 @@ async function Ust() {
       (K.setDynamicAppToolsPipePath(null), delete process.env[as], Oe.dispose());
     }));
   let Me = () => stopServiceWithTimeout(() => K.stopCodexMicro()),
-    Ne = Bce((e) => {
+    Ne = createRemoteControlInstallSnapshot((e) => {
       V.globalState.update(a.J, (t) => ({ ...t, [Ht]: e }));
     });
   y({
@@ -101963,7 +101476,7 @@ async function Ust() {
     onAppEntrySource: fe,
     isTrustedIpcEvent: _e,
   }),
-    new Cue(l.app, u, r.n()).register(),
+    new ChildProcessGoneDiagnostics(l.app, u, r.n()).register(),
     I.add(
       Se.appEvent.subscribe((e) => {
         switch (e.type) {
@@ -101981,7 +101494,7 @@ async function Ust() {
       showMessageBoxSync: (options) => l.dialog.showMessageBoxSync(options),
       getNativeIntl: a.hn,
       shouldBlockQuit: nc,
-      hasInProgressLocalConversation: Lce,
+      hasInProgressLocalConversation: isRemoteControlEnabled,
       getAutomations: n.Ar,
       observeSystemShutdown: _rt,
       armWindowsForcedExit: n7,
@@ -102099,7 +101612,12 @@ async function Ust() {
               sensitive: { error: e },
             }));
       }),
-    Zce({ appServerConnection: tt, globalState: V.globalState }),
+    removeLegacyRemoteControlConfig({
+      appServerConnection: tt,
+      completedStateKey: a.X,
+      globalState: V.globalState,
+      logger: r.n(),
+    }),
     (xe = (e) => {
       P && l.app.isPackaged && e?.quitImmediately !== !1 && n7();
       let t = Ne.saveForInstall(e);

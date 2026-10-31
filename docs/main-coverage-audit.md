@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 startup state, recovery and platform owners
+
+新增 `startup/react-devtools-extension.ts`、`legacy-remote-control-config.ts`、`app-server/sqlite-recovery.ts`、
+`sqlite-state-reconciliation.ts`、`startup/child-process-gone-diagnostics.ts` 与 `bundled-git-environment.ts`，并将既有
+`misc/remote-control-state.ts` 接回全部真实 consumer。恢复的边界包括按 profile/数字版本发现扩展、config batchWrite ledger、恢复提示的启用前
+排队/去重/串行、SQLite threads/edges/dynamic-tools 原子合并与 rollout cwd 修复、GPU/audio/launch-failed 分类及 60 秒日志限流，以及 patched
+OpenAI Git 检测和 bundle env 注入。主 chunk `Ou…Oue` 约 536 行连续旧实现已删除；48 条 focused 断言覆盖行为、事务与启动接线。
+
 ## 2026-11-01 project local-data migration owner
 
 新增 `projects/local-data-migrations.ts`，以明确的 LocalProject/RemoteProject/store/migration 类型恢复六个按序 migration：remote string project、

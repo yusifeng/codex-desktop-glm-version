@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+大批迁出项目 migration 与第三方 vendor 之间的整段启动 owner：既有 `misc/remote-control-state.ts` 现成为窗口、更新安装和应用生命周期的
+唯一远控状态源；新增 React DevTools 发现/加载、legacy remote_control config 清理、SQLite recovery 串行队列、临时 SQLite 合并与 cwd repair、
+Chromium child-process-gone 诊断限流及 macOS bundled Git 环境模块。全部真实 consumer 已改接命名 owner，旧 `Ou…Oue` 约 536 行连续实现整体
+删除；focused suite 以 48 个断言实际执行同身份 session 聚合、扩展版本选择、config ledger、恢复队列、SQLite transaction merge、崩溃分类限流
+和 patched Git 优先级。
+
 新增 738 行 `projects/local-data-migrations.ts`，完整接管 legacy local project 哈希/selection、remote string project 物化、automation target
 迁移与 remap、metadata repair、下载历史清理及 completed-migration ledger；启动流程直接调用语义 runtime，旧 `ece…Du` 约 634 行实现整体移除。
 focused suite 在内存 state store 中执行本地多根 selection、远端 host 优先级、automation 新建/跳过、metadata 合并、逐 migration flush 与一次性清理。
