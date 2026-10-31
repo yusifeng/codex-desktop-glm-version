@@ -85,8 +85,8 @@ async function win32DefaultBrowser(): Promise<
 }
 
 /** 兼容扩展 id 列表（原 `FO`）：仅 Dev flavor 读 bundled 插件目录。 */
-async function getCompatibleExtensionIds(flavor: string): Promise<string[]> {
-  if (flavor !== (BuildFlavor as { Dev: string }).Dev) return [];
+async function getCompatibleExtensionIds(flavor: string): Promise<string[] | undefined> {
+  if (flavor !== (BuildFlavor as { Dev: string }).Dev) return undefined;
   const marketplaceName = (marketplaceNameForFlavor as (flavor: string) => string)(flavor);
   try {
     return (await (listDirectory as (path: string) => Promise<string[]>)(join(getBundledPluginsResourcesPath(), "plugins", marketplaceName, "plugins", devChromeHostPath as string))) ?? [];
@@ -97,7 +97,7 @@ async function getCompatibleExtensionIds(flavor: string): Promise<string[]> {
 
 /** 浏览器族服务（原 `MO`）。 */
 class BrowserFamilyService {
-  getCompatibleExtensionIds: (flavor: string) => Promise<string[]>;
+  getCompatibleExtensionIds: (flavor: string) => Promise<string[] | undefined>;
 
   constructor({ getCompatibleExtensionIds: resolver = getCompatibleExtensionIds } = {}) {
     this.getCompatibleExtensionIds = resolver;

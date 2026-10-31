@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 BrowserFamilyService owner wiring
+
+`src/main/main-app/platform/browser-family.ts` 与旧 `MO` 均为 7 members。本轮修正非 Dev compatible-extension resolver 的
+`undefined` 返回语义，接回 `WindowContext` chromiumBrowser consumer，并删除旧 `AO/jO/MO/NO/PO/FO` 85 行簇；focused suite
+覆盖 installed families、extension status/banner、settings/URL forwarding 与真实 wiring。
+
 ## 2026-10-31 Windows account owner wiring
 
 `src/main/main-app/platform/windows-account.ts` 已完整覆盖旧 `yO/bO/xO/SO/CO/wO/TO/EO/DO/OO/kO`。本轮以压缩名兼容别名

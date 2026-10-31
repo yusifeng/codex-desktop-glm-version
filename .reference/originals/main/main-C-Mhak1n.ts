@@ -150,6 +150,7 @@ const { AvatarManager } = require("./main-app/avatar/pet-install.js");
 const { ComputerUseSettingsService, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");
 const { createDesktopLogArchive: URe, deleteDesktopLogArchive: TV, createFeedbackArchive: wV } = require("./main-app/feedback/desktop-log-archive.js");
 const { loadWindowsAccountAddon: kO, isAdministratorCapable: SO, getWindowsSystemDiagnostics: CO, supportsPersistentAcls: wO, isNetworkDrive: TO, readRegistryValue: EO, registerWindowsProcessListProvider: DO } = require("./main-app/platform/windows-account.js");
+const { BrowserFamilyService: MO } = require("./main-app/platform/browser-family.js");
 const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = require("./main-app/notifications/native-notification-manager.js");
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
@@ -54168,89 +54169,6 @@ function vO(e) {
   } catch {
     return !1;
   }
-}
-var AO = n._f((e) => typeof e == `string` && n.Bc(e)),
-  jO = `HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\https\\UserChoice`,
-  MO = class extends n.Uf {
-    getCompatibleExtensionIds;
-    constructor({ getCompatibleExtensionIds: e = FO } = {}) {
-      (super(), (this.getCompatibleExtensionIds = e));
-    }
-    async getInstalledBrowserFamilies() {
-      let e = Object.keys(n.Pc).filter(n.Bc);
-      return (
-        await Promise.all(
-          e.map(async (e) => ({ browserFamily: e, installed: await Une({ browserFamily: e }) })),
-        )
-      ).flatMap(({ browserFamily: e, installed: t }) => (t ? [e] : []));
-    }
-    async getExtensionStatus({ browserFamily: e }) {
-      let t = AO.parse(e),
-        n = a.in.resolve(),
-        r = ma({
-          browserFamily: t,
-          buildFlavor: n,
-          compatibleExtensionIds: await this.getCompatibleExtensionIds(n),
-        }),
-        i = ga({ browserFamily: t, extensionIds: r.extensionIds });
-      return { installUrl: r.installUrl, installedExtensionId: i };
-    }
-    async getExtensionInstallBanner() {
-      try {
-        let e = a.in.resolve(),
-          [t, n] = await Promise.all([this.getCompatibleExtensionIds(e), NO()]);
-        return n == null ? null : Wne({ buildFlavor: e, compatibleExtensionIds: t, ...n });
-      } catch {
-        return null;
-      }
-    }
-    async openExtensionSettings({ browserFamily: e, extensionId: t }) {
-      await Gne({ browserFamily: AO.parse(e), extensionId: t });
-    }
-    async openUrl({ browserFamily: e, url: t }) {
-      await Kne({ browserFamily: AO.parse(e), url: t });
-    }
-  };
-async function NO() {
-  if (process.platform === `linux`) {
-    let { applications: e, defaultApplicationPath: t } = await uO(),
-      n = e.find((e) => e.appPath === t);
-    return n == null ? null : { defaultBrowserName: n.displayName, defaultBrowserPath: n.appPath };
-  }
-  if (process.platform !== `darwin` && process.platform !== `win32`) return null;
-  if (process.platform === `win32`) {
-    let e = await PO();
-    if (e.status === `resolved`) return e.browser;
-    if (e.status === `unsupported`) return null;
-  }
-  let { name: e, path: t } = await l.app.getApplicationInfoForProtocol(`https://`);
-  return { defaultBrowserName: e, defaultBrowserPath: t };
-}
-async function PO() {
-  try {
-    let e = EO({ key: jO, name: `ProgId` });
-    if (e == null || e.length === 0) return { status: `unavailable` };
-    let t = n.Ic(e);
-    if (t == null) return { status: `unsupported` };
-    let r = n.Pc[t],
-      i = r.windows.commandNames[0];
-    return i == null
-      ? { status: `unavailable` }
-      : {
-          browser: { defaultBrowserName: r.displayName, defaultBrowserPath: i },
-          status: `resolved`,
-        };
-  } catch {
-    return { status: `unavailable` };
-  }
-}
-async function FO(e) {
-  if (e !== a.in.Dev) return;
-  let t = n.Ul(e);
-  try {
-    return await n.on((0, h.join)(Hi(), `plugins`, t, `plugins`, n.Al));
-  } catch {}
-  return [];
 }
 var IO = class extends n.Uf {
   appServerConnection;

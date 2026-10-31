@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 BrowserFamilyService：`platform/browser-family.ts` 的 7-member owner 现已替代主 chunk 旧 `AO/jO/MO/NO/PO/FO`。
+审计同时恢复了非 Dev `getCompatibleExtensionIds` 返回 `undefined` 的原始语义；浏览器安装探测、扩展状态/banner、默认浏览器
+registry/XDG 解析与 extension settings/URL 打开继续由 `WindowContext` 的 `new MO()` 真实 consumer 使用。
+
 接回 Windows account/native addon 门面：`platform/windows-account.ts` 现已替代主 chunk 旧 `yO…kO` 簇，并通过
 `kO/SO/CO/wO/TO/EO/DO` 兼容别名继续服务默认浏览器注册表、workspace ACL/network drive、startup process provider、
 system metrics 与 bootstrap consumers。addon 缓存/HKCU 校验/非 Windows fallback 和异常降级语义保持完整。
