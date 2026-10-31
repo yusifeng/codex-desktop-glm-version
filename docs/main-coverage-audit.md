@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 app-server transport policy
+
+原 `U5/W5/Ynt` 已迁入 `src/main/main-app/app-server/transport-policy.ts`。新 policy 保留
+`CODEX_APP_SERVER_FORCE_CLI` override、cloud websocket_url/local-derived URL、localhost/IPv4/IPv6 loopback proxy bypass、
+cloud internal API domain allowlist 与 remote-host SOCKS5 routing；五个真实 consumers 已接回，旧 helpers 已删除。
+
 ## 2026-10-31 downloads view publisher
 
 原 `Jnt` 已迁入 `src/main/main-app/downloads/downloads-view-publisher.ts`。新 owner 保留 per-app-view lifecycle queue、

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `U5/W5/Ynt` app-server transport policy 迁入 `app-server/transport-policy.ts`；force-CLI override、cloud/
+remote websocket URL selection、loopback proxy bypass、cloud internal-domain allowlist 与 remote SOCKS routing 均由
+新 policy 持有。五个真实 consumers 已接回，旧 helpers/constant 已删除。focused test 覆盖 23 项。
+
 随后将 `Jnt` downloads view publisher 迁入 `downloads/downloads-view-publisher.ts`；app/detached renderer queues、
 initial snapshot、lifecycle ordering、state broadcast coalescing、30 秒 detached watchdog、RPC/renderer teardown 与
 dispose cleanup 均由新 owner 持有。唯一 runtime construction 已接回，旧 class 已删除。focused test 覆盖 29 项。

@@ -120,6 +120,7 @@ const { createTracingRpcServiceClass } = require("./main-app/tracing/tracing-rpc
 const { createTriggerSubscriptionReaderClass } = require("./main-app/triggers/trigger-subscription-reader.js");
 const { createUserVerificationRpcServices } = require("./main-app/user-verification/rpc-services.js");
 const { createDownloadsViewPublisherClass } = require("./main-app/downloads/downloads-view-publisher.js");
+const { createAppServerTransportPolicy } = require("./main-app/app-server/transport-policy.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -140841,20 +140842,13 @@ var Jnt = createDownloadsViewPublisherClass({
     n.iu.REMOTE_CWDS_BY_HOST_AND_WORKSPACE,
     n.iu.ADDED_REMOTE_CONTROL_ENV_IDS,
     n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID,
-  ],
-  U5 = `socks5h://127.0.0.1:1080`;
-function W5(e) {
-  return process.env.CODEX_APP_SERVER_FORCE_CLI === `1`
-    ? null
-    : n.Cs(e.id)
-      ? (e.websocket_url ?? null)
-      : n.mn(e);
-}
-function Ynt(e, t) {
-  let r = new URL(t).hostname;
-  if (r !== `localhost` && r !== `127.0.0.1` && r !== `[::1]`)
-    return n.Cs(e.id) ? (r.endsWith(`.internal.api.openai.org`) ? U5 : void 0) : U5;
-}
+  ];
+var { resolveAppServerWebsocketUrl: W5, resolveAppServerSocksProxyUrl: Ynt } =
+  createAppServerTransportPolicy({
+    environment: process.env,
+    isCloudHostId: n.Cs,
+    resolveHostWebsocketUrl: n.mn,
+  });
 var Xnt = class extends n.Uf {
   windowManager;
   origin;
