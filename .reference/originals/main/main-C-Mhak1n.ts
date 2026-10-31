@@ -352,6 +352,8 @@ const { createUserVerificationRpcServices } = require("./main-app/user-verificat
 const { createDownloadsViewPublisherClass } = require("./main-app/downloads/downloads-view-publisher.js");
 const { createDownloadStoreClass } = require("./main-app/downloads/download-store.js");
 const { createAppServerTransportPolicy } = require("./main-app/app-server/transport-policy.js");
+const { createAppServerTransportFactory } = require("./main-app/app-server/transport-factory.js");
+const { createRequirementsAuthRecoveryRuntime } = require("./main-app/app-server/requirements-auth-recovery.js");
 const { createHostedManagerRegistryClass } = require("./main-app/app-server/hosted-manager-registry.js");
 const { createGithubRequestClientFactory } = require("./main-app/github/github-request-client.js");
 const { createVisualizationServiceRuntime } = require("./main-app/visualizations/visualization-service.js");
@@ -76740,154 +76742,36 @@ var G5 = r.r(`WindowContext`),
     znt,
     getVoiceController,
   });
-function trt(e) {
-  return n.ws(e) ? `remote-control` : n.ks(e) ? `wsl` : `ssh`;
-}
-function K5(e) {
-  let t = HE(e.hostConfig);
-  if (t)
-    return (
-      G5.info(`[ssh-websocket-v0] selected app-server transport`, {
-        safe: { hostId: e.hostConfig.id },
-      }),
-      new VE({ ...t, getConnectTimeoutSeconds: e.getSshConnectTimeoutSeconds })
-    );
-  if (e.transportKind === `remote-control`)
-    return new JEe({
-      hostConfig: e.hostConfig,
-      appServerClient: e.desktopAuthAppServerClient,
-      deviceKeyClient: e.remoteControlDeviceKeyClient,
-      desktopApiOptions: e.desktopApiOptions,
-      globalState: e.globalState,
-      onEnrollmentAuthorizationRequired: e.onEnrollmentAuthorizationRequired,
-    });
-  if (n.As(e.hostConfig))
-    return new QDe({
-      hostConfig: e.hostConfig,
-      repoRoot: e.repoRoot,
-      resourcesPath: e.resourcesPath,
-      defaultOriginator: e.defaultOriginator,
-    });
-  let r = W5(e.hostConfig);
-  if (r) {
-    let t = e.desktopAuthAppServerClient,
-      i =
-        n.Cs(e.hostConfig.id) && t != null
-          ? async () => {
-              let e = await t.getAuthToken({ refreshToken: !1 });
-              if (!e) throw Error(`Sign in to ChatGPT to start a durable thread.`);
-              let r = a.yt(e);
-              return {
-                authenticatedPrincipal: n._i(e),
-                headers: r == null ? void 0 : { "ChatGPT-Account-Id": r },
-                protocols: Te(e),
-              };
-            }
-          : void 0,
-      o = Ynt(e.hostConfig, r),
-      s;
-    if (n.Cs(e.hostConfig.id))
-      try {
-        s = [...(0, ne.getCACertificates)(`default`), ...(0, ne.getCACertificates)(`system`)];
-      } catch (e) {
-        G5.warning(`Failed to load CA certificates for cloud WebSocket`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-    let c = new n.pn({
-      hostConfig: e.hostConfig,
-      websocketUrl: r,
-      ca: s,
-      getWebsocketHandshake: i,
-      ...(o == null ? {} : { socksProxyUrl: o }),
-    });
-    return n.Cs(e.hostConfig.id) && t != null
-      ? new hEe(c, new kT(() => t.getAuthToken({ refreshToken: !1 }), e.desktopApiOptions))
-      : c;
-  }
-  return new n.dn({
-    hostConfig: e.hostConfig,
-    repoRoot: e.repoRoot,
-    resourcesPath: e.resourcesPath,
-    defaultOriginator: e.defaultOriginator,
-    getConfigOverrides: async () => [...(await Xie(e))],
+var { hostKindForConfig: trt, createAppServerTransport: K5 } =
+  createAppServerTransportFactory({
+    isRemoteControlHostConfig: n.ws,
+    isWslHostConfig: n.ks,
+    resolveSshWebsocketConfig: HE,
+    SshWebsocketTransport: VE,
+    RemoteControlTransport: JEe,
+    isRemoteStdioHostConfig: n.As,
+    RemoteStdioTransport: QDe,
+    resolveWebsocketUrl: W5,
+    isCloudHostId: n.Cs,
+    accountIdFromToken: a.yt,
+    authenticatedPrincipalFromToken: n._i,
+    protocolsForToken: Te,
+    resolveSocksProxyUrl: Ynt,
+    getCACertificates: ne.getCACertificates,
+    WebsocketTransport: n.pn,
+    AuthenticatedTransport: hEe,
+    DesktopApiTokenClient: kT,
+    LocalStdioTransport: n.dn,
+    getConfigOverrides: Xie,
+    logger: G5,
   });
-}
-var q5 = {
-    title: {
-      messageId: `desktop.requirementsAuthRecovery.title`,
-      defaultMessage: `Sign in to continue`,
-    },
-    detail: {
-      messageId: `desktop.requirementsAuthRecovery.detail`,
-      defaultMessage: `Your session is no longer valid. Sign in again to open {appName}`,
-    },
-    retryDetail: {
-      messageId: `desktop.requirementsAuthRecovery.retryDetail`,
-      defaultMessage: `{appName} couldn't sign you out. Try again to return to sign-in`,
-    },
-    signIn: {
-      messageId: `desktop.requirementsAuthRecovery.signIn`,
-      defaultMessage: `Sign in again`,
-    },
-    quit: { messageId: `desktop.requirementsAuthRecovery.quit`, defaultMessage: `Quit` },
-  },
-  nrt = new Set(
-    [
-      `Your access token could not be refreshed because your refresh token has expired. Please log out and sign in again.`,
-      `Your access token could not be refreshed because your refresh token was already used. Please log out and sign in again.`,
-      `Your access token could not be refreshed because your refresh token was revoked. Please log out and sign in again.`,
-      `Your access token could not be refreshed. Please log out and sign in again.`,
-      `Your access token could not be refreshed because you have since logged out or signed in to another account. Please sign in again.`,
-    ].map((e) => `failed to read configuration layers: ${e}`),
-  );
-function rrt(e, t) {
-  let r = null;
-  return async (i, a) => {
-    if (!n.jc(i) && !(i instanceof Error && nrt.has(i.message))) throw i;
-    for (; r != null;) await r;
-    if (!a()) return `stop`;
-    r = irt(e, t, a);
-    try {
-      return await r;
-    } finally {
-      r = null;
-    }
-  };
-}
-async function irt(e, t, n) {
-  let i = a.hn(),
-    o = !1;
-  for (; n();) {
-    let { response: a } = await l.dialog.showMessageBox({
-      type: `warning`,
-      message: i.formatMessage(q5.title),
-      detail: i.formatMessage({
-        ...(o ? q5.retryDetail : q5.detail),
-        values: { appName: l.app.getName() },
-      }),
-      buttons: [i.formatMessage(q5.signIn), i.formatMessage(q5.quit)],
-      defaultId: 0,
-      cancelId: 1,
-      noLink: !0,
-    });
-    if (!n()) return `stop`;
-    if (a !== 0) return (t.markQuitApproved(), l.app.quit(), `stop`);
-    try {
-      return (await e.sendAppServerRequest(`account/logout`, void 0), `retry`);
-    } catch (e) {
-      (r
-        .n()
-        .warning(`Failed to sign out for requirements recovery`, {
-          safe: {},
-          sensitive: { error: e },
-        }),
-        (o = !0));
-    }
-  }
-  return `stop`;
-}
+var rrt = createRequirementsAuthRecoveryRuntime({
+  isCloudRequirementsAuthError: n.jc,
+  getNativeIntl: a.hn,
+  dialog: l.dialog,
+  app: l.app,
+  logger: r.n(),
+});
 function art({
   app: e,
   applicationNetwork: t,

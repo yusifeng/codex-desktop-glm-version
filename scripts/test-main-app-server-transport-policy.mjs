@@ -83,8 +83,8 @@ function createPolicy(environment = {}) {
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("resolveAppServerWebsocketUrl: W5"), true);
 equal(main.includes("resolveAppServerSocksProxyUrl: Ynt"), true);
-equal(main.includes("let r = W5(e.hostConfig)"), true);
-equal(main.includes("o = Ynt(e.hostConfig, r)"), true);
+equal(main.includes("resolveWebsocketUrl: W5"), true);
+equal(main.includes("resolveSocksProxyUrl: Ynt"), true);
 equal(main.includes("function W5("), false);
 equal(main.includes("function Ynt("), false);
 equal(main.includes("U5 = `socks5h://127.0.0.1:1080`"), false);

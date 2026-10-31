@@ -4769,3 +4769,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   catalog entry projection；`WindowContext` 的三类 source attach consumers 全部继续真实消费 factory outputs。
 - main 旧 schemas 与 `M5/fnt/N5` 删除 118 行，新生产模块 180 行；focused coverage 47 项，no-unwired gate 扩至
   234 项。下一批重新审计 host transport selection/auth recovery 等后续第一方边界，避免强拆大型 app composition root。
+
+# 2026-11-01 app-server connection bootstrap policies
+
+- `src/main/main-app/app-server/transport-factory.ts` 已接管 host-kind projection、五类 transport selection、cloud
+  handshake/account/protocol、CA/SOCKS fallback 和 authenticated wrapper；底层共享 I/O transports 仍作为依赖注入，
+  `WindowContext` 两条 connection paths 真实消费同一 factory。
+- `src/main/main-app/app-server/requirements-auth-recovery.ts` 已接管 auth-error classification、single-flight、active
+  recheck、localized dialog、logout retry、quit approval 与 cleanup；`observeRequirements` consumer 已真实接回。
+- main 旧 `trt/K5/q5/nrt/rrt/irt` 删除 147 行，新生产模块合计 224 行；focused coverage 合计 95 项，no-unwired
+  gate 扩至 245 项。紧随其后的 `art` 是大型 app composition root，暂不强拆；下一批从其后继续寻找独立 owner。

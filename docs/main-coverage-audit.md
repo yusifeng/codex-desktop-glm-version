@@ -2774,3 +2774,14 @@ read、temporary/invalid-date suppression、timestamp/title/project/origin proje
 的 local、remote 和 ChatGPT 三类 source consumers 均继续真实调用同一 outputs；旧 `j5/unt` schemas、`M5/fnt/N5`
 实现已物理删除。focused test `scripts/test-main-thread-catalog-sources.mjs` 覆盖 47 项 request、pagination、projection、
 notification、optional adapter、validation、cleanup 和 consumer wiring 行为。
+
+### 增量抽取：app-server transport factory 与 requirements auth recovery
+
+app-server host-kind projection、SSH WebSocket precedence、remote-control/remote-stdio/WebSocket/local-stdio selection、
+cloud token handshake/account header/protocol、CA certificate fallback、SOCKS proxy、authenticated wrapper 与 config
+override forwarding 已迁移至 `src/main/main-app/app-server/transport-factory.ts`；`WindowContext` 的 standard 与
+remote-control connection consumers 继续调用原 `K5/trt` aliases。startup requirements 的 cloud/legacy auth-error
+classification、single-flight sequencing、active recheck、localized retry dialog、logout retry、quit approval 和 failure
+logging 已迁移至 `src/main/main-app/app-server/requirements-auth-recovery.ts`，`applicationNetwork.observeRequirements`
+继续真实消费 factory output。旧 `trt/K5/q5/nrt/rrt/irt` cluster 已物理删除。focused tests 合计 95 项，覆盖所有
+transport branches、handshake/CA failure、dialog/logout/quit races、legacy errors、single-flight cleanup 和 consumer wiring。
