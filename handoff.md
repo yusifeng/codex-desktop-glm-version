@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `I5` thread metadata generation service 迁入
+`threads/thread-metadata-generation-service.ts`；ephemeral model resolution、title failure fallback、description
+forwarding、per-host/thread summary rollover/abort、stale-result suppression 与 dispose cleanup 均由新 owner 持有。
+唯一 runtime construction/disposal 已接回，旧 class 已删除。focused test 覆盖 51 项。
+
 随后将 `Ztt/E5` thread-catalog page-slot scheduler 迁入
 `thread-catalog/page-slot-scheduler.ts`；per-host serialization/throttling、foreground promotion、host generation
 cancellation、background dispatch pacing、timer resolution 与 dispose cleanup 均由新 owner 持有。两个 runtime

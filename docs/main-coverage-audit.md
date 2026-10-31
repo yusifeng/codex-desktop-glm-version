@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread metadata generation service
+
+原 `I5` 已迁入 `src/main/main-app/threads/thread-metadata-generation-service.ts`。新 owner 保留 ephemeral model
+config lookup、title/description generation forwarding、title failure logging/null fallback、per-host/thread summary
+request replacement/abort、aborted-result suppression、non-abort error logging 与 static dispose；真实 construction/disposal
+均已接回，旧 class 已删除。
+
 ## 2026-10-31 thread-catalog page-slot scheduler
 
 原 `Ztt/E5` 已迁入 `src/main/main-app/thread-catalog/page-slot-scheduler.ts`。新 owner 保留 per-host page dispatch

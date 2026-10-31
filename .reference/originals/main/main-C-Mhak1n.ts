@@ -113,6 +113,7 @@ const { createNodePtyBackendRuntime } = require("./main-app/terminal/node-pty-ba
 const { createTerminalCommandRuntime } = require("./main-app/terminal/terminal-command-runtime.js");
 const { createThreadArchiveServiceClass } = require("./main-app/threads/thread-archive-service.js");
 const { createThreadCatalogPageSlotSchedulerClass } = require("./main-app/thread-catalog/page-slot-scheduler.js");
+const { createThreadMetadataGenerationServiceClass } = require("./main-app/threads/thread-metadata-generation-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -139940,104 +139941,14 @@ function bnt(e) {
     ? `all`
     : (0, _.createHash)(`sha256`).update(JSON.stringify(e)).digest(`base64url`);
 }
-var I5 = class extends n.Uf {
-    appServerConnectionRegistry;
-    statsig;
-    logger = r.r(`ThreadMetadataGenerationService`);
-    summaryRequests = new Map();
-    disposed = !1;
-    constructor(e, t) {
-      (super(), (this.appServerConnectionRegistry = e), (this.statsig = t));
-    }
-    static dispose(e) {
-      e.disposed = !0;
-      for (let t of e.summaryRequests.values()) t.abort();
-      e.summaryRequests.clear();
-    }
-    async generateTitle({
-      hostId: e,
-      prompt: t,
-      cwd: r,
-      readOnlyAppToolAllowlist: i,
-      serviceName: a,
-    }) {
-      try {
-        return await n.a({
-          model: (await Ln(this.statsig)).ephemeralGenerationModel,
-          prompt: t,
-          cwd: r,
-          serviceTier: null,
-          readOnlyAppToolAllowlist: i,
-          serviceName: a,
-          appServerClient: this.appServerConnectionRegistry.getConnection(e),
-        });
-      } catch (e) {
-        return (
-          this.logger.warning(`Failed to generate thread title`, {
-            safe: {},
-            sensitive: { error: e },
-          }),
-          null
-        );
-      }
-    }
-    async generateDescription({ hostId: e, threadId: t, title: r, cwd: i, serviceName: a }) {
-      return n.r({
-        model: (await Ln(this.statsig)).ephemeralGenerationModel,
-        title: r,
-        cwd: i,
-        serviceTier: null,
-        sourceThreadId: t,
-        serviceName: a,
-        appServerClient: this.appServerConnectionRegistry.getConnection(e),
-      });
-    }
-    async generateSummary({
-      hostId: e,
-      threadId: t,
-      title: r,
-      previousUserMessage: i,
-      previousAssistantMessage: a,
-      latestMessage: o,
-      phase: s,
-      cwd: c,
-      includeCompactSummary: l,
-      serviceName: u,
-    }) {
-      if (this.disposed) return null;
-      let d = `${e}\0${t}`;
-      this.summaryRequests.get(d)?.abort();
-      let f = new AbortController();
-      this.summaryRequests.set(d, f);
-      try {
-        let t = await n.i({
-          model: (await Ln(this.statsig)).ephemeralGenerationModel,
-          title: r,
-          previousUserMessage: i,
-          previousAssistantMessage: a,
-          latestMessage: o,
-          phase: s,
-          cwd: c,
-          includeCompactSummary: l,
-          serviceName: u,
-          signal: f.signal,
-          appServerClient: this.appServerConnectionRegistry.getConnection(e),
-        });
-        return f.signal.aborted ? null : t;
-      } catch (e) {
-        return (
-          f.signal.aborted ||
-            this.logger.warning(`Failed to generate thread turn summary`, {
-              safe: {},
-              sensitive: { error: e },
-            }),
-          null
-        );
-      } finally {
-        this.summaryRequests.get(d) === f && this.summaryRequests.delete(d);
-      }
-    }
-  },
+var I5 = createThreadMetadataGenerationServiceClass({
+    RpcHandlerBase: n.Uf,
+    createLogger: r.r,
+    getFeatureConfig: Ln,
+    generateTitle: n.a,
+    generateDescription: n.r,
+    generateSummary: n.i,
+  }),
   xnt = n.wf({
     threadId: n.Of().min(1).transform(n.$u),
     projectless: n.gf().optional(),
