@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+迁出 download store owner：原 `LGe` 及其 link-download/will-download 辅助簇已迁入 `downloads/download-store.ts`。native
+history/live item 合并、save-path reservation、pause/resume/cancel/open、unacknowledged/lifecycle publication、browser-use 下载准入
+与隐藏 WebContentsView link download 均由完整 49-member owner 持有；真实 browser host consumer 已接回，旧 514 行簇已删除。
+
 收敛 ConversationEventBus：语义 `conversations/event-bus.ts` 已由 `AppServerConversationManager` 真实消费，本轮审计发现旧的
 压缩实现遗漏 turn-start request stale gate，以及监听器在 capture 期间注销时的即时 capture 回收。模块已恢复完整 83-member
 生命周期、keyed conversation/stream role、notification 与事件顺序语义，主 chunk 重复 `Ah` 已物理删除；focused gate 覆盖竞态。

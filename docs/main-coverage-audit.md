@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 download store owner
+
+原 `LGe` 连同 `FGe/IGe/rq/RGe/iq/aq` 已迁入 `src/main/main-app/downloads/download-store.ts`，真实 browser host 继续通过
+`new LGe(options)` 构造语义 factory class。模块保留 native/live history 合并、save path 冲突处理、download lifecycle、未确认
+集合上限、browser-use 准入与 link-download 临时 WebContentsView；focused suite 锁定 49 members、状态转换、历史映射及准入行为。
+
 ## 2026-10-31 ConversationEventBus owner cleanup
 
 `src/main/main-app/conversations/event-bus.ts` 已由语义 `AppServerConversationManager` 直接构造并消费。对照主 chunk 旧 `Ah`
