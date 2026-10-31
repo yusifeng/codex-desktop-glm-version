@@ -2610,3 +2610,14 @@ installation identity 与 persistent partition clear-data RPC 已迁移至
 BrowserWindow startup 真实调用 default header installer，sandbox attach 真实调用 session configurator，`D2e`
 真实复用新 data handler；旧 `c2e..V$` cache、`H$/h2e/g2e` session owner 和旧 `D2e` class 已删除。
 focused test 覆盖 60 项 cache、header、protocol、permission、restriction 和 storage cleanup 行为。
+
+### 增量抽取：native command crash attribution owner
+
+原 main chunk 的 command-completed crash classification、shell command/executable 解析、primary runtime
+script attribution、依赖诊断、metadata timeout、Sentry payload 与 per-item dedupe 已整体迁移至
+`src/main/main-app/diagnostics/native-command-crash.ts`。main 通过
+`createNativeCommandCrashRuntime` 真实接回 notification handler 与 session-source normalization consumer；
+`k2e/A2e/t1/j2e` 常量和 `P2e/F2e/I2e/L2e/R2e/z2e/n1/r1/i1/B2e` 旧实现已物理删除，schema 与
+全局 notification registration 组合根仍留在 main。新模块新增 338 行生产实现，替换 main 中 278 行
+机械恢复代码；`scripts/test-main-native-command-crash-owner.mjs` 覆盖 62 项 signal、shell、attribution、
+suppression、diagnosis、payload、dedupe 与 normalization 行为。

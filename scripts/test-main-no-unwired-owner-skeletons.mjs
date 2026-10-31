@@ -18,6 +18,7 @@ const realOwners = [
   ["src/main/main-app/workspace/worktree-attachment-handler.ts", "createWorktreeAttachmentHandlerClass"],
   ["src/main/main-app/mcp-sandbox/lifecycle.ts", "createMcpSandboxLifecycleRuntime"],
   ["src/main/main-app/mcp-sandbox/network-runtime.ts", "createMcpSandboxNetworkRuntime"],
+  ["src/main/main-app/diagnostics/native-command-crash.ts", "createNativeCommandCrashRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -86,6 +87,10 @@ assert.equal(main.includes("function c2e("), false, "generated MCP prewarm cache
 assert.equal(main.includes("function h2e("), false, "generated MCP default header installer must be removed");
 assert.equal(main.includes("function g2e("), false, "generated MCP session restriction owner must be removed");
 assert.equal(main.includes("D2e = class extends"), false, "generated MCP sandbox data handler must be removed");
+assert.equal(main.includes("createNativeCommandCrashRuntime({"), true, "real native command crash owner is wired");
+assert.equal(main.includes("function P2e("), false, "generated native crash classifier must be removed");
+assert.equal(main.includes("async function F2e("), false, "generated native crash reporter must be removed");
+assert.equal(main.includes("function R2e("), false, "generated primary-runtime attribution must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("77 main unwired-owner skeleton assertions passed");
+console.log("83 main unwired-owner skeleton assertions passed");

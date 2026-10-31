@@ -4633,3 +4633,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - lifecycle 与 network owners 已互相通过显式 callback 接线，共享 guest state 和 gesture token 而不复制 Map；
   focused coverage 60 项，no-unwired gate 77 项。下一步从 MCP 后续区域继续审计 native crash attribution 与
   其他仍在 main chunk 的第一方 RPC/controller，保留纯 Electron session I/O adapter 证据。
+
+# 2026-11-01 native command crash attribution owner
+
+- `src/main/main-app/diagnostics/native-command-crash.ts` 已接管 command notification crash signal
+  classification、shell executable 解析、primary runtime script attribution、依赖诊断、metadata timeout、
+  telemetry payload 与 dedupe；main 通过 factory 真实接回原 notification/session-source consumers。
+- 旧 crash constants/helpers 共 278 行已从 main 物理删除，新生产模块 338 行；focused coverage 62 项，
+  no-unwired gate 扩至 83 项。下一步越过紧邻的 browser focus polling 小 helper，优先审计后续完整
+  browser/native session RPC/controller 边界，避免为了数量拆分共享 Electron I/O 组合根。
