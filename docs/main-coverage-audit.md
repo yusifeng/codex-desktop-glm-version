@@ -3394,3 +3394,15 @@ WebContents 适配层：payload/chunk 投递、loading/availability 检查、销
 15 项 focused 断言覆盖发送、错误、清理、销毁与 ack 拒绝路径；相邻 WebContents host、window manager、desktop fetch、
 Electron message handler 与 Open-In 共 168 项回归通过。原本直接 import `.ts`、实际无法运行的 WebContents host 测试入口
 同步改为 esbuild 加载并恢复执行；no-unwired gate 扩至 601 项。
+
+### 整块抽取：app-entry attribution delivery
+
+新增并接回 `startup/app-entry-delivery.ts`，把 installer/deep-link/foreground attribution 与实际窗口投递统一到一个 owner：
+启动期 receipt 队列、primary-window flush、指定 WebContents 路由、销毁窗口抑制、source activation、background/foreground、
+deep-link 和 initial-window-visible 生命周期均由单一 runtime 转发到 `AppEntryAttributionTracker`。`Ust` 不再保存
+`se/ce/le/ue/de/fe` 六段匿名共享状态，只负责创建 runtime、注入 WindowServices 并把 callbacks 交给 consumers。
+
+14 项 focused 断言覆盖队列、延迟 flush、目标窗口、销毁分支和全部 attribution lifecycle forwarding；attribution/PiP、
+application lifecycle、main IPC、hotkey、native notification 与 Electron message handler 相邻 237 项回归通过。迁移同时修复
+application lifecycle、main IPC router 和 native notification 三个直接 import `.ts`、此前实际无法启动的测试入口；
+no-unwired gate 扩至 607 项。

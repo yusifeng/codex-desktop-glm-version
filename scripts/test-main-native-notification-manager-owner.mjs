@@ -4,10 +4,15 @@ import fs from "node:fs";
 import path from "node:path";
 import * as acorn from "acorn";
 import { transform } from "esbuild";
-import {
-  createNativeNotificationManagerClass,
-  createNotificationSoundHelpers,
-} from "../src/main/main-app/notifications/native-notification-manager.ts";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/notifications/native-notification-manager.ts", import.meta.url),
+  "utf8",
+);
+const runtimeOutput = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const runtimeModule = { exports: {} };
+Function("module", "exports", runtimeOutput.code)(runtimeModule, runtimeModule.exports);
+const { createNativeNotificationManagerClass, createNotificationSoundHelpers } = runtimeModule.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -15,10 +20,6 @@ const equal = (actual, expected) => {
   assertions += 1;
 };
 
-const source = fs.readFileSync(
-  new URL("../src/main/main-app/notifications/native-notification-manager.ts", import.meta.url),
-  "utf8",
-);
 const transpiled = await transform(source, { loader: "ts", format: "esm", target: "es2022" });
 const ast = acorn.parse(transpiled.code, { ecmaVersion: "latest", sourceType: "module" });
 let classNode;

@@ -1,9 +1,19 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import {
-  formatQuitConfirmationDetail,
-  installApplicationLifecycle,
-} from "../src/main/main-app/startup/application-lifecycle.ts";
+import { transform } from "esbuild";
+
+const lifecycleSource = fs.readFileSync(
+  new URL("../src/main/main-app/startup/application-lifecycle.ts", import.meta.url),
+  "utf8",
+);
+const lifecycleOutput = await transform(lifecycleSource, {
+  loader: "ts",
+  format: "cjs",
+  target: "es2022",
+});
+const lifecycleModule = { exports: {} };
+Function("module", "exports", lifecycleOutput.code)(lifecycleModule, lifecycleModule.exports);
+const { formatQuitConfirmationDetail, installApplicationLifecycle } = lifecycleModule.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {

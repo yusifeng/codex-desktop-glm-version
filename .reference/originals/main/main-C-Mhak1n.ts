@@ -369,6 +369,7 @@ const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-
 const { SkysightServiceManager: Moe } = require("./main-app/skysight/service-manager.js");
 const { subscribeComputerUsePipTurnLifecycle: Noe } = require("./main-app/computer-use/pip-turn-lifecycle.js");
 const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entry-attribution.js");
+const { createAppEntryDeliveryRuntime } = require("./main-app/startup/app-entry-delivery.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56220,30 +56221,12 @@ async function Ust() {
     ae = resolveRemoteHostedPipProcessIdentifier(F, process.env[Vst]);
   (ae != null && U.setServiceProcessIdentifier(ae), I.add(U.dispose));
   let oe = new ChunkedWebContentsMessageSender(),
-    se,
-    ce = [],
-    le = () => {
-      let e = se;
-      if (e == null) return;
-      let t = e.getPrimaryWindow();
-      if (!(t == null || t.isDestroyed()))
-        for (let n of ce.splice(0, ce.length)) e.sendMessageToWindow(t, n);
-    },
-    ue = (e, t) => {
-      let n = { type: `desktop-app-entry-received`, receipt: e };
-      if (t != null) {
-        let e = l.BrowserWindow.fromWebContents(t);
-        se != null && e != null && !e.isDestroyed() && se.sendMessageToWindow(e, n);
-        return;
-      }
-      (ce.push(n), le());
-    },
-    de = new Foe(ue, void 0, void 0, void 0, await au()?.readPending()),
-    fe = (e, t) => {
-      de.handleSourceActivation(e, (e) => {
-        ue(e, t);
-      });
-    },
+    appEntryDelivery = createAppEntryDeliveryRuntime({
+      AppEntryAttributionTracker: Foe,
+      BrowserWindow: l.BrowserWindow,
+      initialInstallerId: await au()?.readPending(),
+    }),
+    fe = appEntryDelivery.onAppEntrySource,
     W = dst({
       applicationNetwork: i,
       startupPhases: _,
@@ -56265,11 +56248,11 @@ async function Ust() {
       isRemoteHostedPIPEnabled: re,
       onAppEntrySource: fe,
       onWindowRegistered: (e) => {
-        (U.registerWindow(e), le());
+        (U.registerWindow(e), appEntryDelivery.handleWindowRegistered());
       },
       disposables: I,
     });
-  ((se = W),
+  (appEntryDelivery.setWindowServices(W),
     U.setWindowMessageSender((e) => {
       W.windowManager.sendMessageToAllWindows(e);
     }),
@@ -56554,13 +56537,7 @@ async function Ust() {
       enableUpdater: C,
       isMacOS: N,
       appVersion: D,
-      onDeepLinkReceived: (e) => {
-        if (e == null) {
-          de.handleUnloggableDeepLinkActivation();
-          return;
-        }
-        de.handleDeepLink(e);
-      },
+      onDeepLinkReceived: appEntryDelivery.onDeepLinkReceived,
     });
   ((Te = Le.refreshApplicationMenu),
     I.add(
@@ -57013,13 +56990,7 @@ async function Ust() {
     new ChildProcessGoneDiagnostics(l.app, u, r.n()).register(),
     I.add(
       Se.appEvent.subscribe((e) => {
-        switch (e.type) {
-          case `background`:
-            de.handleBackground();
-            break;
-          case `foreground`:
-            de.handleForeground();
-        }
+        appEntryDelivery.handleAppEvent(e);
       }),
     ),
     installApplicationLifecycle({
@@ -57052,11 +57023,11 @@ async function Ust() {
       disposables: I,
       appEvent: Se.appEvent,
       onAppEntrySource: fe,
-      canAttributeAppReactivation: () => de.canAttributeRuntimeActivation(),
+      canAttributeAppReactivation: appEntryDelivery.canAttributeRuntimeActivation,
     }),
     (L = Date.now()));
   let et = await W.ensureWindow();
-  (et != null && (Be(et, !ze), de.handleInitialWindowVisible()),
+  (et != null && (Be(et, !ze), appEntryDelivery.handleInitialWindowVisible()),
     M(`startup window revealed`, L, { windowVisible: et?.isVisible() ?? !1 }),
     (L = Date.now()));
   try {
@@ -57308,7 +57279,7 @@ async function Ust() {
   (ct == null ? (ct = await W.ensureWindow()) : ct.isDestroyed() && (ct = null),
     ct &&
       (_.reach(`window_created`),
-      et ?? de.handleInitialWindowVisible(),
+      et ?? appEntryDelivery.handleInitialWindowVisible(),
       I.add(
         installDesktopOpenPathHandler({
           ensureWindow: W.ensureWindow,

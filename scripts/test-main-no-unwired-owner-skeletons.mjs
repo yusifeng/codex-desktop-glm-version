@@ -5,6 +5,7 @@ const root = new URL("../", import.meta.url);
 const realOwners = [
   ["src/main/main-app/window/window-context.ts", "createWindowContextClass"],
   ["src/main/main-app/window/chunked-web-contents-message-sender.ts", "createChunkedWebContentsMessageSenderClass"],
+  ["src/main/main-app/startup/app-entry-delivery.ts", "createAppEntryDeliveryRuntime"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -607,5 +608,10 @@ assert.equal(main.includes("ChunkedWebContentsMessageSender = createChunkedWebCo
 assert.equal(main.includes("foe = class"), false, "generated chunked sender owner must be removed");
 assert.equal(main.includes("poe = n.Af"), false, "generated acknowledgement schema must be removed");
 assert.equal(main.includes("function moe("), false, "generated acknowledgement IPC bridge must be removed");
+assert.equal(main.includes('require("./main-app/startup/app-entry-delivery.js")'), true, "app-entry delivery owner is wired");
+assert.equal(main.includes("appEntryDelivery = createAppEntryDeliveryRuntime({"), true, "startup creates one app-entry delivery owner");
+assert.equal(main.includes("let n = { type: `desktop-app-entry-received`, receipt: e }"), false, "generated app-entry message delivery must be removed");
+assert.equal(main.includes("de = new Foe("), false, "generated attribution/delivery assembly must be removed");
+assert.equal(main.includes("de.handleSourceActivation"), false, "generated app-entry source adapter must be removed");
 
-console.log("601 main unwired-owner skeleton assertions passed");
+console.log("607 main unwired-owner skeleton assertions passed");

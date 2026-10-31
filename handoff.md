@@ -5343,3 +5343,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 主 chunk 旧 `foe/poe/moe` 已删除。focused suite 15 项，相邻五组回归 168 项，no-unwired gate 扩至 601 项；同时修复
   `test-main-web-contents-host-client.mjs` 直接 import TypeScript 导致从未实际执行的问题。下一批优先迁出 `Ust` 中独立的
   app-entry receipt queue/delivery 状态，保留 WindowManager/startup 的纯装配顺序。
+
+# 2026-11-01 app-entry attribution delivery extraction
+
+- 新增并真实接回 `startup/app-entry-delivery.ts`，统一拥有启动期 app-entry receipt queue、primary-window flush、指定
+  WebContents 路由、destroyed suppression，以及 installer/deep-link/source/background/foreground/initial-window attribution
+  lifecycle；既有 `AppEntryAttributionTracker` 保持算法 owner，新 runtime 负责投递和组合。
+- `Ust` 旧 `se/ce/le/ue/de/fe` 匿名状态整块删除，改为一个 `appEntryDelivery` 实例。focused suite 14 项，相邻六组
+  回归 237 项，no-unwired gate 扩至 607 项；另修复 application lifecycle、main IPC router、native notification 三个
+  直接 import TypeScript 而无法执行的测试入口。下一批继续审计 `Ust/dst`，只抽取能独立拥有状态与清理顺序的完整边界。

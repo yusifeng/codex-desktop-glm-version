@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { registerMainIpcRouter } from "../src/main/main-app/app-shell/main-ipc-router.ts";
+import { transform } from "esbuild";
+
+const routerSource = fs.readFileSync(
+  new URL("../src/main/main-app/app-shell/main-ipc-router.ts", import.meta.url),
+  "utf8",
+);
+const routerOutput = await transform(routerSource, { loader: "ts", format: "cjs", target: "es2022" });
+const routerModule = { exports: {} };
+Function("module", "exports", routerOutput.code)(routerModule, routerModule.exports);
+const { registerMainIpcRouter } = routerModule.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {

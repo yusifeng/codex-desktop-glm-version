@@ -104,7 +104,8 @@ equal(main.includes("resolveComputerUseAppPath: koe"), true);
 equal(main.includes("var rl ="), false);
 equal(main.includes("var Coe ="), false);
 equal(main.includes("var Foe = class"), false);
-equal(main.includes("new Foe("), true);
+equal(main.includes("AppEntryAttributionTracker: Foe"), true);
+equal(main.includes("new Foe("), false);
 equal(main.includes("I.add(Noe({"), true);
 
 console.log(`${assertions} main startup attribution and PIP owner assertions passed`);
