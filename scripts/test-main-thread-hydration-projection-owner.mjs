@@ -190,6 +190,12 @@ equal(owner.environmentInputResult({
     success: false,
   },
 });
+equal(owner.dynamicToolPendingResult({
+  tool: "request_option_picker",
+  arguments: { question: "Pick", options: [{ label: "A" }, { label: "B", description: "Second" }] },
+}), { status: "pending", notifyUserInput: true });
+equal(owner.dynamicToolPendingResult({ tool: "setup_codex_step", arguments: { step: "complete" } }), null);
+equal(owner.dynamicToolPendingResult({ tool: "request_onboarding_input", arguments: { questions: [] } }).status, "invalid");
 const pendingConversation = (tool, args) => ({
   requests: [{
     method: "item/tool/call",
@@ -302,6 +308,8 @@ equal(main.includes("thread: Av(n.thread, e.getConversation(t)?.threadStartKind,
 for (const name of ["f_e", "av", "p_e", "m_e", "ov", "sv", "cv", "lv", "uv", "dv"])
   equal(main.includes(`function ${name}(`), false);
 for (const name of ["fv", "pv", "mv", "hv", "gv", "h_e"])
+  equal(main.includes(`function ${name}(`), false);
+for (const name of ["Ch", "wh", "Ghe", "Th", "Eh", "Dh"])
   equal(main.includes(`function ${name}(`), false);
 for (const name of ["Ov", "b_e", "x_e", "kv", "Av", "jv", "S_e", "Mv"])
   equal(new RegExp(`(?:async )?function ${name}\\(`).test(main), false);

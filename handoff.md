@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复 server request owner：permissions/file/command approval、user input/option/context picker、pending/invalid/dynamic tool dispatch、MCP elicitation
+validation/auto-approval、current time 与 legacy warning 均按原副作用顺序处理。补齐 userInputResponse synthesis 和 codex_app dynamic tool validator；
+主 chunk 旧 `Pye` 及仅由它消费的 onboarding parser/schema 簇删除。
+
 恢复 goal todo carryover subscription：active goal 的最新 plan 现在跨 continuation turn 克隆，遇到 user item、goal replacement/clear、archive/delete
 时按原条件失效；无 continuation 的 turn completion 会将最后 todo 的 inProgress 归 pending。原占位订阅移除，主 chunk 旧 `ib` 删除。
 

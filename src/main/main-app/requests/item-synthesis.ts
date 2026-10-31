@@ -169,6 +169,29 @@ export function Qv(state: R, requestId: string, params: R, completed: boolean, r
     turnId: params.turnId, reason: params.reason, permissions: params.permissions, completed, response,
   });
 }
+export function applyUserInputRequest(
+  state: R,
+  requestId: string,
+  params: R,
+  answers: R,
+  completed: boolean,
+  _logger: R,
+): void {
+  upsertTurnItem(state, params.turnId, {
+    id: `user-input-response-${requestId}`,
+    type: `userInputResponse`,
+    requestId,
+    turnId: params.turnId,
+    questions: params.questions.map((question: R) => ({
+      id: question.id,
+      header: question.header,
+      options: (question.options ?? []).map((option: R) => ({ description: option.description, label: option.label })),
+      question: question.question,
+    })),
+    answers,
+    completed,
+  });
+}
 export function B_e(options: R): ApprovalActionContext {
   function forward(method: string, valueKey: string) {
     return async (id: string, requestId: string, value: unknown, owner: string) => {

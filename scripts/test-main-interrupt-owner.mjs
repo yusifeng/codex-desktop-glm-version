@@ -8,22 +8,26 @@ const source = fs.readFileSync(new URL("../src/main/main-app/streams/notificatio
 const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
 const module = { exports: {} };
 Function("require", "module", "exports", transpiled.code)((specifier) => {
-  if (specifier === "@chunk/shared") return { $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error) };
+  if (specifier === "@chunk/shared") return { $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error), kd: () => ({}), lr: () => null };
   if (specifier === "../turns/canonical-history") return {
     conversationTurns: (conversation) => conversation.turns,
     findTurnById: (conversation, id) => conversation.turns.find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...conversation.turns].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns,
+    latestTurn: (conversation) => conversation.turns.at(-1) ?? null,
+    appendConversationTurn: (conversation, turn) => (conversation.turns.push(turn), turn),
+    findDraftTurn: (conversation, predicate) => [...conversation.turns].reverse().find(predicate) ?? null,
     timelineEntryKey: () => "entry",
     findTurnEntryForEvent: () => null,
     forEachTurn: (conversation, callback) => (conversation.turns ?? []).forEach(callback),
   };
   if (specifier === "../threads/patch-classification") return { applyThreadSettingsUpdate() {} };
-  if (specifier === "../requests/item-synthesis") return { Qv() {}, Yv: String, Zv() {} };
+  if (specifier === "../requests/item-synthesis") return { applyUserInputRequest() {}, L_e: () => false, Qv() {}, Xv: () => null, Yv: String, Zv() {} };
   if (specifier === "../threads/automation-detector") return { parseAutomationUserMessage: () => null, parseHeartbeatDecision: () => null };
-  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set(), normalizeImageGenerationItem: (item) => item };
+  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set(), dynamicToolPendingResult: () => null, ensureTurnFields: (turn) => turn, environmentInputResult: () => null, normalizeImageGenerationItem: (item) => item };
   if (specifier === "../turns/steering-merge") return { acceptServerUserMessage() {}, isSteeringUserMessage: () => false, recoverSteeringOrphans() {}, upsertItem() {} };
   if (specifier === "../vendor/immer") return { freezeIdentity: (value) => value };
+  if (specifier === "../misc/thread-errors") return { buildInterruptResponse: (action) => ({ action }) };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;

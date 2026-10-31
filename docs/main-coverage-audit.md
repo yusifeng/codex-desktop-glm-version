@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 server request owner restoration
+
+语义 `Pye` 原为不读取真实 options 的空 handler。现恢复审批请求入队/事件、user input synthesis、option/context picker、codex_app pending
+tool admission/invalid response、dynamic execution、elicitation parse/auto-approval/dedupe 与同步响应。hydration 新增共用 dynamic tool validator，
+item-synthesis 补齐未完成 userInputResponse；focused suites 覆盖关键分支。旧 `Pye` 与无剩余 consumer 的 `Ghe` schema/parser 簇删除。
+
 ## 2026-10-31 goal todo carryover subscription restoration
 
 语义 `ib` 原先错误地尝试从不存在的 requestClient 订阅通用通知，完全漏掉旧 owner 的 plan carryover 状态机。本轮恢复 plan capture、

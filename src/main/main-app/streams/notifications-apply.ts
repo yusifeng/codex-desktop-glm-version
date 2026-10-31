@@ -1,12 +1,12 @@
-import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString, kd as defaultSandboxConfig } from "@chunk/shared";
+import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString, kd as defaultSandboxConfig, lr as parseElicitation } from "@chunk/shared";
 import { appendConversationTurn, conversationTurns, findDraftTurn, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, latestTurn, mergedConversationTurns, timelineEntryKey } from "../turns/canonical-history";
 import { applyThreadSettingsUpdate } from "../threads/patch-classification";
-import { Qv as applyPermissionsResolution, Yv as planImplementationId, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
+import { applyUserInputRequest, L_e as canAutoApproveElicitation, Qv as applyPermissionsResolution, Xv as elicitationItem, Yv as planImplementationId, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
 import { parseAutomationUserMessage, parseHeartbeatDecision } from "../threads/automation-detector";
-import { activeAncestryIds, ensureTurnFields } from "../threads/hydration";
-import { normalizeImageGenerationItem } from "../threads/hydration";
+import { activeAncestryIds, dynamicToolPendingResult, ensureTurnFields, environmentInputResult, normalizeImageGenerationItem } from "../threads/hydration";
 import { acceptServerUserMessage, isSteeringUserMessage, recoverSteeringOrphans, upsertItem } from "../turns/steering-merge";
 import { freezeIdentity } from "../vendor/immer";
+import { buildInterruptResponse } from "../misc/thread-errors";
 
 type R=Record<string,unknown>;const rec=(v:unknown):R=>typeof v===`object`&&v!==null?v as R:{};const fn=(v:unknown,n:string)=>(rec(v)[n] as (((...a:unknown[])=>unknown)|undefined));
 function update(manager:unknown,id:string,callback:(state:R)=>void){fn(manager,`updateConversationState`)?.(id,callback)} function append(state:R,item:unknown){const turns=state.turns;if(Array.isArray(turns)&&turns.length>0){const turn=rec(turns[turns.length-1]);const items=Array.isArray(turn.items)?turn.items:[];turn.items=[...items,item]}}
@@ -733,5 +733,94 @@ export async function Ave(options: any): Promise<void> {
     } catch (error) { logger.warning("Failed to interrupt subagent descendant", { safe: { conversationId, childConversationId: id }, sensitive: { error } }); }
   }));
 }
-export async function Pye(options:unknown):Promise<unknown>{const o=rec(options);const handler=o.handler??o.handleRequest;return typeof handler===`function`?(handler as (request:unknown)=>unknown)(o.request):undefined}
+export function Pye(options:any):void{
+  const {manager,serverRequest,canHandleAeonDynamicToolAsFollower,threadExecution,runtimeSettings,runtime,
+    turnMergePolicy,respond,onApprovalRequest,onUserInputRequest,shouldHandleDynamicToolCall,resumeForFileApproval}=options;
+  const {id,method,params}=serverRequest;
+  const notifyEmptyUserInput=(conversationId:string,requestId:string,turnId:string)=>
+    onUserInputRequest({conversationId,requestId,turnId,questionCount:0,firstQuestion:null});
+  switch(method){
+    case `item/permissions/requestApproval`:{
+      const conversationId=normalizeThreadId(params.threadId),requestId=requestIdOf(id);
+      manager.updateConversationState(conversationId,(state:any)=>{
+        state.requests.push(serverRequest);state.hasUnreadTurn=true;
+        applyPermissionsResolution(state,requestId,params,false,null,manager.logger);
+      });
+      onApprovalRequest({conversationId,requestId,kind:`permissionRequest`,reason:params.reason??null});
+      return;
+    }
+    case `item/fileChange/requestApproval`:
+    case `item/commandExecution/requestApproval`:{
+      const threadId=`threadId` in params&&typeof params.threadId===`string`?params.threadId:null;
+      if(!threadId){manager.logger.error(`Missing threadId for approval request`,{safe:{},sensitive:{id,params}});return;}
+      const conversationId=normalizeThreadId(threadId);
+      manager.updateConversationState(conversationId,(state:any)=>{state.requests.push(serverRequest);state.hasUnreadTurn=true;});
+      if(method===`item/fileChange/requestApproval`) resumeForFileApproval(conversationId);
+      onApprovalRequest({conversationId,requestId:requestIdOf(id),kind:method===`item/commandExecution/requestApproval`?`commandExecution`:`fileChange`,reason:params.reason??null});
+      return;
+    }
+    case `item/tool/requestUserInput`:{
+      const threadId=`threadId` in params&&typeof params.threadId===`string`?params.threadId:null;
+      if(!threadId){manager.logger.error(`Missing threadId for user input request`,{safe:{},sensitive:{id,params}});return;}
+      const conversationId=normalizeThreadId(threadId),requestId=requestIdOf(id);
+      manager.updateConversationState(conversationId,(state:any)=>{
+        state.requests.push(serverRequest);state.hasUnreadTurn=true;
+        applyUserInputRequest(state,requestId,params,{},false,manager.logger);
+      });
+      const first=params.questions[0]?.question.trim()??null;
+      onUserInputRequest({conversationId,requestId,turnId:params.turnId,questionCount:params.questions.length,firstQuestion:first?.length?first:null});
+      return;
+    }
+    case `item/tool/requestOptionPicker`:{
+      const threadId=`threadId` in params&&typeof params.threadId===`string`?params.threadId:null;
+      if(!threadId){manager.logger.error(`Missing threadId for option picker request`,{safe:{},sensitive:{id,params}});return;}
+      const conversationId=normalizeThreadId(threadId);
+      manager.updateConversationState(conversationId,(state:any)=>{state.requests.push(serverRequest);state.hasUnreadTurn=true;});
+      notifyEmptyUserInput(conversationId,requestIdOf(id),params.turnId);
+      return;
+    }
+    case `item/tool/requestSetupCodexContextPicker`:
+      respond(method,{id:requestIdOf(id),result:{action:`dismiss`,selectedSources:[]}});return;
+    case `item/tool/call`:{
+      const pending=params.namespace===`codex_app`||params.namespace==null?
+        (environmentInputResult(params)??dynamicToolPendingResult(params)):null;
+      if(pending!=null){
+        if(pending.status===`invalid`){respond(method,{id:requestIdOf(id),result:pending.response});return;}
+        if(canHandleAeonDynamicToolAsFollower)return;
+        const conversationId=normalizeThreadId(params.threadId);
+        manager.updateConversationState(conversationId,(state:any)=>{state.requests.push(freezeIdentity(serverRequest));state.hasUnreadTurn=true;});
+        if(pending.notifyUserInput)notifyEmptyUserInput(conversationId,requestIdOf(id),params.turnId);
+        return;
+      }
+      if(!canHandleAeonDynamicToolAsFollower&&!shouldHandleDynamicToolCall(params.threadId))return;
+      threadExecution.executeDynamicToolCall(serverRequest);return;
+    }
+    case `mcpServer/elicitation/request`:{
+      if(parseElicitation(params,runtimeSettings.isOpenAIFormElicitationsEnabled?.()??true,runtime.parseUrl)==null){
+        const result=buildInterruptResponse(`decline`);
+        manager.logger.info(`Sending server response`,{safe:{},sensitive:{id,method,response:result}});
+        respond(method,{id:requestIdOf(id),result});return;
+      }
+      const conversationId=normalizeThreadId(params.threadId);
+      if(canAutoApproveElicitation(params,params.turnId==null?null:findTurnById(manager.getConversation(conversationId),params.turnId,turnMergePolicy),runtime.parseUrl)){
+        if(manager.getStreamRole(conversationId)?.role!==`follower`)respond(method,{id:requestIdOf(id),result:buildInterruptResponse(`accept`)});
+        return;
+      }
+      manager.updateConversationState(conversationId,(state:any)=>{
+        if(!state.requests.some((entry:any)=>entry.id===id))state.requests.push(freezeIdentity(serverRequest));
+        state.hasUnreadTurn=true;
+        applyMcpElicitationResolution(state,params,elicitationItem(requestIdOf(id),params,false,null),manager.logger);
+      });
+      return;
+    }
+    case `currentTime/read`:
+      respond(method,{id:requestIdOf(id),result:{currentTimeAt:Math.floor(Date.now()/1e3)}});return;
+    case `account/chatgptAuthTokens/refresh`:
+    case `attestation/generate`:
+      return;
+    case `applyPatchApproval`:
+    case `execCommandApproval`:
+      manager.logger.warning(`Ignored legacy approval request`,{safe:{method,id},sensitive:{}});return;
+  }
+}
 export const applyNotification=nb,addSyntheticCompactionItem=Fy,addForkedFromConversationSyntheticItem=Iy,addCloudTaskSyntheticItem=Ly,addWorktreeInitSyntheticTurn=Ry,removePlanImplementationRequest=zy,subscribeToNotificationStream=ib,interruptConversationCore=Ove,interruptSubagentDescendants=Ave,handleServerRequest=Pye;

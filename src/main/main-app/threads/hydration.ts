@@ -649,6 +649,31 @@ export function environmentInputResult(params: Record<string, any>): {
     : null;
 }
 
+export function dynamicToolPendingResult(params: Record<string, any>): {
+  status: string;
+  notifyUserInput?: boolean;
+  response?: { contentItems: Array<{ type: string; text: string }>; success: boolean };
+} | null {
+  const environment = environmentInputResult(params);
+  if (environment != null) return environment;
+  const invalid = (tool: string) => ({
+    status: `invalid`,
+    response: { contentItems: [{ type: `inputText`, text: `${tool} received invalid arguments.` }], success: false },
+  });
+  switch (params.tool) {
+    case `setup_codex_step`:
+      return isRecord(params.arguments) && hasOnlyKeys(params.arguments, [`step`]) && params.arguments.step === `complete`
+        ? null
+        : isSetupCodexStep(params.arguments) ? { status: `pending`, notifyUserInput: true } : invalid(params.tool);
+    case `request_option_picker`:
+      return isOptionPicker(params.arguments) ? { status: `pending`, notifyUserInput: true } : invalid(params.tool);
+    case `request_onboarding_input`:
+      return isOnboardingInput(params.arguments) ? { status: `pending`, notifyUserInput: true } : invalid(params.tool);
+    default:
+      return null;
+  }
+}
+
 /** 会话当前等待的交互种类（原 `mv`/`pv`）。 */
 export function pendingInteraction(
   conversation: Record<string, any> | null,

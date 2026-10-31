@@ -11,6 +11,7 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
   if (specifier === "@chunk/shared") return {
     $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error),
     kd: () => ({ approvalPolicy: "on-request", approvalsReviewer: null, sandboxPolicy: { type: "workspaceWrite" } }),
+    lr: () => null,
   };
   if (specifier === "../turns/canonical-history") return {
     conversationTurns: (conversation) => conversation.turns ?? [],
@@ -31,6 +32,9 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
   };
   if (specifier === "../requests/item-synthesis") return {
     Qv: (state, requestId) => { state.permissionResolved = requestId; },
+    applyUserInputRequest: (state, requestId) => { state.userInputRequested = requestId; },
+    L_e: () => false,
+    Xv: (requestId) => ({ id: `elicitation-${requestId}`, type: "mcpServerElicitation" }),
     Yv: (turnId) => `plan-${turnId}`,
     Zv: (state) => { state.elicitationResolved = true; },
   };
@@ -40,12 +44,15 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
   if (specifier === "../threads/hydration") return {
     activeAncestryIds: () => new Set(), normalizeImageGenerationItem: (item) => item,
     ensureTurnFields: (turn) => (turn.items ??= [], turn.hookRuns ??= [], turn),
+    environmentInputResult: () => null,
+    dynamicToolPendingResult: (params) => params.tool === "invalid-tool" ? { status: "invalid", response: { success: false } } : null,
   };
   if (specifier === "../turns/steering-merge") return {
     acceptServerUserMessage: (turn, item) => turn.items.push(item), isSteeringUserMessage: (item) => item.type === "steeringUserMessage",
     recoverSteeringOrphans() {}, upsertItem: (turn, item) => { const index = turn.items.findIndex((entry) => entry.id === item.id); index < 0 ? turn.items.push(item) : turn.items[index] = item; },
   };
   if (specifier === "../vendor/immer") return { freezeIdentity: (value) => value };
+  if (specifier === "../misc/thread-errors") return { buildInterruptResponse: (action) => ({ action, content: null, _meta: null }) };
   throw new Error(`unexpected require ${specifier}`);
 }, module, module.exports);
 const owner = module.exports;
@@ -209,6 +216,39 @@ goalListeners.completed({ conversationId: "goal-thread", turnId: "goal-turn-2", 
 equal(goalConversations.get("goal-thread").turns[1].items[0].plan[0].status, "pending");
 removeGoalCarryover();
 
+conversations.set("thread-3", { id: "thread-3", turns: [{ turnId: "turn-3", items: [] }], requests: [] });
+const requestEvents = [];
+const requestOptions = {
+  manager: { ...context.manager, getStreamRole: () => ({ role: "owner" }) },
+  canHandleAeonDynamicToolAsFollower: false,
+  threadExecution: { executeDynamicToolCall: (request) => requestEvents.push(["dynamic", request]) },
+  runtimeSettings: {}, runtime: { parseUrl: () => null }, turnMergePolicy: {},
+  respond: (...args) => requestEvents.push(["respond", ...args]),
+  onApprovalRequest: (event) => requestEvents.push(["approval", event]),
+  onUserInputRequest: (event) => requestEvents.push(["user-input", event]),
+  shouldHandleDynamicToolCall: () => true,
+  resumeForFileApproval: (id) => requestEvents.push(["resume", id]),
+};
+owner.handleServerRequest({ ...requestOptions, serverRequest: {
+  id: "permission-3", method: "item/permissions/requestApproval",
+  params: { threadId: "thread-3", turnId: "turn-3", reason: "Need access" },
+} });
+equal(conversations.get("thread-3").hasUnreadTurn, true);
+equal(conversations.get("thread-3").permissionResolved, "permission-3");
+equal(requestEvents.some(([kind]) => kind === "approval"), true);
+owner.handleServerRequest({ ...requestOptions, serverRequest: {
+  id: "input-3", method: "item/tool/requestUserInput",
+  params: { threadId: "thread-3", turnId: "turn-3", questions: [{ question: " Pick one " }] },
+} });
+equal(conversations.get("thread-3").userInputRequested, "input-3");
+equal(requestEvents.find(([kind]) => kind === "user-input")[1].firstQuestion, "Pick one");
+owner.handleServerRequest({ ...requestOptions, serverRequest: { id: "time-3", method: "currentTime/read", params: {} } });
+equal(requestEvents.some((entry) => entry[0] === "respond" && entry[1] === "currentTime/read"), true);
+owner.handleServerRequest({ ...requestOptions, serverRequest: {
+  id: "elicitation-3", method: "mcpServer/elicitation/request", params: { threadId: "thread-3" },
+} });
+equal(requestEvents.some((entry) => entry[0] === "respond" && entry[1] === "mcpServer/elicitation/request" && entry[2].result.action === "decline"), true);
+
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("function nb("), false);
 equal(main.includes("function rb("), false);
@@ -225,6 +265,7 @@ equal(main.includes("function Yve("), false);
 equal(main.includes("function jy("), false);
 for (const name of ["Ry", "Hy", "Uy"]) equal(main.includes(`function ${name}(`), false);
 equal(main.includes("function ib("), false);
+equal(main.includes("function Pye("), false);
 equal(main.includes("addWorktreeInitSyntheticTurn(e, ce, u, t.history)"), true);
 
 console.log(`${assertions} main notification reducer owner assertions passed`);

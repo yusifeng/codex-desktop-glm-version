@@ -110,6 +110,14 @@ const synthesisState = { turns: [{ turnId: "turn-1", items: [] }] };
 owner.applyMcpServerElicitationItem(synthesisState, { turnId: "turn-1" }, { id: "elicitation", type: "mcpServerElicitation" }, logger);
 owner.applyPermissionRequestItem(synthesisState, "permission-1", { turnId: "turn-1", reason: "Need access", permissions: { network: true } }, false, null, logger);
 equal(synthesisState.turns[0].items.map((item) => item.type), ["mcpServerElicitation", "permissionRequest"]);
+owner.applyUserInputRequest(synthesisState, "input-1", {
+  turnId: "turn-1", questions: [{ id: "q1", header: "Choice", question: "Pick", options: [{ label: "A", description: "First" }] }],
+}, {}, false, logger);
+equal(synthesisState.turns[0].items.at(-1), {
+  id: "user-input-response-input-1", type: "userInputResponse", requestId: "input-1", turnId: "turn-1",
+  questions: [{ id: "q1", header: "Choice", question: "Pick", options: [{ label: "A", description: "First" }] }],
+  answers: {}, completed: false,
+});
 
 const managerSource = fs.readFileSync(new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url), "utf8");
 equal(managerSource.includes('createAutoApprovedElicitation as beginUserVerification'), true);
@@ -120,5 +128,6 @@ equal(main.includes("var G_e = class extends n.Uf"), false);
 equal(main.includes("function K_e({"), false);
 for (const name of ["Uv", "Wv", "M_e", "N_e", "P_e", "F_e", "Gv", "Kv", "Jv", "Yv", "Xv", "L_e", "R_e", "Zv", "Qv", "z_e", "B_e", "V_e", "ey", "H_e", "U_e", "W_e"])
   equal(main.includes(`function ${name}(`), false);
+equal(main.includes("function $v("), false);
 
 console.log(`${assertions} main item synthesis owner assertions passed`);
