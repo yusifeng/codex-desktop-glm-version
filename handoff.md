@@ -1,5 +1,8 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `fe` worker app-event publisher 迁入 `worker/app-event-publisher.ts`；timestamp projection、multi-subscriber fan-out
+与幂等 disposal 均由具名 class 持有。真实 worker runtime consumer 已接回，旧匿名 class 已删除。
+
 随后将 `bst` worker process/RPC manager 迁入 `worker/worker-manager.ts`；workerData/MessagePort startup、analytics/auth/
 tracing updates、listener/exit lifecycle、git graceful flush、Sentry/main RPC sessions、CES cancellation/telemetry、OTel export、
 typed success/error response 与 teardown 均由新 class 持有。真实 worker buses 已接回，旧 class 已删除。

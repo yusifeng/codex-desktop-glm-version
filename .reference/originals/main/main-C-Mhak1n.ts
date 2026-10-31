@@ -45,6 +45,7 @@ const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transp
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createWorkerBusClass } = require("./main-app/worker/worker-bus.js");
 const { createWorkerManagerClass } = require("./main-app/worker/worker-manager.js");
+const { AppEventPublisher } = require("./main-app/worker/app-event-publisher.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
@@ -264,22 +265,6 @@ function ue(e) {
 function de({ email: e, plan: t }) {
   return mainBusiness.isEligibleAccount({ type: `chatgpt`, email: e, planType: t });
 }
-var fe = class {
-  handlers = new Set();
-  subscribe(e) {
-    return (
-      this.handlers.add(e),
-      {
-        dispose: () => {
-          this.handlers.delete(e);
-        },
-      }
-    );
-  }
-  emit(e, t = Date.now()) {
-    for (let n of this.handlers) n({ type: e, at: t });
-  }
-};
 function W(e, t) {
   return e.kind === `chatgpt`
     ? t.kind === `chatgpt` && e.accountId === t.accountId && e.userId === t.userId
@@ -149647,7 +149632,7 @@ var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
     channelForWorker: a.Jt,
   });
 function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicationNetwork: r }) {
-  let i = new fe(),
+  let i = new AppEventPublisher(),
     o = new pst(),
     s = [],
     c = new H9(`git`, {

@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 worker app-event publisher
+
+原 `fe` 已迁入 `src/main/main-app/worker/app-event-publisher.ts`。新具名 class 保留 timestamp projection、multi-subscriber
+fan-out 与幂等 subscription disposal；真实 worker runtime consumer 已接回，旧匿名 class 已删除。
+
 ## 2026-10-31 worker process/RPC manager
 
 原 `bst` 已迁入 `src/main/main-app/worker/worker-manager.ts`。新 class 保留 workerData/MessagePort construction、
