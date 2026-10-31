@@ -54,6 +54,7 @@ const realOwners = [
   ["src/main/main-app/browser-use/origin-state.ts", "BrowserSettingsSync"],
   ["src/main/main-app/automations/habitat-runtime.ts", "createHabitatAutomationRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
+  ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");

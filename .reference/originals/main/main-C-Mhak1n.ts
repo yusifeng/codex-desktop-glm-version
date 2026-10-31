@@ -299,6 +299,7 @@ const { createSavedCustomSectionsManagerClass } = require("./main-app/sidebar/sa
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createWorkspaceFileRuntimeSupport } = require("./main-app/workspace/file-runtime-support.js");
 const { createWindowRpcServiceAdapters } = require("./main-app/window/rpc-service-adapters.js");
+const { createBrowserProfileImportServiceClass, createDetachedBrowserTabsServiceClass, createDownloadsServiceClass } = require("./main-app/window/browser-window-rpc-services.js");
 const { createDesktopFileServicesRuntime } = require("./main-app/files/desktop-file-services.js");
 const { createLibraryFilesBackendRuntime } = require("./main-app/files/library-files-backend.js");
 const { createDictationAudioServiceClass } = require("./main-app/dictation/audio.js");
@@ -23616,65 +23617,15 @@ var BrowserHostService = createBrowserHostServiceClass({
   subscribeFavicon: Hke,
   triggerExtensionAction: Rke,
 });
-var qke = class e extends n.Uf {
-    getConfigRequirements;
-    getBrowserSession;
-    logger = r.r(`browser-profile-import`);
-    constructor(e, t) {
-      (super(), (this.getConfigRequirements = e), (this.getBrowserSession = t));
-    }
-    static create(t, n) {
-      if (process.platform === `darwin` || process.platform === `win32`) return new e(t, n);
-    }
-    async getImportSignals() {
-      if (!(await this.isImportAllowed())) return null;
-      let e = this.getBrowserSession();
-      if (e == null) return null;
-      let t;
-      try {
-        t = await e.browserProfileImporter.getSignals();
-      } catch {
-        return (this.logger.warning(`Unable to inspect browser profile import signals`), null);
-      }
-      return n.hl.parse(t);
-    }
-    async importBrowserProfile(e) {
-      if (!(await this.isImportAllowed()))
-        throw Error(`Browser profile import is disabled by managed policy`);
-      let t = n.pl.parse(e);
-      if (t.importExtensions && t.allowUnverifiedExtensions !== !0)
-        throw Error(`Extension import requires confirmation of unverified files and permissions`);
-      if (!t.importCookies && !t.importPasswords && !t.importHistory && !t.importExtensions)
-        throw Error(`Select cookies, passwords, history, extensions, or a combination to import`);
-      if (!t.importCookies && t.cookieDomainAllowlist)
-        throw Error(`Cookie domain selection requires cookie import`);
-      let r = n
-        .hf(n.fl)
-        .parse(await this.#e.browserProfileImporter.list())
-        .find((e) => e.source === t.source && e.profilePath === t.profilePath);
-      if (r == null) throw Error(`Browser profile is no longer importable`);
-      if (t.importExtensions && (r.source !== `chrome` || r.hasExtensions == null))
-        throw Error(`Extension import is unavailable for this browser profile`);
-      let i = await this.#e.browserProfileImporter.import(t);
-      return n.ml.parse(i);
-    }
-    async listImportableBrowserProfiles() {
-      if (!(await this.isImportAllowed())) return [];
-      let e = this.getBrowserSession();
-      if (e == null) return [];
-      let t = await e.browserProfileImporter.list();
-      return n.hf(n.fl).parse(t);
-    }
-    get #e() {
-      let e = this.getBrowserSession();
-      if (e == null) throw Error(`In-app browser is unavailable.`);
-      return e;
-    }
-    async isImportAllowed() {
-      let { requirements: e } = await this.getConfigRequirements();
-      return e?.inAppBrowser?.allowExternalBrowserSettingsImport !== !1;
-    }
-  };
+var BrowserProfileImportService = createBrowserProfileImportServiceClass({
+  RpcHandlerBase: n.Uf,
+  platform: process.platform,
+  logger: r.r(`browser-profile-import`),
+  parseSignals: (value) => n.hl.parse(value),
+  parseImportRequest: (value) => n.pl.parse(value),
+  parseProfileList: (value) => n.hf(n.fl).parse(value),
+  parseImportResult: (value) => n.ml.parse(value),
+});
 function Jke(e, t, n) {
   if (e == null || t.isDestroyed())
     try {
@@ -23980,31 +23931,8 @@ function tAe(e, t) {
 function YD(e, t, n, r) {
   return XD(e, t, n, r)?.window.webContents ?? null;
 }
-var nAe = class extends n.Uf {
-    manager;
-    origin;
-    getCurrentPageUrl;
-    constructor(e, t, n) {
-      (super(), (this.manager = e), (this.origin = t), (this.getCurrentPageUrl = n));
-    }
-    isCurrentBrowserSiteUrl(e, t, n) {
-      let r = this.manager.findForSource(
-        this.origin,
-        (n) => n.content.kind === `browser` && n.sourceThreadId === e && n.tabId === t,
-      );
-      if (r?.request.content.kind !== `browser`) return !1;
-      let { conversationId: i, browserTabId: a } = r.request.content.data;
-      return this.getCurrentPageUrl(r.window.webContents, i, a) === n;
-    }
-    async focusSourceForBrowserComment(e, t) {
-      let n = XD(this.manager, this.origin, e, t);
-      return n != null && (await n.revealSource(!0)) && n.isActive();
-    }
-    isBrowserTabDetachedFromSource(e, t) {
-      return XD(this.manager, this.origin, e, t) != null;
-    }
-  },
-  rAe = class extends n.Uf {
+var DetachedBrowserTabsService = createDetachedBrowserTabsServiceClass(n.Uf);
+var rAe = class extends n.Uf {
     context;
     getCurrentPageUrl;
     source;
@@ -24089,75 +24017,12 @@ function XD(e, t, n, r) {
       e.content.data.browserTabId === r,
   );
 }
-var iAe = class extends n.Uf {
-    downloadStore;
-    origin;
-    registerView;
-    constructor(e, t, n) {
-      (super(), (this.downloadStore = e), (this.origin = t), (this.registerView = n));
-    }
-    async acknowledge(e) {
-      this.downloadStore.acknowledge(e);
-    }
-    downloadUrl(e) {
-      return this.origin.isDestroyed() ? Promise.resolve(!1) : this.downloadStore.downloadUrl(e);
-    }
-    async cancel(e) {
-      return this.downloadStore.cancel(e);
-    }
-    async chooseDownloadDirectory() {
-      let e = {
-          properties: [`openDirectory`, `createDirectory`],
-          title: `Choose Downloads Folder`,
-        },
-        t = l.BrowserWindow.fromWebContents(this.origin),
-        n = t == null ? await l.dialog.showOpenDialog(e) : await l.dialog.showOpenDialog(t, e);
-      return n.canceled ? null : (n.filePaths[0] ?? null);
-    }
-    clearHistory() {
-      return this.downloadStore.clearHistory();
-    }
-    async getSnapshot() {
-      return this.downloadStore.getSnapshot();
-    }
-    open(e) {
-      return this.downloadStore.open(e);
-    }
-    async pause(e) {
-      return this.downloadStore.pause(e);
-    }
-    async removeFromHistory(e) {
-      return this.downloadStore.removeFromHistory(e);
-    }
-    async resume(e) {
-      return this.downloadStore.resume(e);
-    }
-    searchHistory(e) {
-      return this.downloadStore.searchHistory(e);
-    }
-    showDownloadsFolder() {
-      return this.downloadStore.showDownloadsFolder();
-    }
-    async showInFolder(e) {
-      return this.downloadStore.showInFolder(e);
-    }
-    subscribe(e) {
-      return new aAe(this.registerView(this.origin, e.dup()));
-    }
-  },
-  aAe = class extends n.Uf {
-    #e;
-    constructor(e) {
-      (super(), (this.#e = e));
-    }
-    unsubscribe() {
-      (this.#e?.(), (this.#e = null));
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  },
-  ZD = new WeakMap();
+var DownloadsService = createDownloadsServiceClass({
+  RpcHandlerBase: n.Uf,
+  fromWebContents: (webContents) => l.BrowserWindow.fromWebContents(webContents),
+  showOpenDialog: (...args) => l.dialog.showOpenDialog(...args),
+});
+var ZD = new WeakMap();
 function oAe(e) {
   let t = ZD.get(e);
   return (t ?? ((t = new sAe(e)), ZD.set(e, t)), t);
@@ -71732,7 +71597,7 @@ var G5 = r.r(`WindowContext`),
     h,
     i,
     i5,
-    iAe,
+    DownloadsService,
     j,
     jet,
     jnt,
@@ -71751,7 +71616,7 @@ var G5 = r.r(`WindowContext`),
     m4,
     n,
     n5,
-    nAe,
+    DetachedBrowserTabsService,
     ComposerItemsBridge,
     nje,
     ntt,
@@ -71767,7 +71632,7 @@ var G5 = r.r(`WindowContext`),
     pke,
     q,
     qet,
-    qke,
+    BrowserProfileImportService,
     qnt,
     r,
     r$e,

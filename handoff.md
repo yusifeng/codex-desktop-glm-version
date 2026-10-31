@@ -4897,3 +4897,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   permission/page restore/local-work route、annotation preview cleanup 与 viewport wait 竞态；WindowContext 直接使用语义 class。
 - main 旧 `Kke` 227 行已删除，focused coverage 25 项，WindowContext/no-unwired 回归通过。下一批继续处理相邻 browser
   profile/history/top-sites 与 detached-source/downloads RPC owners，保持 browser session 和 detached manager 的唯一状态。
+
+# 2026-11-01 browser window profile/detached/download RPC services
+
+- `window/browser-window-rpc-services.ts` 已整组迁出 profile import、detached browser source 和 downloads renderer owners；
+  policy/validation、source focus/current URL、dialog parent、destroyed-origin gate 与 subscription cleanup 均保留。
+- main 旧 `qke/nAe/iAe/aAe` 删除，focused coverage 32 项，WindowContext/no-unwired 回归通过。下一批审计仍留在相邻
+  history/top-sites service 与 detached toolbar bridge 的 owners，避免拆散共享 browser session lifecycle。

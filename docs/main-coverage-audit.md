@@ -2925,3 +2925,12 @@ actions/menu/profile/favicon 桥、permission prompts、page restore ID validati
 `BrowserHostService`，仍复用唯一 `browserHostManager`、extension usage 和 detached tabs owner；原始 chunk 中 `Kke` 227 行
 已物理删除。focused test 25 项覆盖 forwarding、ID projection、extension bridges、route owner、conversation cleanup、preview
 navigation cleanup、viewport success/cancel 和 service dispose，WindowContext/no-unwired 回归同步通过。
+
+### 增量抽取：browser window profile/detached/download RPC services
+
+`src/main/main-app/window/browser-window-rpc-services.ts` 已整组接管 browser profile import policy/validation/session access、
+detached browser source lookup/focus/current-URL 验证，以及 downloads store forwarding、目录选择和幂等 subscription cleanup。
+三个 owner 均只引用既有 importer/detached manager/download store，不复制状态；WindowContext 直接消费语义 class。
+原始 chunk 中 `qke/nAe/iAe/aAe` 已物理删除。focused test 32 项覆盖 managed-policy gating、import validation、session absence、
+detached lookup/focus/URL、dialog parent selection、destroyed-origin download gate 和 subscription idempotence，WindowContext/no-unwired
+回归通过。
