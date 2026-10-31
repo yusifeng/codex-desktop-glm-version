@@ -134,6 +134,7 @@ const { createMessagePortRemoteMainFactory } = require("./main-app/app-server/me
 const { createQuitStateClass } = require("./main-app/startup/quit-state.js");
 const { createStartupProgressWindowRuntime } = require("./main-app/startup/progress-window.js");
 const { createGlobalDictationWindowControllerClass } = require("./main-app/dictation/global-dictation-window-controller.js");
+const { createRealtimeVoiceHotkeyManager } = require("./main-app/realtime/voice-hotkey-manager.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -146279,72 +146280,14 @@ var r9 = 1280,
   i9 = 700,
   Oat = 5e3,
   a9 = 560,
-  kat = QuickChatWindowManager,
-  Aat = 250;
-function jat({ requestRealtimeToggle: e, subscribeRealtimeVoiceSessionReservation: t }) {
-  let n = cH(`realtimeVoice`).hotkey,
-    i = null,
-    a = null,
-    o = () => {
-      e().catch((e) => {
-        r.n().warning(`Failed to toggle realtime voice hotkey`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      });
-    },
-    s = null,
-    c = (e) => {
-      if (!e) {
-        s != null && (clearInterval(s), (s = null));
-        return;
-      }
-      s ??
-        ((s = setInterval(() => {
-          l.powerMonitor.getSystemIdleState(1) === `locked` && o();
-        }, Aat)),
-        s.unref());
-    },
-    u = t(c),
-    d = () => {
-      (a?.unregister(), (a = null), (i = null));
-    },
-    f = () => {
-      if (n == null) {
-        d();
-        return;
-      }
-      if (i === n) return;
-      let e = qV(n, {
-        onPressed: () => {
-          l.powerMonitor.getSystemIdleState(1) !== `locked` && o();
-        },
-      });
-      if (e == null) throw Error(`Unable to register voice chat hotkey: ${n}`);
-      (d(), (a = e), (i = n));
-    };
-  try {
-    f();
-  } catch (e) {
-    r.n().warning(`Failed to apply realtime voice hotkey`, { safe: {}, sensitive: { error: e } });
-  }
-  return {
-    dispose: () => {
-      (u(), c(!1), d());
-    },
-    syncCommandKeybinding: (e) => {
-      (e != null && e !== n && YV(e), (n = e));
-      try {
-        f();
-      } catch (e) {
-        r.n().warning(`Failed to sync realtime voice hotkey`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-    },
-  };
-}
+  kat = QuickChatWindowManager;
+var jat = createRealtimeVoiceHotkeyManager({
+  getCommandBinding: cH,
+  registerGlobalHotkey: qV,
+  ensureHotkeyPermissions: YV,
+  powerMonitor: l.powerMonitor,
+  logger: r,
+});
 function Mat(e) {
   return Number.isInteger(e)
     ? e >= 4352 &&

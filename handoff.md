@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Aat/jat` realtime-voice global hotkey owner 迁入 `realtime/voice-hotkey-manager.ts`；command binding、
+register/unregister、locked-screen suppression、reservation lock polling、permission refresh、sync rollback logging 与 disposal
+均由新 owner 持有。真实 realtime lifecycle consumer 已接回，旧 function/constant 已删除。focused test 覆盖 32 项。
+
 随后将 `oat/H7/sat` global-dictation overlay window owner 迁入
 `dictation/global-dictation-window-controller.ts`；lazy prewarm/create、renderer-ready handshake、start/stop/paste-failure、
 recovery geometry、pointer interactivity、display listeners、focus filtering、hide/close 与 failure logging 均由新 owner 持有。

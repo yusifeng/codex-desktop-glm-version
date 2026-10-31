@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 realtime-voice hotkey owner
+
+原 `Aat/jat` 已迁入 `src/main/main-app/realtime/voice-hotkey-manager.ts`。新 owner 保留 command binding、global hotkey
+register/unregister、locked-screen press suppression、reservation-driven 250ms lock polling、permission refresh、apply/sync/toggle
+failure logging 与 disposal；真实 realtime lifecycle consumer 已接回，旧 function/constant 已删除。
+
 ## 2026-10-31 global-dictation window owner
 
 原 `oat/H7/sat` 已迁入 `src/main/main-app/dictation/global-dictation-window-controller.ts`。新 owner 保留 lazy
