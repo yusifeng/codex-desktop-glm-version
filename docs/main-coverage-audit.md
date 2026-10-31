@@ -2754,3 +2754,13 @@ shared-object host invalidation、desktop client-coordination 广播、协议版
 `prepareCronTurnReadState`，没有创建第二份持久化状态。旧内联 `Ant` 组合实现已物理删除。focused test
 `scripts/test-main-thread-read-state-runtime.mjs` 覆盖 54 项 identity、connection race、host invalidation、broadcast、
 protocol、cron/context forwarding、failure logging 与 idempotent cleanup 行为。
+
+### 增量抽取：website-preview Electron net fetch lifecycle
+
+website-preview 的 manual-redirect GET policy、credential/referrer suppression、AbortSignal 前置/竞态处理、Electron
+request/response event bridge、多值 header 投影、2 MiB body 上限、204/205/304 无 body 语义、stream cancel/error/
+aborted/end 清理和 invalid response wrapping 已整体迁移至
+`src/main/main-app/network/website-preview-fetch.ts`。main 通过 `createWebsitePreviewFetch` 生成原 `qnt`，既有
+`WindowContext` 继续将同一函数交给 website-preview service，未新增第二条网络路径；旧内联 `qnt` 已物理删除。
+focused test `scripts/test-main-website-preview-fetch.mjs` 覆盖 56 项 request policy、redirect、abort、stream、limit、
+no-body response、failure wrapping、cleanup 和真实 consumer wiring 行为。

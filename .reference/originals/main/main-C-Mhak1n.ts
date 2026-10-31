@@ -358,6 +358,7 @@ const { createHistorySwipeNavigationServiceClass } = require("./main-app/window/
 const { createSystemFontsServiceClass } = require("./main-app/window/system-fonts-service.js");
 const { createThreadReadStateOwnerClass } = require("./main-app/thread-read-state/thread-read-state-owner.js");
 const { createThreadReadStateRuntime } = require("./main-app/thread-read-state/runtime.js");
+const { createWebsitePreviewFetch } = require("./main-app/network/website-preview-fetch.js");
 const { createThreadProjectMembershipOwnerClass } = require("./main-app/projects/thread-project-membership-owner.js");
 const { createCronTurnReadStatePreparer } = require("./main-app/automations/cron-turn-read-state.js");
 const { DockMenuManager } = require("./main-app/misc/dock-menu.js");
@@ -76550,76 +76551,7 @@ var Fnt = createTracingRpcServiceClass({
     realpathSync: v.realpathSync,
     uniqueBy: yu.default,
   });
-function qnt(e, { signal: t }) {
-  return (
-    t?.throwIfAborted(),
-    new Promise((n, r) => {
-      let i = l.net.request({
-          url: e,
-          method: `GET`,
-          credentials: `omit`,
-          redirect: `manual`,
-          referrerPolicy: `no-referrer`,
-        }),
-        a = null,
-        o = !1,
-        s = () => t?.removeEventListener(`abort`, u),
-        c = (e) => {
-          o || ((o = !0), s(), a?.error(e), r(e), i.abort());
-        },
-        u = () => c(new DOMException(`Website preview canceled`, `AbortError`));
-      (t?.addEventListener(`abort`, u, { once: !0 }),
-        i.on(`error`, c),
-        i.on(`redirect`, (e, t, r) => {
-          if (!o)
-            try {
-              let t = new Response(null, { status: e, headers: { location: r } });
-              ((o = !0), s(), n(t), i.abort());
-            } catch (e) {
-              c(Error(`Invalid website preview redirect`, { cause: e }));
-            }
-        }),
-        i.on(`response`, (e) => {
-          if (!o)
-            try {
-              let t = new Headers();
-              for (let [n, r] of Object.entries(e.headers))
-                for (let e of Array.isArray(r) ? r : [r]) t.append(n, e);
-              let r = 0,
-                l = new ReadableStream({
-                  start(t) {
-                    ((a = t),
-                      e.on(`error`, c),
-                      e.on(`aborted`, u),
-                      e.on(`end`, () => {
-                        o || ((o = !0), s(), t.close());
-                      }),
-                      e.on(`data`, (e) => {
-                        if (!o) {
-                          if (((r += e.byteLength), r > 2097152)) {
-                            c(Error(`Website preview response is too large`));
-                            return;
-                          }
-                          t.enqueue(e);
-                        }
-                      }));
-                  },
-                  cancel() {
-                    o || ((o = !0), s(), i.abort());
-                  },
-                });
-              if (e.statusCode === 204 || e.statusCode === 205 || e.statusCode === 304) {
-                let r = new Response(null, { status: e.statusCode, headers: t });
-                (l.cancel(), n(r));
-              } else n(new Response(l, { status: e.statusCode, headers: t }));
-            } catch (e) {
-              c(Error(`Invalid website preview response`, { cause: e }));
-            }
-        }),
-        t?.aborted ? u() : i.end());
-    })
-  );
-}
+var qnt = createWebsitePreviewFetch({ request: (options) => l.net.request(options) });
 var Jnt = createDownloadsViewPublisherClass({
     createLogger: r.r,
     createUsingScope: a.en,

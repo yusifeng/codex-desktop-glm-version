@@ -4753,3 +4753,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 `Ant` 组合实现删除约 130 行，新生产模块 198 行；focused coverage 54 项，no-unwired gate 扩至
   224 项。下一批优先迁移相邻 website-preview Electron net fetch lifecycle，随后继续审计 thread-catalog sources
   和 host transport assembly；大型 app composition root 保持证据驱动，不为增加数量强拆。
+
+# 2026-11-01 website-preview Electron net fetch lifecycle
+
+- `src/main/main-app/network/website-preview-fetch.ts` 已接管 manual redirect、credential/referrer policy、abort race、
+  Electron response events、多值 headers、2 MiB bounded stream、no-body status、cancel/error/end cleanup 和错误包装；
+  `WindowContext` 的 website-preview service 继续真实消费 factory output。
+- main 旧 `qnt` 删除 70 行，新生产模块 127 行；focused coverage 56 项，no-unwired gate 扩至 228 项。
+  下一批审计 thread-catalog local/ChatGPT source adapters，优先按同一 catalog 边界成组迁移，而不是拆成微提交。
