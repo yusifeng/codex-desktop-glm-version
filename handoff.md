@@ -4928,3 +4928,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   per-root queue、目录交换/回滚、metadata/AGENTS 和旧自定义文件保留。两个 owner 状态互不混合，WindowContext 直接消费。
 - main 对应旧 owner/helper belt 约 330 行已删除；focused coverage 53 项，no-unwired gate 扩至 359 项。下一批从 native-host
   install owner 后方的大型连接/环境 schema belt中继续区分 vendor schema 与可迁第一方 service，不为数量强拆 schema composition。
+
+# 2026-11-01 Environment Config RPC and HTTP owner
+
+- `environment-config/service.ts` 已接管 config/list/delete、draft approval/operation、VPN、personal secrets、outbound identity
+  endpoints，以及 token identity double-check、30s/10m timeout、response parse、8 KiB diagnostics、credential redaction 和结构化日志。
+  原 Zod schemas 保留在 main composition root 并显式注入，避免复制或弱化协议验证；WindowContext 直接消费语义 service。
+- main 旧 `Vk/Kk/Hk/qk/Jk/Uk/Wk/Gk` 约 290 行已删除；focused coverage 61 项，no-unwired gate 扩至 361 项。下一批继续
+  审计 `Zk` auto-resolution hook 与 `lA` device lifecycle，优先完整迁移大 lifecycle owner。

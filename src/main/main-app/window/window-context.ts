@@ -65,7 +65,7 @@ export function createWindowContextClass(dependencies) {
     K5,
     Kee,
     Ket,
-    Kk,
+    EnvironmentConfigService,
     BrowserHostService,
     L,
     L6e,
@@ -1485,7 +1485,7 @@ export function createWindowContextClass(dependencies) {
                 .getConnection(n._s)
                 .sendAppServerExtensionRequest(e, t),
             ),
-            environmentConfigs: new Kk(() => i.getAuthToken({ refreshToken: !1 }), this.options),
+            environmentConfigs: new EnvironmentConfigService(() => i.getAuthToken({ refreshToken: !1 }), this.options),
             mcpAppSandbox: new D2e(e),
             visualizations: new Gnt(this.executionHostRegistry, e, (e, t) => {
               if (n.Cs(e)) return;

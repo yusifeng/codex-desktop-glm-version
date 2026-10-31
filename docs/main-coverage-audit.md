@@ -2961,3 +2961,12 @@ resource disposal、active/identity/site gates、timeout、presentation、suspen
 remote callback lease、stream download/SHA-256、cache verify、失败文件降级、只读权限、staging/previous 原子交换、回滚、旧自定义文件
 保留、metadata 和 AGENTS mirror 说明。原始 chunk 中 `ZD/oAe/sAe/QD/fAe/pAe/mAe/hAe/gAe/_Ae/vAe/yAe/bAe/xAe/SAe/CAe/wAe/TAe`
 整段已删除。focused test 53 项覆盖 registry 状态与真实临时文件系统同步、缓存损坏重下、串行化和 wiring。
+
+### 增量抽取：Environment Config RPC/HTTP owner
+
+`src/main/main-app/environment-config/service.ts` 已接管 environment config CRUD/list、draft/approval/operation、VPN、personal
+secrets、outbound identity connection 的 renderer RPC facade 与 authenticated HTTP owner。保留请求前/响应后 identity 校验、
+user/workspace 并行分页、POST config 10 分钟与其他请求 30 秒 timeout、204/response schema、HTTP/transport error projection、
+8 KiB diagnostic body cap、512 字符 credential/URL redaction、route normalization 和安全/敏感日志字段。原请求/响应 schemas
+继续留在 composition root 注入，未复制 schema 状态；WindowContext 直接构造 `EnvironmentConfigService`。旧
+`Vk/Kk/Hk/qk/Jk/Uk/Wk/Gk` 已删除，focused test 61 项覆盖公开端点、路由、认证竞态、诊断限制/清洗与 wiring。

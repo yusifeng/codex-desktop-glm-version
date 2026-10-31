@@ -351,6 +351,7 @@ const { createBrowserHistoryServiceClass } = require("./main-app/browser-sidebar
 const { createDetachedBrowserRuntime } = require("./main-app/browser-sidebar/detached-browser-runtime.js");
 const { createExtensionRecentUseRegistryFactory } = require("./main-app/browser-sidebar/extension-recent-use.js");
 const { createChatGptProjectFilesServiceClass } = require("./main-app/projects/chatgpt-project-files.js");
+const { createEnvironmentConfigServiceClass } = require("./main-app/environment-config/service.js");
 const {
   BrowserSettingsSync,
   BrowserUseOriginState: XOe,
@@ -24232,314 +24233,40 @@ var fk = `environment-setup-server-configs-v1`,
     ),
     base_version_id: n.Of().min(1),
     draft_revision: n.Cf().int().nonnegative().nullable(),
-  }),
-  Vk = class extends n.Uf {
-    #e;
-    constructor(e) {
-      (super(), (this.#e = e));
-    }
-    async delete(e) {
-      let t = Tk.safeParse(e);
-      if (!t.success) return { ok: !1, error: `invalid-request` };
-      let r = t.data,
-        i = await this.#e(
-          r,
-          `/v1/environment-configs/${encodeURIComponent(r.configId)}`,
-          n.mf(),
-          `log`,
-        );
-      return i.ok ? { ok: !0 } : i;
-    }
-    async saveEnvironmentValue(e) {
-      let t = Lk.safeParse(e);
-      return t.success
-        ? this.#e(t.data, `/v1/environment-values`, Rk)
-        : { ok: !1, error: `invalid-request` };
-    }
-    async list({ accountId: e, userId: t, cursor: n }) {
-      let [r, i] = await Promise.all(
-        [`user`, `workspace`].map(async (r) => {
-          let i = n?.[r];
-          if (n != null && i == null) return null;
-          let a = `scope=${r}&limit=100${i == null ? `` : `&cursor=${encodeURIComponent(i)}`}`;
-          return this.#e(
-            { method: `GET`, accountId: e, userId: t },
-            `/v1/environment-configs?${a}`,
-            Ck,
-            `log-and-return`,
-          );
-        }),
-      );
-      if (r != null && !r.ok) return r;
-      if (i != null && !i.ok) return i;
-      let a = r?.data.nextCursor ?? null,
-        o = i?.data.nextCursor ?? null;
-      return {
-        ok: !0,
-        page: {
-          data: [...(r?.data.data ?? []), ...(i?.data.data ?? [])],
-          nextCursor: a == null && o == null ? null : { user: a, workspace: o },
-        },
-      };
-    }
-    async request(e) {
-      try {
-        let t = Ek.safeParse(e);
-        if (!t.success) return { ok: !1, error: `invalid-request` };
-        let n = t.data,
-          r = await this.#e(n, Hk(n), Sk, `log-and-return`);
-        return r.ok ? { ok: !0, config: r.data } : r;
-      } catch {
-        return { ok: !1, error: `unavailable` };
-      }
-    }
-    async requestVpn(e) {
-      let t = zk.safeParse(e);
-      return t.success
-        ? this.#e(
-            t.data,
-            `/v1/environment-configs/${encodeURIComponent(t.data.configId)}/vpn`,
-            Bk,
-            `log`,
-          )
-        : { ok: !1, error: `invalid-request` };
-    }
-    async requestPersonalSecrets(e) {
-      let t = jk.safeParse(e);
-      if (!t.success) return { ok: !1, error: `invalid-request` };
-      let n = t.data,
-        r =
-          n.method === `GET`
-            ? [
-                n.cursor == null ? void 0 : `cursor=${encodeURIComponent(n.cursor)}`,
-                n.namespace == null ? void 0 : `namespace=${n.namespace}`,
-              ]
-                .filter((e) => e != null)
-                .join(`&`)
-            : ``,
-        i = `/v1/personal-secrets${r ? `?${r}` : ``}`;
-      return n.method === `GET` ? this.#e(n, i, Nk) : this.#e(n, i, Pk);
-    }
-    async preflightPersonalSecrets(e) {
-      let t = Fk.safeParse(e);
-      return t.success
-        ? this.#e(
-            { ...t.data, method: `GET` },
-            `/v1/personal-secrets/preflight?environment_config_id=${encodeURIComponent(t.data.configId)}`,
-            Ik,
-          )
-        : { ok: !1, error: `invalid-request` };
-    }
-    async requestApproval(e) {
-      let t = Dk.safeParse(e);
-      if (!t.success) return { ok: !1, error: `invalid-request` };
-      let n = t.data,
-        r = `/v1/environment-configs/${encodeURIComponent(n.configId)}`;
-      return this.#e(n, `${r}/draft/approve/begin`, kk, `log`);
-    }
-    async readOperation(e) {
-      let t = Ok.safeParse(e);
-      return t.success
-        ? this.#e(
-            { ...t.data, method: `GET` },
-            `/v1/environment-operations/${encodeURIComponent(t.data.operationId)}`,
-            kk,
-            `log`,
-          )
-        : { ok: !1, error: `invalid-request` };
-    }
-    async listOutboundIdentityConnections(e) {
-      let t = ck.safeParse(e);
-      if (!t.success) return { ok: !1, error: `invalid-request` };
-      let n = { ...t.data, method: `GET` };
-      return this.#e(
-        n,
-        `/v1/environment-configs/${encodeURIComponent(n.configId)}/outbound-identity-connections`,
-        lk,
-      );
-    }
-    async requestOutboundIdentityConnection(e) {
-      let t = QO.safeParse(e);
-      if (!t.success) return { ok: !1, error: `invalid-request` };
-      let n = t.data,
-        r = `/v1/outbound-identity-connections`;
-      return this.#e(n, n.method === `POST` ? r : `${r}/${encodeURIComponent(n.connectionId)}`, sk);
-    }
-  };
-function Hk(e) {
-  if (!(`configId` in e)) return `/v1/environment-configs`;
-  let t = `/v1/environment-configs/${encodeURIComponent(e.configId)}`;
-  return e.method === `POST`
-    ? `operation_id` in e.body
-      ? `${t}/draft/approve/complete`
-      : `${t}/draft/approve`
-    : e.method === `PATCH` && `base_version_id` in e.body
-      ? `${t}/draft`
-      : t;
-}
-var Uk = 8192,
-  Wk = 512,
-  Gk = n.wf({ error: n.wf({ code: n.Cf().int(), message: n.Of() }) }),
-  Kk = class extends Vk {
-    httpClient;
-    logger = r.i(`environmentConfig`);
-    constructor(e, t) {
-      (super((...e) => this.#e(...e)), (this.httpClient = new kT(e, t)));
-    }
-    async #e(e, t, r, i) {
-      let o,
-        s,
-        c = `configId` in e ? e.configId : void 0,
-        l;
-      `operationId` in e
-        ? (l = e.operationId)
-        : `body` in e && `idempotency_key` in e.body
-          ? (l = e.body.idempotency_key)
-          : `body` in e && `operation_id` in e.body && (l = e.body.operation_id);
-      let u;
-      `body` in e && `expected_revision` in e.body
-        ? (u = e.body.expected_revision)
-        : `body` in e &&
-          `expected_draft_revision` in e.body &&
-          (u = e.body.expected_draft_revision);
-      try {
-        let d = await this.httpClient.getAuthToken();
-        if (!d || a.yt(d) !== e.accountId || (e.userId != null && n._i(d)?.userId !== e.userId))
-          return { ok: !1, error: `authentication` };
-        let f = async () => {
-          if (e.userId == null) return !0;
-          let t = n._i(await this.httpClient.getAuthToken().catch(() => null));
-          return t?.accountId === e.accountId && t.userId === e.userId;
-        };
-        ((o = t),
-          c != null && (o = o.replace(encodeURIComponent(c), `:configId`)),
-          l != null && (o = o.replace(encodeURIComponent(l), `:operationId`)),
-          (o = o.split(`?`)[0]),
-          (s = Date.now()));
-        let p = await this.httpClient
-          .fetch(t, {
-            method: e.method,
-            token: d,
-            signal: AbortSignal.timeout(
-              e.method === `POST` && c != null && !t.endsWith(`/begin`) ? 6e5 : 3e4,
-            ),
-            body: `body` in e ? JSON.stringify(e.body) : void 0,
-          })
-          .then(async ({ response: e }) =>
-            (await f())
-              ? {
-                  response: e,
-                  responseBody: e.ok && e.status !== 204 ? await e.json() : void 0,
-                  diagnostic: !e.ok && i != null ? await qk(e) : void 0,
-                }
-              : { authenticationChanged: !0 },
-          )
-          .catch((e) => ({ error: e }));
-        if (`authenticationChanged` in p || !(await f()))
-          return { ok: !1, error: `authentication` };
-        if (`error` in p) throw p.error;
-        let { response: m, responseBody: h, diagnostic: g } = p;
-        if (!m.ok) {
-          if (i == null) return { ok: !1, error: `http`, status: m.status };
-          let t = [`x-request-id`, `x-openai-request-id`, `traceparent`]
-              .map((e) => m.headers.get(e))
-              .find((e) => e != null && /^[A-Za-z0-9_.:-]{1,128}$/.test(e)),
-            n = { ok: !1, error: `http`, status: m.status };
-          return (
-            i === `log-and-return` && g != null && (n.message = g.message),
-            this.logger().warning(`Environment configuration request failed`, {
-              safe: {
-                method: e.method,
-                route: o,
-                status: m.status,
-                code: g?.code,
-                revision: u,
-                timestamp: new Date(s).toISOString(),
-                elapsedMs: Date.now() - s,
-              },
-              sensitive: {
-                configId: c,
-                ...(l == null ? {} : { operationId: l }),
-                requestId: t,
-                message: g?.message,
-              },
-            }),
-            n
-          );
-        }
-        let _ = r.safeParse(h);
-        return _.success ? { ok: !0, data: _.data } : { ok: !1, error: `invalid-response` };
-      } catch (t) {
-        if (i == null) return { ok: !1, error: `unavailable` };
-        let n = t instanceof Error ? Jk(t.message) : void 0;
-        this.logger().warning(`Environment configuration request failed`, {
-          safe: {
-            method: e.method,
-            route: o,
-            revision: u,
-            errorName:
-              t instanceof Error &&
-              [`AbortError`, `Error`, `TimeoutError`, `TypeError`].includes(t.name)
-                ? t.name
-                : void 0,
-            timestamp: s == null ? void 0 : new Date(s).toISOString(),
-            elapsedMs: s == null ? void 0 : Date.now() - s,
-          },
-          sensitive: { configId: c, ...(l == null ? {} : { operationId: l }), message: n },
-        });
-        let r = { ok: !1, error: `unavailable` };
-        return (i === `log-and-return` && n != null && (r.message = n), r);
-      }
-    }
-  };
-async function qk(e) {
-  let t = e.headers.get(`content-type`);
-  if (!/^application\/(?:problem\+)?json(?:\s*;|$)/i.test(t ?? ``)) return;
-  let n = e.headers.get(`content-length`);
-  if (n != null && Number(n) > Uk) return;
-  let r = e.body?.getReader();
-  if (r != null)
-    try {
-      let e = new TextDecoder(),
-        t = ``,
-        n = 0;
-      for (;;) {
-        let { done: i, value: a } = await r.read();
-        if (i) break;
-        if (((n += a.byteLength), n > Uk)) {
-          await r.cancel();
-          return;
-        }
-        t += e.decode(a, { stream: !0 });
-      }
-      t += e.decode();
-      let i = Gk.safeParse(JSON.parse(t));
-      return i.success ? { code: i.data.error.code, message: Jk(i.data.error.message) } : void 0;
-    } catch {
-      return;
-    } finally {
-      r.releaseLock();
-    }
-}
-function Jk(e) {
-  return e
-    .replace(/\bBearer\s+[^\s,;]+/gi, `Bearer [redacted]`)
-    .replace(
-      /\b(set-cookie|cookie)(?:\\?["'])?\s*[:=]\s*(?:"(?:\\.|[^"\\])*"|\\"(?:(?!\\")[\s\S])*\\"|'(?:\\.|[^'\\])*'|[^,\r\n}]*)/gi,
-      `$1=[redacted]`,
-    )
-    .replace(
-      /\b(authorization|api[_-]?key|access[_-]?token|refresh[_-]?token|password|secret(?:[_-]?value)?)(?:\\?["'])?\s*[:=]\s*(?:"(?:\\.|[^"\\])*"|\\"(?:(?!\\")[\s\S])*\\"|'(?:\\.|[^'\\])*'|[^\s,;{}]+)/gi,
-      `$1=[redacted]`,
-    )
-    .replace(
-      /\b(?:sk-[A-Za-z0-9_-]{8,}|gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+|tskey-[A-Za-z0-9_-]{8,})\b/gi,
-      `[redacted]`,
-    )
-    .replace(/\bhttps?:\/\/[^\s"'<>]+/gi, `[url-redacted]`)
-    .replace(/[\r\n\t]+/g, ` `)
-    .slice(0, Wk);
-}
+  });
+var EnvironmentConfigService = createEnvironmentConfigServiceClass({
+  RpcHandlerBase: n.Uf,
+  createHttpClient: (getAuthToken, options) => new kT(getAuthToken, options),
+  accountIdFromToken: a.yt,
+  identityFromToken: n._i,
+  loggerFactory: r.i,
+  timeoutSignal: (milliseconds) => AbortSignal.timeout(milliseconds),
+  now: Date.now,
+  schemas: {
+    deleteRequest: Tk,
+    emptyResponse: n.mf(),
+    saveValueRequest: Lk,
+    saveValueResponse: Rk,
+    listResponse: Ck,
+    configRequest: Ek,
+    configResponse: Sk,
+    vpnRequest: zk,
+    vpnResponse: Bk,
+    personalSecretsRequest: jk,
+    personalSecretsListResponse: Nk,
+    personalSecretsWriteResponse: Pk,
+    personalSecretsPreflightRequest: Fk,
+    personalSecretsPreflightResponse: Ik,
+    approvalRequest: Dk,
+    readOperationRequest: Ok,
+    operationResponse: kk,
+    outboundListRequest: ck,
+    outboundListResponse: lk,
+    outboundRequest: QO,
+    outboundResponse: sk,
+    failureDiagnostic: n.wf({ error: n.wf({ code: n.Cf().int(), message: n.Of() }) }),
+  },
+});
 var Yk = n.Ef(n.Of(), n.Mf()),
   Xk = n.wf({ accountId: n.Of().min(1), userId: n.Of().min(1), configId: n.Of().min(1) });
 function Zk(e, t) {
@@ -70782,7 +70509,7 @@ var G5 = r.r(`WindowContext`),
     K5,
     Kee,
     Ket,
-    Kk,
+    EnvironmentConfigService,
     BrowserHostService,
     L,
     L6e,
