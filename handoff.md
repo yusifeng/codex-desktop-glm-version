@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `p2` local project cache 迁入 `projects/local-project-cache.ts`；local project snapshot、create/delete
+投影、partial metadata update、updatedAt 语义与 appearance normalization 均由新 owner 持有。两个 runtime
+consumer 已真实接回，旧 class 已删除；共享 `jr/Rr` helpers 保持单一实现并注入。focused test 覆盖 21 项。
+
 随后将 `Y6e` host app-server projects owner 整体迁入
 `projects/host-app-server-projects.ts`；project pagination/migration、legacy↔server ID 映射、create/import/update/
 move/delete、60 秒可恢复删除窗口、排序写入、thread membership 同步与 connection lifetime 均由新 owner 持有。

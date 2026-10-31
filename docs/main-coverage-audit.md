@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 local project cache
+
+原 `p2` 已迁入 `src/main/main-app/projects/local-project-cache.ts`。新 owner 保留 local-host identity、persisted
+project snapshot、create/delete、partial name/root update、updatedAt 与 appearance projection；两个 runtime
+consumer 均直接构造新 class，旧实现已删除。共享 `jr/Rr` 仍服务其他项目读取/写入路径，故保持单一实现并注入。
+
 ## 2026-10-31 host app-server projects owner
 
 原 `Y6e` 已整体迁入 `src/main/main-app/projects/host-app-server-projects.ts`。新 owner 保留 project list

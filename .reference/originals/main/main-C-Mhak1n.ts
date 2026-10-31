@@ -81,6 +81,7 @@ const { createProjectlessDirectoryChooserClass } = require("./main-app/workspace
 const { createThreadProjectAssignmentWriterClass } = require("./main-app/thread-catalog/thread-project-assignment-writer.js");
 const { createPendingProjectDeletionSchedulerClass } = require("./main-app/projects/pending-project-deletion-scheduler.js");
 const { createHostAppServerProjectsClass } = require("./main-app/projects/host-app-server-projects.js");
+const { createLocalProjectCacheClass } = require("./main-app/projects/local-project-cache.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133153,45 +133154,13 @@ var U6e = 100,
     normalizeProjectRoot: zn,
     now: Date.now,
   }),
-  p2 = class {
-    globalState;
-    hostId = J;
-    constructor(e) {
-      this.globalState = e;
-    }
-    getProjects() {
-      return jr(this.globalState);
-    }
-    getAppearance(e) {
-      return n.Io(this.globalState.get(n.iu.PROJECT_APPEARANCES))[e] ?? null;
-    }
-    writeProject(e, t, r) {
-      (e === `project/create`
-        ? this.globalState.set(n.iu.LOCAL_PROJECTS, { ...this.getProjects(), [t.id]: t })
-        : Rr(this.globalState, t.id, () => null),
-        this.updateAppearance(t.id, r));
-    }
-    updateProject(e, t) {
-      (Rr(this.globalState, e, (e) => ({
-        ...e,
-        name: t.name ?? e.name,
-        rootPaths: t.rootPaths ?? e.rootPaths,
-        updatedAt: t.name !== void 0 || t.rootPaths !== void 0 ? Date.now() : e.updatedAt,
-      })),
-        this.updateAppearance(e, t.appearance));
-    }
-    updateAppearance(e, t) {
-      t !== void 0 &&
-        this.globalState.set(
-          n.iu.PROJECT_APPEARANCES,
-          n.Fo({
-            projectAppearances: n.Io(this.globalState.get(n.iu.PROJECT_APPEARANCES)),
-            projectId: e,
-            appearance: t,
-          }),
-        );
-    }
-  },
+  p2 = createLocalProjectCacheClass({
+    runtime: n,
+    hostId: J,
+    getLocalProjects: jr,
+    updateLocalProject: Rr,
+    now: Date.now,
+  }),
   X6e = n.wf({ projects: n.Ef(n.Of(), n.wf({ trust_level: n.Of().optional() })).optional() }),
   Z6e = class {
     connectionForHost;
