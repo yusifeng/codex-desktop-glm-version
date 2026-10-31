@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 checkout webview 全 owner 迁移：`browser-sidebar/checkout-webview.ts` 从 190 行未接线 partial 副本扩展为约 1,096 行单一 runtime factory，
+完整接管 attach queue/webPreferences hardening、partition/session ledger、presentation identity、认证 cookie 串行化、CDP request/response observation、
+订阅 plan 轮询、business/credit/rate-limit completion、navigation/popup policy 和 destroyed cleanup。BrowserWindowManager 与 ElectronMessageHandler
+两个真实 consumer 已改接，主 chunk 约 930 行旧状态机物理删除。focused suite 执行 37 条 attach/CDP/URL/cleanup/fidelity 断言。
+
 接回 Avatar Overlay renderer message dispatch：既有 `avatar-overlay/message-dispatch.ts` 原先仅是未消费的语义副本，且把缺失 drag/interaction
 字段错误地归一为 `0/false`。本批恢复原始 `undefined` 透传语义，由 ElectronMessageHandler 真实消费 message predicate/dispatcher，并从主 chunk
 物理删除 `GBe/tU/KBe`。focused suite 执行 11 条消息、pointer fallback、回执、undefined fidelity 与接线断言。
@@ -5022,8 +5027,7 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 
 # 2026-11-01 browser find and shortcuts wiring
 
-- checkout-webview 当前语义模块仅覆盖 preferences/CDP observer，尚未覆盖完整约 930 行会话状态机，保留旧 owner 等待完整迁移，
-  未做危险的部分删除。
+- checkout-webview 当时仅覆盖 preferences/CDP observer 的 partial 状态已由本轮完整 owner 迁移解决；旧 930 行状态机不再保留。
 - 后续完整的 `find-in-page.ts` 与 `browser-shortcuts.ts` 已接回；修复 shortcuts wrapper/input 双参数契约。main 旧 `oq..KGe`
   约 235 行整带删除。focused coverage 21 项，no-unwired gate 扩至 431 项；下一批从 `qGe` candidate search owner 继续审计。
 

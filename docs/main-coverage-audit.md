@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 checkout webview complete owner extraction
+
+`browser-sidebar/checkout-webview.ts` 已扩为完整 checkout runtime factory：will/did-attach 配对、session registry、presentation URL identity、auth cookie
+serialization、CDP Stripe/subscription observation、personal/business/purchase completion、plan polling、navigation/popup allowlist 与 destroy cleanup 均保持在
+同一状态 owner。BrowserWindowManager 消费 lifecycle installer，ElectronMessageHandler 消费 presentation update；主 chunk `NW…_G` 约 930 行旧实现
+物理删除。37 条 focused 断言覆盖 partition hardening、URL policy、attach/dispose、CDP plan completion、popup routing 和旧定义缺席。
+
 ## 2026-11-01 avatar overlay message dispatch wiring
 
 `avatar-overlay/message-dispatch.ts` 已从无 consumer 的语义副本改为 ElectronMessageHandler 的真实消息边界；修复旧模块对缺失 drag velocity、pointer

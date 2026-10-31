@@ -85,6 +85,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-comment-policy.ts", "createBrowserCommentPolicy"],
   ["src/main/main-app/sidebar/saved-section-policy.ts", "createSavedSectionPolicy"],
   ["src/main/main-app/avatar-overlay/message-dispatch.ts", "dispatchAvatarOverlayMessage"],
+  ["src/main/main-app/browser-sidebar/checkout-webview.ts", "createCheckoutWebviewRuntime"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -174,6 +175,10 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-annotati
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-comment-policy.js")'), true, "browser comment policy is wired");
 assert.equal(main.includes('require("./main-app/sidebar/saved-section-policy.js")'), true, "saved-section policy is wired");
 assert.equal(main.includes('require("./main-app/avatar-overlay/message-dispatch.js")'), true, "avatar overlay message dispatch is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/checkout-webview.js")'), true, "checkout webview runtime is wired");
+for (const oldOwner of ["var NW = r.i(`checkout-webview`)", "function IUe(", "function RUe(", "function BUe(", "function VUe(", "async function GUe(", "function sG("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated checkout webview runtime must be removed`);
+}
 for (const oldOwner of ["function GBe(", "function tU(", "async function KBe("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated avatar overlay dispatch must be removed`);
 }
