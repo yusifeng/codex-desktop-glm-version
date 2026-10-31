@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续清理 browser comment 假迁移：`comment-controller.ts` 只有 8 个成员，而真实 `hGe` 有 68 个；文件仅保留截图等待/
+压缩局部逻辑，没有 overlay/runtime/design editor/message routing 等 owner 职责，也无任何 runtime consumer。该 skeleton 已删除
+并加入防回归 gate，真实 `hGe` 仍留在主 chunk。
+
 删除 browser comment overlay 的未接线 skeleton：旧 `comment-overlay-manager.ts` 只有 11 个成员，而真实 `JWe` 有 42 个，
 其中 `prepare()` 明确为空实现且没有任何 runtime consumer。文件已删除并加入 unwired-owner 防回归 gate；真实 overlay
 owner 继续留在主 chunk，避免把占位壳误记为完成迁移。

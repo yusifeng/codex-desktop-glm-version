@@ -22,6 +22,7 @@ const removedSkeletons = [
   "src/main/main-app/automations/inbox-items.ts",
   "src/main/main-app/automations/index.ts",
   "src/main/main-app/browser-sidebar/comment-overlay-manager.ts",
+  "src/main/main-app/browser-sidebar/comment-controller.ts",
 ];
 
 for (const path of removedSkeletons) {
@@ -36,4 +37,4 @@ assert.equal(main.includes("PBe = createElectronFetchHandlerClass({"), true, "re
 assert.equal(main.includes("ert = createWindowContextClass({"), true, "real WindowContext owner is wired");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("16 main unwired-owner skeleton assertions passed");
+console.log("17 main unwired-owner skeleton assertions passed");

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 browser comment controller skeleton removal
+
+删除无 runtime consumer 的 `src/main/main-app/browser-sidebar/comment-controller.ts`。该文件只有 8 个 members，真实 `hGe`
+有 68 个；仅实现 screenshot waiter/compaction 局部逻辑，缺少 overlay/runtime/design editor/message routing、截图管线与同步
+职责。真实 owner 仍保留在主 chunk，unwired-owner gate 已锁定该 skeleton 不得回归。
+
 ## 2026-10-31 browser comment overlay skeleton removal
 
 删除从未被 main 或其他 runtime 模块消费的 `src/main/main-app/browser-sidebar/comment-overlay-manager.ts`。该文件只有 11 个
