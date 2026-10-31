@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 MessagePort RPC transport
+
+原 `lrt/urt` 已迁入 `src/main/main-app/app-server/message-port-transport.ts`。新模块保留 structured-clone encoding、
+queued/pending receive、null peer-close、port close error、send guard、abort null handshake/close/error retention，以及
+`n.Vf(...).getRemoteMain()` adapter；AppView IPC consumer 已接回，旧 function/class 已删除。
+
 ## 2026-10-31 native tray-menu owner
 
 原 `Z5/drt/frt/prt/Q5/$5` 已迁入 `src/main/main-app/tray/tray-menu-controller.ts`。新 owner 保留 Linux persistent menu、

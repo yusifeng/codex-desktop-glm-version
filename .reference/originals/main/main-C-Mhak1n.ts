@@ -130,6 +130,7 @@ const { createThreadProjectMembershipOwnerClass } = require("./main-app/projects
 const { createCronTurnReadStatePreparer } = require("./main-app/automations/cron-turn-read-state.js");
 const { DockMenuManager } = require("./main-app/misc/dock-menu.js");
 const { createTrayMenuControllerClass, isTrayMenuThreadsChangedMessage } = require("./main-app/tray/tray-menu-controller.js");
+const { createMessagePortRemoteMainFactory } = require("./main-app/app-server/message-port-transport.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142640,56 +142641,7 @@ function crt(e, t) {
     () => l.ipcMain.removeHandler(a.Vt)
   );
 }
-function lrt(e, t, r) {
-  let i = new urt(e);
-  return new n.Vf(i, t, r).getRemoteMain();
-}
-var urt = class {
-    encodingLevel = `structuredClonable`;
-    constructor(e) {
-      ((this.#e = e),
-        e.start(),
-        e.on(`message`, (e) => {
-          this.#i ||
-            (e.data == null
-              ? this.#a(Error(`Peer closed MessagePort connection.`))
-              : this.#t
-                ? (this.#t(e.data), (this.#t = void 0), (this.#n = void 0))
-                : this.#r.push(e.data));
-        }),
-        e.on(`close`, () => {
-          this.#a(Error(`MessagePort message error.`));
-        }));
-    }
-    #e;
-    #t;
-    #n;
-    #r = [];
-    #i;
-    send(e) {
-      if (this.#i) throw this.#i;
-      this.#e.postMessage(e);
-    }
-    async receive() {
-      if (this.#r.length > 0) {
-        let e = this.#r.shift();
-        if (e != null) return e;
-      }
-      if (this.#i) throw this.#i;
-      return new Promise((e, t) => {
-        ((this.#t = e), (this.#n = t));
-      });
-    }
-    abort(e) {
-      try {
-        this.#e.postMessage(null);
-      } catch {}
-      (this.#e.close(), (this.#i ||= e));
-    }
-    #a(e) {
-      this.#i || ((this.#i = e), (this.#n &&= (this.#n(e), (this.#t = void 0), void 0)));
-    }
-  };
+var lrt = createMessagePortRemoteMainFactory({ RemoteMainTransport: n.Vf });
 var TrayMenuController = createTrayMenuControllerClass({
   Menu: l.Menu,
   app: l.app,

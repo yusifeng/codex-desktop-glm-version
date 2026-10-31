@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `lrt/urt` Electron MessagePort RPC transport 迁入 `app-server/message-port-transport.ts`；structured-clone
+encoding、queued/pending receive、peer-close/error propagation、send、abort handshake 与 remote-main adapter 均由新模块
+持有。AppView IPC consumer 已接回，旧 function/class 已删除。focused test 覆盖 29 项。
+
 随后将 `Z5/drt/frt/prt/Q5/$5` native tray-menu owner 迁入 `tray/tray-menu-controller.ts`；Linux persistent menu、
 Windows cached menu、macOS click suppression、ready/destroy、thread sections/overflow、usage limits、platform actions 与
 quit routing 均由新 owner 持有。IPC message guard 和真实 tray construction 已接回，旧 class/helpers 已删除。
