@@ -85,6 +85,7 @@ const { applySparseStateWrite, createFetchHandlerStateRuntime } = require("./mai
 const { createWorkspaceDirectoryBrowser } = require("./main-app/workspace/directory-browser.js");
 const { createThirdPartyNoticesReader, createWorkspaceSettingsServiceClass, resolveSystemBackdropSupport } = require("./main-app/settings/workspace-settings-service.js");
 const { createAutomationsServiceClass } = require("./main-app/automations/automations-service.js");
+const { createPinnedThreadsServiceClass } = require("./main-app/sidebar/pinned-threads-service.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -94798,192 +94799,16 @@ var rBe = class extends n.Uf {
 function aBe(e) {
   return Ub.safeParse(e).success;
 }
-var jH = class extends n.Uf {
-    #e;
-    #t;
-    #n;
-    #r;
-    #i = new Map();
-    savedCustomSections;
-    #a = null;
-    constructor(e, t, n, r) {
-      (super(),
-        (this.#n = e),
-        (this.#e = t),
-        (this.#r = n),
-        (this.#t = new $ze(e, t)),
-        (this.savedCustomSections = new iBe(e, t, n, r, this.#t, async (e, t, n) => {
-          if ((t(), n != null)) {
-            let r = n.sectionId === ve;
-            ((r && n.beforeThreadId !== void 0
-              ? this.#c(
-                  _t({
-                    threadIds: hH(this.#n),
-                    threadId: n.threadId,
-                    beforeThreadId: n.beforeThreadId,
-                  }),
-                )
-              : this.#s(n.threadId, r)) && (await this.#n.flush()),
-              t(),
-              this.#o(
-                e,
-                [n.sectionId, n.previousSectionId].filter(
-                  (e) => e != null && e !== `01984de2-8f74-7c91-a3b2-5c5e937cf318`,
-                ),
-              ));
-          } else this.#o(e);
-        })));
-    }
-    async list(e) {
-      let t = e?.useAppServerPins === !0;
-      if (((this.#a = t), !t)) return { threadIds: hH(this.#n) };
-      let { threadIds: n, serverOrderedThreadIds: r } = await this.#t.listPinnedThreads({
-          cloudThreadIds: e?.cloudThreadIds,
-          hostId: e?.hostId,
-        }),
-        i = new Set(e?.cloudThreadIds),
-        a = new Set(n);
-      return {
-        threadIds: [...n, ...hH(this.#n).filter((e) => i.has(e) && !a.has(e))],
-        serverOrderedThreadIds: r,
-      };
-    }
-    async set({ threadId: e, pinned: t, beforeThreadId: n, useAppServerPins: r, hostId: i }) {
-      if (r) {
-        this.#a = !0;
-        let r = [],
-          a = i,
-          o = await this.#t.setThreadPinned({
-            beforeThreadId: n,
-            threadId: e,
-            pinned: t,
-            hostId: i,
-            onThreadSectionChange: (e, t) => {
-              ((a = t), e != null && e !== `01984de2-8f74-7c91-a3b2-5c5e937cf318` && r.push(e));
-            },
-          });
-        if (o != null)
-          return (
-            (t && n !== void 0
-              ? this.#c(_t({ threadIds: hH(this.#n), threadId: e, beforeThreadId: n }))
-              : this.#s(e, t)) && (await this.#n.flush()),
-            this.#o(o ? (a ?? null) : void 0, o ? r : void 0),
-            { success: o }
-          );
-        if (!(await this.#t.isLegacyThread({ threadId: e, hostId: i })))
-          throw Error(`App server does not support pinning this thread`);
-      }
-      let a =
-        t && n !== void 0
-          ? this.#c(_t({ threadIds: hH(this.#n), threadId: e, beforeThreadId: n }))
-          : this.#s(e, t);
-      return (this.#o(), await this.#n.flush(), { success: a });
-    }
-    async setOrder({
-      threadIds: e,
-      useAppServerPins: t,
-      movedThreadId: n,
-      beforeThreadId: r,
-      hostId: i,
-    }) {
-      let a = !1;
-      if (t) {
-        if (((this.#a = !0), n != null)) {
-          let e = await this.#t.movePinnedThread({
-            threadId: n,
-            beforeThreadId: r ?? null,
-            hostId: i,
-          });
-          if (e != null) {
-            if (!e) return (this.#o(), { success: !1 });
-            a = !0;
-          } else if (!(await this.#t.isLegacyThread({ threadId: n, hostId: i })))
-            throw Error(`App server does not support reordering this thread`);
-        } else a = !0;
-      }
-      let o = a ? new Set(hH(this.#n)) : null,
-        s = this.#c(o == null ? e : e.filter((e) => o.has(e)));
-      return (this.#o(), (s || !a) && (await this.#n.flush()), { success: a || s });
-    }
-    async listSections(e) {
-      return this.#t.listSections(e);
-    }
-    async listSectionThreadIds(e) {
-      return this.#t.listSectionThreadIds(e);
-    }
-    async createSection(e) {
-      let t = await this.#t.createSection(e);
-      return (
-        e.threadIdToMove != null && this.#s(e.threadIdToMove, !1) && (await this.#n.flush()),
-        e.threadIdToMove != null &&
-          this.#o(
-            e.hostId,
-            [t.id, e.previousSectionId].filter(
-              (e) => e != null && e !== `01984de2-8f74-7c91-a3b2-5c5e937cf318`,
-            ),
-          ),
-        this.#o(e.hostId),
-        t
-      );
-    }
-    async updateSection(e) {
-      let t = `${e.hostId}\0${e.sectionId}\0${e.name}`,
-        n = this.#i.get(t);
-      if (n != null) return n;
-      let r = this.#t.updateSection(e).then(() => {
-        this.#o(e.hostId);
-      });
-      this.#i.set(t, r);
-      try {
-        await r;
-      } finally {
-        this.#i.get(t) === r && this.#i.delete(t);
-      }
-    }
-    async deleteSection(e) {
-      (await this.#t.deleteSection(e), this.#o(e.hostId));
-    }
-    async setThreadSection(e) {
-      let t = await this.#t.setThreadSection(e);
-      return (
-        t &&
-          (this.#s(e.threadId, e.sectionId === `01984de2-8f74-7c91-a3b2-5c5e937cf318`) &&
-            (await this.#n.flush()),
-          this.#o(
-            e.hostId,
-            [e.sectionId, e.previousSectionId].filter(
-              (e) => e != null && e !== `01984de2-8f74-7c91-a3b2-5c5e937cf318`,
-            ),
-          )),
-        { success: t }
-      );
-    }
-    static async getPinnedThreadIdsForWorktreeCleanup(e, t) {
-      if (e.#a == null) throw Error(`Pinned thread source has not been initialized`);
-      if (!e.#a) return hH(e.#n);
-      if (e.#e.getMaybeConnection(t)?.getConnectionState() !== `connected`)
-        throw Error(`App server unavailable for pinned worktree protection`);
-      return e.#t.listPinnedThreadIds({ hostId: t });
-    }
-    #o(e, t) {
-      this.#r.sendMessageToAllRegisteredWindows(
-        e === void 0
-          ? { type: `pinned-threads-updated` }
-          : { type: `pinned-threads-updated`, customSectionHostId: e, customSectionIds: t },
-      );
-    }
-    #s(e, t) {
-      let n = hH(this.#n);
-      return this.#c(t ? [...n.filter((t) => t !== e), e] : n.filter((t) => t !== e));
-    }
-    #c(e) {
-      let t = this.#n.get(n.iu.PINNED_THREAD_IDS) ?? [],
-        r = (0, mH.default)(e);
-      return t.length === r.length && t.every((e, t) => e === r[t])
-        ? !1
-        : (this.#n.set(n.iu.PINNED_THREAD_IDS, r), !0);
-    }
-  },
+var jH = createPinnedThreadsServiceClass({
+    DisposableBase: n.Uf,
+    PinnedThreadServer: $ze,
+    SavedCustomSectionsManager: iBe,
+    dedupe: mH.default,
+    pinnedSectionId: ve,
+    pinnedThreadIdsKey: n.iu.PINNED_THREAD_IDS,
+    readPinnedThreadIds: hH,
+    reorderPinnedThreadIds: _t,
+  }),
   oBe = n.wf({
     userId: n.Of().nullable(),
     accountId: n.Of().nullable(),

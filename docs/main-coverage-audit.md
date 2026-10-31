@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 pinned threads service façade
+
+`PBe` 构造器持有的原 `jH` 已迁入 `src/main/main-app/sidebar/pinned-threads-service.ts`。新 class 保留 legacy/server
+listing、pin/reorder fallback、section CRUD delegation、deduped section updates、saved-section callback synchronization、window
+broadcast 与 worktree cleanup protection；真实 consumer 已接回，旧 class body 已删除。
+
 ## 2026-10-31 automations service owner
 
 `PBe` 构造器持有的原 `CMe` 已迁入 `src/main/main-app/automations/automations-service.ts`。新 class 保留 cron/worktree

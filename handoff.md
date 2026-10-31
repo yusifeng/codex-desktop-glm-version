@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续拆 `PBe` 持有的真实 owner：`jH` pinned-threads façade 已迁入 `sidebar/pinned-threads-service.ts`；legacy/server
+listing、pin/reorder fallback、section CRUD delegation、deduped update、saved-section callback synchronization、broadcast 与
+worktree-cleanup protection 均由新 class 持有。真实 consumer 已接回，复杂 server/reconciliation 作为明确注入边界保留。
+
 继续拆 `PBe` 持有的真实 owner：`CMe` automations service 已迁入 `automations/automations-service.ts`；cron/worktree
 validation、canonical/habitat 双路径、delete cleanup/notification、native execution context、local-only 与 migration gates
 均由新 class 持有。真实 `PBe` consumer 已接回，旧 class body 删除。
