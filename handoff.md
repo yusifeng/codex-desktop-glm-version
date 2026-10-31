@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+删除 OpenInService 的未接线 skeleton：`misc/open-in-service.ts` 只有 6 个成员，而真实 `N0` 有 16 个，缺少 open、preferred
+target 写入、remote host/path、native discovery、inline browser panel 等核心路径，且全仓无 runtime consumer。该 270 行骨架已删除
+并加入防回归 gate；真实 `N0` 继续留在主 chunk，后续必须完整迁移而不能直接接线。
+
 接回 Artifact Session host lifecycle：既有 `artifact-session/host-lifecycle.ts` 与 `runtime-install.ts` 现已替代主 chunk 旧 `Hte`
 及完整 runtime pinning/daemon/admission/process helper 簇。44-member lifecycle 的启动校验、runtime generation、viewer reconciliation、
 retry/stop/dispose 保持完整；startup 真实 consumer 继续通过 `Hte.start(...)` 兼容别名调用，旧 729 行簇已删除。

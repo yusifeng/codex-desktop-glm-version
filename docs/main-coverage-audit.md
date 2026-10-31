@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 OpenInService skeleton removal
+
+审计 `src/main/main-app/misc/open-in-service.ts` 时发现其 `OpenInService` 只有 6 个成员，而真实 `N0` 有 16 个；现有实现的
+`getTargets` 甚至始终使用空 available set，并缺失 open、preferred target 写入、remote path/host、native app discovery 与 inline
+browser panel 路由。文件无任何 runtime consumer，本轮删除该 270 行假迁移并加入 skeleton regression gate；真实 `N0` 保持不动。
+
 ## 2026-10-31 Artifact Session host lifecycle wiring
 
 `src/main/main-app/artifact-session/host-lifecycle.ts` 的 44-member `ArtifactSessionHostLifecycle` 与 `runtime-install.ts` 已覆盖原
