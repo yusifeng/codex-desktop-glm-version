@@ -25,6 +25,7 @@ const { conversationFromThreadSummary: V_, cleanThreadTitle: Cv, truncateText: w
 const { me, Xt } = require("./main-app/misc/thread-errors.js");
 const { attachmentsFromInput: X_, normalizeImageGenerationItem: Z_, turnParamsFromReadResponse: $_, projectReadResponseTurns: ev, projectTurns: tv, projectItems: nv, ensureTurnFields: iv, registerThreadMetadata: av, activeAncestryIds: ov, isSubagentThread: sv, effectiveRuntimeStatus: cv, isDescendantOf: lv, parentThreadIdOf: uv, isSurfaceableThread: dv, environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv, withThreadMode: Av, newConversationFromThread: Ov } = require("./main-app/threads/hydration.js");
 const { Yv, Xv, L_e, Zv, Qv } = require("./main-app/requests/item-synthesis.js");
+const { ny } = require("./main-app/files/open-file-watches.js");
 const { AppServerManagerStreamState } = require("./main-app/threads/stream-roles.js");
 const { ThreadStore } = require("./main-app/threads/thread-store.js");
 const { PrewarmSlot, DetachedWindowPrewarmer, DetachedWindowManager, DetachedWindowService, ThreadHandoffLease, DeviceCheckCookieManager, CallIdClaimRegistry } = require("./main-app/window/detached-window-manager.js");
@@ -25351,78 +25352,6 @@ var Yge = AppServerManagerStreamState;
       return this.subscribers.get(e);
     }
   };
-async function ny({
-  conversationId: e,
-  getStreamRole: t,
-  markConversationNeedsResumeForUnavailableOwner: r,
-  resumeConversationForUnavailableOwner: i,
-  workspaceRoots: a,
-  collaborationMode: o,
-  reasoningEffort: s,
-  serviceTier: c,
-  useAppServerPermissionDefault: l,
-  sendRequest: u,
-}) {
-  let d = t(e);
-  try {
-    return await u(d);
-  } catch (t) {
-    if (d?.role !== `follower` || !n.Zo(t).includes(`no-client-found`)) throw t;
-    r(e, d.ownerClientId);
-    let u = await i({
-      conversationId: e,
-      model: null,
-      ...(c === void 0 ? {} : { serviceTier: c }),
-      reasoningEffort: s,
-      workspaceRoots: a,
-      useAppServerPermissionDefault: l,
-      collaborationMode: o,
-    });
-    if (u.status === `not-ready`) throw new n.Wn(u);
-    return null;
-  }
-}
-async function ave(
-  e,
-  t,
-  {
-    markConversationNeedsResumeForUnavailableOwner: r,
-    ownerWindowError: i,
-    registerPendingManualContextCompaction: a,
-    removePendingManualContextCompaction: o,
-    resumeConversationForUnavailableOwner: s,
-    sendThreadFollowerRequest: c,
-  },
-) {
-  try {
-    await e.waitForPendingThreadSettingsUpdate(t);
-  } catch (r) {
-    if (e.getStreamRole(t)?.role !== `follower` || !n.Zo(r).includes(`no-client-found`)) throw r;
-  }
-  let l = e.getConversation(t);
-  if (
-    !(await ny({
-      conversationId: t,
-      getStreamRole: (t) => e.getStreamRole(t),
-      markConversationNeedsResumeForUnavailableOwner: (e, t) => {
-        r(e, t);
-      },
-      resumeConversationForUnavailableOwner: s,
-      workspaceRoots: [e.getConversationCwd(t) ?? `/`],
-      collaborationMode: l?.latestCollaborationMode ?? null,
-      reasoningEffort: l?.latestReasoningEffort ?? null,
-      sendRequest: (e) => c(e, `thread-follower-compact-thread`, { conversationId: t }),
-    }))
-  ) {
-    if (e.getStreamRole(t)?.role !== `owner`) throw Error(i);
-    a(t);
-    try {
-      await e.sendRequest(`thread/compact/start`, { threadId: t });
-    } catch (e) {
-      throw (o(t), e);
-    }
-  }
-}
 function ove(e, t, n) {
   return e == null
     ? null

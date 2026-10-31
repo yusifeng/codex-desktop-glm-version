@@ -1,2 +1,2 @@
-import { ny } from "./open-file-watches";
-export async function delegateTurnStartToFollower<T extends { result: unknown }>(options: Parameters<typeof ny<T>>[0]): Promise<T | null> { return ny(options); }
+import { ny, type DelegateOptions } from "./open-file-watches";
+export async function delegateTurnStartToFollower<T extends { result: unknown }>(options: DelegateOptions<T>): Promise<T | null> { return ny(options); }

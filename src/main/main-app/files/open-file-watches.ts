@@ -1,14 +1,15 @@
+import { Wn as ResumeNotReadyError, Zo as errorToString } from "@chunk/shared";
+
 type UnknownRecord = Record<string, unknown>;
 type StreamRole = { role: string; ownerClientId?: string } | null | undefined;
-interface DelegateOptions<T extends { result: unknown }> { conversationId: string; getStreamRole(id: string): StreamRole; markConversationNeedsResumeForUnavailableOwner(id: string, ownerId: string): void; resumeConversationForUnavailableOwner(options: UnknownRecord | string): Promise<{ status: string }>; workspaceRoots: string[]; collaborationMode: unknown; reasoningEffort: unknown; serviceTier?: unknown; useAppServerPermissionDefault?: unknown; sendRequest(role: StreamRole): Promise<T> }
-function errorText(value: unknown): string { return value instanceof Error ? value.message : String(value); }
+export interface DelegateOptions<T extends { result: unknown }> { conversationId: string; getStreamRole(id: string): StreamRole; markConversationNeedsResumeForUnavailableOwner(id: string, ownerId: string): void; resumeConversationForUnavailableOwner(options: UnknownRecord | string): Promise<{ status: string }>; workspaceRoots: string[]; collaborationMode: unknown; reasoningEffort: unknown; serviceTier?: unknown; useAppServerPermissionDefault?: unknown; sendRequest(role: StreamRole): Promise<T | null> }
 export async function ny<T extends { result: unknown } = { result: unknown }>(options: DelegateOptions<T>): Promise<T | null> {
   const role = options.getStreamRole(options.conversationId);
   try { return await options.sendRequest(role); } catch (error) {
-    if (role?.role !== `follower` || !errorText(error).includes(`no-client-found`)) throw error;
+    if (role?.role !== `follower` || !errorToString(error).includes(`no-client-found`)) throw error;
     options.markConversationNeedsResumeForUnavailableOwner(options.conversationId, role.ownerClientId ?? ``);
     const result = await options.resumeConversationForUnavailableOwner({ conversationId: options.conversationId, model: null, ...(options.serviceTier === undefined ? {} : { serviceTier: options.serviceTier }), reasoningEffort: options.reasoningEffort, workspaceRoots: options.workspaceRoots, useAppServerPermissionDefault: options.useAppServerPermissionDefault, collaborationMode: options.collaborationMode });
-    if (result.status === `not-ready`) throw Error(`Conversation is not ready to resume`);
+    if (result.status === `not-ready`) throw new ResumeNotReadyError(result);
     return null;
   }
 }
@@ -58,7 +59,40 @@ function turns(state: unknown): UnknownRecord[] { if (typeof state !== `object` 
 export function ry(state: unknown, _policy?: unknown): string | undefined { const turn = [...turns(state)].reverse().find((entry) => entry.turnId != null); return turn?.status === `inProgress` && typeof turn.turnId === `string` ? turn.turnId : undefined; }
 export function iy(state: unknown): boolean { if (typeof state !== `object` || state === null) return false; const record = state as UnknownRecord; if (Array.isArray(record.unconfirmedTurnSubmissions) && record.unconfirmedTurnSubmissions.some((entry) => typeof entry === `object` && entry !== null && (entry as UnknownRecord).terminal !== true)) return true; if (record.resumeState === `needs_resume`) return typeof record.threadRuntimeStatus === `object` && record.threadRuntimeStatus !== null && (record.threadRuntimeStatus as UnknownRecord).type === `active`; if (turns(state).length === 0) return record.resumeState === `resuming`; return turns(state).some((turn) => turn.status === `inProgress`); }
 export function ove(state: unknown, request: unknown, _policy?: unknown): UnknownRecord | null { if (typeof state !== `object` || state === null) return null; const record = state as UnknownRecord; const requestRecord = typeof request === `object` && request !== null ? request as UnknownRecord : null; return { originator: record.originator, inProgress: iy(state), activeTurnId: ry(state) ?? null, latestModel: record.latestModel, latestReasoningEffort: record.latestReasoningEffort, threadStartKind: record.threadStartKind, threadSource: record.threadSource, requestTraceId: requestRecord?.requestTraceId }; }
-export async function ave(manager: unknown, conversationId: string, helpers: UnknownRecord): Promise<void> { const target = manager as UnknownRecord; const get = target.getConversation as ((id: string) => UnknownRecord | null) | undefined; const role = target.getStreamRole as ((id: string) => StreamRole) | undefined; await ny({ conversationId, getStreamRole: (id) => role?.call(manager, id), markConversationNeedsResumeForUnavailableOwner: helpers.markConversationNeedsResumeForUnavailableOwner as (id: string, ownerId: string) => void, resumeConversationForUnavailableOwner: helpers.resumeConversationForUnavailableOwner as (options: UnknownRecord | string) => Promise<{ status: string }>, workspaceRoots: [`/`], collaborationMode: get?.call(manager, conversationId)?.latestCollaborationMode ?? null, reasoningEffort: get?.call(manager, conversationId)?.latestReasoningEffort ?? null, sendRequest: async (streamRole) => { const send = helpers.sendThreadFollowerRequest as (role: StreamRole, method: string, params: UnknownRecord) => Promise<unknown>; return { result: await send(streamRole, `thread-follower-compact-thread`, { conversationId }) }; } }); }
+export async function ave(manager: unknown, conversationId: string, helpers: UnknownRecord): Promise<void> {
+  const target = manager as UnknownRecord;
+  const method = (name: string) => target[name] as ((...args: unknown[]) => unknown);
+  const getConversation = method(`getConversation`) as (id: string) => UnknownRecord | null;
+  const getStreamRole = method(`getStreamRole`) as (id: string) => StreamRole;
+  try {
+    await method(`waitForPendingThreadSettingsUpdate`).call(manager, conversationId);
+  } catch (error) {
+    if (getStreamRole.call(manager, conversationId)?.role !== `follower` || !errorToString(error).includes(`no-client-found`)) throw error;
+  }
+  const conversation = getConversation.call(manager, conversationId);
+  const delegated = await ny({
+    conversationId,
+    getStreamRole: (id) => getStreamRole.call(manager, id),
+    markConversationNeedsResumeForUnavailableOwner: helpers.markConversationNeedsResumeForUnavailableOwner as (id: string, ownerId: string) => void,
+    resumeConversationForUnavailableOwner: helpers.resumeConversationForUnavailableOwner as (options: UnknownRecord | string) => Promise<{ status: string }>,
+    workspaceRoots: [String(method(`getConversationCwd`).call(manager, conversationId) ?? `/`)],
+    collaborationMode: conversation?.latestCollaborationMode ?? null,
+    reasoningEffort: conversation?.latestReasoningEffort ?? null,
+    sendRequest: async (role) => {
+      const result = await (helpers.sendThreadFollowerRequest as (role: StreamRole, method: string, params: UnknownRecord) => Promise<unknown>)(role, `thread-follower-compact-thread`, { conversationId });
+      return result == null ? null : { result };
+    },
+  });
+  if (delegated) return;
+  if (getStreamRole.call(manager, conversationId)?.role !== `owner`) throw Error(String(helpers.ownerWindowError));
+  (helpers.registerPendingManualContextCompaction as (id: string) => void)(conversationId);
+  try {
+    await method(`sendRequest`).call(manager, `thread/compact/start`, { threadId: conversationId });
+  } catch (error) {
+    (helpers.removePendingManualContextCompaction as (id: string) => void)(conversationId);
+    throw error;
+  }
+}
 export async function dve(manager: unknown, request: { method: string; params: UnknownRecord }): Promise<UnknownRecord | undefined> { const target = manager as UnknownRecord; const fn = (name: string) => target[name] as ((...args: unknown[]) => unknown); const id = String(request.params.conversationId ?? ``); fn(`assertThreadFollowerOwner`)?.call(manager, id); const methodMap: Record<string, string> = { [`thread-follower-command-approval-decision`]: `replyWithCommandExecutionApprovalDecision`, [`thread-follower-file-approval-decision`]: `replyWithFileChangeApprovalDecision`, [`thread-follower-permissions-request-approval-response`]: `replyWithPermissionsRequestApprovalResponse`, [`thread-follower-submit-mcp-server-elicitation-response`]: `replyWithMcpServerElicitationResponse`, [`thread-follower-submit-user-input`]: `replyWithUserInputResponse`, [`thread-follower-compact-thread`]: `compactThread` }; const method = methodMap[request.method]; if (method == null) return undefined; const args = request.method === `thread-follower-compact-thread` ? [id] : [id, request.params.requestId, request.params.decision ?? request.params.response]; await fn(method)?.apply(manager, args); return { method: request.method, result: { ok: true } }; }
 export const handleThreadFollowerRequest = dve;
 export const activeTurnId = ry;

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 follower delegation owner repair
+
+语义 `ave` 原先省略 settings wait、owner-role gate 与 local compact fallback，并把底层 null 包成 truthy `{result:null}`，导致 owner recovery
+后 compact 静默丢失。本轮恢复旧 `ny/ave` 完整控制流、修正泛型返回约束，将 main `ny` consumers 接回并删除旧定义；focused suite 覆盖
+正常委托、owner 丢失恢复、本地接管和成功不重复执行。
+
 ## 2026-10-31 attachment upload owner cleanup
 
 `attachments/upload.ts` 的 `FileAttachmentUploader/ThreadGoalAttachmentDirectories` 已由 AppServer manager 使用，但 registry 读取原先只校验

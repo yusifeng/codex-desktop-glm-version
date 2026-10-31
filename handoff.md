@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并接回 follower delegation owner：`files/open-file-watches.ts` 的 `ny/ave` 现恢复 pending settings 等待、no-client owner recovery、
+workspace/collaboration resume inputs、owner-role gate、manual compaction register/rollback 与本地 compact fallback；修复 null follower result
+被 truthy wrapper 吞掉的实际缺陷。main 三个 `ny` consumers 接回，旧 `ny/ave` 删除，新增 11 条 focused 断言。
+
 接回 attachment upload/registry owners：`attachments/upload.ts` 已由 AppServer manager 真实消费，本轮修复 registry path 校验过宽，
 恢复 `attachments/<uuid>/<single-file>` 约束；direct transfer、size limit、SFTP fallback、同名去重、pending removal 与 thread-goal owned
 directory 语义保持。主 chunk 零引用的 `q_e…ive` 约 300 行簇删除，新增 17 条 focused 断言。
