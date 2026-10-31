@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `W6e` thread-project assignment writer 迁入
+`thread-catalog/thread-project-assignment-writer.ts`；observe/refresh/adopt、local↔server project 映射、
+metadata write、projectless membership cache 与 paginated migration 均由新 owner 持有。共享 keyed queue `d2`
+仍单一留在 main 供 `Y6e` 复用并注入新 class，旧 `W6e` 已删除。focused test 覆盖 22 项。
+
 随后将 `V6e` projectless directory chooser 迁入 `workspace/projectless-directory-chooser.ts`；owner-aware
 dialog、configured default root、absolute/WSL validation、real-directory/non-symlink 与 RWX permission gate 均由
 新 owner 持有，唯一 runtime consumer 已接回。无 consumer 且包含多个简化伪实现的 `misc/project-sync.ts`

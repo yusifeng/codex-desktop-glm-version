@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread project assignment writer
+
+原 `W6e` 已迁入 `src/main/main-app/thread-catalog/thread-project-assignment-writer.ts`。新 owner 保留 keyed
+serialization、thread read/observe/adopt、local/server project ID 映射、projectless membership、metadata write
+与 paginated assignment migration；`Y6e` 继续真实构造新 class。`d2` 仍被 host manager 共享，故单一保留并
+注入，旧 class 已物理删除。
+
 ## 2026-10-31 projectless directory chooser
 
 原 `V6e` 已迁入 `src/main/main-app/workspace/projectless-directory-chooser.ts`。新 owner 保留 BrowserWindow
