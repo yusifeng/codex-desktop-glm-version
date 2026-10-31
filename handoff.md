@@ -5203,3 +5203,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 新增并接回 `browser-sidebar/browser-use-open-request-registry.ts`，统一 pending panel-open promise 的 debug snapshot、owner/route resolve/reject、
   15 秒 unref timeout、日志/debug 事件和 timer cleanup；主 chunk 旧 `UWe` 已删除。两组 focused suite 共 68 项断言，no-unwired gate
   同步锁定真实接线与旧 owner 缺席。下一批继续审计相邻 browser-settings webview lifecycle belt，避免拆散同一 webContents cleanup owner。
+
+# 2026-11-01 browser settings WebView lifecycle extraction
+
+- 新增并接回 `browser-sidebar/browser-settings-webview-runtime.ts`，一次迁出 settings/page WebView preferences hardening、definition/feature
+  admission、pending instance consume、origin/path navigation allowlist、popup deny/open、越界 committed navigation 恢复、theme sync 串行队列和
+  listener/map cleanup。原模块级 theme WeakMap 也进入同一 owner，没有复制 webContents 状态。
+- 主 chunk 旧 `CWe/wWe/zG/TWe/EWe/DWe/BG/OWe/VG/kWe/AWe/HG/jWe/UG/MWe/WG` 已整带删除，`SWe`、host-policy 和
+  browser-session restriction 三组真实 consumer 统一改接语义 runtime。focused suite 执行 82 项行为/接线断言；下一批继续审计相邻
+  webview instance/adoption helper belt `GG..IWe` 与其 attach transaction，只有在 cleanup/host identity 顺序可保持时迁移。

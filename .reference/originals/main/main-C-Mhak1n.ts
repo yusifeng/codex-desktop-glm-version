@@ -246,6 +246,7 @@ const languageServerProtocolHelpers = require("./main-app/language-server/protoc
 const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/browser-permission-prompt-registry.js");
 const { createBrowserSessionServiceClass } = require("./main-app/browser-sidebar/browser-session-service.js");
 const { BrowserUseOpenRequestRegistry } = require("./main-app/browser-sidebar/browser-use-open-request-registry.js");
+const { createBrowserSettingsWebviewRuntime, parseBrowserSettingsUrl: UG } = require("./main-app/browser-sidebar/browser-settings-webview-runtime.js");
 const { createBrowserCommentOverlayManagerClass } = require("./main-app/browser-sidebar/browser-comment-overlay-manager.js");
 const { createBrowserCommentControllerClass } = require("./main-app/browser-sidebar/browser-comment-controller.js");
 const { createBrowserSessionRegistryRuntime } = require("./main-app/browser-use/session-registry.js");
@@ -36987,7 +36988,6 @@ var FG = r.i(`browser-sidebar-manager`),
   IG = `owl-webcontents-adoption-lease`,
   bWe = `owl-webcontents-adopted-web-contents-id`,
   LG = new WeakSet(),
-  RG = new WeakMap(),
   xWe = [
     { allowedNavigationUrls: n.el, canOpenPopup: ({ url: e }) => MH(e), partition: n.tl },
     {
@@ -37009,6 +37009,19 @@ var FG = r.i(`browser-sidebar-manager`),
     { allowedNavigationUrls: [n.il], canOpenPopup: ({ url: e }) => MH(e), partition: n.ol },
     { allowedNavigationUrls: n.sl, canOpenPopup: ({ url: e }) => MH(e), partition: n.ll },
   ];
+var {
+  bindBrowserSettingsWebview: DWe,
+  configureBrowserPageWebviewPreferences: CWe,
+  configureBrowserSettingsWebviewPreferences: wWe,
+  findBrowserSettingsWebviewDefinition: TWe,
+  isBrowserSettingsNavigationBlocked: OWe,
+  takePendingBrowserSettingsWebview: EWe,
+  updateBrowserSettingsThemeVariant: VG,
+} = createBrowserSettingsWebviewRuntime({
+  definitions: xWe,
+  getPartitionName: () => Jc(`app`),
+  syncColorScheme: GU,
+});
 function SWe({
   admitBrowserTab: e,
   cancelPendingWebviewAttaches: t,
@@ -37486,177 +37499,6 @@ function SWe({
       for (let e of v.browserSettingsWebviewNavigationDisposersByWebContentsId.values()) e();
     }
   );
-}
-function CWe({ browserSession: e, params: t, preloadPath: n, webPreferences: r }) {
-  ((t.partition = Jc(`app`)),
-    (r.session = e),
-    (r.preload = n),
-    (r.navigateOnDragDrop = !0),
-    zG(t, r));
-}
-function wWe({ browserSession: e, params: t, webPreferences: n }) {
-  ((t.partition = Jc(`app`)),
-    (n.session = e),
-    delete n.preload,
-    zG(t, n),
-    (t.allowpopups = ``),
-    Object.assign(n, { disablePopups: !1 }));
-}
-function zG(e, t) {
-  (delete e.allowpopups,
-    delete e.disablewebsecurity,
-    delete e.webpreferences,
-    (t.sandbox = !0),
-    (t.devTools = !0),
-    (t.nodeIntegration = !1),
-    (t.nodeIntegrationInSubFrames = !1),
-    (t.nodeIntegrationInWorker = !1),
-    (t.contextIsolation = !0),
-    (t.webSecurity = !0),
-    (t.allowRunningInsecureContent = !1),
-    (t.webviewTag = !1),
-    (t.plugins = !1),
-    Object.assign(t, { disablePopups: !0 }));
-}
-function TWe(e) {
-  let t =
-    xWe.find(
-      (t) =>
-        e.partition === t.partition &&
-        HG({ allowedNavigationUrls: t.allowedNavigationUrls, navigationUrl: e.src }),
-    ) ?? null;
-  return t != null && (t.isEnabled == null || t.isEnabled()) ? t : null;
-}
-function EWe(e, t) {
-  let n = KG(e);
-  if (n == null) return null;
-  let r = t.pendingBrowserSettingsWebviewsByInstanceId.get(n) ?? null;
-  return r == null ? null : (t.pendingBrowserSettingsWebviewsByInstanceId.delete(n), r);
-}
-function DWe({
-  browserSettingsWebview: e,
-  openBrowserSettingsUrlInTab: t,
-  state: n,
-  webContents: r,
-}) {
-  (n.browserSettingsWebviewNavigationDisposersByWebContentsId.get(r.id)?.(),
-    n.browserSettingsWebviewAllowedNavigationUrlsByWebContentsId.set(r.id, e.allowedNavigationUrls),
-    n.browserSettingsWebContentsByWebContentsId.set(r.id, r));
-  let i = () => {
-      BG(r, n.browserSettingsWebviewThemeVariant);
-    },
-    a = AWe({
-      allowedNavigationUrls: e.allowedNavigationUrls,
-      onDispose: () => {
-        (n.browserSettingsWebviewAllowedNavigationUrlsByWebContentsId.delete(r.id),
-          n.browserSettingsWebContentsByWebContentsId.delete(r.id),
-          n.browserSettingsWebviewNavigationDisposersByWebContentsId.delete(r.id));
-      },
-      webContents: r,
-    });
-  (n.browserSettingsWebviewNavigationDisposersByWebContentsId.set(r.id, () => {
-    (r.removeListener(`did-finish-load`, i), a());
-  }),
-    r.setWindowOpenHandler((n) => (e.canOpenPopup(n) && t(n.url), { action: `deny` })),
-    r.on(`did-finish-load`, i),
-    i());
-}
-function BG(e, t) {
-  let n = (RG.get(e) ?? Promise.resolve())
-    .catch(() => void 0)
-    .then(async () => {
-      await GU(e, t);
-    });
-  RG.set(e, n);
-}
-function OWe({ webContentsId: e, windows: t, url: n }) {
-  let r = e == null ? null : kWe(t, e);
-  return r != null && !HG({ allowedNavigationUrls: r, navigationUrl: n });
-}
-function VG(e, t) {
-  if (e.browserSettingsWebviewThemeVariant !== t) {
-    e.browserSettingsWebviewThemeVariant = t;
-    for (let n of e.browserSettingsWebContentsByWebContentsId.values()) BG(n, t);
-  }
-}
-function kWe(e, t) {
-  for (let n of e) {
-    let e = n.browserSettingsWebviewAllowedNavigationUrlsByWebContentsId.get(t) ?? null;
-    if (e != null) return e;
-  }
-  return null;
-}
-function AWe({ allowedNavigationUrls: e, onDispose: t, webContents: n }) {
-  let r = (t) => HG({ allowedNavigationUrls: e, navigationUrl: t }),
-    i = (e, t) => {
-      e.isMainFrame && !r(t) && e.preventDefault();
-    },
-    a = (e) => {
-      i(e, e.url);
-    },
-    o = (e, t) => {
-      i(e, e.url ?? t);
-    },
-    s = (e, t) => {
-      i(e, e.url ?? t);
-    },
-    c = (t, i) => {
-      i &&
-        !r(t) &&
-        n.loadURL(e[0] ?? `about:blank`).catch(() => {
-          n.close();
-        });
-    },
-    l = (e, t) => {
-      c(t, !0);
-    },
-    u = (e, t, n) => {
-      c(t, n);
-    },
-    d = () => {
-      (n.removeListener(`will-frame-navigate`, a),
-        n.removeListener(`will-navigate`, o),
-        n.removeListener(`will-redirect`, s),
-        n.removeListener(`did-navigate`, l),
-        n.removeListener(`did-navigate-in-page`, u),
-        n.removeListener(`destroyed`, d),
-        t());
-    };
-  return (
-    n.on(`will-frame-navigate`, a),
-    n.on(`will-navigate`, o),
-    n.on(`will-redirect`, s),
-    n.on(`did-navigate`, l),
-    n.on(`did-navigate-in-page`, u),
-    n.on(`destroyed`, d),
-    d
-  );
-}
-function HG({ allowedNavigationUrls: e, navigationUrl: t }) {
-  return e.some((e) => jWe({ allowedNavigationUrl: e, navigationUrl: t }));
-}
-function jWe({ allowedNavigationUrl: e, navigationUrl: t }) {
-  let n = UG(e),
-    r = UG(t);
-  return n == null || r == null || r.protocol !== n.protocol || r.host !== n.host
-    ? !1
-    : MWe(n.pathname, r.pathname);
-}
-function UG(e) {
-  try {
-    return new URL(e);
-  } catch {
-    return null;
-  }
-}
-function MWe(e, t) {
-  let n = WG(e),
-    r = WG(t);
-  return n === `/` || r === n || r.startsWith(`${n}/`);
-}
-function WG(e) {
-  let t = e.replace(/\/+$/, ``);
-  return t.length === 0 ? `/` : t;
 }
 function GG(e) {
   return qG(e.instanceId);

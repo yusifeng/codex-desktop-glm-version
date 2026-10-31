@@ -3242,3 +3242,11 @@ network restriction 和严格 `https://chatgpt.com/codex/deeplink?url=...` trust
 partition/app-route/settings-webview policy，local-subframe 与 Browser Use restriction 直接复用现有语义模块。新增
 `browser-use-open-request-registry.ts`，迁出原 `UWe` 的 pending promise Set、snapshot、window resolve、owner/route rejection、15 秒
 unref timeout、日志/debug 顺序和清理。两个 owner 均由 `tQe` 真实实例化，旧定义物理删除，68 条 focused 断言覆盖行为与接线。
+
+### 增量抽取：browser settings WebView runtime
+
+新增 `browser-sidebar/browser-settings-webview-runtime.ts`，把 settings/page WebView 安全 preferences、definition/feature admission、pending
+instance consume、严格 origin/path navigation allowlist、popup policy、will/did navigation listener、越界 committed-navigation 恢复、theme
+sync Promise 串行队列及销毁时 map/listener cleanup 放回同一 lifecycle owner。`SWe` attach runtime、host-policy theme API 与 browser-session
+network restriction 均通过工厂返回的唯一实现消费；主 chunk 旧 `CWe..WG` 16 个 helper 与 theme WeakMap 已物理删除。focused suite
+执行 82 项断言，覆盖正常/拒绝/恢复/失败关闭/重复 dispose 与真实接线。
