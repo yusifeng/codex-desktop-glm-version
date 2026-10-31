@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 platform shutdown adapters
+
+原 `mrt/t7/hrt/n7/r7/i7/grt/_rt` 已迁入 `src/main/main-app/startup/platform-shutdown.ts`。新 owner 保留 Windows
+descendant kill、native addon validation、10 秒 forced-exit single arm 与 failure retry/logging，以及 macOS AppKit
+power-off observer、typed block、allow-quit callback 和 dynamic-load failure logging；真实 lifecycle/update/final cleanup
+consumers 已接回，旧 cluster 已删除。
+
 ## 2026-10-31 renderer-driven native context menu
 
 原 `J5/Y5/ort/X5/srt/crt` 已迁入 `src/main/main-app/window/renderer-context-menu.ts`。新 owner 保留 IPC trust gate、

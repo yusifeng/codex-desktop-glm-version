@@ -145,6 +145,7 @@ const { createAboutDialog } = require("./main-app/app-shell/about-dialog.js");
 const { installApplicationLifecycle } = require("./main-app/startup/application-lifecycle.js");
 const { registerStartupIpcHandlers } = require("./main-app/startup/startup-ipc.js");
 const { registerRendererContextMenu } = require("./main-app/window/renderer-context-menu.js");
+const { createPlatformShutdownRuntime } = require("./main-app/startup/platform-shutdown.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142542,58 +142543,17 @@ function e7(e) {
   let t = l.Menu.buildFromTemplate([{ role: `quit` }]);
   return (Array.isArray(t) ? t : t.items)[0]?.label ?? `Quit ${e}`;
 }
-var mrt = 1e4,
-  t7 = !1;
-function hrt({
-  platform: e = process.platform,
-  pid: t = process.pid,
-  loadNativeAddon: n = a.ft,
-} = {}) {
-  e === `win32` && r7(n).killProcessDescendants(t);
-}
-function n7({ loadNativeAddon: e = a.ft, platform: t = process.platform } = {}) {
-  if (!(t !== `win32` || t7))
-    try {
-      (r7(e).armTerminateCurrentProcess(mrt), (t7 = !0));
-    } catch (e) {
-      r.n().warning(`Failed to arm Windows forced exit`, { safe: {}, sensitive: { error: e } });
-    }
-}
-function r7(e) {
-  let t = e();
-  if (t == null) throw Error(`Failed to load Windows updater addon.`);
-  return t;
-}
-var i7 = r.i(`mac-system-shutdown`),
-  grt = `/System/Library/Frameworks/AppKit.framework/AppKit`;
-async function _rt(e) {
-  if (process.platform === `darwin`)
-    try {
-      let { NobjcLibrary: t, typedBlock: n } = await import(`objc-js`),
-        r = new t(grt),
-        i = r.NSWorkspace,
-        a = r.NSString;
-      i.sharedWorkspace()
-        .notificationCenter()
-        .addObserverForName$object$queue$usingBlock$(
-          a.stringWithUTF8String$(`NSWorkspaceWillPowerOffNotification`),
-          null,
-          null,
-          n({ returns: `v`, args: [`@`] }, () => {
-            (i7().info(`macOS system shutdown requested; allowing app quit`, {
-              safe: {},
-              sensitive: {},
-            }),
-              e());
-          }),
-        );
-    } catch (e) {
-      i7().warning(`Failed to observe macOS system shutdown`, {
-        safe: {},
-        sensitive: { error: e },
-      });
-    }
-}
+var {
+  killProcessDescendants: hrt,
+  armWindowsForcedExit: n7,
+  observeSystemShutdown: _rt,
+} = createPlatformShutdownRuntime({
+  platform: process.platform,
+  pid: process.pid,
+  loadNativeAddon: a.ft,
+  loadObjcJs: () => import(`objc-js`),
+  logger: r,
+});
 function a7(e = Yoe) {
   (e() || l.app.relaunch(), l.app.quit());
 }

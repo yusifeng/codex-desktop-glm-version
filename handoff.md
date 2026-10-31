@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `mrt/t7/hrt/n7/r7/i7/grt/_rt` platform shutdown adapter 迁入
+`startup/platform-shutdown.ts`；Windows descendant kill、addon validation、10 秒 forced-exit single arm/retry logging，以及
+macOS AppKit power-off observer、typed block、allow-quit callback 与 load failure logging 均由新 owner 持有。真实 app
+lifecycle/update/final cleanup consumers 已接回，旧 cluster 已删除。
+
 随后将 `J5/Y5/ort/X5/srt/crt` renderer-driven native context-menu owner 迁入
 `window/renderer-context-menu.ts`；trust gate、display scale、nested SVG collection/rasterization、currentColor/template handling、
 data/file/absolute/search-root icon resolution、16px resize、menu projection、single-result click/cancel 和 disposer 均由新
