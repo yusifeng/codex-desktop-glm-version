@@ -106,6 +106,7 @@ const { createSshConnectionRegistrationClass } = require("./main-app/remote/ssh-
 const { createNotificationsServiceClass } = require("./main-app/notifications/notifications-service.js");
 const { createShortcutCaptureServices } = require("./main-app/window/shortcut-capture-service.js");
 const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-audio-spectrum-service.js");
+const { createMacNotificationPermissionRuntime } = require("./main-app/notifications/mac-notification-permission.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138461,70 +138462,12 @@ var {
     getFontFamilies() {
       return l.systemPreferences.getFontFamilies();
     }
-  },
-  l5 = r.i(`mac-notification-permission`),
-  ott = 7,
-  stt = `/System/Library/Frameworks/UserNotifications.framework/UserNotifications`,
-  u5,
-  d5 = 0,
-  f5;
-async function ctt() {
-  if (process.platform === `darwin`)
-    try {
-      l5().info(`macOS notification permission request started`, { safe: {}, sensitive: {} });
-      let e = await ltt();
-      l5().info(`macOS notification permission request completed`, {
-        safe: { granted: e },
-        sensitive: {},
-      });
-    } catch (e) {
-      l5().warning(`Failed to request macOS notification authorization`, {
-        safe: {},
-        sensitive: { error: e },
-      });
-    }
-}
-async function ltt() {
-  let { RunLoop: e, typedBlock: t } = await import(`objc-js`),
-    n = await dtt();
-  return new Promise((r, i) => {
-    let a = utt(e);
-    try {
-      n.requestAuthorizationWithOptions$completionHandler$(
-        ott,
-        t({ returns: `v`, args: [`B`, `@`] }, (e, t) => {
-          if ((a(), t != null)) {
-            (l5().warning(`macOS notification permission request returned an error`, {
-              safe: { code: t.code(), domain: t.domain().toString() },
-              sensitive: { localizedDescription: t.localizedDescription().toString() },
-            }),
-              i(Error(`Failed to request macOS notification authorization`, { cause: t })));
-            return;
-          }
-          r(e);
-        }),
-      );
-    } catch (e) {
-      (a(), i(Error(`Failed to request macOS notification authorization`, { cause: e })));
-    }
-  });
-}
-function utt(e) {
-  return (
-    d5 === 0 && (f5 = e.run()),
-    (d5 += 1),
-    () => {
-      (--d5, d5 === 0 && (f5?.(), (f5 = void 0)));
-    }
-  );
-}
-async function dtt() {
-  if (u5 == null) {
-    let { NobjcLibrary: e } = await import(`objc-js`);
-    u5 = new e(stt).UNUserNotificationCenter.currentNotificationCenter();
-  }
-  return u5;
-}
+  };
+var { requestNotificationAuthorization: ctt } = createMacNotificationPermissionRuntime({
+  platform: process.platform,
+  createLogger: r.i,
+  loadObjcJs: () => import(`objc-js`),
+});
 var ytt = SystemPermissionsService,
   Ctt = TabDragPresentationWindow,
   m5 = n.wf({ x: n.Cf(), y: n.Cf() }),

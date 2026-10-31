@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `l5/ott/stt/u5/d5/f5/ctt/ltt/utt/dtt` macOS notification permission runtime 迁入
+`notifications/mac-notification-permission.ts`；Darwin gate、objc bridge、center cache、concurrent RunLoop ref-count、
+native errors 与 lifecycle logging 均由新 owner 持有。唯一 consumer 已接回。focused test 覆盖 27 项。
+
 随后将 `c5/ntt/rtt/itt` system audio spectrum runtime 迁入 `capture/system-audio-spectrum-service.ts`；macOS
 version gate、lazy capture singleton、renderer subscriptions、levels backpressure 与 load/error/RPC teardown 均由新
 owner 持有。唯一 runtime consumer 已接回，旧实现已删除。focused test 覆盖 34 项。

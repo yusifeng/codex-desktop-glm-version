@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 macOS notification permission runtime
+
+原 `l5/ott/stt/u5/d5/f5/ctt/ltt/utt/dtt` 已迁入
+`src/main/main-app/notifications/mac-notification-permission.ts`。新 runtime 保留 Darwin gate、objc-js lazy bridge、
+notification-center cache、并发请求共享 RunLoop ref-count、native error projection 与 request lifecycle logging；唯一
+runtime consumer 已接回，旧 globals/functions 已删除。
+
 ## 2026-10-31 system audio spectrum service
 
 原 `c5/ntt/rtt/itt` 已迁入 `src/main/main-app/capture/system-audio-spectrum-service.ts`。新 runtime 保留 macOS
