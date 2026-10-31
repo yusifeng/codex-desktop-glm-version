@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 automations 的另一组无 consumer 假迁移：旧 `automation-update-tool.ts`、`habitat.ts`、`inbox-items.ts`、`index.ts`
+形成仅内部引用的孤岛，main 从未 require；四文件已删除。真实 update executor/habitat/inbox/scheduler 仍在主 chunk，已接线的
+`automations-service.ts` 与 `cron-turn-read-state.ts` 保留，避免把存在文件误记为已迁移 owner。
+
 清理 saved-sections 的无 consumer 三文件孤岛：旧 `saved-sections-service/state/transactions.ts` 从未接入 main，且 façade
 以 `{}` 强转注入 server engine，不能代表真实 `$ze/iBe`。三文件已删除；真实 generated engine/reconciliation 仍留在主
 chunk并作为 `pinned-threads-service.ts` 的显式依赖。原 unwired-skeleton gate 同步升级，锁定新 PBe/ert owner 不回退为壳。

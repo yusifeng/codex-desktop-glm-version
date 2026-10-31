@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 automations unwired island removal
+
+删除仅彼此引用、从未被 main require 的 `automation-update-tool.ts`、`habitat.ts`、`inbox-items.ts`、`index.ts` 假迁移孤岛。
+真实 update executor、habitat migration、inbox façade 与 scheduler 仍在主 chunk；已真实接线的 `automations-service.ts` 和
+`cron-turn-read-state.ts` 保留。unwired-owner gate 已扩展，防止四个孤岛以“可读但无 consumer”形态回归。
+
 ## 2026-10-31 saved-sections unwired island removal
 
 删除从未有 consumer 的 `saved-sections-service.ts`、`saved-sections-state.ts`、`saved-sections-transactions.ts` 三文件孤岛；
