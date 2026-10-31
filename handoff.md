@@ -1,5 +1,11 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Y6e` host app-server projects owner 整体迁入
+`projects/host-app-server-projects.ts`；project pagination/migration、legacy↔server ID 映射、create/import/update/
+move/delete、60 秒可恢复删除窗口、排序写入、thread membership 同步与 connection lifetime 均由新 owner 持有。
+主入口只保留依赖装配，真实 `new Y6e(...)` consumer 不变，旧 465 行 class 已物理删除；共享 `H6e/d2`
+保持单一实现并注入。focused test 覆盖 46 项。
+
 随后将 `K6e` pending project deletion scheduler 迁入
 `projects/pending-project-deletion-scheduler.ts`；per-project timer ownership、account identity resume/stop、
 deleteAfter scheduling、失败日志与 30 秒 retry backoff 均由新 owner 持有，`Y6e` 已真实接回并删除旧 class。

@@ -1,5 +1,13 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 host app-server projects owner
+
+原 `Y6e` 已整体迁入 `src/main/main-app/projects/host-app-server-projects.ts`。新 owner 保留 project list
+pagination、legacy/server ID persistence、local cache migration、project CRUD/order、recoverable delayed deletion、
+thread assignment migration/observation 与 connection/membership AbortController 生命周期；主入口只做显式依赖装配，
+运行时 consumer 仍直接构造该 class，旧实现已物理删除。`H6e` project-order diff 与 `d2` keyed queue 仍被
+相邻装配复用，故保持单一实现并注入，没有复制状态 owner。
+
 ## 2026-10-31 pending project deletion scheduler
 
 原 `K6e` 已迁入 `src/main/main-app/projects/pending-project-deletion-scheduler.ts`。新 owner 保留 persisted
