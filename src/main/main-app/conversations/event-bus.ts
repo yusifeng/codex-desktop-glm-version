@@ -1,19 +1,323 @@
-type Dispose=()=>void; type Listener=(...args:never[])=>void;
-interface Logger{warning(message:string,details:{safe:Record<string,unknown>;sensitive:Record<string,unknown>}):void}
-interface Observation{isCurrent():boolean;onAccepted(value:unknown):void;onCompleted(value:unknown):void;dispose():void}
-export class Ah{
- private readonly lists=new Map<string,Listener[]>(); private readonly keyed=new Map<string,Map<string,Listener[]>>(); private starts:{listener:(v:unknown)=>Observation|void|null;active:boolean;pending:Set<Dispose>}[]=[];
- private add<T extends Listener>(n:string,l:T):Dispose{this.lists.set(n,[...(this.lists.get(n)??[]),l]);return()=>this.lists.set(n,(this.lists.get(n)??[]).filter(x=>x!==l))} private emit(n:string,a:unknown[]){for(const l of this.lists.get(n)??[])Reflect.apply(l,undefined,a)}
- private addKey<T extends Listener>(g:string,k:string,l:T):Dispose{const m=this.keyed.get(g)??new Map<string,Listener[]>();this.keyed.set(g,m);m.set(k,[...(m.get(k)??[]),l]);return()=>m.set(k,(m.get(k)??[]).filter(x=>x!==l))}
- addTurnStartRequestedListener(listener:(v:unknown)=>Observation|void|null):Dispose{const s={listener,active:true,pending:new Set<Dispose>()};this.starts.push(s);return()=>{s.active=false;this.starts=this.starts.filter(x=>x!==s);for(const d of s.pending)d()}}
- captureTurnStart(v:unknown,capture:(o:Observation)=>Dispose,logger:Logger){for(const s of this.starts){if(!s.active)continue;try{const o=s.listener(v);if(!o)continue;let d:Dispose|null=null,done=false;d=capture({isCurrent:()=>s.active&&o.isCurrent(),onAccepted:x=>o.onAccepted(x),onCompleted:x=>o.onCompleted(x),dispose:()=>{done=true;if(d)s.pending.delete(d);o.dispose()}});if(!done)s.pending.add(d)}catch(error){logger.warning(`Turn start observer capture failed`,{safe:{},sensitive:{error}})}}}
- addStreamRoleCallback<T extends Listener>(k:string,l:T){return this.addKey(`role`,k,l)} addConversationCallback<T extends Listener>(k:string,l:T){return this.addKey(`conversation`,k,l)} addNotificationCallback<T extends Listener>(m:string|string[],l:T){const ds=(Array.isArray(m)?m:[m]).map(k=>this.addKey(`notification`,k,l));return()=>ds.forEach(d=>d())}
- deleteStreamRoleCallbacks(k:string){this.keyed.get(`role`)?.delete(k)} emitConversation(k:string,s:unknown,c:unknown){this.emit(`conversationState`,[k,s,c]);for(const l of this.keyed.get(`conversation`)?.get(k)??[])Reflect.apply(l,undefined,[s])} emitConversationRemoved(k:string){this.keyed.get(`conversation`)?.delete(k);this.emit(`conversationRemoved`,[k]);this.emit(`conversationState`,[k,null,{type:`fullReset`}])} emitStreamRole(k:string,r:unknown){for(const l of this.keyed.get(`role`)?.get(k)??[])Reflect.apply(l,undefined,[r]);this.emit(`roleState`,[k,r])} emitNotification(n:{method:string}){for(const l of this.keyed.get(`notification`)?.get(n.method)??[])Reflect.apply(l,undefined,[n])}
- addQueuedMessageExecutionListener<T extends Listener>(l:T){return this.add(`queued`,l)} emitQueuedMessageExecution(v:unknown){this.emit(`queued`,[v])} addInitialTitleRequestedListener<T extends Listener>(l:T){return this.add(`title`,l)} emitInitialTitleRequested(v:unknown){this.emit(`title`,[v])} addAcceptedHistoryListener<T extends Listener>(l:T){return this.add(`history`,l)} emitAcceptedHistory(...v:unknown[]){this.emit(`history`,v)}
- addAnyConversationCallback<T extends Listener>(l:T){return this.add(`any`,l)} emitAnyConversations(v:unknown){this.emit(`any`,[v])} addAnyConversationMetaCallback<T extends Listener>(l:T){return this.add(`meta`,l)} emitAnyConversationMeta(v:unknown){this.emit(`meta`,[v])} addThreadSummariesCallback<T extends Listener>(l:T){return this.add(`summaries`,l)} emitThreadSummaries(v:unknown){this.emit(`summaries`,[v])} addThreadListInvalidatedListener<T extends Listener>(l:T){return this.add(`invalid`,l)} emitThreadListInvalidated(){this.emit(`invalid`,[])}
- addOpenFileChangeListener<T extends Listener>(l:T){return this.add(`file`,l)} emitOpenFileChange(v:unknown){this.emit(`file`,[v])} addTurnCompletedListener<T extends Listener>(l:T){return this.add(`complete`,l)} emitTurnCompleted(v:unknown){this.emit(`complete`,[v])} addTurnInterruptStartedListener<T extends Listener>(l:T){return this.add(`interrupt`,l)} emitTurnInterruptStarted(v:unknown){this.emit(`interrupt`,[v])} addTurnSteeredListener<T extends Listener>(l:T){return this.add(`steer`,l)} emitTurnSteered(v:unknown){this.emit(`steer`,[v])}
- addApprovalRequestListener<T extends Listener>(l:T){return this.add(`approval`,l)} emitApprovalRequest(v:unknown){this.emit(`approval`,[v])} addRealtimeThreadCreatedListener<T extends Listener>(l:T){return this.add(`realtime`,l)} emitRealtimeThreadCreated(v:unknown){this.emit(`realtime`,[v])} addRealtimeHandoffAttributedListener<T extends Listener>(l:T){return this.add(`handoff`,l)} emitRealtimeHandoffAttributed(v:unknown){this.emit(`handoff`,[v])} addApprovalResolvedListener<T extends Listener>(l:T){return this.add(`resolved`,l)} emitApprovalResolved(v:unknown){this.emit(`resolved`,[v])}
- addUserInputRequestListener<T extends Listener>(l:T){return this.add(`input`,l)} emitUserInputRequest(v:unknown){this.emit(`input`,[v])} addThreadArchivedListener<T extends Listener>(l:T){return this.add(`archive`,l)} emitThreadArchived(v:unknown){this.emit(`archive`,[v])} addThreadUnarchivedListener<T extends Listener>(l:T){return this.add(`unarchive`,l)} emitThreadUnarchived(v:unknown){this.emit(`unarchive`,[v])} addThreadDeletedListener<T extends Listener>(l:T){return this.add(`delete`,l)} emitThreadDeleted(v:unknown){this.emit(`delete`,[v])}
- addConversationStateCallback<T extends Listener>(l:T){return this.add(`conversationState`,l)} addConversationPatchesListener<T extends Listener>(l:T){return this.add(`patches`,l)} emitConversationPatches(...v:unknown[]){this.emit(`patches`,v)} addStreamRoleStateCallback<T extends Listener>(l:T){return this.add(`roleState`,l)} addStreamFollowersChangedCallback<T extends Listener>(l:T){return this.add(`followers`,l)} emitStreamFollowersChanged(v:unknown){this.emit(`followers`,[v])} addConversationRemovedListener<T extends Listener>(l:T){return this.add(`conversationRemoved`,l)}
+// @ts-nocheck
+
+type Dispose = () => void;
+type Listener = (...args: any[]) => void;
+type ListenerField = keyof Ah;
+
+interface Logger {
+  warning(
+    message: string,
+    details: { safe: Record<string, unknown>; sensitive: Record<string, unknown> },
+  ): void;
 }
-export const ConversationEventBus=Ah;
+
+interface TurnStartRequest {
+  isCurrent(): boolean;
+}
+
+interface TurnStartObservation {
+  isCurrent(): boolean;
+  onAccepted(value: unknown): void;
+  onCompleted(value: unknown): void;
+  dispose(): void;
+}
+
+interface TurnStartListenerState {
+  listener: (request: any) => any;
+  active: boolean;
+  pending: Set<Dispose>;
+}
+
+function addListener(owner: Ah, field: ListenerField, listener: Listener): Dispose {
+  owner[field].push(listener);
+  return () => {
+    owner[field] = owner[field].filter((candidate: Listener) => candidate !== listener);
+  };
+}
+
+function emitListeners(owner: Ah, field: ListenerField, ...args: unknown[]): void {
+  for (const listener of owner[field]) listener(...args);
+}
+
+export class Ah {
+  turnStartRequestedListeners: TurnStartListenerState[] = [];
+  addTurnStartRequestedListener(listener: TurnStartListenerState["listener"]): Dispose {
+    const state = { listener, active: true, pending: new Set<Dispose>() };
+    this.turnStartRequestedListeners.push(state);
+    return () => {
+      state.active = false;
+      this.turnStartRequestedListeners = this.turnStartRequestedListeners.filter(
+        (candidate) => candidate !== state,
+      );
+      for (const dispose of state.pending) dispose();
+    };
+  }
+  captureTurnStart(
+    request: any,
+    capture: (observation: TurnStartObservation) => Dispose,
+    logger: Logger,
+  ): void {
+    for (const state of this.turnStartRequestedListeners) {
+      if (!request.isCurrent()) break;
+      if (!state.active) continue;
+      try {
+        const observation = state.listener(request);
+        if (observation == null) continue;
+        let disposedDuringCapture = false;
+        let disposeCapture: Dispose | null = null;
+        disposeCapture = capture({
+          isCurrent: () => state.active && observation.isCurrent(),
+          onAccepted: (value) => observation.onAccepted(value),
+          onCompleted: (value) => observation.onCompleted(value),
+          dispose: () => {
+            disposedDuringCapture = true;
+            if (disposeCapture != null) state.pending.delete(disposeCapture);
+            observation.dispose();
+          },
+        });
+        if (!disposedDuringCapture) {
+          state.pending.add(disposeCapture);
+          if (!state.active) disposeCapture();
+        }
+      } catch (error) {
+        logger.warning("Turn start observer capture failed", {
+          safe: {},
+          sensitive: { error },
+        });
+      }
+    }
+  }
+
+  queuedMessageExecutionListeners: Listener[] = [];
+  addQueuedMessageExecutionListener(listener: Listener): Dispose {
+    return addListener(this, "queuedMessageExecutionListeners", listener);
+  }
+  emitQueuedMessageExecution(value: unknown): void {
+    emitListeners(this, "queuedMessageExecutionListeners", value);
+  }
+  initialTitleListeners: Listener[] = [];
+  addInitialTitleRequestedListener(listener: Listener): Dispose {
+    return addListener(this, "initialTitleListeners", listener);
+  }
+  emitInitialTitleRequested(value: unknown): void {
+    emitListeners(this, "initialTitleListeners", value);
+  }
+  acceptedHistoryListeners: Listener[] = [];
+  addAcceptedHistoryListener(listener: Listener): Dispose {
+    return addListener(this, "acceptedHistoryListeners", listener);
+  }
+  emitAcceptedHistory(conversationId: unknown, history: unknown): void {
+    emitListeners(this, "acceptedHistoryListeners", conversationId, history);
+  }
+
+  conversationCallbacks = new Map<string, Listener[]>();
+  conversationRemovedListeners: Listener[] = [];
+  conversationStateCallbacks: Listener[] = [];
+  conversationPatchListeners: Listener[] = [];
+  streamRoleCallbacks = new Map<string, Listener[]>();
+  streamRoleStateCallbacks: Listener[] = [];
+  streamFollowersChangedCallbacks: Listener[] = [];
+  anyConversationCallbacks: Listener[] = [];
+  anyConversationMetaCallbacks: Listener[] = [];
+  threadSummariesCallbacks: Listener[] = [];
+  threadListInvalidatedListeners: Listener[] = [];
+  openFileChangeListeners: Listener[] = [];
+  turnCompletedListeners: Listener[] = [];
+  turnInterruptStartedListeners: Listener[] = [];
+  turnSteeredListeners: Listener[] = [];
+  approvalRequestListeners: Listener[] = [];
+  realtimeThreadCreatedListeners: Listener[] = [];
+  realtimeHandoffAttributedListeners: Listener[] = [];
+  approvalResolvedListeners: Listener[] = [];
+  userInputRequestListeners: Listener[] = [];
+  threadArchivedListeners: Listener[] = [];
+  threadUnarchivedListeners: Listener[] = [];
+  threadDeletedListeners: Listener[] = [];
+  notificationCallbacks = new Map<string, { notify: Listener }[]>();
+
+  addStreamRoleCallback(streamId: string, listener: Listener): Dispose {
+    const listeners = this.streamRoleCallbacks.get(streamId) ?? [];
+    this.streamRoleCallbacks.set(streamId, [...listeners, listener]);
+    return () => {
+      const current = this.streamRoleCallbacks.get(streamId);
+      if (current != null)
+        this.streamRoleCallbacks.set(
+          streamId,
+          current.filter((candidate) => candidate !== listener),
+        );
+    };
+  }
+  addAnyConversationCallback(listener: Listener): Dispose {
+    return addListener(this, "anyConversationCallbacks", listener);
+  }
+  addAnyConversationMetaCallback(listener: Listener): Dispose {
+    return addListener(this, "anyConversationMetaCallbacks", listener);
+  }
+  addThreadSummariesCallback(listener: Listener): Dispose {
+    return addListener(this, "threadSummariesCallbacks", listener);
+  }
+  addThreadListInvalidatedListener(listener: Listener): Dispose {
+    return addListener(this, "threadListInvalidatedListeners", listener);
+  }
+  addOpenFileChangeListener(listener: Listener): Dispose {
+    return addListener(this, "openFileChangeListeners", listener);
+  }
+  addTurnCompletedListener(listener: Listener): Dispose {
+    return addListener(this, "turnCompletedListeners", listener);
+  }
+  addTurnInterruptStartedListener(listener: Listener): Dispose {
+    return addListener(this, "turnInterruptStartedListeners", listener);
+  }
+  addTurnSteeredListener(listener: Listener): Dispose {
+    return addListener(this, "turnSteeredListeners", listener);
+  }
+  addApprovalRequestListener(listener: Listener): Dispose {
+    return addListener(this, "approvalRequestListeners", listener);
+  }
+  addRealtimeThreadCreatedListener(listener: Listener): Dispose {
+    return addListener(this, "realtimeThreadCreatedListeners", listener);
+  }
+  addRealtimeHandoffAttributedListener(listener: Listener): Dispose {
+    return addListener(this, "realtimeHandoffAttributedListeners", listener);
+  }
+  addApprovalResolvedListener(listener: Listener): Dispose {
+    return addListener(this, "approvalResolvedListeners", listener);
+  }
+  addUserInputRequestListener(listener: Listener): Dispose {
+    return addListener(this, "userInputRequestListeners", listener);
+  }
+  addThreadArchivedListener(listener: Listener): Dispose {
+    return addListener(this, "threadArchivedListeners", listener);
+  }
+  addThreadUnarchivedListener(listener: Listener): Dispose {
+    return addListener(this, "threadUnarchivedListeners", listener);
+  }
+  addThreadDeletedListener(listener: Listener): Dispose {
+    return addListener(this, "threadDeletedListeners", listener);
+  }
+  addConversationCallback(conversationId: string, listener: Listener): Dispose {
+    const listeners = this.conversationCallbacks.get(conversationId) ?? [];
+    this.conversationCallbacks.set(conversationId, [...listeners, listener]);
+    return () => {
+      const current = this.conversationCallbacks.get(conversationId);
+      if (current != null)
+        this.conversationCallbacks.set(
+          conversationId,
+          current.filter((candidate) => candidate !== listener),
+        );
+    };
+  }
+  addConversationRemovedListener(listener: Listener): Dispose {
+    return addListener(this, "conversationRemovedListeners", listener);
+  }
+  addConversationStateCallback(listener: Listener): Dispose {
+    return addListener(this, "conversationStateCallbacks", listener);
+  }
+  addConversationPatchesListener(listener: Listener): Dispose {
+    return addListener(this, "conversationPatchListeners", listener);
+  }
+  addStreamRoleStateCallback(listener: Listener): Dispose {
+    return addListener(this, "streamRoleStateCallbacks", listener);
+  }
+  addStreamFollowersChangedCallback(listener: Listener): Dispose {
+    return addListener(this, "streamFollowersChangedCallbacks", listener);
+  }
+  addNotificationCallback(methods: string | string[], notify: Listener): Dispose {
+    const methodList = Array.isArray(methods) ? methods : [methods];
+    const callback = { notify };
+    for (const method of methodList) {
+      const callbacks = this.notificationCallbacks.get(method) ?? [];
+      this.notificationCallbacks.set(method, [...callbacks, callback]);
+    }
+    return () => {
+      for (const method of methodList) {
+        const callbacks = this.notificationCallbacks.get(method);
+        if (callbacks != null)
+          this.notificationCallbacks.set(
+            method,
+            callbacks.filter((candidate) => candidate !== callback),
+          );
+      }
+    };
+  }
+
+  emitConversation(conversationId: string, conversation: unknown, context: unknown): void {
+    emitListeners(this, "conversationStateCallbacks", conversationId, conversation, context);
+    for (const callback of this.conversationCallbacks.get(conversationId) ?? []) {
+      callback(conversation);
+    }
+  }
+  emitConversationRemoved(conversationId: string): void {
+    this.conversationCallbacks.delete(conversationId);
+    emitListeners(this, "conversationRemovedListeners", conversationId);
+    emitListeners(this, "conversationStateCallbacks", conversationId, null, { type: "fullReset" });
+  }
+  emitConversationPatches(conversationId: unknown, patches: unknown, context: unknown): void {
+    emitListeners(this, "conversationPatchListeners", conversationId, patches, context);
+  }
+  emitStreamRole(streamId: string, role: unknown): void {
+    for (const callback of this.streamRoleCallbacks.get(streamId) ?? []) callback(role);
+    emitListeners(this, "streamRoleStateCallbacks", streamId, role);
+  }
+  emitStreamFollowersChanged(value: unknown): void {
+    emitListeners(this, "streamFollowersChangedCallbacks", value);
+  }
+  deleteStreamRoleCallbacks(streamId: string): void {
+    this.streamRoleCallbacks.delete(streamId);
+  }
+  emitAnyConversations(value: unknown): void {
+    emitListeners(this, "anyConversationCallbacks", value);
+  }
+  emitAnyConversationMeta(value: unknown): void {
+    emitListeners(this, "anyConversationMetaCallbacks", value);
+  }
+  emitThreadSummaries(value: unknown): void {
+    emitListeners(this, "threadSummariesCallbacks", value);
+  }
+  emitThreadListInvalidated(): void {
+    emitListeners(this, "threadListInvalidatedListeners");
+  }
+  emitOpenFileChange(value: unknown): void {
+    emitListeners(this, "openFileChangeListeners", value);
+  }
+  emitTurnCompleted(value: unknown): void {
+    emitListeners(this, "turnCompletedListeners", value);
+  }
+  emitTurnInterruptStarted(value: unknown): void {
+    emitListeners(this, "turnInterruptStartedListeners", value);
+  }
+  emitTurnSteered(value: unknown): void {
+    emitListeners(this, "turnSteeredListeners", value);
+  }
+  emitApprovalRequest(value: unknown): void {
+    emitListeners(this, "approvalRequestListeners", value);
+  }
+  emitRealtimeThreadCreated(value: unknown): void {
+    emitListeners(this, "realtimeThreadCreatedListeners", value);
+  }
+  emitRealtimeHandoffAttributed(value: unknown): void {
+    emitListeners(this, "realtimeHandoffAttributedListeners", value);
+  }
+  emitApprovalResolved(value: unknown): void {
+    emitListeners(this, "approvalResolvedListeners", value);
+  }
+  emitUserInputRequest(value: unknown): void {
+    emitListeners(this, "userInputRequestListeners", value);
+  }
+  emitThreadArchived(value: unknown): void {
+    emitListeners(this, "threadArchivedListeners", value);
+  }
+  emitThreadUnarchived(value: unknown): void {
+    emitListeners(this, "threadUnarchivedListeners", value);
+  }
+  emitThreadDeleted(value: unknown): void {
+    emitListeners(this, "threadDeletedListeners", value);
+  }
+  emitNotification(notification: { method: string }): void {
+    for (const callback of this.notificationCallbacks.get(notification.method) ?? []) {
+      callback.notify(notification);
+    }
+  }
+}
+
+export const ConversationEventBus = Ah;

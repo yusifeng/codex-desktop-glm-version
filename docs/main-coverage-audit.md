@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 ConversationEventBus owner cleanup
+
+`src/main/main-app/conversations/event-bus.ts` 已由语义 `AppServerConversationManager` 直接构造并消费。对照主 chunk 旧 `Ah`
+发现既有压缩模块缺失 request `isCurrent()` 短路，以及 capture 期间 listener 被注销后的即时 disposer 回收；本轮恢复完整
+83-member 状态/API 与事件顺序，物理删除旧 class。focused suite 覆盖 keyed callbacks、conversation reset、stream role、multi-method
+notification、stale request、注销竞态和 observer 错误隔离。
+
 ## 2026-10-31 conversation subowner duplicate cleanup
 
 语义 `AppServerConversationManager`/`ThreadStore` 已真实构造 `ConversationHistoryReader`、`TurnItemsPaginationLoader`、

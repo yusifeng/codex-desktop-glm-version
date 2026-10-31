@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+收敛 ConversationEventBus：语义 `conversations/event-bus.ts` 已由 `AppServerConversationManager` 真实消费，本轮审计发现旧的
+压缩实现遗漏 turn-start request stale gate，以及监听器在 capture 期间注销时的即时 capture 回收。模块已恢复完整 83-member
+生命周期、keyed conversation/stream role、notification 与事件顺序语义，主 chunk 重复 `Ah` 已物理删除；focused gate 覆盖竞态。
+
 继续收敛 conversation 子 owner：语义 manager/thread-store 已真实消费 history reader、turn pagination、timeline index、inactive
 unsubscriber、item notification handler 与 subagent topology，因此主 chunk 旧 `Bge/Kge/g_e/Dve/Rve/ySe` 及专属版本 gate
 `bSe/_Se/vSe` 均已失去 consumer。审计同时发现既有 inactive-unsubscriber 只有 9/28 members，本轮先恢复完整 tracking、
