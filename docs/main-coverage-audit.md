@@ -1,5 +1,20 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 IAB 组合根复核
+
+`tQe` 相邻的两个独立状态 owner 已完成物理迁移：`$Ze` 的站点 annotation feature availability、
+disabled-host settings、runtime/thread projection 由 `site-annotation-feature-controller.ts` 持有；`eQe` 的
+permission pending map、request identity、navigation/render/owner teardown、同 hostname 响应与 settings
+写回由 `site-annotation-permission-controller.ts` 持有。main 入口仅保留依赖适配和真实实例化，旧 class
+主体已删除。
+
+当前 `tQe` 剩余 428 行由约 104 行构造装配和 controller 委托面构成，顺序连接 page command、route、
+comment、annotation、materialization、runtime、navigation、webview binding、host policy、presentation、
+window/thread state、persistence、tab budget 与 page-host lifecycle，并共享同一 `windows`、session registry、
+page lifecycle 和 cleanup owner。把该组合根整体移入独立模块会要求重新暴露上百个 chunk 私有依赖；拆出
+构造片段又会复制 owner/初始化顺序。因此将剩余 `tQe` 标记为 preserve-coupled composition root，而非待迁
+业务 owner；后续继续扫描其相邻独立 class 和其他 main 区段。
+
 ## 已抽取边界
 
 当前已有可执行语义 helper 接回 main 入口：delegation/account helpers

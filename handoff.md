@@ -1,5 +1,12 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+本轮继续收口 IAB/browser-sidebar 组合根相邻 owner：站点 annotation feature availability/settings/runtime
+projection 已迁入 `site-annotation-feature-controller.ts`，permission request 的 pending identity、导航/销毁取消、
+同 hostname 批量完成与 settings 持久化已迁入 `site-annotation-permission-controller.ts`；原 `$Ze/eQe`
+内联 class 已物理删除并由 `tQe` 真实实例化新 owner。focused tests 共 56 项。复核确认当前 `tQe`
+剩余主体是 15 个已迁 controller/service 的构造顺序、共享 owner 状态和对外委托面；若整体搬迁需重新注入
+上百个 chunk 私有符号，因此登记为 preserve-coupled 组合根，不再制造 facade。
+
 随后确认 app-primary `po` 的闭包 registry 实为 app-shared 公共 `wu` plugin-state reader；home
 artifact templates 已显式注入真实 owner 并直连 `isActiveEntity`。semantic/hub 交叉集合现仅剩
 共享同一 browser registry owner 的 `Rs/Us`。

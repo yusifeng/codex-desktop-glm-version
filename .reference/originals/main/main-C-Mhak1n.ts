@@ -89,6 +89,8 @@ const { createBrowserPresentationSyncControllerClass } = require("./main-app/bro
 const { createBrowserWindowThreadStateControllerClass } = require("./main-app/browser-sidebar/browser-window-thread-state-controller.js");
 const { createBrowserNavigationContextControllerClass } = require("./main-app/browser-sidebar/browser-navigation-context-controller.js");
 const { createBrowserPageLookupControllerClass } = require("./main-app/browser-sidebar/browser-page-lookup-controller.js");
+const { createSiteAnnotationFeatureControllerClass } = require("./main-app/browser-sidebar/site-annotation-feature-controller.js");
+const { createSiteAnnotationPermissionControllerClass } = require("./main-app/browser-sidebar/site-annotation-permission-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
 let c = require("node:url"),
@@ -115218,242 +115220,18 @@ function QZe(e) {
     }
   })();`;
 }
-var $Ze = class {
-    options;
-    apiEnabled = null;
-    availabilityListeners = new Set();
-    constructor(e) {
-      this.options = e;
-    }
-    get apiAvailability() {
-      return this.apiEnabled;
-    }
-    getPolicy(e, t, r) {
-      if (e == null)
-        return {
-          enabled: !1,
-          siteAnnotationFeaturesEnabled: !0,
-          siteAnnotationPermissionGranted: !1,
-          canUseTweaks: !1,
-          isAgentControllingBrowser: !1,
-          isAnnotationModeActive: !1,
-        };
-      if (this.apiEnabled == null) return null;
-      let i = this.isEnabled(t);
-      return {
-        enabled: this.apiEnabled,
-        siteAnnotationFeaturesEnabled: i,
-        siteAnnotationPermissionGranted:
-          i &&
-          this.options.settingsStore
-            ?.getEffective(n.Ba.siteAnnotationPermissionAnsweredHostnames.key)
-            ?.includes(yZ(t) ?? ``) === !0,
-        canUseTweaks: r,
-        isAgentControllingBrowser: e.threadState.isAgentControllingBrowser,
-        isAnnotationModeActive:
-          this.apiEnabled && e.threadState.snapshot.interactionMode === `comment`,
-      };
-    }
-    subscribeAvailability(e) {
-      return (
-        this.availabilityListeners.add(e),
-        () => {
-          this.availabilityListeners.delete(e);
-        }
-      );
-    }
-    setApiEnabled(e) {
-      if (this.apiEnabled !== e) {
-        ((this.apiEnabled = e), this.availabilityListeners.forEach((e) => e()));
-        for (let t of this.options.windows.values())
-          for (let n of t.threads.values())
-            (e ||
-              (this.options.comments.cancelPendingVirtualCommentEdit(n),
-              (n.page?.siteAnnotationFeatures != null ||
-                n.snapshot.siteAnnotationFeatures != null ||
-                n.snapshot.siteToolsAvailability?.annotations === `pending-available`) &&
-                (n.page != null && JX(n.page, void 0),
-                (n.snapshot = {
-                  ...n.snapshot,
-                  siteAnnotationFeatures: void 0,
-                  siteToolsAvailability: {
-                    webMcp: n.snapshot.siteToolsAvailability?.webMcp ?? `unavailable`,
-                    annotations: `unavailable`,
-                  },
-                }),
-                this.options.syncThreadState(t, n.conversationId, n))),
-              n.page != null && this.options.syncRuntimeStateToPage(n.page, n));
-      }
-    }
-    setEnabled(e, t) {
-      let r = yZ(t.siteUrl);
-      if (
-        this.options.settingsStore == null ||
-        e == null ||
-        e.isDestroyed() ||
-        r == null ||
-        yZ(e.getURL()) !== r
-      )
-        return !1;
-      let i =
-        this.options.settingsStore.getEffective(n.Ba.disabledSiteAnnotationHostnames.key) ?? [];
-      return (
-        this.options.settingsStore.set(
-          n.Ba.disabledSiteAnnotationHostnames.key,
-          t.enabled ? i.filter((e) => e !== r) : [...new Set([...i, r])],
-        ),
-        this.refresh(),
-        !0
-      );
-    }
-    refresh() {
-      for (let e of this.options.windows.values())
-        for (let t of e.threads.values()) {
-          let n = this.isEnabled(
-            t.page?.view.webContents?.getURL() || t.snapshot.committedUrl || t.snapshot.url,
-          );
-          t.snapshot.siteAnnotationFeaturesEnabled !== n &&
-            ((t.snapshot = { ...t.snapshot, siteAnnotationFeaturesEnabled: n }),
-            this.options.comments.refreshSiteAnnotationFeatures(
-              e.owner,
-              t.conversationId,
-              t.browserTabId,
-              t,
-            ),
-            this.options.syncThreadState(e, t.conversationId, t));
-        }
-    }
-    isEnabled(e) {
-      let t = yZ(e);
-      return (
-        t == null ||
-        !this.options.settingsStore
-          ?.getEffective(n.Ba.disabledSiteAnnotationHostnames.key)
-          ?.includes(t)
-      );
-    }
-    handlePageEvent(e, t) {
-      let n = AZe.safeParse(t);
-      if (!n.success) return;
-      let r = this.apiEnabled === !0 ? [...new Set(n.data.payload.features)] : void 0;
-      JX(e.page, r) &&
-        this.options.syncThreadState(e.windowState, e.page.conversationId, e.threadState);
-    }
-  },
-  eQe = class {
-    options;
-    required = !0;
-    pending = new Map();
-    constructor(e) {
-      this.options = e;
-    }
-    setRequired(e) {
-      ((this.required = e), this.refresh());
-    }
-    isAllowed(e) {
-      let t = e?.page.view.webContents,
-        r = t == null ? null : yZ(t.getURL());
-      return (
-        e != null &&
-        this.canRequest(e) &&
-        r != null &&
-        (!this.required ||
-          this.options.settingsStore
-            ?.getEffective(n.Ba.siteAnnotationPermissionAnsweredHostnames.key)
-            ?.includes(r) === !0)
-      );
-    }
-    request(e, t) {
-      let n = e?.page.view.webContents;
-      if (e == null || n == null || !this.canRequest(e)) return !1;
-      if (this.isAllowed(e)) return !0;
-      let r = yZ(n.getURL()),
-        i = this.options.settingsStore;
-      if (r == null || i == null) return !1;
-      let a = this.pending.get(n);
-      if (a != null) {
-        if (a.isCurrent()) return a.promise;
-        a.finish(!1);
-      }
-      let { page: o, threadState: s } = e,
-        { owner: c } = e.windowState,
-        l = o.navigationVersion,
-        u = (0, _.randomUUID)(),
-        { promise: d, resolve: f } = Promise.withResolvers(),
-        p = () => this.canRequest(e) && o.navigationVersion === l && yZ(n.getURL()) === r,
-        m = (t) => {
-          this.pending.get(n)?.id === u &&
-            (this.pending.delete(n),
-            n.removeListener(`did-start-navigation`, g),
-            n.removeListener(`destroyed`, h),
-            n.removeListener(`render-process-gone`, h),
-            c.removeListener(`destroyed`, h),
-            c.removeListener(`render-process-gone`, h),
-            (s.snapshot = { ...s.snapshot, siteAnnotationPermissionRequest: void 0 }),
-            c.isDestroyed() || this.options.syncThreadState(e),
-            f(t));
-        },
-        h = () => m(!1),
-        g = (e, t, n, r) => {
-          r && !n && h();
-        };
-      return (
-        this.pending.set(n, { id: u, hostname: r, isCurrent: p, finish: m, promise: d }),
-        n.on(`did-start-navigation`, g),
-        n.on(`destroyed`, h),
-        n.on(`render-process-gone`, h),
-        c.on(`destroyed`, h),
-        c.on(`render-process-gone`, h),
-        (s.snapshot = {
-          ...s.snapshot,
-          siteAnnotationPermissionRequest: { id: u, hostname: r, requestedInteractionMode: t },
-        }),
-        this.options.syncThreadState(e),
-        d
-      );
-    }
-    respond(e, t) {
-      let r = e == null ? void 0 : this.pending.get(e),
-        i = this.options.settingsStore;
-      if (e == null || r == null || r.id !== t.requestId || i == null) return !1;
-      if (!r.isCurrent()) return (r.finish(!1), !1);
-      if (
-        !t.allow &&
-        !this.options.features.setEnabled(e, { ...t, siteUrl: e.getURL(), enabled: !1 })
-      )
-        return !1;
-      let a = n.Ba.siteAnnotationPermissionAnsweredHostnames.key;
-      i.set(a, [...new Set([...(i.getEffective(a) ?? []), r.hostname])]);
-      for (let e of this.pending.values())
-        e.hostname === r.hostname && e.finish(t.allow && e.isCurrent());
-      return !0;
-    }
-    refresh() {
-      for (let e of this.pending.values())
-        e.isCurrent() ? this.required || e.finish(!0) : e.finish(!1);
-    }
-    cancel(e) {
-      e != null && this.pending.get(e)?.finish(!1);
-    }
-    canRequest({ windowState: e, page: t, threadState: n }) {
-      let r = t.view.webContents;
-      return (
-        this.options.features.apiAvailability === !0 &&
-        r != null &&
-        !r.isDestroyed() &&
-        !e.owner.isDestroyed() &&
-        e.threads.get(qU(t)) === n &&
-        n.page === t &&
-        !t.isWaitingForResponse &&
-        this.options.features.isEnabled(r.getURL()) &&
-        n.isAnnotationModeEnabled &&
-        n.visible &&
-        n.presented &&
-        !n.isAgentControllingBrowser &&
-        n.snapshot.commentModeDisabledReason == null
-      );
-    }
-  },
+var $Ze = createSiteAnnotationFeatureControllerClass({
+    pageEventSchema: AZe,
+    normalizeSiteHostname: yZ,
+    settings: n.Ba,
+    updatePageAnnotationFeatures: JX,
+  }),
+  eQe = createSiteAnnotationPermissionControllerClass({
+    createId: () => (0, _.randomUUID)(),
+    normalizeSiteHostname: yZ,
+    routeKey: qU,
+    settings: n.Ba,
+  }),
   EZ = (0, h.join)(__dirname, `browser-page-preload.js`),
   DZ = `In-app browser is unavailable.`,
   tQe = class {
