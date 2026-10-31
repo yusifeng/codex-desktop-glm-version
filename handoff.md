@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 conversation stream subscription 重复 owner：`app-server/stream-subscription.ts` 已由 AppServer manager 与 queued-follow-ups
+真实 consumers 使用，主 chunk 旧 `Sm/Cm` 无引用。本轮删除旧 102 行订阅/背压簇；focused suite 覆盖 no-dup fallback、using
+resource disposal、幂等退订、RPC broken、串行消费与相邻 changes 合并。
+
 清理 app-server operation handle 重复 owner：`app-server/operation-handle.ts` 的 `AppServerOperationHandle` 与可取消变体已由
 真实 `AppServerConversationManager` login/sandbox consumers 使用，主 chunk 旧 `Lv/Rv` 无引用。本轮删除旧 27 行 class 簇，并用
 focused suite 锁定 start/completion、null completion error、cancel/dispose abort 与 consumer wiring。

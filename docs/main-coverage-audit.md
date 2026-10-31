@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 conversation stream subscription cleanup
+
+`src/main/main-app/app-server/stream-subscription.ts` 的 `ConversationStreamSubscription` 已由语义 AppServer manager 与
+queued-follow-ups 使用，主 chunk `Sm/Cm` 已无引用。本轮删除旧 102 行重复 owner；focused suite 覆盖 fallback、using dispose、
+幂等 cleanup、RPC broken、背压期间串行消费及 changes 合并。
+
 ## 2026-10-31 app-server operation handle cleanup
 
 `src/main/main-app/app-server/operation-handle.ts` 的 `AppServerOperationHandle/CancellableOperationHandle` 已由语义
