@@ -103,6 +103,7 @@ const { createArtifactDocumentsClass } = require("./main-app/artifacts/artifact-
 const { createArtifactDocumentStoreClass } = require("./main-app/artifacts/artifact-document-store.js");
 const { createArtifactRpcServices } = require("./main-app/artifacts/artifact-rpc-services.js");
 const { createSshConnectionRegistrationClass } = require("./main-app/remote/ssh-connection-registration.js");
+const { createNotificationsServiceClass } = require("./main-app/notifications/notifications-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138409,169 +138410,24 @@ function a5(e, t) {
 function o5(e, t) {
   return typeof e == `object` && !!e && `code` in e && e.code === t;
 }
-var Jet = (0, d.promisify)(P.execFile),
-  Yet = n.wf({
-    fileType: n.df([`WAVE`, `AIFF`, `AIFC`, `caff`]),
-    format: n.df([`lpcm`, `ima4`, `ulaw`, `alaw`]),
-    duration: n.if().positive().lt(30),
-  }),
-  Xet = class extends n.Uf {
-    windowManager;
-    origin;
-    desktopNotificationManager;
-    logger = r.i(`notifications-service`)();
-    #e;
-    constructor(e, t, n) {
-      (super(), (this.windowManager = e), (this.origin = t), (this.desktopNotificationManager = n));
-    }
-    async previewSound(e) {
-      let t = n.Na.sound.schema.safeParse(e);
-      if (!t.success) return !1;
-      (this.#e?.kill(), (this.#e = void 0));
-      let r = t.data;
-      if (r === `none`) return !0;
-      if (process.platform !== `darwin`) {
-        if (r !== "default" && r !== `classic`) return !1;
-        let e = _m(r, process.platform);
-        return e != null && this.#t(e.command, e.args);
-      }
-      let i;
-      return (
-        (i =
-          r === "default" || r === `classic`
-            ? gm(r)
-            : typeof r == `object`
-              ? h.default.join(vm(p.default.homedir()), r.fileName)
-              : h.default.join(`/System/Library/Sounds`, `${r}.aiff`)),
-        this.#t(`/usr/bin/afplay`, [i])
-      );
-    }
-    #t(e, t) {
-      return new Promise((n) => {
-        let r = (0, P.spawn)(e, t, { stdio: `ignore`, windowsHide: !0 });
-        this.#e = r;
-        let i = () => {
-          r.kill();
-        };
-        (this.origin.once(`destroyed`, i),
-          r.once(`error`, () => n(!1)),
-          r.once(`close`, (e, t) => {
-            (this.origin.removeListener(`destroyed`, i),
-              this.#e === r && (this.#e = void 0),
-              n(e === 0 || t === `SIGTERM`));
-          }));
-      });
-    }
-    async importSound({ title: e }) {
-      if (process.platform !== `darwin`) return { status: `error` };
-      let t = this.#i(this.origin);
-      if (t == null) return { status: `cancelled` };
-      try {
-        let n = await l.dialog.showOpenDialog(t, {
-            title: e,
-            properties: [`openFile`],
-            filters: [{ name: `WAV, AIFF, CAF`, extensions: [`wav`, `aif`, `aiff`, `caf`] }],
-          }),
-          r = n.filePaths[0];
-        if (n.canceled || r == null) return { status: `cancelled` };
-        let i = h.default.extname(r).toLowerCase(),
-          a = i === `.aif` ? `.aiff` : i,
-          o = await (0, b.stat)(r);
-        if (!o.isFile() || o.size > 10485760 || ![`.wav`, `.aiff`, `.caf`].includes(a))
-          return { status: `error` };
-        let s = await (0, b.readFile)(r),
-          c = `codex-custom-${(0, _.createHash)(`sha256`).update(s).digest(`hex`)}${a}`,
-          u = vm(p.default.homedir());
-        await (0, b.mkdir)(u, { recursive: !0 });
-        let d = await (0, b.mkdtemp)(h.default.join(u, `.codex-import-`));
-        try {
-          let e = h.default.join(d, c);
-          await (0, b.writeFile)(e, s);
-          let { stdout: t } = await Jet(`/usr/bin/afinfo`, [`-x`, `-r`, e], {
-            timeout: 5e3,
-            maxBuffer: 1048576,
-          });
-          if (
-            !Yet.safeParse({
-              fileType: t.match(/<file_type>'([^']+)'<\/file_type>/)?.[1],
-              format: t.match(/<format_type>([^<]+)<\/format_type>/)?.[1],
-              duration: t.match(/<duration units="sec">([^<]+)<\/duration>/)?.[1],
-            }).success
-          )
-            return { status: `error` };
-          await (0, b.rename)(e, h.default.join(u, c));
-        } finally {
-          await (0, b.rm)(d, { recursive: !0, force: !0 });
-        }
-        return { status: `selected`, sound: { fileName: c, name: h.default.basename(r) } };
-      } catch (e) {
-        return (
-          this.logger.warning(`failed to import notification sound`, {
-            safe: {},
-            sensitive: { error: e },
-          }),
-          { status: `error` }
-        );
-      }
-    }
-    #n(e) {
-      let t = this.#i(e);
-      return t == null
-        ? null
-        : (this.#r(t, { stealFocus: process.platform === `win32` }), t.webContents);
-    }
-    #r(e, { stealFocus: t }) {
-      (e.isMinimized() && e.restore(),
-        t && process.platform === `win32` && e.setAlwaysOnTop(!0),
-        e.show(),
-        e.focus(),
-        t && process.platform === `win32` && e.setAlwaysOnTop(!1));
-    }
-    #i(e) {
-      let t = l.BrowserWindow.fromWebContents(e),
-        n = t != null && !t.isDestroyed() ? t : this.windowManager.getPrimaryWindow();
-      return !n || n.isDestroyed() ? null : n;
-    }
-    show(e, t) {
-      let n = t?.dup();
-      (this.logger.info(`[desktop-notifications] forward show`, {
-        safe: { kind: e.kind },
-        sensitive: { notificationId: e.id },
-      }),
-        this.desktopNotificationManager.showNotification(
-          e,
-          this.origin,
-          (e) => {
-            try {
-              var t = a.en();
-              let r = t.u(n?.dup()),
-                i = e.actionType === `open` ? this.#n(this.origin) : null;
-              return (
-                this.logger.info(`[desktop-notifications] emit action`, {
-                  safe: { actionType: e.actionType, actionId: e.actionId ?? `none` },
-                  sensitive: { notificationId: e.notificationId },
-                }),
-                t.u(r?.({ id: e.actionId ?? null, type: e.actionType, reply: e.reply ?? null })),
-                i
-              );
-            } catch (e) {
-              t.e = e;
-            } finally {
-              t.d();
-            }
-          },
-          () => n?.[Symbol.dispose](),
-        ));
-    }
-    hide(e) {
-      e.notificationId == null
-        ? (this.desktopNotificationManager.dismissByConversationId(e.conversationId ?? null),
-          e.navigationPath != null &&
-            this.desktopNotificationManager.dismissByNavigationPath(e.navigationPath))
-        : this.desktopNotificationManager.dismissByNotificationId(e.notificationId);
-    }
-  },
-  Zet = class extends n.Uf {
+var Xet = createNotificationsServiceClass({
+  runtime: n,
+  promisify: d.promisify,
+  execFile: P.execFile,
+  spawnProcess: P.spawn,
+  platform: process.platform,
+  resolveSoundCommand: _m,
+  resolveMacBuiltinSound: gm,
+  getCustomSoundDirectory: vm,
+  path: h.default,
+  homeDirectory: p.default.homedir,
+  fs: b,
+  createHash: _.createHash,
+  electron: l,
+  createLogger: r.i,
+  createUsingScope: a.en,
+});
+var Zet = class extends n.Uf {
     origin;
     constructor(e) {
       (super(), (this.origin = e));

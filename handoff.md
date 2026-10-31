@@ -1,5 +1,8 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Jet/Yet/Xet` notifications service 迁入 `notifications/notifications-service.ts`；sound preview/import、
+window focus、notification action forwarding 与 dismiss routing 均由新 owner 持有。focused test 覆盖 16 项。
+
 随后将 `s5/$et/ett` SSH connection registration 迁入 `remote/ssh-connection-registration.ts`；alias validation、
 metadata/fast resolution、catalog/auto-connect persistence、refresh、existing identity reuse 与 removal cleanup 均由新
 owner 持有。唯一 runtime consumer 已接回，旧 schema/class 已删除。focused test 覆盖 20 项。

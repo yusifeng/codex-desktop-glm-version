@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 notifications service
+
+原 `Jet/Yet/Xet` 已迁入 `src/main/main-app/notifications/notifications-service.ts`。新 owner 保留跨平台声音预览、
+macOS 自定义声音导入/校验、窗口恢复聚焦、通知 action RPC 转发与 dismiss 路由；唯一 consumer 已接回。
+
 ## 2026-10-31 SSH connection registration
 
 原 `s5/$et/ett` 已迁入 `src/main/main-app/remote/ssh-connection-registration.ts`。新 owner 保留 alias schema、
