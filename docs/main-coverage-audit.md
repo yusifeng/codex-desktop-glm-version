@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread history policy owner repair
+
+`src/main/main-app/threads/history-policy.ts` 的旧 `Cve` 占位实现已替换为 `AUTOMATION_DETECTOR`、`mergeTurnLists`、
+`projectItems/projectTurns/attachmentsFromInput` 的真实组合，并由 AppServer manager 消费；本轮删除主 chunk 无引用的 `Cve/wve/Tve`
+簇。focused suite 锁定 policy identity、projection delegation、merge options、oldest attachments、limit 分支与 manager wiring。
+
 ## 2026-10-31 conversation stream subscription cleanup
 
 `src/main/main-app/app-server/stream-subscription.ts` 的 `ConversationStreamSubscription` 已由语义 AppServer manager 与

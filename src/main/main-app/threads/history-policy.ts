@@ -1,4 +1,8 @@
 import { ArchivedThreadPreviewRead } from "./archived-preview";
+import { Cs as isDurableHost } from "@chunk/shared";
+import { AUTOMATION_DETECTOR } from "./automation-detector";
+import { attachmentsFromInput, projectItems, projectTurns } from "./hydration";
+import { mergeTurnLists } from "../turns/item-merge";
 type Turn = {
   turnId?: string | null;
   items: Array<Record<string, unknown>>;
@@ -15,32 +19,25 @@ type Conversation = {
   };
 };
 export const Cve = {
-  turnMergePolicy: {},
+  turnMergePolicy: AUTOMATION_DETECTOR,
   applyOldestUserInput(
     turn: Record<string, unknown>,
     item: Record<string, unknown>,
   ) {
     if (item.type === "userMessage")
-      turn.params = {
-        ...(turn.params as Record<string, unknown> | undefined),
+      Object.assign(turn.params as Record<string, unknown>, {
         input: item.content,
         clientUserMessageId: item.clientId,
-      };
+        attachments: attachmentsFromInput(item.content as Array<{ type: string; text?: string }>),
+      });
   },
-  mapThreadItems(input: unknown) {
-    return input;
-  },
-  mapThreadTurns(input: { turns: Turn[] }) {
-    return input.turns;
-  },
-  mergeTurns(left: Turn[], right: Turn[]) {
-    const byId = new Map<string, Turn>();
-    const local: Turn[] = [];
-    for (const turn of [...left, ...right]) {
-      if (turn.turnId == null) local.push(turn);
-      else byId.set(turn.turnId, turn);
-    }
-    return [...byId.values(), ...local];
+  mapThreadItems: projectItems,
+  mapThreadTurns: projectTurns,
+  mergeTurns(left: Turn[], right: Turn[], options: Record<string, unknown> = {}) {
+    return mergeTurnLists(left as any[], right as any[], {
+      ...options,
+      policy: AUTOMATION_DETECTOR,
+    }) as Turn[];
   },
 };
 export function Tve(
@@ -48,7 +45,7 @@ export function Tve(
   hasDesktopRuntime: boolean,
   catalogEnabled: boolean,
 ): number {
-  return hostId === "durable" || (!hasDesktopRuntime && hostId === "local")
+  return isDurableHost(hostId) || (!hasDesktopRuntime && hostId === "local")
     ? 50
     : catalogEnabled
       ? 0

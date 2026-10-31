@@ -28765,54 +28765,6 @@ function Sve(e, t, n) {
       }),
       new Map(c.map((e, t) => [e, t])));
 }
-var Cve = {
-  turnMergePolicy: Y_,
-  applyOldestUserInput(e, t) {
-    pg(t, `userMessage`) &&
-      Object.assign(e.params, {
-        input: hh(t.content),
-        clientUserMessageId: t.clientId,
-        attachments: hh(X_(t.content)),
-      });
-  },
-  mapThreadItems: nv,
-  mapThreadTurns: tv,
-  mergeTurns(e, t, n) {
-    return Cg(e, t, { ...n, policy: Y_ });
-  },
-};
-function wve(e, { maxItems: t, maxTextLength: n }) {
-  if (e == null) return null;
-  let r = [],
-    i = kg(e);
-  for (let e = i.length - 1; e >= 0 && r.length < t; --e) {
-    let a = i[e]?.items;
-    if (a != null)
-      for (let e = a.length - 1; e >= 0 && r.length < t; --e) {
-        let t = a[e];
-        if (t != null) {
-          if (pg(t, `userMessage`)) {
-            let e = t.content
-              .filter((e) => e.type === `text`)
-              .map((e) => e.text)
-              .join(
-                `
-`,
-              )
-              .trim();
-            e.length > 0 && r.unshift({ role: `user`, text: e.slice(-n) });
-          } else if (pg(t, `agentMessage`)) {
-            let e = t.text.trim();
-            e.length > 0 && r.unshift({ role: `assistant`, text: e.slice(-n) });
-          }
-        }
-      }
-  }
-  return r;
-}
-function Tve(e, t, r) {
-  return n.Cs(e) || (!t && e === `local`) ? 50 : r ? 0 : 500;
-}
 function my(e) {
   return e.ephemeral === !0 && e.sideConversation === !0;
 }

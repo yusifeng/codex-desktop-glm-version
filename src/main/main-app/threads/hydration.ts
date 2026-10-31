@@ -371,7 +371,7 @@ export function projectTurns({
   });
 }
 
-function projectItems(items: any[]): any[] {
+export function projectItems(items: any[]): any[] {
   return items.map(projectItem);
 }
 

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复并收敛 thread history policy：`threads/history-policy.ts` 的 `Cve` 原为占位 merge/map 实现，本轮改为组合真实
+`AUTOMATION_DETECTOR`、`mergeTurnLists` 与 hydration 的 items/turns/attachments 投影，恢复 oldest input attachments 与 merge options；
+真实 AppServer manager consumer 保持接回，主 chunk 旧 `Cve/wve/Tve` 47 行死簇删除。
+
 清理 conversation stream subscription 重复 owner：`app-server/stream-subscription.ts` 已由 AppServer manager 与 queued-follow-ups
 真实 consumers 使用，主 chunk 旧 `Sm/Cm` 无引用。本轮删除旧 102 行订阅/背压簇；focused suite 覆盖 no-dup fallback、using
 resource disposal、幂等退订、RPC broken、串行消费与相邻 changes 合并。
