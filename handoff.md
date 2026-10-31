@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 browser-use execution host owner：既有 `browser-use/execution-host.ts` 现替代主 chunk 旧 `fte/pte/mte/hte/gte/_te`。
+按 hostId 缓存、spawn tracing、stat/dirent snapshot、child wait/kill、file-watch session dispose 与 16ms/256-path 变更批处理保持
+完整；Git worker 的真实 `setGitWorkerMainRpcTarget(new fte(...))` consumer 通过兼容别名继续使用，旧 197 行状态簇删除。
+
 接回 Computer Use config writer：既有 `computer-use/config-writer.ts` 现替代主 chunk 旧 `Die…is` 123 行簇，并通过
 `Fie/ns` 兼容别名继续服务 settings 变更、线程启动与 startup 初始写入。移除了无人消费的 automation config 转发导出，避免
 main 加载该 owner 时引入 marketplace 循环链；locale fallback/RTL、主题 accent、per-path 串行队列与 tmp+rename 原子写保持完整。

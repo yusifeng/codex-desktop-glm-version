@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 browser-use execution host owner wiring
+
+`src/main/main-app/browser-use/execution-host.ts` 已完整覆盖旧 `ute/dte/fte/pte/mte/hte/gte/_te`。本轮接回 Git worker target
+装配并删除主 chunk 197 行 owner/adapter/handle/batcher 簇；focused suite 覆盖 stat snapshot、路径去重/全失效 flush、promise cleanup、
+child dispose/wait、registry cache、旧 symbols 消失与真实 wiring。
+
 ## 2026-10-31 Computer Use config writer wiring
 
 `src/main/main-app/computer-use/config-writer.ts` 已完整覆盖旧 `Die/Oie/kie/Aie/jie/es/Mie/Nie/ts/Pie/Fie/Iie/ns/Lie/Rie/zie/Bie/Vie/Hie/Uie/Wie/Gie/rs/Kie/qie/is`。
