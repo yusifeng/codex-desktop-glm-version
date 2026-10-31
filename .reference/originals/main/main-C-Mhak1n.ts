@@ -132,6 +132,7 @@ const { DockMenuManager } = require("./main-app/misc/dock-menu.js");
 const { createTrayMenuControllerClass, isTrayMenuThreadsChangedMessage } = require("./main-app/tray/tray-menu-controller.js");
 const { createMessagePortRemoteMainFactory } = require("./main-app/app-server/message-port-transport.js");
 const { createQuitStateClass } = require("./main-app/startup/quit-state.js");
+const { createStartupProgressWindowRuntime } = require("./main-app/startup/progress-window.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -145253,106 +145254,13 @@ function vit({ threadId: e, originHostId: t, catalog: n, hasAppServerConnection:
   return t ?? `local`;
 }
 var yit = createQuitStateClass(),
-  bit = `codex.sqliteBackfillProgress.title`,
-  xit = `Rebuilding conversation history`,
-  Sit = `codex.sqliteBackfillProgress.detail`,
-  Cit = `This may take several minutes — keep the app open`,
-  wit = `codex.appServerStartupProgress.title`,
-  Tit = `Codex is still starting`,
-  Eit = `codex.appServerStartupProgress.detail`,
-  Dit = `This may take several minutes — keep the app open`;
-async function x7({ activate: e = !0, kind: t, onQuit: n, windowIconPath: r }) {
-  let i = a.hn(),
-    o =
-      t === `app-server`
-        ? i.formatMessage({ messageId: wit, defaultMessage: Tit })
-        : i.formatMessage({ messageId: bit, defaultMessage: xit }),
-    s =
-      t === `app-server`
-        ? i.formatMessage({ messageId: Eit, defaultMessage: Dit })
-        : i.formatMessage({ messageId: Sit, defaultMessage: Cit }),
-    c = !1,
-    u = !1,
-    d = new l.BrowserWindow({
-      width: 420,
-      height: 176,
-      resizable: !1,
-      maximizable: !1,
-      fullscreenable: !1,
-      show: !1,
-      title: o,
-      ...(r == null ? {} : { icon: r }),
-      webPreferences: {
-        contextIsolation: !0,
-        nodeIntegration: !1,
-        sandbox: !0,
-        spellcheck: !1,
-        devTools: !1,
-      },
+  { createStartupProgressWindow: x7, createDelayedStartupProgressWindow: Oit } =
+    createStartupProgressWindowRuntime({
+      BrowserWindow: l.BrowserWindow,
+      getNativeIntl: a.hn,
+      escapeHtml: OU.default,
+      createDelayedProgressWindow,
     });
-  (d.setMenuBarVisibility(!1),
-    d.on(`close`, (e) => {
-      if (!(c || u)) {
-        (e.preventDefault(), (u = !0));
-        try {
-          n();
-        } finally {
-          u = !1;
-        }
-      }
-    }),
-    d.webContents.setWindowOpenHandler(() => ({ action: `deny` })),
-    d.webContents.on(`will-navigate`, (e) => {
-      e.preventDefault();
-    }));
-  try {
-    await d.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(kit(o, s))}`);
-  } catch (e) {
-    throw ((c = !0), d.isDestroyed() || d.destroy(), e);
-  }
-  return (
-    d.isDestroyed() || (d.center(), e ? (d.show(), d.focus()) : d.showInactive()),
-    () => {
-      ((c = !0), d.isDestroyed() || d.destroy());
-    }
-  );
-}
-function Oit({ delayMs: e, onError: t, ...n }) {
-  return createDelayedProgressWindow({ delayMs: e, show: () => x7(n), onError: t });
-}
-function kit(e, t) {
-  let n = (0, OU.default)(e);
-  return `<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    :root { color-scheme: light dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      background: Canvas;
-      color: CanvasText;
-      font-family: system-ui, sans-serif;
-    }
-    main { width: 100%; padding: 28px 32px; }
-    h1 { margin: 0; font-size: 17px; font-weight: 600; }
-    p { margin: 8px 0 0; color: GrayText; font-size: 13px; line-height: 1.45; }
-    progress { width: 100%; margin-top: 22px; }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>${n}</h1>
-    <p>${(0, OU.default)(t)}</p>
-    <progress aria-label="${n}"></progress>
-  </main>
-</body>
-</html>`;
-}
 function Fit({ toggleAvatarOverlay: e }) {
   let t = n.bt({ commandId: `openAvatarOverlay`, isMacOS: process.platform === `darwin` }),
     i = null,

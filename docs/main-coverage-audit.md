@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 startup progress-window owner
+
+原 `bit/xit/Sit/Cit/wit/Tit/Eit/Dit/x7/Oit/kit` 已迁入 `src/main/main-app/startup/progress-window.ts`。新 owner
+保留 sqlite/app-server localized copy、安全 HTML、BrowserWindow hardening、active/inactive presentation、user quit guard、
+load failure cleanup、programmatic disposal 与 delayed-show adapter；两个真实 startup consumers 已接回，旧 cluster 已删除。
+
 ## 2026-10-31 temporary quit-state owner
 
 原 `yit` 已迁入 `src/main/main-app/startup/quit-state.ts`。新 owner 保留 prompt bypass、drain bypass、60 秒自动 reset、
