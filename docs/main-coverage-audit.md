@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 workspace file service owner
+
+原 `p$e` 已迁入 `src/main/main-app/workspace/files.ts`，替换此前未接回的 skeleton。新 owner 保留
+temporary-file set/dispose、native thumbnail serialization/timeout/remote sampling、bounded read、text/blob
+projection、etag conflict write、save/download copy 与 Downloads icon；main 唯一 runtime consumer 已真实接回。
+`fQ/pQ/mQ` 路径解析仍被相邻 file-drag service 共用，故保持单一实现并注入新 owner，未复制状态或逻辑。
+
 ## 2026-10-31 dictation history owner
 
 原 `W$e` 和独占 `EQ/L$e/DQ/R$e/OQ/kQ/G$e/MQ` helpers 已迁入

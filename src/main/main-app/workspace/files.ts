@@ -1,131 +1,322 @@
-// workspace 文件服务（p$e 大类）—— 缩略图/读写/etag 冲突检测/原子下载。
-//
-// 对应 main-C-Mhak1n.ts 的 125,189-125,495 行区段：
-//   - 常量：u$e = 40MB 缩略上限 / d$e = 512 尺寸上限 / f$e = 16 并发 /
-//     oQ = 5s 超时
-//   - p$e 类（11 方法）：createDirectory / dispose / createTemporaryFile /
-//     downloadCopy / getDownloadsFolderIcon / getMetadata / #e native 缩略图
-//     （darwin nativeImage.createThumbnailFromPath + 远端 head -c + docx/pdf/
-//     pptx/xlsx magic 校验）/ read（text/blob/auto 表示）/ releaseTemporaryFile /
-//     saveCopy / write（etag 冲突检测）
-//   - helper sQ（.chatgptdownload 原子写 + chmod 保留）/ cQ/m$e/h$e/lQ/
-//     uQ/dQ/fQ/pQ/mQ（路径解析：本地 realpath vs 远端 platformPath，
-//     mQ 处理 workspaceRoot 重新挂接）
+// @ts-nocheck
 
-import { createTaggedLogger } from "@chunk/logger";
+/** Owns workspace file reads/writes, previews, downloads, and temporary-file cleanup. */
+export function createWorkspaceFileServiceClass(
+  dependencies: Record<string, any>,
+) {
+  const {
+    runtime: n,
+    path: h,
+    os: p,
+    crypto: _,
+    fsPromises: b,
+    electron: l,
+    stream: C,
+    sanitizeFileName: je,
+    isFileTooLarge: K,
+    maxFileBytes: Ae,
+    showItemInFolder: Ij,
+    resolveWorkspacePath: fQ,
+    resolveLocalWorkspacePath: pQ,
+    atomicDownloadWrite: sQ,
+    classifyBuffer: cQ,
+    normalizeBase64: m$e,
+    decodeBase64: h$e,
+    statIfExists: lQ,
+    createEtag: uQ,
+    thumbnailMaxBytes: u$e,
+    thumbnailMaxDimension: d$e,
+    thumbnailConcurrency: f$e,
+    operationTimeoutMs: oQ,
+  } = dependencies;
 
-const logger = createTaggedLogger("workspace-file-service");
-
-// ---------------------------------------------------------------------------
-// 常量（原 125,183-125,186）
-// ---------------------------------------------------------------------------
-
-/** 缩略图字节上限（原 `u$e` = 40MB）。 */
-export const THUMBNAIL_MAX_BYTES = 41_943_040;
-
-/** 缩略图尺寸上限（原 `d$e` = 512）。 */
-export const THUMBNAIL_MAX_DIMENSION = 512;
-
-/** 缩略图并发上限（原 `f$e` = 16）。 */
-export const THUMBNAIL_CONCURRENCY = 16;
-
-/** 操作超时（原 `oQ` = 5s）。 */
-export const FILE_SERVICE_TIMEOUT_MS = 5_000;
-
-/** 临时下载后缀（原 sQ 的 .chatgptdownload）。 */
-export const DOWNLOAD_TEMP_SUFFIX = ".chatgptdownload";
-
-// ---------------------------------------------------------------------------
-// 类型
-// ---------------------------------------------------------------------------
-
-/** 文件元数据。 */
-export interface WorkspaceFileMetadata {
-  isDirectory: boolean;
-  isSymbolicLink: boolean;
-  modifiedAtMs: number | null;
-  sizeBytes: number | null;
+  return class WorkspaceFileService extends n.Uf {
+    executionHostRegistry;
+    globalState;
+    isDisposed = !1;
+    nativeThumbnailInFlight = !1;
+    nativeThumbnailQueue = Promise.resolve();
+    pendingNativeThumbnailCount = 0;
+    temporaryFilePaths = new Set();
+    constructor(e, t) {
+      (super(), (this.executionHostRegistry = e), (this.globalState = t));
+    }
+    async createDirectory({ hostId: e, path: t }) {
+      let r = this.executionHostRegistry.get(e);
+      await n.Di.mkdir(await fQ(t, r, this.globalState), { recursive: !0 }, r);
+    }
+    dispose() {
+      this.isDisposed = !0;
+      let e = [...this.temporaryFilePaths];
+      (this.temporaryFilePaths.clear(),
+        Promise.allSettled(
+          e.map((e) => (0, b.rm)(h.dirname(e), { force: !0, recursive: !0 })),
+        ));
+    }
+    async createTemporaryFile({ bytes: e, fileName: t }) {
+      if (this.isDisposed) throw Error(`Workspace file service is disposed`);
+      if (K(e.byteLength)) throw Error(`Temporary file is too large`);
+      let n = await (0, b.mkdtemp)(
+          h.join((0, p.tmpdir)(), `codex-file-preview-`),
+        ),
+        r = h.join(n, je(t));
+      try {
+        if (
+          (await (0, b.writeFile)(r, e, { flag: `wx`, mode: 384 }),
+          this.isDisposed)
+        )
+          throw Error(`Workspace file service is disposed`);
+        return (this.temporaryFilePaths.add(r), { path: r });
+      } catch (e) {
+        throw (await (0, b.rm)(n, { force: !0, recursive: !0 }), e);
+      }
+    }
+    async downloadCopy({ fileName: e, hostId: t, path: r }) {
+      let i = this.executionHostRegistry.get(t);
+      if (n.Es(i.hostConfig))
+        throw Error(`Downloading a copy is only supported for local files`);
+      let a = await fQ(r, i, this.globalState),
+        o = l.app.getPath(`downloads`),
+        s = h.parse(e == null ? a : je(e));
+      for (let e = 0; ; e += 1) {
+        let t = e === 0 ? s.base : `${s.name} (${e})${s.ext}`,
+          r = h.join(o, t);
+        try {
+          (await n.Di.copyFile(a, r, i, { exclusive: !0 }), Ij(r));
+          return;
+        } catch (e) {
+          if (
+            typeof e != `object` ||
+            !e ||
+            !(`code` in e) ||
+            e.code !== `EEXIST`
+          )
+            throw e;
+        }
+      }
+    }
+    async getDownloadsFolderIcon() {
+      let e = l.app.getPath(`downloads`),
+        t = await l.app.getFileIcon(e, { size: `normal` });
+      if (t.isEmpty())
+        throw Error(`Could not load the system Downloads folder icon`);
+      return t.toDataURL();
+    }
+    async getMetadata({ hostId: e, path: t }) {
+      let r = this.executionHostRegistry.get(e),
+        i = await fQ(t, r, this.globalState),
+        a = await n.Di.stat(i, r, { bypassCache: !0 });
+      return a.isDirectory()
+        ? { kind: `directory` }
+        : a.isFile()
+          ? { kind: `file` }
+          : null;
+    }
+    get getThumbnailDataUrl() {
+      return process.platform === `darwin` ? this.#e.bind(this) : void 0;
+    }
+    #e({ hostId: e, maxBytes: t, path: r, size: i }) {
+      let a = this.executionHostRegistry.getMaybe(e);
+      if (
+        this.isDisposed ||
+        a == null ||
+        !Number.isSafeInteger(t) ||
+        t <= 0 ||
+        !Number.isSafeInteger(i) ||
+        i <= 0 ||
+        i > d$e
+      )
+        return Promise.resolve({ dataUrl: null });
+      if (this.pendingNativeThumbnailCount >= f$e)
+        return Promise.resolve({ dataUrl: null, reason: `overloaded` });
+      this.pendingNativeThumbnailCount += 1;
+      let o = this.nativeThumbnailQueue.then(async () => {
+        let e,
+          o,
+          s = !1;
+        try {
+          if (this.isDisposed || this.nativeThumbnailInFlight)
+            return { dataUrl: null };
+          let c = n.Es(a.hostConfig);
+          if (c && (await a.platformFamily()) !== `unix`)
+            return { dataUrl: null, reason: `unsupported` };
+          let u = c
+              ? await fQ(r, a, this.globalState)
+              : pQ(r, a, this.globalState),
+            d = h.extname(u).toLowerCase(),
+            f = await n.Di.stat(u, a, { bypassCache: !0, followSymlinks: !1 });
+          if (!f.isFile() || f.isSymbolicLink() || (!c && f.size == null))
+            return { dataUrl: null };
+          let m = Math.min(t, u$e);
+          if (f.size != null && f.size > m)
+            return { byteLength: f.size, dataUrl: null };
+          let g = c
+              ? Buffer.from(
+                  await new Response(
+                    n.yc(
+                      await a.spawn({
+                        args: [`head`, `-c`, `${m + 1}`, `--`, u],
+                        cwd: `/`,
+                        outputBytesCap: m + 1,
+                        timeoutMs: oQ,
+                      }),
+                      `Failed to read remote thumbnail file`,
+                    ),
+                  ).arrayBuffer(),
+                )
+              : void 0,
+            _ = g?.byteLength ?? f.size;
+          if (_ == null || _ > m) return { byteLength: _, dataUrl: null };
+          if (/^\.(docx|pdf|pptx|xlsx|xlsm)$/.test(d)) {
+            let e = d === `.pdf` ? `%PDF-` : `PK`;
+            if (
+              (
+                g?.subarray(0, e.length) ??
+                (await n.Di.readFileSampleBytes(u, a, e.length))
+              ).toString(`latin1`) !== e
+            )
+              return { dataUrl: null };
+          }
+          let v = u;
+          if (
+            (g != null &&
+              ((o = await (0, b.mkdtemp)(
+                h.join((0, p.tmpdir)(), `codex-remote-file-thumbnail-`),
+              )),
+              (v = h.join(o, je(h.posix.basename(u)))),
+              await (0, b.writeFile)(v, g, { flag: `wx`, mode: 384 })),
+            this.isDisposed)
+          )
+            return { dataUrl: null };
+          ((s = !0), (this.nativeThumbnailInFlight = !0));
+          let y = (async () => {
+              try {
+                return await l.nativeImage.createThumbnailFromPath(v, {
+                  height: i,
+                  width: i,
+                });
+              } finally {
+                (o != null &&
+                  (await (0, b.rm)(o, { force: !0, recursive: !0 }).catch(
+                    () => void 0,
+                  )),
+                  (this.nativeThumbnailInFlight = !1));
+              }
+            })(),
+            x = await Promise.race([
+              y,
+              new Promise((t) => {
+                ((e = setTimeout(t, oQ, null)), e.unref());
+              }),
+            ]);
+          if (x == null) return { dataUrl: null, reason: `timeout` };
+          if (this.isDisposed || x.isEmpty()) return { dataUrl: null };
+          let S = x.toPNG();
+          return {
+            byteLength: _,
+            dataUrl:
+              S.length === 0
+                ? null
+                : `data:image/png;base64,${S.toString(`base64`)}`,
+          };
+        } catch {
+          return { dataUrl: null };
+        } finally {
+          (clearTimeout(e),
+            o != null &&
+              !s &&
+              (await (0, b.rm)(o, { force: !0, recursive: !0 }).catch(
+                () => void 0,
+              )),
+            --this.pendingNativeThumbnailCount);
+        }
+      });
+      return (
+        (this.nativeThumbnailQueue = o.then(
+          () => void 0,
+          () => void 0,
+        )),
+        o
+      );
+    }
+    async read({ hostId: e, maxBytes: t, path: r, representation: i }) {
+      let a = this.executionHostRegistry.get(e),
+        o = await fQ(r, a, this.globalState);
+      if (t != null) {
+        let e = await n.Di.stat(o, a, { bypassCache: !0 });
+        if (e.size != null && e.size > t)
+          throw Error(`Workspace file exceeds the requested size limit`);
+        let r = await n.Di.readFileSampleBytes(o, a, t + 1);
+        if (r.byteLength > t)
+          throw Error(`Workspace file exceeds the requested size limit`);
+        let s = uQ(e);
+        switch (i) {
+          case `auto`:
+            return { ...(await cQ(r)), etag: s };
+          case `blob`:
+            return { blob: r.toString(`base64`), etag: s };
+          case `text`:
+            return { etag: s, text: new TextDecoder().decode(r) };
+        }
+      }
+      if (i === `text`) {
+        let [e, t] = await Promise.all([
+          n.Di.readFile(o, a),
+          n.Di.stat(o, a, { bypassCache: !0 }),
+        ]);
+        return { etag: uQ(t), text: e };
+      }
+      let [s, c] = await Promise.all([
+          n.Di.readFileBase64(o, a),
+          n.Di.stat(o, a, { bypassCache: !0 }),
+        ]),
+        l = h$e(s),
+        u = uQ(c);
+      switch (i) {
+        case `auto`:
+          return { ...(await cQ(l)), etag: u };
+        case `blob`:
+          return { blob: m$e(s), etag: u };
+      }
+    }
+    async releaseTemporaryFile({ path: e }) {
+      this.temporaryFilePaths.delete(e) &&
+        (await (0, b.rm)(h.dirname(e), { force: !0, recursive: !0 }));
+    }
+    async saveCopy(e) {
+      if (this.isDisposed) throw Error(`Workspace file service is disposed`);
+      let t = await l.dialog.showSaveDialog({
+        defaultPath: je(`bytes` in e ? e.fileName : (e.fileName ?? e.path)),
+      });
+      if (t.canceled || t.filePath == null) return { path: null };
+      if (`bytes` in e) {
+        if (K(e.bytes.byteLength))
+          throw Error(`File is too large to save directly`);
+        await sQ(t.filePath, () => e.bytes);
+      } else {
+        let r = this.executionHostRegistry.get(e.hostId),
+          i = await fQ(e.path, r, this.globalState);
+        if (!n.Es(r.hostConfig) && h.resolve(i) === h.resolve(t.filePath))
+          return { path: t.filePath };
+        await sQ(t.filePath, async () => C.Readable.from(await r.readFile(i)));
+      }
+      return (Ij(t.filePath), { path: t.filePath });
+    }
+    async write({ bytes: e, hostId: t, ifMatch: r, path: i }) {
+      if (K(e.byteLength)) return { maxBytes: Ae, outcome: `too-large` };
+      let a = this.executionHostRegistry.get(t),
+        o = await fQ(i, a, this.globalState);
+      if (r != null) {
+        let e = uQ(await lQ(o, a));
+        if (r !== e) return { etag: e, outcome: `conflict` };
+      }
+      return (
+        await n.Di.writeFileBuffer(o, Buffer.from(e), a),
+        { etag: uQ(await lQ(o, a)), outcome: `saved` }
+      );
+    }
+  };
 }
 
-/** 读取表示形态。 */
-export type ReadRepresentation = "auto" | "blob" | "text";
-
-/** etag 冲突错误。 */
-export class FileEtagConflictError extends Error {
-  constructor(public etag: string) {
-    super("File changed on disk while editing");
-    this.name = "FileEtagConflictError";
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 服务（原 `p$e`）
-// ---------------------------------------------------------------------------
-
-/**
- * WorkspaceFileService（原 `p$e`）：
- * 11 方法 + 路径解析 helper 群（本地 realpath / 远端 platformPath /
- * workspaceRoot 重新挂接 mQ）。
- */
-export class WorkspaceFileService {
-  async createDirectory(path: string): Promise<void> {
-    void path;
-  }
-
-  async createTemporaryFile(request: { extension?: string }): Promise<{ dispose(): void; path: string }> {
-    void request;
-    return { dispose: () => void 0, path: "" };
-  }
-
-  async getMetadata(path: string): Promise<WorkspaceFileMetadata | null> {
-    void path;
-    return null;
-  }
-
-  /**
-   * 读取（原 `read`：text/blob/auto——auto 按内容判定）。
-   */
-  async read(path: string, representation: ReadRepresentation = "auto"): Promise<{ content: string } | { blob: Uint8Array }> {
-    void path;
-    void representation;
-    return { content: "" };
-  }
-
-  /**
-   * 写入（原 `write`：etag 冲突检测——etag 不匹配抛 FileEtagConflictError）。
-   */
-  async write(path: string, content: string | Uint8Array, etag?: string): Promise<{ etag: string }> {
-    void path;
-    void content;
-    if (etag != null) throw new FileEtagConflictError(etag);
-    return { etag: "" };
-  }
-
-  /** 另存副本（原 `saveCopy`）。 */
-  async saveCopy(request: { defaultPath?: string; content: Uint8Array; suggestedName: string }): Promise<string | null> {
-    void request;
-    return null;
-  }
-
-  /** 下载副本（原 `downloadCopy`）。 */
-  async downloadCopy(request: { path: string }): Promise<void> {
-    void request;
-  }
-
-  /** 下载文件夹图标（原 `getDownloadsFolderIcon`）。 */
-  async getDownloadsFolderIcon(): Promise<string | null> {
-    return null;
-  }
-
-  dispose(): void {}
-}
-
-/**
- * 原子下载写（原 `sQ`：.chatgptdownload 临时名 + rename + chmod 保留）。
- */
-export async function atomicDownloadWrite(path: string, content: Uint8Array): Promise<void> {
-  void path;
-  void content;
-}
-
-export { logger };
+if (typeof module !== "undefined")
+  module.exports = { createWorkspaceFileServiceClass };

@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将原先空壳的 `workspace/files.ts` 替换为真实 `p$e` owner；local/remote path resolution、metadata、
+bounded text/blob reads、etag conflict writes、temporary preview lifecycle、save/download copy、macOS thumbnail
+queue/timeout/overload 和 dispose cleanup 均由新 class 持有。共享路径/atomic-write helpers 仍单一保留在 main
+供 file-drag consumer 复用，并显式注入新 owner；旧 class 已物理删除。focused test 覆盖 26 项。
+
 随后将原先仅有注释和空方法的 `dictation/history.ts` 补成真实 file-backed owner，并将 `W$e` 及其
 legacy global-history helpers 从 main 物理删除。chunk 去重/排序、metadata 原子写与 fsync、录音恢复、
 20 条清理、audio read/download、transcript/finalize/delete 和 global dictation JSONL bridge 均由单一
