@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { cleanupForImmediateQuitOnUpdate } from "../src/main/main-app/app-shell/immediate-update-exit.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/app-shell/immediate-update-exit.ts", import.meta.url),
+  "utf8",
+);
+const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", output.code)(loaded, loaded.exports);
+const { cleanupForImmediateQuitOnUpdate } = loaded.exports;
 
 const run = async ({ terminate, cleanup, windows = [] } = {}) => {
   const events = [];
@@ -40,7 +49,8 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-assert.equal(main.includes("cleanupForImmediateQuitOnUpdate({"), true);
+assert.equal(main.includes('require("./main-app/app-shell/immediate-update-exit.js")'), true);
+assert.equal(main.includes("cleanupForImmediateQuitOnUpdate({"), false);
 assert.equal(main.includes("async function Wst("), false);
 
-console.log("6 main immediate-update-exit assertions passed");
+console.log("7 main immediate-update-exit assertions passed");

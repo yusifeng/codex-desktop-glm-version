@@ -3463,3 +3463,14 @@ managed Computer Use feature set，以及 recorder stop→connection reconcile �
 `Ust` 原 `$e` 大型 inline transition 已删除，IPC 直接消费 semantic reconciler。23 项 focused 断言覆盖 Windows/non-Windows、
 enable/disable、identity/no-restart、async completion 与 managed-service/recorder failure；desktop availability、plugin orchestrator、
 computer-use runtime、main IPC 相邻 134 项回归通过，no-unwired gate 扩至 643 项。
+
+### 整块抽取：app update install lifecycle
+
+新增并接回 `startup/app-update-lifecycle.ts`，统一拥有 updater bridge callbacks 与 mutable install phase：host 未 ready 时沿用
+最小 allow-quit/app-quit 行为；ready 后保存 remote-control resume snapshot、记录 thread count、处理 Windows packaged forced exit、
+keep-alive preparation、四项 preflight `Promise.allSettled`、immediate cleanup/exit，或非 immediate policy quit。Windows preparation
+继续先触发 keep-alive snapshot，再 `flushOrThrow`，最后并行停止每个 project root 的 fsmonitor daemon。
+
+`Ust` 原 `xe` 可变 handler、inline bridge object 和 host-ready install/prepare 大段已删除，Sparkle bridge 始终转发到唯一 owner。
+26 项 focused 断言与 quit policy、immediate exit、state recovery、startup adapter 相邻 90 项回归通过；其中 immediate-exit 与
+startup-adapter 两个直接 import `.ts` 的失效入口恢复执行。no-unwired gate 扩至 649 项。

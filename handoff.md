@@ -5393,3 +5393,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   Chronicle recorder backend transition。
 - `Ust` 旧 `$e` inline owner 删除，IPC 直接使用 semantic reconciler。focused suite 23 项、相邻四组回归 134 项，
   no-unwired gate 扩至 643 项；异步 plugin completion、recorder stop 顺序和两类 warning 均有行为覆盖。
+
+# 2026-11-01 app update lifecycle extraction
+
+- 新增并真实接回 `startup/app-update-lifecycle.ts`，统一 updater bridge、early→host-ready mutable install handler、resume snapshot、
+  Windows forced-exit preflight/cleanup、非 Windows quit policy 和 per-project fsmonitor shutdown preparation。
+- `Ust` 旧 `xe` 与两段 inline update handling 删除；focused suite 26 项、相邻四组回归 90 项，no-unwired gate 扩至
+  649 项。immediate-exit/startup-adapter 两个原直接 import TypeScript 的测试入口同步恢复真实执行。

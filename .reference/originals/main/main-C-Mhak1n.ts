@@ -377,6 +377,7 @@ const { installNativeThemeWindowSync } = require("./main-app/startup/native-them
 const { createRemoteHostedPipAvailabilityReconciler } = require("./main-app/startup/remote-hosted-pip-availability.js");
 const { installLocaleRefreshLifecycle } = require("./main-app/startup/locale-refresh-lifecycle.js");
 const { createDesktopFeatureAvailabilityReconciler } = require("./main-app/startup/desktop-feature-availability-reconciler.js");
+const { createAppUpdateLifecycle } = require("./main-app/startup/app-update-lifecycle.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
 const { createBrowserHostServiceClass } = require("./main-app/browser-sidebar/browser-host-service.js");
@@ -56302,13 +56303,6 @@ async function Ust() {
   );
   let ye = new yit(),
     be = null,
-    xe = (e) => {
-      if (e?.quitImmediately === !1) {
-        ye.allowQuitTemporarily();
-        return;
-      }
-      (ye.allowQuitTemporarily(), l.app.quit());
-    },
     Se = xst({ applicationNetwork: i, disposables: I, isTrustedIpcEvent: _e, startupConfig: p });
   (Se.setGitWorkerMainRpcTarget(
     new fte((e) => {
@@ -56429,35 +56423,44 @@ async function Ust() {
   let Me = () => stopServiceWithTimeout(() => K.stopCodexMicro()),
     Ne = createRemoteControlInstallSnapshot((e) => {
       V.globalState.update(a.J, (t) => ({ ...t, [Ht]: e }));
+    }),
+    appUpdateLifecycle = createAppUpdateLifecycle({
+      allowQuitTemporarily: () => ye.allowQuitTemporarily(),
+      appQuit: () => l.app.quit(),
+      applyQuitForUpdatePolicy,
+      armWindowsForcedExit: n7,
+      beforeImmediateExit: Q9,
+      broadcastAppUpdateState: () => K.broadcastAppUpdateState(),
+      cleanupBeforeImmediateExit,
+      cleanupForImmediateQuitOnUpdate,
+      disposables: I,
+      exit: (code) => l.app.exit(code),
+      flushAndDisposeContext: je.flushAndDisposeContext,
+      flushGitWorker: () => Se.flushAndDisposeGitWorker(),
+      flushGlobalState: () => V.globalState.flush(),
+      flushGlobalStateOrThrow: () => V.globalState.flushOrThrow(),
+      flushTracing: () => a.C(),
+      getAppServerClient: () => je.getAppServerClientForHost({ hostId: J }),
+      getLogger: r.n,
+      getProjectRootPaths: () => q.getProjectRootPathsForHost(J),
+      globalDictationLifecycleManager: W.globalDictationLifecycleManager,
+      hotkeyWindowLifecycleManager: W.hotkeyWindowLifecycleManager,
+      installSnapshot: Ne,
+      isPackaged: l.app.isPackaged,
+      isTrustedIpcEvent: _e,
+      isWindows: P,
+      listWindows: () => l.BrowserWindow.getAllWindows(),
+      markAppQuitting: W.markAppQuitting,
+      quitState: ye,
+      registerBridgeHandlers: y,
+      stopFsmonitor: (root, client) =>
+        n.H(root, [`fsmonitor--daemon`, `stop`], client, {
+          allowedNonZeroExitCodes: [128],
+          timeoutMs: 2e3,
+        }),
+      stopService: Me,
+      terminateProcessTree: hrt,
     });
-  y({
-    onDownloadProgressChanged: () => {
-      K.broadcastAppUpdateState();
-    },
-    onDownloadedUpdateAppBrandChanged: () => {
-      K.broadcastAppUpdateState();
-    },
-    onInstallProgressChanged: () => {
-      P && K.broadcastAppUpdateState();
-    },
-    onUpdateReadyChanged: () => {
-      K.broadcastAppUpdateState();
-    },
-    onInstallUpdatesAborted: () => {
-      (ye.allowQuitTemporarily({ allowWithoutPrompt: !1 }),
-        Ne.clearAfterAbort() && r.n().info(`update_resume_state_cleared_after_install_abort`));
-    },
-    onUpdateLifecycleStateChanged: () => {
-      K.broadcastAppUpdateState();
-    },
-    onRelaunchNoticeChanged: () => {
-      K.broadcastAppUpdateState();
-    },
-    onInstallUpdatesRequested: (e) => {
-      xe(e);
-    },
-    isTrustedIpcEvent: _e,
-  });
   let Pe = () => K.appServerConnectionRegistry.getConnection(J),
     Fe = Jse(m, (e) => Pe().sendAppServerRequest(`experimentalFeature/list`, e));
   m.registerCheck(() => g.hasInAppUpdatesPolicyChanges());
@@ -57024,72 +57027,9 @@ async function Ust() {
       globalState: V.globalState,
       logger: r.n(),
     }),
-    (xe = (e) => {
-      P && l.app.isPackaged && e?.quitImmediately !== !1 && n7();
-      let t = Ne.saveForInstall(e);
-      if (
-        (r
-          .n()
-          .info(`update_resume_state_saved`, { safe: { threadCount: t?.threadIds.length ?? 0 } }),
-        e?.quitImmediately === !1)
-      ) {
-        if (P) return;
-        ye.allowQuitTemporarily({ allowWithoutPrompt: !0, skipDrainBeforeQuit: !0 });
-        return;
-      }
-      applyQuitForUpdatePolicy({
-        exitImmediately: P && l.app.isPackaged,
-        exitImmediatelyForUpdateInstall: () => {
-          Promise.allSettled([
-            V.globalState.flush(),
-            Me(),
-            a.C(),
-            Se.flushAndDisposeGitWorker(),
-          ]).then(() => {
-            cleanupForImmediateQuitOnUpdate({
-              runCleanupBeforeImmediateExit: async () => {
-                (Q9(),
-                  await cleanupBeforeImmediateExit({
-                    hotkeyWindowLifecycleManager: W.hotkeyWindowLifecycleManager,
-                    globalDictationLifecycleManager: W.globalDictationLifecycleManager,
-                    flushAndDisposeContext: je.flushAndDisposeContext,
-                    disposables: I,
-                  }));
-              },
-              markAppQuitting: W.markAppQuitting,
-              terminateProcessTree: hrt,
-              listWindows: () => l.BrowserWindow.getAllWindows(),
-              warn: (error) =>
-                r.n().warning(`Immediate update exit cleanup failed before process exit`, {
-                  safe: {},
-                  sensitive: { error },
-                }),
-              exit: (code) => l.app.exit(code),
-            });
-          });
-        },
-        quitForUpdateInstall: () => {
-          l.app.quit();
-        },
-        allowQuitTemporarily: () => ye.allowQuitTemporarily(),
-      });
-    }),
+    appUpdateLifecycle.enableHostReadyInstallHandling(),
     P &&
-      (g.prepareWindowsUpdate = async () => {
-        (xe({ quitImmediately: !1 }), await V.globalState.flushOrThrow());
-        let e = je.getAppServerClientForHost({ hostId: J });
-        e != null &&
-          (await Promise.allSettled(
-            q
-              .getProjectRootPathsForHost(J)
-              .map((t) =>
-                n.H(t, [`fsmonitor--daemon`, `stop`], e, {
-                  allowedNonZeroExitCodes: [128],
-                  timeoutMs: 2e3,
-                }),
-              ),
-          ));
-      }));
+      (g.prepareWindowsUpdate = appUpdateLifecycle.prepareWindowsUpdate));
   let at = pae({
     statsig: K.publishedStatsig,
     appVersion: D,

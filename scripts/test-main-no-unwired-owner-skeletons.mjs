@@ -13,6 +13,7 @@ const realOwners = [
   ["src/main/main-app/startup/remote-hosted-pip-availability.ts", "createRemoteHostedPipAvailabilityReconciler"],
   ["src/main/main-app/startup/locale-refresh-lifecycle.ts", "installLocaleRefreshLifecycle"],
   ["src/main/main-app/startup/desktop-feature-availability-reconciler.ts", "createDesktopFeatureAvailabilityReconciler"],
+  ["src/main/main-app/startup/app-update-lifecycle.ts", "createAppUpdateLifecycle"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -649,5 +650,10 @@ assert.equal(main.includes('require("./main-app/startup/desktop-feature-availabi
 assert.equal(main.includes("$e = createDesktopFeatureAvailabilityReconciler({"), true, "startup creates one feature reconciler");
 assert.equal(main.includes("let $e = (e, t) =>"), false, "generated feature transition owner must be removed");
 assert.equal(main.includes("setDesktopFeatureAvailability: $e"), true, "IPC uses the semantic feature reconciler");
+assert.equal(main.includes('require("./main-app/startup/app-update-lifecycle.js")'), true, "app-update lifecycle owner is wired");
+assert.equal(main.includes("appUpdateLifecycle = createAppUpdateLifecycle({"), true, "startup creates one update lifecycle owner");
+assert.equal(main.includes("appUpdateLifecycle.enableHostReadyInstallHandling()"), true, "startup transitions update handling after host readiness");
+assert.equal(main.includes("g.prepareWindowsUpdate = appUpdateLifecycle.prepareWindowsUpdate"), true, "Windows preparation uses the semantic update owner");
+assert.equal(main.includes("xe = (e) =>"), false, "generated mutable install handler must be removed");
 
-console.log("643 main unwired-owner skeleton assertions passed");
+console.log("649 main unwired-owner skeleton assertions passed");

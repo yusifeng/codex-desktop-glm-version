@@ -1,10 +1,29 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createSentryRpcHandlerClass } from "../src/main/main-app/worker/sentry-envelope-transport.ts";
-import { createWorkerRuntimeFactory } from "../src/main/main-app/worker/worker-runtime.ts";
-import { createWorkspacePolicyRuntime } from "../src/main/main-app/startup/workspace-policy-runtime.ts";
-import { createWorkspacePolicyChecker } from "../src/main/main-app/startup/workspace-policy-checker.ts";
-import { showWorkspacePolicyRestartDialog } from "../src/main/main-app/startup/workspace-policy-restart-dialog.ts";
+import { transform } from "esbuild";
+
+const loadModule = async (path) => {
+  const source = fs.readFileSync(new URL(path, import.meta.url), "utf8");
+  const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+  const loaded = { exports: {} };
+  Function("module", "exports", output.code)(loaded, loaded.exports);
+  return loaded.exports;
+};
+const { createSentryRpcHandlerClass } = await loadModule(
+  "../src/main/main-app/worker/sentry-envelope-transport.ts",
+);
+const { createWorkerRuntimeFactory } = await loadModule(
+  "../src/main/main-app/worker/worker-runtime.ts",
+);
+const { createWorkspacePolicyRuntime } = await loadModule(
+  "../src/main/main-app/startup/workspace-policy-runtime.ts",
+);
+const { createWorkspacePolicyChecker } = await loadModule(
+  "../src/main/main-app/startup/workspace-policy-checker.ts",
+);
+const { showWorkspacePolicyRestartDialog } = await loadModule(
+  "../src/main/main-app/startup/workspace-policy-restart-dialog.ts",
+);
 
 let assertions = 0;
 function equal(actual, expected, message) {
@@ -159,7 +178,8 @@ equal(main.includes("function V9("), false);
 equal(main.includes("function gst("), false);
 equal(main.includes("function Ist("), false);
 equal(main.includes("function Lst("), false);
-equal(main.includes("applyQuitForUpdatePolicy({"), true);
+equal(main.includes('require("./main-app/startup/quit-for-update-policy.js")'), true);
+equal(main.includes("appUpdateLifecycle = createAppUpdateLifecycle({"), true);
 equal(main.includes("createComputerUseRpcHandler({"), true);
 
 console.log(`${assertions} main startup adapter-cleanup assertions passed`);
