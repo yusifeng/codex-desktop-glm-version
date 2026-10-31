@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 thread workspace 重复子 owner：语义 `AppServerConversationManager` 已直接构造 `ProjectlessConversations` 与
+`ThreadWorkspaceStorage`，主 chunk 旧 `owe/swe` 只剩定义且无 consumer。核对 28/12 members 精确对齐后删除旧 284 行簇；
+focused gate 覆盖 projectless 登记/提示/删除、writable roots、assignment 与真实 manager wiring。
+
 删除 OpenInService 的未接线 skeleton：`misc/open-in-service.ts` 只有 6 个成员，而真实 `N0` 有 16 个，缺少 open、preferred
 target 写入、remote host/path、native discovery、inline browser panel 等核心路径，且全仓无 runtime consumer。该 270 行骨架已删除
 并加入防回归 gate；真实 `N0` 继续留在主 chunk，后续必须完整迁移而不能直接接线。

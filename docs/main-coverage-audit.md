@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread workspace duplicate cleanup
+
+语义 `AppServerConversationManager` 已直接导入并构造 `ProjectlessConversations` 与 `ThreadWorkspaceStorage`；主 chunk 旧
+`owe/swe` 的出现次数均仅为定义一次。成员数分别精确对齐 28/12，本轮删除 `tw/owe/nw/swe` 重复 284 行簇；focused suite
+验证 projectless load/save/hints/removal、workspace writable roots/assignment/factory 以及 manager 的真实 consumer wiring。
+
 ## 2026-10-31 OpenInService skeleton removal
 
 审计 `src/main/main-app/misc/open-in-service.ts` 时发现其 `OpenInService` 只有 6 个成员，而真实 `N0` 有 16 个；现有实现的
