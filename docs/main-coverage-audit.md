@@ -3228,3 +3228,9 @@ interaction controller 改用具名对象参数接线，IPC guarded event set �
 `browser-use/iab-api.ts` 现直接拥有 primary/child target projection、CDP method/navigation/history/capture policy、viewport parsing、route-tab
 identity、blank/persistent URL 与 title reconciliation、process-gone extraction、finite-coordinate guard、unref wait、timeout clamp/race。主组合根
 依赖由 46 项缩至 14 项环境/command-capability依赖；旧 `OYe..rX` 34 个纯 helper 整带删除。
+
+### 增量抽取：language-server runtime installer
+
+新增并接回 `language-server/runtime-installer.ts`，完整接管并发安装去重、过期 gate、缓存 manifest/path 验证、pinned size/SHA-256
+流式下载、gzip/zip/tar 解包、executable mode、staging cleanup、原子替换与失败回滚。既有 `runtime-resources.ts` 被纠正并成为真实
+spec owner（15 分钟 Kotlin timeout、`gzip`、Windows rust-analyzer `.exe`）；主 chunk 资源清单与 `A1e/P1e/F1e..GQ` 整带删除。

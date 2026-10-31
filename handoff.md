@@ -5187,3 +5187,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   state owner 不再从组合根注入 34 个机械 helper；保留的 14 项均为 Electron/shared/bootstrap、feature flags、logger 或 command capability。
 - 主 chunk 旧 `OYe..rX` helper belt 已删除。focused coverage 新增 primary/child target、capture clip、navigation URL、NUL route key、
   persistent/temporary URL、title/committed URL 与 timeout success；下一批审计仍在主 chunk 的 capability/command schema belt。
+
+# 2026-11-01 language-server runtime installer extraction
+
+- 新增并接回 `language-server/runtime-installer.ts`，承接 install dedupe、expiry、cache validation、size/digest download guard、三种解包、
+  executable、staging cleanup、atomic replace/rollback/fallback；window context 继续通过 `P1e` 使用唯一真实 owner。
+- `runtime-resources.ts` 从未接线清单升级为 spec owner，并修正 900000ms、gzip 与 Windows `.exe` 偏差。主 chunk 清单和
+  `A1e/P1e/F1e/I1e/L1e/UQ/WQ/GQ` 已删除；focused coverage 使用本地 gzip 验证并发、cache、expiry、digest-fallback。

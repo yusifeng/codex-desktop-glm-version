@@ -15,6 +15,7 @@ const realOwners = [
   ["src/main/main-app/dictation/audio.ts", "createDictationAudioServiceClass"],
   ["src/main/main-app/language-server/providers.ts", "createLanguageServerProvidersRuntime"],
   ["src/main/main-app/language-server/session-runtime.ts", "createLanguageServerSessionRuntime"],
+  ["src/main/main-app/language-server/runtime-installer.ts", "createLanguageServerRuntimeInstallerClass"],
   ["src/main/main-app/workspace/worktree-attachment-handler.ts", "createWorktreeAttachmentHandlerClass"],
   ["src/main/main-app/mcp-sandbox/lifecycle.ts", "createMcpSandboxLifecycleRuntime"],
   ["src/main/main-app/mcp-sandbox/network-runtime.ts", "createMcpSandboxNetworkRuntime"],
@@ -153,6 +154,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/sites-bootstrap-
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-page-presentation-policy.js")'), true, "browser page presentation policy is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-session-notification-bridge.js")'), true, "browser session notification bridge is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/site-page-event-runtime.js")'), true, "site page-event runtime is wired");
+assert.equal(main.includes('require("./main-app/language-server/runtime-installer.js")'), true, "language-server runtime installer is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
 }
@@ -200,6 +202,7 @@ for (const oldOwner of ["function QHe(", "function yZ(", "function MZe(", "funct
 for (const oldOwner of ["function LZe(", "function RZe(", "function zZe(", "function BZe(", "function HZe(", "function UZe(", "function WZe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser command policy owner must be removed`);
 for (const oldOwner of ["function YZe(", "function XZe(", "function ZZe(", "function QZe(", "TZ = class"]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated screenshot/permission helper must be removed`);
 for (const oldOwner of ["function OYe(", "function kYe(", "function VY(", "function HY(", "function AYe(", "function UY(", "function jYe(", "function MYe(", "function WY(", "function GY(", "function KY(", "function NYe(", "function PYe(", "function FYe(", "function IYe(", "function qY(", "function JY(", "function LYe(", "function RYe(", "function YY(", "function XY(", "function zYe(", "function BYe(", "function ZY(", "function VYe(", "function QY(", "function $Y(", "function HYe(", "function UYe(", "function eX(", "async function WYe(", "function tX(", "function nX(", "function rX("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated IAB policy helper must be removed`);
+for (const oldOwner of ["function A1e(", "P1e = class", "async function F1e(", "async function I1e(", "async function L1e(", "async function UQ(", "async function WQ(", "async function GQ("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated language-server runtime installer must be removed`);
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }

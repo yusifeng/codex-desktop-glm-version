@@ -2,7 +2,7 @@
 // rust-analyzer）。
 //
 // 对应 main-C-Mhak1n.ts 的 128,278-128,458 行区段：
-//   - HQ = 9e5（下载超时 90s）
+//   - HQ = 9e5（下载超时 15 分钟）
 //   - C1e：pyright 1.1.413（npm tgz，sha256 锁定）
 //   - w1e：typescript-language-server 5.3.0 + typescript 5.9.3（双包）
 //   - T1e + E1e + D1e：java-language-server 0.1.2 + 三平台 config
@@ -17,20 +17,23 @@
 // ---------------------------------------------------------------------------
 
 /** 下载超时（原 `HQ` = 9e5）。 */
-export const LANGUAGE_SERVER_DOWNLOAD_TIMEOUT_MS = 90_000;
+export const LANGUAGE_SERVER_DOWNLOAD_TIMEOUT_MS = 900_000;
 
 // ---------------------------------------------------------------------------
 // 类型
 // ---------------------------------------------------------------------------
 
 /** 资源格式。 */
-export type ResourceFormat = "tar.gz" | "zip" | "gz";
+export type ResourceFormat = "tar.gz" | "zip" | "gzip";
 
 /** 平台资源条目。 */
 export interface PlatformResource {
+  downloadTimeoutMs?: number;
+  executable?: boolean;
   format: ResourceFormat;
   sha256: string;
   sizeBytes: number;
+  sourcePath?: string;
   targetPath: string;
   url: string;
 }
@@ -172,45 +175,139 @@ export const KOTLIN_SERVER_RESOURCES: Record<PlatformKey, PlatformResource> = {
 /** rust-analyzer 2026-08-24 六平台（原 `k1e`）。 */
 export const RUST_ANALYZER_RESOURCES: Record<PlatformKey, PlatformResource> = {
   "darwin-arm64": {
-    format: "gz",
+    executable: true,
+    format: "gzip",
     sha256: "5f4557c2ea4d62f80f1ffeea2646d0d56fab7172a0db11f3065c4d246b763989",
     sizeBytes: 13_875_126,
     targetPath: "rust-analyzer",
     url: "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-aarch64-apple-darwin.gz",
   },
   "darwin-x64": {
-    format: "gz",
+    executable: true,
+    format: "gzip",
     sha256: "822cc4369562fc2ed26d1cf3953ef93927d8fdda4302d82e2eec407e2734eefd",
     sizeBytes: 14_591_602,
     targetPath: "rust-analyzer",
     url: "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-x86_64-apple-darwin.gz",
   },
   "linux-arm64": {
-    format: "gz",
+    executable: true,
+    format: "gzip",
     sha256: "3463f9115c725fc5dfb002431833ec83d1f1f9c4c35b76ad5f47b92c58a521f1",
     sizeBytes: 14_317_193,
     targetPath: "rust-analyzer",
     url: "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-aarch64-unknown-linux-gnu.gz",
   },
   "linux-x64": {
-    format: "gz",
+    executable: true,
+    format: "gzip",
     sha256: "c4d409690b98d84ce98174829362a59214825d72304fe2504f4b906a116b51fe",
     sizeBytes: 14_865_773,
     targetPath: "rust-analyzer",
     url: "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-x86_64-unknown-linux-gnu.gz",
   },
   "win32-arm64": {
+    executable: true,
     format: "zip",
     sha256: "8685e2b4df4ad9ac6fe6b08be7600383496199cd29d413ca47ad67c658e3a510",
     sizeBytes: 15_632_264,
-    targetPath: "rust-analyzer",
+    sourcePath: "rust-analyzer.exe",
+    targetPath: "rust-analyzer.exe",
     url: "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-aarch64-pc-windows-msvc.zip",
   },
   "win32-x64": {
+    executable: true,
     format: "zip",
     sha256: "f6d80045e6f475606f62d294fa3b618304fd24d2ff86160495440f23d5f7fcdb",
     sizeBytes: 17_510_347,
-    targetPath: "rust-analyzer",
+    sourcePath: "rust-analyzer.exe",
+    targetPath: "rust-analyzer.exe",
     url: "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-x86_64-pc-windows-msvc.zip",
   },
 };
+
+export type LanguageServerRuntimeId = "python" | "typescript" | "java" | "kotlin" | "rust";
+
+export interface LanguageServerRuntimeSpec {
+  expectedPaths: string[];
+  id: LanguageServerRuntimeId;
+  resources: PlatformResource[];
+  version: string;
+}
+
+export function getLanguageServerRuntimeSpec(
+  id: string,
+  platform: { arch: string; platform: NodeJS.Platform } = {
+    arch: process.arch,
+    platform: process.platform,
+  },
+): LanguageServerRuntimeSpec | null | undefined {
+  switch (id) {
+    case "python":
+      return {
+        expectedPaths: ["node_modules/pyright/langserver.index.js"],
+        id,
+        resources: [PYRIGHT_RESOURCE],
+        version: "pyright-1.1.413",
+      };
+    case "typescript":
+      return {
+        expectedPaths: [
+          "node_modules/typescript-language-server/lib/cli.mjs",
+          "node_modules/typescript/lib/tsserver.js",
+        ],
+        id,
+        resources: TYPESCRIPT_RESOURCES,
+        version: "typescript-language-server-5.3.0-typescript-5.9.3",
+      };
+    case "java": {
+      const config = JAVA_LANGUAGE_SERVER_CONFIG[platform.platform as "darwin" | "linux" | "win32"];
+      const directory = JAVA_CONFIG_DIRECTORIES[platform.platform as "darwin" | "linux" | "win32"];
+      return config == null || directory == null
+        ? null
+        : {
+            expectedPaths: [
+              "node_modules/@vscjava/java-language-server/server/plugins",
+              `${config.targetPath}/${directory}/config.ini`,
+            ],
+            id,
+            resources: [JAVA_LANGUAGE_SERVER_RESOURCE, config],
+            version: "java-language-server-0.1.2-config-0.1.1",
+          };
+    }
+    case "kotlin": {
+      const resource = KOTLIN_SERVER_RESOURCES[
+        `${platform.platform}-${platform.arch}` as PlatformKey
+      ];
+      return resource == null
+        ? null
+        : {
+            expectedPaths: [
+              `server/bin/intellij-server${platform.platform === "win32" ? ".exe" : ""}`,
+            ],
+            id,
+            resources: [
+              {
+                ...resource,
+                downloadTimeoutMs: LANGUAGE_SERVER_DOWNLOAD_TIMEOUT_MS,
+                sourcePath: "extension/server",
+              },
+            ],
+            version: "kotlin-lsp-262.9593.0",
+          };
+    }
+    case "rust": {
+      const resource = RUST_ANALYZER_RESOURCES[
+        `${platform.platform}-${platform.arch}` as PlatformKey
+      ];
+      return resource == null
+        ? null
+        : {
+            expectedPaths: [resource.targetPath],
+            id,
+            resources: [resource],
+            version: "rust-analyzer-2026-08-24",
+          };
+    }
+  }
+}
