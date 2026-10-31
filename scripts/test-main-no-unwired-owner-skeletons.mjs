@@ -120,6 +120,7 @@ const realOwners = [
   ["src/main/main-app/window/browser-window-policy-adapters.ts", "createBrowserWindowPolicyAdapters"],
   ["src/main/main-app/worker/invocation-sampler.ts", "createGitWorkerInvocationSampler"],
   ["src/main/main-app/worker/worker-main-protocol.ts", "createWorkerMainProtocol"],
+  ["src/main/main-app/tray/tray-lifecycle.ts", "createTrayLifecycle"],
   ["src/main/main-app/tray/native-status-item-event-protocol.ts", "createNativeStatusItemEventProtocol"],
 ];
 for (const [path, factory] of realOwners) {
@@ -701,5 +702,12 @@ assert.equal(main.includes("let Ze = () =>"), false, "generated focus listener a
 assert.equal(main.includes("createChromeNativeHostCacheWatcher: aoe"), false, "startup no longer aliases the cache watcher constructor");
 assert.equal(main.includes("createBundledPluginsOrchestrator: ioe"), false, "startup no longer aliases the plugin orchestrator constructor");
 assert.equal(main.includes("archiveLegacyChronicleSkill: loe"), false, "startup no longer aliases legacy Chronicle archival");
+assert.equal(main.includes('require("./main-app/tray/tray-lifecycle.js")'), true, "tray lifecycle owner is wired");
+assert.equal(main.includes("configureStartup: configureTrayStartup"), true, "startup configuration belongs to the tray owner");
+assert.equal(main.includes("setMacMenuBarEnabled,"), true, "IPC consumes the tray owner's macOS enable policy");
+assert.equal(main.includes("startTrayForCurrentPlatform()"), true, "startup delegates platform auto-start to the tray owner");
+assert.equal(main.includes("start: Pst"), false, "generated tray start alias must be removed");
+assert.equal(main.includes("let Ge = async"), false, "generated tray setup closure must be removed");
+assert.equal(main.includes("Ke = async"), false, "generated macOS tray toggle closure must be removed");
 
-console.log("695 main unwired-owner skeleton assertions passed");
+console.log("703 main unwired-owner skeleton assertions passed");

@@ -33,9 +33,43 @@ export function createTrayLifecycle(dependencies: Record<string, any>) {
   let creationAllowed = false;
   let ready = false;
   let quitListenerInstalled = false;
+  let startupOptions: Record<string, any> | null = null;
 
   const getTrayController = () => controller;
   const isReady = () => isTrayReady(ready, controller);
+
+  function configureStartup(options: Record<string, any>) {
+    startupOptions = options;
+  }
+
+  async function startConfigured() {
+    if (startupOptions == null) throw new Error(`Tray startup has not been configured`);
+    try {
+      return await start(startupOptions);
+    } catch (error) {
+      startupOptions.reportNonFatal(
+        error instanceof Error ? error : `Failed to set up tray`,
+        { kind: `tray-setup-failed`, tags: { errorType: `tray-setup-failed` } },
+      );
+      startupOptions.ensureWindow();
+      return null;
+    }
+  }
+
+  function startForCurrentPlatform() {
+    return platform === `win32` || platform === `linux`
+      ? startConfigured()
+      : Promise.resolve(null);
+  }
+
+  async function setMacMenuBarEnabled(enabled: boolean) {
+    if (platform !== `darwin`) return;
+    if (!enabled) {
+      dispose();
+      return;
+    }
+    await startConfigured();
+  }
 
   async function start(options: Record<string, any>) {
     creationAllowed = true;
@@ -214,7 +248,15 @@ export function createTrayLifecycle(dependencies: Record<string, any>) {
     return null;
   }
 
-  return { dispose, getTrayController, isReady, start };
+  return {
+    configureStartup,
+    dispose,
+    getTrayController,
+    isReady,
+    setMacMenuBarEnabled,
+    start,
+    startForCurrentPlatform,
+  };
 }
 
 if (typeof module !== "undefined") {

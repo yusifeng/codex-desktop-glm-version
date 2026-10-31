@@ -3526,3 +3526,13 @@ reconcile，focus/registry/watcher disposer 保持原引用与顺序。
 WindowContext、status item、managed-service respawn、feature reconciler、IPC reload 与 startup critical-path wait 全部消费该 owner。
 `Ust` 原 `be/Ye/Xe/Ze` 以及 `Moe/aoe/ioe/loe` 直接构造别名删除。22 项 focused 断言与 orchestrator、Skysight、managed
 Computer Use、availability、main IPC 相邻 152 项回归通过，no-unwired gate 扩至 695 项。
+
+### 扩展既有 owner：tray startup policy convergence
+
+扩展已接回的 `tray/tray-lifecycle.ts`，由同一个 singleton owner 保存 startup 配置并统一 Windows/Linux 自动启动、macOS menu-bar
+enable/disable、setup failure non-fatal report 与 ensure-window 降级。低层 controller、pending creation、theme listener、will-quit cleanup
+仍由原 owner 持有，没有新建重复 facade；macOS disabled 可销毁后重新 enable，非 macOS toggle 保持 no-op。
+
+`Ust` 原 `Pst/Ge/Ke` 启动闭包删除，IPC 直接消费 tray owner 方法。原 tray focused suite 的直接 `.ts` import 失效入口修复后，
+既有与新增共 85 项行为断言真实执行；computer-history actions、main IPC、native status-item 相邻 110 项回归通过，no-unwired gate
+扩至 703 项。

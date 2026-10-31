@@ -56028,10 +56028,12 @@ var nativeStatusItemEventProtocol = createNativeStatusItemEventProtocol(n),
     logger: r,
   });
 var {
+  configureStartup: configureTrayStartup,
   getTrayController: X9,
   isReady: Z9,
-  start: Pst,
   dispose: Q9,
+  setMacMenuBarEnabled,
+  startForCurrentPlatform: startTrayForCurrentPlatform,
 } = createTrayLifecycle({
   app: l.app,
   Tray: l.Tray,
@@ -56594,55 +56596,38 @@ async function Ust() {
     windowActivation.openSecondInstance({ channel: `shortcut`, source: `shortcut` });
   });
   dockMenuLifecycle.start();
-  let Ge = async () => {
-      try {
-        await Pst({
-          buildFlavor: s,
-          repoRoot: V.repoRoot,
-          settingsStore: V.settingsStore,
-          onOpenMainWindow: () => windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !1 }),
-          onTrayMenuOpenNewThread: () => windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !0 }),
-          onTrayMenuOpenRecentThread: (e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }),
-          onTrayMenuSendFeedback: async () => {
-            await windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !1 });
-            let e = W.getPrimaryWindow();
-            e != null && W.sendMessageToWindow(e, { type: `run-command`, id: `feedback` });
-          },
-          ...createComputerHistoryStatusItemActions({
-            getConnection: () => K.appServerConnectionRegistry.getMaybeConnection(`local`) ?? null,
-            getFeatureAvailability: Tr,
-            getManagedService: managedComputerUseLifecycle.getService,
-            getRecorder: pluginReconciliationLifecycle.getRecorder,
-            invalidateQuery: (e) => W.broadcastQueryCacheInvalidation(e),
-            logComputerHistoryStatusItemAction: (e) =>
-              publishComputerUseAnalytics({ type: `skysight-status-item-action-clicked`, action: e }),
-            navigate: (e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }),
-            quit: () => l.app.quit(),
-            requestComputerUseWorker: Se.requestComputerUseWorker,
-            historyClearActions: HISTORY_CLEAR_ACTIONS,
-            historyClearRange,
-            historyScopeAction,
-            logger: r,
-          }),
-        });
-      } catch (e) {
-        (u.reportNonFatal(e instanceof Error ? e : `Failed to set up tray`, {
-          kind: `tray-setup-failed`,
-          tags: { errorType: `tray-setup-failed` },
-        }),
-          windowActivation.ensureWindow());
-      }
+  configureTrayStartup({
+    buildFlavor: s,
+    ensureWindow: windowActivation.ensureWindow,
+    repoRoot: V.repoRoot,
+    reportNonFatal: (error, context) => u.reportNonFatal(error, context),
+    settingsStore: V.settingsStore,
+    onOpenMainWindow: () => windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !1 }),
+    onTrayMenuOpenNewThread: () => windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !0 }),
+    onTrayMenuOpenRecentThread: (e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }),
+    onTrayMenuSendFeedback: async () => {
+      await windowActivation.navigateWithAttribution(`/`, { navigateExistingWindow: !1 });
+      let e = W.getPrimaryWindow();
+      e != null && W.sendMessageToWindow(e, { type: `run-command`, id: `feedback` });
     },
-    Ke = async (e) => {
-      if (N) {
-        if (!e) {
-          Q9();
-          return;
-        }
-        await Ge();
-      }
-    };
-  (P || process.platform === `linux`) && Ge();
+    ...createComputerHistoryStatusItemActions({
+      getConnection: () => K.appServerConnectionRegistry.getMaybeConnection(`local`) ?? null,
+      getFeatureAvailability: Tr,
+      getManagedService: managedComputerUseLifecycle.getService,
+      getRecorder: pluginReconciliationLifecycle.getRecorder,
+      invalidateQuery: (e) => W.broadcastQueryCacheInvalidation(e),
+      logComputerHistoryStatusItemAction: (e) =>
+        publishComputerUseAnalytics({ type: `skysight-status-item-action-clicked`, action: e }),
+      navigate: (e) => windowActivation.navigateWithAttribution(e, { navigateExistingWindow: !0 }),
+      quit: () => l.app.quit(),
+      requestComputerUseWorker: Se.requestComputerUseWorker,
+      historyClearActions: HISTORY_CLEAR_ACTIONS,
+      historyClearRange,
+      historyScopeAction,
+      logger: r,
+    }),
+  });
+  startTrayForCurrentPlatform();
   I.add(
       ele({
         appServerConnection: Pe(),
@@ -56803,7 +56788,7 @@ async function Ust() {
     restoreAvatarOverlayOpenState: (e) => W.avatarOverlayManager.restoreOpenState(e),
     prewarmAvatarOverlay: (e) => W.avatarOverlayManager.prewarm(e),
     reloadBundledPlugins: pluginReconciliationLifecycle.reloadBundledPlugins,
-    setMacMenuBarEnabled: Ke,
+    setMacMenuBarEnabled,
     navigateToRoute: Le.navigateToRoute,
     setRemoteHostedPIPActiveThreadID: U.setActiveThreadForWebContents,
     setRemoteHostedPIPHostLayout: U.setHostLayoutForWebContents,

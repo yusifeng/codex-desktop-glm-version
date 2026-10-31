@@ -5434,3 +5434,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   focus observer 构造顺序、connected transition、幂等 start 与 disposer；早期 recorder getter 保持安全 null。
 - WindowContext/status item/managed-service respawn/availability/IPC/startup wait 共用 owner。`Ust` 旧 `be/Ye/Xe/Ze` 及
   `Moe/aoe/ioe/loe` 直接别名删除；focused 22 项、相邻五组 152 项回归通过，no-unwired gate 扩至 695 项。
+
+# 2026-11-01 tray startup policy convergence
+
+- 扩展既有 `tray/tray-lifecycle.ts`，同一 singleton owner 统一 startup config、Windows/Linux auto-start、macOS enable/disable、
+  non-fatal failure 与 ensure-window fallback；未创建第二状态 owner。
+- `Ust` 旧 `Pst/Ge/Ke` 删除，IPC 直接消费 lifecycle。修复 tray suite 直接 import `.ts` 的失效入口后 85 项真实执行，
+  相邻三组 110 项回归通过，no-unwired gate 扩至 703 项。

@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createTrayLifecycle } from "../src/main/main-app/tray/tray-lifecycle.ts";
+import { transform } from "esbuild";
+
+const source = fs.readFileSync(
+  new URL("../src/main/main-app/tray/tray-lifecycle.ts", import.meta.url),
+  "utf8",
+);
+const output = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
+const loaded = { exports: {} };
+Function("module", "exports", output.code)(loaded, loaded.exports);
+const { createTrayLifecycle } = loaded.exports;
 
 let assertions = 0;
 const equal = (actual, expected) => {
@@ -314,6 +323,58 @@ function createHarness(platform, options = {}) {
   equal(harness.trayControllers.length, 1);
 }
 
+{
+  const harness = createHarness("linux", { candidates: () => ["/linux/configured"] });
+  harness.lifecycle.configureStartup({
+    ...harness.startOptions,
+    ensureWindow() { throw new Error("success must not ensure a window"); },
+    reportNonFatal() { throw new Error("success must not report an error"); },
+  });
+  equal(await harness.lifecycle.startForCurrentPlatform(), harness.trayControllers[0]);
+  equal(harness.lifecycle.getTrayController(), harness.trayControllers[0]);
+  equal(await harness.lifecycle.setMacMenuBarEnabled(false), undefined);
+  equal(harness.lifecycle.getTrayController(), harness.trayControllers[0]);
+}
+
+{
+  const calls = [];
+  const harness = createHarness("linux", {
+    candidates: () => ["/linux/missing"],
+    images: { "/linux/missing": "empty" },
+  });
+  harness.lifecycle.configureStartup({
+    ...harness.startOptions,
+    ensureWindow: () => calls.push(["ensure-window"]),
+    reportNonFatal: (error, context) => calls.push(["report", error.message, context]),
+  });
+  equal(await harness.lifecycle.startForCurrentPlatform(), null);
+  equal(calls, [
+    ["report", "Linux tray application icon is unavailable", {
+      kind: "tray-setup-failed",
+      tags: { errorType: "tray-setup-failed" },
+    }],
+    ["ensure-window"],
+  ]);
+}
+
+{
+  const harness = createHarness("darwin", { images: { "/icon/one": "present" } });
+  harness.lifecycle.configureStartup({
+    ...harness.startOptions,
+    ensureWindow() {},
+    reportNonFatal() {},
+  });
+  equal(await harness.lifecycle.startForCurrentPlatform(), null);
+  equal(harness.lifecycle.getTrayController(), null);
+  await harness.lifecycle.setMacMenuBarEnabled(true);
+  equal(harness.lifecycle.getTrayController(), harness.trayControllers[0]);
+  await harness.lifecycle.setMacMenuBarEnabled(false);
+  equal(harness.lifecycle.getTrayController(), null);
+  equal(harness.trayControllers[0].destroyCalls, 1);
+  await harness.lifecycle.setMacMenuBarEnabled(true);
+  equal(harness.trayControllers.length, 2);
+}
+
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
@@ -322,7 +383,12 @@ equal(main.includes("const { createTrayLifecycle } = require(\"./main-app/tray/t
 equal(main.includes("} = createTrayLifecycle({"), true);
 equal(main.includes("getTrayController: X9,"), true);
 equal(main.includes("a.u(Z9)"), true);
-equal(main.includes("await Pst({"), true);
+equal(main.includes("configureTrayStartup({"), true);
+equal(main.includes("startTrayForCurrentPlatform()"), true);
+equal(main.includes("setMacMenuBarEnabled,"), true);
+equal(main.includes("await Pst({"), false);
+equal(main.includes("let Ge = async"), false);
+equal(main.includes("Ke = async"), false);
 equal(main.includes("async function Pst"), false);
 equal(main.includes("function Q9"), false);
 equal(main.includes("function Fst"), false);
