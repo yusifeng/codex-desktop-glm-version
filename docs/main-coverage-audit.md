@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 search-match hydration owner repair
+
+语义 `bve` 原先是单行 `broadcastConversationSnapshot` 占位，搜索结果打开时不会加载 cursor 周边 turns、补齐目标 item 或放置 canonical
+history island。本轮恢复旧 `bve/xve/Sve` 的双向分页、权限投影、时间/anchor 排序、island merge 与错误语义，删除 main 旧簇；focused
+suite 构造真实 canonical search match，验证 entity、island 与 snapshot 均落地。
+
 ## 2026-10-31 archived preview owner cleanup
 
 语义 `ArchivedThreadPreviewRead` 与旧 `yve` 行为逐支一致，但原模块反向导入 re-export 它的 `history-policy.ts`，形成不必要的 CJS cycle；

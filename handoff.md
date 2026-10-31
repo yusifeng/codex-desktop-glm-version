@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复 search-match history hydration owner：`history-policy.ts` 的 `bve` 不再只广播空 snapshot，现恢复双向 turn page、目标 item 向老分页、
+turn projection、权限上下文、canonical search island 定位/合并与失败判定；AppServer manager 的搜索命中 consumer 继续调用该实现，主 chunk
+旧 `bve/xve/Sve` 簇删除，focused suite 新增实际 search island/entity/snapshot 行为覆盖。
+
 收敛 archived thread preview owner：`archived-preview.ts` 不再反向导入 `history-policy.ts`，消除两模块的运行时循环；两处 unarchived-turn
 视图均恢复旧实现的 exhausted-tail 限制，避免把仍有 newer boundary 的 canonical island 当作稳定尾部。AppServer manager 继续消费语义
 preview，主 chunk 旧 `vve/yve/uy` 簇删除，history-policy focused suite 增补边界与 wiring 断言。

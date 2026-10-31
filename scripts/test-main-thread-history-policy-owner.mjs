@@ -17,13 +17,28 @@ const module = { exports: {} };
 Function("require", "module", "exports", transpiled.code)(
   (specifier) => {
     if (specifier === "./archived-preview") return { ArchivedThreadPreviewRead };
-    if (specifier === "@chunk/shared") return { Cs: (hostId) => hostId === "durable" };
+    if (specifier === "@chunk/shared") return {
+      Cs: (hostId) => hostId === "durable",
+      kd: () => ({ approvalPolicy: "on-request", approvalsReviewer: null, sandboxPolicy: { type: "workspaceWrite" } }),
+    };
     if (specifier === "./automation-detector") return { AUTOMATION_DETECTOR: automationDetector };
     if (specifier === "./hydration") return { attachmentsFromInput, projectItems, projectTurns };
     if (specifier === "../turns/item-merge") return { mergeTurnLists };
     if (specifier === "../turns/canonical-history") return {
       exhaustedTailIsland: (history) => history.islands.at(-1)?.newerBoundary?.status === "exhausted" ? history.islands.at(-1) : null,
+      lastTurnWithTurnId: () => null,
+      appendHistoryIsland: (history, segment, adapter) => ({
+        ...history,
+        islands: [...history.islands, {
+          id: segment.id,
+          entries: segment.entries.sort((a, b) => adapter.getPosition(a) - adapter.getPosition(b)),
+          olderBoundary: segment.olderBoundary,
+          newerBoundary: segment.newerBoundary,
+        }],
+      }),
     };
+    if (specifier === "../turns/history-requests") return { listTurnItems: async () => { throw new Error("unexpected item page"); } };
+    if (specifier === "../vendor/immer") return { freezeIdentity: (value) => value };
     throw new Error(`unexpected require ${specifier}`);
   },
   module,
@@ -67,6 +82,28 @@ equal(policyModule.uy({
   } },
 }, { mergeTurns: (left, right) => [...left, ...right] }), [{ turnId: "draft" }]);
 
+const searchConversation = {
+  cwd: "/work", latestModel: "gpt", latestReasoningEffort: "high", turns: [],
+  turnHistory: { kind: "canonical", history: { generation: 0, isComplete: false, islands: [], entitiesByKey: {} } },
+};
+let snapshots = 0;
+await policyModule.bve({
+  getConversation: () => searchConversation,
+  listThreadTurns: async (_id, options) => ({
+    response: { data: [{ id: "turn-search", items: [{ id: "item-search" }], startedAt: 10 }], nextCursor: null },
+    itemsPaginationByTurnId: { "turn-search": { hasLoadedOldest: true } },
+  }),
+  updateConversationState: (_id, update) => update(searchConversation),
+  broadcastConversationSnapshot: () => { snapshots += 1; },
+  sendRequest: async () => { throw new Error("unexpected request"); },
+}, {
+  mapThreadTurns: ({ turns }) => turns.map((entry) => ({ turnId: entry.id, items: entry.items, turnStartedAtMs: entry.startedAt })),
+  createSearchIslandId: () => "match-1",
+}, { conversationId: "thread-search", itemId: "item-search", turnCursor: "cursor", turnId: "turn-search" });
+equal(searchConversation.turnHistory.history.islands[0].id, "search:match-1");
+equal(searchConversation.turnHistory.history.entitiesByKey["turn:turn-search"].items[0].id, "item-search");
+equal(snapshots, 1);
+
 const hydration = fs.readFileSync(new URL("../src/main/main-app/threads/hydration.ts", import.meta.url), "utf8");
 equal(hydration.includes("export function projectItems("), true);
 equal(source.includes('import { mergeTurnLists } from "../turns/item-merge"'), true);
@@ -88,6 +125,9 @@ equal(main.includes("function Tve("), false);
 equal(main.includes("function wve("), false);
 equal(main.includes("yve = class"), false);
 equal(main.includes("function uy("), false);
+equal(main.includes("async function bve("), false);
+equal(main.includes("function xve("), false);
+equal(main.includes("function Sve("), false);
 equal(main.includes('const { AppServerConversationManager } = require("./main-app/conversation/app-server-manager.js");'), true);
 
 console.log(`${assertions} main thread history policy owner assertions passed`);
