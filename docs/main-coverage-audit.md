@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 SSH app-server transport owner
+
+既有 `src/main/main-app/app-server/transports.ts` 的 `AppServerTransportSshWebsocket` 已接回真实 transport factory 与 remote
+installer consumers，替代原 `VE`。新 owner 保留 shell-env loading/proxy-command dependency、remote Codex version discovery/
+installation、SSH websocket proxy stream、connect timeout/error projection、stream disposal 与 startup serialization；29 个
+class member 与原 owner 对齐，主 chunk 旧 650 行 class 已删除。
+
 ## 2026-10-31 detached-window owner cluster
 
 既有 `src/main/main-app/window/detached-window-manager.ts` 已接回真实 consumers，替代原 `GN/qje/Jje/Yje/Xje/Qje/eMe`。

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 SSH app-server transport owner：`app-server/transports.ts` 的 `AppServerTransportSshWebsocket` 现已替代主 chunk 的
+`VE`。shell-env/proxy-command gate、remote Codex discovery/install、websocket proxy stream、timeout/error projection 与
+per-connection startup serialization 保持由 29-member owner 持有；真实 transport factory 和 remote installer consumers 已接回。
+
 接回 detached-window owner cluster：`window/detached-window-manager.ts` 现已替代主 chunk 的 `GN/qje/Jje/Yje/Xje/Qje/eMe`，
 覆盖预热 slot/manager、detached window 状态机、per-origin service、handoff lease、DeviceCheck cookie/token 和 call-id claim
 ledger。真实 `WindowContext` 与 startup dependencies 保持 generated aliases 兼容，7 个重复 class 已物理删除。
