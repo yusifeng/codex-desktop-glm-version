@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Ztt/E5` thread-catalog page-slot scheduler 迁入
+`thread-catalog/page-slot-scheduler.ts`；per-host serialization/throttling、foreground promotion、host generation
+cancellation、background dispatch pacing、timer resolution 与 dispose cleanup 均由新 owner 持有。两个 runtime
+construction paths 已接回，旧 class 已删除。focused test 覆盖 38 项。
+
 随后将 `Xtt` thread archive service 迁入 `threads/thread-archive-service.ts`；local-only inactive archive、missing
 rollout/catalog reconciliation、provisional-thread guard、archive side effects、single/all archived deletion 与 automation
 refresh 均由新 owner 持有。唯一 runtime construction 已接回，旧 class 已删除。focused test 覆盖 36 项。

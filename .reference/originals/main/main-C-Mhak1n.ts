@@ -112,6 +112,7 @@ const { createTerminalWindowRuntime } = require("./main-app/terminal/terminal-wi
 const { createNodePtyBackendRuntime } = require("./main-app/terminal/node-pty-backend.js");
 const { createTerminalCommandRuntime } = require("./main-app/terminal/terminal-command-runtime.js");
 const { createThreadArchiveServiceClass } = require("./main-app/threads/thread-archive-service.js");
+const { createThreadCatalogPageSlotSchedulerClass } = require("./main-app/thread-catalog/page-slot-scheduler.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138554,90 +138555,11 @@ var Xtt = createThreadArchiveServiceClass({
     RpcHandlerBase: n.Uf,
     createLogger: r.r,
   }),
-  Ztt = 1e3,
-  E5 = class {
-    #e;
-    #t = !1;
-    #n = 0;
-    #r = null;
-    #i = new Map();
-    #a = new Map();
-    #o = new Map();
-    #s = new Map();
-    #c = new Map();
-    constructor({ pageIntervalMs: e = Ztt } = {}) {
-      this.#e = e;
-    }
-    getBackgroundPageDispatchDelay() {
-      return this.#r == null ? 0 : Math.max(0, this.#r + this.#e - Date.now());
-    }
-    recordBackgroundPageDispatch() {
-      this.#r = Date.now();
-    }
-    waitForPageSlot(e, t, n = () => !1, r = this.#e) {
-      let i = this.#s.get(e) ?? 0,
-        a = () => n() || i !== (this.#s.get(e) ?? 0);
-      if (t === `immediate`)
-        return this.#t || a()
-          ? Promise.resolve(!1)
-          : (this.#i.set(e, Date.now()), Promise.resolve(!0));
-      let o = this.#n,
-        s = (this.#a.get(e) ?? Promise.resolve()).then(async () => {
-          if (this.#l(e)) return !0;
-          if (this.#t || o !== this.#n || a()) return !1;
-          let t = this.#i.get(e);
-          if (t != null) {
-            let n = Math.max(0, t + r - Date.now());
-            if (n > 0 && !(await this.#u(e, n))) return !1;
-            if (this.#l(e)) return !0;
-          }
-          return this.#t || o !== this.#n || a() ? !1 : (this.#i.set(e, Date.now()), !0);
-        }),
-        c = s.then(
-          () => void 0,
-          () => void 0,
-        );
-      return (
-        this.#a.set(e, c),
-        c.finally(() => {
-          this.#a.get(e) === c && this.#a.delete(e);
-        }),
-        s
-      );
-    }
-    clearHost(e) {
-      this.#s.set(e, (this.#s.get(e) ?? 0) + 1);
-      for (let [t, n] of this.#c)
-        n.hostId === e && (clearTimeout(t), this.#c.delete(t), n.resolve(!1));
-      (this.#o.delete(e), this.#i.delete(e), this.#a.delete(e));
-    }
-    promoteHost(e) {
-      this.#o.set(e, 1);
-      for (let [t, n] of this.#c)
-        n.hostId === e && (clearTimeout(t), this.#c.delete(t), n.resolve(!0));
-    }
-    dispose() {
-      this.#t || ((this.#t = !0), this.cancelPendingWaits());
-    }
-    cancelPendingWaits() {
-      ((this.#n += 1), (this.#r = null));
-      for (let [e, t] of this.#c) (clearTimeout(e), t.resolve(!1));
-      (this.#c.clear(), this.#i.clear(), this.#a.clear(), this.#o.clear(), this.#s.clear());
-    }
-    #l(e) {
-      return this.#o.delete(e) ? (this.#i.set(e, Date.now()), !0) : !1;
-    }
-    #u(e, t) {
-      return this.#t
-        ? Promise.resolve(!1)
-        : new Promise((n) => {
-            let r = setTimeout(() => {
-              (this.#c.delete(r), n(!this.#t));
-            }, t);
-            this.#c.set(r, { hostId: e, resolve: n });
-          });
-    }
-  },
+  E5 = createThreadCatalogPageSlotSchedulerClass({
+    now: Date.now,
+    setTimer: setTimeout,
+    clearTimer: clearTimeout,
+  }),
   D5 = 100,
   Qtt = 3e4,
   O5 = 1e4,

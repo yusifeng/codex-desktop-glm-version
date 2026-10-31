@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread-catalog page-slot scheduler
+
+原 `Ztt/E5` 已迁入 `src/main/main-app/thread-catalog/page-slot-scheduler.ts`。新 owner 保留 per-host page dispatch
+serialization/throttling、global background delay、foreground promotion、host generation invalidation、pending timer
+resolution、cancel-all 与 idempotent dispose；默认及显式两个 runtime constructions 已接回，旧 class 已删除。
+
 ## 2026-10-31 thread archive service
 
 原 `Xtt` 已迁入 `src/main/main-app/threads/thread-archive-service.ts`。新 owner 保留 local-host gate、inactive rollout
