@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 deep-link route actions
+
+原 `b7/uit` 已迁入 `src/main/main-app/deep-links/route-actions.ts`。新模块保留 background browser-tab/browser-panel
+消息形状、initiator 默认值，以及 plugin-list phase flag、marketplace path/name 与 plugin-name 精确匹配；真实 browser、
+local-conversation、new-thread 与 plugin-install consumers 已接回，旧 helpers 已删除。
+
 ## 2026-10-31 deep-link local-project selector
 
 原 `git` 已迁入 `src/main/main-app/deep-links/local-project-selector.ts`。新 owner 保留显式 project lookup、root-based

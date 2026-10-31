@@ -152,6 +152,7 @@ const { ApplicationMenuManager, normalizeMenuAccelerator } = require("./main-app
 const { resolveDeepLinkThreadHost } = require("./main-app/deep-links/thread-host-resolver.js");
 const { resolveDeepLinkWorkspace } = require("./main-app/deep-links/workspace-resolver.js");
 const { selectLocalProjectForWorkspace } = require("./main-app/deep-links/local-project-selector.js");
+const { findPluginMarketplacePath, openBrowserForDeepLink } = require("./main-app/deep-links/route-actions.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -143839,7 +143840,12 @@ async function lit({
     case `pluginInstall`: {
       let r;
       try {
-        r = await uit({ listPlugins: o, route: t });
+        r = await findPluginMarketplacePath({
+          listPlugins: o,
+          marketplaceName: t.marketplaceName,
+          pluginName: t.pluginName,
+          localMarketplacesOnly: Tr().noPluginListPhase2,
+        });
       } catch (n) {
         (y7.warning(`plugin_install_marketplace_lookup_failed`, {
           safe: { marketplaceName: t.marketplaceName, pluginName: t.pluginName },
@@ -143911,7 +143917,12 @@ async function lit({
       l.showPrimaryWindow({ stealFocus: !0 });
       return;
     case `browser`:
-      b7({ browserUrl: t.browserUrl, initiator: `external_link`, window: e, windowManager: l });
+      openBrowserForDeepLink({
+        browserUrl: t.browserUrl,
+        initiator: `external_link`,
+        window: e,
+        windowManager: l,
+      });
       return;
     case `sharedChatGptConversation`:
       u(e, n.uo(t.sharedConversationId));
@@ -143938,7 +143949,7 @@ async function lit({
       )
         return;
       if (t.browserActive === !1 && t.browserTabId != null && t.browserUrl != null) {
-        b7({
+        openBrowserForDeepLink({
           browserActive: !1,
           browserTabId: t.browserTabId,
           browserUrl: t.browserUrl,
@@ -143962,7 +143973,7 @@ async function lit({
           : `${a}?${new URLSearchParams({ hostId: t.hostId })}`,
         i,
       ),
-        b7({
+        openBrowserForDeepLink({
           browserTabId: t.browserTabId,
           browserUrl: t.browserUrl,
           conversationId: t.conversationId,
@@ -144011,7 +144022,7 @@ async function lit({
         prefillPrompt: t.prompt,
         project: d,
       }),
-        b7({ browserUrl: t.browserUrl, window: e, windowManager: l }));
+        openBrowserForDeepLink({ browserUrl: t.browserUrl, window: e, windowManager: l }));
       return;
     }
     case `settings`:
@@ -144024,50 +144035,6 @@ async function lit({
       u(e, `/skills${t.search ?? ``}`);
       return;
   }
-}
-function b7({
-  browserActive: e,
-  browserTabId: t,
-  browserUrl: n,
-  conversationId: r,
-  initiator: i = `open_in_browser_bridge`,
-  window: a,
-  windowManager: o,
-}) {
-  if (n != null) {
-    if (e === !1 && t != null) {
-      o.sendMessageToWindow(a, {
-        type: `open-browser-tab`,
-        active: !1,
-        browserTabId: t,
-        conversationId: r,
-        initialUrl: n,
-        source: `manual`,
-        initiator: i,
-      });
-      return;
-    }
-    o.sendMessageToWindow(a, {
-      type: `toggle-browser-panel`,
-      ...(t == null ? {} : { browserTabId: t }),
-      conversationId: r,
-      open: !0,
-      url: n,
-      source: `manual`,
-      initiator: i,
-    });
-  }
-}
-async function uit({ listPlugins: e, route: t }) {
-  if (e == null) return null;
-  let { marketplaces: n } = await e(Tr().noPluginListPhase2 ? { marketplaceKinds: [`local`] } : {});
-  return (
-    n.find((e) =>
-      e.path == null || e.name !== t.marketplaceName
-        ? !1
-        : e.plugins.some((e) => e.name === t.pluginName),
-    )?.path ?? null
-  );
 }
 function _it({
   settingsStore: e,
