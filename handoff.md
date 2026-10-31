@@ -5096,3 +5096,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   timer cancellation/unref、reset 与 dispose；page materialization 和 webview binding 继续共享同一 `KX` 实现。
 - main 旧 `KX` 与三个 timing constants 已删除。focused coverage 38 项，no-unwired gate 保持 533 项并覆盖新 owner；下一批审计紧随的
   `qX/JX/YX/XX/$Xe/ZX/QX` site-tools availability 状态机，按完整 helper belt 迁移。
+
+# 2026-11-01 site tools availability extraction
+
+- 新增并接回 `browser-sidebar/site-tools-availability.ts`，完整承接 WebMCP/annotation feature 更新、revision、pending/available 状态
+  投影、clear 与 load-complete refresh；main 旧 `qX/JX/YX/XX/$Xe/ZX/QX` 已删除。
+- 修复 `browser-page-webview-binding-controller.ts` 使用 `$Xe` 却未解构、主组合根也未注入的运行时接线缺口。下一批审计相邻
+  Sites auto-auth `rZe` 的 URL policy、bootstrap request、3 秒 timeout 和 session token contract。

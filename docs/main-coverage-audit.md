@@ -3146,3 +3146,10 @@ registry 和 destroyed cleanup。page command、webview binding 与 Browser Use 
 1 秒最短关闭延迟，并保持 timer cancellation/unref、reset、dispose 和 state-change callback 语义。page materialization 与 webview
 binding 继续通过 `KX` 兼容别名共享同一状态机；旧 `KX` 及其 timing constants 已物理删除。focused test 覆盖所有定时边界、重复
 更新、取消、reset/dispose 与真实接线；no-unwired gate 保持 533 项并覆盖新 owner。
+
+### 增量抽取：site tools availability state
+
+新增 `browser-sidebar/site-tools-availability.ts`，统一 WebMCP tools revision、annotation features、available/unavailable 与导航期间
+pending 状态转换、清空及 load-complete refresh。主组合根继续以 `qX/JX/YX/XX/$Xe` 兼容别名服务 WebMCP event、annotation
+controller 与 webview binding；旧 `qX..QX` helper belt 已物理删除。迁移同时修复 webview binding 调用 `$Xe` 却未从依赖注入的
+潜在 `ReferenceError`。focused test 覆盖所有状态迁移、幂等与真实接线。

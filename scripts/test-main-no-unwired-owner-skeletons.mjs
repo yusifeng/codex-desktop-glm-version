@@ -147,6 +147,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-lifecycl
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-context-menu.js")'), true, "browser context menu is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-navigation-runtime.js")'), true, "browser webview navigation runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-media-state-tracker.js")'), true, "browser media state tracker is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/site-tools-availability.js")'), true, "site tools availability runtime is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
 }
@@ -175,6 +176,9 @@ for (const oldOwner of ["function GXe(", "function KXe(", "function qXe(", "func
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser webview navigation owner must be removed`);
 }
 assert.equal(main.includes("function KX("), false, "generated browser media state tracker must be removed");
+for (const oldOwner of ["function qX(", "function JX(", "function YX(", "function XX(", "function $Xe(", "function ZX(", "function QX("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated site tools availability owner must be removed`);
+}
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }

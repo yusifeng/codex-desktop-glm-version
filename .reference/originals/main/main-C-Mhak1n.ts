@@ -482,6 +482,7 @@ const { createBrowserLifecycleDebugEvents } = require("./main-app/browser-sideba
 const { createBrowserContextMenuRuntime } = require("./main-app/browser-sidebar/browser-context-menu.js");
 const { createBrowserWebviewNavigationRuntime } = require("./main-app/browser-sidebar/browser-webview-navigation-runtime.js");
 const { createBrowserMediaStateTracker: KX } = require("./main-app/browser-sidebar/browser-media-state-tracker.js");
+const { createSiteToolsAvailabilityRuntime } = require("./main-app/browser-sidebar/site-tools-availability.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43829,45 +43830,13 @@ var {
   normalizeUrl: Ze,
   routePathForUrl: n.dl,
 });
-function qX(e, t) {
-  let n = e.siteToolsAvailability,
-    r = ZX(e, n.webMcp, t.length > 0);
-  return (0, G.default)(e.webMcpTools, t) && n.webMcp === r
-    ? !1
-    : ((e.webMcpTools = t),
-      (e.webMcpToolsRevision += 1),
-      (e.siteToolsAvailability = { ...n, webMcp: r }),
-      !0);
-}
-function JX(e, t) {
-  let n = e.siteToolsAvailability,
-    r = t == null ? `unavailable` : ZX(e, n.annotations, t.length > 0);
-  return (0, G.default)(e.siteAnnotationFeatures, t) && n.annotations === r
-    ? !1
-    : ((e.siteAnnotationFeatures = t), (e.siteToolsAvailability = { ...n, annotations: r }), !0);
-}
-function YX(e) {
-  let t = e.siteToolsAvailability;
-  e.siteToolsAvailability = { webMcp: QX(t.webMcp), annotations: QX(t.annotations) };
-}
-function XX(e) {
-  (qX(e, []), JX(e, []));
-}
-function $Xe(e) {
-  (qX(e, e.webMcpTools), JX(e, e.siteAnnotationFeatures));
-}
-function ZX(e, t, n) {
-  return n
-    ? `available`
-    : e.isMainFrameLoading && t === `pending-available`
-      ? `pending-available`
-      : `unavailable`;
-}
-function QX(e) {
-  return e === `available` || e === `pending-available`
-    ? `pending-available`
-    : `pending-unavailable`;
-}
+var {
+  applyWebMcpTools: qX,
+  applyAnnotationFeatures: JX,
+  markSiteToolsPending: YX,
+  clearSiteTools: XX,
+  refreshSiteToolsAvailability: $Xe,
+} = createSiteToolsAvailabilityRuntime({ isEqual: G.default });
 var eZe = 3e3,
   tZe = `OAI-Sites-ID-Token`,
   nZe = n.wf({ status: n.bf(`issued`), id_token: n.Of().min(1), expires_in: n.Cf().positive() });
@@ -44939,7 +44908,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ uZe, hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, EHe, wHe, JU, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, logger: r.i(`browser-sidebar-manager`) }))(this)),
