@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 saved-section reconciliation owner
+
+原 `rBe` reconciliation query owner 已迁入 `src/main/main-app/sidebar/saved-section-reconciliation.ts`。新 class 保留
+single-read guard、source/connection lifetime、list/member snapshots、conflict detection 与 commit merge/writeback；真实 `iBe`
+manager consumer 已接回，主 chunk 旧 class body 已删除。
+
 ## 2026-10-31 saved-section undo/redo owner
 
 原 `yH` undo/redo transition owner 已迁入 `src/main/main-app/sidebar/saved-section-undo-redo-stack.ts`。新 factory class

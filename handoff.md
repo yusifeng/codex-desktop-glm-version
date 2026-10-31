@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续迁 saved-section cluster：原 `rBe` reconciliation query owner 已迁入
+`sidebar/saved-section-reconciliation.ts`，single-read guard、source/connection lifetime、list/member snapshots、conflict detection
+与 commit merge/writeback 均由新 class 持有；真实 `iBe` consumer 已接回，旧 class body 删除。
+
 继续向上迁 saved-section cluster：原 `yH` undo/redo transition owner 已迁入
 `sidebar/saved-section-undo-redo-stack.ts`，scope snapshots、structure/order capture、transition sequencing 与 migration state
 仍由完整 class 持有；真实 `iBe` manager consumer 已接回，旧 class body 删除。
