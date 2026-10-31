@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 tray singleton lifecycle
+
+原 `W9/G9/K9/q9/J9/Y9/Nst/X9/Z9/Pst/Q9/Fst/$9` 已迁入 `src/main/main-app/tray/tray-lifecycle.ts`。新 owner
+保留 native macOS status-item 分支、macOS template/Linux resize/Windows theme-aware 图标策略与 fallback、distribution/package
+identity、single-flight creation、readiness、will-quit/dispose、主题 listener cleanup 和异步创建取消；真实 startup、readiness
+与 controller consumers 已接回，旧 globals/functions 已删除。
+
 ## 2026-10-31 native macOS status-item owner
 
 原 `Mst` 已迁入 `src/main/main-app/tray/native-status-item-controller.ts`。新 owner 保留 addon creation、event parsing、

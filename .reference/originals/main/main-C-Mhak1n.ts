@@ -138,6 +138,7 @@ const { createRealtimeVoiceHotkeyManager } = require("./main-app/realtime/voice-
 const { createDebugWindowRuntime } = require("./main-app/debug/debug-window-manager.js");
 const { createThreadMetadataServiceClass } = require("./main-app/threads/thread-metadata-service.js");
 const { createNativeStatusItemControllerClass } = require("./main-app/tray/native-status-item-controller.js");
+const { createTrayLifecycle } = require("./main-app/tray/tray-lifecycle.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -151932,7 +151933,6 @@ function kst({
     },
   };
 }
-const Ast = (e) => resolveWindowsPackageIdentity(e, a.in);
 var jst = n.vf(`type`, [
     n.wf({ type: n.bf(`menu-update`) }),
     n.wf({ type: n.bf(`menu-open`) }),
@@ -151976,130 +151976,35 @@ var jst = n.vf(`type`, [
     projectMenuState: projectNativeStatusItemMenuState,
     getQuitLabel: e7,
     logger: r,
-  }),
-  W9 = 16,
-  G9 = null,
-  K9 = null,
-  q9 = null,
-  J9 = !1,
-  Y9 = !1,
-  Nst = !1;
-function X9() {
-  return G9;
-}
-function Z9() {
-  return isTrayReady(Y9, G9);
-}
-async function Pst(e) {
-  return (
-    (J9 = !0),
-    K9 ??
-      G9 ??
-      ((Nst ||= (l.app.on(`will-quit`, Q9), !0)),
-      (K9 = (async () => {
-        if (
-          process.platform === `darwin` &&
-          e.getNativeStatusItemState != null &&
-          e.getComputerUseServiceProcessIdentifier != null &&
-          e.onNativeStatusItemMenuAction != null
-        ) {
-          if (!J9) return null;
-          let [, t] = resolveTrayTemplateNames(),
-            n = new Mst(
-              (0, h.join)(
-                l.app.isPackaged
-                  ? process.resourcesPath
-                  : (0, h.join)(e.repoRoot, `electron`, `src`, `icons`),
-                t,
-              ),
-              a.hn(),
-              l.app.getName(),
-              e.settingsStore,
-              e.getNativeStatusItemState,
-              e.getComputerUseServiceProcessIdentifier,
-              e.onNativeStatusItemMenuAction,
-            );
-          return ((G9 = n), (Y9 = !0), n);
-        }
-        let t =
-            process.platform === `win32` && l.app.isPackaged
-              ? a.in.getWindowsDistributionFlavor(
-                  e.buildFlavor,
-                  a.an(`codexWindowsPackageIdentity`),
-                )
-              : e.buildFlavor,
-          n = await Fst(t, e.repoRoot),
-          r = new l.Tray(
-            n.defaultIcon,
-            process.platform === `win32` && l.app.isPackaged ? Ast(t) : void 0,
-          );
-        if (!J9) return (r.destroy(), null);
-        if (process.platform === `win32`) {
-          let n = resolveTrayWindowsIconNames(t, a.in.Agent);
-          if (n.dark !== n.light) {
-            let n = () => {
-              let n = $9(t, e.repoRoot);
-              n != null && r.setImage(n);
-            };
-            (l.nativeTheme.on(`updated`, n),
-              (q9 = () => {
-                l.nativeTheme.off(`updated`, n);
-              }),
-              n());
-          }
-        }
-        r.setToolTip(l.app.getName());
-        let i = new TrayMenuController(
-          r,
-          e.onOpenMainWindow,
-          e.onTrayMenuOpenNewThread,
-          e.onTrayMenuOpenRecentThread,
-          e.onTrayMenuSendFeedback,
-          a.hn(),
-          l.app.getName(),
-        );
-        return (
-          (G9 = i),
-          !(await i.waitForReady()) || G9 !== i
-            ? (G9 === i && (q9?.(), (q9 = null), (G9 = null), i.destroy()), null)
-            : ((Y9 = !0), i)
-        );
-      })().finally(() => {
-        K9 = null;
-      })),
-      K9)
-  );
-}
-function Q9() {
-  ((J9 = !1), (Y9 = !1), q9?.(), (q9 = null), G9?.destroy(), (G9 = null));
-}
-async function Fst(e, t) {
-  if (process.platform === `darwin`) {
-    let n = resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: resolveTrayTemplateNames(), iconBaseName: (flavor) => iconBaseName(flavor), windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) });
-    for (let e of n) {
-      let t = l.nativeImage.createFromPath(e);
-      if (!t.isEmpty()) return (t.setTemplateImage(!0), { defaultIcon: t });
-    }
-    return { defaultIcon: await l.app.getFileIcon(process.execPath, { size: `normal` }) };
-  }
-  if (process.platform === `linux`) {
-    let r = l.nativeImage.createFromPath(resolveTrayIconCandidates({ platform: process.platform, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, templateNames: resolveTrayTemplateNames(), iconBaseName: (flavor) => iconBaseName(flavor), windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) })[0]);
-    if (r.isEmpty()) throw Error(`Linux tray application icon is unavailable`);
-    return { defaultIcon: r.resize({ width: W9, height: W9, quality: `best` }) };
-  }
-  let n = $9(e, t);
-  return n == null
-    ? { defaultIcon: await l.app.getFileIcon(process.execPath, { size: `small` }) }
-    : { defaultIcon: n };
-}
-function $9(e, t) {
-  let i = resolveTrayIconCandidates({ platform: `win32`, flavor: e, packaged: l.app.isPackaged, resourcesPath: process.resourcesPath, repoRoot: t, dark: l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI, templateNames: resolveTrayTemplateNames(), iconBaseName: (flavor) => iconBaseName(flavor), windowsIconNames: (flavor) => resolveTrayWindowsIconNames(flavor, a.in.Agent) });
-  for (let e of i) {
-    let t = l.nativeImage.createFromPath(e);
-    if (!t.isEmpty()) return t;
-  }
-  return null;
-}
+  });
+var {
+  getTrayController: X9,
+  isReady: Z9,
+  start: Pst,
+  dispose: Q9,
+} = createTrayLifecycle({
+  app: l.app,
+  Tray: l.Tray,
+  nativeImage: l.nativeImage,
+  nativeTheme: l.nativeTheme,
+  platform: process.platform,
+  resourcesPath: process.resourcesPath,
+  execPath: process.execPath,
+  join: h.join,
+  agentFlavor: a.in.Agent,
+  resolveTrayTemplateNames,
+  resolveTrayWindowsIconNames,
+  resolveTrayIconCandidates,
+  iconBaseName,
+  getWindowsDistributionFlavor: (flavor, identity) =>
+    a.in.getWindowsDistributionFlavor(flavor, identity),
+  getWindowsPackageIdentity: () => a.an(`codexWindowsPackageIdentity`),
+  resolveWindowsPackageIdentity: (flavor) => resolveWindowsPackageIdentity(flavor, a.in),
+  NativeStatusItemController: Mst,
+  TrayMenuController,
+  getNativeIntl: a.hn,
+  isTrayReady,
+});
 function Ist(options) {
   return applyQuitForUpdatePolicy({
     exitImmediately: options.exitImmediately,

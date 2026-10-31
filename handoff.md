@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `W9/G9/K9/q9/J9/Y9/Nst/X9/Z9/Pst/Q9/Fst/$9` tray singleton lifecycle 迁入
+`tray/tray-lifecycle.ts`；native macOS status-item 分支、跨平台图标解析与 fallback、Windows distribution/package
+identity、主题图标刷新、single-flight creation、readiness、will-quit/dispose 和异步取消均由新 owner 持有。真实 startup、
+readiness 与 controller consumers 已接回，旧 globals/functions 已删除。focused test 覆盖各平台与竞态路径。
+
 随后将 `Mst` native macOS status-item owner 迁入 `tray/native-status-item-controller.ts`；addon creation、event parsing、
 indicator setting subscription、menu projection、native menu tracking、service-state filtering、async action/error handling、
 state refresh 与 destroy/readiness 均由新 owner 持有。真实 tray construction 已接回，旧 class 已删除。
