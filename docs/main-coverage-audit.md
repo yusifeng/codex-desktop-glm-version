@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 transcript snapshot/delta cleanup
+
+`threads/hydration.ts` 已完整承接旧 `C_e/Nv/w_e/Pv/Fv`，并由 `ThreadStore` 的 transcript reset/patch 路径真实消费；旧主 chunk 簇
+仅内部互调且无外部引用，本轮整体删除。focused suite 锁定稀疏 item slots、snapshot 索引、同引用无变化与 null previous reset。
+
 ## 2026-10-31 fork conversation skeleton wiring
 
 主 chunk 的 fork result 仍调用旧 `Ov(Av(...))`，而 `ThreadStore` 已真实消费 `threads/hydration.ts` 的 conversation skeleton 与 mode

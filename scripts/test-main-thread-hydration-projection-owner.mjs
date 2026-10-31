@@ -252,6 +252,39 @@ equal({
   workspaceKind: "project",
   cwd: "/work",
 });
+equal(owner.itemSlots([{ id: "a" }, null, { id: "b" }]), {
+  length: 3,
+  entries: [{ index: 0, itemId: "a" }, { index: 2, itemId: "b" }],
+});
+const transcriptConversation = {
+  turns: [{ turnId: "turn-1", status: "completed", items: [{ id: "item-1", type: "agentMessage" }] }],
+  itemTimeline: { entries: [] },
+  realtimeItems: {},
+};
+const transcriptAccess = {
+  turnEntityKeys: () => ["turn:turn-1"],
+  turn: (conversation) => conversation.turns[0] ?? null,
+  hasSubagentActivity: () => false,
+  timeline: () => ["turn:turn-1"],
+};
+const transcriptSnapshot = owner.transcriptSnapshot(transcriptConversation, transcriptAccess);
+equal(transcriptSnapshot.turnsByKey["turn:turn-1"].itemSlots, {
+  length: 1,
+  entries: [{ index: 0, itemId: "item-1" }],
+});
+equal(transcriptSnapshot.itemsByKey['["turn:turn-1","item-1"]'].type, "agentMessage");
+equal(owner.transcriptChanges(
+  { hostId: "host-1", threadId: "thread-1" },
+  transcriptConversation,
+  transcriptConversation,
+  transcriptAccess,
+), null);
+equal(owner.transcriptChanges(
+  { hostId: "host-1", threadId: "thread-1" },
+  null,
+  transcriptConversation,
+  transcriptAccess,
+), { type: "reset", value: transcriptSnapshot });
 
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
@@ -272,6 +305,8 @@ for (const name of ["fv", "pv", "mv", "hv", "gv", "h_e"])
   equal(main.includes(`function ${name}(`), false);
 for (const name of ["Ov", "b_e", "x_e", "kv", "Av", "jv", "S_e", "Mv"])
   equal(new RegExp(`(?:async )?function ${name}\\(`).test(main), false);
+for (const name of ["C_e", "Nv", "w_e", "Pv", "Fv"])
+  equal(main.includes(`function ${name}(`), false);
 equal(source.includes("forEachTurn(draft as never"), true);
 
 console.log(`${assertions} main thread hydration projection owner assertions passed`);

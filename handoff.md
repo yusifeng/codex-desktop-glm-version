@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 transcript snapshot/delta 重复 owner：`threads/hydration.ts` 的 `itemSlots/transcriptSnapshot/historyStateOf/transcriptChanges`
+已由 `ThreadStore` 的 reset 与 patch 广播真实消费；主 chunk 无外部引用的 `C_e/Nv/w_e/Pv/Fv` 自包含死岛删除。focused suite
+新增稀疏槽位、itemsByKey、无变化与 full reset 行为覆盖。
+
 接回 fork conversation skeleton owner：主 chunk 的唯一 `Ov/Av` consumer 现复用 `threads/hydration.ts` 的
 `newConversationFromThread/withThreadMode`；接线时移除了旧签名中被忽略的 hostId 参数，避免直接别名后把 hostId 误写为 mode。
 无引用的 `b_e/x_e/kv/jv/S_e/Mv` 旧副本随整簇删除，真实 hydration/list/upsert consumers 仍由 `ThreadStore` 使用语义模块。
