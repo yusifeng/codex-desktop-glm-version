@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `z8e/B8e/V8e/I2` multi-agent activity service 迁入
+`realtime/multi-agent-activity-service.ts`；per-thread newest-first 去重缓存、100 条上限、session-id 条件 reset、
+host disconnect 清理、initial/update snapshot 与 RPC-broken/unsubscribe/dispose 均由新 owner 持有。唯一 runtime
+consumer 已接回，旧 classes/helper 已删除。focused test 覆盖 24 项。
+
 随后将 `I8e/L8e/R8e/F2` realtime voice host coordinator cluster 迁入
 `realtime/voice-host-coordinator.ts`；renderer claim/publish/control、mute intent queue/ack、native microphone mute、
 dictation/delegation、screen capture、transfer/cancel、orphan/terminate/release、restart blockers 与 subscriber cleanup

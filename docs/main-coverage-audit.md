@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 multi-agent activity service
+
+原 `z8e/B8e/V8e/I2` 已迁入 `src/main/main-app/realtime/multi-agent-activity-service.ts`。新 owner 保留
+per-realtime-thread newest-first ID dedupe、100-entry retention、session-start reset、matching session end/failure reset、
+host disconnect cache/session cleanup、initial/push snapshots 与 RPC broken/unsubscribe/dispose lifecycle；唯一 runtime
+consumer 已接回，旧实现已物理删除。
+
 ## 2026-10-31 realtime voice host coordinator
 
 原 `I8e/L8e/R8e/F2` 已整簇迁入 `src/main/main-app/realtime/voice-host-coordinator.ts`。新 owner 保留

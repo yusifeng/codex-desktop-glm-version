@@ -92,6 +92,7 @@ const { createRealtimeMemorySummaryClass } = require("./main-app/realtime/memory
 const { createRealtimeVoiceHistoryRuntime } = require("./main-app/realtime/voice-history.js");
 const { createAppServerRealtimeEventBridgeClass } = require("./main-app/realtime/app-server-event-bridge.js");
 const { createRealtimeVoiceHostCoordinatorClass } = require("./main-app/realtime/voice-host-coordinator.js");
+const { createMultiAgentActivityServiceClass } = require("./main-app/realtime/multi-agent-activity-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -133263,111 +133264,12 @@ var L8e = createRealtimeVoiceHostCoordinatorClass({
   createUsingScope: a.en,
   now: Date.now,
 });
-var z8e = 100,
-  B8e = class extends n.Uf {
-    #e = new Map();
-    #t = new Map();
-    #n = new Set();
-    #r;
-    constructor(e) {
-      (super(),
-        (this.#r = e.subscribe((e) => {
-          switch (e.type) {
-            case `multi-agent-activity`:
-              this.publish(e.activity);
-              break;
-            case `session-started`:
-              this.#o(e.thread, e.sessionId);
-              break;
-            case `session-ended`:
-            case `session-failed`:
-              this.#s(e.thread, e.sessionId);
-              break;
-            case `host-disconnected`:
-              this.#c(e.hostId);
-          }
-        })));
-    }
-    publish(e) {
-      let t = I2(e.realtimeThread),
-        n = this.#e.get(t) ?? [];
-      if (n.some((t) => t.id === e.id)) return;
-      let r = [e, ...n].slice(0, z8e);
-      (this.#e.set(t, r), this.#i(e.realtimeThread, { activities: r }));
-    }
-    subscribe(e, t) {
-      let n = I2(e),
-        r = { hostId: e.hostId, listener: t.dup(), threadKey: n };
-      return (
-        this.#n.add(r),
-        r.listener.onRpcBroken(() => {
-          this.#u(r);
-        }),
-        this.#l(r, { activities: this.#e.get(n) ?? [] }),
-        new V8e(() => {
-          this.#u(r);
-        })
-      );
-    }
-    dispose = () => {
-      this.#r();
-      for (let e of this.#n) e.listener[Symbol.dispose]();
-      (this.#n.clear(), this.#e.clear(), this.#t.clear());
-    };
-    #i(e, t) {
-      let n = I2(e);
-      for (let e of this.#n) e.threadKey === n && this.#l(e, t);
-    }
-    #a(e) {
-      let t = I2(e);
-      this.#e.delete(t);
-      for (let e of this.#n) e.threadKey === t && this.#l(e, { activities: [] });
-    }
-    #o(e, t) {
-      let n = I2(e);
-      this.#t.get(n)?.sessionId !== t &&
-        (this.#t.set(n, { hostId: e.hostId, sessionId: t }), this.#a(e));
-    }
-    #s(e, t) {
-      let n = I2(e),
-        r = this.#t.get(n);
-      (r == null || t == null || r.sessionId === t) && (this.#t.delete(n), this.#a(e));
-    }
-    #c(e) {
-      for (let [t, n] of this.#e) n[0]?.realtimeThread.hostId === e && this.#e.delete(t);
-      for (let [t, n] of this.#t) n.hostId === e && this.#t.delete(t);
-      for (let t of this.#n) t.hostId === e && this.#l(t, { activities: [] });
-    }
-    #l(e, t) {
-      try {
-        var n = a.en();
-        n.u(e.listener(t));
-      } catch (e) {
-        n.e = e;
-      } finally {
-        n.d();
-      }
-    }
-    #u(e) {
-      this.#n.delete(e) && e.listener[Symbol.dispose]();
-    }
-  },
-  V8e = class extends n.Uf {
-    #e;
-    constructor(e) {
-      (super(), (this.#e = e));
-    }
-    unsubscribe() {
-      (this.#e?.(), (this.#e = null));
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-  };
-function I2(e) {
-  return JSON.stringify([e.hostId, e.conversationId]);
-}
-var L2 = { active: null },
+var B8e = createMultiAgentActivityServiceClass({
+    RpcHandlerBase: n.Uf,
+    createUsingScope: a.en,
+    maxActivities: 100,
+  }),
+  L2 = { active: null },
   H8e = 180,
   U8e = 50,
   W8e = 250,
