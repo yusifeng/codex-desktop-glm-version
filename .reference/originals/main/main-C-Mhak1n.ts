@@ -66,6 +66,7 @@ const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
 const { createProjectFolderPickerClass } = require("./main-app/workspace/project-folder-picker.js");
+const { WebContentsHostClient } = require("./main-app/app-server/web-contents-host-client.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -115691,107 +115692,7 @@ async function OZ({
     );
   }
 }
-var kZ = class {
-    webContents;
-    chunkedMessageSender;
-    browserWindow;
-    ownsBackgroundThread;
-    id;
-    destroyedListeners = new Set();
-    focusChangedListeners = new Set();
-    constructor(e, t, n = null, r = null) {
-      ((this.webContents = e),
-        (this.chunkedMessageSender = t),
-        (this.browserWindow = n),
-        (this.ownsBackgroundThread = r),
-        (this.id = e.id));
-    }
-    send(e, t) {
-      if (
-        this.ownsBackgroundThread != null &&
-        this.webContents.getBackgroundThrottling() &&
-        t.type !== `mcp-response` &&
-        t.type !== `codex-app-server-initialized` &&
-        t.type !== `codex-app-server-connection-changed`
-      ) {
-        let e = t.params;
-        if (t.type === `mcp-request`) {
-          if (t.request == null || typeof t.request != `object` || !(`params` in t.request)) return;
-          e = t.request.params;
-        } else if (t.type !== `mcp-notification`) return;
-        if (
-          typeof t.hostId != `string` ||
-          typeof e != `object` ||
-          !e ||
-          !(`threadId` in e) ||
-          typeof e.threadId != `string` ||
-          !this.ownsBackgroundThread(t.hostId, e.threadId)
-        )
-          return;
-      }
-      this.chunkedMessageSender.send(this.webContents, e, t);
-    }
-    sendCritical(e, t) {
-      this.chunkedMessageSender.sendCritical(this.webContents, e, t);
-    }
-    isDestroyed() {
-      return this.webContents.isDestroyed();
-    }
-    isFocused() {
-      return this.browserWindow?.isFocused() === !0;
-    }
-    onDestroyed(e) {
-      let t = () => {
-        e();
-      };
-      return (
-        this.destroyedListeners.size === 0 &&
-          this.webContents.once(`destroyed`, this.handleDestroyed),
-        this.destroyedListeners.add(t),
-        {
-          dispose: () => {
-            this.destroyedListeners.delete(t) &&
-              (this.destroyedListeners.size > 0 ||
-                this.webContents.removeListener(`destroyed`, this.handleDestroyed));
-          },
-        }
-      );
-    }
-    onFocusChanged(e) {
-      if (this.browserWindow == null) return { dispose: () => {} };
-      let t = (t) => {
-        e(t);
-      };
-      return (
-        this.focusChangedListeners.size === 0 &&
-          (this.browserWindow.on(`focus`, this.handleFocus),
-          this.browserWindow.on(`blur`, this.handleBlur)),
-        this.focusChangedListeners.add(t),
-        {
-          dispose: () => {
-            this.focusChangedListeners.delete(t) &&
-              (this.focusChangedListeners.size > 0 ||
-                (this.browserWindow?.removeListener(`focus`, this.handleFocus),
-                this.browserWindow?.removeListener(`blur`, this.handleBlur)));
-          },
-        }
-      );
-    }
-    handleDestroyed = () => {
-      let e = Array.from(this.destroyedListeners);
-      this.destroyedListeners.clear();
-      for (let t of e) t();
-    };
-    handleFocus = () => {
-      this.notifyFocusChanged(!0);
-    };
-    handleBlur = () => {
-      this.notifyFocusChanged(!1);
-    };
-    notifyFocusChanged(e) {
-      for (let t of Array.from(this.focusChangedListeners)) t(e);
-    }
-  },
+var kZ = WebContentsHostClient,
   iQe = createProjectFolderPickerClass({
     clearTimeout: (e) => clearTimeout(e),
     createLogger: r.i,

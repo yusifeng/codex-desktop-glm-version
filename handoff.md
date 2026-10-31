@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `kZ` WebContents host adapter 整体迁入 `app-server/web-contents-host-client.ts`；critical send、
+background-throttled avatar thread filtering、destroy subscription fanout、focus/blur subscription ownership 与
+listener cleanup 均由语义 class 持有。main 中 5 个真实 consumer 继续经稳定别名构造该 class，旧实现已删除；
+focused test 覆盖 25 项过滤、发送、订阅和接回断言。
+
 随后将 `iQe` project-folder picker 整体迁入 `workspace/project-folder-picker.ts`；local/remote 分流、
 Electron directory dialog、Finder hidden-files preference timeout、source normalize/stat、project create/select/
 rename 与 renderer add/pick/navigate 回执均由新 owner 持有。`r$e` 继续以原三参构造真实消费 factory，旧

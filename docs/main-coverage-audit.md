@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 WebContents host client
+
+原 `kZ` adapter 已整体迁入 `src/main/main-app/app-server/web-contents-host-client.ts`。新 owner 保留普通/
+critical chunked send、background-throttled window 对非 owned thread 消息的过滤、destroy listener fanout、
+focus/blur listener 单一注册与最后订阅 cleanup；main 的 5 个 consumer 经稳定别名直接构造语义 class，旧
+class 已物理删除。
+
 ## 2026-10-31 project folder picker
 
 原 `iQe` project-folder picker 已整体迁入 `src/main/main-app/workspace/project-folder-picker.ts`。新 owner
