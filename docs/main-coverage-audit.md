@@ -2723,3 +2723,14 @@ Map 或 queue。旧 `D6e/U0/Y0/X0/Z0/Q0/$0/e2/t2/k6e/n2/A6e/j6e/M6e/r2/i2/a2/N6e
 c2/l2/I6e/u2` helpers 及 `q0/J0` 状态已物理删除。focused test
 `scripts/test-main-primary-runtime-installer-owner.mjs` 覆盖 72 项 tool、feature、path safety、plugin/skill sync、
 single-flight、cancel、failure stage、framework activation、restore 和 diagnostics 行为。
+
+### 增量抽取：SSH connection discovery owner
+
+SSH config entrypoint 检查、递归 `Include`/glob/cycle traversal、literal Host alias selection、Colima 过滤、排序、
+`ssh -G -F` resolution、resolved hostname/port/identity projection 与 GitHub hostname 排除已整体迁移至
+`src/main/main-app/remote/ssh-connection-discovery.ts`。main 通过 `createSshConnectionDiscovery` 将
+`discoverSshAliases/resolveSshAlias` 直接注入既有 `RemoteConnectionsHandler`；第三方 SSH config parser `Y2`
+作为显式 parser dependency 保留在 generated/vendor 边界，没有被强拆。旧 `Q2/o5e/$2/e4/s5e/t4/c5e/l5e/n4/u5e/d5e`
+helpers 与 discovery logger/constants 已物理删除。focused test
+`scripts/test-main-ssh-connection-discovery-owner.mjs` 覆盖 29 项 directive、include、cycle、filter、command 与
+connection projection 行为。

@@ -28,6 +28,7 @@ const realOwners = [
   ["src/main/main-app/open-target/standalone-editor-targets.ts", "createStandaloneEditorTargetRuntime"],
   ["src/main/main-app/open-target/native-shell-targets.ts", "createNativeShellTargetRuntime"],
   ["src/main/main-app/misc/primary-runtime-installer.ts", "createPrimaryRuntimeInstaller"],
+  ["src/main/main-app/remote/ssh-connection-discovery.ts", "createSshConnectionDiscovery"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -189,6 +190,18 @@ assert.equal(main.includes("async function I6e("), false, "generated runtime rep
 assert.equal(main.includes("function u2("), false, "generated local-host assertion must be removed");
 assert.equal(main.includes("q0 = new Map()"), false, "generated active-install registry must be removed");
 assert.equal(main.includes("J0 = Promise.resolve()"), false, "generated runtime operation queue must be removed");
+assert.equal(main.includes("createSshConnectionDiscovery({"), true, "real SSH connection discovery owner is wired");
+assert.equal(main.includes("function Q2("), false, "generated SSH alias discovery entrypoint must be removed");
+assert.equal(main.includes("function o5e("), false, "generated recursive SSH alias collector must be removed");
+assert.equal(main.includes("async function $2("), false, "generated SSH alias resolver must be removed");
+assert.equal(main.includes("function e4("), false, "generated SSH Include traversal must be removed");
+assert.equal(main.includes("function s5e("), false, "generated resolved SSH config parser must be removed");
+assert.equal(main.includes("function t4("), false, "generated SSH directive flattener must be removed");
+assert.equal(main.includes("function c5e("), false, "generated SSH include-path resolver must be removed");
+assert.equal(main.includes("function l5e("), false, "generated literal-host selector must be removed");
+assert.equal(main.includes("function n4("), false, "generated SSH directive value projector must be removed");
+assert.equal(main.includes("function u5e("), false, "generated SSH scalar directive projector must be removed");
+assert.equal(main.includes("function d5e("), false, "generated SSH home expansion must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("190 main unwired-owner skeleton assertions passed");
+console.log("204 main unwired-owner skeleton assertions passed");

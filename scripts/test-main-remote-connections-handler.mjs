@@ -193,6 +193,10 @@ const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n
 assert.match(main, /D5e = createRemoteConnectionsHandlerClass\(\{/);
 assert.doesNotMatch(main, /D5e = class/);
 assert.doesNotMatch(main, /function O5e\(/);
-assert.match(main, /this\.remoteConnectionsHandler = new D5e\(/);
+const windowContext = fs.readFileSync(
+  new URL("../src/main/main-app/window/window-context.ts", import.meta.url),
+  "utf8",
+);
+assert.match(windowContext, /this\.remoteConnectionsHandler = new D5e\(/);
 
 console.log("remote connections handler assertions: 43");

@@ -4726,3 +4726,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧状态/helpers 删除 767 行，新生产模块 748 行；focused coverage 72 项，no-unwired gate 扩至 190 项。
   下一批从 installer 后续重新审计仍内联的 marketplace listing/class 或 project/realtime 周边组合根，跳过已经
   真实迁出的 host/poller/project owners。
+
+# 2026-11-01 SSH connection discovery owner
+
+- `src/main/main-app/remote/ssh-connection-discovery.ts` 已接管 recursive Include/glob/cycle traversal、literal
+  alias selection、Colima/GitHub exclusions、`ssh -G` resolution 与 connection projection；既有
+  `RemoteConnectionsHandler` 直接消费 factory outputs，SSH config parser `Y2` 明确保留为 vendor parser。
+- main 旧 discovery helpers 删除 183 行，新生产模块 227 行；focused coverage 29 项，no-unwired gate 扩至
+  204 项。下一批继续处理其后 remote-control step-up OAuth/callback lifecycle，或在边界审计后转向更大的
+  first-party owner；不迁移紧随其后的 serialization/vendor runtime。

@@ -285,6 +285,7 @@ const { createMultiAgentActivityServiceClass } = require("./main-app/realtime/mu
 const { createRealtimePresentationCoordinatorClass } = require("./main-app/realtime/presentation-coordinator.js");
 const { createRealtimeVoiceThreadTitleCoordinatorClass } = require("./main-app/realtime/voice-thread-title-coordinator.js");
 const { createRemoteConnectionsHandlerClass } = require("./main-app/remote/remote-connections-handler.js");
+const { createSshConnectionDiscovery } = require("./main-app/remote/ssh-connection-discovery.js");
 const { createRemoteControlDeviceKeyClientClass } = require("./main-app/remote/remote-control-device-key-client.js");
 const { createRemoteRpcServices } = require("./main-app/remote/remote-rpc-services.js");
 const { createRemoteHostConfigRuntime } = require("./main-app/remote/host-config-runtime.js");
@@ -72053,189 +72054,16 @@ function X2(e) {
   };
   return (e.forEach(i), t);
 }
-var Z2 = r.i(`remote-connections/discovery`),
-  n5e = /[!*?[\]]/,
-  r5e = /[*?[\]{}()]/,
-  i5e = new Set([`colima`]),
-  a5e = new Set([`github.com`]);
-function Q2(e) {
-  try {
-    if (!v.default.existsSync(e))
-      return (
-        Z2().info(`ssh_config_entrypoint_missing`, { safe: {}, sensitive: { entrypointPath: e } }),
-        []
-      );
-    Z2().info(`discovery_started`, { safe: {}, sensitive: { entrypointPath: e } });
-    let t = o5e(e),
-      n = t.filter((e) => !i5e.has(e.trim().toLowerCase()));
-    return (
-      Z2().info(`discovery_completed`, {
-        safe: { collectedAliasCount: t.length, filteredAliasCount: t.length - n.length },
-        sensitive: { entrypointPath: e, collectedAliases: t, filteredAliases: n },
-      }),
-      n.sort((e, t) => e.localeCompare(t))
-    );
-  } catch (e) {
-    throw (
-      Z2().warning(`failed to discover remote SSH connections`, {
-        safe: {},
-        sensitive: { error: e },
-      }),
-      Error(`Failed to discover remote SSH connections.`)
-    );
-  }
-}
-function o5e(e) {
-  let t = new Set(),
-    n = new Set(),
-    r = h.default.dirname(h.default.resolve(e));
-  return (
-    e4({
-      configPath: h.default.resolve(e),
-      sshConfigRootDirectory: r,
-      discoveredAliases: t,
-      visitedConfigPaths: n,
-    }),
-    Array.from(t)
-  );
-}
-async function $2({ entrypointPath: e, sshAlias: t }) {
-  let {
-    stdout: r,
-    stderr: i,
-    code: a,
-  } = await n.Kn({ args: [`ssh`, `-G`, `-F`, e, t], spawnInsideWsl: !1 }).wait();
-  if (a !== 0)
-    return (
-      Z2().warning(`failed to resolve discovered SSH alias`, {
-        safe: {},
-        sensitive: { entrypointPath: e, sshAlias: t, stderr: i },
-      }),
-      null
-    );
-  let o = s5e(r);
-  if (!o.hostname)
-    return (
-      Z2().info(`resolved_ssh_alias_missing_hostname`, {
-        safe: {},
-        sensitive: { entrypointPath: e, sshAlias: t },
-      }),
-      null
-    );
-  let s = o.hostname.trim().toLowerCase();
-  return a5e.has(s)
-    ? (Z2().info(`resolved_ssh_alias_excluded`, {
-        safe: {},
-        sensitive: { entrypointPath: e, sshAlias: t, hostname: o.hostname },
-      }),
-      null)
-    : {
-        hostId: n.ys(t),
-        displayName: t,
-        source: `discovered`,
-        autoConnect: !1,
-        sshAlias: t,
-        sshHost: o.hostname,
-        sshPort: o.port,
-        identity: o.identity,
-      };
-}
-function e4({
-  configPath: e,
-  sshConfigRootDirectory: t,
-  discoveredAliases: n,
-  visitedConfigPaths: r,
-}) {
-  if (r.has(e)) return;
-  r.add(e);
-  let i = Y2.parse(v.default.readFileSync(e, `utf8`));
-  for (let e of i) {
-    if (e.type !== G2.DIRECTIVE) continue;
-    let i = e.param.toLowerCase();
-    if (i === `host` && `config` in e) {
-      let t = l5e(e)[0];
-      t != null && n.add(t);
-      continue;
-    }
-    if (i === `include`)
-      for (let i of c5e({ sshConfigRootDirectory: t, includeValue: n4(e) }))
-        e4({
-          configPath: i,
-          sshConfigRootDirectory: t,
-          discoveredAliases: n,
-          visitedConfigPaths: r,
-        });
-  }
-}
-function s5e(e) {
-  let t = Y2.parse(e),
-    n = null,
-    r = null,
-    i = null;
-  for (let e of t4(t)) {
-    if (e.type !== G2.DIRECTIVE) continue;
-    let t = e.param.toLowerCase(),
-      a = u5e(e);
-    if (a != null) {
-      if (t === `hostname` && n == null) {
-        n = a;
-        continue;
-      }
-      if (t === `port` && r == null) {
-        let e = Number(a);
-        Number.isSafeInteger(e) && (r = e);
-        continue;
-      }
-      t === `identityfile` && i == null && a !== `none` && (i = a);
-    }
-  }
-  return { hostname: n, port: r, identity: i };
-}
-function t4(e) {
-  let t = [];
-  for (let n of e) n.type === G2.DIRECTIVE && (t.push(n), `config` in n && t.push(...t4(n.config)));
-  return t;
-}
-function c5e({ sshConfigRootDirectory: e, includeValue: t }) {
-  let n = [];
-  for (let r of t) {
-    let t = d5e(r),
-      i = h.default.isAbsolute(t) ? t : h.default.resolve(e, t),
-      a = v.default.globSync(i);
-    if (a.length === 0 && !r5e.test(i)) {
-      v.default.existsSync(i) && n.push(i);
-      continue;
-    }
-    n.push(...a.filter((e) => v.default.statSync(e).isFile()));
-  }
-  return n;
-}
-function l5e(e) {
-  return n4(e)
-    .filter((e) => e.length > 0)
-    .filter((e) => !n5e.test(e));
-}
-function n4(e) {
-  return Array.isArray(e.value)
-    ? e.value.map((e) => e.val).filter(Boolean)
-    : e.value.split(/\s+/u).filter(Boolean);
-}
-function u5e(e) {
-  if (Array.isArray(e.value))
-    return e.value
-      .map((e) => e.val)
-      .join(``)
-      .trim();
-  let t = e.value.trim();
-  return t.length === 0 ? null : t;
-}
-function d5e(e) {
-  return e === `~`
-    ? p.default.homedir()
-    : e.startsWith(`~/`) || e.startsWith(`~\\`)
-      ? h.default.join(p.default.homedir(), e.slice(2))
-      : e;
-}
+var { discoverSshAliases: Q2, resolveSshAlias: $2 } = createSshConnectionDiscovery({
+  fs: v,
+  path: h,
+  os: p,
+  createLogger: r.i,
+  parseSshConfig: (source) => Y2.parse(source),
+  directiveType: G2.DIRECTIVE,
+  executeCommand: n.Kn,
+  hostIdFromAlias: n.ys,
+});
 var r4 = `app_EMoamEEZ73f0CkXaXp7hrann`,
   f5e = `https://auth.openai.com`,
   p5e = `CODEX_APP_SERVER_LOGIN_ISSUER`,
