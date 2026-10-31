@@ -5166,3 +5166,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   语义命名接线。
 - 主 chunk 旧 `QHe/vZ/AZe/yZ/bZ/jZe/MZe/NZe/PZe/FZe/IZe` 已删除。focused coverage 包含互斥 feature、tool 限额、cyclic JSON、
   capability gate、sync/no-sync、destroyed window 与 generic forwarding。下一批从相邻 annotation-mode activation policy `LZe` 继续整带审计。
+
+# 2026-11-01 annotation activation and page command policy convergence
+
+- annotation interaction controller 直接接管 toggle admission、blocklist、permission promise 与 interaction-mode transition；page command controller
+  直接接管 command admission/dispatch、async navigate identity guard、site-info bounds 和 thumbnail capture/cache/crop/scale。
+- 主 chunk 旧 `LZe/RZe/zZe/BZe/HZe/UZe/WZe` 与 thumbnail cache globals 已删除。focused coverage 覆盖同步/异步 annotation
+  permission、blocked site、wrong window、stale navigation、site-info coordinate projection、2x thumbnail crop/resize 与 cache hit。

@@ -18,11 +18,16 @@ const syncs = [];
 const commentCalls = [];
 const sent = [];
 const pageEvents = [];
+const interactionModes = [];
+let annotationPermission = true;
+let commentModeBlocked = false;
 const page = { view: { webContents: { id: 44 } }, conversationId: "c1", browserTabId: 3 };
 const thread = {
   conversationId: "c1", browserTabId: 3, page,
   snapshot: { interactionMode: "comment", comments: [], areAnnotationMarkersVisible: true },
   isAnnotationModeEnabled: true,
+  visible: true,
+  presented: true,
 };
 const windowState = { owner: { id: 9, isDestroyed: () => false }, threads: new Map(), window: { getContentBounds: () => ({ width: 100 }) } };
 windowState.threads.set("c1:3", thread);
@@ -58,8 +63,10 @@ const host = {
   syncThreadState: (...args) => syncs.push(["thread", ...args]),
   syncRuntimeStateToPage: (...args) => syncs.push(["runtime", ...args]),
   browserSessionRegistry: {},
-  siteAnnotationFeatures: {},
-  commentModeBlocklistLookup: {},
+  siteAnnotationFeatures: { apiAvailability: true, isEnabled: () => true },
+  commentModeBlocklistLookup: { cachedCommentModeBlocked: () => commentModeBlocked },
+  requestSiteAnnotationPermission: () => annotationPermission,
+  setInteractionMode: (...args) => interactionModes.push(args),
   isTweaksFeatureEnabled: true,
   windowManager: { sendMessageToWebContents: (...args) => sent.push(args) },
 };
@@ -67,7 +74,6 @@ const Controller = createBrowserAnnotationInteractionControllerClass({
   hX: () => thread,
   EU: (snapshot, mode, comments = snapshot.comments) => ({ ...snapshot, interactionMode: mode, comments }),
   dispatchPageEvent: (event) => pageEvents.push(event),
-  LZe: () => {},
   n: { ju: (comments) => comments.length > 0 },
   SU: (active, browserTabId, conversationId) => active.delete(windowState.owner.id),
   mVe: () => () => {},
@@ -79,6 +85,19 @@ controller.handlePageEvent({ id: 44 }, { type: "page-ready" });
 equal(pageEvents[0].sender.id, 44);
 equal(pageEvents[0].event.type, "page-ready");
 equal(pageEvents[0].pageState.page, page);
+const runtimeSender = { id: 44, isDestroyed: () => false, getURL: () => "https://example.test" };
+thread.snapshot.interactionMode = "browse";
+controller.handleRuntimeToggleAnnotationMode(runtimeSender, true);
+deepEqual(interactionModes.at(-1), [windowState.owner, "c1", "comment", 3]);
+commentModeBlocked = true;
+controller.handleRuntimeToggleAnnotationMode(runtimeSender, true);
+equal(interactionModes.length, 1);
+commentModeBlocked = false;
+annotationPermission = Promise.resolve(true);
+controller.handleRuntimeToggleAnnotationMode(runtimeSender, true);
+annotationPermission = true;
+await Promise.resolve();
+equal(interactionModes.length, 2);
 
 controller.clearComments(windowState.owner, "c1", 3);
 equal(thread.snapshot.interactionMode, "browse");

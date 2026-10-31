@@ -2,7 +2,7 @@
 
 /** Owns browser annotation ingress, design/comment interactions, and dragged-image state. */
 export function createBrowserAnnotationInteractionControllerClass(dependencies: Record<string, any>) {
-  const { hX, EU, dispatchPageEvent, LZe, n, SU, mVe, gVe } = dependencies;
+  const { hX, EU, dispatchPageEvent, n, SU, mVe, gVe } = dependencies;
   return class BrowserAnnotationInteractionController {
     constructor(host: any) { this.host = host; }
     host: any;
@@ -82,15 +82,53 @@ export function createBrowserAnnotationInteractionControllerClass(dependencies: 
         syncThreadState: this.host.syncThreadState.bind(this),
       });
     }
-    handleRuntimeToggleAnnotationMode(e, t) {
-      LZe(
-        this,
-        e,
-        this.host.findPageStateForRuntimeSender(e),
-        this.host.siteAnnotationFeatures,
-        this.host.commentModeBlocklistLookup,
-        t,
-      );
+    handleRuntimeToggleAnnotationMode(sender, enabled) {
+      const pageState = this.host.findPageStateForRuntimeSender(sender);
+      const features = this.host.siteAnnotationFeatures;
+      if (
+        features.apiAvailability !== true ||
+        sender.isDestroyed() ||
+        pageState == null ||
+        pageState.windowState.owner.isDestroyed()
+      )
+        return;
+      const { windowState, page, threadState } = pageState;
+      if (
+        !features.isEnabled(
+          sender.getURL() || threadState.snapshot.committedUrl || threadState.snapshot.url,
+        ) ||
+        !threadState.isAnnotationModeEnabled ||
+        !threadState.visible ||
+        !threadState.presented ||
+        threadState.isAgentControllingBrowser ||
+        threadState.snapshot.commentModeDisabledReason != null
+      )
+        return;
+      const active =
+        threadState.snapshot.interactionMode === `comment` ||
+        threadState.pendingCommentModeActivation != null;
+      const interactionMode = (enabled ?? !active) ? `comment` : `browse`;
+      if (
+        interactionMode === `comment` &&
+        this.host.commentModeBlocklistLookup.cachedCommentModeBlocked(sender.getURL()) !== false
+      )
+        return;
+      const permission = this.host.requestSiteAnnotationPermission(sender, interactionMode);
+      if (permission !== true) {
+        if (permission !== false)
+          permission.then((allowed) => {
+            if (allowed)
+              this.handleRuntimeToggleAnnotationMode(sender, interactionMode === `comment`);
+          });
+        return;
+      }
+      if (enabled !== active)
+        this.host.setInteractionMode(
+          windowState.owner,
+          page.conversationId,
+          interactionMode,
+          page.browserTabId,
+        );
     }
     handleRuntimeExitCommentMode(e) {
       let t = this.host.findPageStateForRuntimeSender(e);

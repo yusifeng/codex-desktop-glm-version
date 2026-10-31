@@ -2,7 +2,130 @@
 
 /** Owns browser page command routing and host/page lifecycle orchestration. */
 export function createBrowserPageCommandControllerClass(dependencies: Record<string, any>) {
-  const { a, l, n, crypto, hX, mU, pU, hU, QU, RZe, ZZe, zZe, sq, cq, lq, uq, fq, sW, HZe, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX } = dependencies;
+  const { a, l, n, crypto, hX, mU, pU, hU, QU, ZZe, sq, cq, lq, uq, fq, sW, XZe, GXe, iK, pX, DU, oX, PHe, GU, rW, WX, GX } = dependencies;
+  const thumbnailCaptures = new WeakMap();
+  const thumbnailWidth = 608;
+  const thumbnailHeight = 320;
+  const thumbnailCacheLifetimeMs = 1_000;
+
+  function pageInfoAnchorBounds(origin, bounds) {
+    if (
+      bounds == null ||
+      !Number.isFinite(bounds.x) ||
+      !Number.isFinite(bounds.y) ||
+      !Number.isFinite(bounds.width) ||
+      !Number.isFinite(bounds.height) ||
+      bounds.width <= 0 ||
+      bounds.height <= 0
+    )
+      return;
+    const browserWindow = l.BrowserWindow.fromWebContents(origin);
+    if (browserWindow == null || browserWindow.isDestroyed()) return;
+    const contentBounds = browserWindow.getContentBounds();
+    return {
+      height: Math.round(bounds.height),
+      width: Math.round(bounds.width),
+      x: contentBounds.x + Math.round(bounds.x),
+      y: contentBounds.y + Math.round(bounds.y),
+    };
+  }
+
+  function thumbnailCropBounds({ width, height }) {
+    const croppedWidth = Math.max(
+      1,
+      Math.min(width, Math.round((height * thumbnailWidth) / thumbnailHeight)),
+    );
+    const croppedHeight = Math.max(
+      1,
+      Math.min(height, Math.round((width * thumbnailHeight) / thumbnailWidth)),
+    );
+    return {
+      x: Math.floor((width - croppedWidth) / 2),
+      y: 0,
+      width: croppedWidth,
+      height: croppedHeight,
+    };
+  }
+
+  function serializeThumbnail(image) {
+    const scaleFactors = image
+      .getScaleFactors()
+      .filter((value) => Number.isFinite(value) && value > 0);
+    const scaleFactor = scaleFactors.length === 0 ? 1 : Math.min(2, Math.max(...scaleFactors));
+    const cropped = image.crop(thumbnailCropBounds(image.getSize()));
+    const { width, height } = cropped.getSize();
+    const resizeFactor = Math.min(
+      1,
+      thumbnailWidth / (width * scaleFactor),
+      thumbnailHeight / (height * scaleFactor),
+    );
+    return cropped
+      .resize({
+        width: Math.max(1, Math.round(width * resizeFactor)),
+        height: Math.max(1, Math.round(height * resizeFactor)),
+        quality: `good`,
+      })
+      .toDataURL({ scaleFactor });
+  }
+
+  async function captureThumbnail(threadState, isCurrent) {
+    const page = threadState.page;
+    if (page == null) return null;
+    const webContents = page.view.webContents;
+    if (page.isSuspended || webContents == null || webContents.isDestroyed()) return null;
+    const hostGeneration = threadState.hostGeneration;
+    const navigationVersion = page.navigationVersion;
+    const url = webContents.getURL();
+    const remainsCurrent = () =>
+      isCurrent() &&
+      threadState.page === page &&
+      threadState.hostGeneration === hostGeneration &&
+      threadState.pendingTeardown == null &&
+      threadState.pendingWindowTransfer !== true &&
+      !page.isSuspended &&
+      page.navigationVersion === navigationVersion &&
+      page.view.webContents === webContents &&
+      !webContents.isDestroyed() &&
+      webContents.getURL() === url;
+    if (!remainsCurrent()) return null;
+    const cached = thumbnailCaptures.get(page);
+    if (
+      cached?.navigationVersion === navigationVersion &&
+      cached.webContents === webContents &&
+      cached.url === url &&
+      (cached.completedAt == null ||
+        (threadState.presented
+          ? Date.now() - cached.completedAt < thumbnailCacheLifetimeMs
+          : !cached.presented &&
+            cached.lastPresentedSequence === threadState.lastPresentedSequence))
+    ) {
+      const result = await cached.result;
+      return remainsCurrent() ? result : null;
+    }
+    const result = (async () => {
+      try {
+        const image = await webContents.capturePage(undefined, { stayHidden: true });
+        return !remainsCurrent() || image.isEmpty() ? null : serializeThumbnail(image);
+      } catch {
+        return null;
+      }
+    })();
+    const capture = {
+      navigationVersion,
+      webContents,
+      url,
+      completedAt: null,
+      lastPresentedSequence: threadState.lastPresentedSequence,
+      presented: threadState.presented,
+      result,
+    };
+    thumbnailCaptures.set(page, capture);
+    result.then((value) => {
+      capture.completedAt = Date.now();
+      if (value == null && thumbnailCaptures.get(page) === capture) thumbnailCaptures.delete(page);
+    });
+    return result;
+  }
   return class BrowserPageCommandController {
     constructor(host: any) { this.host = host; }
     host: any;
@@ -216,14 +339,131 @@ export function createBrowserPageCommandControllerClass(dependencies: Record<str
         });
     }
     runPageCommand(e, t, n) {
-      return RZe(
-        this.host.windowManager,
-        this,
-        e,
-        () => this.host.getCurrentPageCommandContext(e, t.conversationId, t.browserTabId),
-        t,
-        n,
-      );
+      const resolveContext = () =>
+        this.host.getCurrentPageCommandContext(e, t.conversationId, t.browserTabId);
+      const context = resolveContext();
+      if (context == null) return `page-unavailable`;
+      if (context.windowState.owner !== e) return `wrong-window`;
+      if (
+        context.threadState.pendingTeardown != null ||
+        context.page.view.webContents?.isDestroyed() !== false
+      )
+        return `page-unavailable`;
+      const { threadState } = context;
+      const command = t.command;
+      switch (command.type) {
+        case `navigate`: {
+          if (n == null) return `navigation-unavailable`;
+          const mountGeneration = threadState.mountGeneration;
+          return (async () => {
+            const url = await n(command.url, command.hostId);
+            const current = resolveContext();
+            if (current == null) return `page-unavailable`;
+            if (current.windowState.owner !== e) return `wrong-window`;
+            if (
+              current.page !== context.page ||
+              current.threadState !== context.threadState ||
+              current.windowState !== context.windowState ||
+              current.threadState.mountGeneration !== mountGeneration ||
+              current.threadState.pendingTeardown != null ||
+              current.page.view.webContents?.isDestroyed() !== false
+            )
+              return `page-unavailable`;
+            if (url == null) return `navigation-unavailable`;
+            this.navigate(
+              e,
+              t.conversationId,
+              url,
+              command.source,
+              command.initiator,
+              threadState.browserTabId,
+            );
+            return `accepted`;
+          })();
+        }
+        case `go-back`:
+          this.goBack(e, t.conversationId, threadState.browserTabId);
+          break;
+        case `go-forward`:
+          this.goForward(e, t.conversationId, threadState.browserTabId);
+          break;
+        case `reload`:
+          this.reload(e, t.conversationId, { ignoreCache: command.ignoreCache }, threadState.browserTabId);
+          break;
+        case `stop`:
+          this.stop(e, t.conversationId, threadState.browserTabId);
+          break;
+        case `print`:
+          this.print(e, t.conversationId, threadState.browserTabId);
+          break;
+        case `capture-screenshot`:
+          return this.captureScreenshotToClipboard(e, t.conversationId, threadState.browserTabId).then(
+            () => `accepted`,
+          );
+        case `step-zoom`:
+          this.stepZoom(e, t.conversationId, command.delta, threadState.browserTabId);
+          break;
+        case `reset-zoom`:
+          this.resetZoom(e, t.conversationId, threadState.browserTabId);
+          break;
+        case `set-zoom-percent`:
+          this.setZoomPercent(e, t.conversationId, command.zoomPercent, threadState.browserTabId);
+          break;
+        case `open-find`:
+          sq(this.host.windowManager, e, t.conversationId, threadState);
+          break;
+        case `set-find-query`:
+          cq(this.host.windowManager, e, t.conversationId, threadState, command.query);
+          break;
+        case `find-next`:
+          lq(threadState);
+          break;
+        case `find-previous`:
+          uq(threadState);
+          break;
+        case `close-find`:
+          fq(this.host.windowManager, e, t.conversationId, threadState);
+          break;
+        case `set-interaction-mode`:
+          this.host.setInteractionMode(
+            e,
+            t.conversationId,
+            command.interactionMode,
+            threadState.browserTabId,
+            command.annotationModeEntrySource,
+          );
+          break;
+        case `set-design-modifier-pressed`:
+          this.host.setDesignModifierPressed(
+            e,
+            t.conversationId,
+            command.pressed,
+            threadState.browserTabId,
+          );
+          break;
+        case `set-original-view-enabled`:
+          this.host.setOriginalViewEnabled(
+            e,
+            t.conversationId,
+            command.enabled,
+            threadState.browserTabId,
+          );
+          break;
+        case `discard-pending-annotations`:
+          this.host.discardPendingAnnotations(e, t.conversationId, threadState.browserTabId);
+          break;
+        case `add-annotations-to-composer`:
+          this.host.addAnnotationsToComposer(e, t.conversationId, threadState.browserTabId);
+          break;
+        case `select-comment`:
+          this.host.selectComment(
+            e,
+            t.conversationId,
+            command.commentId,
+            threadState.browserTabId,
+          );
+      }
+      return `accepted`;
     }
     openFind(e, t, n) {
       let r = this.host.ensureThreadCommandContext(e, t, n);
@@ -231,7 +471,9 @@ export function createBrowserPageCommandControllerClass(dependencies: Record<str
     }
     openSiteInfo(e, t, n, r, i) {
       let a = this.host.getPageState(e, t, n)?.view.webContents;
-      return zZe({ anchorBounds: r, origin: e, siteUrl: i, webContents: a });
+      return a == null || a.isDestroyed()
+        ? false
+        : a.showPageInfoDialog({ anchorBounds: pageInfoAnchorBounds(e, r), siteUrl: i });
     }
     setFindQuery(e, t, n, r) {
       let i = this.host.ensureThreadCommandContext(e, t, r);
@@ -336,7 +578,7 @@ export function createBrowserPageCommandControllerClass(dependencies: Record<str
       if (i == null) return null;
       let { threadState: a, windowState: o } = i,
         s = o.rendererInstanceId;
-      return HZe(a, () => {
+      return captureThumbnail(a, () => {
         let e = r();
         return e?.threadState === a && e.windowState === o && o.rendererInstanceId === s;
       });

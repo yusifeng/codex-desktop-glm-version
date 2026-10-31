@@ -3210,3 +3210,9 @@ focused test 新增完整 allowHiddenBlankTab true contract。
 约束、WebMCP descriptor 形状/数量/UTF-8 byte budget/规范化，以及 annotation、WebMCP、generic session event 三路分发。annotation
 interaction controller 改用具名对象参数接线，IPC guarded event set 直接引用语义常量；主 chunk 旧
 `QHe/vZ/AZe/yZ/bZ/jZe/MZe/NZe/PZe/FZe/IZe` 整带删除。
+
+### 增量内聚：annotation activation 与 page command policies
+
+`browser-annotation-interaction-controller.ts` 已直接拥有 runtime annotation toggle 的 feature/page/blocklist/permission gate 与异步恢复；
+`browser-page-command-controller.ts` 已直接拥有 page-command admission/dispatch、navigate 后 identity revalidation、site-info anchor projection，
+以及 navigation-aware thumbnail capture/cache/crop/resize。主 chunk 旧 `LZe/RZe/zZe/BZe/HZe/UZe/WZe` 及 thumbnail 私有状态整带删除。
