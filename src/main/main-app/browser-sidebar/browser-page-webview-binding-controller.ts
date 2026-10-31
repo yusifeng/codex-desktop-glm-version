@@ -2,7 +2,38 @@
 
 /** Owns the complete page-to-WebContents binding lifecycle for Browser sidebar pages. */
 export function createBrowserPageWebviewBindingControllerClass(dependencies: Record<string, any>) {
-  const { e, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
+  const { e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ } = dependencies;
+  const pendingObservers = new WeakMap<object, any>();
+  const resetCaptureState = (page: any) => {
+    page.isCapturingUserMedia = false;
+    page.isCapturingCamera = undefined;
+    page.isCapturingMicrophone = undefined;
+  };
+  const openBrowserTabMessage = ({ active = true, adoptionLease, adoptedWebContentsId, browserTabId, conversationId, initialUrl, insertToRightOfTabId }: any) => ({
+    type: `open-browser-tab`, browserTabId, conversationId, initialUrl, insertToRightOfTabId,
+    adoptionLease, adoptedWebContentsId, ...(active ? {} : { active }), source: `manual`, initiator: `window_open`,
+  });
+  const createNavigationObserver = (webContents: any) => dependencies.WXe(webContents, (observation: any) => {
+    dependencies.RX({ observation, trigger: `phase-timeout` });
+  });
+  const registerPendingObserver = (webContents: any) => {
+    const observer = createNavigationObserver(webContents);
+    const handleDestroyed = () => {
+      if (pendingObservers.get(webContents)?.observer === observer) {
+        pendingObservers.delete(webContents);
+        observer.dispose();
+      }
+    };
+    pendingObservers.set(webContents, { observer, handleDestroyed });
+    webContents.once(`destroyed`, handleDestroyed);
+  };
+  const takePendingObserver = (webContents: any) => {
+    const pending = pendingObservers.get(webContents);
+    if (pending == null) return null;
+    pendingObservers.delete(webContents);
+    webContents.removeListener(`destroyed`, pending.handleDestroyed);
+    return pending.observer;
+  };
 
   function bindPageToWebview(helpers: any, windowState: any, page: any, webContents: any, themeVariant: unknown, initialNavigationOwner: unknown): void {
     const e = helpers;
@@ -24,7 +55,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
         (r.view.webContents = i),
         (r.isMainFrameLoading = i.isLoadingMainFrame()),
         (r.isWaitingForResponse = !1));
-      let m = mZe(i) ?? mZ(i);
+      let m = takePendingObserver(i) ?? createNavigationObserver(i);
       r.takeIncompleteNavigationObservation = m.takeObservation;
       let h = () => void 0;
       r.initialNavigationSync = new Promise((e) => {
@@ -350,7 +381,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
               (r.pendingSuspensionId = null),
               (r.isRestoring = !1),
               (r.isAudible = !1),
-              fZ(r),
+              resetCaptureState(r),
               r.mediaIndicator.dispose(),
               (r.isMainFrameLoading = !1),
               (r.isWaitingForResponse = !1),
@@ -735,10 +766,10 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
                         throw Error(`Owl browser sidebar window.open child WebContents missing`);
                       let l = GX(c, s, { browserTabId: i, conversationId: r.conversationId }, null);
                       return (
-                        pZe(s),
+                        registerPendingObserver(s),
                         e.windowManager.sendMessageToWebContents(
                           c.owner,
-                          pZ({
+                          openBrowserTabMessage({
                             ...(t === `background-tab` ? { active: !1 } : {}),
                             adoptionLease: l,
                             adoptedWebContentsId: s.id,
@@ -756,7 +787,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
               : t === `background-tab`
                 ? (e.windowManager.sendMessageToWebContents(
                     c.owner,
-                    pZ({
+                    openBrowserTabMessage({
                       active: !1,
                       conversationId: r.conversationId,
                       initialUrl: o,
@@ -765,7 +796,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
                   ),
                   { action: `deny` })
                 : (e.windowManager.sendMessageToWebContents(c.owner, {
-                    ...pZ({
+                    ...openBrowserTabMessage({
                       conversationId: r.conversationId,
                       initialUrl: o,
                       insertToRightOfTabId: r.browserTabId,
@@ -812,7 +843,7 @@ export function createBrowserPageWebviewBindingControllerClass(dependencies: Rec
               ((r.managedNavigation = void 0),
               (r.isRestoring = !1),
               (r.isAudible = !1),
-              fZ(r),
+              resetCaptureState(r),
               r.mediaIndicator.dispose(),
               (r.isMainFrameLoading = !1),
               (r.isWaitingForResponse = !1),

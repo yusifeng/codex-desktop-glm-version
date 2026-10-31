@@ -3179,3 +3179,9 @@ snapshot 投影、Browser Use session snapshot、find-state 广播和 state diff
 `browser-navigation-context-controller.ts` 已补齐原 `fZe` 的完整 load-error recovery：find cleanup、stale history error pruning、
 pending usage/media/site-tools reset、snapshot serialization、thread sync/budget，以及带 navigation/version guards 的 50ms×100
 loading/retry loop 和最终 non-fatal report。原主 chunk `fZe` 及专用常量/logger 已删除。
+
+### 增量内聚：webview binding private lifecycle helpers
+
+`browser-page-webview-binding-controller.ts` 已内聚 capture reset、window.open tab message projection，以及 pending navigation observer
+WeakMap 的 register/destroy/take 生命周期；组合根只注入 `WXe/RX` incomplete-navigation primitives。主 chunk 旧
+`fZ/pZ/mZ/pZe/mZe/sZ` 已删除，避免 binding 私有状态继续泄漏在组合根。

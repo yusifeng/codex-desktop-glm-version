@@ -5131,3 +5131,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   guarded error-page load retry 和错误上报；组合根显式注入 policy，旧 `fZe` 与专用 constants/logger 已删除。
 - focused test 覆盖 stale error 清理、pending usage、状态投影、replace-current load 与真实接线。下一批审计 `fZ/pZ` 后续小 helper
   belt 和 webview navigation observer ownership。
+
+# 2026-11-01 webview binding private helper convergence
+
+- `browser-page-webview-binding-controller.ts` 现直接拥有 capture reset、open-tab message 和 pending observer registry/destroy/take；
+  主组合根只提供 incomplete-navigation primitives，旧 `fZ/pZ/mZ/pZe/mZe/sZ` 已删除。
+- binding、navigation-context、incomplete-navigation focused tests 与全量 owner audit 均覆盖该接线。下一批从 `gZe` window-transfer
+  transaction 审计现有 transfer controller 边界。

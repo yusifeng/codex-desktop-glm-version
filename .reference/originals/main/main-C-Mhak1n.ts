@@ -43858,7 +43858,6 @@ var eZ = `-owl-native-contents-close`,
   nZ = `password-manager-open-settings`,
   rZ = `page-info-open-site-settings`,
   iZ = `owl-favicon-image-updated`,
-  sZ = new WeakMap(),
   aZe = {
     [n.gu.BATCH]: { action: `annotate`, annotationModeEntrySource: `context-menu-annotate` },
     [n.gu.QUICK]: {
@@ -43870,51 +43869,6 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
-function fZ(e) {
-  ((e.isCapturingUserMedia = !1),
-    (e.isCapturingCamera = void 0),
-    (e.isCapturingMicrophone = void 0));
-}
-function pZ({
-  active: e = !0,
-  adoptionLease: t,
-  adoptedWebContentsId: n,
-  browserTabId: r,
-  conversationId: i,
-  initialUrl: a,
-  insertToRightOfTabId: o,
-}) {
-  return {
-    type: `open-browser-tab`,
-    browserTabId: r,
-    conversationId: i,
-    initialUrl: a,
-    insertToRightOfTabId: o,
-    adoptionLease: t,
-    adoptedWebContentsId: n,
-    ...(e ? {} : { active: e }),
-    source: `manual`,
-    initiator: `window_open`,
-  };
-}
-function mZ(e) {
-  return WXe(e, (e) => {
-    RX({ observation: e, trigger: `phase-timeout` });
-  });
-}
-function pZe(e) {
-  let t = mZ(e),
-    n = () => {
-      sZ.get(e)?.observer === t && (sZ.delete(e), t.dispose());
-    };
-  (sZ.set(e, { observer: t, handleDestroyed: n }), e.once(`destroyed`, n));
-}
-function mZe(e) {
-  let t = sZ.get(e);
-  return t == null
-    ? null
-    : (sZ.delete(e), e.removeListener(`destroyed`, t.handleDestroyed), t.observer);
-}
 var hZe = r.i(`browser-window-transfer`);
 async function gZe(e, t, n, { content: r, receiver: i, signal: a }, o, s) {
   let c = qU(r),
@@ -44586,9 +44540,9 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
         (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
-        (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: Ze, resetCaptureState: fZ, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
+        (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW, fq, matchesLoadError: FU, normalizeUrl: Ze, resetCaptureState: (page) => { page.isCapturingUserMedia = !1; page.isCapturingCamera = void 0; page.isCapturingMicrophone = void 0; }, clearSiteTools: XX, serializePageState: eW, shouldIgnoreLoadError: NU, shouldRetryLoadError: PU, logger: r.i, setTimer: setTimeout, retryDelayMs: 50, maxAttempts: 100 }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
-(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ }))(this)),
+(this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ, WXe, RX }))(this)),
         (this.hostPolicyController = new (createBrowserHostPolicyControllerClass({ DXe, OXe, kXe, mq, VG, Yc, Xc, DZ, hX }))(this)),
         (this.presentationSyncController = new (createBrowserPresentationSyncControllerClass({ hX, sXe, qU, DU, oX, KU }))(this)),
         (this.windowThreadStateController = new (createBrowserWindowThreadStateControllerClass({ hX, fq, gXe, oX, SWe, aXe, gX, qU, oXe, vX, tq, KU, l, logger: r.i(`browser-sidebar-manager`) }))(this)),
