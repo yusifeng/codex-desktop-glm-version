@@ -11,6 +11,7 @@ const realOwners = [
   ["src/main/main-app/browser-use/session-registry.ts", "createBrowserSessionRegistryRuntime"],
   ["src/main/main-app/window/electron-message-handler.ts", "createElectronMessageHandlerClass"],
   ["src/main/main-app/files/desktop-file-services.ts", "createDesktopFileServicesRuntime"],
+  ["src/main/main-app/files/library-files-backend.ts", "createLibraryFilesBackendRuntime"],
   ["src/main/main-app/dictation/audio.ts", "createDictationAudioServiceClass"],
 ];
 for (const [path, factory] of realOwners) {
@@ -59,6 +60,9 @@ assert.equal(main.includes("createDesktopFileServicesRuntime({"), true, "real de
 assert.equal(main.includes("a$e = class"), false, "generated app-server client registry must be removed");
 assert.equal(main.includes("k$e = createDictationAudioServiceClass({"), true, "real dictation audio owner is wired");
 assert.equal(main.includes("k$e = class"), false, "generated dictation audio owner must be removed");
+assert.equal(main.includes("createLibraryFilesBackendRuntime({"), true, "real Library files backend owner is wired");
+assert.equal(main.includes("t1e = class"), false, "generated Library files backend must be removed");
+assert.equal(main.includes("async function BQ("), false, "generated projectless workspace scope must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("44 main unwired-owner skeleton assertions passed");
+console.log("49 main unwired-owner skeleton assertions passed");

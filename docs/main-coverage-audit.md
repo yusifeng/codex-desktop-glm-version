@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 Library projectless-output backend restoration
+
+新增 `files/library-files-backend.ts`，补齐上一批 Library 安全访问层的 upstream owner：projectless thread 分页、assignment/projectless admission、
+missing-thread promise/negative TTL cache、8-way existence lookup、workspace hint/default/configured roots、WSL path projection、shared output attribution、
+realpath/symlink containment、递归文件 metadata 扫描和 generated-images allowlist 均迁入同一 backend。WindowContext 的 workspace scope 与 Library RPC
+consumer 均改接 factory，主 chunk 约 260 行旧实现删除；42 条 focused 状态/文件系统/分页/缓存/接线断言通过，防空壳审计扩至 49 条。
+
 ## 2026-11-01 desktop host/file services and dictation audio restoration
 
 新增 `files/desktop-file-services.ts`，整体迁出 app-server client registry、file attachment temp persistence、validated renderer/native file drag、

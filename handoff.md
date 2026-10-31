@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+完成 Library projectless-output backend：新增 `files/library-files-backend.ts`，迁出 thread pagination、projectless/assignment admission、missing-thread
+promise/negative cache、workspace roots/hints、WSL path projection、shared-output attribution、realpath/symlink containment、recursive metadata scan 和
+generated-images allowlist；WindowContext 的 scope 与 Library consumers 已真实改接。主 chunk 约 260 行旧实现删除，focused suite 执行 42 条，
+防空壳审计扩至 49 条。
+
 恢复 desktop host/file services 与 dictation audio：新增 `files/desktop-file-services.ts`，接管 client registry、附件临时落盘、renderer/native
 file drag、Library realpath/file-identity allowlist、preview cleanup 和串行 Quick Look/Electron thumbnail；`dictation/audio.ts` 不再是固定返回
 `null` 的未接线 skeleton，现恢复完整 CoreAudio route/device/property-buffer/name decode 并真实接回 WindowContext。主 chunk 约 425 行旧副本删除；

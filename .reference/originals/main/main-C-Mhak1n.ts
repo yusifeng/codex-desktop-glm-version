@@ -250,6 +250,7 @@ const { createSavedSectionReconciliationClass } = require("./main-app/sidebar/sa
 const { createSavedCustomSectionsManagerClass } = require("./main-app/sidebar/saved-custom-sections-manager.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createDesktopFileServicesRuntime } = require("./main-app/files/desktop-file-services.js");
+const { createLibraryFilesBackendRuntime } = require("./main-app/files/library-files-backend.js");
 const { createDictationAudioServiceClass } = require("./main-app/dictation/audio.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -62376,266 +62377,22 @@ var Y$e = class extends n.Uf {
       });
     }
   };
-function Z$e(e, t) {
-  return h.default.join(t(e), `generated_images`);
-}
-var PQ = r.i(`library-files`);
-function Q$e({
-  configuredOutputDirectories: e,
-  shouldUseWslPaths: t,
-  threads: n,
-  workspaceRoots: r,
-}) {
-  let i = {};
-  for (let [n, r] of Object.entries(e ?? {})) i[n] = Vn(r, t);
-  for (let r of n) {
-    let n = e?.[r.id] == null ? h.default.join(Vn(r.cwd, t), `outputs`) : Vn(e[r.id], t);
-    i[r.id] = n;
-  }
-  let a = Object.values(i).filter((e) => r.some((t) => fH(h.default.resolve(e), t)));
-  return { allowedOutputDirectories: [...new Set(a)], outputDirectories: i };
-}
-async function $$e({ allowedOutputDirectories: e, outputDirectories: t, workspaceRoots: n }) {
-  let r = new Map(),
-    i = new Set(e.map(IQ)),
-    a = (
-      await Promise.all(
-        n.map(async (e) => {
-          let t = h.default.resolve(e);
-          try {
-            let e = await (0, b.lstat)(t);
-            return !e.isDirectory() || e.isSymbolicLink() ? null : await (0, b.realpath)(t);
-          } catch (e) {
-            return (
-              PQ().warning(`Failed to inspect projectless workspace root`, {
-                safe: {},
-                sensitive: { error: e, workspaceRootPath: t },
-              }),
-              null
-            );
-          }
-        }),
-      )
-    ).filter((e) => e != null);
-  if (a.length === 0) return [];
-  let o = new Map();
-  for (let [e, n] of Object.entries(t)) {
-    let t = IQ(n),
-      r = o.get(t);
-    o.set(t, { outputDirectory: n, threadId: r == null || r.threadId === e ? e : null });
-  }
-  for (let t of e) {
-    let e = IQ(t);
-    o.set(e, o.get(e) ?? { outputDirectory: t, threadId: null });
-  }
-  let s = [...o.values()].filter(({ outputDirectory: e }) => i.has(IQ(e))),
-    c = await Promise.all(s.map(({ outputDirectory: e, threadId: t }) => e1e(e, a, t)));
-  for (let e of c)
-    for (let t of e) {
-      let e = IQ(t.path);
-      r.has(e) || r.set(e, t);
-    }
-  return [...r.values()].sort((e, t) => e.path.localeCompare(t.path));
-}
-async function e1e(e, t, n) {
-  try {
-    let r = await (0, b.lstat)(e);
-    if (!r.isDirectory() || r.isSymbolicLink()) return [];
-    let i = h.default.resolve(e),
-      a = await (0, b.realpath)(i);
-    return t.some((e) => fH(a, e))
-      ? await FQ({ directory: i, outputDirectory: i, outputDirectoryRealPath: a, threadId: n })
-      : [];
-  } catch (t) {
-    return (
-      PQ().warning(`Failed to inspect projectless output directory`, {
-        safe: {},
-        sensitive: { error: t, outputDirectory: e },
-      }),
-      []
-    );
-  }
-}
-async function FQ({ directory: e, outputDirectory: t, outputDirectoryRealPath: n, threadId: r }) {
-  let i = await (0, b.readdir)(e, { withFileTypes: !0 });
-  return (
-    await Promise.all(
-      i.map(async (i) => {
-        let a = h.default.join(e, i.name);
-        try {
-          let e = await (0, b.lstat)(a);
-          return e.isSymbolicLink() || !fH(await (0, b.realpath)(a), n)
-            ? []
-            : e.isDirectory()
-              ? await FQ({
-                  directory: a,
-                  outputDirectory: t,
-                  outputDirectoryRealPath: n,
-                  threadId: r,
-                })
-              : e.isFile()
-                ? [
-                    {
-                      modifiedAt: e.mtime.toISOString(),
-                      name: i.name,
-                      path: a,
-                      relativePath: h.default.relative(t, a),
-                      sizeBytes: e.size,
-                      threadId: r,
-                    },
-                  ]
-                : [];
-        } catch (e) {
-          return (
-            PQ().warning(`Failed to inspect projectless output entry`, {
-              safe: {},
-              sensitive: { entryPath: a, error: e },
-            }),
-            []
-          );
-        }
-      }),
-    )
-  ).flat();
-}
-function IQ(e) {
-  let t = h.default.normalize(e);
-  return process.platform === `win32` ? t.toLowerCase() : t;
-}
-var LQ = 8,
-  RQ = 3e4,
-  zQ = new WeakMap(),
-  t1e = class {
-    appServerConnection;
-    globalState;
-    settingsStore;
-    generatedImagesDirectory;
-    shouldUseWslPaths;
-    constructor(e, t, r) {
-      ((this.appServerConnection = e),
-        (this.globalState = t),
-        (this.settingsStore = r),
-        (this.shouldUseWslPaths = n.zi(ls)),
-        (this.generatedImagesDirectory = Z$e(n.Oi({ preferWsl: this.shouldUseWslPaths }), (e) =>
-          this.convertPathForDesktopHost(e),
-        )));
-    }
-    convertPathForDesktopHost(e) {
-      return Vn(e, this.shouldUseWslPaths);
-    }
-    async getAllowedLibraryDirectories() {
-      let { allowedOutputDirectories: e } = await this.loadProjectlessOutputDirectories();
-      return [...e, this.generatedImagesDirectory];
-    }
-    async listOutputFiles() {
-      return (await $$e(await this.loadProjectlessOutputDirectories())).map((e) => ({
-        ...e,
-        path: this.convertPathForAgentEnvironment(e.path),
-      }));
-    }
-    convertPathForAgentEnvironment(e) {
-      return zn(e, this.shouldUseWslPaths);
-    }
-    async listLocalThreads() {
-      let e = [],
-        t = null;
-      do {
-        let n = await this.appServerConnection.listThreads({
-          archived: !1,
-          cursor: t,
-          limit: 200,
-          modelProviders: null,
-          sortKey: `updated_at`,
-          useStateDbOnly: !0,
-        });
-        (e.push(...n.data), (t = n.nextCursor));
-      } while (t != null);
-      return e;
-    }
-    async loadProjectlessOutputDirectories() {
-      let e = await this.listLocalThreads(),
-        { localThreadIds: t, workspaceRoots: r } = await BQ({
-          appServerConnection: this.appServerConnection,
-          globalState: this.globalState,
-          localThreadIds: new Set(e.map(({ id: e }) => e)),
-          settingsStore: this.settingsStore,
-        });
-      return {
-        ...Q$e({
-          configuredOutputDirectories: Object.fromEntries(
-            Object.entries(
-              this.globalState.get(n.iu.THREAD_PROJECTLESS_OUTPUT_DIRECTORIES) ?? {},
-            ).filter(([e]) => t.has(e)),
-          ),
-          shouldUseWslPaths: this.shouldUseWslPaths,
-          threads: e.filter(({ id: e }) => t.has(e)),
-          workspaceRoots: r,
-        }),
-        workspaceRoots: r,
-      };
-    }
-  };
-async function BQ({ appServerConnection: e, globalState: t, localThreadIds: r, settingsStore: i }) {
-  let a = i.getEffective(n.Fa.projectlessWorkspaceRoot.key),
-    o = n.ca(t.get(n.iu.THREAD_PROJECT_ASSIGNMENTS)),
-    s = new Set((t.get(n.iu.PROJECTLESS_THREAD_IDS) ?? []).filter((e) => o[e] == null)),
-    c = new Map(Object.entries(t.get(n.iu.THREAD_WORKSPACE_ROOT_HINTS) ?? {})),
-    l = Array.from(
-      new Set([
-        ...c.keys(),
-        ...Object.keys(t.get(n.iu.THREAD_PROJECTLESS_OUTPUT_DIRECTORIES) ?? {}),
-      ]),
-    ).filter((e) => s.has(e)),
-    u = new Set([...r].filter((e) => s.has(e))),
-    d = [];
-  for (let t = 0; t < l.length; t += LQ) {
-    let i = await Promise.all(
-      l.slice(t, t + LQ).map(async (t) => {
-        if (!r.has(t) && !(await n1e(e, t))) return null;
-        u.add(t);
-        let i = c.get(t);
-        return i == null ? null : Vn(i, n.zi(ls));
-      }),
-    );
-    d.push(...i.filter((e) => e != null));
-  }
-  return {
-    localThreadIds: u,
-    workspaceRoots: Array.from(
-      new Set([
-        xt({ homeDirectory: (0, p.homedir)(), path: h.default }),
-        ...(a != null && h.default.isAbsolute(a) ? [a] : []),
-        ...d,
-      ]),
-    ),
-  };
-}
-function n1e(e, t) {
-  let n = zQ.get(e);
-  n ?? ((n = new Map()), zQ.set(e, n));
-  let r = n.get(t);
-  if (r != null && r.expiresAt > Date.now()) return r.promise;
-  let i = e
-    .readThread(t, { includeTurns: !1 })
-    .then((e) => {
-      let r = e != null;
-      if (!r) {
-        let e = n.get(t);
-        e != null && (e.expiresAt = Date.now() + RQ);
-      }
-      return r;
-    })
-    .catch((e) => {
-      let r = n.get(t);
-      return (
-        r != null && e instanceof Error && e.message === `thread not loaded: ${t}`
-          ? (r.expiresAt = Date.now() + RQ)
-          : n.delete(t),
-        !1
-      );
-    });
-  return (n.set(t, { expiresAt: 1 / 0, promise: i }), i);
-}
+var { LibraryFilesBackend: t1e, loadProjectlessWorkspaceScope: BQ } =
+  createLibraryFilesBackendRuntime({
+    path: h,
+    fsPromises: b,
+    homedir: p.homedir,
+    createLogger: r.i,
+    pathContains: fH,
+    convertPathForDesktopHost: Vn,
+    convertPathForAgentEnvironment: zn,
+    getShouldUseWslPaths: () => n.zi(ls),
+    getCodexHome: n.Oi,
+    getDefaultProjectlessWorkspaceRoot: xt,
+    normalizeProjectAssignments: n.ca,
+    stateKeys: n.iu,
+    projectlessWorkspaceRootSettingKey: n.Fa.projectlessWorkspaceRoot.key,
+  });
 var u1e = class extends n.Uf {
     executionHostRegistry;
     constructor(e) {
