@@ -2565,3 +2565,19 @@ focused test 为 `scripts/test-thread-goal-hydration-registry.mjs`，运行命�
 `BrowserWindow` 状态读取、`setOpacity(0)`、`show/focus` 和 `setImmediate` 恢复顺序。
 由 `scripts/test-main-window-presentation-policy.mjs` 覆盖 Windows/visible/minimized 四项矩阵，
 不改变窗口生命周期或副作用 owner。
+
+### 增量抽取：language-server provider、session 与 RPC owners
+
+原 main chunk 的 trusted command resolver、local runtime eligibility、Java/Kotlin/Pyright/
+rust-analyzer/SourceKit/TypeScript 六个 provider 已整体迁移至
+`src/main/main-app/language-server/providers.ts`。新 owner 复用既有 options/policy 模块，继续持有
+host lookup/stat/spawn、Java 21 与 wrapper 验证、Kotlin expired-build ownership、Rust sysroot
+验证及 pinned Node runtime 完整性检查；main 的 `QQ/H1e/U1e/q1e/F0e/G0e/q0e/X0e/Z0e`
+旧实现和专用 helpers 已物理删除，并通过 factory 真实接回原 provider aliases。
+
+LSP request timeout/content-modified retry、document open/change/close 串行状态、idle/process-exit
+cleanup、initialize/configuration handshake 和 `Q0e` RPC owner 已迁移至
+`src/main/main-app/language-server/session-runtime.ts`。新 RPC owner 明确分离全局 logger factory 与
+local-runtime-expired 更新回调，消除机械恢复代码的参数遮蔽风险；`z0e/B0e/V0e/H0e/Q0e` 旧实现已删除。
+focused coverage 为 provider 45 项、session/RPC 42 项，另由 no-unwired gate 60 项验证真实接线及旧
+owner 不得回归。

@@ -4592,3 +4592,16 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   顺序均由新 owner 持有，manager method 仅余 3 行稳定委托；runtime focused coverage 为 17 项。
 - A1 Git manager/watch/session 全局 owner 复核完成：明确大型 lifecycle/controller 待迁清单清零；host assembly、
   transport、query/fsmonitor 与 command/filesystem I/O 等已登记 preserve-coupled 组合根不计为未完成 owner。
+
+# 2026-11-01 language-server owner 迁移
+
+- `src/main/main-app/language-server/providers.ts` 已接管 trusted command resolver、runtime root/Node
+  projection 与 Java、Kotlin、Pyright、Rust、SourceKit、TypeScript 六个 provider。main 通过
+  `createLanguageServerProvidersRuntime` 真实接回原 consumer，删除约 570 行重复 generated provider
+  实现；`scripts/test-main-language-server-providers-owner.mjs` 覆盖 45 项 host/runtime/security/exit 行为。
+- `src/main/main-app/language-server/session-runtime.ts` 已接管 request timeout/retry、document sync、idle/
+  process cleanup、protocol initialize/configuration 和 RPC routing。main 通过
+  `createLanguageServerSessionRuntime` 接回 `Q0e`，删除旧 session/RPC owner，并修复原机械恢复代码中
+  updater callback 参数遮蔽全局 logger namespace 的风险；focused coverage 42 项。
+- 本批完成后优先继续审计 main chunk 紧邻的 worktree attachment、MCP sandbox 与剩余大型第一方 owner；
+  vendor vscode-jsonrpc/LSP/URI runtime 保留为 generated/vendor 边界，不计作业务 owner。

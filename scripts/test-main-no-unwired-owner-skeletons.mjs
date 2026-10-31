@@ -13,6 +13,8 @@ const realOwners = [
   ["src/main/main-app/files/desktop-file-services.ts", "createDesktopFileServicesRuntime"],
   ["src/main/main-app/files/library-files-backend.ts", "createLibraryFilesBackendRuntime"],
   ["src/main/main-app/dictation/audio.ts", "createDictationAudioServiceClass"],
+  ["src/main/main-app/language-server/providers.ts", "createLanguageServerProvidersRuntime"],
+  ["src/main/main-app/language-server/session-runtime.ts", "createLanguageServerSessionRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -63,6 +65,13 @@ assert.equal(main.includes("k$e = class"), false, "generated dictation audio own
 assert.equal(main.includes("createLibraryFilesBackendRuntime({"), true, "real Library files backend owner is wired");
 assert.equal(main.includes("t1e = class"), false, "generated Library files backend must be removed");
 assert.equal(main.includes("async function BQ("), false, "generated projectless workspace scope must be removed");
+assert.equal(main.includes("createLanguageServerProvidersRuntime({"), true, "real language-server providers are wired");
+assert.equal(main.includes("createLanguageServerSessionRuntime({"), true, "real language-server session owner is wired");
+assert.equal(main.includes("var QQ = class"), false, "generated command resolver must be removed");
+assert.equal(main.includes("q1e = class"), false, "generated Java provider must be removed");
+assert.equal(main.includes("var F0e = class"), false, "generated Kotlin provider must be removed");
+assert.equal(main.includes("z0e = class"), false, "generated language-server session must be removed");
+assert.equal(main.includes("var Q0e = class"), false, "generated language-server RPC owner must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("49 main unwired-owner skeleton assertions passed");
+console.log("60 main unwired-owner skeleton assertions passed");
