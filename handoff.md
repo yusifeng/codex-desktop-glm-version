@@ -4995,3 +4995,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   的唯一 owner；`persistableNavigationOf` 补为显式语义导出。
 - main 旧 `WU..ZHe` 约 589 行整带删除，后续 browser window owner 边界保持不变。focused coverage 35 项，no-unwired gate
   扩至 415 项；下一批从 `QHe` 开始的 browser window/bootstrap owner 继续审计。
+
+# 2026-11-01 first-party authenticated webview wiring
+
+- `browser-sidebar/first-party-webview.ts` 已接管 auth/link-session、routing cookies、partition hardening、navigation lock 与 cookie
+  cleanup；模块级 authenticated-session registry 供 window manager 跨 owner 识别。
+- main 旧 `$He..MW` 约 352 行整带删除，checkout owner 边界保持不变。focused coverage 24 项，no-unwired gate 扩至
+  422 项；下一批继续处理紧随其后的 checkout-webview owner。

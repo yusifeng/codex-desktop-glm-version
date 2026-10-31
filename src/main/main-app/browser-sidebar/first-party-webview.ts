@@ -62,7 +62,7 @@ const accountsCheckSchema = objectSchema({
 });
 
 /** ChatGPT origin（原 `bW`/`kW`）。 */
-function chatgptOrigin(): string {
+export function chatgptOrigin(): string {
   return new URL(CHATGPT_CODEX_URL).origin;
 }
 
@@ -279,6 +279,16 @@ export interface OwnerWebContentsLike {
   removeListener(event: string, listener: (...args: never[]) => void): void;
 }
 
+const authenticatedSessions = new WeakSet<object>();
+
+export function isFirstPartyAuthenticatedPartition(details: { partition?: string }): boolean {
+  return details.partition?.startsWith(PARTITION_PREFIX) === true;
+}
+
+export function isFirstPartyAuthenticatedSession(webContents: { session: object }): boolean {
+  return authenticatedSessions.has(webContents.session);
+}
+
 /** will-attach 参数（Electron 结构）。 */
 interface WillAttachDetails {
   partition?: string;
@@ -295,9 +305,8 @@ interface WillAttachDetails {
  */
 export function createFirstPartyWebviewAttachHook({ getAuthToken, owner }: { getAuthToken: AuthTokenProvider; owner: OwnerWebContentsLike }): () => void {
   const pendingBootstrapUrls: string[] = [];
-  const authenticatedSessions = new WeakSet<object>();
   const onWillAttach = (details: { session?: unknown }, preferences: Record<string, unknown>, params: WillAttachDetails) => {
-    if (params.partition?.startsWith(PARTITION_PREFIX) !== true) return;
+    if (!isFirstPartyAuthenticatedPartition(params)) return;
     const session = electronSession.fromPartition(params.partition);
     authenticatedSessions.add(session);
     (details as { session?: unknown }).session = session;
@@ -321,7 +330,7 @@ export function createFirstPartyWebviewAttachHook({ getAuthToken, owner }: { get
     pendingBootstrapUrls.push(params.src ?? "");
   };
   const onDidAttach = (_event: unknown, webContents: { getURL(): string; session: object }) => {
-    if (pendingBootstrapUrls.length === 0 || !authenticatedSessions.has(webContents.session)) return;
+    if (pendingBootstrapUrls.length === 0 || !isFirstPartyAuthenticatedSession(webContents)) return;
     const bootstrapUrl = pendingBootstrapUrls.shift();
     if (bootstrapUrl != null) {
       mountAuthenticatedChatGptWebview({ bootstrapUrl: bootstrapUrl || webContents.getURL(), getAuthToken, webContents: webContents as never });

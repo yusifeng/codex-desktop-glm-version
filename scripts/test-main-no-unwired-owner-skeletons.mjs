@@ -64,6 +64,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/app-shell-keyboard.ts", "createAppShellKeyboardDispatcher"],
   ["src/main/main-app/browser-sidebar/error-pages.ts", "buildCrashErrorPage"],
   ["src/main/main-app/browser-sidebar/page-store.ts", "BrowserSidebarPageStore"],
+  ["src/main/main-app/browser-sidebar/first-party-webview.ts", "authenticateChatGptWebview"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-history-service.ts", "createBrowserHistoryServiceClass"],
@@ -123,6 +124,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/comment-site-sta
 assert.equal(main.includes('require("./main-app/browser-sidebar/app-shell-keyboard.js")'), true, "app-shell keyboard runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/error-pages.js")'), true, "browser error-pages runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/page-store.js")'), true, "browser page-store runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/first-party-webview.js")'), true, "first-party webview runtime is wired");
 assert.equal(main.includes("async function QRe("), false, "generated LaTeX compiler must be removed");
 assert.equal(main.includes("async function lze("), false, "generated internal plugin downloader must be removed");
 assert.equal(main.includes("function qV("), false, "generated global hotkey owner must be removed");
@@ -141,6 +143,10 @@ assert.equal(main.includes("function WU("), false, "generated browser page messa
 assert.equal(main.includes("GHe = class"), false, "generated browser page store must be removed");
 assert.equal(main.includes("var YHe = class"), false, "generated browser page persistence must be removed");
 assert.equal(main.includes("function ZHe("), false, "generated browser page serializer must be removed");
+assert.equal(main.includes("async function xW("), false, "generated ChatGPT webview auth owner must be removed");
+assert.equal(main.includes("async function CW("), false, "generated session plan poller must be removed");
+assert.equal(main.includes("function lUe("), false, "generated first-party attach hook must be removed");
+assert.equal(main.includes("function uUe("), false, "generated authenticated webview mount owner must be removed");
 assert.equal(main.includes("function _Ie("), false, "generated external-agent handlers must be removed");
 assert.equal(main.includes("function lIe("), false, "generated Cowork adapter wrapper must be removed");
 assert.equal(main.includes("async function VIe("), false, "generated imported-project finalizer must be removed");
@@ -398,4 +404,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("415 main unwired-owner skeleton assertions passed");
+console.log("422 main unwired-owner skeleton assertions passed");

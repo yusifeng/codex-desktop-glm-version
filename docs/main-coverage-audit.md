@@ -3040,3 +3040,11 @@ page 恢复默认 secure/local URL policy 注入。原始 chunk 中 `pVe..VU` �
 主组合根和冷恢复逻辑共用。原始 chunk 中 `WU..ZHe` 约 589 行重复实现已整带删除，下一 browser window owner 边界未动。
 focused test 覆盖 URL/navigation、消息/鼠标、store ownership/预算入口、CDP attach/detach 与真实接线；no-unwired gate 扩至
 415 项。
+
+### 增量接线：first-party authenticated ChatGPT webview
+
+`browser-sidebar/first-party-webview.ts` 已接管 token refresh/expiry、link-session、workspace routing cookies、plan poll、partition
+加固、导航白名单、bootstrap handoff 与销毁后 cookies 串行清理。authenticated session WeakSet 提升为模块级共享 registry，并
+导出 partition/session predicates，保持 checkout/window-manager 的跨 owner 识别语义。原始 chunk 中 `$He..MW` 约 352 行
+重复实现已物理删除；focused test 覆盖认证、cookies、handoff、partition hardening、共享 session registry 与真实接线，
+no-unwired gate 扩至 422 项。
