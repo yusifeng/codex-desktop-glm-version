@@ -141,7 +141,7 @@ const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-
 const { SkysightServiceManager } = require("./main-app/skysight/service-manager.js");
 const { RecordingGate, RealtimeSessionRecorder, VoiceTimelineLedger, readRealtimeSessionLogForFeedback } = require("./main-app/realtime/session-recorder.js");
 const { IabTabMentions } = require("./main-app/browser-sidebar/iab-tab-mentions.js");
-const { BrowserSettingsSync, BrowserUseOriginState: XOe } = require("./main-app/browser-use/origin-state.js");
+const { BrowserSettingsSync, BrowserUseOriginState: XOe, RemoteBrowserSettings: uke, BrowserConfigFile: pke } = require("./main-app/browser-use/origin-state.js");
 const { PublishedStatsig } = require("./main-app/account/statsig-adapter.js");
 const { ConversationalOnboardingService } = require("./main-app/onboarding/conversational-onboarding.js");
 const { ArtifactSessionHostLifecycle } = require("./main-app/artifact-session/host-lifecycle.js");
@@ -51317,31 +51317,6 @@ var CD = n.df([`always_ask`, `never_ask`]),
   }),
   DD = `/wham/browser/settings`,
   OD = 15e3,
-  uke = class {
-    fetchJson;
-    expectedPrincipal;
-    constructor(e, t) {
-      ((this.fetchJson = e), (this.expectedPrincipal = t));
-    }
-    async read(e) {
-      return ED.parse(
-        await this.fetchJson(DD, {
-          expectedPrincipal: this.expectedPrincipal,
-          signal: AbortSignal.any([e, AbortSignal.timeout(OD)]),
-        }),
-      );
-    }
-    async update(e, t, n) {
-      return ED.parse(
-        await this.fetchJson(DD, {
-          method: `PATCH`,
-          body: { ...t, expected_revision: e },
-          expectedPrincipal: this.expectedPrincipal,
-          signal: AbortSignal.any([n, AbortSignal.timeout(OD)]),
-        }),
-      );
-    }
-  },
   dke = [
     [`origin`, `origins`],
     [`download`, `downloads`],
@@ -51350,66 +51325,7 @@ var CD = n.df([`always_ask`, `never_ask`]),
   ],
   fke = n
     .wf({ allowed: n.hf(n.Of()).default([]), denied: n.hf(n.Of()).default([]) })
-    .default({ allowed: [], denied: [] }),
-  pke = class {
-    path;
-    constructor(e) {
-      this.path = h.default.join(e, Dn);
-    }
-    async read() {
-      let e = await this.readDocument();
-      return e == null ? null : kD(e.document);
-    }
-    async write(e, t) {
-      t?.throwIfAborted();
-      let n = await this.readDocument(),
-        r = n?.document ?? {},
-        i = Object.fromEntries(
-          dke.map(([t, n]) => {
-            let i = Object.entries(e.rules[t]),
-              a = r[n];
-            return [
-              n,
-              {
-                ...(mke(a) ? a : {}),
-                allowed: i.filter(([, e]) => e === `allow`).map(([e]) => e),
-                denied: i.filter(([, e]) => e === `deny`).map(([e]) => e),
-              },
-            ];
-          }),
-        ),
-        a = Yt(
-          { ...r, ...ED.shape.preferences.parse(e.preferences), ...i },
-          { numbersAsFloat: !0 },
-        ),
-        o = a.endsWith(`
-`)
-          ? a
-          : `${a}\n`;
-      if (o === n?.content) {
-        t?.throwIfAborted();
-        return;
-      }
-      await (0, b.mkdir)(h.default.dirname(this.path), { recursive: !0 });
-      let s = `${this.path}.${(0, _.randomUUID)()}.tmp`;
-      try {
-        (await (0, b.writeFile)(s, o, { encoding: `utf8`, mode: 384, signal: t }),
-          t?.throwIfAborted(),
-          await (0, b.rename)(s, this.path));
-      } finally {
-        await (0, b.rm)(s, { force: !0 });
-      }
-    }
-    async readDocument() {
-      try {
-        let e = await (0, b.readFile)(this.path, `utf8`);
-        return { content: e, document: n.wi(e, { integersAsBigInt: !0 }) };
-      } catch (e) {
-        if (e instanceof Error && `code` in e && e.code === `ENOENT`) return null;
-        throw e;
-      }
-    }
-  };
+    .default({ allowed: [], denied: [] });
 function kD(e) {
   return {
     preferences: ED.shape.preferences.parse({

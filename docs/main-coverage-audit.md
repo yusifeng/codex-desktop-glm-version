@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Browser Settings storage/API owner wiring
+
+`src/main/main-app/browser-use/origin-state.ts` 的 `RemoteBrowserSettings`/`BrowserConfigFile` 与旧 `uke/pke` 均为 5 members。
+本轮复用已加载模块接回 BrowserSettingsSync 的两个真实依赖并删除旧 classes；focused suite 覆盖 remote read/PATCH body/principal、
+config path/ENOENT、成员面与真实 wiring。
+
 ## 2026-10-31 BrowserUseOriginState class wiring
 
 `src/main/main-app/browser-use/origin-state.ts` 的 `BrowserUseOriginState` 与旧 `XOe` 均为 7 members。本轮复用已加载模块接回

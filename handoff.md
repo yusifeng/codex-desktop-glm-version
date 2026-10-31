@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Browser Settings storage/API owners：已加载的 `browser-use/origin-state.ts` 现同时替代主 chunk 旧 `uke/pke` 两个
+5-member owner。远端 read/PATCH 的 principal/revision/15s abort、browser config TOML projection、0600 temp+rename+cleanup 保持完整；
+`BrowserSettingsSync` 真实 `createApi/configFile` consumers 继续通过兼容别名构造。
+
 接回 BrowserUseOriginState class owner：已加载的 `browser-use/origin-state.ts` 现同时提供 `BrowserSettingsSync` 与完整
 7-member `BrowserUseOriginState`，替代主 chunk 旧 `XOe`。WebMCP、IAB history policy、origin rule local/remote sync 保持完整；
 `WindowContext.browserUsePermissions` 真实 consumer 继续通过 `XOe` 兼容别名构造，旧共享 helper 暂保留供其他消费者使用。
