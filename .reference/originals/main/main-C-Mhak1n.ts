@@ -215,6 +215,7 @@ const { createBrowserSessionRegistryRuntime } = require("./main-app/browser-use/
 const { LanguageServerManager } = require("./main-app/language-server/language-server-manager.js");
 const { createLanguageServerProvidersRuntime } = require("./main-app/language-server/providers.js");
 const { createLanguageServerSessionRuntime } = require("./main-app/language-server/session-runtime.js");
+const { createMcpSandboxLifecycleRuntime } = require("./main-app/mcp-sandbox/lifecycle.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
@@ -70905,16 +70906,7 @@ var $0e = createWorktreeAttachmentHandlerClass({
     isCloudHost: (e) => n.Cs(e),
     normalizeConversationId: (e) => n.$u(e),
     supportsFeature: (e, t) => n.Wu(e, t),
-  }),
-  e2e = 5e3,
-  w$ = new WeakMap();
-function T$(e) {
-  w$.set(e, performance.now());
-}
-function E$(e) {
-  let t = w$.get(e);
-  return (w$.delete(e), t != null && performance.now() - t <= e2e);
-}
+  });
 var D$ = `mcp_app_sandbox`,
   O$ = r.i(`mcp-app-sandbox`);
 function k$(e, t, n = {}) {
@@ -70928,10 +70920,6 @@ function k$(e, t, n = {}) {
       ...n.sensitive,
     },
   });
-}
-function t2e(e) {
-  let t = M$(e);
-  return t == null || ![`about:`, `blob:`, `data:`, `http:`, `https:`].includes(t.protocol);
 }
 function n2e(e, { allowLocalDevelopment: t }) {
   let r = M$(e),
@@ -70974,162 +70962,6 @@ function M$(e) {
 }
 function N$(e) {
   return M$(e)?.protocol ?? `invalid`;
-}
-function a2e(e, t, n, r) {
-  let i = M$(t.sourceUrl),
-    o = (e) => {
-      let t = M$(e);
-      return (
-        t != null &&
-        i != null &&
-        t.protocol === i.protocol &&
-        t.host === i.host &&
-        t.pathname === i.pathname &&
-        t.search === i.search
-      );
-    },
-    s = (e) => (e.isMainFrame === !0 ? !o(e.url) : t2e(e.url)),
-    c = (e, n) => {
-      k$(e, t, {
-        safe: {
-          isMainFrame: n.isMainFrame,
-          reason: n.isMainFrame === !0 ? `main_frame_url_mismatch` : `privileged_subframe_url`,
-          urlProtocol: N$(n.url),
-        },
-        sensitive: { guestWebContentsId: n.guestWebContentsId, url: fT(n.url) },
-      });
-    },
-    u = (t, n) => {
-      let r = t.url ?? n;
-      o(r) ||
-        (c(`navigation_blocked`, { guestWebContentsId: e.id, isMainFrame: !0, url: r }),
-        t.preventDefault());
-    },
-    d = (t) => {
-      s({ isMainFrame: t.isMainFrame, url: t.url }) &&
-        (c(`navigation_blocked`, {
-          guestWebContentsId: e.id,
-          isMainFrame: t.isMainFrame,
-          url: t.url,
-        }),
-        t.preventDefault());
-    },
-    f = (t, n) => {
-      let r = t.url ?? n;
-      s({ isMainFrame: t.isMainFrame, url: r }) &&
-        (c(`redirect_blocked`, { guestWebContentsId: e.id, isMainFrame: t.isMainFrame, url: r }),
-        t.preventDefault());
-    },
-    p = !1,
-    m = !1,
-    h = (n, r, i, a, s) => {
-      if (s) {
-        if (p || !o(r)) return;
-        p = !0;
-      } else {
-        if (m) return;
-        m = !0;
-      }
-      k$(s ? `sandbox_document_committed` : `widget_frame_committed`, t, {
-        sensitive: { guestWebContentsId: e.id },
-      });
-    },
-    g = (n, r, i, a, o, s, c) => {
-      r !== -3 &&
-        k$(`guest_load_failed`, t, {
-          safe: { errorCode: r, isMainFrame: o, urlProtocol: N$(a) },
-          sensitive: {
-            errorDescription: i,
-            frameProcessId: s,
-            frameRoutingId: c,
-            guestWebContentsId: e.id,
-            validatedURL: fT(a),
-          },
-        });
-    },
-    _ = (n, r, i) => {
-      O$().error(`${D$}.preload_failed`, {
-        safe: {},
-        sensitive: { error: i, guestWebContentsId: e.id, preloadPath: r, sandboxId: t.sandboxId },
-      });
-    },
-    v = (n, r) => {
-      r.reason !== `clean-exit` &&
-        k$(`render_process_gone`, t, {
-          safe: { reason: r.reason },
-          sensitive: { exitCode: r.exitCode, guestWebContentsId: e.id },
-        });
-    },
-    y = () => {
-      l.Menu.buildFromTemplate([
-        {
-          label: a
-            .hn()
-            .formatMessage({
-              messageId: `mcpApp.contextMenu.devtools`,
-              defaultMessage: `DevTools`,
-            }),
-          click: () => {
-            e.isDestroyed() || e.openDevTools({ mode: `detach` });
-          },
-        },
-      ]).popup({ window: l.BrowserWindow.fromWebContents(t.ownerWebContents) ?? void 0 });
-    },
-    b = (t, n) => {
-      n.type === `mouseDown` && T$(e);
-      let i = n.button;
-      if (
-        (n.type !== `mouseDown` && n.type !== `mouseUp`) ||
-        (i !== `back` && i !== `forward`) ||
-        (t.preventDefault(), n.type !== `mouseUp`)
-      )
-        return;
-      let a = i === `back` ? `navigateBack` : `navigateForward`,
-        o = i === `back` ? `MouseBack` : `MouseForward`;
-      r.getAccelerators(a).includes(o) && r.run(a);
-    },
-    x = (t, n) => {
-      if (n.type !== `keyDown`) return;
-      n.isAutoRepeat !== !0 && (n.key === `Enter` || n.key === ` `) && T$(e);
-      let i = [`navigateBack`, `navigateForward`].find((e) =>
-        r.getAccelerators(e).some((e) => oU(n, e)),
-      );
-      i != null && (t.preventDefault(), n.isAutoRepeat || r.run(i));
-    };
-  e.on(`before-mouse-event`, b);
-  let S = () => {
-    (n(),
-      e.removeListener(`before-mouse-event`, b),
-      e.removeListener(`before-input-event`, x),
-      e.removeListener(`will-navigate`, u),
-      e.removeListener(`will-frame-navigate`, d),
-      e.removeListener(`will-redirect`, f),
-      e.removeListener(`did-frame-navigate`, h),
-      e.removeListener(`did-fail-load`, g),
-      e.removeListener(`preload-error`, _),
-      e.removeListener(`render-process-gone`, v),
-      e.removeListener(`context-menu`, y),
-      e.removeListener(`destroyed`, S));
-  };
-  (e.setWindowOpenHandler(
-    ({ url: n }) => (
-      k$(`popup_blocked`, t, {
-        safe: { urlProtocol: N$(n) },
-        sensitive: { guestWebContentsId: e.id, url: fT(n) },
-      }),
-      { action: `deny` }
-    ),
-  ),
-    e.on(`before-input-event`, x),
-    e.on(`will-navigate`, u),
-    e.on(`will-frame-navigate`, d),
-    e.on(`will-redirect`, f),
-    e.on(`did-frame-navigate`, h),
-    e.on(`did-fail-load`, g),
-    e.on(`preload-error`, _),
-    e.on(`render-process-gone`, v),
-    e.on(`context-menu`, y),
-    e.on(`destroyed`, S));
 }
 var P$ = `web-sandbox.oaiusercontent.com`,
   F$ = process.env.NODE_ENV === `development` ? process.env.CODEX_MCP_APP_SANDBOX_URL : void 0,
@@ -71294,7 +71126,10 @@ function g2e(e, { applicationNetwork: t, getSandboxState: r }) {
         let o = r(e.id);
         if (
           (o != null && K$(t, a.requestingUrl, o)) ||
-          (t === `clipboard-sanitized-write` && o != null && n.as(e.getURL()) === o.origin && E$(e))
+          (t === `clipboard-sanitized-write` &&
+            o != null &&
+            n.as(e.getURL()) === o.origin &&
+            mcpSandboxLifecycle.consumeUserGestureForGuest(e))
         ) {
           i(!0);
           return;
@@ -71353,255 +71188,45 @@ function q$() {
     .join(`,`);
 }
 var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
-  v2e = 3e4,
-  J$ = !1,
-  Y$ = new Map(),
-  X$ = new Map();
-function y2e() {
-  (h2e(), b2e());
-}
-function b2e() {
-  J$ ||
-    (`ipcMain` in l &&
-      l.ipcMain?.on != null &&
-      ((J$ = !0),
-      l.ipcMain.on(a.Nt, (e, t) => {
-        let r = X$.get(e.sender.id);
-        if (r == null) {
-          O$().warning(`${D$}.init_rejected`, {
-            safe: { reason: `unknown_guest` },
-            sensitive: { guestWebContentsId: e.sender.id },
-          });
-          return;
-        }
-        let i = x2e(t);
-        if (i == null) {
-          k$(`init_rejected`, r, { safe: { reason: `invalid_message` } });
-          return;
-        }
-        if (r.origin !== i.origin) {
-          k$(`init_rejected`, r, {
-            safe: { reason: `origin_mismatch` },
-            sensitive: { guestWebContentsId: e.sender.id, receivedOrigin: i.origin },
-          });
-          return;
-        }
-        if (r.initId !== i.initId) {
-          k$(`init_rejected`, r, {
-            safe: { reason: `init_id_mismatch` },
-            sensitive: { guestWebContentsId: e.sender.id },
-          });
-          return;
-        }
-        if (!n.os(i.portNames)) {
-          k$(`init_rejected`, r, {
-            safe: { receivedPortNameCount: i.portNames.length, reason: `invalid_port_names` },
-            sensitive: { guestWebContentsId: e.sender.id },
-          });
-          return;
-        }
-        if (e.ports.length !== i.portNames.length + 1) {
-          k$(`init_rejected`, r, {
-            safe: {
-              expectedPortCount: i.portNames.length + 1,
-              receivedPortCount: e.ports.length,
-              reason: `port_count_mismatch`,
-            },
-            sensitive: { guestWebContentsId: e.sender.id },
-          });
-          return;
-        }
-        if (r.ownerWebContents.isDestroyed()) {
-          k$(`init_rejected`, r, {
-            safe: { reason: `owner_destroyed` },
-            sensitive: { guestWebContentsId: e.sender.id },
-          });
-          return;
-        }
-        r.ownerWebContents.postMessage(
-          a.kt,
-          {
-            initId: i.initId,
-            origin: i.origin,
-            portNames: i.portNames,
-            sandboxId: r.sandboxId,
-            skybridgeCacheState: r.skybridgeCacheState,
-            type: `init`,
-          },
-          e.ports,
-        );
-      })));
-}
-function x2e(e) {
-  if (typeof e != `object` || !e) return null;
-  let { initId: t, origin: n, portNames: r, type: i } = e;
-  return i !== `init` ||
-    typeof t != `string` ||
-    t.length === 0 ||
-    typeof n != `string` ||
-    !Array.isArray(r)
-    ? null
-    : { initId: t, origin: n, portNames: r };
-}
-function Z$(e, t, n) {
-  for (let [r, i] of X$) {
-    if (i.ownerWebContents.id !== e.id || i.sandboxId !== t || (n != null && i.initId !== n))
-      continue;
-    let a = l.webContents.fromId(r);
-    if (a == null || a.isDestroyed()) {
-      X$.delete(r);
-      continue;
-    }
-    return a;
-  }
-  return null;
-}
-function S2e(
-  e,
-  t,
-  { applicationNetwork: r, allowNonMcpAppSandboxWebviews: i = !1, navigation: a },
-) {
-  let o = (a, o, s) => {
-      let c = (t, n = {}) => {
-          (O$().warning(`${D$}.attach_rejected`, {
-            safe: t,
-            sensitive: { ownerWebContentsId: e.id, ...n },
+  mcpSandboxLifecycle = createMcpSandboxLifecycleRuntime({
+    canUseSandboxProtocol: `net` in l && l.net?.fetch != null,
+    configureSession: (e, t, n) => g2e(e, { applicationNetwork: n, getSandboxState: t }),
+    forwardInitChannel: a.kt,
+    getLocale: () => l.app.getLocale(),
+    getSkybridgeCacheState: c2e,
+    initChannel: a.Nt,
+    ipcMain: `ipcMain` in l ? l.ipcMain : null,
+    isPortNameList: (e) => n.os(e),
+    isSandboxId: (e) => n.cs(e),
+    logEvent: k$,
+    logger: O$,
+    matchesAccelerator: (e, t) => oU(e, t),
+    parseInitId: (e) => n.ns(e),
+    parseOrigin: (e, t) => n.as(e, t),
+    parsePartitionSandbox: (e) => n.is(e),
+    parsePersistentSandbox: (e) => n.ts(e),
+    persistentPartition: n.Qo,
+    prewarmSandbox: u2e,
+    sanitizeUrl: (e) => fT(e),
+    sandboxPreloadPath: _2e,
+    sessionFromPartition: (e) => l.session.fromPartition(e),
+    showDevtoolsContextMenu: (e, t) => {
+      l.Menu.buildFromTemplate([
+        {
+          label: a.hn().formatMessage({
+            messageId: `mcpApp.contextMenu.devtools`,
+            defaultMessage: `DevTools`,
           }),
-            a.preventDefault());
+          click: () => {
+            e.isDestroyed() || e.openDevTools({ mode: `detach` });
+          },
         },
-        u = n.is(s.partition);
-      if (u == null) {
-        i || c({ reason: `non_mcp_app_sandbox_webview` });
-        return;
-      }
-      let d = s.src,
-        f = Q$(s.instanceId),
-        p = s.partition.startsWith(`persist:`) ? n.ts(d) : u,
-        m = n.as(d, { requireSkybridge: !0 }),
-        h = n.ns(d);
-      if (p == null || !n.cs(p)) {
-        c({ reason: `invalid_sandbox_id` });
-        return;
-      }
-      if (m == null) {
-        c({ reason: `invalid_source_url`, sourceProtocol: N$(d) }, { sourceUrl: fT(d) });
-        return;
-      }
-      if (h == null) {
-        c({ reason: `invalid_init_id` });
-        return;
-      }
-      if (f == null) {
-        c({ reason: `invalid_view_instance_id` });
-        return;
-      }
-      if (
-        s.partition.startsWith(`persist:`) &&
-        s.partition !== n.Qo &&
-        !(d.startsWith(`https://`) && /^connection-[a-f0-9]{48}$/.test(u))
-      ) {
-        c({ reason: `invalid_persistent_session` });
-        return;
-      }
-      let g = d.startsWith(`codex-sandbox://`) && `net` in l && l.net?.fetch != null,
-        _ = g ? c2e(d) : void 0;
-      g && u2e(new URL(d).searchParams.get(`locale`) ?? l.app.getLocale()).catch(() => {});
-      let v = l.session.fromPartition(s.partition);
-      (g2e(v, { applicationNetwork: r, getSandboxState: (e) => X$.get(e) ?? null }),
-        C2e(
-          v,
-          {
-            allowLocalDevelopment: t,
-            initId: h,
-            origin: m,
-            ownerWebContents: e,
-            sandboxId: p,
-            skybridgeCacheState: _,
-            sourceUrl: d,
-          },
-          f,
-        ),
-        (o.session = v),
-        (o.preload = _2e),
-        (o.nodeIntegration = !1),
-        (o.nodeIntegrationInSubFrames = !1),
-        (o.contextIsolation = !0),
-        (o.disableDialogs = !0),
-        (o.sandbox = !0),
-        (o.webSecurity = !0),
-        (o.plugins = !1),
-        (o.allowRunningInsecureContent = !1),
-        (o.devTools = !0),
-        (o.webviewTag = !1));
+      ]).popup({ window: l.BrowserWindow.fromWebContents(t) ?? void 0 });
     },
-    s = (t, r) => {
-      let i = w2e(r.session, e, Q$(r.viewInstanceId), n.ns(r.getURL()));
-      if (i == null) {
-        O$().warning(`${D$}.attach_unmatched`, {
-          safe: { urlProtocol: N$(r.getURL()) },
-          sensitive: { guestWebContentsId: r.id, url: fT(r.getURL()) },
-        });
-        return;
-      }
-      (X$.set(r.id, i),
-        a2e(
-          r,
-          i,
-          () => {
-            X$.delete(r.id);
-          },
-          a,
-        ),
-        k$(`guest_attached`, i, {
-          safe: { skybridgeCacheState: i.skybridgeCacheState },
-          sensitive: { guestWebContentsId: r.id },
-        }));
-    };
-  (e.on(`will-attach-webview`, o),
-    e.on(`did-attach-webview`, s),
-    e.once(`destroyed`, () => {
-      (e.removeListener(`will-attach-webview`, o),
-        e.removeListener(`did-attach-webview`, s),
-        T2e(e));
-    }));
-}
-function C2e(e, t, n) {
-  let r = setTimeout(() => {
-      k$(`attach_expired`, t);
-      let n = Y$.get(e)?.find((e) => e.state === t);
-      n != null && $$(e, n);
-    }, v2e),
-    i = Y$.get(e) ?? [];
-  (i.push({ viewInstanceId: n, state: t, timeout: r }), Y$.set(e, i));
-}
-function w2e(e, t, n, r) {
-  let i = Y$.get(e),
-    a =
-      n == null
-        ? -1
-        : (i?.findIndex(
-            ({ state: e, viewInstanceId: i }) =>
-              e.ownerWebContents.id === t.id && i === n && (r == null || e.initId === r),
-          ) ?? -1),
-    o = i != null && a >= 0 ? (i.splice(a, 1)[0] ?? null) : null;
-  return (
-    o != null && clearTimeout(o.timeout),
-    (i == null || i.length === 0) && Y$.delete(e),
-    o?.state ?? null
-  );
-}
-function Q$(e) {
-  let t = Number(e);
-  return Number.isInteger(t) && t > 0 ? t : null;
-}
-function $$(e, t) {
-  let n = Y$.get(e);
-  if (n == null) return;
-  let r = n.filter((e) => e !== t);
-  (clearTimeout(t.timeout), r.length === 0 ? Y$.delete(e) : r.length !== n.length && Y$.set(e, r));
-}
-function T2e(e) {
-  for (let [t, n] of Y$) for (let r of n) r.state.ownerWebContents.id === e.id && $$(t, r);
+    webContentsFromId: (e) => l.webContents.fromId(e),
+  });
+function y2e() {
+  (h2e(), mcpSandboxLifecycle.initialize());
 }
 var e1 = n.Of().refine(n.cs),
   E2e = n.wf({ initId: e1, sandboxId: e1 }),
@@ -71631,8 +71256,11 @@ var e1 = n.Of().refine(n.cs),
     async consumeUserGesture(e) {
       let t = E2e.safeParse(e);
       if (!t.success) return !1;
-      let n = Z$(this.origin, t.data.sandboxId, t.data.initId);
-      return n != null && E$(n);
+      return mcpSandboxLifecycle.consumeUserGesture(
+        this.origin,
+        t.data.sandboxId,
+        t.data.initId,
+      );
     }
   },
   O2e = n.wf({
@@ -87660,7 +87288,7 @@ var Qot = createBrowserWindowManagerClass({
   ost,
   L9,
   buildBrowserWindowOptions,
-  S2e,
+  S2e: mcpSandboxLifecycle.bindOwnerWebviews,
   RUe,
   uWe,
   lUe,

@@ -2590,3 +2590,13 @@ archive cleanup barrier 已整体迁移至
 read-before-version 顺序、owner/app-server 双注册 `allSettled` 聚合、同 thread cleanup 等待及 abort
 gate；main 通过 `createWorktreeAttachmentHandlerClass` 真实接回 WindowContext consumer 并删除旧 class。
 `scripts/test-main-worktree-attachment-handler-owner.mjs` 覆盖 28 项并发、分页、副作用顺序和错误 shape。
+
+### 增量抽取：MCP sandbox guest lifecycle owner
+
+MCP sandbox 的 guest identity Map、pending attachment timer registry、IPC init/MessagePort 转交、
+一次性 user-gesture token、owner webview admission、guest navigation/redirect/popup hardening、telemetry 与
+destroy cleanup 已整体迁移至 `src/main/main-app/mcp-sandbox/lifecycle.ts`。BrowserWindow manager 真实消费
+`bindOwnerWebviews`，session permission handler 与 clear-data RPC 真实消费同一 gesture/guest registry；原
+`T$/E$/a2e/b2e/x2e/Z$/S2e/C2e/w2e/Q$/$$/T2e` 状态和 listener 实现已物理删除。
+`scripts/test-main-mcp-sandbox-lifecycle-owner.mjs` 覆盖 59 项 admission、IPC validation、navigation、
+gesture、MessagePort transfer、pending/guest cleanup 与 telemetry 顺序。

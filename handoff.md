@@ -4614,3 +4614,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - focused test `scripts/test-main-worktree-attachment-handler-owner.mjs` 覆盖 28 项；下一步继续审计紧邻
   MCP sandbox 的 gesture/navigation/cache owners，组合根与 Electron event binding 只在可保持 cleanup
   顺序时迁移。
+
+# 2026-11-01 MCP sandbox lifecycle owner
+
+- `src/main/main-app/mcp-sandbox/lifecycle.ts` 已接管 guest/pending attachment 两个 registry、IPC init
+  validation 与 MessagePort transfer、单次 gesture token、owner admission、guest navigation/popup hardening、
+  listener teardown 和 telemetry。BrowserWindow manager、session permission handler 与 clear-data RPC 均已
+  接回同一 owner，旧 main 内联 lifecycle 物理删除。
+- focused coverage 59 项，no-unwired gate 扩至 70 项。后续优先审计同区仍留在 main 的 sandbox prewarm/
+  request-header/session restriction policy 与 clear-data RPC；Electron protocol/session 组合根仅在能够完整
+  保持 global installation identity 时迁移。
