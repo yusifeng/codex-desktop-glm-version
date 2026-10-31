@@ -2874,3 +2874,13 @@ snapshot 重建 command map、visible/type projection、focused guest webContent
 加载期 timezone、语言/字符串长度上限与 display rounding。WindowContext 的四个 consumer 直接使用 semantic classes/functions，
 旧 `cOe/lOe/YE/yOe/EOe/DOe` 已物理删除。focused test 57 项覆盖 update、resume、dialog、menu projection/invoke、
 Appshot forwarding、signal bounds 与真实接线，邻接 application-menu、Appshot 和 WindowContext 回归通过。
+
+### 增量抽取：codex app config remote declaration runtime
+
+codex-app/config 的 remote connection declaration staging 与 remote project application 已迁移至
+`src/main/main-app/remote/codex-app-config-runtime.ts`。runtime 保留 applied-declarations pruning、已有项目预标记、
+discovered connection 追加、missing alias 抑制规则、max-retry/auto-connect changed-key 顺序、folder consent 前后重新读取
+remote projects、同 host/path 去重、label precedence、created ID prepend 和 project-order await 顺序。WindowContext 仍在首次
+remote refresh 前 stage managed connections，刷新后才把 resolved SSH connections 交给 project apply，随后按 changed keys
+刷新连接和广播 UI。旧 `uOe/dOe/fOe/pOe/mOe/hOe/gOe/XE/_Oe/vOe` 已物理删除；focused test 36 项覆盖
+stale state、existing/discovered hosts、consent deny、concurrent project insertion、warnings、order 和真实 wiring。

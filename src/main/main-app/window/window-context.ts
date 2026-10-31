@@ -166,7 +166,7 @@ export function createWindowContextClass(dependencies) {
     d,
     d1e,
     d8e,
-    dOe,
+    stageRemoteConnectionDeclarations,
     dnt,
     e,
     e4e,
@@ -177,7 +177,7 @@ export function createWindowContextClass(dependencies) {
     f,
     f8e,
     fAe,
-    fOe,
+    applyRemoteDeclarations,
     fnt,
     g,
     g8e,
@@ -1616,9 +1616,9 @@ export function createWindowContextClass(dependencies) {
       async applyCodexAppConfig(e) {
         ((this.sshConnectTimeoutSeconds = e.sshConnectTimeoutSeconds),
           await this.initialRemoteConnectionsRefresh);
-        let t = dOe({ config: e, globalState: this.appState }),
+        let t = stageRemoteConnectionDeclarations({ config: e, globalState: this.appState }),
           { remoteConnections: r } = await this.remoteConnectionsHandler.refreshRemoteConnections(),
-          i = await fOe({
+          i = await applyRemoteDeclarations({
             confirmProjectFolders: async (e, t) => (
               await this.remoteConnectionsHandler.ensureRemoteConnectionConnected(e),
               this.projectFolderConsent.confirm(e, t)

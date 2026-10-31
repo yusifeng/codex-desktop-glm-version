@@ -309,6 +309,7 @@ const { createRealtimeVoiceThreadTitleCoordinatorClass } = require("./main-app/r
 const { createRemoteConnectionsHandlerClass } = require("./main-app/remote/remote-connections-handler.js");
 const { createSshConnectionDiscovery } = require("./main-app/remote/ssh-connection-discovery.js");
 const { createRemoteControlStepUpRuntime } = require("./main-app/remote/remote-control-step-up.js");
+const { createCodexAppConfigRuntime } = require("./main-app/remote/codex-app-config-runtime.js");
 const { createRemoteControlDeviceKeyClientClass } = require("./main-app/remote/remote-control-device-key-client.js");
 const { createRemoteRpcServices } = require("./main-app/remote/remote-rpc-services.js");
 const { createRemoteHostConfigRuntime } = require("./main-app/remote/host-config-runtime.js");
@@ -25519,212 +25520,23 @@ var QDe = class {
       return this.stdioTransport.getIoStatsSnapshot();
     }
   };
-var uOe = r.i(`codex-app-config/apply`);
-function dOe({ config: e, globalState: t }) {
-  let r = t.get(n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS) ?? [],
-    i = t.get(n.iu.REMOTE_PROJECTS) ?? [],
-    o = t.get(`electron-codex-app-config-applied-remote-declarations`) ?? {},
-    s = new Set(e.remoteConnections.map((e) => e.sshAlias)),
-    c = new Map(Object.entries(o).filter(([e]) => s.has(e))),
-    l = c.size !== Object.keys(o).length,
-    u = [];
-  for (let t of e.remoteConnections) {
-    if (c.has(t.sshAlias)) continue;
-    let a = r.find((e) => e.alias?.trim() === t.sshAlias),
-      o =
-        a == null
-          ? []
-          : e.remoteConnections
-              .filter((e) => e.sshAlias === t.sshAlias)
-              .flatMap((e) => e.projects)
-              .filter((e) => XE(i, a.hostId, e.remotePath) != null)
-              .map((e) => n.va(e.remotePath));
-    (c.set(t.sshAlias, o),
-      (l = !0),
-      a ??
-        u.push({
-          hostId: n.ys(t.sshAlias),
-          displayName: t.sshAlias,
-          source: `discovered`,
-          alias: t.sshAlias,
-          hostname: null,
-          sshPort: null,
-          identity: null,
-        }));
-  }
-  return (
-    u.length > 0 && t.set(n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS, [...r, ...u]),
-    l && t.set(a.z, Object.fromEntries(c)),
-    u.length > 0
-  );
-}
-async function fOe({
-  config: e,
-  createRemoteProjectId: t = _.randomUUID,
-  confirmProjectFolders: r,
-  globalState: i,
-  setProjectOrder: a,
-  remoteConnections: o,
-}) {
-  let s = gOe(o),
-    c = i.get(`electron-codex-app-config-applied-remote-declarations`) ?? {},
-    l = new Set(
-      (i.get(n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS) ?? []).flatMap((e) => {
-        let t = e.alias?.trim();
-        return t ? [t] : [];
-      }),
-    ),
-    u = new Set(),
-    d = [];
-  for (let t of e.remoteConnections) {
-    let e = s.get(t.sshAlias);
-    if (e == null) {
-      (!Object.hasOwn(c, t.sshAlias) || l.has(t.sshAlias)) && u.add(t.sshAlias);
-      continue;
-    }
-    d.push({ connectionConfig: t, remoteConnection: e });
-  }
-  let f = new Set();
-  (pOe({ config: e, globalState: i }) && f.add(n.iu.REMOTE_CONNECTION_MAX_RETRY_ATTEMPTS),
-    mOe({ globalState: i, remoteConnectionConfigMatches: d }) &&
-      f.add(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID));
-  let p = await hOe({
-    confirmProjectFolders: r,
-    config: e,
-    createRemoteProjectId: t,
-    globalState: i,
-    setProjectOrder: a,
-    remoteConnectionConfigMatches: d,
+var { stageRemoteConnectionDeclarations, applyRemoteDeclarations } =
+  createCodexAppConfigRuntime({
+    keys: {
+      managedRemoteConnections: n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS,
+      remoteProjects: n.iu.REMOTE_PROJECTS,
+      projectOrder: n.iu.PROJECT_ORDER,
+      maxRetryAttempts: n.iu.REMOTE_CONNECTION_MAX_RETRY_ATTEMPTS,
+      autoConnectByHostId: n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID,
+      appliedRemoteDeclarations: a.z,
+    },
+    normalizeRemotePath: n.va,
+    canonicalizeRemotePath: n.ya,
+    defaultProjectLabel: n._a,
+    hostIdForSshAlias: n.ys,
+    randomUUID: _.randomUUID,
+    logger: r.i(`codex-app-config/apply`)(),
   });
-  return (
-    p.remoteProjectsChanged && f.add(n.iu.REMOTE_PROJECTS),
-    p.projectOrderChanged && f.add(n.iu.PROJECT_ORDER),
-    u.size > 0 &&
-      uOe().warning(`skipped_missing_ssh_aliases`, {
-        safe: { missingSshAliasCount: u.size },
-        sensitive: { sshAliases: Array.from(u) },
-      }),
-    {
-      changedGlobalStateKeys: Array.from(f),
-      remoteProjectsChanged: p.remoteProjectsChanged,
-      missingSshAliases: Array.from(u),
-      remoteConnectionHostIdsToConnect: Array.from(
-        new Set(
-          d
-            .filter(
-              ({ remoteConnection: e }) =>
-                i.get(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID)?.[e.hostId] !== !1,
-            )
-            .map(({ remoteConnection: e }) => e.hostId),
-        ),
-      ),
-    }
-  );
-}
-function pOe({ config: e, globalState: t }) {
-  let r = n.iu.REMOTE_CONNECTION_MAX_RETRY_ATTEMPTS,
-    i = e.remoteConnectionMaxRetryAttempts;
-  return (t.get(r) ?? void 0) !== i && (t.set(r, i), !0);
-}
-function mOe({ globalState: e, remoteConnectionConfigMatches: t }) {
-  let r = e.get(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID) ?? {},
-    i = r,
-    a = !1;
-  for (let { remoteConnection: e } of t)
-    r[e.hostId] ?? ((a ||= ((i = { ...r }), !0)), (i[e.hostId] = !0));
-  return a ? (e.set(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID, i), !0) : !1;
-}
-async function hOe({
-  confirmProjectFolders: e,
-  config: t,
-  createRemoteProjectId: r,
-  globalState: i,
-  setProjectOrder: o,
-  remoteConnectionConfigMatches: s,
-}) {
-  let c = i.get(n.iu.REMOTE_PROJECTS) ?? [],
-    l = new Map(
-      Object.entries(i.get(`electron-codex-app-config-applied-remote-declarations`) ?? {}),
-    ),
-    u = !1;
-  for (let [e, r] of l) {
-    let i = t.remoteConnections.filter((t) => t.sshAlias === e);
-    if (i.length === 0) continue;
-    let a = new Set(i.flatMap((e) => e.projects.map((e) => n.va(e.remotePath)))),
-      o = r.filter((e) => a.has(e));
-    o.length !== r.length && (l.set(e, o), (u = !0));
-  }
-  let d = new Map(),
-    f = [];
-  for (let { connectionConfig: t, remoteConnection: a } of s) {
-    let o = [...(l.get(t.sshAlias) ?? [])],
-      s = new Set(o),
-      p = t.projects
-        .map((e) => n.ya(e.remotePath))
-        .filter((e) => !s.has(n.va(e)) && XE(c, a.hostId, e) == null),
-      m = p.length === 0 || (await e(a.hostId, p));
-    c = i.get(n.iu.REMOTE_PROJECTS) ?? [];
-    for (let e of t.projects) {
-      let i = n.ya(e.remotePath),
-        p = n.va(i),
-        h = `${a.hostId}:${p}`,
-        g = d.get(h) ?? XE(c, a.hostId, i);
-      if ((g == null && s.has(p)) || (g == null && !m)) continue;
-      let _ = g?.id ?? r();
-      (g ?? f.push(_),
-        s.has(p) || (s.add(p), o.push(p), l.set(t.sshAlias, o), (u = !0)),
-        d.set(h, {
-          id: _,
-          hostId: a.hostId,
-          remotePath: i,
-          label: e.label?.trim() || g?.label || n._a(i),
-        }));
-    }
-  }
-  if ((u && i.set(a.z, Object.fromEntries(l)), d.size === 0))
-    return { remoteProjectsChanged: !1, projectOrderChanged: !1 };
-  let p = Array.from(d.values()),
-    m = i.get(n.iu.PROJECT_ORDER) ?? [],
-    h = [...p, ...c.filter((e) => !d.has(`${e.hostId}:${n.va(e.remotePath)}`))],
-    g = [...f, ...m],
-    _ = !_Oe(c, h),
-    v = !vOe(m, g);
-  return (
-    _ && i.set(n.iu.REMOTE_PROJECTS, h),
-    v && (await o(g)),
-    { remoteProjectsChanged: _, projectOrderChanged: v }
-  );
-}
-function gOe(e) {
-  let t = new Map();
-  for (let n of e) {
-    let e = n.sshAlias?.trim();
-    e && !t.has(e) && t.set(e, n);
-  }
-  return t;
-}
-function XE(e, t, r) {
-  let i = n.va(r);
-  return e.find((e) => e.hostId === t && n.va(e.remotePath) === i) ?? null;
-}
-function _Oe(e, t) {
-  return (
-    e.length === t.length &&
-    e.every((e, n) => {
-      let r = t[n];
-      return (
-        r != null &&
-        e.id === r.id &&
-        e.hostId === r.hostId &&
-        e.remotePath === r.remotePath &&
-        e.label === r.label
-      );
-    })
-  );
-}
-function vOe(e, t) {
-  return e.length === t.length && e.every((e, n) => e === t[n]);
-}
 var AOe = createHabitatAutomationsServiceClass({
   automationRuntime: n,
   desktopApiRuntime: a,
@@ -74910,7 +74722,7 @@ var G5 = r.r(`WindowContext`),
     d,
     d1e,
     d8e,
-    dOe,
+    stageRemoteConnectionDeclarations,
     dnt,
     e,
     e4e,
@@ -74921,7 +74733,7 @@ var G5 = r.r(`WindowContext`),
     f,
     f8e,
     fAe,
-    fOe,
+    applyRemoteDeclarations,
     fnt,
     g,
     g8e,

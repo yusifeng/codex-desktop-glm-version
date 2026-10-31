@@ -4854,3 +4854,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 `cOe/lOe/YE/yOe/EOe/DOe` 及更新文案/schema/constants 共 173 行已删除，新生产模块 367 行；focused
   coverage 57 项，application-menu/Appshot/WindowContext 回归 19/59/16 项，no-unwired gate 扩至 339 项。下一批审计
   相邻 codex-app-config remote declaration/apply owner，保持 global-state 写入与 project-order side-effect 顺序。
+
+# 2026-11-01 codex app config remote declaration runtime
+
+- `src/main/main-app/remote/codex-app-config-runtime.ts` 已接管 managed SSH connection staging、stale declaration pruning、
+  missing alias classification、retry/auto-connect defaults、folder consent、concurrent project-state re-read、remote project merge、
+  created-project order prepend 与 connect target projection；WindowContext 保持先 stage、refresh connections、再 apply projects 的顺序。
+- main 旧 `uOe/dOe/fOe/pOe/mOe/hOe/gOe/XE/_Oe/vOe` 207 行已删除，新生产模块 417 行；focused
+  coverage 36 项，WindowContext/no-unwired 回归覆盖真实接线，no-unwired gate 扩至 351 项。下一批越过已迁 config owner，
+  继续审计 host storage/registry 或后续浏览器配置 state owners，不重复迁移现有 project managers。

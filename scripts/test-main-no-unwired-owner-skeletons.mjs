@@ -46,6 +46,7 @@ const realOwners = [
   ["src/main/main-app/window/rpc-service-adapters.ts", "createWindowRpcServiceAdapters"],
   ["src/main/main-app/account/account-inputs-owner.ts", "createAccountInputsOwnerClass"],
   ["src/main/main-app/window/desktop-capability-services.ts", "createDesktopCapabilityServices"],
+  ["src/main/main-app/remote/codex-app-config-runtime.ts", "createCodexAppConfigRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -324,6 +325,16 @@ assert.equal(main.includes("yOe = class extends"), false, "generated appshot cap
 assert.equal(main.includes("function EOe("), false, "generated environment signal reader must be removed");
 assert.equal(main.includes("function DOe("), false, "generated environment signal projector must be removed");
 assert.equal(main.includes("ApplicationMenuSnapshotService,"), true, "semantic menu snapshot service must be wired");
+assert.equal(main.includes("createCodexAppConfigRuntime({"), true, "real codex app config runtime is wired");
+assert.equal(main.includes("function dOe("), false, "generated remote connection declaration stager must be removed");
+assert.equal(main.includes("async function fOe("), false, "generated remote declaration apply owner must be removed");
+assert.equal(main.includes("function pOe("), false, "generated retry state updater must be removed");
+assert.equal(main.includes("function mOe("), false, "generated auto-connect initializer must be removed");
+assert.equal(main.includes("async function hOe("), false, "generated remote project declaration owner must be removed");
+assert.equal(main.includes("function gOe("), false, "generated SSH alias indexer must be removed");
+assert.equal(main.includes("function XE("), false, "generated remote project finder must be removed");
+assert.equal(main.includes("function _Oe("), false, "generated remote project comparator must be removed");
+assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("339 main unwired-owner skeleton assertions passed");
+console.log("351 main unwired-owner skeleton assertions passed");
