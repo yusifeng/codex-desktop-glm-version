@@ -4735,3 +4735,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 discovery helpers 删除 183 行，新生产模块 227 行；focused coverage 29 项，no-unwired gate 扩至
   204 项。下一批继续处理其后 remote-control step-up OAuth/callback lifecycle，或在边界审计后转向更大的
   first-party owner；不迁移紧随其后的 serialization/vendor runtime。
+
+# 2026-11-01 remote-control enrollment step-up owner
+
+- `src/main/main-app/remote/remote-control-step-up.ts` 已接管 issuer/env、PKCE、authorize URL、workspace scope、
+  双 callback port、state/error/code validation、timeout/cancel settle、success page、token exchange 与 cleanup；
+  `RemoteConnectionsHandler` 继续作为唯一业务 consumer，直接消费 factory output。
+- main 旧 constants/schema/helpers 删除 372 行，新生产模块 373 行；focused coverage 53 项，no-unwired gate
+  扩至 219 项。紧随其后的 serialization runtime 明确保留为 vendor/generated；下一批转向仍内联的第一方
+  marketplace listing、remote 组合根或后续大型 owner，避免把 vendor codec 误算成业务迁移量。

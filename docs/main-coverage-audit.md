@@ -2734,3 +2734,13 @@ SSH config entrypoint 检查、递归 `Include`/glob/cycle traversal、literal H
 helpers 与 discovery logger/constants 已物理删除。focused test
 `scripts/test-main-ssh-connection-discovery-owner.mjs` 覆盖 29 项 directive、include、cycle、filter、command 与
 connection projection 行为。
+
+### 增量抽取：remote-control enrollment step-up owner
+
+remote-control enrollment 的 issuer/env policy、PKCE verifier/challenge、authorize URL/workspace restriction、
+双端口 loopback callback server、path/state/error/code validation、timeout/cancel settle gate、成功页、token exchange
+与 finally cleanup 已整体迁移至 `src/main/main-app/remote/remote-control-step-up.ts`。main 通过
+`createRemoteControlStepUpRuntime` 将唯一 `requestRemoteControlEnrollmentStepUpToken` consumer 直接注入既有
+`RemoteConnectionsHandler`；旧 `y5e/b5e/x5e/o4/S5e/s4/C5e/w5e/c4/T5e` helpers、schema 和 OAuth constants
+已物理删除。focused test `scripts/test-main-remote-control-step-up-owner.mjs` 覆盖 53 项 PKCE、URL、token body、
+port fallback、callback validation、OAuth error、timeout、cancel、browser-open failure 与 end-to-end cleanup 行为。

@@ -29,6 +29,7 @@ const realOwners = [
   ["src/main/main-app/open-target/native-shell-targets.ts", "createNativeShellTargetRuntime"],
   ["src/main/main-app/misc/primary-runtime-installer.ts", "createPrimaryRuntimeInstaller"],
   ["src/main/main-app/remote/ssh-connection-discovery.ts", "createSshConnectionDiscovery"],
+  ["src/main/main-app/remote/remote-control-step-up.ts", "createRemoteControlStepUpRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -202,6 +203,19 @@ assert.equal(main.includes("function l5e("), false, "generated literal-host sele
 assert.equal(main.includes("function n4("), false, "generated SSH directive value projector must be removed");
 assert.equal(main.includes("function u5e("), false, "generated SSH scalar directive projector must be removed");
 assert.equal(main.includes("function d5e("), false, "generated SSH home expansion must be removed");
+assert.equal(main.includes("createRemoteControlStepUpRuntime({"), true, "real remote-control step-up owner is wired");
+assert.equal(main.includes("async function y5e("), false, "generated remote-control step-up flow must be removed");
+assert.equal(main.includes("function b5e("), false, "generated OAuth authorize URL builder must be removed");
+assert.equal(main.includes("function x5e("), false, "generated login issuer resolver must be removed");
+assert.equal(main.includes("function o4("), false, "generated issuer normalizer must be removed");
+assert.equal(main.includes("function S5e("), false, "generated PKCE owner must be removed");
+assert.equal(main.includes("function s4("), false, "generated OAuth random-state helper must be removed");
+assert.equal(main.includes("async function C5e("), false, "generated OAuth token exchanger must be removed");
+assert.equal(main.includes("async function w5e("), false, "generated OAuth callback server must be removed");
+assert.equal(main.includes("function c4("), false, "generated callback text response writer must be removed");
+assert.equal(main.includes("function T5e("), false, "generated callback success page writer must be removed");
+assert.equal(main.includes("app_EMoamEEZ73f0CkXaXp7hrann"), false, "generated OAuth client configuration must be removed");
+assert.equal(main.includes("CODEX_APP_SERVER_LOGIN_ISSUER"), false, "generated issuer environment policy must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("204 main unwired-owner skeleton assertions passed");
+console.log("219 main unwired-owner skeleton assertions passed");
