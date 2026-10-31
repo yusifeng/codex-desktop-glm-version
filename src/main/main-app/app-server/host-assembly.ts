@@ -65,8 +65,15 @@ import { isSameAuthIdentity } from "../api/desktop-fetch";
 import { createHostThreadReadState as createHostThreadReadStateController } from "../conversation/thread-read-state-controller";
 import { DynamicAppToolPendingResponses } from "./dynamic-app-tool-pending-responses";
 import { runAppServerRequestLifecycle } from "../conversation/app-server-request-lifecycle-controller";
+import { AppServerConversationManager } from "../conversation/app-server-manager";
+import { createThreadStreamBroadcastHandlers } from "./cloud-backend";
 
-const createHostThreadReadState = (dependencies: Parameters<typeof createHostThreadReadStateController>[0]) =>
+const createHostThreadReadState = (
+  dependencies: Omit<
+    Parameters<typeof createHostThreadReadStateController>[0],
+    "isSameAuthIdentity"
+  >,
+) =>
   createHostThreadReadStateController({ ...dependencies, isSameAuthIdentity });
 
 // ---------------------------------------------------------------------------
@@ -462,7 +469,7 @@ interface HostServicesDeps {
   remoteConnections: { startRemoteChatgptLoginPortForward(a: unknown, b: unknown): Promise<void>; stopRemoteChatgptLoginPortForward(a: unknown, b: unknown): Promise<void> };
   archive: { archiveInactiveThread(opts: unknown): Promise<unknown>; deleteAllArchivedThreads(opts: { hostId: string }): Promise<{ deletedThreadIds: string[] }>; deleteArchivedThread(opts: { hostId: string; threadId: string }): Promise<{ deletedThreadIds: string[] }> };
   catalog: { removeMissingEntry(threadId: string): Promise<boolean> } | null;
-  accountId: string | null;
+  accountId: () => string | null;
   pauseRestrictedRuntime: unknown;
   assertCurrent(): void;
 }
@@ -862,7 +869,7 @@ async function subscribeCatalogThreads({
   assertCurrent,
 }: {
   manager: { refreshRecentConversations(opts: { mode: string }): Promise<void>; getHostId(): string; observeCatalogThreads(threads: unknown): void };
-  catalog: { subscribeThreadObservations(cb: (observation: { hostId: string; threads: unknown }) => void): () => void };
+  catalog: { subscribeThreadObservations(cb: (observation: { hostId: string; threads: unknown }) => void): { dispose(): void } };
   assertCurrent(): void;
 }) {
   assertCurrent();
@@ -881,6 +888,201 @@ async function subscribeCatalogThreads({
   });
 }
 
+// ---------------------------------------------------------------------------
+// Hosted manager composition（原 `FEe`）与 execution-path RPC（原 `IEe`）
+// ---------------------------------------------------------------------------
+
+type HostedManagerFactoryDependencies = {
+  HostClientCoordination: new (
+    hostId: string,
+    errorReporter: unknown,
+    getThreadReadStateContext: unknown,
+    assertCurrent: () => void,
+  ) => any;
+  serializeConversationState(value: unknown): unknown;
+};
+
+/**
+ * 完整装配单个 host 的 AppServerConversationManager。
+ *
+ * 保留原 `FEe` 的两阶段生命周期：read-state owner 先建立，manager 成功后才
+ * 绑定 request/coordination；任一阶段失败均按 abort → router → catalog →
+ * manager → read-state → coordination 的顺序回收。
+ */
+function createHostedAppServerManagerFactory(dependencies: HostedManagerFactoryDependencies) {
+  return async function createHostedAppServerManager(options: any) {
+    const { connection, context, fetchHandler, assertCurrent } = options;
+    assertCurrent();
+    const settings = fetchHandler.settings;
+    if (settings == null) throw Error("Settings store unavailable");
+
+    const accountId = () =>
+      context.identity.kind === "chatgpt" ? context.identity.accountId : null;
+    const filesystem = createHostContext({
+      executionHost: options.executionHost,
+      fetchHandler,
+      settings,
+      restricted: options.restricted?.initialization,
+      getRestrictedTaskRoot: options.restricted?.getTaskRoot,
+      assertCurrent,
+    });
+    const readState = await createHostThreadReadState({
+      owner: options.threadReadState,
+      subscribeIdentityChanges: options.subscribeIdentityChanges,
+      hostId: options.hostId,
+      context,
+      assertCurrent,
+      assertLifetimeCurrent: options.assertLifetimeCurrent,
+    });
+
+    let coordination: any;
+    const abortController = new AbortController();
+    const router = new HostRequestRouter(
+      connection,
+      assertCurrent,
+      options.assertLifetimeCurrent,
+    );
+    let manager: AppServerConversationManager | null = null;
+    let catalogSubscription: { dispose(): void } | null = null;
+
+    try {
+      assertCurrent();
+      if (options.localClientCoordinationEnabled) {
+        coordination = new dependencies.HostClientCoordination(
+          options.hostId,
+          options.errorReporter,
+          options.getThreadReadStateContext,
+          assertCurrent,
+        );
+      }
+      const logger = createTaggedLogger("host-app-server-manager");
+      const hostedManager = new AppServerConversationManager({
+        hostId: options.hostId,
+        transport: new AppServerRequestSender(connection, options.hostId, assertCurrent),
+        logger,
+        threadExecution: options.threadExecution ?? null,
+        pendingThreadArchives: {
+          add(threadId: string, placement: unknown) {
+            assertCurrent();
+            connection.registerArchiveThread(threadId, placement);
+          },
+          remove(threadId: string) {
+            assertCurrent();
+            connection.registerUnarchiveThread(threadId);
+          },
+        },
+        sendAppServerResponse(method: string, response: { id: string }) {
+          router.sendResponse(method, response).catch((error) => {
+            logger.warning("Hosted server response failed", {
+              safe: {},
+              sensitive: { error },
+            });
+          });
+        },
+        ipcBridge: coordination?.bridge ?? null,
+        coordination:
+          coordination == null
+            ? null
+            : createThreadStreamBroadcastHandlers(
+                coordination.bridge,
+                dependencies.serializeConversationState,
+              ),
+        queuedMessageCoordination: coordination?.queuedMessages,
+        scheduler: {
+          schedule(callback: () => void, delayMs: number) {
+            const timeout = setTimeout(callback, delayMs);
+            return () => clearTimeout(timeout);
+          },
+          scheduleMicrotask: queueMicrotask,
+        },
+        threadProjectAssignments: options.threadProjectAssignments,
+        savedReadState: readState.state,
+        storage: createHostStorage({
+          globalState: options.globalState,
+          fetchHandler,
+          windowManager: options.windowManager,
+          assertCurrent,
+        }),
+        filesystem,
+        settings: createHostExecutionConfig({
+          hostId: options.hostId,
+          globalState: options.globalState,
+          settings,
+          settingsStore: options.settingsStore,
+          evaluations: options.evaluations,
+          getAppServerVersion: () => connection.appServerVersion,
+          fetchHandler,
+          accountId,
+          catalog: options.catalog,
+          restricted: options.restricted?.resume,
+          assertCurrent,
+        }),
+        runtime: createHostServices({
+          executionHost: options.executionHost,
+          fetchHandler,
+          remoteConnections: options.remoteConnections,
+          archive: options.archive,
+          catalog: options.catalog,
+          accountId,
+          pauseRestrictedRuntime: options.restricted?.pauseRuntime,
+          assertCurrent,
+        }),
+      });
+      manager = hostedManager;
+
+      if (options.threadExecution != null) {
+        coordination?.bind(hostedManager);
+        router.bind(hostedManager);
+      }
+      catalogSubscription =
+        options.catalog == null
+          ? null
+          : await subscribeCatalogThreads({
+              manager: hostedManager,
+              catalog: options.catalog,
+              assertCurrent,
+            });
+
+      const activeCoordination = coordination;
+      return {
+        manager: hostedManager,
+        signal: abortController.signal,
+        callInteractiveDynamicAppTool: (request: any, signal: AbortSignal) =>
+          router.callInteractiveDynamicAppTool(request, signal),
+        dispose() {
+          abortController.abort();
+          router.dispose();
+          catalogSubscription?.dispose();
+          AppServerConversationManager.dispose(hostedManager);
+          readState.dispose();
+          activeCoordination?.dispose();
+        },
+      };
+    } catch (error) {
+      abortController.abort();
+      router.dispose();
+      catalogSubscription?.dispose();
+      if (manager != null) AppServerConversationManager.dispose(manager);
+      readState.dispose();
+      coordination?.dispose();
+      throw error;
+    }
+  };
+}
+
+/** Thin RPC endpoint retained because the base class supplies dispatch metadata. */
+function createCodexHomeServiceClass(RpcHandlerBase: new (...args: any[]) => any) {
+  return class CodexHomeService extends RpcHandlerBase {
+    constructor(private readonly fetchHandler: any) {
+      super();
+    }
+
+    readCodexHome(input: unknown) {
+      return this.fetchHandler.readCodexHome(input);
+    }
+  };
+}
+
 export {
   DynamicAppToolPendingResponses,
   HostRequestRouter,
@@ -895,6 +1097,8 @@ export {
   createHostExecutionConfig,
   createHostStorage,
   subscribeCatalogThreads,
+  createHostedAppServerManagerFactory,
+  createCodexHomeServiceClass,
   type HostConnectionLike,
   type RouterManagerTarget,
 };

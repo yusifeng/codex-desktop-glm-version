@@ -143,8 +143,8 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-equal(main.includes("LEe = createHostedManagerRegistryClass({"), true);
-equal(main.includes("LEe = class"), false);
-equal(/\bLEe\b/.test(main), true);
+equal(main.includes("HostedManagerRegistry = createHostedManagerRegistryClass({"), true);
+equal(main.includes("LEe = createHostedManagerRegistryClass({"), false);
+equal(/\bLEe\b/.test(main), false);
 
 console.log(`${assertions} main hosted manager registry owner assertions passed`);

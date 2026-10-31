@@ -4863,3 +4863,13 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 `uOe/dOe/fOe/pOe/mOe/hOe/gOe/XE/_Oe/vOe` 207 行已删除，新生产模块 417 行；focused
   coverage 36 项，WindowContext/no-unwired 回归覆盖真实接线，no-unwired gate 扩至 351 项。下一批越过已迁 config owner，
   继续审计 host storage/registry 或后续浏览器配置 state owners，不重复迁移现有 project managers。
+
+# 2026-11-01 host AppServer manager composition
+
+- `app-server/host-client-coordination.ts` 已接管 per-host lazy IPC session、protocol-gated broadcasts、request readiness/abort、
+  thread ownership/follower forwarding、stream/queued-message bridges 和 cleanup；`app-server/host-assembly.ts` 已从 helpers
+  提升为完整 hosted `AppServerConversationManager` composition owner。
+- `WindowContext` 直接使用 `HostedManagerRegistry`、`createHostedAppServerManager` 和 `CodexHomeService`；main 旧 host
+  coordination/router/context/read-state/request/runtime/storage/catalog/final assembly 共约 1050 行已物理删除。focused coverage
+  46 项，registry/no-unwired/WindowContext 邻接回归纳入验证。下一批从删除后的 remote-control/browser-config 区域继续审计
+  尚未语义化的第一方状态 owner，保留无法无损拆分的组合根和 vendor belts。

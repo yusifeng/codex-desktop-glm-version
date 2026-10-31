@@ -37,7 +37,7 @@ export function createWindowContextClass(dependencies) {
     F,
     F5e,
     F8e,
-    FEe,
+    createHostedAppServerManager,
     FOe,
     Fnt,
     G,
@@ -53,7 +53,7 @@ export function createWindowContextClass(dependencies) {
     Het,
     I,
     I5,
-    IEe,
+    CodexHomeService,
     IO,
     UpdateCapabilityService,
     IXe,
@@ -70,7 +70,7 @@ export function createWindowContextClass(dependencies) {
     L,
     L6e,
     L8e,
-    LEe,
+    HostedManagerRegistry,
     Ln,
     Lwe,
     M,
@@ -1040,12 +1040,12 @@ export function createWindowContextClass(dependencies) {
             () => t.dispose()
           );
         };
-        ((this.hostAppServerManagers = new LEe({
+        ((this.hostAppServerManagers = new HostedManagerRegistry({
           connections: this.appServerConnectionRegistry,
           localConnection: r,
           readContext: this.threadReadState.getContext,
           create: (t) =>
-            FEe({
+            createHostedAppServerManager({
               ...t,
               localClientCoordinationEnabled: this.localClientCoordinationEnabled,
               executionHost: this.executionHostRegistry.get(t.hostId),
@@ -1313,7 +1313,7 @@ export function createWindowContextClass(dependencies) {
             projectFolderConsent: this.projectFolderConsent.serviceForWindow(e),
             sshConnectionRegistration: new ett(this.appState, this.remoteConnectionsHandler),
             projectlessWorkspace: new V6e(e, this.options.settingsStore),
-            executionPaths: new IEe(this.fetchHandler),
+            executionPaths: new CodexHomeService(this.fetchHandler),
             localThreadCatalog: d,
             localAutomationsScheduler:
               this.options.windowManager.getRendererWindowLogFields(e).rendererWindowAppearance ===

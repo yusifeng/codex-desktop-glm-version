@@ -175,6 +175,7 @@ export interface AppServerManagerOptions {
   threadExecution: any;
   ipcBridge: any;
   coordination: any;
+  queuedMessageCoordination?: any;
   scheduler: { schedule: any; scheduleMicrotask?: any };
   storage: any;
   threadProjectAssignments: any;
@@ -1627,7 +1628,7 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     this.prewarmedThreadManager.discardAllPrewarmedThreads();
   }
 
-  markAllConversationsNeedResumeAfterReconnect(options: any) {
+  markAllConversationsNeedResumeAfterReconnect(options?: any) {
     this.turnStartObservations.clear();
     this.streamRecovery.markAllConversationsNeedResumeAfterReconnect(options);
   }

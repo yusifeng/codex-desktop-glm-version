@@ -2884,3 +2884,15 @@ remote projects、同 host/path 去重、label precedence、created ID prepend �
 remote refresh 前 stage managed connections，刷新后才把 resolved SSH connections 交给 project apply，随后按 changed keys
 刷新连接和广播 UI。旧 `uOe/dOe/fOe/pOe/mOe/hOe/gOe/XE/_Oe/vOe` 已物理删除；focused test 36 项覆盖
 stale state、existing/discovered hosts、consent deny、concurrent project insertion、warnings、order 和真实 wiring。
+
+### 增量抽取：host AppServer manager composition
+
+每 host 的 desktop client coordination session、protocol-version broadcast filtering、request readiness/abort/host routing、
+thread ownership registration、queued-follow-up host scope 和 dispose 已迁移至
+`src/main/main-app/app-server/host-client-coordination.ts`。`src/main/main-app/app-server/host-assembly.ts` 现完整装配
+`AppServerConversationManager`、request router、read-state、storage、execution/runtime services、catalog subscription 和
+thread-stream coordination，并保留成功/失败路径的 abort/router/catalog/manager/read-state/coordination cleanup 顺序。
+`WindowContext` 直接消费新的 hosted manager factory、registry 与 CodexHome RPC class；原始 chunk 中
+`yEe/bEe/IT/xEe/SEe/CEe/wEe/EEe/DEe/RT/zT/BT/OEe/kEe/AEe/jEe/NEe/PEe/FEe/IEe/LEe` 整段重复实现已物理删除。
+focused test 覆盖 lazy session、protocol gate、local/remote request、abort、stream/queue projection、owner binding、dispose、
+assembly wiring 和旧符号移除；registry、WindowContext 与 no-unwired 邻接回归同步执行。
