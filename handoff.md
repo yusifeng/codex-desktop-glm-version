@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `bst` worker process/RPC manager 迁入 `worker/worker-manager.ts`；workerData/MessagePort startup、analytics/auth/
+tracing updates、listener/exit lifecycle、git graceful flush、Sentry/main RPC sessions、CES cancellation/telemetry、OTel export、
+typed success/error response 与 teardown 均由新 class 持有。真实 worker buses 已接回，旧 class 已删除。
+
 随后将 `H9` worker bus owner 迁入 `worker/worker-bus.ts`；renderer/host pending requests、method/result validation、
 AbortSignal cancellation、webContents lifecycle cleanup、worker-exit rejection、host listeners、performance single-recipient、
 host-only 与 broadcast routing，以及 worker-manager delegation 均由新 class 持有。真实 git/open-in buses 已接回。

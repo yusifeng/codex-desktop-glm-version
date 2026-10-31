@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 worker process/RPC manager
+
+原 `bst` 已迁入 `src/main/main-app/worker/worker-manager.ts`。新 class 保留 workerData/MessagePort construction、
+analytics/auth/tracing propagation、git graceful flush、Sentry/main RPC session lifecycle、CES cancellation/telemetry、OTel export、
+success/error response projection 与 exit cleanup；真实 worker buses 已接回，旧 class 已删除。
+
 ## 2026-10-31 worker bus owner
 
 原 `H9` 已迁入 `src/main/main-app/worker/worker-bus.ts`。新 class 保留 renderer/host pending request maps、response

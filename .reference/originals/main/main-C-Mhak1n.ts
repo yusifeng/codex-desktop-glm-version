@@ -44,6 +44,7 @@ const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js
 const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transport.js");
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createWorkerBusClass } = require("./main-app/worker/worker-bus.js");
+const { createWorkerManagerClass } = require("./main-app/worker/worker-manager.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
@@ -149621,263 +149622,24 @@ function vst(e) {
   return isWorkerMainRpcRequest(e);
 }
 var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
-  bst = class {
-    id;
-    startupConfig;
-    applicationNetwork;
-    worker = null;
-    desktopTraceSampleRate = a.Zt.desktopTraceSampleRate;
-    latestAuthUser = null;
-    listeners = new Set();
-    exitListeners = new Set();
-    mainRpcHandler = null;
-    mainRpcTarget = null;
-    sentryRpcSessions = new WeakMap();
-    mainRpcSessions = new WeakMap();
-    exitedWorkers = new WeakSet();
-    disposedWorkers = new WeakSet();
-    cesRequests = new WeakMap();
-    constructor(e, t, n) {
-      ((this.id = e), (this.startupConfig = t), (this.applicationNetwork = n));
-    }
-    dispose() {
-      this.flushAndDispose();
-    }
-    flushAndDispose() {
-      let e = this.worker;
-      return e
-        ? ((this.worker = null),
-          this.disposedWorkers.add(e),
-          this.id !== `git` || !a.T()
-            ? (this.handleWorkerExit(e), e.terminate(), Promise.resolve())
-            : new Promise((t) => {
-                let n = () => {
-                    (clearTimeout(r), t());
-                  },
-                  r = setTimeout(() => {
-                    (this.handleWorkerExit(e), e.terminate().then(n, n));
-                  }, 11e3);
-                (r.unref(), e.on(`exit`, n), e.postMessage({ type: `worker-flush-and-exit` }));
-              }))
-        : Promise.resolve();
-    }
-    addListener(e) {
-      return (
-        this.listeners.add(e),
-        () => {
-          this.listeners.delete(e);
-        }
-      );
-    }
-    addExitListener(e) {
-      return (
-        this.exitListeners.add(e),
-        () => {
-          this.exitListeners.delete(e);
-        }
-      );
-    }
-    setMainRpcHandler(e) {
-      this.mainRpcHandler = e;
-    }
-    setMainRpcTarget(e) {
-      if (this.worker != null)
-        throw Error(`Main RPC target must be set before starting the worker`);
-      this.mainRpcTarget = e;
-    }
-    postMessage(e) {
-      this.ensureWorker().postMessage(e);
-    }
-    start() {
-      this.ensureWorker();
-    }
-    setSentryUser(e, t, n, r) {
-      this.latestAuthUser = { authMethod: e, userId: t, email: n, accountId: r };
-      let i = this.worker;
-      i &&
-        i.postMessage({
-          type: `worker-sentry-user-update`,
-          authMethod: e,
-          userId: t,
-          email: n,
-          accountId: r,
-        });
-    }
-    emitAppEvent(e) {
-      let t = this.worker;
-      t && t.postMessage({ type: `worker-app-event`, event: e });
-    }
-    emitGitTurnComplete(e, t) {
-      this.worker?.postMessage({ type: `worker-git-turn-complete`, cwds: e, hostId: t });
-    }
-    setTracingSampleRate(e) {
-      ((this.desktopTraceSampleRate = e),
-        this.worker?.postMessage({ type: `worker-tracing-sample-rate-update`, sampleRate: e }));
-    }
-    ensureWorker() {
-      if (this.worker) return this.worker;
-      let e = r.r(`worker-manager`),
-        t = (0, h.join)(__dirname, `worker.js`),
-        i = a.gn(a.in.resolve()),
-        o = l.app.isPackaged ? l.app.getAppPath() : process.cwd(),
-        s = this.mainRpcTarget == null ? null : new B.MessageChannel(),
-        c = this.startupConfig.getResolved(),
-        u = new B.MessageChannel(),
-        d = {
-          sentryRpcPort: u.port2,
-          analyticsEnabled: c != null && c.analytics?.enabled !== !1,
-          workerId: this.id,
-          sentryInitOptions: { ...a.Zt, desktopTraceSampleRate: this.desktopTraceSampleRate },
-          maxLogLevel: i,
-          sentryRewriteFramesRoot: o,
-          spawnInsideWsl: n.Ri(),
-          mainRpcPort: s?.port2 ?? null,
-        },
-        f = new B.Worker(t, {
-          name: this.id,
-          workerData: d,
-          transferList: [u.port2, ...(s == null ? [] : [s.port2])],
-        });
-      return (
-        this.sentryRpcSessions.set(f, B9(u.port1, new hst())),
-        s != null &&
-          this.mainRpcTarget != null &&
-          this.mainRpcSessions.set(f, B9(s.port1, this.mainRpcTarget)),
-        this.cesRequests.set(f, new Map()),
-        f.on(`message`, (e) => {
-          if (_st(e)) {
-            e.workerId === this.id && this.cesRequests.get(f)?.get(e.requestId)?.abort();
-            return;
-          }
-          if (vst(e)) {
-            this.handleMainRpcRequest(f, e);
-            return;
-          }
-          this.listeners.forEach((t) => {
-            t(e);
-          });
-        }),
-        f.on(`error`, (t) => {
-          e.warning(`Worker error`, { safe: {}, sensitive: { error: t } });
-        }),
-        f.on(`exit`, (t) => {
-          (this.worker === f && (this.worker = null),
-            this.handleWorkerExit(f),
-            t !== 0 &&
-              !this.disposedWorkers.has(f) &&
-              e.warning(`Worker exited`, { safe: { code: t }, sensitive: {} }));
-        }),
-        f.unref(),
-        (this.worker = f),
-        c ??
-          this.startupConfig.get().then(
-            (e) => {
-              this.worker === f &&
-                f.postMessage({
-                  type: `worker-analytics-enabled-update`,
-                  enabled: e.analytics?.enabled !== !1,
-                });
-            },
-            () => void 0,
-          ),
-        this.latestAuthUser &&
-          f.postMessage({
-            type: `worker-sentry-user-update`,
-            authMethod: this.latestAuthUser.authMethod,
-            userId: this.latestAuthUser.userId,
-            email: this.latestAuthUser.email,
-            accountId: this.latestAuthUser.accountId,
-          }),
-        f
-      );
-    }
-    async handleMainRpcRequest(e, t) {
-      let n = r.r(`worker-manager`);
-      if (t.workerId !== this.id) {
-        n.warning(`Received main RPC request for wrong worker`, {
-          safe: { expectedWorkerId: this.id, workerId: t.workerId, method: t.method },
-        });
-        return;
-      }
-      if (this.exitedWorkers.has(e)) return;
-      let i = t.method === `otel-export` && `bytes` in t.params ? t.params.bytes : null,
-        o = this.mainRpcHandler;
-      if (
-        (t.method === `ces-telemetry`
-          ? (o = async () => {
-              let startup = this.startupConfig.getResolved();
-              if (startup == null || startup.analytics?.enabled === !1) return { status: 204, body: null };
-              let r = new AbortController(),
-                i = this.cesRequests.get(e);
-              i?.set(t.requestId, r);
-              try {
-                return await sendTelemetryRequest(this.applicationNetwork, yst.parse(t.params), r.signal, n.mt);
-              } finally {
-                i?.delete(t.requestId);
-              }
-            })
-          : i != null && (o = async () => (await a.S(i), {})),
-        !o)
-      ) {
-        let n = {
-          type: `worker-main-rpc-response`,
-          workerId: this.id,
-          requestId: t.requestId,
-          method: t.method,
-          result: {
-            type: `error`,
-            error: { message: `No main RPC handler configured for worker '${this.id}'` },
-          },
-        };
-        e.postMessage(n);
-        return;
-      }
-      try {
-        let n = await o(t),
-          r = {
-            type: `worker-main-rpc-response`,
-            workerId: this.id,
-            requestId: t.requestId,
-            method: t.method,
-            result: { type: `ok`, value: n },
-          };
-        this.exitedWorkers.has(e) || e.postMessage(r);
-      } catch (n) {
-        let r =
-            typeof n == `object` && n && `code` in n && typeof n.code == `string` ? n.code : void 0,
-          i = {
-            type: `worker-main-rpc-response`,
-            workerId: this.id,
-            requestId: t.requestId,
-            method: t.method,
-            result: {
-              type: `error`,
-              error: {
-                ...(r == null ? {} : { code: r }),
-                message:
-                  n instanceof Error
-                    ? n.message
-                    : `Failed to handle main RPC request: ${String(n)}`,
-              },
-            },
-          };
-        this.exitedWorkers.has(e) || e.postMessage(i);
-      }
-    }
-    handleWorkerExit(e) {
-      this.exitedWorkers.has(e) ||
-        (this.exitedWorkers.add(e),
-        this.cesRequests.get(e)?.forEach((e) => e.abort()),
-        this.cesRequests.delete(e),
-        this.sentryRpcSessions.get(e)?.[Symbol.dispose](),
-        this.sentryRpcSessions.delete(e),
-        this.mainRpcSessions.get(e)?.[Symbol.dispose](),
-        this.mainRpcSessions.delete(e),
-        this.exitListeners.forEach((e) => {
-          e();
-        }));
-    }
-  },
+  bst = createWorkerManagerClass({
+    createLogger: r.r,
+    workerFilePath: (0, h.join)(__dirname, `worker.js`),
+    resolveMaxLogLevel: () => a.gn(a.in.resolve()),
+    app: l.app,
+    Worker: B.Worker,
+    MessageChannel: B.MessageChannel,
+    sentryInitOptions: a.Zt,
+    spawnInsideWsl: n.Ri,
+    shouldFlushGitWorker: a.T,
+    createRpcSession: B9,
+    SentryRpcHandler: hst,
+    isWorkerMainRpcCancel: _st,
+    isWorkerMainRpcRequest: vst,
+    parseCesPayload: (value) => yst.parse(value),
+    sendTelemetryRequest,
+    exportOtel: a.S,
+  }),
   H9 = createWorkerBusClass({
     WorkerManager: bst,
     createLogger: r.r,
