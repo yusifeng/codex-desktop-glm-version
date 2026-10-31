@@ -4960,3 +4960,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - `automations/automation-update-tool.ts` 现承接 automation_update 的输入投影、安全门、mutation 与错误映射；main 仅保留
   协议 schema 并将其注入 executor，旧 `yMe..SMe` 与死 `KN` 已删除。focused coverage 27 项，no-unwired gate 扩至
   374 项。下一批越过紧随其后的 stream vendor belt，继续审计下一个完整第一方 owner。
+
+# 2026-11-01 LaTeX, internal plugins, global shortcut and app paths wiring
+
+- 越过 tar/minipass vendor belt后，已有 `latex/compile.ts`、`plugins/download-internal-plugins.ts`、
+  `hotkey/global-shortcut.ts`、`util/app-paths.ts` 四个完整语义模块已成为主运行时唯一实现；显式 keymap snapshot 查询也已补齐。
+- main 旧 `YRe..pH` 约 1,060 行整带删除，vendor 与 saved-sections 边界保持不变。focused coverage 34 项，no-unwired
+  gate 扩至 386 项。下一批审计 saved-sections 后仍重复存在的 `browser/link-opening.ts` owner 与其跨模块 consumers。

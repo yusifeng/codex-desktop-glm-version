@@ -55,6 +55,10 @@ const realOwners = [
   ["src/main/main-app/automations/habitat-runtime.ts", "createHabitatAutomationRuntime"],
   ["src/main/main-app/automations/automation-update-tool.ts", "createAutomationUpdateTool"],
   ["src/main/main-app/artifacts/template-picker-runtime.ts", "createArtifactTemplatePickerRuntime"],
+  ["src/main/main-app/latex/compile.ts", "compileLatexArtifact"],
+  ["src/main/main-app/plugins/download-internal-plugins.ts", "downloadInternalPlugins"],
+  ["src/main/main-app/hotkey/global-shortcut.ts", "registerGlobalHotkey"],
+  ["src/main/main-app/util/app-paths.ts", "lookupCommandHotkey"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-history-service.ts", "createBrowserHistoryServiceClass"],
@@ -105,6 +109,14 @@ assert.equal(main.includes('require("./main-app/automations/automation-update-to
 assert.equal(main.includes("function JN("), false, "generated artifact template config owner must be removed");
 assert.equal(main.includes("async function iMe("), false, "generated artifact template loader must be removed");
 assert.equal(main.includes("async function xMe("), false, "generated automation update tool must be removed");
+assert.equal(main.includes('require("./main-app/latex/compile.js")'), true, "LaTeX runtime is wired");
+assert.equal(main.includes('require("./main-app/plugins/download-internal-plugins.js")'), true, "internal plugin runtime is wired");
+assert.equal(main.includes('require("./main-app/hotkey/global-shortcut.js")'), true, "global shortcut runtime is wired");
+assert.equal(main.includes('require("./main-app/util/app-paths.js")'), true, "app paths runtime is wired");
+assert.equal(main.includes("async function QRe("), false, "generated LaTeX compiler must be removed");
+assert.equal(main.includes("async function lze("), false, "generated internal plugin downloader must be removed");
+assert.equal(main.includes("function qV("), false, "generated global hotkey owner must be removed");
+assert.equal(main.includes("async function oH("), false, "generated app icon owner must be removed");
 assert.equal(main.includes("function _Ie("), false, "generated external-agent handlers must be removed");
 assert.equal(main.includes("function lIe("), false, "generated Cowork adapter wrapper must be removed");
 assert.equal(main.includes("async function VIe("), false, "generated imported-project finalizer must be removed");
@@ -362,4 +374,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("374 main unwired-owner skeleton assertions passed");
+console.log("386 main unwired-owner skeleton assertions passed");

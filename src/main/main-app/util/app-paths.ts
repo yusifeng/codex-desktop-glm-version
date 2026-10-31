@@ -129,8 +129,10 @@ interface HotkeyBinding {
 }
 
 /** 命令快捷键查询（原 `cH`/`lH`）。 */
-function lookupCommandHotkey(commandId: string): HotkeyBinding {
-  const keymap = (currentKeymap as () => { bindings: Array<{ command: string; key: string }> })();
+function lookupCommandHotkey(
+  commandId: string,
+  keymap = (currentKeymap as () => { bindings: Array<{ command: string; key: string }> })(),
+): HotkeyBinding {
   const binding = keymap.bindings.find((entry) => entry.command === commandId);
   return binding == null ? { hasBinding: false, hotkey: null } : { hasBinding: true, hotkey: binding.key };
 }

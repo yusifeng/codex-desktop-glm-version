@@ -2998,3 +2998,13 @@ source/path 去重、来源优先级排序，以及 100 项/24 KiB/600 code-poin
 worktree setup-script 安全门、成功卡片和 host/delete 错误映射；Zod 协议 schema 仍留在 main 组合根并注入 executor。
 旧 `JN/iMe/YN` 与 `yMe..SMe` 已物理删除，死 helper `KN` 同步移除。focused test 27 项覆盖跨平台 picker、过滤/降级、
 automation mutation/错误/安全门与真实接线；no-unwired gate 扩至 374 项。
+
+### 增量接线：LaTeX、internal plugins、global shortcut 与 app paths
+
+越过 tar/minipass vendor belt 后，`latex/compile.ts`、`plugins/download-internal-plugins.ts`、`hotkey/global-shortcut.ts` 和
+`util/app-paths.ts` 已整组接回主运行时。唯一语义 owner 现覆盖 Python/tectonic 双级编译与插件定位、marketplace 下载/reload/
+fetch-failure 节流、bare modifier/globalShortcut/键盘布局/听写 release lifecycle，以及应用图标、keymap、Windows storage 与 WSL
+路径转换。`lookupCommandHotkey` 补齐显式 keymap 参数，保持 fetch handler 批量同步时的同一 snapshot 语义。
+原始 chunk 中 `YRe..pH` 约 1,060 行重复实现已物理删除；tar/minipass 前段与后续 saved-sections 组合边界未拆。
+focused test 34 项覆盖注册/suspend/duplicate、插件下载/reload/search、keymap/path 和 LaTeX 路径/空编译；no-unwired gate
+扩至 386 项。
