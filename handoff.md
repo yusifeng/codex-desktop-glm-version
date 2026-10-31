@@ -5103,3 +5103,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   投影、clear 与 load-complete refresh；main 旧 `qX/JX/YX/XX/$Xe/ZX/QX` 已删除。
 - 修复 `browser-page-webview-binding-controller.ts` 使用 `$Xe` 却未解构、主组合根也未注入的运行时接线缺口。下一批审计相邻
   Sites auto-auth `rZe` 的 URL policy、bootstrap request、3 秒 timeout 和 session token contract。
+
+# 2026-11-01 Sites bootstrap token extraction
+
+- 新增并接回 `browser-sidebar/sites-bootstrap-token.ts`，完整承接 auto-auth gate、Sites URL policy、session bootstrap request、abort/3 秒
+  timeout、schema validation 与 120 秒 lifetime cap；electron message handler 的 host-scoped provider 接线保持不变。
+- main 旧 `rZe` 已删除，无仓库调用点的 `iZe` 同步确认为死生成残留并移除。下一批从随后 page default/materialization 相邻区域继续
+  审计完整 owner，避免拆分 `tQe` 大型 host class。

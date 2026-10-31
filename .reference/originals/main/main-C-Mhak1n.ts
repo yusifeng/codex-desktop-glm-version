@@ -483,6 +483,7 @@ const { createBrowserContextMenuRuntime } = require("./main-app/browser-sidebar/
 const { createBrowserWebviewNavigationRuntime } = require("./main-app/browser-sidebar/browser-webview-navigation-runtime.js");
 const { createBrowserMediaStateTracker: KX } = require("./main-app/browser-sidebar/browser-media-state-tracker.js");
 const { createSiteToolsAvailabilityRuntime } = require("./main-app/browser-sidebar/site-tools-availability.js");
+const { createSitesBootstrapTokenRuntime } = require("./main-app/browser-sidebar/sites-bootstrap-token.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43837,89 +43838,20 @@ var {
   clearSiteTools: XX,
   refreshSiteToolsAvailability: $Xe,
 } = createSiteToolsAvailabilityRuntime({ isEqual: G.default });
-var eZe = 3e3,
-  tZe = `OAI-Sites-ID-Token`,
-  nZe = n.wf({ status: n.bf(`issued`), id_token: n.Of().min(1), expires_in: n.Cf().positive() });
-function rZe(e) {
-  return async (t, n) => {
-    let r = URL.parse(t);
-    if (
-      !Tr().autoAuthForSites ||
-      n?.aborted ||
-      r?.protocol !== `https:` ||
-      r.port !== `` ||
-      r.username !== `` ||
-      r.password !== `` ||
-      ![`.chatgpt.site`, `.appgardenapps.dev`].some((e) => r.hostname.endsWith(e))
-    )
-      return null;
-    let i = Date.now(),
-      o = new AbortController(),
-      s = n == null ? o.signal : AbortSignal.any([o.signal, n]),
-      c;
-    try {
-      return await Promise.race([
-        (async () => {
-          if ((s.throwIfAborted(), !Tr().autoAuthForSites)) return null;
-          let n = await a.vt({
-            action: `sign in to a Site`,
-            appServerClient: e,
-            desktopApiOptions: {
-              desktopOriginator: a.Tt,
-              devApiBaseUrl: a.Et,
-              prodApiBaseUrl: a.Kt,
-            },
-            path: `/codex/sites/session_bootstrap`,
-            beforeSend: () => {
-              if (!Tr().autoAuthForSites)
-                throw new DOMException(`Site authentication disabled`, `AbortError`);
-            },
-            request: {
-              method: `POST`,
-              headers: { "Content-Type": `application/json` },
-              body: JSON.stringify({ target_url: t }),
-              signal: s,
-            },
-          });
-          if (!n.ok) return null;
-          let r = nZe.safeParse(await n.json());
-          return r.success
-            ? { idToken: r.data.id_token, expiresAt: i + Math.min(r.data.expires_in, 120) * 1e3 }
-            : null;
-        })(),
-        new Promise((e) => {
-          ((c = setTimeout(() => {
-            (o.abort(), e(null));
-          }, eZe)),
-            c.unref());
-        }),
-      ]);
-    } catch {
-      return null;
-    } finally {
-      clearTimeout(c);
-    }
-  };
-}
-async function iZe({
-  url: e,
-  getToken: t,
-  isCurrentNavigation: n,
-  loadUrl: r,
-  signal: i,
-  stopLoad: a,
-}) {
-  let o = await t(e, i),
-    s = o != null && o.expiresAt > Date.now();
-  if (!n() || (s && i?.aborted)) return !1;
-  let c = s && Tr().autoAuthForSites;
-  c && i?.addEventListener(`abort`, a, { once: !0 });
-  try {
-    return (await r(c ? { [tZe]: o.idToken } : void 0), !c || !i?.aborted);
-  } finally {
-    i?.removeEventListener(`abort`, a);
-  }
-}
+var { createTokenProvider: rZe } = createSitesBootstrapTokenRuntime({
+  authedFetch: a.vt,
+  desktopApiOptions: {
+    desktopOriginator: a.Tt,
+    devApiBaseUrl: a.Et,
+    prodApiBaseUrl: a.Kt,
+  },
+  getFeatureFlags: Tr,
+  sessionResponseSchema: n.wf({
+    status: n.bf(`issued`),
+    id_token: n.Of().min(1),
+    expires_in: n.Cf().positive(),
+  }),
+});
 var $X = r.i(`browser-sidebar-manager`),
   eZ = `-owl-native-contents-close`,
   tZ = `being-captured-state-changed`,

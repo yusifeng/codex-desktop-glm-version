@@ -3153,3 +3153,10 @@ binding 继续通过 `KX` 兼容别名共享同一状态机；旧 `KX` 及其 ti
 pending 状态转换、清空及 load-complete refresh。主组合根继续以 `qX/JX/YX/XX/$Xe` 兼容别名服务 WebMCP event、annotation
 controller 与 webview binding；旧 `qX..QX` helper belt 已物理删除。迁移同时修复 webview binding 调用 `$Xe` 却未从依赖注入的
 潜在 `ReferenceError`。focused test 覆盖所有状态迁移、幂等与真实接线。
+
+### 增量抽取：Sites bootstrap token provider
+
+新增 `browser-sidebar/sites-bootstrap-token.ts`，接管 Sites auto-auth feature gate、HTTPS/suffix/credential/port URL policy、app-server
+session bootstrap POST、外部 abort 合并、3 秒 timeout/unref、response validation 与 120 秒 token lifetime 上限。electron message handler
+继续通过 `rZe` 兼容别名构造 host-scoped provider；旧 `rZe` 已删除，无调用点的 `iZe` navigation helper 作为死生成残留同步移除。
+focused test 覆盖两个域名族、拒绝条件、请求合约、过期时间、失败/abort/timeout、feature flip 与真实接线。
