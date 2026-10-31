@@ -148,6 +148,7 @@ const { registerRendererContextMenu } = require("./main-app/window/renderer-cont
 const { createPlatformShutdownRuntime } = require("./main-app/startup/platform-shutdown.js");
 const { registerMainIpcRouter } = require("./main-app/app-shell/main-ipc-router.js");
 const { createQuitRuntime } = require("./main-app/startup/quit-runtime.js");
+const { ApplicationMenuManager, normalizeMenuAccelerator } = require("./main-app/app-shell/application-menu-runtime.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -142797,11 +142798,11 @@ function sit({
   let x = a.hn(),
     S = `CmdOrCtrl+Shift+C`,
     C = r ? [`Command+F`, `Command+G`, `Command+Shift+G`] : [`Ctrl+F`, `Ctrl+G`, `Shift+F3`],
-    w = new Set(C.map((e) => v7(e, r))),
+    w = new Set(C.map((e) => normalizeMenuAccelerator(e, r))),
     T = { codexLocal: u.codexLocalAccess, workLocal: u.workLocalAccess },
     E = (t) => n.At({ commandId: t, keymapState: e, isMacOS: r }),
     D = (e) => !e.includes(` `) && !n.Pt(e),
-    O = (e) => E(e).filter((e) => D(e) && !w.has(v7(e, r))),
+    O = (e) => E(e).filter((e) => D(e) && !w.has(normalizeMenuAccelerator(e, r))),
     k = async () => {
       let e = l.BrowserWindow.getFocusedWindow();
       return e && !e.isDestroyed() ? e : f();
@@ -142837,8 +142838,8 @@ function sit({
       (e.id === `showWorkspaceTabView` && !u.unifiedTabStrip) ||
       (e.id === `toggleDebugModal` && !o)
     ))
-      for (let t of O(e.id)) M.add(v7(t, r));
-  let N = (e) => e.filter((e) => D(e) && !M.has(v7(e, r))),
+      for (let t of O(e.id)) M.add(normalizeMenuAccelerator(t, r));
+  let N = (e) => e.filter((e) => D(e) && !M.has(normalizeMenuAccelerator(e, r))),
     P = (e) => N(E(e)),
     F = ({ accelerators: e, click: t, enabled: n, label: r }) =>
       e.map((e) => ({
@@ -143037,7 +143038,7 @@ function sit({
       e && y.sendMessageToWindow(e, { type: `archive-thread`, source: `native_accelerator` });
     },
     pe = async () => {
-      if (we.accelerator != null && v7(we.accelerator, r) === v7(S, r) && Pe({ type: `copy-url` }))
+      if (we.accelerator != null && normalizeMenuAccelerator(we.accelerator, r) === normalizeMenuAccelerator(S, r) && Pe({ type: `copy-url` }))
         return;
       let e = await k();
       e && y.sendMessageToWindow(e, { type: `copy-working-directory` });
@@ -143811,52 +143812,7 @@ function sit({
   }
   (l.Menu.setApplicationMenu(Lt), UZ(y));
 }
-function v7(e, t) {
-  return e
-    .split(`+`)
-    .map((e) => {
-      switch (e.toLowerCase()) {
-        case `cmdorctrl`:
-        case `commandorcontrol`:
-          return t ? `command` : `control`;
-        case `cmd`:
-        case `command`:
-          return `command`;
-        case `control`:
-        case `ctrl`:
-          return `control`;
-        case `option`:
-          return t ? `alt` : `option`;
-        case `alt`:
-          return `alt`;
-        case `meta`:
-        case `super`:
-          return t ? `command` : `super`;
-        case `enter`:
-        case `return`:
-          return `enter`;
-        case `esc`:
-        case `escape`:
-          return `escape`;
-        case `plus`:
-          return t ? `=` : `plus`;
-        default:
-          return e.toLowerCase();
-      }
-    })
-    .sort()
-    .join(`+`);
-}
-var cit = class {
-    buildMenu;
-    constructor(e) {
-      this.buildMenu = e;
-    }
-    refresh() {
-      this.buildMenu();
-    }
-  },
-  y7 = r.r(`codex-deep-link-navigation`);
+var y7 = r.r(`codex-deep-link-navigation`);
 async function lit({
   window: e,
   route: t,
@@ -144260,7 +144216,7 @@ function _it({
         });
       },
     }),
-    k = new cit(() => {
+    k = new ApplicationMenuManager(() => {
       sit({
         commandKeymapState: {
           ...n.Ct(),

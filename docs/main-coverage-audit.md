@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 application-menu support runtime
+
+原 `v7/cit` 已迁入 `src/main/main-app/app-shell/application-menu-runtime.ts`。新模块保留跨平台 Electron accelerator
+alias 规范化、排序与 collision/exclusion comparison，以及 focus/locale/browser-state/feature consumers 共用的 refresh manager；
+真实 `sit/_it` consumers 已接回，旧 function/class 已删除。不完整的 `app-menu.ts` 骨架仍明确保持未接入。
+
 ## 2026-10-31 quit and bounded-cleanup runtime
 
 原 `a7/Prt/o7/Irt/Lrt/s7` 已迁入 `src/main/main-app/startup/quit-runtime.ts`。新 runtime 保留 dev relaunch
