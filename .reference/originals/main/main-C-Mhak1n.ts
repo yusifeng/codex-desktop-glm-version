@@ -484,6 +484,7 @@ const { createBrowserWebviewNavigationRuntime } = require("./main-app/browser-si
 const { createBrowserMediaStateTracker: KX } = require("./main-app/browser-sidebar/browser-media-state-tracker.js");
 const { createSiteToolsAvailabilityRuntime } = require("./main-app/browser-sidebar/site-tools-availability.js");
 const { createSitesBootstrapTokenRuntime } = require("./main-app/browser-sidebar/sites-bootstrap-token.js");
+const { createBrowserPagePresentationPolicy } = require("./main-app/browser-sidebar/browser-page-presentation-policy.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43867,93 +43868,11 @@ var $X = r.i(`browser-sidebar-manager`),
       action: `quick-annotate`,
       annotationModeEntrySource: `context-menu-quick-annotate`,
     },
-  },
-  cZ = new WeakMap();
-function oZe(e, t) {
-  return {
-    ...lZ(e, t.title),
-    canGoBack: !1,
-    canGoForward: !1,
-    faviconUrl: null,
-    isColdRestore: !1,
-    isSuspended: !1,
-    pendingUrl: t.url,
-    serializedPageState: eW({ faviconUrl: null, title: t.title, url: t.url }),
-    title: t.title,
-    url: ``,
   };
-}
-function sZe(e, t) {
-  let n = t.navigation.currentIndex;
-  return {
-    ...lZ(e, t.title),
-    canGoBack: n > 0,
-    canGoForward: n < t.navigation.entries.length - 1,
-    faviconUrl: t.faviconUrl,
-    isColdRestore: !0,
-    isSuspended: !0,
-    pendingUrl: ``,
-    serializedPageState: t,
-    title: t.title,
-    url: t.url,
-  };
-}
-function lZ(e, t) {
-  return {
-    browserStorageId: e.browserStorageId,
-    browserTabId: e.browserTabId,
-    conversationId: e.conversationId,
-    debuggerSync: Promise.resolve(),
-    deviceMetricsSyncVersion: 0,
-    dispose: () => void 0,
-    fallbackTitle: t,
-    initialNavigationSync: Promise.resolve(),
-    isAudible: !1,
-    isCapturingUserMedia: !1,
-    isLoading: !1,
-    isWaitingForResponse: !1,
-    isMainFrameLoading: !1,
-    isAgentInitiatedLoad: !1,
-    webMcpTools: [],
-    webMcpToolsRevision: 0,
-    siteToolsAvailability: { webMcp: `pending-unavailable`, annotations: `pending-unavailable` },
-    lastWebMcpToolCall: null,
-    isRestoring: !1,
-    loadError: null,
-    errorPagesByUrl: new Map(),
-    mediaIndicator: KX(),
-    navigationVersion: 0,
-    pendingNavigationUsage: null,
-    pendingSuspensionId: null,
-    takeIncompleteNavigationObservation: () => null,
-    view: { webContents: null },
-  };
-}
-function cZe(e, t, n, r) {
-  let i;
-  switch (r.kind) {
-    case `fresh`:
-      i = oZe(n, r.page);
-      break;
-    case `cold-restore`:
-      i = sZe(n, r.snapshot);
-  }
-  let { conversationId: a } = n;
-  return (
-    (n.page = i),
-    e.updateThreadSessionState(n),
-    e.isBrowserUseManagedBrowserTab(a, n.browserTabId) &&
-      e.browserSessionRegistry.recordPageCreated({
-        browserTabId: n.browserTabId,
-        conversationId: a,
-        windowId: oX(t.window.id),
-      }),
-    e.syncThreadState(t, a, n),
-    e.syncRuntimeStateToPage(i, n),
-    n.isAnnotationModeEnabled && e.comments.prepare(t.owner, a, n.browserTabId, n),
-    i
-  );
-}
+var {
+  securityStateForPage: dZe,
+  syncBackgroundThrottling: dZ,
+} = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
 function uZe(e, t, r, i, a, o) {
   if (t.owner.isDestroyed() || i.pendingTeardown?.reason === `closed`) return;
   let s = i.page,
@@ -44041,20 +43960,6 @@ function uZe(e, t, r, i, a, o) {
         browserTabId: i.browserTabId,
         snapshot: g,
       }));
-}
-function dZe(e) {
-  return e.loadError?.errorDescription.startsWith(`ERR_CERT_`) === !0 ? `certificate-error` : null;
-}
-function dZ(e, t, n) {
-  let r = t.page,
-    i = r?.view.webContents ?? null;
-  if (r == null || i == null || i.isDestroyed()) return;
-  let a = i.isBeingCaptured(),
-    o = !Ve(n ?? QU(r)) || (!t.visible && !t.isBrowserUseActive && !a),
-    s = cZ.get(i);
-  (cZ.set(i, o),
-    i.setBackgroundThrottling(o),
-    s === !0 && !o && !e.window.isDestroyed() && e.window.isVisible() && e.window.showInactive());
 }
 function fZe(e, t, n, r, { failedUrl: i, kind: a, loadError: o }) {
   let s = e.getThreadStateForWindow(t, n.conversationId, n.browserTabId) ?? null;

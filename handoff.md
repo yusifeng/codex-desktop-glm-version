@@ -5110,3 +5110,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   timeout、schema validation 与 120 秒 lifetime cap；electron message handler 的 host-scoped provider 接线保持不变。
 - main 旧 `rZe` 已删除，无仓库调用点的 `iZe` 同步确认为死生成残留并移除。下一批从随后 page default/materialization 相邻区域继续
   审计完整 owner，避免拆分 `tQe` 大型 host class。
+
+# 2026-11-01 browser page presentation policy convergence
+
+- 新增并接回 `browser-sidebar/browser-page-presentation-policy.ts`，承接 security state、background throttling 和解限窗口唤醒；
+  runtime sync、Browser Use route 与 webview binding 的三个 consumer 继续共享同一 `dZ` owner。
+- 删除已由 page materialization controller 替代且无消费者的 `oZe/sZe/lZ/cZe`，以及旧 `dZe/dZ/cZ`。下一批继续审计
+  `uZe` runtime snapshot projection 与其现有 controller 边界，只有能保持消息/registry 顺序时才内聚。

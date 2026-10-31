@@ -3160,3 +3160,10 @@ controller 与 webview binding；旧 `qX..QX` helper belt 已物理删除。迁�
 session bootstrap POST、外部 abort 合并、3 秒 timeout/unref、response validation 与 120 秒 token lifetime 上限。electron message handler
 继续通过 `rZe` 兼容别名构造 host-scoped provider；旧 `rZe` 已删除，无调用点的 `iZe` navigation helper 作为死生成残留同步移除。
 focused test 覆盖两个域名族、拒绝条件、请求合约、过期时间、失败/abort/timeout、feature flip 与真实接线。
+
+### 增量收敛：page materialization 与 presentation policy
+
+新增 `browser-sidebar/browser-page-presentation-policy.ts`，接管 certificate-error projection、first-party/visibility/Browser Use/capture
+组合下的 background throttling，以及 true→false 解限时可见窗口 `showInactive` 语义。三个现有 consumer 继续通过 `dZ` 兼容别名
+共享模块级 WeakMap 状态。已被 `browser-page-materialization-controller.ts` 完整替代且零消费者的 `oZe/sZe/lZ/cZe` 重复实现同步
+删除；旧 `dZe/dZ` 与 `cZ` 也已物理删除。

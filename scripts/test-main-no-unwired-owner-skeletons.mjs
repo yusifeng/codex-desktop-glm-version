@@ -149,6 +149,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-media-state-tracker.js")'), true, "browser media state tracker is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/site-tools-availability.js")'), true, "site tools availability runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/sites-bootstrap-token.js")'), true, "Sites bootstrap token runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-page-presentation-policy.js")'), true, "browser page presentation policy is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
 }
@@ -182,6 +183,9 @@ for (const oldOwner of ["function qX(", "function JX(", "function YX(", "functio
 }
 for (const oldOwner of ["function rZe(", "async function iZe("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Sites authentication owner must be removed`);
+}
+for (const oldOwner of ["function oZe(", "function sZe(", "function lZ(", "function cZe(", "function dZe(", "function dZ("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated page materialization/presentation owner must be removed`);
 }
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
