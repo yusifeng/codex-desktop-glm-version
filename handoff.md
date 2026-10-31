@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `vQe` main-thread jank timer owner 迁入 `main-thread-jank-sampler.ts`，保留 100ms tick、900ms
+drift threshold、10 次上限、suspend/resume baseline 重置、幂等 start/stop listener cleanup 与 snapshot reset；
+SamplerManager 的唯一 consumer 现显式注入 Electron powerMonitor、clock 与 timer，旧 class/default options 已删除。
+focused test 覆盖 22 项 timer/lifecycle/cap/接回断言。
+
 随后将 `uQe` Electron performance snapshot owner 及其独占 command/root aggregation helpers 迁入
 `electron-performance-snapshot-collector.ts`；renderer process grouping/ranking、working-set delta、main/renderer
 CPU snapshot、descendant kind/root/command/rank fields 与跨 snapshot delta 均由新 owner 持有，原 320 余行实现

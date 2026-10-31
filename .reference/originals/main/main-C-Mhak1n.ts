@@ -64,6 +64,7 @@ const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/
 const { LanguageServerManager } = require("./main-app/language-server/language-server-manager.js");
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
+const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -115976,61 +115977,7 @@ function mQe(e) {
           windowAttention: e.some((e) => e.isVisible()) ? `visible_unfocused` : `background`,
         };
 }
-var NZ = 100,
-  hQe = 900,
-  gQe = 10,
-  _Qe = {
-    clearInterval: (e) => clearInterval(e),
-    now: () => R.performance.now(),
-    powerMonitor: l.powerMonitor,
-    setInterval: (e, t) => setInterval(e, t),
-  },
-  vQe = class {
-    options;
-    interval = null;
-    expectedTickAtMs = 0;
-    isSuspended = !1;
-    jankCountSinceLastSnapshot = 0;
-    constructor(e = _Qe) {
-      this.options = e;
-    }
-    start() {
-      this.interval ??
-        ((this.expectedTickAtMs = this.options.now() + NZ),
-        this.options.powerMonitor.on(`suspend`, this.handleSuspend),
-        this.options.powerMonitor.on(`resume`, this.handleResume),
-        (this.interval = this.options.setInterval(() => this.handleTick(), NZ)),
-        this.interval.unref());
-    }
-    stop() {
-      this.interval != null &&
-        (this.options.clearInterval(this.interval),
-        (this.interval = null),
-        this.options.powerMonitor.off(`suspend`, this.handleSuspend),
-        this.options.powerMonitor.off(`resume`, this.handleResume));
-    }
-    takeSnapshotFields() {
-      let e = { main_thread_jank_count_since_last_snapshot: this.jankCountSinceLastSnapshot };
-      return ((this.jankCountSinceLastSnapshot = 0), e);
-    }
-    handleTick() {
-      let e = this.options.now();
-      if (this.isSuspended) {
-        this.expectedTickAtMs = e + NZ;
-        return;
-      }
-      (e - this.expectedTickAtMs >= hQe &&
-        (this.jankCountSinceLastSnapshot = Math.min(this.jankCountSinceLastSnapshot + 1, gQe)),
-        (this.expectedTickAtMs = e + NZ));
-    }
-    handleSuspend = () => {
-      this.isSuspended = !0;
-    };
-    handleResume = () => {
-      ((this.isSuspended = !1), (this.expectedTickAtMs = this.options.now() + NZ));
-    };
-  },
-  yQe = 3e4,
+var yQe = 3e4,
   bQe = 5e3,
   xQe = 6e4,
   SQe = SamplerManager,
@@ -117475,7 +117422,12 @@ var r$e = class {
             .getStdioIoStatsSnapshot(),
         heartbeatIntervalMs: yQe,
         hostId: this.hostId,
-        jankSampler: new vQe(),
+        jankSampler: new MainThreadJankSampler({
+          clearInterval: (e) => clearInterval(e),
+          now: () => R.performance.now(),
+          powerMonitor: l.powerMonitor,
+          setInterval: (e, t) => setInterval(e, t),
+        }),
         logger: r.i(`sampler-manager`),
         now: () => R.performance.now(),
         requestRegistry: new n.Sc({ ttlMs: xQe }),

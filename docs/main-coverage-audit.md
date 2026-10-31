@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 main-thread jank sampler
+
+原 `vQe` 定时器状态 owner 已迁入 `src/main/main-app/startup/main-thread-jank-sampler.ts`；100ms tick、
+900ms drift 判定、10 次计数上限、system suspend/resume baseline、listener/interval cleanup 与 snapshot reset
+均由语义 class 持有。main 的 SamplerManager 装配点显式注入真实 Electron/timer dependencies，旧 class 与
+default options 已物理删除。
+
 ## 2026-10-31 Electron performance snapshot owner
 
 原 `uQe` 与其独占 `jZ/fQe/pQe/MZ` helpers 已整体迁入
