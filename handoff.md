@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `L6e` primary-runtime host 迁入 `misc/primary-runtime-host.ts`；install/repair/diagnostics、feature
+promise cache、progress broadcast、update poller 装配、Windows restore subscription/retry 与 polling cleanup
+由真实 owner 持有。main 唯一 consumer 已接回，旧 class 和从未接回的 `misc/primary-runtime.ts` 伪实现均已
+物理删除。focused test 覆盖 24 项。
+
 随后将 `O6e` primary-runtime update poller 迁入 `misc/primary-runtime-update-poller.ts`；startup/scheduled/
 manual 三类触发、shared-object feature gate、jitter hour scheduling、single-flight/checkRequested 合并、cache
 status projection 与 install trigger/payload 均由新 owner 持有，真实 `L6e` host 已接回并删除旧 class。
