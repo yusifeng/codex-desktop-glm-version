@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 Artifact Session host lifecycle：既有 `artifact-session/host-lifecycle.ts` 与 `runtime-install.ts` 现已替代主 chunk 旧 `Hte`
+及完整 runtime pinning/daemon/admission/process helper 簇。44-member lifecycle 的启动校验、runtime generation、viewer reconciliation、
+retry/stop/dispose 保持完整；startup 真实 consumer 继续通过 `Hte.start(...)` 兼容别名调用，旧 729 行簇已删除。
+
 接回 conversational onboarding owner：既有 `onboarding/conversational-onboarding.ts` 现已替代主 chunk 旧 `kN` 及专属
 notification/path/permission helpers。completion expectation、request-lifetime/principal guard、host completion、状态账本、桌面小工具
 与静态 disposal 由完整 25-member owner 持有；`WindowContext` 真实 consumer 继续通过 `kN` 兼容别名构造。

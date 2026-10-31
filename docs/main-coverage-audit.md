@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Artifact Session host lifecycle wiring
+
+`src/main/main-app/artifact-session/host-lifecycle.ts` 的 44-member `ArtifactSessionHostLifecycle` 与 `runtime-install.ts` 已覆盖原
+`Hte` 及 `Gr..Xte` 的 runtime pinning、daemon readiness、admission、viewer reconciliation、retry、进程终止和文件权限 helper。
+本轮接回 startup `Hte.start(...)` 真实 consumer 并删除旧 729 行簇；focused suite 锁定完整成员面、参数 guard、不可用状态与幂等 disposal。
+
 ## 2026-10-31 conversational onboarding owner wiring
 
 既有 `src/main/main-app/onboarding/conversational-onboarding.ts` 已完整实现原 `kN` 的 25-member owner，但 bootstrap 仍导出旧类。
