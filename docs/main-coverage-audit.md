@@ -2807,3 +2807,15 @@ Sparkle logging、MenuItem insertion 和最终 `Menu.setApplicationMenu`/trace-s
 `g7/iit/_7/ait/oit/sit` 与 about constants 已物理删除。focused integration test
 `scripts/test-main-application-menu-builder.mjs` 覆盖 40 项完整 build、section/role、command routing、reserved accelerator、
 project/about/help/trace/update/macOS insertion、unavailable updater 和真实 wiring 行为；support runtime 相邻 19 项通过。
+
+### 增量抽取：content-tracing lifecycle owner
+
+Electron content tracing 的 process-wide 状态机、renderer start confirmation、upload-details rendezvous、buffer-capacity
+轮询、start/stop/save、运行时 CPU/内存/GPU 健康快照、上传 retry/dialog、菜单 label 与窗口广播已整体迁移至
+`src/main/main-app/diagnostics/content-tracing-runtime.ts`。main 通过 `createContentTracingRuntime` 将同一 owner 的
+`createTraceMenuItem/publishTraceState` 接回 application-menu，将 `toggleTraceRecording` 接回 Electron message handler，
+并将四个 renderer RPC handshake 方法接回 tracing service；SamplerManager 同时消费新模块的 CPU snapshot combiner、
+window-attention projection 与三个 timing constants，没有复制状态。旧 `dQe/AZ/mQe/wQe/TQe/EQe/DQe/OQe/kQe/AQe/
+jQe/IQe/UZ/LQe/RQe/WZ/GZ/KZ/zQe` helpers 及 pending/global state 已物理删除。focused test
+`scripts/test-main-content-tracing-runtime.mjs` 覆盖 52 项 CPU identity/reset、attention、confirmation/cancel、状态广播、
+buffer timer、runtime-health、upload retry、local keep 与真实 consumer wiring；Electron message handler 48 项和菜单 40 项回归通过。

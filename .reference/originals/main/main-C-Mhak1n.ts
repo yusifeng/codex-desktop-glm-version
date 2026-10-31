@@ -230,6 +230,7 @@ const { createNativeShellTargetRuntime } = require("./main-app/open-target/nativ
 const { SamplerManager } = require("./main-app/startup/sampler-manager.js");
 const { createElectronPerformanceSnapshotCollectorClass } = require("./main-app/startup/electron-performance-snapshot-collector.js");
 const { MainThreadJankSampler } = require("./main-app/startup/main-thread-jank-sampler.js");
+const { createContentTracingRuntime } = require("./main-app/diagnostics/content-tracing-runtime.js");
 const { createProjectFolderPickerClass } = require("./main-app/workspace/project-folder-picker.js");
 const { WebContentsHostClient } = require("./main-app/app-server/web-contents-host-client.js");
 const { createRemoteLocalhostNavigationForwarder } = require("./main-app/browser-sidebar/remote-localhost-navigation.js");
@@ -61528,385 +61529,33 @@ var OZ = createRemoteLocalhostNavigationForwarder({
     processApi: process,
     summarizeDescendantProcesses: n.an,
   });
-function dQe(e, t) {
-  let n = AZ(e, t, (e) => e.mainProcessCumulativeCpuSeconds),
-    r = AZ(
-      e,
-      t,
-      (e) => e.rendererProcessCumulativeCpuSeconds,
-      (e, t) =>
-        e.rendererProcessId != null &&
-        e.rendererProcessId === t.rendererProcessId &&
-        e.rendererProcessCreationTimeMs != null &&
-        e.rendererProcessCreationTimeMs === t.rendererProcessCreationTimeMs,
-    );
-  return {
-    samplingWindowDurationMs: Math.max(0, t.capturedAtMonotonicMs - e.capturedAtMonotonicMs),
-    electronProcessWorkingSetKbTotal: t.electronProcessWorkingSetKbTotal,
-    mainProcessCpuPercentAvg: n,
-    mainProcessHandleCount: t.mainProcessHandleCount,
-    mainProcessRssBytes: t.mainProcessRssBytes,
-    rendererProcessCount: t.rendererProcessCount,
-    rendererProcessCpuPercentAvg: r,
-    rendererProcessWorkingSetKb: t.rendererProcessWorkingSetKb,
-    rendererProcessWorkingSetKbTotal: t.rendererProcessWorkingSetKbTotal,
-    systemTotalMemoryBytes: t.systemTotalMemoryBytes,
-    systemFreeMemoryBytes: t.systemFreeMemoryBytes,
-    systemCommitTotalBytes: t.systemCommitTotalBytes,
-    systemCommitLimitBytes: t.systemCommitLimitBytes,
-    systemKernelPagedPoolBytes: t.systemKernelPagedPoolBytes,
-    systemKernelNonpagedPoolBytes: t.systemKernelNonpagedPoolBytes,
-    systemHandleCount: t.systemHandleCount,
-    systemProcessCount: t.systemProcessCount,
-    systemThreadCount: t.systemThreadCount,
-    systemUptimeMs: t.systemUptimeMs,
-  };
-}
-function AZ(e, t, n, r = () => !0) {
-  let i = n(e),
-    a = n(t),
-    o = (t.capturedAtMonotonicMs - e.capturedAtMonotonicMs) / 1e3;
-  if (!(i == null || a == null || !r(e, t) || a < i || o <= 0)) return ((a - i) / o) * 100;
-}
-function mQe(e) {
-  return e.length === 0
-    ? { processRole: `browser_main`, windowAttention: `no_window` }
-    : e.some((e) => e.isFocused())
-      ? { processRole: `browser_main`, windowAttention: `focused` }
-      : {
-          processRole: `browser_main`,
-          windowAttention: e.some((e) => e.isVisible()) ? `visible_unfocused` : `background`,
-        };
-}
-var yQe = 3e4,
-  bQe = 5e3,
-  xQe = 6e4,
-  SQe = SamplerManager,
-  CQe = r.i(`content-tracing`);
-async function wQe(e) {
-  let t = l.app
-      .getAppMetrics()
-      .map((e) => ({
-        pid: e.pid,
-        type: e.type,
-        memory:
-          e.memory == null
-            ? null
-            : {
-                workingSetSize: e.memory.workingSetSize,
-                peakWorkingSetSize: e.memory.peakWorkingSetSize,
-                privateBytes: e.memory.privateBytes ?? 0,
-                sharedBytes: 0,
-              },
-      })),
-    n =
-      e == null || e.isDestroyed()
-        ? null
-        : await (async () => {
-            let n = e.webContents;
-            if (typeof n.getProcessMemoryInfo == `function`)
-              return n
-                .getProcessMemoryInfo()
-                .then((e) => ({ private: e.private, shared: e.shared, residentSet: e.residentSet }))
-                .catch(() => null);
-            let r = n.getOSProcessId();
-            if (r <= 0) return null;
-            let i = t.find((e) => e.pid === r);
-            return i?.memory == null
-              ? null
-              : {
-                  private: i.memory.privateBytes,
-                  shared: i.memory.sharedBytes,
-                  residentSet: i.memory.workingSetSize,
-                };
-          })(),
-    r = Object.fromEntries(Object.entries(l.app.getGPUFeatureStatus())),
-    i = null,
-    a = null;
-  try {
-    let e = TQe(await l.app.getGPUInfo(`basic`)),
-      t = e?.gpuDevice ?? [],
-      n = t.find((e) => e.active) ?? t[0];
-    i = n?.vendorString ?? (n?.vendorId == null ? null : String(n.vendorId));
-    let r = e?.auxAttributes ?? {},
-      o = r.glRenderer ?? r.gl_renderer;
-    a = typeof o == `string` ? o : null;
-  } catch (e) {
-    CQe().warning(`Failed to collect GPU info for trace upload.`, {
-      safe: {},
-      sensitive: { error: e },
-    });
-  }
-  return {
-    appMetrics: t,
-    rendererMemory: n,
-    gpuFeatureStatus: r,
-    gpuVendor: i,
-    gpuRenderer: a,
-    hardwareAccelerationEnabled: !l.app.commandLine.hasSwitch(`disable-gpu`),
-  };
-}
-function TQe(e) {
-  return typeof e != `object` || !e ? null : e;
-}
-var PZ = null,
-  FZ = null;
-function EQe() {
-  if (PZ != null) throw Error(`Trace recording start confirmation is already pending`);
-  return new Promise((e) => {
-    PZ = e;
-  });
-}
-function DQe() {
-  if (PZ == null) return !1;
-  let e = PZ;
-  return ((PZ = null), e(!0), !0);
-}
-function OQe() {
-  if (PZ == null) return !1;
-  let e = PZ;
-  return ((PZ = null), e(!1), !0);
-}
-function kQe() {
-  if (FZ != null) throw Error(`Trace recording upload details are already pending`);
-  return new Promise((e) => {
-    FZ = e;
-  });
-}
-function AQe(e) {
-  if (FZ == null) return !1;
-  let t = FZ;
-  return ((FZ = null), t(e), !0);
-}
-function jQe() {
-  if (FZ == null) return !1;
-  let e = FZ;
-  return ((FZ = null), e(null), !0);
-}
-var IZ = r.i(`content-tracing`),
-  MQe = {
-    idle: { messageId: `electron.appMenu.trace.start`, defaultMessage: `Start Performance Trace` },
-    recording: {
-      messageId: `electron.appMenu.trace.stop`,
-      defaultMessage: `Stop Performance Trace`,
-    },
-    "awaiting-start-confirmation": {
-      messageId: `electron.appMenu.trace.awaitingStart`,
-      defaultMessage: `Waiting to Start Trace…`,
-    },
-    saving: { messageId: `electron.appMenu.trace.saving`, defaultMessage: `Saving Trace…` },
-    "awaiting-upload-details": {
-      messageId: `electron.appMenu.trace.awaitingDetails`,
-      defaultMessage: `Waiting for Trace Details…`,
-    },
-    uploading: {
-      messageId: `electron.appMenu.trace.uploading`,
-      defaultMessage: `Uploading Trace…`,
-    },
-  },
-  LZ = `toggle-trace-recording`,
-  NQe = process.env.CODEX_TRACE_SHORTCUT != null,
-  PQe = [`*`, `disabled-by-default-v8.cpu_profiler`, `disabled-by-default-v8.cpu_profiler.hires`],
-  FQe = [`IndexedDB`, `toplevel.flow`],
-  RZ = `idle`,
-  zZ = null,
-  BZ = null,
-  VZ = null,
-  HZ = null;
-function IQe({
-  allowDevtools: e,
-  accelerator: t,
-  windowManager: n,
-  traceRecordingUploadOptions: r,
-}) {
-  let i = async (e, t = !1) => {
-    if (
-      RZ !== `awaiting-start-confirmation` &&
-      RZ !== `saving` &&
-      RZ !== `awaiting-upload-details` &&
-      RZ !== `uploading`
-    )
-      try {
-        let o = null;
-        if (RZ === `idle`) {
-          if ((WZ(n, e, `awaiting-start-confirmation`), !(await EQe()))) {
-            WZ(n, e, `idle`);
-            return;
-          }
-          (await l.contentTracing.startRecording({
-            excluded_categories: FQe,
-            included_categories: PQe,
-            recording_mode: `record-until-full`,
-          }),
-            (zZ = Date.now()),
-            WZ(n, e, `recording`),
-            GZ(() => i(e, !0)),
-            IZ().info(`Started content trace recording.`));
-          return;
-        }
-        WZ(n, e, `saving`);
-        let s = Date.now(),
-          c = BZ != null,
-          u,
-          d = await l.contentTracing.stopRecording(
-            (0, h.join)((0, p.tmpdir)(), `codex-trace-${s}.${c ? `pftrace` : `json`}`),
-          );
-        BZ = null;
-        let f = zZ == null ? null : Date.now() - zZ;
-        if (
-          (IZ().info(`Stopped content trace recording.`, {
-            safe: { recordingDurationMs: f, bufferFull: t },
-            sensitive: { tracePath: d },
-          }),
-          t)
-        ) {
-          let e = a.hn();
-          await l.dialog.showMessageBox({
-            type: `info`,
-            message: e.formatMessage({
-              messageId: `electron.traceRecording.bufferFull.title`,
-              defaultMessage: `Performance trace recording stopped`,
-            }),
-            detail: e.formatMessage({
-              messageId: `electron.traceRecording.bufferFull.detail`,
-              defaultMessage: `The recording reached its capacity.`,
-            }),
-          });
-        }
-        if (r != null) {
-          let t = l.BrowserWindow.getFocusedWindow(),
-            i = t != null && !t.isDestroyed() ? t : null,
-            a = i?.id ?? null,
-            s = i == null || !n.hasRegisteredWebContents(i.webContents) ? null : J,
-            c = wQe(i);
-          WZ(n, e, `awaiting-upload-details`);
-          let [p, m] = await Promise.all([kQe(), c]);
-          p == null
-            ? l.shell.showItemInFolder(d)
-            : (WZ(n, e, `uploading`),
-              (o = await RQe({
-                ...r,
-                tracePath: d,
-                additionalTraceFiles: u,
-                recordingDurationMs: f,
-                correlation: { conversationId: p.conversationId, hostId: s, windowId: a },
-                runtimeHealth: m,
-                traceRecordingNote: p.note.length > 0 ? p.note : null,
-              })));
-        }
-        ((zZ = null),
-          WZ(n, e, `idle`),
-          o != null &&
-            n.sendMessageToAllRegisteredWindows({
-              type: `trace-recording-uploaded`,
-              reportId: o,
-              tracePath: d,
-            }));
-      } catch (t) {
-        let r = zQe();
-        (r === `saving`
-          ? WZ(n, e, `recording`)
-          : (r === `awaiting-start-confirmation` ||
-              r === `awaiting-upload-details` ||
-              r === `uploading`) &&
-            ((zZ = null), (BZ = null), WZ(n, e, `idle`)),
-          IZ().warning(`Failed to toggle content trace recording.`, {
-            safe: {},
-            sensitive: { error: t },
-          }));
-      }
-  };
-  return (
-    (HZ = i),
-    {
-      id: LZ,
-      label: KZ(RZ),
-      accelerator: e && NQe ? t : void 0,
-      click: async (e) => {
-        await i(e);
-      },
-    }
-  );
-}
-function UZ(e) {
-  e.sendMessageToAllRegisteredWindows({ type: `trace-recording-state-changed`, state: RZ });
-}
-async function LQe() {
-  let e = l.Menu.getApplicationMenu()?.getMenuItemById(LZ);
-  e != null && HZ != null && (await HZ(e));
-}
-async function RQe(e) {
-  let { uploadTraceRecording: t } = await Promise.resolve().then(() =>
-    require("./upload-D8KNqeRP.js"),
-  );
-  for (;;)
-    try {
-      return await t(e);
-    } catch (t) {
-      IZ().warning(`Performance trace submission failed.`, {
-        safe: {},
-        sensitive: { error: t, tracePath: e.tracePath },
-      });
-      let n = a.hn(),
-        { response: r } = await l.dialog.showMessageBox({
-          type: `warning`,
-          message: n.formatMessage({
-            messageId: `electron.traceRecording.uploadFailed.title`,
-            defaultMessage: `Performance trace submission did not finish`,
-          }),
-          detail: n.formatMessage({
-            messageId: `electron.traceRecording.uploadFailed.detail`,
-            defaultMessage: `Your complete trace is still available at {tracePath}. You can try again; some files may already have reached the server.`,
-            values: { tracePath: e.tracePath },
-          }),
-          buttons: [
-            n.formatMessage({
-              messageId: `electron.traceRecording.uploadFailed.retry`,
-              defaultMessage: `Try Again`,
-            }),
-            n.formatMessage({
-              messageId: `electron.traceRecording.showLocalTrace`,
-              defaultMessage: `Show Local Trace`,
-            }),
-            n.formatMessage({
-              messageId: `electron.traceRecording.uploadFailed.close`,
-              defaultMessage: `Close`,
-            }),
-          ],
-          defaultId: 0,
-          cancelId: 2,
-        });
-      if ((r === 1 && l.shell.showItemInFolder(e.tracePath), r !== 0)) return null;
-    }
-}
-function WZ(e, t, n) {
-  (n !== `recording` && VZ != null && (clearTimeout(VZ), (VZ = null)),
-    (RZ = n),
-    (t.label = KZ(n)),
-    UZ(e));
-}
-function GZ(e) {
-  let t = setTimeout(() => {
-    l.contentTracing
-      .getTraceBufferUsage()
-      .then(async ({ percentage: n }) => {
-        VZ === t && (n >= 0.99 ? await e() : GZ(e));
-      })
-      .catch((e) => {
-        IZ().warning(`Failed to read trace recording capacity.`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      });
-  }, 1e3);
-  ((VZ = t), t.unref());
-}
-function KZ(e) {
-  return a.hn().formatMessage(MQe[e]);
-}
-function zQe() {
-  return RZ;
-}
+var {
+  cancelTraceRecordingStart,
+  combinePerformanceSpanSnapshots,
+  confirmTraceRecordingStart,
+  createTraceMenuItem,
+  keepTraceRecordingLocal,
+  performanceHeartbeatIntervalMs,
+  performanceRequestTtlMs,
+  performanceTriggerMinIntervalMs,
+  publishTraceState,
+  submitTraceRecording,
+  summarizeWindowAttention,
+  toggleTraceRecording,
+} = createContentTracingRuntime({
+  electron: l,
+  getIntl: a.hn,
+  join: h.join,
+  temporaryDirectory: p.tmpdir,
+  localHostId: J,
+  loadUploadTraceRecording: () =>
+    Promise.resolve().then(() => require("./upload-D8KNqeRP.js")),
+  createLogger: r.i,
+  now: Date.now,
+  setTimer: setTimeout,
+  clearTimer: clearTimeout,
+  traceShortcutEnabled: process.env.CODEX_TRACE_SHORTCUT != null,
+});
 var BQe = r.r(`worktree-cleanup-service`),
   VQe = 432e6;
 async function qZ(e, t, r) {
@@ -62034,7 +61683,7 @@ var r$e = createElectronMessageHandlerClass({
   BrowserAutocompleteCoordinator: bke,
   BrowserHostManager: tQe,
   MessageReply: kZ,
-  SamplerController: SQe,
+  SamplerController: SamplerManager,
   PerformanceTriggerGate: ct,
   featureFlags: Tr,
   dependencies: {
@@ -62042,7 +61691,7 @@ var r$e = createElectronMessageHandlerClass({
     GD,
     IH,
     KBe,
-    LQe,
+    toggleTraceRecording,
     LUe,
     Lr,
     MainThreadJankSampler,
@@ -62053,21 +61702,21 @@ var r$e = createElectronMessageHandlerClass({
     XQe,
     ZBe,
     applySparseStateWrite,
-    bQe,
+    performanceTriggerMinIntervalMs,
     broadcastPersistedAtomUpdate,
     deletePersistedBrowserConversation,
-    dQe,
+    combinePerformanceSpanSnapshots,
     forwardBrowserNavigationUrl,
     lWe,
-    mQe,
+    summarizeWindowAttention,
     rZe,
     rt,
     setRemoteControlEnabled,
     setRemoteControlSessionActive,
     tee,
     uEe,
-    xQe,
-    yQe,
+    performanceRequestTtlMs,
+    performanceHeartbeatIntervalMs,
   },
 });
 var { AppServerClientRegistry: a$e, FileAttachmentsService: s$e, FileDragService: _$e, LibraryFilesService: l1e } =
@@ -76423,10 +76072,10 @@ var Fnt = createTracingRpcServiceClass({
     RpcHandlerBase: n.Uf,
     exportTraceBatch: a.S,
     setDesktopTracingSampleRate: a.E,
-    confirmTraceRecordingStart: DQe,
-    cancelTraceRecordingStart: OQe,
-    keepTraceRecordingLocal: jQe,
-    submitTraceRecording: AQe,
+    confirmTraceRecordingStart,
+    cancelTraceRecordingStart,
+    keepTraceRecordingLocal,
+    submitTraceRecording,
   }),
   Rnt = createTriggerSubscriptionReaderClass({
     runtime: n,
@@ -77043,8 +76692,8 @@ var sit = createApplicationMenuBuilder({
   showAboutDialog: Qrt,
   resolveCloseTabCommand: dU,
   resolveOriginPanel: fU,
-  createTraceMenuItem: IQe,
-  publishTraceState: UZ,
+  createTraceMenuItem,
+  publishTraceState,
   normalizeMenuAccelerator,
 });
 var y7 = r.r(`codex-deep-link-navigation`),

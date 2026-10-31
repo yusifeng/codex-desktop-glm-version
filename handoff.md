@@ -4797,3 +4797,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 删除 `B9/hst/V9/gst/_st/vst/xst/Tst/Est/Ist/Lst` 旧 wrapper/dead helpers 约 60 行，新生产实现 74 行；
   focused cleanup 32 项、worker runtime 32 项，no-unwired gate 扩至 269 项。下一批继续审计 native-status schema 与
   `Ust` 前后的剩余 adapter；`dst/Ust` 组合根仍保持不强拆。
+
+# 2026-11-01 content-tracing lifecycle owner
+
+- `src/main/main-app/diagnostics/content-tracing-runtime.ts` 已接管进程级 trace 状态、renderer confirmation/upload
+  handshake、capacity poll、save/upload retry、CPU snapshot/窗口 attention projection、运行时健康快照、菜单 label 和广播；
+  application-menu、Electron message handler、tracing RPC 与 SamplerManager 均消费同一个 factory output。
+- main 旧 content-tracing owner 约 378 行已物理删除，新生产模块 529 行；focused coverage 52 项，邻接 handler/menu
+  回归 48/40 项，no-unwired gate 扩至 279 项。下一批重新审计 content-tracing 后的 worktree cleanup/service cluster，
+  优先选择其完整状态/cleanup owner，不回退到 native-status 单 schema 微迁移。

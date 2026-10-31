@@ -42,10 +42,12 @@ function createElectronMessageHandlerClass({
   dependencies,
 }: ElectronMessageHandlerDependencies) {
   const {
-    GBe, GD, IH, KBe, LQe, LUe, Lr, MainThreadJankSampler, Mze, OZ, Vt, WQe, XQe, ZBe,
-    applySparseStateWrite, bQe, broadcastPersistedAtomUpdate, deletePersistedBrowserConversation,
-    dQe, forwardBrowserNavigationUrl, lWe, mQe, rZe, rt, setRemoteControlEnabled,
-    setRemoteControlSessionActive, tee, uEe, xQe, yQe,
+    GBe, GD, IH, KBe, LUe, Lr, MainThreadJankSampler, Mze, OZ, Vt, WQe, XQe, ZBe,
+    applySparseStateWrite, broadcastPersistedAtomUpdate, combinePerformanceSpanSnapshots,
+    deletePersistedBrowserConversation, forwardBrowserNavigationUrl, lWe,
+    performanceHeartbeatIntervalMs, performanceRequestTtlMs, performanceTriggerMinIntervalMs,
+    rZe, rt, setRemoteControlEnabled, setRemoteControlSessionActive, summarizeWindowAttention,
+    tee, toggleTraceRecording, uEe,
   } = dependencies;
 
   var eQ = createLogger(`electron-message-handler`),
@@ -250,7 +252,7 @@ class ElectronMessageHandler {
       (this.samplerManager = new SQe({
         browserSessionRegistry: this.browserSessionRegistry,
         clearInterval: (e) => clearInterval(e),
-        combineCpuSnapshots: dQe,
+        combineCpuSnapshots: combinePerformanceSpanSnapshots,
         createId: () => (0, _.randomUUID)(),
         desktopSentry: this.desktopSentry,
         electronSampler: w,
@@ -259,7 +261,7 @@ class ElectronMessageHandler {
           this.appServerConnectionRegistry
             .getConnection(this.hostId)
             .getStdioIoStatsSnapshot(),
-        heartbeatIntervalMs: yQe,
+        heartbeatIntervalMs: performanceHeartbeatIntervalMs,
         hostId: this.hostId,
         jankSampler: new MainThreadJankSampler({
           clearInterval: (e) => clearInterval(e),
@@ -269,10 +271,10 @@ class ElectronMessageHandler {
         }),
         logger: createLogger(`sampler-manager`),
         now: () => R.performance.now(),
-        requestRegistry: new n.Sc({ ttlMs: xQe }),
+        requestRegistry: new n.Sc({ ttlMs: performanceRequestTtlMs }),
         setInterval: (e, t) => setInterval(e, t),
-        summarizeWindowAttention: mQe,
-        triggerGate: new ct({ minIntervalMs: bQe }),
+        summarizeWindowAttention,
+        triggerGate: new ct({ minIntervalMs: performanceTriggerMinIntervalMs }),
         windowManager: this.windowManager,
       })),
       this.ensureWorktreeService(this.hostId));
@@ -1022,7 +1024,7 @@ class ElectronMessageHandler {
         this.windowManager.sendMessageToAllWindows(t);
         break;
       case `toggle-trace-recording`:
-        await LQe();
+        await toggleTraceRecording();
         break;
       case `log-message`: {
         let { level: n } = t;

@@ -39,6 +39,7 @@ const realOwners = [
   ["src/main/main-app/worker/sentry-envelope-transport.ts", "createSentryRpcHandlerClass"],
   ["src/main/main-app/worker/worker-runtime.ts", "createWorkerRuntimeFactory"],
   ["src/main/main-app/startup/workspace-policy-runtime.ts", "createWorkspacePolicyRuntime"],
+  ["src/main/main-app/diagnostics/content-tracing-runtime.ts", "createContentTracingRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -261,6 +262,14 @@ assert.equal(main.includes("function Ist("), false, "generated quit-for-update p
 assert.equal(main.includes("function Lst("), false, "generated computer-use RPC proxy must be removed");
 assert.equal(main.includes("function V9("), false, "dead object predicate proxy must be removed");
 assert.equal(main.includes("function gst("), false, "dead method predicate proxy must be removed");
+assert.equal(main.includes("createContentTracingRuntime({"), true, "real content-tracing runtime is wired");
+assert.equal(main.includes("function dQe("), false, "generated performance snapshot combiner must be removed");
+assert.equal(main.includes("async function wQe("), false, "generated trace runtime-health collector must be removed");
+assert.equal(main.includes("function EQe("), false, "generated trace start-confirmation owner must be removed");
+assert.equal(main.includes("function IQe("), false, "generated trace menu lifecycle must be removed");
+assert.equal(main.includes("async function RQe("), false, "generated trace upload retry owner must be removed");
+assert.equal(main.includes("function GZ("), false, "generated trace buffer poller must be removed");
+assert.equal(main.includes("var PZ = null"), false, "generated trace pending-state globals must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("269 main unwired-owner skeleton assertions passed");
+console.log("279 main unwired-owner skeleton assertions passed");
