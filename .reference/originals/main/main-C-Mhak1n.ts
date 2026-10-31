@@ -44,7 +44,7 @@ const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transp
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
-const { HISTORY_SCOPE_ACTIONS, HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
+const { HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
 const rendererFrameTrust = require("./main-app/window/renderer-frame-trust.js");
 const { isDeviceCheckPlatform: rr, isAppleSilicon: ir, isDeviceCheckSupported: ar, createDeviceAttestationHandler: or, generateDeviceCheckToken: cr } = require("./main-app/security/device-check.js");
 const remoteHost = require("./main-app/open-target/remote-host.js");
@@ -139,6 +139,7 @@ const { createDebugWindowRuntime } = require("./main-app/debug/debug-window-mana
 const { createThreadMetadataServiceClass } = require("./main-app/threads/thread-metadata-service.js");
 const { createNativeStatusItemControllerClass } = require("./main-app/tray/native-status-item-controller.js");
 const { createTrayLifecycle } = require("./main-app/tray/tray-lifecycle.js");
+const { createComputerHistoryStatusItemActions } = require("./main-app/computer-use/native-status-item-actions.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -151822,117 +151823,6 @@ function Est(e) {
     onError: (error) => r.n().warning(`Failed to show workspace policy restart dialog`, { safe: {}, sensitive: { error } }),
   });
 }
-var Dst = HISTORY_SCOPE_ACTIONS,
-  Ost = HISTORY_CLEAR_ACTIONS;
-function kst({
-  getConnection: e,
-  getFeatureAvailability: t,
-  getManagedService: n,
-  getRecorder: i,
-  invalidateQuery: a,
-  logComputerHistoryStatusItemAction: o,
-  navigate: s,
-  quit: c,
-  requestComputerUseWorker: l,
-}) {
-  return {
-    getComputerUseServiceProcessIdentifier: () => n()?.getServiceProcessIdentifier() ?? null,
-    getNativeStatusItemState: async () => {
-      let i = t(),
-        a = e(),
-        o = i.skysight && (a?.getChronicleControlState().enabled ?? !1),
-        s = n(),
-        c = i.skysight ? (s?.getServiceProcessIdentifier() ?? null) : null;
-      if ((s != null && (i.computerUse || o) && (c = await s.ensureServicePid()), c == null))
-        return {
-          computerHistoryAvailable: i.skysight,
-          computerHistoryEnabled: o,
-          computerUseAvailable: i.computerUse,
-          serviceProcessIdentifier: null,
-          menuState: null,
-        };
-      let u = null;
-      try {
-        u = await l({ method: `statusItemMenuState`, params: {} });
-      } catch (e) {
-        r.n().warning(`Failed to load the native Computer Use menu state`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      }
-      return {
-        computerHistoryAvailable: i.skysight,
-        computerHistoryEnabled: o,
-        computerUseAvailable: i.computerUse,
-        serviceProcessIdentifier: c,
-        menuState: u,
-      };
-    },
-    onNativeStatusItemMenuAction: async (e) => {
-      if (e.type === `open-thread`) {
-        await s(e.path);
-        return;
-      }
-      if (e.type === `quit`) {
-        c();
-        return;
-      }
-      if (e.type === `computer-use/stop-application`) {
-        await l({ method: `stopApplication`, params: { applicationId: e.applicationId } });
-        return;
-      }
-      if (
-        e.type === `computer-history/show-history` ||
-        e.type === `computer-history/open-settings`
-      ) {
-        (await s(
-          e.type === `computer-history/show-history`
-            ? `/settings/chronicle#history`
-            : `/settings/chronicle`,
-        ),
-          o(e.type === `computer-history/show-history` ? `show_all_history` : `open_settings`));
-        return;
-      }
-      if (n() != null)
-        switch (e.type) {
-          case `computer-history/pause`: {
-            let t = i();
-            if (t == null) return;
-            (await t.pause(e.duration), o(`pause`), a([`chronicle-state`]));
-            break;
-          }
-          case `computer-history/resume`: {
-            let e = i();
-            if (e == null) return;
-            (await e.resume(), o(`resume`), a([`chronicle-state`]));
-            break;
-          }
-          case `computer-history/update-observation`:
-            (await l({
-              method: `skysightUpdateObservationPolicy`,
-              params: {
-                observe: e.observe,
-                target:
-                  e.scope === `app`
-                    ? { scope: `app`, bundleID: e.target, urlDomain: null }
-                    : { scope: `url`, bundleID: null, urlDomain: e.target },
-              },
-            }),
-              o(historyScopeAction(e.scope, e.observe)),
-              a([`chronicle-settings`]));
-            break;
-          case `computer-history/clear-history`: {
-            let t = i();
-            if (t == null) return;
-            let n = historyClearRange(e.scope, e.startedAt, e.endedAt);
-            if (e.scope === `application_session` && n == null) return;
-            (await t.clearHistory(e.scope, n), o(Ost[e.scope]), a([`chronicle-history`]));
-            break;
-          }
-        }
-    },
-  };
-}
 var jst = n.vf(`type`, [
     n.wf({ type: n.bf(`menu-update`) }),
     n.wf({ type: n.bf(`menu-open`) }),
@@ -152734,7 +152624,7 @@ async function Ust() {
             let e = W.getPrimaryWindow();
             e != null && W.sendMessageToWindow(e, { type: `run-command`, id: `feedback` });
           },
-          ...kst({
+          ...createComputerHistoryStatusItemActions({
             getConnection: () => K.appServerConnectionRegistry.getMaybeConnection(`local`) ?? null,
             getFeatureAvailability: Tr,
             getManagedService: () => H,
@@ -152745,6 +152635,10 @@ async function Ust() {
             navigate: (e) => Ue(e, { navigateExistingWindow: !0 }),
             quit: () => l.app.quit(),
             requestComputerUseWorker: Se.requestComputerUseWorker,
+            historyClearActions: HISTORY_CLEAR_ACTIONS,
+            historyClearRange,
+            historyScopeAction,
+            logger: r,
           }),
         });
       } catch (e) {

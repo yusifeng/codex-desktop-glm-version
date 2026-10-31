@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 Computer History native status-item actions
+
+原 `Dst/Ost/kst` 已迁入 `src/main/main-app/computer-use/native-status-item-actions.ts`。新 adapter 保留 feature、connection、
+managed-service 与 recorder 状态 projection，service PID ensure、worker menu-state 读取和 failure logging，以及
+open-thread、quit、stop application、pause/resume、observation policy、clear history、history/settings navigation 的 action
+routing、analytics 与 query invalidation；真实 tray startup consumer 已接回，旧 aliases/function 已删除。
+
 ## 2026-10-31 tray singleton lifecycle
 
 原 `W9/G9/K9/q9/J9/Y9/Nst/X9/Z9/Pst/Q9/Fst/$9` 已迁入 `src/main/main-app/tray/tray-lifecycle.ts`。新 owner

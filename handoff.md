@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Dst/Ost/kst` Computer History native status-item action adapter 迁入
+`computer-use/native-status-item-actions.ts`；feature/connection/service state projection、service PID ensure、worker menu-state
+读取与 failure logging，以及 open/quit/stop/pause/resume/observation/clear/history/settings 全部 action routing、analytics 和
+query invalidation 均由新 owner 持有。真实 tray startup consumer 已接回，旧 aliases/function 已删除。
+
 随后将 `W9/G9/K9/q9/J9/Y9/Nst/X9/Z9/Pst/Q9/Fst/$9` tray singleton lifecycle 迁入
 `tray/tray-lifecycle.ts`；native macOS status-item 分支、跨平台图标解析与 fallback、Windows distribution/package
 identity、主题图标刷新、single-flight creation、readiness、will-quit/dispose 和异步取消均由新 owner 持有。真实 startup、
