@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 account-auth lifecycle cleanup
+
+`src/main/main-app/conversation/app-server-manager.ts` 已直接导入并构造 `auth/account-auth.ts` 的 `AccountAuthService`，主 chunk
+旧 `Khe` 因而无任何 consumer，本轮物理删除其 355 行 class。语义 owner 保留 API-key/ChatGPT/device-code login、remote
+port-forward、Windows sandbox setup timeout/retry、auth/MCP notification fan-out 与 disposal；focused suite 覆盖登录完成和回调。
+
 ## 2026-10-31 browser-session registry partial migration removal
 
 删除无 runtime consumer 的 `src/main/main-app/browser-use/session-registry.ts` 及其 focused test。该文件只有 30 个 members，

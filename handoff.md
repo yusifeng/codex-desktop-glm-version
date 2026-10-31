@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+收敛 account-auth lifecycle：`conversation/app-server-manager.ts` 已真实消费 `auth/account-auth.ts` 的 `AccountAuthService`，
+因此主 chunk 中失去 consumer 的旧 `Khe` 355 行 class 已物理删除。语义 owner 保留 API-key/ChatGPT/device-code login、remote
+port-forward、Windows sandbox setup timeout、auth/MCP notifications 与 disposal，并新增 focused 行为测试。
+
 删除 browser-session registry 的部分假迁移：旧 `browser-use/session-registry.ts` 只有 30 个成员，而真实 `cX` 有 64 个，
 缺少 window/session route、native-pipe、download/cursor/page snapshots 等核心路径且无 runtime consumer。模块及其只验证局部
 facade 的 17-assertion 测试已删除，test index 回到 1638，skeleton gate 已扩展；真实 `cX` 继续留在主 chunk。
