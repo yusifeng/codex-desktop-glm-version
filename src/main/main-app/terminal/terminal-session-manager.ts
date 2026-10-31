@@ -5,7 +5,9 @@
  * The returned class owns all session, pending-create, action, listener, and cleanup state.
  */
 export function createTerminalSessionManagerClass(dependencies: Record<string, any>) {
-  const { n, v, D, _, Pr, Bn, zn, Ntt, Gtt, jtt, h5, C5, ztt, NQ, loginShellProbeCommand, Vtt, Htt, x5, Utt, S5 } = dependencies;
+  const { n, v, D, _, Pr, Bn, zn, Ntt, Gtt, jtt, h5, C5, ztt, NQ, loginShellProbeCommand, Vtt, Htt, x5, Utt } = dependencies;
+  const terminalSessionKey = (ownerId: string | number, conversationId: string) =>
+    `${ownerId}:${conversationId}`;
   return class TerminalSessionManager {
   globalState;
   getIntegratedTerminalShellPreference;
@@ -185,8 +187,8 @@ export function createTerminalSessionManagerClass(dependencies: Record<string, a
       ? !1
       : (this.deleteConversationMapping(e.id, String(r), n),
         (a.conversationId = i),
-        this.sessionsByWindowConversation.set(S5(e.id, String(i)), n),
-        t != null && this.sessionsByWindowConversation.set(S5(e.id, String(r)), t),
+        this.sessionsByWindowConversation.set(terminalSessionKey(e.id, String(i)), n),
+        t != null && this.sessionsByWindowConversation.set(terminalSessionKey(e.id, String(r)), t),
         !0);
   }
   async dispose() {
@@ -208,7 +210,7 @@ export function createTerminalSessionManagerClass(dependencies: Record<string, a
       n.attached && this.send(n.owner, { type: `data`, sessionId: n.id, data: t }));
   }
   getSnapshotForConversationId(e, t) {
-    let n = this.sessionsByWindowConversation.get(S5(t, e));
+    let n = this.sessionsByWindowConversation.get(terminalSessionKey(t, e));
     if (!n) return null;
     let r = this.sessions.get(n);
     return r
@@ -256,7 +258,7 @@ export function createTerminalSessionManagerClass(dependencies: Record<string, a
       };
       (this.sessions.set(r, i),
         t.conversationId &&
-          this.sessionsByWindowConversation.set(S5(e.id, String(t.conversationId)), r),
+          this.sessionsByWindowConversation.set(terminalSessionKey(e.id, String(t.conversationId)), r),
         n.pendingState.buffer.length > 0 && (i.buffer = n.pendingState.buffer.slice(-16e3)));
       let o = n.initialShellCwd;
       return o != null &&
@@ -292,7 +294,7 @@ export function createTerminalSessionManagerClass(dependencies: Record<string, a
       return (this.sendError(e, t, `Session owned by another window`), null);
     (r.conversationId &&
       ((i.conversationId = r.conversationId),
-      this.sessionsByWindowConversation.set(S5(e.id, String(r.conversationId)), i.id)),
+      this.sessionsByWindowConversation.set(terminalSessionKey(e.id, String(r.conversationId)), i.id)),
       r.hostId !== void 0 && (i.hostId = r.hostId),
       r.conversationTitle !== void 0 && (i.conversationTitle = r.conversationTitle));
     let { cols: a, rows: o } = r;
@@ -452,7 +454,7 @@ export function createTerminalSessionManagerClass(dependencies: Record<string, a
   getExistingSessionId(e) {
     if (e.sessionId && this.sessions.has(e.sessionId)) return e.sessionId;
     if (e.allowConversationSessionFallback && e.conversationId) {
-      let t = this.sessionsByWindowConversation.get(S5(e.ownerId, String(e.conversationId)));
+      let t = this.sessionsByWindowConversation.get(terminalSessionKey(e.ownerId, String(e.conversationId)));
       if (t) return t;
     }
   }
@@ -472,10 +474,10 @@ export function createTerminalSessionManagerClass(dependencies: Record<string, a
       (e.id = t),
       this.sessions.set(t, e),
       e.conversationId &&
-        this.sessionsByWindowConversation.set(S5(e.ownerId, String(e.conversationId)), t));
+        this.sessionsByWindowConversation.set(terminalSessionKey(e.ownerId, String(e.conversationId)), t));
   }
   deleteConversationMapping(e, t, n) {
-    let r = S5(e, t);
+    let r = terminalSessionKey(e, t);
     this.sessionsByWindowConversation.get(r) === n && this.sessionsByWindowConversation.delete(r);
   }
   resolveTerminalCommand(e) {

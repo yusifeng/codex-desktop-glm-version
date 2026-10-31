@@ -6,6 +6,11 @@ const LABELS = {
   running: { messageId: `trayMenu.runningThreads`, defaultMessage: `Running` },
 };
 
+export function resolveNativeQuitLabel(Menu: any, appName: string): string {
+  const menu = Menu.buildFromTemplate([{ role: `quit` }]);
+  return (Array.isArray(menu) ? menu : menu.items)[0]?.label ?? `Quit ${appName}`;
+}
+
 /** Owns the native macOS status item and its projected menu state. */
 export function createNativeStatusItemControllerClass(dependencies: Record<string, any>) {
   const {
@@ -172,5 +177,5 @@ export function createNativeStatusItemControllerClass(dependencies: Record<strin
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { createNativeStatusItemControllerClass };
+  module.exports = { createNativeStatusItemControllerClass, resolveNativeQuitLabel };
 }

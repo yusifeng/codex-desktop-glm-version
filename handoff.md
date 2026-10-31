@@ -5304,3 +5304,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   computer-history events；`worker/invocation-sampler.ts` 新增固定 30 秒 Git sampler 工厂，避免主组合根专用 subclass。
 - 主 chunk 旧 `yst/jst/fst/pst` 已删除；focused suite 27 项，worker manager/runtime 与 native status controller 回归 101 项，
   no-unwired gate 扩至 587 项。`dst/Ust` 仍作为共享 Electron startup composition roots 保留，不强拆。
+
+# 2026-11-01 terminal/tray residue ownership
+
+- `terminal-session-manager.ts` 直接拥有 owner/conversation compound key；`native-status-item-controller.ts` 直接拥有 Electron Menu quit-label
+  解析。主 chunk 旧 `S5/e7` 删除，terminal/native focused 回归 38/42 项，no-unwired gate 扩至 589 项。
+- 相邻 `_it` 复核为 deep-link listener、application menu、窗口导航、settings 与 dispose ordering 的共享装配根，保持原边界；
+  后续审计继续跳过 ANSI/string-width/electron-context-menu vendor belt和 `dst/Ust` startup composition roots。

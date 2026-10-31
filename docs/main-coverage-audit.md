@@ -3352,3 +3352,9 @@ wrapper belt 整体删除。42 条 focused 断言覆盖环境绑定、转发参�
 status/menu/computer-history event 的严格 schema；`worker/invocation-sampler.ts` 增加固定 30 秒 Git worker sampler 工厂。主组合根旧
 `yst/jst` schemas、`fst/pst` 专用 subclass 已删除，worker manager/runtime 与 native controller 直接消费语义 protocol/factory。
 focused suite 27 项覆盖全部 event union、拒绝分支、rolling-window 参数与接线，三组 owner 回归保持通过。
+
+### 增量内聚：terminal identity 与 native quit label
+
+terminal session 的 owner/conversation compound key 现由 `terminal-session-manager.ts` 私有拥有，不再从组合根注入单行 `S5`；native
+status item 的平台 quit label 解析迁入 `native-status-item-controller.ts` 并由真实 tray consumer 使用，旧 `e7` 删除。相邻 `_it` 经复核是
+deep-link listener、application menu manager、窗口导航与 dispose 顺序共享的装配根，保持不拆。terminal 38 项与 native controller 42 项回归通过。

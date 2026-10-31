@@ -263,21 +263,19 @@ function createHarness() {
     path.join(root, ".reference/originals/main/main-C-Mhak1n.ts"),
     "utf8",
   );
-  const ownerKeyStart = mainSource.indexOf("function S5(e, t) {");
   const managerFactoryStart = mainSource.indexOf("var Wtt = createTerminalSessionManagerClass({");
   const nextHelperStart = mainSource.indexOf(
     "var Xtt = createThreadArchiveServiceClass({",
     managerFactoryStart,
   );
-  equal(ownerKeyStart >= 0, true);
-  equal(managerFactoryStart > ownerKeyStart, true);
-  equal(nextHelperStart > managerFactoryStart, true);
-  equal(
-    mainSource
-      .slice(ownerKeyStart, managerFactoryStart)
-      .endsWith("return `${e}:${t}`;\n}\n"),
-    true,
+  const semanticSource = fs.readFileSync(
+    path.join(root, "src/main/main-app/terminal/terminal-session-manager.ts"),
+    "utf8",
   );
+  equal(mainSource.includes("function S5(e, t) {"), false);
+  equal(managerFactoryStart >= 0, true);
+  equal(nextHelperStart > managerFactoryStart, true);
+  equal(semanticSource.includes("const terminalSessionKey ="), true);
   equal(
     mainSource.slice(managerFactoryStart, nextHelperStart).trimEnd().endsWith("});"),
     true,

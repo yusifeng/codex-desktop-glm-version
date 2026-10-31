@@ -621,7 +621,7 @@ const { createGlobalDictationWindowControllerClass } = require("./main-app/dicta
 const { createRealtimeVoiceHotkeyManager } = require("./main-app/realtime/voice-hotkey-manager.js");
 const { createDebugWindowRuntime } = require("./main-app/debug/debug-window-manager.js");
 const { createThreadMetadataServiceClass } = require("./main-app/threads/thread-metadata-service.js");
-const { createNativeStatusItemControllerClass } = require("./main-app/tray/native-status-item-controller.js");
+const { createNativeStatusItemControllerClass, resolveNativeQuitLabel } = require("./main-app/tray/native-status-item-controller.js");
 const { createNativeStatusItemEventProtocol } = require("./main-app/tray/native-status-item-event-protocol.js");
 const { createTrayLifecycle } = require("./main-app/tray/tray-lifecycle.js");
 const { createComputerHistoryStatusItemActions } = require("./main-app/computer-use/native-status-item-actions.js");
@@ -50391,9 +50391,6 @@ var Vtt = 16e3,
     terminate: () => Promise.resolve(),
     dispose: () => Promise.resolve(),
   };
-function S5(e, t) {
-  return `${e}:${t}`;
-}
 var Wtt = createTerminalSessionManagerClass({
   n,
   v,
@@ -50414,7 +50411,6 @@ var Wtt = createTerminalSessionManagerClass({
   Htt,
   x5,
   Utt,
-  S5,
 });
 var Xtt = createThreadArchiveServiceClass({
     runtime: n,
@@ -51043,10 +51039,6 @@ var TrayMenuController = createTrayMenuControllerClass({
   app: l.app,
   platform: process.platform,
 });
-function e7(e) {
-  let t = l.Menu.buildFromTemplate([{ role: `quit` }]);
-  return (Array.isArray(t) ? t : t.items)[0]?.label ?? `Quit ${e}`;
-}
 var {
   killProcessDescendants: hrt,
   armWindowsForcedExit: n7,
@@ -56179,7 +56171,7 @@ var nativeStatusItemEventProtocol = createNativeStatusItemEventProtocol(n),
     parseNativeEvent: nativeStatusItemEventProtocol.parseNativeEvent,
     indicatorSetting: n.Ia.chronicleMenuBarIndicatorEnabled,
     projectMenuState: projectNativeStatusItemMenuState,
-    getQuitLabel: e7,
+    getQuitLabel: (appName) => resolveNativeQuitLabel(l.Menu, appName),
     logger: r,
   });
 var {

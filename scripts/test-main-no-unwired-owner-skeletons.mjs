@@ -593,5 +593,7 @@ assert.equal(main.includes("createNativeStatusItemEventProtocol(n)"), true, "nat
 assert.equal(main.includes("var yst ="), false, "generated CES request schema must be removed");
 assert.equal(main.includes("var jst ="), false, "generated native status schema must be removed");
 assert.equal(main.includes("class extends WorkerInvocationSampler"), false, "generated sampler subclass must be removed");
+assert.equal(main.includes("function S5(e, t)"), false, "generated terminal session-key helper must be removed");
+assert.equal(main.includes("function e7(e)"), false, "generated native quit-label helper must be removed");
 
-console.log("587 main unwired-owner skeleton assertions passed");
+console.log("589 main unwired-owner skeleton assertions passed");

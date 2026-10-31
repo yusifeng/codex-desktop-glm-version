@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createNativeStatusItemControllerClass } from "../src/main/main-app/tray/native-status-item-controller.ts";
+import { createNativeStatusItemControllerClass, resolveNativeQuitLabel } from "../src/main/main-app/tray/native-status-item-controller.ts";
 
 let assertions = 0;
 const equal = (actual, expected) => {
   assert.deepEqual(actual, expected);
   assertions += 1;
 };
+
+equal(resolveNativeQuitLabel({ buildFromTemplate: () => ({ items: [{ label: "Quit Codex" }] }) }, "Codex"), "Quit Codex");
+equal(resolveNativeQuitLabel({ buildFromTemplate: () => [] }, "Codex"), "Quit Codex");
 
 function createHarness({ createSucceeds = true, menuStateRejects = false, actionRejects = false } = {}) {
   const addonCalls = [];
