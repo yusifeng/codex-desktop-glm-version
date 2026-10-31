@@ -474,6 +474,7 @@ const {
   ownerCommandAcceleratorsFromKeymap: mq,
 } = require("./main-app/browser-sidebar/browser-shortcuts.js");
 const { IabTabCandidateStore: qGe } = require("./main-app/browser-sidebar/iab-tab-candidate-store.js");
+const { createBrowserTabLifecycleRuntime } = require("./main-app/browser-sidebar/browser-tab-lifecycle-runtime.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43715,6 +43716,21 @@ function rX(e, t, n) {
       ));
   });
 }
+var {
+  browserRouteKey: lX,
+  pageRecordKey: uX,
+  emitTabLifecycle: dX,
+  recordTabOpened: eXe,
+  registerThreadAndRecordOpened: fX,
+  recordTabClosed: tXe,
+  deleteThreadAndRecordClosed: nXe,
+  createDefaultBrowserSnapshot: pX,
+} = createBrowserTabLifecycleRuntime({
+  createLogger: r.i,
+  makePageRecordKey: qU,
+  serializeWindowId: oX,
+  shared: n,
+});
 var { BrowserSessionRegistry: cX, BrowserUseHost: ZYe } = createBrowserSessionRegistryRuntime({
   bootstrap: a,
   electron: l,
@@ -43732,105 +43748,6 @@ var { BrowserSessionRegistry: cX, BrowserUseHost: ZYe } = createBrowserSessionRe
   consumeAllowedDownloadSymbol: zY,
   notifyDownloadChangeSymbol: BY,
 });
-function lX({ conversationId: e, windowId: t }) {
-  return `${t}:${e}`;
-}
-function uX({ browserTabId: e, conversationId: t }) {
-  return qU({ browserTabId: e, conversationId: t });
-}
-var QYe = r.i(`browser-sidebar-manager`);
-function $Ye({ action: e, isBrowserUseTab: t, threadState: n, windows: r }) {
-  let i = t ?? n.isBrowserUsePage,
-    a = 0,
-    o = 0,
-    s = 0,
-    c = 0;
-  for (let e of r.values())
-    for (let t of e.threads.values())
-      ((a += 1),
-        t.conversationId === n.conversationId && (s += 1),
-        t.isBrowserUsePage && ((o += 1), t.conversationId === n.conversationId && (c += 1)));
-  return {
-    type: `browser-sidebar-tab-lifecycle`,
-    action: e,
-    conversationId: n.conversationId,
-    threadBrowserTabCount: s,
-    appBrowserTabCount: a,
-    threadBrowserUseTabCount: c,
-    appBrowserUseTabCount: o,
-    isBrowserUseTab: i,
-  };
-}
-function dX({ windowManager: e, windowState: t, ...n }) {
-  let r = $Ye(n);
-  (QYe().info(`IAB_TAB_ANALYTICS browser tab lifecycle`, {
-    safe: {
-      action: r.action,
-      appBrowserTabCount: r.appBrowserTabCount,
-      appBrowserUseTabCount: r.appBrowserUseTabCount,
-      browserTabId: n.threadState.browserTabId,
-      conversationId: r.conversationId,
-      isBrowserUseTab: r.isBrowserUseTab,
-      ownerWebContentsId: t.owner.id,
-      threadBrowserTabCount: r.threadBrowserTabCount,
-      threadBrowserUseTabCount: r.threadBrowserUseTabCount,
-    },
-    sensitive: {},
-  }),
-    e.sendMessageToWebContents(t.owner, r));
-}
-function eXe(e, t, n, r) {
-  dX({ action: `opened`, threadState: r, windowManager: e, windows: t, windowState: n });
-}
-function fX(e, t, n, r, i) {
-  (e.registerThread({ conversationId: i.conversationId, windowId: oX(r.window.id) }),
-    eXe(t, n, r, i));
-}
-function tXe(e, t, n, r) {
-  dX({
-    action: `closed`,
-    isBrowserUseTab: r.isBrowserUsePage,
-    threadState: r,
-    windowManager: e,
-    windows: t,
-    windowState: n,
-  });
-}
-function nXe(e, t, n, r) {
-  let i = qU(r);
-  (n.threads.delete(i),
-    n.ignoredConversationIds.delete(i),
-    n.activeConversationId === r.conversationId &&
-      n.activeBrowserTabId === r.browserTabId &&
-      ((n.activeConversationId = null), (n.activeBrowserTabId = null)),
-    tXe(e, t, n, r));
-}
-function pX() {
-  return {
-    annotationFlow: n.gu.BATCH,
-    annotationModeEntrySource: null,
-    tabType: n.lu.NEW_TAB_PAGE,
-    isSuspended: !1,
-    title: n.du,
-    url: ``,
-    faviconUrl: null,
-    securityState: null,
-    isAudible: !1,
-    isAudioMuted: !1,
-    isCapturingUserMedia: !1,
-    isLoading: !1,
-    isWaitingForResponse: !1,
-    canGoBack: !1,
-    canGoForward: !1,
-    zoomPercent: 100,
-    commentModeDisabledReason: null,
-    interactionMode: `browse`,
-    comments: [],
-    siteToolsAvailability: { webMcp: `unavailable`, annotations: `unavailable` },
-    webMcpToolsRevision: 0,
-    lastWebMcpToolCall: null,
-  };
-}
 function mX(e, t, n) {
   return n ?? (e.activeConversationId === t ? e.activeBrowserTabId : null);
 }

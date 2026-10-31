@@ -3064,3 +3064,11 @@ focused test 覆盖 find lifecycle、requestId、close cleanup、comment toggle�
 recency + tab-id 稳定排序、100 项上限、schema projection、snapshot 变更检测和 invalidation 订阅。主运行时直接构造该语义
 owner；原始 chunk 中 `qGe..XGe` 约 75 行已物理删除，并严格停在其后的内嵌 Zod vendor 带之前。focused test 覆盖窗口族、
 排序/过滤/上限、失效订阅和真实接线；no-unwired gate 扩至 438 项。
+
+### 增量抽取：browser tab lifecycle runtime
+
+新增 `browser-sidebar/browser-tab-lifecycle-runtime.ts`，接管 Browser route/page key adapter、跨窗口 tab/browser-use 计数、
+opened/closed analytics、session registry 注册顺序、thread 删除/active selection 清理，以及 cold-tab 默认 snapshot 合约。
+主运行时直接解构语义 exports 供 session registry、thread materialization 和 window-state controller 继续消费；原始 chunk 中
+`lX/uX/$Ye/dX/eXe/fX/tXe/nXe/pX` 已物理删除。focused test 覆盖计数、显式 browser-use override、日志/message、注册先于
+opened、删除先于 closed 计数、active/ignored 清理、默认 snapshot 与真实接线；no-unwired gate 扩至 452 项。

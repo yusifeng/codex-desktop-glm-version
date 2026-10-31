@@ -5018,3 +5018,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 新增并接回 `browser-sidebar/iab-tab-candidate-store.ts`，完整承接窗口族搜索、candidate projection/排序、snapshot invalidation；
   main 旧 `qGe..XGe` 约 75 行删除，后续内嵌 Zod vendor 带保持原边界。
 - focused coverage 18 项，no-unwired gate 扩至 438 项；下一批越过 vendor 带审计后续第一方 browser owner。
+
+# 2026-11-01 browser tab lifecycle runtime extraction
+
+- 新增并接回 `browser-sidebar/browser-tab-lifecycle-runtime.ts`，完整承接 route/page key、跨窗口 lifecycle 计数、opened/closed
+  emission、registry 注册顺序、thread 删除清理与默认 snapshot；main 旧 `lX..pX` 生命周期组已删除。
+- focused coverage 40 项，no-unwired gate 扩至 452 项。下一批从 `mX` 后的 browser window/thread state helper belt 继续审计，
+  优先迁移完整 lookup/materialization 边界，不拆 generated Browser Use SDK/vendor 区域。

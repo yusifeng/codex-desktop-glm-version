@@ -68,6 +68,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/find-in-page.ts", "openFindInPage"],
   ["src/main/main-app/browser-sidebar/browser-shortcuts.ts", "createBrowserSidebarKeyboardHandler"],
   ["src/main/main-app/browser-sidebar/iab-tab-candidate-store.ts", "IabTabCandidateStore"],
+  ["src/main/main-app/browser-sidebar/browser-tab-lifecycle-runtime.ts", "createBrowserTabLifecycleRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-policy-controller.ts", "createBrowserHostPolicyControllerClass"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -132,6 +133,10 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/first-party-webv
 assert.equal(main.includes('require("./main-app/browser-sidebar/find-in-page.js")'), true, "browser find runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-shortcuts.js")'), true, "browser shortcuts runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/iab-tab-candidate-store.js")'), true, "IAB candidate store is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-tab-lifecycle-runtime.js")'), true, "browser tab lifecycle runtime is wired");
+for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
+  assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
+}
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-host-policy-controller.js")'), true, "browser host policy controller is wired");
 assert.equal(main.includes("async function QRe("), false, "generated LaTeX compiler must be removed");
 assert.equal(main.includes("async function lze("), false, "generated internal plugin downloader must be removed");
@@ -419,4 +424,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("441 main unwired-owner skeleton assertions passed");
+console.log("452 main unwired-owner skeleton assertions passed");
