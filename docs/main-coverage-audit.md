@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 synthetic worktree turn and canonical append restoration
+
+旧 `Ry/Hy/Uy` 的语义 skeleton 曾把新 synthetic turn 错设为 inProgress，且 canonical-history 的 `appendConversationTurn` 仅由 consumer
+动态读取、实际未导出。本轮恢复 completed turn 全字段、权限继承、latest-turn append 与 canonical live-tail island 创建；三个 consumer
+全部改用真实命名导出，主 chunk 唯一旧调用接回语义 owner 后删除 `Ry/Hy/Uy`。新增 focused suite 覆盖 legacy/canonical append。
+
 ## 2026-10-31 realtime timeline reducer restoration
 
 语义 outer reducer 原先完全漏掉旧 `jy`，导致 canonical voice timeline 不记录 turn/item/realtime 生命周期与 transcript delta。本轮恢复完整

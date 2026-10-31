@@ -8,12 +8,17 @@ const source = fs.readFileSync(new URL("../src/main/main-app/streams/notificatio
 const transpiled = await transform(source, { loader: "ts", format: "cjs", target: "es2022" });
 const module = { exports: {} };
 Function("require", "module", "exports", transpiled.code)((specifier) => {
-  if (specifier === "@chunk/shared") return { $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error) };
+  if (specifier === "@chunk/shared") return {
+    $u: String, ed: String, Zo: (error) => error instanceof Error ? error.message : String(error),
+    kd: () => ({ approvalPolicy: "on-request", approvalsReviewer: null, sandboxPolicy: { type: "workspaceWrite" } }),
+  };
   if (specifier === "../turns/canonical-history") return {
     conversationTurns: (conversation) => conversation.turns ?? [],
     findTurnById: (conversation, id) => (conversation.turns ?? []).find((turn) => turn.turnId === id) ?? null,
     lastTurnWithTurnId: (conversation) => [...(conversation.turns ?? [])].reverse().find((turn) => turn.turnId != null) ?? null,
     mergedConversationTurns: (conversation) => conversation.turns ?? [],
+    latestTurn: (conversation) => conversation.turns?.at(-1) ?? null,
+    appendConversationTurn: (conversation, turn) => (conversation.turns.push(turn), turn),
     timelineEntryKey: (entry) => entry.type === "item" ? `item:${entry.turnId}:${entry.item.id}` : `${entry.type}:${entry.turnId ?? entry.item?.id}`,
     findTurnEntryForEvent: (conversation, id) => {
       const turn = (conversation.turns ?? []).find((entry) => entry.turnId === id); return turn == null ? null : { entityKey: `turn:${id}`, turn };
@@ -31,7 +36,10 @@ Function("require", "module", "exports", transpiled.code)((specifier) => {
   if (specifier === "../threads/automation-detector") return {
     parseAutomationUserMessage: () => null, parseHeartbeatDecision: () => null,
   };
-  if (specifier === "../threads/hydration") return { activeAncestryIds: () => new Set(), normalizeImageGenerationItem: (item) => item };
+  if (specifier === "../threads/hydration") return {
+    activeAncestryIds: () => new Set(), normalizeImageGenerationItem: (item) => item,
+    ensureTurnFields: (turn) => (turn.items ??= [], turn.hookRuns ??= [], turn),
+  };
   if (specifier === "../turns/steering-merge") return {
     acceptServerUserMessage: (turn, item) => turn.items.push(item), isSteeringUserMessage: (item) => item.type === "steeringUserMessage",
     recoverSteeringOrphans() {}, upsertItem: (turn, item) => { const index = turn.items.findIndex((entry) => entry.id === item.id); index < 0 ? turn.items.push(item) : turn.items[index] = item; },
@@ -168,6 +176,14 @@ owner.applyNotification(context, "serverRequest/resolved", { threadId: "thread-1
 equal(conversations.get("thread-1").permissionResolved, "request-1");
 equal(conversations.get("thread-1").requests, []);
 
+owner.addWorktreeInitSyntheticTurn(context.manager, "thread-1", { id: "worktree-existing" }, { createSearchIslandId: () => "island" });
+equal(conversations.get("thread-1").turns.at(-1).items.at(-1).type, "worktreeInit");
+conversations.set("thread-2", { id: "thread-2", turns: [], requests: [], latestThreadSettings: { approvalPolicy: "never" } });
+owner.addWorktreeInitSyntheticTurn(context.manager, "thread-2", { id: "worktree-new" }, { createSearchIslandId: () => "island" });
+equal(conversations.get("thread-2").turns[0].status, "completed");
+equal(conversations.get("thread-2").turns[0].params.approvalPolicy, "never");
+equal(conversations.get("thread-2").turns[0].items[0].type, "worktreeInit");
+
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes("function nb("), false);
 equal(main.includes("function rb("), false);
@@ -182,5 +198,7 @@ equal(main.includes("Fve = class"), false);
 equal(main.includes("Ive = class"), false);
 equal(main.includes("function Yve("), false);
 equal(main.includes("function jy("), false);
+for (const name of ["Ry", "Hy", "Uy"]) equal(main.includes(`function ${name}(`), false);
+equal(main.includes("addWorktreeInitSyntheticTurn(e, ce, u, t.history)"), true);
 
 console.log(`${assertions} main notification reducer owner assertions passed`);

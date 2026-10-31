@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复 synthetic worktree turn owner：worktree init 现优先追加到最新 turn，无 turn 时创建 completed synthetic turn，并按
+latestThreadSettings → previous turn → defaults 继承权限。canonical history 新增真实 live-tail append 导出，turn-dispatch/realtime
+consumer 去掉动态缺失导出 shim；主 chunk 唯一 consumer 接到语义 owner，旧 `Ry/Hy/Uy` 删除。
+
 恢复 realtime timeline reducer：paginated canonical voice threads 现处理 transcript delta、turn started/completed、item started/completed 与 realtime
 item started/completed，保持 position、stable key upsert、completed replacement 和 realtimeItems 状态；outer reducer 按旧顺序调用。主 chunk 旧
 `Yve/jy` 删除，保留 `Cy/Wve` 等仍由主 chunk realtime consumer 使用的 parser/builders。

@@ -778,6 +778,36 @@ export function applyCanonicalTurns(
   conversation.turns = [];
 }
 
+/** Append a local turn at the live tail (original `T_`/`E_`). */
+export function appendConversationTurn(
+  conversation: ConversationLike,
+  turn: AnyTurn,
+  createSearchIslandId: () => string,
+): AnyTurn {
+  let frozen = freezeIdentity(turn);
+  let history = canonicalHistory(conversation);
+  if (history == null) {
+    conversation.turns.push(frozen);
+    return frozen;
+  }
+  let island = exhaustedTailIsland(history);
+  if (island == null) {
+    let islandId = `local-live-tail:${createSearchIslandId()}`;
+    island = {
+      id: islandId,
+      entries: [],
+      olderBoundary: { status: `exhausted`, boundaryId: `${islandId}:older` },
+      newerBoundary: { status: `exhausted`, boundaryId: `${islandId}:newer` },
+    };
+    history.islands.push(island);
+    history.isComplete = false;
+  }
+  let entityKey = `${island.id}:local:${createSearchIslandId()}`;
+  island.entries.push({ key: entityKey, value: entityKey });
+  history.entitiesByKey[entityKey] = frozen;
+  return frozen;
+}
+
 // ---------------------------------------------------------------------------
 // turn 定位（原版 h_/g_/__/v_/y_/b_/zge/x_）
 // ---------------------------------------------------------------------------

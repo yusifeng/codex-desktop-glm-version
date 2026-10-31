@@ -18,6 +18,7 @@ const { DesktopFetchService } = require("./main-app/api/desktop-fetch.js");
 const { AppServerTransportSshWebsocket } = require("./main-app/app-server/transports.js");
 const { QueuedFollowUpsCoordinator } = require("./main-app/conversation/queued-follow-ups.js");
 const { AppServerConversationManager } = require("./main-app/conversation/app-server-manager.js");
+const { addWorktreeInitSyntheticTurn } = require("./main-app/streams/notifications-apply.js");
 const { O_e, zv, Bv, Vv, D_e } = require("./main-app/threads/patch-classification.js");
 const { mx, yx } = require("./main-app/threads/start-config.js");
 const { hasCanonicalVoiceHistory: q_, parseHeartbeatDecision: J_, parseAutomationUserMessage: n_e, AUTOMATION_DETECTOR: Y_ } = require("./main-app/threads/automation-detector.js");
@@ -25456,54 +25457,6 @@ function Jve(e) {
     .replaceAll(`&apos;`, `'`)
     .replaceAll(`&amp;`, `&`);
 }
-function Ry(e, t, n, r, i = `latest-turn`) {
-  let a = { ...n, type: `worktreeInit` };
-  if (i === `new-turn`) {
-    e.updateConversationState(t, (e) => {
-      T_(e, Hy(t, a, h_(e) ?? void 0, e.latestThreadSettings), r.createSearchIslandId);
-    });
-    return;
-  }
-  Uy(e, t, a, r);
-}
-function Hy(e, t, r, i, a = `completed`) {
-  let o = n.kd([]);
-  return {
-    params: {
-      threadId: e,
-      input: [],
-      cwd: null,
-      approvalPolicy: i?.approvalPolicy ?? r?.params.approvalPolicy ?? o.approvalPolicy,
-      approvalsReviewer: i?.approvalsReviewer ?? r?.params.approvalsReviewer ?? o.approvalsReviewer,
-      sandboxPolicy: i?.sandboxPolicy ?? r?.params.sandboxPolicy ?? o.sandboxPolicy,
-      model: null,
-      effort: `minimal`,
-      summary: `none`,
-      personality: null,
-      outputSchema: null,
-      collaborationMode: null,
-    },
-    turnId: null,
-    turnStartedAtMs: a === `inProgress` ? Date.now() : null,
-    durationMs: null,
-    firstTurnWorkItemStartedAtMs: null,
-    finalAssistantStartedAtMs: null,
-    status: a,
-    error: null,
-    diff: null,
-    items: [t],
-  };
-}
-function Uy(e, t, n, r) {
-  e.updateConversationState(t, (e) => {
-    let i = h_(e);
-    if (i) {
-      (iv(i), i.items.push(hh(n)));
-      return;
-    }
-    T_(e, Hy(t, n, void 0, e.latestThreadSettings), r.createSearchIslandId);
-  });
-}
 function ib(e, t) {
   let r = new Map(),
     i = (e) => {
@@ -32092,7 +32045,7 @@ async function Exe(
                         localTurnMetadata: F,
                         beforeSendRequest: ve
                           ? async () => {
-                              (u != null && Ry(e, ce, u, t.history),
+                              (u != null && addWorktreeInitSyntheticTurn(e, ce, u, t.history),
                                 o != null && de != null && (fe.gitInfo = fe.gitInfo ?? (await de)),
                                 await (d ?? o)?.(fe));
                             }

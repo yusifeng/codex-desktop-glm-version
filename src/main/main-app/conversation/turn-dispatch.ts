@@ -46,12 +46,8 @@ import {
   lastTurn,
   findDraftTurn,
   removeTurn,
+  appendConversationTurn,
 } from "../turns/canonical-history";
-// T_（31,567）= 会话追加单 turn——R3 turns/canonical-history 尚未导出该
-// 符号（appendConversationTurn），落地后改为命名导出（缺导出已记录）。
-import * as canonicalHistoryModule from "../turns/canonical-history";
-const appendConversationTurn: (conversation: any, turn: any, createId: () => string) => any =
-  (canonicalHistoryModule as any).appendConversationTurn;
 // R3 threads/operations（沙箱/根集合运算，原 Nx/Ox/kx/Ax/Px）。
 import {
   mergeUnique,

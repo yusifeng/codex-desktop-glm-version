@@ -33,11 +33,7 @@ import { subAgentMetadata as parseThreadSource } from "../threads/projection";
 import * as projectionModule from "../threads/projection";
 // hh（28,627）= produce 冻结包装（本 build 中为恒等）——R3 vendor/immer。
 import { freezeIdentity } from "../vendor/immer";
-// T_（31,567）= 会话追加单 turn——R3 turns/canonical-history 尚未导出该
-// 符号（appendConversationTurn），落地后改为命名导出（缺导出已记录）。
-import * as canonicalHistoryModule from "../turns/canonical-history";
-const appendConversationTurn: (conversation: any, turn: any, createId: () => string) => any =
-  (canonicalHistoryModule as any).appendConversationTurn;
+import { appendConversationTurn } from "../turns/canonical-history";
 // dg（30,006）= steeringUserMessage 条目构造——R3 turns/steering-merge 簇
 //（导出名以 R3 侧落地为准——暂按压缩名引用，缺导出已记录）。
 import { dg as buildSteeringUserMessage } from "../turns/steering-merge";

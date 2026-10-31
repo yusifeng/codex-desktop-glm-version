@@ -1,9 +1,9 @@
-import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString } from "@chunk/shared";
-import { conversationTurns, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, mergedConversationTurns, timelineEntryKey } from "../turns/canonical-history";
+import { $u as normalizeThreadId, ed as requestIdOf, Zo as errorToString, kd as defaultSandboxConfig } from "@chunk/shared";
+import { appendConversationTurn, conversationTurns, findTurnById, findTurnEntryForEvent, forEachTurn, lastTurnWithTurnId, latestTurn, mergedConversationTurns, timelineEntryKey } from "../turns/canonical-history";
 import { applyThreadSettingsUpdate } from "../threads/patch-classification";
 import { Qv as applyPermissionsResolution, Yv as planImplementationId, Zv as applyMcpElicitationResolution } from "../requests/item-synthesis";
 import { parseAutomationUserMessage, parseHeartbeatDecision } from "../threads/automation-detector";
-import { activeAncestryIds } from "../threads/hydration";
+import { activeAncestryIds, ensureTurnFields } from "../threads/hydration";
 import { normalizeImageGenerationItem } from "../threads/hydration";
 import { acceptServerUserMessage, isSteeringUserMessage, recoverSteeringOrphans, upsertItem } from "../turns/steering-merge";
 import { freezeIdentity } from "../vendor/immer";
@@ -13,7 +13,41 @@ function update(manager:unknown,id:string,callback:(state:R)=>void){fn(manager,`
 export function Fy(manager:unknown,id:string,item:unknown,_options?:unknown,_history?:unknown):void{update(manager,id,state=>append(state,item))}
 export function Iy(manager:unknown,id:string,sourceId:string,title:unknown,history:unknown):void{update(manager,id,state=>append(state,{id:fn(history,`createSearchIslandId`)?.()??`fork-${sourceId}`,type:`forkedFromConversation`,sourceConversationId:sourceId,sourceConversationTitle:title}))}
 export function Ly(manager:unknown,id:string,taskId:string,history:unknown):void{update(manager,id,state=>append(state,{id:fn(history,`createSearchIslandId`)?.()??`task-${taskId}`,type:`remoteTaskCreated`,taskId}))}
-export function Ry(manager:unknown,id:string,item:unknown,history:unknown,mode:`latest-turn`|`new-turn`=`latest-turn`):void{const value={...rec(item),type:`worktreeInit`};update(manager,id,state=>{if(mode===`new-turn`){const turns=Array.isArray(state.turns)?state.turns:[];state.turns=[...turns,{turnId:fn(history,`createSearchIslandId`)?.()??`worktree-init`,status:`inProgress`,items:[value]}]}else append(state,value)})}
+function syntheticWorktreeTurn(threadId: string, item: unknown, previousTurn: any, settings: any, status = `completed`) {
+  const defaults = defaultSandboxConfig([]);
+  return {
+    params: {
+      threadId, input: [], cwd: null,
+      approvalPolicy: settings?.approvalPolicy ?? previousTurn?.params?.approvalPolicy ?? defaults.approvalPolicy,
+      approvalsReviewer: settings?.approvalsReviewer ?? previousTurn?.params?.approvalsReviewer ?? defaults.approvalsReviewer,
+      sandboxPolicy: settings?.sandboxPolicy ?? previousTurn?.params?.sandboxPolicy ?? defaults.sandboxPolicy,
+      model: null, effort: `minimal`, summary: `none`, personality: null, outputSchema: null, collaborationMode: null,
+    },
+    turnId: null,
+    turnStartedAtMs: status === `inProgress` ? Date.now() : null,
+    durationMs: null,
+    firstTurnWorkItemStartedAtMs: null,
+    finalAssistantStartedAtMs: null,
+    status,
+    error: null,
+    diff: null,
+    items: [item],
+  };
+}
+export function Ry(manager:unknown,id:string,item:unknown,history:unknown,mode:`latest-turn`|`new-turn`=`latest-turn`):void{
+  const value={...rec(item),type:`worktreeInit`};
+  update(manager,id,state=>{
+    const createId = fn(history,`createSearchIslandId`) as (() => string) | undefined;
+    if (createId == null) throw Error(`Missing createSearchIslandId for synthetic worktree turn`);
+    const current = latestTurn(state as any);
+    if(mode===`new-turn`){
+      appendConversationTurn(state as any, syntheticWorktreeTurn(id,value,current,state.latestThreadSettings) as any,createId);
+      return;
+    }
+    if(current != null){ensureTurnFields(current as any);current.items.push(freezeIdentity(value));return;}
+    appendConversationTurn(state as any,syntheticWorktreeTurn(id,value,undefined,state.latestThreadSettings) as any,createId);
+  })
+}
 export function zy(manager:unknown,id:string,turnId:string):void{update(manager,id,state=>{if(Array.isArray(state.requests))state.requests=state.requests.filter(x=>!(rec(x).method===`item/plan/requestImplementation`&&rec(rec(x).params).turnId===turnId))})}
 function goalAllowsConfirmation(status: unknown): boolean {
   return status === "paused" || status === "blocked" || status === "usageLimited";
