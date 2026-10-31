@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 deep-link route executor
+
+原 `lit` 已迁入 `src/main/main-app/deep-links/route-executor.ts`。新 executor 保留所有 parsed-route dispatch、plugin
+lookup failure logging、pet/OAuth/browser 消息、automation/search URL、local-conversation existence/review/prompt/host navigation，
+以及 new-thread workspace/project 编排；真实 `_it` navigation consumer 已接回，旧 function 已删除。
+
 ## 2026-10-31 deep-link route actions
 
 原 `b7/uit` 已迁入 `src/main/main-app/deep-links/route-actions.ts`。新模块保留 background browser-tab/browser-panel

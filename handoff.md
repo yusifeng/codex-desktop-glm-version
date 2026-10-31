@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `lit` deep-link route executor 迁入 `deep-links/route-executor.ts`；no-op routes、announcement/plugin/pet/
+automation/OAuth/browser/shared/library/local-conversation/new-thread/settings/skills dispatch，lookup failure logging、review/
+prompt state 与 workspace/project 子 owner 编排均由新 executor 持有。真实 `_it` navigation consumer 已接回，旧 function 删除。
+
 随后将 `b7/uit` deep-link route actions 迁入 `deep-links/route-actions.ts`；background browser-tab 与 browser-panel
 消息投影、initiator 默认值，以及 phase-flag 驱动的 plugin marketplace 查询/精确匹配均由新模块持有。真实 browser、
 local-conversation、new-thread 与 plugin-install consumers 已接回，旧两个 helpers 已删除。

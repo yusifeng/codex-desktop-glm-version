@@ -153,6 +153,7 @@ const { resolveDeepLinkThreadHost } = require("./main-app/deep-links/thread-host
 const { resolveDeepLinkWorkspace } = require("./main-app/deep-links/workspace-resolver.js");
 const { selectLocalProjectForWorkspace } = require("./main-app/deep-links/local-project-selector.js");
 const { findPluginMarketplacePath, openBrowserForDeepLink } = require("./main-app/deep-links/route-actions.js");
+const { createDeepLinkRouteExecutor } = require("./main-app/deep-links/route-executor.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -143816,226 +143817,41 @@ function sit({
   }
   (l.Menu.setApplicationMenu(Lt), UZ(y));
 }
-var y7 = r.r(`codex-deep-link-navigation`);
-async function lit({
-  window: e,
-  route: t,
-  globalState: r,
-  requestGitWorker: i,
-  appServerClient: a,
-  listPlugins: o,
-  readThread: s,
-  projectsManager: c,
-  windowManager: l,
-  navigateToRoute: u,
-}) {
-  switch (t.kind) {
-    case `applyCodexAppConfig`:
-      return;
-    case `experienceActivation`:
-      l.sendMessageToWindow(e, { type: `show-chatgpt-rosalind-announcement` });
-      return;
-    case `orbitOnboarding`:
-      return;
-    case `pluginInstall`: {
-      let r;
-      try {
-        r = await findPluginMarketplacePath({
-          listPlugins: o,
-          marketplaceName: t.marketplaceName,
-          pluginName: t.pluginName,
-          localMarketplacesOnly: Tr().noPluginListPhase2,
-        });
-      } catch (n) {
-        (y7.warning(`plugin_install_marketplace_lookup_failed`, {
-          safe: { marketplaceName: t.marketplaceName, pluginName: t.pluginName },
-          sensitive: { error: n },
-        }),
-          u(e, `/skills`, { initialTab: `plugins` }));
-        return;
-      }
-      if (r == null) {
-        u(e, `/skills`, { initialTab: `plugins` });
-        return;
-      }
-      u(e, n.po({ marketplacePath: r, pluginId: t.pluginName, pluginName: t.pluginName }));
-      return;
-    }
-    case `petInstall`:
-      (l.showPrimaryWindow({ stealFocus: !0 }),
-        l.sendMessageToWindow(e, {
-          type: `open-pet-install-modal`,
-          name: t.name,
-          description: t.description,
-          imageUrl: t.imageUrl,
-          spriteVersionNumber: t.spriteVersionNumber,
-        }));
-      return;
-    case `pluginDetail`:
-      u(e, n.po(t));
-      return;
-    case `pluginMcpApp`:
-      u(e, n.mo(t.pluginId, t.toolName), {
-        entrypoint: t.entrypoint,
-        mcpAppDeepLink: t.target ?? void 0,
-      });
-      return;
-    case `localPluginDetail`:
-      u(
-        e,
-        n.po({
-          hostId: t.hostId ?? `local`,
-          marketplacePath: t.marketplacePath,
-          pluginId: t.pluginName,
-          pluginName: t.pluginName,
-        }),
-        { pluginDetailDeepLinkMode: t.openShareDialog ? `share` : `view` },
-      );
-      return;
-    case `automations`:
-      u(e, `/automations`, { automationMode: `create` });
-      return;
-    case `automation`: {
-      let n = new URLSearchParams({
-        automationId: t.automationId,
-        automationSource: t.automationSource,
-      });
-      (t.edit && n.set(`edit`, `true`), u(e, `/automations?${n.toString()}`));
-      return;
-    }
-    case `team`:
-      return;
-    case `connectorOAuthCallback`:
-      (l.showPrimaryWindow({ stealFocus: !0 }),
-        l.sendMessageToWindow(e, {
-          type: `connector-oauth-callback`,
-          fullRedirectUrl: t.fullRedirectUrl,
-          returnTo: t.returnTo ?? void 0,
-        }));
-      return;
-    case `launch`:
-      l.showPrimaryWindow({ stealFocus: !0 });
-      return;
-    case `browser`:
-      openBrowserForDeepLink({
-        browserUrl: t.browserUrl,
-        initiator: `external_link`,
-        window: e,
-        windowManager: l,
-      });
-      return;
-    case `sharedChatGptConversation`:
-      u(e, n.uo(t.sharedConversationId));
-      return;
-    case `sharedCodexSnapshot`:
-      return;
-    case `spacePage`:
-      return;
-    case `libraryFile`:
-      u(e, `/library/file/${t.libraryFileId}`);
-      return;
-    case `localConversation`: {
-      if (
-        s == null ||
-        (await s(t.conversationId, { includeTurns: !1 }).catch(
-          (e) => (
-            y7.warning(`local_conversation_deep_link_lookup_failed`, {
-              safe: { conversationId: t.conversationId },
-              sensitive: { error: e },
-            }),
-            null
-          ),
-        )) == null
-      )
-        return;
-      if (t.browserActive === !1 && t.browserTabId != null && t.browserUrl != null) {
-        openBrowserForDeepLink({
-          browserActive: !1,
-          browserTabId: t.browserTabId,
-          browserUrl: t.browserUrl,
-          conversationId: t.conversationId,
-          window: e,
-          windowManager: l,
-        });
-        return;
-      }
-      let r;
-      t.openReview && t.reviewDiffFilter != null
-        ? (r = { openReview: !0, reviewDiffFilter: t.reviewDiffFilter, reviewPath: t.reviewPath })
-        : t.openReview && (r = { openReview: !0 });
-      let i = r;
-      t.prompt != null && (i = { ...r, focusComposerNonce: Date.now(), prefillPrompt: t.prompt });
-      let a = n.fo(t.conversationId);
-      (u(
-        e,
-        t.hostId == null || t.hostId === `local`
-          ? a
-          : `${a}?${new URLSearchParams({ hostId: t.hostId })}`,
-        i,
-      ),
-        openBrowserForDeepLink({
-          browserTabId: t.browserTabId,
-          browserUrl: t.browserUrl,
-          conversationId: t.conversationId,
-          window: e,
-          windowManager: l,
-        }));
-      return;
-    }
-    case `newThread`: {
-      let o =
-          t.projectId == null ? null : (c?.getLocalProjects()[t.projectId] ?? jr(r)[t.projectId]),
-        s = null;
-      s =
-        o == null
-          ? await resolveDeepLinkWorkspace({
-              route: t,
-              globalState: r,
-              requestGitWorker: i,
-              appServerClient: a,
-              projectsManager: c,
-              resolvePath: h.resolve,
-              stat: b.stat,
-              getFallbackRoots: (globalState) => Fr(globalState).roots,
-              parseRepoOrigin: dt,
-            })
-          : n.Wo(o.rootPaths);
-      let d =
-        s == null
-          ? void 0
-          : await selectLocalProjectForWorkspace({
-              globalState: r,
-              projectsManager: c,
-              projectId: o?.id,
-              workspaceRoot: s,
-              windowManager: l,
-              localHostId: J,
-              findProjectByRoot: Mr,
-              getSelectedProject: Nr,
-              setSelectedProject: Lr,
-              globalStateKeys: n.iu,
-            });
-      if (s != null && d == null) return;
-      (u(e, `/`, {
-        codexAppMode: t.codexAppMode,
-        focusComposerNonce: Date.now(),
-        prefillPrompt: t.prompt,
-        project: d,
+var y7 = r.r(`codex-deep-link-navigation`),
+  { executeDeepLinkRoute } = createDeepLinkRouteExecutor({
+    logger: y7,
+    findPluginMarketplacePath: ({ listPlugins, route }) =>
+      findPluginMarketplacePath({
+        listPlugins,
+        marketplaceName: route.marketplaceName,
+        pluginName: route.pluginName,
+        localMarketplacesOnly: Tr().noPluginListPhase2,
       }),
-        openBrowserForDeepLink({ browserUrl: t.browserUrl, window: e, windowManager: l }));
-      return;
-    }
-    case `settings`:
-      u(
-        e,
-        `${t.section == null ? `/settings` : `/settings/${t.section}`}${t.search ?? ``}${t.hash ?? ``}`,
-      );
-      return;
-    case `skills`:
-      u(e, `/skills${t.search ?? ``}`);
-      return;
-  }
-}
+    openBrowserForDeepLink,
+    buildPluginDetailRoute: n.po,
+    buildMcpAppRoute: n.mo,
+    buildSharedConversationRoute: n.uo,
+    buildConversationRoute: n.fo,
+    resolveProjectRoot: n.Wo,
+    getLegacyProjects: jr,
+    resolveWorkspace: (options) =>
+      resolveDeepLinkWorkspace({
+        ...options,
+        resolvePath: h.resolve,
+        stat: b.stat,
+        getFallbackRoots: (globalState) => Fr(globalState).roots,
+        parseRepoOrigin: dt,
+      }),
+    selectWorkspaceProject: (options) =>
+      selectLocalProjectForWorkspace({
+        ...options,
+        localHostId: J,
+        findProjectByRoot: Mr,
+        getSelectedProject: Nr,
+        setSelectedProject: Lr,
+        globalStateKeys: n.iu,
+      }),
+  });
 function _it({
   settingsStore: e,
   buildFlavor: t,
@@ -144084,7 +143900,7 @@ function _it({
                 hasAppServerConnection: f,
               })
             : void 0;
-        return lit({
+        return executeDeepLinkRoute({
           window: e,
           route: t.kind === `localConversation` ? { ...t, hostId: n } : t,
           globalState: r,
