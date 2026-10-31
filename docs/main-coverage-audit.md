@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 avatar overlay composition owner
+
+既有 `src/main/main-app/avatar-overlay/composition-surface.ts` 和 `realtime.ts` 已接回真实 main consumer，替代原 `Hle/rle`
+及重复 WeakMap registry。新 owner 保留 overlay/PIP window lifecycle、geometry、quick-chat element sizing、native app icons、
+presentation 与 realtime voice session/starter 生命周期；接线前校正 `setElementSize` 公共方法名，并恢复 start/cancel RPC
+handle 的 `.dup()` 后持有、仅释放副本语义。真实 startup 仍构造该 owner，旧 class/registry 已从主 chunk 删除。
+
 ## 2026-10-31 local thread catalog store wiring correction
 
 既有 `src/main/main-app/thread-catalog/store.ts` 是完整的 6-table SQLite DAO，但此前从未被 main require；本轮将真实

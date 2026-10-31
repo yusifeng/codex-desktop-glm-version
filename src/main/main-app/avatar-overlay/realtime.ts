@@ -34,6 +34,7 @@ export interface RealtimeLaunch {
 /** renderer 侧 starter 的 RPC 句柄形态（with onRpcBroken + Symbol.dispose）。 */
 export interface StarterRpcHandle {
   (request?: RealtimeStartRequest): Promise<unknown> | unknown;
+  dup(): StarterRpcHandle;
   onRpcBroken(handler: () => void): unknown;
   [Symbol.dispose](): void;
 }
@@ -166,17 +167,17 @@ export class RealtimeVoiceController {
     )
       return;
     this.clearStarter();
-    let startHandle = start as StarterRpcHandle;
-    let cancelHandle = cancelStart as unknown as StarterRpcHandle;
+    let startHandle = (start as StarterRpcHandle).dup();
+    let cancelHandle = (cancelStart as unknown as StarterRpcHandle).dup();
     this.starter = {
       canCreateNewThread,
-      cancelStart: cancelStart as RealtimeStarter["cancelStart"],
+      cancelStart: cancelHandle as RealtimeStarter["cancelStart"],
       rendererId,
-      start,
+      start: startHandle,
       stopSessionIfActive,
     };
     let onBroken = () => {
-      if (this.starter?.start === start) this.clearStarter(rendererId);
+      if (this.starter?.start === startHandle) this.clearStarter(rendererId);
     };
     startHandle.onRpcBroken(onBroken);
     cancelHandle.onRpcBroken(onBroken);

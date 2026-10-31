@@ -131,7 +131,7 @@ export interface GlobalStateLike {
   set(key: unknown, value: unknown): void;
 }
 
-/** renderer 布局状态（setElementSizes 的入参，原 16,630-16,645）。 */
+/** renderer 布局状态（setElementSize 的入参，原 16,630-16,645）。 */
 export interface RendererElementSizes {
   quickChatFocusRequestId?: number | null;
   isQuickChatLoading?: boolean;
@@ -1291,8 +1291,8 @@ function run(argv) {
   // renderer 布局驱动
   // -------------------------------------------------------------------------
 
-  /** renderer 上报元素尺寸（原 setElementSizes，16,630-16,731）。 */
-  setElementSizes(webContentsId: number, sizes: RendererElementSizes): void {
+  /** renderer 上报元素尺寸（原 setElementSize，16,630-16,731）。 */
+  setElementSize(webContentsId: number, sizes: RendererElementSizes): void {
     let window = this.window;
     if (window == null || window.isDestroyed() || window.webContents.id !== webContentsId) return;
     let focusRequestId = sizes.quickChatFocusRequestId;

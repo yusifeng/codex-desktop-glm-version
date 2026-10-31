@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 avatar overlay 的完整 composition owner：既有 `avatar-overlay/composition-surface.ts` 与 `realtime.ts` 现已替代主
+chunk 的 `Hle/rle` 和模块级 voice-controller registry。接线前修正了 renderer 消费的单数 `setElementSize` API，并恢复
+starter RPC handle 的 `.dup()` 所有权语义；真实 startup、quick-chat size update 与 voice consumer 均保持原调用链，旧大类
+和重复 registry 已物理删除。
+
 修复 thread-catalog store 的长期未接线迁移：完整 `LocalThreadCatalogStore` 现已替代主 chunk 的 `hhe`，真实 catalog
 factory consumer 保持 `new hhe(...)` 兼容。主 chunk 中重复的 6-table SQLite DAO、store-only schemas/upsert SQL、filter/
 row-mapping helpers 已删除；仍由 thread projection 使用的 `_he/um/dm` 保留。
