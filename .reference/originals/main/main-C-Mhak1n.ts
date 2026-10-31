@@ -367,7 +367,7 @@ const { createSshConnectionRegistrationClass } = require("./main-app/remote/ssh-
 const { createNotificationsServiceClass } = require("./main-app/notifications/notifications-service.js");
 const { createShortcutCaptureServices } = require("./main-app/window/shortcut-capture-service.js");
 const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-audio-spectrum-service.js");
-const { SkysightServiceManager: Moe } = require("./main-app/skysight/service-manager.js");
+const { createPluginReconciliationLifecycle } = require("./main-app/plugins/startup-reconciliation-lifecycle.js");
 const { subscribeComputerUsePipTurnLifecycle: Noe } = require("./main-app/computer-use/pip-turn-lifecycle.js");
 const { AppEntryAttributionTracker: Foe } = require("./main-app/startup/app-entry-attribution.js");
 const { createAppEntryDeliveryRuntime } = require("./main-app/startup/app-entry-delivery.js");
@@ -767,12 +767,9 @@ const {
 const {
   removeStaleBundledMarketplaces: xre,
   syncCuaSkillsForPlugins: wo,
-  createChromeNativeHostCacheWatcher: aoe,
 } = require("./main-app/plugins/chrome-native-host-sync.js");
 const {
-  createBundledPluginsOrchestrator: ioe,
   listObservedPluginStates: ul,
-  archiveLegacyChronicleSkill: loe,
 } = require("./main-app/plugins/orchestrator.js");
 const {
   CUA_REPL_DISABLED_MCP_SERVER_ENTRY: Bi,
@@ -56300,7 +56297,6 @@ async function Ust() {
     }),
   );
   let ye = new yit(),
-    be = null,
     Se = xst({ applicationNetwork: i, disposables: I, isTrustedIpcEvent: _e, startupConfig: p });
   (Se.setGitWorkerMainRpcTarget(
     new fte((e) => {
@@ -56310,7 +56306,12 @@ async function Ust() {
     }),
   ),
     Se.setGitWorkerTracingSampleRate(ee));
-  let managedComputerUseLifecycle = createManagedComputerUseLifecycle({
+  let pluginReconciliationLifecycle = createPluginReconciliationLifecycle({
+      app: l.app,
+      isMacOS: N,
+      registerDispose: (dispose) => I.add(dispose),
+    }),
+    managedComputerUseLifecycle = createManagedComputerUseLifecycle({
       codexHome: V.codexHome,
       enabled: N,
       environment: process.env,
@@ -56321,7 +56322,7 @@ async function Ust() {
       },
       onServiceRespawned: () => {
         Tr().skysight &&
-          be?.shouldReconcileAfterServiceRespawn() &&
+          pluginReconciliationLifecycle.getRecorder()?.shouldReconcileAfterServiceRespawn() &&
           K.appServerConnectionRegistry.getMaybeConnection(J)?.reconcileChronicle();
       },
       registerDispose: (dispose) => I.add(dispose),
@@ -56430,7 +56431,8 @@ async function Ust() {
     setGitWorkerTracingSampleRate: Se.setGitWorkerTracingSampleRate,
     appEvent: Se.appEvent,
     onAppServerSqliteRecovery: De.onRecovery,
-    getSkysightRecorderController: () => (Tr().skysight ? be : null),
+    getSkysightRecorderController: () =>
+      Tr().skysight ? pluginReconciliationLifecycle.getRecorder() : null,
     artifactSessionHostLifecycle: Ae,
     onCompletedThreadsChanged: dockMenuLifecycle.setCompletedThreads,
   });
@@ -56610,7 +56612,7 @@ async function Ust() {
             getConnection: () => K.appServerConnectionRegistry.getMaybeConnection(`local`) ?? null,
             getFeatureAvailability: Tr,
             getManagedService: managedComputerUseLifecycle.getService,
-            getRecorder: () => be,
+            getRecorder: pluginReconciliationLifecycle.getRecorder,
             invalidateQuery: (e) => W.broadcastQueryCacheInvalidation(e),
             logComputerHistoryStatusItemAction: (e) =>
               publishComputerUseAnalytics({ type: `skysight-status-item-action-clicked`, action: e }),
@@ -56673,26 +56675,16 @@ async function Ust() {
         closeActiveTurn: computerUseNativePipeClient.closeActiveTurn,
       }),
     ));
-  let Ye = aoe({
-    buildFlavor: s,
-    codexHome: V.codexHome,
-    executionCodexHome: V.executionCodexHome,
-    repoRoot: V.repoRoot,
-  });
-  I.add(Ye.dispose);
-  let Xe = ioe({
+  pluginReconciliationLifecycle.start({
     appVersion: D,
     buildFlavor: s,
     codexHome: V.codexHome,
+    connectionRegistry: K.appServerConnectionRegistry,
+    executionCodexHome: V.executionCodexHome,
     getLocalAppServerConnection: Pe,
-    getConnectedRemoteSshAppServerConnections: () =>
-      K.appServerConnectionRegistry
-        .getAllHostIds()
-        .map((e) => K.appServerConnectionRegistry.getConnection(e))
-        .filter((e) => n.Os(e.hostConfig) && e.getConnectionState() === `connected`),
     globalState: V.globalState,
     isPackaged: l.app.isPackaged,
-    onChromePluginInstallStateChanged: Ye.setPluginInstallState,
+    isRemoteSshConnection: (connection) => n.Os(connection.hostConfig),
     onInstallStateObserved: (e) => {
       let t = W.getPrimaryWindow();
       t != null &&
@@ -56704,41 +56696,13 @@ async function Ust() {
     onSkillsMayHaveChanged: () => {
       W.broadcastQueryCacheInvalidation([`skills`]);
     },
-    onReconcileComplete: () => {
+    onPluginsReconciled: () => {
       (W.broadcastQueryCacheInvalidation([`plugins`]), computerUseNativePipeClient.refresh());
     },
     repoRoot: V.repoRoot,
+    requestComputerUseWorker: Se.requestComputerUseWorker,
     trashItem: (e) => l.shell.trashItem(e),
   });
-  (I.add(
-    K.appServerConnectionRegistry.subscribe((e) => {
-      e.type === `added` &&
-        n.Os(e.connection.hostConfig) &&
-        (e.connection.registerInternalConnectionStateHandler((t) => {
-          t === `connected` && Xe.reconcileRemoteSshHost(e.connection);
-        }),
-        e.connection.getConnectionState() === `connected` &&
-          Xe.reconcileRemoteSshHost(e.connection));
-    }),
-  ),
-    N &&
-      (be = new Moe({
-        request: Se.requestComputerUseWorker,
-        reconcileComputerHistoryPluginInstallation: (e) => {
-          Xe.reconcileComputerHistoryPluginInstallation(e);
-        },
-        archiveLegacyChronicleSkill: async () => {
-          (await loe({ codexHome: V.codexHome, reason: `skysight_gate_enabled` })) != null &&
-            W.broadcastQueryCacheInvalidation([`skills`]);
-        },
-      })));
-  let Ze = () => {
-    Xe.reconcileExternalPluginState(`focus`);
-  };
-  (l.app.on(`browser-window-focus`, Ze),
-    I.add(() => {
-      l.app.off(`browser-window-focus`, Ze);
-    }));
   await managedComputerUseLifecycle.start();
   let Qe = new pne(K.getBrowserSessionRegistry());
   I.add(() => {
@@ -56751,7 +56715,7 @@ async function Ust() {
     getLocalAppServerConnection: Pe,
     getLogger: r.n,
     getManagedComputerUseService: managedComputerUseLifecycle.getService,
-    getRecorder: () => be,
+    getRecorder: pluginReconciliationLifecycle.getRecorder,
     hasWindowsCaptureBridge: () => W.windowsCaptureNativeBridge != null,
     isWindows: P,
     notifyDesktopFeatureAvailabilityChanged: () => K.settings.notifyDesktopFeatureAvailabilityChanged(),
@@ -56763,7 +56727,7 @@ async function Ust() {
     setBrowserSessionFeatureAvailability: (availability) => Qe.setDesktopFeatureAvailability(availability),
     setComputerUseFeatureAvailability: (availability) =>
       computerUseNativePipeClient.setDesktopFeatureAvailability(availability),
-    setPluginFeatureAvailability: (availability, reasons) => Xe.setDesktopFeatureAvailability(availability, reasons),
+    setPluginFeatureAvailability: pluginReconciliationLifecycle.setDesktopFeatureAvailability,
     startConversationExecutor: () => K.startConversationExecutor(),
   });
   (registerMainIpcRouter({
@@ -56838,7 +56802,7 @@ async function Ust() {
     },
     restoreAvatarOverlayOpenState: (e) => W.avatarOverlayManager.restoreOpenState(e),
     prewarmAvatarOverlay: (e) => W.avatarOverlayManager.prewarm(e),
-    reloadBundledPlugins: () => Xe.reloadBundledPlugins(),
+    reloadBundledPlugins: pluginReconciliationLifecycle.reloadBundledPlugins,
     setMacMenuBarEnabled: Ke,
     navigateToRoute: Le.navigateToRoute,
     setRemoteHostedPIPActiveThreadID: U.setActiveThreadForWebContents,
@@ -57030,7 +56994,7 @@ async function Ust() {
     Le.refreshApplicationMenu(),
     M(`application menu refreshed`, L),
     (L = Date.now()),
-    await Xe.waitForPendingReconcile(),
+    await pluginReconciliationLifecycle.waitForPendingReconcile(),
     M(`bundled plugins reconcile checked`, L, { isMacOS: N }),
     K.startConversationExecutor(),
     A.info(`Host startup critical-path phases completed`, {

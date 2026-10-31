@@ -18,6 +18,7 @@ const realOwners = [
   ["src/main/main-app/startup/dock-menu-lifecycle.ts", "createDockMenuLifecycle"],
   ["src/main/main-app/startup/application-menu-refresh-lifecycle.ts", "createApplicationMenuRefreshLifecycle"],
   ["src/main/main-app/computer-use/managed-service-lifecycle.ts", "createManagedComputerUseLifecycle"],
+  ["src/main/main-app/plugins/startup-reconciliation-lifecycle.ts", "createPluginReconciliationLifecycle"],
   ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
@@ -686,5 +687,19 @@ assert.equal(main.includes('require("./main-app/computer-use/managed-service.js"
 assert.equal(main.includes('require("./main-app/native-pipe/host-services-server.js")'), false, "startup no longer constructs the host-services server directly");
 assert.equal(main.includes("refreshCanonicalServiceAppCopy: Toe"), false, "startup no longer aliases canonical service refresh");
 assert.equal(main.includes("NODE_REPL_HOST_SERVICES_PIPE_PATH: Go"), false, "startup no longer owns the host-services environment key");
+assert.equal(main.includes('require("./main-app/plugins/startup-reconciliation-lifecycle.js")'), true, "plugin reconciliation lifecycle owner is wired");
+assert.equal(main.includes("pluginReconciliationLifecycle = createPluginReconciliationLifecycle({"), true, "startup creates one plugin reconciliation owner");
+assert.equal(main.includes("pluginReconciliationLifecycle.start({"), true, "startup initializes plugin reconciliation after WindowContext exists");
+assert.equal(main.includes("getRecorder: pluginReconciliationLifecycle.getRecorder"), true, "status-item and feature consumers share the lifecycle recorder");
+assert.equal(main.includes("setPluginFeatureAvailability: pluginReconciliationLifecycle.setDesktopFeatureAvailability"), true, "feature reconciliation delegates to the lifecycle");
+assert.equal(main.includes("reloadBundledPlugins: pluginReconciliationLifecycle.reloadBundledPlugins"), true, "IPC plugin reload delegates to the lifecycle");
+assert.equal(main.includes("await pluginReconciliationLifecycle.waitForPendingReconcile()"), true, "critical path awaits the lifecycle reconcile chain");
+assert.equal(main.includes("be = null"), false, "generated recorder placeholder must be removed");
+assert.equal(main.includes("let Ye = aoe({"), false, "generated cache watcher alias must be removed");
+assert.equal(main.includes("let Xe = ioe({"), false, "generated plugin orchestrator alias must be removed");
+assert.equal(main.includes("let Ze = () =>"), false, "generated focus listener alias must be removed");
+assert.equal(main.includes("createChromeNativeHostCacheWatcher: aoe"), false, "startup no longer aliases the cache watcher constructor");
+assert.equal(main.includes("createBundledPluginsOrchestrator: ioe"), false, "startup no longer aliases the plugin orchestrator constructor");
+assert.equal(main.includes("archiveLegacyChronicleSkill: loe"), false, "startup no longer aliases legacy Chronicle archival");
 
-console.log("680 main unwired-owner skeleton assertions passed");
+console.log("695 main unwired-owner skeleton assertions passed");

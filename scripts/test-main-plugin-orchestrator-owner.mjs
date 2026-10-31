@@ -176,14 +176,16 @@ try {
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
 equal(main.includes('require("./main-app/plugins/orchestrator.js")'), true);
-equal(main.includes("createBundledPluginsOrchestrator: ioe"), true);
-equal(main.includes("createChromeNativeHostCacheWatcher: aoe"), true);
-equal(main.includes("archiveLegacyChronicleSkill: loe"), true);
+equal(main.includes('require("./main-app/plugins/startup-reconciliation-lifecycle.js")'), true);
+equal(main.includes("createBundledPluginsOrchestrator: ioe"), false);
+equal(main.includes("createChromeNativeHostCacheWatcher: aoe"), false);
+equal(main.includes("archiveLegacyChronicleSkill: loe"), false);
 equal(main.includes("var al = ["), false);
 equal(main.includes("function ioe("), false);
 equal(main.includes("function aoe("), false);
 equal(main.includes("async function loe("), false);
-equal(main.includes("let Xe = ioe({"), true);
-equal(main.includes("let Ye = aoe({"), true);
+equal(main.includes("pluginReconciliationLifecycle.start({"), true);
+equal(main.includes("let Xe = ioe({"), false);
+equal(main.includes("let Ye = aoe({"), false);
 
 console.log(`${assertions} main plugin orchestrator owner assertions passed`);

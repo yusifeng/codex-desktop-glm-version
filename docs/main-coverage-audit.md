@@ -3515,3 +3515,14 @@ peer-authorizer 保持在真正启动 pipe 时才调用工厂，非 internal bui
 未提前 package metadata/native addon 副作用。`Ust` 原 nullable `H` 及直接
 `Eoe/Toe/koe/Go/createHostServicesServer` 装配删除，所有 consumer 共享 lifecycle owner。29 项 focused 断言与 managed-service、
 native-pipe、PIP、RPC、availability、status-item 相邻 114 项回归通过，no-unwired gate 扩至 680 项。
+
+### 整块抽取：plugin reconciliation / Skysight startup lifecycle
+
+新增并接回 `plugins/startup-reconciliation-lifecycle.ts`，先创建一个可安全返回 null recorder 的 lifecycle owner，待 WindowContext
+可用后按原顺序一次启动 chrome native-host cache watcher、bundled-plugin orchestrator、remote SSH registry subscription、macOS
+Skysight recorder 与 browser-window-focus observer。重复 start 幂等；remote host 仅在 connected 或 transition-to-connected 时
+reconcile，focus/registry/watcher disposer 保持原引用与顺序。
+
+WindowContext、status item、managed-service respawn、feature reconciler、IPC reload 与 startup critical-path wait 全部消费该 owner。
+`Ust` 原 `be/Ye/Xe/Ze` 以及 `Moe/aoe/ioe/loe` 直接构造别名删除。22 项 focused 断言与 orchestrator、Skysight、managed
+Computer Use、availability、main IPC 相邻 152 项回归通过，no-unwired gate 扩至 695 项。

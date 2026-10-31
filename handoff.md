@@ -5427,3 +5427,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   RPC/status-item/availability consumers、internal host-services pipe、环境变量发布和 cleanup；失败继续 warning 后降级。
 - peer-authorizer 工厂仍到 internal pipe startup 才惰性执行，外部 pipe 环境替换值不会被 cleanup 误删。`Ust` nullable `H`
   与直接 `Eoe/Toe/koe/Go/createHostServicesServer` 装配删除；focused 29 项、相邻六组 114 项回归通过，no-unwired gate 扩至 680 项。
+
+# 2026-11-01 plugin reconciliation startup lifecycle extraction
+
+- 新增并真实接回 `plugins/startup-reconciliation-lifecycle.ts`，统一 watcher→orchestrator→remote SSH subscription→macOS recorder→
+  focus observer 构造顺序、connected transition、幂等 start 与 disposer；早期 recorder getter 保持安全 null。
+- WindowContext/status item/managed-service respawn/availability/IPC/startup wait 共用 owner。`Ust` 旧 `be/Ye/Xe/Ze` 及
+  `Moe/aoe/ioe/loe` 直接别名删除；focused 22 项、相邻五组 152 项回归通过，no-unwired gate 扩至 695 项。

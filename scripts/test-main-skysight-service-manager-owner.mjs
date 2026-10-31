@@ -119,8 +119,10 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-equal(main.includes("var Moe = SkysightServiceManager;"), true);
+equal(main.includes("var Moe = SkysightServiceManager;"), false);
 equal(main.includes("Moe = class"), false);
-equal(main.includes("be = new Moe({"), true);
+equal(main.includes('require("./main-app/plugins/startup-reconciliation-lifecycle.js")'), true);
+equal(main.includes("be = new Moe({"), false);
+equal(main.includes("pluginReconciliationLifecycle.getRecorder"), true);
 
 console.log(`${assertions} main Skysight service manager owner assertions passed`);
