@@ -3032,3 +3032,11 @@ no-unwired gate 扩至 401 项。
 和 context-menu message ids 的唯一 owner。接线时修复 `hasPendingDesignChange` 错把 snapshot 当成外层 tab 的签名，并为 crash
 page 恢复默认 secure/local URL policy 注入。原始 chunk 中 `pVe..VU` 约 691 行（含整套 interstitial HTML/CSS/JS 与图标）已
 物理删除。focused test 覆盖附件、清理、snapshot、HTML/error classification 与真实接线；no-unwired gate 扩至 408 项。
+
+### 增量接线：browser page-store runtime
+
+`browser-sidebar/page-store.ts` 已接管页面 key/URL/导航序列化、attach-token 清理、CDP 颜色与 device metrics、双窗口消息、鼠标
+转发、64MiB/100 页预算、原子落盘、ownership/reassociate/delete 及窗口关闭前持久化。`persistableNavigationOf` 现显式导出供
+主组合根和冷恢复逻辑共用。原始 chunk 中 `WU..ZHe` 约 589 行重复实现已整带删除，下一 browser window owner 边界未动。
+focused test 覆盖 URL/navigation、消息/鼠标、store ownership/预算入口、CDP attach/detach 与真实接线；no-unwired gate 扩至
+415 项。

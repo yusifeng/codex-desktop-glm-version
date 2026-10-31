@@ -4988,3 +4988,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   interstitial；修复 pending-design snapshot 签名及 crash URL policy 默认注入。
 - main 旧 `pVe..VU` 约 691 行整带删除。focused coverage 32 项，no-unwired gate 扩至 408 项；下一批从紧随其后的 page-store
   与 browser manager helpers 继续审计。
+
+# 2026-11-01 browser page-store runtime wiring
+
+- `browser-sidebar/page-store.ts` 已成为 navigation serialization、CDP viewport、page budget/atomic persistence 与 shutdown flush
+  的唯一 owner；`persistableNavigationOf` 补为显式语义导出。
+- main 旧 `WU..ZHe` 约 589 行整带删除，后续 browser window owner 边界保持不变。focused coverage 35 项，no-unwired gate
+  扩至 415 项；下一批从 `QHe` 开始的 browser window/bootstrap owner 继续审计。

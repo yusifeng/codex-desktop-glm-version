@@ -298,7 +298,7 @@ export function pageStateFromWebContents({ pageState, title, url, webContents }:
 }
 
 /** 可持久化导航提取（原 `nW`）：空/单条无 pageState → null。 */
-function persistableNavigationOf(page: PageState | null): PageState["navigation"] | null {
+export function persistableNavigationOf(page: PageState | null): PageState["navigation"] | null {
   const navigation = page?.navigation ?? null;
   if (navigation == null || navigation.entries.length === 0) return null;
   const index = navigation.currentIndex;
