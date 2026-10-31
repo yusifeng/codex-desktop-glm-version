@@ -5212,3 +5212,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 主 chunk 旧 `CWe/wWe/zG/TWe/EWe/DWe/BG/OWe/VG/kWe/AWe/HG/jWe/UG/MWe/WG` 已整带删除，`SWe`、host-policy 和
   browser-session restriction 三组真实 consumer 统一改接语义 runtime。focused suite 执行 82 项行为/接线断言；下一批继续审计相邻
   webview instance/adoption helper belt `GG..IWe` 与其 attach transaction，只有在 cleanup/host identity 顺序可保持时迁移。
+
+# 2026-11-01 browser WebView adoption transaction extraction
+
+- 新增并接回 `browser-sidebar/browser-webview-adoption-runtime.ts`，统一 instance/view-instance 正整数 identity、adoption lease、adopted
+  webContents id、pending route consume，以及 accepted host identity attach transaction。history-clone 的 error-page 转移、attach→stopTracking→
+  back/forward/reload 顺序和 page/webContents identity/destroyed guards 保持原语义。
+- 主 chunk 旧 `GG/KG/qG/NWe/PWe/FWe/IWe` 与 adopted-id 常量已删除，will/did-attach 两条真实路径直接消费语义模块；focused suite
+  执行 66 项断言。下一批审计仍在组合根的 `SWe` owner event lifecycle，若依赖边界可保持则整段迁移，不拆散 listener teardown。

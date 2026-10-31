@@ -247,6 +247,14 @@ const { BrowserPermissionPromptRegistry } = require("./main-app/browser-sidebar/
 const { createBrowserSessionServiceClass } = require("./main-app/browser-sidebar/browser-session-service.js");
 const { BrowserUseOpenRequestRegistry } = require("./main-app/browser-sidebar/browser-use-open-request-registry.js");
 const { createBrowserSettingsWebviewRuntime, parseBrowserSettingsUrl: UG } = require("./main-app/browser-sidebar/browser-settings-webview-runtime.js");
+const {
+  BROWSER_WEBVIEW_ADOPTION_LEASE: IG,
+  getWebviewInstanceId: GG,
+  hasWebviewAdoptionLease: NWe,
+  getAdoptedWebContentsId: PWe,
+  takePendingWebviewRoute: FWe,
+  attachPendingAdoptedWebview,
+} = require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js");
 const { createBrowserCommentOverlayManagerClass } = require("./main-app/browser-sidebar/browser-comment-overlay-manager.js");
 const { createBrowserCommentControllerClass } = require("./main-app/browser-sidebar/browser-comment-controller.js");
 const { createBrowserSessionRegistryRuntime } = require("./main-app/browser-use/session-registry.js");
@@ -36985,8 +36993,6 @@ function PG({ browserTabId: e, conversationId: t }) {
   return nt(`${t}\0${e}`);
 }
 var FG = r.i(`browser-sidebar-manager`),
-  IG = `owl-webcontents-adoption-lease`,
-  bWe = `owl-webcontents-adopted-web-contents-id`,
   LG = new WeakSet(),
   xWe = [
     { allowedNavigationUrls: n.el, canOpenPopup: ({ url: e }) => MH(e), partition: n.tl },
@@ -37440,7 +37446,12 @@ function SWe({
         });
         return;
       }
-      IWe(t, v, i);
+      attachPendingAdoptedWebview({
+        attachWebview: i,
+        routeKey: qU,
+        state: v,
+        webContents: t,
+      });
     },
     S = null,
     C = (e, t, n) => {
@@ -37498,54 +37509,6 @@ function SWe({
         v.pendingBrowserSettingsWebviewsByInstanceId.clear());
       for (let e of v.browserSettingsWebviewNavigationDisposersByWebContentsId.values()) e();
     }
-  );
-}
-function GG(e) {
-  return qG(e.instanceId);
-}
-function KG(e) {
-  return qG(e.viewInstanceId);
-}
-function qG(e) {
-  let t = Number(e);
-  return Number.isInteger(t) && t > 0 ? t : null;
-}
-function NWe(e) {
-  let t = e[IG];
-  return typeof t == `string` && t.length > 0;
-}
-function PWe(e) {
-  let t = Number(e[bWe]);
-  return Number.isInteger(t) && t > 0 ? t : null;
-}
-function FWe(e, t) {
-  let n = KG(e);
-  if (n == null) return null;
-  let r = t.pendingWebviewRoutesByInstanceId.get(n) ?? null;
-  return (t.pendingWebviewRoutesByInstanceId.delete(n), r);
-}
-function IWe(e, t, n) {
-  if (e.isDestroyed()) return !1;
-  let r = t.pendingAdoptedWebviewsByWebContentsId.get(e.id) ?? null;
-  if (r?.acceptedHostIdentity == null) return !1;
-  let i = t.threads.get(qU(r.route))?.page,
-    a = r.initialHistoryNavigation;
-  return (
-    i != null && a != null && (i.errorPagesByUrl = a.errorPagesByUrl),
-    n(e, {
-      ...r.acceptedHostIdentity,
-      route: r.route,
-      initialNavigationOwner: a == null ? `owl` : `history-clone`,
-    }),
-    r.stopTracking(),
-    i?.view.webContents === e &&
-      !e.isDestroyed() &&
-      (a?.navigation === `back`
-        ? e.goBack()
-        : a?.navigation === `forward`
-          ? e.goForward()
-          : a?.navigation === `reload` && e.reload()),
-    !0
   );
 }
 var YG = {

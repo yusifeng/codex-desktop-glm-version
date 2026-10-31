@@ -3250,3 +3250,10 @@ instance consume、严格 origin/path navigation allowlist、popup policy、will
 sync Promise 串行队列及销毁时 map/listener cleanup 放回同一 lifecycle owner。`SWe` attach runtime、host-policy theme API 与 browser-session
 network restriction 均通过工厂返回的唯一实现消费；主 chunk 旧 `CWe..WG` 16 个 helper 与 theme WeakMap 已物理删除。focused suite
 执行 82 项断言，覆盖正常/拒绝/恢复/失败关闭/重复 dispose 与真实接线。
+
+### 增量抽取：browser WebView adoption runtime
+
+新增 `browser-sidebar/browser-webview-adoption-runtime.ts`，集中 instance/view-instance identity、adoption lease、adopted WebContents id、pending
+route consume 和 accepted-host attach transaction。transaction 保持 history clone error-pages 转移、attach、stopTracking 和 back/forward/reload
+的副作用顺序，仅在 semantic page 仍指向同一未销毁 WebContents 时 replay。`SWe` 的 will/did-attach consumer 已直接改接；主 chunk 旧
+`GG/KG/qG/NWe/PWe/FWe/IWe` 与重复常量删除，66 条 focused 断言覆盖所有 history 动作、缺失 identity、销毁与 mismatch 分支。

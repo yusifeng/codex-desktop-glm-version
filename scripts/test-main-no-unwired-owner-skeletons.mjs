@@ -80,6 +80,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/browser-session-service.ts", "createBrowserSessionServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-use-open-request-registry.ts", "BrowserUseOpenRequestRegistry"],
   ["src/main/main-app/browser-sidebar/browser-settings-webview-runtime.ts", "createBrowserSettingsWebviewRuntime"],
+  ["src/main/main-app/browser-sidebar/browser-webview-adoption-runtime.ts", "attachPendingAdoptedWebview"],
   ["src/main/main-app/browser-sidebar/site-page-event-runtime.ts", "createSitePageEventRuntime"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
@@ -160,6 +161,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/site-page-event-
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-session-service.js")'), true, "browser session service is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-use-open-request-registry.js")'), true, "browser open-request registry is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-settings-webview-runtime.js")'), true, "browser settings webview runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-webview-adoption-runtime.js")'), true, "browser webview adoption runtime is wired");
 assert.equal(main.includes('require("./main-app/language-server/runtime-installer.js")'), true, "language-server runtime installer is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
@@ -211,6 +213,7 @@ for (const oldOwner of ["function OYe(", "function kYe(", "function VY(", "funct
 for (const oldOwner of ["function A1e(", "P1e = class", "async function F1e(", "async function I1e(", "async function L1e(", "async function UQ(", "async function WQ(", "async function GQ("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated language-server runtime installer must be removed`);
 for (const oldOwner of ["BWe = class", "function VWe(", "UWe = class"]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser session/open-request owner must be removed`);
 for (const oldOwner of ["function CWe(", "function wWe(", "function zG(", "function TWe(", "function EWe(", "function DWe(", "function BG(", "function OWe(", "function VG(", "function kWe(", "function AWe(", "function HG(", "function jWe(", "function UG(", "function MWe(", "function WG("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser settings webview owner must be removed`);
+for (const oldOwner of ["function GG(", "function KG(", "function qG(", "function NWe(", "function PWe(", "function FWe(", "function IWe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated webview adoption owner must be removed`);
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }
