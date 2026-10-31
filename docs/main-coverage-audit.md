@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 fork rollback and history owner repair
+
+`threads/fork-rollback.ts` 原实现仅循环 legacy pagination、清空少量字段并过滤 `state.turns`，遗漏 follower revision 同步、bounded durable、
+canonical history、read-response projection 与 thread metadata。本轮按旧 owner 恢复完整 load/rollback/revert 流，并发现 manager wrapper 将
+ownerClientId/revision/timeout 参数整体错位的实际缺陷；修正后删除 main 旧七函数簇，以 focused suite 覆盖 legacy/canonical 与同步路径。
+
 ## 2026-10-31 fork and follower dispatch owner repair
 
 `threads/operations.ts` 的 `uve` 原先无条件直接 `thread/fork`，漏掉旧 AppServer 兼容所需的 complete history、target 定位、rollback 应用、

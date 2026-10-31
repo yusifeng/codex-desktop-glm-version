@@ -1571,8 +1571,8 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     return getCompleteConversationTurns(this, conversationId);
   }
 
-  waitForConversationRevision(conversationId: string, revision: any, timeoutMs: any, onTimeout: any) {
-    return this.streamState.waitForConversationRevision(conversationId, revision, timeoutMs, onTimeout);
+  waitForConversationRevision(conversationId: string, ownerClientId: string, revision: number, timeoutMs: number) {
+    return this.streamState.waitForConversationRevision(conversationId, ownerClientId, revision, timeoutMs);
   }
 
   applyRollbackResponseToConversation(entry: any) {

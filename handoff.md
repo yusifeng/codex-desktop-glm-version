@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复 fork rollback/revert 与 history loading owner：`threads/fork-rollback.ts` 现恢复 resumed/bounded durable 校验、follower owner revision
+同步、后台/summary 分页、complete-history 验证、rollback turn 投影/分页/metadata 重建，以及 canonical island/entity revert 修剪；同时修正
+AppServer manager 的 `waitForConversationRevision` 参数错位。主 chunk 旧 `fve/pve/hve/gve/_ve/cy/ly` 簇删除，新增 focused suite。
+
 修复 fork-from-turn 与 follower request dispatcher：`threads/operations.ts` 现按 AppServer 版本选择原生 last-turn fork 或旧版
 fork-latest + rollback 兼容流，恢复 target 校验、synthetic item 与同步失败合并；`files/open-file-watches.ts` 的 dispatcher 恢复 queued
 follow-up、审批、compact/edit/interrupt、完整历史、start/steer、daybreak/settings 全方法覆盖，并改用 canonical complete-history 判定。
