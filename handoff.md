@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Cnt/wnt/Tnt/Ent/Dnt` cron-turn read-state lifecycle 迁入
+`automations/cron-turn-read-state.ts`；connection/notification subscriptions、turn correlation、agent-message fallback、
+notification-policy decision、unread writer、failure logging、start-failure 与 disposal 均由新 owner 持有。真实
+`prepareCronTurnReadState` consumer 已接回，旧 schemas/helper/logger 已删除。focused test 覆盖 33 项。
+
 随后将 `xnt/Snt` thread-project membership owner 迁入 `projects/thread-project-membership-owner.ts`；assignment/
 projectless persistence、membership broadcasts、optional server writer/host-id commit、projectless output/workspace metadata、
 removed-thread tombstones 与 global-state invalidation 均由新 owner 持有。唯一 runtime construction 已接回，旧 cluster

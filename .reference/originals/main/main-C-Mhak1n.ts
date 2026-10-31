@@ -127,6 +127,7 @@ const { createHistorySwipeNavigationServiceClass } = require("./main-app/window/
 const { createSystemFontsServiceClass } = require("./main-app/window/system-fonts-service.js");
 const { createThreadReadStateOwnerClass } = require("./main-app/thread-read-state/thread-read-state-owner.js");
 const { createThreadProjectMembershipOwnerClass } = require("./main-app/projects/thread-project-membership-owner.js");
+const { createCronTurnReadStatePreparer } = require("./main-app/automations/cron-turn-read-state.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -139965,83 +139966,11 @@ var I5 = createThreadMetadataGenerationServiceClass({
     runtime: n,
     MembershipStoreBase: n.n,
   }),
-  Cnt = n.wf({ type: n.bf(`agentMessage`), text: n.Of() }),
-  wnt = n.wf({ threadId: n.Of(), turnId: n.Of(), item: Cnt }),
-  Tnt = n.wf({
-    turn: n.wf({ items: n.hf(n.wf({ type: n.Of(), text: n.Of().optional() })).optional() }),
-  }),
-  Ent = r.i(`cron-turn-read-state`);
-function Dnt({ owner: e, appServerConnection: t, threadId: r, notificationPolicy: i }) {
-  let a = null,
-    o = !1,
-    s,
-    c,
-    l = null;
-  function u() {
-    (s?.(), c?.());
-  }
-  function d() {
-    (u(), f.dispose());
-  }
-  if (t.getConnectionState() !== `connected`) return null;
-  let f = e.openWriter(t.hostId, d);
-  return (
-    (c = t.registerInternalConnectionStateHandler((e) => {
-      e !== `connected` && d();
-    })),
-    (s = t.registerInternalNotificationHandler((e, s) => {
-      if (e.params?.threadId !== r) return;
-      if (e.method === `thread/archived` || e.method === `thread/deleted`) {
-        d();
-        return;
-      }
-      if (e.method === `turn/started`) {
-        a = a ?? n.tr(e.params)?.id ?? null;
-        return;
-      }
-      if (e.method === `item/completed`) {
-        let t = wnt.safeParse(e.params);
-        t.success && (l = { turnId: t.data.turnId, text: t.data.item.text });
-        return;
-      }
-      if (e.method !== `turn/completed`) return;
-      let c = n.tr(e.params);
-      if (
-        c == null ||
-        (s == null
-          ? c.id !== a
-          : s.automationKind !== `cron` || s.threadId !== r || s.turnId !== c.id)
-      )
-        return;
-      o = !0;
-      let p = Tnt.safeParse(e.params),
-        m = p.success ? p.data.turn.items?.findLast((e) => e.type === `agentMessage`) : void 0,
-        { decision: h } = $y({
-          automationKind: `cron`,
-          notificationPolicy: s == null ? i : s.notificationPolicy,
-          lastAgentMessage: m?.text ?? (l?.turnId === c.id ? l.text : null),
-          didCompleteSuccessfully: c.status === `completed`,
-        });
-      if ((u(), h === `DONT_NOTIFY`)) {
-        d();
-        return;
-      }
-      f.set({ hostId: t.hostId, threadId: n.$u(r), hasUnreadTurn: !0 })
-        .catch((e) => {
-          Ent().warning(`Failed to save automation task unread state`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        })
-        .finally(d);
-    })),
-    {
-      handleStartFailure: () => {
-        a == null && !o && d();
-      },
-    }
-  );
-}
+  Dnt = createCronTurnReadStatePreparer({
+    runtime: n,
+    createLogger: r.i,
+    decideNotification: $y,
+  });
 var { ThreadReadStateOwner: Ont } = createThreadReadStateOwnerClass({
   createHash: _.createHash,
   identityEquals: W,

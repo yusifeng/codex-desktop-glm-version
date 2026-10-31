@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 cron-turn read-state lifecycle
+
+原 `Cnt/wnt/Tnt/Ent/Dnt` 已迁入 `src/main/main-app/automations/cron-turn-read-state.ts`。新 owner 保留连接前置检查、
+connection/notification subscription 生命周期、无 context 与 automation context 两条 turn correlation 路径、final/fallback
+agent message、notification policy decision、unread writer、异步 failure logging、start failure 和 terminal disposal；真实
+`prepareCronTurnReadState` consumer 已接回，旧 cluster 已删除。
+
 ## 2026-10-31 thread-project membership owner
 
 原 `xnt/Snt` 已迁入 `src/main/main-app/projects/thread-project-membership-owner.ts`。新 owner 保留 assignment/projectless
