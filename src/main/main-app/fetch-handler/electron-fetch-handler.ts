@@ -14,7 +14,7 @@ export function createElectronFetchHandlerClass(dependencies) {
     Hr,
     Ir,
     J,
-    JI,
+    readImportStatus,
     Js,
     KH,
     Ln,
@@ -28,14 +28,14 @@ export function createElectronFetchHandlerClass(dependencies) {
     TV,
     Tr,
     Un,
-    VIe,
+    finalizeImportedProjects,
     Vee,
     Vr,
     XH,
     YH,
     Ys,
     setBrowserUseApprovalMode,
-    _Ie,
+    createExternalAgentImportHandlers,
     a,
     avatarOverlayAcceleratorFromKeymap,
     b,
@@ -55,7 +55,8 @@ export function createElectronFetchHandlerClass(dependencies) {
     kwe,
     l,
     lH,
-    lIe,
+    createExternalAgentImportAdapter,
+    desktopPaths,
     listWorkspaceDirectory,
     ls,
     lze,
@@ -83,7 +84,7 @@ export function createElectronFetchHandlerClass(dependencies) {
     vi,
     wV,
     xt,
-    zIe,
+    readConnectorCandidates,
     zn,
   } = dependencies;
   return class ElectronFetchHandler {
@@ -984,24 +985,24 @@ export function createElectronFetchHandlerClass(dependencies) {
           return { existingPaths: a.filter((e, t) => s.has(o[t] ?? ``)) };
         },
         "claude-code-import-status": async ({ hostId: e }) =>
-          JI({ appServerClient: this.getRequestAppServerClient(e), providers: [`claude-code`] }),
+          readImportStatus({ appServerClient: this.getRequestAppServerClient(e), providers: [`claude-code`] }),
         "external-agent-imported-connectors": async ({ hostId: e, providers: t }) => {
           let r = this.getRequestAppServerClient(e);
           if (n.Es(r.hostConfig)) return { connectors: [] };
           let i = await r.codexHome();
-          return zIe({ codexHome: Un(i, r.hostConfig) ?? i, providers: t });
+          return readConnectorCandidates({ codexHome: Un(i, r.hostConfig) ?? i, providers: t });
         },
-        ..._Ie({
+        ...createExternalAgentImportHandlers({
           createProjectlessThreadPaths: ({ title: e }) =>
             this.createProjectlessThreadPaths({ createSplitDirectories: !0, prompt: e }),
           getAppServerConnection: (e) => this.appServerConnectionRegistry.getConnection(e),
           getStatus: (e) =>
-            JI({ appServerClient: this.getRequestAppServerClient(e.hostId), providers: e.providers }),
+            readImportStatus({ appServerClient: this.getRequestAppServerClient(e.hostId), providers: e.providers }),
           finalizeImportedProjects: async (
             { allImportedSessionThreadIds: e, importedSessionProjectRoots: t, projectRoots: n },
             r,
           ) =>
-            VIe({
+            finalizeImportedProjects({
               allImportedSessionThreadIds: e,
               appServerClient: this.getRequestAppServerClient(J),
               globalState: this.globalState,
@@ -1015,7 +1016,8 @@ export function createElectronFetchHandlerClass(dependencies) {
             }),
           recordProjectlessThread: (e) => this.recordProjectlessThread(e),
           providerAdapters: {
-            "claude-cowork": lIe({
+            "claude-cowork": createExternalAgentImportAdapter({
+              desktopPaths,
               getAppServerConnection: (e) => this.appServerConnectionRegistry.getConnection(e),
               getRequestAppServerClient: (e) => this.getRequestAppServerClient(e),
               onImportedSessionThreadIds: (e) => this.onCoworkImportedSessionThreadIds?.(e),

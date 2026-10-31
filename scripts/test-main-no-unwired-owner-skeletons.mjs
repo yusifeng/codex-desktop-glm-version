@@ -61,6 +61,7 @@ const realOwners = [
   ["src/main/main-app/projects/chatgpt-project-files.ts", "createChatGptProjectFilesServiceClass"],
   ["src/main/main-app/environment-config/service.ts", "createEnvironmentConfigServiceClass"],
   ["src/main/main-app/device/codex-micro-service-manager.ts", "createCodexMicroServiceManagerClass"],
+  ["src/main/main-app/import/external-agent-import.ts", "createExternalAgentImportHandlers"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -97,6 +98,10 @@ const applicationMenuBuilder = fs.readFileSync(
 assert.equal(inboxOwner.includes("export class InboxItemsFacade"), true, "InboxItemsFacade must remain a real owner");
 assert.equal(main.includes("new InboxItemsFacade({"), true, "InboxItemsFacade must remain wired");
 assert.equal(main.includes("PBe = createElectronFetchHandlerClass({"), true, "real Electron fetch owner is wired");
+assert.equal(main.includes('require("./main-app/import/external-agent-import.js")'), true, "external-agent import runtime is wired");
+assert.equal(main.includes("function _Ie("), false, "generated external-agent handlers must be removed");
+assert.equal(main.includes("function lIe("), false, "generated Cowork adapter wrapper must be removed");
+assert.equal(main.includes("async function VIe("), false, "generated imported-project finalizer must be removed");
 assert.equal(main.includes("ert = createWindowContextClass({"), true, "real WindowContext owner is wired");
 assert.equal(main.includes("N0 = createOpenInServiceClass({"), true, "real OpenInService owner is wired");
 assert.equal(main.includes("N0 = class extends"), false, "generated OpenInService owner must be removed");
@@ -351,4 +356,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("363 main unwired-owner skeleton assertions passed");
+console.log("368 main unwired-owner skeleton assertions passed");

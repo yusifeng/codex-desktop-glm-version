@@ -2979,3 +2979,13 @@ single-tap/action/no-window wakeup，以及 connected/connection-failed/connecti
 底层 `CodexMicroService` rewritten chunk 继续是唯一 I/O service；manager 只持有 desktop lifecycle state。WindowContext 直接构造
 `CodexMicroServiceManager`，旧 `aA/oA/sA/lA` 已删除，后续 YAML generated/vendor belt 保持原边界。focused test 47 项覆盖
 lazy load、ownership/lock、input gestures、lifecycle transitions、dispose-before-load 与 wiring。
+
+### 增量接线：Cowork 与 external-agent import runtime
+
+`import/cowork-history.ts`、`cowork-discovery.ts`、`cowork-mcp-plugins.ts`、`cowork-transcripts.ts` 和
+`external-agent-import.ts` 现已作为一条完整语义链接回 Electron fetch handler，覆盖 Cowork 发现/安全预算、账本、插件与 MCP
+迁移、transcript rollout、Claude Code/Cursor app-server 导入、完成通知、状态与 connector 候选，以及导入后项目归并。
+`createExternalAgentImportHandlers` 现在正确继承 service 级 projectless path/record 回调；adapter 自行装配 desktop 路径与 WSL
+转换，不再要求 consumer 伪造内部依赖。原始 chunk 中 `hP..VIe` 共约 5,200 行重复实现已整带删除，后续 stream vendor belt
+保持原边界。focused test 27 项覆盖跨平台目录推导、Cursor projectless 完成通知、回调/收尾注入和真实接线；no-unwired gate
+扩至 368 项。

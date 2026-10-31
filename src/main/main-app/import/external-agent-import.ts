@@ -665,7 +665,7 @@ function resolveHomeDirectory({
 
 /** 适配器包装（原 `lIe`）：注入桌面路径推导 + 导入线程回调。 */
 export function createExternalAgentImportAdapter(
-  dependencies: CoworkAdapterDependencies & {
+  dependencies: Omit<CoworkAdapterDependencies, "getMigrationOptions" | "pathAdapters"> & {
     desktopPaths: DesktopPaths;
     onImportedSessionThreadIds?(threadIds: string[]): void;
   },
@@ -674,6 +674,7 @@ export function createExternalAgentImportAdapter(
   const adapter = createCoworkProviderAdapter({
     ...rest,
     getMigrationOptions: () => desktopMigrationOptions({ desktopPaths: dependencies.desktopPaths }),
+    pathAdapters: createDesktopPathAdapters(),
   });
   return {
     ...adapter,
@@ -800,11 +801,13 @@ function classifyEnum(value: string | undefined, allowed: Set<string>): string {
 
 /** 服务依赖（原 `_Ie` 的 e）。 */
 export interface ExternalAgentImportService {
+  createProjectlessThreadPaths?: ImportCallbacks["createProjectlessThreadPaths"];
   getAppServerConnection(hostId: string): AppServerConnectionLike;
   getRequestAppServerClient(hostId: string): AppServerClientLike;
   providerAdapters?: Record<string, ProviderAdapter | undefined>;
   finalizeImportedProjects(result: ImportResultSummary, projectId: string | null): Promise<string[]>;
   getStatus(request: { hostId: string; providers: string[] }): Promise<unknown>;
+  recordProjectlessThread?: (thread: ProjectlessSessionThread) => Promise<void>;
 }
 
 /** import 结果摘要（原 `yIe` 返回值）。 */
@@ -855,13 +858,13 @@ export function createExternalAgentImportHandlers(service: ExternalAgentImportSe
     }) => {
       const importAttemptId = request.importAttemptId ?? randomUUID();
       const result = await runExternalAgentImport({
-        createProjectlessThreadPaths: request.createProjectlessThreadPaths,
+        createProjectlessThreadPaths: request.createProjectlessThreadPaths ?? service.createProjectlessThreadPaths,
         getAppServerConnection: service.getAppServerConnection,
         hostId: request.hostId,
         importAttemptId,
         items: request.items,
         providerAdapters: request.providerAdapters ?? service.providerAdapters,
-        recordProjectlessThread: request.recordProjectlessThread,
+        recordProjectlessThread: request.recordProjectlessThread ?? service.recordProjectlessThread,
         sessionLimits: request.sessionLimits,
       });
       let importedProjectIds: string[] = [];

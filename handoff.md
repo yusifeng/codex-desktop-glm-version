@@ -4944,3 +4944,11 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   `CodexMicroService` 仍是唯一硬件 I/O owner。
 - main 旧 `aA/oA/sA/lA` 约 245 行已删除，紧随的 YAML vendor belt 未拆；focused coverage 47 项，no-unwired gate 扩至
   363 项。下一批越过 vendor belt，从其后的第一方 owners 继续审计，另将小型 `Zk` hook 与相邻真实 owner 合并处理。
+
+# 2026-11-01 Cowork and external-agent import runtime wiring
+
+- 已有的 Cowork history/discovery/MCP/transcript 模块与 `external-agent-import.ts` 现整链接入 Electron fetch handler；状态、
+  connector、detect/import handlers、desktop adapter 和 imported-project finalizer 均直接使用语义 API。
+- 修复 service 级 projectless path/record 回调未被 handler 默认采用的问题，并让 desktop adapter 内部装配路径转换。
+  main 旧 `hP..VIe` 共约 5,200 行已物理删除；focused coverage 27 项，no-unwired gate 扩至 368 项。下一批从删除后的
+  artifact-template picker / automation update composition 与后续 vendor belt之间继续审计，不拆 vendor stream runtime。
