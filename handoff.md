@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 conversational onboarding owner：既有 `onboarding/conversational-onboarding.ts` 现已替代主 chunk 旧 `kN` 及专属
+notification/path/permission helpers。completion expectation、request-lifetime/principal guard、host completion、状态账本、桌面小工具
+与静态 disposal 由完整 25-member owner 持有；`WindowContext` 真实 consumer 继续通过 `kN` 兼容别名构造。
+
 接回 Published Statsig owner：既有 `account/statsig-adapter.ts` 的 `PublishedStatsig` 现已替代主 chunk 旧 `STe` 与专属 user
 schema/identity matching helpers。repository/identity subscriptions、publication replacement、离线 client lifecycle、默认 assignments 与
 dispose cleanup 由完整 19-member owner 持有；`WindowContext` 真实 consumer 继续通过 `STe` 兼容别名构造。

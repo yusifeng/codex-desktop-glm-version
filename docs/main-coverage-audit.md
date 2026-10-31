@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 conversational onboarding owner wiring
+
+既有 `src/main/main-app/onboarding/conversational-onboarding.ts` 已完整实现原 `kN` 的 25-member owner，但 bootstrap 仍导出旧类。
+本轮接回 `WindowContext` 的真实 consumer，删除旧 class 与专属 `aje/ON/oje/sje`；focused suite 覆盖 local-host gate、completion
+登记/回填/状态、thread deletion notification、stale request lifetime、幂等静态 disposal 与真实 consumer wiring。
+
 ## 2026-10-31 Published Statsig owner wiring
 
 既有 `src/main/main-app/account/statsig-adapter.ts` 已完整实现原 `STe` 的 19-member publication owner，但 bootstrap 仍导出旧类。
