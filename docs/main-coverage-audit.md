@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 thread read-state owner
+
+原 `Ont/L5/R5` 已迁入 `src/main/main-app/thread-read-state/thread-read-state-owner.ts`。新 owner 保留 identity/host
+generation invalidation、context capture、renderer session 与 background writer ownership、serialized local/broadcast
+writes、self/external fanout、logout identity clearing、legacy unread-state adoption/cleanup 与 dispose retirement；真实
+composition root 已接回，旧 class/identity-key/default-state helpers 已删除。
+
 ## 2026-10-31 system-fonts service
 
 原 `att` 已迁入 `src/main/main-app/window/system-fonts-service.ts`。新 RPC adapter 保留 Electron

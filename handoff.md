@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `Ont/L5/R5` thread read-state owner 迁入 `thread-read-state/thread-read-state-owner.ts`；identity/host
+generation、session/writer ownership、serialized broadcasts、self/external fanout、logout clearing、legacy migration 与
+dispose retirement 均由新 owner 持有。真实 composition root 已接回，旧 class/helpers 已删除。focused test 覆盖 48 项。
+
 随后将 `att` system-fonts RPC adapter 迁入 `window/system-fonts-service.ts`；Electron systemPreferences font-family
 enumeration 由新 adapter 原样转发。唯一 runtime consumer 已接回，旧 class 已删除。focused test 覆盖 8 项。
 
