@@ -3191,3 +3191,9 @@ WeakMap 的 register/destroy/take 生命周期；组合根只注入 `WXe/RX` inc
 `BrowserPageHostLifecycle` 已直接拥有原 `gZe` 的 transfer admission、WebView transfer/receiver/abort、source→target route/state 移交、
 host metadata、annotation mode、attached-host registry、bind/runtime sync/message，以及 moved 后 bind 失败的 closed teardown。组合根只注入
 annotation/message/logger policies；旧 `gZe/hZe` 已删除。focused test 覆盖成功、预先 abort 和 moved 后 bind failure cleanup。
+
+### 增量抽取：browser session notification bridge
+
+新增 `browser-sidebar/browser-session-notification-bridge.ts`，将 app-server 的 completed MCP tool call、archived thread 和 idle thread
+通知分别路由到 parent-call completion、conversation disposal 与 session-activity end。唯一安装点直接使用语义 bridge；旧
+`wZe/TZe/EZe/DZe/CZe` 已删除，focused test 覆盖合法/畸形/无关通知与无 source 情况。

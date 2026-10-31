@@ -485,6 +485,7 @@ const { createBrowserMediaStateTracker: KX } = require("./main-app/browser-sideb
 const { createSiteToolsAvailabilityRuntime } = require("./main-app/browser-sidebar/site-tools-availability.js");
 const { createSitesBootstrapTokenRuntime } = require("./main-app/browser-sidebar/sites-bootstrap-token.js");
 const { createBrowserPagePresentationPolicy } = require("./main-app/browser-sidebar/browser-page-presentation-policy.js");
+const { installBrowserSessionNotificationBridge: wZe } = require("./main-app/browser-sidebar/browser-session-notification-bridge.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -43869,37 +43870,6 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
-var CZe = n.wf({ threadId: n.Of(), item: n.wf({ type: n.bf(`mcpToolCall`), id: n.Of() }) });
-function wZe({ browserSessionRegistry: e, onMcpToolCallCompleted: t, source: n }) {
-  n?.registerInternalNotificationHandler((n) => {
-    if (TZe(n)) {
-      t(n.params.threadId, n.params.item.id);
-      return;
-    }
-    if (EZe(n)) {
-      e.disposeConversation(n.params.threadId);
-      return;
-    }
-    DZe(n) && e.endSessionActivity({ conversationId: n.params.threadId });
-  });
-}
-function TZe(e) {
-  return e.method === `item/completed` && CZe.safeParse(e.params).success;
-}
-function EZe(e) {
-  return e.method === `thread/archived` && typeof e.params?.threadId == `string`;
-}
-function DZe(e) {
-  let t = e.params?.status;
-  return (
-    e.method === `thread/status/changed` &&
-    typeof e.params?.threadId == `string` &&
-    typeof t == `object` &&
-    !!t &&
-    `type` in t &&
-    t.type === `idle`
-  );
-}
 function OZe(e, t, r) {
   if (t == null) return !1;
   let { page: i, threadState: a, windowState: o } = t,

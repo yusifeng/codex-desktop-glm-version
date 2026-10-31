@@ -5145,3 +5145,9 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   failure teardown；主组合根仅注入 annotation/message/logger policy，旧 `gZe/hZe` 已删除。
 - host lifecycle focused coverage 扩至成功、预先 abort、bind failure/closed cleanup。下一批审计紧随的 app-server notification
   bridge `wZe/TZe/EZe/DZe` 与 session registry consumer。
+
+# 2026-11-01 browser session notification bridge extraction
+
+- 新增并接回 `browser-sidebar/browser-session-notification-bridge.ts`，承接 MCP completion、thread archive、thread idle 三类 app-server
+  notification 到 Browser session registry 的路由；旧 `wZe/TZe/EZe/DZe/CZe` 已删除。
+- focused test 覆盖有效、畸形、无关通知和缺失 source。下一批审计 `OZe/kZe` active new-tab matching 与 navigation usage emitter。

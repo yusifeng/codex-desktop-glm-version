@@ -150,6 +150,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/browser-media-st
 assert.equal(main.includes('require("./main-app/browser-sidebar/site-tools-availability.js")'), true, "site tools availability runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/sites-bootstrap-token.js")'), true, "Sites bootstrap token runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-page-presentation-policy.js")'), true, "browser page presentation policy is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/browser-session-notification-bridge.js")'), true, "browser session notification bridge is wired");
 for (const oldOwner of ["function lX(", "function uX(", "function $Ye(", "function dX(", "function eXe(", "function fX(", "function tXe(", "function nXe(", "function pX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser tab lifecycle owner must be removed`);
 }
@@ -191,6 +192,7 @@ assert.equal(main.includes("function uZe("), false, "generated runtime snapshot 
 assert.equal(main.includes("function fZe("), false, "generated browser load-error recovery owner must be removed");
 for (const oldOwner of ["function fZ(", "function pZ(", "function mZ(", "function pZe(", "function mZe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated webview binding helper must be removed`);
 assert.equal(main.includes("async function gZe("), false, "generated browser window transfer owner must be removed");
+for (const oldOwner of ["function wZe(", "function TZe(", "function EZe(", "function DZe("]) assert.equal(main.includes(oldOwner), false, `${oldOwner} generated browser session notification bridge owner must be removed`);
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }
