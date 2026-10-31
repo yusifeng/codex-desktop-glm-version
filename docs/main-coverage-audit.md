@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 worker predicate wiring cleanup
+
+`Sst/Cst/wst` 三个仅转发的 generated aliases 已删除；worker runtime 直接使用
+`worker-event-predicates.ts` 的 start-result、event-type 与 notification-type 语义 exports，未保留重复 facade。
+
 ## 2026-10-31 worker app-event publisher
 
 原 `fe` 已迁入 `src/main/main-app/worker/app-event-publisher.ts`。新具名 class 保留 timestamp projection、multi-subscriber

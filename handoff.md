@@ -1,5 +1,8 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续收紧 worker runtime wiring：`Sst/Cst/wst` 三个无状态 generated aliases 已删除，start-result、event-type 与
+notification-type consumers 直接使用 `worker-event-predicates.ts` 的语义 API，避免下一步 runtime 迁移携带重复 facade。
+
 随后将 `fe` worker app-event publisher 迁入 `worker/app-event-publisher.ts`；timestamp projection、multi-subscriber fan-out
 与幂等 disposal 均由具名 class 持有。真实 worker runtime consumer 已接回，旧匿名 class 已删除。
 

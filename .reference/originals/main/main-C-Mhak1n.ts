@@ -149705,7 +149705,7 @@ function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicati
         let r = await t.requestFromHost(e);
         return (
           n != null &&
-            Sst(r) &&
+            isWorkerStartResult(r) &&
             b({ params: { requestId: n }, signal: e.signal }).catch(() => void 0),
           r
         );
@@ -149747,7 +149747,7 @@ function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicati
     requestOpenInWorker: (e) => u.requestFromHost(e),
     subscribeComputerUseCaptureWorkerEvent: (e, t) => {
       let n = (n) => {
-        Cst(n, e) && t(n);
+        isWorkerEventType(n, e) && t(n);
       };
       return (
         f.add(n),
@@ -149758,7 +149758,7 @@ function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicati
     },
     subscribeGitWorkerEvent: (e, t) =>
       c.subscribeFromHost((n) => {
-        n.type === `worker-event` && wst(n.event, e) && t(n.event);
+        n.type === `worker-event` && isWorkerNotificationType(n.event, e) && t(n.event);
       }),
     updateWorkerSentryUser: _,
     registerWorkerBusMessageHandlers: () => {
@@ -149843,15 +149843,6 @@ function xst({ disposables: e, isTrustedIpcEvent: t, startupConfig: n, applicati
       throw (u || (p(`update_watch_failed`), d()), e);
     }
   }
-}
-function Sst(e) {
-  return isWorkerStartResult(e);
-}
-function Cst(e, t) {
-  return isWorkerEventType(e, t);
-}
-function wst(e, t) {
-  return isWorkerNotificationType(e, t);
 }
 function Tst({ quitState: e, isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i }) {
   return createWorkspacePolicyChecker({ isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i, onRestartRequired: () => Est(e), onError: (error) => r.n().warning(`Failed to check workspace startup settings`, { safe: {}, sensitive: { error } }) });
