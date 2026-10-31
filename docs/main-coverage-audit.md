@@ -1893,14 +1893,14 @@ analytics gate 与 worker 生命周期仍由原 owner 持有。`scripts/test-mai
 覆盖成功/失败状态、body cancel、header 与 URL 传递共 4 项断言。
 
 Sentry worker RPC transport 的 enabled/client/transport fallback（原 `hst.sendEnvelope`）已迁移至
-`src/main/main-app/worker/sentry-envelope-transport.ts`；class 适配层仍由入口持有，focused
+`src/main/main-app/worker/sentry-envelope-transport.ts`；后续 class 适配层也由同模块 factory 接管，focused
 `scripts/test-main-sentry-envelope-transport.mjs` 覆盖 disabled、missing transport、successful
 send 与 403 fallback 共 4 项断言。
 
 ### 增量抽取：worker RPC 消息谓词
 
 worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,312-174,329）已迁移至
-`src/main/main-app/worker/rpc-message-predicates.ts`，入口保留 `gst/_st/vst` 兼容委托。
+`src/main/main-app/worker/rpc-message-predicates.ts`，后续入口兼容委托已删除，WorkerManager 直接消费语义谓词。
 模块只负责对象形状和方法白名单判断，不触碰 RPC 调度或 worker 生命周期；由
 `scripts/test-main-worker-rpc-message-predicates.mjs` 覆盖 10 项断言。
 
@@ -1910,6 +1910,15 @@ worker-main RPC 的允许方法、取消消息与请求消息校验（原 174,31
 已迁移至 `src/main/main-app/startup/workspace-policy-checker.ts`。入口只注入 quit state、
 认证/配置查询、重启提示和错误日志，保持通知取消、generation 防竞态与 app-quitting
 守卫；由 `scripts/test-main-workspace-policy-checker.mjs` 覆盖 7 项异步状态断言。
+
+### 增量抽取：worker/workspace startup adapter cleanup
+
+Sentry RPC subclass 已由 `createSentryRpcHandlerClass` 接管；worker runtime 的 process-wide defaults 已由
+`createWorkerRuntimeFactory` 接管；workspace checker 与 restart dialog 的 quit-state composition 已迁入
+`src/main/main-app/startup/workspace-policy-runtime.ts`。main 的 `B9/hst/_st/vst/xst/Tst/Est/Ist/Lst` wrapper 和无 consumer
+的 `V9/gst` 已删除，WorkerManager 直接消费 `n.Wf` 与语义 predicates，update/computer-use call sites 直接消费既有
+policy/handler。focused cleanup test 覆盖 32 项 Sentry adapter、policy dialog/error、worker defaults 和物理 wiring；
+既有 worker runtime 32 项通过。
 
 ### 增量抽取：computer-use worker RPC handler
 

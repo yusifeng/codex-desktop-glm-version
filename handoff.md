@@ -4788,3 +4788,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - main 旧 `g7/iit/_7/ait/oit/sit` cluster 删除 1,225 行，新生产模块现为 1,286 行；`_it` 的
   `ApplicationMenuManager` 继续真实消费 factory output。focused builder coverage 40 项、support runtime 19 项，
   no-unwired gate 扩至 252 项。下一批继续审计 menu 后的 deep-link/window-service/startup composition 周边，组合根本身不强拆。
+
+# 2026-11-01 worker/workspace startup adapter cleanup
+
+- Sentry RPC subclass、worker runtime defaults、workspace checker/dialog composition 已分别接回
+  `sentry-envelope-transport.ts`、`worker-runtime.ts` 和新 `workspace-policy-runtime.ts`；WorkerManager、startup policy、
+  update install 与 computer-use consumers 均直接消费语义 outputs。
+- main 删除 `B9/hst/V9/gst/_st/vst/xst/Tst/Est/Ist/Lst` 旧 wrapper/dead helpers 约 60 行，新生产实现 74 行；
+  focused cleanup 32 项、worker runtime 32 项，no-unwired gate 扩至 269 项。下一批继续审计 native-status schema 与
+  `Ust` 前后的剩余 adapter；`dst/Ust` 组合根仍保持不强拆。

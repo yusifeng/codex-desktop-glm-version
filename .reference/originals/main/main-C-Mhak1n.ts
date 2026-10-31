@@ -174,9 +174,10 @@ const { cleanupForImmediateQuitOnUpdate } = require("./main-app/app-shell/immedi
 const { createDelayedProgressWindow } = require("./main-app/startup/delayed-progress-window.js");
 const { resolveWindowsPackageIdentity } = require("./main-app/startup/windows-package-identity.js");
 const { isWorkerStartResult, isWorkerEventType, isWorkerNotificationType } = require("./main-app/worker/worker-event-predicates.js");
-const { isAllowedMainRpcMethod, isNonNullObject, isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
+const { isWorkerMainRpcCancel, isWorkerMainRpcRequest } = require("./main-app/worker/rpc-message-predicates.js");
 const { createWorkspacePolicyChecker } = require("./main-app/startup/workspace-policy-checker.js");
 const { showWorkspacePolicyRestartDialog } = require("./main-app/startup/workspace-policy-restart-dialog.js");
+const { createWorkspacePolicyRuntime } = require("./main-app/startup/workspace-policy-runtime.js");
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource } = require("./main-app/startup/icon-flavor-policy.js");
@@ -190,12 +191,12 @@ const { installNativeContextMenu } = require("./main-app/window/native-context-m
 const { shouldApplyWindowsOpacityWorkaround } = require("./main-app/startup/window-presentation-policy.js");
 const { createComputerUseRpcHandler } = require("./main-app/worker/computer-use-rpc-handler.js");
 const { sendTelemetryRequest } = require("./main-app/worker/telemetry-request.js");
-const { sendSentryEnvelope } = require("./main-app/worker/sentry-envelope-transport.js");
+const { createSentryRpcHandlerClass } = require("./main-app/worker/sentry-envelope-transport.js");
 const { WorkerInvocationSampler } = require("./main-app/worker/invocation-sampler.js");
 const { createWorkerBusClass } = require("./main-app/worker/worker-bus.js");
 const { createWorkerManagerClass } = require("./main-app/worker/worker-manager.js");
 const { AppEventPublisher } = require("./main-app/worker/app-event-publisher.js");
-const { createWorkerRuntime } = require("./main-app/worker/worker-runtime.js");
+const { createWorkerRuntimeFactory } = require("./main-app/worker/worker-runtime.js");
 const { createShortcutLinkReader } = require("./main-app/worker/shortcut-link-cache.js");
 const { isTrayReady } = require("./main-app/tray/tray-readiness.js");
 const { HISTORY_CLEAR_ACTIONS, historyScopeAction, historyClearRange } = require("./main-app/computer-use/history-scope-actions.js");
@@ -82135,26 +82136,7 @@ var fst = 3e4,
       super((options) => new jt(options), fst);
     }
   };
-function B9(e, t) {
-  return n.Wf(e, t);
-}
-var hst = class extends n.Uf {
-  async sendEnvelope(e) {
-    return sendSentryEnvelope(() => a.tn(), e);
-  }
-};
-function V9(e) {
-  return isNonNullObject(e);
-}
-function gst(e) {
-  return isAllowedMainRpcMethod(e);
-}
-function _st(e) {
-  return isWorkerMainRpcCancel(e);
-}
-function vst(e) {
-  return isWorkerMainRpcRequest(e);
-}
+var hst = createSentryRpcHandlerClass({ RpcHandlerBase: n.Uf, getClient: () => a.tn() });
 var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
   bst = createWorkerManagerClass({
     createLogger: r.r,
@@ -82166,10 +82148,10 @@ var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
     sentryInitOptions: a.Zt,
     spawnInsideWsl: n.Ri,
     shouldFlushGitWorker: a.T,
-    createRpcSession: B9,
+    createRpcSession: n.Wf,
     SentryRpcHandler: hst,
-    isWorkerMainRpcCancel: _st,
-    isWorkerMainRpcRequest: vst,
+    isWorkerMainRpcCancel,
+    isWorkerMainRpcRequest,
     parseCesPayload: (value) => yst.parse(value),
     sendTelemetryRequest,
     exportOtel: a.S,
@@ -82180,12 +82162,7 @@ var yst = n.wf({ payload: n.Of(), requestId: n.Of() }),
     createRequestId: () => ree(`main-` + (0, _.randomUUID)()),
     channelForWorker: a.Jt,
   });
-function xst({ disposables, isTrustedIpcEvent, startupConfig, applicationNetwork }) {
-  return createWorkerRuntime({
-    disposables,
-    isTrustedIpcEvent,
-    startupConfig,
-    applicationNetwork,
+var xst = createWorkerRuntimeFactory({
     AppEventPublisher,
     createGitInvocationSampler: () => new pst(),
     WorkerBus: H9,
@@ -82199,20 +82176,19 @@ function xst({ disposables, isTrustedIpcEvent, startupConfig, applicationNetwork
     isWorkerEventType,
     isWorkerNotificationType,
   });
-}
-function Tst({ quitState: e, isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i }) {
-  return createWorkspacePolicyChecker({ isAppQuitting: t, getAuthMethod: n, hasStartupPolicyChanges: i, onRestartRequired: () => Est(e), onError: (error) => r.n().warning(`Failed to check workspace startup settings`, { safe: {}, sensitive: { error } }) });
-}
-function Est(e) {
-  showWorkspacePolicyRestartDialog({
-    getIntl: () => a.hn(),
-    getAppName: () => l.app.getName(),
-    showMessageBoxSync: (options) => l.dialog.showMessageBoxSync(options),
-    markQuitApproved: () => e.markQuitApproved(),
-    quit: () => relaunchAndQuit(),
-    onError: (error) => r.n().warning(`Failed to show workspace policy restart dialog`, { safe: {}, sensitive: { error } }),
-  });
-}
+var Tst = createWorkspacePolicyRuntime({
+  createWorkspacePolicyChecker,
+  showWorkspacePolicyRestartDialog,
+  getIntl: () => a.hn(),
+  getAppName: () => l.app.getName(),
+  showMessageBoxSync: (options) => l.dialog.showMessageBoxSync(options),
+  relaunchAndQuit: () => relaunchAndQuit(),
+  onError: (error) =>
+    r.n().warning(`Failed to check workspace startup settings`, {
+      safe: {},
+      sensitive: { error },
+    }),
+});
 var jst = n.vf(`type`, [
     n.wf({ type: n.bf(`menu-update`) }),
     n.wf({ type: n.bf(`menu-open`) }),
@@ -82285,17 +82261,6 @@ var {
   getNativeIntl: a.hn,
   isTrayReady,
 });
-function Ist(options) {
-  return applyQuitForUpdatePolicy({
-    exitImmediately: options.exitImmediately,
-    exitImmediatelyForUpdateInstall: options.exitImmediatelyForUpdateInstall,
-    quitForUpdateInstall: options.quitForUpdateInstall,
-    allowQuitTemporarily: () => options.quitState.allowQuitTemporarily(),
-  });
-}
-function Lst(e) {
-  return createComputerUseRpcHandler(e);
-}
 var Vst = `CODEX_ELECTRON_REMOTE_HOSTED_PIP_PROCESS_IDENTIFIER`,
   Hst = 3e4;
 async function Ust() {
@@ -82799,7 +82764,7 @@ async function Ust() {
     }),
     W.windowManager.setQueueCodexDeepLinkUrl(Le.deepLinks.queueCodexDeepLinkUrl),
     Se.setComputerUseWorkerMainRpcHandler(
-      Lst({
+      createComputerUseRpcHandler({
         ensureManagedComputerUseService: () => {
           if (H == null) throw Error(`Managed Computer Use service is unavailable`);
           return H.ensureServicePid();
@@ -83370,7 +83335,7 @@ async function Ust() {
         ye.allowQuitTemporarily({ allowWithoutPrompt: !0, skipDrainBeforeQuit: !0 });
         return;
       }
-      Ist({
+      applyQuitForUpdatePolicy({
         exitImmediately: P && l.app.isPackaged,
         exitImmediatelyForUpdateInstall: () => {
           Promise.allSettled([
@@ -83404,7 +83369,7 @@ async function Ust() {
         quitForUpdateInstall: () => {
           l.app.quit();
         },
-        quitState: ye,
+        allowQuitTemporarily: () => ye.allowQuitTemporarily(),
       });
     }),
     P &&

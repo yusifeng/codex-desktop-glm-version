@@ -212,7 +212,7 @@ const main = fs.readFileSync(
   "utf8",
 );
 equal(main.includes("createWorkerRuntime"), true);
-equal(main.includes("return createWorkerRuntime({"), true);
+equal(main.includes("var xst = createWorkerRuntimeFactory({"), true);
 equal(main.includes("let i = new AppEventPublisher()"), false);
 
 console.log(`${assertions} main worker-runtime assertions passed`);

@@ -36,6 +36,9 @@ const realOwners = [
   ["src/main/main-app/app-server/transport-factory.ts", "createAppServerTransportFactory"],
   ["src/main/main-app/app-server/requirements-auth-recovery.ts", "createRequirementsAuthRecoveryRuntime"],
   ["src/main/main-app/app-shell/app-menu.ts", "createApplicationMenuBuilder"],
+  ["src/main/main-app/worker/sentry-envelope-transport.ts", "createSentryRpcHandlerClass"],
+  ["src/main/main-app/worker/worker-runtime.ts", "createWorkerRuntimeFactory"],
+  ["src/main/main-app/startup/workspace-policy-runtime.ts", "createWorkspacePolicyRuntime"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -247,6 +250,17 @@ assert.equal(main.includes("function sit("), false, "generated application-menu 
 assert.equal(main.includes("function iit("), false, "generated application role-menu builder must be removed");
 assert.equal(main.includes("var g7 ="), false, "generated application-menu label map must be removed");
 assert.equal(applicationMenuBuilder.includes("return [section(\"file-menu\")"), false, "application-menu skeleton must be replaced");
+assert.equal(main.includes("createSentryRpcHandlerClass({"), true, "real Sentry RPC adapter is wired");
+assert.equal(main.includes("var hst = class"), false, "generated Sentry RPC class must be removed");
+assert.equal(main.includes("var xst = createWorkerRuntimeFactory({"), true, "real worker runtime factory is wired");
+assert.equal(main.includes("function xst("), false, "generated worker runtime wrapper must be removed");
+assert.equal(main.includes("var Tst = createWorkspacePolicyRuntime({"), true, "real workspace-policy runtime is wired");
+assert.equal(main.includes("function Tst("), false, "generated workspace-policy checker wrapper must be removed");
+assert.equal(main.includes("function Est("), false, "generated workspace-policy dialog wrapper must be removed");
+assert.equal(main.includes("function Ist("), false, "generated quit-for-update proxy must be removed");
+assert.equal(main.includes("function Lst("), false, "generated computer-use RPC proxy must be removed");
+assert.equal(main.includes("function V9("), false, "dead object predicate proxy must be removed");
+assert.equal(main.includes("function gst("), false, "dead method predicate proxy must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("252 main unwired-owner skeleton assertions passed");
+console.log("269 main unwired-owner skeleton assertions passed");

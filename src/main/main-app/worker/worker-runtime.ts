@@ -269,6 +269,18 @@ export function createWorkerRuntime(options: Record<string, any>) {
   };
 }
 
+/** Binds process-wide worker dependencies while leaving startup-owned inputs explicit. */
+export function createWorkerRuntimeFactory(defaults: Record<string, any>) {
+  return function createStartupWorkerRuntime(options: {
+    disposables: Record<string, any>;
+    isTrustedIpcEvent(event: unknown): boolean;
+    startupConfig: Record<string, any>;
+    applicationNetwork: Record<string, any>;
+  }) {
+    return createWorkerRuntime({ ...options, ...defaults });
+  };
+}
+
 if (typeof module !== "undefined") {
-  module.exports = { createWorkerRuntime };
+  module.exports = { createWorkerRuntime, createWorkerRuntimeFactory };
 }

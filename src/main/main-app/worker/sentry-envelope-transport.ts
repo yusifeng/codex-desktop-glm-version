@@ -12,4 +12,19 @@ export async function sendSentryEnvelope(
   return (await client.getTransport()?.send(envelope)) ?? { statusCode: 403 };
 }
 
-if (typeof module !== `undefined`) module.exports = { sendSentryEnvelope };
+/** Builds the worker-facing RPC adapter without retaining a main-chunk subclass. */
+export function createSentryRpcHandlerClass({
+  RpcHandlerBase,
+  getClient,
+}: {
+  RpcHandlerBase: new (...args: any[]) => any;
+  getClient: () => SentryClientLike | null | undefined;
+}) {
+  return class SentryRpcHandler extends RpcHandlerBase {
+    async sendEnvelope(envelope: unknown) {
+      return sendSentryEnvelope(getClient, envelope);
+    }
+  };
+}
+
+if (typeof module !== `undefined`) module.exports = { sendSentryEnvelope, createSentryRpcHandlerClass };
