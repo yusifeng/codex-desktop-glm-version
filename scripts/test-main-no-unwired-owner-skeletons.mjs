@@ -6,6 +6,7 @@ const realOwners = [
   ["src/main/main-app/window/window-context.ts", "createWindowContextClass"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
+  ["src/main/main-app/browser-sidebar/browser-comment-overlay-manager.ts", "createBrowserCommentOverlayManagerClass"],
 ];
 for (const [path, factory] of realOwners) {
   const source = fs.readFileSync(new URL(path, root), "utf8");
@@ -21,7 +22,6 @@ const removedSkeletons = [
   "src/main/main-app/automations/automation-update-tool.ts",
   "src/main/main-app/automations/habitat.ts",
   "src/main/main-app/automations/index.ts",
-  "src/main/main-app/browser-sidebar/comment-overlay-manager.ts",
   "src/main/main-app/browser-sidebar/comment-controller.ts",
   "src/main/main-app/browser-use/session-registry.ts",
 ];
@@ -44,6 +44,8 @@ assert.equal(main.includes("PBe = createElectronFetchHandlerClass({"), true, "re
 assert.equal(main.includes("ert = createWindowContextClass({"), true, "real WindowContext owner is wired");
 assert.equal(main.includes("N0 = createOpenInServiceClass({"), true, "real OpenInService owner is wired");
 assert.equal(main.includes("N0 = class extends"), false, "generated OpenInService owner must be removed");
+assert.equal(main.includes("JWe = createBrowserCommentOverlayManagerClass({"), true, "real browser comment overlay owner is wired");
+assert.equal(main.includes("JWe = class"), false, "generated browser comment overlay owner must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("23 main unwired-owner skeleton assertions passed");
+console.log("26 main unwired-owner skeleton assertions passed");

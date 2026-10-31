@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 browser comment overlay lifecycle owner restoration
+
+新增完整 `browser-sidebar/browser-comment-overlay-manager.ts`，替代此前已删除的 11-member/no-op skeleton，并迁出真实 `JWe` 的
+session/open/prepare、renderer window claim、owner focus/visibility、preview/editor interactivity、annotation selection input、conversation transfer、
+dismiss/close、placement geometry、listener/timer cleanup 与 anomaly ledger。主 chunk 原 class/helper 连续区约 1,058 行删除，`hGe` 真实 consumer
+继续通过兼容绑定构造；42 条 focused lifecycle/结构/接线断言和 26 条防空壳断言通过。
+
 ## 2026-11-01 Linux applications and desktop-entry owner restoration
 
 新增 `platform/linux-applications.ts`，完整接管 XDG data/application roots、desktop entry 解析与显示门控、TryExec、GIO content-type/MIME、

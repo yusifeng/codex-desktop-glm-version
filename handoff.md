@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+恢复完整 browser comment overlay lifecycle owner：新增 `browser-sidebar/browser-comment-overlay-manager.ts`，接管真实 `JWe` 的 session、
+window claim、owner focus/visibility、preview/editor、annotation selection、conversation transfer、placement geometry、dismiss/close 和 timer/listener
+cleanup；原 11-member `prepare()` no-op skeleton 不再是实现基础。`hGe` consumer 已真实接回，主 chunk 约 1,058 行旧 class/helper 删除，
+focused suite 执行 42 条生命周期/接线断言，防空壳审计扩至 26 条。
+
 恢复 Linux applications/desktop-entry owner：新增 `platform/linux-applications.ts` 接管 XDG roots、desktop entry/可见性/TryExec、GIO MIME、
 默认浏览器、应用去重和 icon theme/inheritance/pixmaps 安全解析；`util/app-paths.ts` 的 Linux icon null stub 已接回真实 resolver。主 chunk
 `iO…vO` 约 336 行旧实现删除，以 24 条临时 XDG/GIO focused 断言覆盖。
