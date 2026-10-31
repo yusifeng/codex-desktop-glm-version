@@ -97,6 +97,7 @@ const { createRealtimePresentationCoordinatorClass } = require("./main-app/realt
 const { createRealtimeVoiceThreadTitleCoordinatorClass } = require("./main-app/realtime/voice-thread-title-coordinator.js");
 const { createRemoteConnectionsHandlerClass } = require("./main-app/remote/remote-connections-handler.js");
 const { createRemoteControlDeviceKeyClientClass } = require("./main-app/remote/remote-control-device-key-client.js");
+const { createRemoteRpcServices } = require("./main-app/remote/remote-rpc-services.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -134301,88 +134302,8 @@ var F5e = createRemoteControlDeviceKeyClientClass({
   moduleFilename: __filename,
   pathJoin: h.join,
 });
-var R5e = class extends n.Uf {
-    remoteConnectionsHandler;
-    constructor(e) {
-      (super(), (this.remoteConnectionsHandler = e));
-    }
-    renameIfDefault(e) {
-      return this.remoteConnectionsHandler.renameRemoteControlEnvironmentIfDefault(e);
-    }
-  },
-  z5e = class extends n.Uf {
-    controller;
-    origin;
-    handleOriginGone = () => this[Symbol.dispose]();
-    nativeVideoSubscriptionCountsByConversationId = new Map();
-    disposed = !1;
-    constructor(e, t) {
-      (super(),
-        (this.controller = e),
-        (this.origin = t),
-        t.once(`destroyed`, this.handleOriginGone),
-        t.once(`did-navigate`, this.handleOriginGone),
-        t.once(`render-process-gone`, this.handleOriginGone));
-    }
-    async completeTurn(e, t) {
-      this.controller.completeTurn(e, t);
-    }
-    async getState() {
-      return this.controller.getTaskState();
-    }
-    async getBrowserFrameState() {
-      return this.controller.getBrowserFrameState();
-    }
-    async getContentLayoutState() {
-      return _c();
-    }
-    async hideTask(e) {
-      return this.controller.hideTask(e);
-    }
-    async hideForAllActiveTasks() {
-      return this.controller.hideAllActiveTasks();
-    }
-    async importLegacyHiddenTaskIds(e) {
-      return this.controller.importLegacyHiddenTaskIds(e);
-    }
-    async interactWithPresentation(e, t, n) {
-      this.controller.interactWithPresentation(e, t, n);
-    }
-    async showTask(e, t) {
-      return this.controller.showTask(e, t);
-    }
-    async setPlacement(e, t) {
-      this.controller.setPlacement(e, t);
-    }
-    async setNativeVideoReady(e, t) {
-      this.controller.setNativeVideoReady(e, t);
-    }
-    async startNativeVideo(e) {
-      if (this.disposed) return;
-      let t = this.nativeVideoSubscriptionCountsByConversationId.get(e) ?? 0;
-      (this.nativeVideoSubscriptionCountsByConversationId.set(e, t + 1),
-        this.controller.startNativeVideo(e));
-    }
-    async stopNativeVideo(e) {
-      let t = this.nativeVideoSubscriptionCountsByConversationId.get(e);
-      t != null &&
-        (t === 1
-          ? this.nativeVideoSubscriptionCountsByConversationId.delete(e)
-          : this.nativeVideoSubscriptionCountsByConversationId.set(e, t - 1),
-        this.controller.stopNativeVideo(e));
-    }
-    [Symbol.dispose]() {
-      if (!this.disposed) {
-        ((this.disposed = !0),
-          this.origin.removeListener(`destroyed`, this.handleOriginGone),
-          this.origin.removeListener(`did-navigate`, this.handleOriginGone),
-          this.origin.removeListener(`render-process-gone`, this.handleOriginGone));
-        for (let [e, t] of this.nativeVideoSubscriptionCountsByConversationId)
-          for (let n = 0; n < t; n += 1) this.controller.stopNativeVideo(e);
-        this.nativeVideoSubscriptionCountsByConversationId.clear();
-      }
-    }
-  },
+var { RemoteControlEnvironmentService: R5e, RemoteHostedPipContentService: z5e } =
+    createRemoteRpcServices({ RpcHandlerBase: n.Uf, getContentLayoutState: _c }),
   B5e = `(remote) `;
 function V5e(e) {
   let t = {

@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 remote RPC services
+
+原 `R5e/z5e` 已迁入 `src/main/main-app/remote/remote-rpc-services.ts`。新 adapters 保留 remote-control 默认名
+修正转发、hosted PIP task/presentation/layout 转发、per-conversation native-video 引用计数，以及 origin destroyed/
+navigate/render-process-gone 时的 listener 与残余订阅清理；两个 runtime consumers 已接回，旧 classes 已删除。
+
 ## 2026-10-31 remote-control device-key client
 
 原 `M5e/N5e/P5e/d4/F5e/I5e/L5e/f4/p4` 已迁入

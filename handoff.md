@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `R5e/z5e` remote RPC adapters 迁入 `remote/remote-rpc-services.ts`；environment rename forwarding、hosted
+PIP task/presentation/layout forwarding、native-video per-conversation ref-count 与 origin teardown cleanup 均由新
+owners 持有。两个 runtime consumers 已接回，旧 classes 已删除。focused test 覆盖 27 项。
+
 随后将 `M5e/N5e/P5e/d4/F5e/I5e/L5e/f4/p4` remote-control device-key client 迁入
 `remote/remote-control-device-key-client.ts`；native addon lazy load、key CRUD、connection/enrollment payload
 allowlist、audience/scopes、nonce/digest validation、domain separation 与签名 bytes/base64 projection 均由新 owner
