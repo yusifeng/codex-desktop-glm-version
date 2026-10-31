@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 global-dictation policy cleanup
+
+消息白名单与 platform support policy 已并入 `global-dictation-lifecycle-manager.ts`，旧 `cat/W7/G7/fat` 删除；
+accessibility permission prompt 继续由 composition 注入，保持模块无 Electron import 与原副作用时机。
+
 ## 2026-10-31 unwired owner skeleton removal
 
 删除无 consumer 的 `window/window-context.ts` 与 `fetch-handler/electron-fetch-handler.ts`：两者仅是 null/no-op/throwing

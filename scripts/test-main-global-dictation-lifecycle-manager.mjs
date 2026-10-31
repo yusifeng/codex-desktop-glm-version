@@ -1,12 +1,22 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { createGlobalDictationLifecycleManagerClass } from "../src/main/main-app/dictation/global-dictation-lifecycle-manager.ts";
+import {
+  createGlobalDictationLifecycleManagerClass,
+  isGlobalDictationMessage,
+  isGlobalDictationPlatformSupported,
+} from "../src/main/main-app/dictation/global-dictation-lifecycle-manager.ts";
 
 let assertions = 0;
 const equal = (actual, expected) => {
   assert.deepEqual(actual, expected);
   assertions += 1;
 };
+
+equal(isGlobalDictationPlatformSupported("darwin"), true);
+equal(isGlobalDictationPlatformSupported("win32"), true);
+equal(isGlobalDictationPlatformSupported("linux"), false);
+equal(isGlobalDictationMessage({ type: "global-dictation-completed" }), true);
+equal(isGlobalDictationMessage({ type: "global-dictation-unknown" }), false);
 
 function createHarness(overrides = {}) {
   const calls = [];
@@ -177,5 +187,8 @@ const main = fs.readFileSync(
 equal(main.includes("createGlobalDictationLifecycleManagerClass"), true);
 equal(main.includes("dat = createGlobalDictationLifecycleManagerClass({"), true);
 equal(main.includes("dat = class"), false);
+equal(main.includes("function W7("), false);
+equal(main.includes("function G7("), false);
+equal(main.includes("function fat("), false);
 
 console.log(`${assertions} main global-dictation lifecycle-manager assertions passed`);

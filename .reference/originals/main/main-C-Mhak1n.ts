@@ -78,7 +78,7 @@ const { createCommandSessionBackendClass } = require("./main-app/terminal/comman
 const { createWorktreeServiceClass } = require("./main-app/workspace/worktree-service.js");
 const { createDictationHistoryRuntime } = require("./main-app/dictation/history.js");
 const { createGlobalPasteRuntime } = require("./main-app/dictation/global-paste-runtime.js");
-const { createGlobalDictationLifecycleManagerClass } = require("./main-app/dictation/global-dictation-lifecycle-manager.js");
+const { createGlobalDictationLifecycleManagerClass, isGlobalDictationMessage, isGlobalDictationPlatformSupported } = require("./main-app/dictation/global-dictation-lifecycle-manager.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -144005,30 +144005,17 @@ var sat = createGlobalDictationWindowControllerClass({
     logger: r,
     initialRoute: n.so,
   }),
-  cat = {
-    "global-dictation-enabled-changed": !0,
-    "global-dictation-force-lock-changed": !0,
-    "global-dictation-pet-renderer-ready": !0,
-    "global-dictation-renderer-ready": !0,
-    "global-dictation-stop-requested": !0,
-    "global-dictation-pointer-interaction-changed": !0,
-    "global-dictation-recording-stopped": !0,
-    "global-dictation-dismiss": !0,
-    "global-dictation-close": !0,
-    "global-dictation-completed": !0,
-    "global-dictation-record-history-item": !0,
-    "global-dictation-failed": !0,
-    "global-dictation-in-app-started": !0,
-  },
   dat = createGlobalDictationLifecycleManagerClass({
     WindowController: sat,
     shared: n,
     validateGlobalDictationHotkey: QV,
     getCommandBinding: cH,
     resolveConfiguredHotkey: dH,
-    isSupported: W7,
-    requestAccessibilityPermission: G7,
-    isGlobalDictationMessage: fat,
+    isSupported: () => isGlobalDictationPlatformSupported(process.platform),
+    requestAccessibilityPermission: () => {
+      process.platform === `darwin` && l.systemPreferences.isTrustedAccessibilityClient(!0);
+    },
+    isGlobalDictationMessage,
     getClipboardFingerprint: B7,
     ensureGlobalDictationPermissions: XV,
     acquireCrossInstanceLock: jN,
@@ -144041,15 +144028,6 @@ var sat = createGlobalDictationWindowControllerClass({
     pasteGlobalDictation: nat,
     appendGlobalDictationHistory: L$e,
   });
-function W7() {
-  return process.platform === `darwin` || process.platform === `win32`;
-}
-function G7() {
-  process.platform === `darwin` && l.systemPreferences.isTrustedAccessibilityClient(!0);
-}
-function fat(e) {
-  return e.type in cat;
-}
 var Sat = createHotkeyWindowControllerClass({
   BrowserWindow: l.BrowserWindow,
   app: l.app,

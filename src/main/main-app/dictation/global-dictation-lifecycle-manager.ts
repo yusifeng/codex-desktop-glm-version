@@ -1,5 +1,29 @@
 // @ts-nocheck
 
+const GLOBAL_DICTATION_MESSAGE_TYPES = new Set([
+  `global-dictation-enabled-changed`,
+  `global-dictation-force-lock-changed`,
+  `global-dictation-pet-renderer-ready`,
+  `global-dictation-renderer-ready`,
+  `global-dictation-stop-requested`,
+  `global-dictation-pointer-interaction-changed`,
+  `global-dictation-recording-stopped`,
+  `global-dictation-dismiss`,
+  `global-dictation-close`,
+  `global-dictation-completed`,
+  `global-dictation-record-history-item`,
+  `global-dictation-failed`,
+  `global-dictation-in-app-started`,
+]);
+
+export function isGlobalDictationPlatformSupported(platform: string) {
+  return platform === `darwin` || platform === `win32`;
+}
+
+export function isGlobalDictationMessage(message: Record<string, any>) {
+  return GLOBAL_DICTATION_MESSAGE_TYPES.has(message.type);
+}
+
 /** Creates the stateful global-dictation hotkey/session lifecycle controller. */
 export function createGlobalDictationLifecycleManagerClass(dependencies: Record<string, any>) {
   const {
@@ -717,6 +741,10 @@ export function createGlobalDictationLifecycleManagerClass(dependencies: Record<
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { createGlobalDictationLifecycleManagerClass };
+  module.exports = {
+    createGlobalDictationLifecycleManagerClass,
+    isGlobalDictationMessage,
+    isGlobalDictationPlatformSupported,
+  };
 }
 
