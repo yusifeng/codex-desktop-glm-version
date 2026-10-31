@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 request item-synthesis owner repair
+
+`requests/item-synthesis.ts` 原为结构占位，实际 manager consumer 会跳过 follower delegation、MCP safety/equivalent connector auth 与正确
+dynamic option-picker response，自动 user-verification 更会立即伪报 accepted。本轮恢复旧 `M_e…W_e` 核心语义，manager 直接使用完整
+auto-approve factory，修正 elicitation item 参数错位并删除主 chunk 死 `G_e/K_e`；focused suite 覆盖 owner/follower、user input、dynamic tool、
+unsafe MCP 与 wiring。
+
 ## 2026-10-31 ThreadStore local helper cleanup
 
 主 chunk `T_e/Iv/E_e` 已无任何读取；等价的 history invalidation 与 recency comparator 位于语义 `ThreadStore`，分别由 canonical patch

@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复 requests item-synthesis owner：原单行占位版缺失 follower 转发、method 校验、审批清理、MCP 安全/等价 connector 处理、
+动态 option-picker 转换和中断全类型拒绝；现恢复完整语义，并修正 manager 的 elicitation item 四参数签名。user-verification 改接
+`elicitation-auto-approve.ts` 的真实 lifecycle，主 chunk 无引用 `G_e/K_e` 旧流删除；focused suite 新增 16 条行为/wiring 断言。
+
 清理 ThreadStore 局部 helper 死副本：主 chunk 的 `T_e/Iv/E_e` 已零引用；`threads/thread-store.ts` 内部
 `historyInvalidationOf/byRecencyDesc` 由 patch notification 与 recent sorting 真实消费，本轮删除旧别名与两函数，并在 subowner suite
 锁定 consumer wiring。

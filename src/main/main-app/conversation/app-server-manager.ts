@@ -115,11 +115,11 @@ import {
   W_e as replyWithDynamicToolResponse,
   ey as getDynamicToolRequest,
   H_e as removePendingDynamicToolRequest,
-  K_e as beginUserVerification,
   Gv as replyWithMcpServerElicitationResponse,
   Xv as buildMcpServerElicitationItem,
   V_e as markInterruptedCommandExecutions,
 } from "../requests/item-synthesis";
+import { createAutoApprovedElicitation as beginUserVerification } from "../requests/elicitation-auto-approve";
 // R3 threads/archive（41,278-41,455 归档流程）。
 import {
   ab as archiveContextFactory,
@@ -1066,8 +1066,8 @@ export class AppServerConversationManager extends ConversationEventEmitterBase {
     this.threadStore.updateTurnState(conversationId, turnId, updater, { findTurnOptions: options });
   }
 
-  getMcpServerElicitationItem(conversationId: string, requestId: string, params: any, automationCapability: unknown) {
-    return buildMcpServerElicitationItem(conversationId, requestId, params, automationCapability);
+  getMcpServerElicitationItem(requestId: string, params: any, completed: boolean, action: unknown) {
+    return buildMcpServerElicitationItem(requestId, params, completed, action);
   }
 
   // -------------------------------------------------------------------------
