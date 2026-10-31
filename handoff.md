@@ -1,5 +1,10 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `C5/Gtt/Ktt/w5/T5/qtt/Jtt/Ytt` terminal command runtime 迁入
+`terminal/terminal-command-runtime.ts`；跨平台 shell-kind 判定、PowerShell/cmd 路径转义、action command 换行归一化
+与 cwd command wrapping 均由新 runtime 持有。terminal session manager consumer 已接回，旧 helpers 已删除。
+focused test 覆盖 33 项。
+
 随后将 `Ptt/Ftt/b5/Itt/Ltt/Rtt/ztt/Btt` local node-pty backend 迁入
 `terminal/node-pty-backend.ts`；Windows console process enumeration、node-pty lazy load、PTY callbacks/I/O 与
 macOS reverse process-tree SIGKILL/error aggregation 均由新 runtime 持有。terminal session manager consumer 已接回，

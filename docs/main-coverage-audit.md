@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 terminal command runtime
+
+原 `C5/Gtt/Ktt/w5/T5/qtt/Jtt/Ytt` 已迁入
+`src/main/main-app/terminal/terminal-command-runtime.ts`。新 runtime 保留 Windows shell basename/kind 判定、
+PowerShell single-quote 与 cmd double-quote escaping、shell-specific cwd switching、CRLF/LF command normalization，
+以及 WSL 固定 LF 行为；terminal session manager 的两个真实 injections 已接回，旧 helpers 已删除。
+
 ## 2026-10-31 local node-pty backend
 
 原 `Ptt/Ftt/b5/Itt/Ltt/Rtt/ztt/Btt` 已整簇迁入

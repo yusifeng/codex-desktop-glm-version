@@ -110,6 +110,7 @@ const { createMacNotificationPermissionRuntime } = require("./main-app/notificat
 const { createTabDragPreviewServiceClass } = require("./main-app/window/tab-drag-preview-service.js");
 const { createTerminalWindowRuntime } = require("./main-app/terminal/terminal-window-runtime.js");
 const { createNodePtyBackendRuntime } = require("./main-app/terminal/node-pty-backend.js");
+const { createTerminalCommandRuntime } = require("./main-app/terminal/terminal-command-runtime.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138511,6 +138512,8 @@ var { NodePtyBackend: ztt } = createNodePtyBackendRuntime({
   environment: process.env,
   killProcess: process.kill.bind(process),
 });
+var { getTerminalShellKind: C5, formatTerminalActionCommand: Gtt } =
+  createTerminalCommandRuntime({ platform: process.platform });
 var Vtt = 16e3,
   Htt = 100,
   x5 = `xterm-256color`,
@@ -138545,77 +138548,6 @@ var Wtt = createTerminalSessionManagerClass({
   Utt,
   S5,
 });
-function C5(e) {
-  if (process.platform !== `win32`) return `posix`;
-  let t = Ytt(e);
-  return t === `wsl` || t === `wsl.exe`
-    ? `wsl`
-    : t === `pwsh` || t === `pwsh.exe` || t === `powershell` || t === `powershell.exe`
-      ? `powershell`
-      : t === `cmd` || t === `cmd.exe`
-        ? `commandPrompt`
-        : `posix`;
-}
-function Gtt(e, t, n) {
-  if (e === `powershell`) {
-    let r = n.replace(
-      /\r\n|\r|\n/g,
-      `\r
-`,
-    );
-    return `${T5(e, t)}; ${r}\r
-`;
-  }
-  if (e === `commandPrompt`) {
-    let r = n.replace(
-      /\r\n|\r|\n/g,
-      `\r
-`,
-    );
-    return `${T5(e, t)} && ${r}\r
-`;
-  }
-  return e === `wsl`
-    ? w5(
-        t,
-        n,
-        `
-`,
-      )
-    : Ktt(t, n);
-}
-function Ktt(e, t) {
-  return w5(
-    e,
-    t,
-    process.platform === `win32`
-      ? `\r
-`
-      : `
-`,
-  );
-}
-function w5(e, t, n) {
-  let r = t.replace(/\r\n|\r|\n/g, n);
-  return `cd ${JSON.stringify(e)} && ${r}${n}`;
-}
-function T5(e, t) {
-  return e === `powershell`
-    ? `Set-Location -LiteralPath ${qtt(t)}`
-    : e === `commandPrompt`
-      ? `cd /d ${Jtt(t)}`
-      : `cd ${JSON.stringify(t)}`;
-}
-function qtt(e) {
-  return `'${e.replace(/'/g, `''`)}'`;
-}
-function Jtt(e) {
-  return `"${e.replace(/"/g, `""`)}"`;
-}
-function Ytt(e) {
-  let t = (e[0] ?? ``).split(/[/\\]/);
-  return t[t.length - 1]?.toLowerCase() ?? ``;
-}
 var Xtt = class extends n.Uf {
     executionHostRegistry;
     appServerConnectionRegistry;
