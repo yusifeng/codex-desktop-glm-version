@@ -67,6 +67,7 @@ const realOwners = [
   ["src/main/main-app/browser-sidebar/first-party-webview.ts", "authenticateChatGptWebview"],
   ["src/main/main-app/browser-sidebar/find-in-page.ts", "openFindInPage"],
   ["src/main/main-app/browser-sidebar/browser-shortcuts.ts", "createBrowserSidebarKeyboardHandler"],
+  ["src/main/main-app/browser-sidebar/iab-tab-candidate-store.ts", "IabTabCandidateStore"],
   ["src/main/main-app/browser-sidebar/browser-host-service.ts", "createBrowserHostServiceClass"],
   ["src/main/main-app/window/browser-window-rpc-services.ts", "createBrowserProfileImportServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-history-service.ts", "createBrowserHistoryServiceClass"],
@@ -129,6 +130,7 @@ assert.equal(main.includes('require("./main-app/browser-sidebar/page-store.js")'
 assert.equal(main.includes('require("./main-app/browser-sidebar/first-party-webview.js")'), true, "first-party webview runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/find-in-page.js")'), true, "browser find runtime is wired");
 assert.equal(main.includes('require("./main-app/browser-sidebar/browser-shortcuts.js")'), true, "browser shortcuts runtime is wired");
+assert.equal(main.includes('require("./main-app/browser-sidebar/iab-tab-candidate-store.js")'), true, "IAB candidate store is wired");
 assert.equal(main.includes("async function QRe("), false, "generated LaTeX compiler must be removed");
 assert.equal(main.includes("async function lze("), false, "generated internal plugin downloader must be removed");
 assert.equal(main.includes("function qV("), false, "generated global hotkey owner must be removed");
@@ -154,6 +156,10 @@ assert.equal(main.includes("function uUe("), false, "generated authenticated web
 assert.equal(main.includes("function oq("), false, "generated browser find state owner must be removed");
 assert.equal(main.includes("function HGe("), false, "generated browser shortcuts handler must be removed");
 assert.equal(main.includes("function mq("), false, "generated browser shortcut accelerator map must be removed");
+assert.equal(main.includes("var qGe = class"), false, "generated IAB candidate store must be removed");
+assert.equal(main.includes("function JGe("), false, "generated IAB candidate ordering policy must be removed");
+assert.equal(main.includes("function YGe("), false, "generated IAB candidate filter must be removed");
+assert.equal(main.includes("function XGe("), false, "generated IAB candidate projector must be removed");
 assert.equal(main.includes("function _Ie("), false, "generated external-agent handlers must be removed");
 assert.equal(main.includes("function lIe("), false, "generated Cowork adapter wrapper must be removed");
 assert.equal(main.includes("async function VIe("), false, "generated imported-project finalizer must be removed");
@@ -411,4 +417,4 @@ assert.equal(main.includes("function _Oe("), false, "generated remote project co
 assert.equal(main.includes("function vOe("), false, "generated project order comparator must be removed");
 assert.equal(main.includes("async function Ust("), true, "real startup owner remains authoritative");
 
-console.log("431 main unwired-owner skeleton assertions passed");
+console.log("438 main unwired-owner skeleton assertions passed");

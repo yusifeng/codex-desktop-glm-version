@@ -5009,3 +5009,9 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   未做危险的部分删除。
 - 后续完整的 `find-in-page.ts` 与 `browser-shortcuts.ts` 已接回；修复 shortcuts wrapper/input 双参数契约。main 旧 `oq..KGe`
   约 235 行整带删除。focused coverage 21 项，no-unwired gate 扩至 431 项；下一批从 `qGe` candidate search owner 继续审计。
+
+# 2026-11-01 IAB tab candidate store extraction
+
+- 新增并接回 `browser-sidebar/iab-tab-candidate-store.ts`，完整承接窗口族搜索、candidate projection/排序、snapshot invalidation；
+  main 旧 `qGe..XGe` 约 75 行删除，后续内嵌 Zod vendor 带保持原边界。
+- focused coverage 18 项，no-unwired gate 扩至 438 项；下一批越过 vendor 带审计后续第一方 browser owner。

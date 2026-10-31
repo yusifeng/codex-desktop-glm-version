@@ -473,6 +473,7 @@ const {
   createBrowserSidebarKeyboardHandler: HGe,
   ownerCommandAcceleratorsFromKeymap: mq,
 } = require("./main-app/browser-sidebar/browser-shortcuts.js");
+const { IabTabCandidateStore: qGe } = require("./main-app/browser-sidebar/iab-tab-candidate-store.js");
 const {
   inspect: SVe,
   back: CVe,
@@ -38945,81 +38946,6 @@ var LGe = createDownloadStoreClass({
   path: h,
   sanitizeUrl: a.v,
 });
-var qGe = class {
-  windows;
-  invalidationListeners = new Set();
-  constructor(e) {
-    this.windows = e;
-  }
-  subscribeInvalidations(e) {
-    return (
-      this.invalidationListeners.add(e),
-      () => {
-        this.invalidationListeners.delete(e);
-      }
-    );
-  }
-  search(e, t, r, i = 100) {
-    if (t == null) return { candidates: [] };
-    let a = this.getCurrentWindowState(e);
-    return a == null
-      ? { candidates: [] }
-      : {
-          candidates: Array.from(this.windows.values())
-            .filter((e) => e === a || e.tabSourceWindow === a)
-            .flatMap((e) => Array.from(e.threads.values()))
-            .filter((e) => e.conversationId === t && YGe(e) && n.qc(e.snapshot, r))
-            .sort(JGe)
-            .slice(0, Math.min(i, 100))
-            .map((e) => {
-              let t = XGe(e);
-              return t == null
-                ? null
-                : { ...t, faviconUrl: n.Jc(e.snapshot.faviconUrl), recency: e.lastTabActivityTime };
-            })
-            .filter((e) => e != null),
-        };
-  }
-  notifyInvalidated() {
-    for (let e of this.invalidationListeners) e();
-  }
-  trackSnapshotUpdate(e, t) {
-    let { faviconUrl: n, title: r, url: i } = e.snapshot;
-    (t(),
-      (n !== e.snapshot.faviconUrl || r !== e.snapshot.title || i !== e.snapshot.url) &&
-        this.notifyInvalidated());
-  }
-  getCurrentWindowState(e) {
-    let t = l.BrowserWindow.fromWebContents(e);
-    return t == null || t.isDestroyed() ? null : (this.windows.get(t.id) ?? null);
-  }
-};
-function JGe(e, t) {
-  let n = t.lastTabActivityTime - e.lastTabActivityTime;
-  return n === 0
-    ? e.browserTabId === t.browserTabId
-      ? 0
-      : e.browserTabId < t.browserTabId
-        ? -1
-        : 1
-    : n;
-}
-function YGe(e) {
-  return (
-    e.pendingTeardown?.reason !== `closed` &&
-    (e.snapshot.tabType !== n.lu.NEW_TAB_PAGE || e.snapshot.url.length !== 0)
-  );
-}
-function XGe(e) {
-  let t = n.Uc.safeParse({
-    browserId: e.conversationId,
-    pluginId: n.Vc.browser,
-    source: `iab`,
-    tabId: e.browserTabId,
-    snapshot: { title: e.snapshot.title, url: e.snapshot.url },
-  });
-  return t.success ? t.data : null;
-}
 var _q = class {
     type;
     schema;

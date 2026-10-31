@@ -3056,3 +3056,10 @@ owner command accelerator、tab/panel 命令冲突和 comment-mode shortcut。�
 Electron wrapper/input 双参数契约错误。原始 chunk 中 `oq..KGe` 约 235 行已整带删除，后续候选搜索 owner 边界保持不变。
 focused test 覆盖 find lifecycle、requestId、close cleanup、comment toggle、keymap projection 与真实接线；no-unwired gate 扩至
 431 项。
+
+### 增量抽取：IAB tab candidate store
+
+新增 `browser-sidebar/iab-tab-candidate-store.ts`，接管当前窗口族/child window 的 IAB tab 搜索、closed/空 new-tab 过滤、
+recency + tab-id 稳定排序、100 项上限、schema projection、snapshot 变更检测和 invalidation 订阅。主运行时直接构造该语义
+owner；原始 chunk 中 `qGe..XGe` 约 75 行已物理删除，并严格停在其后的内嵌 Zod vendor 带之前。focused test 覆盖窗口族、
+排序/过滤/上限、失效订阅和真实接线；no-unwired gate 扩至 438 项。
