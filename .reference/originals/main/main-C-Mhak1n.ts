@@ -105,6 +105,7 @@ const { createArtifactRpcServices } = require("./main-app/artifacts/artifact-rpc
 const { createSshConnectionRegistrationClass } = require("./main-app/remote/ssh-connection-registration.js");
 const { createNotificationsServiceClass } = require("./main-app/notifications/notifications-service.js");
 const { createShortcutCaptureServices } = require("./main-app/window/shortcut-capture-service.js");
+const { createSystemAudioSpectrumRuntime } = require("./main-app/capture/system-audio-spectrum-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138445,75 +138446,17 @@ var { ShortcutCaptureService: Zet, ShortcutCaptureSession: Qet } =
     pathJoin: h.join,
     homeDirectory: p.homedir,
   }),
-  ttt = StartupRendererCoordinator,
-  c5;
-function ntt(e) {
-  if (process.platform !== `darwin`) return;
-  let [t, n] = process.getSystemVersion().split(`.`).map(Number);
-  if (!(t < 14 || (t === 14 && n < 2))) return new rtt(e);
-}
-var rtt = class extends n.Uf {
-    #e;
-    #t = new Set();
-    #n = () => this[Symbol.dispose]();
-    constructor(e) {
-      (super(),
-        (this.#e = e),
-        e.once(`destroyed`, this.#n),
-        e.once(`render-process-gone`, this.#n));
-    }
-    subscribe(e) {
-      let t = new itt(e.dup(), (e) => this.#t.delete(e));
-      return (this.#t.add(t), t);
-    }
-    [Symbol.dispose]() {
-      (this.#e.removeListener(`destroyed`, this.#n),
-        this.#e.removeListener(`render-process-gone`, this.#n));
-      for (let e of this.#t) e.unsubscribe();
-    }
-  },
-  itt = class extends n.Uf {
-    #e;
-    #t;
-    #n;
-    #r = !1;
-    #i = !1;
-    constructor(e, t) {
-      (super(),
-        (this.#e = e),
-        (this.#t = t),
-        c5 == null
-          ? Promise.resolve()
-              .then(() => require("./capture-DaZJeQgG.js"))
-              .then(({ SpectrumCapture: e }) => {
-                this.#r || ((c5 ??= new e()), this.#a(c5));
-              })
-              .catch(() => this.#o({ type: `error`, reason: `capture-failed` }))
-          : this.#a(c5),
-        e.onRpcBroken(() => this.unsubscribe()));
-    }
-    unsubscribe() {
-      this.#r || ((this.#r = !0), this.#t(this), this.#n?.(), this.#e[Symbol.dispose]());
-    }
-    [Symbol.dispose]() {
-      this.unsubscribe();
-    }
-    #a(e) {
-      this.#n = e.subscribe((e) => this.#o(e));
-    }
-    #o(e) {
-      this.#r ||
-        (e.type === `levels`
-          ? this.#i ||
-            ((this.#i = !0),
-            this.#e(e)
-              .catch(() => this.unsubscribe())
-              .finally(() => {
-                this.#i = !1;
-              }))
-          : (this.#e(e).catch(() => this.unsubscribe()), e.type === `error` && this.unsubscribe()));
-    }
-  },
+  ttt = StartupRendererCoordinator;
+var {
+    createSystemAudioSpectrumService: ntt,
+    SystemAudioSpectrumService: rtt,
+    SystemAudioSpectrumSubscription: itt,
+  } = createSystemAudioSpectrumRuntime({
+    RpcHandlerBase: n.Uf,
+    platform: process.platform,
+    getSystemVersion: () => process.getSystemVersion(),
+    loadSpectrumCapture: () => require("./capture-DaZJeQgG.js"),
+  }),
   att = class extends n.Uf {
     getFontFamilies() {
       return l.systemPreferences.getFontFamilies();

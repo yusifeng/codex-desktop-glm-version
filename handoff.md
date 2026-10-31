@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `c5/ntt/rtt/itt` system audio spectrum runtime 迁入 `capture/system-audio-spectrum-service.ts`；macOS
+version gate、lazy capture singleton、renderer subscriptions、levels backpressure 与 load/error/RPC teardown 均由新
+owner 持有。唯一 runtime consumer 已接回，旧实现已删除。focused test 覆盖 34 项。
+
 随后将 `Zet/Qet` shortcut capture service/session 迁入 `window/shortcut-capture-service.ts`；focused-window gate、
 native bare-modifier capture、promise rollover 与 blur/navigation/renderer teardown cleanup 均由新 owner 持有。
 唯一 runtime consumer 已接回，旧 classes 已删除。focused test 覆盖 35 项。

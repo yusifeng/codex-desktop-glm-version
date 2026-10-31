@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 system audio spectrum service
+
+原 `c5/ntt/rtt/itt` 已迁入 `src/main/main-app/capture/system-audio-spectrum-service.ts`。新 runtime 保留 macOS
+14.2+ gate、SpectrumCapture lazy singleton、per-renderer subscription、levels backpressure，以及 load/error/RPC-broken/
+renderer teardown cleanup；唯一 runtime consumer 已接回，旧 function/classes/shared singleton 已删除。
+
 ## 2026-10-31 shortcut capture service
 
 原 `Zet/Qet` 已迁入 `src/main/main-app/window/shortcut-capture-service.ts`。新 owner 保留 focused-window gate、
