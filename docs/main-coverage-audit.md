@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 timeline item predicate cleanup
+
+`threads/timeline-index.ts` 已提供旧 `_v/vv/__e/yv/bv/xv/Sv` 的逐函数等价实现，并由 `ThreadItemIndex` 与 hydration 真实消费；旧主 chunk
+定义已无引用，本轮删除该死簇。focused suite 执行验证 terminal transient、automation、message/activity/reasoning 与两类 create-thread
+判定，并锁定旧符号不再回流。
+
 ## 2026-10-31 pending interaction owner repair
 
 `threads/hydration.ts` 原先使用不存在的 `request_user_input/setup_codex` 名称、未验证 onboarding 参数且把所有 environment input 都视为

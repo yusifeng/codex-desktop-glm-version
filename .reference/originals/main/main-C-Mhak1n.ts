@@ -25350,46 +25350,6 @@ var Yge = AppServerManagerStreamState;
       return this.subscribers.get(e);
     }
   };
-function _v(e) {
-  return (
-    e.type === `error` ||
-    e.type === `userInputResponse` ||
-    e.type === `planImplementation` ||
-    e.type === `fileChange`
-  );
-}
-function vv(e) {
-  return Sv(e)
-    ? Y_.isAutomationAssistantMessage(e.text)
-    : __e(e) && Y_.isAutomationUserInput(e.content);
-}
-function __e(e) {
-  return e.type === `userMessage`;
-}
-function yv(e) {
-  return e.type === `collabAgentToolCall` || e.type === `subAgentActivity`;
-}
-function bv(e) {
-  return (
-    (e.type === `dynamicToolCall` &&
-      `namespace` in e &&
-      e.namespace === `codex_app` &&
-      `tool` in e &&
-      e.tool === `create_thread`) ||
-    (e.type === `mcpToolCall` &&
-      `server` in e &&
-      e.server === `codex_app` &&
-      `tool` in e &&
-      e.tool === `create_thread`) ||
-    !1
-  );
-}
-function xv(e) {
-  return e.type === `reasoning`;
-}
-function Sv(e) {
-  return e.type === `agentMessage`;
-}
 function Ov({
   thread: e,
   hostId: t,

@@ -39,6 +39,53 @@ for (const [relativePath, className, expectedMembers] of owners) {
   equal(classNode.body.body.length, expectedMembers);
 }
 
+const timelineSource = fs.readFileSync(
+  new URL("../src/main/main-app/threads/timeline-index.ts", import.meta.url),
+  "utf8",
+);
+const timelineTranspiled = await transform(timelineSource, {
+  loader: "ts",
+  format: "cjs",
+  target: "es2022",
+});
+const timelineModule = { exports: {} };
+Function("require", "module", "exports", timelineTranspiled.code)(
+  (specifier) => {
+    if (specifier === "../turns/canonical-history")
+      return { lastTurn: () => null, timelineEntryKey: () => "entry" };
+    if (specifier === "./automation-detector")
+      return {
+        AUTOMATION_DETECTOR: {
+          isAutomationAssistantMessage: (text) => text === "automation-assistant",
+          isAutomationUserInput: (content) => content === "automation-user",
+        },
+      };
+    if (specifier === "./hydration") return { pendingInteraction: () => null };
+    throw new Error(`unexpected require ${specifier}`);
+  },
+  timelineModule,
+  timelineModule.exports,
+);
+const timeline = timelineModule.exports;
+equal(timeline.isTerminalTransientItem({ type: "fileChange" }), true);
+equal(timeline.isTerminalTransientItem({ type: "agentMessage" }), false);
+equal(timeline.isAutomationItem({ type: "agentMessage", text: "automation-assistant" }), true);
+equal(timeline.isAutomationItem({ type: "userMessage", content: "automation-user" }), true);
+equal(timeline.isActivityItem({ type: "subAgentActivity" }), true);
+equal(timeline.isCreateThreadCall({
+  type: "dynamicToolCall",
+  namespace: "codex_app",
+  tool: "create_thread",
+}), true);
+equal(timeline.isCreateThreadCall({
+  type: "mcpToolCall",
+  server: "other",
+  tool: "create_thread",
+}), false);
+equal(timeline.isReasoningItem({ type: "reasoning" }), true);
+equal(timeline.isAgentMessageItem({ type: "agentMessage" }), true);
+equal(timeline.isUserMessageItem({ type: "userMessage" }), true);
+
 const inactiveSource = fs.readFileSync(
   new URL("../src/main/main-app/threads/inactive-unsubscriber.ts", import.meta.url),
   "utf8",
@@ -117,6 +164,8 @@ const main = fs.readFileSync(
 );
 for (const generatedName of ["Bge", "Kge", "g_e", "Dve", "Rve", "ySe", "bSe"])
   equal(new RegExp(`\\b${generatedName}\\b`).test(main), false);
+for (const generatedName of ["_v", "vv", "__e", "yv", "bv", "xv", "Sv"])
+  equal(main.includes(`function ${generatedName}(`), false);
 
 const manager = fs.readFileSync(
   new URL("../src/main/main-app/conversation/app-server-manager.ts", import.meta.url),

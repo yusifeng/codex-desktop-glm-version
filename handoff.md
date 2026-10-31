@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+清理 timeline item predicate 重复 owner：`threads/timeline-index.ts` 的 terminal-transient、automation、user/agent message、activity、
+create-thread 与 reasoning predicates 已由 `ThreadItemIndex`/hydration 真实消费；主 chunk 无引用的 `_v…Sv` 死簇删除，focused suite
+新增两类 automation、dynamic/MCP create-thread 与各 item type 的行为证据。
+
 修复并统一 pending interaction owner：`threads/hydration.ts` 现使用真实 onboarding 工具名，并恢复 onboarding/option-picker/
 setup-step/environment-input 的严格参数校验与 invalid response；main 的 `fv/pv/mv` consumers 已接回语义模块，旧 `fv…h_e`
 重复簇删除。focused suite 覆盖有效/无效环境输入、onboarding user input 与 setup complete 排除。
