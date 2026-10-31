@@ -216,6 +216,7 @@ const { createWorkspacePolicyRuntime } = require("./main-app/startup/workspace-p
 const { waitForCleanupWithTimeout } = require("./main-app/startup/cleanup-timeout.js");
 const { resolveTrayIconCandidates, resolveTrayTemplateNames, resolveTrayWindowsIconNames } = require("./main-app/startup/tray-icon-paths.js");
 const { resolveFlavorIconAssetNames, resolveFlavorIconBaseName, resolveWindowIconResource } = require("./main-app/startup/icon-flavor-policy.js");
+const { createWindowIconLifecycle } = require("./main-app/startup/window-icon-lifecycle.js");
 const { projectNativeStatusItemMenuState } = require("./main-app/startup/native-status-item-menu.js");
 const { buildBrowserWindowOptions } = require("./main-app/startup/browser-window-options.js");
 const { installWindowTitlebarOverlaySync } = require("./main-app/startup/window-titlebar-overlay-sync.js");
@@ -55847,105 +55848,44 @@ function dst({
   startupPhases: T,
 }) {
   let E = (0, h.join)(m, `electron`, `src`, `icons`),
-    D = (e) => {
-      if (!l.app.isPackaged) return null;
-      let t = (0, h.join)(process.resourcesPath, e);
-      return (0, v.existsSync)(t) ? t : null;
-    },
-    O = (e) => {
-      let t = (0, h.join)(E, e);
-      return (0, v.existsSync)(t) ? t : null;
-    },
-    k = (e) => D(e) ?? O(e),
-    A = () => resolveDockIconPreference({
-      buildFlavor: r,
-      getPreference: () => d.get(n.iu.DOCK_ICON_PREFERENCE),
-      eligibleFlavors: [a.in.Dev, a.in.Nightly, a.in.InternalAlpha, a.in.PublicBeta, a.in.Prod],
-      agentFlavor: a.in.Agent,
-    }),
-    j = () => {
-      let e = resolveWindowIconResource(r, { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod });
-      return e == null ? null : e.allowPackaged ? k(e.fileName) : O(e.fileName);
-    },
-    M = () =>
-      _
-        ? TT(r, {
-            localIconsDirectory: (0, h.join)(m, `electron`, `.generated`, `windows-app-icons`),
-          })
-        : null,
-    N = process.platform === `linux` ? wT(r, E) : M();
-  if (_ && N != null) {
-    let e = () => {
-      let e = M();
-      if (e != null && e !== N) {
-        N = e;
-        for (let e of l.BrowserWindow.getAllWindows()) e.isDestroyed() || e.setIcon(N);
-      }
-    };
-    (l.nativeTheme.on(`updated`, e),
-      w.add(() => {
-        l.nativeTheme.off(`updated`, e);
-      }));
-  }
-  let P = iconAssetNames(r),
-    F = y ? process.env.CODEX_ELECTRON_DEV_DOCK_ICONS_PATH : void 0,
-    I = () => (l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI ? P.dark : P.light),
-    L = (e) => {
-      if (F) {
-        let t = `app-default`;
-        e === `codex-system` &&
-          (t = l.nativeTheme.shouldUseDarkColorsForSystemIntegratedUI
-            ? `codex-dark`
-            : `codex-light`);
-        let n = l.nativeImage.createFromPath((0, h.join)(F, `${t}.png`));
-        if (!n.isEmpty()) {
-          l.app.dock?.setIcon(n);
-          return;
-        }
-      }
-      if (e === `app-default` && r !== a.in.Dev) {
-        let e = l.app.dock;
-        e != null && Reflect.apply(e.setIcon.bind(e), e, [null]);
-        return;
-      }
-      let t = e === `codex-system` ? I() : null,
-        n = (t == null ? null : k(t)) ?? j(),
-        i = n == null ? l.nativeImage.createEmpty() : l.nativeImage.createFromPath(n);
-      if (!i.isEmpty()) {
-        if (e === `codex-system`) {
-          let { width: e, height: t } = i.getSize(),
-            n = Math.round(e / 128);
-          i = i.crop({ x: n, y: n, width: e - n * 2, height: t - n * 2 });
-        }
-        l.app.dock?.setIcon(i);
-      }
-    },
-    R = () => {
-      if (!g) return;
-      let e = A();
-      (L(e),
-        Lj({ preference: e, resourceName: e === `codex-system` ? P.light : null }).then((e) => {
-          e && L(A());
-        }));
-    };
-  if (g) {
-    R();
-    let e = () => {
-      let e = A();
-      e === `codex-system` && L(e);
-    };
-    (l.nativeTheme.on(`updated`, e),
-      w.add(() => {
-        l.nativeTheme.off(`updated`, e);
-      }));
-  }
-  let z = null,
+    windowIconLifecycle = createWindowIconLifecycle(
+      {
+        app: l.app,
+        browserWindows: () => l.BrowserWindow.getAllWindows(),
+        createEmptyImage: () => l.nativeImage.createEmpty(),
+        createImageFromPath: (e) => l.nativeImage.createFromPath(e),
+        exists: (e) => (0, v.existsSync)(e),
+        join: (...e) => (0, h.join)(...e),
+        nativeTheme: l.nativeTheme,
+        resolveDockIconPreference,
+        resolveFlavorIconAssetNames,
+        resolveLinuxIcon: wT,
+        resolveWindowIconResource,
+        resolveWindowsIcon: TT,
+        resourcesPath: process.resourcesPath,
+        setMacAppIcon: Lj,
+      },
+      {
+        buildFlavor: r,
+        devDockIconsPath: y ? process.env.CODEX_ELECTRON_DEV_DOCK_ICONS_PATH : void 0,
+        flavorPolicy: { agent: a.in.Agent, nightly: a.in.Nightly, internalAlpha: a.in.InternalAlpha, publicBeta: a.in.PublicBeta, dev: a.in.Dev, prod: a.in.Prod },
+        iconsRoot: E,
+        isDevMode: y,
+        isLinux: process.platform === `linux`,
+        isMacOS: g,
+        isWindows: _,
+        readDockIconPreference: () => d.get(n.iu.DOCK_ICON_PREFERENCE),
+        registerDispose: (e) => w.add(e),
+        repoRoot: m,
+      },
+    ),
+    z = null,
     B = new Qot(e, {
       chunkedMessageSender: t,
       desktopRoot: f,
       iconDirectoryName: a.Dt,
       get windowIconPath() {
-        return N;
+        return windowIconLifecycle.windowIconPath;
       },
       globalState: u,
       settingsStore: d,
@@ -56065,7 +56005,7 @@ function dst({
     };
   return {
     get windowIconPath() {
-      return N;
+      return windowIconLifecycle.windowIconPath;
     },
     windowManager: B,
     avatarOverlayManager: V,
@@ -56076,7 +56016,7 @@ function dst({
     windowsCaptureNativeBridge: re,
     quickChatController: ne,
     realtimeVoiceHotkeyController: ae,
-    updateDockIcon: R,
+    updateDockIcon: windowIconLifecycle.updateDockIcon,
     setWindowContext: (e) => {
       z = e;
       for (let t of l.BrowserWindow.getAllWindows())

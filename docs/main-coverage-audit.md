@@ -3374,3 +3374,12 @@ deep-link listener、application menu manager、窗口导航与 dispose 顺序�
 同一批次进一步将消费审计剩余 13 项全部语义化：browser tab query/favicon/type、dynamic tool 过滤与
 namespace、versioned feature overrides、service-tier/base thread config、worktree containment、project thread ordering 和 elicitation
 approval/connector policy。`audit-shared-consumption` 从 13 降为 0；115 项 evidence/runtime 断言通过。
+
+### 整块抽取：window icon lifecycle
+
+`startup/window-icon-lifecycle.ts` 现独立拥有窗口图标与 macOS dock 图标的平台生命周期：打包资源/源码回退、
+Windows 深浅主题 ico 切换与存量窗口更新、Linux PNG 路径、dev dock 预览、app-default 恢复、Codex 图标
+1/128 裁剪、LaunchServices bundle icon 同步以及两组 nativeTheme listener 的 dispose。`dst` 仅保留 WindowManager/
+hotkey/overlay 装配，通过 getter 读取唯一 icon owner 的实时 Windows 路径；旧内联约 95 行已删除。
+15 项 focused 断言与 browser-window/desktop-environment/icon-flavor/startup/tray 相邻 104 项回归通过，no-unwired gate
+扩至 595 项。

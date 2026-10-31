@@ -4,6 +4,7 @@ import fs from "node:fs";
 const root = new URL("../", import.meta.url);
 const realOwners = [
   ["src/main/main-app/window/window-context.ts", "createWindowContextClass"],
+  ["src/main/main-app/startup/window-icon-lifecycle.ts", "createWindowIconLifecycle"],
   ["src/main/main-app/fetch-handler/electron-fetch-handler.ts", "createElectronFetchHandlerClass"],
   ["src/main/main-app/misc/open-in-service.ts", "createOpenInServiceClass"],
   ["src/main/main-app/browser-sidebar/browser-comment-overlay-manager.ts", "createBrowserCommentOverlayManagerClass"],
@@ -596,5 +597,9 @@ assert.equal(main.includes("class extends WorkerInvocationSampler"), false, "gen
 assert.equal(main.includes("function S5(e, t)"), false, "generated terminal session-key helper must be removed");
 assert.equal(main.includes("function e7(e)"), false, "generated native quit-label helper must be removed");
 assert.equal(main.includes("function n9()"), false, "generated hotkey detail-state helper must be removed");
+assert.equal(main.includes('require("./main-app/startup/window-icon-lifecycle.js")'), true, "window icon lifecycle is wired");
+assert.equal(main.includes("windowIconLifecycle = createWindowIconLifecycle("), true, "window host creates one semantic icon owner");
+assert.equal(main.includes("let P = iconAssetNames(r)"), false, "generated dock icon lifecycle must be removed");
+assert.equal(main.includes("let e = M();\n      if (e != null && e !== N)"), false, "generated Windows theme icon owner must be removed");
 
-console.log("590 main unwired-owner skeleton assertions passed");
+console.log("595 main unwired-owner skeleton assertions passed");

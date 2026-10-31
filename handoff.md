@@ -5325,3 +5325,12 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
 - 将 `audit-shared-consumption` 剩余 13 个真实消费契约一次归零，包括 browser tab contracts、dynamic tools、versioned
   feature overrides、thread-start config、service tier、worktree/project ordering 与 elicitation policy。聚焦测试 115 项，证明
   `0 unlocated` 且 `0 consumed-unsemantic`；本批次源码/测试/审计总体净新增，删除仅是被拆回真实 owner 的临时文件。
+
+# 2026-11-01 window icon lifecycle extraction
+
+- 新增并真实接回 `startup/window-icon-lifecycle.ts`，一次迁出 `dst` 中的 packaged/source icon resolution、Windows
+  nativeTheme 路径切换与存量窗口更新、Linux icon、macOS dock/bundle icon 同步、Codex artwork 裁剪与订阅清理。
+  WindowManager options 和对外 getter 均读取该唯一 owner 的 live `windowIconPath`，没有复制状态。
+- 主 chunk 旧内联图标 owner 约 95 行删除；15 项 focused 断言与六组平台/窗口回归通过，no-unwired gate 扩至
+  595 项。`dst` 剩余部分仍是 WindowManager、overlay、hotkey 和 primary-window 的共享装配根，继续按独立状态边界审计，
+  不为数量强拆。
