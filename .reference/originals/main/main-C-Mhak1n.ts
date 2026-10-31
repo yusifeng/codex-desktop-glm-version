@@ -102,6 +102,7 @@ const { createRemoteHostConfigRuntime } = require("./main-app/remote/host-config
 const { createArtifactDocumentsClass } = require("./main-app/artifacts/artifact-documents.js");
 const { createArtifactDocumentStoreClass } = require("./main-app/artifacts/artifact-document-store.js");
 const { createArtifactRpcServices } = require("./main-app/artifacts/artifact-rpc-services.js");
+const { createSshConnectionRegistrationClass } = require("./main-app/remote/ssh-connection-registration.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138636,99 +138637,14 @@ var Jet = (0, d.promisify)(P.execFile),
         this.#e.resolve(void 0));
     }
   },
-  s5 = n.wf({
-    sshAlias: n
-      .Of()
-      .min(1)
-      .max(255)
-      .regex(/^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$/),
-    autoConnect: n.gf().optional(),
-    waitForMetadata: n.gf().optional(),
+  ett = createSshConnectionRegistrationClass({
+    runtime: n,
+    RpcHandlerBase: n.Uf,
+    resolveSshAlias: $2,
+    createLogger: r.i,
+    pathJoin: h.join,
+    homeDirectory: p.homedir,
   }),
-  $et = s5.extend({ hostId: n.Of() }),
-  ett = class extends n.Uf {
-    globalState;
-    connections;
-    logger = r.i(`ssh-connection-registration`);
-    constructor(e, t) {
-      (super(), (this.globalState = e), (this.connections = t));
-    }
-    async add(e) {
-      let { sshAlias: t, autoConnect: r = !0, waitForMetadata: i = !0 } = s5.parse(e),
-        a = i
-          ? await $2({
-              entrypointPath: (0, h.join)((0, p.homedir)(), `.ssh`, `config`),
-              sshAlias: t,
-            })
-          : {
-              hostId: n.ys(t),
-              displayName: t,
-              source: `discovered`,
-              sshAlias: t,
-              sshHost: t,
-              sshPort: null,
-              identity: null,
-              autoConnect: r,
-            };
-      if (a == null) throw Error(`SSH alias is unavailable`);
-      let o = this.globalState.get(n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS) ?? [],
-        s = o.find((e) => e.alias === t),
-        c = s?.hostId ?? a.hostId;
-      s ??
-        this.globalState.set(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID, {
-          ...this.globalState.get(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID),
-          [c]: r,
-        });
-      let l =
-        s == null
-          ? this.connections.saveCodexManagedRemoteSshConnections([
-              ...o,
-              {
-                hostId: c,
-                displayName: t,
-                source: `discovered`,
-                alias: t,
-                hostname: null,
-                sshPort: null,
-                identity: null,
-              },
-            ])
-          : this.connections.refreshRemoteConnections();
-      return (
-        i
-          ? await l
-          : l.catch((e) => {
-              this.logger().warning(`background_refresh_failed`, {
-                safe: {},
-                sensitive: { error: e },
-              });
-            }),
-        {
-          ...a,
-          hostId: c,
-          displayName: s?.displayName ?? t,
-          autoConnect:
-            this.globalState.get(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID)?.[c] ?? !1,
-        }
-      );
-    }
-    async remove(e) {
-      let { hostId: t, sshAlias: r } = $et.parse(e),
-        i = this.globalState.get(n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS) ?? [];
-      if (!i.some((e) => e.hostId === t && e.alias === r)) return !1;
-      this.globalState.set(
-        n.iu.CODEX_MANAGED_REMOTE_CONNECTIONS,
-        i.filter((e) => e.hostId !== t),
-      );
-      let a = { ...this.globalState.get(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID) };
-      return (
-        delete a[t],
-        this.globalState.set(n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID, a),
-        await this.connections.refreshRemoteConnections(),
-        !0
-      );
-    }
-  },
   ttt = StartupRendererCoordinator,
   c5;
 function ntt(e) {

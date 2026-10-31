@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 SSH connection registration
+
+原 `s5/$et/ett` 已迁入 `src/main/main-app/remote/ssh-connection-registration.ts`。新 owner 保留 alias schema、
+metadata resolve/fast path、saved catalog 与 auto-connect persistence、foreground/background refresh、existing alias
+identity reuse 与 remove cleanup；唯一 runtime consumer 已接回，旧 schema/class 已删除。
+
 ## 2026-10-31 artifact RPC services
 
 原 `Met/Het` 已迁入 `src/main/main-app/artifacts/artifact-rpc-services.ts`。新 adapters 保留 external document
