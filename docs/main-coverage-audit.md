@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 desktop feature availability owner wiring
+
+`src/main/main-app/misc/availability.ts` 已完整覆盖旧 `_r/kte/vr/yr/br/xr/Sr/Cr/wr/Tr/Er/Ate/Dr/Or/jte/kr/Ar/Mte`。
+本轮接回 main 所有读/写/订阅 consumers，删除旧 187 行 schema+mutable ledger，避免已迁模块形成第二状态源；focused suite 覆盖
+loading→ready、两类通知/退订、无差异更新、Windows override、Dev strict JSON、platform gate 与 startup wiring。
+
 ## 2026-10-31 browser-use autocomplete/menu owner wiring
 
 `src/main/main-app/browser-use/autocomplete.ts` 已覆盖旧 `PD/yke/bke/xke/Ske/FD/ID/Cke/wke/LD`。本轮修复 favicon promise

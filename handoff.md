@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+接回 desktop feature availability 单一状态 owner：既有 `misc/availability.ts` 现替代旧 `_r…Mte`，通过 `vr/Tr/Er/Ate/Dr/Or/
+jte/kr/Ar` 兼容别名服务 main 全部读写/订阅/解析 consumers。main 与 autocomplete、host assembly、link opening 等语义模块现共享
+同一 currentAvailability，消除了重复 owner；ready 单向跃迁、deviceAttestation 重算、Dev env strict override 保持完整。
+
 接回 browser-use autocomplete/menu owners：既有 `browser-use/autocomplete.ts` 现替代旧 `PD/yke/bke/xke/Ske/FD/ID/Cke/wke/LD`。
 审计恢复了非 composer favicon promise 缓存、RPC using-scope disposal、静默菜单关闭的 event stream cleanup；startup coordinator、
 WindowContext service 与 BrowserHost extension menus 三个真实 consumers 分别通过 `bke/Cke/wke` 接回，旧 361 行状态簇删除。
