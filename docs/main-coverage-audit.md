@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 pending interaction owner repair
+
+`threads/hydration.ts` 原先使用不存在的 `request_user_input/setup_codex` 名称、未验证 onboarding 参数且把所有 environment input 都视为
+pending。本轮恢复旧 schemas 对应的严格验证与 invalid response，将 main `fv/pv/mv` consumers 接回并删除旧 `fv…h_e` 簇；focused
+suite 覆盖环境输入、onboarding、setup step 与 complete 非 pending 分支。
+
 ## 2026-10-31 subagent metadata and ancestry wiring
 
 `threads/hydration.ts` 已覆盖旧 `f_e/av/p_e/m_e/ov/sv/cv/lv/uv/dv`，但 receiver propagation 的 semantic 版本只遍历 legacy turns。

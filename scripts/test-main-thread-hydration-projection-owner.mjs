@@ -176,6 +176,45 @@ equal(owner.isDescendantOf(
 equal(owner.isSurfaceableThread({ ephemeral: false, threadSource: "user" }), true);
 equal(owner.isSurfaceableThread({ ephemeral: true, threadSource: "user" }), false);
 
+equal(owner.environmentInputResult({
+  tool: "request_environment_input",
+  arguments: { mode: "network", domains: ["example.com"] },
+}), { status: "pending", notifyUserInput: true });
+equal(owner.environmentInputResult({
+  tool: "request_environment_input",
+  arguments: { mode: "network", secrets: [{ name: "TOKEN", unexpected: true }] },
+}), {
+  status: "invalid",
+  response: {
+    contentItems: [{ type: "inputText", text: "request_environment_input received invalid arguments." }],
+    success: false,
+  },
+});
+const pendingConversation = (tool, args) => ({
+  requests: [{
+    method: "item/tool/call",
+    id: "request-1",
+    params: { turnId: "turn-1", tool, arguments: args },
+  }],
+  turns: [{ turnId: "turn-1", items: [] }],
+});
+equal(owner.pendingInteraction(pendingConversation("request_onboarding_input", {
+  questions: [{
+    id: "role",
+    question: "Which role?",
+    options: [{ label: "Developer" }, { label: "Reviewer" }],
+  }],
+}), () => null), { kind: "userInput", userInputRequestId: "request-1" });
+equal(owner.pendingInteraction(pendingConversation("request_onboarding_input", {
+  questions: [{ id: "role", question: "Which role?", options: [{ label: "Only one" }] }],
+}), () => null), null);
+equal(owner.pendingInteractionKind(pendingConversation("setup_codex_step", {
+  step: "role",
+}), () => null), "setupCodexStep");
+equal(owner.pendingInteractionKind(pendingConversation("setup_codex_step", {
+  step: "complete",
+}), () => null), null);
+
 const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
@@ -186,7 +225,10 @@ for (const name of ["c_e", "l_e", "X_", "Z_", "Q_", "$_", "ev", "tv", "nv", "d_e
 equal(main.includes("var o_e ="), false);
 equal(main.includes("var u_e ="), false);
 equal(main.includes("registerThreadMetadata: av, activeAncestryIds: ov"), true);
+equal(main.includes("environmentInputResult: fv, pendingInteractionKind: pv, pendingInteraction: mv"), true);
 for (const name of ["f_e", "av", "p_e", "m_e", "ov", "sv", "cv", "lv", "uv", "dv"])
+  equal(main.includes(`function ${name}(`), false);
+for (const name of ["fv", "pv", "mv", "hv", "gv", "h_e"])
   equal(main.includes(`function ${name}(`), false);
 equal(source.includes("forEachTurn(draft as never"), true);
 

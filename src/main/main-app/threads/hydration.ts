@@ -576,21 +576,76 @@ function hasIncompletePlanImplementation(turn: { items: any[] }): boolean {
 /** onboarding 工具分类（原 `h_e`；工具 schema 由 requests/item-synthesis 提供，此处按方法名保守判定）。 */
 function onboardingToolKind(request: { params: { tool: string; arguments: unknown } }): "userInput" | "optionPicker" | "setupCodexStep" | null {
   switch (request.params.tool) {
-    case "request_user_input":
-      return request.params.arguments == null ? null : "userInput";
+    case "request_onboarding_input":
+      return isOnboardingInput(request.params.arguments) ? "userInput" : null;
     case "request_option_picker":
-      return request.params.arguments == null ? null : "optionPicker";
-    case "setup_codex":
-      return "setupCodexStep";
+      return isOptionPicker(request.params.arguments) ? "optionPicker" : null;
+    case "setup_codex_step":
+      return isSetupCodexStep(request.params.arguments) ? "setupCodexStep" : null;
     default:
       return null;
   }
 }
 
 /** 环境输入请求的 pending 判定（原 `fv`）。 */
-function environmentInputPending(params: Record<string, any>): { status: string; notifyUserInput?: boolean } | null {
+function isRecord(value: unknown): value is Record<string, any> {
+  return typeof value === "object" && value != null && !Array.isArray(value);
+}
+function hasOnlyKeys(value: Record<string, any>, keys: string[]): boolean {
+  return Object.keys(value).every((key) => keys.includes(key));
+}
+function isOption(value: unknown): boolean {
+  return isRecord(value) && typeof value.label === "string" &&
+    (value.description == null || typeof value.description === "string");
+}
+function isOptionPicker(value: unknown): boolean {
+  return isRecord(value) && typeof value.question === "string" &&
+    Array.isArray(value.options) && value.options.every(isOption) &&
+    (value.allowMultiple === undefined || typeof value.allowMultiple === "boolean") &&
+    (value.submitLabel == null || typeof value.submitLabel === "string") &&
+    (value.skipLabel == null || typeof value.skipLabel === "string");
+}
+function isOnboardingInput(value: unknown): boolean {
+  return isRecord(value) && hasOnlyKeys(value, ["questions"]) &&
+    Array.isArray(value.questions) && value.questions.length >= 1 && value.questions.length <= 3 &&
+    value.questions.every((question: unknown) =>
+      isRecord(question) && hasOnlyKeys(question, ["id", "header", "question", "options"]) &&
+      typeof question.id === "string" &&
+      (question.header == null || typeof question.header === "string") &&
+      typeof question.question === "string" && Array.isArray(question.options) &&
+      question.options.length >= 2 && question.options.every(isOption));
+}
+function isSetupCodexStep(value: unknown): boolean {
+  return isRecord(value) && hasOnlyKeys(value, ["step"]) &&
+    (value.step === "role" || value.step === "task");
+}
+function isEnvironmentInput(value: unknown): boolean {
+  if (!isRecord(value) || !hasOnlyKeys(value, ["mode", "reason", "secrets", "domains", "repositories"])) return false;
+  if (!["repositories", "name", "secrets", "network", "review"].includes(value.mode)) return false;
+  if (value.reason !== undefined && (typeof value.reason !== "string" || value.reason.trim().length < 1 || value.reason.trim().length > 512)) return false;
+  if (value.domains !== undefined && (!Array.isArray(value.domains) || value.domains.length > 20 || value.domains.some((item: unknown) => typeof item !== "string" || item.trim().length < 1 || item.trim().length > 253))) return false;
+  if (value.repositories !== undefined && (!Array.isArray(value.repositories) || value.repositories.length > 10 || value.repositories.some((item: unknown) => typeof item !== "string" || item.trim().length < 1 || item.trim().length > 512))) return false;
+  return value.secrets === undefined ||
+    (Array.isArray(value.secrets) && value.secrets.length <= 20 && value.secrets.every((secret: unknown) =>
+      isRecord(secret) && hasOnlyKeys(secret, ["name", "target"]) &&
+      typeof secret.name === "string" && secret.name.trim().length >= 1 &&
+      secret.name.trim().length <= 128));
+}
+export function environmentInputResult(params: Record<string, any>): {
+  status: string;
+  notifyUserInput?: boolean;
+  response?: { contentItems: Array<{ type: string; text: string }>; success: boolean };
+} | null {
   return params.tool === "request_environment_input"
-    ? { status: "pending", notifyUserInput: true }
+    ? isEnvironmentInput(params.arguments)
+      ? { status: "pending", notifyUserInput: true }
+      : {
+          status: "invalid",
+          response: {
+            contentItems: [{ type: "inputText", text: "request_environment_input received invalid arguments." }],
+            success: false,
+          },
+        }
     : null;
 }
 
@@ -630,7 +685,7 @@ export function pendingInteraction(
         pendingStateFor(byTurn, request.params.turnId).hasOptionPicker = true;
         continue;
       case "item/tool/call": {
-        if (!includeEnvironmentInput && environmentInputPending(request.params)?.status === "pending") {
+        if (!includeEnvironmentInput && environmentInputResult(request.params)?.status === "pending") {
           pendingStateFor(byTurn, request.params.turnId).environmentUserInputRequestId ??= requestIdOf(request.id);
           continue;
         }
@@ -692,8 +747,8 @@ export function pendingInteraction(
 }
 
 /** 交互种类名（原 `pv`）。 */
-export function pendingInteractionKind(conversation: Record<string, any> | null, hostId: string): string | null {
-  return pendingInteraction(conversation, hostId, true)?.kind ?? null;
+export function pendingInteractionKind(conversation: Record<string, any> | null, parseUrl: ((url: string) => unknown) | string): string | null {
+  return pendingInteraction(conversation, parseUrl, true)?.kind ?? null;
 }
 
 // ---------------------------------------------------------------------------
