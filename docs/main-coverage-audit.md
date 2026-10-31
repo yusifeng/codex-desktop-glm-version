@@ -1,5 +1,11 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 interrupt owner repair
+
+语义 `Ove/Ave` 原先只找 legacy active turn、单发 interrupt，且 descendant 无状态门或远端 fallback；这会漏 canonical turn、mismatch retry、
+Node REPL 清理与未装载 subagent。本轮恢复旧 `my…jve` 控制流并删除 main 旧簇，focused suite 覆盖正常 interrupt、服务端 active-turn
+错位重试、idle terminal cleanup、本地 descendant 与远端 `listThreadTurns/interruptTurn` 回退。
+
 ## 2026-10-31 search-match hydration owner repair
 
 语义 `bve` 原先是单行 `broadcastConversationSnapshot` 占位，搜索结果打开时不会加载 cursor 周边 turns、补齐目标 item 或放置 canonical

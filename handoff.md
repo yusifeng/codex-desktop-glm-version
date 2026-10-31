@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+修复 conversation/subagent interrupt owner：`streams/notifications-apply.ts` 现恢复 expected-turn gate、mismatch retry、no-active fallback、
+canonical/legacy 状态更新、Node REPL 10 秒清理与 background cleanup；descendant interrupt 恢复本地 snapshot 先行、远端 discovery/list-turn
+fallback 和逐 child 错误隔离。主 chunk 旧 `my…jve` 簇删除，新增 focused suite 覆盖正常/错位/idle/远端 descendant 分支。
+
 修复 search-match history hydration owner：`history-policy.ts` 的 `bve` 不再只广播空 snapshot，现恢复双向 turn page、目标 item 向老分页、
 turn projection、权限上下文、canonical search island 定位/合并与失败判定；AppServer manager 的搜索命中 consumer 继续调用该实现，主 chunk
 旧 `bve/xve/Sve` 簇删除，focused suite 新增实际 search island/entity/snapshot 行为覆盖。
