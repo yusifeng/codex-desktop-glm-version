@@ -124,6 +124,7 @@ const { createAppServerTransportPolicy } = require("./main-app/app-server/transp
 const { createGithubRequestClientFactory } = require("./main-app/github/github-request-client.js");
 const { createVisualizationServiceRuntime } = require("./main-app/visualizations/visualization-service.js");
 const { createHistorySwipeNavigationServiceClass } = require("./main-app/window/history-swipe-navigation-service.js");
+const { createSystemFontsServiceClass } = require("./main-app/window/system-fonts-service.js");
 const { QuickChatWindowManager } = require("./main-app/startup/quick-chat-window-manager.js");
 const { TabDragPresentationWindow } = require("./main-app/window/tab-drag-presentation-window.js");
 const { TabDragSession } = require("./main-app/window/tab-drag-session.js");
@@ -138475,11 +138476,10 @@ var {
     getSystemVersion: () => process.getSystemVersion(),
     loadSpectrumCapture: () => require("./capture-DaZJeQgG.js"),
   }),
-  att = class extends n.Uf {
-    getFontFamilies() {
-      return l.systemPreferences.getFontFamilies();
-    }
-  };
+  att = createSystemFontsServiceClass({
+    RpcHandlerBase: n.Uf,
+    getFontFamilies: () => l.systemPreferences.getFontFamilies(),
+  });
 var { requestNotificationAuthorization: ctt } = createMacNotificationPermissionRuntime({
   platform: process.platform,
   createLogger: r.i,

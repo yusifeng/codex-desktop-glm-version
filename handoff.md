@@ -1,5 +1,8 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+随后将 `att` system-fonts RPC adapter 迁入 `window/system-fonts-service.ts`；Electron systemPreferences font-family
+enumeration 由新 adapter 原样转发。唯一 runtime consumer 已接回，旧 class 已删除。focused test 覆盖 8 项。
+
 随后将 `Xnt` history-swipe navigation RPC adapter 迁入 `window/history-swipe-navigation-service.ts`；renderer origin
 binding 与 window-manager state forwarding 由新 adapter 持有。唯一 runtime consumer 已接回，旧 class 已删除。
 focused test 覆盖 9 项。

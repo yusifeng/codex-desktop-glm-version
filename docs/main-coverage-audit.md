@@ -1,5 +1,10 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 system-fonts service
+
+原 `att` 已迁入 `src/main/main-app/window/system-fonts-service.ts`。新 RPC adapter 保留 Electron
+`systemPreferences.getFontFamilies()` 的原始 return/promise forwarding；唯一 runtime consumer 已接回，旧 class 已删除。
+
 ## 2026-10-31 history-swipe navigation service
 
 原 `Xnt` 已迁入 `src/main/main-app/window/history-swipe-navigation-service.ts`。新 renderer-scoped adapter 保留
