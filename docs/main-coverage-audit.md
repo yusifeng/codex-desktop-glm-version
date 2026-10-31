@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-10-31 workspace directory browser
+
+`PBe` 前置的 workspace directory browse/resolution/symlink-containment cluster 已迁入
+`src/main/main-app/workspace/directory-browser.ts` 并接回真实 handler。local realpath containment、remote path semantics、
+hidden/directory filters、directory-first stable ordering 与 parent projection 均保留；旧 `OBe/kBe/ABe/jBe/UH/MBe/WH`
+已删除。
+
 ## 2026-10-31 fetch-handler support runtime wiring correction
 
 既有 `sftp.ts`/`state-writes.ts` 同样未接回真实 consumers；本轮将两者改为 dependency-injected runtime，接回 SFTP

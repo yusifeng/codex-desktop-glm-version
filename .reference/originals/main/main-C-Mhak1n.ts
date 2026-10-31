@@ -82,6 +82,7 @@ const { createGlobalDictationLifecycleManagerClass, isGlobalDictationMessage, is
 const { createScreenshotTargetResolver } = require("./main-app/fetch-handler/screenshot-target.js");
 const { createSftpTransfers } = require("./main-app/fetch-handler/sftp.js");
 const { applySparseStateWrite, createFetchHandlerStateRuntime } = require("./main-app/fetch-handler/state-writes.js");
+const { createWorkspaceDirectoryBrowser } = require("./main-app/workspace/directory-browser.js");
 const { createWorkspaceFileServiceClass } = require("./main-app/workspace/files.js");
 const { createAuthorizedThreadCatalogServiceClass } = require("./main-app/thread-catalog/authorized-service.js");
 const { createPluginIncentivesClientRuntime } = require("./main-app/plugins/incentives-client.js");
@@ -95644,118 +95645,12 @@ async function DBe() {
   }
   return null;
 }
-async function OBe({
-  appServerClient: e,
-  directoryPath: t,
-  directoriesOnly: r,
-  includeHidden: i,
-  workspaceRoot: a,
-}) {
-  if (a.trim().length === 0) throw Error(`workspaceRoot is required`);
-  if (!(await n.Di.stat(a, e)).isDirectory()) throw Error(`workspaceRoot must be a directory`);
-  let o = jBe(t),
-    s = n.Es(e.hostConfig) ? await e.platformPath() : h,
-    {
-      canonicalDirectoryPath: c,
-      realWorkspaceRoot: l,
-      resolvedDirectoryPath: u,
-      resolvedWorkspaceRoot: d,
-    } = await kBe({ appServerClient: e, directoryPath: o, path: s, workspaceRoot: a });
-  if (!(await n.Di.stat(u, e)).isDirectory())
-    throw Error(`directoryPath must point to a directory`);
-  let f = await n.Di.readdir(u, { withFileTypes: !0 }, e);
-  return {
-    directoryPath: c,
-    entries: (
-      await Promise.all(
-        f
-          .filter((e) => i || !e.name.startsWith(`.`))
-          .map((t) =>
-            ABe({
-              appServerClient: e,
-              entry: t,
-              path: s,
-              realWorkspaceRoot: l,
-              resolvedDirectoryPath: u,
-              resolvedWorkspaceRoot: d,
-            }),
-          ),
-      )
-    )
-      .filter((e) => e != null)
-      .filter((e) => !r || e.type === `directory`)
-      .sort((e, t) =>
-        e.type === t.type ? e.name.localeCompare(t.name) : e.type === `directory` ? -1 : 1,
-      ),
-    parentPath: c.length === 0 ? null : MBe(c),
-  };
-}
-async function kBe({ appServerClient: e, directoryPath: t, path: r, workspaceRoot: i }) {
-  let a = r.resolve(i),
-    o = r.resolve(a, t);
-  if (!WH({ path: r, targetPath: o, workspaceRoot: a }))
-    throw Error(`directoryPath must stay within workspaceRoot`);
-  if (n.Es(e.hostConfig))
-    return {
-      canonicalDirectoryPath: UH(r.relative(a, o)),
-      realWorkspaceRoot: a,
-      resolvedDirectoryPath: o,
-      resolvedWorkspaceRoot: a,
-    };
-  let s = await v.promises.realpath(a);
-  if (!WH({ path: r, targetPath: await v.promises.realpath(o), workspaceRoot: s }))
-    throw Error(`directoryPath must stay within workspaceRoot`);
-  return {
-    canonicalDirectoryPath: UH(r.relative(a, o)),
-    realWorkspaceRoot: s,
-    resolvedDirectoryPath: o,
-    resolvedWorkspaceRoot: a,
-  };
-}
-async function ABe({
-  appServerClient: e,
-  entry: t,
-  path: r,
-  realWorkspaceRoot: i,
-  resolvedDirectoryPath: a,
-  resolvedWorkspaceRoot: o,
-}) {
-  let s = r.join(a, t.name),
-    c = typeof t.isSymbolicLink == `function` && t.isSymbolicLink(),
-    l = t.isDirectory() ? `directory` : `file`;
-  if (c)
-    try {
-      if ((await n.Di.stat(s, e)).isDirectory()) {
-        if (
-          n.Es(e.hostConfig) ||
-          !WH({ path: r, targetPath: await v.promises.realpath(s), workspaceRoot: i })
-        )
-          return null;
-        l = `directory`;
-      }
-    } catch {}
-  return { isSymlink: c, name: t.name, path: UH(r.relative(o, s)), type: l };
-}
-function jBe(e) {
-  let t = e?.trim() ?? ``;
-  return t.length === 0 || t === `.` ? `` : UH(t);
-}
-function UH(e) {
-  return e
-    .replace(/\\/g, `/`)
-    .replace(/^\.\/+/, ``)
-    .replace(/\/+$/, ``);
-}
-function MBe(e) {
-  let t = UH(e);
-  if (t.length === 0) return null;
-  let n = t.split(`/`).filter(Boolean);
-  return n.length === 1 ? `` : n.slice(0, -1).join(`/`);
-}
-function WH({ path: e, targetPath: t, workspaceRoot: n }) {
-  let r = e.relative(n, t);
-  return !(r === `..` || r.startsWith(`..${e.sep}`) || e.isAbsolute(r));
-}
+var listWorkspaceDirectory = createWorkspaceDirectoryBrowser({
+  fileSystem: n.Di,
+  isRemoteHostConfig: n.Es,
+  localPath: h,
+  realpath: (path) => v.promises.realpath(path),
+});
 var { sftpUpload, sftpDownload } = createSftpTransfers({
     isSshHostConfig: n.Os,
     resolveExecutable: (name) => n.qn.resolve(name),
@@ -96151,7 +96046,7 @@ var GH = !!process.env.WSL_DISTRO_NAME,
             directoryPath: u,
             entries: d,
             parentPath: f,
-          } = await OBe({
+          } = await listWorkspaceDirectory({
             appServerClient: o,
             directoryPath: r,
             directoriesOnly: i,

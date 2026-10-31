@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续缩小 `PBe` fetch-handler 的自由依赖面：workspace directory browse/resolution/symlink-containment cluster 已迁入
+`workspace/directory-browser.ts`，真实 handler consumer 已接回；local realpath containment、remote path semantics、hidden/
+directory filters、stable ordering 与 parent projection 均由新 runtime 持有，旧 `OBe/kBe/ABe/jBe/UH/MBe/WH` 删除。
+
 继续修正 fetch-handler support 的假迁移：`sftp.ts` 与 `state-writes.ts` 改为 dependency-injected runtimes，真实
 upload/download、global-hotkey validation、avatar accelerator、bundled-skills root 与 persisted-atom sparse-write consumers
 均已接回；旧 `RBe/zBe/QH/BBe/$H/VBe/eU/HBe/UBe/WBe` 删除，并新增行为与 source-wiring focused gate。
