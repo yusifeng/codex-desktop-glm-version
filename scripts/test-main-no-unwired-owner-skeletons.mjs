@@ -187,6 +187,7 @@ for (const oldOwner of ["function rZe(", "async function iZe("]) {
 for (const oldOwner of ["function oZe(", "function sZe(", "function lZ(", "function cZe(", "function dZe(", "function dZ("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated page materialization/presentation owner must be removed`);
 }
+assert.equal(main.includes("function uZe("), false, "generated runtime snapshot projection owner must be removed");
 for (const oldOwner of ["function cXe(", "function bX(", "async function lXe(", "function uXe(", "function xX(", "function SX(", "function dXe(", "function fXe(", "function CX(", "function wX(", "function TX(", "function EX(", "function pXe(", "function DX(", "function mXe(", "function hXe(", "function OX("]) {
   assert.equal(main.includes(oldOwner), false, `${oldOwner} generated Browser Use route adapter must be removed`);
 }

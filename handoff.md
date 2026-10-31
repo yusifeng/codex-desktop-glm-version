@@ -5117,3 +5117,10 @@ error emission 交织；continuation policy 已抽出，剩余 owner 生命周�
   runtime sync、Browser Use route 与 webview binding 的三个 consumer 继续共享同一 `dZ` owner。
 - 删除已由 page materialization controller 替代且无消费者的 `oZe/sZe/lZ/cZe`，以及旧 `dZe/dZ/cZ`。下一批继续审计
   `uZe` runtime snapshot projection 与其现有 controller 边界，只有能保持消息/registry 顺序时才内聚。
+
+# 2026-11-01 browser runtime snapshot projection convergence
+
+- `browser-runtime-sync-controller.ts` 现直接拥有 capture、throttling、restore/blank snapshot、session registry、find broadcast 与 state
+  message 的完整投影顺序；主组合根显式注入全部策略依赖，旧 `uZe` 已删除。
+- focused test 已从单纯验证委托改为验证真实 snapshot、throttling、find broadcast 和 state message。下一批审计相邻 load-error
+  recovery `fZe` 与现有 error-pages owner 的边界。

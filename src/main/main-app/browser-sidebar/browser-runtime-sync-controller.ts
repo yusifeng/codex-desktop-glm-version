@@ -2,7 +2,7 @@
 
 /** Owns Browser sidebar thread snapshots and runtime-page state projection. */
 export function createBrowserRuntimeSyncControllerClass(dependencies: Record<string, any>) {
-  const { uZe, hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass } = dependencies;
+  const { hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass } = dependencies;
 
   return class BrowserRuntimeSyncController {
     host: any;
@@ -89,8 +89,77 @@ export function createBrowserRuntimeSyncControllerClass(dependencies: Record<str
     syncThreadState(windowState: any, conversationId: string, threadState: any, pendingUrl?: string, previousSnapshot?: any) {
       this.host.iabTabMentions.trackSnapshotUpdate(threadState, () => {
         this.host.refreshCommentModeBlockStatus(windowState, threadState);
-        uZe(this.getPageLifecycleHelpers(), windowState, conversationId, threadState, pendingUrl, previousSnapshot);
+        this.projectRuntimeSnapshot(windowState, conversationId, threadState, pendingUrl, previousSnapshot);
       });
+    }
+
+    projectRuntimeSnapshot(windowState: any, conversationId: string, threadState: any, pendingUrl?: string, previousSnapshot?: any) {
+      if (windowState.owner.isDestroyed() || threadState.pendingTeardown?.reason === `closed`) return;
+      const helpers = this.getPageLifecycleHelpers();
+      const page = threadState.page;
+      const webContents = page?.view.webContents ?? null;
+      if (page != null && webContents != null) {
+        const isCaptured = webContents.isBeingCaptured();
+        if (threadState.isTabCaptureActive !== isCaptured) {
+          threadState.isTabCaptureActive = isCaptured;
+          helpers.enforceDetachedPageBudget(windowState);
+          dependencies.WU(helpers.windowManager, windowState, {
+            type: `browser-sidebar-tab-capture-state`, conversationId: page.conversationId,
+            browserTabId: page.browserTabId, isActive: isCaptured,
+          });
+        }
+      }
+      dependencies.dZ(windowState, threadState, pendingUrl);
+      const pageUrl = page == null ? `` : dependencies.QU(page);
+      const normalizedPageUrl = dependencies.Ze(pageUrl);
+      const normalizedSnapshotUrl = dependencies.Ze(threadState.snapshot.url);
+      const restoringEmpty = page != null && page.isRestoring && normalizedSnapshotUrl.length > 0 && normalizedPageUrl.length === 0;
+      const restoringTitle = page != null && page.isRestoring && page.isLoading && page.loadError == null && normalizedPageUrl.length > 0 &&
+        normalizedSnapshotUrl === normalizedPageUrl && threadState.snapshot.tabType === dependencies.n.lu.WEB &&
+        threadState.snapshot.title.length > 0 && threadState.snapshot.title !== page.fallbackTitle;
+      const blankNonBrowserUse = page != null && !threadState.isBrowserUsePage && !restoringEmpty && normalizedPageUrl.length === 0;
+      let committedUrl = page?.url ?? ``;
+      if (page == null || page.loadError != null || (!page.isSuspended && (webContents == null || webContents.navigationHistory.getActiveIndex() < 0))) {
+        committedUrl = ``;
+      } else if (page.isWaitingForResponse) {
+        committedUrl = threadState.snapshot.committedUrl ?? ``;
+      }
+      const snapshot = page == null ? threadState.snapshot : blankNonBrowserUse
+        ? { ...dependencies.pX(), areAnnotationMarkersVisible: threadState.snapshot.areAnnotationMarkersVisible }
+        : {
+            ...threadState.snapshot, tabType: dependencies.n.lu.WEB, isSuspended: page.isSuspended,
+            title: restoringEmpty || restoringTitle ? threadState.snapshot.title : page.title || page.fallbackTitle,
+            url: restoringEmpty ? threadState.snapshot.url : pageUrl, committedUrl,
+            faviconUrl: restoringEmpty ? threadState.snapshot.faviconUrl : page.faviconUrl,
+            securityState: restoringEmpty ? threadState.snapshot.securityState : dependencies.dZe(page),
+            isAudioMuted: webContents != null && !webContents.isDestroyed() && webContents.isAudioMuted(),
+            isAudible: page.mediaIndicator.state.isAudible,
+            isCapturingUserMedia: page.mediaIndicator.state.isCapturingUserMedia,
+            isCapturingCamera: page.mediaIndicator.state.isCapturingCamera,
+            isCapturingMicrophone: page.mediaIndicator.state.isCapturingMicrophone,
+            isLoading: page.isMainFrameLoading, isWaitingForResponse: page.isWaitingForResponse,
+            canGoBack: page.canGoBack, canGoForward: page.canGoForward,
+            siteAnnotationFeatures: page.siteAnnotationFeatures,
+            siteAnnotationFeaturesEnabled: helpers.areSiteAnnotationFeaturesEnabled(committedUrl || page.url),
+            siteToolsAvailability: page.siteToolsAvailability, webMcpToolsRevision: page.webMcpToolsRevision,
+            lastWebMcpToolCall: page.lastWebMcpToolCall,
+          };
+      threadState.snapshot = snapshot;
+      if (page != null && helpers.isBrowserUseManagedBrowserTab(conversationId, threadState.browserTabId)) {
+        const sourceWindow = windowState.tabSourceWindow ?? windowState;
+        helpers.browserSessionRegistry.recordPageSnapshot({
+          browserTabId: threadState.browserTabId, conversationId,
+          guestWebContentsId: page.view.webContents?.id ?? null, isLoading: page.isLoading,
+          pageKey: dependencies.KU(sourceWindow.owner.id, conversationId, threadState.browserTabId),
+          url: snapshot.url, windowId: dependencies.oX(sourceWindow.window.id),
+        });
+      }
+      dependencies.dq(helpers.windowManager, windowState.owner, conversationId, threadState);
+      if (previousSnapshot == null || !dependencies.isEqual(previousSnapshot, snapshot)) {
+        dependencies.WU(helpers.windowManager, windowState, {
+          type: `browser-sidebar-state`, conversationId, browserTabId: threadState.browserTabId, snapshot,
+        });
+      }
     }
 
     syncThreadStateFromOrigin(ownerWebContents: any, conversationId: string, threadState: any) {

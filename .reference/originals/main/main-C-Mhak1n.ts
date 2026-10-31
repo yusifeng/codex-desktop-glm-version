@@ -43873,94 +43873,6 @@ var {
   securityStateForPage: dZe,
   syncBackgroundThrottling: dZ,
 } = createBrowserPagePresentationPolicy({ isFirstPartyUrl: Ve, pageUrl: QU });
-function uZe(e, t, r, i, a, o) {
-  if (t.owner.isDestroyed() || i.pendingTeardown?.reason === `closed`) return;
-  let s = i.page,
-    c = s?.view.webContents ?? null;
-  if (s != null && c != null) {
-    let n = c.isBeingCaptured();
-    i.isTabCaptureActive !== n &&
-      ((i.isTabCaptureActive = n),
-      e.enforceDetachedPageBudget(t),
-      WU(e.windowManager, t, {
-        type: `browser-sidebar-tab-capture-state`,
-        conversationId: s.conversationId,
-        browserTabId: s.browserTabId,
-        isActive: n,
-      }));
-  }
-  dZ(t, i, a);
-  let l = s == null ? `` : QU(s),
-    u = Ze(l),
-    d = Ze(i.snapshot.url),
-    f = s != null && s.isRestoring && d.length > 0 && u.length === 0,
-    p =
-      s != null &&
-      s.isRestoring &&
-      s.isLoading &&
-      s.loadError == null &&
-      u.length > 0 &&
-      d === u &&
-      i.snapshot.tabType === n.lu.WEB &&
-      i.snapshot.title.length > 0 &&
-      i.snapshot.title !== s.fallbackTitle,
-    m = s != null && !i.isBrowserUsePage && !f && u.length === 0,
-    h = s?.url ?? ``;
-  s == null ||
-  s.loadError != null ||
-  (!s.isSuspended && (c == null || c.navigationHistory.getActiveIndex() < 0))
-    ? (h = ``)
-    : s.isWaitingForResponse && (h = i.snapshot.committedUrl ?? ``);
-  let g =
-    s == null
-      ? i.snapshot
-      : m
-        ? { ...pX(), areAnnotationMarkersVisible: i.snapshot.areAnnotationMarkersVisible }
-        : {
-            ...i.snapshot,
-            tabType: n.lu.WEB,
-            isSuspended: s.isSuspended,
-            title: f || p ? i.snapshot.title : s.title || s.fallbackTitle,
-            url: f ? i.snapshot.url : l,
-            committedUrl: h,
-            faviconUrl: f ? i.snapshot.faviconUrl : s.faviconUrl,
-            securityState: f ? i.snapshot.securityState : dZe(s),
-            isAudioMuted: c != null && !c.isDestroyed() && c.isAudioMuted(),
-            isAudible: s.mediaIndicator.state.isAudible,
-            isCapturingUserMedia: s.mediaIndicator.state.isCapturingUserMedia,
-            isCapturingCamera: s.mediaIndicator.state.isCapturingCamera,
-            isCapturingMicrophone: s.mediaIndicator.state.isCapturingMicrophone,
-            isLoading: s.isMainFrameLoading,
-            isWaitingForResponse: s.isWaitingForResponse,
-            canGoBack: s.canGoBack,
-            canGoForward: s.canGoForward,
-            siteAnnotationFeatures: s.siteAnnotationFeatures,
-            siteAnnotationFeaturesEnabled: e.areSiteAnnotationFeaturesEnabled(h || s.url),
-            siteToolsAvailability: s.siteToolsAvailability,
-            webMcpToolsRevision: s.webMcpToolsRevision,
-            lastWebMcpToolCall: s.lastWebMcpToolCall,
-          };
-  if (((i.snapshot = g), s != null && e.isBrowserUseManagedBrowserTab(r, i.browserTabId))) {
-    let n = t.tabSourceWindow ?? t;
-    e.browserSessionRegistry.recordPageSnapshot({
-      browserTabId: i.browserTabId,
-      conversationId: r,
-      guestWebContentsId: s.view.webContents?.id ?? null,
-      isLoading: s.isLoading,
-      pageKey: KU(n.owner.id, r, i.browserTabId),
-      url: g.url,
-      windowId: oX(n.window.id),
-    });
-  }
-  (dq(e.windowManager, t.owner, r, i),
-    (o == null || !(0, G.default)(o, g)) &&
-      WU(e.windowManager, t, {
-        type: `browser-sidebar-state`,
-        conversationId: r,
-        browserTabId: i.browserTabId,
-        snapshot: g,
-      }));
-}
 function fZe(e, t, n, r, { failedUrl: i, kind: a, loadError: o }) {
   let s = e.getThreadStateForWindow(t, n.conversationId, n.browserTabId) ?? null;
   if (
@@ -44742,7 +44654,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
         (this.commentModeController = new (createBrowserCommentModeControllerClass({ EU, cW, yVe, tq, n }))(this)),
         (this.annotationInteractionController = new (createBrowserAnnotationInteractionControllerClass({ hX, EU, IZe, LZe, n, SU, mVe, gVe }))(this)),
         (this.pageMaterializationController = new (createBrowserPageMaterializationControllerClass({ eW, KX, oX, n }))(this)),
-        (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ uZe, hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass }))(this)),
+        (this.runtimeSyncController = new (createBrowserRuntimeSyncControllerClass({ hX, fq, kZe, tq, KU, EZ, lifecycleHelpersClass: createBrowserPageLifecycleHelpersControllerClass, WU, dZ, QU, Ze, n, pX, dZe, oX, dq, isEqual: G.default }))(this)),
         (this.navigationContextController = new (createBrowserNavigationContextControllerClass({ hX, QU, sW }))(this)),
         (this.pageLookupController = new (createBrowserPageLookupControllerClass({}))(this)),
 (this.pageWebviewBindingController = new (createBrowserPageWebviewBindingControllerClass({ e, c, d, p, mZe, mZ, h, _, dZ, WU, v, b, KX, KU, oX, S, w, TU, XU, Ze, eW, QU, D, k, j, M, N, YX, Xe, L, fq, XX, $Xe, EHe, wHe, JU, MU, sW, re, ie, fZ, ae, oe, se, ce, THe, le, X, ue, de, fe, W, zGe, G, me, pU, hU, he, At, ge, HGe, zX, mU, run, _e, on, Xc, LXe, xU, be, to, al, xe, ul, audio, WX, bn, GX, pZe, pZ, Se, JXe, YXe, Te, EXe, n, a, iZ, tZ, eZ, nZ, rZ }))(this)),

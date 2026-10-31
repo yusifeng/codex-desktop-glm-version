@@ -3167,3 +3167,9 @@ focused test 覆盖两个域名族、拒绝条件、请求合约、过期时间�
 组合下的 background throttling，以及 true→false 解限时可见窗口 `showInactive` 语义。三个现有 consumer 继续通过 `dZ` 兼容别名
 共享模块级 WeakMap 状态。已被 `browser-page-materialization-controller.ts` 完整替代且零消费者的 `oZe/sZe/lZ/cZe` 重复实现同步
 删除；旧 `dZe/dZ` 与 `cZ` 也已物理删除。
+
+### 增量内聚：browser runtime snapshot projection
+
+`browser-runtime-sync-controller.ts` 已直接接管原 `uZe` 的 capture-state/budget/message、background throttling、restore/blank-page
+snapshot 投影、Browser Use session snapshot、find-state 广播和 state diff message 顺序；所有依赖由组合根显式注入。主 chunk 旧
+`uZe` 已物理删除，避免 controller 继续委托给机械 helper。
