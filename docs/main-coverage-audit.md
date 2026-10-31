@@ -1,5 +1,12 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-01 dynamic app tools and host services native-pipe owners
+
+新增 `native-pipe/dynamic-app-tools-server.ts` 与 `host-services-server.ts`，分别接管原 `Hse/Use/Wse/tu/Gse` 和 `Hce/Uce/Wce`。两者保留 8MiB
+frame limit、0600 权限、peer/socket diagnostics、JSON-RPC invalid/error contract；dynamic tool owner 额外保留 allowlisted namespace projection、
+type-stable cancellation key、AbortController 无响应取消和 dispose fan-out，host services 保留 unsupported/empty result 语义。desktop startup consumers
+已直接调用语义工厂并显式注入 peer authorizer，旧定义与 `ql/Ql/Bl` 兼容别名删除；真实 socket focused suite 覆盖 list/call/invalid 与 service branches。
+
 ## 2026-11-01 native-pipe foundation and browser server restoration
 
 主 chunk 的 Browser Use RPC/config 与 `Bl…zse` 共约 925 行 JSON-RPC admission、command dispatch、framing、stream decoder、pipe client/server、

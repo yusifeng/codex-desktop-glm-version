@@ -86,8 +86,8 @@ const main = fs.readFileSync(
   new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url),
   "utf8",
 );
-assert.equal(main.includes('require("./main-app/native-pipe/protocol.js")'), true);
-assert.equal(main.includes('require("./main-app/native-pipe/server.js")'), true);
+assert.equal(main.includes('require("./main-app/native-pipe/protocol.js")'), false);
+assert.equal(main.includes('require("./main-app/native-pipe/server.js")'), false);
 assert.equal(main.includes('require("./main-app/native-pipe/peer-socket-authorizer.js")'), true);
 assert.equal(main.includes('require("./main-app/browser-use/native-pipe-server.js")'), true);
 assert.equal(main.includes("var Bl = class extends Error"), false);
@@ -95,6 +95,6 @@ assert.equal(main.includes("async function ql("), false);
 assert.equal(main.includes("function Ql()"), false);
 assert.equal(main.includes("async function JYe("), false);
 assert.equal(main.includes("createBrowserUseNativePipeServer({"), true);
-assert.equal(main.includes("socketPeerAuthorizer: Ql()"), true);
+assert.equal(main.includes("socketPeerAuthorizer: createSocketPeerAuthorizer()"), true);
 
 console.log("main native pipe server: 26 assertions passed");

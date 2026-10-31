@@ -1,5 +1,9 @@
 # Handoff（终局版）：从「结构等价」到「完全反编译 + 可读工程」
 
+继续向上收敛 native-pipe 服务：新增完整 `dynamic-app-tools-server.ts` 与 `host-services-server.ts`，恢复 JSON-RPC admission、namespace/tool
+projection、call cancellation、hostId envelope、unsupported/error response、service ensure、0600 pipe、peer/socket 日志和 pending abort/close；桌面启动
+两个真实 consumer 改接语义 owner，旧 `Hse…Gse`、`Hce…Wce` 与随机 pipe helper 删除，基础层压缩兼容别名全部消除。
+
 恢复并接回 native-pipe 基础链：`browser-use/rpc-client.ts`、`native-pipe/protocol.ts`、`server.ts`、`peer-socket-authorizer.ts` 取代主 chunk
 约 925 行 Browser Use RPC/config、帧协议、多客户端路由、Chrome provider discovery 和 peer 鉴权旧副本；仍在原入口的
 dynamic-app-tools/node-repl consumers 通过语义 owner 兼容导出。

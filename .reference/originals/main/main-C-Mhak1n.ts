@@ -266,10 +266,10 @@ const { createSiteAnnotationFeatureControllerClass } = require("./main-app/brows
 const { createSiteAnnotationPermissionControllerClass } = require("./main-app/browser-sidebar/site-annotation-permission-controller.js");
 const { createWindowsNativeCaptureBridgeModule } = require("./main-app/computer-use/windows-native-capture-bridge.js");
 const { ADD_BROWSER_USE_DOWNLOAD_CHANGE_LISTENER, CONSUME_ALLOWED_BROWSER_USE_DOWNLOAD, NOTIFY_BROWSER_USE_DOWNLOAD_CHANGE, createIabBrowserUseApiClass } = require("./main-app/browser-use/iab-api.js");
-const { PipeFrameLimitError: Bl } = require("./main-app/native-pipe/protocol.js");
-const { createNativePipeServer: ql } = require("./main-app/native-pipe/server.js");
-const { createSocketPeerAuthorizer: Ql } = require("./main-app/native-pipe/peer-socket-authorizer.js");
+const { createSocketPeerAuthorizer } = require("./main-app/native-pipe/peer-socket-authorizer.js");
 const { createBrowserUseNativePipeServer } = require("./main-app/browser-use/native-pipe-server.js");
+const { createDynamicAppToolsServer } = require("./main-app/native-pipe/dynamic-app-tools-server.js");
+const { createHostServicesServer } = require("./main-app/native-pipe/host-services-server.js");
 const {
   BROWSER_CONFIG_TOML_PATH: Dn,
   FULL_CDP_ACCESS_ENABLED_KEY: Jee,
@@ -6622,9 +6622,6 @@ function pie({
   return ((Wo = v), v);
 }
 var Go = `NODE_REPL_HOST_SERVICES_PIPE_PATH`;
-function mie() {
-  return `/tmp/codex-host-services-${(0, _.randomUUID)()}.sock`;
-}
 var Ko = r.r(`BrowserUseThreadConfig`),
   hie = [Zte, Qee, $ee, ete, tte],
   gie = [Qte, nte, $te, ene, si, ci],
@@ -11095,147 +11092,6 @@ var $oe = `trayMenu.openApp`,
   Pl = `More`,
   Fl = `trayMenu.projectlessThreads`,
   Il = `Chats`;
-var $l = r.i(`dynamic-app-tools-native-pipe`),
-  eu = 8388608,
-  Bse = new Set(n.wc),
-  Vse = n.vf(`method`, [
-    n.wf({
-      id: n.jf([n.Cf(), n.Of()]),
-      jsonrpc: n.bf(`2.0`),
-      method: n.bf(`tools/list`),
-      params: n.wf({ threadStartKind: n.df([`default`, `all`]) }).optional(),
-    }),
-    n.wf({
-      id: n.jf([n.Cf(), n.Of()]),
-      jsonrpc: n.bf(`2.0`),
-      method: n.bf(`tools/call`),
-      params: n.wf({
-        arguments: n.yf(),
-        callId: n.Of().trim().min(1),
-        namespace: n.df(n.wc),
-        threadId: n.Of().trim().min(1),
-        tool: n.Of().trim().min(1),
-        turnId: n.Of().trim().min(1),
-      }),
-    }),
-    n.wf({ id: n.jf([n.Cf(), n.Of()]), jsonrpc: n.bf(`2.0`), method: n.bf(`tools/cancel`) }),
-  ]);
-async function Hse({ callTool: e, listTools: t, pipePath: n, socketPeerAuthorizer: r = Ql() }) {
-  let i = new Map(),
-    a = await ql({
-      maxIncomingFrameBytes: eu,
-      maxOutgoingFrameBytes: eu,
-      pipePath: n,
-      socketPeerAuthorizer: r,
-      events: {
-        onListening: (e) => {
-          (process.platform !== `win32` && (0, v.chmodSync)(e, 384),
-            $l().info(`dynamic_app_tools_listening`, { safe: {}, sensitive: { pipePath: e } }));
-        },
-        onAuthorizationError: (e) => {
-          $l().warning(`dynamic_app_tools_peer_authorization_failed`, {
-            safe: {},
-            sensitive: { error: e },
-          });
-        },
-        onRejectedSocket: (e) => {
-          $l().warning(`dynamic_app_tools_peer_rejected`, {
-            safe: { reason: e.reason ?? `unauthorized` },
-            sensitive: {},
-          });
-        },
-        onSocketError: (e) => {
-          $l().warning(`dynamic_app_tools_socket_error`, { safe: {}, sensitive: { error: e } });
-        },
-      },
-    });
-  return (
-    a.setMessageCallback((n) => {
-      Wse({
-        callTool: e,
-        listTools: t,
-        message: n,
-        pendingToolCalls: i,
-        sendResponse: (e) => {
-          a.sendMessage(e);
-        },
-      });
-    }),
-    {
-      pipePath: a.pipePath,
-      dispose: async () => {
-        for (let e of i.values()) e.abort();
-        (i.clear(), await a.close());
-      },
-    }
-  );
-}
-function Use(e) {
-  return e.flatMap((e) =>
-    e.type !== `namespace` || !Bse.has(e.name)
-      ? []
-      : e.tools.map((t) => ({
-          description: t.description,
-          inputSchema: t.inputSchema,
-          name: t.name,
-          namespace: e.name,
-        })),
-  );
-}
-async function Wse({
-  callTool: e,
-  listTools: t,
-  message: n,
-  pendingToolCalls: r,
-  sendResponse: i,
-}) {
-  let a = Vse.safeParse(n);
-  if (!a.success) {
-    let e = Gse(n);
-    e != null &&
-      i({ error: { code: -32602, message: `Invalid app tool request` }, id: e, jsonrpc: `2.0` });
-    return;
-  }
-  if (a.data.method === `tools/cancel`) {
-    r.get(tu(a.data.id))?.abort();
-    return;
-  }
-  let o = a.data.method === `tools/call` ? new AbortController() : null;
-  o != null && r.set(tu(a.data.id), o);
-  try {
-    let n;
-    if (a.data.method === `tools/list`)
-      n = { tools: Use(await t(a.data.params?.threadStartKind ?? `default`)) };
-    else {
-      if (o == null) return;
-      n = await e({ hostId: J, params: a.data.params }, o.signal);
-    }
-    if (o?.signal.aborted) return;
-    if (n == null) throw Error(`The app tool call ended before producing a result`);
-    i({ id: a.data.id, jsonrpc: `2.0`, result: n });
-  } catch (e) {
-    if (o?.signal.aborted) return;
-    ($l().warning(`dynamic_app_tools_request_failed`, {
-      safe: { method: a.data.method },
-      sensitive: { error: e },
-    }),
-      i({
-        error: { code: -32e3, message: `Codex app tool request failed` },
-        id: a.data.id,
-        jsonrpc: `2.0`,
-      }));
-  } finally {
-    o != null && r.delete(tu(a.data.id));
-  }
-}
-function tu(e) {
-  return `${typeof e}:${String(e)}`;
-}
-function Gse(e) {
-  if (typeof e != `object` || !e || !(`id` in e)) return null;
-  let t = e.id;
-  return typeof t == `string` || typeof t == `number` ? t : null;
-}
 var nu = 4096,
   Xse = 6048e5,
   ru = n
@@ -12008,92 +11864,6 @@ function Bce(e) {
     },
     clearAfterAbort: () => (t ? ((t = !1), e(null), !0) : !1),
   };
-}
-var Nu = r.i(`node-repl-host-services-native-pipe`),
-  Pu = 8388608,
-  Vce = n.wf({
-    id: n.jf([n.Cf(), n.Of()]),
-    jsonrpc: n.bf(`2.0`),
-    method: n.bf(`ensureService`),
-    params: n.wf({ service: n.Of().trim().min(1).max(128) }),
-  });
-async function Hce({ services: e, pipePath: t = mie(), socketPeerAuthorizer: n = Ql() }) {
-  let r = await ql({
-    maxIncomingFrameBytes: Pu,
-    maxOutgoingFrameBytes: Pu,
-    pipePath: t,
-    socketPeerAuthorizer: n,
-    events: {
-      onListening: (e) => {
-        ((0, v.chmodSync)(e, 384),
-          Nu().info(`node_repl_host_services_listening`, { safe: {}, sensitive: { pipePath: e } }));
-      },
-      onAuthorizationError: (e) => {
-        Nu().warning(`node_repl_host_services_peer_authorization_failed`, {
-          safe: {},
-          sensitive: { error: e },
-        });
-      },
-      onRejectedSocket: (e) => {
-        Nu().warning(`node_repl_host_services_peer_rejected`, {
-          safe: { reason: e.reason ?? `unauthorized` },
-          sensitive: {},
-        });
-      },
-      onSocketError: (e) => {
-        Nu().warning(`node_repl_host_services_socket_error`, { safe: {}, sensitive: { error: e } });
-      },
-    },
-  });
-  return (
-    r.setMessageCallback((t) => {
-      Uce(t, e, (e) => {
-        r.sendMessage(e);
-      });
-    }),
-    { pipePath: r.pipePath, dispose: () => r.close() }
-  );
-}
-async function Uce(e, t, n) {
-  let r = Vce.safeParse(e);
-  if (!r.success) {
-    let t = Wce(e);
-    t != null &&
-      n({
-        error: { code: -32602, message: `Invalid host service request` },
-        id: t,
-        jsonrpc: `2.0`,
-      });
-    return;
-  }
-  let i = t.get(r.data.params.service);
-  if (i == null) {
-    n({
-      error: { code: -32602, message: `Unsupported host service: ${r.data.params.service}` },
-      id: r.data.id,
-      jsonrpc: `2.0`,
-    });
-    return;
-  }
-  try {
-    let e = await i();
-    n({ id: r.data.id, jsonrpc: `2.0`, result: e ?? {} });
-  } catch (e) {
-    (Nu().warning(`node_repl_host_service_ensure_failed`, {
-      safe: { service: r.data.params.service },
-      sensitive: { error: e },
-    }),
-      n({
-        error: { code: -32e3, message: `Host service ensure failed` },
-        id: r.data.id,
-        jsonrpc: `2.0`,
-      }));
-  }
-}
-function Wce(e) {
-  if (typeof e != `object` || !e || !(`id` in e)) return null;
-  let t = e.id;
-  return typeof t == `string` || typeof t == `number` ? t : null;
 }
 var Fu = r.i(`react-devtools-extension`),
   Iu = `fmkadmapgofadopljbjfkapdkoienihi`;
@@ -75166,7 +74936,7 @@ var XYe = 200,
             (t.apiImpl = e),
             (t.server = await createBrowserUseNativePipeServer({
               apiImpl: e,
-              socketPeerAuthorizer: Ql(),
+              socketPeerAuthorizer: createSocketPeerAuthorizer(),
             })),
             aX().info(`browser_use_iab_backend_startup_ready`, {
               safe: { backend: `iab`, platform: process.platform, release: l.app.getVersion() },
@@ -109240,10 +109010,11 @@ async function Ust() {
       showPrimaryWindow: (e) => me && W.windowManager.showPrimaryWindow(e),
     });
   delete process.env[as];
-  let Oe = await Hse({
+  let Oe = await createDynamicAppToolsServer({
     callTool: (e, t) => je.getWindowContext().callDynamicAppTool(e, t),
     listTools: (e) =>
       je.getWindowContext().getMessageHandler().requestDynamicToolsForThreadStart(null, !0, e),
+    socketPeerAuthorizer: createSocketPeerAuthorizer(),
   }).catch(
     (e) => (
       r
@@ -109716,7 +109487,7 @@ async function Ust() {
     ) {
       delete process.env[Go];
       try {
-        let e = await Hce({
+        let e = await createHostServicesServer({
           services: new Map([
             [
               `computer-use`,
@@ -109726,6 +109497,7 @@ async function Ust() {
               },
             ],
           ]),
+          socketPeerAuthorizer: createSocketPeerAuthorizer(),
         });
         ((process.env[Go] = e.pipePath),
           I.add(() => {
